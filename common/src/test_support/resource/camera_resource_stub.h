@@ -16,17 +16,22 @@ public:
     virtual QString getDriverName() const override;
     virtual Qn::ResourceStatus getStatus() const override;
 
-    virtual Qn::LicenseType licenseType() const override;
-
     virtual bool hasDualStreaming() const override;
     void setHasDualStreaming(bool value);
 
+    void markCameraAsNvr();
+    void markCameraAsVMax();
+
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
+
+    virtual Qn::LicenseType calculateLicenseType() const override;
 
 private:
     Qn::LicenseType m_licenseType;
     boost::optional<bool> m_hasDualStreaming;
 };
+
+using CameraResourceStubPtr = QnSharedResourcePointer<CameraResourceStub>;
 
 } // namespace nx

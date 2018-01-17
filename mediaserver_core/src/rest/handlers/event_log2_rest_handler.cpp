@@ -24,7 +24,7 @@ int QnEventLog2RestHandler::executeGet(
     nx::vms::event::ActionDataList outputData;
     if (request.isValid(&errStr))
     {
-        outputData = qnServerDb->getActions(request);
+        outputData = qnServerDb->getActions(request.filter);
     }
     else
     {
@@ -34,5 +34,5 @@ int QnEventLog2RestHandler::executeGet(
     QnFusionRestHandlerDetail::serializeRestReply(
         outputData, params, contentBody, contentType, restResult);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

@@ -6,13 +6,14 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/storage_resource.h>
 #include <core/resource/device_dependent_strings.h>
-
 #include <core/resource_management/user_roles_manager.h>
+#include <common/common_module.h>
 
+#include <nx/network/address_resolver.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
-#include <common/common_module.h>
 
 namespace {
 
@@ -23,16 +24,21 @@ QString extractHost(const QString& url)
     int startPos = url.indexOf(lit("://"));
     startPos = startPos == -1 ? 0 : startPos + 3;
 
-    int endPos = url.indexOf(L':', startPos);
-    if (endPos == -1)
-        endPos = url.indexOf(L'/', startPos); /* No port, but we may still get '/' after address. */
+    static const std::array<QChar, 4> kStopChars = { L':', L'/', L'?', L'#' };
+    int endPos = -1;
+    for (const auto& stopChar: kStopChars)
+    {
+        endPos = url.indexOf(stopChar, startPos);
+        if (endPos != -1)
+            break;
+    }
 
     endPos = endPos == -1 ? url.size() : endPos;
 
     return url.mid(startPos, endPos - startPos);
 }
 
-bool hostIsValid(const SocketAddress& address)
+bool hostIsValid(const nx::network::SocketAddress& address)
 {
     QString host = address.address.toString();
 
@@ -46,7 +52,7 @@ bool hostIsValid(const SocketAddress& address)
     return true;
 };
 
-SocketAddress getServerUrl(const QnMediaServerResourcePtr& server)
+nx::network::SocketAddress getServerUrl(const QnMediaServerResourcePtr& server)
 {
     /* We should not display localhost or cloud addresses to user. */
     NX_ASSERT(server);
@@ -152,6 +158,9 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
             if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>())
                 m_name = camera->getUserDefinedName();
         }
+
+        if (QnStorageResourcePtr storage = m_resource.dynamicCast<QnStorageResource>())
+            m_name = storage->getUrl();
     }
 
     if (detailLevel == Qn::RI_NameOnly)

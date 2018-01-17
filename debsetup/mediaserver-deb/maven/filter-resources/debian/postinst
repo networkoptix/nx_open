@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-COMPANY_NAME=${deb.customization.company.name}
+COMPANY_NAME=@deb.customization.company.name@
 
 . /usr/share/debconf/confmodule
 
@@ -39,6 +39,7 @@ TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
 CAMERA_SETTINGS_OPTIMIZATION_DEFAULT=true
 STATISTICS_REPORT_ALLOWED_DEFAULT=true
+SYSTEM_USER=$COMPANY_NAME
 
 function is_local_addr {
     local hostname=$1;
@@ -158,8 +159,8 @@ function display_complete_setup_hint {
 
     if check_new_system $port
     then
-        db_fset ${deb.customization.company.name}-mediaserver/complete-setup-hint seen false
-        db_input critical ${deb.customization.company.name}-mediaserver/complete-setup-hint || true
+        db_fset @deb.customization.company.name@-mediaserver/complete-setup-hint seen false
+        db_input critical @deb.customization.company.name@-mediaserver/complete-setup-hint || true
         db_go
     fi
 }
@@ -240,16 +241,28 @@ case "$1" in
             mv $EC_DIR/var/hostedfiles $BASE_DIR/var/vms_storedfiles
         fi
 
-        if [ '${arch}' != 'arm' ]; then "$CERTGEN" -i; fi
+        if [ '@arch@' != 'arm' ]; then "$CERTGEN" -i; fi
 
         if [ -f "$OLD_DB_PATH" -a ! -f "$DB_PATH" ]; then
             [ -d $BASE_DIR/var ] || mkdir $BASE_DIR/var
             cp "$OLD_DB_PATH" "$DB_PATH"
         fi
 
-        if [ '${arch}' != 'arm' ]
+        if [ '@arch@' != 'arm' ]
         then
             [ -n "$UPGRADING" ] && $DBSYNC
+        fi
+
+        if [ ! -z "$SYSTEM_USER" ]; then
+            $CFG_HELPER systemUser "$SYSTEM_USER"
+            useradd "$SYSTEM_USER" || true
+
+            # Allow core dumps creation.
+            chown "$SYSTEM_USER:$SYSTEM_USER" "$BIN_DIR"
+
+            # Helper tool to get root permissions.
+            chown "root:$SYSTEM_USER" "$BIN_DIR/root_tool"
+            chmod 4750 "$BIN_DIR/root_tool"
         fi
   ;;
 

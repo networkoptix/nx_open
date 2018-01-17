@@ -83,7 +83,7 @@ int QnImageRestHandler::executeGet(
     auto heightIt = params.find("height");
     // Width cannot be specified without height, but height-only is acceptable.
     if (widthIt != params.end() && (heightIt == params.end() || heightIt->second.toInt() < 1))
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
 
     for (int i = 0; i < params.size(); ++i)
     {
@@ -151,10 +151,18 @@ int QnImageRestHandler::executeGet(
         return CODE_INVALID_PARAMETER;
     }
 
+    auto requiredPermission =
+        (time == 0 || time == (qint64) AV_NOPTS_VALUE)
+            ? Qn::Permission::ViewLivePermission
+            : Qn::Permission::ViewFootagePermission;
+
     if (!owner->commonModule()->resourceAccessManager()->hasPermission(
-        owner->accessRights(), camera, Qn::Permission::ReadPermission))
+        owner->accessRights(), camera, requiredPermission))
     {
-        return nx_http::StatusCode::forbidden;
+        result.append("<root>\n");
+        result.append(lit("Access denied: Insufficent access rights"));
+        result.append("</root>\n");
+        return nx::network::http::StatusCode::forbidden;
     }
 
     CLVideoDecoderOutputPtr outFrame =

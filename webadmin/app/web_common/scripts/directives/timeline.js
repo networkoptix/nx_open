@@ -9,7 +9,6 @@ angular.module('nxCommon')
                 recordsProvider: '=',
                 positionProvider: '=',
                 playHandler: '=',
-                liveOnly: '=',
                 canPlayLive: '=',
                 ngClick: '&',
                 positionHandler: '=',
@@ -64,25 +63,23 @@ angular.module('nxCommon')
                 scope.toggleActive = function(){
                     scope.activeVolume = !scope.activeVolume;
                 };
+                var pixelAspectRatio = function(){
+                    if(window.devicePixelRatio > 1)
+                    {
+                        return window.devicePixelRatio;
+                    }
 
-                var hasHighDpi = function(){
                     var mediaQuery = "(-webkit-min-device-pixel-ratio: 1.5),\
                                       (min--moz-device-pixel-ratio: 1.5),\
                                       (-o-min-device-pixel-ratio: 3/2),\
                                       (min-resolution: 1.5dppx)";
-                    if(window.devicePixelRatio > 1)
-                    {
-                        return true;
-                    }
-
                     if( window.matchMedia && window.matchMedia(mediaQuery).matches){
-                        return true;
+                        return 2;
                     }
-                    return false;
+                    return 1;
                 }();
 
-
-                var timelineConfig = TimelineConfig();
+                var timelineConfig = TimelineConfig;
 
                 scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,
                     timelineConfig.maxMsPerPixel,
@@ -93,12 +90,16 @@ angular.module('nxCommon')
                     timelineConfig.lastMinuteDuration,
                     timelineConfig.minPixelsPerLevel,
                     timelineConfig.minScrollBarWidth,
+                    pixelAspectRatio,
                     $q); //Init boundariesProvider
 
                 var animationState = {
                     targetLevels : scope.scaleManager.levels,
                     currentLevels: {events:{index:0},labels:{index:0},middle:{index:0},small:{index:0},marks:{index:0}},
-                    zooming:1
+                    labels:1,
+                    middle:1,
+                    small:1,
+                    marks:1
                 };
 
                 var timelineRender = new TimelineCanvasRender(canvas,
@@ -110,7 +111,7 @@ angular.module('nxCommon')
                         debugEventsMode:debugEventsMode,
                         allowDebug:Config.allowDebugMode
                     },
-                    hasHighDpi);
+                    pixelAspectRatio);
 
                 var timelineActions = new TimelineActions(
                     timelineConfig,
@@ -122,14 +123,14 @@ angular.module('nxCommon')
 
                 // !!! Initialization functions
                 function updateTimelineHeight(){
-                    canvas.height = element.find('.viewport').height();
+                    canvas.height = element.find('.viewport').height() * pixelAspectRatio;
                 }
                 function updateTimelineWidth(){
                     scope.viewportWidth = element.find('.viewport').width();
-                    canvas.width  = scope.viewportWidth;
+                    canvas.width  = scope.viewportWidth * pixelAspectRatio;
                     scope.scaleManager.setViewportWidth(scope.viewportWidth);
                     $timeout(function(){
-                        scope.scaleManager.checkZoom();
+                        scope.scaleManager.checkZoom(scope.scaleManager.zoom());
                     });
                 }
                 function initTimeline(){
@@ -143,11 +144,15 @@ angular.module('nxCommon')
                 // !!! Render everything: updating function
                 function render(){
                     if(scope.recordsProvider) {
-                        scope.recordsProvider.updateLastMinute(timelineConfig.lastMinuteDuration, scope.scaleManager.levels.events.index);
+                        scope.recordsProvider.updateLastMinute(timelineConfig.lastMinuteDuration,
+                                                               scope.scaleManager.levels.events.index);
                     }
 
-                    timelineActions.updateState();
-                    timelineRender.Draw( mouseXOverTimeline, mouseYOverTimeline, timelineActions.scrollingNow, timelineActions.catchScrollBar);
+                    timelineActions.updateState(mouseXOverTimeline);
+                    timelineRender.Draw(mouseXOverTimeline,
+                                        mouseYOverTimeline,
+                                        timelineActions.scrollingNow,
+                                        timelineActions.catchScrollBar);
                 }
 
 
@@ -159,7 +164,7 @@ angular.module('nxCommon')
                  *
                  * Scrollbar:
                  *      + Click - Scroll to one screen
-                 *      + DblClick - Scroll to clicked point
+                 *      + DblClick - Scroll two screens
                  *      + Hold -  Constant Scrolling
                  *
                  * Scrollbar buttons (left/right):
@@ -170,7 +175,6 @@ angular.module('nxCommon')
                  * Other timeline parts:
                  *      Over - Show timemarker, no actions
                  *      + Click - Playing position
-                 *      + DblClick - Playing position and zoom in
                  *      + Drag - Scroll
                  *      + MouseWheel - right-left - Scroll
                  *      + MouseWheel - up-down - Zoom
@@ -182,20 +186,56 @@ angular.module('nxCommon')
                  */
 
                 function goToLive(force){
-                    timelineActions.goToLive();
+                    if(!scope.positionProvider.playing){
+                        scope.playHandler(true);
+                        $timeout(function(){
+                            goToLive(force);
+                        });
+                        return;
+                    }
                     if(!scope.positionProvider.liveMode || force) {
                         scope.positionHandler(false);
                     }
                 }
 
+                var pausedLive = false;
                 function playPause(){
+                    if(scope.positionProvider.playing){
+                        pausedLive = scope.positionProvider.liveMode;
+                        scope.playHandler(false);
+                    }else if(pausedLive){
+                        jumpToPosition(scope.positionProvider.playedPosition);
+                        scope.playHandler(true);
+                    }else{
+                        scope.playHandler(true);
+                    }
+
                     timelineActions.playPause();
-                    scope.playHandler(!scope.positionProvider.playing);
+                }
+
+                function moveTimeToVisiblePosition(position){
+                    var sM = scope.scaleManager;
+                    var date = sM.playedPosition;
+                    var relativePositionOfDate = date - sM.start - (sM.visibleEnd - sM.visibleStart) * position;
+                    var relativeSizeOfTimeLine = sM.end - sM.start - (sM.visibleEnd - sM.visibleStart);
+                    timelineActions.animateScroll(relativePositionOfDate/relativeSizeOfTimeLine, false);
                 }
 
                 function timelineClick(mouseX){
-                    var date = timelineActions.setAnchorCoordinate(mouseX);
+                    var date = timelineActions.setClickedCoordinate(mouseX);
+                    var bufferZone = timelineConfig.edgeBufferZone * pixelAspectRatio;
+                    jumpToPosition(date);
+                    mouseX *= pixelAspectRatio;
 
+                    if (scope.scaleManager.zoom() < scope.scaleManager.fullZoomOutValue()
+                            && (mouseX < bufferZone || mouseX > canvas.width - bufferZone)){
+                        var left = (bufferZone + timelineConfig.markerWidth)/canvas.width;
+                        var right = (canvas.width - (bufferZone + timelineConfig.markerWidth))/canvas.width;
+                        moveTimeToVisiblePosition(mouseX < bufferZone ? left: right);
+                    }
+                }
+
+                function jumpToPosition(date){
                     var lastMinute = scope.scaleManager.lastMinute();
                     if(date > lastMinute){
                         goToLive ();
@@ -211,8 +251,12 @@ angular.module('nxCommon')
                  */
 
                 // High-level Handlers
-                function scrollbarClickOrHold(left){
-                    timelineActions.scrollingStart(left, timelineConfig.scrollSpeed * scope.viewportWidth);
+                function scrollbarClickOrHold(){
+                    timelineActions.scrollingToCursorStart().then(function(result){
+                        if(result){
+                            scrollbarSliderDragStart();
+                        }
+                    });
                 }
 
                 function scrollButtonClickOrHold(left){
@@ -220,9 +264,6 @@ angular.module('nxCommon')
                 }
                 function scrollButtonDblClick(left){
                     timelineActions.animateScroll(left ? 0 : 1);
-                    if(!left){
-                        goToLive();
-                    }
                 }
 
 
@@ -242,6 +283,10 @@ angular.module('nxCommon')
                         mouseOverElements = null;
                         return;
                     }
+                    if(event.touches){
+                        event.pageX = event.touches[0].pageX;
+                        event.pageY = event.touches[0].pageY;
+                    }
 
                     if($(event.target).is('canvas') && event.offsetX){
                         mouseXOverTimeline = event.offsetX;
@@ -251,13 +296,16 @@ angular.module('nxCommon')
                     mouseYOverTimeline = event.offsetY || (event.pageY - $(canvas).offset().top);
 
                     mouseOverElements = timelineRender.checkElementsUnderCursor(mouseXOverTimeline,mouseYOverTimeline);
+                    scope.isPointer = mouseOverElements.leftButton || mouseOverElements.rightButton
+                                                                   || mouseOverElements.leftMarker
+                                                                   || mouseOverElements.rightMarker;
 
                 }
 
                 function viewportMouseWheel(event){
                     updateMouseCoordinate(event);
                     event.preventDefault();
-                    var vertical = Math.abs(event.deltaY) > Math.abs(event.deltaX);
+                    var vertical = Math.abs(event.deltaY) >= Math.abs(event.deltaX);
 
                     if(vertical) { // Zoom or scroll - not both
                         timelineActions.zoomByWheel(event.deltaY, mouseOverElements, mouseXOverTimeline);
@@ -268,51 +316,59 @@ angular.module('nxCommon')
                 }
 
 
-                function canvasDragInit(event){
-                    updateMouseCoordinate(event);
-                }
-
                 var dragged = false;
-                function canvasDragStart(event){
-                    updateMouseCoordinate(event);
-                    dragged = false;
-                    /*if(mouseOverElements.leftButton){
-                     scope.startScroll(true);
-                     return;
-                     }
-
-                     if(mouseOverElements.rightButton){
-                     scope.startScroll(false);
-                     return;
-                     }*/
-
-                    if(mouseOverElements.scrollbarSlider){
-                        timelineActions.scrollbarSliderDragStart(mouseXOverTimeline);
-                    }
-                    if(mouseOverElements.timeline){
-                        timelineActions.timelineDragStart(mouseXOverTimeline)
-                    }
-                }
-                function canvasDrag(event){
-                    updateMouseCoordinate(event);
-                    dragged = timelineActions.scrollbarSliderDrag(mouseXOverTimeline) ||
-                              timelineActions.timelineDrag (mouseXOverTimeline) || dragged;
-                              // dragged is true if it was actually dragged at least once during interaction
-                }
-
+                var dragStarted = 0;
+                var impetusInit = null;
                 var preventClick = false;
-                function canvasDragEnd(){
-                    updateMouseCoordinate(null);
-                    timelineActions.scrollbarSliderDragEnd();
-                    timelineActions.timelineDragEnd();
+                // Impetus is inertia drag library
 
-                    if(dragged){
-                        preventClick = true;
-                        setTimeout(function(){
-                            preventClick = false;
-                        }, timelineConfig.animationDuration);
-                    }
+                function scrollbarSliderDragStart(){ // Activate Impetus forcibly
+                    impetusInit = null;
+                    dragStarted = mouseXOverTimeline;
+                    dragged = false;
+                    timelineActions.scrollbarSliderDragStart(mouseXOverTimeline);
                 }
+                new Impetus({
+                    source: $canvas.get(0),
+                    friction: timelineConfig.intertiaFriction,
+                    start:function(x, y, event){
+                        viewportMouseDown(event);
+
+                        updateMouseCoordinate(event);
+                        dragStarted = mouseXOverTimeline;
+                        impetusInit = x;
+
+                        dragged = false;
+                        if(mouseOverElements.scrollbarSlider){
+                            timelineActions.scrollbarSliderDragStart(mouseXOverTimeline);
+                        }
+                        if(mouseOverElements.timeline){
+                            timelineActions.timelineDragStart(mouseXOverTimeline);
+                        }
+                    },
+                    update: function(x, y) {
+                        if(impetusInit === null){
+                            impetusInit = x;
+                        }
+                        var virtualMouseX = dragStarted + x - impetusInit;
+                        dragged = timelineActions.scrollbarSliderDrag(virtualMouseX) ||
+                                  timelineActions.timelineDrag (virtualMouseX) || dragged;
+                    },
+
+                    release:function(x,y){
+                        if(dragged){
+                            preventClick = true;
+                            setTimeout(function(){
+                                preventClick = false;
+                            }, timelineConfig.animationDuration);
+                        }
+                    },
+                    stop:function(x,y){
+                        updateMouseCoordinate(null);
+                        timelineActions.scrollbarSliderDragEnd();
+                        timelineActions.timelineDragEnd();
+                    }
+                });
 
 
                 function viewportDblClick(event){
@@ -327,7 +383,18 @@ angular.module('nxCommon')
                         scrollButtonDblClick(false);
                         return;
                     }
+
+                    if(mouseOverElements.scrollbarSlider){
+                        timelineActions.fullZoomOut();
+                        return;
+                    }
+                    if(mouseOverElements.scrollbar){
+                        timelineActions.animateScroll(scope.scaleManager.getScrollTarget(mouseXOverTimeline));
+                        return;
+                    }
                 }
+
+                var onReleaseCenter = false;
                 function viewportMouseDown(event){
                     updateMouseCoordinate(event);
 
@@ -342,10 +409,12 @@ angular.module('nxCommon')
                     }
 
                     if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
-                        //checking if mouse is to the left or right of the scrollbar
-                        var scrollLeft = mouseXOverTimeline <= scope.scaleManager.scrollSlider().start;
-                        scrollbarClickOrHold(scrollLeft);
+                        scrollbarClickOrHold();
+                        return;
                     }
+
+                    //scrolls timeline to current time
+                    onReleaseCenter = mouseOverElements.leftMarker || mouseOverElements.rightMarker;
                 }
                 function viewportClick(event){
                     updateMouseCoordinate(event);
@@ -360,7 +429,13 @@ angular.module('nxCommon')
 
                 function viewportMouseUp(){
                     updateMouseCoordinate(null);
-                    timelineActions.scrollingStop(false);
+                    timelineActions.scrollingStop();
+                    timelineActions.scrollingToCursorStop();
+
+                    if(onReleaseCenter){
+                        onReleaseCenter = false;
+                        moveTimeToVisiblePosition(0.5);
+                    }
                 }
                 function viewportMouseMove(event){
                     updateMouseCoordinate(event);
@@ -414,16 +489,11 @@ angular.module('nxCommon')
                 viewport.click(viewportClick);
                 viewport.mousewheel(viewportMouseWheel);
 
+                //For touch screens
+                viewport.on('touchstart', viewportMouseDown);
+                viewport.on('touchmove', viewportMouseMove);
+                viewport.on('touchstop', viewportMouseLeave);
 
-                $canvas.drag('draginit',viewportMouseDown); // draginit overrides mousedown
-                $canvas.drag('dragstart',canvasDragStart);
-                $canvas.drag('drag',canvasDrag);
-                $canvas.drag('dragend',canvasDragEnd);
-
-                $canvas.bind('touchstart', canvasDragStart);
-                $canvas.bind('touchmove', canvasDrag);
-                $canvas.bind('touchend', canvasDragEnd);
-                //$canvas.bind('touchcancel', canvasDragEnd);
                 // Actual browser events handling
 
                 /*
@@ -448,15 +518,22 @@ angular.module('nxCommon')
                 if(scope.positionProvider) {
                     scope.playingTime = dateFormat(scope.positionProvider.playedPosition,timelineConfig.dateFormat + ' ' + timelineConfig.timeFormat);
                 }
+                function initRecordsProvider(){
+                    scope.recordsProvider.init().then(function(hasArchive){
+                        scope.emptyArchive = !hasArchive;
+                        scope.loading = false;
+                        if(hasArchive){
+                            initTimeline(); // There is archive - init timeline
+                        }else{ // No archive - wait and repeat attempt
+                            $timeout(initRecordsProvider, Config.webclient.updateArchiveStateTimeout);
+                        }
+                    });
+                }
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
+                    scope.emptyArchive = true;
                     if(scope.recordsProvider) {
                         scope.loading = true;
-                        scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
-                        scope.recordsProvider.archiveReadyPromise.then(function(hasArchive){
-                            scope.emptyArchive = !hasArchive;
-                            scope.loading = false;
-                        });
-
+                        initRecordsProvider();
                         timelineRender.setRecordsProvider(scope.recordsProvider);
                     }
                 });
@@ -470,7 +547,6 @@ angular.module('nxCommon')
                     the timeline's width should not change after that.
                 */
                 $timeout(updateTimelineWidth); // Adjust width.
-                initTimeline(); // Setup boundaries and scale
 
                 // !!! Start drawing
                 animateScope.setDuration(timelineConfig.animationDuration);

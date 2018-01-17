@@ -7,10 +7,9 @@
 #include <boost/multi_index/ordered_index.hpp>
 
 #include <nx/utils/counter.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/stree/resourcecontainer.h>
-
 #include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/utils/stree/resourcecontainer.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "managers_types.h"
 #include "../access_control/abstract_authentication_data_provider.h"
@@ -19,12 +18,6 @@
 
 namespace nx {
 namespace cdb {
-
-namespace conf {
-
-class Settings;
-
-} // namespace
 
 class TemporaryAccountCredentialsEx:
     public data::TemporaryAccountCredentials
@@ -86,7 +79,7 @@ public:
     virtual nx::utils::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
         nx::utils::db::QueryContext* const queryContext,
         std::string accountEmail) = 0;
-    
+
     virtual void removeTemporaryPasswordsFromCacheByAccountEmail(
         std::string accountEmail) = 0;
 
@@ -101,12 +94,11 @@ class TemporaryAccountPasswordManager:
 {
 public:
     TemporaryAccountPasswordManager(
-        const conf::Settings& settings,
         nx::utils::db::AsyncSqlQueryExecutor* const dbManager) noexcept(false);
     virtual ~TemporaryAccountPasswordManager();
 
     virtual void authenticateByName(
-        const nx_http::StringType& username,
+        const nx::network::http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         const nx::utils::stree::AbstractResourceReader& authSearchInputData,
         nx::utils::stree::ResourceContainer* const authProperties,
@@ -166,7 +158,6 @@ private:
     constexpr static const int kIndexByLogin = 1;
     constexpr static const int kIndexByAccountEmail = 2;
 
-    const conf::Settings& m_settings;
     nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
     nx::utils::Counter m_startedAsyncCallsCounter;
     TemporaryCredentialsDictionary m_temporaryCredentials;
@@ -188,7 +179,7 @@ private:
     nx::utils::db::DBResult deleteTempPassword(
         nx::utils::db::QueryContext* const queryContext,
         std::string tempPasswordID);
-   
+
     boost::optional<const TemporaryAccountCredentialsEx&> findMatchingCredentials(
         const QnMutexLockerBase& lk,
         const std::string& username,

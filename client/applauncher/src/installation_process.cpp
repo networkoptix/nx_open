@@ -60,9 +60,9 @@ bool InstallationProcess::start( const QString& mirrorListUrl )
 {
     if( !m_httpClient )
     {
-        m_httpClient = nx_http::AsyncHttpClient::create();
+        m_httpClient = nx::network::http::AsyncHttpClient::create();
         connect(
-            m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+            m_httpClient.get(), &nx::network::http::AsyncHttpClient::done,
             this, &InstallationProcess::onHttpDone,
             Qt::DirectConnection );
     }
@@ -70,7 +70,7 @@ bool InstallationProcess::start( const QString& mirrorListUrl )
     m_fileSizeByEntry.clear();
     m_state = State::downloadMirrorList;
     m_status = applauncher::api::InstallationStatus::inProgress;
-    m_httpClient->doGet(QUrl(mirrorListUrl));
+    m_httpClient->doGet(nx::utils::Url(mirrorListUrl));
     return true;
 }
 
@@ -201,7 +201,7 @@ bool InstallationProcess::writeInstallationSummary()
     return true;
 }
 
-void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
+void InstallationProcess::onHttpDone( nx::network::http::AsyncHttpClientPtr httpClient )
 {
     NX_ASSERT( m_httpClient == httpClient );
 
@@ -216,7 +216,7 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
     };
     std::unique_ptr<InstallationProcess, decltype(scopedExitFunc)> removeHttpClientGuard( this, scopedExitFunc );
 
-    if( (m_httpClient->state() != nx_http::AsyncClient::State::sDone) ||
+    if( (m_httpClient->state() != nx::network::http::AsyncClient::State::sDone) ||
         !m_httpClient->response() )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
@@ -226,18 +226,18 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
         return;
     }
 
-    if( m_httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
+    if( m_httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
         m_errorText = QString::fromLatin1("Failed to download %1. %2").arg(m_httpClient->url().toString()).
-            arg(QLatin1String(nx_http::StatusCode::toString(m_httpClient->response()->statusLine.statusCode)));
+            arg(QLatin1String(nx::network::http::StatusCode::toString(m_httpClient->response()->statusLine.statusCode)));
         m_state = State::finished;
         m_status = applauncher::api::InstallationStatus::failed;
         return;
     }
 
     //reading message body and parsing mirror list
-    nx_http::BufferType msgBody = m_httpClient->fetchMessageBodyBuffer();
+    nx::network::http::BufferType msgBody = m_httpClient->fetchMessageBodyBuffer();
 
     nx::utils::stree::SaxHandler xmlHandler( m_rns );
 
@@ -293,12 +293,12 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
     NX_LOG( QString::fromLatin1("Searching mirrors.xml with following input data: %1").arg(inputData.toString(m_rns)), cl_logDEBUG2 );
     m_currentTree->get( inputData, &result );
 
-    std::forward_list<QUrl> mirrorList;
+    std::forward_list<nx::utils::Url> mirrorList;
     {
         QString urlStr;
         for (auto it = result.begin(); !it->atEnd(); it->next())
             if (it->resID() == ProductParameters::mirrorUrl)
-                mirrorList.push_front(QUrl(it->value().toString()));
+                mirrorList.push_front(nx::utils::Url(it->value().toString()));
     }
 
     if( mirrorList.empty() )

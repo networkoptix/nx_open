@@ -6,7 +6,7 @@
 
 #include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 
 #include "isd_resource.h"
 
@@ -38,7 +38,7 @@ QString QnISDStreamReader::serializeStreamParams(
     QTextStream t(&result);
 
     static const int kMinBitrate = 256; //< kbps
-    const int desiredBitrateKbps = std::max(kMinBitrate, res->suggestBitrateKbps(params.quality, resolution, params.fps));
+    const int desiredBitrateKbps = std::max(kMinBitrate, res->suggestBitrateKbps(resolution, params, getRole()));
 
     t << "VideoInput.1.h264." << profileIndex << ".Resolution=" << resolution.width()
       << "x" << resolution.height() << "\r\n";
@@ -60,7 +60,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
     QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
     CLHttpStatus status;
 
-    int port = QUrl(res->getUrl()).port(nx_http::DEFAULT_HTTP_PORT);
+    int port = QUrl(res->getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT);
     CLSimpleHTTPClient http (res->getHostAddress(), port, ISD_HTTP_REQUEST_TIMEOUT_MS, res->getAuth());
 
     QSize resolution;
@@ -162,8 +162,8 @@ QnAbstractMediaDataPtr QnISDStreamReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+        return getMetadata();
 
     QnAbstractMediaDataPtr rez;
     int errorCount = 0;

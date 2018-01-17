@@ -1,74 +1,59 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer Tools</h2>
+        <h2>เครื่องมือสำหรับนักพัฒนา</h2>
         <p>
-            Are you happy developing intergrations? Let us know.
+            มีแนวคิดในการปรับปรุงเครื่องมือสำหรับนักพัฒนาซอฟต์แวร์ของเราหรือเพียงต้องการเริ่มต้นการสนทนา
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">ส่งข้อเสนอแนะทางอีเมล</a></p>
     </div>
 
     <div>
-        <h3>Generic Events Generator</h3>
+        <h3>กิจกรรมทั่วไป</h3>
         <p>
-            Generic Events is a special kind of events for 3rd party systems to trigger actions in the VMS.
-            To create Generic Event integrated system needs to make HTTP request to the Server (using Server API).
-            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+            เหตุการณ์ทั่วไปคือวิธีการส่งกิจกรรมจากระบบของบุคคลที่สามไปยังระบบซึ่งสามารถใช้เพื่อเรียกใช้การทำงานของระบบในเครื่องมือเหตุการณ์และกฎ
+            Generator Event Generator เป็นเครื่องมือที่ช่วยสร้าง HTTP Generic Event calls
         </p>
-        <p><a href="#/developers/events">Generic Events Generator</a></p>
+        <p><a href="#/developers/events">กิจกรรมทั่วไป</a></p>
     </div>
     <div>
         <h3>เซิร์ฟเวอร์ API</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
-            access almost every system feature available in the regular client: query/manage system resources (servers,
-            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
-            control PTZ cameras, and more.
+            API ของเซิร์ฟเวอร์มีชุด API API มาตรฐานสำหรับระบบอื่นๆ ช่วยให้นักพัฒนาสามารถเข้าถึงคุณลักษณะของระบบได้เกือบทุกอย่างที่มีอยู่ในไคลเอ็นต์ปกติ: ค้นหา / จัดการทรัพยากรระบบ (เซิร์ฟเวอร์กล้องผู้ใช้สิทธิ์) ดึงวิดีโอสดหรือบันทึกจากระบบสร้างเหตุการณ์สร้างกฎควบคุมกล้อง PTZ, และอื่น ๆ.
         </p>
         <p>
-            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
-            - interactive documentation with tools for testing API calls<br>
-            <a href="#/developers/changelog">API changelog</a>
-            - list of breaking changes in API<br>
-            <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
+            <a href="#/developers/api"><b> เครื่องมือทดสอบ API (ใหม่) </b></a> - เอกสารแบบโต้ตอบกับเครื่องมือสำหรับการทดสอบ API การโทร <br> <a href="#/developers/changelog"> การเปลี่ยนแปลง API </a> - รายการการเปลี่ยนแปลงใน API <br> <a id="api-doc" href="api.xml" target="_blank"> ในเอกสาร API </a>
         </p>
 
     </div>
     <div>
-        <h3>Camera Details Panel</h3>
+        <h3>รายละเอียดกล้อง</h3>
         <p>
-            Special panel for a webclient which displays additional information for cameras:
+            แสดงข้อมูลผู้พัฒนามิตรเพิ่มเติมสำหรับกล้องในอินเทอร์เฟซเว็บ Admin:
         </p>
         <ul>
-            <li>Camera ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
+            <li>รหัสกล้อง</li>
+            <li>ลิงค์สำหรับวิดีโอสตรีมทั้งหมด</li>
+            <li>ส่งออกวิดีโอโดยตรงจากเบราเซอร์</li>
         </ul>
         <p>
-            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
-            settings icon (gear), then choose "Camera Details"
+            การเปิดแผงปุ่มรายละเอียดกล้อง - ไปยังอินเทอร์เฟซสำหรับผู้ดูแลระบบเว็บ เลือก<a href="#/view">มุมมอง</a> เลือกกล้องเป้าหมาย คลิกที่ไอคอนการตั้งค่า (รูปเฟือง), จาก นั้นเลือกกล้องรายละเอียด"
         </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+        <p><a href="#/view/?cameraLinks">รายละเอียดกล้อง</a></p>
     </div>
     <div>
-        <h3>Video Source Integration SDK</h3>
+        <h3>SDK การรวมแหล่งที่มาของวิดีโอ</h3>
         <p>
-            Video Source Integration SDK provides the ability to integrate virtually any live or recorded video source
-            (IP Cameras, NVRs, DVRs, etc) into System. SDK makes possible to create methods for discovering,
-            displaying, analyzing and recording video. It also allows integrating device I/O ports and motion detection
-            information.
+            ซอร์สโค้ด SDK ของวิดีโอ นำเสนอความสามารถในการรวมแหล่งวิดีโอสดหรือที่บันทึกไว้ (กล้อง IP, NVRs, DVRs ฯลฯ) เข้ากับระบบ SDK ช่วยในการสร้างวิธีการในการค้นหาแสดงการวิเคราะห์และบันทึกวิดีโอ นอกจากนี้ยังช่วยให้สามารถรวมพอร์ต I / O อุปกรณ์และข้อมูลการตรวจจับการเคลื่อนไหว
         </p>
-        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >get SDK</a></p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >รับ SDK</a></p>
     </div>
 
     <div>
-        <h3>Storage SDK</h3>
+        <h3>SDK ที่เก็บข้อมูล</h3>
         <p>
-            Storage SDK provides the ability to integrate potential storage  into System. It allows developers to
-            read from or write to any storage location: local, remote, and even cloud one. Creating a storage
-            plugin requires implementing standard functions such as: I/O stream, if file exist, delete file, list of
-            files in the folder, etc.Storage SDK also contains an example for using an FTP server as a storage location.
+            Storage SDK ช่วยให้สามารถรวมระบบจัดเก็บข้อมูลที่มีศักยภาพลงในระบบได้ ช่วยให้นักพัฒนาสามารถอ่านหรือเขียนข้อมูลไปยังที่เก็บสินค้าได้ทั้งแบบท้องถิ่น, ระยะไกลและแบบคลาวด์ การสร้างปลั๊กอินที่เก็บข้อมูลจำเป็นต้องใช้ฟังก์ชันมาตรฐานเช่นสตรีม I / O หากไฟล์มีอยู่ลบไฟล์รายการไฟล์ในโฟลเดอร์เป็นต้น SDK Storage ยังมีตัวอย่างสำหรับการใช้เซิร์ฟเวอร์ FTP เป็นที่เก็บข้อมูล
         </p>
-        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >get SDK</a></p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >รับ SDK</a></p>
     </div>
 </div>

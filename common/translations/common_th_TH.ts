@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
+      <translation>ข้อผิดพลาดที่ไม่รู้จัก.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>ระบบใหม่</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>ระบบค้นพบ %1 ไม่สามารถทำงานร่วมกับระบบปัจจุบันได้</translation>
     </message>
   </context>
   <context>
@@ -255,18 +255,6 @@
       <translation>ทำให้พอร์ต %1 สามารถเข้าถึงได้ (ตัวอย่างเช่น การส่งต่อ).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>หากไม่สามารถแก้ปัญหาได้ให้เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของอุปกรณ์</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>กล้องถูกเรียกคืนจากที่จัดเก็บ ลบกล้องและเพิ่มอีกครั้งเพื่อดูวิดีโอสด</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์ (ข้อผิดพลาด &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์ (ข้อผิดพลาด &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์ (ข้อผิดพลาด &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -370,7 +370,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>ไม่สามารถจัดการ สตรีมเอาร์พุต สำหรับการบันทึก.</translation>
+      <translation>ไม่สามารถจัดการส่งออกสตรีม สำหรับการบันทึก.</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
@@ -420,7 +420,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I / O โมดูล</translation>
+      <translation>I/O โมดูล</translation>
     </message>
     <message>
       <source>Start</source>
@@ -485,6 +485,14 @@
     <message>
       <source>Time Licenses</source>
       <translation>เวลาใบอนุญาต</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation>การเชื่อมต่อ</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>ใบอนุญาตของการเชื่อมต่อ</translation>
     </message>
   </context>
   <context>
@@ -647,7 +655,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>ไม่ระบุ</translation>
+      <translation>ม่รู้จัก</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -764,6 +772,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>ประเภทรีซอร์สไม่ถูกต้องสำหรับการส่งออกข้อมูล</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>ไม่มีข้อมูลที่ส่งออก</translation>
     </message>
   </context>
   <context>
@@ -1434,7 +1446,7 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>ผู้ใช้ %n</numerusform>
+        <numerusform>%n ผู้ใช้</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1474,6 +1486,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>รับทราบ</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>วิเคราะห์เหตุการณ์</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 ที่ %2</translation>
     </message>
   </context>
   <context>

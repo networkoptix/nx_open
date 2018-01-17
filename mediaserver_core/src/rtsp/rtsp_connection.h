@@ -64,8 +64,8 @@ struct RtspServerTrackInfo
     int clientRtcpPort;
     quint16 sequence;
     qint64 firstRtpTime;
-    AbstractDatagramSocket* mediaSocket;
-    AbstractDatagramSocket* rtcpSocket;
+    nx::network::AbstractDatagramSocket* mediaSocket;
+    nx::network::AbstractDatagramSocket* rtcpSocket;
     MediaType mediaType;
 
 private:
@@ -74,13 +74,12 @@ private:
     static QnMutex m_createSocketMutex;
 };
 
-enum Mode {Mode_Live, Mode_Archive, Mode_ThumbNails};
-
 typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
 typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
 
 class QnRtspConnectionProcessorPrivate;
 class QnRtspFfmpegEncoder;
+enum class PlaybackMode;
 
 class QnRtspConnectionProcessor : public QnTCPConnectionProcessor
 {
@@ -89,7 +88,7 @@ class QnRtspConnectionProcessor : public QnTCPConnectionProcessor
 public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
-    QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnRtspConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRtspConnectionProcessor();
     qint64 getRtspTime();
     void setRtspTime(qint64 time);
@@ -123,7 +122,7 @@ private:
     void initResponse(int code = 200, const QString& message = "OK");
     void generateSessionId();
     void sendResponse(int code, const QByteArray& contentType);
-    Mode getStreamingMode() const;
+    PlaybackMode getStreamingMode() const;
 
     int numOfVideoChannels();
     int composeDescribe();

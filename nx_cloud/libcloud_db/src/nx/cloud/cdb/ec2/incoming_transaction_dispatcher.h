@@ -1,12 +1,15 @@
 #pragma once
 
+#include <atomic>
+
 #include <nx/network/aio/timer.h>
+#include <nx/utils/db/async_sql_query_executor.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
-#include <common/common_globals.h>
 #include <transaction/transaction_transport_header.h>
 #include <transaction/transaction.h>
 
@@ -30,7 +33,7 @@ public:
         TransactionLog* const transactionLog);
     virtual ~IncomingTransactionDispatcher();
 
-    /** 
+    /**
      * @note Method is non-blocking, result is delivered by invoking completionHandler.
      */
     void dispatchTransaction(
@@ -51,13 +54,16 @@ public:
             TransactionCommandValue, TransactionDataType, AuxiliaryArgType
         >::OnTranProcessedFunc onTranProcessedFunc)
     {
+        auto context = std::make_unique<TransactionProcessorContext>();
+        context->processor = std::make_unique<TransactionProcessor<
+            TransactionCommandValue, TransactionDataType, AuxiliaryArgType>>(
+                m_transactionLog,
+                std::move(processTranFunc),
+                std::move(onTranProcessedFunc));
+
         m_transactionProcessors.emplace(
             (::ec2::ApiCommand::Value)TransactionCommandValue,
-            std::make_unique<TransactionProcessor<
-                TransactionCommandValue, TransactionDataType, AuxiliaryArgType>>(
-                    m_transactionLog,
-                    std::move(processTranFunc),
-                    std::move(onTranProcessedFunc)));
+            std::move(context));
     }
 
     /**
@@ -69,21 +75,58 @@ public:
             TransactionCommandValue, TransactionDataType
         >::ProcessorFunc processTranFunc)
     {
+        auto context = std::make_unique<TransactionProcessorContext>();
+        context->processor = std::make_unique<SpecialCommandProcessor<
+            TransactionCommandValue, TransactionDataType>>(
+                std::move(processTranFunc));
+
         m_transactionProcessors.emplace(
             (::ec2::ApiCommand::Value)TransactionCommandValue,
-            std::make_unique<SpecialCommandProcessor<
-                TransactionCommandValue, TransactionDataType>>(
-                    std::move(processTranFunc)));
+            std::move(context));
+    }
+
+    /**
+     * Waits for every running transaction of type transactionType processing to complete.
+     */
+    void removeHandler(::ec2::ApiCommand::Value transactionType)
+    {
+        std::unique_ptr<TransactionProcessorContext> processor;
+
+        {
+            QnMutexLocker lock(&m_mutex);
+
+            auto processorIter = m_transactionProcessors.find(transactionType);
+            if (processorIter == m_transactionProcessors.end())
+                return;
+            processorIter->second->markedForRemoval = true;
+
+            while (processorIter->second->usageCount.load() > 0)
+                processorIter->second->usageCountDecreased.wait(lock.mutex());
+
+            processor.swap(processorIter->second);
+            m_transactionProcessors.erase(processorIter);
+        }
     }
 
 private:
+    struct TransactionProcessorContext
+    {
+        std::unique_ptr<AbstractTransactionProcessor> processor;
+        bool markedForRemoval = false;
+        std::atomic<int> usageCount;
+        QnWaitCondition usageCountDecreased;
+
+        TransactionProcessorContext(): usageCount(0) {}
+    };
+
+    using TransactionProcessors =
+        std::map<::ec2::ApiCommand::Value, std::unique_ptr<TransactionProcessorContext>>;
+
     const QnUuid m_moduleGuid;
     TransactionLog* const m_transactionLog;
-    std::map<
-        ::ec2::ApiCommand::Value,
-        std::unique_ptr<AbstractTransactionProcessor>
-    > m_transactionProcessors;
+    TransactionProcessors m_transactionProcessors;
     nx::network::aio::Timer m_aioTimer;
+    mutable QnMutex m_mutex;
 
     void dispatchUbjsonTransaction(
         TransactionTransportHeader transportHeader,

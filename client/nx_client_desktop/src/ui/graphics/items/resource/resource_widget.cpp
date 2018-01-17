@@ -27,6 +27,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 
+#include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
 #include <nx/client/desktop/ui/graphics/items/overlays/selection_overlay_widget.h>
 #include <ui/common/cursor_cache.h>
@@ -60,6 +61,7 @@
 #include <nx/utils/string.h>
 
 using namespace nx::client::desktop::ui;
+using nx::client::core::Geometry;
 
 namespace {
 const qreal kButtonsSize = 24.0;
@@ -68,9 +70,9 @@ static const qreal kHudMargin = 4.0;
 
 /** Default timeout before the video is displayed as "loading", in milliseconds. */
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
-const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION;
+const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION_MS;
 #else
-const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION * 3;
+const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION_MS * 3;
 #endif
 
 /** Background color for overlay panels. */
@@ -144,7 +146,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
             const bool animate = display()->animationAllowed();
             updateStatusOverlay(animate);
         });
-    connect(m_resource, &QnResource::statusChanged, this, &QnResourceWidget::updateOverlayButton);
 
     /* Set up overlay widgets. */
     QFont font = this->font();
@@ -167,15 +168,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     /* Status overlay. */
     m_statusController = new QnStatusOverlayController(m_resource, m_statusOverlay, this);
 
-    connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
-        [this](bool animated)
-        {
-            const auto visibility = (m_statusController->statusOverlay() == Qn::EmptyOverlay)
-                ? Invisible
-                : Visible;
-            setOverlayWidgetVisibility(m_statusOverlay, visibility, animated);
-            updateOverlayButton();
-        });
+    setupOverlayButtonsHandlers();
 
     addOverlayWidget(m_statusOverlay, detail::OverlayParams(Invisible, true, false, StatusLayer));
 
@@ -217,6 +210,28 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 QnResourceWidget::~QnResourceWidget()
 {
     ensureAboutToBeDestroyedEmitted();
+}
+
+void QnResourceWidget::setupOverlayButtonsHandlers()
+{
+    const auto updateButtons =
+        [this]()
+        {
+            updateOverlayButton();
+            updateCustomOverlayButton();
+        };
+
+    connect(m_resource, &QnResource::statusChanged, this, updateButtons);
+    connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
+        [this, updateButtons](bool animated)
+        {
+            const auto visibility = (m_statusController->statusOverlay() == Qn::EmptyOverlay)
+                ? Invisible
+                : Visible;
+            setOverlayWidgetVisibility(m_statusOverlay, visibility, animated);
+            updateButtons();
+        });
+
 }
 
 // TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
@@ -377,7 +392,7 @@ float QnResourceWidget::visualChannelAspectRatio() const
     if (!channelLayout())
         return visualAspectRatio();
 
-    qreal layoutAspectRatio = QnGeometry::aspectRatio(channelLayout()->size());
+    qreal layoutAspectRatio = Geometry::aspectRatio(channelLayout()->size());
     if (QnAspectRatio::isRotated90(rotation()))
         return visualAspectRatio() * layoutAspectRatio;
     else
@@ -402,7 +417,7 @@ QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry, qrea
     {
         /* Calculate bounds of the rotated item. */
         qreal aspectRatio = hasAspectRatio() ? m_aspectRatio : defaultVisualAspectRatio();
-        return encloseRotatedGeometry(enclosingGeometry, aspectRatio, rotation);
+        return Geometry::encloseRotatedGeometry(enclosingGeometry, aspectRatio, rotation);
     }
     else
     {
@@ -525,7 +540,7 @@ QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint, Qt::WindowFram
             result.setHeight(constraint.width() / m_aspectRatio);
             break;
         default:
-            result = expanded(m_aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
+            result = Geometry::expanded(m_aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
             break;
     }
 
@@ -552,6 +567,17 @@ QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant 
 QnResourceWidget::SelectionState QnResourceWidget::selectionState() const
 {
     return m_selectionState;
+}
+
+QPixmap QnResourceWidget::placeholderPixmap() const
+{
+    return m_placeholderPixmap;
+}
+
+void QnResourceWidget::setPlaceholderPixmap(const QPixmap& pixmap)
+{
+    m_placeholderPixmap = pixmap;
+    emit placeholderPixmapChanged();
 }
 
 QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
@@ -587,7 +613,7 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
         return result;
 
     if (which == Qt::MinimumSize)
-        return expanded(m_aspectRatio, result, Qt::KeepAspectRatioByExpanding);
+        return Geometry::expanded(m_aspectRatio, result, Qt::KeepAspectRatioByExpanding);
 
     return result;
 }
@@ -595,14 +621,16 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
 QRectF QnResourceWidget::channelRect(int channel) const
 {
     /* Channel rect is handled at shader level if dewarping is enabled. */
-    QRectF rect = ((m_options & DisplayDewarped) || zoomRect().isNull()) ? this->rect() : unsubRect(this->rect(), zoomRect());
+    QRectF rect = ((m_options & DisplayDewarped) || zoomRect().isNull())
+        ? this->rect()
+        : Geometry::unsubRect(this->rect(), zoomRect());
 
     if (m_channelsLayout->channelCount() == 1)
         return rect;
 
-    QSizeF channelSize = cwiseDiv(rect.size(), m_channelsLayout->size());
+    QSizeF channelSize = Geometry::cwiseDiv(rect.size(), m_channelsLayout->size());
     return QRectF(
-        rect.topLeft() + cwiseMul(m_channelsLayout->position(channel), channelSize),
+        rect.topLeft() + Geometry::cwiseMul(m_channelsLayout->position(channel), channelSize),
         channelSize
     );
 }
@@ -635,7 +663,7 @@ QRectF QnResourceWidget::exposedRect(int channel, bool accountForViewport, bool 
 
     if (useRelativeCoordinates)
     {
-        return QnGeometry::toSubRect(channelRect, result);
+        return Geometry::toSubRect(channelRect, result);
     }
     else
     {
@@ -836,10 +864,21 @@ Qn::ResourceOverlayButton QnResourceWidget::calculateOverlayButton(
     return Qn::ResourceOverlayButton::Empty;
 }
 
+QString QnResourceWidget::overlayCustomButtonText(Qn::ResourceStatusOverlay /*statusOverlay*/) const
+{
+    return QString();
+}
+
 void QnResourceWidget::updateOverlayButton()
 {
     const auto statusOverlay = m_statusController->statusOverlay();
     m_statusController->setCurrentButton(calculateOverlayButton(statusOverlay));
+}
+
+void QnResourceWidget::updateCustomOverlayButton()
+{
+    const auto statusOverlay = m_statusController->statusOverlay();
+    m_statusController->setCustomButtonText(overlayCustomButtonText(statusOverlay));
 }
 
 void QnResourceWidget::setChannelLayout(QnConstResourceVideoLayoutPtr channelLayout)
@@ -871,27 +910,29 @@ void QnResourceWidget::updateHud(bool animate)
 
     /* Motion mask widget should not have overlays at all */
 
-    bool isInactiveInFullScreen = (options().testFlag(FullScreenMode)
+    const bool isInactiveInFullScreen = (options().testFlag(FullScreenMode)
                                    && !options().testFlag(ActivityPresence));
 
-    bool overlaysCanBeVisible = (!isInactiveInFullScreen
-                                 && !options().testFlag(QnResourceWidget::InfoOverlaysForbidden));
+    const bool overlaysCanBeVisible = (!isInactiveInFullScreen
+                                 && !options().testFlag(InfoOverlaysForbidden));
 
-    bool detailsVisible = m_options.testFlag(DisplayInfo);
-    if (QnImageButtonWidget *infoButton = titleBar()->rightButtonsBar()->button(Qn::InfoButton))
+    const bool detailsVisible = m_options.testFlag(DisplayInfo);
+    if (auto infoButton = titleBar()->rightButtonsBar()->button(Qn::InfoButton))
         infoButton->setChecked(detailsVisible);
 
-    bool alwaysShowName = m_options.testFlag(AlwaysShowName);
+    const bool alwaysShowName = m_options.testFlag(AlwaysShowName);
 
     const bool showOnlyCameraName = ((overlaysCanBeVisible && detailsVisible) || alwaysShowName)
         && !m_mouseInWidget;
     const bool showCameraNameWithButtons = overlaysCanBeVisible && m_mouseInWidget;
     const bool showPosition = overlaysCanBeVisible && (detailsVisible || m_mouseInWidget);
-    const bool showDetailedInfo = overlaysCanBeVisible && detailsVisible && (m_mouseInWidget || qnRuntime->showFullInfo());
+    const bool showDetailedInfo = overlaysCanBeVisible && detailsVisible &&
+        (m_mouseInWidget || qnRuntime->showFullInfo());
 
     const bool showButtonsOverlay = (showOnlyCameraName || showCameraNameWithButtons);
 
-    const bool updatePositionTextRequired = (showPosition && !isOverlayWidgetVisible(m_hudOverlay->position()));
+    const bool updatePositionTextRequired = showPosition
+        && !isOverlayWidgetVisible(m_hudOverlay->position());
     setOverlayWidgetVisible(m_hudOverlay->position(), showPosition, animate);
     if (updatePositionTextRequired)
         updatePositionText();
@@ -1023,6 +1064,9 @@ void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 
 void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
+    if (!m_mouseInWidget)
+        hoverEnterEvent(event);
+
     const bool animate = display()->animationAllowed();
 
     setOverlayVisible(true, animate);

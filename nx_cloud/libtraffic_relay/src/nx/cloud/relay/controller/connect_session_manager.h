@@ -11,6 +11,8 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
 
+#include <nx/cloud/relaying/listening_peer_pool.h>
+
 namespace nx {
 namespace cloud {
 namespace relay {
@@ -27,6 +29,12 @@ namespace controller {
 
 class AbstractTrafficRelay;
 
+struct ConnectToPeerRequestEx:
+    api::ConnectToPeerRequest
+{
+    network::SocketAddress clientEndpoint;
+};
+
 class AbstractConnectSessionManager
 {
 public:
@@ -37,7 +45,7 @@ public:
         nx::utils::MoveOnlyFunc<void(api::ResultCode, api::CreateClientSessionResponse)>;
 
     using ConnectToPeerHandler =
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, nx_http::ConnectionEvents)>;
+        nx::utils::MoveOnlyFunc<void(api::ResultCode, nx::network::http::ConnectionEvents)>;
 
     //---------------------------------------------------------------------------------------------
 
@@ -48,7 +56,7 @@ public:
         CreateClientSessionHandler completionHandler) = 0;
 
     virtual void connectToPeer(
-        const api::ConnectToPeerRequest& request,
+        const ConnectToPeerRequestEx& request,
         ConnectToPeerHandler completionHandler) = 0;
 };
 
@@ -59,7 +67,7 @@ public:
     ConnectSessionManager(
         const conf::Settings& settings,
         model::ClientSessionPool* clientSessionPool,
-        model::ListeningPeerPool* listeningPeerPool,
+        relaying::ListeningPeerPool* listeningPeerPool,
         model::AbstractRemoteRelayPeerPool* remoteRelayPeerPool,
         controller::AbstractTrafficRelay* trafficRelay);
     ~ConnectSessionManager();
@@ -69,7 +77,7 @@ public:
         CreateClientSessionHandler completionHandler) override;
 
     virtual void connectToPeer(
-        const api::ConnectToPeerRequest& request,
+        const ConnectToPeerRequestEx& request,
         ConnectToPeerHandler completionHandler) override;
 
 private:
@@ -77,15 +85,15 @@ private:
     {
         std::string id;
         std::string clientPeerName;
-        std::unique_ptr<AbstractStreamSocket> clientConnection;
+        std::unique_ptr<network::AbstractStreamSocket> clientConnection;
         std::string listeningPeerName;
-        std::unique_ptr<AbstractStreamSocket> listeningPeerConnection;
-        nx_http::StringType openTunnelNotificationBuffer;
+        std::unique_ptr<network::AbstractStreamSocket> listeningPeerConnection;
+        nx::network::http::StringType openTunnelNotificationBuffer;
     };
 
     const conf::Settings& m_settings;
     model::ClientSessionPool* m_clientSessionPool;
-    model::ListeningPeerPool* m_listeningPeerPool;
+    relaying::ListeningPeerPool* m_listeningPeerPool;
     model::AbstractRemoteRelayPeerPool* m_remoteRelayPeerPool;
     controller::AbstractTrafficRelay* m_trafficRelay;
     utils::Counter m_apiCallCounter;
@@ -98,18 +106,12 @@ private:
         const std::string& listeningPeerName,
         ConnectSessionManager::ConnectToPeerHandler completionHandler,
         api::ResultCode resultCode,
-        std::unique_ptr<AbstractStreamSocket> listeningPeerConnection);
+        std::unique_ptr<network::AbstractStreamSocket> listeningPeerConnection);
     void startRelaying(
         const std::string& connectSessionId,
         const std::string& listeningPeerName,
-        std::unique_ptr<AbstractStreamSocket> listeningPeerConnection,
-        nx_http::HttpServerConnection* httpConnection);
-    void sendOpenTunnelNotification(
-        std::list<RelaySession>::iterator relaySessionIter);
-    void onOpenTunnelNotificationSent(
-        SystemError::ErrorCode sysErrorCode,
-        std::size_t bytesSent,
-        std::list<RelaySession>::iterator relaySessionIter);
+        std::unique_ptr<network::AbstractStreamSocket> listeningPeerConnection,
+        nx::network::http::HttpServerConnection* httpConnection);
     void startRelaying(RelaySession relaySession);
 };
 
@@ -120,13 +122,13 @@ public:
         std::unique_ptr<AbstractConnectSessionManager>(
             const conf::Settings& settings,
             model::ClientSessionPool* clientSessionPool,
-            model::ListeningPeerPool* listeningPeerPool,
+            relaying::ListeningPeerPool* listeningPeerPool,
             controller::AbstractTrafficRelay* trafficRelay)>;
 
     static std::unique_ptr<AbstractConnectSessionManager> create(
         const conf::Settings& settings,
         model::ClientSessionPool* clientSessionPool,
-        model::ListeningPeerPool* listeningPeerPool,
+        relaying::ListeningPeerPool* listeningPeerPool,
         model::AbstractRemoteRelayPeerPool* remoteRelayPeerPool,
         controller::AbstractTrafficRelay* trafficRelay);
     /**

@@ -2,16 +2,38 @@ from django import forms
 from .models import *
 
 
+def convert_meta_to_description(meta):
+    meta_to_plain = {"format": "Format:  %s",
+                     "height": "Height: %spx",
+                     "height_le": "Height: not greater than %spx",
+                     "height_ge": "Height: not less than %spx",
+                     "width": "Width: %spx",
+                     "width_le": "Width: not greater than %spx",
+                     "width_ge": "Width: not less than %spx",
+                     "size": "Size limit: %s MB",
+                     }
+    converted_msg = ""
+    for k in meta:
+        if k in meta_to_plain:
+            value = meta[k]
+
+            if isinstance(value, list):
+                value = ", ".join(value)
+            converted_msg += "<br>" + meta_to_plain[k] % value
+
+    return converted_msg
+
+
 class CustomContextForm(forms.Form):
     language = forms.ModelChoiceField(
-        widget=forms.Select, label="Language", queryset=Language.objects.all())
+        widget=forms.Select, label="Language", queryset=Language.objects.all().values_list('code', flat=True))
 
     def remove_langauge(self):
         super(CustomContextForm, self)
         self.fields.pop('language')
 
-    def add_fields(self, context, customization, language):
-        data_structures = context.datastructure_set.all()
+    def add_fields(self, context, customization, language, user):
+        data_structures = context.datastructure_set.order_by('order').all()
 
         if len(data_structures) < 1:
             return
@@ -20,9 +42,15 @@ class CustomContextForm(forms.Form):
             self.remove_langauge()
 
         for data_structure in data_structures:
-            ds_name = data_structure.name
+            ds_label = data_structure.label if data_structure.label else data_structure.name
 
             ds_description = data_structure.description
+
+            if data_structure.meta_settings:
+                ds_description += convert_meta_to_description(data_structure.meta_settings)
+
+            if data_structure.type == DataStructure.DATA_TYPES.guid:
+                ds_description += "<br>GUID format is '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}' using hexdecimal characters (0-9, a-f, A-F)"
 
             ds_language = language
             if not data_structure.translatable:
@@ -38,22 +66,54 @@ class CustomContextForm(forms.Form):
 
             widget_type = forms.TextInput(attrs={'size': 80})
 
-            if data_structure.type == DataStructure.get_type("Long Text"):
+            disabled = data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced'))
+
+            if data_structure.type == DataStructure.DATA_TYPES.long_text:
                 widget_type = forms.Textarea
 
-            if data_structure.type == DataStructure.get_type("HTML"):
+            if data_structure.type == DataStructure.DATA_TYPES.html:
                 widget_type = forms.Textarea(
-                    attrs={'cols': 80, 'rows': 10, 'class': 'tinymce'})
+                    attrs={'cols': 120, 'rows': 25, 'class': 'tinymce'})
 
-            if data_structure.type == DataStructure.get_type("Image"):
-                self.fields[ds_name] = forms.ImageField(label=ds_name,
-                                                        help_text=ds_description,
-                                                        initial=record_value,
-                                                        required=False)
+            if data_structure.type == DataStructure.DATA_TYPES.image:
+                self.fields[data_structure.name] = forms.ImageField(label=ds_label,
+                                                                    help_text=ds_description,
+                                                                    initial=record_value,
+                                                                    required=False,
+                                                                    disabled=disabled)
                 continue
 
-            self.fields[ds_name] = forms.CharField(required=False,
-                                                   label=ds_name,
-                                                   help_text=ds_description,
-                                                   initial=record_value,
-                                                   widget=widget_type)
+            elif data_structure.type == DataStructure.DATA_TYPES.file:
+                self.fields[data_structure.name] = forms.FileField(label=ds_label,
+                                                                   help_text=ds_description,
+                                                                   initial=record_value,
+                                                                   required=False,
+                                                                   disabled=disabled)
+                continue
+
+            self.fields[data_structure.name] = forms.CharField(required=False,
+                                                               label=ds_label,
+                                                               help_text=ds_description,
+                                                               initial=record_value,
+                                                               widget=widget_type,
+                                                               disabled=disabled)
+
+
+class ProductSettingsForm(forms.Form):
+    file = forms.FileField(
+        label="File",
+        help_text="Archive with static files and images for content or stucture.json file. "
+                  "Archive must have top-level directories named as customizations",
+        required=True
+    )
+
+    action = forms.ChoiceField(
+        widget=forms.RadioSelect,
+        required=True,
+        choices=(
+            ('generate_json', 'Generate structure template based on archive'),
+            ('update_structure',
+             'Update CMS structure and default values based on archive with structure.json and customization template'),
+            ('update_content', 'Upload customized content files for customizations')
+        )
+    )

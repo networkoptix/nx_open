@@ -11,7 +11,7 @@
 
 #include <api/app_server_connection.h>
 #include <nx/mediaserver/event/event_connector.h>
-#include <core/dataprovider/live_stream_provider.h>
+#include <providers/live_stream_provider.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/abstract_storage_resource.h>
@@ -20,7 +20,6 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resource_searcher.h>
 #include <core/resource_management/data_only_camera_resource.h>
-#include <plugins/storage/dts/abstract_dts_searcher.h>
 #include <plugins/resource/desktop_camera/desktop_camera_resource.h>
 #include <common/common_module.h>
 #include <media_server/settings.h>
@@ -28,10 +27,12 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <media_server/media_server_module.h>
+#include <core/resource/general_attribute_pool.h>
+#include <core/resource/camera_user_attribute_pool.h>
 
 namespace {
 
-static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 1;
+static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
 static const int kRetryCountToMakeCamOffline = 3;
 static const int kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
 
@@ -45,7 +46,6 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnCommonMod
     m_serverOfflineTimeout = qnServerModule->roSettings()->value(
         "redundancyTimeout", m_serverOfflineTimeout/1000).toInt() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
-    m_foreignResourcesRetryCount = 0;
     m_startupTimer.restart();
 }
 
@@ -79,13 +79,50 @@ static void printInLogNetResources(const QnResourceList& resources)
 
 }
 
+void QnMServerResourceDiscoveryManager::sortForeignResources(QList<QnSecurityCamResourcePtr>& foreignResources)
+{
+    const QnUuid ownGuid = commonModule()->moduleGUID();
+    std::sort(foreignResources.begin(), foreignResources.end(),
+        [&ownGuid](const QnSecurityCamResourcePtr& left, const QnSecurityCamResourcePtr& right)
+    {
+        auto failoverPriority =
+            [](const QnSecurityCamResourcePtr& camera)
+            {
+                QnCameraUserAttributePool::ScopedLock userAttributesLock(
+                    camera->commonModule()->cameraUserAttributesPool(),
+                    ec2::ApiCameraData::physicalIdToId(camera->getPhysicalId()));
+                return (*userAttributesLock)->failoverPriority;
+            };
+        auto preferredServerId =
+            [](const QnSecurityCamResourcePtr& camera)
+            {
+                QnCameraUserAttributePool::ScopedLock userAttributesLock(
+                    camera->commonModule()->cameraUserAttributesPool(),
+                    ec2::ApiCameraData::physicalIdToId(camera->getPhysicalId()));
+                return (*userAttributesLock)->preferredServerId;
+            };
+
+        bool isLeftOwnServer = preferredServerId(left) == ownGuid;
+        bool isRightOwnServer = preferredServerId(right) == ownGuid;
+        if (isLeftOwnServer != isRightOwnServer)
+            return isLeftOwnServer > isRightOwnServer;
+
+        return failoverPriority(left) > failoverPriority(right);
+    });
+}
+
 bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, SearchType searchType)
 {
     // fill camera's ID
 
     {
         QnMutexLocker lock(&m_discoveryMutex);
-        // check foreign resources several times in case if camera is discovered not quite stable. It'll improve redundant priority for foreign cameras
+        int foreignResourceIndex = m_discoveryCounter % RETRY_COUNT_FOR_FOREIGN_RESOURCES;
+        while (m_tmpForeignResources.size() <= foreignResourceIndex)
+            m_tmpForeignResources.push_back(ResourceList());
+        m_tmpForeignResources[foreignResourceIndex].clear();
+
+        // Check foreign resources several times in case if camera is discovered not quite stable. It'll improve redundant priority for foreign cameras.
         for (auto itr = resources.begin(); itr != resources.end();)
         {
             QnSecurityCamResourcePtr camRes = (*itr).dynamicCast<QnSecurityCamResource>();
@@ -96,46 +133,41 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QnSecurityCamResourcePtr existRes = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>((*itr)->getUniqueId());
             if (existRes && existRes->hasFlags(Qn::foreigner) && !existRes->hasFlags(Qn::desktop_camera))
             {
-                m_tmpForeignResources.insert(camRes->getUniqueId(), camRes);
+                m_tmpForeignResources[foreignResourceIndex].insert(camRes->getUniqueId(), camRes);
                 itr = resources.erase(itr);
             }
             else {
                 ++itr;
             }
         }
-        if (++m_foreignResourcesRetryCount >= RETRY_COUNT_FOR_FOREIGN_RESOURCES &&
+        if (m_tmpForeignResources.size() == RETRY_COUNT_FOR_FOREIGN_RESOURCES &&
             m_startupTimer.elapsed() > kMinServerStartupTimeToTakeForeignCamerasMs)
         {
-            m_foreignResourcesRetryCount = 0;
-
-            // sort foreign resources to add more important cameras first: check if it is an own cameras, then check failOver priority order
-            auto foreignResources = m_tmpForeignResources.values();
-            const QnUuid ownGuid = commonModule()->moduleGUID();
-            std::sort(foreignResources.begin(), foreignResources.end(), [&ownGuid](const QnSecurityCamResourcePtr& leftCam, const QnSecurityCamResourcePtr& rightCam)
+            // Exclude duplicates.
+            ResourceList foreignResourcesMap;
+            for (const auto& resList: m_tmpForeignResources)
             {
-                bool leftOwnServer = leftCam->preferredServerId() == ownGuid;
-                bool rightOwnServer = rightCam->preferredServerId() == ownGuid;
-                if (leftOwnServer != rightOwnServer)
-                    return leftOwnServer > rightOwnServer;
+                for (auto itr = resList.begin(); itr != resList.end(); ++itr)
+                    foreignResourcesMap.insert(itr.key(), itr.value());
+            }
 
-                // arrange cameras by failover priority order
-                return leftCam->failoverPriority() > rightCam->failoverPriority();
-            });
-
+            // Sort foreign resources to add more important cameras first: check if it is an own cameras, then check failOver priority order.
+            auto foreignResources = foreignResourcesMap.values();
+            const QnUuid ownGuid = commonModule()->moduleGUID();
+            sortForeignResources(foreignResources);
             for (const auto& res : foreignResources)
                 resources << res;
-            m_tmpForeignResources.clear();
         }
     }
 
     QnResourceList extraResources;
     QSet<QString> discoveredResources;
 
-    //assemble list of existing ip
+    // Assemble list of existing ip.
     QMap<quint32, QSet<QnNetworkResourcePtr> > ipsList;
 
 
-    //excluding already existing resources
+    // Excluding already existing resources.
     QnResourceList::iterator it = resources.begin();
     while (it != resources.end())
     {
@@ -178,7 +210,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
 		if (newCamRes)
 		{
-			quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
+			quint32 ips = nx::network::resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
 			if (ips)
 				ipsList[ips].insert(newNetRes);
 		}
@@ -219,6 +251,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 {
                     ec2::ApiCameraData apiCamera;
                     fromResourceToApi(existCamRes, apiCamera);
+                    apiCamera.id = ec2::ApiCameraData::physicalIdToId(apiCamera.physicalId);
 
                     ec2::AbstractECConnectionPtr connect = commonModule()->ec2Connection();
                     const ec2::ErrorCode errorCode = connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
@@ -229,7 +262,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             }
         }
 
-        // seems like resource is in the pool and has OK ip
+        // Seems like resource is in the pool and has OK ip.
         updateResourceStatus(rpNetRes);
 
         discoveredResources.insert(rpNetRes->getUniqueId());
@@ -272,7 +305,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         NX_LOG( lit("Discovery----: after excluding existing resources we've got %1 new resources:").arg(resources.size()), cl_logINFO);
 
     printInLogNetResources(resources);
-
+    ++m_discoveryCounter;
     if (resources.isEmpty())
     {
         resources << extraResources;
@@ -289,23 +322,32 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     return true;
 }
 
-bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras) const
+bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras)
 {
     if (cameras.size() < 2)
         return false;
+    QSet<QString> cameraGroups;
     QSet<int> portList;
+
     for (const auto& netRes: cameras)
     {
         auto camera = netRes.dynamicCast<QnSecurityCamResource>();
         if (!camera || !camera->needCheckIpConflicts())
             continue;
+
+        QString groupId = camera->getGroupId().isEmpty() ? camera->getId().toString() : camera->getGroupId();
+        cameraGroups << groupId;
+        portList << QUrl(camera->getUrl()).port();
+
+        if (cameraGroups.size() < 2)
+            continue; //< Several cameras with same group so far
+
         if (!camera->isManuallyAdded())
-            return true;
-        const int port = QUrl(camera->getUrl()).port();
-        if (portList.contains(port))
             return true; //< Conflict detected
-        portList << port;
+        if (portList.size() < cameraGroups.size())
+            return true; //< For manually added cameras it is allowed to have several cameras with same IP but different ports.
     }
+
     return false;
 }
 

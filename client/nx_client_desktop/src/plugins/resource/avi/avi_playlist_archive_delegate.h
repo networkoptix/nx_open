@@ -4,7 +4,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QFile>
 
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 
 
 class QnAVIPlaylistArchiveDelegate : public QnAviArchiveDelegate
@@ -15,7 +15,9 @@ public:
     QnAVIPlaylistArchiveDelegate();
     virtual ~QnAVIPlaylistArchiveDelegate();
 
-    virtual bool open(const QnResourcePtr& resource) override;
+    virtual bool open(
+        const QnResourcePtr &resource,
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
     virtual void close() override;
     virtual qint64 seek(qint64 time, bool findIFrame) override;
     virtual qint64 endTime() const override;

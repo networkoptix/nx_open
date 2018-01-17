@@ -7,13 +7,15 @@ namespace {
     static const int kDefaultPoolSize = 8;
     static const int kHttpDisconnectTimeout(60 * 1000);
 
-    SocketAddress toSocketAddress(const QUrl& url)
+    nx::network::SocketAddress toSocketAddress(const QUrl& url)
     {
-        return SocketAddress(url.host(), url.port(80));
+        return nx::network::SocketAddress(url.host(), url.port(80));
     }
 }
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 ClientPool::ClientPool(QObject *parent):
     QObject(parent),
@@ -38,7 +40,7 @@ void ClientPool::setPoolSize(int value)
     m_maxPoolSize = value;
 }
 
-int ClientPool::doGet(const QUrl& url, nx_http::HttpHeaders headers)
+int ClientPool::doGet(const nx::utils::Url& url, nx::network::http::HttpHeaders headers)
 {
     Request request;
     request.method = Method::get;
@@ -48,10 +50,10 @@ int ClientPool::doGet(const QUrl& url, nx_http::HttpHeaders headers)
 }
 
 int ClientPool::doPost(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QByteArray& contentType,
     const QByteArray& msgBody,
-    nx_http::HttpHeaders headers)
+    nx::network::http::HttpHeaders headers)
 {
     Request request;
     request.method = Method::post;
@@ -153,7 +155,7 @@ void ClientPool::cleanupDisconnectedUnsafe()
     }
 }
 
-ClientPool::HttpConnection* ClientPool::getUnusedConnection(const QUrl& url)
+ClientPool::HttpConnection* ClientPool::getUnusedConnection(const nx::utils::Url& url)
 {
     cleanupDisconnectedUnsafe();
 
@@ -190,7 +192,7 @@ ClientPool::HttpConnection* ClientPool::getUnusedConnection(const QUrl& url)
 
 AsyncHttpClientPtr ClientPool::createHttpConnection()
 {
-    AsyncHttpClientPtr result = nx_http::AsyncHttpClient::create();
+    AsyncHttpClientPtr result = nx::network::http::AsyncHttpClient::create();
 
     //setting appropriate timeouts
     using namespace std::chrono;
@@ -202,14 +204,14 @@ AsyncHttpClientPtr ClientPool::createHttpConnection()
         duration_cast<milliseconds>(kMessageBodyReadTimeout).count());
 
     connect(
-        result.get(), &nx_http::AsyncHttpClient::done,
+        result.get(), &nx::network::http::AsyncHttpClient::done,
         this, &ClientPool::at_HttpClientDone,
         Qt::DirectConnection);
 
     return result;
 }
 
-void ClientPool::at_HttpClientDone(nx_http::AsyncHttpClientPtr clientPtr)
+void ClientPool::at_HttpClientDone(nx::network::http::AsyncHttpClientPtr clientPtr)
 {
     int requestId = 0;
 
@@ -248,4 +250,6 @@ void ClientPool::at_HttpClientDone(nx_http::AsyncHttpClientPtr clientPtr)
     cleanupDisconnectedUnsafe();
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

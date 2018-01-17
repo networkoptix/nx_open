@@ -6,7 +6,7 @@
                 <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-menu-hamburger"></span></a>
                 <ul uib-dropdown-menu>
                     <li ng-if="activeSystem" ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">설정</a></li>
-                    <li ng-if="activeSystem" ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
+                    <li ng-if="activeSystem" ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">보기</a></li>
                 </ul>
             </li>
         </ul>
@@ -18,13 +18,13 @@
         <ul ng-if="activeSystem" class="nav navbar-nav auth-visible hidden-collapsed" >
             <li class="vertical-bar margin-right"></li>
             <li ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">설정</a></li>
-            <li ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
+            <li ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">보기</a></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right auth-hidden margin-right">
             <li><span class="btn-wrapper"><a href="/login" class="btn btn-default"
-                                             ng-click="login();$event.preventDefault();">Log In</a></span><span
-                    class="btn-wrapper" ng-if="!active.register"><a href="/register" class="btn btn-primary" >Create Account</a></span></li>
+                                             ng-click="login();$event.preventDefault();">로그인</a></span> <span
+                    class="btn-wrapper" ng-if="!active.register"><a href="/register" class="btn btn-primary" >계정 만들기</a></span></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right auth-visible margin-right">
@@ -60,7 +60,7 @@
                     <li><a href="" ng-click="logout()">로그 아웃</a></li>
 
                     <li class="nav-divider" role="separator" ng-if="account.is_staff"></li>
-                    <li><a href="/admin/" target="_blank" ng-if="account.is_staff">Portal management</a></li>
+                    <li><a href="/admin/" target="_blank" ng-if="account.is_staff">포털 관리</a></li>
                 </ul>
             </li>
             <li class="vertical-bar"></li>

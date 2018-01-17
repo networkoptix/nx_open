@@ -1,9 +1,18 @@
+#include <memory>
+
 #include <gtest/gtest.h>
 
+#include <nx/network/aio/aio_service.h>
+#include <nx/network/abstract_socket.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/dns_resolver.h>
 #include <nx/network/resolve/custom_resolver.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/socket_factory.h>
+#include <nx/network/system_socket.h>
 #include <nx/utils/random.h>
+#include <nx/utils/std/future.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
 namespace network {
@@ -11,18 +20,17 @@ namespace test {
 
 namespace {
 
-class AddressResolver:
+class AddressResolverDeprecatedTests:
     public testing::Test
 {
 public:
-    AddressResolver():
+    AddressResolverDeprecatedTests():
         m_startedConnectionsCount(0),
         m_completedConnectionsCount(0)
     {
     }
 
 protected:
-    std::condition_variable m_cond;
     std::mutex m_mutex;
     std::atomic<int> m_startedConnectionsCount;
     std::atomic<int> m_completedConnectionsCount;
@@ -31,12 +39,12 @@ protected:
     void startAnotherSocketNonSafe()
     {
         std::unique_ptr<AbstractStreamSocket> connection(SocketFactory::createStreamSocket());
+        ASSERT_TRUE(connection->setNonBlockingMode(true));
         AbstractStreamSocket* connectionPtr = connection.get();
         m_connections.push_back(std::move(connection));
-        ASSERT_TRUE(connectionPtr->setNonBlockingMode(true));
         connectionPtr->connectAsync(
-            SocketAddress(QString::fromLatin1("ya.ru"), nx_http::DEFAULT_HTTP_PORT),
-            std::bind(&AddressResolver::onConnectionComplete, this, connectionPtr, std::placeholders::_1));
+            SocketAddress(QString::fromLatin1("ya.ru"), nx::network::http::DEFAULT_HTTP_PORT),
+            std::bind(&AddressResolverDeprecatedTests::onConnectionComplete, this, connectionPtr, std::placeholders::_1));
     }
 
     void onConnectionComplete(
@@ -46,8 +54,6 @@ protected:
         ASSERT_TRUE(errorCode == SystemError::noError);
 
         std::unique_lock<std::mutex> lk(m_mutex);
-        m_cond.notify_all();
-        //resolvedAddress = connectionPtr->getForeignAddress().address;
 
         auto iterToRemove = std::remove_if(
             m_connections.begin(), m_connections.end(),
@@ -70,48 +76,17 @@ protected:
         }
     }
 
-    static const int CONCURRENT_CONNECTIONS = 30;
-    static const int TOTAL_CONNECTIONS = 3000;
+    static const int CONCURRENT_CONNECTIONS = 17;
+    static const int TOTAL_CONNECTIONS = 77;
 };
 
 } // namespace
 
-TEST_F(AddressResolver, HostNameResolve1)
-{
-    if (SocketFactory::isStreamSocketTypeEnforced())
-        return;
+// TODO: #ak Most of these tests do not belong here.
+// They actually check how socket use AddressResolver, not how AddressResolver works.
+// So, these tests should belong to some stream socket acceptance test group.
 
-    std::unique_ptr<AbstractStreamSocket> connection(SocketFactory::createStreamSocket());
-    SystemError::ErrorCode connectErrorCode = SystemError::noError;
-    std::condition_variable cond;
-    std::mutex mutex;
-    bool done = false;
-    HostAddress resolvedAddress;
-    ASSERT_TRUE(connection->setNonBlockingMode(true));
-    connection->connectAsync(
-        SocketAddress(QString::fromLatin1("ya.ru"), 80),
-        [&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection](
-            SystemError::ErrorCode errorCode) mutable
-        {
-            std::unique_lock<std::mutex> lk(mutex);
-            connectErrorCode = errorCode;
-            cond.notify_all();
-            done = true;
-            resolvedAddress = connection->getForeignAddress().address;
-        });
-
-    std::unique_lock<std::mutex> lk(mutex);
-    while (!done)
-        cond.wait(lk);
-
-    QString ipStr = resolvedAddress.toString();
-    static_cast<void>(ipStr);
-    ASSERT_TRUE(connectErrorCode == SystemError::noError);
-
-    connection->pleaseStopSync();
-}
-
-TEST_F(AddressResolver, HostNameResolve2)
+TEST_F(AddressResolverDeprecatedTests, HostNameResolve2)
 {
     if (SocketFactory::isStreamSocketTypeEnforced())
         return;
@@ -147,7 +122,7 @@ TEST_F(AddressResolver, HostNameResolve2)
             connectionToCancel.reset();
             ++cancelledConnectionsCount;
         }
-        QThread::msleep(1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
         lk.lock();
     }
 
@@ -156,150 +131,193 @@ TEST_F(AddressResolver, HostNameResolve2)
     ASSERT_TRUE(m_connections.empty());
 }
 
-TEST_F(AddressResolver, HostNameResolve3)
-{
-    auto& dnsResolver = SocketGlobals::addressResolver().dnsResolver();
-    {
-        std::deque<HostAddress> ips;
-        const auto resultCode = dnsResolver.resolveSync(QLatin1String("ya.ru"), AF_INET, &ips);
-        ASSERT_EQ(SystemError::noError, resultCode);
-        ASSERT_GE(ips.size(), 1U);
-        ASSERT_TRUE(ips.front().isIpAddress());
-        ASSERT_TRUE((bool)ips.front().ipV4());
-        ASSERT_TRUE((bool)ips.front().ipV6());
-        ASSERT_NE(0U, ips.front().ipV4()->s_addr);
-    }
+//-------------------------------------------------------------------------------------------------
 
-    {
-        std::deque<HostAddress> ips;
-        const auto resultCode = dnsResolver.resolveSync(QLatin1String("hren2349jf234.ru"), AF_INET, &ips);
-        ASSERT_EQ(SystemError::hostNotFound, resultCode);
-        ASSERT_EQ(0U, ips.size());
-    }
-
-    {
-        const QString kTestHost = QLatin1String("some-test-host-543242145.com");
-        std::vector<HostAddress> kTestAddresses;
-        kTestAddresses.push_back(*HostAddress::ipV4from("12.34.56.78"));
-        kTestAddresses.push_back(*HostAddress::ipV6from("1234::abcd"));
-
-        dnsResolver.addEtcHost(kTestHost, kTestAddresses);
-
-        std::deque<HostAddress> ip4s;
-        SystemError::ErrorCode resultCode = dnsResolver.resolveSync(kTestHost, AF_INET, &ip4s);
-        ASSERT_EQ(SystemError::noError, resultCode);
-
-        std::deque<HostAddress> ip6s;
-        resultCode = dnsResolver.resolveSync(kTestHost, AF_INET6, &ip6s);
-        ASSERT_EQ(SystemError::noError, resultCode);
-
-        dnsResolver.removeEtcHost(kTestHost);
-
-        ASSERT_EQ(1U, ip4s.size());
-        ASSERT_EQ(kTestAddresses.front(), ip4s.front());
-        ASSERT_EQ(2U, ip6s.size());
-        ASSERT_EQ(kTestAddresses.front(), ip6s.front());
-        ASSERT_EQ(kTestAddresses.back(), ip6s.back());
-    }
-}
-
-TEST_F(AddressResolver, HostNameResolveCancellation)
-{
-    static const int TEST_RUNS = 100;
-
-    for (int i = 0; i < TEST_RUNS; ++i)
-    {
-        std::unique_ptr<AbstractStreamSocket> connection(SocketFactory::createStreamSocket());
-        SystemError::ErrorCode connectErrorCode = SystemError::noError;
-        std::condition_variable cond;
-        std::mutex mutex;
-        bool done = false;
-        HostAddress resolvedAddress;
-        ASSERT_TRUE(connection->setNonBlockingMode(true));
-        connection->connectAsync(
-            SocketAddress(QString::fromLatin1("ya.ru"), nx_http::DEFAULT_HTTP_PORT),
-            [&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection](
-                SystemError::ErrorCode errorCode) mutable
-            {
-                std::unique_lock<std::mutex> lk(mutex);
-                connectErrorCode = errorCode;
-                cond.notify_all();
-                done = true;
-                resolvedAddress = connection->getForeignAddress().address;
-            });
-        connection->pleaseStopSync();
-    }
-}
-
-TEST_F(AddressResolver, BadHostNameResolve)
-{
-    static const int kTestRuns = 1000;
-    for (int i = 0; i < kTestRuns; ++i)
-    {
-        std::unique_ptr<AbstractStreamSocket> connection(SocketFactory::createStreamSocket());
-        int iBak = i;
-        ASSERT_TRUE(connection->setNonBlockingMode(true));
-        connection->connectAsync(
-            SocketAddress(QString::fromLatin1("hx.hz"), nx_http::DEFAULT_HTTP_PORT),
-            [&i, iBak](SystemError::ErrorCode /*errorCode*/) mutable
-            {
-                ASSERT_EQ(i, iBak);
-            });
-        connection->pleaseStopSync();
-    }
-}
-
-class AddressResolverTrivialNameResolve:
+class AddressResolver:
     public ::testing::Test
 {
 public:
-    AddressResolverTrivialNameResolve():
-        m_resolver(nullptr),
-        m_hostNameToResolve("127.0.0.1")
+    AddressResolver()
     {
         using namespace std::placeholders;
 
         m_resolver.dnsResolver().registerResolver(
             makeCustomResolver(std::bind(
-                &AddressResolverTrivialNameResolve::saveHostNameWithoutResolving, this, _1, _2, _3)),
+                &AddressResolver::saveHostNameWithoutResolving, this, _1, _2, _3)),
             m_resolver.dnsResolver().maxRegisteredResolverPriority() + 1);
-    }
-
-    ~AddressResolverTrivialNameResolve()
-    {
     }
 
 protected:
     void whenResolvingStringRepresentationOfIpAddress()
     {
+        m_hostNameToResolve = "1.2.3.4";
         m_resolver.resolveSync(m_hostNameToResolve, NatTraversalSupport::disabled, AF_INET);
     }
 
-    void assertIfDnsResolverHasBeenInvoked()
+    void assertDnsResolverHasNotBeenInvoked()
     {
         ASSERT_EQ(
             m_resolvedHostNames.end(),
             std::find(m_resolvedHostNames.begin(), m_resolvedHostNames.end(), m_hostNameToResolve));
     }
 
-private:
-    cloud::AddressResolver m_resolver;
-    const QString m_hostNameToResolve;
-    std::list<QString> m_resolvedHostNames;
+    network::AddressResolver& resolver()
+    {
+        return m_resolver;
+    }
 
-     SystemError::ErrorCode saveHostNameWithoutResolving(
-        const QString& hostName, int /*ipVersion*/, std::deque<HostAddress>* /*resolvedAddresses*/)
+private:
+    using ResolveResult =
+        std::tuple<SystemError::ErrorCode, std::deque<AddressEntry>>;
+
+    network::AddressResolver m_resolver;
+    QString m_hostNameToResolve;
+    SocketAddress m_hostEndpoint;
+    std::list<QString> m_resolvedHostNames;
+    nx::utils::SyncQueue<ResolveResult> m_resolveResults;
+
+    SystemError::ErrorCode saveHostNameWithoutResolving(
+        const QString& hostName,
+        int /*ipVersion*/,
+        std::deque<HostAddress>* /*resolvedAddresses*/)
     {
         m_resolvedHostNames.push_back(hostName);
         return SystemError::hostNotFound;
     }
 };
 
-TEST_F(AddressResolverTrivialNameResolve, DoesNotInvokeDns)
+TEST_F(AddressResolver, does_not_invoke_dns)
 {
     whenResolvingStringRepresentationOfIpAddress();
-    assertIfDnsResolverHasBeenInvoked();
+    assertDnsResolverHasNotBeenInvoked();
 }
+
+//-------------------------------------------------------------------------------------------------
+
+class AddressResolverNameMapping:
+    public AddressResolver
+{
+public:
+    AddressResolverNameMapping()
+    {
+        // Disabling DNS resolve.
+        using namespace std::placeholders;
+
+        struct in_addr stubAddress;
+        memset(&stubAddress, 0, sizeof(stubAddress));
+        stubAddress.s_addr = nx::utils::random::number<std::uint32_t>();
+        m_stubAddress = HostAddress(stubAddress);
+
+        resolver().dnsResolver().registerResolver(
+            makeCustomResolver(std::bind(
+                &AddressResolverNameMapping::dnsResolveStub, this, _1, _2, _3)),
+            resolver().dnsResolver().maxRegisteredResolverPriority() + 1);
+    }
+
+protected:
+    void registerFixedHighLevelDomainName()
+    {
+        m_hostNameToResolve = "a.b";
+        m_hostEndpoint = SocketAddress(
+            HostAddress::localhost,
+            nx::utils::random::number<std::uint16_t>(1));
+        resolver().addFixedAddress(m_hostNameToResolve, m_hostEndpoint);
+    }
+
+    void unregisterDomainName()
+    {
+        resolver().removeFixedAddress(m_hostNameToResolve, m_hostEndpoint);
+    }
+
+    void whenResolveDomain(const QString& domainName)
+    {
+        using namespace std::placeholders;
+
+        resolver().resolveAsync(
+            domainName,
+            std::bind(&AddressResolverNameMapping::saveResolveResult, this, _1, _2),
+            NatTraversalSupport::disabled,
+            AF_INET);
+    }
+
+    void assertLowLevelDomainNameCanBeResolved()
+    {
+        whenResolveDomain(m_hostNameToResolve.split(".").last());
+        thenResolvedTo(m_hostEndpoint);
+    }
+
+    void assertLowLevelDomainNameCannotBeResolved()
+    {
+        whenResolveDomain(m_hostNameToResolve.split(".").last());
+        thenResolvedResultIs(SystemError::hostNotFound);
+    }
+
+    void thenResolvedTo(const SocketAddress& hostEndpoint)
+    {
+        const auto resolveResult = m_resolveResults.pop();
+        ASSERT_EQ(SystemError::noError, std::get<0>(resolveResult));
+        const auto& entries = std::get<1>(resolveResult);
+        ASSERT_EQ(1U, entries.size());
+        ASSERT_EQ(AddressType::direct, entries[0].type);
+        ASSERT_EQ(hostEndpoint.address, entries[0].host);
+    }
+
+    void thenResolvedResultIs(SystemError::ErrorCode systemErrorCode)
+    {
+        const auto resolveResult = m_resolveResults.pop();
+        ASSERT_EQ(systemErrorCode, std::get<0>(resolveResult));
+    }
+
+private:
+    using ResolveResult =
+        std::tuple<SystemError::ErrorCode, std::deque<AddressEntry>>;
+
+    QString m_hostNameToResolve;
+    SocketAddress m_hostEndpoint;
+    nx::utils::SyncQueue<ResolveResult> m_resolveResults;
+    HostAddress m_stubAddress;
+
+    SystemError::ErrorCode dnsResolveStub(
+        const QString& /*hostName*/,
+        int /*ipVersion*/,
+        std::deque<HostAddress>* resolvedAddresses)
+    {
+        resolvedAddresses->push_back(m_stubAddress);
+        return SystemError::noError;
+    }
+
+    void saveResolveResult(
+        SystemError::ErrorCode errorCode,
+        std::deque<AddressEntry> entries)
+    {
+        if (errorCode == SystemError::noError && entries.front().host == m_stubAddress)
+        {
+            errorCode = SystemError::hostNotFound;
+            entries.clear();
+        }
+        m_resolveResults.push(std::make_tuple(errorCode, std::move(entries)));
+    }
+};
+
+TEST_F(
+    AddressResolverNameMapping,
+    low_level_domain_is_resolved_to_address_of_a_high_level_domain)
+{
+    registerFixedHighLevelDomainName();
+    assertLowLevelDomainNameCanBeResolved();
+}
+
+TEST_F(
+    AddressResolverNameMapping,
+    after_removing_hostname_mapping_low_level_domain_cannot_be_resolved)
+{
+    registerFixedHighLevelDomainName();
+    unregisterDomainName();
+
+    assertLowLevelDomainNameCannotBeResolved();
+}
+
+//-------------------------------------------------------------------------------------------------
 
 class AddressResolverNat64:
     public ::testing::Test
@@ -308,7 +326,7 @@ public:
     AddressResolverNat64()
     {
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
-        std::vector<HostAddress> ipList{HostAddress(*kV6.ipV6()), HostAddress(*kV4.ipV4())};
+        std::vector<HostAddress> ipList{HostAddress(*kV6.ipV6().first), HostAddress(*kV4.ipV4())};
         SocketGlobals::addressResolver().dnsResolver().addEtcHost(kV4.toString(), ipList);
     }
 
@@ -330,7 +348,7 @@ TEST_F(AddressResolverNat64, IPv4) // NAT64 not in use, IP v4 is just converted 
         kV4, NatTraversalSupport::disabled, AF_INET);
     ASSERT_EQ(1U, entries.size());
 
-    ASSERT_EQ(cloud::AddressType::direct, entries.front().type);
+    ASSERT_EQ(AddressType::direct, entries.front().type);
     ASSERT_TRUE(entries.front().host.isIpAddress());
     ASSERT_EQ(kV4.ipV4()->s_addr, entries.front().host.ipV4()->s_addr);
 }
@@ -341,13 +359,13 @@ TEST_F(AddressResolverNat64, IPv6) // NAT64 returns 2 addresses: mapped IP v6 an
         kV4, NatTraversalSupport::disabled, AF_INET6);
     ASSERT_EQ(2U, entries.size());
 
-    ASSERT_EQ(cloud::AddressType::direct, entries.front().type);
+    ASSERT_EQ(AddressType::direct, entries.front().type);
     ASSERT_TRUE(entries.front().host.isIpAddress());
-    ASSERT_EQ(0, memcmp(&kV6.ipV6().get(), &entries.front().host.ipV6().get(), sizeof(in6_addr)));
+    ASSERT_EQ(0, memcmp(&kV6.ipV6().first.get(), &entries.front().host.ipV6().first.get(), sizeof(in6_addr)));
 
-    ASSERT_EQ(cloud::AddressType::direct, entries.back().type);
+    ASSERT_EQ(AddressType::direct, entries.back().type);
     ASSERT_TRUE(entries.back().host.isIpAddress());
-    ASSERT_EQ(0, memcmp(&kV4.ipV6().get(), &entries.back().host.ipV6().get(), sizeof(in6_addr)));
+    ASSERT_EQ(0, memcmp(&kV4.ipV6().first.get(), &entries.back().host.ipV6().first.get(), sizeof(in6_addr)));
 }
 
 } // namespace test

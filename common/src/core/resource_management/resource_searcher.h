@@ -4,12 +4,12 @@
 #include <atomic>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/url.h>
 #include <QtCore/QStringList>
 
 #include <core/resource/resource_factory.h>
 #include <common/common_module_aware.h>
 
-class QUrl;
 class QAuthenticator;
 
 enum class DiscoveryMode
@@ -116,7 +116,7 @@ public:
 
     // checks this QHostAddress and creates a QnResource in case of success
     // this function is designed for manual resource addition
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) = 0;
+    virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) = 0;
 };
 
 // =====================================================================
@@ -128,9 +128,8 @@ protected:
 
 public:
     QStringList getPathCheckList() const;
-    void setPathCheckList(const QStringList& paths);
-    inline void clearPathCheckList()
-    { setPathCheckList(QStringList()); }
+    virtual void setPathCheckList(const QStringList& paths);
+    virtual void clearPathCheckList();
 
     // creates an instance of proper resource from file
     virtual QnResourcePtr checkFile(const QString &filename) const = 0;

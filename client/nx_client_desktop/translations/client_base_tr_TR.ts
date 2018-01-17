@@ -48,6 +48,10 @@ to view more bookmarks</source>
       <source>Delete bookmark</source>
       <translation>Yer imini sil</translation>
     </message>
+    <message>
+      <source>Export bookmark</source>
+      <translation>Yer imlerini dışa aktar</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -477,22 +481,6 @@ to view more bookmarks</source>
       <translation>Bilgiyi Gizle</translation>
     </message>
     <message>
-      <source>Change Resolution...</source>
-      <translation>Çözünürlüğü Değiştir...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>Otomatik</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Düşük</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Yüksek</translation>
-    </message>
-    <message>
       <source>PTZ...</source>
       <translation>PTZ...</translation>
     </message>
@@ -705,14 +693,6 @@ to view more bookmarks</source>
       <translation>Mevcut Bağlı Sisteme Birleştir...</translation>
     </message>
     <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>Hücre En-Boy Oranını Değiştir...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>Hücre Aralığını Değiştir...</translation>
-    </message>
-    <message>
       <source>None</source>
       <translation>Yok</translation>
     </message>
@@ -872,6 +852,34 @@ to view more bookmarks</source>
       <source>Make Showreel</source>
       <translation>Showreel Oluştur</translation>
     </message>
+    <message>
+      <source>Start Analytics...</source>
+      <translation>Analytics'i Başlat...</translation>
+    </message>
+    <message>
+      <source>Some cameras require passwords to be set</source>
+      <translation>Bazı kameralar için şifre ayarlanması gerekir</translation>
+    </message>
+    <message>
+      <source>Export Video...</source>
+      <translation>Videoyu Dışa Aktar...</translation>
+    </message>
+    <message>
+      <source>Export Bookmark...</source>
+      <translation>Yer işaretlerini Dışa Aktar...</translation>
+    </message>
+    <message>
+      <source>Resolution...</source>
+      <translation>Çözünürlük...</translation>
+    </message>
+    <message>
+      <source>Cell Aspect Ratio...</source>
+      <translation>En boy oranı...</translation>
+    </message>
+    <message>
+      <source>Cell Spacing...</source>
+      <translation>Hücre aralığı...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -964,6 +972,64 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
+      <translation>Seçilen ayarlar kodlamayı gerektirir. CPU kullanımını artabilir ve işlemler daha uzun zaman alabilir.</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
+      <translation>AVI formatı, ses kaydına sahip sürekli olmayan bir kaydı dışa aktarmak için önerilmez.</translation>
+    </message>
+    <message>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation>Görüntü kaybını engellemek için &quot;Multi Video&quot; seçmenizi öneririz.</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation>Uzun bir videoyu dışa aktarmak üzeresiniz. Aktarım uzun sürebilir ve diskte tutacağı alan Gigabayt seviyesinde olabilir.</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .EXE files.</source>
+      <translation>.EXE dosyaları için ayarlar kullanılamaz.</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>Yerel dosyalar, sunucu monitörü widget'ları ve web sayfaları dışa aktarılmaz.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation>Dışa aktarılan .EXE dosyası 4 GB'dan büyük olacağından Windows'ta çift tıklatılarak açılmaz. Yalnızca %1 İstemcide oynatılabilir.</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileSystemStrings</name>
+    <message>
+      <source>Audio Video Interleave</source>
+      <translation>Audio Video Interleave</translation>
+    </message>
+    <message>
+      <source>Matroska</source>
+      <translation>Matroska</translation>
+    </message>
+    <message>
+      <source>MPEG-4 Part 14</source>
+      <translation>MPEG-4 Part 14</translation>
+    </message>
+    <message>
+      <source>%1 Media File</source>
+      <translation>%1 Medya Dosyası</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x64)</source>
+      <translation>Yürütülebilir %1 Medya Dosyası (x64)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86)</source>
+      <translation>(X86) yürütülebilir %1 medya dosyası</translation>
+    </message>
+  </context>
+  <context>
     <name>GraphicsScrollBar</name>
     <message>
       <source>Scroll Here</source>
@@ -1037,25 +1103,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>&quot;%1&quot; dosyası başka bir işlem tarafından kullanılıyor.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>"%1" dosyası zaten var. Lütfen başka bir ad deneyin.</translation>
     </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+      <translation>
+        <numerusform>Dosya adı ayrılmış şu karakterler içermemelidir: %1</numerusform>
+        <numerusform>Dosya adı ayrılmış şu karakterleri içermemelidir: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>&quot;%1&quot; dosyası başka bir işlem tarafından kullanılıyor. Lütfen başka bir isim deneyin.</translation>
     </message>
   </context>
   <context>
@@ -1081,10 +1145,6 @@ to view more bookmarks</source>
       <translation>Kısa</translation>
     </message>
     <message>
-      <source>Password must be at least 8 characters long.</source>
-      <translation>Şifre en az 8 karakterden oluşmalıdır.</translation>
-    </message>
-    <message>
       <source>Common</source>
       <translation>Ortak</translation>
     </message>
@@ -1099,6 +1159,49 @@ to view more bookmarks</source>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>Sadece latin harfler ve klavye simgeleri kullanılabilir.</translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>Uzun</translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>Sadece latin harfler ve klavye simgeleri %1 kullanılabilir.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
+      <translation>
+        <numerusform>Şifre %n farklı kombinasyonları karakterler, semboller veya basamak içermelidir</numerusform>
+        <numerusform>Şifre %n farklı kombinasyonları karakterler, semboller veya basamak içermelidir</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be at least %n characters long.</source>
+      <translation type="unfinished">
+        <numerusform>Şifre en az %n karakterden oluşmalıdır.</numerusform>
+        <numerusform>Password must be at least %n characters long.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be no longer than %n characters.</source>
+      <translation type="unfinished">
+        <numerusform>Password must be no longer than %n characters.</numerusform>
+        <numerusform>Parola %n karakterden uzun olmak zorundadır.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together.</source>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+        <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters.</source>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+        <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1233,13 +1336,6 @@ to view more bookmarks</source>
     <message>
       <source>Client is not connected to any System</source>
       <translation>İstemci herhangi bir sisteme bağlı değil</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnAbstractCameraAdvancedParamWidget</name>
-    <message>
-      <source>Read-Only</source>
-      <translation>Salt-Okunur</translation>
     </message>
   </context>
   <context>
@@ -2119,6 +2215,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnCameraAnalyticsPolicy</name>
+    <message>
+      <source>Analytics is not available for %1</source>
+      <translation type="unfinished">Analytics is not available for %1</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
       <source>Select device</source>
@@ -2216,6 +2319,26 @@ to view more bookmarks</source>
     <message>
       <source>Secondary</source>
       <translation>İkincil</translation>
+    </message>
+    <message>
+      <source>Don&apos;t change</source>
+      <translation>Değiştirme</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Düşük</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>Orta</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Yüksek</translation>
+    </message>
+    <message>
+      <source>Edge</source>
+      <translation>Uç</translation>
     </message>
   </context>
   <context>
@@ -2369,12 +2492,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform>Kayıt veya Hareket Algılama Devre Dışı Bırakıldı %1</numerusform>
-        <numerusform>Kayıt veya Hareket Algılama Devre Dışı Bırakıldı %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -2395,13 +2515,33 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnCameraPasswordChangeDialog</name>
+    <message>
+      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
+      <translation>Parola kullanıcı adı ile aynı olamaz</translation>
+    </message>
+    <message>
+      <source>New Password</source>
+      <translation>Yeni Parola</translation>
+    </message>
+    <message>
+      <source>Repeat Password</source>
+      <translation>Parolayı tekrarla</translation>
+    </message>
+    <message>
+      <source>Passwords do not match.</source>
+      <translation>Şifreler eşleşmiyor.</translation>
+    </message>
+    <message>
+      <source>Password should be at least 8 symbols long and contain different types of characters.</source>
+      <translation>Parola en az 8 sembol uzunluğunda ve farklı karakter türleri içermelidir.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>Kayıt %1 için Devre Dışı Bırakıldı</numerusform>
-        <numerusform>Kayıt %1 için Devre Dışı Bırakıldı</numerusform>
-      </translation>
+      <translation type="unfinished">Recording is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -2473,6 +2613,18 @@ to view more bookmarks</source>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
       <translation>Etkinleştirmek ve ayarlamak için kamera ayarlarında &quot;hareket&quot; algılama sekmesine gidin.</translation>
+    </message>
+    <message>
+      <source>Mbit/s</source>
+      <translation>Mbit/s</translation>
+    </message>
+    <message>
+      <source>Less Settings</source>
+      <translation>Basit ayarlar</translation>
+    </message>
+    <message>
+      <source>More Settings</source>
+      <translation>Daha Fazla Ayar</translation>
     </message>
   </context>
   <context>
@@ -2667,11 +2819,11 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Hatalı e-posta yada şifre</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+      <translation>&apos;ı aktif değil.Lütfen e-postanızı denetleyin ve sağlanan yönergeleri izleyin</translation>
     </message>
   </context>
   <context>
@@ -3010,6 +3162,28 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnDefaultPasswordAlertBar</name>
+    <message>
+      <source>This camera requires password to be set up.</source>
+      <translation>Bu kameranın ayarlanabilmesi için şifre gerekir.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras requires password to be set up.</source>
+      <translation>Seçili bazı kamerların ayarlanabilmesi için şifre gerekir.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set Password</source>
+      <translation>
+        <numerusform>Parola Belirle</numerusform>
+        <numerusform>Parola Belirle</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation>Bunu yapmak için sistem yöneticinize başvurun.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
@@ -3255,6 +3429,10 @@ to %1</source>
     <message>
       <source>Auto</source>
       <translation>Oto</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation>Temel</translation>
     </message>
   </context>
   <context>
@@ -3548,38 +3726,6 @@ to %1</source>
     <message>
       <source>Failed to turn on I/O port %1</source>
       <translation>%1 I/O portu açılamadı</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLayoutExportTool</name>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>&quot;%1&quot;'ye dışa aktarma;...</translation>
-    </message>
-    <message>
-      <source>Could not export device %1.</source>
-      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-      <translation>%1 Aygıtı Dışarı Aktarılamadı.</translation>
-    </message>
-    <message>
-      <source>Could not export camera %1.</source>
-      <translation>%1 Kamerası Dışarı Aktarılamadı.</translation>
-    </message>
-    <message>
-      <source>Unknown error has occurred.</source>
-      <translation>Bilinmeyen Bir Hata Meydana Geldi.</translation>
-    </message>
-    <message>
-      <source>Could not export I/O module %1.</source>
-      <translation>%1 I/O Mödülü Dışarı Aktarılamadı.</translation>
-    </message>
-    <message>
-      <source>Could not create output file %1...</source>
-      <translation>%1 Giriş Dosyası Oluşturulamadı...</translation>
-    </message>
-    <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>%1 dosyası başka bir işlem tarafından kullanılıyor. Lütfen başka bir isim deneyin.</translation>
     </message>
   </context>
   <context>
@@ -4057,13 +4203,6 @@ to %1</source>
   <context>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
-      <source>Use analog licenses to view these %n cameras</source>
-      <translation>
-        <numerusform>%n Kameralarını Görüntülemek İçin Analog Lisans Kullan</numerusform>
-        <numerusform>%n Kameralarını Görüntülemek İçin Analog Lisansları Kullan</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
         <numerusform>Seçilen %n Aygıt İçin Lisans Kullan</numerusform>
@@ -4082,6 +4221,13 @@ to %1</source>
       <translation>
         <numerusform>Seçilen %n I/O Modülü İçin Lisans Kullan</numerusform>
         <numerusform>Seçilen %n I/O Modülü İçin Lisanslarını Kullan</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Use licenses to view these %n cameras</source>
+      <translation>
+        <numerusform>Seçilen %n Kamera İçin Lisanslarını Kullan</numerusform>
+        <numerusform>Seçilen %n Kamera İçin Lisanslarını Kullan</numerusform>
       </translation>
     </message>
   </context>
@@ -4322,6 +4468,17 @@ to %1</source>
       <comment>Soft Trigger</comment>
       <translation>bas ve basılı tut</translation>
     </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Takvim dışı</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set for all %n Cameras</source>
+      <translation>
+        <numerusform>Tüm %n kameralar için ayarla</numerusform>
+        <numerusform>Tüm %n kameralar için ayarla</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4462,6 +4619,10 @@ to %1</source>
       <source>Previous Chunk</source>
       <translation>Önceki parça</translation>
     </message>
+    <message>
+      <source>NVR cameras do not support not-synchronized playback</source>
+      <translation>NVR a bağlı kameralar senkronize olmayan oynatmayı desteklemez</translation>
+    </message>
   </context>
   <context>
     <name>QnNetworkSpeedStrings</name>
@@ -4556,6 +4717,10 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>Kabul edilen</translation>
     </message>
+    <message>
+      <source>Set Passwords</source>
+      <translation>Parola Belirle</translation>
+    </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
@@ -4623,7 +4788,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>Bildirimi gören kullanıcılardan biri etkinlik açıklamasıyla yer imi oluşturana kadar gösterilir.</translation>
     </message>
   </context>
   <context>
@@ -5934,6 +6099,18 @@ to %1</source>
       <source>Please check authentication information</source>
       <translation>Kimlik doğrulama bilgilerini gözden geçirin</translation>
     </message>
+    <message>
+      <source>TOO MANY CONNECTIONS</source>
+      <translation>ÇOK FAZLA BAĞLANTI</translation>
+    </message>
+    <message>
+      <source>PASSWORD REQUIRED</source>
+      <translation>PAROLA GEREKLİ</translation>
+    </message>
+    <message>
+      <source>Set for this Camera</source>
+      <translation>Bu Kamera için ayarla</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6229,10 +6406,6 @@ to %1</source>
       <translation>Sistem Güvenli Modda</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>Depolama Alanı Dolu</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>Depolama Alanı Yapılandırılmamış</translation>
     </message>
@@ -6275,10 +6448,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>Arşiv Dizininin Yeniden Yapılması Aşağıdaki Sunucu Kullanıcısı Tarafından İptal Edildi:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>Aşağıdaki Sunucuda Depolama Alanı Dolu:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>
@@ -6350,6 +6519,14 @@ to %1</source>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>Aşağıdaki cihaz için uzak arşiv senkronizasyonu tamamlandı:</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation>Uzak arşiv senkronizasyonu</translation>
+    </message>
+    <message>
+      <source>Archive integrity problem detected</source>
+      <translation>Arşiv bütünlüğü sorunu tespit edildi</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -6411,16 +6588,16 @@ to %1</source>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>System time is synchronized with the Internet and is independent from server local times.</source>
-      <translation>Sistem saatini Internet üzerinden eşitler ve sunucu yerel zamanlardan bağımsızdır.</translation>
-    </message>
-    <message>
-      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-      <translation>Sistem saati seçilen sunucu yerel saatiyle senkronize edilir ve diğer sunuculardan bağımsızdır.</translation>
-    </message>
-    <message>
       <source>No server has Internet access. Time is not being synchronized.</source>
       <translation>Hiçbir sunucunun İnternet erişimi yok. Zaman senkronize edilmiyor.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
+      <translation>Sistem saati Internet'le senkronize edilir ve sunuculardaki yerel saate bağlı değildir.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
+      <translation>Sistem saati seçili sistem ile senkronize edilir ve sunuculardaki yerel saate bağlı değildir.</translation>
     </message>
   </context>
   <context>
@@ -6436,7 +6613,7 @@ to %1</source>
     <message>
       <source>hh:mm</source>
       <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>ss:aa</translation>
+      <translation>hh:mm</translation>
     </message>
     <message>
       <source>h ap</source>
@@ -6446,12 +6623,12 @@ to %1</source>
     <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
-      <translation>gg</translation>
+      <translation>dd</translation>
     </message>
     <message>
       <source>MMMM</source>
       <comment>Format for displaying months on timeline.</comment>
-      <translation>AAAA</translation>
+      <translation>MMMM</translation>
     </message>
     <message>
       <source>yyyy</source>
@@ -6461,27 +6638,27 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>gg AAAA yyyy ss:dd</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>gg AAAA yyyy ss:dd</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>gg AAAA yyyy h ap</translation>
+      <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>gg AAAA yyyy</translation>
+      <translation>dd MMMM yyyy</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>AAAA yyyy</translation>
+      <translation>MMMM yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
@@ -6491,12 +6668,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>saat: dakika ap</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>gg AAAA yyyy s: DD ap</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -7038,186 +7215,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchExportHandler</name>
-    <message>
-      <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>Yürütülebilir %1 Medya Dosyası (x64) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>Yürütülebilir %1 Medya Dosyası (x86) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Exporting Layout</source>
-      <translation>Ekran Dışa Aktarılıyor</translation>
-    </message>
-    <message>
-      <source>Export Video As...</source>
-      <translation>Videoyu Olarak Dışa Aktar...</translation>
-    </message>
-    <message>
-      <source>Timestamps:</source>
-      <translation>Zaman Bilgisi:</translation>
-    </message>
-    <message>
-      <source>Exporting Video</source>
-      <translation>Video Dışa Aktarılıyor</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>&quot;%1&quot;'ye dışa aktarma;...</translation>
-    </message>
-    <message>
-      <source>Export Layout As...</source>
-      <translation>Ekranı Olarak Dışa Aktar...</translation>
-    </message>
-    <message>
-      <source>%1 Media File (*.nov)</source>
-      <translation>%1 Medya Dosyası (*.nov)</translation>
-    </message>
-    <message>
-      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-      <translation>Filtreleri Uygula: Döndürme, Düzeltme, Görüntü İyileştirme, Özel En-Boy Oranı (kod çözme gerektiriyor)</translation>
-    </message>
-    <message>
-      <source>exported</source>
-      <translation>dışa aktarıldı</translation>
-    </message>
-    <message>
-      <source>No Timestamp</source>
-      <translation>Zaman Bilgisi Yok</translation>
-    </message>
-    <message>
-      <source>Top Left Corner (requires transcoding)</source>
-      <translation>Sol Üst Köşe (koz çözme gerektiriyor)</translation>
-    </message>
-    <message>
-      <source>Top Right Corner (requires transcoding)</source>
-      <translation>Sağ Üst Köşe (koz çözme gerektiriyor)</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner (requires transcoding)</source>
-      <translation>Sol Alt Köşe (kod çözme gerektiriyor)</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner (requires transcoding)</source>
-      <translation>Sağ Alt Köşe (kod çözme gerektiriyor)</translation>
-    </message>
-    <message>
-      <source>Save local layout as...</source>
-      <translation>Yerel Ekranı Olarak Kaydet...</translation>
-    </message>
-    <message>
-      <source>Make file read-only.</source>
-      <translation>Salt-Okunur Dosya Oluştur.</translation>
-    </message>
-    <message>
-      <source>File already used for recording</source>
-      <translation>Bu dosya kayıt için zaten kullanımda</translation>
-    </message>
-    <message>
-      <source>Please choose another name or wait until recording is finished.</source>
-      <translation>Lütfen başka bir ad seçin veya kayıt tamamlanana kadar bekleyin.</translation>
-    </message>
-    <message>
-      <source>You are about to export a long video</source>
-      <translation>Yüklü boyutta video dışarı aktarmak üzeresiniz</translation>
-    </message>
-    <message>
-      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>Bu işlem 1 gigabyte dan daha fazla alan gerektirebilir ve tamalanması bir kaç saat alabilir.</translation>
-    </message>
-    <message>
-      <source>Export anyway?</source>
-      <translation>Yine de dışa aktar?</translation>
-    </message>
-    <message>
-      <source>Export to AVI anyway?</source>
-      <translation>Avi olarak dışa aktar?</translation>
-    </message>
-    <message>
-      <source>Selected format not recommended</source>
-      <translation>Seçilen format önerilmiyor</translation>
-    </message>
-    <message>
-      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation>Video boyutunu düşürmek için NOV yada EXE formatı önerilir.</translation>
-    </message>
-    <message>
-      <source>Export with transcoding?</source>
-      <translation>Kodeği çevirerek dışa aktar?</translation>
-    </message>
-    <message>
-      <source>It will increase CPU usage and may take significant time.</source>
-      <translation>Bu işlem CPU kullanımını yükseltir ve daha fazla zaman alır.</translation>
-    </message>
-    <message>
-      <source>EXE format not recommended</source>
-      <translation>EXE formatında önerilmez</translation>
-    </message>
-    <message>
-      <source>Export to EXE anyway?</source>
-      <translation>Yinede EXE olarak dışa aktar?</translation>
-    </message>
-    <message>
-      <source>Failed to export Multi-Video</source>
-      <translation>Çoklu video dışa aktarılırken hata oluştu</translation>
-    </message>
-    <message>
-      <source>Local files not allowed for Multi-Video export</source>
-      <translation>Yerel dsoyalar için çoklu video aktarımına izin verilmiyor</translation>
-    </message>
-    <message>
-      <source>Please remove all local files from the layout and try again.</source>
-      <translation>Lütfen ekran düzeninden yerel dosyaları kaldırıp tekrar deneyin.</translation>
-    </message>
-    <message>
-      <source>Export</source>
-      <translation>Dışa Aktar</translation>
-    </message>
-    <message>
-      <source>You are about to export a lot of video</source>
-      <translation>Yüklü boyutta video dışarı aktarmak üzeresiniz</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>Seçilen süre çok kısa</translation>
-    </message>
-    <message>
-      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-      <translation>Hızlı bakış dışarı aktarmak için video en az 10 saniye olmalıdır.</translation>
-    </message>
-    <message>
-      <source>Export completed</source>
-      <translation>Aktarma tamamlandı</translation>
-    </message>
-    <message>
-      <source>Failed to export video</source>
-      <translation>Vidyo aktarılırken hata oluştu</translation>
-    </message>
-    <message>
-      <source>AVI format is not recommended</source>
-      <translation>AVI Formatı Tavsiye Edilmez</translation>
-    </message>
-    <message>
-      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation>Sürekli olmayan kayıtlar için MKV yada diğer formatlar önerilir.</translation>
-    </message>
-    <message>
-      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>4GB dan büyük EXE dosyaları windows limitlerinden dolayı açılamaz.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
-    <message>
-      <source>Enter Password...</source>
-      <translation>Şifre Giriniz...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>Yönetici Şifresi</translation>
-    </message>
     <message>
       <source>Systems will be merged shortly</source>
       <translation>Sistem kısa süre içinde birleştirilecek</translation>
@@ -7239,10 +7237,6 @@ to %1</source>
       <translation>Toplam lisans miktarını azalacaktır</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Parola boş olamaz.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>Bulut sistemler birleştirilemez</translation>
     </message>
@@ -7257,6 +7251,14 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>Sunucu kısa sürede Sistem'e bağlanacak</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>Şifre Giriniz...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>Yönetici parolası</translation>
     </message>
   </context>
   <context>
@@ -7727,6 +7729,459 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::AnalyticsActionFactory</name>
+    <message>
+      <source>Dynamic</source>
+      <translation>Dinamik</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportProcess</name>
+    <message>
+      <source>Unsupported media for data export.</source>
+      <translation>Veri aktarımı için desteklenmeyen medya.</translation>
+    </message>
+    <message>
+      <source>Selected format is not supported by FFMPEG library.</source>
+      <translation>Seçilen format FFMPEG kütüphanesi tarafından desteklenmiyor.</translation>
+    </message>
+    <message>
+      <source>FFMPEG library error.</source>
+      <translation>FFMPEG library hatası.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with selected format.</source>
+      <translation>Ses veya Video Kodek'i Seçilen Formatla Uyumsuz.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation>Dosya yazma hatası.</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>Dahili hata</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Veri dışarı aktarma.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportSettingsDialog</name>
+    <message>
+      <source>exported</source>
+      <translation>dışa aktarıldı</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Dışa Aktar</translation>
+    </message>
+    <message>
+      <source>Rapid Review</source>
+      <translation>Hızlı gözden geçirme</translation>
+    </message>
+    <message>
+      <source>Export Settings</source>
+      <translation>Ayarları Dışa Aktar</translation>
+    </message>
+    <message>
+      <source>Add Timestamp</source>
+      <translation>Zaman Damgasını Ekle</translation>
+    </message>
+    <message>
+      <source>Delete Timestamp</source>
+      <translation>Zaman Damgasını Sil</translation>
+    </message>
+    <message>
+      <source>Timestamp</source>
+      <translation>Zaman Bilgisi</translation>
+    </message>
+    <message>
+      <source>Add Image</source>
+      <translation>Resim Ekle</translation>
+    </message>
+    <message>
+      <source>Delete Image</source>
+      <translation>Resmi sil</translation>
+    </message>
+    <message>
+      <source>Image</source>
+      <translation>Resim</translation>
+    </message>
+    <message>
+      <source>Add Text</source>
+      <translation>Metin ekle</translation>
+    </message>
+    <message>
+      <source>Delete Text</source>
+      <translation>Metni sil</translation>
+    </message>
+    <message>
+      <source>Text</source>
+      <translation>Metin</translation>
+    </message>
+    <message>
+      <source>Reset Speed</source>
+      <translation>Hızı Sıfırla</translation>
+    </message>
+    <message>
+      <source>Add Bookmark Info</source>
+      <translation>Yer İşaret Bilgisi Ekle</translation>
+    </message>
+    <message>
+      <source>Delete Bookmark Info</source>
+      <translation>Yer işaretini sil</translation>
+    </message>
+    <message>
+      <source>Bookmark Info</source>
+      <translation>Bookmark Bilgisi</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::FilenamePanel</name>
+    <message>
+      <source>Folder</source>
+      <translation>Klasör</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>İsim</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty.</source>
+      <translation>İsim boş olamaz.</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>Klasör Seç...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
+    <message>
+      <source>Select file...</source>
+      <translation>Dosya Seç...</translation>
+    </message>
+    <message>
+      <source>Pictures (%1)</source>
+      <translation>Resimler (%1)</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Hata</translation>
+    </message>
+    <message>
+      <source>Image cannot be loaded.</source>
+      <translation>Resim yüklenemiyor.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutThumbnailLoader</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>VERİ YOK</translation>
+    </message>
+    <message>
+      <source>NOT A CAMERA</source>
+      <translation>KAMERA DEĞİL</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionFactory</name>
+    <message>
+      <source>Auto</source>
+      <translation>Oto</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Düşük</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Yüksek</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Özel Ayarlar</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionHandler</name>
+    <message>
+      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
+      <translation>Performansı artırmak için düzen için &quot;Otomatik&quot; olarak ayarlayýn.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RapidReviewSettingsWidget</name>
+    <message numerus="yes">
+      <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
+      <translation>
+        <numerusform>Hızlı bakış dışarı aktarmak için video en az %n saniye olmalıdır.</numerusform>
+        <numerusform>Hızlı bakış dışarı aktarmak için video en az %n saniye olmalıdır.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
+    <message>
+      <source>Long</source>
+      <translation>Uzun</translation>
+    </message>
+    <message>
+      <source>Short</source>
+      <translation>Kısa</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchAnalyticsController</name>
+    <message>
+      <source>%1 Analytics</source>
+      <translation>%1 Analiz</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchExportHandler</name>
+    <message>
+      <source>Stop Export</source>
+      <translation>Aktarmayı durdur</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>Aktarma tamamlandı</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation>Dışa aktarma başarısız oldu</translation>
+    </message>
+    <message>
+      <source>Cannot write file</source>
+      <translation>Dosyaya yazılamıyor</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 başka bir aktarma işlemi tarafından kullanılıyor.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::ExportLayoutTool</name>
+    <message>
+      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+      <translation>%1 dosyası başka bir işlem tarafından kullanılıyor. Lütfen başka bir isim deneyin.</translation>
+    </message>
+    <message>
+      <source>Could not create output file %1...</source>
+      <translation>%1 Giriş Dosyası Oluşturulamadı...</translation>
+    </message>
+    <message>
+      <source>Unknown error has occurred.</source>
+      <translation>Bilinmeyen Bir Hata Meydana Geldi.</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>&quot;%1&quot;'ye dışa aktarma;...</translation>
+    </message>
+    <message>
+      <source>Could not export device %1.</source>
+      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+      <translation>%1 Aygıtı Dışarı Aktarılamadı.</translation>
+    </message>
+    <message>
+      <source>Could not export camera %1.</source>
+      <translation>%1 Kamerası Dışarı Aktarılamadı.</translation>
+    </message>
+    <message>
+      <source>Could not export I/O module %1.</source>
+      <translation>%1 I/O Mödülü Dışarı Aktarılamadı.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::WorkbenchExportHandler</name>
+    <message>
+      <source>Executable %1 Media File (x64) (*.exe)</source>
+      <translation>Yürütülebilir %1 Medya Dosyası (x64) (*.exe)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86) (*.exe)</source>
+      <translation>Yürütülebilir %1 Medya Dosyası (x86) (*.exe)</translation>
+    </message>
+    <message>
+      <source>File already used for recording</source>
+      <translation>Bu dosya kayıt için zaten kullanımda</translation>
+    </message>
+    <message>
+      <source>Please choose another name or wait until recording is finished.</source>
+      <translation>Lütfen başka bir ad seçin veya kayıt tamamlanana kadar bekleyin.</translation>
+    </message>
+    <message>
+      <source>Exporting Layout</source>
+      <translation>Ekran Dışa Aktarılıyor</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video</source>
+      <translation>Yüklü boyutta video dışarı aktarmak üzeresiniz</translation>
+    </message>
+    <message>
+      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation>Bu işlem 1 gigabyte dan daha fazla alan gerektirebilir ve tamalanması bir kaç saat alabilir.</translation>
+    </message>
+    <message>
+      <source>Export anyway?</source>
+      <translation>Yine de dışa aktar?</translation>
+    </message>
+    <message>
+      <source>Export Video As...</source>
+      <translation>Videoyu Olarak Dışa Aktar...</translation>
+    </message>
+    <message>
+      <source>No Timestamp</source>
+      <translation>Zaman Bilgisi Yok</translation>
+    </message>
+    <message>
+      <source>Top Left Corner (requires transcoding)</source>
+      <translation>Sol Üst Köşe (koz çözme gerektiriyor)</translation>
+    </message>
+    <message>
+      <source>Top Right Corner (requires transcoding)</source>
+      <translation>Sağ Üst Köşe (koz çözme gerektiriyor)</translation>
+    </message>
+    <message>
+      <source>Bottom Left Corner (requires transcoding)</source>
+      <translation>Sol Alt Köşe (kod çözme gerektiriyor)</translation>
+    </message>
+    <message>
+      <source>Bottom Right Corner (requires transcoding)</source>
+      <translation>Sağ Alt Köşe (kod çözme gerektiriyor)</translation>
+    </message>
+    <message>
+      <source>Timestamps:</source>
+      <translation>Zaman Bilgisi:</translation>
+    </message>
+    <message>
+      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+      <translation>Filtreleri Uygula: Döndürme, Düzeltme, Görüntü İyileştirme, Özel En-Boy Oranı (kod çözme gerektiriyor)</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended</source>
+      <translation>AVI Formatı Tavsiye Edilmez</translation>
+    </message>
+    <message>
+      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
+      <translation>Sürekli olmayan kayıtlar için MKV yada diğer formatlar önerilir.</translation>
+    </message>
+    <message>
+      <source>Export to AVI anyway?</source>
+      <translation>Avi olarak dışa aktar?</translation>
+    </message>
+    <message>
+      <source>Selected format not recommended</source>
+      <translation>Seçilen format önerilmiyor</translation>
+    </message>
+    <message>
+      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
+      <translation>Video boyutunu düşürmek için NOV yada EXE formatı önerilir.</translation>
+    </message>
+    <message>
+      <source>Export with transcoding?</source>
+      <translation>Kodeği çevirerek dışa aktar?</translation>
+    </message>
+    <message>
+      <source>It will increase CPU usage and may take significant time.</source>
+      <translation>Bu işlem CPU kullanımını yükseltir ve daha fazla zaman alır.</translation>
+    </message>
+    <message>
+      <source>Exporting Video</source>
+      <translation>Video Dışa Aktarılıyor</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>&quot;%1&quot;'ye dışa aktarma;...</translation>
+    </message>
+    <message>
+      <source>EXE format not recommended</source>
+      <translation>EXE formatında önerilmez</translation>
+    </message>
+    <message>
+      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
+      <translation>4GB dan büyük EXE dosyaları windows limitlerinden dolayı açılamaz.</translation>
+    </message>
+    <message>
+      <source>Export to EXE anyway?</source>
+      <translation>Yinede EXE olarak dışa aktar?</translation>
+    </message>
+    <message>
+      <source>Failed to export Multi-Video</source>
+      <translation>Çoklu video dışa aktarılırken hata oluştu</translation>
+    </message>
+    <message>
+      <source>Local files not allowed for Multi-Video export</source>
+      <translation>Yerel dsoyalar için çoklu video aktarımına izin verilmiyor</translation>
+    </message>
+    <message>
+      <source>Please remove all local files from the layout and try again.</source>
+      <translation>Lütfen ekran düzeninden yerel dosyaları kaldırıp tekrar deneyin.</translation>
+    </message>
+    <message>
+      <source>Save local layout as...</source>
+      <translation>Yerel Ekranı Olarak Kaydet...</translation>
+    </message>
+    <message>
+      <source>Export Layout As...</source>
+      <translation>Ekranı Olarak Dışa Aktar...</translation>
+    </message>
+    <message>
+      <source>exported</source>
+      <translation>dışa aktarıldı</translation>
+    </message>
+    <message>
+      <source>%1 Media File (*.nov)</source>
+      <translation>%1 Medya Dosyası (*.nov)</translation>
+    </message>
+    <message>
+      <source>Make file read-only.</source>
+      <translation>Salt-Okunur Dosya Oluştur.</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Dışa Aktar</translation>
+    </message>
+    <message>
+      <source>You are about to export a lot of video</source>
+      <translation>Yüklü boyutta video dışarı aktarmak üzeresiniz</translation>
+    </message>
+    <message>
+      <source>Too short period selected</source>
+      <translation>Seçilen süre çok kısa</translation>
+    </message>
+    <message>
+      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
+      <translation>Hızlı bakış dışarı aktarmak için video en az 10 saniye olmalıdır.</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>Aktarma tamamlandı</translation>
+    </message>
+    <message>
+      <source>Failed to export video</source>
+      <translation>Vidyo aktarılırken hata oluştu</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
+    <message>
+      <source>No event types supported</source>
+      <translation>Desteklenen etkinlik türü yok</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
+    <message>
+      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
+      <translation>Etkinlik tüm şartlar karşılandığında tetiklenecektir. Anahtar kelime alanı boş ise şartlar her zaman karşılanmış olacaktır. Eğer değilse anahtar kelimeye karşılık gelen analiz tetiklenecektir.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
     <message>
       <source>Copy</source>
@@ -7809,11 +8264,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Turu Durdur</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Tura Başla</translation>
     </message>
   </context>
   <context>
@@ -8070,6 +8525,14 @@ to %1</source>
       <source>Failed to open server web page</source>
       <translation>Sunucunun web sayfası açılırken hata oluştu</translation>
     </message>
+    <message>
+      <source>Failed to change password</source>
+      <translation>Parola Değiştirilemedi</translation>
+    </message>
+    <message>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation>%2 kameradan %1'de şifre değiştirilemedi</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -8078,8 +8541,8 @@ to %1</source>
       <translation>Düzeni değiştirmek için klavye oklarını kullanın. Showreel'den çıkmak için Esc tuşuna basın.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>Turu Bitirmek İçin Herhangi Bir Düğmeye Basın.</translation>
     </message>
   </context>
   <context>
@@ -8100,16 +8563,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>Yerleşim Turu %1 Silinsin mi?</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation>Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
       <translation>Showreel %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation>Showreel %1'i silinsin mi?</translation>
     </message>
   </context>
   <context>

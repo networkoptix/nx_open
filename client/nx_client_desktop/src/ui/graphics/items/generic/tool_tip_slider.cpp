@@ -155,6 +155,9 @@ void QnToolTipSlider::hideToolTip(bool animated)
         killTimer(m_toolTipAutoHideTimerId);
         m_toolTipAutoHideTimerId = 0;
     }
+
+    // Make sure tooltip will be auto-shown when needed.
+    m_toolTipAutoVisible = false;
 }
 
 void QnToolTipSlider::setToolTipEnabled(bool enabled)
@@ -193,7 +196,7 @@ void QnToolTipSlider::updateToolTipAutoVisibility()
     if (!toolTipItem())
         return;
 
-    auto shouldBeVisible = calculateToolTipAutoVisibility();
+    const auto shouldBeVisible = calculateToolTipAutoVisibility();
     if (shouldBeVisible == m_toolTipAutoVisible)
         return;
 
@@ -281,6 +284,17 @@ bool QnToolTipSlider::showOwnTooltip(const QPointF& /*pos*/)
      * Displaying is also controlled by the slider itself.
      */
     return true;
+}
+
+bool QnToolTipSlider::actualToolTipVisibility() const
+{
+    const bool isAnimating = m_tooltipWidgetVisibilityAnimator->isRunning();
+
+    const qreal actualOpacity = isAnimating
+        ? m_tooltipWidgetVisibilityAnimator->targetValue().toReal()
+        : m_tooltipWidgetVisibility;
+
+    return !qFuzzyIsNull(actualOpacity);
 }
 
 bool QnToolTipSlider::calculateToolTipAutoVisibility() const

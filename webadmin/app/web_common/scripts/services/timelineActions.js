@@ -29,40 +29,28 @@ TimelineActions.prototype.setPositionProvider = function (positionProvider){
     this.positionProvider = positionProvider;
 };
 
-TimelineActions.prototype.goToLive = function(){
-    var self = this;
-    var moveDate = self.scaleManager.screenCoordinateToDate(1);
-    self.animateScope.progress(self.scope, 'goingToLive' ).then(
-        function(){
-            var activeDate = (new Date()).getTime();
-            self.scaleManager.setAnchorDateAndPoint(activeDate,1);
-            self.scaleManager.watchPlaying(activeDate, true);
-        },
-        function(){},
-        function(val){
-            var activeDate = moveDate + val * ((new Date()).getTime() - moveDate);
-            self.scaleManager.setAnchorDateAndPoint(activeDate,1);
-        });
-};
+TimelineActions.prototype.updatePlayingState = function(playingPosition){
+    this.scaleManager.updatePlayingState(playingPosition, this.positionProvider.liveMode, this.positionProvider.playing);
 
+}
 TimelineActions.prototype.playPause = function() {
-    if (!this.positionProvider.playing) {
-        this.scaleManager.watchPlaying();
-    }
+    this.updatePlayingState(null);
+
+    // Maybe we need to scroll to playing position smoothly?
+    // this.scaleManager.watchPosition();
 };
 
 
 TimelineActions.prototype.delayWatchingPlayingPosition = function(){
     var self = this;
-    if(!self.stopDelay) {
-        self.scaleManager.stopWatching();
-    }else{
+    self.scaleManager.stopWatching();
+    if(self.stopDelay) {
         clearTimeout(self.stopDelay);
     }
     self.stopDelay = setTimeout(function(){
         self.scaleManager.releaseWatching();
         self.stopDelay = null;
-    },self.timelineConfig.animationDuration);
+    }, self.timelineConfig.animationDuration);
 };
 
 
@@ -80,7 +68,7 @@ TimelineActions.prototype.updatePosition = function(){
                 self.nextPlayedPosition = false;
             }
             // Update live position anyways
-            self.scaleManager.tryToSetLiveDate(null, self.positionProvider.liveMode);
+            self.updatePlayingState(null);
             return; // ignore changes until played position wasn't changed
         }
 
@@ -89,8 +77,7 @@ TimelineActions.prototype.updatePosition = function(){
         var largeJump = intervalMs > 2 * self.timelineConfig.animationDuration;
 
         if(intervalMs == 0){
-            // Update live position anyways
-            self.scaleManager.tryToSetLiveDate(null, self.positionProvider.liveMode);
+            self.updatePlayingState(null); // No need to animate, update position
             return;
         }
         if (!largeJump || !self.animateScope.animating(self.scope, 'lastPlayedPosition')) { // Large jump
@@ -101,24 +88,27 @@ TimelineActions.prototype.updatePosition = function(){
                 function () {},
                 function (value) {
                     if(self.nextPlayedPosition){
-                        console.log("problem with playing position",value,self.nextPlayedPosition);
                         self.scope.lastPlayedPosition = self.nextPlayedPosition;
+                        console.error("problem with playing position",value,self.nextPlayedPosition);
                         return;
                     }
-                    self.scaleManager.tryToSetLiveDate(value, self.positionProvider.liveMode);
+                    self.updatePlayingState(value); // animate played position
                 });
         }
     }
 };
 
-TimelineActions.prototype.setAnchorCoordinate = function(mouseX){
+TimelineActions.prototype.setClickedCoordinate = function(mouseX){
+    this.scaleManager.clickedCoordinate(mouseX);
+
     var position = this.scaleManager.setAnchorCoordinate(mouseX); // Set position to keep and get time to set
 
     this.nextPlayedPosition = position; // Setting this we will ignore timeupdates until new position starts playing
 
     this.stopAnimatingMove(); // Instantly jump to new position
     this.scope.lastPlayedPosition = position;
-    this.scaleManager.tryToSetLiveDate(position, this.positionProvider.liveMode);
+
+    this.updatePlayingState(position); // Force set clicked position as playing
 
     return position;
 };
@@ -128,9 +118,10 @@ TimelineActions.prototype.setAnchorCoordinate = function(mouseX){
 // linear is for holding function
 TimelineActions.prototype.animateScroll = function(targetPosition, linear){
     var self = this;
+    this.scope.scrollTarget = this.scaleManager.scroll();
     self.delayWatchingPlayingPosition();
-    self.scope.scrollTarget = self.scaleManager.scroll();
-    self.animateScope.animate(self.scope, 'scrollTarget', targetPosition, linear?'linear':false).
+    self.animateScope.animate(self.scope, 'scrollTarget', targetPosition, linear?'linear':'dryResistance',
+            linear? self.timelineConfig.animationDuration/2: self.timelineConfig.animationDuration).
         then(
         function(){
             self.scrollingNow = false;
@@ -143,18 +134,19 @@ TimelineActions.prototype.animateScroll = function(targetPosition, linear){
 };
 
 // Constant scrolling process
-TimelineActions.prototype.scrollingRenew = function(stoping){
+TimelineActions.prototype.scrollingRenew = function(stopping){
     if(this.scrollingNow) {
         var moveScroll = (this.scrollingLeft ? -1 : 1) * this.scrollingSpeed;
         var scrollTarget = this.scaleManager.getScrollByPixelsTarget(moveScroll);
-        this.animateScroll(scrollTarget,stoping);
+        this.animateScroll(scrollTarget, !stopping);
     }
 };
 TimelineActions.prototype.scrollingStart = function(left,speed){
     this.scrollingLeft = left;
     this.scrollingNow = true;
     this.scrollingSpeed = speed;
-    this.scrollingRenew ();
+    this.scope.scrollTarget = this.scaleManager.scroll();
+    this.scrollingRenew(false);
 };
 TimelineActions.prototype.scrollingStop = function(){
     if(this.scrollingNow) {
@@ -166,7 +158,15 @@ TimelineActions.prototype.scrollingStop = function(){
 
 TimelineActions.prototype.scrollByPixels = function(pixels){
     this.scaleManager.scrollByPixels(pixels);
-    this.delayWatchingPlayingPosition();   
+
+    //If we cant scroll right and we are trying to watch live position and dont delay
+    //Otherwise proceed as normal
+    if(!this.scaleManager.canScroll(false) && pixels > 0){
+        this.scaleManager.checkWatch(true);
+    }
+    else{
+        this.delayWatchingPlayingPosition();
+    }
 };
 
 
@@ -176,6 +176,7 @@ TimelineActions.prototype.scrollByPixels = function(pixels){
 // gets absolute zoom value - to target level from 0 to 1
 TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant){
     var self = this;
+    var originalZoomTarget = zoomTarget;
     zoomTarget = this.scaleManager.boundZoom(zoomTarget);
 
     if(typeof(zoomCoordinate)=='undefined'){
@@ -187,29 +188,56 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
         return; // No need to zoom
     }
 
+    var keepWatching = false;
+    //Need to make sure scaleManager is watching live. Only force it when heading to the right edge
+    //zooming in
+    self.scaleManager.checkWatch(true);
+    if(zoom >= zoomTarget){
+        /*If the zoomCoordinate is at the right border it will be set to the viewport width.
+          When the scaleManager is watching the live position it still needs to keep updating the end.
+          If both conditions are true then we ignore the delayingWatchingPlayingPosition in the setZoom function.
+        */
+        keepWatching = zoomCoordinate == self.scaleManager.viewportWidth && self.scaleManager.watch.live;
+    }
+    //zooming out
+    else{
+        //If scaleManager is watching live we ignore delayingWatchingPlayingPosition
+        keepWatching = self.scaleManager.watch.live;
+    }
+
+
     this.updateZoomLevels(zoomTarget);
     function setZoom(value){
-
-    // Actually, we'd better use zoom around coordinate instead of date?
+        // Actually, we'd better use zoom around coordinate instead of date?
         self.scaleManager.zoomAroundPoint(
             value,
             zoomCoordinate
         );
-        self.scaleManager.checkZoomAsync().then(function(){
-            // TODO: here we need to apply the change to scope - call digest if anything changed
-            self.scope.$digest();
-        });
-        self.delayWatchingPlayingPosition();
+
+        //Have to skip delayWatchingPlayingPosition because it freezes visibleEnd
+        //As a result zoom will not behave correctly
+        if(!keepWatching)
+        {
+            self.delayWatchingPlayingPosition();
+        }
     }
 
+
+    self.scaleManager.checkZoomAsync(zoomTarget).then(function(){
+        self.scope.$digest();
+    });
 
     if(!instant) {
         if(!self.scope.zoomTarget) {
             self.scope.zoomTarget = self.scaleManager.zoom();
         }
-
-        self.delayWatchingPlayingPosition();
-        self.animateScope.animate(self.scope, 'zoomTarget', zoomTarget, 'dryResistance').then(
+        //if using zoom buttons we need to not delay if live
+        if(!keepWatching){
+            self.delayWatchingPlayingPosition();
+        }
+        // If we animate - we animate not to bound zoom, but to original value
+        // we need this to keep constant zooming speed
+        self.animateScope.animate(self.scope, 'zoomTarget', originalZoomTarget, 'dryResistance').then(
             function () {
                 self.zoomByWheelTarget = 0; // When animation if over - clean zoomByWheelTarget
             },
@@ -226,48 +254,50 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
 TimelineActions.prototype.updateZoomLevels = function(zoomTarget){
     var self = this;
     function levelsChanged(newLevels,oldLevels){
+        var changedLevels = [];
         if(newLevels && (!oldLevels || !oldLevels.labels)){
-            return true;
+            return ['labels', 'middle', 'small', 'marks'];
         }
 
         if(newLevels.labels.index != oldLevels.labels.index) {
-            return true;
+            changedLevels.push('labels');
         }
 
         if(newLevels.middle.index != oldLevels.middle.index) {
-            return true;
+            changedLevels.push('middle');
         }
 
         if(newLevels.small.index != oldLevels.small.index) {
-            return true;
+            changedLevels.push('small');
         }
 
         if(newLevels.marks.index != oldLevels.marks.index) {
-            return true;
+            changedLevels.push('marks');
         }
 
-        return false;
+        return changedLevels;
     }
 
     //Find final levels for this zoom and run animation:
     var newTargetLevels = self.scaleManager.targetLevels(zoomTarget);
-    if(levelsChanged(newTargetLevels, self.animationState.targetLevels)){
+    var changedLevels = levelsChanged(newTargetLevels, self.animationState.targetLevels);
+    if(changedLevels.length>0){
         self.animationState.targetLevels = newTargetLevels;
+    }
+    for(var i in changedLevels){
+        var changedLevel = changedLevels[i];
 
-        if( self.animationState.zooming == 1){ // We need to run animation again
-            self.animationState.zooming = 0;
-        }
-
-        // This allows us to continue (and slowdown, mb) animation every time
-        self.scope.zooming = self.animationState.zooming;
-
-        self.animateScope.animate(self.scope,'zooming',1,'dryResistance').then(function(){
-            self.animationState.currentLevels = self.scaleManager.levels;
-        },function(){
-            // ignore animation re-run
-        },function(value){
-            self.animationState.zooming = value;
-        });
+        self.animationState[changedLevel] = 0; // Start animation over
+        self.animationState.currentLevels[changedLevel] = self.scaleManager.levels[changedLevel]; // force old animation to complete
+        (function(changedLevel){
+            self.animateScope.progress(self.scope, 'zooming' + changedLevel, 'dryResistance').then(function(){
+                self.animationState.currentLevels[changedLevel] = self.scaleManager.levels[changedLevel];
+            },function(){
+                // ignore animation re-run
+            },function(value){
+                self.animationState[changedLevel] = value;
+            });
+        })(changedLevel);
     }
 
 };
@@ -309,6 +339,7 @@ TimelineActions.prototype.zoomingStop = function() {
     var animation = this.animateScope.animating(self.scope, 'zoomTarget');
     if(animation){
         animation.breakAnimation();
+        this.scaleManager.checkZoomAsync(this.scaleManager.zoom());
     }
 };
 
@@ -326,7 +357,7 @@ TimelineActions.prototype.zoomingStart = function(zoomIn) {
 // Double click zoom out button - zoom out completely
 TimelineActions.prototype.fullZoomOut = function(){
     this.zoomingStop(); // stop slow zooming
-    this.zoomTo(1); // zoom out completely
+    this.zoomTo(this.scaleManager.fullZoomOutValue()); // zoom out completely
 };
 
 // Zoom by wheel logic - slighly different for Mac and Win (Mac does smooth scroll on OS level, Win - does not
@@ -362,10 +393,51 @@ TimelineActions.prototype.zoomByWheel = function(clicks, mouseOverElements, mous
 
 
 // Update timeline state - process animations every render
-TimelineActions.prototype.updateState = function(){
+TimelineActions.prototype.updateState = function(mouseXOverTimeline){
     this.updatePosition();
     this.zoomingRenew();
     this.scrollingRenew();
+    this.mouseXOverTimeline = mouseXOverTimeline;
+};
+
+TimelineActions.prototype.scrollingToCursorStop = function(){
+    var scrollSliderAnimation = this.animateScope.animating(this.scope, 'scrollSliderAnimation');
+    if(scrollSliderAnimation){
+        scrollSliderAnimation.breakAnimation();
+    }
+};
+TimelineActions.prototype.scrollingToCursorStart = function(){
+    var self = this;
+
+    self.scaleManager.stopWatching();
+    var lastTime = 0;
+
+    // Here we run animation for slider to catch mouse cursor
+    return self.animateScope.progress(self.scope, 'scrollSliderAnimation', 'linear',
+            self.timelineConfig.scrollSliderMoveDuration).then(function(){
+        // end of animation - jump to target position
+        var targetScroll = self.scaleManager.getScrollTarget(self.mouseXOverTimeline);
+        self.scaleManager.scroll(targetScroll);
+        self.scaleManager.releaseWatching();
+        self.sliderAnimation = null;
+        return true;
+    },function(){
+        // cancelled
+        self.scaleManager.releaseWatching();
+        self.sliderAnimation = null;
+        return false;
+    },function(curTime){
+        if(curTime === 1){
+            return;
+        }
+        var deltaTime = curTime - lastTime; // Time since last update
+        var timeLeft = 1 - curTime;
+        lastTime = curTime;
+        var currentScroll = self.scaleManager.scroll();
+        var targetScroll = self.scaleManager.getScrollTarget(self.mouseXOverTimeline);
+        var newScroll = currentScroll + deltaTime * (targetScroll - currentScroll)/ timeLeft;
+        self.scaleManager.scroll(newScroll);
+    });
 };
 
 TimelineActions.prototype.scrollbarSliderDragStart = function(mouseX){
@@ -397,6 +469,7 @@ TimelineActions.prototype.scrollbarSliderDragEnd = function(){
 TimelineActions.prototype.timelineDragStart = function(mouseX){
     this.scaleManager.stopWatching();
     this.catchTimeline = mouseX;
+    this.scaleManager.dragDate = this.scaleManager.screenCoordinateToDate(mouseX);
 };
 TimelineActions.prototype.timelineDrag = function(mouseX){
     if(this.catchTimeline) {
@@ -410,6 +483,7 @@ TimelineActions.prototype.timelineDragEnd = function(){
     if(this.catchTimeline) {
         this.scaleManager.releaseWatching();
         this.catchTimeline = false;
+        this.scaleManager.dragDate = null;
     }
 };
 

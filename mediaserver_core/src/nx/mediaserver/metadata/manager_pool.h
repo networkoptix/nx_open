@@ -1,13 +1,14 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QSet>
 
 #include <map>
 #include <vector>
 
 #include <boost/optional/optional.hpp>
 
-#include <common/common_module.h>
+#include <nx/utils/log/log.h>
 #include <common/common_module_aware.h>
 #include <utils/common/connective.h>
 
@@ -18,61 +19,71 @@
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/mediaserver/metadata/rule_holder.h>
 #include <nx/fusion/serialization/json.h>
+#include <core/dataconsumer/abstract_data_receptor.h>
+#include "resource_metadata_context.h"
+
+class QnMediaServerModule;
+class QnCompressedVideoData;
 
 namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-struct ResourceMetadataContext
+class MetadataHandler;
+
+class ManagerPool final:
+    public Connective<QObject>
 {
-public:
-    using ManagerDeleter = std::function<void(nx::sdk::metadata::AbstractMetadataManager*)>;
-
-    ResourceMetadataContext(
-        nx::sdk::metadata::AbstractMetadataManager*,
-        nx::sdk::metadata::AbstractMetadataHandler*);
-    
-    std::unique_ptr<
-        nx::sdk::metadata::AbstractMetadataManager,
-        ManagerDeleter> manager;
-
-    std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler> handler;
-};
-
-class ManagerPool: 
-    public Connective<QObject>,
-    public QnCommonModuleAware
-{
-    using ResourceMetadataContextMap = std::multimap<QnUuid, ResourceMetadataContext>;
-    using PluginList = QList<nx::sdk::metadata::AbstractMetadataPlugin*>;
+    using ResourceMetadataContextMap = std::map<QnUuid, ResourceMetadataContext>;
 
     Q_OBJECT
 public:
-    ManagerPool(QnCommonModule* commonModule);
+    ManagerPool(QnMediaServerModule* commonModule);
+    ~ManagerPool();
+    void init();
     void at_resourceAdded(const QnResourcePtr& resource);
+    void at_propertyChanged(const QnResourcePtr& resource, const QString& name);
     void at_resourceRemoved(const QnResourcePtr& resource);
-    void at_rulesUpdated(const std::set<QnUuid>& affectedResources);
+    void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
+
+    /**
+     * Return QnAbstractDataReceptor that will receive data from audio/video data provider.
+     */
+    QWeakPointer<QnAbstractDataReceptor> mediaDataReceptor(const QnUuid& id);
+
+    /**
+     * Register data receptor that will receive metadata packets.
+     */
+    void registerDataReceptor(const QnResourcePtr& resource, QWeakPointer<QnAbstractDataReceptor> metadaReceptor);
+
+public slots:
+    void initExistingResources();
 
 private:
+    using PluginList = QList<nx::sdk::metadata::AbstractMetadataPlugin*>;
+
     PluginList availablePlugins() const;
 
-    void createMetadataManagersForResource(const QnSecurityCamResourcePtr& camera);
+    void createMetadataManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera);
 
     nx::sdk::metadata::AbstractMetadataManager* createMetadataManager(
         const QnSecurityCamResourcePtr& camera,
         nx::sdk::metadata::AbstractMetadataPlugin* plugin) const;
 
-    void releaseResourceMetadataManagers(const QnSecurityCamResourcePtr& camera);
+    void releaseResourceMetadataManagersUnsafe(const QnSecurityCamResourcePtr& camera);
 
-    nx::sdk::metadata::AbstractMetadataHandler* createMetadataHandler(
+    MetadataHandler* createMetadataHandler(
         const QnResourcePtr& resource,
         const QnUuid& pluginId);
 
     void handleResourceChanges(const QnResourcePtr& resource);
 
-    bool canFetchMetadataFromResource(const QnSecurityCamResourcePtr& camera) const;
+    bool isCameraAlive(const QnSecurityCamResourcePtr& camera) const;
 
-    bool fetchMetadataForResource(const QnUuid& resourceId, std::set<QnUuid>& eventTypeIds);
+    void fetchMetadataForResourceUnsafe(
+        const QnUuid& resourceId,
+        ResourceMetadataContext& context,
+        QSet<QnUuid>& eventTypeIds);
 
     template<typename T>
     boost::optional<T> deserializeManifest(const char* manifestString) const
@@ -84,7 +95,10 @@ private:
             &success);
 
         if (!success)
+        {
+            NX_ERROR(this) << "Unable to deserialize plugin manifest:" << manifestString;
             return boost::none;
+        }
 
         return deserialized;
     }
@@ -94,14 +108,18 @@ private:
 
     boost::optional<nx::api::AnalyticsDeviceManifest> addManifestToCamera(
         const QnSecurityCamResourcePtr& camera,
-        nx::sdk::metadata::AbstractMetadataManager* manager);
+        nx::sdk::metadata::AbstractMetadataManager* manager,
+        const nx::sdk::metadata::AbstractMetadataPlugin* plugin);
 
     bool resourceInfoFromResource(
         const QnSecurityCamResourcePtr& camera,
         nx::sdk::ResourceInfo* outResourceInfo) const;
 
+    void putVideoData(const QnUuid& id, const QnCompressedVideoData* data);
 private:
     ResourceMetadataContextMap m_contexts;
+    QnMediaServerModule* m_serverModule;
+    QnMutex m_contextMutex;
 };
 
 } // namespace metadata

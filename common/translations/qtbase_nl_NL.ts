@@ -43,7 +43,7 @@
     <name>QAbstractSpinBox</name>
     <message>
       <source>&amp;Select All</source>
-      <translation>&amp;Selecteer alles</translation>
+      <translation>&amp;Alles selecteren</translation>
     </message>
     <message>
       <source>&amp;Step up</source>
@@ -364,7 +364,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation>Datum aangepast</translation>
+      <translation>Datum gewijzigd</translation>
     </message>
   </context>
   <context>
@@ -502,7 +502,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation>&amp;Opslaan</translation>
+      <translation>&amp;Save</translation>
     </message>
     <message>
       <source>All Files (*)</source>
@@ -514,11 +514,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;Rename</source>
-      <translation>&amp;Hernoemen</translation>
+      <translation>&amp;Naam wijzigen</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;Verwijderen</translation>
+      <translation>&amp;Verwijder</translation>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
@@ -526,7 +526,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;New Folder</source>
-      <translation>Nieuwe map</translation>
+      <translation>&amp;Nieuwe map</translation>
     </message>
     <message>
       <source>All files (*)</source>
@@ -621,7 +621,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Onbekend</translation>
+      <translation>Unknown</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -698,7 +698,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation>Datum gewijzigd</translation>
+      <translation>Datum aangepast</translation>
     </message>
     <message>
       <source>My Computer</source>
@@ -717,15 +717,15 @@ Do you want to delete it anyway?</source>
     <name>QGnomeTheme</name>
     <message>
       <source>&amp;OK</source>
-      <translation>&amp;OK</translation>
+      <translation>&amp;Oké</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation>&amp;Save</translation>
+      <translation>&amp;Opslaan</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>
-      <translation>&amp;Annuleer</translation>
+      <translation>&amp;Annuleren</translation>
     </message>
     <message>
       <source>&amp;Close</source>
@@ -852,7 +852,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation>Plakken</translation>
+      <translation>&amp;Plakken</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1158,7 +1158,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation>&amp;Plakken</translation>
+      <translation>Plakken</translation>
     </message>
     <message>
       <source>Delete</source>

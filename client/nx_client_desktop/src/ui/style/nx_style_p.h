@@ -4,8 +4,6 @@
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/private/qcommonstyle_p.h>
 
-#include <ui/common/geometry.h>
-
 #include "nx_style.h"
 #include "generic_palette.h"
 #include "noptix_style_animator.h"
@@ -14,12 +12,13 @@
 class QInputDialog;
 class QScrollBar;
 
-class QnNxStylePrivate : public QCommonStylePrivate, public QnGeometry
+class QnNxStylePrivate: public QCommonStylePrivate
 {
     Q_DECLARE_PUBLIC(QnNxStyle)
 
 public:
-    QnNxStylePrivate();
+    explicit QnNxStylePrivate();
+    virtual ~QnNxStylePrivate() override;
 
     QnPaletteColor findColor(const QColor& color) const;
     QnPaletteColor mainColor(QnNxStyle::Colors::Palette palette) const;
@@ -84,7 +83,7 @@ public:
 
 public:
     QnGenericPalette palette;
-    QnNoptixStyleAnimator* idleAnimator;
-    QnNoptixStyleAnimator* stateAnimator;
+    QScopedPointer<QnNoptixStyleAnimator> idleAnimator;
+    QScopedPointer<QnNoptixStyleAnimator> stateAnimator;
     QPointer<QWidget> lastProxiedWidgetUnderMouse;
 };

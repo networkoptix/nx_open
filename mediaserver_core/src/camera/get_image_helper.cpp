@@ -8,15 +8,19 @@
 #include "camera/camera_pool.h"
 #include "plugins/resource/server_archive/server_archive_delegate.h"
 #include <decoders/video/ffmpeg_video_decoder.h>
+#include <nx/utils/log/log_main.h>
+#include "media_server/media_server_module.h"
 
 static const int MAX_GOP_LEN = 100;
+static const nx::utils::log::Tag kLogTag(lit("QnGetImageHelper"));
 
-QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serverDelegate, qint64 ceilTime)
+
+QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnAbstractArchiveDelegate* archiveDelegate, qint64 ceilTime)
 {
     QnCompressedVideoDataPtr video;
     for (int i = 0; i < 20 && !video; ++i)
     {
-        QnAbstractMediaDataPtr media = serverDelegate.getNextData();
+        QnAbstractMediaDataPtr media = archiveDelegate->getNextData();
         if (!media || media->timestamp == DATETIME_NOW)
             break;
         video = std::dynamic_pointer_cast<QnCompressedVideoData>(media);
@@ -27,7 +31,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
     {
         for (int i = 0; i < MAX_GOP_LEN; ++i)
         {
-            QnAbstractMediaDataPtr media2 = serverDelegate.getNextData();
+            QnAbstractMediaDataPtr media2 = archiveDelegate->getNextData();
             if (!media2 || media2->timestamp == DATETIME_NOW)
                 break;
             QnCompressedVideoDataPtr video2 = std::dynamic_pointer_cast<QnCompressedVideoData>(media2);
@@ -39,7 +43,11 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
     return video;
 }
 
-QSize QnGetImageHelper::updateDstSize(const QSharedPointer<QnSecurityCamResource>& res, const QSize& srcSize, QSharedPointer<CLVideoDecoderOutput> outFrame)
+QSize QnGetImageHelper::updateDstSize(
+    const QSharedPointer<QnSecurityCamResource>& res,
+    const QSize& srcSize,
+    QSharedPointer<CLVideoDecoderOutput> outFrame,
+    QnThumbnailRequestData::AspectRatio aspectRatio)
 {
     QSize dstSize(srcSize);
     double sar = outFrame->sample_aspect_ratio;
@@ -64,7 +72,7 @@ QSize QnGetImageHelper::updateDstSize(const QSharedPointer<QnSecurityCamResource
     dstSize.setHeight(qMin(dstSize.height(), qMax(kMaxSize, outFrame->height)));
 
     qreal customAR = res->customAspectRatio();
-    if (!qFuzzyIsNull(customAR))
+    if (aspectRatio == QnThumbnailRequestData::AutoAspectRatio && !qFuzzyIsNull(customAR))
         dstSize.setWidth(dstSize.height() * customAR);
 
     return QnCodecTranscoder::roundSize(dstSize);
@@ -75,10 +83,31 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
     qint64 time,
     bool useHQ,
     QnThumbnailRequestData::RoundMethod roundMethod,
-    const QnSecurityCamResourcePtr &res,
-    QnServerArchiveDelegate& serverDelegate,
-    int prefferedChannel)
+    const QnSecurityCamResourcePtr& res,
+    QnAbstractArchiveDelegate* archiveDelegate,
+    int prefferedChannel,
+    bool& isOpened)
 {
+    auto openDelegateIfNeeded =
+        [&](std::function<qint64 ()> positionUs)
+        {
+            if (isOpened)
+                return;
+            const bool canSeekImmediately = archiveDelegate->getFlags().
+                testFlag(QnAbstractArchiveDelegate::Flag_CanSeekImmediatly);
+            if (canSeekImmediately)
+            {
+                archiveDelegate->seek(positionUs(), true);
+                isOpened = archiveDelegate->open(res, /*archiveIntegrityWatcher*/ nullptr);
+            }
+            else
+            {
+                isOpened = archiveDelegate->open(res, /*archiveIntegrityWatcher*/ nullptr);
+                if (isOpened)
+                    archiveDelegate->seek(positionUs(), true);
+            }
+        };
+
     auto camera = qnCameraPool->getVideoCamera(res);
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
@@ -93,17 +122,16 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
     else if (time == QnThumbnailRequestData::kLatestThumbnail)
     {
         // get latest data
-        if (camera) {
+        if (camera)
+        {
             video = camera->getLastVideoFrame(useHQ, prefferedChannel);
             if (!video)
                 video = camera->getLastVideoFrame(!useHQ, prefferedChannel);
         }
-        if (!video) {
-            if (!serverDelegate.isOpened()) {
-                serverDelegate.open(res);
-                serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
-            }
-            video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
+        if (!video)
+        {
+            openDelegateIfNeeded([&]() {return archiveDelegate->endTime() - 1000 * 100;});
+            video = getNextArchiveVideoPacket(archiveDelegate, AV_NOPTS_VALUE);
             isArchiveVideoPacket = true;
         }
     }
@@ -111,12 +139,11 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
     {
         isArchiveVideoPacket = true;
         // get archive data
-        if (!serverDelegate.isOpened()) {
-            serverDelegate.open(res);
-            serverDelegate.seek(time, true);
-        }
+        openDelegateIfNeeded([&]() {return time;});
         // todo: getNextArchiveVideoPacket should be refactored to videoSequence interface
-        video = getNextArchiveVideoPacket(serverDelegate, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod ? time : AV_NOPTS_VALUE);
+        video = getNextArchiveVideoPacket(
+            archiveDelegate,
+            roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod ? time : AV_NOPTS_VALUE);
         if (!video && camera)
         {
             // try approx frame from GOP keeper
@@ -159,7 +186,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
             gotFrame = decoder.decode(video, &outFrame) && (!precise || video->timestamp >= time);
             if (gotFrame)
                 break;
-            video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
+            video = getNextArchiveVideoPacket(archiveDelegate, AV_NOPTS_VALUE);
         }
     }
 
@@ -169,7 +196,13 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
     return outFrame;
 }
 
-QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImage(const QnSecurityCamResourcePtr& res, qint64 time, const QSize& size, QnThumbnailRequestData::RoundMethod roundMethod, int rotation)
+QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImage(
+    const QnSecurityCamResourcePtr& res,
+    qint64 time,
+    const QSize& size,
+    QnThumbnailRequestData::RoundMethod roundMethod,
+    int rotation,
+    QnThumbnailRequestData::AspectRatio aspectRatio)
 {
     if (!res)
         return QSharedPointer<CLVideoDecoderOutput>();
@@ -196,11 +229,13 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImage(const QnSecurity
     if ((dstSize.width() > 0 && dstSize.width() <= 480) || (dstSize.height() > 0 && dstSize.height() <= 316))
         useHQ = false;
 
-    auto frame = getImageWithCertainQuality( useHQ, res, time, dstSize, roundMethod, rotation );
+    auto frame = getImageWithCertainQuality(
+        useHQ, res, time, dstSize, roundMethod, rotation, aspectRatio );
     if( frame )
         return frame;
     //trying different quality if could not find frame
-    return getImageWithCertainQuality( !useHQ, res, time, dstSize, roundMethod, rotation );
+    return getImageWithCertainQuality(
+        !useHQ, res, time, dstSize, roundMethod, rotation, aspectRatio );
 }
 
 AVPixelFormat updatePixelFormat(AVPixelFormat fmt)
@@ -224,8 +259,10 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
 
     AVCodecContext* videoEncoderCodecCtx = avcodec_alloc_context3(0);
     videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
-    videoEncoderCodecCtx->codec_id = (format == "jpg" || format == "jpeg") ? AV_CODEC_ID_MJPEG : AV_CODEC_ID_PNG;
-    videoEncoderCodecCtx->pix_fmt = updatePixelFormat((AVPixelFormat) outFrame->format);
+    auto codecId = (format == "jpg" || format == "jpeg") ? AV_CODEC_ID_MJPEG : AV_CODEC_ID_PNG;
+    videoEncoderCodecCtx->codec_id = codecId;
+    auto pixelFormat = updatePixelFormat((AVPixelFormat)outFrame->format);
+    videoEncoderCodecCtx->pix_fmt = pixelFormat;
     videoEncoderCodecCtx->width = outFrame->width;
     videoEncoderCodecCtx->height = outFrame->height;
     videoEncoderCodecCtx->bit_rate = outFrame->width * outFrame->height;
@@ -236,7 +273,11 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
     AVCodec* codec = avcodec_find_encoder_by_name(format == "jpg" || format == "jpeg" ? "mjpeg" : format.constData());
     if (avcodec_open2(videoEncoderCodecCtx, codec, NULL) < 0)
     {
-        qWarning() << "Can't initialize ffmpeg encoder for encoding image to format " << format;
+        NX_WARNING(kLogTag,
+            lm("Can't initialize ffmpeg encoder to encode image. codec=%1, pixel format=%2, size=%3x%4")
+            .arg(codecId)
+            .arg(pixelFormat)
+            .arg(outFrame->width).arg(outFrame->height));
     }
     else {
         const int MAX_VIDEO_FRAME = outFrame->width * outFrame->height * 3 / 2;
@@ -246,7 +287,18 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
         int got_packet = 0;
         int encodeResult = avcodec_encode_video2(videoEncoderCodecCtx, &outPacket, outFrame.data(), &got_packet);
         if (encodeResult == 0 && got_packet)
-            result.append((const char*) m_videoEncodingBuffer, outPacket.size);
+        {
+            result.append((const char*)m_videoEncodingBuffer, outPacket.size);
+        }
+        else
+        {
+            NX_WARNING(kLogTag,
+                lm("Can't encode image. codec=%1, pixel format=%2, size=%3x%4, errCode=%5")
+                .arg(codecId)
+                .arg(pixelFormat)
+                .arg(outFrame->width).arg(outFrame->height)
+                .arg(encodeResult));
+        }
 
         qFreeAligned(m_videoEncodingBuffer);
     }
@@ -256,8 +308,13 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
 }
 
 QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQuality(
-    bool useHQ, const QnSecurityCamResourcePtr& res, qint64 time,
-    const QSize& size, QnThumbnailRequestData::RoundMethod roundMethod, int rotation )
+    bool useHQ,
+    const QnSecurityCamResourcePtr& res,
+    qint64 time,
+    const QSize& size,
+    QnThumbnailRequestData::RoundMethod roundMethod,
+    int rotation,
+    QnThumbnailRequestData::AspectRatio aspectRatio)
 {
     QSize dstSize = size;
 
@@ -266,9 +323,14 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQualit
 
     QnConstResourceVideoLayoutPtr layout = res->getVideoLayout();
 
-    QnServerArchiveDelegate serverDelegate;
+    std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate(res->createArchiveDelegate());
+    if (!archiveDelegate)
+        archiveDelegate.reset(new QnServerArchiveDelegate(qnServerModule)); // default value
+    archiveDelegate->setPlaybackMode(PlaybackMode::ThumbNails);
+    bool isOpened = false;
+
     if( !useHQ )
-        serverDelegate.setQuality( MEDIA_Quality_Low, true, QSize() );
+        archiveDelegate->setQuality( MEDIA_Quality_Low, true, QSize() );
 
     QList<QnAbstractImageFilterPtr> filterChain;
 
@@ -277,7 +339,14 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQualit
     bool gotNullFrame = false;
     for( int i = 0; i < layout->channelCount(); ++i )
     {
-        CLVideoDecoderOutputPtr frame = readFrame( time, useHQ, roundMethod, res, serverDelegate, i );
+        CLVideoDecoderOutputPtr frame = readFrame(
+            time,
+            useHQ,
+            roundMethod,
+            res,
+            archiveDelegate.get(),
+            i,
+            isOpened);
         if( !frame )
         {
             gotNullFrame = true;
@@ -289,7 +358,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQualit
         channelMask &= ~(1 << frame->channel);
         if( i == 0 )
         {
-            dstSize = updateDstSize( res, dstSize, frame );
+            dstSize = updateDstSize( res, dstSize, frame, aspectRatio );
             if( dstSize.width() <= 16 || dstSize.height() <= 8 )
                 return CLVideoDecoderOutputPtr();
             filterChain << QnAbstractImageFilterPtr( new QnScaleImageFilter( dstSize ) );
@@ -310,7 +379,14 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQualit
     {
         for( int i = 0; i < 10; ++i )
         {
-            CLVideoDecoderOutputPtr frame = readFrame( time, useHQ, roundMethod, res, serverDelegate, 0 );
+            CLVideoDecoderOutputPtr frame = readFrame(
+                time,
+                useHQ,
+                roundMethod,
+                res,
+                archiveDelegate.get(),
+                0,
+                isOpened);
             if( frame )
             {
                 channelMask &= ~(1 << frame->channel);

@@ -13,7 +13,7 @@
 int QnPlSonyResource::MAX_RESOLUTION_DECREASES_NUM = 3;
 static const int INPUT_MONITOR_TIMEOUT_SEC = 5;
 
-using namespace nx_http;
+using namespace nx::network::http;
 
 QnPlSonyResource::QnPlSonyResource()
 {
@@ -21,7 +21,7 @@ QnPlSonyResource::QnPlSonyResource()
 }
 
 QnPlSonyResource::~QnPlSonyResource() {
-    nx_http::AsyncHttpClientPtr inputMonitorHttpClient;
+    nx::network::http::AsyncHttpClientPtr inputMonitorHttpClient;
     {
         QnMutexLocker lk(&m_inputPortMutex);
         inputMonitorHttpClient = std::move(m_inputMonitorHttpClient);
@@ -168,7 +168,7 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
     }
 
     QAuthenticator auth = getAuth();
-    QUrl requestUrl;
+    nx::utils::Url requestUrl;
     requestUrl.setHost( getHostAddress() );
     requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_HTTP_PORT) );
 
@@ -177,17 +177,17 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
 
     requestUrl.setPath(lit("/command/alarmdata.cgi"));
     requestUrl.setQuery(lit("interval=%1").arg(INPUT_MONITOR_TIMEOUT_SEC));
-    m_inputMonitorHttpClient = nx_http::AsyncHttpClient::create();
+    m_inputMonitorHttpClient = nx::network::http::AsyncHttpClient::create();
     connect(
-        m_inputMonitorHttpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+        m_inputMonitorHttpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived,
         this, &QnPlSonyResource::onMonitorResponseReceived,
         Qt::DirectConnection );
     connect(
-        m_inputMonitorHttpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
+        m_inputMonitorHttpClient.get(), &nx::network::http::AsyncHttpClient::someMessageBodyAvailable,
         this, &QnPlSonyResource::onMonitorMessageBodyAvailable,
         Qt::DirectConnection );
     connect(
-        m_inputMonitorHttpClient.get(), &nx_http::AsyncHttpClient::done,
+        m_inputMonitorHttpClient.get(), &nx::network::http::AsyncHttpClient::done,
         this, &QnPlSonyResource::onMonitorConnectionClosed,
         Qt::DirectConnection );
     m_inputMonitorHttpClient->setTotalReconnectTries( AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
@@ -199,7 +199,7 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
 
 void QnPlSonyResource::stopInputPortMonitoringAsync()
 {
-    nx_http::AsyncHttpClientPtr inputMonitorHttpClient;
+    nx::network::http::AsyncHttpClientPtr inputMonitorHttpClient;
     {
         QnMutexLocker lk( &m_inputPortMutex );
         inputMonitorHttpClient = std::move(m_inputMonitorHttpClient);
@@ -295,7 +295,7 @@ void QnPlSonyResource::onMonitorConnectionClosed( AsyncHttpClientPtr httpClient 
 
     auto response = httpClient->response();
     if (static_cast<bool>(response) &&
-        response->statusLine.statusCode != nx_http::StatusCode::ok)
+        response->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
         return;
     }

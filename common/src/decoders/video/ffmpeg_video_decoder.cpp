@@ -156,7 +156,6 @@ void QnFfmpegVideoDecoder::closeDecoder()
         av_free(m_deinterlaceBuffer);
     av_free(m_deinterlacedFrame);
     delete m_frameTypeExtractor;
-    m_motionMap.clear();
 }
 
 void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data)
@@ -182,8 +181,8 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
                 quint8 nalType = *curNal & 0x1f;
                 if (nalType >= nuSliceNonIDR && nalType <= nuSliceIDR) {
                     BitStreamReader bitReader;
-                    bitReader.setBuffer(curNal+1, end);
                     try {
+                        bitReader.setBuffer(curNal + 1, end);
                         int first_mb_in_slice = NALUnit::extractUEGolombCode(bitReader);
                         if (first_mb_in_slice > 0) {
                             nextSliceCnt++;
@@ -270,13 +269,13 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
         return; // can't reset right now
     }
 
-    //closeDecoder();
-    //openDecoder();
-    //return;
+    QnFfmpegHelper::deleteAvCodecContext(m_passedContext);
+    m_passedContext = nullptr;
 
-    if (m_passedContext && data->context)
+    if (data->context)
 	{
         m_codec = findCodec(data->context->getCodecId());
+        m_passedContext = avcodec_alloc_context3(nullptr);
         QnFfmpegHelper::mediaContextToAvCodecContext(m_passedContext, data->context);
     }
     if (m_passedContext && m_passedContext->width > 8 && m_passedContext->height > 8 && m_currentWidth == -1)
@@ -303,7 +302,6 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
 
     //m_context->debug |= FF_DEBUG_THREADS;
     //m_context->flags2 |= CODEC_FLAG2_FAST;
-    m_motionMap.clear();
     m_frame->data[0] = 0;
     m_spsFound = false;
 }
@@ -322,15 +320,6 @@ void QnFfmpegVideoDecoder::setSpeed( float newValue )
 {
     Q_UNUSED(newValue)
     //ffmpeg-based decoder has nothing to do here
-}
-
-int QnFfmpegVideoDecoder::findMotionInfo(qint64 pkt_dts)
-{
-    for (int i = 0; i < m_motionMap.size(); ++i) {
-        if (m_motionMap[i].first == pkt_dts)
-            return i;
-    }
-    return -1;
 }
 
 void QnFfmpegVideoDecoder::reallocateDeinterlacedFrame()
@@ -387,7 +376,11 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
     if (data && m_codecId!= data->compressionType) {
         if (m_codecId != AV_CODEC_ID_NONE && data->context)
+        {
+            if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+                return false; //< Can't switch decoder to new codec right now.
             resetDecoder(data);
+        }
         m_codecId = data->compressionType;
     }
 
@@ -510,14 +503,6 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                 processNewResolutionIfChanged(data, data->context->getWidth(), data->context->getHeight());
         }
 
-        if (data->motion) {
-            while (m_motionMap.size() > MAX_DECODE_THREAD+1)
-                m_motionMap.remove(0);
-
-            m_motionMap
-                << QPair<qint64, QnAbstractCompressedMetadataPtr>(data->timestamp, data->motion);
-        }
-
         // -------------------------
         if(m_context->codec)
         {
@@ -572,14 +557,6 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
     if (got_picture)
     {
-        int motionIndex = findMotionInfo(m_frame->pkt_dts);
-        if (motionIndex >= 0) {
-            outFrame->metadata = m_motionMap[motionIndex].second;
-            m_motionMap.remove(motionIndex);
-        }
-        else
-            outFrame->metadata.reset();
-
         AVPixelFormat correctedPixelFormat = GetPixelFormat();
         if (!outFrame->isExternalData() &&
             (outFrame->width != m_context->width || outFrame->height != m_context->height ||

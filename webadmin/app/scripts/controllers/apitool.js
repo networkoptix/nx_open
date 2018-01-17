@@ -1,31 +1,6 @@
 'use strict';
 
 angular.module('webadminApp')
-    .filter('highlight', function($sce) {
-        return function(text, phrase) {
-          if (phrase) text = text.replace(new RegExp('('+phrase+')', 'gi'),
-            '<span class="highlighted">$1</span>')
-
-          return $sce.trustAsHtml(text)
-        }
-    })
-    .filter('escape', function($sce) {
-        var entityMap = {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#39;',
-          '/': '&#x2F;',
-          '`': '&#x60;',
-          '=': '&#x3D;'
-        };
-        return function(text, phrase) {
-            return String(text).replace(/[&<>"'`=\/]/g, function (s) {
-                return entityMap[s];
-            });
-        }
-    })
     .controller('ApiToolCtrl', ['$scope', 'mediaserver', '$sessionStorage', '$routeParams',
                                 '$location', '$timeout', 'systemAPI',
     function ($scope, mediaserver, $sessionStorage, $routeParams,
@@ -76,7 +51,7 @@ angular.module('webadminApp')
                                     }
                                 }
                             });
-                            if(param.optional == 'true' && (func.method == 'GET' || func.method == 'POST')){
+                            if(param.optional && (func.method == 'GET' || func.method == 'POST')){
                                 param.values.unshift({label:'', name:null});
                             }
                         }
@@ -87,7 +62,7 @@ angular.module('webadminApp')
                     });
 
                     if(func.url == activeApiMethod){ // Check if we should select this method (checking url parameter)
-                        if(func.proprietary == 'true' && !$scope.allowProprietary){
+                        if(func.proprietary && !$scope.allowProprietary){
                             return; // proprietary methods are forbidden
                         }
                         $scope.setActiveFunction(group, func);

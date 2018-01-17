@@ -4,8 +4,8 @@
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
-#include <nx/utils/collection.h>
 #include <nx/network/socket_common.h>
+#include <nx/utils/algorithm/index_of.h>
 
 namespace
 {
@@ -16,13 +16,13 @@ namespace
     int storageIndex(const QnStorageModelInfoList& list, const QnStorageModelInfo& storage)
     {
         auto byId = [storage](const QnStorageModelInfo& info)  { return storage.id == info.id;  };
-        return qnIndexOf(list, byId);
+        return nx::utils::algorithm::index_of(list, byId);
     }
 
     int storageIndex(const QnStorageModelInfoList& list, const QString& path)
     {
         auto byPath = [path](const QnStorageModelInfo& info)  { return path == info.url;  };
-        return qnIndexOf(list, byPath);
+        return nx::utils::algorithm::index_of(list, byPath);
     }
 
 } // anonymous namespace
@@ -140,7 +140,7 @@ QString urlPath(const QString& url)
         return url;
 
     const QUrl u(url);
-    return SocketAddress(u.host(), u.port(0)).toString() + u.path();
+    return nx::network::SocketAddress(u.host(), u.port(0)).toString() + u.path();
 }
 
 QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedText) const

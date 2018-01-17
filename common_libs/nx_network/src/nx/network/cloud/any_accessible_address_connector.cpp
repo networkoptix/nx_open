@@ -21,7 +21,7 @@ AnyAccessibleAddressConnector::AnyAccessibleAddressConnector(
 void AnyAccessibleAddressConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
-    
+
     m_timer.bindToAioThread(aioThread);
 
     for (auto& connection: m_directConnections)
@@ -38,7 +38,8 @@ void AnyAccessibleAddressConnector::connectAsync(
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("Connecting to %1").arg(containerString(m_entries)), cl_logDEBUG2);
+    NX_VERBOSE(this,
+        lm("Connecting to %1 with timeout %2").args(containerString(m_entries), timeout));
 
     m_timeout = timeout;
     m_handler = std::move(handler);
@@ -71,7 +72,7 @@ void AnyAccessibleAddressConnector::connectAsync(
 void AnyAccessibleAddressConnector::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
-    
+
     m_timer.pleaseStopSync();
     m_directConnections.clear();
     m_cloudConnectors.clear();
@@ -172,7 +173,7 @@ void AnyAccessibleAddressConnector::onConnectDone(
             .arg(m_awaitedConnectOperationCount), cl_logDEBUG2);
         return; //< Waiting for other operations to finish.
     }
-    
+
     if (connection)
         m_socketAttributes.applyTo(connection.get());
 

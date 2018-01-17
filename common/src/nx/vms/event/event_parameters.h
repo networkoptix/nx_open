@@ -39,10 +39,10 @@ struct EventParameters
 
     EventType eventType;
 
-    /** When did the event occur - in usecs. */
+    /** When did the event occur - in microseconds. */
     qint64 eventTimestampUsec;
 
-    /** Event source - camera or server. */
+    /** Event source - id of a camera or a server. */
     QnUuid eventResourceId;
 
     /**
@@ -53,22 +53,22 @@ struct EventParameters
     QString resourceName;
 
 #if 0
-    /** Resource with was used for action. */
+    /** Resource that was used for action. */
     QnUuid actionResourceId;
 #endif // 0
 
-    /** Server that generated the event. */
+    /** Id of a server that generated the event. */
     QnUuid sourceServerId;
 
-    /** Used for QnReasonedBusinessEvent business events as reason code. */
+    /** Used for ReasonedEvent business events as reason code. */
     EventReason reasonCode;
 
-    /** Used for Input events only. */
+    /** Used for Input events only. Identifies the input port. */
     QString inputPortId;
 
     /**
-     * Short event description. Used for camera/server conflict as resource name which cause error.
-     * Used in custom events as a short description.
+     * Short event description. Used for camera/server conflict events as the resource name which
+     * causes the error. Used in custom events as a short description.
      */
     QString caption;
 
@@ -85,6 +85,12 @@ struct EventParameters
      */
     EventMetaData metadata;
 
+    /**
+     * Flag allows to omit event logging to DB on the server.
+     * This event still triggers user notifications
+     */
+    bool omitDbLogging = false;
+
     // TODO: #GDM #vkutin #rvasilenko think about implementing something like std::variant here.
     QnUuid analyticsEventId() const;
     void setAnalyticsEventId(const QnUuid& id);
@@ -97,8 +103,10 @@ struct EventParameters
 
 #define EventParameters_Fields \
     (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
-    (reasonCode)(inputPortId)(caption)(description)(metadata)
+    (reasonCode)(inputPortId)(caption)(description)(metadata)(omitDbLogging)
 QN_FUSION_DECLARE_FUNCTIONS(EventParameters, (ubjson)(json)(eq)(xml)(csv_record));
+
+bool checkForKeywords(const QString& value, const QString& keywords);
 
 } // namespace event
 } // namespace vms

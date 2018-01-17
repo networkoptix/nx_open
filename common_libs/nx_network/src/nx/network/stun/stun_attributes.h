@@ -9,6 +9,7 @@
 #include "stun_message_serializer_buffer.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 namespace error {
@@ -185,7 +186,7 @@ struct NX_NETWORK_API FingerPrint: Attribute
 {
     static const int TYPE = fingerPrint;
 
-    FingerPrint(uint32_t crc32_);
+    FingerPrint(uint32_t crc32_ = 0);
     virtual int getType() const override { return TYPE; }
     uint32_t getCrc32() const { return crc32; }
 
@@ -233,4 +234,5 @@ struct NX_NETWORK_API IntAttribute: Unknown
 } // namespace attrs
 
 } // namespace stun
+} // namespace network
 } // namespace nx

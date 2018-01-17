@@ -1,8 +1,3 @@
-/**********************************************************
-* 6 may 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "authentication_manager.h"
 
 #include <future>
@@ -12,19 +7,16 @@
 
 #include <nx/cloud/cdb/client/data/types.h>
 
-#include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/custom_headers.h>
-#include <nx/network/http/server/fusion_request_result.h>
 #include <nx/network/http/server/http_server_connection.h>
+#include <nx/utils/cryptographic_random_device.h>
+#include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/time.h>
-
-#include <common/common_globals.h> //for Qn::SerializationFormat
-#include <utils/common/app_info.h>
 
 #include "abstract_authentication_data_provider.h"
 #include "../managers/account_manager.h"
@@ -38,29 +30,28 @@
 namespace nx {
 namespace cdb {
 
-using namespace nx_http;
+using namespace nx::network::http;
 
 AuthenticationManager::AuthenticationManager(
     std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
-    const nx_http::AuthMethodRestrictionList& authRestrictionList,
+    const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
     const StreeManager& stree)
 :
     m_authRestrictionList(authRestrictionList),
     m_stree(stree),
-    m_dist(0, std::numeric_limits<size_t>::max()),
     m_authDataProviders(std::move(authDataProviders))
 {
 }
 
 void AuthenticationManager::authenticate(
-    const nx_http::HttpServerConnection& connection,
-    const nx_http::Request& request,
-    nx_http::server::AuthenticationCompletionHandler completionHandler)
+    const nx::network::http::HttpServerConnection& connection,
+    const nx::network::http::Request& request,
+    nx::network::http::server::AuthenticationCompletionHandler completionHandler)
 {
-    boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate;
+    boost::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate;
     nx::utils::stree::ResourceContainer authProperties;
-    nx_http::HttpHeaders responseHeaders;
-    std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
+    nx::network::http::HttpHeaders responseHeaders;
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody;
 
     api::ResultCode authResult = api::ResultCode::notAuthorized;
     auto guard = makeScopeGuard(
@@ -69,21 +60,21 @@ void AuthenticationManager::authenticate(
         {
             if (authResult != api::ResultCode::ok)
             {
-                nx_http::FusionRequestResult result(
-                    nx_http::FusionRequestErrorClass::unauthorized,
+                nx::network::http::FusionRequestResult result(
+                    nx::network::http::FusionRequestErrorClass::unauthorized,
                     QnLexical::serialized(authResult),
                     static_cast<int>(authResult),
                     "unauthorized");
                 responseHeaders.emplace(
                     Qn::API_RESULT_CODE_HEADER_NAME,
                     QnLexical::serialized(authResult).toLatin1());
-                msgBody = std::make_unique<nx_http::BufferSource>(
+                msgBody = std::make_unique<nx::network::http::BufferSource>(
                     Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
                     QJson::serialized(result));
             }
 
             completionHandler(
-                nx_http::server::AuthenticationResult(
+                nx::network::http::server::AuthenticationResult(
                     authResult == api::ResultCode::ok,
                     std::move(authProperties),
                     std::move(wwwAuthenticate),
@@ -91,7 +82,7 @@ void AuthenticationManager::authenticate(
                     std::move(msgBody)));
         });
 
-    //TODO #ak use QnAuthHelper class to enable all that authentication types
+    // TODO: #ak Use QnAuthHelper class to enable all that authentication types.
 
     const auto allowedAuthMethods = m_authRestrictionList.getAllowedAuthMethods(request);
     if (allowedAuthMethods & AuthMethod::noAuth)
@@ -107,7 +98,7 @@ void AuthenticationManager::authenticate(
 
     const auto authHeaderIter = request.headers.find(header::Authorization::NAME);
 
-    //checking header
+    // Checking header.
     boost::optional<header::DigestAuthorization> authzHeader;
     if (authHeaderIter != request.headers.end())
     {
@@ -116,7 +107,7 @@ void AuthenticationManager::authenticate(
             authzHeader.reset();
     }
 
-    //performing stree search
+    // Performing stree search.
     nx::utils::stree::ResourceContainer authTraversalResult;
     nx::utils::stree::ResourceContainer inputRes;
     if (authzHeader && !authzHeader->userid().isEmpty())
@@ -166,7 +157,7 @@ void AuthenticationManager::authenticate(
         std::placeholders::_1,
         std::move(authzHeader.get()));
 
-    //analyzing authSearchResult for password or ha1 pesence
+    // Analyzing authSearchResult for password or ha1 pesence.
     if (auto foundHa1 = authTraversalResult.get(attr::ha1))
     {
         if (validateHa1Func(foundHa1.get().toString().toLatin1()))
@@ -199,20 +190,20 @@ nx::String AuthenticationManager::realm()
     return nx::network::AppInfo::realm().toUtf8();
 }
 
-bool AuthenticationManager::validateNonce(const nx_http::StringType& nonce)
+bool AuthenticationManager::validateNonce(const nx::network::http::StringType& nonce)
 {
-    //TODO #ak introduce more strong nonce validation
-        //Currently, forbidding authentication with nonce, generated by /auth/get_nonce request
+    // TODO: #ak introduce more strong nonce validation.
+    // Currently, forbidding authentication with nonce, generated by /auth/get_nonce request.
     return nonce.size() < 31;
 }
 
 api::ResultCode AuthenticationManager::authenticateInDataManagers(
-    const nx_http::StringType& username,
+    const nx::network::http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
     const nx::utils::stree::AbstractResourceReader& authSearchInputData,
     nx::utils::stree::ResourceContainer* const authProperties)
 {
-    //TODO #ak AuthenticationManager has to become async some time...
+    // TODO: #ak AuthenticationManager has to become async some time...
 
     for (AbstractAuthenticationDataProvider* authDataProvider: m_authDataProviders)
     {
@@ -223,22 +214,23 @@ api::ResultCode AuthenticationManager::authenticateInDataManagers(
             validateHa1Func,
             authSearchInputData,
             authProperties,
-            [&authPromise](api::ResultCode authResult) {
+            [&authPromise](api::ResultCode authResult)
+            {
                 authPromise.set_value(authResult);
             });
         authFuture.wait();
         const auto result = authFuture.get();
         if (result != api::ResultCode::notAuthorized)
-            return result;  //"ok" or "credentialsRemovedPermanently"
+            return result;  //< "ok" or "credentialsRemovedPermanently".
     }
 
     return api::ResultCode::notAuthorized;
 }
 
 void AuthenticationManager::addWWWAuthenticateHeader(
-    boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate)
+    boost::optional<nx::network::http::header::WWWAuthenticate>* const wwwAuthenticate)
 {
-    //adding WWW-Authenticate header
+    // Adding WWW-Authenticate header.
     *wwwAuthenticate = header::WWWAuthenticate();
     wwwAuthenticate->get().authScheme = header::AuthScheme::digest;
     wwwAuthenticate->get().params.insert("nonce", generateNonce());
@@ -248,9 +240,12 @@ void AuthenticationManager::addWWWAuthenticateHeader(
 
 nx::Buffer AuthenticationManager::generateNonce()
 {
-    const size_t nonce = m_dist(m_rd) | nx::utils::timeSinceEpoch().count();
+    const auto nonce =
+        nx::utils::random::number<nx::utils::random::CryptographicRandomDevice, uint64_t>(
+            nx::utils::random::CryptographicRandomDevice::instance())
+        | nx::utils::timeSinceEpoch().count();
     return nx::Buffer::number((qulonglong)nonce);
 }
 
-}   //cdb
-}   //nx
+} // namespace cdb
+} // namespace nx

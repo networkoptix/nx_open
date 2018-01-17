@@ -19,6 +19,9 @@
 #include <nx/streaming/media_context.h>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <common/common_globals.h>
+
+#include "media_data_packet_fwd.h"
 
 // TODO: #dmishin move all classes to separate source files.
 // TODO: #dmishin place this code into proper namespace.
@@ -57,9 +60,6 @@ using QnEmptyMediaDataPtr = std::shared_ptr<QnEmptyMediaData>;
 using QnAbstractCompressedMetadataPtr = std::shared_ptr<QnAbstractCompressedMetadata>;
 using QnConstAbstractCompressedMetadataPtr = std::shared_ptr<const QnAbstractCompressedMetadata>;
 
-using QnCompressedMetadataPtr = std::shared_ptr<QnCompressedMetadata>;
-using QnConstCompressedMetadataPtr = std::shared_ptr<const QnCompressedMetadata>;
-
 using QnMetaDataV1Ptr = std::shared_ptr<QnMetaDataV1>;
 using QnConstMetaDataV1Ptr = std::shared_ptr<const QnMetaDataV1>;
 
@@ -67,6 +67,7 @@ using QnMetaDataLightVector = std::vector<QnMetaDataV1Light, QnAlignedAllocator<
 
 Q_DECLARE_METATYPE(QnMetaDataV1Ptr);
 Q_DECLARE_METATYPE(QnConstMetaDataV1Ptr);
+Q_DECLARE_METATYPE(QnAbstractCompressedMetadataPtr);
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((MediaQuality), (lexical))
 
 struct QnAbstractMediaData : public QnAbstractDataPacket
@@ -118,8 +119,8 @@ public:
         AUDIO,
         CONTAINER,
         META_V1,
-        GENERIC_METADATA,
-        EMPTY_DATA
+        EMPTY_DATA,
+        GENERIC_METADATA
     };
 
 public:
@@ -171,7 +172,8 @@ public:
 enum class MetadataType
 {
     Motion,
-    ObjectDetection
+    ObjectDetection,
+    MediaStreamEvent
 };
 
 // TODO: #dmishin get rid of implementations and members in this class
@@ -186,12 +188,13 @@ public:
 
     virtual bool containTime(const qint64 timeUsec) const;
 
+    qint64 duration() const;
+
 public:
     MetadataType metadataType;
     qint64 m_duration;
     QnByteArray m_data;
 };
-
 
 struct QnCompressedMetadata: public QnAbstractCompressedMetadata
 {
@@ -202,7 +205,15 @@ struct QnCompressedMetadata: public QnAbstractCompressedMetadata
         QnAbstractAllocator* allocator = QnSystemAllocator::instance()) const override;
     virtual const char* data() const override;
     virtual size_t dataSize() const override;
-    virtual bool setData(const char* data, std::size_t dataSize);
+
+    bool setData(const char* data, std::size_t dataSize);
+    bool setData(const QByteArray& data);
+    void setDurationUsec(qint64 value) { m_duration = value;  }
+    void setTimestampUsec(qint64 value) { timestamp = value; }
+
+    static QnCompressedMetadataPtr createMediaEventPacket(
+        qint64 timestampUs,
+        Qn::MediaStreamEvent value);
 };
 
 /**
@@ -313,3 +324,5 @@ protected:
 private:
     qint64 m_firstTimestamp;
 };
+
+using FrameMetadata = QVector<QnAbstractCompressedMetadataPtr>;

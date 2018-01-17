@@ -14,11 +14,11 @@ GetListeningPeerListHandler::GetListeningPeerListHandler(const PeerRegistrator& 
 }
 
 void GetListeningPeerListHandler::processRequest(
-    nx_http::HttpServerConnection* const /*connection*/,
-    const nx_http::Request& /*request*/,
+    nx::network::http::HttpServerConnection* const /*connection*/,
+    const nx::network::http::Request& /*request*/,
     nx::utils::stree::ResourceContainer /*authInfo*/)
 {
-    requestCompleted(nx_http::FusionRequestResult(), m_registrator.getListeningPeers());
+    requestCompleted(nx::network::http::FusionRequestResult(), m_registrator.getListeningPeers());
 }
 
 } // namespace http

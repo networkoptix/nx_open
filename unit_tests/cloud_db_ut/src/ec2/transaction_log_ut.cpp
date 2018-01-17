@@ -324,7 +324,7 @@ private:
         transaction.persistentInfo.dbID = m_otherPeerDbId;
         transaction.transactionType = ::ec2::TransactionType::Cloud;
         transaction.persistentInfo.sequence = m_otherPeerSequence++;
-        transaction.persistentInfo.timestamp = 
+        transaction.persistentInfo.timestamp =
             m_initialTransaction
             ? m_initialTransaction->persistentInfo.timestamp + timestampDiff
             : transactionLog()->generateTransactionTimestamp(m_systemId.c_str()) + timestampDiff;
@@ -548,7 +548,7 @@ private:
         m_sharing.accountId = m_accountToShareWith.id;
         m_sharing.accountEmail = m_accountToShareWith.email;
         m_sharing.accessRole = api::SystemAccessRole::advancedViewer;
-        m_sharing.vmsUserId = 
+        m_sharing.vmsUserId =
             guidFromArbitraryData(m_sharing.accountEmail).toSimpleString().toStdString();
     }
 
@@ -610,6 +610,7 @@ public:
     TransactionLogOverlappingTransactions():
         TransactionLog(dao::DataObjectType::ram)
     {
+        persistentDbManager()->queryExecutor().setConcurrentModificationQueryLimit(0 /*no limit*/);
     }
 
 protected:
@@ -631,7 +632,17 @@ protected:
     {
         using namespace std::placeholders;
 
-        constexpr int transactionToAddCount = 100;
+        const int transactionToAddCount = dbConnectionOptions().maxConnectionCount;
+        ASSERT_GT(transactionToAddCount, 1);
+        m_transactionToExecuteThreshold = 7;
+
+        m_transactionOrder.resize(transactionToAddCount);
+        for (int i = 0; i < transactionToAddCount; ++i)
+            m_transactionOrder[i] = i;
+
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(m_transactionOrder.begin(), m_transactionOrder.end(), g);
 
         QnWaitCondition cond;
         int transactionsToWait = 0;
@@ -643,7 +654,7 @@ protected:
             ++transactionsToWait;
             transactionLog()->startDbTransaction(
                 getSystem(0).id.c_str(),
-                std::bind(&TransactionLogOverlappingTransactions::shareSystemToRandomUser, this, _1),
+                std::bind(&TransactionLogOverlappingTransactions::shareSystemToRandomUser, this, _1, i),
                 [this, &transactionsToWait, &cond](
                     nx::utils::db::QueryContext*, nx::utils::db::DBResult dbResult)
                 {
@@ -692,8 +703,13 @@ protected:
 
 private:
     QnMutex m_mutex;
+    QnWaitCondition m_cond;
+    std::vector<int> m_transactionOrder;
+    int m_transactionToExecuteThreshold = 0;
 
-    nx::utils::db::DBResult shareSystemToRandomUser(nx::utils::db::QueryContext* queryContext)
+    nx::utils::db::DBResult shareSystemToRandomUser(
+        nx::utils::db::QueryContext* queryContext,
+        int originalTransactionIndex)
     {
         api::SystemSharingEx sharing;
         sharing.systemId = getSystem(0).id;
@@ -720,10 +736,32 @@ private:
             std::move(userData));
         NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
 
-        std::this_thread::sleep_for(
-            std::chrono::milliseconds(nx::utils::random::number<int>(0, 1000)));
+        // Making sure transactions are completed in the order
+        // different from the one they were added.
+        yieldToOtherTransactions(originalTransactionIndex);
 
         return nx::utils::db::DBResult::ok;
+    }
+
+    void yieldToOtherTransactions(int originalTransactionIndex)
+    {
+        using namespace std::chrono;
+
+        constexpr milliseconds kMaxDelay = milliseconds(50);
+
+        QnMutexLocker lock(&m_mutex);
+
+        const auto t0 = std::chrono::steady_clock::now();
+        while (m_transactionOrder[originalTransactionIndex] > m_transactionToExecuteThreshold)
+        {
+            const auto timePassed = duration_cast<milliseconds>(steady_clock::now() - t0);
+            if (timePassed >= kMaxDelay)
+                break;
+            m_cond.wait(lock.mutex(), (kMaxDelay - timePassed).count());
+        }
+
+        ++m_transactionToExecuteThreshold;
+        m_cond.wakeAll();
     }
 };
 

@@ -39,33 +39,33 @@
 
                     <div>
                         <h3>重置伺服器</h3>
-                        <p>This action will revert this server to defaults (clear the database and reset configuration).
-                            The server will be detached from the current system. Video archive will remain intact.</p>
+                        <p>此操作將把此伺服器恢復為預設值 (清除資料庫並還原設定).
+                            此伺服器將脫離目前系統. 影像資料將保持完好.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">恢復出廠預設值</button></p>
                     </div>
                     <div>
-                        <h3>Detach server from the system</h3>
-                        <p>This action will detach server from the system keeping database, local users and configuration.
-                            Video archive will remain intact. <b>Cloud users will be deleted.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the system</button></p>
+                        <h3>將伺服器從系統中脫離</h3>
+                        <p>此動作將使伺服器脫離系統但保留資料庫, 使用者訊資以及設定.
+                            影像資料將保持完好. <b>雲端使用者將被刪除.</b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">從系統中脫離</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
-                        <p><button type="button" class="btn btn-default" ng-click="restart()">Restart Server</button>
-                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
+                        <h3>重新啟動</h3>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()">重啟伺服器</button>
+                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">重新開機</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
-                            <p>If System is local (not connected to the cloud) this will change the password for user "admin" and the recovery (root) password on some servers.<br>
-                                Otherwise this will change the recovery password only.</p>
+                            <h3>變更管理員密碼 (注意! 這裡將變更您的最高權限管理員密碼!)</h3>
+                            <p>如果本系統是本地系統 (未連接到雲) 這將只改變管理者"admin"的密碼以及在某些伺服器上的還原 (root) 密碼.<br>
+                                否則這將只變更還原密碼.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">更改密碼</button>
                             </div>
                         </form>
                     </div>
@@ -134,7 +134,7 @@
                                     <tr>
                                         <td><label for="timeZone">時區</label></td>
                                         <td><label for="date">日期</label></td>
-                                        <td><label for="time">時間</label></td>
+                                        <td><label for="time">時效性</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

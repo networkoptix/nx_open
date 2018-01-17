@@ -9,6 +9,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/client/core/utils/geometry.h>
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
 
@@ -29,6 +30,8 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
+
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -353,7 +356,7 @@ void PtzInstrument::ensureElementsWidget()
         return;
 
     m_elementsWidget = new PtzElementsWidget();
-    display()->setLayer(elementsWidget(), Qn::EffectsLayer);
+    display()->setLayer(elementsWidget(), QnWorkbenchDisplay::EffectsLayer);
 
     if (scene())
         scene()->addItem(elementsWidget());
@@ -440,20 +443,20 @@ void PtzInstrument::updateTraits(QnMediaResourceWidget* widget)
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QPointF& pos)
 {
-    ptzMoveTo(widget, QRectF(pos - toPoint(widget->size() / 2), widget->size()));
+    ptzMoveTo(widget, QRectF(pos - Geometry::toPoint(widget->size() / 2), widget->size()));
 }
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect)
 {
-    qreal aspectRatio = QnGeometry::aspectRatio(widget->size());
-    QRectF viewport = QnGeometry::cwiseDiv(rect, widget->size());
+    qreal aspectRatio = Geometry::aspectRatio(widget->size());
+    QRectF viewport = Geometry::cwiseDiv(rect, widget->size());
     widget->ptzController()->viewportMove(aspectRatio, viewport, 1.0);
 }
 
 void PtzInstrument::ptzUnzoom(QnMediaResourceWidget* widget)
 {
     QSizeF size = widget->size() * 100;
-    ptzMoveTo(widget, QRectF(widget->rect().center() - toPoint(size) / 2, size));
+    ptzMoveTo(widget, QRectF(widget->rect().center() - Geometry::toPoint(size) / 2, size));
 }
 
 void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const QVector3D& speed, bool instant)
@@ -518,7 +521,7 @@ void PtzInstrument::processPtzDrag(const QRectF& rect)
     QnSplashItem *splashItem = newSplashItem(target());
     splashItem->setSplashType(QnSplashItem::Rectangular);
     splashItem->setPos(rect.center());
-    splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
+    splashItem->setRect(QRectF(-Geometry::toPoint(rect.size()) / 2, rect.size()));
     m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
 
     ptzMoveTo(target(), rect);
@@ -534,7 +537,7 @@ void PtzInstrument::processPtzDoubleClick()
     splashItem->setSplashType(QnSplashItem::Rectangular);
     splashItem->setPos(target()->rect().center());
     QSizeF size = target()->size() * 1.1;
-    splashItem->setRect(QRectF(-toPoint(size) / 2, size));
+    splashItem->setRect(QRectF(-Geometry::toPoint(size) / 2, size));
     m_activeAnimations.push_back(SplashItemAnimation(splashItem, -1.0, 1.0));
 
     ptzUnzoom(target());
@@ -785,7 +788,7 @@ void PtzInstrument::dragMove(DragInfo* info)
             qreal scale = qMax(size.width(), size.height()) / 2.0;
             QPointF speed(qBound(-1.0, delta.x() / scale, 1.0), qBound(-1.0, -delta.y() / scale, 1.0));
 
-            qreal speedMagnitude = length(speed);
+            qreal speedMagnitude = Geometry::length(speed);
             qreal arrowSize = 12.0 * (1.0 + 3.0 * speedMagnitude);
 
             ensureElementsWidget();
@@ -806,7 +809,7 @@ void PtzInstrument::dragMove(DragInfo* info)
         case ViewportMovement:
             ensureSelectionItem();
             selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(),
-                aspectRatio(target()->size()), target()->rect());
+                Geometry::aspectRatio(target()->size()), target()->rect());
             break;
 
         case VirtualMovement:

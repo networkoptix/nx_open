@@ -95,6 +95,23 @@ ConditionWrapper operator&&(ConditionWrapper&& l, ConditionWrapper&& r);
 ConditionWrapper operator||(ConditionWrapper&& l, ConditionWrapper&& r);
 ConditionWrapper operator!(ConditionWrapper&& l);
 
+class ResourceCondition: public Condition
+{
+public:
+    using CheckDelegate = std::function<bool(const QnResourcePtr& resource)>;
+
+    ResourceCondition(CheckDelegate delegate, MatchMode matchMode);
+
+    ActionVisibility check(const QnResourceList& resources,
+        QnWorkbenchContext* /*context*/);
+
+    ActionVisibility check(const QnResourceWidgetList& widgets,
+        QnWorkbenchContext* /*context*/);
+
+private:
+    CheckDelegate m_delegate;
+    MatchMode m_matchMode;
+};
 
 /** Base condition class for actions that should be visible in videowall review mode only. */
 class VideoWallReviewModeCondition: public Condition
@@ -283,11 +300,7 @@ private:
 class ExportCondition: public Condition
 {
 public:
-    ExportCondition(bool centralItemRequired);
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
-
-private:
-    bool m_centralItemRequired;
 };
 
 class AddBookmarkCondition: public Condition
@@ -308,10 +321,9 @@ public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
-class PreviewCondition: public ExportCondition
+class PreviewCondition: public Condition
 {
 public:
-    PreviewCondition();
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
@@ -603,8 +615,21 @@ ConditionWrapper isLayoutTourReviewMode();
 /** Check that fisheye cameras can save position only when dewarping is enabled. */
 ConditionWrapper canSavePtzPosition();
 
+ConditionWrapper hasTimePeriod();
+
+ConditionWrapper hasArgument(int key, int targetTypeId = -1);
+
+template<class T>
+ConditionWrapper hasArgumentOfType(int key)
+{
+    return hasArgument(key, qMetaTypeId<T>());
+}
+
 /** Check if the resource is Entropix camera. */
 ConditionWrapper isEntropixCamera();
+
+/** Playback sync is forced. */
+ConditionWrapper syncIsForced();
 
 } // namespace condition
 

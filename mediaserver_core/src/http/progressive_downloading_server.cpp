@@ -63,7 +63,7 @@ public:
         m_lastMediaTime(AV_NOPTS_VALUE),
         m_utcShift(0),
         m_maxFramesToCacheBeforeDrop( maxFramesToCacheBeforeDrop ),
-        m_adaptiveSleep( MAX_FRAME_DURATION*1000 ),
+        m_adaptiveSleep( MAX_FRAME_DURATION_MS*1000 ),
         m_rtStartTime( AV_NOPTS_VALUE ),
         m_lastRtTime( 0 ),
         m_endTimeUsec( AV_NOPTS_VALUE ),
@@ -179,7 +179,7 @@ protected:
 
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_continuousTimestamps)
         {
-            if (m_lastMediaTime != (qint64)AV_NOPTS_VALUE && media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000 &&
+            if (m_lastMediaTime != (qint64)AV_NOPTS_VALUE && media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION_MS*1000 &&
                 media->timestamp != (qint64)AV_NOPTS_VALUE && media->timestamp != DATETIME_NOW)
             {
                 m_utcShift -= (media->timestamp - m_lastMediaTime) - 1000000/60;
@@ -328,8 +328,8 @@ private:
         else
         {
             qint64 timeDiff = media->timestamp - m_lastRtTime;
-            if( timeDiff <= MAX_FRAME_DURATION*1000 )
-                m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION*1000); // if diff too large, it is recording hole. do not calc delay for this case
+            if( timeDiff <= MAX_FRAME_DURATION_MS*1000 )
+                m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION_MS*1000); // if diff too large, it is recording hole. do not calc delay for this case
         }
         m_lastRtTime = media->timestamp;
     }
@@ -378,7 +378,7 @@ static const QLatin1String RT_OPTIMIZATION_PARAM_NAME( "rt" ); // realtime trans
 static const QLatin1String CONTINUOUS_TIMESTAMPS_PARAM_NAME( "ct" );
 static const int MS_PER_SEC = 1000;
 
-QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
+QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket, _owner)
 {
     Q_D(QnProgressiveDownloadingConsumer);
@@ -509,7 +509,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
         updateCodecByFormat(d->streamingFormat);
 
-        const QUrlQuery decodedUrlQuery( getDecodedUrl() );
+        const QUrlQuery decodedUrlQuery( getDecodedUrl().toQUrl() );
 
         QSize videoSize(640,480);
         QByteArray resolutionStr = decodedUrlQuery.queryItemValue("resolution").toLatin1().toLower();
@@ -560,24 +560,25 @@ void QnProgressiveDownloadingConsumer::run()
 
         if (!resourceAccessManager()->hasPermission(d->accessRights, resource, Qn::ReadPermission))
         {
-            sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+            sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
             return;
         }
 
         QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
-        if (mediaRes) {
-            QnImageFilterHelper extraParams;
-            extraParams.setVideoLayout(mediaRes->getVideoLayout());
+        if (mediaRes)
+        {
+            QnLegacyTranscodingSettings extraParams;
+            extraParams.resource = mediaRes;
             int rotation;
             if (decodedUrlQuery.hasQueryItem("rotation"))
                 rotation = decodedUrlQuery.queryItemValue("rotation").toInt();
             else
                 rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
             qreal customAR = mediaRes->customAspectRatio();
-            extraParams.setRotation(rotation);
-            extraParams.setCustomAR(customAR);
+            extraParams.rotation = rotation;
+            extraParams.forcedAspectRatio = customAR;
 
-            d->transcoder.setExtraTranscodeParams(extraParams);
+            d->transcoder.setTranscodingSettings(extraParams);
             d->transcoder.setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
         }
 
@@ -650,11 +651,11 @@ void QnProgressiveDownloadingConsumer::run()
         auto camera = qnCameraPool->getVideoCamera(resource);
 
         bool isLive = position.isEmpty() || position == "now";
-
-        if (!isLive &&
-            !commonModule()->resourceAccessManager()->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission))
+        auto requiredPermission = isLive
+            ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
+        if (!commonModule()->resourceAccessManager()->hasPermission(d->accessRights, resource, requiredPermission))
         {
-            sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+            sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
             return;
         }
 
@@ -704,10 +705,10 @@ void QnProgressiveDownloadingConsumer::run()
                 if (camRes) {
                     archive = camRes->createArchiveDelegate();
                     if (!archive)
-                        archive = new QnServerArchiveDelegate(); // default value
+                        archive = new QnServerArchiveDelegate(qnServerModule); // default value
                 }
                 if (archive) {
-                    archive->open(resource);
+                    archive->open(resource, qnServerModule->archiveIntegrityWatcher());
                     archive->seek( timeUSec, true);
                     qint64 timestamp = AV_NOPTS_VALUE;
                     int counter = 0;
@@ -751,7 +752,7 @@ void QnProgressiveDownloadingConsumer::run()
             }
 
             d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(Qn::CR_Archive)));
-            d->archiveDP->open();
+            d->archiveDP->open(qnServerModule->archiveIntegrityWatcher());
             d->archiveDP->jumpTo( timeUSec, timeUSec );
 
             if (!endPosition.isEmpty())

@@ -10,6 +10,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/event_parameters.h>
+#include <nx/vms/event/events/events_fwd.h>
 
 struct QnModuleInformation;
 
@@ -126,7 +127,12 @@ public slots:
         vms::event::EventState toggleState,
         const QString& caption,
         const QString& description,
+        const QString& auxiliaryData,
         qint64 timeStampUsec);
+
+    void at_analyticsSdkEvent(const nx::vms::event::AnalyticsSdkEventPtr& event);
+
+    void at_fileIntegrityCheckFailed(const QnResourcePtr& resource);
 
     bool createEventFromParams(const nx::vms::event::EventParameters& params,
         vms::event::EventState eventState, const QnUuid& userId = QnUuid(),

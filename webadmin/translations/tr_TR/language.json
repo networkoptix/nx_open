@@ -1,117 +1,204 @@
 {
-  "language_name":"DİL ADI",
-  "dialogs":{
-    "okButton":"Tamam",
-    "openLink":"Bu bağlantıyı ziyaret edin",
-    "openLinkWithTitle":"Linki açın {{title}}"
-  },
-  "setup":{
-    "createAccount":"hesap oluştur",
-    "errorNoHDD":"Bu cihaz dahili bir disk ile çalışabilir.<br>Lütfen cihazı kapatıp bir disk ekleyin.",
-    "errorNoNetwork":"Bu cihazın çalışması için ağ bağlantısına ihtiyaç vardır. <br>Lütfen yerel bir ağa veya internete bağlayın"
-  },
-  "passwordRequirements":{
-    "minLengthMessage":"Parola en az 8 karakterden oluşmalıdır",
-    "requiredMessage":"Sadece latin harfler, sayılar ve klavye simgeler izin verilir",
-    "weakMessage":"Parola farklı simgeler içermelidir.",
-    "strongMessage":"Güçlü parola!",
-    "commonMessage":"Bu parola sık kullanılanlar listesinde ve tahmin edilebilir."
-  },
-  "settings":{
-    "tabs":{
-      "server":"Sunucu",
-      "system":"Sistem",
-      "device":"Cihaz"
+    "language_name": "Türk",
+    "dialogs": {
+        "okButton": "Tamam",
+        "openLink": "Bu bağlantıyı ziyaret edin",
+        "openLinkWithTitle": "Linki açın {{title}}"
     },
-    "confirmRestart":"Sunucuyu yeniden başlat?",
-    "couldntCheckInternet":"Bulut bağlantısı kontrol edilemedi",
-    "confirmRestoreDefault":"Database ve ayarlar temizlensin mi? Bu işlem biraz zaman alabilir ve tamamlandığında sunucu yeniden başlatılacak.",
-    "confirmRestoreDefaultTitle":"Fabrika ayarlarına geri yükle",
-    "unexpectedError":"Hata: beklenmedik bir hata oluştu",
-    "connnetionError":"Bağlantı hatası",
-    "wrongPassword":"Hatalı parola.",
-    "error":"Hata: ",
-    "restartNeeded":"Değişiklikler kaydedildi. Yeni ayarlarda uygulama yeniden başlatılsın mı?",
-    "settingsSaved":"Ayarlar kaydedildi",
-    "confirmHardwareRestart":"Sunucunun çalıştığı işletim sistemi yeniden başlatılsın mı?",
-    "confirmRestoreSettings":"Tüm sunucu ayarları fabrika ayarlarına çevrilsin mi? Arşiv kaydediliyor ancak ağ ayarları sıfırlanacak.",
-    "confirmRestoreSettingsNotNetwork":"Sunucu konfigürasyonunu sıfırlamak istiyor musunuz? Arşiv ve ağ ayarları kaydedilecek.",
-    "unavailable":"Kullanılamaz",
-    "unsafePortConfirm":"1025 den daha düşük bir port kullanmak güvenli olmayabilir. Sunucuya erişim kesilebilir. Yinede devam edilsin mi?",
-    "confirmDisconnectFromCloud":"{{CLOUD_NAME}} ile Bağlanıtıyı kes",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'>Tüm bulut kullanıcıları silinecek.</span><br><br>Sisteme sadece yerel yönetici hesabı erişebilecektir.",
-    "confirmDisconnectFromCloudAction":"Bağlantıyı kes",
-    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
-    "confirmDisconnectFromSystem":"Detach server from current system",
-    "confirmDisconnectFromSystemTitle":"",
-    "confirmDisconnectFromSystemAction":"Detach",
-    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
-    "connectedSuccess":"Sistem bağlantısı başarılı",
-    "createLocalOwnerTitle":"Yerel yönetici oluştur",
-    "confirmChangePassword":"Yönetici parolasını değiştir",
-    "confirmChangePasswordTitle":"Sistem şifresi değiştirilsin mi? Bu işlem 'admin' kullanıcısının kök kullanıcıların şifrelerini etkileyebilir",
-    "confirmChangePasswordAction":"Yeni parolayı kaydet",
-    "nx1ControlHint":"İstemci uygulaması başlatıldı. Uygulamayı kontrol etmek için mouse/klavye veya mobil uygulamayı kullan."
-  },
-  "info":{
-    "tabs":{
-      "healthMonitoring":"Performans İzleme",
-      "storage":"Depolama",
-      "log":"Günlük"
+    "setup": {
+        "createAccount": "hesap oluştur",
+        "errorNoHDD": "Bu cihaz dahili bir disk ile çalışabilir.<br>Lütfen cihazı kapatıp bir disk ekleyin.",
+        "errorNoNetwork": "Bu cihazın çalışması için ağ bağlantısına ihtiyaç vardır. <br>Lütfen yerel bir ağa veya internete bağlayın"
+    },
+    "passwordRequirements": {
+        "minLengthMessage": "Parola en az 8 karakterden oluşmalıdır",
+        "requiredMessage": "Sadece latin harfler, sayılar ve klavye simgeler izin verilir",
+        "weakMessage": "Parola farklı simgeler içermelidir",
+        "strongMessage": "Güçlü parola!",
+        "commonMessage": "Bu parola sık kullanılanlar listesinde ve tahmin edilebilir"
+    },
+    "settings": {
+        "tabs": {
+            "server": "Sunucu",
+            "system": "Sistem",
+            "device": "Cihaz"
+        },
+        "confirmRestart": "Sunucuyu yeniden başlat?",
+        "couldntCheckInternet": "Bulut bağlantısı kontrol edilemedi",
+        "confirmRestoreDefault": "Database ve ayarlar temizlensin mi? Bu işlem biraz zaman alabilir ve tamamlandığında sunucu yeniden başlatılacak.",
+        "confirmRestoreDefaultTitle": "Fabrika ayarlarına geri yükle",
+        "unexpectedError": "Hata: beklenmedik bir hata oluştu",
+        "connnetionError": "Bağlantı hatası",
+        "wrongPassword": "Hatalı parola.",
+        "error": "Hata: ",
+        "restartNeeded": "Değişiklikler kaydedildi. Yeni ayarlarda uygulama yeniden başlatılsın mı?",
+        "settingsSaved": "Ayarlar kaydedildi",
+        "confirmHardwareRestart": "Sunucunun çalıştığı işletim sistemi yeniden başlatılsın mı?",
+        "confirmRestoreSettings": "Tüm sunucu ayarları fabrika ayarlarına çevrilsin mi? Arşiv kaydediliyor ancak ağ ayarları sıfırlanacak.",
+        "confirmRestoreSettingsNotNetwork": "Sunucu konfigürasyonunu sıfırlamak istiyor musunuz? Arşiv ve ağ ayarları kaydedilecek.",
+        "unavailable": "Kullanılamaz",
+        "unsafePortConfirm": "1025 den daha düşük bir port kullanmak güvenli olmayabilir. Sunucuya erişim kesilebilir. Yinede devam edilsin mi?",
+        "confirmDisconnectFromCloud": "{{CLOUD_NAME}} ile Bağlanıtıyı kes",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Tüm bulut kullanıcıları silinecek.</span><br><br>Sisteme sadece yerel yönetici hesabı erişebilecektir.",
+        "confirmDisconnectFromCloudAction": "Bağlantıyı kes",
+        "disconnectedFromCloudSuccess": "Sistemin {{CLOUD_NAME}} ile başarıyla bağlantısı kesildi",
+        "confirmDisconnectFromSystem": "Sunucuyu mevcut sistemden ayır",
+        "confirmDisconnectFromSystemAction": "Ayır",
+        "disconnectedFromSystemSuccess": "Sunucu, sistemden başarıyla ayrıldı",
+        "connectedSuccess": "Sistem bağlantısı başarılı",
+        "createLocalOwnerTitle": "Yerel yönetici oluştur",
+        "confirmChangePassword": "Yönetici parolasını değiştir",
+        "confirmChangePasswordTitle": "Sistem şifresi değiştirilsin mi? Bu işlem 'admin' kullanıcısının kök kullanıcıların şifrelerini etkileyebilir",
+        "confirmChangePasswordAction": "Yeni parolayı kaydet",
+        "nx1ControlHint": "İstemci uygulaması başlatıldı. Uygulamayı kontrol etmek için mouse/klavye veya mobil uygulamayı kullan."
+    },
+    "settingsConfig": {
+        "arecontRtspEnabled": "Arecont RTSP Etkin",
+        "auditTrailEnabled": "Denetim etkinleştirildi",
+        "auditTrailPeriodDays": "Audit trail period days",
+        "autoDiscoveryEnabled": "Cihaz otomatik bulmayı etkinleştir",
+        "autoUpdateThumbnails": "Auto-update thumbnails",
+        "backupNewCamerasByDefault": "Varsayılan olarak yeni kameraları yedekle",
+        "backupQualities": "Yedekleme Kalitesi",
+        "cameraSettingsOptimization": "Cihaz optimizasyonuna izin ver",
+        "clientStatisticsSettingsUrl": "Client statistics relative url",
+        "cloudAccountName": "Cloud hesabı sahibi",
+        "cloudConnectRelayingEnabled": "Enable relaying for cloud connect",
+        "cloudConnectUdpHolePunchingEnabled": "Enable UDP hole punching for cloud connect",
+        "cloudHost": "Cloud sunucu",
+        "cloudSystemID": "Cloud sistemi Id",
+        "disabledVendors": "Engelli tedarikçi",
+        "ec2AliveUpdateIntervalSec": "Canlılık güncelleme aralığı (saniye)",
+        "ec2ConnectionKeepAliveTimeoutSec": "Bağlantı canlı tutma zaman aşımı (saniye)",
+        "ec2KeepAliveProbeCount": "Bağlantı canlı tutma bekleme süresi (saniye)",
+        "emailFrom": "Kimden",
+        "emailSignature": "E-posta imzası",
+        "emailSupportEmail": "Destek maili",
+        "enableEdgeRecording": "Enable edge recording",
+        "eventLogPeriodDays": "Event log period (days)",
+        "hanwhaDeleteProfilesOnInitIfNeeded": "Delete camera profiles on init if needed",
+        "ldapAdminDn": "LDAP yönetici DN",
+        "ldapSearchBase": "LDAP veritabanı",
+        "ldapSearchFilter": "LDAP arama filtresi",
+        "ldapUri": "LDAP URI",
+        "localSystemId": "Local System ID",
+        "maxDifferenceBetweenSynchronizedAndInternetTime": "Max difference between synchronized and Internet time (milliseconds)",
+        "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max difference between synchronized and local time (milliseconds)",
+        "maxRecordQueueSizeBytes": "Max record queue size (bytes)",
+        "maxRecordQueueSizeElements": "Max record queue size (elements)",
+        "maxRemoteArchiveSynchronizationThreads": "Max remote archive synchronization threads",
+        "maxSceneItems": "Max scene items (0 means default)",
+        "proxyConnectTimeoutSec": "Vekil sunucu zaman aşımı(saniye)",
+        "rtpTimeoutMs": "RTP timeout (milliseconds)",
+        "sequentialFlirOnvifSearcherEnabled": "Use sequential Flir Onvif searcher",
+        "serverDiscoveryPingTimeoutSec": "Sunucu keşif zaman aşımı",
+        "smtpConnectionType": "SMTP bağlantı türü",
+        "smtpHost": "SMTP Sunucusu",
+        "smtpPort": "SMTP port",
+        "smtpSimple": "SMTP basit doğrulama",
+        "smtpTimeout": "SMTP zaman aşımı",
+        "smtpUser": "SMTP kullanıcı",
+        "statisticsAllowed": "Anonim kullanım istatistiklerini ve kilitlenme raporlarını gönder",
+        "statisticsReportLastNumber": "İstatistik raporu - son sayı",
+        "statisticsReportLastTime": "İstatistik raporu - son sayı",
+        "statisticsReportLastVersion": "Statistics report - last version",
+        "statisticsReportServerApi": "Istatistik sunucusu api",
+        "statisticsReportTimeCycle": "Istatistik rapor aralığı",
+        "statisticsReportUpdateDelay": "Statistics report - update delay",
+        "synchronizeTimeWithInternet": "Synchronize time with Internet",
+        "systemName": "Sistem Adı",
+        "takeCameraOwnershipWithoutLock": "Kilitler olmadan kamera sahipliğini alın",
+        "timeSynchronizationEnabled": "Zaman senkronizasyonu etkin",
+        "updateNotificationsEnabled": "Güncelleştirme bildirimleri etkin",
+        "upnpPortMappingEnabled": "UPNP bağlantı noktası eşlemesi etkinleştirildi",
+        "useTextEmailFormat": "Send plain-text emails"
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "Performans İzleme",
+            "storage": "Depolama",
+            "log": "Günlük"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "Sistem ulaşılabilir değil.",
+        "incorrectCurrentPassword": "Geçerli parola hatalı.",
+        "incorrectRemotePassword": "Kullanıcı adı veya şifre hatalı.",
+        "incompatibleVersion": "Sistem ulaşılabilir değil, yok veya versiyon uyumsuz.",
+        "wrongUrl": "İstenilen sunucuya bağlanılamadı.",
+        "newSystemError": "Sistemler birleştirilemiyor. Uzak sistem konfigüre edilmemiş.",
+        "safeMode": "Sistemler birleştirilemiyor. Uzak sistem güvenli modda.",
+        "configError": "Sistemler birleştirilemiyor. Bir sistem güvenli modda olabilir.",
+        "cloudError": "Sistemler birleştirilemiyor. Buluta bağlı ise ilk olarak sistemleri buluttan çıkarın.",
+        "cloudBothError": "Sistemler birleştirilemedi. İki sistemde buluta bağlı. Öncelikle bulut bağlantılarını kesmelisiniz.",
+        "cloudHostConflict": "Sistemler birleştirelemez, çünkü sunucukar farklı barındırıcılarda bulunuyor",
+        "licenceError": "Uyarı! starter lisansına sahip sistemleri birleştiriyorsunuz. Sistem başına sadece bir starter lisansa izin verilir buna bağlı olarak ikinci lisans devre dışı kalacaktır. Yinede birleştirilsin mi?",
+        "connectionFailed": "Bağlantı başarısız: ",
+        "unknownError": "Bilinmeyen hata",
+        "mergeFailed": "Birleştirme başarısız: ",
+        "mergeSucceed": "Birleştirme başarılı.",
+        "newSystemDisplayName": "Yeni sistem",
+        "incompatibleProtocol": "uyumsuz versiyon",
+        "incompatibleCloudHost": "bulut sistem Uyuşmazlığı",
+        "incompatibleCloudState": "bulut bağlandı"
+    },
+    "login": {
+        "incorrectPassword": "Kullanıcı adı veya şifre hatalı"
+    },
+    "navigaion": {
+        "cannotGetUser": "Sunucu hatası: kullanıcı verileri alınamıyor"
+    },
+    "offlineDialog": {
+        "serverOffline": "sunucu çevrimdışı"
+    },
+    "restartDialog": {
+        "serverStarting": "sunucu başlatılıyor",
+        "serverRestarting": "sunucu yeniden başlatılıyor",
+        "serverOffline": "sunucu çevrimdışı"
+    },
+    "fileUpload": {
+        "started": "Güncelleme başarıyla başlatıldı. Biraz zaman alabilir",
+        "upToDate": "Güncelleme başarısız. Bu sürüm zaten yüklü.",
+        "invalidFile": "Güncelleme başarısız. Dosyalar geçersiz.",
+        "incompatibleSystem": "Güncelleme başarısız. Dosyalar başka bir sistem için ayarlanmış.",
+        "extractionError": "Güncelleme başarısız. Yükleme alanı yetersiz. Lütfen diskteki boş alanı kontrol edin.",
+        "installationError": "Güncelleme başarısız. Yükleme komutları çalıştırılamıyor.",
+        "selectFiles": "Dosyaları seç"
+    },
+    "advanced": {
+        "free": "Ücretsiz",
+        "total": "Toplam",
+        "occupied": "Kullanımda",
+        "reserved": "Rezerve"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} web arayüzü"
+    },
+    "common": {
+        "systemOffline": "Sistem çevrimdışı",
+        "cameraLinks": {
+            "copyToClipboard": "panoya kopyala",
+            "highStream": "Yüksek akış",
+            "copyDefaultText": "kopyala",
+            "unknown": "Belirtilmemiş",
+            "lowStream": "Düşük akış",
+            "transcoding": "Dönüştürme",
+            "copyActiveText": "panoya kopyalandı"
+        },
+        "searchCamPlaceholder": "arama",
+        "cameraStates": {
+            "noFormat": "Bu tarayıcı veya cihaz bu kameradan video oynatmayı desteklemez.",
+            "ieWin10": "Lütfen, Microsoft Edge veya Google Chrome tarayıcılarını kullanın.",
+            "iosVideoTooLarge": "iOS, fullHD'den daha büyük videoyu desteklemez (2MP: 1920x1080).",
+            "unauthorized": "Kimlik doğrulaması gerekli",
+            "ubuntuNX": "Bu tarayıcı, ARM tabanlı sunuculardan gelen videoyu desteklemez. Bunun yerine, Chromium tarayıcıyı kullanın.",
+            "ieNoWebm": "Internet Explorer için <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> yükleyin.",
+            "flashOrWebmRequired": "Internet Explorer'da video oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> veya<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec'i</a> yükleyin.",
+            "noArmSupport": "Bu tarayıcı veya aygıt, ARM tabanlı sunuculardan video oynatmayı desteklemez.",
+            "error": "Hata",
+            "offline": "Çevrimdışı",
+            "noData": "Veri bulunamadı",
+            "flashRequired": "ARM tabanlı sunuculardan video oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a>'i yükleyin."
+        }
     }
-  },
-  "join":{
-    "systemIsUnreacheble":"Sistem ulaşılabilir değil.",
-    "incorrectCurrentPassword":"Geçerli parola hatalı.",
-    "incorrectRemotePassword":"Kullanıcı adı veya şifre hatalı.",
-    "incompatibleVersion":"Sistem ulaşılabilir değil, yok veya versiyon uyumsuz.",
-    "wrongUrl":"İstenilen sunucuya bağlanılamadı.",
-    "newSystemError":"Sistemler birleştirilemiyor. Uzak sistem konfigüre edilmemiş.",
-    "safeMode":"Sistemler birleştirilemiyor. Uzak sistem güvenli modda.",
-    "configError":"Sistemler birleştirilemiyor. Bir sistem güvenli modda olabilir.",
-    "cloudError":"Sistemler birleştirilemiyor. Buluta bağlı ise ilk olarak sistemleri buluttan çıkarın.",
-    "cloudBothError":"Sistemler birleştirilemedi. İki sistemde buluta bağlı. Öncelikle bulut bağlantılarını kesmelisiniz.",
-    "cloudHostConflict":"Sistemler birleştirelemez, çünkü sunucukar farklı barındırıcılarda bulunuyor",
-    "licenceError":"Uyarı! starter lisansına sahip sistemleri birleştiriyorsunuz. Sistem başına sadece bir starter lisansa izin verilir buna bağlı olarak ikinci lisans devre dışı kalacaktır. Yinede birleştirilsin mi?",
-    "connectionFailed":"Bağlantı başarısız: ",
-    "unknownError":"Bilinmeyen hata",
-    "mergeFailed":"Birleştirme başarısız: ",
-    "mergeSucceed":"Birleştirme başarılı.",
-    "newSystemDisplayName":"Yeni sistem",
-    "incompatibleProtocol":"uyumsuz versiyon",
-    "incompatibleCloudHost":"bulut sistem Uyuşmazlığı",
-    "incompatibleCloudState":"bulut bağlandı"
-  },
-  "login":{
-    "incorrectPassword":"Kullanıcı adı veya şifre hatalı"
-  },
-  "navigaion":{
-    "cannotGetUser":"Sunucu hatası: kullanıcı verileri alınamıyor"
-  },
-  "offlineDialog":{
-    "serverOffline":"sunucu çevrimdışı"
-  },
-  "restartDialog":{
-    "serverStarting":"sunucu başlatılıyor",
-    "serverRestarting":"sunucu yeniden başlatılıyor",
-    "serverOffline":"sunucu çevrimdışı"
-  },
-  "fileUpload":{
-    "started":"Güncelleme başarıyla başlatıldı. Biraz zaman alabilir",
-    "upToDate":"Güncelleme başarısız. Bu sürüm zaten yüklü.",
-    "invalidFile":"Güncelleme başarısız. Dosyalar geçersiz.",
-    "incompatibleSystem":"Güncelleme başarısız. Dosyalar başka bir sistem için ayarlanmış.",
-    "extractionError":"Güncelleme başarısız. Yükleme alanı yetersiz. Lütfen diskteki boş alanı kontrol edin.",
-    "installationError":"Güncelleme başarısız. Yükleme komutları çalıştırılamıyor.",
-    "selectFiles":"Dosyaları seç"
-  },
-  "advanced":{
-    "free":"Ücretsiz",
-    "total":"Toplam",
-    "occupied":"Kullanımda",
-    "reserved":"Rezerve"
-  },
-  "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web arayüzü"
-  }
 }

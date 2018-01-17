@@ -7,7 +7,7 @@
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/app_info.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/stun/stun_types.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/stree/node.h>
@@ -64,13 +64,12 @@ class BasicCloudModuleUrlFetcher:
 
 public:
     BasicCloudModuleUrlFetcher():
-        m_requestIsRunning(false),
-        m_modulesXmlUrl(AppInfo::defaultCloudModulesXmlUrl())
+        m_requestIsRunning(false)
     {
         // Preparing compatibility data.
-        m_moduleToDefaultUrlScheme.emplace(kCloudDbModuleName, nx_http::kUrlSchemeName);
-        m_moduleToDefaultUrlScheme.emplace(kConnectionMediatorModuleName, nx::stun::kUrlSchemeName);
-        m_moduleToDefaultUrlScheme.emplace(kNotificationModuleName, nx_http::kUrlSchemeName);
+        m_moduleToDefaultUrlScheme.emplace(kCloudDbModuleName, nx::network::http::kUrlSchemeName);
+        m_moduleToDefaultUrlScheme.emplace(kConnectionMediatorModuleName, nx::network::stun::kUrlSchemeName);
+        m_moduleToDefaultUrlScheme.emplace(kNotificationModuleName, nx::network::http::kUrlSchemeName);
     }
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
@@ -93,7 +92,7 @@ public:
     /**
      * NOTE: Default value is taken from application settings.
      */
-    void setModulesXmlUrl(QUrl url)
+    void setModulesXmlUrl(nx::utils::Url url)
     {
         m_modulesXmlUrl = std::move(url);
     }
@@ -111,7 +110,7 @@ protected:
         const nx::utils::stree::ResourceContainer& searchResult) = 0;
     virtual void invokeHandler(
         const Handler& handler,
-        nx_http::StatusCode::Value statusCode) = 0;
+        nx::network::http::StatusCode::Value statusCode) = 0;
 
     const CloudInstanceSelectionAttributeNameset& nameset() const
     {
@@ -119,7 +118,7 @@ protected:
     }
 
     void initiateModulesXmlRequestIfNeeded(
-        const nx_http::AuthInfo& auth,
+        const nx::network::http::AuthInfo& auth,
         Handler handler)
     {
         using namespace std::chrono;
@@ -133,7 +132,7 @@ protected:
 
         NX_ASSERT(!m_httpClient);
         // If requested url is unknown, fetching description xml.
-        m_httpClient = nx_http::AsyncHttpClient::create();
+        m_httpClient = nx::network::http::AsyncHttpClient::create();
         m_httpClient->setAuth(auth);
         m_httpClient->bindToAioThread(getAioThread());
 
@@ -148,19 +147,23 @@ protected:
             duration_cast<milliseconds>(kHttpRequestTimeout).count());
 
         m_requestIsRunning = true;
+
+        if (m_modulesXmlUrl.isEmpty())
+            m_modulesXmlUrl = AppInfo::defaultCloudModulesXmlUrl();
+
         m_httpClient->doGet(
             m_modulesXmlUrl,
             std::bind(&BasicCloudModuleUrlFetcher::onHttpClientDone, this, _1));
     }
 
-    QUrl buildUrl(const QString& str, int moduleAttrName)
+    nx::utils::Url buildUrl(const QString& str, int moduleAttrName)
     {
-        QUrl url(str);
+        nx::utils::Url url(str);
         if (url.host().isEmpty())
         {
             // str could be host:port.
             const SocketAddress endpoint(str);
-            url = QUrl();
+            url = nx::utils::Url();
             url.setHost(endpoint.address.toString());
             if (endpoint.port > 0)
                 url.setPort(endpoint.port);
@@ -174,12 +177,12 @@ protected:
             if (it != m_moduleToDefaultUrlScheme.end())
                 url.setScheme(it->second);
             else
-                url.setScheme(QLatin1String(nx_http::kUrlSchemeName));
+                url.setScheme(QLatin1String(nx::network::http::kUrlSchemeName));
 
-            if ((url.scheme() == QLatin1String(nx_http::kUrlSchemeName))
-                && (url.port() == nx_http::DEFAULT_HTTPS_PORT))
+            if ((url.scheme() == QLatin1String(nx::network::http::kUrlSchemeName))
+                && (url.port() == nx::network::http::DEFAULT_HTTPS_PORT))
             {
-                url.setScheme(QLatin1String(nx_http::kSecureUrlSchemeName));
+                url.setScheme(QLatin1String(nx::network::http::kSecureUrlSchemeName));
             }
         }
 
@@ -187,15 +190,15 @@ protected:
     }
 
 private:
-    nx_http::AsyncHttpClientPtr m_httpClient;
+    nx::network::http::AsyncHttpClientPtr m_httpClient;
     const CloudInstanceSelectionAttributeNameset m_nameset;
     std::vector<Handler> m_resolveHandlers;
     bool m_requestIsRunning;
-    QUrl m_modulesXmlUrl;
+    nx::utils::Url m_modulesXmlUrl;
     std::list<std::pair<nx::String, nx::String>> m_additionalHttpHeadersForGetRequest;
     std::map<QString, QString> m_moduleToDefaultUrlScheme;
 
-    void onHttpClientDone(nx_http::AsyncHttpClientPtr client)
+    void onHttpClientDone(nx::network::http::AsyncHttpClientPtr client)
     {
         NX_ASSERT(isInSelfAioThread());
 
@@ -207,14 +210,14 @@ private:
         {
             return signalWaitingHandlers(
                 &lk,
-                nx_http::StatusCode::serviceUnavailable);
+                nx::network::http::StatusCode::serviceUnavailable);
         }
 
-        if (client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+        if (client->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
         {
             return signalWaitingHandlers(
                 &lk,
-                static_cast<nx_http::StatusCode::Value>(
+                static_cast<nx::network::http::StatusCode::Value>(
                     client->response()->statusLine.statusCode));
         }
 
@@ -226,7 +229,7 @@ private:
         {
             return signalWaitingHandlers(
                 &lk,
-                nx_http::StatusCode::serviceUnavailable);
+                nx::network::http::StatusCode::serviceUnavailable);
         }
 
         // Selecting endpoint.
@@ -234,10 +237,10 @@ private:
         {
             return signalWaitingHandlers(
                 &lk,
-                nx_http::StatusCode::notFound);
+                nx::network::http::StatusCode::notFound);
         }
 
-        signalWaitingHandlers(&lk, nx_http::StatusCode::ok);
+        signalWaitingHandlers(&lk, nx::network::http::StatusCode::ok);
     }
 
     bool findModuleUrl(const nx::utils::stree::AbstractNode& treeRoot)
@@ -276,7 +279,7 @@ private:
 
     void signalWaitingHandlers(
         QnMutexLockerBase* const lk,
-        nx_http::StatusCode::Value statusCode)
+        nx::network::http::StatusCode::Value statusCode)
     {
         auto handlers = std::move(m_resolveHandlers);
         m_resolveHandlers = decltype(m_resolveHandlers)();

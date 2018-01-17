@@ -3,6 +3,8 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/http/http_async_client.h>
 
 namespace nx {
 namespace vms {
@@ -81,6 +83,17 @@ struct ActionParameters
     //HTTP action
     QString contentType;
 
+    //HTTP action
+    nx::network::http::AuthType authType;
+
+    //HTTP action (empty string means auto detection)
+    nx::network::http::Method::ValueType requestType;
+
+    /**
+    * For "Open layout" action: resource id for layout to be opened.
+    */
+    QnUuid layoutResourceId;
+
     /**
      * \returns                        Whether all parameters have default values.
      */
@@ -96,7 +109,7 @@ struct ActionParameters
 #define ActionParameters_Fields (needConfirmation)(actionResourceId)\
     (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
     (durationMs)(additionalResources)(allUsers)(forced)(presetId)(useSource)(recordBeforeMs)\
-    (playToClient)(contentType)(actionId)
+    (playToClient)(contentType)(actionId)(authType)(requestType)(layoutResourceId)
 
 /* Backward compatibility is not really important here as this class is stored in the DB as json. */
 QN_FUSION_DECLARE_FUNCTIONS(ActionParameters, (ubjson)(json)(eq)(xml)(csv_record));

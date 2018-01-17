@@ -87,6 +87,14 @@ typedef std::shared_ptr<AbstractMediaServerNotificationManager> AbstractMediaSer
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
+        ErrorCode removeSync(const QnUuid& id)
+        {
+            return impl::doSyncCall<impl::SimpleHandler>([=](const impl::SimpleHandlerPtr &handler)
+            {
+                return this->remove(id, handler);
+            });
+        }
+
         /*!
         \param handler Functor with params: (ErrorCode)
         */

@@ -200,9 +200,9 @@ const api::SystemData& Ec2MserverCloudSynchronization::registeredSystemData() co
     return m_system;
 }
 
-QUrl Ec2MserverCloudSynchronization::cdbEc2TransactionUrl() const
+nx::utils::Url Ec2MserverCloudSynchronization::cdbEc2TransactionUrl() const
 {
-    QUrl url(lit("http://%1/").arg(cdb()->endpoint().toString()));
+    nx::utils::Url url(lit("http://%1/").arg(cdb()->endpoint().toString()));
     url.setUserName(QString::fromStdString(m_system.id));
     url.setPassword(QString::fromStdString(m_system.authKey));
     return url;
@@ -710,7 +710,7 @@ void Ec2MserverCloudSynchronization::waitForCloudAndVmsToSyncSystemData(
 api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLog(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
-    const QUrl url(lm("http://%1%2?systemId=%3")
+    const nx::utils::Url url(lm("http://%1%2?systemId=%3")
         .arg(cdb()->endpoint()).arg(kMaintenanceGetTransactionLog)
         .arg(registeredSystemData().id));
     return fetchTransactionLog(url, transactionList);
@@ -719,7 +719,7 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLog(
 api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLogFromMediaserver(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
-    QUrl url(lm("http://%1/%2?cloud_only=true")
+    nx::utils::Url url(lm("http://%1/%2?cloud_only=true")
         .arg(appserver2()->moduleInstance()->endpoint()).arg("ec2/getTransactionLog"));
     url.setUserName("admin");
     url.setPassword("admin");
@@ -749,13 +749,13 @@ bool Ec2MserverCloudSynchronization::findAdminUserId(QnUuid* const id)
 }
 
 api::ResultCode Ec2MserverCloudSynchronization::fetchTransactionLog(
-    const QUrl& url,
+    const nx::utils::Url& url,
     ::ec2::ApiTransactionDataList* const transactionList)
 {
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     if (!httpClient.doGet(url))
         return api::ResultCode::networkError;
-    if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
         return api::ResultCode::notAuthorized;
 
     nx::Buffer msgBody;

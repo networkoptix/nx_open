@@ -15,6 +15,7 @@
 static const size_t DEFAULT_BUFFER_SIZE = 4 * 1024;
 
 namespace nx {
+namespace network {
 namespace stun {
 
 Header::Header()
@@ -39,7 +40,7 @@ Header::Header(Header&& right)
     transactionId(std::move(right.transactionId))
 {
 }
-         
+
 Header::Header( MessageClass messageClass_ , int method_)
     : messageClass( messageClass_ )
     , method( method_ )
@@ -178,4 +179,5 @@ void Message::clear()
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

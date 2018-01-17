@@ -18,12 +18,14 @@ public:
 
     static QnUuid getDesktopResourceUuid();
 
-    virtual void addConnection(const QnMediaServerResourcePtr& server);
+    virtual void addConnection(const QnMediaServerResourcePtr& server, const QnUuid& userId);
     virtual void removeConnection(const QnMediaServerResourcePtr& server);
 
     virtual bool isRendererSlow() const = 0;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(
         const QnAbstractStreamDataProvider *dataProvider) const override;
+
+    static QString calculateUniqueId(const QnUuid& moduleId, const QnUuid& userId);
 
 protected:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(

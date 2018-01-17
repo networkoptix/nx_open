@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QAction>
 
+#include <ini.h>
+
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <core/resource/camera_resource.h>
@@ -10,7 +12,9 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/fake_media_server.h>
 
-#include <ui/dialogs/resource_properties/camera_settings_dialog.h>
+#include <nx/client/desktop/resource_properties/camera/legacy_camera_settings_dialog.h>
+#include <nx/client/desktop/resource_properties/camera/camera_settings_dialog.h>
+
 #include <ui/dialogs/resource_properties/layout_settings_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
@@ -21,14 +25,23 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout.h>
 
-using namespace nx::client::desktop::ui;
+#include <nx/utils/raii_guard.h>
+#include <nx/client/desktop/utils/parameter_helper.h>
+
+/// For local resource discovery
+#include <core/resource_management/resource_discovery_manager.h>
+#include <ui/workbench/workbench_context.h>
+#include <common/common_module.h>
+#include <client/client_settings.h>
+#include <core/resource/resource_directory_browser.h>
+
+
+using namespace nx::client::desktop;
+using namespace ui;
 
 QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
-    m_cameraSettingsDialog(),
-    m_serverSettingsDialog(),
-    m_userSettingsDialog()
+    QnWorkbenchContextAware(parent)
 {
     connect(action(action::CameraSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered);
@@ -44,13 +57,13 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
         &QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered);
     connect(action(action::CurrentLayoutSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_currentLayoutSettingsAction_triggered);
+
+    connect(action(action::UpdateLocalFilesAction), &QAction::triggered, this,
+        &QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered);
 }
 
 QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
 {
-     delete m_cameraSettingsDialog.data();
-     delete m_serverSettingsDialog.data();
-     delete m_userSettingsDialog.data();
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
@@ -60,18 +73,37 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
     if (cameras.isEmpty())
         return;
 
-    QnNonModalDialogConstructor<QnCameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
-    dialogConstructor.disableAutoFocus();
+    const auto parent = nx::utils::extractParentWidget(parameters, mainWindowWidget());
 
-    if (!m_cameraSettingsDialog->setCameras(cameras))
-        return;
-
-    m_cameraSettingsDialog->updateFromResources();
-
-    if (parameters.hasArgument(Qn::FocusTabRole))
+    if (ini().redesignedCameraSettingsDialog)
     {
-        auto tab = parameters.argument(Qn::FocusTabRole).toInt();
-        m_cameraSettingsDialog->setCurrentTab(static_cast<Qn::CameraSettingsTab>(tab));
+        QnNonModalDialogConstructor<CameraSettingsDialog> dialogConstructor(
+            m_cameraSettingsDialog, parent);
+        dialogConstructor.disableAutoFocus();
+
+        if (!m_cameraSettingsDialog->setCameras(cameras))
+            return;
+
+        if (parameters.hasArgument(Qn::FocusTabRole))
+        {
+            const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
+            m_cameraSettingsDialog->setCurrentPage(tab);
+        }
+    }
+    else
+    {
+        QnNonModalDialogConstructor<LegacyCameraSettingsDialog> dialogConstructor(
+            m_legacyCameraSettingsDialog, parent);
+        dialogConstructor.disableAutoFocus();
+
+        if (!m_legacyCameraSettingsDialog->setCameras(cameras))
+            return;
+
+        if (parameters.hasArgument(Qn::FocusTabRole))
+        {
+            const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
+            m_legacyCameraSettingsDialog->setCurrentTab(static_cast<CameraSettingsTab>(tab));
+        }
     }
 }
 
@@ -95,7 +127,10 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
     if (!hasAccess)
         return;
 
-    QnNonModalDialogConstructor<QnServerSettingsDialog> dialogConstructor(m_serverSettingsDialog, mainWindow());
+    const auto parent = nx::utils::extractParentWidget(params, mainWindowWidget());
+    QnNonModalDialogConstructor<QnServerSettingsDialog> dialogConstructor(
+        m_serverSettingsDialog, parent);
+
     dialogConstructor.disableAutoFocus();
 
     m_serverSettingsDialog->setServer(server);
@@ -109,12 +144,18 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
     user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
 
     // Shows New User dialog as modal because we can't pick anothr user from resources tree anyway.
+    const auto params = menu()->currentParameters(sender());
+    const auto parent = nx::utils::extractParentWidget(params, mainWindowWidget());
+
     if (!m_userSettingsDialog)
-        m_userSettingsDialog = new QnUserSettingsDialog(mainWindow());
+        m_userSettingsDialog = new QnUserSettingsDialog(parent);
+    else
+        DialogUtils::setDialogParent(m_userSettingsDialog, parent);
 
     m_userSettingsDialog->setUser(user);
     m_userSettingsDialog->setCurrentPage(QnUserSettingsDialog::SettingsPage);
     m_userSettingsDialog->forcedUpdate();
+
     m_userSettingsDialog->exec();
 }
 
@@ -130,8 +171,9 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
     if (!hasAccess)
         return;
 
-    QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(m_userSettingsDialog,
-        mainWindow());
+    const auto parent = nx::utils::extractParentWidget(params, mainWindowWidget());
+    QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(
+        m_userSettingsDialog, parent);
 
     // Navigating resource tree, we should not take focus. From System Administration - we must.
     bool force = params.argument(Qn::ForceRole, false);
@@ -147,9 +189,11 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
 void QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
+    const auto parent = nx::utils::extractParentWidget(parameters, mainWindowWidget());
+
     QnUuid userRoleId = parameters.argument(Qn::UuidRole).value<QnUuid>();
 
-    QScopedPointer<QnUserRolesDialog> dialog(new QnUserRolesDialog(mainWindow()));
+    QScopedPointer<QnUserRolesDialog> dialog(new QnUserRolesDialog(parent));
     if (!userRoleId.isNull())
         dialog->selectUserRole(userRoleId);
 
@@ -167,6 +211,24 @@ void QnWorkbenchResourcesSettingsHandler::at_currentLayoutSettingsAction_trigger
     openLayoutSettingsDialog(workbench()->currentLayout()->resource());
 }
 
+void QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered()
+{
+    QnResourceDiscoveryManager* discoveryManager = context()->commonModule()->resourceDiscoveryManager();
+
+    // We should update local media directories
+    // Is there a better place for it?
+    auto localFilesSearcher = commonModule()->instance<QnResourceDirectoryBrowser>();
+    if (localFilesSearcher)
+    {
+        QStringList dirs;
+        dirs << qnSettings->mediaFolder();
+        dirs << qnSettings->extraMediaFolders();
+        localFilesSearcher->setPathCheckList(dirs);
+    }
+
+    discoveryManager->queryLocalDiscovery();
+}
+
 void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
     const QnLayoutResourcePtr& layout)
 {
@@ -176,7 +238,7 @@ void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
     if (!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
         return;
 
-    QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindow()));
+    QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindowWidget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->readFromResource(layout);
 

@@ -1,12 +1,23 @@
+# These variables must be defined first as they are going to config file
 set(project.build.directory "${CMAKE_CURRENT_BINARY_DIR}")
 set(bin_resources "${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources")
 set(filter_resources "${CMAKE_CURRENT_SOURCE_DIR}/maven/filter-resources")
 set(ClientHelpSourceDir "${bin_source_dir}/help")
-set(ClientVoxSourceDir "${bin_source_dir}/vox")
-set(ClientQmlDir "${CMAKE_CURRENT_BINARY_DIR}/clientqml")
+set(VoxSourceDir "${bin_source_dir}/vox")
+set(client_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/client_qml")
+set(nxtool_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/nxtool_qml")
 set(ClientBgSourceDir "${CMAKE_CURRENT_BINARY_DIR}/Backgrounds")
 set(ClientFontsDir "${bin_source_dir}/fonts")
-set(target_pack_dir ${CMAKE_CURRENT_BINARY_DIR}/pack)
+set(VC14RedistPath "${vcredist_directory}")
+
+# These folders are filtered from filter-resources and required for update packages only
+set(client_update_files_directory "${CMAKE_CURRENT_BINARY_DIR}/client")
+set(server_update_files_directory "${CMAKE_CURRENT_BINARY_DIR}/server")
+
+file(TO_CMAKE_PATH ${wix_directory} wix_directory)
+file(TO_CMAKE_PATH ${signtool_directory} signtool_directory)
+file(TO_CMAKE_PATH ${certificates_path} certificates_path)
+file(TO_CMAKE_PATH ${VC14RedistPath} VC14RedistPath)
 
 ExternalProject_Add(
     customactions
@@ -16,6 +27,7 @@ ExternalProject_Add(
         -DCONFIG_DIRECTORY=${CMAKE_CURRENT_BINARY_DIR}
         -DROOT_DIR=${CMAKE_SOURCE_DIR}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DwixDirectory=${wix_directory}
 )
 
 nx_copy_bin_resources(${bin_resources} "${CMAKE_CURRENT_BINARY_DIR}")
@@ -23,93 +35,219 @@ nx_copy_bin_resources("${customization_dir}/wixsetup" "${CMAKE_CURRENT_BINARY_DI
 nx_configure_directory(${filter_resources} "${CMAKE_CURRENT_BINARY_DIR}")
 
 file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
+file(COPY "${CMAKE_SOURCE_DIR}/common/maven/bin-resources/resources/qt/etc/qt.conf"
+    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
-add_custom_target(wixsetup ALL
-    DEPENDS desktop_client applauncher traytool mediaserver minilauncher customactions testcamera
-    COMMENT "Creating installer..."
-    # TODO move python to cmake
+set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
+nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
+
+if (withMediaServer OR withDesktopClient)
+    add_custom_target(wixsetup ALL
+        DEPENDS
+            customactions
+        COMMENT "Creating installer..."
+        COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
+        COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
+    )
+endif()
+
+
+if(withTestCamera)
+    add_dependencies(wixsetup testcamera)
+
+    add_custom_target(generate_testcamera_package ALL
+        COMMENT "Preparing testcamera package..."
+        DEPENDS
+            testcamera
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_testcamera_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
+endif()
+
+
+if(withNxTool)
+    set(nxtool_qml_root "${CMAKE_SOURCE_DIR}/nxtool/static-resources/src/qml/")
+    set(nxtool_executable "${bin_source_dir}/nxtool.exe")
+
+    add_custom_target(collect_nxtool_qml_dependencies
+        DEPENDS
+            nxtool
+        COMMENT "Collecting NxTool QML libraries..."
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
+            "--config" ${config_file}
+            "--source" ${nxtool_executable}
+            "--qml-root" ${nxtool_qml_root}
+            "--output" ${nxtool_qml_dir}
+        )
+
+    add_custom_target(create_nxtool_installer ALL
+        COMMENT "Generating NxTool installer..."
+        DEPENDS
+            collect_nxtool_qml_dependencies
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} create_nxtool_installer.py
+            "--config" ${config_file}
+            "--qml-dir" ${nxtool_qml_dir}
+            "--sources-dir" "${CMAKE_CURRENT_BINARY_DIR}"
+            "--output" ${distribution_output_dir}
+    )
+endif()
+
+if(withDesktopClient)
+    set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/client/nx_client_desktop/static-resources/qml/")
+    set(desktop_client_executable "${bin_source_dir}/desktop_client.exe")
+
+    add_custom_target(collect_qml_dependencies
+        DEPENDS
+            desktop_client
+        COMMENT "Collecting QML libraries..."
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
+            "--config" ${config_file}
+            "--source" ${desktop_client_executable}
+            "--qml-root" ${desktop_client_qml_root}
+            "--output" ${client_qml_dir}
+        )
+    add_dependencies(wixsetup collect_qml_dependencies applauncher minilauncher)
+
+    add_custom_target(copy_client_binaries
+    COMMENT "Copying client binaries..."
+    DEPENDS
+        desktop_client
+        minilauncher
     COMMAND ${CMAKE_COMMAND} -E copy
         "${bin_source_dir}/minilauncher.exe" "${bin_source_dir}/${minilauncher.binary.name}"
     COMMAND ${CMAKE_COMMAND} -E copy
-        "${bin_source_dir}/desktop_client.exe" "${bin_source_dir}/${client.binary.name}"
-    COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
-    COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
-)
+        "${desktop_client_executable}" "${bin_source_dir}/${client.binary.name}"
+    )
+    add_dependencies(wixsetup copy_client_binaries)
 
-file(GLOB_RECURSE ffmpeg_libraries
-    "${bin_source_dir}/av*.dll"
-    "${bin_source_dir}/lib*.dll"
-    "${bin_source_dir}/swscale-*.dll"
-    "${bin_source_dir}/swresample-*.dll"
-    "${bin_source_dir}/swscale-*.dll"
-)
+    add_custom_target(generate_client_update_package ALL
+    COMMENT "Preparing client update package..."
+    DEPENDS
+        collect_qml_dependencies
+        applauncher
+        minilauncher
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+    COMMAND ${PYTHON_EXECUTABLE} generate_client_update_package.py
+        "--config" ${config_file}
+        "--output" ${distribution_output_dir}
+    )
 
-file(GLOB_RECURSE qt_common_libraries
-    "${QT_DIR}/bin/icu*.dll"
-)
+    add_custom_target(generate_client_debug_package ALL
+        COMMENT "Preparing client debug package..."
+        DEPENDS
+            desktop_client
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_client_debug_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
+endif()
 
-list(APPEND qt_common_libraries
-    "${QT_DIR}/bin/Qt5Concurrent.dll"
-    "${QT_DIR}/bin/Qt5Core.dll"
-    "${QT_DIR}/bin/Qt5Gui.dll"
-    "${QT_DIR}/bin/Qt5Multimedia.dll"
-    "${QT_DIR}/bin/Qt5Network.dll"
-    "${QT_DIR}/bin/Qt5Sql.dll"
-    "${QT_DIR}/bin/Qt5Xml.dll"
-)
+if(withMediaServer)
+    add_dependencies(wixsetup
+        mediaserver
+        server_plugins
+    )
 
-file(GLOB_RECURSE nx_libraries "${bin_source_dir}/nx*.dll")
-list(APPEND nx_libraries "${bin_source_dir}/udt.dll")
-
-file(TO_CMAKE_PATH "${VC14RedistPath}" VC14RedistPath)
-
-file(GLOB_RECURSE vc14redist_files
-    "${VC14RedistPath}/bin/*"
-)
-
-# Qt Plugins
-set(qt_plugins platforms imageformats mediaservice)
-set(qt_plugin_group_platforms qwindows)
-set(qt_plugin_group_imageformats qgif qjpeg qtiff)
-set(qt_plugin_group_mediaservice dsengine qtmedia_audioengine)
-
-foreach(qt_plugin_group ${qt_plugins})
-    foreach(plugin ${qt_plugin_group_${qt_plugin_group}})
-        nx_copy("${QT_DIR}/plugins/${qt_plugin_group}/${plugin}.dll"
-            DESTINATION "${target_pack_dir}/${artifact.name.client_update}/${qt_plugin_group}"
-            IF_NEWER IF_DIFFERENT)
-        if(addQtPdb)
-            nx_copy("${QT_DIR}/plugins/${qt_plugin_group}/${plugin}.pdb"
-                DESTINATION "${target_pack_dir}/${artifact.name.qt_debug}/${qt_plugin_group}"
-                IF_NEWER IF_DIFFERENT)
-        endif()
-    endforeach()
-endforeach()
-
-file(GLOB_RECURSE all_qt_debug_files "${QT_DIR}/bin/Qt5*.pdb")
-set(qt_debug_files)
-foreach(file ${all_qt_debug_files})
-    if(NOT file MATCHES ".*d\\.pdb")
-        list(APPEND qt_debug_files ${file})
+    if(withTrayTool)
+        add_dependencies(wixsetup traytool)
     endif()
-endforeach()
 
-foreach(qt_debug_files_exclude ${qt_debug_files_excludes})
-    list(REMOVE_ITEM qt_debug_files "${qt_debug_files_exclude}")
-endforeach()
+    add_custom_target(generate_server_update_package ALL
+        COMMENT "Preparing mediaserver update package..."
+        DEPENDS
+            wixsetup
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_server_update_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
+endif()
 
-# Processing file lists in order not to pass tons of variables to custom target
-nx_configure_directory("${CMAKE_CURRENT_SOURCE_DIR}/packages" "${CMAKE_CURRENT_BINARY_DIR}/packages")
 
-add_custom_target(pack_updates ALL
-    DEPENDS wixsetup
-    COMMENT "Preparing update and debug packages ..."
-    COMMAND
-        "${CMAKE_COMMAND}"
-        -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -Dtarget_pack_dir=${target_pack_dir}
-        -P "${CMAKE_CURRENT_SOURCE_DIR}/pack.cmake"
-    COMMAND "pack.bat"
+if(withDesktopClient OR withMediaServer OR withTestCamera)
+    add_custom_target(generate_libs_debug_package ALL
+        COMMENT "Preparing libs debug package..."
+        DEPENDS
+            nx_network
+            nx_utils
+            nx_vms_utils
+            udt
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_libs_debug_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
+endif()
+
+if(withMediaServer)
+    add_custom_target(generate_mediaserver_debug_package ALL
+        COMMENT "Preparing mediaserver debug package..."
+        DEPENDS
+            mediaserver
+            server_plugins
+
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_mediaserver_debug_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
+endif()
+
+if(withClouds)
+    add_custom_target(generate_cloud_debug_package ALL
+        COMMENT "Preparing cloud debug package..."
+        DEPENDS
+            cloud_connect_test_util
+            cloud_db
+            connection_mediator
+            vms_gateway
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_cloud_debug_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
+endif()
+
+if(addQtPdb)
+    add_custom_target(generate_qt_debug_package ALL
+        COMMENT "Preparing Qt debug package..."
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_qt_debug_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
+endif()
+
+add_custom_target(generate_misc_debug_package ALL
+    COMMENT "Preparing misc debug package..."
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+    COMMAND ${PYTHON_EXECUTABLE} generate_misc_debug_package.py
+        "--config" ${config_file}
+        "--output" ${distribution_output_dir}
 )
 
+if(TARGET applauncher)
+    add_dependencies(generate_misc_debug_package applauncher)
+endif()
+
+if(TARGET minilauncher)
+    add_dependencies(generate_misc_debug_package minilauncher)
+endif()
+
+if(TARGET traytool)
+    add_dependencies(generate_misc_debug_package traytool)
+endif()
+
+if(TARGET testcamera)
+    add_dependencies(generate_misc_debug_package testcamera)
+endif()
+
+if(TARGET media_db_util)
+    add_dependencies(generate_misc_debug_package media_db_util)
+endif()

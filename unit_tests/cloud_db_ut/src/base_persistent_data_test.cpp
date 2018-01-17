@@ -50,9 +50,14 @@ api::AccountData DaoHelper::insertRandomAccount()
 
 api::SystemData DaoHelper::insertRandomSystem(const api::AccountData& account)
 {
-    using namespace std::placeholders;
-
     auto system = cdb::test::BusinessDataGenerator::generateRandomSystem(account);
+    insertSystem(account, system);
+    return system;
+}
+
+void DaoHelper::insertSystem(const api::AccountData& account, const data::SystemData& system)
+{
+    using namespace std::placeholders;
 
     auto dbResult = executeUpdateQuerySync(
         std::bind(&SystemDataObject::insert, &m_systemDbController,
@@ -71,7 +76,6 @@ api::SystemData DaoHelper::insertRandomSystem(const api::AccountData& account)
 
     NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
     m_systems.push_back(system);
-    return system;
 }
 
 void DaoHelper::insertSystemSharing(const api::SystemSharingEx& sharing)
@@ -86,11 +90,11 @@ void DaoHelper::insertSystemSharing(const api::SystemSharingEx& sharing)
 
 void DaoHelper::deleteSystemSharing(const api::SystemSharingEx& sharing)
 {
-    const nx::utils::db::InnerJoinFilterFields sqlFilter =
-        {{"account_id", ":accountId",
-           QnSql::serialized_field(sharing.accountId)}};
-
     using namespace std::placeholders;
+
+    const nx::utils::db::InnerJoinFilterFields sqlFilter =
+        {nx::utils::db::SqlFilterFieldEqual("account_id", ":accountId",
+            QnSql::serialized_field(sharing.accountId))};
 
     const auto dbResult = executeUpdateQuerySync(
         std::bind(&SystemSharingDataObject::deleteSharing,

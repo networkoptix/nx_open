@@ -1,10 +1,4 @@
-/**********************************************************
-* Jul 17, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_SAFE_DIRECT_CONNECTION_H
-#define NX_SAFE_DIRECT_CONNECTION_H
+#pragma once
 
 #include <functional>
 #include <list>
@@ -15,182 +9,171 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-
-#include "functor_proxy_helper.h"
 #include <nx/utils/singleton.h>
 
+#include "functor_proxy_helper.h"
 
-namespace Qn
+namespace Qn {
+
+class SafeDirectConnectionGlobalHelper;
+
+/**
+ * Class that want to receive signals directly, MUST inherit this type.
+ * WARNING: Implementation MUST call EnableSafeDirectConnection::directDisconnectAll before object destruction.
+ */
+class NX_UTILS_API EnableSafeDirectConnection
 {
-    class SafeDirectConnectionGlobalHelper;
-
-    //!Class that want to receive signals directly, MUST inherit this type
-    /*!
-        \warning Implementation MUST call \a EnableSafeDirectConnection::directDisconnectAll before object destruction
-    */
-    class NX_UTILS_API EnableSafeDirectConnection
-    {
-    public:
+public:
 #ifdef __arm__
-        //#ak ISD Jaguar lacks kernel support for atomic int64
-        typedef unsigned int ID;
+    //#ak ISD Jaguar lacks kernel support for atomic int64
+    typedef unsigned int ID;
 #else
-        typedef quint64 ID;
+    typedef quint64 ID;
 #endif
 
-        EnableSafeDirectConnection();
-        virtual ~EnableSafeDirectConnection();
+    EnableSafeDirectConnection();
+    virtual ~EnableSafeDirectConnection();
 
-        //!Disconnects from all directly-connected slot connected with \a directConnect
-        void directDisconnectAll();
-        //!Using integer sequence as a unique object id since pointer can be reused immediately after its free
-        ID uniqueObjectSequence() const;
+    /**
+     * Disconnects from all directly-connected slot connected with directConnect.
+     */
+    void directDisconnectAll();
+    /**
+     * Using integer sequence as a unique object id since pointer can be reused immediately after its free.
+     */
+    ID uniqueObjectSequence() const;
 
-    private:
-        std::shared_ptr<SafeDirectConnectionGlobalHelper> m_globalHelper;
-        const ID m_uniqueObjectSequence;
-    };
+private:
+    std::shared_ptr<SafeDirectConnectionGlobalHelper> m_globalHelper;
+    const ID m_uniqueObjectSequence;
+};
 
-    /*!
-        All signals, connected with \a Qn::safe_direct_connect, are delivered 
-        through global instance of this class
-    */
-    class NX_UTILS_API SafeDirectConnectionGlobalHelper
-    :
-        public QObject/*,
-        public Singleton<SafeDirectConnectionGlobalHelper>*/
-    {
-        Q_OBJECT
+/**
+ * All signals, connected with Qn::safe_direct_connect, are delivered
+ * through global instance of this class.
+ */
+class NX_UTILS_API SafeDirectConnectionGlobalHelper:
+    public QObject/*,
+    public Singleton<SafeDirectConnectionGlobalHelper>*/
+{
+    Q_OBJECT
 
-    public:
-        /*!
-            Overload for slot as a member function
-        */
-        template<
-            class SenderType, class SignalType,
-            class ReceiverType, class SlotType            
-        >
-            void directConnect(
-                const SenderType* sender, SignalType signalPtr,
-                ReceiverType* receiver, SlotType slotPtr,
-                typename std::enable_if<std::is_member_function_pointer<SlotType>::value>::type* = nullptr )
-        {
-            directConnectInternal( sender, signalPtr, receiver, nx::bind_only_1st( slotPtr, receiver ) );
-        }
-
-        /*!
-            Overload for slot as a functor
-        */
-        template<
-            class SenderType, class SignalType,
-            class ReceiverType, class SlotType            
-        >
-            void directConnect(
-                const SenderType* sender, SignalType signalPtr,
-                ReceiverType* receiver, SlotType slotFunc,
-                typename std::enable_if<!std::is_member_function_pointer<SlotType>::value>::type* = nullptr )
-        {
-            directConnectInternal( sender, signalPtr, receiver, slotFunc );
-        }
-
-        //!Safely disconnects \a receiver from all signals
-        /*!
-            \note Blocks till currently executed slots return
-        */
-        void directDisconnectAll( const EnableSafeDirectConnection* receiver );
-        //!Returns \a true if receiver is still connected to some signal
-        bool isConnected( const EnableSafeDirectConnection* receiver ) const;
-
-        /*!
-            \note By using \a std::shared_ptr we ensure that \a SafeDirectConnectionGlobalHelper instance
-                is destroyed not earlier then last \a EnableSafeDirectConnection instance
-        */
-        static std::shared_ptr<SafeDirectConnectionGlobalHelper> instance();
-
-    private:
-        struct ReceiverContext
-        {
-            int slotsInvokedCounter;
-            std::list<QMetaObject::Connection> connections;
-            bool terminated;
-
-            ReceiverContext()
-            :
-                slotsInvokedCounter(0),
-                terminated(false)
-            {
-            }
-        };
-
-        mutable QnMutex m_mutex;
-        QnWaitCondition m_cond;
-        //!map<receiver, counter>
-        std::map<EnableSafeDirectConnection::ID, ReceiverContext> m_receivers;
-
-        template<
-            class SenderType, class SignalType,
-            class ReceiverType, class SlotType            
-        >
-            void directConnectInternal(
-                const SenderType* sender, SignalType signalPtr,
-                ReceiverType* receiver, SlotType slotFunc )
-        {
-            auto proxyFunc = nx::createProxyFunc(
-                slotFunc,
-                std::bind(
-                    &SafeDirectConnectionGlobalHelper::beforeSlotInvoked, this,
-                    sender, receiver->uniqueObjectSequence() ),
-                std::bind(
-                    &SafeDirectConnectionGlobalHelper::afterSlotInvoked, this,
-                    sender, receiver->uniqueObjectSequence() ),
-                signalPtr );
-
-            auto connection = connect( sender, signalPtr, this, proxyFunc, Qt::DirectConnection );
-            newSafeConnectionEstablished( receiver->uniqueObjectSequence(), std::move(connection) );
-        }
-
-        void newSafeConnectionEstablished(
-            EnableSafeDirectConnection::ID receiverID,
-            QMetaObject::Connection connection );
-        bool beforeSlotInvoked( const QObject* sender, EnableSafeDirectConnection::ID receiver );
-        void afterSlotInvoked( const QObject* sender, EnableSafeDirectConnection::ID receiver );
-    };
-
-    //!MUST be used instead of QObject::connect with Qt::DirectConnection specified to guarantee thread-safety while disconnecting
-    /*!
-        \note overload for slot as a member function
-    */
+public:
+    /**
+     * Overload for slot as a member function.
+     */
     template<
-        typename SenderType, typename SignalType,
-        typename ReceiverType, typename SlotType
+        class SenderType, class SignalType,
+        class ReceiverType, class SlotType
     >
         void directConnect(
-            const SenderType* sender, SignalType signalFunc,
-            ReceiverType* receiver, SlotType slotFunc )
+            const SenderType* sender, SignalType signalPtr,
+            ReceiverType* receiver, SlotType slotPtr,
+            typename std::enable_if<std::is_member_function_pointer<SlotType>::value>::type* = nullptr )
     {
-        return SafeDirectConnectionGlobalHelper::instance()->directConnect(
-            sender, signalFunc, receiver, slotFunc );
+        directConnectInternal( sender, signalPtr, receiver, nx::bind_only_1st( slotPtr, receiver ) );
     }
 
-    //!Safely disconnects \a receiver from all signals
-    /*!
-        \note Blocks till currently executed slots return
-    */
-    void NX_UTILS_API directDisconnectAll( const EnableSafeDirectConnection* receiver );
+    /**
+     * Overload for slot as a functor.
+     */
+    template<
+        class SenderType, class SignalType,
+        class ReceiverType, class SlotType
+    >
+        void directConnect(
+            const SenderType* sender, SignalType signalPtr,
+            ReceiverType* receiver, SlotType slotFunc,
+            typename std::enable_if<!std::is_member_function_pointer<SlotType>::value>::type* = nullptr )
+    {
+        directConnectInternal( sender, signalPtr, receiver, slotFunc );
+    }
 
-    //!Waits for currently running slots to exit
-    /*!
-        \param sender Can be NULL
-        \param receiver Can be NULL
-    */
-    //template<class SignalType, class SlotType>
-    //    void directDisconnect(
-    //        const QObject* sender, SignalType signalFunc,
-    //        EnableSafeDirectConnection* receiver, SlotType slotFunc )
-    //{
-    //    SafeDirectConnectionGlobalHelper::instance()->directDisconnect(
-    //        sender, signalFunc, receiver, slotFunc );
-    //}
+    /**
+     * Safely disconnects receiver from all signals.
+     * NOTE: Blocks till currently executed slots return.
+     */
+    void directDisconnectAll( const EnableSafeDirectConnection* receiver );
+    /**
+     * @return true if receiver is still connected to some signal.
+     */
+    bool isConnected( const EnableSafeDirectConnection* receiver ) const;
+
+    /**
+     * NOTE: By using std::shared_ptr we ensure that SafeDirectConnectionGlobalHelper instance
+     *     is destroyed not earlier then last EnableSafeDirectConnection instance.
+     */
+    static std::shared_ptr<SafeDirectConnectionGlobalHelper> instance();
+
+private:
+    struct ReceiverContext
+    {
+        int slotsInvokedCounter;
+        std::list<QMetaObject::Connection> connections;
+        bool terminated;
+
+        ReceiverContext():
+            slotsInvokedCounter(0),
+            terminated(false)
+        {
+        }
+    };
+
+    mutable QnMutex m_mutex;
+    QnWaitCondition m_cond;
+    //!map<receiver, counter>
+    std::map<EnableSafeDirectConnection::ID, ReceiverContext> m_receivers;
+
+    template<
+        class SenderType, class SignalType,
+        class ReceiverType, class SlotType
+    >
+        void directConnectInternal(
+            const SenderType* sender, SignalType signalPtr,
+            ReceiverType* receiver, SlotType slotFunc )
+    {
+        auto proxyFunc = nx::createProxyFunc(
+            slotFunc,
+            std::bind(
+                &SafeDirectConnectionGlobalHelper::beforeSlotInvoked, this,
+                sender, receiver->uniqueObjectSequence() ),
+            std::bind(
+                &SafeDirectConnectionGlobalHelper::afterSlotInvoked, this,
+                sender, receiver->uniqueObjectSequence() ),
+            signalPtr );
+
+        auto connection = connect( sender, signalPtr, this, proxyFunc, Qt::DirectConnection );
+        newSafeConnectionEstablished( receiver->uniqueObjectSequence(), std::move(connection) );
+    }
+
+    void newSafeConnectionEstablished(
+        EnableSafeDirectConnection::ID receiverID,
+        QMetaObject::Connection connection );
+    bool beforeSlotInvoked( const QObject* sender, EnableSafeDirectConnection::ID receiver );
+    void afterSlotInvoked( const QObject* sender, EnableSafeDirectConnection::ID receiver );
+};
+
+/**
+ * MUST be used instead of QObject::connect with Qt::DirectConnection specified
+ *   to guarantee thread-safety while disconnecting.
+ * NOTE: overload for slot as a member function.
+ */
+template<
+    typename SenderType, typename SignalType,
+    typename ReceiverType, typename SlotType
+>
+    void directConnect(
+        const SenderType* sender, SignalType signalFunc,
+        ReceiverType* receiver, SlotType slotFunc )
+{
+    return SafeDirectConnectionGlobalHelper::instance()->directConnect(
+        sender, signalFunc, receiver, slotFunc );
 }
 
-#endif  //NX_SAFE_DIRECT_CONNECTION_H
+/**
+ * Safely disconnects receiver from all signals.
+ * NOTE: Blocks till currently executed slots return.
+ */
+void NX_UTILS_API directDisconnectAll( const EnableSafeDirectConnection* receiver );
+
+} // namespace Qn

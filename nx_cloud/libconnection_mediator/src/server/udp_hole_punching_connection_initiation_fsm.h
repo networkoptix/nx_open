@@ -1,8 +1,3 @@
-/**********************************************************
-* Jan 15, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <functional>
@@ -37,7 +32,7 @@ class UDPHolePunchingConnectionInitiationFsm:
     using base_type = network::aio::BasicPollable;
 
 public:
-    /** 
+    /**
      * @note onFsmFinishedEventHandler is allowed to free
      *     UDPHolePunchingConnectionInitiationFsm instance.
      */
@@ -69,9 +64,10 @@ private:
     enum class State
     {
         init,
-        /** connectionReqiested indication has been sent to the server */
+        /** ConnectionReqiested indication has been sent to the server. */
         waitingServerPeerUDPAddress,
-        /** reported server's UDP address to the client, waiting for result */
+        resolvingServersRelayInstance,
+        /** Reported server's UDP address to the client, waiting for result. */
         waitingConnectionResult,
         fini,
     };
@@ -84,43 +80,56 @@ private:
     nx::network::aio::Timer m_timer;
     ConnectionWeakRef m_serverConnectionWeakRef;
     std::function<void(api::ResultCode, api::ConnectResponse)> m_connectResponseSender;
-    ListeningPeerData m_serverPeerData;
+    const std::list<network::SocketAddress> m_serverPeerEndpoints;
+    const nx::String m_serverPeerHostName;
     stats::ConnectSession m_sessionStatisticsInfo;
+    api::ConnectResponse m_preparedConnectResponse;
     boost::optional<std::pair<api::ResultCode, api::ConnectResponse>> m_cachedConnectResponse;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
+    std::function<void(api::ResultCode)> m_connectionAckCompletionHandler;
 
     virtual void stopWhileInAioThread() override;
-    
+
     void processConnectRequest(
         const ConnectionStrongRef& originatingPeerConnection,
         api::ConnectRequest request,
         std::function<void(api::ResultCode, api::ConnectResponse)> connectResponseSender);
+
     bool connectResponseHasAlreadyBeenSent() const;
+
     void repeatConnectResponse(
         std::function<void(api::ResultCode, api::ConnectResponse)> connectResponseSender);
+
     void updateSessionStatistics(
         const ConnectionStrongRef& originatingPeerConnection,
         const api::ConnectRequest& connectRequest);
+
     bool notifyListeningPeerAboutConnectRequest(
         const ConnectionStrongRef& originatingPeerConnection,
         const api::ConnectRequest& connectRequest);
-    nx::stun::Message prepareConnectionRequestedIndication(
+
+    nx::network::stun::Message prepareConnectionRequestedIndication(
         const ConnectionStrongRef& originatingPeerConnection,
         const api::ConnectRequest& connectRequest);
+
     void noConnectionAckOnTime();
 
     void processConnectionAckRequest(
         const ConnectionStrongRef& connection,
         api::ConnectionAckRequest request,
         std::function<void(api::ResultCode)> completionHandler);
-    void onRelayInstanceSearchCompletion(
-        api::ConnectResponse connectResponse,
-        boost::optional<QUrl> relayInstanceUrl,
-        std::function<void(api::ResultCode)> completionHandler);
+
+    void initiateRelayInstanceSearch();
+
+    void finishConnect();
+
+    void onRelayInstanceSearchCompletion(boost::optional<QUrl> relayInstanceUrl);
+
     api::ConnectResponse prepareConnectResponse(
         const api::ConnectionAckRequest& connectionAckRequest,
-        std::list<SocketAddress> tcpEndpoints,
+        std::list<network::SocketAddress> tcpEndpoints,
         boost::optional<QUrl> relayInstanceUrl);
+
     void sendConnectResponse(
         api::ResultCode resultCode,
         api::ConnectResponse connectResponse);

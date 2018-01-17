@@ -41,20 +41,20 @@ struct QnCameraAdvancedParameterCondition
 {
     enum class ConditionType
     {
-        Equal,
-        InRange,
-        NotInRange,
-        Default,
-        Unknown
+        equal, //< Watched value strictly equals to condition value
+        inRange, //< Watched value is in condition value range
+        notInRange,
+        present, //< Watched parameter is present in parameter list
+        notPresent,
+        valueChanged,
+        unknown
     };
 
-    ConditionType type = ConditionType::Unknown;
+    ConditionType type = ConditionType::unknown;
     QString paramId;
     QString value;
 
     bool checkValue(const QString& valueToCheck) const;
-    static ConditionType fromStringToConditionType(const QString& conditionTypeString);
-    static QString fromConditionTypeToString(const ConditionType& conditionType);
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterCondition::ConditionType, (lexical))
@@ -65,19 +65,17 @@ struct QnCameraAdvancedParameterDependency
 {
     enum class DependencyType
     {
-        Show,
-        Range,
-        Unknown
+        show,
+        range,
+        trigger,
+        unknown
     };
 
     QString id;
-    DependencyType type = DependencyType::Unknown;
+    DependencyType type = DependencyType::unknown;
     QString range;
     QString internalRange;
     std::vector<QnCameraAdvancedParameterCondition> conditions;
-
-    static DependencyType fromStringToDependencyType(const QString& dependencyType);
-    static QString fromDependencyTypeToString(const DependencyType& dependencyType);
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterDependency::DependencyType, (lexical))
@@ -93,7 +91,8 @@ struct QnCameraAdvancedParameter
         Number,
         Enumeration,
         Button,
-        String
+        String,
+        Separator
     };
 
     QString id;
@@ -101,7 +100,8 @@ struct QnCameraAdvancedParameter
     QString range;
     QString name;
     QString description;
-    QString tag;  
+    QString confirmation; //< Confirmation message. Actual only for the buttons now.
+    QString tag;
     bool readOnly = false;
     QString readCmd; //< Read parameter command line. Isn't used in UI.
     QString writeCmd; //< Write parameter command line. Isn't used in UI.
@@ -109,6 +109,11 @@ struct QnCameraAdvancedParameter
     QString aux; //< Auxiliary driver dependent data.
     std::vector<QnCameraAdvancedParameterDependency> dependencies;
     bool showRange = false; //< Show range near parameter's label
+    QString unit;
+    QString notes;
+    bool resync = false;
+    bool shouldKeepInitialValue = false;
+    bool bindDefaultToMinimum = false;
 
     bool isValid() const;
     QStringList getRange() const;
@@ -132,6 +137,7 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (range)\
     (name)\
     (description)\
+    (confirmation)\
     (tag)\
     (readOnly)\
     (readCmd)\
@@ -139,7 +145,11 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (internalRange)\
     (aux)\
     (dependencies)\
-    (showRange)
+    (showRange)\
+    (unit)\
+    (notes)\
+    (shouldKeepInitialValue)\
+    (bindDefaultToMinimum)
 
 struct QnCameraAdvancedParamGroup
 {

@@ -134,7 +134,6 @@ protected:
     }
 
 private:
-    QnStaticCommonModule m_common;
     std::map<QnUuid, std::unique_ptr<MediaServer>> m_servers;
 };
 

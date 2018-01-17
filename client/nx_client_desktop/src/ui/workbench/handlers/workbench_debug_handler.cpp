@@ -26,6 +26,7 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
+#include <ui/widgets/main_window.h>
 
 #include <nx/client/desktop/ui/dialogs/debug/animations_control_dialog.h>
 #include <nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.h>
@@ -96,7 +97,7 @@ class QnDebugControlDialog: public QnDialog, public QnWorkbenchContextAware
     typedef QnDialog base_type;
 
 public:
-    QnDebugControlDialog(QWidget *parent = NULL):
+    QnDebugControlDialog(QWidget *parent):
         base_type(parent),
         QnWorkbenchContextAware(parent)
     {
@@ -125,20 +126,68 @@ public:
                 dialog->show();
             });
 
+        addButton(lit("Toggle default password"),
+            [this]
+            {
+                const auto cameras = resourcePool()->getAllCameras(QnResourcePtr(), true);
+                if (cameras.empty())
+                    return;
+
+                const auto caps = Qn::SetUserPasswordCapability | Qn::isDefaultPasswordCapability;
+
+                const bool isDefaultPassword = cameras.first()->needsToChangeDefaultPassword();
+
+                for (const auto& camera: cameras)
+                {
+                    // Toggle current option.
+                    if (isDefaultPassword)
+                        camera->setCameraCapabilities(camera->getCameraCapabilities() & ~caps);
+                    else
+                        camera->setCameraCapabilities(camera->getCameraCapabilities() | caps);
+                    camera->saveParamsAsync();
+                }
+
+            });
+
         addButton(lit("Palette"), [this]
             {
                 QnPaletteWidget *w = new QnPaletteWidget(this);
                 w->setPalette(qApp->palette());
-                auto messageBox = new QnMessageBox(mainWindow());
+                auto messageBox = new QnMessageBox(mainWindowWidget());
                 messageBox->setWindowFlags(Qt::Window);
                 messageBox->addCustomWidget(w);
                 messageBox->addButton(QDialogButtonBox::Ok);
                 messageBox->show();
             });
 
+        addButton(lit("RandomizePtz"), [this]
+            {
+                QList<Ptz::Capabilities> presets;
+                presets.push_back(Ptz::NoPtzCapabilities);
+                presets.push_back(Ptz::ContinuousZoomCapability);
+                presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability);
+                presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability
+                    | Ptz::AuxilaryPtzCapability);
+                presets.push_back(Ptz::ContinuousPanTiltCapabilities);
+                presets.push_back(Ptz::ContinuousPtzCapabilities | Ptz::ContinuousFocusCapability
+                    | Ptz::AuxilaryPtzCapability | Ptz::PresetsPtzCapability);
+
+                for (const auto& camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
+                {
+                    int idx = presets.indexOf(camera->getPtzCapabilities());
+                    if (idx < 0)
+                        idx = 0;
+                    else
+                        idx = (idx + 1) % presets.size();
+
+                    camera->setPtzCapabilities(presets[idx]);
+                }
+
+            });
+
         addButton(lit("Resource Pool"), [this]
             {
-                auto messageBox = new QnMessageBox(mainWindow());
+                auto messageBox = new QnMessageBox(mainWindowWidget());
                 messageBox->setWindowFlags(Qt::Window);
 
                 messageBox->addCustomWidget(new QnResourceListView(resourcePool()->getResources(),
@@ -173,9 +222,9 @@ public:
                     for (int j = 0; j < 3; ++j)
                     {
                         nx::api::AnalyticsEventType eventType;
-                        eventType.eventTypeId = QnUuid::createUuid();
-                        eventType.eventName.value = lit("Event %1").arg(j);
-                        eventType.eventName.localization[lit("ru_RU")] = lit("Russion %1").arg(j);
+                        eventType.typeId = QnUuid::createUuid();
+                        eventType.name.value = lit("Event %1").arg(j);
+                        eventType.name.localization[lit("ru_RU")] = lit("Russion %1").arg(j);
                         manifest.outputEventTypes.push_back(eventType);
                     }
 
@@ -208,7 +257,7 @@ public:
                                 std::back_inserter(supported),
                                 [](const nx::api::AnalyticsEventType& eventType)
                                 {
-                                    return eventType.eventTypeId;
+                                    return eventType.typeId;
                                 });
                             camera->setAnalyticsSupportedEvents(supported);
                         }
@@ -261,7 +310,7 @@ private:
 
             m_tilesTests = new QnSystemTilesTestCase(testSystemsFinder, this);
 
-            const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+            const auto welcomeScreen = mainWindow()->welcomeScreen();
 
             connect(m_tilesTests, &QnSystemTilesTestCase::openTile,
                 welcomeScreen, &QnWorkbenchWelcomeScreen::openTile);
@@ -334,11 +383,12 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     supressLog(nx::utils::log::Tag(lit("__workbenchState")));
     supressLog(nx::utils::log::Tag(lit("__itemMap")));
     supressLog(QnLog::PERMISSIONS_LOG);
+    //consoleLog(lit("nx::client::desktop::RadassController::Private"));
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()
 {
-    QnDebugControlDialog* dialog(new QnDebugControlDialog(mainWindow()));
+    QnDebugControlDialog* dialog(new QnDebugControlDialog(mainWindowWidget()));
     dialog->show();
 }
 

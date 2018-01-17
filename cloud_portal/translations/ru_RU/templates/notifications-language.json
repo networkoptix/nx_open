@@ -1,17 +1,17 @@
 {
-  "activate_account":{
-    "emailSubject":"Подтвердить свою учетную запись"
+  "activate_account": {
+    "emailSubject": "Подтвердить свою учетную запись"
   },
-  "restore_password":{
-    "emailSubject":"Восстановление пароля"
+  "restore_password": {
+    "emailSubject": "Восстановление пароля"
   },
-  "system_invite":{
-    "emailSubject":"Вам открыт доступ к системе {{message.system_name}}"
+  "system_invite": {
+    "emailSubject": "Вам открыт доступ к системе {{message.system_name}}"
   },
-  "system_shared":{
-    "emailSubject":"Вам открыт доступ к системе {{message.system_name}}"
+  "system_shared": {
+    "emailSubject": "Вам открыт доступ к системе {{message.system_name}}"
   },
-  "review_version":{
-    "emailSubject":"Version {{message.id}} is ready to be reviewed"
+  "review_version": {
+    "emailSubject": "Версия {{message.id}} готова к проверке"
   }
 }

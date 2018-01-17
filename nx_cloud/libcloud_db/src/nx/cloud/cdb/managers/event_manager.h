@@ -16,6 +16,7 @@
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/http/abstract_msg_body_source.h>
+#include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/counter.h>
@@ -24,12 +25,17 @@
 #include "../data/account_data.h"
 
 
-namespace nx_http
-{
-    class HttpServerConnection;
-    class MessageDispatcher;
-    class MultipartMessageBodySource;
-}
+namespace nx {
+namespace network {
+namespace http {
+
+class HttpServerConnection;
+class MessageDispatcher;
+class MultipartMessageBodySource;
+
+} // namespace http
+} // namespace network
+} // namespace nx
 
 namespace nx {
 namespace cdb {
@@ -48,13 +54,13 @@ public:
 
     void registerHttpHandlers(
         const AuthorizationManager& authorizationManager,
-        nx_http::MessageDispatcher* const httpMessageDispatcher);
+        nx::network::http::server::rest::MessageDispatcher* const httpMessageDispatcher);
 
     void subscribeToEvents(
-        nx_http::HttpServerConnection* connection,
+        nx::network::http::HttpServerConnection* connection,
         const AuthorizationInfo& authzInfo,
         nx::utils::MoveOnlyFunc<
-            void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
+            void(api::ResultCode, std::unique_ptr<nx::network::http::AbstractMsgBodySource>)
         > completionHandler);
 
     bool isSystemOnline(const std::string& systemId) const;
@@ -63,13 +69,13 @@ private:
     class ServerConnectionContext
     {
     public:
-        const nx_http::HttpServerConnection* httpConnection;
-        nx_http::MultipartMessageBodySource* msgBody;
+        const nx::network::http::HttpServerConnection* httpConnection;
+        nx::network::http::MultipartMessageBodySource* msgBody;
         std::unique_ptr<nx::network::aio::Timer> timer;
         const std::string systemId;
 
         ServerConnectionContext(
-            const nx_http::HttpServerConnection* _httpConnection,
+            const nx::network::http::HttpServerConnection* _httpConnection,
             const std::string& _systemId)
         :
             httpConnection(_httpConnection),
@@ -86,7 +92,7 @@ private:
             boost::multi_index::ordered_unique<
                 boost::multi_index::member<
                     ServerConnectionContext,
-                    const nx_http::HttpServerConnection*,
+                    const nx::network::http::HttpServerConnection*,
                     &ServerConnectionContext::httpConnection >>,
             //indexing by system id
             boost::multi_index::ordered_non_unique<
@@ -106,7 +112,7 @@ private:
     mutable QnMutex m_mutex;
 
     void beforeMsgBodySourceDestruction(
-        nx_http::HttpServerConnection* connection);
+        nx::network::http::HttpServerConnection* connection);
     void onConnectionToPeerLost(
         MediaServerConnectionContainer::iterator serverConnectionIter);
     void onMediaServerIdlePeriodExpired(

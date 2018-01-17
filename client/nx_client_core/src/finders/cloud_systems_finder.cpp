@@ -7,7 +7,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/async_http_client_reply.h>
 #include <rest/server/json_rest_result.h>
 #include <network/system_helpers.h>
@@ -170,8 +170,8 @@ void QnCloudSystemsFinder::tryRemoveAlienServer(const QnModuleInformation &serve
 
 void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
 {
-    auto client = nx_http::AsyncHttpClient::create();
-    client->setAuthType(nx_http::AuthType::authBasicAndDigest);
+    auto client = nx::network::http::AsyncHttpClient::create();
+    client->setAuthType(nx::network::http::AuthType::authBasicAndDigest);
     // First connection to a system (cloud and not cloud) may take a long time
     // because it may require hole punching.
     client->setSendTimeoutMs(kSystemConnectTimeout.count());
@@ -180,7 +180,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
     QPointer<QObject> guard(this);
 
     const auto handleReply =
-        [this, guard, cloudSystemId](nx_http::AsyncHttpClientPtr reply)
+        [this, guard, cloudSystemId](nx::network::http::AsyncHttpClientPtr reply)
         {
             const bool failed = reply->failed();
             const QByteArray data = failed ? QByteArray() : reply->fetchMessageBodyBuffer();
@@ -242,7 +242,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                         systemDescription->addServer(moduleInformation, 0);
                     }
 
-                    QUrl url;
+                    nx::utils::Url url;
                     url.setHost(moduleInformation.cloudId());
                     url.setScheme(moduleInformation.sslAllowed ? lit("https") : lit("http"));
                     systemDescription->setServerHost(serverId, url);

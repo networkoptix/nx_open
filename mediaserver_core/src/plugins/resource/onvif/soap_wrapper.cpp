@@ -18,7 +18,7 @@
 #include <onvif/soapEventBindingProxy.h>
 #include <onvif/soapSubscriptionManagerBindingProxy.h>
 #include <onvif/soapPullPointSubscriptionBindingProxy.h>
-#include <onvif/wsseapi.h>
+#include <gsoap/wsseapi.h>
 #include <nx/utils/log/log.h>
 #include <QtCore/QtGlobal>
 #include <QtCore/QDateTime>
@@ -666,6 +666,12 @@ int MediaSoapWrapper::getVideoSourceConfigurations(VideoSrcConfigsReq& request, 
 {
     beforeMethodInvocation();
     return m_soapProxy->GetVideoSourceConfigurations(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::getAudioOutputs( _onvifMedia__GetAudioOutputs& request, _onvifMedia__GetAudioOutputsResponse& response )
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetAudioOutputs(m_endpoint, NULL, &request, &response);
 }
 
 int MediaSoapWrapper::getVideoSources(_onvifMedia__GetVideoSources& request, _onvifMedia__GetVideoSourcesResponse& response)

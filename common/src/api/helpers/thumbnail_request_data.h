@@ -27,11 +27,17 @@ struct QnThumbnailRequestData: public QnMultiserverRequestData
         RawFormat, //< Raw video frame. Makes the request much more lightweight for Edge servers.
     };
 
+    enum AspectRatio
+    {
+        AutoAspectRatio,
+        SourceAspectRatio,
+    };
+
     QnThumbnailRequestData();
 
     void loadFromParams(QnResourcePool* resourcePool, const QnRequestParamList& params);
     QnRequestParamList toParams() const;
-    bool isValid() const;
+    boost::optional<QString> getError() const;
 
     /** Check if value is "special" - DATETIME_NOW or negative. */
     static bool isSpecialTimeValue(qint64 value);
@@ -64,10 +70,13 @@ struct QnThumbnailRequestData: public QnMultiserverRequestData
 
     /** Method of rounding, influences the precision. */
     RoundMethod roundMethod;
+
+    AspectRatio aspectRatio;
 };
 
 #define QN_THUMBNAIL_ENUM_TYPES \
     (QnThumbnailRequestData::RoundMethod)\
     (QnThumbnailRequestData::ThumbnailFormat)\
+    (QnThumbnailRequestData::AspectRatio)\
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_THUMBNAIL_ENUM_TYPES, (lexical))

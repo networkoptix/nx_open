@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('CloudDialogCtrl', function ($scope, $modalInstance, mediaserver, cloudAPI, connect, systemName,
-                                             cloudSystemID, cloudAccountName) {
-
+    .controller('CloudDialogCtrl', ['$scope', '$modalInstance', 'mediaserver', 'cloudAPI', 'connect',
+                                    'systemName', 'cloudSystemID', 'cloudAccountName',
+    function ($scope, $modalInstance, mediaserver, cloudAPI, connect, systemName, cloudSystemID, cloudAccountName) {
         //1. Detect action: connect or disconnect
         $scope.connect = connect;
         $scope.Config = Config;
@@ -101,4 +101,4 @@ angular.module('webadminApp')
                 console.error("this method is obsolete and does not work anymore");
             }
         };
-    });
+    }]);

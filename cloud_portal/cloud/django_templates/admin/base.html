@@ -1,0 +1,9 @@
+{% extends 'admin/base.html' %}
+{% load i18n admin_urls admin_static %}
+{% load static %}
+{% block extrahead %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {{ block.super }}
+{% endblock %}

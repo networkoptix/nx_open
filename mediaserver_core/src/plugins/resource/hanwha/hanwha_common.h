@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -40,18 +42,36 @@ enum class HanwhaClientType
     mobile
 };
 
+enum class HanwhaSessionType
+{
+    undefined,
+    live,
+    archive,
+    preview,
+    fileExport,
+    count
+};
+
 //TODO: #dmishin consider using Fusion instead of custom methods.
+
+static const int kHanwhaBlockedHttpCode = 490;
+
+static const QString kHanwhaManufacturerName("Hanwha Techwin");
 static const int kHanwhaInvalidProfile = -1;
 static const int kHanwhaInvalidGovLength = -1;
 static const int kHanwhaInvalidFps = -1;
 static const int kHanwhaInvalidBitrate = -1;
 static const int kHanwhaInvalidChannel = -1;
+static const int kHanwhaDefaultOverlappedId = 0;
 static const int kHanwhaMaxSecondaryStreamArea = 1024 * 768;
-static const int kHanwhaMaxPresetNumber = 1000;
+static const int kHanwhaDefaultMaxPresetNumber = 1000;
 static const int kHanwhaProfileNameMaxLength = 12;
 
-const QString kHanwhaPrimaryNxProfileSuffix = lit("P");
-const QString kHanwhaSecondaryNxProfileSuffix = lit("S");
+static const QString kHanwhaDateTimeFormat("yyyy-MM-dd hh:mm:ss");
+static const QString kHanwhaUtcDateTimeFormat("yyyy-MM-ddThh:mm:ssZ");
+
+static const QString kHanwhaPrimaryNxProfileSuffix = lit("Primary");
+static const QString kHanwhaSecondaryNxProfileSuffix = lit("Secondary");
 
 static const QString kHanwhaTrue = lit("True");
 static const QString kHanwhaFalse = lit("False");
@@ -88,6 +108,8 @@ static const QString kHanwhaUdp = lit("UDP");
 
 static const QString kHanwhaPcClient = lit("PC");
 static const QString kHanwhaMobileClient = lit("Mobile");
+
+static const QString kHanwhaAll = lit("All");
 
 static const QString kHanwhaChannelPropertyTemplate = lit("Channel.%1");
 static const QString kHanwhaChannelProperty = lit("Channel");
@@ -126,6 +148,12 @@ static const QString kHanwhaDefaultCbrBitrateProperty = lit("DefaultCBRTargetBit
 static const QString kHanwhaMaxVbrBitrateProperty = lit("MaxVBRTargetBitrate");
 static const QString kHanwhaMinVbrBitrateProperty = lit("MinVBRTargetBitrate");
 static const QString kHanwhaDefaultVbrBitrateProperty = lit("DefaultVBRTargetBitrate");
+static const QString kHanwhaChannelIdListProperty = lit("ChannelIDList");
+static const QString kHanwhaFromDateProperty = lit("FromDate");
+static const QString kHanwhaToDateProperty = lit("ToDate");
+static const QString kHanwhaOverlappedIdProperty = lit("OverlappedID");
+static const QString kHanwhaResultsInUtcProperty = lit("ResultsInUTC");
+static const QString kHanwhaRecordingTypeProperty = lit("Type");
 
 static const QString kHanwhaNearFocusMove = lit("Near");
 static const QString kHanwhaFarFocusMove = lit("Far");
@@ -163,9 +191,14 @@ static const QString kHanwhaTrueValueAttribute = lit("true");
 static const QString kHanwhaFalseValueAttribute = lit("false");
 static const QString kHanwhaFormatInfoAttribute = lit("formatInfo");
 static const QString kHanwhaFormatAttribute = lit("format");
+static const QString kHanwhaMaxLengthAttribute = lit("maxlen");
 
 static const int kHanwhaConfigurationNotFoundError = 612;
+
+static const QString kHanwhaNvrDeviceType = lit("NVR");
 
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

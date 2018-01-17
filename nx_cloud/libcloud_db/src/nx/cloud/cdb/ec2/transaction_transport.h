@@ -6,7 +6,6 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/move_only_func.h>
 
-#include <common/common_globals.h>
 #include <nx_ec/data/api_tran_state_data.h>
 #include <nx_ec/ec_proto_version.h>
 #include <transaction/transaction_transport_base.h>
@@ -48,14 +47,14 @@ public:
         const ConnectionRequestAttributes& connectionRequestAttributes,
         const nx::String& systemId,
         const ::ec2::ApiPeerData& localPeer,
-        const SocketAddress& remotePeerEndpoint,
-        const nx_http::Request& request);
+        const network::SocketAddress& remotePeerEndpoint,
+        const nx::network::http::Request& request);
     virtual ~TransactionTransport();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
 
-    virtual SocketAddress remoteSocketAddr() const override;
+    virtual network::SocketAddress remoteSocketAddr() const override;
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
     virtual QnUuid connectionGuid() const override;
@@ -65,10 +64,10 @@ public:
         const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
 
     void receivedTransaction(
-        const nx_http::HttpHeaders& headers,
+        const nx::network::http::HttpHeaders& headers,
         const QnByteArrayConstRef& tranData);
 
-    void setOutgoingConnection(QSharedPointer<AbstractCommunicatingSocket> socket);
+    void setOutgoingConnection(QSharedPointer<network::AbstractCommunicatingSocket> socket);
 
     void startOutgoingChannel();
 
@@ -94,13 +93,13 @@ private:
     std::unique_ptr<TransactionLogReader> m_transactionLogReader;
     const nx::String m_systemId;
     const nx::String m_connectionId;
-    const SocketAddress m_connectionOriginatorEndpoint;
+    const network::SocketAddress m_connectionOriginatorEndpoint;
     TransactionTransportHeader m_commonTransportHeaderOfRemoteTransaction;
     /**
      * Transaction state, we need to synchronize remote side to, before we can mark it write sync.
      */
     ::ec2::QnTranState m_tranStateToSynchronizeTo;
-    /** 
+    /**
      * Transaction state of remote peer. Transactions before this state have been sent to the peer.
      */
     ::ec2::QnTranState m_remotePeerTranState;

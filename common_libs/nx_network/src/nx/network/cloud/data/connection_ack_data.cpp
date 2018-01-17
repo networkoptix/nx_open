@@ -1,25 +1,20 @@
-/**********************************************************
-* Jan 18, 2016
-* akolesnikov
-***********************************************************/
-
 #include "connection_ack_data.h"
-
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-ConnectionAckRequest::ConnectionAckRequest()
-:
+ConnectionAckRequest::ConnectionAckRequest():
     StunRequestData(kMethod),
     connectionMethods(0),
     cloudConnectVersion(kCurrentCloudConnectVersion)
 {
 }
 
-void ConnectionAckRequest::serializeAttributes(nx::stun::Message* const message)
+void ConnectionAckRequest::serializeAttributes(network::stun::Message* const message)
 {
+    using namespace nx::network;
+
     message->newAttribute<stun::extension::attrs::ConnectionId>(connectSessionId);
     message->newAttribute<stun::extension::attrs::ConnectionMethods>(
         nx::String::number(connectionMethods));
@@ -30,8 +25,10 @@ void ConnectionAckRequest::serializeAttributes(nx::stun::Message* const message)
     message->addAttribute(stun::extension::attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
-bool ConnectionAckRequest::parseAttributes(const nx::stun::Message& message)
+bool ConnectionAckRequest::parseAttributes(const nx::network::stun::Message& message)
 {
+    using namespace nx::network;
+
     if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
 
@@ -43,6 +40,6 @@ bool ConnectionAckRequest::parseAttributes(const nx::stun::Message& message)
         readAttributeValue<stun::extension::attrs::UdtHpEndpointList>(message, &udpEndpointList);
 }
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx

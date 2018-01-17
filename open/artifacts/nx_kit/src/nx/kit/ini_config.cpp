@@ -113,7 +113,7 @@ struct AbstractParam
             const char* const descriptionPrefix = (description[0] == '\0') ? "" : " # ";
 
             *output << prefix << value << valueNameSeparator << name << error
-                    << descriptionPrefix << description << std::endl;
+                << descriptionPrefix << description << std::endl;
         }
     }
 };
@@ -184,8 +184,9 @@ bool Param<int>::reload(const std::string* value, std::ostream* output)
     {
         // NOTE: std::stoi() is missing on Android.
         char* pEnd = nullptr;
+        errno = 0; //< Required before strtol().
         const long v = std::strtol(value->c_str(), &pEnd, /*base*/ 0);
-        if (v > INT_MAX || v < INT_MIN || errno == ERANGE || *pEnd != '\0')
+        if (v > INT_MAX || v < INT_MIN || errno != 0 || *pEnd != '\0')
             error = " [invalid value]";
         else
             *pValue = (int) v;
@@ -282,6 +283,7 @@ struct IniConfig::Impl
 
     bool parseIniFile(std::ostream* output, bool* outputIsNeeded);
     void createDefaultIniFile(std::ostream* output);
+    void reloadParams(std::ostream* output, bool* outputIsNeeded) const;
 
     const std::string iniFile;
     const std::string iniFileDir;
@@ -388,7 +390,8 @@ bool IniConfig::Impl::parseIniFile(std::ostream* output, bool* outputIsNeeded)
             {
                 *output << iniFile << " ERROR: Cannot parse line " << line
                     << ", file " << iniFilePath << std::endl;
-                *outputIsNeeded = true;
+                if (outputIsNeeded != nullptr)
+                    *outputIsNeeded = true;
             }
             continue;
         }
@@ -421,6 +424,22 @@ void IniConfig::Impl::createDefaultIniFile(std::ostream* output)
     }
 }
 
+void IniConfig::Impl::reloadParams(std::ostream* output, bool* outputIsNeeded) const
+{
+    for (const auto& param: params)
+    {
+        const std::string* value = nullptr;
+        const auto it = iniMap.find(param->name);
+        if (it != iniMap.end())
+            value = &it->second;
+        if (param->reload(value, output))
+        {
+            if (output && outputIsNeeded != nullptr)
+                *outputIsNeeded = true;
+        }
+    }
+}
+
 void IniConfig::reload()
 {
     if (!isEnabled())
@@ -440,13 +459,12 @@ void IniConfig::reload()
     if (iniFileExists)
     {
         if (output)
-            *output << d->iniFile << " [" << d->iniFilePath << "]:" << std::endl;
+            *output << d->iniFile << " [" << d->iniFilePath << "]" << std::endl;
         if (!d->parseIniFile(output, &outputIsNeeded))
         {
             if (output)
             {
-                *output << "    ATTENTION: .ini file is empty; filling with defaults."
-                    << std::endl;
+                *output << "    ATTENTION: .ini file is empty; filling in defaults." << std::endl;
                 outputIsNeeded = true;
             }
             d->createDefaultIniFile(output);
@@ -456,21 +474,13 @@ void IniConfig::reload()
     {
         if (output)
         {
-            *output << d->iniFile << " (not found; touch " << iniFilePath()
-                << " to fill with defaults):" << std::endl;
+            *output << d->iniFile << " (absent) To fill in defaults, touch " << iniFilePath()
+                << std::endl;
         }
         d->iniMap.clear();
     }
 
-    for (const auto& param: d->params)
-    {
-        const std::string* value = nullptr;
-        const auto it = d->iniMap.find(param->name);
-        if (it != d->iniMap.end())
-            value = &it->second;
-        if (param->reload(value, output))
-            outputIsNeeded = true;
-    }
+    d->reloadParams(iniFileExists ? output : nullptr, &outputIsNeeded);
 
     if (output && outputIsNeeded)
         *Impl::output() << outputString.str();

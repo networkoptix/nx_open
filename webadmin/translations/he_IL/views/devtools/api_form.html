@@ -31,7 +31,7 @@
     </div>
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">URL של שולח הבקשה</label>
+        <label class="col-sm-2 control-label">מבקש כתובת אתר</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{getDebugUrl()}}</p>
         </div>
@@ -132,7 +132,7 @@
     </div>
 
     <div class="form-group" ng-if="apiMethod.addCredentials">
-        <label class="col-sm-2 control-label" for="useLogin">כניסה</label>
+        <label class="col-sm-2 control-label" for="useLogin">שם משתמש</label>
         <div class="col-sm-10">
             <input id="useLogin" type="text" class="form-control input-sm"
                    ng-model="apiMethod.login">
@@ -141,7 +141,7 @@
     </div>
 
     <div class="form-group" ng-if="apiMethod.addCredentials">
-        <label class="col-sm-2 control-label" for="usePassword">סיסמא</label>
+        <label class="col-sm-2 control-label" for="usePassword"> סיסמא </label>
         <div class="col-sm-10">
             <input id="usePassword" type="text" class="form-control input-sm"
                    ng-model="apiMethod.password">
@@ -182,7 +182,7 @@
 
 
     <div class="form-group" ng-if="result.result || result.image" ng-class="{'has-error':result.error}">
-        <label class="col-sm-2 control-label">מצב</label>
+        <label class="col-sm-2 control-label">Status</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{result.status}}</p>
         </div>

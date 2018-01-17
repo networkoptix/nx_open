@@ -89,6 +89,9 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                     dismissButton: hold
                 });
             },
+            dismissNotifications:function(){
+                return ngToast.dismiss();
+            },
             alert:function(message, title){
                 return openDialog({
                     title:title,

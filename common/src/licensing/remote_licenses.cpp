@@ -4,13 +4,13 @@
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 
 namespace {
     const int defaultTimeoutMs = 10 * 1000;
 }
 
-QnLicenseList remoteLicenses(const QUrl &url, const QAuthenticator &auth, int *status) {
+QnLicenseList remoteLicenses(const nx::utils::Url &url, const QAuthenticator &auth, int *status) {
     QnLicenseList result;
 
     CLSimpleHTTPClient client(url, defaultTimeoutMs, auth);

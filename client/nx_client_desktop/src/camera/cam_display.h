@@ -16,6 +16,10 @@
 #include "video_stream_display.h"
 #include <map>
 
+// TODO: #GDM use forward declaration
+#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+#include <nx/utils/elapsed_timer.h>
+
 class QnAbstractRenderer;
 class QnVideoStreamDisplay;
 class QnAudioStreamDisplay;
@@ -55,6 +59,9 @@ public:
     void removeVideoRenderer(QnAbstractRenderer* vw);
     int channelsCount() const;
 
+    void addMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
+    void removeMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
+
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     virtual void pleaseStop() override;
@@ -78,15 +85,15 @@ public:
      * \returns                         Current time in microseconds.
      */
 
-    virtual qint64 getCurrentTime() const;
-    virtual qint64 getDisplayedTime() const;
-    virtual qint64 getExternalTime() const;
-    virtual qint64 getNextTime() const;
+    virtual qint64 getCurrentTime() const override;
+    virtual qint64 getDisplayedTime() const override;
+    virtual qint64 getExternalTime() const override;
+    virtual qint64 getNextTime() const override;
 
     void setMTDecoding(bool value);
 
     QSize getFrameSize(int channel) const;
-    QImage getScreenshot(const QnImageFilterHelper& imageProcessingParams, bool anyQuality);
+    QImage getScreenshot(const QnLegacyTranscodingSettings& imageProcessingParams, bool anyQuality);
     QImage getGrayscaleScreenshot(int channel);
     QSize getVideoSize() const;
     bool isRealTimeSource() const;
@@ -119,6 +126,10 @@ public:
 
     QnMediaResourcePtr resource() const;
 
+    Qn::MediaStreamEvent lastMediaEvent() const;
+
+    bool isForcedBufferingEnabled() const;
+
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);
@@ -134,7 +145,6 @@ public slots:
 signals:
     void liveMode(bool value);
     void stillImageChanged();
-
 protected:
     void setSingleShotMode(bool single);
     virtual void setSpeed(float speed) override;
@@ -178,12 +188,20 @@ private:
     template <class T> void markIgnoreBefore(const T& queue, qint64 time);
     bool needBuffering(qint64 vTime) const;
     void processSkippingFramesTime();
-    void clearMetaDataInfo();
-    void mapMetadataFrame(const QnCompressedVideoDataPtr& video);
     qint64 doSmartSleep(const qint64 needToSleep, float speed);
+    bool fillDataQueue();
+    bool isDataQueueFilled() const;
 
     static qint64 initialLiveBufferMkSecs();
     static qint64 maximumLiveBufferMkSecs();
+
+    void moveTimestampTo(qint64 timestampUs);
+    void processFillerPacket(
+        qint64 timestampUs,
+        QnAbstractStreamDataProvider* dataProvider,
+        QnAbstractMediaData::MediaFlags flags);
+
+    void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
 
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
@@ -233,7 +251,6 @@ protected:
     int m_executingJump;
     int m_skipPrevJumpSignal;
     int m_processedPackets;
-    std::map<qint64, QnAbstractCompressedMetadataPtr> m_lastMetadata[CL_MAX_CHANNELS];
     qint64 m_nextReverseTime[CL_MAX_CHANNELS];
     int m_emptyPacketCounter;
     bool m_isStillImage;
@@ -267,6 +284,12 @@ protected:
     int m_liveBufferSize;
     bool m_liveMaxLenReached;
     bool m_hasVideo;
+    Qn::MediaStreamEvent m_lastMediaEvent = Qn::MediaStreamEvent::NoEvent;
+    nx::utils::ElapsedTimer m_lastMediaEventTimeout;
+
+    mutable QnMutex m_metadataConsumersHashMutex;
+    QMultiMap<MetadataType, QWeakPointer<nx::media::AbstractMetadataConsumer>>
+        m_metadataConsumerByType;
 };
 
 #endif //QN_CAM_DISPLAY_H

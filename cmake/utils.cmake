@@ -11,9 +11,13 @@ else()
     set(CMAKE_ACTIVE_CONFIGURATIONS)
 endif()
 
-macro(nx_expose_variables_to_parent_scope _variables_list)
-    foreach(_variable_name IN LISTS ${_variables_list})
-        set(${_variable_name} ${${_variable_name}} PARENT_SCOPE)
+macro(nx_expose_to_parent_scope variable)
+    set(${variable} ${${variable}} PARENT_SCOPE)
+endmacro()
+
+macro(nx_expose_variables_to_parent_scope variables_list)
+    foreach(variable IN LISTS ${variables_list})
+        nx_expose_to_parent_scope(${variable})
     endforeach()
 endmacro()
 
@@ -70,13 +74,23 @@ function(nx_configure_file input output)
 endfunction()
 
 function(nx_configure_directory input output)
+    cmake_parse_arguments(ARG "" "OUTPUT_FILES_VARIABLE" "" ${ARGN})
+
+    set(output_files)
+
+    message(STATUS "Configuring directory (recursively) ${input}")
     file(GLOB_RECURSE files RELATIVE ${input} ${input}/*)
     foreach(file ${files})
         set(src_template_path ${input}/${file})
         if(NOT IS_DIRECTORY ${src_template_path})
-            nx_configure_file(${input}/${file} ${output}/${file})
+            nx_configure_file(${input}/${file} ${output}/${file} ${ARG_UNPARSED_ARGUMENTS})
+            list(APPEND output_files ${output}/${file})
         endif()
     endforeach()
+
+    if(ARG_OUTPUT_FILES_VARIABLE)
+        set(${ARG_OUTPUT_FILES_VARIABLE} ${output_files} PARENT_SCOPE)
+    endif()
 endfunction()
 
 function(nx_copy_package_for_configuration package_dir config)
@@ -138,7 +152,7 @@ endfunction()
 
 function(nx_copy_current_package)
     file(GLOB contents ${CMAKE_CURRENT_LIST_DIR}/*)
-    file(COPY ${contents} DESTINATION .
+    file(COPY ${contents} DESTINATION ${CMAKE_BINARY_DIR}
         PATTERN ".rdpack" EXCLUDE
         PATTERN "*.cmake" EXCLUDE
     )
@@ -148,7 +162,19 @@ endfunction()
 function(nx_copy_bin_resources input output)
   file(GLOB files RELATIVE ${input} ${input}/*)
   foreach(file ${files})
-    message("copying ${file}")
+    message(STATUS "copying ${file}")
     nx_copy("${input}/${file}" DESTINATION "${output}")
   endforeach(file)
+endfunction()
+
+function(nx_create_qt_conf file_name)
+    cmake_parse_arguments(CONF "" "QT_PREFIX" "" ${ARGN})
+
+    if(NOT CONF_QT_PREFIX)
+        set(qt_prefix "..")
+    else()
+        set(qt_prefix ${CONF_QT_PREFIX})
+    endif()
+
+    nx_configure_file(${CMAKE_SOURCE_DIR}/cmake/qt.conf ${file_name})
 endfunction()

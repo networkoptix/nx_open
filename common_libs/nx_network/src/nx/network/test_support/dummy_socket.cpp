@@ -31,6 +31,16 @@ bool DummySocket::getReuseAddrFlag(bool* /*val*/) const
     return true;
 }
 
+bool DummySocket::setReusePortFlag(bool /*value*/)
+{
+    return true;
+}
+
+bool DummySocket::getReusePortFlag(bool* /*value*/) const
+{
+    return true;
+}
+
 bool DummySocket::setNonBlockingMode(bool /*val*/)
 {
     return true;
@@ -108,7 +118,7 @@ Pollable* DummySocket::pollable()
 
 bool DummySocket::connect(
     const SocketAddress& remoteSocketAddress,
-    unsigned int /*timeoutMillis*/)
+    std::chrono::milliseconds /*timeout*/)
 {
     m_remotePeerAddress = remoteSocketAddress;
     return true;
@@ -128,11 +138,6 @@ void DummySocket::cancelIOAsync(
 
 void DummySocket::cancelIOSync(aio::EventType /*eventType*/)
 {
-}
-
-bool DummySocket::reopen()
-{
-    return connect(m_remotePeerAddress);
 }
 
 bool DummySocket::setNoDelay(bool /*value*/)
@@ -181,13 +186,13 @@ void DummySocket::connectAsync(
 
 void DummySocket::readSomeAsync(
     nx::Buffer* const /*buf*/,
-    std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
+    IoCompletionHandler /*handler*/)
 {
 }
 
 void DummySocket::sendAsync(
     const nx::Buffer& /*buf*/,
-    std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
+    IoCompletionHandler /*handler*/)
 {
 }
 

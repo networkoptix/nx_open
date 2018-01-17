@@ -193,7 +193,7 @@ CameraDiagnostics::Result QnPlDroidIpWebCamReader::openStreamInternal(bool isCam
         case CL_HTTP_AUTH_REQUIRED:
             return CameraDiagnostics::NotAuthorisedResult(requestedUrl.toString());
         default:
-            return CameraDiagnostics::RequestFailedResult(QLatin1String("videofeed"), QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
+            return CameraDiagnostics::RequestFailedResult(QLatin1String("videofeed"), QLatin1String(nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)status)));
     }
 }
 

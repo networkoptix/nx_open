@@ -7,7 +7,9 @@
 
 #include "upnp_device_description.h"
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 
 /**
  * Receives discovered devices info.
@@ -22,7 +24,7 @@ public:
      * @param discoveredDevAddress Discovered device address
      * @param devInfo Parameters, received by parsing xmlDevInfo
      * @param xmlDevInfo xml data as defined in [UPnP Device Architecture 1.1, section 2.3]
-     * @return true, if device has been recognized and processed successfully, false otherwise. 
+     * @return true, if device has been recognized and processed successfully, false otherwise.
      *   If true, packet WILL NOT be passed to other processors.
      */
     virtual bool processPacket(
@@ -40,4 +42,6 @@ public:
     virtual ~SearchAutoHandler() override;
 };
 
-} // namespace nx_upnp
+} // namespace nx
+} // namespace network
+} // namespace upnp

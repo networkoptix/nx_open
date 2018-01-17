@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log, nativeClient, systemAPI) {
+    .factory('mediaserver', ['$http', '$modal', '$q', '$localStorage', '$location', '$log', 'nativeClient', 'systemAPI',
+    function ($http, $modal, $q, $localStorage, $location, $log, nativeClient, systemAPI) {
 
 
         if($localStorage.auth){
@@ -190,8 +191,8 @@ angular.module('webadminApp')
                     }
                     params.url = url;
                 }
-
-                return $http.get(proxy + '/web/api/getNonce?' + $.param(params));
+                var nonceType = url ? 'getRemoteNonce' : 'getNonce';
+                return $http.get(proxy + '/web/api/' + nonceType + '?' + $.param(params));
             },
             logout:function(){
                 $localStorage.$reset();
@@ -573,4 +574,4 @@ angular.module('webadminApp')
         };
 
         return mediaserver;
-    });
+    }]);

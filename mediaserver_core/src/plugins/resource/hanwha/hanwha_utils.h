@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 #include <plugins/resource/hanwha/hanwha_common.h>
 
 #include <set>
@@ -22,6 +24,18 @@ extern "C" {
 
 } // extern "C"
 
+inline bool operator<(const QSize& lhs, const QSize& rhs)
+{
+    return lhs.width() * lhs.height() < rhs.width() * rhs.height();
+}
+
+#define READ_NEXT_AND_RETURN_IF_NEEDED(reader)\
+{\
+    (reader).readNextStartElement();\
+    if ((reader).atEnd())\
+        return !(reader).hasError();\
+}
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -35,14 +49,21 @@ using HanwhaProfileParameterName = QString;
 using HanwhaProfileParameterValue = QString;
 using HanwhaProfileParameters = std::map<QString, QString>;
 
+static const std::map<AVCodecID, int> kHanwhaCodecCoefficients = {
+    {AV_CODEC_ID_H264, 3},
+    {AV_CODEC_ID_H265, 2},
+    {AV_CODEC_ID_MJPEG, 1}
+};
+
 template<typename T>
 CameraDiagnostics::Result error(
     const T& response,
     const CameraDiagnostics::Result& authorizedResult)
 {
     auto statusCode = response.statusCode();
-    bool unauthorizedResponse = statusCode == nx_http::StatusCode::unauthorized
-        || statusCode == nx_http::StatusCode::notAllowed;
+    bool unauthorizedResponse = statusCode == nx::network::http::StatusCode::unauthorized
+        || statusCode == nx::network::http::StatusCode::notAllowed
+        || statusCode == kHanwhaBlockedHttpCode;
 
     if (!unauthorizedResponse)
         return authorizedResult;
@@ -64,11 +85,9 @@ boost::optional<AVCodecID> toCodecId(const boost::optional<QString>& str);
 
 boost::optional<QSize> toQSize(const boost::optional<QString>& str);
 
+boost::optional<QSize> toQDateTime(const boost::optional<QString>& str);
+
 HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response);
-
-QString nxProfileName(Qn::ConnectionRole role);
-
-bool isNxProfile(const QString& profileName);
 
 template<typename T>
 T fromHanwhaString(const QString& str)
@@ -135,6 +154,8 @@ QString toHanwhaString(AVCodecID codecId);
 
 QString toHanwhaString(const QSize& value);
 
+QString toHanwhaString(const QDateTime& value);
+
 QString toHanwhaString(Qn::BitrateControl codecId);
 
 QString toHanwhaString(Qn::EncodingPriority encodingPriority);
@@ -155,6 +176,12 @@ bool areaComparator(const QString& lhs, const QString& rhs);
 
 bool ratioComparator(const QString& lhs, const QString& rhs);
 
+qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::seconds timeZoneShift);
+
+QDateTime toHanwhaDateTime(qint64 valueMs, std::chrono::seconds timeZoneShift);
+
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

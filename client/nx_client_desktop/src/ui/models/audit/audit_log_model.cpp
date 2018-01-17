@@ -30,7 +30,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
-#include <utils/common/qtimespan.h>
+#include <nx/client/core/utils/human_readable.h>
 #include <utils/math/math.h>
 
 using namespace nx;
@@ -125,7 +125,22 @@ public:
 
     static bool lessThanEndTimestamp(const QnAuditRecord *d1, const QnAuditRecord *d2)
     {
-        return d1->rangeEndSec < d2->rangeEndSec;
+        const bool leftIsUncompleteLoginSession =
+            d1->rangeEndSec == 0 && d1->eventType == Qn::AR_Login;
+        const bool rightIsUncompleteLoginSession =
+            d2->rangeEndSec == 0 && d2->eventType == Qn::AR_Login;
+
+        if (leftIsUncompleteLoginSession)
+        {
+            if (leftIsUncompleteLoginSession == rightIsUncompleteLoginSession)
+                return d1->createdTimeSec < d2->createdTimeSec; // Both sessions are uncompleted.
+            else
+                return true; // Uncompleted session is always "less" then completed
+        }
+
+        return rightIsUncompleteLoginSession
+            ? false
+            : d1->rangeEndSec < d2->rangeEndSec;
     }
 
     static bool lessThanDuration(const QnAuditRecord *d1, const QnAuditRecord *d2)
@@ -285,14 +300,15 @@ QString QnAuditLogModel::formatDateTime(const QDateTime& dateTime, bool showDate
 
 QString QnAuditLogModel::formatDuration(int durationSecs)
 {
-    qint64 durationMs = durationSecs * 1000;
-
+    const auto duration = std::chrono::seconds(durationSecs);
     static const QString kSeparator(L' ');
-    return QTimeSpan(durationMs).toApproximateString(
-        QTimeSpan::kDoNotSuppressSecondUnit,
-        Qt::Days | Qt::Hours | Qt::Minutes,
-        QTimeSpan::SuffixFormat::Short,
-        kSeparator);
+
+    using HumanReadable = client::core::HumanReadable;
+    return HumanReadable::timeSpan(duration,
+        HumanReadable::Days | HumanReadable::Hours | HumanReadable::Minutes,
+        HumanReadable::SuffixFormat::Short,
+        kSeparator,
+        HumanReadable::kNoSuppressSecondUnit);
 }
 
 QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)

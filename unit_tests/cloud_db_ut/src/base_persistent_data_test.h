@@ -25,6 +25,7 @@ public:
 
     api::AccountData insertRandomAccount();
     api::SystemData insertRandomSystem(const api::AccountData& account);
+    void insertSystem(const api::AccountData& account, const data::SystemData& system);
 
     void insertSystemSharing(const api::SystemSharingEx& sharing);
     void deleteSystemSharing(const api::SystemSharingEx& sharing);
@@ -88,7 +89,7 @@ protected:
      * @param queryFunc throws nx::utils::db::Exception.
      */
     template<typename QueryFunc>
-    typename std::result_of<QueryFunc(nx::utils::db::QueryContext*)>::type 
+    typename std::result_of<QueryFunc(nx::utils::db::QueryContext*)>::type
         executeSelectQuerySyncThrow(QueryFunc queryFunc)
     {
         return m_persistentDbManager->queryExecutor()

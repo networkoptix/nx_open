@@ -23,7 +23,6 @@ void AbstractAsyncSqlQueryExecutor::executeSqlSync(QByteArray sqlStatement)
         });
 }
 
-
 //-------------------------------------------------------------------------------------------------
 
 static const size_t kDesiredMaxQueuedQueriesPerConnection = 5;
@@ -43,10 +42,13 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     if (m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection
             > std::chrono::minutes::zero())
     {
-        m_requestQueue.enableItemStayTimeoutEvent(
+        m_queryQueue.enableItemStayTimeoutEvent(
             m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection,
             std::bind(&AsyncSqlQueryExecutor::reportQueryCancellation, this, _1));
     }
+
+    if (m_connectionOptions.driverType == RdbmsDriverType::sqlite)
+        m_queryQueue.setConcurrentModificationQueryLimit(1);
 }
 
 AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
@@ -55,15 +57,21 @@ AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
     m_dropConnectionThread.join();
 
     std::vector<std::unique_ptr<BaseRequestExecutor>> dbThreadPool;
+    decltype(m_cursorProcessorContexts) cursorProcessorContexts;
     {
         QnMutexLocker lk(&m_mutex);
         std::swap(m_dbThreadPool, dbThreadPool);
+        std::swap(m_cursorProcessorContexts, cursorProcessorContexts);
         m_terminated = true;
     }
 
     for (auto& dbConnection: dbThreadPool)
         dbConnection->pleaseStop();
     dbThreadPool.clear();
+
+    for (auto& context: cursorProcessorContexts)
+        context->processingThread->pleaseStop();
+    cursorProcessorContexts.clear();
 }
 
 const ConnectionOptions& AsyncSqlQueryExecutor::connectionOptions() const
@@ -109,9 +117,40 @@ DBResult AsyncSqlQueryExecutor::execSqlScriptSync(
 
 bool AsyncSqlQueryExecutor::init()
 {
-    QnMutexLocker lk(&m_mutex);
-    openNewConnection(lk);
-    // TODO: Waiting for connection to change state
+    {
+        QnMutexLocker lk(&m_mutex);
+        openNewConnection(lk);
+    }
+
+    // Waiting for connection to change state.
+    for (;;)
+    {
+        ConnectionState connectionState = ConnectionState::initializing;
+        {
+            QnMutexLocker lk(&m_mutex);
+            connectionState = m_dbThreadPool.empty()
+                ? ConnectionState::closed //< Connection has been closed due to some problem.
+                : m_dbThreadPool.front()->state();
+        }
+
+        switch (connectionState)
+        {
+            case ConnectionState::initializing:
+                // TODO: #ak Replace with a "state changed" event from the thread.
+                // But, delay is not a big problem because connection to a DB is not a quick thing.
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                continue;
+
+            case ConnectionState::opened:
+                break;
+
+            case ConnectionState::closed:
+            default:
+                return false;
+        }
+
+        break;
+    }
 
     return true;
 }
@@ -131,36 +170,76 @@ void AsyncSqlQueryExecutor::reserveConnections(int count)
 
 std::size_t AsyncSqlQueryExecutor::pendingQueryCount() const
 {
-    QnMutexLocker lock(&m_mutex);
-    return m_requestQueue.size();
+    return m_queryQueue.size();
+}
+
+void AsyncSqlQueryExecutor::removeCursor(QnUuid id)
+{
+    m_cursorProcessorContexts.front()->cursorContextPool.markCursorForDeletion(id);
+    auto task = std::make_unique<detail::CleanUpDroppedCursorsExecutor>(
+        &m_cursorProcessorContexts.front()->cursorContextPool);
+    m_cursorTaskQueue.push(std::move(task));
+}
+
+int AsyncSqlQueryExecutor::openCursorCount() const
+{
+    return std::accumulate(
+        m_cursorProcessorContexts.begin(), m_cursorProcessorContexts.end(),
+        0,
+        [](int sum, const std::unique_ptr<CursorProcessorContext>& element) -> int
+        {
+            return sum + (int) element->cursorContextPool.cursorCount();
+        });
+}
+
+void AsyncSqlQueryExecutor::setConcurrentModificationQueryLimit(int value)
+{
+    m_queryQueue.setConcurrentModificationQueryLimit(value);
 }
 
 bool AsyncSqlQueryExecutor::isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const
 {
+    // TODO: #ak Check for non-busy threads.
+
     const auto effectiveDBConnectionCount = m_dbThreadPool.size();
-    const auto queueSize = static_cast< size_t >(m_requestQueue.size());
+    const auto queueSize = static_cast< size_t >(m_queryQueue.size());
     const auto maxDesiredQueueSize =
         effectiveDBConnectionCount * kDesiredMaxQueuedQueriesPerConnection;
     if (queueSize < maxDesiredQueueSize)
-        return false;    //< Task number is not too high.
+        return false; //< Task number is not too high.
     if (effectiveDBConnectionCount >= static_cast<size_t>(m_connectionOptions.maxConnectionCount))
-        return false;    //< Pool size is already at maximum.
+        return false; //< Pool size is already at maximum.
 
     return true;
 }
 
-void AsyncSqlQueryExecutor::openNewConnection(const QnMutexLockerBase& /*lk*/)
+void AsyncSqlQueryExecutor::openNewConnection(const QnMutexLockerBase& lock)
 {
-    auto executorThread = RequestExecutorFactory::create(
-        m_connectionOptions,
-        &m_requestQueue);
-    auto executorThreadPtr = executorThread.get();
-
+    auto executorThread = createNewConnectionThread(lock, &m_queryQueue);
     m_dbThreadPool.push_back(std::move(executorThread));
+}
 
-    executorThreadPtr->setOnClosedHandler(
-        std::bind(&AsyncSqlQueryExecutor::onConnectionClosed, this, executorThreadPtr));
-    executorThreadPtr->start();
+std::unique_ptr<BaseRequestExecutor> AsyncSqlQueryExecutor::createNewConnectionThread(
+    const QnMutexLockerBase& lock,
+    detail::QueryQueue* const queryQueue)
+{
+    return createNewConnectionThread(lock, m_connectionOptions, queryQueue);
+}
+
+std::unique_ptr<BaseRequestExecutor> AsyncSqlQueryExecutor::createNewConnectionThread(
+    const QnMutexLockerBase& /*lock*/,
+    const ConnectionOptions& connectionOptions,
+    detail::QueryQueue* const queryQueue)
+{
+    auto executorThread = RequestExecutorFactory::instance().create(
+        connectionOptions,
+        queryQueue);
+
+    executorThread->setOnClosedHandler(
+        std::bind(&AsyncSqlQueryExecutor::onConnectionClosed, this, executorThread.get()));
+    executorThread->start();
+
+    return executorThread;
 }
 
 void AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc()
@@ -208,6 +287,16 @@ void AsyncSqlQueryExecutor::dropConnectionAsync(
         return; //< This can happen during AsyncSqlQueryExecutor destruction.
     m_connectionsToDropQueue.push(std::move(*it));
     m_dbThreadPool.erase(it);
+}
+
+void AsyncSqlQueryExecutor::addCursorProcessingThread(const QnMutexLockerBase& lock)
+{
+    m_cursorProcessorContexts.push_back(std::make_unique<CursorProcessorContext>());
+    // Disabling inactivity timer.
+    auto connectionOptions = m_connectionOptions;
+    connectionOptions.inactivityTimeout = std::chrono::seconds::zero();
+    m_cursorProcessorContexts.back()->processingThread =
+        createNewConnectionThread(lock, connectionOptions, &m_cursorTaskQueue);
 }
 
 } // namespace db

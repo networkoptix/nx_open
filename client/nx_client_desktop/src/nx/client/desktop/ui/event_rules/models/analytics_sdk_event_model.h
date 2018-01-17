@@ -37,7 +37,7 @@ public:
 
 private:
     struct Private;
-    std::unique_ptr<Private> d;
+    QScopedPointer<Private> d;
 
 };
 

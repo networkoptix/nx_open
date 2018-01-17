@@ -1,21 +1,26 @@
 {{#systemName}}
-{{systemName}}
+{{&systemName}}
 {{#systemSignature}}
-{{systemSignature}}
+{{&systemSignature}}
 {{/systemSignature}}
 {{#cloudOwnerEmail}}
-{{cloudOwnerEmail}}
+{{&cloudOwnerEmail}}
 {{/cloudOwnerEmail}}
 {{/systemName}}
 
 {{#analyticsSdkEventType}}
-    {{analyticsSdkEventType}} {{source}}
+    {{analyticsSdkEventType}}{{#source}} at {{source}}{{/source}}
 {{/analyticsSdkEventType}}
 {{^analyticsSdkEventType}}
-    {{event}} {{source}}
+    {{event}}{{#source}} at {{source}}{{/source}}
 {{/analyticsSdkEventType}}
 
+{{#count}}
 Trigger has been activated {{count}} times, first:
+{{/count}}
+{{^count}}
+    Trigger has been activated at:
+{{/count}}
 {{timestampDate}} {{timestampTime}}
 
 {{#urlint}}
@@ -25,6 +30,6 @@ Play archive from the web: {{urlext}}
 {{/urlext}}
 
 
-Website: {{companyUrl}}
-Support: {{supportLinkText}}
+Website: {{&companyUrl}}
+Support: {{&supportLinkText}}
 

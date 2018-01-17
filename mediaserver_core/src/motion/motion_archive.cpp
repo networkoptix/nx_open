@@ -24,10 +24,10 @@ bool operator < (const IndexRecord& other, qint64 start) { return other.start < 
 // --------------- QnMotionArchiveConnection ---------------------
 
 QnMotionArchiveConnection::QnMotionArchiveConnection(QnMotionArchive* owner):
-m_owner(owner),
-m_minDate(AV_NOPTS_VALUE),
-m_maxDate(AV_NOPTS_VALUE),
-m_lastResult(new QnMetaDataV1())
+    m_owner(owner),
+    m_minDate(AV_NOPTS_VALUE),
+    m_maxDate(AV_NOPTS_VALUE),
+    m_lastResult(new QnMetaDataV1())
 {
     m_lastTimeMs = AV_NOPTS_VALUE;
     m_motionLoadedStart = m_motionLoadedEnd = -1;
@@ -39,7 +39,7 @@ QnMotionArchiveConnection::~QnMotionArchiveConnection()
     qFreeAligned(m_motionBuffer);
 }
 
-QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
+QnAbstractCompressedMetadataPtr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
 {
     if (m_lastResult->containTime(timeUsec))
         return QnMetaDataV1Ptr(); // do not duplicate data
@@ -184,7 +184,7 @@ QnTimePeriodList QnMotionArchive::matchPeriod(const QRegion& region, qint64 msSt
     simd128i mask[Qn::kMotionGridWidth * Qn::kMotionGridHeight / 128];
     int maskStart, maskEnd;
 
-    NX_ASSERT(((unsigned long)mask)%16 == 0);
+    NX_ASSERT(!useSSE2() || ((unsigned long)mask) % 16 == 0);
 
     QnMetaDataV1::createMask(region, (char*)mask, &maskStart, &maskEnd);
     bool isFirstStep = true;
@@ -428,7 +428,7 @@ bool QnMotionArchive::saveToArchive(QnConstMetaDataV1Ptr data)
         m_lastDetailedData->timestamp = data->timestamp;
     }
     else {
-        if(data->timestamp >= m_lastTimestamp && data->timestamp - m_lastTimestamp <= MAX_FRAME_DURATION*1000ll) {
+        if(data->timestamp >= m_lastTimestamp && data->timestamp - m_lastTimestamp <= MAX_FRAME_DURATION_MS*1000ll) {
             m_lastDetailedData->m_duration = data->timestamp - m_lastDetailedData->timestamp;
         }
         else {

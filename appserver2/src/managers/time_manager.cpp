@@ -6,7 +6,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QDateTime>
 #include <nx/utils/thread/mutex.h>
-#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(__aarch64__)
 #include <zlib.h>
 #else
 #include <QtZlib/zlib.h>
@@ -425,7 +425,12 @@ qint64 TimeSynchronizationManager::getSyncTime() const
 
 ApiTimeData TimeSynchronizationManager::getTimeInfo() const
 {
-    const auto& resPool = m_messageBus->commonModule()->resourcePool();
+    std::vector<QnUuid> allServerIds;
+    if (const auto& resourcePool = m_messageBus->commonModule()->resourcePool())
+    {
+        for (const auto& server: resourcePool->getAllServers(Qn::AnyStatus))
+            allServerIds.push_back(server->getId());
+    }
 
     QnMutexLocker lock(&m_mutex);
     ApiTimeData result;
@@ -437,20 +442,16 @@ ApiTimeData TimeSynchronizationManager::getTimeInfo() const
     if (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSetByUser)
         result.syncTimeFlags |= Qn::TF_peerTimeSetByUser;
 
-    if (resPool)
+    for (const auto& serverId: allServerIds)
     {
-        const auto allServers = resPool->getAllServers(Qn::AnyStatus);
-        for (const auto& server: allServers)
+        const auto s = serverId.toByteArray();
+        if (m_usedTimeSyncInfo.timePriorityKey.seed == crc32(0, (const Bytef*) s.constData(), s.size()))
         {
-            const auto guidStr = server->getId().toByteArray();
-            if (m_usedTimeSyncInfo.timePriorityKey.seed ==
-                crc32(0, (const Bytef*)guidStr.constData(), guidStr.size()))
-            {
-                result.primaryTimeServerGuid = server->getId();
-                break;
-            }
+            result.primaryTimeServerGuid = serverId;
+            break;
         }
     }
+
     return result;
 }
 
@@ -504,8 +505,8 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
     //"select primary time server" means "take its local time", so resetting internet synchronization flag
     m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
     if (!m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
-        m_localTimePriorityKey,
-        commonModule->globalSettings()->isSynchronizingTimeWithInternet()))
+        	m_localTimePriorityKey,
+        	commonModule->globalSettings()->isSynchronizingTimeWithInternet()))
     {
         return;
     }
@@ -518,10 +519,13 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
         elapsed,
         currentMSecsSinceEpoch(),
         m_localTimePriorityKey);
-    //resetting "synchronized with internet" flag
-    NX_LOGX(lit("Received primary time server change transaction. New synchronized time %1, new priority key 0x%2").
-        arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logINFO);
     m_timeSynchronized = true;
+
+    NX_LOGX(lit("Selecting local server time as synchronized. "
+            "New synchronized time %1, new priority key 0x%2")
+        .arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate))
+        .arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logINFO);
+
     //saving synchronized time to DB
     if (m_connection)
     {
@@ -577,7 +581,7 @@ void TimeSynchronizationManager::forceTimeResync()
 
 void TimeSynchronizationManager::processTimeSyncInfoHeader(
     const QnUuid& peerID,
-    const nx_http::StringType& serializedTimeSync,
+    const nx::network::http::StringType& serializedTimeSync,
     boost::optional<qint64> rttMillis)
 {
     TimeSyncInfo remotePeerTimeSyncInfo;
@@ -609,7 +613,7 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
 {
     const auto& commonModule = m_messageBus->commonModule();
     NX_ASSERT( remotePeerTimePriorityKey.seed > 0 );
-    NX_LOGX( QString::fromLatin1("TimeSynchronizationManager. Received sync time update from peer %1, "
+    NX_LOGX( QString::fromLatin1("Received sync time update from peer %1, "
         "peer's sync time (%2), peer's time priority key 0x%3. Local peer id %4, local sync time %5, used priority key 0x%6").
         arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
         arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(commonModule->moduleGUID().toString()).
@@ -726,11 +730,11 @@ void TimeSynchronizationManager::onNewConnectionEstablished(QnAbstractTransactio
     if (!transport->isIncoming())
     {
         //we can connect to the peer
-        const QUrl remoteAddr = transport->remoteAddr();
+        const nx::utils::Url remoteAddr = transport->remoteAddr();
         //saving credentials has been used to establish connection
         startSynchronizingTimeWithPeer( //starting sending time sync info to peer
             transport->remotePeer().id,
-            SocketAddress( remoteAddr.host(), remoteAddr.port() ),
+            nx::network::SocketAddress( remoteAddr.host(), remoteAddr.port() ),
             transport->authData() );
     }
 }
@@ -742,8 +746,8 @@ void TimeSynchronizationManager::onPeerLost(QnUuid peer, Qn::PeerType /*peerType
 
 void TimeSynchronizationManager::startSynchronizingTimeWithPeer(
     const QnUuid& peerID,
-    SocketAddress peerAddress,
-    nx_http::AuthInfoCache::AuthorizationCacheItem authData )
+    nx::network::SocketAddress peerAddress,
+    nx::network::http::AuthInfoCache::AuthorizationCacheItem authData )
 {
     QnMutexLocker lock( &m_mutex );
     auto iterResultPair = m_peersToSendTimeSyncTo.emplace(
@@ -763,7 +767,7 @@ void TimeSynchronizationManager::startSynchronizingTimeWithPeer(
 void TimeSynchronizationManager::stopSynchronizingTimeWithPeer( const QnUuid& peerID )
 {
     nx::utils::TimerManager::TimerGuard timerID;
-    nx_http::AsyncHttpClientPtr httpClient;
+    nx::network::http::AsyncHttpClientPtr httpClient;
 
     QnMutexLocker lock( &m_mutex );
     auto peerIter = m_peersToSendTimeSyncTo.find( peerID );
@@ -779,7 +783,7 @@ void TimeSynchronizationManager::stopSynchronizingTimeWithPeer( const QnUuid& pe
 void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
 {
     const auto& commonModule = m_messageBus->commonModule();
-    nx_http::AsyncHttpClientPtr clientPtr;
+    nx::network::http::AsyncHttpClientPtr clientPtr;
 
     QnMutexLocker lock( &m_mutex );
     if( m_terminated )
@@ -807,20 +811,20 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
     NX_LOG(lm("TimeSynchronizationManager. About to report sync_time to peer %1 (%2)")
         .arg(peerID).arg(peerIter->second.peerAddress.toString()), cl_logDEBUG2);
 
-    QUrl targetUrl;
+    nx::utils::Url targetUrl;
     targetUrl.setScheme( lit("http") );
     targetUrl.setHost( peerIter->second.peerAddress.address.toString() );
     targetUrl.setPort( peerIter->second.peerAddress.port );
     targetUrl.setPath( lit("/") + QnTimeSyncRestHandler::PATH );
 
     NX_ASSERT( !peerIter->second.httpClient );
-    clientPtr = nx_http::AsyncHttpClient::create();
+    clientPtr = nx::network::http::AsyncHttpClient::create();
     using namespace std::placeholders;
     const auto requestSendClock = m_monotonicClock.elapsed();
     connect(
-        clientPtr.get(), &nx_http::AsyncHttpClient::done,
+        clientPtr.get(), &nx::network::http::AsyncHttpClient::done,
         this,
-        [this, peerID, requestSendClock]( nx_http::AsyncHttpClientPtr clientPtr ) {
+        [this, peerID, requestSendClock]( nx::network::http::AsyncHttpClientPtr clientPtr ) {
             const qint64 rtt = m_monotonicClock.elapsed() - requestSendClock;
             {
                 //saving rtt
@@ -849,20 +853,10 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
     {
         clientPtr->addAdditionalHeader(
             Qn::RTT_MS_HEADER_NAME,
-            nx_http::StringType::number(peerIter->second.rttMillis.get()));
+            nx::network::http::StringType::number(peerIter->second.rttMillis.get()));
     }
 
-    clientPtr->setUserName( peerIter->second.authData.userName );
-    if( peerIter->second.authData.password )
-    {
-        clientPtr->setAuthType( nx_http::AuthType::authBasicAndDigest );
-        clientPtr->setUserPassword( peerIter->second.authData.password.get() );
-    }
-    else if( peerIter->second.authData.ha1 )
-    {
-        clientPtr->setAuthType( nx_http::AuthType::authDigestWithPasswordHash );
-        clientPtr->setUserPassword( peerIter->second.authData.ha1.get() );
-    }
+    clientPtr->setUserCredentials(peerIter->second.authData.userCredentials);
 
     clientPtr->doGet( targetUrl );
     peerIter->second.syncTimerID.reset();
@@ -872,7 +866,7 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
 
 void TimeSynchronizationManager::timeSyncRequestDone(
     const QnUuid& peerID,
-    nx_http::AsyncHttpClientPtr clientPtr,
+    nx::network::http::AsyncHttpClientPtr clientPtr,
     qint64 requestRttMillis)
 {
     NX_LOG(lm("TimeSynchronizationManager. Received (%1) response from peer %2")
@@ -880,7 +874,7 @@ void TimeSynchronizationManager::timeSyncRequestDone(
         .arg(peerID), cl_logDEBUG2);
 
     if( clientPtr->response() &&
-        clientPtr->response()->statusLine.statusCode == nx_http::StatusCode::ok )
+        clientPtr->response()->statusLine.statusCode == nx::network::http::StatusCode::ok )
     {
         //reading time sync information from remote server
         auto timeSyncHeaderIter = clientPtr->response()->headers.find( QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME );
@@ -906,7 +900,8 @@ void TimeSynchronizationManager::timeSyncRequestDone(
     //scheduling next synchronization
     if( m_terminated )
         return;
-        peerIter->second.syncTimerID =
+
+    peerIter->second.syncTimerID =
         nx::utils::TimerManager::TimerGuard(
             m_timerManager,
             m_timerManager->addTimer(
@@ -1161,6 +1156,8 @@ void TimeSynchronizationManager::onDbManagerInitialized()
             m_usedTimeSyncInfo.syncTime = QDateTime::currentMSecsSinceEpoch() - restoredTimeDelta;
             m_usedTimeSyncInfo.timePriorityKey = restoredPriorityKey;
             m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
+            // TODO: #ak The next line is doubtful. It may be needed in case if server was down
+            // for a long time and time priority sequence has overflowed.
             m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSetByUser;
             NX_LOGX( lit("Successfully restored synchronized time %1 (delta %2, key 0x%3) from DB").
                 arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).
@@ -1217,7 +1214,7 @@ void TimeSynchronizationManager::resyncTimeWithPeer(const QnUuid& peerId)
 
 void TimeSynchronizationManager::onBeforeSendingTransaction(
     QnTransactionTransportBase* /*transport*/,
-    nx_http::HttpHeaders* const headers)
+    nx::network::http::HttpHeaders* const headers)
 {
     headers->emplace(
         QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME,
@@ -1226,7 +1223,7 @@ void TimeSynchronizationManager::onBeforeSendingTransaction(
 
 void TimeSynchronizationManager::onTransactionReceived(
     QnTransactionTransportBase* /*transport*/,
-    const nx_http::HttpHeaders& headers)
+    const nx::network::http::HttpHeaders& headers)
 {
     const auto& settings = m_messageBus->commonModule()->globalSettings();
     for (auto header : headers)
@@ -1234,7 +1231,7 @@ void TimeSynchronizationManager::onTransactionReceived(
         if (header.first != QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME)
             continue;
 
-        const nx_http::StringType& serializedTimeSync = header.second;
+        const nx::network::http::StringType& serializedTimeSync = header.second;
         TimeSyncInfo remotePeerTimeSyncInfo;
         if (!remotePeerTimeSyncInfo.fromString(serializedTimeSync))
             continue;
@@ -1282,7 +1279,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
     const qint64 curSysTime = QDateTime::currentMSecsSinceEpoch();
     const int synchronizedToLocalTimeOffset = getSyncTime() - curSysTime;
 
-    //local OS time has been changed. If system time is set 
+    //local OS time has been changed. If system time is set
     //by local host time then updating system time
     const bool isSystemTimeSynchronizedWithInternet =
         settings->isSynchronizingTimeWithInternet() &&
@@ -1292,18 +1289,34 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
         m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey &&
         !isSystemTimeSynchronizedWithInternet;
 
-    const bool isSynchronizedToLocalTimeOffsetExceeded = 
+    const bool isSynchronizedToLocalTimeOffsetExceeded =
         qAbs(synchronizedToLocalTimeOffset) >
         duration_cast<milliseconds>(settings->maxDifferenceBetweenSynchronizedAndLocalTime()).count();
 
+    bool isTimeChanged = false;
     if (isTimeSynchronizedByThisPeerLocalTime && isSynchronizedToLocalTimeOffsetExceeded)
     {
         NX_LOGX(lm("System time is synchronized with this peer's local time. "
             "Detected time shift %1 ms. Updating synchronized time...")
             .arg(synchronizedToLocalTimeOffset), cl_logDEBUG1);
         forceTimeResync();
+        isTimeChanged = true;
     }
-    else if (m_connection && isSynchronizedToLocalTimeOffsetExceeded)
+    else if (!isSystemTimeSynchronizedWithInternet)
+    {
+        // Checking whether it is appropriate to switch to local time.
+        QnMutexLocker lk(&m_mutex);
+        if (m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
+                m_localTimePriorityKey, settings->isSynchronizingTimeWithInternet()))
+        {
+            selectLocalTimeAsSynchronized(&lk, m_localTimePriorityKey.sequence);
+            isTimeChanged = true;
+        }
+    }
+
+    if (!isTimeChanged &&
+        m_connection &&
+        isSynchronizedToLocalTimeOffsetExceeded)
     {
         saveSyncTimeAsync(
             QDateTime::currentMSecsSinceEpoch() - getSyncTime(),

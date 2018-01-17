@@ -10,7 +10,8 @@ angular.module('cloudApp', [
     'ngStorage',
     'base64',
     'nxCommon',
-    'ngToast'
+    'ngToast',
+    'angular-clipboard'
 ]).config(['$httpProvider', function ($httpProvider) {
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
@@ -111,14 +112,6 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.reactivating = true; }]
             }
         })
-        .when('/activate/sent', {
-            title: L.pageTitles.activateSent,
-            templateUrl: Config.viewsDir + 'activeActions.html',
-            controller: 'ActivateRestoreCtrl',
-            resolve: {
-                test: ['$route',function ($route) { $route.current.params.reactivatingSuccess = true; }]
-            }
-        })
         .when('/activate/success',{
             title: L.pageTitles.activateSuccess,
             templateUrl: Config.viewsDir + 'activeActions.html',
@@ -182,6 +175,21 @@ angular.module('cloudApp', [
             }
         })
 
+        .when('/downloads/history', {
+            title: L.pageTitles.download,
+            templateUrl: Config.viewsDir + 'downloadHistory.html',
+            controller: 'DownloadHistoryCtrl'
+        })
+        .when('/downloads/:build', {
+            title: L.pageTitles.download,
+            templateUrl: Config.viewsDir + 'downloadHistory.html',
+            controller: 'DownloadHistoryCtrl'
+        })
+        .when('/downloads', {
+            title: L.pageTitles.download,
+            templateUrl: Config.viewsDir + 'download.html',
+            controller: 'DownloadCtrl'
+        })
         .when('/download', {
             title: L.pageTitles.download,
             templateUrl: Config.viewsDir + 'download.html',

@@ -27,6 +27,8 @@ WebSocket::WebSocket(
     m_aliveTimeout(kAliveTimeout),
     m_lastError(SystemError::noError)
 {
+    m_socket->setRecvTimeout(0);
+    m_socket->setSendTimeout(0);
     aio::AbstractAsyncChannel::bindToAioThread(m_socket->getAioThread());
     m_pingTimer->bindToAioThread(m_socket->getAioThread());
     m_aliveTimer->bindToAioThread(m_socket->getAioThread());
@@ -67,9 +69,9 @@ void WebSocket::restartTimers()
 
 void WebSocket::stopWhileInAioThread()
 {
-    m_socket.reset();
     m_pingTimer.reset();
     m_aliveTimer.reset();
+    m_socket.reset();
 }
 
 void WebSocket::setIsLastFrame()
@@ -186,7 +188,7 @@ void WebSocket::readWithoutAddingToQueueSync()
     }
 }
 
-void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
+void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler)
 {
     post(
         [this, buffer, handler = std::move(handler)]() mutable
@@ -207,7 +209,7 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
         });
 }
 
-void WebSocket::sendAsync(const nx::Buffer& buffer, HandlerType handler)
+void WebSocket::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
 {
     post(
         [this, &buffer, handler = std::move(handler)]() mutable
@@ -290,7 +292,7 @@ void WebSocket::handleSocketWrite(SystemError::ErrorCode ecode, size_t /*bytesSe
             });
 }
 
-void WebSocket::sendPreparedMessage(nx::Buffer* buffer, int writeSize, HandlerType handler)
+void WebSocket::sendPreparedMessage(nx::Buffer* buffer, int writeSize, IoCompletionHandler handler)
 {
     WriteData writeData(std::move(*buffer), writeSize);
     bool queueEmpty = m_writeQueue.empty();
@@ -306,11 +308,19 @@ void WebSocket::sendPreparedMessage(nx::Buffer* buffer, int writeSize, HandlerTy
 
 void WebSocket::cancelIOSync(nx::network::aio::EventType eventType)
 {
-    m_socket->cancelIOSync(eventType);
-    m_pingTimer->cancelSync();
-    m_aliveTimer->cancelSync();
-    m_readQueue.clear();
-    m_writeQueue.clear();
+    nx::utils::promise<void> p;
+    auto f = p.get_future();
+
+    dispatch(
+        [this, eventType, p = std::move(p)] ()
+        {
+            m_pingTimer->cancelSync();
+            m_aliveTimer->cancelSync();
+            m_socket->cancelIOSync(eventType);
+
+        });
+
+    f.wait();
 }
 
 bool WebSocket::isDataFrame() const

@@ -10,9 +10,6 @@
 #include "statistics/stats_manager.h"
 
 namespace nx {
-
-namespace stun { class MessageDispatcher; }
-
 namespace hpm {
 
 namespace conf { class Settings; }
@@ -20,20 +17,26 @@ namespace conf { class Settings; }
 class Controller
 {
 public:
-    Controller(
-        const conf::Settings& settings,
-        nx::stun::MessageDispatcher* stunMessageDispatcher);
+    Controller(const conf::Settings& settings);
+
+    MediaserverEndpointTester& mediaserverEndpointTester();
+
+    ListeningPeerPool& listeningPeerPool();
 
     PeerRegistrator& listeningPeerRegistrator();
-    ListeningPeerPool& listeningPeerPool();
+    const PeerRegistrator& listeningPeerRegistrator() const;
+
+    HolePunchingProcessor& cloudConnectProcessor();
+
     nx::cloud::discovery::RegisteredPeerPool& discoveredPeerPool();
+    const nx::cloud::discovery::RegisteredPeerPool& discoveredPeerPool() const;
 
     void stop();
 
 private:
     stats::StatsManager m_statsManager;
     std::unique_ptr<AbstractCloudDataProvider> m_cloudDataProvider;
-    MediaserverEndpointTester m_mediaserverApi;
+    MediaserverEndpointTester m_mediaserverEndpointTester;
     std::unique_ptr<AbstractRelayClusterClient> m_relayClusterClient;
     ListeningPeerPool m_listeningPeerPool;
     PeerRegistrator m_listeningPeerRegistrator;

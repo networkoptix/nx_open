@@ -1,8 +1,3 @@
-/**********************************************************
-* apr 12, 2016
-* akolesnikov
-***********************************************************/
-
 #include <memory>
 
 #include <gtest/gtest.h>
@@ -13,12 +8,11 @@
 #include "functional_tests/test_setup.h"
 #include "functional_tests/system_ut.h"
 
-
 namespace nx {
 namespace cdb {
+namespace test {
 
-class CdbLoadTest
-:
+class CdbLoadTest:
     public CdbFunctionalTest
 {
 };
@@ -109,5 +103,6 @@ TEST_F(CdbLoadTest, manyClients)
 }
 #endif
 
-}   //namespace cdb
-}   //namespace nx
+} // namespace cdb
+} // namespace cdb
+} // namespace nx

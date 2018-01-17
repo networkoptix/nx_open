@@ -4,41 +4,49 @@
 
 #include "http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 class NX_NETWORK_API MultipartBodySerializer
 {
 public:
     /**
-        @param boundary Does not contain -- neither in the beginning nor in the end
-    */
+     * @param boundary Does not contain -- neither in the beginning nor in the end.
+     */
     MultipartBodySerializer(
         StringType boundary,
         std::shared_ptr<nx::utils::bstream::AbstractByteStreamFilter> outputStream);
-    virtual ~MultipartBodySerializer();
+    virtual ~MultipartBodySerializer() = default;
 
     StringType contentType() const;
 
-    /** Ends current part (if any).
-        @param headers should not contain Content-Type header since it is inserted with \a contentType value
-    */
+    /**
+     * Ends current part (if any).
+     * @param headers Should not contain Content-Type header since it is inserted with contentType value.
+     */
     void beginPart(
         const StringType& contentType,
-        const nx_http::HttpHeaders& headers,
+        const nx::network::http::HttpHeaders& headers,
         BufferType data);
-    /** Can be called only after \a MultipartMessageBodySource::beginPart */
+    /**
+     * Can be called only after MultipartMessageBodySource::beginPart.
+     */
     void writeData(BufferType data);
 
-    /** Writes whole part.
-        Includes Content-Length header if none present in \a headers
-    */
+    /**
+     * Writes whole part.
+     * Includes Content-Length header if none present in headers.
+     */
     void writeBodyPart(
         const StringType& contentType,
-        const nx_http::HttpHeaders& headers,
+        const nx::network::http::HttpHeaders& headers,
         BufferType data);
-    /** Signal end of multipart body */
+    /** Signal end of multipart body. */
     void writeEpilogue();
-    /** Returns \a true after \a MultipartBodySerializer::writeEpilogue has been called */
+    /**
+     * @return True after MultipartBodySerializer::writeEpilogue has been called.
+     */
     bool eof() const;
 
 private:
@@ -50,9 +58,11 @@ private:
 
     void startBodyPartInternal(
         const StringType& contentType,
-        const nx_http::HttpHeaders& headers,
+        const nx::network::http::HttpHeaders& headers,
         BufferType data,
         boost::optional<std::uint64_t> contentLength);
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

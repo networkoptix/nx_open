@@ -48,8 +48,12 @@ public:
 
     ~WebSocket();
 
-    virtual void readSomeAsync(nx::Buffer* const buffer, HandlerType handler) override;
-    virtual void sendAsync(const nx::Buffer& buffer, HandlerType handler) override;
+    virtual void readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler) override;
+    virtual void sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler) override;
+
+    /**
+     * Cancels all IO operations. Socket is not operational after this function is called.
+     */
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -86,7 +90,7 @@ private:
     /** Own helper functions*/
     void processReadData();
     bool isDataFrame() const;
-    void sendPreparedMessage(nx::Buffer* buffer, int writeSize, HandlerType handler);
+    void sendPreparedMessage(nx::Buffer* buffer, int writeSize, IoCompletionHandler handler);
     void sendControlResponse(FrameType requestType, FrameType responseType);
     void sendControlRequest(FrameType type);
     void readWithoutAddingToQueueSync();

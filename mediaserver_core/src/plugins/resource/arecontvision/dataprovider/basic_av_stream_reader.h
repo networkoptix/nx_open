@@ -89,9 +89,9 @@ public:
                     this->m_streamParam.insert("resolution", lit("full"));
 
                 if (avRes->isPanoramic())
-                    avRes->setParamPhysicalAsync(lit("Quality"), QString::number(16)); // panoramic
+                    avRes->setParamPhysicalAsync(lit("Quality"), QString::number(13)); // panoramic
                 else
-                    this->m_streamParam.insert("Quality", 16);
+                    this->m_streamParam.insert("Quality", 13);
                 break;
 
             case Qn::QualityNormal:
@@ -101,9 +101,9 @@ public:
                     this->m_streamParam.insert("resolution", lit("full"));
 
                 if (avRes->isPanoramic())
-                    avRes->setParamPhysicalAsync(lit("Quality"), QString::number(13)); // panoramic
+                    avRes->setParamPhysicalAsync(lit("Quality"), QString::number(8)); // panoramic
                 else
-                    this->m_streamParam.insert("Quality", 13);
+                    this->m_streamParam.insert("Quality", 8);
                 break;
 
             case Qn::QualityLow:
@@ -113,9 +113,9 @@ public:
                     this->m_streamParam.insert("resolution", lit("half"));
 
                 if (avRes->isPanoramic())
-                    avRes->setParamPhysicalAsync(lit("Quality"), QString::number(15)); // panoramic
+                    avRes->setParamPhysicalAsync(lit("Quality"), QString::number(4)); // panoramic
                 else
-                    this->m_streamParam.insert("Quality", 10);
+                    this->m_streamParam.insert("Quality", 4);
                 break;
 
 

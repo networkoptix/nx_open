@@ -1,10 +1,4 @@
-/**********************************************************
-* 24 sep 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_UUID_H
-#define NX_UUID_H
+#pragma once
 
 #include <string>
 
@@ -19,10 +13,10 @@
 #include <QDebug>
 #include <QMetaType>
 
-
-//!This class added to minimize creation/destruction of QByteArray and QString
 class NX_UTILS_API QnUuid
 {
+    Q_GADGET
+
 public:
     static const size_t RFC4122_SIZE = 16;
 
@@ -38,12 +32,12 @@ public:
 
     const QUuid& getQUuid() const;
 
-    bool isNull() const;
+    Q_INVOKABLE bool isNull() const;
     const QByteArray toByteArray() const;
     const QByteArray toRfc4122() const;
-    const QString toString() const;
-    /** Returns guid without {}. */
-    QString toSimpleString() const;
+    Q_INVOKABLE const QString toString() const;
+    /** @return GUID without braces */
+    Q_INVOKABLE QString toSimpleString() const;
     QByteArray toSimpleByteArray() const;
     std::string toStdString() const;
     QUuid toQUuid() const;
@@ -63,7 +57,8 @@ public:
     /** Construct QnUuid from pool of id's. Pool is determined by base id and individual offset. */
     static QnUuid createUuidFromPool(const QUuid &baseId, uint offset);
 
-    /*! Construct QnUuid from string representation.
+    /**
+     * Construct QnUuid from string representation.
      * If the string is not a valid UUID null QnUuid will be returned.
      */
     static QnUuid fromStringSafe(const QString& uuid);
@@ -73,11 +68,6 @@ public:
 
 private:
     QUuid m_uuid;
-    //mutable boost::optional<QString> m_stringRepresentation;
-    //!text representation
-    //mutable boost::optional<QByteArray> m_byteArrayRepresentation;
-    //!binary representation
-   // mutable boost::optional<QByteArray> m_rfc4122Representation;
 
     friend NX_UTILS_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
 };
@@ -100,5 +90,3 @@ NX_UTILS_API uint qHash( const QnUuid& uuid, uint seed = 0 ) throw();
 NX_UTILS_API QDataStream& operator<<(QDataStream& s, const QnUuid& id);
 NX_UTILS_API QDebug operator<<(QDebug dbg, const QnUuid& id);
 NX_UTILS_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
-
-#endif  //NX_UUID_H

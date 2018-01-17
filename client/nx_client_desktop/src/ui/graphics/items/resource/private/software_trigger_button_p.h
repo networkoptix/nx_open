@@ -50,7 +50,7 @@ public:
     void setState(SoftwareTriggerButton::State state);
 
     bool isLive() const;
-    void setLive(bool value);
+    bool setLive(bool value); // Returns true if value has changed.
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         QWidget* widget);

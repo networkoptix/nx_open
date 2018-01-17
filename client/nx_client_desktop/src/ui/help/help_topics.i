@@ -167,7 +167,6 @@ QN_HELP_TOPIC(EventsActions_EmailNotSet_Help,					"e-mail_is_not_set_for_users.h
 QN_HELP_TOPIC(EventsActions_EmailServerNotSet_Help,				"e-mail_server_is_not_configure.htm")
 QN_HELP_TOPIC(EventsActions_SendMailError_Help,					"error_while_sending_e-mail.htm")
 QN_HELP_TOPIC(EventsActions_StoragesMisconfigured_Help,			"storages_misconfiguration.htm")
-QN_HELP_TOPIC(EventsActions_StorageFull_Help,					"storage_is_full.htm")
 
 QN_HELP_TOPIC(EventsActions_CameraMotion_Help,					"motion_on_camera.htm")
 QN_HELP_TOPIC(EventsActions_CameraDisconnected_Help,			"camera_disconnection_malfuncti.htm")
@@ -180,8 +179,9 @@ QN_HELP_TOPIC(EventsActions_MediaServerConflict_Help,			"media_servers_conflict.
 QN_HELP_TOPIC(EventsActions_MediaServerStarted_Help,			"media_server_started.htm")
 QN_HELP_TOPIC(EventsActions_LicenseIssue_Help,			        "license_issue.htm")
 QN_HELP_TOPIC(EventsActions_BackupFinished_Help,                "archive_backup_finished.htm")
+QN_HELP_TOPIC(EventActions_SoftTrigger_Help,                    "soft_triggers.htm")
 QN_HELP_TOPIC(EventsActions_Generic_Help,                       "generic_event.htm")
-QN_HELP_TOPIC(EventsActions_VideoAnalytics_Help,                "video_analytics_event.htm")
+QN_HELP_TOPIC(EventsActions_VideoAnalytics_Help,                "analytics_event.htm")
 
 QN_HELP_TOPIC(LayoutSettings_Locking_Help,						"locking_layouts.htm")
 QN_HELP_TOPIC(LayoutSettings_Look_Help,                         "adjusting_the_layout_look_and_feel.htm")

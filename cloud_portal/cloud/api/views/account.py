@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def register(request):
-    from .utils import detect_language_by_request
+    from util.helpers import detect_language_by_request
     logger.debug('/api/account/register called')
     lang = detect_language_by_request(request)
     data = request.data
@@ -40,12 +40,23 @@ def register(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def login(request):
-    # authorize user here
-    # return user
-    require_params(request, ('email', 'password'))
-    email = request.data['email'].lower()
-    password = request.data['password']
-    user = django.contrib.auth.authenticate(username=email, password=password)
+    user = None
+    if 'login' in request.session and 'password' in request.session:
+        email = request.session['login']
+        password = request.session['password']
+        try:
+            user = django.contrib.auth.authenticate(username=email, password=password)
+        except APINotAuthorisedException:
+            pass
+
+    if user is None:
+        # authorize user here
+        # return user
+        require_params(request, ('email', 'password'))
+        email = request.data['email'].lower()
+        password = request.data['password']
+        user = django.contrib.auth.authenticate(username=email, password=password)
+
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
 

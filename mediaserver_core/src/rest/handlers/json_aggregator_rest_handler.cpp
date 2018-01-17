@@ -22,7 +22,7 @@ bool QnJsonAggregatorRestHandler::executeCommad(
     QVariantMap& fullData)
 {
     int port = owner->owner()->getPort();
-    QUrl url(lit("http://localhost:%1/%2").arg(port).arg(QnTcpListener::normalizedPath(command)));
+    nx::utils::Url url(lit("http://localhost:%1/%2").arg(port).arg(QnTcpListener::normalizedPath(command)));
     QUrlQuery urlQuery;
     for (auto itr = params.begin(); itr != params.end(); ++itr)
         urlQuery.addQueryItem(itr.key(), itr.value());
@@ -35,7 +35,7 @@ bool QnJsonAggregatorRestHandler::executeCommad(
         return false;
     }
 
-    nx_http::HttpClient client;
+    nx::network::http::HttpClient client;
     client.setUserName(server->getId().toString());
     client.setUserPassword(server->getAuthKey());
     auto user = owner->resourcePool()->getResourceById<QnUserResource>(owner->accessRights().userId);
@@ -53,7 +53,7 @@ bool QnJsonAggregatorRestHandler::executeCommad(
         return false;
     }
 
-    nx_http::BufferType msgBody;
+    nx::network::http::BufferType msgBody;
     while (!client.eof())
         msgBody.append(client.fetchMessageBodyBuffer());
 

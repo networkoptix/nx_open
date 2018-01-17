@@ -3,6 +3,7 @@
 #include <media_server/server_update_tool.h>
 #include <api/model/upload_update_reply.h>
 #include <managers/updates_manager.h>
+#include <nx/utils/file_system.h>
 
 int QnUpdateUnauthenticatedRestHandler::executeGet(
     const QString& path,
@@ -23,10 +24,12 @@ int QnUpdateUnauthenticatedRestHandler::executePost(
     const auto updateId = params.value(lit("updateId"));
     const bool delayed = params.value(lit("delayed"), lit("false")) != lit("false");
 
-    if (updateId.isEmpty())
+    // TODO: updateId is not a path, so verification must be a bit tougher.
+    // It may be verified to be a file name.
+    if (updateId.isEmpty() || !nx::utils::file_system::isRelativePathSafe(updateId))
     {
         result.setError(QnJsonRestResult::InvalidParameter, lit("updateId"));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     QnUploadUpdateReply reply;
@@ -41,5 +44,5 @@ int QnUpdateUnauthenticatedRestHandler::executePost(
         : ec2::AbstractUpdatesManager::UnknownError;
     result.setReply(reply);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

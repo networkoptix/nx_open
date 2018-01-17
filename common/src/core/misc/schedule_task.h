@@ -12,38 +12,55 @@ class QnScheduleTask
 public:
     struct Data
     {
-        Data(int dayOfWeek = 1, int startTime = 0, int endTime = 0, Qn::RecordingType recordType = Qn::RT_Never,
-             int beforeThreshold = 0, int afterThreshold = 0, Qn::StreamQuality streamQuality = Qn::QualityHighest, int fps = 10, bool doRecordAudio = false)
-            : m_dayOfWeek(dayOfWeek),
-              m_startTime(startTime),
-              m_endTime(endTime),
-              m_recordType(recordType),
-              m_beforeThreshold(beforeThreshold),
-              m_afterThreshold(afterThreshold),
-              m_streamQuality(streamQuality),
-              m_fps(fps),
-              m_doRecordAudio(doRecordAudio)
+        Data()
         {
         }
 
+        Data(
+            int dayOfWeek,
+            int startTime,
+            int endTime,
+            Qn::RecordingType recordType,
+            int beforeThreshold,
+            int afterThreshold,
+            Qn::StreamQuality streamQuality,
+            int fps,
+            bool recordAudio,
+            int bitrateKbps)
+            :
+            m_dayOfWeek(dayOfWeek),
+            m_startTime(startTime),
+            m_endTime(endTime),
+            m_recordType(recordType),
+            m_beforeThreshold(beforeThreshold),
+            m_afterThreshold(afterThreshold),
+            m_streamQuality(streamQuality),
+            m_fps(fps),
+            m_doRecordAudio(recordAudio),
+            m_bitrateKbps(bitrateKbps)
+        {
+        }
+
+
         /** Day of the week, integer in range [1..7]. */
-        int m_dayOfWeek;
+        int m_dayOfWeek = 1;
 
         /** Start time offset, in seconds. */
-        int m_startTime;
+        int m_startTime = 0;
 
         /** End time offset, in seconds. */
-        int m_endTime;
+        int m_endTime = 0;
 
-        Qn::RecordingType m_recordType;
+        Qn::RecordingType m_recordType = Qn::RT_Never;
 
-        int m_beforeThreshold;
+        int m_beforeThreshold = 0;
 
-        int m_afterThreshold;
+        int m_afterThreshold = 0;
 
-        Qn::StreamQuality m_streamQuality;
-        int m_fps;
-        bool m_doRecordAudio;
+        Qn::StreamQuality m_streamQuality = Qn::QualityHighest;
+        int m_fps = 10;
+        bool m_doRecordAudio = false;
+        int m_bitrateKbps = 0;
 
         inline bool operator==(const Data &e2) const
         {
@@ -55,7 +72,8 @@ public:
                 m_afterThreshold == e2.m_afterThreshold &&
                 m_streamQuality == e2.m_streamQuality &&
                 m_fps == e2.m_fps &&
-                m_doRecordAudio == e2.m_doRecordAudio;
+                m_doRecordAudio == e2.m_doRecordAudio &&
+                m_bitrateKbps == e2.m_bitrateKbps;
         }
     };
 
@@ -72,11 +90,31 @@ public:
     {
     }
 
-    QnScheduleTask(QnUuid resourceId, int dayOfWeek, int startTime, int endTime,
-                   Qn::RecordingType recordType =  Qn::RT_Never, int beforeThreshold = 0, int afterThreshold = 0,
-                   Qn::StreamQuality streamQuality = Qn::QualityHighest, int fps = 10, bool doRecordAudio = false)
-        : m_resourceId(resourceId),
-          m_data(dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio)
+    QnScheduleTask(
+        QnUuid resourceId,
+        int dayOfWeek,
+        int startTime,
+        int endTime,
+        Qn::RecordingType recordType,
+        int beforeThreshold,
+        int afterThreshold,
+        Qn::StreamQuality streamQuality,
+        int fps,
+        bool doRecordAudio,
+        int bitrateKbps)
+        :
+        m_resourceId(resourceId),
+          m_data(
+              dayOfWeek,
+              startTime,
+              endTime,
+              recordType,
+              beforeThreshold,
+              afterThreshold,
+              streamQuality,
+              fps,
+              doRecordAudio,
+              bitrateKbps)
     {}
 
     bool isEmpty() const { return m_data.m_startTime == 0 && m_data.m_endTime == 0; }
@@ -105,8 +143,11 @@ public:
 
     int getFps() const { return m_data.m_fps; }
     void setFps(int value) { m_data.m_fps = value; }
-    bool getDoRecordAudio() const { return m_data.m_doRecordAudio; }
 
+    void setBitrateKbps(int value) { m_data.m_bitrateKbps = value; }
+    int getBitrateKbps() const { return m_data.m_bitrateKbps; }
+
+    bool getDoRecordAudio() const { return m_data.m_doRecordAudio; }
 
     /*
     * Duration at ms
@@ -133,8 +174,6 @@ private:
     QnUuid m_resourceId;
 
     Data m_data;
-
-    friend class QnCameraScheduleWidget; // TODO: #vasilenko what the hell?
 };
 
 inline bool operator<(qint64 first, const QnScheduleTask &other)

@@ -2,8 +2,8 @@
 #define QN_PTZ_INSTRUMENT_P_H
 
 #include <utils/common/scoped_painter_rollback.h>
+#include <nx/client/core/utils/geometry.h>
 
-#include <ui/common/geometry.h>
 #include <ui/customization/customized.h>
 #include <ui/graphics/items/standard/graphics_path_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
@@ -16,6 +16,7 @@
 
 #include "selection_item.h"
 
+using nx::client::core::Geometry;
 
 // -------------------------------------------------------------------------- //
 // PtzArrowItem
@@ -51,7 +52,7 @@ public:
 
     void moveTo(const QPointF &origin, const QPointF &target) {
         setPos(target);
-        setRotation(QnGeometry::atan2(origin - target) / M_PI * 180);
+        setRotation(Geometry::atan2(origin - target) / M_PI * 180);
     }
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = NULL) override {
@@ -364,12 +365,10 @@ private:
         QPointF left = (rect.topLeft() + rect.bottomLeft()) / 2.0;
         QPointF right = (rect.topRight() + rect.bottomRight()) / 2.0;
         QPointF xStep(unit, 0), yStep(0, unit);
-        QSizeF size = QnGeometry::toSize(xStep + yStep);
-
-        QN_UNUSED(left);
+        QSizeF size = Geometry::toSize(xStep + yStep);
 
         m_manipulatorWidget->setGeometry(QRectF(center - xStep - yStep, center + xStep + yStep));
-        m_modeButton->setGeometry(QRectF(right - xStep * 4.0 - yStep * 1.5, 3.0 * size));
+        m_modeButton->setGeometry(QRectF(left + xStep - yStep * 1.5, 3.0 * size));
 
         m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * size));
         m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * size));

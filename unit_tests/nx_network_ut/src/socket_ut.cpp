@@ -1,8 +1,3 @@
-/**********************************************************
-* 9 jan 2015
-* a.kolesnikov
-***********************************************************/
-
 #include <condition_variable>
 #include <chrono>
 #include <deque>
@@ -14,6 +9,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QThread>
 
+#include <nx/network/address_resolver.h>
 #include <nx/network/dns_resolver.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
@@ -45,7 +41,7 @@ static void runCancelAsyncIOTest()
     const QString kTestHost = QLatin1String("some-test-host-456233.com");
     std::vector<HostAddress> kTestAddresses;
     kTestAddresses.push_back(*HostAddress::ipV4from("12.34.56.78"));
-    kTestAddresses.push_back(*HostAddress::ipV6from("1234::abcd"));
+    kTestAddresses.push_back(*HostAddress::ipV6from("1234::abcd").first);
     kTestAddresses.push_back(*HostAddress::ipV4from("127.0.0.1"));
 
     auto& dnsResolver = SocketGlobals::addressResolver().dnsResolver();

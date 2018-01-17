@@ -238,7 +238,7 @@ int syncDir(const QString& localDir, QString remoteUrl)
     remoteUrl = lit("http://") + remoteUrl;
 
     RDirSyncher::EventReceiver dummyEventReceiver;
-    auto syncher = std::make_shared<RDirSyncher>(QUrl(remoteUrl), localDir, &dummyEventReceiver);
+    auto syncher = std::make_shared<RDirSyncher>(nx::utils::Url(remoteUrl), localDir, &dummyEventReceiver);
     if (!syncher->startAsync())
     {
         std::cerr << "Error: Failed to start synchronization" << std::endl;
@@ -335,13 +335,13 @@ int doInstallation(
 
 int downloadFile(const QString& url, const QString& destFilePath)
 {
-    QUrl sourceUrl(url);
+    nx::utils::Url sourceUrl(url);
 
     std::string destFile = destFilePath.isEmpty()
         ? QFileInfo(sourceUrl.path()).fileName().toStdString()
         : destFilePath.toStdString();
 
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     httpClient.setUserName(sourceUrl.userName());
     httpClient.setUserPassword(sourceUrl.password());
     if (!httpClient.doGet(sourceUrl))
@@ -350,7 +350,7 @@ int downloadFile(const QString& url, const QString& destFilePath)
         return 1;
     }
 
-    if ((httpClient.response()->statusLine.statusCode / 200 * 200) != nx_http::StatusCode::ok)
+    if ((httpClient.response()->statusLine.statusCode / 200 * 200) != nx::network::http::StatusCode::ok)
     {
         std::cerr << "Failed to get " << url.toStdString() << ". " << httpClient.response()->statusLine.reasonPhrase.constData() << std::endl;
         return 1;
@@ -366,7 +366,7 @@ int downloadFile(const QString& url, const QString& destFilePath)
 
     while (!httpClient.eof())
     {
-        const nx_http::BufferType& buf = httpClient.fetchMessageBodyBuffer();
+        const nx::network::http::BufferType& buf = httpClient.fetchMessageBodyBuffer();
         f.write(buf.constData(), buf.size());
     }
     f.close();

@@ -6,6 +6,7 @@
 
 #include <nx/network/abstract_stream_socket_acceptor.h>
 #include <nx/network/http/server/http_server_connection.h>
+#include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/reverse_connection_acceptor.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/basic_factory.h>
@@ -24,12 +25,12 @@ namespace detail {
 class NX_NETWORK_API ReverseConnection:
     public aio::BasicPollable,
     public AbstractAcceptableReverseConnection,
-    public server::StreamConnectionHolder<nx_http::AsyncMessagePipeline>
+    public nx::network::http::StreamConnectionHolder
 {
     using base_type = aio::BasicPollable;
 
 public:
-    ReverseConnection(const QUrl& relayUrl);
+    ReverseConnection(const utils::Url &relayUrl);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -48,21 +49,21 @@ private:
     std::unique_ptr<nx::cloud::relay::api::Client> m_relayClient;
     const nx::String m_peerName;
     ReverseConnectionCompletionHandler m_connectHandler;
-    std::unique_ptr<nx_http::AsyncMessagePipeline> m_httpPipeline;
+    std::unique_ptr<nx::network::http::AsyncMessagePipeline> m_httpPipeline;
     ReverseConnectionCompletionHandler m_onConnectionActivated;
     std::unique_ptr<AbstractStreamSocket> m_streamSocket;
     nx::cloud::relay::api::BeginListeningResponse m_beginListeningResponse;
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
-        nx_http::AsyncMessagePipeline* connection) override;
+        nx::network::http::AsyncMessagePipeline* connection) override;
 
     void onConnectDone(
         nx::cloud::relay::api::ResultCode resultCode,
         nx::cloud::relay::api::BeginListeningResponse response,
         std::unique_ptr<AbstractStreamSocket> streamSocket);
 
-    void relayNotificationReceived(nx_http::Message message);
+    void relayNotificationReceived(nx::network::http::Message message);
 };
 
 } // namespace detail
@@ -75,7 +76,7 @@ class NX_NETWORK_API ConnectionAcceptor:
     using base_type = AbstractConnectionAcceptor;
 
 public:
-    ConnectionAcceptor(const QUrl& relayUrl);
+    ConnectionAcceptor(const utils::Url &relayUrl);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -88,7 +89,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    const QUrl m_relayUrl;
+    const nx::utils::Url m_relayUrl;
     ReverseConnectionAcceptor<detail::ReverseConnection> m_acceptor;
     bool m_started = false;
 
@@ -102,10 +103,10 @@ private:
 
 class NX_NETWORK_API ConnectionAcceptorFactory:
     public nx::utils::BasicFactory<
-        std::unique_ptr<AbstractConnectionAcceptor>(const QUrl& /*relayUrl*/)>
+        std::unique_ptr<AbstractConnectionAcceptor>(const nx::utils::Url& /*relayUrl*/)>
 {
     using base_type = nx::utils::BasicFactory<
-        std::unique_ptr<AbstractConnectionAcceptor>(const QUrl& /*relayUrl*/)>;
+        std::unique_ptr<AbstractConnectionAcceptor>(const nx::utils::Url& /*relayUrl*/)>;
 
 public:
     ConnectionAcceptorFactory();
@@ -113,8 +114,7 @@ public:
     static ConnectionAcceptorFactory& instance();
 
 private:
-    std::unique_ptr<AbstractConnectionAcceptor> defaultFactoryFunc(
-        const QUrl& relayUrl);
+    std::unique_ptr<AbstractConnectionAcceptor> defaultFactoryFunc(const utils::Url &relayUrl);
 };
 
 } // namespace relay

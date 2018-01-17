@@ -31,17 +31,19 @@ public:
         nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool);
 
     void listen();
-    nx_http::server::rest::MessageDispatcher& messageDispatcher();
-    std::vector<SocketAddress> httpEndpoints() const;
+    void stopAcceptingNewRequests();
+
+    nx::network::http::server::rest::MessageDispatcher& messageDispatcher();
+    std::vector<network::SocketAddress> endpoints() const;
 
 private:
     const conf::Settings& m_settings;
-    std::unique_ptr<nx_http::server::rest::MessageDispatcher> m_httpMessageDispatcher;
-    std::unique_ptr<nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>>
+    std::unique_ptr<nx::network::http::server::rest::MessageDispatcher> m_httpMessageDispatcher;
+    std::unique_ptr<nx::network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>>
         m_multiAddressHttpServer;
     std::unique_ptr<nx::cloud::discovery::HttpServer> m_discoveryHttpServer;
     nx::cloud::discovery::RegisteredPeerPool* m_registeredPeerPool;
-    std::vector<SocketAddress> m_httpEndpoints;
+    std::vector<network::SocketAddress> m_endpoints;
 
     bool launchHttpServerIfNeeded(
         const conf::Settings& settings,

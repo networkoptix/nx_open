@@ -19,12 +19,12 @@ int QnGetSystemIdRestHandler::executeGet(
 {
     result = owner->commonModule()->globalSettings()->localSystemId().toByteArray();
     contentType = "application/text";
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnGetSystemIdRestHandler::executePost(const QString& /*path*/, const QnRequestParamList& /*params*/,
                                             const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType */, QByteArray& /*result*/, QByteArray& /*contentType*/
                                             , const QnRestConnectionProcessor*)
 {
-    return nx_http::StatusCode::forbidden;
+    return nx::network::http::StatusCode::forbidden;
 }

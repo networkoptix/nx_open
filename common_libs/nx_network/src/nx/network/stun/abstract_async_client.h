@@ -4,8 +4,10 @@
 #include <nx/network/retry_timer.h>
 #include <nx/network/stun/message.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/url.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 constexpr int kEveryIndicationMethod = 0;
@@ -46,12 +48,12 @@ public:
      * @param handler Called when 1st connection attempt has passed regardless of its success.
      * NOTE: Shall be called only once (to provide address). Reconnect will happen automatically.
      */
-    virtual void connect(const QUrl& url, ConnectHandler handler = nullptr) = 0;
+    virtual void connect(const nx::utils::Url& url, ConnectHandler handler = nullptr) = 0;
 
     /**
      * Subscribes for certain indications.
      *
-     * @param method Indication method of interest. 
+     * @param method Indication method of interest.
      *    Use kEveryIndicationMethod constant to install handler
      *    that will receive every unhandled indication.
      * @param handler Will be called for each indication message.
@@ -73,7 +75,7 @@ public:
     /**
      * Sends message asynchronously.
      *
-     * @param requestHandler Triggered after response has been received or error has occured. 
+     * @param requestHandler Triggered after response has been received or error has occured.
      *     Resulting Message object is valid only if error code is SystemError::noError.
      * @param client Can be used to cancel subscription.
      * @return false, if could not start asynchronous operation.
@@ -119,4 +121,5 @@ public:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

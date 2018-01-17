@@ -3,7 +3,9 @@
 
 #include <memory>
 
-#include <plugins/resource/test_camera/testcamera_const.h>
+#include <nx/network/nettools.h>
+
+#include <core/resource/test_camera/testcamera_const.h>
 #include "test_camera_processor.h"
 
 int MEDIA_PORT = 4985;
@@ -14,7 +16,7 @@ int MEDIA_PORT = 4985;
 
 class QnCameraDiscoveryListener: public QnLongRunnable
 {
-    struct NetRange
+    struct IpRangeV4
     {
         bool contains(quint32 addr) const
         {
@@ -35,19 +37,19 @@ public:
 protected:
     virtual void run() override
     {
-        std::unique_ptr<AbstractDatagramSocket> discoverySock( SocketFactory::createDatagramSocket().release() );
+        std::unique_ptr<nx::network::AbstractDatagramSocket> discoverySock(nx::network::SocketFactory::createDatagramSocket().release() );
 #if 1
-        discoverySock->bind(SocketAddress(HostAddress::anyHost, TestCamConst::DISCOVERY_PORT));
+        discoverySock->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, TestCamConst::DISCOVERY_PORT));
         for (const auto& addr: m_localInterfacesToListen)
         {
-            for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
+            for (const auto& iface: nx::network::getAllIPv4Interfaces())
             {
                 if (iface.address == QHostAddress(addr))
                 {
-                    NetRange netRange;
-                    netRange.firstIp = iface.networkAddress().toIPv4Address();
+                    IpRangeV4 netRange;
+                    netRange.firstIp = iface.subNetworkAddress().toIPv4Address();
                     netRange.lastIp = iface.broadcastAddress().toIPv4Address();
-                    m_allowedIpRange.push_back(netRange);
+                    m_allowedIpRanges.push_back(netRange);
                 }
             }
         }
@@ -61,9 +63,9 @@ protected:
 #endif
         discoverySock->setRecvTimeout(100);
         quint8 buffer[1024*8];
-        SocketAddress peerEndpoint;
+        nx::network::SocketAddress peerEndpoint;
 
-        auto hasRange = [&](const SocketAddress& peerEndpoint)
+        auto hasRange = [&](const nx::network::SocketAddress& peerEndpoint)
         {
             const auto addr = peerEndpoint.address.ipV4();
             if (!addr)
@@ -72,10 +74,10 @@ protected:
             const quint32 v4Addr = ntohl(*addrPtr);
 
             return std::any_of(
-                m_allowedIpRange.begin(), 
-                m_allowedIpRange.end(),
-                [v4Addr](const NetRange& range)
-                { 
+                m_allowedIpRanges.begin(),
+                m_allowedIpRanges.end(),
+                [v4Addr](const IpRangeV4& range)
+                {
                     return range.contains(v4Addr);
                 });
         };
@@ -85,7 +87,7 @@ protected:
             int readed = discoverySock->recvFrom(buffer, sizeof(buffer), &peerEndpoint);
             if (readed > 0)
             {
-                if (!m_allowedIpRange.isEmpty() && !hasRange(peerEndpoint))
+                if (!m_allowedIpRanges.isEmpty() && !hasRange(peerEndpoint))
                     continue;
 
                 if (QByteArray((const char*)buffer, readed).startsWith(TestCamConst::TEST_CAMERA_FIND_MSG))
@@ -105,7 +107,7 @@ protected:
 
 private:
     const QStringList m_localInterfacesToListen;
-    QVector<NetRange> m_allowedIpRange;
+    QVector<IpRangeV4> m_allowedIpRanges;
 };
 
 
@@ -123,14 +125,20 @@ QnCameraPool* QnCameraPool::instance()
     return inst;
 }
 
-QnCameraPool::QnCameraPool(const QStringList& localInterfacesToListen,
-    QnCommonModule* commonModule)
+QnCameraPool::QnCameraPool(
+    const QStringList& localInterfacesToListen,
+    QnCommonModule* commonModule,
+    bool noSecondaryStream,
+    int fps)
     :
     QnTcpListener(commonModule,
         localInterfacesToListen.isEmpty()
         ? QHostAddress::Any
         : QHostAddress(localInterfacesToListen[0]), MEDIA_PORT),
-    m_cameraNum(0)
+    m_cameraNum(0),
+    m_noSecondaryStream(noSecondaryStream),
+    m_fps(fps)
+
 {
     m_discoveryListener = new QnCameraDiscoveryListener(localInterfacesToListen);
     m_discoveryListener->start();
@@ -141,7 +149,13 @@ QnCameraPool::~QnCameraPool()
     delete m_discoveryListener;
 }
 
-void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList primaryFileList, QStringList secondaryFileList, int offlineFreq)
+void QnCameraPool::addCameras(
+    bool cameraForEachFile,
+    bool includePts,
+    int count,
+    QStringList primaryFileList,
+    QStringList secondaryFileList,
+    int offlineFreq)
 {
     qDebug() << "Add" << count << "cameras from primary file(s)" << primaryFileList << " secondary file(s)" << secondaryFileList << "offlineFreq=" << offlineFreq;
     QMutexLocker lock(&m_mutex);
@@ -149,7 +163,7 @@ void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList pri
     {
         for (int i = 0; i < count; ++i)
         {
-            QnTestCamera* camera = new QnTestCamera(++m_cameraNum);
+            QnTestCamera* camera = new QnTestCamera(++m_cameraNum, includePts);
             camera->setPrimaryFileList(primaryFileList);
             camera->setSecondaryFileList(secondaryFileList);
             camera->setOfflineFreq(offlineFreq);
@@ -167,7 +181,7 @@ void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList pri
             QString primaryFile = primaryFileList[i];
             QString secondaryFile = i < secondaryFileList.length() ? secondaryFileList[i] : ""; // secondary file is optional
 
-            QnTestCamera* camera = new QnTestCamera(++m_cameraNum);
+            QnTestCamera* camera = new QnTestCamera(++m_cameraNum, includePts);
             camera->setPrimaryFileList(QStringList() << primaryFile);
             camera->setSecondaryFileList(QStringList() << secondaryFile);
             camera->setOfflineFreq(offlineFreq);
@@ -182,10 +196,11 @@ void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList pri
     }
 }
 
-QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
+QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(
+    QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
 {
     QMutexLocker lock(&m_mutex);
-    return new QnTestCameraProcessor(clientSocket, this);
+    return new QnTestCameraProcessor(clientSocket, this, m_noSecondaryStream, m_fps);
 }
 
 QByteArray QnCameraPool::getDiscoveryResponse()

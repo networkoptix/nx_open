@@ -1,10 +1,10 @@
-There is a new revision for {{ message.product }}
+Существует новая версия {{ message.product }}
 
-Click on the link to review draft {{ message.id }} for {{ message.product }}
+Щелкните по ссылке чтобы просмотреть черновик {{ message.id }} для {{ message.product }}
 
-Link to review: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+Ссылка для проверки: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
 
-On this page you can
-1) Create a preview to see the most recent changes.
-2) Publish this version which will update all content.
-3) Edit contexts by clicking on the edit record button. To see those changes you will need to create a new version.
+На этой странице можно
+1) Просмотреть последние изменения.
+2) Опубликовать эту версию, которая обновит весь контент.
+3) Редактировать контексты, нажав кнопку редактирования записи. Чтобы увидеть эти изменения, вам нужно будет создать новую версию.

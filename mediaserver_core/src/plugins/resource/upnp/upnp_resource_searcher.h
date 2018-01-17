@@ -40,36 +40,36 @@ protected:
     */
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const HostAddress& host,
-        const nx_upnp::DeviceInfo& devInfo,
+        const nx::network::HostAddress& host,
+        const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         const QAuthenticator &auth,
         QnResourceList& result) = 0;
 
 private:
     QByteArray getDeviceDescription(const QByteArray& uuidStr, const QUrl& url);
-    QHostAddress findBestIface(const HostAddress& host);
-    void processSocket(AbstractDatagramSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result);
+    QHostAddress findBestIface(const nx::network::HostAddress& host);
+    void processSocket(nx::network::AbstractDatagramSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result);
 
 protected:
     void readDeviceXml(
         const QByteArray& uuidStr,
         const QUrl& descritionUrl,
-        const HostAddress& sender,
+        const nx::network::HostAddress& sender,
         QnResourceList& result);
     void processDeviceXml(
         const QByteArray& foundDeviceDescription,
-        const HostAddress& host,
-        const HostAddress& sender,
+        const nx::network::HostAddress& host,
+        const nx::network::HostAddress& sender,
         QnResourceList& result );
 
 private:
-    QMap<QString, AbstractDatagramSocket*> m_socketList;
-    AbstractDatagramSocket* sockByName(const QnInterfaceAndAddr& iface);
+    QMap<QString, nx::network::AbstractDatagramSocket*> m_socketList;
+    nx::network::AbstractDatagramSocket* sockByName(const nx::network::QnInterfaceAndAddr& iface);
 
     QMap<QByteArray, QByteArray> m_deviceXmlCache;
     QElapsedTimer m_cacheLivetime;
-    AbstractDatagramSocket* m_receiveSocket;
+    nx::network::AbstractDatagramSocket* m_receiveSocket;
 };
 
 
@@ -77,7 +77,7 @@ private:
 class QnUpnpResourceSearcherAsync
 :
     virtual public QnAbstractNetworkResourceSearcher,
-    public nx_upnp::SearchHandler
+    public nx::network::upnp::SearchHandler
 {
 public:
     QnUpnpResourceSearcherAsync(QnCommonModule* commonModule);
@@ -87,8 +87,8 @@ public:
     //!Implementation of UPNPSearchHandler::processPacket
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
-        const SocketAddress& discoveredDevAddress,
-        const nx_upnp::DeviceInfo& devInfo,
+        const nx::network::SocketAddress& discoveredDevAddress,
+        const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo ) override;
 
 protected:
@@ -100,8 +100,8 @@ protected:
     */
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const SocketAddress& deviceEndpoint,
-        const nx_upnp::DeviceInfo& devInfo,
+        const nx::network::SocketAddress& deviceEndpoint,
+        const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         QnResourceList& result ) = 0;
 

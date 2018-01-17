@@ -1,13 +1,17 @@
 #include "cross_nat_connector.h"
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "outgoing_tunnel_connection_watcher.h"
+#include "outgoing_tunnel_pool.h"
 #include "tcp/outgoing_reverse_tunnel_connection.h"
 #include "udp/connector.h"
+#include "../cloud_connect_settings.h"
 
 namespace nx {
 namespace network {
@@ -45,12 +49,12 @@ CrossNatConnector::CrossNatConnector(
     m_mediatorUdpEndpoint(
         mediatorUdpEndpoint
         ? mediatorUdpEndpoint.get()
-        : *nx::network::SocketGlobals::mediatorConnector().udpEndpoint()),
+        : *nx::network::SocketGlobals::cloud().mediatorConnector().udpEndpoint()),
     m_originatingHostAddressReplacement(
-        SocketGlobals::cloudConnectSettings().originatingHostAddressReplacement()),
+        SocketGlobals::cloud().settings().originatingHostAddressReplacement()),
     m_done(false)
 {
-    m_mediatorUdpClient = 
+    m_mediatorUdpClient =
         std::make_unique<api::MediatorClientUdpConnection>(m_mediatorUdpEndpoint);
     m_mediatorUdpClient->bindToAioThread(getAioThread());
 
@@ -61,7 +65,7 @@ CrossNatConnector::CrossNatConnector(
 void CrossNatConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     AbstractCrossNatConnector::bindToAioThread(aioThread);
-    
+
     m_mediatorUdpClient->bindToAioThread(aioThread);
     m_timer->bindToAioThread(aioThread);
     if (m_cloudConnectorExecutor)
@@ -76,7 +80,7 @@ void CrossNatConnector::connect(
         [this, timeout, handler = std::move(handler)]() mutable
         {
             const auto hostName = m_targetPeerAddress.host.toString().toUtf8();
-            if (auto holder = SocketGlobals::tcpReversePool().getConnectionSource(hostName))
+            if (auto holder = SocketGlobals::cloud().tcpReversePool().getConnectionSource(hostName))
             {
                 s_mediatorResponseCounter.addResult(hpm::api::ResultCode::notImplemented);
                 NX_DEBUG(this, lm("Using TCP reverse connections from pool to connect to host %1")
@@ -128,9 +132,9 @@ void CrossNatConnector::messageReceived(
     //here we can receive response to connect result report. We just don't need it
 }
 
-void CrossNatConnector::ioFailure(SystemError::ErrorCode /*errorCode*/) 
+void CrossNatConnector::ioFailure(SystemError::ErrorCode /*errorCode*/)
 {
-    //if error happens when sending connect result report, 
+    //if error happens when sending connect result report,
     //  it will be reported to TunnelConnector::connectSessionReportSent too
     //  and we will handle error there
 }
@@ -348,6 +352,19 @@ void CrossNatConnector::connectSessionReportSent(
         .arg(SystemError::toString(sysErrorCodeToReport)),
         cl_logDEBUG2);
 
+    if (m_connection)
+    {
+        NX_INFO(this, lm("Cloud connection (session %1) to %2 has been established. Info %3")
+            .args(m_connectSessionId, m_targetPeerAddress.toString(), m_connection->toString()));
+    }
+    else
+    {
+        NX_INFO(this, lm("Cloud connection (session %1) to %2 has failed. %3 / %4")
+            .args(m_connectSessionId, m_targetPeerAddress.toString(),
+                QnLexical::serialized(m_connectResultReport.resultCode),
+                SystemError::toString(m_connectResultReport.sysErrorCode)));
+    }
+
     auto completionHandler = std::move(m_completionHandler);
     auto tunnelConnection = std::move(m_connection);
     completionHandler(sysErrorCodeToReport, std::move(tunnelConnection));
@@ -357,7 +374,7 @@ hpm::api::ConnectRequest CrossNatConnector::prepareConnectRequest() const
 {
     api::ConnectRequest connectRequest;
 
-    connectRequest.originatingPeerId = SocketGlobals::outgoingTunnelPool().ownPeerId();
+    connectRequest.originatingPeerId = SocketGlobals::cloud().outgoingTunnelPool().ownPeerId();
     connectRequest.connectSessionId = m_connectSessionId;
     connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
     connectRequest.destinationHostName = m_targetPeerAddress.host.toString().toUtf8();

@@ -17,11 +17,7 @@ cloud_portal:
 
 
 cloud_gateway:
-    url: 'http://$CLOUD_DB_HOST:3347'
-
-mail_from: 'service@networkoptix.com'
-
-mail_prefix: '[CLOUD_PORTAL]'
+    url: 'http://$CLOUD_DB_HOST:3347/gateway'
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'
@@ -34,9 +30,6 @@ admins:
     -
         - 'Cloud Portal Admins'
         - 'cloud-portal-admins@networkoptix.com'
-languages:
-    - en_US
-    - ru_RU
 
 queue_name: '$INSTANCE_NAME'
 max_retries: 10

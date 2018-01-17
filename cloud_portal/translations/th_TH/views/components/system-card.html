@@ -1,13 +1,12 @@
 
 <div class="panel panel-default" ng-if="system.isMine">
     <div class="panel-body">
-        <h2>Your System</h2>
+        <h2>ระบบของคุณ</h2>
         <p></p>
         <p>
-            <button class="btn btn-default" ng-click="rename()">Rename System</button>
+            <button class="btn btn-default" ng-click="rename()">เปลี่ยนชื่อระบบ</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()">Disconnect from
-            <span class="product-name">{{PRODUCT_NAME}}</span></button>
+        <button class="btn btn-default" ng-click="disconnect()">ตัดการเชื่อมต่อจาก <span class="product-name"> {{PRODUCT_NAME}} </span></button>
     </div>
 </div>
 
@@ -18,13 +17,12 @@
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
         <hr>
         <p>
-            Your permissions:
-            <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
+            สิทธิ์ของคุณ: <b> {{$root.L.accessRoles[system.accessRole].label || system.accessRole}} </b>
         </p>
 
         <p ng-if="system.permissions.isAdmin">
-            <button class="btn btn-default" ng-click="rename()">Rename System</button>
+            <button class="btn btn-default" ng-click="rename()">เปลี่ยนชื่อระบบ</button>
         </p>
-        <button class="btn btn-default" ng-click="delete()">Disconnect from my account</button>
+        <button class="btn btn-default" ng-click="delete()">ตัดการเชื่อมต่อจากบัญชีของฉัน</button>
     </div>
 </div>

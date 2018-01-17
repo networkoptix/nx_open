@@ -23,25 +23,33 @@ class LilinRemoteArchiveManager:
 {
     Q_OBJECT;
 
-    using RemoteArchiveEntry = nx::core::resource::RemoteArchiveEntry;
+    using RemoteArchiveEntry = nx::core::resource::RemoteArchiveChunk;
     using BufferType = nx::core::resource::BufferType;
 
 public:
 
     explicit LilinRemoteArchiveManager(LilinResource* resource);
-    virtual ~LilinRemoteArchiveManager() override;
+    virtual ~LilinRemoteArchiveManager() = default;
 
-    // Implementation of AbstractRemoteArchiveManager::listAvailableArchiveEntries 
     virtual bool listAvailableArchiveEntries(
-        std::vector<RemoteArchiveEntry>* outArchiveEntries,
+        nx::core::resource::OverlappedRemoteChunks* outArchiveEntries,
         int64_t startTimeMs = 0,
         int64_t endTimeMs = std::numeric_limits<int64_t>::max()) override;
 
-    // Implementation of AbstractRemoteArchiveManager::fetchArchiveEntries
+    virtual std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate(
+        const nx::core::resource::RemoteArchiveChunk& chunk) override;
+
     virtual bool fetchArchiveEntry(const QString& entryId, BufferType* outBuffer) override;
 
-    // Implementation of AbstractRemoteArchiveManager::removeArchiveEntry
     virtual bool removeArchiveEntries(const std::vector<QString>& entryIds) override;
+
+    virtual nx::core::resource::RemoteArchiveCapabilities capabilities() const override;
+
+    virtual nx::core::resource::RemoteArchiveSynchronizationSettings settings() const override;
+
+    virtual void beforeSynchronization() override;
+
+    virtual void afterSynchronization(bool isSynchronizationSuccessful) override;
 
 private:
 
@@ -51,8 +59,8 @@ private:
         end
     };
 
-    std::unique_ptr<nx_http::HttpClient> initHttpClient() const;
-    boost::optional<nx_http::BufferType> doRequest(const QString& requestPath, bool expectOnlyBody = false);
+    std::unique_ptr<nx::network::http::HttpClient> initHttpClient() const;
+    boost::optional<nx::network::http::BufferType> doRequest(const QString& requestPath, bool expectOnlyBody = false);
 
     boost::optional<int64_t> getRecordingBound(RecordingBound bound);
     boost::optional<int64_t> getRecordingStart();

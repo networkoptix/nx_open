@@ -52,7 +52,7 @@ public:
 
 private:
     virtual void stopWhileInAioThread() override;
-    
+
     void monitorKeepAlive();
     void readConnectionRequest();
     void continueReadRequest();

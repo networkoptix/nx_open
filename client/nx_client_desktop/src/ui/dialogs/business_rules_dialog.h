@@ -27,7 +27,7 @@ class QnBusinessRulesDialog: public QnSessionAwareButtonBoxDialog
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    explicit QnBusinessRulesDialog(QWidget *parent = 0);
+    explicit QnBusinessRulesDialog(QWidget *parent);
     virtual ~QnBusinessRulesDialog();
 
     void setFilter(const QString &filter);

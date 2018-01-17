@@ -5,6 +5,9 @@
 
 #include "aio/pollable.h"
 
+namespace nx {
+namespace network {
+
 //-------------------------------------------------------------------------------------------------
 // class AbstractSocket.
 
@@ -27,18 +30,9 @@ bool AbstractSocket::isInSelfAioThread() const
 bool AbstractCommunicatingSocket::connect(
     const QString& foreignAddress,
     unsigned short foreignPort,
-    unsigned int timeoutMillis)
+    std::chrono::milliseconds timeout)
 {
-    // TODO: #ak this method MUST replace the previous one
-    return connect(SocketAddress(foreignAddress, foreignPort), timeoutMillis);
-}
-
-bool AbstractCommunicatingSocket::connect(
-    const SocketAddress& remoteSocketAddress,
-    std::chrono::milliseconds timeoutMillis)
-{
-    // TODO: #ak this method MUST replace the previous one
-    return connect(remoteSocketAddress, timeoutMillis.count());
+    return connect(SocketAddress(foreignAddress, foreignPort), timeout);
 }
 
 int AbstractCommunicatingSocket::send(const QByteArray& data)
@@ -62,7 +56,7 @@ void AbstractCommunicatingSocket::registerTimer(
 
 void AbstractCommunicatingSocket::readAsyncAtLeast(
     nx::Buffer* const buffer, size_t minimalSize,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     NX_CRITICAL(
         buffer->capacity() >= buffer->size() + static_cast<int>(minimalSize),
@@ -101,13 +95,13 @@ QString AbstractCommunicatingSocket::idForToStringFromPtr() const
 
 void AbstractCommunicatingSocket::readAsyncAtLeastImpl(
     nx::Buffer* const buffer, size_t minimalSize,
-    std::function<void(SystemError::ErrorCode, size_t)> handler,
+    IoCompletionHandler handler,
     size_t initBufSize)
 {
     readSomeAsync(
         buffer,
         [this, buffer, minimalSize, handler = std::move(handler), initBufSize](
-            SystemError::ErrorCode code, size_t size)
+            SystemError::ErrorCode code, size_t size) mutable
         {
             if (code != SystemError::noError || size == 0 ||
                 static_cast<size_t>(buffer->size()) >= initBufSize + minimalSize)
@@ -119,57 +113,6 @@ void AbstractCommunicatingSocket::readAsyncAtLeastImpl(
             readAsyncAtLeastImpl(
                 buffer, minimalSize, std::move(handler), initBufSize);
         });
-}
-
-//-------------------------------------------------------------------------------------------------
-
-KeepAliveOptions::KeepAliveOptions(
-    std::chrono::seconds inactivityPeriodBeforeFirstProbe,
-    std::chrono::seconds probeSendPeriod,
-    size_t probeCount)
-:
-    inactivityPeriodBeforeFirstProbe(inactivityPeriodBeforeFirstProbe),
-    probeSendPeriod(probeSendPeriod),
-    probeCount(probeCount)
-{
-}
-
-bool KeepAliveOptions::operator==(const KeepAliveOptions& rhs) const
-{
-    return inactivityPeriodBeforeFirstProbe == rhs.inactivityPeriodBeforeFirstProbe
-        && probeSendPeriod == rhs.probeSendPeriod
-        && probeCount == rhs.probeCount;
-}
-
-std::chrono::seconds KeepAliveOptions::maxDelay() const
-{
-    return inactivityPeriodBeforeFirstProbe + probeSendPeriod * probeCount;
-}
-
-QString KeepAliveOptions::toString() const
-{
-    // TODO: Use JSON serrialization instead?
-    return lm("{ %1, %2, %3 }").arg(inactivityPeriodBeforeFirstProbe.count())
-        .arg(probeSendPeriod.count()).arg(probeCount);
-}
-
-boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& string)
-{
-    QStringRef stringRef(&string);
-    if (stringRef.startsWith(QLatin1String("{")) && stringRef.endsWith(QLatin1String("}")))
-        stringRef = stringRef.mid(1, stringRef.length() - 2);
-
-    const auto split = stringRef.split(QLatin1String(","));
-    if (split.size() != 3)
-        return boost::none;
-
-    KeepAliveOptions options;
-    options.inactivityPeriodBeforeFirstProbe = 
-        std::chrono::seconds((size_t) split[0].trimmed().toUInt());
-    options.probeSendPeriod = 
-        std::chrono::seconds((size_t) split[1].trimmed().toUInt());
-    options.probeCount = (size_t) split[2].trimmed().toUInt();
-    return options;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -204,3 +147,6 @@ bool AbstractDatagramSocket::sendTo(
 {
     return sendTo(buf.constData(), buf.size(), foreignAddress);
 }
+
+} // namespace network
+} // namespace nx

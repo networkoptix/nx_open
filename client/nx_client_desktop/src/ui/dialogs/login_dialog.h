@@ -33,7 +33,7 @@ class QnLoginDialog: public QnButtonBoxDialog, public QnWorkbenchContextAware
 
     using base_type = QnButtonBoxDialog;
 public:
-    explicit QnLoginDialog(QWidget *parent = NULL);
+    explicit QnLoginDialog(QWidget *parent);
     virtual ~QnLoginDialog();
 
 public slots:
@@ -74,7 +74,7 @@ private:
     void at_moduleChanged(nx::vms::discovery::ModuleEndpoint data);
     void at_moduleLost(QnUuid id);
 
-    QUrl currentUrl() const;
+    nx::utils::Url currentUrl() const;
     bool isValid() const;
 
     QStandardItem* newConnectionItem(const QnConnectionData& connection);
@@ -102,7 +102,7 @@ private:
     struct QnFoundSystemData
     {
         QnModuleInformation info;
-        QUrl url;
+        nx::utils::Url url;
 
         bool operator==(const QnFoundSystemData& other) const;
         bool operator!=(const QnFoundSystemData& other) const;

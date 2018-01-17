@@ -23,19 +23,24 @@ public:
 
     boost::optional<hikvision::ChannelCapabilities>
     channelCapabilities(Qn::ConnectionRole role);
+    bool findDefaultPtzProfileToken();
+
+    static bool tryToEnableOnvifSupport(const nx::utils::Url& url, const QAuthenticator& authenticator);
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual CameraDiagnostics::Result initializeMedia(
         const CapabilitiesResp& onvifCapabilities) override;
+
+    virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true) override;
 private:
     CameraDiagnostics::Result fetchChannelCapabilities(
         Qn::ConnectionRole role,
         hikvision::ChannelCapabilities* outCapabilities);
 
     CameraDiagnostics::Result initialize2WayAudio();
-    std::unique_ptr<nx_http::HttpClient> getHttpClient();
+    std::unique_ptr<nx::network::http::HttpClient> getHttpClient();
 
 private:
     std::map<Qn::ConnectionRole, hikvision::ChannelCapabilities> m_channelCapabilitiesByRole;

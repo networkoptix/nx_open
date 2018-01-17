@@ -75,12 +75,12 @@
                                             ng-if="apiMethod.method"></ng-include>
 
                                 <div ng-if="activeFunction.result.params || activeFunction.result.caption">
-                                    <h3>Result</h3>
+                                    <h3>Resultado</h3>
                                     <p>{{activeFunction.result.caption}}</p>
                                     <ul ng-if="activeFunction.result.params">
                                         <li ng-repeat="param in activeFunction.result.params">
                                             <div class="label label-danger" ng-if="param.proprietary">proprietary</div>
-                                            <div class="label label-danger" ng-if="param.optional=='false'">required</div>
+                                            <div class="label label-danger" ng-if="!param.optional">required</div>
                                             <b>{{param.name}}</b>
                                             <span ng-if="param.description.xml" ng-bind-html="param.description.xml"></span>
                                             <span ng-if="param.values">

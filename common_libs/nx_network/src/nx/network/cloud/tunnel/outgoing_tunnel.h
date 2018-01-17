@@ -7,7 +7,7 @@
 #include <nx/utils/basic_factory.h>
 
 #include "abstract_tunnel_connector.h"
-#include "cross_nat_connector.h"
+#include "abstract_cross_nat_connector.h"
 #include "tunnel.h"
 #include "tunnel_attributes.h"
 
@@ -34,7 +34,7 @@ public:
      * Establish new connection.
      * @param timeout Zero means no timeout.
      * @param socketAttributes attribute values to apply to a newly-created socket.
-     * @note This method is re-enterable. So, it can be called in different threads simultaneously.
+     * NOTE: This method is re-enterable. So, it can be called in different threads simultaneously.
      */
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,
@@ -45,11 +45,11 @@ public:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * @note OutgoingTunnel instance can be safely freed only after 
- *       OutgoingTunnel::pleaseStop completion. It is allowed 
+ * NOTE: OutgoingTunnel instance can be safely freed only after
+ *       OutgoingTunnel::pleaseStop completion. It is allowed
  *       to free object in "on closed" handler itself.
  *       It is needed to guarantee that all clients receive response.
- * @note Calling party MUST not use object after OutgoingTunnel::pleaseStop call
+ * NOTE: Calling party MUST not use object after OutgoingTunnel::pleaseStop call
  */
 class NX_NETWORK_API OutgoingTunnel:
     public AbstractOutgoingTunnel
@@ -73,11 +73,11 @@ public:
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     /**
-     * @note Calling party MUST not use object after OutgoingTunnel::pleaseStop call.
+     * NOTE: Calling party MUST not use object after OutgoingTunnel::pleaseStop call.
      */
     virtual void stopWhileInAioThread() override;
 
-    virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler);
+    virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,

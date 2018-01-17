@@ -124,7 +124,7 @@ describe('User activation', function () {
         });
     });
 
-    it("link works and suggests to log out user, if he was logged in", function () {
+    xit("link works and suggests to log out user, if he was logged in", function () {
         var userEmail = p.helper.getRandomEmail();
 
         p.helper.register(null, null, userEmail);

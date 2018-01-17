@@ -1,13 +1,9 @@
-/**********************************************************
-* Feb 4, 2016
-* akolesnikov
-***********************************************************/
-
 #include <atomic>
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/aio/aio_service.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_connection_watcher.h>
@@ -105,6 +101,11 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
         m_onClosedHandler = std::move(handler);
+    }
+
+    virtual std::string toString() const override
+    {
+        return "DummyConnection";
     }
 
     void ignoreConnectRequests()
@@ -310,12 +311,12 @@ public:
     {
         SystemError::ErrorCode sysErrorCode;
         TunnelAttributes tunnelAttributes;
-        std::unique_ptr<AbstractStreamSocket> connection;
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection;
 
         ConnectionResult(
             SystemError::ErrorCode sysErrorCode,
             TunnelAttributes tunnelAttributes,
-            std::unique_ptr<AbstractStreamSocket> connection)
+            std::unique_ptr<nx::network::AbstractStreamSocket> connection)
             :
             sysErrorCode(sysErrorCode),
             tunnelAttributes(std::move(tunnelAttributes)),
@@ -414,7 +415,7 @@ protected:
                 [&connectionContext](
                     SystemError::ErrorCode errorCode,
                     TunnelAttributes tunnelAttributes,
-                    std::unique_ptr<AbstractStreamSocket> socket)
+                    std::unique_ptr<nx::network::AbstractStreamSocket> socket)
                 {
                     connectionContext.endTime = steady_clock::now();
                     connectionContext.completionPromise.set_value(
@@ -509,7 +510,7 @@ TEST_F(OutgoingTunnel, general)
                 [&connectedPromise](
                     SystemError::ErrorCode errorCode,
                     TunnelAttributes tunnelAttributes,
-                    std::unique_ptr<AbstractStreamSocket> socket)
+                    std::unique_ptr<nx::network::AbstractStreamSocket> socket)
                 {
                     connectedPromise.set_value(
                         ConnectionResult(errorCode, std::move(tunnelAttributes), std::move(socket)));
@@ -588,7 +589,7 @@ TEST_F(OutgoingTunnel, singleShotConnection)
             [&connectedPromise](
                 SystemError::ErrorCode errorCode,
                 TunnelAttributes tunnelAttributes,
-                std::unique_ptr<AbstractStreamSocket> socket)
+                std::unique_ptr<nx::network::AbstractStreamSocket> socket)
             {
                 connectedPromise.set_value(
                     ConnectionResult(errorCode, std::move(tunnelAttributes), std::move(socket)));
@@ -633,7 +634,7 @@ TEST_F(OutgoingTunnel, handlersQueueingWhileInConnectingState)
             [&connectedPromise](
                 SystemError::ErrorCode errorCode,
                 TunnelAttributes tunnelAttributes,
-                std::unique_ptr<AbstractStreamSocket> socket)
+                std::unique_ptr<nx::network::AbstractStreamSocket> socket)
             {
                 connectedPromise.set_value(
                     ConnectionResult(errorCode, std::move(tunnelAttributes), std::move(socket)));
@@ -686,7 +687,7 @@ TEST_F(OutgoingTunnel, cancellation)
                 [&connectedPromise](
                     SystemError::ErrorCode errorCode,
                     TunnelAttributes tunnelAttributes,
-                    std::unique_ptr<AbstractStreamSocket> socket)
+                    std::unique_ptr<nx::network::AbstractStreamSocket> socket)
                 {
                     connectedPromise.set_value(
                         ConnectionResult(errorCode, std::move(tunnelAttributes), std::move(socket)));
@@ -757,7 +758,7 @@ TEST_F(OutgoingTunnel, connectTimeout2)
         [&connectionContext](
             SystemError::ErrorCode errorCode,
             TunnelAttributes tunnelAttributes,
-            std::unique_ptr<AbstractStreamSocket> socket)
+            std::unique_ptr<nx::network::AbstractStreamSocket> socket)
         {
             connectionContext.endTime = std::chrono::steady_clock::now();
             connectionContext.completionPromise.set_value(
@@ -814,7 +815,7 @@ TEST_F(OutgoingTunnel, pool)
             [&connectionContext](
                 SystemError::ErrorCode errorCode,
                 TunnelAttributes tunnelAttributes,
-                std::unique_ptr<AbstractStreamSocket> socket)
+                std::unique_ptr<nx::network::AbstractStreamSocket> socket)
             {
                 connectionContext.completionPromise.set_value(
                     ConnectionResult(errorCode, std::move(tunnelAttributes), std::move(socket)));
@@ -882,7 +883,7 @@ protected:
             [](
                 SystemError::ErrorCode,
                 TunnelAttributes /*tunnelAttributes*/,
-                std::unique_ptr<AbstractStreamSocket>) {});
+                std::unique_ptr<nx::network::AbstractStreamSocket>) {});
     }
 
     void whenTunnelConnectionHasBeenClosed()
@@ -911,7 +912,7 @@ private:
             [&tunnelOpened](
                 SystemError::ErrorCode,
                 TunnelAttributes /*tunnelAttributes*/,
-                std::unique_ptr<AbstractStreamSocket>)
+                std::unique_ptr<nx::network::AbstractStreamSocket>)
             {
                 tunnelOpened.set_value();
             });

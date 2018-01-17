@@ -121,7 +121,7 @@ nx::utils::db::DBResult AuthenticationProvider::afterSharingSystem(
         .arg(sharing.accountEmail).arg(sharing.systemId));
 
     const auto nonce = fetchOrCreateNonce(queryContext, sharing.systemId);
-        
+
     const auto account = m_accountManager->findAccountByUserName(sharing.accountEmail);
     if (!account)
         throw nx::utils::db::Exception(nx::utils::db::DBResult::notFound);
@@ -262,7 +262,7 @@ api::AuthResponse AuthenticationProvider::prepareResponse(
     response.nonce = std::move(nonce);
     response.authenticatedAccountData = std::move(systemSharing);
     response.accessRole = response.authenticatedAccountData.accessRole;
-    const auto intermediateResponse = nx_http::calcIntermediateResponse(
+    const auto intermediateResponse = nx::network::http::calcIntermediateResponse(
         passwordHa1.c_str(),
         response.nonce.c_str());
     response.intermediateResponse.assign(
@@ -312,9 +312,9 @@ api::AuthInfoRecord AuthenticationProvider::generateAuthRecord(
 {
     api::AuthInfoRecord authInfo;
     authInfo.nonce = nonce;
-    authInfo.intermediateResponse = nx_http::calcIntermediateResponse(
+    authInfo.intermediateResponse = nx::network::http::calcIntermediateResponse(
         account.passwordHa1.c_str(), nonce.c_str()).toStdString();
-    authInfo.expirationTime = 
+    authInfo.expirationTime =
         nx::utils::utcTime() + m_settings.auth().offlineUserHashValidityPeriod;
     return authInfo;
 }
@@ -333,9 +333,9 @@ void AuthenticationProvider::generateUpdateUserAuthInfoTransaction(
 {
     ::ec2::ApiResourceParamWithRefData userAuthenticationInfoAttribute;
     userAuthenticationInfoAttribute.name = api::kVmsUserAuthInfoAttributeName;
-    userAuthenticationInfoAttribute.resourceId = 
+    userAuthenticationInfoAttribute.resourceId =
         QnUuid::fromStringSafe(vmsUserId.c_str());
-    userAuthenticationInfoAttribute.value = 
+    userAuthenticationInfoAttribute.value =
         QString::fromUtf8(QJson::serialized(userAuthenticationRecords));
     const auto dbResult = m_vmsP2pCommandBus->saveResourceAttribute(
         queryContext,

@@ -117,23 +117,15 @@ int runUi(QtSingleGuiApplication* application)
     QFileSelector fileSelector;
     fileSelector.setExtraSelectors(selectors);
 
-    QQmlEngine engine;
-    auto basePath = qnSettings->basePath();
-    if (!basePath.startsWith(lit("qrc:")))
-        basePath = lit("file://") + QDir(basePath).absolutePath() + lit("/");
-    engine.setBaseUrl(QUrl(basePath + lit("qml/")));
-    engine.addImportPath(basePath + lit("qml"));
-    QQmlFileSelector qmlFileSelector(&engine);
+    const auto engine = qnClientCoreModule->mainQmlEngine();
+    QQmlFileSelector qmlFileSelector(engine);
     qmlFileSelector.setSelector(&fileSelector);
 
-    if (QnAppInfo::applicationPlatform() == lit("ios"))
-        engine.addImportPath(lit("qt_qml"));
+    engine->addImageProvider(lit("thumbnail"), thumbnailProvider);
+    engine->addImageProvider(lit("active"), activeCameraThumbnailProvider);
+    engine->rootContext()->setContextObject(&context);
 
-    engine.addImageProvider(lit("thumbnail"), thumbnailProvider);
-    engine.addImageProvider(lit("active"), activeCameraThumbnailProvider);
-    engine.rootContext()->setContextObject(&context);
-
-    QQmlComponent mainComponent(&engine, QUrl(lit("main.qml")));
+    QQmlComponent mainComponent(engine, QUrl(lit("main.qml")));
     QPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
 
     QScopedPointer<QnTextureSizeHelper> textureSizeHelper(
@@ -166,7 +158,7 @@ int runUi(QtSingleGuiApplication* application)
         return 1;
     }
 
-    QObject::connect(&engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
+    QObject::connect(engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
 
     prepareWindow();
     std::shared_ptr<nx::media::AbstractResourceAllocator> allocator(new ResourceAllocator(
@@ -228,9 +220,9 @@ int runUi(QtSingleGuiApplication* application)
                     break;
                 case InterClientMessage::Command::updateUrl:
                 {
-                    QUrl url(message.parameters);
+                    nx::utils::Url url(message.parameters);
                     if (url.isValid())
-                        qnSettings->startupParameters().url = QUrl(message.parameters);
+                        qnSettings->startupParameters().url = nx::utils::Url(message.parameters);
                     break;
                 }
             }
@@ -337,15 +329,6 @@ void initLog(const QString& logLevel)
 
 void processStartupParams(const QnMobileClientStartupParameters& startupParameters)
 {
-    if (!startupParameters.basePath.isEmpty())
-    {
-        const auto path = QDir(startupParameters.basePath).absoluteFilePath(lit("qml/main.qml"));
-        if (QFile::exists(path))
-            qnSettings->setBasePath(startupParameters.basePath);
-        else
-            qWarning() << lit("File %1 doesn't exist. Loading from qrc...").arg(path);
-    }
-
     if (ini().forceNonLiteMode)
         qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeDisabled));
     else if (startupParameters.liteMode || ini().forceLiteMode)

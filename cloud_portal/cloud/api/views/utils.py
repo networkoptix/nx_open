@@ -1,8 +1,9 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.core.cache import cache
-from rest_framework.permissions import AllowAny
-from api.helpers.exceptions import handle_exceptions, api_success, require_params, APIRequestException, ErrorCodes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from api.helpers.exceptions import handle_exceptions, api_success, require_params, \
+    APIRequestException, APIForbiddenException, APINotFoundException, ErrorCodes
 import datetime, logging
 import json
 import requests
@@ -35,44 +36,11 @@ def visited_key(request):
     return Response({'visited': value})
 
 
-def detect_language_by_request(request):
-    lang = None
-
-    # 1. Try account value - top priority
-    if request.user.is_authenticated():
-        lang = request.user.language
-
-    # 2. try session valie
-    if not lang:
-        lang = request.session.get('language', False)
-
-    # 3. Try cookie value (saved in browser some time ago)
-    if not lang:
-        if 'language' in request.COOKIES:
-            lang = request.COOKIES['language']
-
-    # 4. Try ACCEPT_LANGUAGE header
-    if not lang and 'HTTP_ACCEPT_LANGUAGE' in request.META:
-        languages = request.META['HTTP_ACCEPT_LANGUAGE']
-        languages = languages.split(';')[0]
-        languages = languages.split(',')
-        for l in languages:
-            if l in settings.LANGUAGES:
-                lang = l
-                break
-            if l.split('-')[0] in settings.LANGUAGES:
-                lang = l.split('-')[0]
-                break
-
-    if not lang or lang not in settings.LANGUAGES:  # not supported language
-        lang = settings.DEFAULT_LANGUAGE  # return default
-    return lang
-
-
 @api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
 def language(request):
     if request.method == 'GET':  # Get language for current user
+        from util.helpers import detect_language_by_request
         lang = detect_language_by_request(request)
         language_file = '/static/lang_' + lang + '/language.json'
         # Return: redirect to language.json file for selected language
@@ -100,6 +68,57 @@ def language(request):
 
 
 @api_view(['GET'])
+@permission_classes((IsAuthenticated, ))
+@handle_exceptions
+def downloads_history(request):
+    # TODO: later we can check specific permissions
+    customization = settings.CUSTOMIZATION
+    if not request.user.is_superuser and (request.user.customization != customization \
+                                     or not request.user.has_perm('api.can_view_release')):
+        raise APIForbiddenException("Not authorized!!!", ErrorCodes.forbidden)
+
+    downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', customization)
+    downloads_json = requests.get(downloads_url)
+    downloads_json.raise_for_status()
+    downloads_json = downloads_json.json()
+
+    return Response(downloads_json)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+@handle_exceptions
+def download_build(request, build):
+    # TODO: later we can check specific permissions
+    customization = settings.CUSTOMIZATION
+    if not request.user.is_superuser and (request.user.customization != customization \
+                                     or not request.user.has_perm('api.can_view_release')):
+        raise APIForbiddenException("Not authorized!!!", ErrorCodes.forbidden)
+
+    downloads_url = settings.DOWNLOADS_VERSION_JSON.replace('{{customization}}', customization).replace('{{build}}', build)
+    downloads_json = requests.get(downloads_url)
+    downloads_json.raise_for_status()
+    downloads_json = downloads_json.json()
+
+    if 'releaseNotes' not in downloads_json:
+        raise APINotFoundException("No downloads.json for this build!!!", ErrorCodes.not_found, error_data=request.query_params)
+
+    updates_json = requests.get(settings.UPDATE_JSON)
+    updates_json.raise_for_status()
+    updates_json = updates_json.json()
+
+    # find settings for customizations
+    if customization not in updates_json:
+        logger.error('Customization not in updates.json: ' + customization + '. Ask Boris to fix that.')
+        customization = 'default'
+
+    updates_record = updates_json[customization]
+    downloads_json['updatesPrefix'] = updates_record['updates_prefix']
+
+    return Response(downloads_json)
+
+
+@api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def downloads(request):
@@ -116,42 +135,41 @@ def downloads(request):
 
         # find settings for customizations
         if customization not in updates_json:
+            logger.error('Customization not in updates.json: ' + customization + '. Ask Boris to fix that.')
             customization = 'default'
         updates_record = updates_json[customization]
-        latest_release = None
-        if 'current_release' in updates_record:
-            latest_release = updates_record['current_release']
-        if not latest_release:  # Hack for new customizations
-            logger.error('No official release for customization: ' + customization + '. Ask Boris to fix that.')
-            latest_release = '3.0'
-        latest_version = updates_record['releases'][latest_release]
+        latest_version = updates_record['download_version'] if 'download_version' in updates_record else None
+
+        # Fallback section for old structure and old versions
+        if not latest_version or latest_version.startswith('2'):
+            if latest_version and latest_version.startswith('2'):
+                logger.error('No 3.0 downloadable release for customization: ' + customization +
+                             '. Ask Boris to fix that')
+            else:
+                logger.error('No download_version in updates.json for customization: ' + customization +
+                             '. Ask Boris to fix that.')
+            latest_release = None
+            if 'current_release' in updates_record:
+                latest_release = updates_record['current_release']
+            if not latest_release:  # Hack for new customizations
+                logger.error('No official release for customization: ' + customization + '. Ask Boris to fix that.')
+                latest_release = '3.0'
+            if latest_release.startswith('2'):  # latest release is 2.* - fallback for 3.0
+                latest_release = '3.0'
+            if latest_release not in updates_record['releases']:
+                logger.error('No 3.0 release for customization: ' + customization + '. Ask Boris to fix that')
+                return Response(None)
+            latest_version = updates_record['releases'][latest_release]
+        # End of fallback section for old structure and old versions
 
         build_number = latest_version.split('.')[-1]
         updates_path = updates_record['updates_prefix']
 
-        # get downloads.json for specific version
+        # get downloads.json for specific version. If get there - version is at least 3.0, so downloads.json is present
         downloads_path = updates_path + '/' + build_number + '/downloads.json'
         downloads_result = requests.get(downloads_path)
-        downloads_json = None
-
-        try:
-            downloads_json = downloads_result.json()
-        except:
-            pass  # we cannot parse json from the result - ignore for now, we will deal with this issue on the next line
-
-        # Check response result here
-        if not downloads_json or downloads_result.status_code != requests.codes.ok:
-            # old or broken release - no downloads json
-            # TODO: this is hardcode - remove it after release
-            latest_version = updates_record['releases']['3.0']
-            build_number = latest_version.split('.')[-1]        # Use the latest 3.0 public version
-            downloads_path = updates_path + '/' + build_number + '/downloads.json'
-            downloads_result = requests.get(downloads_path)
-            pass
-
         downloads_result.raise_for_status()
         downloads_json = downloads_result.json()
-
         downloads_json['releaseNotes'] = updates_record['release_notes']
         downloads_json['releaseUrl'] = updates_path + '/' + build_number + '/'
         # add release notes to downloads.json

@@ -150,7 +150,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunk(
 rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
     const QnUuid& peerId,
     const QString& fileName,
-    const QUrl& url,
+    const nx::utils::Url& url,
     int chunkIndex,
     int chunkSize,
     AbstractPeerManager::ChunkCallback callback)
@@ -174,7 +174,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
             fileName, url, chunkIndex, chunkSize, handleReply, thread());
     }
 
-    auto httpClient = nx_http::AsyncHttpClient::create();
+    auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
     httpClient->setSendTimeoutMs(kDownloadRequestTimeoutMs);
     httpClient->setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);

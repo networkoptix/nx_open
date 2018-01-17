@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <deque>
 #include <functional>
 
@@ -25,7 +26,7 @@ namespace server {
  *     void processMessage(Message request);
  * </code></pre>
  *
- * NOTE: Serializer::serialize is allowed to reallocate source buffer if needed, 
+ * NOTE: Serializer::serialize is allowed to reallocate source buffer if needed,
  *   but it is not recommended due to performance considerations!
  * NOTE: It is allowed to free instance within event handler.
  */
@@ -52,7 +53,8 @@ public:
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
         base_type(connectionManager, std::move(streamSocket)),
-        m_serializerState(SerializerState::done)
+        m_serializerState(SerializerState::done),
+        m_creationTimestamp(std::chrono::steady_clock::now())
     {
         static const size_t DEFAULT_SEND_BUFFER_SIZE = 4 * 1024;
         m_writeBuffer.reserve(DEFAULT_SEND_BUFFER_SIZE);
@@ -184,6 +186,17 @@ public:
         m_sendCompletionHandler = std::move(handler);
     }
 
+    std::chrono::milliseconds lifeDuration() const
+    {
+        using namespace std::chrono;
+        return duration_cast<milliseconds>(steady_clock::now() - m_creationTimestamp);
+    }
+
+    int messagesReceivedCount() const
+    {
+        return m_messagesReceivedCount;
+    }
+
 protected:
     virtual void processMessage(Message message) = 0;
     virtual void processSomeMessageBody(nx::Buffer /*messageBodyBuffer*/) {}
@@ -234,6 +247,8 @@ private:
     nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
     bool m_messageReported = false;
     QnByteArrayConstRef m_dataToParse;
+    std::chrono::steady_clock::time_point m_creationTimestamp;
+    int m_messagesReceivedCount = 0;
 
     /**
      * @param buf Source buffer.
@@ -264,6 +279,8 @@ private:
 
             case ParserState::done:
             {
+                ++m_messagesReceivedCount;
+
                 if (!reportMessageIfNeeded())
                     return false;
                 if (!reportMsgBodyIfHaveSome())
@@ -389,7 +406,7 @@ private:
 };
 
 /**
- * Inherits BaseStreamProtocolConnection and delegates processMessage to the functor 
+ * Inherits BaseStreamProtocolConnection and delegates processMessage to the functor
  * set with BaseStreamProtocolConnectionEmbeddable::setMessageHandler.
  */
 template<

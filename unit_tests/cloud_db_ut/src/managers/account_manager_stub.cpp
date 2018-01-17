@@ -22,9 +22,42 @@ void AccountManagerStub::removeExtension(AbstractAccountManagerExtension*)
 {
 }
 
+std::string AccountManagerStub::generateNewAccountId() const
+{
+    return std::string();
+}
+
+nx::utils::db::DBResult AccountManagerStub::insertAccount(
+    nx::utils::db::QueryContext* const /*queryContext*/,
+    data::AccountData /*account*/)
+{
+    // TODO
+    return nx::utils::db::DBResult::ok;
+}
+
+nx::utils::db::DBResult AccountManagerStub::fetchAccountByEmail(
+    nx::utils::db::QueryContext* /*queryContext*/,
+    const std::string& /*accountEmail*/,
+    data::AccountData* const /*accountData*/)
+{
+    // TODO
+    return nx::utils::db::DBResult::ok;
+}
+
+nx::utils::db::DBResult AccountManagerStub::createPasswordResetCode(
+    nx::utils::db::QueryContext* const /*queryContext*/,
+    const std::string& /*accountEmail*/,
+    std::chrono::seconds /*codeExpirationTimeout*/,
+    data::AccountConfirmationCode* const /*confirmationCode*/)
+{
+    // TODO
+    return nx::utils::db::DBResult::ok;
+}
+
 void AccountManagerStub::addAccount(AccountWithPassword account)
 {
-    m_emailToAccount.emplace(account.email, std::move(account));
+    auto accountEmail = account.email;
+    m_emailToAccount.emplace(accountEmail, std::move(account));
 }
 
 } // namespace test

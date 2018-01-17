@@ -12,6 +12,7 @@
 
 #include <core/resource_management/resource_pool.h>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 
@@ -73,6 +74,7 @@ void QnWorkbenchAccessController::setUser(const QnUserResourcePtr& user)
 {
     if (m_user == user)
         return;
+
     m_user = user;
     recalculateAllPermissions();
 }
@@ -165,6 +167,8 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
     {
         return Qn::ReadPermission
             | Qn::ViewContentPermission
+            | Qn::ViewLivePermission
+            | Qn::ViewFootagePermission
             | Qn::ExportPermission
             | Qn::WritePermission
             | Qn::WriteNamePermission;
@@ -188,6 +192,16 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
             return hasGlobalPermission(Qn::GlobalAdminPermission)
                 ? Qn::FullUserPermissions
                 : Qn::NoPermissions;
+        }
+    }
+
+    if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        if (camera->licenseType() == Qn::LC_VMAX && !camera->isLicenseUsed())
+        {
+            const Qn::Permissions forbidden = Qn::ViewLivePermission | Qn::ViewFootagePermission;
+            const auto basePermissions = resourceAccessManager()->permissions(m_user, resource);
+            return basePermissions & ~forbidden;
         }
     }
 

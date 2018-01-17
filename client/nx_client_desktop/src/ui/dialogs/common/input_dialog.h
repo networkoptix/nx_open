@@ -4,6 +4,7 @@
 
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QLineEdit>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 
@@ -21,7 +22,7 @@ class QnInputDialog: public QnSessionAwareButtonBoxDialog
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    QnInputDialog(QWidget* parent = nullptr);
+    QnInputDialog(QWidget* parent);
     virtual ~QnInputDialog() override;
 
     QString caption() const;
@@ -33,12 +34,16 @@ public:
     QString placeholderText() const;
     void setPlaceholderText(const QString& placeholderText);
 
+    QLineEdit::EchoMode echoMode() const;
+    void setEchoMode(QLineEdit::EchoMode echoMode);
+
     QDialogButtonBox::StandardButtons buttons() const;
     void setButtons(QDialogButtonBox::StandardButtons buttons);
 
     static QString getText(QWidget* parent,
         const QString& title, const QString& label,
         QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        QLineEdit::EchoMode echoMode = QLineEdit::Normal,
         const QString& placeholder = QString(),
         const QString& initialText = QString());
 

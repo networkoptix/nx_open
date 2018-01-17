@@ -6,7 +6,6 @@ Config.helpLinks.push({
     target: "new" // new|frame
 });
 
-
 Config.helpLinks.push({
     urls: [
         {
@@ -15,7 +14,7 @@ Config.helpLinks.push({
             class:'appstore'
         },
         {
-            url: "https://play.google.com/store/apps/details?id=jp.co.systemk.skvms",
+            url: "https://play.google.com/store/apps/details?id=com.senturiansolutions.sentry",
             class:'googleplay',
             button: "Android Client"
         }
@@ -27,5 +26,5 @@ Config.helpLinks.push({
 Config.allowDebugMode = false;
 Config.productName = 'Sentry Matrix';
 Config.cloud.productName = 'Sentry Cloud';
-
+Config.defaultLanguage = 'en_US';
 Config.supportedLanguages = ['en_US', 'zh_CN'];

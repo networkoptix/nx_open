@@ -6,6 +6,9 @@
 #include <QtGui/QColor>
 
 #include <common/common_meta_types.h>
+
+#include <health/system_health.h>
+
 #include <utils/common/app_info.h>
 
 #include <core/resource/resource_display_info.h>
@@ -24,6 +27,9 @@
 
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
+
+#include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
+#include <nx/client/desktop/export/settings/export_layout_persistent_settings.h>
 
 class QSettings;
 
@@ -142,10 +148,14 @@ public:
         INITIAL_LIVE_BUFFER_MSECS,
         MAXIMUM_LIVE_BUFFER_MSECS,
 
-        TIMELAPSE_SPEED,
-
         LAST_LOCAL_CONNECTION_URL,
         KNOWN_SERVER_URLS,
+
+        EXPORT_MEDIA_SETTINGS,
+        EXPORT_LAYOUT_SETTINGS,
+        EXPORT_BOOKMARK_SETTINGS,
+        LAST_EXPORT_MODE,
+
         VARIABLE_COUNT
     };
 
@@ -168,12 +178,17 @@ signals:
 protected:
     virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids) override;
 
-    virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
-    virtual void writeValueToSettings(QSettings *settings, int id, const QVariant &value) const override;
+    virtual QVariant readValueFromSettings(QSettings *settings, int id,
+        const QVariant& defaultValue) const override;
+    virtual void writeValueToSettings(QSettings *settings, int id,
+        const QVariant& value) const override;
 
     virtual UpdateStatus updateValue(int id, const QVariant &value) override;
 
 private:
+    using ExportMediaSettings = nx::client::desktop::ExportMediaPersistentSettings;
+    using ExportLayoutSettings = nx::client::desktop::ExportLayoutPersistentSettings;
+
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_RW_PROPERTY(int,                         maxSceneVideoItems,     setMaxSceneVideoItems,      MAX_SCENE_VIDEO_ITEMS,      24)
         QN_DECLARE_RW_PROPERTY(int,                         maxPreviewSearchItems,  setMaxPreviewSearchItems,   MAX_PREVIEW_SEARCH_ITEMS,   16)
@@ -188,7 +203,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QnWorkbenchStateList,        workbenchStates,        setWorkbenchStates,         WORKBENCH_STATES,           QnWorkbenchStateList())
         QN_DECLARE_RW_PROPERTY(QnLicenseWarningStateHash,   licenseWarningStates,   setLicenseWarningStates,    LICENSE_WARNING_STATES,     QnLicenseWarningStateHash())
         QN_DECLARE_RW_PROPERTY(QnConnectionData,            lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData())
-        QN_DECLARE_RW_PROPERTY(QUrl,                        lastLocalConnectionUrl, setLastLocalConnectionUrl,  LAST_LOCAL_CONNECTION_URL,  QUrl())
+        QN_DECLARE_RW_PROPERTY(QString,                     lastLocalConnectionUrl, setLastLocalConnectionUrl,  LAST_LOCAL_CONNECTION_URL,  QString())
         QN_DECLARE_RW_PROPERTY(QnConnectionDataList,        customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList())
         QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     locale,                 setLocale,                  LOCALE,                     QnAppInfo::defaultLanguage())
@@ -210,7 +225,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isClockWeekdayOn,       setClockWeekdayOn,          CLOCK_WEEKDAY,              false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockDateOn,          setClockDateOn,             CLOCK_DATE,                 false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockSecondsOn,       setClockSecondsOn,          CLOCK_SECONDS,              true)
-        QN_DECLARE_RW_PROPERTY(quint64,                     popupSystemHealth,      setPopupSystemHealth,       POPUP_SYSTEM_HEALTH,        0xFFFFFFFFFFFFFFFFull)
+        QN_DECLARE_RW_PROPERTY(QSet<QnSystemHealth::MessageType>, popupSystemHealth, setPopupSystemHealth,      POPUP_SYSTEM_HEALTH,        QnSystemHealth::allVisibleMessageTypes().toSet())
         QN_DECLARE_RW_PROPERTY(bool,                        autoStart,              setAutoStart,               AUTO_START,                 false)
         QN_DECLARE_RW_PROPERTY(bool,                        autoLogin,              setAutoLogin,               AUTO_LOGIN,                 false)
         QN_DECLARE_R_PROPERTY (int,                         statisticsNetworkFilter,                            STATISTICS_NETWORK_FILTER,  1)
@@ -220,17 +235,20 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isGlBlurEnabled,        setGlBlurEnabled,           GL_BLUR,                    true)
         QN_DECLARE_RW_PROPERTY(bool,                        isVSyncEnabled,         setVSyncEnabled,            GL_VSYNC,                   true)
         QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)
-        // TODO: #GDM #3.1 replace with full set of export parameters in json
-        //QN_DECLARE_RW_PROPERTY(Qt::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
+        QN_DECLARE_RW_PROPERTY(ExportMediaSettings,         exportMediaSettings,    setExportMediaSettings,     EXPORT_MEDIA_SETTINGS,      ExportMediaSettings())
+        QN_DECLARE_RW_PROPERTY(ExportLayoutSettings,        exportLayoutSettings,   setExportLayoutSettings,    EXPORT_LAYOUT_SETTINGS,     ExportLayoutSettings())
+        QN_DECLARE_RW_PROPERTY(ExportMediaSettings,         exportBookmarkSettings, setExportBookmarkSettings,  EXPORT_BOOKMARK_SETTINGS,   ExportMediaSettings({nx::client::desktop::ExportOverlayType::bookmark}))
+        QN_DECLARE_RW_PROPERTY(QString,                     lastExportMode,         setLastExportMode,          LAST_EXPORT_MODE,           lit("media"))
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0)
         QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
-        QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMSecs, setInitialLiveBufferMSecs,  INITIAL_LIVE_BUFFER_MSECS,  300)
         QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMSecs, setMaximumLiveBufferMSecs,  MAXIMUM_LIVE_BUFFER_MSECS,  600)
-        QN_DECLARE_RW_PROPERTY(int,                         timelapseSpeed,         setTimelapseSpeed,          TIMELAPSE_SPEED,            10)
+
+        // Was used earlier. Kept to migrate old settings.
+        QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();

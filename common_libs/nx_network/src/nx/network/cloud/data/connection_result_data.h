@@ -33,16 +33,16 @@ class NX_NETWORK_API ConnectionResultRequest:
     public StunRequestData
 {
 public:
-    constexpr static const stun::extension::methods::Value kMethod =
-        stun::extension::methods::connectionResult;
+    constexpr static const network::stun::extension::methods::Value kMethod =
+        network::stun::extension::methods::connectionResult;
 
     nx::String connectSessionId;
     NatTraversalResultCode resultCode;
     SystemError::ErrorCode sysErrorCode;
 
     ConnectionResultRequest();
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::hpm::api::NatTraversalResultCode)

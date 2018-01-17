@@ -39,14 +39,18 @@
 #include <ui/help/help_topics.h>
 
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/client/desktop/ui/workbench/handlers/layout_tours_handler.h>
+#include <nx/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
 
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/handlers/workbench_bookmarks_handler.h>
 #include <ui/workbench/handlers/workbench_connect_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
+#include <ui/workbench/handlers/workbench_permissions_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
-#include <ui/workbench/handlers/workbench_export_handler.h>
+#include <nx/client/desktop/export/workbench/workbench_export_handler.h>
+#include <nx/client/desktop/legacy/legacy_workbench_export_handler.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_ptz_handler.h>
 #include <ui/workbench/handlers/workbench_debug_handler.h>
@@ -58,8 +62,8 @@
 #include <ui/workbench/handlers/workbench_webpage_handler.h>
 #include <ui/workbench/handlers/workbench_screen_recording_handler.h>
 #include <ui/workbench/handlers/workbench_text_overlays_handler.h>
+#include <nx/client/desktop/analytics/analytics_action_handler.h>
 #include <nx/client/desktop/radass/radass_action_handler.h>
-#include <ui/workbench/handlers/workbench_analytics_handler.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
@@ -82,6 +86,7 @@
 #include <ui/workbench/workbench_ui.h>
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
 #include <ui/widgets/main_window_title_bar_widget.h>
@@ -95,15 +100,20 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_message_processor.h>
 
+#include <client_core/client_core_module.h>
+
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
 
-#include <nx/client/desktop/ui/workbench/handlers/layout_tours_handler.h>
+#include <nx/client/core/utils/geometry.h>
+
 #include <nx/utils/app_info.h>
 
 #include "resource_browser_widget.h"
 #include "layout_tab_bar.h"
 #include "dwm.h"
+
+using nx::client::core::Geometry;
 
 namespace nx {
 namespace client {
@@ -151,8 +161,12 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
         ),
     QnWorkbenchContextAware(context),
     m_dwm(nullptr),
-    m_currentPageHolder(new QStackedWidget()),
-    m_titleBar(new QnMainWindowTitleBarWidget(this)),
+    m_welcomeScreen(
+        qnRuntime->isDesktopMode()
+            ? new QnWorkbenchWelcomeScreen(qnClientCoreModule->mainQmlEngine(), this)
+            : nullptr),
+    m_currentPageHolder(new QStackedWidget(this)),
+    m_titleBar(new QnMainWindowTitleBarWidget(this, context)),
     m_titleVisible(true),
     m_drawCustomFrame(false),
     m_inFullscreenTransition(false)
@@ -236,8 +250,10 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchConnectHandler>();
     context->instance<QnWorkbenchNotificationsHandler>();
     context->instance<QnWorkbenchScreenshotHandler>();
-    context->instance<QnWorkbenchExportHandler>();
+    context->instance<WorkbenchExportHandler>();
+    context->instance<legacy::WorkbenchExportHandler>();
     context->instance<workbench::LayoutsHandler>();
+    context->instance<PermissionsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
     context->instance<QnWorkbenchVideoWallHandler>();
@@ -249,8 +265,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchTextOverlaysHandler>();
     context->instance<QnWorkbenchCloudHandler>();
     context->instance<workbench::LayoutToursHandler>();
-    context->instance<nx::client::desktop::RadassActionHandler>();
-    context->instance<QnWorkbenchAnalyticsHandler>();
+    context->instance<RadassActionHandler>();
+    context->instance<AnalyticsActionHandler>();
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
@@ -266,6 +282,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
+
+    context->instance<WorkbenchProgressManager>();
 
     /* Set up actions. Only these actions will be available through hotkeys. */
     addAction(action(action::NextLayoutAction));
@@ -310,6 +328,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     if (auto screenRecordingAction = action(action::ToggleScreenRecordingAction))
         addAction(screenRecordingAction);
     addAction(action(action::ShowFpsAction));
+    addAction(action(action::OpenNewSceneAction));
 
     connect(action(action::MaximizeAction), &QAction::toggled, this,
         &MainWindow::setMaximized);
@@ -340,19 +359,12 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     setLayout(m_globalLayout);
 
     if (qnRuntime->isDesktopMode())
-    {
         m_currentPageHolder->addWidget(new QWidget());
-    }
 
     m_currentPageHolder->addWidget(m_view.data());
 
     if (qnRuntime->isDesktopMode())
-    {
-        const auto welcomeScreen = context->instance<QnWorkbenchWelcomeScreen>();
-        connect(welcomeScreen, &QnWorkbenchWelcomeScreen::visibleChanged,
-            this, &MainWindow::updateWidgetsVisibility);
-        m_currentPageHolder->addWidget(welcomeScreen->widget());
-    }
+        m_currentPageHolder->addWidget(m_welcomeScreen);
 
     // Post-initialize.
     if (nx::utils::AppInfo::isMacOsX())
@@ -364,7 +376,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     if (nx::utils::AppInfo::isMacOsX())
         menu()->newMenu(action::MainScope);
 
-    if (!qnRuntime->isActiveXMode())
+    if (!qnRuntime->isActiveXMode() && !qnRuntime->isProfilerMode())
     {
         /* VSync workaround must always be enabled to limit fps usage in following cases:
          * * VSync is not supported by drivers
@@ -372,8 +384,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
          * * double buffering is disabled in drivers or in our program
          * Workaround must be disabled in activeX mode.
          */
-         QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
-         Q_UNUSED(vsyncWorkaround);
+        auto vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
+        Q_UNUSED(vsyncWorkaround);
     }
 
     updateWidgetsVisibility();
@@ -388,82 +400,49 @@ QWidget *MainWindow::viewport() const {
     return m_view->viewport();
 }
 
+QnWorkbenchWelcomeScreen* MainWindow::welcomeScreen() const
+{
+    return m_welcomeScreen;
+}
+
 bool MainWindow::isTitleVisible() const
 {
     if (!qnRuntime->isDesktopMode())
         return false;
 
-    return m_titleVisible || isWelcomeScreenVisible();
-}
-
-bool MainWindow::isWelcomeScreenVisible() const
-{
-    if (!qnRuntime->isDesktopMode())
-        return false;
-
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-    return (welcomeScreen && welcomeScreen->isVisible());
+    return m_titleVisible || m_welcomeScreenVisible;
 }
 
 void MainWindow::updateWidgetsVisibility()
 {
-    const auto updateWelcomeScreenVisibility =
-        [this](bool welcomeScreenIsVisible)
-        {
-            // In activeX and videowall mode there is only scene widget on a holder
-            if (!qnRuntime->isDesktopMode())
-            {
-                NX_EXPECT(m_currentPageHolder->count() == 1);
-                m_titleBar->setVisible(false);
-                return;
-            }
+    m_titleBar->setTabBarStuffVisible(!m_welcomeScreenVisible);
 
-            enum { kWorkaroundPage, kSceneIndex, kWelcomePageIndex };
+    if (m_welcomeScreenVisible)
+        m_currentPageHolder->setCurrentWidget(m_welcomeScreen);
+    else
+        m_currentPageHolder->setCurrentWidget(m_view.data());
 
-            NX_EXPECT(m_currentPageHolder->count() == 3);
+    // Always show title bar for welcome screen (it does not matter if it is fullscreen).
+    m_titleBar->setVisible(isTitleVisible());
 
-            // Due to flickering when switching between two opengl contexts
-            // we have to use intermediate non-opengl page switch.
-            m_currentPageHolder->setCurrentIndex(kWorkaroundPage);
+    /* Fix scene activation state (Qt bug workaround) */
+    if (!m_welcomeScreenVisible)
+    {
+        /*
+         * Fixes VMS-2413. The bug is following:
+         * QGraphicsScene contains activation counter.
+         * On WindowActivate counter is increased, on WindowsDeactivate (focus change, hide, etc) - decreased.
+         * There is scenario when WindowDeactivate is called twice (change focus to 'Reconnecting' dialog,
+         * then display Welcome Screen. In this case counter goes below zero, and the scene goes crazy.
+         * That's why I hate constructions like:
+         *   if (!--d->activationRefCount) { ... }
+         * --gdm
+         */
+        QEvent e(QEvent::WindowActivate);
+        QObject* sceneObject = m_scene.data();
+        sceneObject->event(&e);
+    }
 
-            if (welcomeScreenIsVisible)
-                m_titleBar->setVisible(isTitleVisible());
-            m_currentPageHolder->repaint();
-            if (!welcomeScreenIsVisible)
-                m_titleBar->setVisible(isTitleVisible());
-
-            m_currentPageHolder->setCurrentIndex(welcomeScreenIsVisible
-                ? kWelcomePageIndex : kSceneIndex);
-
-            /* Fix scene activation state (Qt bug workaround) */
-            if (welcomeScreenIsVisible)
-                return;
-
-            if (!display() || !display()->scene())
-                return;
-
-            if (display()->scene()->isActive())
-                return;
-
-            /*
-             * Fixes VMS-2413. The bug is following:
-             * QGraphicsScene contains activation counter.
-             * On WindowActivate counter is increased, on WindowsDeactivate (focus change, hide, etc) - decreased.
-             * There is scenario when WindowDeactivate is called twice (change focus to 'Reconnecting' dialog,
-             * then display Welcome Screen. In this case counter goes below zero, and the scene goes crazy.
-             * That's why I hate constructions like:
-             *   if (!--d->activationRefCount) { ... }
-             * --gdm
-             */
-            QEvent e(QEvent::WindowActivate);
-            QObject* sceneObject = display()->scene();
-            sceneObject->event(&e);
-        };
-
-    // Always show title bar for welcome screen (it does not matter if it is fullscreen)
-
-    m_titleBar->setTabBarStuffVisible(!isWelcomeScreenVisible());
-    updateWelcomeScreenVisibility(isWelcomeScreenVisible());
     updateDwmState();
 }
 
@@ -473,6 +452,16 @@ void MainWindow::setTitleVisible(bool visible)
         return;
 
     m_titleVisible = visible;
+
+    updateWidgetsVisibility();
+}
+
+void MainWindow::setWelcomeScreenVisible(bool visible)
+{
+    if (m_welcomeScreenVisible == visible)
+        return;
+
+    m_welcomeScreenVisible = visible;
 
     updateWidgetsVisibility();
 }
@@ -777,21 +766,24 @@ void MainWindow::updateDwmState()
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-bool MainWindow::event(QEvent *event) {
+bool MainWindow::event(QEvent* event)
+{
     bool result = base_type::event(event);
 
-    if ((event->type() == QEvent::WindowActivate) && isWelcomeScreenVisible())
+    if (event->type() == QEvent::WindowActivate)
     {
-        // Welcome screen looses focus after window deactivation. We restore it here.
-        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-        welcomeScreen->forceActiveFocus();
+        if (m_welcomeScreen && m_welcomeScreenVisible)
+        {
+            // Welcome screen looses focus after window deactivation. We restore it here.
+            m_welcomeScreen->forceActiveFocus();
+        }
     }
     else if (event->type() == QnEvent::WinSystemMenu)
     {
         action(action::MainMenuAction)->trigger();
     }
 
-    if(m_dwm != NULL)
+    if (m_dwm)
         result |= m_dwm->widgetEvent(event);
 
     return result;
@@ -855,7 +847,7 @@ Qt::WindowFrameSection MainWindow::windowFrameSectionAt(const QPoint &pos) const
     Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(
             Qn::calculateRectangularFrameSections(
                     rect(),
-                    QnGeometry::eroded(rect(), m_frameMargins),
+                    Geometry::eroded(rect(), m_frameMargins),
                     QRect(pos, pos)));
 
     if (m_options.testFlag(TitleBarDraggable) &&

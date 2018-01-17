@@ -11,13 +11,16 @@
 
 #include <nx_ec/data/api_layout_tour_data.h>
 
+#include <nx/client/desktop/radass/radass_resource_manager.h>
+#include <nx/client/desktop/radass/radass_types.h>
+
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
-
-#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <utils/math/math.h>
 
@@ -169,6 +172,8 @@ void LayoutTourExecutor::stopCurrentTour()
 
 void LayoutTourExecutor::resetTourItems(const ec2::ApiLayoutTourItemDataList& items)
 {
+    const auto radassManager = context()->instance<RadassResourceManager>();
+
     m_tour.items.clear();
 
     for (const auto& item: items)
@@ -177,15 +182,29 @@ void LayoutTourExecutor::resetTourItems(const ec2::ApiLayoutTourItemDataList& it
         if (!existing)
             continue;
 
-        auto existingLayout = existing.dynamicCast<QnLayoutResource>();
+        const auto existingLayout = existing.dynamicCast<QnLayoutResource>();
+
+        QHash<QnUuid, QnUuid> remapHash;
 
         QnLayoutResourcePtr layout = existingLayout
-            ? existingLayout->clone()
+            ? existingLayout->clone(&remapHash)
             : QnLayoutResource::createFromResource(existing);
 
         NX_EXPECT(layout);
         if (!layout)
             continue;
+
+        if (existingLayout)
+        {
+            for (auto iter = remapHash.cbegin(); iter != remapHash.cend(); ++iter)
+            {
+                const QnLayoutItemIndex oldIndex(existingLayout, iter.key());
+                const QnLayoutItemIndex newIndex(layout, iter.value());
+                const auto mode = radassManager->mode(oldIndex);
+                if (mode != RadassMode::Auto)
+                    radassManager->setMode(newIndex, mode);
+            }
+        }
 
         layout->addFlags(Qn::local);
         layout->setData(Qn::LayoutFlagsRole, qVariantFromValue(QnLayoutFlag::FixedViewport
@@ -321,7 +340,7 @@ void LayoutTourExecutor::setHintVisible(bool visible)
     {
         const auto hint = m_mode == Mode::MultipleLayouts
             ? tr("Use keyboard arrows to switch layouts. To exit the showreel press Esc.")
-            : tr("Use keyboard arrows to switch cameras. Press any key to stop the tour.");
+            : tr("Press any key to stop the tour.");
 
         m_hintLabel = QnGraphicsMessageBox::information(hint, kHintTimeoutMs);
     }

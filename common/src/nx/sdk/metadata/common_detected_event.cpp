@@ -1,10 +1,9 @@
 #include "common_detected_event.h"
+#include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace sdk {
 namespace metadata {
-
-
 
 void* CommonDetectedEvent::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
@@ -23,9 +22,9 @@ void* CommonDetectedEvent::queryInterface(const nxpl::NX_GUID& interfaceId)
 }
 
 
-nxpl::NX_GUID CommonDetectedEvent::eventTypeId() const
+nxpl::NX_GUID CommonDetectedEvent::typeId() const
 {
-    return m_eventTypeId;
+    return m_typeId;
 }
 
 float CommonDetectedEvent::confidence() const
@@ -53,9 +52,9 @@ bool CommonDetectedEvent::isActive() const
     return m_isActive;
 }
 
-void CommonDetectedEvent::setEventTypeId(const nxpl::NX_GUID& eventTypeId)
+void CommonDetectedEvent::setTypeId(const nxpl::NX_GUID& typeId)
 {
-    m_eventTypeId = eventTypeId;
+    m_typeId = typeId;
 }
 
 void CommonDetectedEvent::setConfidence(float confidence)
@@ -85,7 +84,7 @@ void CommonDetectedEvent::setIsActive(bool isActive)
 
 CommonDetectedEvent::~CommonDetectedEvent()
 {
-    qDebug() << "##### DESTROYING ITEM!!!!";
+    NX_VERBOSE(this, "DESTROYING ITEM");
 }
 
 } // namespace metadata

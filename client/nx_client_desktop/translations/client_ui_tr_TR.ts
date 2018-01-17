@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>Blur efekti etkin ise Intel HD Graphics sorun yaşayabilir. Etkinleştirme önerilmez.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>Blur efektini devre dışı bırak</translation>
     </message>
   </context>
   <context>
@@ -144,6 +144,29 @@
       <location/>
       <source>Instant</source>
       <translation>Derhal</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSdkEventWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
+      <source>Keywords separated by space</source>
+      <translation>Anahtar Kelimeler Boşluk İle Ayrılır</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Caption contains:</source>
+      <translation>Başlık İçeriği:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Description contains:</source>
+      <translation>Açıklama İçeriği:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Event Type:</source>
+      <translation>Etkinlik Türü:</translation>
     </message>
   </context>
   <context>
@@ -331,6 +354,34 @@
       <location/>
       <source>Post-recording:</source>
       <translation>Kayıt Sonrası Süre:</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
+      <source>Bookmark Info</source>
+      <translation>Yer işareti bilgi</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>Sil</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>Alan Genişliği</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>Yazı Tipi Boyutu</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Include description</source>
+      <translation>Açıklama</translation>
     </message>
   </context>
   <context>
@@ -578,58 +629,8 @@
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>I have read the manual and understand the risks</source>
-      <translation>Uyarıları Okudum ve Riskleri Anladım</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Camera Settings Control</source>
-      <translation>Kamera Ayar Kontrolü</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>Uyarı! Bu Kayıt Takvimindeki Kaliteyi ve FPS Ayarlarını Etkileyebilir.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Secondary Stream Control</source>
-      <translation>İkincil Akış Kontrolü</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Override secondary stream quality</source>
-      <translation>İkincil Akış Kalitesini Geçersiz Kıl</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Do not use</source>
-      <translation>Kullanma</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Low quality</source>
-      <translation>Düşük Kalite</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Medium quality</source>
-      <translation>Orta Kalite</translation>
-    </message>
-    <message>
-      <location/>
-      <source>High quality</source>
-      <translation>Yüksek Kalite</translation>
-    </message>
-    <message>
-      <location/>
       <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
       <translation>Uyarı! Yüksek Kalite Seçimi CPU ve Ağ Performansını Etkileyebilir ve Ek Sorunlara Yol Açabilir.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Archive control</source>
-      <translation>Arşiv Kontrolü</translation>
     </message>
     <message>
       <location/>
@@ -640,11 +641,6 @@
       <location/>
       <source>Do not archive secondary stream</source>
       <translation>İkincil Akışı Arşivleme</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Media streaming control</source>
-      <translation>Medya Akış Kontrolü</translation>
     </message>
     <message>
       <location/>
@@ -678,38 +674,8 @@
     </message>
     <message>
       <location/>
-      <source>Motion detection control</source>
-      <translation>Hareket algılama kontrolü</translation>
-    </message>
-    <message>
-      <location/>
       <source>Force motion detection for stream:</source>
       <translation>Hareket algılamayı bu akış için zorla:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-      <translation>Bitrate'i GOP a göre hesapla. ( kameranın bitratei yükselebilir)</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep camera streams and profiles settings</source>
-      <translation>Kamera akış ve profil ayarlarını koru</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation>&quot;Kameranın ayarlarını optimize etmek için Sistemi kapatın&quot;, Sistem Yönetimi'nde devre dışı bırakıldı.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
-      <translation>Uyarı! Bu ayarları değiştrimeniz önerilmez. Bu değişiklikler olası sistem sorunlarına yol açabilir.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>PTZ Control</source>
-      <translation>PTZ Kontrolü</translation>
     </message>
     <message>
       <location/>
@@ -720,6 +686,71 @@
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
       <translation>Uyarı! Yerli kamera hazır ayarları mevcut olmayacaktır.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+      <translation>Uyarı! Bu ayarları değiştrimeniz önerilmez. Bu değişiklikler olası sistem sorunlarına yol açabilir.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera Settings</source>
+      <translation>Kamera Ayarları</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Keep camera stream and profile settings</source>
+      <translation>Kamera akış ve profil ayarlarını koru</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
+      <translation>Kayıt Takvimindeki kalite ve kare hızı (FPS) ayarları uyumsuz hale gelecektir.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Calculate bitrate per GOP instead of bitrate per second</source>
+      <translation>Saniyede bit hızı yerine GOP başına bit hızını hesapla</translation>
+    </message>
+    <message>
+      <location/>
+      <source>It will increase bitrate for camera.</source>
+      <translation>Kameranın bitrate yükselecektir.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Secondary Stream</source>
+      <translation>İkincil akış</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable secondary stream</source>
+      <translation>İkincil akışı devre dışı bırakın</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality</source>
+      <translation>Kalite</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>Hareket Algılama</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Archive</source>
+      <translation>Arşiv</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Media Streaming</source>
+      <translation>Medya akışı</translation>
+    </message>
+    <message>
+      <location/>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
     </message>
   </context>
   <context>
@@ -867,6 +898,11 @@
       <location/>
       <source>Motion + Lo-Res</source>
       <translation>Hareket + Düşük Kalite</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Bitrate</source>
+      <translation>Bitrate</translation>
     </message>
   </context>
   <context>
@@ -1017,6 +1053,16 @@
       <source>HTTP URL</source>
       <translation>HTTP URL</translation>
     </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation>Kimlik doğrulama türü</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation>Talep Türü</translation>
+    </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
@@ -1024,6 +1070,42 @@
       <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
       <source>PTZ preset:</source>
       <translation>PTZ ön tanımlı pozisyon:</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportLayoutSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>Ayarları Dışa Aktar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Make read-only</source>
+      <translation>Salt-Okunur Dosya Oluştur</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportMediaSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>Ayarları Dışa Aktar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Apply Filters</source>
+      <translation>Filtre Uygula</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Rotation, Dewarping, Image Enhancement etc.</source>
+      <translation>Döndürme, Dewarping, Görüntü Geliştirme vb.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
+      <translation>Filtrelerin uygulanması ve yer paylaşımlarının eklenmesi, CPU kullanımını artırır ve önemli ölçüde zaman alabilecek kodlama gerektirir.</translation>
     </message>
   </context>
   <context>
@@ -1052,6 +1134,37 @@
       <location/>
       <source>Rapid Review speed</source>
       <translation>Gözden geçirme hızı</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
+      <source>Export Video</source>
+      <translation>Videoyu Dışa Aktar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Single Camera</source>
+      <translation>Tek Kamera</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Export Settings</source>
+      <translation>Ayarları Dışa Aktar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Multi Video</source>
+      <translation>Çoklu Video</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilenamePanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/common/widgets/filename_panel.ui"/>
+      <source>Browse...</source>
+      <translation>Gözat...</translation>
     </message>
   </context>
   <context>
@@ -1199,6 +1312,39 @@
       <location/>
       <source>Rotation</source>
       <translation>Döndürme</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImageOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
+      <source>Image</source>
+      <translation>Resim</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>Sil</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Size</source>
+      <translation>Boyut</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>Opasite</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default</source>
+      <translation>Varsayılan</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>Gözat...</translation>
     </message>
   </context>
   <context>
@@ -1618,8 +1764,8 @@
     </message>
     <message>
       <location/>
-      <source>Showreel cycle</source>
-      <translation>Showreel döngüsü</translation>
+      <source>Tour cycle</source>
+      <translation>Tur periyodu</translation>
     </message>
   </context>
   <context>
@@ -2125,6 +2271,39 @@
     </message>
   </context>
   <context>
+    <name>RapidReviewSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
+      <source>Rapid Review</source>
+      <translation>Hızlı gözden geçirme</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Initial video length</source>
+      <translation>Geçersiz video boyutu</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Exported video length</source>
+      <translation>Dışa aktarılan Video uzunluğu</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Speed</source>
+      <translation>Hız</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frames interval</source>
+      <translation>Zaman Aralığı</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset Speed</source>
+      <translation>Hızı Sıfırla</translation>
+    </message>
+  </context>
+  <context>
     <name>ReconnectInfoDialog</name>
     <message>
       <location filename="../src/ui/dialogs/reconnect_info_dialog.ui"/>
@@ -2514,7 +2693,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation>TextLabel</translation>
+      <translation type="unfinished">TextLabel</translation>
     </message>
   </context>
   <context>
@@ -2778,6 +2957,34 @@
     </message>
   </context>
   <context>
+    <name>TextOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
+      <source>Text</source>
+      <translation>Metin</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>Sil</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>Yazı Tipi Boyutu</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enter plain text or HTML</source>
+      <translation>Düz metin veya HTML girin</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>Alan Genişliği</translation>
+    </message>
+  </context>
+  <context>
     <name>TimeServerSelectionWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
@@ -2788,6 +2995,29 @@
       <location/>
       <source>Sync time with the Internet</source>
       <translation>Internet üzerinden tarihi eşitle</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimestampOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
+      <source>Timestamp</source>
+      <translation>Zaman Bilgisi</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>Yazı Tipi Boyutu</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Format</source>
+      <translation>Biçim</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>Sil</translation>
     </message>
   </context>
   <context>

@@ -1,117 +1,204 @@
 {
-  "language_name":"Français",
-  "dialogs":{
-    "okButton":"Ok",
-    "openLink":"Visitez ce lien",
-    "openLinkWithTitle":"À {{title}}, visitez ce lien"
-  },
-  "setup":{
-    "createAccount":"créer compte",
-    "errorNoHDD":"Ce périphérique sert à travailler avec le disque dur installé. <br>S.V.P éteindre l’appareil et installer un disque dur.",
-    "errorNoNetwork":"Cet appareil a besoin de connexion réseau pour fonctionner. <br>S.V.P connecter au réseau local ou Internet"
-  },
-  "passwordRequirements":{
-    "minLengthMessage":"Mot de passe doit avoir au moins 8 caractères",
-    "requiredMessage":"Uniquement lettres latines, chiffres et symboles clavier sont autorisés",
-    "weakMessage":"Mot de passe doit contenir différents types de symboles",
-    "strongMessage":"Mot de passe fort!",
-    "commonMessage":"Ce mot de passe est dans la liste des mots de passe plus populaires"
-  },
-  "settings":{
-    "tabs":{
-      "server":"Serveur",
-      "system":"Système",
-      "device":"Périphérique"
+    "language_name": "Français",
+    "dialogs": {
+        "okButton": "Ok",
+        "openLink": "Visitez ce lien",
+        "openLinkWithTitle": "À {{title}}, visitez ce lien"
     },
-    "confirmRestart":"Redémarrer serveur?",
-    "couldntCheckInternet":"Impossible de vérifier la connexion nuage",
-    "confirmRestoreDefault":"Effacer la base de données et paramètres? Ce processus prendra du temps et le serveur sera redémarré après.",
-    "confirmRestoreDefaultTitle":"Restaurer les paramètres par défaut",
-    "unexpectedError":"Échec : une erreur inattendue survenue",
-    "connnetionError":"Erreur de connexion",
-    "wrongPassword":"Mot de passe incorrect.",
-    "error":"Erreur: ",
-    "restartNeeded":"Changements enregistrées. Redémarrer le serveur pour appliquer?",
-    "settingsSaved":"Paramètres enregistrés",
-    "confirmHardwareRestart":"Redémarrer le système d’exploitation du serveur?",
-    "confirmRestoreSettings":"Restaurer tous les paramètres du serveur? Les archives seront gardéess, mais les paramètres réseau seront réinitialisés.",
-    "confirmRestoreSettingsNotNetwork":"Réinitialiser la configuration du serveur? Archives et paramètres réseau seront enregistrées.",
-    "unavailable":"Non disponible",
-    "unsafePortConfirm":"Il n’est pas sécuritaire d’utiliser un port inférieur à 1025. Le Serveur ne sera peut-être pas accessible. Continuer quand même?",
-    "confirmDisconnectFromCloud":"Déconnecter le système de {{CLOUD_NAME}}",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'> Tous les utilisateurs de nuages seront supprimés.</span> <br><br>Système sera accessible via un réseau local avec le compte administrateur local.",
-    "confirmDisconnectFromCloudAction":"Déconnecter",
-    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
-    "confirmDisconnectFromSystem":"Detach server from current system",
-    "confirmDisconnectFromSystemTitle":"",
-    "confirmDisconnectFromSystemAction":"Detach",
-    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
-    "connectedSuccess":"Système connecté avec succès",
-    "createLocalOwnerTitle":"Créer administrateur local",
-    "confirmChangePassword":"Changer mot de passe admin",
-    "confirmChangePasswordTitle":"Changer mot de passe système? Cela affectera l’utilisateur \"admin\" et mot de passe root pour certains serveurs",
-    "confirmChangePasswordAction":"Enregistrer nouveau mot de passe",
-    "nx1ControlHint":"Application Client démarrée. Utiliser un clavier/souris ou une application mobile pour contrôler."
-  },
-  "info":{
-    "tabs":{
-      "healthMonitoring":"Moniteur de santé",
-      "storage":"Stockage",
-      "log":"Journal"
+    "setup": {
+        "createAccount": "créer compte",
+        "errorNoHDD": "Ce périphérique sert à travailler avec le disque dur installé.<br>S.V.P éteindre l’appareil et installer un disque dur.",
+        "errorNoNetwork": "Cet appareil a besoin de connexion réseau pour fonctionner.<br>S.V.P connecter au réseau local ou Internet"
+    },
+    "passwordRequirements": {
+        "minLengthMessage": "Mot de passe doit avoir au moins 8 caractères",
+        "requiredMessage": "Uniquement lettres latines, chiffres et symboles clavier sont autorisés",
+        "weakMessage": "Mot de passe doit contenir différents types de symboles",
+        "strongMessage": "Mot de passe fort!",
+        "commonMessage": "Ce mot de passe est dans la liste des mots de passe plus populaires"
+    },
+    "settings": {
+        "tabs": {
+            "server": "Serveur",
+            "system": "Système",
+            "device": "Périphérique"
+        },
+        "confirmRestart": "Redémarrer serveur?",
+        "couldntCheckInternet": "Impossible de vérifier la connexion nuage",
+        "confirmRestoreDefault": "Effacer la base de données et paramètres? Ce processus prendra du temps et le serveur sera redémarré après.",
+        "confirmRestoreDefaultTitle": "Restaurer les paramètres par défaut",
+        "unexpectedError": "Échec : une erreur inattendue survenue",
+        "connnetionError": "Erreur de connexion",
+        "wrongPassword": "Mot de passe incorrect.",
+        "error": "Erreur: ",
+        "restartNeeded": "Changements enregistrées. Redémarrer le serveur pour appliquer?",
+        "settingsSaved": "Paramètres enregistrés",
+        "confirmHardwareRestart": "Redémarrer le système d’exploitation du serveur?",
+        "confirmRestoreSettings": "Restaurer tous les paramètres du serveur? Les archives seront gardéess, mais les paramètres réseau seront réinitialisés.",
+        "confirmRestoreSettingsNotNetwork": "Réinitialiser la configuration du serveur? Archives et paramètres réseau seront enregistrées.",
+        "unavailable": "Non disponible",
+        "unsafePortConfirm": "Il n’est pas sécuritaire d’utiliser un port inférieur à 1025. Le Serveur ne sera peut-être pas accessible. Continuer quand même?",
+        "confirmDisconnectFromCloud": "Déconnecter le système de {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'> Tous les utilisateurs de nuages seront supprimés.</span> <br><br>Système sera accessible via un réseau local avec le compte administrateur local.",
+        "confirmDisconnectFromCloudAction": "Déconnecter",
+        "disconnectedFromCloudSuccess": "Système a été déconnecté de {{CLOUD_NAME}} avec succès",
+        "confirmDisconnectFromSystem": "Détacher le serveur du système actuel",
+        "confirmDisconnectFromSystemAction": "Détacher",
+        "disconnectedFromSystemSuccess": "Serveur a été détachée du système avec succès",
+        "connectedSuccess": "Système connecté avec succès",
+        "createLocalOwnerTitle": "Créer administrateur local",
+        "confirmChangePassword": "Changer mot de passe admin",
+        "confirmChangePasswordTitle": "Changer mot de passe système? Cela affectera l’utilisateur \"admin\" et mot de passe root pour certains serveurs",
+        "confirmChangePasswordAction": "Enregistrer nouveau mot de passe",
+        "nx1ControlHint": "Application Client démarrée. Utiliser un clavier/souris ou une application mobile pour contrôler."
+    },
+    "settingsConfig": {
+        "arecontRtspEnabled": "Arecont RTSP activé",
+        "auditTrailEnabled": "Piste d'audit activée",
+        "auditTrailPeriodDays": "Audit trail period days",
+        "autoDiscoveryEnabled": "Activer la détection automatique de périphérique",
+        "autoUpdateThumbnails": "Auto-update thumbnails",
+        "backupNewCamerasByDefault": "Sauvegarde de nouvelles caméras par défaut",
+        "backupQualities": "Qualités de sauvegarde",
+        "cameraSettingsOptimization": "Autoriser l'optimisation de paramètre périphérique",
+        "clientStatisticsSettingsUrl": "Client statistics relative url",
+        "cloudAccountName": "Compte propriétaire du Nuage",
+        "cloudConnectRelayingEnabled": "Enable relaying for cloud connect",
+        "cloudConnectUdpHolePunchingEnabled": "Enable UDP hole punching for cloud connect",
+        "cloudHost": "Hôte Nuage",
+        "cloudSystemID": "Id système nuage",
+        "disabledVendors": "Vendeurs Désactivés",
+        "ec2AliveUpdateIntervalSec": "Intervalle de mise à jour système actif (secondes)",
+        "ec2ConnectionKeepAliveTimeoutSec": "Temps Mort de connexion 'Keep Alive' (secondes)",
+        "ec2KeepAliveProbeCount": "Sondes de connexion 'Keep Alive' (secondes)",
+        "emailFrom": "Courriel de",
+        "emailSignature": "Signature Courriel",
+        "emailSupportEmail": "Support Courriel",
+        "enableEdgeRecording": "Enable edge recording",
+        "eventLogPeriodDays": "Event log period (days)",
+        "hanwhaDeleteProfilesOnInitIfNeeded": "Delete camera profiles on init if needed",
+        "ldapAdminDn": "LDAP admin DN",
+        "ldapSearchBase": "LDAP Base de recherche",
+        "ldapSearchFilter": "LDAP Filtre de recherche",
+        "ldapUri": "LDAP URL",
+        "localSystemId": "Local System ID",
+        "maxDifferenceBetweenSynchronizedAndInternetTime": "Max difference between synchronized and Internet time (milliseconds)",
+        "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max difference between synchronized and local time (milliseconds)",
+        "maxRecordQueueSizeBytes": "Max record queue size (bytes)",
+        "maxRecordQueueSizeElements": "Max record queue size (elements)",
+        "maxRemoteArchiveSynchronizationThreads": "Max remote archive synchronization threads",
+        "maxSceneItems": "Max scene items (0 means default)",
+        "proxyConnectTimeoutSec": "Délai de connexion du proxy (secondes)",
+        "rtpTimeoutMs": "RTP timeout (milliseconds)",
+        "sequentialFlirOnvifSearcherEnabled": "Use sequential Flir Onvif searcher",
+        "serverDiscoveryPingTimeoutSec": "Délai de découverte du serveur",
+        "smtpConnectionType": "Type de connexion SMTP",
+        "smtpHost": "Hôte SMTP",
+        "smtpPort": "Port SMTP",
+        "smtpSimple": "SMTP simple",
+        "smtpTimeout": "Délai d’attente SMTP",
+        "smtpUser": "Usager SMTP",
+        "statisticsAllowed": "Envoyer des statistiques d'utilisation et des rapports d'erreur anonymes",
+        "statisticsReportLastNumber": "Rapport statistique - dernier numéro",
+        "statisticsReportLastTime": "Rapport statistique - dernière fois",
+        "statisticsReportLastVersion": "Statistics report - last version",
+        "statisticsReportServerApi": "Serveur de statistiques api",
+        "statisticsReportTimeCycle": "Intervalle de rapport de statistiques",
+        "statisticsReportUpdateDelay": "Statistics report - update delay",
+        "synchronizeTimeWithInternet": "Synchronize time with Internet",
+        "systemName": "Nom Système",
+        "takeCameraOwnershipWithoutLock": "Prendre propriété des caméras sans verrou",
+        "timeSynchronizationEnabled": "Synchronisation de l'heure activée",
+        "updateNotificationsEnabled": "Notifications de mise à jour activées",
+        "upnpPortMappingEnabled": "Mappage de port UPNP activé",
+        "useTextEmailFormat": "Send plain-text emails"
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "Moniteur de santé",
+            "storage": "Stockage",
+            "log": "Journal"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "Système inaccessible ou n’existe pas.",
+        "incorrectCurrentPassword": "Mot de passe actuel incorrect.",
+        "incorrectRemotePassword": "Identifiant ou mot de passe incorrect.",
+        "incompatibleVersion": "Système est inaccessible, il n’existe pas ou a version incompatible.",
+        "wrongUrl": "Impossible de se connecter au serveur spécifié.",
+        "newSystemError": "Impossible de fusionner les systèmes. Système distant n’est pas configuré.",
+        "safeMode": "Impossible de fusionner les systèmes. Système distant en mode sans échec.",
+        "configError": "Impossible de fusionner les systèmes. Un des systèmes est peut-être en mode sans échec.",
+        "cloudError": "Impossible de fusionner les systèmes. Le système dépendant est connecté au nuage. Vous devez tout d’abord déconnecter.",
+        "cloudBothError": "Impossible de fusionner les systèmes. Ils sont reliés aux nuages. Vous devez en déconnecter un.",
+        "cloudHostConflict": "Impossible de fusionner les systèmes, parce que les serveurs sont conçus avec de différents hôtes nuages",
+        "licenceError": "Attention! Vous êtes sur le point de fusionner les systèmes disposant de licences Starter. Une seule licence Starter est autorisé par système, donc la seconde licence sera désactivée. Fusionner quand même ?",
+        "connectionFailed": "Échec de connexion: ",
+        "unknownError": "Erreur inconnue",
+        "mergeFailed": "Échec de fusion: ",
+        "mergeSucceed": "Fusion réussie.",
+        "newSystemDisplayName": "Nouveau système",
+        "incompatibleProtocol": "version incompatible",
+        "incompatibleCloudHost": "conflit de nuage",
+        "incompatibleCloudState": "nuage connecté"
+    },
+    "login": {
+        "incorrectPassword": "Identifiant ou mot de passe incorrect"
+    },
+    "navigaion": {
+        "cannotGetUser": "Panne du serveur : impossible de récupérer les données d’usager actuel"
+    },
+    "offlineDialog": {
+        "serverOffline": "serveur hors ligne"
+    },
+    "restartDialog": {
+        "serverStarting": "démarrage du serveur",
+        "serverRestarting": "redémarrage du serveur",
+        "serverOffline": "serveur hors ligne"
+    },
+    "fileUpload": {
+        "started": "Mise à jour démarré avec succès. Cela prendra plusieurs minutes",
+        "upToDate": "Mise à jour échoué. La version fournie est déjà installée.",
+        "invalidFile": "Mise à jour échoué. Fichier fourni n’est pas une archive de mise à jour valide.",
+        "incompatibleSystem": "Mise à jour a échoué. Fichier fourni est ciblé pour un autre système.",
+        "extractionError": "Mise à jour a échoué. Espace insuffisant pour extraire l’archive, confimez stockage disponible.",
+        "installationError": "Mise à jour a échoué. Ne peut pas exécuter le script d’installation.",
+        "selectFiles": "Sélectionner fichiers"
+    },
+    "advanced": {
+        "free": "Gratuit",
+        "total": "Total",
+        "occupied": "Occupé",
+        "reserved": "Réservés"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} interface web"
+    },
+    "common": {
+        "systemOffline": "System Hors ligne",
+        "cameraLinks": {
+            "copyToClipboard": "copier vers Presse-Papier",
+            "highStream": "Flux Haut",
+            "copyDefaultText": "copier",
+            "unknown": "Inconnu",
+            "lowStream": "Flux Bas",
+            "transcoding": "Transcodage",
+            "copyActiveText": "copié dans le presse-papiers"
+        },
+        "searchCamPlaceholder": "recherche",
+        "cameraStates": {
+            "noFormat": "Ce navigateur ou le périphérique ne supporte pas la lecture vidéo de cette caméra.",
+            "ieWin10": "S.V.P, utilisez les navigateurs Edge Microsoft ou Google Chrome.",
+            "iosVideoTooLarge": "iOS ne supporte pas une vidéo supérieure à fullHD (2MP : 1920 x 1080).",
+            "unauthorized": "Authentification requise",
+            "ubuntuNX": "Ce navigateur ne supporte pas la vidéo à partir de serveurs ARM. S.V.P, utilisez un navigateur Chromium.",
+            "ieNoWebm": "Veuillez installer <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> pour Internet Explorer.",
+            "flashOrWebmRequired": "S.V.P. <a href='https://get.adobe.com/flashplayer/' target='_blank'> installer Adobe Flash</a> ou le <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> codec WebM</a> pour la lecture vidéo dans Internet Explorer.",
+            "noArmSupport": "Ce navigateur ou ce périphérique ne supporte pas la lecture vidéo à partir de serveurs basés sur ARM.",
+            "error": "Erreur",
+            "offline": "Hors ligne",
+            "noData": "Aucune donnée",
+            "flashRequired": "S.V.P.<a href='https://get.adobe.com/flashplayer/' target='_blank'> installer Adobe Flash</a> pour la lecture vidéo à partir de serveurs ARM."
+        }
     }
-  },
-  "join":{
-    "systemIsUnreacheble":"Système inaccessible ou n’existe pas.",
-    "incorrectCurrentPassword":"Mot de passe actuel incorrect.",
-    "incorrectRemotePassword":"Identifiant ou mot de passe incorrect.",
-    "incompatibleVersion":"Système est inaccessible, il n’existe pas ou a version incompatible.",
-    "wrongUrl":"Impossible de se connecter au serveur spécifié.",
-    "newSystemError":"Impossible de fusionner les systèmes. Système distant n’est pas configuré.",
-    "safeMode":"Impossible de fusionner les systèmes. Système distant en mode sans échec.",
-    "configError":"Impossible de fusionner les systèmes. Un des systèmes est peut-être en mode sans échec.",
-    "cloudError":"Impossible de fusionner les systèmes. Le système dépendant est connecté au nuage. Vous devez tout d’abord déconnecter.",
-    "cloudBothError":"Impossible de fusionner les systèmes. Ils sont reliés aux nuages. Vous devez en déconnecter un.",
-    "cloudHostConflict":"Impossible de fusionner les systèmes, parce que les serveurs sont conçus avec de différents hôtes nuages",
-    "licenceError":"Attention! Vous êtes sur le point de fusionner les systèmes disposant de licences Starter. Une seule licence Starter est autorisé par système, donc la seconde licence sera désactivée. Fusionner quand même ?",
-    "connectionFailed":"Échec de connexion: ",
-    "unknownError":"Erreur inconnue",
-    "mergeFailed":"Échec de fusion: ",
-    "mergeSucceed":"Fusion réussie.",
-    "newSystemDisplayName":"Nouveau système",
-    "incompatibleProtocol":"version incompatible",
-    "incompatibleCloudHost":"conflit de nuage",
-    "incompatibleCloudState":"nuage connecté"
-  },
-  "login":{
-    "incorrectPassword":"Identifiant ou mot de passe incorrect"
-  },
-  "navigaion":{
-    "cannotGetUser":"Panne du serveur : impossible de récupérer les données d’usager actuel"
-  },
-  "offlineDialog":{
-    "serverOffline":"serveur hors ligne"
-  },
-  "restartDialog":{
-    "serverStarting":"démarrage du serveur",
-    "serverRestarting":"redémarrage du serveur",
-    "serverOffline":"serveur hors ligne"
-  },
-  "fileUpload":{
-    "started":"Mise à jour démarré avec succès. Cela prendra plusieurs minutes",
-    "upToDate":"Mise à jour échoué. La version fournie est déjà installée.",
-    "invalidFile":"Mise à jour échoué. Fichier fourni n’est pas une archive de mise à jour valide.",
-    "incompatibleSystem":"Mise à jour a échoué. Fichier fourni est ciblé pour un autre système.",
-    "extractionError":"Mise à jour a échoué. Espace insuffisant pour extraire l’archive, confimez stockage disponible.",
-    "installationError":"Mise à jour a échoué. Ne peut pas exécuter le script d’installation.",
-    "selectFiles":"Sélectionner fichiers"
-  },
-  "advanced":{
-    "free":"Gratuit",
-    "total":"Total",
-    "occupied":"Occupé",
-    "reserved":"Réservés"
-  },
-  "pageTitles":{
-    "default":"{{PRODUCT_NAME}} interface web"
-  }
 }

@@ -1,5 +1,4 @@
-#ifndef REQUEST_PROCESSOR_H
-#define REQUEST_PROCESSOR_H
+#pragma once
 
 #include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/network/stun/message_dispatcher.h>
@@ -7,11 +6,10 @@
 #include "cloud_data_provider.h"
 #include "server/stun_request_processing_helper.h"
 
-
 namespace nx {
 namespace hpm {
 
-/** TODO #ak replace this structure with something not related to "system" and "server" */
+// TODO: #ak Replace this structure with something not related to "system" and "server".
 struct MediaserverData
 {
     String systemId;
@@ -55,15 +53,16 @@ struct MediaserverData
 class RequestProcessor
 {
 public:
-    RequestProcessor( AbstractCloudDataProvider* cloudData );
-    virtual ~RequestProcessor() = 0;
+    RequestProcessor(AbstractCloudDataProvider* cloudData);
+    virtual ~RequestProcessor() = default;
 
 protected:
-
-    /** Returns mediaserver data from \a request */
+    /**
+     * @return mediaserver data from request.
+     */
     api::ResultCode getMediaserverData(
-        const ConnectionStrongRef& connection,
-        stun::Message& request,
+        const nx::network::stun::AbstractServerConnection& connection,
+        network::stun::Message& request,
         MediaserverData* const foundData,
         nx::String* errorMessage);
 
@@ -73,5 +72,3 @@ private:
 
 } // namespace hpm
 } // namespace nx
-
-#endif // REQUEST_PROCESSOR_H

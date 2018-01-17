@@ -69,7 +69,7 @@ protected:
         addSetting("--cloud_db/endpoint=" + settingValue);
     }
 
-    void assertCloudDbUrlEqualTo(const boost::optional<QUrl>& expected)
+    void assertCloudDbUrlEqualTo(const boost::optional<nx::utils::Url>& expected)
     {
         loadSettings();
 
@@ -86,26 +86,26 @@ TEST_F(SettingsCloudDbUrl, no_url)
 TEST_F(SettingsCloudDbUrl, parsing_url_passed_to_endpoint_setting)
 {
     whenPassedStringAsCloudDbEndpoint("http://cloud-test.hdw.mx:33461");
-    assertCloudDbUrlEqualTo(QUrl("http://cloud-test.hdw.mx:33461"));
+    assertCloudDbUrlEqualTo(nx::utils::Url("http://cloud-test.hdw.mx:33461"));
 }
 
 TEST_F(SettingsCloudDbUrl, parsing_endpoint_setting)
 {
     whenPassedStringAsCloudDbEndpoint("cloud-test.hdw.mx:33461");
-    assertCloudDbUrlEqualTo(QUrl("http://cloud-test.hdw.mx:33461"));
+    assertCloudDbUrlEqualTo(nx::utils::Url("http://cloud-test.hdw.mx:33461"));
 }
 
 TEST_F(SettingsCloudDbUrl, endpoint_setting_is_ignored_ifurl_is_present)
 {
     whenPassedCloudDbUrl("http://cloud-dev.hdw.mx:12345");
     whenPassedStringAsCloudDbEndpoint("cloud-test.hdw.mx:33461");
-    assertCloudDbUrlEqualTo(QUrl("http://cloud-dev.hdw.mx:12345"));
+    assertCloudDbUrlEqualTo(nx::utils::Url("http://cloud-dev.hdw.mx:12345"));
 }
 
 TEST_F(SettingsCloudDbUrl, passing_only_url)
 {
     whenPassedCloudDbUrl("http://cloud-dev.hdw.mx:12345");
-    assertCloudDbUrlEqualTo(QUrl("http://cloud-dev.hdw.mx:12345"));
+    assertCloudDbUrlEqualTo(nx::utils::Url("http://cloud-dev.hdw.mx:12345"));
 }
 
 //-------------------------------------------------------------------------------------------------

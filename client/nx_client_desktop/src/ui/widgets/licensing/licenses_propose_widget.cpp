@@ -17,7 +17,7 @@ using namespace nx::client::desktop::ui;
 
 QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
     QWidget(parent),
-    QnWorkbenchContextAware(parent, true),
+    QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::manual),
     QnUpdatable(),
     ui(new Ui::LicensesProposeWidget)
 {
@@ -121,7 +121,7 @@ void QnLicensesProposeWidget::updateFromResources()
     QString title;
     if (analogCameras == m_cameras.size())
     {
-        title = tr("Use analog licenses to view these %n cameras", "", analogCameras);
+        title = tr("Use licenses to view these %n cameras", "", analogCameras);
     }
     else
     {

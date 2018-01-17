@@ -1,10 +1,10 @@
-#ifndef STUN_ASYNC_CLIENT_MOCK_H
-#define STUN_ASYNC_CLIENT_MOCK_H
+#pragma once
 
 #include <gmock/gmock.h>
 #include <nx/network/stun/async_client.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -28,7 +28,7 @@ public:
         stopWhileInAioThread();
     }
 
-    virtual void connect(const QUrl&, ConnectHandler) override {}
+    virtual void connect(const nx::utils::Url&, ConnectHandler) override {}
     MOCK_METHOD3(setIndicationHandler, bool(int, IndicationHandler, void*));
     MOCK_METHOD2(addOnReconnectedHandler, void(ReconnectHandler, void*));
     MOCK_METHOD3(addConnectionTimer, bool(std::chrono::milliseconds, TimerHandler, void*));
@@ -90,8 +90,7 @@ private:
     }
 };
 
-} // test
-} // stun
-} // nx
-
-#endif // STUN_ASYNC_CLIENT_MOCK_H
+} // namespace test
+} // namespace stun
+} // namespace network
+} // namespace nx

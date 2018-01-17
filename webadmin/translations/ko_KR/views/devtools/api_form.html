@@ -12,9 +12,7 @@
          ng-if="!param.proprietary || allowProprietary"
          ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false'}">
         <label class="col-sm-2 control-label" for="{{param.name}}">
-            {{param.name}}
-            <small ng-if="param.optional=='false'">(required)</small>
-            <small ng-if="param.proprietary">(proprietary)</small>
+            {{param.name}} <small ng-if="param.optional=='false'"> (필수) </small> <small ng-if="param.proprietary"> (독점적) </small>
         </label>
         <div class="col-sm-10">
             <p class="form-control-static" ng-if="param.description.xml"
@@ -51,9 +49,7 @@
          ng-if="!param.proprietary || allowProprietary"
          ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false' && param.type != 'info'}">
         <label class="col-sm-2 control-label" for="{{param.name}}">
-            {{param.name}}
-            <small ng-if="param.optional=='false'">(required)</small>
-            <small ng-if="param.proprietary">(proprietary)</small>
+            {{param.name}} <small ng-if="param.optional=='false'"> (필수) </small> <small ng-if="param.proprietary"> (독점적) </small>
         </label>
         <div class="col-sm-10">
 
@@ -85,7 +81,7 @@
                     </span>
                 </div>
                 <p class="help-block" ng-switch-when="timestamp">
-                    <i>Timestamp: {{apiMethod.params[param.name].getTime()}}</i>
+                    <i>타임 스탬프: {{apiMethod.params[param.name].getTime()}}</i>
                 </p>
 
                 <input type="text"
@@ -101,7 +97,7 @@
                        typeahead-focus
  class="form-control input-sm">
                 <p class="help-block" ng-switch-when="camera">
-                    <i>Selected camera: {{cameraIds[apiMethod.params[param.name]].name}}</i>
+                    <i>선택된 카메라: {{cameraIds[apiMethod.params[param.name]].name}}</i>
                 </p>
 
                 <span ng-switch-when="info"></span>
@@ -124,24 +120,24 @@
         <div class="col-sm-offset-2 col-sm-10">
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" ng-model="apiMethod.addCredentials"> Use credentials
+                    <input type="checkbox" ng-model="apiMethod.addCredentials"> 인증 사용
                 </label>
-                <p class="help-block">Add login and password to url</p>
+                <p class="help-block">Url에 로그인 과 패스워드 추가</p>
             </div>
         </div>
     </div>
 
     <div class="form-group" ng-if="apiMethod.addCredentials">
-        <label class="col-sm-2 control-label" for="useLogin">Login</label>
+        <label class="col-sm-2 control-label" for="useLogin">로그인</label>
         <div class="col-sm-10">
             <input id="useLogin" type="text" class="form-control input-sm"
                    ng-model="apiMethod.login">
-            <p class="help-block">It is recommended to create dedicated user for integrations</p>
+            <p class="help-block">통합을 위해 전용 사용자를 만드는 것이 좋습니다</p>
         </div>
     </div>
 
     <div class="form-group" ng-if="apiMethod.addCredentials">
-        <label class="col-sm-2 control-label" for="usePassword">Password</label>
+        <label class="col-sm-2 control-label" for="usePassword">패스워드</label>
         <div class="col-sm-10">
             <input id="usePassword" type="text" class="form-control input-sm"
                    ng-model="apiMethod.password">
@@ -156,12 +152,12 @@
             <p class="help-block" ng-if="clipboardSupported">
                 <a clipboard
  supported="clipboardSupported"
-                   text="getDebugUrl()" href="">Copy to clipboard</a>
+                   text="getDebugUrl()" href="">클립보드에 복사</a>
             </p>
         </div>
     </div>
     <div class="form-group" ng-if="apiMethod.method=='POST'">
-        <label class="col-sm-2 control-label">POST data</label>
+        <label class="col-sm-2 control-label">POST 데이터</label>
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{getPostData()}}</textarea>
             <p class="help-block">
@@ -174,9 +170,8 @@
         <div class="col-sm-offset-2 col-sm-10">
             <button type="submit"
                     ng-if="apiMethod.method=='GET' || apiMethod.method=='POST'"
-                    class="btn btn-primary" ng-click="testMethod()">Test method</button>
-            <a class="btn btn-default" ng-if="apiMethod.method=='GET'"
-               ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
+                    class="btn btn-primary" ng-click="testMethod()"> 시험 방법 </button> <a class="btn btn-default" ng-if="apiMethod.method=='GET'"
+               ng-href="{{getDebugUrl()}}" target="_blank"> 새 탭에서 열기 </a>
         </div>
     </div>
 
@@ -188,16 +183,16 @@
         </div>
     </div>
     <div class="form-group" ng-if="result.image">
-        <label class="col-sm-2 control-label">Response</label>
+        <label class="col-sm-2 control-label">응답</label>
         <div class="col-sm-10">
             <img style="max-width:100%" ng-src="{{result.image}}">
             <div class="col-sm-10">
-                <p class="help-block">Content-type: {{result.contentType}}</p>
+                <p class="help-block">콘텐츠 유형: {{result.contentType}}</p>
             </div>
         </div>
     </div>
     <div class="form-group" ng-if="result.result" ng-class="{'has-error':result.error}">
-        <label class="col-sm-2 control-label">Response</label>
+        <label class="col-sm-2 control-label">응답</label>
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{result.result}}</textarea>
             <p class="help-block">

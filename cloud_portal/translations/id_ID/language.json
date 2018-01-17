@@ -1,240 +1,237 @@
 {
-  "language_name":"LANGUAGE_NAME",
-  "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
-  "dialogs":{
-    "okButton":"Ok",
-    "cancelButton":"Cancel",
-    "loginTitle":"Log in to {{PRODUCT_NAME}}",
-    "loginButton":"Log in",
-    "logoutAuthorisedText":"",
-    "logoutAuthorisedTitle":"You are already logged in",
-    "logoutAuthorisedContinueButton":"Continue",
-    "logoutAuthorisedLogoutButton":"Log Out"
+  "language_name": "Bahasa Indonesia",
+  "productName": "{{PRODUCT_NAME}}",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "dialogs": {
+    "okButton": "Ok",
+    "cancelButton": "Cancel",
+    "loginTitle": "Log in to {{PRODUCT_NAME}}",
+    "loginButton": "Log in",
+    "logoutAuthorisedTitle": "You are already logged in",
+    "logoutAuthorisedContinueButton": "Continue",
+    "logoutAuthorisedLogoutButton": "Log Out"
   },
-  "pageTitles":{
-    "template":"{{title}} {{PRODUCT_NAME}}",
-    "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"Welcome to",
-    "register":"Create account in",
-    "changePassword":"Change password -",
-    "account":"Account settings -",
-    "systems":"Systems -",
-    "system":"System -",
-    "systemShare":"Share System -",
-    "activate":"Activate account -",
-    "activateSent":"Activate account -",
-    "activateSuccess":"Account activated -",
-    "activateCode":"Activate account -",
-    "restorePassword":"Reset password -",
-    "restorePasswordSuccess":"Password saved -",
-    "restorePasswordCode":"Reset password -",
-    "view":"View cameras - ",
-    "contentPage":"",
-    "debug":"Debug",
-    "login":"Log in -",
-    "download":"Download {{VMS_NAME}}",
-    "downloadPlatform":"Download {{VMS_NAME}} for ",
-    "startPage":"",
-    "pageNotFound":"Page not found"
+  "pageTitles": {
+    "template": "{{title}} {{PRODUCT_NAME}}",
+    "default": "{{PRODUCT_NAME}}",
+    "registerSuccess": "Welcome to",
+    "register": "Create account in",
+    "changePassword": "Change password -",
+    "account": "Account settings -",
+    "systems": "Systems -",
+    "system": "System -",
+    "systemShare": "Share System -",
+    "activate": "Activate account -",
+    "activateSent": "Activate account -",
+    "activateSuccess": "Account activated -",
+    "activateCode": "Activate account -",
+    "restorePassword": "Reset password -",
+    "restorePasswordSuccess": "Password saved -",
+    "restorePasswordCode": "Reset password -",
+    "view": "View cameras - ",
+    "debug": "Debug",
+    "login": "Log in -",
+    "download": "Download {{VMS_NAME}}",
+    "downloadPlatform": "Download {{VMS_NAME}} for ",
+    "pageNotFound": "Page not found"
   },
-  "systemStatuses":{
-    "notActivated":"not activated",
-    "activated":"activated",
-    "online":"online",
-    "offline":"offline",
-    "unavailable":"unavailable"
+  "systemStatuses": {
+    "notActivated": "not activated",
+    "activated": "activated",
+    "online": "online",
+    "offline": "offline",
+    "unavailable": "unavailable"
   },
-  "accessRoles":{
-    "disabled":{
-      "label":"Disabled",
-      "description":"User is disabled and cannot log in to System"
+  "accessRoles": {
+    "disabled": {
+      "label": "Disabled",
+      "description": "User is disabled and cannot log in to System"
     },
-    "Owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+    "Owner": {
+      "label": "Owner",
+      "description": "Unrestricted access including the ability to share and connect/disconnect System from cloud"
     },
-    "Viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+    "Viewer": {
+      "label": "Viewer",
+      "description": "Can view live video and browse the archive"
     },
-    "Live Viewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+    "Live Viewer": {
+      "label": "Live Viewer",
+      "description": "Can only view live video"
     },
-    "Advanced Viewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+    "Advanced Viewer": {
+      "label": "Advanced Viewer",
+      "description": "Can view live video, browse the archive, configure cameras, control PTZ etc"
     },
-    "Administrator":{
-      "label":"Administrator",
-      "description":"Unrestricted access including the ability to share"
+    "Administrator": {
+      "label": "Administrator",
+      "description": "Unrestricted access including the ability to share"
     },
-    "Custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+    "Custom": {
+      "label": "Custom",
+      "description": "Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
     },
-    "cloudAdmin":{
-      "label":"Administrator",
-      "description":"Can configure System and share it"
+    "cloudAdmin": {
+      "label": "Administrator",
+      "description": "Can configure System and share it"
     },
-    "customRole":{
-      "label":"Custom role",
-      "description":"Custom user role specified in System"
+    "customRole": {
+      "label": "Custom role",
+      "description": "Custom user role specified in System"
     },
-    "owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+    "owner": {
+      "label": "Owner",
+      "description": "Unrestricted access including the ability to share and connect/disconnect System from cloud"
     },
-    "viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+    "viewer": {
+      "label": "Viewer",
+      "description": "Can view live video and browse the archive"
     },
-    "liveViewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+    "liveViewer": {
+      "label": "Live Viewer",
+      "description": "Can only view live video"
     },
-    "advancedViewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+    "advancedViewer": {
+      "label": "Advanced Viewer",
+      "description": "Can view live video, browse the archive, configure cameras, control PTZ etc"
     },
-    "custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+    "custom": {
+      "label": "Custom",
+      "description": "Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
     }
   },
-  "errorCodes":{
-    "ok":"ok",
-    "cantSendActivationPrefix":"Cannot send confirmation Email",
-    "cantDisconnectSystemPrefix":"Cannot delete System",
-    "cantUnshareWithMeSystemPrefix":"Cannot delete System",
-    "cantSharePrefix":"Cannot share System",
-    "cantGetUsersListPrefix":"Users list is unavailable",
-    "cantGetSystemsListPrefix":"System list is unavailable",
-    "cantRegisterPrefix":"Error occurred",
-    "cantGetSystemInfoPrefix":"System info is unavailable",
-    "cantChangeAccountPrefix":"Cannot save changes",
-    "cantChangePasswordPrefix":"Cannot save password",
-    "cantActivatePrefix":"Cannot activate your account",
-    "cantSendConfirmationPrefix":"Cannot send confirmation Email",
-    "cloudInvalidResponse":"Cloud DB returned an unexpected response",
-    "notAuthorized":"Incorrect Email or password",
-    "wrongParameters":"Some parameters on the form are incorrect",
-    "wrongCode":"Account is already activated or confirmation code is incorrect",
-    "wrongCodeRestore":"Confirmation code is already used or incorrect",
-    "forbidden":"You do not have permissions to perform this action",
-    "accountNotActivated":"This account is not activated yet. <a href=\"/activate\">Send activation link again</a>",
-    "accountBlocked":"This account is blocked",
-    "notFound":"Not found",
-    "alreadyExists":"This account already exists",
-    "unknownError":"Unexpected error occured",
-    "accountAlreadyActivated":"This account is already activated",
-    "emailNotFound":"Account does not exist",
-    "EmailAlreadyExists":"This Email is already registered",
-    "oldPasswordMistmatch":"Current password is incorrect",
-    "passwordMismatch":"Wrong password",
-    "cantEditYourself":"Changing own permissions is not allowed",
-    "cantEditAdmin":"This user has administrator permissions",
-    "cantOpenClient":"{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
-    "lostConnection":"Connection to {{systemName}} lost",
-    "thisSystem":"the system"
+  "errorCodes": {
+    "ok": "ok",
+    "cantSendActivationPrefix": "Cannot send confirmation Email",
+    "cantDisconnectSystemPrefix": "Cannot delete System",
+    "cantUnshareWithMeSystemPrefix": "Cannot delete System",
+    "cantSharePrefix": "Cannot share System",
+    "cantGetUsersListPrefix": "Users list is unavailable",
+    "cantGetSystemsListPrefix": "System list is unavailable",
+    "cantRegisterPrefix": "Error occurred",
+    "cantGetSystemInfoPrefix": "System info is unavailable",
+    "cantChangeAccountPrefix": "Cannot save changes",
+    "cantChangePasswordPrefix": "Cannot save password",
+    "cantActivatePrefix": "Cannot activate your account",
+    "cantSendConfirmationPrefix": "Cannot send confirmation Email",
+    "cloudInvalidResponse": "Cloud DB returned an unexpected response",
+    "notAuthorized": "Incorrect Email or password",
+    "wrongParameters": "Some parameters on the form are incorrect",
+    "wrongCode": "Account is already activated or confirmation code is incorrect",
+    "wrongCodeRestore": "Confirmation code is already used or incorrect",
+    "forbidden": "You do not have permissions to perform this action",
+    "accountNotActivated": "This account is not activated yet. <a href=\"/activate\">Send activation link again</a>",
+    "accountBlocked": "This account is blocked",
+    "notFound": "Not found",
+    "alreadyExists": "This account already exists",
+    "unknownError": "Unexpected error occured",
+    "accountAlreadyActivated": "This account is already activated",
+    "emailNotFound": "Account does not exist",
+    "EmailAlreadyExists": "This Email is already registered",
+    "oldPasswordMistmatch": "Current password is incorrect",
+    "passwordMismatch": "Wrong password",
+    "cantEditYourself": "Changing own permissions is not allowed",
+    "cantEditAdmin": "This user has administrator permissions",
+    "cantOpenClient": "{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
+    "lostConnection": "Connection to {{systemName}} lost",
+    "thisSystem": "the system"
   },
-  "passwordRequirements":{
-    "minLengthMessage":"Password must contain at least 8 characters",
-    "requiredMessage":"Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
-    "weakMessage":"Use numbers, upper and lower case letters and special characters to make your password stronger",
-    "strongMessage":"Strong password!",
-    "commonMessage":"This password is in top most popular passwords in the world"
+  "passwordRequirements": {
+    "minLengthMessage": "Password must contain at least 8 characters",
+    "requiredMessage": "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
+    "weakMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger",
+    "strongMessage": "Strong password!",
+    "commonMessage": "This password is in top most popular passwords in the world"
   },
-  "sharing":{
-    "confirmOwner":"If you change System owner, you will revoke ownership from the current account. This action is irreversible. Are you sure?",
-    "shareTitle":"Share",
-    "shareConfirmButton":"Share",
-    "editShareTitle":"Edit Permissions",
-    "editShareConfirmButton":"Save",
-    "permissionsSaved":"New permissions saved"
+  "sharing": {
+    "confirmOwner": "If you change System owner, you will revoke ownership from the current account. This action is irreversible. Are you sure?",
+    "shareTitle": "Share",
+    "shareConfirmButton": "Share",
+    "editShareTitle": "Edit Permissions",
+    "editShareConfirmButton": "Save",
+    "permissionsSaved": "New permissions saved"
   },
-  "system":{
-    "yourSystem":"Your System",
-    "mySystemSearch":"IMeMyMine",
-    "unavailable":"System is unreachable",
-    "offline":"System is offline",
-    "openClient":"Open in {{VMS_NAME}}",
-    "confirmRenameTitle":"System name",
-    "confirmRenameAction":"Save",
-    "successRename":"System name saved",
-    "confirmDisconnectTitle":"Disconnect System from {{PRODUCT_NAME}}?",
-    "confirmDisconnectAction":"Disconnect",
-    "confirmUnshareFromMe":"You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
-    "confirmUnshareFromMeTitle":"Disconnect System?",
-    "confirmUnshareFromMeAction":"Disconnect",
-    "confirmUnshare":"This user will not be able to access System. Are you sure?",
-    "confirmUnshareTitle":"Delete user?",
-    "confirmUnshareAction":"Delete",
-    "successDisconnected":"System is successfully disconnected from {{PRODUCT_NAME}}",
-    "successDeleted":"System {{systemName}} is successfully deleted from your account",
-    "permissionsRemoved":"Permissions were removed from {{email}}"
+  "system": {
+    "yourSystem": "Your System",
+    "mySystemSearch": "IMeMyMine",
+    "unavailable": "System is unreachable",
+    "offline": "System is offline",
+    "openClient": "Open in {{VMS_NAME}}",
+    "confirmRenameTitle": "System name",
+    "confirmRenameAction": "Save",
+    "successRename": "System name saved",
+    "confirmDisconnectTitle": "Disconnect System from {{PRODUCT_NAME}}?",
+    "confirmDisconnectAction": "Disconnect",
+    "confirmUnshareFromMe": "You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
+    "confirmUnshareFromMeTitle": "Disconnect System?",
+    "confirmUnshareFromMeAction": "Disconnect",
+    "confirmUnshare": "This user will not be able to access System. Are you sure?",
+    "confirmUnshareTitle": "Delete user?",
+    "confirmUnshareAction": "Delete",
+    "successDisconnected": "System is successfully disconnected from {{PRODUCT_NAME}}",
+    "successDeleted": "System {{systemName}} is successfully deleted from your account",
+    "permissionsRemoved": "Permissions were removed from {{email}}"
   },
-  "account":{
-    "accountSavedSuccess":"Your account is successfully saved",
-    "passwordChangedSuccess":"Your account is successfully saved",
-    "changePassword":"Change Password",
-    "newPasswordLabel":"New password",
-    "saveChanges":"Save"
+  "account": {
+    "accountSavedSuccess": "Your account is successfully saved",
+    "activationLinkSent": "Activation Link Sent",
+    "passwordChangedSuccess": "Your account is successfully saved",
+    "changePassword": "Change Password",
+    "newPasswordLabel": "New password",
+    "saveChanges": "Save"
   },
-  "downloads":{
-    "noClientDetectedTitle":"Install {{VMS_NAME}} to view your System",
-    "noClientDetectedMessage":"",
-    "action":"Download {{VMS_NAME}}",
-    "mobile":{
-      "ios":{
-        "link":"{{IOS_APP_LINK}}"
+  "downloads": {
+    "noClientDetectedTitle": "Install {{VMS_NAME}} to view your System",
+    "action": "Download {{VMS_NAME}}",
+    "mobile": {
+      "ios": {
+        "link": "{{IOS_APP_LINK}}"
       },
-      "android":{
-        "link":"{{ANDROID_APP_LINK}}"
+      "android": {
+        "link": "{{ANDROID_APP_LINK}}"
       }
     },
-    "groups":{
-      "windows":{
-        "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+    "groups": {
+      "windows": {
+        "label": "Windows",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
-      "mac":{
-        "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "linux":{
-        "label":"Ubuntu Linux",
-        "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
-    "platforms":{
-      "win64":"x64",
-      "win86":"x86",
-      "linux64":"x64",
-      "linux86":"x86",
-      "mac":"X"
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
     },
-    "appTypes":{
-      "client":"Client only",
-      "server":"Server only",
-      "bundle":"Client and Server",
-      "servertool":"Configuration tool"
+    "appTypes": {
+      "client": "Client only",
+      "server": "Server only",
+      "bundle": "Client and Server",
+      "servertool": "Configuration tool"
     }
   },
-  "activeActions":{
-    "sendConfirm":"Send",
-    "resetPassword":"Reset Password",
-    "setNewPassword":"Save password",
-    "setNewPasswordLabel":"New password"
+  "activeActions": {
+    "sendConfirm": "Resend activation link",
+    "resetPassword": "Reset Password",
+    "setNewPassword": "Save password",
+    "setNewPasswordLabel": "New password"
   },
-  "regActions":{
-    "passwordLabel":"Password",
-    "createAccount":"Create Account"
+  "regActions": {
+    "passwordLabel": "Password",
+    "createAccount": "Create Account"
   },
-  "header":{
-    "allSystems":"All Systems",
-    "systems":"Systems"
+  "header": {
+    "allSystems": "All Systems",
+    "systems": "Systems"
   }
 }

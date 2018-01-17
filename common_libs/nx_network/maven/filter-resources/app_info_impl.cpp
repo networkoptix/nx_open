@@ -2,6 +2,8 @@
 // This file is generated. Go to pom.xml.
 //
 #include "nx/network/app_info.h"
+#include "nx/network/cloud/cloud_connect_controller.h"
+#include "nx/network/socket_global.h"
 
 namespace nx {
 namespace network {
@@ -17,6 +19,12 @@ static const char* kCloudHostName = kCloudHostNameWithPrefix + sizeof("this_is_c
 
 QString AppInfo::defaultCloudHost()
 {
+#ifdef _DEBUG
+    const QString overriddenHost = SocketGlobals::cloud().ini().cloudHost;
+    if (!overriddenHost.isEmpty())
+        return overriddenHost;
+#endif
+
     return QString::fromUtf8(kCloudHostName);
 }
 

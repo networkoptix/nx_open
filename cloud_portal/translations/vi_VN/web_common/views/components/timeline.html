@@ -5,7 +5,7 @@
             <!--<div class="webclient-panel-border"></div>-->
             <placeholder ng-if="loading" preloader="true" class="preloader-small"></placeholder>
             <div class="viewport"
-                 ng-class="{invisible:liveOnly || !canViewArchive}"
+                 ng-class="{invisible:emptyArchive || !canViewArchive}"
                  ng-mouseup="mouseUp($event)"
                  ng-mouseleave="mouseLeave($event)"
                  ng-mousemove="mouseMove($event)"
@@ -14,34 +14,30 @@
                  ng-mousedown="mouseDown($event)">
                 <canvas ></canvas>
             </div>
-            <span ng-if="emptyArchive  && liveOnly && !loading" class="no-archive-message">
-                No Archive
-            </span>  
+            <span ng-if="emptyArchive && !loading" class="no-archive-message"> Không lưu trữ </span>  
         </div>
         <div class="text-right pull-right hidden-xs" ng-class="{'no-volume':disableVolume, 'shadows-off': emptyArchive}">
             <span class="live-button inline-block pull-left "
               ng-class="{active:positionProvider.liveMode && positionProvider.playing && canPlayLive,disabled:!canPlayLive}"
-              ng-click="goToLive()">
-                <div class="live-glyph"></div>LIVE
-            </span>
+              ng-click="goToLive()"> <div class="live-glyph"> </div> TRỰC TIẾP </span>
             <span ng-if="!disableVolume" class="webclient-button volume inline-block pull-right" ng-click="toggleActive()">
                 <span class="glyphicon glyphicon-volume-up"></span>
             </span>
         </div>
         <div class="text-left pull-left hidden-xs" ng-class="{'pp-only': !canViewArchive, 'shadows-off': emptyArchive}">
             <span class="webclient-button glyphicon-pp inline-block player-controls pull-left"
-                  ng-class="{disabled: !canPlayLive && (liveOnly || emptyArchive || positionProvider.liveMode)}"
-                    ng-click="(!canPlayLive && (liveOnly || emptyArchive || positionProvider.liveMode)) || playPause()">
+                  ng-class="{disabled: !canPlayLive && (emptyArchive || positionProvider.liveMode)}"
+                    ng-click="(!canPlayLive && (emptyArchive || positionProvider.liveMode)) || playPause()">
                 <span class="glyphicon glyphicon-play"
                         ng-class="{'glyphicon-play':!positionProvider.playing,'glyphicon-pause':positionProvider.playing}"></span>
             </span>
             <div class="inline-block zoom-level pull-right" ng-if="canViewArchive">
                 <span class="webclient-button glyphicon-pm zoomInButton"
-                      ng-class="{disabled:scaleManager.disableZoomIn || liveOnly}">
+                      ng-class="{disabled:scaleManager.disableZoomIn || emptyArchive}">
                     <span class="glyphicon glyphicon-plus"></span>
                 </span>
                 <span class="webclient-button glyphicon-pm zoomOutButton"
-                      ng-class="{disabled:scaleManager.disableZoomOut || liveOnly}">
+                      ng-class="{disabled:scaleManager.disableZoomOut || emptyArchive}">
                     <span class="glyphicon glyphicon-minus"></span>
                 </span>
             </div>
@@ -49,31 +45,29 @@
             <!--Gonna have to move this later-->
         </div>
     </div>
-    <div class="mobile-controls visible-xs" ng-class="{'no-border': !loading && (!emptyArchive || !liveOnly)}">
+    <div class="mobile-controls visible-xs" ng-class="{'no-border': !loading && !emptyArchive}">
         <div class="text-right pull-right" ng-class="{'no-volume':disableVolume}">
             <span class="live-button inline-block pull-left "
                 ng-class="{active:positionProvider.liveMode && canPlayLive,disabled:!canPlayLive}"
-                ng-click="goToLive()">
-                <div class="live-glyph"></div>LIVE
-            </span>
+                ng-click="goToLive()"> <div class="live-glyph"> </div> TRỰC TIẾP </span>
             <span ng-if="!disableVolume" class="webclient-button volume inline-block pull-right" ng-click="toggleActive()">
                 <span class="glyphicon glyphicon-volume-up"></span>
             </span>
         </div>
         <div class="text-left pull-left pp-only">
             <span class="webclient-button glyphicon-pp inline-block player-controls pull-left"
-                ng-class="{disabled: !canPlayLive && (liveOnly || emptyArchive || positionProvider.liveMode)}"
-                ng-click="(!canPlayLive && (liveOnly || emptyArchive || positionProvider.liveMode)) || playPause()">
+                ng-class="{disabled: !canPlayLive && (emptyArchive || positionProvider.liveMode)}"
+                ng-click="(!canPlayLive && (emptyArchive || positionProvider.liveMode)) || playPause()">
                 <span class="glyphicon glyphicon-play"
                       ng-class="{'glyphicon-play':!positionProvider.playing,'glyphicon-pause':positionProvider.playing}"></span>
             </span>
         </div>
         <span class="webclient-button glyphicon-pm zoomInButton inline-block" ng-if="canViewArchive"
-            ng-class="{disabled:scaleManager.disableZoomIn || liveOnly}">
+            ng-class="{disabled:scaleManager.disableZoomIn || emptyArchive}">
             <span class="glyphicon glyphicon-plus"></span>
         </span>
         <span class="webclient-button glyphicon-pm zoomOutButton inline-block" ng-if="canViewArchive"
-            ng-class="{disabled:scaleManager.disableZoomOut || liveOnly}">
+            ng-class="{disabled:scaleManager.disableZoomOut || emptyArchive}">
             <span class="glyphicon glyphicon-minus"></span>
         </span>
     </div>

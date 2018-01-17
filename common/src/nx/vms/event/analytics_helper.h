@@ -29,16 +29,20 @@ public:
     AnalyticsHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
 
     /** Get list of all supported analytics events in the system. */
-    QList<EventDescriptor> analyticsEvents() const;
+    QList<EventDescriptor> systemSupportedAnalyticsEvents() const;
 
     /** Get list of all supported analytics events for the given cameras. */
-    static QList<EventDescriptor> analyticsEvents(
+    static QList<EventDescriptor> supportedAnalyticsEvents(
         const QnVirtualCameraResourceList& cameras);
 
     static bool hasDifferentDrivers(const QList<EventDescriptor>& events);
 
     static QString eventName(const QnVirtualCameraResourcePtr& camera,
         const QnUuid& eventTypeId,
+        const QString& locale);
+
+    static QString objectName(const QnVirtualCameraResourcePtr& camera,
+        const QnUuid& objectTypeId,
         const QString& locale);
 
 };

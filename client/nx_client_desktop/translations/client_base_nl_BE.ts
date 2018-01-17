@@ -48,6 +48,10 @@ to view more bookmarks</source>
       <source>Delete bookmark</source>
       <translation>Bladwijzer verwijderen</translation>
     </message>
+    <message>
+      <source>Export bookmark</source>
+      <translation>Exporteer bladwijzer</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -95,7 +99,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>Gebeurtenissenlog...</translation>
+      <translation>Logboek...</translation>
     </message>
     <message>
       <source>Cameras to Backup...</source>
@@ -183,11 +187,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New Layout...</source>
-      <translation>Nieuwe lay-out...</translation>
+      <translation>Nieuwe schermindeling...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation>Nieuwe lay-out...</translation>
+      <translation>Open schermindeling...</translation>
     </message>
     <message>
       <source>Open...</source>
@@ -211,11 +215,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation>Huidige lay-out opslaan</translation>
+      <translation>Huidige schermindeling opslaan</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation>Bewaar huidige lay-out als...</translation>
+      <translation>Huidige schermindeling opslaan als...</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
@@ -306,7 +310,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>Event regels...</translation>
+      <translation>Gebeurtenisregels...</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -398,7 +402,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
-      <translation>Openen in alarm lay-out</translation>
+      <translation>Toon op alarm scherm</translation>
     </message>
     <message>
       <source>Open in New Window</source>
@@ -442,7 +446,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Verwijder</translation>
+      <translation>Verwijderen</translation>
     </message>
     <message>
       <source>Stop Video Wall</source>
@@ -454,11 +458,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Layout</source>
-      <translation>Layout opslaan</translation>
+      <translation>Schermindeling opslaan</translation>
     </message>
     <message>
       <source>Save Layout As...</source>
-      <translation>Sla de layout op als...</translation>
+      <translation>Sla de schermindeling op als...</translation>
     </message>
     <message>
       <source>Maximize Item</source>
@@ -475,22 +479,6 @@ to view more bookmarks</source>
     <message>
       <source>Hide Info</source>
       <translation>Verberg informatie</translation>
-    </message>
-    <message>
-      <source>Change Resolution...</source>
-      <translation>Verander resolutie...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>Automatisch</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Lage</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Hoog</translation>
     </message>
     <message>
       <source>PTZ...</source>
@@ -554,11 +542,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation>Verwijderen uit de lay-out</translation>
+      <translation>Verwijderen uit de schermindeling</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
-      <translation>Lay-out delen beëindigen</translation>
+      <translation>Delen van de schermindeling beëindigen</translation>
     </message>
     <message>
       <source>Edit...</source>
@@ -574,7 +562,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation>Lay-out instellen als achtergrond</translation>
+      <translation>Schermindeling instellen als achtergrond</translation>
     </message>
     <message>
       <source>User Settings...</source>
@@ -582,11 +570,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>User Roles...</source>
-      <translation>Gebruikersrollen...</translation>
+      <translation>Gebruikersprofielen...</translation>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation>Rolinstellingen...</translation>
+      <translation>Profielinstellingen...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -666,7 +654,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Layout Settings...</source>
-      <translation>Lay-out instellingen...</translation>
+      <translation>Schermindeling instellingen...</translation>
     </message>
     <message>
       <source>Video Wall Settings...</source>
@@ -703,14 +691,6 @@ to view more bookmarks</source>
     <message>
       <source>Merge to Currently Connected System...</source>
       <translation>Samenvoegen met het huidige systeem...</translation>
-    </message>
-    <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>Aanpassen van de aspect ratio van de cellen...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>Ruimte tussen cellen wijzigen...</translation>
     </message>
     <message>
       <source>None</source>
@@ -872,6 +852,34 @@ to view more bookmarks</source>
       <source>Make Showreel</source>
       <translation>Maak een showreel</translation>
     </message>
+    <message>
+      <source>Start Analytics...</source>
+      <translation>Start Analytics...</translation>
+    </message>
+    <message>
+      <source>Some cameras require passwords to be set</source>
+      <translation>Voor sommige camera's moeten wachtwoorden worden ingesteld</translation>
+    </message>
+    <message>
+      <source>Export Video...</source>
+      <translation>Video exporteren...</translation>
+    </message>
+    <message>
+      <source>Export Bookmark...</source>
+      <translation>Exporteer bladwijzer...</translation>
+    </message>
+    <message>
+      <source>Resolution...</source>
+      <translation>Resolutie...</translation>
+    </message>
+    <message>
+      <source>Cell Aspect Ratio...</source>
+      <translation>Beeldverhouding...</translation>
+    </message>
+    <message>
+      <source>Cell Spacing...</source>
+      <translation>Celafstand...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -960,7 +968,65 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>Hardware-id van server met deze licentie komt niet overeen met hardware-id waarop de licentie is geactiveerd.</translation>
+      <translation>Hardware-Id van server met deze licentie komt niet overeen met hardware-id waarop de licentie is geactiveerd.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
+      <translation>Gekozen instellingen vereisen transcodering. Het CPU-gebruik zal toenemen en kan aanzienlijke tijd duren.</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
+      <translation>AVI-indeling wordt niet aanbevolen voor het exporteren van een niet-continu opname met audio-track.</translation>
+    </message>
+    <message>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation>We raden aan om video van deze camera te exporteren als &quot;Multi Video&quot; om downscaling te voorkomen.</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation>U staat op het punt een lange video te exporteren. Het kan meer dan een gigabyte aan harde schijfruimte vereisen en het kan enkele minuten duren voordat het voltooid is.</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .EXE files.</source>
+      <translation>Instellingen zijn niet beschikbaar voor .EXE-bestanden.</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>Lokale bestanden, widgets en webpagina's voor servermonitoring worden niet geëxporteerd.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation>Geëxporteerd. EXE-bestand heeft een grootte van meer dan 4 GB en kan niet worden geopend door te dubbelklikken in Windows. Het kan alleen in %1 Client worden gespeeld.</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileSystemStrings</name>
+    <message>
+      <source>Audio Video Interleave</source>
+      <translation>Audio Video Interleave</translation>
+    </message>
+    <message>
+      <source>Matroska</source>
+      <translation>Matroska</translation>
+    </message>
+    <message>
+      <source>MPEG-4 Part 14</source>
+      <translation>MPEG-4 Deel 14</translation>
+    </message>
+    <message>
+      <source>%1 Media File</source>
+      <translation>%1 Mediabestand</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x64)</source>
+      <translation>Uitvoerbaar %1 Mediabestand (x64)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86)</source>
+      <translation>Uitvoerbaar %1 Mediabestand (x86)</translation>
     </message>
   </context>
   <context>
@@ -1037,25 +1103,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>Bestand &quot;%1&quot; wordt gebruikt door een ander proces.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>Bestand &quot;%1&quot; kan niet worden weggeschreven. Probeer een andere naam.</translation>
     </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+      <translation>
+        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
+        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>De bestandsnaam &quot;%1&quot; is gereserveerd door het besturingssysteem. Probeer een andere naam.</translation>
     </message>
   </context>
   <context>
@@ -1081,10 +1145,6 @@ to view more bookmarks</source>
       <translation>Kort</translation>
     </message>
     <message>
-      <source>Password must be at least 8 characters long.</source>
-      <translation>Wachtwoord moet ten minste 8 karakters hebben.</translation>
-    </message>
-    <message>
       <source>Common</source>
       <translation>Veel voorkomend</translation>
     </message>
@@ -1100,6 +1160,49 @@ to view more bookmarks</source>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>Alleen letters, cijfers en symbolen van het toetsenbord zijn toegestaan.</translation>
     </message>
+    <message>
+      <source>Long</source>
+      <translation>Lang</translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>Alleen letters, cijfers en toetsenbordsymbolen %1 zijn toegestaan.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
+      <translation>
+        <numerusform>Wachtwoord moet %n verschillende combinaties van tekens, symbolen of cijfers bevatten</numerusform>
+        <numerusform>Wachtwoord moet %n verschillende combinaties van tekens, symbolen of cijfers bevatten</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be at least %n characters long.</source>
+      <translation>
+        <numerusform>Wachtwoord moet ten minste %n karakters hebben.</numerusform>
+        <numerusform>Wachtwoord moet ten minste %n karakters hebben.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be no longer than %n characters.</source>
+      <translation>
+        <numerusform>Wachtwoord mag niet langer zijn dan %n karakters.</numerusform>
+        <numerusform>Wachtwoord mag niet langer zijn dan %n karakters.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together.</source>
+      <translation>
+        <numerusform>Wachtwoord mag niet %n of meer opeenvolgende tekens bevatten.</numerusform>
+        <numerusform>Wachtwoord mag niet %n of meer opeenvolgende tekens bevatten.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters.</source>
+      <translation>
+        <numerusform>Wachtwoord mag niet %n of meer opeenvolgende karakters bevatten.</numerusform>
+        <numerusform>Wachtwoord mag niet %n of meer opeenvolgende karakters bevatten.</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>PermissionsInfoTable</name>
@@ -1109,7 +1212,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Gedeelde lay-outs</translation>
+      <translation>Gedeelde schermindelingen</translation>
     </message>
     <message>
       <source>All</source>
@@ -1236,13 +1339,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnAbstractCameraAdvancedParamWidget</name>
-    <message>
-      <source>Read-Only</source>
-      <translation>Alleen lezen</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
@@ -1271,11 +1367,11 @@ to view more bookmarks</source>
     <name>QnAccessibleResourcesWidget</name>
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>Door het geven van toegang tot sommige lay-outs, geeft u ook toegang tot alle camera's in deze lay-out. Daarmee krijgt de gebruiker toegang tot extra camera's op deze lay-outs.</translation>
+      <translation>Door het geven van toegang tot sommige schermindelingen, geeft u ook toegang tot alle camera's in deze schermindeling. Daarmee krijgt de gebruiker toegang tot extra camera's op deze schermindeling.</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>Alle camera's &amp; apparaten</translation>
+      <translation>Alle camera's en apparaten</translation>
     </message>
   </context>
   <context>
@@ -1380,35 +1476,35 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>These devices are removed from System</source>
       <translation>
-        <numerusform>Dit aparaat is verwijderd uit het systeem</numerusform>
+        <numerusform>Deze apparaten worden verwijderd uit het systeem</numerusform>
         <numerusform>Deze apparaten worden verwijderd uit het systeem</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
       <translation>
-        <numerusform>Deze camera wordt verwijderd uit het systeem</numerusform>
+        <numerusform>Deze camera's worden verwijderd uit het systeem</numerusform>
         <numerusform>Deze camera's worden verwijderd uit het systeem</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
       <translation>
-        <numerusform>Deze server wordt verwijderd uit het systeem</numerusform>
+        <numerusform>Deze server worden verwijderd uit het systeem</numerusform>
         <numerusform>Deze server worden verwijderd uit het systeem</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
       <translation>
-        <numerusform>Deze gebruiker wordt verwijderd uit het systeem</numerusform>
+        <numerusform>Deze gebruikers worden verwijderd uit het systeem</numerusform>
         <numerusform>Deze gebruikers worden verwijderd uit het systeem</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
       <translation>
-        <numerusform>Deze bron wordt verwijderd uit het systeem</numerusform>
+        <numerusform>Deze bronnen worden verwijderd uit het systeem</numerusform>
         <numerusform>Deze bronnen worden verwijderd uit het systeem</numerusform>
       </translation>
     </message>
@@ -1421,7 +1517,7 @@ to view more bookmarks</source>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation>Onbekend</translation>
+      <translation>Unknown</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -1685,7 +1781,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
@@ -1723,7 +1819,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
       <translation>
-        <numerusform>%1 van %n I/O module</numerusform>
+        <numerusform>%1 van %n I/O modules</numerusform>
         <numerusform>%1 van %n I/O modules</numerusform>
       </translation>
     </message>
@@ -1787,7 +1883,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
       <translation>
-        <numerusform>Bron- en %n meer camera</numerusform>
+        <numerusform>Bron- en %n meer camera's</numerusform>
         <numerusform>Bron- en %n meer camera's</numerusform>
       </translation>
     </message>
@@ -1873,7 +1969,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No event rules</source>
-      <translation>Geen event regels</translation>
+      <translation>Geen gebeurtenisregels</translation>
     </message>
     <message>
       <source>Filter by devices...</source>
@@ -1993,7 +2089,7 @@ to view more bookmarks</source>
       <source>%n devices found</source>
       <translation>
         <numerusform>%n apparaat gevonden</numerusform>
-        <numerusform>%n apparaten gevonden</numerusform>
+        <numerusform>%n apparaat gevonden</numerusform>
       </translation>
     </message>
     <message>
@@ -2039,7 +2135,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
       <translation>
-        <numerusform>Het toevoegen van %n het apparaat is niet gelukt</numerusform>
+        <numerusform>Het toevoegen van %n apparaten is niet gelukt</numerusform>
         <numerusform>Het toevoegen van %n apparaten is niet gelukt</numerusform>
       </translation>
     </message>
@@ -2119,6 +2215,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnCameraAnalyticsPolicy</name>
+    <message>
+      <source>Analytics is not available for %1</source>
+      <translation type="unfinished">Analytics is not available for %1</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
       <source>Select device</source>
@@ -2131,7 +2234,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
       <translation>
-        <numerusform>%1 biedt geen ondersteuning voor twee-weg audio</numerusform>
+        <numerusform>%1 bieden geen ondersteuning voor twee-weg audio</numerusform>
         <numerusform>%1 bieden geen ondersteuning voor twee-weg audio</numerusform>
       </translation>
     </message>
@@ -2217,6 +2320,26 @@ to view more bookmarks</source>
       <source>Secondary</source>
       <translation>Secundaire</translation>
     </message>
+    <message>
+      <source>Don&apos;t change</source>
+      <translation>Niet opslaan</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Lage</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>Middelgroot</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Hoog</translation>
+    </message>
+    <message>
+      <source>Edge</source>
+      <translation>Edge</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2230,7 +2353,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%1 have no input ports</source>
       <translation>
-        <numerusform>%1 geeft geen inputpoort</numerusform>
+        <numerusform>%1 geeft geen inputpoorten</numerusform>
         <numerusform>%1 geeft geen inputpoorten</numerusform>
       </translation>
     </message>
@@ -2270,14 +2393,14 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n devices found</source>
       <translation>
-        <numerusform>%n apparaat gevonden</numerusform>
+        <numerusform>%n apparaten gevonden</numerusform>
         <numerusform>%n apparaten gevonden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
       <translation>
-        <numerusform>%n camera gevonden</numerusform>
+        <numerusform>%n camera's gevonden</numerusform>
         <numerusform>%n camera's gevonden</numerusform>
       </translation>
     </message>
@@ -2292,7 +2415,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n I/O modules found</source>
       <translation>
-        <numerusform>%n I/O module gevonden</numerusform>
+        <numerusform>%n I/O modules gevonden</numerusform>
         <numerusform>%n I/O modules gevonden</numerusform>
       </translation>
     </message>
@@ -2369,12 +2492,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform>Opname of bewegingsdetectie is uitgeschakeld voor %1</numerusform>
-        <numerusform>Opname of bewegingsdetectie is uitgeschakeld voor %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -2389,19 +2509,39 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%1 have no output relays</source>
       <translation>
-        <numerusform>%1 heeft geen relaisuitgang</numerusform>
+        <numerusform>%1 hebben geen relaisuitgangen</numerusform>
         <numerusform>%1 hebben geen relaisuitgangen</numerusform>
       </translation>
     </message>
   </context>
   <context>
+    <name>QnCameraPasswordChangeDialog</name>
+    <message>
+      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
+      <translation>Wachtwoord mag niet gelijk zijn aan de gebruikersnaam van de camera's</translation>
+    </message>
+    <message>
+      <source>New Password</source>
+      <translation>Nieuw wachtwoord</translation>
+    </message>
+    <message>
+      <source>Repeat Password</source>
+      <translation>Herhaal wachtwoord</translation>
+    </message>
+    <message>
+      <source>Passwords do not match.</source>
+      <translation>Wachtwoorden komen niet overeen.</translation>
+    </message>
+    <message>
+      <source>Password should be at least 8 symbols long and contain different types of characters.</source>
+      <translation>Wachtwoord moet minstens 8 symbolen lang zijn en verschillende tekens bevatten.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>Opname is uitgeschakeld voor %1</numerusform>
-        <numerusform>Opname is uitgeschakeld voor %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -2473,6 +2613,18 @@ to view more bookmarks</source>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
       <translation>Als u deze wilt inschakelen of aanpassen, gaat u naar het tabblad &quot;Motion&quot; in camera-instellingen.</translation>
+    </message>
+    <message>
+      <source>Mbit/s</source>
+      <translation>Mbit/s</translation>
+    </message>
+    <message>
+      <source>Less Settings</source>
+      <translation>Minder instellingen</translation>
+    </message>
+    <message>
+      <source>More Settings</source>
+      <translation>Meer instellingen</translation>
     </message>
   </context>
   <context>
@@ -2667,11 +2819,11 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Incorrecte email of wachtwoord</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+      <translation>Account is niet geactiveerd. Controleer uw e-mail en volg de instructies</translation>
     </message>
   </context>
   <context>
@@ -2705,7 +2857,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -3010,6 +3162,28 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnDefaultPasswordAlertBar</name>
+    <message>
+      <source>This camera requires password to be set up.</source>
+      <translation>Voor deze camera moet een wachtwoord worden ingesteld.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras requires password to be set up.</source>
+      <translation>Voor sommige geselecteerde camera's moet een wachtwoord worden ingesteld.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set Password</source>
+      <translation>
+        <numerusform>Stel nieuw wachtwoord in</numerusform>
+        <numerusform>Stel nieuw wachtwoord in</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation>Vraag uw systeembeheerder om het te doen.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
@@ -3079,11 +3253,11 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Internal Error</source>
@@ -3190,7 +3364,7 @@ to %1</source>
     </message>
     <message>
       <source>Event</source>
-      <translation>Event</translation>
+      <translation>Gebeurtenis</translation>
     </message>
     <message>
       <source>Source</source>
@@ -3255,6 +3429,10 @@ to %1</source>
     <message>
       <source>Auto</source>
       <translation>Automatisch</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation>Basis</translation>
     </message>
   </context>
   <context>
@@ -3551,38 +3729,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutExportTool</name>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>Exporteren naar &quot;%1&quot;...</translation>
-    </message>
-    <message>
-      <source>Could not export device %1.</source>
-      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-      <translation>Apparaat %1 kan niet worden geëxporteerd.</translation>
-    </message>
-    <message>
-      <source>Could not export camera %1.</source>
-      <translation>Camera %1 kon niet worden geëxporteerd.</translation>
-    </message>
-    <message>
-      <source>Unknown error has occurred.</source>
-      <translation>Er is een onbekende fout opgetreden.</translation>
-    </message>
-    <message>
-      <source>Could not export I/O module %1.</source>
-      <translation>Kan de I/O-module %1 niet exporteren.</translation>
-    </message>
-    <message>
-      <source>Could not create output file %1...</source>
-      <translation>Kan het uitvoerbestand %1 niet maken...</translation>
-    </message>
-    <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>Bestand &quot;%1&quot; wordt gebruikt door een ander proces. Probeer een andere naam.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLayoutSettingsDialog</name>
     <message>
       <source>Select file...</source>
@@ -3658,7 +3804,7 @@ to %1</source>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Email</source>
@@ -3736,7 +3882,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation>Gelieerd aan Hardware ID</translation>
+      <translation>Gelieerd aan Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -3771,7 +3917,7 @@ to %1</source>
     </message>
     <message>
       <source>Error</source>
-      <translation>Fout</translation>
+      <translation>Error</translation>
     </message>
     <message>
       <source>Server not found</source>
@@ -4012,11 +4158,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware ID %1</translation>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware Id %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1 op %2</translation>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1 op %2</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -4047,7 +4193,7 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het hardware-id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-Id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
@@ -4056,13 +4202,6 @@ to %1</source>
   </context>
   <context>
     <name>QnLicensesProposeWidget</name>
-    <message numerus="yes">
-      <source>Use analog licenses to view these %n cameras</source>
-      <translation>
-        <numerusform>Gebruik encoder licenties om deze %n camera's te bekijken</numerusform>
-        <numerusform>Gebruik encoder licenties om deze %n camera's te bekijken</numerusform>
-      </translation>
-    </message>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
@@ -4084,6 +4223,13 @@ to %1</source>
         <numerusform>Gebruik licenties voor de geselecteerde %n I / O-modules</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Use licenses to view these %n cameras</source>
+      <translation>
+        <numerusform>Gebruik encoder licenties om deze %n camera's te bekijken</numerusform>
+        <numerusform>Gebruik encoder licenties om deze %n camera's te bekijken</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnLinkToCloudDialogPrivate</name>
@@ -4101,11 +4247,11 @@ to %1</source>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation>Personalisatie</translation>
+      <translation>Persoonlijke instellingen</translation>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation>Scherm Opname</translation>
+      <translation>Schermopname</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -4191,11 +4337,11 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation>Account aanmaken</translation>
+      <translation>Accounts aanmaken</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -4208,7 +4354,7 @@ to %1</source>
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Inloggen op %1</translation>
+      <translation>Meld u aan bij %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
@@ -4321,6 +4467,17 @@ to %1</source>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
       <translation>houd ingedrukt</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Uitgeschakeld volgens schema</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set for all %n Cameras</source>
+      <translation>
+        <numerusform>Instellen voor alle %n camera 's</numerusform>
+        <numerusform>Instellen voor alle %n camera 's</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4462,6 +4619,10 @@ to %1</source>
       <source>Previous Chunk</source>
       <translation>Vorige stuk</translation>
     </message>
+    <message>
+      <source>NVR cameras do not support not-synchronized playback</source>
+      <translation>NVR camera's ondersteunen geen niet-gesynchroniseerde afspelen</translation>
+    </message>
   </context>
   <context>
     <name>QnNetworkSpeedStrings</name>
@@ -4556,6 +4717,10 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>Bevestigen</translation>
     </message>
+    <message>
+      <source>Set Passwords</source>
+      <translation>Wachtwoorden instellen</translation>
+    </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
@@ -4623,7 +4788,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>De notificatie wordt weergegeven totdat een van de gebruikers, een bladwijzer aanmaken met gebeurtenisbeschrijving</translation>
     </message>
   </context>
   <context>
@@ -5176,7 +5341,7 @@ to %1</source>
     </message>
     <message>
       <source>Search</source>
-      <translation>Zoek</translation>
+      <translation>Search</translation>
     </message>
   </context>
   <context>
@@ -5214,7 +5379,7 @@ to %1</source>
     <name>QnSearchLineEdit</name>
     <message>
       <source>Search</source>
-      <translation>Zoek</translation>
+      <translation>Search</translation>
     </message>
   </context>
   <context>
@@ -5754,7 +5919,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -5781,7 +5946,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -5934,6 +6099,18 @@ to %1</source>
     <message>
       <source>Please check authentication information</source>
       <translation>Controleer de verificatiegegevens</translation>
+    </message>
+    <message>
+      <source>TOO MANY CONNECTIONS</source>
+      <translation>TEVEEL VERBINDINGEN</translation>
+    </message>
+    <message>
+      <source>PASSWORD REQUIRED</source>
+      <translation>WACHTWOORD VEREIST</translation>
+    </message>
+    <message>
+      <source>Set for this Camera</source>
+      <translation>Instellen voor deze camera</translation>
     </message>
   </context>
   <context>
@@ -6230,10 +6407,6 @@ to %1</source>
       <translation>Systeem is in de veilige modus</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>Opslag is vol</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>Opslag is niet geconfigureerd</translation>
     </message>
@@ -6276,10 +6449,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>De archiefindex herbouwen wordt door de gebruiker op de volgende server geannuleerd:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>Opslag is vol op de volgende server:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>
@@ -6351,6 +6520,14 @@ to %1</source>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>Externe archiefsynchronisatie is voltooid voor het volgende apparaat:</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation>Extern archief synchronisatie</translation>
+    </message>
+    <message>
+      <source>Archive integrity problem detected</source>
+      <translation>Archief integriteit probleem gedetecteerd</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -6412,16 +6589,16 @@ to %1</source>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>System time is synchronized with the Internet and is independent from server local times.</source>
-      <translation>Systeemtijd is gesynchroniseerd met het internet en is onafhankelijk van lokale servertijden.</translation>
-    </message>
-    <message>
-      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-      <translation>Systeemtijd is gesynchroniseerd met lokale tijd van de geselecteerde server en is onafhankelijk van andere servers.</translation>
-    </message>
-    <message>
       <source>No server has Internet access. Time is not being synchronized.</source>
       <translation>Geen server heeft internettoegang. De tijd wordt niet gesynchroniseerd.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
+      <translation>Systeemtijd wordt gesynchroniseerd met internet en is niet afhankelijk van de lokale tijd op servers.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
+      <translation>Systeemtijd wordt gesynchroniseerd met de lokale tijd op de geselecteerde server en is niet afhankelijk van de lokale tijd op andere servers.</translation>
     </message>
   </context>
   <context>
@@ -6457,37 +6634,37 @@ to %1</source>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation>jjjj</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM jjjj uu:mm</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM jjjj uu:mm</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM jjjj u ap</translation>
+      <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>dd MMMM jjjj</translation>
+      <translation>dd MMMM yyyy</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM, jjjj</translation>
+      <translation>MMMM yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>jjjj</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>h:mm ap</source>
@@ -6632,7 +6809,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Role</source>
@@ -6689,7 +6866,7 @@ to %1</source>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6697,7 +6874,7 @@ to %1</source>
     </message>
     <message>
       <source>Role</source>
-      <translation>Rol</translation>
+      <translation>Profiel</translation>
     </message>
     <message>
       <source>Email</source>
@@ -6761,7 +6938,7 @@ to %1</source>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Layouts</translation>
+      <translation>Schermindelingen</translation>
     </message>
     <message>
       <source>New Role</source>
@@ -6784,11 +6961,11 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
-      <translation>Camera's &amp;&amp; apparaten</translation>
+      <translation>Camera's en apparaten</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Layouts</translation>
+      <translation>Schermindelingen</translation>
     </message>
     <message>
       <source>Send Invite</source>
@@ -6836,7 +7013,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -6864,7 +7041,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -7039,186 +7216,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchExportHandler</name>
-    <message>
-      <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>Uitvoerbaar %1 Mediabestand (x64) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>Uitvoerbaar %1 Mediabestand (x86) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Exporting Layout</source>
-      <translation>Layout exporteren</translation>
-    </message>
-    <message>
-      <source>Export Video As...</source>
-      <translation>Video exporteren als...</translation>
-    </message>
-    <message>
-      <source>Timestamps:</source>
-      <translation>Tijdstempels:</translation>
-    </message>
-    <message>
-      <source>Exporting Video</source>
-      <translation>Video exporteren</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>Exporteren naar &quot;%1&quot;...</translation>
-    </message>
-    <message>
-      <source>Export Layout As...</source>
-      <translation>Exporteer de layout als...</translation>
-    </message>
-    <message>
-      <source>%1 Media File (*.nov)</source>
-      <translation>%1 Mediabestand (*.nov)</translation>
-    </message>
-    <message>
-      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-      <translation>Filters toepassen: rotatie, dewarping, image enhancement, aangepaste aspect ratio (vereist transcoderen)</translation>
-    </message>
-    <message>
-      <source>exported</source>
-      <translation>geëxporteerd</translation>
-    </message>
-    <message>
-      <source>No Timestamp</source>
-      <translation>Geen tijdsstempel</translation>
-    </message>
-    <message>
-      <source>Top Left Corner (requires transcoding)</source>
-      <translation>Linkerbovenhoek (vereist transcoderen)</translation>
-    </message>
-    <message>
-      <source>Top Right Corner (requires transcoding)</source>
-      <translation>Rechterbovenhoek (vereist transcoderen)</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner (requires transcoding)</source>
-      <translation>Linkeronderhoek (vereist transcoderen)</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner (requires transcoding)</source>
-      <translation>Rechteronderhoek (vereist transcoderen)</translation>
-    </message>
-    <message>
-      <source>Save local layout as...</source>
-      <translation>Sla lokale lay-out op als...</translation>
-    </message>
-    <message>
-      <source>Make file read-only.</source>
-      <translation>Maak het bestand alleen-lezen.</translation>
-    </message>
-    <message>
-      <source>File already used for recording</source>
-      <translation>Bestand al gebruikt voor opname</translation>
-    </message>
-    <message>
-      <source>Please choose another name or wait until recording is finished.</source>
-      <translation>Kies alstublieft een andere naam of wacht tot de opname is voltooid.</translation>
-    </message>
-    <message>
-      <source>You are about to export a long video</source>
-      <translation>U staat op het punt om een ​​lange video te exporteren</translation>
-    </message>
-    <message>
-      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>Het kan wellicht meer dan een gigabyte HDD-ruimte nodig hebben en enkele minuten duren om te voltooien.</translation>
-    </message>
-    <message>
-      <source>Export anyway?</source>
-      <translation>Toch exporteren?</translation>
-    </message>
-    <message>
-      <source>Export to AVI anyway?</source>
-      <translation>Toch exporteren naar AVI?</translation>
-    </message>
-    <message>
-      <source>Selected format not recommended</source>
-      <translation>Geselecteerd formaat niet aanbevolen</translation>
-    </message>
-    <message>
-      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation>Om de video-downscaling te voorkomen, worden *.nov of *.exe formaten aanbevolen voor deze camera.</translation>
-    </message>
-    <message>
-      <source>Export with transcoding?</source>
-      <translation>Exporteren met transcodering?</translation>
-    </message>
-    <message>
-      <source>It will increase CPU usage and may take significant time.</source>
-      <translation>De CPU belasting zal toenemen en kan aanzienlijke tijd duren.</translation>
-    </message>
-    <message>
-      <source>EXE format not recommended</source>
-      <translation>*.exe formaat niet aanbevolen</translation>
-    </message>
-    <message>
-      <source>Export to EXE anyway?</source>
-      <translation>Toch exporteren naar *.exe?</translation>
-    </message>
-    <message>
-      <source>Failed to export Multi-Video</source>
-      <translation>Multi-video exporteren mislukt</translation>
-    </message>
-    <message>
-      <source>Local files not allowed for Multi-Video export</source>
-      <translation>Locale bestanden kunnen niet worden geëxporteerd als multi-video export</translation>
-    </message>
-    <message>
-      <source>Please remove all local files from the layout and try again.</source>
-      <translation>Verwijder alle lokale bestanden uit de layout en probeer het opnieuw.</translation>
-    </message>
-    <message>
-      <source>Export</source>
-      <translation>Exporteer</translation>
-    </message>
-    <message>
-      <source>You are about to export a lot of video</source>
-      <translation>U staat op het punt om een ​​lange video te exporteren</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>Te korte periode geselecteerd</translation>
-    </message>
-    <message>
-      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-      <translation>Als u wilt exporteren als een rapid review, moet de videolengte minstens 10 seconden zijn.</translation>
-    </message>
-    <message>
-      <source>Export completed</source>
-      <translation>Exporteren voltooid</translation>
-    </message>
-    <message>
-      <source>Failed to export video</source>
-      <translation>Exporteren van de video is mislukt</translation>
-    </message>
-    <message>
-      <source>AVI format is not recommended</source>
-      <translation>AVI formaat wordt niet aanbevolen</translation>
-    </message>
-    <message>
-      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation>Voor het exporteren van een niet-continue opname *.mkv of een ander formaat wordt aanbevolen.</translation>
-    </message>
-    <message>
-      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>*.exe bestanden boven 4 GB kunnen niet worden geopend met dubbelklikken door een beperking in Windows.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
-    <message>
-      <source>Enter Password...</source>
-      <translation>Voer wachtwoord in...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>Administrator wachtwoord</translation>
-    </message>
     <message>
       <source>Systems will be merged shortly</source>
       <translation>Systemen zullen spoedig zijn samengevoegd</translation>
@@ -7240,10 +7238,6 @@ to %1</source>
       <translation>Totaal aantal licenties zal afnemen</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Wachtwoord mag niet leeg zijn.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>Cloud systemen kunnen niet worden samengevoegd</translation>
     </message>
@@ -7258,6 +7252,14 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>Server wordt spoedig op het systeem aangesloten</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>Voer wachtwoord in...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>Admin wachtwoord</translation>
     </message>
   </context>
   <context>
@@ -7728,6 +7730,459 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::AnalyticsActionFactory</name>
+    <message>
+      <source>Dynamic</source>
+      <translation>Dynamisch</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportProcess</name>
+    <message>
+      <source>Unsupported media for data export.</source>
+      <translation>Niet-ondersteunde media voor gegevensexport.</translation>
+    </message>
+    <message>
+      <source>Selected format is not supported by FFMPEG library.</source>
+      <translation>Geselecteerde indeling wordt niet ondersteund door de FFMPEG-bibliotheek.</translation>
+    </message>
+    <message>
+      <source>FFMPEG library error.</source>
+      <translation>FFMPEG bibliotheek fout.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with selected format.</source>
+      <translation>Video- of audiocodec is niet compatibel met het geselecteerde formaat.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation>Bestand schrijffout.</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>Interne fout</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Geen gegevens geëxporteerd.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportSettingsDialog</name>
+    <message>
+      <source>exported</source>
+      <translation>geëxporteerd</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Exporteer</translation>
+    </message>
+    <message>
+      <source>Rapid Review</source>
+      <translation>Rapid Review</translation>
+    </message>
+    <message>
+      <source>Export Settings</source>
+      <translation>Exportinstellingen</translation>
+    </message>
+    <message>
+      <source>Add Timestamp</source>
+      <translation>Tijdstempel toevoegen</translation>
+    </message>
+    <message>
+      <source>Delete Timestamp</source>
+      <translation>Tijdstempel verwijderen</translation>
+    </message>
+    <message>
+      <source>Timestamp</source>
+      <translation>Tijdstempel</translation>
+    </message>
+    <message>
+      <source>Add Image</source>
+      <translation>Afbeelding toevoegen</translation>
+    </message>
+    <message>
+      <source>Delete Image</source>
+      <translation>Afbeelding verwijderen</translation>
+    </message>
+    <message>
+      <source>Image</source>
+      <translation>Afbeelding</translation>
+    </message>
+    <message>
+      <source>Add Text</source>
+      <translation>Tekst toevoegen</translation>
+    </message>
+    <message>
+      <source>Delete Text</source>
+      <translation>Tekst verwijderen</translation>
+    </message>
+    <message>
+      <source>Text</source>
+      <translation>Tekst</translation>
+    </message>
+    <message>
+      <source>Reset Speed</source>
+      <translation>Reset snelheid</translation>
+    </message>
+    <message>
+      <source>Add Bookmark Info</source>
+      <translation>Voeg bladwijzerinfo toe</translation>
+    </message>
+    <message>
+      <source>Delete Bookmark Info</source>
+      <translation>Verwijder bladwijzer Info</translation>
+    </message>
+    <message>
+      <source>Bookmark Info</source>
+      <translation>Bladwijzer Info</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::FilenamePanel</name>
+    <message>
+      <source>Folder</source>
+      <translation>Map</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Naam</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty.</source>
+      <translation>De naam mag niet leeg zijn.</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>Selecteer map...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
+    <message>
+      <source>Select file...</source>
+      <translation>Selecteer bestand...</translation>
+    </message>
+    <message>
+      <source>Pictures (%1)</source>
+      <translation>Afbeeldingen (%1)</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Error</translation>
+    </message>
+    <message>
+      <source>Image cannot be loaded.</source>
+      <translation>Afbeelding kan niet worden geladen.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutThumbnailLoader</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>GEEN GEGEVENS</translation>
+    </message>
+    <message>
+      <source>NOT A CAMERA</source>
+      <translation>GEEN CAMERA</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionFactory</name>
+    <message>
+      <source>Auto</source>
+      <translation>Automatisch</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Lage</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Hoog</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Aangepast</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionHandler</name>
+    <message>
+      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
+      <translation>Stel de opmaakresolutie in op &quot;Auto&quot; om de prestaties te verbeteren.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RapidReviewSettingsWidget</name>
+    <message numerus="yes">
+      <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
+      <translation>
+        <numerusform>Als u wilt exporteren als een rapid review, moet de videolengte minstens %n seconden zijn.</numerusform>
+        <numerusform>Als u wilt exporteren als een rapid review, moet de videolengte minstens %n seconden zijn.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
+    <message>
+      <source>Long</source>
+      <translation>Lang</translation>
+    </message>
+    <message>
+      <source>Short</source>
+      <translation>Kort</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchAnalyticsController</name>
+    <message>
+      <source>%1 Analytics</source>
+      <translation>%1 Analytics</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchExportHandler</name>
+    <message>
+      <source>Stop Export</source>
+      <translation>Export stoppen</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>Exporteren voltooid</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation>Export mislukt</translation>
+    </message>
+    <message>
+      <source>Cannot write file</source>
+      <translation>Kan geen bestand schrijven</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 is in gebruik door een andere export.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::ExportLayoutTool</name>
+    <message>
+      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+      <translation>Bestand &quot;%1&quot; wordt gebruikt door een ander proces. Probeer een andere naam.</translation>
+    </message>
+    <message>
+      <source>Could not create output file %1...</source>
+      <translation>Kan het uitvoerbestand %1 niet maken...</translation>
+    </message>
+    <message>
+      <source>Unknown error has occurred.</source>
+      <translation>Er is een onbekende fout opgetreden.</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>Exporteren naar &quot;%1&quot;...</translation>
+    </message>
+    <message>
+      <source>Could not export device %1.</source>
+      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+      <translation>Apparaat %1 kan niet worden geëxporteerd.</translation>
+    </message>
+    <message>
+      <source>Could not export camera %1.</source>
+      <translation>Camera %1 kon niet worden geëxporteerd.</translation>
+    </message>
+    <message>
+      <source>Could not export I/O module %1.</source>
+      <translation>Kan de I/O-module %1 niet exporteren.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::WorkbenchExportHandler</name>
+    <message>
+      <source>Executable %1 Media File (x64) (*.exe)</source>
+      <translation>Uitvoerbaar %1 Mediabestand (x64) (*.exe)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86) (*.exe)</source>
+      <translation>Uitvoerbaar %1 Mediabestand (x86) (*.exe)</translation>
+    </message>
+    <message>
+      <source>File already used for recording</source>
+      <translation>Bestand al gebruikt voor opname</translation>
+    </message>
+    <message>
+      <source>Please choose another name or wait until recording is finished.</source>
+      <translation>Kies alstublieft een andere naam of wacht tot de opname is voltooid.</translation>
+    </message>
+    <message>
+      <source>Exporting Layout</source>
+      <translation>Layout exporteren</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video</source>
+      <translation>U staat op het punt om een ​​lange video te exporteren</translation>
+    </message>
+    <message>
+      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation>Het kan wellicht meer dan een gigabyte HDD-ruimte nodig hebben en enkele minuten duren om te voltooien.</translation>
+    </message>
+    <message>
+      <source>Export anyway?</source>
+      <translation>Toch exporteren?</translation>
+    </message>
+    <message>
+      <source>Export Video As...</source>
+      <translation>Video exporteren als...</translation>
+    </message>
+    <message>
+      <source>No Timestamp</source>
+      <translation>Geen tijdsstempel</translation>
+    </message>
+    <message>
+      <source>Top Left Corner (requires transcoding)</source>
+      <translation>Linkerbovenhoek (vereist transcoderen)</translation>
+    </message>
+    <message>
+      <source>Top Right Corner (requires transcoding)</source>
+      <translation>Rechterbovenhoek (vereist transcoderen)</translation>
+    </message>
+    <message>
+      <source>Bottom Left Corner (requires transcoding)</source>
+      <translation>Linkeronderhoek (vereist transcoderen)</translation>
+    </message>
+    <message>
+      <source>Bottom Right Corner (requires transcoding)</source>
+      <translation>Rechteronderhoek (vereist transcoderen)</translation>
+    </message>
+    <message>
+      <source>Timestamps:</source>
+      <translation>Tijdstempels:</translation>
+    </message>
+    <message>
+      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+      <translation>Filters toepassen: rotatie, dewarping, image enhancement, aangepaste aspect ratio (vereist transcoderen)</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended</source>
+      <translation>AVI formaat wordt niet aanbevolen</translation>
+    </message>
+    <message>
+      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
+      <translation>Voor het exporteren van een niet-continue opname *.mkv of een ander formaat wordt aanbevolen.</translation>
+    </message>
+    <message>
+      <source>Export to AVI anyway?</source>
+      <translation>Toch exporteren naar AVI?</translation>
+    </message>
+    <message>
+      <source>Selected format not recommended</source>
+      <translation>Geselecteerd formaat niet aanbevolen</translation>
+    </message>
+    <message>
+      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
+      <translation>Om de video-downscaling te voorkomen, worden *.nov of *.exe formaten aanbevolen voor deze camera.</translation>
+    </message>
+    <message>
+      <source>Export with transcoding?</source>
+      <translation>Exporteren met transcodering?</translation>
+    </message>
+    <message>
+      <source>It will increase CPU usage and may take significant time.</source>
+      <translation>De CPU belasting zal toenemen en kan aanzienlijke tijd duren.</translation>
+    </message>
+    <message>
+      <source>Exporting Video</source>
+      <translation>Video exporteren</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>Exporteren naar &quot;%1&quot;...</translation>
+    </message>
+    <message>
+      <source>EXE format not recommended</source>
+      <translation>*.exe formaat niet aanbevolen</translation>
+    </message>
+    <message>
+      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
+      <translation>*.exe bestanden boven 4 GB kunnen niet worden geopend met dubbelklikken door een beperking in Windows.</translation>
+    </message>
+    <message>
+      <source>Export to EXE anyway?</source>
+      <translation>Toch exporteren naar *.exe?</translation>
+    </message>
+    <message>
+      <source>Failed to export Multi-Video</source>
+      <translation>Multi-video exporteren mislukt</translation>
+    </message>
+    <message>
+      <source>Local files not allowed for Multi-Video export</source>
+      <translation>Locale bestanden kunnen niet worden geëxporteerd als multi-video export</translation>
+    </message>
+    <message>
+      <source>Please remove all local files from the layout and try again.</source>
+      <translation>Verwijder alle lokale bestanden uit de layout en probeer het opnieuw.</translation>
+    </message>
+    <message>
+      <source>Save local layout as...</source>
+      <translation>Sla lokale lay-out op als...</translation>
+    </message>
+    <message>
+      <source>Export Layout As...</source>
+      <translation>Exporteer de layout als...</translation>
+    </message>
+    <message>
+      <source>exported</source>
+      <translation>geëxporteerd</translation>
+    </message>
+    <message>
+      <source>%1 Media File (*.nov)</source>
+      <translation>%1 Mediabestand (*.nov)</translation>
+    </message>
+    <message>
+      <source>Make file read-only.</source>
+      <translation>Maak het bestand alleen-lezen.</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Exporteer</translation>
+    </message>
+    <message>
+      <source>You are about to export a lot of video</source>
+      <translation>U staat op het punt om een ​​lange video te exporteren</translation>
+    </message>
+    <message>
+      <source>Too short period selected</source>
+      <translation>Te korte periode geselecteerd</translation>
+    </message>
+    <message>
+      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
+      <translation>Als u wilt exporteren als een rapid review, moet de videolengte minstens 10 seconden zijn.</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>Exporteren voltooid</translation>
+    </message>
+    <message>
+      <source>Failed to export video</source>
+      <translation>Exporteren van de video is mislukt</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
+    <message>
+      <source>No event types supported</source>
+      <translation>Geen gebeurtenistypen ondersteund</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
+    <message>
+      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
+      <translation>Evenement wordt alleen geactiveerd als Analytics-evenement aan alle bovenstaande voorwaarden voldoet. Als een trefwoordveld leeg is, is aan de voorwaarde altijd voldaan. Als dat niet het geval is, wordt aan de voorwaarde voldaan als het overeenkomstige veld van Analytics-evenement een zoekwoord bevat.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
     <message>
       <source>Copy</source>
@@ -7810,11 +8265,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Stop tour</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Start tour</translation>
     </message>
   </context>
   <context>
@@ -7921,8 +8376,8 @@ to %1</source>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
       <translation>
-        <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n camera's. Verplaats ze toch?</numerusform>
-        <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n camera's. Verplaats ze toch?</numerusform>
+        <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n camera's. Toch verplaatsen?</numerusform>
+        <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n camera's. Toch verplaatsen?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7938,7 +8393,7 @@ to %1</source>
     </message>
     <message>
       <source>Layout is locked and cannot be changed.</source>
-      <translation>Layout is vergrendeld en kan niet worden gewijzigd.</translation>
+      <translation>De schermindeling is vergrendeld en kan niet worden gewijzigd.</translation>
     </message>
     <message>
       <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
@@ -8071,6 +8526,14 @@ to %1</source>
       <source>Failed to open server web page</source>
       <translation>Kan de webpagina van de server niet openen</translation>
     </message>
+    <message>
+      <source>Failed to change password</source>
+      <translation>Wachtwoord wijzigen mislukt</translation>
+    </message>
+    <message>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation>Wijzigen van wachtwoorden op %1 van %2 camera's mislukt</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -8079,8 +8542,8 @@ to %1</source>
       <translation>Gebruik de toetsenbordpijlen om layouts te veranderen. Druk op Esc om de showreel te verlaten.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>Druk op een willekeurige toets om de tour te stoppen.</translation>
     </message>
   </context>
   <context>
@@ -8101,10 +8564,6 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>Layout tour %1 verwijderen?</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation>Showreel</translation>
     </message>
@@ -8112,28 +8571,32 @@ to %1</source>
       <source>Showreel %1</source>
       <translation>Showreel %1</translation>
     </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation>Showreel %1 verwijderen?</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutsHandler</name>
     <message>
       <source>Save Layout As</source>
-      <translation>Layout opslaan als</translation>
+      <translation>Schermindeling opslaan als</translation>
     </message>
     <message>
       <source>Enter Layout Name:</source>
-      <translation>Voer layout naam in:</translation>
+      <translation>Voer de naam voor de schermindeling in:</translation>
     </message>
     <message>
       <source>New Layout</source>
-      <translation>Nieuwe layout</translation>
+      <translation>Nieuwe schermindeling</translation>
     </message>
     <message>
       <source>Enter the name of the layout to create:</source>
-      <translation>Voer de naam van de layout in om deze aan te maken:</translation>
+      <translation>Voer de naam van de schermindeling in om deze aan te maken:</translation>
     </message>
     <message>
       <source>New Layout %1</source>
-      <translation>Nieuwe layout %1</translation>
+      <translation>Nieuwe schermindeling %1</translation>
     </message>
   </context>
 </TS>

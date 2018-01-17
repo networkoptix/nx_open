@@ -86,7 +86,7 @@ QSize QnCheckBoxedHeaderView::sectionSizeFromContents(int logicalIndex) const
 void QnCheckBoxedHeaderView::at_sectionClicked(int logicalIndex)
 {
     if (logicalIndex == m_checkBoxColumn)
-        setCheckState(m_checkState != Qt::Unchecked ? Qt::Unchecked : Qt::Checked);
+        setCheckState(m_checkState == Qt::Checked ? Qt::Unchecked : Qt::Checked);
 }
 
 void QnCheckBoxedHeaderView::mouseReleaseEvent(QMouseEvent* event)

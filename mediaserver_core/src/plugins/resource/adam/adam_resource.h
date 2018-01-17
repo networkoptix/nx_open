@@ -11,12 +11,11 @@
 #include <plugins/common_interfaces/abstract_io_manager.h>
 #include <nx/utils/safe_direct_connection.h>
 
-class QnAdamResource :
+class QnAdamResource:
     public QnPhysicalCameraResource,
     public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
-
     struct PortTimerEntry
     {
         QString portId;
@@ -66,13 +65,12 @@ private:
 
     void setPortDefaultStates();
 
+    Qn::IOPortType portType(const QString& portId) const;
 
 private:
     std::unique_ptr<QnAbstractIOManager> m_ioManager;
     std::map<quint64, PortTimerEntry> m_autoResetTimers;
-
-
-
+    std::map<QString, Qn::IOPortType> m_portTypes;
     mutable QnMutex m_mutex;
 
 

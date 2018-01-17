@@ -7,12 +7,14 @@
     },
     "outputEventTypes": [
         {
-            "eventTypeId": "{5DFC6D1B-3B92-4E55-A627-0DB2A2422DB3}",
-            "eventName": {
+            "typeId": "{5DFC6D1B-3B92-4E55-A627-0DB2A2422DB3}",
+            "name": {
                 "value": "Face detection",
                 "localization": {
                 }
             },
+
+            "_": "Following fields belong to private plugin implementation.",
             "internalName": "FaceDetection",
             "description": "Face %1",
             "positiveState": "has been detected",
@@ -20,8 +22,21 @@
             "flags": "stateDependent"
         },
         {
-            "eventTypeId": "{67EDDD6A-A31F-41C4-91B6-B6298FE257A1}",
-            "eventName": {
+            "typeId": "{95F33B59-0CA8-4CB2-9248-1F5E616483F7}",
+            "name": {
+                "value": "Fog detection",
+                "localization": {
+                }
+            },
+            "internalName": "FogDetection",
+            "description": "Fog %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
+        {
+            "typeId": "{67EDDD6A-A31F-41C4-91B6-B6298FE257A1}",
+            "name": {
                 "value": "Virtual line crossing",
                 "localization": {
                 }
@@ -32,8 +47,8 @@
             "regionDescription": "#%1"
         },
         {
-            "eventTypeId": "{6F602403-CCA4-4F85-8777-F340E8239A23}",
-            "eventName": {
+            "typeId": "{6F602403-CCA4-4F85-8777-F340E8239A23}",
+            "name": {
                 "value": "Entering the area",
                 "localization": {
                 }
@@ -44,8 +59,8 @@
             "regionDescription": " the region #%1"
         },
         {
-            "eventTypeId": "{2C218743-604C-475D-AED9-A848F40F13F9}",
-            "eventName": {
+            "typeId": "{2C218743-604C-475D-AED9-A848F40F13F9}",
+            "name": {
                 "value": "Exiting the area",
                 "localization": {
                 }
@@ -56,13 +71,13 @@
             "regionDescription": " the region #%1"
         },
         {
-            "eventTypeId": "{A452E49A-D1D8-44EA-84DA-F581414E8153}",
-            "eventName": {
+            "typeId": "{A452E49A-D1D8-44EA-84DA-F581414E8153}",
+            "name": {
                 "value": "Appearing in the area",
                 "localization": {
                 }
             },
-            "internalName": "VideoAnalytics.AppearDisappear",
+            "internalName": "VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing",
             "description": "Object %1 ",
             "positiveState": "appeared",
             "negativeState": "disappeared",
@@ -70,9 +85,9 @@
             "regionDescription": "  in the region #%1"
         },
         {
-            "eventTypeId": "{42D4994A-A267-4C39-98AA-CBC4D41CA42B}",
-            "eventName": {
-                "value": "Intrusion in the area",
+            "typeId": "{42D4994A-A267-4C39-98AA-CBC4D41CA42B}",
+            "name": {
+                "value": "Intrusion",
                 "localization": {
                 }
             },
@@ -83,8 +98,8 @@
             "flags": "stateDependent"
         },
         {
-            "eventTypeId": "{CABB4644-F6C2-4F09-8EDF-E0FAFCC4F833}",
-            "eventName": {
+            "typeId": "{CABB4644-F6C2-4F09-8EDF-E0FAFCC4F833}",
+            "name": {
                 "value": "Audio detection",
                 "localization": {
                 }
@@ -96,8 +111,8 @@
             "flags": "stateDependent"
         },
         {
-            "eventTypeId": "{657B39C2-36C1-4644-9357-58593658D567}",
-            "eventName": {
+            "typeId": "{657B39C2-36C1-4644-9357-58593658D567}",
+            "name": {
                 "value": "Tampering detection",
                 "localization": {
                 }
@@ -109,8 +124,8 @@
             "flags": "stateDependent"
         },
         {
-            "eventTypeId": "{216668D9-EA9B-483A-A43E-9414ED760A01}",
-            "eventName": {
+            "typeId": "{216668D9-EA9B-483A-A43E-9414ED760A01}",
+            "name": {
                 "value": "Defocusing detection",
                 "localization": {
                 }
@@ -122,21 +137,21 @@
             "flags": "stateDependent"
         },
         {
-            "eventTypeId": "{1BAB8A57-5F19-4E3A-B73B-3641058D46B8}",
-            "eventName": {
+            "typeId": "{1BAB8A57-5F19-4E3A-B73B-3641058D46B8}",
+            "name": {
                 "value": "Dry contact input",
                 "localization": {
                 }
             },
-            "internalName": "DryContactInput",
+            "internalName": "AlarmInput.,NetworkAlarmInput",
             "description": "Dry contact input has been %1",
             "positiveState": "activated",
             "negativeState": "deactivated",
             "flags": "stateDependent"
         },
         {
-            "eventTypeId": "{F1F723BB-20C8-453A-AFCE-86F318CBF097}",
-            "eventName": {
+            "typeId": "{F1F723BB-20C8-453A-AFCE-86F318CBF097}",
+            "name": {
                 "value": "Motion detection",
                 "localization": {
                 }
@@ -149,8 +164,8 @@
             "regionDescription": "  in the region #%1"
         },
         {
-            "eventTypeId": "{79F03CE5-AFD1-4942-905C-46A981942422}",
-            "eventName": {
+            "typeId": "{79F03CE5-AFD1-4942-905C-46A981942422}",
+            "name": {
                 "value": "Sound - Scream",
                 "localization": {
                 }
@@ -162,8 +177,8 @@
             "flags": "stateDependent"
         },
         {
-            "eventTypeId": "{02567E19-33AC-440B-8647-16D95EF6B295}",
-            "eventName": {
+            "typeId": "{02567E19-33AC-440B-8647-16D95EF6B295}",
+            "name": {
                 "value": "Sound - Gun shot",
                 "localization": {
                 }
@@ -175,8 +190,8 @@
             "flags": "stateDependent"
         },
         {
-            "eventTypeId": "{BD275A24-F758-4FD5-9239-FBE87B1331CE}",
-            "eventName": {
+            "typeId": "{BD275A24-F758-4FD5-9239-FBE87B1331CE}",
+            "name": {
                 "value": "Sound - Explosion",
                 "localization": {
                 }
@@ -188,8 +203,8 @@
             "flags": "stateDependent"
         },
         {
-            "eventTypeId": "{BA9DFE3C-55E6-4298-BC8E-CAA947CB9440}",
-            "eventName": {
+            "typeId": "{BA9DFE3C-55E6-4298-BC8E-CAA947CB9440}",
+            "name": {
                 "value": "Sound - Glass break",
                 "localization": {
                 }
@@ -201,9 +216,9 @@
             "flags": "stateDependent"
         },
         {
-            "eventTypeId": "{1B541CB7-E377-4818-8801-323281530E7B}",
-            "eventName": {
-                "value": "Loitering detected",
+            "typeId": "{1B541CB7-E377-4818-8801-323281530E7B}",
+            "name": {
+                "value": "Loitering",
                 "localization": {
                 }
             },

@@ -5,6 +5,7 @@
 
 #include <nx/utils/concurrent.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/url.h>
 
 #include <QDir>
 #include <QSettings>
@@ -35,14 +36,14 @@ public:
     /** Sends \param crash to \param serverApi asynchronously
      *  \note Might be used for debug purposes
      */
-    bool send(const QUrl& serverApi, const QFileInfo& crash, QSettings* settings);
+    bool send(const nx::utils::Url& serverApi, const QFileInfo& crash, QSettings* settings);
 
 private:
     friend class ReportData;
 
     QnMutex m_mutex;
     nx::utils::concurrent::Future<bool> m_activeCollection;
-    nx_http::AsyncHttpClientPtr m_activeHttpClient;
+    nx::network::http::AsyncHttpClientPtr m_activeHttpClient;
     bool m_terminated;
     boost::optional<qint64> m_timerId;
 };
@@ -55,10 +56,10 @@ public:
     ReportData(const QFileInfo& crashFile, QSettings* settings,
                CrashReporter& host, QObject* parent = 0);
 
-    nx_http::HttpHeaders makeHttpHeaders() const;
+    nx::network::http::HttpHeaders makeHttpHeaders() const;
 
 public slots:
-    void finishReport(nx_http::AsyncHttpClientPtr httpClient);
+    void finishReport(nx::network::http::AsyncHttpClientPtr httpClient);
 
 private:
     const QFileInfo m_crashFile;

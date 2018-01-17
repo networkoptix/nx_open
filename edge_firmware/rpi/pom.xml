@@ -2,12 +2,12 @@
     <parent>
         <artifactId>edge_firmware</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>rpi</artifactId>
     <packaging>pom</packaging>
@@ -16,7 +16,6 @@
     <properties>
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/../..</root.dir>
-        <rdep.linux.packages>cifs-utils</rdep.linux.packages>
     </properties>
 
     <build>
@@ -109,6 +108,26 @@
                     <systemPath>${root.dir}/client/mobile_client/pom.xml</systemPath>
                 </dependency>
             </dependencies>
+        </profile>
+
+        <!-- ATTENTION: cifs-utils enabled only for rpi, because its version for bananapi in
+            buildenv/packages/bpi is broken. Enable when it's fixed. -->
+        <profile>
+            <id>linux-arm-rpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>rpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.packages>cifs-utils</rdep.linux.packages>
+            </properties>
         </profile>
     </profiles>
 </project>

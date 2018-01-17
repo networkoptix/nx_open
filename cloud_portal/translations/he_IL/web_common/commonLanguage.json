@@ -1,27 +1,27 @@
 {
-  "cameraLinks":{
-    "highStream":"High stream",
-    "lowStream":"Low stream",
-    "transcoding":"Transcoding",
-    "unknown":"Unknown",
-    "copyToClipboard":"Copy to clipboard",
-    "copyDefaultText":"Copy",
-    "copyActiveText":"Copied to clipboard"
-  },
-  "systemOffline":"System Offline",
-  "cameraStates":{
-    "offline":"Offline",
-    "error":"Error",
-    "unauthorized":"Authentication required",
-    "noData":"No data",
-    "iosVideoTooLarge":"iOS does not support video larger than fullHD (2MP: 1920x1080).",
-    "flashRequired":"Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers.",
-    "flashOrWebmRequired":"Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
-    "noArmSupport":"This browser or device does not support video playback from ARM-based servers.",
-    "noFormat":"This browser or device does not support video playback from  this camera.",
-    "ieNoWebm":"Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
-    "ieWin10":"Please, use Microsoft Edge or Google Chrome browsers.",
-    "ubuntuNX":"This browser does not support video from ARM-based servers. Please, use Chromium browser instead."
-  },
-  "searchCamPlaceholder":"search"
+    "cameraLinks": {
+        "highStream": "תזרים ראשי",
+        "lowStream": "תזרים משני",
+        "transcoding": "המרה",
+        "unknown": "לא ידוע",
+        "copyToClipboard": "העתק ללוח העריכה",
+        "copyDefaultText": "העתק",
+        "copyActiveText": "הועתק ללוח"
+    },
+    "systemOffline": "השרת אינו זמין",
+    "cameraStates": {
+        "offline": "לא מקוון",
+        "error": "שגיאה",
+        "unauthorized": "נדרש אימות",
+        "noData": "אין נתונים",
+        "iosVideoTooLarge": "iOS אינה תומכת בוידאו גדול מ fullHD (2MP: 1920 x 1080).",
+        "flashRequired": "אנא התקן <a href='https://get.adobe.com/flashplayer/' target='_blank'> את Adobe Flash</a> להפעלת וידאו משרתים מבוססי ARM.",
+        "flashOrWebmRequired": "יש <a href='https://get.adobe.com/flashplayer/' target='_blank'> להתקין Adobe Flash</a> או <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM codec</a> עבור הצגת וידאו ב- Internet Explorer.",
+        "noArmSupport": "דפדפן או התקן זה אינו תומך בהפעלת וידאו משרתים מבוססי ARM.",
+        "noFormat": "דפדפן או התקן זה אינו תומך בהפעלת וידאו ממצלמה זו.",
+        "ieNoWebm": "התקן את <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> עבור Internet Explorer.",
+        "ieWin10": "השתמש ב- Microsoft Edge או בדפדפן Google Chrome.",
+        "ubuntuNX": "דפדפן זה אינו תומך בווידאו משרתים מבוססי ARM. בבקשה, השתמש בדפדפן Chromium במקום זאת."
+    },
+    "searchCamPlaceholder": "חיפוש"
 }

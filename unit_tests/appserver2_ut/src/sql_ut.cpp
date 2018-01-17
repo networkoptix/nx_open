@@ -9,11 +9,17 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_options.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 
-class DataBase: public testing::Test
+class DataBase:
+    public nx::utils::test::TestWithTemporaryDirectory,
+    public testing::Test
 {
+    using base_type = nx::utils::test::TestWithTemporaryDirectory;
+
 public:
     DataBase():
+        base_type("DataBase", nx::utils::TestOptions::temporaryDirectoryPath()),
         m_file(nx::utils::TestOptions::temporaryDirectoryPath() + QLatin1String("/db.sqlite")),
         m_db(QSqlDatabase::addDatabase("QSQLITE", "db"))
     {

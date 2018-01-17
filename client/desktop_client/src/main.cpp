@@ -26,6 +26,7 @@
 
 #include <QtGui/QDesktopServices>
 #include <QtGui/QWindow>
+#include <QtGui/QScreen>
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
@@ -79,6 +80,7 @@ namespace
 {
     const int kSuccessCode = 0;
     const int kInvalidParametersCode = -1;
+    static const nx::utils::log::Tag kMainWindow(lit("MainWindow"));
 }
 
 #ifndef API_TEST_MAIN
@@ -168,9 +170,11 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
     #endif
 
     QDesktopWidget *desktop = qApp->desktop();
-    bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen && startupParams.screen < desktop->screenCount();
+    bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen
+        && startupParams.screen < desktop->screenCount();
     if (customScreen)
     {
+        NX_INFO(kMainWindow) << "Running application on a custom screen" << startupParams.screen;
         const auto windowHandle = mainWindow->windowHandle();
         if (windowHandle && (desktop->screenCount() > 0))
         {
@@ -178,14 +182,37 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
             qApp->processEvents();
 
             /* Set target screen for fullscreen mode. */
-            windowHandle->setScreen(QGuiApplication::screens().value(startupParams.screen, 0));
+            const auto screen = QGuiApplication::screens().value(startupParams.screen, 0);
+            NX_INFO(kMainWindow) << "Target screen geometry is" << screen->geometry();
+            windowHandle->setScreen(screen);
 
-            /* Set target position for the window when we set fullscreen off. */
-            QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
-            QPoint targetPosition = desktop->screenGeometry(startupParams.screen).topLeft() + screenDelta;
+            // Set target position for the window when we set fullscreen off.
+            QPoint screenDelta = mainWindow->pos()
+                - desktop->screenGeometry(mainWindow.data()).topLeft();
+            NX_INFO(kMainWindow) << "Current display offset is" << screenDelta;
+
+            QPoint targetPosition = desktop->screenGeometry(startupParams.screen).topLeft()
+                + screenDelta;
+            NX_INFO(kMainWindow) << "Target top-left corner position is" << targetPosition;
+
             mainWindow->move(targetPosition);
         }
     }
+    bool debugScreensGeometry = startupParams.screen != QnStartupParameters::kInvalidScreen
+        && startupParams.screen >= desktop->screenCount();
+    if (debugScreensGeometry)
+    {
+        NX_INFO(kMainWindow) << "System screen configuration:";
+        for (int i = 0; i < desktop->screenCount(); ++i)
+        {
+            const auto screen = QGuiApplication::screens().value(i);
+            NX_INFO(kMainWindow) << "Screen" << i << "geometry is" << screen->geometry();
+            if (desktop->screenGeometry(i) != screen->geometry())
+                NX_INFO(kMainWindow) << "Alternative screen" << i << "geometry is" << desktop->screenGeometry(i);
+        }
+    }
+
+
     mainWindow->show();
     joystickManager->start();
     if (customScreen)
@@ -252,6 +279,9 @@ int main(int argc, char** argv)
     textToWaveServer->start();
     textToWaveServer->waitForStarted();
 #endif
+
+    // This attribute is needed to embed QQuickWidget into other QWidgets.
+    QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
     const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
     if (startupParams.hiDpiDisabled)

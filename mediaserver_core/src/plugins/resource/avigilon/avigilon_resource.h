@@ -13,7 +13,7 @@
 #include <QString>
 
 #include <plugins/resource/onvif/onvif_resource.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 
 /*!
@@ -35,9 +35,9 @@ protected:
     virtual bool isInputPortMonitored() const override;
 
 private:
-    nx_http::AsyncHttpClientPtr m_checkInputPortsRequest;
+    nx::network::http::AsyncHttpClientPtr m_checkInputPortsRequest;
     mutable QnMutex m_ioPortMutex;
-    QUrl m_checkInputUrl;
+    nx::utils::Url m_checkInputUrl;
     bool m_inputMonitored;
     qint64 m_checkInputPortStatusTimerID;
     //!true - closed, falswe - opened
@@ -46,7 +46,7 @@ private:
     void checkInputPortState( qint64 timerID );
 
 private slots:
-    void onCheckPortRequestDone( nx_http::AsyncHttpClientPtr httpClient );
+    void onCheckPortRequestDone( nx::network::http::AsyncHttpClientPtr httpClient );
 };
 
 #endif  //ENABLE_ONVIF

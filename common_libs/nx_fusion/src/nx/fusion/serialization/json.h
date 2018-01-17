@@ -169,7 +169,7 @@ bool deserialize(
     bool optional = false,
     bool* outFound = nullptr,
     DeprecatedFieldNames* deprecatedFieldNames = nullptr,
-    const std::type_info& structTypeInfo = typeid(nullptr_t))
+    const std::type_info& structTypeInfo = typeid(std::nullptr_t))
 {
     QJsonObject::const_iterator pos = QJsonDetail::findField(
         value, key, deprecatedFieldNames, structTypeInfo);
@@ -299,13 +299,13 @@ template<class T>
 T deserialized(const QByteArray& value, const T& defaultValue = T(), bool* success = nullptr)
 {
     T target;
-    bool result = QJson::deserialize(value, &target);
+    const bool result = QJson::deserialize(value, &target);
     if (success)
         *success = result;
 
-    T local; //enforcing NVRO
     if (result)
     {
+        T local; // Enforcing NRVO, which is blocked by address-taking operator above.
         std::swap(local, target);
         return local;
     }

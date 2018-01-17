@@ -24,14 +24,25 @@ Use the following tags for markup, among others:
     b { color: blue; /* non-bold */ font-weight: inherit; font-family: inherit; }
 </style>
 
-<!------------------------------------------------------------------------------------------------>
+<!--============================================================================================-->
 
-A number of Rest <strong>API</strong> methods and params have been <strong>renamed</strong>
-in 3.0.0, <strong>breaking</strong> backwards <strong>compatibility</strong> (except where
-<strong>deprecated names</strong> are supported).
+Here the <strong>changes</strong> of Rest <strong>API</strong> from VMS version to version are
+documented, which can potentially <strong>break compatibility</strong>. In particular, methods and
+params can be <strong>renamed</strong>, though often <strong>deprecated names</strong> are
+supported for a while, when noted below.
 
-<!------------------------------------------------------------------------------------------------>
-<h2>Breaking compatibility</h2>
+<!--============================================================================================-->
+<hr/>
+<h2>VMS <b>3.1</b> relative to <i>3.0</i></h2>
+
+No breaking changes were introduced; no features became deprecated.
+
+<!--============================================================================================-->
+<hr/>
+<h2>VMS <b>3.0</b> relative to <i>2.6</i></h2>
+
+<!--============================================================================================-->
+<h3>Breaking compatibility</h3>
 
 Renamed methods:
 <pre>
@@ -60,15 +71,15 @@ Changed <strong>reply</strong> format <strong><i>XML</i> -> <b>JSON</b></strong>
     /api/storageStatus
 </pre>
 
-<!------------------------------------------------------------------------------------------------>
-<h2>Retaining compatibility until expired</h2>
+<!--============================================================================================-->
+<h3>Retaining compatibility until expired</h3>
 
 <p>Replaced method <strong><code>/api/image -> /ec2/cameraThumbnail</code></strong>
-Deprecated method support expires by 3.1. The new method can get thumbnails from cameras
+Deprecated method support expires by 3.2. The new method can get thumbnails from cameras
 located on other servers (the old one can't).
 </p>
 Renamed param <strong><code>cameraI<i>D</i> -> cameraI<b>d</b></code></strong>
-(deprecated name support expires by 3.1) in methods:
+(deprecated name support expires by 3.2) in methods:
 <pre>
     /ec2/getCamerasEx
     /ec2/getCameraUserAttributesList
@@ -77,7 +88,7 @@ Renamed param <strong><code>cameraI<i>D</i> -> cameraI<b>d</b></code></strong>
 </pre>
 
 Renamed param <strong><code>serverI<i>D</i> -> serverI<b>d</b></code></strong>
-(deprecated name support expires by 3.1) in methods:
+(deprecated name support expires by 3.2) in methods:
 <pre>
     /ec2/getMediaServerUserAttributesList
     /ec2/saveMediaServerUserAttributesList
@@ -85,14 +96,14 @@ Renamed param <strong><code>serverI<i>D</i> -> serverI<b>d</b></code></strong>
 </pre>
 
 Renamed param <strong><code>ph<i>i</i>sicalMemory -> ph<b>y</b>sicalMemory</code></strong>
-(deprecated name support expires by 3.1) in methods:
+(deprecated name support expires by 3.2) in methods:
 <pre>
     /ec2/saveClientInfo
     /ec2/getClientInfoList
 </pre>
 
 Renamed param <strong><code>prefe<i>r</i>edServerId -> prefe<b>rr</b>edServerId</code></strong>
-(deprecated name support expires by 3.1) in methods:
+(deprecated name support expires by 3.2) in methods:
 <pre>
     /ec2/saveCameraUserAttributesList
     /ec2/saveCameraUserAttributes
@@ -101,7 +112,7 @@ Renamed param <strong><code>prefe<i>r</i>edServerId -> prefe<b>rr</b>edServerId<
 </pre>
 
 Renamed param <strong><code><i>res_id </i>-> <b>cameraId</b></code></strong>
-(deprecated name support expires by 3.1) in methods:
+(deprecated name support expires by 3.2) in methods:
 <pre>
     /api/doCameraDiagnosticsStep
     /api/setCameraParam
@@ -109,20 +120,20 @@ Renamed param <strong><code><i>res_id </i>-> <b>cameraId</b></code></strong>
 </pre>
 
 Renamed param <strong><code><i>resource</i>Id -> <b>camera</b>Id</code></strong>
-(deprecated name support expires by 3.1) in methods:
+(deprecated name support expires by 3.2) in methods:
 <pre>
     /api/ptz
 </pre>
 
 Renamed and merged together params
 <strong><code><i>mac</i> + <i>physicalId</i> -> <b>cameraId</b></code></strong>
-(deprecated names support expires by 3.1) in methods:
+(deprecated names support expires by 3.2) in methods:
 <pre>
     /ec2/bookmarks
 </pre>
 
 Renamed param <strong><code><i>physical</i>Id -> <b>camera</b>Id</code></strong>
-(deprecated name support expires by 3.1) in methods:
+(deprecated name support expires by 3.2) in methods:
 <pre>
     /api/image
     /api/getEvents
@@ -130,25 +141,25 @@ Renamed param <strong><code><i>physical</i>Id -> <b>camera</b>Id</code></strong>
 </pre>
 
 Changed <strong><i>GET</i> -> <b>POST</b></strong>
-(deprecated method support expires by 3.1, check extra details in documentation) in methods:
+(deprecated method support expires by 3.2, check extra details in documentation) in methods:
 <pre>
     /api/manualCamera/add
 </pre>
 
 Changed <strong>RTSP</strong> Streaming <strong>URL</strong>
-(deprecated URL support expires by 3.1):
+(deprecated URL support expires by 3.2):
 <pre>
     /&lt;<i>physicalId</i>&gt; -> /&lt;<b>cameraId</b>&gt;
 </pre>
 
 Changed <strong>HTTP</strong> Streaming <strong>URL</strong>
-(deprecated URL support expires by 3.1):
+(deprecated URL support expires by 3.2):
 <pre>
     /media/&lt;<i>physicalId</i>&gt;.&lt;format&gt; -> /media/&lt;<b>cameraId</b>&gt;.&lt;format&gt;
 </pre>
 
 Changed <strong>HLS</strong> Streaming/Download <strong>URL</strong>
-(deprecated URL support expires by 3.1):
+(deprecated URL support expires by 3.2):
 <pre>
     /hls/&lt;<i>physicalid</i>&gt;.&lt;format&gt; -> /hls/&lt;<b>cameraId</b>&gt;.&lt;format&gt;
 </pre>

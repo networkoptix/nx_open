@@ -1,12 +1,12 @@
 <div class="container auth-visible" process-loading="gettingSystem">
     <div ng-if="systemNoAccess" class="text-center">
-        <h1>Failed to access System</h1>
-        <p>This link is broken,<br>
-            System may be disconnected from {{PRODUCT_NAME}},<br>
-            Access to this System may be revoked, <br>
-            or you may be logged into a different account</p>
+        <h1>Truy cập hệ thống bị lỗi</h1>
+        <p>Kiểm tra các lỗi dưới đây,<br>
+Hệ thống truy nhập có thể bị mất kết nối khỏi{{PRODUCT_NAME}}<br>
+Truy cập vào hệ thống này có thể bị thu hồi,<br>
+Hoặc bạn có thể đăng nhập vào bằng một tài khoản khác</p>
         <p>
-            <a href="/systems" class="btn btn-default">Available Systems list</a>
+            <a href="/systems" class="btn btn-default">Danh sách các Hệ thống có sẵn</a>
         </p>
     </div>
 
@@ -18,7 +18,7 @@
         <div class="col-md-8 col-md-pull-4">
             <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
                 <span class="no-data-panel-body">
-                    You do not have access to System information.
+                    Bạn không có quyền truy cập thông tin hệ thống.
                 </span>
             </div>
             <ng-include src="$root.C.viewsDir + 'components/system-users.html'" ng-if="system.permissions.editUsers" ></ng-include>

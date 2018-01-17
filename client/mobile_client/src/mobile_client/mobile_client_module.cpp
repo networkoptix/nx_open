@@ -2,6 +2,7 @@
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QDesktopServices>
+#include <QtQml/QQmlEngine>
 
 #include <api/app_server_connection.h>
 
@@ -35,6 +36,9 @@
 #include "mobile_client_translation_manager.h"
 #include "mobile_client_app_info.h"
 #include "mobile_client_startup_parameters.h"
+#include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
 #include <nx/mobile_client/settings/migration_helper.h>
 #include <nx/mobile_client/settings/settings_migration.h>
@@ -43,6 +47,8 @@
 #include <core/ptz/client_ptz_controller_pool.h>
 
 using namespace nx::mobile_client;
+
+static const QString kQmlRoot = QStringLiteral("qrc:///qml");
 
 QnMobileClientModule::QnMobileClientModule(
     const QnMobileClientStartupParameters& startupParameters,
@@ -67,10 +73,10 @@ QnMobileClientModule::QnMobileClientModule(
     m_clientCoreModule.reset(new QnClientCoreModule());
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->setModuleGUID(QnUuid::createUuid());
-    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("mc", commonModule->moduleGUID());
+    nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("mc", commonModule->moduleGUID());
 
     // TODO: #mu ON/OFF switch in settings?
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
+    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
 
     // TODO: #mshevchenko Remove when client_core_module is created.
     commonModule->store(translationManager);
@@ -130,6 +136,20 @@ QnMobileClientModule::QnMobileClientModule(
 
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
     commonModule->instance<QnServerInterfaceWatcher>();
+
+    auto qmlRoot = startupParameters.qmlRoot.isEmpty() ? kQmlRoot : startupParameters.qmlRoot;
+    if (!qmlRoot.endsWith(L'/'))
+        qmlRoot.append(L'/');
+    NX_INFO(this, lm("Setting QML root to %1").arg(qmlRoot));
+
+    m_clientCoreModule->mainQmlEngine()->setBaseUrl(
+        qmlRoot.startsWith(lit("qrc:"))
+            ? QUrl(qmlRoot)
+            : QUrl::fromLocalFile(qmlRoot));
+    m_clientCoreModule->mainQmlEngine()->addImportPath(qmlRoot);
+
+    if (QnAppInfo::applicationPlatform() == lit("ios"))
+        m_clientCoreModule->mainQmlEngine()->addImportPath(lit("qt_qml"));
 }
 
 QnMobileClientModule::~QnMobileClientModule()

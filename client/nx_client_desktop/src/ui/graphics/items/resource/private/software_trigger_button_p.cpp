@@ -6,7 +6,6 @@
 #include <QtWidgets/QGraphicsDropShadowEffect>
 
 #include <ui/animation/opacity_animator.h>
-#include <ui/common/geometry.h>
 #include <ui/graphics/items/generic/slider_tooltip_widget.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/style/icon.h>
@@ -16,6 +15,7 @@
 #include <ui/style/software_trigger_pixmaps.h>
 #include <ui/widgets/common/busy_indicator.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
+#include <nx/client/core/utils/geometry.h>
 
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
@@ -102,13 +102,6 @@ SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton
             Q_Q(SoftwareTriggerButton);
             m_imagesDirty = true;
             q->update();
-        });
-
-    connect(main, &SoftwareTriggerButton::enabledChanged, this,
-        [this]()
-        {
-            Q_Q(const SoftwareTriggerButton);
-            m_toolTip->setVisible(q->isEnabled());
         });
 
     m_toolTipHoverProcessor->addTargetItem(main);
@@ -290,16 +283,18 @@ bool SoftwareTriggerButtonPrivate::isLive() const
     return m_live;
 }
 
-void SoftwareTriggerButtonPrivate::setLive(bool value)
+bool SoftwareTriggerButtonPrivate::setLive(bool value)
 {
     if (m_live == value)
-        return;
+        return false;
 
     m_live = value;
     updateToolTipText();
 
     Q_Q(SoftwareTriggerButton);
     q->update();
+
+    return true;
 }
 
 SoftwareTriggerButton::State SoftwareTriggerButtonPrivate::state() const
@@ -515,12 +510,12 @@ QPixmap SoftwareTriggerButtonPrivate::generatePixmap(
     painter.setPen(frame.isValid() ? QPen(frame, kFrameLineWidth) : QPen(Qt::NoPen));
 
     painter.drawEllipse(frame.isValid()
-        ? QnGeometry::eroded(QRectF(buttonRect()), kFrameLineWidth / 2.0)
+        ? nx::client::core::Geometry::eroded(QRectF(buttonRect()), kFrameLineWidth / 2.0)
         : buttonRect());
 
     if (!icon.isNull())
     {
-        const auto pixmapRect = QnGeometry::aligned(
+        const auto pixmapRect = nx::client::core::Geometry::aligned(
             icon.size() / icon.devicePixelRatio(),
             buttonRect());
 

@@ -9,7 +9,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/time.h>
 
-constexpr size_t kMaxTimeStrLength = sizeof(quint32); 
+constexpr size_t kMaxTimeStrLength = sizeof(quint32);
 constexpr std::chrono::seconds kSocketRecvTimeout = std::chrono::seconds(7);
 constexpr int kMillisPerSec = 1000;
 

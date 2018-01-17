@@ -19,7 +19,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     ConnectionRole ResourceStatus BitratePerGopType
     StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PeerType StatisticsDeviceType
     ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
-    RebuildAction BackupAction FailoverPriority
+    RebuildAction BackupAction FailoverPriority MediaStreamEvent
     Permission GlobalPermission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
@@ -41,7 +41,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         RelayOutputCapability               = 0x010,
         ShareIpCapability                   = 0x020,
         AudioTransmitCapability             = 0x040,
-        RemoteArchiveCapability             = 0x100
+        RemoteArchiveCapability             = 0x100,
+        SetUserPasswordCapability           = 0x200, //< Can change password on a camera.
+        isDefaultPasswordCapability         = 0x400 //< Camera has default password now.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -119,7 +121,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     enum PtzCoordinateSpace {
         DevicePtzCoordinateSpace,
         LogicalPtzCoordinateSpace,
-        InvalidPtzCoordinateSpace 
+        InvalidPtzCoordinateSpace
     };
 
     enum PtzObjectType {
@@ -381,6 +383,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     enum TimePeriodContent {
         RecordingContent,
         MotionContent,
+        AnalyticsContent,
 
         TimePeriodContentCount
     };
@@ -521,6 +524,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         LC_Free,
 
         /**
+         * For all new DVR/NVR devices except of VMAX
+         */
+        LC_Bridge,
+
+        /**
          * Invalid license. Required when the correct license type is not known in current version.
          */
         LC_Invalid,
@@ -630,57 +638,147 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StorageInitResult)
 
     /**
-     * Flags describing the actions permitted for the user to do with the
-     * selected resource. Calculated in runtime.
+     * Flags describing the actions permitted for the user/role to do with the selected resource.
+     * Calculated in runtime.
      */
     enum Permission
     {
-        /* Generic permissions. */
-        NoPermissions                   = 0x0000,   /**< No access */
+        //-----------------------------------------------------------------------------------------
+        //  Generic resource permissions.
 
-        ReadPermission                  = 0x0001,   /**< Generic read access. Having this access right doesn't necessary mean that all information is readable. */
-        WritePermission                 = 0x0002,   /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */
-        SavePermission                  = 0x0004,   /**< Generic save access. Entity can be saved to the server. */
-        RemovePermission                = 0x0008,   /**< Generic delete permission. */
+        // No access.
+        NoPermissions = 0,
+
+        // Generic read access. Having this permission doesn't necessary mean that all
+        // information is readable. See resource-specific permissions below. By default this means
+        // that this resource will be available in server api replies (e.g. FullInfo)
+        ReadPermission = 1 << 0,
+
+        // Generic write access. Having this permission doesn't necessary mean that all
+        // information is writable. See resource-specific permissions below. Actual only on the
+        // client side. By default this means we can modify the resource somehow.
+        WritePermission = 1 << 1,
+
+        // Generic save access. Resource can be saved to the server database. Actual both on the
+        // client and the server side.
+        SavePermission = 1 << 2,
+
+        // Generic delete permission. Resource can be deleted from the server database.
+        RemovePermission = 1 << 3,
+
+        // Permission to edit resource's name.
+        WriteNamePermission = 1 << 4,
+
+        // Alias for common set of generic permissions.
         ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
-        WriteNamePermission             = 0x0010,   /**< Permission to edit resource's name. */
+
+        // Alias for full set of generic permissions.
+        FullGenericPermissions = ReadWriteSavePermission | RemovePermission | WriteNamePermission,
 
         /**
-         * Permission to view resource content.
-         * Currently used for server's health monitor access.
-         * Automatically granted for cameras and web pages if user has ReadPermission for them.
+         * Generic permission to view actual resource content. Actually that means we can open
+         * widget with this resource's content on the scene. For servers: health monitor access.
          */
-        ViewContentPermission           = 0x0020,
+        ViewContentPermission = 1 << 5,
 
-        /** Full set of permissions which can be available for server resource. */
-        FullServerPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | ViewContentPermission,
+        //-----------------------------------------------------------------------------------------
 
-        /* Layout-specific permissions. */
-        AddRemoveItemsPermission        = 0x0040,   /**< Permission to add or remove items from a layout. */
-        EditLayoutSettingsPermission    = 0x0080,   /**< Permission to setup layout background or set locked flag. */
-        ModifyLayoutPermission          = ReadPermission | WritePermission | AddRemoveItemsPermission, /**< Permission to modify without saving. */
-        FullLayoutPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | ModifyLayoutPermission | EditLayoutSettingsPermission,
+        //-----------------------------------------------------------------------------------------
+        // Webpage-specific permissions.
 
-        /* User-specific permissions. */
-        WritePasswordPermission         = 0x0200,   /**< Permission to edit associated password. */
-        WriteAccessRightsPermission     = 0x0400,   /**< Permission to edit access rights. */
-        WriteEmailPermission            = 0x0800,   /**< Permission to edit user's email. */
-        WriteFullNamePermission         = 0x1000,   /**< Permission to edit user's full name. */
-        FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission
-                                            | RemovePermission | WritePasswordPermission
-                                            | WriteAccessRightsPermission
-                                            | WriteFullNamePermission | WriteEmailPermission,
+        // Permission to view web page.
+        ViewWebPagePermission = ViewContentPermission,
 
-        /* Media-specific permissions. */
-        ExportPermission                = 0x2000,   /**< Permission to export video parts. */
+        //-----------------------------------------------------------------------------------------
 
-        /* Camera-specific permissions. */
-        WritePtzPermission              = 0x4000,   /**< Permission to use camera's PTZ controls. */
+        //-----------------------------------------------------------------------------------------
+        // Server-specific permissions.
 
-        /* Mode-specific permissions. */
-        VideoWallLayoutPermissions      = ModifyLayoutPermission,
-        VideoWallMediaPermissions       = ReadPermission | ViewContentPermission | WritePtzPermission,
+        // Permission to view health monitoring.
+        ViewHealthMonitorPermission = ViewContentPermission,
 
+        // Full set of permissions which can be available for the server resource.
+        FullServerPermissions = FullGenericPermissions | ViewHealthMonitorPermission,
+
+        //-----------------------------------------------------------------------------------------
+
+        //-----------------------------------------------------------------------------------------
+        // Layout-specific permissions.
+
+         // Permission to add or remove items from a layout.
+        AddRemoveItemsPermission = 1 << 6,
+
+        // Permission to setup layout background or set locked flag.
+        EditLayoutSettingsPermission = 1 << 7,
+
+        // Permission set to modify without saving.
+        ModifyLayoutPermission = ReadPermission | WritePermission | AddRemoveItemsPermission,
+
+        // Full set of permissions which can be available for the layout resource.
+        FullLayoutPermissions = FullGenericPermissions
+            | AddRemoveItemsPermission
+            | EditLayoutSettingsPermission,
+
+        //-----------------------------------------------------------------------------------------
+
+        //-----------------------------------------------------------------------------------------
+        // User-specific permissions.
+
+        // Permission to edit associated password.
+        WritePasswordPermission = 1 << 8,
+
+        // Permission to edit access rights.
+        WriteAccessRightsPermission = 1 << 9,
+
+        // Permission to edit user's email.
+        WriteEmailPermission = 1 << 10,
+
+        // Permission to edit user's full name.
+        WriteFullNamePermission = 1 << 11,
+
+        // Full set of permissions which can be available for the user resource.
+        FullUserPermissions = FullGenericPermissions
+            | WritePasswordPermission
+            | WriteAccessRightsPermission
+            | WriteFullNamePermission
+            | WriteEmailPermission,
+
+        //-----------------------------------------------------------------------------------------
+
+        //-----------------------------------------------------------------------------------------
+        // Media-specific permissions.
+
+        // Permission to view camera's live stream.
+        ViewLivePermission = 1 << 12,
+
+        // Permission to view camera's footage.
+        ViewFootagePermission = 1 << 13,
+
+        // Permission to export video parts.
+        ExportPermission = 1 << 14,
+
+        // Permission to use camera's PTZ controls.
+        WritePtzPermission = 1 << 15,
+
+        //-----------------------------------------------------------------------------------------
+
+        //-----------------------------------------------------------------------------------------
+        // Mode-specific permissions.
+
+        // Layout access permission for the running videowall instance.
+        VideoWallLayoutPermissions = ModifyLayoutPermission,
+
+        // Media access permission for the running videowall instance.
+        // PTZ is intended here - by SpaceX request.
+        VideoWallMediaPermissions = ReadPermission
+            | ViewContentPermission
+            | ViewLivePermission
+            | ViewFootagePermission
+            | WritePtzPermission,
+
+        //-----------------------------------------------------------------------------------------
+
+        // All eventually possible permissions.
         AllPermissions = 0xFFFFFFFF
     };
 
@@ -779,6 +877,12 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         DisabledUserConnectionResult                /*< Disabled user*/
     };
 
+    enum MediaStreamEvent
+    {
+        NoEvent,
+        TooManyOpenedConnections
+    };
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -815,7 +919,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-    (Qn::FailoverPriority)
+    (Qn::FailoverPriority)(Qn::MediaStreamEvent)
     ,
     (metatype)(lexical)
 )

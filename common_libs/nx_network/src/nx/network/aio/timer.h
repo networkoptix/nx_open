@@ -28,8 +28,8 @@ public:
     Timer(const Timer&) = delete;
     Timer& operator=(const Timer&) = delete;
 
-    /** 
-     * @note If timer is already started, this method overwrites timer, not adds a new one!
+    /**
+     * NOTE: If timer is already started, this method overwrites timer, not adds a new one!
      */
     void start(
         std::chrono::milliseconds timeout,

@@ -35,6 +35,8 @@ int eventHelpId(vms::event::EventType type)
             return Qn::EventsActions_BackupFinished_Help;
         case vms::event::analyticsSdkEvent:
             return Qn::EventsActions_VideoAnalytics_Help;
+        case vms::event::softwareTriggerEvent:
+            return Qn::EventActions_SoftTrigger_Help;
         default:
             return type >= vms::event::userDefinedEvent
                 ? Qn::EventsActions_Generic_Help
@@ -94,8 +96,6 @@ int healthHelpId(QnSystemHealth::MessageType type)
             return Qn::EventsActions_SendMailError_Help;
         case QnSystemHealth::StoragesNotConfigured:
             return Qn::EventsActions_StoragesMisconfigured_Help;
-        case QnSystemHealth::StoragesAreFull:
-            return Qn::EventsActions_StorageFull_Help;
         default:
             return -1;
     }

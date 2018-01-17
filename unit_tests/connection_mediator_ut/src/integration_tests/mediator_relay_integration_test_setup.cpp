@@ -1,5 +1,6 @@
 #include "mediator_relay_integration_test_setup.h"
 
+#include <nx/network/stun/stun_types.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -45,7 +46,7 @@ private:
     QUrl m_relayUrl;
 };
 
-} // namespace 
+} // namespace
 
 //-------------------------------------------------------------------------------------------------
 
@@ -96,9 +97,9 @@ void MediatorRelayIntegrationTestSetup::SetUp()
     m_systemCredentials.key = system.authKey;
     m_systemCredentials.serverId = QnUuid::createUuid().toSimpleByteArray();
 
-    m_stunClient = std::make_shared<nx::stun::AsyncClient>();
+    m_stunClient = std::make_shared<nx::network::stun::AsyncClient>();
     m_stunClient->connect(
-        nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName)
+        nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName)
         .setEndpoint(stunEndpoint()));
     m_serverConnection =
         std::make_unique<api::MediatorServerTcpConnection>(m_stunClient, this);
@@ -149,7 +150,7 @@ void MediatorRelayIntegrationTestSetup::issueConnectRequest()
     m_mediatorUdpClient->connect(
         request,
         [this, &done](
-            stun::TransportHeader /*stunTransportHeader*/,
+            nx::network::stun::TransportHeader /*stunTransportHeader*/,
             nx::hpm::api::ResultCode resultCode,
             nx::hpm::api::ConnectResponse response)
         {

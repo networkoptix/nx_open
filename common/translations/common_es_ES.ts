@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Nuevo Sistema</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>El Sistema descubierto %1 es incompatible con el Sistema actual.</translation>
     </message>
   </context>
   <context>
@@ -256,18 +256,6 @@
       <translation>Asegúrese de que el puerto %1 es accesible (por ejemplo, reenviar).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración del dispositivo.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración de la cámara.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración del módulo E/S.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Si no funciona, restaurar valores predeterminados de fábrica en la página web del dispositivo.</translation>
     </message>
@@ -314,6 +302,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>La cámara se ha restaurado del archivo. Elimine la cámara y agrégala de nuevo para ver el video en vivo.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración del dispositivo (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración de la cámara (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración del módulo E/S (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -486,6 +486,14 @@
     <message>
       <source>Time Licenses</source>
       <translation>Licencias de tiempo</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation>Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>Licencias Bridge</translation>
     </message>
   </context>
   <context>
@@ -775,6 +783,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>Tipo de recurso no válido para la exportación de datos.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>No se exportaron datos.</translation>
     </message>
   </context>
   <context>
@@ -1505,6 +1517,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>Confirmar</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>Evento de Analiticas</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 En %2</translation>
     </message>
   </context>
   <context>

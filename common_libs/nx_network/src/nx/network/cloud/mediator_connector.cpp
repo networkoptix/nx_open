@@ -6,6 +6,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
+#include "connection_mediator_url_fetcher.h"
+
 static const std::chrono::milliseconds kRetryIntervalInitial = std::chrono::seconds(1);
 static const std::chrono::milliseconds kRetryIntervalMax = std::chrono::minutes(10);
 
@@ -15,12 +17,12 @@ namespace api {
 
 namespace {
 
-static stun::AbstractAsyncClient::Settings s_stunClientSettings;
+static network::stun::AbstractAsyncClient::Settings s_stunClientSettings;
 
 } // namespace
 
 MediatorConnector::MediatorConnector():
-    m_stunClient(std::make_shared<stun::AsyncClientWithHttpTunneling>(s_stunClientSettings)),
+    m_stunClient(std::make_shared<network::stun::AsyncClientWithHttpTunneling>(s_stunClientSettings)),
     m_mediatorUrlFetcher(std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>()),
     m_fetchEndpointRetryTimer(
         std::make_unique<nx::network::RetryTimer>(
@@ -82,13 +84,13 @@ std::unique_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection
     return std::make_unique<MediatorServerTcpConnection>(m_stunClient, this);
 }
 
-void MediatorConnector::mockupCloudModulesXmlUrl(const QUrl& cloudModulesXmlUrl)
+void MediatorConnector::mockupCloudModulesXmlUrl(const nx::utils::Url& cloudModulesXmlUrl)
 {
     QnMutexLocker lock(&m_mutex);
     m_mediatorUrlFetcher->setModulesXmlUrl(cloudModulesXmlUrl);
 }
 
-void MediatorConnector::mockupMediatorUrl(const QUrl& mediatorUrl)
+void MediatorConnector::mockupMediatorUrl(const nx::utils::Url& mediatorUrl)
 {
     {
         QnMutexLocker lock(&m_mutex);
@@ -108,6 +110,9 @@ void MediatorConnector::mockupMediatorUrl(const QUrl& mediatorUrl)
     m_mediatorUdpEndpoint = nx::network::url::getEndpoint(mediatorUrl);
     m_stunClient->connect(mediatorUrl, [](SystemError::ErrorCode) {});
     m_promise->set_value(true);
+
+    if (m_mediatorAvailabilityChangedHandler)
+        m_mediatorAvailabilityChangedHandler(true);
 }
 
 void MediatorConnector::setSystemCredentials(boost::optional<SystemCredentials> value)
@@ -132,20 +137,20 @@ boost::optional<SystemCredentials> MediatorConnector::getSystemCredentials() con
     return m_credentials;
 }
 
-boost::optional<SocketAddress> MediatorConnector::udpEndpoint() const
+boost::optional<network::SocketAddress> MediatorConnector::udpEndpoint() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_mediatorUdpEndpoint;
 }
 
-bool MediatorConnector::isConnected() const
+void MediatorConnector::setOnMediatorAvailabilityChanged(
+    MediatorAvailabilityChangedHandler handler)
 {
-    QnMutexLocker lock(&m_mutex);
-    return static_cast<bool>(m_mediatorUrl);
+    m_mediatorAvailabilityChangedHandler.swap(handler);
 }
 
 void MediatorConnector::setStunClientSettings(
-    stun::AbstractAsyncClient::Settings stunClientSettings)
+    network::stun::AbstractAsyncClient::Settings stunClientSettings)
 {
     s_stunClientSettings = std::move(stunClientSettings);
 }
@@ -165,9 +170,9 @@ void MediatorConnector::stopWhileInAioThread()
 void MediatorConnector::fetchEndpoint()
 {
     m_mediatorUrlFetcher->get(
-        [this](nx_http::StatusCode::Value status, QUrl tcpUrl, QUrl udpUrl)
+        [this](nx::network::http::StatusCode::Value status, nx::utils::Url tcpUrl, nx::utils::Url udpUrl)
         {
-            if (status != nx_http::StatusCode::ok)
+            if (status != nx::network::http::StatusCode::ok)
             {
                 NX_LOGX(lit("Can not fetch mediator address: HTTP %1")
                     .arg(status), cl_logDEBUG1);
@@ -185,6 +190,8 @@ void MediatorConnector::fetchEndpoint()
                 m_mediatorUdpEndpoint = nx::network::url::getEndpoint(udpUrl);
                 m_mediatorUrl = tcpUrl;
                 connectToMediatorAsync();
+                if (m_mediatorAvailabilityChangedHandler)
+                    m_mediatorAvailabilityChangedHandler(true);
             }
         });
 }

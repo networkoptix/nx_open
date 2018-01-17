@@ -42,11 +42,11 @@ public:
 
     void doSearch();
 
-    QUrl url();
+    nx::utils::Url url();
     QString toString();
 
 private:
-    QUrl m_url;
+    nx::utils::Url m_url;
     QAuthenticator m_auth;
 
     /**
@@ -96,7 +96,7 @@ private:
     QStringList getOnlineHosts(
         const QString& startAddr,
         const QString& endAddr,
-        int port = nx_http::DEFAULT_HTTP_PORT);
+        int port = nx::network::http::DEFAULT_HTTP_PORT);
 
     void runTasksUnsafe(QThreadPool* threadPool);
     QList<QnAbstractNetworkResourceSearcher*> getAllNetworkSearchers() const;

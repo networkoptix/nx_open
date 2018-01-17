@@ -1,8 +1,9 @@
 #include <boost/optional.hpp>
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
+#include <nx/network/cloud/tunnel/cross_nat_connector.h>
 #include <nx/network/cloud/tunnel/udp/connector.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/random.h>
@@ -28,8 +29,7 @@ public:
     UdpTunnelConnector():
         m_cloudConnectMaskBak(ConnectorFactory::getEnabledCloudConnectMask())
     {
-        ConnectorFactory::setEnabledCloudConnectMask(
-            (int)CloudConnectType::udpHp);
+        ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::udpHp);
     }
 
     ~UdpTunnelConnector()
@@ -96,7 +96,7 @@ TEST_F(UdpTunnelConnector, timeout)
     const std::chrono::milliseconds connectTimeout(utils::random::number(1000, 4000));
 
     // Timing out udt connection...
-    boost::optional<SocketAddress> mediatorAddressForConnector;
+    boost::optional<nx::network::SocketAddress> mediatorAddressForConnector;
 
     const auto connectResult = doSimpleConnectTest(
         connectTimeout,
@@ -143,7 +143,7 @@ TEST_F(UdpTunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
 
     nx::utils::promise<ConnectResult> connectedPromise;
     CrossNatConnector connector(
-        SocketAddress((server1->serverId() + "." + system1.id).constData()));
+        nx::network::SocketAddress((server1->serverId() + "." + system1.id).constData()));
     connector.replaceOriginatingHostAddress("192.168.0.1");
 
     connector.connect(
@@ -164,7 +164,7 @@ TEST_F(UdpTunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
         std::find(
             connectionRequestedEvent.udpEndpointList.begin(),
             connectionRequestedEvent.udpEndpointList.end(),
-            SocketAddress(HostAddress("192.168.0.1"), connector.localAddress().port)) !=
+            nx::network::SocketAddress(nx::network::HostAddress("192.168.0.1"), connector.localAddress().port)) !=
         connectionRequestedEvent.udpEndpointList.end());
 
     connector.pleaseStopSync();

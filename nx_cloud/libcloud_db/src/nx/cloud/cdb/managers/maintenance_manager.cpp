@@ -112,6 +112,7 @@ void MaintenanceManager::onTransactionLogRead(
         tran.tranGuid = QnUuid::fromStringSafe(transactionContext.hash);
         nx::Buffer serializedTransaction =
             transactionContext.serializer->serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION);
+        tran.dataSize = serializedTransaction.size();
         QnUbjsonReader<nx::Buffer> stream(&serializedTransaction);
         if (QnUbjson::deserialize(&stream, &tran.tran))
         {

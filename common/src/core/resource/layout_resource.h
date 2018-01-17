@@ -23,8 +23,12 @@ class QnLayoutResource: public QnResource,
     private QnThreadsafeItemStorageNotifier<QnLayoutItemData>
 {
     Q_OBJECT
+    Q_PROPERTY(float cellAspectRatio
+        READ cellAspectRatio WRITE setCellAspectRatio NOTIFY cellAspectRatioChanged)
+    Q_PROPERTY(qreal cellSpacing
+        READ cellSpacing WRITE setCellSpacing NOTIFY cellSpacingChanged)
 
-    typedef QnResource base_type;
+    using base_type = QnResource;
 
 public:
     QnLayoutResource(QnCommonModule* commonModule = nullptr);
@@ -32,7 +36,7 @@ public:
     virtual QString getUniqueId() const override;
     virtual Qn::ResourceStatus getStatus() const override;
 
-    QnLayoutResourcePtr clone() const;
+    QnLayoutResourcePtr clone(QHash<QnUuid, QnUuid>* remapHash = nullptr) const;
 
     /** Create a new layout with a given resource on it. */
     static QnLayoutResourcePtr createFromResource(const QnResourcePtr& resource);
@@ -51,7 +55,7 @@ public:
 
     void removeItem(const QnLayoutItemData &item);
 
-    void removeItem(const QnUuid &itemUuid);
+    Q_INVOKABLE void removeItem(const QnUuid &itemUuid);
 
     /**
      * @note Resource replacement is not supported for item.
@@ -86,6 +90,10 @@ public:
     /** Size of background image - in cells */
     QSize backgroundSize() const;
     void setBackgroundSize(QSize size);
+
+    /** Helper to get the actual scene item coordinates of the layout background. */
+    QRect backgroundRect() const;
+    static QRect backgroundRect(const QSize& backgroundSize);
 
     /** Filename of background image on Server */
     QString backgroundImageFilename() const;

@@ -3,7 +3,7 @@
 #include <QtCore/QMimeData>
 
 #include <QtQuickWidgets/QQuickWidget>
-#include <QtQuick/QQuickView>
+#include <QtQuick/QQuickItem>
 #include <QtQml/QQmlContext>
 
 #include <QtWidgets/QAction>
@@ -12,10 +12,11 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QWhatsThis>
 
+#include <client_core/client_core_settings.h>
 #include <client/startup_tile_manager.h>
 #include <client/forgotten_systems_manager.h>
-#include <client_core/client_core_settings.h>
 #include <client/client_runtime_settings.h>
+#include <client/system_weights_manager.h>
 
 #include <common/common_module.h>
 
@@ -48,56 +49,9 @@
 
 using namespace nx::client::desktop::ui;
 
-namespace
-{
-typedef QPointer<QnWorkbenchWelcomeScreen> GuardType;
+namespace {
 
-QWidget* createMainView(QObject* context, QQuickView* quickView)
-{
-    static const auto kWelcomeScreenSource = lit("qrc:/src/qml/WelcomeScreen.qml");
-    static const auto kContextVariableName = lit("context");
-
-    auto holder = new QStackedWidget();
-    holder->addWidget(new QWidget());
-    holder->addWidget(QWidget::createWindowContainer(quickView));
-    setHelpTopic(holder, Qn::Login_Help);
-
-    const auto loadQmlData = [quickView, context, holder]()
-        {
-            const auto updateQmlViewVisibility = [holder](QQuickView::Status status)
-                {
-                    if (status != QQuickView::Ready)
-                        return false;
-
-                    enum { kQmlViewIndex = 1 };
-                    holder->setCurrentIndex(kQmlViewIndex);
-                    return true;
-                };
-
-            QObject::connect(quickView, &QQuickView::statusChanged,
-                quickView, updateQmlViewVisibility);
-
-            quickView->rootContext()->setContextProperty(
-                kContextVariableName, context);
-            quickView->setSource(kWelcomeScreenSource);
-        };
-
-    // Async load of qml data
-    executeDelayedParented(loadQmlData, 0, quickView);
-    return holder;
-}
-
-QnGenericPalette extractPalette()
-{
-    const auto proxy = dynamic_cast<QProxyStyle *>(qApp->style());
-    NX_ASSERT(proxy, Q_FUNC_INFO, "Invalid application style");
-    const auto style = dynamic_cast<QnNxStyle *>(proxy ? proxy->baseStyle() : nullptr);
-    NX_ASSERT(style, Q_FUNC_INFO, "Style of application is not NX");
-    return (style ? style->genericPalette() : QnGenericPalette());
-}
-
-
-QnResourceList extractResources(const UrlsList& urls)
+QnResourceList extractResources(const QList<QUrl>& urls)
 {
     return QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(urls));
 }
@@ -114,23 +68,26 @@ QUrl urlFromUserInput(const QString& value)
 
 } // namespace
 
-QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
+QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(
+    QQmlEngine* engine,
+    QWidget* parent)
     :
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
-
-    m_receivingResources(false),
-    m_visibleControls(true),
-    m_visible(false),
-    m_connectingSystemName(),
-    m_palette(extractPalette()),
-    m_quickView(new QQuickView()),
-    m_widget(createMainView(this, m_quickView)),
-    m_pageSize(m_widget->size()),
-    m_message(),
-    m_appInfo(new QnAppInfo(this))
+    base_type(engine, parent),
+    QnWorkbenchContextAware(parent)
 {
     NX_EXPECT(qnRuntime->isDesktopMode());
+
+    rootContext()->setContextProperty(lit("context"), this);
+    setSource(lit("Nx/WelcomeScreen/WelcomeScreen.qml"));
+    setResizeMode(QQuickWidget::SizeRootObjectToView);
+
+    if (status() == QQuickWidget::Error)
+    {
+        for (const auto& error: errors())
+            NX_ERROR(this, error.toString());
+        NX_CRITICAL(false, Q_FUNC_INFO, "Welcome screen loading failed.");
+    }
+
     NX_CRITICAL(qnStartupTileManager, Q_FUNC_INFO, "Startup tile manager does not exists");
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
@@ -140,27 +97,8 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::isCloudEnabledChanged,
         this, &QnWorkbenchWelcomeScreen::isCloudEnabledChanged);
 
-    //
-    m_widget->installEventFilter(this);
-    m_quickView->installEventFilter(this);
-    qApp->installEventFilter(this); //< QTBUG-34414 workaround
+    setHelpTopic(this, Qn::Login_Help);
 
-    setHelpTopic(m_widget, Qn::Login_Help);
-
-    connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this,
-        [this]()
-        {
-            if (!m_visible)
-            {
-                setGlobalPreloaderVisible(false);         //< Auto toggle off preloader
-                qnStartupTileManager->skipTileAction(); //< available only on first show
-            }
-
-            context()->action(action::EscapeHotkeyAction)->setEnabled(!m_visible);
-        });
-
-    setVisible(true);
-    setVisibleControls(false);
     connect(qnSettings, &QnClientSettings::valueChanged, this, [this](int valueId)
     {
         if (valueId == QnClientSettings::AUTO_LOGIN)
@@ -172,7 +110,8 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
 }
 
 QnWorkbenchWelcomeScreen::~QnWorkbenchWelcomeScreen()
-{}
+{
+}
 
 void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, bool initial)
 {
@@ -240,24 +179,21 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
     executeDelayedParented([this, system]() { emit openTile(system->id());  }, 0, this);
 }
 
-QWidget* QnWorkbenchWelcomeScreen::widget()
+void QnWorkbenchWelcomeScreen::showEvent(QShowEvent* event)
 {
-    return m_widget.data();
+    base_type::showEvent(event);
+
+    action(action::EscapeHotkeyAction)->setEnabled(false);
 }
 
-bool QnWorkbenchWelcomeScreen::isVisible() const
+void QnWorkbenchWelcomeScreen::hideEvent(QHideEvent* event)
 {
-    return m_visible;
-}
+    base_type::hideEvent(event);
 
-void QnWorkbenchWelcomeScreen::setVisible(bool isVisible)
-{
-    if (m_visible == isVisible)
-        return;
+    setGlobalPreloaderVisible(false); //< Auto toggle off preloader
+    qnStartupTileManager->skipTileAction(); //< available only on first show
 
-    m_visible = isVisible;
-
-    emit visibleChanged();
+    action(action::EscapeHotkeyAction)->setEnabled(true);
 }
 
 QString QnWorkbenchWelcomeScreen::cloudUserName() const
@@ -273,20 +209,6 @@ bool QnWorkbenchWelcomeScreen::isLoggedInToCloud() const
 bool QnWorkbenchWelcomeScreen::isCloudEnabled() const
 {
     return qnCloudStatusWatcher->isCloudEnabled();
-}
-
-QSize QnWorkbenchWelcomeScreen::pageSize() const
-{
-    return m_pageSize;
-}
-
-void QnWorkbenchWelcomeScreen::setPageSize(const QSize& size)
-{
-    if (m_pageSize == size)
-        return;
-
-    m_pageSize = size;
-    emit pageSizeChanged();
 }
 
 bool QnWorkbenchWelcomeScreen::visibleControls() const
@@ -367,9 +289,12 @@ void QnWorkbenchWelcomeScreen::setMessage(const QString& message)
 
     emit messageChanged();
 
-    m_widget->repaint();
-    m_widget->window()->repaint();
-    m_widget->window()->update();
+    // Repainting the widget to guarantee that started screen recording won't contain the visible
+    // message.
+    // TODO: Find a better way to achieve the same effect.
+    repaint();
+    window()->repaint();
+    window()->update();
 
     qApp->flush();
     qApp->sendPostedEvents();
@@ -378,11 +303,6 @@ void QnWorkbenchWelcomeScreen::setMessage(const QString& message)
 QString QnWorkbenchWelcomeScreen::message() const
 {
     return m_message;
-}
-
-QnAppInfo* QnWorkbenchWelcomeScreen::appInfo() const
-{
-    return m_appInfo;
 }
 
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const QList<QUrl>& urls)
@@ -438,7 +358,8 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
 
 void QnWorkbenchWelcomeScreen::forceActiveFocus()
 {
-    m_quickView->requestActivate();
+    if (const auto rootItem = rootObject())
+        rootItem->forceActiveFocus();
 }
 
 void QnWorkbenchWelcomeScreen::connectToSystemInternal(
@@ -459,7 +380,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
         {
             setConnectingToSystem(systemId);
 
-            QUrl url = serverUrl;
+            auto url = nx::utils::Url::fromQUrl(serverUrl);
             if (!credentials.password.isEmpty())
                 url.setPassword(credentials.password.value());
             if (!credentials.user.isEmpty())
@@ -503,7 +424,7 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
     const auto showDialogHandler = [this, serverUrl, controlsGuard]()
         {
             /* We are receiving string with port but without protocol, so we must parse it. */
-            const QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindow()));
+            const QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindowWidget()));
 
             dialog->setUrl(QUrl(serverUrl));
             if (isLoggedInToCloud())
@@ -563,117 +484,14 @@ void QnWorkbenchWelcomeScreen::createAccount()
 
 //
 
-QColor QnWorkbenchWelcomeScreen::getContrastColor(const QString& group)
-{
-    return m_palette.colors(group).contrastColor();
-}
-
-QColor QnWorkbenchWelcomeScreen::getPaletteColor(const QString& group, int index)
-{
-    return m_palette.color(group, index);
-}
-
-QColor QnWorkbenchWelcomeScreen::getDarkerColor(const QColor& color, int offset)
-{
-    const auto paletteColor = m_palette.color(color);
-    return paletteColor.darker(offset);
-}
-
-QColor QnWorkbenchWelcomeScreen::getLighterColor(const QColor& color, int offset)
-{
-    const auto paletteColor = m_palette.color(color);
-    return paletteColor.lighter(offset);
-}
-
-QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color, qreal alpha)
-{
-    color.setAlphaF(alpha);
-    return color;
-}
-
 void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId, const QString& localSystemId)
 {
     qnForgottenSystemsManager->forgetSystem(systemId);
     qnForgottenSystemsManager->forgetSystem(localSystemId);
 }
 
-bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)
+void QnWorkbenchWelcomeScreen::moveToBack(const QUuid& localSystemId)
 {
-    // TODO: #3.1 Implement something generic to handle help events inside QQuickView items.
-    if (obj == m_quickView)
-    {
-        // Copy some logic from QWhatsThisPrivate.
-        switch (event->type())
-        {
-            case QEvent::MouseButtonPress:
-            {
-                const auto mouseEvent = static_cast<QMouseEvent*>(event);
-                if (QWhatsThis::inWhatsThisMode())
-                {
-                    if (mouseEvent->button() == Qt::LeftButton)
-                    {
-                        QHelpEvent helpEvent(
-                            QEvent::WhatsThis, mouseEvent->pos(), mouseEvent->globalPos());
-                        qApp->sendEvent(m_widget, &helpEvent);
-                    }
-                    else
-                    {
-                        QWhatsThis::leaveWhatsThisMode();
-                    }
-
-                    event->accept();
-                    return true;
-                }
-                break;
-            }
-
-            case QEvent::MouseMove:
-            {
-                const auto mouseEvent = static_cast<QMouseEvent*>(event);
-                if (QWhatsThis::inWhatsThisMode())
-                {
-                    QHelpEvent helpEvent(
-                        QEvent::QueryWhatsThis, mouseEvent->pos(), mouseEvent->globalPos());
-                    const bool sentEvent = qApp->sendEvent(m_widget, &helpEvent);
-
-                    QApplication::changeOverrideCursor((!sentEvent || !helpEvent.isAccepted())
-                        ? Qt::ForbiddenCursor
-                        : Qt::WhatsThisCursor);
-
-                    event->accept();
-                    return true;
-                }
-                break;
-            }
-
-            case QEvent::QueryWhatsThis:
-            {
-                event->setAccepted(true);
-                return true;
-            }
-
-            default:
-                break;
-        }
-    }
-
-    if (obj != m_widget)
-        return base_type::eventFilter(obj, event);
-
-    switch(event->type())
-    {
-        case QEvent::Resize:
-            if (auto resizeEvent = dynamic_cast<QResizeEvent *>(event))
-                setPageSize(resizeEvent->size());
-            break;
-#if defined(Q_OS_MACX)
-        case QEvent::WindowActivate:
-            m_widget->activateWindow(); //< QTBUG-34414 workaround
-            break;
-#endif
-        default:
-            break;
-    }
-
-    return base_type::eventFilter(obj, event);
+    qnSystemWeightsManager->setWeight(localSystemId, 0); //< Moves system to the end of tile's list.
+    qnClientCoreSettings->save();
 }

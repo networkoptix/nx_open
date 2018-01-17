@@ -95,7 +95,7 @@ namespace {
 
 QnCheckForUpdatesPeerTask::QnCheckForUpdatesPeerTask(const QnUpdateTarget &target, QObject *parent) :
     QnNetworkPeerTask(parent),
-    m_mainUpdateUrl(QUrl(qnSettings->updateFeedUrl())),
+    m_mainUpdateUrl(nx::utils::Url(qnSettings->updateFeedUrl())),
     m_target(target)
 {
 }
@@ -222,10 +222,10 @@ bool QnCheckForUpdatesPeerTask::isDowngradeAllowed()
 
 void QnCheckForUpdatesPeerTask::checkBuildOnline()
 {
-    QUrl url(lit("%1/%2/%3")
+    nx::utils::Url url(lit("%1/%2/%3")
         .arg(m_updateLocationPrefix).arg(m_target.version.build()).arg(buildInformationSuffix));
 
-    auto httpClient = nx_http::AsyncHttpClient::create();
+    auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
     auto reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished,
@@ -355,7 +355,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
 
     reply->deleteLater();
 
-    if (reply->isFailed() || (reply->response().statusLine.statusCode != nx_http::StatusCode::ok))
+    if (reply->isFailed() || (reply->response().statusLine.statusCode != nx::network::http::StatusCode::ok))
     {
         NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request to %1 failed.")
             .arg(reply->url().toString()), cl_logDEBUG2);
@@ -415,7 +415,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
             const auto modification = variant.key().mid(arch.size() + 1);
 
             QnUpdateFileInformationPtr info(
-                new QnUpdateFileInformation(m_target.version, QUrl(urlPrefix + variant->file)));
+                new QnUpdateFileInformation(m_target.version, nx::utils::Url(urlPrefix + variant->file)));
             info->baseFileName = variant->file;
             info->fileSize = variant->size;
             info->md5 = variant->md5;
@@ -443,7 +443,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
         if (!variant.file.isEmpty())
         {
             m_clientUpdateFile.reset(
-                new QnUpdateFileInformation(m_target.version, QUrl(urlPrefix + variant.file)));
+                new QnUpdateFileInformation(m_target.version, nx::utils::Url(urlPrefix + variant.file)));
             m_clientUpdateFile->baseFileName = variant.file;
             m_clientUpdateFile->fileSize = variant.size;
             m_clientUpdateFile->md5 = variant.md5;
@@ -582,7 +582,7 @@ void QnCheckForUpdatesPeerTask::loadServersFromSettings()
         const auto infoMap = alternative.toMap();
 
         UpdateServerInfo serverInfo;
-        serverInfo.url = infoMap.value(lit("url")).toUrl();
+        serverInfo.url = nx::utils::Url::fromQUrl(infoMap.value(lit("url")).toUrl());
         if (!serverInfo.url.isValid())
             continue;
 
@@ -598,7 +598,7 @@ bool QnCheckForUpdatesPeerTask::tryNextServer()
     const auto serverInfo = m_updateServers.takeFirst();
     m_currentUpdateUrl = serverInfo.url;
 
-    auto httpClient = nx_http::AsyncHttpClient::create();
+    auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
     auto reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished,

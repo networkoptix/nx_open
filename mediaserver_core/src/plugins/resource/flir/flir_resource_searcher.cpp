@@ -44,7 +44,7 @@ QnResourcePtr QnFlirResourceSearcher::createResource(const QnUuid &resourceTypeI
 
 }
 
-QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     QList<QnResourcePtr> result;
     FlirDeviceInfo deviceInfo;
@@ -193,7 +193,7 @@ void QnFlirResourceSearcher::createResource(const FlirDeviceInfo& info, const QA
     resource->setVendor(manufacture());
     resource->setTypeId(m_eipFlirResTypeId);
     resource->setUrl(info.url.toString());
-    resource->setMAC(QnMacAddress(info.mac));
+    resource->setMAC(nx::network::QnMacAddress(info.mac));
     resource->setDefaultAuth(auth);
     resource->setFirmware(info.firmware);
 

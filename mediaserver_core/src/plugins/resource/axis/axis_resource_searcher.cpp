@@ -62,7 +62,7 @@ QString QnPlAxisResourceSearcher::manufacture() const
 }
 
 
-QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
 
@@ -77,7 +77,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
 
 
     if (port < 0)
-        port = nx_http::DEFAULT_HTTP_PORT;
+        port = nx::network::http::DEFAULT_HTTP_PORT;
 
     CLHttpStatus status;
     //QString response = QString(QLatin1String(downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=Network"), host, port, timeout, auth)));
@@ -129,8 +129,8 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     resource->setTypeId(typeId);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(QnMacAddress(mac));
-    QUrl finalUrl(url);
+    resource->setMAC(nx::network::QnMacAddress(mac));
+    nx::utils::Url finalUrl(url);
     finalUrl.setScheme(QLatin1String("http"));
     finalUrl.setPort(port);
     resource->setUrl(finalUrl.toString());
@@ -179,7 +179,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     for (int i = iqpos; i < macpos; i++)
     {
         const unsigned char c = responseData.at(i);
-        if (c < 0x20 && c == 0x7F) // Control char.
+        if (c < 0x20 || c == 0x7F) // Control char.
             name += QLatin1Char('?');
         else
             name += QLatin1Char(c); //< Assume Latin-1 encoding.
@@ -243,9 +243,9 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(QnMacAddress(smac));
+    resource->setMAC(nx::network::QnMacAddress(smac));
 
-    quint16 port = nx_http::DEFAULT_HTTP_PORT;
+    quint16 port = nx::network::http::DEFAULT_HTTP_PORT;
     QnMdnsPacket packet;
     if (packet.fromDatagram(responseData))
     {
@@ -284,7 +284,7 @@ bool QnPlAxisResourceSearcher::testCredentials(
     const QAuthenticator& auth) const
 {
     auto host = url.host();
-    auto port = url.port(nx_http::DEFAULT_HTTP_PORT);
+    auto port = url.port(nx::network::http::DEFAULT_HTTP_PORT);
 
     CLHttpStatus status;
     auto response = downloadFile(status, kTestCredentialsUrl, host, port, kDefaultAxisTimeout, auth);

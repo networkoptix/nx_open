@@ -6,13 +6,15 @@ nx_set_variable_if_empty(applauncher.name "${company.name} ${display.product.nam
 nx_set_variable_if_empty(traytool.name "${display.product.name} Tray Assistant")
 nx_set_variable_if_empty(mediaserver.name "${company.name} Media Server")
 nx_set_variable_if_empty(mediaserver.display.name "${display.product.name} Media Server")
+nx_set_variable_if_empty(client.mediafolder.name "${product.name} Media")
+nx_set_variable_if_empty(nxtool.name "${company.name} ${display.product.name} Server Tool")
 
 set(client.binary.name "client-bin")
 set(applauncher.binary.name "applauncher")
 set(minilauncher.binary.name "applauncher-bin")
-set(mediaserver.name "${company.name} Media Server")
-set(mediaserver.display.name "${display.product.name} Media Server")
 set(testcamera.binary.name "testcamera")
+set(installation.root "/opt/${deb.customization.company.name}")
+set(launcher.version.file "launcher.version")
 
 if(WINDOWS)
     set(client.binary.name "${product.name}.exe")
@@ -26,16 +28,11 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     nx_set_variable_if_empty(protocol_handler_app_name "${display.product.name} Client.app")
 endif()
 
-nx_set_variable_if_empty(client.mediafolder.name "${product.name} Media")
-
 if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
     set(liteMode "true")
 else()
     set(liteMode "false")
 endif()
-
-set(launcher.version.file "launcher.version")
-set(installation.root "/opt/${deb.customization.company.name}")
 
 set(apple_team_id "L6FE34GJWM")
 

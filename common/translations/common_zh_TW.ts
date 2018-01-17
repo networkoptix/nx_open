@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>未知錯誤.</translation>
+      <translation>未知的錯誤.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>新系統</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>找到的系統 %1 與目前的系統不相容。</translation>
     </message>
   </context>
   <context>
@@ -255,18 +255,6 @@
       <translation>請確認 %1 埠可被連結 (譬如已開啟轉發埠).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>若無幫助, 請在設備 Web 頁面上還原預設值.</translation>
     </message>
@@ -314,6 +302,18 @@
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>攝影機是從錄影資料中找回的. 刪除相機並重加一遍以瀏覽即時影像.</translation>
     </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps (错误&quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps (错误&quot;%1&quot;)..</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps (错误&quot;%1&quot;)..</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -327,7 +327,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>無法初始化聲音編碼器.</translation>
+      <translation>無法初始化聲音編碼器。</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
@@ -480,11 +480,19 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>時效性</translation>
+      <translation>時間</translation>
     </message>
     <message>
       <source>Time Licenses</source>
       <translation>時效性授權</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation>橋接</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>橋接授權</translation>
     </message>
   </context>
   <context>
@@ -765,6 +773,10 @@
       <source>Invalid resource type for data export.</source>
       <translation>無效的資料匯出資源類型.</translation>
     </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>未匯出任何資料.</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
@@ -835,7 +847,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>月</translation>
+      <translation>分</translation>
     </message>
     <message>
       <source>y</source>
@@ -986,7 +998,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>自定</translation>
+      <translation>自訂</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
@@ -1434,7 +1446,7 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n 使用者</numerusform>
+        <numerusform>%n 個使用者</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1474,6 +1486,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>確認</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>分析事件</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 於 %2</translation>
     </message>
   </context>
   <context>

@@ -9,6 +9,7 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 class SystemSharingInvitingUser:
     public CdbFunctionalTest
@@ -154,7 +155,7 @@ TEST_F(SystemSharingInvitingUser, basic_scenario)
 
     // Setting new password.
     api::AccountUpdateData update;
-    update.passwordHa1 = nx_http::calcHa1(
+    update.passwordHa1 = nx::network::http::calcHa1(
         newAccountEmail.c_str(),
         moduleInfo().realm.c_str(),
         newAccountPassword.c_str()).constData();
@@ -178,5 +179,6 @@ TEST_F(SystemSharingInvitingUser, basic_scenario)
     ASSERT_EQ(newAccountAccessRoleInSystem1, systems[0].accessRole);
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

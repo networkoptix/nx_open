@@ -2,9 +2,8 @@
 
 #include <boost/optional.hpp>
 
+#include <nx/network/abstract_socket.h>
 #include <nx/utils/system_error.h>
-
-#include "nx/network/abstract_socket.h"
 
 namespace nx {
 namespace network {
@@ -16,6 +15,7 @@ class SocketAttributes
 {
 public:
     boost::optional<bool> reuseAddrFlag;
+    boost::optional<bool> reusePortFlag;
     boost::optional<bool> nonBlockingMode;
     boost::optional<unsigned int> sendBufferSize;
     boost::optional<unsigned int> recvBufferSize;
@@ -30,6 +30,7 @@ public:
 
         return
             apply(socket, &AbstractSocket::setReuseAddrFlag, reuseAddrFlag) &&
+            apply(socket, &AbstractSocket::setReusePortFlag, reusePortFlag) &&
             apply(socket, &AbstractSocket::setNonBlockingMode, nonBlockingMode) &&
             apply(socket, &AbstractSocket::setSendBufferSize, sendBufferSize) &&
             apply(socket, &AbstractSocket::setRecvBufferSize, recvBufferSize) &&
@@ -80,6 +81,21 @@ public:
             &AbstractSocket::getReuseAddrFlag,
             decltype(m_socketAttributes.reuseAddrFlag)(false),
             val);
+    }
+    virtual bool setReusePortFlag(bool value) override
+    {
+        return setAttributeValue(
+            &m_socketAttributes.reusePortFlag,
+            &AbstractSocket::setReusePortFlag,
+            value);
+    }
+    virtual bool getReusePortFlag(bool* value) const override
+    {
+        return getAttributeValue(
+            m_socketAttributes.reusePortFlag,
+            &AbstractSocket::getReusePortFlag,
+            decltype(m_socketAttributes.reusePortFlag)(false),
+            value);
     }
     virtual bool setNonBlockingMode(bool val) override
     {

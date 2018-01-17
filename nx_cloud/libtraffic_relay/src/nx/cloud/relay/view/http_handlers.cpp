@@ -7,26 +7,6 @@ namespace cloud {
 namespace relay {
 namespace view {
 
-const char* BeginListeningHandler::kPath = api::kServerIncomingConnectionsPath;
-
-BeginListeningHandler::BeginListeningHandler(
-    controller::AbstractListeningPeerManager* listeningPeerManager)
-    :
-    base_type(
-        listeningPeerManager,
-        &controller::AbstractListeningPeerManager::beginListening)
-{
-}
-
-api::BeginListeningRequest BeginListeningHandler::prepareRequestData()
-{
-    api::BeginListeningRequest inputData;
-    inputData.peerName = requestPathParams()[0].toStdString();
-    return inputData;
-}
-
-//-------------------------------------------------------------------------------------------------
-
 const char* CreateClientSessionHandler::kPath = api::kServerClientSessionsPath;
 
 CreateClientSessionHandler::CreateClientSessionHandler(
@@ -39,6 +19,8 @@ CreateClientSessionHandler::CreateClientSessionHandler(
 }
 
 void CreateClientSessionHandler::prepareRequestData(
+    nx::network::http::HttpServerConnection* const /*connection*/,
+    const nx::network::http::Request& /*httpRequest*/,
     api::CreateClientSessionRequest* request)
 {
     request->targetPeerName = requestPathParams()[0].toStdString();
@@ -57,9 +39,12 @@ ConnectToPeerHandler::ConnectToPeerHandler(
 {
 }
 
-api::ConnectToPeerRequest ConnectToPeerHandler::prepareRequestData()
+controller::ConnectToPeerRequestEx ConnectToPeerHandler::prepareRequestData(
+    nx::network::http::HttpServerConnection* const connection,
+    const nx::network::http::Request& /*httpRequest*/)
 {
-    api::ConnectToPeerRequest inputData;
+    controller::ConnectToPeerRequestEx inputData;
+    inputData.clientEndpoint = connection->socket()->getForeignAddress();
     inputData.sessionId = requestPathParams()[0].toStdString();
     return inputData;
 }

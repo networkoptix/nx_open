@@ -248,6 +248,14 @@ int QnMjpegRtpParser::makeHeaders(
     if (dri != 0)
         p = MakeDRIHeader(p, dri);
 
+    const int bytesLeft = sizeof(m_hdrBuffer) - (p - start);
+    if (m_extendedJpegHeader.size() > 0 && m_extendedJpegHeader.size() < bytesLeft)
+    {
+        memcpy(p, m_extendedJpegHeader.data(), m_extendedJpegHeader.size());
+        p += m_extendedJpegHeader.size();
+        return p - start;
+    }
+
     *p++ = 0xff;
     *p++ = 0xc0; //< SOF
     *p++ = 0; //< length msb
@@ -319,8 +327,8 @@ QnMjpegRtpParser::QnMjpegRtpParser():
 {
     memset(m_lumaTable, 0, sizeof(m_lumaTable));
     memset(m_chromaTable, 0, sizeof(m_chromaTable));
-    m_sdpWidth = 0;
-    m_sdpHeight = 0;
+    m_frameWidth = 0;
+    m_frameHeight = 0;
     m_lastJpegQ = -1;
 
     m_hdrQ = -1;
@@ -337,7 +345,7 @@ QnMjpegRtpParser::~QnMjpegRtpParser()
 {
 }
 
-void QnMjpegRtpParser::setSDPInfo(QList<QByteArray> lines)
+void QnMjpegRtpParser::setSdpInfo(QList<QByteArray> lines)
 {
     for (int i = 0; i < lines.size(); ++i)
     {
@@ -350,8 +358,8 @@ void QnMjpegRtpParser::setSDPInfo(QList<QByteArray> lines)
                 QList<QByteArray> dimension = values[1].split('-');
                 if (dimension.size() == 2)
                 {
-                    m_sdpWidth = dimension[0].trimmed().toInt();
-                    m_sdpHeight = dimension[1].trimmed().toInt();
+                    m_frameWidth = dimension[0].trimmed().toInt();
+                    m_frameHeight = dimension[1].trimmed().toInt();
                 }
             }
         }
@@ -363,12 +371,78 @@ void QnMjpegRtpParser::setSDPInfo(QList<QByteArray> lines)
                 QList<QByteArray> dimension = values[1].split(',');
                 if (dimension.size() == 2)
                 {
-                    m_sdpWidth = dimension[0].trimmed().toInt();
-                    m_sdpHeight = dimension[1].trimmed().toInt();
+                    m_frameWidth = dimension[0].trimmed().toInt();
+                    m_frameHeight = dimension[1].trimmed().toInt();
                 }
             }
         }
     }
+}
+
+bool QnMjpegRtpParser::parseMjpegExtension(const quint8* data, int size)
+{
+    // Remove padding
+    while (size > 0 && data[size - 1] == 0xff)
+        --size;
+
+    m_extendedJpegHeader.resize(size);
+    if (size > 0)
+        memcpy(m_extendedJpegHeader.data(), data, size);
+    if (size >= 9)
+    {
+        quint16 markerType = (data[0] << 8) + data[1];
+        if (markerType == 0xffc0)
+        {
+            // Ffmpeg SOF header. Extract size from offset [5..8]
+            m_frameHeight = (data[5] << 8) + data[6];
+            m_frameWidth = (data[7] << 8) + data[8];
+        }
+    }
+    return true;
+}
+
+bool getUint16(const quint8** data, int* size, quint16* result)
+{
+    if (*size < 2)
+        return false;
+    *result = ((*data)[0] << 8) + (*data)[1];
+    *data += 2;
+    *size -= 2;
+    return true;
+};
+
+bool QnMjpegRtpParser::processRtpExtensions(const quint8* data, int size)
+{
+    static const quint16 kOnvifTimeExtensionCode = 0xabac;
+    static const quint16 kOnvifJpegExtensionCode = 0xffd8;
+    while (size > 0)
+    {
+        quint16 extensionCode;
+        if (!getUint16(&data, &size, &extensionCode))
+            return false;
+        quint16 extensionSize;
+        if (!getUint16(&data, &size, &extensionSize))
+            return false;
+        extensionSize *= 4;
+        if (extensionSize > size)
+            return false;
+
+        switch (extensionCode)
+        {
+        case kOnvifTimeExtensionCode:
+            extensionSize = 3 * 4;
+            break;
+        case kOnvifJpegExtensionCode:
+            parseMjpegExtension(data, extensionSize);
+            break;
+        default:
+            break;
+        }
+
+        data += extensionSize;
+        size -= extensionSize;
+    }
+    return size == 0;
 }
 
 bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytesRead, const QnRtspStatistic& statistics, bool& gotData)
@@ -391,8 +465,10 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
             return false;
 
         int extWords = ((int)curPtr[2] << 8) + curPtr[3];
-        curPtr += extWords * 4 + 4;
-        bytesLeft -= extWords * 4 + 4;
+        const auto extensionsSize = (extWords + 1) * 4;
+        bytesLeft -= extensionsSize;
+        processRtpExtensions(curPtr, std::min(extensionsSize, bytesLeft));
+        curPtr += extensionsSize;
     }
 
     if (rtpHeader->padding != 0)
@@ -412,20 +488,20 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     int width = *curPtr++;
     int height = *curPtr++;
 
-    if (width == 0 && m_sdpWidth > 0)
-        width = m_sdpWidth / 8;
-    if (height == 0 && m_sdpHeight > 0)
-        height = m_sdpHeight / 8;
+    if (m_frameWidth > 0)
+        width = m_frameWidth / 8;
+    if (m_frameHeight > 0)
+        height = m_frameHeight / 8;
 
     // Workaround: certain 4K cameras do not provide "a=framesize", and drop MSB from resolution.
-    if (m_sdpWidth <= 0 && m_sdpHeight <= 0
+    if (m_frameWidth <= 0 && m_frameHeight <= 0
         && width == (3840 - 2048) / 8 && height == (2160 - 2048) / 8)
     {
         if (!resolutionWorkaroundLogged)
         {
             resolutionWorkaroundLogged = true;
             NX_LOG(lit(
-                "[mjpeg_rtp_parser] Camera reports resolution 112 x 1792, assuming 3840 x 2160 (~4K)"),
+                "[mjpeg_rtp_parser] Camera reports resolution 1792 x 112, assuming 3840 x 2160 (~4K)"),
                 cl_logDEBUG1);
         }
         width = 3840 / 8;
@@ -436,7 +512,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
 
     quint16 dri = 0;
     // 2. restart marker header (optional)
-    if (jpegType >= 64 && jpegType <= 127)
+    if (jpegType & 0x40)
     {
         if (bytesLeft < 4)
             return false;
@@ -444,6 +520,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
 
         curPtr += 4;
         bytesLeft -= 4;
+        jpegType &= ~0x40;
     }
 
     if (fragmentOffset == 0)
@@ -502,7 +579,8 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
             m_lastJpegQ = jpegQ;
         }
 
-        if (m_hdrQ != jpegQ || dri != m_hdrDri || m_hdrWidth != width || m_hdrHeight != height)
+        if (m_hdrQ != jpegQ || dri != m_hdrDri || m_hdrWidth != width || m_hdrHeight != height ||
+           !m_extendedJpegHeader.empty())
         {
             if (jpegQ != 255)
             {

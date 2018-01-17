@@ -91,6 +91,11 @@ void QnAbstractFileResourceSearcher::setPathCheckList(const QStringList& paths)
     m_pathListToCheck = paths;
 }
 
+void QnAbstractFileResourceSearcher::clearPathCheckList()
+{
+    setPathCheckList(QStringList());
+}
+
 QnResourceList QnAbstractFileResourceSearcher::checkFiles(const QStringList &files) const
 {
     QnResourceList result;

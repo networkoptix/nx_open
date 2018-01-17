@@ -18,14 +18,6 @@ namespace nx {
 namespace network {
 namespace aio {
 
-AIOService::AIOService(unsigned int aioThreadPollSize)
-{
-    if (!aioThreadPollSize)
-        aioThreadPollSize = QThread::idealThreadCount();
-
-    initializeAioThreadPool(aioThreadPollSize);
-}
-
 AIOService::~AIOService()
 {
     pleaseStopSync();
@@ -36,8 +28,11 @@ void AIOService::pleaseStopSync()
     m_aioThreadPool.clear();
 }
 
-bool AIOService::isInitialized() const
+bool AIOService::initialize(unsigned int aioThreadPollSize)
 {
+    if (!aioThreadPollSize)
+        aioThreadPollSize = QThread::idealThreadCount();
+    initializeAioThreadPool(aioThreadPollSize);
     return !m_aioThreadPool.empty();
 }
 

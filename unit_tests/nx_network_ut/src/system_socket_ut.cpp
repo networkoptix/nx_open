@@ -100,7 +100,7 @@ private:
                 return false;
             *millis = tv.tv_sec*1000 + tv.tv_usec/1000;
         #endif
-        
+
         return true;
     }
 };
@@ -126,7 +126,7 @@ TEST_F(TcpSocket, KeepAliveOptions )
     #elif defined( Q_OS_WIN )
         EXPECT_EQ( result->inactivityPeriodBeforeFirstProbe.count(), 5 );
         EXPECT_EQ( result->probeSendPeriod.count(), 1 );
-        EXPECT_EQ( result->probeCount, 0U ); // means default
+        EXPECT_EQ( result->probeCount, 10U ); // means default
     #elif defined( Q_OS_MACX )
         EXPECT_EQ( result->inactivityPeriodBeforeFirstProbe.count(), 5 );
         EXPECT_EQ( result->probeSendPeriod.count(), 0 ); // means default
@@ -172,19 +172,27 @@ TEST_F(TcpSocket, DISABLED_KeepAliveOptionsServer)
     waitForKeepAliveDisconnect(client.get());
 }
 
-TEST_F(TcpSocket, DISABLED_KeepAliveOptionsClient)
+struct TcpSocketIpv4Factory
 {
-    const auto client = std::make_unique<TCPSocket>(AF_INET);
-    ASSERT_TRUE(client->connect(SocketAddress("52.55.219.5:3345")));
-    waitForKeepAliveDisconnect(client.get());
-}
+    std::unique_ptr<nx::network::TCPSocket> operator()() const
+    {
+        return std::make_unique<nx::network::TCPSocket>(AF_INET);
+    }
+};
 
-TEST_F(TcpSocket, ErrorHandling)
+INSTANTIATE_TYPED_TEST_CASE_P(TcpSocket, SocketOptions, TcpSocketIpv4Factory);
+INSTANTIATE_TYPED_TEST_CASE_P(TcpSocket, SocketOptionsDefaultValue, TcpSocketIpv4Factory);
+
+struct TcpSocketIpv6Factory
 {
-    nx::network::test::socketErrorHandling(
-        []() { return std::make_unique<TCPServerSocket>(AF_INET); },
-        []() { return std::make_unique<TCPSocket>(AF_INET); });
-}
+    std::unique_ptr<nx::network::TCPSocket> operator()() const
+    {
+        return std::make_unique<nx::network::TCPSocket>(AF_INET6);
+    }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(TcpSocket6, SocketOptions, TcpSocketIpv6Factory);
+INSTANTIATE_TYPED_TEST_CASE_P(TcpSocket6, SocketOptionsDefaultValue, TcpSocketIpv6Factory);
 
 TEST_F(TcpSocket, socket_timer_is_single_shot)
 {
@@ -208,7 +216,7 @@ TEST_F(TcpSocket, ConnectErrorReporting)
     const SocketAddress localAddress(HostAddress::localhost, 1);
 
     TCPSocket tcpSocket(AF_INET);
-    const bool connectResult = tcpSocket.connect(localAddress, 1500);
+    const bool connectResult = tcpSocket.connect(localAddress, std::chrono::milliseconds(100));
     const auto connectErrorCode = SystemError::getLastOSErrorCode();
     ASSERT_FALSE(connectResult);
     ASSERT_NE(SystemError::noError, connectErrorCode);
@@ -252,6 +260,6 @@ NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE(
 
 INSTANTIATE_TYPED_TEST_CASE_P(TCPServerSocket, ServerSocketTest, TCPServerSocket);
 
-}   //test
-}   //network
-}   //nx
+} // test
+} // network
+} // nx

@@ -19,7 +19,7 @@ class StunOverHttpTunnelling:
 {
 public:
     StunOverHttpTunnelling():
-        m_stunClient(nx::stun::AbstractAsyncClient::Settings())
+        m_stunClient(nx::network::stun::AbstractAsyncClient::Settings())
     {
     }
 
@@ -42,7 +42,7 @@ protected:
     void whenIssueStunRequestThroughHttpTunnel()
     {
         using namespace std::placeholders;
-        using namespace nx::stun;
+        using namespace nx::network::stun;
 
         Message request(Header(
             MessageClass::request,
@@ -58,17 +58,17 @@ protected:
         auto response = m_messagesReceived.pop();
         ASSERT_EQ(SystemError::noError, std::get<0>(response));
         ASSERT_EQ(
-            nx::stun::MessageClass::successResponse,
+            nx::network::stun::MessageClass::successResponse,
             std::get<1>(response).header.messageClass);
     }
 
 private:
-    nx::stun::AsyncClientWithHttpTunneling m_stunClient;
-    nx::utils::SyncQueue<std::tuple<SystemError::ErrorCode, nx::stun::Message>> m_messagesReceived;
+    nx::network::stun::AsyncClientWithHttpTunneling m_stunClient;
+    nx::utils::SyncQueue<std::tuple<SystemError::ErrorCode, nx::network::stun::Message>> m_messagesReceived;
 
     void onStunResponse(
         SystemError::ErrorCode sysErrorCode,
-        nx::stun::Message responseMessage)
+        nx::network::stun::Message responseMessage)
     {
          m_messagesReceived.push(std::make_tuple(sysErrorCode, std::move(responseMessage)));
     }

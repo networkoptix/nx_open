@@ -1,8 +1,3 @@
-/**********************************************************
-* Jan 19, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <nx/network/stun/extension/stun_extension_types.h>
@@ -10,7 +5,6 @@
 #include <nx/utils/move_only_func.h>
 
 #include "data/result_code.h"
-
 
 namespace nx {
 namespace hpm {
@@ -38,9 +32,9 @@ protected:
         RequestData requestData,
         CompletionHandlerType completionHandler)
     {
-        nx::stun::Message request(
-            nx::stun::Header(
-                stun::MessageClass::request,
+        network::stun::Message request(
+            network::stun::Header(
+                network::stun::MessageClass::request,
                 RequestData::kMethod));
         requestData.serialize(&request);
 
@@ -53,24 +47,24 @@ protected:
 
     template<typename ResponseData>
     void sendRequestAndReceiveResponse(
-        nx::stun::Message request,
-        utils::MoveOnlyFunc<void(stun::TransportHeader, nx::hpm::api::ResultCode, ResponseData)> completionHandler)
+        network::stun::Message request,
+        utils::MoveOnlyFunc<void(network::stun::TransportHeader, nx::hpm::api::ResultCode, ResponseData)> completionHandler)
     {
         using namespace nx::hpm::api;
-        const nx::stun::extension::methods::Value method =
-            static_cast<nx::stun::extension::methods::Value>(request.header.method);
+        const network::stun::extension::methods::Value method =
+            static_cast<network::stun::extension::methods::Value>(request.header.method);
         NX_ASSERT(method == ResponseData::kMethod, "Request and response methods mismatch");
 
         this->sendRequest(
             std::move(request),
             [this, method, completionHandler = std::move(completionHandler)](
                 SystemError::ErrorCode code,
-                stun::Message message)
+                network::stun::Message message)
         {
             if (code != SystemError::noError)
             {
                 NX_LOGX(lm("Error performing %1 request to connection_mediator. %2").
-                    arg(stun::extension::methods::toString(method)).
+                    arg(network::stun::extension::methods::toString(method)).
                     arg(SystemError::toString(code)),
                     cl_logDEBUG1);
                 return completionHandler(
@@ -80,8 +74,8 @@ protected:
             }
 
             api::ResultCode resultCode = api::ResultCode::ok;
-            const auto* resultCodeHeader = 
-                message.getAttribute<nx::stun::extension::attrs::ResultCode>();
+            const auto* resultCodeHeader =
+                message.getAttribute<network::stun::extension::attrs::ResultCode>();
             if (resultCodeHeader)
                 resultCode = resultCodeHeader->value();
 
@@ -99,7 +93,7 @@ protected:
             if (!responseData.parse(message))
             {
                 NX_LOGX(lm("Failed to parse %1 response: %2").
-                    arg(nx::stun::extension::methods::toString(method)).
+                    arg(network::stun::extension::methods::toString(method)).
                     arg(responseData.errorText()), cl_logDEBUG1);
                 return completionHandler(
                     std::move(message.transportHeader),
@@ -116,14 +110,14 @@ protected:
 
     template<typename ResponseData>
     void sendRequestAndReceiveResponse(
-        nx::stun::Message request,
+        network::stun::Message request,
         utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode, ResponseData)> completionHandler)
     {
         sendRequestAndReceiveResponse<ResponseData>(
             std::move(request),
-            nx::utils::MoveOnlyFunc<void(stun::TransportHeader, nx::hpm::api::ResultCode, ResponseData)>(
+            nx::utils::MoveOnlyFunc<void(network::stun::TransportHeader, nx::hpm::api::ResultCode, ResponseData)>(
                 [completionHandler = std::move(completionHandler)](
-                    stun::TransportHeader /*transportHeader*/,
+                    network::stun::TransportHeader /*transportHeader*/,
                     nx::hpm::api::ResultCode resultCode,
                     ResponseData responseData)
                 {
@@ -132,31 +126,31 @@ protected:
     }
 
     void sendRequestAndReceiveResponse(
-        nx::stun::Message request,
-        utils::MoveOnlyFunc<void(stun::TransportHeader, nx::hpm::api::ResultCode)> completionHandler)
+        network::stun::Message request,
+        utils::MoveOnlyFunc<void(network::stun::TransportHeader, nx::hpm::api::ResultCode)> completionHandler)
     {
         using namespace nx::hpm::api;
 
-        const nx::stun::extension::methods::Value method =
-            static_cast<nx::stun::extension::methods::Value>(request.header.method);
+        const network::stun::extension::methods::Value method =
+            static_cast<network::stun::extension::methods::Value>(request.header.method);
 
         this->sendRequest(
             std::move(request),
             [this, method, completionHandler = std::move(completionHandler)](
                 SystemError::ErrorCode code,
-                nx::stun::Message message) mutable
+                network::stun::Message message) mutable
         {
             if (code != SystemError::noError)
             {
                 NX_LOGX(lm("Error performing %1 request to connection_mediator. %2").
-                    arg(stun::extension::methods::toString(method)).
+                    arg(network::stun::extension::methods::toString(method)).
                     arg(SystemError::toString(code)), cl_logDEBUG1);
                 return completionHandler(std::move(message.transportHeader), ResultCode::networkError);
             }
 
             api::ResultCode resultCode = api::ResultCode::ok;
-            const auto* resultCodeHeader = 
-                message.getAttribute<nx::stun::extension::attrs::ResultCode>();
+            const auto* resultCodeHeader =
+                message.getAttribute<network::stun::extension::attrs::ResultCode>();
             if (resultCodeHeader)
                 resultCode = resultCodeHeader->value();
 
@@ -174,14 +168,14 @@ protected:
     }
 
     void sendRequestAndReceiveResponse(
-        nx::stun::Message request,
+        network::stun::Message request,
         utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
     {
         sendRequestAndReceiveResponse(
             std::move(request),
-            nx::utils::MoveOnlyFunc<void(stun::TransportHeader, nx::hpm::api::ResultCode)>(
+            nx::utils::MoveOnlyFunc<void(network::stun::TransportHeader, nx::hpm::api::ResultCode)>(
                 [completionHandler = std::move(completionHandler)](
-                    stun::TransportHeader /*transportHeader*/,
+                    network::stun::TransportHeader /*transportHeader*/,
                     nx::hpm::api::ResultCode resultCode)
                 {
                     completionHandler(resultCode);

@@ -77,12 +77,12 @@
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
                 <label>
                     <input type="checkbox" id="{{setting}}"
-                           ng-model="systemSettings[setting]"> <span>{{Config.settingsConfig[setting].label}}</span>
+                           ng-model="systemSettings[setting]"> <span>{{L.settingsConfig[setting]}}</span>
                 </label>
             </div>
 
             <label ng-if="Config.settingsConfig[setting].type != 'checkbox' "
-                   for="{{setting}}" >{{Config.settingsConfig[setting].label}}</label>
+                   for="{{setting}}" >{{L.settingsConfig[setting]}}</label>
             <input ng-if="Config.settingsConfig[setting].type == 'number' " type="number"
                    id="{{setting}}"
                    placeholder="{{}}"
@@ -170,7 +170,7 @@
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
-                   type="password" autocomplete="new-password" required placeholder="Wachtwoord" ng-change="clearCloudError()">
+                   type="password" autocomplete="new-password" required placeholder="Password" ng-change="clearCloudError()">
         </div>
 
         <div class="checkbox text-left" ng-if="settings.thickClient">
@@ -266,7 +266,7 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                De wachtwoorden komen niet overeen
+                Wachtwoorden komen niet overeen
             </div>
         </div>
     </form>
@@ -296,13 +296,13 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Login" required>
+                   placeholder="Gebruikersnaam" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
                    name="remotePassword" autocomplete="new-password" class="form-control" type="password"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Wachtwoord" required>
+                   placeholder="Password" required>
         </div>
         <div class="form-group has-error"
              ng-if="forms.remoteSystemForm.remoteSystemName.$touched &&  forms.remoteSystemForm.remoteSystemName.$error.required||
@@ -366,7 +366,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>Systeem is klaar voor gebruik</h2>
-    <p>Login</p>
+    <p>Gebruikersnaam</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Delen en account instellingen</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="open {{Config.cloud.productName}}"
@@ -461,8 +461,8 @@
             <div class="text-center"><b>Gebruik {{Config.productName}} applicatie</b></div>
             <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
             <div class="col-xs-6 text-right">Poort</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
-            <div class="col-xs-6 text-right">Wachtwoord</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
+            <div class="col-xs-6 text-right">Gebruikersnaam</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>
 </div>
@@ -471,19 +471,16 @@
     <button class="btn btn-default"
             ng-if="activeStep.cancel"
             ng-disabled="lockNextButton"
-            ng-click="cancel()">Annuleer</button>
-    <button class="btn btn-default"
+            ng-click="cancel()">Annuleren</button>     <button class="btn btn-default"
             ng-if="activeStep.back"
             ng-disabled="lockNextButton"
-            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
-    <button class="btn btn-primary pull-right"
+            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button> <button class="btn btn-primary pull-right"
             ng-if="activeStep.next"
             ng-disabled="lockNextButton"
             auto-focus
- ng-click="next()">Volgende <span class="glyphicon glyphicon-arrow-right"></span></button>
-    <button class="btn btn-primary pull-right"
+ ng-click="next()">Volgende <span class="glyphicon glyphicon-arrow-right"></span></button> <button class="btn btn-primary pull-right"
             ng-if="activeStep.finish"
             ng-disabled="lockNextButton"
             auto-focus
- ng-click="finish()">Afsluiten</button>
+ ng-click="finish()">Voltooien</button>
 </div>

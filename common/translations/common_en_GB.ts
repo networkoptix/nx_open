@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>New System</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>The discovered System %1 is incompatible with the current System.</translation>
     </message>
   </context>
   <context>
@@ -255,18 +255,6 @@
       <translation>Make sure port %1 is accessible (e.g. forwarded).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>First, try to turn on recording (if it is off) and decrease fps in device settings.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>First, try to turn on recording (if it is off) and decrease fps in camera settings.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>If it does not help, restore factory defaults on the device web-page.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -485,6 +485,14 @@
     <message>
       <source>Time Licenses</source>
       <translation>Time Licenses</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation>Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>Bridge Licenses</translation>
     </message>
   </context>
   <context>
@@ -774,6 +782,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>Invalid resource type for data export.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>
@@ -1504,6 +1516,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>Acknowledge</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>Analytics Event</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 at %2</translation>
     </message>
   </context>
   <context>

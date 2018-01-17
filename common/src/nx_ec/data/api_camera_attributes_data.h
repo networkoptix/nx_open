@@ -16,7 +16,8 @@ struct ApiScheduleTaskData: ApiData
         beforeThreshold(0),
         afterThreshold(0),
         streamQuality(Qn::QualityNotDefined),
-        fps(0.0)
+        fps(0.0),
+        bitrateKbps(0)
     {
     }
 
@@ -29,6 +30,7 @@ struct ApiScheduleTaskData: ApiData
     qint16 afterThreshold;
     Qn::StreamQuality streamQuality;
     qint16 fps;
+    int bitrateKbps = 0;
 };
 #define ApiScheduleTaskData_Fields \
     (startTime) \
@@ -39,7 +41,8 @@ struct ApiScheduleTaskData: ApiData
     (beforeThreshold) \
     (afterThreshold) \
     (streamQuality) \
-    (fps)
+    (fps) \
+    (bitrateKbps)
 
 //-------------------------------------------------------------------------------------------------
 

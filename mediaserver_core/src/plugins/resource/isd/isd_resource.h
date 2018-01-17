@@ -5,7 +5,7 @@
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include "nx/streaming/media_data_packet.h"
 
 class QnPlIsdResource : public QnPhysicalCameraResource
@@ -42,7 +42,7 @@ protected:
 
 private:
     void setMaxFps(int f);
-    CameraDiagnostics::Result doISDApiRequest( const QUrl& apiRequestUrl, QByteArray* const msgBody );
+    CameraDiagnostics::Result doISDApiRequest( const nx::utils::Url& apiRequestUrl, QByteArray* const msgBody );
 };
 
 #endif // #ifdef ENABLE_ISD

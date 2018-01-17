@@ -2,12 +2,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>unit_tests</artifactId>
     <packaging>pom</packaging>
@@ -57,8 +57,10 @@
                 <module>cloud_db_ut</module>
                 <module>connection_mediator_ut</module>
                 <module>traffic_relay_ut</module>
-
+                <module>relaying_ut</module>
+<!--
                 <module>client_ut</module>
+-->
                 <module>vms_gateway_ut</module>
             </modules>
             <properties>
@@ -98,7 +100,9 @@
                 </property>
             </activation>
             <modules>
+<!--
                 <module>client_ut</module>
+-->
                 <module>vms_gateway_ut</module>
             </modules>
         </profile>

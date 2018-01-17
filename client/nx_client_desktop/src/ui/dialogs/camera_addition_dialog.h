@@ -36,7 +36,7 @@ public:
         Count
     };
 
-    explicit QnCameraAdditionDialog(QWidget *parent = NULL);
+    explicit QnCameraAdditionDialog(QWidget *parent);
     virtual ~QnCameraAdditionDialog();
 
     QnMediaServerResourcePtr server() const;
@@ -56,7 +56,7 @@ private:
      * Fill table with the received cameras info.
      * \returns number of new cameras.
      */
-    int fillTable(const QnManualResourceSearchList &cameras);
+    int fillTable(QnManualResourceSearchList cameras);
     void removeAddedCameras();
     void updateSubnetMode();
 

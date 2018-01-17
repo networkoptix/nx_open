@@ -18,7 +18,7 @@ namespace aio {
 /**
  * Bridge between two asynchronous channels (e.g., sockets).
  * Reads data from first channel and writes to the second and vice versa.
- * Seeks for loading both channels simultaneously regardless 
+ * Seeks for loading both channels simultaneously regardless
  *   of channel speed difference to maximize throughput.
  * Supports:
  * - Inactivity timeout.
@@ -167,7 +167,7 @@ private:
         const detail::AsyncChannelUnidirectionalBridge* theOtherUnidirectionalBridge)
     {
         ++m_closedChannelCount;
-        if (m_closedChannelCount < 2 && 
+        if (m_closedChannelCount < 2 &&
             !theOtherUnidirectionalBridge->isSendQueueEmpty())
         {
             return;
@@ -203,7 +203,7 @@ private:
     {
         m_prevActivityTime = std::chrono::steady_clock::now();
     }
-    
+
     void reportFailure(SystemError::ErrorCode sysErrorCode)
     {
         m_leftChannel->cancelIOSync(aio::EventType::etNone);
@@ -215,8 +215,9 @@ private:
 };
 
 /**
- * LeftChannel and RightChannel types must be at least movable.
- * That allows them to be std::unique_ptr<Something>.
+ * LeftChannel and RightChannel types must meet the requirements of MoveConstructible
+ * and support AbstractAsyncChannel API.
+ * NOTE: LeftChannel and RightChannel are allowed to be std::unique_ptr<...>.
  */
 template<typename LeftChannel, typename RightChannel>
 std::unique_ptr<AsyncChannelBridgeImpl<LeftChannel, RightChannel>>

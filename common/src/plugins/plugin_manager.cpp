@@ -13,6 +13,9 @@
 #include <decoders/abstractvideodecoderplugin.h>
 #include <plugins/camera_plugin.h>
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <plugins/plugin_tools.h>
+
+#include "plugins_ini.h"
 
 using namespace nx::sdk;
 
@@ -111,7 +114,7 @@ void PluginManager::loadPluginsFromDir(
             loadQtPlugin( pluginDir.path() + lit("/") + entry );
 
         if( pluginsToLoad & NxPlugin )
-            loadNxPlugin( settingsForPlugin, pluginDir.path() + lit("/") + entry );
+            loadNxPlugin( settingsForPlugin, pluginDir.path(), entry );
     }
 }
 
@@ -141,63 +144,78 @@ bool PluginManager::loadQtPlugin( const QString& fullFilePath )
 
 bool PluginManager::loadNxPlugin(
     const std::vector<nxpl::Setting>& settingsForPlugin,
-    const QString& fullFilePath )
+    const QString& fileDir,
+    const QString& fileName)
 {
-    QLibrary lib( fullFilePath );
-    if( !lib.load() )
+    const QString filePath = fileDir + lit("/") + fileName;
+
+    if (pluginsIni().disabledNxPlugins[0])
     {
-        NX_LOG( lit("Failed to load %1: %2").arg(fullFilePath).arg(lib.errorString()), cl_logERROR );
+        // Check if the plugin is mentioned in this setting and thus should be skipped.
+        const QStringList disabledPlugins =
+            QString::fromLatin1(pluginsIni().disabledNxPlugins).split(lit(","));
+
+        QString pluginName = fileName.left(fileName.lastIndexOf(lit(".")));
+        static const auto kPrefix = lit("lib");
+        if (pluginName.startsWith(kPrefix))
+            pluginName.remove(0, kPrefix.size());
+
+        if (disabledPlugins.contains(pluginName))
+        {
+            NX_WARNING(this) << lm("Skipped loading NX plugin %1 - demanded by %2")
+                .args(filePath, pluginsIni().iniFile());
+            return true;
+        }
+    }
+
+    QLibrary lib(filePath);
+    if (!lib.load())
+    {
+        NX_ERROR(this) << lit("Failed to load %1: %2").arg(filePath).arg(lib.errorString());
         return false;
     }
 
-    nxpl::PluginInterface* (*entryProc)() = (decltype(entryProc))lib.resolve( "createNXPluginInstance" );
+    typedef nxpl::PluginInterface* (*EntryProc)();
+
+    auto entryProc = (EntryProc) lib.resolve("createNXPluginInstance");
 
     if (entryProc == nullptr)
-        entryProc = (decltype(entryProc))lib.resolve("createNxMetadataPlugin");
+        entryProc = (EntryProc) lib.resolve("createNxMetadataPlugin");
 
     if (entryProc == nullptr)
     {
-        NX_LOG( lit("Failed to load %1: no createNXPluginInstance").arg(fullFilePath), cl_logERROR );
+        NX_ERROR(this) << lit("Failed to load %1: no createNXPluginInstance").arg(filePath);
         lib.unload();
         return false;
     }
 
     nxpl::PluginInterface* obj = entryProc();
-    if( !obj )
+    if (!obj)
     {
-        NX_LOG( lit("Failed to load %1: no PluginInterface").arg(fullFilePath), cl_logERROR );
+        NX_ERROR(this) << lit("Failed to load %1: no PluginInterface").arg(filePath);
         lib.unload();
         return false;
     }
 
-    NX_LOG(lit("Successfully loaded NX plugin %1").arg(fullFilePath), cl_logWARNING);
+    NX_WARNING(this) << lit("Successfully loaded NX plugin %1").arg(filePath);
     m_nxPlugins.push_back(obj);
 
-    //checking, whther plugin supports nxpl::Plugin interface
-    nxpl::Plugin* pluginObj = static_cast<nxpl::Plugin*>(obj->queryInterface( nxpl::IID_Plugin ));
-    if (pluginObj)
+    if (auto pluginObj = nxpt::ScopedRef<nxpl::Plugin>(obj->queryInterface(nxpl::IID_Plugin)))
     {
-        //reporting settings to plugin
-        if( !settingsForPlugin.empty() )
-            pluginObj->setSettings( &settingsForPlugin[0], settingsForPlugin.size() );
-
-        pluginObj->releaseRef();
+        // Report settings to the plugin.
+        if (!settingsForPlugin.empty())
+            pluginObj->setSettings(&settingsForPlugin[0], settingsForPlugin.size());
     }
 
-    nxpl::Plugin2* plugin2Obj = static_cast<nxpl::Plugin2*>(obj->queryInterface(nxpl::IID_Plugin2));
-    if (plugin2Obj)
+    if (auto plugin2Obj = nxpt::ScopedRef<nxpl::Plugin2>(obj->queryInterface(nxpl::IID_Plugin2)))
     {
         if (m_pluginContainer)
             plugin2Obj->setPluginContainer(m_pluginContainer);
-
-        plugin2Obj->releaseRef();
     }
 
-    nxpl::Plugin3* plugin3Obj = static_cast<nxpl::Plugin3*>(obj->queryInterface(nxpl::IID_Plugin3));
-    if (plugin3Obj)
+    if (auto plugin3Obj = nxpt::ScopedRef<nxpl::Plugin3>(obj->queryInterface(nxpl::IID_Plugin3)))
     {
-        plugin3Obj->setLocale("en_US"); //< Change to real locale.
-        plugin3Obj->releaseRef();
+        plugin3Obj->setLocale("en_US"); //< TODO: Change to the real locale.
     }
 
     emit pluginLoaded();

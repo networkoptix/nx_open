@@ -32,7 +32,7 @@ int QnCanAcceptCameraRestHandler::executePost(
     QnCameraListReply inCameras;
     QnCameraListReply outCameras;
     //QnSecurityCamResourceList manualCamList;
-    QnManualCameraInfoMap manualCamList;
+    std::vector<QnManualCameraInfo> manualCameraList;
     std::deque<QnSecurityCamResourcePtr> camerasToPing;
     QJson::deserialize(body, &inCameras);
 
@@ -53,7 +53,7 @@ int QnCanAcceptCameraRestHandler::executePost(
 
         if (camera->isManuallyAdded())
         {
-            owner->commonModule()->resourceDiscoveryManager()->fillManualCamInfo(manualCamList, camera);
+            manualCameraList.push_back(owner->commonModule()->resourceDiscoveryManager()->manualCameraInfo(camera));
             continue;
         }
 
@@ -64,7 +64,7 @@ int QnCanAcceptCameraRestHandler::executePost(
     }
 
     // add manual cameras
-    QFuture<QnResourceList> manualDiscoveryResults = QtConcurrent::mapped(manualCamList, &CheckHostAddrAsync);
+    QFuture<QnResourceList> manualDiscoveryResults = QtConcurrent::mapped(manualCameraList, &CheckHostAddrAsync);
     //checking cameras with unicast
     nx::utils::concurrent::Future<bool> camerasToPingResults( camerasToPing.size() );
     for( size_t i = 0; i < camerasToPing.size(); ++i )
@@ -98,5 +98,5 @@ int QnCanAcceptCameraRestHandler::executePost(
     }
 
     result.setReply( outCameras );
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

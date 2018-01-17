@@ -8,7 +8,7 @@ namespace cloud {
 namespace tcp {
 
 EndpointVerificatorFactory::EndpointVerificatorFactory():
-    base_type(std::bind(&EndpointVerificatorFactory::defaultFactoryFunc, this, 
+    base_type(std::bind(&EndpointVerificatorFactory::defaultFactoryFunc, this,
         std::placeholders::_1))
 {
 }
@@ -19,7 +19,7 @@ EndpointVerificatorFactory& EndpointVerificatorFactory::instance()
     return instance;
 }
 
-std::unique_ptr<AbstractEndpointVerificator> 
+std::unique_ptr<AbstractEndpointVerificator>
     EndpointVerificatorFactory::defaultFactoryFunc(const nx::String& connectSessionId)
 {
     return std::make_unique<AvailableEndpointVerificator>(connectSessionId);

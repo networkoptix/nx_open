@@ -1,253 +1,78 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.9.0)
 project(tegra_video)
 
-# ATTENTION: This cmake file is not intended for building but rather just for IDE convenience.
+# ATTENTION: This cmake file is not intended for building the real libtegra_video.so, which is
+# to be built via make on a physical Tegra device - it allows only to build a stub version of
+# libtegra_video.so and run those unit tests (on a PC) which do not depend on NVidia libraries.
+# Sources of the real libtegra_video.so implementation are registered here for IDE convenience.
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTEGRA_VIDEO_STUB_ONLY=")
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNX_UTILS_API= -DTEGRA_VIDEO_API=")
+if(NOT TARGET nx_kit)
+    set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
+    set(NX_KIT_DIR "../../../open/artifacts/nx_kit")
+    include(${NX_KIT_DIR}/nx_kit.cmake)
+endif()
 
 include_directories(
-    .
     include
     samples/common/algorithm/gie
     samples/common/algorithm/cuda
 )
 
-set(SOURCE_FILES
-    nx/utils/debug_utils.h
-    nx/utils/debug_utils.cpp
-    nx/utils/flag_config.h
-    nx/utils/flag_config.cpp
-    nx/utils/string.h
-    samples/04_video_dec_gie/video_dec_gie.h
-    samples/04_video_dec_gie/video_dec_gie_csvparser.cpp
-    samples/04_video_dec_gie/video_dec_gie_main.cpp
-    samples/04_video_dec_gie/video_dec_gie_main.h
+file(GLOB_RECURSE SOURCE_FILES
+    LIST_DIRECTORIES true
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    samples/*.h samples/*.cpp include/*.h
+)
+
+# The real libtegravideo.so is marked EXCLUDE_FROM_ALL because it is built on a Tegra device.
+add_executable(tegra_video_EXCLUDED EXCLUDE_FROM_ALL ${SOURCE_FILES})
+
+add_library(tegra_video SHARED
+    samples/04_video_dec_gie/tegra_video_ini.h
     samples/04_video_dec_gie/tegra_video.h
     samples/04_video_dec_gie/tegra_video.cpp
-    samples/04_video_dec_gie/config.h
-    samples/04_video_dec_gie/config.cpp
-    samples/04_video_dec_gie/tegra_video_impl.cpp
     samples/04_video_dec_gie/tegra_video_stub.cpp
-    samples/04_video_dec_gie/main_tv.h
-    samples/04_video_dec_gie/main_tv.cpp
-    argus/apps/camera/common/ConditionVariable.cpp
-    argus/apps/camera/common/ConditionVariable.h
-    argus/apps/camera/common/Mutex.cpp
-    argus/apps/camera/common/Mutex.h
-    argus/apps/camera/common/ScopedGuard.h
-    argus/apps/camera/common/Util.cpp
-    argus/apps/camera/common/Util.h
-    argus/apps/camera/common/VideoPipeline.cpp
-    argus/apps/camera/common/VideoPipeline.h
-    argus/apps/camera/modules/tasks/Gallery.cpp
-    argus/apps/camera/modules/tasks/Gallery.h
-    argus/apps/camera/modules/tasks/MultiExposure.cpp
-    argus/apps/camera/modules/tasks/MultiExposure.h
-    argus/apps/camera/modules/tasks/MultiSession.cpp
-    argus/apps/camera/modules/tasks/MultiSession.h
-    argus/apps/camera/modules/tasks/StillCapture.cpp
-    argus/apps/camera/modules/tasks/StillCapture.h
-    argus/apps/camera/modules/tasks/VideoRecord.cpp
-    argus/apps/camera/modules/tasks/VideoRecord.h
-    argus/apps/camera/modules/Dispatcher.cpp
-    argus/apps/camera/modules/Dispatcher.h
-    argus/apps/camera/modules/EventThread.cpp
-    argus/apps/camera/modules/EventThread.h
-    argus/apps/camera/modules/ITask.h
-    argus/apps/camera/modules/PerfTracker.cpp
-    argus/apps/camera/modules/PerfTracker.h
-    argus/apps/camera/modules/XMLConfig.cpp
-    argus/apps/camera/modules/XMLConfig.h
-    argus/apps/camera/renderer/Composer.cpp
-    argus/apps/camera/renderer/Composer.h
-    argus/apps/camera/renderer/Renderer.cpp
-    argus/apps/camera/renderer/Renderer.h
-    argus/apps/camera/renderer/StreamConsumer.cpp
-    argus/apps/camera/renderer/StreamConsumer.h
-    argus/apps/camera/ui/camera/Main.cpp
-    argus/apps/camera/ui/capture/AppModuleCapture.cpp
-    argus/apps/camera/ui/capture/AppModuleCapture.h
-    argus/apps/camera/ui/common/App.cpp
-    argus/apps/camera/ui/common/App.h
-    argus/apps/camera/ui/common/AppModuleGeneric.cpp
-    argus/apps/camera/ui/common/AppModuleGeneric.h
-    argus/apps/camera/ui/common/IAppModule.h
-    argus/apps/camera/ui/common/Options.cpp
-    argus/apps/camera/ui/common/Options.h
-    argus/apps/camera/ui/gallery/AppModuleGallery.cpp
-    argus/apps/camera/ui/gallery/AppModuleGallery.h
-    argus/apps/camera/ui/multiExposure/AppModuleMultiExposure.cpp
-    argus/apps/camera/ui/multiExposure/AppModuleMultiExposure.h
-    argus/apps/camera/ui/multiSession/AppModuleMultiSession.cpp
-    argus/apps/camera/ui/multiSession/AppModuleMultiSession.h
-    argus/apps/camera/ui/video/AppModuleVideo.cpp
-    argus/apps/camera/ui/video/AppModuleVideo.h
-    argus/include/Argus/Ext/BayerAverageMap.h
-    argus/include/Argus/Ext/BayerSharpnessMap.h
-    argus/include/Argus/Ext/DebugCaptureMetadata.h
-    argus/include/Argus/Ext/DebugCaptureSession.h
-    argus/include/Argus/Ext/DeFog.h
-    argus/include/Argus/Ext/FaceDetect.h
-    argus/include/Argus/Ext/SensorPrivateMetadata.h
-    argus/include/Argus/Argus.h
-    argus/include/Argus/CameraDevice.h
-    argus/include/Argus/CameraProvider.h
-    argus/include/Argus/CaptureMetadata.h
-    argus/include/Argus/CaptureSession.h
-    argus/include/Argus/Event.h
-    argus/include/Argus/EventProvider.h
-    argus/include/Argus/EventQueue.h
-    argus/include/Argus/Request.h
-    argus/include/Argus/Settings.h
-    argus/include/Argus/Stream.h
-    argus/include/Argus/Types.h
-    argus/include/Argus/UUID.h
-    argus/include/EGLStream/NV/ImageNativeBuffer.h
-    argus/include/EGLStream/ArgusCaptureMetadata.h
-    argus/include/EGLStream/EGLStream.h
-    argus/include/EGLStream/Frame.h
-    argus/include/EGLStream/FrameConsumer.h
-    argus/include/EGLStream/Image.h
-    argus/include/EGLStream/MetadataContainer.h
-    argus/samples/bayerAverageMap/main.cpp
-    argus/samples/cudaHistogram/histogram.h
-    argus/samples/cudaHistogram/main.cpp
-    argus/samples/denoise/main.cpp
-    argus/samples/facedetect/main.cpp
-    argus/samples/gstVideoEncode/main.cpp
-    argus/samples/multiSensor/main.cpp
-    argus/samples/multiStream/main.cpp
-    argus/samples/oneShot/main.cpp
-    argus/samples/openglBox/utils/MathUtils.cpp
-    argus/samples/openglBox/utils/MathUtils.h
-    argus/samples/openglBox/main.cpp
-    argus/samples/syncSensor/KLDistance.h
-    argus/samples/syncSensor/main.cpp
-    argus/samples/userAutoExposure/main.cpp
-    argus/samples/userAutoWhiteBalance/main.cpp
-    argus/samples/utils/glx/Window.cpp
-    argus/samples/utils/glx/Window.h
-    argus/samples/utils/gtk/GuiElement.cpp
-    argus/samples/utils/gtk/GuiElement.h
-    argus/samples/utils/gtk/Window.cpp
-    argus/samples/utils/gtk/Window.h
-    argus/samples/utils/Courier16x24.h
-    argus/samples/utils/CUDAHelper.cpp
-    argus/samples/utils/CUDAHelper.h
-    argus/samples/utils/EGLGlobal.cpp
-    argus/samples/utils/EGLGlobal.h
-    argus/samples/utils/Error.h
-    argus/samples/utils/GLContext.cpp
-    argus/samples/utils/GLContext.h
-    argus/samples/utils/InitOnce.h
-    argus/samples/utils/IObserver.h
-    argus/samples/utils/JPEGConsumer.cpp
-    argus/samples/utils/JPEGConsumer.h
-    argus/samples/utils/Observed.cpp
-    argus/samples/utils/Observed.h
-    argus/samples/utils/Ordered.h
-    argus/samples/utils/PreviewConsumer.cpp
-    argus/samples/utils/PreviewConsumer.h
-    argus/samples/utils/Thread.cpp
-    argus/samples/utils/Thread.h
-    argus/samples/utils/UniquePointer.h
-    argus/samples/utils/Validator.h
-    argus/samples/utils/Value.h
-    argus/samples/utils/Window.h
-    argus/samples/utils/WindowBase.cpp
-    argus/samples/utils/WindowBase.h
-    argus/samples/yuvJpeg/main.cpp
-    include/Argus/Ext/BayerAverageMap.h
-    include/Argus/Ext/BayerSharpnessMap.h
-    include/Argus/Ext/DebugCaptureMetadata.h
-    include/Argus/Ext/DebugCaptureSession.h
-    include/Argus/Ext/DeFog.h
-    include/Argus/Ext/FaceDetect.h
-    include/Argus/Ext/SensorPrivateMetadata.h
-    include/Argus/Argus.h
-    include/Argus/CameraDevice.h
-    include/Argus/CameraProvider.h
-    include/Argus/CaptureMetadata.h
-    include/Argus/CaptureSession.h
-    include/Argus/Event.h
-    include/Argus/EventProvider.h
-    include/Argus/EventQueue.h
-    include/Argus/Request.h
-    include/Argus/Settings.h
-    include/Argus/Stream.h
-    include/Argus/Types.h
-    include/Argus/UUID.h
-    include/EGL/egl.h
-    include/EGL/eglext.h
-    include/EGL/eglext_nv.h
-    include/EGL/eglplatform.h
-    include/EGLStream/NV/ImageNativeBuffer.h
-    include/EGLStream/ArgusCaptureMetadata.h
-    include/EGLStream/EGLStream.h
-    include/EGLStream/Frame.h
-    include/EGLStream/FrameConsumer.h
-    include/EGLStream/Image.h
-    include/EGLStream/MetadataContainer.h
-    include/GL/gl.h
-    include/GL/glcorearb.h
-    include/GL/glext.h
-    include/GL/glxext.h
-    include/GLES2/gl2.h
-    include/GLES2/gl2ext.h
-    include/GLES2/gl2ext_nv.h
-    include/GLES2/gl2platform.h
-    include/GLES3/gl3.h
-    include/GLES3/gl31.h
-    include/GLES3/gl32.h
-    include/GLES3/gl3platform.h
-    include/KHR/khrplatform.h
-    include/libjpeg-8b/jconfig.h
-    include/libjpeg-8b/jmorecfg.h
-    include/libjpeg-8b/jpeglib.h
-    include/CameraEGLStreamConsumer.h
-    include/libv4l2.h
-    include/NvApplicationProfiler.h
-    include/nvbuf_utils.h
-    include/NvBuffer.h
-    include/NvEglRenderer.h
-    include/NvElement.h
-    include/NvElementProfiler.h
-    include/NvJpegDecoder.h
-    include/NvJpegEncoder.h
-    include/NvLogging.h
-    include/nvosd.h
-    include/NvUtils.h
-    include/NvV4l2Element.h
-    include/NvV4l2ElementPlane.h
-    include/NvVideoConverter.h
-    include/NvVideoDecoder.h
-    include/NvVideoEncoder.h
-    include/v4l2_nv_extensions.h
-    samples/backend/v4l2_backend_csvparser.cpp
-    samples/backend/v4l2_backend_main.cpp
-    samples/backend/v4l2_backend_test.h
-    samples/common/algorithm/cuda/NvAnalysis.h
-    samples/common/algorithm/cuda/NvCudaProc.cpp
-    samples/common/algorithm/cuda/NvCudaProc.h
-    samples/common/algorithm/gie/gie_inference.cpp
-    samples/common/algorithm/gie/gie_inference.h
-    samples/common/classes/NvApplicationProfiler.cpp
-    samples/common/classes/NvBuffer.cpp
-    samples/common/classes/NvEglRenderer.cpp
-    samples/common/classes/NvElement.cpp
-    samples/common/classes/NvElementProfiler.cpp
-    samples/common/classes/NvJpegDecoder.cpp
-    samples/common/classes/NvJpegEncoder.cpp
-    samples/common/classes/NvLogging.cpp
-    samples/common/classes/NvUtils.cpp
-    samples/common/classes/NvV4l2Element.cpp
-    samples/common/classes/NvV4l2ElementPlane.cpp
-    samples/common/classes/NvVideoConverter.cpp
-    samples/common/classes/NvVideoDecoder.cpp
-    samples/common/classes/NvVideoEncoder.cpp
-    tools/ConvertCaffeToGieModel/ConvertCaffeToGieModel_main.cpp
-    tools/ConvertCaffeToGieModel/gieModel.h)
+    samples/04_video_dec_gie/rects_serialization.h
+    samples/04_video_dec_gie/rects_serialization.cpp
+)
+target_include_directories(tegra_video
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/samples/04_video_dec_gie
+)
+target_link_libraries(tegra_video nx_kit)
+if(WIN32)
+    set(TEGRA_VIDEO_API_IMPORT_MACRO "__declspec(dllimport)")
+    set(TEGRA_VIDEO_API_EXPORT_MACRO "__declspec(dllexport)")
+else()
+    set_target_properties(tegra_video PROPERTIES CXX_VISIBILITY_PRESET hidden)
+    set(TEGRA_VIDEO_API_IMPORT_MACRO "")
+    set(TEGRA_VIDEO_API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
+endif()
+target_compile_definitions(tegra_video
+    PRIVATE TEGRA_VIDEO_API=${TEGRA_VIDEO_API_EXPORT_MACRO}
+    INTERFACE TEGRA_VIDEO_API=${TEGRA_VIDEO_API_IMPORT_MACRO}
+)
 
-add_executable(tegra_video ${SOURCE_FILES})
+if("${withTests}" STREQUAL "")
+    set(withTests ON)
+endif()
+
+if(withTests)
+    add_executable(tegra_video_ut
+        samples/04_video_dec_gie/unit_tests/main.cpp
+        samples/04_video_dec_gie/net_dimensions.h
+        samples/04_video_dec_gie/net_dimensions.cpp
+        samples/04_video_dec_gie/unit_tests/net_dimensions_ut.cpp
+        samples/04_video_dec_gie/rects_serialization.h
+        samples/04_video_dec_gie/rects_serialization.cpp
+        samples/04_video_dec_gie/unit_tests/rects_serialization_ut.cpp
+        samples/04_video_dec_gie/unit_tests/tegra_video_stub_ut.cpp
+    )
+    target_link_libraries(tegra_video_ut nx_kit tegra_video)
+
+    add_test(NAME tegra_video_ut COMMAND tegra_video_ut)
+endif()

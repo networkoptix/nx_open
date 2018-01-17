@@ -1,3 +1,4 @@
+#include <nx/utils/log/log.h>
 #include "file_system.h"
 
 #if defined(Q_OS_UNIX)
@@ -207,95 +208,6 @@ QString applicationFileNameInternal(const QString& /*defaultFileName*/)
 }
 #endif // #if defined(Q_OS_WINRT) && _MSC_VER < 1900
 
-namespace {
-
-static HANDLE driveHandleByString(const QString& driveString)
-{
-    QString driveSysString = QString(lit("\\\\.\\%1:")).arg(driveString[0]);
-
-    return CreateFile(
-        (LPCWSTR)driveSysString.data(),
-        FILE_READ_ATTRIBUTES,
-        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-        NULL,
-        OPEN_EXISTING,
-        0,
-        NULL);
-}
-
-static bool mediaIsInserted(HANDLE driveHandle)
-{
-    DWORD bytesReturned;
-    return DeviceIoControl(
-        driveHandle,
-        IOCTL_STORAGE_CHECK_VERIFY2,
-        NULL, 0,
-        NULL, 0,
-        &bytesReturned,
-        NULL);
-}
-
-} // <anonymous>
-
-bool mediaIsInserted(const QString& driveString)
-{
-    auto handle = driveHandleByString(driveString);
-    if (handle == INVALID_HANDLE_VALUE)
-        return false;
-
-    auto result = mediaIsInserted(handle);
-    CloseHandle(handle);
-
-    return result;
-}
-
-WinDriveInfoList getWinDrivesInfo()
-{
-    WinDriveInfoList result;
-    const DWORD drivesBufLen = 512;
-    TCHAR drivesBuf[drivesBufLen];
-
-    if (!GetLogicalDriveStrings(drivesBufLen, drivesBuf))
-        return result;
-
-    LPTSTR pdrivesBuf = drivesBuf;
-    while (*pdrivesBuf != L'\0')
-    {
-        QString drive = QString::fromUtf16((ushort*)pdrivesBuf);
-        pdrivesBuf += drive.length() + 1;
-
-        WinDriveInfo driveInfo;
-        driveInfo.path = drive;
-
-        auto driveHandle = driveHandleByString(drive);
-        if (driveHandle == INVALID_HANDLE_VALUE)
-            continue;
-
-        if (!mediaIsInserted(driveHandle))
-        {
-            CloseHandle(driveHandle);
-            continue;
-        }
-
-        driveInfo.access |= WinDriveInfo::Readable;
-        DWORD bytesReturned;
-        BOOL isWritable = DeviceIoControl(
-            driveHandle,
-            IOCTL_DISK_IS_WRITABLE,
-            NULL, 0,
-            NULL, 0,
-            &bytesReturned,
-            NULL);
-        driveInfo.access |= isWritable ? WinDriveInfo::Writable : 0;
-        driveInfo.type = GetDriveType((LPCWSTR)driveInfo.path.data());
-
-        CloseHandle(driveHandle);
-        result.append(driveInfo);
-    }
-
-    return result;
-}
-
 #endif // #ifdef Q_OS_WIN
 
 QString applicationDirPath(const QString& defaultFilePath)
@@ -386,6 +298,30 @@ bool isUsb(const QString& devName)
 }
 
 #endif
+
+bool isRelativePathSafe(const QString& path)
+{
+    if (path.contains(lit("..")))
+        return false; //< May be a path traversal attempt.
+
+    if (path.startsWith('/'))
+        return false; //< UNIX root.
+
+    if (path.contains('*') || path.contains('?') || path.contains('[') || path.contains(']'))
+        return false; //< UNIX shell wildcards.
+
+    if (path.startsWith('-') || path.startsWith('~'))
+        return false; //< UNIX shell special characters.
+
+    if (path.size() > 1 && path[1] == ':')
+        return false; //< Windows mount point.
+
+    if (path.startsWith('\\'))
+        return false; //< Windows SMB drive.
+
+    // TODO: It makes sense to add some more security cheks e.g. symlinks, etc.
+    return true;
+}
 
 } // namespace file_system
 } // namespace utils

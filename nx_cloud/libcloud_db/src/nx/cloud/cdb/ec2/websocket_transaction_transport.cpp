@@ -1,9 +1,11 @@
 #include "websocket_transaction_transport.h"
+
 #include <nx_ec/data/api_peer_data.h>
+#include <nx/p2p/p2p_serialization.h>
 #include <transaction/connection_guard.h>
+
 #include "compatible_ec2_protocol_version.h"
 #include "transaction_log.h"
-#include <nx/p2p/p2p_serialization.h>
 
 namespace nx {
 namespace cdb {
@@ -152,7 +154,7 @@ void WebSocketTransactionTransport::onTransactionsReadFromLog(
         m_sendHandshakeDone = true; //< All data are sent.
 }
 
-SocketAddress WebSocketTransactionTransport::remoteSocketAddr() const
+network::SocketAddress WebSocketTransactionTransport::remoteSocketAddr() const
 {
     return webSocket()->socket()->getForeignAddress();
 }
@@ -210,7 +212,7 @@ int WebSocketTransactionTransport::highestProtocolVersionCompatibleWithRemotePee
 }
 
 void WebSocketTransactionTransport::fillAuthInfo(
-    nx_http::AsyncClient* /*httpClient*/,
+    nx::network::http::AsyncClient* /*httpClient*/,
     bool /*authByKey*/)
 {
     NX_ASSERT(0, "This method is used for outgoing connections only. Not implemented");

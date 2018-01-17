@@ -8,53 +8,94 @@
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
 
-namespace {
-    const QString idParam = lit("id");
-    const QString valueParam = lit("value");
+using namespace nx::utils::log;
+
+static const QString kNameParam = lit("name");
+static const QString kIdParam = lit("id");
+static const QString kValueParam = lit("value");
+
+static bool hasPermission(const QnRestConnectionProcessor* processor)
+{
+    return processor->commonModule()->resourceAccessManager()->hasGlobalPermission(
+        processor->accessRights(), Qn::GlobalPermission::GlobalAdminPermission);
 }
 
-int QnLogLevelRestHandler::executeGet(
-    const QString &path,
-    const QnRequestParams &params,
-    QnJsonRestResult &result,
-    const QnRestConnectionProcessor *processor)
+static QString levelString(const std::shared_ptr<Logger>& logger)
 {
-    QN_UNUSED(path, processor);
+    LevelSettings settings(logger->defaultLevel(), logger->levelFilters());
+    return settings.toString();
+}
 
-    int logId = 0;
-    requireParameter(params, idParam, result, &logId, true);
-    const auto logger = QnLogs::logger(logId);
-    if (!logger)
+static JsonRestResponse invalidParamiter(const QString& name, const QString& value)
+{
+    return {QnJsonRestResult::InvalidParameter,
+        lm("Parameter '%1' has invalid value '%2'").args(name, value)};
+}
+
+JsonRestResponse QnLogLevelRestHandler::executeGet(const JsonRestRequest& request)
+{
+    // TODO: Remove as soon as WEB client supports new API.
+    if (request.params.contains(kIdParam))
+        return manageLogLevelById(request);
+    
+    if (request.params.empty())
     {
-        result.setError(QnJsonRestResult::InvalidParameter,
-            lit("Parameter '%1' has invalid value '%2'").arg(idParam).arg(logId));
-        return CODE_OK;
+        std::map<QString, QString> levelsByName;
+        for (const auto& name: QnLogs::getLoggerNames())
+            levelsByName[name] = levelString(QnLogs::getLogger(name));
+        return {levelsByName};
     }
 
-    auto setValue = params.find(valueParam);
-    if (setValue != params.cend())
-    {
-        if (!processor->commonModule()->resourceAccessManager()->hasGlobalPermission(
-                processor->accessRights(),
-                Qn::GlobalPermission::GlobalAdminPermission))
-        {
-            result.setError(QnJsonRestResult::Forbidden);
-            return nx_http::StatusCode::forbidden;
-        }
+    const auto name = request.params.value(kNameParam);
+    const auto logger = QnLogs::getLogger(name);
+    if (!logger)
+        return invalidParamiter(kNameParam, name);
 
-        QString level = *setValue;
-        QnLogLevel logLevel = nx::utils::log::levelFromString(level);
-        if (logLevel == cl_logUNKNOWN)
-        {
-            result.setError(QnJsonRestResult::InvalidParameter,
-                lit("Parameter '%1' has invalid value '%2'").arg(valueParam).arg(level));
-            return CODE_OK;
-        }
+    const auto value = request.params.value(kValueParam);
+    if (!value.isEmpty())
+    {
+        if (!hasPermission(request.owner))
+            return {nx::network::http::StatusCode::forbidden, QnJsonRestResult::Forbidden};
+
+        LevelSettings settings;
+        if (!settings.parse(value))
+            return invalidParamiter(kValueParam, value);
+
+        // TODO: Also update in config.
+        logger->setDefaultLevel(settings.primary);
+        logger->setLevelFilters(settings.filters);
+    }
+    
+    return {levelString(logger)};
+}
+
+JsonRestResponse QnLogLevelRestHandler::manageLogLevelById(const JsonRestRequest& request)
+{
+    std::shared_ptr<nx::utils::log::Logger> logger;
+    const auto logId = request.params.value(kIdParam);
+    {
+        bool isLogIdInt = false;
+        const auto logIdInt = logId.toInt(&isLogIdInt);
+        if (isLogIdInt)
+            logger = QnLogs::getLogger(logIdInt);
+    }
+
+    if (!logger)
+        return invalidParamiter(kIdParam, logId);
+
+    auto value = request.params.find(kValueParam);
+    if (value != request.params.cend())
+    {
+        if (!hasPermission(request.owner))
+            return {nx::network::http::StatusCode::forbidden, QnJsonRestResult::Forbidden};
+
+        const auto logLevel = nx::utils::log::levelFromString(*value);
+        if (logLevel == Level::undefined)
+            return invalidParamiter(kValueParam, *value);
 
         logger->setDefaultLevel(logLevel);
     }
 
     const auto level = logger->defaultLevel();
-    result.setReply(level == nx::utils::log::Level::verbose ? lit("DEBUG2") : toString(level).toUpper());
-    return CODE_OK;
+    return {(level == Level::verbose) ? lit("DEBUG2") : toString(level).toUpper()};
 }

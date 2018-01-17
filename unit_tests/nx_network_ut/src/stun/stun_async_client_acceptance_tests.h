@@ -4,13 +4,17 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/socket_factory.h>
+#include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/abstract_async_client.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -19,22 +23,40 @@ class AbstractStunServer
 public:
     virtual ~AbstractStunServer() = default;
 
-    virtual bool bind(const SocketAddress&) = 0;
+    virtual bool bind(const network::SocketAddress&) = 0;
     virtual bool listen() = 0;
-    virtual QUrl getServerUrl() const = 0;
-    virtual void sendIndicationThroughEveryConnection(nx::stun::Message) = 0;
-    virtual nx::stun::MessageDispatcher& dispatcher() = 0;
+    virtual nx::utils::Url getServerUrl() const = 0;
+    virtual void sendIndicationThroughEveryConnection(stun::Message) = 0;
+    virtual nx::network::stun::MessageDispatcher& dispatcher() = 0;
     virtual std::size_t connectionCount() const = 0;
+};
+
+class BasicStunAsyncClientAcceptanceTest:
+    public ::testing::Test
+{
+public:
+    ~BasicStunAsyncClientAcceptanceTest();
+
+protected:
+    void setSingleShotUnconnectableSocketFactory();
+
+private:
+    boost::optional<network::SocketFactory::CreateStreamSocketFuncType> m_streamSocketFactoryBak;
+    QnMutex m_mutex;
+
+    std::unique_ptr<network::AbstractStreamSocket> createUnconnectableStreamSocket(
+        bool /*sslRequired*/,
+        nx::network::NatTraversalSupport /*natTraversalRequired*/);
 };
 
 /**
  * @param AsyncClientTestTypes It is a struct with following nested types:
- * - ClientType Type that inherits nx::stun::AbstractAsyncClient.
+ * - ClientType Type that inherits nx::network::stun::AbstractAsyncClient.
  * - ServerType Class that implements AbstractStunServer interface.
  */
 template<typename AsyncClientTestTypes>
 class StunAsyncClientAcceptanceTest:
-    public ::testing::Test
+    public BasicStunAsyncClientAcceptanceTest
 {
 public:
     ~StunAsyncClientAcceptanceTest()
@@ -45,7 +67,7 @@ public:
 protected:
     void subscribeToEveryIndication()
     {
-        m_indictionMethodToSubscribeTo = nx::stun::kEveryIndicationMethod;
+        m_indictionMethodToSubscribeTo = nx::network::stun::kEveryIndicationMethod;
     }
 
     template<typename Func>
@@ -68,18 +90,13 @@ protected:
 
     void givenConnectedClient()
     {
-        using namespace std::placeholders;
-
-        ASSERT_TRUE(m_client.setIndicationHandler(
-            m_indictionMethodToSubscribeTo,
-            std::bind(&StunAsyncClientAcceptanceTest::saveIndication, this, _1),
-            this));
-
-        nx::utils::promise<SystemError::ErrorCode> connected;
-        m_client.connect(
-            m_serverUrl,
-            [&connected](SystemError::ErrorCode resultCode) { connected.set_value(resultCode); });
-        ASSERT_EQ(SystemError::noError, connected.get_future().get());
+        nx::utils::promise<SystemError::ErrorCode> connectCompleted;
+        initializeClient(
+            [&connectCompleted](SystemError::ErrorCode systemErrorCode)
+            {
+                connectCompleted.set_value(systemErrorCode);
+            });
+        ASSERT_EQ(SystemError::noError, connectCompleted.get_future().get());
 
         waitForServerToHaveAtLeastOneConnection();
     }
@@ -98,16 +115,20 @@ protected:
 
     void givenDisconnectedClient()
     {
-        using namespace std::placeholders;
+        initializeClient([](SystemError::ErrorCode /*resultCode*/) {});
+    }
 
-        ASSERT_TRUE(m_client.setIndicationHandler(
-            m_indictionMethodToSubscribeTo,
-            std::bind(&StunAsyncClientAcceptanceTest::saveIndication, this, _1),
-            this));
+    void givenClientFailedToConnect()
+    {
+        setSingleShotUnconnectableSocketFactory();
 
-        m_client.connect(
-            m_serverUrl,
-            [](SystemError::ErrorCode /*resultCode*/) {});
+        nx::utils::promise<SystemError::ErrorCode> connectCompleted;
+        initializeClient(
+            [&connectCompleted](SystemError::ErrorCode systemErrorCode)
+            {
+                connectCompleted.set_value(systemErrorCode);
+            });
+        ASSERT_NE(SystemError::noError, connectCompleted.get_future().get());
     }
 
     void whenRemoveHandler()
@@ -218,10 +239,10 @@ private:
     typename AsyncClientTestTypes::ClientType m_client;
     std::unique_ptr<typename AsyncClientTestTypes::ServerType> m_server;
     SocketAddress m_serverEndpoint = SocketAddress::anyPrivateAddress;
-    QUrl m_serverUrl;
+    nx::utils::Url m_serverUrl;
     nx::utils::SyncQueue<int /*dummy*/> m_reconnectEvents;
     nx::utils::SyncQueue<RequestResult> m_requestResult;
-    nx::utils::SyncQueue<nx::stun::Message> m_indicationsReceived;
+    nx::utils::SyncQueue<nx::network::stun::Message> m_indicationsReceived;
     RequestResult m_prevRequestResult;
     const int m_testMethodNumber = stun::MethodType::userMethod + 1;
     int m_indictionMethodToSubscribeTo = stun::MethodType::userMethod + 1;
@@ -252,11 +273,26 @@ private:
         ASSERT_TRUE(m_server->listen());
     }
 
+    void initializeClient(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler)
+    {
+        using namespace std::placeholders;
+
+        ASSERT_TRUE(m_client.setIndicationHandler(
+            m_indictionMethodToSubscribeTo,
+            std::bind(&StunAsyncClientAcceptanceTest::saveIndication, this, _1),
+            this));
+
+        m_client.connect(
+            m_serverUrl,
+            std::move(completionHandler));
+    }
+
     void sendResponse(
         std::shared_ptr<stun::AbstractServerConnection> connection,
-        nx::stun::Message request)
+        nx::network::stun::Message request)
     {
-        nx::stun::Message response(
+        nx::network::stun::Message response(
             stun::Header(
                 stun::MessageClass::successResponse,
                 request.header.method,
@@ -275,7 +311,7 @@ private:
     {
         return m_client.setIndicationHandler(
             m_testMethodNumber + 1,
-            [](nx::stun::Message) {},
+            [](nx::network::stun::Message) {},
             this);
     }
 
@@ -284,7 +320,7 @@ private:
         m_reconnectEvents.push(0);
     }
 
-    void saveIndication(nx::stun::Message indication)
+    void saveIndication(nx::network::stun::Message indication)
     {
         m_indicationsReceived.push(std::move(indication));
     }
@@ -321,6 +357,16 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, reconnect_works)
     this->whenRestartServer();
     this->thenClientReconnects();
     this->thenClientIsAbleToPerformRequests();
+}
+
+TYPED_TEST_P(StunAsyncClientAcceptanceTest, reconnect_occurs_after_initial_connect_failure)
+{
+    this->givenBrokenServer();
+    this->givenClientFailedToConnect();
+
+    this->whenRestartServer();
+
+    this->thenClientReconnects();
 }
 
 TYPED_TEST_P(StunAsyncClientAcceptanceTest, client_receives_indication)
@@ -390,6 +436,7 @@ REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     same_handler_cannot_be_added_twice,
     add_remove_indication_handler,
     reconnect_works,
+    reconnect_occurs_after_initial_connect_failure,
     client_receives_indication,
     subscription_to_every_indication,
     client_receives_indication_after_reconnect,
@@ -397,6 +444,8 @@ REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     scheduled_request_is_completed_after_reconnect,
     request_result_is_reported_even_if_connect_always_fails);
 
+
 } // namespace test
 } // namespace stun
+} // namespace network
 } // namespace nx

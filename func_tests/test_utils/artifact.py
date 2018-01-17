@@ -1,7 +1,9 @@
 'Produce file names for storing artifacts'
 
-import os.path
 import logging
+import os.path
+import json
+
 from .utils import is_list_inst
 
 log = logging.getLogger(__name__)
@@ -35,7 +37,10 @@ class ArtifactFactory(object):
         self._artifact_set = artifact_set
         self._artifact = artifact
 
-    def __call__(self, path_part_list=None, ext=None, name=None, full_name=None, is_error=None, type_name=None, content_type=None):
+    def __call__(self, *args, **kw):
+        return self.make_artifact(*args, **kw)
+
+    def make_artifact(self, path_part_list=None, ext=None, name=None, full_name=None, is_error=None, type_name=None, content_type=None):
         assert path_part_list is None or is_list_inst(path_part_list, str), repr(path_part_list)
         path_root = '-'.join([self._artifact.path_root] + (path_part_list or []))
         artifact = Artifact(path_root,
@@ -50,6 +55,12 @@ class ArtifactFactory(object):
     def produce_file_path(self):
         self._artifact_set.add(self._artifact)
         return self._artifact.path
+
+    def save_json(self, value, encoder=None):
+        path = self.make_artifact(ext='.json', type_name='json', content_type='application/json').produce_file_path()
+        with open(path, 'w') as f:
+            json.dump(value, f, indent=4, cls=encoder)
+        return path
 
     def write_file(self, contents):
         path = self.produce_file_path()

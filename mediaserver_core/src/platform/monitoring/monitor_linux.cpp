@@ -290,7 +290,7 @@ protected:
                 if( ctx.interfaceName.isEmpty() )
                 {
                     ctx.interfaceName = interfaceName;
-                    ctx.macAddress = QnMacAddress( QLatin1String(readFileContents( QString::fromLatin1("/sys/class/net/%1/address").arg(interfaceName) )) );
+                    ctx.macAddress = nx::network::QnMacAddress( QLatin1String(readFileContents( QString::fromLatin1("/sys/class/net/%1/address").arg(interfaceName) )) );
                     int sysType = readFileContents( QString::fromLatin1("/sys/class/net/%1/type").arg(interfaceName) ).toInt();
                     switch( sysType )
                     {
@@ -568,7 +568,7 @@ static QList<QnPlatformMonitor::PartitionSpace> readPartitionsAndSizes()
         QnPlatformMonitor::PartitionSpace partitionInfo;
         partitionInfo.devName = data.devName;
         partitionInfo.path = data.path;
-        partitionInfo.type = data.isUsb ? QnPlatformMonitor::UsbDiskPartition : fsNameToType(data.fsName);
+        partitionInfo.type = data.isUsb ? QnPlatformMonitor::RemovableDiskPartition : fsNameToType(data.fsName);
         partitionInfo.sizeBytes = data.sizeBytes;
         partitionInfo.freeBytes = data.freeBytes;
         result.push_back(partitionInfo);
@@ -577,49 +577,7 @@ static QList<QnPlatformMonitor::PartitionSpace> readPartitionsAndSizes()
     return result;
 }
 
-namespace {
-class PartitionInfoAsyncFetcher : public QRunnable
-{
-public:
-    PartitionInfoAsyncFetcher() {}
-
-    virtual void run() override
-    {
-        m_info = readPartitionsAndSizes();
-    }
-
-    QList<QnPlatformMonitor::PartitionSpace> getInfo()
-    {
-        return m_info;
-    }
-private:
-    QList<QnPlatformMonitor::PartitionSpace> m_info;
-};
-}
-
 QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
 {
-    const int kExpiryTimeout = 500;
-    QThreadPool pool;
-    PartitionInfoAsyncFetcher infoFetcher;
-
-    NX_VERBOSE(this, lm("Preparing to get partitions info. Timeout is %1 ms.").arg(kExpiryTimeout));
-    pool.setMaxThreadCount(1);
-    infoFetcher.setAutoDelete(false);
-
-    pool.start(&infoFetcher);
-    pool.waitForDone(kExpiryTimeout);
-    auto result = infoFetcher.getInfo();
-
-    if (result.isEmpty())
-    {
-        NX_WARNING(this, lm("Get partitions info result is empty. "
-            "This might result in serious storage related problems."));
-    }
-    else
-    {
-        NX_DEBUG(this, lm("Get partitions info: %1").container(result));
-    }
-
-    return result;
+    return readPartitionsAndSizes();
 }

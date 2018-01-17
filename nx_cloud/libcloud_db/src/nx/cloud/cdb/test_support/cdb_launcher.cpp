@@ -7,14 +7,21 @@
 #include <thread>
 #include <tuple>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/http/http_client.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/sync_call.h>
 #include <nx/utils/app_info.h>
 
 #include <nx/cloud/cdb/api/account_manager.h>
+#include <nx/cloud/cdb/client/cdb_request_path.h>
+#include <nx/cloud/cdb/client/data/types.h>
+
+#include <transaction/transaction.h>
 
 #include "business_data_generator.h"
 #include "../cloud_db_service.h"
@@ -92,6 +99,9 @@ CdbLauncher::~CdbLauncher()
 
 bool CdbLauncher::waitUntilStarted()
 {
+    constexpr const std::chrono::seconds kRequestTimeout = std::chrono::seconds(3);
+    constexpr const int kRetryCount = 3;
+
     if (!utils::test::ModuleLauncher<CloudDbServicePublic>::waitUntilStarted())
         return false;
 
@@ -102,20 +112,27 @@ bool CdbLauncher::waitUntilStarted()
 
     m_connectionFactory->setCloudUrl(lit("http://127.0.0.1:%1").arg(m_port).toStdString());
 
-    //retrieving module info
-    auto connection = m_connectionFactory->createConnection();
-    api::ResultCode result = api::ResultCode::ok;
-    std::tie(result, m_moduleInfo) = makeSyncCall<api::ResultCode, api::ModuleInfo>(
-        std::bind(
-            &nx::cdb::api::Connection::ping,
-            connection.get(),
-            std::placeholders::_1));
-    return result == api::ResultCode::ok;
+    // Retrieving module info.
+    for (int i = 0; i < kRetryCount; ++i)
+    {
+        auto connection = m_connectionFactory->createConnection();
+        connection->setRequestTimeout(kRequestTimeout);
+        api::ResultCode result = api::ResultCode::ok;
+        std::tie(result, m_moduleInfo) = makeSyncCall<api::ResultCode, api::ModuleInfo>(
+            std::bind(
+                &nx::cdb::api::Connection::ping,
+                connection.get(),
+                std::placeholders::_1));
+        if (result == api::ResultCode::ok)
+            return true;
+    }
+
+    return false;
 }
 
-SocketAddress CdbLauncher::endpoint() const
+network::SocketAddress CdbLauncher::endpoint() const
 {
-    return SocketAddress(HostAddress::localhost, m_port);
+    return network::SocketAddress(network::HostAddress::localhost, m_port);
 }
 
 nx::cdb::api::ConnectionFactory* CdbLauncher::connectionFactory()
@@ -128,7 +145,8 @@ std::unique_ptr<nx::cdb::api::Connection> CdbLauncher::connection(
     const std::string& password)
 {
     auto connection = connectionFactory()->createConnection();
-    connection->setCredentials(login, password);
+    if (!login.empty() || !password.empty())
+        connection->setCredentials(login, password);
     return connection;
 }
 
@@ -157,12 +175,12 @@ api::ResultCode CdbLauncher::addAccount(
     if (accountData->fullName.empty())
         accountData->fullName = "Account " + accountData->email + " full name";
     if (accountData->passwordHa1.empty())
-        accountData->passwordHa1 = nx_http::calcHa1(
+        accountData->passwordHa1 = nx::network::http::calcHa1(
             QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
             moduleInfo().realm.c_str(),
             password->c_str()).constData();
     if (accountData->passwordHa1Sha256.empty())
-        accountData->passwordHa1Sha256 = nx_http::calcHa1(
+        accountData->passwordHa1Sha256 = nx::network::http::calcHa1(
             QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
             moduleInfo().realm.c_str(),
             password->c_str(),
@@ -181,7 +199,7 @@ api::ResultCode CdbLauncher::addAccount(
 
     //adding account
     api::ResultCode result = api::ResultCode::ok;
-    std::tie(result, *activationCode) = 
+    std::tie(result, *activationCode) =
         makeSyncCall<api::ResultCode, api::AccountConfirmationCode>(
             std::bind(
                 &nx::cdb::api::AccountManager::registerNewAccount,
@@ -410,7 +428,7 @@ api::ResultCode CdbLauncher::bindRandomSystem(
     if (resCode != api::ResultCode::ok)
         return resCode;
 
-    systemData->status = api::SystemStatus::ssActivated;
+    systemData->status = api::SystemStatus::activated;
     return api::ResultCode::ok;
 }
 
@@ -907,6 +925,37 @@ api::ResultCode CdbLauncher::getVmsConnections(
     return resCode;
 }
 
+api::ResultCode CdbLauncher::getTransactionLog(
+    const std::string& accountEmail,
+    const std::string& accountPassword,
+    const std::string& systemId,
+    ::ec2::ApiTransactionDataList* const transactions)
+{
+    const auto requestUrl = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName).setEndpoint(endpoint())
+        .setUserName(accountEmail.c_str()).setPassword(accountPassword.c_str())
+        .setPath(kMaintenanceGetTransactionLog).setQuery(lm("systemId=%1").args(systemId));
+
+    nx::network::http::HttpClient httpClient;
+    if (!httpClient.doGet(requestUrl))
+        return api::ResultCode::networkError;
+
+    if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
+    {
+        return api::httpStatusCodeToResultCode(
+            static_cast<nx::network::http::StatusCode::Value>(
+                httpClient.response()->statusLine.statusCode));
+    }
+
+    nx::Buffer msgBody;
+    while (!httpClient.eof())
+        msgBody += httpClient.fetchMessageBodyBuffer();
+
+    *transactions = QJson::deserialized<::ec2::ApiTransactionDataList>(msgBody);
+
+    return api::ResultCode::ok;
+}
+
 api::ResultCode CdbLauncher::getStatistics(api::Statistics* const statistics)
 {
     auto connection = connectionFactory()->createConnection();
@@ -917,6 +966,26 @@ api::ResultCode CdbLauncher::getStatistics(api::Statistics* const statistics)
             std::bind(
                 &nx::cdb::api::MaintenanceManager::getStatistics,
                 connection->maintenanceManager(),
+                std::placeholders::_1));
+    return resCode;
+}
+
+api::ResultCode CdbLauncher::mergeSystems(
+    const AccountWithPassword& account,
+    const std::string& systemToMergeTo,
+    const std::string& systemBeingMerged)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(account.email, account.password);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) =
+        makeSyncCall<nx::cdb::api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::SystemManager::startMerge,
+                connection->systemManager(),
+                systemToMergeTo,
+                systemBeingMerged,
                 std::placeholders::_1));
     return resCode;
 }

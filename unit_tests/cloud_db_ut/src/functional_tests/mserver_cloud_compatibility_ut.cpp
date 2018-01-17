@@ -126,6 +126,6 @@ TEST(Ec2MserverCloudCompabilityCheckRoutine, incompatible_versions)
     ASSERT_FALSE(ec2::isProtocolVersionCompatible(ec2::kMaxSupportedProtocolVersion + 1));
 }
 
-} // namespace test 
+} // namespace test
 } // namespace cdb
 } // namespace nx

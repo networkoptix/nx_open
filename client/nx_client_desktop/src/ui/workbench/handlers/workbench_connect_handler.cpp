@@ -40,6 +40,7 @@
 
 #include <finders/systems_finder.h>
 
+#include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 
 #include <helpers/system_weight_helper.h>
@@ -57,6 +58,8 @@
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+
+#include <ui/widgets/main_window.h>
 
 #include <ui/style/skin.h>
 
@@ -104,19 +107,19 @@ static const int kVideowallCloseTimeoutMSec = 10000;
 static const int kMessagesDelayMs = 5000;
 static constexpr int kReconnectDelayMs = 3000;
 
-bool isConnectionToCloud(const QUrl& url)
+bool isConnectionToCloud(const nx::utils::Url& url)
 {
     return nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host());
 }
 
-bool isSameConnectionUrl(const QUrl& first, const QUrl& second)
+bool isSameConnectionUrl(const nx::utils::Url& first, const nx::utils::Url& second)
 {
     return ((first.host() == second.host())
         && (first.port() == second.port())
         && (first.userName() == second.userName()));
 }
 
-QString getConnectionName(const QString& systemName, const QUrl& url)
+QString getConnectionName(const QString& systemName, const nx::utils::Url& url)
 {
     static const auto kNameTemplate = QnWorkbenchConnectHandler::tr("%1 in %2",
         "%1 is user name, %2 is name of system");
@@ -124,7 +127,7 @@ QString getConnectionName(const QString& systemName, const QUrl& url)
     return kNameTemplate.arg(url.userName(), systemName);
 }
 
-void removeCustomConnection(const QnUuid& localId, const QUrl& url)
+void removeCustomConnection(const QnUuid& localId, const nx::utils::Url& url)
 {
     NX_ASSERT(!localId.isNull(), "We can't remove custom user connections");
 
@@ -144,7 +147,7 @@ void removeCustomConnection(const QnUuid& localId, const QUrl& url)
     qnSettings->save();
 }
 
-void storeCustomConnection(const QnUuid& localId, const QString& systemName, const QUrl& url)
+void storeCustomConnection(const QnUuid& localId, const QString& systemName, const nx::utils::Url& url)
 {
     if (url.password().isEmpty())
         return;
@@ -193,7 +196,7 @@ void storeCustomConnection(const QnUuid& localId, const QString& systemName, con
 void storeLocalSystemConnection(
     const QString& systemName,
     const QnUuid& localSystemId,
-    QUrl url,
+    nx::utils::Url url,
     bool storePassword)
 {
     if (!storePassword)
@@ -386,19 +389,16 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
 
     context()->instance<ServerNotificationCache>();
 
-    QnWorkbenchWelcomeScreen* welcomeScreen = qnRuntime->isDesktopMode()
-        ? context()->instance<QnWorkbenchWelcomeScreen>()
-        : nullptr;
     const auto resourceModeAction = action(action::ResourcesModeAction);
     connect(resourceModeAction, &QAction::toggled, this,
-        [this, welcomeScreen](bool checked)
+        [this](bool checked)
         {
             // Check if action state was changed during queued connection.
             if (action(action::ResourcesModeAction)->isChecked() != checked)
                 return;
 
-            if (welcomeScreen)
-                welcomeScreen->setVisible(!checked);
+            if (mainWindow()->welcomeScreen())
+                mainWindow()->setWelcomeScreenVisible(!checked);
             if (workbench()->layouts().isEmpty())
                 action(action::OpenNewTabAction)->trigger();
         }, Qt::QueuedConnection); //< QueuedConnection is needed here because 2 title bars
@@ -461,7 +461,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
 
     auto status = silent
         ? QnConnectionValidator::validateConnection(connectionInfo, errorCode)
-        : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, mainWindow());
+        : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, mainWindowWidget());
     NX_ASSERT(connection || status != Qn::SuccessConnectionResult);
     NX_LOG(lm("handleConnectReply: connection status %1").arg(status), cl_logDEBUG1);
 
@@ -477,9 +477,8 @@ void QnWorkbenchConnectHandler::handleConnectReply(
             if (helpers::isNewSystem(connectionInfo) && !connectionInfo.ecDbReadOnly)
             {
                 disconnectFromServer(DisconnectFlag::Force);
-                if (qnRuntime->isDesktopMode())
+                if (const auto welcomeScreen = mainWindow()->welcomeScreen())
                 {
-                    auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
                     /* Method is called from QML where we are passing QString. */
                     welcomeScreen->setupFactorySystem(connectionInfo.effectiveUrl().toString());
                 }
@@ -577,7 +576,7 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
     auto connectionInfo = connection->connectionInfo();
 
     setPhysicalState(PhysicalState::waiting_peer);
-    QUrl url = connectionInfo.effectiveUrl();
+    nx::utils::Url url = connectionInfo.effectiveUrl();
     if (connectionInfo.ecUrl != url)
         connection->updateConnectionUrl(url);
 
@@ -594,7 +593,7 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
 }
 
 void QnWorkbenchConnectHandler::storeConnectionRecord(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QnConnectionInfo& info,
     ConnectionOptions options)
 {
@@ -717,7 +716,7 @@ void QnWorkbenchConnectHandler::showPreloader()
     if (!qnRuntime->isDesktopMode())
         return;
 
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    const auto welcomeScreen = mainWindow()->welcomeScreen();
     const auto resourceModeAction = action(action::ResourcesModeAction);
 
     resourceModeAction->setChecked(false); //< Shows welcome screen
@@ -735,9 +734,8 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
     {
         case LogicalState::disconnected:
         {
-            if (qnRuntime->isDesktopMode())
+            if (const auto welcomeScreen = mainWindow()->welcomeScreen())
             {
-                const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
                 welcomeScreen->handleDisconnectedFromSystem();
                 welcomeScreen->setGlobalPreloaderVisible(false);
             }
@@ -907,11 +905,8 @@ void QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived()
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered()
 {
-    if (qnRuntime->isDesktopMode())
-    {
-        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    if (const auto welcomeScreen = mainWindow()->welcomeScreen())
         welcomeScreen->setVisibleControls(true);
-    }
 
     bool directConnection = !qnRuntime->isDesktopMode();
     if (m_logicalState == LogicalState::connected)
@@ -935,7 +930,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
     NX_ASSERT(parameters.hasArgument(Qn::StoreSessionRole));
     const bool storeSession = parameters.argument(Qn::StoreSessionRole, true);
-    QUrl url = parameters.argument(Qn::UrlRole, QUrl());
+    nx::utils::Url url = parameters.argument(Qn::UrlRole, nx::utils::Url());
 
     if (directConnection)
     {
@@ -994,7 +989,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     if (reachableServer == servers.cend())
         return;
 
-    QUrl url = system->getServerHost(reachableServer->id);
+    nx::utils::Url url = system->getServerHost(reachableServer->id);
     auto credentials = qnCloudStatusWatcher->credentials();
     url.setUserName(credentials.user);
     url.setPassword(credentials.password.value());
@@ -1010,7 +1005,7 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
     if (m_logicalState != LogicalState::connected)
         return;
 
-    QUrl currentUrl = commonModule()->currentUrl();
+    nx::utils::Url currentUrl = commonModule()->currentUrl();
     disconnectFromServer(DisconnectFlag::Force);
 
     // Do not store connections in case of reconnection
@@ -1029,7 +1024,7 @@ void QnWorkbenchConnectHandler::at_disconnectAction_triggered()
     disconnectFromServer(flags);
 }
 
-void QnWorkbenchConnectHandler::connectToServer(const QUrl &url)
+void QnWorkbenchConnectHandler::connectToServer(const nx::utils::Url &url)
 {
     auto validState =
         m_logicalState == LogicalState::testing
@@ -1066,11 +1061,8 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(DisconnectFlags flags)
     if (!force)
         qnGlobalSettings->synchronizeNow();
 
-    if (isErrorReason && qnRuntime->isDesktopMode())
-    {
-        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-        welcomeScreen->openConnectingTile();
-    }
+    if (isErrorReason && mainWindow()->welcomeScreen())
+        mainWindow()->welcomeScreen()->openConnectingTile();
 
     setState(LogicalState::disconnected, PhysicalState::disconnected);
 
@@ -1078,9 +1070,8 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(DisconnectFlags flags)
     return true;
 }
 
-void QnWorkbenchConnectHandler::handleTestConnectionReply(
-    int handle,
-    const QUrl& url,
+void QnWorkbenchConnectHandler::handleTestConnectionReply(int handle,
+    const nx::utils::Url &url,
     ec2::ErrorCode errorCode,
     const QnConnectionInfo& connectionInfo,
     ConnectionOptions options,
@@ -1100,7 +1091,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
         return;
 
     auto status =  QnConnectionDiagnosticsHelper::validateConnection(
-        connectionInfo, errorCode, mainWindow());
+        connectionInfo, errorCode, mainWindowWidget());
 
     switch (status)
     {
@@ -1141,7 +1132,7 @@ void QnWorkbenchConnectHandler::showLoginDialog()
     if (context()->closingDown())
         return;
 
-    const QScopedPointer<QnLoginDialog> dialog(new QnLoginDialog(context()->mainWindow()));
+    const QScopedPointer<QnLoginDialog> dialog(new QnLoginDialog(mainWindow()));
     dialog->exec();
 }
 
@@ -1195,7 +1186,7 @@ void QnWorkbenchConnectHandler::clearConnection()
 }
 
 void QnWorkbenchConnectHandler::testConnectionToServer(
-    const QUrl& url,
+    const nx::utils::Url& url,
     ConnectionOptions options,
     bool force)
 {
@@ -1214,7 +1205,7 @@ void QnWorkbenchConnectHandler::testConnectionToServer(
 
 bool QnWorkbenchConnectHandler::tryToRestoreConnection()
 {
-    QUrl currentUrl = commonModule()->currentUrl();
+    nx::utils::Url currentUrl = commonModule()->currentUrl();
     NX_ASSERT(!currentUrl.isEmpty());
     if (currentUrl.isEmpty())
         return false;
@@ -1228,7 +1219,7 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection()
         return false;
     }
 
-    m_reconnectDialog = new QnReconnectInfoDialog(mainWindow());
+    m_reconnectDialog = new QnReconnectInfoDialog(mainWindowWidget());
     connect(m_reconnectDialog, &QDialog::rejected, this,
         [this]
         {

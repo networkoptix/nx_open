@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"> <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
         <relativePath>../../cpp</relativePath>
     </parent>
 
@@ -52,7 +52,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_client_core</artifactId>
-            <version>3.1.0-SNAPSHOT</version>
+            <version>4.0.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/client/nx_client_core/pom.xml</systemPath>
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_audio</artifactId>
-            <version>3.1.0-SNAPSHOT</version>
+            <version>4.0.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_audio/pom.xml</systemPath>
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_media</artifactId>
-            <version>3.1.0-SNAPSHOT</version>
+            <version>4.0.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_media/pom.xml</systemPath>

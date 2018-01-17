@@ -1,10 +1,4 @@
-/**********************************************************
-* Nov 20, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_FUSION_REQUEST_RESULT_H
-#define NX_FUSION_REQUEST_RESULT_H
+#pragma once
 
 #include <QtCore/QString>
 
@@ -13,8 +7,9 @@
 
 #include "../http_types.h"
 
-
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 enum class FusionRequestErrorClass
 {
@@ -26,6 +21,7 @@ enum class FusionRequestErrorClass
     //!indicates server bug?
     internalError
 };
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FusionRequestErrorClass)
 
 enum class FusionRequestErrorDetail
 {
@@ -34,6 +30,7 @@ enum class FusionRequestErrorDetail
     deserializationError,
     notAcceptable
 };
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FusionRequestErrorDetail)
 
 class NX_NETWORK_API FusionRequestResult
 {
@@ -56,28 +53,21 @@ public:
         FusionRequestErrorDetail _errorDetail,
         QString _errorText);
 
-    nx_http::StatusCode::Value httpStatusCode() const;
-    void setHttpStatusCode(nx_http::StatusCode::Value statusCode);
+    nx::network::http::StatusCode::Value httpStatusCode() const;
+    void setHttpStatusCode(nx::network::http::StatusCode::Value statusCode);
 
 private:
-    boost::optional<nx_http::StatusCode::Value> m_httpStatusCode;
+    boost::optional<nx::network::http::StatusCode::Value> m_httpStatusCode;
 
-    nx_http::StatusCode::Value calculateHttpStatusCode() const;
+    nx::network::http::StatusCode::Value calculateHttpStatusCode() const;
 };
 
 #define FusionRequestResult_Fields (errorClass)(resultCode)(errorDetail)(errorText)
 
-//not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
-bool NX_NETWORK_API deserialize(QnJsonContext*, const QJsonValue&, class FusionRequestResult*);
-void NX_NETWORK_API serialize(QnJsonContext*, const FusionRequestResult&, class QJsonValue*);
+QN_FUSION_DECLARE_FUNCTIONS(nx::network::http::FusionRequestErrorDetail, (lexical), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::network::http::FusionRequestErrorClass, (lexical), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::network::http::FusionRequestResult, (json), NX_NETWORK_API)
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::FusionRequestErrorClass)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx_http::FusionRequestErrorClass), (lexical))
-
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::FusionRequestErrorDetail)
-//not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
-void NX_NETWORK_API serialize(const nx_http::FusionRequestErrorDetail&, QString*);
-
-} // namespace nx_http
-
-#endif  //NX_FUSION_REQUEST_RESULT_H
+} // namespace nx
+} // namespace network
+} // namespace http

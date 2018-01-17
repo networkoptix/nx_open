@@ -32,6 +32,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>
+#include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/radass/radass_controller.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -103,6 +104,7 @@
 using namespace nx;
 using namespace nx::client::desktop;
 using namespace client::desktop::ui;
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -328,9 +330,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     connect(context()->instance<QnWorkbenchNotificationsHandler>(), &QnWorkbenchNotificationsHandler::notificationAdded,
         this, &QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded);
-
-    /* Set up defaults. */
-    connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay()
@@ -594,13 +593,13 @@ void QnWorkbenchDisplay::initSceneView()
     /* Set up curtain. */
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
-    setLayer(m_curtainItem.data(), Qn::BackLayer);
+    setLayer(m_curtainItem.data(), QnWorkbenchDisplay::BackLayer);
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
     /* Set up grid. */
     m_gridItem = new QnGridItem();
     m_scene->addItem(m_gridItem.data());
-    setLayer(m_gridItem.data(), Qn::BackLayer);
+    setLayer(m_gridItem.data(), QnWorkbenchDisplay::BackLayer);
     opacityAnimator(m_gridItem.data())->setTimeLimit(300);
     m_gridItem.data()->setOpacity(0.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
@@ -610,8 +609,7 @@ void QnWorkbenchDisplay::initSceneView()
         //
         m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
         m_scene->addItem(gridBackgroundItem());
-        setLayer(gridBackgroundItem(), Qn::EMappingLayer);
-        gridBackgroundItem()->setOpacity(0.0);
+        setLayer(gridBackgroundItem(), QnWorkbenchDisplay::EMappingLayer);
         gridBackgroundItem()->setMapper(workbench()->mapper());
     }
 
@@ -664,14 +662,14 @@ QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties
 // -------------------------------------------------------------------------- //
-Qn::ItemLayer QnWorkbenchDisplay::layer(QGraphicsItem *item) const
+QnWorkbenchDisplay::ItemLayer QnWorkbenchDisplay::layer(QGraphicsItem *item) const
 {
     bool ok;
-    Qn::ItemLayer layer = static_cast<Qn::ItemLayer>(item->data(ITEM_LAYER_KEY).toInt(&ok));
-    return ok ? layer : Qn::BackLayer;
+    ItemLayer layer = static_cast<ItemLayer>(item->data(ITEM_LAYER_KEY).toInt(&ok));
+    return ok ? layer : BackLayer;
 }
 
-void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Qn::ItemLayer layer)
+void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, QnWorkbenchDisplay::ItemLayer layer)
 {
     if (item == NULL)
     {
@@ -685,7 +683,7 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Qn::ItemLayer layer)
     item->setZValue(layer * layerZSize + std::fmod(item->zValue(), layerZSize));
 }
 
-void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, Qn::ItemLayer layer)
+void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, QnWorkbenchDisplay::ItemLayer layer)
 {
     foreach(QGraphicsItem *item, items)
         setLayer(item, layer);
@@ -737,7 +735,7 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
 
 QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const
 {
-    const auto occupiedGeometry = QnGeometry::rotated(widgetGeometry, rotation);
+    const auto occupiedGeometry = Geometry::rotated(widgetGeometry, rotation);
     const auto viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 
     QSizeF newWidgetSize = occupiedGeometry.size() * focusExpansion;
@@ -760,8 +758,8 @@ QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal ro
     QPointF viewportCenter = viewportGeometry.center();
 
     /* Allow expansion no further than the maximal size, but no less than current size. */
-    newWidgetSize = bounded(newWidgetSize, maxWidgetSize, Qt::KeepAspectRatio);
-    newWidgetSize = expanded(newWidgetSize, occupiedGeometry.size(), Qt::KeepAspectRatio);
+    newWidgetSize = Geometry::bounded(newWidgetSize, maxWidgetSize, Qt::KeepAspectRatio);
+    newWidgetSize = Geometry::expanded(newWidgetSize, occupiedGeometry.size(), Qt::KeepAspectRatio);
 
     /* Calculate expansion values. Expand towards the screen center. */
     qreal xp1 = 0.0, xp2 = 0.0, yp1 = 0.0, yp2 = 0.0;
@@ -1092,9 +1090,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item)
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay)
 {
-    int maxItems = m_lightMode.testFlag(Qn::LightModeSingleItem)
-        ? 1
-        : qnSettings->maxSceneVideoItems();
+    int maxItems = qnRuntime->maxSceneItems();
 
     if (m_widgets.size() >= maxItems)
     {
@@ -1149,6 +1145,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if (widgetsForResource.size() == 1)
         emit resourceAdded(widget->resource());
 
+    QnResourceWidget::Options options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
+    if (options)
+        widget->setOptions(widget->options() | options);
+
     synchronize(widget, false);
     bringToFront(widget);
 
@@ -1161,10 +1161,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     QColor frameColor = item->data(Qn::ItemFrameDistinctionColorRole).value<QColor>();
     if (frameColor.isValid())
         widget->setFrameDistinctionColor(frameColor);
-
-    QnResourceWidget::Options options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
-    if (options)
-        widget->setOptions(widget->options() | options);
 
     emit widgetAdded(widget);
 
@@ -1244,8 +1240,13 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     m_widgets.removeOne(widget);
     m_widgetByItem.remove(item);
-    if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-        qnClientModule->radassController()->unregisterConsumer(mediaWidget->display()->camDisplay());
+
+    const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
+    if (mediaWidget && !mediaWidget->isZoomWindow())
+    {
+        qnClientModule->radassController()->unregisterConsumer(
+            mediaWidget->display()->camDisplay());
+    }
 
     if (destroyWidget)
     {
@@ -1401,59 +1402,51 @@ void QnWorkbenchDisplay::updateCurrentMarginFlags()
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: calculators
 // -------------------------------------------------------------------------- //
-qreal QnWorkbenchDisplay::layerFrontZValue(Qn::ItemLayer layer) const
+qreal QnWorkbenchDisplay::layerFrontZValue(ItemLayer layer) const
 {
     return layerZValue(layer) + m_frontZ;
 }
 
-qreal QnWorkbenchDisplay::layerZValue(Qn::ItemLayer layer) const
+qreal QnWorkbenchDisplay::layerZValue(ItemLayer layer) const
 {
     return layer * layerZSize;
 }
 
-Qn::ItemLayer QnWorkbenchDisplay::shadowLayer(Qn::ItemLayer itemLayer) const
+QnWorkbenchDisplay::ItemLayer QnWorkbenchDisplay::shadowLayer(ItemLayer itemLayer) const
 {
     switch (itemLayer)
     {
-        case Qn::PinnedRaisedLayer:
-            return Qn::PinnedLayer;
-        case Qn::UnpinnedRaisedLayer:
-            return Qn::UnpinnedLayer;
+        case PinnedRaisedLayer:
+            return PinnedLayer;
+        case UnpinnedRaisedLayer:
+            return UnpinnedLayer;
         default:
             return itemLayer;
     }
 }
 
-Qn::ItemLayer QnWorkbenchDisplay::synchronizedLayer(QnResourceWidget *widget) const
+QnWorkbenchDisplay::ItemLayer QnWorkbenchDisplay::synchronizedLayer(QnResourceWidget *widget) const
 {
-    NX_ASSERT(widget != NULL);
+    NX_ASSERT(widget);
+
+    if (widget->options().testFlag(QnResourceWidget::InvisibleWidgetOption))
+        return InvisibleLayer;
 
     if (widget == m_widgetByRole[Qn::ZoomedRole])
-    {
-        return Qn::ZoomedLayer;
-    }
-    else if (widget->item()->isPinned())
-    {
-        if (widget == m_widgetByRole[Qn::RaisedRole])
-        {
-            return Qn::PinnedRaisedLayer;
-        }
-        else
-        {
-            return Qn::PinnedLayer;
-        }
-    }
-    else
+        return ZoomedLayer;
+
+    if (widget->item()->isPinned())
     {
         if (widget == m_widgetByRole[Qn::RaisedRole])
-        {
-            return Qn::UnpinnedRaisedLayer;
-        }
-        else
-        {
-            return Qn::UnpinnedLayer;
-        }
+            return PinnedRaisedLayer;
+
+        return PinnedLayer;
     }
+
+    if (widget == m_widgetByRole[Qn::RaisedRole])
+        return UnpinnedRaisedLayer;
+
+    return UnpinnedLayer;
 }
 
 QRectF QnWorkbenchDisplay::itemEnclosingGeometry(QnWorkbenchItem *item) const
@@ -1495,7 +1488,8 @@ QRectF QnWorkbenchDisplay::itemGeometry(QnWorkbenchItem *item, QRectF *enclosing
         return QRectF();
     }
 
-    QRectF geometry = rotated(widget->calculateGeometry(itemEnclosingGeometry(item)), item->rotation());
+    QRectF geometry =
+        Geometry::rotated(widget->calculateGeometry(itemEnclosingGeometry(item)), item->rotation());
     return geometry;
 }
 
@@ -1543,7 +1537,7 @@ QRectF QnWorkbenchDisplay::boundedViewportGeometry(Qn::MarginTypes marginTypes) 
     if (m_view == NULL)
         return QRectF();
 
-    const auto boundedRect = QnGeometry::eroded(m_view->viewport()->rect(),
+    const auto boundedRect = Geometry::eroded(m_view->viewport()->rect(),
         viewportMargins(marginTypes));
     return QnSceneTransformations::mapRectToScene(m_view, boundedRect);
 }
@@ -1612,6 +1606,7 @@ void QnWorkbenchDisplay::synchronize(QnResourceWidget *widget, bool animate)
     synchronizeZoomRect(widget);
     synchronizeGeometry(widget, animate);
     synchronizeLayer(widget);
+    synchronizePlaceholder(widget);
 }
 
 void QnWorkbenchDisplay::synchronizeGeometry(QnWorkbenchItem *item, bool animate)
@@ -1650,8 +1645,9 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     {
         QRectF targetGeometry = widget->calculateGeometry(enclosingGeometry, rotation);
         QRectF raisedGeometry = this->raisedGeometry(targetGeometry, rotation);
-        qreal scale = scaleFactor(targetGeometry.size(), raisedGeometry.size(), Qt::KeepAspectRatio);
-        enclosingGeometry = scaled(enclosingGeometry, scale, enclosingGeometry.center());
+        qreal scale = Geometry::scaleFactor(
+            targetGeometry.size(), raisedGeometry.size(), Qt::KeepAspectRatio);
+        enclosingGeometry = Geometry::scaled(enclosingGeometry, scale, enclosingGeometry.center());
         enclosingGeometry.moveCenter(enclosingGeometry.center() + raisedGeometry.center() - targetGeometry.center());
     }
 
@@ -1705,6 +1701,11 @@ void QnWorkbenchDisplay::synchronizeLayer(QnResourceWidget *widget)
     setLayer(widget, synchronizedLayer(widget));
 }
 
+void QnWorkbenchDisplay::synchronizePlaceholder(QnResourceWidget* widget)
+{
+    widget->setPlaceholderPixmap(widget->item()->data(Qn::ItemPlaceholderRole).value<QPixmap>());
+}
+
 void QnWorkbenchDisplay::synchronizeSceneBounds()
 {
     if (m_instrumentManager->scene() == NULL)
@@ -1732,15 +1733,18 @@ void QnWorkbenchDisplay::synchronizeSceneBounds()
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension()
 {
-    MarginsF marginsExtension(0.0, 0.0, 0.0, 0.0);
+    QMarginsF marginsExtension(0.0, 0.0, 0.0, 0.0);
 
     /* If an item is zoomed then the margins should be null because all panels are hidden. */
     if (currentMarginFlags() != 0 && !m_widgetByRole[Qn::ZoomedRole])
-        marginsExtension = cwiseDiv(m_viewportAnimator->viewportMargins(), m_view->viewport()->size());
+    {
+        marginsExtension = Geometry::cwiseDiv(
+            m_viewportAnimator->viewportMargins(), m_view->viewport()->size());
+    }
 
     /* Sync position extension. */
     {
-        MarginsF positionExtension(0.0, 0.0, 0.0, 0.0);
+        QMarginsF positionExtension(0.0, 0.0, 0.0, 0.0);
 
         if (currentMarginFlags() & Qn::MarginsAffectPosition)
             positionExtension = marginsExtension;
@@ -1751,15 +1755,15 @@ void QnWorkbenchDisplay::synchronizeSceneBoundsExtension()
         }
         else
         {
-            m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension + MarginsF(0.5, 0.5, 0.5, 0.5));
+            m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension + QMarginsF(0.5, 0.5, 0.5, 0.5));
         }
     }
 
     /* Sync size extension. */
     if (currentMarginFlags() & Qn::MarginsAffectSize)
     {
-        QSizeF sizeExtension = sizeDelta(marginsExtension);
-        sizeExtension = cwiseDiv(sizeExtension, QSizeF(1.0, 1.0) - sizeExtension);
+        QSizeF sizeExtension = Geometry::sizeDelta(marginsExtension);
+        sizeExtension = Geometry::cwiseDiv(sizeExtension, QSizeF(1.0, 1.0) - sizeExtension);
 
         m_boundingInstrument->setSizeBoundsExtension(m_view, sizeExtension, sizeExtension);
         if (!m_widgetByRole[Qn::ZoomedRole])
@@ -1792,7 +1796,13 @@ void QnWorkbenchDisplay::adjustGeometryLater(QnWorkbenchItem *item, bool animate
         widget->hide(); /* So that it won't appear where it shouldn't. */
     }
 
-    emit geometryAdjustmentRequested(item, animate);
+    executeDelayedParented(
+        [this, item, animate]
+        {
+            adjustGeometry(item, animate);
+        },
+        kDefaultDelay,
+        item); //< Making item the parent to avoid call when it is deleted already.
 }
 
 void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate)
@@ -1844,13 +1854,16 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate)
         {
             QnConstResourceVideoLayoutPtr videoLayout = widget->channelLayout();
             /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
-            widgetAspectRatio = aspectRatio(videoLayout->size()) * (item->zoomRect().isNull() ? 1.0 : aspectRatio(item->zoomRect())) * (4.0 / 3.0);
+            widgetAspectRatio = Geometry::aspectRatio(
+                videoLayout->size())
+                    * (item->zoomRect().isNull() ? 1.0 : Geometry::aspectRatio(item->zoomRect()))
+                    * (4.0 / 3.0);
             if (QnAspectRatio::isRotated90(item->rotation()))
                 widgetAspectRatio = 1 / widgetAspectRatio;
         }
         Qt::Orientation orientation = widgetAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
         if (qFuzzyEquals(widgetAspectRatio, 1.0))
-            orientation = QnGeometry::aspectRatio(workbench()->mapper()->cellSize()) > 1.0 ? Qt::Horizontal : Qt::Vertical;
+            orientation = Geometry::aspectRatio(workbench()->mapper()->cellSize()) > 1.0 ? Qt::Horizontal : Qt::Vertical;
         size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, widgetAspectRatio);
     }
 
@@ -1858,13 +1871,19 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate)
     if (size != item->geometry().size())
     {
         QRectF combinedGeometry = item->combinedGeometry();
-        combinedGeometry.moveTopLeft(combinedGeometry.topLeft() - toPoint(size - combinedGeometry.size()) / 2.0);
+        combinedGeometry.moveTopLeft(
+            combinedGeometry.topLeft() - Geometry::toPoint(size - combinedGeometry.size()) / 2.0);
         combinedGeometry.setSize(size);
         item->setCombinedGeometry(combinedGeometry);
     }
 
     /* Pin the item. */
-    QnAspectRatioMagnitudeCalculator metric(newPos, size, item->layout()->boundingRect(), aspectRatio(m_view->viewport()->size()) / aspectRatio(workbench()->mapper()->step()));
+    QnAspectRatioMagnitudeCalculator metric(
+        newPos,
+        size,
+        item->layout()->boundingRect(),
+        Geometry::aspectRatio(m_view->viewport()->size())
+            / Geometry::aspectRatio(workbench()->mapper()->step()));
     QRect geometry = item->layout()->closestFreeSlot(newPos, size, &metric);
     item->layout()->pinItem(item, geometry);
     item->setFlag(Qn::PendingGeometryAdjustment, false);
@@ -1962,7 +1981,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
     {
         if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
         {
-            qint64 timeUSec = mediaWidget->display()->camera()->getCurrentTime();
+            qint64 timeUSec = mediaWidget->display()->camDisplay()->getExternalTime();
             if (timeUSec != AV_NOPTS_VALUE)
                 mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : timeUSec / 1000);
 
@@ -2187,8 +2206,21 @@ void QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded(const QnThumbnail &thu
 
 void QnWorkbenchDisplay::at_item_dataChanged(Qn::ItemDataRole role)
 {
-    if (role == Qn::ItemFlipRole)
-        synchronizeGeometry(static_cast<QnWorkbenchItem *>(sender()), false);
+    const auto item = static_cast<QnWorkbenchItem*>(sender());
+
+    switch (role)
+    {
+        case Qn::ItemFlipRole:
+            synchronizeGeometry(item, false);
+            break;
+
+        case Qn::ItemPlaceholderRole:
+            synchronizePlaceholder(widget(item));
+            break;
+
+        default:
+            break;
+    }
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged()
@@ -2390,7 +2422,7 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
     }
     else
     {
-        Q_ASSERT_X(actionType == vms::event::showPopupAction || actionType == vms::event::playSoundAction,
+        NX_ASSERT(actionType == vms::event::showPopupAction || actionType == vms::event::playSoundAction,
             Q_FUNC_INFO, "Invalid action type");
         vms::event::EventParameters eventParams = businessAction->getRuntimeParams();
         if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
@@ -2432,16 +2464,16 @@ void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, con
         QnSplashItem *splashItem = new QnSplashItem();
         splashItem->setSplashType(QnSplashItem::Rectangular);
         splashItem->setPos(rect.center() + widget->pos());
-        splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
+        splashItem->setRect(QRectF(-Geometry::toPoint(rect.size()) / 2, rect.size()));
         splashItem->setColor(
             withAlpha(
                 QnNotificationLevel::notificationColor(QnNotificationLevel::valueOf(businessAction)),
                 128));
         splashItem->setOpacity(0.0);
         splashItem->setRotation(widget->rotation());
-        splashItem->animate(1000, QnGeometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
+        splashItem->animate(1000, Geometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
         scene()->addItem(splashItem);
-        setLayer(splashItem, Qn::EffectsLayer);
+        setLayer(splashItem, QnWorkbenchDisplay::EffectsLayer);
     }
 }
 

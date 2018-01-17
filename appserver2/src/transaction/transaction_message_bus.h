@@ -11,7 +11,7 @@
 #include "nx_ec/data/api_lock_data.h"
 #include <nx_ec/data/api_peer_data.h>
 #include "transaction.h"
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include "transaction_transport.h"
 #include <transaction/transaction_log.h>
 #include "runtime_transaction_log.h"
@@ -43,18 +43,18 @@ public:
 
     //void addConnectionToPeer(const QUrl& url);
     //void removeConnectionFromPeer(const QUrl& url);
-    virtual void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url) override;
+    virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) override;
     virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
 
 
     virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
     void gotConnectionFromRemotePeer(const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         ConnectionType::Type connectionType,
         const ApiPeerData& remotePeer,
         qint64 remoteSystemIdentityTime,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QByteArray& contentEncoding,
         std::function<void()> ttFinishCallback,
         const Qn::UserAccessData &userAccessData);
@@ -65,15 +65,15 @@ public:
     */
     void gotIncomingTransactionsConnectionFromRemotePeer(
         const QnUuid& connectionGuid,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         const ApiPeerData &remotePeer,
         qint64 remoteSystemIdentityTime,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QByteArray& requestBuf);
     //!Process transaction received via standard HTTP server interface
     bool gotTransactionFromRemotePeer(
         const QnUuid& connectionGuid,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QByteArray& requestMsgBody);
     //!Blocks till connection \a connectionGuid is ready to accept new transactions
     void waitForNewTransactionsReady(const QnUuid& connectionGuid);
@@ -124,7 +124,9 @@ public:
     AlivePeersMap aliveClientPeers() const;
 
     virtual QSet<QnUuid> directlyConnectedClientPeers() const override;
+    virtual QSet<QnUuid> directlyConnectedServerPeers() const override;
     virtual void dropConnections() override;
+
 signals:
     void gotLockRequest(ApiLockData);
     //void gotUnlockRequest(ApiLockData);
@@ -206,7 +208,7 @@ private:
     void connectToPeerEstablished(const ApiPeerData &peerInfo);
     void connectToPeerLost(const QnUuid& id);
     void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool sendTran);
-    bool isPeerUsing(const QUrl& url);
+    bool isPeerUsing(const nx::utils::Url& url);
     void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
     bool onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
 
@@ -235,7 +237,7 @@ private:
     void sendDelayedAliveTran();
     void reconnectAllPeers(QnMutexLockerBase* const /*lock*/);
 
-    QUrl updateOutgoingUrl(const QUrl& srcUrl) const;
+    nx::utils::Url updateOutgoingUrl(const nx::utils::Url& srcUrl) const;
 private slots:
     void at_stateChanged(QnTransactionTransport::State state);
     void at_gotTransaction(
@@ -244,7 +246,7 @@ private slots:
         const QnTransactionTransportHeader &transportHeader);
     void doPeriodicTasks();
     bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport);
-    void at_peerIdDiscovered(const QUrl& url, const QnUuid& id);
+    void at_peerIdDiscovered(const nx::utils::Url &url, const QnUuid& id);
     void at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
     void emitRemotePeerUnauthorized(const QnUuid& id);
     void onEc2ConnectionSettingsChanged(const QString& key);
@@ -263,7 +265,7 @@ private:
         QnUuid id;
     };
 
-    QMap<QUrl, RemoteUrlConnectInfo> m_remoteUrls;
+    QMap<nx::utils::Url, RemoteUrlConnectInfo> m_remoteUrls;
     QTimer* m_timer;
     QnConnectionMap m_connections;
 

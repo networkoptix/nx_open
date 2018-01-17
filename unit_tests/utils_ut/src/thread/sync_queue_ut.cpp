@@ -41,11 +41,6 @@ protected:
         return total;
     }
 
-    virtual void TearDown() override
-    {
-        ASSERT_TRUE(queue.isEmpty());
-    }
-
     nx::utils::SyncQueue<int> queue;
 };
 
@@ -82,6 +77,38 @@ TEST_F(SyncQueue, TimedPop)
 
     pusher.join();
 }
+
+TEST_F(SyncQueue, conditional_pop)
+{
+    for (int i = 1; i < 8; ++i)
+        queue.push(i);
+
+    ASSERT_EQ(4, queue.popIf([](int val) { return val > 3; }));
+    ASSERT_EQ(2, queue.popIf([](int val) { return val > 1; }));
+    ASSERT_EQ(1, queue.popIf([](int val) { return val >= 1; }));
+}
+
+TEST_F(SyncQueue, conditional_pop_blocks_if_no_element_satisfies_condition)
+{
+    for (int i = 1; i < 8; ++i)
+        queue.push(i);
+
+    std::atomic<int> limit(8);
+
+    std::thread t(
+        [this, &limit]()
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            limit = 4;
+            queue.retestPopIfCondition();
+        });
+
+    ASSERT_EQ(4, queue.popIf([&limit](int val) { return val >= limit.load(); }));
+
+    t.join();
+}
+
+//-------------------------------------------------------------------------------------------------
 
 class SyncQueueTermination:
     public ::testing::Test
@@ -122,7 +149,7 @@ protected:
     {
         // If reader did not stop we will hang in destructor, so doing nothing here.
     }
-    
+
     void verifyThatOtherReadersAreWorking()
     {
         QnMutex mutex;
@@ -155,7 +182,7 @@ private:
     };
 
     using Readers = std::map<QueueReaderId, ReaderContext>;
-    using OnElementReadHandler = 
+    using OnElementReadHandler =
         nx::utils::MoveOnlyFunc<void(QueueReaderId /*readerId*/, int /*value*/)>;
 
     Readers m_readers;

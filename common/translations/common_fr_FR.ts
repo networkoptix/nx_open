@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Nouveau Système</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>Le système découvert %1 est incompatible avec le système actuel.</translation>
     </message>
   </context>
   <context>
@@ -255,18 +255,6 @@
       <translation>Assurez-vous que le port %1 est accessible.(redirigé).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Premièrement, essayez d'activer l'enregistrement (si désactivé) et diminuer IPS dans les paramètres périphérique.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Premièrement, essayez d'activer l'enregistrement (si désactivé) et diminuer IPS dans les paramètres caméra.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Premièrement, essayez d'activer l'enregistrement (si désactivé) et diminuer IPS dans les paramètres module I/O.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Si cela n’aide pas, rétablir par défaut sur la page web périphérique.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Caméra restaurée à partir des archives. Supprimez la caméra et ajoutez-la à nouveau pour voir la vidéo en direct.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Premièrement, essayez d'activer l'enregistrement (si désactivé) et diminuer ips dans les paramètres périphérique (erreur &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Premièrement, essayez d'activer l'enregistrement (si désactivé) et diminuer ips dans les paramètres caméra (erreur &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Premièrement, essayez d'activer l'enregistrement (si désactivé) et diminuer ips dans les paramètres module I/O (erreur &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -485,6 +485,14 @@
     <message>
       <source>Time Licenses</source>
       <translation>Licences Temps</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation>Pont</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>Pont de Licenses</translation>
     </message>
   </context>
   <context>
@@ -774,6 +782,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>Type de ressource invalide pour l’exportation de données.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Aucune donnée exportée.</translation>
     </message>
   </context>
   <context>
@@ -1504,6 +1516,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>Reconnaître</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>Événement Analytique</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 à %2</translation>
     </message>
   </context>
   <context>

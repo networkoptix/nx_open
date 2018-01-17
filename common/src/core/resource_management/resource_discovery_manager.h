@@ -3,6 +3,8 @@
 #include <memory>
 #include <atomic>
 
+#include <QThreadPool>
+
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
@@ -10,6 +12,7 @@
 
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/singleton.h>
+#include <nx/utils/url.h>
 #include <nx/network/nettools.h>
 
 #include <api/model/manual_camera_seach_reply.h>
@@ -43,16 +46,15 @@ class QnAbstractDTSSearcher;
 
 struct QnManualCameraInfo
 {
-    QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType);
+    QnManualCameraInfo(const nx::utils::Url& url, const QAuthenticator& auth, const QString& resType, const QString& uniqueId);
     QList<QnResourcePtr> checkHostAddr() const;
 
-    QUrl url;
+    nx::utils::Url url;
     QnResourceTypePtr resType;
     QAuthenticator auth;
     QnAbstractResourceSearcher* searcher;
     QString uniqueId;
 };
-typedef QMap<QString, QnManualCameraInfo> QnManualCameraInfoMap;
 
 class QnAbstractResourceSearcher;
 
@@ -68,10 +70,11 @@ class QnResourceDiscoveryManagerTimeoutDelegate
     Q_OBJECT
 
 public:
-    QnResourceDiscoveryManagerTimeoutDelegate( QnResourceDiscoveryManager* discoveryManager );
+    QnResourceDiscoveryManagerTimeoutDelegate(QnResourceDiscoveryManager* discoveryManager);
 
-public slots:
+    public slots:
     void onTimeout();
+    void onForceSearch();
 
 private:
     QnResourceDiscoveryManager* m_discoveryManager;
@@ -109,6 +112,7 @@ public:
     void addDeviceServer(QnAbstractResourceSearcher* serv);
     void addDTSServer(QnAbstractDTSSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
+    QnAbstractResourceSearcher* searcherByManufacture(const QString& manufacture) const;
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
@@ -117,14 +121,18 @@ public:
     void setReady(bool ready);
 
     /** Returns number of cameras that were sucessfully added. */
-    int registerManualCameras(const QnManualCameraInfoMap& cameras);
-    bool containManualCamera(const QString& url);
-    void fillManualCamInfo(QnManualCameraInfoMap& cameras, const QnSecurityCamResourcePtr& camera);
+    int registerManualCameras(const std::vector<QnManualCameraInfo>& cameras);
+    bool isManuallyAdded(const QnSecurityCamResourcePtr& camera) const;
+    QnManualCameraInfo manualCameraInfo(const QnSecurityCamResourcePtr& camera);
 
     ResourceSearcherList plugins() const;
 
     //!This method MUST be called from non-GUI thread, since it can block for some time
     virtual void doResourceDiscoverIteration();
+
+    // Queries a new file discovery
+    // Can be called from any thread. It is asynchronous
+    void queryLocalDiscovery();
 
     State state() const;
 
@@ -134,14 +142,16 @@ public:
 
     static QnNetworkResourcePtr findSameResource(const QnNetworkResourcePtr& netRes);
 
+    QThreadPool* threadPool();
+
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 protected:
     unsigned int m_runNumber;
-
-    virtual void run();
+    virtual void run() override;
 
 signals:
+    void forceLocalSearch();    // Local timer connects to this signal to force resource discovery
     void localSearchDone();
     void localInterfacesChanged();
     void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
@@ -157,23 +167,28 @@ protected:
     };
     virtual bool processDiscoveredResources(QnResourceList& resources, SearchType searchType);
     bool canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt);
+
+    friend class QnResourceDiscoveryManagerTimeoutDelegate;
 private:
     void updateLocalNetworkInterfaces();
 
     // returns new resources( not from pool) or updates some in resource pool
     QnResourceList findNewResources();
+    // Run search of local files
+    void doLocalSearch();
 
     void appendManualDiscoveredResources(QnResourceList& resources);
-    void dtsAssignment();
 
     void updateSearcherUsage(QnAbstractResourceSearcher *searcher, bool usePartialEnable);
     void updateSearchersUsage();
     bool isRedundancyUsing() const;
 private:
-    QnMutex m_searchersListMutex;
+    QThreadPool m_threadPool;
+
+    mutable QnMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
-    QnManualCameraInfoMap m_manualCameraMap;
+    QMap<QString, QnManualCameraInfo> m_manualCameraByUniqueId;
 
     bool m_server;
     std::atomic<bool> m_ready;

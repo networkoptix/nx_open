@@ -31,7 +31,7 @@
     <name>QnSystrayWindow</name>
     <message>
       <source>Access denied.</source>
-      <translation>truy cập bị từ chối.</translation>
+      <translation>Truy cập bị từ chối.</translation>
     </message>
     <message>
       <source>Specified database does not exist.</source>
@@ -47,7 +47,7 @@
     </message>
     <message>
       <source>No %1 services installed</source>
-      <translation>không %1 Dịch vụ cài đặt</translation>
+      <translation>Không %1 Dịch vụ cài đặt</translation>
     </message>
     <message>
       <source>&amp;Quit</source>
@@ -59,7 +59,7 @@
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation>Máy chủ đã bị dừng</translation>
+      <translation>Các máy chủ đã ngừng hoạt động</translation>
     </message>
     <message>
       <source>Server has been started</source>
@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>paused</source>
-      <translation>đã tạm dừng</translation>
+      <translation>giờ nghĩ giảo lao</translation>
     </message>
     <message>
       <source>pausing</source>

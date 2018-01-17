@@ -3,7 +3,7 @@
 #include <chrono>
 
 #include <nx/network/retry_timer.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include "stun_message_data.h"
 
@@ -19,12 +19,12 @@ constexpr static const std::chrono::seconds
 
 constexpr static const size_t kUdpTunnelKeepAliveRetriesDefault = 3;
 
-constexpr static const std::chrono::seconds 
+constexpr static const std::chrono::seconds
     kDefaultTunnelInactivityTimeout = std::chrono::minutes(8);
 
 // Nat traversal methods default start delays.
 
-constexpr static const std::chrono::milliseconds 
+constexpr static const std::chrono::milliseconds
     kUdpHolePunchingStartDelayDefault = std::chrono::milliseconds::zero();
 
 constexpr static const std::chrono::milliseconds
@@ -34,7 +34,7 @@ constexpr static const std::chrono::milliseconds
     kDirectTcpConnectStartDelayDefault = std::chrono::milliseconds::zero();
 
 /**
- * @note All fields are optional for backward compatibility.
+ * NOTE: All fields are optional for backward compatibility.
  */
 class NX_NETWORK_API ConnectionParameters:
     public StunMessageAttributesData
@@ -43,14 +43,14 @@ public:
     std::chrono::milliseconds rendezvousConnectTimeout;
     std::chrono::milliseconds udpTunnelKeepAliveInterval;
     /**
-     * UDP tunnel should be considered inactive if no keep-alive messages have been 
+     * UDP tunnel should be considered inactive if no keep-alive messages have been
      *   received during rendezvousConnectTimeout*udpTunnelKeepAliveRetries period.
      */
     int udpTunnelKeepAliveRetries;
     std::chrono::seconds tunnelInactivityTimeout;
 
     nx::network::RetryPolicy tcpReverseRetryPolicy;
-    nx_http::AsyncHttpClient::Timeouts tcpReverseHttpTimeouts;
+    nx::network::http::AsyncHttpClient::Timeouts tcpReverseHttpTimeouts;
 
     std::chrono::milliseconds udpHolePunchingStartDelay;
     std::chrono::milliseconds trafficRelayingStartDelay;
@@ -59,8 +59,8 @@ public:
     ConnectionParameters();
     bool operator==(const ConnectionParameters& rhs) const;
 
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 } // namespace api

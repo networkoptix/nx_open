@@ -12,7 +12,7 @@ namespace aio {
 
 /**
  * Adapts type Adaptee to AbstractAsyncChannel.
- * @param AdapteePtr can be raw pointer or smart pointer. 
+ * @param AdapteePtr can be raw pointer or smart pointer.
  * In latter case AsyncChannelAdapter takes adaptee ownership.
  */
 template <typename AdapteePtr>
@@ -36,14 +36,14 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
+        IoCompletionHandler handler) override
     {
         m_adaptee->readSomeAsync(buffer, std::move(handler));
     }
 
     virtual void sendAsync(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
+        IoCompletionHandler handler) override
     {
         m_adaptee->sendAsync(buffer, std::move(handler));
     }

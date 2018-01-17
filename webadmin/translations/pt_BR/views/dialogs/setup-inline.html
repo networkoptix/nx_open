@@ -78,12 +78,12 @@
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
                 <label>
                     <input type="checkbox" id="{{setting}}"
-                           ng-model="systemSettings[setting]"> <span>{{Config.settingsConfig[setting].label}}</span>
+                           ng-model="systemSettings[setting]"> <span>{{L.settingsConfig[setting]}}</span>
                 </label>
             </div>
 
             <label ng-if="Config.settingsConfig[setting].type != 'checkbox' "
-                   for="{{setting}}" >{{Config.settingsConfig[setting].label}}</label>
+                   for="{{setting}}" >{{L.settingsConfig[setting]}}</label>
             <input ng-if="Config.settingsConfig[setting].type == 'number' " type="number"
                    id="{{setting}}"
                    placeholder="{{}}"
@@ -271,7 +271,7 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                Passwords do not match
+                As passwords não conferem
             </div>
         </div>
     </form>
@@ -471,7 +471,7 @@
         <div class="col-xs-6">
             <div class="text-center"><b>Using {{Config.productName}} application</b></div>
             <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
-            <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+            <div class="col-xs-6 text-right">Porto</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
             <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
             <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>

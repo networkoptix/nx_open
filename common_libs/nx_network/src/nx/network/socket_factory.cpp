@@ -2,13 +2,15 @@
 
 #include <iostream>
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/std/cpp14.h>
 
-using namespace nx::network;
+namespace nx {
+namespace network {
 
 namespace {
 
@@ -29,14 +31,16 @@ std::unique_ptr<UDPSocket> SocketFactory::createUdpSocket()
 
 std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
     bool sslRequired,
-    NatTraversalSupport natTraversalSupport)
+    NatTraversalSupport natTraversalSupport,
+    boost::optional<int> ipVersion)
 {
     if (createStreamSocketFunc)
-        return createStreamSocketFunc(sslRequired, natTraversalSupport);
+        return createStreamSocketFunc(sslRequired, natTraversalSupport, ipVersion);
 
     auto result = defaultStreamSocketFactoryFunc(
         natTraversalSupport,
-        s_enforcedStreamSocketType);
+        s_enforcedStreamSocketType,
+        ipVersion);
 
     if (!result)
         return std::unique_ptr<AbstractStreamSocket>();
@@ -50,7 +54,9 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
 }
 
 std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerSocket(
-    bool sslRequired, NatTraversalSupport natTraversalSupport, boost::optional<int> ipVersion)
+    bool sslRequired,
+    NatTraversalSupport natTraversalSupport,
+    boost::optional<int> ipVersion)
 {
     if (createStreamServerSocketFunc)
         return createStreamServerSocketFunc(sslRequired, natTraversalSupport, ipVersion);
@@ -232,16 +238,17 @@ std::atomic< bool > SocketFactory::s_isSslEnforced(false);
 
 std::unique_ptr<AbstractStreamSocket> SocketFactory::defaultStreamSocketFactoryFunc(
     NatTraversalSupport nttType,
-    SocketType forcedSocketType)
+    SocketType forcedSocketType,
+    boost::optional<int> _ipVersion)
 {
-    auto ipVersion = s_tcpClientIpVersion.load();
+    auto ipVersion = (bool) _ipVersion ? *_ipVersion : s_tcpClientIpVersion.load();
     switch (forcedSocketType)
     {
         case SocketFactory::SocketType::cloud:
             switch (nttType)
             {
                 case NatTraversalSupport::enabled:
-                    if (SocketGlobals::ini().disableCloudSockets)
+                    if (SocketGlobals::cloud().ini().disableCloudSockets)
                         return std::make_unique<TCPSocket>(ipVersion);
                     return std::make_unique<cloud::CloudStreamSocket>(ipVersion);
 
@@ -281,3 +288,6 @@ std::unique_ptr<AbstractStreamServerSocket> SocketFactory::defaultStreamServerSo
             return nullptr;
     };
 }
+
+} // namespace network
+} // namespace nx

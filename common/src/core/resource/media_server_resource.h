@@ -12,10 +12,17 @@
 
 #include "api/server_rest_connection_fwd.h"
 
-namespace nx_http { class AsyncHttpClientPtr; }
-namespace nx { namespace api { struct AnalyticsDriverManifest; } }
+namespace nx {
+namespace network {
+namespace http {
 
-class SocketAddress;
+class AsyncHttpClientPtr;
+
+} // namespace nx
+} // namespace network
+} // namespace http
+
+namespace nx { namespace api { struct AnalyticsDriverManifest; } }
 
 class QnMediaServerResource:
     public QnResource,
@@ -38,32 +45,32 @@ public:
     //!Overrides \a QnResource::setName. Writes name to \a QnMediaServerUserAttributes
     virtual void setName( const QString& name ) override;
 
-    void setNetAddrList(const QList<SocketAddress>& value);
-    QList<SocketAddress> getNetAddrList() const;
+    void setNetAddrList(const QList<nx::network::SocketAddress>& value);
+    QList<nx::network::SocketAddress> getNetAddrList() const;
 
     // TODO: #dklychkov Use QSet instead of QList
-    void setAdditionalUrls(const QList<QUrl> &urls);
-    QList<QUrl> getAdditionalUrls() const;
+    void setAdditionalUrls(const QList<nx::utils::Url> &urls);
+    QList<nx::utils::Url> getAdditionalUrls() const;
 
-    void setIgnoredUrls(const QList<QUrl> &urls);
-    QList<QUrl> getIgnoredUrls() const;
+    void setIgnoredUrls(const QList<nx::utils::Url> &urls);
+    QList<nx::utils::Url> getIgnoredUrls() const;
 
-    boost::optional<SocketAddress> getCloudAddress() const;
+    boost::optional<nx::network::SocketAddress> getCloudAddress() const;
 
     virtual QString getUrl() const override;
     virtual void setUrl(const QString& url) override;
     // TODO: #dklychkov remove this, use getPrimaryAddress() instead.
     quint16 getPort() const;
-    virtual QUrl getApiUrl() const;
+    virtual nx::utils::Url getApiUrl() const;
 
-    SocketAddress getPrimaryAddress() const;
-    void setPrimaryAddress(const SocketAddress &getPrimaryAddress);
+    nx::network::SocketAddress getPrimaryAddress() const;
+    void setPrimaryAddress(const nx::network::SocketAddress &getPrimaryAddress);
 
     bool isSslAllowed() const;
     void setSslAllowed(bool sslAllowed);
 
     /** Get list of all available server addresses. */
-    QList<SocketAddress> getAllAvailableAddresses() const;
+    QList<nx::network::SocketAddress> getAllAvailableAddresses() const;
 
     /*
     * Deprecated server rest connection
@@ -121,6 +128,9 @@ public:
     virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;
     qint64 currentStatusTime() const;
 
+    /** Server local timezone. */
+    qint64 utcOffset(qint64 defaultValue = Qn::InvalidUtcOffset) const;
+
     void beforeDestroy();
 
     /**
@@ -153,17 +163,17 @@ signals:
     void apiUrlChanged(const QnResourcePtr& resource);
     void primaryAddressChanged(const QnResourcePtr& resource);
 private:
-    SocketAddress m_primaryAddress;
+    nx::network::SocketAddress m_primaryAddress;
     QnMediaServerConnectionPtr m_apiConnection; // deprecated
     rest::QnConnectionPtr m_restConnection; // new one
-    QList<SocketAddress> m_netAddrList;
-    QList<QUrl> m_additionalUrls;
-    QList<QUrl> m_ignoredUrls;
+    QList<nx::network::SocketAddress> m_netAddrList;
+    QList<nx::utils::Url> m_additionalUrls;
+    QList<nx::utils::Url> m_ignoredUrls;
     bool m_sslAllowed = false;
     Qn::ServerFlags m_serverFlags;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;
-    QVector<nx_http::AsyncHttpClientPtr> m_runningIfRequests;
+    QVector<nx::network::http::AsyncHttpClientPtr> m_runningIfRequests;
     QElapsedTimer m_statusTimer;
     QString m_authKey;
 
@@ -173,7 +183,7 @@ private:
     mutable QnResourcePtr m_firstCamera;
 
     Qn::PanicMode calculatePanicMode() const;
-    QUrl buildApiUrl() const;
+    nx::utils::Url buildApiUrl() const;
 };
 
 Q_DECLARE_METATYPE(QnMediaServerResourcePtr)

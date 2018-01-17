@@ -189,7 +189,7 @@ void QnSearchTask::doSearch()
     m_callback(results, this);
 }
 
-QUrl QnSearchTask::url()
+nx::utils::Url QnSearchTask::url()
 {
     return m_url;
 }
@@ -507,7 +507,7 @@ QStringList QnManualCameraSearcher::getOnlineHosts(
     onlineHosts = m_ipChecker.onlineHosts(
         QHostAddress(startAddr),
         QHostAddress(endAddr),
-        port ? port : nx_http::DEFAULT_HTTP_PORT );
+        port ? port : nx::network::http::DEFAULT_HTTP_PORT );
 
     {
         QnMutexLocker lock( &m_mutex );

@@ -21,9 +21,12 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+LOCAL_ENVIRONMENT = False
 conf = get_config()
-CUSTOMIZATION = conf['customization']
+
+CUSTOMIZATION = os.getenv('CUSTOMIZATION')
+if not CUSTOMIZATION:
+    CUSTOMIZATION = conf['customization']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -40,7 +43,13 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = (
+    'admin_tools',
+    'admin_tools.menu',
+    'admin_tools.theming',
+    'admin_tools.dashboard',
+
     'django.contrib.admin',
+    'django.contrib.sites',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -48,12 +57,15 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_celery_results',
     'rest_framework',
+    'rest_hooks',
     'corsheaders',
     'notifications',
     'api',
     'cms',
+    'zapier',
     'tinymce'
 )
+
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -69,14 +81,30 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'cloud.urls'
 
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # /app/app
+STATIC_LOCATION = os.path.join(BASE_DIR, "static")  # this is used for email_engine to find templates
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static/common/static")
+if LOCAL_ENVIRONMENT:
+    STATIC_ROOT = os.path.join(BASE_DIR, "static/common")
+    STATICFILES_DIRS = (
+        os.path.join(STATIC_LOCATION, CUSTOMIZATION, "static"),
+        os.path.join(STATIC_LOCATION, CUSTOMIZATION, "static/lang_en_US"),
+    )
+
+ADMIN_TOOLS_INDEX_DASHBOARD = 'cloud.dashboard.CustomIndexDashboard'
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': (
-            '/app/app/static/{}'.format(CUSTOMIZATION), # Looks like static files used as templates
-            '/app/app/static/{}/templates'.format(CUSTOMIZATION),
+            STATIC_ROOT,
+            os.path.join(STATIC_LOCATION, CUSTOMIZATION),  # get rid of app/app hardcode
+            os.path.join(STATIC_LOCATION, CUSTOMIZATION, 'templates'),
+            os.path.join(BASE_DIR, 'django_templates'),
         ),
-        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -85,6 +113,11 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
             ],
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                'admin_tools.template_loaders.Loader',
+            ]
         },
     },
 ]
@@ -107,7 +140,7 @@ DATABASES = {
         'NAME': cloud_db['database'],
         'OPTIONS': {
             'sql_mode': 'TRADITIONAL',
-            'charset': 'utf8',
+            'charset': 'utf8mb4',
             'init_command': 'SET '
                 'character_set_connection=utf8,'
                 'collation_connection=utf8_bin'
@@ -117,10 +150,23 @@ DATABASES = {
 
 CACHES = {
     'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
+    },
+    "global": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+if LOCAL_ENVIRONMENT:
+    conf["cloud_db"]["url"] = 'https://cloud-dev.hdw.mx/cdb'
+    CACHES["global"] = {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
         'LOCATION': 'portal_cache',
     }
-}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -217,6 +263,9 @@ REST_FRAMEWORK = {
        'rest_framework.permissions.AllowAny',
     )
 }
+HOOK_EVENTS = {
+    'user.send_zap_request': None
+}
 
 # Celery settings section
 
@@ -273,13 +322,14 @@ AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend', )
 CORS_ORIGIN_ALLOW_ALL = True  # TODO: Change this value on production!
 CORS_ALLOW_CREDENTIALS = True
 
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 USE_ASYNC_QUEUE = True
 
 ADMINS = conf['admins']
 
-DEFAULT_FROM_EMAIL = conf['mail_from']
-EMAIL_SUBJECT_PREFIX = conf['mail_prefix']
+EMAIL_SUBJECT_PREFIX = ''
 EMAIL_HOST = conf['smtp']['host']
 EMAIL_HOST_USER = conf['smtp']['user']
 EMAIL_HOST_PASSWORD = conf['smtp']['password']
@@ -287,13 +337,12 @@ EMAIL_PORT = conf['smtp']['port']
 EMAIL_USE_TLS = conf['smtp']['tls']
 
 
-SERVER_EMAIL = DEFAULT_FROM_EMAIL
 LINKS_LIVE_TIMEOUT = 300  # Five minutes
 
 PASSWORD_REQUIREMENTS = {
     'minLength': 8,
     'requiredRegex': re.compile("^[\x21-\x7E]|[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$"),
-    'commonList': 'static/{}/static/scripts/commonPasswordsList.json'.format(CUSTOMIZATION)
+    'commonList': 'static/_source/blue/static/scripts/commonPasswordsList.json'
 }
 
 common_list_file = PASSWORD_REQUIREMENTS['commonList']
@@ -321,14 +370,10 @@ NOTIFICATIONS_CONFIG = {
 
 NOTIFICATIONS_AUTO_SUBSCRIBE = False
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_LOCATION = os.path.join(BASE_DIR, "static")
-STATIC_ROOT = '/app/app/static/common/static'
 
-
-LANGUAGES = conf['languages']
-DEFAULT_LANGUAGE = conf['languages'][0]
 UPDATE_JSON = 'http://updates.networkoptix.com/updates.json'
+DOWNLOADS_JSON = 'http://updates.networkoptix.com/{{customization}}/downloads.json'
+DOWNLOADS_VERSION_JSON = 'http://updates.networkoptix.com/{{customization}}/{{build}}/downloads.json'
 
 MAX_RETRIES = conf['max_retries']
 

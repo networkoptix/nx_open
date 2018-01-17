@@ -12,15 +12,16 @@ All these 3 classes are internal for this module; Tests only see and use Camera 
 created using 'camera' or 'camera_factory' fixtures.
 '''
 
-import logging
 import datetime
-import hashlib
-import time
-import socket
+import logging
 import select
+import socket
 import threading
-import pytest
+import time
+
 import hachoir_core.config
+import pytest
+
 # overwise hachoir will replace sys.stdout/err with UnicodeStdout, incompatible with pytest terminal module:
 hachoir_core.config.unicode_stdout = False
 import hachoir_parser

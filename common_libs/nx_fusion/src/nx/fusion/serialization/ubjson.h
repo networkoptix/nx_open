@@ -36,13 +36,13 @@ namespace QnUbjson {
     {
         T target;
         QnUbjsonReader<QByteArray> stream(&value);
-        bool result = QnUbjson::deserialize(&stream, &target);
+        const bool result = QnUbjson::deserialize(&stream, &target);
         if (success)
             *success = result;
 
-        T local; //enforcing NVRO
         if (result)
         {
+            T local; // Enforcing NRVO, which is blocked by address-taking operator above.
             std::swap(local, target);
             return local;
         }

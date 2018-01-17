@@ -10,6 +10,7 @@
 #include "abstract_server_connection.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 /**
@@ -35,7 +36,7 @@ public:
      * @param messageProcessor Ownership of this object is not passed.
      * NOTE: All processors MUST be registered before connection processing is started,
      *   since this class methods are not thread-safe.
-     * @return true if requestProcessor has been registered, 
+     * @return true if requestProcessor has been registered,
      *   false if processor for method has already been registered.
      * NOTE: Message processing function MUST be non-blocking.
      */
@@ -46,7 +47,7 @@ public:
     /**
      * Pass message to corresponding processor.
      * @param message This object is not moved in case of failure to find processor.
-     * @return true if request processing passed to corresponding processor and 
+     * @return true if request processing passed to corresponding processor and
      *   async processing has been started, false otherwise.
      */
     virtual bool dispatchRequest(
@@ -59,4 +60,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

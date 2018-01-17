@@ -40,7 +40,7 @@ QnAacRtpParser::~QnAacRtpParser()
     // Do nothing.
 }
 
-void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
+void QnAacRtpParser::setSdpInfo(QList<QByteArray> lines)
 {
     // determine here:
     // 1. sizeLength(au size in bits)  or constantSize

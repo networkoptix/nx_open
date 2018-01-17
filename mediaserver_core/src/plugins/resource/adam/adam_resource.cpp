@@ -47,7 +47,7 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
     auto host  = url.host();
     auto port = url.port(nx::modbus::kDefaultModbusPort);
 
-    SocketAddress endpoint(host, port);
+    nx::network::SocketAddress endpoint(host, port);
 
     nx::modbus::QnModbusClient testClient(endpoint);
 
@@ -74,6 +74,10 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
     QnIOPortDataList allPorts = getInputPortList();
     QnIOPortDataList outputPorts = getRelayOutputList();
     allPorts.insert(allPorts.begin(), outputPorts.begin(), outputPorts.end());
+
+    m_portTypes.clear();
+    for (const auto& port: allPorts)
+        m_portTypes[port.id] = port.portType;
 
     setPortDefaultStates();
     setIOPorts(allPorts);
@@ -102,11 +106,24 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
 
         bool isActive = nx_io_managment::isActiveIOPortState(inputState);
 
-        emit cameraInput(
-            toSharedPointer(),
-            portId,
-            isActive != isDefaultPortStateActive,
-            qnSyncTime->currentUSecsSinceEpoch());
+        const auto ioPortType = portType(portId);
+
+        if (ioPortType == Qn::PT_Input)
+        {
+            emit cameraInput(
+                toSharedPointer(),
+                portId,
+                isActive != isDefaultPortStateActive,
+                qnSyncTime->currentUSecsSinceEpoch());
+        }
+        else if (ioPortType == Qn::PT_Output)
+        {
+            emit cameraOutput(
+                toSharedPointer(),
+                portId,
+                isActive != isDefaultPortStateActive,
+                qnSyncTime->currentUSecsSinceEpoch());
+        }
     };
 
     auto networkIssueHandler = [this](QString reason, bool isFatal)
@@ -215,7 +232,7 @@ QnIOPortDataList QnAdamResource::getInputPortList() const
         for (const auto& ioPort: savedIO)
         {
             if (ioPort.portType == Qn::PT_Input)
-                savedInputs.push_back(ioPort);
+                savedInputs.push_back(ioPort);            
         }
 
         return mergeIOPortData(deviceInputs, savedInputs);
@@ -296,6 +313,15 @@ void QnAdamResource::at_propertyChanged(const QnResourcePtr &res, const QString 
 
 void QnAdamResource::setIframeDistance(int /*frames*/, int /*timeMs*/)
 {
+}
+
+Qn::IOPortType QnAdamResource::portType(const QString& portId) const
+{
+    const auto itr = m_portTypes.find(portId);
+    if (itr == m_portTypes.cend())
+        return Qn::PT_Unknown;
+
+    return itr->second;
 }
 
 #endif //< ENABLE_ADVANTECH

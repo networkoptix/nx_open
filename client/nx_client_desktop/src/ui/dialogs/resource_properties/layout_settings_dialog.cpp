@@ -16,7 +16,6 @@
 #include <client/client_settings.h>
 #include <core/resource/layout_resource.h>
 
-#include <ui/common/geometry.h>
 #include <ui/common/image_processing.h>
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -27,7 +26,8 @@
 #include <ui/widgets/common/framed_label.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/threaded_image_loader.h>
+#include <nx/client/desktop/image_providers/threaded_image_loader.h>
+#include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/utils/server_image_cache.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -264,9 +264,10 @@ bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout)
     return true;
 }
 
-qreal QnLayoutSettingsDialog::screenAspectRatio() const {
-    QRect screen = qApp->desktop()->screenGeometry();
-    return (qreal)screen.width() / (qreal)screen.height();
+QnAspectRatio QnLayoutSettingsDialog::screenAspectRatio() const
+{
+    const auto screen = qApp->desktop()->screenGeometry();
+    return QnAspectRatio(screen.size());
 }
 
 qreal QnLayoutSettingsDialog::bestAspectRatioForCells() const {
@@ -351,8 +352,14 @@ void QnLayoutSettingsDialog::updateControls() {
     qreal targetAspectRatio = bestAspectRatioForCells();
     // TODO: #GDM #Common do not change if values were changed manually?
     if (ui->keepAspectRatioCheckBox->isChecked() && targetAspectRatio > 0 && !cellsAreBestAspected()) {
-        QSize minSize = QnGeometry::expanded(targetAspectRatio, qnGlobals->layoutBackgroundMinSize(), Qt::KeepAspectRatioByExpanding).toSize();
-        QSize maxSize = QnGeometry::expanded(targetAspectRatio, qnGlobals->layoutBackgroundMaxSize(), Qt::KeepAspectRatio).toSize();
+        QSize minSize = nx::client::core::Geometry::expanded(
+            targetAspectRatio,
+            qnGlobals->layoutBackgroundMinSize(),
+            Qt::KeepAspectRatioByExpanding).toSize();
+        QSize maxSize = nx::client::core::Geometry::expanded(
+            targetAspectRatio,
+            qnGlobals->layoutBackgroundMaxSize(),
+            Qt::KeepAspectRatio).toSize();
 
         ui->widthSpinBox->setRange(minSize.width(), maxSize.width());
         ui->heightSpinBox->setRange(minSize.height(), maxSize.height());
@@ -494,12 +501,13 @@ void QnLayoutSettingsDialog::loadPreview() {
     if (!d->imageFileIsAvailable() || d->imageIsLoading())
         return;
 
-    QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
+    auto loader = new ThreadedImageLoader(this);
     loader->setInput(d->imageSourcePath);
     loader->setTransformationMode(Qt::FastTransformation);
     loader->setSize(ui->imageLabel->contentSize());
-    loader->setFlags(Qn::TouchSizeFromOutside);
-    connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
+    loader->setFlags(ThreadedImageLoader::TouchSizeFromOutside);
+    connect(loader, &ThreadedImageLoader::imageLoaded, this, &QnLayoutSettingsDialog::setPreview);
+    connect(loader, &ThreadedImageLoader::imageLoaded, loader, &QObject::deleteLater);
     loader->start();
 
     if (d->state == ImageDownloaded)
@@ -517,7 +525,7 @@ void QnLayoutSettingsDialog::viewFile() {
     if (QDesktopServices::openUrl(QUrl(path)))
         return;
 
-    QnImagePreviewDialog dialog;
+    QnImagePreviewDialog dialog(this);
     dialog.openImage(d->imageSourcePath);
     dialog.exec();
 }
@@ -602,10 +610,12 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
 
     /* Disable cropping for images that are quite well aspected. */
     qreal imageAspectRatio = (qreal)image.width() / (qreal)image.height();
-    if (qAbs(imageAspectRatio - screenAspectRatio()) > aspectRatioVariation) {
+    if (qAbs(imageAspectRatio - screenAspectRatio().toFloat()) > aspectRatioVariation)
+    {
         d->croppedPreview = cropToAspectRatio(image, screenAspectRatio());
     }
-    else {
+    else
+    {
         d->croppedPreview = QImage();
     }
 

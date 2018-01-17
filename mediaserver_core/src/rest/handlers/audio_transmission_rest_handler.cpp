@@ -25,17 +25,17 @@ int QnAudioTransmissionRestHandler::executeGet(
     if (!validateParams(params, errorStr))
     {
         result.setError(QnJsonRestResult::InvalidParameter, errorStr);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
-    auto clientId = params[kClientIdParamName];
+    auto sourceId = params[kClientIdParamName];
     auto resourceId = params[kResourceIdParamName];
     QnAudioStreamerPool::Action action = (params[kActionParamName] == kStartStreamAction)
         ? QnAudioStreamerPool::Action::Start
         : QnAudioStreamerPool::Action::Stop;
 
     if (!QnAudioStreamerPool::instance()->startStopStreamToResource(
-            QnUuid::fromStringSafe(clientId),
+            sourceId,
             QnUuid::fromStringSafe(resourceId),
             action,
             errorStr,
@@ -43,7 +43,7 @@ int QnAudioTransmissionRestHandler::executeGet(
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errorStr);
     }
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 bool QnAudioTransmissionRestHandler::validateParams(const QnRequestParams &params, QString& error)

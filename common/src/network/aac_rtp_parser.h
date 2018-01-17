@@ -15,7 +15,7 @@ class QnAacRtpParser: public QnRtpAudioStreamParser
 public:
     QnAacRtpParser();
     virtual ~QnAacRtpParser();
-    virtual void setSDPInfo(QList<QByteArray> sdpInfo) override;
+    virtual void setSdpInfo(QList<QByteArray> sdpInfo) override;
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData) override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;

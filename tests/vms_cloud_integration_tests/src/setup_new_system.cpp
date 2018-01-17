@@ -1,4 +1,8 @@
+#include <memory>
+
 #include <gtest/gtest.h>
+
+#include <nx/network/url/url_builder.h>
 
 #include "mediaserver_cloud_integration_test_setup.h"
 
@@ -28,14 +32,18 @@ protected:
 
         ASSERT_EQ(
             QnJsonRestResult::NoError,
-            client.setupCloudSystem(std::move(request)).error);
+            client->setupCloudSystem(std::move(request)).error);
     }
 
     void thenSystemMustBeAccessibleWithCloudOwnerCredentials()
     {
-        MediaServerClient client(mediaServerEndpoint());
-        client.setUserName(QString::fromStdString(accountEmail()));
-        client.setPassword(QString::fromStdString(accountPassword()));
+        MediaServerClient client(
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+                .setEndpoint(mediaServerEndpoint()));
+
+        client.setUserCredentials(nx::network::http::Credentials(
+            accountEmail().c_str(),
+            nx::network::http::PasswordAuthToken(accountPassword().c_str())));
         ec2::ApiResourceParamDataList vmsSettings;
         ASSERT_EQ(ec2::ErrorCode::ok, client.ec2GetSettings(&vmsSettings));
     }
@@ -49,9 +57,12 @@ protected:
 
     void detachSystemFromCloud()
     {
-        MediaServerClient client(mediaServerEndpoint());
-        client.setUserName(QString::fromStdString(accountEmail()));
-        client.setPassword(QString::fromStdString(accountPassword()));
+        MediaServerClient client(
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+                .setEndpoint(mediaServerEndpoint()));
+        client.setUserCredentials(nx::network::http::Credentials(
+            accountEmail().c_str(),
+            nx::network::http::PasswordAuthToken(accountPassword().c_str())));
 
         ASSERT_EQ(
             QnJsonRestResult::NoError,
@@ -60,9 +71,12 @@ protected:
 
     void assertSystemAcceptsDefaultCredentials()
     {
-        MediaServerClient client(mediaServerEndpoint());
-        client.setUserName("admin");
-        client.setPassword("admin");
+        MediaServerClient client(
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+                .setEndpoint(mediaServerEndpoint()));
+        client.setUserCredentials(nx::network::http::Credentials(
+            "admin",
+            nx::network::http::PasswordAuthToken("admin")));
 
         ec2::ApiResourceParamDataList vmsSettings;
         ASSERT_EQ(
@@ -72,9 +86,12 @@ protected:
 
     void assertIfSystemHasNotBecameNew()
     {
-        MediaServerClient client(mediaServerEndpoint());
-        client.setUserName("admin");
-        client.setPassword("admin");
+        MediaServerClient client(
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+                .setEndpoint(mediaServerEndpoint()));
+        client.setUserCredentials(nx::network::http::Credentials(
+            "admin",
+            nx::network::http::PasswordAuthToken("admin")));
 
         for (;;)
         {

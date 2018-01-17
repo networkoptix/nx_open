@@ -8,6 +8,7 @@
 #include "core/resource/media_resource.h"
 #include "utils/common/sleep.h"
 #include <nx/streaming/video_data_packet.h>
+#include "abstract_archive_integrity_watcher.h"
 
 QnAbstractArchiveStreamReader::QnAbstractArchiveStreamReader(const QnResourcePtr &dev):
     QnAbstractMediaStreamDataProvider(dev),
@@ -68,9 +69,10 @@ void QnAbstractArchiveStreamReader::setCycleMode(bool value)
     m_cycleMode = value;
 }
 
-bool QnAbstractArchiveStreamReader::open()
+bool QnAbstractArchiveStreamReader::open(AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher)
 {
-    return m_delegate && m_delegate->open(m_resource);
+    m_archiveIntegrityWatcher = archiveIntegrityWatcher;
+    return m_delegate && m_delegate->open(m_resource, archiveIntegrityWatcher);
 }
 
 void QnAbstractArchiveStreamReader::jumpToPreviousFrame(qint64 usec)
@@ -93,7 +95,7 @@ void QnAbstractArchiveStreamReader::run()
 {
     initSystemThreadId();
 
-    NX_INFO(this, "Started");
+    NX_VERBOSE(this, "Started");
     beforeRun();
 
     while(!needToStop())
@@ -114,6 +116,9 @@ void QnAbstractArchiveStreamReader::run()
 
         if (data==0 && !needToStop())
         {
+            if (m_noDataHandler)
+                m_noDataHandler();
+
             setNeedKeyData();
             mFramesLost++;
             m_stat[0].onData(0, false);
@@ -163,5 +168,11 @@ void QnAbstractArchiveStreamReader::run()
     }
 
     afterRun();
-    NX_INFO(this, "Stopped");
+    NX_VERBOSE(this, "Stopped");
+}
+
+void QnAbstractArchiveStreamReader::setNoDataHandler(
+    nx::utils::MoveOnlyFunc<void()> noDataHandler)
+{
+    m_noDataHandler = std::move(noDataHandler);
 }

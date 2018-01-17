@@ -10,24 +10,26 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/stoppable.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 class HttpStreamSocketServer;
 class MessageDispatcher;
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http
 
 namespace nx {
 namespace hpm {
-
-class PeerRegistrator;
 
 namespace conf { class Settings; }
 namespace http { class Server; }
 
 class Controller;
 class ListeningPeerPool;
-class StunServer;
+class View;
 
 class MediatorProcess:
     public nx::utils::Service
@@ -37,21 +39,20 @@ class MediatorProcess:
 public:
     MediatorProcess(int argc, char **argv);
 
-    std::vector<SocketAddress> httpEndpoints() const;
-    std::vector<SocketAddress> stunEndpoints() const;
+    std::vector<network::SocketAddress> httpEndpoints() const;
+    std::vector<network::SocketAddress> stunEndpoints() const;
     ListeningPeerPool* listeningPeerPool() const;
+
+    Controller& controller();
+    const Controller& controller() const;
 
 protected:
     virtual std::unique_ptr<nx::utils::AbstractServiceSettings> createSettings() override;
     virtual int serviceMain(const nx::utils::AbstractServiceSettings& settings) override;
 
 private:
-    Controller* m_controller;
-    StunServer* m_stunServer;
-    http::Server* m_httpServer;
-
-    QString getDataDirectory();
-    int printHelp();
+    Controller* m_controller = nullptr;
+    View* m_view = nullptr;
 };
 
 } // namespace hpm

@@ -175,15 +175,35 @@ void QnStorageDb::startVacuumAsync(Callback callback)
         return;
     }
 
-    if (m_vacuumThread.joinable())
-        m_vacuumThread.join();
+    try
+    {
+        if (m_vacuumThread.joinable())
+            m_vacuumThread.join();
+    }
+    catch (const std::exception& e)
+    {
+        NX_LOG(
+            lit("Failed to join vacuum thread: %1").arg(QString::fromStdString(e.what())),
+            cl_logERROR);
+    }
 
-    m_vacuumThread = nx::utils::thread([this, callback]
-                                 {
-                                     m_vacuumThreadRunning = true;
-                                     callback(vacuum());
-                                     m_vacuumThreadRunning = false;
-                                 });
+    try
+    {
+        m_vacuumThread = nx::utils::thread(
+            [this, callback]()
+            {
+                m_vacuumThreadRunning = true;
+                callback(vacuum());
+                m_vacuumThreadRunning = false;
+            });
+    }
+    catch (const std::exception& e)
+    {
+        NX_LOG(
+            lit("Failed to start vacuum thread: %1").arg(QString::fromStdString(e.what())),
+            cl_logERROR);
+        m_vacuumThread = nx::utils::thread();
+    }
 }
 
 bool QnStorageDb::addRecord(const QString& cameraUniqueId,
@@ -224,6 +244,7 @@ bool QnStorageDb::addRecord(const QString& cameraUniqueId,
     mediaFileOp.setCameraId(cameraId);
     mediaFileOp.setCatalog(catalog);
     mediaFileOp.setDuration(chunk.durationMs);
+    mediaFileOp.setFileTypeIndex(chunk.fileIndex);
     mediaFileOp.setFileSize(chunk.getFileSize());
     mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationAdd);
     mediaFileOp.setStartTime(chunk.startTimeMs);
@@ -368,7 +389,16 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
             .arg(m_dbFileName), cl_logINFO);
 
     if (!vacuum(&result))
-        NX_LOG("[StorageDb] vacuum failed", cl_logWARNING);
+    {
+        NX_LOG(lit("[StorageDb] loading chunks from DB failed. storage: %1, file: %2")
+                .arg(m_storage->getUrl())
+                .arg(m_dbFileName), cl_logWARNING);
+        return result;
+    }
+
+    NX_LOG(lit("[StorageDb] finished loading chunks from DB. storage: %1, file: %2")
+            .arg(m_storage->getUrl())
+            .arg(m_dbFileName), cl_logINFO);
 
     return result;
 }
@@ -380,6 +410,11 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
     BOOST_SCOPE_EXIT(this_)
     {
         this_->m_dbHelper.setMode(nx::media_db::Mode::Write);
+        {
+            QnMutexLocker lock(&this_->m_syncMutex);
+            for (const auto& uth : this_->m_readUuidToHash)
+                this_->m_uuidToHash.insert(uth);
+        }
     }
     BOOST_SCOPE_EXIT_END
 
@@ -448,7 +483,7 @@ bool QnStorageDb::vacuumInternal()
         return false;
     }
 
-    for (auto it = m_uuidToHash.right.begin(); it != m_uuidToHash.right.end(); ++it)
+    for (auto it = m_readUuidToHash.right.begin(); it != m_readUuidToHash.right.end(); ++it)
     {
         nx::media_db::CameraOperation camOp;
         camOp.setCameraId(it->first);
@@ -469,9 +504,9 @@ bool QnStorageDb::vacuumInternal()
             for (auto chunkIt = it->second[i].cbegin(); chunkIt != it->second[i].cend(); ++chunkIt)
             {
                 nx::media_db::MediaFileOperation mediaFileOp;
-                auto cameraIdIt = m_uuidToHash.left.find(it->first);
-                NX_ASSERT(cameraIdIt != m_uuidToHash.left.end());
-                if (cameraIdIt == m_uuidToHash.left.end())
+                auto cameraIdIt = m_readUuidToHash.left.find(it->first);
+                NX_ASSERT(cameraIdIt != m_readUuidToHash.left.end());
+                if (cameraIdIt == m_readUuidToHash.left.end())
                 {
                     NX_LOG(lit("[media_db] camera id %1 not found in UuidToHash map").arg(it->first), cl_logDEBUG1);
                     continue;
@@ -482,6 +517,7 @@ bool QnStorageDb::vacuumInternal()
                                        QnServer::ChunksCatalog::HiQualityCatalog);
                 mediaFileOp.setDuration(chunkIt->durationMs);
                 mediaFileOp.setFileSize(chunkIt->getFileSize());
+                mediaFileOp.setFileTypeIndex(chunkIt->fileIndex);
                 mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationAdd);
                 mediaFileOp.setStartTime(chunkIt->startTimeMs);
                 mediaFileOp.setTimeZone(chunkIt->timeZone);
@@ -594,10 +630,10 @@ void QnStorageDb::handleCameraOp(const nx::media_db::CameraOperation &cameraOp,
         return;
 
     QString cameraUniqueId = cameraOp.getCameraUniqueId();
-    auto uuidIt = m_uuidToHash.left.find(cameraUniqueId);
+    auto uuidIt = m_readUuidToHash.left.find(cameraUniqueId);
 
-    if (uuidIt == m_uuidToHash.left.end())
-        m_uuidToHash.insert(UuidToHash::value_type(cameraUniqueId, cameraOp.getCameraId()));
+    if (uuidIt == m_readUuidToHash.left.end())
+        m_readUuidToHash.insert(UuidToHash::value_type(cameraUniqueId, cameraOp.getCameraId()));
 }
 
 void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &mediaFileOp,
@@ -607,13 +643,13 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
         return;
 
     uint16_t cameraId = mediaFileOp.getCameraId();
-    auto cameraUuidIt = m_uuidToHash.right.find(cameraId);
+    auto cameraUuidIt = m_readUuidToHash.right.find(cameraId);
     auto opType = mediaFileOp.getRecordType();
     auto opCatalog = mediaFileOp.getCatalog();
 
     // camera with this ID should have already been found
-    NX_ASSERT(cameraUuidIt != m_uuidToHash.right.end());
-    if (cameraUuidIt == m_uuidToHash.right.end())
+    NX_ASSERT(cameraUuidIt != m_readUuidToHash.right.end());
+    if (cameraUuidIt == m_readUuidToHash.right.end())
     {
         NX_LOG(lit("%1 Got media file with unknown camera ID. Skipping.").arg(Q_FUNC_INFO), cl_logWARNING);
         return;
@@ -629,7 +665,7 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
 
     DeviceFileCatalog::Chunk newChunk(
         DeviceFileCatalog::Chunk(mediaFileOp.getStartTime(), m_storageIndex,
-                                 DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION,
+                                 mediaFileOp.getFileTypeIndex(),
                                  mediaFileOp.getDuration(), mediaFileOp.getTimeZone(),
                                  (quint16)(mediaFileOp.getFileSize() >> 32),
                                  (quint32)mediaFileOp.getFileSize()));

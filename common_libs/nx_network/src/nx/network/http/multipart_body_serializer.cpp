@@ -1,6 +1,8 @@
 #include "multipart_body_serializer.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 MultipartBodySerializer::MultipartBodySerializer(
     StringType boundary,
@@ -14,10 +16,6 @@ MultipartBodySerializer::MultipartBodySerializer(
 {
 }
 
-MultipartBodySerializer::~MultipartBodySerializer()
-{
-}
-
 StringType MultipartBodySerializer::contentType() const
 {
     return "multipart/x-mixed-replace;boundary="+m_boundary;
@@ -25,7 +23,7 @@ StringType MultipartBodySerializer::contentType() const
 
 void MultipartBodySerializer::beginPart(
     const StringType& contentType,
-    const nx_http::HttpHeaders& headers,
+    const nx::network::http::HttpHeaders& headers,
     BufferType data)
 {
     startBodyPartInternal(
@@ -43,7 +41,7 @@ void MultipartBodySerializer::writeData(BufferType data)
 
 void MultipartBodySerializer::writeBodyPart(
     const StringType& contentType,
-    const nx_http::HttpHeaders& headers,
+    const nx::network::http::HttpHeaders& headers,
     BufferType data)
 {
     auto contentLength = data.size();
@@ -69,14 +67,14 @@ bool MultipartBodySerializer::eof() const
 
 void MultipartBodySerializer::startBodyPartInternal(
     const StringType& contentType,
-    const nx_http::HttpHeaders& headers,
+    const nx::network::http::HttpHeaders& headers,
     BufferType data,
     boost::optional<std::uint64_t> contentLength)
 {
     m_bodyPartStarted = true;
 
     BufferType serializedData;
-    //TODO #ak it makes sense to make a rough estimation of required serializedData size and reserve
+    // TODO: #ak It makes sense to make a rough estimation of required serializedData size and reserve.
 
     serializedData +=
         m_delimiter +
@@ -91,4 +89,6 @@ void MultipartBodySerializer::startBodyPartInternal(
     m_outputStream->processData(std::move(serializedData));
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

@@ -23,9 +23,9 @@ QnMutexCameraDataHandler::QnMutexCameraDataHandler(QnCommonModule* commonModule)
 QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
 {
 #ifdef EDGE_SERVER
-    char  mac[MAC_ADDR_LEN];
+    char  mac[nx::network::MAC_ADDR_LEN];
     char* host = 0;
-    getMacFromPrimaryIF(mac, &host);
+    nx::network::getMacFromPrimaryIF(mac, &host);
 
     if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX))
     {

@@ -37,6 +37,8 @@ public:
     virtual bool isClosed() const override;
     virtual bool setReuseAddrFlag(bool reuseAddr) override;
     virtual bool getReuseAddrFlag(bool* val) const override;
+    virtual bool setReusePortFlag(bool value) override;
+    virtual bool getReusePortFlag(bool* value) const override;
     virtual bool setNonBlockingMode(bool val) override;
     virtual bool getNonBlockingMode(bool* val) const override;
     virtual bool getMtu(unsigned int* mtuValue) const override;
@@ -69,7 +71,7 @@ public:
 
     /**
      * These methods can be called concurrently with MultipleServerSocket::accept.
-     * @note Blocks until completion.
+     * NOTE: Blocks until completion.
      */
     bool addSocket(std::unique_ptr<AbstractStreamServerSocket> socket);
     void removeSocket(size_t pos);

@@ -41,12 +41,12 @@ QString toString(ConnectionBase::State value)
 ConnectionBase::ConnectionBase(
     const QnUuid& remoteId,
     const ApiPeerDataEx& localPeer,
-    const QUrl& _remotePeerUrl,
+    const nx::utils::Url& _remotePeerUrl,
     const std::chrono::seconds& keepAliveTimeout,
     std::unique_ptr<QObject> opaqueObject,
     std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
 :
-    m_httpClient(new nx_http::AsyncClient()),
+    m_httpClient(new nx::network::http::AsyncClient()),
     m_localPeer(localPeer),
     m_direction(Direction::outgoing),
     m_keepAliveTimeout(keepAliveTimeout),
@@ -110,18 +110,18 @@ ConnectionBase::~ConnectionBase()
     }
 }
 
-QUrl ConnectionBase::remoteAddr() const
+nx::utils::Url ConnectionBase::remoteAddr() const
 {
     if (m_direction == Direction::outgoing)
         return m_remotePeerUrl;
     if (m_webSocket)
     {
         auto address = m_webSocket->socket()->getForeignAddress();
-        return QUrl(lit("http://%1:%2")
+        return nx::utils::Url(lit("http://%1:%2")
             .arg(address.address.toString())
             .arg(address.port));
     }
-    return QUrl();
+    return nx::utils::Url();
 }
 
 void ConnectionBase::cancelConnecting(State newState, const QString& reason)
@@ -137,8 +137,8 @@ void ConnectionBase::cancelConnecting(State newState, const QString& reason)
 
 void ConnectionBase::onHttpClientDone()
 {
-    nx_http::AsyncClient::State state = m_httpClient->state();
-    if (state == nx_http::AsyncClient::State::sFailed)
+    nx::network::http::AsyncClient::State state = m_httpClient->state();
+    if (state == nx::network::http::AsyncClient::State::sFailed)
     {
         cancelConnecting(State::Error, lm("Http request failed %1").arg(m_httpClient->lastSysErrorCode()));
         return;
@@ -148,7 +148,7 @@ void ConnectionBase::onHttpClientDone()
 
     NX_VERBOSE(this, lit("%1. statusCode = %2").arg(Q_FUNC_INFO).arg(statusCode));
 
-    if (statusCode == nx_http::StatusCode::unauthorized)
+    if (statusCode == nx::network::http::StatusCode::unauthorized)
     {
         // try next credential source
         m_credentialsSource = (CredentialsSource)((int)m_credentialsSource + 1);
@@ -166,7 +166,7 @@ void ConnectionBase::onHttpClientDone()
         }
         return;
     }
-    else if (!nx_http::StatusCode::isSuccessCode(statusCode)) //< Checking that statusCode is 2xx.
+    else if (!nx::network::http::StatusCode::isSuccessCode(statusCode)) //< Checking that statusCode is 2xx.
     {
         cancelConnecting(State::Error, lm("Not success HTTP status code %1").arg(statusCode));
         return;
@@ -186,7 +186,7 @@ void ConnectionBase::onHttpClientDone()
     }
 
     ApiPeerDataEx remotePeer;
-    QByteArray serializedPeerData = nx_http::getHeaderValue(headers, Qn::EC2_PEER_DATA);
+    QByteArray serializedPeerData = nx::network::http::getHeaderValue(headers, Qn::EC2_PEER_DATA);
     serializedPeerData = QByteArray::fromBase64(serializedPeerData);
 
     bool success = false;
@@ -233,7 +233,7 @@ void ConnectionBase::onHttpClientDone()
     }
 
     //saving credentials we used to authorize request
-    if (m_httpClient->request().headers.find(nx_http::header::Authorization::NAME) !=
+    if (m_httpClient->request().headers.find(nx::network::http::header::Authorization::NAME) !=
         m_httpClient->request().headers.end())
     {
         QnMutexLocker lock(&m_mutex);
@@ -254,7 +254,7 @@ void ConnectionBase::onHttpClientDone()
 
 void ConnectionBase::startConnection()
 {
-    nx_http::Request request;
+    nx::network::http::Request request;
     nx::network::websocket::addClientHeaders(&request.headers, kP2pProtoName);
     request.headers.emplace(Qn::EC2_PEER_DATA, QnUbjson::serialized(m_localPeer).toBase64());
     request.headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, m_localPeer.instanceId.toByteArray());
@@ -427,7 +427,7 @@ bool ConnectionBase::handleMessage(const nx::Buffer& message)
     return true;
 }
 
-nx_http::AuthInfoCache::AuthorizationCacheItem ConnectionBase::authData() const
+nx::network::http::AuthInfoCache::AuthorizationCacheItem ConnectionBase::authData() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_httpAuthCacheItem;

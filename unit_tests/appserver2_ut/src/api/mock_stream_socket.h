@@ -2,22 +2,21 @@
 
 #include <nx/network/abstract_socket.h>
 
-class MockStreamSocket: public AbstractStreamSocket
+class MockStreamSocket: public nx::network::AbstractStreamSocket
 {
 public:
-    virtual bool reopen() override { return true; }
     virtual bool setNoDelay(bool value) override { QN_UNUSED(value); return true; }
     virtual bool getNoDelay(bool* value) const override { QN_UNUSED(value); return true; }
     virtual bool toggleStatisticsCollection(bool val) override { QN_UNUSED(val); return true; }
-    virtual bool getConnectionStatistics(StreamSocketInfo* info) override { QN_UNUSED(info); return true; }
-    virtual bool setKeepAlive(boost::optional<KeepAliveOptions> info) override { QN_UNUSED(info); return true; }
-    virtual bool getKeepAlive(boost::optional<KeepAliveOptions>* result) const override { QN_UNUSED(result); return true; }
+    virtual bool getConnectionStatistics(nx::network::StreamSocketInfo* info) override { QN_UNUSED(info); return true; }
+    virtual bool setKeepAlive(boost::optional<nx::network::KeepAliveOptions> info) override { QN_UNUSED(info); return true; }
+    virtual bool getKeepAlive(boost::optional<nx::network::KeepAliveOptions>* result) const override { QN_UNUSED(result); return true; }
 
     virtual bool connect(
-        const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override
+        const nx::network::SocketAddress& remoteSocketAddress,
+        std::chrono::milliseconds timeout) override
     {
-        QN_UNUSED(remoteSocketAddress, timeoutMillis);
+        QN_UNUSED(remoteSocketAddress, timeout);
         return true;
     }
 
@@ -33,15 +32,15 @@ public:
         return bufferLen;
     }
 
-    virtual SocketAddress getForeignAddress() const override
+    virtual nx::network::SocketAddress getForeignAddress() const override
     {
-        return SocketAddress();
+        return nx::network::SocketAddress();
     }
 
     virtual bool isConnected() const { return true; };
 
     virtual void connectAsync(
-        const SocketAddress& address,
+        const nx::network::SocketAddress& address,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
         QN_UNUSED(address, handler);
@@ -49,14 +48,14 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
+        nx::network::IoCompletionHandler handler) override
     {
         QN_UNUSED(buffer, handler);
     }
 
     virtual void sendAsync(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
+        nx::network::IoCompletionHandler handler) override
     {
         QN_UNUSED(buffer, handler);
     }
@@ -81,13 +80,13 @@ public:
 
     virtual void pleaseStopSync() {}
 
-    virtual bool bind(const SocketAddress& localAddress) override
+    virtual bool bind(const nx::network::SocketAddress& localAddress) override
     {
         m_localAddress = localAddress;
         return true;
     }
 
-    virtual SocketAddress getLocalAddress() const override
+    virtual nx::network::SocketAddress getLocalAddress() const override
     {
         return m_localAddress;
     }
@@ -106,6 +105,19 @@ public:
     {
         if (val)
             *val = m_reuseAddrFlag;
+        return true;
+    }
+
+    virtual bool setReusePortFlag(bool value) override
+    {
+        m_reusePortFlag = value;
+        return true;
+    }
+
+    virtual bool getReusePortFlag(bool* value) const override
+    {
+        if (value)
+            *value = m_reusePortFlag;
         return true;
     }
 
@@ -212,13 +224,14 @@ public:
     }
 
 private:
-    bool m_reuseAddrFlag;
-    bool m_nonBlockingMode;
-    int m_sendBufferSize;
-    int m_recvBufferSize;
-    unsigned int m_recvTimeoutMs;
-    unsigned int m_sendTimeoutMs;
-    nx::network::aio::AbstractAioThread* m_aioThread;
-    SocketAddress m_localAddress;
+    bool m_reuseAddrFlag = false;
+    bool m_reusePortFlag = false;
+    bool m_nonBlockingMode = false;
+    int m_sendBufferSize = 0;
+    int m_recvBufferSize = 0;
+    unsigned int m_recvTimeoutMs = 0;
+    unsigned int m_sendTimeoutMs = 0;
+    nx::network::aio::AbstractAioThread* m_aioThread = nullptr;
+    nx::network::SocketAddress m_localAddress;
 };
 

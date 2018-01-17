@@ -107,7 +107,7 @@ QString ThirdPartyResourceSearcher::manufacture() const
     return THIRD_PARTY_MANUFACTURER_NAME;
 }
 
-QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const QUrl& url, const QAuthenticator& auth, bool /*doMultichannelCheck*/ )
+QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const nx::utils::Url& url, const QAuthenticator& auth, bool /*doMultichannelCheck*/ )
 {
     QVector<nxcip::CameraInfo> cameraInfoTempArray;
 
@@ -191,8 +191,8 @@ QList<QnNetworkResourcePtr> ThirdPartyResourceSearcher::processPacket(
 
 void ThirdPartyResourceSearcher::processPacket(
     const QHostAddress& /*discoveryAddr*/,
-    const SocketAddress& /*host*/,
-    const nx_upnp::DeviceInfo& /*devInfo*/,
+    const nx::network::SocketAddress& /*host*/,
+    const nx::network::upnp::DeviceInfo& /*devInfo*/,
     const QByteArray& xmlDevInfo,
     QnResourceList& result )
 {
@@ -304,7 +304,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
         resource->setName( QString::fromUtf8("%1-%2").arg(vendor).arg(QString::fromUtf8(cameraInfo.modelName)) );
     resource->setModel( QString::fromUtf8(cameraInfo.modelName) );
     resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid).trimmed() );
-    resource->setMAC( QnMacAddress(QString::fromUtf8(cameraInfo.uid).trimmed()) );
+    resource->setMAC( nx::network::QnMacAddress(QString::fromUtf8(cameraInfo.uid).trimmed()) );
     resource->setDefaultAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setVendor( vendor );

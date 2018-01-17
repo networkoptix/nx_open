@@ -1,8 +1,12 @@
 #ifdef ENABLE_DROID
 
-#include "network/h264_rtp_parser.h"
-
 #include "droid_stream_reader.h"
+
+#include <nx/network/nettools.h>
+#include <nx/network/socket_factory.h>
+#include <nx/utils/std/cpp14.h>
+
+#include "network/h264_rtp_parser.h"
 #include "droid_resource.h"
 
 static const int DROID_TIMEOUT = 3 * 1000;
@@ -29,7 +33,8 @@ PlDroidStreamReader::PlDroidStreamReader(const QnResourcePtr& res):
     m_h264Parser(0),
     m_gotSDP(0)
 {
-    m_tcpSock = SocketFactory::createStreamSocket();
+    m_tcpSock = std::make_unique<nx::network::TCPSocket>(
+        nx::network::SocketFactory::tcpClientIpVersion());
 
     m_droidRes = qSharedPointerDynamicCast<QnDroidResource>(res);
 
@@ -80,7 +85,7 @@ CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraC
     m_gotSDP =  false;
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
-    
+
     QString portStr = m_resource->getUrl();
 	auto virtRes = m_resource.dynamicCast<QnVirtualCameraResource>();
 
@@ -99,7 +104,7 @@ CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraC
 
     if (ports[0].contains(QLatin1Char(':')))
         m_connectionPort = ports[0].mid(ports[0].indexOf(QLatin1Char(':'))+1).toInt();
-    
+
     //m_videoPort = ports[1].toInt();
     //m_audioPort = ports[2].toInt();
     m_dataPort = ports[1].toInt();
@@ -112,7 +117,9 @@ CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraC
 
     if (m_tcpSock->isClosed())
         m_tcpSock->reopen();
-    if (!m_tcpSock->connect(host, m_connectionPort))
+    if (!m_tcpSock->connect(
+            nx::network::SocketAddress(host, m_connectionPort),
+            nx::network::deprecated::kDefaultConnectTimeout))
     {
         closeStream();
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(m_resource->getUrl(), m_connectionPort);
@@ -124,12 +131,12 @@ CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraC
 
     {
         QnMutexLocker lock( &m_allReadersMutex );
-        quint32 ip = resolveAddress(res->getHostAddress()).toIPv4Address();
+        quint32 ip = nx::network::resolveAddress(res->getHostAddress()).toIPv4Address();
         m_allReaders.insert(ip, this);
     }
     QByteArray request = QString(QLatin1String("v:%1,a:%2,f:%3")).arg(m_videoIoDevice->getMediaSocket()->getLocalAddress().port).
             arg(m_audioIoDevice->getMediaSocket()->getLocalAddress().port).arg(DROID_CONTROL_TCP_SERVER_PORT).toLatin1();
-    
+
     int sendLen = m_tcpSock->send(request.data(), request.size());
     if (sendLen != request.size())
     {
@@ -158,7 +165,7 @@ void PlDroidStreamReader::closeStream()
 {
     {
         QnMutexLocker lock( &m_allReadersMutex );
-        quint32 ip = resolveAddress(m_droidRes->getHostAddress()).toIPv4Address();
+        quint32 ip = nx::network::resolveAddress(m_droidRes->getHostAddress()).toIPv4Address();
         m_allReaders.remove(ip);
     }
 
@@ -184,7 +191,7 @@ bool PlDroidStreamReader::isStreamOpened() const
 void PlDroidStreamReader::setSDPInfo(QByteArray sdpInfo)
 {
     QnMutexLocker lock( &m_controlPortSync );
-    m_h264Parser->setSDPInfo(sdpInfo.split('\n'));
+    m_h264Parser->setSdpInfo(sdpInfo.split('\n'));
     m_gotSDP = true;
 }
 

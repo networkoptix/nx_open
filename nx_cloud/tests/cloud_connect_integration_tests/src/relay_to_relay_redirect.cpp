@@ -2,9 +2,9 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/utils/std/future.h>
 
-#include <nx/cloud/relay/controller/connect_session_manager.h>
 #include <nx/cloud/relay/settings.h>
 
 #include "basic_test_fixture.h"
@@ -30,7 +30,7 @@ public:
     virtual void SetUp() override
     {
         BasicTestFixture::SetUp();
-        ConnectorFactory::setEnabledCloudConnectMask((int)CloudConnectType::proxy);
+        ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::proxy);
         startServer();
     }
 
@@ -52,9 +52,9 @@ public:
                 [this, &requestCompletion](
                     api::ResultCode resultCode,
                     api::CreateClientSessionResponse response)
-            {
-                requestCompletion.set_value(std::make_tuple(resultCode, std::move(response)));
-            });
+                {
+                    requestCompletion.set_value(std::make_tuple(resultCode, std::move(response)));
+                });
 
             const auto result = requestCompletion.get_future().get();
             if (std::get<0>(result) == api::ResultCode::ok)
@@ -67,13 +67,13 @@ public:
 
     void assertFirstRelayHasBeenAddedToThePool()
     {
-        auto serverId = nx::String::fromStdString(m_addedPeer.first);
+        auto serverId = nx::String::fromStdString(m_addedPeer);
         ASSERT_TRUE(serverId.contains(serverSocketCloudAddress()));
     }
 
-    virtual void peerAdded(const std::string& domainName, const std::string& relayHost) override
+    virtual void peerAdded(const std::string& domainName) override
     {
-        m_addedPeer = std::make_pair(domainName, relayHost);
+        m_addedPeer = domainName;
         m_addPeerPromise.set_value();
     }
 
@@ -108,7 +108,7 @@ public:
 
 
 private:
-    std::pair<std::string, std::string> m_addedPeer;
+    std::string m_addedPeer;
     std::string m_removedPeer;
 
     nx::utils::promise<void> m_removePeerPromise;

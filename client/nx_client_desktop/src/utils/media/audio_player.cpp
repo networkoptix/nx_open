@@ -10,7 +10,7 @@
 #include <QtCore/QBuffer>
 
 #include <core/resource/resource.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
 #include <nx_speech_synthesizer/text_to_wav.h>
 #include <camera/audio_stream_display.h>
@@ -31,7 +31,7 @@ public:
 AudioPlayer::AudioPlayer( const QString& filePath )
 :
     m_mediaFileReader( NULL ),
-    m_adaptiveSleep( MAX_FRAME_DURATION*1000 ),
+    m_adaptiveSleep( MAX_FRAME_DURATION_MS*1000 ),
     m_renderer( NULL ),
     m_rtStartTime( AV_NOPTS_VALUE ),
     m_lastRtTime( 0 ),
@@ -308,7 +308,7 @@ bool AudioPlayer::openNonSafe( QIODevice* dataSource )
 
     QnResourcePtr res( new LocalAudioFileResource() );
     res->setUrl( temporaryFilePath );
-    if( !mediaFileReader->open( res ) )
+    if( !mediaFileReader->open(res, /*archiveIntegrityWatcher*/ nullptr))
     {
         m_storage->removeFile( temporaryFilePath );
         return false;
@@ -340,8 +340,8 @@ void AudioPlayer::doRealtimeDelay( const QnAbstractDataPacketPtr& media )
     else if( media->timestamp - m_rtStartTime > AUDIO_PRE_BUFFER*MS_PER_USEC )
     {
         qint64 timeDiff = media->timestamp - m_lastRtTime;
-        if( timeDiff <= MAX_FRAME_DURATION*1000 )
-            m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION*1000); // if diff too large, it is recording hole. do not calc delay for this case
+        if( timeDiff <= MAX_FRAME_DURATION_MS*1000 )
+            m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION_MS*1000); // if diff too large, it is recording hole. do not calc delay for this case
     }
     m_lastRtTime = media->timestamp;
 }

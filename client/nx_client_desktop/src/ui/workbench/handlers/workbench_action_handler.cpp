@@ -12,13 +12,13 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QInputDialog>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWhatsThis>
 
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
+#include <api/server_rest_connection.h>
 
 #include <nx/vms/event/action_parameters.h>
 
@@ -60,20 +60,24 @@
 
 #include <nx_ec/dummy_handler.h>
 
+#include <client_core/client_core_module.h>
+
+#include <nx/client/core/utils/geometry.h>
+
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 #include <nx/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/client/desktop/ui/messages/local_files_messages.h>
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 
 #include <nx/streaming/archive_stream_reader.h>
 
 #include <network/cloud_url_validator.h>
 
-#include <plugins/resource/avi/avi_resource.h>
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <platform/environment.h>
 
@@ -85,6 +89,7 @@
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/dialogs/local_settings_dialog.h>
 #include <ui/dialogs/camera_addition_dialog.h>
+#include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/failover_priority_dialog.h>
@@ -94,10 +99,10 @@
 #include <ui/dialogs/camera_diagnostics_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
-#include <ui/dialogs/media_file_settings_dialog.h>
 #include <ui/dialogs/ping_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
+#include <ui/dialogs/camera_password_change_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -105,6 +110,9 @@
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
+
+#include <nx/client/desktop/resource_properties/media_file/media_file_settings_dialog.h>
+#include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -136,7 +144,6 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
-
 #include <nx/client/desktop/utils/server_image_cache.h>
 
 #include <utils/applauncher_utils.h>
@@ -158,6 +165,7 @@
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
+
 #include <nx/utils/app_info.h>
 
 #ifdef Q_OS_MACX
@@ -175,6 +183,11 @@
 #include "ui/widgets/palette_widget.h"
 #include "network/authutil.h"
 #include <core/resource/fake_media_server.h>
+
+#include <nx/client/desktop/ui/main_window.h>
+#include <nx/client/desktop/ui/dialogs/device_addition_dialog.h>
+
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -217,6 +230,12 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::AboutAction), SIGNAL(triggered()), this, SLOT(at_aboutAction_triggered()));
     connect(action(action::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
     connect(action(action::OpenFolderAction), SIGNAL(triggered()), this, SLOT(at_openFolderAction_triggered()));
+
+    connect(qnGlobalSettings, &QnGlobalSettings::maxSceneItemsChanged, this,
+        [this]
+        {
+            qnRuntime->setMaxSceneItemsOverride(qnGlobalSettings->maxSceneItemsOverride());
+        });
 
     // local settings
     connect(action(action::PreferencesGeneralTabAction), &QAction::triggered, this,
@@ -271,6 +290,9 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::ReviewLayoutTourInNewWindowAction), &QAction::triggered, this,
         &ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered);
 
+    connect(action(action::ChangeDefaultCameraPasswordAction), &QAction::triggered,
+        this, &ActionHandler::at_changeDefaultCameraPassword_triggered);
+
     connect(action(action::MediaFileSettingsAction), &QAction::triggered, this, &ActionHandler::at_mediaFileSettingsAction_triggered);
     connect(action(action::CameraIssuesAction), SIGNAL(triggered()), this, SLOT(at_cameraIssuesAction_triggered()));
     connect(action(action::CameraBusinessRulesAction), SIGNAL(triggered()), this, SLOT(at_cameraBusinessRulesAction_triggered()));
@@ -292,6 +314,12 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::ExitAction), &QAction::triggered, this, &ActionHandler::closeApplication);
     connect(action(action::ThumbnailsSearchAction), SIGNAL(triggered()), this, SLOT(at_thumbnailsSearchAction_triggered()));
     connect(action(action::CreateZoomWindowAction), SIGNAL(triggered()), this, SLOT(at_createZoomWindowAction_triggered()));
+
+    connect(action(action::AddDeviceManuallyAction), &QAction::triggered,
+        this, &ActionHandler::at_addDeviceManually_triggered);
+
+    connect(action(action::MainMenuAddDeviceManuallyAction), &QAction::triggered,
+        this, &ActionHandler::at_mainMenuAddDeviceManually_triggered);
 
     connect(action(action::ConvertCameraToEntropix), &QAction::triggered,
         this, &ActionHandler::at_convertCameraToEntropix_triggered);
@@ -344,6 +372,8 @@ ActionHandler::ActionHandler(QObject *parent) :
 
     connect(action(action::BeforeExitAction), &QAction::triggered, this, &ActionHandler::at_beforeExitAction_triggered);
 
+    connect(action(action::OpenNewSceneAction), &QAction::triggered, this, &ActionHandler::at_openNewScene_triggered);
+
     /* Run handlers that update state. */
     at_scheduleWatcher_scheduleEnabledChanged();
 }
@@ -395,8 +425,15 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
     data.dewarpingParams = params.dewarpingParams;
 
     qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemTimeRole, params.time);
+
     if (params.frameDistinctionColor.isValid())
         qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemFrameDistinctionColorRole, params.frameDistinctionColor);
+
+    if (!params.zoomWindowRectangleVisible)
+    {
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            data.uuid, Qn::ItemZoomWindowRectangleVisibleRole, false);
+    }
 
     if (params.usePosition)
         data.combinedGeometry = QRectF(params.position, params.position); /* Desired position is encoded into a valid rect. */
@@ -458,7 +495,7 @@ void ActionHandler::openNewWindow(const QStringList &args) {
             commonModule()->currentUrl());
     }
 
-    if (mainWindow())
+    if (mainWindowWidget())
     {
         int screen = context()->instance<QnScreenManager>()->nextFreeScreen();
         arguments << QnStartupParameters::kScreenKey << QString::number(screen);
@@ -644,22 +681,150 @@ void ActionHandler::at_previousLayoutAction_triggered()
     workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() - 1 + total) % total);
 }
 
+void ActionHandler::showSingleCameraErrorMessage(const QString& explanation)
+{
+    static const auto kMessageText = tr("Failed to change password");
+    QnMessageBox::critical(mainWindowWidget(), kMessageText, explanation);
+}
+
+void ActionHandler::showMultipleCamerasErrorMessage(
+    int totalCameras,
+    const QnVirtualCameraResourceList& camerasWithError,
+    const QString& explanation)
+{
+    static const auto kMessageTemplate = tr("Failed to change password on %1 of %2 cameras");
+    static const auto kSimpleOptions = QnResourceListView::Options(
+        QnResourceListView::HideStatusOption
+        | QnResourceListView::ServerAsHealthMonitorOption
+        | QnResourceListView::SortAsInTreeOption);
+
+    QnSessionAwareMessageBox messageBox(mainWindowWidget());
+    messageBox.setIcon(QnMessageBoxIcon::Critical);
+    messageBox.setText(kMessageTemplate.arg(
+        QString::number(camerasWithError.size()), QString::number(totalCameras)));
+    if (!explanation.isEmpty())
+        messageBox.setInformativeText(explanation);
+    messageBox.addCustomWidget(
+        new QnResourceListView(camerasWithError, kSimpleOptions, &messageBox),
+        QnMessageBox::Layout::AfterMainLabel);
+
+    messageBox.setStandardButtons(QDialogButtonBox::Ok);
+    messageBox.exec();
+}
+
+void ActionHandler::changeDefaultPasswords(
+    const QString& previousPassword,
+    const QnVirtualCameraResourceList& cameras,
+    bool forceShowCamerasList)
+{
+    const auto server = commonModule()->currentServer();
+    const auto serverConnection = server ? server->restConnection() : rest::QnConnectionPtr();
+    if (!serverConnection)
+    {
+        NX_EXPECT(false, "No connection to server");
+        return;
+    }
+
+    QnCameraPasswordChangeDialog dialog(
+        previousPassword, cameras, forceShowCamerasList, mainWindowWidget());
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
+    using PasswordChangeResult = QPair<QnVirtualCameraResourcePtr, QnRestResult>;
+    using PassswordChangeResultList = QList<PasswordChangeResult>;
+
+    const auto errorResultsStorage = QSharedPointer<PassswordChangeResultList>(
+        new PassswordChangeResultList());
+
+    const auto password = dialog.password();
+    const auto guard = QPointer<ActionHandler>(this);
+    const auto completionGuard = QnRaiiGuard::createDestructible(
+        [this, guard, cameras, errorResultsStorage, password, forceShowCamerasList]()
+        {
+            if (!guard || errorResultsStorage->isEmpty())
+                return;
+
+            // Show error dialog and try one more time
+            const auto camerasWithError =
+                [errorResultsStorage]()
+                {
+                    QnVirtualCameraResourceList result;
+                    for (const auto errorResult: *errorResultsStorage)
+                        result.push_back(errorResult.first);
+                    return result;
+                }();
+
+            auto explanation =
+                [errorResultsStorage]()
+                {
+                    QnRestResult::Error error = errorResultsStorage->first().second.error;
+                    if (errorResultsStorage->size() != 1)
+                    {
+                        const bool hasAnotherError = std::any_of(
+                            errorResultsStorage->begin() + 1, errorResultsStorage->end(),
+                            [error](const PasswordChangeResult& result)
+                            {
+                                return error != result.second.error;
+                            });
+
+                        if (hasAnotherError)
+                            error = QnRestResult::NoError;
+                    }
+
+                    return error == QnRestResult::NoError
+                        ? QString() //< NoError means different or unspecified error
+                        : errorResultsStorage->first().second.errorString;
+                }();
+
+            if (cameras.size() > 1)
+                showMultipleCamerasErrorMessage(cameras.size(), camerasWithError, explanation);
+            else
+                showSingleCameraErrorMessage(explanation);
+
+            changeDefaultPasswords(password, camerasWithError, forceShowCamerasList);
+        });
+
+    for (const auto camera: cameras)
+    {
+        auto auth = camera->getDefaultAuth();
+        auth.setPassword(password);
+
+        const auto resultCallback =
+            [guard, completionGuard, camera, errorResultsStorage]
+                (bool success, rest::Handle /*handle*/, QnRestResult result)
+            {
+                if (!guard)
+                    return;
+
+                if (!success)
+                    errorResultsStorage->append(PasswordChangeResult(camera, QnRestResult()));
+                else if (result.error != QnRestResult::NoError)
+                    errorResultsStorage->append(PasswordChangeResult(camera, result));
+            };
+
+        serverConnection->changeCameraPassword(
+            camera->getId(), auth, resultCallback, QThread::currentThread());
+    }
+}
+
+void ActionHandler::at_changeDefaultCameraPassword_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    const auto camerasWithDefaultPassword =
+        parameters.resources().filtered<QnVirtualCameraResource>();
+
+    if (camerasWithDefaultPassword.isEmpty())
+    {
+        NX_EXPECT(false, "No cameras with default password");
+        return;
+    }
+
+    const bool forceShowCamerasList = parameters.argument(Qn::ForceShowCamerasList, false);
+    changeDefaultPasswords(QString(), camerasWithDefaultPassword, forceShowCamerasList);
+}
+
 void ActionHandler::at_openInLayoutAction_triggered()
 {
-    /**
-     * When we add widget (possibliy with animation) to the scene, whole scene may loose
-     * ability to handle hover events.
-     * TODO: #ynikitenkov. Investigate problem and get rid of this ugly workaround
-     */
-    const auto uglyMacOsHoverWorkaround = nx::utils::AppInfo::isMacOsX()
-        ? QnRaiiGuard::create(
-            []() { QCursor::setPos(QPoint(0, 0)); },
-            [this, mp = QCursor::pos()]()
-            {
-                executeDelayedParented([mp]() { QCursor::setPos(mp); }, 0, this);
-            })
-        : QnRaiiGuardPtr();
-
     const auto parameters = menu()->currentParameters(sender());
 
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
@@ -676,17 +841,36 @@ void ActionHandler::at_openInLayoutAction_triggered()
     QnResourceWidgetList widgets = parameters.widgets();
     if (!widgets.empty() && position.isNull() && layout->getItems().empty())
     {
+        static const auto kExtraItemRoles =
+            {Qn::ItemTimeRole, Qn::ItemPausedRole, Qn::ItemSpeedRole};
+
+        using ExtraItemDataHash = QHash<Qn::ItemDataRole, QVariant>;
+        QHash<QnUuid, ExtraItemDataHash> extraItemRoleValues;
+
         QHash<QnUuid, QnLayoutItemData> itemDataByUuid;
         for (auto widget: widgets)
         {
             QnLayoutItemData data = widget->item()->data();
+            const auto oldUuid = data.uuid;
+            data.uuid = QnUuid::createUuid();
             data.flags = Qn::PendingGeometryAdjustment;
-            itemDataByUuid[data.uuid] = data;
-        }
+            itemDataByUuid[oldUuid] = data;
 
-        /* Generate new UUIDs. */
-        for (auto pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
-            pos->uuid = QnUuid::createUuid();
+            // Do not save position and state for cameras which footage we cannot see.
+            if (const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>())
+            {
+                if (!accessController()->hasPermissions(camera, Qn::ViewFootagePermission))
+                    continue;
+            }
+
+            for (const auto extraItemRole: kExtraItemRoles)
+            {
+                const auto value =
+                    qnResourceRuntimeDataManager->layoutItemData(oldUuid, extraItemRole);
+                if (value.isValid())
+                    extraItemRoleValues[data.uuid].insert(extraItemRole, value);
+            }
+        }
 
         /* Update cross-references. */
         for (auto pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
@@ -702,6 +886,10 @@ void ActionHandler::at_openInLayoutAction_triggered()
                 return;
 
             layout->addItem(data);
+
+            const auto values = extraItemRoleValues[data.uuid];
+            for (auto it = values.begin(); it != values.end(); ++it)
+                qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, it.key(), it.value());
         }
     }
     else
@@ -784,7 +972,7 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
         const auto resources = parameters.resources();
 
         // Displaying message delayed to avoid waiting cursor (see drop_instrument.cpp:245)
-        if (!messages::Videowall::checkLocalFiles(mainWindow(), index, resources, true))
+        if (!messages::Videowall::checkLocalFiles(mainWindowWidget(), index, resources, true))
             return;
     }
 
@@ -814,12 +1002,39 @@ void ActionHandler::at_openInNewTabAction_triggered()
         workbench()->setCurrentLayout(wbLayout);
     }
 
-    const auto openable = parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
-    if (openable.empty())
-        return;
-    parameters.setResources(openable);
+    if (parameters.widgets().isEmpty())
+    {
+        // Called from resources tree view
+        const auto openable = parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
+        if (openable.empty())
+            return;
 
-    menu()->trigger(action::OpenNewTabAction);
+        parameters.setResources(openable);
+        menu()->trigger(action::OpenNewTabAction);
+    }
+    else
+    {
+        // Action is called from the current layout context menu.
+
+        const auto widgets = parameters.widgets();
+        const bool hasViewFootagePermission = std::any_of(widgets.cbegin(), widgets.cend(),
+            [this](const QnResourceWidget* widget)
+            {
+                const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+                return camera
+                    && accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
+            });
+
+        const auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+        const auto state = hasViewFootagePermission
+            ? streamSynchronizer->state()
+            : QnStreamSynchronizationState::live();
+
+        action::Parameters params;
+        params.setArgument(Qn::LayoutSyncStateRole, state);
+        menu()->trigger(action::OpenNewTabAction, params);
+    }
+
     menu()->trigger(action::DropResourcesAction, parameters);
 }
 
@@ -881,7 +1096,7 @@ void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& re
         const auto extras = tr("Server \"%1\" is not responding.").arg(server->getName());
         QnMessageBox messageBox(QnMessageBoxIcon::Critical,
             text, extras, QDialogButtonBox::Ok, QDialogButtonBox::Ok,
-            mainWindow());
+            mainWindowWidget());
 
         messageBox.addCustomWidget(new QnResourceListView(modifiedResources, &messageBox));
         messageBox.exec();
@@ -918,7 +1133,7 @@ void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& re
         QnMessageBox messageBox(QnMessageBoxIcon::Warning,
             text, QString(),
             QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-            mainWindow());
+            mainWindowWidget());
 
         messageBox.addButton(tr("Move"), QDialogButtonBox::YesRole, Qn::ButtonAccent::Standard);
         const auto skipButton = messageBox.addCustomButton(QnMessageBoxCustomButton::Skip,
@@ -980,6 +1195,19 @@ void ActionHandler::at_convertCameraToEntropix_triggered()
     }
 }
 
+void ActionHandler::at_openNewScene_triggered()
+{
+    if (!m_mainWindow)
+    {
+        m_mainWindow = new experimental::MainWindow(
+            qnClientCoreModule->mainQmlEngine(), context());
+        m_mainWindow->resize(mainWindowWidget()->size());
+    }
+
+    m_mainWindow->show();
+    m_mainWindow->raise();
+}
+
 void ActionHandler::at_moveCameraAction_triggered() {
     const auto parameters = menu()->currentParameters(sender());
 
@@ -1038,7 +1266,8 @@ void ActionHandler::at_dropResourcesAction_triggered()
 
     if (!resources.empty())
     {
-        parameters.setResources(resources);
+        if (parameters.widgets().isEmpty()) //< Triggered by resources tree view
+            parameters.setResources(resources);
         if (!menu()->triggerIfPossible(action::OpenInCurrentLayoutAction, parameters))
             menu()->triggerIfPossible(action::OpenInNewTabAction, parameters);
     }
@@ -1087,7 +1316,7 @@ void ActionHandler::at_openFileAction_triggered() {
     filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
     filters << tr("All files (*.*)");
 
-    QStringList files = QnFileDialog::getOpenFileNames(mainWindow(),
+    QStringList files = QnFileDialog::getOpenFileNames(mainWindowWidget(),
         tr("Open File"),
         QString(),
         filters.join(lit(";;")),
@@ -1099,7 +1328,7 @@ void ActionHandler::at_openFileAction_triggered() {
 }
 
 void ActionHandler::at_openFolderAction_triggered() {
-    QString dirName = QnFileDialog::getExistingDirectory(mainWindow(),
+    QString dirName = QnFileDialog::getExistingDirectory(mainWindowWidget(),
         tr("Select folder..."),
         QString(),
         QnCustomFileDialog::directoryDialogOptions());
@@ -1109,13 +1338,13 @@ void ActionHandler::at_openFolderAction_triggered() {
 }
 
 void ActionHandler::openFailoverPriorityDialog() {
-    QScopedPointer<QnFailoverPriorityDialog> dialog(new QnFailoverPriorityDialog(mainWindow()));
+    QScopedPointer<QnFailoverPriorityDialog> dialog(new QnFailoverPriorityDialog(mainWindowWidget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
 void ActionHandler::openBackupCamerasDialog() {
-    QScopedPointer<QnBackupCamerasDialog> dialog(new QnBackupCamerasDialog(mainWindow()));
+    QScopedPointer<QnBackupCamerasDialog> dialog(new QnBackupCamerasDialog(mainWindowWidget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -1123,19 +1352,19 @@ void ActionHandler::openBackupCamerasDialog() {
 void ActionHandler::openSystemAdministrationDialog(int page)
 {
     QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(
-        m_systemAdministrationDialog, mainWindow());
+        m_systemAdministrationDialog, mainWindowWidget());
     systemAdministrationDialog()->setCurrentPage(page);
 }
 
 void ActionHandler::openLocalSettingsDialog(int page)
 {
-    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
+    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindowWidget()));
     dialog->setCurrentPage(page);
     dialog->exec();
 }
 
 void ActionHandler::at_aboutAction_triggered() {
-    QScopedPointer<QnAboutDialog> dialog(new QnAboutDialog(mainWindow()));
+    QScopedPointer<QnAboutDialog> dialog(new QnAboutDialog(mainWindowWidget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -1146,7 +1375,7 @@ void ActionHandler::at_businessEventsAction_triggered() {
 
 void ActionHandler::at_openBusinessRulesAction_triggered()
 {
-    QnNonModalDialogConstructor<QnBusinessRulesDialog> dialogConstructor(m_businessRulesDialog, mainWindow());
+    QnNonModalDialogConstructor<QnBusinessRulesDialog> dialogConstructor(m_businessRulesDialog, mainWindowWidget());
 
     QStringList filter;
     const auto parameters = menu()->currentParameters(sender());
@@ -1229,7 +1458,7 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
         const auto upperCaseName = newFileName.toUpper();
         if (kReservedFilenames.contains(upperCaseName))
         {
-            messages::LocalFiles::reservedFilename(mainWindow(), upperCaseName);
+            messages::LocalFiles::reservedFilename(mainWindowWidget(), upperCaseName);
             return;
         }
     }
@@ -1244,7 +1473,7 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
     {
         if (kForbiddenChars.contains(character))
         {
-            messages::LocalFiles::invalidChars(mainWindow(), kForbiddenChars);
+            messages::LocalFiles::invalidChars(mainWindowWidget(), kForbiddenChars);
             return;
         }
     }
@@ -1254,21 +1483,21 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
 
     if (QFileInfo::exists(filePath))
     {
-        messages::LocalFiles::fileExists(mainWindow(), filePath);
+        messages::LocalFiles::fileExists(mainWindowWidget(), filePath);
         return;
     }
 
     QString targetPath = QFileInfo(filePath).absolutePath();
     if (!QDir().mkpath(targetPath))
     {
-        messages::LocalFiles::pathInvalid(mainWindow(), targetPath);
+        messages::LocalFiles::pathInvalid(mainWindowWidget(), targetPath);
         return;
     }
 
     QFile writabilityTest(filePath);
     if (!writabilityTest.open(QIODevice::WriteOnly))
     {
-        messages::LocalFiles::fileCannotBeWritten(mainWindow(), filePath);
+        messages::LocalFiles::fileCannotBeWritten(mainWindowWidget(), filePath);
         return;
     }
 
@@ -1286,22 +1515,10 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
 
             if (!QFile::rename(oldPath, filePath))
             {
-                messages::LocalFiles::fileIsBusy(mainWindow(), oldPath);
+                messages::LocalFiles::fileIsBusy(mainWindowWidget(), oldPath);
             }
-            else
-            {
-                if (resource->hasFlags(Qn::layout))
-                {
-                    result = QnResourceDirectoryBrowser::layoutFromFile(filePath, resourcePool());
-                }
-                else
-                {
-                    QString targetName = QFileInfo(filePath).fileName();
-                    result->setName(targetName);
-                    result->setUrl(filePath);
-                }
-            }
-            resourcePool()->addResource(result);
+            // Renamed file is discovered immediately by ResourceDirectoryBrowser.
+            // It will deal with adding a resource with new name
         },
         kTimeToCloseResourceMs,
         this);
@@ -1326,7 +1543,7 @@ void ActionHandler::at_openBookmarksSearchAction_triggered()
 
     const auto dialogCreationFunction = [this, startTimeMs, endTimeMs, filterText]()
     {
-        return new QnSearchBookmarksDialog(filterText, startTimeMs, endTimeMs, mainWindow());
+        return new QnSearchBookmarksDialog(filterText, startTimeMs, endTimeMs, mainWindowWidget());
     };
 
     const bool firstTime = m_searchBookmarksDialog.isNull();
@@ -1337,7 +1554,7 @@ void ActionHandler::at_openBookmarksSearchAction_triggered()
 }
 
 void ActionHandler::at_openBusinessLogAction_triggered() {
-    QnNonModalDialogConstructor<QnEventLogDialog> dialogConstructor(m_businessEventsLogDialog, mainWindow());
+    QnNonModalDialogConstructor<QnEventLogDialog> dialogConstructor(m_businessEventsLogDialog, mainWindowWidget());
 
     const auto parameters = menu()->currentParameters(sender());
 
@@ -1361,12 +1578,12 @@ void ActionHandler::at_openBusinessLogAction_triggered() {
 }
 
 void ActionHandler::at_openAuditLogAction_triggered() {
-    QnNonModalDialogConstructor<QnAuditLogDialog> dialogConstructor(m_auditLogDialog, mainWindow());
+    QnNonModalDialogConstructor<QnAuditLogDialog> dialogConstructor(m_auditLogDialog, mainWindowWidget());
     const auto parameters = menu()->currentParameters(sender());
 }
 
 void ActionHandler::at_cameraListAction_triggered() {
-    QnNonModalDialogConstructor<QnCameraListDialog> dialogConstructor(m_cameraListDialog, mainWindow());
+    QnNonModalDialogConstructor<QnCameraListDialog> dialogConstructor(m_cameraListDialog, mainWindowWidget());
     const auto parameters = menu()->currentParameters(sender());
     QnMediaServerResourcePtr server;
     if (!parameters.resources().isEmpty())
@@ -1403,19 +1620,27 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     }
 
     /* Adjust for chunks. If they are provided, they MUST intersect with period */
-    if (!periods.empty()) {
-
+    if (!periods.empty())
+    {
         QnTimePeriodList localPeriods = periods.intersected(period);
+        NX_ASSERT(!localPeriods.empty());
 
-        qint64 startDelta = localPeriods.begin()->startTimeMs - period.startTimeMs;
-        if (startDelta > 0) { //user selected period before the first chunk
-            period.startTimeMs += startDelta;
-            period.durationMs -= startDelta;
-        }
+        if (!localPeriods.empty())
+        {
+            // Check if user selected period before the first chunk.
+            const qint64 startDelta = localPeriods.begin()->startTimeMs - period.startTimeMs;
+            if (startDelta > 0)
+            {
+                period.startTimeMs += startDelta;
+                period.durationMs -= startDelta;
+            }
 
-        qint64 endDelta = period.endTimeMs() - localPeriods.last().endTimeMs();
-        if (endDelta > 0) { // user selected period after the last chunk
-            period.durationMs -= endDelta;
+            // Check if user selected period after the last chunk.
+            const qint64 endDelta = period.endTimeMs() - localPeriods.last().endTimeMs();
+            if (endDelta > 0)
+            {
+                period.durationMs -= endDelta;
+            }
         }
     }
 
@@ -1453,7 +1678,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
 
     if (period.durationMs < steps[1])
     {
-        QnMessageBox::warning(mainWindow(),
+        QnMessageBox::warning(mainWindowWidget(),
             tr("Too short period selected"),
             tr("Cannot perform Preview Search. Please select a period of 15 seconds or longer."));
         return;
@@ -1527,7 +1752,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
 
     qreal displayAspectRatio = viewportGeometry.isNull()
         ? desiredItemAspectRatio
-        : QnGeometry::aspectRatio(viewportGeometry);
+        : Geometry::aspectRatio(viewportGeometry);
 
     const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * itemCount / desiredCellAspectRatio)));
 
@@ -1597,19 +1822,21 @@ void ActionHandler::at_mediaFileSettingsAction_triggered() {
     if (!media)
         return;
 
-    QScopedPointer<QnMediaFileSettingsDialog> dialog;
+    QScopedPointer<MediaFileSettingsDialog> dialog;
     if (resource->hasFlags(Qn::remote))
-        dialog.reset(new QnSessionAware<QnMediaFileSettingsDialog>(mainWindow()));
+        dialog.reset(new QnSessionAware<MediaFileSettingsDialog>(mainWindowWidget()));
     else
-        dialog.reset(new QnMediaFileSettingsDialog(mainWindow()));
+        dialog.reset(new MediaFileSettingsDialog(mainWindowWidget()));
 
     dialog->updateFromResource(media);
-    if (dialog->exec()) {
+    if (dialog->exec())
+    {
         dialog->submitToResource(media);
     }
-    else {
-        QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
-        if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget))
+    else
+    {
+        auto centralWidget = display()->widget(Qn::CentralRole);
+        if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget))
             mediaWidget->setDewarpingParams(media->getDewarpingParams());
     }
 }
@@ -1631,7 +1858,7 @@ void ActionHandler::at_cameraDiagnosticsAction_triggered() {
     if (!resource)
         return;
 
-    QScopedPointer<QnCameraDiagnosticsDialog> dialog(new QnCameraDiagnosticsDialog(mainWindow()));
+    QScopedPointer<QnCameraDiagnosticsDialog> dialog(new QnCameraDiagnosticsDialog(mainWindowWidget()));
     dialog->setResource(resource);
     dialog->restart();
     dialog->exec();
@@ -1644,7 +1871,7 @@ void ActionHandler::at_serverAddCameraManuallyAction_triggered()
     if (!server)
         return;
 
-    QnNonModalDialogConstructor<QnCameraAdditionDialog> dialogConstructor(m_cameraAdditionDialog, mainWindow());
+    QnNonModalDialogConstructor<QnCameraAdditionDialog> dialogConstructor(m_cameraAdditionDialog, mainWindowWidget());
 
     QnCameraAdditionDialog* dialog = cameraAdditionDialog();
 
@@ -1652,7 +1879,7 @@ void ActionHandler::at_serverAddCameraManuallyAction_triggered()
         if (dialog->state() == QnCameraAdditionDialog::Searching
             || dialog->state() == QnCameraAdditionDialog::Adding) {
 
-            const auto result = QnMessageBox::question(mainWindow(),
+            const auto result = QnMessageBox::question(mainWindowWidget(),
                 tr("Cancel device adding?"), QString(),
                 QDialogButtonBox::Yes | QDialogButtonBox::No,
                 QDialogButtonBox::No);
@@ -1662,6 +1889,32 @@ void ActionHandler::at_serverAddCameraManuallyAction_triggered()
         }
         dialog->setServer(server);
     }
+}
+
+void ActionHandler::at_mainMenuAddDeviceManually_triggered()
+{
+    const auto servers = commonModule()->resourcePool()->getAllServers(Qn::Online);
+    if (servers.isEmpty())
+    {
+        NX_EXPECT(false, "No online servers for device searching");
+        return;
+    }
+
+    menu()->triggerForced(action::AddDeviceManuallyAction,
+        action::Parameters(servers.first()));
+}
+
+void ActionHandler::at_addDeviceManually_triggered()
+{
+    const auto params = menu()->currentParameters(sender());
+    const auto server = params.resource().dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
+
+    QnNonModalDialogConstructor<DeviceAdditionDialog> dialogContructor(
+        m_deviceAdditionDialog, mainWindowWidget());
+
+    m_deviceAdditionDialog->setServer(server);
 }
 
 void ActionHandler::at_serverLogsAction_triggered()
@@ -1724,7 +1977,7 @@ void ActionHandler::at_deleteFromDiskAction_triggered()
         tr("Confirm files deleting"),
         tr("Are you sure you want to permanently delete these %n files?", "", resources.size()),
         QDialogButtonBox::Yes | QDialogButtonBox::No, QDialogButtonBox::Yes,
-        mainWindow());
+        mainWindowWidget());
 
     messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
     auto result = messageBox.exec();
@@ -1759,11 +2012,11 @@ bool ActionHandler::validateResourceName(const QnResourcePtr& resource, const QS
 
         if (checkedFlags == Qn::user)
         {
-            QnMessageBox::warning(mainWindow(), tr("There is another user with the same name"));
+            QnMessageBox::warning(mainWindowWidget(), tr("There is another user with the same name"));
         }
         else if (checkedFlags == Qn::videowall)
         {
-            messages::Videowall::anotherVideoWall(mainWindow());
+            messages::Videowall::anotherVideoWall(mainWindowWidget());
         }
         else if (checkedFlags == Qn::local_media)
         {
@@ -1811,19 +2064,21 @@ void ActionHandler::at_renameAction_triggered()
         ? camera->getGroupName()
         : resource->getName();
 
+    // TODO: #vkutin #gdm Is the following block of code still in use?
     if (name.isEmpty())
     {
         bool ok = false;
         do
         {
-            name = QInputDialog::getText(mainWindow(),
+            name = QnInputDialog::getText(mainWindowWidget(),
                 tr("Rename"),
                 tr("Enter new name for the selected item:"),
+                QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                 QLineEdit::Normal,
-                oldName,
-                &ok)
-                .trimmed();
-            if (!ok || name.isEmpty() || name == oldName)
+                QString(),
+                oldName).trimmed();
+
+            if (name.isEmpty() || name == oldName)
                 return;
 
         } while (!validateResourceName(resource, name));
@@ -1899,7 +2154,7 @@ void ActionHandler::at_removeFromServerAction_triggered()
                 && !resource->hasFlags(Qn::layout);
         });
 
-    if (ui::messages::Resources::deleteResources(mainWindow(), resources))
+    if (ui::messages::Resources::deleteResources(mainWindowWidget(), resources))
         qnResourcesChangesManager->deleteResources(resources);
 }
 
@@ -1929,7 +2184,7 @@ void ActionHandler::at_adjustVideoAction_triggered()
     if (!widget)
         return;
 
-    QnNonModalDialogConstructor<QnAdjustVideoDialog> dialogConstructor(m_adjustVideoDialog, mainWindow());
+    QnNonModalDialogConstructor<QnAdjustVideoDialog> dialogConstructor(m_adjustVideoDialog, mainWindowWidget());
     adjustVideoDialog()->setWidget(widget);
 }
 
@@ -1948,6 +2203,8 @@ void ActionHandler::at_createZoomWindowAction_triggered() {
     addParams.dewarpingParams.enabled = widget->resource()->getDewarpingParams().enabled;  // zoom items on fisheye cameras must always be dewarped
     addParams.zoomUuid = widget->item()->uuid();
     addParams.frameDistinctionColor = params.argument<QColor>(Qn::ItemFrameDistinctionColorRole);
+    addParams.zoomWindowRectangleVisible =
+        params.argument<bool>(Qn::ItemZoomWindowRectangleVisibleRole);
     addParams.rotation = widget->item()->rotation();
 
     addToLayout(workbench()->currentLayout()->resource(), widget->resource()->toResourcePtr(), addParams);
@@ -1970,7 +2227,7 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
     if (!checkCondition())
         return;
 
-    QnProgressDialog *progressDialog = new QnProgressDialog(mainWindow());
+    QnProgressDialog *progressDialog = new QnProgressDialog(mainWindowWidget());
     progressDialog->setWindowTitle(tr("Updating Background..."));
     progressDialog->setLabelText(tr("Image processing may take a few moments. Please be patient."));
     progressDialog->setRange(0, 0);
@@ -1992,7 +2249,7 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
             // TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
             //Important: maximumFileSize() is hardcoded in 1024-base
             const auto maxFileSize = ServerFileCache::maximumFileSize() / (1024 * 1024);
-            QnMessageBox::warning(mainWindow(),
+            QnMessageBox::warning(mainWindowWidget(),
                 tr("Image too big"),
                 tr("Maximum size is %1 MB.").arg(maxFileSize));
             return;
@@ -2000,7 +2257,7 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
 
         if (status != ServerFileCache::OperationResult::ok)
         {
-            QnMessageBox::critical(mainWindow(), tr("Failed to upload image"));
+            QnMessageBox::critical(mainWindowWidget(), tr("Failed to upload image"));
             return;
         }
 
@@ -2116,7 +2373,7 @@ void ActionHandler::at_browseUrlAction_triggered() {
     if (url.isEmpty())
         return;
 
-    QDesktopServices::openUrl(QUrl::fromUserInput(url));
+    QDesktopServices::openUrl(nx::utils::Url::fromUserInput(url).toQUrl());
 }
 
 void ActionHandler::at_versionMismatchMessageAction_triggered()
@@ -2180,7 +2437,7 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
 
     const QString extras = messageParts.join(lit("<br/>"));
     QScopedPointer<QnSessionAwareMessageBox> messageBox(
-        new QnSessionAwareMessageBox(mainWindow()));
+        new QnSessionAwareMessageBox(mainWindowWidget()));
     messageBox->setIcon(QnMessageBoxIcon::Warning);
     messageBox->setText(tr("Components of System have different versions:"));
     messageBox->setInformativeText(extras);
@@ -2211,7 +2468,7 @@ void ActionHandler::at_betaVersionMessageAction_triggered()
     QnMessageBox dialog(QnMessageBoxIcon::Information,
         tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
         tr("Some functionality may be unavailable or not working properly."),
-        QDialogButtonBox::Ok, QDialogButtonBox::Ok, mainWindow());
+        QDialogButtonBox::Ok, QDialogButtonBox::Ok, mainWindowWidget());
 
     dialog.setCheckBoxEnabled();
     dialog.exec();
@@ -2243,7 +2500,7 @@ void ActionHandler::checkIfStatisticsReportAllowed() {
     if (!atLeastOneServerHasInternetAccess)
         return;
 
-    QnMessageBox::information(mainWindow(),
+    QnMessageBox::information(mainWindowWidget(),
         tr("System sends anonymous usage statistics"),
         tr("It will be used by software development team to improve your user experience.")
             + L'\n' + tr("To disable it, go to System Administration dialog."));
@@ -2280,7 +2537,7 @@ void ActionHandler::at_queueAppRestartAction_triggered()
 
     if (!tryToRestartClient())
     {
-        QnConnectionDiagnosticsHelper::failedRestartClientMessage(mainWindow());
+        QnConnectionDiagnosticsHelper::failedRestartClientMessage(mainWindowWidget());
         return;
     }
     menu()->trigger(action::DelayedForcedExitAction);
@@ -2299,14 +2556,14 @@ void ActionHandler::openInBrowserDirectly(const QnMediaServerResourcePtr& server
     if (nx::network::isCloudServer(server))
         return;
 
-    QUrl url(server->getApiUrl());
+    nx::utils::Url url(server->getApiUrl());
     url.setUserName(QString());
     url.setPassword(QString());
     url.setScheme(lit("http"));
     url.setPath(path);
     url.setFragment(fragment);
     url = qnClientModule->networkProxyFactory()->urlToResource(url, server, lit("proxy"));
-    QDesktopServices::openUrl(url);
+    QDesktopServices::openUrl(url.toQUrl());
 }
 
 void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
@@ -2316,16 +2573,16 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
         return;
     // path may contains path + url query params
     // TODO: #akolesnikov #3.1 VMS-2806
-    QUrl serverUrl(server->getApiUrl().toString() + path);
+    nx::utils::Url serverUrl(server->getApiUrl().toString() + path);
     serverUrl.setFragment(fragment);
 
-    QUrl proxyUrl = qnClientModule->networkProxyFactory()->urlToResource(serverUrl, server);
+    nx::utils::Url proxyUrl = qnClientModule->networkProxyFactory()->urlToResource(serverUrl, server);
     proxyUrl.setPath(lit("/api/getNonce"));
 
     if (m_serverRequests.find(proxyUrl) == m_serverRequests.end())
     {
         // No other requests to this proxy, so we have to get nonce by ourselves.
-        auto reply = new QnAsyncHttpClientReply(nx_http::AsyncHttpClient::create(), this);
+        auto reply = new QnAsyncHttpClientReply(nx::network::http::AsyncHttpClient::create(), this);
         connect(
             reply, &QnAsyncHttpClientReply::finished,
             this, &ActionHandler::at_nonceReceived);
@@ -2355,7 +2612,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
     NonceReply auth;
     if (!QJson::deserialize(reply->data(), &result) || !QJson::deserialize(result.reply, &auth))
     {
-        QnMessageBox::critical(mainWindow(), tr("Failed to open server web page"));
+        QnMessageBox::critical(mainWindowWidget(), tr("Failed to open server web page"));
         return;
     }
 
@@ -2364,22 +2621,22 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         const auto appserverUrl = commonModule()->currentUrl();
         const auto authParam = createHttpQueryAuthParam(
             appserverUrl.userName(), appserverUrl.password(),
-            auth.realm, nx_http::Method::get, auth.nonce.toUtf8());
+            auth.realm, nx::network::http::Method::get, auth.nonce.toUtf8());
 
-        QUrl targetUrl(request.url);
-        QUrlQuery urlQuery(targetUrl);
+        nx::utils::Url targetUrl(request.url);
+        QUrlQuery urlQuery(targetUrl.toQUrl());
         urlQuery.addQueryItem(lit("auth"), QLatin1String(authParam));
         targetUrl.setQuery(urlQuery);
 
         targetUrl = qnClientModule->networkProxyFactory()->urlToResource(targetUrl, request.server);
 
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-        targetUrl = QUrl(lit("http://%1/%2:%3:%4%5?%6")
+        targetUrl = nx::utils::Url(lit("http://%1/%2:%3:%4%5?%6")
             .arg(gateway->endpoint().toString()).arg(targetUrl.scheme())
             .arg(targetUrl.host()).arg(targetUrl.port())
             .arg(targetUrl.path()).arg(targetUrl.query()));
 
-        QDesktopServices::openUrl(targetUrl);
+        QDesktopServices::openUrl(targetUrl.toQUrl());
     }
 }
 

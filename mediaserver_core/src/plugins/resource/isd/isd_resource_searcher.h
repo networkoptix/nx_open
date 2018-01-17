@@ -7,10 +7,11 @@
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <plugins/resource/mdns/mdns_listener.h>
 #include <nx/network/upnp/upnp_search_handler.h>
+#include <nx/utils/url.h>
 
 class QnPlISDResourceSearcher:
 	public QnAbstractNetworkResourceSearcher,
-	public nx_upnp::SearchHandler
+	public nx::network::upnp::SearchAutoHandler
 {
 
 public:
@@ -26,39 +27,40 @@ public:
     virtual QnResourceList findResources(void) override;
 
     virtual QList<QnResourcePtr> checkHostAddr(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QAuthenticator& auth,
         bool doMultichannelCheck) override;
 
     //Upnp resource searcher
     virtual bool processPacket(
         const QHostAddress& discoveryAddr,
-        const SocketAddress& deviceEndpoint,
-        const nx_upnp::DeviceInfo& devInfo,
+        const nx::network::SocketAddress& deviceEndpoint,
+        const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) override;
 
 private:
 
     void createResource(
-        const nx_upnp::DeviceInfo& devInfo,
-        const QnMacAddress& mac,
+        const nx::network::upnp::DeviceInfo& devInfo,
+        const nx::network::QnMacAddress& mac,
         const QAuthenticator& auth,
         QnResourceList& result );
 
     QList<QnResourcePtr> checkHostAddrInternal(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QAuthenticator& auth);
 
     bool testCredentials(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QAuthenticator& auth);
 
     void cleanupSpaces(QString& rowWithSpaces) const;
 
     bool isDwOrIsd(const QString& vendorName, const QString& model) const;
 
-    QnResourcePtr processMdnsResponse (
-        const QnMdnsListener::ConsumerData& mdnsResponse,
+    QnResourcePtr processMdnsResponse(
+        const QString& mdnsResponse,
+        const QString& mdnsRemoteAddress,
         const QnResourceList& alreadyFoundResources);
 
 private:

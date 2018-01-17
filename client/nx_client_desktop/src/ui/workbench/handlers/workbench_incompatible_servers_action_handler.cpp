@@ -3,7 +3,6 @@
 #include <QtCore/QUrl>
 
 #include <QtWidgets/QAction>
-#include <QtWidgets/QInputDialog>
 
 #include <core/resource/resource.h>
 #include <core/resource/fake_media_server.h>
@@ -16,6 +15,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/merge_systems_dialog.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/help/help_topics.h>
@@ -49,7 +49,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 {
     if (m_connectTool)
     {
-        QnMessageBox::information(mainWindow(),
+        QnMessageBox::information(mainWindowWidget(),
             tr("Systems will be merged shortly"),
             tr("Servers from the other System will appear in the resource tree."));
         return;
@@ -78,7 +78,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 
         const auto message = utils::MergeSystemsStatus::getErrorMessage(
              kStatus, moduleInformation).prepend(lit("\n"));
-        QnMessageBox::warning(mainWindow(),
+        QnMessageBox::warning(mainWindowWidget(),
             tr("Cloud Systems cannot be merged"),
             message);
         return;
@@ -112,7 +112,7 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(
 
     m_connectTool = new QnConnectToCurrentSystemTool(this);
 
-    auto progressDialog = new QnProgressDialog(mainWindow());
+    auto progressDialog = new QnProgressDialog(mainWindowWidget());
     progressDialog->setAttribute(Qt::WA_DeleteOnClose);
     progressDialog->setCancelButton(nullptr);
     progressDialog->setWindowTitle(tr("Connecting to the current System..."));
@@ -140,7 +140,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggere
         return;
     }
 
-    m_mergeDialog = new QnSessionAware<QnMergeSystemsDialog>(mainWindow());
+    m_mergeDialog = new QnSessionAware<QnMergeSystemsDialog>(mainWindowWidget());
     m_mergeDialog->setAttribute(Qt::WA_DeleteOnClose);
     m_mergeDialog->open();
 }
@@ -153,19 +153,19 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
     switch (errorCode)
     {
         case QnConnectToCurrentSystemTool::NoError:
-            QnMessageBox::success(mainWindow(),
+            QnMessageBox::success(mainWindowWidget(),
                 tr("Server will be connected to System shortly"),
                 tr("It will appear in the resource tree when the database synchronization is finished."));
             break;
 
         case QnConnectToCurrentSystemTool::UpdateFailed:
-            QnMessageBox::critical(mainWindow(),
+            QnMessageBox::critical(mainWindowWidget(),
                 tr("Failed to update Server"),
                 m_connectTool->updateResult().errorMessage());
             break;
 
         case QnConnectToCurrentSystemTool::MergeFailed:
-            QnMessageBox::critical(mainWindow(),
+            QnMessageBox::critical(mainWindowWidget(),
                 tr("Failed to merge Systems"),
                 m_connectTool->mergeErrorMessage());
             break;
@@ -193,7 +193,7 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
     const auto message = utils::MergeSystemsStatus::getErrorMessage(
         utils::MergeSystemsStatus::starterLicense, server->getModuleInformation());
 
-    const auto result = QnMessageBox::warning(mainWindow(),
+    const auto result = QnMessageBox::warning(mainWindowWidget(),
         tr("Total amount of licenses will decrease"), message,
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel, QDialogButtonBox::Ok);
 
@@ -217,29 +217,13 @@ bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(
 
 QString QnWorkbenchIncompatibleServersActionHandler::requestPassword() const
 {
-    QString password;
-    for (;;)
-    {
-        QInputDialog dialog(mainWindow());
-        dialog.setWindowTitle(tr("Enter Password..."));
-        dialog.setLabelText(tr("Administrator Password"));
-        dialog.setTextEchoMode(QLineEdit::Password);
-        dialog.setTextValue(password);
-        setHelpTopic(&dialog, Qn::Systems_ConnectToCurrentSystem_Help);
+    QnInputDialog dialog(mainWindowWidget());
+    dialog.setWindowTitle(tr("Enter password..."));
+    dialog.setCaption(tr("Administrator password"));
+    dialog.setEchoMode(QLineEdit::Password);
+    setHelpTopic(&dialog, Qn::Systems_ConnectToCurrentSystem_Help);
 
-        if (dialog.exec() != QDialog::Accepted)
-            return QString();
-
-        password = dialog.textValue();
-
-        if (password.isEmpty())
-        {
-            QnMessageBox::warning(mainWindow(), tr("Password cannot be empty."));
-            continue;
-        }
-
-        break;
-    }
-
-    return password;
+    return dialog.exec() == QDialog::Accepted
+        ? dialog.value()
+        : QString();
 }

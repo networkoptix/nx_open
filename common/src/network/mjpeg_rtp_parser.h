@@ -12,7 +12,7 @@ class QnMjpegRtpParser: public QnRtpVideoStreamParser
 public:
     QnMjpegRtpParser();
     virtual ~QnMjpegRtpParser();
-    virtual void setSDPInfo(QList<QByteArray> lines) override;
+    virtual void setSdpInfo(QList<QByteArray> lines) override;
 
     virtual bool processData(
         quint8* rtpBufferBase, int bufferOffset, int bytesRead, const QnRtspStatistic& statistics,
@@ -24,6 +24,8 @@ private:
 
     void updateHeaderTables(const quint8* lumaTable, const quint8* chromaTable);
 
+    bool parseMjpegExtension(const quint8* data, int size);
+    bool processRtpExtensions(const quint8* data, int size);
 private:
     bool resolutionWorkaroundLogged = false;
     bool mjpeg16BitWarningLogged = false;
@@ -35,8 +37,8 @@ private:
     //AVJpeg::Header m_jpegHeader;
     quint8 m_lumaTable[64 * 2];
     quint8 m_chromaTable[64 * 2];
-    int m_sdpWidth;
-    int m_sdpHeight;
+    int m_frameWidth;
+    int m_frameHeight;
 
     int m_lastJpegQ;
 
@@ -51,6 +53,7 @@ private:
 
     //QnByteArray m_frameData;
     int m_frameSize;
+    std::vector<quint8> m_extendedJpegHeader;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

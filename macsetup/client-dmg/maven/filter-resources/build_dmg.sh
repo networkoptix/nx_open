@@ -1,22 +1,24 @@
 #!/bin/bash
+set -x
+set -e
 
-BINARIES=${libdir}/bin/${build.configuration}
-LIBRARIES=${libdir}/lib/${build.configuration}
+BINARIES=@libdir@/bin/@build.configuration@
+LIBRARIES=@libdir@/lib/@build.configuration@
 SRC=./dmg-folder
 TMP=tmp
-VOLUME_NAME="${display.product.name} ${release.version}"
-DMG_FILE="${artifact.name.client}.dmg"
+VOLUME_NAME="@display.product.name@ @release.version@"
+DMG_FILE="@artifact.name.client@.dmg"
 
 # Take into consideration that we have protocol handler app with name
-# ${protocol_handler_app_name} = ${display.product.name} Client.app.
+# @protocol_handler_app_name@ = @display.product.name@ Client.app.
 # Please do not add "Client" word to APP_DIR because of that.
-APP_DIR="$SRC/${display.product.name}.app"
-HELP=${ClientHelpSourceDir}
-RELEASE_VERSION=${release.version}
-PROTOCOL_HANDLER_APP_NAME="${protocol_handler_app_name}"
+APP_DIR="$SRC/@display.product.name@.app"
+HELP=@ClientHelpSourceDir@
+RELEASE_VERSION=@release.version@
+PROTOCOL_HANDLER_APP_NAME="@protocol_handler_app_name@"
 
-QT_DIR="${qt.dir}"
-QT_VERSION="${qt.version}"
+QT_DIR="@qt.dir@"
+QT_VERSION="@qt.version@"
 
 ln -s /Applications $SRC/Applications
 
@@ -25,7 +27,7 @@ mv "$APP_DIR"/Contents/MacOS/protocol_handler.app "$APP_DIR"/Contents/MacOS/"$PR
 mkdir -p "$APP_DIR/Contents/Resources"
 cp logo.icns "$APP_DIR/Contents/Resources/appIcon.icns"
 cp logo.icns $SRC/.VolumeIcon.icns
-cp -R "${packages.dir}/any/roboto-fonts/bin/fonts" "${APP_DIR}/Contents/MacOS/"
+cp -R "@packages.dir@/any/roboto-fonts/bin/fonts" "$APP_DIR/Contents/MacOS/"
 
 function hexify
 {
@@ -54,12 +56,12 @@ patch_dsstore "$SRC/DS_Store" "$SRC/.DS_Store" $RELEASE_VERSION
 rm "$SRC/DS_Store"
 
 python macdeployqt.py "$APP_DIR" "$BINARIES" "$LIBRARIES" "$HELP" "$QT_DIR" "$QT_VERSION"
-security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
-security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain
+security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain \
+    || security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
 
-if [ '${mac.skip.sign}' == 'false'  ]
+if [ '@mac.skip.sign@' == 'false'  ]
 then
-    codesign -f -v --deep -s "${mac.sign.identity}" "$APP_DIR"
+    codesign -f -v --deep -s "@mac.sign.identity@" "$APP_DIR"
 fi
 
 SetFile -c icnC $SRC/.VolumeIcon.icns
@@ -69,7 +71,7 @@ hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -format UDRW -ov "raw-$DM
 
 mv update.json $SRC
 cd dmg-folder
-zip -y -r ../${artifact.name.client_update}.zip ./*.app *.json
+zip -y -r ../@artifact.name.client_update@.zip ./*.app *.json
 cd ..
 
 rm -rf $TMP

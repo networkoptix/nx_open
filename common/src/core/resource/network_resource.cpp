@@ -7,6 +7,7 @@
 
 #include <nx/network/nettools.h>
 #include "utils/common/sleep.h"
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/ping.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
@@ -25,7 +26,7 @@ QnNetworkResource::QnNetworkResource(QnCommonModule* commonModule):
     m_authenticated(true),
     m_networkStatus(0),
     m_networkTimeout(1000 * 10),
-    m_httpPort(nx_http::DEFAULT_HTTP_PORT),
+    m_httpPort(nx::network::http::DEFAULT_HTTP_PORT),
     m_mediaPort(nx_rtsp::DEFAULT_RTSP_PORT),
     m_probablyNeedToUpdateStatus(false)
 {
@@ -68,13 +69,13 @@ void QnNetworkResource::setHostAddress(const QString &ip)
     }
 }
 
-QnMacAddress QnNetworkResource::getMAC() const
+nx::network::QnMacAddress QnNetworkResource::getMAC() const
 {
     QnMutexLocker mutexLocker( &m_mutex );
     return m_macAddress;
 }
 
-void QnNetworkResource::setMAC(const QnMacAddress &mac)
+void QnNetworkResource::setMAC(const nx::network::QnMacAddress &mac)
 {
     QnMutexLocker mutexLocker( &m_mutex );
     m_macAddress = mac;
@@ -118,7 +119,6 @@ QAuthenticator QnNetworkResource::getResourceAuth(
     const QnUuid &resourceId,
     const QnUuid &resourceTypeId)
 {
-    // TODO: #GDM think about code duplication
     NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred");
     QString value = getResourceProperty(
         commonModule,
@@ -132,15 +132,7 @@ QAuthenticator QnNetworkResource::getResourceAuth(
             resourceId,
             resourceTypeId);
 
-    value = nx::utils::decodeStringFromHexStringAES128CBC(value);
-
-    const QStringList& credentialsList = value.split(lit(":"));
-    QAuthenticator auth;
-    if (credentialsList.size() >= 1)
-        auth.setUser(credentialsList[0]);
-    if (credentialsList.size() >= 2)
-        auth.setPassword(credentialsList[1]);
-    return auth;
+    return getAuthInternal(value);
 }
 
 QAuthenticator QnNetworkResource::getAuth() const
@@ -148,8 +140,18 @@ QAuthenticator QnNetworkResource::getAuth() const
     QString value = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME);
     if (value.isNull())
         value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
+    return getAuthInternal(value);
+}
 
-    value = nx::utils::decodeStringFromHexStringAES128CBC(value);
+QAuthenticator QnNetworkResource::getDefaultAuth() const
+{
+    QString value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
+    return getAuthInternal(value);
+}
+
+QAuthenticator QnNetworkResource::getAuthInternal(const QString& encodedAuth)
+{
+    QString value = nx::utils::decodeStringFromHexStringAES128CBC(encodedAuth);
 
     const QStringList& credentialsList = value.split(lit(":"));
     QAuthenticator auth;
@@ -270,8 +272,11 @@ int QnNetworkResource::getChannel() const
 
 bool QnNetworkResource::ping()
 {
-    std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
-    return sock->connect( getHostAddress(), QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    std::unique_ptr<nx::network::AbstractStreamSocket> sock( nx::network::SocketFactory::createStreamSocket() );
+    return sock->connect(
+        getHostAddress(),
+        QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT),
+        nx::network::deprecated::kDefaultConnectTimeout);
 }
 
 void QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )

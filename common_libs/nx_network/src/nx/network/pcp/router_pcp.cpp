@@ -9,6 +9,8 @@ static const quint32 LIFETIME = 1 * 60 * 60;
 static const int RESPONCE_WAIT = 1000;
 static const int RESPONCE_BUFFER = 1024;
 
+namespace nx {
+namespace network {
 namespace pcp {
 
 Router::Router(const HostAddress& address)
@@ -59,8 +61,8 @@ QByteArray Router::makeMapRequest(Mapping& mapping)
     header.opcode = Opcode::MAP;
     header.lifeTime = LIFETIME;
     header.clientIp = QByteArray(
-        reinterpret_cast<const char*>(mapping.internal.address.ipV6().get_ptr()),
-        sizeof(*mapping.internal.address.ipV6()));
+        reinterpret_cast<const char*>(mapping.internal.address.ipV6().first.get_ptr()),
+        sizeof(*mapping.internal.address.ipV6().first));
 
     MapMessage message;
     message.nonce = mapping.nonce;
@@ -103,3 +105,5 @@ bool Router::parseMapResponse(const QByteArray& response, Mapping& mapping)
 }
 
 } // namespace pcp
+} // namespace network
+} // namespace nx

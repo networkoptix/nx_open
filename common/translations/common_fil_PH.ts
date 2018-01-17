@@ -255,18 +255,6 @@
       <translation type="unfinished">Make sure port %1 is accessible (e.g. forwarded).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in device settings.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in camera settings.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation type="unfinished">If it does not help, restore factory defaults on the device web-page.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -485,6 +485,14 @@
     <message>
       <source>Time Licenses</source>
       <translation type="unfinished">Time Licenses</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation type="unfinished">Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation type="unfinished">Bridge Licenses</translation>
     </message>
   </context>
   <context>
@@ -774,6 +782,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation type="unfinished">Invalid resource type for data export.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>
@@ -1504,6 +1516,15 @@
     <message>
       <source>Acknowledge</source>
       <translation type="unfinished">Acknowledge</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation type="unfinished">Analytics Event</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation type="unfinished">%1 at %2</translation>
     </message>
   </context>
   <context>

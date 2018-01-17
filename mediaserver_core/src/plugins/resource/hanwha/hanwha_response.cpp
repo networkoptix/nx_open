@@ -1,3 +1,5 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_response.h"
 #include "hanwha_utils.h"
 
@@ -15,28 +17,36 @@ const QString kUnknownErrorString = lit("Unknown error");
 } // namespace
 
 
-HanwhaResponse::HanwhaResponse(nx_http::StatusCode::Value statusCode):
+HanwhaResponse::HanwhaResponse(
+    nx::network::http::StatusCode::Value statusCode,
+    const QString& requestUrl)
+    :
     m_errorCode(HanwhaError::kUnknownError),
     m_errorString(kUnknownErrorString),
-    m_statusCode(statusCode)
+    m_statusCode(statusCode),
+    m_requestUrl(requestUrl)
 {
 }
 
 HanwhaResponse::HanwhaResponse(
     const nx::Buffer& rawBuffer,
-    nx_http::StatusCode::Value statusCode,
-    const QString& groupBy)
-    :
+    nx::network::http::StatusCode::Value statusCode,
+    const QString& requestUrl,
+    const QString& groupBy,
+    bool isListMode)
+:
     m_statusCode(statusCode),
-    m_groupBy(groupBy)
+    m_groupBy(groupBy),
+    m_requestUrl(requestUrl)
+
 {
-    parseBuffer(rawBuffer);
+    parseBuffer(rawBuffer, isListMode);
 }
 
 bool HanwhaResponse::isSuccessful() const
 {
     return m_errorCode == HanwhaError::kNoError
-        && nx_http::StatusCode::isSuccessCode(m_statusCode);
+        && nx::network::http::StatusCode::isSuccessCode(m_statusCode);
 }
 
 int HanwhaResponse::errorCode() const
@@ -46,7 +56,16 @@ int HanwhaResponse::errorCode() const
 
 QString HanwhaResponse::errorString() const
 {
-    return m_errorString;
+    if (!m_errorString.isEmpty())
+        return m_errorString;
+    if (!nx::network::http::StatusCode::isSuccessCode(m_statusCode))
+    {
+        if (m_statusCode == kHanwhaBlockedHttpCode)
+            return "Temporary unauthorized";
+        else
+            return nx::network::http::StatusCode::toString(m_statusCode);
+    }
+    return m_errorCode == HanwhaError::kNoError ? QString() : "Unknown error";
 }
 
 std::map<QString, QString> HanwhaResponse::response() const
@@ -54,19 +73,24 @@ std::map<QString, QString> HanwhaResponse::response() const
     return m_response;
 }
 
-nx_http::StatusCode::Value HanwhaResponse::statusCode() const
+nx::network::http::StatusCode::Value HanwhaResponse::statusCode() const
 {
     return m_statusCode;
 }
 
-void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer)
+QString HanwhaResponse::requestUrl() const
+{
+    return m_requestUrl;
+}
+
+void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer, bool isListMode)
 {
     const auto groupBy = m_groupBy.toUtf8();
     auto lines = rawBuffer.split(L'\n');
     bool isError = false;
     bool gotErrorDetails = false;
     QString currentGroupPrefix;
-    
+
     for (const auto& line: lines)
     {
         const auto trimmed = line.trimmed();
@@ -102,10 +126,22 @@ void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer)
 
                 if (i == splitSize - 1)
                 {
-                    auto nameAndValue = part.split(L'=');
+                    QList<nx::Buffer> nameAndValue;
+                    if (isListMode)
+                    {
+                        const auto colonIndex = part.indexOf(L':');
+                        if (colonIndex == -1)
+                            continue;
 
-                    if (nameAndValue.size() != 2)
-                        continue;
+                        nameAndValue.push_back(part.left(colonIndex));
+                        nameAndValue.push_back(part.mid(colonIndex + 1));
+                    }
+                    else
+                    {
+                        nameAndValue = part.split(L'=');
+                        if (nameAndValue.size() != 2)
+                            continue;
+                    }
 
                     if (nameAndValue[0] == groupBy)
                     {
@@ -147,19 +183,21 @@ void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer)
         }
         else
         {
-            auto split = line.split(L'=');
-            if (split.size() != 2)
+            auto separatorPosition = line.indexOf(L'=');
+            if (separatorPosition == -1)
                 continue;
 
-            m_response[currentGroupPrefix + split[0].trimmed()] = split[1].trimmed();
+            m_response[currentGroupPrefix + line.left(separatorPosition).trimmed()]
+                = line.mid(separatorPosition + 1).trimmed();
             m_errorCode = HanwhaError::kNoError;
         }
     }
 }
 
-boost::optional<QString> HanwhaResponse::findParameter(const QString& parameterName) const
+boost::optional<QString> HanwhaResponse::findParameter(const QString& parameterName, int channel) const
 {
-    auto itr = m_response.find(parameterName);
+    auto itr = m_response.find(channel == kNoChannel
+        ? parameterName : lit("Channel.%1.%2").arg(channel).arg(parameterName));
     if (itr == m_response.cend())
         return boost::none;
 
@@ -167,41 +205,43 @@ boost::optional<QString> HanwhaResponse::findParameter(const QString& parameterN
 }
 
 template<>
-boost::optional<bool> HanwhaResponse::parameter<bool>(const QString& parameterName) const
+boost::optional<bool> HanwhaResponse::parameter<bool>(const QString& parameterName, int channel) const
 {
-    return toBool(findParameter(parameterName));
+    return toBool(findParameter(parameterName, channel));
 }
 
 template<>
-boost::optional<int> HanwhaResponse::parameter<int>(const QString& parameterName) const
+boost::optional<int> HanwhaResponse::parameter<int>(const QString& parameterName, int channel) const
 {
-    return toInt(findParameter(parameterName));
+    return toInt(findParameter(parameterName, channel));
 }
 
 template<>
-boost::optional<double> HanwhaResponse::parameter<double>(const QString& parameterName) const
+boost::optional<double> HanwhaResponse::parameter<double>(const QString& parameterName, int channel) const
 {
-    return toDouble(findParameter(parameterName));
+    return toDouble(findParameter(parameterName, channel));
 }
 
 template<>
-boost::optional<AVCodecID> HanwhaResponse::parameter<AVCodecID>(const QString& parameterName) const
+boost::optional<AVCodecID> HanwhaResponse::parameter<AVCodecID>(const QString& parameterName, int channel) const
 {
-    return toCodecId(findParameter(parameterName));
+    return toCodecId(findParameter(parameterName, channel));
 }
 
 template<>
-boost::optional<QSize> HanwhaResponse::parameter<QSize>(const QString& parameterName) const
+boost::optional<QSize> HanwhaResponse::parameter<QSize>(const QString& parameterName, int channel) const
 {
-    return toQSize(findParameter(parameterName));
+    return toQSize(findParameter(parameterName, channel));
 }
 
 template<>
-boost::optional<QString> HanwhaResponse::parameter<QString>(const QString& parameterName) const
+boost::optional<QString> HanwhaResponse::parameter<QString>(const QString& parameterName, int channel) const
 {
-    return findParameter(parameterName);
+    return findParameter(parameterName, channel);
 }
 
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

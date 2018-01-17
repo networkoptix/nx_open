@@ -3,12 +3,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cpp</artifactId>
     <packaging>pom</packaging>
@@ -232,6 +232,14 @@
                                         <replacement>
                                             <token>${project.artifactId}${parsedVersion.majorVersion}</token>
                                             <value>${project.artifactId}</value>
+                                        </replacement>
+                                        <replacement>
+                                            <token>${targetName}${release.version}</token>
+                                            <value>${targetName}</value>
+                                        </replacement>
+                                        <replacement>
+                                            <token>${targetName}${parsedVersion.majorVersion}</token>
+                                            <value>${targetName}</value>
                                         </replacement>
 
                                         <!-- Disabling compile of .res file (otherwise we come into duplicate resource error during linkage) -->

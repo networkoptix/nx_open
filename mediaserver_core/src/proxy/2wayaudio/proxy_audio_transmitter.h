@@ -3,7 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <core/dataconsumer/audio_data_transmitter.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <utils/common/request_param.h>
 #include <nx/network/socket.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
@@ -31,7 +31,7 @@ private:
 private:
     QnResourcePtr m_camera;
     bool m_initialized;
-    std::unique_ptr<AbstractStreamSocket> m_socket;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
     const QnRequestParams m_params;
     int m_sequence;
     std::unique_ptr<QnRtspFfmpegEncoder> m_serializer;

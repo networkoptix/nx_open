@@ -69,11 +69,11 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
         if (!mServer)
             return false;
 
-        nx_http::HttpClient httpClient;
+        nx::network::http::HttpClient httpClient;
         httpClient.addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, m_camera->getParentId().toByteArray());
         httpClient.addAdditionalHeader("Connection", "Keep-Alive");
 
-        QUrl url;
+        nx::utils::Url url;
         url.setScheme("http");
         url.setHost(route.addr.address.toString());
         url.setPort(route.addr.port);
@@ -87,7 +87,7 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
         httpClient.setSendTimeoutMs(kRequestTimeout);
         if (!httpClient.doPost(url, "text/plain", QByteArray()))
             return false;
-        if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
+        if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
             return false;
 
         m_socket = httpClient.takeSocket();

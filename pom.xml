@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
@@ -80,15 +80,18 @@
         <vms_gateway_ut.guid>{DFBAE289-29C2-4026-A8F6-B8A2D131DC75}</vms_gateway_ut.guid>
         <libconnection_mediator.guid>{109DCEE1-AADA-4C88-9FE4-8521525EF7FF}</libconnection_mediator.guid>
         <cloud_connect_auto_test.guid>{D2C6C354-447F-4786-9270-FD2F73552322}</cloud_connect_auto_test.guid>
-        <libvms_gateway.guid>{76E39CFB-F504-428A-B67E-2544D4222E28}</libvms_gateway.guid>
+        <libvms_gateway_core.guid>{76E39CFB-F504-428A-B67E-2544D4222E28}</libvms_gateway_core.guid>
         <vms_gateway.guid>{A2C631CB-073C-4F1A-9B47-63C52B68B71C}</vms_gateway.guid>
         <testcamera.guid>{f98dae04-4b22-4d73-b55a-038cfa0f3cfe}</testcamera.guid>
+        <librelaying.guid>{237616bc-45ea-43cf-a2c1-4049468d92a9}</librelaying.guid>
         <libtraffic_relay.guid>{237676bc-45ea-43cf-a2c1-4048468d92a9}</libtraffic_relay.guid>
         <traffic_relay.guid>{7f7104b2-1f99-4e4f-bff3-ad050eb0db8e}</traffic_relay.guid>
         <nx_kit.guid>{5db17d17-17fe-4ebe-a14f-ffced5d2c09b}</nx_kit.guid>
         <vms_cloud_integration_tests.guid>{45F679BE-E497-40AD-9E0E-5401D3BE1C6D}</vms_cloud_integration_tests.guid>
         <hanwha_metadata_plugin.guid>{414bb961-a348-4e39-ac20-4e65e1d246ca}</hanwha_metadata_plugin.guid>
+        <hikvision_metadata_plugin.guid>{67178141-FE19-410C-BA94-3A2166A8BE47}</hikvision_metadata_plugin.guid>
         <stub_metadata_plugin.guid>{8f5484ec-6bea-4a9c-8746-9e49d6fea726}</stub_metadata_plugin.guid>
+        <root_tool.guid>{366783da-a82c-11e7-b026-57c39dec835a}</root_tool.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -124,7 +127,9 @@
         <minilauncher.name>${company.name} ${display.product.name} Launcher</minilauncher.name>
         <media_db_util.name>${company.name} ${display.product.name} Media DB Utility</media_db_util.name>
         <hanwha_metadata_plugin.name>${company.name} Hanwha metadata plugin</hanwha_metadata_plugin.name>
+        <hikvision_metadata_plugin.name>${company.name} Hikvision metadata plugin</hikvision_metadata_plugin.name>
         <stub_metadata_plugin.name>${company.name} Stub metadata plugin</stub_metadata_plugin.name>
+        <root_tool.name>${company.name} Root tool</root_tool.name>
 
         <product.display.title>${product.title}</product.display.title>
 
@@ -162,7 +167,7 @@
         <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
-        <help.version>${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</help.version>
+        <help.version>${customization}-3.1.1</help.version>
         <ClientHelpSourceDir>${packages.dir}/any/help-${help.version}/bin/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
@@ -217,6 +222,8 @@
         <customization.defines/>
 
         <additionalQrcPaths/>
+
+        <distribution_output_dir/>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
         <qtlibs>
@@ -534,6 +541,7 @@
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>plugins/metadata/hanwha_metadata_plugin</module>
+                <module>plugins/metadata/hikvision_metadata_plugin</module>
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
@@ -541,6 +549,18 @@
 
                 <!-- <module>mediaproxy</module> -->
             </modules>
+        </profile>
+        <profile>
+            <id>not-hanwha</id>
+            <activation>
+                <property>
+                    <name>customization</name>
+                    <value>!hanwha</value>
+                </property>
+            </activation>
+            <properties>
+                <customization.defines>DISABLE_HANWHA</customization.defines>
+            </properties>
         </profile>
         <profile>
             <id>desktop</id>
@@ -556,12 +576,14 @@
             </properties>
             <modules>
                 <module>common_libs/nx_audio</module>
+<!--
                 <module>client/applauncher</module>
                 <module>client/nx_client_core</module>
                 <module>client/nx_client_desktop</module>
                 <module>client/desktop_client</module>
+-->
                 <module>common_libs/nx_media</module>
-                <module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/libvms_gateway_core</module>
             </modules>
         </profile>
         <profile>
@@ -577,7 +599,7 @@
                 </property>
             </activation>
             <modules>
-                <module>client/mobile_client</module>
+                <!-- <module>client/mobile_client</module> -->
             </modules>
         </profile>
         <profile>
@@ -674,9 +696,10 @@
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>media_db_util</module>
-                <module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/libvms_gateway_core</module>
                 <module>nx_cloud/vms_gateway</module>
                 <module>common_libs/nx_cassandra</module>
+                <module>nx_cloud/librelaying</module>
                 <module>nx_cloud/libtraffic_relay</module>
                 <module>nx_cloud/traffic_relay</module>
                 <module>client/minilauncher</module>
@@ -685,7 +708,7 @@
                 <!--<module>vmaxproxy</module>  -->
                 <!--<module>nxtool</module>-->
                 <module>testcamera</module>
-                <module>wixsetup</module>
+                <!-- <module>wixsetup</module> -->
             </modules>
         </profile>
 
@@ -783,7 +806,7 @@
                 <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
                 <installation.root>/Applications/</installation.root>
                 <artifact.name.platform>mac</artifact.name.platform>
-                <qt.version>5.6.2-2</qt.version>
+                <qt.version>5.6.3</qt.version>
                 <festival.version>2.1</festival.version>
                 <openssl.version>1.0.2e-2</openssl.version>
                 <quazip.version>0.7.3</quazip.version>
@@ -792,12 +815,13 @@
             <modules>
                 <module>common_libs/nx_email</module>
                 <module>common_libs/nx_speech_synthesizer</module>
-                <module>macsetup/client-dmg</module>
+                <!-- <module>macsetup/client-dmg</module> -->
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>common_libs/nx_cassandra</module>
+                <module>nx_cloud/librelaying</module>
                 <module>nx_cloud/libtraffic_relay</module>
-                <module>client/mobile_client</module>
+                <!-- <module>client/mobile_client</module> -->
             </modules>
         </profile>
 
@@ -821,17 +845,20 @@
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>nx_cloud/librelaying</module>
                 <module>nx_cloud/libtraffic_relay</module>
                 <module>common_libs/nx_cassandra</module>
                 <module>media_db_util</module>
                 <module>testcamera</module>
-                <module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/libvms_gateway_core</module>
                 <module>nx_cloud/vms_gateway</module>
                 <module>nx_cloud/time_server</module>
                 <module>plugins/it930x_plugin</module>
+                <!--
                 <module>debsetup/client-deb</module>
+                -->
                 <module>debsetup/mediaserver-deb</module>
-
+                <module>root_tool</module>
                 <!-- <module>storage_plugins/teststorageplugin/test</module> -->
             </modules>
             <properties>
@@ -910,7 +937,8 @@
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
-                <gcc.version>4.9.3</gcc.version>
+                <gcc.version>4.9.4</gcc.version>
+                <qt.version>5.6.1-2</qt.version>
                 <qt.spec/>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
@@ -955,8 +983,10 @@
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speech_synthesizer</module>
+                <!-- 
                 <module>client/nx_client_core</module>
                 <module>client/mobile_client</module>
+                -->
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>media_db_util</module>
@@ -1019,14 +1049,16 @@
                 <target.arch>armhf</target.arch>
             </properties>
             <modules>
+<!--
                 <module>client/nx_client_core</module>
                 <module>client/nx_client_desktop</module>
                 <module>client/desktop_client</module>
                 <module>client/applauncher</module>
-                <module>nx_cloud/libvms_gateway</module>
+                <module>debsetup/client-deb</module>
+-->
+                <module>nx_cloud/libvms_gateway_core</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speech_synthesizer</module>
-                <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
             </modules>
         </profile>
@@ -1119,8 +1151,10 @@
             <modules>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
+                <!--
                 <module>client/nx_client_core</module>
                 <module>client/mobile_client</module>
+                -->
             </modules>
             <properties>
             </properties>
@@ -1264,7 +1298,18 @@
                 <artifact.name.cloud.suffix>-${cloudGroup}</artifact.name.cloud.suffix>
             </properties>
         </profile>
-
+        <profile>
+            <id>help</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>help</name>
+                </property>
+            </activation>
+            <modules>
+                <module>help</module>
+            </modules>
+        </profile>
         <!-- End of artifact naming profiles -->
 
     </profiles>

@@ -8,6 +8,7 @@
 #include <client/client_color_types.h>
 
 #include <ui/customization/customized.h>
+#include <nx/utils/url.h>
 
 class QnServerAddressesModel : public Customized<QAbstractItemModel> {
     Q_OBJECT
@@ -33,23 +34,23 @@ public:
     void setPort(int port);
     int port() const;
 
-    void setAddressList(const QList<QUrl> &addresses);
-    QList<QUrl> addressList() const;
+    void setAddressList(const QList<nx::utils::Url> &addresses);
+    QList<nx::utils::Url> addressList() const;
 
-    void setManualAddressList(const QList<QUrl> &addresses);
-    QList<QUrl> manualAddressList() const;
+    void setManualAddressList(const QList<nx::utils::Url> &addresses);
+    QList<nx::utils::Url> manualAddressList() const;
 
-    void setIgnoredAddresses(const QSet<QUrl> &ignoredAddresses);
-    QSet<QUrl> ignoredAddresses() const;
+    void setIgnoredAddresses(const QSet<nx::utils::Url> &ignoredAddresses);
+    QSet<nx::utils::Url> ignoredAddresses() const;
 
-    void addAddress(const QUrl &url, bool isManualAddress = true);
+    void addAddress(const nx::utils::Url &url, bool isManualAddress = true);
     void removeAddressAtIndex(const QModelIndex &index);
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
     void clear();
-    void resetModel(const QList<QUrl> &addresses, const QList<QUrl> &manualAddresses, const QSet<QUrl> &ignoredAddresses, int port);
+    void resetModel(const QList<nx::utils::Url> &addresses, const QList<nx::utils::Url> &manualAddresses, const QSet<nx::utils::Url> &ignoredAddresses, int port);
 
     bool isManualAddress(const QModelIndex &index) const;
 
@@ -70,14 +71,14 @@ signals:
     void urlEditingFailed(const QModelIndex &index, int error);
 
 private:
-    QUrl addressAtIndex(const QModelIndex &index, int defaultPort = -1) const;
+    nx::utils::Url addressAtIndex(const QModelIndex &index, int defaultPort = -1) const;
 
 private:
     bool m_readOnly;
     int m_port;
-    QList<QUrl> m_addresses;
-    QList<QUrl> m_manualAddresses;
-    QSet<QUrl> m_ignoredAddresses;
+    QList<nx::utils::Url> m_addresses;
+    QList<nx::utils::Url> m_manualAddresses;
+    QSet<nx::utils::Url> m_ignoredAddresses;
 
     QnRoutingManagementColors m_colors;
 };

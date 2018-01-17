@@ -3,8 +3,8 @@
 
 #ifdef ENABLE_TEST_CAMERA
 
-#include <core/dataprovider/spush_media_stream_provider.h>
-#include <nx/network/simple_http_client.h>
+#include <providers/spush_media_stream_provider.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/socket.h>
 #include <nx/streaming/rtsp_client.h>
 
@@ -24,7 +24,7 @@ protected:
 
     int receiveData(quint8* buffer, int size);
 private:
-    std::unique_ptr<AbstractStreamSocket> m_tcpSock;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSock;
     QnConstMediaContextPtr m_context;
 };
 

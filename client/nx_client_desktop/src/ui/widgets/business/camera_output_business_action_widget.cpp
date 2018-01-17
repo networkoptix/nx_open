@@ -21,11 +21,13 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget* 
 {
     ui->setupUi(this);
 
+    ui->timeDuration->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
+    ui->timeDuration->addDurationSuffix(QnTimeStrings::Suffix::Hours);
+
     connect(ui->fixedDurationCheckBox, &QCheckBox::toggled, this,
         [this](bool checked)
         {
-            ui->fixedDurationSpinBox->setEnabled(checked);
-            ui->fixedDurationSuffixLabel->setEnabled(checked);
+            ui->timeDuration->setEnabled(checked);
 
             // Prolonged type of event has changed. In case of instant
             // action event state should be updated
@@ -35,11 +37,12 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget* 
             emit paramsChanged();
         });
 
+    ui->fixedDurationCheckBox->setCheckable(true);
+
     connect(ui->relayComboBox, QnComboboxCurrentIndexChanged, this,
         &QnCameraOutputBusinessActionWidget::paramsChanged);
 
-    connect(ui->fixedDurationSpinBox, QnSpinboxIntValueChanged, this,
-        &QnCameraOutputBusinessActionWidget::paramsChanged);
+    connect(ui->timeDuration, SIGNAL(valueChanged()), this, SLOT(paramsChanged()));
 
     setHelpTopic(this, Qn::EventsActions_CameraOutput_Help);
 }
@@ -51,8 +54,8 @@ void QnCameraOutputBusinessActionWidget::updateTabOrder(QWidget* before, QWidget
 {
     setTabOrder(before, ui->relayComboBox);
     setTabOrder(ui->relayComboBox, ui->fixedDurationCheckBox);
-    setTabOrder(ui->fixedDurationCheckBox, ui->fixedDurationSpinBox);
-    setTabOrder(ui->fixedDurationSpinBox, after);
+    setTabOrder(ui->fixedDurationCheckBox, ui->timeDuration);
+    setTabOrder(ui->timeDuration, after);
 }
 
 void QnCameraOutputBusinessActionWidget::at_model_dataChanged(Fields fields)
@@ -123,7 +126,7 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(Fields fields)
         ui->fixedDurationCheckBox->setChecked(fixedDuration > 0);
         if (fixedDuration > 0)
         {
-            ui->fixedDurationSpinBox->setValue(fixedDuration);
+            ui->timeDuration->setValue(fixedDuration);
         }
     }
 }
@@ -136,7 +139,7 @@ void QnCameraOutputBusinessActionWidget::paramsChanged()
     auto params = model()->actionParams();
     params.relayOutputId = ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString();
     params.durationMs = ui->fixedDurationCheckBox->isChecked()
-        ? ui->fixedDurationSpinBox->value() * 1000
+        ? ui->timeDuration->value() * 1000
         : 0;
 
     model()->setActionParams(params);

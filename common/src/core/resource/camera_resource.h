@@ -14,8 +14,6 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_media_stream_info.h>
 
-class QnAbstractDTSFactory;
-
 class CameraMediaStreams;
 class CameraBitrates;
 class CameraBitrateInfo;
@@ -28,11 +26,6 @@ class QN_EXPORT QnVirtualCameraResource : public QnSecurityCamResource
     using base_type = QnSecurityCamResource;
 public:
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
-
-    QnAbstractDTSFactory* getDTSFactory();
-    void setDTSFactory(QnAbstractDTSFactory* factory);
-    void lockDTSFactory();
-    void unLockDTSFactory();
 
     virtual QString getUniqueId() const override;
 
@@ -58,7 +51,6 @@ public:
     QnAspectRatio aspectRatio() const;
 
 private:
-    QnAbstractDTSFactory* m_dtsFactory;
     int m_issueCounter;
     QElapsedTimer m_lastIssueTimer;
     std::map<Qn::ConnectionRole, QString> m_cachedStreamUrls;
@@ -66,7 +58,7 @@ private:
 
 
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);
-const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
+const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 360);
 const QSize SECONDARY_STREAM_MAX_RESOLUTION(1024, 768);
 
 class QN_EXPORT QnPhysicalCameraResource : public QnVirtualCameraResource
@@ -77,9 +69,6 @@ public:
 
     // the difference between desired and real is that camera can have multiple clients we do not know about or big exposure time
     int getPrimaryStreamRealFps() const;
-
-    float rawSuggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const;
-    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
 
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
@@ -96,7 +85,35 @@ public:
     bool saveBitrateIfNeeded( const CameraBitrateInfo& bitrateInfo );
 
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
-    static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList, double* coeff = 0); // find resolution helper function
+
+    /**
+     * @param resolution Resolution for which we want to find the closest one.
+     * @param aspectRatio Ideal aspect ratio for resolution we want to find. If 0 than this
+     *  this parameter is not taken in account.
+     * @param maxResolutionArea Maximum area of found resolution.
+     * @param resolutionList List of resolutions from which we should choose closest
+     * @param outCoefficient Output parameter. Measure of similarity for original resolution
+     *  and a found one.
+     * @return Closest resolution or empty QSize if nothing found.
+     */
+    static QSize getNearestResolution(
+        const QSize& resolution,
+        float aspectRatio,
+        double maxResolutionArea,
+        const QList<QSize>& resolutionList,
+        double* outCoefficient = 0);
+
+    /**
+     * Simple wrapper for getNearestResolution(). Calls getNearestResolution() twice.
+     * First time it calls it with provided aspectRatio. If appropriate resolution is not found
+     * getNearestResolution() is called with 0 aspectRatio.
+     */
+    static QSize closestResolution(
+        const QSize& idealResolution,
+        float aspectRatio,
+        const QSize& maxResolution,
+        const QList<QSize>& resolutionList,
+        double* outCoefficient = 0);
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;

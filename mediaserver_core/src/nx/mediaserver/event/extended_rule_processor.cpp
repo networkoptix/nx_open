@@ -26,7 +26,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_history.h>
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <database/server_db.h>
 
@@ -61,7 +61,7 @@
 
 #include <providers/stored_file_data_provider.h>
 #include <streaming/audio_streamer_pool.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include <nx/streaming/abstract_archive_stream_reader.h>
 
@@ -299,7 +299,16 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
     }
 
     if (result)
-        qnServerDb->saveActionToDB(action);
+    {
+        if (actionRequiresLogging(action))
+        {
+            qnServerDb->saveActionToDB(action);
+        }
+        else
+        {
+            NX_DEBUG(this, "Omitted event logging at executeActionInternal");
+        }
+    }
 
     return result;
 }
@@ -406,14 +415,16 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
 
 bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractActionPtr& action)
 {
-    QUrl url(action->getParams().url);
+    const nx::vms::event::ActionParameters& actionParameters=action->getParams();
 
-    if (action->getParams().text.isEmpty())
+    nx::utils::Url url(action->getParams().url);
+    if ((actionParameters.requestType == nx::network::http::Method::get) ||
+        (actionParameters.requestType.isEmpty() && actionParameters.text.isEmpty()))
     {
-        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType messageBody)
+        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType messageBody)
         {
             if (osErrorCode != SystemError::noError ||
-                statusCode != nx_http::StatusCode::ok)
+                statusCode != nx::network::http::StatusCode::ok)
             {
                 qWarning() << "Failed to execute HTTP action for url "
                     << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
@@ -423,9 +434,11 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
             }
         };
 
-        nx_http::downloadFileAsync(
+        nx::network::http::downloadFileAsync(
             url,
-            callback);
+            callback,
+            nx::network::http::HttpHeaders(),
+            actionParameters.authType);
         return true;
     }
     else
@@ -433,7 +446,7 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
         auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode)
         {
             if (osErrorCode != SystemError::noError ||
-                statusCode != nx_http::StatusCode::ok)
+                statusCode != nx::network::http::StatusCode::ok)
             {
                 qWarning() << "Failed to execute HTTP action for url "
                            << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
@@ -442,15 +455,16 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
             }
         };
 
-        QByteArray contentType = action->getParams().contentType.toUtf8();
+        QByteArray contentType = actionParameters.contentType.toUtf8();
         if (contentType.isEmpty())
-            contentType = autoDetectHttpContentType(action->getParams().text.toUtf8());
+            contentType = autoDetectHttpContentType(actionParameters.text.toUtf8());
 
-        nx_http::uploadDataAsync(url,
+        nx::network::http::uploadDataAsync(url,
             action->getParams().text.toUtf8(),
             contentType,
-            nx_http::HttpHeaders(),
-            callback);
+            nx::network::http::HttpHeaders(),
+            callback,
+            actionParameters.authType);
         return true;
     }
 }
@@ -486,7 +500,7 @@ bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingAc
                 camera,
                 action->getStreamQuality(),
                 action->getFps(),
-                0, /* Record-before setup is forbidden */
+                action->getRecordBeforeSec(), //< Record-before setup is allowed after VMS-7148 is implemented
                 action->getRecordAfterSec(),
                 action->getDurationSec());
         }
@@ -560,7 +574,7 @@ QByteArray ExtendedRuleProcessor::getEventScreenshotEncoded(const QnUuid& id, qi
     QByteArray frame;
     QByteArray contentType;
     auto result = handler.getScreenshot(commonModule(), request, frame, contentType, server->getPort());
-    if (result != nx_http::StatusCode::ok)
+    if (result != nx::network::http::StatusCode::ok)
         return QByteArray();
     return frame;
 
@@ -762,6 +776,10 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
     contextMap[tpSource] = helper.getResoureNameFromParams(params, Qn::ResourceInfoLevel::RI_NameOnly);
     contextMap[tpSourceIP] = helper.getResoureIPFromParams(params);
 
+    const auto aggregationCount = action->getAggregationCount();
+    if (aggregationCount > 1)
+        contextMap[tpCount] = QString::number(aggregationCount);
+
     switch (eventType)
     {
         case vms::event::cameraMotionEvent:
@@ -792,11 +810,6 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                 ? helper.defaultSoftwareTriggerName()
                 : params.caption;
 
-            const auto aggregationCount = action->getAggregationCount();
-
-            if (aggregationCount > 1)
-                contextMap[tpCount] = QString::number(aggregationCount);
-
             contextMap[tpTimestamp] = helper.eventTimestampShort(params, aggregationCount);
             contextMap[tpTimestampDate] = helper.eventTimestampDate(params);
             contextMap[tpTimestampTime] = helper.eventTimestampTime(params);
@@ -816,12 +829,6 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
         case vms::event::analyticsSdkEvent:
         {
             contextMap[tpAnalyticsSdkEventType] = helper.getAnalyticsSdkEventName(params);
-
-            const auto aggregationCount = action->getAggregationCount();
-
-            if (aggregationCount > 1)
-                contextMap[tpCount] = QString::number(aggregationCount);
-
             contextMap[tpTimestamp] = helper.eventTimestampShort(params, aggregationCount);
             contextMap[tpTimestampDate] = helper.eventTimestampDate(params);
             contextMap[tpTimestampTime] = helper.eventTimestampTime(params);

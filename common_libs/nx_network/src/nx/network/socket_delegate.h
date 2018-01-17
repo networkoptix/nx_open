@@ -8,7 +8,7 @@ namespace nx {
 namespace network {
 
 /**
- * Base for some class that wants to extend socket functionality a bit 
+ * Base for some class that wants to extend socket functionality a bit
  * and delegate rest of API calls to existing implementation.
  */
 template<typename SocketInterfaceToImplement>
@@ -95,6 +95,16 @@ public:
         return m_target->getReuseAddrFlag(val);
     }
 
+    virtual bool setReusePortFlag(bool value) override
+    {
+        return m_target->setReusePortFlag(value);
+    }
+
+    virtual bool getReusePortFlag(bool* value) const override
+    {
+        return m_target->getReusePortFlag(value);
+    }
+
     virtual bool setNonBlockingMode(bool val) override
     {
         return m_target->setNonBlockingMode(val);
@@ -177,9 +187,9 @@ public:
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override
+        std::chrono::milliseconds timeout) override
     {
-        return this->m_target->connect(remoteSocketAddress, timeoutMillis);
+        return this->m_target->connect(remoteSocketAddress, timeout);
     }
 
     virtual int recv(void* buffer, unsigned int bufferLen, int flags) override
@@ -216,14 +226,14 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
+        IoCompletionHandler handler) override
     {
         return this->m_target->readSomeAsync(buffer, std::move(handler));
     }
 
     virtual void sendAsync(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
+        IoCompletionHandler handler) override
     {
         return this->m_target->sendAsync(buffer, std::move(handler));
     }
@@ -259,7 +269,6 @@ class NX_NETWORK_API StreamSocketDelegate:
 public:
     StreamSocketDelegate(AbstractStreamSocket* target);
 
-    virtual bool reopen() override;
     virtual bool setNoDelay(bool value) override;
     virtual bool getNoDelay(bool* value) const override;
     virtual bool toggleStatisticsCollection(bool val) override;

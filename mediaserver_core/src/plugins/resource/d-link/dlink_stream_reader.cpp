@@ -164,7 +164,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
 		}
 		else
 		{
-			return CameraDiagnostics::RequestFailedResult(m_profile.url, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
+			return CameraDiagnostics::RequestFailedResult(m_profile.url, QLatin1String(nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)status)));
 		}
     }
 }
@@ -185,8 +185,8 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr();
 
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+        return getMetadata();
 
     if (m_profile.codec.contains("264"))
         return m_rtpReader.getNextData();
@@ -261,8 +261,10 @@ QByteArray PlDlinkStreamReader::getQualityString(const QnLiveStreamParams& param
     return info.possibleQualities[qualityIndex];
 }
 
-QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, const QnLiveStreamParams& params)
+QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, const QnLiveStreamParams& streamParams)
 {
+    QnLiveStreamParams params = streamParams;
+
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
     QnDlink_cam_info info = res->getCamInfo();
 
@@ -296,15 +298,15 @@ QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, c
     {
         t << "&resolution=" << resolution.width() << "x" << resolution.height() << "&";
 
-        int fps = info.frameRateCloseTo( qMin((int)params.fps, res->getMaxFps()) );
-        t << "framerate=" << fps << "&";
+        params.fps = info.frameRateCloseTo( qMin((int)params.fps, res->getMaxFps()) );
+        t << "framerate=" << params.fps << "&";
         t << "codec=" << profile.codec.toLower() << "&";
         bool useCBR = (profile.codec.contains("264") || profile.codec == "MPEG4");
         if (useCBR)
         {
             // just CBR fo mpeg so far
             t << "qualitymode=CBR" << "&";
-            t << "bitrate=" <<  info.bitrateCloseTo(res->suggestBitrateKbps(params.quality, resolution, fps));
+            t << "bitrate=" <<  info.bitrateCloseTo(res->suggestBitrateKbps(resolution, params, getRole()));
         }
         else
         {

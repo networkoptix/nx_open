@@ -226,8 +226,8 @@ protected:
     {
         PollSetFactory::instance()->disableUdt();
         m_customAioService = std::make_unique<aio::AIOService>();
+        ASSERT_TRUE(m_customAioService->initialize());
         PollSetFactory::instance()->enableUdt();
-        ASSERT_TRUE(m_customAioService->isInitialized());
     }
 
     void runTest()

@@ -175,15 +175,13 @@ bool QnResourceWidgetRenderer::isHardwareDecoderUsed(int channel) const
     return ctx.renderer ? ctx.renderer->isHardwareDecoderUsed() : 0;
 }
 
-QnAbstractCompressedMetadataPtr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
+qint64 QnResourceWidgetRenderer::lastDisplayedTimestampUsec(int channel) const
 {
     if (m_channelRenderers.size() <= static_cast<size_t>(channel))
-        return QnAbstractCompressedMetadataPtr();
+        return -1;
 
-    const RenderingTools& ctx = m_channelRenderers[channel];
-    return ctx.renderer
-        ? ctx.renderer->lastFrameMetadata()
-        : QnAbstractCompressedMetadataPtr();
+    const RenderingTools& ctx = m_channelRenderers[static_cast<size_t>(channel)];
+    return ctx.renderer ? ctx.renderer->lastDisplayedTime() : -1;
 }
 
 void QnResourceWidgetRenderer::setBlurFactor(qreal value)
@@ -202,6 +200,18 @@ Qn::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &sour
 
     ctx.renderer->setBlurFactor(m_blurFactor);
     return ctx.renderer->paint(sourceRect, targetRect);
+}
+
+Qn::RenderStatus QnResourceWidgetRenderer::discardFrame(int channel)
+{
+    if (m_channelRenderers.size() <= static_cast<size_t>(channel))
+        return Qn::NothingRendered;
+
+    const auto& ctx = m_channelRenderers[static_cast<size_t>(channel)];
+    if (!ctx.renderer)
+        return Qn::NothingRendered;
+
+    return ctx.renderer->discardFrame();
 }
 
 void QnResourceWidgetRenderer::skip(int channel) {

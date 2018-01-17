@@ -90,10 +90,10 @@ QnActiResource::~QnActiResource()
 
 void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
-    QUrl apiUrl;
+    nx::utils::Url apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
-    apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    apiUrl.setPort( QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT) );
 
     QAuthenticator auth = getAuth();
 
@@ -104,10 +104,10 @@ void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHan
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
-        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
+        ( SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody ) mutable
     {
         if( osErrorCode != SystemError::noError ||
-            statusCode != nx_http::StatusCode::ok )
+            statusCode != nx::network::http::StatusCode::ok )
         {
             return completionHandler( false );
         }
@@ -121,7 +121,7 @@ void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHan
         completionHandler(mac == resourceMac);
     };
 
-    nx_http::downloadFileAsync(
+    nx::network::http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc );
 }
@@ -185,7 +185,7 @@ CLHttpStatus QnActiResource::makeActiRequest(
     QByteArray* const msgBody,
     QString* const localAddress )
 {
-    CLSimpleHTTPClient client(url.host(), url.port(nx_http::DEFAULT_HTTP_PORT), TCP_TIMEOUT, QAuthenticator());
+    CLSimpleHTTPClient client(url.host(), url.port(nx::network::http::DEFAULT_HTTP_PORT), TCP_TIMEOUT, QAuthenticator());
     QString pattern(QLatin1String("cgi-bin/%1?USER=%2&PWD=%3&%4"));
     CLHttpStatus status = client.doGET(pattern.arg(group).arg(auth.user()).arg(auth.password()).arg(command));
     if (status == CL_HTTP_SUCCESS) {
@@ -360,7 +360,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     auto report = parseSystemInfo(serverReport);
 
     setFirmware(report.value(kActiFirmawareVersionParamName));
-    setMAC(QnMacAddress(report.value(kActiMacAddressParamName)));
+    setMAC(nx::network::QnMacAddress(report.value(kActiMacAddressParamName)));
 
     m_platform = report.value(kActiPlatformParamName)
         .trimmed()
@@ -739,13 +739,13 @@ void QnActiResource::stopInputPortMonitoringAsync()
     m_inputMonitored = false;
 
     QAuthenticator auth = getAuth();
-    QUrl url = getUrl();
+    nx::utils::Url url = getUrl();
     url.setPath(lit("/cgi-bin/%1").arg(lit("encoder")));
     url.setQuery(lit("USER=%1&PWD=%2&%3").arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr));
-    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
     //TODO #ak do not use DummyHandler here. httpClient->doGet should accept functor
-    connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
-        ec2::DummyHandler::instance(), [httpClient](nx_http::AsyncHttpClientPtr) mutable {
+    connect( httpClient.get(), &nx::network::http::AsyncHttpClient::done,
+        ec2::DummyHandler::instance(), [httpClient](nx::network::http::AsyncHttpClientPtr) mutable {
             httpClient->disconnect( nullptr, (const char*)nullptr );
             httpClient.reset();
         },

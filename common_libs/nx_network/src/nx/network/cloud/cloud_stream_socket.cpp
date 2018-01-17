@@ -1,9 +1,9 @@
 #include "cloud_stream_socket.h"
 
-#include <nx/utils/system_error.h>
-
+#include <nx/network/aio/aio_service.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/system_error.h>
 
 #include "tunnel/outgoing_tunnel.h"
 #include "../socket_global.h"
@@ -53,7 +53,7 @@ void CloudStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 
 bool CloudStreamSocket::bind(const SocketAddress& localAddress)
 {
-    // TODO: #ak just ignoring for now. 
+    // TODO: #ak just ignoring for now.
     // Usually, we do not care about the exact port on tcp client socket.
     static_cast<void>(localAddress);
     return true;
@@ -120,25 +120,20 @@ AbstractSocket::SOCKET_HANDLE CloudStreamSocket::handle() const
     return -1;
 }
 
-bool CloudStreamSocket::reopen()
-{
-    if (m_socketDelegate)
-        return m_socketDelegate->reopen();
-
-    return false;
-}
-
 bool CloudStreamSocket::connect(
     const SocketAddress& remoteAddress,
-    unsigned int timeoutMillis)
+    std::chrono::milliseconds timeout)
 {
     NX_EXPECT(!SocketGlobals::aioService().isInAnyAioThread());
 
     unsigned int sendTimeoutBak = 0;
     if (!getSendTimeout(&sendTimeoutBak))
         return false;
-    if (!setSendTimeout(timeoutMillis))
-        return false;
+    if (timeout != nx::network::kNoTimeout)
+    {
+        if (!setSendTimeout(timeout.count()))
+            return false;
+    }
 
     nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
     {
@@ -170,7 +165,7 @@ bool CloudStreamSocket::connect(
                         promisePtr->set_value(std::make_pair(code, 0));
                 });
         });
-    
+
     auto result = promise.get_future().get().first;
     if (result != SystemError::noError)
     {
@@ -302,22 +297,38 @@ void CloudStreamSocket::connectAsync(
 
 void CloudStreamSocket::readSomeAsync(
     nx::Buffer* const buf,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     if (m_socketDelegate)
+    {
         m_socketDelegate->readSomeAsync(buf, std::move(handler));
+    }
     else
-        m_readIoBinder.post(std::bind(handler, SystemError::notConnected, 0));
+    {
+        m_readIoBinder.post(
+            [handler = std::move(handler)]()
+            {
+                handler(SystemError::notConnected, 0);
+            });
+    }
 }
 
 void CloudStreamSocket::sendAsync(
     const nx::Buffer& buf,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     if (m_socketDelegate)
+    {
         m_socketDelegate->sendAsync(buf, std::move(handler));
+    }
     else
-        m_writeIoBinder.post(std::bind(handler, SystemError::notConnected, 0));
+    {
+        m_writeIoBinder.post(
+            [handler = std::move(handler)]()
+            {
+                handler(SystemError::notConnected, 0);
+            });
+    }
 }
 
 void CloudStreamSocket::registerTimer(
@@ -365,7 +376,11 @@ QString CloudStreamSocket::idForToStringFromPtr() const
 
 QString CloudStreamSocket::getForeignHostName() const
 {
-    return m_cloudTunnelAttributes.remotePeerName;
+    if (!m_cloudTunnelAttributes.remotePeerName.isEmpty())
+        return m_cloudTunnelAttributes.remotePeerName;
+    if (m_socketDelegate)
+        return m_socketDelegate->getForeignHostName();
+    return QString();
 }
 
 void CloudStreamSocket::connectToEntriesAsync(
@@ -437,7 +452,14 @@ void CloudStreamSocket::onConnectDone(
         if (errorCode != SystemError::noError)
             connection.reset();
         if (cloudTunnelAttributes)
+        {
+            NX_VERBOSE(this, lm("Got connection to %1").arg(cloudTunnelAttributes->remotePeerName));
             m_cloudTunnelAttributes = std::move(*cloudTunnelAttributes);
+        }
+        else
+        {
+            NX_VERBOSE(this, lm("Got connection without tunnel attributes"));
+        }
     }
 
     if (errorCode == SystemError::noError)

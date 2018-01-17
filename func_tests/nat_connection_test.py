@@ -1,12 +1,15 @@
-import time
 import logging
-import pytest
+import time
 from datetime import datetime
-from test_utils.utils import SimpleNamespace, datetime_utc_now
-from test_utils.server import TimePeriod
-from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
-import pytz
 
+import pytest
+import pytz
+import requests
+import requests.auth
+
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
+from test_utils.server import TimePeriod
+from test_utils.utils import SimpleNamespace, datetime_utc_now
 
 log = logging.getLogger(__name__)
 
@@ -59,6 +62,7 @@ def wait_for_servers_return_same_results_to_api_call(env, method, api_object, ap
         time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.0)
 
 
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920653/Connection+behind+NAT#ConnectionbehindNAT-test_merged_servers_should_return_same_results_to_certain_api_calls
 def test_merged_servers_should_return_same_results_to_certain_api_calls(env):
     test_api_calls = [
         ('GET', 'ec2', 'getStorages'),
@@ -80,6 +84,7 @@ def assert_both_servers_are_online(env):
             server, len(online_servers))
 
 
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920653/Connection+behind+NAT#ConnectionbehindNAT-test_proxy_requests
 @pytest.mark.parametrize('http_schema', ['http'])
 @pytest.mark.parametrize('nat_schema', ['nat'])
 def test_proxy_requests(env):
@@ -95,6 +100,32 @@ def test_proxy_requests(env):
     assert direct_response_in_front != direct_response_behind
 
 
+@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7818")
+@pytest.mark.parametrize('http_schema', ['http'])
+@pytest.mark.parametrize('nat_schema', ['nat'])
+def test_non_existent_endpoint_via_proxy_with_auth_same_connection(env):
+    # Use requests directly, so REST API wrapper doesn't catch errors.
+    root_url = env.in_front.rest_api.url.rstrip('/')
+    log.debug("Request /api/ping via proxy to show that remote server GUID is correct.")
+    requests.get(root_url + '/api/ping', headers={'X-server-guid': env.behind.ecs_guid})
+    log.debug("Request non-existent path; both requests are made through same connection.")
+    auth = requests.auth.HTTPDigestAuth(env.in_front.rest_api.user, env.in_front.rest_api.password)
+    dummy_response = requests.get(root_url + '/dummy', auth=auth, headers={'X-server-guid': env.behind.ecs_guid})
+    assert dummy_response.status_code == 404, "Expected 404 but got: %r." % dummy_response
+
+
+@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7819")
+@pytest.mark.parametrize('http_schema', ['http'])
+@pytest.mark.parametrize('nat_schema', ['nat'])
+def test_direct_after_proxy_same_connection(env):
+    # Use requests directly, so REST API wrapper doesn't catch errors.
+    front_url = env.in_front.rest_api.url.rstrip('/') + '/api/ping'
+    with requests.Session() as session:
+        session.get(front_url, headers={'X-server-guid': env.behind.ecs_guid})
+        direct_response = session.get(front_url)
+    assert direct_response.status_code == 200, "Expected 200 but got: %r." % direct_response
+
+
 def assert_server_stream(server, camera, sample_media_file, stream_type, artifact_factory, start_time):
     assert TimePeriod(start_time, sample_media_file.duration) in server.get_recorded_time_periods(camera)
     stream = server.get_media_stream(stream_type, camera)
@@ -106,6 +137,7 @@ def assert_server_stream(server, camera, sample_media_file, stream_type, artifac
         assert metadata.height == sample_media_file.height
 
 
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920653/Connection+behind+NAT#ConnectionbehindNAT-test_get_streams
 @pytest.mark.parametrize('http_schema', ['http'])
 @pytest.mark.parametrize('nat_schema', ['nat'])
 def test_get_streams(artifact_factory, env, camera, sample_media_file, stream_type):

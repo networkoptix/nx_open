@@ -8,8 +8,10 @@
 #include <nx/network/stun/message_parser.h>
 #include <nx/network/stun/message_serializer.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/url.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 using MessagePipeline = nx::network::server::BaseStreamProtocolConnectionEmbeddable<
@@ -42,17 +44,18 @@ public:
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     virtual void connect(
-        const QUrl& url,
+        const nx::utils::Url& url,
         ConnectHandler completionHandler = nullptr) override;
 
     virtual bool setIndicationHandler(
         int method, IndicationHandler handler, void* client = nullptr) override;
-    
+
     virtual void addOnReconnectedHandler(ReconnectHandler handler, void* client = nullptr) override;
     virtual void sendRequest(Message request, RequestHandler handler, void* client = nullptr) override;
+    // TODO: #ak This method does not seem to belong here. Remove it.
     virtual bool addConnectionTimer(
         std::chrono::milliseconds period, TimerHandler handler, void* client) override;
-    
+
     virtual SocketAddress localAddress() const override;
     virtual SocketAddress remoteAddress() const override;
     virtual void closeConnection(SystemError::ErrorCode errorCode) override;
@@ -81,7 +84,10 @@ private:
     void processMessage(Message message );
 
     typedef std::map<void*, std::unique_ptr<network::aio::Timer>> ConnectionTimers;
-    void startTimer(ConnectionTimers::iterator timer, std::chrono::milliseconds period, TimerHandler handler);
+    void startTimer(
+        ConnectionTimers::iterator timer,
+        std::chrono::milliseconds period,
+        TimerHandler handler);
 
     virtual void stopWhileInAioThread() override;
 
@@ -111,4 +117,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

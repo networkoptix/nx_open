@@ -30,6 +30,9 @@ public:
         clearArgs();
     }
 
+    ModuleLauncher(ModuleLauncher&&) = default;
+    ModuleLauncher& operator=(ModuleLauncher&&) = default;
+
     void start()
     {
         nx::utils::promise<void> moduleInstantiatedCreatedPromise;

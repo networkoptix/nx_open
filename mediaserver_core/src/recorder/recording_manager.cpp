@@ -20,7 +20,6 @@
 #include "server_stream_recorder.h"
 #include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
-#include "plugins/storage/dts/abstract_dts_reader_factory.h"
 #include <nx/vms/event/rule.h>
 #include <nx/mediaserver/event/rule_processor.h>
 #include <nx/mediaserver/event/event_connector.h>
@@ -271,7 +270,10 @@ bool QnRecordingManager::startOrStopRecording(
     QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
     QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
-    bool needRecordCamera = !isResourceDisabled(res) && !cameraRes->isDtsBased();
+    bool needRecordCamera =
+        !isResourceDisabled(res) &&
+        !cameraRes->isDtsBased() &&
+        !cameraRes->needsToChangeDefaultPassword();
 
     bool someRecordingIsPresent = false;
 
@@ -332,8 +334,8 @@ bool QnRecordingManager::startOrStopRecording(
         if (needStopHi) {
             recorderHiRes->pleaseStop();
             camera->notInUse(recorderHiRes);
-            if (providerHi)
-                providerHi->setFps(cameraRes->getMaxFps());
+            //if (providerHi)
+            //    providerHi->setFps(cameraRes->getMaxFps());
         }
 
         if (needStopLow) {
@@ -464,7 +466,9 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
 
 void QnRecordingManager::at_serverPropertyChanged(const QnResourcePtr &, const QString &key)
 {
-    if (key == QnMediaResource::panicRecordingKey()) {
+    if (key == QnMediaResource::panicRecordingKey())
+    {
+        NX_DEBUG(this, "Panic mode has changed, update camera");
         for (const auto& camera: m_recordMap.keys())
             updateCamera(camera.dynamicCast<QnSecurityCamResource>());
     }
@@ -491,8 +495,8 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
 
     beforeDeleteRecorder(recorders);
     stopRecorder(recorders);
-    qnCameraPool->removeVideoCamera(resource);
     deleteRecorder(recorders, resource);
+    qnCameraPool->removeVideoCamera(resource);
 }
 
 bool QnRecordingManager::isCameraRecoring(const QnResourcePtr& camera) const
@@ -669,33 +673,22 @@ Q_GLOBAL_STATIC(QnServerDataProviderFactory, qn_serverDataProviderFactory_instan
 
 QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role)
 {
+    if (role != Qn::CR_Archive)
+        return nullptr;
+
     QnVirtualCameraResourcePtr vcRes = qSharedPointerDynamicCast<QnVirtualCameraResource>(res);
+    QnAbstractArchiveDelegate* archiveDelegate = nullptr;
+    if (auto camRes = res.dynamicCast<QnSecurityCamResource>())
+        archiveDelegate = camRes->createArchiveDelegate();
+    if (!archiveDelegate)
+        archiveDelegate = new QnServerArchiveDelegate(qnServerModule); // default value
+    if (!archiveDelegate)
+        return nullptr;
 
-
-    bool sholdBeDts = (role == Qn::CR_Archive) && vcRes && vcRes->getDTSFactory();
-    if (sholdBeDts)
-    {
-        QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(res);
-        archiveReader->setCycleMode(false);
-
-        vcRes->lockDTSFactory();
-
-        QnAbstractArchiveDelegate* del = vcRes->getDTSFactory()->createDeligate(vcRes);
-
-        vcRes->unLockDTSFactory();
-
-        archiveReader->setArchiveDelegate(del);
-        return archiveReader;
-
-    }
-    else  if (role == Qn::CR_Archive)
-    {
-        QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(res);
-        archiveReader->setCycleMode(false);
-        archiveReader->setArchiveDelegate(new QnServerArchiveDelegate());
-        return archiveReader;
-    }
-    return 0;
+    QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(res);
+    archiveReader->setCycleMode(false);
+    archiveReader->setArchiveDelegate(archiveDelegate);
+    return archiveReader;
 }
 
 QnServerDataProviderFactory* QnServerDataProviderFactory::instance()

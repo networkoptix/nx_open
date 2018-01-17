@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>알수없는 오류</translation>
+      <translation>알 수 없는 오류.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>새로운 시스템</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>발견 된 시스템 %1이 (가) 현재 시스템과 호환되지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -255,18 +255,6 @@
       <translation>%1포트가 접속가능한지 확인하세요.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>도움이 되지 않는 경우 장치 웹 페이지에서 기본값 복원.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>카메라 아카이브에서 복원 되었습니다. 라이브 비디오를 보려면 카메라를 삭제 한후 다시 추가하십시요.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>우선, 장치 설정에서 녹화모드를 켜고 FPS를 줄이세요 (오류 &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요 (오류 &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요 (오류 &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -416,7 +416,7 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation>비디오 월</translation>
+      <translation>Video Wall</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -424,7 +424,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation>시작:</translation>
+      <translation>시작</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -486,6 +486,14 @@
       <source>Time Licenses</source>
       <translation>Time Licenses</translation>
     </message>
+    <message>
+      <source>Bridge</source>
+      <translation>브릿지</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>브릿지 라이센스</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -542,7 +550,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>알수없는 오류</translation>
+      <translation>알 수 없는 오류</translation>
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
@@ -647,11 +655,11 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>알수 없음</translation>
+      <translation>알 수 없음</translation>
     </message>
     <message>
       <source>FREE License</source>
-      <translation>무료 인증키</translation>
+      <translation>무료 라이센스</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
@@ -690,7 +698,7 @@
     </message>
     <message>
       <source>Best</source>
-      <translation>최적</translation>
+      <translation>최고</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -765,6 +773,10 @@
       <source>Invalid resource type for data export.</source>
       <translation>데이터 내보내기에 대 한 잘못 된 리소스 형식입니다.</translation>
     </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>내 보낼 데이타가 없습니다.</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
@@ -835,7 +847,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>월</translation>
+      <translation>분</translation>
     </message>
     <message>
       <source>y</source>
@@ -986,7 +998,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>사용자 지정.</translation>
+      <translation>사용자 정의</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
@@ -1425,7 +1437,7 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation>Trigger 이름</translation>
+      <translation>트리거 이름</translation>
     </message>
     <message>
       <source>Role</source>
@@ -1473,7 +1485,16 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation>확인</translation>
+      <translation>확인함</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>분석 이벤트</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%2 에서 %1</translation>
     </message>
   </context>
   <context>

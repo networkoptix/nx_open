@@ -1,7 +1,12 @@
 #pragma once
 
+#include <chrono>
+
+#include <boost/optional.hpp>
+
 #include <QUrlQuery>
 
+#include <analytics/detected_objects_storage/analytics_events_storage_types.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
 
@@ -29,11 +34,13 @@ struct QnChunksRequestData
     QnSecurityCamResourceList resList;
     qint64 startTimeMs;
     qint64 endTimeMs;
-    qint64 detailLevel;
+    std::chrono::milliseconds detailLevel;
     bool keepSmallChunks;
     QString filter; //< TODO: This string is a json. Consider changing to QList<QRegion>.
     bool isLocal;
     Qn::SerializationFormat format;
     int limit;
     bool flat;
+
+    boost::optional<nx::analytics::storage::Filter> analyticsStorageFilter;
 };

@@ -10,7 +10,8 @@
 #include <QtWidgets/QComboBox>
 
 #include <camera/cam_display.h>
-#include <camera/single_thumbnail_loader.h>
+#include <camera/resource_display.h>
+#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -23,9 +24,6 @@
 
 #include <platform/environment.h>
 
-#include <transcoding/filters/contrast_image_filter.h>
-#include <transcoding/filters/fisheye_image_filter.h>
-
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -35,7 +33,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
-#include <ui/workbench/workbench_context.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -43,9 +40,8 @@
 #include <nx/utils/string.h>
 #include <utils/common/warnings.h>
 
-#include "transcoding/filters/fisheye_image_filter.h"
 #include "transcoding/filters/filter_helper.h"
-#include "transcoding/filters/abstract_image_filter.h"
+#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -57,12 +53,7 @@ namespace {
     const qint64 latestScreenshotTime = -1;
 }
 
-QnScreenshotParameters::QnScreenshotParameters():
-    utcTimestampMsec(0),
-    isUtc(false),
-    displayTimeMsec(0),
-    customAspectRatio(0.0),
-    rotationAngle(0.0)
+QnScreenshotParameters::QnScreenshotParameters()
 {
     timestampParams.enabled = true;
     timestampParams.corner = Qt::BottomRightCorner;
@@ -180,15 +171,13 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMedi
 
     // Either tiling (pano cameras) and crop rect are handled here, so it isn't passed to image processing params
 
-    QnImageFilterHelper imageProcessingParams;
-    QnMediaResourcePtr mediaRes = display->mediaResource();
-    if (mediaRes)
-        imageProcessingParams.setVideoLayout(layout);
-    imageProcessingParams.setSrcRect(parameters.zoomRect);
-    imageProcessingParams.setContrastParams(parameters.imageCorrectionParams);
-    imageProcessingParams.setDewarpingParams(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
-    imageProcessingParams.setRotation(parameters.rotationAngle);
-    imageProcessingParams.setCustomAR(parameters.customAspectRatio);
+    QnLegacyTranscodingSettings imageProcessingParams;
+    imageProcessingParams.resource = display->mediaResource();
+    imageProcessingParams.zoomWindow = parameters.zoomRect;
+    imageProcessingParams.contrastParams = parameters.imageCorrectionParams;
+    imageProcessingParams.itemDewarpingParams = parameters.itemDewarpingParams;
+    imageProcessingParams.rotation = parameters.rotationAngle;
+    imageProcessingParams.forcedAspectRatio = parameters.customAspectRatio;
 
     QImage screenshot = display->camDisplay()->getScreenshot(imageProcessingParams, anyQuality);
     if (screenshot.isNull())
@@ -283,7 +272,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
     QnResourceDisplayPtr display = widget->display();
 
-    QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog(mainWindow()));
+    QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog(mainWindowWidget()));
     dialog->setMaximum(count);
     dialog->setValue(current);
     dialog->setMinimumWidth(600);
@@ -299,7 +288,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
         Key timeKey(keyStack, lit("_") + parameters.timeString());
 
         parameters.itemDewarpingParams = widget->item()->dewarpingParams();
-        parameters.mediaDewarpingParams = widget->dewarpingParams();
+        parameters.resource = widget->resource();
         parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
 
         for (const ImageCorrectionParams &imageCorr: imageCorrList) {
@@ -344,7 +333,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
     dialog->hide();
     qint64 endTime = QDateTime::currentMSecsSinceEpoch();
-    QnMessageBox::success(mainWindow(),
+    QnMessageBox::success(mainWindowWidget(),
         lit("%1 screenshots done for %2 seconds").arg(count).arg((endTime - startTime) / 1000));
 }
 
@@ -375,7 +364,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.filename = filename;
    // parameters.timestampPosition = qnSettings->timestampCorner(); // TODO: #GDM #3.1 store full screenshot settings
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
-    parameters.mediaDewarpingParams = widget->dewarpingParams();
+    parameters.resource = widget->resource();
     parameters.imageCorrectionParams = widget->item()->imageEnhancement();
     parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
     parameters.customAspectRatio = display->camDisplay()->overridenAspectRatio();
@@ -406,7 +395,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
 
     QScopedPointer<QnSessionAwareFileDialog> dialog(
         new QnSessionAwareFileDialog (
-        mainWindow(),
+        mainWindowWidget(),
         tr("Save Screenshot As..."),
         suggestion,
         allowedFormatFilter
@@ -453,7 +442,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
 
             if (QFile::exists(fileName)
                 && !QnFileMessages::confirmOverwrite(
-                    mainWindow(), QFileInfo(fileName).fileName()))
+                    mainWindowWidget(), QFileInfo(fileName).fileName()))
             {
                 continue;
             }
@@ -467,7 +456,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
         if (QFile::exists(fileName) && !QFile::remove(fileName))
         {
             QnFileMessages::overwriteFailed(
-                mainWindow(), QFileInfo(fileName).fileName());
+                mainWindowWidget(), QFileInfo(fileName).fileName());
             continue;
         }
 
@@ -509,31 +498,33 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     QImage result = image;
 
     if (!result.isNull()) {
-        // TODO: #GDM looks like total mess
+        // TODO: #GDM #3.2 looks like total mess
         parameters.timestampParams.timeMs = parameters.utcTimestampMsec == latestScreenshotTime
             ? QDateTime::currentMSecsSinceEpoch()
             : parameters.displayTimeMsec;
 
-        QnImageFilterHelper transcodeParams;
+        QnLegacyTranscodingSettings transcodeParams;
         // Doing heavy filters only. This filters doesn't supported on server side for screenshots
-        transcodeParams.setDewarpingParams(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
-        transcodeParams.setContrastParams(parameters.imageCorrectionParams);
-        transcodeParams.setTimeStampParams(parameters.timestampParams);
-        transcodeParams.setRotation(parameters.rotationAngle);
-        transcodeParams.setSrcRect(parameters.zoomRect);
-        QList<QnAbstractImageFilterPtr> filters = transcodeParams.createFilterChain(result.size());
+        transcodeParams.itemDewarpingParams = parameters.itemDewarpingParams;
+        transcodeParams.resource = parameters.resource;
+        transcodeParams.contrastParams = parameters.imageCorrectionParams;
+        transcodeParams.timestampParams = parameters.timestampParams;
+        transcodeParams.rotation = parameters.rotationAngle;
+        transcodeParams.zoomWindow = parameters.zoomRect;
+        auto filters = QnImageFilterHelper::createFilterChain(
+            transcodeParams);
 
-        if (!filters.isEmpty()) {
+        // Thumbnail from loader is already merged for panoramic cameras.
+        const QSize noDownscale(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
+        filters.prepareForImage(parameters.resource, result.size(), noDownscale);
+
+        if (!filters.isEmpty())
+        {
             QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(result));
             // TODO: #GDM how is this supposed to work with latestScreenshotTime?
             frame->pts = parameters.utcTimestampMsec * 1000;
-            for(auto filter: filters)
-            {
-                frame = filter->updateImage(frame);
-                if (!frame)
-                    break;
-            }
-            result = (bool)frame ? frame->toImage() : QImage();
+            frame = filters.apply(frame);
+            result = frame ? frame->toImage() : QImage();
         }
     }
 
@@ -543,7 +534,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     {
         hideProgress();
 
-        QnMessageBox::critical(mainWindow(), tr("Failed to save screenshot"));
+        QnMessageBox::critical(mainWindowWidget(), tr("Failed to save screenshot"));
         return;
     }
 
@@ -552,7 +543,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
 void QnWorkbenchScreenshotHandler::showProgressDelayed(const QString &message) {
     if (!m_screenshotProgressDialog) {
-        m_screenshotProgressDialog = new QnSessionAware<QnProgressDialog>(mainWindow());
+        m_screenshotProgressDialog = new QnSessionAware<QnProgressDialog>(mainWindowWidget());
         m_screenshotProgressDialog->setWindowTitle(tr("Saving Screenshot..."));
         m_screenshotProgressDialog->setInfiniteProgress();
         // TODO: #dklychkov ensure concurrent screenshot saving is ok and disable modality
@@ -606,15 +597,17 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
     QnScreenshotParameters localParameters = parameters;
 
     // Revert UI has 'hack'. VerticalDown fisheye option is emulated by additional rotation. But filter has built-in support for that option.
-    if (localParameters.itemDewarpingParams.enabled && localParameters.mediaDewarpingParams.viewMode == QnMediaDewarpingParams::VerticalDown)
+    if (localParameters.itemDewarpingParams.enabled
+        && widget->resource()->getDewarpingParams().viewMode == QnMediaDewarpingParams::VerticalDown)
+    {
         localParameters.rotationAngle -= 180;
+    }
 
     QnResourceDisplayPtr display = widget->display();
     QnImageProvider* imageProvider = getLocalScreenshotProvider(widget, localParameters);
     if (imageProvider) {
         // avoiding post-processing duplication
         localParameters.imageCorrectionParams.enabled = false;
-        localParameters.mediaDewarpingParams.enabled = false;
         localParameters.itemDewarpingParams.enabled = false;
         localParameters.zoomRect = QRectF();
         localParameters.customAspectRatio = 0.0;
@@ -636,7 +629,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
 
     if (!imageProvider)
     {
-        QnMessageBox::critical(mainWindow(), tr("Failed to take screenshot"));
+        QnMessageBox::critical(mainWindowWidget(), tr("Failed to take screenshot"));
         return;
     }
 

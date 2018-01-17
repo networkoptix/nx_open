@@ -31,15 +31,58 @@ QnPasswordInformation::QnPasswordInformation(PasswordStrength strength)
             m_acceptance = Inacceptable;
             break;
 
+        case PasswordStrength::WeakAndFair:
+            m_text = tr("Weak");
+            m_hint = tr("Password should contain %n different combinations of either characters, symbols, or digits",
+                "", PasswordLimitations::kPreferredCategories);
+            m_acceptance = Inacceptable;
+            break;
+
+        case PasswordStrength::WeakAndGood:
+            m_text = tr("Weak");
+            m_hint = tr("Password should contain %n different combinations of either characters, symbols, or digits",
+                "", PasswordLimitations::kMinimumCategories);
+            m_acceptance = Inacceptable;
+            break;
+
         case PasswordStrength::Short:
             m_text = tr("Short");
-            m_hint = tr("Password must be at least 8 characters long.");
+            m_hint = tr("Password must be at least %n characters long.",
+                "", PasswordLimitations::kMinimumLength);
+            m_acceptance = Inacceptable;
+            break;
+
+        case PasswordStrength::Long:
+            m_text = tr("Long");
+            m_hint = tr("Password must be no longer than %n characters.",
+                "", PasswordLimitations::kMaximumLengthForCamera);
+            m_acceptance = Inacceptable;
+            break;
+
+        case PasswordStrength::Conseq:
+            m_text = tr("Weak");
+            m_hint = tr("Password should not contain %n or more consecutive characters together.",
+                "", PasswordLimitations::kConsecutiveCharactersLimit);
+            m_acceptance = Inacceptable;
+            break;
+
+        case PasswordStrength::Repeat:
+            m_text = tr("Weak");
+            m_hint = tr("Password should not contain %n or more repeating characters.",
+                "", PasswordLimitations::kRepeatingCharactersLimit);
             m_acceptance = Inacceptable;
             break;
 
         case PasswordStrength::Common:
             m_text = tr("Common");
             m_hint = tr("This password is in list of the most popular passwords.");
+            m_acceptance = Inacceptable;
+            break;
+
+        case PasswordStrength::IncorrectCamera:
+            m_text = tr("Incorrect");
+            m_hint = tr("Only latin letters, numbers and keyboard symbols %1 are allowed.")
+                .arg(QString::fromLatin1(PasswordLimitations::kCameraAllowedSymbols));
             m_acceptance = Inacceptable;
             break;
 

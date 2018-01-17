@@ -1,11 +1,10 @@
-#ifndef __MULTI_CODEC_RTP_READER__
-#define __MULTI_CODEC_RTP_READER__
-
-#ifdef ENABLE_DATA_PROVIDERS
+#pragma once
+#if defined(ENABLE_DATA_PROVIDERS)
 
 #include <QtCore/QElapsedTimer>
 
 #include <vector>
+#include <atomic>
 
 #include <core/dataprovider/abstract_media_stream_provider.h>
 #include <core/resource/resource_consumer.h>
@@ -20,27 +19,25 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/streaming/rtp_stream_parser.h>
 
+namespace RtpTransport {
 
-namespace RtpTransport
-{
-    typedef QString Value;
+typedef QString Value;
 
-    //!Server selects best suitable transport
+// Server selects best suitable transport.
+static const QLatin1String _auto( "AUTO" );
+static const QLatin1String udp( "UDP" );
+static const QLatin1String tcp( "TCP" );
 
-    static const QLatin1String _auto( "AUTO" );
-    static const QLatin1String udp( "UDP" );
-    static const QLatin1String tcp( "TCP" );
+Value fromString(const QString& str);
 
-    Value fromString(const QString& str);
-};
+} // namespace RtpTransport
 
 class QnRtpStreamParser;
 class QnRtpAudioStreamParser;
 class QnRtpVideoStreamParser;
 class QnResourceAudioLayout;
 
-class QnMulticodecRtpReader
-:
+class QnMulticodecRtpReader:
     public QObject,
     public QnResourceConsumer,
     public QnAbstractMediaStreamProvider,
@@ -49,35 +46,40 @@ class QnMulticodecRtpReader
 {
     Q_OBJECT
 
-private:
-    enum {BLOCK_SIZE = 1460};
-
 public:
+    using OnSocketReadTimeoutCallback = nx::utils::MoveOnlyFunc<QnAbstractMediaDataPtr()>;
+
     QnMulticodecRtpReader(
-        const QnResourcePtr& res,
-        std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>() );
+        const QnResourcePtr& resource,
+        std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock = std::unique_ptr<nx::network::AbstractStreamSocket>());
     virtual ~QnMulticodecRtpReader();
 
-    //!Implementation of QnAbstractMediaStreamProvider::getNextData
+    /** Implementation of QnAbstractMediaStreamProvider::getNextData. */
     virtual QnAbstractMediaDataPtr getNextData() override;
-    //!Implementation of QnAbstractMediaStreamProvider::openStream
+
+    /** Implementation of QnAbstractMediaStreamProvider::openStream. */
     virtual CameraDiagnostics::Result openStream() override;
-    //!Implementation of QnAbstractMediaStreamProvider::closeStream
+
+    /** Implementation of QnAbstractMediaStreamProvider::closeStream. */
     virtual void closeStream() override;
-    //!Implementation of QnAbstractMediaStreamProvider::isStreamOpened
+
+    /** Implementation of QnAbstractMediaStreamProvider::isStreamOpened. */
     virtual bool isStreamOpened() const override;
-    //!Implementation of QnAbstractMediaStreamProvider::getLastResponseCode
+
+    /** Implementation of QnAbstractMediaStreamProvider::getLastResponseCode. */
     virtual int getLastResponseCode() const override;
-    //!Implementation of QnAbstractMediaStreamProvider::getAudioLayout
+
+    /** Implementation of QnAbstractMediaStreamProvider::getAudioLayout. */
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() const override;
-    //!Implementation of QnStoppable::pleaseStop
+
+    /** Implementation of QnStoppable::pleaseStop. */
     virtual void pleaseStop() override;
 
     void setRequest(const QString& request);
     void setRole(Qn::ConnectionRole role);
-    void setPrefferedAuthScheme(const nx_http::header::AuthScheme::Value scheme);
+    void setPrefferedAuthScheme(const nx::network::http::header::AuthScheme::Value scheme);
 
-    static void setDefaultTransport( const RtpTransport::Value& defaultTransportToUse );
+    static void setDefaultTransport(const RtpTransport::Value& defaultTransportToUse);
     void setRtpTransport(const RtpTransport::Value& value);
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
@@ -85,17 +87,45 @@ public:
 
     QString getCurrentStreamUrl() const;
 
+    void setPositionUsec(qint64 value);
+
+    void setDateTimeFormat(const QnRtspClient::DateTimeFormat& format);
+
+    QnRtspClient& rtspClient();
+
+    /**
+     * Trust to camera NPT clock if value is true. Remember difference between camera and local clock otherwise.
+     * Default value is false.
+     */
+    void setTrustToCameraTime(bool value);
+
+    void setTimePolicy(TimePolicy timePolicy);
+
+    void addRequestHeader(const QString& requestName, const nx::network::http::HttpHeader& header);
+    void setRtpFrameTimeoutMs(int value);
+
+    /**
+     * This callback is called every time socket read timeout happens.
+     * Connection may be closed on socket read error, media frame timeout
+     * or by RTSP session timeout (usually 1 minute).
+     * If callback returns valid packet it is returned from getNextDataTcp, otherwise timeout is skipped.
+     */
+    void setOnSocketReadTimeoutCallback(OnSocketReadTimeoutCallback callback);
 signals:
-    void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
+    void networkIssue(
+        const QnResourcePtr&,
+        qint64 timeStamp,
+        nx::vms::event::EventReason reasonCode,
+        const QString& reasonParamsEncoded);
 
 private:
 
     struct TrackInfo
     {
         TrackInfo(): ioDevice(0), parser(0) {}
-        ~TrackInfo() { delete parser; }
-        QnRtspIoDevice* ioDevice; // external reference. do not delete
-        QnRtpStreamParser* parser;
+        ~TrackInfo() { }
+        QnRtspIoDevice* ioDevice; //< External reference; do not delete.
+        std::shared_ptr<QnRtpStreamParser> parser;
     };
 
     QnRtpStreamParser* createParser(const QString& codecName);
@@ -103,16 +133,30 @@ private:
     void clearKeyData(int channelNum);
     QnAbstractMediaDataPtr getNextDataUDP();
     QnAbstractMediaDataPtr getNextDataTCP();
-    void processTcpRtcp(QnRtspIoDevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity);
+    void processTcpRtcp(
+        quint8* buffer, int bufferSize, int bufferCapacity);
     void buildClientRTCPReport(quint8 chNumber);
     QnAbstractMediaDataPtr getNextDataInternal();
     QnRtspClient::TransportType getRtpTransport() const;
 
     void calcStreamUrl();
 
+    boost::optional<std::chrono::microseconds> parseOnvifNtpExtensionTime(
+        quint8* bufferStart,
+        int length) const;
+
+    bool isOnvifNtpExtensionId(uint16_t id) const;
+
+    QnRtspStatistic rtspStatistics(
+        int rtpBufferOffset,
+        int rtpPacketSize,
+        int track,
+        int rtpChannel);
+
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
-    void at_propertyChanged(const QnResourcePtr & res, const QString & key);
+    void at_propertyChanged(const QnResourcePtr& res, const QString& key);
+    void createTrackParsers();
 private:
     QnRtspClient m_RtpSession;
     QVector<bool> m_gotKeyDataInfo;
@@ -134,14 +178,15 @@ private:
     bool m_gotData;
     QElapsedTimer m_dataTimer;
     bool m_rtpStarted;
-    nx_http::header::AuthScheme::Value m_prefferedAuthScheme;
+    nx::network::http::header::AuthScheme::Value m_prefferedAuthScheme;
     QString m_currentStreamUrl;
     QString m_rtpTransport;
 
     int m_maxRtpRetryCount{0};
     int m_rtpFrameTimeoutMs{0};
+    std::atomic<qint64> m_positionUsec{AV_NOPTS_VALUE};
+    boost::optional<std::chrono::microseconds> m_lastOnvifNtpExtensionTime;
+    OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
 };
 
-#endif // ENABLE_DATA_PROVIDERS
-
-#endif //__MULTI_CODEC_RTP_READER__
+#endif // defined(ENABLE_DATA_PROVIDERS)

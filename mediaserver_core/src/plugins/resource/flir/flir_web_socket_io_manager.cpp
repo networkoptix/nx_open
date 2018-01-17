@@ -105,7 +105,7 @@ void WebSocketIoManager::stopIOMonitoring()
 bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive)
 {
     QString path;
-    QUrl url;
+    nx::utils::Url url;
 
     NX_LOGX(
         lm("Setting output port state. Port: %1, isActive: %2")
@@ -132,7 +132,7 @@ bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive
             .arg(isActive ? 1 : 0);
     }
 
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     httpClient.setSendTimeoutMs(kSetOutputStateTimeout.count());
     httpClient.setResponseReadTimeoutMs(kSetOutputStateTimeout.count());
     httpClient.setMessageBodyReadTimeoutMs(kSetOutputStateTimeout.count());
@@ -145,10 +145,10 @@ bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive
     if (!response)
         return false;
 
-    if (response->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (response->statusLine.statusCode != nx::network::http::StatusCode::ok)
         return false;
 
-    nx_http::BufferType messageBody;
+    nx::network::http::BufferType messageBody;
     while (!httpClient.eof())
         messageBody.append(httpClient.fetchMessageBodyBuffer());
 

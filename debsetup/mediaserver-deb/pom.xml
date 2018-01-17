@@ -2,12 +2,12 @@
     <parent>
         <artifactId>debsetup</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mediaserver-deb</artifactId>
     <packaging>pom</packaging>
@@ -20,6 +20,17 @@
         <common.depends>libstdc++6 (>= 4.1.1), zlib1g (>= 1:1.1.4), debconf (>= 0.5) | debconf-2.0, python, upstart-job, psmisc, upstart (>= 0.6.5-8), libsm6, libice6, libaudio2, libogg0, libxfixes3, libxrender1, libfontconfig1, libgl1-mesa-glx, cifs-utils</common.depends>
         <arch.depends />
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>root_tool</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/root_tool/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
 
     <build>
         <directory>${arch}</directory>

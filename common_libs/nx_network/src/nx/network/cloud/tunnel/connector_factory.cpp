@@ -10,7 +10,7 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-static int s_cloudConnectTypeMask = (int)CloudConnectType::all;
+static int s_cloudConnectTypeMask = (int)ConnectType::all;
 
 using namespace std::placeholders;
 
@@ -33,7 +33,7 @@ CloudConnectors ConnectorFactory::defaultFactoryFunction(
 {
     CloudConnectors connectors;
 
-    if (((s_cloudConnectTypeMask & (int)CloudConnectType::udpHp) > 0) &&
+    if (((s_cloudConnectTypeMask & (int)ConnectType::udpHp) > 0) &&
         (udpSocket || !response.udpEndpointList.empty()))
     {
         TunnelConnectorContext context;
@@ -45,7 +45,7 @@ CloudConnectors ConnectorFactory::defaultFactoryFunction(
         connectors.emplace_back(std::move(context));
     }
 
-    if (((s_cloudConnectTypeMask & (int)CloudConnectType::forwardedTcpPort) > 0) &&
+    if (((s_cloudConnectTypeMask & (int)ConnectType::forwardedTcpPort) > 0) &&
         !response.forwardedTcpEndpointList.empty())
     {
         TunnelConnectorContext context;
@@ -55,12 +55,12 @@ CloudConnectors ConnectorFactory::defaultFactoryFunction(
         connectors.emplace_back(std::move(context));
     }
 
-    if (((s_cloudConnectTypeMask & (int)CloudConnectType::proxy) > 0) &&
+    if (((s_cloudConnectTypeMask & (int)ConnectType::proxy) > 0) &&
         response.trafficRelayUrl)
     {
         TunnelConnectorContext context;
         context.connector = std::make_unique<relay::Connector>(
-            QUrl(*response.trafficRelayUrl), targetAddress, connectSessionId);
+            nx::utils::Url(*response.trafficRelayUrl), targetAddress, connectSessionId);
         context.startDelay = response.params.trafficRelayingStartDelay;
         connectors.emplace_back(std::move(context));
     }

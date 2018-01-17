@@ -12,10 +12,10 @@ namespace api {
  */
 struct AnalyticsEventType
 {
-    QnUuid eventTypeId;
-    TranslatableString eventName;
+    QnUuid typeId;
+    TranslatableString name;
 };
-#define AnalyticsEventType_Fields (eventTypeId)(eventName)
+#define AnalyticsEventType_Fields (typeId)(name)
 
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEventType, (json))
 

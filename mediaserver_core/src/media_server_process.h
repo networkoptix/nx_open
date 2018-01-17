@@ -27,6 +27,7 @@
 #include "health/system_health.h"
 #include "platform/platform_abstraction.h"
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/log_settings.h>
 #include <nx/vms/discovery/manager.h>
 
 class QnAppserverResourceProcessor;
@@ -38,7 +39,7 @@ class QnLdapManager;
 struct BeforeRestoreDbData;
 namespace ec2 { class CrashReporter; }
 
-struct CloudManagerGroup;
+namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
 
 void restartServer(int restartTimeout);
 
@@ -67,6 +68,7 @@ public:
     QString enforcedMediatorEndpoint;
     QString ipVersion;
     QString createFakeData;
+    QString crashDirectory;
 
     CmdLineArguments():
         logLevel(
@@ -114,6 +116,8 @@ public:
 
     MSSettings* serverSettings() const { return m_settings.get(); }
 
+    static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
+
 signals:
     void started();
 
@@ -122,9 +126,6 @@ public slots:
     void stopSync();
 
 private slots:
-    void loadResourcesFromECS(
-        ec2::AbstractECConnectionPtr ec2Connection,
-        QnCommonMessageProcessor* messageProcessor);
     void at_portMappingChanged(QString address);
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
@@ -153,7 +154,7 @@ private:
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
     void registerRestHandlers(
-        CloudManagerGroup* const cloudManagerGroup,
+        nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
         QnUniversalTcpListener* tcpListener,
         ec2::TransactionMessageBusAdapter* messageBus);
 
@@ -161,28 +162,34 @@ private:
     void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
 
     bool initTcpListener(
-        CloudManagerGroup* const cloudManagerGroup,
+        nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
         ec2::TransactionMessageBusAdapter* messageBus);
     void initializeCloudConnect();
+    void changeSystemUser(const QString& userName);
 
-    std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
+    std::unique_ptr<nx::network::upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
+    void initPublicIpDiscoveryUpadate();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(
         ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
     void dumpSystemUsageStats();
     bool isStopping() const;
-    void resetSystemState(CloudConnectionManager& cloudConnectionManager);
+    void resetSystemState(nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager);
     void performActionsOnExit();
     void parseCommandLineParameters(int argc, char* argv[]);
     void updateAllowedInterfaces();
     void addCommandLineParametersFromConfig(MSSettings* settings);
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
-    void serviceModeInit();
+    nx::utils::log::Settings makeLogSettings();
+
+    void initializeLogging();
+    void initializeHardwareId();
     QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
+    void connectArchiveIntegrityWatcher();
 
 private:
     int m_argc;
@@ -190,11 +197,12 @@ private:
     bool m_startMessageSent;
     qint64 m_firstRunningTime;
 
+    std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> m_preparedTcpServerSockets;
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
-    std::map<HostAddress, quint16> m_forwardedAddresses;
+    std::map<nx::network::HostAddress, quint16> m_forwardedAddresses;
     QnMutex m_mutex;
     std::unique_ptr<nx::network::PublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
@@ -209,6 +217,6 @@ private:
     QnUuid m_obsoleteGuid;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     std::weak_ptr<QnMediaServerModule> m_serverModule;
-    bool m_serviceMode;
+    const bool m_serviceMode;
     std::unique_ptr<MSSettings> m_settings;
 };

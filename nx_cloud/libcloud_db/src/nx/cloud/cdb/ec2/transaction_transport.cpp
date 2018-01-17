@@ -1,5 +1,6 @@
 #include "transaction_transport.h"
 
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -21,8 +22,8 @@ TransactionTransport::TransactionTransport(
     const ConnectionRequestAttributes& connectionRequestAttributes,
     const nx::String& systemId,
     const ::ec2::ApiPeerData& localPeer,
-    const SocketAddress& remotePeerEndpoint,
-    const nx_http::Request& request)
+    const network::SocketAddress& remotePeerEndpoint,
+    const nx::network::http::Request& request)
 :
     m_baseTransactionTransport(
         QnUuid(), //< localSystemId. Not used here
@@ -52,11 +53,11 @@ TransactionTransport::TransactionTransport(
 {
     using namespace std::placeholders;
 
-    m_commonTransportHeaderOfRemoteTransaction.connectionId = 
+    m_commonTransportHeaderOfRemoteTransaction.connectionId =
         connectionRequestAttributes.connectionId;
     m_commonTransportHeaderOfRemoteTransaction.systemId = systemId;
     m_commonTransportHeaderOfRemoteTransaction.endpoint = remotePeerEndpoint;
-    m_commonTransportHeaderOfRemoteTransaction.vmsTransportHeader.sender = 
+    m_commonTransportHeaderOfRemoteTransaction.vmsTransportHeader.sender =
         connectionRequestAttributes.remotePeer.id;
 
     bindToAioThread(aioThread);
@@ -79,7 +80,7 @@ TransactionTransport::TransactionTransport(
     if (m_baseTransactionTransport.remotePeerSupportsKeepAlive())
     {
         m_inactivityTimer->start(
-            m_baseTransactionTransport.connectionKeepAliveTimeout() 
+            m_baseTransactionTransport.connectionKeepAliveTimeout()
                 * m_baseTransactionTransport.keepAliveProbeCount(),
             std::bind(&TransactionTransport::onInactivityTimeout, this));
     }
@@ -114,7 +115,7 @@ void TransactionTransport::stopWhileInAioThread()
     m_inactivityTimer.reset();
 }
 
-SocketAddress TransactionTransport::remoteSocketAddr() const
+network::SocketAddress TransactionTransport::remoteSocketAddr() const
 {
     return m_baseTransactionTransport.remoteSocketAddr();
 }
@@ -129,12 +130,12 @@ void TransactionTransport::setOnGotTransaction(GotTransactionEventHandler handle
     m_gotTransactionEventHandler = std::move(handler);
 }
 
-QnUuid TransactionTransport::connectionGuid() const 
+QnUuid TransactionTransport::connectionGuid() const
 {
     return m_baseTransactionTransport.connectionGuid();
 }
 
-const TransactionTransportHeader& 
+const TransactionTransportHeader&
     TransactionTransport::commonTransportHeaderOfRemoteTransaction() const
 {
     return m_commonTransportHeaderOfRemoteTransaction;
@@ -184,14 +185,14 @@ void TransactionTransport::sendTransaction(
 }
 
 void TransactionTransport::receivedTransaction(
-    const nx_http::HttpHeaders& headers,
+    const nx::network::http::HttpHeaders& headers,
     const QnByteArrayConstRef& tranData)
 {
     m_baseTransactionTransport.receivedTransaction(headers, tranData);
 }
 
 void TransactionTransport::setOutgoingConnection(
-    QSharedPointer<AbstractCommunicatingSocket> socket)
+    QSharedPointer<network::AbstractCommunicatingSocket> socket)
 {
     m_baseTransactionTransport.setOutgoingConnection(std::move(socket));
 }
@@ -361,6 +362,10 @@ void TransactionTransport::forwardStateChangedEvent(
     if (newState == ::ec2::QnTransactionTransportBase::Closed ||
         newState == ::ec2::QnTransactionTransportBase::Error)
     {
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
+            lm("systemId %1, connection %2. Reporting connection closure")
+                .args(m_systemId, m_connectionId), cl_logDEBUG2);
+
         m_closed = true;
         if (m_connectionClosedEventHandler)
             m_connectionClosedEventHandler(SystemError::connectionReset);
@@ -464,13 +469,15 @@ void TransactionTransport::restartInactivityTimer()
 
     m_inactivityTimer->cancelSync();
     m_inactivityTimer->start(
-        m_baseTransactionTransport.connectionKeepAliveTimeout() 
+        m_baseTransactionTransport.connectionKeepAliveTimeout()
             * m_baseTransactionTransport.keepAliveProbeCount(),
         std::bind(&TransactionTransport::onInactivityTimeout, this));
 }
 
 void TransactionTransport::onInactivityTimeout()
 {
+    NX_LOGX(QnLog::EC2_TRAN_LOG, lm("systemId %1, connection %2. Inactivity timeout triggered")
+        .args(m_systemId, m_connectionId), cl_logDEBUG2);
     m_baseTransactionTransport.setState(::ec2::QnTransactionTransportBase::Error);
 }
 

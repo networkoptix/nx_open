@@ -56,7 +56,7 @@ nx::api::AnalyticsEventType analyticsEventType(const QnVirtualCameraResourcePtr&
     const auto eventType = std::find_if(types.cbegin(), types.cend(),
         [eventTypeId](const nx::api::AnalyticsEventType eventType)
         {
-            return eventType.eventTypeId == eventTypeId;
+            return eventType.typeId == eventTypeId;
         });
 
     return eventType == types.cend()
@@ -96,6 +96,7 @@ QString StringsHelper::actionName(ActionType value) const
         case showOnAlarmLayoutAction: return tr("Show on Alarm Layout");
         case execHttpRequestAction:   return tr("Do HTTP request");
         case acknowledgeAction:       return tr("Acknowledge");
+        case openLayoutAction:        return tr("Open layout");
 
         case cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -626,7 +627,7 @@ QString StringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool
     if (const auto& connection = camera->commonModule()->ec2Connection())
     {
         auto appServerUrl = connection->connectionInfo().ecUrl;
-        if (appServerUrl.host().isEmpty() || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost)
+        if (appServerUrl.host().isEmpty() || nx::network::resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost)
         {
             appServerUrl = server->getApiUrl();
             if (isPublic)
@@ -723,7 +724,7 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
     const auto eventType = analyticsEventType(camera, driverId, eventTypeId);
-    const auto text = eventType.eventName.text(locale);
+    const auto text = eventType.name.text(locale);
 
     return !text.isEmpty()
         ? text

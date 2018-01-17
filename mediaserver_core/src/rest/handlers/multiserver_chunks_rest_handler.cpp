@@ -11,7 +11,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/compressed_time_functions.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/fusion/serialization/compressed_time.h>
 
 #include <recorder/storage_manager.h>
@@ -24,6 +24,8 @@
 #include <rest/helpers/request_helpers.h>
 
 namespace {
+
+static const nx::utils::log::Tag kTag{lit("multiserver_chunks_rest_handler")};
 
 static QString urlPath;
 
@@ -50,17 +52,18 @@ static void loadRemoteDataAsync(
 {
     auto requestCompletionFunc =
         [ctx, &outputData, server, requestNum, timer](
-            SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody)
+            SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody)
         {
             MultiServerPeriodDataList remoteData;
             bool success = false;
-            if (osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
+            if (osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok)
             {
                 remoteData = QnCompressedTime::deserialized(
                     msgBody, MultiServerPeriodDataList(), &success);
             }
 
-            qDebug() << "In progress request QnMultiserverChunksRestHandler::loadRemoteDataAsync #"
+            NX_VERBOSE(kTag)
+                << "In progress request QnMultiserverChunksRestHandler::loadRemoteDataAsync #"
                 << requestNum << ". Got response from server" << server->getId()
                 << "osErrorCode=" << osErrorCode << "statusCode=" << statusCode
                 << "cameras=" << toString(ctx->request().resList)
@@ -76,7 +79,7 @@ static void loadRemoteDataAsync(
                 });
         };
 
-    QUrl apiUrl(server->getApiUrl());
+    nx::utils::Url apiUrl(server->getApiUrl());
     apiUrl.setPath(lit("/%1/").arg(urlPath));
 
     QnChunksRequestData modifiedRequest = ctx->request();
@@ -124,11 +127,11 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
     int requestNum = ++staticRequestNum;
     QElapsedTimer timer;
     timer.restart();
-    qDebug() << "Start executing request QnMultiserverChunksRestHandler::loadDataSync #"
+    NX_VERBOSE(kTag) << "Start executing request QnMultiserverChunksRestHandler::loadDataSync #"
         << requestNum << ". cameras=" << toString(request.resList);
 
     auto result = loadDataSync(request, owner, requestNum, timer);
-    qDebug() << "Finishing executing request QnMultiserverChunksRestHandler::loadDataSync #"
+    NX_VERBOSE(kTag) << "Finishing executing request QnMultiserverChunksRestHandler::loadDataSync #"
         << requestNum;
 
     return result;
@@ -146,7 +149,7 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
     if (request.isLocal)
     {
         loadLocalData(owner->commonModule(), outputData, &ctx);
-        qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #"
+        NX_VERBOSE(kTag) << " In progress request QnMultiserverChunksRestHandler::executeGet #"
             << requestNum << ". After loading local data timeout=" << timer.elapsed();
     }
     else
@@ -160,13 +163,15 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
             if (server->getId() == owner->commonModule()->moduleGUID())
             {
                 loadLocalData(owner->commonModule(), outputData, &ctx);
-                qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #"
+                NX_VERBOSE(kTag)
+                    << " In progress request QnMultiserverChunksRestHandler::executeGet #"
                     << requestNum << ". After loading local data. timeout=" << timer.elapsed();
             }
             else
             {
                 loadRemoteDataAsync(owner->commonModule(), outputData, server, &ctx, requestNum, timer);
-                qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #"
+                NX_VERBOSE(kTag)
+                    << " In progress request QnMultiserverChunksRestHandler::executeGet #"
                     << requestNum << ". After loading remote data from server" << server->getId()
                     << ". timeout=" << timer.elapsed();
             }
@@ -174,6 +179,7 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
 
         ctx.waitForDone();
     }
+
     return outputData;
 }
 
@@ -191,17 +197,17 @@ int QnMultiserverChunksRestHandler::executeGet(
     int requestNum = ++staticRequestNum;
     QElapsedTimer timer;
     timer.restart();
-    qDebug() << "Start executing request QnMultiserverChunksRestHandler::executeGet #"
+    NX_VERBOSE(kTag) << "Start executing request QnMultiserverChunksRestHandler::executeGet #"
         << requestNum << ". cameras=" << toString(request.resList);
 
     if (!request.isValid())
     {
         restResult.setError(QnRestResult::InvalidParameter, "Invalid parameters");
         QnFusionRestHandlerDetail::serializeRestReply(outputData, params, result, contentType, restResult);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
     outputData = loadDataSync(request, owner, requestNum, timer);
-    qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #"
+    NX_VERBOSE(kTag) << " In progress request QnMultiserverChunksRestHandler::executeGet #"
         << requestNum << ". After loading data. timeout=" << timer.elapsed();
 
     if (request.flat)
@@ -237,8 +243,8 @@ int QnMultiserverChunksRestHandler::executeGet(
         }
     }
 
-    qDebug() << "Finish executing request QnMultiserverChunksRestHandler::executeGet #"
+    NX_VERBOSE(kTag) << "Finish executing request QnMultiserverChunksRestHandler::executeGet #"
         << requestNum << ". timeout=" << timer.elapsed();
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

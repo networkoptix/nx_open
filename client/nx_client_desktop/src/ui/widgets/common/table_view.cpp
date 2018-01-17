@@ -1,7 +1,7 @@
 #include "table_view.h"
 
+#include <QtCore/QPointer>
 #include <QtGui/QPainter>
-
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QScrollBar>
 
@@ -115,4 +115,66 @@ QRect QnTableView::rowRect(int row) const
     int rowStart = columnViewportPosition(0);
     int rowWidth = columnViewportPosition(lastColumn) + columnWidth(lastColumn) - rowStart;
     return QRect(rowStart, rowViewportPosition(row), rowWidth, rowHeight(row));
+}
+
+void QnTableView::setModel(QAbstractItemModel* newModel)
+{
+    const auto currentModel = model();
+    if (currentModel == newModel)
+        return;
+
+    if (currentModel)
+        disconnect(currentModel);
+
+    base_type::setModel(newModel);
+
+    if (!newModel)
+        return;
+
+    const auto openEditors =
+        [this](int firstRow, int lastRow)
+        {
+            for (const auto column: m_delegates.keys())
+                openEditorsForColumn(column, firstRow, lastRow);
+        };
+
+    connect(newModel, &QAbstractItemModel::rowsInserted, this,
+        [openEditors](const QModelIndex& /*index*/, int firstRow, int lastRow)
+        {
+            openEditors(firstRow, lastRow);
+        });
+
+    const auto handleModelReset =
+        [newModel, openEditors]()
+        {
+            openEditors(0, newModel->rowCount() - 1);
+        };
+
+    connect(newModel, &QAbstractItemModel::modelReset, this, handleModelReset);
+    handleModelReset();
+}
+
+void QnTableView::setPersistentDelegateForColumn(int column, QAbstractItemDelegate* delegate)
+{
+    const auto it = m_delegates.find(column);
+    if (it != m_delegates.end())
+    {
+        delete it.value().data();
+        m_delegates.erase(it);
+    }
+
+    delegate->setParent(this);
+    m_delegates.insert(column, QPointer<QAbstractItemDelegate>(delegate));
+
+    setItemDelegateForColumn(column, delegate);
+}
+
+void QnTableView::openEditorsForColumn(int column, int firstRow, int lastRow)
+{
+    const auto currentModel = model();
+    if (!currentModel)
+        return;
+
+    for (int row = firstRow; row <= lastRow; ++row)
+        openPersistentEditor(currentModel->index(row, column));
 }

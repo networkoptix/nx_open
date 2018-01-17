@@ -16,7 +16,7 @@
     <message>
       <location/>
       <source>Credits</source>
-      <translation>생성</translation>
+      <translation>Credits</translation>
     </message>
     <message>
       <location/>
@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>흐림 효과가 설정된 경우 Intel HD 그래픽 디스플레이에 문제가 발생할 수 있습니다. 옵션을 그대로 두는 것을 권합니다.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>흐림 효과 사용 안 함</translation>
     </message>
   </context>
   <context>
@@ -144,6 +144,29 @@
       <location/>
       <source>Instant</source>
       <translation>긴급</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSdkEventWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
+      <source>Keywords separated by space</source>
+      <translation>공간으로 단어 구분됨</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Caption contains:</source>
+      <translation>주석 포함</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Description contains:</source>
+      <translation>상세 포함</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Event Type:</source>
+      <translation>이벤트 유형:</translation>
     </message>
   </context>
   <context>
@@ -211,7 +234,7 @@
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation>시스템 감사</translation>
+      <translation>감사 추적</translation>
     </message>
     <message>
       <location/>
@@ -334,6 +357,34 @@
     </message>
   </context>
   <context>
+    <name>BookmarkOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
+      <source>Bookmark Info</source>
+      <translation>책갈피 정보</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>삭제</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>영역 넓이</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>글꼴 크기</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Include description</source>
+      <translation>설명 포함</translation>
+    </message>
+  </context>
+  <context>
     <name>BookmarkWidget</name>
     <message>
       <location filename="../src/ui/widgets/bookmark_widget.ui"/>
@@ -419,7 +470,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>항목</translation>
     </message>
   </context>
   <context>
@@ -442,7 +493,7 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation>이벤트 로그...</translation>
+      <translation>이벤트정보...</translation>
     </message>
     <message>
       <location/>
@@ -455,7 +506,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
       <source>Server is offline</source>
-      <translation>오프라인</translation>
+      <translation>서버는 오프 라인 입니다</translation>
     </message>
     <message>
       <location/>
@@ -480,7 +531,7 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation>정지</translation>
+      <translation>멈춤</translation>
     </message>
     <message>
       <location/>
@@ -535,12 +586,12 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
@@ -578,58 +629,8 @@
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>I have read the manual and understand the risks</source>
-      <translation>설명서를 읽고 리스크의 이해 필요</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Camera Settings Control</source>
-      <translation>카메라 설정 조정</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>주위: 이 옵션 활성화 시 기 설정된 녹화 설정 값과 다르게 동작할 수 있습니다.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Secondary Stream Control</source>
-      <translation>보조 스트림 제어</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Override secondary stream quality</source>
-      <translation>보조 스트림의 화질 조정</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Do not use</source>
-      <translation>사용안함</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Low quality</source>
-      <translation>저화질</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Medium quality</source>
-      <translation>일반화질</translation>
-    </message>
-    <message>
-      <location/>
-      <source>High quality</source>
-      <translation>고화질</translation>
-    </message>
-    <message>
-      <location/>
       <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
       <translation>주위: 고해상도 선택시 CPU및 네트워크 부하등의 기타 원인이 될 수 있습니다.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Archive control</source>
-      <translation>저장 제어</translation>
     </message>
     <message>
       <location/>
@@ -640,11 +641,6 @@
       <location/>
       <source>Do not archive secondary stream</source>
       <translation>보조 스트림을 저장하지 않음</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Media streaming control</source>
-      <translation>미디어 스트리밍 제어</translation>
     </message>
     <message>
       <location/>
@@ -669,7 +665,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>초기값 복구</translation>
+      <translation>기본값 복원</translation>
     </message>
     <message>
       <location/>
@@ -678,48 +674,83 @@
     </message>
     <message>
       <location/>
-      <source>Motion detection control</source>
-      <translation>모션 감지 제어</translation>
-    </message>
-    <message>
-      <location/>
       <source>Force motion detection for stream:</source>
       <translation>스트림에 대 한 강제 모션 감지:</translation>
     </message>
     <message>
       <location/>
-      <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-      <translation>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep camera streams and profiles settings</source>
-      <translation>카메라 스트림 및 프로필 설정 유지</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
-      <translation>주위: 시스템에 영향을 줄 수있으므로 정확한 내용 숙지되지 않은 상태에서 변경하지 마세요</translation>
-    </message>
-    <message>
-      <location/>
-      <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
-    </message>
-    <message>
-      <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>자체 preset 설정 사용 중지, 대신 시스템 preset 설정 사용</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>경고! 카메라 자체 preset 설정은 사용할 수 없습니다.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+      <translation>시스템 성능에 잠재적으로 영향을 미칠 수 있다는 확신이 들지 않으면이 설정을 변경하지 마십시오.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera Settings</source>
+      <translation>카메라 설정</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Keep camera stream and profile settings</source>
+      <translation>카메라 스트림 및 프로필 설정 유지</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
+      <translation>녹화 일정의 화질 및 프레임 속도 (FPS) 설정은 관련성이 없어집니다.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Calculate bitrate per GOP instead of bitrate per second</source>
+      <translation>초당 비트 레이트 대신 GOP 당 비트 레이트를 계산</translation>
+    </message>
+    <message>
+      <location/>
+      <source>It will increase bitrate for camera.</source>
+      <translation>카메라의 비트율을 증가합니다.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Secondary Stream</source>
+      <translation>2 차 스트림</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable secondary stream</source>
+      <translation>보조 스트림 활성화</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality</source>
+      <translation>화질</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>움직임 감지:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Archive</source>
+      <translation>보관하기</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Media Streaming</source>
+      <translation>미디어 스트리밍</translation>
+    </message>
+    <message>
+      <location/>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
     </message>
   </context>
   <context>
@@ -727,7 +758,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>입력 Id</translation>
     </message>
   </context>
   <context>
@@ -753,7 +784,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>출력 Id:</translation>
     </message>
   </context>
   <context>
@@ -868,13 +899,18 @@
       <source>Motion + Lo-Res</source>
       <translation>움직임 + 저해상도</translation>
     </message>
+    <message>
+      <location/>
+      <source>Bitrate</source>
+      <translation>비트 전송률</translation>
+    </message>
   </context>
   <context>
     <name>ChangeUserPasswordDialog</name>
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>암호 변경</translation>
+      <translation>패스워드 변경</translation>
     </message>
   </context>
   <context>
@@ -882,7 +918,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation>로그인 상태 유지</translation>
+      <translation>로그인 유지</translation>
     </message>
   </context>
   <context>
@@ -900,7 +936,7 @@
     <message>
       <location/>
       <source>Save password</source>
-      <translation>비밀번호 저장</translation>
+      <translation>패스워드 저장</translation>
     </message>
   </context>
   <context>
@@ -995,7 +1031,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
@@ -1005,7 +1041,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <location/>
@@ -1017,6 +1053,16 @@
       <source>HTTP URL</source>
       <translation>HTTP URL</translation>
     </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation>인증 유형</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation>요청 유형</translation>
+    </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
@@ -1024,6 +1070,42 @@
       <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
       <source>PTZ preset:</source>
       <translation>&amp;PTZ 프리셋</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportLayoutSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>설정 내보내기</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Make read-only</source>
+      <translation>읽기 전용으로 설정</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportMediaSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>설정 내보내기</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Apply Filters</source>
+      <translation>필터 적용</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Rotation, Dewarping, Image Enhancement etc.</source>
+      <translation>회전, Dewarping, 이미지 향상 등</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
+      <translation>필터를 적용하고 오버레이를 추가하면 트랜스 코딩이 필요하므로 CPU 사용량이 늘어나고 상당한 시간이 걸릴 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -1052,6 +1134,37 @@
       <location/>
       <source>Rapid Review speed</source>
       <translation>빠른 검토 속도</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
+      <source>Export Video</source>
+      <translation>영상 백업</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Single Camera</source>
+      <translation>단일 카메라</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Export Settings</source>
+      <translation>설정 내보내기</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Multi Video</source>
+      <translation>멀티 비디오</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilenamePanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/common/widgets/filename_panel.ui"/>
+      <source>Browse...</source>
+      <translation>찾기...</translation>
     </message>
   </context>
   <context>
@@ -1094,7 +1207,7 @@
     <message>
       <location/>
       <source>X Offset</source>
-      <translation>오프셋 X</translation>
+      <translation>X 오프셋</translation>
     </message>
     <message>
       <location/>
@@ -1137,7 +1250,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>제거</translation>
+      <translation>삭제</translation>
     </message>
     <message>
       <location/>
@@ -1199,6 +1312,39 @@
       <location/>
       <source>Rotation</source>
       <translation>회전</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImageOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
+      <source>Image</source>
+      <translation>이미지:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>삭제</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Size</source>
+      <translation>크기</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>투명도</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default</source>
+      <translation>기본</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>찾기...</translation>
     </message>
   </context>
   <context>
@@ -1322,7 +1468,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <location/>
@@ -1340,7 +1486,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>LDAP으로 부터 사용자 정보 일기</translation>
+      <translation>LDAP으로 부터 사용자 정보 가져오기</translation>
     </message>
     <message>
       <location/>
@@ -1393,7 +1539,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>하드웨어 Id에 잠김:</translation>
     </message>
   </context>
   <context>
@@ -1406,7 +1552,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>제거</translation>
+      <translation>삭제</translation>
     </message>
     <message>
       <location/>
@@ -1492,7 +1638,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>하드웨어 Id:</translation>
     </message>
   </context>
   <context>
@@ -1546,12 +1692,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <location/>
@@ -1604,7 +1750,7 @@
     <message>
       <location/>
       <source>Intensity</source>
-      <translation>강도:</translation>
+      <translation>강도</translation>
     </message>
     <message>
       <location/>
@@ -1618,8 +1764,8 @@
     </message>
     <message>
       <location/>
-      <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <source>Tour cycle</source>
+      <translation>투어 간격</translation>
     </message>
   </context>
   <context>
@@ -1688,7 +1834,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>사용자에게 재생</translation>
     </message>
   </context>
   <context>
@@ -1706,7 +1852,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>강제 승인</translation>
     </message>
   </context>
   <context>
@@ -1824,7 +1970,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>북마크</translation>
+      <translation>북마크(책갈피)</translation>
     </message>
   </context>
   <context>
@@ -1845,7 +1991,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>비밀번호:</translation>
+      <translation>패스워드:</translation>
     </message>
     <message>
       <location/>
@@ -1876,7 +2022,7 @@
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation>로그인 상태 유지</translation>
+      <translation>로그인 유지</translation>
     </message>
   </context>
   <context>
@@ -1902,7 +2048,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>비밀번호:</translation>
+      <translation>패스워드:</translation>
     </message>
     <message>
       <location/>
@@ -1912,7 +2058,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>로그인:</translation>
+      <translation>Login:</translation>
     </message>
     <message>
       <location/>
@@ -1966,7 +2112,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>제거</translation>
+      <translation>삭제</translation>
     </message>
     <message>
       <location/>
@@ -2022,7 +2168,7 @@
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>
       <source>System Administration</source>
-      <translation>관리자</translation>
+      <translation>시스템 관리자</translation>
     </message>
   </context>
   <context>
@@ -2050,7 +2196,7 @@
     <message>
       <location/>
       <source>Options</source>
-      <translation>옵션</translation>
+      <translation>옵션:</translation>
     </message>
     <message>
       <location/>
@@ -2122,6 +2268,39 @@
       <location/>
       <source>Place shortcut on desktop.</source>
       <translation>바탕화면에 바로가기 만들기</translation>
+    </message>
+  </context>
+  <context>
+    <name>RapidReviewSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
+      <source>Rapid Review</source>
+      <translation>빠른 검토</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Initial video length</source>
+      <translation>초기 영상길이</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Exported video length</source>
+      <translation>추출된 영상 길이</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Speed</source>
+      <translation>속도</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frames interval</source>
+      <translation>프레임 간격</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset Speed</source>
+      <translation>속도 초기화</translation>
     </message>
   </context>
   <context>
@@ -2205,7 +2384,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>최상 화질및 해상도를 위해서는 강력한 PC 시용를 권합니다.</translation>
     </message>
     <message>
       <location/>
@@ -2271,7 +2450,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>사용자와 대화하기</translation>
     </message>
   </context>
   <context>
@@ -2302,7 +2481,7 @@
     <message>
       <location/>
       <source>Failover Priority...</source>
-      <translation>이중화 우선순위</translation>
+      <translation>Failover우선순위...</translation>
     </message>
     <message>
       <location/>
@@ -2444,7 +2623,7 @@
     <message>
       <location/>
       <source>Fisheye</source>
-      <translation>어안렌즈</translation>
+      <translation>Fisheye</translation>
     </message>
     <message>
       <location/>
@@ -2479,12 +2658,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <location/>
@@ -2611,7 +2790,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>사용할 수 있는</translation>
     </message>
     <message>
       <location/>
@@ -2621,7 +2800,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>아이콘</translation>
     </message>
   </context>
   <context>
@@ -2723,12 +2902,12 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>로그인:</translation>
+      <translation>Login:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation>비밀번호:</translation>
+      <translation>패스워드:</translation>
     </message>
   </context>
   <context>
@@ -2736,22 +2915,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>역할</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>모든 사용자 표시</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>사용자 선택</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>검색과 일치하는 것이 없습니다,</translation>
     </message>
   </context>
   <context>
@@ -2778,6 +2957,34 @@
     </message>
   </context>
   <context>
+    <name>TextOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
+      <source>Text</source>
+      <translation>문자</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>삭제</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>글꼴 크기</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enter plain text or HTML</source>
+      <translation>일반 텍스트 또는 HTML을 입력</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>영역 넓이</translation>
+    </message>
+  </context>
+  <context>
     <name>TimeServerSelectionWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
@@ -2787,7 +2994,30 @@
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>인터넷으로 시간 동기화</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimestampOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
+      <source>Timestamp</source>
+      <translation>타임스템프</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>글꼴 크기</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Format</source>
+      <translation>포맷</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>삭제</translation>
     </message>
   </context>
   <context>
@@ -2827,8 +3057,7 @@
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>사용자 지정 역할이 설정되어 있지 않습니다. New Role 버튼을 눌러 새로 생성하세요</translation>
     </message>
     <message>
       <location/>

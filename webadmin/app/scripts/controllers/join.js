@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('JoinCtrl', function ($scope, $modalInstance, $interval, mediaserver,dialogs) {
+    .controller('JoinCtrl', ['$scope', '$modalInstance', '$interval', 'mediaserver', 'dialogs',
+    function ($scope, $modalInstance, $interval, mediaserver, dialogs) {
         $scope.settings = {
             url :'',
             login: Config.defaultLogin,
@@ -104,11 +105,11 @@ angular.module('webadminApp')
             return errorToShow;
         }
         function normalizeUrl(url){
-            if(url.indexOf("//")<0){
-                url = "http://" + url;
-            }
             if(url.indexOf(":")<0){
                 url = url + ":7001";
+            }
+            if(url.indexOf("//")<0){
+                url = "http://" + url;
             }
             return url;
         }
@@ -197,4 +198,4 @@ angular.module('webadminApp')
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
-    });
+    }]);

@@ -13,6 +13,9 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
 
 
+    //var cloudHost = 'localhost';  // for python manage.py runserver
+    //var cloudPort = 8000;
+
     var cloudHost = 'cloud-test.hdw.mx';  // 'cloud-local' // For local vagrant
     var cloudPort = 80;
 
@@ -70,7 +73,7 @@ module.exports = function (grunt) {
             },
             compass: {
                 files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}',
-                        'customizations/<%= yeoman.config.customization %>/front_end/{,*/}*.{scss,sass}',
+                        'skins/<%= yeoman.config.skin %>/front_end/{,*/}*.{scss,sass}',
                         '<%= yeoman.web_common %>/styles/{,*/}*.{scss,sass}'],
                 tasks: ['compass:server', 'autoprefixer']
             },
@@ -96,6 +99,9 @@ module.exports = function (grunt) {
         // The actual grunt server settings
         connect: {
             options: {
+                protocol: 'https',
+                key: grunt.file.read('ssl_keys/server.key').toString(),
+                cert: grunt.file.read('ssl_keys/server.crt').toString(),
                 port: 9000,
                 // Change this to '0.0.0.0' to access the server from outside.
                 hostname: '0.0.0.0',
@@ -446,13 +452,13 @@ module.exports = function (grunt) {
         copy: {
             custom: {
                 expand: true,
-                cwd: '../customizations/<%= yeoman.config.customization %>/front_end',
+                cwd: '../skins/<%= yeoman.config.skin %>/front_end',
                 dest: '.tmp/',
                 src: '**'
             },
             custom_css: {
                 expand: true,
-                cwd: '../customizations/<%= yeoman.config.customization %>/front_end/styles/',
+                cwd: '../skins/<%= yeoman.config.skin %>/front_end/styles/',
                 dest: '<%= yeoman.app %>/styles/custom/',
                 src: '**'
             },
@@ -488,7 +494,7 @@ module.exports = function (grunt) {
                     },
                     {
                         expand: true,
-                        cwd: '../customizations/<%= yeoman.config.customization %>/front_end',
+                        cwd: '../skins/<%= yeoman.config.skin %>/front_end',
                         dest: '<%= yeoman.dist %>/',
                         src: '**'
                     },
@@ -689,8 +695,8 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('setbranding', function (branding) {
-        var config = {customization: branding};
+    grunt.registerTask('setskin', function (skin) {
+        var config = {skin: skin};
         grunt.file.write('config.json', JSON.stringify(config, null, 2) + '\n');
     });
 
@@ -891,7 +897,7 @@ module.exports = function (grunt) {
 
 
 
-    grunt.registerTask('pushdef', function(branch){
+    /*grunt.registerTask('pushdef', function(branch){
         grunt.task.run([
             'pull:vms_3.1',
             'push:vms_3.1',
@@ -900,5 +906,5 @@ module.exports = function (grunt) {
             'push:default',
             'shell:up_3_1'
         ]);
-    });
+    });*/
 };

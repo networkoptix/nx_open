@@ -1,6 +1,7 @@
 #include "udp_client.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 const std::chrono::milliseconds UdpClient::kDefaultRetransmissionTimeOut(500);
@@ -319,4 +320,5 @@ void UdpClient::timedOut(nx::Buffer transactionId)
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

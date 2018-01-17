@@ -147,13 +147,6 @@ bool ServerWriterHandler::handleFileData(const QString& path, const QByteArray& 
     if (!storage)
         return false;
 
-    if (!storage->removeFile(path))
-    {
-        NX_LOG(lit("%1. Remove camera info file failed for this path: %2")
-                .arg(Q_FUNC_INFO)
-                .arg(path), cl_logDEBUG1);
-        return false;
-    }
     auto outFile = std::unique_ptr<QIODevice>(storage->open(path, QIODevice::WriteOnly));
     if (!outFile)
     {

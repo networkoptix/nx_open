@@ -62,7 +62,7 @@ protected:
 private:
     utils::promise<SystemError::ErrorCode> m_connectFinished;
     std::unique_ptr<tcp::IncomingReverseTunnelConnection> m_connection;
-    TestHttpServer m_proxyServer;
+    nx::network::http::TestHttpServer m_proxyServer;
     tcp::IncomingReverseTunnelConnection::StartHandler m_additionalHandler;
 
     void onConnectFinished(SystemError::ErrorCode sysErrorCode)

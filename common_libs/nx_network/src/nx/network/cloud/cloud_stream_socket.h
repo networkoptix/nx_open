@@ -23,7 +23,7 @@ namespace cloud {
  * Socket that is able to use hole punching (tcp or udp) and mediator to establish connection.
  * Method to use to connect to a remote peer is selected depending on the route to the peer.
  * If connection to peer requires using udp hole punching, then this socket uses UDT.
- * NOTE: Actual socket is instantiated only when address is known 
+ * NOTE: Actual socket is instantiated only when address is known
  *   (AbstractCommunicatingSocket::connect or AbstractCommunicatingSocket::connectAsync)
  */
 class NX_NETWORK_API CloudStreamSocket:
@@ -45,11 +45,9 @@ public:
     virtual bool shutdown() override;
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
 
-    virtual bool reopen() override;
-
     virtual bool connect(
         const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis) override;
+        std::chrono::milliseconds timeout) override;
 
     virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) override;
     virtual int send(const void* buffer, unsigned int bufferLen) override;
@@ -69,10 +67,10 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler) override;

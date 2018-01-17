@@ -7,8 +7,8 @@
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
-#include <nx/network/http/asynchttpclient.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/asynchttpclient.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include "nx/streaming/media_data_packet.h"
 
 
@@ -100,10 +100,10 @@ private:
     int m_prevMotionChannel;
     bool m_dualsensor;
     bool m_inputPortState;
-    nx_http::AsyncHttpClientPtr m_relayInputClient;
+    nx::network::http::AsyncHttpClientPtr m_relayInputClient;
 
     bool getParamPhysical2(int channel, const QString& name, QString &val);
-    void inputPortStateRequestDone(nx_http::AsyncHttpClientPtr client);
+    void inputPortStateRequestDone(nx::network::http::AsyncHttpClientPtr client);
 };
 
 typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;

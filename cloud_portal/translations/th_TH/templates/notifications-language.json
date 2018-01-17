@@ -1,17 +1,17 @@
 {
-  "activate_account":{
-    "emailSubject":"Confirm your account"
+  "activate_account": {
+    "emailSubject": "ยืนยันบัญชีของคุณ"
   },
-  "restore_password":{
-    "emailSubject":"Restore your password"
+  "restore_password": {
+    "emailSubject": "เรียกคืนรหัสผ่านของคุณ"
   },
-  "system_invite":{
-    "emailSubject":"Video system {{message.system_name}} was shared with you"
+  "system_invite": {
+    "emailSubject": "ใช้ระบบวีดีโอร่วมกัน {{message.system_name}}"
   },
-  "system_shared":{
-    "emailSubject":"Video system {{message.system_name}} was shared with you"
+  "system_shared": {
+    "emailSubject": "ใช้ระบบวีดีโอร่วมกัน {{message.system_name}}"
   },
-  "review_version":{
-    "emailSubject":"Version {{message.id}} is ready to be reviewed"
+  "review_version": {
+    "emailSubject": "ตรวจสอบความพร้อมของ Version {{message.id}}"
   }
 }

@@ -1,31 +1,38 @@
 {{#analyticsSdkEventType}}
-    <h1>{{analyticsSdkEventType}}{{#source}} <b>{{source}}</b>{{/source}}</h1>
+    <h1>{{analyticsSdkEventType}}{{#source}} at <b>{{source}}</b>{{/source}}</h1>
 {{/analyticsSdkEventType}}
 {{^analyticsSdkEventType}}
-    <h1>{{event}}{{#source}} <b>{{source}}</b>{{/source}}</h1>
+    <h1>{{event}}{{#source}} at <b>{{source}}</b>{{/source}}</h1>
 {{/analyticsSdkEventType}}
 
 {{#screenshot}}
     <div class="description">
         <img alt="Screenshot" src="{{screenshot}}"/>
-        {{#caption}}
-            <h2>{{caption}}</h2>
-        {{/caption}}
-        {{#description}}
-            <p> {{description}}</p>
-        {{/description}}
     </div>
 {{/screenshot}}
+
+{{#count}}
 
 <div class="date">
     Trigger has been activated {{count}} times, first:<br/>
     <b>{{timestampDate}} {{timestampTime}}</b>
-
-    {{#urlint}}
-        <p><a href="{{urlint}}">Play archive from the local network</a></p>
-    {{/urlint}}
-
-    {{#urlext}}
-        <p><a href="{{urlext}}">Play archive from the web</a></p>
-    {{/urlext}}
 </div>
+
+{{/count}}
+
+{{^count}}
+
+<div class="date">
+    Trigger has been activated at:<br/>
+    <b>{{timestampDate}} {{timestampTime}}</b>
+</div>
+
+{{/count}}
+
+{{#urlint}}
+    <p><a href="{{urlint}}">Play archive from the local network</a></p>
+{{/urlint}}
+
+{{#urlext}}
+    <p><a href="{{urlext}}">Play archive from the web</a></p>
+{{/urlext}}

@@ -38,8 +38,8 @@ MultisensorDataProvider::~MultisensorDataProvider()
 
 QnAbstractMediaDataPtr MultisensorDataProvider::getNextData()
 {
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+        return getMetadata();
 
     auto data = m_dataSource.retrieveData();
 
@@ -87,7 +87,7 @@ CameraDiagnostics::Result MultisensorDataProvider::openStreamInternal(
 
         QnAbstractStreamDataProviderPtr source(reader);
         if (!doNotConfigureCamera)
-            reader->setDesiredLiveParams(params);
+            reader->setParams(params);
 
         reader->setRole(getRole());
 

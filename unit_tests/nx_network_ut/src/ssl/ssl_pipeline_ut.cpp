@@ -64,7 +64,7 @@ public:
             if (m_clientToServerPipeline.totalBytesThrough() == m_clientToServerTotalBytesThrough &&
                 m_serverToClientPipeline.totalBytesThrough() == m_serverToClientTotalBytesThrough)
             {
-                // On error in handshake data SSL may not report error but keep asking for data. 
+                // On error in handshake data SSL may not report error but keep asking for data.
                 // Another side will also be asking for data and as a result pipe will stuck.
                 break;
             }
@@ -75,7 +75,7 @@ public:
             if (senderActive)
             {
                 const int bytesToWrite = std::min<int>(m_maxBytesToWrite, dataToSend.size());
-                const int bytesWritten = 
+                const int bytesWritten =
                     m_clientPipeline->write(dataToSend.constData(), bytesToWrite);
                 if (bytesWritten > 0)
                     dataToSend.remove(0, bytesWritten);
@@ -238,7 +238,7 @@ protected:
     {
         constexpr int minChunkSize = 1;
         constexpr int maxChunkSize = 128;
-        
+
         for (int pos = 0; pos < m_inputData.size();)
         {
             const auto bytesToWrite = std::min<int>(
@@ -274,7 +274,7 @@ protected:
         ASSERT_TRUE(m_serverPipeline->eof());
         ASSERT_TRUE(m_serverPipeline->failed());
     }
-    
+
     void thenPartialDataHasBeenReceived()
     {
         ASSERT_TRUE(m_inputData.startsWith(m_outputData));
@@ -366,7 +366,7 @@ TEST_F(SslPipeline, random_error_in_data)
 
     whenDataIsTransferredThroughPipeline();
 
-    // On error in handshake data SSL may not report error but keep asking for data. 
+    // On error in handshake data SSL may not report error but keep asking for data.
     // Another side will also be asking for data and as a result pipe will stuck.
     // So, we cannot always detect error.
     thenPartialDataHasBeenReceived();

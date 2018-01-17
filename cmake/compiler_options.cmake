@@ -62,8 +62,11 @@ if(enableAllVendors)
         -DENABLE_ISD
         -DENABLE_PULSE_CAMERA
         -DENABLE_FLIR
-        -DENABLE_HANWHA
+        -DENABLE_ADVANTECH
     )
+    if(customization STREQUAL "hanwha")
+        add_definitions(-DENABLE_HANWHA)
+    endif()
 endif()
 
 if(WINDOWS)
@@ -110,11 +113,9 @@ if(WINDOWS)
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_extra_linker_flags}")
     set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /ignore:4221")
 
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
-        set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
-        set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG")
-    endif()
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
+    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG")
     unset(_extra_linker_flags)
 endif()
 
@@ -129,11 +130,7 @@ if(UNIX)
         -Wno-error=unused-function
     )
 
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7.0)
-            add_compile_options(-Wno-error=dangling-else)
-        endif()
-    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         add_compile_options(
             -Wno-c++14-extensions
             -Wno-inconsistent-missing-override
@@ -142,12 +139,17 @@ if(UNIX)
 endif()
 
 if(LINUX)
+    # TODO: Use CMake defaults in the next release version (remove the following two lines).
+    string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+    string(REPLACE "-O3" "-O2" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+
     if(NOT "${arch}" MATCHES "arm|aarch64")
         add_compile_options(-msse2)
     endif()
     add_compile_options(
         -Wno-unknown-pragmas
         -Wno-ignored-qualifiers
+        -fstack-protector-all #< TODO: Use -fstask-protector-strong when supported.
     )
     set(CMAKE_SKIP_BUILD_RPATH ON)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
@@ -161,6 +163,10 @@ if(LINUX)
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
     set(CMAKE_SHARED_LINKER_FLAGS
         "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--no-undefined")
+
+    if(NOT ANDROID AND CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_compile_options(-ggdb1 -fno-omit-frame-pointer)
+    endif()
 endif()
 
 if(MACOSX)
@@ -183,7 +189,7 @@ if(qml_debug)
 endif()
 
 set(strip_binaries ON)
-if(targetDevice MATCHES "bpi|bananapi|rpi"
+if(targetDevice MATCHES "bpi|bananapi|rpi|edge1"
     OR targetDevice STREQUAL "linux-x64"
     OR targetDevice STREQUAL "linux-x86"
     OR (targetDevice STREQUAL "" AND platform STREQUAL "linux")

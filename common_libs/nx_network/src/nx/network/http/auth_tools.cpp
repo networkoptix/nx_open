@@ -4,21 +4,77 @@
 
 #include <QtCore/QCryptographicHash>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
+
+void AuthToken::setPassword(const nx::String& password)
+{
+    type = AuthTokenType::password;
+    value = password;
+}
+
+void AuthToken::setHa1(const nx::String& ha1)
+{
+    type = AuthTokenType::ha1;
+    value = ha1;
+}
+
+bool AuthToken::empty() const
+{
+    return type == AuthTokenType::none || value.isEmpty();
+}
+
+PasswordAuthToken::PasswordAuthToken(const nx::String& password)
+{
+    setPassword(password);
+}
+
+Ha1AuthToken::Ha1AuthToken(const nx::String& ha1)
+{
+    setHa1(ha1);
+}
+
+Credentials::Credentials(
+    const QString& username,
+    const AuthToken& authToken)
+    :
+    username(username),
+    authToken(authToken)
+{
+}
+
+//-------------------------------------------------------------------------------------------------
+
+namespace {
+
+static void extractValues(
+    const AuthToken& authToken,
+    boost::optional<StringType>* userPassword,
+    boost::optional<BufferType>* predefinedHa1)
+{
+    if (authToken.type == AuthTokenType::password)
+        *userPassword = authToken.value;
+    else if (authToken.type == AuthTokenType::ha1)
+        *predefinedHa1 = authToken.value;
+}
+
+} // namespace
 
 bool addAuthorization(
     Request* const request,
-    const StringType& userName,
-    const boost::optional<StringType>& userPassword,
-    const boost::optional<BufferType>& predefinedHA1,
+    const Credentials& credentials,
     const header::WWWAuthenticate& wwwAuthenticateHeader)
 {
-    if (wwwAuthenticateHeader.authScheme == header::AuthScheme::basic)
+    if (wwwAuthenticateHeader.authScheme == header::AuthScheme::basic &&
+        (credentials.authToken.type == AuthTokenType::password || credentials.authToken.empty()))
     {
-        header::BasicAuthorization basicAuthorization(userName, userPassword ? userPassword.get() : StringType());
-        nx_http::insertOrReplaceHeader(
+        header::BasicAuthorization basicAuthorization(
+            credentials.username.toUtf8(),
+            credentials.authToken.value);
+        nx::network::http::insertOrReplaceHeader(
             &request->headers,
-            nx_http::HttpHeader(
+            nx::network::http::HttpHeader(
                 header::Authorization::NAME,
                 basicAuthorization.serialized()));
         return true;
@@ -26,12 +82,9 @@ bool addAuthorization(
     else if (wwwAuthenticateHeader.authScheme == header::AuthScheme::digest)
     {
         header::DigestAuthorization digestAuthorizationHeader;
-        //calculating authorization header
         if (!calcDigestResponse(
                 request->requestLine.method,
-                userName,
-                userPassword,
-                predefinedHA1,
+                credentials,
                 request->requestLine.url.path().toUtf8(),
                 wwwAuthenticateHeader,
                 &digestAuthorizationHeader))
@@ -40,7 +93,7 @@ bool addAuthorization(
         }
         insertOrReplaceHeader(
             &request->headers,
-            nx_http::HttpHeader(
+            nx::network::http::HttpHeader(
                 header::Authorization::NAME,
                 digestAuthorizationHeader.serialized()));
         return true;
@@ -161,7 +214,7 @@ static bool calcDigestResponse(
     const QByteArray& method,
     const StringType& userName,
     const boost::optional<StringType>& userPassword,
-    const boost::optional<BufferType>& predefinedHA1,
+    const boost::optional<BufferType>& predefinedHa1,
     const StringType& uri,
     const QMap<BufferType, BufferType>& inputParams,
     QMap<BufferType, BufferType>* const outputParams)
@@ -178,8 +231,8 @@ static bool calcDigestResponse(
     if (qop.indexOf("auth-int") != -1)
         return false; //< qop=auth-int is not supported
 
-    const BufferType& ha1 = predefinedHA1
-        ? predefinedHA1.get()
+    const BufferType& ha1 = predefinedHa1
+        ? predefinedHa1.get()
         : calcHa1(
             userName,
             realm,
@@ -223,7 +276,7 @@ bool calcDigestResponse(
     const QByteArray& method,
     const StringType& userName,
     const boost::optional<StringType>& userPassword,
-    const boost::optional<BufferType>& predefinedHA1,
+    const boost::optional<BufferType>& predefinedHa1,
     const StringType& uri,
     const header::WWWAuthenticate& wwwAuthenticateHeader,
     header::DigestAuthorization* const digestAuthorizationHeader)
@@ -237,17 +290,38 @@ bool calcDigestResponse(
         method,
         userName,
         userPassword,
-        predefinedHA1,
+        predefinedHa1,
         uri,
         wwwAuthenticateHeader.params,
         &digestAuthorizationHeader->digest->params);
+}
+
+bool calcDigestResponse(
+    const StringType& method,
+    const Credentials& credentials,
+    const StringType& uri,
+    const header::WWWAuthenticate& wwwAuthenticateHeader,
+    header::DigestAuthorization* const digestAuthorizationHeader)
+{
+    boost::optional<StringType> userPassword;
+    boost::optional<BufferType> predefinedHa1;
+    extractValues(credentials.authToken, &userPassword, &predefinedHa1);
+
+    return calcDigestResponse(
+        method,
+        credentials.username.toUtf8(),
+        userPassword,
+        predefinedHa1,
+        uri,
+        wwwAuthenticateHeader,
+        digestAuthorizationHeader);
 }
 
 bool validateAuthorization(
     const StringType& method,
     const StringType& userName,
     const boost::optional<StringType>& userPassword,
-    const boost::optional<BufferType>& predefinedHA1,
+    const boost::optional<BufferType>& predefinedHa1,
     const header::DigestAuthorization& digestAuthorizationHeader)
 {
     const auto& digestParams = digestAuthorizationHeader.digest->params;
@@ -262,7 +336,7 @@ bool validateAuthorization(
 
     QMap<BufferType, BufferType> outputParams;
     const auto result = calcDigestResponse(
-        method, userName, userPassword, predefinedHA1, uri,
+        method, userName, userPassword, predefinedHa1, uri,
         digestParams, &outputParams);
 
     if (!result)
@@ -316,4 +390,6 @@ BufferType calcResponseFromIntermediate(
     return response.toHex();
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

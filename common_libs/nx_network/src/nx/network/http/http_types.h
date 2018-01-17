@@ -19,6 +19,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/qnbytearrayref.h>
 #include <nx/utils/software_version.h>
+#include <nx/utils/url.h>
 
 /**
  * Holds http-implementation suitable for async/sync i/o.
@@ -30,7 +31,9 @@
  *     header data to buffer, ready to be passed to socket.
  *   - QByteArray is compatible with QString.
  */
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 const int DEFAULT_HTTP_PORT = 80;
 const int DEFAULT_HTTPS_PORT = 443;
@@ -73,9 +76,9 @@ struct NX_NETWORK_API ci_less:
 };
 
 /** HTTP header container.
- * WARNING: This is multimap(!) to allow same header be present multiple times in a 
- * single http message. 
- * To insert or replace use nx_http::insertOrReplaceHeader
+ * WARNING: This is multimap(!) to allow same header be present multiple times in a
+ * single http message.
+ * To insert or replace use nx::network::http::insertOrReplaceHeader
  */
 using HttpHeaders = std::multimap<StringType, StringType, ci_less>;
 using HttpHeader = HttpHeaders::value_type;
@@ -101,6 +104,15 @@ bool NX_NETWORK_API readHeader(
  */
 HttpHeaders::iterator NX_NETWORK_API insertOrReplaceHeader(
     HttpHeaders* const headers, const HttpHeader& newHeader);
+
+template<typename HeaderType>
+HttpHeaders::iterator insertOrReplaceHeader(
+    HttpHeaders* const headers, const HeaderType& header)
+{
+    return insertOrReplaceHeader(
+        headers,
+        HttpHeader(HeaderType::NAME, header.toString()));
+}
 
 HttpHeaders::iterator NX_NETWORK_API insertHeader(
     HttpHeaders* const headers, const HttpHeader& newHeader);
@@ -238,7 +250,7 @@ class NX_NETWORK_API RequestLine
 {
 public:
     StringType method;
-    QUrl url;
+    nx::utils::Url url;
     MimeProtoVersion version;
 
     RequestLine() = default;
@@ -502,18 +514,18 @@ static const StringType ANY_CODING("*");
 class NX_NETWORK_API AcceptEncodingHeader
 {
 public:
-    AcceptEncodingHeader(const nx_http::StringType& strValue);
+    AcceptEncodingHeader(const nx::network::http::StringType& strValue);
 
-    void parse(const nx_http::StringType& str);
+    void parse(const nx::network::http::StringType& str);
     /**
-     * @return true if encodingName is present in header and 
+     * @return true if encodingName is present in header and
      *   returns corresponding qvalue in *q (if not null).
      */
-    bool encodingIsAllowed(const nx_http::StringType& encodingName, double* q = nullptr) const;
+    bool encodingIsAllowed(const nx::network::http::StringType& encodingName, double* q = nullptr) const;
 
 private:
     /** map<coding, qvalue>. */
-    std::map<nx_http::StringType, double> m_codings;
+    std::map<nx::network::http::StringType, double> m_codings;
     boost::optional<double> m_anyCodingQValue;
 };
 
@@ -538,7 +550,7 @@ public:
     /**
      * NOTE: In case of parse error, contents of this object are undefined.
      */
-    bool parse(const nx_http::StringType& strValue);
+    bool parse(const nx::network::http::StringType& strValue);
 
     /**
      * @return true if range is satisfiable for content of size contentSize.
@@ -598,7 +610,7 @@ public:
     /**
      * NOTE: In case of parse error, contents of this object are undefined.
      */
-    bool parse(const nx_http::StringType& strValue);
+    bool parse(const nx::network::http::StringType& strValue);
     StringType toString() const;
 };
 
@@ -613,7 +625,7 @@ public:
         std::chrono::seconds _timeout,
         boost::optional<int> _max = boost::none);
 
-    bool parse(const nx_http::StringType& strValue);
+    bool parse(const nx::network::http::StringType& strValue);
     StringType toString() const;
 };
 
@@ -637,15 +649,29 @@ public:
 
     bool operator==(const Server&) const;
 
-    bool parse(const nx_http::StringType& strValue);
+    bool parse(const nx::network::http::StringType& strValue);
     StringType toString() const;
 
 private:
-    nx_http::StringType toString(const Product& product) const;
+    nx::network::http::StringType toString(const Product& product) const;
     bool readProduct(Product* product, QnByteArrayConstRef* inputStr);
     void readProductName(Product* product, QnByteArrayConstRef* inputStr);
     void readProductVersion(Product* product, QnByteArrayConstRef* inputStr);
     void readProductComment(Product* product, QnByteArrayConstRef* inputStr);
+};
+
+class NX_NETWORK_API StrictTransportSecurity
+{
+public:
+    static const StringType NAME;
+
+    std::chrono::seconds maxAge = std::chrono::seconds::zero();
+    bool includeSubDomains = false;
+    bool preload = false;
+
+    bool operator==(const StrictTransportSecurity&) const;
+    bool parse(const nx::network::http::StringType& strValue);
+    StringType toString() const;
 };
 
 } // namespace header
@@ -674,7 +700,7 @@ public:
      */
     int parse(const ConstBufferRefType& buf);
     /**
-     * @return bytes written to dstBuffer. -1 in case of serialize error. 
+     * @return bytes written to dstBuffer. -1 in case of serialize error.
      *   In this case contents of dstBuffer are undefined.
      */
     int serialize(BufferType* const dstBuffer) const;
@@ -694,4 +720,6 @@ StringType NX_NETWORK_API serverString();
  */
 QByteArray NX_NETWORK_API formatDateTime(const QDateTime& value);
 
-} // nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

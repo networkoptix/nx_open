@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
 set(customization "default" CACHE STRING "Product customization")
 option(beta "Is this build is beta build" ON)
@@ -42,7 +42,7 @@ if(targetDevice AND NOT targetDevice STREQUAL "ios")
     include(cmake/sync_toolchain.cmake)
 endif()
 
-project(vms VERSION 3.1.0)
+project(vms VERSION 4.0.0)
 
 if(targetDevice STREQUAL "ios")
     include(cmake/ios.cmake)
@@ -57,11 +57,15 @@ set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+set(CMAKE_DEBUG_POSTFIX "" CACHE INTERNAL "" FORCE)
+
 list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/build_utils/cmake
-    ${PROJECT_SOURCE_DIR}/cmake)
+    ${PROJECT_SOURCE_DIR}/cmake
+)
 
 include(CMakeParseArguments)
+include(CMakeDependentOption)
 include(ExternalProject)
 include(target_detection)
 include(utils)
@@ -94,11 +98,8 @@ include(dependencies)
 include(maven_compatibility)
 include(generate_current_config)
 
-if(CMAKE_CROSSCOMPILING)
-    set(QT_PREFIX "..")
-else()
-    set(QT_PREFIX "${QT_DIR}")
-endif()
+nx_create_dev_qt_conf()
+
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
     set(CMAKE_FRAMEWORK_PATH "${QT_DIR}/lib")
@@ -134,7 +135,12 @@ find_package(Qt5
         Concurrent
         Multimedia)
 
-if(withDesktopClient OR withMobileClient)
+if(targetDevice STREQUAL "bpi")
+    set_property(TARGET Qt5::Gui APPEND PROPERTY
+        INTERFACE_LINK_LIBRARIES EGL GLESv2 UMP)
+endif()
+
+if(withDesktopClient OR withMobileClient OR withNxTool)
     find_package(Qt5
         COMPONENTS
             Qml
@@ -143,7 +149,9 @@ endif()
 
 set(QML_IMPORT_PATH
     "${QT_DIR}/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/client/nx_client_desktop/static-resources/qml"
     "${CMAKE_CURRENT_LIST_DIR}/client/mobile_client/static-resources/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/nxtool/static-resources/src/qml"
     CACHE STRING "Extra QML import paths")
 
 if(ANDROID)
@@ -153,24 +161,30 @@ endif()
 if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        add_subdirectory(wixsetup)
-    endif()
 endif()
+
+add_subdirectory(dependencies)
 
 # Required for QN_DECLARE_METAOBJECT_HEADER
 include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
 
-add_subdirectory(common_libs)
-add_subdirectory(common)
-add_subdirectory(appserver2)
-add_subdirectory(nx_cloud)
+
+if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
+    add_subdirectory(common_libs)
+    add_subdirectory(common)
+    add_subdirectory(appserver2)
+    add_subdirectory(nx_cloud)
+endif()
 
 if(withMediaServer)
     add_subdirectory(mediaserver_core)
     add_subdirectory(mediaserver)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
+
+    if(LINUX AND box MATCHES "none|tx1")
+        add_subdirectory(root_tool)
+    endif()
 endif()
 
 if(withTestCamera)
@@ -185,13 +199,57 @@ if(withDesktopClient OR withMobileClient)
     add_subdirectory(client)
 endif()
 
+if(withNxTool)
+    add_subdirectory(nxtool)
+endif()
+
 if(withTests)
+    set(_build_shared_libs ${BUILD_SHARED_LIBS})
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
+    # Prevent overriding the parent project's compiler/linker settings on Windows.
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+    add_subdirectory(${CMAKE_SOURCE_DIR}/artifacts/googletest)
+
+    unset(BUILD_SHARED_LIBS CACHE)
+    set(BUILD_SHARED_LIBS ${_build_shared_libs})
+    unset(_build_shared_libs)
+
+    add_library(GTest INTERFACE)
+    target_link_libraries(GTest INTERFACE gtest gtest_main)
+    add_library(GMock INTERFACE)
+    target_link_libraries(GMock INTERFACE gmock gmock_main)
+
     add_subdirectory(unit_tests)
     add_subdirectory(tests)
 endif()
 
-if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
-    add_subdirectory(edge_firmware)
+if(withDistributions)
+    if(WINDOWS)
+        add_subdirectory(wixsetup)
+    endif()
+
+    if(LINUX AND box STREQUAL "none") #< Desktop Linux.
+        add_subdirectory(debsetup)
+    endif()
+
+    if(MACOSX)
+        add_subdirectory(macsetup)
+    endif()
+
+    if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
+        add_subdirectory(edge_firmware)
+    endif()
 endif()
 
 include(fix_qt_vars)
+
+if(beta)
+    set(beta_bool "true")
+else()
+    set(beta_bool "false")
+endif()
+nx_configure_file(
+    build_variables/maven/filter-resources/build_info.txt
+    ${CMAKE_CURRENT_BINARY_DIR})

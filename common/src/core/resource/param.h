@@ -17,7 +17,6 @@ namespace Qn
     static const QString IS_AUDIO_SUPPORTED_PARAM_NAME = lit("isAudioSupported");
     static const QString STREAM_FPS_SHARING_PARAM_NAME = lit("streamFpsSharing");
     static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
-    static const QString FORCED_AUDIO_SUPPORTED_PARAM_NAME = lit("forcedIsAudioSupported");
     static const QString MOTION_WINDOW_CNT_PARAM_NAME = lit("motionWindowCnt");
     static const QString MOTION_MASK_WINDOW_CNT_PARAM_NAME = lit("motionMaskWindowCnt");
     static const QString MOTION_SENS_WINDOW_CNT_PARAM_NAME = lit("motionSensWindowCnt");
@@ -62,6 +61,7 @@ namespace Qn
     static const QString TWO_WAY_AUDIO_PARAM_NAME = lit("2WayAudio");
     static const QString kCombinedSensorsDescriptionParamName = lit("combinedSensorsDescription");
     static const QString kAnalyticsDriversParamName = lit("analyticsDrivers");
+    static const QString kGroupPlayParamName = lit("groupplay");
 
     static const QString kPrimaryStreamResolutionParamName = lit("primaryStreamResolution");
     static const QString kSecondaryStreamResolutionParamName = lit("secondaryStreamResolution");
@@ -70,23 +70,26 @@ namespace Qn
     static const QString kSecondaryStreamCodecParamName = lit("secondaryStreamCodec");
     static const QString kSecondaryStreamCodecProfileParamName = lit("secondaryStreamCodecProfile");
     static const QString kPrimaryStreamGovLengthParamName = lit("primaryStreamGovLength");
-    static const QString kSecondaryStreamGovLengthParamName = lit("secondaryStreamGovLenght");
+    static const QString kSecondaryStreamGovLengthParamName = lit("secondaryStreamGovLength");
     static const QString kPrimaryStreamBitrateControlParamName = lit("primaryStreamBitrateControl");
     static const QString kSecondaryStreamBitrateControlParamName = lit("secondaryStreamBitrateControl");
     static const QString kPrimaryStreamBitrateParamName = lit("primaryStreamBitrate");
     static const QString kSecondaryStreamBitrateParamName = lit("secondaryStreamBitrate");
+    static const QString kPrimaryStreamEntropyCodingParamName = lit("primaryStreamEntropyCoding");
+    static const QString kSecondaryStreamEntropyCodingParamName = lit("secondaryStreamEntropyCoding");
+    static const QString kSecondaryStreamFpsParamName = lit("secondaryStreamFps");
 
     static const QString ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME = lit("advancedParameterOverloads");
 
     static const QString PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME = lit("preStreamConfigureRequests");
 
     static const QString SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME = lit("shouldAppearAsSingleChannel");
+    static const QString IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME = lit("ignoreCameraTimeIfBigJitter");
     //!Contains QnCameraAdvancedParams in ubjson-serialized state
     static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
     static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");
     static const QString SPROP_PARAMETER_SETS_PARAM_NAME = lit("sprop-parameter-sets");
     static const QString FIRMWARE_PARAM_NAME = lit("firmware");
-    static const QString IS_AUDIO_FORCED_PARAM_NAME = lit("forcedAudioStream");
 	static const QString VIDEO_DISABLED_PARAM_NAME = lit("noVideoSupport");
     static const QString IO_SETTINGS_PARAM_NAME = lit("ioSettings");
     static const QString IO_CONFIG_PARAM_NAME = lit("ioConfigCapability");
@@ -103,6 +106,9 @@ namespace Qn
     static const QString NO_RECORDING_PARAMS_PARAM_NAME = lit("noRecordingParams");
     static const QString PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER = lit("parseOnvifNotificationsWithHttpReader");
     static const QString DISABLE_HEVC_PARAMETER_NAME = lit("disableHevc");
+
+    // Mediaserver common info
+    static const QString kTimezoneUtcOffset = lit("timezoneUtcOffset");
 
     // Mediaserver info for Statistics
     static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");

@@ -19,9 +19,9 @@
 #include <nx/utils/math/digraph.h>
 
 
-//!Checks that two sorted ranges contain elements of same value using comparator \a comp. Though, different element count is allowed
+//!Checks that two sorted ranges contain elements of same value using comparator comp. Though, different element count is allowed
 /*!
-    \note Multiple same elements in either range are allowed
+    NOTE: Multiple same elements in either range are allowed
     \param Comp comparator used to sort ranges
 */
 template<class FirstRangeIter, class SecondRangeIter, class Comp>
@@ -56,7 +56,7 @@ bool is_equal_sorted_ranges_if(
 }
 
 /*!
-    \note Multiple same elements in either range are allowed
+    NOTE: Multiple same elements in either range are allowed
 */
 template<class FirstRangeIter, class SecondRangeIter>
 bool are_elements_same_in_sorted_ranges(
@@ -147,7 +147,7 @@ public:
     LockGraphEdgeData& operator=( LockGraphEdgeData&& rhs );
 
     /*!
-        Returns \a true if run-time transition from *this to \a rhs is possible.
+        Returns true if run-time transition from *this to rhs is possible.
         That means:\n
             - rhs has elements with different thread id
             - or it has element with same thread id and this->secondLocked == rhs.firstLocked

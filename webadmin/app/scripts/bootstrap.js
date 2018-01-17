@@ -37,7 +37,6 @@ function setLanguage(lang){
     var userLang = getCookie("language");
     if(!userLang) {
         var match = window.location.href.match(/[?&]lang=([^&#]+)/i);
-        console.log(match);
         if(match){
             userLang = match[1];
         }
@@ -45,6 +44,9 @@ function setLanguage(lang){
     if(!userLang){
         userLang = navigator.language || navigator.userLanguage;
         userLang = userLang.replace('-','_');
+        userLang = _.find(Config.supportedLanguages, function(supportedLanguage){
+            return supportedLanguage.indexOf(userLang) == 0;
+        });
     }
     if(!userLang){
         userLang = Config.defaultLanguage;
@@ -58,6 +60,7 @@ function setLanguage(lang){
         success: function (response) {
             L = response;// Fill global L variable
             Config.viewsDir = 'lang_' + L.language + '/views/';
+            Config.viewsDirCommon =  'lang_' + L.language + '/web_common/views/';
             angular.bootstrap(document, ['webadminApp']);
         },
         error:function(){
@@ -68,8 +71,8 @@ function setLanguage(lang){
                 dataType: 'json',
                 success: function (response) {
                     L = response;// Fill global L variable
-                    Config.viewsDir = 'lang_' + L.language + '/views/';
-                    Config.viewsDirCommon =  'lang_' + L.language + '/web_common/views/';
+                    Config.viewsDir = 'lang_' + Config.defaultLanguage + '/views/';
+                    Config.viewsDirCommon =  'lang_' + Config.defaultLanguage + '/web_common/views/';
                     angular.bootstrap(document, ['webadminApp']);
                 },
                 error:function(){

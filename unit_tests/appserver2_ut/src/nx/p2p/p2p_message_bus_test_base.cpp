@@ -197,7 +197,7 @@ void P2pMessageBusTestBase::connectServers(const Appserver2Ptr& srcServer, const
     const auto addr = dstServer->moduleInstance()->endpoint();
     auto peerId = dstServer->moduleInstance()->commonModule()->moduleGUID();
 
-    QUrl url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
+    nx::utils::Url url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
     srcServer->moduleInstance()->ecConnection()->messageBus()->
         addOutgoingConnectionToPeer(peerId, url);
 }
@@ -228,6 +228,39 @@ void P2pMessageBusTestBase::fullConnect(std::vector<Appserver2Ptr>& servers)
             connectServers(servers[j], servers[i]);
         }
     }
+}
+
+bool P2pMessageBusTestBase::waitForCondition(
+    std::function<bool()> condition,
+    std::chrono::milliseconds timeout)
+{
+    QElapsedTimer timer;
+    timer.restart();
+    while (!condition() && timer.elapsed() < timeout.count())
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    return condition();
+}
+
+bool P2pMessageBusTestBase::waitForConditionOnAllServers(
+    std::function<bool(const Appserver2Ptr&)> condition,
+    std::chrono::milliseconds timeout)
+{
+    int syncDoneCounter = 0;
+    QElapsedTimer timer;
+    timer.restart();
+    do
+    {
+        syncDoneCounter = 0;
+        for (const auto& server: m_servers)
+        {
+            if (condition(server))
+                ++syncDoneCounter;
+            else
+                break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    } while (syncDoneCounter != m_servers.size() && timer.elapsed() < timeout.count());
+    return timer.elapsed() < timeout.count();
 }
 
 } // namespace test

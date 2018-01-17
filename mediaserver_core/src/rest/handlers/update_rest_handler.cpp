@@ -15,6 +15,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"
 #include <common/static_common_module.h>
+#include <nx/utils/file_system.h>
 
 int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *processor)
 {
@@ -40,7 +41,7 @@ int QnUpdateRestHandler::executePost(
         reply.offset = ec2::AbstractUpdatesManager::UnknownError;
         result.setError(QnJsonRestResult::Error::Forbidden);
         result.setReply(reply);
-        return nx_http::StatusCode::forbidden;
+        return nx::network::http::StatusCode::forbidden;
     }
 
 
@@ -63,8 +64,16 @@ int QnUpdateRestHandler::executePost(
                 ? ec2::AbstractUpdatesManager::NoError
                 : ec2::AbstractUpdatesManager::UnknownError;
             result.setReply(reply);
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         }
+    }
+
+    // TODO: updateId is not a path, so verification must be a bit tougher.
+    // It may be verified to be a file name.
+    if (!nx::utils::file_system::isRelativePathSafe(updateId))
+    {
+        result.setError(QnRestResult::InvalidParameter, lit("updateId"));
+        return nx::network::http::StatusCode::ok;
     }
 
     QnSoftwareVersion version;
@@ -75,31 +84,31 @@ int QnUpdateRestHandler::executePost(
         if (!verifyUpdatePackage(&buffer, &version, &sysInfo)) {
             NX_WARNING(this, "An upload has been received but not veryfied");
             result.setError(QnJsonRestResult::CantProcessRequest, lit("INVALID_FILE"));
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         }
     }
 
     if (version == qnStaticCommon->engineVersion()) {
         result.setError(QnJsonRestResult::NoError, lit("UP_TO_DATE"));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     if (sysInfo != QnSystemInformation::currentSystemInformation()) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE_SYSTEM"));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     if (!QnServerUpdateTool::instance()->addUpdateFile(version.toString(), body)) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("EXTRACTION_ERROR"));
-        return nx_http::StatusCode::internalServerError;
+        return nx::network::http::StatusCode::internalServerError;
     }
 
     if (!QnServerUpdateTool::instance()->installUpdate(version.toString())) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INSTALLATION_ERROR"));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnUpdateRestHandler::handlePartialUpdate(const QString &updateId, const QByteArray &data, qint64 offset, QnJsonRestResult &result) {
@@ -126,5 +135,5 @@ int QnUpdateRestHandler::handlePartialUpdate(const QString &updateId, const QByt
 
     result.setReply(reply);
     result.setError(QnJsonRestResult::NoError);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

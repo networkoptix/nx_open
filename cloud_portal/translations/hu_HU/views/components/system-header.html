@@ -1,8 +1,13 @@
 <div class="row">
     <div class="col-sm-6">
-        <h1 ng-if="gettingSystem.success" class="ellipsis">{{system.info.name}} <span ng-if="!system.isOnline" class="label"
-                  ng-class="$root.C.systemStatuses[system.info.stateOfHealth].style || $root.C.systemStatuses.default.style">{{$root.L.systemStatuses[system.info.stateOfHealth]||system.info.stateOfHealth}}</span> <span ng-if="system.isOnline&&!system.isAvailable" class="label"
-                  ng-class="$root.C.systemStatuses.unavailable.style">{{$root.L.systemStatuses.unavailable}}</span>
+        <h1 ng-if="gettingSystem.success" class="ellipsis">{{system.info.name}}
+            <span ng-if="!system.isOnline" class="label"
+                  ng-class="$root.C.systemStatuses[system.info.stateOfHealth].style || $root.C.systemStatuses.default.style">
+                  {{$root.L.systemStatuses[system.info.stateOfHealth]||system.info.stateOfHealth}}</span>
+
+            <span ng-if="system.isOnline&&!system.isAvailable" class="label"
+                  ng-class="$root.C.systemStatuses.unavailable.style">
+                  {{$root.L.systemStatuses.unavailable}}</span>
         </h1>
     </div>
     <div class="col-sm-6">

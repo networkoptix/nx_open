@@ -1,5 +1,7 @@
 #include "listener.h"
 
+namespace nx {
+namespace network {
 namespace pcp {
 
 Listener::Listener(Events& events)
@@ -61,3 +63,5 @@ void Listener::readHandler(SystemError::ErrorCode /*result*/, size_t /*size*/)
 }
 
 } // namespace pcp
+} // namespace network
+} // namespace nx

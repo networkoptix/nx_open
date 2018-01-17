@@ -59,5 +59,5 @@ int QnAuditLogRestHandler::executeGet(
     }
 
     QnFusionRestHandlerDetail::serializeRestReply(outputData, params, contentBody, contentType, QnRestResult());
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

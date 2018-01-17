@@ -20,13 +20,13 @@ public:
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+    virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
 protected:
     // return the manufacture of the server
     virtual QString manufacture() const;
 private:
-    QList<QSharedPointer<AbstractDatagramSocket> > m_socketList;
+    QList<QSharedPointer<nx::network::AbstractDatagramSocket> > m_socketList;
     qint64 m_lastReadSocketTime;
 };
 

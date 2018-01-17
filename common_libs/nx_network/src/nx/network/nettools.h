@@ -1,5 +1,4 @@
-#ifndef cl_net_tools_1232
-#define cl_net_tools_1232
+#pragma once
 
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QUdpSocket>
@@ -7,6 +6,8 @@
 
 #include <nx/network/socket_common.h>
 
+namespace nx {
+namespace network {
 
 static const int ping_timeout = 300;
 
@@ -24,8 +25,9 @@ struct NX_NETWORK_API QnInterfaceAndAddr
     {
     }
 
-    QHostAddress networkAddress() const;
+    QHostAddress subNetworkAddress() const;
     QHostAddress broadcastAddress() const;
+    bool isHostBelongToIpv4Network(const QHostAddress& address) const;
 
     QString name;
     QHostAddress address;
@@ -54,10 +56,16 @@ NX_NETWORK_API QString MACToString(const unsigned char *mac);
 NX_NETWORK_API unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep);
 NX_NETWORK_API unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);
 
-// returns list of interfaces.
-// Set allowItfWithoutAddress to <true> to get list with interfaces without any ip
+/**
+ * Returns list of network interfaces.
+ * @param allowInterfacesWithoutAddress get interfaces without ipv4.
+ * @param keepAllAddressesPerInterface return several records for interfaces with multiple addresses.
+ */
+
 typedef QList<QnInterfaceAndAddr> QnInterfaceAndAddrList;
-QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(bool allowItfWithoutAddress = false);
+QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(
+    bool allowInterfacesWithoutAddress = false,
+    bool keepAllAddressesPerInterface = false);
 
 // returns list of IPv4 addresses of current machine. Skip 127.0.0.1 and addresses we can't bind to.
 QList<QHostAddress> NX_NETWORK_API allLocalIpV4Addresses();
@@ -98,6 +106,7 @@ QList<QHostAddress> NX_NETWORK_API pingableAddresses(const QHostAddress& startAd
 //QN_EXPORT bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port = 0, QUdpSocket::BindMode mode = QUdpSocket::DefaultForPlatform);
 
 bool NX_NETWORK_API isIpv4Address(const QString& addr);
+// TODO: #ak Remove this method if favor of AddressResolver.
 QHostAddress NX_NETWORK_API resolveAddress(const QString& addr);
 
 int NX_NETWORK_API strEqualAmount(const char* str1, const char* str2);
@@ -108,7 +117,7 @@ bool NX_NETWORK_API isNewDiscoveryAddressBetter(
 
 static const int MAC_ADDR_LEN = 18;
 /*!
-    \param host If function succeeds \a *host contains pointer to statically-allocated buffer,
+    \param host If function succeeds *host contains pointer to statically-allocated buffer,
         so it MUST NOT be freed!
     \return 0 on success, -1 in case of error. Use errno to get error code
 */
@@ -117,4 +126,5 @@ QString NX_NETWORK_API getMacFromPrimaryIF();
 
 QSet<QString> NX_NETWORK_API getLocalIpV4AddressList();
 
-#endif //cl_net_tools_1232
+} // namespace network
+} // namespace nx

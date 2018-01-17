@@ -3,9 +3,9 @@
 #include "vmax480_resource_searcher.h"
 #include "vmax480_resource.h"
 #include "utils/common/sleep.h"
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/http/http_types.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/utils/log/log.h>
 
 #include <QtXml/QXmlDefaultHandler>
@@ -33,14 +33,14 @@ QnPlVmax480ResourceSearcher::~QnPlVmax480ResourceSearcher()
 }
 
 void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAddr,
-                                                const SocketAddress& deviceEndpoint,
-                                                const nx_upnp::DeviceInfo& devInfo,
+                                                const nx::network::SocketAddress& deviceEndpoint,
+                                                const nx::network::upnp::DeviceInfo& devInfo,
                                                 const QByteArray& /*xmlDevInfo*/,
                                                 QnResourceList& result)
 {
     Q_UNUSED(discoveryAddr)
 
-    QnMacAddress mac(devInfo.serialNumber);
+    nx::network::QnMacAddress mac(devInfo.serialNumber);
     const int channelCountEndIndex = devInfo.modelName.indexOf( QLatin1String("CH") );
     if( channelCountEndIndex == -1 )
         return;
@@ -266,7 +266,7 @@ int extractChannelCount(const QByteArray& model)
     return num.toInt();
 }
 
-QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol

@@ -5,20 +5,22 @@
 
 #include <client/client_globals.h>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/common/geometry.h>
+#include <nx/client/core/utils/geometry.h>
 #include <ui/common/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/autoscaled_plain_text.h>
 #include <ui/widgets/common/busy_indicator.h>
 
-#include <utils/image_provider.h>
+#include <nx/client/desktop/image_providers/image_provider.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -41,7 +43,7 @@ public:
         auto sourceRect = indicatorRect();
         auto targetRect = contentsRect();
 
-        qreal scale = QnGeometry::scaleFactor(sourceRect.size(), targetRect.size(),
+        qreal scale = Geometry::scaleFactor(sourceRect.size(), targetRect.size(),
             Qt::KeepAspectRatio);
 
         QnScopedPainterTransformRollback transformRollback(painter);
@@ -140,6 +142,58 @@ void QnResourcePreviewWidget::setBorderRole(QPalette::ColorRole role)
     update();
 }
 
+QRectF QnResourcePreviewWidget::highlightRect() const
+{
+    return m_highlightRect;
+}
+
+void QnResourcePreviewWidget::setHighlightRect(const QRectF& relativeRect)
+{
+    if (m_highlightRect == relativeRect)
+        return;
+
+    m_highlightRect = relativeRect;
+    update();
+}
+
+QnResourcePreviewWidget::CropMode QnResourcePreviewWidget::cropMode() const
+{
+    return m_cropMode;
+}
+
+void QnResourcePreviewWidget::setCropMode(CropMode value)
+{
+    if (m_cropMode == value)
+        return;
+
+    m_cropMode = value;
+    update();
+}
+
+bool QnResourcePreviewWidget::cropRequired() const
+{
+    if (m_highlightRect.isEmpty())
+        return false;
+
+    switch (m_cropMode)
+    {
+        case CropMode::never:
+            return false;
+
+        case CropMode::always:
+            return true;
+
+        case CropMode::hovered:
+            return underMouse();
+
+        case CropMode::notHovered:
+            return !underMouse();
+    }
+
+    NX_ASSERT(false); //< Should never happen.
+    return false;
+}
+
 void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
@@ -162,12 +216,47 @@ void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
     }
     else
     {
-        const auto sourceSize = m_preview.size() / m_preview.devicePixelRatio();
-        const auto paintSize = QnGeometry::bounded(sourceSize, size(), Qt::KeepAspectRatio);
+        const auto paintSize = Geometry::scaled(m_preview.size(), size(), Qt::KeepAspectRatio);
         const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
-            size(), QRect(QPoint(), paintSize.toSize()));
-        painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-        painter.drawPixmap(paintRect, m_preview);
+            paintSize.toSize(), rect());
+
+        QRectF highlightSubRect;
+        painter.setRenderHints(QPainter::SmoothPixmapTransform);
+
+        if (cropRequired())
+        {
+            const auto croppedImageRect = Geometry::subRect(m_preview.rect(), m_highlightRect);
+            const auto boundingRect = Geometry::expanded(Geometry::aspectRatio(paintRect),
+                croppedImageRect, Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
+
+            const auto sourceRect = Geometry::movedInto(boundingRect, m_preview.rect());
+
+            painter.drawPixmap(paintRect, m_preview, sourceRect);
+            highlightSubRect = Geometry::toSubRect(sourceRect, croppedImageRect);
+        }
+        else
+        {
+            painter.drawPixmap(paintRect, m_preview);
+            highlightSubRect = m_highlightRect;
+        }
+
+        if (highlightSubRect.isEmpty())
+            return;
+
+        // Dim everything around highlighted area.
+        const auto highlightRect = Geometry::subRect(paintRect, highlightSubRect).toAlignedRect()
+            .intersected(paintRect);
+
+        if (highlightRect != paintRect)
+        {
+            QPainterPath path;
+            path.addRegion(QRegion(paintRect).subtracted(highlightRect));
+            painter.fillPath(path, palette().alternateBase());
+        }
+
+        // Paint frame.
+        painter.setPen(QPen(palette().highlight(), 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+        painter.drawRect(Geometry::eroded(QRectF(highlightRect), 0.5));
     }
 }
 
@@ -195,7 +284,7 @@ QSize QnResourcePreviewWidget::sizeHint() const
     if (!m_cachedSizeHint.isValid())
     {
         if (!m_preview.isNull())
-            m_cachedSizeHint = m_preview.size();
+            m_cachedSizeHint = m_preview.size() / m_preview.devicePixelRatio();
 
         if (m_cachedSizeHint.isEmpty())
         {
@@ -227,7 +316,7 @@ bool QnResourcePreviewWidget::hasHeightForWidth() const
 int QnResourcePreviewWidget::heightForWidth(int width) const
 {
     const QSizeF hint = sizeHint();
-    return qRound(hint.height() / hint.width() * width);
+    return qMin(hint.height(), qRound(hint.height() / hint.width() * width));
 }
 
 void QnResourcePreviewWidget::retranslateUi()
@@ -264,7 +353,8 @@ void QnResourcePreviewWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
 
 void QnResourcePreviewWidget::updateThumbnailImage(const QImage& image)
 {
-    const auto maxHeight = qMin(maximumHeight(), heightForWidth(maximumWidth()));
+    const auto maxHeight =
+        qMin(maximumHeight(), maximumWidth() / Geometry::aspectRatio(sizeHint()));
     m_preview = QPixmap::fromImage(image.size().height() > maxHeight
         ? image.scaled(maximumSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation)
         : image);

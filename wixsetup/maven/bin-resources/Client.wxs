@@ -8,15 +8,15 @@
             <Directory Id="$(var.customization)ClientDir" Name="Client">
                 <Directory Id="$(var.customization)HelpDir" Name="help"/>
 
-                <Directory Id="$(var.clientDirId)" Name="$(var.releaseVersionFull)">
+                <Directory Id="ClientRootDir" Name="$(var.releaseVersionFull)">
 
                     <Component Id="MiniLauncherExecutable">
                         <File Id="minilauncher.exe" Name="$(var.minilauncherBinaryName)" Source="$(var.SourceDir)/minilauncher.exe" KeyPath="yes" DiskId="14">
                             <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="$(var.productName)"
-                              WorkingDirectory='$(var.clientDirId)' Advertise="yes" Icon="icon_menu.exe" >
+                              WorkingDirectory='ClientRootDir' Advertise="yes" Icon="icon_menu.exe" >
                             </Shortcut>
                             <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="$(var.productName)"
-                                 WorkingDirectory='$(var.clientDirId)' Icon="icon_desktop.exe">
+                                 WorkingDirectory='ClientRootDir' Icon="icon_desktop.exe">
                             </Shortcut>
                         </File>
                     </Component>
@@ -41,8 +41,12 @@
                     <Component Id="DefaultLanguage">
                         <RegistryKey Root="HKCU"
                                  Key="Software\[Manufacturer]\$(var.clientName)">
-                            <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_$(var.defaultTranslation).qm"/>
+                            <RegistryValue Type="string" Name="locale" Value="$(var.defaultTranslation)"/>
                         </RegistryKey>
+                    </Component>
+
+                    <Component Id="QtConf">
+                        <File Id="qt.conf" Name="qt.conf" Source="$(var.CurrentBinaryDir)/qt.conf" KeyPath="yes" DiskId="14"/>
                     </Component>
 
                     <Component Id="ClientUriHandler">
@@ -75,7 +79,7 @@
 
                     <Directory Id="Mediaservice" Name="mediaservice">
                     </Directory>
-                
+
                     <Directory Id="Audio" Name="audio">
                     </Directory>
 
@@ -103,15 +107,11 @@
                             <RegistryValue Type="string" Name="appserverLogin" Value="[CLIENT_APPSERVER_LOGIN]"/>
                         </RegistryKey>
                     </Component>
-
-                    <Component Id="ClientSigar">
-                        <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll" DiskId="6"/>
-                    </Component>
                 </Directory>
             </Directory>
         </DirectoryRef>
 
-        <ComponentGroup Id="ClientFFmpegLibraries" Directory="$(var.clientDirId)">
+        <ComponentGroup Id="ClientFFmpegLibraries" Directory="ClientRootDir">
             <Component>
                 <File Id="avcodec.dll" Name="avcodec-57.dll" Source="$(var.SourceDir)/avcodec-57.dll" DiskId="2" />
             </Component>
@@ -143,7 +143,7 @@
                 <File Id="libmp3lame.dll" Name="libmp3lame.dll" Source="$(var.SourceDir)/libmp3lame.dll" DiskId="3"/>
             </Component>
         </ComponentGroup>
-        <ComponentGroup Id="ClientLibs" Directory="$(var.clientDirId)">
+        <ComponentGroup Id="ClientLibs" Directory="ClientRootDir">
             <Component>
                 <File Id="nx_utils.dll" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="4" />
             </Component>
@@ -154,14 +154,20 @@
                 <File Id="nx_network.dll" Name="nx_network.dll" Source="$(var.SourceDir)/nx_network.dll" DiskId="4" />
             </Component>
             <Component>
+                <File Id="vms_gateway_core.dll" Name="vms_gateway_core.dll" Source="$(var.SourceDir)/vms_gateway_core.dll" DiskId="13" />
+            </Component>
+            <Component>
                 <File Id="udt.dll" Name="udt.dll" Source="$(var.SourceDir)/udt.dll" DiskId="4" />
             </Component>
             <Component>
                 <File Id="nx_kit.dll" Name="nx_kit.dll" Source="$(var.SourceDir)/nx_kit.dll" DiskId="4" />
             </Component>
+            <Component>
+                <File Id="nx_relaying.dll" Name="nx_relaying.dll" Source="$(var.SourceDir)/nx_relaying.dll" DiskId="13" />
+            </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ClientOpenAL" Directory="$(var.clientDirId)">
+        <ComponentGroup Id="ClientOpenAL" Directory="ClientRootDir">
             <Component>
                 <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="$(var.SourceDir)\OpenAL32.dll" DiskId="13"/>
             </Component>
@@ -178,7 +184,7 @@
         </ComponentGroup>
         <?endif?>
 
-        <ComponentGroup Id="ClientQTLibraries" Directory="$(var.clientDirId)">
+        <ComponentGroup Id="ClientQTLibraries" Directory="ClientRootDir">
             <Component>
                 <File Id="Qt5Core.dll" Name="Qt5Core.dll" Source="$(var.QtDir)\Qt5Core.dll" DiskId="7"/>
             </Component>
@@ -250,13 +256,13 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ClientQuazip" Directory="$(var.clientDirId)">
+        <ComponentGroup Id="ClientQuazip" Directory="ClientRootDir">
             <Component>
                 <File Id="quazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="6" />
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ClientOpenSSL" Directory="$(var.clientDirId)">
+        <ComponentGroup Id="ClientOpenSSL" Directory="ClientRootDir">
             <Component>
                 <File Id="ssl_libeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll" DiskId="6"/>
             </Component>
@@ -284,8 +290,8 @@
             <Component>
                 <File Id="qtmedia_audioengine.dll" Name="qtmedia_audioengine.dll" Source="$(var.QtPluginsDir)\mediaservice\qtmedia_audioengine.dll" DiskId="12" />
             </Component>
-        </ComponentGroup>		
-		
+        </ComponentGroup>
+
         <ComponentGroup Id="AudioPlugins" Directory="Audio">
             <Component>
                 <File Id="qtaudio_windows.dll" Name="qtaudio_windows.dll" Source="$(var.QtPluginsDir)\audio\qtaudio_windows.dll" DiskId="12" />
@@ -310,6 +316,7 @@
             <ComponentRef Id="DefaultLanguage" />
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="ClientUriHandler"/>
+            <ComponentRef Id="QtConf"/>
             <ComponentGroupRef Id="ClientHelpComponent"/>
             <ComponentGroupRef Id="ClientVoxComponent"/>
             <ComponentGroupRef Id="ClientFontsComponent"/>
@@ -329,7 +336,6 @@
             <ComponentGroupRef Id="AudioPlugins" />
             <ComponentGroupRef Id="ClientOpenAL" />
             <ComponentGroupRef Id="ClientOpenSSL" />
-            <ComponentRef Id="ClientSigar"/>
             <ComponentGroupRef Id="ClientVcrt14ComponentGroup"/>
         </Feature>
     </Fragment>

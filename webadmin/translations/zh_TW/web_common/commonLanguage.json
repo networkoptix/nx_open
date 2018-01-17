@@ -4,24 +4,24 @@
     "lowStream":"低解析串流",
     "transcoding":"轉碼",
     "unknown":"未知",
-    "copyToClipboard":"copy to clipboard",
-    "copyDefaultText":"copy",
-    "copyActiveText":"copied to clipboard"
+    "copyToClipboard":"複製到剪貼簿",
+    "copyDefaultText":"複製",
+    "copyActiveText":"已複製到剪貼簿"
   },
-  "systemOffline":"System Offline",
+  "systemOffline":"系統處於離線狀態",
   "cameraStates":{
     "offline":"離線",
     "error":"錯誤",
     "unauthorized":"需要身份驗證",
-    "noData":"No data",
-    "iosVideoTooLarge":"iOS does not support video larger than fullHD (2MP: 1920x1080).",
-    "flashRequired":"Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers.",
-    "flashOrWebmRequired":"Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
-    "noArmSupport":"This browser or device does not support video playback from ARM-based servers.",
-    "noFormat":"This browser or device does not support video playback from  this camera.",
-    "ieNoWebm":"Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
-    "ieWin10":"Please, use Microsoft Edge or Google Chrome browsers.",
-    "ubuntuNX":"This browser does not support video from ARM-based servers. Please, use Chromium browser instead."
+    "noData":"無資料",
+    "iosVideoTooLarge":"iOS不支援大於 fullHD (2MP：1920x1080) 的影像。",
+    "flashRequired":"要在 ARM 伺服器上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a>.",
+    "flashOrWebmRequired":"要在 Internet Explorer 上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a> 或 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>.",
+    "noArmSupport":"此瀏覽器或設備不支援從 ARM 伺服器上回放影像。",
+    "noFormat":"此瀏覽器或設備不支援從此攝影機回放影像。",
+    "ieNoWebm":"請安裝 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> 以支援 Internet Explorer.",
+    "ieWin10":"請使用Microsoft Edge或Google Chrome瀏覽器。",
+    "ubuntuNX":"此瀏覽器不支援從 ARM 伺服器播放影像。請改用 Chromium 瀏覽器。"
   },
-  "searchCamPlaceholder":"search"
+  "searchCamPlaceholder":"搜尋"
 }

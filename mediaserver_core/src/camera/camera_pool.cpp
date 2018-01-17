@@ -43,8 +43,12 @@ void QnVideoCameraPool::stop()
     m_cameras.clear();
 }
 
-QnVideoCameraPool::QnVideoCameraPool(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+QnVideoCameraPool::QnVideoCameraPool(
+    const MSSettings& settings,
+    QnResourcePool* resourcePool)
+    :
+    m_settings(settings),
+    m_resourcePool(resourcePool)
 {
 }
 
@@ -74,7 +78,16 @@ QnVideoCameraPtr QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res)
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
         return QnVideoCameraPtr();
     QnMutexLocker lock(&m_mutex);
-    return m_cameras.insert(res, QnVideoCameraPtr(new QnVideoCamera(res))).value();
+    return m_cameras.insert(res, QnVideoCameraPtr(new QnVideoCamera(m_settings, res))).value();
+}
+
+bool QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res, QnVideoCameraPtr camera)
+{
+    if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
+        return false;
+    QnMutexLocker lock(&m_mutex);
+    m_cameras.insert(res, camera);
+    return true;
 }
 
 void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
@@ -86,7 +99,7 @@ void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
 std::unique_ptr<VideoCameraLocker>
     QnVideoCameraPool::getVideoCameraLockerByResourceId(const QnUuid& id) const
 {
-    QnResourcePtr resource = resourcePool()->getResourceById(id);
+    QnResourcePtr resource = m_resourcePool->getResourceById(id);
     if (!resource)
         return nullptr;
 

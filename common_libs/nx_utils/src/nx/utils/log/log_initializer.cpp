@@ -58,7 +58,7 @@ void initialize(
 
     const auto filePath = logger->filePath();
     write(lm("Log level: %1").arg(settings.level));
-    write(lm("Log maxFileSize: %2, maxBackupCount: %3, file: %4").args(
+    write(lm("Log file size: %2, backup count: %3, file: %4").args(
         nx::utils::bytesToString(settings.maxFileSize), settings.maxBackupCount,
         filePath ? *filePath : lit("-")));
 }
@@ -68,12 +68,18 @@ void initializeGlobally(const nx::utils::ArgumentParser& arguments)
     const auto logger = mainLogger();
     isInitializedGlobally = true;
 
+    bool isLogLevelSpecified = false;
     if (const auto value = arguments.get("log-level", "ll"))
     {
         LevelSettings level;
         level.parse(*value);
         logger->setDefaultLevel(level.primary);
         logger->setLevelFilters(level.filters);
+        isLogLevelSpecified = true;
+    }
+    else
+    {
+        logger->setDefaultLevel(Level::none);
     }
 
     if (const auto value = arguments.get("log-file", "lf"))
@@ -84,6 +90,9 @@ void initializeGlobally(const nx::utils::ArgumentParser& arguments)
         fileSettings.count = 5;
 
         logger->setWriter(std::make_unique<File>(fileSettings));
+
+        if (!isLogLevelSpecified)
+            logger->setDefaultLevel(kDefaultLevel);
     }
 }
 

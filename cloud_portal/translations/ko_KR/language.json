@@ -1,240 +1,237 @@
 {
-  "language_name":"국어",
-  "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
-  "dialogs":{
-    "okButton":"Ok",
-    "cancelButton":"취소",
-    "loginTitle":"{{PRODUCT_NAME}}에 로그인",
-    "loginButton":"로그인",
-    "logoutAuthorisedText":"",
-    "logoutAuthorisedTitle":"이미 로그인 되어 있습니다",
-    "logoutAuthorisedContinueButton":"계속",
-    "logoutAuthorisedLogoutButton":"로그 아웃"
+  "language_name": "언어",
+  "productName": "{{PRODUCT_NAME}}",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "dialogs": {
+    "okButton": "Ok",
+    "cancelButton": "취소",
+    "loginTitle": "{{PRODUCT_NAME}} 에 로그인",
+    "loginButton": "로그인",
+    "logoutAuthorisedTitle": "이미 로그인 되어 있습니다",
+    "logoutAuthorisedContinueButton": "계속",
+    "logoutAuthorisedLogoutButton": "로그 아웃"
   },
-  "pageTitles":{
-    "template":"{{title}} {{PRODUCT_NAME}}",
-    "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"에 오신 것을 환영합니다",
-    "register":"에 계정 만들기",
-    "changePassword":"패스워드 변경 -",
-    "account":"계정 설정-",
-    "systems":"시스템-",
-    "system":"시스템-",
-    "systemShare":"시스템 공유 -",
-    "activate":"계정 활성화 -",
-    "activateSent":"계정 활성화 -",
-    "activateSuccess":"계정 활성화 됨 -",
-    "activateCode":"계정 활성화 -",
-    "restorePassword":"패스워드 재설정",
-    "restorePasswordSuccess":"패스워드 저장됨-",
-    "restorePasswordCode":"패스워드 재설정",
-    "view":"View cameras - ",
-    "contentPage":"",
-    "debug":"디버그",
-    "login":"로그인 -",
-    "download":"{{VMS_NAME}} 다운로드",
-    "downloadPlatform":"에 대한 {{VMS_NAME}} 다운로드 ",
-    "startPage":"",
-    "pageNotFound":"페이지를 찾을 수 없음"
+  "pageTitles": {
+    "template": "{{title}} {{PRODUCT_NAME}}",
+    "default": "{{PRODUCT_NAME}}",
+    "registerSuccess": "에 오신 것을 환영합니다",
+    "register": "에 계정 만들기",
+    "changePassword": "패스워드 변경 -",
+    "account": "계정 설정-",
+    "systems": "시스템-",
+    "system": "시스템-",
+    "systemShare": "시스템 공유 -",
+    "activate": "계정 활성화 -",
+    "activateSent": "계정 활성화 -",
+    "activateSuccess": "계정 활성화 됨 -",
+    "activateCode": "계정 활성화 -",
+    "restorePassword": "패스워드 재설정",
+    "restorePasswordSuccess": "패스워드 저장됨-",
+    "restorePasswordCode": "패스워드 재설정",
+    "view": "카메라 보기 - ",
+    "debug": "디버그",
+    "login": "로그인 -",
+    "download": "{{VMS_NAME}} 다운로드",
+    "downloadPlatform": "에 대한 {{VMS_NAME}} 다운로드 ",
+    "pageNotFound": "페이지를 찾을 수 없음"
   },
-  "systemStatuses":{
-    "notActivated":"활성화되지 않음",
-    "activated":"활성화 됨",
-    "online":"온라인",
-    "offline":"오프라인",
-    "unavailable":"사용할 수 없음"
+  "systemStatuses": {
+    "notActivated": "활성화되지 않음",
+    "activated": "활성화 됨",
+    "online": "온라인",
+    "offline": "오프라인",
+    "unavailable": "사용할 수 없음"
   },
-  "accessRoles":{
-    "disabled":{
-      "label":"비활성화",
-      "description":"사용자가 비활성화 되어있어 시스템에 로그인 할 수 없습니다."
+  "accessRoles": {
+    "disabled": {
+      "label": "비활성화",
+      "description": "사용자가 비활성화 되어있어 시스템에 로그인 할 수 없습니다."
     },
-    "Owner":{
-      "label":"소유자",
-      "description":"클라우드에서 시스템을 공유하고 연결 / 연결 해제하는 기능을 포함한 무제한 액세스"
+    "Owner": {
+      "label": "소유자",
+      "description": "클라우드에서 시스템을 공유하고 연결 / 연결 해제하는 기능을 포함한 무제한 액세스"
     },
-    "Viewer":{
-      "label":"뷰어",
-      "description":"라이브 비디오를보고 아카이브를 열람 할 수 있습니다."
+    "Viewer": {
+      "label": "뷰어",
+      "description": "라이브 비디오를보고 아카이브를 열람 할 수 있습니다."
     },
-    "Live Viewer":{
-      "label":"라이브 뷰어",
-      "description":"라이브 비디오 만 볼 수 있음"
+    "Live Viewer": {
+      "label": "라이브 뷰어",
+      "description": "라이브 비디오 만 볼 수 있음"
     },
-    "Advanced Viewer":{
-      "label":"고급 뷰어",
-      "description":"라이브 비디오를보고, 아카이브를 검색하고, 카메라를 구성하고, PTZ 등을 제어 할 수 있습니다."
+    "Advanced Viewer": {
+      "label": "고급 뷰어",
+      "description": "라이브 비디오를보고, 아카이브를 검색하고, 카메라를 구성하고, PTZ 등을 제어 할 수 있습니다."
     },
-    "Administrator":{
-      "label":"관리자",
-      "description":"공유 기능을 포함한 무제한 액세스"
+    "Administrator": {
+      "label": "관리자",
+      "description": "공유 기능을 포함한 무제한 액세스"
     },
-    "Custom":{
-      "label":"사용자 정의",
-      "description":"{{PRODUCT_NAME}} 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
+    "Custom": {
+      "label": "사용자 정의",
+      "description": "{{PRODUCT_NAME}} 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
     },
-    "cloudAdmin":{
-      "label":"관리자",
-      "description":"시스템을 구성하고 공유 할 수 있습니다."
+    "cloudAdmin": {
+      "label": "관리자",
+      "description": "시스템을 구성하고 공유 할 수 있습니다."
     },
-    "customRole":{
-      "label":"사용자 지정 역할",
-      "description":"시스템에 지정된 사용자 지정 사용자 역할"
+    "customRole": {
+      "label": "사용자 지정 역할",
+      "description": "시스템에 지정된 사용자 지정 사용자 역할"
     },
-    "owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+    "owner": {
+      "label": "소유자",
+      "description": "클라우드에서 시스템을 공유하고 연결 / 연결 해제하는 기능을 포함한 무제한 액세스"
     },
-    "viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+    "viewer": {
+      "label": "뷰어",
+      "description": "라이브 비디오를보고 아카이브를 열람 할 수 있습니다."
     },
-    "liveViewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+    "liveViewer": {
+      "label": "라이브 뷰어",
+      "description": "라이브 비디오 만 볼 수 있음"
     },
-    "advancedViewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+    "advancedViewer": {
+      "label": "고급 뷰어",
+      "description": "라이브 비디오를보고, 아카이브를 검색하고, 카메라를 구성하고, PTZ 등을 제어 할 수 있습니다."
     },
-    "custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+    "custom": {
+      "label": "사용자 정의",
+      "description": "{{PRODUCT_NAME}} 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
     }
   },
-  "errorCodes":{
-    "ok":"ok",
-    "cantSendActivationPrefix":"확인 이메일을 보낼 수 없습니다.",
-    "cantDisconnectSystemPrefix":"시스템을 삭제할 수 없습니다.",
-    "cantUnshareWithMeSystemPrefix":"시스템을 삭제할 수 없습니다.",
-    "cantSharePrefix":"시스템을 공유 할 수 없습니다.",
-    "cantGetUsersListPrefix":"사용자 목록이 없습니다.",
-    "cantGetSystemsListPrefix":"시스템 목록이 없습니다.",
-    "cantRegisterPrefix":"오류가 발생했습니다.",
-    "cantGetSystemInfoPrefix":"시스템 정보가 없습니다.",
-    "cantChangeAccountPrefix":"변경 사항을 저장할 수 없습니다.",
-    "cantChangePasswordPrefix":"패스워드를 저장할 수 없습니다.",
-    "cantActivatePrefix":"계정을 활성화 할 수 없습니다.",
-    "cantSendConfirmationPrefix":"확인 이메일을 보낼 수 없습니다.",
-    "cloudInvalidResponse":"Cloud DB에서 예기치 않은 응답을 반환했습니다.",
-    "notAuthorized":"이메일 또는 패스워드가 잘못 되었습니다",
-    "wrongParameters":"양식의 일부 매개 변수가 잘못되었습니다.",
-    "wrongCode":"계정이 이미 활성화되었거나 확인 코드가 잘못되었습니다.",
-    "wrongCodeRestore":"확인 코드가 이미 사용되었거나 잘못되었습니다.",
-    "forbidden":"이 작업을 수행 할 수있는 권한이 없습니다.",
-    "accountNotActivated":"이 계정은 아직 활성화되지 않았습니다. <a href=\"/activate\"> 활성화 링크 다시 보내기 </a>",
-    "accountBlocked":"이 계정은 차단되었습니다.",
-    "notFound":"찾을 수 없습니다",
-    "alreadyExists":"이 계정이 이미 존재합니다.",
-    "unknownError":"예기치 않은 오류가 발생했습니다.",
-    "accountAlreadyActivated":"이 계정은 이미 활성화되었습니다.",
-    "emailNotFound":"계정이 존재하지 않습니다.",
-    "EmailAlreadyExists":"이 전자 메일은 이미 등록되었습니다.",
-    "oldPasswordMistmatch":"현재 패스워드가 잘못되었습니다",
-    "passwordMismatch":"패스워드가 틀립니다.",
-    "cantEditYourself":"자신의 사용 권한 변경은 허용 되지 않습니다.",
-    "cantEditAdmin":"이 사용자는 관리자 권한이 있습니다.",
-    "cantOpenClient":"{{VMS_NAME}} 프로그램이 감지되지 않았습니다. <a href=\"/download\"> 다운로드 </a>",
-    "lostConnection":"{{systemName}} 연결이 끊어졌습니다.",
-    "thisSystem":"the system"
+  "errorCodes": {
+    "ok": "ok",
+    "cantSendActivationPrefix": "확인 이메일을 보낼 수 없습니다.",
+    "cantDisconnectSystemPrefix": "시스템을 삭제할 수 없습니다.",
+    "cantUnshareWithMeSystemPrefix": "시스템을 삭제할 수 없습니다.",
+    "cantSharePrefix": "시스템을 공유 할 수 없습니다.",
+    "cantGetUsersListPrefix": "사용자 목록이 없습니다.",
+    "cantGetSystemsListPrefix": "시스템 목록이 없습니다.",
+    "cantRegisterPrefix": "오류가 발생했습니다.",
+    "cantGetSystemInfoPrefix": "시스템 정보가 없습니다.",
+    "cantChangeAccountPrefix": "변경 사항을 저장할 수 없습니다.",
+    "cantChangePasswordPrefix": "패스워드를 저장할 수 없습니다.",
+    "cantActivatePrefix": "계정을 활성화 할 수 없습니다.",
+    "cantSendConfirmationPrefix": "확인 이메일을 보낼 수 없습니다.",
+    "cloudInvalidResponse": "Cloud DB에서 예기치 않은 응답을 반환했습니다.",
+    "notAuthorized": "이메일 또는 패스워드가 잘못 되었습니다",
+    "wrongParameters": "양식의 일부 매개 변수가 잘못되었습니다.",
+    "wrongCode": "계정이 이미 활성화되었거나 확인 코드가 잘못되었습니다.",
+    "wrongCodeRestore": "확인 코드가 이미 사용되었거나 잘못되었습니다.",
+    "forbidden": "이 작업을 수행 할 수있는 권한이 없습니다.",
+    "accountNotActivated": "이 계정은 아직 활성화되지 않았습니다. <a href=\"/activate\"> 활성화 링크 다시 보내기 </a>",
+    "accountBlocked": "이 계정은 차단되었습니다.",
+    "notFound": "찾을 수 없습니다",
+    "alreadyExists": "이 계정이 이미 존재합니다.",
+    "unknownError": "예기치 않은 오류가 발생했습니다.",
+    "accountAlreadyActivated": "이 계정은 이미 활성화되었습니다.",
+    "emailNotFound": "계정이 존재하지 않습니다.",
+    "EmailAlreadyExists": "이 전자 메일은 이미 등록되었습니다.",
+    "oldPasswordMistmatch": "현재 패스워드가 잘못되었습니다",
+    "passwordMismatch": "패스워드가 틀립니다.",
+    "cantEditYourself": "자신의 사용 권한 변경은 허용 되지 않습니다.",
+    "cantEditAdmin": "이 사용자는 관리자 권한이 있습니다.",
+    "cantOpenClient": "{{VMS_NAME}} 프로그램이 감지되지 않았습니다. <a href=\"/download\"> 다운로드 </a>",
+    "lostConnection": "{{systemName}} 연결이 끊어졌습니다.",
+    "thisSystem": "시스템"
   },
-  "passwordRequirements":{
-    "minLengthMessage":"비밀번호는 최소 8자 이상 포함되어야 합니다.",
-    "requiredMessage":"라틴 문자, 숫자 및 키보드 기호 만 사용하고 앞뒤 공백은 피하십시오.",
-    "weakMessage":"숫자, 대 / 소문자 및 특수 문자를 사용하여 패스워드를 더 강하게 만듭니다.",
-    "strongMessage":"강력한 암호!",
-    "commonMessage":"현재 암호는 가능 많이 사용되는 암호입니다."
+  "passwordRequirements": {
+    "minLengthMessage": "패스워드는 8 자 이상이어야합니다.",
+    "requiredMessage": "라틴 문자, 숫자 및 키보드 기호 만 사용하고 앞뒤 공백은 피하십시오.",
+    "weakMessage": "숫자, 대 / 소문자 및 특수 문자를 사용하여 패스워드를 더 강하게 만듭니다.",
+    "strongMessage": "강력한 패스워드!",
+    "commonMessage": "현재 암호는 가능 많이 사용되는 암호입니다."
   },
-  "sharing":{
-    "confirmOwner":"시스템 소유자를 변경하면 현재 계정에서 소유권이 박탈 됩니다. 이 작업은 되돌릴 수 없습니다. 확실합니까?",
-    "shareTitle":"공유",
-    "shareConfirmButton":"공유",
-    "editShareTitle":"권한 수정",
-    "editShareConfirmButton":"저장",
-    "permissionsSaved":"새 권한이 저장되었습니다."
+  "sharing": {
+    "confirmOwner": "시스템 소유자를 변경하면 현재 계정에서 소유권이 박탈 됩니다. 이 작업은 되돌릴 수 없습니다. 확실합니까?",
+    "shareTitle": "공유",
+    "shareConfirmButton": "공유",
+    "editShareTitle": "권한 수정",
+    "editShareConfirmButton": "저장",
+    "permissionsSaved": "새 권한이 저장되었습니다."
   },
-  "system":{
-    "yourSystem":"귀하의 시스템",
-    "mySystemSearch":"IMeMyMine",
-    "unavailable":"시스템에 연결할 수 없습니다.",
-    "offline":"시스템이 오프라인 상태입니다.",
-    "openClient":"{{VMS_NAME}}에서 열기",
-    "confirmRenameTitle":"시스템 이름",
-    "confirmRenameAction":"저장",
-    "successRename":"시스템 이름 저장",
-    "confirmDisconnectTitle":"{{PRODUCT_NAME}}에서 시스템 연결을 끊으시겠습니까?",
-    "confirmDisconnectAction":"연결 끊기",
-    "confirmUnshareFromMe":"이 시스템을 당신의 계정과의 연결을 해제하려고합니다. 더 이상이 시스템에 액세스 할 수 없습니다. 확실합니까?",
-    "confirmUnshareFromMeTitle":"시스템 연결을 끊으시겠습니까?",
-    "confirmUnshareFromMeAction":"연결 끊기",
-    "confirmUnshare":"이 사용자는 시스템에 액세스 할 수 없게 됩니다. 확실합니까?",
-    "confirmUnshareTitle":"사용자 삭제?",
-    "confirmUnshareAction":"삭제",
-    "successDisconnected":"시스템이 성공적으로 {{PRODUCT_NAME}}에서 분리 되었습니다.",
-    "successDeleted":"시스템 {{systemName}}이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
-    "permissionsRemoved":"권한이 {{email}}에서 제거 되었습니다."
+  "system": {
+    "yourSystem": "귀하의 시스템",
+    "mySystemSearch": "IMeMyMine",
+    "unavailable": "시스템에 연결할 수 없습니다.",
+    "offline": "시스템이 오프라인 상태입니다.",
+    "openClient": "{{VMS_NAME}} 에서 열기",
+    "confirmRenameTitle": "시스템 이름",
+    "confirmRenameAction": "저장",
+    "successRename": "시스템 이름 저장",
+    "confirmDisconnectTitle": "{{PRODUCT_NAME}} 에서 시스템 연결을 끊으시겠습니까?",
+    "confirmDisconnectAction": "연결 끊기",
+    "confirmUnshareFromMe": "이 시스템을 당신의 계정과의 연결을 해제하려고합니다. 더 이상이 시스템에 액세스 할 수 없습니다. 확실합니까?",
+    "confirmUnshareFromMeTitle": "시스템 연결을 끊으시겠습니까?",
+    "confirmUnshareFromMeAction": "연결 끊기",
+    "confirmUnshare": "이 사용자는 시스템에 액세스 할 수 없게 됩니다. 확실합니까?",
+    "confirmUnshareTitle": "사용자 삭제?",
+    "confirmUnshareAction": "삭제",
+    "successDisconnected": "시스템이 성공적으로 {{PRODUCT_NAME}} 에서 분리 되었습니다.",
+    "successDeleted": "시스템 {{systemName}} 이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
+    "permissionsRemoved": "권한이 {{email}} 에서 제거 되었습니다."
   },
-  "account":{
-    "accountSavedSuccess":"계정이 성공적으로 저장되었습니다.",
-    "passwordChangedSuccess":"계정이 성공적으로 저장되었습니다.",
-    "changePassword":"패스워드 변경",
-    "newPasswordLabel":"새 패스워드",
-    "saveChanges":"저장"
+  "account": {
+    "accountSavedSuccess": "계정이 성공적으로 저장되었습니다.",
+    "activationLinkSent": "활성화 링크 전송",
+    "passwordChangedSuccess": "계정이 성공적으로 저장되었습니다.",
+    "changePassword": "패스워드 변경",
+    "newPasswordLabel": "새 패스워드",
+    "saveChanges": "저장"
   },
-  "downloads":{
-    "noClientDetectedTitle":"시스템이 성공적으로 {{PRODUCT_NAME}}에서 분리 되었습니다",
-    "noClientDetectedMessage":"",
-    "action":"{{VMS_NAME}} 다운로드",
-    "mobile":{
-      "ios":{
-        "link":"{{IOS_APP_LINK}}"
+  "downloads": {
+    "noClientDetectedTitle": "시스템이 성공적으로 {{VMS_NAME}} 에서 분리 되었습니다",
+    "action": "{{VMS_NAME}} 다운로드",
+    "mobile": {
+      "ios": {
+        "link": "{{IOS_APP_LINK}}"
       },
-      "android":{
-        "link":"{{ANDROID_APP_LINK}}"
+      "android": {
+        "link": "{{ANDROID_APP_LINK}}"
       }
     },
-    "groups":{
-      "windows":{
-        "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+    "groups": {
+      "windows": {
+        "label": "윈도우즈",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
-      "mac":{
-        "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "linux":{
-        "label":"Ubuntu Linux",
-        "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
-    "platforms":{
-      "win64":"x64",
-      "win86":"x86",
-      "linux64":"x64",
-      "linux86":"x86",
-      "mac":"X"
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
     },
-    "appTypes":{
-      "client":"클라이언트만",
-      "server":"서버 만",
-      "bundle":"클라이언트와 서버",
-      "servertool":"구성 도구"
+    "appTypes": {
+      "client": "클라이언트만",
+      "server": "서버 만",
+      "bundle": "클라이언트와 서버",
+      "servertool": "구성 도구"
     }
   },
-  "activeActions":{
-    "sendConfirm":"보내기",
-    "resetPassword":"패스워드 재설정",
-    "setNewPassword":"패스워드 저장",
-    "setNewPasswordLabel":"새 패스워드"
+  "activeActions": {
+    "sendConfirm": "활성화 링크 재전송",
+    "resetPassword": "패스워드 재설정",
+    "setNewPassword": "패스워드 저장",
+    "setNewPasswordLabel": "새 패스워드"
   },
-  "regActions":{
-    "passwordLabel":"패스워드",
-    "createAccount":"계정 만들기"
+  "regActions": {
+    "passwordLabel": "패스워드",
+    "createAccount": "계정 만들기"
   },
-  "header":{
-    "allSystems":"All Systems",
-    "systems":"시스템"
+  "header": {
+    "allSystems": "모든 시스템",
+    "systems": "시스템"
   }
 }

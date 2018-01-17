@@ -15,7 +15,7 @@ const std::chrono::milliseconds kActiSystemInfoResponseReceiveTimeout(4000);
 } // namespace
 
 
-QnActiSystemInfoChecker::QnActiSystemInfoChecker(const QUrl& url):
+QnActiSystemInfoChecker::QnActiSystemInfoChecker(const nx::utils::Url& url):
     m_baseUrl(url),
     m_systemInfo(boost::none),
     m_lastSuccessfulAuth(boost::none),
@@ -30,7 +30,7 @@ QnActiSystemInfoChecker::QnActiSystemInfoChecker(const QUrl& url):
 QnActiSystemInfoChecker::~QnActiSystemInfoChecker()
 {
     directDisconnectAll();
-    nx_http::AsyncHttpClientPtr httpClientCopy;
+    nx::network::http::AsyncHttpClientPtr httpClientCopy;
 
     {
         QnMutexLocker lock(&m_mutex);
@@ -62,7 +62,7 @@ bool QnActiSystemInfoChecker::isFailed()
     return m_failed;
 }
 
-void QnActiSystemInfoChecker::setUrl(const QUrl& url)
+void QnActiSystemInfoChecker::setUrl(const nx::utils::Url& url)
 {
     QnMutexLocker lock(&m_mutex);
     m_baseUrl = url;
@@ -85,12 +85,12 @@ void QnActiSystemInfoChecker::initHttpClientIfNeededUnsafe()
     if (m_httpClient)
         return;
 
-    m_httpClient = nx_http::AsyncHttpClient::create();
+    m_httpClient = nx::network::http::AsyncHttpClient::create();
     m_httpClient->setSendTimeoutMs(kActiSystemInfoRequestSendTimeout.count());
     m_httpClient->setResponseReadTimeoutMs(kActiSystemInfoResponseReceiveTimeout.count());
 
     directConnect(
-        m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+        m_httpClient.get(), &nx::network::http::AsyncHttpClient::done,
         this, &QnActiSystemInfoChecker::handleSystemInfoResponse);
 }
 
@@ -127,7 +127,7 @@ void QnActiSystemInfoChecker::tryToGetSystemInfoWithGivenAuthUnsafe(const QAuthe
 {
     initHttpClientIfNeededUnsafe();
 
-    QUrl requestUrl = m_baseUrl;
+    nx::utils::Url requestUrl = m_baseUrl;
     requestUrl.setPath(lit("/cgi-bin/system"));
 
     QUrlQuery query;
@@ -159,16 +159,16 @@ QAuthenticator QnActiSystemInfoChecker::getNextAuthToCheckUnsafe()
     return auth;
 }
 
-void QnActiSystemInfoChecker::handleSystemInfoResponse(nx_http::AsyncHttpClientPtr httpClient)
+void QnActiSystemInfoChecker::handleSystemInfoResponse(nx::network::http::AsyncHttpClientPtr httpClient)
 {
-    if (httpClient->state() != nx_http::AsyncClient::State::sDone)
+    if (httpClient->state() != nx::network::http::AsyncClient::State::sDone)
     {
         handleFail();
         return;
     }
 
     auto response = httpClient->response();
-    if (!response || response->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (!response || response->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
         handleFail();
         return;

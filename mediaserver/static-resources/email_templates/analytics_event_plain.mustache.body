@@ -1,11 +1,16 @@
 {{#analyticsSdkEventType}}
-    {{analyticsSdkEventType}} {{source}}
+    {{analyticsSdkEventType}}{{#source}} at {{source}}{{/source}}
 {{/analyticsSdkEventType}}
 {{^analyticsSdkEventType}}
-    {{event}} {{source}}
+    {{event}}{{#source}} at {{source}}{{/source}}
 {{/analyticsSdkEventType}}
 
+{{#count}}
 Trigger has been activated {{count}} times, first:
+{{/count}}
+{{^count}}
+    Trigger has been activated at:
+{{/count}}
 {{timestampDate}} {{timestampTime}}
 
 {{#urlint}}

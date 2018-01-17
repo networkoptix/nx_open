@@ -63,10 +63,9 @@ QnStatusOverlayController::QnStatusOverlayController(
         this, &QnStatusOverlayController::updateVisibleItems);
 
     connect(m_widget, &QnStatusOverlayWidget::actionButtonClicked, this,
-        [this]
-        {
-            emit buttonClicked(m_currentButton);
-        });
+        [this] { emit buttonClicked(m_currentButton); });
+    connect(m_widget, &QnStatusOverlayWidget::customButtonClicked,
+        this, &QnStatusOverlayController::customButtonClicked);
 
     connect(this, &QnStatusOverlayController::isErrorOverlayChanged, this,
         [this]() { m_widget->setErrorStyle(isErrorOverlay()); });
@@ -74,9 +73,15 @@ QnStatusOverlayController::QnStatusOverlayController(
     connect(this, &QnStatusOverlayController::currentButtonChanged, this,
         [this]() { m_widget->setButtonText(currentButtonText()); });
 
+    connect(this, &QnStatusOverlayController::customButtonTextChanged, this,
+        [this]()
+        {
+            updateVisibleItems();
+            m_widget->setCustomButtonText(customButtonText());
+        });
+
     connect(this, &QnStatusOverlayController::visibleItemsChanged,
         this, &QnStatusOverlayController::updateWidgetItems);
-
 }
 
 QnStatusOverlayWidget::Controls QnStatusOverlayController::visibleItems() const
@@ -138,7 +143,7 @@ void QnStatusOverlayController::onStatusOverlayChanged(bool /*animated*/)
     updateVisibleItems();
 }
 
-QnStatusOverlayWidget::Controls QnStatusOverlayController::errorVisibleItems()
+QnStatusOverlayWidget::Controls QnStatusOverlayController::errorVisibleItems() const
 {
     const auto overlay = statusOverlay();
 
@@ -153,10 +158,13 @@ QnStatusOverlayWidget::Controls QnStatusOverlayController::errorVisibleItems()
     if (!descriptionText(overlay).isEmpty())
         result |= QnStatusOverlayWidget::Control::kDescription;
 
+    if (!m_customButtonText.isEmpty())
+        result |= QnStatusOverlayWidget::Control::kCustomButton;
+
     return result;
 }
 
-QnStatusOverlayWidget::Controls QnStatusOverlayController::normalVisibleItems()
+QnStatusOverlayWidget::Controls QnStatusOverlayController::normalVisibleItems() const
 {
     switch (statusOverlay())
     {
@@ -187,18 +195,18 @@ void QnStatusOverlayController::setStatusOverlay(Qn::ResourceStatusOverlay statu
     emit statusOverlayChanged(animated);
 }
 
-Qn::ResourceOverlayButton QnStatusOverlayController::currentButton() const
+QString QnStatusOverlayController::customButtonText() const
 {
-    return m_currentButton;
+    return m_customButtonText;
 }
 
-void QnStatusOverlayController::setCurrentButton(Qn::ResourceOverlayButton button)
+void QnStatusOverlayController::setCustomButtonText(const QString& text)
 {
-    if (m_currentButton == button)
+    if (m_customButtonText == text)
         return;
 
-    m_currentButton = button;
-    emit currentButtonChanged();
+    m_customButtonText = text;
+    emit customButtonTextChanged();
 }
 
 bool QnStatusOverlayController::isErrorOverlay() const
@@ -214,6 +222,20 @@ void QnStatusOverlayController::updateErrorState()
 
     m_isErrorOverlay = isError;
     emit isErrorOverlayChanged();
+}
+
+Qn::ResourceOverlayButton QnStatusOverlayController::currentButton() const
+{
+    return m_currentButton;
+}
+
+void QnStatusOverlayController::setCurrentButton(Qn::ResourceOverlayButton button)
+{
+    if (m_currentButton == button)
+        return;
+
+    m_currentButton = button;
+    emit currentButtonChanged();
 }
 
 QString QnStatusOverlayController::currentButtonText() const
@@ -236,6 +258,8 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
             result[toInt(Qn::ServerOfflineOverlay)] = tr("SERVER UNAVAILABLE");
             result[toInt(Qn::ServerUnauthorizedOverlay)] = tr("NO ACCESS");
             result[toInt(Qn::IoModuleDisabledOverlay)] = tr("DEVICE DISABLED");
+            result[toInt(Qn::TooManyOpenedConnectionsOverlay)] = tr("TOO MANY CONNECTIONS");
+            result[toInt(Qn::PasswordRequiredOverlay)] = tr("PASSWORD REQUIRED");
             return result;
         }();
 
@@ -264,6 +288,7 @@ QString QnStatusOverlayController::statusIcon(Qn::ResourceStatusOverlay overlay)
             result[toInt(Qn::IoModuleDisabledOverlay)] = lit("item_placeholders/disabled.png");
             result[toInt(Qn::NoVideoDataOverlay)] = lit("legacy/io_speaker.png");
             result[toInt(Qn::PausedOverlay)] = lit("item_placeholders/pause.png");
+            result[toInt(Qn::PasswordRequiredOverlay)] = lit("item_placeholders/alert.png");
             return result;
         }();
 
@@ -285,8 +310,10 @@ QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
         : QnVirtualCameraResourcePtr());
     IntStringHash result;
     result.insert(toInt(Qn::ResourceOverlayButton::Diagnostics), tr("Diagnostics"));
-    result.insert(toInt(Qn::ResourceOverlayButton::IoEnable), tr("Enable"));
+    result.insert(toInt(Qn::ResourceOverlayButton::EnableLicense), tr("Enable"));
     result.insert(toInt(Qn::ResourceOverlayButton::MoreLicenses), tr("Activate License"));
+    result.insert(toInt(Qn::ResourceOverlayButton::SetPassword), tr("Set for this Camera"));
+
     if (resource)
     {
         result.insert(toInt(Qn::ResourceOverlayButton::Settings),

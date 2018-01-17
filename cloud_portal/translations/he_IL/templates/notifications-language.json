@@ -1,17 +1,17 @@
 {
-  "activate_account":{
-    "emailSubject":"אשר את החשבון שלך"
+  "activate_account": {
+    "emailSubject": "אשר את החשבון שלך"
   },
-  "restore_password":{
-    "emailSubject":"שחזר את הסיסמא שלך"
+  "restore_password": {
+    "emailSubject": "שחזר את הסיסמא שלך"
   },
-  "system_invite":{
-    "emailSubject":"מערכת הווידאו {{message.system_name}} שותפה איתך"
+  "system_invite": {
+    "emailSubject": "מערכת הווידאו {{message.system_name}} שותפה איתך"
   },
-  "system_shared":{
-    "emailSubject":"מערכת הווידאו {{message.system_name}} שותפה איתך"
+  "system_shared": {
+    "emailSubject": "מערכת הווידאו {{message.system_name}} שותפה איתך"
   },
-  "review_version":{
-    "emailSubject":"גרסה {{message.id}} מוכנה לבדיקה"
+  "review_version": {
+    "emailSubject": "גרסה {{message.id}} מוכנה לבדיקה"
   }
 }

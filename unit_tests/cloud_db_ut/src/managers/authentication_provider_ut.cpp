@@ -45,7 +45,7 @@ public:
         m_settings.load(args.size(), args.data());
 
         prepareTestData();
-        
+
         m_vmsP2pCommandBusStub.setOnSaveResourceAttribute(
             std::bind(&AuthenticationProvider::onSaveResourceAttribute, this, _1, _2));
 
@@ -121,7 +121,7 @@ protected:
     void whenChangingAccountPassword()
     {
         m_ownerAccount.password = nx::utils::generateRandomName(7).toStdString();
-        m_ownerAccount.passwordHa1 = nx_http::calcHa1(
+        m_ownerAccount.passwordHa1 = nx::network::http::calcHa1(
             m_ownerAccount.email.c_str(),
             nx::network::AppInfo::realm().toStdString().c_str(),
             m_ownerAccount.password.c_str()).toStdString();
@@ -305,14 +305,14 @@ private:
 
     void assertUserAuthenticationHashIsValid(const api::AuthInfoRecord& authInfo)
     {
-        const auto ha2 = nx_http::calcHa2("GET", "/getsome/");
+        const auto ha2 = nx::network::http::calcHa2("GET", "/getsome/");
         const auto nonce = api::generateNonce(authInfo.nonce);
-        const auto expectedResponse = nx_http::calcResponse(
+        const auto expectedResponse = nx::network::http::calcResponse(
             m_ownerAccount.passwordHa1.c_str(), nonce.c_str(), ha2);
 
         const auto nonceTrailer = nonce.substr(authInfo.nonce.size());
 
-        const auto actualResponse = nx_http::calcResponseFromIntermediate(
+        const auto actualResponse = nx::network::http::calcResponseFromIntermediate(
             authInfo.intermediateResponse.c_str(),
             authInfo.nonce.size(),
             nonceTrailer.c_str(),

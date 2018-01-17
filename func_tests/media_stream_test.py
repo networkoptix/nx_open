@@ -1,9 +1,7 @@
-import os.path
-from datetime import datetime, timedelta
-import time
-import pytest
+from datetime import datetime
+
 import pytz
-from test_utils.utils import log_list
+
 from test_utils.server import TimePeriod
 
 

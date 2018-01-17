@@ -289,7 +289,7 @@ select {
 .uib-tab.active{
     .tab-heading-hack{
         border-bottom:1px solid $nav-tabs-border-color;
-        padding: 14px 0;
+        padding: 10px 0;
     }
 }
 
@@ -319,3 +319,15 @@ select {
   background-color: #fff !important;
 }
 
+.info-icon.active {
+    color: $brand_core !important;
+}
+
+.video-settings-button:hover,
+.webclient-panel .dropdown-menu > li > a:hover{
+    background-color: $brand_l2 !important;
+}
+
+.webclient-panel .dropdown-menu > li > a.active{
+    background-color: $brand_l1 !important;
+}

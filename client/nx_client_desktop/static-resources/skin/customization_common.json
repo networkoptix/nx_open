@@ -64,6 +64,9 @@
         "red_d2":       "#8e1717",
         "red_d3":       "#741414",
         "red_d4":       "#5e1010",
+        "red_d5":       "#480d0d",
+        "red_d6":       "#330909",
+        "red_d7":       "#1d0505",
 
         "brand_l4":     "#77d2ff",
         "brand_l3":     "#5ecbff",
@@ -80,8 +83,8 @@
 
         "brand_contrast":   "#ffffff",
 
-        "error":        "#d65029",
-        "error_d1":     "#743320",
+        "orange_main":  "#d65029",
+        "orange_d3":    "#743320",
 
         "timeline_main":    "#3a911e",
         "timeline_bg":      "#223925",
@@ -326,7 +329,9 @@
             "default": {
                 "shadow":        "dark7",
                 "window":        "dark9",
-                "windowText":    "light16"
+                "windowText":    "light16",
+                "highlight":     "brand_core",
+                "alternateBase": "dark1.setAlpha(110)"
             }
         }
     },
@@ -825,6 +830,29 @@
         "palette": { "default": { "window": "dark8" } }
     },
 
+    "nx::client::desktop::ui::SelectableTextButton": {
+        "palette": {
+            "_1": "selected",
+            "active": {
+                "window": "dark5",
+                "dark": "dark5",
+                "midlight": "dark5",
+                "shadow": "dark4",
+                "windowText": "light10",
+                "text": "light10"
+            },
+            "_2": "not selected",
+            "inactive": {
+                "window": "dark10",
+                "dark": "dark6",
+                "shadow": "transparent",
+                "midlight": "dark11",
+                "windowText": "light14",
+                "text": "light16"
+            }
+        }
+    },
+
     "nx::client::desktop::ui::graphics::SoftwareTriggerButton": {
         "palette": {
             "default": {
@@ -842,6 +870,15 @@
         "fontColor": "light16",
         "backgroundColor": "dark7",
         "itemBackgroundColor": "dark5"
+    },
+
+    "nx::client::desktop::EventTile": {
+        "palette": {
+            "default": {
+                "window": "dark9",
+                "midlight": "dark10"
+            }
+        }
     },
 
     "QnHudOverlayWidget": {
@@ -869,7 +906,14 @@
             "emailSettings": "#cbcbcb",
             "chartColor": "brand_d3"
         }
-    }
+    },
 
+    "nx::client::desktop::EventPanel": {
+        "palette": {
+            "default": {
+                "window": "dark6"
+            }
+        }
+    }
 }
 

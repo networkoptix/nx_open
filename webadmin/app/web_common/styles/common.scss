@@ -25,6 +25,7 @@ $preloader_small_circle_distance: 8px;
         width:$circle_size;
         border-radius:$circle_size/2;
         margin:0 $circle_distance/2;
+        -webkit-transform: translate3d(0, 0, 0);
         -webkit-animation-name:bounce_circleG;
                 animation-name:bounce_circleG;
         -webkit-animation-duration:1.4s;
@@ -69,9 +70,13 @@ placeholder{ /* Hack to have full-screen */
     width:100%;
     height:100%;
 
-    z-index:1000;
+    z-index: 1; /*This is used for the preloaders.
+                  It should always be higher than the video,
+                  but not the top bar of the video player*/
+
     background-color: $dark9;
-    opacity: 0.6;
+    opacity: 0.9;
+    position: relative;
 
     &.has-preloader{
         background-color: transparent;
@@ -131,9 +136,19 @@ placeholder{ /* Hack to have full-screen */
 
 .webclient-placeholder{
     position: absolute;
+    z-index: 5; /*If the system is offline this should cover everything.
+                  Must always be the highest z-index*/
+
+    & > .placeholder{
+        opacity: 1;
+    }
 
     .placeholder>.placeholder-content{
         top:40%;
     }
 }
 
+.highlighted{
+    display:inline;
+    background-color:yellow;
+}

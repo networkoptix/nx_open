@@ -3,6 +3,7 @@
 #include <functional>
 
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 #include <api/server_rest_connection_fwd.h>
 
 #include "../file_information.h"
@@ -52,7 +53,7 @@ public:
     virtual rest::Handle downloadChunkFromInternet(
         const QnUuid& peerId,
         const QString& fileName,
-        const QUrl& url,
+        const nx::utils::Url& url,
         int chunkIndex,
         int chunkSize,
         ChunkCallback callback) = 0;

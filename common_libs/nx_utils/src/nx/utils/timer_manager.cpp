@@ -22,10 +22,10 @@ StandaloneTimerManager::TimerGuard::TimerGuard():
 
 StandaloneTimerManager::TimerGuard::TimerGuard(
     StandaloneTimerManager* const StandaloneTimerManager,
-    TimerId timerID)
+    TimerId timerId)
 :
     m_standaloneTimerManager(StandaloneTimerManager),
-    m_timerID(timerID)
+    m_timerID(timerId)
 {
 }
 
@@ -55,7 +55,6 @@ StandaloneTimerManager::TimerGuard& StandaloneTimerManager::TimerGuard::operator
     return *this;
 }
 
-//!Cancels timer and blocks until running handler returns
 void StandaloneTimerManager::TimerGuard::reset()
 {
     if (!m_timerID)
@@ -81,21 +80,21 @@ StandaloneTimerManager::TimerGuard::operator bool_type() const
     return m_timerID ? &TimerGuard::this_type_does_not_support_comparisons : 0;
 }
 
-bool StandaloneTimerManager::TimerGuard::operator==(const StandaloneTimerManager::TimerGuard& right) const
+bool StandaloneTimerManager::TimerGuard::operator==(
+    const StandaloneTimerManager::TimerGuard& right) const
 {
     return m_timerID == right.m_timerID;
 }
 
-bool StandaloneTimerManager::TimerGuard::operator!=(const StandaloneTimerManager::TimerGuard& right) const
+bool StandaloneTimerManager::TimerGuard::operator!=(
+    const StandaloneTimerManager::TimerGuard& right) const
 {
     return m_timerID != right.m_timerID;
 }
 
+//-------------------------------------------------------------------------------------------------
 
-
-
-StandaloneTimerManager::StandaloneTimerManager()
-:
+StandaloneTimerManager::StandaloneTimerManager():
     m_terminated(false),
     m_runningTaskID(0)
 {
@@ -113,7 +112,7 @@ StandaloneTimerManager::~StandaloneTimerManager()
 void StandaloneTimerManager::stop()
 {
     {
-        QnMutexLocker lk(&m_mtx);
+        QnMutexLocker lk(&m_mutex);
         m_terminated = true;
         m_cond.wakeAll();
     }
@@ -135,7 +134,7 @@ TimerId StandaloneTimerManager::addTimer(
 {
     const auto timerId = generateNextTimerId();
 
-    QnMutexLocker lk(&m_mtx);
+    QnMutexLocker lk(&m_mutex);
     addTaskNonSafe(
         lk,
         timerId,
@@ -161,7 +160,7 @@ TimerId StandaloneTimerManager::addNonStopTimer(
 {
     const auto timerId = generateNextTimerId();
 
-    QnMutexLocker lk(&m_mtx);
+    QnMutexLocker lk(&m_mutex);
     addTaskNonSafe(
         lk,
         timerId,
@@ -174,22 +173,22 @@ TimerId StandaloneTimerManager::addNonStopTimer(
 }
 
 bool StandaloneTimerManager::modifyTimerDelay(
-    TimerId timerID,
+    TimerId timerId,
     std::chrono::milliseconds newDelay)
 {
     NX_LOGX(lm("Modifying timer %1, new delay %2 ms")
-        .arg(timerID).arg(newDelay.count()),
+        .arg(timerId).arg(newDelay.count()),
         cl_logDEBUG2);
 
-    QnMutexLocker lk(&m_mtx);
-    if (m_runningTaskID == timerID)
-        return false; //timer being executed at the moment
+    QnMutexLocker lk(&m_mutex);
+    if (m_runningTaskID == timerId)
+        return false; //< Timer being executed at the moment.
 
-                      //fetching handler
-    auto taskIter = m_taskToTime.find(timerID);
+    // Fetching handler.
+    auto taskIter = m_taskToTime.find(timerId);
     if (taskIter == m_taskToTime.end())
-        return false;   //no timer with requested id
-    auto handlerIter = m_timeToTask.find(std::make_pair(taskIter->second, timerID));
+        return false; //< No timer with requested id.
+    auto handlerIter = m_timeToTask.find(std::make_pair(taskIter->second, timerId));
     NX_ASSERT(handlerIter != m_timeToTask.end());
 
     auto taskContext = std::move(handlerIter->second);
@@ -200,40 +199,40 @@ bool StandaloneTimerManager::modifyTimerDelay(
     m_timeToTask.erase(handlerIter);
 
     NX_LOGX(lm("Modifyed timer %1, new delay %2 ms")
-        .arg(timerID).arg(newDelay.count()),
+        .arg(timerId).arg(newDelay.count()),
         cl_logDEBUG2);
 
     addTaskNonSafe(
         lk,
-        timerID,
+        timerId,
         std::move(taskContext),
         newDelay);
     return true;
 }
 
-void StandaloneTimerManager::deleteTimer(const TimerId& timerID)
+void StandaloneTimerManager::deleteTimer(const TimerId& timerId)
 {
-    QnMutexLocker lk(&m_mtx);
+    QnMutexLocker lk(&m_mutex);
 
-    NX_LOGX(lm("Deleting timer %1").arg(timerID), cl_logDEBUG2);
+    NX_LOGX(lm("Deleting timer %1").arg(timerId), cl_logDEBUG2);
 
-    deleteTaskNonSafe(lk, timerID);
+    deleteTaskNonSafe(lk, timerId);
 }
 
-void StandaloneTimerManager::joinAndDeleteTimer(const TimerId& timerID)
+void StandaloneTimerManager::joinAndDeleteTimer(const TimerId& timerId)
 {
-    NX_ASSERT(timerID, lm("Timer id should be a positive number, 0 given."));
-    if (timerID == 0)
+    NX_ASSERT(timerId, lm("Timer id should be a positive number, 0 given."));
+    if (timerId == 0)
         return;
 
-    QnMutexLocker lk(&m_mtx);
-    //having locked \a m_mtx we garantee, that execution of timer timerID will not start
+    QnMutexLocker lk(&m_mutex);
+    //having locked m_mutex we garantee, that execution of timer timerId will not start
 
     if (QThread::currentThread() != this)
     {
-        NX_LOGX(lm("Waiting for timer %1 to complete").arg(timerID), cl_logDEBUG2);
+        NX_LOGX(lm("Waiting for timer %1 to complete").arg(timerId), cl_logDEBUG2);
 
-        while (m_runningTaskID == timerID)
+        while (m_runningTaskID == timerId)
             m_cond.wait(lk.mutex());      //waiting for timer handler execution finish
     }
     else
@@ -242,9 +241,9 @@ void StandaloneTimerManager::joinAndDeleteTimer(const TimerId& timerID)
         //    There is no sense to wait task completion
     }
 
-    //since mutex is locked and m_runningTaskID != timerID,
+    //since mutex is locked and m_runningTaskID != timerId,
     //    timer handler is not running at the moment
-    deleteTaskNonSafe(lk, timerID);
+    deleteTaskNonSafe(lk, timerId);
 }
 
 constexpr static std::chrono::milliseconds kErrorSkipTimeout =
@@ -252,7 +251,7 @@ constexpr static std::chrono::milliseconds kErrorSkipTimeout =
 
 void StandaloneTimerManager::run()
 {
-    QnMutexLocker lk(&m_mtx);
+    QnMutexLocker lk(&m_mutex);
 
     NX_LOG(lit("StandaloneTimerManager started"), cl_logDEBUG1);
 
@@ -274,29 +273,29 @@ void StandaloneTimerManager::run()
                 if (currentTime < taskIter->first.first)
                     break;
 
-                const TimerId timerID = taskIter->first.second;
+                const TimerId timerId = taskIter->first.second;
                 auto taskContext = std::move(taskIter->second);
 
-                m_runningTaskID = timerID;
+                m_runningTaskID = timerId;
 
                 {
                     // Using unlocker to ensure exception-safety.
                     QnMutexUnlocker unlocker(&lk);
 
-                    NX_LOGX(lm("Executing task %1").arg(timerID), cl_logDEBUG2);
-                    taskContext.func(timerID);
-                    NX_LOGX(lm("Done task %1").arg(timerID), cl_logDEBUG2);
+                    NX_LOGX(lm("Executing task %1").arg(timerId), cl_logDEBUG2);
+                    taskContext.func(timerId);
+                    NX_LOGX(lm("Done task %1").arg(timerId), cl_logDEBUG2);
                 }
 
-                if (m_taskToTime.find(timerID) != m_taskToTime.cend())
+                if (m_taskToTime.find(timerId) != m_taskToTime.cend())
                 {
-                    m_taskToTime.erase(timerID);
+                    m_taskToTime.erase(timerId);
                     m_timeToTask.erase(taskIter);
 
                     if (!taskContext.singleShot)
                         addTaskNonSafe(
                             lk,
-                            timerID,
+                            timerId,
                             std::move(taskContext),
                             taskContext.repeatPeriod);
                 }
@@ -345,19 +344,19 @@ void StandaloneTimerManager::run()
 
 void StandaloneTimerManager::addTaskNonSafe(
     const QnMutexLockerBase& /*lk*/,
-    const TimerId timerID,
+    const TimerId timerId,
     TaskContext taskContext,
     std::chrono::milliseconds delay)
 {
     const qint64 taskTime = m_monotonicClock.elapsed() + delay.count();
 
     if (!m_timeToTask.emplace(
-        std::make_pair(taskTime, timerID),
+        std::make_pair(taskTime, timerId),
         std::move(taskContext)).second)
     {
         //ASSERT( false );
     }
-    if (!m_taskToTime.emplace(timerID, taskTime).second)
+    if (!m_taskToTime.emplace(timerId, taskTime).second)
     {
         //ASSERT( false );
     }
@@ -367,9 +366,9 @@ void StandaloneTimerManager::addTaskNonSafe(
 
 void StandaloneTimerManager::deleteTaskNonSafe(
     const QnMutexLockerBase& /*lk*/,
-    const TimerId timerID)
+    const TimerId timerId)
 {
-    const std::map<TimerId, qint64>::iterator it = m_taskToTime.find(timerID);
+    const std::map<TimerId, qint64>::iterator it = m_taskToTime.find(timerId);
     if (it == m_taskToTime.end())
         return;
 
@@ -381,16 +380,15 @@ uint64_t StandaloneTimerManager::generateNextTimerId()
 {
     static QAtomicInt lastTaskID = 0;
 
-    TimerId timerID = lastTaskID.fetchAndAddOrdered(1) + 1;
-    if (timerID == 0)
-        timerID = lastTaskID.fetchAndAddOrdered(1) + 1;
-    return timerID;
+    TimerId timerId = lastTaskID.fetchAndAddOrdered(1) + 1;
+    if (timerId == 0)
+        timerId = lastTaskID.fetchAndAddOrdered(1) + 1;
+    return timerId;
 }
 
+//-------------------------------------------------------------------------------------------------
 
-
-StandaloneTimerManager::TaskContext::TaskContext(MoveOnlyFunc<void(TimerId)> _func)
-:
+StandaloneTimerManager::TaskContext::TaskContext(MoveOnlyFunc<void(TimerId)> _func):
     func(std::move(_func)),
     singleShot(true)
 {

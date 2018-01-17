@@ -16,7 +16,7 @@ class PublicIPDiscovery:
 {
 public:
     PublicIPDiscovery():
-        m_testHttpServer(std::make_unique<TestHttpServer>())
+        m_testHttpServer(std::make_unique<http::TestHttpServer>())
     {
         init();
     }
@@ -27,7 +27,7 @@ protected:
         withDelay = 1,
     };
 
-    TestHttpServer* testHttpServer()
+    http::TestHttpServer* testHttpServer()
     {
         return m_testHttpServer.get();
     }
@@ -56,7 +56,7 @@ protected:
         m_publicAddressFinder->update();
         m_eventHandlerHasBeenInvoked.get_future().wait();
     }
-    
+
     void destroyFinder()
     {
         m_publicAddressFinder.reset();
@@ -77,8 +77,8 @@ protected:
     }
 
 private:
-    std::unique_ptr<TestHttpServer> m_testHttpServer;
-    std::unique_ptr<::nx::network::PublicIPDiscovery> m_publicAddressFinder;
+    std::unique_ptr<http::TestHttpServer> m_testHttpServer;
+    std::unique_ptr<nx::network::PublicIPDiscovery> m_publicAddressFinder;
     nx::utils::promise<void> m_finderHasFinished;
     nx::utils::promise<void> m_eventHandlerHasBeenInvoked;
     boost::optional<QString> m_foundIpAddress;

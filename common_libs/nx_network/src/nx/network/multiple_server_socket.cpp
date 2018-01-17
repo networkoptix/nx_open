@@ -110,6 +110,8 @@ bool MultipleServerSocket::isClosed() const
 
 MultipleServerSocket_FORWARD_SET(setReuseAddrFlag, bool);
 MultipleServerSocket_FORWARD_GET(getReuseAddrFlag, bool);
+MultipleServerSocket_FORWARD_SET(setReusePortFlag, bool);
+MultipleServerSocket_FORWARD_GET(getReusePortFlag, bool);
 
 bool MultipleServerSocket::setNonBlockingMode(bool value)
 {

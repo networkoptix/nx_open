@@ -28,7 +28,6 @@ public:
         ShowCameraInfo,
         LiveVideoPreviews,
 
-        BasePath,
         TestMode,
         InitialTest,
         WebSocketPort,
@@ -60,7 +59,7 @@ protected:
     virtual void updateValuesFromSettings(
             QSettings* settings, const QList<int>& ids) override;
     virtual QVariant readValueFromSettings(
-            QSettings* settings, int id, const QVariant& defaultValue) override;
+            QSettings* settings, int id, const QVariant& defaultValue) const override;
     virtual void writeValueToSettings(
             QSettings* settings, int id, const QVariant& value) const override;
     virtual UpdateStatus updateValue(int id, const QVariant& value) override;
@@ -87,7 +86,6 @@ private:
             liveVideoPreviews, setLiveVideoPreviews,
             LiveVideoPreviews, true)
 
-        QN_DECLARE_RW_PROPERTY(QString,                     basePath,                   setBasePath,                BasePath,                   lit("qrc:///"))
         QN_DECLARE_RW_PROPERTY(bool,                        testMode,                   setTestMode,                TestMode,                   false)
         QN_DECLARE_RW_PROPERTY(QString,                     initialTest,                setInitialTest,             InitialTest,                QString())
         QN_DECLARE_RW_PROPERTY(quint16,                     webSocketPort,              setWebSocketPort,           WebSocketPort,              0)

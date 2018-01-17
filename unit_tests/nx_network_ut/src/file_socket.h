@@ -1,22 +1,16 @@
-/**********************************************************
-* 25 feb 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef FILE_SOCKET_H
-#define FILE_SOCKET_H
+#pragma once
 
 #include <fstream>
 
 #include <nx/network/test_support/dummy_socket.h>
 
-
 namespace nx {
 namespace network {
 
-//!Reads data from file. Sent data is just ignored
-class FileSocket
-:
+/**
+ * Reads data from file. Sent data is just ignored.
+ */
+class FileSocket:
     public DummySocket
 {
 public:
@@ -27,7 +21,7 @@ public:
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
+        std::chrono::milliseconds timeout) override;
     virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
     virtual bool isConnected() const override;
@@ -38,7 +32,5 @@ private:
     size_t m_bytesRead;
 };
 
-}   //network
-}   //nx
-
-#endif  //FILE_SOCKET_H
+} // namespace network
+} // namespace nx

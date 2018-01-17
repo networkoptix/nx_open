@@ -40,18 +40,18 @@ class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource
     Q_OBJECT
     Q_FLAGS(Qn::ResourceFlags)
     Q_FLAGS(Ptz::Capabilities)
-    Q_FLAGS(Qn::ResourceFlags)
-    Q_PROPERTY(QnUuid id READ getId WRITE setId)
-    Q_PROPERTY(QnUuid typeId READ getTypeId WRITE setTypeId)
-    Q_PROPERTY(QString uniqueId READ getUniqueId)
+    Q_PROPERTY(QnUuid id READ getId CONSTANT)
+    Q_PROPERTY(QnUuid typeId READ getTypeId CONSTANT)
+    Q_PROPERTY(QString uniqueId READ getUniqueId CONSTANT)
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString searchString READ toSearchString)
-    Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId)
-    Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags)
+    Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId NOTIFY parentIdChanged)
+    Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
     Q_PROPERTY(QStringList tags READ getTags WRITE setTags)
-    Q_PROPERTY(Ptz::Capabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
+    Q_PROPERTY(Ptz::Capabilities ptzCapabilities
+        READ getPtzCapabilities WRITE setPtzCapabilities NOTIFY ptzCapabilitiesChanged)
 public:
 
     QnResource(QnCommonModule* commonModule = nullptr);
@@ -65,7 +65,7 @@ public:
     virtual void setParentId(const QnUuid& parent);
 
     // device unique identifier
-    virtual QString getUniqueId() const { return getId().toString(); };
+    virtual QString getUniqueId() const { return getId().toString(); }
     virtual void setUniqId(const QString& value);
 
 
@@ -93,8 +93,21 @@ public:
         Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
     */
     void blockingInit();
-    // TODO: comment
+
+    /**
+     * Initialize camera sync. This function can omit initialization if recently call was failed.
+     * It init camera not often then some time period.
+     * @param optional - if false and no thread in ThreadPool left then return immediately.
+     * if true and no thread in ThreadPool left then add new thread to ThreadPool queue.
+     */
     void initAsync(bool optional);
+
+    /**
+     * Same as initAsync but run initialization always.
+     * This call don't check if initAsync was called recently but always add a new task.
+     */
+    void reinitAsync();
+
     CameraDiagnostics::Result prevInitializationResult() const;
     //!Returns counter of resource initialization attempts (every attempt: successful or not)
     int initializationAttemptCount() const;

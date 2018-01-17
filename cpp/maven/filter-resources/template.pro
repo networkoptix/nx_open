@@ -13,6 +13,8 @@ ROOT_DIR = $$clean_path("${root.dir}")
 
 CONFIG += unversioned_soname unversioned_libname
 
+CONFIG += object_parallel_to_source
+
 ## GLOBAL CONFIGURATIONS
 !ios|equals(TEMPLATE, app) {
     CONFIG += precompile_header
@@ -41,6 +43,8 @@ if (android | ios) {
 
 include( optional_functionality.pri )
 
+#Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
+#DEFINES += USE_OWN_MUTEX ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
 
 CONFIG(debug, debug|release) {
   CONFIGURATION=debug
@@ -53,8 +57,6 @@ CONFIG(debug, debug|release) {
   !linux-clang {
     # Temporary fix for linux clang 3.6-3.7 that crashes with our mutex.
     DEFINES += USE_OWN_MUTEX
-    #Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
-    #DEFINES += ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
   }
   CONFIG += qml_debug
 }
@@ -132,6 +134,8 @@ win* {
         NX_FUSION_API=__declspec(dllimport) \
         NX_VMS_UTILS_API=__declspec(dllimport) \
         UDT_API=__declspec(dllimport) \
+        NX_RELAYING_API=__declspec(dllimport) \
+        NX_VMS_GATEWAY_API=__declspec(dllimport) \
 
 } else {
     DEFINES += \
@@ -142,6 +146,8 @@ win* {
         NX_FUSION_API= \
         NX_VMS_UTILS_API= \
         UDT_API= \
+        NX_RELAYING_API= \
+        NX_VMS_GATEWAY_API= \
 
 }
 
@@ -254,11 +260,12 @@ linux*:!android {
         QMAKE_CXXFLAGS += -msse4.1
     }
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedefs
+    QMAKE_CXXFLAGS += -fstack-protector-all
   } else {
     LIBS -= -lssl
     LIBS += ${linux.arm.oslibs}
     QMAKE_CXXFLAGS += -fno-omit-frame-pointer
-    CONFIG(release, debug|release)|!equals(BOX, tx1): QMAKE_CXXFLAGS += -ggdb1
+    CONFIG(release, debug|release): QMAKE_CXXFLAGS += -ggdb1
   }
   QMAKE_LFLAGS += -rdynamic -Wl,--no-undefined
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers

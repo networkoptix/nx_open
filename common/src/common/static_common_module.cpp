@@ -54,7 +54,7 @@ QnStaticCommonModule::QnStaticCommonModule(
     store(new nx::utils::TimerManager());
 
     instance<QnSyncTime>();
-    instance<nx_http::ClientPool>();
+    instance<nx::network::http::ClientPool>();
 }
 
 void QnStaticCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {

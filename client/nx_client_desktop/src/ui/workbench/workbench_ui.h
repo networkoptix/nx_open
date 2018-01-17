@@ -9,7 +9,6 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/common/geometry.h>
 #include <nx/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/animation/animation_timer_listener.h>
 
@@ -67,8 +66,7 @@ class QnWorkbenchUi:
     public Disconnective<QObject>,
     public QnWorkbenchContextAware,
     public nx::client::desktop::ui::action::TargetProvider,
-    public AnimationTimerListener,
-    protected QnGeometry
+    public AnimationTimerListener
 {
     Q_OBJECT
     Q_ENUMS(Flags Flag)

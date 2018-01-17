@@ -1,9 +1,11 @@
 #include <gtest/gtest.h>
 
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/ssl_socket.h>
@@ -11,6 +13,7 @@
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/test_options.h>
+#include <nx/utils/subscription.h>
 
 namespace nx {
 namespace network {
@@ -42,16 +45,16 @@ public:
             m_system, boost::none, hpm::ServerTweak::noBindEndpoint);
 
         ASSERT_NE(nullptr, m_server);
-        SocketGlobals::mediatorConnector().setSystemCredentials(
+        SocketGlobals::cloud().mediatorConnector().setSystemCredentials(
             nx::hpm::api::SystemCredentials(
                 m_system.id,
                 m_server->serverId(),
                 m_system.authKey));
 
-        SocketGlobals::mediatorConnector().mockupMediatorUrl(
+        SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(mediator().stunEndpoint()));
-        SocketGlobals::mediatorConnector().enable(true);
+        SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
     const hpm::MediatorFunctionalTest& mediator() const
@@ -67,7 +70,7 @@ public:
     std::unique_ptr<AbstractStreamServerSocket> cloudServerSocket()
     {
         auto serverSocket = std::make_unique<CloudServerSocket>(
-            &SocketGlobals::mediatorConnector());
+            &SocketGlobals::cloud().mediatorConnector());
 
         serverSocket->setSupportedConnectionMethods(m_methods);
         NX_CRITICAL(serverSocket->registerOnMediatorSync() == hpm::api::ResultCode::ok);
@@ -97,14 +100,14 @@ NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE_EX(
     TEST_F, UdpHolePunching,
     [&](){ return cloudServerSocket(); },
     [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
-    SocketAddress(m_server->fullName()));
+    nx::network::SocketAddress(m_server->fullName()));
 
 TEST_F(UdpHolePunching, TransferSyncSsl)
 {
     network::test::socketTransferSync(
         [&]() { return std::make_unique<deprecated::SslServerSocket>(cloudServerSocket(), false); },
         []() { return std::make_unique<deprecated::SslSocket>(std::make_unique<CloudStreamSocket>(AF_INET), false); },
-        SocketAddress(m_server->fullName()));
+        nx::network::SocketAddress(m_server->fullName()));
 }
 
 TEST_F(UdpHolePunching, loadTest)
@@ -123,7 +126,7 @@ TEST_F(UdpHolePunching, loadTest)
     auto serverGuard = makeScopeGuard([&server]() { server.pleaseStopSync(); });
 
     test::ConnectionsGenerator connectionsGenerator(
-        SocketAddress(QString::fromUtf8(m_server->fullName()), 0),
+        nx::network::SocketAddress(QString::fromUtf8(m_server->fullName()), 0),
         maxSimultaneousConnections,
         test::TestTrafficLimitType::incoming,
         bytesToSendThroughConnection,
@@ -161,7 +164,7 @@ public:
 
         using namespace std::placeholders;
 
-        SocketGlobals::outgoingTunnelPool().onTunnelClosedSubscription().subscribe(
+        SocketGlobals::cloud().outgoingTunnelPool().onTunnelClosedSubscription().subscribe(
             std::bind(&CloudConnectTunnel::onTunnelClosed, this, _1),
             &m_onTunnelClosedSubscriptionId);
     }
@@ -170,7 +173,7 @@ public:
     {
         base_type::TearDown();
 
-        SocketGlobals::outgoingTunnelPool().onTunnelClosedSubscription().removeSubscription(
+        SocketGlobals::cloud().outgoingTunnelPool().onTunnelClosedSubscription().removeSubscription(
             m_onTunnelClosedSubscriptionId);
         m_onTunnelClosedSubscriptionId = nx::utils::kInvalidSubscriptionId;
 
@@ -179,9 +182,9 @@ public:
     }
 
 protected:
-    SocketAddress serverAddress() const
+    nx::network::SocketAddress serverAddress() const
     {
-        return SocketAddress(QString::fromUtf8(m_server->fullName()), 0);
+        return nx::network::SocketAddress(QString::fromUtf8(m_server->fullName()), 0);
     }
 
     void initializeCloudServerSocket()
@@ -190,7 +193,7 @@ protected:
         m_serverSocket->acceptAsync(
             [this](
                 SystemError::ErrorCode /*errorCode*/,
-                std::unique_ptr<AbstractStreamSocket> newConnection)
+                std::unique_ptr<nx::network::AbstractStreamSocket> newConnection)
             {
                 m_acceptedConnections.push_back(std::move(newConnection));
             });
@@ -199,7 +202,7 @@ protected:
     bool tryOpenTunnel()
     {
         auto clientSocket = std::make_unique<CloudStreamSocket>(AF_INET);
-        m_tunnelOpened = clientSocket->connect(serverAddress(), 2000);
+        m_tunnelOpened = clientSocket->connect(serverAddress(), std::chrono::seconds(2));
         clientSocket.reset();
         return m_tunnelOpened;
     }
@@ -207,7 +210,7 @@ protected:
     void openConnection()
     {
         auto clientSocket = std::make_unique<CloudStreamSocket>(AF_INET);
-        ASSERT_TRUE(clientSocket->connect(serverAddress(), 300000))
+        ASSERT_TRUE(clientSocket->connect(serverAddress(), nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText().toStdString();
         m_tunnelOpened = true;
     }
@@ -251,7 +254,7 @@ private:
     QnMutex m_mutex;
     QnWaitCondition m_cond;
     bool m_tunnelOpened;
-    std::vector<std::unique_ptr<AbstractStreamSocket>> m_acceptedConnections;
+    std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> m_acceptedConnections;
 
     void onTunnelClosed(const QString& hostName)
     {

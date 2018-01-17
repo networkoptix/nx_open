@@ -60,6 +60,13 @@ add_custom_command(
             "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
 )
 
+set_source_files_properties(
+    "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
+    "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
+    PROPERTIES
+        RESOURCE_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources"
+)
+
 nx_add_target(mediaserver_core LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mediaserver_core_app_info_impl.cpp"
@@ -71,7 +78,7 @@ nx_add_target(mediaserver_core LIBRARY
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
     PUBLIC_LIBS
         qtservice qtsinglecoreapplication Qt5::WebSockets
-        ffmpeg onvif quazip sigar openssl
+        ffmpeg nx_onvif quazip sigar openssl
         common appserver2 cloud_db_client nx_email nx_speech_synthesizer nx_network nx_fusion nx_utils nx_kit)
 
 if(LINUX)

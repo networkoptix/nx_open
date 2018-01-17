@@ -4,7 +4,7 @@
 
 #include <plugins/utils/multisensor_data_provider.h>
 #include <plugins/resource/onvif/onvif_resource_information_fetcher.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -105,7 +105,7 @@ CameraDiagnostics::Result QnOpteraResource::initInternal()
 
     CLSimpleHTTPClient http(
         url.host(),
-        url.port(nx_http::DEFAULT_HTTP_PORT),
+        url.port(nx::network::http::DEFAULT_HTTP_PORT),
         kChangeCameraModeTimeout,
         auth);
 

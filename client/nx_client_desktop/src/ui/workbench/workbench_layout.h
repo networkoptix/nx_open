@@ -29,6 +29,7 @@ enum class QnLayoutFlag
     NoTimeline = 0x10,
     SpecialBackground = 0x20,
     FillViewport = 0x40, //< Layout must fill viewport as much as possible
+    MotionWidget = 0x80, //< Layout is a special one, that displayed on a camera motion widget.
 };
 Q_DECLARE_FLAGS(QnLayoutFlags, QnLayoutFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnLayoutFlags)
@@ -42,6 +43,7 @@ Q_DECLARE_METATYPE(QnLayoutFlags)
 class QnWorkbenchLayout: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
+    Q_PROPERTY(QnLayoutResource* resource READ resourcePtr CONSTANT)
 
 public:
     /**
@@ -69,6 +71,11 @@ public:
     QnLayoutResourcePtr resource() const;
 
     /**
+     * @return Plain pointer to the associated resource. Needed by QML.
+     */
+    QnLayoutResource* resourcePtr() const;
+
+    /**
      * @return Layout associated with the given resource, if any.
      */
     static QnWorkbenchLayout* instance(const QnLayoutResourcePtr& layout);
@@ -88,6 +95,8 @@ public:
 
     QnLayoutFlags flags() const;
     void setFlags(QnLayoutFlags value);
+
+    QnUuid resourceId() const;
 
     /**
      * @return Name of this layout.

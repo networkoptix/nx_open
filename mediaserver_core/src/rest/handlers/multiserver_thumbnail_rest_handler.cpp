@@ -8,10 +8,11 @@
 
 #include <common/common_module.h>
 
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/camera_history.h>
 
 #include <network/tcp_listener.h>
 
@@ -20,6 +21,7 @@
 #include <rest/server/rest_connection_processor.h>
 
 #include <utils/media/frame_info.h>
+#include <nx/utils/log/log_main.h>
 
 namespace
 {
@@ -39,7 +41,20 @@ int QnMultiserverThumbnailRestHandler::executeGet(
     QByteArray& result, QByteArray& contentType,
     const QnRestConnectionProcessor* processor )
 {
-    auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(processor->commonModule()->resourcePool(), params);
+    auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(
+        processor->commonModule()->resourcePool(), params);
+
+    auto requiredPermission = QnThumbnailRequestData::isSpecialTimeValue(request.msecSinceEpoch)
+            ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
+
+    if (!processor->commonModule()->resourceAccessManager()->hasPermission(
+        processor->accessRights(), request.camera, requiredPermission))
+    {
+        return makeError(nx::network::http::StatusCode::forbidden,
+            lit("Access denied: Insufficent access rights"),
+            &result, &contentType, request.format, request.extraFormatting);
+    }
+
     const auto ownerPort = processor->owner()->getPort();
     return getScreenshot(processor->commonModule(), request, result, contentType, ownerPort);
 }
@@ -54,7 +69,7 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(
     if (request.camera && !request.camera->hasVideo(nullptr))
     {
         return makeError(
-            nx_http::StatusCode::badRequest
+            nx::network::http::StatusCode::badRequest
             , lit("Camera has no video")
             , &result
             , &contentType
@@ -62,11 +77,11 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(
             , request.extraFormatting);
     }
 
-    if (!request.isValid())
+    if (const auto error = request.getError())
     {
         return makeError(
-            nx_http::StatusCode::badRequest
-            , lit("Invalid request") // TODO: #GDM think about more detailed error
+            nx::network::http::StatusCode::badRequest
+            , lit("Invalid request: ") + *error
             , &result
             , &contentType
             , request.format
@@ -103,12 +118,19 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
         ? request.msecSinceEpoch
         : request.msecSinceEpoch * kUsecPerMs;
 
-    CLVideoDecoderOutputPtr outFrame = QnGetImageHelper::getImage(request.camera, timeUSec, request.size, request.roundMethod, request.rotation);
+    CLVideoDecoderOutputPtr outFrame = QnGetImageHelper::getImage(
+        request.camera,
+        timeUSec,
+        request.size,
+        request.roundMethod,
+        request.rotation,
+        request.aspectRatio);
+
     if (!outFrame)
     {
         result = QByteArray();
         contentType = QByteArray();
-        return nx_http::StatusCode::noContent;
+        return nx::network::http::StatusCode::noContent;
     }
 
     QByteArray imageFormat = QnLexical::serialized<QnThumbnailRequestData::ThumbnailFormat>(request.imageFormat).toUtf8();
@@ -133,8 +155,13 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
 
     if (result.isEmpty())
     {
+        NX_WARNING(this, lm("Can't encode image to '%1' format. Image size: %2x%3")
+            .arg(QString::fromUtf8(imageFormat))
+            .arg(outFrame->width)
+            .arg(outFrame->height));
+
         return makeError(
-            nx_http::StatusCode::badRequest
+            nx::network::http::StatusCode::unsupportedMediaType
             , lit("Unsupported image format '%1'").arg(QString::fromUtf8(imageFormat))
             , &result
             , &contentType
@@ -143,9 +170,51 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
     }
 
     contentType = QByteArray("image/") + imageFormat;
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
+struct DownloadResult
+{
+    SystemError::ErrorCode osStatus = SystemError::notImplemented;
+    nx::network::http::StatusCode::Value httpStatus = nx::network::http::StatusCode::internalServerError;
+    QByteArray body;
+};
+
+static DownloadResult downloadImage(
+    const QnMediaServerResourcePtr& server,
+    const QnThumbnailRequestData& request,
+    int ownerPort)
+{
+    NX_ASSERT(!request.isLocal, "Local request must be processed before");
+    nx::utils::Url apiUrl(server->getApiUrl());
+    apiUrl.setPath(L'/' + urlPath);
+
+    QnMultiserverRequestContext<QnThumbnailRequestData> context(request, ownerPort);
+    QnThumbnailRequestData modifiedRequest(request);
+    modifiedRequest.makeLocal();
+    apiUrl.setQuery(modifiedRequest.toUrlQuery());
+    // TODO: #rvasilenko implement raw format here
+
+    DownloadResult result;
+    auto requestCompletionFunc =
+        [&] (SystemError::ErrorCode osStatus, int httpStatus, nx::network::http::BufferType body)
+        {
+            result.osStatus = osStatus;
+            result.httpStatus = (nx::network::http::StatusCode::Value) httpStatus;
+            result.body = std::move(body);
+            context.executeGuarded([&context]() { context.requestProcessed(); });
+        };
+
+    runMultiserverDownloadRequest(server->commonModule()->router(),
+        apiUrl, server, requestCompletionFunc, &context);
+
+    context.waitForDone();
+    NX_DEBUG(typeid(QnMultiserverThumbnailRestHandler),
+        lm("Request to '%1' finithed (%2) http status %3").args(
+            apiUrl, SystemError::toString(result.osStatus), result.httpStatus));
+
+    return result;
+}
 
 int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
     const QnMediaServerResourcePtr &server,
@@ -154,45 +223,28 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
     QByteArray& contentType,
     int ownerPort ) const
 {
-    typedef QnMultiserverRequestContext<QnThumbnailRequestData> QnThumbnailRequestContext;
-
-    QnThumbnailRequestContext context(request, ownerPort);
-    NX_ASSERT(!request.isLocal, Q_FUNC_INFO, "Local request must be processed before");
-
-    QUrl apiUrl(server->getApiUrl());
-    apiUrl.setPath(L'/' + urlPath);
-
-    QnThumbnailRequestData modifiedRequest(request);
-    modifiedRequest.makeLocal();
-    apiUrl.setQuery(modifiedRequest.toUrlQuery());
-    // TODO: #rvasilenko implement raw format here
-
-    auto requestCompletionFunc = [&context, &result] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) {
-
-        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok ) {
-            result = msgBody;
-        }
-
-        context.executeGuarded([&context]()
-        {
-            context.requestProcessed();
-        });
-    };
-    runMultiserverDownloadRequest(server->commonModule()->router(), apiUrl, server, requestCompletionFunc, &context);
-    context.waitForDone();
-
-    QByteArray imageFormat = QnLexical::serialized<QnThumbnailRequestData::ThumbnailFormat>(request.imageFormat).toUtf8();
-    if (result.isEmpty())
+    const auto response = downloadImage(server, request, ownerPort);
+    if (response.osStatus != SystemError::noError)
     {
-        return makeError(
-            nx_http::StatusCode::badRequest
-            , lit("Unsupported image format '%1'").arg(QString::fromUtf8(imageFormat))
-            , &result
-            , &contentType
-            , request.format
-            , request.extraFormatting);
+        return makeError(nx::network::http::StatusCode::internalServerError,
+            lit("Internal error: ") + SystemError::toString(response.osStatus),
+            &result, &contentType, request.format, request.extraFormatting);
     }
 
-    contentType = QByteArray("image/") + imageFormat;
-    return nx_http::StatusCode::ok;
+    if (response.httpStatus == nx::network::http::StatusCode::unauthorized)
+    {
+        return makeError(nx::network::http::StatusCode::internalServerError,
+            lit("Internal error: ") + nx::network::http::StatusCode::toString(response.httpStatus),
+            &result, &contentType, request.format, request.extraFormatting);
+    }
+
+    if (!response.body.isEmpty())
+    {
+        result = std::move(response.body);
+        contentType = (response.httpStatus == nx::network::http::StatusCode::ok)
+            ? QByteArray("image/") + QnLexical::serialized(request.imageFormat).toUtf8()
+            : QByteArray("application/json"); //< TODO: Provide content type from response.
+    }
+
+    return response.httpStatus;
 }

@@ -4,11 +4,12 @@
 #define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
 
-#include <random>
 #include <climits>
 #include <vector>
+#include <set>
 #include <algorithm>
 #include <cerrno>
+#include <sstream>
 
 #include <QtCore>
 #include <QtSql>
@@ -21,6 +22,7 @@
 #include <core/resource_management/resource_properties.h>
 #include <utils/common/util.h>
 #include <utils/db/db_helper.h>
+#include <nx/utils/random.h>
 
 #ifdef Q_OS_LINUX
 #   include <platform/monitoring/global_monitor.h>
@@ -31,24 +33,46 @@
 #include <media_server/settings.h>
 #include <media_server/media_server_module.h>
 
-template<qint64 From, qint64 To>
-qint64 genRandomNumber()
-{
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    static std::uniform_int_distribution<qint64> dist(From, To);
+#include "../media_server_module_fixture.h"
 
-    return dist(gen);
+struct ErrorStream
+{
+    QnMutex mutex;
+    std::unique_ptr<std::stringstream> stream;
+
+    void reset()
+    {
+        QnMutexLocker lock(&mutex);
+        stream.reset(new std::stringstream);
+    }
+
+    ErrorStream(): stream(new std::stringstream) {}
+};
+
+template<class _Elem, class _Traits>
+using EndlType = std::basic_ostream<_Elem, _Traits>& (*)(std::basic_ostream<_Elem, _Traits>&);
+
+ErrorStream& operator<<(ErrorStream& stream, EndlType<char, std::char_traits<char>>)
+{
+    QnMutexLocker lock(&stream.mutex);
+    *(stream.stream) << std::endl;
+    return stream;
 }
+
+template<typename T>
+ErrorStream& operator<<(ErrorStream& stream, T&& t)
+{
+    QnMutexLocker lock(&stream.mutex);
+    *(stream.stream) << std::forward<T>(t);
+    return stream;
+}
+
+ErrorStream errorStream;
 
 void generateCameraUid(QByteArray *camUid, size_t n)
 {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    static std::uniform_int_distribution<int> dist(65, 90);
-
     for (size_t i = 0; i < n; i++)
-        camUid->append(dist(gen));
+        camUid->append(nx::utils::random::number(65, 90));
 }
 
 struct TestFileHeader
@@ -58,7 +82,7 @@ struct TestFileHeader
 
 TestFileHeader generateFileHeader()
 {
-    return { (int)genRandomNumber<0, 127>() };
+    return{ nx::utils::random::number(0, 127) };
 }
 
 struct TestFileOperation
@@ -70,40 +94,62 @@ struct TestFileOperation
     int duration;
     int timeZone;
     int chunksCatalog;
+    int fileIndex;
 };
 
 bool operator == (const TestFileOperation &lhs, const TestFileOperation &rhs)
 {
     return lhs.startTime == rhs.startTime && lhs.fileSize == rhs.fileSize &&
-           lhs.code == rhs.code && lhs.cameraId == rhs.cameraId &&
-           lhs.timeZone == rhs.timeZone && lhs.duration == rhs.duration &&
-           lhs.chunksCatalog == rhs.chunksCatalog;
+        lhs.code == rhs.code && lhs.cameraId == rhs.cameraId &&
+        lhs.timeZone == rhs.timeZone && lhs.duration == rhs.duration &&
+        lhs.chunksCatalog == rhs.chunksCatalog && lhs.fileIndex == rhs.fileIndex;
 }
 
 TestFileOperation generateFileOperation(int code)
 {
-    int tz = genRandomNumber<0, 14>() * 60;
-    switch (genRandomNumber<0, 2>())
+    TestFileOperation result;
+
+    result.startTime = nx::utils::random::number(1000LL, 439804651110LL);
+    result.fileSize = nx::utils::random::number(0LL, 54975581388LL);
+    result.code = code;
+    result.cameraId = nx::utils::random::number(0, 65535);
+    result.duration = nx::utils::random::number(0, 1048575);
+
+    result.timeZone = nx::utils::random::number(0, 14) * 60;
+    switch (nx::utils::random::number(0, 2))
     {
     case 0:
         break;
     case 1:
-        tz += 30;
+        result.timeZone += 30;
         break;
     case 2:
-        tz += 45;
+        result.timeZone += 45;
         break;
     }
-    tz *= genRandomNumber<0, 1>() == 0 ? 1 : -1;
+    result.timeZone *= nx::utils::random::number(0, 1) == 0 ? 1 : -1;
 
-    return{ genRandomNumber<1000, 439804651110LL>(), genRandomNumber<0, 1099511627776LL>(),
-            code, (int)genRandomNumber<0, 65535>(), (int)genRandomNumber<0, 1048575LL>(),
-            tz, (int)genRandomNumber<0, 1>() };
+    result.chunksCatalog = nx::utils::random::number(0, 1);
+    result.fileIndex = nx::utils::random::number(0, 1) == 0
+        ? DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION
+        : DeviceFileCatalog::Chunk::FILE_INDEX_NONE;
+
+    errorStream
+        << "result.startTime: " << result.startTime << std::endl
+        << "result.fileSize: " << result.fileSize << std::endl
+        << "result.code: " << result.code << std::endl
+        << "result.cameraId: " << result.cameraId << std::endl
+        << "result.duration: " << result.duration << std::endl
+        << "result.timezone: " << result.timeZone << std::endl
+        << "result.catalog: " << result.chunksCatalog << std::endl
+        << "result.fileIndex: " << result.fileIndex << std::endl;
+
+    return result;
 }
 
 struct TestCameraOperation
 {
-    int code;
+    nx::media_db::RecordType code;
     int uuidLen;
     int id;
     QByteArray camUniqueId;
@@ -117,11 +163,14 @@ bool operator == (const TestCameraOperation &lhs, const TestCameraOperation &rhs
 
 TestCameraOperation generateCameraOperation()
 {
-    int camUidLen = (int)genRandomNumber<20, 40>();
-    QByteArray camUid;
-    generateCameraUid(&camUid, camUidLen);
+    TestCameraOperation result;
 
-    return{ 2, camUidLen, (int)genRandomNumber<0, 65535>(), camUid };
+    result.code = nx::media_db::RecordType::CameraOperationAdd;
+    result.uuidLen = nx::utils::random::number(20, 40);
+    generateCameraUid(&result.camUniqueId, result.uuidLen);
+    result.id = nx::utils::random::number(0, 65535);
+
+    return result;
 }
 
 typedef boost::variant<TestFileHeader, TestFileOperation, TestCameraOperation> TestRecord;
@@ -144,6 +193,7 @@ public:
         fileOp.setDuration(tfo.duration);
         fileOp.setTimeZone(tfo.timeZone);
         fileOp.setFileSize(tfo.fileSize);
+        fileOp.setFileTypeIndex(tfo.fileIndex);
         fileOp.setRecordType(nx::media_db::RecordType(tfo.code));
         fileOp.setStartTime(tfo.startTime);
 
@@ -155,11 +205,12 @@ public:
         nx::media_db::CameraOperation camOp;
         camOp.setCameraId(tco.id);
         camOp.setCameraUniqueIdLen(tco.uuidLen);
-        camOp.setRecordType(nx::media_db::RecordType(tco.code));
+        camOp.setRecordType(tco.code);
         camOp.setCameraUniqueId(tco.camUniqueId);
 
         m_helper->writeRecord(camOp);
     }
+
 private:
     nx::media_db::DbHelper *m_helper;
 };
@@ -180,10 +231,10 @@ struct TestDataManager
         dataVector.emplace_back(generateFileHeader(), false);
         for (size_t i = 0; i < dataSize; ++i)
         {
-            switch (genRandomNumber<0, 1>())
+            switch (nx::utils::random::number(0, 1))
             {
             case 0:
-                switch (genRandomNumber<0, 1>())
+                switch (nx::utils::random::number(0, 1))
                 {
                 case 0:
                     dataVector.emplace_back(generateFileOperation(0), false);
@@ -238,7 +289,12 @@ public:
         Catalog *catalog;
     };
 
-    typedef std::vector<TestChunk> TestChunkCont;
+    friend bool operator<(const TestChunk &lhs, const TestChunk &rhs)
+    {
+        return lhs.chunk.startTimeMs < rhs.chunk.startTimeMs;
+    }
+
+    typedef std::set<TestChunk> TestChunkCont;
     typedef std::vector<Catalog> CatalogCont;
 
 public:
@@ -247,7 +303,7 @@ public:
         for (int i = 0; i < cameraCount; ++i)
         {
             QByteArray camuuid;
-            generateCameraUid(&camuuid, genRandomNumber<7, 15>());
+            generateCameraUid(&camuuid, nx::utils::random::number(7, 15));
             Catalog c1 = { camuuid, QnServer::LowQualityCatalog };
             Catalog c2 = { camuuid, QnServer::HiQualityCatalog };
 
@@ -256,19 +312,18 @@ public:
         }
     }
 
-    TestChunk generateAddOperation()
+    boost::optional<TestChunk> generateAddOperation()
     {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<qint64> dist(0, m_catalogs.size() - 1);
-
-        Catalog *catalog = &m_catalogs[dist(gen)];
+        Catalog *catalog = &m_catalogs[nx::utils::random::number((size_t)0, m_catalogs.size() - 1)];
+        errorStream << "catalog: " << catalog->cameraUniqueId.constData() << std::endl;
         TestFileOperation fileOp = generateFileOperation(0);
-        DeviceFileCatalog::Chunk chunk(fileOp.startTime, 1,
-                                       DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION,
-                                       fileOp.duration, fileOp.timeZone,
-                                       (quint16)(fileOp.fileSize >> 32),
-                                       (quint32)(fileOp.fileSize));
+
+        if (chunkExists(fileOp.startTime))
+            return boost::none;
+
+        DeviceFileCatalog::Chunk chunk(fileOp.startTime, 1,  fileOp.fileIndex,
+            fileOp.duration, fileOp.timeZone, (quint16)(fileOp.fileSize >> 32),
+            (quint32)(fileOp.fileSize));
 
         TestChunk ret;
         ret.catalog = catalog;
@@ -276,55 +331,49 @@ public:
         ret.isVisited = false;
         ret.chunk = chunk;
 
-        m_chunks.push_back(ret);
+        m_chunks.insert(ret);
 
         return ret;
     }
 
-    TestChunk *generateRemoveOperation()
+    TestChunk* generateRemoveOperation()
     {
         std::vector<TestChunk *> unremovedChunks;
-        for (size_t i = 0; i < m_chunks.size(); ++i)
+        for (auto& chunk: m_chunks)
         {
-            if (m_chunks[i].isDeleted == false)
-                unremovedChunks.push_back(&m_chunks[i]);
+            if (chunk.isDeleted == false)
+                unremovedChunks.push_back((TestChunk*)&chunk);
         }
         if (unremovedChunks.empty())
             return nullptr;
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<qint64> dist(0, unremovedChunks.size() - 1);
 
-        TestChunk *chunk = unremovedChunks[dist(gen)];
+        TestChunk *chunk = unremovedChunks[nx::utils::random::number((size_t)0, unremovedChunks.size() - 1)];
         chunk->isDeleted = true;
         return chunk;
     }
 
     std::pair<Catalog, std::deque<DeviceFileCatalog::Chunk>> generateReplaceOperation(int size)
     {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<qint64> dist(0, m_catalogs.size() - 1);
-
-        Catalog *catalog = &m_catalogs[dist(gen)];
-        for (size_t i = 0; i < m_chunks.size(); ++i)
+        Catalog *catalog = &m_catalogs[nx::utils::random::number((size_t)0, m_catalogs.size() - 1)];
+        for (auto& chunk: m_chunks)
         {
-            if (m_chunks[i].catalog->cameraUniqueId == catalog->cameraUniqueId &&
-                m_chunks[i].catalog->quality == catalog->quality)
-            {
-                m_chunks[i].isDeleted = true;
-            }
+            bool sameUniqueId = chunk.catalog->cameraUniqueId == catalog->cameraUniqueId;
+            bool sameQuality = chunk.catalog->quality == catalog->quality;
+
+            if (sameUniqueId && sameQuality)
+                ((TestChunk&)chunk).isDeleted = true;
         }
 
         std::deque<DeviceFileCatalog::Chunk> ret;
         for (int i = 0; i < size; ++i)
         {
             TestFileOperation fileOp = generateFileOperation(0);
-            DeviceFileCatalog::Chunk chunk(fileOp.startTime, 1,
-                                           DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION,
-                                           fileOp.duration, fileOp.timeZone,
-                                           (quint16)((fileOp.fileSize) >> 32),
-                                           (quint32)(fileOp.fileSize));
+            if (chunkExists(fileOp.startTime))
+                continue;
+
+            DeviceFileCatalog::Chunk chunk(fileOp.startTime, 1, fileOp.fileIndex,
+                fileOp.duration, fileOp.timeZone, (quint16)((fileOp.fileSize) >> 32),
+                (quint32)(fileOp.fileSize));
 
             TestChunk tc;
             tc.catalog = catalog;
@@ -332,7 +381,7 @@ public:
             tc.isVisited = false;
             tc.chunk = chunk;
 
-            m_chunks.push_back(tc);
+            m_chunks.insert(tc);
             ret.push_back(tc.chunk);
         }
 
@@ -344,6 +393,17 @@ public:
 private:
     TestChunkCont m_chunks;
     CatalogCont m_catalogs;
+
+    bool chunkExists(qint64 startTime) const
+    {
+        TestChunk existingChunk;
+        existingChunk.chunk.startTimeMs = startTime;
+
+        if (m_chunks.find(existingChunk) != m_chunks.cend())
+            return true;
+
+        return false;
+    }
 };
 
 std::string dbErrorToString(nx::media_db::Error error)
@@ -376,7 +436,7 @@ public:
 
         TestCameraOperation top;
         top.camUniqueId = cameraOp.getCameraUniqueId();
-        top.code = (int)cameraOp.getRecordType();
+        top.code = cameraOp.getRecordType();
         top.id = cameraOp.getCameraId();
         top.uuidLen = cameraOp.getCameraUniqueIdLen();
 
@@ -397,6 +457,7 @@ public:
         tfop.duration = mediaFileOp.getDuration();
         tfop.timeZone = mediaFileOp.getTimeZone();
         tfop.fileSize = mediaFileOp.getFileSize();
+        tfop.fileIndex = mediaFileOp.getFileTypeIndex();
         tfop.startTime = mediaFileOp.getStartTime();
 
         if (!m_tdm->seekAndSet(tfop))
@@ -463,7 +524,19 @@ void reopenDbFile(QFile *dbFile, const QString& fileName)
         << strerror(errno);
 }
 
-TEST(MediaDbTest, SimpleFileWriteTest)
+class MediaDbTest:
+    public MediaServerModuleFixture
+{
+public:
+    MediaDbTest()
+    {
+        platformAbstraction = std::make_unique<QnPlatformAbstraction>();
+    }
+
+    std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
+};
+
+TEST_F(MediaDbTest, SimpleFileWriteTest)
 {
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
@@ -501,7 +574,7 @@ TEST(MediaDbTest, SimpleFileWriteTest)
     }
 }
 
-TEST(MediaDbTest, BitsTwiddling)
+TEST_F(MediaDbTest, BitsTwiddling)
 {
     const size_t kTestBufSize = 10000;
     std::vector<TestFileHeader> fhVector;
@@ -531,6 +604,7 @@ TEST(MediaDbTest, BitsTwiddling)
         mfop.setDuration(tfop.duration);
         mfop.setTimeZone(tfop.timeZone);
         mfop.setFileSize(tfop.fileSize);
+        mfop.setFileTypeIndex(tfop.fileIndex);
         mfop.setStartTime(tfop.startTime);
         mfop.setRecordType(nx::media_db::RecordType(tfop.code));
 
@@ -538,6 +612,7 @@ TEST(MediaDbTest, BitsTwiddling)
         ASSERT_TRUE(mfop.getCatalog() == tfop.chunksCatalog);
         ASSERT_TRUE(mfop.getDuration() == tfop.duration);
         ASSERT_TRUE(mfop.getFileSize() == tfop.fileSize);
+        ASSERT_TRUE(mfop.getFileTypeIndex() == tfop.fileIndex);
         ASSERT_TRUE(mfop.getRecordType() == nx::media_db::RecordType(tfop.code));
         ASSERT_TRUE(mfop.getStartTime() == tfop.startTime);
         ASSERT_TRUE(mfop.getTimeZone() == tfop.timeZone);
@@ -565,7 +640,57 @@ TEST(MediaDbTest, BitsTwiddling)
     }
 }
 
-TEST(MediaDbTest, ReadWrite_Simple)
+TEST_F(MediaDbTest, MediaFileOP_ResetValues)
+{
+    nx::media_db::MediaFileOperation mfop;
+    mfop.setCameraId(65535);
+    qint64 newCameraId = nx::utils::random::number<qint64>(0, 65534);
+    mfop.setCameraId(newCameraId);
+    ASSERT_EQ(newCameraId, mfop.getCameraId());
+
+    mfop.setCatalog(1);
+    mfop.setCatalog(0);
+    ASSERT_EQ(0, mfop.getCatalog());
+
+    mfop.setDuration(std::pow(2, 20));
+    quint64 newDuration = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 20) - 1));
+    mfop.setDuration(newDuration);
+    ASSERT_EQ(newDuration, mfop.getDuration());
+
+    mfop.setFileSize(std::pow(2, 39));
+    quint64 newFileSize = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 39) - 1));
+    mfop.setFileSize(newFileSize);
+    ASSERT_EQ((qint64) newFileSize, mfop.getFileSize());
+
+    mfop.setFileTypeIndex(DeviceFileCatalog::Chunk::FILE_INDEX_NONE);
+    mfop.setFileTypeIndex(DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION);
+    ASSERT_EQ(DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION, mfop.getFileTypeIndex());
+
+    mfop.setRecordType(nx::media_db::RecordType::CameraOperationAdd);
+    mfop.setRecordType(nx::media_db::RecordType::FileOperationAdd);
+    ASSERT_EQ(nx::media_db::RecordType::FileOperationAdd, mfop.getRecordType());
+
+    mfop.setStartTime(std::pow(2, 42));
+    quint64 newStartTime = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 42) - 1));
+    mfop.setStartTime(newStartTime);
+    ASSERT_EQ(newStartTime, mfop.getStartTime());
+}
+
+TEST_F(MediaDbTest, CameraOP_ResetValues)
+{
+    nx::media_db::CameraOperation cop;
+    cop.setCameraId(std::pow(2, 16));
+    quint64 newCameraId = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 16) - 1));
+    cop.setCameraId(newCameraId);
+    ASSERT_EQ(newCameraId, cop.getCameraId());
+
+    cop.setCameraUniqueIdLen(std::pow(2, 14));
+    quint64 newCameraUniqueIdLen = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 14) - 1));
+    cop.setCameraUniqueIdLen(newCameraUniqueIdLen);
+    ASSERT_EQ(newCameraUniqueIdLen, cop.getCameraUniqueIdLen());
+}
+
+TEST_F(MediaDbTest, ReadWrite_Simple)
 {
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
@@ -619,7 +744,7 @@ TEST(MediaDbTest, ReadWrite_Simple)
     ASSERT_TRUE(readRecords == tdm.dataVector.size());
 }
 
-TEST(MediaDbTest, DbFileTruncate)
+TEST_F(MediaDbTest, DbFileTruncate)
 {
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
@@ -657,7 +782,7 @@ TEST(MediaDbTest, DbFileTruncate)
                                      << fileName.toLatin1().constData()
                                      << " remove failed";
         // truncating randomly last record
-        content.truncate(content.size() - genRandomNumber<1, sizeof(qint64) * 2 - 1>());
+        content.truncate((int)content.size() - nx::utils::random::number((size_t)1, sizeof(qint64) * 2 - 1));
 
         initDbFile(&dbFile, fileName);
         dbFile.write(content);
@@ -689,7 +814,7 @@ TEST(MediaDbTest, DbFileTruncate)
     }
 }
 
-TEST(MediaDbTest, ReadWrite_MT)
+TEST_F(MediaDbTest, ReadWrite_MT)
 {
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
@@ -806,21 +931,15 @@ TEST(MediaDbTest, ReadWrite_MT)
     QFile::remove(fileName);
 }
 
-TEST(MediaDbTest, StorageDB)
+TEST_F(MediaDbTest, StorageDB)
 {
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
     const QString workDirPath = *workDirResource.getDirName();
 
-    const QnUuid moduleGuid("{A680980C-70D1-4545-A5E5-72D89E33648B}");
-
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
-    std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
-    serverModule->commonModule()->setModuleGUID(moduleGuid);
-
     bool result;
-    QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule->commonModule()));
+    QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule().commonModule()));
     storage->setUrl(workDirPath);
     result = storage->initOrUpdate() == Qn::StorageInit_Ok;
     ASSERT_TRUE(result);
@@ -839,17 +958,18 @@ TEST(MediaDbTest, StorageDB)
     {
         for (int i = 0; i < 100; ++i)
         {
-            int diceRoll = genRandomNumber<0, 10>();
+            int diceRoll = nx::utils::random::number(0, 10);
+            errorStream << "dice rolled: " << diceRoll << std::endl;
             switch (diceRoll)
             {
             case 0:
                 {
                     QnMutexLocker lk(&mutex);
                     std::pair<TestChunkManager::Catalog, std::deque<DeviceFileCatalog::Chunk>> p;
-                    p = tcm.generateReplaceOperation(genRandomNumber<10, 100>());
+                    p = tcm.generateReplaceOperation(nx::utils::random::number(10, 100));
                     sdb.replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
                 }
-            break;
+                break;
             case 1:
             case 2:
                 {
@@ -857,19 +977,20 @@ TEST(MediaDbTest, StorageDB)
                     TestChunkManager::TestChunk *chunk;
                     chunk = tcm.generateRemoveOperation();
                     if (chunk)
-                        sdb.deleteRecords(chunk->catalog->cameraUniqueId,
-                                          chunk->catalog->quality,
-                                          chunk->chunk.startTimeMs);
+                    {
+                        sdb.deleteRecords(chunk->catalog->cameraUniqueId, chunk->catalog->quality,
+                            chunk->chunk.startTimeMs);
+                    }
                 }
                 break;
             default:
                 {
                     QnMutexLocker lk(&mutex);
-                    TestChunkManager::TestChunk chunk;
-                    chunk = tcm.generateAddOperation();
-                    sdb.addRecord(chunk.catalog->cameraUniqueId,
-                                  chunk.catalog->quality,
-                                  chunk.chunk);
+                    boost::optional<TestChunkManager::TestChunk> chunk = tcm.generateAddOperation();
+                    if (!(bool)chunk)
+                        break;
+                    sdb.addRecord(chunk->catalog->cameraUniqueId, chunk->catalog->quality,
+                        chunk->chunk);
                 }
                 break;
             }
@@ -907,18 +1028,17 @@ TEST(MediaDbTest, StorageDB)
              ++chunkIt)
         {
             TestChunkManager::TestChunkCont::iterator tcmIt =
-                std::find_if(tcm.get().begin(),
-                             tcm.get().end(),
-                             [catalogIt, chunkIt](const TestChunkManager::TestChunk &tc)
-                             {
-                                 return tc.catalog->cameraUniqueId == (*catalogIt)->cameraUniqueId() &&
-                                        tc.catalog->quality == (*catalogIt)->getCatalog() &&
-                                        !tc.isVisited && !tc.isDeleted && tc.chunk == *chunkIt;
-                             });
+                std::find_if(tcm.get().begin(), tcm.get().end(),
+                    [catalogIt, chunkIt](const TestChunkManager::TestChunk &tc)
+                    {
+                        return tc.catalog->cameraUniqueId == (*catalogIt)->cameraUniqueId()
+                            && tc.catalog->quality == (*catalogIt)->getCatalog()
+                            && !tc.isVisited && !tc.isDeleted && tc.chunk == *chunkIt;
+                    });
             bool tcmChunkFound = tcmIt != tcm.get().end();
             ASSERT_TRUE(tcmChunkFound);
             if (tcmChunkFound)
-                tcmIt->isVisited = true;
+                ((TestChunkManager::TestChunk&)(*tcmIt)).isVisited = true;
         }
     }
 
@@ -929,6 +1049,8 @@ TEST(MediaDbTest, StorageDB)
                                    });
     if (!allVisited)
     {
+        std::cout << errorStream.stream->str() << std::endl;
+        errorStream.reset();
         size_t notVisited = std::count_if(
                 tcm.get().cbegin(),
                 tcm.get().cend(),
@@ -936,22 +1058,17 @@ TEST(MediaDbTest, StorageDB)
                 { return !tc.isDeleted && !tc.isVisited; });
         qWarning() << lit("Not visited count: %1").arg(notVisited);
     }
+
     ASSERT_EQ(allVisited, true);
 }
 
-TEST(MediaDbTest, Migration_from_sqlite)
+TEST_F(MediaDbTest, Migration_from_sqlite)
 {
-    const QnUuid moduleGuid("{A680980C-70D1-4545-A5E5-72D89E33648B}");
-
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
-    std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
-    serverModule->commonModule()->setModuleGUID(moduleGuid);
-
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
     const QString workDirPath = *workDirResource.getDirName();
-    QString simplifiedGUID = moduleGuid.toSimpleString();
+    QString simplifiedGUID = serverModule().commonModule()->moduleGUID().toSimpleString();
     QString fileName = closeDirPath(workDirPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
     //QString fileName = closeDirPath(workDirPath) + lit("media.sqlite");
     auto sqlDb = std::unique_ptr<QSqlDatabase>(
@@ -1008,7 +1125,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
     }
 
     bool result;
-    QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule->commonModule()));
+    QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule().commonModule()));
     storage->setUrl(workDirPath);
     result = storage->initOrUpdate() == Qn::StorageInit_Ok;
     ASSERT_TRUE(result);

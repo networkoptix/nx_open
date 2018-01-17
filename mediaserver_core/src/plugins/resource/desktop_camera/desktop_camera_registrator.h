@@ -1,21 +1,18 @@
-#ifndef __DESKTOP_CAMERA_REGISTRATOR_H_
-#define __DESKTOP_CAMERA_REGISTRATOR_H_
+#pragma once
 
-#ifdef ENABLE_DESKTOP_CAMERA
+#if defined(ENABLE_DESKTOP_CAMERA)
 
-#include "network/tcp_connection_processor.h"
+#include <network/tcp_connection_processor.h>
 
 class QnDesktopCameraRegistratorPrivate;
 
 class QnDesktopCameraRegistrator: public QnTCPConnectionProcessor
 {
 public:
-    QnDesktopCameraRegistrator(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnDesktopCameraRegistrator(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
 
 protected:
-    virtual void run();
+    virtual void run() override;
 };
 
-#endif //ENABLE_DESKTOP_CAMERA
-
-#endif // __DESKTOP_CAMERA_REGISTRATOR_H_
+#endif // defined(ENABLE_DESKTOP_CAMERA)

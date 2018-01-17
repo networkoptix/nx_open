@@ -4,6 +4,10 @@
 
 #include "data_stream_helpers.h"
 
+namespace nx {
+namespace network {
+namespace pcp {
+
 class TestRouter : protected pcp::Router
 {
 public:
@@ -18,15 +22,15 @@ TEST(PcpRouter, StaticMap)
     mapping.internal = SocketAddress(localhost, 0x1234);
 
     const auto request = TestRouter::makeMapRequest(mapping);
-    const auto header = QByteArray("02010000100e0000") + dsh::rawBytes(*localhost.ipV6()).toHex();
+    const auto header = QByteArray("02010000100e0000") + dsh::rawBytes(*localhost.ipV6().first).toHex();
     const auto nonce = mapping.nonce.toHex();
     const auto nullv6 = QByteArray(16, 0).toHex();
     EXPECT_EQ(header + nonce + QByteArray("0000000034123412") + nullv6, request.toHex());
 
     const HostAddress external("32.43.12.43");
-    const auto header2 = QByteArray("02810000100e0000") + dsh::rawBytes(*localhost.ipV6()).toHex();
+    const auto header2 = QByteArray("02810000100e0000") + dsh::rawBytes(*localhost.ipV6().first).toHex();
     const auto response = header2 + nonce + QByteArray("0000000034123412") +
-            dsh::rawBytes(*external.ipV6()).toHex();
+            dsh::rawBytes(*external.ipV6().first).toHex();
 
     EXPECT_TRUE(TestRouter::parseMapResponse(QByteArray::fromHex(response), mapping));
     EXPECT_EQ(mapping.external.toString().toUtf8(), QByteArray("32.43.12.43:4660"));
@@ -44,3 +48,7 @@ TEST(PcpRouter, DISABLED_RealMap)
 
     EXPECT_GT(mapping.lifeTime, 0U);
 }
+
+} // namespace pcp
+} // namespace network
+} // namespace nx

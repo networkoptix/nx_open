@@ -29,7 +29,7 @@ set(licenseEmail "licenses@dwcc.tv")
 # end of Support section
 
 set(backgroundImage
-    "{\"enabled\": true, \"name\": \":/skin/background.png\", \"mode\": \"Crop\"}")
+    "{\"enabled\": true, \"name\": \":/skin/background.png\", \"mode\": \"Fit\"}")
 set(defaultWebPages
     "{\"Home Page\": \"http://digital-watchdog.com/DW_Spectrum/\"}")
 

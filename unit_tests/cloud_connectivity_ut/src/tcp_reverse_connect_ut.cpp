@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_server_socket.h>
+#include <nx/network/cloud/tunnel/tcp/reverse_connection_pool.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>
@@ -30,9 +32,9 @@ protected:
             m_system, boost::none, hpm::ServerTweak::noListenToConnect);
 
         ASSERT_NE(nullptr, m_server);
-        SocketGlobals::mediatorConnector().mockupMediatorUrl(
+        SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             url::Builder().setScheme("stun").setEndpoint(m_mediator.stunEndpoint()));
-        SocketGlobals::mediatorConnector().enable(true);
+        SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
     std::unique_ptr<AbstractStreamServerSocket> cloudServerSocket(
@@ -47,11 +49,11 @@ protected:
 
     void enableReveseConnectionsOnClient(boost::optional<size_t> poolSize = boost::none)
     {
-        auto& pool = SocketGlobals::tcpReversePool();
+        auto& pool = SocketGlobals::cloud().tcpReversePool();
         pool.setPoolSize(poolSize);
         pool.setKeepAliveOptions(KeepAliveOptions(
             std::chrono::seconds(60), std::chrono::seconds(10), 3));
-        ASSERT_TRUE(pool.start(HostAddress::localhost, 0, true));
+        ASSERT_TRUE(pool.start(nx::network::HostAddress::localhost, 0, true));
     }
 
     void simpleTest(std::unique_ptr<AbstractStreamServerSocket> serverSocket, String hostName)
@@ -62,7 +64,7 @@ protected:
         network::test::socketTransferSync(
             [&]() { return std::move(serverSocket); },
             []() { return std::make_unique<CloudStreamSocket>(AF_INET); },
-            SocketAddress(hostName));
+            nx::network::SocketAddress(hostName));
     }
 
     hpm::MediatorFunctionalTest m_mediator;
@@ -111,7 +113,9 @@ TEST_F(TcpReverseConnectTest, SimpleMultiserver)
 
     // Cause old tunnel to expire to close by unsuccessful connect attempt.
     CloudStreamSocket socket(AF_INET);
-    ASSERT_FALSE(socket.connect(m_system.id, 100));
+    ASSERT_FALSE(socket.connect(
+        nx::network::SocketAddress(m_system.id.toStdString(), 100),
+        std::chrono::milliseconds(10)));
     ASSERT_EQ(SystemError::timedOut, SystemError::getLastOSErrorCode());
 
     // Ensure new tunnel to open and function normaly.
@@ -129,7 +133,7 @@ TEST_F(TcpReverseConnectTest, TransferSyncSsl)
     network::test::socketTransferSync(
         [&]() { return std::make_unique<deprecated::SslServerSocket>(std::move(serverSocket), false); },
         []() { return std::make_unique<deprecated::SslSocket>(std::make_unique<CloudStreamSocket>(AF_INET), false); },
-        SocketAddress(m_server->fullName()));
+        nx::network::SocketAddress(m_server->fullName()));
 }
 
 TEST_F(TcpReverseConnectTest, Load)
@@ -151,7 +155,7 @@ TEST_F(TcpReverseConnectTest, Load)
     ASSERT_TRUE(server.start());
 
     network::test::ConnectionsGenerator connectionsGenerator(
-        SocketAddress(QString::fromUtf8(m_server->fullName()), 0),
+        nx::network::SocketAddress(QString::fromUtf8(m_server->fullName()), 0),
         maxSimultaneousConnections,
         network::test::TestTrafficLimitType::incoming,
         bytesToSendThroughConnection,

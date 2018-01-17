@@ -59,11 +59,11 @@
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation type="unfinished">Server has been stopped</translation>
+      <translation>เซิร์ฟเวอร์ถูกหยุดการทำงาน</translation>
     </message>
     <message>
       <source>Server has been started</source>
-      <translation type="unfinished">Server has been started</translation>
+      <translation>เซิร์ฟเวอร์ถูกหยุดการทำงาน.</translation>
     </message>
     <message>
       <source>Server will be stopped. Continue?</source>
@@ -71,47 +71,47 @@
     </message>
     <message>
       <source>Show Server Log</source>
-      <translation type="unfinished">Show Server Log</translation>
+      <translation>แสดงล็อกเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Start Server</source>
-      <translation type="unfinished">Start Server</translation>
+      <translation>เริ่มต้นเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Stop Server</source>
-      <translation type="unfinished">Stop Server</translation>
+      <translation>หยุดเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>เซิร์ฟเวอร์เว็บเพจ</translation>
     </message>
     <message>
       <source>stopped</source>
-      <translation type="unfinished">stopped</translation>
+      <translation>หยุด</translation>
     </message>
     <message>
       <source>starting</source>
-      <translation type="unfinished">starting</translation>
+      <translation>ที่เริ่มต้น</translation>
     </message>
     <message>
       <source>stopping</source>
-      <translation type="unfinished">stopping</translation>
+      <translation>หยุด</translation>
     </message>
     <message>
       <source>started</source>
-      <translation type="unfinished">started</translation>
+      <translation>เริ่มต้นใช้งาน</translation>
     </message>
     <message>
       <source>resuming</source>
-      <translation type="unfinished">resuming</translation>
+      <translation>กลับมาทำงาน</translation>
     </message>
     <message>
       <source>paused</source>
-      <translation type="unfinished">paused</translation>
+      <translation>หยุด</translation>
     </message>
     <message>
       <source>pausing</source>
-      <translation type="unfinished">pausing</translation>
+      <translation>หยุดชั่วคราว</translation>
     </message>
   </context>
 </TS>

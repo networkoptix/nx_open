@@ -13,6 +13,8 @@
 #include <common/common_module.h>
 #include <helpers/system_helpers.h>
 
+#include <nx_ec/ec_api.h>
+
 #include <ui/common/read_only.h>
 #include <ui/common/aligner.h>
 #include <ui/dialogs/resource_properties/change_user_password_dialog.h>
@@ -64,8 +66,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
         if (!permissions.testFlag(Qn::WritePasswordPermission))
             return;
 
-        QScopedPointer<QnChangeUserPasswordDialog> dialog(new QnChangeUserPasswordDialog());
-        dialog->initializeContext(this);
+        QScopedPointer<QnChangeUserPasswordDialog> dialog(new QnChangeUserPasswordDialog(this));
         dialog->setWindowModality(Qt::ApplicationModal);
         if (dialog->exec() != QDialog::Accepted)
             return;
@@ -173,7 +174,7 @@ void QnUserProfileWidget::applyChanges()
 
         if (isOwnProfile)
         {
-            QUrl url = commonModule()->currentUrl();
+            nx::utils::Url url = commonModule()->currentUrl();
             url.setPassword(m_newPassword);
 
             if (auto connection = QnAppServerConnectionFactory::ec2Connection())

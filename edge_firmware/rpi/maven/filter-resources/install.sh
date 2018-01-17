@@ -14,7 +14,10 @@ configure()
     LOG_FILE="$LOGS_DIR/vms-upgrade.log"
     DISTRIB="@artifact.name.server@"
     STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-mediaserver"
-    TAR_FILE="./$DISTRIB.tar.gz"
+	INSTALLER_DIR="$(dirname "$0")"
+    TAR_FILE="$INSTALLER_DIR/$DISTRIB.tar.gz"
+	ZIP_FILE="$INSTALLER_DIR/../$DISTRIB.zip"
+    TOOLS_DIR="/root/tools/$CUSTOMIZATION"
 }
 
 checkRunningUnderRoot()
@@ -85,8 +88,9 @@ copyToDataPartition()
     # Unpack the distro to sdcard.
     tar xfv "$TAR_FILE" -C "$MNT/" || return $?
 
+    # Copy backed-up license db from HDD to SD card.
     mkdir -p "$MNT/$MEDIASERVER_PATH/var" || return $?
-    cp -f "/root/tools/nx/ecs_static.sqlite" "$MNT/$MEDIASERVER_PATH/var/" || return $?
+    cp -f "$TOOLS_DIR/ecs_static.sqlite" "$MNT/$MEDIASERVER_PATH/var/" || true
 
     local CONF_FILE="$MNT/$MEDIASERVER_PATH/etc/mediaserver.conf"
     local CONF_CONTENT="statisticsReportAllowed=true"
@@ -118,7 +122,7 @@ installDebs() # package [version]
 
 upgradeVms()
 {
-    rm -rf "../$DISTRIB.zip" || true  #< Already unzipped, so remove .zip to save space in "/tmp".
+    rm -rf "$ZIP_FILE" || true  #< Already unzipped, so remove .zip to save space in "/tmp".
 
     # Clean up potentially unwanted files from previous installations.
     rm -rf "/$MEDIASERVER_PATH/lib" "/$MEDIASERVER_PATH/bin" || true
@@ -133,7 +137,8 @@ upgradeVms()
         # Avoid grabbing libstdc++ from mediaserver lib folder.
         export LD_LIBRARY_PATH=""
 
-        cp -f "/$MEDIASERVER_PATH/var/ecs_static.sqlite" "/root/tools/nx/"
+        # Backup current license db if exists.
+        cp -f "/$MEDIASERVER_PATH/var/ecs_static.sqlite" "$TOOLS_DIR" || true
 
         callMounted vfat "/dev/mmcblk0p1" "/mnt/boot" copyToBootPartition
 
@@ -142,6 +147,7 @@ upgradeVms()
         installDebs fonts-takao-mincho
         installDebs fonts-baekmuk
         installDebs fonts-arphic-ukai
+        installDebs fonts-thai-tlwg
 
         touch "/dev/cedar_dev"
         chmod 777 "/dev/disp"
@@ -174,13 +180,14 @@ checkMediaserverPid() # pid
 
 restartMediaserver()
 {
-    local MEDIASERVER_PORT=$(cat "/$MEDIASERVER_PATH/etc/mediaserver.conf" \
-        |grep '^port=[0-9]\+$' |sed 's/port=//')
-
     # If the mediaserver cannot start because another process uses its port, kill it and restart.
     while true; do
         "$STARTUP_SCRIPT" start || true #< If not started, the loop will try again.
         sleep 3
+
+		# NOTE: mediaserver.conf may not exist before "start", thus, checking the port after it.
+        local MEDIASERVER_PORT=$(cat "/$MEDIASERVER_PATH/etc/mediaserver.conf" \
+            |grep '^port=[0-9]\+$' |sed 's/port=//')
 
         local PID_WHICH_USES_PORT=$(getPidWhichUsesPort "$MEDIASERVER_PORT")
         local MEDIASERVER_PID=$(checkMediaserverPid "$PID_WHICH_USES_PORT")
@@ -204,14 +211,15 @@ restartMediaserver()
 
 main()
 {
+    configure
+    checkRunningUnderRoot
+
     if [ $# = 0 ] || ( [ "$1" != "-v" ] && [ "$1" != "--verbose" ] ); then
-        configure #< Called to set the values required for log redirection.
         redirectOutput "$LOG_FILE"
     fi
 
     set -x #< Log each command.
-    configure #< If the output was redirected, called again to log the values.
-    checkRunningUnderRoot
+    configure #< If the output was redirected, do it again to log the values.
 
     rm -rf "$FAILURE_FLAG" || true
 

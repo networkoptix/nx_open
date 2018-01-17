@@ -41,13 +41,13 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+        return getMetadata();
 
     QnAbstractDataPacketPtr result;
     QElapsedTimer getTimer;
     getTimer.restart();
-    while (!needToStop() && isStreamOpened() && getTimer.elapsed() < MAX_FRAME_DURATION * 2 && !result)
+    while (!needToStop() && isStreamOpened() && getTimer.elapsed() < MAX_FRAME_DURATION_MS * 2 && !result)
     {
         result = m_maxStream->getNextData(this);
     }
@@ -63,7 +63,7 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
             if (getResource()->getStatus() == Qn::Unauthorized || getResource()->getStatus() == Qn::Offline)
                 getResource()->setStatus(Qn::Online);
         }
-        else if (m_lastMediaTimer.elapsed() > MAX_FRAME_DURATION * 2) {
+        else if (m_lastMediaTimer.elapsed() > MAX_FRAME_DURATION_MS * 2) {
             m_resource->setStatus(Qn::Offline);
         }
     }

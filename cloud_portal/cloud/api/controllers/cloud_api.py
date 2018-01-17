@@ -31,9 +31,11 @@ class System(object):
     @staticmethod
     @validate_response
     @lower_case_email
-    def list(email, password):
+    def list(email, password, one_customization=True):
         # TODO: create wrappers
-        request = CLOUD_DB_URL + "/system/get?customization=" + settings.CUSTOMIZATION
+        request = CLOUD_DB_URL + "/system/get"
+        if one_customization:
+            request += "?customization=" + settings.CUSTOMIZATION
         return requests.get(request, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
@@ -121,6 +123,16 @@ class System(object):
         params = {
             'name': name,
             'customization': customization
+        }
+        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+
+    @staticmethod
+    @validate_response
+    @lower_case_email
+    def merge(email, password, master_system_id, slave_system_id):
+        request = CLOUD_DB_URL + "/system/%s/merged_systems/" % master_system_id
+        params = {
+            'system_id': slave_system_id
         }
         return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
 

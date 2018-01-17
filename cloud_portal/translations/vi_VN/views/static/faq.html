@@ -1,50 +1,29 @@
-<h1 set-title>Known limitations in <span class="product-name add-version">{{PRODUCT_NAME}}</span></h1>
+<h1 set-title>Những hạn chế cần biết đối với sản phẩm <span class="product-name add-version"> {{PRODUCT_NAME}} </span></h1>
 
 <div class="panel">
     <div class="panel-body">
-        <h2>Remote connectivity</h2>
+        <h2>Kết nối từ xa</h2>
         <p class="help-topic">
-            Sometimes it's possible to connect to System from one network/place and impossible from another.
-        </p>
-        <p>
-            In order to get remote connectivity to work without port forwarding, DDNS, VPN etc, software has to "punch
-            the UDP hole" on the client side as well as on the server side. Success depends on many factors such as
-            router model/firmware, ISP network type (cell, cable, wi-fi) and infrastructure, country etc.<br>
-            In spite of working well in general, it may not work in a particular case.
-        </p>
-        <p>
-            <b>The issue could be fixed by manual port forwarding setup. DDNS is never needed (even with non-static
-                public IP address).</b>
+            Nếu phiên bản bạn đang sử dụng là 3.1 hoặc mới hơn, kết nối từ xa có thể hoạt động.              Nếu bạn gặp vấn đề,  <a href="{{supportLink}}" target="_blank">vui lòng liên lạc với bộ phận hỗ trợ</a>.
         </p>
     </div>
 </div>
 
 <div class="panel">
     <div class="panel-body">
-        <h2>Cloud System Merge</h2>
+        <h2>Hợp nhất hệ thống đám mây</h2>
         <p class="help-topic">
-            Cloud Systems merging is not supported at the moment.
-            Local System can be merged with the cloud one at any given time. So in order to merge two cloud Systems
-            one should be disconnected from {{PRODUCT_NAME}}.
+            Sự Kết hợp giữa các Hệ thống đám mây không được hỗ trợ tại thời điểm này.
+            Hệ thống mạng cục bộ có thể kết hợp với đám mây vào bất kỳ thời điểm nào. Vì vậy, để hợp nhất hai Hệ thống Điện toán đám mây nên ngắt kết nối từ {{PRODUCT_NAME}}.
         </p>
     </div>
 </div>
 
 <div class="panel">
     <div class="panel-body">
-        <h2>Offline Login</h2>
+        <h2>Hỗ trợ</h2>
         <p class="help-topic">
-            {{PRODUCT_NAME}} credentials cannot be used to connect to System which has no Internet at the moment.
-            In order to connect to such System locally (such as "admin") local user credentials should be used.
-        </p>
-    </div>
-</div>
-
-<div class="panel">
-    <div class="panel-body">
-        <h2>ủng hộ</h2>
-        <p class="help-topic">
-           If you have any questions, <a href="{{supportLink}}" target="_blank">please contact our support team</a>.
+           Nếu bạn có bất kỳ câu hỏi nào, <a href="{{supportLink}}" target="_blank"> vui lòng liên hệ với nhóm hỗ trợ của chúng tôi </a>.
         </p>
     </div>
 </div>

@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>出现未知的错误。</translation>
+      <translation>未知的错误.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>新系统</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>发现的系统%1与当前系统不兼容。</translation>
     </message>
   </context>
   <context>
@@ -255,18 +255,6 @@
       <translation>请确认端口 %1可用(如转发).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>首先，试着打开记录 （如果它是关闭的） 和减少 fps 在设备设置。</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>首先，尝试打开记录 （如果它是关闭的） 和降低 fps 的相机设置。</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>首先，试着打开记录 （如果它是关闭的） 和减少 fps 在 I/O 模块设置。</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>如果它没有帮助，恢复出厂默认设置设备 web 页上的。</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>摄像机是从归档中恢复。删除摄像机并重新添加以观看直播视频。</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>首先，试着打开记录 （如果它是关闭的） 和减少 fps 在设备设置 (错误&quot;%1&quot;)。</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>首先，尝试打开记录 （如果它是关闭的） 和降低 fps 的相机设置 (错误&quot;%1&quot;).。</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>首先，试着打开记录 （如果它是关闭的） 和减少 fps 在 I/O 模块设置 (错误&quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Free</source>
-      <translation>免费</translation>
+      <translation>可用</translation>
     </message>
     <message>
       <source>Free license</source>
@@ -480,11 +480,19 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>时效性</translation>
+      <translation>时间</translation>
     </message>
     <message>
       <source>Time Licenses</source>
       <translation>时效性授权</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation>桥接</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>桥接授权</translation>
     </message>
   </context>
   <context>
@@ -542,7 +550,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>未知错误</translation>
+      <translation>未知的错误</translation>
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
@@ -647,11 +655,11 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>未知</translation>
+      <translation>未知的</translation>
     </message>
     <message>
       <source>FREE License</source>
-      <translation>免费许可</translation>
+      <translation>免费授权</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
@@ -765,6 +773,10 @@
       <source>Invalid resource type for data export.</source>
       <translation>数据导出非法资源类型.</translation>
     </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>没有数据导出。</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
@@ -835,7 +847,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>月</translation>
+      <translation>分</translation>
     </message>
     <message>
       <source>y</source>
@@ -1294,7 +1306,7 @@
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>%n次，第一次：%2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n 次，第一次︰ %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1449,7 +1461,7 @@
     </message>
     <message>
       <source>All Users</source>
-      <translation>所有用户</translation>
+      <translation>All 用户</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1474,6 +1486,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>接受</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>分析事件</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 在 %2</translation>
     </message>
   </context>
   <context>

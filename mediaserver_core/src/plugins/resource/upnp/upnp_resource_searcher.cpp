@@ -1,8 +1,8 @@
 #include "upnp_resource_searcher.h"
 #include "utils/common/sleep.h"
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/http/http_types.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/system_socket.h>
 
 #include <QtXml/QXmlDefaultHandler>
@@ -27,7 +27,7 @@ using nx::network::UDPSocket;
 //!Partial parser for SSDP description xml (UPnP(TM) Device Architecture 1.1, 2.3)
 class UpnpResourceDescriptionSaxHandler: public QXmlDefaultHandler
 {
-    nx_upnp::DeviceInfo m_deviceInfo;
+    nx::network::upnp::DeviceInfo m_deviceInfo;
     QString m_currentElementName;
 public:
     virtual bool startDocument()
@@ -79,7 +79,7 @@ public:
     QString serialNumber() const { return m_serialNumber; }
     QString presentationUrl() const { return m_presentationUrl; }
     */
-    nx_upnp::DeviceInfo deviceInfo() const { return m_deviceInfo; }
+    nx::network::upnp::DeviceInfo deviceInfo() const { return m_deviceInfo; }
 };
 
 
@@ -97,33 +97,33 @@ QnUpnpResourceSearcher::QnUpnpResourceSearcher(QnCommonModule* commonModule):
 
 QnUpnpResourceSearcher::~QnUpnpResourceSearcher()
 {
-    for(AbstractDatagramSocket* sock: m_socketList)
+    for(nx::network::AbstractDatagramSocket* sock: m_socketList)
         delete sock;
     delete m_receiveSocket;
 }
 
-AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndAddr& iface)
+nx::network::AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const nx::network::QnInterfaceAndAddr& iface)
 {
     if (m_receiveSocket == 0)
     {
         UDPSocket* udpSock = new UDPSocket(AF_INET);
         udpSock->setReuseAddrFlag(true);
         udpSock->setRecvBufferSize(RECV_BUFFER_SIZE);
-        udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
-        for(const auto& iface: getAllIPv4Interfaces())
+        udpSock->bind( nx::network::SocketAddress( nx::network::HostAddress::anyHost, GROUP_PORT ) );
+        for(const auto& iface: nx::network::getAllIPv4Interfaces())
             udpSock->joinGroup(groupAddress.toString(), iface.address.toString());
         m_receiveSocket = udpSock;
     }
 
 
-    QMap<QString, AbstractDatagramSocket*>::iterator it = m_socketList.find(iface.address.toString());
+    QMap<QString, nx::network::AbstractDatagramSocket*>::iterator it = m_socketList.find(iface.address.toString());
     if (it == m_socketList.end())
     {
-        std::unique_ptr<AbstractDatagramSocket> sock( SocketFactory::createDatagramSocket() );
+        std::unique_ptr<nx::network::AbstractDatagramSocket> sock( nx::network::SocketFactory::createDatagramSocket() );
         QString localAddress = iface.address.toString();
 
         //if (!sock->bindToInterface(iface))
-        if( !sock->bind( SocketAddress( iface.address.toString() ) ) ||
+        if( !sock->bind( nx::network::SocketAddress( iface.address.toString() ) ) ||
             !sock->setMulticastIF( localAddress ) ||
             !sock->setRecvBufferSize( RECV_BUFFER_SIZE ) )
         {
@@ -149,7 +149,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
 
 QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidStr, const QUrl& url)
 {
-    if (m_cacheLivetime.elapsed() > nx_upnp::DeviceSearcher::instance()->cacheTimeout())
+    if (m_cacheLivetime.elapsed() > nx::network::upnp::DeviceSearcher::instance()->cacheTimeout())
     {
         m_cacheLivetime.restart();
         m_deviceXmlCache.clear();
@@ -158,7 +158,7 @@ QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidSt
     if (m_deviceXmlCache.contains(uuidStr))
         return m_deviceXmlCache.value(uuidStr);
 
-    CLSimpleHTTPClient http( url.host(), url.port(nx_http::DEFAULT_HTTP_PORT), TCP_TIMEOUT, QAuthenticator() );
+    CLSimpleHTTPClient http( url.host(), url.port(nx::network::http::DEFAULT_HTTP_PORT), TCP_TIMEOUT, QAuthenticator() );
     CLHttpStatus status = http.doGET( url.path() );
     QByteArray result;
     if (status == CL_HTTP_SUCCESS) {
@@ -169,11 +169,11 @@ QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidSt
     return result;
 }
 
-QHostAddress QnUpnpResourceSearcher::findBestIface(const HostAddress& host)
+QHostAddress QnUpnpResourceSearcher::findBestIface(const nx::network::HostAddress& host)
 {
     QHostAddress oldAddress;
     QHostAddress result;
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
+    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
     {
         const QHostAddress& newAddress = iface.address;
         if (isNewDiscoveryAddressBetter(host, newAddress, oldAddress))
@@ -188,21 +188,21 @@ QHostAddress QnUpnpResourceSearcher::findBestIface(const HostAddress& host)
 void QnUpnpResourceSearcher::readDeviceXml(
     const QByteArray& uuidStr,
     const QUrl& descritionUrl,
-    const HostAddress& sender,
+    const nx::network::HostAddress& sender,
     QnResourceList& result )
 {
     QByteArray foundDeviceDescription = getDeviceDescription(uuidStr, descritionUrl);
     processDeviceXml(
         foundDeviceDescription,
-        HostAddress( descritionUrl.host() ),
+        nx::network::HostAddress( descritionUrl.host() ),
         sender,
         result );
 }
 
 void QnUpnpResourceSearcher::processDeviceXml(
     const QByteArray& foundDeviceDescription,
-    const HostAddress& host,
-    const HostAddress& sender,
+    const nx::network::HostAddress& host,
+    const nx::network::HostAddress& sender,
     QnResourceList& result )
 {
     //TODO/IMPL checking Content-Type of received description (MUST be upnp xml description to continue)
@@ -221,26 +221,26 @@ void QnUpnpResourceSearcher::processDeviceXml(
     processPacket(findBestIface(sender), host, xmlHandler.deviceInfo(), foundDeviceDescription, QAuthenticator(), result);
 }
 
-void QnUpnpResourceSearcher::processSocket(AbstractDatagramSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result)
+void QnUpnpResourceSearcher::processSocket(nx::network::AbstractDatagramSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result)
 {
     while(socket->hasData())
     {
         char buffer[1024*16+1];
 
-        SocketAddress sourceEndpoint;
+        nx::network::SocketAddress sourceEndpoint;
         int readed = socket->recvFrom(buffer, sizeof(buffer), &sourceEndpoint);
         if (readed > 0)
             buffer[readed] = 0;
         QByteArray reply = QByteArray::fromRawData(buffer, readed);
 
-        nx_http::Request foundDeviceReply;
+        nx::network::http::Request foundDeviceReply;
         if( !foundDeviceReply.parse( reply ) )
             continue;
-        nx_http::HttpHeaders::const_iterator locationHeader = foundDeviceReply.headers.find( "LOCATION" );
+        nx::network::http::HttpHeaders::const_iterator locationHeader = foundDeviceReply.headers.find( "LOCATION" );
         if( locationHeader == foundDeviceReply.headers.end() )
             continue;
 
-        nx_http::HttpHeaders::const_iterator uuidHeader = foundDeviceReply.headers.find( "USN" );
+        nx::network::http::HttpHeaders::const_iterator uuidHeader = foundDeviceReply.headers.find( "USN" );
         if( uuidHeader == foundDeviceReply.headers.end() )
             continue;
 
@@ -265,9 +265,9 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
     QnResourceList result;
     QSet<QByteArray> processedUuid;
 
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
+    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
     {
-        AbstractDatagramSocket* sock = sockByName(iface);
+        nx::network::AbstractDatagramSocket* sock = sockByName(iface);
         if (!sock)
             continue;
 
@@ -314,14 +314,14 @@ QnUpnpResourceSearcherAsync::QnUpnpResourceSearcherAsync(QnCommonModule* commonM
 QnResourceList QnUpnpResourceSearcherAsync::findResources()
 {
     m_resList.clear();
-    nx_upnp::DeviceSearcher::instance()->processDiscoveredDevices( this );
+    nx::network::upnp::DeviceSearcher::instance()->processDiscoveredDevices( this );
     return m_resList;
 }
 
 bool QnUpnpResourceSearcherAsync::processPacket(
     const QHostAddress& localInterfaceAddress,
-    const SocketAddress& discoveredDevAddress,
-    const nx_upnp::DeviceInfo& devInfo,
+    const nx::network::SocketAddress& discoveredDevAddress,
+    const nx::network::upnp::DeviceInfo& devInfo,
     const QByteArray& xmlDevInfo )
 {
     const int resListSizeBak = m_resList.size();

@@ -14,7 +14,7 @@ public:
     virtual api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
         const std::string& systemId) const override;
-    
+
     virtual boost::optional<api::SystemSharingEx> getSystemSharingData(
         const std::string& accountEmail,
         const std::string& systemId) const override;

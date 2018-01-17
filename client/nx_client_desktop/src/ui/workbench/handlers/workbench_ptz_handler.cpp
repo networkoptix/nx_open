@@ -7,7 +7,6 @@
 
 #include <api/app_server_connection.h>
 
-#include <nx/utils/collection.h>
 #include <utils/resource_property_adaptors.h>
 
 #include <common/common_globals.h>
@@ -44,8 +43,9 @@ const QString kPtzHotkeysPropertyName = lit("ptzHotkeys");
 class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, public QnWorkbenchContextAware
 {
 public:
-    QnSingleCameraPtzHotkeysDelegate(const QnResourcePtr &resource, QnWorkbenchContext *context):
+    QnSingleCameraPtzHotkeysDelegate(QWidget* parent, const QnResourcePtr &resource, QnWorkbenchContext *context):
         QnWorkbenchContextAware(context),
+        m_parent(parent),
         m_camera(resource.dynamicCast<QnVirtualCameraResource>()),
         m_resourceId(resource->getId()),
         m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzIdByHotkeyHash>())
@@ -88,6 +88,7 @@ public:
     }
 
 private:
+    QWidget* m_parent;
     QnVirtualCameraResourcePtr m_camera;
     QnUuid m_resourceId;
     std::unique_ptr<QnJsonResourcePropertyHandler<QnPtzIdByHotkeyHash>> m_propertyHandler;
@@ -168,15 +169,16 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
     // TODO: #GDM #PTZ fix the text
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        messages::Ptz::failedToGetPosition(mainWindow(),
+        messages::Ptz::failedToGetPosition(mainWindowWidget(),
         QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
         return;
     }
 
-    QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(new QnSingleCameraPtzHotkeysDelegate(resource, context()));
 
-    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
+    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindowWidget()));
     dialog->setController(widget->ptzController());
+    QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(
+        new QnSingleCameraPtzHotkeysDelegate(dialog.data(), resource, context()));
     dialog->setHotkeysDelegate(hotkeysDelegate.data());
     dialog->exec();
 }
@@ -237,12 +239,12 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered()
         if (!widget->ptzController()->getPresets(&presets))
             return;
 
-        int tourIdx = qnIndexOf(tours, [&id](const QnPtzTour &tour) { return id == tour.id; });
-        if (tourIdx < 0)
+        const auto tour = std::find_if(tours.cbegin(), tours.cend(),
+            [&id](const QnPtzTour &tour) { return id == tour.id; });
+        if (tour == tours.cend())
             return;
 
-        QnPtzTour tour = tours[tourIdx];
-        if (!tour.isValid(presets))
+        if (!tour->isValid(presets))
             return;
     }
 
@@ -279,15 +281,12 @@ void QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered()
     if (!widget->ptzController()->getPresets(&presets))
         return;
 
-    int index = qnIndexOf(presets, [&](const QnPtzPreset &preset) { return preset.id == id; });
-    if (index == -1)
-    {
+    const auto preset = std::find_if(presets.cbegin(), presets.cend(),
+        [&](const QnPtzPreset &preset) { return preset.id == id; });
+    if (preset == presets.cend())
         menu()->trigger(action::PtzActivateTourAction, parameters);
-    }
     else
-    {
         menu()->trigger(action::PtzActivatePresetAction, parameters);
-    }
 }
 
 
@@ -301,14 +300,14 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
 
     QnPtzManageDialog* dialog = QnPtzManageDialog::instance();
     if (!dialog)
-        dialog = new QnPtzManageDialog(mainWindow());
+        dialog = new QnPtzManageDialog(mainWindowWidget());
 
     if (dialog->isVisible() && !dialog->tryClose(false))
         return;
 
     auto res = widget->resource()->toResourcePtr();
     auto hotkeysDelegate =
-        new QnSingleCameraPtzHotkeysDelegate(res, context());
+        new QnSingleCameraPtzHotkeysDelegate(dialog, res, context());
 
     dialog->setWidget(widget);
     dialog->setHotkeysDelegate(hotkeysDelegate);
@@ -378,7 +377,7 @@ void QnWorkbenchPtzHandler::showSetPositionWarning(const QnResourcePtr& resource
 {
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        messages::Ptz::failedToSetPosition(mainWindow(),
+        messages::Ptz::failedToSetPosition(mainWindowWidget(),
             QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
     }
     // TODO: #GDM #PTZ check other cases

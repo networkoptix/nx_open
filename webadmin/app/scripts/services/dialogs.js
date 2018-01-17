@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('dialogs', function ($http, $modal, $q, $location) {
+    .factory('dialogs', ['$http', '$modal', '$q', '$location', function ($http, $modal, $q, $location) {
         function openDialog(settings){
 
             //scope.inline = typeof($location.search().inline) != 'undefined';
@@ -114,7 +114,7 @@ angular.module('webadminApp')
                 }).result;
             }
         };
-    }).controller("DialogCtrl",function($scope, $modalInstance, settings){
+    }]).controller("DialogCtrl", ['$scope', '$modalInstance', 'settings', function($scope, $modalInstance, settings){
         $scope.settings = settings;
         $scope.settings.localLogin = $scope.settings.localLogin || Config.defaultLogin;
         $scope.forms = {};
@@ -143,4 +143,4 @@ angular.module('webadminApp')
         $scope.$on('$routeChangeStart', function(){
             $modalInstance.close();
         });
-    });
+    }]);

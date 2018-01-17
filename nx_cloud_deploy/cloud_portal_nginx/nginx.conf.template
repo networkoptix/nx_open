@@ -114,6 +114,26 @@ http {
             error_page 404 /static/index.html;
         }
 
+        location /static/admin_tools/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;   
+        }
+
+        location /static/css/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;   
+        }
+
+        location /static/cms_images/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;   
+        }
+
+        location /static/bootstrap {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;
+        }
+
         location /fonts/ {
             root /app/app/static/common/static;
             error_page 404 /static/index.html;

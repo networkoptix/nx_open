@@ -1,240 +1,237 @@
 {
-  "language_name":"LANGUAGE_NAME",
-  "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}",
-  "dialogs":{
-    "okButton":"确定",
-    "cancelButton":"取消",
-    "loginTitle":"登录到 {{PRODUCT_NAME}}",
-    "loginButton":"登录",
-    "logoutAuthorisedText":"",
-    "logoutAuthorisedTitle":"您已经登录",
-    "logoutAuthorisedContinueButton":"继续",
-    "logoutAuthorisedLogoutButton":"退出登录"
+  "language_name": "简体中文",
+  "productName": "{{PRODUCT_NAME}}",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "dialogs": {
+    "okButton": "确定",
+    "cancelButton": "取消",
+    "loginTitle": "登录到 {{PRODUCT_NAME}}",
+    "loginButton": "登录",
+    "logoutAuthorisedTitle": "您已经登录",
+    "logoutAuthorisedContinueButton": "继续",
+    "logoutAuthorisedLogoutButton": "退出登录"
   },
-  "pageTitles":{
-    "template":"{{title}}{{PRODUCT_NAME}}",
-    "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"欢迎来到",
-    "register":"创建帐户中",
-    "changePassword":"更改密码-",
-    "account":"帐户设置-",
-    "systems":"系统.",
-    "system":"系统-",
-    "systemShare":"共享系统-",
-    "activate":"激活帐户-",
-    "activateSent":"激活帐户-",
-    "activateSuccess":"帐户激活 -",
-    "activateCode":"激活帐户-",
-    "restorePassword":"重置密码-",
-    "restorePasswordSuccess":"保存的密码-",
-    "restorePasswordCode":"重置密码-",
-    "view":"查看相机 - ",
-    "contentPage":"",
-    "debug":"调试",
-    "login":"登录-",
-    "download":"下载 {{VMS_NAME}}",
-    "downloadPlatform":"下载的 {{VMS_NAME}} ",
-    "startPage":"",
-    "pageNotFound":"找不到页面"
+  "pageTitles": {
+    "template": "{{title}} {{PRODUCT_NAME}}",
+    "default": "{{PRODUCT_NAME}}",
+    "registerSuccess": "欢迎来到",
+    "register": "创建帐户中",
+    "changePassword": "更改密码-",
+    "account": "帐户设置-",
+    "systems": "系统.",
+    "system": "系统-",
+    "systemShare": "共享系统-",
+    "activate": "激活帐户-",
+    "activateSent": "激活帐户-",
+    "activateSuccess": "帐户激活 -",
+    "activateCode": "激活帐户-",
+    "restorePassword": "重置密码-",
+    "restorePasswordSuccess": "保存的密码-",
+    "restorePasswordCode": "重置密码-",
+    "view": "查看相机 - ",
+    "debug": "调试",
+    "login": "登录-",
+    "download": "下载 {{VMS_NAME}}",
+    "downloadPlatform": "下载的 {{VMS_NAME}} ",
+    "pageNotFound": "找不到页面"
   },
-  "systemStatuses":{
-    "notActivated":"未激活",
-    "activated":"激活",
-    "online":"在线",
-    "offline":"离线",
-    "unavailable":"不可用"
+  "systemStatuses": {
+    "notActivated": "未激活",
+    "activated": "激活",
+    "online": "在线",
+    "offline": "离线",
+    "unavailable": "不可用"
   },
-  "accessRoles":{
-    "disabled":{
-      "label":"禁用",
-      "description":"用户被禁用，无法登录到系统"
+  "accessRoles": {
+    "disabled": {
+      "label": "禁用",
+      "description": "用户被禁用，无法登录到系统"
     },
-    "Owner":{
-      "label":"所有者",
-      "description":"不受限制地的访问包括共享和连接断开系统从云的能力"
+    "Owner": {
+      "label": "所有者",
+      "description": "不受限制地的访问包括共享和连接断开系统从云的能力"
     },
-    "Viewer":{
-      "label":"操作员",
-      "description":"可以查看实时视频和浏览存档"
+    "Viewer": {
+      "label": "操作员",
+      "description": "可以查看实时视频和浏览存档"
     },
-    "Live Viewer":{
-      "label":"实时操作员",
-      "description":"只可以查看视频直播"
+    "Live Viewer": {
+      "label": "实时操作员",
+      "description": "只可以查看视频直播"
     },
-    "Advanced Viewer":{
-      "label":"高级操作员",
-      "description":"可以查看实时视频，浏览存档，配置摄像头，控制云台等"
+    "Advanced Viewer": {
+      "label": "高级操作员",
+      "description": "可以查看实时视频，浏览存档，配置摄像头，控制云台等"
     },
-    "Administrator":{
-      "label":"管理员",
-      "description":"不受限制地的访问包括共享的能力"
+    "Administrator": {
+      "label": "管理员",
+      "description": "不受限制地的访问包括共享的能力"
     },
-    "Custom":{
-      "label":"自定义",
-      "description":"使用 {{PRODUCT_NAME}} 客户端应用程序可以设置自定义权限"
+    "Custom": {
+      "label": "自定义",
+      "description": "使用 {{PRODUCT_NAME}} 客户端应用程序可以设置自定义权限"
     },
-    "cloudAdmin":{
-      "label":"管理员",
-      "description":"可以配置系统和共享它"
+    "cloudAdmin": {
+      "label": "管理员",
+      "description": "可以配置系统和共享它"
     },
-    "customRole":{
-      "label":"自定义角色",
-      "description":"在系统中指定的自定义用户角色"
+    "customRole": {
+      "label": "自定义角色",
+      "description": "在系统中指定的自定义用户角色"
     },
-    "owner":{
-      "label":"所有者",
-      "description":"不受限制地的访问包括共享和从云连接或断开系统的能力"
+    "owner": {
+      "label": "所有者",
+      "description": "不受限制地的访问包括共享和连接断开系统从云的能力"
     },
-    "viewer":{
-      "label":"浏览者",
-      "description":"可以查看实时视频和浏览存档"
+    "viewer": {
+      "label": "操作员",
+      "description": "可以查看实时视频和浏览存档"
     },
-    "liveViewer":{
-      "label":"实时浏览者",
-      "description":"只能查看实时视频"
+    "liveViewer": {
+      "label": "实时操作员",
+      "description": "只可以查看视频直播"
     },
-    "advancedViewer":{
-      "label":"高级浏览者",
-      "description":"可以查看实时视频，浏览存档，配置摄像头，控制云台等"
+    "advancedViewer": {
+      "label": "高级操作员",
+      "description": "可以查看实时视频，浏览存档，配置摄像头，控制云台等"
     },
-    "custom":{
-      "label":"自定义",
-      "description":"使用 {{PRODUCT_NAME}} 客户端应用程序设置自定义权限"
+    "custom": {
+      "label": "自定义",
+      "description": "使用 {{PRODUCT_NAME}} 客户端应用程序可以设置自定义权限"
     }
   },
-  "errorCodes":{
-    "ok":"ok",
-    "cantSendActivationPrefix":"不能发送确认电子邮件",
-    "cantDisconnectSystemPrefix":"不能删除系统",
-    "cantUnshareWithMeSystemPrefix":"不能删除系统",
-    "cantSharePrefix":"不能共享系统",
-    "cantGetUsersListPrefix":"用户列表不可用",
-    "cantGetSystemsListPrefix":"系统列表不可用",
-    "cantRegisterPrefix":"出现错误",
-    "cantGetSystemInfoPrefix":"系统信息不可用",
-    "cantChangeAccountPrefix":"无法保存更改",
-    "cantChangePasswordPrefix":"无法保存密码",
-    "cantActivatePrefix":"无法激活您的帐户",
-    "cantSendConfirmationPrefix":"不能发送确认电子邮件",
-    "cloudInvalidResponse":"云 DB 返回了意外的响应",
-    "notAuthorized":"错误的邮箱或密码",
-    "wrongParameters":"窗体上的一些参数不正确",
-    "wrongCode":"已经激活帐户或确认码不正确",
-    "wrongCodeRestore":"确认代码已使用或不正确",
-    "forbidden":"您没有权限执行此操作",
-    "accountNotActivated":"此帐户尚未激活。<a href=\"/activate\"> 发送激活链接，再一次</a>",
-    "accountBlocked":"此帐户被阻止。",
-    "notFound":"找不到",
-    "alreadyExists":"此帐户已存在",
-    "unknownError":"发生意外的错误",
-    "accountAlreadyActivated":"此帐户已激活",
-    "emailNotFound":"帐户不存在",
-    "EmailAlreadyExists":"此电子邮件已被注册",
-    "oldPasswordMistmatch":"当前密码不正确",
-    "passwordMismatch":"错误的密码。",
-    "cantEditYourself":"不允许更改自己的权限",
-    "cantEditAdmin":"此用户具有管理员权限",
-    "cantOpenClient":"{{VMS_NAME}} 应用程序未检测到。<a href=\"/download\"> 下载</a>",
-    "lostConnection":"连接到 {{systemName}} 失去了",
-    "thisSystem":"系统"
+  "errorCodes": {
+    "ok": "ok",
+    "cantSendActivationPrefix": "不能发送确认电子邮件",
+    "cantDisconnectSystemPrefix": "不能删除系统",
+    "cantUnshareWithMeSystemPrefix": "不能删除系统",
+    "cantSharePrefix": "不能共享系统",
+    "cantGetUsersListPrefix": "用户列表不可用",
+    "cantGetSystemsListPrefix": "系统列表不可用",
+    "cantRegisterPrefix": "出现错误",
+    "cantGetSystemInfoPrefix": "系统信息不可用",
+    "cantChangeAccountPrefix": "无法保存更改",
+    "cantChangePasswordPrefix": "无法保存密码",
+    "cantActivatePrefix": "无法激活您的帐户",
+    "cantSendConfirmationPrefix": "不能发送确认电子邮件",
+    "cloudInvalidResponse": "云 DB 返回了意外的响应",
+    "notAuthorized": "错误的邮箱或密码",
+    "wrongParameters": "窗体上的一些参数不正确",
+    "wrongCode": "已经激活帐户或确认码不正确",
+    "wrongCodeRestore": "确认代码已使用或不正确",
+    "forbidden": "您没有权限执行此操作",
+    "accountNotActivated": "此帐户尚未激活。<a href=\"/activate\"> 发送激活链接，再一次</a>",
+    "accountBlocked": "此帐户被阻止。",
+    "notFound": "找不到",
+    "alreadyExists": "此帐户已存在",
+    "unknownError": "发生意外的错误",
+    "accountAlreadyActivated": "此帐户已激活",
+    "emailNotFound": "帐户不存在",
+    "EmailAlreadyExists": "此电子邮件已被注册",
+    "oldPasswordMistmatch": "当前密码不正确",
+    "passwordMismatch": "错误的密码。",
+    "cantEditYourself": "不允许更改自己的权限",
+    "cantEditAdmin": "此用户具有管理员权限",
+    "cantOpenClient": "{{VMS_NAME}} 应用程序未检测到。<a href=\"/download\"> 下载</a>",
+    "lostConnection": "连接到 {{systemName}} 失去了",
+    "thisSystem": "系统"
   },
-  "passwordRequirements":{
-    "minLengthMessage":"密码必须包含至少 8 个字符",
-    "requiredMessage":"使用只有拉丁文字母、 数字和符号键盘，避免前导和尾随空格",
-    "weakMessage":"使用数字、 上层和小写字母和特殊字符，使您更强的密码",
-    "strongMessage":"强密码 ！",
-    "commonMessage":"此密码是在世界顶级最受欢迎的密码"
+  "passwordRequirements": {
+    "minLengthMessage": "密码必须包含至少 8 个字符",
+    "requiredMessage": "使用只有拉丁文字母、 数字和符号键盘，避免前导和尾随空格",
+    "weakMessage": "使用数字、 上层和小写字母和特殊字符，使您更强的密码",
+    "strongMessage": "强密码 ！",
+    "commonMessage": "此密码是在世界顶级最受欢迎的密码"
   },
-  "sharing":{
-    "confirmOwner":"如果您更改系统所有者，将撤消从当前帐户的所有权。此操作是不可逆的。是否确定？",
-    "shareTitle":"共享",
-    "shareConfirmButton":"共享",
-    "editShareTitle":"编辑权限",
-    "editShareConfirmButton":"保存",
-    "permissionsSaved":"保存的新权限"
+  "sharing": {
+    "confirmOwner": "如果您更改系统所有者，将撤消从当前帐户的所有权。此操作是不可逆的。是否确定？",
+    "shareTitle": "共享",
+    "shareConfirmButton": "共享",
+    "editShareTitle": "编辑权限",
+    "editShareConfirmButton": "保存",
+    "permissionsSaved": "保存的新权限"
   },
-  "system":{
-    "yourSystem":"您的系统",
-    "mySystemSearch":"我的",
-    "unavailable":"系统无法访问",
-    "offline":"系统处于离线状态",
-    "openClient":"在 {{VMS_NAME}} 中打开",
-    "confirmRenameTitle":"系统名称",
-    "confirmRenameAction":"保存",
-    "successRename":"保存的系统名称",
-    "confirmDisconnectTitle":"系统断开 {{PRODUCT_NAME}} 吗？",
-    "confirmDisconnectAction":"断开连接",
-    "confirmUnshareFromMe":"您将要断开此系统从您的帐户。你将无法再访问该系统。是否确定？",
-    "confirmUnshareFromMeTitle":"断开系统吗？",
-    "confirmUnshareFromMeAction":"断开连接",
-    "confirmUnshare":"此用户不能访问系统。是否确定？",
-    "confirmUnshareTitle":"删除用户？",
-    "confirmUnshareAction":"删除",
-    "successDisconnected":"系统成功地断开 {{PRODUCT_NAME}}",
-    "successDeleted":"从您的帐户成功删除系统 {{systemName}}",
-    "permissionsRemoved":"权限从 {{email}} 被刪除"
+  "system": {
+    "yourSystem": "您的系统",
+    "mySystemSearch": "我的",
+    "unavailable": "系统无法访问",
+    "offline": "系统处于离线状态",
+    "openClient": "在 {{VMS_NAME}} 中打开",
+    "confirmRenameTitle": "系统名称",
+    "confirmRenameAction": "保存",
+    "successRename": "保存的系统名称",
+    "confirmDisconnectTitle": "系统断开 {{PRODUCT_NAME}} 吗？",
+    "confirmDisconnectAction": "断开连接",
+    "confirmUnshareFromMe": "您将要断开此系统从您的帐户。你将无法再访问该系统。是否确定？",
+    "confirmUnshareFromMeTitle": "断开系统吗？",
+    "confirmUnshareFromMeAction": "断开连接",
+    "confirmUnshare": "此用户不能访问系统。是否确定？",
+    "confirmUnshareTitle": "删除用户？",
+    "confirmUnshareAction": "删除",
+    "successDisconnected": "系统成功地断开 {{PRODUCT_NAME}}",
+    "successDeleted": "从您的帐户成功删除系统 {{systemName}}",
+    "permissionsRemoved": "权限从 {{email}} 被刪除"
   },
-  "account":{
-    "accountSavedSuccess":"您的帐户已成功保存",
-    "passwordChangedSuccess":"您的帐户已成功保存",
-    "changePassword":"更改密码",
-    "newPasswordLabel":"新密码",
-    "saveChanges":"保存"
+  "account": {
+    "accountSavedSuccess": "您的帐户已成功保存",
+    "activationLinkSent": "激活链接已发送",
+    "passwordChangedSuccess": "您的帐户已成功保存",
+    "changePassword": "更改密码",
+    "newPasswordLabel": "新密码",
+    "saveChanges": "保存"
   },
-  "downloads":{
-    "noClientDetectedTitle":"安装 {{VMS_NAME}} 来查看您的系统",
-    "noClientDetectedMessage":"",
-    "action":"下载 {{VMS_NAME}}",
-    "mobile":{
-      "ios":{
-        "link":"{{IOS_APP_LINK}}"
+  "downloads": {
+    "noClientDetectedTitle": "安装 {{VMS_NAME}} 来查看您的系统",
+    "action": "下载 {{VMS_NAME}}",
+    "mobile": {
+      "ios": {
+        "link": "{{IOS_APP_LINK}}"
       },
-      "android":{
-        "link":"{{ANDROID_APP_LINK}}"
+      "android": {
+        "link": "{{ANDROID_APP_LINK}}"
       }
     },
-    "groups":{
-      "windows":{
-        "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+    "groups": {
+      "windows": {
+        "label": "Windows",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
-      "mac":{
-        "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "linux":{
-        "label":"Ubuntu Linux",
-        "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
-    "platforms":{
-      "win64":"x64",
-      "win86":"x86",
-      "linux64":"x64",
-      "linux86":"x86",
-      "mac":"X"
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
     },
-    "appTypes":{
-      "client":"仅用于客户端",
-      "server":"仅限服务器",
-      "bundle":"客户端和服务器",
-      "servertool":"配置工具"
+    "appTypes": {
+      "client": "仅用于客户端",
+      "server": "仅限服务器",
+      "bundle": "客户端和服务器",
+      "servertool": "配置工具"
     }
   },
-  "activeActions":{
-    "sendConfirm":"发送",
-    "resetPassword":"重置密码",
-    "setNewPassword":"保存密码",
-    "setNewPasswordLabel":"新密码"
+  "activeActions": {
+    "sendConfirm": "重新发送激活链接",
+    "resetPassword": "重置密码",
+    "setNewPassword": "保存密码",
+    "setNewPasswordLabel": "新密码"
   },
-  "regActions":{
-    "passwordLabel":"密码",
-    "createAccount":"创建帐户"
+  "regActions": {
+    "passwordLabel": "密码",
+    "createAccount": "创建帐户"
   },
-  "header":{
-    "allSystems":"所有系统",
-    "systems":"系统"
+  "header": {
+    "allSystems": "所有系统",
+    "systems": "系统"
   }
 }

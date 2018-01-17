@@ -79,6 +79,11 @@ angular.module('cloudApp')
                 account.login($scope.account.email, $scope.account.password);
             }else{
                 $location.path('/register/success',false);
+                account.setEmail($scope.account.email);
             }
+        });
+
+        $scope.$on('$destroy', function(){
+            dialogs.dismissNotifications();
         });
     }]);

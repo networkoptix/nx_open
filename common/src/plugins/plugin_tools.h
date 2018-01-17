@@ -1,4 +1,3 @@
-
 #ifndef PLUGIN_TOOLS_H
 #define PLUGIN_TOOLS_H
 
@@ -15,7 +14,6 @@
 
 #include "plugin_api.h"
 
-
 namespace nxpt
 {
     //!Automatic scoped pointer class which uses \a PluginInterface reference counting interface (\a PluginInterface::addRef and \a PluginInterface::releaseRef) instead of new/delete
@@ -28,6 +26,9 @@ namespace nxpt
     class ScopedRef
     {
     public:
+        /** Intended to be applied to queryInterface(). */
+        ScopedRef(void* ptr): ScopedRef(static_cast<T*>(ptr), /*increaseRef*/ false) {}
+
         //!Calls \a ptr->addRef() if \a ptr is not 0 and \a increaseRef is true
         ScopedRef( T* ptr = 0, bool increaseRef = true )
         :
@@ -36,6 +37,17 @@ namespace nxpt
             m_ptr = ptr;
             if( m_ptr && increaseRef )
                 m_ptr->addRef();
+        }
+
+        ScopedRef(ScopedRef<T>&& right)
+        {
+            m_ptr = right.release();
+        }
+
+        ScopedRef<T>& operator=(ScopedRef<T>&& right)
+        {
+            m_ptr = right.release();
+            return (*this);
         }
 
         ~ScopedRef()
@@ -255,7 +267,7 @@ namespace nxpt
         CommonRefManager* m_refCountingDelegate;
     };
 
-    
+
     template <typename T>
     class CommonRefCounter: public T
     {
@@ -365,7 +377,7 @@ namespace nxpt
         }
     };
 
-    
+
 
 } // namespace nxpt
 
@@ -389,7 +401,7 @@ struct hash<nxpl::NX_GUID>
 
         for (auto i = 0; i < sizeof(guid.bytes); ++i)
             h = (h + (324723947 + guid.bytes[i])) ^ 93485734985;
-        
+
         return h;
     }
 };

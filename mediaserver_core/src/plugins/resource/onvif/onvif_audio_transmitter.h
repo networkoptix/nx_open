@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/streaming/rtsp_client.h>
 #include <core/resource/camera_resource.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>

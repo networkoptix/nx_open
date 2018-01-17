@@ -23,15 +23,17 @@ INSTALL_PATH="opt/$CUSTOMIZATION"
 # If not empty, a symlink will be created from this path to $INSTALL_PATH.
 SYMLINK_INSTALL_PATH=""
 
-# To save storage space on the device, Qt .so files can be copied to an alternative location
-# defined by QT_LIB_INSTALL_PATH (e.g. an sdcard which does not support symlinks), and symlinks
+# To save storage space on the device, some .so files can be copied to an alternative location
+# defined by ALT_LIB_INSTALL_PATH (e.g. an sdcard which does not support symlinks), and symlinks
 # to these .so files will be created in the regular LIB_INSTALL_DIR.
-QT_LIB_INSTALL_PATH=""
+ALT_LIB_INSTALL_PATH=""
+
+OUTPUT_DIR=${DISTRIBUTION_OUTPUT_DIR:-"$CURRENT_BUILD_DIR"}
 
 if [ "$BOX" = "edge1" ]; then
     INSTALL_PATH="usr/local/apps/$CUSTOMIZATION"
     SYMLINK_INSTALL_PATH="opt/$CUSTOMIZATION"
-    QT_LIB_INSTALL_PATH="sdcard/${CUSTOMIZATION}_service"
+    ALT_LIB_INSTALL_PATH="sdcard/${CUSTOMIZATION}_service"
 fi
 
 if [ "$BOX" = "bpi" ]; then
@@ -40,49 +42,11 @@ else
     LIB_INSTALL_PATH="$INSTALL_PATH/mediaserver/lib"
 fi
 
+LOG_FILE="$LOGS_DIR/create_arm_installer.log"
+
 #--------------------------------------------------------------------------------------------------
 
-help()
-{
-    echo "Options:"
-    echo " --no-client: Do not pack Lite Client."
-    echo " -v, --verbose: Do not redirect output to a log file."
-}
-
-# [out] LITE_CLIENT
-# [out] VERBOSE
-parseArgs() # "$@"
-{
-    LITE_CLIENT=1
-    VERBOSE=0
-
-    local ARG
-    for ARG in "$@"; do
-        if [ "$ARG" = "-h" -o "$ARG" = "--help" ]; then
-            help
-            exit 0
-        elif [ "$ARG" = "--no-client" ] ; then
-            LITE_CLIENT=0
-        elif [ "$ARG" = "-v" ] || [ "$ARG" = "--verbose" ]; then
-            VERBOSE=1
-        fi
-    done
-}
-
-redirectOutput() # log-file
-{
-    local -r LOG_FILE="$1"; shift
-
-    echo "  See the log in $LOG_FILE"
-
-    rm -rf "$LOG_FILE"
-    exec 1<&- #< Close stdout fd.
-    exec 2<&- #< Close stderr fd.
-    exec 1<>"$LOG_FILE" #< Open stdout as $LOG_FILE for reading and writing.
-    exec 2>&1 #< Redirect stderr to stdout.
-}
-
-create_archive() # archive dir command...
+createArchive() # archive dir command...
 {
     local -r ARCHIVE="$1"; shift
     local -r DIR="$1"; shift
@@ -93,13 +57,35 @@ create_archive() # archive dir command...
     echo "  Done"
 }
 
+# Copy the specified file to the proper location, creating the symlink if necessary: if alt_lib_dir
+# is empty, or the file is a symlink, just copy it to lib_dir; otherwise, put it to alt_lib_dir,
+# and create a symlink from lib_dir to the file basename in symlink_target_dir.
+#
+copyLib() # file lib_dir alt_lib_dir symlink_target_dir
+{
+    local -r FILE="$1"; shift
+    local -r LIB_DIR="$1"; shift
+    local -r ALT_LIB_DIR="$1"; shift
+    local -r SYMLINK_TARGET_DIR="$1"; shift
+
+    if [ ! -z "$ALT_LIB_DIR" ] && [ ! -L "$FILE" ]; then
+        # FILE is not a symlink - put to the alt location, and create a symlink to it.
+        cp -r "$FILE" "$ALT_LIB_DIR/"
+        ln -s "$SYMLINK_TARGET_DIR/$(basename "$FILE")" \
+            "$LIB_DIR/$(basename "$FILE")"
+    else
+        # FILE is a symlink, or the alt location is not defined - put to the regular location.
+        cp -r "$FILE" "$LIB_DIR/"
+    fi
+}
+
 #--------------------------------------------------------------------------------------------------
 
 # [in] LIB_INSTALL_DIR
+# [in] ALT_LIB_INSTALL_DIR
+# [in] ALT_LIB_INSTALL_PATH
 copyBuildLibs()
 {
-    mkdir -p "$LIB_INSTALL_DIR"
-
     local LIBS_TO_COPY=(
         # vms
         libappserver2
@@ -169,34 +155,29 @@ copyBuildLibs()
     local LIB
     for LIB in "${LIBS_TO_COPY[@]}"; do
         local FILE
-        for FILE in "$LIB_BUILD_DIR/$LIB"*; do
+        for FILE in "$LIB_BUILD_DIR/$LIB"*.so*; do
             if [[ $FILE != *.debug ]]; then
                 echo "Copying $(basename "$FILE")"
-                cp -r "$FILE" "$LIB_INSTALL_DIR/"
+                copyLib "$FILE" "$LIB_INSTALL_DIR" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
             fi
         done
     done
     for LIB in "${OPTIONAL_LIBS_TO_COPY[@]}"; do
         local FILE
-        for FILE in "$LIB_BUILD_DIR/$LIB"*; do
+        for FILE in "$LIB_BUILD_DIR/$LIB"*.so*; do
             if [ -f "$FILE" ]; then
                 echo "Copying (optional) $(basename "$FILE")"
-                cp -r "$FILE" "$LIB_INSTALL_DIR/"
+                copyLib "$FILE" "$LIB_INSTALL_DIR" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
             fi
         done
     done
 }
 
 # [in] LIB_INSTALL_DIR
+# [in] ALT_LIB_INSTALL_DIR
+# [in] ALT_LIB_INSTALL_PATH
 copyQtLibs()
 {
-    if [ ! -z "$QT_LIB_INSTALL_PATH" ]; then
-        local -r QT_LIB_INSTALL_DIR="$TAR_DIR/$QT_LIB_INSTALL_PATH"
-        mkdir -p "$QT_LIB_INSTALL_DIR"
-    fi
-
-    mkdir -p "$LIB_INSTALL_DIR"
-
     local QT_LIBS_TO_COPY=(
         Concurrent
         Core
@@ -231,15 +212,7 @@ copyQtLibs()
         echo "Copying (Qt) $LIB_FILENAME"
         local FILE
         for FILE in "$QT_DIR/lib/$LIB_FILENAME"*; do
-            if [ ! -z "$QT_LIB_INSTALL_PATH" ] && [ ! -L "$FILE" ]; then
-                # FILE is not a symlink - put to the Qt libs location, and create a symlink to it.
-                cp -r "$FILE" "$QT_LIB_INSTALL_DIR/"
-                ln -s "/$QT_LIB_INSTALL_PATH/$(basename "$FILE")" \
-                    "$LIB_INSTALL_DIR/$(basename "$FILE")"
-            else
-                # FILE is a symlink, or Qt libs location is not defined - put to install dir.
-                cp -r "$FILE" "$LIB_INSTALL_DIR/"
-            fi
+            copyLib "$FILE" "$LIB_INSTALL_DIR" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
         done
     done
 }
@@ -248,7 +221,7 @@ copyQtLibs()
 copyBins()
 {
     mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR"
-    local BINS_TO_COPY=(
+    local -r BINS_TO_COPY=(
         mediaserver
         external.dat
     )
@@ -272,6 +245,10 @@ copyBins()
             local FILE
             for FILE in "$BIN_BUILD_DIR/plugins/"*; do
                 if [[ $FILE != *.debug ]]; then
+                    if [ "$CUSTOMIZATION" != "hanwha" ] && [[ "$FILE" == *hanwha* ]]; then
+                        continue
+                    fi
+
                     echo "Copying plugins/$(basename "$FILE")"
                     cp -r "$FILE" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
                 fi
@@ -344,14 +321,16 @@ copyDebs()
 # [in] LIB_INSTALL_DIR
 copyBpiLiteClient()
 {
+    local -r LITE_CLIENT_BIN_DIR="$INSTALL_DIR/lite_client/bin"
+
     if [ -d "$LIB_BUILD_DIR/ffmpeg" ]; then
         echo "Copying libs of a dedicated ffmpeg for Lite Client's proxydecoder"
         cp -r "$LIB_BUILD_DIR/ffmpeg" "$LIB_INSTALL_DIR/"
     fi
 
     echo "Copying lite_client bin"
-    mkdir -p "$INSTALL_DIR/lite_client/bin"
-    cp "$BIN_BUILD_DIR/mobile_client" "$INSTALL_DIR/lite_client/bin/"
+    mkdir -p "$LITE_CLIENT_BIN_DIR"
+    cp "$BIN_BUILD_DIR/mobile_client" "$LITE_CLIENT_BIN_DIR/"
 
     echo "Creating symlink for rpath needed by mediaserver binary"
     ln -s "../lib" "$INSTALL_DIR/mediaserver/lib"
@@ -360,30 +339,33 @@ copyBpiLiteClient()
     ln -s "../lib" "$INSTALL_DIR/lite_client/lib"
 
     echo "Creating symlink for rpath needed by Qt plugins"
-    ln -s "../../lib" "$INSTALL_DIR/lite_client/bin/lib"
+    ln -s "../../lib" "$LITE_CLIENT_BIN_DIR/lib"
 
     # Copy directories needed for lite client.
     local DIRS_TO_COPY=(
-        fonts # packages/any/roboto-fonts/bin/
-        egldeviceintegrations # $QT_DIR/plugins/
-        imageformats # $QT_DIR/plugins/
-        platforms # $QT_DIR/plugins/
-        qml # $QT_DIR/
-        libexec # $QT_DIR/
+        fonts #< packages/any/roboto-fonts/bin/
+        egldeviceintegrations #< $QT_DIR/plugins/
+        imageformats #< $QT_DIR/plugins/
+        platforms #< $QT_DIR/plugins/
+        qml #< $QT_DIR/
+        libexec #< $QT_DIR/
     )
     local DIR
     for DIR in "${DIRS_TO_COPY[@]}"; do
         echo "Copying directory (to Lite Client bin/) $DIR"
-        cp -r "$BIN_BUILD_DIR/$DIR" "$INSTALL_DIR/lite_client/bin/"
+        cp -r "$BIN_BUILD_DIR/$DIR" "$LITE_CLIENT_BIN_DIR/"
     done
 
-    mkdir -p "$INSTALL_DIR/lite_client/bin/translations"
-    echo "Copying (to lite_client/bin/) Qt translations"
-    cp -r "$QT_DIR/translations" "$INSTALL_DIR/lite_client/bin/"
+    echo "Copying Qt translations"
+    cp -r "$QT_DIR/translations" "$LITE_CLIENT_BIN_DIR/"
+
     # TODO: Investigate how to get rid of "resources" duplication.
-    echo "Copying (to lite_client/bin/ and lite_client/libexec/) Qt resources"
-    cp -r "$QT_DIR/resources" "$INSTALL_DIR/lite_client/bin/"
-    cp -r "$QT_DIR/resources/"* "$INSTALL_DIR/lite_client/bin/libexec/"
+    echo "Copying Qt resources"
+    cp -r "$QT_DIR/resources" "$LITE_CLIENT_BIN_DIR/"
+    cp -r "$QT_DIR/resources/"* "$LITE_CLIENT_BIN_DIR/libexec/"
+
+    echo "Copying qt.conf"
+    cp -r "$SOURCE_DIR/common/maven/bin-resources/resources/qt/etc/qt.conf" "$LITE_CLIENT_BIN_DIR/"
 }
 
 # [in] TAR_DIR
@@ -398,11 +380,19 @@ copyBpiSpecificFiles()
     echo "Copying (bpi) root/"
     cp -r "$CURRENT_BUILD_DIR/root" "$TAR_DIR/"
 
-    local -r TOOLS_DIR="$TAR_DIR/root/tools/nx"
+    local -r TOOLS_PATH="root/tools/$CUSTOMIZATION"
+    local -r TOOLS_DIR="$TAR_DIR/$TOOLS_PATH"
     local -r CONF_FILE="mediaserver.conf.template"
-    echo "Copying $CONF_FILE (used for factory reset) to root/tools/nx/"
+    echo "Copying $CONF_FILE (used for factory reset) to $TOOLS_PATH/"
     mkdir -p "$TOOLS_DIR"
     cp "$CURRENT_BUILD_DIR/opt/networkoptix/mediaserver/etc/$CONF_FILE" "$TOOLS_DIR/"
+}
+
+copyEdge1SpecificFiles()
+{
+    local -r GDB_DIR="$INSTALL_DIR/mediaserver/bin"
+    echo "Copying gdb to $GDB_DIR/"
+    cp -r "$PACKAGES_DIR/gdb"/* "$GDB_DIR/"
 }
 
 # [in] INSTALL_DIR
@@ -444,40 +434,41 @@ copyVox()
 }
 
 # [in] LIB_INSTALL_DIR
-copyLibcIfNeeded()
+copyToolchainLibsIfNeeded()
 {
-    # TODO: Consider unconditionally copying from the compiler artifact. Decision on usage will
-    # then be made in install.sh on the box.
-    if [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
-        echo "Copying libstdc++ (Banana Pi)"
-        cp -r "$PACKAGES_DIR/libstdc++-6.0.19/lib/libstdc++.s"* "$LIB_INSTALL_DIR/"
-    fi
+    [ -z "$TOOLCHAIN_LIB_DIR" ] && exit
+
+    echo "Copying toolchain libs (libstdc++, libatomic)"
+    cp -r "$TOOLCHAIN_LIB_DIR/libstdc++.so"* "$LIB_INSTALL_DIR/"
+    cp -r "$TOOLCHAIN_LIB_DIR/libatomic.so"* "$LIB_INSTALL_DIR/"
 }
 
 # [in] WORK_DIR
 # [in] TAR_DIR
+# [in] OUTPUT_DIR
 buildInstaller()
 {
     echo ""
-    echo "Creating installer .tar.gz"
+    echo "Creating distribution .tar.gz"
     if [ ! -z "$SYMLINK_INSTALL_PATH" ]; then
         mkdir -p "$TAR_DIR/$(dirname "$SYMLINK_INSTALL_PATH")"
         ln -s "/$INSTALL_PATH" "$TAR_DIR/$SYMLINK_INSTALL_PATH"
     fi
-    create_archive "$CURRENT_BUILD_DIR/$TAR_FILENAME" "$TAR_DIR" tar czf
+    createArchive "$OUTPUT_DIR/$TAR_FILENAME" "$TAR_DIR" tar czf
 
     echo ""
     echo "Creating \"update\" .zip"
     local -r ZIP_DIR="$WORK_DIR/zip"
     mkdir -p "$ZIP_DIR"
-    cp -r "$CURRENT_BUILD_DIR/$TAR_FILENAME" "$ZIP_DIR/"
+    cp -r "$OUTPUT_DIR/$TAR_FILENAME" "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR"/update.* "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR"/install.sh "$ZIP_DIR/"
-    create_archive "$CURRENT_BUILD_DIR/$ZIP_FILENAME" "$ZIP_DIR" zip
+    createArchive "$OUTPUT_DIR/$ZIP_FILENAME" "$ZIP_DIR" zip
+    cp "$OUTPUT_DIR/$ZIP_FILENAME" "$OUTPUT_DIR/$ZIP_INSTALLER_FILENAME"
 }
 
 # [in] WORK_DIR
-# [in] TAR_DIR
+# [in] OUTPUT_DIR
 buildDebugSymbolsArchive()
 {
     echo ""
@@ -503,37 +494,35 @@ buildDebugSymbolsArchive()
     if [ $DEBUG_FILES_EXIST = 0 ]; then
         echo "  No .debug files found"
     else
-        create_archive \
-            "$CURRENT_BUILD_DIR/$TAR_FILENAME-debug-symbols.tar.gz" "$DEBUG_TAR_DIR" tar czf
+        createArchive \
+            "$OUTPUT_DIR/$TAR_FILENAME-debug-symbols.tar.gz" "$DEBUG_TAR_DIR" tar czf
     fi
 }
 
 #--------------------------------------------------------------------------------------------------
 
-main()
+# [in] WORK_DIR
+buildDistribution()
 {
-    local -i LITE_CLIENT
-    local -i VERBOSE
-    parseArgs "$@"
-
-    local -r WORK_DIR=$(mktemp -d)
-    rm -rf "$WORK_DIR"
-
     local -r TAR_DIR="$WORK_DIR/tar"
     local -r INSTALL_DIR="$TAR_DIR/$INSTALL_PATH"
     local -r LIB_INSTALL_DIR="$TAR_DIR/$LIB_INSTALL_PATH"
     local -r MEDIASERVER_BIN_INSTALL_DIR="$INSTALL_DIR/mediaserver/bin"
 
-    echo "Creating installer in $WORK_DIR (please delete it on failure)."
-
-    if [ $VERBOSE = 0 ]; then
-        redirectOutput "$BUILD_DIR/create_arm_installer.log"
+    mkdir -p "$INSTALL_DIR"
+    mkdir -p "$LIB_INSTALL_DIR"
+    if [ -z "$ALT_LIB_INSTALL_PATH" ]; then
+        local -r ALT_LIB_INSTALL_DIR=""
+    else
+        local -r ALT_LIB_INSTALL_DIR="$TAR_DIR/$ALT_LIB_INSTALL_PATH"
+        mkdir -p "$ALT_LIB_INSTALL_DIR"
     fi
 
-    mkdir -p "$INSTALL_DIR"
-
-    echo "Creating version.txt: $VERSION"
+    echo "Generating version.txt: $VERSION"
     echo "$VERSION" >"$INSTALL_DIR/version.txt"
+
+    echo "Copying build_info.txt"
+    cp -r "$BUILD_DIR/build_info.txt" "$INSTALL_DIR/"
 
     copyBuildLibs
     copyQtLibs
@@ -543,22 +532,113 @@ main()
     copyDebs
     copyAdditionalSysrootFilesIfNeeded
     copyVox
-    copyLibcIfNeeded
+    copyToolchainLibsIfNeeded
 
     if [ "$BOX" = "bpi" ]; then
         copyBpiSpecificFiles
         if [ $LITE_CLIENT = 1 ]; then
             copyBpiLiteClient
         fi
+    elif [ "$BOX" = "edge1" ]; then
+        copyEdge1SpecificFiles
     fi
 
     buildInstaller
     buildDebugSymbolsArchive
+}
 
+#--------------------------------------------------------------------------------------------------
+
+showHelp()
+{
+    echo "Options:"
+    echo " --no-client: Do not pack Lite Client."
+    echo " -v, --verbose: Do not redirect output to a log file."
+    echo " -k, --keep-work-dir: Do not delete work directory on success."
+}
+
+# [out] LITE_CLIENT
+# [out] KEEP_WORK_DIR
+# [out] VERBOSE
+parseArgs() # "$@"
+{
+    LITE_CLIENT=1
+    KEEP_WORK_DIR=0
+    VERBOSE=0
+
+    local ARG
+    for ARG in "$@"; do
+        if [ "$ARG" = "-h" -o "$ARG" = "--help" ]; then
+            showHelp
+            exit 0
+        elif [ "$ARG" = "--no-client" ] ; then
+            LITE_CLIENT=0
+        elif [ "$ARG" = "-k" ] || [ "$ARG" = "--keep-work-dir" ]; then
+            KEEP_WORK_DIR=1
+        elif [ "$ARG" = "-v" ] || [ "$ARG" = "--verbose" ]; then
+            VERBOSE=1
+        fi
+    done
+}
+
+redirectOutputToLog()
+{
+    echo "  See the log in $LOG_FILE"
+
+    mkdir -p "$LOGS_DIR" #< In case log dir is not created yet.
+    rm -rf "$LOG_FILE"
+
+    # Redirect only stdout to the log file, leaving stderr as is, because there seems to be no
+    # reliable way to duplicate error output to both log file and stderr, keeping the correct order
+    # of regular and error lines in the log file.
+    exec 1>"$LOG_FILE" #< Open log file for writing as stdout.
+}
+
+# Called by trap.
+# [in] $?
+# [in] VERBOSE
+onExit()
+{
+    local RESULT=$?
+    echo "" #< Newline, to separate SUCCESS/FAILURE message from the above log.
+    if [ $RESULT != 0 ]; then #< Failure.
+        echo "FAILURE (status $RESULT); see the error message(s) above." >&2 #< To stderr.
+        if [ $VERBOSE = 0 ]; then #< stdout redirected to log file.
+            echo "FAILURE (status $RESULT); see the error message(s) on stderr." #< To log file.
+        fi
+    else
+        echo "SUCCESS"
+    fi
+    return $RESULT
+}
+
+main()
+{
+    declare -i VERBOSE #< Mot local - needed by onExit().
+    local -i LITE_CLIENT
+    parseArgs "$@"
+
+    trap onExit EXIT
+
+    local -r WORK_DIR="$BUILD_DIR/create_arm_installer_tmp"
     rm -rf "$WORK_DIR"
 
-    echo ""
-    echo "FINISHED"
+    if [ KEEP_WORK_DIR = 1 ]; then
+        local -r WORK_DIR_NOTE="(ATTENTION: will NOT be deleted)"
+    else
+        local -r WORK_DIR_NOTE="(will be deleted on success)"
+    fi
+    echo "Creating distribution in $WORK_DIR $WORK_DIR_NOTE."
+
+    if [ $VERBOSE = 0 ]; then
+        redirectOutputToLog
+    fi
+
+    buildDistribution
+
+    if [ KEEP_WORK_DIR = 0 ]; then
+        rm -rf "$WORK_DIR"
+    fi
 }
 
 main "$@"

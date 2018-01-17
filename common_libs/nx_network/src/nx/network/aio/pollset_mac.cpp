@@ -297,6 +297,7 @@ namespace aio {
             timeout.tv_nsec = (millisToWait % MILLIS_IN_SEC) * NSEC_IN_MS;
         }
         m_impl->receivedEventCount = 0;
+
         int result = kevent(
             m_impl->kqueueFD,
             NULL,
@@ -304,10 +305,11 @@ namespace aio {
             m_impl->receivedEventlist, 
             sizeof(m_impl->receivedEventlist)/sizeof(*m_impl->receivedEventlist),
             millisToWait >= 0 ? &timeout : NULL );
-        if( result == EINTR )
-            return 0;   //TODO #ak repeat wait (with timeout correction) in this case
-        if( result <= 0 )
-            return result;
+
+        if (result == 0) //< Timed out.
+            return 0;
+        if (result < 0)
+            return errno == EINTR ? 0 : result; //< Not reporting EINTR as an error since it is quite normal.
 
         m_impl->receivedEventCount = result;
         //not reporting event used to interrupt blocking poll

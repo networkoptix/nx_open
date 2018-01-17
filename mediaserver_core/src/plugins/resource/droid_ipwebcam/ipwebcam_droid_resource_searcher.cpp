@@ -55,7 +55,7 @@ QString QnPlIpWebCamResourceSearcher::manufacture() const
 }
 
 
-QList<QnResourcePtr> QnPlIpWebCamResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnPlIpWebCamResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     Q_UNUSED(url)
     Q_UNUSED(auth)
@@ -77,11 +77,11 @@ struct AnDroidDev
         android = false;
         QString request;
 
-        const auto sock = SocketFactory::createStreamSocket();
+        const auto sock = nx::network::SocketFactory::createStreamSocket();
         sock->setRecvTimeout(500);
         sock->setSendTimeout(500);
 
-        if (sock->connect(QHostAddress(ip).toString(), 8080, AbstractCommunicatingSocket::kDefaultTimeoutMillis))
+        if (sock->connect(QHostAddress(ip).toString(), 8080, nx::network::deprecated::kDefaultConnectTimeout))
         {
             android = true;
 
@@ -179,7 +179,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 
                 resource->setTypeId(rt);
                 resource->setName(name);
-                resource->setMAC(QnMacAddress(smac));
+                resource->setMAC(nx::network::QnMacAddress(smac));
                 resource->setHostAddress(QHostAddress(ad.ip).toString());
 
                 result.push_back(resource);

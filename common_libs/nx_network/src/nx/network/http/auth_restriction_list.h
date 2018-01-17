@@ -1,12 +1,16 @@
-#pragma once 
+#pragma once
 
 #include <map>
 
 #include <QtCore/QString>
+#include <QtCore/QRegExp>
 
 #include <nx/network/http/http_types.h>
+#include <nx/utils/thread/mutex.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 namespace AuthMethod {
 
@@ -41,16 +45,18 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Values);
 } // namespace AuthMethod
 
 /**
- * @note By default, AuthMethod::http, AuthMethod::cookie and AuthMethod::videowall 
+ * NOTE: By default, AuthMethod::http, AuthMethod::cookie and AuthMethod::videowall
  * authorization methods are allowed fo every url.
  */
 class NX_NETWORK_API AuthMethodRestrictionList
 {
 public:
+    static const unsigned int kDefaults;
+
     /**
      * @return Bit mask of auth methods (AuthMethod::Value enumeration).
      */
-    unsigned int getAllowedAuthMethods(const nx_http::Request& request) const;
+    unsigned int getAllowedAuthMethods(const nx::network::http::Request& request) const;
 
     /**
      * @param pathMask Wildcard-mask of path.
@@ -62,10 +68,18 @@ public:
     void deny(const QString& pathMask, AuthMethod::Value method);
 
 private:
-    /** map<path mask, allowed auth bitmask>. */
-    std::map<QString, unsigned int> m_allowed;
-    /** map<path mask, denied auth bitmask>. */
-    std::map<QString, unsigned int> m_denied;
+    struct Rule
+    {
+        QRegExp expression;
+        unsigned int method;
+        Rule(const QString& expression, unsigned int method);
+    };
+
+    mutable QnMutex m_mutex;
+    std::map<QString, Rule> m_allowed;
+    std::map<QString, Rule> m_denied;
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

@@ -82,6 +82,15 @@
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Cloud Systeem kan alleen met non-cloud worden samengevoegd. Systeemnaam en wachtwoord worden afkomstig van Cloud Systeem.</translation>
     </message>
+    <message>
+      <source>New System</source>
+      <translation>Nieuw systeem</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation>Het gevonden systeem %1 is niet samen te voegen met het huidige systeem.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -111,7 +120,7 @@
     </message>
     <message>
       <source>(unknown)</source>
-      <translation>(onbekend)</translation>
+      <translation>(unknown)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
@@ -246,18 +255,6 @@
       <translation>Zorg ervoor dat poort %1 toegankelijk is (bijv. geforward).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in apparaatinstellingen.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in camera-instellingen.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in I/O instellingen.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Als dit niet helpt, herstel dan de fabrieksinstellingen op de webpagina van het apparaat.</translation>
     </message>
@@ -305,6 +302,18 @@
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Camera is hersteld vanuit het archief. Verwijder de camera en voeg het opnieuw toe om live video te bekijken.</translation>
     </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in apparaatinstellingen (fout &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in camera-instellingen (fout &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in I/O instellingen (fout &quot;%1&quot;).</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -314,7 +323,7 @@
     </message>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Kan de encoder voor codec %1 niet vinden.</translation>
+      <translation>Kon geen encoder vinden voor codec %1.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
@@ -361,7 +370,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kan de uitvoer stream niet voor opname toewijzen.</translation>
+      <translation>Kan de output stream niet toewijzen voor opname.</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
@@ -380,7 +389,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Kon geen encoder vinden voor codec %1.</translation>
+      <translation>Kan de encoder voor codec %1 niet vinden.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -476,6 +485,14 @@
     <message>
       <source>Time Licenses</source>
       <translation>Testlicenties</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation>Recorder</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>Recorder licentie</translation>
     </message>
   </context>
   <context>
@@ -648,7 +665,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Onbekend</translation>
+      <translation>Unknown</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -744,7 +761,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kan de output stream niet toewijzen voor opname.</translation>
+      <translation>Kan de uitvoer stream niet voor opname toewijzen.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
@@ -765,6 +782,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>Ongeldig brontype voor gegevensuitvoer.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Er zijn geen gegevens geëxporteerd.</translation>
     </message>
   </context>
   <context>
@@ -979,7 +1000,7 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>Geavanceerde Kijker</translation>
+      <translation>Geavanceerde kijker</translation>
     </message>
     <message>
       <source>Viewer</source>
@@ -987,7 +1008,7 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>Live Viewer</translation>
+      <translation>Live kijker</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1453,7 +1474,7 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n gebruikers</numerusform>
+        <numerusform>%n Gebruikers</numerusform>
         <numerusform>%n gebruikers</numerusform>
       </translation>
     </message>
@@ -1495,6 +1516,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>Bevestigen</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>Analytics Event</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 op %2</translation>
     </message>
   </context>
   <context>

@@ -12,11 +12,7 @@
 
 #include <media_server/serverutil.h>
 
-
-namespace {
 static const int kReadBlockSize = 1024 * 512;
-static const QString kIdParam = lit("id");
-}
 
 int QnLogRestHandler::executeGet(
     const QString& path,
@@ -31,7 +27,7 @@ int QnLogRestHandler::executeGet(
             processor->accessRights(),
             Qn::GlobalPermission::GlobalAdminPermission))
     {
-        return nx_http::StatusCode::forbidden;
+        return nx::network::http::StatusCode::forbidden;
     }
 
     qint64 linesToRead = 100;
@@ -44,19 +40,26 @@ int QnLogRestHandler::executeGet(
         }
     }
 
-    int logId = 0;
-    const auto idIter = params.find(kIdParam);
-    if (idIter != params.end())
-        logId = idIter->second.toInt();
-
     boost::optional<QString> logFilePath;
-    if (const auto logger = QnLogs::logger(logId))
-        logFilePath = logger->filePath();
+    {
+        const auto name = params.value(lit("name"));
+        if (!name.isEmpty())
+        {
+            if (auto logger = QnLogs::getLogger(name))
+                logFilePath = logger->filePath();
+        }
+        else
+        {
+            const auto id = params.value(lit("id")).toInt();
+            if (auto logger = QnLogs::getLogger(id))
+                logFilePath = logger->filePath();
+        }
+    }
 
     if (!logFilePath)
     {
-        result.append(QString("<root>Bad log file id</root>\n"));
-        return nx_http::StatusCode::badRequest;
+        result.append(QString("<root>Bad log file id or name</root>\n"));
+        return nx::network::http::StatusCode::badRequest;
     }
 
     if (linesToRead == 0ll)
@@ -66,7 +69,7 @@ int QnLogRestHandler::executeGet(
     if (!f.open(QFile::ReadOnly))
     {
         result.append(QString("<root>Can't open log file</root>\n"));
-        return nx_http::StatusCode::internalServerError;
+        return nx::network::http::StatusCode::internalServerError;
     }
     qint64 fileSize = f.size();
 
@@ -110,7 +113,7 @@ int QnLogRestHandler::executeGet(
     }
     contentType = "text/plain; charset=UTF-8";
     result = solidArray;
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnLogRestHandler::executePost(

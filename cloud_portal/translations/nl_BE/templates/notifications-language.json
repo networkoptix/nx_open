@@ -1,17 +1,17 @@
 {
-  "activate_account":{
-    "emailSubject":"Bevestig uw account"
+  "activate_account": {
+    "emailSubject": "Bevestig uw account"
   },
-  "restore_password":{
-    "emailSubject":"Herstel uw wachtwoord"
+  "restore_password": {
+    "emailSubject": "Herstel uw wachtwoord"
   },
-  "system_invite":{
-    "emailSubject":"Videosysteem {{message.system_name}} is met u gedeeld"
+  "system_invite": {
+    "emailSubject": "Videosysteem {{message.system_name}} is met u gedeeld"
   },
-  "system_shared":{
-    "emailSubject":"Videosysteem {{message.system_name}} is met u gedeeld"
+  "system_shared": {
+    "emailSubject": "Videosysteem {{message.system_name}} is met u gedeeld"
   },
-  "review_version":{
-    "emailSubject":"Versie {{message.id}} is klaar om te worden beoordeeld"
+  "review_version": {
+    "emailSubject": "Versie {{message.id}} is klaar om te worden beoordeeld"
   }
 }

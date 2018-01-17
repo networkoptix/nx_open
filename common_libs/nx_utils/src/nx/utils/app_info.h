@@ -40,7 +40,24 @@ public:
     static bool isLinux() { return applicationPlatform() == lit("linux"); }
     static bool isWindows() { return applicationPlatform() == lit("windows"); }
     static bool isMacOsX() { return applicationPlatform() == lit("macosx"); }
+
+    static bool isWin64()
+    {
+        if (!isWindows())
+            return false;
+
+        #if defined(Q_OS_WIN64)
+            return true;
+        #else
+            return false;
+        #endif
+    }
+
+    static bool isWin32()
+    {
+        return isWindows() && !isWin64();
+    }
 };
 
-} // namespace nx
 } // namespace utils
+} // namespace nx

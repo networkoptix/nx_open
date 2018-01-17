@@ -1,117 +1,204 @@
 {
-  "language_name":"עברית",
-  "dialogs":{
-    "okButton":"אישור",
-    "openLink":"בקר בקישור הבא",
-    "openLinkWithTitle":"{{title}} בקר בקישור זה"
-  },
-  "setup":{
-    "createAccount":"צור חשבון",
-    "errorNoHDD":"מכשיר זה מיועד לעבודה עם דיסק קשיח מותקן. <br>יש לכבות את המכשיר ולהתקין דיסק קשיח.",
-    "errorNoNetwork":"מכשיר זה צריך חיבור רשת כדי לעבוד. <br>יש לחבר אותו לרשת המקומית או לרשת האינטרנט"
-  },
-  "passwordRequirements":{
-    "minLengthMessage":"סיסמא חייבת להכיל לפחות 8 תווים",
-    "requiredMessage":"רק אותיות לטינית, מספרים וסימני מקלדת מותרים",
-    "weakMessage":"הסיסמה צריכה להכיל סוגים שונים של סמלים",
-    "strongMessage":"סיסמה חזקה!",
-    "commonMessage":"סיסמה זו נמצאת ברשימת הסיסמאות הפופולריות ביותר"
-  },
-  "settings":{
-    "tabs":{
-      "server":"שרת",
-      "system":"מערכת",
-      "device":"מכשיר"
+    "language_name": "עברית",
+    "dialogs": {
+        "okButton": "אישור",
+        "openLink": "בקר בקישור הבא",
+        "openLinkWithTitle": "{{title}} בקר בקישור זה"
     },
-    "confirmRestart":"להפעיל מחדש את השרת?",
-    "couldntCheckInternet":"לא ניתן לבדוק את החיבור לענן",
-    "confirmRestoreDefault":"נקה את מסד נתונים והגדרות? תהליך זה ייקח זמן מה, השרת יופעל מחדש לאחר מכן.",
-    "confirmRestoreDefaultTitle":"שחזר להגדרות ברירת מחדל",
-    "unexpectedError":"כשלון: שגיאה בלתי צפויה התרחשה",
-    "connnetionError":"שגיאת חיבור",
-    "wrongPassword":"סיסמא שגויה.",
-    "error":"שגיאה: ",
-    "restartNeeded":"שינויים שנשמרו. להפעיל מחדש את השרת בכדי להחיל את ההגדרות החדשות?",
-    "settingsSaved":"ההגדרות נשמרו",
-    "confirmHardwareRestart":"אתחל מחדש את השרת?",
-    "confirmRestoreSettings":"לשחזר את כל הגדרות השרת? הארכיון יישמר, אך יתבצע איפוס של הגדרות הרשת.",
-    "confirmRestoreSettingsNotNetwork":"האם לאפס את תצורת שרת? ארכיון והגדרות הרשת יישמרו.",
-    "unavailable":"לא זמין",
-    "unsafePortConfirm":"אין זה בטוח להשתמש במספר היציאה הקטן מ -1025. ייתכן שהשרת לה יהיה נגיש. המשך בכל זאת?",
-    "confirmDisconnectFromCloud":"נתק את המערכת מ {{CLOUD_NAME}}",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'> כל משתמשי הענן יימחקו.</span> <br><br>המערכת תהיה נגישה דרך הרשת המקומית עם חשבון מנהל מערכת מקומי.",
-    "confirmDisconnectFromCloudAction":"התנתק",
-    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
-    "confirmDisconnectFromSystem":"Detach server from current system",
-    "confirmDisconnectFromSystemTitle":"",
-    "confirmDisconnectFromSystemAction":"Detach",
-    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
-    "connectedSuccess":"מערכת חובר בהצלחה",
-    "createLocalOwnerTitle":"צור מנהל המקומי",
-    "confirmChangePassword":"שנה סיסמת מנהל מערכת",
-    "confirmChangePasswordTitle":"האם לשנות את סיסמת המערכת? פעולה זו תשפיע על המשתמש 'admin' ועל סיסמת ה root עבור שרתים מסוימים",
-    "confirmChangePasswordAction":"שמור סיסמה חדשה",
-    "nx1ControlHint":"יישום הלקוח הופעל. השתמש מקלדת/עכבר או יישום נייד כדי לשלוט בו."
-  },
-  "info":{
-    "tabs":{
-      "healthMonitoring":"ניטור תקינות",
-      "storage":"אחסון",
-      "log":"יומן"
+    "setup": {
+        "createAccount": "צור חשבון",
+        "errorNoHDD": "מכשיר זה מיועד לעבודה עם דיסק קשיח מותקן. <br>יש לכבות את המכשיר ולהתקין דיסק קשיח.",
+        "errorNoNetwork": "מכשיר זה צריך חיבור רשת כדי לעבוד. <br>יש לחבר אותו לרשת המקומית או לרשת האינטרנט"
+    },
+    "passwordRequirements": {
+        "minLengthMessage": "סיסמא חייבת להכיל לפחות 8 תווים",
+        "requiredMessage": "רק אותיות לטינית, מספרים וסימני מקלדת מותרים",
+        "weakMessage": "הסיסמא צריכה להכיל סוגים שונים של סמלים",
+        "strongMessage": "סיסמה חזקה!",
+        "commonMessage": "סיסמה זו נמצאת ברשימת הסיסמהות הפופולריות ביותר"
+    },
+    "settings": {
+        "tabs": {
+            "server": "שרת",
+            "system": "מערכת",
+            "device": "מכשיר"
+        },
+        "confirmRestart": "להפעיל מחדש את השרת?",
+        "couldntCheckInternet": "לא ניתן לבדוק את החיבור לענן",
+        "confirmRestoreDefault": "נקה את מסד נתונים והגדרות? תהליך זה ייקח זמן מה, השרת יופעל מחדש לאחר מכן.",
+        "confirmRestoreDefaultTitle": "שחזר להגדרות ברירת מחדל",
+        "unexpectedError": "כשלון: שגיאה בלתי צפויה התרחשה",
+        "connnetionError": "שגיאת חיבור",
+        "wrongPassword": "סיסמה שגויה.",
+        "error": "שגיאה: ",
+        "restartNeeded": "שינויים שנשמרו. להפעיל מחדש את השרת בכדי להחיל את ההגדרות החדשות?",
+        "settingsSaved": "ההגדרות נשמרו",
+        "confirmHardwareRestart": "אתחל מחדש את השרת?",
+        "confirmRestoreSettings": "לשחזר את כל הגדרות השרת? הארכיון יישמר, אך יתבצע איפוס של הגדרות הרשת.",
+        "confirmRestoreSettingsNotNetwork": "האם לאפס את תצורת שרת? ארכיון והגדרות הרשת יישמרו.",
+        "unavailable": "לא זמין",
+        "unsafePortConfirm": "אין זה בטוח להשתמש במספר היציאה הקטן מ -1025. ייתכן שהשרת לה יהיה נגיש. המשך בכל זאת?",
+        "confirmDisconnectFromCloud": "נתק את המערכת מ {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'> כל משתמשי הענן יימחקו.</span> <br><br>המערכת תהיה נגישה דרך הרשת המקומית עם חשבון מנהל מערכת מקומי.",
+        "confirmDisconnectFromCloudAction": "נתק",
+        "disconnectedFromCloudSuccess": "המערכת נותקה בהצלחה מ {{CLOUD_NAME}}",
+        "confirmDisconnectFromSystem": "נתק שרת מהמערכת הנוכחית",
+        "confirmDisconnectFromSystemAction": "ניתוק",
+        "disconnectedFromSystemSuccess": "השרת נותק מהמערכת בהצלחה",
+        "connectedSuccess": "מערכת חובר בהצלחה",
+        "createLocalOwnerTitle": "צור מנהל המקומי",
+        "confirmChangePassword": "שנה סיסמת מנהל מערכת",
+        "confirmChangePasswordTitle": "האם לשנות את סיסמת המערכת? פעולה זו תשפיע על המשתמש 'admin' ועל סיסמת ה root עבור שרתים מסוימים",
+        "confirmChangePasswordAction": "שמור סיסמא חדשה",
+        "nx1ControlHint": "יישום הלקוח הופעל. השתמש מקלדת/עכבר או יישום נייד כדי לשלוט בו."
+    },
+    "settingsConfig": {
+        "arecontRtspEnabled": "Arecont RTSP מאופשר",
+        "auditTrailEnabled": "זנב עקיבה מאופשר",
+        "auditTrailPeriodDays": "Audit trail period days",
+        "autoDiscoveryEnabled": "אפשר גילוי והוספת התקנים אוטומטית",
+        "autoUpdateThumbnails": "Auto-update thumbnails",
+        "backupNewCamerasByDefault": "גבה מצלמות חדשות כברירת מחדל",
+        "backupQualities": "תכונות הגיבוי",
+        "cameraSettingsOptimization": "אפשר הגדרות אופטימיזציה להתקן",
+        "clientStatisticsSettingsUrl": "Client statistics relative url",
+        "cloudAccountName": "חשבון הבעלים של הענן",
+        "cloudConnectRelayingEnabled": "Enable relaying for cloud connect",
+        "cloudConnectUdpHolePunchingEnabled": "Enable UDP hole punching for cloud connect",
+        "cloudHost": "ענן מארח",
+        "cloudSystemID": "מזהה מערכת ענן",
+        "disabledVendors": "יצרנים לא מאופשרים",
+        "ec2AliveUpdateIntervalSec": "מרווח עדכון מצב מערכת(שניות)",
+        "ec2ConnectionKeepAliveTimeoutSec": "מרווח זמן עדכון מצב תקשורת(שניות)",
+        "ec2KeepAliveProbeCount": "בדיקת עדכון מצב תקשורת(שניות)",
+        "emailFrom": "אי מייל מ",
+        "emailSignature": "חתימת דוא\"ל",
+        "emailSupportEmail": "דוא\"ל תמיכה",
+        "enableEdgeRecording": "Enable edge recording",
+        "eventLogPeriodDays": "Event log period (days)",
+        "hanwhaDeleteProfilesOnInitIfNeeded": "Delete camera profiles on init if needed",
+        "ldapAdminDn": "מנהל LDAP DN",
+        "ldapSearchBase": "בסיס חיפוש LDAP",
+        "ldapSearchFilter": "מסנן חיפוש LDAP",
+        "ldapUri": "כתובת אתר של LDAP",
+        "localSystemId": "Local System ID",
+        "maxDifferenceBetweenSynchronizedAndInternetTime": "Max difference between synchronized and Internet time (milliseconds)",
+        "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max difference between synchronized and local time (milliseconds)",
+        "maxRecordQueueSizeBytes": "Max record queue size (bytes)",
+        "maxRecordQueueSizeElements": "Max record queue size (elements)",
+        "maxRemoteArchiveSynchronizationThreads": "Max remote archive synchronization threads",
+        "maxSceneItems": "Max scene items (0 means default)",
+        "proxyConnectTimeoutSec": "זמן קצוב לחיבור של שרת proxy (שניות)",
+        "rtpTimeoutMs": "RTP timeout (milliseconds)",
+        "sequentialFlirOnvifSearcherEnabled": "Use sequential Flir Onvif searcher",
+        "serverDiscoveryPingTimeoutSec": "זמן גילוי של השרת",
+        "smtpConnectionType": "סוג חיבור SMTP",
+        "smtpHost": "מארח SMTP",
+        "smtpPort": "פורט SMTP",
+        "smtpSimple": "SMTP פשוט",
+        "smtpTimeout": "זמן קצוב SMTP",
+        "smtpUser": "שם משתמש SMTP",
+        "statisticsAllowed": "שלח סטטיסטיקות שימוש אנונימיות ודוחות קריסה",
+        "statisticsReportLastNumber": "דוח סטטיסטי - מספר אחרון",
+        "statisticsReportLastTime": "דוח סטטיסטי - זמן אחרון",
+        "statisticsReportLastVersion": "Statistics report - last version",
+        "statisticsReportServerApi": "שרת סטטיסטיקה api",
+        "statisticsReportTimeCycle": "מרווח דוח סטטיסטיקה",
+        "statisticsReportUpdateDelay": "Statistics report - update delay",
+        "synchronizeTimeWithInternet": "Synchronize time with Internet",
+        "systemName": "שם מערכת",
+        "takeCameraOwnershipWithoutLock": "לקיחת בעלות על מצלמות ללא נעילה",
+        "timeSynchronizationEnabled": "סינכרון זמן מאופשר",
+        "updateNotificationsEnabled": "עדכון ההתראות מופעל",
+        "upnpPortMappingEnabled": "מיפוי יציאת UPNP מאופשר",
+        "useTextEmailFormat": "Send plain-text emails"
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "ניטור תקינות",
+            "storage": "אחסון",
+            "log": "יומן"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "אין אפשרות לגשת למערכת או שהמערכת אינה קיימת.",
+        "incorrectCurrentPassword": "סיסמה נוכחית שגויה.",
+        "incorrectRemotePassword": "שם או הסיסמה שגויים.",
+        "incompatibleVersion": "לא ניתן להגיע למערכת, היא אנה קיימת או בעלת גירסה לא תואמת.",
+        "wrongUrl": "אין אפשרות להתחבר לשרת שצוין.",
+        "newSystemError": "אין אפשרות למזג מערכות. המערכת המרוחקת לא הוגדרה.",
+        "safeMode": "אין אפשרות למזג מערכות. המערכת המרוחקת היא במצב בטוח.",
+        "configError": "אין אפשרות למזג מערכות. יתכן ואחת ממערכות נמצא במצב בטוח.",
+        "cloudError": "אין אפשרות למזג מערכות. המערכת למיזוג מחוברת לענן. יש לנתק אותה קודם.",
+        "cloudBothError": "אין אפשרות למזג מערכות. שתי מערכות מחוברות לענן. יש לנתק אחת קודם.",
+        "cloudHostConflict": "אין אפשרות למזג מערכות, מאחר והשרתים נבנו עם שרתי ענן שונים",
+        "licenceError": "אזהרה! אתה עומד למזג מערכות עם רישיונות Starter. רשיון Starter אחד בלבד מותר לכל מערכת, הרישיון השני יכובה. האם למזג בכל מקרה?",
+        "connectionFailed": "החיבור נכשל: ",
+        "unknownError": "שגיאה לא מוכרת",
+        "mergeFailed": "המיזוג נכשל: ",
+        "mergeSucceed": "המיזוג להצליח.",
+        "newSystemDisplayName": "מערכת חדשה",
+        "incompatibleProtocol": "גירסה לא תואמת",
+        "incompatibleCloudHost": "קונפליקט ענן",
+        "incompatibleCloudState": "ענן מחובר"
+    },
+    "login": {
+        "incorrectPassword": "שם או הסיסמה שגויים"
+    },
+    "navigaion": {
+        "cannotGetUser": "תקלה בשרת: אין אפשרות לקבל את נתוני המשתמש הנוכחי"
+    },
+    "offlineDialog": {
+        "serverOffline": "השרת אינו זמין"
+    },
+    "restartDialog": {
+        "serverStarting": "השרת עולה",
+        "serverRestarting": "השרת מאתחל",
+        "serverOffline": "השרת אינו זמין"
+    },
+    "fileUpload": {
+        "started": "עדכון התחיל בהצלחה. פעולה זו תימשך כמה דקות",
+        "upToDate": "העדכון נכשל. הגרסה להתקנה כבר מותקנת.",
+        "invalidFile": "העדכון נכשל. הקובץ שסופק אינו ארכיון עדכון חוקי.",
+        "incompatibleSystem": "העדכון נכשל. הקובץ שסופק מיועד למערכת אחרת.",
+        "extractionError": "העדכון נכשל. אין די שטח פנוי כדי לחלץ ארכיון, יש לבדוק אחסון זמין.",
+        "installationError": "העדכון נכשל. אין אפשרות להריץ את ההתקנה.",
+        "selectFiles": "בחר קבצים"
+    },
+    "advanced": {
+        "free": "פנוי",
+        "total": "סה\"כ",
+        "occupied": "תפוס",
+        "reserved": "שמור"
+    },
+    "pageTitles": {
+        "default": "ממשק אינטרנט ל {{PRODUCT_NAME}}"
+    },
+    "common": {
+        "systemOffline": "השרת אינו זמין",
+        "cameraLinks": {
+            "copyToClipboard": "העתק ללוח העריכה",
+            "highStream": "תזרים ראשי",
+            "copyDefaultText": "העתק",
+            "unknown": "לא ידוע",
+            "lowStream": "תזרים משני",
+            "transcoding": "המרה",
+            "copyActiveText": "הועתק ללוח"
+        },
+        "searchCamPlaceholder": "חיפוש",
+        "cameraStates": {
+            "noFormat": "דפדפן או התקן זה אינו תומך בהפעלת וידאו ממצלמה זו.",
+            "ieWin10": "השתמש ב- Microsoft Edge או בדפדפן Google Chrome.",
+            "iosVideoTooLarge": "iOS אינה תומכת בוידאו גדול מ fullHD (2MP: 1920 x 1080).",
+            "unauthorized": "נדרש אימות",
+            "ubuntuNX": "דפדפן זה אינו תומך בווידאו משרתים מבוססי ARM. בבקשה, השתמש בדפדפן Chromium במקום זאת.",
+            "ieNoWebm": "התקן את <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> עבור Internet Explorer.",
+            "flashOrWebmRequired": "יש <a href='https://get.adobe.com/flashplayer/' target='_blank'> להתקין Adobe Flash</a> או <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM codec</a> עבור הצגת וידאו ב- Internet Explorer.",
+            "noArmSupport": "דפדפן או התקן זה אינו תומך בהפעלת וידאו משרתים מבוססי ARM.",
+            "error": "שגיאה",
+            "offline": "לא מקוון",
+            "noData": "אין נתונים",
+            "flashRequired": "אנא התקן <a href='https://get.adobe.com/flashplayer/' target='_blank'> את Adobe Flash</a> להפעלת וידאו משרתים מבוססי ARM."
+        }
     }
-  },
-  "join":{
-    "systemIsUnreacheble":"אין אפשרות לגשת למערכת או שהמערכת אינה קיימת.",
-    "incorrectCurrentPassword":"סיסמה נוכחית שגויה.",
-    "incorrectRemotePassword":"שם או הסיסמא שגויים.",
-    "incompatibleVersion":"לא ניתן להגיע למערכת, היא אנה קיימת או בעלת גירסה לא תואמת.",
-    "wrongUrl":"אין אפשרות להתחבר לשרת שצוין.",
-    "newSystemError":"אין אפשרות למזג מערכות. המערכת המרוחקת לא הוגדרה.",
-    "safeMode":"אין אפשרות למזג מערכות. המערכת המרוחקת היא במצב בטוח.",
-    "configError":"אין אפשרות למזג מערכות. יתכן ואחת ממערכות נמצא במצב בטוח.",
-    "cloudError":"אין אפשרות למזג מערכות. המערכת למיזוג מחוברת לענן. יש לנתק אותה קודם.",
-    "cloudBothError":"אין אפשרות למזג מערכות. שתי מערכות מחוברות לענן. יש לנתק אחת קודם.",
-    "cloudHostConflict":"אין אפשרות למזג מערכות, מאחר והשרתים נבנו עם שרתי ענן שונים",
-    "licenceError":"אזהרה! אתה עומד למזג מערכות עם רישיונות Starter. רשיון Starter אחד בלבד מותר לכל מערכת, הרישיון השני יכובה. האם למזג בכל מקרה?",
-    "connectionFailed":"החיבור נכשל: ",
-    "unknownError":"שגיאה לא מוכרת",
-    "mergeFailed":"המיזוג נכשל: ",
-    "mergeSucceed":"המיזוג להצליח.",
-    "newSystemDisplayName":"מערכת חדשה",
-    "incompatibleProtocol":"גירסה לא תואמת",
-    "incompatibleCloudHost":"קונפליקט ענן",
-    "incompatibleCloudState":"ענן מחובר"
-  },
-  "login":{
-    "incorrectPassword":"שם או הסיסמא שגויים"
-  },
-  "navigaion":{
-    "cannotGetUser":"תקלה בשרת: אין אפשרות לקבל את נתוני המשתמש הנוכחי"
-  },
-  "offlineDialog":{
-    "serverOffline":"השרת אינו זמין"
-  },
-  "restartDialog":{
-    "serverStarting":"השרת עולה",
-    "serverRestarting":"השרת מאתחל",
-    "serverOffline":"השרת אינו זמין"
-  },
-  "fileUpload":{
-    "started":"עדכון התחיל בהצלחה. פעולה זו תימשך כמה דקות",
-    "upToDate":"העדכון נכשל. הגרסה להתקנה כבר מותקנת.",
-    "invalidFile":"העדכון נכשל. הקובץ שסופק אינו ארכיון עדכון חוקי.",
-    "incompatibleSystem":"העדכון נכשל. הקובץ שסופק מיועד למערכת אחרת.",
-    "extractionError":"העדכון נכשל. אין די שטח פנוי כדי לחלץ ארכיון, יש לבדוק אחסון זמין.",
-    "installationError":"העדכון נכשל. אין אפשרות להריץ את ההתקנה.",
-    "selectFiles":"בחר קבצים"
-  },
-  "advanced":{
-    "free":"פנוי",
-    "total":"סה\"כ",
-    "occupied":"תפוס",
-    "reserved":"שמור"
-  },
-  "pageTitles":{
-    "default":"ממשק אינטרנט ל {{PRODUCT_NAME}}"
-  }
 }

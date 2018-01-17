@@ -46,7 +46,7 @@ public:
     virtual QString manufacture() const override;
     //!Implementation of QnAbstractNetworkResourceSearcher::checkHostAddr
     virtual QList<QnResourcePtr> checkHostAddr(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QAuthenticator& auth,
         bool doMultichannelCheck ) override;
 
@@ -63,8 +63,8 @@ protected:
     //!Implementation of QnUpnpResourceSearcherAsync::processPacket
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const SocketAddress& host,
-        const nx_upnp::DeviceInfo& devInfo,
+        const nx::network::SocketAddress& host,
+        const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         QnResourceList& result ) override;
     //!Implementation of QnAbstractResourceSearcher::findResources

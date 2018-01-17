@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 extern "C"
 {
     #include <libswscale/swscale.h>
@@ -9,8 +11,10 @@ extern "C"
 
 #include "decoders/video/abstract_video_decoder.h"
 #include <nx/utils/thread/stoppable.h>
+#include <nx/utils/thread/mutex.h>
 #include "frame_scaler.h"
 #include "transcoding/filters/filter_helper.h"
+#include <nx/media/abstract_metadata_consumer.h>
 
 
 class QnAbstractVideoDecoder;
@@ -18,7 +22,7 @@ class QnCompressedVideoData;
 class QnAbstractRenderer;
 class QnBufferedFrameDisplayer;
 
-static const int MAX_FRAME_QUEUE_SIZE = 6;
+static const int kMaxFrameQueueSize = 6;
 static const int MAX_QUEUE_TIME = 1000 * 200;
 
 /**
@@ -33,7 +37,7 @@ public:
     enum FrameDisplayStatus {Status_Displayed, Status_Skipped, Status_Buffered};
 
     QnVideoStreamDisplay(bool can_downscale, int channelNumber);
-    ~QnVideoStreamDisplay();
+    virtual ~QnVideoStreamDisplay() override;
 
     //!Implementation of QnStoppable::pleaseStop()
     virtual void pleaseStop() override;
@@ -95,15 +99,15 @@ private:
     mutable QnMutex m_mtx;
     QMap<AVCodecID, QnAbstractVideoDecoder*> m_decoder;
 
-    QSet<QnAbstractRenderer*> m_newList;
-    QSet<QnAbstractRenderer*> m_renderList;
+    std::set<QnAbstractRenderer*> m_newList;
+    std::set<QnAbstractRenderer*> m_renderList;
     bool m_renderListModified;
 
     /**
       * to reduce image size for weak video cards
       */
 
-    QSharedPointer<CLVideoDecoderOutput> m_frameQueue[MAX_FRAME_QUEUE_SIZE];
+    QSharedPointer<CLVideoDecoderOutput> m_frameQueue[kMaxFrameQueueSize];
     int m_frameQueueIndex;
 
     QnAbstractVideoDecoder::DecodeMode m_decodeMode;
@@ -150,7 +154,7 @@ private:
 
     QnFrameScaler::DownscaleFactor findScaleFactor(int width, int height, int fitWidth, int fitHeight);
     QnFrameScaler::DownscaleFactor determineScaleFactor(
-        QSet<QnAbstractRenderer*> renderList,
+        std::set<QnAbstractRenderer*> renderList,
         int channelNumber,
         int srcWidth,
         int srcHeight,

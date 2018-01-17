@@ -1,6 +1,10 @@
 set(product.title "${company.name} Mediator Lib")
 set(product.display.title "${company.name} Mediator Lib")
 
+if(LINUX)
+    add_compile_options("-Werror" "-Wall" "-Wextra")
+endif()
+
 nx_configure_file(
     maven/filter-resources/libconnection_mediator_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})

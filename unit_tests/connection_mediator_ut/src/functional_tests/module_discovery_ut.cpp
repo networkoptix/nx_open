@@ -64,7 +64,7 @@ protected:
     {
         base_type::SetUp();
 
-        auto discoveryUrl = nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+        auto discoveryUrl = nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
             .setEndpoint(httpEndpoint()).toUrl();
         m_moduleRegistrar = std::make_unique<DiscoveryClient>(discoveryUrl, m_moduleId);
 
@@ -117,7 +117,7 @@ protected:
     {
         const auto relayUrl = reportedTrafficRelayUrl();
         ASSERT_TRUE(static_cast<bool>(relayUrl));
-        ASSERT_EQ(m_moduleUrl, QUrl(*relayUrl));
+        ASSERT_EQ(m_moduleUrl, nx::utils::Url(*relayUrl));
     }
 
     void thenNoModuleUrlHasBeenReported()
@@ -127,13 +127,13 @@ protected:
 
 private:
     std::string m_moduleId;
-    QUrl m_moduleUrl;
+    nx::utils::Url m_moduleUrl;
     std::unique_ptr<DiscoveryClient> m_moduleRegistrar;
 
     nx::cloud::discovery::PeerStatus fetchPeerStatus()
     {
         nx::cloud::discovery::ModuleFinder moduleFinder(
-            nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
                 .setEndpoint(httpEndpoint()).toUrl());
         nx::utils::promise<
             std::tuple<nx::cloud::discovery::ResultCode, std::vector<InstanceInformation>>
@@ -150,7 +150,7 @@ private:
         if (resultCode != nx::cloud::discovery::ResultCode::ok)
         {
             throw std::runtime_error(
-                "Error fetching peer status. " + 
+                "Error fetching peer status. " +
                 QnLexical::serialized(resultCode).toStdString());
         }
 

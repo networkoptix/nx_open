@@ -390,7 +390,7 @@ public:
     TestStorageThread(QnStorageManager* owner): m_owner(owner) {}
     virtual void run() override
     {
-        for (const auto& storage : m_owner->getStorages())
+        for (const auto& storage : storagesToTest())
         {
             if (needToStop())
                 return;
@@ -412,6 +412,33 @@ public:
 
 private:
     QnStorageManager* m_owner;
+
+    QnStorageResourceList storagesToTest()
+    {
+        QnStorageResourceList result = m_owner->getStorages();
+        std::sort(
+            result.begin(),
+            result.end(),
+            [this](const QnStorageResourcePtr& lhs, const QnStorageResourcePtr& rhs)
+            {
+                return isLocal(lhs) && !isLocal(rhs);
+            });
+
+        return result;
+    }
+
+    static bool isLocal(const QnStorageResourcePtr& storage)
+    {
+        QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
+        if (fileStorage)
+            return fileStorage->isLocal();
+
+        const auto localDiskType = QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition);
+        const auto removableDiskType = QnLexical::serialized(QnPlatformMonitor::RemovableDiskPartition);
+        const auto storageType = storage->getStorageType();
+
+        return storageType == localDiskType || storageType == removableDiskType;
+    }
 };
 
 // -------------------- QnStorageManager --------------------
@@ -1796,11 +1823,11 @@ QnStorageResourceList QnStorageManager::getStoragesInLexicalOrder() const
 void QnStorageManager::deleteRecordsToTime(DeviceFileCatalogPtr catalog, qint64 minTime)
 {
     int idx = catalog->findFileIndex(minTime, DeviceFileCatalog::OnRecordHole_NextChunk);
-    if (idx != -1) {
-        QVector<DeviceFileCatalog::Chunk> deletedChunks = catalog->deleteRecordsBefore(idx);
-        for(const DeviceFileCatalog::Chunk& chunk: deletedChunks)
-            clearDbByChunk(catalog, chunk);
-    }
+    if (idx == -1)
+        idx = std::numeric_limits<int>::max();
+    QVector<DeviceFileCatalog::Chunk> deletedChunks = catalog->deleteRecordsBefore(idx);
+    for(const DeviceFileCatalog::Chunk& chunk: deletedChunks)
+        clearDbByChunk(catalog, chunk);
 }
 
 void QnStorageManager::clearDbByChunk(DeviceFileCatalogPtr catalog, const DeviceFileCatalog::Chunk& chunk)
@@ -2443,7 +2470,12 @@ bool QnStorageManager::renameFileWithDuration(
     return storage->renameFile(oldName, newName);
 }
 
-bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* /*provider*/, qint64 fileSize)
+bool QnStorageManager::fileFinished(
+    int durationMs,
+    const QString& fileName,
+    QnAbstractMediaStreamDataProvider* /*provider*/,
+    qint64 fileSize,
+    qint64 startTimeMs)
 {
     int storageIndex;
     QString quality;
@@ -2464,7 +2496,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     DeviceFileCatalogPtr catalog = getFileCatalog(cameraUniqueId, quality);
     if (catalog == 0)
         return false;
-    auto chunk = catalog->updateDuration(durationMs, fileSize, renameOK);
+    const auto chunk = catalog->updateDuration(durationMs, fileSize, renameOK, startTimeMs);
     if (chunk.startTimeMs != -1)
     {
         QnStorageDbPtr sdb = qnStorageDbPool->getSDB(storage);
@@ -2477,7 +2509,12 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     return false;
 }
 
-bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* /*provider*/)
+bool QnStorageManager::fileStarted(
+    const qint64& startDateMs,
+    int timeZone,
+    const QString& fileName,
+    QnAbstractMediaStreamDataProvider* /*provider*/,
+    bool sideRecorder)
 {
     int storageIndex;
     QString quality, mac;
@@ -2506,7 +2543,7 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
         -1,
         (qint16) timeZone
     );
-    catalog->addRecord(chunk);
+    catalog->addRecord(chunk, sideRecorder);
     return true;
 }
 

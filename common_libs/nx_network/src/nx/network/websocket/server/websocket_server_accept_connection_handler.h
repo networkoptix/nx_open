@@ -11,15 +11,15 @@ namespace websocket {
 namespace server {
 
 class NX_NETWORK_API AcceptConnectionHandler:
-    public nx_http::server::handler::CreateTunnelHandler
+    public nx::network::http::server::handler::CreateTunnelHandler
 {
-    using base_type = nx_http::server::handler::CreateTunnelHandler;
+    using base_type = nx::network::http::server::handler::CreateTunnelHandler;
 
 public:
-    using ConnectionCreatedHandler = 
+    using ConnectionCreatedHandler =
         nx::utils::MoveOnlyFunc<void(
             std::unique_ptr<WebSocket>,
-            std::vector<nx_http::StringType> /*REST request parameters values*/)>;
+            std::vector<nx::network::http::StringType> /*REST request parameters values*/)>;
 
     AcceptConnectionHandler(ConnectionCreatedHandler onConnectionCreated);
 };

@@ -20,7 +20,7 @@ public:
 
     /**
      * Erases element with specified key from dictionary and moves its value to the caller.
-     * @note Does not test whether requested element actually present in the dictionary.
+     * NOTE: Does not test whether requested element actually present in the dictionary.
      */
     Mapped take(const Key& key)
     {

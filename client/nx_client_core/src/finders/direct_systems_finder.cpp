@@ -6,6 +6,7 @@
 #include <network/system_helpers.h>
 #include <network/local_system_description.h>
 
+#include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/url/url_builder.h>
@@ -19,7 +20,7 @@ bool isOldServer(const QnModuleInformation& info)
     return (info.version < kMinVersionWithSystem);
 }
 
-bool isCloudAddress(const HostAddress& address)
+bool isCloudAddress(const nx::network::HostAddress& address)
 {
     return nx::network::SocketGlobals::addressResolver()
         .isCloudHostName(address.toString());

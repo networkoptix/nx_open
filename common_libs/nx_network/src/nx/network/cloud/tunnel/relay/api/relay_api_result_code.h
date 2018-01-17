@@ -24,14 +24,14 @@ enum class ResultCode
 };
 
 NX_NETWORK_API hpm::api::NatTraversalResultCode toNatTraversalResultCode(ResultCode);
-NX_NETWORK_API nx_http::StatusCode::Value toHttpStatusCode(ResultCode);
-NX_NETWORK_API ResultCode fromHttpStatusCode(nx_http::StatusCode::Value statusCode);
+NX_NETWORK_API nx::network::http::StatusCode::Value toHttpStatusCode(ResultCode);
+NX_NETWORK_API ResultCode fromHttpStatusCode(nx::network::http::StatusCode::Value statusCode);
 NX_NETWORK_API SystemError::ErrorCode toSystemError(ResultCode resultCode);
 
-NX_NETWORK_API nx_http::FusionRequestResult resultCodeToFusionRequestResult(
+NX_NETWORK_API nx::network::http::FusionRequestResult resultCodeToFusionRequestResult(
     api::ResultCode resultCode);
 NX_NETWORK_API api::ResultCode fusionRequestResultToResultCode(
-    nx_http::FusionRequestResult result);
+    nx::network::http::FusionRequestResult result);
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 
@@ -40,6 +40,9 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 } // namespace cloud
 } // namespace nx
 
-//not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
+/**
+ * Not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec.
+ */
+
 NX_NETWORK_API void serialize(const nx::cloud::relay::api::ResultCode&, QString*);
 NX_NETWORK_API bool deserialize(const QString&, nx::cloud::relay::api::ResultCode*);

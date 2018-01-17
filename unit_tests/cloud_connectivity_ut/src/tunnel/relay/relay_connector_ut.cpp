@@ -60,7 +60,7 @@ protected:
 
     void givenHappyRelay()
     {
-        m_relayUrl = QUrl(lm("http://127.0.0.1:12345"));
+        m_relayUrl = nx::utils::Url(lm("http://127.0.0.1:12345"));
 
         m_connector = std::make_unique<relay::Connector>(
             m_relayUrl,
@@ -70,7 +70,7 @@ protected:
 
     void givenUnhappyRelay()
     {
-        m_relayUrl = QUrl(lm("http://127.0.0.1:12345"));
+        m_relayUrl = nx::utils::Url(lm("http://127.0.0.1:12345"));
         m_connector = std::make_unique<relay::Connector>(
             m_relayUrl,
             AddressEntry(AddressType::cloud, "any_name"),
@@ -80,7 +80,7 @@ protected:
 
     void givenSilentRelay()
     {
-        m_relayUrl = QUrl(lm("http://127.0.0.1:12345"));
+        m_relayUrl = nx::utils::Url(lm("http://127.0.0.1:12345"));
 
         m_connector = std::make_unique<relay::Connector>(
             m_relayUrl,
@@ -153,13 +153,13 @@ protected:
     }
 
     void createRelayConnector(
-        QUrl relayUrl,
+        nx::utils::Url relayUrl,
         nx::String targetHostAddress,
         nx::String connectSessionId)
     {
         m_connector = std::make_unique<relay::Connector>(
             relayUrl,
-            nx::network::cloud::AddressEntry(
+            nx::network::AddressEntry(
                 AddressType::cloud, targetHostAddress.constData()),
             connectSessionId);
     }
@@ -172,7 +172,7 @@ protected:
 private:
     std::unique_ptr<relay::Connector> m_connector;
     nx::utils::promise<Result> m_connectFinished;
-    QUrl m_relayUrl;
+    nx::utils::Url m_relayUrl;
     std::atomic<nx::cloud::relay::api::test::ClientImpl*>
         m_prevClientToRelayConnectionInstanciated;
     boost::optional<Result> m_prevConnectorResult;
@@ -237,7 +237,7 @@ TEST_F(RelayConnector, stops_internal_timer_when_reporting_result)
 
 static const char* const kRelaySessionId = "session1";
 static const char* const kServerId = "server1.system1";
-static const char* const kRelayRelayApiPrefix = "/RelayConnectorRedirectTest";
+static const char* const kRelayApiPrefix = "/RelayConnectorRedirectTest";
 
 class RelayConnectorRedirect:
     public RelayConnector
@@ -278,12 +278,12 @@ private:
     struct ConnectResult
     {
         SystemError::ErrorCode systemErrorCode;
-        std::unique_ptr<AbstractStreamSocket> connection;
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection;
         bool stillValid;
     };
 
-    TestHttpServer m_redirectingRelay;
-    TestHttpServer m_realRelay;
+    nx::network::http::TestHttpServer m_redirectingRelay;
+    nx::network::http::TestHttpServer m_realRelay;
     nx::utils::SyncQueue<ConnectResult> m_connectResults;
     nx::utils::SyncQueue<int /*dummy*/> m_connectionsUpgradedByRealRelay;
 
@@ -292,12 +292,12 @@ private:
         using namespace std::placeholders;
 
         const auto createClientSessionPath = 
-            nx_http::rest::substituteParameters(
+            nx::network::http::rest::substituteParameters(
                 nx::cloud::relay::api::kServerClientSessionsPath, {kServerId});
 
         m_realRelay.registerStaticProcessor(
             nx::network::url::normalizePath(
-                kRelayRelayApiPrefix + nx::String("/") +
+                kRelayApiPrefix + nx::String("/") +
                 createClientSessionPath),
             QByteArray("{ \"sessionId\": \"") + kRelaySessionId + 
                 QByteArray("\", \"sessionTimeout\": \"100\" }"),
@@ -305,37 +305,38 @@ private:
 
         m_realRelay.registerRequestProcessorFunc(
             nx::network::url::normalizePath(
-                kRelayRelayApiPrefix + nx::String("/") + 
-                nx_http::rest::substituteParameters(
+                kRelayApiPrefix + nx::String("/") + 
+                nx::network::http::rest::substituteParameters(
                     nx::cloud::relay::api::kClientSessionConnectionsPath, {kRelaySessionId})),
             std::bind(&RelayConnectorRedirect::upgradeConnection, this, _1, _2, _3, _4, _5));
 
         ASSERT_TRUE(m_realRelay.bindAndListen());
 
         m_redirectingRelay.registerRedirectHandler(
-            createClientSessionPath,
+            createClientSessionPath.c_str(),
             nx::network::url::Builder().setScheme("http")
-                .setEndpoint(m_realRelay.serverAddress()).setPath(kRelayRelayApiPrefix + createClientSessionPath));
+                .setEndpoint(m_realRelay.serverAddress())
+                .setPath(QString::fromStdString(kRelayApiPrefix + createClientSessionPath)));
 
         ASSERT_TRUE(m_redirectingRelay.bindAndListen());
     }
 
     void saveConnectionResult(
         SystemError::ErrorCode systemErrorCode,
-        std::unique_ptr<AbstractStreamSocket> connection,
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection,
         bool stillValid)
     {
         m_connectResults.push({systemErrorCode, std::move(connection), stillValid});
     }
 
     void upgradeConnection(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
-        completionHandler(nx_http::StatusCode::switchingProtocols);
+        completionHandler(nx::network::http::StatusCode::switchingProtocols);
         m_connectionsUpgradedByRealRelay.push(0);
     }
 };

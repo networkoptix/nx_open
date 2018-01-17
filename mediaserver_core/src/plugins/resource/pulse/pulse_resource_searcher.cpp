@@ -40,7 +40,7 @@ QnResourceList QnPlPulseSearcher::findResources()
         res->setName(r.name);
         if (cameraRes)
             cameraRes->setModel(r.name);
-        res->setMAC(QnMacAddress(r.mac));
+        res->setMAC(nx::network::QnMacAddress(r.mac));
         res->setHostAddress(r.ip);
 
         result.push_back(res);
@@ -81,7 +81,7 @@ QnResourcePtr QnPlPulseSearcher::createResource(const QnUuid &resourceTypeId, co
     return result;
 }
 
-QList<QnResourcePtr> QnPlPulseSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnPlPulseSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     Q_UNUSED(url)
     Q_UNUSED(auth)

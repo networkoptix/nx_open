@@ -4,8 +4,10 @@
 
 #include <QtCore/QTimeZone>
 
-namespace nx_hls {
-    
+namespace nx {
+namespace mediaserver {
+namespace hls {
+
 Chunk::Chunk():
     duration(0),
     discontinuity(false)
@@ -47,7 +49,7 @@ QByteArray Playlist::toString() const
     {
         if (chunk.discontinuity)
             playlistStr += "#EXT-X-DISCONTINUITY\r\n";
-        // Generating string 2010-02-19T14:54:23.031+08:00, since QDateTime::setTimeSpec() 
+        // Generating string 2010-02-19T14:54:23.031+08:00, since QDateTime::setTimeSpec()
         //   and QDateTime::toString(Qt::ISODate) do not provide expected result.
         if (chunk.programDateTime)
         {
@@ -88,7 +90,7 @@ QByteArray VariantPlaylist::toString() const
             str += "BANDWIDTH=" + QByteArray::number(playlist.bandwidth.get());
         str += "\r\n";
         str += playlist.url.host().isEmpty()
-            ? playlist.url.path().toLatin1() + "?" + 
+            ? playlist.url.path().toLatin1() + "?" +
                 playlist.url.query(QUrl::FullyEncoded).toLatin1()    //< Reporting only path if host not specified.
             : playlist.url.toString(QUrl::FullyEncoded).toLatin1();
         str += "\r\n";
@@ -97,4 +99,6 @@ QByteArray VariantPlaylist::toString() const
     return str;
 }
 
-} // namespace nx_hls
+} // namespace hls
+} // namespace mediaserver
+} // namespace nx

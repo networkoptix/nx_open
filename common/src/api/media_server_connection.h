@@ -208,13 +208,12 @@ public:
         const QByteArray& passwordHash, const QByteArray& passwordDigest,
         const QByteArray& cryptSha512Hash, int port, QObject* target, const char* slot);
 
-    int pingSystemAsync(const QUrl& url, const QString& getKey, QObject* target, const char* slot);
-    int getNonceAsync(const QUrl& url, QObject* target, const char* slot);
+    int pingSystemAsync(const nx::utils::Url &url, const QString& getKey, QObject* target, const char* slot);
+    int getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot);
     int getRecordingStatisticsAsync(
         qint64 bitrateAnalizePeriodMs, QObject* target, const char* slot);
     int getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject* target, const char* slot);
-    int mergeSystemAsync(
-        const QUrl& url, const QString& getKey, const QString& postKey, bool ownSettings,
+    int mergeSystemAsync(const nx::utils::Url &url, const QString& getKey, const QString& postKey, bool ownSettings,
         bool oneServer, bool ignoreIncompatible, QObject* target, const char* slot);
 
     int testEmailSettingsAsync(const QnEmailSettings& settings, QObject* target, const char* slot);
@@ -243,7 +242,7 @@ protected:
 
     int sendAsyncPostRequestLogged(
         int object,
-        nx_http::HttpHeaders headers,
+        nx::network::http::HttpHeaders headers,
         const QnRequestParamList& params,
         const QByteArray& data,
         const char* replyTypeName,

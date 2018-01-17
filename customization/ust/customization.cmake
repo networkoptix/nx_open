@@ -80,4 +80,5 @@ set(additionalTranslations
     nl_NL
     pl_PL
     vi_VN
+    th_TH
 )

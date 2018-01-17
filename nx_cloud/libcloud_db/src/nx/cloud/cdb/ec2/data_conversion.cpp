@@ -1,11 +1,7 @@
 #include "data_conversion.h"
 
-#include <nx/cloud/cdb/api/system_data.h>
-
 #include <nx_ec/data/api_user_data.h>
 #include <nx/fusion/serialization/lexical.h>
-
-#include <utils/common/app_info.h>
 
 namespace nx {
 namespace cdb {
@@ -77,6 +73,7 @@ void convert(const api::SystemSharing& from, ::ec2::ApiUserData* const to)
     to->realm = nx::network::AppInfo::realm();
     to->hash = "password_is_in_cloud";
     to->digest = "password_is_in_cloud";
+    to->isCloud = true;
     accessRoleToPermissions(from.accessRole, &to->permissions, &to->isAdmin);
 }
 

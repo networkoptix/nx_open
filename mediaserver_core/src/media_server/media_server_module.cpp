@@ -15,6 +15,8 @@
 #include "server/server_globals.h"
 #include <plugins/resource/onvif/onvif_helper.h>
 
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_global.h>
 
 #include <translation/translation_manager.h>
@@ -22,7 +24,6 @@
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/common/buffered_file.h>
 #include <utils/common/writer_pool.h>
-#include "master_server_status_watcher.h"
 #include "settings.h"
 
 #include <utils/common/delayed.h>
@@ -33,6 +34,7 @@
 #include <core/ptz/server_ptz_controller_pool.h>
 #include <recorder/storage_db_pool.h>
 #include <recorder/storage_manager.h>
+#include <recorder/archive_integrity_watcher.h>
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
 #include <nx/mediaserver/event/event_message_bus.h>
@@ -40,14 +42,20 @@
 #include <nx/mediaserver/license_watcher.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
+#include <nx/mediaserver/resource/shared_context_pool.h>
+#include <nx/mediaserver/root_tool.h>
 
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
+#include <nx/mediaserver/server_meta_types.h>
+#include <analytics/detected_objects_storage/analytics_events_storage.h>
 
 namespace {
+
+const auto kLastRunningTime = lit("lastRunningTime");
 
 void installTranslations()
 {
@@ -81,6 +89,7 @@ QnMediaServerModule::QnMediaServerModule(
 {
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(appserver2);
+    nx::mediaserver::MetaTypes::initialize();
 
     store(new QnStaticCommonModule(
         Qn::PT_Server,
@@ -113,13 +122,10 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnFfmpegInitializer());
 
     if (!enforcedMediatorEndpoint.isEmpty())
-        nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(enforcedMediatorEndpoint);
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
+        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(enforcedMediatorEndpoint);
+    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
-    store(new QnMasterServerStatusWatcher(
-        commonModule(),
-        m_settings->delayBeforeSettingMasterFlag()));
     m_unusedWallpapersWatcher = store(new nx::mediaserver::UnusedWallpapersWatcher(commonModule()));
     m_licenseWatcher = store(new nx::mediaserver::LicenseWatcher(commonModule()));
 
@@ -132,6 +138,7 @@ QnMediaServerModule::QnMediaServerModule(
     auto streamingChunkTranscoder = store(
         new StreamingChunkTranscoder(
             commonModule()->resourcePool(),
+            nullptr, //< TODO: #ak pass videoCameraPool here. Currently, it is created later.
             StreamingChunkTranscoder::fBeginOfRangeInclusive));
 
     m_streamingChunkCache = store(new StreamingChunkCache(
@@ -171,9 +178,17 @@ QnMediaServerModule::QnMediaServerModule(
             commonModule()->eventRuleManager()));
 
     m_metadataManagerPoolThread = new QThread(this);
-    m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(commonModule()));
+    m_metadataManagerPoolThread->setObjectName(lit("MetadataManagerPool"));
+    m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(this));
     m_metadataManagerPool->moveToThread(m_metadataManagerPoolThread);
     m_metadataManagerPoolThread->start();
+
+    m_analyticsEventsStorage =
+        nx::analytics::storage::EventsStorageFactory::instance()
+            .create(m_settings->analyticEventsStorage());
+
+    m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
+    m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -213,6 +228,28 @@ QSettings* QnMediaServerModule::runTimeSettings() const
     return m_settings->runTimeSettings();
 }
 
+std::chrono::milliseconds QnMediaServerModule::lastRunningTime() const
+{
+    return std::chrono::milliseconds(runTimeSettings()->value(kLastRunningTime).toLongLong());
+}
+
+std::chrono::milliseconds QnMediaServerModule::lastRunningTimeBeforeRestart() const
+{
+    if (!m_lastRunningTimeBeforeRestart)
+        m_lastRunningTimeBeforeRestart = lastRunningTime();
+
+    return *m_lastRunningTimeBeforeRestart;
+}
+
+void QnMediaServerModule::setLastRunningTime(std::chrono::milliseconds value) const
+{
+    if (!m_lastRunningTimeBeforeRestart)
+        m_lastRunningTimeBeforeRestart = lastRunningTime();
+
+    runTimeSettings()->setValue(kLastRunningTime, (qlonglong) value.count());
+    runTimeSettings()->sync();
+}
+
 nx::mediaserver::UnusedWallpapersWatcher* QnMediaServerModule::unusedWallpapersWatcher() const
 {
     return m_unusedWallpapersWatcher;
@@ -236,4 +273,29 @@ nx::mediaserver::metadata::ManagerPool* QnMediaServerModule::metadataManagerPool
 nx::mediaserver::metadata::EventRuleWatcher* QnMediaServerModule::metadataRuleWatcher() const
 {
     return m_metadataRuleWatcher;
+}
+
+nx::mediaserver::resource::SharedContextPool* QnMediaServerModule::sharedContextPool() const
+{
+    return m_sharedContextPool;
+}
+
+AbstractArchiveIntegrityWatcher* QnMediaServerModule::archiveIntegrityWatcher() const
+{
+    return m_archiveIntegrityWatcher;
+}
+
+nx::analytics::storage::AbstractEventsStorage* QnMediaServerModule::analyticsEventsStorage() const
+{
+    return m_analyticsEventsStorage.get();
+}
+
+void QnMediaServerModule::initializeRootTool()
+{
+    m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
+}
+
+nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
+{
+    return m_rootTool.get();
 }

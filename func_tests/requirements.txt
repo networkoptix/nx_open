@@ -1,10 +1,10 @@
+urllib3>=1.22
 pytest
 pytest-timeout
-pytest-capturelog
 pytest-cpp
 pytz
 tzlocal
-requests>=2.12.5
+requests>=2.18.4
 python-vagrant
 Jinja2
 python-debian>=0.1.28

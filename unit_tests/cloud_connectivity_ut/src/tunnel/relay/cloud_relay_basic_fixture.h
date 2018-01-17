@@ -34,7 +34,7 @@ private:
         m_clientFactoryBak;
 
     std::unique_ptr<nx::cloud::relay::api::Client> 
-        clientFactoryFunc(const QUrl& /*relayUrl*/);
+        clientFactoryFunc(const utils::Url & /*relayUrl*/);
 };
 
 } // namespace test

@@ -1,8 +1,3 @@
-/**********************************************************
-* Oct 2, 2015
-* akolesnikov
-***********************************************************/
-
 #include "generic_user_data_provider.h"
 
 #include <QtCore/QCryptographicHash>
@@ -14,7 +9,6 @@
 
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
-
 
 GenericUserDataProvider::GenericUserDataProvider(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
@@ -56,11 +50,11 @@ QnResourcePtr GenericUserDataProvider::findResByName(const QByteArray& nxUserNam
 
 Qn::AuthResult GenericUserDataProvider::authorize(
     const QnResourcePtr& res,
-    const nx_http::Method::ValueType& method,
-    const nx_http::header::Authorization& authorizationHeader,
-    nx_http::HttpHeaders* const /*responseHeaders*/)
+    const nx::network::http::Method::ValueType& method,
+    const nx::network::http::header::Authorization& authorizationHeader,
+    nx::network::http::HttpHeaders* const /*responseHeaders*/)
 {
-    if (authorizationHeader.authScheme == nx_http::header::AuthScheme::digest)
+    if (authorizationHeader.authScheme == nx::network::http::header::AuthScheme::digest)
     {
         QByteArray ha1;
         auto user = res.dynamicCast<QnUserResource>();
@@ -94,7 +88,7 @@ Qn::AuthResult GenericUserDataProvider::authorize(
             return Qn::Auth_DisabledUser;
         return Qn::Auth_OK;
     }
-    else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)
+    else if (authorizationHeader.authScheme == nx::network::http::header::AuthScheme::basic)
     {
         if (auto user = res.dynamicCast<QnUserResource>())
         {
@@ -113,9 +107,9 @@ Qn::AuthResult GenericUserDataProvider::authorize(
 }
 
 std::tuple<Qn::AuthResult, QnResourcePtr> GenericUserDataProvider::authorize(
-    const nx_http::Method::ValueType& method,
-    const nx_http::header::Authorization& authorizationHeader,
-    nx_http::HttpHeaders* const responseHeaders)
+    const nx::network::http::Method::ValueType& method,
+    const nx::network::http::header::Authorization& authorizationHeader,
+    nx::network::http::HttpHeaders* const responseHeaders)
 {
     auto res = findResByName(authorizationHeader.userid());
     if (!res)

@@ -55,7 +55,7 @@ AccountManager::~AccountManager()
 }
 
 void AccountManager::authenticateByName(
-    const nx_http::StringType& username,
+    const nx::network::http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
     const nx::utils::stree::AbstractResourceReader& authSearchInputData,
     nx::utils::stree::ResourceContainer* const authProperties,
@@ -192,8 +192,8 @@ void AccountManager::updateAccount(
     data::AccountUpdateDataWithEmail updateDataWithEmail(std::move(accountData));
     updateDataWithEmail.email = accountEmail;
 
-    auto onUpdateCompletion = 
-        [this, 
+    auto onUpdateCompletion =
+        [this,
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             authenticatedByEmailCode,
             completionHandler = std::move(completionHandler)](
@@ -297,7 +297,7 @@ void AccountManager::reactivateAccount(
         {
             return issueAccountActivationCode(
                 queryContext,
-                accountEmail, 
+                accountEmail,
                 std::move(notification),
                 resultData);
         },
@@ -357,9 +357,11 @@ void AccountManager::createTemporaryCredentials(
         nx::utils::timeSinceEpoch().count() +
         params.timeouts.expirationPeriod.count();
     if (params.timeouts.autoProlongationEnabled)
-        tempPasswordData.prolongationPeriodSec = 
+    {
+        tempPasswordData.prolongationPeriodSec =
             std::chrono::duration_cast<std::chrono::seconds>(
                 params.timeouts.prolongationPeriod).count();
+    }
     tempPasswordData.maxUseCount = std::numeric_limits<int>::max();
     //filling in access rights
     tempPasswordData.accessRights.requestsDenied.push_back(kAccountUpdatePath);
@@ -430,7 +432,7 @@ nx::utils::db::DBResult AccountManager::updateAccount(
     auto dbResult = m_dao->update(queryContext, account);
     if (dbResult != nx::utils::db::DBResult::ok)
         return dbResult;
-    
+
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         [this, account = std::move(account)]() mutable
         {
@@ -479,12 +481,12 @@ nx::utils::db::DBResult AccountManager::createPasswordResetCode(
         queryContext,
         tempPasswordData,
         &credentials);
-    if (dbResultCode != nx::utils::db::DBResult::ok && 
+    if (dbResultCode != nx::utils::db::DBResult::ok &&
         dbResultCode != nx::utils::db::DBResult::notFound)
     {
         return dbResultCode;
     }
-    
+
     std::string temporaryPassword;
     if (dbResultCode == nx::utils::db::DBResult::ok)
     {
@@ -520,11 +522,6 @@ void AccountManager::addExtension(AbstractAccountManagerExtension* extension)
 void AccountManager::removeExtension(AbstractAccountManagerExtension* extension)
 {
     m_extensions.remove(extension);
-}
-
-void AccountManager::setUpdateAccountSubroutine(UpdateAccountSubroutine func)
-{
-    m_updateAccountSubroutine = std::move(func);
 }
 
 nx::utils::db::DBResult AccountManager::fillCache()
@@ -594,7 +591,7 @@ nx::utils::db::DBResult AccountManager::registerNewAccountInDb(
                 cl_logDEBUG1);
             return nx::utils::db::DBResult::uniqueConstraintViolation;
         }
-        
+
         existingAccount.statusCode = api::AccountStatus::awaitingActivation;
         // Merging existing account with new one.
         auto accountIdBak = std::move(existingAccount.id);
@@ -650,7 +647,7 @@ nx::utils::db::DBResult AccountManager::issueAccountActivationCode(
     else
     {
         auto emailVerificationCode = QnUuid::createUuid().toByteArray().toHex().toStdString();
-        const auto codeExpirationTime = 
+        const auto codeExpirationTime =
             QDateTime::currentDateTimeUtc().addSecs(
                 std::chrono::duration_cast<std::chrono::seconds>(
                     m_settings.accountManager().accountActivationCodeExpirationTimeout).count());
@@ -795,8 +792,10 @@ nx::utils::db::DBResult AccountManager::updateAccountInDb(
             account);
     }
 
-    if (m_updateAccountSubroutine)
-        return m_updateAccountSubroutine(queryContext, accountUpdateData);
+    m_extensions.invoke(
+        &AbstractAccountManagerExtension::afterUpdatingAccount,
+        queryContext,
+        accountUpdateData);
 
     return nx::utils::db::DBResult::ok;
 }
@@ -869,7 +868,7 @@ nx::utils::db::DBResult AccountManager::resetPassword(
             .arg(accountEmail), cl_logDEBUG1);
         return dbResult;
     }
-    
+
     RestorePasswordNotification notification;
     notification.customization = account.customization;
     notification.setAddressee(accountEmail);

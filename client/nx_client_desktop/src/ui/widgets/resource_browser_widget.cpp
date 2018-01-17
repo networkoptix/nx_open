@@ -16,7 +16,7 @@
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QGraphicsLinearLayout>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 #include <client/client_runtime_settings.h>
 
@@ -107,7 +107,7 @@ static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* it
 // -------------------------------------------------------------------------- //
 QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchContext* context):
     QWidget(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(context),
     ui(new Ui::ResourceBrowserWidget()),
     m_ignoreFilterChanges(false),
     m_filterTimerId(0),

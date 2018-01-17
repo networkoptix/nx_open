@@ -1,12 +1,13 @@
 #ifndef QN_BUFFERED_FRAME_DISPLAYER_H
 #define QN_BUFFERED_FRAME_DISPLAYER_H
 
+#include <set>
+
 #include <QtCore/QTime>
 #include <nx/utils/thread/mutex.h>
-
 #include <nx/utils/thread/long_runnable.h>
-#include <utils/common/threadqueue.h>
 
+#include <utils/common/threadqueue.h>
 
 class QnAbstractRenderer;
 class CLVideoDecoderOutput;
@@ -19,7 +20,7 @@ class QnBufferedFrameDisplayer: public QnLongRunnable
 public:
     QnBufferedFrameDisplayer();
 
-    void setRenderList(QSet<QnAbstractRenderer*> renderList);
+    void setRenderList(std::set<QnAbstractRenderer*> renderList);
 
     virtual ~QnBufferedFrameDisplayer();
 
@@ -43,7 +44,7 @@ protected:
 
 private:
     QnSafeQueue<QSharedPointer<CLVideoDecoderOutput>> m_queue;
-    QSet<QnAbstractRenderer*> m_renderList;
+    std::set<QnAbstractRenderer*> m_renderList;
     qint64 m_lastQueuedTime;
     qint64 m_expectedTime;
     QTime m_timer;

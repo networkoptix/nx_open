@@ -1,6 +1,5 @@
 #include "connection_manager.h"
 
-#include <QtCore/QUrl>
 #include <QtGui/QGuiApplication>
 #include <QtCore/QMetaEnum>
 
@@ -27,6 +26,7 @@
 #include <nx_ec/dummy_handler.h>
 
 #include <watchers/user_watcher.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <network/system_helpers.h>
 #include <helpers/system_weight_helper.h>
@@ -40,7 +40,7 @@ namespace {
     const QString kLiteClientConnectionScheme = lit("liteclient");
     enum { kInvalidHandle = -1 };
 
-    QnConnectionManager::ConnectionType connectionTypeForUrl(const QUrl& url)
+    QnConnectionManager::ConnectionType connectionTypeForUrl(const nx::utils::Url& url)
     {
         if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host())
             || url.scheme() == QnConnectionManager::kCloudConnectionScheme)
@@ -78,12 +78,12 @@ public:
 
     void updateConnectionState();
 
-    void setUrl(const QUrl& url);
+    void setUrl(const nx::utils::Url &url);
 
     void setSystemName(const QString& systemName);
 
 public:
-    QUrl url;
+    nx::utils::Url url;
     QString systemName;
     bool suspended = false;
     bool wasConnected = false;
@@ -163,10 +163,10 @@ int QnConnectionManager::defaultServerPort() const
     return DEFAULT_APPSERVER_PORT;
 }
 
-QUrl QnConnectionManager::currentUrl() const
+nx::utils::Url QnConnectionManager::currentUrl() const
 {
     Q_D(const QnConnectionManager);
-    return d->url.isValid() ? d->url : QUrl();
+    return d->url.isValid() ? d->url : nx::utils::Url();
 }
 
 QString QnConnectionManager::currentHost() const
@@ -193,14 +193,14 @@ QnSoftwareVersion QnConnectionManager::connectionVersion() const
     return d->connectionVersion;
 }
 
-bool QnConnectionManager::connectToServer(const QUrl& url)
+bool QnConnectionManager::connectToServer(const nx::utils::Url& url)
 {
     Q_D(QnConnectionManager);
 
     if (connectionState() != QnConnectionManager::Disconnected)
         disconnectFromServer();
 
-    QUrl actualUrl = url;
+    nx::utils::Url actualUrl = url;
     if (actualUrl.port() == -1)
         actualUrl.setPort(defaultServerPort());
     actualUrl.setUserName(actualUrl.userName().toLower());
@@ -209,7 +209,7 @@ bool QnConnectionManager::connectToServer(const QUrl& url)
 }
 
 bool QnConnectionManager::connectToServer(
-    const QUrl &url,
+    const nx::utils::Url &url,
     const QString& userName,
     const QString& password,
     bool cloudConnection)
@@ -227,7 +227,7 @@ bool QnConnectionManager::connectByUserInput(
     const QString& userName,
     const QString& password)
 {
-    QUrl url = QUrl::fromUserInput(address);
+    nx::utils::Url url = nx::utils::Url::fromUserInput(address);
     if (url.port() <= 0)
         url.setPort(DEFAULT_APPSERVER_PORT);
 
@@ -243,7 +243,7 @@ void QnConnectionManager::disconnectFromServer()
     if (d->connectionHandle != kInvalidHandle)
     {
         d->connectionHandle = kInvalidHandle;
-        d->setUrl(QUrl());
+        d->setUrl(nx::utils::Url());
         d->updateConnectionState();
         return;
     }
@@ -254,7 +254,7 @@ void QnConnectionManager::disconnectFromServer()
     d->wasConnected = false;
     d->doDisconnect();
 
-    d->setUrl(QUrl());
+    d->setUrl(nx::utils::Url());
     commonModule()->instance<QnUserWatcher>()->setUserName(QString());
 
     // TODO: #dklychkov Move it to a better place
@@ -497,7 +497,7 @@ void QnConnectionManagerPrivate::updateConnectionState()
     emit q->connectionStateChanged();
 }
 
-void QnConnectionManagerPrivate::setUrl(const QUrl& url)
+void QnConnectionManagerPrivate::setUrl(const nx::utils::Url& url)
 {
     if (this->url == url)
         return;

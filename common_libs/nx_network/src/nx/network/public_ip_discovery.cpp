@@ -97,12 +97,12 @@ QHostAddress PublicIPDiscovery::publicIP() const
     return m_publicIP;
 }
 
-void PublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpClient)
+void PublicIPDiscovery::handleReply(const nx::network::http::AsyncHttpClientPtr& httpClient)
 {
     /* Check if reply finished successfully. */
 
     if ((httpClient->failed()) ||
-        (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok))
+        (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok))
     {
         return;
     }
@@ -111,7 +111,7 @@ void PublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpClien
     const QRegExp ipRegExpr(kIpRegExprValue);
 
     /* Check if reply contents contain any ip address. */
-    QByteArray response = 
+    QByteArray response =
         QByteArray(" ") + httpClient->fetchMessageBodyBuffer() + QByteArray(" ");
     const int ipPos = ipRegExpr.indexIn(QString::fromUtf8(response));
     if (ipPos < 0)
@@ -137,7 +137,7 @@ void PublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpClien
 
 void PublicIPDiscovery::sendRequest(const QString &url)
 {
-    nx_http::AsyncHttpClientPtr httpRequest = nx_http::AsyncHttpClient::create();
+    nx::network::http::AsyncHttpClientPtr httpRequest = nx::network::http::AsyncHttpClient::create();
     httpRequest->bindToAioThread(getAioThread());
     {
         QnMutexLocker lock(&m_mutex);
@@ -145,7 +145,7 @@ void PublicIPDiscovery::sendRequest(const QString &url)
     }
 
     auto at_reply_finished =
-        [this](const nx_http::AsyncHttpClientPtr& httpClient) mutable
+        [this](const nx::network::http::AsyncHttpClientPtr& httpClient) mutable
         {
             handleReply(httpClient);
             httpClient->disconnect();

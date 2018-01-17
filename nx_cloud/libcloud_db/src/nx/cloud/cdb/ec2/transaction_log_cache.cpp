@@ -215,7 +215,7 @@ VmsTransactionLogCache::TranContext&
     return findTranContext(lock, tranId);
 }
 
-VmsTransactionLogCache::TranContext& 
+VmsTransactionLogCache::TranContext&
     VmsTransactionLogCache::findTranContext(const QnMutexLockerBase& /*lock*/, TranId tranId)
 {
     return m_tranIdToContext[tranId];

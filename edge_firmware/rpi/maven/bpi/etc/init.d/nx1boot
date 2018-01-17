@@ -58,6 +58,7 @@ export MNTDATAHDDPART=/mnt/hdd/data
 export HDDBOOTFLUSHSCRIPT=hddbootflush.sh
 export HDDBOOTFLUSH=/etc/init.d/$HDDBOOTFLUSHSCRIPT
 export HDDBOOT_INDICATOR=$MNTUBOOTENVPART/hddboot
+export TOOLS_DIR=/root/tools/$CUSTOMIZATION
 
 setup_hdd_environment() {
     if [ -f /tmp/hdd_native ]; then rm /tmp/hdd_native; fi
@@ -284,7 +285,7 @@ system_restore () {
         rm -Rf $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc/
         mkdir -p $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc/
         mkdir -p $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var/
-        cp -f /root/tools/nx/mediaserver.conf.template $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc
+        cp -f $TOOLS_DIR/mediaserver.conf.template $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc
         cp -f /opt/$CUSTOMIZATION/mediaserver/var/ecs_static.sqlite $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var
         mv -f $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/scripts $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var
         #restoring saved IP configuration

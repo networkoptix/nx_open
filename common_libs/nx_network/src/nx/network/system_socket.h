@@ -81,6 +81,8 @@ public:
     virtual bool isClosed() const override;
     virtual bool setReuseAddrFlag(bool reuseAddr) override;
     virtual bool getReuseAddrFlag(bool* val) const override;
+    virtual bool setReusePortFlag(bool value) override;
+    virtual bool getReusePortFlag(bool* value) const override;
     virtual bool setNonBlockingMode(bool val) override;
     virtual bool getNonBlockingMode(bool* val) const override;
     virtual bool getMtu(unsigned int* mtuValue) const override;
@@ -133,7 +135,7 @@ public:
 
     virtual bool connect(
         const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override;
+        std::chrono::milliseconds timeout) override;
 
     virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;
     virtual int send(const void* buffer, unsigned int bufferLen) override;
@@ -144,10 +146,10 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -160,7 +162,9 @@ public:
     virtual bool shutdown() override;
 
 protected:
-    bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
+    bool connectToIp(
+        const SocketAddress& remoteAddress,
+        std::chrono::milliseconds timeout);
 
     std::unique_ptr<aio::AsyncSocketImplHelper<SelfType>> m_aioHelper;
     bool m_connected;
@@ -186,13 +190,14 @@ public:
     TCPSocket(TCPSocket&&) = delete;
     TCPSocket& operator=(TCPSocket&&) = delete;
 
-    virtual bool reopen() override;
     virtual bool setNoDelay(bool value) override;
     virtual bool getNoDelay(bool* value) const override;
     virtual bool toggleStatisticsCollection(bool val) override;
     virtual bool getConnectionStatistics(StreamSocketInfo* info) override;
     virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
     virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
+
+    bool reopen();
 
 private:
     friend class TCPServerSocketPrivate;
@@ -295,7 +300,7 @@ public:
     virtual void sendToAsync(
         const nx::Buffer& buf,
         const SocketAddress& foreignAddress,
-        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) override;
     /**
      * Actually calls UDPSocket::recvFrom and makes datagram source address/port
      *   available through UDPSocket::lastDatagramSourceAddress.
@@ -307,7 +312,7 @@ public:
         SocketAddress* const sourceAddress ) override;
     virtual void recvFromAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> handler) override;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> handler) override;
     virtual SocketAddress lastDatagramSourceAddress() const override;
     virtual bool hasData() const override;
     /**

@@ -12,16 +12,13 @@
    All necessary files are on the rsync://noptix.enk.me/buildenv/test
 '''
 
-import abc
-import logging
-import pytest
 import os
 import time
-import json
-from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str
-from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
-import server_api_data_generators as generator
 
+import pytest
+
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
+from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str
 
 SERVER_CONFIG = dict(
     one=SimpleNamespace(
@@ -97,11 +94,6 @@ def assert_jsons_are_equal(json_one, json_two, json_name):
         assert json_one == json_two, json_name
 
 
-def store_json_data(filepath, json_data):
-    with open(filepath, 'wb') as f:
-        json.dump(json_data, f, sort_keys=True, indent=4, separators=(',', ': '))
-
-
 def wait_until_servers_have_same_full_info(one, two):
     start_time = datetime_utc_now()
     while True:
@@ -127,7 +119,8 @@ def wait_for_camera_disappearance_after_backup(server, camera_guid):
         time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.)
 
 
-def test_backup_restore(one, two, camera):
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85690455/Mediaserver+database+test#Mediaserverdatabasetest-test_backup_restore
+def test_backup_restore(artifact_factory, one, two, camera):
     two.merge_systems(one)
     full_info_initial = wait_until_servers_have_same_full_info(one, two)
     backup = one.rest_api.ec2.dumpDatabase.GET()
@@ -138,10 +131,18 @@ def test_backup_restore(one, two, camera):
     one.rest_api.ec2.restoreDatabase.POST(data=backup['data'])
     wait_for_camera_disappearance_after_backup(one, camera_guid)
     full_info_after_backup_restore = wait_until_servers_have_same_full_info(one, two)
-    assert full_info_after_backup_restore == full_info_initial
+    try:
+        assert full_info_after_backup_restore == full_info_initial
+    except AssertionError:
+        artifact_factory(['full_info_initial'],
+                             name='full_info_initial').save_json(full_info_initial)
+        artifact_factory(['full_info_after_backup_restore'],
+                             name='full_info_after_backup_restore').save_json(full_info_after_backup_restore)
+        raise
 
 
 # To detect VMS-5969
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85690455/Mediaserver+database+test#Mediaserverdatabasetest-test_server_guids_changed
 @pytest.mark.skip(reason="VMS-5969")
 @pytest.mark.parametrize('db_version', ['current'])
 def test_server_guids_changed(one, two):

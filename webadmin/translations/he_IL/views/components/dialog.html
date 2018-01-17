@@ -10,7 +10,7 @@
         <form class="master-controls" name="forms.localForm" novalidate disable-autocomplete>
             <div class="form-group" validate-field>
                 <input ng-model="settings.localLogin" name="localLogin" class="form-control"
-                       type="text" placeholder="כניסה" required readonly>
+                       type="text" placeholder="שם משתמש" required readonly>
             </div>
             <password-input ng-model="settings.localPassword"></password-input>
             <div class="form-group" validate-field ng-class="{'has-error':forms.localForm.passwordInput.$valid &&

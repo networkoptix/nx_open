@@ -1,5 +1,6 @@
 #include "basic_pollable.h"
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/utils/std/future.h>
 
 #include "../socket_global.h"
@@ -31,7 +32,15 @@ BasicPollable::BasicPollable(
 BasicPollable::~BasicPollable()
 {
     if (isInSelfAioThread())
+    {
         m_aioService->cancelPostedCalls(&m_pollable, true);
+    }
+    else
+    {
+        NX_CRITICAL(!m_aioService->isSocketBeingMonitored(&m_pollable),
+            "You MUST cancel running async operation before deleting pollable "
+            "if you delete it from non-aio thread");
+    }
 }
 
 void BasicPollable::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -58,7 +67,7 @@ void BasicPollable::pleaseStopSync(bool checkForLocks)
     else
     {
         NX_ASSERT(!m_aioService->isInAnyAioThread());
-        QnStoppableAsync::pleaseStopSync(checkForLocks);
+        QnStoppableAsync::pleaseStopSync(m_aioService, checkForLocks);
     }
 }
 

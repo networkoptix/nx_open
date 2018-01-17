@@ -19,15 +19,14 @@ namespace api {
 
 static ClientFactory::CustomFactoryFunc factoryFunc;
 
-std::unique_ptr<Client> ClientFactory::create(
-    const QUrl& baseUrl)
+std::unique_ptr<Client> ClientFactory::create(const utils::Url &baseUrl)
 {
     if (factoryFunc)
         return factoryFunc(baseUrl);
     return std::make_unique<ClientImpl>(baseUrl);
 }
 
-ClientFactory::CustomFactoryFunc 
+ClientFactory::CustomFactoryFunc
     ClientFactory::setCustomFactoryFunc(CustomFactoryFunc newFactoryFunc)
 {
     CustomFactoryFunc oldFunc;
@@ -39,7 +38,7 @@ ClientFactory::CustomFactoryFunc
 //-------------------------------------------------------------------------------------------------
 // ClientImpl
 
-ClientImpl::ClientImpl(const QUrl& baseUrl):
+ClientImpl::ClientImpl(const nx::utils::Url& baseUrl):
     m_baseUrl(baseUrl),
     m_prevSysErrorCode(SystemError::noError)
 {
@@ -63,7 +62,7 @@ void ClientImpl::beginListening(
 
     issueUpgradeRequest<
         BeginListeningRequest, nx::String, BeginListeningHandler, BeginListeningResponse>(
-            nx_http::Method::post,
+            nx::network::http::Method::post,
             kRelayProtocolName,
             std::move(request),
             kServerIncomingConnectionsPath,
@@ -82,7 +81,7 @@ void ClientImpl::startSession(
     request.desiredSessionId = desiredSessionId.toStdString();
     request.targetPeerName = targetPeerName.toStdString();
 
-    const auto requestPath = nx_http::rest::substituteParameters(
+    const auto requestPath = nx::network::http::rest::substituteParameters(
         kServerClientSessionsPath, {targetPeerName});
 
     issueRequest<CreateClientSessionRequest, CreateClientSessionResponse>(
@@ -95,12 +94,12 @@ void ClientImpl::startSession(
             CreateClientSessionResponse response)
         {
             response.actualRelayUrl = contentLocationUrl;
-            // Removing request path from the end of response.actualRelayUrl 
+            // Removing request path from the end of response.actualRelayUrl
             // so that we have basic relay url.
             NX_ASSERT(
-                response.actualRelayUrl.find(requestPath.toStdString()) != std::string::npos);
+                response.actualRelayUrl.find(requestPath) != std::string::npos);
             NX_ASSERT(
-                response.actualRelayUrl.find(requestPath.toStdString()) + requestPath.size() ==
+                response.actualRelayUrl.find(requestPath) + requestPath.size() ==
                 response.actualRelayUrl.size());
 
             response.actualRelayUrl.erase(
@@ -120,7 +119,7 @@ void ClientImpl::openConnectionToTheTargetHost(
 
     issueUpgradeRequest<
         ConnectToPeerRequest, nx::String, OpenRelayConnectionHandler>(
-            nx_http::Method::post,
+            nx::network::http::Method::post,
             kRelayProtocolName,
             std::move(request),
             kClientSessionConnectionsPath,
@@ -128,7 +127,7 @@ void ClientImpl::openConnectionToTheTargetHost(
             std::move(completionHandler));
 }
 
-QUrl ClientImpl::url() const
+nx::utils::Url ClientImpl::url() const
 {
     return m_baseUrl;
 }
@@ -150,14 +149,14 @@ template<
     typename ... Response
 >
 void ClientImpl::issueUpgradeRequest(
-    nx_http::Method::ValueType httpMethod,
-    const nx_http::StringType& protocolToUpgradeTo,
+    nx::network::http::Method::ValueType httpMethod,
+    const nx::network::http::StringType& protocolToUpgradeTo,
     Request request,
     const char* requestPathTemplate,
     std::initializer_list<RequestPathArgument> requestPathArguments,
     CompletionHandler completionHandler)
 {
-    using ResponseOrVoid = 
+    using ResponseOrVoid =
         typename nx::utils::tuple_first_element<void, std::tuple<Response...>>::type;
 
     auto httpClient = prepareHttpRequest<Request, ResponseOrVoid>(
@@ -196,7 +195,7 @@ void ClientImpl::issueRequest(
         std::move(requestPathArguments));
 
     post(
-        [this, httpClient = std::move(httpClient), 
+        [this, httpClient = std::move(httpClient),
             completionHandler = std::move(completionHandler)]() mutable
         {
             executeRequest<Response>(
@@ -205,20 +204,20 @@ void ClientImpl::issueRequest(
 }
 
 template<typename Request, typename Response, typename RequestPathArgument>
-std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
+std::unique_ptr<nx::network::http::FusionDataHttpClient<Request, Response>>
     ClientImpl::prepareHttpRequest(
         Request request,
         const char* requestPathTemplate,
         std::initializer_list<RequestPathArgument> requestPathArguments)
 {
-    QUrl requestUrl = m_baseUrl;
+    nx::utils::Url requestUrl = m_baseUrl;
     requestUrl.setPath(network::url::normalizePath(
         requestUrl.path() +
-        nx_http::rest::substituteParameters(
-            requestPathTemplate, std::move(requestPathArguments))));
+        nx::network::http::rest::substituteParameters(
+            requestPathTemplate, std::move(requestPathArguments)).c_str()));
 
     auto httpClient = std::make_unique<
-        nx_http::FusionDataHttpClient<Request, Response>>(
+        nx::network::http::FusionDataHttpClient<Request, Response>>(
             requestUrl,
             m_authInfo,
             std::move(request));
@@ -228,8 +227,8 @@ std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
 
 template<typename HttpClient, typename CompletionHandler, typename ... Response>
 void ClientImpl::executeUpgradeRequest(
-    nx_http::Method::ValueType httpMethod,
-    const nx_http::StringType& protocolToUpgradeTo,
+    nx::network::http::Method::ValueType httpMethod,
+    const nx::network::http::StringType& protocolToUpgradeTo,
     HttpClient httpClient,
     CompletionHandler completionHandler)
 {
@@ -242,7 +241,7 @@ void ClientImpl::executeUpgradeRequest(
             httpClientIter = std::prev(m_activeRequests.end()),
             completionHandler = std::move(completionHandler)](
                 SystemError::ErrorCode sysErrorCode,
-                const nx_http::Response* httpResponse,
+                const nx::network::http::Response* httpResponse,
                 Response ... response) mutable
         {
             auto connection = httpClientPtr->takeSocket();
@@ -269,10 +268,10 @@ void ClientImpl::executeRequest(
             httpClientIter = std::prev(m_activeRequests.end()),
             completionHandler = std::move(completionHandler)](
                 SystemError::ErrorCode sysErrorCode,
-                const nx_http::Response* httpResponse,
+                const nx::network::http::Response* httpResponse,
                 Response response) mutable
         {
-            auto contentLocationUrl = 
+            auto contentLocationUrl =
                 httpClientPtr->httpClient().contentLocationUrl().toString().toStdString();
             m_prevSysErrorCode = sysErrorCode;
             const auto resultCode = toResultCode(sysErrorCode, httpResponse);
@@ -283,26 +282,26 @@ void ClientImpl::executeRequest(
 
 ResultCode ClientImpl::toUpgradeResultCode(
     SystemError::ErrorCode sysErrorCode,
-    const nx_http::Response* httpResponse)
+    const nx::network::http::Response* httpResponse)
 {
     if (sysErrorCode != SystemError::noError || !httpResponse)
         return ResultCode::networkError;
 
-    if (httpResponse->statusLine.statusCode == nx_http::StatusCode::switchingProtocols)
+    if (httpResponse->statusLine.statusCode == nx::network::http::StatusCode::switchingProtocols)
         return ResultCode::ok;
 
     const auto resultCode = toResultCode(sysErrorCode, httpResponse);
     if (resultCode == api::ResultCode::ok)
     {
         // Server did not upgrade connection, but reported OK. It is unexpected...
-        return api::ResultCode::unknownError; 
+        return api::ResultCode::unknownError;
     }
     return resultCode;
 }
 
 ResultCode ClientImpl::toResultCode(
     SystemError::ErrorCode sysErrorCode,
-    const nx_http::Response* httpResponse)
+    const nx::network::http::Response* httpResponse)
 {
     if (sysErrorCode != SystemError::noError || !httpResponse)
         return ResultCode::networkError;
@@ -317,7 +316,7 @@ ResultCode ClientImpl::toResultCode(
     }
 
     return fromHttpStatusCode(
-        static_cast<nx_http::StatusCode::Value>(
+        static_cast<nx::network::http::StatusCode::Value>(
             httpResponse->statusLine.statusCode));
 }
 

@@ -17,12 +17,14 @@ enum class Value
     CommonNotification,
     ImportantNotification,
     CriticalNotification,
+    SuccessNotification,
     LevelCount
 };
 
 Value valueOf(const nx::vms::event::AbstractActionPtr &businessAction);
 Value valueOf(QnSystemHealth::MessageType messageType);
 
+QColor notificationTextColor(Value level);
 QColor notificationColor(Value level);
 
 };

@@ -99,7 +99,7 @@ void DeprecatedMulticastFinder::updateInterfaces()
     QList<QHostAddress> addressesToRemove = m_clientSockets.keys();
 
     /* This function only adds interfaces to the list. */
-    for (const QString &addressStr: getLocalIpV4AddressList())
+    for (const QString &addressStr: nx::network::getLocalIpV4AddressList())
     {
         QHostAddress address(addressStr);
         addressesToRemove.removeOne(address);
@@ -112,9 +112,9 @@ void DeprecatedMulticastFinder::updateInterfaces()
             //if( addressToUse == QHostAddress(lit("127.0.0.1")) )
             //    continue;
             auto sock = std::make_unique<nx::network::UDPSocket>(AF_INET);
-            sock->bind(SocketAddress(address.toString(), 0));
+            sock->bind(nx::network::SocketAddress(address.toString(), 0));
             sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
-            sock->setDestAddr(SocketAddress(m_multicastGroupAddress.toString(), m_multicastGroupPort));
+            sock->setDestAddr(nx::network::SocketAddress(m_multicastGroupAddress.toString(), m_multicastGroupPort));
             auto it = m_clientSockets.insert(address, sock.release());
             if (m_serverSocket)
             {
@@ -196,7 +196,7 @@ bool DeprecatedMulticastFinder::processDiscoveryRequest(UDPSocket *udpSocket)
     static const size_t READ_BUFFER_SIZE = UDPSocket::MAX_PACKET_SIZE;
     quint8 readBuffer[READ_BUFFER_SIZE];
 
-    SocketAddress remoteEndpoint;
+    nx::network::SocketAddress remoteEndpoint;
     int bytesRead = udpSocket->recvFrom(readBuffer, READ_BUFFER_SIZE, &remoteEndpoint);
     if (bytesRead == -1)
     {
@@ -259,7 +259,7 @@ bool DeprecatedMulticastFinder::processDiscoveryResponse(UDPSocket *udpSocket)
     const size_t readBufferSize = UDPSocket::MAX_PACKET_SIZE;
     quint8 readBuffer[readBufferSize];
 
-    SocketAddress remoteEndpoint;
+    nx::network::SocketAddress remoteEndpoint;
     int bytesRead = udpSocket->recvFrom(readBuffer, readBufferSize, &remoteEndpoint);
     if (bytesRead == -1)
     {
@@ -305,7 +305,7 @@ bool DeprecatedMulticastFinder::processDiscoveryResponse(UDPSocket *udpSocket)
 
     emit responseReceived(
         *response,
-        SocketAddress(remoteEndpoint.address.toString(), response->port),
+        nx::network::SocketAddress(remoteEndpoint.address.toString(), response->port),
         remoteEndpoint.address);
     return true;
 }
@@ -327,7 +327,7 @@ void DeprecatedMulticastFinder::run()
         QnMutexLocker lk(&m_mutex);
         m_serverSocket.reset(new UDPSocket(AF_INET));
         m_serverSocket->setReuseAddrFlag(true);
-        m_serverSocket->bind(SocketAddress(HostAddress::anyHost, m_multicastGroupPort));
+        m_serverSocket->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, m_multicastGroupPort));
         if (!m_pollSet.add(m_serverSocket.get(), aio::etRead, m_serverSocket.get()))
             NX_ASSERT(false, SystemError::getLastOSErrorText());
         else
@@ -380,24 +380,6 @@ void DeprecatedMulticastFinder::run()
             }
 
             m_prevPingClock = currentClock;
-        }
-
-        if (const auto timeout = SocketGlobals::debugIni().multicastModuleFinderTimeout)
-        {
-            NX_INFO(this, lm("Avoid using poll, use %1 ms recv timeouts instead").arg(timeout));
-            if (m_serverSocket)
-            {
-                m_serverSocket->setRecvTimeout((unsigned int) timeout);
-                processDiscoveryRequest(m_serverSocket.get());
-            }
-
-            for (auto& socket: m_clientSockets)
-            {
-                socket->setRecvTimeout((unsigned int) timeout);
-                processDiscoveryResponse(socket);
-            }
-
-            continue;
         }
 
         int socketCount = m_pollSet.poll(m_pingTimeoutMillis - (currentClock - m_prevPingClock));

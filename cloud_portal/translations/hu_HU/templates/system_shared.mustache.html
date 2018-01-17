@@ -3,6 +3,8 @@
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> megosztotta {{message.system_name}} rendszerét Önnel.</p>
 {{/message.sharer_name}}
+
+{{^message.sharer_name}}
 <p>Hozzáférést kapott {{message.system_name}} videó rendszerhez.</p>
 {{/message.sharer_name}}
 

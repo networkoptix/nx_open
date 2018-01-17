@@ -10,7 +10,7 @@
 #include <QtCore/QObject>
 
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/retry_timer.h>
 
@@ -55,18 +55,18 @@ private:
 
     std::unique_ptr<network::cloud::CloudModuleUrlFetcher::ScopedOperation>
         m_cdbEndPointFetcher;
-    nx_http::AuthInfo m_auth;
-    nx_http::AsyncHttpClientPtr m_httpClient;
+    nx::network::http::AuthInfo m_auth;
+    nx::network::http::AsyncHttpClientPtr m_httpClient;
     api::SystemEventHandlers m_eventHandlers;
     std::function<void(api::ResultCode)> m_connectCompletionHandler;
-    std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
+    std::shared_ptr<nx::network::http::MultipartContentParser> m_multipartContentParser;
     network::RetryTimer m_reconnectTimer;
     State m_state;
-    QUrl m_cdbUrl;
+    nx::utils::Url m_cdbUrl;
 
     void cdbEndpointResolved(
-        nx_http::StatusCode::Value resCode,
-        QUrl url);
+        nx::network::http::StatusCode::Value resCode,
+        nx::utils::Url url);
     void initiateConnection();
     void connectionAttemptHasFailed(api::ResultCode result);
     void retryToConnect();
@@ -78,9 +78,9 @@ private:
         std::uint16_t proxyPort) override;
 
 private:
-    void onHttpResponseReceived(nx_http::AsyncHttpClientPtr);
-    void onSomeMessageBodyAvailable(nx_http::AsyncHttpClientPtr);
-    void onHttpClientDone(nx_http::AsyncHttpClientPtr);
+    void onHttpResponseReceived(nx::network::http::AsyncHttpClientPtr);
+    void onSomeMessageBodyAvailable(nx::network::http::AsyncHttpClientPtr);
+    void onHttpClientDone(nx::network::http::AsyncHttpClientPtr);
     void onReceivingSerializedEvent(QByteArray serializedEvent);
 };
 

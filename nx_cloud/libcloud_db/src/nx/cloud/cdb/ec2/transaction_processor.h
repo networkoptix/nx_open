@@ -5,7 +5,6 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
-#include <common/common_globals.h>
 #include <transaction/transaction_transport_header.h>
 #include <transaction/transaction.h>
 #include <nx/utils/db/async_sql_query_executor.h>
@@ -14,9 +13,7 @@
 #include "transaction_log.h"
 #include "transaction_transport_header.h"
 
-namespace ec2 {
-class QnAbstractTransaction;
-} // namespace ec2
+namespace ec2 { class QnAbstractTransaction; }
 
 namespace nx {
 namespace cdb {
@@ -262,7 +259,7 @@ private:
         TransactionProcessedHandler handler) override
     {
         using namespace std::placeholders;
-        
+
         auto auxiliaryArg = std::make_unique<AuxiliaryArgType>();
         auto auxiliaryArgPtr = auxiliaryArg.get();
         TransactionContext transactionContext{
@@ -286,7 +283,7 @@ private:
             {
                 dbProcessingCompleted(
                     queryContext,
-                    dbResult, 
+                    dbResult,
                     std::move(*auxiliaryArg),
                     std::move(handler));
             });
@@ -303,12 +300,12 @@ private:
                 transactionContext.transportHeader.systemId,
                 transactionContext.transaction);
 
-        const auto transactionCommand = 
+        const auto transactionCommand =
             transactionContext.transaction.get().command;
 
         if (dbResultCode == nx::utils::db::DBResult::cancelled)
         {
-            NX_LOGX(QnLog::EC2_TRAN_LOG, 
+            NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Ec2 transaction log skipped transaction %1 received from (%2, %3)")
                 .arg(::ec2::ApiCommand::toString(transactionCommand))
                 .arg(transactionContext.transportHeader.systemId)
@@ -318,7 +315,7 @@ private:
         }
         else if (dbResultCode != nx::utils::db::DBResult::ok)
         {
-            NX_LOGX(QnLog::EC2_TRAN_LOG, 
+            NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Error saving transaction %1 received from (%2, %3) to the log. %4")
                 .arg(::ec2::ApiCommand::toString(transactionCommand))
                 .arg(transactionContext.transportHeader.systemId)
@@ -335,7 +332,7 @@ private:
             auxiliaryArg);
         if (dbResultCode != nx::utils::db::DBResult::ok)
         {
-            NX_LOGX(QnLog::EC2_TRAN_LOG, 
+            NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Error processing transaction %1 received from %2. %3")
                 .arg(::ec2::ApiCommand::toString(transactionCommand))
                 .arg(transactionContext.transportHeader)

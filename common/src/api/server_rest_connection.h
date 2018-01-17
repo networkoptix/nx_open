@@ -9,7 +9,7 @@
 #include "utils/common/request_param.h"
 #include "nx_ec/data/api_fwd.h"
 #include <api/helpers/request_helpers_fwd.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include <rest/server/json_rest_result.h>
 #include <nx/utils/safe_direct_connection.h>
@@ -18,6 +18,7 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 #include <api/model/time_reply.h>
+#include <analytics/detected_objects_storage/analytics_events_storage.h>
 
 /**
  * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -83,6 +84,8 @@ public:
     */
     Handle cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread = 0);
 
+    Handle getServerLocalTime(Result<QnJsonRestResult>::type callback, QThread* targetThread = nullptr);
+
     /**
     * Get camera thumbnail for specified time.
     *
@@ -96,7 +99,12 @@ public:
         Result<QByteArray>::type callback,
         QThread* targetThread = 0);
 
-    Handle twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread = 0);
+    Handle twoWayAudioCommand(
+        const QString& sourceId,
+        const QnUuid& cameraId,
+        bool start,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
 
     Handle softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
             nx::vms::event::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
@@ -163,9 +171,8 @@ public:
         Result<QByteArray>::type callback,
         QThread* targetThread = nullptr);
 
-    Handle downloadFileChunkFromInternet(
-        const QString& fileName,
-        const QUrl& url,
+    Handle downloadFileChunkFromInternet(const QString& fileName,
+        const nx::utils::Url &url,
         int chunkIndex,
         int chunkSize,
         Result<QByteArray>::type callback,
@@ -198,6 +205,27 @@ public:
         Result<EventLogData>::type callback,
         QThread *targetThread = nullptr);
 
+    Handle getEvents(const QnEventLogMultiserverRequestData& request,
+        Result<EventLogData>::type callback,
+        QThread *targetThread = nullptr);
+
+    /**
+     * Change user's password on a camera. This method doesn't create new user.
+     * Only cameras with capability Qn::SetUserPasswordCapability support it.
+     * @param id camera id
+     * @param auth user name and new password. User name should exists on camera.
+     */
+    Handle changeCameraPassword(
+        const QnUuid& id,
+        const QAuthenticator& auth,
+        Result<QnRestResult>::type callback,
+        QThread *targetThread = nullptr);
+
+    Handle lookupDetectedObjects(
+        const nx::analytics::storage::Filter& request,
+        Result<nx::analytics::storage::LookupResult>::type callback,
+        QThread* targetThread = nullptr);
+
     /**
     * Cancel running request by known requestID. If request is canceled, callback isn't called.
     * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.
@@ -206,7 +234,7 @@ public:
     void cancelRequest(const Handle& requestId);
 
 private slots:
-    void onHttpClientDone(int requestId, nx_http::AsyncHttpClientPtr httpClient);
+    void onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient);
 private:
     template <typename ResultType> Handle executeGet(
         const QString& path,
@@ -217,16 +245,16 @@ private:
     template <typename ResultType> Handle executePost(
         const QString& path,
         const QnRequestParamList& params,
-        const nx_http::StringType& contentType,
-        const nx_http::StringType& messageBody,
+        const nx::network::http::StringType& contentType,
+        const nx::network::http::StringType& messageBody,
         Callback<ResultType> callback,
         QThread* targetThread);
 
     template <typename ResultType> Handle executePut(
         const QString& path,
         const QnRequestParamList& params,
-        const nx_http::StringType& contentType,
-        const nx_http::StringType& messageBody,
+        const nx::network::http::StringType& contentType,
+        const nx::network::http::StringType& messageBody,
         Callback<ResultType> callback,
         QThread* targetThread);
 
@@ -237,28 +265,28 @@ private:
         QThread* targetThread);
 
     template <typename ResultType>
-    Handle executeRequest(const nx_http::ClientPool::Request& request,
+    Handle executeRequest(const nx::network::http::ClientPool::Request& request,
         Callback<ResultType> callback,
         QThread* targetThread);
 
-    Handle executeRequest(const nx_http::ClientPool::Request& request,
+    Handle executeRequest(const nx::network::http::ClientPool::Request& request,
         Callback<QByteArray> callback,
         QThread* targetThread);
 
-    Handle executeRequest(const nx_http::ClientPool::Request& request,
+    Handle executeRequest(const nx::network::http::ClientPool::Request& request,
         Callback<EmptyResponseType> callback,
         QThread* targetThread);
 
     QUrl prepareUrl(const QString& path, const QnRequestParamList& params) const;
 
-    nx_http::ClientPool::Request prepareRequest(
-        nx_http::Method::ValueType method,
+    nx::network::http::ClientPool::Request prepareRequest(
+        nx::network::http::Method::ValueType method,
         const QUrl& url,
-        const nx_http::StringType& contentType = nx_http::StringType(),
-        const nx_http::StringType& messageBody = nx_http::StringType());
+        const nx::network::http::StringType& contentType = nx::network::http::StringType(),
+        const nx::network::http::StringType& messageBody = nx::network::http::StringType());
 
-    typedef std::function<void (Handle, SystemError::ErrorCode, int, nx_http::StringType contentType, nx_http::BufferType msgBody)> HttpCompletionFunc;
-    Handle sendRequest(const nx_http::ClientPool::Request& request, HttpCompletionFunc callback = HttpCompletionFunc());
+    typedef std::function<void (Handle, SystemError::ErrorCode, int, nx::network::http::StringType contentType, nx::network::http::BufferType msgBody)> HttpCompletionFunc;
+    Handle sendRequest(const nx::network::http::ClientPool::Request& request, HttpCompletionFunc callback = HttpCompletionFunc());
 
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 

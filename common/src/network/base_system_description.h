@@ -3,6 +3,7 @@
 #include <QtCore/QObject>
 
 #include <network/module_information.h>
+#include <nx/utils/url.h>
 
 class QnUuid;
 class QnBaseSystemDescription;
@@ -56,7 +57,7 @@ public:
     virtual bool isReachableServer(const QnUuid& serverId) const = 0;
 
     // TODO: #ynikitenkov Rename host "field" to appropriate
-    virtual QUrl getServerHost(const QnUuid& serverId) const = 0;
+    virtual nx::utils::Url getServerHost(const QnUuid& serverId) const = 0;
 
     virtual qint64 getServerLastUpdatedMs(const QnUuid& serverId) const = 0;
 

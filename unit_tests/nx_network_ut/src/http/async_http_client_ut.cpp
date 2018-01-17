@@ -4,10 +4,11 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <queue>
 
 #include <gtest/gtest.h>
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/http/http_client.h>
@@ -29,11 +30,13 @@
 
 #include "repeating_buffer_sender.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace test {
 
 class SslAssertHandler:
-    public nx_http::AbstractHttpRequestHandler
+    public nx::network::http::AbstractHttpRequestHandler
 {
 public:
     SslAssertHandler(bool expectSsl):
@@ -42,17 +45,17 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
         EXPECT_EQ(m_expectSsl, connection->isSsl());
-        completionHandler(nx_http::RequestResult(
-            nx_http::StatusCode::ok,
-            std::make_unique<nx_http::BufferSource>(
-                nx_http::BufferType("text/plain"), nx_http::BufferType("ok"))));
+        completionHandler(nx::network::http::RequestResult(
+            nx::network::http::StatusCode::ok,
+            std::make_unique<nx::network::http::BufferSource>(
+                nx::network::http::BufferType("text/plain"), nx::network::http::BufferType("ok"))));
     }
 
 private:
@@ -121,13 +124,13 @@ protected:
 
     void httpsTest(const QString& scheme, const QString& path)
     {
-        const QUrl url(lit("%1://%2/%3")
+        const nx::utils::Url url(lit("%1://%2/%3")
             .arg(scheme).arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
         nx::utils::promise<void> promise;
         NX_LOGX(lm("httpsTest: %1").arg(url), cl_logINFO);
 
-        const auto client = nx_http::AsyncHttpClient::create();
+        const auto client = nx::network::http::AsyncHttpClient::create();
         client->doGet(url,
             [&promise](AsyncHttpClientPtr ptr)
             {
@@ -138,15 +141,15 @@ protected:
         promise.get_future().wait();
     }
 
-    void testResult(const QString& path, const nx_http::BufferType& expectedResult)
+    void testResult(const QString& path, const nx::network::http::BufferType& expectedResult)
     {
-        const QUrl url(lit("http://%1%2")
+        const nx::utils::Url url(lit("http://%1%2")
             .arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
         nx::utils::promise<void> promise;
         NX_LOGX(lm("testResult: %1").arg(url), cl_logINFO);
 
-        const auto client = nx_http::AsyncHttpClient::create();
+        const auto client = nx::network::http::AsyncHttpClient::create();
         client->doGet(url,
             [&promise, &expectedResult](AsyncHttpClientPtr ptr)
             {
@@ -159,9 +162,9 @@ protected:
     }
 
 private:
-    nx::utils::SyncQueue<nx_http::Request> m_receivedRequests;
+    nx::utils::SyncQueue<nx::network::http::Request> m_receivedRequests;
 
-    QUrl commonTestUrl(const QString& requestPath) const
+    nx::utils::Url commonTestUrl(const QString& requestPath) const
     {
         return nx::network::url::Builder().setScheme("http")
             .setEndpoint(testHttpServer().serverAddress())
@@ -172,7 +175,7 @@ private:
     {
         nx::utils::promise<void> promise;
 
-        const auto client = nx_http::AsyncHttpClient::create();
+        const auto client = nx::network::http::AsyncHttpClient::create();
         client->doPost(
             commonTestUrl("/saveRequest"),
             "plain/text",
@@ -187,29 +190,29 @@ private:
     }
 
     void onRequestReceived(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request request,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request request,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
         m_receivedRequests.push(std::move(request));
-        completionHandler(nx_http::StatusCode::ok);
+        completionHandler(nx::network::http::StatusCode::ok);
     }
 };
 
 TEST_F(AsyncHttpClient, Https)
 {
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
-    httpsTest(nx_http::kUrlSchemeName, lit("httpOnly"));
-    httpsTest(nx_http::kSecureUrlSchemeName, lit("httpsOnly"));
+    httpsTest(nx::network::http::kUrlSchemeName, lit("httpOnly"));
+    httpsTest(nx::network::http::kSecureUrlSchemeName, lit("httpsOnly"));
 }
 
 // TODO: #mux Better create HttpServer test and move it there.
 TEST_F(AsyncHttpClient, ServerModRewrite)
 {
     m_testHttpServer->registerStaticProcessor(
-        nx_http::kAnyPath, "root", "text/plain");
+        nx::network::http::kAnyPath, "root", "text/plain");
     m_testHttpServer->registerStaticProcessor(
         lit("/somePath1/longerPath"), "someData1", "text/plain");
     m_testHttpServer->registerStaticProcessor(
@@ -241,12 +244,12 @@ TEST_F(AsyncHttpClient, ServerModRewrite)
 }
 
 namespace {
-static void testHttpClientForFastRemove(const QUrl& url)
+static void testHttpClientForFastRemove(const nx::utils::Url& url)
 {
     // use different delays (10us - 0.5s) to catch problems on different stages
     for (uint time = 10; time < 500000; time *= 2)
     {
-        const auto client = nx_http::AsyncHttpClient::create();
+        const auto client = nx::network::http::AsyncHttpClient::create();
         client->doGet(url);
 
         // kill the client after some delay
@@ -269,11 +272,11 @@ TEST_F(AsyncHttpClient, FastRemove)
 
 TEST_F(AsyncHttpClient, FastRemoveBadHost)
 {
-    QUrl url(lit("http://doestNotExist.host/"));
+    nx::utils::Url url(lit("http://doestNotExist.host/"));
 
     for (int i = 0; i < 1000; ++i)
     {
-        const auto client = nx_http::AsyncHttpClient::create();
+        const auto client = nx::network::http::AsyncHttpClient::create();
         client->doGet(url);
         std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
@@ -307,7 +310,7 @@ TEST_F(AsyncHttpClient, motionJpegRetrieval)
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
     //fetching mjpeg with async http client
-    const QUrl url(lit("http://127.0.0.1:%1/mjpg").arg(m_testHttpServer->serverAddress().port));
+    const nx::utils::Url url(lit("http://127.0.0.1:%1/mjpg").arg(m_testHttpServer->serverAddress().port));
 
     struct ClientContext
     {
@@ -317,8 +320,8 @@ TEST_F(AsyncHttpClient, motionJpegRetrieval)
             client.reset(); //ensuring client removed before multipartParser
         }
 
-        nx_http::AsyncHttpClientPtr client;
-        nx_http::MultipartContentParser multipartParser;
+        nx::network::http::AsyncHttpClientPtr client;
+        nx::network::http::MultipartContentParser multipartParser;
     };
 
     std::atomic<size_t> bytesProcessed(0);
@@ -331,24 +334,24 @@ TEST_F(AsyncHttpClient, motionJpegRetrieval)
     std::vector<ClientContext> clients(CONCURRENT_CLIENT_COUNT);
     for (ClientContext& clientCtx : clients)
     {
-        clientCtx.client = nx_http::AsyncHttpClient::create();
+        clientCtx.client = nx::network::http::AsyncHttpClient::create();
         clientCtx.multipartParser.setNextFilter(nx::utils::bstream::makeCustomOutputStream(checkReceivedContentFunc));
         QObject::connect(
-            clientCtx.client.get(), &nx_http::AsyncHttpClient::responseReceived,
+            clientCtx.client.get(), &nx::network::http::AsyncHttpClient::responseReceived,
             clientCtx.client.get(),
-            [&](nx_http::AsyncHttpClientPtr client)
+            [&](nx::network::http::AsyncHttpClientPtr client)
             {
                 ASSERT_TRUE(client->response() != nullptr);
-                ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
+                ASSERT_EQ(nx::network::http::StatusCode::ok, client->response()->statusLine.statusCode);
                 auto contentTypeIter = client->response()->headers.find("Content-Type");
                 ASSERT_TRUE(contentTypeIter != client->response()->headers.end());
                 clientCtx.multipartParser.setContentType(contentTypeIter->second);
             },
             Qt::DirectConnection);
         QObject::connect(
-            clientCtx.client.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
+            clientCtx.client.get(), &nx::network::http::AsyncHttpClient::someMessageBodyAvailable,
             clientCtx.client.get(),
-            [&](nx_http::AsyncHttpClientPtr client)
+            [&](nx::network::http::AsyncHttpClientPtr client)
             {
                 clientCtx.multipartParser.processData(client->fetchMessageBodyBuffer());
             },
@@ -383,14 +386,14 @@ class AsyncHttpClientTestMultiRequest:
 {
 public:
     AsyncHttpClientTestMultiRequest():
-        m_client(nx_http::AsyncHttpClient::create()),
+        m_client(nx::network::http::AsyncHttpClient::create()),
         m_requestFinished(false)
     {
         init();
     }
 
 protected:
-    void doRequest(const QUrl& url, const QByteArray& message)
+    void doRequest(const nx::utils::Url& url, const QByteArray& message)
     {
         static const int kWaitTimeoutMs = 1000 * 10;
 
@@ -411,13 +414,13 @@ protected:
 private:
     struct TestRequestContext
     {
-        QUrl url;
+        nx::utils::Url url;
         QByteArray message;
     };
 
     std::vector<TestRequestContext> m_requests;
 
-    nx_http::AsyncHttpClientPtr m_client;
+    nx::network::http::AsyncHttpClientPtr m_client;
     QnMutex m_mutex;
     QnWaitCondition m_waitCond;
     bool m_requestFinished;
@@ -430,7 +433,7 @@ private:
 
         for (std::size_t i = 0; i < m_requests.size(); ++i)
         {
-            m_requests[i].url = QUrl(
+            m_requests[i].url = nx::utils::Url(
                 lit("http://127.0.0.1/AsyncHttpClientTestMultiRequest_%1").arg(i));
             m_requests[i].message = lit("SimpleMessage_%1").arg(i).toLatin1();
         }
@@ -449,13 +452,13 @@ private:
             ctx.url.setPort(testHttpServer().serverAddress().port);
 
         QObject::connect(
-            m_client.get(), &nx_http::AsyncHttpClient::done,
+            m_client.get(), &nx::network::http::AsyncHttpClient::done,
             m_client.get(),
-            [this](nx_http::AsyncHttpClientPtr client) { onDone(std::move(client)); },
+            [this](nx::network::http::AsyncHttpClientPtr client) { onDone(std::move(client)); },
             Qt::DirectConnection);
     }
 
-    void onDone(nx_http::AsyncHttpClientPtr client)
+    void onDone(nx::network::http::AsyncHttpClientPtr client)
     {
         ASSERT_FALSE(client->failed()) << "Response: " <<
             (client->response() == nullptr
@@ -463,7 +466,7 @@ private:
                 : client->response()->statusLine.reasonPhrase.toStdString());
         client->socket()->cancelIOSync(nx::network::aio::etNone);
 
-        ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, client->response()->statusLine.statusCode);
         ASSERT_EQ(m_expectedResponse, client->fetchMessageBodyBuffer());
         auto contentTypeIter = client->response()->headers.find("Content-Type");
         ASSERT_TRUE(contentTypeIter != client->response()->headers.end());
@@ -529,16 +532,16 @@ protected:
         serverAddress = address.get_future().get();
     }
 
-    void testGet(const nx_http::AsyncHttpClientPtr& client, const QByteArray& query,
-        std::function<void(const nx_http::AsyncHttpClientPtr&)> expectations,
-        nx_http::HttpHeaders headers = {})
+    void testGet(const nx::network::http::AsyncHttpClientPtr& client, const QByteArray& query,
+        std::function<void(const nx::network::http::AsyncHttpClientPtr&)> expectations,
+        nx::network::http::HttpHeaders headers = {})
     {
         client->setAdditionalHeaders(headers);
 
         nx::utils::promise<void> clientDone;
         client->doGet(
             lit("http://%1/%2").arg(serverAddress.toString()).arg(QString::fromLatin1(query)),
-            [&](nx_http::AsyncHttpClientPtr client)
+            [&](nx::network::http::AsyncHttpClientPtr client)
             {
               expectations(client);
               clientDone.set_value();
@@ -564,9 +567,9 @@ TEST_F(AsyncHttpClientCustom, ConnectionBreak)
         "not enough content");
 
     start(kResponse, true);
-    auto client = nx_http::AsyncHttpClient::create();
+    auto client = nx::network::http::AsyncHttpClient::create();
     testGet(client, "test",
-        [](const nx_http::AsyncHttpClientPtr& client)
+        [](const nx::network::http::AsyncHttpClientPtr& client)
         {
             EXPECT_TRUE(client->failed());
             EXPECT_EQ(QByteArray("not enough content"), client->fetchMessageBodyBuffer());
@@ -596,7 +599,7 @@ TEST_F(AsyncHttpClientCustom, DISABLED_cameraThumbnail)
         "ec2/cameraThumbnail?format=ubjson&cameraId=%7B38c5e727-b304-d188-0733-8619d09baae5%7D"
             "&time=latest&rotate=-1&height=184&widht=0&imageFormat=jpeg&method=after";
 
-    static const nx_http::HttpHeaders kRequestHeaders =
+    static const nx::network::http::HttpHeaders kRequestHeaders =
     {
         {"X-server-guid", "{d16e21d4-0899-0a68-18c5-7e1058f229c4}"},
         {"X-Nx-User-Name", "admin"},
@@ -605,11 +608,11 @@ TEST_F(AsyncHttpClientCustom, DISABLED_cameraThumbnail)
     };
 
     start(kResponseHeader + kResponseBody, false);
-    auto client = nx_http::AsyncHttpClient::create();
+    auto client = nx::network::http::AsyncHttpClient::create();
     for (size_t i = 0; i < 5; ++i)
     {
         testGet(client, kRequestQuery,
-            [&](const nx_http::AsyncHttpClientPtr& client)
+            [&](const nx::network::http::AsyncHttpClientPtr& client)
             {
                 // Response is invalid, it has a message body with code "204 No Content" what is
                 // forbidden by HTTP RFC.
@@ -621,7 +624,7 @@ TEST_F(AsyncHttpClientCustom, DISABLED_cameraThumbnail)
 
 namespace {
 class TestHandler:
-    public nx_http::AbstractHttpRequestHandler
+    public nx::network::http::AbstractHttpRequestHandler
 {
 public:
     TestHandler(int requestNumber):
@@ -632,23 +635,23 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
         if (m_requestNumber > 0)
             connection->takeSocket(); //< Closing connection by destroying socket.
 
         completionHandler(
-            nx_http::RequestResult(
-                nx_http::StatusCode::ok,
-                std::make_unique< nx_http::BufferSource >(m_mimeType, m_response)));
+            nx::network::http::RequestResult(
+                nx::network::http::StatusCode::ok,
+                std::make_unique< nx::network::http::BufferSource >(m_mimeType, m_response)));
     }
 
 private:
-    const nx_http::StringType m_mimeType;
+    const nx::network::http::StringType m_mimeType;
     const QByteArray m_response;
     int m_requestNumber;
 };
@@ -668,11 +671,11 @@ TEST_F(AsyncHttpClient, ConnectionBreakAfterReceivingSecondRequest)
             }));
     ASSERT_TRUE(testHttpServer().bindAndListen());
 
-    QUrl testUrl(lit("http://%1%2")
+    nx::utils::Url testUrl(lit("http://%1%2")
         .arg(testHttpServer().serverAddress().toString())
         .arg(QString::fromLatin1(testPath)));
 
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     ASSERT_TRUE(httpClient.doGet(testUrl));
     ASSERT_NE(nullptr, httpClient.response());
     ASSERT_EQ(SystemError::noError, httpClient.lastSysErrorCode());
@@ -703,7 +706,7 @@ protected:
         const auto query = QUrl::toPercentEncoding("param1=test#%20#&param2");
         const auto fragment = QUrl::toPercentEncoding("#frag%20ment");
 
-        m_testUrl = QUrl(lit("http://%1%2?%3#%4")
+        m_testUrl = nx::utils::Url(lit("http://%1%2?%3#%4")
             .arg(testHttpServer().serverAddress().toString())
             .arg(testPath()).arg(QLatin1String(query)).arg(QLatin1String(fragment)));
 
@@ -720,7 +723,7 @@ protected:
         const auto request = m_receivedRequests.pop();
         ASSERT_EQ(
             testHttpServer().serverAddress().toString().toUtf8(),
-            nx_http::getHeaderValue(request.headers, "Host"));
+            nx::network::http::getHeaderValue(request.headers, "Host"));
     }
 
     void assertServerHasReceivedCorrectUrl()
@@ -733,10 +736,10 @@ protected:
     }
 
 private:
-    nx::utils::SyncQueue<nx_http::Request> m_receivedRequests;
-    nx::utils::SyncQueue<QUrl> m_urlsFromReceivedRequests;
-    nx_http::HttpClient m_httpClient;
-    QUrl m_testUrl;
+    nx::utils::SyncQueue<nx::network::http::Request> m_receivedRequests;
+    nx::utils::SyncQueue<nx::utils::Url> m_urlsFromReceivedRequests;
+    nx::network::http::HttpClient m_httpClient;
+    nx::utils::Url m_testUrl;
 
     void init()
     {
@@ -751,21 +754,21 @@ private:
         ASSERT_TRUE(testHttpServer().bindAndListen());
     }
 
-    QUrl commonTestUrl() const
+    nx::utils::Url commonTestUrl() const
     {
-        return QUrl(lm("http://%1%2").arg(testHttpServer().serverAddress()).arg(testPath()));
+        return nx::utils::Url(lm("http://%1%2").arg(testHttpServer().serverAddress()).arg(testPath()));
     }
 
     void onRequestReceived(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request request,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request request,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
         m_urlsFromReceivedRequests.push(request.requestLine.url);
         m_receivedRequests.push(std::move(request));
-        completionHandler(nx_http::StatusCode::ok);
+        completionHandler(nx::network::http::StatusCode::ok);
     }
 };
 
@@ -829,7 +832,7 @@ protected:
         m_clients.resize(kNumberOfClients);
         for (auto& clientContext: m_clients)
         {
-            clientContext.client = nx_http::AsyncHttpClient::create();
+            clientContext.client = nx::network::http::AsyncHttpClient::create();
             clientContext.client->setResponseReadTimeoutMs(500);
             clientContext.client->setMessageBodyReadTimeoutMs(500);
             clientContext.requestsToSend = nx::utils::random::number<int>(1, 3);
@@ -860,7 +863,7 @@ protected:
 private:
     struct ClientContext
     {
-        nx_http::AsyncHttpClientPtr client;
+        nx::network::http::AsyncHttpClientPtr client;
         nx::utils::promise<void> requestDonePromise;
         int requestsToSend;
     };
@@ -869,9 +872,9 @@ private:
     SocketAddress m_serverEndpoint;
     std::vector<ClientContext> m_clients;
 
-    QUrl serverUrl() const
+    nx::utils::Url serverUrl() const
     {
-        return QUrl(lit("http://%1/tst").arg(m_serverEndpoint.toString()));
+        return nx::utils::Url(lit("http://%1/tst").arg(m_serverEndpoint.toString()));
     }
 
     void issueRequests()
@@ -895,7 +898,7 @@ private:
             clientContext.requestDonePromise.get_future().wait();
     }
 
-    void onRequestDone(nx_http::AsyncHttpClientPtr /*client*/, ClientContext* clientContext)
+    void onRequestDone(nx::network::http::AsyncHttpClientPtr /*client*/, ClientContext* clientContext)
     {
         --clientContext->requestsToSend;
         if (clientContext->requestsToSend == 0)
@@ -926,10 +929,10 @@ public:
 
     AsyncHttpClientReusingConnection()
     {
-        m_httpClient = nx_http::AsyncHttpClient::create();
+        m_httpClient = nx::network::http::AsyncHttpClient::create();
         m_httpClient->setSendTimeoutMs(1000);
         QObject::connect(
-            m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+            m_httpClient.get(), &nx::network::http::AsyncHttpClient::done,
             [this](AsyncHttpClientPtr client)
             {
                 onRequestCompleted(std::move(client));
@@ -985,7 +988,7 @@ protected:
 
     void performRequestToInvalidUrl()
     {
-        m_httpClient->doGet(QUrl("http://example.com:58249/test"));
+        m_httpClient->doGet(nx::utils::Url("http://example.com:58249/test"));
     }
 
     void assertRequestSucceeded()
@@ -1005,12 +1008,12 @@ private:
         int requestsReceived = 0;
     };
 
-    QUrl m_testUrl;
-    nx::utils::SyncQueue<std::unique_ptr<nx_http::Response>> m_responseQueue;
-    nx_http::AsyncHttpClientPtr m_httpClient;
-    std::queue<QUrl> m_scheduledRequests;
+    nx::utils::Url m_testUrl;
+    nx::utils::SyncQueue<std::unique_ptr<nx::network::http::Response>> m_responseQueue;
+    nx::network::http::AsyncHttpClientPtr m_httpClient;
+    std::queue<nx::utils::Url> m_scheduledRequests;
     std::map<
-        nx_http::HttpServerConnection*,
+        nx::network::http::HttpServerConnection*,
         std::unique_ptr<HttpConnectionContext>> m_connectionToContext;
     QnMutex m_mutex;
 
@@ -1024,7 +1027,7 @@ private:
     void onRequestCompleted(AsyncHttpClientPtr client)
     {
         if (client->response() && !client->failed())
-            m_responseQueue.push(std::make_unique<nx_http::Response>(*client->response()));
+            m_responseQueue.push(std::make_unique<nx::network::http::Response>(*client->response()));
         else
             m_responseQueue.push(nullptr);
 
@@ -1035,13 +1038,13 @@ private:
     }
 
     void delayedConnectionClosureHttpHandlerFunc(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
-        nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
+        nx::network::http::RequestResult requestResult(nx::network::http::StatusCode::ok);
 
         HttpConnectionContext* connectionContext = nullptr;
         {
@@ -1062,7 +1065,7 @@ private:
         completionHandler(std::move(requestResult));
     }
 
-    void onResponseSent(nx_http::HttpServerConnection* connection)
+    void onResponseSent(nx::network::http::HttpServerConnection* connection)
     {
         QnMutexLocker lock(&m_mutex);
 
@@ -1076,13 +1079,13 @@ private:
             std::bind(&AsyncHttpClientReusingConnection::closeConnection, this, connection));
     }
 
-    void closeConnection(nx_http::HttpServerConnection* connection)
+    void closeConnection(nx::network::http::HttpServerConnection* connection)
     {
         connection->socket()->shutdown();
         connection->closeConnection(SystemError::connectionReset);
     }
 
-    void onConnectionClosed(nx_http::HttpServerConnection* connection)
+    void onConnectionClosed(nx::network::http::HttpServerConnection* connection)
     {
         QnMutexLocker lock(&m_mutex);
 
@@ -1224,14 +1227,16 @@ X-Nx-Result-Code: ok
         << SystemError::getLastOSErrorText().toStdString();
     testTcpServer.start();
 
-    QUrl url(lit("http://%1/secret/path").arg(testTcpServer.endpoint().toString()));
+    nx::utils::Url url(lit("http://%1/secret/path").arg(testTcpServer.endpoint().toString()));
     url.setUserName("don't tell");
     url.setPassword("anyone");
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     ASSERT_TRUE(httpClient.doGet(url));
     ASSERT_NE(nullptr, httpClient.response());
-    ASSERT_EQ(nx_http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
+    ASSERT_EQ(nx::network::http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
 }
 
 } // namespace test
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

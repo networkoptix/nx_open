@@ -2,9 +2,11 @@
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> מזמין אותך להצטרף אל <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> ושיתף את המערכת שלו {{message.system_name}} איתך.</p>
-{{/message.sharer_name}} {{^message.sharer_name}}
-<p>אתה מוזמן להצטרף אל <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a>. המערכת {{message.system_name}} שותפה איתך.</p>
-{{#message.sharer_name}}
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+<p>אתה מוזמן להצטרף אל <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a>. מערכת {{message.system_name}} שותפה איתך.</p>
+{{/message.sharer_name}}
 
 <a class="btn" href="{{config.portal_url}}/register/{{message.code}}">הרשם וצפה במערכת</a>
 

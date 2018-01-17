@@ -20,10 +20,10 @@
 namespace {
 
 template<typename ContextType>
-QUrl getServerApiUrl(
+nx::utils::Url getServerApiUrl(
     const QString& path, const QnMediaServerResourcePtr& server, ContextType context)
 {
-    QUrl result(server->getApiUrl());
+    nx::utils::Url result(server->getApiUrl());
     result.setPath(path);
 
     auto modifiedRequest = context->request();
@@ -73,13 +73,13 @@ void requestRemotePeers(
             [&outputReply, context, serverId = server->getId(), &mergeFunction](
                 SystemError::ErrorCode /*osErrorCode*/,
                 int statusCode,
-                nx_http::BufferType body)
+                nx::network::http::BufferType body)
             {
                 ReplyType reply;
                 bool success = false;
 
-                const auto httpCode = static_cast<nx_http::StatusCode::Value>(statusCode);
-                if (httpCode == nx_http::StatusCode::ok)
+                const auto httpCode = static_cast<nx::network::http::StatusCode::Value>(statusCode);
+                if (httpCode == nx::network::http::StatusCode::ok)
                     reply = QJson::deserialized(body, reply, &success);
 
                 const auto updateOutputDataCallback =
@@ -92,7 +92,7 @@ void requestRemotePeers(
                 context->executeGuarded(updateOutputDataCallback);
             };
 
-        const QUrl apiUrl = getServerApiUrl(path, server, context);
+        const nx::utils::Url apiUrl = getServerApiUrl(path, server, context);
         runMultiserverDownloadRequest(commonModule->router(), apiUrl, server, completionFunc, context);
         context->waitForDone();
     }
@@ -166,7 +166,7 @@ int QnUpdateInformationRestHandler::executeGet(
             loadFreeSpaceRemotely(processor->commonModule(), path, reply, &context);
 
         QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
     else if (path.endsWith(lit("/checkCloudHost")))
     {
@@ -177,10 +177,10 @@ int QnUpdateInformationRestHandler::executeGet(
             checkCloudHostRemotely(processor->commonModule(), path, reply, &context);
 
         QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
-    return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
+    return QnFusionRestHandler::makeError(nx::network::http::StatusCode::badRequest,
         lit("Unknown operation"),
         &result, &contentType, request.format, request.extraFormatting,
         QnRestResult::CantProcessRequest);

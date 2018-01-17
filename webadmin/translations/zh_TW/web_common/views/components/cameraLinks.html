@@ -4,7 +4,7 @@
     </div>
     <div class='camera-links-title'>攝影機詳細資訊</div>
     <table>
-        <tr ng-if="debugMode"><td>Playing</td><td class="camera-links-info">{{transport}} - {{currentResolution}} with {{player}}</td></tr>
+        <tr ng-if="debugMode"><td>正在播放</td><td class="camera-links-info">{{transport}} - {{currentResolution}} with {{player}}</td></tr>
         <tr><td>名稱</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
         <tr>
             <td>CameraID</td>
@@ -14,7 +14,7 @@
         </tr>
         <tr><td>IP (URL)</td><td class="camera-links-info"><a target="_blank" ng-href="{{activeCamera.url | checkProtocol}}">{{activeCamera.url}}</a></td></tr>
         <tr>
-            <td>查看</td>
+            <td>瀏覽</td>
             <td>
                 <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'web')}}">Web</a>
                 <copy-button copy-data="formatLink(activeCamera, 0, 'web')"></copy-button>
@@ -32,23 +32,23 @@
         <tr>
             <td>下載</td>
             <td>
-                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">HIGH</a>
+                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">高</a>
                 &nbsp;/&nbsp;
-                <a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">LOW</a>
+                <a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">低</a>
                 &nbsp;/&nbsp;
-                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">PREVIEW</a>
+                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">預覽</a>
             </td>
         </tr>
     </table>
     <div class="camera-links-break"></div>
-    <div class='camera-links-title'>Link settings</div>
+    <div class='camera-links-title'>連結設定</div>
     <table>
         <tr>
-            <td colspan="2"><label><input type="checkbox" ng-model="linkSettings.useAuth">&nbsp;Use temporary key</label></td>
+            <td colspan="2"><label><input type="checkbox" ng-model="linkSettings.useAuth">&nbsp;使用暫用密碼</label></td>
         </tr>
         <tr>
             <td colspan="2"><label><input type="checkbox" ng-model="linkSettings.useCredentials"
-                       ng-disabled="linkSettings.useAuth">&nbsp;Use credentials</label></td>
+                       ng-disabled="linkSettings.useAuth">&nbsp;使用認證資訊</label></td>
         </tr>
         <tr ng-if="!linkSettings.useAuth && linkSettings.useCredentials">
             <td><label class="camera-links-label" for="useLogin">登入帳號</label></td>
@@ -61,17 +61,17 @@
                        ng-model="linkSettings.usePassword"></td>
         </tr>
         <tr>
-            <td><label class="camera-links-label" for="duration">Duration (sec)</label></td>
+            <td><label class="camera-links-label" for="duration">長度(秒)</label></td>
             <td><input id="duration" type="text" class="input-sm camera-links-info"
                        ng-model="linkSettings.duration"></td>
         </tr>
         <tr>
-            <td><label class="camera-links-label" for="resolution">解析度:</label></td>
+            <td><label class="camera-links-label" for="resolution">解析度</label></td>
             <td><input id="resolution" type="text" class="input-sm camera-links-info" 
                        ng-model="linkSettings.resolution"></td>
         </tr>
         <tr>
-            <td>Playing position</td><td class="camera-links-info">{{liveMode?'live': position.toFixed(0)}}</td>
+            <td>播放位置</td><td class="camera-links-info">{{liveMode?'live': position.toFixed(0)}}</td>
         </tr>
     </table>
 </div>

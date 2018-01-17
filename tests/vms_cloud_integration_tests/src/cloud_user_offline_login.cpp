@@ -96,7 +96,7 @@ protected:
     {
         auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
         ec2::ApiResourceParamDataList vmsSettings;
-        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2GetSettings(&vmsSettings));
+        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetSettings(&vmsSettings));
     }
 
     void thenAllUsersCanStillLogin()
@@ -104,20 +104,25 @@ protected:
         auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
         for (const auto& account: m_additionalCloudUsers)
         {
-            mediaServerClient.setUserName(QString::fromStdString(account.email));
-            mediaServerClient.setPassword(QString::fromStdString(account.password));
+            mediaServerClient->setUserCredentials(nx::network::http::Credentials(
+                account.email.c_str(),
+                nx::network::http::PasswordAuthToken(account.password.c_str())));
+
             ec2::ApiUserDataList users;
-            ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2GetUsers(&users));
+            ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
         }
     }
 
     void thenInvitedUserCanLoginToTheSystem()
     {
         auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
-        mediaServerClient.setUserName(QString::fromStdString(m_invitedAccount.email));
-        mediaServerClient.setPassword(QString::fromStdString(m_invitedAccount.password));
+
+        mediaServerClient->setUserCredentials(nx::network::http::Credentials(
+            m_invitedAccount.email.c_str(),
+            nx::network::http::PasswordAuthToken(m_invitedAccount.password.c_str())));
+
         ec2::ApiUserDataList users;
-        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2GetUsers(&users));
+        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
     }
 
 private:
@@ -139,7 +144,7 @@ private:
             ec2::ApiResourceParamDataList params;
             ASSERT_EQ(
                 ec2::ErrorCode::ok,
-                mediaServerClient.ec2GetResourceParams(
+                mediaServerClient->ec2GetResourceParams(
                     QnUuid::fromStringSafe(cloudOwnerVmsUserId()),
                     &params));
             if (resourceParamPresent(params, nx::cdb::api::kVmsUserAuthInfoAttributeName))
@@ -156,7 +161,7 @@ private:
             cdb()->resetAccountPassword(email, &confirmationCode));
 
         nx::cdb::api::AccountUpdateData accountUpdate;
-        accountUpdate.passwordHa1 = nx_http::calcHa1(
+        accountUpdate.passwordHa1 = nx::network::http::calcHa1(
             email.c_str(),
             nx::network::AppInfo::realm().toStdString().c_str(),
             password.c_str()).toStdString();

@@ -463,10 +463,52 @@ bool QnServerDb::addAuditRecords(const std::map<int, QnAuditRecord>& records)
         QnSql::bind(data, &insQuery);
         if (!execSQLQuery(&insQuery, Q_FUNC_INFO))
             return false;
+
+        NX_VERBOSE(this, lm("Update audit record %1 for %2 (session %3): %4 %5-%6").args(
+            itr->first, data.authSession.userName, data.authSession.id,
+            QnLexical::serialized(data.eventType), data.rangeStartSec, data.rangeEndSec));
     }
+
     cleanupAuditLog();
     tran.commit();
     return true;
+}
+
+bool QnServerDb::closeUnclosedAuditRecords(int lastRunningTimeSec)
+{
+    QnDbTransactionLocker tran(getTransaction());
+    if (!m_sdb.isOpen())
+        return false;
+
+    QSqlQuery query(m_sdb);
+    if (lastRunningTimeSec)
+    {
+        query.prepare(R"sql(
+            UPDATE audit_log
+            SET rangeEndSec = :lastRunningTimeSec
+            WHERE (rangeStartSec != 0 AND rangeEndSec = 0)
+        )sql");
+
+        query.bindValue(":lastRunningTimeSec", lastRunningTimeSec);
+        if (!execSQLQuery(&query, Q_FUNC_INFO))
+            return false;
+
+        NX_DEBUG(this, lm("Close %1 audit records with last runnig time %2").args(
+            query.numRowsAffected(), lastRunningTimeSec));
+    }
+
+
+    query.prepare(R"sql(
+        UPDATE audit_log
+        SET rangeEndSec = rangeStartSec
+        WHERE rangeStartSec > rangeEndSec
+    )sql");
+
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return false;
+
+    NX_DEBUG(this, lm("Fixed %1 incorrcet audit record end times").args(query.numRowsAffected()));
+    return tran.commit();
 }
 
 QnAuditRecordList QnServerDb::getAuditData(const QnTimePeriod& period, const QnUuid& sessionId)
@@ -800,12 +842,14 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
     return rez;
 }
 
-QString QnServerDb::getRequestStr(const QnEventLogRequestData& request) const
+QString QnServerDb::getRequestStr(const QnEventLogFilterData& request,
+    Qt::SortOrder order,
+    int limit) const
 {
-    QString requestStr(lit("SELECT * FROM runtime_actions where"));
+    QString requestStr(lit("SELECT * FROM runtime_actions WHERE"));
     if (!request.period.isInfinite())
     {
-        requestStr += lit(" timestamp between '%1' and '%2'")
+        requestStr += lit(" timestamp BETWEEN '%1' AND '%2'")
             .arg(request.period.startTimeMs / 1000).arg(request.period.endTimeMs() / 1000);
     }
     else
@@ -815,7 +859,7 @@ QString QnServerDb::getRequestStr(const QnEventLogRequestData& request) const
 
     if (request.cameras.size() == 1)
     {
-        requestStr += QString(lit(" and event_resource_guid = %1 "))
+        requestStr += QString(lit(" AND event_resource_guid = %1 "))
             .arg(guidToSqlString(request.cameras[0]->getId()));
     }
     else if (request.cameras.size() > 1)
@@ -827,7 +871,7 @@ QString QnServerDb::getRequestStr(const QnEventLogRequestData& request) const
                 idList += QLatin1Char(',');
             idList += guidToSqlString(camera->getId());
         }
-        requestStr += QString(lit(" and event_resource_guid in (%1) ")).arg(idList);
+        requestStr += QString(lit(" AND event_resource_guid IN (%1) ")).arg(idList);
     }
 
     if (request.eventType != vms::event::undefinedEvent
@@ -842,35 +886,46 @@ QString QnServerDb::getRequestStr(const QnEventLogRequestData& request) const
                     eventTypeStr += QLatin1Char(',');
                 eventTypeStr += QString::number((int) evnt);
             }
-            requestStr += QString(lit(" and event_type in (%1) ")).arg(eventTypeStr);
+            requestStr += QString(lit(" AND event_type IN (%1) ")).arg(eventTypeStr);
         }
         else
         {
-            requestStr += QString(lit(" and event_type = %1 ")).arg((int) request.eventType);
+            requestStr += QString(lit(" AND event_type = %1 ")).arg((int) request.eventType);
         }
     }
 
     if (!request.eventSubtype.isNull())
     {
-        requestStr += lit(" and event_subtype = %1 ").arg(guidToSqlString(request.eventSubtype));
+        requestStr += lit(" AND event_subtype = %1 ").arg(guidToSqlString(request.eventSubtype));
     }
 
     if (request.actionType != vms::event::undefinedAction)
-        requestStr += QString(lit(" and action_type = %1 ")).arg((int) request.actionType);
+        requestStr += QString(lit(" AND action_type = %1 ")).arg((int) request.actionType);
 
     if (!request.ruleId.isNull())
     {
-        requestStr += QString(lit(" and  business_rule_guid = %1 "))
+        requestStr += QString(lit(" AND  business_rule_guid = %1 "))
             .arg(guidToSqlString(request.ruleId));
     }
+
+    requestStr += lit(" ORDER BY timestamp");
+
+    if (order == Qt::DescendingOrder)
+        requestStr += lit(" DESC");
+
+    if (limit > 0 && limit < std::numeric_limits<int>().max())
+        requestStr += lit(" LIMIT %1").arg(limit);
 
     return requestStr;
 }
 
-vms::event::ActionDataList QnServerDb::getActions(const QnEventLogRequestData& request) const
+vms::event::ActionDataList QnServerDb::getActions(
+    const QnEventLogFilterData& request,
+    Qt::SortOrder order,
+    int limit) const
 {
     vms::event::ActionDataList result;
-    QString requestStr = getRequestStr(request);
+    QString requestStr = getRequestStr(request, order, limit);
 
     QnWriteLocker lock(&m_mutex);
 
@@ -899,6 +954,23 @@ vms::event::ActionDataList QnServerDb::getActions(const QnEventLogRequestData& r
             query.value(businessRuleIdx).toByteArray());
         actionData.aggregationCount = query.value(aggregationCntIdx).toInt();
 
+        if (actionData.eventParams.eventType == vms::event::cameraMotionEvent
+            || actionData.eventParams.eventType == vms::event::cameraInputEvent
+            || actionData.eventParams.eventType == vms::event::analyticsSdkEvent
+            || actionData.actionType == vms::event::ActionType::bookmarkAction
+            || actionData.actionType == vms::event::ActionType::acknowledgeAction)
+        {
+            QnNetworkResourcePtr camRes =
+                resourcePool()->getResourceById<QnNetworkResource>(actionData.eventParams.eventResourceId);
+            if (camRes)
+            {
+                if (QnStorageManager::isArchiveTimeExists(
+                    camRes->getUniqueId(), actionData.eventParams.eventTimestampUsec / 1000))
+                {
+                    actionData.flags |= vms::event::ActionData::VideoLinkExists;
+                }
+            }
+        }
         result.push_back(std::move(actionData));
     }
 
@@ -919,7 +991,7 @@ inline void appendQnUuidToByteArray(QByteArray& byteArray, const QnUuid& value)
 void QnServerDb::getAndSerializeActions(const QnEventLogRequestData& request,
     QByteArray& result) const
 {
-    QString requestStr = getRequestStr(request);
+    QString requestStr = getRequestStr(request.filter);
 
     QnWriteLocker lock(&m_mutex);
 

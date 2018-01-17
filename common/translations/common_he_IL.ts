@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>שגיאה לא ידועה.</translation>
+      <translation>שגיאה לא מוכרת.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>מערכת חדשה</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>מערכת %1 שהתגלתה אינה תואמת למערכת הנוכחית.</translation>
     </message>
   </context>
   <context>
@@ -255,18 +255,6 @@
       <translation>וודא שפורט %1 נגישץ (כלומר שהוא מופנה).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין fps בהגדרות המכשיר.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין fps בהגדרות המצלמה.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין fps בהגדרות מודלות קלט/פלט.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>אם זה לא עוזר, שחזר את הגדרות ברירות המחדל של היצרן בדף האינטרנט של ההתקן.</translation>
     </message>
@@ -314,6 +302,18 @@
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>המצלמה שוחזרה מארכיון. מחק את המצלמה והוסף אותה שוב לתצוגת וידאו חי.</translation>
     </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין את ה fps בהגדרות המכשיר (שגיאה &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין את ה fps בהגדרות המצלמה (שגיאה &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין את ה fps בהגדרות התקן הקלט/פלט (שגיאה &quot;%1&quot;).</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -327,7 +327,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>לא ניתן לאתחל את מקודד האודיו.</translation>
+      <translation>לא ניתן להפעיל את מקודד האודיו.</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
@@ -480,11 +480,19 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>זמן</translation>
+      <translation>שעה</translation>
     </message>
     <message>
       <source>Time Licenses</source>
       <translation>רישיונות זמניים</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation>Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>רישיונות Bridge</translation>
     </message>
   </context>
   <context>
@@ -554,7 +562,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>שגיאה לא מוגדרת</translation>
+      <translation>שגיאה לא מוכרת</translation>
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
@@ -658,7 +666,7 @@
     </message>
     <message>
       <source>I/O Modules</source>
-      <translation>מודולי קלט פלט</translation>
+      <translation>מודולי קלט/פלט</translation>
     </message>
     <message>
       <source>I/O modules</source>
@@ -708,7 +716,7 @@
     </message>
     <message>
       <source>Low</source>
-      <translation>נמוכה</translation>
+      <translation>נמוך</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -716,11 +724,11 @@
     </message>
     <message>
       <source>High</source>
-      <translation>גבוהה</translation>
+      <translation>גבוה</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation>מיטבית</translation>
+      <translation>הטוב ביותר</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -794,6 +802,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>סוג משאב לא חוקי לייצוא נתונים.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>ייצוא נתונים לא בוצע.</translation>
     </message>
   </context>
   <context>
@@ -1032,7 +1044,7 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>צופה בוידאו חי</translation>
+      <translation>צופה בשידור חי</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1564,6 +1576,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>אשר</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>ארוע אנליטיקה</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 ב%2</translation>
     </message>
   </context>
   <context>

@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <nx/network/abstract_socket.h>
 
@@ -18,6 +18,8 @@ public:
     virtual SocketAddress getLocalAddress() const override;
     virtual bool setReuseAddrFlag( bool reuseAddr ) override;
     virtual bool getReuseAddrFlag( bool* val ) const override;
+    virtual bool setReusePortFlag(bool value) override;
+    virtual bool getReusePortFlag(bool* value) const override;
     virtual bool setNonBlockingMode( bool val ) override;
     virtual bool getNonBlockingMode( bool* val ) const override;
     virtual bool getMtu( unsigned int* mtuValue ) const  override;
@@ -35,7 +37,7 @@ public:
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
+        std::chrono::milliseconds timeout) override;
 
     virtual SocketAddress getForeignAddress() const override;
     virtual void cancelIOAsync(
@@ -43,7 +45,6 @@ public:
         nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
     virtual void cancelIOSync(aio::EventType eventType) override;
 
-    virtual bool reopen() override;
     virtual bool setNoDelay( bool value ) override;
     virtual bool getNoDelay( bool* value ) const override;
     virtual bool toggleStatisticsCollection( bool val ) override;
@@ -60,11 +61,11 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode, size_t )> handler ) override;
 
     virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode, size_t )> handler ) override;
 
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,

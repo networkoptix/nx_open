@@ -95,12 +95,12 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraC
     auto resData = qnStaticCommon->dataPool()->data(m_onvifRes);
     if (resData.contains(Qn::PREFERRED_AUTH_SCHEME_PARAM_NAME))
     {
-        auto authScheme = nx_http::header::AuthScheme::fromString(
+        auto authScheme = nx::network::http::header::AuthScheme::fromString(
             resData.value<QString>(Qn::PREFERRED_AUTH_SCHEME_PARAM_NAME)
                 .toLatin1()
                 .constData());
 
-        if (authScheme != nx_http::header::AuthScheme::none)
+        if (authScheme != nx::network::http::header::AuthScheme::none)
             m_multiCodec.setPrefferedAuthScheme(authScheme);
     }
 
@@ -272,8 +272,8 @@ QnAbstractMediaDataPtr QnOnvifStreamReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+        return getMetadata();
 
     QnAbstractMediaDataPtr rez;
     for (int i = 0; i < 2 && !rez; ++i)
@@ -316,7 +316,7 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
 
     CLSimpleHTTPClient http(
         m_onvifRes->getHostAddress(),
-        QUrl(m_onvifRes->getUrl()).port(nx_http::DEFAULT_HTTP_PORT),
+        QUrl(m_onvifRes->getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT),
         3000, //<  TODO: #dmishin move to constant
         m_onvifRes->getAuth());
 
@@ -340,9 +340,9 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
     return true;
 }
 
-void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrimary, const QnLiveStreamParams& params) const
+void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrimary, const QnLiveStreamParams& streamParams) const
 {
-
+    QnLiveStreamParams params = streamParams;
     auto resData = qnStaticCommon->dataPool()->data(m_onvifRes);
     bool useEncodingInterval = resData.value<bool>
         (Qn::CONTROL_FPS_VIA_ENCODING_INTERVAL_PARAM_NAME);
@@ -381,14 +381,14 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
         else
         {
             int fpsBase = resData.value<int>(Qn::FPS_BASE_PARAM_NAME);
-            int closestAvailableFps = m_onvifRes->getClosestAvailableFps(params.fps);
+            params.fps = m_onvifRes->getClosestAvailableFps(params.fps);
             encoder.RateControl->FrameRateLimit = fpsBase;
             encoder.RateControl->EncodingInterval = static_cast<int>(
-                fpsBase / closestAvailableFps + 0.5);
+                fpsBase / params.fps + 0.5);
         }
 
         encoder.RateControl->BitrateLimit = m_onvifRes
-            ->suggestBitrateKbps(quality, resolution, encoder.RateControl->FrameRateLimit, getRole());
+            ->suggestBitrateKbps(resolution, params, getRole());
     }
 
 
@@ -589,15 +589,12 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
     if (useExistingProfiles)
         return CameraDiagnostics::NoErrorResult();
 
-    if (!isCameraControlRequired) {
-        // TODO: #Elric need to untangle this evil.
-		if (getRole() == Qn::CR_LiveVideo)
-			m_onvifRes->setPtzProfileToken(info.profileToken);
+    if (getRole() == Qn::CR_LiveVideo)
+        m_onvifRes->setPtzProfileToken(info.profileToken);
+    if (!isCameraControlRequired)
         return CameraDiagnostics::NoErrorResult();
-    } else {
+    else
         return sendProfileToCamera(info, profile);
-    }
-
 }
 
 CameraDiagnostics::Result QnOnvifStreamReader::createNewProfile(const QString& name, const QString& token) const
@@ -727,9 +724,11 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
 
     if (getRole() == Qn::CR_LiveVideo)
     {
-        if(!m_onvifRes->getPtzUrl().isEmpty() && !m_onvifRes->getPtzConfigurationToken().isEmpty()) {
+        if(!m_onvifRes->getPtzUrl().isEmpty() && !m_onvifRes->getPtzConfigurationToken().isEmpty()) 
+        {
             bool ptzMatched = profile && profile->PTZConfiguration;
-            if (!ptzMatched) {
+            if (!ptzMatched) 
+            {
                 AddPTZConfigReq request;
                 AddPTZConfigResp response;
 
@@ -737,9 +736,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
                 request.ConfigurationToken = m_onvifRes->getPtzConfigurationToken().toStdString();
 
                 int soapRes = soapWrapper.addPTZConfiguration(request, response);
-                if (soapRes == SOAP_OK) {
-                    m_onvifRes->setPtzProfileToken(QString::fromStdString(profile->token));
-                } else {
+                if (soapRes != SOAP_OK) 
+                {
 #ifdef PL_ONVIF_DEBUG
                     qCritical() << "QnOnvifStreamReader::addPTZConfiguration: can't add ptz configuration to profile. Gsoap error: "
                         << soapRes << ", description: " << soapWrapper.getLastError()
@@ -747,12 +745,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
 #endif
                     return CameraDiagnostics::RequestFailedResult( QLatin1String("addPTZConfiguration"), soapWrapper.getLastError() );
                 }
-            } else {
-                m_onvifRes->setPtzProfileToken(QString::fromStdString(profile->token));
             }
         }
     }
-
 
     //Adding audio source
     if (!info.audioSourceId.isEmpty() && !info.audioEncoderId.isEmpty())

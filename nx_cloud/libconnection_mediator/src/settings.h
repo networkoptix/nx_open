@@ -6,8 +6,6 @@
 
 #include <boost/optional.hpp>
 
-#include <QtCore/QUrl>
-
 #include <nx/network/cloud/cloud_connect_options.h>
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/socket_common.h>
@@ -32,46 +30,41 @@ struct General
 
 struct CloudDb
 {
-    bool runWithCloud;
-    boost::optional<QUrl> url;
+    bool runWithCloud = true;
+    boost::optional<nx::utils::Url> url;
     QString user;
     QString password;
     std::chrono::seconds updateInterval{0};
     std::chrono::seconds startTimeout{0};
-
-    CloudDb():
-        runWithCloud(true)
-    {
-    }
 };
 
 struct Stun
 {
-    std::list<SocketAddress> addrToListenList;
-    boost::optional<KeepAliveOptions> keepAliveOptions;
+    std::list<network::SocketAddress> addrToListenList;
+    boost::optional<network::KeepAliveOptions> keepAliveOptions;
     boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
 struct Http
 {
-    std::list<SocketAddress> addrToListenList;
-    boost::optional<KeepAliveOptions> keepAliveOptions;
+    std::list<network::SocketAddress> addrToListenList;
+    boost::optional<network::KeepAliveOptions> keepAliveOptions;
     boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
 struct Statistics
 {
-    bool enabled;
-
-    Statistics():
-        enabled(true)
-    {
-    }
+    bool enabled = true;
 };
 
 struct TrafficRelay
 {
     QString url;
+};
+
+struct ListeningPeer
+{
+    boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
 /**
@@ -82,6 +75,7 @@ struct ConnectionParameters:
 {
     std::chrono::milliseconds connectionAckAwaitTimeout;
     std::chrono::milliseconds connectionResultWaitTimeout;
+    std::chrono::milliseconds maxRelayInstanceSearchTime;
 
     ConnectionParameters();
 };
@@ -109,6 +103,7 @@ public:
     const Statistics& statistics() const;
     const TrafficRelay& trafficRelay() const;
     const nx::cloud::discovery::conf::Discovery& discovery() const;
+    const ListeningPeer& listeningPeer() const;
 
 private:
     General m_general;
@@ -121,15 +116,17 @@ private:
     Statistics m_statistics;
     TrafficRelay m_trafficRelay;
     nx::cloud::discovery::conf::Discovery m_discovery;
+    ListeningPeer m_listeningPeer;
 
     virtual void loadSettings() override;
 
     void initializeWithDefaultValues();
     void readEndpointList(
         const QString& str,
-        std::list<SocketAddress>* const addrToListenList);
+        std::list<network::SocketAddress>* const addrToListenList);
     void loadConnectionParameters();
     void loadTrafficRelay();
+    void loadListeningPeer();
 };
 
 } // namespace conf

@@ -16,6 +16,7 @@
 #include <nx/utils/test_support/sync_queue.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -23,7 +24,7 @@ class TestServer:
     public SocketServer
 {
 public:
-    TestServer(const nx::stun::MessageDispatcher& dispatcher):
+    TestServer(const nx::network::stun::MessageDispatcher& dispatcher):
         SocketServer(&dispatcher, false),
         m_totalConnectionsAccepted(0)
     {
@@ -127,7 +128,7 @@ protected:
         return sendWaiter.pop();
     }
 
-    nx::stun::MessageDispatcher dispatcher;
+    nx::network::stun::MessageDispatcher dispatcher;
     std::shared_ptr<AbstractAsyncClient> client;
     std::unique_ptr<TestServer> server;
 };
@@ -145,7 +146,7 @@ TEST_F(StunClientServerTest, Connectivity)
 
     const auto address = startServer();
     server.reset();
-    client->connect(nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
+    client->connect(nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
     auto clientGuard = makeScopeGuard([this]() { client->pleaseStopSync(); });
 
     EXPECT_THAT(sendTestRequestSync(), testing::AnyOf(
@@ -186,7 +187,7 @@ TEST_F(StunClientServerTest, Connectivity)
 
     while (server->connectionCount() == 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    ASSERT_EQ(1U, server->connectionCount()) << 
+    ASSERT_EQ(1U, server->connectionCount()) <<
         "Total connections accepted: " << server->totalConnectionsAccepted();
 
     ASSERT_TRUE(client->addConnectionTimer(timerPeriod, incrementTimer, nullptr)) <<
@@ -201,7 +202,7 @@ TEST_F(StunClientServerTest, RequestResponse)
     const auto t1 = std::chrono::steady_clock::now();
 
     const auto address = startServer();
-    client->connect(nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
+    client->connect(nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
     {
         Message request(Header(MessageClass::request, MethodType::bindingMethod));
 
@@ -209,7 +210,7 @@ TEST_F(StunClientServerTest, RequestResponse)
         client->sendRequest(std::move(request), waiter.pusher());
 
         const auto result = waiter.pop();
-        const auto timePassed = 
+        const auto timePassed =
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - t1);
 
@@ -251,12 +252,13 @@ TEST_F(StunClientServerTest, Indications)
     const auto address = startServer();
 
     utils::TestSyncQueue<Message> recvWaiter;
-    client->connect(nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
+    client->connect(nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
     client->setIndicationHandler(0xAB, recvWaiter.pusher());
     client->setIndicationHandler(0xCD, recvWaiter.pusher());
 
     EXPECT_EQ(sendTestRequestSync(), SystemError::noError);
-    EXPECT_EQ(1U, server->connectionCount());
+    while (server->connectionCount() < 1)
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
     EXPECT_EQ(sendIndicationSync(0xAB), SystemError::noError);
     EXPECT_EQ(sendIndicationSync(0xCD), SystemError::noError);
@@ -292,7 +294,7 @@ static const size_t REQUEST_RATIO = 5;
 TEST_F(StunClientServerTest, AsyncClientUser)
 {
     const auto address = startServer();
-    client->connect(nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
+    client->connect(nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
     for (size_t uc = 0; uc <USER_COUNT; ++uc)
     {
         auto user = std::make_shared<TestUser>(client);
@@ -317,7 +319,7 @@ TEST_F(StunClientServerTest, cancellation)
     const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
 
     auto clientGuard = makeScopeGuard([this]() { client->pleaseStopSync(); });
-    client->connect(nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
+    client->connect(nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
     client->addOnReconnectedHandler(reconnectHandler);
     client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
 
@@ -327,5 +329,6 @@ TEST_F(StunClientServerTest, cancellation)
 }
 
 } // namespace test
-} // namespace hpm
+} // namespace stun
+} // namespace network
 } // namespace nx

@@ -3,12 +3,12 @@
     <parent>
         <artifactId>metadata_plugins</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <artifactId>stub_metadata_plugin</artifactId>
     <packaging>pom</packaging>
     <name>Nx Witness Stub Metadata Plugin</name>
@@ -18,7 +18,7 @@
         <product.title>${stub_metadata_plugin.name}</product.title>
 
         <qt.libs>core</qt.libs>
-        <global.libs>-lcommon</global.libs>
+        <global.libs>-lcommon -lnx_kit</global.libs>
     </properties>
     <dependencies>
         <dependency>

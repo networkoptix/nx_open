@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <functional>
 
@@ -13,6 +13,7 @@
 #include "abstract_server_connection.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 class MessageDispatcher;
@@ -27,12 +28,11 @@ class NX_NETWORK_API ServerConnection:
     public std::enable_shared_from_this<ServerConnection>
 {
 public:
-    typedef nx::network::server::BaseStreamProtocolConnection<
+    using base_type = nx::network::server::BaseStreamProtocolConnection<
         ServerConnection,
         Message,
         MessageParser,
-        MessageSerializer
-    > BaseType;
+        MessageSerializer>;
 
     ServerConnection(
         nx::network::server::StreamConnectionHolder<ServerConnection>* socketServer,
@@ -41,13 +41,14 @@ public:
     ~ServerConnection();
 
     virtual void sendMessage(
-        nx::stun::Message message,
+        nx::network::stun::Message message,
         std::function<void(SystemError::ErrorCode)> handler) override;
     virtual nx::network::TransportProtocol transportProtocol() const override;
     virtual SocketAddress getSourceAddress() const override;
     virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual AbstractCommunicatingSocket* socket() override;
     virtual void close() override;
+    virtual void setInactivityTimeout(boost::optional<std::chrono::milliseconds> value) override;
 
     void setDestructHandler(std::function< void() > handler = nullptr);
 
@@ -67,4 +68,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

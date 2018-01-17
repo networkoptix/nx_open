@@ -1,9 +1,9 @@
 'Class to manipulate directory to which server instance is installed'
 
-import os.path
-import logging
-import StringIO
 import ConfigParser
+import StringIO
+import logging
+import os.path
 
 log = logging.getLogger(__name__)
 
@@ -12,6 +12,7 @@ MEDIASERVER_CONFIG_PATH = 'etc/mediaserver.conf'
 MEDIASERVER_CONFIG_PATH_INITIAL = 'etc/mediaserver.conf.initial'
 MEDIASERVER_VAR_PATH = 'var'
 MEDIASERVER_LOG_PATH = 'var/log/log_file.log'
+MEDIASERVER_KEY_CERT_PATH = 'var/ssl/cert.pem'
 # path to .so file containing cloud host in it. Different for different server versions
 MEDIASERVER_CLOUDHOST_LIB_PATH_LIST = ['lib/libnx_network.so', 'lib/libcommon.so']
 
@@ -27,10 +28,14 @@ class ServerInstallation(object):
         self._config_path = os.path.join(self.dir, MEDIASERVER_CONFIG_PATH)
         self._config_path_initial = os.path.join(self.dir, MEDIASERVER_CONFIG_PATH_INITIAL)
         self._log_path = os.path.join(self.dir, MEDIASERVER_LOG_PATH)
+        self._key_cert_path = os.path.join(self.dir, MEDIASERVER_KEY_CERT_PATH)
         self._current_cloud_host = None  # cloud_host encoded in currently installed binary .so file, None means unknown yet
 
     def cleanup_var_dir(self):
         self.host.run_command(['rm', '-rf', os.path.join(self.dir, MEDIASERVER_VAR_PATH, '*')])
+
+    def put_key_and_cert(self, key_and_cert):
+        self.host.write_file(os.path.join(self.dir, MEDIASERVER_KEY_CERT_PATH), key_and_cert)
 
     def list_core_files(self):
         return self.host.expand_glob(os.path.join(self.dir, 'bin/*core*'))

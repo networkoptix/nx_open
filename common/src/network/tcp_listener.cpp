@@ -16,8 +16,8 @@ class QnTcpListenerPrivate
 {
 public:
     nx::network::SocketGlobals::InitGuard socketGlobalsInitGuard;
-    AbstractStreamServerSocket* serverSocket;
-    SocketAddress localEndpoint;
+    nx::network::AbstractStreamServerSocket* serverSocket;
+    nx::network::SocketAddress localEndpoint;
     QList<QnLongRunnable*> connections;
     QByteArray authDigest;
     mutable QnMutex mutex;
@@ -53,12 +53,12 @@ QString QnTcpListenerPrivate::pathIgnorePrefix;
 // QnTcpListener
 
 bool QnTcpListener::authenticate(
-    const nx_http::Request& request, nx_http::Response& response) const
+    const nx::network::http::Request& request, nx::network::http::Response& response) const
 {
     Q_D(const QnTcpListener);
     if (d->authDigest.isEmpty())
         return true;
-    nx_http::HttpHeaders::const_iterator authorizationIter = request.headers.find("Authorization");
+    nx::network::http::HttpHeaders::const_iterator authorizationIter = request.headers.find("Authorization");
     if(authorizationIter == request.headers.end())
         return false;
 
@@ -68,8 +68,8 @@ bool QnTcpListener::authenticate(
         rez = data[1] == d->authDigest;
     if (!rez)
     {
-        nx_http::insertOrReplaceHeader(&response.headers,
-            std::make_pair("WWW-Authenticate", "Basic realm=\"Secure Area\""));
+        nx::network::http::insertOrReplaceHeader(&response.headers,
+            nx::network::http::HttpHeader("WWW-Authenticate", "Basic realm=\"Secure Area\""));
     }
     return rez;
 }
@@ -118,7 +118,7 @@ bool QnTcpListener::bindToLocalAddress()
 {
     Q_D(QnTcpListener);
 
-    const SocketAddress localAddress(d->serverAddress.toString(), d->localPort);
+    const nx::network::SocketAddress localAddress(d->serverAddress.toString(), d->localPort);
     d->serverSocket = createAndPrepareSocket(d->useSSL, localAddress);
     if (!d->serverSocket
         || !d->serverSocket->setRecvTimeout(kSocketAcceptTimeoutMs))
@@ -137,7 +137,7 @@ bool QnTcpListener::bindToLocalAddress()
         d->localPort = d->localEndpoint.port;
     }
 
-    NX_LOGX(lm("Server started at %1").arg(localAddress), cl_logDEBUG1);
+    NX_LOGX(lm("Server started at %1").arg(localAddress), cl_logINFO);
     return true;
 }
 
@@ -146,12 +146,13 @@ void QnTcpListener::doPeriodicTasks()
     removeDisconnectedConnections();
 }
 
-AbstractStreamServerSocket* QnTcpListener::createAndPrepareSocket(
+nx::network::AbstractStreamServerSocket* QnTcpListener::createAndPrepareSocket(
     bool sslNeeded,
-    const SocketAddress& localAddress)
+    const nx::network::SocketAddress& localAddress)
 {
-    auto serverSocket = SocketFactory::createStreamServerSocket(sslNeeded);
+    auto serverSocket = nx::network::SocketFactory::createStreamServerSocket(sslNeeded);
     if (!serverSocket->setReuseAddrFlag(true) ||
+        !serverSocket->setReusePortFlag(true) ||
         !serverSocket->bind(localAddress) ||
         !serverSocket->listen())
     {
@@ -162,7 +163,7 @@ AbstractStreamServerSocket* QnTcpListener::createAndPrepareSocket(
     return serverSocket.release();
 }
 
-void QnTcpListener::destroyServerSocket(AbstractStreamServerSocket* serverSocket)
+void QnTcpListener::destroyServerSocket(nx::network::AbstractStreamServerSocket* serverSocket)
 {
     delete serverSocket;
 }
@@ -330,7 +331,7 @@ void QnTcpListener::run()
                 d->localPort = d->serverSocket->getLocalAddress().port;
 
             doPeriodicTasks();
-            AbstractStreamSocket* clientSocket = d->serverSocket->accept();
+            nx::network::AbstractStreamSocket* clientSocket = d->serverSocket->accept();
             if(clientSocket)
             {
                 if (d->connections.size() > d->maxConnections)
@@ -346,10 +347,10 @@ void QnTcpListener::run()
                     continue;
                 }
                 d->ddosWarned = false;
-                NX_LOG(lit("New client connection from %1")
-                    .arg(clientSocket->getForeignAddress().address.toString()), cl_logDEBUG1);
+                NX_VERBOSE(this, lit("New client connection from %1")
+                    .arg(clientSocket->getForeignAddress().address.toString()));
                 QnTCPConnectionProcessor* processor =
-                    createRequestProcessor(QSharedPointer<AbstractStreamSocket>(clientSocket));
+                    createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket>(clientSocket));
                 clientSocket->setRecvTimeout(processor->getSocketTimeout());
                 clientSocket->setSendTimeout(processor->getSocketTimeout());
 
@@ -396,7 +397,7 @@ int QnTcpListener::getPort() const
     return d->localPort;
 }
 
-SocketAddress QnTcpListener::getLocalEndpoint() const
+nx::network::SocketAddress QnTcpListener::getLocalEndpoint() const
 {
     Q_D(const QnTcpListener);
     QnMutexLocker lk(&d->mutex);

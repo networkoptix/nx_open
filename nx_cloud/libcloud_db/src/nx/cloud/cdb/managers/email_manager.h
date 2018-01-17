@@ -7,12 +7,10 @@
 #include <set>
 
 #include <QtCore/QString>
-#include <QtCore/QUrl>
-
 #include <nx_ec/data/api_email_data.h>
 #include <utils/common/threadqueue.h>
 #include <nx/fusion/serialization/json.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/thread/mutex.h>
@@ -56,18 +54,18 @@ private:
         ::ec2::ApiEmailData email;
         std::function<void( bool )> completionHandler;
     };
-    
+
     const conf::Settings& m_settings;
     bool m_terminated;
     mutable QnMutex m_mutex;
-    QUrl m_notificationModuleUrl;
-    std::set<nx_http::AsyncHttpClientPtr> m_ongoingRequests;
+    nx::utils::Url m_notificationModuleUrl;
+    std::set<nx::network::http::AsyncHttpClientPtr> m_ongoingRequests;
     nx::utils::Counter m_startedAsyncCallsCounter;
     std::atomic<std::uint64_t> m_notificationSequence;
 
     void onSendNotificationRequestDone(
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
-        nx_http::AsyncHttpClientPtr client,
+        nx::network::http::AsyncHttpClientPtr client,
         std::uint64_t notificationIndex,
         std::function<void(bool)> completionHandler);
 };

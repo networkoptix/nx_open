@@ -24,7 +24,7 @@ public:
         stun::AbstractAsyncClient::bindToAioThread(aioThread);
     }
 
-    virtual void connect(const QUrl& /*url*/, ConnectHandler handler = nullptr) override
+    virtual void connect(const nx::utils::Url& /*url*/, ConnectHandler handler = nullptr) override
     {
         if (handler)
             post([handler = std::move(handler)]() { handler(SystemError::noError); });
@@ -64,14 +64,14 @@ public:
         return true;
     }
 
-    virtual SocketAddress localAddress() const override
+    virtual nx::network::SocketAddress localAddress() const override
     {
-        return SocketAddress();
+        return nx::network::SocketAddress();
     }
 
-    virtual SocketAddress remoteAddress() const override
+    virtual nx::network::SocketAddress remoteAddress() const override
     {
-        return SocketAddress();
+        return nx::network::SocketAddress();
     }
 
     virtual void closeConnection(SystemError::ErrorCode /*errorCode*/) override
@@ -150,7 +150,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        std::list<SocketAddress> addresses{ SocketAddress::anyPrivateAddress };
+        std::list<nx::network::SocketAddress> addresses{ nx::network::SocketAddress::anyPrivateAddress };
         for (int i = 0; i < requestCount; ++i)
         {
             m_publisher->updateAddresses(

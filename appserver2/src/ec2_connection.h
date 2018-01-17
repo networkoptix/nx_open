@@ -8,6 +8,7 @@
 
 #include <memory>
 
+#include <nx/utils/url.h>
 #include "base_ec2_connection.h"
 #include "ec2_statictics_reporter.h"
 #include "server_query_processor.h"
@@ -25,12 +26,12 @@ namespace ec2
             const Ec2DirectConnectionFactory* connectionFactory,
             ServerQueryProcessorAccess* queryProcessor,
             const QnConnectionInfo& connectionInfo,
-            const QUrl& dbUrl);
+            const nx::utils::Url& dbUrl);
         virtual ~Ec2DirectConnection();
 
         //!Implementation of ec2::AbstractECConnection::connectionInfo
         virtual QnConnectionInfo connectionInfo() const override;
-        virtual void updateConnectionUrl(const QUrl& url) override;
+        virtual void updateConnectionUrl(const nx::utils::Url& url) override;
 
         bool initialized() const;
 

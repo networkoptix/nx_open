@@ -78,10 +78,13 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
 
     /* Persistent settings override. */
     addParserParam(commandLineParser, &result.logLevel, "--log-level");
+    addParserParam(commandLineParser, &result.logFile, "--log-file");
     addParserParam(commandLineParser, &result.ec2TranLogLevel, "--ec2-tran-log-level", lit("none"));
+    addParserParam(commandLineParser, &result.exceptionFilters, "--exception-filters");
 
     addParserParam(commandLineParser, &result.clientUpdateDisabled, "--no-client-update");
     addParserParam(commandLineParser, &result.vsyncDisabled, "--no-vsync");
+    addParserParam(commandLineParser, &result.profilerMode, "--profiler");
 
     /* Runtime settings */
     addParserParam(commandLineParser, &result.ignoreVersionMismatch, "--no-version-mismatch-check");
@@ -97,6 +100,8 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.lightMode, "--light-mode", lit("full"));
     addParserParam(commandLineParser, &result.enforceSocketType, "--enforce-socket");
     addParserParam(commandLineParser, &result.enforceMediatorEndpoint, "--enforce-mediator");
+
+    addParserParam(commandLineParser, &result.qmlRoot, "--qml-root");
 
     commandLineParser.parse(argc, (const char**) argv, stderr);
 
@@ -123,7 +128,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     return result;
 }
 
-QString QnStartupParameters::createAuthenticationString(const QUrl& url,
+QString QnStartupParameters::createAuthenticationString(const nx::utils::Url& url,
     const QnSoftwareVersion& version)
 {
     // For old clients use compatible format
@@ -134,7 +139,7 @@ QString QnStartupParameters::createAuthenticationString(const QUrl& url,
     return kEncodeAuthMagic + encoded.encoded();
 }
 
-QUrl QnStartupParameters::parseAuthenticationString(QString string)
+nx::utils::Url QnStartupParameters::parseAuthenticationString(QString string)
 {
     if (string.startsWith(kEncodeAuthMagic))
     {
@@ -142,10 +147,10 @@ QUrl QnStartupParameters::parseAuthenticationString(QString string)
         string = QnEncodedString::fromEncoded(string).value();
     }
 
-    return QUrl::fromUserInput(string);
+    return nx::utils::Url::fromUserInput(string);
 }
 
-QUrl QnStartupParameters::parseAuthenticationString() const
+nx::utils::Url QnStartupParameters::parseAuthenticationString() const
 {
     return parseAuthenticationString(authenticationString);
 }

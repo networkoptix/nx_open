@@ -1,7 +1,7 @@
 #include "sign_dialog.h"
 #include "ui_sign_dialog.h"
 
-#include "plugins/resource/avi/avi_resource.h"
+#include "core/resource/avi/avi_resource.h"
 #include "nx/streaming/abstract_archive_stream_reader.h"
 
 #include "camera/gl_renderer.h"

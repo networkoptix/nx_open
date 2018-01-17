@@ -15,7 +15,7 @@ namespace nx { namespace vms { namespace discovery { class Manager; } } }
 struct QnRoute
 {
 
-    SocketAddress addr; // address for physical connect
+    nx::network::SocketAddress addr; // address for physical connect
     QnUuid id;          // requested server ID
     QnUuid gatewayId;   // proxy server ID. May be null
     bool reverseConnect;// if target server should connect to this one
@@ -36,7 +36,7 @@ public:
 
     // todo: new routing functions below. We have to delete above functions
     QnRoute routeTo(const QnUuid &id);
-    void updateRequest(QUrl& url, nx_http::HttpHeaders& headers, const QnUuid &id);
+    void updateRequest(QUrl& url, nx::network::http::HttpHeaders& headers, const QnUuid &id);
 
 private:
     const nx::vms::discovery::Manager* m_moduleManager;

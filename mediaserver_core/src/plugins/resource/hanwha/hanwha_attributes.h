@@ -17,8 +17,8 @@ class HanwhaAttributes
     static const int kNoChannel = -1;
 public:
     HanwhaAttributes() = default;
-    explicit HanwhaAttributes(nx_http::StatusCode::Value statusCode);
-    explicit HanwhaAttributes(const QString& attributesXml, nx_http::StatusCode::Value statusCode);
+    explicit HanwhaAttributes(nx::network::http::StatusCode::Value statusCode);
+    explicit HanwhaAttributes(const QString& attributesXml, nx::network::http::StatusCode::Value statusCode);
 
     template<typename T>
     boost::optional<T> attribute(
@@ -58,28 +58,22 @@ public:
 
     bool isValid() const;
 
-    int channelCount() const;
-
-    nx_http::StatusCode::Value statusCode() const;
+    nx::network::http::StatusCode::Value statusCode() const;
 
 private:
+
     boost::optional<QString> findAttribute(
         const QString& group,
         const QString& attributeName,
         int channel) const;
 
-    bool parseXml(const QString& attributesXml);
-
-    bool parseGroups(QXmlStreamReader& reader);
-
-    bool parseCategories(QXmlStreamReader& reader, const QString& group);
-
-    bool parseAttributes(QXmlStreamReader& reader, const QString& group, int channel = kNoChannel);
+    void parseXml(QXmlStreamReader& reader, const QString& group, int channel);
+    void parseAttribute(QXmlStreamReader& reader, const QString& group, int channel);
 
 private:
     using GroupName = QString;
     using ChannelNumber = int;
-    using AttributeName = QString; 
+    using AttributeName = QString;
     using AttributeValue = QString;
     using Groups = std::map<GroupName, std::map<AttributeName, AttributeValue>>;
 
@@ -87,7 +81,7 @@ private:
 
 private:
     bool m_isValid = false;
-    nx_http::StatusCode::Value m_statusCode;
+    nx::network::http::StatusCode::Value m_statusCode;
 };
 
 template<>

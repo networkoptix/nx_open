@@ -2,7 +2,7 @@
 
 #if defined(ENABLE_HANWHA)
 
-#include <plugins/resource/hanwha/hanwha_mixed_preset_manager.h>
+#include <plugins/resource/hanwha/hanwha_mapped_preset_manager.h>
 
 #include <core/ptz/basic_ptz_controller.h>
 #include <core/resource/resource_fwd.h>
@@ -11,20 +11,6 @@
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
-
-static const std::map<QString, Ptz::Capability> kHanwhaPtzCapabilityAttributes =
-{
-    {lit("Absolute.Pan"), Ptz::Capability::AbsolutePanCapability},
-    {lit("Absolute.Tilt"), Ptz::Capability::AbsoluteTiltCapability},
-    {lit("Absolute.Zoom"), Ptz::Capability::AbsoluteZoomCapability},
-    {lit("Continuous.Pan"), Ptz::Capability::ContinuousPanCapability},
-    {lit("Continuous.Tilt"), Ptz::Capability::ContinuousTiltCapability},
-    {lit("Continuous.Zoom"), Ptz::Capability::ContinuousZoomCapability},
-    {lit("Continuous.Focus"), Ptz::Capability::ContinuousFocusCapability},
-    {lit("Preset"), Ptz::Capability::NativePresetsPtzCapability},
-    {lit("AreaZoom"), Ptz::Capability::ViewportPtzCapability},
-    {lit("Home"), Ptz::Capability::HomePtzCapability}
-};
 
 class HanwhaPtzController: public QnBasicPtzController
 {
@@ -83,7 +69,8 @@ private:
     Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
     QnPtzLimits m_ptzLimits;
     QnPtzAuxilaryTraitList m_ptzTraits;
-    mutable std::unique_ptr<HanwhaMixedPresetManager> m_presetManager;
+    mutable std::unique_ptr<HanwhaMappedPresetManager> m_presetManager;
+    QMap<QString, float> m_lastParamValue;
 
 };
 

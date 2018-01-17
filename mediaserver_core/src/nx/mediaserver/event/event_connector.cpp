@@ -217,14 +217,27 @@ void EventConnector::at_analyticsSdkEvent(const QnResourcePtr& resource,
     vms::event::EventState toggleState,
     const QString& caption,
     const QString& description,
+    const QString& auxiliaryData,
     qint64 timeStampUsec)
 {
     if (!resource)
         return;
 
     vms::event::AnalyticsSdkEventPtr event(new vms::event::AnalyticsSdkEvent(
-        resource->toSharedPointer(), driverId, eventId, toggleState, caption, description, timeStampUsec));
+        resource->toSharedPointer(),
+        driverId,
+        eventId,
+        toggleState,
+        caption,
+        description,
+        auxiliaryData,
+        timeStampUsec));
 
+    qnEventRuleProcessor->processEvent(event);
+}
+
+void EventConnector::at_analyticsSdkEvent(const nx::vms::event::AnalyticsSdkEventPtr& event)
+{
     qnEventRuleProcessor->processEvent(event);
 }
 
@@ -273,11 +286,19 @@ void EventConnector::at_noStorages(const QnResourcePtr& resource)
 
 void EventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& resource)
 {
+    const auto secRes = resource.dynamicCast<QnSecurityCamResource>();
+    NX_ASSERT(secRes, lit("Resource is not a descendant of QnSecurityCamResource"));
+    if (!secRes)
+        return;
+
     vms::event::SystemHealthActionPtr action(
         new vms::event::SystemHealthAction(QnSystemHealth::MessageType::RemoteArchiveSyncStarted,
-        serverGuid()));
+            serverGuid()));
 
     auto params = action->getRuntimeParams();
+    params.description = lit("Remote archive synchronization has been started for resource %1")
+        .arg(secRes->getUserDefinedName());
+
     params.metadata.cameraRefs.push_back(resource->getId());
     action->setRuntimeParams(params);
     qnEventRuleProcessor->broadcastAction(action);
@@ -285,11 +306,19 @@ void EventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& resource)
 
 void EventConnector::at_remoteArchiveSyncFinished(const QnResourcePtr &resource)
 {
+    const auto secRes = resource.dynamicCast<QnSecurityCamResource>();
+    NX_ASSERT(secRes, lit("Resource is not a descendant of QnSecurityCamResource"));
+    if (!secRes)
+        return;
+
     vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         QnSystemHealth::MessageType::RemoteArchiveSyncFinished,
         serverGuid()));
 
     auto params = action->getRuntimeParams();
+    params.description = lit("Remote archive synchronization has been finished for resource %1")
+        .arg(secRes->getUserDefinedName());
+
     params.metadata.cameraRefs.push_back(resource->getId());
     action->setRuntimeParams(params);
     qnEventRuleProcessor->broadcastAction(action);
@@ -299,6 +328,11 @@ void EventConnector::at_remoteArchiveSyncError(
     const QnResourcePtr &resource,
     const QString& error)
 {
+    const auto secRes = resource.dynamicCast<QnSecurityCamResource>();
+    NX_ASSERT(secRes, lit("Resource is not a descendant of QnSecurityCamResource"));
+    if (!secRes)
+        return;
+
     vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         QnSystemHealth::MessageType::RemoteArchiveSyncError,
         serverGuid()));
@@ -306,6 +340,9 @@ void EventConnector::at_remoteArchiveSyncError(
     auto params = action->getRuntimeParams();
     params.metadata.cameraRefs.push_back(resource->getId());
     params.caption = error;
+    params.description = lit("Error occurred while synchronizing remote archive for resource %1")
+        .arg(secRes->getUserDefinedName());
+
     action->setRuntimeParams(params);
     qnEventRuleProcessor->broadcastAction(action);
 }
@@ -316,24 +353,40 @@ void EventConnector::at_remoteArchiveSyncProgress(
 {
     NX_ASSERT(progress >= 0 && progress <= 1);
 
+    const auto secRes = resource.dynamicCast<QnSecurityCamResource>();
+    NX_ASSERT(secRes, lit("Resource is not a descendant of QnSecurityCamResource"));
+    if (!secRes)
+        return;
+
     vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         QnSystemHealth::MessageType::RemoteArchiveSyncProgress,
         serverGuid()));
 
     auto params = action->getRuntimeParams();
     params.metadata.cameraRefs.push_back(resource->getId());
+    params.description = lit("Remote archive synchronization progress is %1% for resource %2")
+        .arg(qRound(progress * 100))
+        .arg(secRes->getUserDefinedName());
+
     action->setRuntimeParams(params);
     qDebug() << "Broadcasting sync progress business action";
     qnEventRuleProcessor->broadcastAction(action);
 }
-
-
 
 void EventConnector::at_archiveRebuildFinished(const QnResourcePtr& resource,
     QnSystemHealth::MessageType msgType)
 {
     vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         msgType, resource->getId()));
+    qnEventRuleProcessor->broadcastAction(action);
+}
+
+void EventConnector::at_fileIntegrityCheckFailed(const QnResourcePtr& resource)
+{
+    vms::event::SystemHealthActionPtr action(
+        new vms::event::SystemHealthAction(
+            QnSystemHealth::ArchiveIntegrityFailed,
+            resource->getId()));
     qnEventRuleProcessor->broadcastAction(action);
 }
 
@@ -498,7 +551,12 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
                 return false;
 
             at_analyticsSdkEvent(resource, params.analyticsDriverId(), params.analyticsEventId(),
-                eventState, params.caption, params.description, params.eventTimestampUsec);
+                eventState,
+                params.caption,
+                params.description,
+                /*auxiliary data*/QString(),
+                params.eventTimestampUsec);
+
             return true;
         }
 

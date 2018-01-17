@@ -1,6 +1,9 @@
 #include "restore_state_rest_handler.h"
 
 #include <nx/network/http/http_types.h>
+
+#include <nx/vms/utils/vms_utils.h>
+
 #include <rest/server/rest_connection_processor.h>
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
@@ -45,16 +48,16 @@ int QnRestoreStateRestHandler::execute(
         return QnPermissionsHelper::notOwnerError(result);
 
     QString errStr;
-    if (!validatePasswordData(passwordData, &errStr))
+    if (!nx::vms::utils::validatePasswordData(passwordData, &errStr))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
         return QnPermissionsHelper::safeModeError(result);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 void QnRestoreStateRestHandler::afterExecute(

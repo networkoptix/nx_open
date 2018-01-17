@@ -32,6 +32,7 @@ namespace settings_names {
 const QString kNameDisabledVendors(lit("disabledVendors"));
 const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
 const QString kNameAutoUpdateThumbnails(lit("autoUpdateThumbnails"));
+const QString kMaxSceneItemsOverrideKey(lit("maxSceneItems"));
 const QString kUseTextEmailFormat(lit("useTextEmailFormat"));
 const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
 const QString kAuditTrailPeriodDaysName(lit("auditTrailPeriodDays"));
@@ -127,6 +128,12 @@ public:
      */
     bool isAutoUpdateThumbnailsEnabled() const;
     void setAutoUpdateThumbnailsEnabled(bool value);
+
+    /**
+     * Override maximum allowed scene items count.
+     */
+    int maxSceneItemsOverride() const;
+    void setMaxSceneItemsOverride(int value);
 
     /**
      * Send text email instead of HTML email in event rules/actions
@@ -254,6 +261,9 @@ public:
     bool cloudConnectUdpHolePunchingEnabled() const;
     bool cloudConnectRelayingEnabled() const;
 
+    std::chrono::seconds maxRtspConnectDuration() const;
+    void setMaxRtspConnectDuration(std::chrono::seconds newValue);
+
     /*!
         \a QnAbstractResourcePropertyAdaptor class methods are thread-safe
         \note returned list is not changed during \a QnGlobalSettings instance life-time
@@ -265,17 +275,30 @@ public:
     int maxRecorderQueueSizeBytes() const;
     int maxRecorderQueueSizePackets() const;
 
+    #if defined(ENABLE_HANWHA)
+        bool hanwhaDeleteProfilesOnInitIfNeeded() const;
+        void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
+    #endif
+
+    bool isEdgeRecordingEnabled() const;
+    void setEdgeRecordingEnabled(bool enabled);
+
+    int maxRemoteArchiveSynchronizationThreads() const;
+    void setMaxRemoteArchiveSynchronizationThreads(int newValue);
+
 signals:
     void initialized();
 
     void systemNameChanged();
     void localSystemIdChanged();
+    void localSystemIdChangedDirect();
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
     void auditTrailPeriodDaysChanged();
     void eventLogPeriodDaysChanged();
     void cameraSettingsOptimizationChanged();
     void autoUpdateThumbnailsChanged();
+    void maxSceneItemsChanged();
     void useTextEmailFormatChanged();
     void autoDiscoveryChanged();
     void emailSettingsChanged();
@@ -307,6 +330,7 @@ private:
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
     QnResourcePropertyAdaptor<bool> *m_autoUpdateThumbnailsAdaptor;
+    QnResourcePropertyAdaptor<int>* m_maxSceneItemsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_useTextEmailFormatAdaptor;
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor;
@@ -379,9 +403,18 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount;
 
     QnResourcePropertyAdaptor<int>* m_rtpFrameTimeoutMs;
+    QnResourcePropertyAdaptor<int>* m_maxRtspConnectDuration;
 
     QnResourcePropertyAdaptor<bool>* m_cloudConnectUdpHolePunchingEnabledAdaptor;
     QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor;
+
+    #if defined(ENABLE_HANWHA)
+        QnResourcePropertyAdaptor<bool>* m_hanwhaDeleteProfilesOnInitIfNeeded;
+    #endif
+
+    QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor;
+
+    QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads;
 
     AdaptorList m_allAdaptors;
 

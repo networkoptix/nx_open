@@ -63,7 +63,7 @@
                             </div>
                             <div ng-if="activeFunction">
                                 <h2>
-                                    {activeFunction.caption || activeFunction.name}
+                                    {{activeFunction.caption || activeFunction.name}}
                                     <small><a ng-click="clearActiveFunction($event)"
                                               title="back to functions list"
                                               href="#/developers/api">(X)</a></small>
@@ -80,7 +80,7 @@
                                     <ul ng-if="activeFunction.result.params">
                                         <li ng-repeat="param in activeFunction.result.params">
                                             <div class="label label-danger" ng-if="param.proprietary">所有權</div>
-                                            <div class="label label-danger" ng-if="param.optional=='false'">必填</div>
+                                            <div class="label label-danger" ng-if="!param.optional">必填</div>
                                             <b>{{param.name}}</b>
                                             <span ng-if="param.description.xml" ng-bind-html="param.description.xml"></span>
                                             <span ng-if="param.values">

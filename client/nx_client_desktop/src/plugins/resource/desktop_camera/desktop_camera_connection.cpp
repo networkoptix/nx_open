@@ -108,7 +108,7 @@ public:
 };
 
 QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     void* sslContext,
     QnDesktopResource* desktop)
     :
@@ -158,7 +158,7 @@ void QnDesktopCameraConnectionProcessor::processRequest()
     {
         // nothing to do. we restarting timer on any request
     }
-    d->response.headers.insert(std::make_pair("cSeq", nx_http::getHeaderValue(d->request.headers, "cSeq")));
+    d->response.headers.insert(std::make_pair("cSeq", nx::network::http::getHeaderValue(d->request.headers, "cSeq")));
     //QnMutexLocker lock( &d->sendMutex );
     //sendResponse("RTSP", CODE_OK, QByteArray(), QByteArray());
 }
@@ -217,11 +217,15 @@ void QnDesktopCameraConnectionProcessor::sendData(const char* data, int len)
 
 // --------------- QnDesktopCameraconnection ------------------
 
-QnDesktopCameraConnection::QnDesktopCameraConnection(QnDesktopResource* owner, const QnMediaServerResourcePtr &server):
+QnDesktopCameraConnection::QnDesktopCameraConnection(
+    QnDesktopResource* owner,
+    const QnMediaServerResourcePtr& server,
+    const QnUuid& userId)
+    :
     QnLongRunnable(),
     m_owner(owner),
     m_server(server),
-    processor(0)
+    m_userId(userId)
 {
 }
 
@@ -237,8 +241,8 @@ void QnDesktopCameraConnection::terminatedSleep(int sleep)
         msleep(10);
 }
 
-QSharedPointer<AbstractStreamSocket> QnDesktopCameraConnection::takeSocketFromHttpClient(
-    std::unique_ptr<nx_http::HttpClient>& httpClient)
+QSharedPointer<nx::network::AbstractStreamSocket> QnDesktopCameraConnection::takeSocketFromHttpClient(
+    std::unique_ptr<nx::network::http::HttpClient>& httpClient)
 {
     auto socket = QSharedPointer<nx::network::BufferedStreamSocket>(
         new nx::network::BufferedStreamSocket(httpClient->takeSocket()));
@@ -274,7 +278,7 @@ void QnDesktopCameraConnection::run()
         auth.setUser(commonModule()->currentUrl().userName());
         auth.setPassword(commonModule()->currentUrl().password());
         {
-            decltype(httpClient) localHttpClient(new nx_http::HttpClient());
+            decltype(httpClient) localHttpClient(new nx::network::http::HttpClient());
             QnMutexLocker lock(&m_mutex);
             tcpSocket.reset();
             processor.reset();
@@ -282,7 +286,10 @@ void QnDesktopCameraConnection::run()
         }
 
         httpClient->addAdditionalHeader("user-name", auth.user().toUtf8());
+        // TODO: #GDM #3.2 Remove 3.1 compatibility layer.
         httpClient->addAdditionalHeader("user-id", commonModule()->moduleGUID().toByteArray());
+        httpClient->addAdditionalHeader("unique-id",
+            QnDesktopResource::calculateUniqueId(commonModule()->moduleGUID(), m_userId).toUtf8());
         httpClient->setSendTimeoutMs(CONNECT_TIMEOUT);
         httpClient->setResponseReadTimeoutMs(CONNECT_TIMEOUT);
 
@@ -294,7 +301,7 @@ void QnDesktopCameraConnection::run()
             continue;
         }
 
-        QUrl url(m_server->getApiUrl());
+        nx::utils::Url url(m_server->getApiUrl());
         url.setScheme(lit("http"));
         url.setPath(lit("/desktop_camera"));
 

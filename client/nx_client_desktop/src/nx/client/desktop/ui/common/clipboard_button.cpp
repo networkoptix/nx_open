@@ -58,6 +58,11 @@ QString typicalConfirmation(ClipboardButton::StandardType type)
 
 } // namespace
 
+ClipboardButton::ClipboardButton(QWidget* parent):
+    ClipboardButton(StandardType::copy, parent)
+{
+}
+
 ClipboardButton::ClipboardButton(StandardType type, QWidget* parent):
     ClipboardButton(typicalText(type), typicalConfirmation(type), parent)
 {
@@ -69,7 +74,7 @@ ClipboardButton::ClipboardButton(
     QWidget* parent)
     :
     base_type(
-        qnSkin->icon(lit("buttons/copy.png")),
+        qnSkin->icon(lit("text_buttons/copy.png")),
         text,
         qnSkin->icon(lit("buttons/checkmark.png")),
         confirmationText,

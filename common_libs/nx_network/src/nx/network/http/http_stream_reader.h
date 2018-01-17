@@ -11,15 +11,19 @@
 #include "http_types.h"
 #include "line_splitter.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 /**
  * Parses stream of bytes as http messages.
- * Can handle multiple subsequent messages. Increases \a HttpStreamReader::currentMessageNumber() after successfully reading each message
+ * Can handle multiple subsequent messages.
+ * Increases HttpStreamReader::currentMessageNumber() after successfully reading each message.
  * Supports chunked stream.
- * @note Thread safety: only message body buffer - related functionality is thread-safe (required by \a AsyncHttpClient class). All other methods are NOT thread-safe
- * @note Assumes that any message is followed by message body
- * @note If message body encoding is unknown, assumes identity. If Content-Length is unknown, assumes
+ * NOTE: Thread safety: only message body buffer - related functionality is thread-safe (required by AsyncHttpClient class).
+ *   All other methods are NOT thread-safe.
+ * NOTE: Assumes that any message is followed by message body.
+ * NOTE: If message body encoding is unknown, assumes identity. If Content-Length is unknown, assumes
  *   infinite content-length (even when identity encoding is used)
  */
 class NX_NETWORK_API HttpStreamReader
@@ -30,7 +34,7 @@ public:
         waitingMessageStart,
         readingMessageHeaders,
         /**
-         * Moves to this state after reading whole message body 
+         * Moves to this state after reading whole message body
          * (in case content-length is known or chunk encoding is used).
          */
         messageDone,
@@ -56,7 +60,7 @@ public:
         const QnByteArrayConstRef& data,
         size_t* bytesProcessed = NULL);
     /**
-     * @return Actual only after state changed from readingMessageHeaders 
+     * @return Actual only after state changed from readingMessageHeaders
      * to waitingMessageStart or readingMessageBody.
      */
     const Message& message() const;
@@ -67,7 +71,7 @@ public:
     ReadState state() const;
     quint64 messageBodyBytesRead() const;
     size_t messageBodyBufferSize() const;
-    /** 
+    /**
      * Returns internal message body buffer and clears internal buffer.
      */
     BufferType fetchMessageBody();
@@ -146,7 +150,7 @@ private:
     /**
      * Reads message body parameters from message headers and initializes required data.
      * Sets members m_contentLength, m_isChunkedTransfer, a m_contentDecoder.
-     * @return true If message body could be read or no message body is delared in message. 
+     * @return true If message body could be read or no message body is delared in message.
      *   false if cannot read message body (e.g., unsupported content encoding)
      */
     bool prepareToReadMessageBody();
@@ -170,8 +174,10 @@ private:
      * Returns nullptr if encodingName is unknown.
      */
     std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter> createContentDecoder(
-        const nx_http::StringType& encodingName);
+        const nx::network::http::StringType& encodingName);
     void resetStateInternal();
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

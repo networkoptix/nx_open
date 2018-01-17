@@ -21,6 +21,7 @@ extern const char* const kSystemRenamePath;
 extern const char* const kSystemUpdatePath;
 extern const char* const kSystemRecordUserSessionStartPath;
 extern const char* const kSystemHealthHistoryPath;
+extern const char* const kSystemsMergedToASpecificSystem;
 
 extern const char* const kAuthGetNoncePath;
 extern const char* const kAuthGetAuthenticationPath;

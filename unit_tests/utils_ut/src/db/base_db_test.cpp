@@ -3,6 +3,7 @@
 #include <QtCore/QDir>
 #include <QtSql/QSqlQuery>
 
+#include <nx/utils/db/query.h>
 #include <nx/utils/test_support/utils.h>
 
 namespace nx {
@@ -10,64 +11,89 @@ namespace utils {
 namespace db {
 namespace test {
 
-BaseDbTest::BaseDbTest():
+BasicFixture::BasicFixture():
     nx::utils::test::TestWithTemporaryDirectory("utils_ut", "")
 {
     init();
 }
 
-BaseDbTest::~BaseDbTest()
+BasicFixture::~BasicFixture()
 {
 }
 
-ConnectionOptions& BaseDbTest::connectionOptions()
-{
-    return m_connectionOptions;
-}
-
-const ConnectionOptions& BaseDbTest::connectionOptions() const
+ConnectionOptions& BasicFixture::connectionOptions()
 {
     return m_connectionOptions;
 }
 
-void BaseDbTest::initializeDatabase()
+const ConnectionOptions& BasicFixture::connectionOptions() const
+{
+    return m_connectionOptions;
+}
+
+void BasicFixture::initializeDatabase()
 {
     m_connectionOptions.driverType = RdbmsDriverType::sqlite;
     m_connectionOptions.dbName = m_tmpDir + "/db.sqlite";
 
-    m_asyncSqlQueryExecutor = std::make_unique<AsyncSqlQueryExecutor>(m_connectionOptions);
-    ASSERT_TRUE(m_asyncSqlQueryExecutor->init());
+    initializeQueryExecutor(m_connectionOptions);
 }
 
-void BaseDbTest::closeDatabase()
-{
-    m_asyncSqlQueryExecutor.reset();
-}
-
-const std::unique_ptr<AsyncSqlQueryExecutor>& BaseDbTest::asyncSqlQueryExecutor()
-{
-    return m_asyncSqlQueryExecutor;
-}
-
-void BaseDbTest::executeUpdate(const QString& queryText)
+void BasicFixture::executeUpdate(const QString& queryText)
 {
     const auto dbResult = executeQuery(
         [queryText](nx::utils::db::QueryContext* queryContext)
         {
-            QSqlQuery query(*queryContext->connection());
+            SqlQuery query(*queryContext->connection());
             query.prepare(queryText);
-            if (!query.exec())
-                return DBResult::ioError;
+            query.exec();
             return DBResult::ok;
         });
     NX_GTEST_ASSERT_EQ(DBResult::ok, dbResult);
 }
 
-void BaseDbTest::init()
+void BasicFixture::init()
 {
     m_tmpDir = testDataDir() + "/db_test/";
     QDir(m_tmpDir).removeRecursively();
     ASSERT_TRUE(QDir().mkpath(m_tmpDir));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void BaseDbTest::initializeQueryExecutor(const ConnectionOptions& connectionOptions)
+{
+    m_dbInstanceController = std::make_unique<InstanceController>(connectionOptions);
+    ASSERT_TRUE(m_dbInstanceController->initialize());
+}
+
+void BaseDbTest::closeDatabase()
+{
+    m_dbInstanceController.reset();
+}
+
+AsyncSqlQueryExecutor& BaseDbTest::asyncSqlQueryExecutor()
+{
+    return m_dbInstanceController->queryExecutor();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void FixtureWithQueryExecutorOnly::initializeQueryExecutor(
+    const ConnectionOptions& connectionOptions)
+{
+    m_queryExecutor = std::make_unique<AsyncSqlQueryExecutor>(connectionOptions);
+    ASSERT_TRUE(m_queryExecutor->init());
+}
+
+void FixtureWithQueryExecutorOnly::closeDatabase()
+{
+    m_queryExecutor.reset();
+}
+
+AsyncSqlQueryExecutor& FixtureWithQueryExecutorOnly::asyncSqlQueryExecutor()
+{
+    return *m_queryExecutor;
 }
 
 } // namespace test

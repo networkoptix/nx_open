@@ -12,17 +12,11 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <onvif/soapMediaBindingProxy.h>
+#include <nx/utils/log/log.h>
+#include <plugins/utils/xml_request_helper.h>
 
 namespace {
-
-const std::chrono::milliseconds kRequestTimeout(4000);
-
-bool isResponseOK(const nx_http::HttpClient* client)
-{
-    if (!client->response())
-        return false;
-    return client->response()->statusLine.statusCode == nx_http::StatusCode::ok;
-}
 
 const std::array<Qn::ConnectionRole, 2> kRoles = {
     Qn::ConnectionRole::CR_LiveVideo,
@@ -35,6 +29,7 @@ namespace mediaserver_core {
 namespace plugins {
 
 using namespace nx::mediaserver_core::plugins::hikvision;
+using namespace nx::plugins::utils;
 
 HikvisionResource::HikvisionResource():
     QnPlOnvifResource()
@@ -49,6 +44,8 @@ HikvisionResource::~HikvisionResource()
 
 CameraDiagnostics::Result HikvisionResource::initInternal()
 {
+    tryToEnableOnvifSupport(getDeviceOnvifUrl(), getAuth());
+
     auto result = QnPlOnvifResource::initInternal();
     if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
         return result;
@@ -63,7 +60,7 @@ QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
 {
     if (m_hevcSupported)
         return new plugins::HikvisionHevcStreamReader(toSharedPointer(this));
-    
+
     return base_type::createLiveDataProvider();
 }
 
@@ -105,34 +102,27 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
     if (!m_hevcSupported)
         return base_type::initializeMedia(onvifCapabilities);
 
-    return CameraDiagnostics::NoErrorResult();
+    return fetchChannelCount();
 }
 
-std::unique_ptr<nx_http::HttpClient> HikvisionResource::getHttpClient()
+std::unique_ptr<nx::network::http::HttpClient> HikvisionResource::getHttpClient()
 {
-    std::unique_ptr<nx_http::HttpClient> httpClient(new nx_http::HttpClient);
-    httpClient->setResponseReadTimeoutMs(kRequestTimeout.count());
-    httpClient->setSendTimeoutMs(kRequestTimeout.count());
-    httpClient->setMessageBodyReadTimeoutMs(kRequestTimeout.count());
-    httpClient->setUserName(getAuth().user());
-    httpClient->setUserPassword(getAuth().password());
-
-    return std::move(httpClient);
+    return makeHttpClient(getAuth());
 }
 
 CameraDiagnostics::Result HikvisionResource::fetchChannelCapabilities(
     Qn::ConnectionRole role,
     ChannelCapabilities* outCapabilities)
 {
-    auto url = QUrl(getUrl());
+    auto url = nx::utils::Url(getUrl());
     url.setPath(kCapabilitiesRequestPathTemplate.arg(
         buildChannelNumber(role, getChannel())));
 
     nx::Buffer response;
-    nx_http::StatusCode::Value statusCode;
+    nx::network::http::StatusCode::Value statusCode;
     if (!doGetRequest(url, getAuth(), &response, &statusCode))
     {
-        if (statusCode == nx_http::StatusCode::Value::unauthorized)
+        if (statusCode == nx::network::http::StatusCode::Value::unauthorized)
             return CameraDiagnostics::NotAuthorisedResult(url.toString());
 
         return CameraDiagnostics::RequestFailedResult(
@@ -154,10 +144,10 @@ CameraDiagnostics::Result HikvisionResource::initialize2WayAudio()
 {
     auto httpClient = getHttpClient();
 
-    QUrl requestUrl(getUrl());
+    nx::utils::Url requestUrl(getUrl());
     requestUrl.setPath(lit("/ISAPI/System/TwoWayAudio/channels"));
     requestUrl.setHost(getHostAddress());
-    requestUrl.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
+    requestUrl.setPort(nx::utils::Url(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT));
 
     if (!httpClient->doGet(requestUrl) || !isResponseOK(httpClient.get()))
     {
@@ -205,7 +195,7 @@ CameraDiagnostics::Result HikvisionResource::initialize2WayAudio()
         if (hikTransmitter)
         {
             hikTransmitter->setChannelId(channel->id);
-            hikTransmitter->setAudioUploadHttpMethod(nx_http::Method::put);
+            hikTransmitter->setAudioUploadHttpMethod(nx::network::http::Method::put);
         }
 
         setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
@@ -222,6 +212,158 @@ boost::optional<ChannelCapabilities> HikvisionResource::channelCapabilities(
         return boost::none;
 
     return itr->second;
+}
+
+bool HikvisionResource::findDefaultPtzProfileToken()
+{
+    std::unique_ptr<MediaSoapWrapper> soapWrapper(new MediaSoapWrapper(
+        getMediaUrl().toStdString(),
+        getAuth().user(),
+        getAuth().password(),
+        getTimeDrift()));
+
+    ProfilesReq request;
+    ProfilesResp response;
+    int soapRes = soapWrapper->getProfiles(request, response);
+    if (soapRes != SOAP_OK)
+    {
+        NX_WARNING(this, lm("Can't read profile list from device %1").arg(getMediaUrl()));
+        return false;
+    }
+
+    for (const auto& profile : response.Profiles)
+    {
+        if (!profile || !profile->PTZConfiguration)
+            continue;
+        QString ptzConfiguration = QString::fromStdString(profile->PTZConfiguration->token);
+        if (ptzConfiguration == getPtzConfigurationToken())
+        {
+            setPtzProfileToken(QString::fromStdString(profile->token));
+            return true;
+        }
+    }
+    return false;
+}
+
+static const auto kIntegratePath = lit("ISAPI/System/Network/Integrate");
+static const auto kEnableOnvifXml = QString::fromUtf8(R"xml(
+<?xml version:"1.0" encoding="UTF-8"?>
+<Integrate>
+    <ONVIF><enable>true</enable><certificateType/></ONVIF>
+</Integrate>
+)xml").trimmed();
+
+static const auto kSetOnvifUserPath = lit("ISAPI/Security/ONVIF/users/");
+static const auto kSetOnvifUserXml = QString::fromUtf8(R"xml(
+<?xml version:"1.0" encoding="UTF-8"?>
+<User>
+    <id>%1</id>
+    <userName>%2</userName>
+    <password>%3</password>
+    <userType>administrator</userType>
+</User>
+)xml").trimmed();
+
+class HikvisionRequestHelper: protected XmlRequestHelper
+{
+public:
+    using XmlRequestHelper::XmlRequestHelper;
+
+    boost::optional<bool> isOnvifSupported()
+    {
+        const auto document = get(kIntegratePath);
+        if (!document)
+            return boost::none;
+
+        const auto value = document->documentElement()
+            .firstChildElement(lit("ONVIF")).firstChildElement(lit("enable")).text();
+
+        if (value == lit("true"))
+            return true;
+
+        if (value == lit("false"))
+            return false;
+
+        NX_WARNING(this, lm("Unexpected ONVIF.enable value '%1' on %2").args(value, m_client->url()));
+        return boost::none;
+    }
+
+    bool enableOnvif()
+    {
+        const auto result = put(kIntegratePath, kEnableOnvifXml);
+        NX_DEBUG(this, lm("Enable ONVIF result=%1 on %2").args(result, m_client->url()));
+        return result;
+    }
+
+    boost::optional<std::map<int, QString>> getOnvifUsers()
+    {
+        const auto document = get(kSetOnvifUserPath);
+        if (!document)
+            return boost::none;
+
+        std::map<int, QString> users;
+        const auto nodeList = document->documentElement().elementsByTagName(lit("User"));
+        for (int nodeIndex = 0; nodeIndex < nodeList.size(); ++nodeIndex)
+        {
+            const auto element = nodeList.at(nodeIndex).toElement();
+            const auto value =
+                [&](const QString& s) { return element.elementsByTagName(s).at(0).toElement().text(); };
+
+            bool isOk = false;
+            users.emplace(value(lit("id")).toInt(&isOk), value(lit("userName")));
+            if (!isOk || users.rbegin()->second.isEmpty())
+            {
+                NX_VERBOSE(this, lm("Unable to parse users from %1").arg(m_client->url()));
+                return boost::none;
+            }
+        }
+
+        NX_VERBOSE(this, lm("ONVIF users %1 on %2").container(users).arg(m_client->url()));
+        return users;
+    }
+
+    bool setOnvifCredentials(int userId, const QString& login, const QString& password)
+    {
+        const auto userNumber = QString::number(userId);
+        const auto result = put(
+            kSetOnvifUserPath + userNumber,
+            kSetOnvifUserXml.arg(userNumber, login, password));
+
+        NX_DEBUG(this, lm("Set ONVIF credentials result=%1 on %2").args(result, m_client->url()));
+        return result;
+    }
+};
+
+bool HikvisionResource::tryToEnableOnvifSupport(const nx::utils::Url& url, const QAuthenticator& authenticator)
+{
+    HikvisionRequestHelper requestHelper(url, authenticator);
+    const auto isOnvifSupported = requestHelper.isOnvifSupported();
+    if (!isOnvifSupported)
+        return false;
+
+    if (*isOnvifSupported == false)
+    {
+        if (!requestHelper.enableOnvif())
+            return false;
+    }
+
+    const auto users = requestHelper.getOnvifUsers();
+    if (!users)
+        return false;
+
+    const auto existingUser = std::find_if(users->begin(), users->end(),
+        [&](const std::pair<int, QString>& u) { return u.second == authenticator.user(); });
+
+    return requestHelper.setOnvifCredentials(
+        (existingUser != users->end())
+            ? existingUser->first //< Override user permissions and password.
+            : (users->empty() ? 1 : users->rbegin()->first + 1), //< New user.
+        authenticator.user(), authenticator.password());
+}
+
+CameraDiagnostics::Result HikvisionResource::fetchChannelCount(bool /*limitedByEncoders*/)
+{
+    return base_type::fetchChannelCount(/*limitedByEncoders*/ false);
 }
 
 } // namespace plugins

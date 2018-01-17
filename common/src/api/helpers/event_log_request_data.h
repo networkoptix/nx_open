@@ -8,7 +8,7 @@
 
 #include <nx/utils/uuid.h>
 
-struct QnEventLogRequestData
+struct QnEventLogFilterData
 {
     QnTimePeriod period;
     QnSecurityCamResourceList cameras;
@@ -16,6 +16,16 @@ struct QnEventLogRequestData
     QnUuid eventSubtype;
     nx::vms::event::ActionType actionType = nx::vms::event::undefinedAction;
     QnUuid ruleId;
+
+    void loadFromParams(QnResourcePool* resourcePool, const QnRequestParamList& params);
+    QnRequestParamList toParams() const;
+
+    bool isValid(QString* errorString) const;
+};
+
+struct QnEventLogRequestData
+{
+    QnEventLogFilterData filter;
     Qn::SerializationFormat format = Qn::SerializationFormat::JsonFormat;
 
     void loadFromParams(QnResourcePool* resourcePool, const QnRequestParamList& params);

@@ -75,7 +75,7 @@ void QnMobileClientSettings::updateValuesFromSettings(
 QVariant QnMobileClientSettings::readValueFromSettings(
         QSettings* settings,
         int id,
-        const QVariant& defaultValue)
+        const QVariant& defaultValue) const
 {
     auto baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
 
@@ -102,7 +102,6 @@ void QnMobileClientSettings::writeValueToSettings(
     switch (id)
     {
         /* Temporary options. Not to be written. */
-        case BasePath:
         case LiteMode:
         case TestMode:
         case InitialTest:

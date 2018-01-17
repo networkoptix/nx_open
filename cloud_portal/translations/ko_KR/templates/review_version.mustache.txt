@@ -1,10 +1,10 @@
-There is a new revision for {{ message.product }}
+{{ message.product }}의 새개정판이 있습니다.
 
-Click on the link to review draft {{ message.id }} for {{ message.product }}
+{{ message.id }}링크를 선택하여 {{ message.product }}에 대한 내용을 검토를 하세요.
 
-Link to review: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+연결확인: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
 
-On this page you can
-1) Create a preview to see the most recent changes.
-2) Publish this version which will update all content.
-3) Edit contexts by clicking on the edit record button. To see those changes you will need to create a new version.
+상기내용은 아래와 같습니다.
+1) 최근변경사항 확인하기
+2) 모든 콘텐츠가 업데이트된 지금 버전을 게시하세요.
+3) 레코드 편집 버튼을 선택하여 텍스트를 편집하십시오. 변경 사항을 확인하려면 새 버전을 생성해야 합니다.

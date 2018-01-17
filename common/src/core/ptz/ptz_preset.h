@@ -5,10 +5,6 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QVector3D>
 
-#ifndef Q_MOC_RUN
-#include <boost/operators.hpp>
-#endif
-
 #include "ptz_fwd.h"
 
 #include <common/common_globals.h>
@@ -16,8 +12,9 @@
 #include <nx/fusion/model_functions_fwd.h>
 
 static const QString kPresetsPropertyKey = lit("ptzPresets");
+static const QString kPtzPresetMappingPropertyName = lit("presetMapping");
 
-struct QnPtzPreset: public boost::equality_comparable1<QnPtzPreset>
+struct QnPtzPreset
 {
     Q_GADGET
 public:
@@ -26,14 +23,12 @@ public:
         const QString& id,
         const QString& name,
         const QString& idOnDevice = QString())
-        : 
+        :
         id(id),
         name(name),
         idOnDevice(idOnDevice)
     {
     }
-
-    friend bool operator==(const QnPtzPreset &l, const QnPtzPreset &r);
 
     QString id;
     QString name;
@@ -76,5 +71,7 @@ struct QnPtzPresetRecord
 QN_FUSION_DECLARE_FUNCTIONS(QnPtzPresetRecord, (json)(eq));
 
 using QnPtzPresetRecordHash = QHash<QString, QnPtzPresetRecord>;
+
+using QnPtzPresetMapping = QMap<QString, QnPtzPreset>;
 
 Q_DECLARE_METATYPE(QnPtzPresetRecordHash);

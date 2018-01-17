@@ -11,7 +11,7 @@ var Config = {
 
     cacheTimeout: 20 * 1000, // Cache lives for 30 seconds
     updateInterval:  30 * 1000, // Update content on pages every 30 seconds
-    openClientTimeout: 10 * 1000, // 20 seconds we wait for client to open
+    openClientTimeout: 20 * 1000, // 20 seconds we wait for client to open
 
     openMobileClientTimeout: 300, // 300ms for mobile browsers
 
@@ -208,15 +208,24 @@ var Config = {
             // * 30 seconds for server to init camera
             // * 20 seconds for chunks
             // * 10 seconds extra
+        updateArchiveStateTimeout: 60*1000, // If camera hs no archive - try to update it every minute
         flashChromelessPath: "components/flashlsChromeless.swf",
         flashChromelessDebugPath: "components/flashlsChromeless_debug.swf",
-        staticResources: "static/web_common/"
+        staticResources: "static/web_common/",
+        maxCrashCount: 2,
+        nativeTimeout: 60 * 1000, //60s
+        playerReadyTimeout: 100,
+        endOfArchiveTime: 30 * 1000, //30s
+        chunksToCheckFatal: 30 //This is used in short cache when requesting chunks for jumpToPosition in timeline directive
+
     },
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',
     globalAccessAllMediaPermission: 'GlobalAccessAllMediaPermission',
+    allowBetaMode: false, //Enables usage of beta features
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
         chunksOnTimeline: false, // timeline.js - draw debug events
     },
+    responseOk: 'ok'
 };

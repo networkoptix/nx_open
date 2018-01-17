@@ -13,14 +13,17 @@
 #include <boost/optional.hpp>
 
 #include <udt/udt.h>
+
+#include <nx/network/aio/aio_service.h>
+#include <nx/network/system_socket.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
-#include <nx/network/system_socket.h>
 #include <nx/utils/scope_guard.h>
 
 #include "udt_common.h"
 #include "udt_socket_impl.h"
 #include "../aio/async_socket_helper.h"
+#include "../address_resolver.h"
 #ifdef _WIN32
 #include "../win32_socket_tools.h"
 #endif
@@ -30,22 +33,15 @@ namespace nx {
 namespace network {
 namespace detail {
 
-//TODO #ak we have UdtSocketImpl and UDTSocketImpl! refactor!
-// Implementator to keep the layout of class clean and achieve binary compatible
+// TODO: #ak we have UdtSocketImpl and UDTSocketImpl! refactor!
 class UdtSocketImpl:
     public UDTSocketImpl
 {
 public:
-    UdtSocketImpl()
-    {
-    }
+    UdtSocketImpl() = default;
 
     UdtSocketImpl(UDTSOCKET socket):
         UDTSocketImpl(socket)
-    {
-    }
-
-    ~UdtSocketImpl()
     {
     }
 
@@ -56,33 +52,44 @@ private:
 
 struct UdtEpollHandlerHelper
 {
-    UdtEpollHandlerHelper(int fd,UDTSOCKET udt_handler):
+    UdtEpollHandlerHelper(int fd, UDTSOCKET udt_handler):
         epoll_fd(fd)
     {
 #ifndef TRACE_UDT_SOCKET
-            Q_UNUSED(udt_handler);
+        Q_UNUSED(udt_handler);
 #endif
     }
     ~UdtEpollHandlerHelper()
     {
-        if(epoll_fd >=0) {
+        if (epoll_fd >= 0)
+        {
             int ret = UDT::epoll_release(epoll_fd);
 #ifndef TRACE_UDT_SOCKET
             Q_UNUSED(ret);
 #endif
         }
     }
-    
+
     int epoll_fd;
     UDTSOCKET udt_handler;
 };
 
 
+static void setLastSystemErrorCodeAppropriately()
+{
+    const auto systemErrorCode =
+        detail::convertToSystemError(UDT::getlasterror().getErrorCode());
+    NX_ASSERT(systemErrorCode != SystemError::noError);
+    SystemError::setLastErrorCode(
+        systemErrorCode == SystemError::noError
+        ? SystemError::invalidData
+        : systemErrorCode);
+}
+
 }// namespace detail
 
-// =====================================================================
-// UdtSocket implementation
-// =====================================================================
+ //=================================================================================================
+ // UdtSocket implementation.
 
 template<typename InterfaceToImplement>
 UdtSocket<InterfaceToImplement>::UdtSocket(int ipVersion):
@@ -99,12 +106,12 @@ UdtSocket<InterfaceToImplement>::UdtSocket(int ipVersion):
 template<typename InterfaceToImplement>
 UdtSocket<InterfaceToImplement>::~UdtSocket()
 {
-    //TODO #ak if socket is destroyed in its aio thread, it can cleanup here
+    // TODO: #ak If socket is destroyed in its aio thread, it can cleanup here.
 
     NX_CRITICAL(
         !nx::network::SocketGlobals::isInitialized() ||
         !nx::network::SocketGlobals::aioService()
-            .isSocketBeingMonitored(static_cast<Pollable*>(this)),
+        .isSocketBeingMonitored(static_cast<Pollable*>(this)),
         "You MUST cancel running async socket operation before "
         "deleting socket if you delete socket from non-aio thread");
 
@@ -117,7 +124,7 @@ UdtSocket<InterfaceToImplement>::UdtSocket(
     int ipVersion,
     detail::UdtSocketImpl* impl,
     detail::SocketState state)
-:
+    :
     Pollable(-1, std::unique_ptr<detail::UdtSocketImpl>(impl)),
     m_state(state),
     m_ipVersion(ipVersion)
@@ -130,15 +137,13 @@ UdtSocket<InterfaceToImplement>::UdtSocket(
 template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::bindToUdpSocket(UDPSocket&& udpSocket)
 {
-    //switching socket to blocking mode
     if (!udpSocket.setNonBlockingMode(false))
         return false;
 
-    //taking system socket out of udpSocket
+    // Taking system socket out of udpSocket.
     if (UDT::bind2(m_impl->udtHandle, udpSocket.handle()) != 0)
     {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return false;
     }
     udpSocket.takeHandle();
@@ -148,12 +153,11 @@ bool UdtSocket<InterfaceToImplement>::bindToUdpSocket(UDPSocket&& udpSocket)
 template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::bind(const SocketAddress& localAddress)
 {
-    SystemSocketAddress addr(localAddress, m_ipVersion);
+    const SystemSocketAddress addr(localAddress, m_ipVersion);
 
-    int ret = UDT::bind(m_impl->udtHandle, addr.ptr.get(), addr.size);
+    int ret = UDT::bind(m_impl->udtHandle, addr.get(), addr.length());
     if (ret != 0)
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -161,10 +165,9 @@ template<typename InterfaceToImplement>
 SocketAddress UdtSocket<InterfaceToImplement>::getLocalAddress() const
 {
     SystemSocketAddress addr(m_ipVersion);
-    if (UDT::getsockname(m_impl->udtHandle, addr.ptr.get(), reinterpret_cast<int*>(&addr.size)) != 0)
+    if (UDT::getsockname(m_impl->udtHandle, addr.get(), reinterpret_cast<int*>(&addr.length())) != 0)
     {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return SocketAddress();
     }
     else
@@ -177,10 +180,10 @@ template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::close()
 {
     if (m_impl->udtHandle == UDT::INVALID_SOCK)
-        return true;    //already closed
+        return true; //< Already closed.
 
-    //TODO #ak linger MUST be optional
-    //  set UDT_LINGER to 1 if socket is in blocking mode?
+                     // TODO: #ak linger MUST be optional.
+                     //  set UDT_LINGER to 1 if socket is in blocking mode?
     struct linger lingerVal;
     memset(&lingerVal, 0, sizeof(lingerVal));
     lingerVal.l_onoff = 1;
@@ -201,7 +204,7 @@ template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::shutdown()
 {
     // TODO #ak: Implementing shutdown via close may lead to undefined behavior in case of handle reuse.
-    // But, UDT allocates socket handles as atomic increment, so handle reuse is 
+    // But, UDT allocates socket handles as atomic increment, so handle reuse is
     // hard to imagine in real life.
 
 #if 0   //no LINGER
@@ -229,7 +232,7 @@ bool UdtSocket<InterfaceToImplement>::setReuseAddrFlag(bool reuseAddr)
     int reuseAddrInt = reuseAddr ? 1 : 0;
     int ret = UDT::setsockopt(m_impl->udtHandle, 0, UDT_REUSEADDR, &reuseAddrInt, sizeof(reuseAddrInt));
     if (ret != 0)
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -240,8 +243,20 @@ bool UdtSocket<InterfaceToImplement>::getReuseAddrFlag(bool* val) const
     int len = sizeof(*val);
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_REUSEADDR, val, &len);
     if (ret != 0)
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
+}
+
+template<typename InterfaceToImplement>
+bool UdtSocket<InterfaceToImplement>::setReusePortFlag(bool /*value*/)
+{
+    return true;
+}
+
+template<typename InterfaceToImplement>
+bool UdtSocket<InterfaceToImplement>::getReusePortFlag(bool* value) const
+{
+    return getReuseAddrFlag(value);
 }
 
 template<typename InterfaceToImplement>
@@ -252,12 +267,12 @@ bool UdtSocket<InterfaceToImplement>::setNonBlockingMode(bool val)
     int ret = UDT::setsockopt(m_impl->udtHandle, 0, UDT_SNDSYN, &value, sizeof(value));
     if (ret != 0)
     {
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return false;
     }
     ret = UDT::setsockopt(m_impl->udtHandle, 0, UDT_RCVSYN, &value, sizeof(value));
     if (ret != 0)
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -269,10 +284,7 @@ bool UdtSocket<InterfaceToImplement>::getNonBlockingMode(bool* val) const
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_SNDSYN, val, &len);
 
     if (ret != 0)
-    {
-        const auto error = UDT::getlasterror();
-        SystemError::setLastErrorCode(detail::convertToSystemError(error.getErrorCode()));
-    }
+        detail::setLastSystemErrorCodeAppropriately();
 
     *val = !*val;
     return ret == 0;
@@ -284,8 +296,7 @@ bool UdtSocket<InterfaceToImplement>::getMtu(unsigned int* mtuValue) const
     int valueLength = sizeof(*mtuValue);
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_MSS, mtuValue, &valueLength);
     if (ret != 0)
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -296,8 +307,7 @@ bool UdtSocket<InterfaceToImplement>::setSendBufferSize(unsigned int buffSize)
     NX_ASSERT(buffSize < static_cast<unsigned int>(std::numeric_limits<int>::max()));
     int ret = UDT::setsockopt(m_impl->udtHandle, 0, UDT_SNDBUF, &buffSize, sizeof(buffSize));
     if (ret != 0)
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -308,8 +318,7 @@ bool UdtSocket<InterfaceToImplement>::getSendBufferSize(unsigned int* buffSize) 
     int len = sizeof(*buffSize);
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_SNDBUF, buffSize, &len);
     if (ret != 0)
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -320,8 +329,7 @@ bool UdtSocket<InterfaceToImplement>::setRecvBufferSize(unsigned int buffSize)
     NX_ASSERT(buffSize < static_cast<unsigned int>(std::numeric_limits<int>::max()));
     int ret = UDT::setsockopt(m_impl->udtHandle, 0, UDT_RCVBUF, &buffSize, sizeof(buffSize));
     if (ret != 0)
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -332,8 +340,7 @@ bool UdtSocket<InterfaceToImplement>::getRecvBufferSize(unsigned int* buffSize) 
     int len = sizeof(*buffSize);
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_RCVBUF, buffSize, &len);
     if (ret != 0)
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -348,8 +355,7 @@ bool UdtSocket<InterfaceToImplement>::setRecvTimeout(unsigned int millis)
     if (ret == 0)
         m_readTimeoutMS = millis;
     else
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -363,7 +369,7 @@ bool UdtSocket<InterfaceToImplement>::getRecvTimeout(unsigned int* millis) const
         m_impl->udtHandle, 0, UDT_RCVTIMEO, &time, &len);
     *millis = (time == -1) ? 0 : static_cast<unsigned int>(time);
     if (ret != 0)
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -378,7 +384,7 @@ bool UdtSocket<InterfaceToImplement>::setSendTimeout(unsigned int ms)
     if (ret == 0)
         m_writeTimeoutMS = ms;
     else
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -392,16 +398,13 @@ bool UdtSocket<InterfaceToImplement>::getSendTimeout(unsigned int* millis) const
         m_impl->udtHandle, 0, UDT_SNDTIMEO, &time, &len);
     *millis = (time == -1) ? 0 : static_cast<unsigned int>(time);
     if (ret != 0)
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
 template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::getLastError(SystemError::ErrorCode* /*errorCode*/) const
 {
-    //NX_ASSERT(!isClosed());
-    //*errorCode = static_cast<SystemError::ErrorCode>(UDT::getlasterror().getErrno());
-    //TODO #ak
     SystemError::setLastErrorCode(SystemError::notImplemented);
     return false;
 }
@@ -413,7 +416,6 @@ AbstractSocket::SOCKET_HANDLE UdtSocket<InterfaceToImplement>::handle() const
     static_assert(
         sizeof(UDTSOCKET) <= sizeof(AbstractSocket::SOCKET_HANDLE),
         "One have to fix UdtSocket<InterfaceToImplement>::handle() implementation");
-    //return *reinterpret_cast<const AbstractSocket::SOCKET_HANDLE*>(&m_impl->udtHandle);
     return static_cast<AbstractSocket::SOCKET_HANDLE>(m_impl->udtHandle);
 }
 
@@ -464,18 +466,17 @@ bool UdtSocket<InterfaceToImplement>::open()
     m_impl->udtHandle = UDT::socket(m_ipVersion, SOCK_STREAM, 0);
     if (m_impl->udtHandle == UDT::INVALID_SOCK)
     {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return false;
     }
 
-    //tuning udt socket
+    // Tuning udt socket.
     constexpr const int kPacketsCoeff = 2;
     constexpr const int kBytesCoeff = 6;
 
     constexpr const int kMtuSize = 1400;
     constexpr const int kMaximumUdtWindowSizePacketsBase = 64;
-    constexpr const int kMaximumUdtWindowSizePackets = 
+    constexpr const int kMaximumUdtWindowSizePackets =
         kMaximumUdtWindowSizePacketsBase * kPacketsCoeff;
 
     constexpr const int kUdtBufferMultiplier = 48;
@@ -511,8 +512,7 @@ bool UdtSocket<InterfaceToImplement>::open()
             &kUdpRecvBufSize, sizeof(kUdpRecvBufSize)) != 0
         )
     {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         UDT::close(m_impl->udtHandle);
         return false;
     }
@@ -525,9 +525,9 @@ template class UdtSocket<AbstractStreamSocket>;
 template class UdtSocket<AbstractStreamServerSocket>;
 
 
-// =====================================================================
-// UdtStreamSocket implementation
-// =====================================================================
+//=================================================================================================
+// UdtStreamSocket implementation.
+
 UdtStreamSocket::UdtStreamSocket(int ipVersion):
     base_type(ipVersion),
     m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, ipVersion))
@@ -560,26 +560,25 @@ bool UdtStreamSocket::setRendezvous(bool val)
 
 bool UdtStreamSocket::connect(
     const SocketAddress& remoteAddress,
-    unsigned int timeoutMs )
+    std::chrono::milliseconds timeout)
 {
     if (remoteAddress.address.isIpAddress())
-        return connectToIp(remoteAddress, timeoutMs);
+        return connectToIp(remoteAddress, timeout);
+
+    auto resolvedEntries = SocketGlobals::addressResolver().resolveSync(
+        remoteAddress.address.toString(), NatTraversalSupport::disabled, m_ipVersion);
+    if (resolvedEntries.empty())
+        return false;
 
     std::deque<HostAddress> ips;
-    const SystemError::ErrorCode resultCode =
-        SocketGlobals::addressResolver().dnsResolver().resolveSync(
-            remoteAddress.address.toString(), m_ipVersion, &ips);
-    if (resultCode != SystemError::noError)
-    {
-        SystemError::setLastErrorCode(resultCode);
-        return false;
-    }
+    for (auto& entry: resolvedEntries)
+        ips.push_back(std::move(entry.host));
 
     while (!ips.empty())
     {
         auto ip = std::move(ips.front());
         ips.pop_front();
-        if (connectToIp(SocketAddress(std::move(ip), remoteAddress.port), timeoutMs))
+        if (connectToIp(SocketAddress(std::move(ip), remoteAddress.port), timeout))
             return true;
     }
 
@@ -614,7 +613,7 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     return handleRecvResult(bytesRead);
 }
 
-int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
+int UdtStreamSocket::send(const void* buffer, unsigned int bufferLen)
 {
     int sendResult = UDT::send(m_impl->udtHandle, reinterpret_cast<const char*>(buffer), bufferLen, 0);
     if (sendResult == UDT::ERROR)
@@ -629,13 +628,13 @@ int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
     }
     else if (sendResult == 0)
     {
-        //connection has been closed
+        // Connection has been closed.
         m_state = detail::SocketState::open;
     }
     else if (sendResult > 0)
     {
         if (m_isInternetConnection)
-            UdtStatistics::global.internetBytesTransfered += (size_t) sendResult;
+            UdtStatistics::global.internetBytesTransfered += (size_t)sendResult;
     }
 
     return sendResult;
@@ -644,10 +643,9 @@ int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
 SocketAddress UdtStreamSocket::getForeignAddress() const
 {
     SystemSocketAddress addr(m_ipVersion);
-    if (UDT::getpeername(m_impl->udtHandle, addr.ptr.get(), reinterpret_cast<int*>(&addr.size)) != 0)
+    if (UDT::getpeername(m_impl->udtHandle, addr.get(), reinterpret_cast<int*>(&addr.length())) != 0)
     {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return SocketAddress();
     }
     else
@@ -659,13 +657,6 @@ SocketAddress UdtStreamSocket::getForeignAddress() const
 bool UdtStreamSocket::isConnected() const
 {
     return m_state == detail::SocketState::connected;
-}
-
-bool UdtStreamSocket::reopen()
-{
-    if (isClosed())
-        return open();
-    return true;
 }
 
 void UdtStreamSocket::cancelIOAsync(
@@ -684,7 +675,7 @@ void UdtStreamSocket::cancelIOSync(aio::EventType eventType)
 
 bool UdtStreamSocket::setNoDelay(bool value)
 {
-    //udt does not support it. Returned true so that caller code works
+    // Udt does not support it. Returned true so that caller code works.
     m_noDelay = value;
     return true;
 }
@@ -724,7 +715,7 @@ bool UdtStreamSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) 
 
 void UdtStreamSocket::connectAsync(
     const SocketAddress& addr,
-    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     return m_aioHelper->connectAsync(
         addr,
@@ -738,34 +729,36 @@ void UdtStreamSocket::connectAsync(
 
 void UdtStreamSocket::readSomeAsync(
     nx::Buffer* const buf,
-    std::function<void( SystemError::ErrorCode, size_t )> handler )
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, size_t)> handler)
 {
     return m_aioHelper->readSomeAsync(buf, std::move(handler));
 }
 
 void UdtStreamSocket::sendAsync(
     const nx::Buffer& buf,
-    std::function<void( SystemError::ErrorCode, size_t )> handler )
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, size_t)> handler)
 {
     return m_aioHelper->sendAsync(buf, std::move(handler));
 }
 
 void UdtStreamSocket::registerTimer(
     std::chrono::milliseconds timeoutMillis,
-    nx::utils::MoveOnlyFunc<void()> handler )
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     return m_aioHelper->registerTimer(timeoutMillis, std::move(handler));
 }
 
 bool UdtStreamSocket::connectToIp(
     const SocketAddress& remoteAddress,
-    unsigned int /*timeoutMs*/ )
+    std::chrono::milliseconds /*timeout*/)
 {
-    //TODO #ak use timeoutMs
+    // TODO: #ak use timeoutMs.
 
     NX_ASSERT(m_state == detail::SocketState::open);
 
-    SystemSocketAddress addr(remoteAddress, m_ipVersion);
+    const SystemSocketAddress addr(remoteAddress, m_ipVersion);
+    if (!addr.get())
+        return false;
 
     // The official documentation doesn't advice using select but here we just need
     // to wait on a single socket fd, select is way more faster than epoll on linux
@@ -778,14 +771,14 @@ bool UdtStreamSocket::connectToIp(
         if (!setNonBlockingMode(nbk_sock))
             return false;
     }
-    int ret = UDT::connect(m_impl->udtHandle, addr.ptr.get(), addr.size);
+    int ret = UDT::connect(m_impl->udtHandle, addr.get(), addr.length());
     // The UDT connect will always return zero even if such operation is async which is
     // different with the existed Posix/Win32 socket design. So if we meet an non-zero
     // value, the only explanation is an error happened which cannot be solved.
     if (ret != 0)
     {
         // Error happened
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return false;
     }
     m_state = detail::SocketState::connected;
@@ -807,8 +800,7 @@ bool UdtStreamSocket::checkIfRecvModeSwitchIsRequired(
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_RCVSYN, &currentMode, &len);
     if (ret != 0)
     {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return false;
     }
 
@@ -828,10 +820,7 @@ bool UdtStreamSocket::setRecvMode(bool isRecvSync)
 {
     auto ret = UDT::setsockopt(m_impl->udtHandle, 0, UDT_RCVSYN, &isRecvSync, sizeof(isRecvSync));
     if (ret != 0)
-    {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
-    }
+        detail::setLastSystemErrorCodeAppropriately();
 
     return ret == 0;
 }
@@ -872,15 +861,15 @@ int UdtStreamSocket::handleRecvResult(int recvResult)
     else if (recvResult > 0)
     {
         if (m_isInternetConnection)
-            UdtStatistics::global.internetBytesTransfered += (size_t) recvResult;
+            UdtStatistics::global.internetBytesTransfered += (size_t)recvResult;
     }
 
     return recvResult;
 }
 
-// =====================================================================
-// UdtStreamServerSocket implementation
-// =====================================================================
+//=================================================================================================
+// UdtStreamServerSocket implementation.
+
 UdtStreamServerSocket::UdtStreamServerSocket(int ipVersion):
     base_type(ipVersion),
     m_aioHelper(new aio::AsyncServerSocketHelper<UdtStreamServerSocket>(this))
@@ -894,14 +883,13 @@ UdtStreamServerSocket::~UdtStreamServerSocket()
         stopWhileInAioThread();
 }
 
-bool UdtStreamServerSocket::listen( int backlog )
+bool UdtStreamServerSocket::listen(int backlog)
 {
     NX_ASSERT(m_state == detail::SocketState::open);
     int ret = UDT::listen(m_impl->udtHandle, backlog);
     if (ret != 0)
     {
-        const auto udtError = UDT::getlasterror();
-        SystemError::setLastErrorCode(detail::convertToSystemError(udtError.getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return false;
     }
     else
@@ -920,7 +908,7 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
     if (isNonBlocking)
         return systemAccept();
 
-    //this method always blocks
+    // This method always blocks.
     nx::utils::promise<
         std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
     > acceptedSocketPromise;
@@ -974,7 +962,7 @@ void UdtStreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
             SystemError::ErrorCode errorCode,
             std::unique_ptr<AbstractStreamSocket> socket)
         {
-            //every accepted socket MUST be in blocking mode!
+            // Every accepted socket MUST be in blocking mode!
             if (socket)
             {
                 if (!socket->setNonBlockingMode(false))
@@ -1023,9 +1011,7 @@ AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
     UDTSOCKET ret = UDT::accept(m_impl->udtHandle, NULL, NULL);
     if (ret == UDT::INVALID_SOCK)
     {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(
-                UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return nullptr;
     }
 

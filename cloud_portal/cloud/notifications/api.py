@@ -18,7 +18,8 @@ def send(user_email, msg_type, message, customization, external_id=None):
     django.core.validators.validate_email(user_email)
 
     msg = Message(user_email=user_email, type=msg_type,
-                  message=message, customization=customization)
+                  message=message, customization=customization,
+                  external_id=external_id)
 
     # TODO: validate email among existing users
 

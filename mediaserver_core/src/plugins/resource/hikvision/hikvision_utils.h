@@ -101,16 +101,16 @@ struct CommonResponse final
 QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateKHz);
 
 std::vector<ChannelStatusResponse> parseAvailableChannelsResponse(
-    nx_http::StringType message);
+    nx::network::http::StringType message);
 
 boost::optional<ChannelStatusResponse> parseChannelStatusResponse(
-    nx_http::StringType message);
+    nx::network::http::StringType message);
 
 boost::optional<OpenChannelResponse> parseOpenChannelResponse(
-    nx_http::StringType message);
+    nx::network::http::StringType message);
 
 boost::optional<CommonResponse> parseCommonResponse(
-    nx_http::StringType message);
+    nx::network::http::StringType message);
 
 bool parseChannelCapabilitiesResponse(
     const nx::Buffer& response,
@@ -136,27 +136,27 @@ bool parseTransportElement(
     ChannelProperties* outChannelProperties);
 
 bool doGetRequest(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
     nx::Buffer* outBuffer,
-    nx_http::StatusCode::Value* outStatusCode = nullptr);
+    nx::network::http::StatusCode::Value* outStatusCode = nullptr);
 
 bool doPutRequest(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
     const nx::Buffer& buffer,
-    nx_http::StatusCode::Value* outStatusCode = nullptr);
+    nx::network::http::StatusCode::Value* outStatusCode = nullptr);
 
 bool doRequest(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
-    const nx_http::Method::ValueType& method,
+    const nx::network::http::Method::ValueType& method,
     const nx::Buffer* bufferToSend = nullptr,
     nx::Buffer* outResponseBuffer = nullptr,
-    nx_http::StatusCode::Value* outStatusCode = nullptr
+    nx::network::http::StatusCode::Value* outStatusCode = nullptr
 );
 
-bool tuneHttpClient(nx_http::HttpClient* outHttpClient, const QAuthenticator& auth);
+bool tuneHttpClient(nx::network::http::HttpClient* outHttpClient, const QAuthenticator& auth);
 
 QString buildChannelNumber(Qn::ConnectionRole role, int channelNumber);
 

@@ -21,6 +21,7 @@ const char* const kSystemRenamePath = "/cdb/system/rename";
 const char* const kSystemUpdatePath = "/cdb/system/update";
 const char* const kSystemRecordUserSessionStartPath = "/cdb/system/recordUserSessionStart";
 const char* const kSystemHealthHistoryPath = "/cdb/system/healthHistory";
+const char* const kSystemsMergedToASpecificSystem = "/cdb/system/{systemId}/merged_systems/";
 
 const char* const kAuthGetNoncePath = "/cdb/auth/getNonce";
 const char* const kAuthGetAuthenticationPath = "/cdb/auth/getAuthentication";

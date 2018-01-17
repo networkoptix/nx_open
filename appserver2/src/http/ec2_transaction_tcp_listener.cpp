@@ -39,7 +39,7 @@ public:
 
 QnTransactionTcpProcessor::QnTransactionTcpProcessor(
     QnTransactionMessageBus* messageBus,
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
     QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket, owner)
@@ -100,23 +100,23 @@ void QnTransactionTcpProcessor::run()
 
     if (peerType == Qn::PT_Server && commonModule()->isReadOnly())
     {
-        sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
+        sendResponse(nx::network::http::StatusCode::forbidden, nx::network::http::StringType());
         return;
     }
 
     const auto& commonModule = d->messageBus->commonModule();
     d->response.headers.emplace(
         Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
-        nx_http::header::KeepAlive(
+        nx::network::http::header::KeepAlive(
             commonModule->globalSettings()->connectionKeepAliveTimeout()).toString());
 
-    if( d->request.requestLine.method == nx_http::Method::post ||
-        d->request.requestLine.method == nx_http::Method::put )
+    if( d->request.requestLine.method == nx::network::http::Method::post ||
+        d->request.requestLine.method == nx::network::http::Method::put )
     {
         auto connectionGuidIter = d->request.headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
         if( connectionGuidIter == d->request.headers.end() )
         {
-            sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
+            sendResponse( nx::network::http::StatusCode::forbidden, nx::network::http::StringType() );
             return;
         }
         const QnUuid connectionGuid( connectionGuidIter->second );
@@ -124,13 +124,13 @@ void QnTransactionTcpProcessor::run()
         auto connectionDirectionIter = d->request.headers.find( Qn::EC2_CONNECTION_DIRECTION_HEADER_NAME );
         if( connectionDirectionIter == d->request.headers.end() )
         {
-            sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
+            sendResponse( nx::network::http::StatusCode::forbidden, nx::network::http::StringType() );
             return;
         }
         const ConnectionType::Type connectionDirection = ConnectionType::fromString( connectionDirectionIter->second );
         if( connectionDirection != ConnectionType::outgoing )
         {
-            sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
+            sendResponse( nx::network::http::StatusCode::forbidden, nx::network::http::StringType() );
             return;
         }
 
@@ -145,35 +145,35 @@ void QnTransactionTcpProcessor::run()
             remoteSystemIdentityTime,
             d->request,
             d->clientRequest );
-        sendResponse( nx_http::StatusCode::ok, nx_http::StringType() );
+        sendResponse( nx::network::http::StatusCode::ok, nx::network::http::StringType() );
         return;
     }
 
-    d->response.headers.insert(nx_http::HttpHeader(
+    d->response.headers.insert(nx::network::http::HttpHeader(
         Qn::EC2_GUID_HEADER_NAME,
         commonModule->moduleGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader(
+    d->response.headers.insert(nx::network::http::HttpHeader(
         Qn::EC2_RUNTIME_GUID_HEADER_NAME,
         commonModule->runningInstanceGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader(
+    d->response.headers.insert(nx::network::http::HttpHeader(
         Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME,
         QByteArray::number(commonModule->systemIdentityTime())));
-    d->response.headers.insert(nx_http::HttpHeader(
+    d->response.headers.insert(nx::network::http::HttpHeader(
         Qn::EC2_PROTO_VERSION_HEADER_NAME,
-        nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
-    d->response.headers.insert(nx_http::HttpHeader(
+        nx::network::http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
+    d->response.headers.insert(nx::network::http::HttpHeader(
         Qn::EC2_CLOUD_HOST_HEADER_NAME,
         nx::network::AppInfo::defaultCloudHost().toUtf8()));
-    d->response.headers.insert(nx_http::HttpHeader(
+    d->response.headers.insert(nx::network::http::HttpHeader(
         Qn::EC2_SYSTEM_ID_HEADER_NAME,
         commonModule->globalSettings()->localSystemId().toByteArray()));
 
     auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_ID_HEADER_NAME);
     if( (systemNameHeaderIter != d->request.headers.end()) &&
-        (nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_ID_HEADER_NAME) !=
+        (nx::network::http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_ID_HEADER_NAME) !=
             commonModule->globalSettings()->localSystemId().toByteArray()) )
     {
-        sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
+        sendResponse(nx::network::http::StatusCode::forbidden, nx::network::http::StringType());
         return;
     }
 
@@ -192,7 +192,7 @@ void QnTransactionTcpProcessor::run()
 
         d->response.headers.emplace( "Content-Length", "0" );   //only declaring content-type
         sendResponse(
-            lockOK ? nx_http::StatusCode::noContent : nx_http::StatusCode::forbidden,
+            lockOK ? nx::network::http::StatusCode::noContent : nx::network::http::StatusCode::forbidden,
             QnTransactionTransport::TUNNEL_CONTENT_TYPE );
         if (!lockOK)
             return;
@@ -203,38 +203,38 @@ void QnTransactionTcpProcessor::run()
 
         parseRequest();
 
-        d->response.headers.insert(nx_http::HttpHeader(
+        d->response.headers.insert(nx::network::http::HttpHeader(
             Qn::EC2_GUID_HEADER_NAME,
             commonModule->moduleGUID().toByteArray()));
-        d->response.headers.insert(nx_http::HttpHeader(
+        d->response.headers.insert(nx::network::http::HttpHeader(
             Qn::EC2_RUNTIME_GUID_HEADER_NAME,
             commonModule->runningInstanceGUID().toByteArray()));
-        d->response.headers.insert(nx_http::HttpHeader(
+        d->response.headers.insert(nx::network::http::HttpHeader(
             Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME,
             QByteArray::number(commonModule->systemIdentityTime())));
-        d->response.headers.insert(nx_http::HttpHeader(
+        d->response.headers.insert(nx::network::http::HttpHeader(
             Qn::EC2_PROTO_VERSION_HEADER_NAME,
-            nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
-        d->response.headers.insert(nx_http::HttpHeader(
+            nx::network::http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
+        d->response.headers.insert(nx::network::http::HttpHeader(
             Qn::EC2_CLOUD_HOST_HEADER_NAME,
             nx::network::AppInfo::defaultCloudHost().toUtf8()));
 
-        d->response.headers.insert(nx_http::HttpHeader(
+        d->response.headers.insert(nx::network::http::HttpHeader(
             Qn::EC2_SYSTEM_ID_HEADER_NAME,
             commonModule->globalSettings()->localSystemId().toByteArray()));
 
         auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_ID_HEADER_NAME);
         if( (systemNameHeaderIter != d->request.headers.end()) &&
-            (nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_ID_HEADER_NAME) !=
+            (nx::network::http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_ID_HEADER_NAME) !=
                 commonModule->globalSettings()->localSystemId().toByteArray()) )
         {
-            sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
+            sendResponse(nx::network::http::StatusCode::forbidden, nx::network::http::StringType());
             return;
         }
 
         d->response.headers.emplace(
             Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
-            nx_http::header::KeepAlive(
+            nx::network::http::header::KeepAlive(
                 commonModule->globalSettings()->connectionKeepAliveTimeout()).toString());
     }
 
@@ -257,7 +257,7 @@ void QnTransactionTcpProcessor::run()
     QByteArray contentEncoding;
     if( acceptEncodingHeaderIter != d->request.headers.end() )
     {
-        nx_http::header::AcceptEncodingHeader acceptEncodingHeader( acceptEncodingHeaderIter->second );
+        nx::network::http::header::AcceptEncodingHeader acceptEncodingHeader( acceptEncodingHeaderIter->second );
         if( acceptEncodingHeader.encodingIsAllowed( "identity" ) )
             contentEncoding = "identity";
         else if( acceptEncodingHeader.encodingIsAllowed( "gzip" ) )
@@ -284,7 +284,7 @@ void QnTransactionTcpProcessor::run()
     //d->response.headers.emplace( "Connection", "close" );
     if( fail )
     {
-        sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
+        sendResponse( nx::network::http::StatusCode::forbidden, nx::network::http::StringType() );
     }
     else
     {
@@ -301,7 +301,7 @@ void QnTransactionTcpProcessor::run()
             d->response.headers.insert( *base64EncodingRequiredHeaderIter );
 
 
-        sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
+        sendResponse( nx::network::http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
 
         // By default all peers have read permissions on all resources
         auto access = d->accessRights;

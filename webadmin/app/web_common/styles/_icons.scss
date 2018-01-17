@@ -84,6 +84,18 @@
   }
 }
 
+.glyphicon-close-fullscreen{
+  @include kill-glyphicon;
+  background-position: -26px -99px;
+
+  &:hover{
+    background-position: -26px -123px;
+  }
+  &:active{
+    background-position: -26px -147px;
+  }
+}
+
 .glyphicon-server-online,
 .glyphicon-server-active,
 .glyphicon-server-offline
@@ -106,13 +118,12 @@
   background-position: -50px -170px
 }
 
-
 .glyphicon-search{
   @include kill-glyphicon;
   background-position: -50px -26px;
 }
 
-.glyphicon-info-sign{
+/*.glyphicon-info-sign{
   @include kill-glyphicon;
   &{
     background-position: -74px -26px;
@@ -120,7 +131,13 @@
   &.active{
     background-position: -98px -26px;
   }
+}*/
+
+.glyphicon-arrow-left{
+  @include kill-glyphicon;
+  background-position: -169px -50px;
 }
+
 /* Check CLOUD-1197 - this style affected some other remove buttons, so we limit its effect to cameras-panel only */
 .cameras-panel .glyphicon-remove{
   @include kill-glyphicon;
@@ -141,6 +158,7 @@
   background-position: -148px -52px;
 }
 
+.camera-preview-failed,
 .camera-preview-offline,
 .camera-preview-unauthorized{
   @include icon;
@@ -150,6 +168,10 @@
   display: block;
   margin:0 auto;
   top: 5px;
+}
+
+.camera-preview-failed{
+  background-position: -48px -191px; 
 }
 
 .camera-preview-offline{

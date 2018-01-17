@@ -18,10 +18,10 @@ for file in os.listdir("."):
     if file.endswith("_plain.mustache.body"):
         f = file.replace('.mustache.body', '')
         text = containter_text_plain.replace('{{>body}}', open(f + '.mustache.body').read())
-        with open(f + '.mustache', 'w') as newf:
-            print >> newf, text
+        with open(f + '.mustache', 'wb') as newf:
+            newf.write(text + '\n')
     elif file.endswith(".mustache.body"):
         f = file.replace('.mustache.body', '')
         text = containter_text.replace('{{>body}}', open(f + '.mustache.body').read())
-        with open(f + '.mustache', 'w') as newf:
-            print >> newf, inline_css(text).encode('utf-8','replace')
+        with open(f + '.mustache', 'wb') as newf:
+            newf.write(inline_css(text).encode('utf-8','replace') + '\n')

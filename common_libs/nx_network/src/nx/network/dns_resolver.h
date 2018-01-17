@@ -40,7 +40,7 @@ public:
      * @param handler MUST not block
      * @param requestId Used to cancel request. Multiple requests can be started using same request id.
      * @return false if failed to start asynchronous resolve operation
-     * @note It is garanteed that reqID is set before completionHandler is called.
+     * NOTE: It is garanteed that reqID is set before completionHandler is called.
      */
     void resolveAsync(const QString& hostName, Handler handler, int ipVersion, RequestId requestId);
     SystemError::ErrorCode resolveSync(
@@ -49,7 +49,7 @@ public:
         std::deque<HostAddress>* resolvedAddresses);
 
     /**
-     * @param waitForRunningHandlerCompletion if true, this method blocks until 
+     * @param waitForRunningHandlerCompletion if true, this method blocks until
      * running completion handler (if any) returns.
      */
     void cancel(RequestId requestId, bool waitForRunningHandlerCompletion);

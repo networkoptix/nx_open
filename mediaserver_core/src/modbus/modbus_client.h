@@ -18,10 +18,10 @@ class QnModbusClient
 
 public:
     QnModbusClient();
-    QnModbusClient(const SocketAddress& sockaddr);
+    QnModbusClient(const nx::network::SocketAddress& sockaddr);
     ~QnModbusClient();
 
-    void setEndpoint(const SocketAddress& sockaddr);
+    void setEndpoint(const nx::network::SocketAddress& sockaddr);
 
     bool connect();
     void disconnect();
@@ -52,9 +52,9 @@ private:
     quint16 m_requestTransactionId;
     char m_recvBuffer[kBufferSize];
 
-    SocketAddress m_endpoint;
+    nx::network::SocketAddress m_endpoint;
     bool m_connected;
-    std::shared_ptr<AbstractStreamSocket> m_socket;
+    std::shared_ptr<nx::network::AbstractStreamSocket> m_socket;
 };
 
 } //< Closing namespace modbus.

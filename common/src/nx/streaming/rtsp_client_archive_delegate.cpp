@@ -38,6 +38,7 @@ extern "C"
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/basic_media_context.h>
 #include <nx/fusion/serialization/lexical_enum.h>
+#include <api/global_settings.h>
 
 static const int MAX_RTP_BUFFER_SIZE = 65536;
 static const int REOPEN_TIMEOUT = 1000;
@@ -79,7 +80,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_isMultiserverAllowed(true),
     m_playNowModeAllowed(true),
     m_reader(reader),
-    m_frameCnt(0)
+    m_frameCnt(0),
+    m_maxSessionDurationMs(std::numeric_limits<qint64>::max())
 {
     m_footageUpToDate.test_and_set();
     m_currentServerUpToDate.test_and_set();
@@ -108,6 +110,9 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &came
     m_server = camera->getParentServer();
 
     auto commonModule = camera->commonModule();
+    auto maxSessionDuration = commonModule->globalSettings()->maxRtspConnectDuration();
+    if (maxSessionDuration.count() > 0)
+        m_maxSessionDurationMs = maxSessionDuration;
 
     m_auth.username = commonModule->currentUrl().userName();
     m_auth.password = commonModule->currentUrl().password();
@@ -262,7 +267,9 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 tim
 
 }
 
-bool QnRtspClientArchiveDelegate::open(const QnResourcePtr &resource) {
+bool QnRtspClientArchiveDelegate::open(const QnResourcePtr &resource,
+    AbstractArchiveIntegrityWatcher * /*archiveIntegrityWatcher*/)
+{
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     NX_ASSERT(camera);
     if (!camera)
@@ -278,11 +285,12 @@ bool QnRtspClientArchiveDelegate::open(const QnResourcePtr &resource) {
     return rez;
 }
 
-bool QnRtspClientArchiveDelegate::openInternal() {
+bool QnRtspClientArchiveDelegate::openInternal()
+{
     if (m_opened)
         return true;
     m_closing = false;
-
+    m_sessionTimeout.restart();
     m_customVideoLayout.reset();
     m_globalMinArchiveTime = startTime(); // force current value to avoid flicker effect while current server is being changed
 
@@ -426,8 +434,11 @@ void QnRtspClientArchiveDelegate::reopen()
 
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 {
-    if (!m_currentServerUpToDate.test_and_set())
+    if (!m_currentServerUpToDate.test_and_set() ||
+        (m_sessionTimeout.isValid() && m_sessionTimeout.hasExpired(m_maxSessionDurationMs.count())))
+    {
         reopen();
+    }
 
     if (!m_footageUpToDate.test_and_set()) {
         if (m_isMultiserverAllowed)
@@ -727,7 +738,7 @@ namespace {
 /**
  * @return Zero version if serverString is invalid.
  */
-nx::utils::SoftwareVersion extractServerVersion(const nx_http::StringType& serverString)
+nx::utils::SoftwareVersion extractServerVersion(const nx::network::http::StringType& serverString)
 {
     int versionStartPos = serverString.indexOf("/") + 1;
     int versionEndPos = serverString.indexOf(" ", versionStartPos);
@@ -747,8 +758,9 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     QMap<int, QnNxRtpParserPtr>::iterator itr = m_parsers.find(channelNum);
     if (itr == m_parsers.end())
     {
-        auto parser = new QnNxRtpParser();
-        // TODO: Use nx_http::header::Server here
+        auto parser = new QnNxRtpParser(
+            lm("%1-%2").args(m_camera->getUserDefinedName(), channelNum));
+        // TODO: Use nx::network::http::header::Server here
         // to get RFC2616-conformant Server header parsing function.
         auto serverVersion = extractServerVersion(m_rtspSession->serverInfo());
         if (!serverVersion.isNull() && serverVersion < nx::utils::SoftwareVersion(3, 0))
@@ -757,7 +769,8 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     }
     QnNxRtpParserPtr parser = itr.value();
     bool gotData = false;
-    parser->processData(data, 0, dataSize, QnRtspStatistic(), gotData);
+    if (!parser->processData(data, 0, dataSize, QnRtspStatistic(), gotData))
+        return QnAbstractDataPacketPtr(); //< Report error to reopen connection.
     *parserPosition = parser->position();
     if (gotData) {
         result = parser->nextData();
@@ -767,24 +780,25 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     return result;
 }
 
-void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
 {
+    if (value == 0.0)
+        return;
+
+    m_position = displayTime;
+
+    bool oldReverseMode = m_rtspSession->getScale() < 0;
+    bool newReverseMode = value < 0;
+    m_rtspSession->setScale(value);
+
+    bool needSendRequest = !m_opened || oldReverseMode != newReverseMode ||  m_camera->isDtsBased();
+    if (!needSendRequest)
+        return;
+
+    bool fromLive = newReverseMode && m_position == DATETIME_NOW;
     m_blockReopening = false;
-    int sign = value ? -1 : 1;
-    bool fromLive = value && m_position == DATETIME_NOW;
-    close();
 
-    if (!m_opened && m_camera) {
-        m_rtspSession->setScale(qAbs(m_rtspSession->getScale()) * sign);
-        m_position = displayTime;
-        openInternal();
-    }
-    else {
-        m_rtspSession->sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession->getScale()) * sign);
-    }
-    m_sendedCSec = m_rtspSession->lastSendedCSeq();
-    //m_waitBOF = true;
-
+    seek(displayTime, /* findIFrame */ true);
     if (fromLive)
         m_position = AV_NOPTS_VALUE;
 }
@@ -859,7 +873,7 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
 
 void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
 {
-    if (m_camera && m_camera->hasParam(lit("groupplay")))
+    if (m_camera && m_camera->isGroupPlayOnly())
         return; // avoid close/open for VMAX
 
     qint64 diff = qAbs(m_lastReceivedTime - qnSyncTime->currentMSecsSinceEpoch());
@@ -871,11 +885,15 @@ void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
     }
 }
 
-void QnRtspClientArchiveDelegate::beforeChangeReverseMode(bool reverseMode)
+void QnRtspClientArchiveDelegate::beforeChangeSpeed(double speed)
 {
+    bool oldReverseMode = m_rtspSession->getScale() < 0;
+    bool newReverseMode = speed < 0;
+
     // Reconnect If camera is offline and it is switch from live to archive
-    if (m_position == DATETIME_NOW) {
-        if (reverseMode)
+    if (oldReverseMode != newReverseMode && m_position == DATETIME_NOW)
+    {
+        if (newReverseMode)
             beforeSeek(AV_NOPTS_VALUE);
         else
             m_blockReopening = false;
@@ -909,7 +927,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnSecurityCamResourcePt
     QAuthenticator auth;
     auth.setUser(user);
     auth.setPassword(password);
-    session->setAuth(auth, nx_http::header::AuthScheme::digest);
+    session->setAuth(auth, nx::network::http::header::AuthScheme::digest);
 
     if (!m_auth.videowall.isNull())
         session->setAdditionAttribute(Qn::VIDEOWALL_GUID_HEADER_NAME, m_auth.videowall.toString().toUtf8());

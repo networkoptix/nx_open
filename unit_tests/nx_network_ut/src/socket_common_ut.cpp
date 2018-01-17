@@ -1,11 +1,16 @@
 #ifdef _WIN32
 #include <Winsock2.h>
+#include <Ws2tcpip.h>
 typedef ULONG in_addr_t;
 #endif
 
 #include <gtest/gtest.h>
 
 #include <nx/network/socket_common.h>
+
+namespace nx {
+namespace network {
+namespace test {
 
 namespace {
 
@@ -32,13 +37,13 @@ static void testHostAddress(
 
     if (ipv6)
     {
-        const auto ip =  host.ipV6();
+        const auto ip =  host.ipV6().first;
         ASSERT_TRUE((bool)ip);
         ASSERT_EQ(0, memcmp(&ip.get(), &ipv6.get(), sizeof(in6_addr)));
     }
     else
     {
-        ASSERT_FALSE((bool)host.ipV6());
+        ASSERT_FALSE((bool)host.ipV6().first);
     }
 }
 
@@ -74,8 +79,8 @@ TEST(HostAddress, Base)
     testHostAddress("127.0.0.1", "::1", htonl(INADDR_LOOPBACK), in6addr_loopback);
 
     const auto kIpV4a = HostAddress::ipV4from(QString("12.34.56.78"));
-    const auto kIpV6a = HostAddress::ipV6from(QString("::ffff:c22:384e"));
-    const auto kIpV6b = HostAddress::ipV6from(QString("2001:db8:0:2::1"));
+    const auto kIpV6a = HostAddress::ipV6from(QString("::ffff:c22:384e")).first;
+    const auto kIpV6b = HostAddress::ipV6from(QString("2001:db8:0:2::1")).first;
 
     ASSERT_TRUE((bool)kIpV4a);
     ASSERT_TRUE((bool)kIpV6a);
@@ -85,14 +90,45 @@ TEST(HostAddress, Base)
     testHostAddress(nullptr, "2001:db8:0:2::1", boost::none, kIpV6b);
 }
 
+TEST(HostAddress, IpV6FromString)
+{
+    HostAddress addr("fd00::9465:d2ff:fe64:2772%1");
+    ASSERT_FALSE(addr.isIpAddress());
+    ASSERT_TRUE(addr.isPureIpV6());
+
+    in6_addr addr6;
+    ASSERT_TRUE(inet_pton(AF_INET6, "fd00::9465:d2ff:fe64:2772", &addr6));
+    ASSERT_TRUE(memcmp(&addr6, &addr.ipV6().first.get(), sizeof(in6_addr)) == 0);
+    ASSERT_EQ(1U, addr.ipV6().second.get());
+}
+
+TEST(HostAddress, MappedIpV4AddressIsNotAPureIpV6)
+{
+    HostAddress addr("::ffff:172.25.4.8");
+    ASSERT_FALSE(addr.isPureIpV6());
+
+    addr = HostAddress("::ffff:c22:384e");
+    ASSERT_FALSE(addr.isPureIpV6());
+}
+
+TEST(HostAddress, IpToStringV6)
+{
+    in6_addr addr6;
+    ASSERT_TRUE(inet_pton(AF_INET6, "fd00::9465:d2ff:fe64:2772", &addr6));
+    ASSERT_EQ("fd00::9465:d2ff:fe64:2772%1", HostAddress::ipToString(addr6, 1).get());
+
+    HostAddress addr(addr6, 1);
+    ASSERT_EQ("fd00::9465:d2ff:fe64:2772%1", addr.toString());
+}
+
 TEST(HostAddress, IsLocal)
 {
     ASSERT_TRUE(HostAddress("127.0.0.1").isLocal());
     ASSERT_TRUE(HostAddress("10.0.2.103").isLocal());
     ASSERT_TRUE(HostAddress("172.17.0.2").isLocal());
     ASSERT_TRUE(HostAddress("192.168.1.1").isLocal());
-    ASSERT_TRUE(HostAddress("fd00::9465:d2ff:fe64:2772").isLocal());
-    ASSERT_TRUE(HostAddress("fe80::d250:99ff:fe39:1d29").isLocal());
+    ASSERT_TRUE(HostAddress("fd00::9465:d2ff:fe64:2772%1").isLocal());
+    ASSERT_TRUE(HostAddress("fe80::d250:99ff:fe39:1d29%2").isLocal());
     ASSERT_TRUE(HostAddress("::ffff:172.25.4.8").isLocal());
 
     ASSERT_FALSE(HostAddress("12.34.56.78").isLocal());
@@ -100,6 +136,11 @@ TEST(HostAddress, IsLocal)
     ASSERT_FALSE(HostAddress("172.8.0.2").isLocal());
     ASSERT_FALSE(HostAddress("2001:db8:0:2::1").isLocal());
     ASSERT_FALSE(HostAddress("::ffff:12.34.56.78").isLocal());
+}
+
+TEST(HostAddress, isIpAddress)
+{
+    ASSERT_FALSE(HostAddress("127.0.0.1").isIpAddress());
 }
 
 #if 0 // TODO: #ak CLOUD-1124
@@ -160,3 +201,7 @@ TEST(SocketAddress, Base)
     testSocketAddress("[::ffff:12.34.56.78]", "::ffff:12.34.56.78", 0);
     testSocketAddress("[::ffff:12.34.56.78]:777", "::ffff:12.34.56.78", 777);
 }
+
+} // namespace test
+} // namespace network
+} // namespace nx

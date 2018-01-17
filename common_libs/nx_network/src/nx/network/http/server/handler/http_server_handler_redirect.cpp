@@ -6,26 +6,30 @@
 
 #include "../../buffer_source.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 namespace handler {
 
-Redirect::Redirect(const QUrl& actualLocation):
+Redirect::Redirect(const nx::utils::Url& actualLocation):
     m_actualLocation(actualLocation)
 {
 }
 
 void Redirect::processRequest(
-    nx_http::HttpServerConnection* const /*connection*/,
+    nx::network::http::HttpServerConnection* const /*connection*/,
     nx::utils::stree::ResourceContainer /*authInfo*/,
-    nx_http::Request /*request*/,
-    nx_http::Response* const response,
-    nx_http::RequestProcessedHandler completionHandler)
+    nx::network::http::Request /*request*/,
+    nx::network::http::Response* const response,
+    nx::network::http::RequestProcessedHandler completionHandler)
 {
     response->headers.emplace("Location", m_actualLocation.toString().toUtf8());
-    completionHandler(nx_http::StatusCode::movedPermanently);
+    completionHandler(nx::network::http::StatusCode::movedPermanently);
 }
 
 } // namespace handler
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

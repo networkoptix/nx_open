@@ -1,8 +1,3 @@
-/**********************************************************
-* 9 jan 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "socket_test_helper.h"
 
 #include <atomic>
@@ -152,7 +147,7 @@ void TestConnection::start(std::chrono::milliseconds rwTimeout)
             &TestConnection::onConnected, this,
             SystemError::getLastOSErrorCode()));
     }
-        
+
     if( m_connected )
         return startIO();
 
@@ -453,7 +448,7 @@ void TestConnection::reportFinish(SystemError::ErrorCode code)
 
 void TestConnection::prepareConsequentDataToSend(QByteArray* buffer)
 {
-    for (char* 
+    for (char*
         pos = buffer->data();
         pos <= (buffer->data() + buffer->size() - sizeof(m_dataSequence));
         pos += sizeof(m_dataSequence))
@@ -499,7 +494,7 @@ bool operator==(
     const ConnectionTestStatistics& left,
     const ConnectionTestStatistics& right)
 {
-    return 
+    return
         left.bytesReceived == right.bytesReceived &&
         left.bytesSent == right.bytesSent &&
         left.totalConnections == right.totalConnections &&
@@ -607,7 +602,7 @@ void RandomDataTcpServer::setLocalAddress(SocketAddress addr)
 SocketAddress RandomDataTcpServer::addressBeingListened() const
 {
     const auto localAddress = m_serverSocket->getLocalAddress();
-    return 
+    return
         localAddress.address == HostAddress::anyHost
         ? SocketAddress(HostAddress::localhost, localAddress.port)
         : localAddress;
@@ -958,7 +953,7 @@ void AddressBinder::add(const SocketAddress& key, SocketAddress address)
     QnMutexLocker lock(&m_mutex);
     auto it = m_map.find(key);
     NX_CRITICAL(it != m_map.end());
-    NX_CRITICAL(it->second.insert(std::move(address)).second);
+    NX_CRITICAL(it->second.insert(address).second, address.toString());
     NX_LOGX(lm("New address %1 is bound to %2").args(address, key), cl_logDEBUG1);
 }
 
@@ -1006,7 +1001,8 @@ MultipleClientSocketTester::MultipleClientSocketTester(AddressBinder* addressBin
 }
 
 bool MultipleClientSocketTester::connect(
-    const SocketAddress& address, unsigned int timeout)
+    const SocketAddress& address,
+    std::chrono::milliseconds timeout)
 {
     return TCPSocket::connect(modifyAddress(address), timeout);
 }

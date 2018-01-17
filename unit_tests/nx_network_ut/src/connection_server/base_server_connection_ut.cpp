@@ -37,7 +37,7 @@ public:
         base_type(connectionManager, std::move(streamSocket))
     {
     }
-        
+
     void bytesReceived(nx::Buffer& /*buffer*/)
     {
     }
@@ -56,21 +56,47 @@ class ConnectionServerBaseServerConnection:
     public nx::network::server::StreamConnectionHolder<TestConnection>
 {
 protected:
+    void setInactivityTimeout(std::chrono::milliseconds timeout)
+    {
+        m_inactivityTimeout = timeout;
+    }
+
+    void givenConnection()
+    {
+        auto clientConnection = std::make_unique<TCPSocket>(AF_INET);
+        ASSERT_TRUE(clientConnection->connect(m_serverSocket.getLocalAddress(), nx::network::kNoTimeout));
+        m_clientConnections.push_back(std::move(clientConnection));
+
+        std::unique_ptr<AbstractStreamSocket> acceptedConnection(m_serverSocket.accept());
+        ASSERT_NE(nullptr, acceptedConnection);
+        ASSERT_TRUE(acceptedConnection->setNonBlockingMode(true));
+
+        m_connection = std::make_unique<TestConnection>(
+            this,
+            std::move(acceptedConnection));
+    }
+
     void givenConnectionWithBrokenSocket()
     {
         m_connection = std::make_unique<TestConnection>(
             this,
             std::make_unique<TestStreamSocket>());
     }
-    
-    void whenInvokeStartReading()
+
+    void givenStartedConnection()
+    {
+        givenConnection();
+        whenStartReadingConnection();
+    }
+
+    void whenStartReadingConnection()
     {
         nx::utils::promise<void> done;
         m_connection->post(
             [this, &done]()
             {
                 m_invokingConnectionMethod = true;
-                m_connection->startReadingConnection();
+                m_connection->startReadingConnection(m_inactivityTimeout);
                 m_invokingConnectionMethod = false;
 
                 done.set_value();
@@ -78,10 +104,36 @@ protected:
         done.get_future().wait();
     }
 
+    void whenChangeConnectionInactivityTimeoutTo(std::chrono::milliseconds timeout)
+    {
+        m_connection->executeInAioThreadSync(
+            [this, timeout]() { m_connection->setInactivityTimeout(timeout); });
+    }
+
     void thenFailureIsReportedDelayed()
     {
         m_connectionCloseEvents.pop();
         ASSERT_FALSE(*m_connectionClosedReportedDirectly);
+    }
+
+    void thenConnectionIsClosedByTimeout()
+    {
+        ASSERT_EQ(SystemError::timedOut, m_connectionCloseEvents.pop());
+    }
+
+private:
+    std::unique_ptr<TestConnection> m_connection;
+    bool m_invokingConnectionMethod = false;
+    boost::optional<bool> m_connectionClosedReportedDirectly;
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_connectionCloseEvents;
+    boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
+    TCPServerSocket m_serverSocket;
+    std::vector<std::unique_ptr<TCPSocket>> m_clientConnections;
+
+    virtual void SetUp() override
+    {
+        ASSERT_TRUE(m_serverSocket.bind(SocketAddress::anyPrivateAddress));
+        ASSERT_TRUE(m_serverSocket.listen());
     }
 
     virtual void closeConnection(
@@ -94,19 +146,31 @@ protected:
 
         m_connectionCloseEvents.push(closeReason);
     }
-
-private:
-    std::unique_ptr<TestConnection> m_connection;
-    bool m_invokingConnectionMethod = false;
-    boost::optional<bool> m_connectionClosedReportedDirectly;
-    nx::utils::SyncQueue<SystemError::ErrorCode> m_connectionCloseEvents;
 };
 
 TEST_F(ConnectionServerBaseServerConnection, start_read_failure_is_report_via_event_loop)
 {
     givenConnectionWithBrokenSocket();
-    whenInvokeStartReading();
+    whenStartReadingConnection();
     thenFailureIsReportedDelayed();
+}
+
+TEST_F(ConnectionServerBaseServerConnection, inactivity_timeout_works)
+{
+    setInactivityTimeout(std::chrono::milliseconds(1));
+
+    givenConnection();
+    whenStartReadingConnection();
+    thenConnectionIsClosedByTimeout();
+}
+
+TEST_F(ConnectionServerBaseServerConnection, changing_inactivity_timeout)
+{
+    setInactivityTimeout(std::chrono::hours(1));
+
+    givenStartedConnection();
+    whenChangeConnectionInactivityTimeoutTo(std::chrono::milliseconds(1));
+    thenConnectionIsClosedByTimeout();
 }
 
 } // namespace test

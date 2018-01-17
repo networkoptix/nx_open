@@ -11,7 +11,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/server/fusion_request_result.h>
 #include <nx/utils/test_support/utils.h>
@@ -25,6 +25,7 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 class AccountTemporaryCredentials:
     public CdbFunctionalTest
@@ -135,7 +136,7 @@ TEST_F(AccountTemporaryCredentials, verify_temporary_credentials_are_accepted_by
         //checking that account update is forbidden
         std::string account1NewPassword = account1Password + "new";
         api::AccountUpdateData update;
-        update.passwordHa1 = nx_http::calcHa1(
+        update.passwordHa1 = nx::network::http::calcHa1(
             account1.email.c_str(),
             moduleInfo().realm.c_str(),
             account1NewPassword.c_str()).constData();
@@ -253,7 +254,7 @@ TEST_F(AccountTemporaryCredentials, temporary_credentials_removed_on_password_ch
 
     std::string account1NewPassword = account.password + "new";
     api::AccountUpdateData accountUpdateData;
-    accountUpdateData.passwordHa1 = nx_http::calcHa1(
+    accountUpdateData.passwordHa1 = nx::network::http::calcHa1(
         account.email.c_str(),
         moduleInfo().realm.c_str(),
         account1NewPassword.c_str()).constData();
@@ -279,5 +280,6 @@ TEST_F(AccountTemporaryCredentials, temporary_credentials_are_low_case)
     assertTemporaryCredentialsAreLowCase();
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

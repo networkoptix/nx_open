@@ -42,7 +42,7 @@ void AsyncChannel::bindToAioThread(AbstractAioThread* aioThread)
 
 void AsyncChannel::readSomeAsync(
     nx::Buffer* const buffer,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     NX_ASSERT(buffer->capacity() > buffer->size());
 
@@ -57,7 +57,7 @@ void AsyncChannel::readSomeAsync(
 
 void AsyncChannel::sendAsync(
     const nx::Buffer& buffer,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     QnMutexLocker lock(&m_mutex);
 

@@ -1,13 +1,13 @@
-import os.path
-import logging
-import datetime
 import argparse
-import yaml
+import datetime
+import logging
+import os.path
 import re
-from .utils import SimpleNamespace
+
+import yaml
+
 from .server_physical_host import PhysicalInstallationHostConfig
-from datetime import timedelta
-from .host import SshHostConfig
+from .utils import SimpleNamespace
 
 log = logging.getLogger(__name__)
 
@@ -24,21 +24,21 @@ def timedelta_constructor(loader, node):
     value = loader.construct_scalar(node)
     return str_to_timedelta(value)
 
-def str_to_timedelta(value):
-    match = TIMEDELTA_REGEXP.match(value)
+def str_to_timedelta(duration_str):
+    match = TIMEDELTA_REGEXP.match(duration_str)
     try:
-        if not match: return timedelta(seconds=int(duration_str))
+        if not match: return datetime.timedelta(seconds=int(duration_str))
         timedelta_params = {k: int(v)
                             for (k, v) in match.groupdict().iteritems() if v}
         if not timedelta_params:
-            return timedelta(seconds=int(duration_str))
-        return timedelta(**timedelta_params)
+            return datetime.timedelta(seconds=int(duration_str))
+        return datetime.timedelta(**timedelta_params)
     except ValueError:
         return None
 
 
 def timedelta_representer(dumper, data):
-    assert isinstance(data, timedelta)
+    assert isinstance(data, datetime.timedelta)
     hours = data.seconds / (60 * 60)
     minutes = (data.seconds - hours * 60 * 60) / 60
     seconds = data.seconds % 60
@@ -47,7 +47,7 @@ def timedelta_representer(dumper, data):
 
 
 yaml.add_constructor(u'!timedelta', timedelta_constructor)
-yaml.add_representer(timedelta, timedelta_representer)
+yaml.add_representer(datetime.timedelta, timedelta_representer)
 yaml.add_implicit_resolver(u'!timedelta', TIMEDELTA_REGEXP)
 
 

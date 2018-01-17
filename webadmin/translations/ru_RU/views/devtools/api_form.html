@@ -13,8 +13,8 @@
          ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false'}">
         <label class="col-sm-2 control-label" for="{{param.name}}">
             {{param.name}}
-            <small ng-if="param.optional=='false'">(required)</small>
-            <small ng-if="param.proprietary">(proprietary)</small>
+            <small ng-if="param.optional=='false'">(обязательный)</small>
+            <small ng-if="param.proprietary">(собственный)</small>
         </label>
         <div class="col-sm-10">
             <p class="form-control-static" ng-if="param.description.xml"
@@ -52,8 +52,8 @@
          ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false' && param.type != 'info'}">
         <label class="col-sm-2 control-label" for="{{param.name}}">
             {{param.name}}
-            <small ng-if="param.optional=='false'">(required)</small>
-            <small ng-if="param.proprietary">(proprietary)</small>
+            <small ng-if="param.optional=='false'">(обязательный)</small>
+            <small ng-if="param.proprietary">(собственный)</small>
         </label>
         <div class="col-sm-10">
 
@@ -85,7 +85,7 @@
                     </span>
                 </div>
                 <p class="help-block" ng-switch-when="timestamp">
-                    <i>Timestamp: {{apiMethod.params[param.name].getTime()}}</i>
+                    <i>Временная метка: {{apiMethod.params[param.name].getTime()}}</i>
                 </p>
 
                 <input type="text"
@@ -101,7 +101,7 @@
                        typeahead-focus
  class="form-control input-sm">
                 <p class="help-block" ng-switch-when="camera">
-                    <i>Selected camera: {{cameraIds[apiMethod.params[param.name]].name}}</i>
+                    <i>Выбранная камера: {{cameraIds[apiMethod.params[param.name]].name}}</i>
                 </p>
 
                 <span ng-switch-when="info"></span>
@@ -124,9 +124,9 @@
         <div class="col-sm-offset-2 col-sm-10">
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" ng-model="apiMethod.addCredentials"> Use credentials
+                    <input type="checkbox" ng-model="apiMethod.addCredentials"> Использовать учетные данные
                 </label>
-                <p class="help-block">Add login and password to url</p>
+                <p class="help-block">Добавить имя пользователя и пароль для Url-адреса</p>
             </div>
         </div>
     </div>
@@ -136,12 +136,12 @@
         <div class="col-sm-10">
             <input id="useLogin" type="text" class="form-control input-sm"
                    ng-model="apiMethod.login">
-            <p class="help-block">It is recommended to create dedicated user for integrations</p>
+            <p class="help-block">Рекомендуется создавать выделенного пользователя для тестирования интеграции</p>
         </div>
     </div>
 
     <div class="form-group" ng-if="apiMethod.addCredentials">
-        <label class="col-sm-2 control-label" for="usePassword">Password</label>
+        <label class="col-sm-2 control-label" for="usePassword">Пароль</label>
         <div class="col-sm-10">
             <input id="usePassword" type="text" class="form-control input-sm"
                    ng-model="apiMethod.password">
@@ -156,7 +156,7 @@
             <p class="help-block" ng-if="clipboardSupported">
                 <a clipboard
  supported="clipboardSupported"
-                   text="getDebugUrl()" href="">Copy to clipboard</a>
+                   text="getDebugUrl()" href="">Скопировать в буфер обмена</a>
             </p>
         </div>
     </div>
@@ -174,9 +174,9 @@
         <div class="col-sm-offset-2 col-sm-10">
             <button type="submit"
                     ng-if="apiMethod.method=='GET' || apiMethod.method=='POST'"
-                    class="btn btn-primary" ng-click="testMethod()">Test method</button>
+                    class="btn btn-primary" ng-click="testMethod()">Проверить метод</button>
             <a class="btn btn-default" ng-if="apiMethod.method=='GET'"
-               ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
+               ng-href="{{getDebugUrl()}}" target="_blank">Открыть на новой вкладке</a>
         </div>
     </div>
 
@@ -188,16 +188,16 @@
         </div>
     </div>
     <div class="form-group" ng-if="result.image">
-        <label class="col-sm-2 control-label">Response</label>
+        <label class="col-sm-2 control-label">Ответ</label>
         <div class="col-sm-10">
             <img style="max-width:100%" ng-src="{{result.image}}">
             <div class="col-sm-10">
-                <p class="help-block">Content-type: {{result.contentType}}</p>
+                <p class="help-block">Тип содержимого: {{result.contentType}}</p>
             </div>
         </div>
     </div>
     <div class="form-group" ng-if="result.result" ng-class="{'has-error':result.error}">
-        <label class="col-sm-2 control-label">Response</label>
+        <label class="col-sm-2 control-label">Ответ</label>
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{result.result}}</textarea>
             <p class="help-block">

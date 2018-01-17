@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/network/stun/abstract_server_connection.h>
+#include <nx/network/stun/server_connection.h>
 #include <nx/network/system_socket.h>
 
 namespace nx {
@@ -24,13 +24,16 @@ template<> struct SocketTypeToProtocolType<nx::network::UDPSocket>
         nx::network::TransportProtocol::udp;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 template<typename Socket>
 class TestConnection:
-    public stun::AbstractServerConnection
+    public nx::network::stun::AbstractServerConnection,
+    public nx::network::aio::BasicPollable
 {
 public:
     virtual void sendMessage(
-        nx::stun::Message /*message*/,
+        nx::network::stun::Message /*message*/,
         std::function<void(SystemError::ErrorCode)> /*handler*/ = nullptr) override
     {
     }
@@ -40,16 +43,18 @@ public:
         return SocketTypeToProtocolType<Socket>::value;
     }
 
-    virtual SocketAddress getSourceAddress() const override
+    virtual nx::network::SocketAddress getSourceAddress() const override
     {
-        return SocketAddress();
+        return nx::network::SocketAddress();
     }
 
-    virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> /*handler*/) override
+    virtual void addOnConnectionCloseHandler(
+        nx::utils::MoveOnlyFunc<void()> handler) override
     {
+        m_connectionCloseHandler.swap(handler);
     }
 
-    virtual AbstractCommunicatingSocket* socket() override
+    virtual nx::network::AbstractCommunicatingSocket* socket() override
     {
         return &m_socket;
     }
@@ -58,8 +63,56 @@ public:
     {
     }
 
+    virtual void setInactivityTimeout(
+        boost::optional<std::chrono::milliseconds> value) override
+    {
+        m_inactivityTimeout = value;
+    }
+
+    boost::optional<std::chrono::milliseconds> inactivityTimeout() const
+    {
+        return m_inactivityTimeout;
+    }
+
+    void reportConnectionClosure()
+    {
+        post(
+            [this]()
+            {
+                if (m_connectionCloseHandler)
+                    nx::utils::swapAndCall(m_connectionCloseHandler);
+            });
+    }
+
 private:
     Socket m_socket;
+    boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
+    nx::utils::MoveOnlyFunc<void()> m_connectionCloseHandler;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class TestTcpConnection:
+    public nx::network::stun::ServerConnection
+{
+    using base_type = nx::network::stun::ServerConnection;
+
+public:
+    TestTcpConnection();
+
+    virtual void sendMessage(
+        nx::network::stun::Message /*message*/,
+        std::function<void(SystemError::ErrorCode)> /*handler*/ = nullptr) override;
+
+    virtual nx::network::SocketAddress getSourceAddress() const override;
+
+    virtual void setInactivityTimeout(
+        boost::optional<std::chrono::milliseconds> value) override;
+
+    boost::optional<std::chrono::milliseconds> inactivityTimeout() const;
+
+private:
+    boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
 };
 
 } // namespace test

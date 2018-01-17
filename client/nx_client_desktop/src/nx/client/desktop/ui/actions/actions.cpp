@@ -1,13 +1,15 @@
 #include "actions.h"
-#include "config.h"
 
 #include <core/resource/device_dependent_strings.h>
+
+#include <ini.h>
 
 #include <client/client_runtime_settings.h>
 
 #include <nx/client/desktop/ui/actions/menu_factory.h>
 #include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <nx/client/desktop/ui/actions/action_factories.h>
+#include <nx/client/desktop/analytics/analytics_action_factory.h>
 #include <nx/client/desktop/radass/radass_action_factory.h>
 #include <nx/client/desktop/ui/actions/action_text_factories.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -21,8 +23,6 @@
 #include <nx/network/app_info.h>
 
 #include <nx/utils/app_info.h>
-
-#include <ini.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop::ui::action, IDType)
 
@@ -359,14 +359,11 @@ void initialize(Manager* manager, Action* root)
         .childFactory(new OpenCurrentUserLayoutFactory(manager))
         .icon(qnSkin->icon("titlebar/dropdown.png"));
 
-    if (ini().enableAnalytics)
-    {
-        factory(StartAnalyticsAction)
-            .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
-            .text(ContextMenu::tr("Start Analytics..."))
-            .childFactory(new AnalyticsModeActionFactory(manager))
-            .condition(condition::hasFlags(Qn::server_live_cam, MatchMode::All));
-    }
+    factory(StartAnalyticsAction)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Start Analytics..."))
+        .childFactory(new AnalyticsActionFactory(manager))
+        .condition(AnalyticsActionFactory::condition());
 
     factory()
         .flags(TitleBar)
@@ -438,6 +435,13 @@ void initialize(Manager* manager, Action* root)
             && !condition::tourIsRunning());
 
     factory(ShareLayoutAction)
+        .mode(DesktopMode)
+        .flags(SingleTarget | ResourceTarget)
+        .autoRepeat(false)
+        .requiredGlobalPermission(Qn::GlobalAdminPermission)
+        .condition(!condition::isSafeMode());
+
+    factory(ShareCameraAction)
         .mode(DesktopMode)
         .flags(SingleTarget | ResourceTarget)
         .autoRepeat(false)
@@ -559,6 +563,10 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("User Management..."))
         .condition(condition::treeNodeType(Qn::UsersNode));
 
+    factory(UpdateLocalFilesAction)
+        .flags(NoTarget)
+        .text(ContextMenu::tr("Update local files"));
+
     factory(PreferencesGeneralTabAction)
         .flags(Main)
         .text(ContextMenu::tr("Local Settings..."))
@@ -602,6 +610,12 @@ void initialize(Manager* manager, Action* root)
     factory(HideCloudPromoAction)
         .flags(NoTarget);
 
+    factory(ChangeDefaultCameraPasswordAction)
+        .flags(SingleTarget | MultiTarget | ResourceTarget)
+        .requiredGlobalPermission(Qn::GlobalAdminPermission)
+        .mode(DesktopMode)
+        .text(ContextMenu::tr("Some cameras require passwords to be set"));
+
     factory(OpenCloudRegisterUrl)
         .flags(NoTarget)
         .text(ContextMenu::tr("Create Account..."));
@@ -632,6 +646,15 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("Ctrl+M"))
         .condition(!condition::tourIsRunning())
         .autoRepeat(false);
+
+    factory(MainMenuAddDeviceManuallyAction)
+        .flags(Main)
+        .text(ContextMenu::tr("Add Device..."))
+        .requiredGlobalPermission(Qn::GlobalAdminPermission)
+        .condition(condition::isLoggedIn()
+            && !condition::isSafeMode()
+            && !condition::tourIsRunning()
+            && condition::isTrue(nx::client::desktop::ini().enableDeviceSearch));
 
     factory(MergeSystems)
         .flags(Main | Tree)
@@ -749,23 +772,12 @@ void initialize(Manager* manager, Action* root)
         .flags(Slider)
         .separator();
 
-    factory(ExportTimeSelectionAction)
-        .flags(Slider | SingleTarget | ResourceTarget)
-        .text(ContextMenu::tr("Export Selected Area..."))
-        .requiredTargetPermissions(Qn::ExportPermission)
-        .condition(new ExportCondition(true));
-
-    factory(ExportLayoutAction)
-        .flags(Slider | SingleTarget | MultiTarget | NoTarget)
-        .text(ContextMenu::tr("Export Multi-Video..."))
-        .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
-        .condition(new ExportCondition(false));
-
-    factory(ExportRapidReviewAction)
-        .flags(Slider | SingleTarget | MultiTarget | NoTarget)
-        .text(ContextMenu::tr("Export Rapid Review..."))
-        .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
-        .condition(new ExportCondition(true));
+    factory(ExportVideoAction)
+        .flags(Slider | SingleTarget | MultiTarget | NoTarget | WidgetTarget | ResourceTarget)
+        .text(ContextMenu::tr("Export Video..."))
+        .conditionalText(ContextMenu::tr("Export Bookmark..."),
+            condition::hasArgument(Qn::CameraBookmarkRole))
+        .condition(ConditionWrapper(new ExportCondition()));
 
     factory(ThumbnailsSearchAction)
         .flags(Slider | Scene | SingleTarget)
@@ -924,6 +936,16 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Save Layout"))
         .condition(ConditionWrapper(new SaveLayoutCondition(false)));
 
+    factory(SaveLocalLayoutAction)
+        .flags(SingleTarget | ResourceTarget)
+        .requiredTargetPermissions(Qn::SavePermission)
+        .condition(condition::hasFlags(Qn::layout, MatchMode::All));
+
+    factory(SaveLocalLayoutAsAction)
+        .flags(SingleTarget | ResourceTarget)
+        .requiredTargetPermissions(Qn::SavePermission)
+        .condition(condition::hasFlags(Qn::layout, MatchMode::All));
+
     factory(SaveLayoutAsAction) // TODO: #GDM #access check canCreateResource permission
         .flags(SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::UserResourceRole, Qn::SavePermission)
@@ -939,6 +961,16 @@ void initialize(Manager* manager, Action* root)
             ConditionWrapper(new SaveLayoutAsCondition(false))
             && !condition::isLayoutTourReviewMode()
         );
+
+    factory()
+        .flags(Tree)
+        .separator();
+
+    factory(MakeLayoutTourAction)
+        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
+        .text(ContextMenu::tr("Make Showreel"))
+        .condition(condition::hasFlags(Qn::layout, MatchMode::All)
+            && !condition::isSafeMode());
 
     factory()
         .flags(Scene | Tree)
@@ -992,14 +1024,6 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("Alt+I"))
         .condition(ConditionWrapper(new DisplayInfoCondition())
             && !condition::isLayoutTourReviewMode());
-
-    factory(RadassAction)
-        .flags(Scene | NoTarget | SingleTarget | MultiTarget | LayoutItemTarget)
-        .text(ContextMenu::tr("Resolution..."))
-        .childFactory(new RadassActionFactory(manager))
-        .condition(ConditionWrapper(new ChangeResolutionCondition())
-            && !condition::isLayoutTourReviewMode()
-            && !condition::tourIsRunning());
 
     factory()
         .flags(Scene | SingleTarget)
@@ -1112,6 +1136,13 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("270 degrees"))
             .condition(new RotateItemCondition());
     } factory.endSubMenu();
+
+    factory(RadassAction)
+        .flags(Scene | NoTarget | SingleTarget | MultiTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Resolution..."))
+        .childFactory(new RadassActionFactory(manager))
+        .condition(ConditionWrapper(new ChangeResolutionCondition())
+            && !condition::isLayoutTourReviewMode());
 
     factory()
         .flags(Scene | Tree)
@@ -1316,6 +1347,18 @@ void initialize(Manager* manager, Action* root)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
 
+    factory(AddDeviceManuallyAction)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Add Device..."))   //intentionally hardcode devices here
+        .requiredGlobalPermission(Qn::GlobalAdminPermission)
+        .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)
+            && ConditionWrapper(new EdgeServerCondition(false))
+            && !ConditionWrapper(new FakeServerCondition(true))
+            && !condition::isSafeMode()
+            && !condition::tourIsRunning()
+            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode())
+            && condition::isTrue(nx::client::desktop::ini().enableDeviceSearch));
+
     factory(CameraListByServerAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -1513,12 +1556,6 @@ void initialize(Manager* manager, Action* root)
 
     factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
 
-    factory(MakeLayoutTourAction)
-        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
-        .text(ContextMenu::tr("Make Showreel"))
-        .condition(condition::hasFlags(Qn::layout, MatchMode::All)
-            && !condition::isSafeMode());
-
     factory(LayoutTourSettingsAction)
         .flags(Tree | NoTarget)
         .text(ContextMenu::tr("Settings"))
@@ -1658,7 +1695,8 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Synchronize Streams"))
         .toggledText(ContextMenu::tr("Disable Stream Synchronization"))
         .condition(ConditionWrapper(new ArchiveCondition())
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::syncIsForced());
 
     factory()
         .flags(Slider | TitleBar | Tree)
@@ -1733,6 +1771,11 @@ void initialize(Manager* manager, Action* root)
 
     factory(PtzActivatePresetByIndexAction)
         .flags(NoTarget);
+
+    factory(OpenNewSceneAction)
+        .flags(GlobalHotkey | DevMode)
+        .shortcut(lit("Ctrl+Shift+E"))
+        .autoRepeat(false);
 }
 
 } // namespace action

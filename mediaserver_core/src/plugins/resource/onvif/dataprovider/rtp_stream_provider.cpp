@@ -1,7 +1,10 @@
 #include "rtp_stream_provider.h"
 #include <core/resource/camera_resource.h>
+#include <nx/utils/log/log.h>
 
 #ifdef ENABLE_DATA_PROVIDERS
+
+static const size_t kPacketCountToOmitLog = 50;
 
 QnRtpStreamReader::QnRtpStreamReader(const QnResourcePtr& res, const QString& request):
     CLServerPushStreamReader(res),
@@ -9,7 +12,6 @@ QnRtpStreamReader::QnRtpStreamReader(const QnResourcePtr& res, const QString& re
     m_request(request),
     m_rtpTransport(RtpTransport::_auto)
 {
-
 }
 
 QnRtpStreamReader::~QnRtpStreamReader()
@@ -27,20 +29,41 @@ void QnRtpStreamReader::setRequest(const QString& request)
     m_request = request;
 }
 
-QnAbstractMediaDataPtr QnRtpStreamReader::getNextData() 
+QnAbstractMediaDataPtr QnRtpStreamReader::getNextData()
 {
     if (!isStreamOpened())
+    {
+        NX_VERBOSE(this, lm("Next data: stream %1 is closed")
+            .args(m_rtpReader.getCurrentStreamUrl()));
         return QnAbstractMediaDataPtr(0);
+    }
 
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+    {
+        const auto metaData = getMetadata();
+        NX_VERBOSE(this, lm("Next data: meta at %1 from %2")
+            .args(metaData->timestamp, m_rtpReader.getCurrentStreamUrl()));
+        return metaData;
+    }
 
     QnAbstractMediaDataPtr result;
     for (int i = 0; i < 2 && !result; ++i)
         result = m_rtpReader.getNextData();
 
     if (!result)
+    {
+        NX_VERBOSE(this, lm("Next data: end of stream %1")
+            .args(m_rtpReader.getCurrentStreamUrl()));
         closeStream();
+    }
+    else
+    {
+        if (m_dataPassed++ % kPacketCountToOmitLog == 0)
+        {
+            NX_VERBOSE(this, lm("Next data: media timestamp %1 from %2")
+                .args(result->timestamp, m_rtpReader.getCurrentStreamUrl()));
+        }
+    }
 
     return result;
 }
@@ -59,15 +82,20 @@ CameraDiagnostics::Result QnRtpStreamReader::openStreamInternal(bool isCameraCon
 	if (virtRes)
 		virtRes->updateSourceUrl(m_rtpReader.getCurrentStreamUrl(), getRole());
 
-    return m_rtpReader.openStream();
+    const auto result = m_rtpReader.openStream();
+    NX_VERBOSE(this, lm("Role %1, open stream %2 -> %3")
+        .args((int) getRole(), m_rtpReader.getCurrentStreamUrl(), result.toString(nullptr)));
+
+    return result;
 }
 
-void QnRtpStreamReader::closeStream() 
+void QnRtpStreamReader::closeStream()
 {
+    m_dataPassed = 0;
     m_rtpReader.closeStream();
 }
 
-bool QnRtpStreamReader::isStreamOpened() const 
+bool QnRtpStreamReader::isStreamOpened() const
 {
     return m_rtpReader.isStreamOpened();
 }

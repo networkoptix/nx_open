@@ -1,18 +1,11 @@
-/**********************************************************
-* 25 feb 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "file_socket.h"
-
 
 namespace nx {
 namespace network {
 
-FileSocket::FileSocket( const std::string& filePath )
-:
-    m_filePath( filePath ),
-    m_bytesRead( 0 )
+FileSocket::FileSocket(const std::string& filePath):
+    m_filePath(filePath),
+    m_bytesRead(0)
 {
 }
 
@@ -29,24 +22,24 @@ bool FileSocket::isClosed() const
 
 bool FileSocket::connect(
     const SocketAddress& remoteSocketAddress,
-    unsigned int timeoutMillis )
+    std::chrono::milliseconds timeout)
 {
-    DummySocket::connect( remoteSocketAddress, timeoutMillis );
+    DummySocket::connect(remoteSocketAddress, timeout);
 
-    if( m_file.is_open() )
+    if (m_file.is_open())
         m_file.close();
-    m_file.open( m_filePath, std::ifstream::binary );
+    m_file.open(m_filePath, std::ifstream::binary);
     return m_file.is_open();
 }
 
-int FileSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )
+int FileSocket::recv(void* buffer, unsigned int bufferLen, int /*flags*/)
 {
-    m_file.read( (char*)buffer, bufferLen );
+    m_file.read((char*)buffer, bufferLen);
     m_bytesRead += m_file.gcount();
     return m_file.gcount();
 }
 
-int FileSocket::send( const void* /*buffer*/, unsigned int bufferLen )
+int FileSocket::send(const void* /*buffer*/, unsigned int bufferLen)
 {
     return bufferLen;
 }
@@ -56,5 +49,5 @@ bool FileSocket::isConnected() const
     return m_file.is_open();
 }
 
-}   //network
-}   //nx
+} // namespace network
+} // namespace nx

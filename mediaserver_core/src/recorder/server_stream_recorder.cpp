@@ -9,7 +9,7 @@
 #include "motion/motion_helper.h"
 #include "storage_manager.h"
 #include <nx/streaming/abstract_media_stream_data_provider.h>
-#include "core/dataprovider/live_stream_provider.h"
+#include "providers/live_stream_provider.h"
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include <core/resource/server_backup_schedule.h>
@@ -18,18 +18,20 @@
 #include "utils/math/math.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
-#include "core/dataprovider/spush_media_stream_provider.h"
+#include "providers/spush_media_stream_provider.h"
 #include <nx/mediaserver/event/event_connector.h>
 #include <nx/vms/event/events/reasoned_event.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "nx/streaming/media_data_packet.h"
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
-#include "utils/common/util.h" /* For MAX_FRAME_DURATION, MIN_FRAME_DURATION. */
+#include "utils/common/util.h" /* For MAX_FRAME_DURATION_MS, MIN_FRAME_DURATION_USEC. */
 #include <recorder/recording_manager.h>
 #include <utils/common/buffered_file.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/cryptographic_hash.h>
+#include "archive_integrity_watcher.h"
 
 namespace {
 static const int kMotionPrebufferSize = 8;
@@ -95,6 +97,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(
 
 QnServerStreamRecorder::~QnServerStreamRecorder()
 {
+    m_device->disconnect(this);
+    disconnect();
     stop();
 }
 
@@ -158,6 +162,11 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
         addQueueSizeUnsafe(media->dataSize());
         QnStreamRecorder::putData(nonConstData);
     }
+}
+
+void QnServerStreamRecorder::setLastMediaTime(qint64 lastMediaTime)
+{
+    m_lastMediaTime = lastMediaTime;
 }
 
 void QnServerStreamRecorder::updateRebuildState()
@@ -316,17 +325,24 @@ void QnServerStreamRecorder::updateStreamParams()
     if (m_mediaProvider)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
-        if (m_catalog == QnServer::HiQualityCatalog) {
-            if (m_currentScheduleTask.getRecordingType() != Qn::RT_Never && !camera->isScheduleDisabled()) {
-                liveProvider->setFps(m_currentScheduleTask.getFps());
-                liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
+        if (m_catalog == QnServer::HiQualityCatalog)
+        {
+            QnLiveStreamParams params;
+            if (m_currentScheduleTask.getRecordingType() != Qn::RT_Never && !camera->isScheduleDisabled())
+            {
+                params.fps = m_currentScheduleTask.getFps();
+                params.quality = m_currentScheduleTask.getStreamQuality();
+                params.bitrateKbps = m_currentScheduleTask.getBitrateKbps();
             }
             else {
                 NX_ASSERT(camera);
-                liveProvider->setFps(camera->getMaxFps());
-                liveProvider->setQuality(Qn::QualityHighest);
+
+                params.fps = camera->getMaxFps();
+                params.quality = Qn::QualityHighest;
+                params.bitrateKbps = 0;
             }
-            liveProvider->setSecondaryQuality(camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
+            params.secondaryQuality = (camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
+            liveProvider->setParams(params);
         }
         liveProvider->setCameraControlDisabled(camera->isCameraControlDisabled());
     }
@@ -341,7 +357,7 @@ bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 
 void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr& media)
 {
-    m_lastMediaTime = media->timestamp;
+    setLastMediaTime(media->timestamp);
 
     NX_ASSERT(m_dualStreamingHelper, Q_FUNC_INFO, "Dual streaming helper must be defined!");
     QnConstMetaDataV1Ptr metaData = std::dynamic_pointer_cast<const QnMetaDataV1>(media);
@@ -381,6 +397,8 @@ void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
         m_lastMotionTimeUsec = motionTime;
         setPrebufferingUsec(0); // motion in progress, flush prebuffer
     }
+
+    return;
 }
 
 void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timestamp, const QnConstMetaDataV1Ptr& metaData)
@@ -389,6 +407,14 @@ void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timest
         return;
     m_lastMotionState = value;
     emit motionDetected(getResource(), m_lastMotionState, timestamp, metaData);
+}
+
+void QnServerStreamRecorder::updateContainerMetadata(QnAviArchiveMetadata* metadata) const
+{
+    using namespace nx::mediaserver;
+    metadata->version = QnAviArchiveMetadata::kIntegrityCheckVersion;
+    metadata->integrityHash =
+        IntegrityHashHelper::generateIntegrityHash(QByteArray::number(m_startDateTime / 1000));
 }
 
 bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)
@@ -400,10 +426,10 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     bool isMotionContinue = m_lastMotionTimeUsec != (qint64)AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + afterThreshold;
     if (!isMotionContinue)
     {
-        if (m_endDateTime == (qint64)AV_NOPTS_VALUE || media->timestamp - m_endDateTime < MAX_FRAME_DURATION*1000)
+        if (m_endDateTime == (qint64)AV_NOPTS_VALUE || media->timestamp - m_endDateTime < MAX_FRAME_DURATION_MS*1000)
             updateMotionStateInternal(false, media->timestamp, QnMetaDataV1Ptr());
         else
-            updateMotionStateInternal(false, m_endDateTime + MIN_FRAME_DURATION, QnMetaDataV1Ptr());
+            updateMotionStateInternal(false, m_endDateTime + MIN_FRAME_DURATION_USEC, QnMetaDataV1Ptr());
     }
     QnScheduleTask task = currentScheduleTask();
 
@@ -448,10 +474,10 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     //qDebug() << "needSaveData=" << rez << "df=" << (media->timestamp - (m_lastMotionTimeUsec + task.getAfterThreshold()*1000000ll))/1000000.0;
     if (!isMotionContinue && m_endDateTime != (qint64)AV_NOPTS_VALUE)
     {
-        if (media->timestamp - m_endDateTime < MAX_FRAME_DURATION*1000)
+        if (media->timestamp - m_endDateTime < MAX_FRAME_DURATION_MS*1000)
             m_endDateTime = media->timestamp;
         else
-            m_endDateTime += MIN_FRAME_DURATION;
+            m_endDateTime += MIN_FRAME_DURATION_USEC;
         close();
     }
     return isMotionContinue;
@@ -589,7 +615,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 
     m_usedSpecialRecordingMode = m_usedPanicMode = false;
-    QnScheduleTask noRecordTask(QnUuid(), 1, 0, 0, Qn::RT_Never, 0, 0);
+    QnScheduleTask noRecordTask;
 
     if (!m_schedule.isEmpty())
     {
@@ -613,7 +639,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
                 updateRecordingType(noRecordTask);
             }
             static const qint64 SCHEDULE_AGGREGATION = 1000*60*15;
-            m_lastSchedulePeriod = QnTimePeriod(qFloor(timeMs, SCHEDULE_AGGREGATION)-MAX_FRAME_DURATION, SCHEDULE_AGGREGATION+MAX_FRAME_DURATION); // check period each 15 min
+            m_lastSchedulePeriod = QnTimePeriod(qFloor(timeMs, SCHEDULE_AGGREGATION)-MAX_FRAME_DURATION_MS, SCHEDULE_AGGREGATION+MAX_FRAME_DURATION_MS); // check period each 15 min
         }
     }
     else {
@@ -640,6 +666,7 @@ bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 
     // for empty schedule we record all time
     beforeProcessData(media);
+
     bool rez = QnStreamRecorder::processData(data);
     return rez;
 }
@@ -725,7 +752,12 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
     }
 }
 
-void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
+void QnServerStreamRecorder::fileFinished(
+    qint64 durationMs,
+    const QString& fileName,
+    QnAbstractMediaStreamDataProvider* provider,
+    qint64 fileSize,
+    qint64 startTimeMs)
 {
     if (m_truncateInterval != 0)
     {
@@ -733,19 +765,26 @@ void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& file
             durationMs,
             fileName,
             provider,
-            fileSize
+            fileSize,
+            startTimeMs
         );
 
         qnBackupStorageMan->fileFinished(
             durationMs,
             fileName,
             provider,
-            fileSize
+            fileSize,
+            startTimeMs
         );
     }
 };
 
-void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
+void QnServerStreamRecorder::fileStarted(
+    qint64 startTimeMs,
+    int timeZone,
+    const QString& fileName,
+    QnAbstractMediaStreamDataProvider* provider,
+    bool sideRecorder)
 {
     if (m_truncateInterval > 0)
     {
@@ -753,14 +792,16 @@ void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, int timeZone, const
             startTimeMs,
             timeZone,
             fileName,
-            provider
+            provider,
+            sideRecorder
         );
 
         qnBackupStorageMan->fileStarted(
             startTimeMs,
             timeZone,
             fileName,
-            provider
+            provider,
+            sideRecorder
         );
     }
 }

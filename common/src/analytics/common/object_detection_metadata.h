@@ -1,63 +1,84 @@
 #pragma once
 
 #include <set>
+#include <chrono>
+#include <memory>
+#include <ostream>
 
-#include <analytics/common/abstract_metadata.h>
-
-#include <nx/utils/uuid.h>
+#include <QtCore/QRect>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/streaming/media_data_packet_fwd.h>
+#include <nx/utils/uuid.h>
 
-struct QnObjectFeature
+namespace nx {
+namespace common {
+namespace metadata {
+
+struct Attribute
 {
-    QString keyword;
+    QString name;
     QString value;
 };
-QN_FUSION_DECLARE_FUNCTIONS(QnObjectFeature, (json)(ubjson)(metatype));
-#define QnObjectFeature_Fields (keyword)(value)
+#define Attribute_Fields (name)(value)
+QN_FUSION_DECLARE_FUNCTIONS(Attribute, (json)(ubjson));
 
-bool operator< (const QnObjectFeature& f, const QnObjectFeature& s);
+bool operator< (const Attribute& f, const Attribute& s);
+bool operator==(const Attribute& left, const Attribute& right);
 
-struct QnPoint2D
+QString toString(const Attribute&);
+
+//-------------------------------------------------------------------------------------------------
+
+struct DetectedObject
 {
-    QnPoint2D() {};
-    QnPoint2D(double xC, double yC): x(xC), y(yC) {};
-    double x = 0;
-    double y = 0;
-};
-QN_FUSION_DECLARE_FUNCTIONS(QnPoint2D, (json)(ubjson)(metatype));
-#define QnPoint2D_Fields (x)(y)
-
-struct QnRect
-{
-    QnRect() {}
-    QnRect(QnPoint2D tl, QnPoint2D br): topLeft(tl), bottomRight(br) {}
-
-    QnPoint2D topLeft;
-    QnPoint2D bottomRight;
-};
-QN_FUSION_DECLARE_FUNCTIONS(QnRect, (json)(ubjson)(metatype));
-#define QnRect_Fields (topLeft)(bottomRight)
-
-struct QnObjectDetectionInfo
-{
+    QnUuid objectTypeId;
     QnUuid objectId;
-    QnRect boundingBox;
-    std::set<QnObjectFeature> labels;
+    /**
+     * Coordinates are in range [0;1].
+     */
+    QRectF boundingBox;
+    std::vector<Attribute> labels;
 };
-QN_FUSION_DECLARE_FUNCTIONS(QnObjectDetectionInfo, (json)(ubjson)(metatype));
-#define QnObjectDetectionInfo_Fields (boundingBox)(objectId)(labels)
+#define DetectedObject_Fields (objectTypeId)(objectId)(boundingBox)(labels)
+QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
 
-struct QnObjectDetectionMetadata: public QnAbstractMetadata
+bool operator==(const DetectedObject& left, const DetectedObject& right);
+
+//-------------------------------------------------------------------------------------------------
+
+struct DetectionMetadataPacket
 {
-    std::vector<QnObjectDetectionInfo> detectedObjects;
-
-    virtual QnCompressedMetadataPtr serialize() const override;
-    virtual bool deserialize(const QnConstCompressedMetadataPtr& data) override;
+    QnUuid deviceId;
+    // TODO: Rename "Usec" -> "Us".
+    qint64 timestampUsec = 0;
+    qint64 durationUsec = 0;
+    std::vector<DetectedObject> objects;
 };
-QN_FUSION_DECLARE_FUNCTIONS(QnObjectDetectionMetadata, (json)(ubjson)(metatype));
-#define QnObjectDetectionMetadata_Fields (detectedObjects)
+#define DetectionMetadataPacket_Fields (deviceId)(timestampUsec)(durationUsec)(objects)
+QN_FUSION_DECLARE_FUNCTIONS(DetectionMetadataPacket, (json)(ubjson));
 
-#define QN_OBJECT_DETECTION_TYPES (QnPoint2D)(QnRect)(QnObjectFeature)(QnObjectDetectionInfo)(QnObjectDetectionMetadata)
+bool operator==(const DetectionMetadataPacket& left, const DetectionMetadataPacket& right);
 
-using QnObjectDetectionMetadataPtr = std::shared_ptr<QnObjectDetectionMetadata>;
+#define QN_OBJECT_DETECTION_TYPES \
+    (Attribute)\
+    (DetectedObject)\
+    (DetectionMetadataPacket)
+
+using DetectionMetadataPacketPtr = std::shared_ptr<DetectionMetadataPacket>;
+using ConstDetectionMetadataPacketPtr = std::shared_ptr<const DetectionMetadataPacket>;
+using DetectionMetadataTrack = DetectionMetadataPacket;
+
+bool operator<(const DetectionMetadataPacket& first,
+    const DetectionMetadataPacket& second);
+bool operator<(std::chrono::microseconds first, const DetectionMetadataPacket& second);
+bool operator<(const DetectionMetadataPacket& first, std::chrono::microseconds second);
+
+QString toString(const DetectionMetadataPacket&);
+QnCompressedMetadataPtr toMetadataPacket(const DetectionMetadataPacket&);
+DetectionMetadataPacketPtr fromMetadataPacket(const QnCompressedMetadataPtr&);
+::std::ostream& operator<<(::std::ostream& os, const DetectionMetadataPacket& packet);
+
+} // namespace metadata
+} // namespace common
+} // namespace nx

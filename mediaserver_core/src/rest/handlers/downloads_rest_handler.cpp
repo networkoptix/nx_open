@@ -5,7 +5,9 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <rest/server/json_rest_result.h>
+#include <rest/helpers/request_helpers.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/file_system.h>
 
 using nx::vms::common::p2p::downloader::Downloader;
 using nx::vms::common::p2p::downloader::FileInformation;
@@ -170,7 +172,7 @@ int Helper::handleAddDownload(const QString& fileName)
     const auto urlString = params.value("url");
     if (!urlString.isEmpty())
     {
-        fileInfo.url = QUrl(urlString);
+        fileInfo.url = nx::utils::Url(urlString);
         if (!fileInfo.url.isValid())
             return makeInvalidParameterError("url");
     }
@@ -179,7 +181,7 @@ int Helper::handleAddDownload(const QString& fileName)
     if (errorCode != ResultCode::ok)
         return makeDownloaderError(errorCode);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int Helper::handleRemoveDownload(const QString& fileName)
@@ -190,7 +192,7 @@ int Helper::handleRemoveDownload(const QString& fileName)
     if (errorCode != ResultCode::ok)
         return makeDownloaderError(errorCode);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int Helper::handleGetChunkChecksums(const QString& fileName)
@@ -203,7 +205,7 @@ int Helper::handleGetChunkChecksums(const QString& fileName)
 
     QnFusionRestHandlerDetail::serializeJsonRestReply(
         checksums, params, result, resultContentType, QnRestResult());
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int Helper::handleDownloadChunk(const QString& fileName, int chunkIndex)
@@ -218,12 +220,12 @@ int Helper::handleDownloadChunk(const QString& fileName, int chunkIndex)
 
     result = data;
     resultContentType = kOctetStreamContentType;
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIndex)
 {
-    const QUrl url = params.value("url");
+    const nx::utils::Url url = params.value("url");
     if (url.isEmpty())
         return makeInvalidParameterError("url", QnRestResult::MissingParameter);
     else if (!url.isValid())
@@ -250,11 +252,11 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
         {
             result = data;
             resultContentType = kOctetStreamContentType;
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         }
     }
 
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     httpClient.setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
     httpClient.setSendTimeoutMs(kDownloadRequestTimeoutMs);
     httpClient.setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);
@@ -264,11 +266,11 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
         lit("bytes=%1-%2").arg(pos).arg(pos + chunkSize - 1).toLatin1());
 
     if (!httpClient.doGet(url) || !httpClient.response())
-        return nx_http::StatusCode::internalServerError;
+        return nx::network::http::StatusCode::internalServerError;
 
     const auto status = httpClient.response()->statusLine.statusCode;
 
-    if (status != nx_http::StatusCode::ok && status != nx_http::StatusCode::partialContent)
+    if (status != nx::network::http::StatusCode::ok && status != nx::network::http::StatusCode::partialContent)
         return status;
 
     result.clear();
@@ -278,7 +280,7 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
     if (!httpClient.isValid())
     {
         result.clear();
-        return nx_http::StatusCode::internalServerError;
+        return nx::network::http::StatusCode::internalServerError;
     }
 
     resultContentType = kOctetStreamContentType;
@@ -286,7 +288,7 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
     if (useDownloader)
         downloader->writeFileChunk(fileName, chunkIndex, result);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int Helper::handleUploadChunk(
@@ -298,7 +300,7 @@ int Helper::handleUploadChunk(
     if (contentType != kOctetStreamContentType)
     {
         return makeError(
-            nx_http::StatusCode::badRequest,
+            nx::network::http::StatusCode::badRequest,
             QnRestResult::CantProcessRequest,
             lit("Only %1 Content-Type is supported.").arg(
                 QLatin1String(kOctetStreamContentType)));
@@ -308,7 +310,7 @@ int Helper::handleUploadChunk(
     if (errorCode != ResultCode::ok)
         return makeDownloaderError(errorCode);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int Helper::handleStatus(const QString& fileName)
@@ -335,7 +337,7 @@ int Helper::handleStatus(const QString& fileName)
             infoList, params, result, resultContentType, QnRestResult());
     }
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int Helper::makeError(
@@ -356,13 +358,13 @@ int Helper::makeError(
 int Helper::makeInvalidParameterError(
     const QString& parameter, const QnRestResult::Error& error)
 {
-    return makeError(nx_http::StatusCode::invalidParameter, error, parameter);
+    return makeError(nx::network::http::StatusCode::invalidParameter, error, parameter);
 }
 
 int Helper::makeFileError(const QString& fileName)
 {
     return makeError(
-        nx_http::StatusCode::badRequest,
+        nx::network::http::StatusCode::badRequest,
         QnRestResult::CantProcessRequest,
         lit("%1: file does not exist.").arg(fileName));
 }
@@ -370,7 +372,7 @@ int Helper::makeFileError(const QString& fileName)
 int Helper::makeDownloaderError(ResultCode errorCode)
 {
     return makeError(
-        nx_http::StatusCode::internalServerError,
+        nx::network::http::StatusCode::internalServerError,
         QnRestResult::CantProcessRequest,
         lit("DistributedFileDownloader returned error: %1").arg(
             QnLexical::serialized(errorCode)));
@@ -381,7 +383,32 @@ bool Helper::hasDownloader() const
     return downloader != nullptr;
 }
 
+boost::optional<int> hasError(const Request& request, Helper& helper)
+{
+    if (!request.isValid())
+        return nx::network::http::StatusCode::badRequest;
+
+    if (!nx::utils::file_system::isRelativePathSafe(request.fileName))
+    {
+        return helper.makeError(
+            nx::network::http::StatusCode::badRequest,
+            QnRestResult::InvalidParameter,
+            "File name in not a valid relative path.");
+    }
+
+    if (!helper.hasDownloader())
+    {
+        return helper.makeError(
+            nx::network::http::StatusCode::internalServerError,
+            QnRestResult::CantProcessRequest,
+            "DistributedFileDownloader is not initialized.");
+    }
+
+    return boost::none;
+}
+
 } // namespace
+
 
 int QnDownloadsRestHandler::executeGet(
     const QString& path,
@@ -391,18 +418,9 @@ int QnDownloadsRestHandler::executeGet(
     const QnRestConnectionProcessor* /*processor*/)
 {
     Request request(path);
-    if (!request.isValid())
-        return nx_http::StatusCode::badRequest;
-
     Helper helper(this, params, result, resultContentType);
-
-    if (!helper.hasDownloader())
-    {
-        return helper.makeError(
-            nx_http::StatusCode::internalServerError,
-            QnRestResult::CantProcessRequest,
-            "DistributedFileDownloader is not initialized.");
-    }
+    if (const auto returnCode = hasError(request, helper))
+        return *returnCode;
 
     switch (request.subject)
     {
@@ -413,7 +431,7 @@ int QnDownloadsRestHandler::executeGet(
         case Request::Subject::status:
             return helper.handleStatus(request.fileName);
         default:
-            return nx_http::StatusCode::badRequest;
+            return nx::network::http::StatusCode::badRequest;
     }
 }
 
@@ -427,18 +445,9 @@ int QnDownloadsRestHandler::executePost(
     const QnRestConnectionProcessor* /*processor*/)
 {
     Request request(path);
-    if (!request.isValid())
-        return nx_http::StatusCode::badRequest;
-
     Helper helper(this, params, result, resultContentType);
-
-    if (!helper.hasDownloader())
-    {
-        return helper.makeError(
-            nx_http::StatusCode::internalServerError,
-            QnRestResult::CantProcessRequest,
-            "DistributedFileDownloader is not initialized.");
-    }
+    if (const auto returnCode = hasError(request, helper))
+        return *returnCode;
 
     switch (request.subject)
     {
@@ -448,10 +457,10 @@ int QnDownloadsRestHandler::executePost(
             return helper.handleUploadChunk(
                 request.fileName, request.chunkIndex, body, bodyContentType);
         default:
-            return nx_http::StatusCode::badRequest;
+            return nx::network::http::StatusCode::badRequest;
     }
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnDownloadsRestHandler::executePut(
@@ -474,18 +483,9 @@ int QnDownloadsRestHandler::executeDelete(
     const QnRestConnectionProcessor* /*processor*/)
 {
     Request request(path);
-    if (!request.isValid() || request.subject != Request::Subject::file)
-        return nx_http::StatusCode::badRequest;
-
     Helper helper(this, params, result, resultContentType);
-
-    if (!helper.hasDownloader())
-    {
-        return helper.makeError(
-            nx_http::StatusCode::internalServerError,
-            QnRestResult::CantProcessRequest,
-            "DistributedFileDownloader is not initialized.");
-    }
+    if (const auto returnCode = hasError(request, helper))
+        return *returnCode;
 
     return helper.handleRemoveDownload(request.fileName);
 }

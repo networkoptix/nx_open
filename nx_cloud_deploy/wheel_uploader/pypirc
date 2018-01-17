@@ -1,0 +1,14 @@
+[distutils]
+index-servers =
+    internal
+    la.hdw.mx
+
+[internal]
+repository: http://hdw.mx:8006
+username:pypi
+password:225653
+
+[la.hdw.mx]
+repository: http://la.hdw.mx:8006
+username:pypi
+password:225653

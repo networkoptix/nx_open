@@ -12,7 +12,10 @@ angular.module('webadminApp', [
     'typeahead-focus',
     'ui.timepicker',
     'angular-clipboard'
-]).config(function ($routeProvider) {
+]).config(['$httpProvider', function ($httpProvider) {
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+}]).config(['$routeProvider', function ($routeProvider) {
 
     var universalResolves = {
         currentUser: ['mediaserver',function(mediaserver){
@@ -132,4 +135,4 @@ angular.module('webadminApp', [
         .otherwise({
             redirectTo: '/'
         });
-});
+}]);

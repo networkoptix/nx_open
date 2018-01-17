@@ -56,6 +56,8 @@ static QList<QHostAddress> allowedInterfaces;
 
 } // namespace
 
+namespace nx {
+namespace network {
 
 void setInterfaceListFilter(const QList<QHostAddress>& ifList)
 {
@@ -68,13 +70,26 @@ QHostAddress QnInterfaceAndAddr::broadcastAddress() const
     return QHostAddress(broadcastIpv4);
 }
 
-QHostAddress QnInterfaceAndAddr::networkAddress() const
+QHostAddress QnInterfaceAndAddr::subNetworkAddress() const
 {
-    quint32 networkIpv4 = address.toIPv4Address() & netMask.toIPv4Address();
-    return QHostAddress(networkIpv4);
+    quint32 subnetworkIpV4 = address.toIPv4Address() & netMask.toIPv4Address();
+    return QHostAddress(subnetworkIpV4);
 }
 
-QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
+bool QnInterfaceAndAddr::isHostBelongToIpv4Network(const QHostAddress& address) const
+{
+    auto between = [](const quint32 min, const quint32 value, const quint32 max)
+        { return min <= value && value < max; };
+
+    return between(
+        subNetworkAddress().toIPv4Address(),
+        address.toIPv4Address(),
+        broadcastAddress().toIPv4Address());
+}
+
+QnInterfaceAndAddrList getAllIPv4Interfaces(
+    bool allowInterfacesWithoutAddress,
+    bool keepAllAddressesPerInterface)
 {
     struct LocalCache
     {
@@ -86,7 +101,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
     enum { kCacheLinesCount = 2};
     static LocalCache caches[kCacheLinesCount];
 
-    LocalCache &cache = caches[allowItfWithoutAddress ? 1 : 0];
+    LocalCache &cache = caches[allowInterfacesWithoutAddress ? 1 : 0];
     {
         // speed optimization
         QnMutexLocker lock(&cache.guard);
@@ -108,7 +123,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
             continue;
 #endif
 
-        bool addInterfaceAnyway = allowItfWithoutAddress;
+        bool addInterfaceAnyway = allowInterfacesWithoutAddress;
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         for (const QNetworkAddressEntry& address: addresses)
         {
@@ -121,7 +136,8 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
                 {
                     result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
                     addInterfaceAnyway = false;
-                    break;
+                    if (!keepAllAddressesPerInterface)
+                        break;
                 }
             }
         }
@@ -139,13 +155,29 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
 
 namespace {
 
-/** Qt on linux returns ipv6 address with "%enp0s3" suffix. */
-static QString fixIpv6AddressString(const QString& ipv6Str)
+static QString ipv6AddrStringWithIfaceNameToAddrStringWithIfaceId(
+    const QString& ipv6AddrString,
+    const QString& ifaceName,
+    int ifaceIndex)
 {
-    int unexpectedSuffixPos = ipv6Str.indexOf('%');
-    if (unexpectedSuffixPos == -1)
-        return ipv6Str;
-    return ipv6Str.mid(0, unexpectedSuffixPos);
+    int scopeIdDelimPos = ipv6AddrString.indexOf('%');
+    if (scopeIdDelimPos == -1)
+        return ipv6AddrString;
+
+    NX_ASSERT(scopeIdDelimPos != 0 && scopeIdDelimPos != ipv6AddrString.length() - 1);
+    if (scopeIdDelimPos == 0 || scopeIdDelimPos == ipv6AddrString.length() - 1)
+        return QString();
+
+    QString scopeIdTail = ipv6AddrString.mid(scopeIdDelimPos + 1);
+    QString scopeIdFromIndex = QString::number(ifaceIndex);
+    if (scopeIdTail == scopeIdFromIndex)
+        return ipv6AddrString;
+
+    NX_ASSERT(ifaceName == scopeIdTail);
+    if (ifaceName != scopeIdTail)
+        return QString();
+
+    return ipv6AddrString.left(scopeIdDelimPos + 1) + scopeIdFromIndex;
 }
 
 } // namespace
@@ -177,7 +209,13 @@ QList<HostAddress> allLocalAddresses(AddressFilters filter)
                 result << HostAddress(address.ip().toString());
 
             if (isIpV6 && (filter.testFlag(AddressFilter::ipV6)))
-                result << HostAddress(fixIpv6AddressString(address.ip().toString()));
+            {
+                QString addrString = ipv6AddrStringWithIfaceNameToAddrStringWithIfaceId(
+                    address.ip().toString(),
+                    iface.name(),
+                    iface.index());
+                result << HostAddress(addrString);
+            }
         }
     }
 
@@ -823,3 +861,6 @@ QString getMacFromPrimaryIF()
         return QString();
     return QString::fromLatin1(mac);
 }
+
+} // namespace network
+} // namespace nx

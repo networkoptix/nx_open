@@ -1,10 +1,8 @@
 import logging
-import time
-import pprint
-import pytest
-import pytz
-from test_utils.server_rest_api import HttpError, ServerRestApiError
 
+import pytest
+
+from test_utils.rest_api import HttpError, RestApiError
 
 log = logging.getLogger(__name__)
 
@@ -20,26 +18,26 @@ def check_user_exists(server, is_cloud):
 
 # https://networkoptix.atlassian.net/browse/VMS-3730
 # https://networkoptix.atlassian.net/wiki/display/SD/Merge+systems+test#Mergesystemstest-test_with_different_cloud_hosts_must_not_be_able_to_merge
-def test_with_different_cloud_hosts_must_not_be_able_to_merge(server_factory, cloud_host, http_schema):
-    cloud_host_2_host = 'cloud.non.existent'
+def test_with_different_cloud_hosts_must_not_be_able_to_merge(server_factory, cloud_account, http_schema):
+    cloud_host_2 = 'cloud.non.existent'
 
     one = server_factory('one', setup=False, http_schema=http_schema)
     two = server_factory('two', start=False, http_schema=http_schema)
 
-    two.patch_binary_set_cloud_host(cloud_host_2_host)
+    two.patch_binary_set_cloud_host(cloud_host_2)
     two.start_service()
     two.setup_local_system()
 
-    one.setup_cloud_system(cloud_host)
+    one.setup_cloud_system(cloud_account)
     check_user_exists(one, is_cloud=True)
 
-    with pytest.raises(ServerRestApiError) as x_info:
+    with pytest.raises(HttpError) as x_info:
         one.merge_systems(two)
-    assert x_info.value.error_string == 'INCOMPATIBLE'
+    assert x_info.value.reason == 'INCOMPATIBLE'
 
     # after patching to new cloud host server should reset system and users
     one.stop_service()
-    one.patch_binary_set_cloud_host(cloud_host_2_host)
+    one.patch_binary_set_cloud_host(cloud_host_2)
     one.start_service()
     assert one.get_setup_type() == None  # patch/change cloud host must reset the system
     one.setup_local_system()
@@ -50,11 +48,11 @@ def test_with_different_cloud_hosts_must_not_be_able_to_merge(server_factory, cl
     check_user_exists(two, is_cloud=False)  # cloud user most not get into server two either
     
 
-def test_server_should_be_able_to_merge_local_to_cloud_one(server_factory, cloud_host, http_schema):
+def test_server_should_be_able_to_merge_local_to_cloud_one(server_factory, cloud_account, http_schema):
     one = server_factory('one', setup=False, http_schema=http_schema)
     two = server_factory('two', http_schema=http_schema)
 
-    one.setup_cloud_system(cloud_host)
+    one.setup_cloud_system(cloud_account)
     check_user_exists(one, is_cloud=True)
 
     check_user_exists(two, is_cloud=False)
@@ -63,10 +61,10 @@ def test_server_should_be_able_to_merge_local_to_cloud_one(server_factory, cloud
 
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85204446/Cloud+test
-def test_server_with_hardcoded_cloud_host_should_be_able_to_setup_with_cloud(server_factory, cloud_host, http_schema):
+def test_server_with_hardcoded_cloud_host_should_be_able_to_setup_with_cloud(server_factory, cloud_account, http_schema):
     one = server_factory('one', setup=False, leave_initial_cloud_host=True, http_schema=http_schema)
     try:
-        one.setup_cloud_system(cloud_host)
+        one.setup_cloud_system(cloud_account)
     except HttpError as x:
         if x.reason == 'Could not connect to cloud: notAuthorized':
             pytest.fail('Server is incompatible with this cloud host/customization')

@@ -20,6 +20,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 
+#include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 
@@ -38,18 +39,16 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 
-#include <ui/workaround/widgets_signals_workaround.h>
+#include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
 
 #include <utils/common/event_processors.h>
 
-#include <ui/common/geometry.h>
 #include <ui/common/palette.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/common/item_view_auto_hider.h>
-#include <ui/widgets/properties/camera_settings_tab.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -57,7 +56,8 @@
 
 #include <ui/workaround/hidpi_workarounds.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
+using namespace ui;
 
 namespace
 {
@@ -128,8 +128,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
 
     connect(ui->dateRangeWidget, &QnDateRangeWidget::rangeChanged, this, &QnAuditLogDialog::updateData);
 
-    ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
-    ui->clearFilterButton->setIcon(qnSkin->icon("buttons/clear.png"));
+    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+    ui->clearFilterButton->setIcon(qnSkin->icon("text_buttons/clear.png"));
 
     connect(ui->mainTabWidget,  &QTabWidget::currentChanged,    this, &QnAuditLogDialog::at_currentTabChanged);
 
@@ -668,7 +668,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
     qreal displayAspectRatio = viewportGeometry.isNull()
         ? desiredItemAspectRatio
-        : QnGeometry::aspectRatio(viewportGeometry);
+        : nx::client::core::Geometry::aspectRatio(viewportGeometry);
 
     if (resList.size() == 1)
     {
@@ -770,7 +770,7 @@ void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
     else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
         triggerAction(record,
             action::CameraSettingsAction,
-            Qn::GeneralSettingsTab);
+            static_cast<int>(CameraSettingsTab::general));
 
     if (isMaximized())
         showNormal();
@@ -862,10 +862,12 @@ void QnAuditLogDialog::makeSessionData()
             }
             else
             {
-                // group sessions because of different servers may have same session
+                // Group sessions because of different servers may have same session
+                // or a single server can duplicate session after restart
                 QnAuditRecord& existRecord = itr.value();
                 existRecord.rangeStartSec = qMin(existRecord.rangeStartSec, record.rangeStartSec);
-                existRecord.rangeEndSec = qMax(existRecord.rangeEndSec, record.rangeEndSec);
+                existRecord.rangeEndSec = (existRecord.rangeEndSec == 0 || record.rangeEndSec == 0)
+                    ? 0 : qMax(existRecord.rangeEndSec, record.rangeEndSec);
             }
         }
         activityPerSession[record.authSession.id]++;

@@ -11,6 +11,7 @@
 #include <QtCore/QFile>
 
 #include <nx/network/http/http_client.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 
@@ -45,8 +46,8 @@ int main(int /*argc*/, char* /*argv*/[])
     QnLog::instance()->setLogLevel(cl_logDEBUG2);
 
     nx::network::SocketGlobals::InitGuard socketInitializationGuard;
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
-    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId(
+    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
+    nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId(
         "cloud_connect_auto_test", QnUuid::createUuid());
 
     bool succeeded = true;
@@ -58,7 +59,7 @@ int main(int /*argc*/, char* /*argv*/[])
 
         std::cout<<"Connecting to "<<addressDescriptor.description<<" >>   ";
         QUrl url(lit("http://%1/api/ping").arg(addressDescriptor.address));
-        nx_http::HttpClient httpClient;
+        nx::network::http::HttpClient httpClient;
         httpClient.setSendTimeoutMs(kSendTimeoutMs);
         httpClient.setResponseReadTimeoutMs(kSendTimeoutMs);
         httpClient.setMessageBodyReadTimeoutMs(kSendTimeoutMs);
@@ -78,13 +79,13 @@ int main(int /*argc*/, char* /*argv*/[])
             continue;
         }
 
-        nx_http::BufferType msgBodyBuf;
+        nx::network::http::BufferType msgBodyBuf;
         while (!httpClient.eof())
             msgBodyBuf += httpClient.fetchMessageBodyBuffer();
 
         connectDuration = std::chrono::steady_clock::now() - startConnectingTimepoint;
 
-        if (nx_http::StatusCode::isSuccessCode(httpClient.response()->statusLine.statusCode))
+        if (nx::network::http::StatusCode::isSuccessCode(httpClient.response()->statusLine.statusCode))
         {
             NX_LOG(lm("SUCCESS (%1ms)")
                 .arg(duration_cast<milliseconds>(connectDuration).count()),
@@ -117,7 +118,7 @@ int main(int /*argc*/, char* /*argv*/[])
             return 1;
         }
         const auto logFileContents = logFile.readAll();
-        nx_http::HttpClient httpClient;
+        nx::network::http::HttpClient httpClient;
         if (!httpClient.doPost(QUrl(kLogFileUploadUrl), "text/plain", logFileContents))
         {
             std::cout << "Could not upload log" << std::endl;

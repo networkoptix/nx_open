@@ -1,16 +1,21 @@
 #include "module_connector.h"
 
-#include <nx/utils/log/log.h>
 #include <rest/server/json_rest_result.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/log/log.h>
+#include <nx/network/address_resolver.h>
+#include <nx/network/url/url_builder.h>
+#include <rest/server/json_rest_result.h>
+
+#include <rest/server/json_rest_result.h>
 
 namespace nx {
 namespace vms {
 namespace discovery {
 
-static const auto kUrl =
-    lit("http://%1/api/moduleInformation?showAddresses=false&keepConnectionOpen&updateStream");
+static const nx::utils::Url kUrl(lit(
+    "http://localhost/api/moduleInformation?showAddresses=false&keepConnectionOpen&updateStream"));
 
 std::chrono::seconds kDefaultDisconnectTimeout(10);
 static const network::RetryPolicy kDefaultRetryPolicy(
@@ -45,7 +50,7 @@ void ModuleConnector::setDisconnectHandler(DisconnectedHandler handler)
     m_disconnectedHandler = std::move(handler);
 }
 
-static void validateEndpoints(std::set<SocketAddress>* endpoints)
+static void validateEndpoints(std::set<nx::network::SocketAddress>* endpoints)
 {
     const auto& resolver = nx::network::SocketGlobals::addressResolver();
     for (auto it = endpoints->begin(); it != endpoints->end(); )
@@ -59,7 +64,7 @@ static void validateEndpoints(std::set<SocketAddress>* endpoints)
     }
 }
 
-void ModuleConnector::newEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
+void ModuleConnector::newEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id)
 {
     validateEndpoints(&endpoints);
     NX_ASSERT(endpoints.size());
@@ -73,7 +78,7 @@ void ModuleConnector::newEndpoints(std::set<SocketAddress> endpoints, const QnUu
         });
 }
 
-void ModuleConnector::setForbiddenEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
+void ModuleConnector::setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id)
 {
     validateEndpoints(&endpoints);
     dispatch(
@@ -113,7 +118,7 @@ void ModuleConnector::stopWhileInAioThread()
 
 ModuleConnector::InformationReader::InformationReader(const ModuleConnector* parent):
     m_parent(parent),
-    m_httpClient(nx_http::AsyncHttpClient::create())
+    m_httpClient(nx::network::http::AsyncHttpClient::create())
 {
     m_httpClient->bindToAioThread(parent->getAioThread());
 }
@@ -130,10 +135,10 @@ void ModuleConnector::InformationReader::setHandler(
     m_handler = std::move(handler);
 }
 
-void ModuleConnector::InformationReader::start(const SocketAddress& endpoint)
+void ModuleConnector::InformationReader::start(const nx::network::SocketAddress& endpoint)
 {
     const auto handler =
-        [this](nx_http::AsyncHttpClientPtr client) mutable
+        [this](nx::network::http::AsyncHttpClientPtr client) mutable
         {
             NX_ASSERT(m_httpClient, client);
             const auto clientGuard = makeScopeGuard([client](){ client->pleaseStopSync(); });
@@ -150,9 +155,9 @@ void ModuleConnector::InformationReader::start(const SocketAddress& endpoint)
             readUntilError();
         };
 
-    QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, handler);
-    QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, handler);
-    m_httpClient->doGet(kUrl.arg(endpoint.toString()));
+    QObject::connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived, handler);
+    QObject::connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::done, handler);
+    m_httpClient->doGet(nx::network::url::Builder(kUrl).setEndpoint(endpoint));
 }
 
 static inline boost::optional<nx::Buffer> takeJsonObject(nx::Buffer* buffer)
@@ -237,7 +242,7 @@ ModuleConnector::Module::~Module()
     m_connectedReader.reset();
 }
 
-void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
+void ModuleConnector::Module::addEndpoints(std::set<nx::network::SocketAddress> endpoints)
 {
     NX_VERBOSE(this, lm("Add endpoints %1").container(endpoints));
     if (m_id.isNull())
@@ -270,7 +275,7 @@ void ModuleConnector::Module::ensureConnection()
         connectToGroup(m_endpoints.begin());
 }
 
-void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endpoints)
+void ModuleConnector::Module::setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints)
 {
     NX_VERBOSE(this, lm("Forbid endpoints %1").container(endpoints));
     NX_ASSERT(!m_id.isNull(), "Does not make sense to block endpoints for unknown servers");
@@ -278,18 +283,18 @@ void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endp
 }
 
 ModuleConnector::Module::Priority
-    ModuleConnector::Module::hostPriority(const HostAddress& host) const
+    ModuleConnector::Module::hostPriority(const nx::network::HostAddress& host) const
 {
     if (m_id.isNull())
         return kDefault;
 
-    if (host == HostAddress::localhost)
+    if (host == nx::network::HostAddress::localhost)
         return kLocalHost;
 
     if (host.isLocal())
         return kLocalNetwork;
 
-    if (host.ipV4() || host.ipV6())
+    if (host.ipV4() || (bool) host.ipV6().first)
         return kIp; //< TODO: Consider to check if we have such interface.
 
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host.toString()))
@@ -304,16 +309,16 @@ QString ModuleConnector::Module::idForToStringFromPtr() const
 }
 
 boost::optional<ModuleConnector::Module::Endpoints::iterator>
-    ModuleConnector::Module::saveEndpoint(SocketAddress endpoint)
+    ModuleConnector::Module::saveEndpoint(nx::network::SocketAddress endpoint)
 {
     const auto getGroup =
         [&](Priority p)
         {
-            return m_endpoints.emplace(p, std::set<SocketAddress>()).first;
+            return m_endpoints.emplace(p, std::set<nx::network::SocketAddress>()).first;
         };
 
     const auto insertIntoGroup =
-        [&](Endpoints::iterator groupIterator, SocketAddress endpoint)
+        [&](Endpoints::iterator groupIterator, nx::network::SocketAddress endpoint)
         {
             auto& group = groupIterator->second;
             return group.insert(std::move(endpoint)).second;
@@ -369,6 +374,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
             continue;
 
         ++endpointsInProgress;
+        NX_ASSERT(!endpoint.toString().isEmpty());
         connectToEndpoint(endpoint, endpointsGroup);
     }
 
@@ -378,7 +384,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 }
 
 void ModuleConnector::Module::connectToEndpoint(
-    const SocketAddress& endpoint, Endpoints::iterator endpointsGroup)
+    const nx::network::SocketAddress& endpoint, Endpoints::iterator endpointsGroup)
 {
     NX_VERBOSE(this, lm("Attempt to connect by %1").arg(endpoint));
     m_attemptingReaders.push_front(std::make_unique<InformationReader>(m_parent));
@@ -421,7 +427,7 @@ void ModuleConnector::Module::connectToEndpoint(
        });
 }
 
-bool ModuleConnector::Module::saveConnection(SocketAddress endpoint,
+bool ModuleConnector::Module::saveConnection(nx::network::SocketAddress endpoint,
     std::unique_ptr<InformationReader> reader, const QnModuleInformation& information)
 {
     NX_ASSERT(!m_id.isNull());

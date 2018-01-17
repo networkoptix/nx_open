@@ -28,7 +28,7 @@ enum class ResultCode
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 
 ResultCode NX_NETWORK_API fromStunErrorToResultCode(
-    const nx::stun::attrs::ErrorCode& errorCode);
+    const nx::network::stun::attrs::ErrorCode& errorCode);
 int NX_NETWORK_API resultCodeToStunErrorCode(ResultCode resultCode);
 
 QString NX_NETWORK_API toString(ResultCode code);
@@ -37,5 +37,4 @@ QString NX_NETWORK_API toString(ResultCode code);
 } // namespace hpm
 } // namespace nx
 
-//not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
-void NX_NETWORK_API serialize(const nx::hpm::api::ResultCode&, QString*);
+QN_FUSION_DECLARE_FUNCTIONS(nx::hpm::api::ResultCode, (lexical), NX_NETWORK_API)

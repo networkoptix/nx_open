@@ -16,7 +16,7 @@ namespace
     const QString kStartStreamAction("start");
     const QString kStopStreamAction("stop");
 
-    bool readBytes(QSharedPointer<AbstractStreamSocket> socket, quint8* dst, int size)
+    bool readBytes(QSharedPointer<nx::network::AbstractStreamSocket> socket, quint8* dst, int size)
     {
         while (size > 0)
         {
@@ -29,7 +29,7 @@ namespace
         return true;
     }
 
-    bool readHttpHeaders(QSharedPointer<AbstractStreamSocket> socket)
+    bool readHttpHeaders(QSharedPointer<nx::network::AbstractStreamSocket> socket)
     {
         int toRead = QnProxyAudioTransmitter::kFixedPostRequest.size();
         QByteArray buffer;
@@ -48,6 +48,7 @@ private:
 public:
     QnProxyDesktopDataProvider(const QnUuid& cameraId):
         QnAbstractStreamDataProvider(QnResourcePtr()),
+        m_parser(cameraId.toString()),
         m_cameraId(cameraId)
     {
         m_recvBuffer = new quint8[65536];
@@ -59,7 +60,7 @@ public:
         delete [] m_recvBuffer;
     }
 
-    void setSocket(const QSharedPointer<AbstractStreamSocket>& socket)
+    void setSocket(const QSharedPointer<nx::network::AbstractStreamSocket>& socket)
     {
         stop();
         QnMutexLocker lock(&m_mutex);
@@ -113,7 +114,7 @@ protected:
     }
 
 private:
-    QSharedPointer<AbstractStreamSocket> m_socket;
+    QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
     mutable QnMutex m_mutex;
     QnUuid m_cameraId;
 };
@@ -122,7 +123,7 @@ typedef QSharedPointer<QnProxyDesktopDataProvider> QnProxyDesktopDataProviderPtr
 
 
 QnAudioProxyReceiver::QnAudioProxyReceiver(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
     QnTCPConnectionProcessor(socket, owner)
@@ -145,10 +146,10 @@ void QnAudioProxyReceiver::run()
     QString errorStr;
     if (!QnAudioTransmissionRestHandler::validateParams(params, errorStr))
     {
-        sendResponse(nx_http::StatusCode::badRequest, QByteArray());
+        sendResponse(nx::network::http::StatusCode::badRequest, QByteArray());
         return;
     }
-    sendResponse(nx_http::StatusCode::ok, QByteArray());
+    sendResponse(nx::network::http::StatusCode::ok, QByteArray());
 
     const QnUuid clientId(params[kClientIdParamName]);
 

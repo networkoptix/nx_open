@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <common/common_globals.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/http_client.h>
 #include <nx/utils/random.h>
 
@@ -23,12 +23,12 @@ public:
     {
     }
 
-    void addGetRequest( const QUrl& url )
+    void addGetRequest( const nx::utils::Url& url )
     {
         m_getRequestUrls.push_back( url );
     }
 
-    void addUpdateRequest( const QUrl& url, const QByteArray& msgBody )
+    void addUpdateRequest( const nx::utils::Url& url, const QByteArray& msgBody )
     {
         m_updateRequests.push_back( std::make_pair( url, msgBody ) );
     }
@@ -43,14 +43,14 @@ public:
         m_maxSimultaneousRequestsCount = maxSimultaneousRequestsCount;
     }
 
-    void startAnotherClient( nx_http::AsyncHttpClientPtr httpClient )
+    void startAnotherClient( nx::network::http::AsyncHttpClientPtr httpClient )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
 
         if( m_requestsStarted < maxRequestsToPerform() )
         {
-            nx_http::AsyncHttpClientPtr newClient = nx_http::AsyncHttpClient::create();
-            connect( newClient.get(), &nx_http::AsyncHttpClient::done, 
+            nx::network::http::AsyncHttpClientPtr newClient = nx::network::http::AsyncHttpClient::create();
+            connect( newClient.get(), &nx::network::http::AsyncHttpClient::done, 
                      this, &RequestsGenerator::startAnotherClient,
                      Qt::DirectConnection );
             newClient->setResponseReadTimeoutMs( 60*1000 );
@@ -75,7 +75,7 @@ public:
     {
         NX_ASSERT( !m_getRequestUrls.empty() || !m_updateRequests.empty() );
         for( int i = 0; i < m_maxSimultaneousRequestsCount; ++i )
-            startAnotherClient( nx_http::AsyncHttpClientPtr() );
+            startAnotherClient( nx::network::http::AsyncHttpClientPtr() );
     }
 
     void wait()
@@ -103,12 +103,12 @@ private:
         static const int UPDATE_REQUEST = 2;
 
         int requestType;
-        QUrl url;
+        nx::utils::Url url;
         //!for update requests
         QByteArray body;
 
         //!create get requests
-        Request( const QUrl& _url )
+        Request( const nx::utils::Url& _url )
         :
             requestType( GET_REQUEST ),
             url( _url )
@@ -116,7 +116,7 @@ private:
         }
 
         //!create update requests
-        Request( const QUrl& _url, const QByteArray& _body )
+        Request( const nx::utils::Url& _url, const QByteArray& _body )
         :
             requestType( UPDATE_REQUEST ),
             url( _url ),
@@ -125,15 +125,15 @@ private:
         }
     };
 
-    std::vector<QUrl> m_getRequestUrls;
-    std::vector<std::pair<QUrl, QByteArray>> m_updateRequests;
+    std::vector<nx::utils::Url> m_getRequestUrls;
+    std::vector<std::pair<nx::utils::Url, QByteArray>> m_updateRequests;
     int m_requestsStarted;
     int m_requestsCompleted;
     int m_maxSimultaneousRequestsCount;
     int m_maxRequestsToPerform;
     std::mutex m_mutex;
     std::condition_variable m_cond;
-    std::list<nx_http::AsyncHttpClientPtr> m_runningRequests;
+    std::list<nx::network::http::AsyncHttpClientPtr> m_runningRequests;
 
     Request getRequestToPerform() const
     {
@@ -224,12 +224,12 @@ TEST_F( Ec2APITest, removeResource )
 
     for( int i = 0; i < 1; ++i )
     {
-        nx_http::HttpClient httpClient;
+        nx::network::http::HttpClient httpClient;
         if( !httpClient.doPost( url, "application/json", data ) )
             return 1;
 
         int statusCode = httpClient.response()->statusLine.statusCode;
-        if( statusCode != nx_http::StatusCode::ok )
+        if( statusCode != nx::network::http::StatusCode::ok )
             int x = 0;
     }
 

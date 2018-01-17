@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <functional>
 
@@ -13,8 +13,12 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/url.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
+
 namespace detail {
 
 template<typename InputData>
@@ -22,34 +26,52 @@ void serializeToUrl(const InputData& data, QUrl* const url)
 {
     QUrlQuery urlQuery;
     serializeToUrlQuery(data, &urlQuery);
-    urlQuery.addQueryItem("format", QnLexical::serialized(Qn::JsonFormat));
+    urlQuery.addQueryItem(QLatin1String("format"), QnLexical::serialized(Qn::JsonFormat));
     url->setQuery(urlQuery);
+}
+
+/**
+ * Default overload for types that do not support this.
+ */
+template<typename T>
+bool deserializeFromHeaders(
+    const nx::network::http::HttpHeaders& /*from*/,
+    T* /*what*/)
+{
+    return false;
 }
 
 template<typename OutputData>
 void processHttpResponse(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, const nx_http::Response*, OutputData)> handler,
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, const nx::network::http::Response*, OutputData)> handler,
     SystemError::ErrorCode errCode,
-    const nx_http::Response* response,
-    nx_http::BufferType msgBody)
+    const nx::network::http::Response* response,
+    nx::network::http::BufferType msgBody)
 {
     if (errCode != SystemError::noError ||
         !response ||
-        (response->statusLine.statusCode / 100) != (nx_http::StatusCode::ok / 100))
+        !nx::network::http::StatusCode::isSuccessCode(response->statusLine.statusCode))
     {
-        handler(
-            errCode,
-            response,
-            OutputData());
+        handler(errCode, response, OutputData());
         return;
     }
 
-    bool success = false;
-    OutputData outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
-    if (!success)
+    OutputData outputData;
+
+    if (!msgBody.isEmpty())
     {
-        handler(SystemError::invalidData, response, OutputData());
-        return;
+        bool success = false;
+        outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
+        if (!success)
+        {
+            handler(SystemError::invalidData, response, OutputData());
+            return;
+        }
+    }
+    else
+    {
+        // Trying to read response data from HTTP headers.
+        deserializeFromHeaders(response->headers, &outputData);
     }
 
     handler(SystemError::noError, response, std::move(outputData));
@@ -63,7 +85,7 @@ class BaseFusionDataHttpClient:
     using self_type = BaseFusionDataHttpClient<HandlerFunc>;
 
 public:
-    BaseFusionDataHttpClient(QUrl url, AuthInfo auth):
+    BaseFusionDataHttpClient(nx::utils::Url url, AuthInfo auth):
         m_url(std::move(url))
     {
         m_httpClient.setAuth(auth);
@@ -72,7 +94,7 @@ public:
 
     virtual ~BaseFusionDataHttpClient() = default;
 
-    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
     {
         base_type::bindToAioThread(aioThread);
         m_httpClient.bindToAioThread(aioThread);
@@ -81,7 +103,8 @@ public:
     void execute(nx::utils::MoveOnlyFunc<HandlerFunc> handler)
     {
         m_handler = std::move(handler);
-        addRequestBody();
+        if (!m_requestBody.isEmpty())
+            addRequestBody();
         auto completionHandler = std::bind(&self_type::requestDone, this, &m_httpClient);
 
         if (m_requestContentType.isEmpty())
@@ -90,23 +113,36 @@ public:
             m_httpClient.doPost(m_url, std::move(completionHandler));
     }
 
+    void execute(
+        nx::network::http::Method::ValueType httpMethod,
+        nx::utils::MoveOnlyFunc<HandlerFunc> handler)
+    {
+        m_handler = std::move(handler);
+        if (!m_requestBody.isEmpty())
+            addRequestBody();
+        auto completionHandler = std::bind(&self_type::requestDone, this, &m_httpClient);
+
+        m_httpClient.doRequest(httpMethod, m_url, std::move(completionHandler));
+    }
+
     void executeUpgrade(
-        const nx_http::StringType& protocolToUpgradeConnectionTo,
+        const nx::network::http::StringType& protocolToUpgradeConnectionTo,
         nx::utils::MoveOnlyFunc<HandlerFunc> handler)
     {
         executeUpgrade(
-            nx_http::Method::options,
+            nx::network::http::Method::options,
             protocolToUpgradeConnectionTo,
             std::move(handler));
     }
 
     void executeUpgrade(
-        nx_http::Method::ValueType httpMethod,
-        const nx_http::StringType& protocolToUpgradeConnectionTo,
+        nx::network::http::Method::ValueType httpMethod,
+        const nx::network::http::StringType& protocolToUpgradeConnectionTo,
         nx::utils::MoveOnlyFunc<HandlerFunc> handler)
     {
         m_handler = std::move(handler);
-        addRequestBody();
+        if (!m_requestBody.isEmpty())
+            addRequestBody();
 
         m_httpClient.doUpgrade(
             m_url,
@@ -127,26 +163,26 @@ public:
         return m_httpClient.takeSocket();
     }
 
-    nx_http::AsyncClient& httpClient()
+    nx::network::http::AsyncClient& httpClient()
     {
         return m_httpClient;
     }
 
-    const nx_http::AsyncClient& httpClient() const
+    const nx::network::http::AsyncClient& httpClient() const
     {
         return m_httpClient;
     }
 
 protected:
-    QUrl m_url;
-    nx_http::StringType m_requestContentType;
-    nx_http::BufferType m_requestBody;
+    nx::utils::Url m_url;
+    nx::network::http::StringType m_requestContentType;
+    nx::network::http::BufferType m_requestBody;
     nx::utils::MoveOnlyFunc<HandlerFunc> m_handler;
 
-    virtual void requestDone(nx_http::AsyncClient* client) = 0;
+    virtual void requestDone(nx::network::http::AsyncClient* client) = 0;
 
 private:
-    nx_http::AsyncClient m_httpClient;
+    nx::network::http::AsyncClient m_httpClient;
 
     virtual void stopWhileInAioThread() override
     {
@@ -159,7 +195,7 @@ private:
         requestBody.swap(m_requestBody);
 
         m_httpClient.setRequestBody(
-            std::make_unique<nx_http::BufferSource>(
+            std::make_unique<nx::network::http::BufferSource>(
                 m_requestContentType,
                 std::move(requestBody)));
     }
@@ -171,23 +207,23 @@ private:
  * HTTP client that uses fusion to serialize/deserialize input/output data.
  * If output data is expected, then only GET request can be used.
  * Input data in this case is serialized to the url by calling serializeToUrlQuery(InputData, QUrlQuery*).
- * @note Reports SystemError::invalidData on failure to parse response.
+ * NOTE: Reports SystemError::invalidData on failure to parse response.
  */
 template<typename InputData, typename OutputData>
 class FusionDataHttpClient:
     public detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx_http::Response*, OutputData)>
+        void(SystemError::ErrorCode, const nx::network::http::Response*, OutputData)>
 {
     using base_type =
         detail::BaseFusionDataHttpClient<
-            void(SystemError::ErrorCode, const nx_http::Response*, OutputData)>;
+            void(SystemError::ErrorCode, const nx::network::http::Response*, OutputData)>;
 
 public:
     /**
      * TODO: #ak If response Content-Type is multipart, then handler is invoked for every body part.
      */
     FusionDataHttpClient(
-        QUrl url,
+        nx::utils::Url url,
         AuthInfo auth,
         const InputData& input)
         :
@@ -199,7 +235,7 @@ public:
     }
 
 private:
-    virtual void requestDone(nx_http::AsyncClient* client) override
+    virtual void requestDone(nx::network::http::AsyncClient* client) override
     {
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
@@ -217,19 +253,19 @@ private:
 template<typename OutputData>
 class FusionDataHttpClient<void, OutputData>:
     public detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx_http::Response*, OutputData)>
+        void(SystemError::ErrorCode, const nx::network::http::Response*, OutputData)>
 {
     typedef detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx_http::Response*, OutputData)> ParentType;
+        void(SystemError::ErrorCode, const nx::network::http::Response*, OutputData)> ParentType;
 
 public:
-    FusionDataHttpClient(QUrl url, AuthInfo auth):
+    FusionDataHttpClient(nx::utils::Url url, AuthInfo auth):
         ParentType(std::move(url), std::move(auth))
     {
     }
 
 private:
-    virtual void requestDone(nx_http::AsyncClient* client) override
+    virtual void requestDone(nx::network::http::AsyncClient* client) override
     {
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
@@ -241,20 +277,20 @@ private:
     }
 };
 
-/** 
+/**
  * Specialization for void output data.
  */
 template<typename InputData>
 class FusionDataHttpClient<InputData, void>:
     public detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx_http::Response*)>
+        void(SystemError::ErrorCode, const nx::network::http::Response*)>
 {
     typedef detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx_http::Response*)> ParentType;
+        void(SystemError::ErrorCode, const nx::network::http::Response*)> ParentType;
 
 public:
     FusionDataHttpClient(
-        QUrl url,
+        nx::utils::Url url,
         AuthInfo auth,
         const InputData& input)
         :
@@ -266,7 +302,7 @@ public:
     }
 
 private:
-    virtual void requestDone(nx_http::AsyncClient* client) override
+    virtual void requestDone(nx::network::http::AsyncClient* client) override
     {
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
@@ -282,19 +318,19 @@ private:
 template<>
 class FusionDataHttpClient<void, void>:
     public detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx_http::Response*)>
+        void(SystemError::ErrorCode, const nx::network::http::Response*)>
 {
     typedef detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx_http::Response*)> ParentType;
+        void(SystemError::ErrorCode, const nx::network::http::Response*)> ParentType;
 
 public:
-    FusionDataHttpClient(QUrl url, AuthInfo auth):
+    FusionDataHttpClient(nx::utils::Url url, AuthInfo auth):
         ParentType(std::move(url), std::move(auth))
     {
     }
 
 private:
-    virtual void requestDone(nx_http::AsyncClient* client) override
+    virtual void requestDone(nx::network::http::AsyncClient* client) override
     {
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
@@ -304,4 +340,6 @@ private:
     }
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

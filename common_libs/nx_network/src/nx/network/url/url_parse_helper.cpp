@@ -9,9 +9,9 @@ namespace url {
 
 quint16 getDefaultPortForScheme(const QString& scheme)
 {
-    if (scheme.toLower() == nx_http::kUrlSchemeName)
+    if (scheme.toLower() == nx::network::http::kUrlSchemeName)
         return 80;
-    else if (scheme.toLower() == nx_http::kSecureUrlSchemeName)
+    else if (scheme.toLower() == nx::network::http::kSecureUrlSchemeName)
         return 443;
     else if (scheme.toLower() == nx_rtsp::kUrlSchemeName)
         return 554;
@@ -19,7 +19,7 @@ quint16 getDefaultPortForScheme(const QString& scheme)
     return 0;
 }
 
-SocketAddress getEndpoint(const QUrl& url)
+SocketAddress getEndpoint(const nx::utils::Url& url)
 {
     return SocketAddress(
         url.host(),

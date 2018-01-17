@@ -13,7 +13,9 @@
     #include <arpa/inet.h>
 #endif
 
-#include <stdint.h>
+#include <chrono>
+#include <cstdint>
+#include <string>
 
 #include <QtCore/QtEndian>
 #include <QtCore/QHash>
@@ -63,22 +65,22 @@ enum InitializationFlags
 
 NX_NETWORK_API bool socketCannotRecoverFromError(SystemError::ErrorCode sysErrorCode);
 
-} // namespace network
-} // namespace nx
-
 /**
  * Represents ipv4 address. Supports conversion to QString and to uint32.
- * @note Not using QHostAddress because QHostAddress can trigger dns name 
+ * NOTE: Not using QHostAddress because QHostAddress can trigger dns name
  * lookup which depends on Qt sockets which we do not want to use.
  */
 class NX_NETWORK_API HostAddress
 {
 public:
     HostAddress(const in_addr& addr);
-    HostAddress(const in6_addr& addr = in6addr_any);
+    HostAddress(
+        const in6_addr& addr = in6addr_any,
+        boost::optional<uint32_t> scopeId = boost::none);
 
     HostAddress(const QString& addrStr);
     HostAddress(const char* addrStr);
+    HostAddress(const std::string& addrStr);
 
     ~HostAddress();
 
@@ -96,25 +98,30 @@ public:
      */
     boost::optional<in_addr> ipV4() const;
 
+    using IpV6WithScope = std::pair<boost::optional<in6_addr>, boost::optional<uint32_t>>;
     /**
      * IP v6 if address is v6 or v4 converted to v6.
      */
-    boost::optional<in6_addr> ipV6() const;
+    IpV6WithScope ipV6() const;
+    boost::optional<uint32_t> scopeId() const;
 
     bool isLocal() const;
     bool isIpAddress() const;
+    bool isPureIpV6() const;
 
     static const HostAddress localhost;
     static const HostAddress anyHost;
 
     static boost::optional<QString> ipToString(const in_addr& addr);
-    static boost::optional<QString> ipToString(const in6_addr& addr);
+    static boost::optional<QString> ipToString(
+        const in6_addr& addr,
+        boost::optional<uint32_t> scopeId);
 
     static boost::optional<in_addr> ipV4from(const QString& ip);
-    static boost::optional<in6_addr> ipV6from(const QString& ip);
+    static IpV6WithScope ipV6from(const QString& ip);
 
     static boost::optional<in_addr> ipV4from(const in6_addr& addr);
-    static in6_addr ipV6from(const in_addr& addr);
+    static IpV6WithScope ipV6from(const in_addr& addr);
 
     void swap(HostAddress& other);
 
@@ -122,11 +129,10 @@ private:
     mutable boost::optional<QString> m_string;
     boost::optional<in_addr> m_ipV4;
     boost::optional<in6_addr> m_ipV6;
+    boost::optional<uint32_t> m_scopeId;
 };
 
 NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);
-
-Q_DECLARE_METATYPE(HostAddress)
 
 /**
  * Represents host and port (e.g. 127.0.0.1:1234).
@@ -161,11 +167,43 @@ inline uint qHash(const SocketAddress &address)
     return qHash(address.address.toString(), address.port);
 }
 
+struct NX_NETWORK_API KeepAliveOptions
+{
+    std::chrono::seconds inactivityPeriodBeforeFirstProbe;
+    std::chrono::seconds probeSendPeriod;
+    /**
+    * The number of unacknowledged probes to send before considering the connection dead and
+    * notifying the application layer.
+    */
+    size_t probeCount;
+
+    KeepAliveOptions(
+        std::chrono::seconds inactivityPeriodBeforeFirstProbe = std::chrono::seconds::zero(),
+        std::chrono::seconds probeSendPeriod = std::chrono::seconds::zero(),
+        size_t probeCount = 0);
+
+    bool operator==(const KeepAliveOptions& rhs) const;
+
+    /** Maximum time before lost connection can be acknowledged. */
+    std::chrono::seconds maxDelay() const;
+    QString toString() const;
+
+    void resetUnsupportedFieldsToSystemDefault();
+
+    static boost::optional<KeepAliveOptions> fromString(const QString& string);
+};
+
+} // namespace network
+} // namespace nx
+
+Q_DECLARE_METATYPE(nx::network::HostAddress)
+Q_DECLARE_METATYPE(nx::network::SocketAddress)
+
 namespace std {
 
-template <> struct hash<SocketAddress>
+template <> struct hash<nx::network::SocketAddress>
 {
-    size_t operator()(const SocketAddress& socketAddress) const
+    size_t operator()(const nx::network::SocketAddress& socketAddress) const
     {
         const auto stdString = socketAddress.toString().toStdString();
         return hash<std::string>{}(stdString);
@@ -185,5 +223,3 @@ inline unsigned long long qn_ntohll(unsigned long long value) { return qFromBigE
 #ifndef ntohll
 #define ntohll qn_ntohll
 #endif
-
-Q_DECLARE_METATYPE(SocketAddress)

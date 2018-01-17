@@ -4,7 +4,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
@@ -204,6 +204,8 @@ bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
                 return true;
             }
             break;
+        case Qn::AnalyticsContent:
+            return false;
         default:
             Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
             break;

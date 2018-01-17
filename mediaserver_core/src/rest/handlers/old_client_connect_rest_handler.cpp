@@ -15,7 +15,7 @@ int QnOldClientConnectRestHandler::executeGet(const QString &path, const QnReque
 
     QFile f(":/pb_connect.bin");
     if (!f.open(QFile::ReadOnly))
-        return nx_http::StatusCode::notFound;
+        return nx::network::http::StatusCode::notFound;
 
     contentType = "application/x-protobuf";
 
@@ -36,10 +36,10 @@ int QnOldClientConnectRestHandler::executeGet(const QString &path, const QnReque
     responseMessageBody[versionOffset] = newLength;
     responseMessageBody.replace(versionOffset + 1, oldLength, version);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnOldClientConnectRestHandler::executePost(const QString &, const QnRequestParamList &, const QByteArray &, const QByteArray &, QByteArray &, QByteArray &, const QnRestConnectionProcessor*) 
 {
-    return nx_http::StatusCode::notImplemented;
+    return nx::network::http::StatusCode::notImplemented;
 }

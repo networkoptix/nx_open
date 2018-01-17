@@ -4,6 +4,7 @@
 #include <nx/utils/async_operation_guard.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 /**
@@ -53,4 +54,5 @@ protected:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

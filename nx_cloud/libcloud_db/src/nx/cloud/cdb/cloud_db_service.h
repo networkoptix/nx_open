@@ -24,7 +24,15 @@
 
 class QnCommandLineParser;
 
-namespace nx_http { class MessageDispatcher; }
+namespace nx {
+namespace network {
+namespace http {
+
+class MessageDispatcher;
+
+} // namespace nx
+} // namespace network
+} // namespace http
 
 namespace nx {
 
@@ -45,6 +53,7 @@ class AuthorizationManager;
 class AuthenticationProvider;
 class MaintenanceManager;
 class CloudModuleUrlProvider;
+class HttpView;
 
 namespace conf { class Settings; }
 namespace ec2 { class ConnectionManager; }
@@ -57,111 +66,15 @@ class CloudDbService:
 public:
     CloudDbService(int argc, char **argv);
 
-    const std::vector<SocketAddress>& httpEndpoints() const;
+    std::vector<network::SocketAddress> httpEndpoints() const;
 
 protected:
     virtual std::unique_ptr<utils::AbstractServiceSettings> createSettings() override;
     virtual int serviceMain(const utils::AbstractServiceSettings& settings) override;
 
 private:
-    template<typename ManagerType>
-    class CustomHttpHandler:
-        public nx_http::AbstractHttpRequestHandler
-    {
-    public:
-        typedef void (ManagerType::*ManagerFuncType)(
-            nx_http::HttpServerConnection* const connection,
-            nx::utils::stree::ResourceContainer authInfo,
-            nx_http::Request request,
-            nx_http::Response* const response,
-            nx_http::RequestProcessedHandler completionHandler);
-
-        CustomHttpHandler(
-            ManagerType* manager,
-            ManagerFuncType managerFuncPtr)
-            :
-            m_manager(manager),
-            m_managerFuncPtr(managerFuncPtr)
-        {
-        }
-
-    protected:
-        virtual void processRequest(
-            nx_http::HttpServerConnection* const connection,
-            nx::utils::stree::ResourceContainer authInfo,
-            nx_http::Request request,
-            nx_http::Response* const response,
-            nx_http::RequestProcessedHandler completionHandler) override
-        {
-            (m_manager->*m_managerFuncPtr)(
-                connection,
-                std::move(authInfo),
-                std::move(request),
-                response,
-                std::move(completionHandler));
-        }
-
-    private:
-        ManagerType* m_manager;
-        ManagerFuncType m_managerFuncPtr;
-    };
-
-    std::vector<SocketAddress> m_httpEndpoints;
-
-    //following pointers are here for debugging convenience
     const conf::Settings* m_settings;
-    nx_http::MessageDispatcher* m_httpMessageDispatcher;
-    AuthenticationManager* m_authenticationManager;
-    AuthorizationManager* m_authorizationManager;
-
-    void registerApiHandlers(
-        nx_http::MessageDispatcher* const msgDispatcher,
-        const AuthorizationManager& authorizationManager,
-        AccountManager* const accountManager,
-        SystemManager* const systemManager,
-        SystemHealthInfoProvider* const systemHealthInfoProvider,
-        AuthenticationProvider* const authProvider,
-        EventManager* const eventManager,
-        ec2::ConnectionManager* const ec2ConnectionManager,
-        MaintenanceManager* const maintenanceManager,
-        const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
-        const CloudModuleUrlProvider& cloudModuleUrlProvider);
-
-    /** input & output */
-    template<typename ManagerType, typename InputData, typename... OutputData>
-    void registerHttpHandler(
-        const char* handlerPath,
-        void (ManagerType::*managerFunc)(
-            const AuthorizationInfo& authzInfo,
-            InputData inputData,
-            std::function<void(api::ResultCode, OutputData...)> completionHandler),
-        ManagerType* manager,
-        EntityType entityType,
-        DataActionType dataActionType);
-
-    /** no input, output */
-    template<typename ManagerType, typename... OutputData>
-    void registerHttpHandler(
-        const char* handlerPath,
-        void (ManagerType::*managerFunc)(
-            const AuthorizationInfo& authzInfo,
-            std::function<void(api::ResultCode, OutputData...)> completionHandler),
-        ManagerType* manager,
-        EntityType entityType,
-        DataActionType dataActionType);
-
-    template<typename ManagerType>
-    void registerHttpHandler(
-        const char* handlerPath,
-        typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
-        ManagerType* manager);
-
-    template<typename ManagerType>
-    void registerHttpHandler(
-        nx_http::Method::ValueType method,
-        const char* handlerPath,
-        typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
-        ManagerType* manager);
+    HttpView* m_view = nullptr;
 };
 
 } // namespace cdb

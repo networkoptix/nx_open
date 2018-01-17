@@ -34,6 +34,33 @@ void Collector::saveConnectSessionStatistics(ConnectSession data)
         });
 }
 
+//-------------------------------------------------------------------------------------------------
+
+void DummyCollector::saveConnectSessionStatistics(ConnectSession /*data*/)
+{
+}
+
+//-------------------------------------------------------------------------------------------------
+
+CollectorFactory::CollectorFactory():
+    base_type(std::bind(&CollectorFactory::defaultFactoryFunction, this,
+        std::placeholders::_1, std::placeholders::_2))
+{
+}
+
+CollectorFactory& CollectorFactory::instance()
+{
+    static CollectorFactory collectorInstance;
+    return collectorInstance;
+}
+
+std::unique_ptr<AbstractCollector> CollectorFactory::defaultFactoryFunction(
+    const conf::Statistics& settings,
+    nx::utils::db::AsyncSqlQueryExecutor* sqlQueryExecutor)
+{
+    return std::make_unique<Collector>(settings, sqlQueryExecutor);
+}
+
 } // namespace stats
 } // namespace hpm
 } // namespace nx

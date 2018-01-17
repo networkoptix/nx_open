@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Lỗi không rõ.</translation>
+      <translation>Lỗi không xác định.</translation>
     </message>
     <message>
       <source>Unexpected network error. Please check your Internet connection and try again.</source>

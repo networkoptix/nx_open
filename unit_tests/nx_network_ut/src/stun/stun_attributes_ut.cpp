@@ -6,6 +6,7 @@
 #include <nx/network/stun/message_parser.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace attrs {
 namespace test {
@@ -147,4 +148,5 @@ TEST_F(StunAttributeMappedAddress, composite_test)
 } // namespace test
 } // namespace attrs
 } // namespace stun
+} // namespace network
 } // namespace nx

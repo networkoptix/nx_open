@@ -4,6 +4,7 @@
 #ifdef ENABLE_THIRD_PARTY
 
 #include <algorithm>
+#include <nx/utils/std/cpp14.h>
 
 #include <QtCore/QTextStream>
 
@@ -23,6 +24,7 @@
 #include "third_party_video_data_packet.h"
 
 #include <motion/motion_detection.h>
+#include <utils/common/synctime.h>
 
 namespace
 {
@@ -171,7 +173,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if( isCameraControlRequired )
         {
             const nxcip::Resolution& resolution = m_thirdPartyRes->getSelectedResolutionForEncoder( encoderIndex );
-            int bitrateKbps = m_thirdPartyRes->suggestBitrateKbps( params.quality, QSize(resolution.width, resolution.height), params.fps );
+            int bitrateKbps = m_thirdPartyRes->suggestBitrateKbps(QSize(resolution.width, resolution.height), params, getRole() );
 
             nxcip::LiveStreamConfig config;
             memset(&config, 0, sizeof(nxcip::LiveStreamConfig));
@@ -225,7 +227,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
 
             int selectedBitrateKbps = 0;
             if( cameraEncoder.setBitrate(
-                m_thirdPartyRes->suggestBitrateKbps(params.quality, QSize(resolution.width, resolution.height), params.fps),
+                m_thirdPartyRes->suggestBitrateKbps(QSize(resolution.width, resolution.height), params, getRole()),
                     &selectedBitrateKbps ) != nxcip::NX_NO_ERROR )
             {
                 return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
@@ -260,7 +262,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         {
             QString mediaUrlStr(mediaUrlBuf);
             m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
-        }   
+        }
 
         return CameraDiagnostics::NoErrorResult();
     }
@@ -300,7 +302,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
                 m_resource,
                 mediaUrl.path() + (!mediaUrl.query().isEmpty() ? lit("?") + mediaUrl.query() : QString())));
         }
-        else 
+        else
         {
             return CameraDiagnostics::UnknownErrorResult();
         }
@@ -316,6 +318,8 @@ void ThirdPartyStreamReader::closeStream()
 
     if( m_builtinStreamReader.get() )
         m_builtinStreamReader->closeStream();
+    m_videoTimeHelpers.clear();
+    m_audioTimeHelpers.clear();
 }
 
 bool ThirdPartyStreamReader::isStreamOpened() const
@@ -328,8 +332,8 @@ int ThirdPartyStreamReader::getLastResponseCode() const
 {
     QnMutexLocker lock(&m_streamReaderMutex);
     return m_liveStreamReader
-        ? nx_http::StatusCode::ok
-        : (m_builtinStreamReader.get() ? m_builtinStreamReader->getLastResponseCode() : nx_http::StatusCode::ok);
+        ? nx::network::http::StatusCode::ok
+        : (m_builtinStreamReader.get() ? m_builtinStreamReader->getLastResponseCode() : nx::network::http::StatusCode::ok);
 }
 
 //bool ThirdPartyStreamReader::needMetaData() const
@@ -410,8 +414,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
     if( !isStreamOpened() )
         return QnAbstractMediaDataPtr(0);
 
-    if( !(m_cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability) && needMetaData() )
-        return getMetaData();
+    if( !(m_cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability) && needMetadata() )
+        return getMetadata();
 
     QnAbstractMediaDataPtr rez;
     static const int MAX_TRIES_TO_READ_MEDIA_PACKET = 10;
@@ -439,11 +443,11 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
 
                     rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
                     QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.get());
-                    if( videoData && videoData->motion )
+                    if( videoData && !videoData->metadata.isEmpty() )
                     {
                         m_savedMediaPacket = rez;
-                        rez = std::move(videoData->motion);
-                        videoData->motion.reset();
+                        rez = videoData->metadata.first();
+                        videoData->metadata.pop_front();
                     }
                     else if( rez->dataType == QnAbstractMediaData::AUDIO )
                     {
@@ -491,7 +495,38 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
         }
     }
 
+    if (m_needCorrectTime && rez)
+    {
+        if (auto helper = timeHelper(rez))
+            rez->timestamp = helper->getTimeUs(rez->timestamp);
+    }
+
     return rez;
+}
+
+void ThirdPartyStreamReader::setNeedCorrectTime(bool value)
+{
+    m_needCorrectTime = value;
+}
+
+nx::utils::TimeHelper* ThirdPartyStreamReader::timeHelper(const QnAbstractMediaDataPtr& data)
+{
+    std::vector<TimeHelperPtr>* helperList = nullptr;
+    if (data->dataType == QnAbstractMediaData::VIDEO)
+        helperList = &m_videoTimeHelpers;
+    else if (data->dataType == QnAbstractMediaData::AUDIO)
+        helperList = &m_audioTimeHelpers;
+
+    if (helperList == nullptr || data->channelNumber >= CL_MAX_CHANNELS)
+        return nullptr;
+    while (helperList->size() <= data->channelNumber)
+    {
+        helperList->push_back(
+            std::make_unique<nx::utils::TimeHelper>(
+                m_resource->getUniqueId(),
+                []() { return qnSyncTime->currentTimePoint(); }));
+    }
+    return helperList->at(data->channelNumber).get();
 }
 
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const
@@ -611,7 +646,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
                         motion->timestamp = srcVideoPacket->timestamp();
                         motion->channelNumber = packet->channelNumber();
                         motion->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-                        videoPacket->motion = motion;
+                        videoPacket->metadata << motion;
                     }
                     srcMotionData->releaseRef();
                 }

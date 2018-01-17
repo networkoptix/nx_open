@@ -8,10 +8,23 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
-ReverseConnectionHolder::ReverseConnectionHolder(aio::AbstractAioThread* aioThread):
+static std::chrono::milliseconds s_connectionLessHolderExpirationTimeout = std::chrono::seconds(31);
+
+void ReverseConnectionHolder::setConnectionlessHolderExpirationTimeout(
+    std::chrono::milliseconds value)
+{
+    s_connectionLessHolderExpirationTimeout = value;
+}
+
+ReverseConnectionHolder::ReverseConnectionHolder(
+    aio::AbstractAioThread* aioThread,
+    const String& hostName)
+    :
     aio::BasicPollable(aioThread),
+    m_hostName(hostName),
     m_socketCount(0),
-    m_timer(std::make_unique<aio::Timer>())
+    m_timer(std::make_unique<aio::Timer>()),
+    m_prevConnectionTime(std::chrono::steady_clock::now())
 {
     m_timer->bindToAioThread(aioThread);
 }
@@ -43,8 +56,8 @@ void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> s
     NX_ASSERT(isInSelfAioThread());
     if (!m_handlers.empty())
     {
-        NX_LOGX(lm("Use new socket(%1), %2 sockets left")
-            .args(socket, m_socketCount.load()), cl_logDEBUG2);
+        NX_LOGX(lm("Host %1. Using newly-acquired socket(%2), %3 sockets left")
+            .args(m_hostName, socket, m_socketCount.load()), cl_logDEBUG1);
 
         auto handler = std::move(m_handlers.begin()->second);
         m_handlers.erase(m_handlers.begin());
@@ -53,11 +66,21 @@ void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> s
 
     const auto it = m_sockets.insert(m_sockets.end(), std::move(socket));
     ++m_socketCount;
-    NX_LOGX(lm("One socket(%1) added, %2 sockets left")
-        .args(*it, m_socketCount.load()), cl_logDEBUG2);
+    NX_LOGX(lm("Host %1. One socket(%2) added, %3 sockets left")
+        .args(m_hostName, *it, m_socketCount.load()), cl_logDEBUG1);
 
     (*it)->bindToAioThread(getAioThread());
     monitorSocket(it);
+
+    m_prevConnectionTime = std::chrono::steady_clock::now();
+}
+
+bool ReverseConnectionHolder::isActive() const
+{
+    const auto expirationTime = m_prevConnectionTime + s_connectionLessHolderExpirationTimeout;
+    return
+        m_socketCount > 0 ||
+        (std::chrono::steady_clock::now() < expirationTime);
 }
 
 size_t ReverseConnectionHolder::socketCount() const
@@ -65,8 +88,15 @@ size_t ReverseConnectionHolder::socketCount() const
     return m_socketCount;
 }
 
+// Code here is not written to work without timeout.
+// So, instead of "no timeout" using timeout that is unusually large for sockets.
+static const std::chrono::milliseconds kInfiniteTimeoutEmulation(std::chrono::hours(2));
+
 void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Handler handler)
 {
+    if (timeout == nx::network::kNoTimeout)
+        timeout = kInfiniteTimeoutEmulation;
+
     post(
         [this, expirationTime = std::chrono::steady_clock::now() + timeout,
             handler = std::move(handler)]() mutable
@@ -76,8 +106,8 @@ void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Hand
                 auto socket = std::move(m_sockets.front());
                 --m_socketCount;
                 m_sockets.pop_front();
-                NX_LOGX(lm("One socket(%1) used, %2 sockets left")
-                    .args(socket, m_socketCount.load()), cl_logDEBUG2);
+                NX_LOGX(lm("Host %1. One socket(%2) used, %3 sockets left")
+                    .args(m_hostName, socket, m_socketCount.load()), cl_logDEBUG1);
 
                 socket->cancelIOSync(aio::etNone);
                 handler(SystemError::noError, std::move(socket));
@@ -94,6 +124,9 @@ void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Hand
                     startCleanupTimer(timeLeft);
 
                 m_handlers.emplace(expirationTime, std::move(handler));
+
+                NX_LOGX(lm("Added pending receiver for connection to %1. Totally %2 receives pending")
+                    .args(m_hostName, m_handlers.size()), cl_logDEBUG1);
             }
         });
 }
@@ -135,15 +168,15 @@ void ReverseConnectionHolder::monitorSocket(
 
             if (code != SystemError::noError || size == 0)
             {
-                NX_LOGX(lm("Connection(%1) has been closed: %2 (%3 sockets left)")
-                    .args(*it, SystemError::toString(code), m_socketCount.load() - 1),
+                NX_LOGX(lm("Host %1. Connection(%2) has been closed: %3 (%4 sockets left)")
+                    .args(m_hostName, *it, SystemError::toString(code), m_socketCount.load() - 1),
                     cl_logDEBUG1);
             }
             else
             {
-                NX_LOGX(lm("Unexpected read on socket(%1), size=%2. Closing socket (%3 sockets left)")
-                    .args(*it, size, m_socketCount.load() - 1),
-                    cl_logERROR);
+                NX_LOGX(lm("Host %1. Unexpected read on socket(%2), size=%3. "
+                    "Closing socket (%4 sockets left)")
+                    .args(m_hostName, *it, size, m_socketCount.load() - 1), cl_logERROR);
             }
 
             (void)buffer; //< This buffer might be helpful for debug is case smth goes wrong!

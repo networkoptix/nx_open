@@ -164,12 +164,12 @@ QnControlsStatisticsModule* QnWorkbenchContext::statisticsModule() const
     return m_statisticsModule.data();
 }
 
-QWidget* QnWorkbenchContext::mainWindow() const
+MainWindow* QnWorkbenchContext::mainWindow() const
 {
     return m_mainWindow.data();
 }
 
-void QnWorkbenchContext::setMainWindow(QWidget *mainWindow)
+void QnWorkbenchContext::setMainWindow(MainWindow* mainWindow)
 {
     if (m_mainWindow == mainWindow)
         return;
@@ -233,7 +233,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
 
             bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
 
-            QUrl systemUrl = QUrl::fromUserInput(systemId);
+            auto systemUrl = nx::utils::Url::fromUserInput(systemId);
             NX_LOG(lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()), cl_logDEBUG1);
 
             systemUrl.setUserName(auth.user);
@@ -262,7 +262,7 @@ bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& 
 {
     /* Set authentication parameters from command line. */
 
-    QUrl appServerUrl = startupParams.parseAuthenticationString();
+    nx::utils::Url appServerUrl = startupParams.parseAuthenticationString();
 
     // TODO: #refactor System URI to support videowall
     if (!startupParams.videoWallGuid.isNull())
@@ -306,11 +306,8 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
     * * we have opened exported exe-file
     * Otherwise we should try to connect or show welcome page.
     */
-    if (qnRuntime->isDesktopMode())
-    {
-        const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
+    if (const auto welcomeScreen = mainWindow()->welcomeScreen())
         welcomeScreen->setVisibleControls(true);
-    }
 
     if (!connectUsingCustomUri(startupParams.customUri)
         && startupParams.instantDrop.isEmpty()

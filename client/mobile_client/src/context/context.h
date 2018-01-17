@@ -4,6 +4,7 @@
 #include <QtCore/QScopedPointer>
 
 #include <client_core/connection_context_aware.h>
+#include <nx/utils/url.h>
 
 class QnConnectionManager;
 class QnMobileAppInfo;
@@ -11,7 +12,6 @@ class QnCloudStatusWatcher;
 class QnMobileClientUiController;
 class QnUserWatcher;
 class QnCloudUrlHelper;
-class NxGlobalsObject;
 
 namespace nx {
 namespace client {
@@ -30,7 +30,6 @@ class QnContext: public QObject, public QnConnectionContextAware
     Q_OBJECT
     typedef QObject base_type;
 
-    Q_PROPERTY(NxGlobalsObject* Nx MEMBER m_nxGlobals CONSTANT)
     Q_PROPERTY(QnConnectionManager* connectionManager MEMBER m_connectionManager CONSTANT)
     Q_PROPERTY(nx::client::mobile::QmlSettingsAdaptor* settings MEMBER m_settings CONSTANT)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo MEMBER m_appInfo CONSTANT)
@@ -94,10 +93,10 @@ public:
     Q_INVOKABLE void clearSavedPasswords();
     Q_INVOKABLE void clearLastUsedConnection();
     Q_INVOKABLE QString getLastUsedSystemName() const;
-    Q_INVOKABLE QUrl getLastUsedUrl() const;
-    Q_INVOKABLE QUrl getInitialUrl() const;
-    Q_INVOKABLE bool isCloudConnectionUrl(const QUrl& url);
-    Q_INVOKABLE QUrl getWebSocketUrl() const;
+    Q_INVOKABLE nx::utils::Url getLastUsedUrl() const;
+    Q_INVOKABLE nx::utils::Url getInitialUrl() const;
+    Q_INVOKABLE bool isCloudConnectionUrl(const nx::utils::Url& url);
+    Q_INVOKABLE nx::utils::Url getWebSocketUrl() const;
 
     Q_INVOKABLE void setCloudCredentials(const QString& login, const QString& password);
 
@@ -110,7 +109,6 @@ signals:
     void deviceStatusBarHeightChanged();
 
 private:
-    NxGlobalsObject* m_nxGlobals;
     QnConnectionManager *m_connectionManager;
     QmlSettingsAdaptor* m_settings;
     QnMobileAppInfo *m_appInfo;

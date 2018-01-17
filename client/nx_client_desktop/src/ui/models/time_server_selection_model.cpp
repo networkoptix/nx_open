@@ -19,14 +19,15 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
-#include <nx/utils/collection.h>
-#include <utils/common/qtimespan.h>
+#include <nx/client/core/utils/human_readable.h>
 #include <utils/common/synctime.h>
 #include <utils/tz/tz.h>
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 #include <algorithm>
 #include <api/model/time_reply.h>
+
+#include <nx/utils/algorithm/index_of.h>
 
 namespace {
 
@@ -127,7 +128,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
             if (info.data.peer.peerType != Qn::PT_Server)
                 return;
 
-            int idx = qnIndexOf(m_items,
+            int idx = nx::utils::algorithm::index_of(m_items,
                 [info](const Item& item)
                 {
                     return item.peerId == info.uuid;
@@ -155,7 +156,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
                 return;
 
             QnUuid id = resource->getId();
-            int idx = qnIndexOf(m_items,
+            int idx = nx::utils::algorithm::index_of(m_items,
                 [id](const Item& item)
                 {
                     return item.peerId == id;
@@ -204,19 +205,26 @@ void QnTimeServerSelectionModel::updateTimeOffset()
     auto apiConnection = server->restConnection();
     m_currentRequest = apiConnection->getTimeOfServersAsync(
         [this, apiConnection]
-        (bool success, int handle, rest::MultiServerTimeData data)
+            (bool success, rest::Handle handle, rest::MultiServerTimeData data)
         {
-            auto syncTime = qnSyncTime->currentMSecsSinceEpoch();
+            if (m_currentRequest != handle)
+                return;
+
+            m_currentRequest = rest::Handle(); //< Reset.
+            if (!success)
+                return;
+
+            const auto syncTime = qnSyncTime->currentMSecsSinceEpoch();
             for (const auto& record: data.data)
             {
-                /* Store received value to use it later. */
-                qint64 offset = record.timeSinseEpochMs - syncTime;
+                // Store received value to use it later.
+                const auto offset = record.timeSinseEpochMs - syncTime;
                 m_serverOffsetCache[record.serverId] = offset;
                 PRINT_DEBUG("get time for peer " + peerId.toByteArray());
 
-                /* Check if the server is already online. */
-                int idx = qnIndexOf(m_items,
-                    [record](const Item& item)
+                // Check if the server is already online.
+                const auto idx = nx::utils::algorithm::index_of(m_items,
+                    [&record](const Item& item)
                     {
                         return item.peerId == record.serverId;
                     });
@@ -229,7 +237,6 @@ void QnTimeServerSelectionModel::updateTimeOffset()
                 PRINT_DEBUG("peer " + peerId.toByteArray() + " is ready");
                 emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), kTextRoles);
             }
-            m_currentRequest = rest::Handle(); //< reset
         });
 }
 
@@ -489,7 +496,8 @@ void QnTimeServerSelectionModel::setSelectedServer(const QnUuid& serverId)
 
     if (!serverId.isNull())
     {
-        int idx = qnIndexOf(m_items, [serverId](const Item& item){return item.peerId == serverId; });
+        int idx = nx::utils::algorithm::index_of(m_items,
+            [serverId](const Item& item){return item.peerId == serverId; });
         if (idx < 0)
         {
             PRINT_DEBUG("model: selected peer " + serverId.toByteArray() + " NOT FOUND");
@@ -520,11 +528,15 @@ bool QnTimeServerSelectionModel::isSelected(quint64 priority)
 
 QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMs)
 {
-    static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes | Qt::Hours;
+    const auto duration = std::chrono::milliseconds(offsetMs);
     static const QString kSeparator(L' ');
 
-    return QTimeSpan(offsetMs).toApproximateString(QTimeSpan::kDoNotSuppressSecondUnit, kFormat,
-        QTimeSpan::SuffixFormat::Short, kSeparator);
+    using HumanReadable = nx::client::core::HumanReadable;
+    return HumanReadable::timeSpan(duration,
+        HumanReadable::Hours | HumanReadable::Minutes | HumanReadable::Seconds,
+        HumanReadable::SuffixFormat::Short,
+        kSeparator,
+        HumanReadable::kNoSuppressSecondUnit);
 }
 
 QVariant QnTimeServerSelectionModel::offsetForeground(qint64 offsetMs) const
@@ -574,27 +586,21 @@ bool QnTimeServerSelectionModel::hasInternetAccess() const
 
 bool QnTimeServerSelectionModel::calculateSameTimezone() const
 {
-    auto watcher = context()->instance<QnWorkbenchServerTimeWatcher>();
-    qint64 localOffset = nx_tz::getLocalTimeZoneOffset(); /* In minutes. */
-    qint64 commonOffset = localOffset == -1
-        ? Qn::InvalidUtcOffset
-        : localOffset*60;
+    qint64 commonUtcOffset = Qn::InvalidUtcOffset;
 
-    for (const auto& item : m_items)
+    for (const auto& item: m_items)
     {
-        QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(item.peerId);
+        const auto server = resourcePool()->getResourceById<QnMediaServerResource>(item.peerId);
         if (!server || server->getStatus() != Qn::Online)
             continue;
 
-        auto offsetMs = watcher->utcOffset(server);
-        if (offsetMs == Qn::InvalidUtcOffset)
+        const auto utcOffset = server->utcOffset();
+        if (utcOffset == Qn::InvalidUtcOffset)
             continue;
 
-        auto offset = offsetMs / 1000;
-
-        if (commonOffset == Qn::InvalidUtcOffset)
-            commonOffset = offset;
-        else if (commonOffset != offset)
+        if (commonUtcOffset == Qn::InvalidUtcOffset)
+            commonUtcOffset = utcOffset;
+        else if (commonUtcOffset != utcOffset)
             return false;
     }
 

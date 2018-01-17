@@ -64,7 +64,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_newLiveQuality(MEDIA_Quality_None),
     m_streamingSpeed(MAX_STREAMING_SPEED),
     m_multiChannelVideo(false),
-    m_adaptiveSleep(MAX_FRAME_DURATION*1000),
+    m_adaptiveSleep(MAX_FRAME_DURATION_MS*1000),
     m_useUTCTime(true),
     m_fastChannelZappingSize(0),
     m_firstLiveTime(AV_NOPTS_VALUE),
@@ -462,8 +462,8 @@ void QnRtspDataConsumer::doRealtimeDelay(QnConstAbstractMediaDataPtr media)
     }
     else {
         qint64 timeDiff = media->timestamp - m_lastRtTime;
-        if (timeDiff <= MAX_FRAME_DURATION*1000)
-            m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION*1000); // if diff too large, it is recording hole. do not calc delay for this case
+        if (timeDiff <= MAX_FRAME_DURATION_MS*1000)
+            m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION_MS*1000); // if diff too large, it is recording hole. do not calc delay for this case
     }
     m_lastRtTime = media->timestamp;
 }
@@ -729,7 +729,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         else
         {
             NX_ASSERT(m_sendBuffer.size() < 16384);
-            AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
+            nx::network::AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
             mediaSocket->send(m_sendBuffer.data(), m_sendBuffer.size());
             m_sendBuffer.clear();
         }

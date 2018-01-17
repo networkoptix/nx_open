@@ -144,6 +144,8 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(HealthMonitor| Offline,  loadIcon(lit("tree/health_monitor_offline.png")));
     m_cache.insert(Camera | Offline,        loadIcon(lit("tree/camera_offline.png")));
     m_cache.insert(Camera | Unauthorized,   loadIcon(lit("tree/camera_unauthorized.png")));
+    m_cache.insert(Camera | Incompatible,   loadIcon(lit("tree/camera_alert.png")));
+    m_cache.insert(IOModule | Incompatible, loadIcon(lit("tree/camera_alert.png")));
     m_cache.insert(Layout | Locked,         loadIcon(lit("tree/layout_locked.png")));
     m_cache.insert(SharedLayout | Locked,   loadIcon(lit("tree/layout_shared_locked.png")));
     m_cache.insert(VideoWallItem | Locked,  loadIcon(lit("tree/screen_locked.png")));
@@ -249,6 +251,35 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
     Key status = Unknown;
 
+    const auto updateStatus =
+        [&status, key, resource]()
+        {
+            switch (resource->getStatus())
+            {
+                case Qn::Online:
+                    if (key == Server && resource->getId() == resource->commonModule()->remoteGUID())
+                        status = Control;
+                    else
+                        status = Online;
+                    break;
+
+                case Qn::Offline:
+                    status = Offline;
+                    break;
+
+                case Qn::Unauthorized:
+                    status = Unauthorized;
+                    break;
+
+                case Qn::Incompatible:
+                    status = Incompatible;
+                    break;
+
+                default:
+                    break;
+            };
+        };
+
     // Fake servers
     if (flags.testFlag(Qn::fake))
     {
@@ -272,32 +303,15 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             ? Locked
             : Unknown;
     }
+    else if (const auto camera = resource.dynamicCast<QnSecurityCamResource>())
+    {
+        updateStatus();
+        if (status == Online && camera->needsToChangeDefaultPassword())
+            status = Incompatible;
+    }
     else
     {
-        switch (resource->getStatus())
-        {
-            case Qn::Online:
-                if (key == Server && resource->getId() == resource->commonModule()->remoteGUID())
-                    status = Control;
-                else
-                    status = Online;
-                break;
-
-            case Qn::Offline:
-                status = Offline;
-                break;
-
-            case Qn::Unauthorized:
-                status = Unauthorized;
-                break;
-
-            case Qn::Incompatible:
-                status = Incompatible;
-                break;
-
-            default:
-                break;
-        }
+        updateStatus();
     }
 
     if (flags.testFlag(Qn::read_only))

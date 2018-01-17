@@ -1,5 +1,6 @@
 #include "request_executor_factory.h"
 
+#include <nx/utils/basic_factory.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "request_execution_thread.h"
@@ -8,24 +9,25 @@ namespace nx {
 namespace utils {
 namespace db {
 
-static RequestExecutorFactory::FactoryFunc actualFactory;
+RequestExecutorFactory::RequestExecutorFactory():
+    base_type(std::bind(&RequestExecutorFactory::defaultFactoryFunction, this,
+        std::placeholders::_1, std::placeholders::_2))
+{
+}
 
-std::unique_ptr<BaseRequestExecutor> RequestExecutorFactory::create(
+RequestExecutorFactory& RequestExecutorFactory::instance()
+{
+    static RequestExecutorFactory staticInstance;
+    return staticInstance;
+}
+
+std::unique_ptr<BaseRequestExecutor> RequestExecutorFactory::defaultFactoryFunction(
     const ConnectionOptions& connectionOptions,
     QueryExecutorQueue* const queryExecutorQueue)
 {
-    if (actualFactory)
-        return actualFactory(connectionOptions, queryExecutorQueue);
-
     return std::make_unique<DbRequestExecutionThread>(
         connectionOptions,
         queryExecutorQueue);
-}
-
-void RequestExecutorFactory::setFactoryFunc(
-    RequestExecutorFactory::FactoryFunc factoryFunc)
-{
-    actualFactory = std::move(factoryFunc);
 }
 
 } // namespace db

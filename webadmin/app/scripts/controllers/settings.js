@@ -1,8 +1,10 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver, $poll, $localStorage,
-                                          cloudAPI, $location, $timeout, dialogs, nativeClient) {
+    .controller('SettingsCtrl', ['$scope', '$rootScope', '$modal', '$log', 'mediaserver', '$poll', '$localStorage',
+                                 'cloudAPI', '$location', '$timeout', 'dialogs', 'nativeClient',
+    function ($scope, $rootScope, $modal, $log, mediaserver, $poll, $localStorage, cloudAPI, $location,
+              $timeout, dialogs, nativeClient) {
 
         if(mediaserver.hasProxy()){
             $location.path("/view");
@@ -331,7 +333,7 @@ angular.module('webadminApp')
 
         $scope.disconnectFromSystem = function(){ // Detach server from the system
             dialogs.confirmWithPassword(
-                L.settings.confirmDisconnectFromSystemTitle,
+                "", // L.settings.confirmDisconnectFromSystemTitle,
                 L.settings.confirmDisconnectFromSystem,
                 L.settings.confirmDisconnectFromSystemAction,
                 'danger').then(function (oldPassword) {
@@ -459,4 +461,4 @@ angular.module('webadminApp')
             mediaserver.timeSettings($scope.dateTimeSettings.dateTime.getTime(), $scope.dateTimeSettings.timeZone).
                 then(resultHandler,errorHandler);
         };
-    });
+    }]);

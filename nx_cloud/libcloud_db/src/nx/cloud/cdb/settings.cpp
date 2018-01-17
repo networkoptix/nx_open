@@ -88,6 +88,13 @@ const int kDefaultTcpBacklogSize = 1024;
 const QLatin1String kConnectionInactivityPeriod("http/connectionInactivityPeriod");
 const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disabled
 
+//-------------------------------------------------------------------------------------------------
+// VmsGateway
+const QLatin1String kVmsGatewayUrl("vmsGateway/url");
+
+const QLatin1String kVmsGatewayRequestTimeout("vmsGateway/requestTimeout");
+const std::chrono::milliseconds kDefaultVmsGatewayRequestTimeout(std::chrono::seconds(21));
+
 } // namespace
 
 
@@ -124,9 +131,20 @@ EventManager::EventManager():
 {
 }
 
+ModuleFinder::ModuleFinder():
+    cloudModulesXmlTemplatePath(kDefaultCloudModuleXmlTemplatePath),
+    newCloudModulesXmlTemplatePath(kDefaultNewCloudModuleXmlTemplatePath)
+{
+}
+
 Http::Http():
     tcpBacklogSize(kDefaultTcpBacklogSize),
     connectionInactivityPeriod(kDefaultConnectionInactivityPeriod)
+{
+}
+
+VmsGateway::VmsGateway():
+    requestTimeout(kDefaultVmsGatewayRequestTimeout)
 {
 }
 
@@ -226,23 +244,28 @@ const Http& Settings::http() const
     return m_http;
 }
 
+const VmsGateway& Settings::vmsGateway() const
+{
+    return m_vmsGateway;
+}
+
 void Settings::setDbConnectionOptions(
     const nx::utils::db::ConnectionOptions& options)
 {
     m_dbConnectionOptions = options;
 }
 
-std::list<SocketAddress> Settings::endpointsToListen() const
+std::list<network::SocketAddress> Settings::endpointsToListen() const
 {
     const QStringList& httpAddrToListenStrList = settings().value(
         kEndpointsToListen,
         kDefaultEndpointsToListen ).toString().split( ',' );
-    std::list<SocketAddress> httpAddrToListenList;
+    std::list<network::SocketAddress> httpAddrToListenList;
     std::transform(
         httpAddrToListenStrList.begin(),
         httpAddrToListenStrList.end(),
         std::back_inserter( httpAddrToListenList ),
-        []( const QString& str ) { return SocketAddress( str ); } );
+        []( const QString& str ) { return network::SocketAddress( str ); } );
 
     return httpAddrToListenList;
 }
@@ -335,6 +358,14 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(
             settings().value(kConnectionInactivityPeriod).toString(),
             kDefaultConnectionInactivityPeriod));
+
+    //vmsGateway
+    m_vmsGateway.url = settings().value(kVmsGatewayUrl).toString().toStdString();
+
+    m_vmsGateway.requestTimeout =
+        nx::utils::parseTimerDuration(
+            settings().value(kVmsGatewayRequestTimeout).toString(),
+            kDefaultVmsGatewayRequestTimeout);
 }
 
 } // namespace conf

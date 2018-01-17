@@ -64,7 +64,7 @@ void Connection::setProxyVia(
     const std::string& proxyHost,
     std::uint16_t proxyPort)
 {
-    const SocketAddress proxyEndpoint(proxyHost.c_str(), proxyPort);
+    const nx::network::SocketAddress proxyEndpoint(proxyHost.c_str(), proxyPort);
     m_accountManager->setProxyVia(proxyEndpoint);
     m_systemManager->setProxyVia(proxyEndpoint);
     m_authProvider->setProxyVia(proxyEndpoint);

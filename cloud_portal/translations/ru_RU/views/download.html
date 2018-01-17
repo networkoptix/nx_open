@@ -26,15 +26,15 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <a class="media btn btn-lg btn-default download-button" ng-href="{{platform.installers[0].url}}" >
-                                      <div class="media-left">
-                                            <span class="download-link"></span>
-                                      </div>
-                                      <div class="media-body text-left">
-                                            <h2><b>Download {{VMS_NAME}}</b></h2>
-                                            <span class="installer-name">{{$root.L.downloads.groups[platform.name].shortLabel ||
-                                                $root.L.downloads.groups[platform.name].label}} {{platform.installers[0].formatName}}</span>
-                                      </div>
-                                </a>
+                                  <div class="media-left">
+                                        <span class="download-link"></span>
+                                  </div>
+                                  <div class="media-body text-left">
+                                        <h2><b>Загрузить {{VMS_NAME}}</b></h2>
+                                        <span class="installer-name">{{$root.L.downloads.groups[platform.name].shortLabel ||
+                                            $root.L.downloads.groups[platform.name].label}} {{platform.installers[0].formatName}}</span>
+                                  </div>
+                            </a>
                                 <p class="small" ng-if="$root.L.downloads.groups[platform.name].supported"
                                    ng-bind-html="$root.L.downloads.groups[platform.name].supported"></p>
                             </div>

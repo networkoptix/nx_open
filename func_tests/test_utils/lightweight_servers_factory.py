@@ -1,15 +1,17 @@
 # create lightweight servers (LWS) containers implemented by appserver2_ut with requested number of servers in them
 
-import os.path
-import logging
 import datetime
+import logging
+import os.path
+
 from requests.exceptions import ReadTimeout
-from .template_renderer import TemplateRenderer
+
 from . import utils
-from .utils import GrowingSleep
 from .core_file_traceback import create_core_file_traceback
-from .server_ctl import SERVER_CTL_TARGET_PATH, PhysicalHostServerCtl
 from .server import Server
+from .server_ctl import SERVER_CTL_TARGET_PATH, PhysicalHostServerCtl
+from .template_renderer import TemplateRenderer
+from .utils import GrowingSleep
 
 log = logging.getLogger(__name__)
 
@@ -24,13 +26,13 @@ LWS_SYNC_CHECK_TIMEOUT = datetime.timedelta(minutes=1)  # calling api/moduleInfo
 
 class LightweightServersFactory(object):
 
-    def __init__(self, artifact_factory, physical_installation_ctl, test_binary_path):
+    def __init__(self, artifact_factory, physical_installation_ctl, test_binary_path, ca):
         self._artifact_factory = artifact_factory
         self._physical_installation_ctl = physical_installation_ctl
         self._test_binary_path = test_binary_path
         physical_installation_host = self._pick_server()
         if physical_installation_host:
-            self._lws_host = LightweightServersHost(self._artifact_factory, self._test_binary_path, physical_installation_host)
+            self._lws_host = LightweightServersHost(self._artifact_factory, self._test_binary_path, physical_installation_host, ca)
         else:
             self._lws_host = None
 
@@ -67,11 +69,12 @@ class LightweightServersFactory(object):
 
 class LightweightServersInstallation(object):
 
-    def __init__(self, host, dir):
+    def __init__(self, host, dir, ca):
         self.host = host
         self.dir = dir
         self.test_tmp_dir = os.path.join(dir, 'tmp')
         self.log_path_base = os.path.join(dir, 'lws')
+        self._ca = ca
 
     def cleanup_var_dir(self):
         self._not_supported()
@@ -93,7 +96,7 @@ class LightweightServersInstallation(object):
         self._not_supported()
 
     def get_log_file(self):
-        if self.host.file_exists(self._log_path):
+        if self.host.file_exists(self.log_path_base):
             return self.host.read_file(self.log_path_base + '.log')
         else:
             return None
@@ -104,13 +107,13 @@ class LightweightServersInstallation(object):
 
 class LightweightServer(Server):
 
-    def __init__(self, name, host, installation, server_ctl, rest_api_url, internal_ip_port=None, timezone=None):
-        Server.__init__(self, name, host, installation, server_ctl, rest_api_url,
+    def __init__(self, name, host, installation, server_ctl, rest_api_url, ca, internal_ip_port=None, timezone=None):
+        Server.__init__(self, name, host, installation, server_ctl, rest_api_url, ca,
                             internal_ip_port=internal_ip_port, timezone=timezone)
         self.internal_ip_address = host.host
         self._state = self._st_started
 
-    def load_system_settings(self):
+    def load_system_settings(self, log_settings=False):
         response = self.rest_api.api.ping.GET()
         self.local_system_id = response['localSystemId']
 
@@ -134,15 +137,16 @@ class LightweightServer(Server):
 
 class LightweightServersHost(object):
 
-    def __init__(self, artifact_factory, test_binary_path, physical_installation_host):
+    def __init__(self, artifact_factory, test_binary_path, physical_installation_host, ca):
         self._artifact_factory = artifact_factory
         self._test_binary_path = test_binary_path
         self._physical_installation_host = physical_installation_host
         self._host = physical_installation_host.host
         self._host_name = physical_installation_host.name
         self._timezone = physical_installation_host.timezone
+        self._ca = ca
         self._installation = LightweightServersInstallation(
-            self._host, os.path.join(physical_installation_host.root_dir, 'lws'))
+            self._host, os.path.join(physical_installation_host.root_dir, 'lws'), self._ca)
         self._template_renderer = TemplateRenderer()
         self._lws_dir = self._installation.dir
         self._server_ctl = PhysicalHostServerCtl(self._host, self._lws_dir)
@@ -167,7 +171,7 @@ class LightweightServersHost(object):
             server_port = LWS_PORT_BASE + idx
             rest_api_url = '%s://%s:%d/' % ('http', self._host.host, server_port)
             server = LightweightServer('lws-%05d' % idx, self._host, self._installation, self._server_ctl, rest_api_url,
-                                       internal_ip_port=server_port, timezone=self._timezone)
+                                       self._ca, internal_ip_port=server_port, timezone=self._timezone)
             response = server.wait_for_server_become_online(timeout=LWS_START_TIMEOUT, check_interval_sec=2)
             server.local_system_id = response['localSystemId']
             if not self._first_server:

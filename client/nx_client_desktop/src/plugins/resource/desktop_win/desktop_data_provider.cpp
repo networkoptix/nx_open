@@ -30,6 +30,7 @@ extern "C"
 #include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
 #include <utils/media/ffmpeg_helper.h>
+#include <nx/streaming/video_data_packet.h>
 
 namespace {
 
@@ -58,6 +59,7 @@ QnDesktopDataProvider::EncodedAudioInfo::EncodedAudioInfo(QnDesktopDataProvider*
     m_tmpAudioBuffer(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE),
     m_speexPreprocess(nullptr),
     m_owner(owner),
+    hWaveIn(0),
     m_terminated(false),
     m_waveInOpened(false)
 {
@@ -177,7 +179,7 @@ void QnDesktopDataProvider::EncodedAudioInfo::stop()
         if (!m_waveInOpened)
             return;
     }
-
+    waveInStop(hWaveIn);
     waveInReset(hWaveIn);
     waveInClose(hWaveIn);
     clearBuffers();

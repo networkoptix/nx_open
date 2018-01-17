@@ -82,6 +82,15 @@
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Облачная система может быть объединена только с локальной. Системное имя и пароль берутся из облачной системы.</translation>
     </message>
+    <message>
+      <source>New System</source>
+      <translation>Новая система</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation>Обнаружкнная система %1 несовместима с текущей.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -95,7 +104,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -246,18 +255,6 @@
       <translation>Убедитесь, что порт %1 доступен (например, проброшен).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках камеры.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Если это не помогает, восстановите заводские настройки на web-странице устройства.</translation>
     </message>
@@ -304,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Камера была восстановлена ​​из архива. Удалите камеру и добавьте ее снова, чтобы просмотреть видео в реальном времени.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства (ошибка "%1").</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках камеры (ошибка "%1").</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках I/O модуля (ошибка "%1").</translation>
     </message>
   </context>
   <context>
@@ -380,7 +389,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Не найден кодировщик для кодекa %1.</translation>
+      <translation>Не найден кодировщик для кодека %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -415,7 +424,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation>Начать</translation>
+      <translation>Начинается</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -455,7 +464,7 @@
     </message>
     <message>
       <source>Invalid</source>
-      <translation>Неверно</translation>
+      <translation>Неверный</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
@@ -463,7 +472,7 @@
     </message>
     <message>
       <source>Free</source>
-      <translation>Бесплатная</translation>
+      <translation>Свободно</translation>
     </message>
     <message>
       <source>Free license</source>
@@ -477,22 +486,30 @@
       <source>Time Licenses</source>
       <translation>Возобновляемые лицензии</translation>
     </message>
+    <message>
+      <source>Bridge</source>
+      <translation>Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>Лицензии Bridge</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%n %2 использована из %1.</numerusform>
-        <numerusform>%n %2 использованы из %1.</numerusform>
+        <numerusform>%n %2 использовано из %1.</numerusform>
+        <numerusform>%n %2 использовано из %1.</numerusform>
         <numerusform>%n %2 использовано из %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>%n %2 будет использована из %1.</numerusform>
-        <numerusform>%n %2 будут использованы из %1.</numerusform>
+        <numerusform>%n %2 будет использовано из %1.</numerusform>
+        <numerusform>%n %2 будет использовано из %1.</numerusform>
         <numerusform>%n %2 будет использовано из %1.</numerusform>
       </translation>
     </message>
@@ -525,7 +542,7 @@
     </message>
     <message>
       <source>License is expired</source>
-      <translation>Срок действия лицензии истёк</translation>
+      <translation>Истёк срок действия лицензии</translation>
     </message>
     <message>
       <source>Invalid type</source>
@@ -658,7 +675,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Неизвестно</translation>
+      <translation>Неизвестный</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -689,15 +706,15 @@
     </message>
     <message>
       <source>Low</source>
-      <translation>Низкое</translation>
+      <translation>Низкая</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Среднее</translation>
+      <translation>Средний</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Высокое</translation>
+      <translation>Высокая</translation>
     </message>
     <message>
       <source>Best</source>
@@ -776,6 +793,10 @@
       <source>Invalid resource type for data export.</source>
       <translation>Недопустимый тип ресурса для экспорта данных.</translation>
     </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Нет данных для экспорта.</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
@@ -788,7 +809,7 @@
     <name>QnTCPConnectionProcessor</name>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Not Found</source>
@@ -898,25 +919,25 @@
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
         <numerusform>миллисекунда</numerusform>
-        <numerusform>миллисекунды</numerusform>
-        <numerusform>миллисекунд</numerusform>
+        <numerusform>миллисекунда</numerusform>
+        <numerusform>миллисекунда</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>секунда</numerusform>
         <numerusform>секунды</numerusform>
-        <numerusform>секунд</numerusform>
+        <numerusform>секунды</numerusform>
+        <numerusform>секунды</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>минута</numerusform>
-        <numerusform>минуты</numerusform>
+        <numerusform>минут</numerusform>
+        <numerusform>минут</numerusform>
         <numerusform>минут</numerusform>
       </translation>
     </message>
@@ -924,8 +945,8 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>час</numerusform>
-        <numerusform>часа</numerusform>
+        <numerusform>часов</numerusform>
+        <numerusform>часов</numerusform>
         <numerusform>часов</numerusform>
       </translation>
     </message>
@@ -933,8 +954,8 @@
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>день</numerusform>
-        <numerusform>дня</numerusform>
+        <numerusform>дней</numerusform>
+        <numerusform>дней</numerusform>
         <numerusform>дней</numerusform>
       </translation>
     </message>
@@ -942,8 +963,8 @@
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
       <translation>
-        <numerusform>неделя</numerusform>
-        <numerusform>недели</numerusform>
+        <numerusform>недель</numerusform>
+        <numerusform>недель</numerusform>
         <numerusform>недель</numerusform>
       </translation>
     </message>
@@ -951,8 +972,8 @@
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
       <translation>
-        <numerusform>месяц</numerusform>
-        <numerusform>месяца</numerusform>
+        <numerusform>месяцев</numerusform>
+        <numerusform>месяцев</numerusform>
         <numerusform>месяцев</numerusform>
       </translation>
     </message>
@@ -960,8 +981,8 @@
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
       <translation>
-        <numerusform>год</numerusform>
-        <numerusform>года</numerusform>
+        <numerusform>лет</numerusform>
+        <numerusform>лет</numerusform>
         <numerusform>лет</numerusform>
       </translation>
     </message>
@@ -1005,7 +1026,7 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>Только видео с камер</translation>
+      <translation>Только видео в реальном времени</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1013,7 +1034,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>Особая</translation>
+      <translation>Особые</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
@@ -1025,7 +1046,7 @@
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation>Может смотреть живое видео со всех камер.</translation>
+      <translation>Может смотреть видео в реальном времени со всех камер.</translation>
     </message>
     <message>
       <source>Custom user role.</source>
@@ -1525,6 +1546,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>Подтвердить</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>Событие аналитики</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 на %2</translation>
     </message>
   </context>
   <context>

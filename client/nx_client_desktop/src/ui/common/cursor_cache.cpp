@@ -10,10 +10,9 @@
 
 #include <platform/platform_abstraction.h>
 
-#include <ui/common/geometry.h>
 #include <ui/common/frame_section.h>
 
-class QnCursorCachePrivate: protected QnGeometry
+class QnCursorCachePrivate
 {
 public:
     QCursor cursor(Qt::CursorShape shape, int rotation)

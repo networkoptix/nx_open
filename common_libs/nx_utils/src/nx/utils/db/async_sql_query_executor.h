@@ -16,8 +16,11 @@
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 
 #include "base_request_executor.h"
+#include "detail/cursor_handler.h"
+#include "detail/query_queue.h"
 #include "request_executor.h"
 #include "types.h"
+#include "query.h"
 #include "query_context.h"
 
 namespace nx {
@@ -57,7 +60,7 @@ public:
      * @param queryFunc throws nx::utils::db::Exception.
      * @throws nx::utils::db::Exception.
      */
-    template<typename QueryFunc, typename... OutputData>
+    template<typename QueryFunc>
     void executeUpdateQuerySync(QueryFunc queryFunc)
     {
         nx::utils::promise<nx::utils::db::DBResult> queryDonePromise;
@@ -69,8 +72,7 @@ public:
             },
             [&queryDonePromise](
                 nx::utils::db::QueryContext*,
-                nx::utils::db::DBResult dbResult,
-                OutputData... outputData)
+                nx::utils::db::DBResult dbResult)
             {
                 queryDonePromise.set_value(dbResult);
             });
@@ -89,7 +91,7 @@ public:
      * @throws nx::utils::db::Exception.
      */
     template<typename QueryFunc>
-    typename std::result_of<QueryFunc(nx::utils::db::QueryContext*)>::type 
+    typename std::result_of<QueryFunc(nx::utils::db::QueryContext*)>::type
         executeSelectQuerySync(QueryFunc queryFunc)
     {
         typename std::result_of<QueryFunc(nx::utils::db::QueryContext*)>::type result;
@@ -154,18 +156,23 @@ public:
 
     void reserveConnections(int count);
 
+    /**
+     * @param value Zero - no limit. By default, zero.
+     */
+    void setConcurrentModificationQueryLimit(int value);
+
     std::size_t pendingQueryCount() const;
 
     /**
      * Executes data modification request that spawns some output data.
-     * Hold multiple threads inside. \a dbUpdateFunc is executed within random thread.
-     * Transaction is started before \a dbUpdateFunc call.
-     * Transaction committed if \a dbUpdateFunc succeeded.
+     * Hold multiple threads inside. dbUpdateFunc is executed within random thread.
+     * Transaction is started before dbUpdateFunc call.
+     * Transaction committed if dbUpdateFunc succeeded.
      * @param dbUpdateFunc This function may executed SQL commands and fill output data
      * @param completionHandler DB operation result is passed here. Output data is valid only if operation succeeded
-     * @note DB operation may fail even if \a dbUpdateFunc finished successfully (e.g., transaction commit fails).
-     * @note \a dbUpdateFunc may not be called if there was no connection available for
-     *       \a ConnectionOptions::maxPeriodQueryWaitsForAvailableConnection period.
+     * NOTE: DB operation may fail even if dbUpdateFunc finished successfully (e.g., transaction commit fails).
+     * NOTE: dbUpdateFunc may not be called if there was no connection available for
+     *       ConnectionOptions::maxPeriodQueryWaitsForAvailableConnection period.
      */
     template<typename InputData, typename OutputData>
     void executeUpdate(
@@ -200,19 +207,74 @@ public:
             std::move(input));
     }
 
+    template<typename Record>
+    void createCursor(
+        MoveOnlyFunc<void(SqlQuery*)> prepareCursorFunc,
+        MoveOnlyFunc<void(SqlQuery*, Record*)> readRecordFunc,
+        MoveOnlyFunc<void(DBResult, QnUuid /*cursorId*/)> completionHandler)
+    {
+        {
+            QnMutexLocker lock(&m_mutex);
+            if (m_cursorProcessorContexts.empty())
+                addCursorProcessingThread(lock);
+        }
+
+        auto cursorHandler = std::make_unique<detail::CursorHandler<Record>>(
+            std::move(prepareCursorFunc),
+            std::move(readRecordFunc),
+            std::move(completionHandler));
+        auto cursorCreator = std::make_unique<detail::CursorCreator>(
+            &m_cursorProcessorContexts.front()->cursorContextPool,
+            std::move(cursorHandler));
+        m_cursorTaskQueue.push(std::move(cursorCreator));
+    }
+
+    template<typename Record>
+    void fetchNextRecordFromCursor(
+        QnUuid id,
+        MoveOnlyFunc<void(DBResult, Record)> completionHandler)
+    {
+        auto task = std::make_unique<detail::FetchCursorDataExecutor<Record>>(
+            &m_cursorProcessorContexts.front()->cursorContextPool,
+            id,
+            std::move(completionHandler));
+        m_cursorTaskQueue.push(std::move(task));
+    }
+
+    void removeCursor(QnUuid id);
+
+    int openCursorCount() const;
+
 private:
+    struct CursorProcessorContext
+    {
+        detail::CursorHandlerPool cursorContextPool;
+        std::unique_ptr<BaseRequestExecutor> processingThread;
+    };
+
     const ConnectionOptions m_connectionOptions;
     mutable QnMutex m_mutex;
-    nx::utils::SyncQueueWithItemStayTimeout<std::unique_ptr<AbstractExecutor>>
-        m_requestQueue;
+    detail::QueryQueue m_queryQueue;
     std::vector<std::unique_ptr<BaseRequestExecutor>> m_dbThreadPool;
     nx::utils::thread m_dropConnectionThread;
     nx::utils::SyncQueue<std::unique_ptr<BaseRequestExecutor>> m_connectionsToDropQueue;
     bool m_terminated;
     StatisticsCollector* m_statisticsCollector;
 
+    detail::QueryQueue m_cursorTaskQueue;
+    std::vector<std::unique_ptr<CursorProcessorContext>> m_cursorProcessorContexts;
+
     bool isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const;
+
     void openNewConnection(const QnMutexLockerBase& /*lk*/);
+    std::unique_ptr<BaseRequestExecutor> createNewConnectionThread(
+        const QnMutexLockerBase& /*lock*/,
+        detail::QueryQueue* const queryQueue);
+    std::unique_ptr<BaseRequestExecutor> createNewConnectionThread(
+        const QnMutexLockerBase& /*lock*/,
+        const ConnectionOptions& connectionOptions,
+        detail::QueryQueue* const queryQueue);
+
     void dropExpiredConnectionsThreadFunc();
     void reportQueryCancellation(std::unique_ptr<AbstractExecutor>);
     void onConnectionClosed(BaseRequestExecutor* const executorThreadPtr);
@@ -241,8 +303,10 @@ private:
         if (m_statisticsCollector)
             executor->setStatisticsCollector(m_statisticsCollector);
 
-        m_requestQueue.push(std::move(executor));
+        m_queryQueue.push(std::move(executor));
     }
+
+    void addCursorProcessingThread(const QnMutexLockerBase& lock);
 };
 
 } // namespace db

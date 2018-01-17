@@ -220,3 +220,8 @@ syntax: regexp
 nx_cloud/cloud_tests/monitoring/monitoring_simple.egg-info
 nx_cloud/cloud_tests/monitoring/env
 nx_cloud/cloud_tests/monitoring/dist
+cloud_portal/build_scripts/env
+nx_cloud_deploy/log_alarm_dispatcher/env
+nx_cloud_deploy/log_alarm_dispatcher/dist/log_alarm_dispatcher.zip
+nx_cloud_deploy/log_alarm_dispatcher/event.json
+nx_cloud_deploy/log_alarm_dispatcher/message.json

@@ -24,12 +24,12 @@ static bool readExtraFields(QnNetworkAddressEntryList& entryList, bool addFromCo
     }
     const QByteArray data = netSettings.readAll();
 
-    nx_http::LineSplitter lineSplitter;
+    nx::network::http::LineSplitter lineSplitter;
     QnByteArrayConstRef line;
     size_t bytesRead = 0;
     size_t dataOffset = 0;
     QnNetworkAddressEntry* currentEntry = nullptr;
-    while( lineSplitter.parseByLines( nx_http::ConstBufferRefType(data, dataOffset), &line, &bytesRead) )
+    while( lineSplitter.parseByLines( nx::network::http::ConstBufferRefType(data, dataOffset), &line, &bytesRead) )
     {
         dataOffset += bytesRead;
 
@@ -82,7 +82,7 @@ QnNetworkAddressEntryList systemNetworkAddressEntryList(bool* isOk, bool addFrom
     QnNetworkAddressEntryList entryList;
 
     const bool allInterfaces = (QnAppInfo::isBpi());
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces(allInterfaces))
+    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces(allInterfaces))
     {
         static const QChar kColon = ':';
         if (allInterfaces && iface.name.contains(kColon))

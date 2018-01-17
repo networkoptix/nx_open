@@ -6,7 +6,7 @@
 #include <nx/utils/timer_manager.h>
 
 #include <api/helpers/camera_id_helper.h>
-#include <core/dataprovider/h264_mp4_to_annexb.h>
+#include <providers/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 #include <recording/time_period.h>
@@ -32,9 +32,15 @@ StreamingChunkTranscoder::TranscodeContext::TranscodeContext():
 {
 }
 
-StreamingChunkTranscoder::StreamingChunkTranscoder(QnResourcePool* resPool, Flags flags):
+StreamingChunkTranscoder::StreamingChunkTranscoder(
+    QnResourcePool* resPool,
+    QnVideoCameraPool* videoCameraPool,
+    Flags flags)
+    :
+    m_resPool(resPool),
+    m_videoCameraPool(videoCameraPool),
     m_flags(flags),
-    m_resPool(resPool)
+    m_dataSourceCache(nx::utils::TimerManager::instance())
 {
     m_transcodeThreads.resize(TRANSCODE_THREAD_COUNT);
     for (size_t i = 0; i < m_transcodeThreads.size(); ++i)
@@ -94,8 +100,16 @@ bool StreamingChunkTranscoder::transcodeAsync(
         return false;
     }
 
-    auto camera = qnCameraPool->getVideoCamera(cameraResource);
-    NX_ASSERT(camera);
+    auto camera = videoCameraPool()->getVideoCamera(cameraResource);
+    // Camera is inserted to this pool asynchronously. So it could be a race condition when
+    // camera already at resourcePool but still missing at qnCameraPool.
+    if (!camera)
+    {
+        NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "
+            "Requested resource %1 is not completly registered yet")
+            .arg(transcodeParams.srcResourceUniqueID()), cl_logDEBUG1);
+        return false;
+    }
 
     // If requested stream time range is in the future for not futher than MAX_CHUNK_TIMESTAMP_ADVANCE
     // then scheduling transcoding task.
@@ -104,7 +118,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
 
     chunk->openForModification();
 
-    DataSourceContextPtr dataSourceCtx = 
+    DataSourceContextPtr dataSourceCtx =
         prepareDataSourceContext(cameraResource, camera, transcodeParams);
     if (!dataSourceCtx)
     {
@@ -118,15 +132,18 @@ bool StreamingChunkTranscoder::transcodeAsync(
             .arg(transcodeParams.startTimestamp()).arg(transcodeParams.duration()),
             cl_logDEBUG1);
 
-        const quint64 cacheEndTimestamp = 
-            camera->liveCache(transcodeParams.streamQuality())->currentTimestamp();
+        const auto liveCache = camera->liveCache(transcodeParams.streamQuality());
+        if (!liveCache)
+            return false;
+
+        const quint64 cacheEndTimestamp = liveCache->currentTimestamp();
         if (transcodeParams.alias().isEmpty() &&
             transcodeParams.startTimestamp() > cacheEndTimestamp &&
             transcodeParams.startTimestamp() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS)
         {
             // Chunk is in the future not futher than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS.
             // Scheduling transcoding on data availability.
-            std::pair<std::map<int, TranscodeContext>::iterator, bool> p = 
+            std::pair<std::map<int, TranscodeContext>::iterator, bool> p =
                 m_scheduledTranscodings.emplace(newTranscodingId, TranscodeContext());
             NX_ASSERT(p.second);
 
@@ -174,15 +191,38 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
     }
     else
     {
-        dataSourceCtx = DataSourceContextPtr(new DataSourceContext(nullptr, nullptr));
+        dataSourceCtx = std::make_shared<DataSourceContext>(nullptr, nullptr);
     }
 
     if (!dataSourceCtx->mediaDataProvider)
     {
-        dataSourceCtx->mediaDataProvider =
-            createMediaDataProvider(cameraResource, camera, transcodeParams);
-        if (!dataSourceCtx->mediaDataProvider)
+        AbstractOnDemandDataProviderPtr mediaDataProvider;
+        if (transcodeParams.live())
+        {
+            dataSourceCtx->videoCameraLocker =
+                videoCameraPool()->getVideoCameraLockerByResourceId(cameraResource->getId());
+            if (!dataSourceCtx->videoCameraLocker)
+            {
+                NX_DEBUG(this, lm("Could not lock camera %1 (%2)")
+                    .args(cameraResource->getId(), cameraResource->getName()));
+                return nullptr;
+            }
+            mediaDataProvider = createLiveMediaDataProvider(
+                *dataSourceCtx->videoCameraLocker,
+                camera,
+                transcodeParams);
+        }
+        else
+        {
+            mediaDataProvider = createArchiveReader(cameraResource, transcodeParams, QnUuid());
+            //< TODO: #dmishin Pass real client id
+        }
+
+        if (!mediaDataProvider)
             return nullptr;
+
+        dataSourceCtx->mediaDataProvider = AbstractOnDemandDataProviderPtr(
+            new H264Mp4ToAnnexB(mediaDataProvider));
     }
 
     if (!dataSourceCtx->transcoder)
@@ -202,89 +242,89 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
     return dataSourceCtx;
 }
 
-AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createMediaDataProvider(
-    QnSecurityCamResourcePtr cameraResource,
+AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createLiveMediaDataProvider(
+    const VideoCameraLocker& /*locker*/,
     QnVideoCameraPtr camera,
     const StreamingChunkCacheKey& transcodeParams)
 {
     using namespace std::chrono;
 
-    AbstractOnDemandDataProviderPtr mediaDataProvider;
+    const auto liveCache = camera->liveCache(transcodeParams.streamQuality());
+    if (!liveCache)
+        return nullptr;
 
-    // Checking requested time region: whether data is present (in archive or cache).
-    if (transcodeParams.live())
+    NX_LOGX(lm("Creating LIVE reader for resource %1, start timestamp %2, duration %3")
+        .arg(transcodeParams.srcResourceUniqueID())
+        .arg(transcodeParams.startTimestamp())
+        .arg(transcodeParams.duration()), cl_logDEBUG2);
+
+    const quint64 cacheStartTimestamp = liveCache->startTimestamp();
+    const quint64 cacheEndTimestamp = liveCache->currentTimestamp();
+    const quint64 actualStartTimestamp =
+        std::max<>(cacheStartTimestamp, transcodeParams.startTimestamp());
+    auto mediaDataProvider = AbstractOnDemandDataProviderPtr(
+        new LiveMediaCacheReader(liveCache, actualStartTimestamp));
+
+    if ((transcodeParams.startTimestamp() < cacheEndTimestamp && //< Requested data is in live cache (at least, partially).
+        transcodeParams.endTimestamp() > cacheStartTimestamp) ||
+        (transcodeParams.startTimestamp() > cacheEndTimestamp && //< Chunk is in the future not futher
+                                                                    //< than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS.
+            transcodeParams.startTimestamp() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS) ||
+        !transcodeParams.alias().isEmpty()) //< Has alias, startTimestamp may be invalid.
     {
-        if (!camera->liveCache(transcodeParams.streamQuality()))
-            return nullptr;
-
-        NX_LOGX(lm("Creating LIVE reader for resource %1, start timestamp %2, duration %3")
-            .arg(transcodeParams.srcResourceUniqueID())
-            .arg(transcodeParams.startTimestamp())
-            .arg(transcodeParams.duration()), cl_logDEBUG2);
-
-        const quint64 cacheStartTimestamp = 
-            camera->liveCache(transcodeParams.streamQuality())->startTimestamp();
-        const quint64 cacheEndTimestamp = 
-            camera->liveCache(transcodeParams.streamQuality())->currentTimestamp();
-        const quint64 actualStartTimestamp = 
-            std::max<>(cacheStartTimestamp, transcodeParams.startTimestamp());
-        mediaDataProvider = AbstractOnDemandDataProviderPtr(
-            new LiveMediaCacheReader(
-                camera->liveCache(transcodeParams.streamQuality()), actualStartTimestamp));
-
-        if ((transcodeParams.startTimestamp() < cacheEndTimestamp && //< Requested data is in live cache (at least, partially).
-            transcodeParams.endTimestamp() > cacheStartTimestamp) ||
-            (transcodeParams.startTimestamp() > cacheEndTimestamp && //< Chunk is in the future not futher
-                                                                     //< than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS.
-                transcodeParams.startTimestamp() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS) ||
-            !transcodeParams.alias().isEmpty()) //< Has alias, startTimestamp may be invalid.
-        {
-        }
-        else
-        {
-            // No data. e.g., request is too far away in the future.
-            return nullptr;
-        }
     }
     else
     {
-        NX_LOGX(lm("Creating archive reader for resource %1, start timestamp %2, duration %3")
-            .arg(transcodeParams.srcResourceUniqueID()).arg(transcodeParams.startTimestamp())
-            .arg(transcodeParams.duration()), cl_logDEBUG2);
-
-        // Creating archive reader.
-        QSharedPointer<QnAbstractStreamDataProvider> dp(
-            cameraResource->createDataProvider(Qn::CR_Archive));
-        if (!dp)
-        {
-            NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "
-                "Failed (1) to create archive data provider (resource %1)").
-                arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING);
-            return nullptr;
-        }
-
-        QnAbstractArchiveStreamReader* archiveReader = 
-            dynamic_cast<QnAbstractArchiveStreamReader*>(dp.data());
-        if (!archiveReader || !archiveReader->open())
-        {
-            NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "
-                "Failed (2) to create archive data provider (resource %1)").
-                arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING);
-            return nullptr;
-        }
-        archiveReader->setQuality(
-            transcodeParams.streamQuality() == MEDIA_Quality_High
-            ? MEDIA_Quality_ForceHigh
-            : transcodeParams.streamQuality(),
-            true);
-        archiveReader->setPlaybackRange(QnTimePeriod(
-            transcodeParams.startTimestamp() / USEC_IN_MSEC,
-            duration_cast<milliseconds>(transcodeParams.duration()).count()));
-        mediaDataProvider = OnDemandMediaDataProviderPtr(new OnDemandMediaDataProvider(dp));
-        archiveReader->start();
+        // No data. E.g., request is too far away in the future.
+        return nullptr;
     }
 
-    mediaDataProvider = AbstractOnDemandDataProviderPtr(new H264Mp4ToAnnexB(mediaDataProvider));
+    return mediaDataProvider;
+}
+
+AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
+    QnSecurityCamResourcePtr cameraResource,
+    const StreamingChunkCacheKey& transcodeParams,
+    const QnUuid& clientId)
+{
+    using namespace std::chrono;
+
+    NX_LOGX(lm("Creating archive reader for resource %1, start timestamp %2, duration %3")
+        .arg(transcodeParams.srcResourceUniqueID()).arg(transcodeParams.startTimestamp())
+        .arg(transcodeParams.duration()), cl_logDEBUG2);
+
+    // Creating archive reader.
+    QSharedPointer<QnAbstractStreamDataProvider> dp(
+        cameraResource->createDataProvider(Qn::CR_Archive));
+    if (!dp)
+    {
+        NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "
+            "Failed (1) to create archive data provider (resource %1)").
+            arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING);
+        return nullptr;
+    }
+
+    QnAbstractArchiveStreamReader* archiveReader =
+        dynamic_cast<QnAbstractArchiveStreamReader*>(dp.data());
+    archiveReader->getArchiveDelegate()->setGroupId(clientId.toByteArray());
+    archiveReader->getArchiveDelegate()->setPlaybackMode(PlaybackMode::Export);
+    if (!archiveReader || !archiveReader->open(/*archiveIntegrityWatcher*/ nullptr))
+    {
+        NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "
+            "Failed (2) to create archive data provider (resource %1)").
+            arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING);
+        return nullptr;
+    }
+    archiveReader->setQuality(
+        transcodeParams.streamQuality() == MEDIA_Quality_High
+        ? MEDIA_Quality_ForceHigh
+        : transcodeParams.streamQuality(),
+        true);
+    archiveReader->setPlaybackRange(QnTimePeriod(
+        transcodeParams.startTimestamp() / USEC_IN_MSEC,
+        duration_cast<milliseconds>(transcodeParams.duration()).count()));
+    auto mediaDataProvider = OnDemandMediaDataProviderPtr(new OnDemandMediaDataProvider(dp));
+    archiveReader->start();
 
     return mediaDataProvider;
 }
@@ -433,7 +473,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
         else
         {
             NX_ASSERT(false);
-            videoResolution = QSize(1280, 720); //< TODO/hls: #ak get resolution of resource video stream. 
+            videoResolution = QSize(1280, 720); //< TODO/hls: #ak get resolution of resource video stream.
                                                 //< This resolution is ignored when TM_DirectStreamCopy is used.
         }
     }
@@ -504,4 +544,10 @@ void StreamingChunkTranscoder::onResourceRemoved(const QnResourcePtr& resource)
     m_dataSourceCache.removeRange(
         StreamingChunkCacheKey(resourceIDStr),
         StreamingChunkCacheKey(nextResourceIDStr));
+}
+
+QnVideoCameraPool* StreamingChunkTranscoder::videoCameraPool()
+{
+    // TODO: #ak Fix it after fixing initialization order in MediaServerModule.
+    return m_videoCameraPool ? m_videoCameraPool : qnCameraPool;
 }

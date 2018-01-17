@@ -1,5 +1,7 @@
 #include "client_core_module.h"
 
+#include <QtQml/QQmlEngine>
+
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
@@ -39,6 +41,8 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
     m_commonModule->instance<QnLayoutTourStateManager>();
 
     m_commonModule->store(new watchers::KnownServerConnections(m_commonModule));
+
+    m_qmlEngine = new QQmlEngine(this);
 }
 
 QnClientCoreModule::~QnClientCoreModule()
@@ -64,4 +68,9 @@ QnPtzControllerPool* QnClientCoreModule::ptzControllerPool() const
 QnLayoutTourStateManager* QnClientCoreModule::layoutTourStateManager() const
 {
     return m_commonModule->instance<QnLayoutTourStateManager>();
+}
+
+QQmlEngine*QnClientCoreModule::mainQmlEngine()
+{
+    return m_qmlEngine;
 }

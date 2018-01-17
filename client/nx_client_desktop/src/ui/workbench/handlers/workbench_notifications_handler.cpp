@@ -88,8 +88,6 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
         });
 
     QnCommonMessageProcessor* messageProcessor = qnCommonMessageProcessor;
-    connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this,
-        &QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed);
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         &QnWorkbenchNotificationsHandler::at_eventManager_actionReceived);
 
@@ -127,7 +125,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
         return;
 
     const QScopedPointer<QnCameraBookmarkDialog> bookmarksDialog(
-        new QnCameraBookmarkDialog(true, mainWindow()));
+        new QnCameraBookmarkDialog(true, mainWindowWidget()));
 
     bookmark.description = QString(); //< Force user to fill description out.
     bookmarksDialog->loadData(bookmark);
@@ -224,14 +222,9 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
     addSystemHealthEvent(message, vms::event::AbstractActionPtr());
 }
 
-void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const vms::event::AbstractActionPtr &action)
+void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message,
+    const vms::event::AbstractActionPtr &action)
 {
-    if (message == QnSystemHealth::StoragesAreFull)
-        return; //Bug #2308: Need to remove notification "Storages are full"
-
-    if (!(qnSettings->popupSystemHealth() & (1ull << message)))
-        return;
-
     setSystemHealthEventVisibleInternal(message, QVariant::fromValue(action), true);
 }
 
@@ -255,10 +248,6 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     switch (message)
     {
         case QnSystemHealth::EmailIsEmpty:
-        case QnSystemHealth::RemoteArchiveSyncStarted:
-        case QnSystemHealth::RemoteArchiveSyncFinished:
-        case QnSystemHealth::RemoteArchiveSyncError:
-        case QnSystemHealth::RemoteArchiveSyncProgress:
             return false;
 
         case QnSystemHealth::NoLicenses:
@@ -266,11 +255,15 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
         case QnSystemHealth::UsersEmailIsEmpty:
         case QnSystemHealth::EmailSendError:
         case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::ArchiveRebuildFinished:
+        case QnSystemHealth::ArchiveIntegrityFailed:
         case QnSystemHealth::ArchiveRebuildCanceled:
         case QnSystemHealth::ArchiveFastScanFinished:
         case QnSystemHealth::SystemIsReadOnly:
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+        case QnSystemHealth::RemoteArchiveSyncError:
+        case QnSystemHealth::RemoteArchiveSyncProgress:
         case QnSystemHealth::CloudPromo:
             return true;
 
@@ -294,13 +287,14 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
     setSystemHealthEventVisibleInternal(message, QVariant::fromValue(resource), visible);
 }
 
-void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(QnSystemHealth::MessageType message,
+void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
+    QnSystemHealth::MessageType message,
     const QVariant& params,
     bool visible)
 {
     bool canShow = true;
 
-    bool connected = !commonModule()->remoteGUID().isNull();
+    const bool connected = !commonModule()->remoteGUID().isNull();
 
     if (!connected)
     {
@@ -323,8 +317,18 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(QnSyst
     /* Some messages are not to be displayed to users. */
     canShow &= (QnSystemHealth::isMessageVisible(message));
 
+    // TODO: remove this hack in VMS-7724
+    auto filterMessageKey = message;
+    if (message == QnSystemHealth::RemoteArchiveSyncFinished
+        || message == QnSystemHealth::RemoteArchiveSyncProgress
+        || message == QnSystemHealth::RemoteArchiveSyncError)
+    {
+        filterMessageKey = QnSystemHealth::RemoteArchiveSyncStarted;
+    }
+
     /* Checking that we want to see this message */
-    bool isAllowedByFilter = qnSettings->popupSystemHealth() & (1ull << message);
+    const bool isAllowedByFilter = qnSettings->popupSystemHealth().contains(filterMessageKey);
+
     canShow &= isAllowedByFilter;
 
     if (visible && canShow)
@@ -345,7 +349,6 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
     switch (message)
     {
         case QnSystemHealth::EmailSendError:
-        case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
@@ -415,11 +418,6 @@ void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserRe
     setSystemHealthEventVisible(message, user, visible);
 }
 
-void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed()
-{
-    clear();
-}
-
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
     const vms::event::AbstractActionPtr& action)
 {
@@ -480,15 +478,11 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id)
     if (id != QnClientSettings::POPUP_SYSTEM_HEALTH)
         return;
 
-    quint64 filter = qnSettings->popupSystemHealth();
-    for (int i = 0; i < QnSystemHealth::Count; i++)
+    auto filter = qnSettings->popupSystemHealth();
+    for (auto messageType: QnSystemHealth::allVisibleMessageTypes())
     {
-        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageOptional(messageType))
-            continue;
-
-        bool oldVisible = (m_popupSystemHealthFilter &  (1ull << i));
-        bool newVisible = (filter &  (1ull << i));
+        bool oldVisible = m_popupSystemHealthFilter.contains(messageType);
+        bool newVisible = filter.contains(messageType);
         if (oldVisible == newVisible)
             continue;
 

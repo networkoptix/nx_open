@@ -13,6 +13,7 @@
 #include <common/common_module_aware.h>
 
 class QnTimePeriod;
+struct QnEventLogFilterData;
 struct QnEventLogRequestData;
 
 namespace pb {
@@ -35,13 +36,15 @@ public:
     bool saveActionToDB(const nx::vms::event::AbstractActionPtr& action);
     bool removeLogForRes(const QnUuid& resId);
 
-    nx::vms::event::ActionDataList getActions(const QnEventLogRequestData& request) const;
+    nx::vms::event::ActionDataList getActions(const QnEventLogFilterData& request,
+        Qt::SortOrder order = Qt::AscendingOrder, int limit = std::numeric_limits<int>().max()) const;
 
     void getAndSerializeActions(const QnEventLogRequestData& request, QByteArray& result) const;
 
     QnAuditRecordList getAuditData(const QnTimePeriod& period, const QnUuid& sessionId = QnUuid());
     int auditRecordMaxId() const;
     bool addAuditRecords(const std::map<int, QnAuditRecord>& records);
+    bool closeUnclosedAuditRecords(int lastRunningTime);
 
     /* Bookmarks API */
 
@@ -77,7 +80,9 @@ private:
     bool bookmarksUniqueIdToCameraGuid();
     bool cleanupAuditLog();
 
-    QString getRequestStr(const QnEventLogRequestData& request) const;
+    QString getRequestStr(const QnEventLogFilterData& request,
+        Qt::SortOrder order = Qt::AscendingOrder, int limit = std::numeric_limits<int>().max()) const;
+
 private:
     qint64 m_lastCleanuptime;
     qint64 m_auditCleanuptime;

@@ -1,16 +1,17 @@
-import os
+import cv2
 import logging
-import time
-from datetime import datetime, timedelta
-import struct
 import math
+import os
+import struct
+import time
 import urllib
 import urlparse
+from datetime import datetime, timedelta
+
 import requests
 from requests.auth import HTTPDigestAuth
-import cv2
-from .utils import datetime_utc_to_timestamp
 
+from .utils import datetime_utc_to_timestamp
 
 log = logging.getLogger(__name__)
 
@@ -36,8 +37,9 @@ class Metadata(object):
 
     @classmethod
     def from_file(cls, file_path):
+        assert os.stat(file_path).st_size != 0, 'Server returned empty media stream'
         cap = cv2.VideoCapture(file_path)
-        assert cap.isOpened(), 'Media stream saved to %r is invalid' % file_path
+        assert cap.isOpened(), 'Media stream returned from server is invalid (saved to %r)' % file_path
         try:
             metadata = cls(cap)
             metadata.log_properties(file_path)
