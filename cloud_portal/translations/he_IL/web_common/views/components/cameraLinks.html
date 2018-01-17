@@ -51,12 +51,12 @@
                        ng-disabled="linkSettings.useAuth">&nbsp;השתמש באישורים</label></td>
         </tr>
         <tr ng-if="!linkSettings.useAuth && linkSettings.useCredentials">
-            <td><label class="camera-links-label" for="useLogin">שם משתמש</label></td>
+            <td><label class="camera-links-label" for="useLogin">כניסה</label></td>
             <td><input id="useLogin" type="text" class="input-sm camera-links-info"
                        ng-model="linkSettings.useLogin"></td>
         </tr>
         <tr ng-if="!linkSettings.useAuth && linkSettings.useCredentials">
-            <td><label class="camera-links-label" for="usePassword">סיסמה</label></td>
+            <td><label class="camera-links-label" for="usePassword">סיסמא</label></td>
             <td><input id="usePassword" type="text" class="input-sm camera-links-info"
                        ng-model="linkSettings.usePassword"></td>
         </tr>
