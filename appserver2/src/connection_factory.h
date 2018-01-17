@@ -74,6 +74,7 @@ namespace ec2 {
 
         QnJsonTransactionSerializer* jsonTranSerializer() const;
         QnUbjsonTransactionSerializer* ubjsonTranSerializer() const;
+        virtual void shutdown() override;
 
 private:
     QnMutex m_mutex;

@@ -3094,6 +3094,7 @@ void MediaServerProcess::run()
     //ptzPool.reset();
 
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
+    ec2ConnectionFactory->shutdown();
 
     //disconnecting from EC2
     clearEc2ConnectionGuard.reset();
