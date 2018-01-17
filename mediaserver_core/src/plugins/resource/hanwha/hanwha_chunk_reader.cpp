@@ -185,7 +185,7 @@ boost::optional<int> HanwhaChunkLoader::overlappedId() const
     QnMutexLocker lock(&m_mutex);
     NX_ASSERT(m_isNvr, lit("Method should be called only for NVRs"));
     if (m_isNvr)
-        return m_overlappedIds.front();
+        return m_overlappedIds.back();
 
     // For cameras we should import all chunks from all overlapped IDs.
     return boost::none;
@@ -309,9 +309,7 @@ void HanwhaChunkLoader::sendTimelineRequest()
         m_endTimeUs = AV_NOPTS_VALUE;
     }
 
-    bool arePreviousChunksInvalid =
-        m_overlappedIds.front() != m_lastNvrOverlappedId;
-
+    bool arePreviousChunksInvalid = m_overlappedIds.back() != m_lastNvrOverlappedId;
     if (arePreviousChunksInvalid)
     {
         m_chunks.clear();
@@ -319,10 +317,10 @@ void HanwhaChunkLoader::sendTimelineRequest()
         m_endTimeUs = AV_NOPTS_VALUE;
     }
 
-    m_lastNvrOverlappedId = m_overlappedIds.front();
+    m_lastNvrOverlappedId = m_overlappedIds.back();
 
     const auto overlappedId = m_isNvr
-        ? QString::number(m_overlappedIds.front())
+        ? QString::number(m_overlappedIds.back())
         : QString::number(*m_currentOverlappedId);
 
     using P = HanwhaRequestHelper::Parameters::value_type;
@@ -631,6 +629,8 @@ void HanwhaChunkLoader::parseOverlappedIdListData(const nx::Buffer& data)
                 m_overlappedIds.push_back(id);
         }
     }
+
+    std::sort(m_overlappedIds.begin(), m_overlappedIds.end());
 }
 
 void HanwhaChunkLoader::prepareHttpClient()
@@ -817,40 +817,23 @@ OverlappedTimePeriods HanwhaChunkLoader::overlappedTimelineThreadUnsafe(
     QnTimePeriod boundingPeriod(startTimeMs, endTimeMs - startTimeMs);
 
     OverlappedTimePeriods result;
-    if (isNvr())
+    for (auto itr = m_chunks.rbegin(); itr != m_chunks.rend(); ++itr)
     {
-        // In the case of NVR we must provide only chunks that
-        // belong to the latest overlapped ID.
-        const auto entry = m_chunks.rbegin();
-        if (entry == m_chunks.rend())
-            return result;
+        const auto overlappedId = itr->first;
+        const auto& chunksByChannel = itr->second;
 
-        const auto overlappedId = entry->first;
-        const auto chunksByChannel = entry->second;
-
-        if (chunksByChannel.size() < channelNumber + 1)
-            return result;
-
-        if (needToRestrictPeriods)
-            result[overlappedId] = chunksByChannel[channelNumber].intersected(boundingPeriod);
-        else
-            result[overlappedId] = chunksByChannel[channelNumber];
-
-        return result;
-    }
-
-    for (const auto& entry : m_chunks)
-    {
-        const auto overlappedId = entry.first;
-        const auto& chunksByChannel = entry.second;
-
-        if (chunksByChannel.size() < channelNumber + 1)
+        if (channelNumber >= chunksByChannel.size())
             continue;
 
         if (needToRestrictPeriods)
             result[overlappedId] = chunksByChannel[channelNumber].intersected(boundingPeriod);
         else
             result[overlappedId] = chunksByChannel[channelNumber];
+
+        // In the case of NVR we must provide only chunks that
+        // belong to the latest overlapped ID.
+        if (isNvr())
+            break;
     }
 
     return result;
@@ -891,6 +874,7 @@ void HanwhaChunkLoader::at_gotChunkData()
 
     QnMutexLocker lock(&m_mutex);
     // This function should be fast because of large amount of records for recorded data
+
     auto buffer = m_unfinishedLine;
     buffer.append(m_httpClient->fetchMessageBodyBuffer());
     int index = buffer.lastIndexOf('\n');
