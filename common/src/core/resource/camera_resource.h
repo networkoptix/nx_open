@@ -62,10 +62,13 @@ public:
     /** @return true if bitrateInfo.encoderIndex is not already saved. */
     bool saveBitrateIfNeeded( const CameraBitrateInfo& bitrateInfo );
 
-    /** Returns advanced live stream parameters. These parameters are configured on advanced tab.
-    * For primary stream this parameters are merged with parameters on record schedule.
-    */
-    QnAdvancedStreamParams advancedLiveStreamParams() const;
+    // TODO: Move to nx::mediaserver::resource::Camera, it should be used only on server cameras!
+    /**
+     * Returns advanced live stream parameters. These parameters are configured on advanced tab.
+     * For primary stream this parameters are merged with parameters on record schedule.
+     */
+    virtual QnAdvancedStreamParams advancedLiveStreamParams() const;
+
 private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
 

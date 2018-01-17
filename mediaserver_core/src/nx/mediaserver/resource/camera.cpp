@@ -236,6 +236,24 @@ void Camera::setAdvancedParametersAsync(
         toSharedPointer(this), values, std::move(handler)));
 }
 
+QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
+{
+    const auto getStreamParamiters =
+        [&](bool isPrimary)
+        {
+            const auto it = m_streamCapabilityAdvancedProviders.find(isPrimary);
+            if (it == m_streamCapabilityAdvancedProviders.end())
+                return QnLiveStreamParams();
+
+            return it->second->getParameters();
+        };
+
+    QnAdvancedStreamParams paramiters;
+    paramiters.primaryStream = getStreamParamiters(/*isPrimary*/ true);
+    paramiters.secondaryStream = getStreamParamiters(/*isPrimary*/ false);
+    return paramiters;
+}
+
 float Camera::getResolutionAspectRatio(const QSize& resolution)
 {
     if (resolution.height() == 0)
@@ -328,21 +346,24 @@ QSize Camera::closestResolution(
 
 CameraDiagnostics::Result Camera::initInternal()
 {
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    int timeoutSec = resData.value<int>(Qn::kUnauthrizedTimeoutParamName);
-    auto credentials = getAuth();
-    auto status = getStatus();
-    if (timeoutSec > 0 &&
-        m_lastInitTime.isValid() &&
-        m_lastInitTime.elapsed() < timeoutSec * 1000 &&
-        status == Qn::Unauthorized &&
-        m_lastCredentials == credentials)
+    if (qnStaticCommon)
     {
-        return CameraDiagnostics::NotAuthorisedResult(getUrl());
-    }
+        auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+        int timeoutSec = resData.value<int>(Qn::kUnauthrizedTimeoutParamName);
+        auto credentials = getAuth();
+        auto status = getStatus();
+        if (timeoutSec > 0 &&
+            m_lastInitTime.isValid() &&
+            m_lastInitTime.elapsed() < timeoutSec * 1000 &&
+            status == Qn::Unauthorized &&
+            m_lastCredentials == credentials)
+        {
+            return CameraDiagnostics::NotAuthorisedResult(getUrl());
+        }
 
-    m_lastInitTime.restart();
-    m_lastCredentials = credentials;
+        m_lastInitTime.restart();
+        m_lastCredentials = credentials;
+    }
 
     m_streamCapabilityAdvancedProviders.clear();
     m_defaultAdvancedParametersProviders = nullptr;

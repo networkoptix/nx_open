@@ -23,8 +23,6 @@
 
 namespace {
 
-static const QString kAdvancedLiveStreamParamsName(lit("advancedStreamParams"));
-
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
 static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 60;
 static const qint64 UPDATE_BITRATE_TIMEOUT_DAYS = 7;
@@ -458,6 +456,6 @@ void QnVirtualCameraResource::saveResolutionList( const CameraMediaStreams& supp
 
 QnAdvancedStreamParams QnVirtualCameraResource::advancedLiveStreamParams() const
 {
-    return QJson::deserialized<QnAdvancedStreamParams>(
-        getProperty(kAdvancedLiveStreamParamsName).toUtf8());
+    NX_ASSERT(false, lm("This method should not be called on client side."));
+    return QnAdvancedStreamParams();
 }

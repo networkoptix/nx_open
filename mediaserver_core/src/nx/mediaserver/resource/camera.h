@@ -68,6 +68,8 @@ public:
         const QnCameraAdvancedParamValueMap& values,
         std::function<void(const QSet<QString>&)> handler = nullptr);
 
+    virtual QnAdvancedStreamParams advancedLiveStreamParams() const override;
+
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
 
     /** Gets supported codecs and their resolution list. */
