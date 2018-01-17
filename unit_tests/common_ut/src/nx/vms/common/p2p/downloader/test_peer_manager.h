@@ -59,6 +59,7 @@ public:
 
     TestPeerManager();
 
+    void setPeerList(const QList<QnUuid>& peerList) { m_peerList = peerList; }
     void addPeer(const QnUuid& peerId, const QString& peerName = QString());
     QnUuid addPeer(const QString& peerName = QString());
 
@@ -86,6 +87,7 @@ public:
     virtual QnUuid selfId() const override;
     virtual QString peerString(const QnUuid& peerId) const;
     virtual QList<QnUuid> getAllPeers() const override;
+    virtual QList<QnUuid> peers() const override { return m_peerList; }
     virtual int distanceTo(const QnUuid&) const override;
     virtual bool hasInternetConnection(const QnUuid& peerId) const override;
 
@@ -137,6 +139,7 @@ private:
     int m_requestIndex = 0;
 
     QHash<nx::utils::Url, QString> m_fileByUrl;
+    QList<QnUuid> m_peerList;
 
     struct Request
     {
@@ -163,11 +166,13 @@ public:
     const RequestCounter* requestCounter() const;
 
     void requestWait(qint64 waitTime, TestPeerManager::WaitCallback callback);
+    void setPeerList(const QList<QnUuid>& peerList) { m_peerList = peerList; }
 
     // AbstractPeerManager implementation
     virtual QnUuid selfId() const override;
     virtual QString peerString(const QnUuid& peerId) const;
     virtual QList<QnUuid> getAllPeers() const override;
+    virtual QList<QnUuid> peers() const override { return m_peerList; }
     virtual int distanceTo(const QnUuid&) const override;
     virtual bool hasInternetConnection(const QnUuid& peerId) const override;
 
@@ -202,6 +207,7 @@ private:
     QnUuid m_selfId;
     QHash<QnUuid, int> m_distances;
     RequestCounter m_requestCounter;
+    QList<QnUuid> m_peerList;
 };
 
 } // namespace downloader

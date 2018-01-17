@@ -56,8 +56,11 @@ void DownloaderPrivate::createWorker(const QString& fileName)
     if (status != FileInformation::Status::downloaded
         && status != FileInformation::Status::uploading)
     {
+        auto peerPolicy = storage->fileInformation(fileName).peerPolicy;
         auto worker = new Worker(
-            fileName, storage.data(), peerManagerFactory->createPeerManager());
+            fileName,
+            storage.data(),
+            peerManagerFactory->createPeerManager(peerPolicy));
         workers[fileName] = worker;
 
         connect(worker, &Worker::finished, this, &DownloaderPrivate::at_workerFinished);
@@ -99,6 +102,12 @@ Downloader::Downloader(
     Q_D(Downloader);
     d->storage.reset(new Storage(downloadsDirectory));
 
+    connect(d->storage.data(), &Storage::fileAdded, this, &Downloader::fileAdded);
+    connect(d->storage.data(), &Storage::fileDeleted, this, &Downloader::fileDeleted);
+    connect(d->storage.data(), &Storage::fileInformationChanged, this,
+        &Downloader::fileInformationChanged);
+    connect(d->storage.data(), &Storage::fileStatusChanged, this, &Downloader::fileStatusChanged);
+
     d->peerManagerFactory = peerManagerFactory;
     if (!d->peerManagerFactory)
     {
@@ -106,8 +115,13 @@ Downloader::Downloader(
         d->peerManagerFactory = factory.get();
         d->peerManagerFactoryOwner = std::move(factory);
     }
+}
 
-    for (const auto& fileName: d->storage->files())
+
+void Downloader::atServerStart()
+{
+    Q_D(Downloader);
+    for (const auto& fileName : d->storage->files())
         d->createWorker(fileName);
 }
 

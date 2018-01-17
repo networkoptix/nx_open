@@ -1913,6 +1913,96 @@ content type "application/json". Example of such object:
                     </result>
                   </function>
                   <function>
+                    <name>analyticsLookupDetectedObjects</name>
+                    <description>Search analytics DB for objects that match filter specified.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>deviceId</name>
+                            <description>Id of camera.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>objectTypeId</name>
+                            <description>Analytics object type id.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>objectId</name>
+                            <description>Analytics object id.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>startTime</name>
+                            <description>Milliseconds since epoch (1970-01-01 00:00, UTC).</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>endTime</name>
+                            <description>Milliseconds since epoch (1970-01-01 00:00, UTC).</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>x1</name>
+                            <description>Top left "x" coordinate of picture bounding box to search within. In range [0.0; 1.0].</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>y1</name>
+                            <description>Top left "y" coordinate of picture bounding box to search within. In range [0.0; 1.0].</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>x2</name>
+                            <description>Bottom right "x" coordinate of picture bounding box to search within. In range [0.0; 1.0].</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>y2</name>
+                            <description>Bottom right "y" coordinate of picture bounding box to search within. In range [0.0; 1.0].</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>freeText</name>
+                            <description>Text to match within object's properties.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>limit</name>
+                            <description>Maximum number of objects to return.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>maxTrackSize</name>
+                            <description>Maximum length of elements of object's track.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>sortOrder</name>
+                            <description>Sort order of objects by track start timestamp.</description>
+                            <values>
+                                <value>
+                                    <name>asc</name>
+                                    <description>Ascending order.</description>
+                                </value>
+                                <value>
+                                    <name>desc</name>
+                                    <description>Descending order.</description>
+                                </value>
+                            </values>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>isLocal</name>
+                            <description>If "false" then request is forwarded to every other online server and results are merged. Otherwise, request is processed on receiving server only.</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                      <caption>JSON data.</caption>
+                    </result>
+                  </function>
+                  <function>
                     <name>storageSpace</name>
                     <description>Return a list of all server storages.</description>
                     <method>GET</method>

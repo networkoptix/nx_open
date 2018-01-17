@@ -1,16 +1,16 @@
-'''Mediaserver database test
+"""Mediaserver database test
 
-   https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85690455/Mediaserver+database+test
+https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85690455/Mediaserver+database+test
 
-   It tests some cases with main server database, such as:
-   - compatibility with database from previous version;
-   - backup/restore.
+It tests some cases with main server database, such as:
+- compatibility with database from previous version;
+- backup/restore.
 
-   You have to prepare old-version database files for the test in the bin directory:
-   * for 4.1 - v2.4.1-box1.db, v2.4.1-box2.db
+You have to prepare old-version database files for the test in the bin directory:
+* for 4.1 - v2.4.1-box1.db, v2.4.1-box2.db
 
-   All necessary files are on the rsync://noptix.enk.me/buildenv/test
-'''
+All necessary files are on the rsync://noptix.enk.me/buildenv/test
+"""
 
 import os
 import time
@@ -79,7 +79,7 @@ def check_camera(server, camera_guid):
 
 
 def assert_jsons_are_equal(json_one, json_two, json_name):
-    '''It fails after the first error'''
+    """It fails after the first error"""
     if isinstance(json_one, dict):
         assert json_one.keys() == json_two.keys(), "'%s' dicts have different keys" % json_name
         for key in json_one.keys():

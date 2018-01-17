@@ -60,16 +60,6 @@ public:
     bool haveChunksToDownload();
 
     /**
-     * Peers from which the worker will choose to perform the operation.
-     * All other peers from the peer manager will be ignored.
-     * This is used by updates manager to prevent the downloader from looking for files
-     * on peers which cannot contain an apropriate update file, e.g. ignore Linux servers
-     * when looking for updates for a Windows server.
-     */
-    QList<QnUuid> peers() const;
-    void setPeers(const QList<QnUuid>& peers);
-
-    /**
      * Preferred peers could be used to hint the worker where to find the file.
      * This is used similarly to forced peers but does not limit the worker in selecting
      * other peers.
@@ -154,7 +144,6 @@ private:
         void decreaseRank(int value = 1);
     };
     QHash<QnUuid, PeerInformation> m_peerInfoById;
-    QList<QnUuid> m_peers;
 
     boost::optional<int> m_subsequentChunksToDownload;
     bool m_usingInternet = false;

@@ -1,7 +1,7 @@
-'''Mediaserver and cloud protocol synchronization
+"""Mediaserver and cloud protocol synchronization
 
-   Initial task https://networkoptix.atlassian.net/browse/UT-42
-'''
+Initial task https://networkoptix.atlassian.net/browse/UT-42.
+"""
 import pytest
 
 

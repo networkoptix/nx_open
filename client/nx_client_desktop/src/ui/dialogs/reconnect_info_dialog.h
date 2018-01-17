@@ -19,9 +19,6 @@ public:
         Qt::WindowFlags windowFlags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     virtual ~QnReconnectInfoDialog();
 
-    QnMediaServerResourceList servers() const;
-    void setServers(const QnMediaServerResourceList &servers);
-
     QnMediaServerResourcePtr currentServer() const;
     void setCurrentServer(const QnMediaServerResourcePtr &server);
 

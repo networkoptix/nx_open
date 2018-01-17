@@ -1,4 +1,7 @@
-'Server controller: setup/start/stop server on vagrant boxes, remote or local hosts'
+"""Server controller
+
+Setup/start/stop server on vagrant boxes, remote or local hosts.
+"""
 
 import abc
 import os.path

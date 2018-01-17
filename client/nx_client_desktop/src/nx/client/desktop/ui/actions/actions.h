@@ -1140,7 +1140,7 @@ enum IDType
 
     ChangeDefaultCameraPasswordAction,
 
-    /** Start searhing for local files */
+    /** Start searhing for local files. */
     UpdateLocalFilesAction,
 
     // TODO: #dklychkov Remove when the new scene engine becomes default.

@@ -14,24 +14,30 @@
 #include <common/common_module.h>
 #include <network/system_helpers.h>
 #include <nx_ec/data/api_conversion_functions.h>
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace vms {
 namespace utils {
 
+QString makeNextUniqueName(const QString& prefix, int build)
+{
+    QString fileName;
+    for (int index = 0; ; ++index)
+    {
+        auto fileName = lm("%1_%2_%3.backup").args(prefix, build, index);
+        if (!QFile::exists(fileName))
+            return fileName;
+    }
+    return fileName; //< We never reach this line.
+}
+
 bool backupDatabase(
     const QString& outputDir,
     std::shared_ptr<ec2::AbstractECConnection> connection)
 {
-    QString dir = outputDir + lit("/");
-    QString fileName;
-    for (int i = -1; ; i++)
-    {
-        QString suffix = (i < 0) ? QString() : lit("_") + QString::number(i);
-        fileName = dir + lit("ecs") + suffix + lit(".backup");
-        if (!QFile::exists(fileName))
-            break;
-    }
+    const nx::utils::SoftwareVersion productVersion(nx::utils::AppInfo::applicationVersion());
+    QString fileName = makeNextUniqueName(outputDir + lit("/ecs"), productVersion.build());
 
     const ec2::ErrorCode errorCode = connection->dumpDatabaseToFileSync(fileName);
     if (errorCode != ec2::ErrorCode::ok)
@@ -39,7 +45,6 @@ bool backupDatabase(
         NX_LOG(lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)), cl_logERROR);
         return false;
     }
-
     return true;
 }
 

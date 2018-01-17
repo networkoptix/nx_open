@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>build_ut</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>4.0.0-SNAPSHOT</version>
+        <relativePath>../build_ut</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>4.0.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>nx_update_ut</artifactId>
+    <packaging>pom</packaging>
+    <name>Nx Update Unit Tests</name>
+
+    <properties>
+        <guid>${nx_update_ut.guid}</guid>
+        <qt.libs>core</qt.libs>
+        <global.libs>-lnx_update -lnx_utils -lnx_network -lcommon</global.libs>
+        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
+
+        <rdep.packages>gtest gmock </rdep.packages>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_update</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_update/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
+</project>

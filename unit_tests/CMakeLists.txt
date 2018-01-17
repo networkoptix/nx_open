@@ -4,6 +4,7 @@ add_subdirectory(nx_fusion_ut)
 add_subdirectory(utils_ut)
 add_subdirectory(nx_media_ut)
 add_subdirectory(nx_network_ut)
+add_subdirectory(nx_update_ut)
 
 if(withDesktopClient)
     add_subdirectory(client_core_ut)

@@ -21,7 +21,7 @@
 #include <network/universal_request_processor.h>
 #include <common/common_module.h>
 
-#include <ini.h>
+#include <mediaserver_ini.h>
 
 static const qint64 kUsPerMs = 1000;
 

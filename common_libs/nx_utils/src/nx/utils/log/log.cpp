@@ -32,18 +32,21 @@ std::vector<QString> QnLogs::getLoggerNames()
 
 std::shared_ptr<nx::utils::log::Logger> QnLogs::getLogger(int id)
 {
-    // Currently hardcoded in some places client.
-    if (id == 0) return nx::utils::log::mainLogger();
-    if (id == 1) return nx::utils::log::getExactLogger(QnLog::HTTP_LOG_INDEX);
-    if (id == 2) return nx::utils::log::getExactLogger(QnLog::HWID_LOG);
-    if (id == 3) return nx::utils::log::getExactLogger(QnLog::EC2_TRAN_LOG);
-    if (id == 4) return nx::utils::log::getExactLogger(QnLog::PERMISSIONS_LOG);
-    return nullptr;
+    // Currently hardcoded in some places of desktop client.
+    switch (id)
+    {
+        case 0: return nx::utils::log::mainLogger();
+        case 1: return nx::utils::log::getExactLogger(QnLog::HTTP_LOG_INDEX);
+        case 2: return nx::utils::log::getExactLogger(QnLog::HWID_LOG);
+        case 3: return nx::utils::log::getExactLogger(QnLog::EC2_TRAN_LOG);
+        case 4: return nx::utils::log::getExactLogger(QnLog::PERMISSIONS_LOG);
+        default: return nullptr;
+    }
 }
 
 std::shared_ptr<nx::utils::log::Logger> QnLogs::getLogger(const QString& name)
 {
-    if (name == kMainLogName) 
+    if (name == kMainLogName)
         return nx::utils::log::mainLogger();
 
     return nx::utils::log::getExactLogger(nx::utils::log::Tag(name));

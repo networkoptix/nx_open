@@ -283,6 +283,8 @@
 #include <rest/handlers/change_camera_password_rest_handler.h>
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
+#include <nx/mediaserver/updates2/updates2_manager.h>
+#include <nx/vms/common/p2p/downloader/downloader.h>
 
 
 #if !defined(EDGE_SERVER)
@@ -292,6 +294,7 @@
 
 #include <streaming/audio_streamer_pool.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
+#include "nx/mediaserver/rest/updates2/updates2_rest_handler.h"
 
 #if defined(__arm__)
     #include "nx1/info.h"
@@ -1203,6 +1206,8 @@ void MediaServerProcess::stopObjects()
         delete m_universalTcpListener;
         m_universalTcpListener = 0;
     }
+
+    qnServerModule->updates2Manager()->stopAsyncTasks();
 }
 
 void MediaServerProcess::updateDisabledVendorsIfNeeded()
@@ -1628,7 +1633,7 @@ void MediaServerProcess::registerRestHandlers(
     reg(
         "ec2/analyticsLookupDetectedObjects",
         new QnMultiserverAnalyticsLookupDetectedObjects(
-            "ec2/analyticsLookupDetectedObjects",
+            commonModule(),
             qnServerModule->analyticsEventsStorage()));
 
     reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(cloudManagerGroup));
@@ -1647,6 +1652,9 @@ void MediaServerProcess::registerRestHandlers(
     static const char kGetHardwareIdsPath[] = "api/getHardwareIds";
     reg(kGetHardwareIdsPath, new QnGetHardwareIdsRestHandler());
     reg("ec2/getHardwareIdsOfServers", new QnMultiserverGetHardwareIdsRestHandler(QLatin1String("/") + kGetHardwareIdsPath));
+
+    using namespace mediaserver::rest::updates2;
+    reg(kUpdates2Path, new Updates2RestHandler());
 }
 
 template<class TcpConnectionProcessor, typename... ExtraParam>
@@ -1807,7 +1815,7 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
         nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
     if (m_preparedTcpServerSockets.empty())
     {
-        qWarning().noquote() << "WARNING: Unable to prealocate TCP sockets on port" << port << ":"
+        qWarning().noquote() << "WARNING: Unable to preallocate TCP sockets on port" << port << ":"
             << SystemError::getLastOSErrorText();
     }
 
@@ -2244,6 +2252,16 @@ void MediaServerProcess::run()
         m_cmdLineArguments.enforcedMediatorEndpoint,
         m_cmdLineArguments.configFilePath,
         m_cmdLineArguments.rwConfigFilePath));
+
+    connect(
+        this, &MediaServerProcess::started,
+        [&serverModule]() { serverModule->updates2Manager()->atServerStart(); });
+
+    using namespace nx::vms::common::p2p::downloader;
+    connect(
+        this, &MediaServerProcess::started,
+        [&serverModule]() {serverModule->findInstance<Downloader>()->atServerStart(); });
+
 
     qnServerModule->runTimeSettings()->remove("rebuild");
 
@@ -3076,6 +3094,7 @@ void MediaServerProcess::run()
     //ptzPool.reset();
 
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
+    ec2ConnectionFactory->shutdown();
 
     //disconnecting from EC2
     clearEc2ConnectionGuard.reset();

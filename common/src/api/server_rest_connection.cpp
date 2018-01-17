@@ -270,6 +270,7 @@ Handle ServerConnection::addFileDownload(
     int size,
     const QByteArray& md5,
     const QUrl& url,
+    const QString& peerPolicy,
     GetCallback callback,
     QThread* targetThread)
 {
@@ -278,7 +279,8 @@ Handle ServerConnection::addFileDownload(
         QnRequestParamList{
             {lit("size"), QString::number(size)},
             {lit("md5"), QString::fromUtf8(md5)},
-            {lit("url"), url.toString()}},
+            {lit("url"), url.toString()},
+            {lit("peerPolicy"), peerPolicy }},
         QByteArray(),
         QByteArray(),
         callback,
@@ -479,11 +481,13 @@ Handle ServerConnection::changeCameraPassword(
 
 Handle ServerConnection::lookupDetectedObjects(
     const nx::analytics::storage::Filter& request,
+    bool isLocal,
     Result<nx::analytics::storage::LookupResult>::type callback,
     QThread* targetThread)
 {
     QnRequestParamList queryParams;
     nx::analytics::storage::serializeToParams(request, &queryParams);
+    queryParams.insert(lit("isLocal"), isLocal? lit("true") : lit("false"));
 
     return executeGet(
         lit("/ec2/analyticsLookupDetectedObjects"),
