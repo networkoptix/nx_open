@@ -1,6 +1,18 @@
 'use strict';
 
 angular.module('nxCommon')
+    .directive('voiceControl', function () {
+        return{
+        	restrict: 'E',
+        	scope:{
+        	    'voiceControls': '='
+        	},
+        	templateUrl: Config.viewsDirCommon + 'components/voiceControl.html',
+        	link: function(scope, element){
+		        scope.commands = L.common.voiceCommands;
+        	}
+        };
+    })
     .service('voiceControl', function () {
         if(!window.chrome){
             return;
@@ -18,12 +30,12 @@ angular.module('nxCommon')
 
 	    this.startListening = function() {
             recognition.start();
-            console.log('Ready to listen.');
+            //console.log('Ready to listen.');
         };
 
         this.stopListening = function(){
             recognition.stop();
-            console.log("Stop listening.");
+            //console.log("Stop listening.");
         };
 
         this.initControls = function(cameraDetails, switchPlaying, switchPosition, viewScope){
@@ -36,8 +48,8 @@ angular.module('nxCommon')
         recognition.onresult = function(event) {
             var last = event.results.length - 1;
             var text = event.results[last][0].transcript.replace(/^\ /i, '');
-            console.log(text);
-            console.log('Confidence: ' + event.results[0][0].confidence);
+            //console.log(text);
+            //console.log('Confidence: ' + event.results[0][0].confidence);
             var voicePatterns = {
                 "stop listening": /^(stop|halt|disable)\ (listening|eavsdropping)/i,
                 "play": /^(play|continue|start|go on)/im,
@@ -49,9 +61,10 @@ angular.module('nxCommon')
                 "close all servers": /close (all|servers)/i,
                 "open details": /^(open details|show details|open panel|open camera links)/im,
                 "close details": /^(close details|hide details|close panel|hide panel)/im,
-                "search": /^(search|look for|find)/im,
+                "clear search": /^(clear|empty)\ search/im,
+                "search": /^(search for|look for|find)/im,
                 "select": /^(select|choose|use|switch to)\ camera/im,
-                "clear search": /^(clear|empty)\ search/im
+                "help": /^(help|show commands)/im
             };
             var command = null;
             for(var k in voicePatterns){
@@ -112,6 +125,9 @@ angular.module('nxCommon')
                 case "stop listening":
                     self.viewScope.voiceControls.enabled = false;
                     self.stopListening();
+                    break;
+                case "help":
+                    self.viewScope.voiceControls.showCommands = true
                     break;
                 default:
                     console.log("Did not recognize command");

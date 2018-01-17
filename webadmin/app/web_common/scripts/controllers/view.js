@@ -30,7 +30,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         $scope.isWebAdmin = Config.webadminSystemApiCompatibility;
         $scope.cameraLinks = {enabled: $location.search().cameraLinks};
-        $scope.voiceControls = {enabled: true};
+        $scope.voiceControls = {enabled: false, showCommands: false};
 
         if(!$routeParams.cameraId && $scope.storage.cameraId){
             systemAPI.setCameraPath($scope.storage.cameraId);

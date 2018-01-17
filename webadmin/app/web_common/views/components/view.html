@@ -64,8 +64,13 @@
                                                         <span class="glyphicon glyphicon-cog"></span>Camera Details
                                                     </li>
                                                     <li class="video-settings-divider buffer" ng-if="betaMode || debugMode"></li>
+                                                    <li class="video-settings-button" ng-if="betaMode || debugMode"
+                                                        ng-click="voiceControls.showCommands=!voiceControls.showCommands">
+                                                        <span class="">List Voice Commands</span>
+                                                    </li>
+                                                    <li class="video-settings-divider buffer" ng-if="betaMode || debugMode"></li>
                                                     <li class="video-settings-button" ng-if="betaMode || debugMode">
-                                                        <label for="voiceControls">Voice Controls:</label>
+                                                        <label for="voiceControls">Enable Voice Controls:</label>
                                                         <input type="checkbox" id="voiceControls" ng-model="voiceControls.enabled">
                                                     </li>
                                                 </ul>
@@ -101,6 +106,7 @@
                                               live-mode="positionProvider.liveMode" active-camera="activeCamera"
                                               player="player" current-resolution="currentResolution"
                                               camera-links="cameraLinks"></camera-links>
+                                <voice-control ng-if="voiceControls.showCommands" voice-controls="voiceControls"></voice-control>
                                 <camera-view-informer flags="{'status':activeCamera.status,
                                                               'positionSelected': positionSelected,
                                                               'iOSVideoTooLarge': iOSVideoTooLarge}"

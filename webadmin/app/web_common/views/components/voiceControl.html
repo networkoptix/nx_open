@@ -1,0 +1,12 @@
+<div class="camera-links-panel night-mode">
+    <div ng-click="voiceControls.showCommands = false" class="pull-right">
+        <span class="glyphicon glyphicon-remove"></span>
+    </div>
+    <div class='camera-links-title'>Voice Commands</div>
+    <table>
+        <tr ng-repeat="(command, text) in commands">
+            <td>{{command}}</td>
+            <td class="camera-links-info" style="white-space: nowrap">{{text}}</td>
+        </tr>
+    </table>
+</div>
