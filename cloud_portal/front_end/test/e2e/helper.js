@@ -76,7 +76,8 @@ var Helper = function () {
             passwordGroup: element(by.css('password-input')),
             passwordInput: element(by.css('password-input')).element(by.css('input[type=password]')),
             submitButton: element(by.css('[form=registerForm]')).element(by.buttonText('Create Account')),
-            processSuccess: element(by.css('.process-success[ng-if="activate.success"]'))
+            processSuccess: element(by.css('.process-success[ng-if="activate.success"]')),
+            resendActivation: element(by.css('[form=reactivateAccount]')).element(by.buttonText('Resend activation link'))
         },
         account: {
             firstNameInput: element(by.model('account.first_name')),
@@ -95,6 +96,7 @@ var Helper = function () {
             submitButton: element(by.css('process-button[process="sharing"]'))
         },
         logout: {
+            email: element(by.css('.collapse-first')).element(by.css('.ellipsis')),
             navbar: element(by.css('header')).element(by.css('.navbar')),
             dropdownToggle: h.getParentOf(element(by.css('span.glyphicon-user'))),
             dropdownMenu: h.getGrandParentOf(element(by.css('span.glyphicon-user'))).element(by.css('[uib-dropdown-menu]')),
@@ -610,9 +612,9 @@ var Helper = function () {
     };
 
     this.emailSubjects = {
-        register: "Confirm your account",
+        register: "Activate your account",
         invite: " was shared with you",
-        restorePass: "Restore your password",
+        restorePass: "Reset your password",
         share: " was shared with you"
     };
 
