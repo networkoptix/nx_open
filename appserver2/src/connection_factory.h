@@ -76,6 +76,7 @@ namespace ec2 {
         QnUbjsonTransactionSerializer* ubjsonTranSerializer() const;
 
 private:
+    QnMutex m_mutex;
     Settings m_settingsInstance;
 
     std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
@@ -85,15 +86,14 @@ private:
     std::unique_ptr<QnTransactionLog> m_transactionLog;
     std::unique_ptr<TransactionMessageBusAdapter> m_bus;
 
-    std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
     std::unique_ptr<ServerQueryProcessorAccess> m_serverQueryProcessor;
+    std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
     std::unique_ptr<QnDistributedMutexManager> m_distributedMutexManager;
     bool m_terminated;
     int m_runningRequests;
     bool m_sslEnabled;
 
     ClientQueryProcessor m_remoteQueryProcessor;
-    QnMutex m_mutex;
     Ec2DirectConnectionPtr m_directConnection;
     bool m_p2pMode = false;
 private:
