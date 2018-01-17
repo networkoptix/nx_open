@@ -12,6 +12,7 @@ this behavior.
 
 import argparse
 import json
+import logging
 import os
 import shutil
 import sys
@@ -26,6 +27,8 @@ elif sys.version_info[:2] in {(3, 5), (3, 6)}:
     from http.server import HTTPServer, BaseHTTPRequestHandler
     # noinspection PyCompatibility,PyUnresolvedReferences
     from http.client import HTTPConnection
+
+_logger = logging.getLogger(__name__)
 
 UPDATE_PATH_PATTERN = '/{}/{}/update.json'
 UPDATES_PATH = '/updates.json'
@@ -210,7 +213,7 @@ def make_handler_class(root_obj, path_to_update, args):
 def main():
     args = parse_args()
     if args.generate_data:
-        print('Loading and generating data. Be patient')
+        _logger.info('Loading and generating data. Be patient')
         root_obj, path_to_update_obj = collect_actual_data()
         new_versions = [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')]
         new_root, new_path_to_update_obj = append_new_versions(root_obj, path_to_update_obj, new_versions)
@@ -222,16 +225,17 @@ def main():
         new_root, new_path_to_update_obj = load_data_from_files()
 
     server_address = ('', 8080)
-    print('Starting HTTP server')
+    _logger.info('Starting HTTP server')
     server = None
     try:
         server = HTTPServer(server_address, make_handler_class(new_root, new_path_to_update_obj, args))
         server.serve_forever()
     except KeyboardInterrupt:
-        print('Shutting down...')
+        _logger.info('Shutting down...')
         if server:
             server.shutdown()
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     main()
