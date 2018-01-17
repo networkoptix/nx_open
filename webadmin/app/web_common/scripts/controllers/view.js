@@ -438,7 +438,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         var timeFromUrl = $routeParams.time || null;
         $scope.$watch('activeCamera', function(){
             if(!$scope.activeCamera){
-                $scope.activeCamera = $scope.camerasProvider.getFirstCam();
+                $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
                 return;
             }
             $scope.player = null;

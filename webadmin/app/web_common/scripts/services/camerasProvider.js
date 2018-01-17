@@ -303,22 +303,39 @@ angular.module('nxCommon')
 
         //External Functions
         camerasProvider.prototype.getFirstAvailableCamera = function(cameraName){
+            var results = {'visible':[], 'hidden': []};
             var servers = this.mediaServers;
             var cameras = this.cameras;
             var getFirstCamera = cameraName === undefined;
             for(var i in servers){
                 var server = servers[i];
-                if(!server.visible || server.collapsed){
+                if(!server.visible){
                     continue;
                 }
                 for(var j in cameras[server.id]){
                     var camera = cameras[server.id][j];
                     if(camera.visible && (camera.name.replace(/ /g, '').toLowerCase().indexOf(cameraName) >= 0 || getFirstCamera)){
-                        return camera;
+                        if(getFirstCamera){
+                            return camera;
+                        }
+                        if(server.collapsed){
+                            results['hidden'].push(camera);
+                        }
+                        else{
+                            results['visible'].push(camera);
+                        }
                     }
                 }
             }
-            return null;
+            if(results['visible'].length > 0){
+                return results['visible'][0];
+            }
+            else if(results['hidden'].length > 0){
+                return results['hidden'][0];
+            }
+            else{
+                return null;
+            }
         };
 
         camerasProvider.prototype.getServerTimeOffset = function(serverId){
