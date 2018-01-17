@@ -36,7 +36,7 @@ static QString filePath()
 static qint64 refreshTimeout()
 {
     const auto settingsValue = qnServerModule->roSettings()->value(
-        nx_ms_conf::CHECK_FOR_UPDATE_REFRESH_TIMEOUT).toLongLong();
+        nx_ms_conf::CHECK_FOR_UPDATE_TIMEOUT).toLongLong();
     return settingsValue == 0 ? kRefreshTimeoutMs : settingsValue;
 }
 
