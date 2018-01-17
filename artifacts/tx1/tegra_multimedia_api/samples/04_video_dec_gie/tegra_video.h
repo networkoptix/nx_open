@@ -13,6 +13,7 @@
 class TEGRA_VIDEO_API TegraVideo
 {
 public:
+    // TODO: #mike: Eliminate createImpl() and createStub(); delete on the same level.
     static TegraVideo* create();
     static TegraVideo* createImpl();
     static TegraVideo* createStub();
