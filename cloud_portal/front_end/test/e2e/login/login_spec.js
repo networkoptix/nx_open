@@ -34,7 +34,11 @@ describe('Login dialog', function () {
 
     it("redirects to Systems after login", function () {
         p.helper.login();
-        // No need to check for login success since it's done at login() func
+
+        // Check that user is on page Systems
+        expect(browser.getCurrentUrl()).toContain('systems');
+        expect(p.htmlBody.getText()).toContain('Systems');
+
         p.helper.logout();
     });
 
@@ -46,7 +50,7 @@ describe('Login dialog', function () {
         p.login();
         p.helper.forms.logout.dropdownToggle.click();
 
-        expect(p.helper.forms.logout.dropdownParent.getText()).toContain(email);
+        expect(p.helper.forms.logout.email.getText()).toContain(email);
         expect(p.helper.forms.logout.dropdownMenu.getText()).toContain('Account Settings');
         expect(p.helper.forms.logout.dropdownMenu.getText()).toContain('Change Password');
         expect(p.helper.forms.logout.dropdownMenu.getText()).toContain('Log Out');
@@ -200,7 +204,7 @@ describe('Login dialog', function () {
         expect(p.restoreEmailInput.getAttribute('value')).toContain(currentEmail);
     });
 
-    it("rejects log in and shows error for inactivated user", function () {
+    it("redirects to /activate and shows non-activated user message when not activated; Resend activation button sends email", function () {
         var userEmail = p.helper.getRandomEmail();
 
         p.helper.register(null, null, userEmail);
@@ -208,9 +212,12 @@ describe('Login dialog', function () {
         p.emailInput.sendKeys(userEmail);
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.dialogLoginButton.click();
-        p.alert.catchAlert(p.alert.alertMessages.loginNotActive, p.alert.alertTypes.danger);
+        //p.alert.catchAlert(p.alert.alertMessages.loginNotActive, p.alert.alertTypes.danger);
+        expect(p.htmlBody.getText()).toContain('You have registered in Nx Cloud');
+        expect(p.htmlBody.getText()).toContain("We've sent you a letter with activation link to " + userEmail + ".");
+        expect(p.htmlBody.getText()).toContain("Please activate your account by visiting this link.");
+        expect(p.helper.forms.register.resendActivation.isDisplayed()).toBe(true);
     });
-
     p.alert.checkAlert(function(){
         var deferred = protractor.promise.defer();
         var userEmail = p.helper.getRandomEmail();
@@ -219,11 +226,13 @@ describe('Login dialog', function () {
         p.loginButton.click();
         p.emailInput.sendKeys(userEmail);
         p.passwordInput.sendKeys(p.helper.userPassword);
+
+        p.alert.submitButton.click();
         p.alert.submitButton.click();
 
         deferred.fulfill();
         return deferred.promise;
-    }, p.alert.alertMessages.loginNotActive, p.alert.alertTypes.danger, true);
+    }, p.alert.alertMessages.activationLinkSent, p.alert.alertTypes.success, true);
 
     xit("logs in with Remember Me checkmark switched on; after close browser, open browser enters same session", function () {
         //check remember me function by closing browser instance and opening it again
@@ -369,6 +378,7 @@ describe('Login dialog', function () {
 
     it("handles two tabs, rejects navigation on second tab if logout is done on first", function() {
         var termsConditions = element(by.linkText('Terms and Conditions'));
+        var email = p.helper.userEmailOwner;
         // Open Terms and Conditions link allows to open new tab. Opening new browser Tab is not supported in Selenium
         p.helper.get(p.helper.urls.register);
         browser.sleep(2000);
@@ -387,7 +397,7 @@ describe('Login dialog', function () {
                 // a real switch between tabs. For browser, tab stays not active,
                 // so login there does not affect other tabs
                 p.helper.forms.logout.dropdownToggle.click();
-                expect(p.helper.forms.logout.dropdownParent.getText()).toContain('noptixqa'); // user is logged in
+                expect(p.helper.forms.logout.email.getText()).toContain(email); // user is logged in
                 p.helper.forms.logout.dropdownToggle.click();
                 p.helper.logout();
             });

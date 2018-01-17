@@ -8,7 +8,7 @@ To view and manage it, please visit the link below to create account on {{PRODUC
 
 {{^message.sharer_name}}
 You have been granted access to video management system "{{message.system_name}}".
-To view and manage it, please create account on <0>{{PRODUCT_NAME}}</0> using your current email address and follow further instructions.
+You have been granted access to video management system "{{message.system_name}}".
 {{/message.sharer_name}}
 
 {{config.portal_url}}/register/{{message.code}}

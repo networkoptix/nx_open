@@ -19,10 +19,10 @@
         <!--Global libs-->
         <template>lib</template>
 
-        <qt.libs>core</qt.libs>
+        <qt.libs>core gui</qt.libs>
         <global.libs>-lnx_fusion -lnx_utils -lnx_network -lcommon</global.libs>
         <windows.oslibs>-lws2_32 DbgHelp.lib -lIphlpapi -lOle32  -lSecur32 -lwinmm</windows.oslibs>
-        <mac.oslibs>-framework IOKit -framework CoreFoundation  -lz -framework QtConcurrent</mac.oslibs>
+        <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
 
         <windows.defines>_USING_V110_SDK71_</windows.defines>

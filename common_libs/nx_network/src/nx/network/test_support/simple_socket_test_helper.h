@@ -935,11 +935,17 @@ void acceptedSocketOptionsInheritance(
 }
 
 template<typename ClientSocketMaker>
-void socketSingleAioThread(const ClientSocketMaker& clientMaker)
+void multipleSocketsBoundToTheSameThreadReportCompletionWithinSameThread(const ClientSocketMaker& clientMaker)
 {
     aio::AbstractAioThread* aioThread(nullptr);
-    std::vector<decltype(clientMaker())> sockets;
     nx::utils::TestSyncQueue<nx::utils::thread::id> threadIdQueue;
+    std::vector<decltype(clientMaker())> sockets;
+    auto socketsGuard = makeScopeGuard(
+        [&sockets]()
+        {
+            for (auto& each: sockets)
+                each->pleaseStopSync();
+        });
 
     const auto clientCount = testClientCount();
     for (size_t i = 0; i < clientCount; ++i)
@@ -954,12 +960,12 @@ void socketSingleAioThread(const ClientSocketMaker& clientMaker)
         else
             aioThread = client->getAioThread();
 
-        client->connectAsync("12.34.56.78:9999",
-                             [&](SystemError::ErrorCode code)
-        {
-            EXPECT_NE(code, SystemError::noError);
-            threadIdQueue.push(std::this_thread::get_id());
-        });
+        client->connectAsync(
+            "12.34.56.78:9999",
+            [&](SystemError::ErrorCode /*code*/)
+            {
+                threadIdQueue.push(std::this_thread::get_id());
+            });
 
         sockets.push_back(std::move(client));
     }
@@ -973,9 +979,6 @@ void socketSingleAioThread(const ClientSocketMaker& clientMaker)
         else
             aioThreadId = threadId;
     }
-
-    for (auto& each : sockets)
-        each->pleaseStopSync();
 }
 
 template<typename ClientSocketMaker>
@@ -1384,7 +1387,7 @@ typedef nx::network::test::StopType StopType;
 
 #define NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, SingleAioThread) \
-        { nx::network::test::socketSingleAioThread(mkClient); } \
+        { nx::network::test::multipleSocketsBoundToTheSameThreadReportCompletionWithinSameThread(mkClient); } \
     Type(Name, Shutdown) \
         { nx::network::test::socketShutdown(mkServer, mkClient, false, endpointToConnectTo); } \
     Type(Name, ShutdownAfterAsync) \

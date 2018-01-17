@@ -2,7 +2,7 @@
 
 {{PRODUCT_NAME}} köszöni részvételét. E-mail címe visszaigazolásához és fiókja aktiválásához kattintson az alábbi gombra.
 
-Fiók aktiválása: {{config.portal_url}}/aktiválás/{{message.code}}
+Fiók aktiválása: {{config.portal_url}}/hatékonnyá tesz/{{message.code}}
 
 Ha nem regisztrált {{PRODUCT_NAME}} alkalmazásban ne foglalkozzon ezzel az e-maillel.
 Kérjük senkinek se továbbítsa ezt az üzenetet.

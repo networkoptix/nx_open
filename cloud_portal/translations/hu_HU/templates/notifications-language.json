@@ -1,6 +1,6 @@
 {
   "activate_account": {
-    "emailSubject": "Fiók nyugtázása"
+    "emailSubject": "Fiók nyugtásása"
   },
   "restore_password": {
     "emailSubject": "Jelszó visszaállítása"
