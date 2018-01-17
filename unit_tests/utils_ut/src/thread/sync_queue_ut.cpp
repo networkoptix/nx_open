@@ -74,7 +74,7 @@ TEST_F(SyncQueue, TimedPop)
     const std::chrono::milliseconds kSmallDelay(100);
     const std::chrono::seconds kLongDelay(10);
 
-    ASSERT_FALSE(queue.pop(kSmallDelay));
+    ASSERT_FALSE(static_cast<bool>(queue.pop(kSmallDelay)));
 
     auto pusher1 = pushAsync({1}, kSmallDelay);
     const auto value1 = queue.pop(kLongDelay);
@@ -82,7 +82,7 @@ TEST_F(SyncQueue, TimedPop)
     ASSERT_EQ(*value1, 1);
     pusher1.join();
 
-    ASSERT_FALSE(queue.pop(kSmallDelay));
+    ASSERT_FALSE(static_cast<bool>(queue.pop(kSmallDelay)));
 
     auto pusher2 = pushAsync({2}, kSmallDelay);
     const auto value2 = queue.pop(kLongDelay);
@@ -90,7 +90,7 @@ TEST_F(SyncQueue, TimedPop)
     ASSERT_EQ(*value2, 2);
     pusher2.join();
 
-    ASSERT_FALSE(queue.pop(kSmallDelay));
+    ASSERT_FALSE(static_cast<bool>(queue.pop(kSmallDelay)));
 }
 
 class SyncQueueTermination:
@@ -132,7 +132,7 @@ protected:
     {
         // If reader did not stop we will hang in destructor, so doing nothing here.
     }
-    
+
     void verifyThatOtherReadersAreWorking()
     {
         QnMutex mutex;
@@ -165,7 +165,7 @@ private:
     };
 
     using Readers = std::map<QueueReaderId, ReaderContext>;
-    using OnElementReadHandler = 
+    using OnElementReadHandler =
         nx::utils::MoveOnlyFunc<void(QueueReaderId /*readerId*/, int /*value*/)>;
 
     Readers m_readers;
