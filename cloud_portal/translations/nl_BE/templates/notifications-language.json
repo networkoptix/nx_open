@@ -3,7 +3,7 @@
     "emailSubject": "Bevestig uw account"
   },
   "restore_password": {
-    "emailSubject": "Herstel uw wachtwoord"
+    "emailSubject": "Uw wachtwoord opnieuw instellen"
   },
   "system_invite": {
     "emailSubject": "Videosysteem {{message.system_name}} is met u gedeeld"

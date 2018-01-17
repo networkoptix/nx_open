@@ -198,15 +198,13 @@ angular.module('nxCommon')
                     }
                 }
 
-                var pausedLive = false;
                 function playPause(){
                     if(scope.positionProvider.playing){
-                        pausedLive = scope.positionProvider.liveMode;
                         scope.playHandler(false);
-                    }else if(pausedLive){
-                        jumpToPosition(scope.positionProvider.playedPosition);
-                        scope.playHandler(true);
                     }else{
+                        if(!scope.emptyArchive){
+                            jumpToPosition(scope.positionProvider.playedPosition);
+                        }
                         scope.playHandler(true);
                     }
 
