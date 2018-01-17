@@ -92,7 +92,9 @@ void UploadWorker::cancel()
     FileUpload::Status status = d->upload.status;
     if (status == FileUpload::Initial || status == FileUpload::Done ||
         status == FileUpload::Error || status == FileUpload::Canceled)
+    {
         return;
+    }
 
     handleStop();
     d->upload.status = FileUpload::Canceled;
