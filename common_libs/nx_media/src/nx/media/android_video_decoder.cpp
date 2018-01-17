@@ -55,6 +55,12 @@ static const GLfloat g_texture_data[] = {
     0.f, 1.f
 };
 
+bool isValidFrameSize(const QSize& size)
+{
+    static const auto kMinimumFrameSize = QSize(64, 64);
+    return size.width() >= kMinimumFrameSize.width()
+        && size.height() >= kMinimumFrameSize.height();
+}
 
 /**
  * Convert codec from ffmpeg enum to Android codec string representation.
@@ -64,6 +70,8 @@ static QString codecToString(AVCodecID codecId)
 {
     switch(codecId)
     {
+        case AV_CODEC_ID_H265:
+            return lit("video/hevc");
         case AV_CODEC_ID_H264:
             return lit("video/avc");
         case AV_CODEC_ID_H263:
@@ -255,8 +263,6 @@ QMutex AndroidVideoDecoderPrivate::maxResolutionsMutex;
 
 FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
 {
-    QElapsedTimer tm;
-    tm.restart();
 
     QOpenGLFunctions *funcs = QOpenGLContext::currentContext()->functions();
 
@@ -265,11 +271,7 @@ FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
 
     CHECK_GL_ERROR
 
-    auto t1 = tm.elapsed();
-
     updateTexImage();
-
-    auto t2 = tm.elapsed();
 
     // save current render states
     GLboolean stencilTestEnabled;
@@ -334,17 +336,12 @@ FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
     if (blendEnabled)
         glEnable(GL_BLEND);
 
-    auto t3 = tm.elapsed();
-
     if (threadGlCtx)
     {
         // We used decoder thread to render. Flush everything to the texture.
         glFlush();
         glFinish();
     }
-
-    auto t4 = tm.elapsed();
-    //NX_LOG(lit("render t1=%1 t2=%2 t3=%3 t4=%4").arg(t1).arg(t2).arg(t3).arg(t4), cl_logINFO);
 
     return fbo;
 }
@@ -413,7 +410,7 @@ AndroidVideoDecoder::AndroidVideoDecoder(
 
             if (d->threadGlCtx->create() && d->threadGlCtx->shareContext())
             {
-                NX_LOG(lit("Using shared openGL ctx"), cl_logINFO);
+                NX_DEBUG(this, lit("Using shared openGL ctx"));
                 d->offscreenSurface.reset(new QOffscreenSurface());
                 d->offscreenSurface->setFormat(d->threadGlCtx->format());
                 d->offscreenSurface->create();
@@ -452,13 +449,15 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
         if (maxSize.isEmpty())
         {
             // NOTE: Zeroes come from JNI in case the Java class was not loaded due to some issue.
-            NX_LOG(lm("ERROR: Android Video Decoder failed to report max resolution for codec %1")
-                .arg(codecMimeType), cl_logERROR);
+            NX_WARNING(typeid(AndroidVideoDecoderPrivate),
+                lm("ERROR: Android Video Decoder failed to report max resolution for codec %1")
+                .arg(codecMimeType));
         }
         else
         {
-            NX_LOG(lm("Maximum hardware decoder resolution: %1 for codec %2")
-                .arg(maxSize).arg(codecMimeType), cl_logWARNING);
+            NX_INFO(typeid(AndroidVideoDecoderPrivate),
+                lm("Maximum hardware decoder resolution: %1 for codec %2")
+                .arg(maxSize).arg(codecMimeType));
             maxResolutions[codec] = maxSize;
         }
     }
@@ -482,10 +481,14 @@ bool AndroidVideoDecoder::isCompatible(
 
     if (resolution.width() > maxSize.width() || resolution.height() > maxSize.height())
     {
-        NX_LOG(lm("Codec for %1 is not compatible with resolution %2 because max is %3")
-            .arg(codecToString(codec)).arg(resolution).arg(maxSize), cl_logWARNING);
+        NX_WARNING(typeid(AndroidVideoDecoder),
+            lm("Codec for %1 is not compatible with resolution %2 because max is %3")
+            .arg(codecToString(codec)).arg(resolution).arg(maxSize));
         return false;
     }
+
+    NX_DEBUG(typeid(AndroidVideoDecoder), lm("Codec %1 is compatible with resolution %2")
+        .arg(codecToString(codec)).arg(resolution));
 
     return true;
 }
@@ -508,7 +511,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
             return 0;
 
         d->frameSize = QSize(frame->width, frame->height);
-        if (d->frameSize.isEmpty())
+        if (!isValidFrameSize(d->frameSize))
             d->frameSize = nx::media::AbstractVideoDecoder::mediaSizeFromRawData(frame);
         if (d->frameSize.isEmpty())
             return 0; //< Wait for I frame to be able to extract data from the binary stream.
@@ -583,7 +586,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
         }
     #endif
 
-    //NX_LOG(lit("--got frame num %1 decode time1=%2 time2=%3").arg(outFrameNum).arg(time1).arg(tm.elapsed()), cl_logINFO);
+    NX_VERBOSE(this, lit("got frame num %1 decode time1=%2 time2=%3").arg(outFrameNum).arg(time1).arg(tm.elapsed()));
 
     QAbstractVideoBuffer* buffer = new TextureBuffer (std::move(fboToRender), d);
     QVideoFrame* videoFrame = new QVideoFrame(buffer, d->frameSize, QVideoFrame::Format_BGR32);
@@ -599,6 +602,11 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
 
     result->reset(videoFrame);
     return (int) outFrameNum - 1; //< convert range [1..N] to [0..N]
+}
+
+AbstractVideoDecoder::Capabilities AndroidVideoDecoder::capabilities() const
+{
+    return Capability::hardwareAccelerated;
 }
 
 QVariant TextureBuffer::handle() const

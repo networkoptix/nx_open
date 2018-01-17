@@ -1,7 +1,10 @@
 # Components Namings
+set(defaultSkin "dark_blue")
 set(parent.customization "default")
 set(product.name "VMS Smart Client")
 set(display.product.name "VMS DTV")
+set(display_mobile_name "VMS DTV")
+set(mobile_bundle_name "VMSDTV")
 set(product.name.short "ust")
 set(product.appName "vmsdtv")
 set(company.name "UST")

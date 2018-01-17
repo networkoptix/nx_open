@@ -24,6 +24,8 @@
 #include <settings/last_connection.h>
 #include <settings/qml_settings_adaptor.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/cloud/address_resolver.h>
 
 using namespace nx::vms::utils;
 
@@ -226,6 +228,11 @@ void QnContext::removeSavedConnection(const QString& localSystemId, const QStrin
     qnClientCoreSettings->save();
 }
 
+void QnContext::clearSavedPasswords()
+{
+    nx::client::core::helpers::clearSavedPasswords();
+}
+
 void QnContext::clearLastUsedConnection()
 {
     qnSettings->setLastUsedConnection(LastConnectionData());
@@ -239,6 +246,11 @@ QString QnContext::getLastUsedSystemName() const
 QUrl QnContext::getLastUsedUrl() const
 {
     return qnSettings->lastUsedConnection().urlWithCredentials();
+}
+
+bool QnContext::isCloudConnectionUrl(const QUrl& url)
+{
+    return url.scheme() == QnConnectionManager::kCloudConnectionScheme;
 }
 
 QUrl QnContext::getInitialUrl() const

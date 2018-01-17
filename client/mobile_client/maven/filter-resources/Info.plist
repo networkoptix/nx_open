@@ -6,6 +6,8 @@
 	<string></string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<true/>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleExecutable</key>
@@ -13,15 +15,20 @@
 	<key>CFBundleIdentifier</key>
 	<string>${ios.new_bundle_identifier}</string>
 	<key>CFBundleDisplayName</key>
-	<string>${display.mobile.name}</string>
+	<string>${display_mobile_name}</string>
 	<key>CFBundleName</key>
-	<string>${display.mobile.name}</string>
+	<string>${mobile_bundle_name}</string>
 	<key>CFBundleShortVersionString</key>
 	<string>${project.version.name}</string>
 	<key>CFBundleVersion</key>
 	<string>${project.version.code}</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>UIDeviceFamily</key>
+	<array>
+	    <integer>1</integer>
+	    <integer>2</integer>
+	</array>
 	<key>NSAppTransportSecurity</key>  
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

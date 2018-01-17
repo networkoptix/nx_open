@@ -82,15 +82,6 @@
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Cloud Systeem kan alleen met non-cloud worden samengevoegd. Systeemnaam en wachtwoord worden afkomstig van Cloud Systeem.</translation>
     </message>
-    <message>
-      <source>New System</source>
-      <translation type="unfinished">New System</translation>
-    </message>
-    <message>
-      <source>The discovered System %1 is incompatible with the current System.</source>
-      <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
-    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -484,7 +475,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation>Tijdlicenties</translation>
+      <translation>Testlicenties</translation>
     </message>
   </context>
   <context>
@@ -550,7 +541,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation>Server met bijpassende Hardware-ID niet gevonden</translation>
+      <translation>Server met bijpassende Hardware-Id niet gevonden</translation>
     </message>
   </context>
   <context>
@@ -673,11 +664,11 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation>Hardware ID</translation>
+      <translation>Hardware Id: %1</translation>
     </message>
     <message>
       <source>Time License</source>
-      <translation>Tijdlicentie</translation>
+      <translation>Testicentie</translation>
     </message>
   </context>
   <context>
@@ -1000,7 +991,7 @@
     </message>
     <message>
       <source>Custom Role</source>
-      <translation>Aangepaste rollen</translation>
+      <translation>Aangepaste profielen</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1020,7 +1011,7 @@
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation>Aangepaste gebruikersrol.</translation>
+      <translation>Aangepast profiel.</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
@@ -1047,7 +1038,7 @@
     </message>
     <message>
       <source>Write to log</source>
-      <translation>Schrijf weg naar het log</translation>
+      <translation>Schrijf weg naar het logboek</translation>
     </message>
     <message>
       <source>Show notification</source>
@@ -1075,7 +1066,7 @@
     </message>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation>Toon op alarm layout</translation>
+      <translation>Toon op alarm scherm</translation>
     </message>
     <message>
       <source>Do HTTP request</source>
@@ -1313,7 +1304,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1457,7 +1448,7 @@
     </message>
     <message>
       <source>Role</source>
-      <translation>Rol</translation>
+      <translation>Profiel</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -1469,8 +1460,8 @@
     <message numerus="yes">
       <source>%n Roles</source>
       <translation>
-        <numerusform>%n Rollen</numerusform>
-        <numerusform>%n Rollen</numerusform>
+        <numerusform>%n Profielen</numerusform>
+        <numerusform>%n Profielen</numerusform>
       </translation>
     </message>
     <message>

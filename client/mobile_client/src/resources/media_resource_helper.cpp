@@ -43,6 +43,12 @@ QnMediaResourceHelper::~QnMediaResourceHelper()
 {
 }
 
+bool QnMediaResourceHelper::analogCameraWithoutLicense() const
+{
+    Q_D(const QnMediaResourceHelper);
+    return d->camera && d->camera->isDtsBased() && !d->camera->isLicenseUsed();
+}
+
 QString QnMediaResourceHelper::serverName() const
 {
     Q_D(const QnMediaResourceHelper);
@@ -160,6 +166,8 @@ void QnMediaResourceHelperPrivate::handleResourceChanged()
             q, &QnMediaResourceHelper::videoLayoutChanged);
         connect(camera, &QnResource::mediaDewarpingParamsChanged,
             q, &QnMediaResourceHelper::fisheyeParamsChanged);
+        connect(camera, &QnVirtualCameraResource::licenseUsedChanged,
+            q, &QnMediaResourceHelper::analogCameraWithoutLicenseChanged);
 
         updateServer();
     }
@@ -169,4 +177,5 @@ void QnMediaResourceHelperPrivate::handleResourceChanged()
     emit q->resourceStatusChanged();
     emit q->videoLayoutChanged();
     emit q->fisheyeParamsChanged();
+    emit q->analogCameraWithoutLicenseChanged();
 }

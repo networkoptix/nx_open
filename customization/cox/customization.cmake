@@ -1,7 +1,10 @@
 # Components Namings
 set(parent.customization "default")
+set(defaultSkin "dark_blue")
 set(product.name "Cox Business Security Solutions")
 set(display.product.name "Cox Business Security Solutions")
+set(display_mobile_name "${display.product.name} Surveillance")
+set(mobile_bundle_name "CoxSurveillance")
 set(product.name.short "dwspectrum")
 set(product.appName "coxvms")
 set(company.name "Cox Communications")
@@ -43,13 +46,12 @@ set(mac.bundle.identifier "com.networkoptix.HDWitness2")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 set(mac.skip.sign "true")
 
+set(codeSigning "OFF")
 
 set(ios.skip.sign "true")
 set(ios.new_bundle_identifier "com.cox.cb.vms")
 set(ios.group_identifier "group.com.cox.cb.hdsec")
 set(ios.sign.identity "iPhone Developer: Ivan Vigasin (KZ74EE5FP2)")
-
-set(display.mobile.name "${display.product.name} Surveillance")
 
 # Other customizations.
 set(freeLicenseIsTrial "true")

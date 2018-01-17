@@ -4,7 +4,8 @@ set(compatibleCustomizations "default_cn" "default_zh_CN")
 
 # Components Namings
 set(display.product.name "Nx Witness")
-set(display.mobile.name "Nx Mobile")
+set(display_mobile_name "Nx Mobile")
+set(mobile_bundle_name "NxMobile")
 set(product.name "HD Witness")
 set(product.name.short "hdwitness")
 set(product.appName "hdwitness")

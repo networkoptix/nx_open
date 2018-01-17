@@ -41,7 +41,7 @@ set(target_args
         "${CMAKE_CURRENT_BINARY_DIR}/mobile_client_app_info_impl.cpp"
         ${ios_sources}
     ADDITIONAL_RESOURCES
-        "${customization_dir}/mobile_client/resources"
+        ${CMAKE_CURRENT_SOURCE_DIR}/skins/${defaultSkin}
     OTHER_SOURCES
         ${QML_FILES}
         ${resources}
@@ -78,20 +78,34 @@ if(ANDROID)
     get_target_property(FFMPEG_LIBS ffmpeg INTERFACE_LINK_LIBRARIES)
     get_target_property(OPENAL_LIBS openal INTERFACE_LINK_LIBRARIES)
 
-    add_android_apk(mobile_client.apk TARGET mobile_client
-        APK_NAME "${mobile_client_distribution_name}.apk"
+    set(apk_file_name "${distribution_output_dir}/${mobile_client_distribution_name}.apk")
+
+    if(codeSigning)
+        set(code_signing_parameters
+            KEYSTORE_FILE "${customization_dir}/mobile_client/key.store"
+            KEYSTORE_ALIAS "${android.alias}"
+            KEYSTORE_PASSWORD "${android.storepass}"
+            KEYSTORE_KEY_PASSWORD "${android.keypass}"
+        )
+    else()
+        set(code_signing_parameters)
+    endif()
+
+    add_android_apk(mobile_client_apk TARGET mobile_client
+        FILE_NAME ${apk_file_name}
         PACKAGE_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/android"
         QML_ROOT_PATH "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
         VERSION "${mobileClientVersion.full}"
         EXTRA_LIBS ${OPENSSL_LIBS} ${FFMPEG_LIBS} ${OPENAL_LIBS}
-        KEYSTORE_FILE "${customization_dir}/mobile_client/key.store"
-        KEYSTORE_ALIAS "hdwitness"
-        KEYSTORE_PASSWORD "hYCmvTDu"
-        KEYSTORE_KEY_PASSWORD "31O2zNNy"
+        ${code_signing_parameters}
     )
 endif()
 
 if(IOS)
+    if(mobile_bundle_name STREQUAL display_mobile_name)
+        message(FATAL_ERROR "mobile_bundle_name cannot be equal to display_mobile_name.")
+    endif()
+
     set(provisioning_profiles_dir "${certificates_path}/mobile_client/ios/provisioning_profiles")
 
     if(beta)
@@ -118,11 +132,27 @@ if(IOS)
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/maven/filter-resources/Info.plist"
         RESOURCE "${resources}"
-        XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
-        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
-        XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
         XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES FALSE
+        XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
     )
+
+    if(NOT codeSigning)
+        set_target_properties(mobile_client PROPERTIES
+            XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
+            XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO"
+        )
+    elseif(developerBuild)
+        set_target_properties(mobile_client PROPERTIES
+            XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
+            XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${apple_team_id}"
+        )
+    else()
+        set_target_properties(mobile_client PROPERTIES
+            XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
+            XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
+            XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
+        )
+    endif()
 
     setup_ios_application(mobile_client
         ADDITIONAL_PLUGINS qtmedia_audioengine qtaudio_coreaudio
@@ -139,6 +169,7 @@ if(IOS)
         Qt5WebView
     )
 
-    add_ios_ipa(mobile_client_ipa TARGET mobile_client
-        FILE_NAME "${CMAKE_BINARY_DIR}/${mobile_client_distribution_name}.ipa")
+    set(ipa_file_name "${distribution_output_dir}/${mobile_client_distribution_name}.ipa")
+
+    add_ios_ipa(mobile_client_ipa TARGET mobile_client FILE_NAME ${ipa_file_name})
 endif()

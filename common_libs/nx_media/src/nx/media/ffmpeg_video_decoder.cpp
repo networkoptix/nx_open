@@ -221,7 +221,7 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
 //-------------------------------------------------------------------------------------------------
 // FfmpegDecoder
 
-QSize FfmpegVideoDecoder::s_maxResolution;
+QMap<int, QSize> FfmpegVideoDecoder::s_maxResolutions;
 
 FfmpegVideoDecoder::FfmpegVideoDecoder(
     const ResourceAllocatorPtr& /*allocator*/,
@@ -264,9 +264,12 @@ bool FfmpegVideoDecoder::isCompatible(
     }
 }
 
-QSize FfmpegVideoDecoder::maxResolution(const AVCodecID /*codec*/)
+QSize FfmpegVideoDecoder::maxResolution(const AVCodecID codec)
 {
-    return s_maxResolution;
+    QSize  result = s_maxResolutions.value(codec);
+    if (!result.isEmpty())
+        return result;
+    return s_maxResolutions.value(AV_CODEC_ID_NONE);
 }
 
 int FfmpegVideoDecoder::decode(
@@ -355,9 +358,14 @@ double FfmpegVideoDecoder::getSampleAspectRatio() const
     return 1.0;
 }
 
-void FfmpegVideoDecoder::setMaxResolution(const QSize& maxResolution)
+void FfmpegVideoDecoder::setMaxResolutions(const QMap<int, QSize>& maxResolutions)
 {
-    s_maxResolution = maxResolution;
+    s_maxResolutions = maxResolutions;
+}
+
+AbstractVideoDecoder::Capabilities FfmpegVideoDecoder::capabilities() const
+{
+    return Capability::noCapability;
 }
 
 } // namespace media

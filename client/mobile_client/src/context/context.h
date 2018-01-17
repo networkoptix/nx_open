@@ -91,11 +91,12 @@ public:
     Q_INVOKABLE void removeSavedConnection(
         const QString& localSystemId, const QString& userName = QString());
 
+    Q_INVOKABLE void clearSavedPasswords();
     Q_INVOKABLE void clearLastUsedConnection();
     Q_INVOKABLE QString getLastUsedSystemName() const;
     Q_INVOKABLE QUrl getLastUsedUrl() const;
     Q_INVOKABLE QUrl getInitialUrl() const;
-
+    Q_INVOKABLE bool isCloudConnectionUrl(const QUrl& url);
     Q_INVOKABLE QUrl getWebSocketUrl() const;
 
     Q_INVOKABLE void setCloudCredentials(const QString& login, const QString& password);

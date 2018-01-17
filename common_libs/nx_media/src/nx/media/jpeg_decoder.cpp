@@ -47,5 +47,10 @@ int JpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFrameP
     return d->frameNumber++;
 }
 
+AbstractVideoDecoder::Capabilities JpegDecoder::capabilities() const
+{
+    return Capability::noCapability;
+}
+
 } // namespace media
 } // namespace nx

@@ -5,11 +5,11 @@
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>เลือกกล้อง</translation>
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>จำเป็นต้องระบุตัวตนผู้ใช้</translation>
     </message>
     <message>
       <source>Offline</source>
@@ -20,25 +20,25 @@
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>เข้าสู่ระบบ %1</translation>
     </message>
   </context>
   <context>
     <name>CloudScreen</name>
     <message>
       <source>Cloud Account</source>
-      <translation type="unfinished">Cloud Account</translation>
+      <translation>บัญชี Cloud</translation>
     </message>
   </context>
   <context>
     <name>CloudSummary</name>
     <message>
       <source>Log out</source>
-      <translation type="unfinished">Log out</translation>
+      <translation>ออกจากระบบ</translation>
     </message>
     <message>
       <source>Go to %1</source>
-      <translation type="unfinished">Go to %1</translation>
+      <translation>ไปที่ %1</translation>
     </message>
   </context>
   <context>
@@ -53,31 +53,31 @@
     </message>
     <message>
       <source>Learn more about %1</source>
-      <translation type="unfinished">Learn more about %1</translation>
+      <translation>เรียนรู้เพิ่มเติมเกี่ยวกับ %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>สร้างบัญชี</translation>
     </message>
     <message>
       <source>Forgot your password?</source>
-      <translation type="unfinished">Forgot your password?</translation>
+      <translation>ลืมรหัสผ่านของคุณหรือ?</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>ไม่สามารถเชื่อมต่อกับ %1</translation>
     </message>
     <message>
       <source>Email and password cannot be empty</source>
-      <translation type="unfinished">Email and password cannot be empty</translation>
+      <translation>อีเมลและรหัสผ่านต้องไม่ว่างเปล่า</translation>
     </message>
     <message>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>ลงชื่อเข้าสู่ระบบ</translation>
     </message>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>อีเมลหรือรหัสผ่านไม่ถูกต้อง</translation>
     </message>
   </context>
   <context>
@@ -88,19 +88,19 @@
     </message>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>เชื่อมต่อกับเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Enter server address</source>
-      <translation type="unfinished">Enter server address</translation>
+      <translation>ที่อยู่เซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>ลบข้อมูลเข้าสู่ระบบ &quot;%1&quot;?</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-      <translation type="unfinished">Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</translation>
+      <translation>ที่อยู่เซิร์ฟเวอร์และข้อมูลการเข้าสู่ระบบอื่น ๆ จะยังคงอยู่ ในการลบข้อมูลการเชื่อมต่อทั้งหมดคุณควรลบข้อมูลล็อกอินที่บันทึกไว้ทั้งหมด</translation>
     </message>
     <message>
       <source>Delete connection?</source>
@@ -108,22 +108,22 @@
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>ช่องผู้ใช้งาน ต้องไม่ปล่อยว่าง.</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>รหัสผ่านต้องไม่ปล่อยว่าง.</translation>
     </message>
   </context>
   <context>
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>การตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>ระดับล็อก</translation>
     </message>
   </context>
   <context>
@@ -142,11 +142,11 @@
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>ใช่</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>ไม่</translation>
     </message>
     <message>
       <source>Abort</source>
@@ -182,23 +182,23 @@
     <name>HelpPopup</name>
     <message>
       <source>Select another cell</source>
-      <translation type="unfinished">Select another cell</translation>
+      <translation>เลือกอีกหมวดหมู่</translation>
     </message>
     <message>
       <source>Switch camera in the cell</source>
-      <translation type="unfinished">Switch camera in the cell</translation>
+      <translation>เปลี่ยนกล้องถ่ายรูปในเซลล์</translation>
     </message>
     <message>
       <source>Enter or exit fullscreen</source>
-      <translation type="unfinished">Enter or exit fullscreen</translation>
+      <translation>เข้า หรือออกจากโหมดเต็มหน้าจอ</translation>
     </message>
     <message>
       <source>Press any key to go to cameras</source>
-      <translation type="unfinished">Press any key to go to cameras</translation>
+      <translation>กดปุ่มใด ๆ เพื่อไปที่กล้อง</translation>
     </message>
     <message>
       <source>Press F1 to show this message again</source>
-      <translation type="unfinished">Press F1 to show this message again</translation>
+      <translation>กด F1 เพื่อแสดงข้อความนี้อีกครั้ง</translation>
     </message>
   </context>
   <context>
@@ -216,57 +216,57 @@
     </message>
     <message>
       <source>%1 fps</source>
-      <translation type="unfinished">%1 fps</translation>
+      <translation>%1 เฟรมต่อวินาที</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>ความละเอียดสูง</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>ความละเอียดต่ำ</translation>
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
-      <translation type="unfinished">Keyfr + Lo-Res</translation>
+      <translation>Keyfr + ความละเอียดต่ำ</translation>
     </message>
     <message>
       <source>Custom-Res</source>
-      <translation type="unfinished">Custom-Res</translation>
+      <translation>ความละเอียดแบบกำหนดเอง</translation>
     </message>
   </context>
   <context>
     <name>LaunchButton</name>
     <message>
       <source>Turn On</source>
-      <translation type="unfinished">Turn On</translation>
+      <translation>เปิดใช้งาน</translation>
     </message>
   </context>
   <context>
     <name>LiteClientControlScreen</name>
     <message>
       <source>Cannot start client</source>
-      <translation type="unfinished">Cannot start client</translation>
+      <translation>ไม่สามารถเริ่มต้นไคลเอนต์</translation>
     </message>
     <message>
       <source>Cannot stop client</source>
-      <translation type="unfinished">Cannot stop client</translation>
+      <translation>ไม่สามารถหยุดไคลเอ็นต์</translation>
     </message>
     <message>
       <source>Please make sure that display is connected to %1.</source>
-      <translation type="unfinished">Please make sure that display is connected to %1.</translation>
+      <translation>โปรดตรวจสอบว่าได้เชื่อมต่อจอแสดงผลกับ %1 แล้ว</translation>
     </message>
     <message>
       <source>%1 is offline</source>
-      <translation type="unfinished">%1 is offline</translation>
+      <translation>%1 ได้ออฟไลน์</translation>
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>ไม่มีสนับสนุนซอฟต์แวร์การหมุนภาพในโหมดเต็มหน้าจอ</translation>
     </message>
   </context>
   <context>
@@ -287,53 +287,53 @@
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>แตะที่ภาพเพื่อวางตำแหน่งกล้องของคุณ</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>ยกเลิก</translation>
     </message>
   </context>
   <context>
     <name>NoCameraItem</name>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>ไม่มีภาพ</translation>
     </message>
   </context>
   <context>
     <name>NoDisplayDummy</name>
     <message>
       <source>No display connected</source>
-      <translation type="unfinished">No display connected</translation>
+      <translation>ไม่มีการเชื่อมต่อจอแสดงผล</translation>
     </message>
   </context>
   <context>
     <name>OfflineDummy</name>
     <message>
       <source>You are not connected to any System</source>
-      <translation type="unfinished">You are not connected to any System</translation>
+      <translation>คุณไม่ได้เชื่อมต่อกับระบบ</translation>
     </message>
   </context>
   <context>
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>ค่าที่ตั้งไว้</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>ตั้งไว้ล่วงหน้า PTZ</translation>
     </message>
   </context>
   <context>
     <name>QualityDialog</name>
     <message>
       <source>Video Quality</source>
-      <translation type="unfinished">Video Quality</translation>
+      <translation>คุณภาพวิดีโอ</translation>
     </message>
     <message>
       <source>Unknown</source>
@@ -341,11 +341,11 @@
     </message>
     <message>
       <source>Highest speed</source>
-      <translation type="unfinished">Highest speed</translation>
+      <translation>ความเร็วสูงสุด</translation>
     </message>
     <message>
       <source>Best quality</source>
-      <translation type="unfinished">Best quality</translation>
+      <translation>คุณภาพดีที่สุด</translation>
     </message>
   </context>
   <context>
@@ -356,31 +356,31 @@
     </message>
     <message>
       <source>Loading...</source>
-      <translation>กำลังโหลด ...</translation>
+      <translation>กำลังโหลด...</translation>
     </message>
     <message>
       <source>Connecting...</source>
-      <translation>กำลังเชื่อมต่อ ...</translation>
+      <translation>กำลังเชื่อมต่อ...</translation>
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation type="unfinished">No cameras available on this layout</translation>
+      <translation>กล้องไม่พร้อมใช้งานบนเค้าโครงนี้</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation type="unfinished">Show all cameras</translation>
+      <translation>แสดงกล้องทั้งหมด</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>ไม่พบสิ่งใด</translation>
     </message>
     <message>
       <source>Cannot connect to server</source>
-      <translation type="unfinished">Cannot connect to server</translation>
+      <translation>ไม่สามารถเชื่อมต่อ server ได้</translation>
     </message>
     <message>
       <source>Press %1 to exit</source>
-      <translation type="unfinished">Press %1 to exit</translation>
+      <translation>กด %1 เพื่อออก</translation>
     </message>
   </context>
   <context>
@@ -394,25 +394,25 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>เลือกกล้อง</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>กด Ctrl + ลูกศร หรือใช้เลื่อนของเมาส์</translation>
     </message>
   </context>
   <context>
     <name>ServerOfflineDummy</name>
     <message>
       <source>%1 is offline</source>
-      <translation type="unfinished">%1 is offline</translation>
+      <translation>%1 ได้ออฟไลน์</translation>
     </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
     <message>
       <source>Host : Port</source>
-      <translation type="unfinished">Host : Port</translation>
+      <translation>โฮสต์: พอร์ต</translation>
     </message>
     <message>
       <source>Login</source>
@@ -424,7 +424,7 @@
     </message>
     <message>
       <source>Hosts</source>
-      <translation type="unfinished">Hosts</translation>
+      <translation>โฮสต์</translation>
     </message>
     <message>
       <source>Users</source>
@@ -435,62 +435,62 @@
     <name>SessionItem</name>
     <message>
       <source>This server has too old version. Please update it to the latest version.</source>
-      <translation type="unfinished">This server has too old version. Please update it to the latest version.</translation>
+      <translation>เซิร์ฟเวอร์นี้มีรุ่นที่เก่าเกินไป กรุณาปรับปรุงให้รุ่นล่าสุด</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>ออฟไลน์</translation>
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>เข้ากันไม่ได้</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>ไม่สามารถเข้าถึงได้</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>เชื่อมต่อกับเซิร์ฟเวอร์นี้จากเว็บเบราเซอร์หรือผ่านทางไคลเอ็นต์เดสก์ท็อปเพื่อตั้งค่า</translation>
     </message>
   </context>
   <context>
     <name>SessionsScreen</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>เข้าสู่ระบบ %1</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>ไม่สามารถเชื่อมต่อกับ %1</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>ตรวจสอบการเชื่อมต่อเครือข่ายของคุณหรือกดปุ่ม &quot;%1&quot; เพื่อป้อนที่อยู่เซิร์ฟเวอร์ที่รู้จัก</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
-      <translation type="unfinished">Check your network connection or contact a system administrator</translation>
+      <translation>ตรวจสอบการเชื่อมต่อเครือข่ายของคุณหรือติดต่อผู้ดูแลระบบ</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>เชื่อมต่อกับเซิร์ฟเวอร์ ...</translation>
+      <translation>เชื่อมต่อกับเซิร์ฟเวอร์...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation>เชื่อมต่อไปยังเซิร์ฟเวอร์อื่น ...</translation>
+      <translation>เชื่อมต่อไปยังเซิร์ฟเวอร์อื่น...</translation>
     </message>
     <message>
       <source>No Systems found</source>
-      <translation type="unfinished">No Systems found</translation>
+      <translation>ไม่พบระบบ</translation>
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>ไม่สามารถเชื่อมต่อกับระบบ &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>
-      <translation type="unfinished">Cannot connect to Server</translation>
+      <translation>ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
@@ -501,11 +501,11 @@
     </message>
     <message>
       <source>Live previews in the cameras list</source>
-      <translation type="unfinished">Live previews in the cameras list</translation>
+      <translation>แสดงตัวอย่างในรายการกล้อง</translation>
     </message>
     <message>
       <source>Save passwords for servers</source>
-      <translation type="unfinished">Save passwords for servers</translation>
+      <translation>บันทึกรหัสผ่านสำหรับเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
@@ -520,29 +520,29 @@
     </message>
     <message>
       <source>Start test</source>
-      <translation type="unfinished">Start test</translation>
+      <translation>เริ่มการทดสอบ</translation>
     </message>
     <message>
       <source>Stop test</source>
-      <translation type="unfinished">Stop test</translation>
+      <translation>หยุดการทดสอบ</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation type="unfinished">Disconnect from Server</translation>
+      <translation>ถูกตัดออกจากเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
     <name>StartingDummy</name>
     <message>
       <source>Turning on</source>
-      <translation type="unfinished">Turning on</translation>
+      <translation>การเปิดใช้งาน</translation>
     </message>
   </context>
   <context>
     <name>StoppingDummy</name>
     <message>
       <source>Turning off</source>
-      <translation type="unfinished">Turning off</translation>
+      <translation>การปิด</translation>
     </message>
   </context>
   <context>
@@ -553,29 +553,29 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>เซิร์ฟเวอร์ใหม่</translation>
     </message>
   </context>
   <context>
     <name>TestSelectionDialog</name>
     <message>
       <source>Select Test</source>
-      <translation type="unfinished">Select Test</translation>
+      <translation>เลือกทดสอบ</translation>
     </message>
   </context>
   <context>
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>ตัด</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>สำเนา</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>แปะ</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -586,15 +586,15 @@
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>ไม่มีสนับสนุนซอฟต์แวร์การหมุนภาพในโหมดเต็มหน้าจอ</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>แสดงตามเดิม</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(ช่องว่าง)</translation>
     </message>
   </context>
   <context>
@@ -612,7 +612,7 @@
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>จำเป็นต้องระบุตัวตนผู้ใช้</translation>
     </message>
     <message>
       <source>Camera offline</source>
@@ -620,19 +620,19 @@
     </message>
     <message>
       <source>Cannot load video</source>
-      <translation type="unfinished">Cannot load video</translation>
+      <translation>ไม่สามารถโหลดวิดีโอ</translation>
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>ออฟไลน์</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>หน้าเว็บไซต์ไม่ได้รับอนุญาต</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>ไม่สามารถเล่นวิดีโอสตรีมใดก็ได้</translation>
     </message>
   </context>
   <context>
@@ -655,7 +655,7 @@
     <name>VideoScreen</name>
     <message>
       <source>Change Quality</source>
-      <translation type="unfinished">Change Quality</translation>
+      <translation>เปลี่ยนแปลงคุณภาพ</translation>
     </message>
     <message>
       <source>Information</source>
@@ -666,7 +666,7 @@
     <name>WelcomeScreen</name>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>ข้าม</translation>
     </message>
   </context>
 </TS>

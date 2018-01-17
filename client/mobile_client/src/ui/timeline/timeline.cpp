@@ -1145,7 +1145,7 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
     QnTimelineChunkPainter chunkPainter(geometry);
     auto colors = chunkPainter.colors();
     colors[Qn::RecordingContent] = d->chunkColor;
-    colors[Qn::TimePeriodContentCount] = d->chunkBarColor;
+    colors[Qn::TimePeriodContentCount] = d->hasArchive() ? d->chunkBarColor : Qt::transparent;
     chunkPainter.setColors(colors);
     chunkPainter.start(
         value, QRectF(0, y, width(), height() - y),

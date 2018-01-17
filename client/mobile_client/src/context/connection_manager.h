@@ -27,6 +27,8 @@ class QnConnectionManager: public QObject, public QnConnectionContextAware
     Q_ENUM(Qn::ConnectionResult)
 
 public:
+    static const QString kCloudConnectionScheme;
+
     enum State
     {
         Disconnected = static_cast<int>(QnConnectionState::Disconnected),
@@ -80,7 +82,11 @@ signals:
 
 public slots:
     bool connectToServer(const QUrl &url);
-    bool connectToServer(const QUrl &url, const QString& userName, const QString& password);
+    bool connectToServer(
+        const QUrl &url,
+        const QString& userName,
+        const QString& password,
+        bool cloudConnection);
     bool connectByUserInput(
         const QString& address, const QString& userName, const QString& password);
     void disconnectFromServer();

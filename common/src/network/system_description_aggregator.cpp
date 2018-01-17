@@ -239,8 +239,11 @@ bool QnSystemDescriptionAggregator::isRunning() const
     if (isEmptyAggregator())
         return false;
 
-    // Returns running state of most valuable system (by priority)
-    return m_systems.first()->isRunning();
+    return std::any_of(m_systems.begin(), m_systems.end(),
+        [](const QnSystemDescriptionPtr& system)
+        {
+            return system->isRunning();
+        });
 }
 
 bool QnSystemDescriptionAggregator::isReachable() const
@@ -248,10 +251,11 @@ bool QnSystemDescriptionAggregator::isReachable() const
     if (isEmptyAggregator())
         return false;
 
-    // TODO: #ynikitenkov Make "reachable" flag depends on any system in 3.1
-
-    // Returns reachable state of most valuable system (by priority)
-    return m_systems.first()->isReachable();
+    return std::any_of(m_systems.begin(), m_systems.end(),
+        [](const QnSystemDescriptionPtr& system)
+        {
+            return system->isReachable();
+        });
 }
 
 bool QnSystemDescriptionAggregator::isConnectable() const
@@ -259,10 +263,11 @@ bool QnSystemDescriptionAggregator::isConnectable() const
     if (isEmptyAggregator())
         return false;
 
-    // TODO: #ynikitenkov Make "connectable" flag depends on any system in 3.1
-
-    // Returns connectable state of most valuable system (by priority)
-    return m_systems.first()->isConnectable();
+    return std::any_of(m_systems.begin(), m_systems.end(),
+        [](const QnSystemDescriptionPtr& system)
+        {
+            return system->isConnectable();
+        });
 }
 
 void QnSystemDescriptionAggregator::updateServers()

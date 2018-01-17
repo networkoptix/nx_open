@@ -2,6 +2,7 @@
 
 #include <utils/media/jpeg_utils.h>
 #include <utils/media/h264_utils.h>
+#include <utils/media/hevc_sps.h>
 
 namespace nx {
 namespace media {
@@ -10,10 +11,18 @@ QSize AbstractVideoDecoder::mediaSizeFromRawData(const QnConstCompressedVideoDat
 {
     switch (frame->context->getCodecId())
     {
+        case AV_CODEC_ID_H265:
+        {
+            QSize result;
+            nx::media_utils::hevc::Sps sps;
+            if (sps.decodeFromVideoFrame(frame))
+                result = QSize(sps.picWidthInLumaSamples, sps.picHeightInLumaSamples);
+            return result;
+        }
         case AV_CODEC_ID_H264:
         {
             QSize result;
-            extractSpsPps(frame, &result, nullptr);
+            nx::media_utils::avc::extractSpsPps(frame, &result, nullptr);
             return result;
         }
         case AV_CODEC_ID_MJPEG:

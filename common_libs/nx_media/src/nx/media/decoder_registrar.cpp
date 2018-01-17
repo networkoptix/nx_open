@@ -20,7 +20,7 @@ namespace media {
 
 void DecoderRegistrar::registerDecoders(
     std::shared_ptr<AbstractResourceAllocator> allocator,
-    const QSize& maxFfmpegResolution,
+    const QMap<int, QSize>& maxFfmpegResolutions,
     bool isTranscodingEnabled)
 {
     NX_ASSERT(allocator);
@@ -56,7 +56,7 @@ void DecoderRegistrar::registerDecoders(
     #endif
 
     {
-        FfmpegVideoDecoder::setMaxResolution(maxFfmpegResolution);
+        FfmpegVideoDecoder::setMaxResolutions(maxFfmpegResolutions);
 
         VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
         AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();

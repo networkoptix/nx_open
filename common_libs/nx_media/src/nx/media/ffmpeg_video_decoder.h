@@ -18,8 +18,10 @@ class FfmpegVideoDecoderPrivate;
 class FfmpegVideoDecoder: public AbstractVideoDecoder
 {
 public:
-    /** @param maxResolution Limits applicability of the decoder. If empty, there is no limit. */
-    static void setMaxResolution(const QSize& maxResolution);
+    /** @param maxResolution Limits applicability of the decoder. If empty, there is no limit.
+     * Map key with value 0 means default resolution limit otherwise limit for specified AV codec.
+     */
+    static void setMaxResolutions(const QMap<int, QSize>& maxResolutions);
 
     FfmpegVideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
     virtual ~FfmpegVideoDecoder();
@@ -33,8 +35,10 @@ public:
         const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 
     virtual double getSampleAspectRatio() const override;
+
+    virtual Capabilities capabilities() const override;
 private:
-    static QSize s_maxResolution;
+    static QMap<int, QSize> s_maxResolutions;
 
     QScopedPointer<FfmpegVideoDecoderPrivate> d_ptr;
     Q_DECLARE_PRIVATE(FfmpegVideoDecoder);

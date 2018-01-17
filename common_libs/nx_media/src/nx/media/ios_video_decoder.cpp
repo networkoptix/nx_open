@@ -32,7 +32,13 @@ namespace nx {
 namespace media {
 
 namespace {
-
+    
+    bool isValidFrameSize(const QSize& size)
+    {
+        static const auto kMinimumFrameSize = QSize(64, 64);
+        return size.width() >= kMinimumFrameSize.width()
+        && size.height() >= kMinimumFrameSize.height();
+    }
 
     bool isFatalError(int ffmpegErrorCode)
     {
@@ -223,6 +229,7 @@ public:
     AVCodecContext* codecContext;
     AVFrame* frame;
     qint64 lastPts;
+    bool isHardwareAccelerated = false;
 };
 
 void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
@@ -234,7 +241,16 @@ void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
     codecContext = avcodec_alloc_context3(codec);
     if (frame->context)
         QnFfmpegHelper::mediaContextToAvCodecContext(codecContext, frame->context);
-
+    QSize frameSize = QSize(codecContext->width, codecContext->height);
+    if (!isValidFrameSize(frameSize))
+    {
+        frameSize = QSize(frame->width, frame->height);
+        if (!isValidFrameSize(frameSize))
+            frameSize = nx::media::AbstractVideoDecoder::mediaSizeFromRawData(frame);
+        codecContext->width = frameSize.width();
+        codecContext->height = frameSize.height();
+    }
+    
     codecContext->thread_count = 1;
     codecContext->opaque = this;
     codecContext->get_format = get_format;
@@ -280,8 +296,11 @@ bool IOSVideoDecoder::isCompatible(
     const QSize& resolution,
     bool /*allowOverlay*/)
 {
-    if (codec != AV_CODEC_ID_H264 &&
-        codec != AV_CODEC_ID_H263 &&
+    // VideoToolBox supports H263 only.
+    // If cheat it and provide H263P instead (by changing compression type H263P -> H263)
+    // it would show green box.
+    if (codec != AV_CODEC_ID_H265 &&
+        codec != AV_CODEC_ID_H264 &&
         codec != AV_CODEC_ID_H263P &&
         codec != AV_CODEC_ID_MPEG4 &&
         codec != AV_CODEC_ID_MPEG1VIDEO &&
@@ -300,22 +319,39 @@ QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
     static const QSize kFullHdResolution(1920, 1080);
     static const QSize kUhd4kResolution(3840, 2160);
 
-    if (codec != AV_CODEC_ID_H264)
-        return kHdReadyResolution;
-
     const auto& deviceInfo = iosDeviceInformation();
-    if (deviceInfo.type == IosDeviceInformation::Type::iPhone)
+    switch (codec)
     {
-        if (deviceInfo.majorVersion >= 7) //< iPhone 6 and newer.
-            return kUhd4kResolution;
+        case AV_CODEC_ID_H265:
+            // List of models with HEVC:
+            // https://support.apple.com/en-ie/HT207022
+            // https://stackoverflow.com/questions/11197509/how-to-get-device-make-and-model-on-ios
+            if (deviceInfo.type == IosDeviceInformation::Type::iPhone)
+            {
+                if (deviceInfo.majorVersion > 7)
+                    return kUhd4kResolution;
+            }
+            else if (deviceInfo.type == IosDeviceInformation::Type::iPad)
+            {
+                if (deviceInfo.majorVersion > 5)
+                    return kUhd4kResolution;
+            }
+            return QSize(); //< HEVC is not supported.
+        case AV_CODEC_ID_H264:
+            if (deviceInfo.type == IosDeviceInformation::Type::iPhone)
+            {
+                if (deviceInfo.majorVersion >= 7) //< iPhone 6 and newer.
+                    return kUhd4kResolution;
+            }
+            else if (deviceInfo.type == IosDeviceInformation::Type::iPad)
+            {
+                if (deviceInfo.majorVersion >= 5) //< iPad Air 2 / iPad Mini 4 or newer.
+                    return kUhd4kResolution;
+            }
+            return kFullHdResolution;
+        default:
+            return kHdReadyResolution;
     }
-    else if (deviceInfo.type == IosDeviceInformation::Type::iPad)
-    {
-        if (deviceInfo.majorVersion >= 5) //< iPad Air 2 / iPad Mini 4 or newer.
-            return kUhd4kResolution;
-    }
-
-    return kFullHdResolution;
 }
 
 int IOSVideoDecoder::decode(
@@ -363,7 +399,7 @@ int IOSVideoDecoder::decode(
     int res = avcodec_decode_video2(d->codecContext, d->frame, &gotPicture, &avpkt);
     if (res <= 0 || !gotPicture)
     {
-        qWarning() << "IOS decoder error. gotPicture=" << gotPicture << "errCode=" << QString::number(res, 16);
+        qWarning() << "IOS decoder error. gotPicture=" << gotPicture << "errCode=" << res;
         // hardware decoder crash if use same frame after decoding error. It seems
         // leaves invalid ref_count on error.
         av_frame_free(&d->frame);
@@ -380,7 +416,8 @@ int IOSVideoDecoder::decode(
     int frameNum = qMax(0, d->codecContext->frame_number - 1);
 
     QVideoFrame::PixelFormat qtPixelFormat = QVideoFrame::Format_Invalid;
-    if (d->frame->data[3])
+    d->isHardwareAccelerated = d->frame->data[3];
+    if (d->isHardwareAccelerated)
     {
         CVPixelBufferRef pixBuf = (CVPixelBufferRef)d->frame->data[3];
         qtPixelFormat = toQtPixelFormat(CVPixelBufferGetPixelFormatType(pixBuf));
@@ -407,6 +444,11 @@ int IOSVideoDecoder::decode(
     return frameNum;
 }
 
+AbstractVideoDecoder::Capabilities IOSVideoDecoder::capabilities() const
+{
+    Q_D(const IOSVideoDecoder);
+    return d->isHardwareAccelerated ? Capability::hardwareAccelerated : Capability::noCapability;
+}
 
 } // namespace media
 } // namespace nx

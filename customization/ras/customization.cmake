@@ -1,10 +1,10 @@
-[basic]
 set(defaultSkin "dark_blue")
 set(parent.customization "default")
 
 # Components Namings
 set(display.product.name "Sefica ProBox")
-set(display.mobile.name "Sefica ProBox Mobile")
+set(display_mobile_name "Sefica ProBox Mobile")
+set(mobile_bundle_name "ProBox")
 set(product.name "Sefica ProBox")
 set(product.name.short "ras")
 set(product.appName "probox")
@@ -39,8 +39,8 @@ set(customization.serverUpgradeCode "{B85E5E85-963A-477A-9D04-F122576E2364}")
 set(customization.clientBundleUpgradeCode "{4A83450D-1F57-4314-9638-6C66AB1C8E06}")
 set(customization.serverBundleUpgradeCode "{76AEB816-5F97-4C06-96E4-2D5603F29111}")
 set(customization.fullBundleUpgradeCode "{164BDBC7-B4AE-463D-9D9E-D2731D5E0E54}")
-set(#customization.nxtoolBundleUpgradeCode "")
-set(#customization.axBundleUpgradeCode "")
+set(customization.nxtoolBundleUpgradeCode "")
+set(customization.axBundleUpgradeCode "")
 
 set(deb.customization.company.name "ras")
 

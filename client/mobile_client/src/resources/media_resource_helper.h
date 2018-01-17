@@ -14,7 +14,8 @@ class QnMediaResourceHelper: public QnResourceHelper
     Q_PROPERTY(int channelCount READ channelCount NOTIFY videoLayoutChanged)
     Q_PROPERTY(QSize layoutSize READ layoutSize NOTIFY videoLayoutChanged)
     Q_PROPERTY(QnMediaDewarpingParams fisheyeParams READ fisheyeParams NOTIFY fisheyeParamsChanged)
-
+    Q_PROPERTY(bool analogCameraWithoutLicense READ analogCameraWithoutLicense
+        NOTIFY analogCameraWithoutLicenseChanged)
     Q_ENUMS(Qn::ResourceStatus)
 
     using base_type = QnResourceHelper;
@@ -29,6 +30,7 @@ public:
     int channelCount() const;
     QSize layoutSize() const;
     QnMediaDewarpingParams fisheyeParams() const;
+    bool analogCameraWithoutLicense() const;
     Q_INVOKABLE QPoint channelPosition(int channel) const;
 
 signals:
@@ -37,6 +39,7 @@ signals:
     void customRotationChanged();
     void videoLayoutChanged();
     void fisheyeParamsChanged();
+    void analogCameraWithoutLicenseChanged();
 
 private:
     QScopedPointer<QnMediaResourceHelperPrivate> d_ptr;

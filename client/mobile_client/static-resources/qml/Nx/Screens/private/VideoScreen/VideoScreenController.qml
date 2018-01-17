@@ -22,6 +22,7 @@ Object
     readonly property bool noVideoStreams: mediaPlayer.noVideoStreams
     readonly property bool failed: mediaPlayer.failed
     readonly property bool offline: serverOffline || cameraOffline
+    readonly property bool noLicenses: resourceHelper.analogCameraWithoutLicense;
 
     readonly property string dummyState:
     {
@@ -35,6 +36,8 @@ Object
             return "noVideoStreams"
         else if (failed)
             return "videoLoadingFailed"
+        else if (noLicenses)
+            return "noLicenses";
         else
             return ""
     }

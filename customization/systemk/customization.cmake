@@ -1,7 +1,9 @@
 # Components Namings
+set(defaultSkin "dark_blue")
 set(parent.customization "default")
 set(display.product.name "SK VMS")
-set(display.mobile.name "SK VMS")
+set(display_mobile_name "SK VMS")
+set(mobile_bundle_name "SK")
 set(product.name "SK VMS")
 set(product.name.short "systemk")
 set(company.name "SystemK Corporation")

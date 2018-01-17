@@ -16,16 +16,17 @@ AbstractButton
 
     background: Rectangle
     {
-        implicitWidth: 76
-        implicitHeight: 76
+        implicitWidth: 56
+        implicitHeight: 56
+
         color: ColorTheme.transparent(ColorTheme.base3, 0.2)
         radius: height / 2
+
     }
 
     label: Rectangle
     {
         anchors.fill: parent
-        anchors.margins: 8
         radius: height / 2
         color: "transparent"
         border.width: 2

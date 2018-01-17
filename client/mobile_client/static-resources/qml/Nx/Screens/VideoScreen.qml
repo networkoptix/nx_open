@@ -63,7 +63,8 @@ PageBase
                 || videoScreenController.cameraOffline
                 || videoScreenController.cameraUnauthorized
                 || videoScreenController.failed
-                || videoScreenController.noVideoStreams)
+                || videoScreenController.noVideoStreams
+                || videoScreenController.noLicenses)
             && !videoScreenController.mediaPlayer.playing
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
@@ -457,8 +458,7 @@ PageBase
 
             Button
             {
-                anchors.verticalCenter: parent.bottom
-                anchors.verticalCenterOffset: -150 - 64
+                y: 56 / 2 - height / 2
                 padding: 8
                 width: 56
                 height: width
@@ -471,8 +471,7 @@ PageBase
 
             Button
             {
-                anchors.verticalCenter: parent.bottom
-                anchors.verticalCenterOffset: -150 - 64
+                y: 56 / 2 - height / 2
                 anchors.right: parent.right
                 padding: 8
                 width: 56
@@ -496,6 +495,7 @@ PageBase
                     ptzAvailable: ptzPanel.controller.available
                         && videoScreenController.accessRightsHelper.canManagePtz
                         && !videoScreenController.offline
+                        && !videoScreenController.resourceHelper.fisheyeParams.enabled
                     onPtzButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Ptz
                 }
             }
@@ -510,6 +510,7 @@ PageBase
                     ptzAvailable: ptzPanel.controller.available
                         && videoScreenController.accessRightsHelper.canManagePtz
                         && !videoScreenController.offline
+                        && !videoScreenController.resourceHelper.fisheyeParams.enabled
                     onPtzButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Ptz
                 }
             }

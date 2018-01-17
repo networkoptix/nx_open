@@ -222,8 +222,11 @@ public:
     // Interval since last time player got some data
     QElapsedTimer gotDataTimer;
 
-    // Turn on / turn off audio
+    // Turn on / turn off audio.
     bool isAudioEnabled;
+
+    // Hardware decoding has been used for the last presented frame.
+    bool isHwAccelerated;
 
     void applyVideoQuality();
 
@@ -281,7 +284,8 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     overflowCounter(0),
     videoQuality(Player::HighVideoQuality),
     allowOverlay(true),
-    isAudioEnabled(true)
+    isAudioEnabled(true),
+    isHwAccelerated(false)
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
     execTimer->setSingleShot(true);
@@ -546,7 +550,7 @@ void PlayerPrivate::presentNextFrame()
     if (videoSurface && videoSurface->isActive() && !skipFrame)
     {
         setMediaStatus(Player::MediaStatus::Loaded);
-
+        isHwAccelerated = metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_HWDecodingUsed);
         videoSurface->present(*scaleFrame(videoFrameToRender));
         if (dataConsumer)
         {
@@ -1289,7 +1293,7 @@ PlayerStatistics Player::currentStatistics() const
 
     if (const auto codecContext = d->archiveReader->getCodecContext())
         result.codec = codecContext->getCodecName();
-
+    result.isHwAccelerated = d->isHwAccelerated;
     return result;
 }
 

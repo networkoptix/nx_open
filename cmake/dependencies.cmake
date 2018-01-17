@@ -41,6 +41,7 @@ function(detect_package_versions)
     if(IOS)
         set(_openssl_version "1.0.1i")
         set(_libjpeg-turbo_version "1.4.1")
+        set(_ffmpeg_version "3.4")
     endif()
 
     if(box MATCHES "bpi|bananapi")
@@ -127,6 +128,9 @@ function(get_dependencies)
         nx_rdep_add_package(any/qtsinglecoreapplication)
     endif()
 
+    if(WIN32)
+        set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
+    endif()
     nx_rdep_add_package(any/nx_kit)
     nx_rdep_add_package(any/detection_plugin_interface)
 

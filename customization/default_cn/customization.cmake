@@ -1,12 +1,12 @@
 # Components Namings
 set(parent.customization "default")
+set(defaultSkin "dark_blue")
 set(product.name "Nx Witness Chinese")
 set(display.product.name "Nx Witness")
 set(product.name.short "hdwitness_all_cn")
 set(company.name "Network Optix")
 
 set(product.appName "hdwitness")
-set(display.mobile.name "Nx Mobile")
 set(short.company.name "Nx")
 set(uri.protocol "nx-vms")
 set(liteDeviceName "nx1")

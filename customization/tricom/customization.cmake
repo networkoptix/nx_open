@@ -1,7 +1,9 @@
 # Components Namings
+set(defaultSkin "dark_blue")
 set(parent.customization "default")
 set(display.product.name "Tricom MVSS")
-set(display.mobile.name "MVSS Mobile")
+set(display_mobile_name "MVSS Mobile")
+set(mobile_bundle_name "MVSS")
 set(product.name "Tricom MVSS")
 set(product.name.short "tricom")
 set(company.name "Tricom Research, Inc.")

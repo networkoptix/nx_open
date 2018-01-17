@@ -105,7 +105,7 @@ void Connector::onStartRelaySessionResponse(
     m_connectSessionId = response.sessionId.c_str();
 
     auto tunnelConnection = std::make_unique<OutgoingTunnelConnection>(
-        m_relayUrl,
+        QUrl(response.actualRelayUrl.c_str()),
         m_connectSessionId,
         std::move(m_relayClient));
     handler(

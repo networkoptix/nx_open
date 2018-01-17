@@ -123,7 +123,7 @@ Item
         id: navigator
 
         width: parent.width
-        height: timeline.height + playbackController.height
+        height: timeline.height + playbackController.height - 16
         Behavior on y { SmoothedAnimation { duration: 200; reversingMode: SmoothedAnimation.Sync } }
 
         MouseArea
@@ -188,6 +188,7 @@ Item
             source: lp("/images/timeline_chunkbar_preloader.png")
             sourceSize: Qt.size(timeline.chunkBarHeight, timeline.chunkBarHeight)
             fillMode: Image.Tile
+            visible: d.hasArchive
         }
 
         Image
@@ -198,6 +199,7 @@ Item
             anchors.bottomMargin: timeline.chunkBarHeight
             sourceSize.height: 150 - timeline.chunkBarHeight
             source: lp("/images/timeline_gradient.png")
+            visible: d.hasArchive
         }
 
         Timeline
@@ -210,12 +212,12 @@ Item
 
             anchors.bottom: parent.bottom
             width: parent.width
-            height: 104
+            height: 96
 
             stickToEnd: d.liveMode && !paused
 
-            chunkBarHeight: 32
-            textY: height - chunkBarHeight - 16 - 24
+            chunkBarHeight: 16
+            textY: height - chunkBarHeight - 16 - 14
 
             chunkProvider: cameraChunkProvider
             startBound: cameraChunkProvider.bottomBound
@@ -332,7 +334,7 @@ Item
             font.capitalization: Font.AllUppercase
             font.pixelSize: 12
             anchors.bottom: timeline.bottom
-            anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2
+            anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2 + 12
             color: ColorTheme.windowText
             visible: !d.hasArchive
             opacity: 0.5 * timelineOpactiyMask.opacity
@@ -343,7 +345,7 @@ Item
             id: navigationPanel
 
             width: parent.width
-            height: 64
+            height: 56
             anchors.top: timeline.bottom
             background: Rectangle { color: ColorTheme.base3 }
             padding: 4
@@ -432,10 +434,10 @@ Item
         {
             id: dateTimeLabel
 
-            height: 56
+            height: 48
             width: parent.width
             anchors.bottom: timeline.bottom
-            anchors.bottomMargin: timeline.chunkBarHeight + 16
+            anchors.bottomMargin: timeline.chunkBarHeight + 8
             opacity: d.controlsOpacity
 
             Text
@@ -444,8 +446,8 @@ Item
 
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                height: 24
-                font.pixelSize: 14
+                height: 20
+                font.pixelSize: 13
                 font.weight: Font.Normal
                 verticalAlignment: Text.AlignVCenter
 
@@ -480,7 +482,7 @@ Item
                 {
                     id: liveLabel
                     anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 32
+                    font.pixelSize: 28
                     font.weight: Font.Normal
                     color: ColorTheme.windowText
                     text: qsTr("LIVE")
@@ -493,8 +495,7 @@ Item
         {
             id: playbackController
 
-            anchors.verticalCenter: timeline.bottom
-            anchors.verticalCenterOffset: -150
+            anchors.top: navigator.top
             anchors.horizontalCenter: parent.horizontalCenter
 
             loading: videoScreenController.mediaPlayer.loading || timeline.dragging
@@ -526,20 +527,9 @@ Item
         {
             color: ColorTheme.windowText
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: playbackController.bottom
-            width: 2
-            height: 8
-            visible: d.hasArchive
-            opacity: timelineOpactiyMask.opacity
-        }
-
-        Rectangle
-        {
-            color: ColorTheme.windowText
-            anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             width: 2
-            height: timeline.chunkBarHeight + 8
+            height: 20
             visible: d.hasArchive
             opacity: timelineOpactiyMask.opacity
         }

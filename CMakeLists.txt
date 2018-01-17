@@ -16,6 +16,12 @@ option(addQtPdb
     "Whether add Qt PDB files to debug libs"
     OFF)
 
+option(developerBuild
+    "Disable this option for production builds (Jenkins)"
+    ON)
+
+option(codeSigning "Enable code signing." ON)
+
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
@@ -46,7 +52,7 @@ set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
 
-set(mobileClientVersion 17.3)
+set(mobileClientVersion 17.3.2)
 set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

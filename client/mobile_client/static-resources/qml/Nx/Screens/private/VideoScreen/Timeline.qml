@@ -63,7 +63,7 @@ Item
 
         timeZoneShift: -(new Date()).getTimezoneOffset() * 60 * 1000
 
-        font.pixelSize: 16
+        font.pixelSize: 15
 
         onMoveFinished: moving = false
     }

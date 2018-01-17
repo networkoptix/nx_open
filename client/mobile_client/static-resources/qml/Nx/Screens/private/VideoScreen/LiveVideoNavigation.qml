@@ -46,11 +46,11 @@ Item
         {
             id: liveLabel
             anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: 32
+            font.pixelSize: 28
             font.weight: Font.Normal
             color: ColorTheme.windowText
             text: qsTr("LIVE")
-            height: 64
+            height: 56
             verticalAlignment: Text.AlignVCenter
             opacity: videoScreenController
                 && videoScreenController.mediaPlayer.loading ? 0.2 : 1.0

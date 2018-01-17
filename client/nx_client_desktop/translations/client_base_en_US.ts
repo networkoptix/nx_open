@@ -1150,33 +1150,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-        <source>Zoom In</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Focus Far</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Focus Near</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auto Focus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change Dewarping Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <source>Parameter 1 is null.</source>

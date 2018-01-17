@@ -116,16 +116,7 @@ Pane
         anchors.right: parent.right
         icon: lp("/images/edit.png")
         visible: !cloudSystem && authenticationDataModel.hasData
-        onClicked:
-        {
-            Workflow.openSavedSession(
-                systemId,
-                localId,
-                systemName,
-                informationBlock.address,
-                informationBlock.user,
-                authenticationDataModel.defaultCredentials.password)
-        }
+        onClicked: d.openSavedSession()
     }
 
     IssueLabel
@@ -155,7 +146,7 @@ Pane
         text:
         {
             if (!compatible)
-                return invalidVersion ? invalidVersion : qsTr("INCOMPATIBLE");
+                return invalidVersion ? invalidVersion : qsTr("INCOMPATIBLE")
 
             if (!running)
                 return qsTr("OFFLINE")
@@ -197,7 +188,8 @@ Pane
                 if (!connectionManager.connectToServer(
                     hostsModelAccessor.defaultAddress,
                     cloudStatusWatcher.credentials.user,
-                    cloudStatusWatcher.credentials.password))
+                    cloudStatusWatcher.credentials.password,
+                    true))
                 {
                     sessionsScreen.openConnectionWarningDialog(systemName)
                     return
@@ -208,18 +200,26 @@ Pane
         }
         else
         {
-            if (authenticationDataModel.hasStoredPassword)
+            if (authenticationDataModel.hasData)
             {
-                if (!connectionManager.connectToServer(
-                    hostsModelAccessor.defaultAddress,
-                    authenticationDataModel.defaultCredentials.user,
-                    authenticationDataModel.defaultCredentials.password))
+                if (authenticationDataModel.hasStoredPassword)
                 {
-                    sessionsScreen.openConnectionWarningDialog(systemName)
-                    return
-                }
+                    if (!connectionManager.connectToServer(
+                        hostsModelAccessor.defaultAddress,
+                        authenticationDataModel.defaultCredentials.user,
+                        authenticationDataModel.defaultCredentials.password,
+                        false))
+                    {
+                        sessionsScreen.openConnectionWarningDialog(systemName)
+                        return
+                    }
 
-                Workflow.openResourcesScreen(systemName)
+                    Workflow.openResourcesScreen(systemName)
+                }
+                else
+                {
+                    d.openSavedSession()
+                }
             }
             else
             {
@@ -235,6 +235,17 @@ Pane
 
         readonly property string kFactorySystemDetailsText:
             qsTr("Connect to this server from web browser or through desktop client to set it up")
+
+        function openSavedSession()
+        {
+            Workflow.openSavedSession(
+                systemId,
+                localId,
+                systemName,
+                informationBlock.address,
+                informationBlock.user,
+                authenticationDataModel.defaultCredentials.password)
+        }
     }
 
     Keys.onEnterPressed: open()

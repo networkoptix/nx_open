@@ -9,11 +9,11 @@
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>Authentication required</translation>
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Offline</translation>
     </message>
   </context>
   <context>
@@ -34,11 +34,11 @@
     <name>CloudSummary</name>
     <message>
       <source>Log out</source>
-      <translation type="unfinished">Log out</translation>
+      <translation>Uitloggen</translation>
     </message>
     <message>
       <source>Go to %1</source>
-      <translation type="unfinished">Go to %1</translation>
+      <translation>Ga naar %1</translation>
     </message>
   </context>
   <context>
@@ -61,7 +61,7 @@
     </message>
     <message>
       <source>Forgot your password?</source>
-      <translation type="unfinished">Forgot your password?</translation>
+      <translation>Wachtwoord vergeten?</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
@@ -69,7 +69,7 @@
     </message>
     <message>
       <source>Email and password cannot be empty</source>
-      <translation type="unfinished">Email and password cannot be empty</translation>
+      <translation>E-mail en wachtwoord kunnen niet leeg zijn</translation>
     </message>
     <message>
       <source>Log in</source>
@@ -92,15 +92,15 @@
     </message>
     <message>
       <source>Enter server address</source>
-      <translation type="unfinished">Enter server address</translation>
+      <translation>Voer het serveradres in</translation>
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>Verwijder login &quot;%1&quot;?</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-      <translation type="unfinished">Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</translation>
+      <translation>Serveradressen en andere inloggegevens blijven bewaard. Om alle verbindingsgegevens te verwijderen, moet u alle opgeslagen inloggegevens verwijderen.</translation>
     </message>
     <message>
       <source>Delete connection?</source>
@@ -108,11 +108,11 @@
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>Login mag niet leeg zijn</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Wachtwoord kan niet leeg zijn</translation>
     </message>
   </context>
   <context>
@@ -142,19 +142,19 @@
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Ja</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Nee</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>Afbreken</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Opnieuw proberen</translation>
     </message>
   </context>
   <context>
@@ -162,16 +162,16 @@
     <message>
       <source>To connect to old servers please download the legacy application from Google Play.</source>
       <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation type="unfinished">To connect to old servers please download the legacy application from Google Play.</translation>
+      <translation>Om verbinding te maken met oude servers, download de legacy-applicatie van Google Play.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the App Store.</source>
       <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation type="unfinished">To connect to old servers please download the legacy application from the App Store.</translation>
+      <translation>Om verbinding te maken met oude servers, download de legacy-applicatie van de App Store.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation type="unfinished">To connect to old servers please download the legacy application from the Internet.</translation>
+      <translation>Als u verbinding wilt maken met oude servers, kunt u de legacy-applicatie van het internet downloaden.</translation>
     </message>
     <message>
       <source>Download</source>
@@ -182,23 +182,23 @@
     <name>HelpPopup</name>
     <message>
       <source>Select another cell</source>
-      <translation type="unfinished">Select another cell</translation>
+      <translation>Selecteer een andere cel</translation>
     </message>
     <message>
       <source>Switch camera in the cell</source>
-      <translation type="unfinished">Switch camera in the cell</translation>
+      <translation>Wijzig de camera in een cel</translation>
     </message>
     <message>
       <source>Enter or exit fullscreen</source>
-      <translation type="unfinished">Enter or exit fullscreen</translation>
+      <translation>Open / sluit volbeeld</translation>
     </message>
     <message>
       <source>Press any key to go to cameras</source>
-      <translation type="unfinished">Press any key to go to cameras</translation>
+      <translation>Druk op een willekeurige toets om naar camera's te gaan</translation>
     </message>
     <message>
       <source>Press F1 to show this message again</source>
-      <translation type="unfinished">Press F1 to show this message again</translation>
+      <translation>Druk op F1 om dit bericht opnieuw te tonen</translation>
     </message>
   </context>
   <context>
@@ -216,7 +216,7 @@
     </message>
     <message>
       <source>%1 fps</source>
-      <translation type="unfinished">%1 fps</translation>
+      <translation>%1 fps</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
@@ -232,41 +232,41 @@
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
-      <translation type="unfinished">Keyfr + Lo-Res</translation>
+      <translation>Keyfr + Lo-Res</translation>
     </message>
     <message>
       <source>Custom-Res</source>
-      <translation type="unfinished">Custom-Res</translation>
+      <translation>Custom-Res</translation>
     </message>
   </context>
   <context>
     <name>LaunchButton</name>
     <message>
       <source>Turn On</source>
-      <translation type="unfinished">Turn On</translation>
+      <translation>Aanzetten</translation>
     </message>
   </context>
   <context>
     <name>LiteClientControlScreen</name>
     <message>
       <source>Cannot start client</source>
-      <translation type="unfinished">Cannot start client</translation>
+      <translation>Kan client niet starten</translation>
     </message>
     <message>
       <source>Cannot stop client</source>
-      <translation type="unfinished">Cannot stop client</translation>
+      <translation>Kan de client niet stoppen</translation>
     </message>
     <message>
       <source>Please make sure that display is connected to %1.</source>
-      <translation type="unfinished">Please make sure that display is connected to %1.</translation>
+      <translation>Zorg ervoor dat het scherm is aangesloten op %1.</translation>
     </message>
     <message>
       <source>%1 is offline</source>
-      <translation type="unfinished">%1 is offline</translation>
+      <translation>%1 is offline</translation>
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>De softwarematige beeldrotatie wordt niet ondersteund in de modus volbeeld</translation>
     </message>
   </context>
   <context>
@@ -287,11 +287,11 @@
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>Tik op de afbeelding om uw camera te plaatsen</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>ANNULEER</translation>
     </message>
   </context>
   <context>
@@ -305,28 +305,28 @@
     <name>NoDisplayDummy</name>
     <message>
       <source>No display connected</source>
-      <translation type="unfinished">No display connected</translation>
+      <translation>Geen display aangesloten</translation>
     </message>
   </context>
   <context>
     <name>OfflineDummy</name>
     <message>
       <source>You are not connected to any System</source>
-      <translation type="unfinished">You are not connected to any System</translation>
+      <translation>U bent niet verbonden met een systeem</translation>
     </message>
   </context>
   <context>
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>PRESETS</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>PTZ presets</translation>
     </message>
   </context>
   <context>
@@ -341,11 +341,11 @@
     </message>
     <message>
       <source>Highest speed</source>
-      <translation type="unfinished">Highest speed</translation>
+      <translation>Hoogste snelheid</translation>
     </message>
     <message>
       <source>Best quality</source>
-      <translation type="unfinished">Best quality</translation>
+      <translation>Beste kwaliteit</translation>
     </message>
   </context>
   <context>
@@ -360,15 +360,15 @@
     </message>
     <message>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Verbinden...</translation>
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation type="unfinished">No cameras available on this layout</translation>
+      <translation>Er zijn geen camera's beschikbaar op deze layout</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation type="unfinished">Show all cameras</translation>
+      <translation>Toon alle camera's</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -376,11 +376,11 @@
     </message>
     <message>
       <source>Cannot connect to server</source>
-      <translation type="unfinished">Cannot connect to server</translation>
+      <translation>Kan geen verbinding maken met de server</translation>
     </message>
     <message>
       <source>Press %1 to exit</source>
-      <translation type="unfinished">Press %1 to exit</translation>
+      <translation>Druk op %1 om af te sluiten</translation>
     </message>
   </context>
   <context>
@@ -394,25 +394,25 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Selecteer camera</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Druk op Ctrl + pijl of gebruik muiswiel</translation>
     </message>
   </context>
   <context>
     <name>ServerOfflineDummy</name>
     <message>
       <source>%1 is offline</source>
-      <translation type="unfinished">%1 is offline</translation>
+      <translation>%1 is offline</translation>
     </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
     <message>
       <source>Host : Port</source>
-      <translation type="unfinished">Host : Port</translation>
+      <translation>Host: poort</translation>
     </message>
     <message>
       <source>Login</source>
@@ -424,7 +424,7 @@
     </message>
     <message>
       <source>Hosts</source>
-      <translation type="unfinished">Hosts</translation>
+      <translation>Hosts</translation>
     </message>
     <message>
       <source>Users</source>
@@ -435,7 +435,7 @@
     <name>SessionItem</name>
     <message>
       <source>This server has too old version. Please update it to the latest version.</source>
-      <translation type="unfinished">This server has too old version. Please update it to the latest version.</translation>
+      <translation>Deze server heeft te oude versie. Update het bij de nieuwste versie.</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -447,11 +447,11 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>ONBEREIKBAAR</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>Verbinding maken met deze server vanuit een webbrowser of via een desktopclient om het in te stellen</translation>
     </message>
   </context>
   <context>
@@ -466,11 +466,11 @@
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>Controleer uw netwerkverbinding of druk op &quot;%1&quot; knop om een ​​bekend serveradres in te voeren.</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
-      <translation type="unfinished">Check your network connection or contact a system administrator</translation>
+      <translation>Controleer uw netwerkverbinding of neem contact op met een systeembeheerder</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
@@ -482,15 +482,15 @@
     </message>
     <message>
       <source>No Systems found</source>
-      <translation type="unfinished">No Systems found</translation>
+      <translation>Geen systemen gevonden</translation>
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>Kan geen verbinding maken met Systeem &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>
-      <translation type="unfinished">Cannot connect to Server</translation>
+      <translation>Kan geen verbinding maken met de server</translation>
     </message>
   </context>
   <context>
@@ -501,18 +501,18 @@
     </message>
     <message>
       <source>Live previews in the cameras list</source>
-      <translation type="unfinished">Live previews in the cameras list</translation>
+      <translation>Live previews in de cameralijst</translation>
     </message>
     <message>
       <source>Save passwords for servers</source>
-      <translation type="unfinished">Save passwords for servers</translation>
+      <translation>Onthou de wachtwoorden voor servers</translation>
     </message>
   </context>
   <context>
     <name>SideNavigation</name>
     <message>
       <source>New connection</source>
-      <translation type="unfinished">New connection</translation>
+      <translation>Nieuwe verbinding</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -520,11 +520,11 @@
     </message>
     <message>
       <source>Start test</source>
-      <translation type="unfinished">Start test</translation>
+      <translation>Start test</translation>
     </message>
     <message>
       <source>Stop test</source>
-      <translation type="unfinished">Stop test</translation>
+      <translation>Stop test</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
@@ -535,14 +535,14 @@
     <name>StartingDummy</name>
     <message>
       <source>Turning on</source>
-      <translation type="unfinished">Turning on</translation>
+      <translation>Inschakelen</translation>
     </message>
   </context>
   <context>
     <name>StoppingDummy</name>
     <message>
       <source>Turning off</source>
-      <translation type="unfinished">Turning off</translation>
+      <translation>Uitschakelen</translation>
     </message>
   </context>
   <context>
@@ -553,14 +553,14 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Nieuwe server</translation>
     </message>
   </context>
   <context>
     <name>TestSelectionDialog</name>
     <message>
       <source>Select Test</source>
-      <translation type="unfinished">Select Test</translation>
+      <translation>Selecteer test</translation>
     </message>
   </context>
   <context>
@@ -586,15 +586,15 @@
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>De softwarematige beeldrotatie wordt niet ondersteund in de modus volbeeld</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>Toon zoals het is</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(Space)</translation>
     </message>
   </context>
   <context>
@@ -612,34 +612,34 @@
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>Authentication required</translation>
     </message>
     <message>
       <source>Camera offline</source>
-      <translation type="unfinished">Camera offline</translation>
+      <translation>Camera offline</translation>
     </message>
     <message>
       <source>Cannot load video</source>
-      <translation type="unfinished">Cannot load video</translation>
+      <translation>Kan video niet laden</translation>
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Offline</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Ongeautoriseerd</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>Kan geen enkele videostream afspelen</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
     <message>
       <source>No Archive</source>
-      <translation type="unfinished">No Archive</translation>
+      <translation>Geen archief</translation>
     </message>
     <message>
       <source>LIVE</source>
@@ -648,14 +648,14 @@
     <message>
       <source>d MMMM yyyy</source>
       <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
+      <translation>d MMMM jjjj</translation>
     </message>
   </context>
   <context>
     <name>VideoScreen</name>
     <message>
       <source>Change Quality</source>
-      <translation type="unfinished">Change Quality</translation>
+      <translation>Kwaliteit wijzigen</translation>
     </message>
     <message>
       <source>Information</source>

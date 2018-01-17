@@ -28,6 +28,22 @@ void storeConnection(const QnUuid& localSystemId, const QString& systemName, con
     qnClientCoreSettings->setRecentLocalConnections(connections);
 }
 
+void clearSavedPasswords()
+{
+    QnClientCoreSettings::SystemAuthenticationDataHash result;
+
+    const auto credentialsHash = qnClientCoreSettings->systemAuthenticationData();
+    for (auto it = credentialsHash.begin(); it != credentialsHash.end(); ++it)
+    {
+        QList<QnEncodedCredentials> credentials;
+        for (const auto& currentCredential: it.value())
+            credentials.append(QnEncodedCredentials(currentCredential.user, QString()));
+        result[it.key()] = credentials;
+    }
+    qnClientCoreSettings->setSystemAuthenticationData(result);
+    qnClientCoreSettings->save();
+}
+
 void removeConnection(const QnUuid& localSystemId, const QUrl& url)
 {
     auto connections = qnClientCoreSettings->recentLocalConnections();

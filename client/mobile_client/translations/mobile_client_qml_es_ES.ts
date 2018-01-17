@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Authentication required</source>
-      <translation>Es necesario identificarse</translation>
+      <translation>Autenticación necesaria</translation>
     </message>
     <message>
       <source>Offline</source>
@@ -27,7 +27,7 @@
     <name>CloudScreen</name>
     <message>
       <source>Cloud Account</source>
-      <translation>Cuentas en la nube</translation>
+      <translation>Cuenta en la Nube</translation>
     </message>
   </context>
   <context>
@@ -57,7 +57,7 @@
     </message>
     <message>
       <source>Create account</source>
-      <translation>Crear Cuenta</translation>
+      <translation>Crear cuenta</translation>
     </message>
     <message>
       <source>Forgot your password?</source>
@@ -77,7 +77,7 @@
     </message>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Correo electrónico o contraseña incorrecta</translation>
     </message>
   </context>
   <context>
@@ -96,11 +96,11 @@
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>Eliminar usuario &quot;%1&quot;?</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-      <translation>Direcciones de los servidores y otros inicios de sesión permanecerán guardados. Para eliminar toda la conexión de información que debe eliminar todos salvos los inicios de sesión.</translation>
+      <translation>Direcciones de los servidores y otras usuarios permanecerán guardados. Para eliminar toda la información de las conexiones debe eliminar todos los usuarios salvados.</translation>
     </message>
     <message>
       <source>Delete connection?</source>
@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation>Inicio de sesión no puede estar vacío</translation>
+      <translation>Usuario no puede estar vacío</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -150,11 +150,11 @@
     </message>
     <message>
       <source>Abort</source>
-      <translation>Anular</translation>
+      <translation>Abortar</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation>Volver a intentarlo</translation>
+      <translation>Volver a intentar</translation>
     </message>
   </context>
   <context>
@@ -162,16 +162,16 @@
     <message>
       <source>To connect to old servers please download the legacy application from Google Play.</source>
       <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>Para conectar a viejos servidores por favor, descarga la aplicación obsoleta desde Google Play.</translation>
+      <translation>Para conectar a viejos servidores descargar la aplicación antigua desde Google Play.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the App Store.</source>
       <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>Para conectar a viejos servidores por favor descargar la aplicación obsoleta desde la App Store.</translation>
+      <translation>Para conectar a viejos servidores por favor descargar la aplicación antigua desde la App Store.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>Para conectar a viejos servidores por favor, descarga la aplicación obsoleta desde Internet.</translation>
+      <translation>Para conectar a viejos servidores por favor, descarga la aplicación antigua desde Internet.</translation>
     </message>
     <message>
       <source>Download</source>
@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>La rotación de imagen del software no es compatible con el modo de pantalla completa</translation>
     </message>
   </context>
   <context>
@@ -287,11 +287,11 @@
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>Toque la imagen para colocar la cámara</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>CANCELAR</translation>
     </message>
   </context>
   <context>
@@ -319,14 +319,14 @@
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>AJUSTES PREESTABLECIDOS</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>Pre-programados de PTZ</translation>
     </message>
   </context>
   <context>
@@ -394,11 +394,11 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Seleccione cámara</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Presione Ctrl + flecha o utilice la rueda del ratón</translation>
     </message>
   </context>
   <context>
@@ -447,11 +447,11 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>INALCANZABLE</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>Conéctese a este servidor desde el navegador web o a través del cliente para configurarlo</translation>
     </message>
   </context>
   <context>
@@ -466,7 +466,7 @@
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>Compruebe la conexión de red o presione el botón &quot;%1&quot; para ingresar una dirección de servidor conocida.</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
@@ -486,7 +486,7 @@
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>No se puede conectar al sistema &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>
@@ -501,7 +501,7 @@
     </message>
     <message>
       <source>Live previews in the cameras list</source>
-      <translation>Previsualizaciones en directo en la lista de cámaras</translation>
+      <translation>Previsualizaciones en vivo en la lista de cámaras</translation>
     </message>
     <message>
       <source>Save passwords for servers</source>
@@ -528,14 +528,14 @@
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>Desconectado del servidor</translation>
+      <translation>Desconectar del servidor</translation>
     </message>
   </context>
   <context>
     <name>StartingDummy</name>
     <message>
       <source>Turning on</source>
-      <translation>Encender</translation>
+      <translation>Iniciando</translation>
     </message>
   </context>
   <context>
@@ -553,25 +553,25 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Nuevo Servidor</translation>
     </message>
   </context>
   <context>
     <name>TestSelectionDialog</name>
     <message>
       <source>Select Test</source>
-      <translation>Seleccione prueba de</translation>
+      <translation>Seleccione Prueba</translation>
     </message>
   </context>
   <context>
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>Corte</translation>
+      <translation>Cortar</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Copia</translation>
+      <translation>Copiar</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -586,15 +586,15 @@
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>La rotación de imagen del software no es compatible con el modo de pantalla completa</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>Mostrar como es</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(Espacio)</translation>
     </message>
   </context>
   <context>
@@ -624,15 +624,15 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Desconectado</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>No autorizado</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>No se puede reproducir ninguna secuencia de vídeo</translation>
     </message>
   </context>
   <context>
@@ -655,7 +655,7 @@
     <name>VideoScreen</name>
     <message>
       <source>Change Quality</source>
-      <translation>Cambiar la calidad de</translation>
+      <translation>Cambiar la Calidad</translation>
     </message>
     <message>
       <source>Information</source>

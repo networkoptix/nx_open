@@ -22,9 +22,6 @@ BaseTile
     property string wrongVersion;
     property string compatibleVersion;
 
-    // TODO: #ynikitenkov Will be available in 3.1, remove property and related code.
-    readonly property bool offlineCloudConnectionsDisabled: true;
-
     isConnecting: ((control.systemId == context.connectingToSystem)
         && context.connectingToSystem.length && !impl.isFactoryTile);
 
@@ -34,11 +31,6 @@ BaseTile
             return true;
 
         if (wrongVersion || !isCompatible)
-            return false;
-
-
-        // TODO: #ynikitenkov remove condition below in 3.1
-        if (offlineCloudConnectionsDisabled && isCloudTile && !context.isCloudEnabled)
             return false;
 
         return control.isConnectable;
