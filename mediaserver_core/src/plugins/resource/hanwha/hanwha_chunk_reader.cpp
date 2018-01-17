@@ -823,7 +823,12 @@ OverlappedTimePeriods HanwhaChunkLoader::overlappedTimelineThreadUnsafe(
         const auto& chunksByChannel = itr->second;
 
         if (channelNumber >= chunksByChannel.size())
-            continue;
+        {
+            if (isNvr())
+                break;
+            else
+                continue;
+        }
 
         if (needToRestrictPeriods)
             result[overlappedId] = chunksByChannel[channelNumber].intersected(boundingPeriod);
