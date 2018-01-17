@@ -200,10 +200,27 @@
         "label": "Mac OS",
         "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
+      "macos": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+      },
       "linux": {
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
         "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      },
+      "arm": {
+        "label": "ARM",
+        "shortLabel": "ARM",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      },
+      "ios": {
+        "label": "iOS",
+        "shortLabel": "iOS"
+      },
+      "android": {
+        "label": "Android",
+        "shortLabel": "Android"
       }
     },
     "platforms": {
@@ -218,6 +235,15 @@
       "server": "서버 만",
       "bundle": "클라이언트와 서버",
       "servertool": "구성 도구"
+    },
+    "releasesTypes": {
+      "beta": "Beta",
+      "betas": "Betas",
+      "rc": "Release Candidate",
+      "release": "Release",
+      "releases": "Releases",
+      "patch": "Patch",
+      "patches": "Patches"
     }
   },
   "activeActions": {
