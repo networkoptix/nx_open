@@ -2124,7 +2124,7 @@
         },
         {
             "keys": [
-                "UNIVIEW|IPC6253SR-X33*"
+                "UNIVIEW|IPC6253SR-X33*", "Securicorp|SCL-SDM03MVIR-WD3533X"
             ],
             "ptzMapper": {
                 "fromCamera": {
