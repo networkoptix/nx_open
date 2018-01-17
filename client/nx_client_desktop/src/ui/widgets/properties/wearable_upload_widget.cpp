@@ -5,7 +5,7 @@
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <core/resource/camera_resource.h>
 #include <client/client_module.h>
-#include <client/client_wearable_manager.h>
+#include <nx/client/desktop/utils/wearable_manager.h>
 
 
 QnWearableUploadWidget::QnWearableUploadWidget(QWidget *parent)

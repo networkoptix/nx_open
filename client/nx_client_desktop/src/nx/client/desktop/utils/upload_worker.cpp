@@ -1,4 +1,4 @@
-#include "client_upload_worker.h"
+#include "upload_worker.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>

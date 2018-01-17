@@ -34,8 +34,6 @@
 #include <client/client_settings_watcher.h>
 #include <client/client_show_once_settings.h>
 #include <client/client_autorun_watcher.h>
-#include <client/client_upload_manager.h>
-#include <client/client_wearable_manager.h>
 
 #include <cloud/cloud_connection.h>
 
@@ -82,6 +80,8 @@
 #include <utils/server_interface_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
+#include <nx/client/desktop/utils/upload_manager.h>
+#include <nx/client/desktop/utils/wearable_manager.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>

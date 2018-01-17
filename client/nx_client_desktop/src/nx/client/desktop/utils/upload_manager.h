@@ -5,7 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 
-#include "client_upload_worker.h"
+#include "upload_worker.h"
 
 class QnClientUploadManager: public QObject
 {

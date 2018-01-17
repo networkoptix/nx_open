@@ -4,6 +4,8 @@
 
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/utils/upload_manager.h>
+#include <nx/client/desktop/utils/wearable_manager.h>
 #include <api/model/wearable_camera_reply.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
@@ -18,8 +20,6 @@
 #include <api/server_rest_connection.h>
 
 #include <client/client_module.h>
-#include <client/client_upload_manager.h>
-#include <client/client_wearable_manager.h>
 
 namespace {
     /* Using TTL of 10 mins for uploads. This shall be enough even for the most extreme cases.

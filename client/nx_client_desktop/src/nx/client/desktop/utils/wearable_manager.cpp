@@ -1,4 +1,4 @@
-#include "client_wearable_manager.h"
+#include "wearable_manager.h"
 
 
 QnClientWearableManager::QnClientWearableManager(QObject* parent):
