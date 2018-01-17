@@ -21,6 +21,8 @@ namespace nx {
 namespace mediaserver {
 namespace updates2 {
 
+using namespace vms::common::p2p::downloader;
+
 namespace {
 
 static const qint64 kRefreshTimeoutMs = 24 * 60 * 60 * 1000; //< 1 day
@@ -74,7 +76,6 @@ Updates2Manager::Updates2Manager(QnCommonModule* commonModule):
 
 void Updates2Manager::atServerStart()
 {
-    using namespace vms::common::p2p::downloader;
     using namespace std::placeholders;
 
     checkForGlobalDictionaryUpdate();
@@ -111,6 +112,18 @@ void Updates2Manager::atServerStart()
     connect(
         qnServerModule->findInstance<Downloader>(), &Downloader::downloadFinished,
         this, &Updates2Manager::onDownloadFinished);
+    connect(
+        qnServerModule->findInstance<Downloader>(), &Downloader::fileAdded,
+        this, &Updates2Manager::onFileAdded);
+    connect(
+        qnServerModule->findInstance<Downloader>(), &Downloader::fileDeleted,
+        this, &Updates2Manager::onFileDeleted);
+    connect(
+        qnServerModule->findInstance<Downloader>(), &Downloader::fileInformationChanged,
+        this, &Updates2Manager::onFileInformationChanged);
+    connect(
+        qnServerModule->findInstance<Downloader>(), &Downloader::fileStatusChanged,
+        this, &Updates2Manager::onFileStatusChanged);
 
     m_timerManager.addNonStopTimer(
         std::bind(&Updates2Manager::checkForRemoteUpdate, this, _1),
@@ -346,6 +359,26 @@ void Updates2Manager::onDownloadFinished(const QString& fileName)
                 "Update has been downloaded and now is preparing for install");
             break;
     }
+}
+
+void Updates2Manager::onFileAdded(const FileInformation& fileInformation)
+{
+
+}
+
+void Updates2Manager::onFileDeleted(const QString& fileName)
+{
+
+}
+
+void Updates2Manager::onFileInformationChanged(const FileInformation& fileInformation)
+{
+
+}
+
+void Updates2Manager::onFileStatusChanged(const FileInformation& fileInformation)
+{
+
 }
 
 void Updates2Manager::stopAsyncTasks()
