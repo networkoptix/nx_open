@@ -20,58 +20,9 @@ struct ServiceGuard
 private:
     T& m_service;
 };
+
 using EventServiceGuard = ServiceGuard<EventBindingProxy>;
 using ActionServiceGuard = ServiceGuard<ActionBindingProxy>;
-
-#if 0
-//This is the obsolete variant of ScopedGC.
-/**
-* Simple Scoped Garbage Collector.
-* Usage:
-* 1. Instantiate the class with the types, you are going to create, i.e.
-*     <code>ScopedGc<int, std::string, MyClass> scopedGc;</code>
-* 2. Create objects with "create" member-function, i.e.
-* <pre><code>
-*     int* i = scopedGc.create<int>;
-*     std::string* s1 = scopedGc.create<std::string>("Hello!");
-*     auto s2 = scopedGc.create<std::string>("Bye!");
-*     MyClass* myClass = scopedGc.create<MyClass>(100, 200, "Ok");
-* </code></pre>
-* 3. Objects will be deleted when scopedGC leaves it scope.
-* 4. WARNING: The order of objects destruction is not specified!
-*/
-template<class ...Ts>
-class ScopedGc
-{
-    // Tuple's element type.
-    template<class T>
-    using Element = std::vector<std::unique_ptr<T>>;
-
-    //Tuple. Each element in it is a guard for a separate type.
-    std::tuple<Element<Ts>...> guards;
-
-    //@return An appropriate guard for a type.
-    template<class T>
-    Element<T>& giveMeGuard()
-    {
-        return std::get<Element<T>>(guards);
-    }
-
-public:
-    /**
-    * Creates an object of class T using its constructor with parameters "args...",
-    * and stores a unique pointer to the object in a corresponding guard.
-    * All guards delete all their creatred objects when ScopedGC leaves its scope.
-    */
-    template<class T, class ...Args>
-    T* create(Args&&... args)
-    {
-        auto& guard = this->giveMeGuard<T>();
-        guard.push_back(std::make_unique<T>(std::forward<Args>(args)...));
-        return guard.back().get();
-    }
-};
-#endif
 
 /**
 * RAII helper class that sets a value to a variable in constructor and restores variable's

@@ -1109,34 +1109,6 @@
     </message>
   </context>
   <context>
-    <name>ExportRapidReviewDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
-      <source>Export Rapid Review</source>
-      <translation>Xuất nhanh Xem lại</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Initial Video Length</source>
-      <translation>Thời lượng video ban đầu</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Exported Video Length</source>
-      <translation>Thời lượng video xuất khẩu</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Frames Interval</source>
-      <translation>Khoảng thời gian khung hình</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Rapid Review speed</source>
-      <translation>Tốc độ Xem nhanh</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
@@ -2867,11 +2839,6 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>Cài đặt sao lưu...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Sẽ không ghi hình khi vô hiệu hóa thiết bị lưu trữ. Tuy nhiên, xóa các video cũ từ bộ nhớ vấn được.</translation>
     </message>
   </context>
   <context>

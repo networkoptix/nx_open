@@ -780,6 +780,8 @@ int QnRtspConnectionProcessor::composeDescribe()
     if (!d->mediaRes)
         return CODE_NOT_FOUND;
 
+    d->playbackMode = getStreamingMode();
+
     createDataProvider();
 
     QString acceptMethods = nx::network::http::getHeaderValue(d->request.headers, "Accept");

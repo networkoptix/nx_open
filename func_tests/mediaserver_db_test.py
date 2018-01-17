@@ -135,9 +135,9 @@ def test_backup_restore(artifact_factory, one, two, camera):
         assert full_info_after_backup_restore == full_info_initial
     except AssertionError:
         artifact_factory(['full_info_initial'],
-                             name='full_info_initial').save_json(full_info_initial)
+                         name='full_info_initial').save_as_json(full_info_initial)
         artifact_factory(['full_info_after_backup_restore'],
-                             name='full_info_after_backup_restore').save_json(full_info_after_backup_restore)
+                         name='full_info_after_backup_restore').save_as_json(full_info_after_backup_restore)
         raise
 
 

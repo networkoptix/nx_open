@@ -1,7 +1,5 @@
 #pragma once
 
-#include "axis_common.h"
-
 #include <map>
 #include <vector>
 
@@ -17,51 +15,49 @@
 #include <nx/network/http/test_http_server.h>
 #include <common/common_module.h>
 
+#include "identified_supported_event.h"
+
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace axis {
 
-class AxisMetadataManager;
+class Manager;
 
-class AxisMetadataMonitor: public QObject
+class Monitor: public QObject
 {
     Q_OBJECT
 
 public:
-    using Handler = std::function<void(const AxisEventList&)>;
+    using Handler = std::function<void(const std::vector<IdentifiedSupportedEvent>&)>;
 
-    AxisMetadataMonitor(
-        const Axis::DriverManifest& manifest,
+    Monitor(
+        Manager* manager,
         const QUrl& resourceUrl,
-        const QAuthenticator& auth);
-    virtual ~AxisMetadataMonitor();
+        const QAuthenticator& auth,
+        nx::sdk::metadata::AbstractMetadataHandler* handler);
+    virtual ~Monitor();
 
-    void setRule(const nx::network::SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
+    void addRules(const nx::network::SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
         int eventTypeListSize);
+
+    void removeRules();
+
     nx::network::HostAddress getLocalIp(const nx::network::SocketAddress& cameraAddress);
     nx::sdk::Error startMonitoring(nxpl::NX_GUID* eventTypeList, int eventTypeListSize);
     void stopMonitoring();
 
-    void setManager(AxisMetadataManager* manager);
-
-private:
-    const Axis::DriverManifest& m_manifest;
+ private:
+    Manager * m_manager;
     const QUrl m_url;
     const QUrl m_endpoint;
     const QAuthenticator m_auth;
-    nx::network::aio::Timer m_timer;
-
-    static const char* const kWebServerPath;
-
-    mutable QnMutex m_mutex;
-
-    std::vector<int> m_actionIds;
-    std::vector<int> m_ruleIds;
+    nx::sdk::metadata::AbstractMetadataHandler* m_handler;
     nx::network::http::TestHttpServer* m_httpServer;
-
-    AxisMetadataManager* m_manager = nullptr;
+    mutable QnMutex m_mutex;
 };
 
-} // namespace plugins
-} // namespace mediaserver
+} // axis
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx
