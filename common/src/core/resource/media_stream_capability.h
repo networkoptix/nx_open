@@ -15,6 +15,8 @@ struct CameraStreamCapability
     int defaultBitrateKbps = 0;
     int defaultFps = 0;
     int maxFps = 0;
+
+    QString toString() const;
 };
 
 #define CameraStreamCapability_Fields (minBitrateKbps)(maxBitrateKbps)(defaultBitrateKbps)(defaultFps)(maxFps)

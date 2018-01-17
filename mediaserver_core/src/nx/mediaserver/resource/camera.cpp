@@ -5,7 +5,10 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/resource_command.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 #include <utils/xml/camera_advanced_param_reader.h>
+
+#include "camera_advanced_parameters_providers.h"
 
 namespace nx {
 namespace mediaserver {
@@ -95,6 +98,11 @@ Camera::Camera(QnCommonModule* commonModule):
 {
     setFlags(Qn::local_live_cam);
     m_lastInitTime.invalidate();
+}
+
+Camera::~Camera()
+{
+    // Needed because of the forward declaration.
 }
 
 int Camera::getChannel() const
@@ -334,6 +342,7 @@ CameraDiagnostics::Result Camera::initInternal()
     m_lastInitTime.restart();
     m_lastCredentials = credentials;
 
+    m_streamCapabilityAdvancedProviders.clear();
     m_defaultAdvancedParametersProviders = nullptr;
     m_advancedParametersProvidersByParameterId.clear();
 
@@ -341,12 +350,37 @@ CameraDiagnostics::Result Camera::initInternal()
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return driverResult;
 
-    QnCameraAdvancedParams advancedParameters;
-    for (const auto& provider: advancedParametersProviders())
-    {
-        if (m_defaultAdvancedParametersProviders == nullptr)
-            m_defaultAdvancedParametersProviders = provider;
+    return initializaAdvancedParamitersProviders();
+}
 
+CameraDiagnostics::Result Camera::initializaAdvancedParamitersProviders()
+{
+    auto allAdvancedParamitersProviders = advancedParametersProviders();
+    if (!allAdvancedParamitersProviders.empty())
+        m_defaultAdvancedParametersProviders = allAdvancedParamitersProviders.front();
+
+    boost::optional<QSize> baseResolution;
+    for (const auto streamType: {true, false})
+    {
+        auto streamCapabilities = getStreamCapabilityMap(streamType);
+        if (!streamCapabilities.isEmpty())
+        {
+            auto provider = std::make_unique<StreamCapabilityAdvancedParametersProvider>(
+                this, streamCapabilities, streamType,
+                baseResolution ? *baseResolution : QSize());
+
+            if (!baseResolution)
+                baseResolution = provider->getParameters().resolution;
+
+            // TODO: It might make sence to insert these before driver specific providers.
+            allAdvancedParamitersProviders.push_back(provider.get());
+            m_streamCapabilityAdvancedProviders.emplace(streamType, std::move(provider));
+        }
+    }
+
+    QnCameraAdvancedParams advancedParameters;
+    for (const auto& provider: allAdvancedParamitersProviders)
+    {
         auto providerParamiters = provider->descriptions();
         for (const auto& id: providerParamiters.allParameterIds())
             m_advancedParametersProvidersByParameterId.emplace(id, provider);

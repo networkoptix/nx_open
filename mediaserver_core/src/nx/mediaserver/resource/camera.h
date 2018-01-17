@@ -8,6 +8,8 @@ namespace nx {
 namespace mediaserver {
 namespace resource {
 
+class StreamCapabilityAdvancedParametersProvider;
+
 struct StreamCapabilityKey
 {
     QString codec;
@@ -21,6 +23,11 @@ struct StreamCapabilityKey
             return resolution.width() < other.resolution.width();
         return resolution.height() < other.resolution.height();
     }
+
+    QString toString() const
+    {
+        return lm("%1(%2x%3)").args(codec, resolution.width(), resolution.height());
+    }
 };
 using StreamCapabilityMap = QMap<StreamCapabilityKey, nx::media::CameraStreamCapability>;
 
@@ -32,6 +39,7 @@ public:
     static const float kMaxEps;
 
     Camera(QnCommonModule* commonModule = nullptr);
+    virtual ~Camera() override;
 
     /**
      * The difference between desired and real is that camera can have multiple clients we do not
@@ -120,8 +128,10 @@ protected:
     * CameraStreamCapability could be null. That case it is auto-filled with default values.
     */
     virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(bool primaryStream) = 0;
+
 private:
     virtual CameraDiagnostics::Result initInternal() override;
+    CameraDiagnostics::Result initializaAdvancedParamitersProviders();
 
 private:
     int m_channelNumber; // video/audio source number
@@ -129,6 +139,7 @@ private:
     QAuthenticator m_lastCredentials;
     AdvancedParametersProvider* m_defaultAdvancedParametersProviders = nullptr;
     std::map<QString, AdvancedParametersProvider*> m_advancedParametersProvidersByParameterId;
+    std::map<bool, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>> m_streamCapabilityAdvancedProviders;
 };
 
 } // namespace resource

@@ -18,4 +18,4 @@ struct QnLiveStreamParams
 #define QnLiveStreamParams_Fields (quality)(fps)(bitrateKbps)(resolution)(codec)
 
 //QN_FUSION_DEFINE_FUNCTIONS(QnLiveStreamParams, (eq))
-QN_FUSION_DECLARE_FUNCTIONS(QnLiveStreamParams, (eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnLiveStreamParams, (eq)(json))

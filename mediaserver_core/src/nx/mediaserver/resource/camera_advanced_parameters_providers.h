@@ -6,6 +6,9 @@ namespace nx {
 namespace mediaserver {
 namespace resource {
 
+/**
+ * Base Camera::AdvancedParametersProvider implementation helper.
+ */
 template<typename ApiProvider>
 class ApiAdvancedParamitersProvider: public Camera::AdvancedParametersProvider
 {
@@ -23,6 +26,9 @@ protected:
     QnCameraAdvancedParams m_parameters;
 };
 
+/**
+ * Automatic get/set redirector to resource getApiParameters/setApiParameters.
+ */
 template<typename ApiProvider>
 class ApiMultiAdvancedParamitersProvider: public ApiAdvancedParamitersProvider<ApiProvider>
 {
@@ -34,6 +40,9 @@ public:
     virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
 };
 
+/**
+ * Automatic get/set redirector to resource getApiParameter/setApiParameter.
+ */
 template<typename ApiProvider>
 class ApiSingleAdvancedParamitersProvider: public ApiAdvancedParamitersProvider<ApiProvider>
 {
@@ -43,6 +52,50 @@ public:
 
     virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
     virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
+};
+
+/**
+ * Provides codec, resolution, bitrate and FPS options for primary or secondary stream.
+ * Stores selected values in a designated property.
+ *
+ * Parameters structure:
+ * Group: Video Stream Configuration
+ *   + Group: <STREAM>
+ *     + Parametrs: Codec, resolution, bitrate and FPS
+ */
+class StreamCapabilityAdvancedParametersProvider: public Camera::AdvancedParametersProvider
+{
+public:
+    StreamCapabilityAdvancedParametersProvider(
+        Camera* camera,
+        const StreamCapabilityMap& capabilities,
+        bool isPrimaryStream,
+        const QSize& baseResolution);
+
+    QnLiveStreamParams getParameters() const;
+
+    virtual QnCameraAdvancedParams descriptions() override;
+    virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
+    virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
+
+private:
+    QnCameraAdvancedParams describeCapabilities(const StreamCapabilityMap& capabilities) const;
+    QnLiveStreamParams bestParameters(
+        const StreamCapabilityMap& capabilities, const QSize& baseResolution);
+
+    QString proprtyName() const;
+    QString parameterName(const QString& baseName) const;
+    boost::optional<QString> getValue(
+        const QnCameraAdvancedParamValueMap& values,
+        const QString& baseName);
+
+private:
+    Camera* const m_camera;
+    const bool m_isPrimaryStream; // TODO: use emum instead.
+    const QnCameraAdvancedParams m_descriptions;
+
+    mutable QnMutex m_mutex;
+    QnLiveStreamParams m_parameters;
 };
 
 // -------------------------------------------------------------------------------------------------
