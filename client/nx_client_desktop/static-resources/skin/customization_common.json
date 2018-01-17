@@ -908,6 +908,23 @@
         }
     },
 
+    "nx::client::desktop::CompactTabBar": {
+        "palette": {
+            "default": {
+                "windowText": "light12",
+                "light": "light10",
+                "midlight": "dark12",
+                "highlight": "brand_core"
+            },
+            "disabled": {
+                "windowText": "dark12",
+                "light": "dark12",
+                "midlight": "dark12",
+                "highlight": "dark12"
+            }
+        }
+    },
+
     "nx::client::desktop::EventPanel": {
         "palette": {
             "default": {

@@ -107,10 +107,30 @@ void EventsStorage::lookupTimePeriods(
 }
 
 void EventsStorage::markDataAsDeprecated(
-    QnUuid /*deviceId*/,
-    qint64 /*oldestNeededDataTimestamp*/)
+    QnUuid deviceId,
+    std::chrono::milliseconds oldestDataToKeepTimestamp)
 {
-    // TODO
+    using namespace std::placeholders;
+
+    NX_VERBOSE(this, lm("Cleaning data of device %1 up to timestamp %2")
+        .args(deviceId, oldestDataToKeepTimestamp.count()));
+
+    m_dbController.queryExecutor().executeUpdate(
+        std::bind(&EventsStorage::cleanupData, this, _1, deviceId, oldestDataToKeepTimestamp),
+        [this, deviceId, oldestDataToKeepTimestamp](
+            QueryContext*, DBResult resultCode)
+        {
+            if (resultCode == DBResult::ok)
+            {
+                NX_VERBOSE(this, lm("Cleaned data of device %1 up to timestamp %2")
+                    .args(deviceId, oldestDataToKeepTimestamp));
+            }
+            else
+            {
+                NX_DEBUG(this, lm("Error (%1) while cleaning up data of device %2 up to timestamp %3")
+                    .args(toString(resultCode), deviceId, oldestDataToKeepTimestamp));
+            }
+        });
 }
 
 DBResult EventsStorage::savePacket(
@@ -540,6 +560,29 @@ void EventsStorage::loadTimePeriods(
 
     *result = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
         *result, options.detailLevel);
+}
+
+nx::utils::db::DBResult EventsStorage::cleanupData(
+    nx::utils::db::QueryContext* queryContext,
+    const QnUuid& deviceId,
+    std::chrono::milliseconds oldestDataToKeepTimestamp)
+{
+    using namespace std::chrono;
+
+    SqlQuery deleteEventsQuery(*queryContext->connection());
+    deleteEventsQuery.prepare(QString::fromLatin1(R"sql(
+        DELETE FROM event
+        WHERE device_guid=:deviceId AND timestamp_usec_utc < :timestampUsec
+    )sql"));
+    deleteEventsQuery.bindValue(
+        lit(":deviceId"),
+        QnSql::serialized_field(deviceId));
+    deleteEventsQuery.bindValue(
+        lit(":timestampUsec"),
+        (qint64) microseconds(oldestDataToKeepTimestamp).count());
+
+    deleteEventsQuery.exec();
+    return nx::utils::db::DBResult::ok;
 }
 
 //-------------------------------------------------------------------------------------------------

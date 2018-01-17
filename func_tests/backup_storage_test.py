@@ -1,7 +1,3 @@
-'''
-Backup storage test
-'''
-
 import logging
 import os
 import time

@@ -1,4 +1,4 @@
-# create lightweight servers (LWS) containers implemented by appserver2_ut with requested number of servers in them
+"""Create lightweight servers (LWS) containers implemented by appserver2_ut with requested number of servers within"""
 
 import datetime
 import logging

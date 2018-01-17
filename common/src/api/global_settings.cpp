@@ -432,6 +432,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kMaxRemoteArchiveSynchronizationThreadsDefault,
         this);
 
+    m_updates2InfoAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
+        kUpdates2PropertyName,
+        QByteArray(),
+        this);
+
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
 
@@ -460,6 +465,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(
         m_cloudConnectRelayingEnabledAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
         this, &QnGlobalSettings::cloudConnectRelayingEnabledChanged,
+        Qt::QueuedConnection);
+
+    connect(
+        m_updates2InfoAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &QnGlobalSettings::updates2RegistryChanged,
         Qt::QueuedConnection);
 
     QnGlobalSettings::AdaptorList result;
@@ -493,6 +503,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         #endif
         << m_edgeRecordingEnabledAdaptor
         << m_maxRemoteArchiveSynchronizationThreads
+        << m_updates2InfoAdaptor
         ;
 
     return result;
@@ -1106,6 +1117,16 @@ bool QnGlobalSettings::isEdgeRecordingEnabled() const
 void QnGlobalSettings::setEdgeRecordingEnabled(bool enabled)
 {
     m_edgeRecordingEnabledAdaptor->setValue(enabled);
+}
+
+QByteArray QnGlobalSettings::updates2Registry() const
+{
+    return m_updates2InfoAdaptor->value();
+}
+
+void QnGlobalSettings::setUpdates2Registry(const QByteArray& serializedRegistry)
+{
+    m_updates2InfoAdaptor->setValue(serializedRegistry);
 }
 
 int QnGlobalSettings::maxRemoteArchiveSynchronizationThreads() const

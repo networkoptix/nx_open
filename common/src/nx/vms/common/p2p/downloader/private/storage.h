@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <QtCore/QDir>
 
@@ -28,10 +29,12 @@ struct FileMetadata: FileInformation
     QVector<QByteArray> chunkChecksums;
 };
 
-class Storage
+class Storage: public QObject
 {
+    Q_OBJECT
+
 public:
-    Storage(const QDir& m_downloadsDirectory);
+    Storage(const QDir& m_downloadsDirectory, QObject* parent = nullptr);
 
     QDir downloadsDirectory() const;
 
@@ -61,6 +64,12 @@ public:
     static qint64 calculateFileSize(const QString& filePath);
     static int calculateChunkCount(qint64 fileSize, qint64 calculateChunkSize);
     static QVector<QByteArray> calculateChecksums(const QString& filePath, qint64 chunkSize);
+
+signals:
+    void fileAdded(const FileInformation& fileInformation);
+    void fileDeleted(const QString& fileName);
+    void fileInformationChanged(const FileInformation& fileInformation);
+    void fileStatusChanged(const FileInformation& fileInformation);
 
 private:
     ResultCode addDownloadedFile(const FileInformation& fileInformation);

@@ -58,8 +58,7 @@ Error AxisMetadataManager::startFetchingMetadata(nxpl::NX_GUID* eventTypeList, i
     if (!m_monitor)
         return Error::unknownError;
     m_monitor->setManager(this);
-    m_monitor->startMonitoring(eventTypeList, eventTypeListSize);
-    return Error::noError;
+    return m_monitor->startMonitoring(eventTypeList, eventTypeListSize);
 }
 
 Error AxisMetadataManager::stopFetchingMetadata()

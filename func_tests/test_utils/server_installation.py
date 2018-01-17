@@ -1,4 +1,4 @@
-'Class to manipulate directory to which server instance is installed'
+"""Manipulate directory to which server instance is installed."""
 
 import ConfigParser
 import StringIO

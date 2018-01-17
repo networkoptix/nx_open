@@ -1,6 +1,4 @@
-'''
-Proxy test. It tests proxy request feature (request with X-server-guid HTTP header)
-'''
+"""Test proxy request feature (request with X-server-guid HTTP header)."""
 
 
 def test_proxy_light_request(server_factory, http_schema):

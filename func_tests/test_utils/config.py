@@ -29,7 +29,7 @@ def str_to_timedelta(duration_str):
     try:
         if not match: return datetime.timedelta(seconds=int(duration_str))
         timedelta_params = {k: int(v)
-                            for (k, v) in match.groupdict().iteritems() if v}
+                            for (k, v) in match.groupdict().items() if v}
         if not timedelta_params:
             return datetime.timedelta(seconds=int(duration_str))
         return datetime.timedelta(**timedelta_params)

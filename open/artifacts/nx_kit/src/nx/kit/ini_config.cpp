@@ -344,25 +344,46 @@ std::string IniConfig::Impl::determineIniDir()
         return iniFilesDir();
 
     #if defined(ANDROID) || defined(__ANDROID__)
-        // NOTE: On Android, QDir::iniFileDir() and std::tmpnam() return non-existing "/tmp".
         return "/sdcard/";
     #else
-        // If the temp path cannot be determined, it remains empty.
-        char iniFileDir[L_tmpnam] = "";
-        if (std::tmpnam(iniFileDir))
+        #if defined(_WIN32)
+            static const char kSeparator = '\\';
+            static const char* const kEnvVar = "LOCALAPPDATA";
+            static const std::string extraDir = "";
+        #else
+            static const char kSeparator = '/';
+            static const char* const kEnvVar = "HOME";
+            static const std::string extraDir = std::string(".config") + kSeparator;
+        #endif
+
+        const char* const env_NX_INI_DIR = getenv("NX_INI_DIR");
+        if (env_NX_INI_DIR != nullptr)
+            return std::string(env_NX_INI_DIR) + kSeparator;
+
+        const char* const env = getenv(kEnvVar);
+        if (env != nullptr)
+            return std::string(env) + kSeparator + extraDir + "nx_ini" + kSeparator;
+    #endif
+
+#if 0 // Using OS temp dir has been abandoned.
+    char iniFileDir[L_tmpnam] = "";
+    if (std::tmpnam(iniFileDir))
+    {
+        // Extract dir name from the file path - truncate after the last path separator.
+        for (int i = (int) strlen(iniFileDir) - 1; i >= 0; --i)
         {
-            // Extract dir name from the file path - truncate after the last path separator.
-            for (int i = (int) strlen(iniFileDir) - 1; i >= 0; --i)
+            if (iniFileDir[i] == '/' || iniFileDir[i] == '\\')
             {
-                if (iniFileDir[i] == '/' || iniFileDir[i] == '\\')
-                {
-                    iniFileDir[i + 1] = '\0';
-                    break;
-                }
+                iniFileDir[i + 1] = '\0';
+                break;
             }
         }
-        return std::string(iniFileDir);
-    #endif
+    }
+    return std::string(iniFileDir);
+#endif // 0
+
+    // If the path cannot be determined, use empty string.
+    return "";
 }
 
 /**

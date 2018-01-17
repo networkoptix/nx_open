@@ -1,6 +1,6 @@
-'''Camera support classes
+"""Camera support classes
 
-Server has separate protocol created specifically for test cameras. It multicast UDP packets on port 4984
+Server has separate protocol created specifically for test cameras. It multicasts UDP packets to port 4984
 and expects UDP responses from test cameras, with camera mac address and TCP endpoint for media streaming.
 Then it connects to that endpoint using TCP, with one-line request and expects media stream with specific
 formatting in response.
@@ -10,7 +10,7 @@ All this is supported by 3 classes:
 * MediaStreamer - reads TCP request on connected socket and sends media stream from file.
 All these 3 classes are internal for this module; Tests only see and use Camera and CameraFactory instances,
 created using 'camera' or 'camera_factory' fixtures.
-'''
+"""
 
 import datetime
 import logging
@@ -121,10 +121,11 @@ class Camera(object):
     def switch_to_server(self, server):
         assert self.id, 'Camera %s is not yet registered on server' % self
         server.rest_api.ec2.saveCamera.POST(id=self.id, parentId=server.ecs_guid)
+        d = None
         for d in server.rest_api.ec2.getCamerasEx.GET():
             if d['id'] == self.id:
                 break
-        else:
+        if d is None:
             pytest.fail('Camera %s is unknown for server %s' % (self, server))
         assert d['parentId'] == server.ecs_guid
 
@@ -221,7 +222,7 @@ class MediaListener(object):
         self._thread.start()
 
     def __str__(self):
-        return ('Test camera media listener at %s:%d' % (self.host, self.port))
+        return 'Test camera media listener at %s:%d' % (self.host, self.port)
 
     def stop(self):
         log.info('%s with %d active streamers: stopping...', self, len(self._streamers))
@@ -257,7 +258,7 @@ class MediaStreamer(object):
 
     def __str__(self):
         host, port = self._peer_address
-        return ('Test camera media streamer for %s:%d' % (host, port))
+        return 'Test camera media streamer for %s:%d' % (host, port)
 
     def stop(self):
         self._stop_flag = True

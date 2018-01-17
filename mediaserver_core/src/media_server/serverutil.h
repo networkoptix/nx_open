@@ -1,4 +1,5 @@
 #pragma once
+#include <QtCore/QString>
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>

@@ -1,7 +1,7 @@
-'''Transaction log utilities
+"""Transaction log utilities
 
-    Classes and utilities to work with transaction log JSON structure returned by server
-'''
+Classes and utilities to work with transaction log JSON structure returned by server
+"""
 
 import json
 from functools import total_ordering

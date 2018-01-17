@@ -81,10 +81,10 @@ buildDistribution()
 
     # Copy mediaserver plugins.
     local PLUGIN_FILENAME
-    local -r PLUGINS=( hikvision_metadata_plugin )
+    local PLUGINS=( hikvision_metadata_plugin )
     if [ "$COMPANY_NAME" == "hanwha" ]
     then
-        PLUGINS+=( hanwha_metadata__plugin )
+        PLUGINS+=( hanwha_metadata_plugin )
     fi
     for PLUGIN in "${PLUGINS[@]}"
     do

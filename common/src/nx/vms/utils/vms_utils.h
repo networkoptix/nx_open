@@ -13,6 +13,12 @@ namespace nx {
 namespace vms {
 namespace utils {
 
+/**
+* @return Unique filename according to pattern "<prefix>_<build>_<index>.backup" by
+* incrementing index
+*/
+    QString makeNextUniqueName(const QString& prefix, int build);
+
 bool backupDatabase(
     const QString& outputDir,
     std::shared_ptr<ec2::AbstractECConnection> connection);

@@ -23,16 +23,19 @@
 #include <core/resource/media_server_resource.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/resource_views/functional_delegate_utilities.h>
+
+#include <ui/delegates/resource_item_delegate.h>
+#include <ui/delegates/customizable_item_delegate.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/models/resource/resource_list_model.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
-#include <ui/style/custom_style.h>
 
 #include <utils/email/email.h>
 #include <utils/common/html.h>
-
 #include <nx/audio/audiodevice.h>
 #include <utils/common/app_info.h>
 
@@ -60,6 +63,25 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
     m_copyButton = new ClipboardButton(ClipboardButton::StandardType::copyLong, this);
     ui->buttonBox->addButton(m_copyButton, QDialogButtonBox::HelpRole);
 
+    using ResourceListModel = QnResourceListModel;
+    ui->servers->setItemDelegateForColumn(0, new QnResourceItemDelegate(this));
+    ui->servers->setItemDelegateForColumn(1, nx::client::desktop::makeVersionStatusDelegate(context(), this));
+
+    m_serverListModel = new QnResourceListModel(this);
+    m_serverListModel->setHasStatus(true);
+
+    // Custom accessor to get a string with server version
+    m_serverListModel->setCustomColumnAccessor(1, nx::client::desktop::resourceVersionAccessor);
+    ui->servers->setModel(m_serverListModel);
+
+    auto* header = ui->servers->horizontalHeader();
+    header->setSectionsClickable(false);
+    header->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
+    header->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+
+    // Fill in server list and generate report.
+    generateServersReport();
+
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QnAboutDialog::reject);
     connect(m_copyButton, &QPushButton::clicked, this, &QnAboutDialog::at_copyButton_clicked);
     connect(qnGlobalSettings, &QnGlobalSettings::emailSettingsChanged, this, &QnAboutDialog::retranslateUi);
@@ -80,18 +102,12 @@ void QnAboutDialog::changeEvent(QEvent *event)
         retranslateUi();
 }
 
-QString QnAboutDialog::connectedServers() const
+void QnAboutDialog::generateServersReport()
 {
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
 
-    QnSoftwareVersion latestVersion = watcher->latestVersion();
-    QnSoftwareVersion latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
-
-    // if some component is newer than the newest mediaserver, focus on its version
-    if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
-        latestMsVersion = latestVersion;
-
-    QStringList servers;
+    QnResourceList servers;
+    QStringList report;
     for (const QnAppInfoMismatchData &data: watcher->mismatchData())
     {
         if (data.component != Qn::ServerComponent)
@@ -101,17 +117,15 @@ QString QnAboutDialog::connectedServers() const
         if (!server)
             continue;
 
-        /* Consistency with ActionHandler::at_versionMismatchMessageAction_triggered */
         QString version = L'v' + data.version.toString();
-        bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
-        if (updateRequested)
-            version = setWarningStyleHtml(version);
-
         QString serverText = lit("%1: %2").arg(QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl), version);
-        servers << serverText;
+        report << serverText;
+        servers << server;
     }
 
-    return servers.join(lit("<br/>"));
+    this->m_serversReport = report.join(lit("<br/>"));
+
+    m_serverListModel->setResources(servers);
 }
 
 void QnAboutDialog::retranslateUi()
@@ -129,10 +143,6 @@ void QnAboutDialog::retranslateUi()
         .arg(QnAppInfo::applicationPlatform())
         .arg(QnAppInfo::applicationArch())
         .arg(QnAppInfo::applicationCompiler());
-
-    QString servers = connectedServers();
-    if (servers.isEmpty())
-        servers = tr("Client is not connected to any System");
 
     QString appName = lit("<b>%1&trade; %2</b>")
         .arg(QnAppInfo::organizationName())
@@ -165,7 +175,6 @@ void QnAboutDialog::retranslateUi()
     ui->versionLabel->setText(version.join(lineSeparator));
     ui->creditsLabel->setText(credits.join(lineSeparator));
     ui->gpuLabel->setText(gpu.join(lineSeparator));
-    ui->serversLabel->setText(servers);
 
     QString supportAddress = qnGlobalSettings->emailSettings().supportEmail;
     QString supportLink = supportAddress;
@@ -186,14 +195,13 @@ void QnAboutDialog::retranslateUi()
 void QnAboutDialog::at_copyButton_clicked() {
     QClipboard *clipboard = QApplication::clipboard();
 
-    clipboard->setText(
-         QTextDocumentFragment::fromHtml(ui->versionLabel->text()).toPlainText() +
-         QLatin1String("\n") +
-         QTextDocumentFragment::fromHtml(ui->gpuLabel->text()).toPlainText() +
-         QLatin1String("\n") +
-         QTextDocumentFragment::fromHtml(ui->serversLabel->text()).toPlainText()
-    );
+    QString output;
+
+    output += QTextDocumentFragment::fromHtml(ui->versionLabel->text()).toPlainText() +
+        QLatin1String("\n");
+    output += QTextDocumentFragment::fromHtml(ui->gpuLabel->text()).toPlainText() +
+        QLatin1String("\n");
+    output += QTextDocumentFragment::fromHtml(m_serversReport).toPlainText();
+
+    clipboard->setText(output);
 }
-
-
-

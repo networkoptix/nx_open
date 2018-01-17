@@ -56,6 +56,8 @@ class AuxiliaryTask;
 class QnUuid;
 class QnScheduleSync;
 
+namespace nx { namespace analytics { namespace storage { class AbstractEventsStorage; }}}
+
 class QnStorageManager: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
@@ -69,7 +71,10 @@ public:
 
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
-    QnStorageManager(QnCommonModule* commonModule, QnServer::StoragePool kind);
+    QnStorageManager(
+        QnCommonModule* commonModule,
+        nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
+        QnServer::StoragePool kind);
     virtual ~QnStorageManager();
     static QnStorageManager* normalInstance();
     static QnStorageManager* backupInstance();
@@ -241,7 +246,8 @@ private:
 
     // get statistics for the whole archive except of bitrate. It's analyzed for the last records of archive only in range <= bitrateAnalizePeriodMs
     QnRecordingStatsData mergeStatsFromCatalogs(qint64 bitrateAnalizePeriodMs, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
-    void clearBookmarks();
+    void clearAnalyticsEvents(const QMap<QnUuid, qint64>& dataToDelete);
+    QMap<QnUuid, qint64> calculateOldestDataTimestampByCamera();
     bool getMinTimes(QMap<QString, qint64>& lastTime);
     void processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap);
 
@@ -261,6 +267,7 @@ private:
     void startAuxTimerTasks();
 
 private:
+    nx::analytics::storage::AbstractEventsStorage* m_analyticsEventsStorage;
     const QnServer::StoragePool m_role;
     StorageMap                  m_storageRoots;
     FileCatalogMap              m_devFileCatalog[QnServer::ChunksCatalogCount];

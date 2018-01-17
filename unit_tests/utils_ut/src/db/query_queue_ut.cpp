@@ -81,7 +81,7 @@ protected:
     void whenQueryTimedOut()
     {
         std::this_thread::sleep_for(kQueryTimeout * 2);
-        ASSERT_FALSE(m_queryQueue.pop(std::chrono::milliseconds(1)));
+        ASSERT_FALSE(static_cast<bool>(m_queryQueue.pop(std::chrono::milliseconds(1))));
         m_timedOutQueries.pop();
     }
 
@@ -94,7 +94,7 @@ protected:
             std::bind(&QueryQueue::processTimedOutQuery, this, _1));
 
         m_queryQueue.push(std::make_unique<QueryExecutorStub>(QueryType::modification));
-        ASSERT_TRUE(m_queryQueue.pop());
+        ASSERT_TRUE(static_cast<bool>(m_queryQueue.pop()));
     }
 
     detail::QueryQueue& queryQueue()
