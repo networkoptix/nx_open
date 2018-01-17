@@ -73,7 +73,8 @@ FileUpload UploadWorker::start()
 
     QSharedPointer<QFile> fileCopy = d->file;
     d->md5Future = QtConcurrent::run(
-        [fileCopy]() {
+        [fileCopy]()
+        {
             nx::utils::QnCryptographicHash hash(nx::utils::QnCryptographicHash::Md5);
             if (hash.addData(fileCopy.data()))
                 return hash.result();
