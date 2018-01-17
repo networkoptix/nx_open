@@ -109,6 +109,36 @@ bool QnCameraAdvancedParameter::isValid() const
         && (!id.isEmpty());
 }
 
+bool QnCameraAdvancedParameter::isValueValid(const QString& value) const
+{
+    if (dataType == DataType::None) 
+        return false;
+
+    if (dataType == DataType::Bool)
+        return value == lit("true") || value == lit("false");
+
+    if (dataType == DataType::Number)
+    {
+        bool isOk = false;
+        const auto number = value.toDouble(&isOk);
+        if (!isOk)
+            return false;
+
+        if (range.isEmpty())
+            return true;
+
+        double min = 0, max = 0;
+        getRange(min, max);
+        return number >= min && number <= max;
+    }
+
+    if (dataType == DataType::Enumeration)
+        return range.isEmpty() || getRange().contains(value);
+
+    // TODO: Add some more checks?
+    return true;
+}
+
 QString QnCameraAdvancedParameter::dataTypeToString(DataType value)
 {
     switch (value)

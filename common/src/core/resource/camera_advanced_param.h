@@ -120,6 +120,7 @@ struct QnCameraAdvancedParameter
     bool bindDefaultToMinimum = false;
 
     bool isValid() const;
+    bool isValueValid(const QString& value) const;
     QStringList getRange() const;
     QStringList getInternalRange() const;
     QString fromInternalRange(const QString& value) const;

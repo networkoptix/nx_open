@@ -196,7 +196,7 @@ QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::describeCapab
     bitrate.range = lit("1,999999");
 
     QnCameraAdvancedParameter fps;
-    fps.id = parameterName(kBitrateKpbs);
+    fps.id = parameterName(kFps);
     fps.name = lit("Frame per Second (FPS)");
     fps.dataType = QnCameraAdvancedParameter::DataType::Number;
     fps.range = lit("1,999999");
@@ -344,8 +344,8 @@ boost::optional<QString> StreamCapabilityAdvancedParametersProvider::getValue(
     if (values.contains(name))
     {
         const auto value = values.value(name);
-        const auto range = m_descriptions.getParameterById(name).getRange();
-        if (range.isEmpty() || range.contains(value))
+        // TODO: Consider to move this check a level higher.
+        if (m_descriptions.getParameterById(name).isValueValid(value))
             return value;
     }
 
