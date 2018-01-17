@@ -8,6 +8,7 @@
 
 #include <nx/network/http/http_client.h>
 #include <plugins/resource/hikvision/hikvision_resource.h>
+#include <utils/media/av_codec_helper.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -58,8 +59,10 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
 
     auto channelCapabilities = optionalChannelCapabilities.get();
     auto resolutionList = m_hikvisionResource->primaryVideoCapabilities().resolutions;
-    auto resolution = chooseResolution(channelCapabilities, resolutionList.isEmpty() ? QSize() : resolutionList.front());
-    auto codec = chooseCodec(channelCapabilities);
+    auto resolution = chooseResolution(channelCapabilities, liveStreamParameters.resolution);
+    auto codec = chooseCodec(
+        channelCapabilities,
+        QnAvCodecHelper::codecIdFromString(liveStreamParameters.codec));
     auto fps = chooseFps(channelCapabilities, liveStreamParameters.fps);
 
     boost::optional<int> quality = boost::none;
@@ -128,19 +131,36 @@ QSize HikvisionHevcStreamReader::chooseResolution(
     return secondaryResolution;
 }
 
-QString HikvisionHevcStreamReader::chooseCodec(
-    const ChannelCapabilities& channelCapabilities) const
+QString codecToHikvisionString(AVCodecID codec)
 {
-    // TODO: #dmishin use constants instead of literals
-    if (codecSupported(AV_CODEC_ID_HEVC, channelCapabilities))
+    switch (codec)
+    {
+    case AV_CODEC_ID_HEVC:
         return lit("H.265");
-    else if (codecSupported(AV_CODEC_ID_H264, channelCapabilities))
+    case AV_CODEC_ID_H264:
         return lit("H.264");
-    else if (codecSupported(AV_CODEC_ID_MJPEG, channelCapabilities))
+    case AV_CODEC_ID_MJPEG:
         return lit("MJPEG");
+    default:
+        NX_ASSERT(0, "Unsupported codec");
+        return QString();
+    }
+}
+
+QString HikvisionHevcStreamReader::chooseCodec(
+    const ChannelCapabilities& channelCapabilities,
+    AVCodecID codec) const
+{
+    if (codecSupported(codec, channelCapabilities))
+        return codecToHikvisionString(codec);
+    else if (codecSupported(AV_CODEC_ID_HEVC, channelCapabilities))
+        return codecToHikvisionString(AV_CODEC_ID_HEVC);
+    else if (codecSupported(AV_CODEC_ID_H264, channelCapabilities))
+        return codecToHikvisionString(AV_CODEC_ID_H264);
+    else if (codecSupported(AV_CODEC_ID_MJPEG, channelCapabilities))
+        return codecToHikvisionString(AV_CODEC_ID_MJPEG);
 
     return QString();
-
 }
 
 int HikvisionHevcStreamReader::chooseFps(

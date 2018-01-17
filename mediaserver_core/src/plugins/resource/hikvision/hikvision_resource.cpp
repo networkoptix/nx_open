@@ -15,6 +15,8 @@
 #include <onvif/soapMediaBindingProxy.h>
 #include <nx/utils/log/log.h>
 #include <plugins/utils/xml_request_helper.h>
+#include <utils/media/av_codec_helper.h>
+#include <utils/media/av_codec_helper.h>
 
 namespace {
 
@@ -45,8 +47,20 @@ HikvisionResource::~HikvisionResource()
 nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDrives(
     bool primaryStream)
 {
-    // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    using namespace nx::mediaserver::resource;
+    auto result = base_type::getStreamCapabilityMapFromDrives(primaryStream);
+    if (m_hevcSupported)
+    {
+        StreamCapabilityMap resultCopy = result;
+        for (const auto& onvifKeys: resultCopy.keys())
+        {
+            StreamCapabilityKey key;
+            key.codec = QnAvCodecHelper::codecIdToString(AV_CODEC_ID_HEVC);
+            key.resolution = onvifKeys.resolution;
+            result.insert(key, nx::media::CameraStreamCapability());
+        }
+    }
+    return result;
 }
 
 CameraDiagnostics::Result HikvisionResource::initializeCameraDriver()
@@ -106,10 +120,7 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
         }
     }
 
-    if (!m_hevcSupported)
-        return base_type::initializeMedia(onvifCapabilities);
-
-    return fetchChannelCount();
+    return base_type::initializeMedia(onvifCapabilities);
 }
 
 std::unique_ptr<nx_http::HttpClient> HikvisionResource::getHttpClient()

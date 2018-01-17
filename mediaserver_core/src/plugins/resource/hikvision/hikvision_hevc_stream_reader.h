@@ -33,7 +33,8 @@ private:
         const QSize& primaryResolution) const;
 
     QString chooseCodec(
-        const hikvision::ChannelCapabilities& channelCapabilities) const;
+        const hikvision::ChannelCapabilities& channelCapabilities,
+        AVCodecID codec) const;
 
     int chooseFps(
         const hikvision::ChannelCapabilities& channelCapabilities,

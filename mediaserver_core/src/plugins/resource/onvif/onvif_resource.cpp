@@ -52,6 +52,7 @@
 #include <plugins/utils/multisensor_data_provider.h>
 #include <core/resource_management/resource_properties.h>
 #include <common/static_common_module.h>
+#include <utils/media/av_codec_helper.h>
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
@@ -547,7 +548,8 @@ nx::mediaserver::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
     auto& capabilities = primaryStream ? m_primaryStreamCapabilities : m_secondaryStreamCapabilities;
 
     StreamCapabilityKey key;
-    key.codec = capabilities.isH264 ? "H264" : "JPEG";
+    key.codec = QnAvCodecHelper::codecIdToString(
+        capabilities.isH264 ? AV_CODEC_ID_H264 : AV_CODEC_ID_MJPEG);
 
     StreamCapabilityMap result;
     for (const auto& resolution: capabilities.resolutions)
