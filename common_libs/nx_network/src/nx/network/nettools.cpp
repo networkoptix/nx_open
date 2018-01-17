@@ -829,7 +829,6 @@ int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
 
             case AF_INET:
             {
-                uint32_t ip4Addr = ((struct in_addr*)(ifaptr)->ifa_addr)->s_addr;
                 std::cout<<"AF_INET. "<<ifaptr->ifa_name<<": "<<inet_ntoa( ((struct sockaddr_in*)ifaptr->ifa_addr)->sin_addr )<<std::endl;
                 ifNameToInetAddress[ifaptr->ifa_name] = inet_ntoa( ((struct sockaddr_in*)ifaptr->ifa_addr)->sin_addr );
                 break;
