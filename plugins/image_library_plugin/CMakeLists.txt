@@ -1,4 +1,4 @@
-nx_add_target(image_library_plugin LIBRARY
+nx_add_server_plugin(image_library_plugin
     NO_MOC NO_PCH PUBLIC_LIBS Qt5::Core)
 
 target_include_directories(image_library_plugin

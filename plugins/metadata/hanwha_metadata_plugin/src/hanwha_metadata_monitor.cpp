@@ -45,7 +45,12 @@ HanwhaMetadataMonitor::~HanwhaMetadataMonitor()
 
 void HanwhaMetadataMonitor::startMonitoring()
 {
-    m_timer.post([this](){ initMonitorUnsafe(); });
+    m_timer.post(
+        [this]()
+        {
+            m_monitoringIsInProgress = true;
+            initMonitorUnsafe();
+        });
 }
 
 void HanwhaMetadataMonitor::stopMonitoring()
@@ -54,6 +59,7 @@ void HanwhaMetadataMonitor::stopMonitoring()
     m_timer.post(
         [this, &promise]()
         {
+            m_monitoringIsInProgress = false;
             if (m_httpClient)
                 m_httpClient->pleaseStopSync();
 
@@ -83,6 +89,19 @@ void HanwhaMetadataMonitor::clearHandlers()
     m_handlers.clear();
 }
 
+void HanwhaMetadataMonitor::setResourceAccess(const QUrl& url, const QAuthenticator& auth)
+{
+    m_timer.post(
+        [this, url, auth]()
+        {
+            m_url = buildMonitoringUrl(url);
+            m_auth = auth;
+
+            if (m_monitoringIsInProgress)
+                initMonitorUnsafe();
+        });
+}
+
 QUrl HanwhaMetadataMonitor::buildMonitoringUrl(const QUrl& url) const
 {
     return QUrl(kMonitorUrlTemplate
@@ -92,9 +111,12 @@ QUrl HanwhaMetadataMonitor::buildMonitoringUrl(const QUrl& url) const
 
 void HanwhaMetadataMonitor::initMonitorUnsafe()
 {
+    if (!m_monitoringIsInProgress)
+        return;
+
     std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
     auto httpClient = nx_http::AsyncHttpClient::create();
-    m_timer.pleaseStopSync();
+    m_timer.cancelSync();
     httpClient->bindToAioThread(m_timer.getAioThread());
 
     connect(

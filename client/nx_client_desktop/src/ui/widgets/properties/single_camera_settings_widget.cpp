@@ -514,7 +514,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         if (!silent)
         {
             const auto callback = [this]() { showMaxFpsWarningIfNeeded(); };
-            executeDelayedParented(callback, kDefaultDelay, this);
+            executeDelayedParented(callback, this);
         }
     }
 

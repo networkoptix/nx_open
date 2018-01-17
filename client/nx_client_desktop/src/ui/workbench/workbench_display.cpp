@@ -1794,7 +1794,6 @@ void QnWorkbenchDisplay::adjustGeometryLater(QnWorkbenchItem *item, bool animate
         {
             adjustGeometry(item, animate);
         },
-        kDefaultDelay,
         item); //< Making item the parent to avoid call when it is deleted already.
 }
 

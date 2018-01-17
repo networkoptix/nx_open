@@ -120,8 +120,7 @@ private:
 
     void setFrameSize(const QSize& size);
 
-    void setCamera(const QnVirtualCameraResourcePtr& camera);
-    void setLocalFile(const QnMediaResourcePtr& other);
+    void updateThumbnail(const QnMediaResourcePtr& media);
 
     static void generateAlerts(ExportMediaValidator::Results results,
         QStringList& weakAlerts, QStringList& severeAlerts);

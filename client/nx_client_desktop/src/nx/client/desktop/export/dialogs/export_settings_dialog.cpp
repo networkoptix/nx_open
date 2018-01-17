@@ -26,7 +26,6 @@
 #include <utils/math/math.h>
 #include <nx/client/desktop/ui/common/selectable_text_button_group.h>
 #include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
-#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
 #include <nx/fusion/model_functions.h>
 
 namespace nx {

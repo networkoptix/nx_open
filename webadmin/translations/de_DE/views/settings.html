@@ -43,7 +43,7 @@ Bitte an das Netzwerk anschließen oder eine korrekte IP-Adresse vergeben.
                             Der Server wird vom aktuellen System abgelöst. Videoarchiv bleibt intakt.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Werkseinstellungen wiederherstellen</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>Server aus dem System trennen</h3>
                         <p>Diese Aktion löscht den Server vom System. Die Datenbank, die lokalen Benutzer und die Konfiguration wird beibehalten. Videoarchiv bleibt intakt. <b>Cloud-Benutzer werden gelöscht.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Vom System trennen</button></p>

@@ -27,6 +27,24 @@ function(nx_set_variable_if_empty variable value)
     endif()
 endfunction()
 
+function(nx_init_known_files_list)
+    get_property(property_set GLOBAL PROPERTY known_files SET)
+
+    if(NOT property_set)
+        set_property(GLOBAL PROPERTY known_files "known_files.txt\n")
+    endif()
+endfunction()
+
+function(nx_store_known_file file_name)
+    file(RELATIVE_PATH file ${CMAKE_BINARY_DIR} "${file_name}")
+    set_property(GLOBAL APPEND_STRING PROPERTY known_files "${file}\n")
+endfunction()
+
+function(nx_save_known_files)
+    get_property(files GLOBAL PROPERTY known_files)
+    file(WRITE ${CMAKE_BINARY_DIR}/known_files.txt ${files})
+endfunction()
+
 function(nx_copy)
     cmake_parse_arguments(COPY "IF_NEWER;IF_DIFFERENT;IF_MISSING" "DESTINATION" "" ${ARGN})
 
@@ -71,6 +89,7 @@ function(nx_configure_file input output)
 
     message(STATUS "Generating ${output}")
     configure_file(${input} ${output} ${ARGN})
+    nx_store_known_file(${output})
 endfunction()
 
 function(nx_configure_directory input output)
@@ -93,6 +112,35 @@ function(nx_configure_directory input output)
     endif()
 endfunction()
 
+function(nx_get_copy_full_destination_name var src dst)
+    if(IS_DIRECTORY ${dst})
+        get_filename_component(basename ${src} NAME)
+        set(${var} ${dst}/${basename} PARENT_SCOPE)
+    else()
+        set(${var} ${dst} PARENT_SCOPE)
+    endif()
+endfunction()
+
+function(nx_copy_package_entry src dst)
+    if(NOT EXISTS ${src})
+        message(FATAL_ERROR "${src} does not exist.")
+    endif()
+
+    file(COPY ${src} DESTINATION ${dst})
+
+    nx_get_copy_full_destination_name(full_dst ${src} ${dst})
+
+    if(IS_DIRECTORY ${src})
+        file(GLOB_RECURSE files RELATIVE ${src} "${src}/*")
+
+        foreach(file ${files})
+            nx_store_known_file(${full_dst}/${file})
+        endforeach()
+    else()
+        nx_store_known_file(${full_dst})
+    endif()
+endfunction()
+
 function(nx_copy_package_for_configuration package_dir config)
     cmake_parse_arguments(COPY "SKIP_BIN;SKIP_LIB" "" "" ${ARGN})
     if(config)
@@ -104,9 +152,9 @@ function(nx_copy_package_for_configuration package_dir config)
             file(GLOB entries "${package_dir}/bin/*")
             foreach(entry ${entries})
                 if(CONFIG)
-                    file(COPY "${entry}" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG}}")
+                    nx_copy_package_entry("${entry}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG}}")
                 else()
-                    file(COPY "${entry}" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+                    nx_copy_package_entry("${entry}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
                 endif()
             endforeach()
         endif()
@@ -122,10 +170,10 @@ function(nx_copy_package_for_configuration package_dir config)
                 endif()
                 foreach(entry ${entries})
                     if(CONFIG)
-                        file(COPY "${entry}"
-                            DESTINATION "${CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CONFIG}}")
+                        nx_copy_package_entry("${entry}"
+                            "${CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CONFIG}}")
                     else()
-                        file(COPY "${entry}" DESTINATION "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+                        nx_copy_package_entry("${entry}" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
                     endif()
                 endforeach()
             endif()
@@ -151,11 +199,12 @@ function(nx_copy_package package_dir)
 endfunction()
 
 function(nx_copy_current_package)
-    file(GLOB contents ${CMAKE_CURRENT_LIST_DIR}/*)
-    file(COPY ${contents} DESTINATION ${CMAKE_BINARY_DIR}
-        PATTERN ".rdpack" EXCLUDE
-        PATTERN "*.cmake" EXCLUDE
-    )
+    file(GLOB entries ${CMAKE_CURRENT_LIST_DIR}/*)
+    foreach(entry ${entries})
+        if(NOT entry MATCHES "\\.rdpack$|.cmake$")
+            nx_copy_package_entry(${entry} ${CMAKE_BINARY_DIR})
+        endif()
+    endforeach()
 endfunction()
 
 # TODO Extend nx_copy function
@@ -177,4 +226,17 @@ function(nx_create_qt_conf file_name)
     endif()
 
     nx_configure_file(${CMAKE_SOURCE_DIR}/cmake/qt.conf ${file_name})
+    nx_store_known_file(${file_name})
 endfunction()
+
+function(nx_find_first_matching_file var glob)
+    file(GLOB files "${glob}")
+    if(files)
+        list(GET files 0 file)
+    else()
+        set(file)
+    endif()
+    set(${var} ${file} PARENT_SCOPE)
+endfunction()
+
+nx_init_known_files_list()

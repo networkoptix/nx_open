@@ -3,11 +3,13 @@
 #include <algorithm>
 #include <QtGui/QPainter>
 
-#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+
 #include <nx/client/desktop/image_providers/layout_background_image_provider.h>
+#include <nx/client/desktop/image_providers/resource_thumbnail_provider.h>
+
 #include <ui/common/geometry.h>
 #include <ui/common/palette.h>
 #include <ui/style/globals.h>
@@ -32,30 +34,27 @@ static inline bool isOdd(int value)
 
 } // namespace
 
+using ResourceThumbnailProviderPtr = QSharedPointer<ResourceThumbnailProvider>;
+using QnImageProviderPtr = QSharedPointer<QnImageProvider>;
+
 struct LayoutThumbnailLoader::Private
 {
     // Input data.
     LayoutThumbnailLoader* const q;
     QnLayoutResourcePtr layout;
-    bool allowNonCameraResources = true;
     QSize maximumSize;
     qint64 msecSinceEpoch;
-    QnThumbnailRequestData::ThumbnailFormat format;
 
     // Methods.
     Private(LayoutThumbnailLoader* q,
         const QnLayoutResourcePtr& layout,
-        bool allowNonCameraResources,
         const QSize& maximumSize,
-        qint64 msecSinceEpoch,
-        QnThumbnailRequestData::ThumbnailFormat format)
+        qint64 msecSinceEpoch)
         :
         q(q),
         layout(layout),
-        allowNonCameraResources(allowNonCameraResources),
         maximumSize(maximumSize),
         msecSinceEpoch(msecSinceEpoch),
-        format(format),
         noDataWidget(new QnAutoscaledPlainText()),
         nonCameraWidget(new QnAutoscaledPlainText())
     {
@@ -71,7 +70,26 @@ struct LayoutThumbnailLoader::Private
         setPaletteColor(nonCameraWidget.data(), QPalette::WindowText, qnGlobals->errorTextColor());
     }
 
-    void updateTileStatus(Qn::ThumbnailStatus status, qreal aspectRatio,
+    void trackLoader(QnImageProviderPtr loader)
+    {
+        data.loaders.push_back(loader);
+        data.numLoading++;
+    }
+
+    void loaderIsComplete()
+    {
+        if (data.numLoading > 0)
+        {
+            --data.numLoading;
+            if(data.numLoading == 0)
+            {
+                data.status = Qn::ThumbnailStatus::Loaded;
+                emit q->statusChanged(data.status);
+            }
+        }
+    }
+
+    void updateTileStatus(Qn::ThumbnailStatus status, const QnAspectRatio& aspectRatio,
         const QRectF& cellRect, qreal rotation)
     {
         switch (status)
@@ -80,7 +98,7 @@ struct LayoutThumbnailLoader::Private
                 break;
 
             case Qn::ThumbnailStatus::Loaded:
-                --data.numLoading;
+                loaderIsComplete();
                 break;
 
             case Qn::ThumbnailStatus::Refreshing:
@@ -89,10 +107,12 @@ struct LayoutThumbnailLoader::Private
             {
                 rotation = qMod(rotation, 180.0);
 
-                if (qFuzzyIsNull(rotation))
+                // Aspect ratio is invalid when there is no image. No need to rotate in this case.
+                if (qFuzzyIsNull(rotation) || !aspectRatio.isValid())
                 {
-                    const auto targetRect = QnGeometry::expanded(aspectRatio,
-                        cellRect, Qt::KeepAspectRatio);
+                    const auto targetRect = aspectRatio.isValid()
+                        ? QnGeometry::expanded(aspectRatio.toFloat(), cellRect, Qt::KeepAspectRatio)
+                        : cellRect;
 
                     QPainter painter(&data.image);
                     paintPixmapSharp(&painter, specialPixmap(status, targetRect.size().toSize()),
@@ -106,13 +126,14 @@ struct LayoutThumbnailLoader::Private
                     // 0 = up, 1 = left, 2 = down.
                     const auto direction = qRound(rotation / 90.0);
 
+                    qreal ar = aspectRatio.toFloat();
                     rotation -= direction * 90.0;
                     if (isOdd(direction))
-                        aspectRatio = 1.0 / aspectRatio;
+                        ar = 1.0 / ar;
 
                     const auto cellCenter = cellRect.center();
                     const auto targetRect = QnGeometry::encloseRotatedGeometry(
-                        cellRect, aspectRatio, rotation);
+                        cellRect, ar, rotation);
 
                     QPainter painter(&data.image);
                     painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -125,16 +146,10 @@ struct LayoutThumbnailLoader::Private
 
                 emit q->imageChanged(data.image);
 
-                --data.numLoading;
+                loaderIsComplete();
                 break;
             }
         }
-
-        if (data.numLoading > 0)
-            return;
-
-        data.status = Qn::ThumbnailStatus::Loaded;
-        emit q->statusChanged(data.status);
     }
 
     void drawTile(const QImage& tile, qreal aspectRatio, const QRectF& cellRect,
@@ -221,7 +236,7 @@ struct LayoutThumbnailLoader::Private
     {
         QImage image;
         Qn::ThumbnailStatus status = Qn::ThumbnailStatus::Invalid;
-        QList<QSharedPointer<QnSingleThumbnailLoader>> loaders;
+        QList<QnImageProviderPtr> loaders;
         int numLoading = 0;
     };
 
@@ -232,14 +247,12 @@ struct LayoutThumbnailLoader::Private
 
 LayoutThumbnailLoader::LayoutThumbnailLoader(
     const QnLayoutResourcePtr& layout,
-    bool allowNonCameraResources,
     const QSize& maximumSize,
     qint64 msecSinceEpoch,
-    QnThumbnailRequestData::ThumbnailFormat format,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(this, layout, allowNonCameraResources, maximumSize, msecSinceEpoch, format))
+    d(new Private(this, layout, maximumSize, msecSinceEpoch))
 {
 }
 
@@ -314,9 +327,6 @@ void LayoutThumbnailLoader::doLoadAsync()
         if (!resource)
             continue;
 
-        if (!d->allowNonCameraResources && !resource.dynamicCast<QnVirtualCameraResource>())
-            continue;
-
         bounding = bounding.united(itemRect);
         validItems << qMakePair(iter.key(),  resource);
     }
@@ -369,9 +379,19 @@ void LayoutThumbnailLoader::doLoadAsync()
 
     if (hasBackground)
     {
-        auto backgroundLoader = new LayoutBackgroundImageProvider(d->layout,
-            kBackgroundPreviewSize, this);
-        connect(backgroundLoader, &QnImageProvider::imageChanged, this,
+        QnImageProviderPtr loader(
+            new LayoutBackgroundImageProvider(d->layout, kBackgroundPreviewSize));
+
+        connect(loader.data(), &QnImageProvider::statusChanged, this,
+            [this](Qn::ThumbnailStatus status)
+            {
+                if (status == Qn::ThumbnailStatus::Loaded)
+                {
+                    d->loaderIsComplete();
+                }
+            });
+
+        connect(loader.data(), &QnImageProvider::imageChanged, this,
             [this, backgroundRect, xscale, yscale, bounding](const QImage& image)
             {
                 const QRectF scaledBackgroundRect(
@@ -382,7 +402,10 @@ void LayoutThumbnailLoader::doLoadAsync()
 
                 d->drawBackground(image, scaledBackgroundRect);
             });
-        backgroundLoader->loadAsync();
+
+        // Ensure that loader is not forgotten before it produces any result.
+        d->trackLoader(loader);
+        loader->loadAsync();
     }
 
     for (const auto& item: validItems)
@@ -400,28 +423,22 @@ void LayoutThumbnailLoader::doLoadAsync()
             (cellRect.width() - spacing) * xscale,
             (cellRect.height() - spacing) * yscale);
 
-        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera)
-        {
-            // Non-camera resources are drawn as "NOT A CAMERA".
-            const auto scaledCellAr = QnGeometry::aspectRatio(scaledCellRect);
-            d->updateTileStatus(Qn::ThumbnailStatus::Invalid, scaledCellAr,
-                scaledCellRect, rotation);
-            continue;
-        }
-
         QSize thumbnailSize(0, scaledCellRect.height());
         if (!zoomRect.isEmpty())
             thumbnailSize /= zoomRect.height();
 
-        QSharedPointer<QnSingleThumbnailLoader> loader(new QnSingleThumbnailLoader(
-            camera, d->msecSinceEpoch, 0, thumbnailSize, d->format));
+        api::ResourceImageRequest request;
+        request.resource = resource;
+        request.msecSinceEpoch = d->msecSinceEpoch;
+        request.size = thumbnailSize;
+
+        ResourceThumbnailProviderPtr loader(new ResourceThumbnailProvider(request));
 
         connect(loader.data(), &QnImageProvider::statusChanged, this,
             [this, loader, rotation, scaledCellRect](Qn::ThumbnailStatus status)
             {
-                d->updateTileStatus(status, QnGeometry::aspectRatio(loader->sizeHint()),
-                    scaledCellRect, rotation);
+                QnAspectRatio aspectRatio(loader->sizeHint());
+                d->updateTileStatus(status, aspectRatio, scaledCellRect, rotation);
             });
 
         connect(loader.data(), &QnImageProvider::imageChanged, this,
@@ -435,9 +452,7 @@ void LayoutThumbnailLoader::doLoadAsync()
                 d->drawTile(tile, aspectRatio, scaledCellRect, rotation, zoomRect);
             });
 
-        d->data.loaders.push_back(loader);
-        ++d->data.numLoading;
-
+        d->trackLoader(loader);
         loader->loadAsync();
     }
 

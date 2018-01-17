@@ -1,4 +1,5 @@
 #pragma once
+#include <QtCore/QString>
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
@@ -25,6 +26,7 @@ namespace ec2 {
 
 QString getDataDirectory();
 void syncStoragesToSettings(const QnMediaServerResourcePtr &server);
+QString makeNextUniqueName(const QString& dir, int build);
 bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection);
 
 namespace nx

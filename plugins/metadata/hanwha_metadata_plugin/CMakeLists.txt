@@ -1,4 +1,4 @@
-nx_add_target(hanwha_metadata_plugin LIBRARY
+nx_add_server_plugin(hanwha_metadata_plugin
     NO_PCH
     PUBLIC_LIBS
         Qt5::Core Qt5::Network Qt5::Sql

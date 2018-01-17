@@ -70,11 +70,14 @@ void executeDelayed(Callback callback, int delayMs, QThread* targetThread)
     executeDelayedImpl(std::move(callback), delayMs, targetThread, nullptr);
 }
 
-QTimer *executeDelayedParented(Callback callback
-    , int delayMs
-    , QObject *parent)
+QTimer* executeDelayedParented(Callback callback, int delayMs, QObject *parent)
 {
     return executeDelayedImpl(callback, delayMs, nullptr, parent);
+}
+
+QTimer* executeDelayedParented(Callback callback, QObject* parent)
+{
+    return executeDelayedImpl(callback, kDefaultDelay, nullptr, parent);
 }
 
 void executeInThread(QThread* thread, Callback callback)

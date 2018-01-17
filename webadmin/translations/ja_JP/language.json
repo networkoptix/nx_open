@@ -87,6 +87,7 @@
         "maxRecordQueueSizeBytes": "レコードキューの最大サイズ（バイト）",
         "maxRecordQueueSizeElements": "レコードキューの最大サイズ（要素）",
         "maxRemoteArchiveSynchronizationThreads": "リモート アーカイブ同期スレッドの最大数",
+        "maxRtspConnectDurationSeconds": "Max Rtsp connect duration seconds",
         "maxSceneItems": "最大シーンアイテム（0はデフォルト）",
         "proxyConnectTimeoutSec": "プロキシ接続タイムアウト（秒）",
         "rtpTimeoutMs": "RTPタイムアウト（ミリ秒）",

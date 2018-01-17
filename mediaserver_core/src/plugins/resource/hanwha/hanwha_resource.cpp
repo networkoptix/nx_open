@@ -17,7 +17,10 @@
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
 #include <plugins/plugin_internal_tools.h>
 #include <utils/xml/camera_advanced_param_reader.h>
+
 #include <camera/camera_pool.h>
+#include <camera/video_camera.h>
+
 #include <common/common_module.h>
 
 #include <nx/utils/log/log.h>

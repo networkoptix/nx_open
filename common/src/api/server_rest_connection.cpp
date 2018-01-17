@@ -13,6 +13,7 @@
 #include <api/helpers/thumbnail_request_data.h>
 #include <api/helpers/send_statistics_request_data.h>
 #include <api/helpers/event_log_request_data.h>
+#include <nx/api/mediaserver/image_request.h>
 
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
@@ -88,9 +89,15 @@ Handle ServerConnection::getServerLocalTime(Result<QnJsonRestResult>::type callb
     return executeGet(lit("/api/gettime"), params, callback, targetThread);
 }
 
-rest::Handle ServerConnection::cameraThumbnailAsync( const QnThumbnailRequestData &request, Result<QByteArray>::type callback, QThread* targetThread /*= 0*/ )
+rest::Handle ServerConnection::cameraThumbnailAsync(const nx::api::CameraImageRequest& request,
+    Result<QByteArray>::type callback,
+    QThread* targetThread)
 {
-    return executeGet(lit("/ec2/cameraThumbnail"), request.toParams(), callback, targetThread);
+    QnThumbnailRequestData data;
+    data.request = request;
+    data.format = Qn::UbjsonFormat;
+
+    return executeGet(lit("/ec2/cameraThumbnail"), data.toParams(), callback, targetThread);
 }
 
 rest::Handle ServerConnection::twoWayAudioCommand(const QString& sourceId,
