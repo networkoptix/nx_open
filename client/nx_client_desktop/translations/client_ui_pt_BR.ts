@@ -1109,34 +1109,6 @@
     </message>
   </context>
   <context>
-    <name>ExportRapidReviewDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
-      <source>Export Rapid Review</source>
-      <translation>Exportação "Rapid Review"</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Initial Video Length</source>
-      <translation>Duração Original do vídeo</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Exported Video Length</source>
-      <translation>Duração do Vídeo Exportado</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Frames Interval</source>
-      <translation>Intervalo de frames</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Rapid Review speed</source>
-      <translation>Velocidade "Rapid Review"</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
@@ -2867,11 +2839,6 @@
       <location/>
       <source>Backup Settings...</source>
       <translation type="unfinished">Backup Settings...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
     </message>
   </context>
   <context>

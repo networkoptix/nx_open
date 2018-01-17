@@ -366,18 +366,6 @@ to view more bookmarks</source>
       <translation>删除书签...</translation>
     </message>
     <message>
-      <source>Export Selected Area...</source>
-      <translation>导出所选录像区域...</translation>
-    </message>
-    <message>
-      <source>Export Multi-Video...</source>
-      <translation>导出多个录像...</translation>
-    </message>
-    <message>
-      <source>Export Rapid Review...</source>
-      <translation>导出快速回放</translation>
-    </message>
-    <message>
       <source>Preview Search...</source>
       <translation>预览搜索...</translation>
     </message>
@@ -991,16 +979,16 @@ to view more bookmarks</source>
       <translation>您即将导出长视频。它可能需要超过千兆字节的硬盘空间，需要几分钟才能完成。</translation>
     </message>
     <message>
-      <source>Settings are not available for .EXE files.</source>
-      <translation>设置不可用于.EXE文件。</translation>
-    </message>
-    <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
       <translation>本地文件，服务器监视器小部件和网页将不会被导出。</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
       <translation>导出的.EXE文件的大小超过4 GB，无法在Windows中双击打开。它只能在 %1 Client中播放。</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .NOV and .EXE files.</source>
+      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
     </message>
   </context>
   <context>
@@ -1113,8 +1101,9 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation>
-        <numerusform>文件名不应包含下列字符：%1</numerusform>
+      <translation type="unfinished">
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
       </translation>
     </message>
     <message>
@@ -1352,8 +1341,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
-        <numerusform>还有 %n项...</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -1469,32 +1458,32 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation>
-        <numerusform>这些设备已从系统中移除</numerusform>
+      <translation type="unfinished">
+        <numerusform>These devices are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation>
-        <numerusform>摄像机已从系统中移除</numerusform>
+      <translation type="unfinished">
+        <numerusform>These cameras are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation>
-        <numerusform>服务器已从系统中移除</numerusform>
+      <translation type="unfinished">
+        <numerusform>These servers are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation>
-        <numerusform>用户已从系统中移除</numerusform>
+      <translation type="unfinished">
+        <numerusform>These users are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation>
-        <numerusform>资源已从系统中删除</numerusform>
+      <translation type="unfinished">
+        <numerusform>These resources are removed from System</numerusform>
       </translation>
     </message>
     <message>
@@ -1574,8 +1563,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n action(s)</source>
-      <translation>
-        <numerusform>%n 使用</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n action(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -1724,8 +1713,8 @@ to view more bookmarks</source>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation>
-        <numerusform>当前有 %n 通知</numerusform>
+      <translation type="unfinished">
+        <numerusform>You have %n notifications</numerusform>
       </translation>
     </message>
   </context>
@@ -1783,14 +1772,14 @@ to view more bookmarks</source>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation>
-        <numerusform>%n 设备的 %1</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 of %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation>
-        <numerusform>%n 摄像机的 %1</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 of %n cameras</numerusform>
       </translation>
     </message>
     <message>
@@ -1803,8 +1792,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation>
-        <numerusform>%n 的 %1 I/O模块</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 of %n I/O modules</numerusform>
       </translation>
     </message>
     <message>
@@ -1827,8 +1816,8 @@ to view more bookmarks</source>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
-      <translation>
-        <numerusform>%n 台服务器</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Server(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -1865,8 +1854,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
-      <translation>
-        <numerusform>资源以及 %n 的摄像机</numerusform>
+      <translation type="unfinished">
+        <numerusform>Source and %n more cameras</numerusform>
       </translation>
     </message>
     <message>
@@ -2069,8 +2058,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation>
-        <numerusform>%n 设备被发现</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n devices found</numerusform>
       </translation>
     </message>
     <message>
@@ -2104,8 +2093,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices added.</source>
-      <translation>
-        <numerusform>添加的 %n 设备。</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n devices added.</numerusform>
       </translation>
     </message>
     <message>
@@ -2114,8 +2103,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation>
-        <numerusform>添加%n设备失败</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to add %n devices</numerusform>
       </translation>
     </message>
     <message>
@@ -2212,8 +2201,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation>
-        <numerusform>%1 不支持双向音频</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 does not support two-way audio</numerusform>
       </translation>
     </message>
   </context>
@@ -2330,8 +2319,8 @@ to view more bookmarks</source>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation>
-        <numerusform>%1 无报警输入</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 have no input ports</numerusform>
       </translation>
     </message>
   </context>
@@ -2369,14 +2358,14 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation>
-        <numerusform>%n 设备被发现</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n devices found</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation>
-        <numerusform>%n 摄像机被发现</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n cameras found</numerusform>
       </translation>
     </message>
     <message>
@@ -2389,8 +2378,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation>
-        <numerusform>发现 %n I/O 模块</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n I/O modules found</numerusform>
       </translation>
     </message>
     <message>
@@ -2482,8 +2471,8 @@ to view more bookmarks</source>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation>
-        <numerusform>%1 无报警输出</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 have no output relays</numerusform>
       </translation>
     </message>
   </context>
@@ -2660,20 +2649,20 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation>
-        <numerusform>不保存对以下的 %n 设备的更改︰</numerusform>
+      <translation type="unfinished">
+        <numerusform>Changes to the following %n devices are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation>
-        <numerusform>不保存对以下 %n 摄像机的更改︰</numerusform>
+      <translation type="unfinished">
+        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation>
-        <numerusform>不保存对以下 %n I/O 模块的更改︰</numerusform>
+      <translation type="unfinished">
+        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
       </translation>
     </message>
     <message>
@@ -2739,10 +2728,6 @@ devices</source>
       <translation>从任何地方连接到您的系统与任何设备</translation>
     </message>
     <message>
-      <source>Known limitations</source>
-      <translation>已知的限制</translation>
-    </message>
-    <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>系统断开 %1</translation>
@@ -2773,11 +2758,6 @@ account</source>
 to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>将系统连接到 %1</translation>
-    </message>
-    <message>
-      <source>%1 is in Beta.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 是 beta 版。</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
@@ -3296,14 +3276,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation>
-        <numerusform>搜索到 %1 从 %2时间段的事件日志 - %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation>
-        <numerusform>%1 事件日志 - 发现 %n 个事件</numerusform>
+      <translation type="unfinished">
+        <numerusform>Event log for %1 - %n event(s) found</numerusform>
       </translation>
     </message>
     <message>
@@ -3356,8 +3336,8 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n 时间)</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 (%n times)</numerusform>
       </translation>
     </message>
     <message>
@@ -3366,20 +3346,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation>
-        <numerusform>和 %n 用户更多...</numerusform>
+      <translation type="unfinished">
+        <numerusform>and %n users more...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation>
-        <numerusform>和 %n 更多...</numerusform>
+      <translation type="unfinished">
+        <numerusform>and %n more...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation>
-        <numerusform>%n 个已删除主题</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Removed subjects</numerusform>
       </translation>
     </message>
     <message>
@@ -3742,8 +3722,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation>
-        <numerusform>测试成功， 发现 %n 用户.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Test completed successfully: %n users found.</numerusform>
       </translation>
     </message>
   </context>
@@ -3911,8 +3891,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation>
-        <numerusform>授权过期在 %n 天</numerusform>
+      <translation type="unfinished">
+        <numerusform>License expires in %n days</numerusform>
       </translation>
     </message>
     <message>
@@ -4004,14 +3984,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
-      <translation>
-        <numerusform>至少 %n %1 必填项</numerusform>
+      <translation type="unfinished">
+        <numerusform>At least %n %1 are required</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
-      <translation>
-        <numerusform>%n %1 当前正在使用中</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n %1 are currently in use</numerusform>
       </translation>
     </message>
     <message>
@@ -4020,8 +4000,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>重置授权?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate licenses?</numerusform>
       </translation>
     </message>
     <message>
@@ -4030,20 +4010,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation>
-        <numerusform>重置 %n 个授权失败</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to deactivate %n licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation>
-        <numerusform>%n 个授权中有 %1 个授权无法重置</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>无法重置授权</numerusform>
+      <translation type="unfinished">
+        <numerusform>Cannot deactivate licenses</numerusform>
       </translation>
     </message>
     <message>
@@ -4064,8 +4044,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation>
-        <numerusform>%n 个授权已重置</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n licenses deactivated</numerusform>
       </translation>
     </message>
     <message>
@@ -4078,8 +4058,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation>
-        <numerusform>%n 个授權。</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n channels.</numerusform>
       </translation>
     </message>
     <message>
@@ -4088,8 +4068,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>重置 %n 个其他授权</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
     <message>
@@ -4156,20 +4136,20 @@ to %1</source>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
-      <translation>
-        <numerusform>所选 %n设备使用授权</numerusform>
+      <translation type="unfinished">
+        <numerusform>Use licenses for selected %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
-      <translation>
-        <numerusform>所选 %n设备使用授权</numerusform>
+      <translation type="unfinished">
+        <numerusform>Use licenses for selected %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
-      <translation>
-        <numerusform>所选 %nI/O模块使用授权</numerusform>
+      <translation type="unfinished">
+        <numerusform>Use licenses for selected %n I/O modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4590,8 +4570,8 @@ to %1</source>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
       <source>%n more notifications</source>
-      <translation>
-        <numerusform>%n 更多通知</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n more notifications</numerusform>
       </translation>
     </message>
   </context>
@@ -4787,20 +4767,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation>
-        <numerusform>预置位将在 %n分钟后激活</numerusform>
+      <translation type="unfinished">
+        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation>
-        <numerusform>轮巡包含%n 相同的位置</numerusform>
+      <translation type="unfinished">
+        <numerusform>Tour has %n identical positions</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation>
-        <numerusform>关于 %n 分钟</numerusform>
+      <translation type="unfinished">
+        <numerusform>about %n minute(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -5021,22 +5001,22 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
-        <numerusform>总共 %1 %n 设备</numerusform>
+      <translation type="unfinished">
+        <numerusform>Total %1 %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
-        <numerusform>总共 %1 %n 摄像机</numerusform>
+      <translation type="unfinished">
+        <numerusform>Total %1 %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
-        <numerusform>总共 %1 %n I/O 模块</numerusform>
+      <translation type="unfinished">
+        <numerusform>Total %1 %n I/O modules</numerusform>
       </translation>
     </message>
     <message>
@@ -5090,8 +5070,8 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n 个选定角色中 %1 个没有 %2 权限</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
       </translation>
     </message>
     <message>
@@ -5107,8 +5087,8 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n 个选定用戶中 %1 个没有 %2 权限</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
       </translation>
     </message>
   </context>
@@ -5363,8 +5343,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation>
-        <numerusform>%n 服务器</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Servers</numerusform>
       </translation>
     </message>
   </context>
@@ -5384,8 +5364,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation>
-        <numerusform>%n 用户</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
       </translation>
     </message>
   </context>
@@ -5393,8 +5373,8 @@ to %1</source>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation>
-        <numerusform>%n 增加</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n additional</numerusform>
       </translation>
     </message>
     <message>
@@ -5403,8 +5383,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation>
-        <numerusform>%n 的 %1 用户无有效的邮箱地址users have invalid email address</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of %1 users have invalid email address</numerusform>
       </translation>
     </message>
     <message>
@@ -5413,8 +5393,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation>
-        <numerusform>%n 的 %1 其它邮箱地址无效</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
       </translation>
     </message>
     <message>
@@ -5665,8 +5645,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
-      <translation>
-        <numerusform>没有足够的可用空间在 %n 服务器︰</numerusform>
+      <translation type="unfinished">
+        <numerusform>Not enough free space at %n Servers:</numerusform>
       </translation>
     </message>
     <message>
@@ -6070,7 +6050,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n TB</numerusform>
       </translation>
     </message>
@@ -6185,6 +6165,14 @@ to %1</source>
     <message>
       <source>Backup completed</source>
       <translation>备份已完成。</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
+      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
     </message>
   </context>
   <context>
@@ -6600,12 +6588,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h: mm ap</translation>
+      <translation>hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd日 MMMM yyyy h:mm ap</translation>
+      <translation>dd日 MMMM yyyy hh:mm</translation>
     </message>
   </context>
   <context>
@@ -6670,32 +6658,32 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
-      <translation>
-        <numerusform>问题发生在 %n 服务器:</numerusform>
+      <translation type="unfinished">
+        <numerusform>The problem is caused by %n servers:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
-      <translation>
-        <numerusform>%n 服务器上没有更多空间:</numerusform>
+      <translation type="unfinished">
+        <numerusform>No free space left on %n servers:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
-      <translation>
-        <numerusform>%n 服务器无回应:</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n servers are not responding:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
-      <translation>
-        <numerusform>%n 服务器已离线:</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n servers have gone offline:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
-      <translation>
-        <numerusform>%n 服务器身份验证失败:</numerusform>
+      <translation type="unfinished">
+        <numerusform>Authentication failed for %n servers:</numerusform>
       </translation>
     </message>
     <message>
@@ -6842,8 +6830,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation>
-        <numerusform>请选择要对 %n 具有此角色的用户执行的操作</numerusform>
+      <translation type="unfinished">
+        <numerusform>Please select an action to perform on %n users with this role</numerusform>
       </translation>
     </message>
   </context>
@@ -7036,8 +7024,8 @@ to %1</source>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation>
-        <numerusform>PC %1-显示 %2</numerusform>
+      <translation type="unfinished">
+        <numerusform>PC %1 - Displays %2</numerusform>
       </translation>
     </message>
   </context>
@@ -7113,8 +7101,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation>
-        <numerusform>删除 %n 书签吗？</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n bookmarks?</numerusform>
       </translation>
     </message>
   </context>
@@ -7189,8 +7177,8 @@ to %1</source>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation>
-        <numerusform>以下%n 项未保存.</numerusform>
+      <translation type="unfinished">
+        <numerusform>The following %n items are not saved:</numerusform>
       </translation>
     </message>
     <message>
@@ -7203,8 +7191,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation>
-        <numerusform>以下 %n项未删除.</numerusform>
+      <translation type="unfinished">
+        <numerusform>The following %n items are not deleted:</numerusform>
       </translation>
     </message>
     <message>
@@ -7213,8 +7201,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation>
-        <numerusform>未能删除 %n 项目︰</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to delete %n items:</numerusform>
       </translation>
     </message>
     <message>
@@ -7370,8 +7358,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation>
-        <numerusform>删除 %n 项目吗？</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n items?</numerusform>
       </translation>
     </message>
     <message>
@@ -7388,8 +7376,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>删除 %n 矩阵？</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n matrices?</numerusform>
       </translation>
     </message>
     <message>
@@ -7452,8 +7440,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>用户仍然可对 %n 删除资源访问︰</numerusform>
+      <translation type="unfinished">
+        <numerusform>User will still have access to %n removed resources:</numerusform>
       </translation>
     </message>
     <message>
@@ -7462,8 +7450,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation>
-        <numerusform>具有此角色的所有用户将都获得 %n 资源︰</numerusform>
+      <translation type="unfinished">
+        <numerusform>All users with this role will get access to %n resources:</numerusform>
       </translation>
     </message>
     <message>
@@ -7472,8 +7460,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>具有此角色的所有用户将仍然都有对 %n 中删除资源的访问︰</numerusform>
+      <translation type="unfinished">
+        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
       </translation>
     </message>
     <message>
@@ -7486,32 +7474,32 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation>
-        <numerusform>用户将不能访问 %n 资源︰</numerusform>
+      <translation type="unfinished">
+        <numerusform>User will lose access to %n resources:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation>
-        <numerusform>具有此角色的所有用户将都失去对 %n 资源访问权︰</numerusform>
+      <translation type="unfinished">
+        <numerusform>All users with this role will lose access to %n resources:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation>
-        <numerusform>删除 %n 共享布局吗？</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n shared layouts?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation>
-        <numerusform>这些 %n 布局是与其他用户共享，所以你也为他们删除它。</numerusform>
+      <translation type="unfinished">
+        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation>
-        <numerusform>从布局中删除 %n 项目吗？</numerusform>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from layout?</numerusform>
       </translation>
     </message>
     <message>
@@ -7528,50 +7516,50 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation>
-        <numerusform>删除 %n 用户吗？</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n users?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation>
-        <numerusform>删除 %n 设备吗？</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n devices?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation>
-        <numerusform>删除 %n 相机吗？</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n cameras?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation>
-        <numerusform>删除 %n I/O 模块吗？</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n I/O Modules?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation>
-        <numerusform>删除 %n 项目吗？</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n items?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation>
-        <numerusform>其中 %n 是自动发现。</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of them are auto-discovered.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation>
-        <numerusform>%n 相机是自动发现。</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n cameras are auto-discovered.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation>
-        <numerusform>%n I/O 模块是自动发现。</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n I/O modules are auto-discovered.</numerusform>
       </translation>
     </message>
     <message>
@@ -7588,8 +7576,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation>
-        <numerusform>从幻灯片中删除 %n 项目吗？</numerusform>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from showreel?</numerusform>
       </translation>
     </message>
   </context>
@@ -7597,8 +7585,8 @@ to %1</source>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
-      <translation>
-        <numerusform>%n用户</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n users</numerusform>
       </translation>
     </message>
   </context>
@@ -7863,6 +7851,10 @@ to %1</source>
       <comment>%1 is file name</comment>
       <translation>%1 正在被另一个导出使用。</translation>
     </message>
+    <message>
+      <source>Selected period cannot be exported for the current camera.</source>
+      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::legacy::ExportLayoutTool</name>
@@ -7919,86 +7911,6 @@ to %1</source>
       <translation>导出视窗</translation>
     </message>
     <message>
-      <source>You are about to export a long video</source>
-      <translation>您将要导出长视频</translation>
-    </message>
-    <message>
-      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>它可能需要高於 1GB 的硬盘空间，需要几分钟才能完成。</translation>
-    </message>
-    <message>
-      <source>Export anyway?</source>
-      <translation>仍要导出吗？</translation>
-    </message>
-    <message>
-      <source>Export Video As...</source>
-      <translation>导出视频为...</translation>
-    </message>
-    <message>
-      <source>No Timestamp</source>
-      <translation>无时间戳</translation>
-    </message>
-    <message>
-      <source>Top Left Corner (requires transcoding)</source>
-      <translation>左上角((需转码)</translation>
-    </message>
-    <message>
-      <source>Top Right Corner (requires transcoding)</source>
-      <translation>右上角((需转码)</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner (requires transcoding)</source>
-      <translation>左下角((需转码)</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner (requires transcoding)</source>
-      <translation>右下角((需转码)</translation>
-    </message>
-    <message>
-      <source>Timestamps:</source>
-      <translation>时间戳:</translation>
-    </message>
-    <message>
-      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-      <translation>应用过滤器:旋转、图像矫正、图像增强、自定义宽高比(需转码)</translation>
-    </message>
-    <message>
-      <source>AVI format is not recommended</source>
-      <translation>不建议AVI格式</translation>
-    </message>
-    <message>
-      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation>导出非连续的录像，建议 MKV 或其他格式。</translation>
-    </message>
-    <message>
-      <source>Export to AVI anyway?</source>
-      <translation>仍要导出 AVI 吗？</translation>
-    </message>
-    <message>
-      <source>Selected format not recommended</source>
-      <translation>不推荐所选择的格式</translation>
-    </message>
-    <message>
-      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation>为避免降级，这台相机建议用 NOV 或 EXE 格式。</translation>
-    </message>
-    <message>
-      <source>Export with transcoding?</source>
-      <translation>导出与转码？</translation>
-    </message>
-    <message>
-      <source>It will increase CPU usage and may take significant time.</source>
-      <translation>它会增加 CPU 使用率和可能会占用大量的时间。</translation>
-    </message>
-    <message>
-      <source>Exporting Video</source>
-      <translation>导出视频</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>导出到&quot;%1&quot;...</translation>
-    </message>
-    <message>
       <source>EXE format not recommended</source>
       <translation>不推荐的 EXE 格式</translation>
     </message>
@@ -8027,10 +7939,6 @@ to %1</source>
       <translation>保存本地视窗为...</translation>
     </message>
     <message>
-      <source>Export Layout As...</source>
-      <translation>导出视窗为...</translation>
-    </message>
-    <message>
       <source>exported</source>
       <translation>导出</translation>
     </message>
@@ -8045,26 +7953,6 @@ to %1</source>
     <message>
       <source>Export</source>
       <translation>导出</translation>
-    </message>
-    <message>
-      <source>You are about to export a lot of video</source>
-      <translation>您将要导出大量的视频</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>太短的时间选择</translation>
-    </message>
-    <message>
-      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-      <translation>要导出快速审查，视频长度应至少 10 秒。</translation>
-    </message>
-    <message>
-      <source>Export completed</source>
-      <translation>导出完成</translation>
-    </message>
-    <message>
-      <source>Failed to export video</source>
-      <translation>未能导出视频</translation>
     </message>
   </context>
   <context>
@@ -8242,20 +8130,20 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::ActionHandler</name>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation>
-        <numerusform>移动 %n 设备失败</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to move %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation>
-        <numerusform>移动 %n 相机失败</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to move %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation>
-        <numerusform>移动 %n I/O 模块失败</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to move %n I/O Modules</numerusform>
       </translation>
     </message>
     <message>
@@ -8264,20 +8152,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation>
-        <numerusform>服务器 &quot;%1&quot; 不能访问这 %n 个设备。仍移动他们吗？</numerusform>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation>
-        <numerusform>服务器 &quot;%1&quot; 不能访问这 %n 个摄像机。仍移动他们吗？</numerusform>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation>
-        <numerusform>服务器 &quot;%1&quot; 不能访问这 %n 个 I/O 模块。仍移动他们吗？</numerusform>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
       </translation>
     </message>
     <message>
@@ -8334,8 +8222,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation>
-        <numerusform>确定是否永久删除 %n 文件?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
       </translation>
     </message>
     <message>

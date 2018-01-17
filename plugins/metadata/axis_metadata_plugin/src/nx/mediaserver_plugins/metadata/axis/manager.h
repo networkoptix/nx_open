@@ -1,6 +1,5 @@
 #pragma once
 
-//#if defined(ENABLE_HANWHA)
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QString>
@@ -10,23 +9,24 @@
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/abstract_metadata_manager.h>
 
-#include "axis_metadata_monitor.h"
-#include "axis_metadata_plugin.h"
+#include "identified_supported_event.h"
+#include "monitor.h"
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace axis {
 
-class AxisMetadataManager:
+class Manager:
     public QObject,
     public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
 {
     Q_OBJECT;
 public:
-    AxisMetadataManager(const nx::sdk::ResourceInfo& resourceInfo,
-        const QList<SupportedEventEx>& axisEvents);
+    Manager(const nx::sdk::ResourceInfo& resourceInfo,
+        const QList<IdentifiedSupportedEvent>& events);
 
-    virtual ~AxisMetadataManager();
+    virtual ~Manager();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -39,18 +39,20 @@ public:
 
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
 
-    const QList<SupportedEventEx>& axisEvents() const { return m_axisEvents; }
+    const QList<IdentifiedSupportedEvent>& identifiedSupportedEvents() const
+    {
+        return m_identifiedSupportedEvents;
+    }
 
 private:
     QByteArray m_deviceManifest;
     QUrl m_url;
     QAuthenticator m_auth;
-    QList<SupportedEventEx> m_axisEvents;
-    AxisMetadataMonitor* m_monitor = nullptr;
+    QList<IdentifiedSupportedEvent> m_identifiedSupportedEvents;
+    Monitor* m_monitor = nullptr;
 };
 
-} // namespace plugins
-} // namespace mediaserver
+} // axis
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx
-
-//#endif // defined(ENABLE_HANWHA)

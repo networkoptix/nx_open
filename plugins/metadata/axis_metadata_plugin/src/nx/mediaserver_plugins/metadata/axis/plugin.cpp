@@ -1,4 +1,4 @@
-﻿#include "axis_metadata_plugin.h"
+﻿#include "plugin.h"
 
 #include <string>
 #include <fstream>
@@ -11,12 +11,12 @@
 #include <nx/fusion/model_functions.h>
 #include <plugins/plugin_internal_tools.h>
 
-#include "axis_metadata_manager.h"
-#include "axis_common.h"
+#include "manager.h"
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace axis {
 
 namespace {
 
@@ -33,9 +33,9 @@ const char* const kVideoSource = "tns1:VideoSource";
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-AxisMetadataPlugin::AxisMetadataPlugin()
+Plugin::Plugin()
 {
-    QFile f(":manifest.json");
+    QFile f(":/axis/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
 #if 0
@@ -45,7 +45,7 @@ AxisMetadataPlugin::AxisMetadataPlugin()
 #endif
 }
 
-void* AxisMetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_MetadataPlugin)
     {
@@ -79,24 +79,24 @@ void* AxisMetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-const char* AxisMetadataPlugin::name() const
+const char* Plugin::name() const
 {
     return kPluginName;
 }
 
-void AxisMetadataPlugin::setSettings(const nxpl::Setting* settings, int count)
+void Plugin::setSettings(const nxpl::Setting* settings, int count)
 {
 }
 
-void AxisMetadataPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
+void Plugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
 }
 
-void AxisMetadataPlugin::setLocale(const char* locale)
+void Plugin::setLocale(const char* locale)
 {
 }
 
-AbstractMetadataManager* AxisMetadataPlugin::managerForResource(
+AbstractMetadataManager* Plugin::managerForResource(
     const ResourceInfo& resourceInfo,
     Error* outError)
 {
@@ -106,14 +106,14 @@ AbstractMetadataManager* AxisMetadataPlugin::managerForResource(
     if (!vendor.startsWith(kAxisVendor))
         return nullptr;
 
-    QList<SupportedEventEx> events = fetchSupportedEvents(resourceInfo);
+    QList<IdentifiedSupportedEvent> events = fetchSupportedEvents(resourceInfo);
     if (events.empty())
         return nullptr;
 
-    return new AxisMetadataManager(resourceInfo, events);
+    return new Manager(resourceInfo, events);
 }
 
-AbstractSerializer* AxisMetadataPlugin::serializerForType(
+AbstractSerializer* Plugin::serializerForType(
     const nxpl::NX_GUID& typeGuid,
     Error* outError)
 {
@@ -121,16 +121,16 @@ AbstractSerializer* AxisMetadataPlugin::serializerForType(
     return nullptr;
 }
 
-const char* AxisMetadataPlugin::capabilitiesManifest(Error* error) const
+const char* Plugin::capabilitiesManifest(Error* error) const
 {
     *error = Error::noError;
     return m_manifest.constData();
 }
 
-QList<SupportedEventEx> AxisMetadataPlugin::fetchSupportedEvents(
+QList<IdentifiedSupportedEvent> Plugin::fetchSupportedEvents(
     const ResourceInfo& resourceInfo)
 {
-    QList<SupportedEventEx> result;
+    QList<IdentifiedSupportedEvent> result;
     const char* const ip_port = resourceInfo.url + sizeof("http://") - 1;
     nx::axis::CameraController axisCameraController(ip_port, resourceInfo.login,
         resourceInfo.password);
@@ -140,7 +140,7 @@ QList<SupportedEventEx> AxisMetadataPlugin::fetchSupportedEvents(
 
     const auto& src = axisCameraController.suppotedEvents();
     std::transform(src.begin(), src.end(), std::back_inserter(result),
-        [](const axis::SupportedEvent& event) {return SupportedEventEx(event); });
+        [](const nx::axis::SupportedEvent& event) {return IdentifiedSupportedEvent(event); });
 
     // Being uncommented, the next code line allows to get the list of supported events
     // in the same json format that is used in "static-resources/manifest.json".
@@ -150,15 +150,16 @@ QList<SupportedEventEx> AxisMetadataPlugin::fetchSupportedEvents(
     return result;
 }
 
-} // namespace plugins
-} // namespace mediaserver
+} // axis
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx
 
 extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
 {
-    return new nx::mediaserver::plugins::AxisMetadataPlugin();
+    return new nx::mediaserver_plugins::metadata::axis::Plugin();
 }
 
 } // extern "C"

@@ -40,7 +40,7 @@
                             השרת ינותק מהמערכת הנוכחית. ארכיון הווידאו יישאר שלם.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">שחזר להגדרות ברירת מחדל</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>נתק את השרת מן המערכת</h3>
                         <p>פעולה זו תנתק שרת מהמערכת תוך שמירה על מסד נתונים, משתמשים מקומיים והגדרות. ארכיון הווידאו יישאר שלם. <b> משתמשי ענן יימחקו. </b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">נתק את השרת מן המערכת</button></p>

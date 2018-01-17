@@ -1,6 +1,4 @@
-//#if defined(ENABLE_HANWHA)
-
-#include "axis_metadata_manager.h"
+#include "manager.h"
 
 #include <chrono>
 
@@ -13,42 +11,41 @@
 
 #include <nx/fusion/serialization/json.h>
 
-#include "axis_common.h"
-
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace axis {
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-AxisMetadataManager::AxisMetadataManager(
+Manager::Manager(
     const nx::sdk::ResourceInfo& resourceInfo,
-    const QList<SupportedEventEx>& axisEvents)
+    const QList<IdentifiedSupportedEvent>& events)
 {
     m_url = resourceInfo.url;
     m_auth.setUser(resourceInfo.login);
     m_auth.setPassword(resourceInfo.password);
 
     nx::api::AnalyticsDeviceManifest deviceManifest;
-    for (const auto& event : axisEvents)
+    for (const auto& event : events)
     {
         deviceManifest.supportedEventTypes.push_back(event.internalTypeId());
     }
     m_deviceManifest = QJson::serialized(deviceManifest);
 
-    m_axisEvents = axisEvents;
+    m_identifiedSupportedEvents = events;
 
     NX_PRINT << "Ctor :" << this;
 }
 
-AxisMetadataManager::~AxisMetadataManager()
+Manager::~Manager()
 {
     stopFetchingMetadata();
     NX_PRINT << "Dtor :" << this;
 }
 
-void* AxisMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_MetadataManager)
     {
@@ -63,21 +60,21 @@ void* AxisMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-Error AxisMetadataManager::startFetchingMetadata(AbstractMetadataHandler* handler,
+Error Manager::startFetchingMetadata(AbstractMetadataHandler* handler,
     nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
 {
-    m_monitor = new AxisMetadataMonitor(this, m_url, m_auth, handler);
+    m_monitor = new Monitor(this, m_url, m_auth, handler);
     return m_monitor->startMonitoring(eventTypeList, eventTypeListSize);
 }
 
-Error AxisMetadataManager::stopFetchingMetadata()
+Error Manager::stopFetchingMetadata()
 {
     delete m_monitor;
     m_monitor = nullptr;
     return Error::noError;
 }
 
-const char* AxisMetadataManager::capabilitiesManifest(Error* error) const
+const char* Manager::capabilitiesManifest(Error* error) const
 {
     if (m_deviceManifest.isEmpty())
     {
@@ -89,8 +86,7 @@ const char* AxisMetadataManager::capabilitiesManifest(Error* error) const
     return m_deviceManifest.constData();
 }
 
-} // namespace plugins
-} // namespace mediaserver
+} // axis
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx
-
-//#endif // defined(ENABLE_HANWHA)

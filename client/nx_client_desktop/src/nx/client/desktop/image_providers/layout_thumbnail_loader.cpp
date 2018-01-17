@@ -35,6 +35,7 @@ static inline bool isOdd(int value)
 } // namespace
 
 using ResourceThumbnailProviderPtr = QSharedPointer<ResourceThumbnailProvider>;
+using QnImageProviderPtr = QSharedPointer<QnImageProvider>;
 
 struct LayoutThumbnailLoader::Private
 {
@@ -69,6 +70,25 @@ struct LayoutThumbnailLoader::Private
         setPaletteColor(nonCameraWidget.data(), QPalette::WindowText, qnGlobals->errorTextColor());
     }
 
+    void trackLoader(QnImageProviderPtr loader)
+    {
+        data.loaders.push_back(loader);
+        data.numLoading++;
+    }
+
+    void loaderIsComplete()
+    {
+        if (data.numLoading > 0)
+        {
+            --data.numLoading;
+            if(data.numLoading == 0)
+            {
+                data.status = Qn::ThumbnailStatus::Loaded;
+                emit q->statusChanged(data.status);
+            }
+        }
+    }
+
     void updateTileStatus(Qn::ThumbnailStatus status, const QnAspectRatio& aspectRatio,
         const QRectF& cellRect, qreal rotation)
     {
@@ -78,7 +98,7 @@ struct LayoutThumbnailLoader::Private
                 break;
 
             case Qn::ThumbnailStatus::Loaded:
-                --data.numLoading;
+                loaderIsComplete();
                 break;
 
             case Qn::ThumbnailStatus::Refreshing:
@@ -126,16 +146,10 @@ struct LayoutThumbnailLoader::Private
 
                 emit q->imageChanged(data.image);
 
-                --data.numLoading;
+                loaderIsComplete();
                 break;
             }
         }
-
-        if (data.numLoading > 0)
-            return;
-
-        data.status = Qn::ThumbnailStatus::Loaded;
-        emit q->statusChanged(data.status);
     }
 
     void drawTile(const QImage& tile, qreal aspectRatio, const QRectF& cellRect,
@@ -222,7 +236,7 @@ struct LayoutThumbnailLoader::Private
     {
         QImage image;
         Qn::ThumbnailStatus status = Qn::ThumbnailStatus::Invalid;
-        QList<ResourceThumbnailProviderPtr> loaders;
+        QList<QnImageProviderPtr> loaders;
         int numLoading = 0;
     };
 
@@ -365,9 +379,19 @@ void LayoutThumbnailLoader::doLoadAsync()
 
     if (hasBackground)
     {
-        auto backgroundLoader = new LayoutBackgroundImageProvider(d->layout,
-            kBackgroundPreviewSize, this);
-        connect(backgroundLoader, &QnImageProvider::imageChanged, this,
+        QnImageProviderPtr loader(
+            new LayoutBackgroundImageProvider(d->layout, kBackgroundPreviewSize));
+
+        connect(loader.data(), &QnImageProvider::statusChanged, this,
+            [this](Qn::ThumbnailStatus status)
+            {
+                if (status == Qn::ThumbnailStatus::Loaded)
+                {
+                    d->loaderIsComplete();
+                }
+            });
+
+        connect(loader.data(), &QnImageProvider::imageChanged, this,
             [this, backgroundRect, xscale, yscale, bounding](const QImage& image)
             {
                 const QRectF scaledBackgroundRect(
@@ -378,7 +402,10 @@ void LayoutThumbnailLoader::doLoadAsync()
 
                 d->drawBackground(image, scaledBackgroundRect);
             });
-        backgroundLoader->loadAsync();
+
+        // Ensure that loader is not forgotten before it produces any result.
+        d->trackLoader(loader);
+        loader->loadAsync();
     }
 
     for (const auto& item: validItems)
@@ -425,9 +452,7 @@ void LayoutThumbnailLoader::doLoadAsync()
                 d->drawTile(tile, aspectRatio, scaledCellRect, rotation, zoomRect);
             });
 
-        d->data.loaders.push_back(loader);
-        ++d->data.numLoading;
-
+        d->trackLoader(loader);
         loader->loadAsync();
     }
 

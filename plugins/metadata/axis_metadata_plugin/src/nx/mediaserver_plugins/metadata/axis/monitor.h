@@ -1,7 +1,5 @@
 #pragma once
 
-#include "axis_common.h"
-
 #include <map>
 #include <vector>
 
@@ -17,25 +15,28 @@
 #include <nx/network/http/test_http_server.h>
 #include <common/common_module.h>
 
+#include "identified_supported_event.h"
+
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace axis {
 
-class AxisMetadataManager;
+class Manager;
 
-class AxisMetadataMonitor: public QObject
+class Monitor: public QObject
 {
     Q_OBJECT
 
 public:
-    using Handler = std::function<void(const std::vector<SupportedEventEx>&)>;
+    using Handler = std::function<void(const std::vector<IdentifiedSupportedEvent>&)>;
 
-    AxisMetadataMonitor(
-        AxisMetadataManager* manager,
+    Monitor(
+        Manager* manager,
         const QUrl& resourceUrl,
         const QAuthenticator& auth,
         nx::sdk::metadata::AbstractMetadataHandler* handler);
-    virtual ~AxisMetadataMonitor();
+    virtual ~Monitor();
 
     void addRules(const SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
         int eventTypeListSize);
@@ -47,7 +48,7 @@ public:
     void stopMonitoring();
 
  private:
-    AxisMetadataManager * m_manager;
+    Manager * m_manager;
     const QUrl m_url;
     const QUrl m_endpoint;
     const QAuthenticator m_auth;
@@ -56,6 +57,7 @@ public:
     mutable QnMutex m_mutex;
 };
 
-} // namespace plugins
-} // namespace mediaserver
+} // axis
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx

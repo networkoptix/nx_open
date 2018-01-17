@@ -40,7 +40,7 @@
                             Serwer zostanie odłączony od bieżącego systemu. Archiwum wideo pozostanie nienaruszone.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Przywróć ustawienia fabryczne</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>Odłącz serwer z systemu</h3>
                         <p>Ta czynność spowoduje odłączenie serwera od systemu utrzymującego bazę danych, użytkowników lokalnych i konfigurację. Archiwum wideo pozostanie nienaruszone. <b>Użytkownicy chmury zostaną usunięci.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Odłącz od systemu</button></p>

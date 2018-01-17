@@ -1,7 +1,5 @@
 #pragma once
 
-#include "camera_controller.h"
-
 #include <QtCore/QString>
 #include <QtCore/QFlag>
 
@@ -12,25 +10,28 @@
 #include <nx/api/analytics/driver_manifest.h>
 #include <nx/fusion/model_functions_fwd.h>
 
-namespace nx {
-namespace mediaserver {
-namespace plugins {
+#include "nx/axis/camera_controller.h"
 
-class SupportedEventEx: private nx::axis::SupportedEvent
+namespace nx {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace axis {
+
+class IdentifiedSupportedEvent: private nx::axis::SupportedEvent
 {
-    //nx::axis::SupportedEvent m_supportedEvent;
     QnUuid m_internalTypeId;
     nxpl::NX_GUID m_externalTypeId;
 public:
-    SupportedEventEx(const nx::axis::SupportedEvent& supportedEvent);
+    IdentifiedSupportedEvent(const nx::axis::SupportedEvent& supportedEvent);
     const nx::axis::SupportedEvent& base() const { return *this; }
     const QnUuid& internalTypeId() const { return m_internalTypeId; }
     const nxpl::NX_GUID& externalTypeId() const { return m_externalTypeId; }
 };
 
-QString serializeEvent(const SupportedEventEx& event);
-QString serializeEvents(const QList<SupportedEventEx>& events);
+QString serializeEvent(const IdentifiedSupportedEvent& identifiedSupportedEvent);
+QString serializeEvents(const QList<IdentifiedSupportedEvent>& identifiedSupportedEvents);
 
-} // namespace plugins
-} // namespace mediaserver
+} // axis
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx

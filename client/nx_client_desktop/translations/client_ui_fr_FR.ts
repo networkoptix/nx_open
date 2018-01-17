@@ -1109,34 +1109,6 @@
     </message>
   </context>
   <context>
-    <name>ExportRapidReviewDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
-      <source>Export Rapid Review</source>
-      <translation>Exporter Analyse Rapide</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Initial Video Length</source>
-      <translation>Durée de la vidéo Initial</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Exported Video Length</source>
-      <translation>Durée de la vidéo exportée</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Frames Interval</source>
-      <translation>Intervalle d'image</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Rapid Review speed</source>
-      <translation>Vitesse Analyse Rapide</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
@@ -2867,11 +2839,6 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>Paramétrages Sauvegarde...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>L'enregistrement des stockages désactivés va s"arrêter. Cependant, effacer du vidéo désuet va continuer.</translation>
     </message>
   </context>
   <context>

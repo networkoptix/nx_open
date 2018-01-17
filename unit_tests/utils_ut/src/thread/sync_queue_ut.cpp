@@ -78,7 +78,7 @@ TEST_F(SyncQueue, TimedPop)
 
     auto pusher1 = pushAsync({1}, kSmallDelay);
     const auto value1 = queue.pop(kLongDelay);
-    ASSERT_TRUE(value1);
+    ASSERT_TRUE(static_cast<bool>(value1));
     ASSERT_EQ(*value1, 1);
     pusher1.join();
 
@@ -86,7 +86,7 @@ TEST_F(SyncQueue, TimedPop)
 
     auto pusher2 = pushAsync({2}, kSmallDelay);
     const auto value2 = queue.pop(kLongDelay);
-    ASSERT_TRUE(value2);
+    ASSERT_TRUE(static_cast<bool>(value2));
     ASSERT_EQ(*value2, 2);
     pusher2.join();
 
