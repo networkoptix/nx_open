@@ -12,8 +12,14 @@ class QnClientCoreModule;
 class QnNetworkProxyFactory;
 class QnStaticCommonModule;
 class QnCloudStatusWatcher;
-class QnClientUploadManager;
-class QnClientWearableManager;
+namespace nx {
+namespace client {
+namespace desktop {
+class UploadManager;
+class WearableManager;
+}
+}
+}
 
 class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
@@ -28,8 +34,8 @@ public:
 
     QnNetworkProxyFactory* networkProxyFactory() const;
     QnCloudStatusWatcher* cloudStatusWatcher() const;
-    QnClientUploadManager* uploadManager() const;
-    QnClientWearableManager* wearableManager() const;
+    nx::client::desktop::UploadManager* uploadManager() const;
+    nx::client::desktop::WearableManager* wearableManager() const;
 
 private:
     void initApplication();
@@ -48,8 +54,8 @@ private:
     QScopedPointer<QnClientCoreModule> m_clientCoreModule;
     QnNetworkProxyFactory* m_networkProxyFactory;
     QnCloudStatusWatcher* m_cloudStatusWatcher;
-    QnClientUploadManager* m_uploadManager;
-    QnClientWearableManager* m_wearableManager;
+    nx::client::desktop::UploadManager* m_uploadManager;
+    nx::client::desktop::WearableManager* m_wearableManager;
 };
 
 #define qnClientModule QnClientModule::instance()

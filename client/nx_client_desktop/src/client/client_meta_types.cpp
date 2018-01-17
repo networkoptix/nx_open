@@ -115,7 +115,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnFullUpdateStage>();
     qRegisterMetaType<QnUpdateResult>();
     qRegisterMetaType<QnCheckForUpdateResult>();
-    qRegisterMetaType<QnFileUpload>();
+    qRegisterMetaType<FileUpload>();
 
     qRegisterMetaType<nx::cdb::api::ResultCode>();
     qRegisterMetaType<nx::cdb::api::SystemData>();

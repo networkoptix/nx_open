@@ -356,8 +356,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     m_networkProxyFactory = new QnNetworkProxyFactory(commonModule);
     QNetworkProxyFactory::setApplicationProxyFactory(m_networkProxyFactory);
 
-    m_uploadManager = new QnClientUploadManager(commonModule);
-    m_wearableManager = new QnClientWearableManager(commonModule);
+    m_uploadManager = new nx::client::desktop::UploadManager(commonModule);
+    m_wearableManager = new nx::client::desktop::WearableManager(commonModule);
 
 #ifdef Q_OS_WIN
     commonModule->store(new QnIexploreUrlHandler());
@@ -605,12 +605,12 @@ QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
     return m_cloudStatusWatcher;
 }
 
-QnClientUploadManager* QnClientModule::uploadManager() const
+nx::client::desktop::UploadManager* QnClientModule::uploadManager() const
 {
     return m_uploadManager;
 }
 
-QnClientWearableManager* QnClientModule::wearableManager() const
+nx::client::desktop::WearableManager* QnClientModule::wearableManager() const
 {
     return m_wearableManager;
 }

@@ -1,12 +1,19 @@
 #include "wearable_manager.h"
 
+namespace nx {
+namespace client {
+namespace desktop {
 
-QnClientWearableManager::QnClientWearableManager(QObject* parent):
+WearableManager::WearableManager(QObject* parent):
     QObject(parent)
 {
 
 }
 
-QnClientWearableManager::~QnClientWearableManager()
+WearableManager::~WearableManager()
 {
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

@@ -24,7 +24,7 @@ QnWearableUploadWidget::QnWearableUploadWidget(QWidget *parent)
         }
     );
 
-    connect(qnClientModule->wearableManager(), &QnClientWearableManager::progress, this,
+    connect(qnClientModule->wearableManager(), &nx::client::desktop::WearableManager::progress, this,
         [this](qreal progress)
         {
             ui->uploadProgressBar->setValue(progress * 100);

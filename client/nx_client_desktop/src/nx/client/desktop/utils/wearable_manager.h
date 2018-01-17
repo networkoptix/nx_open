@@ -2,12 +2,16 @@
 
 #include <QtCore/QObject>
 
-class QnClientWearableManager: public QObject
+namespace nx {
+namespace client {
+namespace desktop {
+
+class WearableManager: public QObject
 {
     Q_OBJECT
 public:
-    QnClientWearableManager(QObject* parent = nullptr);
-    ~QnClientWearableManager();
+    WearableManager(QObject* parent = nullptr);
+    ~WearableManager();
 
     void tehProgress(qreal aaaaaaa) {
         emit progress(aaaaaaa);
@@ -17,3 +21,6 @@ signals:
     void progress(qreal progress);
 };
 
+} // namespace desktop
+} // namespace client
+} // namespace nx

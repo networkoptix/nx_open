@@ -10,10 +10,14 @@
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 
-class QnClientUploadWorkerPrivate
+namespace nx {
+namespace client {
+namespace desktop {
+
+class UploadWorkerPrivate
 {
 public:
-    QnFileUpload upload;
+    FileUpload upload;
     QnMediaServerResourcePtr server;
     QSharedPointer<QFile> file;
     qint64 ttl = 0;
@@ -27,26 +31,26 @@ public:
     rest::Handle runningHandle = 0;
 };
 
-QnClientUploadWorker::QnClientUploadWorker(const QnMediaServerResourcePtr& server, const QString& path, qint64 ttl, QObject* parent):
+UploadWorker::UploadWorker(const QnMediaServerResourcePtr& server, const QString& path, qint64 ttl, QObject* parent):
     QObject(parent),
-    d(new QnClientUploadWorkerPrivate)
+    d(new UploadWorkerPrivate)
 {
     d->server = server;
     d->file.reset(new QFile(path));
     d->ttl = ttl;
 
     connect(&d->md5FutureWatcher, &QFutureWatcherBase::finished,
-        this, &QnClientUploadWorker::handleMd5Calculated);
+        this, &UploadWorker::handleMd5Calculated);
 }
 
-QnClientUploadWorker::~QnClientUploadWorker()
+UploadWorker::~UploadWorker()
 {
     handleStop();
 }
 
-QnFileUpload QnClientUploadWorker::start()
+FileUpload UploadWorker::start()
 {
-    NX_ASSERT(d->upload.status == QnFileUpload::Initial);
+    NX_ASSERT(d->upload.status == FileUpload::Initial);
 
     d->upload.id = lit("tmp-") + QnUuid::createUuid().toSimpleString();
     QFileInfo info(d->file->fileName());
@@ -55,7 +59,7 @@ QnFileUpload QnClientUploadWorker::start()
 
     if (!d->file->open(QIODevice::ReadOnly))
     {
-        d->upload.status = QnFileUpload::Error;
+        d->upload.status = FileUpload::Error;
         d->upload.errorMessage = tr("Could not open file \"%1\"").arg(d->file->fileName());
         return d->upload;
     }
@@ -63,7 +67,7 @@ QnFileUpload QnClientUploadWorker::start()
     d->upload.size = d->file->size();
     d->totalChunks = (d->upload.size + d->chunkSize - 1) / d->chunkSize;
 
-    d->upload.status = QnFileUpload::CalculatingMD5;
+    d->upload.status = FileUpload::CalculatingMD5;
 
     emitProgress();
 
@@ -82,32 +86,32 @@ QnFileUpload QnClientUploadWorker::start()
     return d->upload;
 }
 
-void QnClientUploadWorker::cancel()
+void UploadWorker::cancel()
 {
-    QnFileUpload::Status status = d->upload.status;
-    if (status == QnFileUpload::Initial || status == QnFileUpload::Done ||
-        status == QnFileUpload::Error || status == QnFileUpload::Canceled)
+    FileUpload::Status status = d->upload.status;
+    if (status == FileUpload::Initial || status == FileUpload::Done ||
+        status == FileUpload::Error || status == FileUpload::Canceled)
         return;
 
     handleStop();
-    d->upload.status = QnFileUpload::Canceled;
+    d->upload.status = FileUpload::Canceled;
     /* We don't emit signals here as canceling is also a way of silencing the worker. */
 }
 
-QnFileUpload QnClientUploadWorker::status() const
+FileUpload UploadWorker::status() const
 {
     return d->upload;
 }
 
-void QnClientUploadWorker::emitProgress()
+void UploadWorker::emitProgress()
 {
-    NX_ASSERT(d->upload.status != QnFileUpload::Canceled);
-    NX_ASSERT(d->upload.status != QnFileUpload::Initial);
+    NX_ASSERT(d->upload.status != FileUpload::Canceled);
+    NX_ASSERT(d->upload.status != FileUpload::Initial);
 
     emit progress(d->upload);
 }
 
-void QnClientUploadWorker::handleStop()
+void UploadWorker::handleStop()
 {
     d->md5FutureWatcher.disconnect(this);
 
@@ -115,22 +119,22 @@ void QnClientUploadWorker::handleStop()
         d->server->restConnection()->cancelRequest(d->runningHandle);
     d->runningHandle = 0;
 
-    QnFileUpload::Status status = d->upload.status;
-    if (status == QnFileUpload::CreatingUpload || status == QnFileUpload::Uploading ||
-        status == QnFileUpload::Checking)
+    FileUpload::Status status = d->upload.status;
+    if (status == FileUpload::CreatingUpload || status == FileUpload::Uploading ||
+        status == FileUpload::Checking)
         d->server->restConnection()->removeFileDownload(d->upload.id, true, nullptr);
 }
 
-void QnClientUploadWorker::handleError(const QString& message)
+void UploadWorker::handleError(const QString& message)
 {
     handleStop();
 
-    d->upload.status = QnFileUpload::Error;
+    d->upload.status = FileUpload::Error;
     d->upload.errorMessage = message;
     emitProgress();
 }
 
-void QnClientUploadWorker::handleMd5Calculated()
+void UploadWorker::handleMd5Calculated()
 {
     QByteArray md5 = d->md5Future.result();
     if (md5.isEmpty())
@@ -140,7 +144,7 @@ void QnClientUploadWorker::handleMd5Calculated()
     }
 
     d->md5 = md5;
-    d->upload.status = QnFileUpload::CreatingUpload;
+    d->upload.status = FileUpload::CreatingUpload;
 
     emitProgress();
 
@@ -159,7 +163,7 @@ void QnClientUploadWorker::handleMd5Calculated()
         thread());
 }
 
-void QnClientUploadWorker::handleFileUploadCreated(bool success, rest::Handle handle)
+void UploadWorker::handleFileUploadCreated(bool success, rest::Handle handle)
 {
     NX_ASSERT(d->runningHandle == handle);
     d->runningHandle = 0;
@@ -170,11 +174,11 @@ void QnClientUploadWorker::handleFileUploadCreated(bool success, rest::Handle ha
         return;
     }
 
-    d->upload.status = QnFileUpload::Uploading;
+    d->upload.status = FileUpload::Uploading;
     handleUpload();
 }
 
-void QnClientUploadWorker::handleUpload()
+void UploadWorker::handleUpload()
 {
     if (d->currentChunk == d->totalChunks) {
         handleAllUploaded();
@@ -205,7 +209,7 @@ void QnClientUploadWorker::handleUpload()
     d->currentChunk++;
 }
 
-void QnClientUploadWorker::handleChunkUploaded(bool success, rest::Handle handle)
+void UploadWorker::handleChunkUploaded(bool success, rest::Handle handle)
 {
     NX_ASSERT(d->runningHandle == handle);
     d->runningHandle = 0;
@@ -220,9 +224,9 @@ void QnClientUploadWorker::handleChunkUploaded(bool success, rest::Handle handle
     handleUpload();
 }
 
-void QnClientUploadWorker::handleAllUploaded()
+void UploadWorker::handleAllUploaded()
 {
-    d->upload.status = QnFileUpload::Checking;
+    d->upload.status = FileUpload::Checking;
 
     emitProgress();
 
@@ -239,7 +243,7 @@ void QnClientUploadWorker::handleAllUploaded()
         thread());
 }
 
-void QnClientUploadWorker::handleCheckFinished(bool success, rest::Handle handle, bool ok)
+void UploadWorker::handleCheckFinished(bool success, rest::Handle handle, bool ok)
 {
     NX_ASSERT(d->runningHandle == handle);
     d->runningHandle = 0;
@@ -256,8 +260,11 @@ void QnClientUploadWorker::handleCheckFinished(bool success, rest::Handle handle
         return;
     }
 
-    d->upload.status = QnFileUpload::Done;
+    d->upload.status = FileUpload::Done;
 
     emitProgress();
 }
 
+} // namespace desktop
+} // namespace client
+} // namespace nx

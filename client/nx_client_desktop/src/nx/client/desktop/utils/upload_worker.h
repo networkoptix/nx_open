@@ -6,7 +6,11 @@
 #include <core/resource/resource_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 
-struct QnFileUpload
+namespace nx {
+namespace client {
+namespace desktop {
+
+struct FileUpload
 {
     enum Status
     {
@@ -35,24 +39,24 @@ struct QnFileUpload
     /** Error message, if any. */
     QString errorMessage;
 };
-Q_DECLARE_METATYPE(QnFileUpload)
+Q_DECLARE_METATYPE(FileUpload)
 
-class QnClientUploadWorkerPrivate;
+class UploadWorkerPrivate;
 
-class QnClientUploadWorker: public QObject
+class UploadWorker: public QObject
 {
     Q_OBJECT
 public:
-    QnClientUploadWorker(const QnMediaServerResourcePtr& server, const QString& path, qint64 ttl, QObject* parent = nullptr);
-    ~QnClientUploadWorker();
+    UploadWorker(const QnMediaServerResourcePtr& server, const QString& path, qint64 ttl, QObject* parent = nullptr);
+    ~UploadWorker();
 
-    QnFileUpload start();
+    FileUpload start();
     void cancel();
 
-    QnFileUpload status() const;
+    FileUpload status() const;
 
 signals:
-    void progress(const QnFileUpload&);
+    void progress(const FileUpload&);
 
 private:
     void emitProgress();
@@ -66,6 +70,9 @@ private:
     void handleCheckFinished(bool success, rest::Handle handle, bool ok);
 
 private:
-    QScopedPointer<QnClientUploadWorkerPrivate> d;
+    QScopedPointer<UploadWorkerPrivate> d;
 };
 
+} // namespace desktop
+} // namespace client
+} // namespace nx

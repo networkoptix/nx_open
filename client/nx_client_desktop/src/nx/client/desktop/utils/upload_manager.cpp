@@ -2,36 +2,40 @@
 
 #include <memory>
 
-QnClientUploadManager::QnClientUploadManager(QObject* parent):
+namespace nx {
+namespace client {
+namespace desktop {
+
+UploadManager::UploadManager(QObject* parent):
     QObject(parent)
 {
 }
 
-QnClientUploadManager::~QnClientUploadManager()
+UploadManager::~UploadManager()
 {
 }
 
-QnFileUpload QnClientUploadManager::addUpload(
+FileUpload UploadManager::addUpload(
     const QnMediaServerResourcePtr& server,
     const QString& path,
     qint64 ttl,
     QObject* context,
     Callback callback)
 {
-    std::unique_ptr<QnClientUploadWorker> worker = std::make_unique<QnClientUploadWorker>(server, path, ttl, this);
+    std::unique_ptr<UploadWorker> worker = std::make_unique<UploadWorker>(server, path, ttl, this);
 
-    QnFileUpload result = worker->start();
-    if (result.status == QnFileUpload::Error)
+    FileUpload result = worker->start();
+    if (result.status == FileUpload::Error)
         return result;
 
     if (callback)
-        connect(worker.get(), &QnClientUploadWorker::progress, context, callback);
+        connect(worker.get(), &UploadWorker::progress, context, callback);
 
-    connect(worker.get(), &QnClientUploadWorker::progress, this,
-        [this](const QnFileUpload& upload)
+    connect(worker.get(), &UploadWorker::progress, this,
+        [this](const FileUpload& upload)
         {
-            QnFileUpload::Status status = upload.status;
-            if (status == QnFileUpload::Error || status == QnFileUpload::Done)
+            FileUpload::Status status = upload.status;
+            if (status == FileUpload::Error || status == FileUpload::Done)
             {
                 m_workers[upload.id]->deleteLater();
                 m_workers.remove(upload.id);
@@ -43,7 +47,7 @@ QnFileUpload QnClientUploadManager::addUpload(
     return result;
 }
 
-void QnClientUploadManager::cancelUpload(const QString& id)
+void UploadManager::cancelUpload(const QString& id)
 {
     auto pos = m_workers.find(id);
     if (pos == m_workers.end())
@@ -54,3 +58,6 @@ void QnClientUploadManager::cancelUpload(const QString& id)
     m_workers.erase(pos);
 }
 
+} // namespace desktop
+} // namespace client
+} // namespace nx

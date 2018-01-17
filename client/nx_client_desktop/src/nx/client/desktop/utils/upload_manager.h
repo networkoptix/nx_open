@@ -7,14 +7,18 @@
 
 #include "upload_worker.h"
 
-class QnClientUploadManager: public QObject
+namespace nx {
+namespace client {
+namespace desktop {
+
+class UploadManager: public QObject
 {
     Q_OBJECT
 public:
-    using Callback = std::function<void(const QnFileUpload&)>;
+    using Callback = std::function<void(const FileUpload&)>;
 
-    QnClientUploadManager(QObject* parent = nullptr);
-    ~QnClientUploadManager();
+    UploadManager(QObject* parent = nullptr);
+    ~UploadManager();
 
     /**
      * Adds a file to the upload queue.
@@ -29,7 +33,7 @@ public:
      * @returns                         Upload description. Don't forget to check for
      *                                  errors in the return value.
      */
-    QnFileUpload addUpload(
+    FileUpload addUpload(
         const QnMediaServerResourcePtr& server,
         const QString& path,
         qint64 ttl,
@@ -39,6 +43,9 @@ public:
     void cancelUpload(const QString& id);
 
 private:
-    QHash<QString, QnClientUploadWorker*> m_workers;
+    QHash<QString, UploadWorker*> m_workers;
 };
 
+} // namespace desktop
+} // namespace client
+} // namespace nx

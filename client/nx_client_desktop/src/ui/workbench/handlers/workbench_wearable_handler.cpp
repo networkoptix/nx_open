@@ -43,17 +43,17 @@ QnWorkbenchWearableHandler::~QnWorkbenchWearableHandler()
 {
 }
 
-qreal QnWorkbenchWearableHandler::calculateProgress(const QnFileUpload& upload, bool processed) {
+qreal QnWorkbenchWearableHandler::calculateProgress(const nx::client::desktop::FileUpload& upload, bool processed) {
     if (processed)
         return 1.0;
 
     switch (upload.status) {
-    case QnFileUpload::CreatingUpload:
+    case nx::client::desktop::FileUpload::CreatingUpload:
         return 0.1;
-    case QnFileUpload::Uploading:
+    case nx::client::desktop::FileUpload::Uploading:
         return 0.1 + 0.8 * upload.uploaded / upload.size;
-    case QnFileUpload::Checking:
-    case QnFileUpload::Done:
+    case nx::client::desktop::FileUpload::Checking:
+    case nx::client::desktop::FileUpload::Done:
         return 0.9;
     default:
         return 0.0;
@@ -160,15 +160,15 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     if (startTimeMs == 0)
         startTimeMs = QFileInfo(fileName).created().toMSecsSinceEpoch();
 
-    QnFileUpload upload = qnClientModule->uploadManager()->addUpload(
+    nx::client::desktop::FileUpload upload = qnClientModule->uploadManager()->addUpload(
         server,
         fileName,
         kDefaultUploadTtl,
         this,
-        [this](const QnFileUpload& upload) { at_upload_progress(upload); }
+        [this](const nx::client::desktop::FileUpload& upload) { at_upload_progress(upload); }
     );
 
-    if (upload.status == QnFileUpload::Error)
+    if (upload.status == nx::client::desktop::FileUpload::Error)
     {
         QnMessageBox::critical(
             mainWindow(),
@@ -183,19 +183,19 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     m_infoByUploadId[upload.id] = info;
 }
 
-void QnWorkbenchWearableHandler::at_upload_progress(const QnFileUpload& upload)
+void QnWorkbenchWearableHandler::at_upload_progress(const nx::client::desktop::FileUpload& upload)
 {
     FootageInfo info = m_infoByUploadId.value(upload.id);
 
     qnClientModule->wearableManager()->tehProgress(calculateProgress(upload, false));
 
-    if (upload.status == QnFileUpload::Error)
+    if (upload.status == nx::client::desktop::FileUpload::Error)
     {
         m_infoByUploadId.remove(upload.id);
         return;
     }
 
-    if (upload.status == QnFileUpload::Done)
+    if (upload.status == nx::client::desktop::FileUpload::Done)
     {
         /* Check if it's our download. */
         if (!info.camera)
