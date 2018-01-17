@@ -56,8 +56,8 @@ static const auto upperBoundPredicateMs =
     [](qint64 leftMs, const DetectedObject& right)
     {
         using namespace std::chrono;
-        const auto leftUs = duration_cast<microseconds>(milliseconds(leftMs)).count();
-        return leftUs > right.firstAppearanceTimeUsec;
+        return leftMs > duration_cast<milliseconds>(
+            microseconds(right.firstAppearanceTimeUsec)).count();
     };
 
 } // namespace

@@ -45,8 +45,8 @@ static const auto upperBoundPredicateMs =
     [](qint64 leftMs, const vms::event::ActionData& right)
     {
         using namespace std::chrono;
-        const auto leftUs = duration_cast<microseconds>(milliseconds(leftMs)).count();
-        return leftUs > right.eventParams.eventTimestampUsec;
+        return leftMs > duration_cast<milliseconds>(
+            microseconds(right.eventParams.eventTimestampUsec)).count();
     };
 
 static qint64 timestampUs(const vms::event::ActionData& event)
