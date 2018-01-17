@@ -76,7 +76,7 @@ struct LayoutThumbnailLoader::Private
         data.numLoading++;
     }
 
-    void loaderIsComplete()
+    void notifyLoaderIsComplete()
     {
         if (data.numLoading > 0)
         {
@@ -92,13 +92,14 @@ struct LayoutThumbnailLoader::Private
     void updateTileStatus(Qn::ThumbnailStatus status, const QnAspectRatio& aspectRatio,
         const QRectF& cellRect, qreal rotation)
     {
+        bool loaderIsComplete = false;
         switch (status)
         {
             case Qn::ThumbnailStatus::Loading:
                 break;
 
             case Qn::ThumbnailStatus::Loaded:
-                loaderIsComplete();
+                loaderIsComplete = true;
                 break;
 
             case Qn::ThumbnailStatus::Refreshing:
@@ -145,11 +146,13 @@ struct LayoutThumbnailLoader::Private
                 }
 
                 emit q->imageChanged(data.image);
-
-                loaderIsComplete();
+                loaderIsComplete = true;
                 break;
             }
         }
+
+        if (loaderIsComplete)
+            notifyLoaderIsComplete();
     }
 
     void drawTile(const QImage& tile, qreal aspectRatio, const QRectF& cellRect,
@@ -387,7 +390,7 @@ void LayoutThumbnailLoader::doLoadAsync()
             {
                 if (status == Qn::ThumbnailStatus::Loaded)
                 {
-                    d->loaderIsComplete();
+                    d->notifyLoaderIsComplete();
                 }
             });
 
