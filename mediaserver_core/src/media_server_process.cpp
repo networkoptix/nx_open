@@ -284,6 +284,8 @@
     #include "nx1/info.h"
 #endif
 
+#include "ini.h"
+
 
 using namespace nx;
 
@@ -1790,7 +1792,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getCameraParam", new QnCameraSettingsRestHandler());
     reg("api/setCameraParam", new QnCameraSettingsRestHandler());
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
-    reg("api/wearableCamera", new QnWearableCameraRestHandler());
+    if(ini().enableWearableCameras)
+        reg("api/wearableCamera", new QnWearableCameraRestHandler());
     reg("api/ptz", new QnPtzRestHandler());
     reg("api/image", new QnImageRestHandler()); //< deprecated
     reg("api/createEvent", new QnExternalEventRestHandler());

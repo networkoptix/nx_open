@@ -346,6 +346,7 @@ void initialize(Manager* manager, Action* root)
             .pulledText(ContextMenu::tr("New Wearable Camera..."))
             .condition(condition::isLoggedIn()
                 && !condition::isSafeMode()
+                && condition::isTrue(ini().enableWearableCameras)
             )
             .autoRepeat(false);
     }
@@ -1248,7 +1249,8 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Upload to Wearable Camera..."))
-        .condition(condition::hasFlags(Qn::wearable_camera, All));
+        .condition(condition::hasFlags(Qn::wearable_camera, All)
+            && condition::isTrue(ini().enableWearableCameras));
 
     factory(CameraIssuesAction)
         .mode(DesktopMode)
