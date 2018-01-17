@@ -26,21 +26,24 @@ InstanceController::InstanceController(const ConnectionOptions& dbConnectionOpti
 
 bool InstanceController::initialize()
 {
+    NX_DEBUG(this, lm("Initializing query executor"));
     if (!m_queryExecutor->init())
     {
-        NX_LOG(lit("Failed to open connection to DB"), cl_logERROR);
+        NX_ERROR(this, "Failed to open connection to DB");
         return false;
     }
 
+    NX_DEBUG(this, lm("Updating DB structure"));
     if (!updateDbStructure())
     {
-        NX_LOG("Could not update DB to current vesion", cl_logERROR);
+        NX_ERROR(this, "Could not update DB to current vesion");
         return false;
     }
 
+    NX_DEBUG(this, lm("Configuring DB"));
     if (!configureDb())
     {
-        NX_LOG("Failed to tune DB", cl_logERROR);
+        NX_ERROR(this, "Failed to tune DB");
         return false;
     }
 
