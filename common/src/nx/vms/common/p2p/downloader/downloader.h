@@ -62,6 +62,10 @@ public:
 signals:
     void downloadFinished(const QString& fileName);
     void downloadFailed(const QString& fileName);
+    void fileAdded(const FileInformation& fileInformation);
+    void fileDeleted(const QString& fileName);
+    void fileInformationChanged(const FileInformation& fileInformation);
+    void fileStatusChanged(const FileInformation& fileInformation);
 
 private:
     QScopedPointer<DownloaderPrivate> const d_ptr;

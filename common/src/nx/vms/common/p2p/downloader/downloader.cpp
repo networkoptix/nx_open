@@ -102,6 +102,12 @@ Downloader::Downloader(
     Q_D(Downloader);
     d->storage.reset(new Storage(downloadsDirectory));
 
+    connect(d->storage.data(), &Storage::fileAdded, this, &Downloader::fileAdded);
+    connect(d->storage.data(), &Storage::fileDeleted, this, &Downloader::fileDeleted);
+    connect(d->storage.data(), &Storage::fileInformationChanged, this,
+        &Downloader::fileInformationChanged);
+    connect(d->storage.data(), &Storage::fileStatusChanged, this, &Downloader::fileStatusChanged);
+
     d->peerManagerFactory = peerManagerFactory;
     if (!d->peerManagerFactory)
     {
