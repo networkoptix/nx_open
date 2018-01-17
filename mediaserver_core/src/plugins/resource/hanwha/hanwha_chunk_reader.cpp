@@ -271,7 +271,7 @@ void HanwhaChunkLoader::sendOverlappedIdRequest()
         lit("recording/overlapped/view"),
         {
             {kHanwhaChannelIdListProperty, makeChannelIdListString()},
-            {kHanwhaFromDateProperty, makeStartDateTimeString()},
+            {kHanwhaFromDateProperty, convertDateToString(kMinDateTime)},
             {kHanwhaToDateProperty, makeEndDateTimeSting()}
         });
 
@@ -308,6 +308,18 @@ void HanwhaChunkLoader::sendTimelineRequest()
         m_startTimeUs = AV_NOPTS_VALUE;
         m_endTimeUs = AV_NOPTS_VALUE;
     }
+
+    bool arePreviousChunksInvalid =
+        m_overlappedIds.front() != m_lastNvrOverlappedId;
+
+    if (arePreviousChunksInvalid)
+    {
+        m_chunks.clear();
+        m_startTimeUs = AV_NOPTS_VALUE;
+        m_endTimeUs = AV_NOPTS_VALUE;
+    }
+
+    m_lastNvrOverlappedId = m_overlappedIds.front();
 
     const auto overlappedId = m_isNvr
         ? QString::number(m_overlappedIds.front())
@@ -805,6 +817,28 @@ OverlappedTimePeriods HanwhaChunkLoader::overlappedTimelineThreadUnsafe(
     QnTimePeriod boundingPeriod(startTimeMs, endTimeMs - startTimeMs);
 
     OverlappedTimePeriods result;
+    if (isNvr())
+    {
+        // In the case of NVR we must provide only chunks that
+        // belong to the latest overlapped ID.
+        const auto entry = m_chunks.rbegin();
+        if (entry == m_chunks.rend())
+            return result;
+
+        const auto overlappedId = entry->first;
+        const auto chunksByChannel = entry->second;
+
+        if (chunksByChannel.size() < channelNumber + 1)
+            return result;
+
+        if (needToRestrictPeriods)
+            result[overlappedId] = chunksByChannel[channelNumber].intersected(boundingPeriod);
+        else
+            result[overlappedId] = chunksByChannel[channelNumber];
+
+        return result;
+    }
+
     for (const auto& entry : m_chunks)
     {
         const auto overlappedId = entry.first;
