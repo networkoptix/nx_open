@@ -72,39 +72,46 @@ def collect_actual_data():
 
 def append_new_versions(root_obj, path_to_update_obj, new_versions):
     for customization_name, customization_obj in root_obj.items():
-        existing_update_key_with_customization = None
+        # Searching for the update object with the highest build number for the current customization.
+        new_update_obj = None
+        highest_build = 0
         for path in path_to_update_obj.keys():
-            if customization_name in path:
-                existing_update_key_with_customization = path
-        if existing_update_key_with_customization:
-            if 'packages' not in path_to_update_obj[existing_update_key_with_customization]:
-                continue
-            for new_version in new_versions:
-                customization_obj['releases'][new_version[0]] = new_version[1]
-                new_update_obj = path_to_update_obj[existing_update_key_with_customization].copy()
-                new_update_obj['version'] = new_version[1]
-                new_update_obj['cloudHost'] = new_version[2]
+            path_parts = path.split('/')
+            if customization_name == path_parts[1] and int(path_parts[2]) > highest_build and \
+                    'packages' in path_to_update_obj[path]:
+                highest_build = int(path_parts[2])
+                new_update_obj = path_to_update_obj[path]
 
-                def amend_file_info_obj(file_info_obj):
-                    old_file_name_splits = file_info_obj['file'].split('.')
-                    new_version_splits = new_version[1].split('.')
-                    new_file_name_prefix = list(old_file_name_splits[0])
-                    new_file_name_prefix[-1] = new_version_splits[0]
-                    new_file_name_prefix = ''.join(new_file_name_prefix)
-                    new_file_name = '.'.join([new_file_name_prefix, new_version_splits[1], new_version_splits[2],
-                                              new_version_splits[3], 'zip'])
-                    file_info_obj['file'] = new_file_name
+        if not new_update_obj:
+            continue
 
-                def amend_packages(update_obj, packages_name):
-                    for os_key, os_obj in update_obj[packages_name].items():
-                        for file_key, file_obj in os_obj.items():
-                            amend_file_info_obj(file_obj)
+        for new_version in new_versions:
+            customization_obj['releases'][new_version[0]] = new_version[1]
+            new_update_obj['version'] = new_version[1]
+            new_update_obj['cloudHost'] = new_version[2]
 
-                amend_packages(new_update_obj, 'clientPackages')
-                amend_packages(new_update_obj, 'packages')
+            def amend_file_info_obj(file_info_obj):
+                # TODO: amend md5 and size as well
+                # Amending file name. Changing only the version part of the file name.
+                old_file_name_splits = file_info_obj['file'].split('.')
+                new_version_splits = new_version[1].split('.')
+                new_file_name_prefix = list(old_file_name_splits[0])
+                new_file_name_prefix[-1] = new_version_splits[0]
+                new_file_name_prefix = ''.join(new_file_name_prefix)
+                new_file_name = '.'.join([new_file_name_prefix, new_version_splits[1], new_version_splits[2],
+                                          new_version_splits[3], 'zip'])
+                file_info_obj['file'] = new_file_name
 
-                new_path_key = UPDATE_PATH_PATTERN.format(customization_name, new_version[1].split('.')[-1])
-                path_to_update_obj[new_path_key] = new_update_obj
+            def amend_packages(update_obj, packages_name):
+                for os_key, os_obj in update_obj[packages_name].items():
+                    for file_key, file_obj in os_obj.items():
+                        amend_file_info_obj(file_obj)
+
+            amend_packages(new_update_obj, 'clientPackages')
+            amend_packages(new_update_obj, 'packages')
+
+            new_path_key = UPDATE_PATH_PATTERN.format(customization_name, new_version[1].split('.')[-1])
+            path_to_update_obj[new_path_key] = new_update_obj
 
     return root_obj, path_to_update_obj
 
