@@ -1,4 +1,5 @@
 set(CMAKE_SYSTEM_NAME Android)
+set(box "android")
 
 if(NOT "$ENV{ANDROID_NDK}" STREQUAL "")
     set(CMAKE_ANDROID_NDK "$ENV{ANDROID_NDK}")
