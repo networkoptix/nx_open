@@ -20,7 +20,7 @@
         <template>app</template>
 
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia websockets</qt.libs>
-        <global.libs>-lmediaserver_core -lcommon -lnx_network -lappserver2 -ludt -lcloud_db_client -lnx_email -lnx_speech_synthesizer -lnx_fusion -lnx_utils -lnx_kit</global.libs>
+        <global.libs>-lmediaserver_core -lnx_update -lcommon -lnx_network -lappserver2 -ludt -lcloud_db_client -lnx_email -lnx_speech_synthesizer -lnx_fusion -lnx_utils -lnx_kit</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
         <linux.oslibs>-lldap -ldl</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
