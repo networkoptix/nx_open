@@ -12,6 +12,11 @@ function(_generate_moc_parameters target parameters_file)
         set(framework_directories)
     endif()
 
+    # Temporary hack begin
+    set(include_directories "-I${CMAKE_SOURCE_DIR}/common_libs/nx_fusion/src\n-I${CMAKE_CURRENT_SOURCE_DIR}/src\n")
+    set(framework_directories)
+    # Temporary hack end
+
     set(definitions
         "$<TARGET_PROPERTY:${target},COMPILE_DEFINITIONS>")
     set(definitions
