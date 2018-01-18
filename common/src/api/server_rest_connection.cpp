@@ -287,7 +287,7 @@ Handle ServerConnection::addFileDownload(
             {lit("size"), QString::number(size)},
             {lit("md5"), QString::fromUtf8(md5)},
             {lit("url"), url.toString()},
-            {lit("peerPolicy"), peerPolicy }},
+            {lit("peerPolicy"), peerPolicy}},
         QByteArray(),
         QByteArray(),
         callback,
