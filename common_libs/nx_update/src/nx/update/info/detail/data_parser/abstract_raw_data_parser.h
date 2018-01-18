@@ -14,7 +14,7 @@ namespace data_parser {
 class AbstractRawDataParser
 {
 public:
-    virtual ~AbstractRawDataParser() {}
+    virtual ~AbstractRawDataParser() = default;
     virtual ResultCode parseMetaData(const QByteArray& rawData, UpdatesMetaData* outUpdatesMetaData) = 0;
     virtual ResultCode parseUpdateData(const QByteArray& rawData, UpdateData* outUpdateData) = 0;
 };
