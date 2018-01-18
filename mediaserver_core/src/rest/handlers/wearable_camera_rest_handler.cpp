@@ -1,5 +1,7 @@
 #include "wearable_camera_rest_handler.h"
 
+#include <memory>
+
 #include <QtCore/QBuffer>
 #include <QtCore/QFile> // TODO: drop
 
