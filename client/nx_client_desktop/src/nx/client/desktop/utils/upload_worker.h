@@ -80,4 +80,4 @@ private:
 } // namespace client
 } // namespace nx
 
-Q_DECLARE_METATYPE(FileUpload)
+Q_DECLARE_METATYPE(nx::client::desktop::FileUpload)
