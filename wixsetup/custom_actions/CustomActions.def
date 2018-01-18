@@ -1,4 +1,4 @@
-LIBRARY "CustomActions"
+LIBRARY "wix_custom_actions"
 
 EXPORTS
 
