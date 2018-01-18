@@ -41,7 +41,7 @@ class UdpHolePunchingTunnelAcceptorTest:
 {
 protected:
     UdpHolePunchingTunnelAcceptorTest():
-        stunClientMock(std::make_unique<stun::test::AsyncClientMock>()),
+        stunClientMock(std::make_shared<stun::test::AsyncClientMock>()),
         manualAcceptorStop(false),
         udpStunServer(&stunMessageDispatcher),
         isUdpServerEnabled(true),
@@ -265,7 +265,7 @@ protected:
             mediatorConnection->pleaseStopSync();
     }
 
-    std::unique_ptr<stun::test::AsyncClientMock> stunClientMock;
+    std::shared_ptr<stun::test::AsyncClientMock> stunClientMock;
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection;
 
     bool manualAcceptorStop;
