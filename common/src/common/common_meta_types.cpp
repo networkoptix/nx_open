@@ -111,6 +111,8 @@
 #include <core/resource/camera_advanced_param.h>
 #include <core/dataprovider/stream_mixer_data.h>
 
+#include <nx/vms/common/p2p/downloader/file_information.h>
+
 namespace {
     bool qn_commonMetaTypes_initialized = false;
 }
@@ -386,6 +388,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QList<QnResourceChannelMapping>>();
 
     qRegisterMetaType<QnAbstractCompressedMetadataPtr>();
+
+    qRegisterMetaType<nx::vms::common::p2p::downloader::FileInformation>();
 
     QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
