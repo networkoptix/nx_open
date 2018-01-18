@@ -1,3 +1,6 @@
+set(nx_enable_werror OFF)
+set(nx_werror_condition CMAKE_COMPILER_IS_GNUCXX)
+
 # build_source_groups(<source root path> <list of source files with absolute paths> <name of root group>)
 function(build_source_groups _src_root_path _source_list _root_group_name)
     foreach(_source IN ITEMS ${_source_list})
@@ -9,8 +12,14 @@ function(build_source_groups _src_root_path _source_list _root_group_name)
     endforeach()
 endfunction()
 
+function(nx_target_enable_werror target)
+    if(${nx_werror_condition})
+        target_compile_options(${target} PRIVATE -Werror -Wall -Wextra)
+    endif()
+endfunction()
+
 function(nx_add_target name type)
-    set(options NO_MOC NO_PCH)
+    set(options NO_MOC NO_PCH WERROR NO_WERROR)
     set(oneValueArgs LIBRARY_TYPE)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
@@ -100,6 +109,10 @@ function(nx_add_target name type)
 
     if(stripBinaries)
         nx_strip_target(${name} COPY_DEBUG_INFO)
+    endif()
+
+    if(NOT NX_NO_WERROR AND (nx_enable_werror OR NX_WERROR))
+        nx_target_enable_werror(${name})
     endif()
 
     if(NOT NX_NO_PCH)
