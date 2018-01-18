@@ -30,10 +30,10 @@ protected:
     void resetClientFactoryToDefault();
 
 private:
-    boost::optional<nx::cloud::relay::api::ClientFactory::CustomFactoryFunc> 
+    boost::optional<nx::cloud::relay::api::ClientFactory::CustomFactoryFunc>
         m_clientFactoryBak;
 
-    std::unique_ptr<nx::cloud::relay::api::Client> 
+    std::unique_ptr<nx::cloud::relay::api::Client>
         clientFactoryFunc(const utils::Url & /*relayUrl*/);
 };
 

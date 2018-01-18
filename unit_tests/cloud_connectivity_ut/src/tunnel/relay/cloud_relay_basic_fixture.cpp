@@ -33,7 +33,7 @@ void BasicFixture::resetClientFactoryToDefault()
     }
 }
 
-std::unique_ptr<api::Client> 
+std::unique_ptr<api::Client>
     BasicFixture::clientFactoryFunc(const nx::utils::Url& /*relayUrl*/)
 {
     auto result = std::make_unique<nx::cloud::relay::api::test::ClientImpl>();
