@@ -1625,7 +1625,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         {
             removeBusinessRule(rule->id());
         }
-        return resyncIfNeeded(ResyncRules);
+        return fixDefaultBusinessRuleGuids() && resyncIfNeeded(ResyncRules);
     }
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);

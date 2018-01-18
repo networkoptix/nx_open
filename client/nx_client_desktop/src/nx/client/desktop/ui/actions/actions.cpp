@@ -564,8 +564,7 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::treeNodeType(Qn::UsersNode));
 
     factory(UpdateLocalFilesAction)
-        .flags(NoTarget)
-        .text(ContextMenu::tr("Update local files"));
+        .flags(NoTarget);
 
     factory(PreferencesGeneralTabAction)
         .flags(Main)

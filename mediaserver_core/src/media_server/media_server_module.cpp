@@ -52,6 +52,7 @@
 #include <plugins/plugin_manager.h>
 #include <nx/mediaserver/server_meta_types.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <nx/mediaserver/updates2/updates2_manager.h>
 
 namespace {
 
@@ -153,15 +154,21 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_context.reset(new UniquePtrContext());
 
+    m_analyticsEventsStorage =
+        nx::analytics::storage::EventsStorageFactory::instance()
+            .create(m_settings->analyticEventsStorage());
+
     m_context->normalStorageManager.reset(
         new QnStorageManager(
             commonModule(),
+            m_analyticsEventsStorage.get(),
             QnServer::StoragePool::Normal
         ));
 
     m_context->backupStorageManager.reset(
         new QnStorageManager(
             commonModule(),
+            nullptr,
             QnServer::StoragePool::Backup
         ));
 
@@ -183,12 +190,9 @@ QnMediaServerModule::QnMediaServerModule(
     m_metadataManagerPool->moveToThread(m_metadataManagerPoolThread);
     m_metadataManagerPoolThread->start();
 
-    m_analyticsEventsStorage =
-        nx::analytics::storage::EventsStorageFactory::instance()
-            .create(m_settings->analyticEventsStorage());
-
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
+    m_updates2Manager = store(new nx::mediaserver::updates2::Updates2Manager(this->commonModule()));
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -298,4 +302,9 @@ void QnMediaServerModule::initializeRootTool()
 nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
 {
     return m_rootTool.get();
+}
+
+nx::mediaserver::updates2::Updates2Manager* QnMediaServerModule::updates2Manager() const
+{
+    return m_updates2Manager;
 }

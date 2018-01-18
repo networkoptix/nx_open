@@ -50,7 +50,7 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
         result.reset(new deprecated::SslSocket(std::move(result), false));
 #endif // ENABLE_SSL
 
-    return std::move(result);
+    return result;
 }
 
 std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerSocket(
@@ -77,7 +77,7 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
             result.reset(new deprecated::SslServerSocket(std::move(result), true));
 #endif // ENABLE_SSL
 
-    return std::move(result);
+    return result;
 }
 
 QString SocketFactory::toString(SocketType type)

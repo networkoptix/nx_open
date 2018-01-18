@@ -6,6 +6,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/utils/scope_guard.h>
 
 namespace {
 
@@ -22,9 +23,8 @@ namespace downloader {
 
 QN_FUSION_DECLARE_FUNCTIONS(FileMetadata, (json))
 
-Storage::Storage(
-    const QDir& downloadsDirectory)
-    :
+Storage::Storage(const QDir& downloadsDirectory, QObject* parent):
+    QObject(parent),
     m_downloadsDirectory(downloadsDirectory)
 {
     findDownloads();
@@ -111,6 +111,10 @@ ResultCode Storage::addDownloadedFile(const FileInformation& fileInformation)
 
     m_fileInformationByName.insert(fileInformation.name, info);
 
+    lock.unlock();
+
+    emit fileAdded(fileInformation);
+
     return ResultCode::ok;
 }
 
@@ -182,6 +186,10 @@ ResultCode Storage::addNewFile(const FileInformation& fileInformation)
 
     m_fileInformationByName.insert(fileInformation.name, info);
 
+    lock.unlock();
+
+    emit fileAdded(fileInformation);
+
     return ResultCode::ok;
 }
 
@@ -217,6 +225,19 @@ ResultCode Storage::updateFileInformation(
         it->md5 = md5;
         updated = true;
     }
+
+    const auto& exitGuard = makeScopeGuard(
+        [this, &lock, updated, it, status = it->status]()
+        {
+            if (updated || status != it->status)
+            {
+                lock.unlock();
+
+                emit fileInformationChanged(it.value());
+                if (!updated)
+                    emit fileStatusChanged(it.value());
+            }
+        });
 
     if (resizeFailed)
         return ResultCode::noFreeSpace;
@@ -255,6 +276,13 @@ ResultCode Storage::setChunkSize(const QString& fileName, qint64 chunkSize)
         it->chunkChecksums.clear();
         it->chunkChecksums.resize(chunkCount);
     }
+
+    const auto& exitGuard = makeScopeGuard(
+        [this, &lock, it]()
+        {
+            lock.unlock();
+            emit fileInformationChanged(it.value());
+        });
 
     if (it->status == FileInformation::Status::corrupted)
         it->status = FileInformation::Status::downloading;
@@ -329,6 +357,17 @@ ResultCode Storage::writeFileChunk(
 
     file.close();
 
+    const auto& exitGuard = makeScopeGuard(
+        [this, &lock, it, status = it->status]()
+        {
+            lock.unlock();
+
+            emit fileInformationChanged(it.value());
+
+            if (status != it->status)
+                emit fileStatusChanged(it.value());
+        });
+
     it->downloadedChunks.setBit(chunkIndex);
     checkDownloadCompleted(it.value());
     saveMetadata(it.value());
@@ -377,6 +416,10 @@ ResultCode Storage::deleteFile(const QString& fileName, bool deleteData)
 
     m_fileInformationByName.erase(it);
 
+    lock.unlock();
+
+    emit fileDeleted(fileName);
+
     return ResultCode::ok;
 }
 
@@ -410,6 +453,17 @@ ResultCode Storage::setChunkChecksums(
         return ResultCode::invalidChecksum;
 
     it->chunkChecksums = chunkChecksums;
+
+    const auto& exitGuard = makeScopeGuard(
+        [this, &lock, it, status = it->status]()
+        {
+            lock.unlock();
+
+            emit fileInformationChanged(it.value());
+
+            if (status != it->status)
+                emit fileStatusChanged(it.value());
+        });
 
     if (it->size < 0)
         return ResultCode::ok;

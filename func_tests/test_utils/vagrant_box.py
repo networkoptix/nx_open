@@ -1,5 +1,3 @@
-'''Vagrant wrappers classes'''
-
 import logging
 import os
 import os.path

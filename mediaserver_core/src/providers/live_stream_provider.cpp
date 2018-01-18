@@ -10,6 +10,7 @@
 #include <nx/streaming/config.h>
 #include <nx/streaming/media_data_packet.h>
 
+#include <core/dataconsumer/conditional_data_proxy.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_properties.h>
 
@@ -23,7 +24,7 @@
 #include <nx/streaming/config.h>
 #include <utils/media/hevc_sps.h>
 #include <camera/video_camera.h>
-#include <ini.h>
+#include <mediaserver_ini.h>
 #include <analytics/detected_objects_storage/analytics_events_receptor.h>
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
@@ -99,6 +100,13 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
         new nx::analytics::storage::AnalyticsEventsReceptor(
             qnServerModule->analyticsEventsStorage()));
+    m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
+        new ConditionalDataProxy(
+            m_analyticsEventsSaver,
+            [this](const QnAbstractDataPacketPtr& /*data*/)
+            {
+                return m_cameraRes->getStatus() == Qn::Recording;
+            }));
     m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
 
     auto pool = qnServerModule->metadataManagerPool();

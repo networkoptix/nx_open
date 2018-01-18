@@ -1,8 +1,3 @@
-'''pytest configuration file for functional testsevi
-
-Loaded by pytest before running all functional tests. Adds common fixtures used by tests.
-'''
-
 import logging
 import os.path
 
@@ -177,7 +172,7 @@ def junk_shop_repository(request, init_logging):
     else:
         db_capture_repository = None
         current_test_run = None
-    return (db_capture_repository, current_test_run)
+    return db_capture_repository, current_test_run
 
 @pytest.fixture
 def artifact_factory(request, run_options, junk_shop_repository):

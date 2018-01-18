@@ -1,8 +1,3 @@
-/**********************************************************
-* May 11, 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <map>
@@ -23,7 +18,6 @@
 
 #include "../access_control/auth_types.h"
 #include "../data/account_data.h"
-
 
 namespace nx {
 namespace network {
@@ -119,5 +113,5 @@ private:
         MediaServerConnectionContainer::iterator serverConnectionIter);
 };
 
-}   //namespace cdb
-}   //namespace nx
+} // namespace cdb
+} // namespace nx

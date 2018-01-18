@@ -22,7 +22,7 @@
 #include "media_data_receptor.h"
 #include <nx/utils/log/log_main.h>
 
-#include <ini.h>
+#include <mediaserver_ini.h>
 
 namespace nx {
 namespace mediaserver {

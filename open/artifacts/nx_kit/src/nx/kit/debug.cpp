@@ -58,13 +58,13 @@ char pathSeparator()
 
 size_t commonPrefixSize(const std::string& s1, const std::string& s2)
 {
-    const std::string& sA = (s1.size() > s2.size()) ? s1 : s2;
-    const std::string& sB = (s1.size() > s2.size()) ? s2 : s1;
+    const std::string& shorter = (s1.size() < s2.size()) ? s1 : s2;
+    const std::string& longer = (s1.size() < s2.size()) ? s2 : s1;
 
     const auto afterCommonPrefix = std::mismatch(
-        sA.cbegin(), sA.cend(), sB.cbegin());
+        shorter.cbegin(), shorter.cend(), longer.cbegin());
 
-    return (size_t) (afterCommonPrefix.first - sA.cbegin());
+    return (size_t) (afterCommonPrefix.first - shorter.cbegin());
 }
 
 const char* relativeSrcFilename(const char* file)

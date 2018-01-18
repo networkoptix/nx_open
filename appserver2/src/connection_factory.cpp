@@ -103,15 +103,21 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     //m_transactionMessageBus->start();
 }
 
-Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
+void Ec2DirectConnectionFactory::shutdown()
 {
     // Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
     // uses QnTransactionMessageBus.
     if (m_timeSynchronizationManager)
         m_timeSynchronizationManager->pleaseStop();
 
+    m_serverQueryProcessor->waitForAsyncTasks();
+
     pleaseStop();
     join();
+}
+
+Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
+{
 }
 
 void Ec2DirectConnectionFactory::pleaseStop()

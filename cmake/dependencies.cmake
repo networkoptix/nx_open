@@ -136,7 +136,6 @@ function(nx_get_dependencies)
     if(box MATCHES "bpi|bananapi")
         nx_rdep_add_package(sysroot)
         nx_rdep_add_package(opengl-es-mali)
-        nx_rdep_add_package(libstdc++-6.0.19)
     endif()
 
     if(box MATCHES "rpi")
@@ -215,7 +214,7 @@ function(nx_get_dependencies)
             nx_rdep_add_package(any/server-external-${branch} OPTIONAL
                 PATH_VARIABLE server_external_path)
             if(NOT server_external_path)
-                nx_rdep_add_package(any/server-external-${releaseVersion.short})
+                nx_rdep_add_package(any/server-external-vms)
             endif()
         endif()
 

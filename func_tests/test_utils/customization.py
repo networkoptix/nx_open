@@ -1,7 +1,7 @@
-'''Customization support module
+"""Customization support module
 
-load information related to [current] customization
-'''
+Load information related to [current] customization.
+"""
 
 import debian.debfile
 

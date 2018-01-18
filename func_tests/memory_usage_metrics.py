@@ -1,4 +1,5 @@
-# Load memory usage metrics for a host
+"""Load memory usage metrics for a host
+"""
 
 from collections import namedtuple
 

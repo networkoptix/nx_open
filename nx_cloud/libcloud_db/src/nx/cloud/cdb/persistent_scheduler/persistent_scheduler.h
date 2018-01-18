@@ -4,11 +4,13 @@
 #include <chrono>
 #include <unordered_map>
 #include <unordered_set>
+
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/db/async_sql_query_executor.h>
+
 #include "persistent_scheduler_db_helper.h"
 #include "persistent_scheduler_common.h"
 
@@ -22,11 +24,11 @@ using OnTimerUserFunc = nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(nx::util
 class AbstractPersistentScheduleEventReceiver
 {
 public:
+    virtual ~AbstractPersistentScheduleEventReceiver() = default;
+
     virtual OnTimerUserFunc persistentTimerFired(
         const QnUuid& taskId,
         const ScheduleParams& params) = 0;
-
-    virtual ~AbstractPersistentScheduleEventReceiver() {}
 };
 
 class PersistentScheduler
@@ -86,5 +88,5 @@ private:
     std::unordered_set<QnUuid> m_delayed;
 };
 
-}
-}
+} // namespace cdb
+} // namespace nx

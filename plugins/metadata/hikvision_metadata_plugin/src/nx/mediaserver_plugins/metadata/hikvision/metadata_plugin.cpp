@@ -38,7 +38,7 @@ using namespace nx::sdk::metadata;
 
 MetadataPlugin::MetadataPlugin()
 {
-    QFile file(":manifest.json");
+    QFile file(":/manifest.json");
     if (file.open(QFile::ReadOnly))
         m_manifest = file.readAll();
     {

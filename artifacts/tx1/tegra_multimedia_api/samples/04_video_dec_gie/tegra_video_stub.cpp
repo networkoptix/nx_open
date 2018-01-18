@@ -39,10 +39,13 @@ public:
             {
                 m_ptsModulusUs = -1;
             }
-            if (m_ptsModulusUs <= 0)
+            else
             {
-                NX_PRINT << "ERROR: Expected a positive integer in Modulus file, but "
-                    << m_ptsModulusUs << " found.";
+                if (m_ptsModulusUs <= 0)
+                {
+                    NX_PRINT << "ERROR: Expected a positive integer in Modulus file, but "
+                        << m_ptsModulusUs << " found.";
+                }
             }
         }
     }

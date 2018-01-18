@@ -71,7 +71,6 @@ def test_server_should_pick_archive_file_with_time_after_db_time(server, camera,
 
 def assert_server_has_resource(server, method, **kw):
     def is_subset(subset, superset):
-        '''Test that [subset] is a subset of [superset]'''
         return all(item in superset.items() for item in subset.items())
     resources = [r for r in server.rest_api.get_api_fn('GET', 'ec2', method)()
                  if is_subset(kw, r)]

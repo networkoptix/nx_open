@@ -1,5 +1,3 @@
-'''Virtual Box VBoxManage command wrapper'''
-
 import re
 
 from netaddr import IPNetwork
@@ -109,7 +107,7 @@ class VBoxManage(object):
                 continue
             servers.append(server)
             last_index = max(last_index, int(server.name[len(self._vm_net_prefix):]))
-        return (servers, last_index)
+        return servers, last_index
 
     def _add_dhcp_server(self, dhcp_server):
         self._run_command(['dhcpserver', 'add',

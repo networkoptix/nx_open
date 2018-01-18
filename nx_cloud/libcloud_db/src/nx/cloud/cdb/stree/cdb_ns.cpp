@@ -1,10 +1,4 @@
-/**********************************************************
-* Oct 19, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "cdb_ns.h"
-
 
 namespace nx {
 namespace cdb {
@@ -50,5 +44,5 @@ CdbAttrNameSet::CdbAttrNameSet()
     registerResource(attr::credentialsProlongationPeriod, "credentials.prolongationPeriod", QVariant::String);
 }
 
-}   //namespace cdb
-}   //namespace nx
+} // namespace cdb
+} // namespace nx

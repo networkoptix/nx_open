@@ -6,9 +6,6 @@
 
 #include <QDateTime>
 
-static const int AFORT_COUNT = 3;
-static const quint32 LIFETIME = 1 * 60 * 60; // 1 hour
-
 namespace nx {
 namespace network {
 namespace pcp {

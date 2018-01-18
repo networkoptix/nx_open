@@ -50,7 +50,7 @@ def test_merged_archive(server_factory, camera, sample_media_file):
     two.rebuild_archive()
     assert all_expected_periods == one.get_recorded_time_periods(camera)
     assert all_expected_periods == two.get_recorded_time_periods(camera)
-    return (one, two, expected_periods_one, expected_periods_two)
+    return one, two, expected_periods_one, expected_periods_two
 
 
 def test_separated_archive(server_factory, camera, sample_media_file):

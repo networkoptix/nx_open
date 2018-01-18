@@ -1,7 +1,7 @@
-'''Scalability test
+"""Scalability test
 
-  Measure system synchronization time
-'''
+Measure system synchronization time.
+"""
 
 import datetime
 import logging
@@ -180,7 +180,7 @@ def clean_transaction_log(json):
 
 def clean_full_info(json):
     # We have to not check 'resStatusList' section due to VMS-5969
-    return {k: v for k, v in json.iteritems() if k !='resStatusList'}
+    return {k: v for k, v in json.items() if k !='resStatusList'}
 
 def clean_json(api_method, json):
     cleaners = dict(
@@ -236,8 +236,8 @@ def wait_for_method_matched(artifact_factory, servers, method, api_object, api_m
                 result = get_response(srv, method, api_object, api_method)
                 result_cleaned = clean_json(api_method, result)
                 if result_cleaned != expected_result:
-                    return (srv, result_cleaned)
-            return (None, None)
+                    return srv, result_cleaned
+            return None, None
     
         first_unsynced_server, unmatched_result = check(servers[1:])
         if not first_unsynced_server:

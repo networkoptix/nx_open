@@ -1,4 +1,4 @@
-'Produce file names for storing artifacts'
+"""Produce file names for storing artifacts."""
 
 import logging
 import os.path

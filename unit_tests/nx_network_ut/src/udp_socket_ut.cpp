@@ -92,7 +92,7 @@ private:
     const Buffer m_testMessage;
     std::unique_ptr<UDPSocket> m_sender;
     std::unique_ptr<UDPSocket> m_receiver;
-    nx::utils::SyncQueue<SendResult> m_sendResultQueue;
+    nx::utils::SyncQueue<SendResult> m_successfulSendResultQueue;
     std::unique_ptr<RetryTimer> m_sendRetryTimer;
 
     void initializeSender(int ipVersion)
@@ -130,7 +130,11 @@ private:
                 SocketAddress resolvedTargetEndpoint,
                 size_t size)
             {
-                m_sendResultQueue.push(SendResult{code, resolvedTargetEndpoint, size});
+                if (code == SystemError::noError)
+                {
+                    m_successfulSendResultQueue.push(
+                        SendResult{code, resolvedTargetEndpoint, size});
+                }
 
                 m_sendRetryTimer->scheduleNextTry(
                     [this, targetEndpoint]()
@@ -176,7 +180,7 @@ private:
 
     void assertSendResultIsCorrect(const SocketAddress& receiverEndpoint)
     {
-        const auto sendResult = m_sendResultQueue.pop();
+        const auto sendResult = m_successfulSendResultQueue.pop();
         ASSERT_EQ(SystemError::noError, sendResult.code)
             << SystemError::toString(sendResult.code).toStdString();
         ASSERT_TRUE(sendResult.resolvedTargetEndpoint.address.isIpAddress());

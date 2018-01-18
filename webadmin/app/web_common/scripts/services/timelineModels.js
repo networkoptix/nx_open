@@ -951,6 +951,10 @@ ShortCache.prototype.checkEndOfArchive = function(){
     },function(){return null;});
 };
 
+
+ShortCache.prototype.isArchiveEmpty = function(){
+    return this.currentDetailization < 1;
+}
 //Used by ShortCache and CameraRecords
 function parseChunks(chunks){
     return _.forEach(chunks,function(chunk){
@@ -1362,7 +1366,9 @@ ScaleManager.prototype.scroll = function(value){
 };
 
 ScaleManager.prototype.getScrollByPixelsTarget = function(pixels){
-    return this.bound(0,this.scroll() + pixels * this.getRelativeWidth() / this.viewportWidth,1);
+    var availableWidth = (this.end - this.start) - (this.visibleEnd - this.visibleStart);
+    var relativeValue = (this.visibleEnd - this.visibleStart) / availableWidth;
+    return this.bound(0,this.scroll() + pixels / this.viewportWidth * relativeValue,1);
 };
 
 ScaleManager.prototype.getScrollTarget = function(pixels){

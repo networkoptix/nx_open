@@ -190,6 +190,8 @@ statserver/dist
 
 *test-tmp.cfg
 func_tests_old/ssh.*.conf
+func_tests/test_utils/updates2/test_updates_server/data/*.json
+func_tests/test_utils/updates2/test_updates_server/data/*.raw
 
 statserver/statserver.egg-info
 

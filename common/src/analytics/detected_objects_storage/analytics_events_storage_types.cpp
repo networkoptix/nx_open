@@ -143,18 +143,26 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 
 ::std::ostream& operator<<(::std::ostream& os, const Filter& filter)
 {
-    return os <<
-        "deviceId " << filter.deviceId.toSimpleString().toStdString() << "; " <<
-        "objectTypeId " << lm("%1").container(filter.objectTypeId).toStdString() << "; " <<
-        "objectId " << filter.objectId.toSimpleString().toStdString() << "; " <<
-        "timePeriod [" << filter.timePeriod.startTimeMs << ", " <<
-            filter.timePeriod.durationMs << "]; " <<
-        "boundingBox [" <<
+    if (!filter.deviceId.isNull())
+        os << "deviceId " << filter.deviceId.toSimpleString().toStdString() << "; ";
+    if (!filter.objectTypeId.empty())
+        os << "objectTypeId " << lm("%1").container(filter.objectTypeId).toStdString() << "; ";
+    if (!filter.objectId.isNull())
+        os << "objectId " << filter.objectId.toSimpleString().toStdString() << "; ";
+    os << "timePeriod [" << filter.timePeriod.startTimeMs << ", " <<
+        filter.timePeriod.durationMs << "]; ";
+    if (!filter.boundingBox.isNull())
+    {
+        os << "boundingBox [" <<
             filter.boundingBox.topLeft().x() << ", " <<
             filter.boundingBox.topLeft().y() << ", " <<
             filter.boundingBox.bottomRight().x() << ", " <<
-            filter.boundingBox.bottomRight().y() << "]; " <<
-        "freeText \"" << filter.freeText.toStdString() << "\"; ";
+            filter.boundingBox.bottomRight().y() << "]; ";
+    }
+    if (!filter.freeText.isEmpty())
+        os << "freeText \"" << filter.freeText.toStdString() << "\"; ";
+
+    return os;
 }
 
 QString toString(const Filter& filter)

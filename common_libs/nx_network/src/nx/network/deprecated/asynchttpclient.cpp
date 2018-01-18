@@ -20,17 +20,11 @@
 
 #include <nx/fusion/model_functions.h>
 
-static const int DEFAULT_SEND_TIMEOUT = 3000;
-static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
-
 using std::make_pair;
 
 namespace nx {
 namespace network {
 namespace http {
-
-static constexpr size_t RESPONSE_BUFFER_SIZE = 16 * 1024;
-static constexpr int kMaxNumberOfRedirects = 5;
 
 AsyncHttpClient::AsyncHttpClient()
 {

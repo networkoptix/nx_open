@@ -1,12 +1,13 @@
 import json
 import logging
+import operator
 import os
 from collections import defaultdict, deque
 from datetime import datetime
+import re
 
 import boto3
 from dateutil.parser import parse
-
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 MAX_LINES_BEFORE = 20
@@ -96,7 +97,44 @@ def format_date_from_msecs(msecs):
 
 
 def is_pattern_matched(line, filter_pattern):
-    return filter_pattern.strip('"') in line
+    if filter_pattern.startswith('"'):
+        return filter_pattern.strip('"') in line
+    elif filter_pattern.startswith('['):
+        filter_components = [x.strip() for x in filter_pattern.strip('[]').split(',') if x.strip()]
+        line_components = [x.strip() for x in line.split(' ') if x.strip()]
+
+        operands_map = {
+            '<': operator.lt,
+            '<=': operator.le,
+            '>': operator.gt,
+            '>=': operator.ge,
+            '=': operator.eq,
+            '!=': operator.ne
+        }
+
+        for n, f in enumerate(filter_components):
+            if n >= len(line_components):
+                return False
+
+            l = line_components[n]
+            if '<' in f or '>' in 'f' or '=' in f:
+                try:
+                    l_value = int(l)
+                except ValueError:
+                    break
+
+                m = re.match(r'(\w+)([><=!]+)(.*)', f)
+                if m:
+                    f_split = m.groups()
+
+                    if len(f_split) == 3:
+                        operand = f_split[1]
+                        value = int(f_split[2])
+
+                        if operand in operands_map:
+                            return operands_map[operand](l_value, value)
+
+        return False
 
 
 def get_logs_and_send_email(cwl, ses, alarm_info, message, metric_filter_data):
@@ -133,8 +171,8 @@ def get_logs_and_send_email(cwl, ses, alarm_info, message, metric_filter_data):
 
             ts = format_date_from_msecs(event['timestamp'])
             ebs.append({'timestamp': ts,
-                           'matched': matched,
-                           'text': text})
+                        'matched': matched,
+                        'text': text})
 
             if matched:
                 matched_events_by_stream[log_stream] += ebs

@@ -5,8 +5,10 @@
 #include <common/common_globals.h>
 
 namespace ec2 {
+
 struct ApiUserData;
 struct ApiIdData;
+
 } // namespace ec2
 
 namespace nx {

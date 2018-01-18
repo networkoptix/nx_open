@@ -7,6 +7,7 @@
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
 
+#include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/resource.h>
@@ -449,9 +450,11 @@ static QnStorageManager* QnBackupStorageManager_instance = nullptr;
 
 QnStorageManager::QnStorageManager(
     QnCommonModule* commonModule,
+    nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
     QnServer::StoragePool role)
 :
     QnCommonModuleAware(commonModule),
+    m_analyticsEventsStorage(analyticsEventsStorage),
     m_role(role),
     m_mutexStorages(QnMutex::Recursive),
     m_mutexCatalog(QnMutex::Recursive),
@@ -1709,17 +1712,39 @@ void QnStorageManager::clearSpace(bool forced)
     // 6. Cleanup bookmarks
     if (m_clearBookmarksTimer.elapsed() > BOOKMARK_CLEANUP_INTERVAL) {
         m_clearBookmarksTimer.restart();
-        clearBookmarks();
+
+        const auto oldestDataTimestampByCamera = calculateOldestDataTimestampByCamera();
+        if (!oldestDataTimestampByCamera.isEmpty())
+        {
+            qnServerDb->deleteBookmarksToTime(oldestDataTimestampByCamera);
+
+            if (m_analyticsEventsStorage)
+                clearAnalyticsEvents(oldestDataTimestampByCamera);
+        }
     }
 }
 
-void QnStorageManager::clearBookmarks()
+void QnStorageManager::clearAnalyticsEvents(
+    const QMap<QnUuid, qint64>& dataToDelete)
+{
+    for (auto itr = dataToDelete.begin(); itr != dataToDelete.end(); ++itr)
+    {
+        const QnUuid& cameraId = itr.key();
+        qint64 timestampMs = itr.value();
+
+        m_analyticsEventsStorage->markDataAsDeprecated(
+            cameraId,
+            std::chrono::milliseconds(timestampMs));
+    }
+}
+
+QMap<QnUuid, qint64> QnStorageManager::calculateOldestDataTimestampByCamera()
 {
     QMap<QString, qint64> minTimes; // key - unique id, value - timestamp to delete
     if (!qnNormalStorageMan->getMinTimes(minTimes))
-        return;
+        return QMap<QnUuid, qint64>();
     if (!qnBackupStorageMan->getMinTimes(minTimes))
-        return;
+        return QMap<QnUuid, qint64>();
 
     QMap<QnUuid, qint64> dataToDelete;
     for (auto itr = minTimes.begin(); itr != minTimes.end(); ++itr)
@@ -1740,6 +1765,8 @@ void QnStorageManager::clearBookmarks()
         qnServerDb->deleteBookmarksToTime(dataToDelete);
 
     m_lastCatalogTimes = minTimes;
+
+    return dataToDelete;
 }
 
 bool QnStorageManager::getMinTimes(QMap<QString, qint64>& lastTime)
