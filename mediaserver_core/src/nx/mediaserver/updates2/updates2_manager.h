@@ -36,6 +36,7 @@ private:
     void refreshStatusAfterCheck();
     void setStatusUnsafe(api::Updates2StatusData::StatusCode code, const QString& message);
     void onDownloadFinished(const QString& fileName);
+    void onDownloadFailed(const QString& fileName);
     void onFileAdded(const vms::common::p2p::downloader::FileInformation& fileInformation);
     void onFileDeleted(const QString& fileName);
     void onFileInformationChanged(

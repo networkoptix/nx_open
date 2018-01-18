@@ -113,6 +113,9 @@ void Updates2Manager::atServerStart()
         qnServerModule->findInstance<Downloader>(), &Downloader::downloadFinished,
         this, &Updates2Manager::onDownloadFinished);
     connect(
+        qnServerModule->findInstance<Downloader>(), &Downloader::downloadFailed,
+        this, &Updates2Manager::onDownloadFailed);
+    connect(
         qnServerModule->findInstance<Downloader>(), &Downloader::fileAdded,
         this, &Updates2Manager::onFileAdded);
     connect(
@@ -359,6 +362,11 @@ void Updates2Manager::onDownloadFinished(const QString& fileName)
                 "Update has been downloaded and now is preparing for install");
             break;
     }
+}
+
+void Updates2Manager::onDownloadFailed(const QString& fileName)
+{
+
 }
 
 void Updates2Manager::onFileAdded(const FileInformation& fileInformation)
