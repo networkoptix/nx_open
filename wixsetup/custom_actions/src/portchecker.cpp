@@ -1,12 +1,10 @@
-#include "stdafx.h"
+#include "portchecker.h"
 
 // Need to link with Iphlpapi.lib and Ws2_32.lib
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
 #include <stdio.h>
-
-#include "portchecker.h"
 
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "ws2_32.lib")
@@ -65,12 +63,12 @@ int PortChecker::fillBusyPorts()
     if (pTcpTable != NULL) {
         FREE(pTcpTable);
         pTcpTable = NULL;
-    }    
+    }
 
     return 0;
 }
 
-bool PortChecker::isPortAvailable(u_short port)
+bool PortChecker::isPortAvailable(unsigned short port)
 {
     return ports.find(port) == ports.end();
 }

@@ -1,7 +1,34 @@
-// CustomActions.cpp : Defines the exported functions for the DLL application.
-//
+//#include "CustomActions.h"
 
-#include "stdafx.h"
+#include "targetver.h"
+
+#define _WINSOCKAPI_
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
+// Windows Header Files:
+#include <windows.h>
+
+#include <tchar.h>
+#include <atlstr.h>
+#include <atlpath.h>
+#include <strsafe.h>
+#include <msiquery.h>
+
+// WiX Header Files:
+#include <Msi.h>
+#include <MsiQuery.h>
+#include <wcautil.h>
+
+#include <comutil.h>
+#include <shobjidl.h>
+#include <Shellapi.h>
+#include <shlobj.h>
+
+#include <Aclapi.h>
+
+#include <vector>
+#include <algorithm>
+#include <iterator>
 
 #include "Utils.h"
 
@@ -162,7 +189,7 @@ LExit:
 }
 
 /**
-  * Check if drive which contains directory specified in SERVER_DIRECTORY installer property 
+  * Check if drive which contains directory specified in SERVER_DIRECTORY installer property
   * have space less than 10GB.
   * Set SERVERDIR_LOWDISKSPACE property if so. Otherwize set SERVERDIR_LOWDISKSPACE property to empty string.
   */
@@ -285,7 +312,7 @@ UINT __stdcall DeleteDatabaseFile(MSIHANDLE hInstall)
     }
 
 LExit:
-    
+
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
@@ -316,7 +343,7 @@ UINT __stdcall DeleteRegistryKeys(MSIHANDLE hInstall)
     RegKey.Close();
 
 LExit:
-    
+
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
@@ -352,7 +379,7 @@ UINT __stdcall DeleteAllRegistryKeys(MSIHANDLE hInstall)
     RegKey.Close();
 
 LExit:
-    
+
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
@@ -382,7 +409,7 @@ UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
 
         WcaLog(LOGMSG_STANDARD, "DB dir: %S", fromDir);
         CRegKey key;
-        static const int MAX_VERSION_SIZE = 50;
+        static const ULONG MAX_VERSION_SIZE = 50;
         TCHAR szBuffer[MAX_VERSION_SIZE + 1];
         if (key.Open(HKEY_LOCAL_MACHINE, versionPath, KEY_READ) == ERROR_SUCCESS) {
             ULONG chars;
@@ -391,7 +418,7 @@ UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
             WcaLog(LOGMSG_STANDARD, "Opened key: %S", versionPath);
 
             if (key.QueryStringValue(versionName, 0, &chars) == ERROR_SUCCESS) {
-                chars = min(chars, MAX_VERSION_SIZE);
+                chars = std::min(chars, MAX_VERSION_SIZE);
                 key.QueryStringValue(versionName, szBuffer, &chars);
                 version = szBuffer;
             } else {
@@ -418,7 +445,7 @@ UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
     }
 
 LExit:
-    
+
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
@@ -446,7 +473,7 @@ UINT __stdcall RestoreDatabaseFile(MSIHANDLE hInstall)
     }
 
 LExit:
-    
+
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
@@ -483,7 +510,7 @@ UINT __stdcall CopyDatabaseFile(MSIHANDLE hInstall)
     }
 
 LExit:
-    
+
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
@@ -521,7 +548,7 @@ UINT __stdcall CopyHostedFiles(MSIHANDLE hInstall)
     }
 
 LExit:
-    
+
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
@@ -537,23 +564,23 @@ UINT __stdcall PopulateRestoreVersions(MSIHANDLE hInstall)
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
     {
-        MSIHANDLE hTable = NULL; 
-        MSIHANDLE hColumns = NULL; 
+        MSIHANDLE hTable = NULL;
+        MSIHANDLE hColumns = NULL;
 
-        WIN32_FIND_DATA fdFile; 
-        HANDLE hFind = NULL; 
+        WIN32_FIND_DATA fdFile;
+        HANDLE hFind = NULL;
 
-        wchar_t sPath[2048]; 
+        wchar_t sPath[2048];
 
         CAtlString sDir = GetProperty(hInstall, L"AppserverDbDir");
         wsprintf(sPath, L"%s\\ecs.db.*", sDir);
 
         if((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE) {
             goto LExit;
-        } 
+        }
 
         int n = 100;
-        do { 
+        do {
             if(fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                 continue;
 
@@ -572,24 +599,24 @@ UINT __stdcall PopulateRestoreVersions(MSIHANDLE hInstall)
             FileTimeToSystemTime(&ft, &st);
             GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, NULL, szLocalDate, 255);
             GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, NULL, szLocalTime, 255);
-            
+
             wchar_t label[1024];
             wsprintf(label, L"%s, Last use: %s %s", version, szLocalDate, szLocalTime);
             hr = WcaAddTempRecord(&hTable, &hColumns, L"ComboBox", NULL, 0, 4, L"VERSION_TO_RESTORE", n--, version, label);
-        } 
+        }
         while (FindNextFile(hFind, &fdFile));
 
         FindClose(hFind);
 
-        if (hColumns) 
+        if (hColumns)
             MsiCloseHandle(hColumns);
 
-        if (hTable) 
+        if (hTable)
             MsiCloseHandle(hTable);
     }
 
 LExit:
-    
+
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }

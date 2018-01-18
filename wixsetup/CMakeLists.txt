@@ -19,16 +19,7 @@ file(TO_CMAKE_PATH ${signtool_directory} signtool_directory)
 file(TO_CMAKE_PATH ${certificates_path} certificates_path)
 file(TO_CMAKE_PATH ${VC14RedistPath} VC14RedistPath)
 
-ExternalProject_Add(
-    customactions
-    SOURCE_DIR "${bin_resources}/CustomActions"
-    CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/CustomActions
-        -DCONFIG_DIRECTORY=${CMAKE_CURRENT_BINARY_DIR}
-        -DROOT_DIR=${CMAKE_SOURCE_DIR}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -DwixDirectory=${wix_directory}
-)
+add_subdirectory(custom_actions)
 
 nx_copy_bin_resources(${bin_resources} "${CMAKE_CURRENT_BINARY_DIR}")
 nx_copy_bin_resources("${customization_dir}/wixsetup" "${CMAKE_CURRENT_BINARY_DIR}")

@@ -1,15 +1,14 @@
-#include "stdafx.h"
 #include "fileutil.h"
 #include "memutil.h"
 #include "strutil.h"
 #include "Utils.h"
 #include "portchecker.h"
 
-Error::Error(LPCWSTR msg) 
+Error::Error(LPCWSTR msg)
     : _msg(msg) {}
 
 LPCWSTR Error::msg() const {
-    return (LPCWSTR)_msg; 
+    return (LPCWSTR)_msg;
 }
 
 #define VERIFY(exp, msg) ( if((exp) != ERROR_SUCCESS) { throw Error(msg); } )
@@ -19,7 +18,7 @@ CString GenerateGuid()
     static const int MAX_GUID_SIZE = 50;
 
     GUID guid;
-    WCHAR guidBuffer[MAX_GUID_SIZE]; 
+    WCHAR guidBuffer[MAX_GUID_SIZE];
     CoCreateGuid(&guid);
     StringFromGUID2(guid, guidBuffer, MAX_GUID_SIZE);
 
@@ -41,7 +40,7 @@ LPCWSTR GetProperty(MSIHANDLE hInstall, LPCWSTR name)
 
     if (ERROR_SUCCESS != uiStat)
     {
-        if (szValueBuf != NULL) 
+        if (szValueBuf != NULL)
             delete[] szValueBuf;
 
         return NULL;
