@@ -160,10 +160,6 @@ if(WINDOWS)
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
 endif()
 
-# Required for QN_DECLARE_METAOBJECT_HEADER
-include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
-
-
 if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
     add_subdirectory(common_libs)
     add_subdirectory(common)
