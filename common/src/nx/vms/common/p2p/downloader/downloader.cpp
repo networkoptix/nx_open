@@ -47,7 +47,6 @@ void DownloaderPrivate::createWorker(const QString& fileName)
 {
     QnMutexLocker lock(&mutex);
 
-    NX_ASSERT(!workers.contains(fileName));
     if (workers.contains(fileName))
         return;
 
