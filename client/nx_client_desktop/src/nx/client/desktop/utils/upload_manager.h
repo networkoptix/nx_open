@@ -14,11 +14,12 @@ namespace desktop {
 class UploadManager: public QObject
 {
     Q_OBJECT
+
 public:
     using Callback = std::function<void(const FileUpload&)>;
 
     UploadManager(QObject* parent = nullptr);
-    ~UploadManager();
+    virtual ~UploadManager() override;
 
     /**
      * Adds a file to the upload queue.

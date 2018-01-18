@@ -12,14 +12,17 @@ class QnClientCoreModule;
 class QnNetworkProxyFactory;
 class QnStaticCommonModule;
 class QnCloudStatusWatcher;
+
 namespace nx {
 namespace client {
 namespace desktop {
+
 class UploadManager;
 class WearableManager;
-}
-}
-}
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
 
 class QnClientModule: public QObject, public Singleton<QnClientModule>
 {

@@ -14,7 +14,7 @@ class QnNewWearableCameraDialog: public QnSessionAwareButtonBoxDialog
 
 public:
     explicit QnNewWearableCameraDialog(QWidget* parent);
-    ~QnNewWearableCameraDialog();
+    virtual ~QnNewWearableCameraDialog() override;
 
     QString name() const;
     const QnMediaServerResourcePtr server() const;

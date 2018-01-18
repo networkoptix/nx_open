@@ -10,10 +10,10 @@ namespace Ui { class WearableUploadWidget; }
 class QnWearableUploadWidget : public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef QWidget base_type;
+    using base_type = QWidget;
 
 public:
-    QnWearableUploadWidget(QWidget *parent = nullptr);
+    explicit QnWearableUploadWidget(QWidget* parent = nullptr);
     virtual ~QnWearableUploadWidget() override;
 
     void setCamera(const QnVirtualCameraResourcePtr &camera);
@@ -23,4 +23,3 @@ private:
     QScopedPointer<Ui::WearableUploadWidget> ui;
     QnVirtualCameraResourcePtr m_camera;
 };
-

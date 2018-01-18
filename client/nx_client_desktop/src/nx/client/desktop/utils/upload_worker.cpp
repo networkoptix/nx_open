@@ -14,9 +14,8 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class UploadWorkerPrivate
+struct UploadWorker::Private
 {
-public:
     FileUpload upload;
     QnMediaServerResourcePtr server;
     QSharedPointer<QFile> file;
@@ -33,7 +32,7 @@ public:
 
 UploadWorker::UploadWorker(const QnMediaServerResourcePtr& server, const QString& path, qint64 ttl, QObject* parent):
     QObject(parent),
-    d(new UploadWorkerPrivate)
+    d(new Private)
 {
     d->server = server;
     d->file.reset(new QFile(path));
@@ -78,8 +77,7 @@ FileUpload UploadWorker::start()
             nx::utils::QnCryptographicHash hash(nx::utils::QnCryptographicHash::Md5);
             if (hash.addData(fileCopy.data()))
                 return hash.result();
-            else
-                return QByteArray();
+            return QByteArray();
         }
     );
     d->md5FutureWatcher.setFuture(d->md5Future);
@@ -123,9 +121,12 @@ void UploadWorker::handleStop()
     d->runningHandle = 0;
 
     FileUpload::Status status = d->upload.status;
-    if (status == FileUpload::CreatingUpload || status == FileUpload::Uploading ||
-        status == FileUpload::Checking)
-        d->server->restConnection()->removeFileDownload(d->upload.id, true, nullptr);
+    if (status == FileUpload::CreatingUpload
+        || status == FileUpload::Uploading
+        || status == FileUpload::Checking)
+    {
+        d->server->restConnection()->removeFileDownload(d->upload.id, /*deleteData*/ true);
+    }
 }
 
 void UploadWorker::handleError(const QString& message)
@@ -151,10 +152,11 @@ void UploadWorker::handleMd5Calculated()
 
     emitProgress();
 
-    auto callback = [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
-    {
-        this->handleFileUploadCreated(success, handle);
-    };
+    auto callback =
+        [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
+        {
+            this->handleFileUploadCreated(success, handle);
+        };
 
     d->runningHandle = d->server->restConnection()->addFileUpload(
         d->upload.id,
@@ -183,7 +185,8 @@ void UploadWorker::handleFileUploadCreated(bool success, rest::Handle handle)
 
 void UploadWorker::handleUpload()
 {
-    if (d->currentChunk == d->totalChunks) {
+    if (d->currentChunk == d->totalChunks)
+    {
         handleAllUploaded();
         return;
     }
@@ -198,10 +201,11 @@ void UploadWorker::handleUpload()
         return;
     }
 
-    auto callback = [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
-    {
-        this->handleChunkUploaded(success, handle);
-    };
+    auto callback =
+        [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
+        {
+            this->handleChunkUploaded(success, handle);
+        };
 
     d->runningHandle = d->server->restConnection()->uploadFileChunk(
         d->upload.id,
@@ -233,12 +237,14 @@ void UploadWorker::handleAllUploaded()
 
     emitProgress();
 
-    auto callback = [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
-    {
-        using namespace nx::vms::common::p2p::downloader;
-        FileInformation info = result.deserialized<FileInformation>();
-        this->handleCheckFinished(success, handle, info.status == FileInformation::Status::downloaded);
-    };
+    auto callback =
+        [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        {
+            using namespace nx::vms::common::p2p::downloader;
+            FileInformation info = result.deserialized<FileInformation>();
+            const bool fileStatusOk = info.status == FileInformation::Status::downloaded;
+            this->handleCheckFinished(success, handle, fileStatusOk);
+        };
 
     d->runningHandle = d->server->restConnection()->fileDownloadStatus(
         d->upload.id,

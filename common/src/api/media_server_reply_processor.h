@@ -21,7 +21,6 @@
 #include <api/model/camera_list_reply.h>
 #include <api/model/configure_reply.h>
 #include <api/model/upload_update_reply.h>
-#include <api/model/wearable_camera_reply.h>
 #include "model/getnonce_reply.h"
 
 #include "media_server_connection.h"

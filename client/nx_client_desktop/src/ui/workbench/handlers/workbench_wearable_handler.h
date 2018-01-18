@@ -9,13 +9,7 @@
 #include <nx/utils/uuid.h>
 
 class QnNewWearableCameraDialog;
-namespace nx {
-namespace client {
-namespace desktop {
-struct FileUpload;
-}
-}
-}
+namespace nx { namespace client { namespace desktop { struct FileUpload; }}}
 
 class QnWorkbenchWearableHandler: public Connective<QObject>, public QnWorkbenchContextAware
 {
@@ -23,7 +17,7 @@ class QnWorkbenchWearableHandler: public Connective<QObject>, public QnWorkbench
     using base_type = Connective<QObject>;
 
 public:
-    explicit QnWorkbenchWearableHandler(QObject *parent = 0);
+    explicit QnWorkbenchWearableHandler(QObject* parent = nullptr);
     virtual ~QnWorkbenchWearableHandler() override;
 
 private:
@@ -35,7 +29,7 @@ private slots:
     void at_newWearableCameraAction_triggered();
     void at_uploadWearableCameraFileAction_triggered();
 
-    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
+    void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
 
     void at_upload_progress(const nx::client::desktop::FileUpload& upload);
 

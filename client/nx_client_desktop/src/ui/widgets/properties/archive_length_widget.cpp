@@ -14,20 +14,19 @@
 #include <core/resource/device_dependent_strings.h>
 #include <nx_ec/data/api_camera_attributes_data.h>
 
-namespace
-{
-    static const int kDangerousMinArchiveDays = 5;
-    static const int kRecordedDaysDontChange = std::numeric_limits<int>::max();
+namespace {
+static const int kDangerousMinArchiveDays = 5;
+static const int kRecordedDaysDontChange = std::numeric_limits<int>::max();
 }
 
 using namespace nx::client::desktop::ui;
 
-QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget *parent)
-    : QWidget(parent)
-    , QnUpdatable()
-    , QnWorkbenchContextAware(parent, true)
-    , ui(new Ui::ArchiveLengthWidget)
-    , m_readOnly(false)
+QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget* parent):
+    base_type(parent),
+    QnUpdatable(),
+    QnWorkbenchContextAware(parent, true),
+    ui(new Ui::ArchiveLengthWidget),
+    m_readOnly(false)
 {
     ui->setupUi(this);
 
@@ -38,30 +37,46 @@ QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget *parent)
 
     auto notifyChanged =
         [this]
-    {
-        if (!isUpdating())
+        {
+            if (!isUpdating())
             emit changed();
-    };
+        };
 
-    connect(ui->checkBoxMinArchive, &QCheckBox::stateChanged, this,
-        &QnArchiveLengthWidget::updateArchiveRangeEnabledState);
-    connect(ui->checkBoxMinArchive, &QCheckBox::stateChanged, this,
-        notifyChanged);
+    connect(ui->checkBoxMinArchive,
+            &QCheckBox::stateChanged,
+            this,
+            &QnArchiveLengthWidget::updateArchiveRangeEnabledState);
+    connect(ui->checkBoxMinArchive,
+            &QCheckBox::stateChanged,
+            this,
+            notifyChanged);
 
-    connect(ui->checkBoxMaxArchive, &QCheckBox::stateChanged, this,
-        &QnArchiveLengthWidget::updateArchiveRangeEnabledState);
-    connect(ui->checkBoxMaxArchive, &QCheckBox::stateChanged, this,
-        notifyChanged);
+    connect(ui->checkBoxMaxArchive,
+            &QCheckBox::stateChanged,
+            this,
+            &QnArchiveLengthWidget::updateArchiveRangeEnabledState);
+    connect(ui->checkBoxMaxArchive,
+            &QCheckBox::stateChanged,
+            this,
+            notifyChanged);
 
-    connect(ui->spinBoxMinDays, QnSpinboxIntValueChanged, this,
-        &QnArchiveLengthWidget::validateArchiveLength);
-    connect(ui->spinBoxMinDays, QnSpinboxIntValueChanged, this,
-        notifyChanged);
+    connect(ui->spinBoxMinDays,
+            QnSpinboxIntValueChanged,
+            this,
+            &QnArchiveLengthWidget::validateArchiveLength);
+    connect(ui->spinBoxMinDays,
+            QnSpinboxIntValueChanged,
+            this,
+            notifyChanged);
 
-    connect(ui->spinBoxMaxDays, QnSpinboxIntValueChanged, this,
-        &QnArchiveLengthWidget::validateArchiveLength);
-    connect(ui->spinBoxMaxDays, QnSpinboxIntValueChanged, this,
-        notifyChanged);
+    connect(ui->spinBoxMaxDays,
+            QnSpinboxIntValueChanged,
+            this,
+            &QnArchiveLengthWidget::validateArchiveLength);
+    connect(ui->spinBoxMaxDays,
+            QnSpinboxIntValueChanged,
+            this,
+            notifyChanged);
 
     updateArchiveRangeEnabledState();
 }
@@ -70,7 +85,7 @@ QnArchiveLengthWidget::~QnArchiveLengthWidget()
 {
 }
 
-void QnArchiveLengthWidget::updateFromResources(const QnVirtualCameraResourceList &cameras)
+void QnArchiveLengthWidget::updateFromResources(const QnVirtualCameraResourceList& cameras)
 {
     QnUpdatableGuard<QnArchiveLengthWidget> guard(this);
 
@@ -78,7 +93,7 @@ void QnArchiveLengthWidget::updateFromResources(const QnVirtualCameraResourceLis
     updateMaxDays(cameras);
 }
 
-void QnArchiveLengthWidget::submitToResources(const QnVirtualCameraResourceList &cameras)
+void QnArchiveLengthWidget::submitToResources(const QnVirtualCameraResourceList& cameras)
 {
     if (m_readOnly)
         return;
@@ -86,8 +101,7 @@ void QnArchiveLengthWidget::submitToResources(const QnVirtualCameraResourceList 
     int maxDays = maxRecordedDays();
     int minDays = minRecordedDays();
 
-    for (const auto& camera : cameras)
-    {
+    for (const auto& camera: cameras) {
         if (maxDays != kRecordedDaysDontChange)
             camera->setMaxDays(maxDays);
 
@@ -132,12 +146,10 @@ int QnArchiveLengthWidget::maxRecordedDays() const
 {
     switch (ui->checkBoxMaxArchive->checkState())
     {
-    case Qt::Unchecked:
-        return ui->spinBoxMaxDays->value();
-    case Qt::Checked:   //automatically manage but save for future use
-        return ui->spinBoxMaxDays->value() * -1;
-    default:
-        return kRecordedDaysDontChange;
+        case Qt::Unchecked: return ui->spinBoxMaxDays->value();
+        case Qt::Checked: //automatically manage but save for future use
+            return ui->spinBoxMaxDays->value() * -1;
+        default: return kRecordedDaysDontChange;
     }
 }
 
@@ -145,25 +157,25 @@ int QnArchiveLengthWidget::minRecordedDays() const
 {
     switch (ui->checkBoxMinArchive->checkState())
     {
-    case Qt::Unchecked:
-        return ui->spinBoxMinDays->value();
-    case Qt::Checked:   //automatically manage but save for future use
-        return ui->spinBoxMinDays->value() * -1;
-    default:
-        return kRecordedDaysDontChange;
+        case Qt::Unchecked: return ui->spinBoxMinDays->value();
+        case Qt::Checked: //automatically manage but save for future use
+            return ui->spinBoxMinDays->value() * -1;
+        default: return kRecordedDaysDontChange;
     }
 }
 
 void QnArchiveLengthWidget::validateArchiveLength()
 {
-    if (ui->checkBoxMinArchive->checkState() == Qt::Unchecked && ui->checkBoxMaxArchive->checkState() == Qt::Unchecked)
+    if (ui->checkBoxMinArchive->checkState() == Qt::Unchecked
+        && ui->checkBoxMaxArchive->checkState() == Qt::Unchecked)
     {
         if (ui->spinBoxMaxDays->value() < ui->spinBoxMinDays->value())
             ui->spinBoxMaxDays->setValue(ui->spinBoxMinDays->value());
     }
 
     QString alertText;
-    bool alertVisible = ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() > kDangerousMinArchiveDays;
+    bool alertVisible = ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() >
+        kDangerousMinArchiveDays;
 
     if (alertVisible)
     {
@@ -183,7 +195,7 @@ void QnArchiveLengthWidget::updateArchiveRangeEnabledState()
     validateArchiveLength();
 }
 
-void QnArchiveLengthWidget::updateMinDays(const QnVirtualCameraResourceList &cameras)
+void QnArchiveLengthWidget::updateMinDays(const QnVirtualCameraResourceList& cameras)
 {
     if (cameras.isEmpty())
         return;
@@ -192,26 +204,28 @@ void QnArchiveLengthWidget::updateMinDays(const QnVirtualCameraResourceList &cam
     auto calcMinDays = [](int d) { return d == 0 ? ec2::kDefaultMinArchiveDays : qAbs(d); };
 
     const int minDays = (*std::min_element(cameras.cbegin(), cameras.cend(),
-        [calcMinDays](const QnVirtualCameraResourcePtr &l, const QnVirtualCameraResourcePtr &r)
-    {
-        return calcMinDays(l->minDays()) < calcMinDays(r->minDays());
-    }))->minDays();
+        [calcMinDays](const QnVirtualCameraResourcePtr& l,
+            const QnVirtualCameraResourcePtr& r)
+        {
+            return calcMinDays(l->minDays()) < calcMinDays(
+                r->minDays());
+        }))->minDays();
 
-    const bool isAuto = minDays <= 0;
+        const bool isAuto = minDays <= 0;
 
-    bool sameMinDays = boost::algorithm::all_of(cameras,
-        [minDays, isAuto](const QnVirtualCameraResourcePtr &camera)
-    {
-        return isAuto
-            ? camera->minDays() <= 0
-            : camera->minDays() == minDays;
-    });
+        bool sameMinDays = boost::algorithm::all_of(cameras,
+            [minDays, isAuto](const QnVirtualCameraResourcePtr& camera)
+            {
+                return isAuto
+                    ? camera->minDays() <= 0
+                    : camera->minDays() == minDays;
+            });
 
-    CheckboxUtils::setupTristateCheckbox(ui->checkBoxMinArchive, sameMinDays, isAuto);
-    ui->spinBoxMinDays->setValue(calcMinDays(minDays));
+        CheckboxUtils::setupTristateCheckbox(ui->checkBoxMinArchive, sameMinDays, isAuto);
+        ui->spinBoxMinDays->setValue(calcMinDays(minDays));
 }
 
-void QnArchiveLengthWidget::updateMaxDays(const QnVirtualCameraResourceList &cameras)
+void QnArchiveLengthWidget::updateMaxDays(const QnVirtualCameraResourceList& cameras)
 {
     if (cameras.isEmpty())
         return;
@@ -219,25 +233,24 @@ void QnArchiveLengthWidget::updateMaxDays(const QnVirtualCameraResourceList &cam
     /* Any negative max days value means 'auto'. Storing absolute value to keep previous one. */
     auto calcMaxDays = [](int d) { return d == 0 ? ec2::kDefaultMaxArchiveDays : qAbs(d); };
 
-    const int maxDays = (*std::max_element(cameras.cbegin(), cameras.cend(),
-        [calcMaxDays](const QnVirtualCameraResourcePtr &l, const QnVirtualCameraResourcePtr &r)
-    {
-        return calcMaxDays(l->maxDays()) < calcMaxDays(r->maxDays());
-    }))->maxDays();
+    const int maxDays = (*std::max_element(cameras.cbegin(),
+        cameras.cend(),
+        [calcMaxDays](const QnVirtualCameraResourcePtr& l,
+            const QnVirtualCameraResourcePtr& r)
+        {
+            return calcMaxDays(l->maxDays()) < calcMaxDays(
+                r->maxDays());
+        }))->maxDays();
 
-    const bool isAuto = maxDays <= 0;
-    bool sameMaxDays = boost::algorithm::all_of(cameras,
-        [maxDays, isAuto](const QnVirtualCameraResourcePtr &camera)
-    {
-        return isAuto
-            ? camera->maxDays() <= 0
-            : camera->maxDays() == maxDays;
-    });
+        const bool isAuto = maxDays <= 0;
+        bool sameMaxDays = boost::algorithm::all_of(cameras,
+            [maxDays, isAuto](const QnVirtualCameraResourcePtr& camera)
+            {
+                return isAuto
+                    ? camera->maxDays() <= 0
+                    : camera->maxDays() == maxDays;
+            });
 
-    CheckboxUtils::setupTristateCheckbox(ui->checkBoxMaxArchive, sameMaxDays, isAuto);
-    ui->spinBoxMaxDays->setValue(calcMaxDays(maxDays));
+        CheckboxUtils::setupTristateCheckbox(ui->checkBoxMaxArchive, sameMaxDays, isAuto);
+        ui->spinBoxMaxDays->setValue(calcMaxDays(maxDays));
 }
-
-
-
-

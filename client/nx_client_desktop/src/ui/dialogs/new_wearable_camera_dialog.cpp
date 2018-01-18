@@ -35,12 +35,12 @@ QnNewWearableCameraDialog::QnNewWearableCameraDialog(QWidget* parent):
 
     /* Set up name edit. */
     QStringList usedNames;
-    for (const auto& server: servers)
-        for (const auto& camera : resourcePool()->getAllCameras(server))
-            usedNames.push_back(camera->getName());
+    for (const auto& camera: resourcePool()->getAllCameras())
+        usedNames.push_back(camera->getName());
+
     QString name = nx::utils::generateUniqueString(
-        usedNames, 
-        tr("Wearable Camera"), 
+        usedNames,
+        tr("Wearable Camera"),
         tr("Wearable Camera %1"));
 
     ui->nameEdit->setText(name);
@@ -48,16 +48,16 @@ QnNewWearableCameraDialog::QnNewWearableCameraDialog(QWidget* parent):
     setResizeToContentsMode(Qt::Vertical);
 }
 
-QnNewWearableCameraDialog::~QnNewWearableCameraDialog() 
+QnNewWearableCameraDialog::~QnNewWearableCameraDialog()
 {
 }
 
-QString QnNewWearableCameraDialog::name() const 
+QString QnNewWearableCameraDialog::name() const
 {
     return ui->nameEdit->text();
 }
 
-const QnMediaServerResourcePtr QnNewWearableCameraDialog::server() const 
+const QnMediaServerResourcePtr QnNewWearableCameraDialog::server() const
 {
     QVariant data = ui->serverComboBox->currentData(Qn::ResourceRole);
     return data.value<QnResourcePtr>().dynamicCast<QnMediaServerResource>();

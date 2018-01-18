@@ -58,7 +58,7 @@ void QnImageControlWidget::updateFromResources(
     QnUpdatableGuard<QnImageControlWidget> guard(this);
     bool allCamerasHaveVideo = true;
     bool hasWearable = false;
-    for (const auto& camera : cameras)
+    for (const auto& camera: cameras)
     {
         allCamerasHaveVideo &= camera->hasVideo(0);
         hasWearable |= camera->hasFlags(Qn::wearable_camera);

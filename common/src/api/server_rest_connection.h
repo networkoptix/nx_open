@@ -158,7 +158,7 @@ public:
     Handle removeFileDownload(
         const QString& fileName,
         bool deleteData,
-        PostCallback callback,
+        PostCallback callback = nullptr,
         QThread* targetThread = nullptr);
 
     Handle fileChunkChecksums(

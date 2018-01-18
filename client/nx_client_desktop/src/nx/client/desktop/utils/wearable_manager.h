@@ -11,9 +11,10 @@ class WearableManager: public QObject
     Q_OBJECT
 public:
     WearableManager(QObject* parent = nullptr);
-    ~WearableManager();
+    virtual ~WearableManager() override;
 
-    void tehProgress(qreal aaaaaaa) {
+    void tehProgress(qreal aaaaaaa)
+    {
         emit progress(aaaaaaa);
     }
 

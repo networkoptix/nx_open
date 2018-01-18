@@ -41,14 +41,17 @@ struct FileUpload
 };
 Q_DECLARE_METATYPE(FileUpload)
 
-class UploadWorkerPrivate;
-
 class UploadWorker: public QObject
 {
     Q_OBJECT
+
 public:
-    UploadWorker(const QnMediaServerResourcePtr& server, const QString& path, qint64 ttl, QObject* parent = nullptr);
-    ~UploadWorker();
+    UploadWorker(
+        const QnMediaServerResourcePtr& server,
+        const QString& path,
+        qint64 ttl,
+        QObject* parent = nullptr);
+    virtual ~UploadWorker() override;
 
     FileUpload start();
     void cancel();
@@ -70,7 +73,8 @@ private:
     void handleCheckFinished(bool success, rest::Handle handle, bool ok);
 
 private:
-    QScopedPointer<UploadWorkerPrivate> d;
+    struct Private;
+    QScopedPointer<Private> d;
 };
 
 } // namespace desktop

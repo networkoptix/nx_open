@@ -453,14 +453,14 @@ void Storage::cleanupExpiredFiles()
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
 
     QSet<QString> expiredFiles;
-    for (const FileMetadata& data : m_fileInformationByName)
+    for (const FileMetadata& data: m_fileInformationByName)
     {
         if (data.ttl > 0 && data.touchTime + data.ttl <= currentTime)
             expiredFiles.insert(data.name);
     }
 
-    for (const QString& name : expiredFiles)
-        deleteFileInternal(name, true);
+    for (const QString& name: expiredFiles)
+        deleteFileInternal(name, /*deleteData*/ true);
 }
 
 void Storage::findDownloads()
@@ -598,7 +598,7 @@ ResultCode Storage::loadDownload(
     if (!fileInfo.isValid())
         return ResultCode::fileDoesNotExist;
 
-    return addFile(fileInfo, false);
+    return addFile(fileInfo, /*updateTouchTime*/ false);
 }
 
 void Storage::checkDownloadCompleted(FileMetadata& fileInfo)

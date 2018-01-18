@@ -14,14 +14,14 @@ class QnArchiveLengthWidget: public QWidget, public QnUpdatable, public QnWorkbe
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
-    typedef QWidget base_type;
+    using base_type = QWidget;
 
 public:
-    QnArchiveLengthWidget(QWidget *parent = nullptr);
+    explicit QnArchiveLengthWidget(QWidget* parent = nullptr);
     virtual ~QnArchiveLengthWidget();
 
-    void updateFromResources(const QnVirtualCameraResourceList &cameras);
-    void submitToResources(const QnVirtualCameraResourceList &cameras);
+    void updateFromResources(const QnVirtualCameraResourceList& cameras);
+    void submitToResources(const QnVirtualCameraResourceList& cameras);
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
@@ -39,8 +39,8 @@ signals:
 private:
     void validateArchiveLength();
     void updateArchiveRangeEnabledState();
-    void updateMinDays(const QnVirtualCameraResourceList &cameras);
-    void updateMaxDays(const QnVirtualCameraResourceList &cameras);
+    void updateMinDays(const QnVirtualCameraResourceList& cameras);
+    void updateMaxDays(const QnVirtualCameraResourceList& cameras);
 
 private:
     QScopedPointer<Ui::ArchiveLengthWidget> ui;
