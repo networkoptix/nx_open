@@ -144,7 +144,24 @@ const char* Plugin::capabilitiesManifest(Error* error) const
                     }
                 }
             ],
-            "capabilities": "needDeepCopyForMediaFrame"
+            "capabilities": "needDeepCopyForMediaFrame",
+            "parameters": {
+                "params": [
+                    {
+                        "id": "paramAId",
+                        "dataType": "Number",
+                        "name": "Param A",
+                        "description": "Number A"
+                    },
+                    {
+                        "id": "paramBId",
+                        "dataType": "Enumeration",
+                        "range": "b1,b3",
+                        "name": "Param B",
+                        "description": "Enumeration B"
+                    }
+                ]
+            }
         }
     )json";
 }

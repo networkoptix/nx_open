@@ -215,7 +215,6 @@ AbstractMetadataManager* ManagerPool::createMetadataManager(
         lm("Creating metadata manager for resource %1 (%2).")
             .args(camera->getUserDefinedName(), camera->getId()));
 
-    Error error = Error::noError;
     ResourceInfo resourceInfo;
     bool success = resourceInfoFromResource(camera, &resourceInfo);
     if (!success)
@@ -232,6 +231,7 @@ AbstractMetadataManager* ManagerPool::createMetadataManager(
         lm("Resource info for resource %1 (%2): %3")
         .args(camera->getUserDefinedName(), camera->getId(), resourceInfo));
 
+    Error error = Error::noError;
     return plugin->managerForResource(resourceInfo, &error);
 }
 

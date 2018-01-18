@@ -7,6 +7,7 @@ namespace nx {
 namespace sdk {
 namespace metadata {
 
+// TODO: #mike: Consider renaming to GenericCompressed...VideoFrame.
 class CommonCompressedVideoPacket: public CommonCompressedMediaPacket<AbstractCompressedVideoPacket>
 {
 public:
