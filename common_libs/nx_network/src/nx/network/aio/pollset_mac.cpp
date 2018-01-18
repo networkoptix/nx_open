@@ -262,9 +262,9 @@ namespace aio {
 
         //erasing socket from occured events array
         //TODO #ak better remove this linear run
-        for( size_t i = 0; i < m_impl->receivedEventCount; ++i )
+        for( int i = 0; i < m_impl->receivedEventCount; ++i )
         {
-            if( m_impl->receivedEventlist[i].ident == sock->handle() && m_impl->receivedEventlist[i].filter == kfilterType )
+            if( (AbstractSocket::SOCKET_HANDLE)m_impl->receivedEventlist[i].ident == sock->handle() && m_impl->receivedEventlist[i].filter == kfilterType )
                 m_impl->receivedEventlist[i].ident = (uintptr_t)-1;
         }
 
@@ -277,7 +277,6 @@ namespace aio {
         return m_impl->monitoredEvents.size();
     }
 
-    static const int INTERRUPT_CHECK_TIMEOUT_MS = 100;
     static const int MILLIS_IN_SEC = 1000;
     static const int NSEC_IN_MS = 1000000;
 

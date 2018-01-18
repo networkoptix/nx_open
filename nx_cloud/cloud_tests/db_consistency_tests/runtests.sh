@@ -4,7 +4,7 @@ total_records=0
 
 for f in *.sql
 do
-    echo -n "Test $f: "
+    echo "Test $f:"
     records=$(mysql -sN < $f | tee /dev/tty | wc -l)
     [ $? -ne 0 ] && exit 1
     echo "$records failures"

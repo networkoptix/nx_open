@@ -8,11 +8,10 @@ namespace ssl {
 
 StreamServerSocket::StreamServerSocket(
     std::unique_ptr<AbstractStreamServerSocket> delegatee,
-    EncryptionUse encryptionUse)
+    EncryptionUse /*encryptionUse*/)
     :
     base_type(delegatee.get()),
-    m_delegatee(std::move(delegatee)),
-    m_encryptionUse(encryptionUse)
+    m_delegatee(std::move(delegatee))
 {
 }
 
