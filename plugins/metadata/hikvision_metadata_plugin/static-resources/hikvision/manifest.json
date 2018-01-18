@@ -235,7 +235,8 @@
                 }
             },
             "internalName": "SceneChange",
-            "description": "Scene has been changed"
+            "description": "Scene has been changed",
+            "flags": "stateDependent"
         },
         {
             "eventTypeId": "{7DDF49F1-2B50-4FF9-9FB7-3898EAAB0FE2}",
