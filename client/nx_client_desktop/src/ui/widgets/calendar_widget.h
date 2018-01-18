@@ -73,7 +73,7 @@ private:
     QnTimePeriodStorage m_currentPeriodStorage;
     QnTimePeriodStorage m_syncedPeriodStorage;
     QnTimePeriodStorage m_emptyPeriodStorage;
-    QnTimePeriod m_selectedPeriod, m_selectedDaysPeriod, m_enabledPeriod;
+    QnTimePeriod m_selectedPeriod, m_enabledPeriod;
     bool m_empty;
     bool m_currentTimePeriodsVisible;
 
