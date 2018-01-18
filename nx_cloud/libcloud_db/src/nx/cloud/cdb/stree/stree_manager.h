@@ -1,10 +1,4 @@
-/**********************************************************
-* Sep 14, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_STREE_MANAGER_H
-#define NX_CDB_STREE_MANAGER_H
+#pragma once
 
 #include <memory>
 #include <stdexcept>
@@ -15,7 +9,6 @@
 
 #include "cdb_ns.h"
 #include "settings.h"
-
 
 namespace nx {
 namespace cdb {
@@ -33,10 +26,10 @@ class StreeManager:
     public Singleton<StreeManager>
 {
 public:
-    /*!
-        Performs initial parsing
-        \throw \a std::runtime_error in case of parse error
-    */
+    /**
+     * Performs initial parsing.
+     * @throw std::runtime_error in case of parse error.
+     */
     StreeManager(const QString& xmlFilePath) noexcept(false);
 
     void search(
@@ -50,9 +43,7 @@ private:
     nx::utils::stree::StreeManager m_impl;
 };
 
-}   //cdb
-}   //nx
+} // namespace cdb
+} // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::StreeOperation), (lexical));
-
-#endif  //NX_CDB_STREE_MANAGER_H
