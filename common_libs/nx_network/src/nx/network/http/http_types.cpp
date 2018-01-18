@@ -889,13 +889,13 @@ bool DigestCredentials::parse(const BufferType& str, char separator)
 void DigestCredentials::serialize(BufferType* const dstBuffer) const
 {
     const static std::array<const char*, 5> predefinedOrder =
-    {
+    {{
         "username",
         "realm",
         "nonce",
         "uri",
         "response"
-    };
+    }};
 
     bool isFirst = true;
     auto serializeParam = [&isFirst, dstBuffer](const BufferType& name, const BufferType& value)

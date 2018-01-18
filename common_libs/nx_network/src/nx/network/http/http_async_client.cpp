@@ -568,9 +568,20 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
         return;
     }
 
-    m_socket->readSomeAsync(
-        &m_responseBuffer,
-        std::bind(&AsyncClient::onSomeBytesReadAsync, this, _1, _2));
+    if (!m_receivedBytesLeft.isEmpty())
+    {
+        // Processing what we have in the buffer first.
+        NX_ASSERT(m_responseBuffer.isEmpty());
+        m_responseBuffer.swap(m_receivedBytesLeft);
+        m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
+        processReceivedBytes(m_responseBuffer.size());
+    }
+    else
+    {
+        m_socket->readSomeAsync(
+            &m_responseBuffer,
+            std::bind(&AsyncClient::onSomeBytesReadAsync, this, _1, _2));
+    }
 }
 
 void AsyncClient::onSomeBytesReadAsync(
