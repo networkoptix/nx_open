@@ -187,6 +187,7 @@
 #include <rest/handlers/downloads_rest_handler.h>
 #include <rest/handlers/get_hardware_ids_rest_handler.h>
 #include <rest/handlers/multiserver_get_hardware_ids_rest_handler.h>
+#include <rest/handlers/wearable_camera_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -282,6 +283,8 @@
 #if defined(__arm__)
     #include "nx1/info.h"
 #endif
+
+#include "ini.h"
 
 
 using namespace nx;
@@ -1791,6 +1794,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getCameraParam", new QnCameraSettingsRestHandler());
     reg("api/setCameraParam", new QnCameraSettingsRestHandler());
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
+    if(ini().enableWearableCameras)
+        reg("api/wearableCamera", new QnWearableCameraRestHandler());
     reg("api/ptz", new QnPtzRestHandler());
     reg("api/image", new QnImageRestHandler()); //< deprecated
     reg("api/createEvent", new QnExternalEventRestHandler());

@@ -168,7 +168,8 @@ public:
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
-    QnVirtualCameraResourceList getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras = false) const;
+    QnVirtualCameraResourceList getAllCameras(const QnResourcePtr &mServer = QnResourcePtr(),
+        bool ignoreDesktopCameras = false) const;
 
     // @note Never returns fake servers
     QnMediaServerResourceList getAllServers(Qn::ResourceStatus status) const;

@@ -9,6 +9,7 @@ QnServerEdgeStreamRecorder::QnServerEdgeStreamRecorder(
     :
     QnServerStreamRecorder(dev, catalog, mediaProvider)
 {
+    setCanDropPackets(false);
 }
 
 QnServerEdgeStreamRecorder::~QnServerEdgeStreamRecorder()
@@ -19,6 +20,11 @@ QnServerEdgeStreamRecorder::~QnServerEdgeStreamRecorder()
 void QnServerEdgeStreamRecorder::setOnFileWrittenHandler(FileWrittenHandler handler)
 {
     m_fileWrittenHandler = handler;
+}
+
+bool QnServerEdgeStreamRecorder::canAcceptData() const 
+{
+    return !isQueueFull();
 }
 
 bool QnServerEdgeStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)

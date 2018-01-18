@@ -15,6 +15,7 @@ struct Ini: public nx::kit::IniConfig
         entropixEnhancerUrl, "URL of Entropix image enhancement API.");
     NX_INI_FLAG(0, enableUnlimitedZoom, "Enable unlimited zoom feature.");
     NX_INI_FLAG(0, showVideoQualityOverlay, "Show video quality overlay.");
+    NX_INI_FLAG(0, enableWearableCameras, "Enable wearable cameras.");
 };
 
 inline Ini& ini()

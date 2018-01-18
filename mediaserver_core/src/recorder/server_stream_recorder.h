@@ -50,6 +50,14 @@ public:
 
     int getFRAfterThreshold() const;
     bool needConfigureProvider() const;
+    bool isQueueFull() const;
+
+    /**
+     * Sets whether this recorder can drop packets when its queue is full.
+     * Note that this setter is not thread-safe, don't use it on a running stream recorder!
+     */
+    void setCanDropPackets(bool canDrop);
+    bool canDropPackets() const;
 
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
@@ -110,7 +118,7 @@ private:
     void updateRebuildState();
     void pauseRebuildIfHighDataNoLock();
     void resumeRebuildIfLowDataNoLock();
-    bool cleanupQueueIfOverflow();
+    bool cleanupQueue();
     void addQueueSizeUnsafe(qint64 value);
 private slots:
     void at_recordingFinished(const StreamRecorderErrorStruct& status,
@@ -143,11 +151,12 @@ private:
     qint64 m_queuedSize;
     static std::atomic<qint64> m_totalQueueSize;
     static std::atomic<int> m_totalRecorders;
-    QnMutex m_queueSizeMutex;
+    mutable QnMutex m_queueSizeMutex;
     qint64 m_lastMediaTime;
     QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;
     bool m_diskErrorWarned;
     std::atomic<bool> m_rebuildBlocked;
     bool m_usePrimaryRecorder;
     bool m_useSecondaryRecorder;
+    bool m_canDropPackets;
 };

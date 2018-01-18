@@ -157,6 +157,9 @@ void fromApiToResource(const ApiCameraData& src, QnVirtualCameraResourcePtr& dst
     if (src.typeId == QnResourceTypePool::kDesktopCameraTypeUuid)
         dst->addFlags(Qn::desktop_camera);
 
+    if (src.typeId == QnResourceTypePool::kWearableCameraTypeUuid)
+        dst->addFlags(Qn::wearable_camera);
+
     dst->setPhysicalId(src.physicalId);
     dst->setMAC(QnMacAddress(src.mac));
     dst->setManuallyAdded(src.manuallyAdded);

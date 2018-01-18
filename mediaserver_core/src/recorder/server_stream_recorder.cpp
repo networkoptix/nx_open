@@ -59,7 +59,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_queuedSize(0),
     m_lastMediaTime(AV_NOPTS_VALUE),
     m_diskErrorWarned(false),
-    m_rebuildBlocked(false)
+    m_rebuildBlocked(false),
+    m_canDropPackets(false)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
@@ -146,7 +147,8 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
     if (!isRunning())
         return;
 
-    cleanupQueueIfOverflow();
+    if(m_canDropPackets && isQueueFull())
+        cleanupQueue();
     updateRebuildState(); //< pause/resume archive rebuild
 
     const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(nonConstData.get());
@@ -196,24 +198,36 @@ void QnServerStreamRecorder::resumeRebuildIfLowDataNoLock()
     }
 }
 
-bool QnServerStreamRecorder::cleanupQueueIfOverflow()
+bool QnServerStreamRecorder::isQueueFull() const
 {
-    {
-        QnMutexLocker lock( &m_queueSizeMutex );
+    QnMutexLocker lock(&m_queueSizeMutex);
 
-        bool needCleanup = m_dataQueue.size() > m_maxRecordQueueSizeElements;
-        if (!needCleanup)
-        {
-            // check for global overflow bytes between all recorders
-            const qint64 totalAllowedBytes = m_maxRecordQueueSizeBytes * m_totalRecorders;
-            if (totalAllowedBytes > m_totalQueueSize)
-                return false; //< no need to cleanup
+    if (m_dataQueue.size() > m_maxRecordQueueSizeElements)
+        return true;
 
-            if (m_queuedSize < m_maxRecordQueueSizeBytes)
-                return false; //< no need to cleanup
-        }
-    }
+    // check for global overflow bytes between all recorders
+    const qint64 totalAllowedBytes = m_maxRecordQueueSizeBytes * m_totalRecorders;
+    if (totalAllowedBytes > m_totalQueueSize)
+        return false; //< no need to cleanup
 
+    if (m_queuedSize < m_maxRecordQueueSizeBytes)
+        return false; //< no need to cleanup
+
+    return true;
+}
+
+void QnServerStreamRecorder::setCanDropPackets(bool canDrop)
+{
+    m_canDropPackets = canDrop;
+}
+
+bool QnServerStreamRecorder::canDropPackets() const
+{
+    return m_canDropPackets;
+}
+
+bool QnServerStreamRecorder::cleanupQueue()
+{
     if (!m_recordingContextVector.empty())
     {
         size_t slowestStorageIndex;

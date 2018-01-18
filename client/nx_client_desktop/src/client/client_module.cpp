@@ -80,6 +80,8 @@
 #include <utils/server_interface_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
+#include <nx/client/desktop/utils/upload_manager.h>
+#include <nx/client/desktop/utils/wearable_manager.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -354,6 +356,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     m_networkProxyFactory = new QnNetworkProxyFactory(commonModule);
     QNetworkProxyFactory::setApplicationProxyFactory(m_networkProxyFactory);
 
+    m_uploadManager = new nx::client::desktop::UploadManager(commonModule);
+    m_wearableManager = new nx::client::desktop::WearableManager(commonModule);
+
 #ifdef Q_OS_WIN
     commonModule->store(new QnIexploreUrlHandler());
 #endif
@@ -598,6 +603,16 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
 {
     return m_cloudStatusWatcher;
+}
+
+nx::client::desktop::UploadManager* QnClientModule::uploadManager() const
+{
+    return m_uploadManager;
+}
+
+nx::client::desktop::WearableManager* QnClientModule::wearableManager() const
+{
+    return m_wearableManager;
 }
 
 void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)

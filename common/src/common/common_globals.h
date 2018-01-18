@@ -229,6 +229,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         exported                    = 0x20000000,   /**< Exported media file. */
         removed                     = 0x40000000,   /**< resource removed from pool. */
 
+        wearable_camera             = 0x80000000,   /**< Wearable camera resource. */
+
 
         local_media = local | media | url,
         exported_media = local_media | exported,
