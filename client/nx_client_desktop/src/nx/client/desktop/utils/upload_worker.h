@@ -39,7 +39,6 @@ struct FileUpload
     /** Error message, if any. */
     QString errorMessage;
 };
-Q_DECLARE_METATYPE(FileUpload)
 
 class UploadWorker: public QObject
 {
@@ -80,3 +79,5 @@ private:
 } // namespace desktop
 } // namespace client
 } // namespace nx
+
+Q_DECLARE_METATYPE(FileUpload)
