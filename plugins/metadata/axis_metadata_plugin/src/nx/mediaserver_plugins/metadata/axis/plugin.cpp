@@ -1,7 +1,8 @@
 ﻿#include "plugin.h"
 
-#include <string>
+#include <array>
 #include <fstream>
+#include <string>
 
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
@@ -28,10 +29,19 @@ const QString kSoapPath("/vapix/services");
 const char* const kRuleEngine = "tns1:RuleEngine";
 const char* const kVideoSource = "tns1:VideoSource";
 
+const std::array<const char*, 4> kTestTopics = {
+    "tns1:RecordingConfig",
+    "tnsaxis:Storage",
+    "tns1:PTZController",
+    "tns1:Device",
+    };
+
 } // namespace
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
+
+//const QnUuid Plugin::kDriverId = QnUuid();
 
 Plugin::Plugin()
 {
@@ -136,8 +146,21 @@ QList<IdentifiedSupportedEvent> Plugin::fetchSupportedEvents(
         resourceInfo.password);
     if (!axisCameraController.readSupportedEvents())
         return result;
-    axisCameraController.filterSupportedEvents({ kRuleEngine, kVideoSource });
 
+//#define THIS_IS_FOR_TESTING_PURPOSES_ONLY__PLUGIN
+#ifdef THIS_IS_FOR_TESTING_PURPOSES_ONLY__PLUGIN
+    static int i = 0;
+    ++i;
+    if (i == kTestTopics.size())
+    {
+        i = 0;
+        return QList<IdentifiedSupportedEvent>();
+    }
+    else
+        axisCameraController.filterSupportedEvents({ kTestTopics[i] });
+#else
+    axisCameraController.filterSupportedEvents({ kRuleEngine });
+#endif
     const auto& src = axisCameraController.suppotedEvents();
     std::transform(src.begin(), src.end(), std::back_inserter(result),
         [](const nx::axis::SupportedEvent& event) {return IdentifiedSupportedEvent(event); });

@@ -65,9 +65,16 @@ public:
     /**
      * @brief provides null terminated UTF8 string containing json manifest
      * according to nx_metadata_plugin_manifest.schema.json.
-     * @return pointer to c-style string which MUST be valid till manager object exists
+     * @return pointer to c-style string which MUST be valid till method "freeManifest"
+     * will be envoked,
      */
-    virtual const char* capabilitiesManifest(Error* error) const = 0;
+    virtual const char* capabilitiesManifest(Error* error) = 0;
+
+    /**
+     * @brief tells manager that memory (previously returned by "capabilitiesManifest") pointed to
+     * by "data" is no longer needed and may be disposed
+     */
+    virtual void freeManifest(const char* data) const = 0;
 };
 
 } // namespace metadata

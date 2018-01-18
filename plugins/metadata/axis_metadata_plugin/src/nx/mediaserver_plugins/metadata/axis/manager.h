@@ -37,7 +37,9 @@ public:
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
-    virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
+    virtual const char* capabilitiesManifest(nx::sdk::Error* error) override;
+
+    virtual void freeManifest(const char* data) const override;
 
     const QList<IdentifiedSupportedEvent>& identifiedSupportedEvents() const
     {
@@ -45,11 +47,14 @@ public:
     }
 
 private:
-    QByteArray m_deviceManifest;
+    QByteArray m_deviceManifestPartial; //< Guids only.
+    QByteArray m_deviceManifestFull; //< Guids and description.
     QUrl m_url;
     QAuthenticator m_auth;
     QList<IdentifiedSupportedEvent> m_identifiedSupportedEvents;
     Monitor* m_monitor = nullptr;
+    QList<QByteArray> m_givenManifests; //< Place to store manifests we gave to caller
+    // to provide 1) sufficient lifetime and 2) memory releasing in destructor.
 };
 
 } // axis
