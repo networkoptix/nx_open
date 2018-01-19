@@ -67,8 +67,11 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& sourceParent) const
 {
-    if (m_query.text.isEmpty())
-        return m_defaultBehavior == DefaultBehavior::showAll;
+    const bool searchMode = !m_query.text.isEmpty();
+    if (!searchMode && m_defaultBehavior != DefaultBehavior::showAll)
+        return false;
+
+    const bool showAllMode = m_defaultBehavior == DefaultBehavior::showAll;
 
     QModelIndex root = (sourceParent.column() > Qn::NameColumn)
         ? sourceParent.sibling(sourceParent.row(), Qn::NameColumn)
@@ -79,6 +82,42 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         return true;
 
     const auto nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+
+    // Handles visibility of nodes in search mode
+    switch(nodeType)
+    {
+        case Qn::ServersNode:
+        case Qn::UserResourcesNode:
+        case Qn::LayoutsNode:
+        case Qn::UsersNode:
+        case Qn::LayoutToursNode:
+            if (searchMode)
+                return false;
+            break;
+
+        case Qn::FilteredServersNode:
+        case Qn::FilteredCamerasNode:
+        case Qn::FilteredLayoutsNode:
+        case Qn::FilteredUsersNode:
+        case Qn::FilteredShowreelsNode:
+        case Qn::FilteredVideowallsNode:
+            if (!searchMode)
+                return false;
+            break;
+        default:
+            break;
+    }
+
+    if (!searchMode && showAllMode)
+        return true;
+
+    const auto resource = this->resource(index);
+    if (searchMode && resource
+        && (resource->hasFlags(Qn::server) || resource->hasFlags(Qn::videowall)))
+    {
+        return false; // We don't show servers and videowalls in case of search.
+    }
+
     switch (nodeType)
     {
         case Qn::CurrentSystemNode:
@@ -114,7 +153,6 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         return true;
 
     // Show only resources with given flags.
-    QnResourcePtr resource = this->resource(index);
     return resource && resource->hasFlags(m_query.flags);
 }
 

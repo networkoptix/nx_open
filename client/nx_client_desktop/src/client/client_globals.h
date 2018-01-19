@@ -27,6 +27,13 @@ namespace Qn
         LocalResourcesNode,     /**< Root node for local resources. */
         LocalSeparatorNode,     /**< Root node for spacing between local resources header and resources. */
 
+        FilteredServersNode,    /**< Root node for filtered servers */
+        FilteredCamerasNode,    /**< Root node for filtered cameras, i/o modules and other devices. Used for filtering purposes. */
+        FilteredLayoutsNode,    /**< Root node for filtered layouts */
+        FilteredUsersNode,      /**< Root node for filtered users */
+        FilteredVideowallsNode, /**< Root node for filtered videowalls */
+        FilteredShowreelsNode,  /**< Root node for filtered showreels*/
+
         BastardNode,            /**< Root node for hidden resources. */
 
         // Per-user placeholder nodes

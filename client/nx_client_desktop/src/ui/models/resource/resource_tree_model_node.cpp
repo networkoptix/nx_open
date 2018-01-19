@@ -43,6 +43,12 @@ bool nodeRequiresChildren(Qn::NodeType nodeType)
         result
         << Qn::OtherSystemsNode
         << Qn::ServersNode
+        << Qn::FilteredServersNode
+        << Qn::FilteredCamerasNode
+        << Qn::FilteredVideowallsNode
+        << Qn::FilteredShowreelsNode
+        << Qn::FilteredLayoutsNode
+        << Qn::FilteredUsersNode
         << Qn::UserResourcesNode
         << Qn::RecorderNode
         << Qn::SystemNode
@@ -104,6 +110,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         m_displayName = QString();
         m_name = lit("-");
         break;
+    case Qn::FilteredServersNode:
     case Qn::ServersNode:
         setNameInternal(tr("Servers"));
         break;
@@ -111,18 +118,27 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         setNameInternal(tr("Other Systems"));
         m_state = Invalid;
         break;
+    case Qn::FilteredUsersNode:
     case Qn::UsersNode:
         setNameInternal(tr("Users"));
         break;
     case Qn::WebPagesNode:
         setNameInternal(tr("Web Pages"));
         break;
+    case Qn::FilteredCamerasNode:
+        setNameInternal(tr("Cameras & Devices"));
+        break;
     case Qn::UserResourcesNode:
         setNameInternal(tr("Cameras & Resources"));
         break;
+    case Qn::FilteredLayoutsNode:
     case Qn::LayoutsNode:
         setNameInternal(tr("Layouts"));
         break;
+    case Qn::FilteredVideowallsNode:
+        setNameInternal(tr("Videowalls"));
+        break;
+    case Qn::FilteredShowreelsNode:
     case Qn::LayoutToursNode:
         setNameInternal(tr("Showreels"));
         break;
@@ -467,6 +483,14 @@ bool QnResourceTreeModelNode::calculateBastard() const
         case Qn::SeparatorNode:
         case Qn::LocalSeparatorNode:
         case Qn::OtherSystemsNode:
+
+        case Qn::FilteredServersNode:
+        case Qn::FilteredCamerasNode:
+        case Qn::FilteredLayoutsNode:
+        case Qn::FilteredUsersNode:
+        case Qn::FilteredVideowallsNode:
+        case Qn::FilteredShowreelsNode:
+
 
         /* These will be hidden or displayed together with their parent. */
         case Qn::VideoWallItemNode:
@@ -1129,28 +1153,36 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
         case Qn::CurrentUserNode:
             return qnResIconCache->icon(QnResourceIconCache::User);
 
+        case Qn::FilteredServersNode:
         case Qn::ServersNode:
             return qnResIconCache->icon(QnResourceIconCache::Servers);
 
         case Qn::UsersNode:
         case Qn::RoleNode:
         case Qn::RoleUsersNode:
+        case Qn::FilteredUsersNode:
             return qnResIconCache->icon(QnResourceIconCache::Users);
 
         case Qn::WebPagesNode:
             return qnResIconCache->icon(QnResourceIconCache::WebPages);
 
+        case Qn::FilteredVideowallsNode:
+            return qnResIconCache->icon(QnResourceIconCache::VideoWall); //< Fix me: change to videowallS icon
+
+        case Qn::FilteredCamerasNode:
         case Qn::UserResourcesNode:
         case Qn::AllCamerasAccessNode:
         case Qn::SharedResourcesNode:
             return qnResIconCache->icon(QnResourceIconCache::Cameras);
 
+        case Qn::FilteredLayoutsNode:
         case Qn::LayoutsNode:
             return qnResIconCache->icon(QnResourceIconCache::Layouts);
 
         case Qn::LayoutTourNode:
             return qnResIconCache->icon(QnResourceIconCache::LayoutTour);
 
+        case Qn::FilteredShowreelsNode:
         case Qn::LayoutToursNode:
             return qnResIconCache->icon(QnResourceIconCache::LayoutTours);
 

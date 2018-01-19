@@ -147,6 +147,13 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
                 }
                 case Qn::ServersNode:
                 case Qn::UserResourcesNode:
+
+                case Qn::FilteredServersNode:
+                case Qn::FilteredCamerasNode:
+                case Qn::FilteredLayoutsNode:
+                case Qn::FilteredUsersNode:
+                case Qn::FilteredShowreelsNode:
+                case Qn::FilteredVideowallsNode:
                     return true;
                 default:
                     break;

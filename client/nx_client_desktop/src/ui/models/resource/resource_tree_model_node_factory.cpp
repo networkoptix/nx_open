@@ -14,6 +14,80 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_access/providers/resource_access_provider.h>
+
+#include <nx/client/desktop/resource_views/models/generic_resource_tree_model_node.h>
+
+namespace {
+
+bool isAcceptableForModelCamera(
+    QnResourceTreeModel* model,
+    const QnResourcePtr& resource)
+{
+    const auto context = model->context();
+    return model->scope() != QnResourceTreeModel::UsersScope
+        && QnResourceAccessFilter::isShareableMedia(resource)
+        && context->resourceAccessProvider()->hasAccess(context->user(), resource)
+        && resource->hasFlags(Qn::live_cam);
+}
+
+bool isAcceptableForModelLayout(
+    QnResourceTreeModel* model,
+    const QnResourcePtr& resource)
+{
+    const auto context = model->context();
+    return model->scope() == QnResourceTreeModel::FullScope
+        && context->resourceAccessProvider()->hasAccess(context->user(), resource)
+        && resource->hasFlags(Qn::layout);
+}
+
+bool isAcceptableForModelServer(
+    QnResourceTreeModel* model,
+    const QnResourcePtr& resource)
+{
+    const auto context = model->context();
+    return model->scope() == QnResourceTreeModel::FullScope
+        && context->resourceAccessProvider()->hasAccess(context->user(), resource)
+        && resource->hasFlags(Qn::server)
+        && !resource->hasFlags(Qn::fake);
+}
+
+bool isAcceptableForModelUser(
+    QnResourceTreeModel* model,
+    const QnResourcePtr& resource)
+{
+    const auto context = model->context();
+    return model->scope() != QnResourceTreeModel::CamerasScope
+        && context->resourceAccessProvider()->hasAccess(context->user(), resource)
+        && resource->hasFlags(Qn::user);
+}
+
+bool isAcceptableForModelVideowall(
+    QnResourceTreeModel* model,
+    const QnResourcePtr& resource)
+{
+    const auto context = model->context();
+    return model->scope() == QnResourceTreeModel::FullScope
+        && context->resourceAccessProvider()->hasAccess(context->user(), resource)
+        && resource->hasFlags(Qn::videowall);
+}
+
+/*
+bool isAcceptableForModelShowreel(
+    QnResourceTreeModel* model,
+    const QnResourcePtr& resource)
+{
+    const auto context = model->context();
+    return model->scope() == QnResourceTreeModel::FullScope
+        && context->resourceAccessProvider()->hasAccess(context->user(), resource)
+        && resource->hasFlags(Qn::layou);
+}
+*/
+} // namespace
+
+using namespace nx::client::desktop;
+
 QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createNode(
     Qn::NodeType nodeType,
     QnResourceTreeModel* model,
@@ -22,6 +96,36 @@ QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createNode(
     QnResourceTreeModelNodePtr result;
     switch (nodeType)
     {
+        case Qn::FilteredCamerasNode:
+            result.reset(new GenericResourceTreeModelNode(
+                model, isAcceptableForModelCamera, Qn::FilteredCamerasNode));
+            break;
+
+        case Qn::FilteredLayoutsNode:
+            result.reset(new GenericResourceTreeModelNode(
+                model, isAcceptableForModelLayout, Qn::FilteredLayoutsNode));
+            break;
+
+        case Qn::FilteredServersNode:
+            result.reset(new GenericResourceTreeModelNode(
+                model, isAcceptableForModelServer, Qn::FilteredServersNode));
+            break;
+
+        case Qn::FilteredUsersNode:
+            result.reset(new GenericResourceTreeModelNode(
+                model, isAcceptableForModelUser, Qn::FilteredUsersNode));
+            break;
+
+        case Qn::FilteredVideowallsNode:
+            result.reset(new GenericResourceTreeModelNode(
+                model, isAcceptableForModelVideowall, Qn::FilteredVideowallsNode));
+            break;
+/*
+        case Qn::FilteredShowreelsNode:
+            result.reset(new GenericResourceTreeModelNode(
+                model, isAcceptableForModelShowreels, Qn::FilteredShowreelssNode));
+            break;
+*/
         case Qn::UserResourcesNode:
             result.reset(new QnResourceTreeModelUserResourcesNode(model));
             break;

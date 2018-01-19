@@ -87,6 +87,12 @@ QList<Qn::NodeType> rootNodeTypes()
             << Qn::SeparatorNode
             << Qn::UsersNode
             << Qn::ServersNode
+            << Qn::FilteredServersNode
+            << Qn::FilteredCamerasNode
+            << Qn::FilteredVideowallsNode
+            << Qn::FilteredShowreelsNode
+            << Qn::FilteredUsersNode
+            << Qn::FilteredLayoutsNode
             << Qn::UserResourcesNode
             << Qn::LayoutsNode
             << Qn::LayoutToursNode
@@ -359,6 +365,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         if (m_scope == FullScope && isLoggedIn)
             return rootNode;
         return bastardNode;
+
+    case Qn::FilteredCamerasNode:
+    case Qn::FilteredServersNode:
+    case Qn::FilteredLayoutsNode:
+    case Qn::FilteredUsersNode:
+    case Qn::FilteredVideowallsNode:
+    case Qn::FilteredShowreelsNode:
+        return rootNode; // Always root node.
 
     case Qn::UserResourcesNode:
         if (m_scope == CamerasScope && !isAdmin)
