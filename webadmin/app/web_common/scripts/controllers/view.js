@@ -2,9 +2,9 @@
 
 angular.module('nxCommon').controller('ViewCtrl',
             ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', 'chromeCast', '$q',
-              'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI',
+              'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI', 'voiceControl',
     function ($scope, $rootScope, $location, $routeParams, cameraRecords, chromeCast, $q,
-              camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI) {
+              camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI, voiceControl) {
 
         var channels = {
             Auto: 'lo',
@@ -17,6 +17,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         }
         $scope.systemAPI = systemAPI;
 
+        $scope.betaMode = Config.allowBetaMode;
         $scope.debugMode = Config.allowDebugMode;
         $scope.session = $sessionStorage;
         $scope.storage = $localStorage;
@@ -24,10 +25,12 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.storage.serverStates = $scope.storage.serverStates || {};
 
         $scope.canViewArchive = false;
+        $scope.searchCams = "";
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
         $scope.isWebAdmin = Config.webadminSystemApiCompatibility;
         $scope.cameraLinks = {enabled: $location.search().cameraLinks};
+        $scope.voiceControls = {enabled: false, showCommands: false};
 
         if(!$routeParams.cameraId && $scope.storage.cameraId){
             systemAPI.setCameraPath($scope.storage.cameraId);
@@ -319,6 +322,11 @@ angular.module('nxCommon').controller('ViewCtrl',
             }*/
         };
 
+        if($scope.betaMode && window.chrome){
+            $scope.voiceControls = {enabled:true,showCommands:true};
+            voiceControl.initControls($scope);
+        }
+
         //On player error update source to cause player to restart
         $scope.crashCount = 0;
 
@@ -422,7 +430,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         var timeFromUrl = $routeParams.time || null;
         $scope.$watch('activeCamera', function(){
             if(!$scope.activeCamera){
-                $scope.activeCamera = $scope.camerasProvider.getFirstCam();
+                $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
                 return;
             }
             $scope.player = null;

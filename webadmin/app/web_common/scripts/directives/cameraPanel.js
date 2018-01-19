@@ -6,13 +6,13 @@ angular.module('nxCommon')
             scope:{
                 "activeCamera":"=",
                 "camerasProvider": "=",
-                "showCameraPanel": "="
+                "showCameraPanel": "=",
+                "searchCams": "="
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
             link: function (scope, element/*, attrs*/) {
                 scope.Config = Config;
                 scope.storage = $localStorage;
-                scope.searchCams = '';
                 scope.inputPlaceholder = L.common.searchCamPlaceholder;
 
                 var updateCameras = function(){
@@ -41,7 +41,7 @@ angular.module('nxCommon')
                 
                 function searchCams(searchText){
                     function has(str, substr){
-                        return str && str.toLowerCase().indexOf(substr.toLowerCase()) >= 0;
+                        return str && str.toLowerCase().replace(/\s/g, '').indexOf(substr.toLowerCase().replace(/\s/g, '')) >= 0;
                     }
 
                     //If the text is blank allow scope.searchCams to update in dom then update cameras
