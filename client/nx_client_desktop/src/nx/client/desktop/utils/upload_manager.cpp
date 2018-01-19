@@ -1,6 +1,6 @@
 #include "upload_manager.h"
 
-#include <memory>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace client {
