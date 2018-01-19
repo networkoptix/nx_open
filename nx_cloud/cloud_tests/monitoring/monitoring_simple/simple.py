@@ -233,8 +233,8 @@ class CloudSession(object):
         stdout = container.logs(stdout=True, stderr=False)
         stderr = container.logs(stdout=False, stderr=True)
 
-        log.info('Stdout:\n{}'.format(stdout).decode('utf-8'))
-        log.info('Stderr:\n{}'.format(stderr).decode('utf-8'))
+        log.info('Stdout:\n{}'.format(stdout.decode('utf-8')))
+        log.info('Stderr:\n{}'.format(stderr.decode('utf-8')))
         container.remove()
 
         assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect'
