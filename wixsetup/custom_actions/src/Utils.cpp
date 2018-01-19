@@ -1,7 +1,8 @@
+#include "Utils.h"
+
 #include "fileutil.h"
 #include "memutil.h"
 #include "strutil.h"
-#include "Utils.h"
 #include "portchecker.h"
 
 Error::Error(LPCWSTR msg)
