@@ -29,7 +29,7 @@ public:
         if (handler)
             post([handler = std::move(handler)]() { handler(SystemError::noError); });
     }
-    
+
     virtual bool setIndicationHandler(
         int /*method*/, IndicationHandler /*handler*/, void* /*client*/ = 0) override
     {
@@ -158,7 +158,7 @@ protected:
                 std::bind(&MediatorAddressPublisher::onUpdateAddressesCompleted, this, _1));
         }
     }
-    
+
     void thenErrorShouldBeReported()
     {
         for (int i = 0; i < requestCount; ++i)

@@ -57,9 +57,9 @@ public:
         m_connectTimeout(std::chrono::milliseconds::zero()),
         m_connectionsToCreateCount(1)
     {
-        m_resultingSocketAttributes.aioThread = 
+        m_resultingSocketAttributes.aioThread =
             SocketGlobals::aioService().getRandomAioThread();
-        m_resultingSocketAttributes.recvBufferSize = 
+        m_resultingSocketAttributes.recvBufferSize =
             nx::utils::random::number<unsigned int>(10000, 50000);
     }
 
@@ -84,7 +84,7 @@ protected:
     {
         m_relayType = RequestProcessingBehavior::fail;
     }
-    
+
     void givenSilentRelay()
     {
         m_relayType = RequestProcessingBehavior::ignore;

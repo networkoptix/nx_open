@@ -25,11 +25,11 @@ public:
     RandomOnlineEndpointSelector()
     {
         for (int i = 0; i < kTestHostCount; ++i)
-            m_testEndpoints.push_back(nx::network::SocketAddress(QnUuid::createUuid().toString() + ".ru", 80));
-    }
-
-    ~RandomOnlineEndpointSelector()
-    {
+        {
+            m_testEndpoints.push_back(
+                nx::network::SocketAddress(
+                    QnUuid::createUuid().toString() + ".ru", 80));
+        }
     }
 
 protected:

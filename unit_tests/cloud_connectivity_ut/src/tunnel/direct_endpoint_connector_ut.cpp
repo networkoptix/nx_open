@@ -96,7 +96,7 @@ TEST_F(TcpTunnelConnector, connectedToWrongServer)
         {nx::String("invalid_cloud_system_id"), false},
         {boost::none, false} };
 
-    // Connecting to a specific server within a system, 
+    // Connecting to a specific server within a system,
     // but connected to another server of that system.
 
     const auto peerId = QnUuid::createUuid();
