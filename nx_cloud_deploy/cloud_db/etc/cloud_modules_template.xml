@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sequence>
     <set resName="cdb" resValue="https://%host%:443"/>
-    <sequence>
-        <set resName="hpm.tcpUrl" resValue="http://%host%:3345"/>
-        <set resName="hpm.udpUrl" resValue="stun://%host%:3345"/>
-    </sequence>
+    <set resName="hpm" resValue="stun://$INSTANCE_IP:3345"/>
     <set resName="notification_module" resValue="https://%host%:443"/>
 </sequence>
