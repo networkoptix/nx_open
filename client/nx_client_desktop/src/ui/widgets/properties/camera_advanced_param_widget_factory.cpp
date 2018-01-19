@@ -200,6 +200,8 @@ public:
 
     virtual void setValue(const QString& newValue) override
     {
+        if (m_comboBox->findText(newValue) == -1)
+            m_comboBox->addItem(newValue);
         m_comboBox->setCurrentText(newValue);
     }
 
