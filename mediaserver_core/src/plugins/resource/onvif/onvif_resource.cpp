@@ -2548,7 +2548,7 @@ QnCameraAdvancedParamValueMap QnPlOnvifResource::getApiParamiters(const QSet<QSt
     return result;
 }
 
-QSet<QString> QnPlOnvifResource::setApiParamiters(const QnCameraAdvancedParamValueMap& values)
+QSet<QString> QnPlOnvifResource::setApiParameters(const QnCameraAdvancedParamValueMap& values)
 {
     QnCameraAdvancedParamValueList result;
     {

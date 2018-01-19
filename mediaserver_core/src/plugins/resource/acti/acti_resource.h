@@ -45,7 +45,7 @@ public:
     virtual QString getDriverName() const override;
 
     QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
-    QSet<QString> setApiParamiters(const QnCameraAdvancedParamValueMap& values);
+    QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 

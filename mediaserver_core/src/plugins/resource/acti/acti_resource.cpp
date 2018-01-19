@@ -800,7 +800,7 @@ QnCameraAdvancedParamValueMap QnActiResource::getApiParamiters(const QSet<QStrin
     return result;
 }
 
-QSet<QString> QnActiResource::setApiParamiters(const QnCameraAdvancedParamValueMap& values)
+QSet<QString> QnActiResource::setApiParameters(const QnCameraAdvancedParamValueMap& values)
 {
     bool success;
     QSet<QString> idList;

@@ -251,7 +251,7 @@ public:
     static int calcTimeDrift(const QString& deviceUrl, int* outSoapRes = nullptr, QTimeZone* timeZone = nullptr);
 
     virtual QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
-    virtual QSet<QString> setApiParamiters(const QnCameraAdvancedParamValueMap& values);
+    virtual QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);

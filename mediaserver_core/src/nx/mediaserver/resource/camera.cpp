@@ -127,9 +127,10 @@ void Camera::setUrl(const QString &urlStr)
 
 QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>& ids)
 {
-    if (m_defaultAdvancedParametersProviders == nullptr)
+    if (m_defaultAdvancedParametersProviders == nullptr
+        && m_advancedParametersProvidersByParameterId.empty())
     {
-        NX_ASSERT(this, "Get advanced parameters with no providers");
+        NX_ASSERT(this, "Get advanced parameters from camera with no providers");
         return {};
     }
 
@@ -141,10 +142,14 @@ QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>&
         {
             idsByProvider[it->second].insert(id);
         }
-        else
+        else if (m_defaultAdvancedParametersProviders)
         {
             NX_DEBUG(this, lm("Get undeclared advanced parameter: %1").arg(id));
             idsByProvider[m_defaultAdvancedParametersProviders].insert(id);
+        }
+        else
+        {
+            NX_WARNING(this, lm("No provider to set parameter: %1").arg(id));
         }
     }
 
@@ -176,9 +181,10 @@ boost::optional<QString> Camera::getAdvancedParameter(const QString& id)
 
 QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap& values)
 {
-    if (m_defaultAdvancedParametersProviders == nullptr)
+    if (m_defaultAdvancedParametersProviders == nullptr
+        && m_advancedParametersProvidersByParameterId.empty())
     {
-        NX_ASSERT(this, "Get advanced paramiters with no providers");
+        NX_ASSERT(this, "Set advanced parameters from camera with no providers");
         return {};
     }
 
@@ -190,10 +196,14 @@ QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap&
         {
             valuesByProvider[it->second].push_back(value);
         }
-        else
+        else if (m_defaultAdvancedParametersProviders)
         {
             NX_WARNING(this, lm("Set undeclared advanced parameter: %1").arg(value.id));
             valuesByProvider[m_defaultAdvancedParametersProviders].push_back(value);
+        }
+        else
+        {
+            NX_WARNING(this, lm("No provider to set parameter: %1").arg(value.id));
         }
     }
 

@@ -70,7 +70,7 @@ public:
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
     QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
-    QSet<QString> setApiParamiters(const QnCameraAdvancedParamValueMap& values);
+    QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     virtual QnIOStateDataList ioStates() const override;
 

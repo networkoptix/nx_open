@@ -442,7 +442,11 @@ static void mergeGroups(
 
         if (targetGroup != target->end())
         {
-            targetGroup->description += lit("\n") + sourceGroup.description;
+            if (!targetGroup->description.isEmpty() && !sourceGroup.description.isEmpty())
+                targetGroup->description += lit("\n") + sourceGroup.description;
+            else
+                targetGroup->description +=  sourceGroup.description;
+
             mergeParams(&targetGroup->params, &sourceGroup.params);
             mergeGroups(&targetGroup->groups, &sourceGroup.groups);
         }

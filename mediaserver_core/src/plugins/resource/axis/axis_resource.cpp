@@ -1706,7 +1706,7 @@ QnCameraAdvancedParamValueMap QnPlAxisResource::getApiParamiters(const QSet<QStr
     return parseParamsQueriesResult(queriesResults, params);
 }
 
-QSet<QString> QnPlAxisResource::setApiParamiters(const QnCameraAdvancedParamValueMap& values)
+QSet<QString> QnPlAxisResource::setApiParameters(const QnCameraAdvancedParamValueMap& values)
 {
     const auto valueList = values.toValueList();
     const auto query = buildSetParamsQuery(valueList);

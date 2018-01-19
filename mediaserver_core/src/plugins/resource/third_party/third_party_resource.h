@@ -89,7 +89,7 @@ public:
     nxcip::Resolution getSelectedResolutionForEncoder(Qn::StreamIndex encoderIndex ) const;
 
     QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
-    QSet<QString> setApiParamiters(const QnCameraAdvancedParamValueMap& values);
+    QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(

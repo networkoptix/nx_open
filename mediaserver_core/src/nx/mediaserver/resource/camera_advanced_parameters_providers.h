@@ -150,7 +150,7 @@ template<typename ApiProvider>
 QSet<QString> ApiMultiAdvancedParamitersProvider<ApiProvider>::set(
     const QnCameraAdvancedParamValueMap& values)
 {
-    return this->m_api->setApiParamiters(values);
+    return this->m_api->setApiParameters(values);
 }
 
 template<typename ApiProvider>

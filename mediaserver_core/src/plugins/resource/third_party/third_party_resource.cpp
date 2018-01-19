@@ -119,7 +119,7 @@ QnCameraAdvancedParamValueMap QnThirdPartyResource::getApiParamiters(const QSet<
     return {};
 }
 
-QSet<QString> QnThirdPartyResource::setApiParamiters(const QnCameraAdvancedParamValueMap& values)
+QSet<QString> QnThirdPartyResource::setApiParameters(const QnCameraAdvancedParamValueMap& values)
 {
     if (!setParam("", "{"))
         return QSet<QString>();

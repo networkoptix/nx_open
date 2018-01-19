@@ -362,7 +362,7 @@ QnCameraAdvancedParamValueMap HanwhaResource::getApiParamiters(const QSet<QStrin
     return result;
 }
 
-QSet<QString> HanwhaResource::setApiParamiters(const QnCameraAdvancedParamValueMap& values)
+QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueMap& values)
 {
     using ParameterMap = std::map<QString, QString>;
     using SubmenuMap = std::map<QString, ParameterMap>;
