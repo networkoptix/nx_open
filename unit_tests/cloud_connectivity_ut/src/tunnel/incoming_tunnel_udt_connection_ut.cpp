@@ -1,4 +1,3 @@
-
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>

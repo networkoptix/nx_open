@@ -1,4 +1,5 @@
 #include <boost/optional.hpp>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/address_resolver.h>
@@ -10,7 +11,6 @@
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
 
 #include "cross_nat_connector_test.h"
-
 
 namespace nx {
 namespace network {
@@ -110,7 +110,7 @@ TEST_F(UdpTunnelConnector, timeout)
     //    connectResult.executionTime < connectTimeout*1.2);
 }
 
-/** problem: server peer does not see connecting peer 
+/** problem: server peer does not see connecting peer
     on the same address that mediator sees connecting peer
 */
 TEST_F(UdpTunnelConnector, connecting_peer_in_the_same_lan_as_mediator)

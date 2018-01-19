@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include <nx/network/websocket/websocket_handshake.h>
 
 namespace test {
@@ -119,4 +120,4 @@ TEST(WebsocketHandshake, validateResponse)
     ASSERT_EQ(validateResponse(request, response), Error::noError);
 }
 
-}
+} // namespace test

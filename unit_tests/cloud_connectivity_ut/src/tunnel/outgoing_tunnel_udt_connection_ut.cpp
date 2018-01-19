@@ -15,13 +15,11 @@ namespace network {
 namespace cloud {
 namespace udp {
 
-class OutgoingTunnelConnectionTest
-:
+class OutgoingTunnelConnectionTest:
     public ::testing::Test
 {
 public:
-    OutgoingTunnelConnectionTest()
-    :
+    OutgoingTunnelConnectionTest():
         m_serverSocket(std::make_unique<UdtStreamServerSocket>(AF_INET)),
         m_first(true)
     {
@@ -376,7 +374,7 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
     ASSERT_EQ(SystemError::noError, result.errorCode);
 }
 
-}   //namespace udp
-}   //namespace cloud
-}   //namespace network
-}   //namespace nx
+} // namespace udp
+} // namespace cloud
+} // namespace network
+} // namespace nx
