@@ -19,7 +19,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     ConnectionRole ResourceStatus BitratePerGopType
     StreamQuality PanicMode RebuildState BackupState RecordingType PeerType StatisticsDeviceType
     ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
-    RebuildAction BackupAction FailoverPriority MediaStreamEvent
+    RebuildAction BackupAction FailoverPriority MediaStreamEvent StreamIndex
     Permission GlobalPermission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
@@ -874,9 +874,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
     enum class StreamIndex
     {
-        primaryStream = 0,
-        secondaryStream = 1
+        undefined = -1,
+        primary = 0,
+        secondary = 1
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamIndex)
 
     /**
      * Invalid value for a timezone UTC offset.
@@ -914,7 +916,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-    (Qn::FailoverPriority)(Qn::MediaStreamEvent)
+    (Qn::FailoverPriority)(Qn::MediaStreamEvent)(Qn::StreamIndex)
     ,
     (metatype)(lexical)
 )

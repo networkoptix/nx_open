@@ -39,12 +39,12 @@ void findCameraStreams(
 {
     for (const auto& stream: camera->mediaStreams().streams)
     {
-        if (stream.encoderIndex == (int) Qn::StreamIndex::primaryStream) //< High
+        if (stream.encoderIndex == Qn::StreamIndex::primary) //< High
         {
             *outHighCodec = (AVCodecID) stream.codec;
             *outHighResolution = stream.getResolution();
         }
-        else if (stream.encoderIndex == (int) Qn::StreamIndex::secondaryStream) //< Low
+        else if (stream.encoderIndex == Qn::StreamIndex::secondary) //< Low
         {
             *outLowCodec = (AVCodecID) stream.codec;
             *outLowResolution = stream.getResolution();

@@ -25,6 +25,7 @@
 #include <utils/media/nalUnits.h>
 #include <utils/media/av_codec_helper.h>
 #include <utils/common/synctime.h>
+#include <nx/fusion/model_functions.h>
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10 * 1000;
@@ -116,10 +117,10 @@ Qn::ConnectionRole QnLiveStreamProvider::getRole() const
     return m_role;
 }
 
-int QnLiveStreamProvider::encoderIndex() const
+Qn::StreamIndex QnLiveStreamProvider::encoderIndex() const
 {
-    return getRole() == Qn::CR_LiveVideo ? PRIMARY_ENCODER_INDEX
-                                         : SECONDARY_ENCODER_INDEX;
+    return getRole() == Qn::CR_LiveVideo ? Qn::StreamIndex::primary
+                                         : Qn::StreamIndex::secondary;
 }
 
 void QnLiveStreamProvider::setCameraControlDisabled(bool value)
@@ -673,7 +674,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     {
         m_cameraRes->saveParamsAsync();
         NX_LOG(lm("QnLiveStreamProvider: bitrateInfo has been updated for %1 stream")
-                .arg(info.encoderIndex), cl_logINFO);
+                .arg(QnLexical::serialized(info.encoderIndex)), cl_logINFO);
     }
 }
 

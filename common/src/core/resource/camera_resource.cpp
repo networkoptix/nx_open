@@ -189,7 +189,7 @@ CameraMediaStreamInfo QnVirtualCameraResource::defaultStream() const
     auto defaultStream = std::find_if(streams.cbegin(), streams.cend(),
         [](const CameraMediaStreamInfo& stream)
         {
-            return (Qn::StreamIndex) stream.encoderIndex == Qn::StreamIndex::primaryStream;
+            return (Qn::StreamIndex) stream.encoderIndex == Qn::StreamIndex::primary;
         });
     if (defaultStream != streams.cend())
         return *defaultStream;
@@ -320,7 +320,7 @@ bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStre
             supportedMediaStreams.streams.begin(),
             supportedMediaStreams.streams.end(),
             [](const CameraMediaStreamInfo& mediaInfo) {
-                return (Qn::StreamIndex) mediaInfo.encoderIndex == Qn::StreamIndex::secondaryStream;
+                return (Qn::StreamIndex) mediaInfo.encoderIndex == Qn::StreamIndex::secondary;
             });
         if (secondStreamIter != supportedMediaStreams.streams.end())
         {

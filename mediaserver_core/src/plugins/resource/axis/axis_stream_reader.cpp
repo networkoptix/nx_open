@@ -191,19 +191,15 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
 
         // ------------------- determine stream parameters ----------------------------
         float fps = params.fps;
-        const QnPlAxisResource::AxisResolution& resolution = m_axisRes->getResolution(
-            role == Qn::CR_LiveVideo
-            ? PRIMARY_ENCODER_INDEX
-            : SECONDARY_ENCODER_INDEX);
 
-        if (resolution.size.isEmpty())
+        if (params.resolution.isEmpty())
             qWarning() << "Can't determine max resolution for axis camera " << m_axisRes->getName() << "use default resolution";
         Qn::StreamQuality quality = params.quality;
 
         QByteArray paramsStr;
         paramsStr.append("videocodec=h264");
-        if (!resolution.size.isEmpty())
-            paramsStr.append("&resolution=").append(resolution.resolutionStr);
+        if (!params.resolution.isEmpty())
+            paramsStr.append("&resolution=").append(m_axisRes->resolutionToString(params.resolution));
         //paramsStr.append("&text=0"); // do not use onscreen text message (fps e.t.c)
         paramsStr.append("&fps=").append(QByteArray::number(fps));
         if (quality != Qn::QualityPreSet)

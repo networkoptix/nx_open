@@ -30,6 +30,7 @@
 #include <common/static_common_module.h>
 
 #include <algorithm>
+#include <utils/media/av_codec_helper.h>
 
 using namespace std;
 
@@ -423,8 +424,17 @@ bool resolutionGreatThan(const QnPlAxisResource::AxisResolution& res1, const QnP
 nx::mediaserver::resource::StreamCapabilityMap QnPlAxisResource::getStreamCapabilityMapFromDrives(
     bool primaryStream)
 {
-    // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    using namespace nx::mediaserver::resource;
+
+    StreamCapabilityKey key;
+    StreamCapabilityMap result;
+    for (const auto& resolution: m_resolutionList)
+    {
+        key.codec = QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H264);
+        key.resolution = resolution.size;
+        result.insert(key, nx::media::CameraStreamCapability());
+    }
+    return result;
 }
 
 CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
@@ -545,14 +555,6 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     {
         QnMutexLocker lock(&m_mutex);
         std::sort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
-
-        //detecting primary & secondary resolution
-        m_resolutions[PRIMARY_ENCODER_INDEX] = getMaxResolution();
-        m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(
-            QSize(480,316),
-            getResolutionAspectRatio(getMaxResolution()) );
-        if (m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty())
-            m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
     }
 
 
@@ -1374,13 +1376,6 @@ QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {
     return new QnAxisPtzController(toSharedPointer(this));
 }
 
-QnPlAxisResource::AxisResolution QnPlAxisResource::getResolution( int encoderIndex ) const
-{
-    return (unsigned int)encoderIndex < sizeof(m_resolutions)/sizeof(*m_resolutions)
-        ? m_resolutions[encoderIndex]
-        : QnPlAxisResource::AxisResolution();
-}
-
 int QnPlAxisResource::getChannel() const
 {
     return getChannelNumAxis() - 1;
@@ -1725,6 +1720,17 @@ QSet<QString> QnPlAxisResource::setApiParamiters(const QnCameraAdvancedParamValu
         executeParamsQueries(maintenanceQuery, success);
 
     return success ? values.ids() : QSet<QString>();
+}
+
+QString QnPlAxisResource::resolutionToString(const QSize& resolution)
+{
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& axisResolution: m_resolutionList)
+    {
+        if (axisResolution.size == resolution)
+            return axisResolution.resolutionStr;
+    }
+    return lm("%1x%2").args(resolution.width(), resolution.height());
 }
 
 #endif // #ifdef ENABLE_AXIS

@@ -72,9 +72,10 @@ public:
     QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
     QSet<QString> setApiParamiters(const QnCameraAdvancedParamValueMap& values);
 
-    AxisResolution getResolution( int encoderIndex ) const;
     virtual QnIOStateDataList ioStates() const override;
 
+
+    QString resolutionToString(const QSize& resolution);
 public slots:
     void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
     void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
@@ -141,7 +142,6 @@ private:
 
     nx_http::AsyncHttpClientPtr m_inputPortHttpMonitor;
     nx_http::BufferType m_currentMonitorData;
-    AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
 
     QnWaitCondition m_stopInputMonitoringWaitCondition;
 
