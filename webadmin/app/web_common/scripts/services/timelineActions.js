@@ -118,7 +118,6 @@ TimelineActions.prototype.setClickedCoordinate = function(mouseX){
 // linear is for holding function
 TimelineActions.prototype.animateScroll = function(targetPosition, linear){
     var self = this;
-    this.scope.scrollTarget = this.scaleManager.scroll();
     self.delayWatchingPlayingPosition();
     self.animateScope.animate(self.scope, 'scrollTarget', targetPosition, linear?'linear':'dryResistance',
             linear? self.timelineConfig.animationDuration/2: self.timelineConfig.animationDuration).

@@ -1,0 +1,18 @@
+<div class="container">
+    <h1>Yayıncı Notları</h1>
+    <uib-tabset ng-if="downloadTypes">
+        <uib-tab ng-repeat="type in downloadTypes"
+                 select="changeType(type)" >
+            <uib-tab-heading>
+                <span class="tab-heading-hack">{{$root.L.downloads.releasesTypes[type] || type}}</span>
+            </uib-tab-heading>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div ng-repeat="release in activeBuilds">
+                        <ng-include src="$root.C.viewsDir + 'components/downloadRelease.html'"></ng-include>
+                    </div>
+                </div>
+            </div>
+        </uib-tab>
+    </uib-tabset>
+</div>

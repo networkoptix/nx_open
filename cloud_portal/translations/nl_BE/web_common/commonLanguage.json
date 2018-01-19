@@ -15,13 +15,13 @@
         "unauthorized": "Authenticatie vereist",
         "noData": "Geen data",
         "iosVideoTooLarge": "iOS ondersteunt geen video die groter is dan FullHD (2MP: 1920x1080).",
-        "flashRequired": "<a href='https://get.adobe.com/flashplayer/' target='_blank'>installeer Adobe Flash</a> om video af te spelen van ARM-based servers.",
+        "flashRequired": "Video wordt niet afgespeeld. <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> voor het spelen van video voor ARM gebaseerde servers.",
         "flashOrWebmRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> of <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> te installeren voor het afspelen van video's in Internet Explorer.",
         "noArmSupport": "Deze browser of dit apparaat ondersteunt geen videoweergave van ARM-gebaseerde servers.",
-        "noFormat": "Deze browser of apparaat ondersteunt geen videoweergave van deze camera.",
+        "noFormat": "Deze browser ondersteunt het afspelen van videobeelden van deze camera niet.",
         "ieNoWebm": "Installeer alstublieft <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor Internet Explorer.",
         "ieWin10": "Gebruik alsjeblieft de browsers Microsoft Edge of Google Chrome.",
         "ubuntuNX": "Deze browser ondersteunt geen video van ARM-gebaseerde servers. Gebruik alsjeblieft de Chromium-browser."
     },
-    "searchCamPlaceholder": "search"
+    "searchCamPlaceholder": "zoeken"
 }

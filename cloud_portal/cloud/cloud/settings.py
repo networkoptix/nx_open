@@ -325,8 +325,13 @@ NOTIFICATIONS_CONFIG = {
     'system_shared': {
         'engine': 'email'
     },
+    'cloud_notification':{
+        'engine': 'email',
+        'queue': 'broadcast-notifications'
+    }
 }
 
+BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = True
 NOTIFICATIONS_AUTO_SUBSCRIBE = False
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -337,7 +342,7 @@ STATIC_ROOT = '/app/app/static/common/static'
 LANGUAGES = conf['languages']
 DEFAULT_LANGUAGE = conf['languages'][0]
 UPDATE_JSON = 'http://updates.networkoptix.com/updates.json'
-DOWNLOADS_JSON = 'http://updates.networkoptix.com/{{customization}}/downloads.json'
+DOWNLOADS_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}}/downloads.json'
 DOWNLOADS_VERSION_JSON = 'http://updates.networkoptix.com/{{customization}}/{{build}}/downloads.json'
 
 MAX_RETRIES = conf['max_retries']
