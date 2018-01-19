@@ -34,12 +34,12 @@ QnCameraAdvancedParamValueMap CameraMock::getApiParamiters(const QSet<QString>& 
     return result;
 }
 
-QSet<QString> CameraMock::setApiParamiters(const QnCameraAdvancedParamValueMap& values)
+QSet<QString> CameraMock::setApiParameters(const QnCameraAdvancedParamValueMap& values)
 {
     QSet<QString> result;
-    for (const auto& id: values)
-        if (setApiParameter(id, values.value(id)))
-            result.insert(id);
+    for (auto it = values.begin(); it != values.end(); ++it)
+        if (setApiParameter(it.key(), it.value()))
+            result.insert(it.key());
 
     return result;
 }
@@ -50,19 +50,48 @@ void CameraMock::setStreamCapabilityMaps(StreamCapabilityMap primary, StreamCapa
     m_streamCapabilityMaps[false] = std::move(secondary);
 }
 
-static const void addParameterTo
+static void addParameterToGroups(
+    std::vector<QnCameraAdvancedParamGroup>* groups,
+    QStringList parameterPath, const QString& parameterName)
+{
+    const auto groupName = parameterPath.front();
+    parameterPath.pop_front();
+
+    auto groupIt = std::find_if(groups->begin(), groups->end(),
+        [&](const QnCameraAdvancedParamGroup& group) { return group.name == groupName; });
+
+    if (groupIt == groups->end())
+    {
+        QnCameraAdvancedParamGroup group;
+        group.name = groupName;
+        groupIt = groups->insert(groups->end(), group);
+    }
+
+    if (!parameterPath.empty())
+        return addParameterToGroups(&groupIt->groups, std::move(parameterPath), parameterName);
+
+    QnCameraAdvancedParameter parameter;
+    parameter.id = parameterName;
+    parameter.name = parameterName;
+    parameter.dataType = QnCameraAdvancedParameter::DataType::String;
+    groupIt->params.push_back(std::move(parameter));
+}
 
 QnCameraAdvancedParams CameraMock::makeParameterDescriptions(const std::vector<QString>& parameters)
 {
     QnCameraAdvancedParams descriptions;
-    for (const auto& parameter: parameters)
+    descriptions.name = QString::fromUtf8(__func__);
+    descriptions.version = lit("1.0");
+    descriptions.unique_id = lit("X");
+    for (const auto& name: parameters)
     {
-        auto path = parameter.split('.');
-
-        //parameter
+        auto path = name.split('.');
+        NX_CRITICAL(path.size() >= 2);
+        path.pop_back();
+        addParameterToGroups(&descriptions.groups, path, name);
     }
 
-    return QnCameraAdvancedParams();
+    return descriptions;
 }
 
 QString CameraMock::getDriverName() const
@@ -82,7 +111,11 @@ CameraDiagnostics::Result CameraMock::initializeCameraDriver()
 
 std::vector<Camera::AdvancedParametersProvider*> CameraMock::advancedParametersProviders()
 {
-    return {};
+    std::vector<AdvancedParametersProvider*> rawPointers;
+    for (const auto& provider: m_advancedParametersProviders)
+        rawPointers.push_back(provider.get());
+
+    return rawPointers;
 }
 
 StreamCapabilityMap CameraMock::getStreamCapabilityMapFromDrives(bool primaryStream)
@@ -90,11 +123,24 @@ StreamCapabilityMap CameraMock::getStreamCapabilityMapFromDrives(bool primaryStr
     return m_streamCapabilityMaps.value(primaryStream);
 }
 
+QString CameraMock::getProperty(const QString& key) const
+{
+    return m_properties[key];
+}
+
+bool CameraMock::setProperty(const QString& key, const QString& value, PropertyOptions /*options*/)
+{
+    m_properties[key] = value;
+    return true;
+}
+
+bool CameraMock::saveParams()
+{
+    return true;
+}
+
 QnSharedResourcePointer<CameraMock> CameraTest::newCamera(std::function<void(CameraMock*)> setup)
 {
-    // TODO: Use MediaServerLauncher, and make a huck for QnResourceDiscoveryManager to
-    // the resource is created by API request in server's ResourcePool so real initilization
-    // takes place.
     QnSharedResourcePointer<CameraMock> camera(new CameraMock());
     setup(camera.data());
     return camera->initInternal() ? camera : QnSharedResourcePointer<CameraMock>();

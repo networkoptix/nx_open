@@ -36,6 +36,9 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
     Q_OBJECT
 
 public:
+    static const int kDefaultSecondStreamFpsLow;
+    static const int kDefaultSecondStreamFpsMedium;
+    static const int kDefaultSecondStreamFpsHigh;
     static QnUuid makeCameraIdFromUniqueId(const QString& uniqueId);
 
 public:
@@ -303,7 +306,7 @@ public:
 
     virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
     virtual int suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
-    float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const;
+    static float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps);
 
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
     virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const;

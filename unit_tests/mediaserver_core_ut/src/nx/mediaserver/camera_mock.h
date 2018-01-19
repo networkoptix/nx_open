@@ -19,7 +19,7 @@ public:
     bool setApiParameter(const QString& id, const QString& value);
 
     QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
-    QSet<QString> setApiParamiters(const QnCameraAdvancedParamValueMap& values);
+    QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     void setStreamCapabilityMaps(StreamCapabilityMap primary, StreamCapabilityMap secondary);
 
@@ -32,11 +32,16 @@ protected:
     virtual std::vector<AdvancedParametersProvider*> advancedParametersProviders() override;
     virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(bool primaryStream) override;
 
+    virtual QString getProperty(const QString& key) const override;
+    virtual bool setProperty(const QString& key, const QString& value, PropertyOptions options) override;
+    virtual bool saveParams() override;
+
 private:
     friend class CameraTest;
     std::map<QString, QString> m_apiAadvancedParameters;
     std::vector<std::unique_ptr<AdvancedParametersProvider>> m_advancedParametersProviders;
     QMap<bool, StreamCapabilityMap> m_streamCapabilityMaps;
+    mutable std::map<QString, QString> m_properties;
 };
 
 class CameraTest: public testing::Test
@@ -53,6 +58,10 @@ void CameraMock::makeApiAdvancedParametersProvider(
 {
     auto provider = std::make_unique<ApiProvider<CameraMock>>(this);
     provider->assign(makeParameterDescriptions(parameters));
+
+    for (const auto& id: provider->descriptions().allParameterIds())
+        m_apiAadvancedParameters[id] = lit("default");
+
     m_advancedParametersProviders.push_back(std::move(provider));
 }
 

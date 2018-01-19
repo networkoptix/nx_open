@@ -39,11 +39,11 @@ static const int kSharePixelsDefaultReservedSecondStreamFps = 0;
 static const Qn::StreamFpsSharingMethod kDefaultStreamFpsSharingMethod = Qn::PixelsFpsSharing;
 //static const Qn::MotionType defaultMotionType = Qn::MT_MotionWindow;
 
-static const int kDefaultSecondStreamFpsLow = 2;
-static const int kDefaultSecondStreamFpsMedium = 7;
-static const int kDefaultSecondStreamFpsHigh = 12;
-
 } // namespace
+
+const int QnSecurityCamResource::kDefaultSecondStreamFpsLow = 2;
+const int QnSecurityCamResource::kDefaultSecondStreamFpsMedium = 7;
+const int QnSecurityCamResource::kDefaultSecondStreamFpsHigh = 12;
 
 QnUuid QnSecurityCamResource::makeCameraIdFromUniqueId(const QString& uniqueId)
 {
@@ -1339,7 +1339,7 @@ void QnSecurityCamResource::analyticsEventEnded(const QString& caption, const QS
         qnSyncTime->currentMSecsSinceEpoch());
 }
 
-float QnSecurityCamResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
+float QnSecurityCamResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps)
 {
     float lowEnd = 0.1f;
     float hiEnd = 1.0f;

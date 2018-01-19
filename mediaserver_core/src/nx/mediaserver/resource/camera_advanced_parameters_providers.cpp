@@ -21,7 +21,7 @@ static const QString sizeToString(const QSize& size)
 }
 
 // TODO: Makes sense to somewhere in nx::utils.
-boost::optional<QSize> sizeFromString(const QString& size)
+static boost::optional<QSize> sizeFromString(const QString& size)
 {
     const auto sizeParts = size.splitRef(QChar('x'));
     if (sizeParts.size() != 2)
@@ -33,6 +33,13 @@ boost::optional<QSize> sizeFromString(const QString& size)
         return boost::none;
 
     return QSize{width, heigth};
+}
+
+// TODO: Makes sense to move into QnCameraAdvancedParam
+static QString makeRange(QStringList list)
+{
+    std::sort(list.begin(), list.end());
+    return list.join(',');
 }
 
 // TODO: Makes sense to move into QnCameraAdvancedParameterCondition.
@@ -202,7 +209,7 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
     codec.id = parameterName(kCodec);
     codec.name = lit("Codec");
     codec.dataType = QnCameraAdvancedParameter::DataType::Enumeration;
-    codec.range = codecResolutionCapabilities.keys().join(',');
+    codec.range = makeRange(codecResolutionCapabilities.keys());
 
     QnCameraAdvancedParameter resolution;
     resolution.id = parameterName(kResolution);
@@ -215,7 +222,7 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
     {
         resolution.dependencies.push_back(valueDependency(
             QnCameraAdvancedParameterDependency::DependencyType::range,
-            codecResolution.value().keys().join(','),
+            makeRange(codecResolution.value().keys()),
             {{parameterName(kCodec), codecResolution.key()}}));
     }
 
@@ -256,7 +263,7 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
 
             fps.dependencies.push_back(valueDependency(
                 QnCameraAdvancedParameterDependency::DependencyType::range,
-                lm("%1,%2").args(capability.defaultFps, capability.maxFps), condition));
+                lm("1,%2").args(capability.maxFps), condition));
         }
     }
 
@@ -264,7 +271,7 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
 }
 
 static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
-    const StreamCapabilityMap& capabilities)
+    const StreamCapabilityMap& capabilities, bool isPrimaryStream)
 {
     std::map<QString, std::vector<QnLiveStreamParams>> optionsByCodec;
     for (auto it = capabilities.begin(); it != capabilities.end(); ++it)
@@ -272,8 +279,14 @@ static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
         QnLiveStreamParams option;
         option.codec = it.key().codec;
         option.resolution = it.key().resolution;
-        option.bitrateKbps = it.value().maxBitrateKbps;
-        option.fps = it.value().maxFps;
+
+        option.fps = isPrimaryStream
+            ? it.value().maxFps
+            : QnSecurityCamResource::kDefaultSecondStreamFpsMedium;
+
+        option.bitrateKbps = static_cast<int>(QnSecurityCamResource::rawSuggestBitrateKbps(
+            Qn::QualityNormal, option.resolution, option.fps));
+
         optionsByCodec[option.codec].push_back(option);
     }
 
@@ -292,7 +305,7 @@ static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
 QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::bestParameters(
     const StreamCapabilityMap& capabilities, const QSize& baseResolution)
 {
-    const auto recomendedOptions = calculateRecomendedOptions(capabilities);
+    const auto recomendedOptions = calculateRecomendedOptions(capabilities, m_isPrimaryStream);
     if (m_isPrimaryStream)
     {
         QnLiveStreamParams bestOption = recomendedOptions.front();
