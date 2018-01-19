@@ -14,13 +14,15 @@ class Instrument;
  *
  * Useful for placing UI controls.
  */
-class QnUiElementsWidget: public GraphicsWidget {
-    Q_OBJECT;
-    typedef GraphicsWidget base_type;
+class QnGuiElementsWidget: public GraphicsWidget
+{
+    Q_OBJECT
+
+    using base_type = GraphicsWidget;
 
 public:
-    QnUiElementsWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
-    virtual ~QnUiElementsWidget();
+    QnGuiElementsWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    virtual ~QnGuiElementsWidget();
 
 protected:
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;

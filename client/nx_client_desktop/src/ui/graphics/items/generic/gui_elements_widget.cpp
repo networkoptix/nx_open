@@ -1,4 +1,4 @@
-#include "ui_elements_widget.h"
+#include "gui_elements_widget.h"
 
 #include <QtWidgets/QGraphicsView>
 
@@ -7,18 +7,18 @@
 #include <ui/graphics/instruments/transform_listener_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 
-QnUiElementsWidget::QnUiElementsWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+QnGuiElementsWidget::QnGuiElementsWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags) 
 {
     itemChange(ItemSceneHasChanged, QVariant::fromValue(this->scene()));
     itemChange(ItemParentHasChanged, QVariant::fromValue(this->parent()));
 }
 
-QnUiElementsWidget::~QnUiElementsWidget() {
+QnGuiElementsWidget::~QnGuiElementsWidget() {
     return;
 }
 
-QVariant QnUiElementsWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
+QVariant QnGuiElementsWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
     switch(change) {
     case ItemParentHasChanged:
         if(parentItem())
@@ -54,10 +54,10 @@ QVariant QnUiElementsWidget::itemChange(GraphicsItemChange change, const QVarian
     return base_type::itemChange(change, value);
 }
 
-void QnUiElementsWidget::updateTransform(QGraphicsView *view) {
+void QnGuiElementsWidget::updateTransform(QGraphicsView *view) {
     setTransform(view->viewportTransform().inverted());
 }
 
-void QnUiElementsWidget::updateSize(QGraphicsView *view) {
+void QnGuiElementsWidget::updateSize(QGraphicsView *view) {
     resize(view->viewport()->size());
 }
