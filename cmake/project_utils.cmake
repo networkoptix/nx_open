@@ -62,7 +62,7 @@ function(nx_add_target name type)
         )
     endif()
 
-    set(sources ${cpp_files} ${rcc_files} ${qm_files})
+    set(sources ${cpp_files} ${hpp_files} ${rcc_files} ${qm_files})
     if(NOT NX_NO_PCH)
         set(sources ${sources} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
     endif()
@@ -112,14 +112,13 @@ function(nx_add_target name type)
         nx_target_enable_werror(${name})
     endif()
 
-    if(NOT NX_NO_MOC)
-        nx_add_qt_mocables(${name} ${hpp_files}
-            INCLUDE_DIRS
-                ${CMAKE_CURRENT_SOURCE_DIR}/src
-                # TODO: #dklychkov Remove hardcoded nx_fusion after updating to a newer Qt which
-                # has Q_NAMESPACE macro which can avoid QN_DECLARE_METAOBJECT_HEADER.
-                ${CMAKE_SOURCE_DIR}/common_libs/nx_fusion/src
-        )
+    if(NX_NO_MOC)
+        set_target_properties(${name} PROPERTIES AUTOMOC OFF)
+    else()
+        if(NOT NX_NO_PCH)
+            set_target_properties(${name} PROPERTIES AUTOMOC_MOC_OPTIONS
+                "-b;${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
+        endif()
     endif()
 
     if(NOT NX_NO_PCH)
