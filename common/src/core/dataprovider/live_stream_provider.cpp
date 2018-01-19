@@ -149,7 +149,6 @@ void QnLiveStreamProvider::mergeWithAdvancedParams(QnLiveStreamParams params)
         params.codec = advancedLiveStreamParams.codec;
     if (advancedLiveStreamParams.bitrateKbps > 0)
         params.bitrateKbps = advancedLiveStreamParams.bitrateKbps;
-    NX_ASSERT(!params.resolution.isEmpty());
     m_newLiveParams = params;
 }
 
@@ -436,7 +435,6 @@ QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
 {
     QnMutexLocker lock(&m_livemutex);
     mergeWithAdvancedParams(m_newLiveParams);
-    NX_ASSERT(!m_newLiveParams.resolution.isEmpty());
     return m_newLiveParams;
 }
 
