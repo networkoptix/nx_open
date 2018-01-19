@@ -160,7 +160,14 @@ public:
                     pollSetImpl->epollEventsArray[currentIndex].events |=
                         socketData->second.eventsMask & (EPOLLIN | EPOLLOUT);
                     handlerToUse = (socketData->second.eventsMask & EPOLLIN) ? aio::etRead : aio::etWrite;
-                    triggeredEvent = handlerToUse;
+                    // Reporting connection closure as an error when writing data to
+                    // provide behavior similar to recv/send functions.
+                    // recv returns (ok, 0 bytes) in case of a closed connection.
+                    // send reports error in that case.
+                    if (socketData->second.eventsMask & EPOLLOUT)
+                        triggeredEvent = aio::etError;
+                    else
+                        triggeredEvent = handlerToUse;
                 }
                 else if (pollSetImpl->epollEventsArray[currentIndex].events & EPOLLIN)
                 {
