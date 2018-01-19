@@ -61,7 +61,7 @@ void FfmpegImageProvider::doLoadAsync()
     executeDelayedParented([this]{emit statusChanged(d->status);}, this);
 
     QnAviArchiveDelegatePtr archiveDelegate(new QnAviArchiveDelegate());
-    if (!archiveDelegate->open(d->resource, /*archiveIntegrityWatcher*/ nullptr))
+    if (!archiveDelegate->open(d->resource))
         return;
 
     /* This is required to correctly get file duration. */
