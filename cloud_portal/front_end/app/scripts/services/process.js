@@ -76,7 +76,7 @@ angular.module('cloudApp')
                             self.error = true;
                             self.errorData = data;
 
-                            if(!settings.ignoreUnauthorized &&
+                            if(!settings.ignoreUnauthorized && data &&
                                     data.data &&
                                     (data.data.detail ||
                                         // detail appears only when django rest framewrok declines request with
@@ -89,7 +89,7 @@ angular.module('cloudApp')
                                 return;
                             }
 
-                            var formatted = formatError(data.data || data, errorCodes);
+                            var formatted = formatError(data ? data.data : data, errorCodes);
                             if(formatted !== false){
                                 self.errorMessage = formatted;
                                 // Error handler here
