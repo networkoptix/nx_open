@@ -47,11 +47,11 @@ struct RequestCounter
 class TestPeerManager: public AbstractPeerManager
 {
 public:
-    struct FileInformation: downloader::FileInformation
+    struct TestFileInformation: downloader::FileInformation
     {
         using downloader::FileInformation::FileInformation;
-        FileInformation() = default;
-        FileInformation(const downloader::FileInformation& fileInfo);
+        TestFileInformation() = default;
+        TestFileInformation(const downloader::FileInformation& fileInfo);
 
         QString filePath;
         QVector<QByteArray> checksums;
@@ -63,8 +63,8 @@ public:
     void addPeer(const QnUuid& peerId, const QString& peerName = QString());
     QnUuid addPeer(const QString& peerName = QString());
 
-    void setFileInformation(const QnUuid& peerId, const FileInformation& fileInformation);
-    FileInformation fileInformation(const QnUuid& peerId, const QString& fileName) const;
+    void setFileInformation(const QnUuid& peerId, const TestFileInformation& fileInformation);
+    TestFileInformation fileInformation(const QnUuid& peerId, const QString& fileName) const;
 
     void setPeerStorage(const QnUuid& peerId, Storage* storage);
     void setHasInternetConnection(const QnUuid& peerId, bool hasInternetConnection = true);
@@ -108,11 +108,9 @@ public:
         ChunkCallback callback) override;
 
     virtual rest::Handle downloadChunkFromInternet(
+        const FileInformation& fileInformation,
         const QnUuid& peerId,
-        const QString& fileName,
-        const nx::utils::Url& url,
         int chunkIndex,
-        int chunkSize,
         ChunkCallback callback) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
@@ -123,12 +121,12 @@ private:
     rest::Handle getRequestHandle();
     rest::Handle enqueueRequest(const QnUuid& peerId, qint64 time, RequestCallback callback);
 
-    static QByteArray readFileChunk(const FileInformation& fileInformation, int chunkIndex);
+    static QByteArray readFileChunk(const TestFileInformation& fileInformation, int chunkIndex);
 
     struct PeerInfo
     {
         QString name;
-        QHash<QString, FileInformation> fileInformationByName;
+        QHash<QString, TestFileInformation> fileInformationByName;
         QStringList groups;
         Storage* storage = nullptr;
         bool hasInternetConnection = false;
@@ -193,11 +191,9 @@ public:
         ChunkCallback callback) override;
 
     virtual rest::Handle downloadChunkFromInternet(
+        const FileInformation& fileInformation,
         const QnUuid& peerId,
-        const QString& fileName,
-        const nx::utils::Url& url,
         int chunkIndex,
-        int chunkSize,
         ChunkCallback callback) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;

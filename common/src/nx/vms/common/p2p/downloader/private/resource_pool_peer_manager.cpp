@@ -1,6 +1,7 @@
 #include "resource_pool_peer_manager.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/std/future.h>
 #include <nx/network/http/async_http_client_reply.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -18,6 +19,7 @@ namespace downloader {
 namespace {
 
 static const int kDownloadRequestTimeoutMs = 10 * 60 * 1000;
+
 using namespace peer_selection;
 
 class OtherPeerInfosProvider
@@ -27,7 +29,7 @@ public:
     {
         const auto selfId = commonModule->moduleGUID();
         const auto servers = commonModule->resourcePool()->getAllServers(Qn::Online);
-        for (const auto& server : servers)
+        for (const auto& server: servers)
             addInfo(server, selfId);
     }
 
@@ -43,6 +45,7 @@ public:
     {
         return m_peerInfos;
     }
+
 private:
     PeerInformationList m_peerInfos;
 
@@ -171,16 +174,26 @@ rest::Handle ResourcePoolPeerManager::downloadChunk(
     if (!connection)
         return -1;
 
-    return connection->downloadFileChunk(fileName, chunkIndex, callback, thread());
+    return connection->downloadFileChunk(
+        fileName,
+        chunkIndex,
+        [callback](bool success, rest::Handle handle, const QByteArray& result)
+        {
+            callback(
+                success
+                    ? AbstractPeerManager::ChunkDownloadResult::ok
+                    : AbstractPeerManager::ChunkDownloadResult::recoverableError,
+                handle,
+                result);
+        },
+        thread());
 }
 
 rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
+    const FileInformation& fileInformation,
     const QnUuid& peerId,
-    const QString& fileName,
-    const nx::utils::Url& url,
     int chunkIndex,
-    int chunkSize,
-    AbstractPeerManager::ChunkCallback callback)
+    ChunkCallback callback)
 {
     if (peerId != selfId())
     {
@@ -192,25 +205,72 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
             [this, callback](bool success, rest::Handle handle, const QByteArray& result)
             {
                 if (!success)
-                    callback(success, handle, QByteArray());
+                    callback(ChunkDownloadResult::recoverableError, handle, QByteArray());
 
-                callback(success, handle, result);
+                callback(ChunkDownloadResult::ok, handle, result);
             };
 
         return connection->downloadFileChunkFromInternet(
-            fileName, url, chunkIndex, chunkSize, handleReply, thread());
+            fileInformation.name, fileInformation.url, chunkIndex, fileInformation.chunkSize,
+            handleReply, thread());
     }
+
+    const auto handle = ++m_currentSelfRequestHandle;
 
     auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
     httpClient->setSendTimeoutMs(kDownloadRequestTimeoutMs);
     httpClient->setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);
 
-    const qint64 pos = chunkIndex * chunkSize;
-    httpClient->addAdditionalHeader("Range",
-        lit("bytes=%1-%2").arg(pos).arg(pos + chunkSize - 1).toLatin1());
+    // If not chunk has already been downloaded, check whether the file has a correct size. This
+    // check result is considered provided server can serve HEAD request and there is a
+    // Content-length header in response.
+    if (fileInformation.downloadedChunks.isEmpty()
+        || fileInformation.downloadedChunks.count(true) == 0)
+    {
+        utils::promise<bool> headReadyPromise;
+        utils::future<bool> headReadyFuture = headReadyPromise.get_future();
 
-    const auto handle = ++m_currentSelfRequestHandle;
+        httpClient->doHead(fileInformation.url,
+            [headReadyPromise = std::move(headReadyPromise), this, &fileInformation](
+                network::http::AsyncHttpClientPtr asyncClient) mutable
+            {
+                if (asyncClient->response()->statusLine.statusCode != network::http::StatusCode::ok)
+                {
+                    // Treating failure to serve HEAD request as success for now
+                    headReadyPromise.set_value(true);
+                    return;
+                }
+
+                auto& responseHeaders = asyncClient->response()->headers;
+                auto contentLengthItr = responseHeaders.find("Content-Length");
+                if (contentLengthItr == responseHeaders.cend())
+                {
+                    headReadyPromise.set_value(true);
+                    return;
+                }
+
+                if (contentLengthItr->second.toInt() != fileInformation.size)
+                {
+                    headReadyPromise.set_value(false);
+                    return;
+                }
+
+                headReadyPromise.set_value(true);
+            });
+
+        if (!headReadyFuture.get())
+        {
+            callback(ChunkDownloadResult::irrecoverableError, handle, QByteArray());
+            return handle;
+        }
+    }
+
+
+    const qint64 pos = chunkIndex * fileInformation.chunkSize;
+    httpClient->addAdditionalHeader("Range",
+        lit("bytes=%1-%2").arg(pos).arg(pos + fileInformation.chunkSize - 1).toLatin1());
+
 
     auto reply = new QnAsyncHttpClientReply(httpClient, this);
     m_replyByHandle[handle] = reply;
@@ -226,10 +286,12 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
             if (!reply->isFailed())
                 result = reply->data();
 
-            callback(!result.isNull(), handle, result);
+            callback(
+                result.isNull() ? ChunkDownloadResult::recoverableError : ChunkDownloadResult::ok,
+                handle, result);
         });
 
-    httpClient->doGet(url);
+    httpClient->doGet(fileInformation.url);
 
     return handle;
 }
@@ -279,7 +341,7 @@ ResourcePoolPeerManagerFactory::ResourcePoolPeerManagerFactory(QnCommonModule* c
 }
 
 AbstractPeerManager* ResourcePoolPeerManagerFactory::createPeerManager(
-    FileInformation::PeerPolicy peerPolicy)
+    FileInformation::PeerSelectionPolicy peerPolicy)
 {
     return new ResourcePoolPeerManager(
         commonModule(),

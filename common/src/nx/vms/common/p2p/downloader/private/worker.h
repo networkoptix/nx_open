@@ -10,6 +10,7 @@
 #include <api/server_rest_connection_fwd.h>
 
 #include "../file_information.h"
+#include "abstract_peer_manager.h"
 
 class QTimer;
 
@@ -84,7 +85,10 @@ private:
         bool success, rest::Handle handle, const QVector<QByteArray>& checksums);
     void downloadNextChunk();
     void handleDownloadChunkReply(
-        bool success, rest::Handle handle, int chunkIndex, const QByteArray& data);
+        AbstractPeerManager::ChunkDownloadResult chunkDownloadResult,
+        rest::Handle handle,
+        int chunkIndex,
+        const QByteArray& data);
 
     void cancelRequests();
 

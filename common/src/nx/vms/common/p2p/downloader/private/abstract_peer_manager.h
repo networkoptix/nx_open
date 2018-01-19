@@ -17,6 +17,13 @@ namespace downloader {
 class AbstractPeerManager: public QObject
 {
 public:
+    enum class ChunkDownloadResult
+    {
+        ok,
+        recoverableError,
+        irrecoverableError
+    };
+
     AbstractPeerManager(QObject* parent = nullptr);
     virtual ~AbstractPeerManager();
 
@@ -44,7 +51,7 @@ public:
         ChecksumsCallback callback) = 0;
 
     using ChunkCallback =
-        std::function<void(bool, rest::Handle, const QByteArray&)>;
+        std::function<void(ChunkDownloadResult, rest::Handle, const QByteArray&)>;
     virtual rest::Handle downloadChunk(
         const QnUuid& peer,
         const QString& fileName,
@@ -52,11 +59,9 @@ public:
         ChunkCallback callback) = 0;
 
     virtual rest::Handle downloadChunkFromInternet(
+        const FileInformation& fileInformation,
         const QnUuid& peerId,
-        const QString& fileName,
-        const nx::utils::Url& url,
         int chunkIndex,
-        int chunkSize,
         ChunkCallback callback) = 0;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) = 0;
@@ -66,7 +71,7 @@ class AbstractPeerManagerFactory
 {
 public:
     virtual ~AbstractPeerManagerFactory();
-    virtual AbstractPeerManager* createPeerManager(FileInformation::PeerPolicy peerPolicy) = 0;
+    virtual AbstractPeerManager* createPeerManager(FileInformation::PeerSelectionPolicy peerPolicy) = 0;
 };
 
 } // namespace downloader

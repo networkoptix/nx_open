@@ -47,11 +47,9 @@ public:
         int chunkIndex,
         ChunkCallback callback) override;
 
-    virtual rest::Handle downloadChunkFromInternet(const QnUuid& peerId,
-        const QString& fileName,
-        const nx::utils::Url &url,
+    virtual rest::Handle downloadChunkFromInternet(const FileInformation& fileInformation,
+        const QnUuid& peerId,
         int chunkIndex,
-        int chunkSize,
         ChunkCallback callback) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
@@ -71,7 +69,7 @@ class ResourcePoolPeerManagerFactory:
 {
 public:
     ResourcePoolPeerManagerFactory(QnCommonModule* commonModule);
-    virtual AbstractPeerManager* createPeerManager(FileInformation::PeerPolicy peerPolicy) override;
+    virtual AbstractPeerManager* createPeerManager(FileInformation::PeerSelectionPolicy peerPolicy) override;
 };
 
 } // namespace downloader

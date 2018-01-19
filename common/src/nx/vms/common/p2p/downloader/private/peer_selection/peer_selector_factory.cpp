@@ -12,20 +12,21 @@ namespace downloader {
 namespace peer_selection {
 
 namespace {
+
 using namespace impl;
 
 static AbstractPeerSelectorPtr createPeerSelector(
-    FileInformation::PeerPolicy peerPolicy,
+    FileInformation::PeerSelectionPolicy peerPolicy,
     QnCommonModule* commonModule)
 {
     switch (peerPolicy)
     {
-        case FileInformation::PeerPolicy::urlOnly:
+        case FileInformation::PeerSelectionPolicy::none:
             return EmptyPeerSelector::create();
-        case FileInformation::PeerPolicy::byPlatform:
+        case FileInformation::PeerSelectionPolicy::byPlatform:
             return ByPlatformPeerSelector::create(
                 commonModule->moduleInformation().systemInformation);
-        case FileInformation::PeerPolicy::all:
+        case FileInformation::PeerSelectionPolicy::all:
             return AllPeerSelector::create();
         default:
             return AbstractPeerSelectorPtr();
@@ -37,7 +38,7 @@ static AbstractPeerSelectorPtr createPeerSelector(
 PeerSelectorFactoryFactoryFunc PeerSelectorFactory::m_peerSelectorFactoryFactoryFunc = nullptr;
 
 AbstractPeerSelectorPtr PeerSelectorFactory::create(
-    FileInformation::PeerPolicy peerPolicy,
+    FileInformation::PeerSelectionPolicy peerPolicy,
     QnCommonModule* commonModule)
 {
     if (m_peerSelectorFactoryFactoryFunc != nullptr)

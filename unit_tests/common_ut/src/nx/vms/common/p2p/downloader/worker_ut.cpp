@@ -91,7 +91,7 @@ protected:
         NX_ASSERT(workingDirectory.removeRecursively());
     }
 
-    TestPeerManager::FileInformation createTestFile(
+    TestPeerManager::TestFileInformation createTestFile(
         const QString& fileName = kTestFileName, qint64 size = kTestFileSize)
     {
         const QFileInfo fileInfo(workingDirectory.absoluteFilePath(fileName));
@@ -101,13 +101,13 @@ protected:
             if (!QDir().mkpath(directory.absolutePath()))
             {
                 NX_ASSERT("Cannot create directory for test file.");
-                return TestPeerManager::FileInformation();
+                return TestPeerManager::TestFileInformation();
             }
         }
 
         utils::createRandomFile(fileInfo.absoluteFilePath(), size);
 
-        TestPeerManager::FileInformation testFileInfo(kTestFileName);
+        TestPeerManager::TestFileInformation testFileInfo(kTestFileName);
         testFileInfo.filePath = workingDirectory.absoluteFilePath(fileName);
         testFileInfo.chunkSize = kChunkSize;
         testFileInfo.size = kTestFileSize;
@@ -117,7 +117,7 @@ protected:
         if (testFileInfo.md5.isEmpty())
         {
             NX_ASSERT("Cannot calculate md5 for file.");
-            return TestPeerManager::FileInformation();
+            return TestPeerManager::TestFileInformation();
         }
         testFileInfo.downloadedChunks.resize(
             Storage::calculateChunkCount(testFileInfo.size, testFileInfo.chunkSize));
@@ -148,7 +148,7 @@ protected:
         return peer;
     }
 
-    QnUuid addPeerWithFile(const TestPeerManager::FileInformation& fileInformation)
+    QnUuid addPeerWithFile(const TestPeerManager::TestFileInformation& fileInformation)
     {
         const auto peerId = commonPeerManager->addPeer();
         commonPeerManager->setFileInformation(peerId, fileInformation);

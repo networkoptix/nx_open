@@ -153,6 +153,11 @@ public:
         const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
+    void doHead(const nx::utils::Url& url);
+    void doHead(
+        const nx::utils::Url& url,
+        nx::utils::MoveOnlyFunc<void()> completionHandler);
+
     /**
      * Start POST request to url.
      * @return true, if socket is created and async connect is started. false otherwise
