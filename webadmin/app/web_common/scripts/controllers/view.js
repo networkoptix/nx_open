@@ -323,16 +323,8 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         if($scope.betaMode && window.chrome){
-            voiceControl.initControls($scope.cameraLinks, $scope.switchPlaying,
-                                      $scope.switchPosition, $scope);
-            $scope.$watch('voiceControls.enabled', function(){
-                if($scope.voiceControls.enabled){
-                    voiceControl.startListening();
-                }
-                else{
-                    voiceControl.stopListening();
-                }
-            });
+            $scope.voiceControls = {enabled:true,showCommands:true};
+            voiceControl.initControls($scope);
         }
 
         //On player error update source to cause player to restart

@@ -570,6 +570,21 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
+/* Voice controls */
+.voice-panel{
+  max-width: 200px;
+}
+.no-wrap{
+  white-space: nowrap;
+}
+.voice-panel-text{
+  color: $light6;
+}
+.transcript{
+  max-height: 120px;
+  overflow: hidden;
+}
+
 /* View */
 
 .view{
@@ -783,6 +798,9 @@ table.webclient-window>tbody>tr>td{
     &:hover{
       background-color: $light16;
     }
+  }
+  .voice-active{
+    color: red;
   }
 }
 

@@ -1,12 +1,22 @@
-<div class="camera-links-panel night-mode">
+<div class="camera-links-panel voice-panel night-mode">
     <div ng-click="voiceControls.showCommands = false" class="pull-right">
         <span class="glyphicon glyphicon-remove"></span>
     </div>
-    <div class='camera-links-title'>Voice Commands</div>
+    <div class="camera-links-title">Voice Settings</div>
+    <div class="voice-panel-text">
+        <label for="voiceControls">Enable Voice Controls:&nbsp;</label>
+        <input type="checkbox" id="voiceControls" ng-model="voiceControls.enabled">
+    </div>
+    <div class="camera-links-break"></div>
+    <div class='camera-links-title'>List of Voice Commands</div>
     <table>
-        <tr ng-repeat="(command, text) in commands">
-            <td>{{command}}</td>
-            <td class="camera-links-info" style="white-space: nowrap">{{text}}</td>
+        <tr ng-repeat="command in commands" class="no-wrap">
+            <td class="text-center">{{command}}</td>
         </tr>
     </table>
+    <div class="camera-links-break" ng-if="voiceControls.lastCommand"></div>
+    <div class='camera-links-title' ng-if="voiceControls.lastCommand">Transcript</div>
+    <div class="voice-panel-text transcript" ng-if="voiceControls.lastCommand">{{voiceControls.lastCommand}}</div>
+    <div class="camera-links-break"></div>
+    <div class="text-center camera-links-title video-settings-button" ng-mousedown="pushToTalk()" ng-mouseup="stopListening()">Push To Talk</div>
 </div>

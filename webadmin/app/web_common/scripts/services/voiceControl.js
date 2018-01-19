@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('nxCommon')
-    .directive('voiceControl', function () {
+    .directive('voiceControl', ['voiceControl', function (voiceControl) {
         return{
         	restrict: 'E',
         	scope:{
@@ -10,9 +10,16 @@ angular.module('nxCommon')
         	templateUrl: Config.viewsDirCommon + 'components/voiceControl.html',
         	link: function(scope, element){
 		        scope.commands = L.common.voiceCommands;
+		        scope.pushToTalk = function(){
+                    voiceControl.startListening(true);
+		        };
+
+		        scope.stopListening = function(){
+		            voiceControl.stopListening();
+		        };
         	}
         };
-    })
+    }])
     .service('voiceControl', function () {
         if(!window.chrome){
             return;
@@ -25,10 +32,15 @@ angular.module('nxCommon')
 	    var recognition = new SpeechRecognition();
 	    recognition.continuous = true;
 	    recognition.lang = 'en-US';
-	    this.playerAPI = null;
-	    this.cameraLinks = null;
 
-	    this.startListening = function() {
+	    this.startListening = function(pushToTalk) {
+	        if(pushToTalk){
+	            recognition.continuous = false;
+	            self.viewScope.voiceControls.enabled = false;
+	        }
+	        else{
+	            recognition.continuous = true;
+	        }
             recognition.start();
             //console.log('Ready to listen.');
         };
@@ -38,11 +50,16 @@ angular.module('nxCommon')
             //console.log("Stop listening.");
         };
 
-        this.initControls = function(cameraDetails, switchPlaying, switchPosition, viewScope){
-            this.cameraDetails = cameraDetails;
-            this.switchPlaying = switchPlaying;
-            this.switchPosition = switchPosition;
+        this.initControls = function(viewScope){
             this.viewScope = viewScope;
+            this.viewScope.$watch('voiceControls.enabled', function(){
+                if(self.viewScope.voiceControls.enabled){
+                    self.startListening();
+                }
+                else{
+                    self.stopListening();
+                }
+            });
         };
 
         recognition.onresult = function(event) {
@@ -55,15 +72,15 @@ angular.module('nxCommon')
                 "play": /^(play|continue|start|go on)/im,
                 "pause": /^(pause|stop|end|wait)/im,
                 "live": /^(live|go to live|jump to live|show me live)/im,
-                "open server": /^(open|uncollapse)\ server/im,
-                "close server": /^(close|collapse)\ server/im,
-                "open all servers": /open (all|servers)/i,
-                "close all servers": /close (all|servers)/i,
-                "open details": /^(open details|show details|open panel|open camera links)/im,
-                "close details": /^(close details|hide details|close panel|hide panel)/im,
+                "expand server": /^(open|expand)\ server/im,
+                "collapse server": /^(close|collapse)\ server/im,
+                "expand all servers": /(open|expand) (all|servers)/i,
+                "collapse all servers": /(close|collapse) (all|servers)/i,
+                "open camera details": /^(open details|show details|open panel|open camera links)/im,
+                "close camera details": /^(close details|hide details|close panel|hide panel)/im,
                 "clear search": /^(clear|empty)\ search/im,
                 "search": /^(search for|look for|find)/im,
-                "select": /^(select|choose|use|switch to)\ camera/im,
+                "view": /^(select|choose|use|switch to|view)/im,
                 "help": /^(help|show commands)/im
             };
             var command = null;
@@ -73,35 +90,36 @@ angular.module('nxCommon')
                     break;
                 }
             }
+            self.viewScope.voiceControls.lastCommand = text;
             text = text.replace(voicePatterns[command], '');
             switch(command){
                 case "play":
-                    self.switchPlaying(true);
+                    self.viewScope.switchPlaying(true);
                     break;
                 case "pause":
-                    self.switchPlaying(false);
+                    self.viewScope.switchPlaying(false);
                     break;
                 case "live":
-                    self.switchPosition();
+                    self.viewScope.switchPosition();
                     break;
-                case "open server":
+                case "expand server":
                     var serverName = text.replace(/ /g,'').toLowerCase();
                     self.viewScope.camerasProvider.collapseServer(serverName, false);
                     break;
-                case "close server":
+                case "collapse server":
                     var serverName = text.replace(/ /g,'').toLowerCase();
                     self.viewScope.camerasProvider.collapseServer(serverName, true);
                     break;
-                case "open details":
-                    self.cameraDetails.enabled = true;
+                case "open camera details":
+                    self.viewScope.cameraLinks.enabled = true;
                     break;
-                case "close details":
-                    self.cameraDetails.enabled = false;
+                case "close camera details":
+                    self.viewScope.cameraLinks.enabled = false;
                     break;
-                case "open all servers":
+                case "expand all servers":
                     self.viewScope.camerasProvider.collapseAllServers(false);
                     break;
-                case "close all servers":
+                case "collapse all servers":
                     self.viewScope.camerasProvider.collapseAllServers(true);
                     break;
                 case "search":
@@ -110,7 +128,7 @@ angular.module('nxCommon')
                 case "clear search":
                     self.viewScope.searchCams = "";
                     break;
-                case "select":
+                case "view":
                     var cameraName = text.replace(/ /g,'').toLowerCase();
                     if(cameraName){
                         var camera = self.viewScope.camerasProvider.getFirstAvailableCamera(cameraName);
@@ -130,6 +148,7 @@ angular.module('nxCommon')
                     self.viewScope.voiceControls.showCommands = true
                     break;
                 default:
+                    self.viewScope.voiceControls.lastCommand = "Did not recognize command";
                     console.log("Did not recognize command");
                     break
             }
@@ -138,6 +157,7 @@ angular.module('nxCommon')
             recognition.stop();
         };
         recognition.onerror = function(event) {
+            self.viewScope.voiceControls.enabled = false;
             console.log('Error occurred in recognition: %s', event.error);
         };
     });
