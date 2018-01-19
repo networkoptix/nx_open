@@ -75,6 +75,8 @@ private:
             const Hanwha::DriverManifest& driverManifest,
             const QUrl& url,
             const QAuthenticator& auth);
+
+        void setResourceAccess(const QUrl& url, const QAuthenticator& auth);
     };
 
 private:

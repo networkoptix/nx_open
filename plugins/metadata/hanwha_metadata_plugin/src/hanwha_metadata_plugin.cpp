@@ -15,6 +15,7 @@
 #include <plugins/resource/hanwha/hanwha_request_helper.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace mediaserver {
@@ -50,9 +51,17 @@ HanwhaMetadataPlugin::SharedResources::SharedResources(
     sharedContext->setRecourceAccess(url, auth);
 }
 
+void HanwhaMetadataPlugin::SharedResources::setResourceAccess(
+    const QUrl& url,
+    const QAuthenticator& auth)
+{
+    sharedContext->setRecourceAccess(url, auth);
+    monitor->setResourceAccess(url, auth);
+}
+
 HanwhaMetadataPlugin::HanwhaMetadataPlugin()
 {
-    QFile f(":manifest.json");
+    QFile f(":/hanwha/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
     m_driverManifest = QJson::deserialized<Hanwha::DriverManifest>(m_manifest);
@@ -124,7 +133,12 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
         return nullptr;
 
     auto sharedRes = sharedResources(resourceInfo);
-    ++sharedRes->managerCounter;
+    auto sharedResourceGuard = makeScopeGuard(
+        [&sharedRes, &resourceInfo, this]()
+        {
+            if (sharedRes->managerCounter == 0)
+                m_sharedResources.remove(QString::fromUtf8(resourceInfo.sharedId));
+        });
 
     auto supportedEvents = fetchSupportedEvents(resourceInfo);
     if (!supportedEvents)
@@ -137,6 +151,8 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
     manager->setResourceInfo(resourceInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
+
+    ++sharedRes->managerCounter;
 
     return manager;
 }
@@ -303,6 +319,10 @@ std::shared_ptr<HanwhaMetadataPlugin::SharedResources> HanwhaMetadataPlugin::sha
                 driverManifest(),
                 url,
                 auth));
+    }
+    else
+    {
+        sharedResourcesItr.value()->setResourceAccess(url, auth);
     }
 
     return sharedResourcesItr.value();

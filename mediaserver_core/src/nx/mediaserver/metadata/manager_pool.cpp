@@ -29,6 +29,7 @@ ResourceMetadataContext::ResourceMetadataContext(
     AbstractMetadataManager* metadataManager,
     AbstractMetadataHandler* metadataHandler)
 :
+    handler(metadataHandler),
     manager(
         metadataManager,
         ManagerDeleter(
@@ -36,8 +37,7 @@ ResourceMetadataContext::ResourceMetadataContext(
             {
                 metadataManager->stopFetchingMetadata();
                 metadataManager->releaseRef();
-            })),
-    handler(metadataHandler)
+            }))
 {
 }
 

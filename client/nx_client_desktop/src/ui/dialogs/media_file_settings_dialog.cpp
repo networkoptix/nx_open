@@ -16,7 +16,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 
-#include <utils/ffmpeg_image_provider.h>
+#include <nx/client/desktop/image_providers/ffmpeg_image_provider.h>
 
 
 QnMediaFileSettingsDialog::QnMediaFileSettingsDialog(QWidget* parent):
@@ -47,7 +47,7 @@ void QnMediaFileSettingsDialog::updateFromResource(const QnMediaResourcePtr& res
     if (resourcePtr->hasFlags(Qn::still_image))
         m_imageProvider.reset(new QnBasicImageProvider(QImage(resourcePtr->getUrl()), this));
     else
-        m_imageProvider.reset(new QnFfmpegImageProvider(resourcePtr, this));
+        m_imageProvider.reset(new nx::client::desktop::FfmpegImageProvider(resourcePtr, this));
 
     m_imageProvider->loadAsync();
 

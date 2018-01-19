@@ -21,7 +21,7 @@ SYSTEMDTARGET=/etc/systemd/system
 FINALNAME=@artifact.name.server@
 UPDATE_NAME=@artifact.name.server_update@.zip
 
-STAGEBASE=deb
+STAGEBASE=stagebase
 STAGE=$STAGEBASE/$FINALNAME
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
@@ -81,10 +81,10 @@ buildDistribution()
 
     # Copy mediaserver plugins.
     local PLUGIN_FILENAME
-    local -r PLUGINS=( hikvision_metadata_plugin )
+    local PLUGINS=( hikvision_metadata_plugin )
     if [ "$COMPANY_NAME" == "hanwha" ]
     then
-        PLUGINS+=( hanwha_metadata__plugin )
+        PLUGINS+=( hanwha_metadata_plugin )
     fi
     for PLUGIN in "${PLUGINS[@]}"
     do
@@ -193,6 +193,14 @@ buildDistribution()
 
     echo "Generating finalname-server.properties"
     echo "server.finalName=$FINALNAME" >> finalname-server.properties
+
+    # Copying filtered resources.
+    local RESOURCE
+    for RESOURCE in "deb"/*
+    do
+        echo "Copying filtered $(basename "$RESOURCE")"
+        cp -r "$RESOURCE" "$STAGEBASE/"
+    done
 
     echo "Creating .zip $UPDATE_NAME"
     (cd $STAGEBASE

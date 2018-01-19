@@ -128,7 +128,6 @@
 #include <rest/handlers/crash_server_handler.h>
 #include <rest/handlers/external_event_rest_handler.h>
 #include <rest/handlers/favicon_rest_handler.h>
-#include <rest/handlers/image_rest_handler.h>
 #include <rest/handlers/log_rest_handler.h>
 #include <rest/handlers/manual_camera_addition_rest_handler.h>
 #include <rest/handlers/ping_rest_handler.h>
@@ -187,6 +186,7 @@
 #include <rest/handlers/downloads_rest_handler.h>
 #include <rest/handlers/get_hardware_ids_rest_handler.h>
 #include <rest/handlers/multiserver_get_hardware_ids_rest_handler.h>
+#include <rest/handlers/wearable_camera_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -287,6 +287,8 @@
 #if defined(__arm__)
     #include "nx1/info.h"
 #endif
+
+#include "ini.h"
 
 
 using namespace nx;
@@ -1179,6 +1181,8 @@ void MediaServerProcess::stopObjects()
 
     qnNormalStorageMan->cancelRebuildCatalogAsync();
     qnBackupStorageMan->cancelRebuildCatalogAsync();
+    qnNormalStorageMan->stopAsyncTasks();
+    qnBackupStorageMan->stopAsyncTasks();
 
     if (qnFileDeletor)
         qnFileDeletor->stop();
@@ -1276,10 +1280,11 @@ void MediaServerProcess::updateAddressesList()
         serverAddresses.begin(), serverAddresses.end()));
 }
 
-void MediaServerProcess::loadResourcesFromECS(
+void MediaServerProcess::loadResourcesFromEc(
     ec2::AbstractECConnectionPtr ec2Connection,
-    QnCommonMessageProcessor* messageProcessor)
+    QnServerMessageProcessor* serverMessageProcessor)
 {
+    QnCommonMessageProcessor* messageProcessor = serverMessageProcessor;
     ec2::ErrorCode rez;
     {
         //reading servers list
@@ -1327,7 +1332,7 @@ void MediaServerProcess::loadResourcesFromECS(
             const auto dictionary = commonModule()->serverAdditionalAddressesDictionary();
             dictionary->setAdditionalUrls(mediaServer.id, additionalAddresses);
             dictionary->setIgnoredUrls(mediaServer.id, ignoredAddressesById.values(mediaServer.id));
-            messageProcessor->updateResource(mediaServer, ec2::NotificationSource::Local);
+            commonModule()->messageProcessor()->updateResource(mediaServer, ec2::NotificationSource::Local);
         }
         do {
             if (needToStop())
@@ -1547,9 +1552,7 @@ void MediaServerProcess::loadResourcesFromECS(
             messageProcessor->on_licenseChanged(license);
     }
 
-    // Start receiving local notifications
-    auto processor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
-    processor->startReceivingLocalNotifications(ec2Connection);
+    serverMessageProcessor->startReceivingLocalNotifications(ec2Connection);
 }
 
 void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
@@ -1803,8 +1806,9 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getCameraParam", new QnCameraSettingsRestHandler());
     reg("api/setCameraParam", new QnCameraSettingsRestHandler());
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
+    if(ini().enableWearableCameras)
+        reg("api/wearableCamera", new QnWearableCameraRestHandler());
     reg("api/ptz", new QnPtzRestHandler());
-    reg("api/image", new QnImageRestHandler()); //< deprecated
     reg("api/createEvent", new QnExternalEventRestHandler());
     static const char kGetTimePath[] = "api/gettime";
     reg(kGetTimePath, new QnTimeRestHandler());
@@ -2171,10 +2175,17 @@ void MediaServerProcess::initPublicIpDiscovery()
     m_ipDiscovery->update();
     m_ipDiscovery->waitForFinished();
     at_updatePublicAddress(m_ipDiscovery->publicIP());
+}
 
+void MediaServerProcess::initPublicIpDiscoveryUpdate()
+{
     m_updatePiblicIpTimer.reset(new QTimer());
-    connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::update);
-    connect(m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
+    connect(m_updatePiblicIpTimer.get(), &QTimer::timeout,
+        m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::update);
+
+    connect(m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::found,
+        this, &MediaServerProcess::at_updatePublicAddress);
+
     m_updatePiblicIpTimer->start(kPublicIpUpdateTimeoutMs);
 }
 
@@ -2606,7 +2617,7 @@ void MediaServerProcess::run()
         nx::utils::AppInfo::productName().toUtf8(), "US",
         nx::utils::AppInfo::organizationName().toUtf8());
 
-    commonModule()->createMessageProcessor<QnServerMessageProcessor>();
+    auto messageProcessor = commonModule()->createMessageProcessor<QnServerMessageProcessor>();
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer(commonModule()) );
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb(commonModule()));
     auto auditManager = std::make_unique<QnMServerAuditManager>(
@@ -2743,6 +2754,7 @@ void MediaServerProcess::run()
             case Qn::IncompatibleVersionConnectionResult:
             case Qn::IncompatibleProtocolConnectionResult:
                 NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
+                stopObjects();
                 return;
             default:
                 break;
@@ -2764,7 +2776,10 @@ void MediaServerProcess::run()
         this, &MediaServerProcess::at_runtimeInfoChanged, Qt::QueuedConnection);
 
     if (needToStop())
+    {
+        stopObjects();
         return; //TODO #ak correctly deinitialize what has been initialised
+    }
 
     qnServerModule->roSettings()->setValue(QnServer::kRemoveDbParamName, "0");
 
@@ -2774,6 +2789,7 @@ void MediaServerProcess::run()
     if (qnServerModule->roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes")
     {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
+        stopObjects();
         nx::SystemName systemName(connectInfo.systemName);
         systemName.saveToConfig(); //< migrate system name from foreign database via config
         nx::ServerSetting::setSysIdTime(0);
@@ -2846,7 +2862,10 @@ void MediaServerProcess::run()
     }
 
     if (needToStop())
+    {
+        stopObjects();
         return;
+    }
 
     if (qnServerModule->roSettings()->value("disableTranscoding").toBool())
         commonModule()->setTranscodeDisabled(true);
@@ -2859,6 +2878,7 @@ void MediaServerProcess::run()
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
+        stopObjects();
         return;
     }
 
@@ -2871,8 +2891,7 @@ void MediaServerProcess::run()
     m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>(
         &QnUniversalRequestProcessor::isProxy,
         ec2ConnectionFactory->messageBus());
-    auto processor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
-    processor->registerProxySender(m_universalTcpListener);
+    messageProcessor->registerProxySender(m_universalTcpListener);
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 
@@ -3054,9 +3073,10 @@ void MediaServerProcess::run()
 
     commonModule()->resourceAccessManager()->beginUpdate();
     commonModule()->resourceAccessProvider()->beginUpdate();
-    loadResourcesFromECS(ec2Connection, commonModule()->messageProcessor());
+    loadResourcesFromEc(ec2Connection, messageProcessor);
     qnServerModule->metadataManagerPool()->init();
     at_runtimeInfoChanged(runtimeManager->localInfo());
+    initPublicIpDiscoveryUpdate();
 
     saveServerInfo(m_mediaServer);
     m_mediaServer->setStatus(Qn::Online);
@@ -3303,9 +3323,6 @@ void MediaServerProcess::run()
 
     motionHelper.reset();
 
-    qnNormalStorageMan->stopAsyncTasks();
-    qnBackupStorageMan->stopAsyncTasks();
-
     //ptzPool.reset();
 
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
@@ -3347,7 +3364,7 @@ void MediaServerProcess::at_appStarted()
     if (isStopping())
         return;
 
-    commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
+    commonModule()->ec2Connection()->startReceivingNotifications();
     m_crashReporter->scanAndReportByTimer(qnServerModule->runTimeSettings());
 
     QString dataLocation = getDataDirectory();

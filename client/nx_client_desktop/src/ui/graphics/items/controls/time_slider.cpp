@@ -3453,7 +3453,7 @@ void QnTimeSlider::dragMove(DragInfo* info)
             [this]()
             {
                 const auto redragCallback = [this]() { dragProcessor()->redrag(); };
-                executeDelayedParented(redragCallback, kDefaultDelay, this);
+                executeDelayedParented(redragCallback, this);
             };
 
         if (left < 0)

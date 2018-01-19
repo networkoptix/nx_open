@@ -11,7 +11,7 @@
 
 #include <common/common_globals.h>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 #include <core/resource_access/resource_access_filter.h>
 

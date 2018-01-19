@@ -7,8 +7,6 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
-#include <camera/camera_thumbnail_manager.h>
-#include <camera/single_thumbnail_loader.h>
 #include <camera/thumbnails_loader.h>
 #include <client/client_settings.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
@@ -20,9 +18,10 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/file_system.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/client/desktop/utils/layout_thumbnail_loader.h>
-#include <nx/client/desktop/utils/proxy_image_provider.h>
+#include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
+#include <nx/client/desktop/image_providers/proxy_image_provider.h>
 #include <nx/client/desktop/utils/transcoding_image_processor.h>
+#include <nx/client/desktop/image_providers/resource_thumbnail_provider.h>
 
 namespace {
 
@@ -236,11 +235,7 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     m_mediaImageProvider.reset();
     m_fullFrameSize = QSize();
 
-    if (const auto camera = media->toResourcePtr().dynamicCast<QnVirtualCameraResource>())
-        setCamera(camera);
-    else
-        setLocalFile(media);
-
+    updateThumbnail(media);
     validateSettings(Mode::Media);
     updateMediaImageProcessor();
 
@@ -251,70 +246,21 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     m_mediaImageProvider->loadAsync();
 }
 
-void ExportSettingsDialog::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
+void ExportSettingsDialog::Private::updateThumbnail(const QnMediaResourcePtr& resource)
 {
-    setFrameSize(QnCameraThumbnailManager::sizeHintForCamera(camera, QSize()));
-
     m_mediaImageProvider.reset(new ProxyImageProvider());
 
-    m_mediaImageProvider->setSourceProvider(new QnSingleThumbnailLoader(
-        camera,
-        m_exportMediaSettings.timePeriod.startTimeMs,
-        0,
-        QSize(),
-        QnThumbnailRequestData::JpgFormat,
-        QnThumbnailRequestData::AspectRatio::SourceAspectRatio,
-        QnThumbnailRequestData::RoundMethod::PreciseMethod,
+    api::ResourceImageRequest request;
+    request.resource = resource->toResourcePtr();
+    request.msecSinceEpoch = m_exportMediaSettings.timePeriod.startTimeMs;
+    request.aspectRatio = api::ImageRequest::AspectRatio::source;
+    request.roundMethod = api::ImageRequest::RoundMethod::precise;
+
+    m_mediaImageProvider->setSourceProvider(new ResourceThumbnailProvider(request,
         m_mediaImageProvider.data()));
 
     connect(m_mediaImageProvider.data(), &QnImageProvider::sizeHintChanged,
         this, &Private::setFrameSize);
-}
-
-void ExportSettingsDialog::Private::setLocalFile(const QnMediaResourcePtr& other)
-{
-    // TODO: #vkutin #gdm Do not use QnThumbnailsLoader here,
-    // implement QnSingleLocalThumbnailLoader as image provider
-    // or better support local files in QnSingleThumbnailLoader.
-
-    if (!QnThumbnailsLoader::supportedResource(other))
-    {
-        NX_ASSERT(false, Q_FUNC_INFO, "Incompatible media resource.");
-        return;
-    }
-
-    m_mediaImageProvider.reset(new ProxyImageProvider());
-
-    const auto startTimeMs = m_exportMediaSettings.timePeriod.startTimeMs;
-    static constexpr auto kSensibleDurationMs = 1000;
-
-    const auto loader = new QnThumbnailsLoader(other);
-    loader->setTimePeriod(QnTimePeriod(startTimeMs, kSensibleDurationMs));
-    loader->setTimeStep(kSensibleDurationMs);
-    loader->setBoundingSize(m_previewSize);
-
-    connect(loader, &QnThumbnailsLoader::thumbnailLoaded, this,
-        [this, loader = QPointer<QnThumbnailsLoader>(loader)](const QnThumbnail& thumbnail)
-        {
-            if (!loader)
-                return;
-
-            // At this point we can update frame size.
-            setFrameSize(loader->sourceSize());
-
-            // Delete old source provider after setting a new one.
-            QScopedPointer<QnImageProvider> oldSource(m_mediaImageProvider->sourceProvider());
-
-            // Set new source provider.
-            m_mediaImageProvider->setSourceProvider(new QnBasicImageProvider(
-                thumbnail.image(), m_mediaImageProvider.data()));
-
-            // We don't need more than one thumbnail.
-            loader->stop();
-            loader->disconnect(this);
-        });
-
-    loader->start();
 }
 
 void ExportSettingsDialog::Private::setFrameSize(const QSize& size)
@@ -354,7 +300,6 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
 
     m_layoutImageProvider.reset(new LayoutThumbnailLoader(
         layout,
-        /*allowNonCameraResources*/ false,
         m_previewSize,
         m_exportLayoutSettings.period.startTimeMs));
 

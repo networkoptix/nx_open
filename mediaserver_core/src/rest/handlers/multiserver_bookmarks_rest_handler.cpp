@@ -44,7 +44,7 @@ static int checkPermissions(
     {
         if (QnPermissionsHelper::isSafeMode(commonModule))
         {
-            const QnMultiserverRequestData request(commonModule->resourcePool(), params);
+            const QnBaseMultiserverRequestData request(params);
             return QnPermissionsHelper::safeModeError(
                 *outBody, *outContentType, request.format, request.extraFormatting);
         }
@@ -53,7 +53,7 @@ static int checkPermissions(
     if (!commonModule->resourceAccessManager()->hasGlobalPermission(
         processor->accessRights(), requiredPermission))
     {
-        const QnMultiserverRequestData request(commonModule->resourcePool(), params);
+        const QnBaseMultiserverRequestData request(params);
         return QnPermissionsHelper::permissionsError(
             *outBody, *outContentType, request.format, request.extraFormatting);
     }

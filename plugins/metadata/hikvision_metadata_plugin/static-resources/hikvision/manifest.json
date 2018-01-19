@@ -1,0 +1,285 @@
+{
+    "driverId": "{55C9D815-D25E-4638-98E5-40DDBAFEB98E}",
+    "driverName": {
+        "value": "Hikvision metadata driver",
+        "localization": {
+        }
+    },
+    "outputEventTypes": [
+
+        {
+            "eventTypeId": "{98FF85DC-F4CA-4254-BEA5-4204AD9E82BD}",
+            "eventName": {
+                "value": "Loitering detected",
+                "localization": {
+                }
+            },
+
+            "internalName": "loitering",
+            "description": "Loitering %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
+		
+        {
+            "eventTypeId": "{4168BB12-3005-4855-A5A2-A5753C0894A0}",
+            "eventName": {
+                "value": "Intrusion detected",
+                "localization": {
+                }
+            },
+
+            "internalName": "fielddetection",
+            "description": "Intrusion %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
+
+        {
+            "eventTypeId": "{792319D0-EE91-41B9-A160-C21F4BB6689B}",
+            "eventName": {
+                "value": "Group detected",
+                "localization": {
+                }
+            },
+
+            "internalName": "group",
+            "description": "Group %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
+
+        {
+            "eventTypeId": "{183A9FE5-BC24-455B-A799-FA57ADBA9BA1}",
+            "eventName": {
+                "value": "Video loss detected",
+                "localization": {
+                }
+            },
+
+            "internalName": "videoloss",
+            "description": "videoloss %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
+
+        {
+            "eventTypeId": "{90630A08-05ED-4EF0-BAC4-245B9E21FC02}",
+            "eventName": {
+                "value": "Rapid move detected",
+                "localization": {
+                }
+            },
+
+            "internalName": "rapidMove",
+            "description": "Rapid move %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
+
+        {
+            "eventTypeId": "{958C6843-93FC-49BB-9C58-05A7D5ABF19C}",
+            "eventName": {
+                "value": "Parking detected",
+                "localization": {
+                }
+            },
+
+            "internalName": "parking",
+            "description": "Parking %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
+
+        {
+            "eventTypeId": "{97C0F367-854C-4B49-8CD5-36C38344D989}",
+            "eventName": {
+                "value": "Face detection",
+                "localization": {
+                }
+            },
+
+            "_": "Following fields belong to private plugin implementation.",
+            "internalName": "Face",
+            "description": "Face %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{BA6A2683-D0DF-4103-A7DA-832F9BB635F9}",
+            "eventName": {
+                "value": "Virtual line crossing",
+                "localization": {
+                }
+            },
+            "internalName": "LineDetect,linedetection",
+            "description": "Virtual line #%1 was crossed",
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": "#%1"
+        },
+        {
+            "eventTypeId": "{5574DD9E-AE30-4B84-9F20-A4DA1A843F48}",
+            "eventName": {
+                "value": "Entering the area",
+                "localization": {
+                }
+            },
+            "internalName": "RegionEntrance",
+            "description": "Object has entered %1",
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": " the region #%1"
+        },
+        {
+            "eventTypeId": "{99EE7514-FB88-481F-8445-FD86BD47CB22}",
+            "eventName": {
+                "value": "Exiting the area",
+                "localization": {
+                }
+            },
+            "internalName": "RegionExiting",
+            "description": "Object has exited %1",
+            "flags": "regionDependent | stateDependent",
+            "regionDescription": " the region #%1"
+        },
+        {
+            "eventTypeId": "{278BBB2E-F3FA-4520-8A35-486E5AF9569D}",
+            "eventName": {
+                "value": "Audio exception",
+                "localization": {
+                }
+            },
+            "internalName": "AudioException",
+            "description": "The audio volume level is %1 the threshold",
+            "positiveState": "above",
+            "negativeState": "below",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{9D7DF4C5-A0AD-43DB-ABF9-57E9A44B6BD1}",
+            "eventName": {
+                "value": "Tampering detection",
+                "localization": {
+                }
+            },
+            "internalName": "Tamper,shelteralarm",
+            "description": "Tampering %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{E1AEAB1C-3D77-41AA-9D59-0EBE187B73A2}",
+            "eventName": {
+                "value": "Defocusing detection",
+                "localization": {
+                }
+            },
+            "internalName": "Defocus",
+            "description": "Defocusing %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{9DFC725A-723B-4666-8A73-A93FFAC6B001}",
+            "eventName": {
+                "value": "Motion detection",
+                "localization": {
+                }
+            },
+            "internalName": "Motion,VMD",
+            "description": "Motion %1%2",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent | regionDependent",
+            "regionDescription": "  in the region #%1"
+        },
+        {
+            "eventTypeId": "{BE93937E-A24F-4CEE-9C51-B588DB672D4E}",
+            "eventName": {
+                "value": "Unattended baggage",
+                "localization": {
+                }
+            },
+            "internalName": "UnattendedBaggage",
+            "description": "Unattended baggage %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{6E62AA61-6308-467E-AF0D-C5DC34A86C42}",
+            "eventName": {
+                "value": "Attended baggage",
+                "localization": {
+                }
+            },
+            "internalName": "AttendedBaggage",
+            "description": "Attended baggage %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{6B8CF0F7-E6F0-4DAA-AD8E-7D43D6B174BF}",
+            "eventName": {
+                "value": "Scene changed",
+                "localization": {
+                }
+            },
+            "internalName": "SceneChange",
+            "description": "Scene has been changed",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{7DDF49F1-2B50-4FF9-9FB7-3898EAAB0FE2}",
+            "eventName": {
+                "value": "Attended baggage",
+                "localization": {
+                }
+            },
+            "internalName": "AttendedBaggage",
+            "description": "Attended baggage %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{349DA8B8-6F8A-4F8F-8CD9-3D34E1DC5651}",
+            "eventName": {
+                "value": "Black list",
+                "localization": {
+                }
+            },
+            "internalName": "BlackList",
+            "description": "Black list"
+        },
+        {
+            "eventTypeId": "{F61119D1-BA55-4731-A541-232CB611DB1E}",
+            "eventName": {
+                "value": "White list",
+                "localization": {
+                }
+            },
+            "internalName": "WhiteList",
+            "description": "White list"
+        },
+        {
+            "eventTypeId": "{4DAE9597-7A81-4A48-AEDC-37D5B184DB11}",
+            "eventName": {
+                "value": "Vehicle detected",
+                "localization": {
+                }
+            },
+            "internalName": "Vehicle",
+            "description": "Vehicle detected"
+        }
+    ]
+}

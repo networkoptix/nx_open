@@ -25,6 +25,7 @@ QList<QnPlatformMonitor::PartitionSpace> QnPlatformMonitor::totalPartitionSpaceI
     (QnPlatformMonitor::OpticalDiskPartition,  "optical")   \
     (QnPlatformMonitor::SwapPartition,         "swap")      \
     (QnPlatformMonitor::NetworkPartition,      "network")   \
+    (QnPlatformMonitor::RemovableDiskPartition,"usb")       \
     (QnPlatformMonitor::UnknownPartition,      "unknown")
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor, PartitionType, LEXICAL_VALUES_FOR_PT)

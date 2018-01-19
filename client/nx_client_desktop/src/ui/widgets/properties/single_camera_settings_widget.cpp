@@ -8,7 +8,7 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QDesktopServices>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <camera/fps_calculator.h>
 
 // TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
@@ -69,6 +69,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     m_sensitivityButtons(new QButtonGroup(this))
 {
     ui->setupUi(this);
+    ui->wearableUploadWidget->initializeContext(this);
     ui->licensingWidget->initializeContext(this);
     ui->cameraScheduleWidget->initializeContext(this);
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
@@ -241,6 +242,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     ui->advancedSettingsWidget->setCamera(camera);
     ui->cameraScheduleWidget->setCameras(cameras);
     ui->licensingWidget->setCameras(cameras);
+    ui->wearableUploadWidget->setCamera(camera);
 
     if (m_camera)
     {
@@ -514,7 +516,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         if (!silent)
         {
             const auto callback = [this]() { showMaxFpsWarningIfNeeded(); };
-            executeDelayedParented(callback, kDefaultDelay, this);
+            executeDelayedParented(callback, this);
         }
     }
 

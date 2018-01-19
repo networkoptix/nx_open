@@ -366,18 +366,6 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Könyvejlzők eltávolítása...</translation>
     </message>
     <message>
-      <source>Export Selected Area...</source>
-      <translation>Kijelölt terület exportálása...</translation>
-    </message>
-    <message>
-      <source>Export Multi-Video...</source>
-      <translation>Multi-videó exportálása...</translation>
-    </message>
-    <message>
-      <source>Export Rapid Review...</source>
-      <translation>Gyors áttekintés exportálása...</translation>
-    </message>
-    <message>
       <source>Preview Search...</source>
       <translation>Keresés előnézet...</translation>
     </message>
@@ -991,16 +979,16 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Hosszabb videó exportálására készül. Ez több gigabájtnyi merevlemez-területet igényelhet, és több percet vesz igénybe.</translation>
     </message>
     <message>
-      <source>Settings are not available for .EXE files.</source>
-      <translation>A beállítások nem állnak rendelkezésre az .EXE fájlokhoz.</translation>
-    </message>
-    <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
       <translation>A helyi fájlok, a szervermonitor widgetek és a weboldalak nem lesznek exportálva.</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
       <translation>Az exportált .EXE fájl mérete több mint 4 GB, és nem nyitható meg dupla kattintással a Windows rendszerben. Csak %1 kliensben játszható le.</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .NOV and .EXE files.</source>
+      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
     </message>
   </context>
   <context>
@@ -1113,9 +1101,11 @@ több könyvjelző megjelenítéséhez</translation>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation>
-        <numerusform>A fájlnév nem tartalmazhatja a következő fenntartott karaktereket: %1</numerusform>
-        <numerusform>A fájlnév nem tartalmazhatja a következő fenntartott karaktereket: %1</numerusform>
+      <translation type="unfinished">
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
       </translation>
     </message>
     <message>
@@ -1358,9 +1348,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
-        <numerusform>... és még %n</numerusform>
-        <numerusform>... és még %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -1476,37 +1466,37 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation>
-        <numerusform>Ezeket az eszközöket eltávolították a rendszerből</numerusform>
-        <numerusform>Ezeket az eszközöket eltávolították a rendszerből</numerusform>
+      <translation type="unfinished">
+        <numerusform>These devices are removed from System</numerusform>
+        <numerusform>These devices are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation>
-        <numerusform>Ezeket a kamerákat eltávolították a rendszerből</numerusform>
-        <numerusform>Ezeket a kamerákat eltávolították a rendszerből</numerusform>
+      <translation type="unfinished">
+        <numerusform>These cameras are removed from System</numerusform>
+        <numerusform>These cameras are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation>
-        <numerusform>Ezeket a szervereket eltávolították a rendszerből</numerusform>
-        <numerusform>Ezeket a szervereket eltávolították a rendszerből</numerusform>
+      <translation type="unfinished">
+        <numerusform>These servers are removed from System</numerusform>
+        <numerusform>These servers are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation>
-        <numerusform>Ezeket a felhasználókat eltávolították a rendszerből</numerusform>
-        <numerusform>Ezeket a felhasználókat eltávolították a rendszerből</numerusform>
+      <translation type="unfinished">
+        <numerusform>These users are removed from System</numerusform>
+        <numerusform>These users are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation>
-        <numerusform>Ezeket az erőforrásokat eltávolították a rendszerből</numerusform>
-        <numerusform>Ezeket az erőforrásokat eltávolították a rendszerből</numerusform>
+      <translation type="unfinished">
+        <numerusform>These resources are removed from System</numerusform>
+        <numerusform>These resources are removed from System</numerusform>
       </translation>
     </message>
     <message>
@@ -1586,9 +1576,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>%n action(s)</source>
-      <translation>
-        <numerusform>%n művelet</numerusform>
-        <numerusform>%n művelet</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n action(s)</numerusform>
+        <numerusform>%n action(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -1737,9 +1727,9 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation>
-        <numerusform>%n figyelmeztetése van</numerusform>
-        <numerusform>%n figyelmeztetése van</numerusform>
+      <translation type="unfinished">
+        <numerusform>You have %n notifications</numerusform>
+        <numerusform>You have %n notifications</numerusform>
       </translation>
     </message>
   </context>
@@ -1797,16 +1787,16 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation>
-        <numerusform>%1 a %n eszközből</numerusform>
-        <numerusform>%1 a %n eszközből</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 of %n devices</numerusform>
+        <numerusform>%1 of %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation>
-        <numerusform>%1 a %n kamerából</numerusform>
-        <numerusform>%1 a %n kamerából</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 of %n cameras</numerusform>
+        <numerusform>%1 of %n cameras</numerusform>
       </translation>
     </message>
     <message>
@@ -1819,9 +1809,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation>
-        <numerusform>%1 a %n I/O modulból</numerusform>
-        <numerusform>%1 a %n I/O modulból</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 of %n I/O modules</numerusform>
+        <numerusform>%1 of %n I/O modules</numerusform>
       </translation>
     </message>
     <message>
@@ -1844,9 +1834,9 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
-      <translation>
-        <numerusform>%n szerver</numerusform>
-        <numerusform>%n szerver</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Server(s)</numerusform>
+        <numerusform>%n Server(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -1883,9 +1873,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
-      <translation>
-        <numerusform>Forrás és még %n kamera</numerusform>
-        <numerusform>Forrás és még %n kamera</numerusform>
+      <translation type="unfinished">
+        <numerusform>Source and %n more cameras</numerusform>
+        <numerusform>Source and %n more cameras</numerusform>
       </translation>
     </message>
     <message>
@@ -2088,9 +2078,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation>
-        <numerusform>%n eszköz megtalálva</numerusform>
-        <numerusform>%n eszköz megtalálva</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n devices found</numerusform>
+        <numerusform>%n devices found</numerusform>
       </translation>
     </message>
     <message>
@@ -2124,9 +2114,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>%n devices added.</source>
-      <translation>
-        <numerusform>%n eszköz hozzáadva.</numerusform>
-        <numerusform>%n eszköz hozzáadva.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n devices added.</numerusform>
+        <numerusform>%n devices added.</numerusform>
       </translation>
     </message>
     <message>
@@ -2135,9 +2125,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation>
-        <numerusform>%n eszköz hozzáadása sikertelen</numerusform>
-        <numerusform>%n eszköz hozzáadása sikertelen</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to add %n devices</numerusform>
+        <numerusform>Failed to add %n devices</numerusform>
       </translation>
     </message>
     <message>
@@ -2234,9 +2224,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation>
-        <numerusform>%1 nem támogatja a kétirányú audio kapcsolatot</numerusform>
-        <numerusform>%1 nem támogatja a kétirányú audio kapcsolatot</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 does not support two-way audio</numerusform>
+        <numerusform>%1 does not support two-way audio</numerusform>
       </translation>
     </message>
   </context>
@@ -2353,9 +2343,9 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation>
-        <numerusform>%1 nem rendelkezik bemeneti porttal</numerusform>
-        <numerusform>%1 nem rendelkezik bemeneti porttal</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 have no input ports</numerusform>
+        <numerusform>%1 have no input ports</numerusform>
       </translation>
     </message>
   </context>
@@ -2393,16 +2383,16 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation>
-        <numerusform>%n eszköz megtalálva</numerusform>
-        <numerusform>%n eszköz megtalálva</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n devices found</numerusform>
+        <numerusform>%n devices found</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation>
-        <numerusform>%n kamera megtalálva</numerusform>
-        <numerusform>%n kamera megtalálva</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n cameras found</numerusform>
+        <numerusform>%n cameras found</numerusform>
       </translation>
     </message>
     <message>
@@ -2415,9 +2405,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation>
-        <numerusform>%n I/O modul megtalálva</numerusform>
-        <numerusform>%n I/O modul megtalálva</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n I/O modules found</numerusform>
+        <numerusform>%n I/O modules found</numerusform>
       </translation>
     </message>
     <message>
@@ -2509,9 +2499,9 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation>
-        <numerusform>%1 nem rendelkezik kimeneti relével</numerusform>
-        <numerusform>%1 nem rendelkezik kimeneti relével</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 have no output relays</numerusform>
+        <numerusform>%1 have no output relays</numerusform>
       </translation>
     </message>
   </context>
@@ -2688,23 +2678,23 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation>
-        <numerusform>A változások a következő %n eszközön nem lettek mentve:</numerusform>
-        <numerusform>A változások a következő %n eszközön nem lettek mentve:</numerusform>
+      <translation type="unfinished">
+        <numerusform>Changes to the following %n devices are not saved:</numerusform>
+        <numerusform>Changes to the following %n devices are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation>
-        <numerusform>A változások a következő %n kamerán nem lettek mentve:</numerusform>
-        <numerusform>A változások a következő %n kamerán nem lettek mentve:</numerusform>
+      <translation type="unfinished">
+        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation>
-        <numerusform>A változások a következő %n I/O modulon nem lettek mentve:</numerusform>
-        <numerusform>A változások a következő %n I/O modulon nem lettek mentve:</numerusform>
+      <translation type="unfinished">
+        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
       </translation>
     </message>
     <message>
@@ -2772,10 +2762,6 @@ bárhonnan, bármilyen
 eszközzel</translation>
     </message>
     <message>
-      <source>Known limitations</source>
-      <translation>Ismert korlátok</translation>
-    </message>
-    <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Szüntesse meg a kapcsolatot %1 felhővel</translation>
@@ -2806,11 +2792,6 @@ account</source>
 to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Csatlakozzon %1 felhőhöz</translation>
-    </message>
-    <message>
-      <source>%1 is in Beta.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 Beta verzió.</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
@@ -3330,16 +3311,16 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation>
-        <numerusform>Esemény naplóban %1 és %2 között - %n eseménytalálat</numerusform>
-        <numerusform>Esemény naplóban %1 és %2 között - %n eseménytalálat</numerusform>
+      <translation type="unfinished">
+        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
+        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation>
-        <numerusform>Eseménynapló %1- %n eseménytalálat</numerusform>
-        <numerusform>Eseménynapló %1- %n eseménytalálat</numerusform>
+      <translation type="unfinished">
+        <numerusform>Event log for %1 - %n event(s) found</numerusform>
+        <numerusform>Event log for %1 - %n event(s) found</numerusform>
       </translation>
     </message>
     <message>
@@ -3392,9 +3373,9 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n alkalom)</numerusform>
-        <numerusform>%1 (%n alkalom)</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 (%n times)</numerusform>
+        <numerusform>%1 (%n times)</numerusform>
       </translation>
     </message>
     <message>
@@ -3403,23 +3384,23 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation>
-        <numerusform>és még %n felhasználó...</numerusform>
-        <numerusform>és még %n felhasználó...</numerusform>
+      <translation type="unfinished">
+        <numerusform>and %n users more...</numerusform>
+        <numerusform>and %n users more...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation>
-        <numerusform>és még %n...</numerusform>
-        <numerusform>és még %n...</numerusform>
+      <translation type="unfinished">
+        <numerusform>and %n more...</numerusform>
+        <numerusform>and %n more...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation>
-        <numerusform>%n eltávolított tárgy</numerusform>
-        <numerusform>%n eltávolított tárgy</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n Removed subjects</numerusform>
       </translation>
     </message>
     <message>
@@ -3782,9 +3763,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation>
-        <numerusform>A teszt sikeresen lefutott: %n felhasználó megtalálva.</numerusform>
-        <numerusform>A teszt sikeresen lefutott: %n felhasználó megtalálva.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Test completed successfully: %n users found.</numerusform>
+        <numerusform>Test completed successfully: %n users found.</numerusform>
       </translation>
     </message>
   </context>
@@ -3952,9 +3933,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation>
-        <numerusform>A licenc %n nap múlva lejár</numerusform>
-        <numerusform>A licenc %n nap múlva lejár</numerusform>
+      <translation type="unfinished">
+        <numerusform>License expires in %n days</numerusform>
+        <numerusform>License expires in %n days</numerusform>
       </translation>
     </message>
     <message>
@@ -4046,16 +4027,16 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
-      <translation>
-        <numerusform>Legalább %n %1 szükséges</numerusform>
-        <numerusform>Legalább %n %1 szükséges</numerusform>
+      <translation type="unfinished">
+        <numerusform>At least %n %1 are required</numerusform>
+        <numerusform>At least %n %1 are required</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
-      <translation>
-        <numerusform>%n %1 használatban</numerusform>
-        <numerusform>%n %1 használatban</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n %1 are currently in use</numerusform>
+        <numerusform>%n %1 are currently in use</numerusform>
       </translation>
     </message>
     <message>
@@ -4064,9 +4045,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>Licenc deaktiválása?</numerusform>
-        <numerusform>Licenc deaktiválása?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
       </translation>
     </message>
     <message>
@@ -4075,23 +4056,23 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation>
-        <numerusform>%n licenc deaktiválása sikertelen</numerusform>
-        <numerusform>%n licenc deaktiválása sikertelen</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>Failed to deactivate %n licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation>
-        <numerusform>%1 a %n licencből ne deaktiválható</numerusform>
-        <numerusform>%1 a %n licencből ne deaktiválható</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>A licencek nem deaktiválhatók</numerusform>
-        <numerusform>A licencek nem deaktiválhatók</numerusform>
+      <translation type="unfinished">
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
       </translation>
     </message>
     <message>
@@ -4112,9 +4093,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation>
-        <numerusform>%n licenc deaktiválva</numerusform>
-        <numerusform>%n licenc deaktiválva</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n licenses deactivated</numerusform>
       </translation>
     </message>
     <message>
@@ -4127,9 +4108,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation>
-        <numerusform>%n csatorna.</numerusform>
-        <numerusform>%n csatorna.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n channels.</numerusform>
+        <numerusform>%n channels.</numerusform>
       </translation>
     </message>
     <message>
@@ -4138,9 +4119,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Még %n deaktiválása</numerusform>
-        <numerusform>Még %n deaktiválása</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
     <message>
@@ -4207,23 +4188,23 @@ to %1</source>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
-      <translation>
-        <numerusform>Licencek használata a kiválasztott %n eszközhöz</numerusform>
-        <numerusform>Licencek használata a kiválasztott %n eszközhöz</numerusform>
+      <translation type="unfinished">
+        <numerusform>Use licenses for selected %n devices</numerusform>
+        <numerusform>Use licenses for selected %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
-      <translation>
-        <numerusform>Licencek használata a kiválasztott %n kamerához</numerusform>
-        <numerusform>Licencek használata a kiválasztott %n kamerához</numerusform>
+      <translation type="unfinished">
+        <numerusform>Use licenses for selected %n cameras</numerusform>
+        <numerusform>Use licenses for selected %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
-      <translation>
-        <numerusform>Licencek használata a kiválasztott %n I/O modulhoz</numerusform>
-        <numerusform>Licencek használata a kiválasztott %n I/O modulhoz</numerusform>
+      <translation type="unfinished">
+        <numerusform>Use licenses for selected %n I/O modules</numerusform>
+        <numerusform>Use licenses for selected %n I/O modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4646,9 +4627,9 @@ to %1</source>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
       <source>%n more notifications</source>
-      <translation>
-        <numerusform>még %n értesítés</numerusform>
-        <numerusform>még %n értesítés</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n more notifications</numerusform>
+        <numerusform>%n more notifications</numerusform>
       </translation>
     </message>
   </context>
@@ -4844,23 +4825,23 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation>
-        <numerusform>Ez a preset aktiválva lesz %n perc inaktivitás után</numerusform>
-        <numerusform>Ez a preset aktiválva lesz %n perc inaktivitás után</numerusform>
+      <translation type="unfinished">
+        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation>
-        <numerusform>A túrának %n azonos pozíciója van</numerusform>
-        <numerusform>A túrának %n azonos pozíciója van</numerusform>
+      <translation type="unfinished">
+        <numerusform>Tour has %n identical positions</numerusform>
+        <numerusform>Tour has %n identical positions</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation>
-        <numerusform>nagyjából %n perc</numerusform>
-        <numerusform>nagyjából %n perc</numerusform>
+      <translation type="unfinished">
+        <numerusform>about %n minute(s)</numerusform>
+        <numerusform>about %n minute(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -5081,25 +5062,25 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
-        <numerusform>Összesen %1 %n eszköz</numerusform>
-        <numerusform>Összesen %1 %n eszköz</numerusform>
+      <translation type="unfinished">
+        <numerusform>Total %1 %n devices</numerusform>
+        <numerusform>Total %1 %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
-        <numerusform>Összesen %1 %n kamera</numerusform>
-        <numerusform>Összesen %1 %n kamera</numerusform>
+      <translation type="unfinished">
+        <numerusform>Total %1 %n cameras</numerusform>
+        <numerusform>Total %1 %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
-        <numerusform>Összesen %1 %n I/O modul</numerusform>
-        <numerusform>Összesen %1 %n I/O modul</numerusform>
+      <translation type="unfinished">
+        <numerusform>Total %1 %n I/O modules</numerusform>
+        <numerusform>Total %1 %n I/O modules</numerusform>
       </translation>
     </message>
     <message>
@@ -5153,9 +5134,9 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n/%1 szerepkörnek nincs %2 engedélye</numerusform>
-        <numerusform>%n/%1 szerepkörnek nincs %2 engedélye</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
       </translation>
     </message>
     <message>
@@ -5171,9 +5152,9 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n/%1 felhasználónak nincs %2 engedélye</numerusform>
-        <numerusform>%n/%1 felhasználónak nincs %2 engedélye</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
       </translation>
     </message>
   </context>
@@ -5428,9 +5409,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation>
-        <numerusform>%n szerver</numerusform>
-        <numerusform>%n szerver</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Servers</numerusform>
+        <numerusform>%n Servers</numerusform>
       </translation>
     </message>
   </context>
@@ -5450,9 +5431,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation>
-        <numerusform>%n felhasználó</numerusform>
-        <numerusform>%n felhasználó</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
       </translation>
     </message>
   </context>
@@ -5460,9 +5441,9 @@ to %1</source>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation>
-        <numerusform>még %n</numerusform>
-        <numerusform>még %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n additional</numerusform>
+        <numerusform>%n additional</numerusform>
       </translation>
     </message>
     <message>
@@ -5471,9 +5452,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation>
-        <numerusform>%n/%1 felhasználó e-mail címe érvénytelen</numerusform>
-        <numerusform>%n/%1 felhasználó e-mail címe érvénytelen</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>%n of %1 users have invalid email address</numerusform>
       </translation>
     </message>
     <message>
@@ -5482,9 +5463,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation>
-        <numerusform>%n/%1 további e-mail cím érvénytelen</numerusform>
-        <numerusform>%n/%1 további e-mail cím érvénytelen</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
       </translation>
     </message>
     <message>
@@ -5735,9 +5716,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
-      <translation>
-        <numerusform>Nincs elég hely %n szerveren:</numerusform>
-        <numerusform>Nincs elég hely %n szerveren:</numerusform>
+      <translation type="unfinished">
+        <numerusform>Not enough free space at %n Servers:</numerusform>
+        <numerusform>Not enough free space at %n Servers:</numerusform>
       </translation>
     </message>
     <message>
@@ -6141,7 +6122,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
       </translation>
@@ -6257,6 +6238,14 @@ to %1</source>
     <message>
       <source>Backup completed</source>
       <translation>Biztonsági mentés kész</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
+      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
     </message>
   </context>
   <context>
@@ -6672,12 +6661,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h:mm ap</translation>
+      <translation>hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>yyyy MMMM dd hh:mm ap</translation>
+      <translation>yyyy MMMM dd hh:mm</translation>
     </message>
   </context>
   <context>
@@ -6742,37 +6731,37 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
-      <translation>
-        <numerusform>A problémát a %n szerver okozza:</numerusform>
-        <numerusform>A problémát a %n szerver okozza:</numerusform>
+      <translation type="unfinished">
+        <numerusform>The problem is caused by %n servers:</numerusform>
+        <numerusform>The problem is caused by %n servers:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
-      <translation>
-        <numerusform>Nincs szabad hely a %n szerveren:</numerusform>
-        <numerusform>Nincs szabad hely a %n szerveren:</numerusform>
+      <translation type="unfinished">
+        <numerusform>No free space left on %n servers:</numerusform>
+        <numerusform>No free space left on %n servers:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
-      <translation>
-        <numerusform>A %n szerver nem válaszol:</numerusform>
-        <numerusform>A %n szerver nem válaszol:</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n servers are not responding:</numerusform>
+        <numerusform>%n servers are not responding:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
-      <translation>
-        <numerusform>A %n szerver nem elérhető:</numerusform>
-        <numerusform>A %n szerver nem elérhető:</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n servers have gone offline:</numerusform>
+        <numerusform>%n servers have gone offline:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
-      <translation>
-        <numerusform>Sikertelen bejelentkezés %n szerveren:</numerusform>
-        <numerusform>Sikertelen bejelentkezés %n szerveren:</numerusform>
+      <translation type="unfinished">
+        <numerusform>Authentication failed for %n servers:</numerusform>
+        <numerusform>Authentication failed for %n servers:</numerusform>
       </translation>
     </message>
     <message>
@@ -6919,9 +6908,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation>
-        <numerusform>Válasszon ki egy műveletet ezt a szerepkört használó %n felhasználó számára</numerusform>
-        <numerusform>Válasszon ki egy műveletet ezt a szerepkört használó %n felhasználó számára</numerusform>
+      <translation type="unfinished">
+        <numerusform>Please select an action to perform on %n users with this role</numerusform>
+        <numerusform>Please select an action to perform on %n users with this role</numerusform>
       </translation>
     </message>
   </context>
@@ -7114,9 +7103,9 @@ to %1</source>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation>
-        <numerusform>PC %1 - kijelző %2</numerusform>
-        <numerusform>PC %1 - kijelző %2</numerusform>
+      <translation type="unfinished">
+        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Displays %2</numerusform>
       </translation>
     </message>
   </context>
@@ -7192,9 +7181,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation>
-        <numerusform>Törli %n könyvjelzőt?</numerusform>
-        <numerusform>Törli %n könyvjelzőt?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n bookmarks?</numerusform>
+        <numerusform>Delete %n bookmarks?</numerusform>
       </translation>
     </message>
   </context>
@@ -7269,9 +7258,9 @@ to %1</source>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation>
-        <numerusform>A következő %n elem nincs mentve:</numerusform>
-        <numerusform>A következő %n elem nincs mentve:</numerusform>
+      <translation type="unfinished">
+        <numerusform>The following %n items are not saved:</numerusform>
+        <numerusform>The following %n items are not saved:</numerusform>
       </translation>
     </message>
     <message>
@@ -7284,9 +7273,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation>
-        <numerusform>A következő %n elem nem lett törölve:</numerusform>
-        <numerusform>A következő %n elem nem lett törölve:</numerusform>
+      <translation type="unfinished">
+        <numerusform>The following %n items are not deleted:</numerusform>
+        <numerusform>The following %n items are not deleted:</numerusform>
       </translation>
     </message>
     <message>
@@ -7295,9 +7284,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation>
-        <numerusform>%n elem törlése sikertelen:</numerusform>
-        <numerusform>%n elem törlése sikertelen:</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to delete %n items:</numerusform>
+        <numerusform>Failed to delete %n items:</numerusform>
       </translation>
     </message>
     <message>
@@ -7453,9 +7442,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Töröl %n elemet?</numerusform>
-        <numerusform>Töröl %n elemet?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Delete %n items?</numerusform>
       </translation>
     </message>
     <message>
@@ -7472,9 +7461,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Töröl %n mátrixot?</numerusform>
-        <numerusform>Töröl %n mátrixot?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n matrices?</numerusform>
+        <numerusform>Delete %n matrices?</numerusform>
       </translation>
     </message>
     <message>
@@ -7537,9 +7526,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>A felhasználó hozzáfér még %n eltávolított forráshoz:</numerusform>
-        <numerusform>A felhasználó hozzáfér még %n eltávolított forráshoz:</numerusform>
+      <translation type="unfinished">
+        <numerusform>User will still have access to %n removed resources:</numerusform>
+        <numerusform>User will still have access to %n removed resources:</numerusform>
       </translation>
     </message>
     <message>
@@ -7548,9 +7537,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation>
-        <numerusform>Minden, ezzel a szerepkörrel rendelkező felhasználó hozzáférést kap %n forráshoz:</numerusform>
-        <numerusform>Minden, ezzel a szerepkörrel rendelkező felhasználó hozzáférést kap %n forráshoz:</numerusform>
+      <translation type="unfinished">
+        <numerusform>All users with this role will get access to %n resources:</numerusform>
+        <numerusform>All users with this role will get access to %n resources:</numerusform>
       </translation>
     </message>
     <message>
@@ -7559,9 +7548,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>Minden, ezzel a szerepkörrel rendelkező felhasználónak továbbra is hozzáférése lesz %n forráshoz:</numerusform>
-        <numerusform>Minden, ezzel a szerepkörrel rendelkező felhasználónak továbbra is hozzáférése lesz %n forráshoz:</numerusform>
+      <translation type="unfinished">
+        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
       </translation>
     </message>
     <message>
@@ -7574,37 +7563,37 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation>
-        <numerusform>A felhasználó elveszti hozzáférését %n forráshoz:</numerusform>
-        <numerusform>A felhasználó elveszti hozzáférését %n forráshoz:</numerusform>
+      <translation type="unfinished">
+        <numerusform>User will lose access to %n resources:</numerusform>
+        <numerusform>User will lose access to %n resources:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation>
-        <numerusform>Minden felhasználó elveszti hozzáférését %n forráshoz:</numerusform>
-        <numerusform>Minden felhasználó elveszti hozzáférését %n forráshoz:</numerusform>
+      <translation type="unfinished">
+        <numerusform>All users with this role will lose access to %n resources:</numerusform>
+        <numerusform>All users with this role will lose access to %n resources:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation>
-        <numerusform>Töröl %n megosztott elrendezést?</numerusform>
-        <numerusform>Töröl %n megosztott elrendezést?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n shared layouts?</numerusform>
+        <numerusform>Delete %n shared layouts?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation>
-        <numerusform>A kijelölt %n elrendezés más felhasználókkal is meg van osztva. Tőlük is törölni fogja őket.</numerusform>
-        <numerusform>A kijelölt %n elrendezés más felhasználókkal is meg van osztva. Tőlük is törölni fogja őket.</numerusform>
+      <translation type="unfinished">
+        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
+        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation>
-        <numerusform>Eltávolít %n elemet az elrendezésből?</numerusform>
-        <numerusform>Eltávolít %n elemet az elrendezésből?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from layout?</numerusform>
+        <numerusform>Remove %n items from layout?</numerusform>
       </translation>
     </message>
     <message>
@@ -7621,58 +7610,58 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation>
-        <numerusform>Töröl %n felhasználót?</numerusform>
-        <numerusform>Töröl %n felhasználót?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n users?</numerusform>
+        <numerusform>Delete %n users?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation>
-        <numerusform>Töröl %n eszközt?</numerusform>
-        <numerusform>Töröl %n eszközt?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n devices?</numerusform>
+        <numerusform>Delete %n devices?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation>
-        <numerusform>Töröl %n kamerát?</numerusform>
-        <numerusform>Töröl %n kamerát?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n cameras?</numerusform>
+        <numerusform>Delete %n cameras?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation>
-        <numerusform>Töröl %n I/O modult?</numerusform>
-        <numerusform>Töröl %n I/O modult?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n I/O Modules?</numerusform>
+        <numerusform>Delete %n I/O Modules?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Törli a(z) %n elemet?</numerusform>
-        <numerusform>Törli a(z) %n elemet?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Delete %n items?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation>
-        <numerusform>%n automatikusan felderítve.</numerusform>
-        <numerusform>%n automatikusan felderítve.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of them are auto-discovered.</numerusform>
+        <numerusform>%n of them are auto-discovered.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation>
-        <numerusform>%n kamera automatikusan felderítve.</numerusform>
-        <numerusform>%n kamera automatikusan felderítve.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n cameras are auto-discovered.</numerusform>
+        <numerusform>%n cameras are auto-discovered.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation>
-        <numerusform>%n I/O modul automatikusan felderítve.</numerusform>
-        <numerusform>%n I/O modul automatikusan felderítve.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n I/O modules are auto-discovered.</numerusform>
+        <numerusform>%n I/O modules are auto-discovered.</numerusform>
       </translation>
     </message>
     <message>
@@ -7689,9 +7678,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation>
-        <numerusform>Eltávolít %n elemet a showreelből?</numerusform>
-        <numerusform>Eltávolít %n elemet a showreelből?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>Remove %n items from showreel?</numerusform>
       </translation>
     </message>
   </context>
@@ -7699,9 +7688,9 @@ to %1</source>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
-      <translation>
-        <numerusform>%n felhasználó</numerusform>
-        <numerusform>%n felhasználó</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n users</numerusform>
+        <numerusform>%n users</numerusform>
       </translation>
     </message>
   </context>
@@ -7967,6 +7956,10 @@ to %1</source>
       <comment>%1 is file name</comment>
       <translation>A %1 más export által használva.</translation>
     </message>
+    <message>
+      <source>Selected period cannot be exported for the current camera.</source>
+      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::legacy::ExportLayoutTool</name>
@@ -8023,86 +8016,6 @@ to %1</source>
       <translation>Elrendezés exportálása</translation>
     </message>
     <message>
-      <source>You are about to export a long video</source>
-      <translation>Hosszú videó exportálására készül</translation>
-    </message>
-    <message>
-      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>Több mint egy GB tárhelyet is igényelhet és több percig is eltarthat.</translation>
-    </message>
-    <message>
-      <source>Export anyway?</source>
-      <translation>Mindenképpen exportálja?</translation>
-    </message>
-    <message>
-      <source>Export Video As...</source>
-      <translation>Video exportálása mint...</translation>
-    </message>
-    <message>
-      <source>No Timestamp</source>
-      <translation>Nincs időbélyeg</translation>
-    </message>
-    <message>
-      <source>Top Left Corner (requires transcoding)</source>
-      <translation>Bal felső sarok (átkódolás szükséges)</translation>
-    </message>
-    <message>
-      <source>Top Right Corner (requires transcoding)</source>
-      <translation>Jobb felső sarok (átkódolás szükséges)</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner (requires transcoding)</source>
-      <translation>Bal alsó sarok (átkódolás szükséges)</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner (requires transcoding)</source>
-      <translation>Jobb alsó sarok (átkódolás szükséges)</translation>
-    </message>
-    <message>
-      <source>Timestamps:</source>
-      <translation>Időbélyegek:</translation>
-    </message>
-    <message>
-      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-      <translation>Szűrők alkalmazása: Elforgatás, Kiterítés, Kép javítás, Egyedi képarány (átkódolás szükséges)</translation>
-    </message>
-    <message>
-      <source>AVI format is not recommended</source>
-      <translation>AVI formátum nem ajánlott</translation>
-    </message>
-    <message>
-      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation>Nem-folyamatos videó exportálásához MKV, vagy valami más formátum ajánlott.</translation>
-    </message>
-    <message>
-      <source>Export to AVI anyway?</source>
-      <translation>Mindenképpen exportálja AVI-ba?</translation>
-    </message>
-    <message>
-      <source>Selected format not recommended</source>
-      <translation>A kiválasztott formátum nem ajánlott</translation>
-    </message>
-    <message>
-      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation>A minőség megőrzése érdekében NOV vagy EXE formátum használata ajánlott.</translation>
-    </message>
-    <message>
-      <source>Export with transcoding?</source>
-      <translation>Exportálás transzkódolással?</translation>
-    </message>
-    <message>
-      <source>It will increase CPU usage and may take significant time.</source>
-      <translation>Megnöveli a CPU használatot és hosszú ideig tarthat.</translation>
-    </message>
-    <message>
-      <source>Exporting Video</source>
-      <translation>Video exportálása</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>Exportálás &quot;%1&quot; fájlba...</translation>
-    </message>
-    <message>
       <source>EXE format not recommended</source>
       <translation>EXE formátum nem ajánlott</translation>
     </message>
@@ -8131,10 +8044,6 @@ to %1</source>
       <translation>Helyi elrendezés mentése mint...</translation>
     </message>
     <message>
-      <source>Export Layout As...</source>
-      <translation>Elrendezés mentése mint...</translation>
-    </message>
-    <message>
       <source>exported</source>
       <translation>exportálva</translation>
     </message>
@@ -8149,26 +8058,6 @@ to %1</source>
     <message>
       <source>Export</source>
       <translation>Exportálás</translation>
-    </message>
-    <message>
-      <source>You are about to export a lot of video</source>
-      <translation>Sok videó exportálására készül</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>Túl rövid időtartam van kiválasztva</translation>
-    </message>
-    <message>
-      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-      <translation>Gyors áttekintés exportálásához a videó hossza legalább 10 másodperc kell, hogy legyen.</translation>
-    </message>
-    <message>
-      <source>Export completed</source>
-      <translation>Exportálás elkészült</translation>
-    </message>
-    <message>
-      <source>Failed to export video</source>
-      <translation>Exportálás sikertelen</translation>
     </message>
   </context>
   <context>
@@ -8346,23 +8235,23 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::ActionHandler</name>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation>
-        <numerusform>%n eszköz áthelyezése sikertelen</numerusform>
-        <numerusform>%n eszköz áthelyezése sikertelen</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to move %n devices</numerusform>
+        <numerusform>Failed to move %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation>
-        <numerusform>%n kamera áthelyezése sikertelen</numerusform>
-        <numerusform>%n kamera áthelyezése sikertelen</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to move %n cameras</numerusform>
+        <numerusform>Failed to move %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation>
-        <numerusform>%n I/O mkodul áthelyezése sikertelen</numerusform>
-        <numerusform>%n I/O mkodul áthelyezése sikertelen</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to move %n I/O Modules</numerusform>
+        <numerusform>Failed to move %n I/O Modules</numerusform>
       </translation>
     </message>
     <message>
@@ -8371,23 +8260,23 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation>
-        <numerusform>&quot;%1&quot; szerver nem fér hozzá %n eszközhöz. Mindenképpen áthelyezi?</numerusform>
-        <numerusform>&quot;%1&quot; szerver nem fér hozzá %n eszközhöz. Mindenképpen áthelyezi?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation>
-        <numerusform>&quot;%1&quot; szerver nem fér hozzá %n kamerához. Mindenképpen áthelyezi?</numerusform>
-        <numerusform>&quot;%1&quot; szerver nem fér hozzá %n kamerához. Mindenképpen áthelyezi?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation>
-        <numerusform>&quot;%1&quot; szerver nem fér hozzá %n I/O modulhoz. Mindenképpen áthelyezi?</numerusform>
-        <numerusform>&quot;%1&quot; szerver nem fér hozzá %n I/O modulhoz. Mindenképpen áthelyezi?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
       </translation>
     </message>
     <message>
@@ -8444,9 +8333,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation>
-        <numerusform>Biztos benne, hogy véglegesen törli ezt a %n fájlt?</numerusform>
-        <numerusform>Biztos benne, hogy véglegesen törli ezt a %n fájlt?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
       </translation>
     </message>
     <message>

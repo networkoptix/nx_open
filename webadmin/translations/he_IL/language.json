@@ -87,6 +87,7 @@
         "maxRecordQueueSizeBytes": "Max record queue size (bytes)",
         "maxRecordQueueSizeElements": "Max record queue size (elements)",
         "maxRemoteArchiveSynchronizationThreads": "Max remote archive synchronization threads",
+        "maxRtspConnectDurationSeconds": "Max Rtsp connect duration seconds",
         "maxSceneItems": "Max scene items (0 means default)",
         "proxyConnectTimeoutSec": "זמן קצוב לחיבור של שרת proxy (שניות)",
         "rtpTimeoutMs": "RTP timeout (milliseconds)",

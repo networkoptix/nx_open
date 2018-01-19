@@ -27,7 +27,7 @@
 #include <ui/widgets/common/framed_label.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/threaded_image_loader.h>
+#include <nx/client/desktop/image_providers/threaded_image_loader.h>
 #include <nx/client/desktop/utils/server_image_cache.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -264,9 +264,10 @@ bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout)
     return true;
 }
 
-qreal QnLayoutSettingsDialog::screenAspectRatio() const {
-    QRect screen = qApp->desktop()->screenGeometry();
-    return (qreal)screen.width() / (qreal)screen.height();
+QnAspectRatio QnLayoutSettingsDialog::screenAspectRatio() const
+{
+    const auto screen = qApp->desktop()->screenGeometry();
+    return QnAspectRatio(screen.size());
 }
 
 qreal QnLayoutSettingsDialog::bestAspectRatioForCells() const {
@@ -494,12 +495,13 @@ void QnLayoutSettingsDialog::loadPreview() {
     if (!d->imageFileIsAvailable() || d->imageIsLoading())
         return;
 
-    QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
+    auto loader = new ThreadedImageLoader(this);
     loader->setInput(d->imageSourcePath);
     loader->setTransformationMode(Qt::FastTransformation);
     loader->setSize(ui->imageLabel->contentSize());
-    loader->setFlags(Qn::TouchSizeFromOutside);
-    connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
+    loader->setFlags(ThreadedImageLoader::TouchSizeFromOutside);
+    connect(loader, &ThreadedImageLoader::imageLoaded, this, &QnLayoutSettingsDialog::setPreview);
+    connect(loader, &ThreadedImageLoader::imageLoaded, loader, &QObject::deleteLater);
     loader->start();
 
     if (d->state == ImageDownloaded)
@@ -602,10 +604,12 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
 
     /* Disable cropping for images that are quite well aspected. */
     qreal imageAspectRatio = (qreal)image.width() / (qreal)image.height();
-    if (qAbs(imageAspectRatio - screenAspectRatio()) > aspectRatioVariation) {
+    if (qAbs(imageAspectRatio - screenAspectRatio().toFloat()) > aspectRatioVariation)
+    {
         d->croppedPreview = cropToAspectRatio(image, screenAspectRatio());
     }
-    else {
+    else
+    {
         d->croppedPreview = QImage();
     }
 

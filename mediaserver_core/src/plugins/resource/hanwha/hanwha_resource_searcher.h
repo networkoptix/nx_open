@@ -63,7 +63,9 @@ private:
 
     struct SunApiData: public nx_upnp::DeviceInfo
     {
+        SunApiData() { timer.restart(); }
         QnMacAddress macAddress;
+        QElapsedTimer timer;
     };
     bool parseSunApiData(const QByteArray& data, SunApiData* outData);
     bool isHostBelongsToValidSubnet(const QHostAddress& address) const;
@@ -90,6 +92,7 @@ private:
     const std::vector<std::vector<quint8>> m_sunapiProbePackets;
     std::vector<std::unique_ptr<AbstractDatagramSocket>> m_sunApiSocketList;
     QList<QnInterfaceAndAddr> m_lastInterfaceList;
+    QMap<QnMacAddress, SunApiData> m_sunapiDiscoveredDevices;
 };
 
 } // namespace plugins

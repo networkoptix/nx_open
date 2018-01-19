@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+    xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+    xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns6="http://www.w3.org/2005/08/addressing"
+    xmlns:ns4="http://docs.oasis-open.org/wsrf/bf-2"
+    xmlns:ns2="http://docs.oasis-open.org/wsn/t-1"
+    xmlns:ns3="http://docs.oasis-open.org/wsn/b-2"
+    xmlns:ns1="http://www.axis.com/vapix/ws/event1"
+    xmlns:ns5="http://www.axis.com/vapix/ws/action1">
+ <SOAP-ENV:Body>
+  <!-- __ns5__GetActionTemplates(..., _ns5__GetActionTemplatesResponse &ns5__GetActionTemplatesResponse) -->
+  <ns5:GetActionTemplatesResponse>
+   <!-- ns5__ActionTemplates *ActionTemplates -->
+   <ns5:ActionTemplates>
+    <!-- std::vector<ns5__ActionTemplate *> ActionTemplate -->
+    <ns5:ActionTemplate>
+     <!-- std::string TemplateToken -->
+     <ns5:TemplateToken></ns5:TemplateToken>
+     <!-- std::string *RecipientTemplate -->
+     <ns5:RecipientTemplate></ns5:RecipientTemplate>
+     <!-- ns5__ActionTemplateParameters *Parameters -->
+     <ns5:Parameters>
+      <!-- std::vector<ns5__ActionTemplateParameter *> Parameter -->
+      <ns5:Parameter Name="" Type="">
+      </ns5:Parameter>
+      <ns5:Parameter Name="" Type="">
+      </ns5:Parameter>
+     </ns5:Parameters>
+    </ns5:ActionTemplate>
+    <ns5:ActionTemplate>
+     <!-- std::string TemplateToken -->
+     <ns5:TemplateToken></ns5:TemplateToken>
+     <!-- std::string *RecipientTemplate -->
+     <ns5:RecipientTemplate></ns5:RecipientTemplate>
+     <!-- ns5__ActionTemplateParameters *Parameters -->
+     <ns5:Parameters>
+      <!-- std::vector<ns5__ActionTemplateParameter *> Parameter -->
+      <ns5:Parameter Name="" Type="">
+      </ns5:Parameter>
+      <ns5:Parameter Name="" Type="">
+      </ns5:Parameter>
+     </ns5:Parameters>
+    </ns5:ActionTemplate>
+   </ns5:ActionTemplates>
+  </ns5:GetActionTemplatesResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

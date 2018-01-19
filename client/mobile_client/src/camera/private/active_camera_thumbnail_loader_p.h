@@ -8,7 +8,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/pending_operation.h>
 #include <ui/camera_thumbnail_provider.h>
-#include <api/helpers/thumbnail_request_data.h>
+#include <nx/api/mediaserver/image_request.h>
 
 class QnActiveCameraThumbnailLoaderPrivate: public QObject
 {
@@ -36,7 +36,7 @@ public:
 
     QnCameraThumbnailProvider* imageProvider = nullptr;
 
-    QnThumbnailRequestData request;
+    nx::api::CameraImageRequest request;
     int requestId;
     bool requestNextAfterReply = false;
     QElapsedTimer fetchTimer;

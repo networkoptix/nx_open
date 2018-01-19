@@ -1,5 +1,6 @@
 #include "plugin_internal_tools.h"
 #include <nx/utils/log/log.h>
+#include <plugins/plugin_tools.h>
 
 #ifdef Q_OS_WIN
 #include <WinSock2.h>
@@ -23,6 +24,11 @@ QnUuid fromPluginGuidToQnUuid(const nxpl::NX_GUID& guid)
         guid.bytes[13],
         guid.bytes[14],
         guid.bytes[15]));
+}
+
+nxpl::NX_GUID fromQnUuidToPluginGuid(const QnUuid& uuid)
+{
+    return nxpt::NxGuidHelper::fromRawData(uuid.toRfc4122());
 }
 
 } // namespace nxpt

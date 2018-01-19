@@ -9,9 +9,10 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include "camera/video_camera.h"
 #include <common/common_module_aware.h>
 #include <nx/utils/singleton.h>
+
+#include "camera_fwd.h"
 
 #define qnCameraPool QnVideoCameraPool::instance()
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+    xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+    xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns6="http://www.w3.org/2005/08/addressing"
+    xmlns:ns4="http://docs.oasis-open.org/wsrf/bf-2"
+    xmlns:ns2="http://docs.oasis-open.org/wsn/t-1"
+    xmlns:ns3="http://docs.oasis-open.org/wsn/b-2"
+    xmlns:ns1="http://www.axis.com/vapix/ws/event1"
+    xmlns:ns5="http://www.axis.com/vapix/ws/action1">
+ <SOAP-ENV:Body>
+  <!-- __ns1__AddScheduledEvent(..., _ns1__AddScheduledEvent *ns1__AddScheduledEvent, ...) -->
+   <!-- _ns1__AddScheduledEvent *ns1__AddScheduledEvent -->
+   <ns1:AddScheduledEvent>
+    <!-- ns1__NewScheduledEvent *NewScheduledEvent -->
+    <ns1:NewScheduledEvent>
+     <!-- std::string *EventID -->
+     <ns1:EventID></ns1:EventID>
+     <!-- std::string *Name -->
+     <ns1:Name></ns1:Name>
+     <!-- ns1__Schedule *Schedule -->
+     <ns1:Schedule>
+      <!-- ns1__ICalendar *ICalendar -->
+      <ns1:ICalendar Dialect=""></ns1:ICalendar>
+     </ns1:Schedule>
+    </ns1:NewScheduledEvent>
+   </ns1:AddScheduledEvent>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

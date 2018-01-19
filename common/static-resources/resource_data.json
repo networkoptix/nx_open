@@ -2183,6 +2183,32 @@
                 "DigitalWatchdog|DWC-MTT4Wi36"
             ],
             "forceOnvifAdvancedParameters": true
-        }
+        },
+        {
+            "keys": [
+                "UNIVIEW|IPC6253SR-X33*", "Securicorp|SCL-SDM03MVIR-WD3533X"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-0.1666667, 1],
+                        "logical": [15, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 1],
+                        "logical": [1, 7],
+                        "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        }      
     ]
 }

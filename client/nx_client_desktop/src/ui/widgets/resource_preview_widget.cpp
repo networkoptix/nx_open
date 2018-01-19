@@ -5,7 +5,7 @@
 
 #include <client/client_globals.h>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -17,12 +17,15 @@
 #include <ui/widgets/common/autoscaled_plain_text.h>
 #include <ui/widgets/common/busy_indicator.h>
 
-#include <utils/image_provider.h>
+#include <nx/client/desktop/image_providers/image_provider.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
 
 static const QMargins kMinIndicationMargins(4, 2, 4, 2);
+
+// Default size must be big enough to avoid layout flickering.
+static const QSize kDefaultThumbnailSize(1920, 1080);
 
 /* QnBusyIndicatorWidget draws dots snapped to the pixel grid.
  * This descendant when it is downscaled draws dots generally not snapped. */
@@ -204,6 +207,9 @@ QSize QnResourcePreviewWidget::sizeHint() const
 
             if (m_cachedSizeHint.isNull())
                 m_cachedSizeHint = minimumSize();
+
+            if (m_cachedSizeHint.isNull())
+                m_cachedSizeHint = kDefaultThumbnailSize;
         }
 
         const QSize maxSize = maximumSize();

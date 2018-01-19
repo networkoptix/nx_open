@@ -50,6 +50,12 @@ public:
     }
 protected:
 
+    virtual void TearDown() override
+    {
+        qnNormalStorageMan->stopAsyncTasks();
+        qnBackupStorageMan->stopAsyncTasks();
+    }
+
     virtual void SetUp() override
     {
         prepare();

@@ -7,6 +7,7 @@
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QFile>
+#include <QtCore/QFileInfo>
 
 #include <nx/network/http/http_client.h>
 #include <nx/api/analytics/device_manifest.h>
@@ -37,9 +38,19 @@ using namespace nx::sdk::metadata;
 
 MetadataPlugin::MetadataPlugin()
 {
-    QFile file(":manifest.json");
+    QFile file(":/hikvision/manifest.json");
     if (file.open(QFile::ReadOnly))
         m_manifest = file.readAll();
+    {
+        QFile file("plugins/hikvision/manifest.json");
+        if (file.open(QFile::ReadOnly))
+        {
+            NX_INFO(this,
+                lm("Switch to external manifest file %1").arg(QFileInfo(file).absoluteFilePath()));
+            m_manifest = file.readAll();
+        }
+    }
+
     m_driverManifest = QJson::deserialized<Hikvision::DriverManifest>(m_manifest);
 }
 

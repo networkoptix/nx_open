@@ -13,6 +13,7 @@
 #include <api/helpers/thumbnail_request_data.h>
 #include <api/helpers/send_statistics_request_data.h>
 #include <api/helpers/event_log_request_data.h>
+#include <nx/api/mediaserver/image_request.h>
 
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
@@ -88,9 +89,15 @@ Handle ServerConnection::getServerLocalTime(Result<QnJsonRestResult>::type callb
     return executeGet(lit("/api/gettime"), params, callback, targetThread);
 }
 
-rest::Handle ServerConnection::cameraThumbnailAsync( const QnThumbnailRequestData &request, Result<QByteArray>::type callback, QThread* targetThread /*= 0*/ )
+rest::Handle ServerConnection::cameraThumbnailAsync(const nx::api::CameraImageRequest& request,
+    Result<QByteArray>::type callback,
+    QThread* targetThread)
 {
-    return executeGet(lit("/ec2/cameraThumbnail"), request.toParams(), callback, targetThread);
+    QnThumbnailRequestData data;
+    data.request = request;
+    data.format = Qn::UbjsonFormat;
+
+    return executeGet(lit("/ec2/cameraThumbnail"), data.toParams(), callback, targetThread);
 }
 
 rest::Handle ServerConnection::twoWayAudioCommand(const QString& sourceId,
@@ -268,7 +275,7 @@ Handle ServerConnection::checkCloudHost(
 
 Handle ServerConnection::addFileDownload(
     const QString& fileName,
-    int size,
+    qint64 size,
     const QByteArray& md5,
     const QUrl& url,
     GetCallback callback,
@@ -286,10 +293,33 @@ Handle ServerConnection::addFileDownload(
         targetThread);
 }
 
+Handle ServerConnection::addFileUpload(
+    const QString& fileName,
+    qint64 size,
+    qint64 chunkSize,
+    const QByteArray& md5,
+    qint64 ttl,
+    PostCallback callback,
+    QThread* targetThread)
+{
+    return executePost(
+        lit("/api/downloads/%1").arg(fileName),
+        QnRequestParamList{
+            { lit("size"), QString::number(size) },
+            { lit("chunkSize"), QString::number(chunkSize) },
+            { lit("md5"), QString::fromUtf8(md5) },
+            { lit("ttl"), QString::number(ttl) },
+            { lit("upload"), lit("true") } },
+        QByteArray(),
+        QByteArray(),
+        callback,
+        targetThread);
+}
+
 Handle ServerConnection::removeFileDownload(
     const QString& fileName,
     bool deleteData,
-    GetCallback callback,
+    PostCallback callback,
     QThread* targetThread)
 {
     return executeDelete(
@@ -345,7 +375,7 @@ Handle ServerConnection::uploadFileChunk(
     const QString& fileName,
     int index,
     const QByteArray& data,
-    GetCallback callback,
+    PostCallback callback,
     QThread* targetThread)
 {
     return executePut(
@@ -432,6 +462,39 @@ rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
         QJson::serialized(rule->eventParams().metadata)));
 
     return executeGet(lit("/api/createEvent"), params, callback, targetThread);
+}
+
+Handle ServerConnection::addWearableCameraAsync(
+    const QString& name,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executePost(
+        lit("/api/wearableCamera/add"),
+        QnRequestParamList{ { lit("name"), name } },
+        QByteArray(),
+        QByteArray(),
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::consumeWearableCameraFileAsync(
+    const QnNetworkResourcePtr& camera,
+    const QString& uploadId,
+    qint64 startTimeMs,
+    PostCallback callback,
+    QThread* targetThread)
+{
+    return executePost(
+        lit("/api/wearableCamera/consume"),
+        QnRequestParamList{
+            { lit("cameraId"), camera->getId().toSimpleString() },
+            { lit("uploadId"), uploadId },
+            { lit("startTime"), QString::number(startTimeMs) } },
+        QByteArray(),
+        QByteArray(),
+        callback,
+        targetThread);
 }
 
 Handle ServerConnection::getEvents(QnEventLogRequestData request,

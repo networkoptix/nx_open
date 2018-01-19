@@ -37,6 +37,7 @@ struct QnManualResourceSearchStatus {
 
 #define QnManualResourceSearchStatus_Fields (state)(current)(total)
 
+// TODO: #wearable better split this struct in two. name, vendor & existsInPool unused in add requests.
 struct QnManualResourceSearchEntry {
     QString name;
     QString url;

@@ -1,5 +1,4 @@
-#ifndef __VIDEO_CAMERA_H__
-#define __VIDEO_CAMERA_H__
+#pragma once
 
 #include <memory>
 
@@ -14,7 +13,10 @@
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <streaming/hls/hls_live_playlist_manager.h>
 #include <core/dataprovider/live_stream_provider.h>
-#include <api/helpers/thumbnail_request_data.h>
+
+#include <nx/api/mediaserver/image_request.h>
+
+#include "camera_fwd.h"
 
 
 class QnVideoCameraGopKeeper;
@@ -48,7 +50,7 @@ public:
         bool primaryLiveStream,
         qint64 time,
         int channel,
-        QnThumbnailRequestData::RoundMethod roundMethod) const;
+        nx::api::ImageRequest::RoundMethod roundMethod) const;
 
     Q_SLOT void at_camera_resourceChanged();
     void beforeStop();
@@ -114,7 +116,3 @@ private:
         qint64 targetDurationUSec );
     QElapsedTimer m_lastActivityTimer;
 };
-
-typedef QnSharedResourcePointer<QnVideoCamera> QnVideoCameraPtr;
-
-#endif // __VIDEO_CAMERA_H__

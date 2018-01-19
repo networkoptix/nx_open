@@ -35,7 +35,7 @@
       <attribute name="title">
        <string>General</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1,0,1000">
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1,0,1000">
        <property name="leftMargin">
         <number>16</number>
        </property>
@@ -124,6 +124,9 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QnWearableUploadWidget" name="wearableUploadWidget" native="true"/>
        </item>
        <item>
         <layout class="QGridLayout" name="generalGridLayout" columnstretch="3,2">
@@ -629,12 +632,6 @@
    <header location="global">ui/widgets/common/alert_bar.h</header>
   </customwidget>
   <customwidget>
-   <class>QnFisheyeSettingsWidget</class>
-   <extends>QWidget</extends>
-   <header>ui/widgets/properties/fisheye_settings_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QnCameraExpertSettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/expert_settings_widget.h</header>
@@ -644,6 +641,24 @@
    <class>QnImageControlWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/image_control_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnLicensesProposeWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/licensing/licenses_propose_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnCameraScheduleWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/properties/camera_schedule_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnFisheyeSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>ui/widgets/properties/fisheye_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -659,15 +674,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnLicensesProposeWidget</class>
+   <class>QnWearableUploadWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/licensing/licenses_propose_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QnCameraScheduleWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/camera_schedule_widget.h</header>
+   <header location="global">ui/widgets/properties/wearable_upload_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -11,11 +11,42 @@
 #include <onvif/soapPTZBindingProxy.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/utils/scope_guard.h>
 #include <common/static_common_module.h>
 
 #include "soap_wrapper.h"
 #include <nx/utils/log/log_main.h>
 
+namespace {
+
+static const Namespace kOverridenNamespaces[] = {
+    {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", nullptr, nullptr},
+    {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", nullptr, nullptr},
+    {"xsi", "http://www.w3.org/2001/XMLSchema-instance", nullptr, nullptr},
+    {"xsd", "http://www.w3.org/2001/XMLSchema", nullptr, nullptr},
+    {
+        "wsse",
+        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
+        nullptr,
+        nullptr
+    },
+    {"onvifPtz", "http://www.onvif.org/ver20/ptz/wsdl", nullptr, nullptr},
+    {
+        "wsu",
+        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
+        nullptr,
+        nullptr
+    },
+    {
+        "onvifXsd",
+        "http://www.onvif.org/ver10/schema",
+        nullptr,
+        nullptr
+    },
+    {nullptr, nullptr, nullptr, nullptr}
+};
+
+} // namespace
 
 static QByteArray ENCODE_PREFIX("BASE64_");
 
@@ -74,7 +105,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     bool focusEnabled       = data.value<bool>(lit("onvifPtzFocusEnabled"),         false);
     bool presetsEnabled     = data.value<bool>(lit("onvifPtzPresetsEnabled"),       false);
 
-    const int digitsAfterDecimalPoint  = data.value<int>(lit("onvifPtzDigitsAfterDecimalPoint"), 4);
+    const int digitsAfterDecimalPoint  = data.value<int>(lit("onvifPtzDigitsAfterDecimalPoint"), 10);
     sprintf( m_floatFormat, "%%.%df", digitsAfterDecimalPoint );
     sprintf( m_doubleFormat, "%%.%dlf", digitsAfterDecimalPoint );
 
@@ -442,12 +473,15 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
 #endif
 
     _onvifPtz__AbsoluteMoveResponse response;
-    if (ptz.doAbsoluteMove(request, response) != SOAP_OK) {
-        qnWarning("Execution of PTZ absolute move command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
-        return false;
-    }
 
-    return true;
+    // Remove unneeded namespaces since they can cause request failure on some cameras.
+    soap_set_namespaces(ptz.getProxy()->soap, kOverridenNamespaces);
+
+    const bool result = ptz.doAbsoluteMove(request, response) == SOAP_OK;
+    if (!result)
+        qnWarning("Execution of PTZ absolute move command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
+
+    return result;
 }
 
 bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const

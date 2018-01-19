@@ -28,8 +28,9 @@ struct FileMetadata: FileInformation
     QVector<QByteArray> chunkChecksums;
 };
 
-class Storage
+class Storage: public QObject
 {
+    Q_OBJECT
 public:
     Storage(const QDir& m_downloadsDirectory);
 
@@ -41,7 +42,7 @@ public:
 
     FileInformation fileInformation(const QString& fileName) const;
 
-    ResultCode addFile(const FileInformation& fileInformation);
+    ResultCode addFile(FileInformation fileInformation, bool updateTouchTime = true);
     ResultCode updateFileInformation(const QString& fileName, qint64 size, const QByteArray& md5);
     ResultCode setChunkSize(const QString& fileName, qint64 chunkSize);
 
@@ -54,6 +55,8 @@ public:
     ResultCode setChunkChecksums(
         const QString& fileName, const QVector<QByteArray>& chunkChecksums);
 
+    void cleanupExpiredFiles();
+
     void findDownloads();
 
     static qint64 defaultChunkSize();
@@ -65,6 +68,7 @@ public:
 private:
     ResultCode addDownloadedFile(const FileInformation& fileInformation);
     ResultCode addNewFile(const FileInformation& fileInformation);
+    ResultCode deleteFileInternal(const QString& fileName, bool deleteData = true);
 
     bool saveMetadata(const FileMetadata& fileInformation);
     FileMetadata loadMetadata(const QString& fileName);

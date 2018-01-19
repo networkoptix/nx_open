@@ -6,7 +6,7 @@
 #include <client_core/connection_context_aware.h>
 
 #include <core/resource/resource_fwd.h>
-#include <api/helpers/thumbnail_request_data.h>
+#include <nx/api/mediaserver/image_request.h>
 #include <utils/common/id.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
@@ -56,6 +56,6 @@ private:
     QElapsedTimer m_elapsedTimer;
     QHash<QnUuid, ThumbnailData> m_thumbnailByResourceId;
     QHash<QString, QPixmap> m_pixmaps;
-    QnThumbnailRequestData m_request;
+    nx::api::CameraImageRequest m_request;
     QThread *m_decompressThread;
 };

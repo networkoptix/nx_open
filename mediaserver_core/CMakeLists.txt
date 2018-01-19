@@ -55,9 +55,13 @@ add_custom_command(
             "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
             "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
     COMMAND
+        ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
+    COMMAND
         ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_CURRENT_BINARY_DIR}/api.json"
             "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
+    COMMAND
+        ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_BINARY_DIR}/api.json"
 )
 
 set_source_files_properties(
