@@ -14,9 +14,14 @@ public:
         const QnRequestParams& params,
         const QByteArray& body,
         QnJsonRestResult& result,
-        const QnRestConnectionProcessor* owner);
+        const QnRestConnectionProcessor* owner) override;
 
 private:
-    int executeAdd(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner);
-    int executeConsume(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner);
+    int executeAdd(const QnRequestParams& params,
+        QnJsonRestResult& result,
+        const QnRestConnectionProcessor* owner);
+
+    int executeConsume(const QnRequestParams& params,
+        QnJsonRestResult& result,
+        const QnRestConnectionProcessor* owner);
 };

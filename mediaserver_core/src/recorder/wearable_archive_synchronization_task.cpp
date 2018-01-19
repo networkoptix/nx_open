@@ -21,8 +21,8 @@ WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
     QnCommonModule* commonModule,
     const QnSecurityCamResourcePtr& resource,
     std::unique_ptr<QIODevice> file,
-    qint64 startTimeMs
-):
+    qint64 startTimeMs)
+    :
     base_type(commonModule),
     m_resource(resource),
     m_file(file.release()),
@@ -31,7 +31,8 @@ WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
 
 WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask()
 {
-    /* execute() was never called? */
+    // Actual data should be deleted in execute().
+    NX_ASSERT(!m_file);
     if (m_file)
         delete m_file.data();
 }
@@ -55,6 +56,7 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
 {
     QString temporaryFilePath = QString::number(nx::utils::random::number());
     QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource(commonModule()));
+    // Storage takes ownership on file data.
     storage->registerResourceData(temporaryFilePath, m_file.data());
     storage->setIsIoDeviceOwner(false);
 
@@ -73,22 +75,22 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
     //m_archiveReader->setPlaybackMask(timePeriod);
 
     m_archiveReader->setErrorHandler(
-        [this](const QString& errorString) {
+        [this](const QString& errorString)
+        {
             NX_DEBUG(this, lm("Can not synchronize wearable chunk, error: %1").args(errorString));
 
             m_archiveReader->pleaseStop();
             if (m_recorder)
                 m_recorder->pleaseStop();
-        }
-    );
+        });
 
     m_archiveReader->setNoDataHandler(
-        [this]() {
+        [this]()
+        {
             m_archiveReader->pleaseStop();
             if (m_recorder)
                 m_recorder->pleaseStop();
-        }
-    );
+        });
 }
 
 void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs)
@@ -107,19 +109,19 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
     m_recorder->setObjectName(lit("WearableCameraArchiveRecorder"));
 
     m_recorder->setOnFileWrittenHandler(
-        [this](milliseconds startTime, milliseconds duration) {
+        [this](milliseconds startTime, milliseconds duration)
+        {
             int a = 10;
-        }
-    );
+        });
 
     m_recorder->setEndOfRecordingHandler(
-        [this]() {
+        [this]()
+        {
             if (m_archiveReader)
                 m_archiveReader->pleaseStop();
 
             m_recorder->pleaseStop();
-        }
-    );
+        });
 }
 
 

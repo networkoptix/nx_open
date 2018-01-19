@@ -20,6 +20,7 @@ namespace recorder {
 class WearableArchiveSynchronizationTask: public QnCommonModuleAware
 {
     using base_type = QnCommonModuleAware;
+
 public:
     WearableArchiveSynchronizationTask(
         QnCommonModule* commonModule,
@@ -27,7 +28,6 @@ public:
         std::unique_ptr<QIODevice> file,
         qint64 startTimeMs
     );
-
     ~WearableArchiveSynchronizationTask();
 
     bool execute();
