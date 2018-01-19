@@ -145,7 +145,7 @@ void PeerRegistrator::listen(
         [this, serverConnection, completionHandler = std::move(completionHandler),
             asyncCallLocker = m_counter.getScopedIncrement()](
                 nx::cloud::relay::api::ResultCode resultCode,
-                QUrl relayInstanceUrl)
+                QUrl relayInstanceUrl) mutable
         {
             sendListenResponse(
                 serverConnection,
@@ -153,6 +153,12 @@ void PeerRegistrator::listen(
                     ? boost::make_optional(relayInstanceUrl)
                     : boost::none,
                 std::move(completionHandler));
+
+            // Releasing shared pointer will can cause serverConnection to be deleted.
+            // Since that can safely be done only within serverConnection's aio thread, doing post.
+            auto serverConnectionPtr = serverConnection.get();
+            serverConnectionPtr->post(
+                [serverConnection = std::move(serverConnection)]() {});
         });
 }
 
