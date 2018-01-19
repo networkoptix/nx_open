@@ -1,31 +1,21 @@
 function(_generate_moc_parameters target parameters_file)
-    set(include_directories
-        "$<TARGET_PROPERTY:${target},INCLUDE_DIRECTORIES>"
-        ${CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES})
-    set(include_directories
-        "$<$<BOOL:${include_directories}>:-I$<JOIN:${include_directories},\n-I>\n>")
+    cmake_parse_arguments(MOC "" "" "INCLUDE_DIRS" ${ARGN})
 
-    if(MACOSX)
-        set(framework_directories
-            "$<$<BOOL:${CMAKE_FRAMEWORK_PATH}>:-F $<JOIN:${CMAKE_FRAMEWORK_PATH},\n-F >\n>")
+    if(MOC_INCLUDE_DIRS)
+        string(REPLACE ";" "\n-I" include_dirs "-I${MOC_INCLUDE_DIRS}\n")
     else()
-        set(framework_directories)
+        set(include_dirs)
     endif()
-
-    # Temporary hack begin
-    set(include_directories "-I${CMAKE_SOURCE_DIR}/common_libs/nx_fusion/src\n-I${CMAKE_CURRENT_SOURCE_DIR}/src\n")
-    set(framework_directories)
-    # Temporary hack end
 
     set(definitions
         "$<TARGET_PROPERTY:${target},COMPILE_DEFINITIONS>")
     set(definitions
         "$<$<BOOL:${definitions}>:-D$<JOIN:${definitions},\n-D>\n>")
 
-    set(options "--no-notes\n")
+    set(options "--no-notes")
 
     file(GENERATE OUTPUT "${parameters_file}" CONTENT
-        "${include_directories}${framework_directories}${definitions}${options}\n")
+        "${include_dirs}${definitions}${options}\n")
 endfunction()
 
 function(_get_moc_file_name var src_file)
@@ -47,15 +37,18 @@ function(_get_moc_file_name var src_file)
 endfunction()
 
 function(nx_add_qt_mocables target)
+    cmake_parse_arguments(MOC "" "" "INCLUDE_DIRS" ${ARGN})
+
     if(NOT Qt5Core_MOC_EXECUTABLE)
         message(FATAL_ERROR "Qt5 moc is not known: Qt5Core_MOC_EXECUTABLE is not set.")
     endif()
 
     set(moc_parameters_file
-        ${CMAKE_CURRENT_BINARY_DIR}/${target}.moc_parameters$<$<BOOL:$<CONFIGURATION>>:_$<CONFIGURATION>>)
-    _generate_moc_parameters(${target} ${moc_parameters_file})
+        ${CMAKE_CURRENT_BINARY_DIR}/${target}.moc_parameters)
+    _generate_moc_parameters(${target} ${moc_parameters_file}
+        INCLUDE_DIRS ${MOC_INCLUDE_DIRS})
 
-    foreach(file ${ARGN})
+    foreach(file ${MOC_UNPARSED_ARGUMENTS})
         _get_moc_file_name(moc_file ${file})
 
         add_custom_command(
