@@ -1,6 +1,10 @@
 #ifndef _CUSTOM_ACTIONS_UTILS_H_
 #define _CUSTOM_ACTIONS_UTILS_H_
 
+#include "Windows.h"
+#include <atlstr.h>
+#include <Msi.h>
+
 class Error {
 public:
     Error(LPCWSTR msg);

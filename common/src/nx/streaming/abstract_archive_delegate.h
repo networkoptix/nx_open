@@ -63,8 +63,8 @@ public:
     virtual ~QnAbstractArchiveDelegate() {}
 
     virtual bool open(
-        const QnResourcePtr &resource,
-        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) = 0;
+        const QnResourcePtr& resource,
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher = nullptr) = 0;
     virtual void close() = 0;
     virtual qint64 startTime() const = 0;
     virtual qint64 endTime() const = 0;

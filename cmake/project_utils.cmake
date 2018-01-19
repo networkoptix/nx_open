@@ -113,7 +113,13 @@ function(nx_add_target name type)
     endif()
 
     if(NOT NX_NO_MOC)
-        nx_add_qt_mocables(${name} ${hpp_files})
+        nx_add_qt_mocables(${name} ${hpp_files}
+            INCLUDE_DIRS
+                ${CMAKE_CURRENT_SOURCE_DIR}/src
+                # TODO: #dklychkov Remove hardcoded nx_fusion after updating to a newer Qt which
+                # has Q_NAMESPACE macro which can avoid QN_DECLARE_METAOBJECT_HEADER.
+                ${CMAKE_SOURCE_DIR}/common_libs/nx_fusion/src
+        )
     endif()
 
     if(NOT NX_NO_PCH)
