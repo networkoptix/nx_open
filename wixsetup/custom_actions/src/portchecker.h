@@ -1,3 +1,5 @@
+#pragma once
+
 #include <set>
 
 class PortChecker

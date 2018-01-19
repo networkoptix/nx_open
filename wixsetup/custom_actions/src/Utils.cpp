@@ -1,5 +1,28 @@
 #include "Utils.h"
 
+#include <vector>
+#include <set>
+#include <algorithm>
+
+#define _WINSOCKAPI_
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
+#include "Windows.h"
+#include "VersionHelpers.h"
+#include "UserEnv.h"
+#include <winsock2.h>
+#include "IPTypes.h"
+#include "iphlpapi.h"
+
+#include <comutil.h>
+#include <shobjidl.h>
+#include <Shellapi.h>
+#include <shlobj.h>
+
+#include "Msi.h"
+#include "MsiQuery.h"
+
+#include "wcautil.h"
 #include "fileutil.h"
 #include "memutil.h"
 #include "strutil.h"
