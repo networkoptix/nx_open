@@ -167,9 +167,11 @@ def make_handler_class(root_obj, path_to_update, args):
             self.path_to_update = path_to_update
             super(TestHandler, self).__init__(*args, **kwargs)
 
-        def _send_ok_headers(self, content_type):
+        def _send_ok_headers(self, content_type, content_length=None):
             self.send_response(200)
             self.send_header('Content-type', content_type)
+            if content_length:
+                self.send_header('Content-length', content_length)
             self.end_headers()
 
         def _send_not_found(self):
@@ -177,9 +179,16 @@ def make_handler_class(root_obj, path_to_update, args):
             self.end_headers()
 
         def do_GET(self):
+            self._serve_get(True)
+
+        def do_HEAD(self):
+            self._serve_get(False)
+
+        def _serve_get(self, give_away_content):
             if self.path in self.path_to_update:
                 self._send_ok_headers('application/json')
-                self.wfile.write(json.dumps(self.path_to_update[self.path]).encode())
+                if give_away_content:
+                    self.wfile.write(json.dumps(self.path_to_update[self.path]).encode())
             elif self.path.endswith('.zip') and not args.emulate_no_update_files:
                 path_components = self.path.split('/')
                 possible_path_key = '/'.join(path_components[:-1]) + '/update.json'
@@ -204,7 +213,11 @@ def make_handler_class(root_obj, path_to_update, args):
 
                 if not os.path.exists(DUMMY_FILE_PATH):
                     raise Exception('Dummy file not found')
-                self._send_ok_headers('application/zip')
+
+                self._send_ok_headers('application/zip', os.path.getsize(DUMMY_FILE_PATH))
+                if not give_away_content:
+                    return
+
                 with open(DUMMY_FILE_PATH, 'rb') as f:
                     while True:
                         read_buf = f.read(4096)

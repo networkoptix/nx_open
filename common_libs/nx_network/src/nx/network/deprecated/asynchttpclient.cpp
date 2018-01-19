@@ -103,6 +103,19 @@ void AsyncHttpClient::doGet(
     m_delegate.doGet(url);
 }
 
+void AsyncHttpClient::doHead(const nx::utils::Url& url)
+{
+    m_delegate.doHead(url);
+}
+
+void AsyncHttpClient::doHead(
+    const nx::utils::Url& url,
+    nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+{
+    m_onDoneHandler = std::move(completionHandler);
+    m_delegate.doHead(url);
+}
+
 namespace {
 
 class CustomBufferSource:

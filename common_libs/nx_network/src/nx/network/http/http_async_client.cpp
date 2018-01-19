@@ -187,6 +187,20 @@ void AsyncClient::doGet(
     doGet(url);
 }
 
+void AsyncClient::doHead(const nx::utils::Url& url)
+{
+    doRequest(nx::network::http::Method::head, url);
+}
+
+void AsyncClient::doHead(
+    const nx::utils::Url& url,
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    m_onDone = std::move(completionHandler);
+    doHead(url);
+}
+
+
 void AsyncClient::doPost(const nx::utils::Url& url)
 {
     doRequest(nx::network::http::Method::post, url);

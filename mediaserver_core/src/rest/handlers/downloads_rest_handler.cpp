@@ -182,9 +182,9 @@ int Helper::handleAddDownload(const QString& fileName)
     if (!peerPolicyString.isEmpty())
     {
         bool deserialized = false;
-        fileInfo.peerPolicy = QnLexical::deserialized<FileInformation::PeerPolicy>(
+        fileInfo.peerPolicy = QnLexical::deserialized<FileInformation::PeerSelectionPolicy>(
             peerPolicyString,
-            FileInformation::PeerPolicy::urlOnly,
+            FileInformation::PeerSelectionPolicy::none,
             &deserialized);
     }
 

@@ -13,25 +13,32 @@
 #include <utils/common/writer_pool.h>
 #include <utils/fs/file.h>
 
-void doTestInternal(int systemFlags)
+
+namespace {
+
+static QString temporaryFileName()
 {
     nx::ut::utils::WorkDirResource workDir(nx::utils::TestOptions::temporaryDirectoryPath());
-    QnWriterPool writerPool;
-    ASSERT_TRUE((bool)workDir.getDirName());
+    return QDir(*workDir.getDirName()).absoluteFilePath("test_data1.bin");
+}
 
-    const QString kTestFileName = QDir(*workDir.getDirName()).absoluteFilePath("test_data1.bin");
+} // namespace
+
+void doTestInternal(int systemFlags)
+{
+    QnWriterPool writerPool;
+    const QString testFileName = temporaryFileName();
     const QByteArray kTestPattern("1234567890");
     const int kPatternRepCnt = 2000 * 499;
 
     // write file
     std::unique_ptr<QBufferedFile> testFile(
         new QBufferedFile(
-        std::shared_ptr<IQnFile>(new QnFile(kTestFileName)),
-        1024*1024*2,
-        1024*1024*4,
-        1024*1024*4,
-        QnUuid::createUuid()
-        ));
+            std::shared_ptr<IQnFile>(new QnFile(testFileName)),
+            1024*1024*2,
+            1024*1024*4,
+            1024*1024*4,
+            QnUuid::createUuid()));
 
     testFile->setSystemFlags(systemFlags);
 
@@ -49,7 +56,7 @@ void doTestInternal(int systemFlags)
 
     // read file
 
-    QFile checkResultFile(kTestFileName);
+    QFile checkResultFile(testFileName);
     ASSERT_TRUE(checkResultFile.open(QIODevice::ReadOnly));
 
     ASSERT_EQ(checkResultFile.size(), kPatternRepCnt * kTestPattern.length());
@@ -65,7 +72,7 @@ void doTestInternal(int systemFlags)
     ASSERT_EQ(QByteArray(buffer, 5), QByteArray("67890"));
 
     int rep1 = 32768 / kTestPattern.length();
-    rep1 -= 2; // we've already readed 20 bytes
+    rep1 -= 2; // we've already read 20 bytes
     for (int i = 0; i < rep1; ++i) {
         checkResultFile.read(buffer, 10);
         ASSERT_EQ(QByteArray(buffer, 10), kTestPattern);
@@ -88,7 +95,7 @@ void doTestInternal(int systemFlags)
 
     ASSERT_EQ(checkResultFile.pos(), checkResultFile.size());
 
-    QFile::remove(kTestFileName);
+    QFile::remove(testFileName);
 }
 
 TEST(BufferedFileWriter, noDirectIO)
@@ -269,18 +276,18 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
 TEST(BufferedFileWriter, VariousSizes)
 {
     QnWriterPool writerPool;
+    const QByteArray testPattern("1234567890");
+    const auto testFileName = temporaryFileName();
 
-    const QByteArray kTestFileName("test_data1.bin");
-    const QByteArray kTestPattern("1234567890");
     for (int fileBlockSize = 32768; fileBlockSize < 327680; fileBlockSize += 27000)
         for (int minBufSize = 1; minBufSize < 10000; minBufSize += 2500)
             for (int testDataSize = 65536; testDataSize < 65536 * 5; testDataSize += 17000)
             {
-                QFile::remove(kTestFileName);
+                QFile::remove(testFileName);
 
                 std::unique_ptr<QBufferedFile> testFile(
                     new QBufferedFile(
-                        std::shared_ptr<IQnFile>(new QnFile(kTestFileName)),
+                        std::shared_ptr<IQnFile>(new QnFile(testFileName)),
                         fileBlockSize,
                         minBufSize,
                         1024 * 64,
@@ -306,15 +313,12 @@ TEST(BufferedFileWriter, VariousSizes)
 TEST(BufferedFileWriter, seekBeforeEnd)
 {
     QnWriterPool writerPool;
-
-    const QByteArray kTestFileName("test_data1.bin");
-    QFile::remove(kTestFileName);
-
+    const auto testFileName = temporaryFileName();
     static const int kBlockSize = 1024 * 64;
 
     std::unique_ptr<QBufferedFile> testFile(
         new QBufferedFile(
-            std::shared_ptr<IQnFile>(new QnFile(kTestFileName)),
+            std::shared_ptr<IQnFile>(new QnFile(testFileName)),
             kBlockSize,
             kBlockSize,
             kBlockSize,

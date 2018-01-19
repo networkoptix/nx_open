@@ -572,9 +572,12 @@ void Worker::downloadNextChunk()
             .arg(m_peerManager->distanceTo(peerId)));
 
     auto handleReply =
-        [this, chunkIndex](bool success, rest::Handle handle, const QByteArray& data)
+        [this, chunkIndex](
+            AbstractPeerManager::ChunkDownloadResult chunkDownloadResult,
+            rest::Handle handle,
+            const QByteArray& data)
         {
-            handleDownloadChunkReply(success, handle, chunkIndex, data);
+            handleDownloadChunkReply(chunkDownloadResult, handle, chunkIndex, data);
         };
 
     if (m_subsequentChunksToDownload == boost::none || m_subsequentChunksToDownload == 0)
@@ -592,8 +595,7 @@ void Worker::downloadNextChunk()
         NX_VERBOSE(m_logTag,
             lm("Requesting chunk %1 from the Internet via %2...")
                 .arg(chunkIndex).arg(m_peerManager->peerString(peerId)));
-        handle = m_peerManager->downloadChunkFromInternet(
-            peerId, fileInfo.name, fileInfo.url, chunkIndex, fileInfo.chunkSize, handleReply);
+        handle = m_peerManager->downloadChunkFromInternet(fileInfo, peerId, chunkIndex, handleReply);
     }
     else
     {
@@ -613,25 +615,35 @@ void Worker::downloadNextChunk()
 }
 
 void Worker::handleDownloadChunkReply(
-    bool success, rest::Handle handle, int chunkIndex, const QByteArray& data)
+    AbstractPeerManager::ChunkDownloadResult chunkDownloadResult,
+    rest::Handle handle,
+    int chunkIndex,
+    const QByteArray& data)
 {
     const auto peerId = m_peerByRequestHandle.take(handle);
     if (peerId.isNull())
         return;
 
+    if (chunkDownloadResult == AbstractPeerManager::ChunkDownloadResult::irrecoverableError)
+    {
+        fail();
+        return;
+    }
+
     NX_VERBOSE(m_logTag,
         lm("Got chunk %1 from %2: %3")
             .arg(chunkIndex)
             .arg(m_peerManager->peerString(peerId))
-            .arg(statusString(success)));
+            .arg(statusString(chunkDownloadResult == AbstractPeerManager::ChunkDownloadResult::ok)));
 
     auto exitGuard = QnRaiiGuard::createDestructible(
-        [this, &success]()
+        [this, &chunkDownloadResult]()
         {
-            waitForNextStep(success ? 0 : -1);
+            waitForNextStep(
+                chunkDownloadResult == AbstractPeerManager::ChunkDownloadResult::ok ? 0 : -1);
         });
 
-    if (!success)
+    if (chunkDownloadResult == AbstractPeerManager::ChunkDownloadResult::recoverableError)
     {
         decreasePeerRank(peerId);
         return;
@@ -648,7 +660,7 @@ void Worker::handleDownloadChunkReply(
             lm("Cannot write chunk. Storage error: %1").arg(resultCode));
 
         // TODO: Implement error handling
-        success = false;
+        // success = false;
         return;
     }
 }

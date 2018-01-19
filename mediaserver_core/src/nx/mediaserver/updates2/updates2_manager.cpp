@@ -294,7 +294,7 @@ api::Updates2StatusData Updates2Manager::download()
     fileInformation.name = fileData.file;
     fileInformation.size = fileData.size;
     fileInformation.url = fileData.url;
-    fileInformation.peerPolicy = FileInformation::PeerPolicy::byPlatform;
+    fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
 
     for (const auto file: m_currentStatus.downloadedFiles)
         qnServerModule->findInstance<Downloader>()->deleteFile(file);
