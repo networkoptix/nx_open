@@ -1,7 +1,5 @@
 #include "wearable_archive_synchronization_task.h"
 
-#include <memory>
-
 #include <nx/utils/random.h>
 #include <nx/utils/log/log.h>
 #include <nx/streaming/archive_stream_reader.h>
@@ -11,6 +9,8 @@
 #include <core/resource/security_cam_resource.h>
 
 #include "server_edge_stream_recorder.h"
+
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace mediaserver_core {
