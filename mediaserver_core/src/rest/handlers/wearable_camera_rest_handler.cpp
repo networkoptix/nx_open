@@ -1,7 +1,5 @@
 #include "wearable_camera_rest_handler.h"
 
-#include <memory>
-
 #include <QtCore/QBuffer>
 #include <QtCore/QFile> // TODO: drop
 
@@ -17,6 +15,8 @@
 #include <common/common_module.h>
 #include <plugins/resource/wearable/wearable_camera_resource.h>
 #include <media_server/media_server_module.h>
+
+#include <nx/utils/std/cpp14.h>
 
 QStringList QnWearableCameraRestHandler::cameraIdUrlParams() const
 {
