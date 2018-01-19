@@ -88,6 +88,11 @@ public:
         const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
+    void doHead(const nx::utils::Url& url);
+    void doHead(
+        const nx::utils::Url& url,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
+
     /**
      * Start POST request to url.
      * @param includeContentLength TODO #ak this parameter is a hack. Replace it with AbstractMsgBodySource if future version
