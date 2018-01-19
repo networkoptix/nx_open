@@ -22,6 +22,7 @@
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
 #include <plugins/resource/stardot/stardot_resource_searcher.h>
 #include <plugins/resource/third_party/third_party_resource_searcher.h>
+#include <plugins/resource/wearable/wearable_camera_resource_searcher.h>
 #include <plugins/resource/archive_camera/archive_camera.h>
 
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
@@ -43,7 +44,9 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
     QnDesktopCameraDeleter* autoDeleter = new QnDesktopCameraDeleter(this);
     Q_UNUSED(autoDeleter); /* Class instance will be auto-deleted in our dtor. */
 #endif  //ENABLE_DESKTOP_CAMERA
-
+#ifdef ENABLE_WEARABLE
+    m_searchers << new QnWearableCameraResourceSearcher(commonModule);
+#endif
 
 #ifndef EDGE_SERVER
     #ifdef ENABLE_ARECONT

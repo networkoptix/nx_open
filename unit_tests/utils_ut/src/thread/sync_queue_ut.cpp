@@ -72,24 +72,21 @@ TEST_F(SyncQueue, MultiPushPop)
 TEST_F(SyncQueue, TimedPop)
 {
     const std::chrono::milliseconds kSmallDelay(100);
-    const std::chrono::seconds kLongDelay(10);
+    const std::chrono::hours kLongDelay(1);
+
+    const auto syncPushAndPop =
+        [&](int value)
+        {
+            auto pusher = pushAsync({value}, kSmallDelay);
+            const auto popedValue = queue.pop(kLongDelay);
+            pusher.join();
+            return popedValue && popedValue == value;
+        };
 
     ASSERT_FALSE(queue.pop(kSmallDelay));
-
-    auto pusher1 = pushAsync({1}, kSmallDelay);
-    const auto value1 = queue.pop(kLongDelay);
-    ASSERT_TRUE(value1);
-    ASSERT_EQ(*value1, 1);
-    pusher1.join();
-
+    syncPushAndPop(1);
     ASSERT_FALSE(queue.pop(kSmallDelay));
-
-    auto pusher2 = pushAsync({2}, kSmallDelay);
-    const auto value2 = queue.pop(kLongDelay);
-    ASSERT_TRUE(value2);
-    ASSERT_EQ(*value2, 2);
-    pusher2.join();
-
+    syncPushAndPop(2);
     ASSERT_FALSE(queue.pop(kSmallDelay));
 }
 
@@ -132,7 +129,7 @@ protected:
     {
         // If reader did not stop we will hang in destructor, so doing nothing here.
     }
-    
+
     void verifyThatOtherReadersAreWorking()
     {
         QnMutex mutex;
@@ -165,7 +162,7 @@ private:
     };
 
     using Readers = std::map<QueueReaderId, ReaderContext>;
-    using OnElementReadHandler = 
+    using OnElementReadHandler =
         nx::utils::MoveOnlyFunc<void(QueueReaderId /*readerId*/, int /*value*/)>;
 
     Readers m_readers;

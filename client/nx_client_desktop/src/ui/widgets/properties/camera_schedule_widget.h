@@ -49,8 +49,6 @@ public:
     bool hasDualStreamingMotionOnGrid() const;
 
     void setExportScheduleButtonEnabled(bool enabled);
-    int maxRecordedDays() const;
-    int minRecordedDays() const;
 
     /** Returns true if there's any recording requested in the schedule */
     bool isRecordingScheduled() const;
@@ -75,8 +73,6 @@ private:
     void updateScheduleTypeControls();
     void updateGridParams(bool pickedFromGrid = false);
     void updateGridEnabledState();
-    void updateArchiveRangeEnabledState();
-    void validateArchiveLength();
     void updateLicensesLabelText();
     void updateMotionButtons();
     void updatePanicLabelText();
@@ -97,7 +93,7 @@ private:
     void at_exportScheduleButton_clicked();
 
     void setScheduleAlert(const QString& scheduleAlert);
-    void setArchiveLengthAlert(const QString& archiveLengthAlert);
+    void emitAlert();
 
 private:
     /**
@@ -111,8 +107,6 @@ private:
     void setFps(int value);
 
     void updateScheduleEnabled();
-    void updateMinDays();
-    void updateMaxDays();
     void updateMaxFPS();
     void updateMotionAvailable();
 
@@ -168,7 +162,6 @@ private:
     Qn::MotionType m_motionTypeOverride;
 
     QString m_scheduleAlert;
-    QString m_archiveLengthAlert;
 
     bool m_updating = false;
     bool m_bitrateUpdating = false;

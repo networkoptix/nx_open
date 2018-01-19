@@ -42,9 +42,11 @@ public:
     qint64 chunkSize = 0;
     Status status = Status::notFound;
     QBitArray downloadedChunks;
+    qint64 touchTime = 0;
+    qint64 ttl = 0;
 };
 #define FileInformation_Fields \
-    (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks)
+    (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks)(touchTime)(ttl)
 
 QN_FUSION_DECLARE_FUNCTIONS(FileInformation, (json))
 QN_FUSION_DECLARE_FUNCTIONS(FileInformation::Status, (lexical))

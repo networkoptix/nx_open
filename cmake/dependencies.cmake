@@ -53,14 +53,14 @@ function(nx_detect_package_versions)
 
     if(box STREQUAL "bananapi")
         _set_version(ffmpeg "3.1.1-bananapi")
-        _set_version(qt "5.6.1")
+        _set_version(qt "5.6.1-1")
         _set_version(openssl "1.0.0j")
     endif()
 
     if(box STREQUAL "rpi")
         _set_version(qt "5.6.1")
         _set_version(quazip "0.7.2")
-        _set_version(openssl "1.0.0j")
+        _set_version(openssl "1.0.1t")
     endif()
 
     if(box STREQUAL "edge1")
