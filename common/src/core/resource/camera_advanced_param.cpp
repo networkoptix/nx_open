@@ -444,6 +444,7 @@ static void mergeGroups(
         {
             targetGroup->description += lit("\n") + sourceGroup.description;
             mergeParams(&targetGroup->params, &sourceGroup.params);
+            mergeGroups(&targetGroup->groups, &sourceGroup.groups);
         }
         else
         {

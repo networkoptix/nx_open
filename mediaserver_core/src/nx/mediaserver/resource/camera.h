@@ -109,13 +109,13 @@ public:
     public:
         virtual ~AdvancedParametersProvider() = default;
 
-        /** Returns supported parameters descriptions. */
+        /** @return supported parameters descriptions. */
         virtual QnCameraAdvancedParams descriptions() = 0;
 
-        /** Returns id-value pairs. */
+        /** @return id-value pairs. */
         virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) = 0;
 
-        /** Returns ids of successfully set parameters. */
+        /** @return ids of successfully set parameters. */
         virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) = 0;
     };
 

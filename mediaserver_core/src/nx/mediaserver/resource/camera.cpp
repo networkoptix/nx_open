@@ -404,22 +404,19 @@ CameraDiagnostics::Result Camera::initializaAdvancedParamitersProviders()
     QnCameraAdvancedParams advancedParameters;
     for (const auto& provider: allAdvancedParamitersProviders)
     {
-        auto providerParamiters = provider->descriptions();
-        for (const auto& id: providerParamiters.allParameterIds())
+        auto providerParameters = provider->descriptions();
+        for (const auto& id: providerParameters.allParameterIds())
             m_advancedParametersProvidersByParameterId.emplace(id, provider);
 
         if (advancedParameters.groups.empty())
-            advancedParameters = std::move(providerParamiters);
+            advancedParameters = std::move(providerParameters);
         else
-            advancedParameters.merge(providerParamiters);
+            advancedParameters.merge(providerParameters);
     }
 
-    if (m_defaultAdvancedParametersProviders)
-    {
-        NX_VERBOSE(this, lm("Default advanced parameters provider %1, providers by params: %2").args(
-            m_defaultAdvancedParametersProviders,
-            containerString(m_advancedParametersProvidersByParameterId)));
-    }
+    NX_VERBOSE(this, lm("Default advanced parameters provider %1, providers by params: %2").args(
+        m_defaultAdvancedParametersProviders,
+        containerString(m_advancedParametersProvidersByParameterId)));
 
     QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), advancedParameters);
     return CameraDiagnostics::NoErrorResult();
