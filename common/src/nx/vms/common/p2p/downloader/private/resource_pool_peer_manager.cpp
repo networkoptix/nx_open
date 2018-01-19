@@ -18,6 +18,7 @@ namespace downloader {
 namespace {
 
 static const int kDownloadRequestTimeoutMs = 10 * 60 * 1000;
+
 using namespace peer_selection;
 
 class OtherPeerInfosProvider
@@ -27,7 +28,7 @@ public:
     {
         const auto selfId = commonModule->moduleGUID();
         const auto servers = commonModule->resourcePool()->getAllServers(Qn::Online);
-        for (const auto& server : servers)
+        for (const auto& server: servers)
             addInfo(server, selfId);
     }
 
@@ -43,6 +44,7 @@ public:
     {
         return m_peerInfos;
     }
+
 private:
     PeerInformationList m_peerInfos;
 
@@ -279,7 +281,7 @@ ResourcePoolPeerManagerFactory::ResourcePoolPeerManagerFactory(QnCommonModule* c
 }
 
 AbstractPeerManager* ResourcePoolPeerManagerFactory::createPeerManager(
-    FileInformation::PeerPolicy peerPolicy)
+    FileInformation::PeerSelectionPolicy peerPolicy)
 {
     return new ResourcePoolPeerManager(
         commonModule(),

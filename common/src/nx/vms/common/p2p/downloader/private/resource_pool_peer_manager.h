@@ -71,7 +71,7 @@ class ResourcePoolPeerManagerFactory:
 {
 public:
     ResourcePoolPeerManagerFactory(QnCommonModule* commonModule);
-    virtual AbstractPeerManager* createPeerManager(FileInformation::PeerPolicy peerPolicy) override;
+    virtual AbstractPeerManager* createPeerManager(FileInformation::PeerSelectionPolicy peerPolicy) override;
 };
 
 } // namespace downloader

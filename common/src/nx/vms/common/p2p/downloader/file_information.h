@@ -36,13 +36,13 @@ public:
     };
     Q_ENUM(Status)
 
-    enum class PeerPolicy
+    enum PeerSelectionPolicy
     {
-        urlOnly,
+        none, //< only provided url will be used for downloading
         all = 1 << 0,
         byPlatform = 1 << 1,
     };
-    Q_ENUM(PeerPolicy)
+    Q_ENUM(PeerSelectionPolicy)
 
     QString name;
     qint64 size = -1;
@@ -51,14 +51,14 @@ public:
     qint64 chunkSize = 0;
     Status status = Status::notFound;
     QBitArray downloadedChunks;
-    PeerPolicy peerPolicy = PeerPolicy::urlOnly;
+    PeerSelectionPolicy peerPolicy = PeerSelectionPolicy::none;
 };
 #define FileInformation_Fields \
     (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks)(peerPolicy)
 
 QN_FUSION_DECLARE_FUNCTIONS(FileInformation, (json))
 QN_FUSION_DECLARE_FUNCTIONS(FileInformation::Status, (lexical))
-QN_FUSION_DECLARE_FUNCTIONS(FileInformation::PeerPolicy, (lexical))
+QN_FUSION_DECLARE_FUNCTIONS(FileInformation::PeerSelectionPolicy, (lexical))
 
 } // namespace downloader
 } // namespace p2p
