@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <utils/common/synctime.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/random_file.h>
@@ -176,6 +178,7 @@ protected:
     QHash<QnUuid, Peer*> peerById;
     Peer* defaultPeer = nullptr;
     int step = 0;
+    QnSyncTime syncTime;
 };
 
 TEST_F(DistributedFileDownloaderWorkerTest, simplePeersSelection)
