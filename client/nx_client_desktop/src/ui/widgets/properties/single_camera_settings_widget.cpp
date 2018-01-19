@@ -430,11 +430,14 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         ui->motionSensitivityGroupBox->setEnabled(false);
         ui->motionControlsWidget->setVisible(false);
         ui->motionAvailableLabel->setVisible(true);
+        ui->wearableUploadWidget->setVisible(false);
     }
     else
     {
         bool hasVideo = m_camera->hasVideo(0);
         bool hasAudio = m_camera->isAudioSupported();
+
+        ui->wearableUploadWidget->setVisible(m_camera->hasFlags(Qn::wearable_camera));
 
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
