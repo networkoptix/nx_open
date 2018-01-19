@@ -1,6 +1,6 @@
 "use strict";
 angular.module('nxCommon')
-    .directive('cameraPanel', ['$localStorage',function ($localStorage) {
+    .directive('cameraPanel', ['$localStorage', '$timeout', function ($localStorage, $timeout) {
         return {
             restrict: 'E',
             scope:{
@@ -39,10 +39,16 @@ angular.module('nxCommon')
                     scope.storage.serverStates[server.id] = server.collapsed;
                 };
                 
-                function searchCams(){
+                function searchCams(searchText){
                     function has(str, substr){
                         return str && str.toLowerCase().indexOf(substr.toLowerCase()) >= 0;
                     }
+
+                    //If the text is blank allow scope.searchCams to update in dom then update cameras
+                    if(searchText === ''){
+                        return $timeout(searchCams);
+                    }
+
                     _.forEach(scope.mediaServers,function(server){
                         var cameras = scope.cameras[server.id];
                         var camsVisible = false;
