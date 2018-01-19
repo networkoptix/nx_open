@@ -192,7 +192,7 @@ private:
     QSet<QString> m_recentlyDeleted;
 
     QHash<QnUuid, QnManualResourceSearchStatus> m_searchProcessStatuses;
-    QHash<QnUuid, QnManualResourceSearchList> m_searchProcessResults;
+    QHash<QnUuid, QnManualResourceSearchList> m_searchProcessResults; // TODO: #wearable unused!!!
 
     mutable QnMutex m_resListMutex;
     QnResourceList m_lastDiscoveredResources[6];
