@@ -44,7 +44,7 @@ function(nx_add_qt_mocables target)
     endif()
 
     set(moc_parameters_file
-        ${CMAKE_CURRENT_BINARY_DIR}/${target}.moc_parameters)
+        ${CMAKE_CURRENT_BINARY_DIR}/${target}.moc_parameters$<$<BOOL:$<CONFIGURATION>>:_$<CONFIGURATION>>)
     _generate_moc_parameters(${target} ${moc_parameters_file}
         INCLUDE_DIRS ${MOC_INCLUDE_DIRS})
 
