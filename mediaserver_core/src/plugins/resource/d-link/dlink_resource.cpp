@@ -230,7 +230,7 @@ QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnPlDlinkResource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
     return nx::mediaserver::resource::StreamCapabilityMap();

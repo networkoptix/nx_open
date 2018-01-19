@@ -444,7 +444,7 @@ nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder(Qn::Stre
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnThirdPartyResource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
     return nx::mediaserver::resource::StreamCapabilityMap();

@@ -72,7 +72,7 @@ bool QnDesktopCameraResource::isReadyToDetach() const {
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnDesktopCameraResource::getStreamCapabilityMapFromDrives(
-    bool /*primaryStream*/)
+    Qn::StreamIndex /*streamIndex*/)
 {
     return nx::mediaserver::resource::StreamCapabilityMap(); //< Not used.
 }

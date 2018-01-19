@@ -38,7 +38,7 @@ public:
     virtual bool isReadyToDetach() const override;
 
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
-        bool primaryStream) override;
+        Qn::StreamIndex streamIndex) override;
     virtual bool isInitialized() const override { return true; }
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 };

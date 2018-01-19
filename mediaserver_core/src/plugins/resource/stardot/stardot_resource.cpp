@@ -131,7 +131,7 @@ void QnStardotResource::parseInfo(const QByteArray& info)
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnStardotResource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
     return nx::mediaserver::resource::StreamCapabilityMap();

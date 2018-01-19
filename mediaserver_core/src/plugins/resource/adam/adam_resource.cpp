@@ -40,7 +40,7 @@ QString QnAdamResource::getDriverName() const
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnAdamResource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
     return nx::mediaserver::resource::StreamCapabilityMap();

@@ -22,7 +22,7 @@ void QnPlDriodIpWebCamResource::setIframeDistance(int /*frames*/, int /*timems*/
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnPlDriodIpWebCamResource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
     return nx::mediaserver::resource::StreamCapabilityMap();

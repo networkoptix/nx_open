@@ -197,7 +197,7 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
     httpClientCaptured->doGet( url );
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnPlAreconVisionResource::getStreamCapabilityMapFromDrives(bool primaryStream)
+nx::mediaserver::resource::StreamCapabilityMap QnPlAreconVisionResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
     return nx::mediaserver::resource::StreamCapabilityMap();

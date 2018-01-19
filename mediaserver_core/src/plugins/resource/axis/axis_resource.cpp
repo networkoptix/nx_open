@@ -422,7 +422,7 @@ bool resolutionGreatThan(const QnPlAxisResource::AxisResolution& res1, const QnP
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnPlAxisResource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex streamIndex)
 {
     using namespace nx::mediaserver::resource;
 

@@ -249,9 +249,9 @@ void Camera::setAdvancedParametersAsync(
 QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
 {
     const auto getStreamParamiters =
-        [&](bool isPrimary)
+        [&](Qn::StreamIndex streamIndex)
         {
-            const auto it = m_streamCapabilityAdvancedProviders.find(isPrimary);
+            const auto it = m_streamCapabilityAdvancedProviders.find(streamIndex);
             if (it == m_streamCapabilityAdvancedProviders.end())
                 return QnLiveStreamParams();
 
@@ -259,8 +259,8 @@ QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
         };
 
     QnAdvancedStreamParams paramiters;
-    paramiters.primaryStream = getStreamParamiters(/*isPrimary*/ true);
-    paramiters.secondaryStream = getStreamParamiters(/*isPrimary*/ false);
+    paramiters.primaryStream = getStreamParamiters(Qn::StreamIndex::primary);
+    paramiters.secondaryStream = getStreamParamiters(Qn::StreamIndex::secondary);
     return paramiters;
 }
 
@@ -392,7 +392,7 @@ CameraDiagnostics::Result Camera::initializaAdvancedParamitersProviders()
         m_defaultAdvancedParametersProviders = allAdvancedParamitersProviders.front();
 
     boost::optional<QSize> baseResolution;
-    for (const auto streamType: {true, false})
+    for (const auto streamType: {Qn::StreamIndex::primary, Qn::StreamIndex::secondary})
     {
         auto streamCapabilities = getStreamCapabilityMap(streamType);
         if (!streamCapabilities.isEmpty())
@@ -431,7 +431,7 @@ CameraDiagnostics::Result Camera::initializaAdvancedParamitersProviders()
     return CameraDiagnostics::NoErrorResult();
 }
 
-StreamCapabilityMap Camera::getStreamCapabilityMap(bool primaryStream)
+StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
 {
     auto defaultStreamCapability = [this](const StreamCapabilityKey& key)
     {
@@ -442,7 +442,7 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(bool primaryStream)
         return result;
     };
 
-    StreamCapabilityMap result = getStreamCapabilityMapFromDrives(primaryStream);
+    StreamCapabilityMap result = getStreamCapabilityMapFromDrives(streamIndex);
     for (auto itr = result.begin(); itr != result.end(); ++itr)
     {
         auto& value = itr.value();

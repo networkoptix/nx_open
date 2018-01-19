@@ -69,7 +69,7 @@ public:
     StreamCapabilityAdvancedParametersProvider(
         Camera* camera,
         const StreamCapabilityMap& capabilities,
-        bool isPrimaryStream,
+        Qn::StreamIndex streamIndex,
         const QSize& baseResolution);
 
     QnLiveStreamParams getParameters() const;
@@ -95,7 +95,7 @@ private:
 
 private:
     Camera* const m_camera;
-    const bool m_isPrimaryStream; // TODO: use emum instead.
+    const Qn::StreamIndex m_streamIndex;
     const QnCameraAdvancedParams m_descriptions;
 
     mutable QnMutex m_mutex;

@@ -44,7 +44,7 @@ FcResource::~FcResource()
 }
 
 nx::mediaserver::resource::StreamCapabilityMap FcResource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
     return nx::mediaserver::resource::StreamCapabilityMap();

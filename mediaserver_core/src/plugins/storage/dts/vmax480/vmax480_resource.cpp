@@ -128,7 +128,7 @@ QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnPlVmax480Resource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
     return nx::mediaserver::resource::StreamCapabilityMap();

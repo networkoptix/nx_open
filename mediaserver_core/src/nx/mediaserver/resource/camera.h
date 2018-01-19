@@ -73,7 +73,7 @@ public:
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
 
     /** Gets supported codecs and their resolution list. */
-    StreamCapabilityMap getStreamCapabilityMap(bool primaryStream);
+    StreamCapabilityMap getStreamCapabilityMap(Qn::StreamIndex streamIndex);
 
     /**
      * @param resolution Resolution for which we want to find the closest one.
@@ -131,7 +131,7 @@ protected:
     /** Gets supported codecs and their resolution list. For each key optional CameraStreamCapability could be provided.
     * CameraStreamCapability could be null. That case it is auto-filled with default values.
     */
-    virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(bool primaryStream) = 0;
+    virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) = 0;
 
 private:
     CameraDiagnostics::Result initializaAdvancedParamitersProviders();
@@ -142,7 +142,7 @@ private:
     QAuthenticator m_lastCredentials;
     AdvancedParametersProvider* m_defaultAdvancedParametersProviders = nullptr;
     std::map<QString, AdvancedParametersProvider*> m_advancedParametersProvidersByParameterId;
-    std::map<bool, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>> m_streamCapabilityAdvancedProviders;
+    std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>> m_streamCapabilityAdvancedProviders;
 };
 
 } // namespace resource

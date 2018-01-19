@@ -59,7 +59,7 @@ void QnArchiveCamResource::setMotionMaskPhysical(int /*channel*/)
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnArchiveCamResource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
     return nx::mediaserver::resource::StreamCapabilityMap();

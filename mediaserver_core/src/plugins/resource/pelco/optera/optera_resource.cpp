@@ -9,6 +9,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <common/static_common_module.h>
+#include <plugins/resource/onvif/onvif_stream_reader.h>
 
 namespace
 {
@@ -79,9 +80,9 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnOpteraResource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex streamIndex)
 {
-    return base_type::getStreamCapabilityMapFromDrives(primaryStream);
+    return base_type::getStreamCapabilityMapFromDrives(streamIndex);
 }
 
 CameraDiagnostics::Result QnOpteraResource::initializeCameraDriver()
@@ -144,7 +145,12 @@ QnAbstractStreamDataProvider* QnOpteraResource::createLiveDataProvider()
     if (!isInitialized())
         return nullptr;
 
-    return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer());
+    return new nx::plugins::utils::MultisensorDataProvider(
+        toSharedPointer(this),
+        [](const QnResourcePtr& resource)
+    {
+        return new QnOnvifStreamReader(resource);
+    });
 }
 
 

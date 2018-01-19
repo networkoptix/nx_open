@@ -533,19 +533,27 @@ QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
     bool shouldAppearAsSingleChannel = resData.value<bool>(
         Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
-
     if (shouldAppearAsSingleChannel)
-        return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
+    {
+        return new nx::plugins::utils::MultisensorDataProvider(
+            toSharedPointer(this),
+            [](const QnResourcePtr& resource)
+        {
+            return new QnOnvifStreamReader(resource);
+        });
+    }
+
 
     return new QnOnvifStreamReader(toSharedPointer());
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex streamIndex)
 {
     using namespace nx::mediaserver::resource;
 
-    auto& capabilities = primaryStream ? m_primaryStreamCapabilities : m_secondaryStreamCapabilities;
+    auto& capabilities = streamIndex == Qn::StreamIndex::primary
+        ? m_primaryStreamCapabilities : m_secondaryStreamCapabilities;
 
     StreamCapabilityKey key;
     key.codec = QnAvCodecHelper::codecIdToString(

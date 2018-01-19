@@ -66,7 +66,7 @@ public:
 
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
-        bool primaryStream) override;
+        Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override; // does a lot of physical work
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCroppingPhysical(QRect cropping);

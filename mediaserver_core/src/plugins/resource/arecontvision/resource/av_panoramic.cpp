@@ -120,7 +120,7 @@ bool QnArecontPanoramicResource::setSpecialParam(const QString &id, const QStrin
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnArecontPanoramicResource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
     return nx::mediaserver::resource::StreamCapabilityMap();

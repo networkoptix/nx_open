@@ -45,10 +45,10 @@ HikvisionResource::~HikvisionResource()
 }
 
 nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex streamIndex)
 {
     using namespace nx::mediaserver::resource;
-    auto result = base_type::getStreamCapabilityMapFromDrives(primaryStream);
+    auto result = base_type::getStreamCapabilityMapFromDrives(streamIndex);
     if (m_hevcSupported)
     {
         StreamCapabilityMap resultCopy = result;

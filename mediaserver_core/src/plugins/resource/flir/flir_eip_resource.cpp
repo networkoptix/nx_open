@@ -39,7 +39,7 @@ QByteArray QnFlirEIPResource::PASSTHROUGH_EPATH()
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnFlirEIPResource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
     return nx::mediaserver::resource::StreamCapabilityMap();

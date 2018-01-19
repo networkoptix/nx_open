@@ -605,7 +605,7 @@ int HanwhaResource::maxProfileCount() const
 }
 
 nx::mediaserver::resource::StreamCapabilityMap HanwhaResource::getStreamCapabilityMapFromDrives(
-    bool primaryStream)
+    Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
     return nx::mediaserver::resource::StreamCapabilityMap();
