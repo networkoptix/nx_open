@@ -35,7 +35,7 @@
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
-#include <ui/graphics/items/generic/ui_elements_widget.h>
+#include <ui/graphics/items/generic/gui_elements_widget.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/controls/navigation_item.h>
@@ -607,7 +607,7 @@ void QnWorkbenchUi::setOpenedPanels(Panels panels, bool animate)
 
 void QnWorkbenchUi::initGraphicsMessageBoxHolder()
 {
-    auto overlayWidget = new QnUiElementsWidget();
+    auto overlayWidget = new QnGuiElementsWidget();
     overlayWidget->setAcceptedMouseButtons(0);
     display()->scene()->addItem(overlayWidget);
     display()->setLayer(overlayWidget, QnWorkbenchDisplay::MessageBoxLayer);
@@ -844,7 +844,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
 
 void QnWorkbenchUi::createControlsWidget()
 {
-    m_controlsWidget = new QnUiElementsWidget();
+    m_controlsWidget = new QnGuiElementsWidget();
     m_controlsWidget->setAcceptedMouseButtons(0);
     display()->scene()->addItem(m_controlsWidget);
     display()->setLayer(m_controlsWidget, QnWorkbenchDisplay::UiLayer);
