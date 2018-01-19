@@ -10,14 +10,15 @@ namespace peer_selection {
 namespace impl {
 
 namespace {
+
 class SimilarPeersSelector
 {
 public:
     SimilarPeersSelector(
-        const QnSystemInformation& selfInformation,
+        const QnSystemInformation& systemInformation,
         const PeerInformationList& otherPeerInfos)
         :
-        m_selfInformation(selfInformation)
+        m_selfInformation(systemInformation)
     {
         for (const auto& peerInfo: otherPeerInfos)
             addId(peerInfo);

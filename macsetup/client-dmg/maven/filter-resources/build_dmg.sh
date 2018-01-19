@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -x
 set -e
 
@@ -8,6 +9,7 @@ SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="@display.product.name@ @release.version@"
 DMG_FILE="@artifact.name.client@.dmg"
+KEYCHAIN="@codeSigningKeychainName@"
 
 # Take into consideration that we have protocol handler app with name
 # @protocol_handler_app_name@ = @display.product.name@ Client.app.
@@ -56,12 +58,19 @@ patch_dsstore "$SRC/DS_Store" "$SRC/.DS_Store" $RELEASE_VERSION
 rm "$SRC/DS_Store"
 
 python macdeployqt.py "$APP_DIR" "$BINARIES" "$LIBRARIES" "$HELP" "$QT_DIR" "$QT_VERSION"
-security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain \
-    || security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
 
 if [ '@mac.skip.sign@' == 'false'  ]
 then
-    codesign -f -v --deep -s "@mac.sign.identity@" "$APP_DIR"
+    if [ -z "$KEYCHAIN" ]
+    then
+        KEYCHAIN_ARGS=
+        security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain \
+            || security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
+    else
+        KEYCHAIN_ARGS="--keychain $KEYCHAIN"
+    fi
+
+    codesign -f -v --deep $KEYCHAIN_ARGS -s "@mac.sign.identity@" "$APP_DIR"
 fi
 
 SetFile -c icnC $SRC/.VolumeIcon.icns

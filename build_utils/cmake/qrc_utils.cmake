@@ -52,6 +52,7 @@ function(nx_generate_qrc qrc_file)
     if(NOT result EQUAL 0)
         message(FATAL_ERROR "Cannot create ${qrc_file}")
     endif()
+    file(REMOVE ${qrc_file}.copy)
 
     if(QRC_USED_FILES_VARIABLE)
         set(${QRC_USED_FILES_VARIABLE} ${used_files} PARENT_SCOPE)

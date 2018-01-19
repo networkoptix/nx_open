@@ -108,12 +108,20 @@ inline __m128 CalcWeights(float x, float y)
     return _mm_mul_ps(w_x, w_y);
 }
 
-static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
+static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y, int width, int height)
 {
     simd128 weight = CalcWeights(x, y);
 
     const quint8* curPtr = buffer + (int)x + (int)y * stride; // pointer to first pixel
-    simd128 data = _mm_setr_ps((float) curPtr[0], (float) curPtr[1], (float) curPtr[stride], (float) curPtr[stride+1]);
+    simd128 data;
+    if (x < width -1 && y < height - 1)
+        data = _mm_setr_ps((float)curPtr[0], (float)curPtr[1], (float)curPtr[stride], (float)curPtr[stride + 1]);
+    else if (x < width - 1)
+        data = _mm_setr_ps((float)curPtr[0], (float)curPtr[1], (float)curPtr[0], (float)curPtr[1]);
+    else if (y < height - 1)
+        data = _mm_setr_ps((float)curPtr[0], (float)curPtr[0], (float)curPtr[stride], (float)curPtr[stride]);
+    else
+        data = _mm_setr_ps((float)curPtr[0], (float)curPtr[0], (float)curPtr[0], (float)curPtr[0]);
 
     union data {
         float fData[4];
@@ -126,13 +134,13 @@ static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
     //return _mm_cvtsi128_si32(out);
 }
 #elif __arm__ && __ARM_NEON__
-static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
+static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y, int width, int height)
 {
     //TODO/ARM
     return 0;
 }
 #else
-static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
+static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y, int width, int height)
 {
     // TODO: C fallback routine
     return 0;
@@ -215,7 +223,7 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
             for (int x = 0; x < w; ++x)
             {
                 const QPointF* dstPixel = m_transform[plane].data() + index;
-                quint8 pixel = GetPixel(m_tmpBuffer->data[plane], m_tmpBuffer->linesize[plane], dstPixel->x(), dstPixel->y());
+                quint8 pixel = GetPixel(m_tmpBuffer->data[plane], m_tmpBuffer->linesize[plane], dstPixel->x(), dstPixel->y(), w, h);
                 dstLine[x] = pixel;
 
                 index++;
@@ -318,12 +326,9 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
             qreal dstX = pos.x() * (imageSize.width()-1);
             qreal dstY = pos.y() * (imageSize.height()-1);
 
-            if (dstX < 0.0 || dstX > (qreal) (imageSize.width() - 1) ||
-                dstY < 0.0 || dstY > (qreal) (imageSize.height() - 1))
-            {
-                dstX = imageSize.width();
-                dstY = 0.0;
-            }
+            dstX = qBound(0.0, dstX, (qreal)imageSize.width() - 1);
+            dstY = qBound(0.0, dstY, (qreal)imageSize.height() - 1);
+
 
             *dstPos = QPointF(dstX, dstY);
             dstPos += dstDelta;
@@ -405,12 +410,8 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
             qreal dstX = pos.x() * (imageSize.width()-1);
             qreal dstY = pos.y() * (imageSize.height()-1);
 
-            if (dstX < 0.0 || dstX > (qreal) (imageSize.width() - 1) ||
-                dstY < 0.0 || dstY > (qreal) (imageSize.height() - 1))
-            {
-                dstX = imageSize.width();
-                dstY = 0.0;
-            }
+            dstX = qBound(0.0, dstX, (qreal) imageSize.width() - 1);
+            dstY = qBound(0.0, dstY, (qreal) imageSize.height() - 1);
 
             *dstPos = QPointF(dstX, dstY);
             dstPos += dstDelta;

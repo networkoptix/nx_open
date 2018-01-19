@@ -14,7 +14,7 @@ class SyncQueue:
     public ::testing::Test
 {
 protected:
-    nx::utils::thread push(
+    nx::utils::thread pushAsync(
         std::vector<int> values,
         std::chrono::milliseconds delay = std::chrono::milliseconds(0))
     {
@@ -31,8 +31,7 @@ protected:
             });
     }
 
-    int popSum(
-        std::chrono::milliseconds timeout = std::chrono::milliseconds(100))
+    int popSum(std::chrono::milliseconds timeout = std::chrono::milliseconds(500))
     {
         int total(0);
         while (auto value = queue.pop(timeout))
@@ -46,16 +45,16 @@ protected:
 
 TEST_F(SyncQueue, SinglePushPop)
 {
-    auto pusher = push({1, 2, 3, 4, 5});
+    auto pusher = pushAsync({1, 2, 3, 4, 5});
     ASSERT_EQ(popSum(), 15);
     pusher.join();
 }
 
 TEST_F(SyncQueue, MultiPushPop)
 {
-    auto pusher1 = push({1, 2, 3, 4, 5});
-    auto pusher2 = push({5, 5, 5});
-    auto pusher3 = push({3, 3, 3, 3});
+    auto pusher1 = pushAsync({1, 2, 3, 4, 5});
+    auto pusher2 = pushAsync({5, 5, 5});
+    auto pusher3 = pushAsync({3, 3, 3, 3});
 
     ASSERT_EQ(popSum(), 42);
 
@@ -64,18 +63,29 @@ TEST_F(SyncQueue, MultiPushPop)
     pusher3.join();
 }
 
+
 TEST_F(SyncQueue, TimedPop)
 {
-    ASSERT_FALSE(queue.pop(std::chrono::milliseconds(100)));
-    auto pusher = push({1, 2}, std::chrono::milliseconds(500));
+    const std::chrono::milliseconds kSmallDelay(100);
+    const std::chrono::milliseconds kLongDelay(10 * 1000);
 
-    ASSERT_FALSE(queue.pop(std::chrono::milliseconds(100))); // too early
-    ASSERT_EQ(*queue.pop(std::chrono::milliseconds(500)), 1); // just in time
+    ASSERT_FALSE(static_cast<bool>(queue.pop(kSmallDelay)));
 
-    ASSERT_FALSE(queue.pop(std::chrono::milliseconds(100))); // too early again
-    ASSERT_EQ(*queue.pop(std::chrono::milliseconds(500)), 2); // just in time
+    auto pusher1 = pushAsync({1}, kSmallDelay);
+    const auto value1 = queue.pop(kLongDelay);
+    ASSERT_TRUE(static_cast<bool>(value1));
+    ASSERT_EQ(*value1, 1);
+    pusher1.join();
 
-    pusher.join();
+    ASSERT_FALSE(static_cast<bool>(queue.pop(kSmallDelay)));
+
+    auto pusher2 = pushAsync({2}, kSmallDelay);
+    const auto value2 = queue.pop(kLongDelay);
+    ASSERT_TRUE(static_cast<bool>(value2));
+    ASSERT_EQ(*value2, 2);
+    pusher2.join();
+
+    ASSERT_FALSE(static_cast<bool>(queue.pop(kSmallDelay)));
 }
 
 TEST_F(SyncQueue, conditional_pop)

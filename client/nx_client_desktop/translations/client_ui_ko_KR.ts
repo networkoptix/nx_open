@@ -1109,34 +1109,6 @@
     </message>
   </context>
   <context>
-    <name>ExportRapidReviewDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
-      <source>Export Rapid Review</source>
-      <translation>빠른검토 내보내기</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Initial Video Length</source>
-      <translation>초기 영상길이</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Exported Video Length</source>
-      <translation>추출된 영상 길이</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Frames Interval</source>
-      <translation>프레임 간격</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Rapid Review speed</source>
-      <translation>빠른 검토 속도</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
@@ -2867,11 +2839,6 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>백업 설정</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
     </message>
   </context>
   <context>

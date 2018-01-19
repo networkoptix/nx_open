@@ -10,7 +10,6 @@
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QApplication>
 
-#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <utils/common/event_processors.h>
@@ -22,6 +21,9 @@
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/utils/log/assert.h>
+#include <api/helpers/thumbnail_request_data.h>
+#include <nx/api/mediaserver/image_request.h>
+#include <nx/client/desktop/image_providers/resource_thumbnail_provider.h>
 
 namespace nx {
 namespace client {
@@ -244,15 +246,16 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         ? kDefaultThumbnailWidth
         : qMin(kDefaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
 
-    tile->setPreview(new QnSingleThumbnailLoader(
-        camera,
-        previewTimeMs > 0 ? previewTimeMs : QnThumbnailRequestData::kLatestThumbnail,
-        QnThumbnailRequestData::kDefaultRotation,
-        QSize(thumbnailWidth, 0),
-        QnThumbnailRequestData::JpgFormat,
-        QnThumbnailRequestData::AspectRatio::AutoAspectRatio,
-        QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod,
-        tile));
+    api::ResourceImageRequest request;
+    request.resource = camera;
+    request.msecSinceEpoch = previewTimeMs > 0 ? previewTimeMs : nx::api::ImageRequest::kLatestThumbnail;
+    request.rotation = nx::api::ImageRequest::kDefaultRotation;
+    request.size = QSize(thumbnailWidth, 0);
+    request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
+    request.aspectRatio = nx::api::ImageRequest::AspectRatio::source;
+    request.roundMethod = nx::api::ImageRequest::RoundMethod::iFrameAfter;
+
+    tile->setPreview(new ResourceThumbnailProvider(request, tile));
 
     tile->preview()->loadAsync();
     tile->setPreviewCropRect(previewCropRect);

@@ -1,0 +1,58 @@
+SOFTWARE LICENSE AGREEMENT
+
+Unpacking, installing and using this software indicates you have read and understood the Agreement below and that you accept its terms.  Should you be unable or unwilling to accept these terms, do not unpack, install or use this software.  You should contact Cox Communications if you wish to raise any questions regarding the terms of the Agreement below before you unpack, install and use this software.
+
+END USER LICENSE AGREEMENT
+
+In consideration of the rights and restrictions included in this Agreement, and other good and valuable consideration, the sufficiency of which is hereby acknowledged, you agree as follows:
+
+1. OWNERSHIP.
+
+Cox Communications retains all rights, title and interest in and to any attached software (including SDK) and accompanying written documentation (together, the "Program"), including all intellectual property rights therein, subject to the rights expressly granted below.
+2. LICENSE.
+
+Subject to the terms and conditions of this Agreement, Cox Communications hereby grants to you a non-exclusive license to use the Program on one or more machines and to copy the Program onto any machine as a backup for the sole purpose of supporting your use of the Program for archival purposes.  You must reproduce and include the copyright at all times. This Agreement is your proof of license to exercise the rights granted herein and must be retained by you.  You may not sublicense, rent, lease or assign the License or the Program to any third party.  You may not translate or convert the Program to another programming language, decompile, disassemble or otherwise attempt to reverse engineer the Program, or export the Program from the country where the Program was provided to you without the appropriate government licenses.  You may only use, copy or transfer the Program, or any copy or merged portion, in whole or in part, as expressly provided for in this Agreement.
+
+3. COPYRIGHT.
+
+The Program is a proprietary product of Cox Communications or its licensors and is protected by copyright laws and international treaties.  All copies of the Program, in whole or in part, remain the property of Cox Communications or its licensors and are to be considered as part of the Program for the purpose of this Agreement.  Subject to the license expressly granted above, Cox Communications or its licensors retains all rights, title and interest in and to the Program.  You must treat the Program like any other copyrighted material.
+
+4. LIMITED WARRANTY.
+
+The Program is provided "as is" without warranty of any kind, either express or implied, including but not limited to the implied warranties of merchantability and fitness for a particular purpose and those arising by statute or otherwise in law or from a course of dealing or usage of trade.  The entire risk as to the quality and performance of the Program is with you.  Some states and provinces do not allow the exclusion of implied warranties so the above exclusion may not apply to you.
+
+Cox Communications does not warrant that the functions contained in the Program will meet your requirements or that the operation of the Program will be uninterrupted or error free or that errors will be corrected.
+
+5. NO SUPPORT
+
+Except as expressly required by applicable law, nothing in this Agreement entitles you to any support, maintenance or new versions of the Program.  You may contact Cox Communications to determine the availability of support, maintenance, and new versions, and the fees, terms and conditions that would apply.
+
+6. LIMITATION OF REMEDIES.
+
+In no event will Cox Communications or its licensors be liable to you or any third party for any indirect, incidental or consequential damages (including without limitation lost profits, lost savings or lost data) arising out of this Agreement or use or inability to use the Program even if Cox Communications has been advised of the possibility of such damage or claim. In no event will Cox Communications’s direct liability under or arising out of this Agreement, whether in contract or in tort, exceed the amount paid by you for the Program.  Some states and provinces do not allow the limitation or exclusion of liability for incidental or consequential damages so the above limitation or exclusion may not apply to you.
+
+7. TERM.
+
+This Agreement is effective until terminated.  Cox Communications may terminate this Agreement immediately if you fail to comply with any material term of this Agreement.  You may elect to terminate this Agreement at any time by giving written notice to Cox Communications.  In the event of termination of this Agreement, you agree to destroy all copies of the Program, in whole or in part, provided or created under this Agreement that are in your possession, power or control.  A signed certification to this effect will be required.
+
+8. THIRD PARTY LICENSES
+
+The Program uses FFmpeg, qt and Ajax.org Cloud9 Editor (formerly Bespin) (together “Third Party Software”). Third Party Software are being provided to you under the terms and conditions of GNU Lesser General Public License v2.1 (“LGPL”), which is available for you to review at:
+
+http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+
+You understand and agree that, although provided to you by Cox Communications with the Program, your use of Third Party Software shall be and is governed by the LGPL.  The ownership terms in the Agreement do not apply to Third Party Software.  You understand and acknowledge that under the LGPL, Third Party Software is being provided “AS IS” WITHOUT ANY WARRANTY, INCLUDING BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  If there is a conflict between the Agreement and LGPL with respect to Third Party Software, the provisions of the LGPL shall prevail.
+
+You may obtain a complete copy of the source code for the above-mentioned free software, under the terms of the LGPL, from Cox Communications, without charge, except for the cost of media, shipping, and handling, upon written request to Cox Communications at the address set forth below:
+
+1001 Summit Blvd.
+
+Atlanta, Georgia, USA 30319
+
+9. WAIVER OF CONTRACTUAL RIGHT.
+
+The failure of Cox Communications to enforce any provision of this Agreement shall not be construed as a waiver or limitation of Cox Communications’s right to subsequently enforce and compel strict compliance with every provision of this Agreement.
+
+10. GENERAL.
+
+If any provision of this Agreement is found to be unlawful, void or unenforceable for any reason, then that provision shall be deemed severed from this Agreement and shall not affect the validity and the enforceability of the remaining portions of this Agreement.  You acknowledge and agree that Cox Communications’s licensor is a third party beneficiary of this Agreement and the provisions of this Agreement are made expressly for the benefit of, and are enforceable by, such licensor.  This Agreement is the complete and exclusive statement of the agreement between Cox Communications and you and supersedes any proposal or prior agreement, oral or written, and any other communications between Cox Communications and you relating to the subject matter hereof.  This Agreement is governed by the laws of the State of Georgia without regard to conflict of law principles. The United Nations Convention On Contracts for the International Sale Of Goods, 1980, and any successor thereto, shall not apply. The Federal and State courts within the State of Georgia shall have exclusive jurisdiction to adjudicate all disputes and claims arising out of or related to this Agreement.

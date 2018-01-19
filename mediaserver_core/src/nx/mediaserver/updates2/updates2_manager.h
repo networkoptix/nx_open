@@ -6,6 +6,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/mediaserver/updates2/detail/updates2_status_data_ex.h>
+#include <nx/vms/common/p2p/downloader/file_information.h>
 
 namespace nx {
 namespace mediaserver {
@@ -33,8 +34,14 @@ private:
     void loadStatusFromFile();
     void swapRegistries(update::info::AbstractUpdateRegistryPtr otherRegistry);
     void refreshStatusAfterCheck();
-    void onDownloadFinished(const QString& fileName);
     void setStatusUnsafe(api::Updates2StatusData::StatusCode code, const QString& message);
+    void onDownloadFinished(const QString& fileName);
+    void onDownloadFailed(const QString& fileName);
+    void onFileAdded(const vms::common::p2p::downloader::FileInformation& fileInformation);
+    void onFileDeleted(const QString& fileName);
+    void onFileInformationChanged(
+        const vms::common::p2p::downloader::FileInformation& fileInformation);
+    void onFileStatusChanged(const vms::common::p2p::downloader::FileInformation& fileInformation);
 };
 
 } // namespace updates2

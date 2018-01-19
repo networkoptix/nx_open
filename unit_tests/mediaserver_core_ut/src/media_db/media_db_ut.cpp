@@ -1060,6 +1060,8 @@ TEST_F(MediaDbTest, StorageDB)
     }
 
     ASSERT_EQ(allVisited, true);
+    qnNormalStorageMan->stopAsyncTasks();
+    qnBackupStorageMan->stopAsyncTasks();
 }
 
 TEST_F(MediaDbTest, Migration_from_sqlite)
@@ -1164,5 +1166,8 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
         ASSERT_TRUE(left == right);
 
     }
+
+    qnNormalStorageMan->stopAsyncTasks();
+    qnBackupStorageMan->stopAsyncTasks();
 }
 

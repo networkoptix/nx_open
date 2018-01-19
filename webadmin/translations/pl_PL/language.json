@@ -87,6 +87,7 @@
         "maxRecordQueueSizeBytes": "Max rozmiar kolejki rekordów (bajty)",
         "maxRecordQueueSizeElements": "Max rozmiar kolejki rekordów (elementy)",
         "maxRemoteArchiveSynchronizationThreads": "Max liczba wątków synchronizacji zdalnej archiwizacji",
+        "maxRtspConnectDurationSeconds": "Max Rtsp connect duration seconds",
         "maxSceneItems": "Max liczba elementów sceny (0 oznacza domyślną)",
         "proxyConnectTimeoutSec": "Limit czasu połączenia proxy (sek.)",
         "rtpTimeoutMs": "Limit czasu RTP (ms)",

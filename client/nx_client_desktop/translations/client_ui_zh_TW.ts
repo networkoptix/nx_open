@@ -1109,34 +1109,6 @@
     </message>
   </context>
   <context>
-    <name>ExportRapidReviewDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
-      <source>Export Rapid Review</source>
-      <translation>匯出縮時預覽</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Initial Video Length</source>
-      <translation>原始影像長度</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Exported Video Length</source>
-      <translation>匯出影像長度</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Frames Interval</source>
-      <translation>兩張影像間隔</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Rapid Review speed</source>
-      <translation>縮時預覽倍數</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
@@ -2867,11 +2839,6 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>備份設置...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>錄影到停用的儲存將置將停止. 但其中的錄影資料仍會被循環錄影刪除.</translation>
     </message>
   </context>
   <context>
