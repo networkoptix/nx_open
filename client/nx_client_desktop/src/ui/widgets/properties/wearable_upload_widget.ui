@@ -71,7 +71,7 @@
       <item>
        <widget class="QLabel" name="warningLabel">
         <property name="text">
-         <string>&lt;warning&gt;</string>
+         <string></string>
         </property>
        </widget>
       </item>
