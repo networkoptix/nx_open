@@ -158,10 +158,10 @@ static const int kDisableAllSslVerions =
 
 void SslStaticData::setAllowedServerVersions(const String& versions)
 {
-    NX_LOG(lm("Set server SSL versions: %1").container(versions), cl_logALWAYS);
-
     int disabledVersions = kDisableAllSslVerions;
     const auto versionList = versions.split('|');
+    NX_LOG(lm("Set server SSL versions: %1").container(versionList), cl_logALWAYS);
+
     for (const auto& version: versionList)
     {
         const auto s = version.trimmed().toLower();
@@ -199,7 +199,7 @@ void SslStaticData::setAllowedServerCiphers(const String& ciphers)
 }
 
 std::atomic<bool> SslStaticData::s_isInitialized(false);
-int SslStaticData::s_disabledServerVersions(SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3);
+int SslStaticData::s_disabledServerVersions(SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1);
 String SslStaticData::s_allowedServerCiphers("HIGH:!RC4:!3DES");
 
 } // namespace ssl

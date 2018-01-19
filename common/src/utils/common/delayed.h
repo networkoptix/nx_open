@@ -20,4 +20,10 @@ void executeDelayed(Callback callback, int delayMs = kDefaultDelay, QThread* tar
 /// You have to delete timer to prevent callback to be executed
 QTimer* executeDelayedParented(Callback callback, int delayMs, QObject* parent);
 
+/**
+ * Execute specified functor in the thread of the provided parent. If parent is destroyed, callback
+ * will not be called.
+ */
+QTimer* executeDelayedParented(Callback callback, QObject* parent);
+
 void executeInThread(QThread* thread, Callback callback);

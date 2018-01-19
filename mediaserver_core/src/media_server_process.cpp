@@ -134,7 +134,6 @@
 #include <rest/handlers/crash_server_handler.h>
 #include <rest/handlers/external_event_rest_handler.h>
 #include <rest/handlers/favicon_rest_handler.h>
-#include <rest/handlers/image_rest_handler.h>
 #include <rest/handlers/log_rest_handler.h>
 #include <rest/handlers/manual_camera_addition_rest_handler.h>
 #include <rest/handlers/ping_rest_handler.h>
@@ -1191,6 +1190,8 @@ void MediaServerProcess::stopObjects()
 
     qnNormalStorageMan->cancelRebuildCatalogAsync();
     qnBackupStorageMan->cancelRebuildCatalogAsync();
+    qnNormalStorageMan->stopAsyncTasks();
+    qnBackupStorageMan->stopAsyncTasks();
 
     if (qnFileDeletor)
         qnFileDeletor->stop();
@@ -1554,7 +1555,6 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/setCameraParam", new QnCameraSettingsRestHandler());
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
     reg("api/ptz", new QnPtzRestHandler());
-    reg("api/image", new QnImageRestHandler()); //< deprecated
     reg("api/createEvent", new QnExternalEventRestHandler());
     static const char kGetTimePath[] = "api/gettime";
     reg(kGetTimePath, new QnTimeRestHandler());
@@ -1930,10 +1930,17 @@ void MediaServerProcess::initPublicIpDiscovery()
     m_ipDiscovery->update();
     m_ipDiscovery->waitForFinished();
     at_updatePublicAddress(m_ipDiscovery->publicIP());
+}
 
+void MediaServerProcess::initPublicIpDiscoveryUpdate()
+{
     m_updatePiblicIpTimer.reset(new QTimer());
-    connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::update);
-    connect(m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
+    connect(m_updatePiblicIpTimer.get(), &QTimer::timeout,
+        m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::update);
+
+    connect(m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::found,
+        this, &MediaServerProcess::at_updatePublicAddress);
+
     m_updatePiblicIpTimer->start(kPublicIpUpdateTimeoutMs);
 }
 
@@ -2507,6 +2514,7 @@ void MediaServerProcess::run()
             case Qn::IncompatibleVersionConnectionResult:
             case Qn::IncompatibleProtocolConnectionResult:
                 NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
+                stopObjects();
                 return;
             default:
                 break;
@@ -2537,7 +2545,10 @@ void MediaServerProcess::run()
         this, &MediaServerProcess::at_runtimeInfoChanged, Qt::QueuedConnection);
 
     if (needToStop())
+    {
+        stopObjects();
         return; //TODO #ak correctly deinitialize what has been initialised
+    }
 
     qnServerModule->roSettings()->setValue(QnServer::kRemoveDbParamName, "0");
 
@@ -2547,6 +2558,7 @@ void MediaServerProcess::run()
     if (qnServerModule->roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes")
     {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
+        stopObjects();
         nx::SystemName systemName(connectInfo.systemName);
         systemName.saveToConfig(); //< migrate system name from foreign database via config
         nx::ServerSetting::setSysIdTime(0);
@@ -2618,7 +2630,10 @@ void MediaServerProcess::run()
     }
 
     if (needToStop())
+    {
+        stopObjects();
         return;
+    }
 
     if (qnServerModule->roSettings()->value("disableTranscoding").toBool())
         commonModule()->setTranscodeDisabled(true);
@@ -2631,6 +2646,7 @@ void MediaServerProcess::run()
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
+        stopObjects();
         return;
     }
 
@@ -2842,6 +2858,7 @@ void MediaServerProcess::run()
 
     qnServerModule->metadataManagerPool()->init();
     at_runtimeInfoChanged(runtimeManager->localInfo());
+    initPublicIpDiscoveryUpdate();
 
     saveServerInfo(m_mediaServer);
     m_mediaServer->setStatus(Qn::Online);
@@ -3087,9 +3104,6 @@ void MediaServerProcess::run()
     eventRuleProcessor.reset();
 
     motionHelper.reset();
-
-    qnNormalStorageMan->stopAsyncTasks();
-    qnBackupStorageMan->stopAsyncTasks();
 
     //ptzPool.reset();
 

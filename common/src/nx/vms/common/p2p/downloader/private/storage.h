@@ -66,10 +66,13 @@ public:
     static QVector<QByteArray> calculateChecksums(const QString& filePath, qint64 chunkSize);
 
 signals:
-    void fileAdded(const FileInformation& fileInformation);
+    void fileAdded(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
     void fileDeleted(const QString& fileName);
-    void fileInformationChanged(const FileInformation& fileInformation);
-    void fileStatusChanged(const FileInformation& fileInformation);
+    void fileInformationChanged(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
+    void fileStatusChanged(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
 
 private:
     ResultCode addDownloadedFile(const FileInformation& fileInformation);

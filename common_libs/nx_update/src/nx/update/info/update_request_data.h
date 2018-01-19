@@ -6,7 +6,7 @@ namespace nx {
 namespace update {
 namespace info {
 
-struct NX_UPDATE_API OsVersion
+struct OsVersion
 {
     QString family;
     QString architecture;
@@ -40,13 +40,13 @@ struct NX_UPDATE_API OsVersion
     }
 };
 
-NX_UPDATE_API OsVersion ubuntuX64();
-NX_UPDATE_API OsVersion ubuntuX86();
-NX_UPDATE_API OsVersion windowsX64();
-NX_UPDATE_API OsVersion windowsX86();
-NX_UPDATE_API OsVersion armBpi();
-NX_UPDATE_API OsVersion armRpi();
-NX_UPDATE_API OsVersion armBananapi();
+OsVersion ubuntuX64();
+OsVersion ubuntuX86();
+OsVersion windowsX64();
+OsVersion windowsX86();
+OsVersion armBpi();
+OsVersion armRpi();
+OsVersion armBananapi();
 
 struct UpdateRequestData
 {

@@ -366,18 +366,6 @@ to view more bookmarks</translation>
       <translation type="unfinished">Remove Bookmarks...</translation>
     </message>
     <message>
-      <source>Export Selected Area...</source>
-      <translation type="unfinished">Export Selected Area...</translation>
-    </message>
-    <message>
-      <source>Export Multi-Video...</source>
-      <translation type="unfinished">Export Multi-Video...</translation>
-    </message>
-    <message>
-      <source>Export Rapid Review...</source>
-      <translation type="unfinished">Export Rapid Review...</translation>
-    </message>
-    <message>
       <source>Preview Search...</source>
       <translation type="unfinished">Preview Search...</translation>
     </message>
@@ -991,16 +979,16 @@ to view more bookmarks</translation>
       <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
     </message>
     <message>
-      <source>Settings are not available for .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .EXE files.</translation>
-    </message>
-    <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
       <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
       <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .NOV and .EXE files.</source>
+      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
     </message>
   </context>
   <context>
@@ -2742,10 +2730,6 @@ from anywhere with any
 devices</translation>
     </message>
     <message>
-      <source>Known limitations</source>
-      <translation type="unfinished">Known limitations</translation>
-    </message>
-    <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation type="unfinished">Disconnect System from %1</translation>
@@ -2778,11 +2762,6 @@ to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation type="unfinished">Connect System
 to %1</translation>
-    </message>
-    <message>
-      <source>%1 is in Beta.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">%1 is in Beta.</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
@@ -6191,6 +6170,14 @@ to %1</translation>
       <source>Backup completed</source>
       <translation type="unfinished">Backup completed</translation>
     </message>
+    <message>
+      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
+      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -7868,6 +7855,10 @@ to %1</translation>
       <comment>%1 is file name</comment>
       <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
+    <message>
+      <source>Selected period cannot be exported for the current camera.</source>
+      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::legacy::ExportLayoutTool</name>
@@ -7924,86 +7915,6 @@ to %1</translation>
       <translation type="unfinished">Exporting Layout</translation>
     </message>
     <message>
-      <source>You are about to export a long video</source>
-      <translation type="unfinished">You are about to export a long video</translation>
-    </message>
-    <message>
-      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation type="unfinished">It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
-    </message>
-    <message>
-      <source>Export anyway?</source>
-      <translation type="unfinished">Export anyway?</translation>
-    </message>
-    <message>
-      <source>Export Video As...</source>
-      <translation type="unfinished">Export Video As...</translation>
-    </message>
-    <message>
-      <source>No Timestamp</source>
-      <translation type="unfinished">No Timestamp</translation>
-    </message>
-    <message>
-      <source>Top Left Corner (requires transcoding)</source>
-      <translation type="unfinished">Top Left Corner (requires transcoding)</translation>
-    </message>
-    <message>
-      <source>Top Right Corner (requires transcoding)</source>
-      <translation type="unfinished">Top Right Corner (requires transcoding)</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner (requires transcoding)</source>
-      <translation type="unfinished">Bottom Left Corner (requires transcoding)</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner (requires transcoding)</source>
-      <translation type="unfinished">Bottom Right Corner (requires transcoding)</translation>
-    </message>
-    <message>
-      <source>Timestamps:</source>
-      <translation type="unfinished">Timestamps:</translation>
-    </message>
-    <message>
-      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-      <translation type="unfinished">Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</translation>
-    </message>
-    <message>
-      <source>AVI format is not recommended</source>
-      <translation type="unfinished">AVI format is not recommended</translation>
-    </message>
-    <message>
-      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation type="unfinished">For exporting a non-continuous recording MKV or some other format is recommended.</translation>
-    </message>
-    <message>
-      <source>Export to AVI anyway?</source>
-      <translation type="unfinished">Export to AVI anyway?</translation>
-    </message>
-    <message>
-      <source>Selected format not recommended</source>
-      <translation type="unfinished">Selected format not recommended</translation>
-    </message>
-    <message>
-      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation type="unfinished">To avoid video downscaling, NOV or EXE formats are recommended for this camera.</translation>
-    </message>
-    <message>
-      <source>Export with transcoding?</source>
-      <translation type="unfinished">Export with transcoding?</translation>
-    </message>
-    <message>
-      <source>It will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">It will increase CPU usage and may take significant time.</translation>
-    </message>
-    <message>
-      <source>Exporting Video</source>
-      <translation type="unfinished">Exporting Video</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation type="unfinished">Exporting to &quot;%1&quot;...</translation>
-    </message>
-    <message>
       <source>EXE format not recommended</source>
       <translation type="unfinished">EXE format not recommended</translation>
     </message>
@@ -8032,10 +7943,6 @@ to %1</translation>
       <translation type="unfinished">Save local layout as...</translation>
     </message>
     <message>
-      <source>Export Layout As...</source>
-      <translation type="unfinished">Export Layout As...</translation>
-    </message>
-    <message>
       <source>exported</source>
       <translation type="unfinished">exported</translation>
     </message>
@@ -8050,26 +7957,6 @@ to %1</translation>
     <message>
       <source>Export</source>
       <translation type="unfinished">Export</translation>
-    </message>
-    <message>
-      <source>You are about to export a lot of video</source>
-      <translation type="unfinished">You are about to export a lot of video</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation type="unfinished">Too short period selected</translation>
-    </message>
-    <message>
-      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-      <translation type="unfinished">For exporting as Rapid Review, video length should be at least 10 seconds.</translation>
-    </message>
-    <message>
-      <source>Export completed</source>
-      <translation type="unfinished">Export completed</translation>
-    </message>
-    <message>
-      <source>Failed to export video</source>
-      <translation type="unfinished">Failed to export video</translation>
     </message>
   </context>
   <context>

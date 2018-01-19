@@ -1190,7 +1190,8 @@ bool QnRtspClient::sendSetup()
         {
             if (m_transport == TRANSPORT_AUTO && m_prefferedTransport == TRANSPORT_TCP) {
                 m_prefferedTransport = TRANSPORT_UDP;
-                return sendSetup(); // try UDP transport
+                if (!sendSetup()) //< Try UDP transport.
+                    return false;
             }
             else
                 return false;

@@ -175,7 +175,7 @@ private:
     QQueue<ScanData> m_scanTasks;
     mutable QnMutex m_mutex;
     QnWaitCondition m_waitCond;
-    bool m_fullScanCanceled;
+    std::atomic<bool> m_fullScanCanceled;
 
 public:
     ScanMediaFilesTask(QnStorageManager* owner): QnLongRunnable(), m_owner(owner), m_fullScanCanceled(false)
@@ -379,8 +379,13 @@ public:
                 }
             }
 
-            NX_ASSERT(qnBackupStorageMan->scheduleSync());
-            qnBackupStorageMan->scheduleSync()->updateLastSyncChunk();
+            NX_ASSERT(m_owner);
+            if (m_owner && m_owner->m_role == QnServer::StoragePool::Backup)
+            {
+                NX_ASSERT(m_owner->scheduleSync());
+                if (m_owner->scheduleSync())
+                    m_owner->scheduleSync()->updateLastSyncChunk();
+            }
         }
     }
 };
@@ -894,9 +899,9 @@ QnStorageScanData QnStorageManager::rebuildInfo() const
 QnStorageScanData QnStorageManager::rebuildCatalogAsync()
 {
     QnStorageScanData result = rebuildInfo();
+    QnMutexLocker lock(&m_mutexRebuild);
     if (!m_rebuildArchiveThread->hasFullScanTasks())
     {
-        QnMutexLocker lock( &m_mutexRebuild );
         m_rebuildCancelled = false;
         QVector<QnStorageResourcePtr> storagesToScan;
         for(const QnStorageResourcePtr& storage: getStoragesInLexicalOrder()) {
@@ -1207,12 +1212,23 @@ void QnStorageManager::removeAbsentStorages(const QnStorageResourceList &newStor
 
 QnStorageManager::~QnStorageManager()
 {
+    // These threads below should've been stopped and destroyed manually by this moment.
+    {
+        QnMutexLocker lock(&m_testStorageThreadMutex);
+        NX_ASSERT(!m_testStorageThread);
+    }
+
+    {
+        QnMutexLocker lock(&m_mutexRebuild);
+        NX_ASSERT(!m_rebuildArchiveThread);
+    }
+
+    stopAsyncTasks();
+
     if (m_role == QnServer::StoragePool::Normal)
         QnNormalStorageManager_instance = nullptr;
     else if (m_role == QnServer::StoragePool::Backup)
         QnBackupStorageManager_instance = nullptr;
-
-    stopAsyncTasks();
 }
 
 QnStorageManager* QnStorageManager::normalInstance()
@@ -2180,7 +2196,11 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
         migrateSqliteDatabase(fileStorage);
         addDataFromDatabase(fileStorage);
         NX_LOG(lit("[Storage, scan]: storage %1 - finished loading data from DB. Ready for scan").arg(fileStorage->getUrl()), cl_logDEBUG2);
-        m_rebuildArchiveThread->addStorageToScan(fileStorage, true);
+        {
+            QnMutexLocker lock(&m_mutexRebuild);
+            if (m_rebuildArchiveThread)
+                m_rebuildArchiveThread->addStorageToScan(fileStorage, true);
+        }
         m_spaceInfo.storageAdded(qnStorageDbPool->getStorageIndex(fileStorage), fileStorage->getTotalSpace());
     }
 
@@ -2229,7 +2249,8 @@ void QnStorageManager::stopAsyncTasks()
 {
     {
         QnMutexLocker lock( &m_testStorageThreadMutex );
-        if (m_testStorageThread) {
+        if (m_testStorageThread)
+        {
             m_testStorageThread->stop();
             delete m_testStorageThread;
             m_testStorageThread = 0;
@@ -2237,10 +2258,14 @@ void QnStorageManager::stopAsyncTasks()
     }
 
     m_rebuildCancelled = true;
-    if (m_rebuildArchiveThread) {
-        m_rebuildArchiveThread->stop();
-        delete m_rebuildArchiveThread;
-        m_rebuildArchiveThread = 0;
+    {
+        QnMutexLocker lock(&m_mutexRebuild);
+        if (m_rebuildArchiveThread)
+        {
+            m_rebuildArchiveThread->stop();
+            delete m_rebuildArchiveThread;
+            m_rebuildArchiveThread = 0;
+        }
     }
 
     m_auxTasksTimerManager.stop();

@@ -62,7 +62,7 @@ void Plugin::SharedResources::setResourceAccess(
 
 Plugin::Plugin()
 {
-    QFile f(":manifest.json");
+    QFile f(":/hanwha/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
     m_driverManifest = QJson::deserialized<Hanwha::DriverManifest>(m_manifest);

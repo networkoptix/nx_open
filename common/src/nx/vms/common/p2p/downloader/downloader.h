@@ -62,10 +62,13 @@ public:
 signals:
     void downloadFinished(const QString& fileName);
     void downloadFailed(const QString& fileName);
-    void fileAdded(const FileInformation& fileInformation);
+    void fileAdded(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
     void fileDeleted(const QString& fileName);
-    void fileInformationChanged(const FileInformation& fileInformation);
-    void fileStatusChanged(const FileInformation& fileInformation);
+    void fileInformationChanged(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
+    void fileStatusChanged(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
 
 private:
     QScopedPointer<DownloaderPrivate> const d_ptr;

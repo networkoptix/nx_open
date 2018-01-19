@@ -23,10 +23,8 @@ class LayoutThumbnailLoader:
 public:
     explicit LayoutThumbnailLoader(
         const QnLayoutResourcePtr& layout,
-        bool allowNonCameraResources,
         const QSize& maximumSize,
-        qint64 msecSinceEpoch = QnThumbnailRequestData::kLatestThumbnail,
-        QnThumbnailRequestData::ThumbnailFormat format = QnThumbnailRequestData::JpgFormat,
+        qint64 msecSinceEpoch,
         QObject* parent = nullptr);
 
     virtual ~LayoutThumbnailLoader() override;

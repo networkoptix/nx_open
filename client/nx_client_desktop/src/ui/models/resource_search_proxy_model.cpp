@@ -60,7 +60,7 @@ void QnResourceSearchProxyModel::invalidateFilterLater()
         return; /* Already waiting for invalidation. */
 
     m_invalidating = true;
-    executeDelayedParented([this]{ invalidateFilter(); }, kDefaultDelay, this);
+    executeDelayedParented([this]{ invalidateFilter(); }, this);
 }
 
 bool QnResourceSearchProxyModel::filterAcceptsRow(

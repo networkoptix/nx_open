@@ -65,3 +65,5 @@ QN_FUSION_DECLARE_FUNCTIONS(FileInformation::PeerPolicy, (lexical))
 } // namespace common
 } // namespace vms
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::vms::common::p2p::downloader::FileInformation)

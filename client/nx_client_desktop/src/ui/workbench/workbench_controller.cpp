@@ -566,7 +566,7 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos)
                 return;
 
             QnHiDpiWorkarounds::showMenu(menu.data(), pos);
-        }, kDefaultDelay, this);
+        }, this);
 }
 
 void QnWorkbenchController::updateDraggedItems()

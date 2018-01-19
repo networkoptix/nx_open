@@ -47,6 +47,12 @@ class AbstractStorageResourceTest:
     using base_type = MediaServerModuleFixture;
 
 protected:
+    virtual void TearDown() override
+    {
+        qnNormalStorageMan->stopAsyncTasks();
+        qnBackupStorageMan->stopAsyncTasks();
+    }
+
     virtual void SetUp() override
     {
         base_type::SetUp();

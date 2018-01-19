@@ -10,6 +10,8 @@ set(display.mobile.name "${display.product.name} Mobile")
 set(uri.protocol "nx-vms")
 
 set(nxtoolUpgradeCode "cc740987-5070-4750-b853-327417176031")
+set(build_nxtool OFF)
+
 set(backgroundImage "{}")
 set(defaultWebPages "{}")
 set(installer.language "en_US")
@@ -30,6 +32,8 @@ if(beta)
 else()
     set(updateFeedUrl ${prodUpdateFeedUrl})
 endif()
+
+set(mac_certificate_file_password "qweasd123")
 
 # Additional Features
 set(vmax false)

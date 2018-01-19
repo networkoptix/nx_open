@@ -175,9 +175,9 @@ void HanwhaResourceSearcher::updateSocketList()
 
 bool HanwhaResourceSearcher::isHostBelongsToValidSubnet(const QHostAddress& address) const
 {
-    const auto interfaceList = nx::network::getAllIPv4Interfaces(
-        false, /*allowInterfacesWithoutAddress*/
-        true /*keepAllAddressesPerInterface*/);
+    using namespace nx::network;
+    const auto interfaceList = getAllIPv4Interfaces(
+        InterfaceListPolicy::keepAllAddressesPerInterface);
     return std::any_of(
         interfaceList.begin(), interfaceList.end(),
         [&address](const nx::network::QnInterfaceAndAddr& netInterface)
@@ -366,8 +366,8 @@ void HanwhaResourceSearcher::createResource(
     auto auth = rpRes ? rpRes->getAuth() : getDefaultAuth();
     resource->setDefaultAuth(auth);
     result << resource;
-
-    addMultichannelResources(result, auth);
+    if (rpRes)
+        addMultichannelResources(result, auth);
 }
 
 template <typename T>
