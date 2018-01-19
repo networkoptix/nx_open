@@ -333,6 +333,7 @@ protected:
     void setMaxFps(int f);
 
     void setPrimaryVideoCapabilities(const VideoOptionsLocal& capabilities) { m_primaryStreamCapabilities = capabilities; }
+    void setSecondaryVideoCapabilities(const VideoOptionsLocal& capabilities) { m_secondaryStreamCapabilities = capabilities; }
     boost::optional<onvifXsd__H264Profile> getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
 private:
     friend class QnOnvifStreamReader;

@@ -43,7 +43,9 @@ private:
 
     CameraDiagnostics::Result initialize2WayAudio();
     std::unique_ptr<nx_http::HttpClient> getHttpClient();
-
+    void setResolutionList(
+        const hikvision::ChannelCapabilities& channelCapabilities,
+        Qn::ConnectionRole role);
 private:
     std::map<Qn::ConnectionRole, hikvision::ChannelCapabilities> m_channelCapabilitiesByRole;
     bool m_hevcSupported = false;

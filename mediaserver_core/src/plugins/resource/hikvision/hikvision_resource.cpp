@@ -79,10 +79,7 @@ CameraDiagnostics::Result HikvisionResource::initializeCameraDriver()
 
 QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
 {
-    if (m_hevcSupported)
-        return new plugins::HikvisionHevcStreamReader(toSharedPointer(this));
-
-    return base_type::createLiveDataProvider();
+    return new plugins::HikvisionHevcStreamReader(toSharedPointer(this));
 }
 
 CameraDiagnostics::Result HikvisionResource::initializeMedia(
@@ -104,23 +101,36 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
             m_hevcSupported = hikvision::codecSupported(
                 AV_CODEC_ID_HEVC,
                 channelCapabilities);
-            if (m_hevcSupported && role == Qn::ConnectionRole::CR_LiveVideo)
+            if (m_hevcSupported)
             {
-                setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, 1);
-                if (!channelCapabilities.resolutions.empty())
+                if (role == Qn::ConnectionRole::CR_LiveVideo)
                 {
-                    auto capabilities = primaryVideoCapabilities();
-                    capabilities.resolutions = QList<QSize>::fromVector(QVector<QSize>::fromStdVector(
-                        channelCapabilities.resolutions));
-                    setPrimaryVideoCapabilities(capabilities);
+                    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, 1);
+                    if (!channelCapabilities.fps.empty())
+                        setMaxFps(channelCapabilities.fps[0] / 100);
                 }
-                if (!channelCapabilities.fps.empty())
-                    setMaxFps(channelCapabilities.fps[0] / 100);
+                if (!channelCapabilities.resolutions.empty())
+                    setResolutionList(channelCapabilities, role);
             }
         }
     }
-
+    if (m_hevcSupported)
+        return CameraDiagnostics::NoErrorResult();
     return base_type::initializeMedia(onvifCapabilities);
+}
+
+void HikvisionResource::setResolutionList(
+    const hikvision::ChannelCapabilities& channelCapabilities,
+    Qn::ConnectionRole role)
+{
+    auto capabilities = role == Qn::CR_SecondaryLiveVideo
+        ? secondaryVideoCapabilities() : primaryVideoCapabilities();
+    capabilities.resolutions = QList<QSize>::fromVector(QVector<QSize>::fromStdVector(
+        channelCapabilities.resolutions));
+    if (role == Qn::CR_SecondaryLiveVideo)
+        setSecondaryVideoCapabilities(capabilities);
+    else
+        setPrimaryVideoCapabilities(capabilities);
 }
 
 std::unique_ptr<nx_http::HttpClient> HikvisionResource::getHttpClient()
