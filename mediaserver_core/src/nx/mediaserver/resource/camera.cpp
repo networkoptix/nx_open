@@ -322,8 +322,7 @@ QSize Camera::closestResolution(
     const QList<QSize>& resolutionList,
     double* outCoefficient)
 {
-    const auto maxResolutionArea = maxResolution.width() * maxResolution.height();
-
+    const auto maxResolutionArea = double(maxResolution.width()) * double(maxResolution.height());
     QSize result = getNearestResolution(
         idealResolution,
         aspectRatio,

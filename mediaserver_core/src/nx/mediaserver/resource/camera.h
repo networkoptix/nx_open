@@ -120,6 +120,8 @@ public:
     };
 
 protected:
+    virtual CameraDiagnostics::Result initInternal() override;
+
     /** Is called during initInternal(). */
     virtual CameraDiagnostics::Result initializeCameraDriver() = 0;
 
@@ -132,7 +134,6 @@ protected:
     virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(bool primaryStream) = 0;
 
 private:
-    virtual CameraDiagnostics::Result initInternal() override;
     CameraDiagnostics::Result initializaAdvancedParamitersProviders();
 
 private:

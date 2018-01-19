@@ -80,6 +80,10 @@ public:
 
 private:
     QnCameraAdvancedParams describeCapabilities(const StreamCapabilityMap& capabilities) const;
+    std::vector<QnCameraAdvancedParameter> describeCapabilities(
+        const QMap<QString, QMap<QString, nx::media::CameraStreamCapability>>&
+            codecResolutionCapabilities) const;
+
     QnLiveStreamParams bestParameters(
         const StreamCapabilityMap& capabilities, const QSize& baseResolution);
 

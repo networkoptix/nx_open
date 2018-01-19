@@ -178,6 +178,26 @@ QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::describeCapab
     for (auto it = capabilities.begin(); it != capabilities.end(); ++it)
         codecResolutionCapabilities[it.key().codec][sizeToString(it.key().resolution)] = it.value();
 
+    QnCameraAdvancedParamGroup streamParameters;
+    streamParameters.name = m_isPrimaryStream ? lit("Primary") : lit("Secondary");
+    streamParameters.params = describeCapabilities(codecResolutionCapabilities);
+
+    QnCameraAdvancedParamGroup videoStreams;
+    videoStreams.name = lit("Video Streams Configuration");
+    videoStreams.groups.push_back(streamParameters);
+
+    QnCameraAdvancedParams descriptions;
+    descriptions.name = proprtyName();
+    descriptions.unique_id = QnUuid::createUuid().toSimpleString();
+    descriptions.version = toString(this);
+    descriptions.groups.push_back(videoStreams);
+    return descriptions;
+}
+
+std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvider::describeCapabilities(
+    const QMap<QString, QMap<QString, nx::media::CameraStreamCapability>>&
+        codecResolutionCapabilities) const
+{
     QnCameraAdvancedParameter codec;
     codec.id = parameterName(kCodec);
     codec.name = lit("Codec");
@@ -189,18 +209,6 @@ QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::describeCapab
     resolution.name = lit("Resolution");
     resolution.dataType = QnCameraAdvancedParameter::DataType::Enumeration;
 
-    QnCameraAdvancedParameter bitrate;
-    bitrate.id = parameterName(kBitrateKpbs);
-    bitrate.name = lit("Bitrate (Kbps)");
-    bitrate.dataType = QnCameraAdvancedParameter::DataType::Number;
-    bitrate.range = lit("1,999999");
-
-    QnCameraAdvancedParameter fps;
-    fps.id = parameterName(kFps);
-    fps.name = lit("Frame per Second (FPS)");
-    fps.dataType = QnCameraAdvancedParameter::DataType::Number;
-    fps.range = lit("1,999999");
-
     // Dependency: resolution -> codec.
     for (auto codecResolution = codecResolutionCapabilities.begin();
          codecResolution != codecResolutionCapabilities.end(); ++codecResolution)
@@ -211,7 +219,22 @@ QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::describeCapab
             {{parameterName(kCodec), codecResolution.key()}}));
     }
 
-    // Dependency: bitrate -> codec + resolution; fps -> codec + resolution.
+    if (m_isPrimaryStream)
+        return {codec, resolution};
+
+    QnCameraAdvancedParameter bitrate;
+    bitrate.id = parameterName(kBitrateKpbs);
+    bitrate.name = lit("Bitrate (Kbps)");
+    bitrate.dataType = QnCameraAdvancedParameter::DataType::Number;
+    bitrate.range = lit("1,100000");
+
+    QnCameraAdvancedParameter fps;
+    fps.id = parameterName(kFps);
+    fps.name = lit("Frames per Second (FPS)");
+    fps.dataType = QnCameraAdvancedParameter::DataType::Number;
+    fps.range = lit("1,100");
+
+    // Dependencies: bitrate -> codec + resolution; fps -> codec + resolution.
     for (auto codecResolution = codecResolutionCapabilities.begin();
          codecResolution != codecResolutionCapabilities.end(); ++codecResolution)
     {
@@ -237,92 +260,78 @@ QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::describeCapab
         }
     }
 
-    QnCameraAdvancedParamGroup streamParameters;
-    streamParameters.name = m_isPrimaryStream ?
-        lit("Primary (High Quality)") : lit("Secondary (Low Quality)");
-
-    streamParameters.params.push_back(codec);
-    streamParameters.params.push_back(resolution);
-    streamParameters.params.push_back(bitrate);
-    streamParameters.params.push_back(fps);
-
-    QnCameraAdvancedParamGroup videoStreams;
-    videoStreams.name = lit("Video Stream Configuration");
-    videoStreams.groups.push_back(streamParameters);
-
-    QnCameraAdvancedParams descriptions;
-    descriptions.name = proprtyName();
-    descriptions.unique_id = QnUuid::createUuid().toSimpleString();
-    descriptions.version = toString(this);
-    descriptions.groups.push_back(videoStreams);
-    return descriptions;
+    return {codec, resolution, bitrate, fps};
 }
 
-QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::bestParameters(
-    const StreamCapabilityMap& capabilities, const QSize& baseResolution)
+static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
+    const StreamCapabilityMap& capabilities)
 {
-    // By default we recomentd to use h264 because of the performance and wide support.
-    std::vector<QnLiveStreamParams> recomendedOptions;
+    std::map<QString, std::vector<QnLiveStreamParams>> optionsByCodec;
     for (auto it = capabilities.begin(); it != capabilities.end(); ++it)
     {
-        if (!it.key().codec.contains(lit("264")))
-            continue;
-
         QnLiveStreamParams option;
         option.codec = it.key().codec;
         option.resolution = it.key().resolution;
         option.bitrateKbps = it.value().maxBitrateKbps;
         option.fps = it.value().maxFps;
-        recomendedOptions.push_back(option);
+        optionsByCodec[option.codec].push_back(option);
     }
 
-    if (!recomendedOptions.empty())
+    // By default we recomentd to use h264 because of the performance and wide support.
+    const auto h264 = optionsByCodec.find(lit("H264"));
+    if (h264 != optionsByCodec.end())
+        return h264->second;
+
+    // Avoid H265 to avoid possible performance drops.
+    if (optionsByCodec.size() > 1)
+        optionsByCodec.erase(lit("H265"));
+
+    return optionsByCodec.begin()->second;
+}
+
+QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::bestParameters(
+    const StreamCapabilityMap& capabilities, const QSize& baseResolution)
+{
+    const auto recomendedOptions = calculateRecomendedOptions(capabilities);
+    if (m_isPrimaryStream)
     {
-        if (m_isPrimaryStream)
+        QnLiveStreamParams bestOption = recomendedOptions.front();
+        for (const auto& option: recomendedOptions)
         {
-            // Biggest resolution is the best option for primary stream.
-            QnLiveStreamParams bestOption = recomendedOptions.front();
-            for (const auto& option: recomendedOptions)
+            if (bestOption.resolution.width() * bestOption.resolution.height() <
+                option.resolution.width() * option.resolution.height())
             {
-                if (bestOption.resolution.width() * bestOption.resolution.height() <
-                    option.resolution.width() * option.resolution.height())
-                {
-                    bestOption = option;
-                }
+                bestOption = option;
             }
-
-            return bestOption;
         }
 
-        // For the secondary stream the option should have the same aspect ration as for
-        // primary stream provided by baseResolution.
-        QList<QSize> supportedResolutions;
-        for (const auto& option: recomendedOptions)
-            supportedResolutions.push_back(option.resolution);
+        NX_DEBUG(this, lm("Default is biggest resolution for primary camera %1 stream: %2")
+            .args(m_camera->getPhysicalId(), QJson::serialized(bestOption)));
+        return bestOption;
+    }
 
-        const auto selectedResolution = nx::mediaserver::resource::Camera::getNearestResolution(
-            baseResolution,
-            nx::mediaserver::resource::Camera::getResolutionAspectRatio(baseResolution),
-            baseResolution.width() * baseResolution.height(),
-            supportedResolutions);
+    // For the secondary stream the option should have the same aspect ration as for
+    // primary stream provided by baseResolution.
+    QList<QSize> supportedResolutions;
+    for (const auto& option: recomendedOptions)
+        supportedResolutions.push_back(option.resolution);
 
-        for (const auto& option: recomendedOptions)
+    const auto selectedResolution = Camera::closestResolution(
+        SECONDARY_STREAM_DEFAULT_RESOLUTION, Camera::getResolutionAspectRatio(baseResolution),
+        UNLIMITED_RESOLUTION, supportedResolutions);
+
+    for (const auto& option: recomendedOptions)
+    {
+        if (option.resolution == selectedResolution)
         {
-            if (option.resolution == selectedResolution)
-                return option;
+            NX_DEBUG(this, lm("Default is closest resolution to %1 for secondary camera %2 stream: %3")
+                .args(baseResolution, m_camera->getPhysicalId(), QJson::serialized(option)));
+            return option;
         }
     }
 
-    QnLiveStreamParams bestOption;
-    bestOption.codec = capabilities.firstKey().codec;
-    bestOption.resolution = capabilities.firstKey().resolution;
-    bestOption.bitrateKbps = capabilities.first().maxBitrateKbps;
-    bestOption.fps = capabilities.first().maxFps;
-
-    NX_WARNING(this, lm("No good default option for camera %1, select first avaliable: %2")
-        .args(m_camera->getPhysicalId(), QJson::serialized(bestOption)));
-
-    return bestOption;
+    NX_ASSERT(false);
+    return QnLiveStreamParams();
 }
 
 QString StreamCapabilityAdvancedParametersProvider::proprtyName() const
