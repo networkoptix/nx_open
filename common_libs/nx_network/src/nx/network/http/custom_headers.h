@@ -52,8 +52,8 @@ static const QByteArray EC2_MEDIA_ROLE = "X-Media-Role";
 static const QByteArray DESKTOP_CAMERA_NO_VIDEO_HEADER_NAME = "X-no-video";
 
 static const QByteArray URL_QUERY_AUTH_KEY_NAME = "auth";
-static const QByteArray CSRF_TOKEN_COOKIE_NAME = "csrftoken";
-static const QByteArray CSRF_TOKEN_HEADER_NAME = "X-Csrftoken";
+static const QByteArray CSRF_TOKEN_COOKIE_NAME = "nx-vms-csrf-token";
+static const QByteArray CSRF_TOKEN_HEADER_NAME = "Nx-Vms-Csrf-Token";
 
 /** Url query item used in api/iomonitor and deprecated api/image. */
 static const QByteArray PHYSICAL_ID_URL_QUERY_ITEM = "cameraId";

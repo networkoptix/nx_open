@@ -538,10 +538,7 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
 
     const auto auth = params.value(Qn::URL_QUERY_AUTH_KEY_NAME);
     if (auth.isEmpty())
-    {
-        NX_ASSERT(false);
         return Qn::Auth_Forbidden;
-    }
 
     const auto csrfParam = params.value(Qn::CSRF_TOKEN_COOKIE_NAME);
     if (csrfParam.isEmpty() || csrfParam != csrfToken)
