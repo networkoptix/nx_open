@@ -32,7 +32,6 @@ namespace Qn
         FilteredLayoutsNode,    /**< Root node for filtered layouts */
         FilteredUsersNode,      /**< Root node for filtered users */
         FilteredVideowallsNode, /**< Root node for filtered videowalls */
-        FilteredShowreelsNode,  /**< Root node for filtered showreels*/
 
         BastardNode,            /**< Root node for hidden resources. */
 

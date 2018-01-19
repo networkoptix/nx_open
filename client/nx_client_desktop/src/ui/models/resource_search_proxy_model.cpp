@@ -90,7 +90,6 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         case Qn::UserResourcesNode:
         case Qn::LayoutsNode:
         case Qn::UsersNode:
-        case Qn::LayoutToursNode:
             if (searchMode)
                 return false;
             break;
@@ -99,7 +98,6 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         case Qn::FilteredCamerasNode:
         case Qn::FilteredLayoutsNode:
         case Qn::FilteredUsersNode:
-        case Qn::FilteredShowreelsNode:
         case Qn::FilteredVideowallsNode:
             if (!searchMode)
                 return false;
@@ -111,11 +109,18 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
     if (!searchMode && showAllMode)
         return true;
 
-    const auto resource = this->resource(index);
-    if (searchMode && resource
-        && (resource->hasFlags(Qn::server) || resource->hasFlags(Qn::videowall)))
+    if (searchMode)
     {
-        return false; // We don't show servers and videowalls in case of search.
+        // We don't show servers and videowalls in case of search.
+        if (const auto resource = this->resource(index))
+        {
+            const auto parentNodeType = sourceParent.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+            if (parentNodeType != Qn::FilteredServersNode && resource->hasFlags(Qn::server))
+                return false;
+
+            if (parentNodeType != Qn::FilteredVideowallsNode && resource->hasFlags(Qn::videowall))
+                return false;
+        }
     }
 
     switch (nodeType)
@@ -153,6 +158,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         return true;
 
     // Show only resources with given flags.
+    const auto resource = this->resource(index);
     return resource && resource->hasFlags(m_query.flags);
 }
 

@@ -99,12 +99,6 @@ void GenericResourceTreeModelNode::handleAccessChanged(
 QnResourceTreeModelNodePtr GenericResourceTreeModelNode::tryEnsureResourceNode(
     const QnResourcePtr& resource)
 {
-    if (m_type == Qn::FilteredServersNode)
-    {
-        if (resource->hasFlags(Qn::server))
-            qDebug() << resource->getName();
-    }
-
     if (!m_isAcceptableCheck(model(), resource))
         return QnResourceTreeModelNodePtr();
 

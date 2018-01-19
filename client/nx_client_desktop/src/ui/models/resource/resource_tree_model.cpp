@@ -90,7 +90,6 @@ QList<Qn::NodeType> rootNodeTypes()
             << Qn::FilteredServersNode
             << Qn::FilteredCamerasNode
             << Qn::FilteredVideowallsNode
-            << Qn::FilteredShowreelsNode
             << Qn::FilteredUsersNode
             << Qn::FilteredLayoutsNode
             << Qn::UserResourcesNode
@@ -371,7 +370,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
     case Qn::FilteredLayoutsNode:
     case Qn::FilteredUsersNode:
     case Qn::FilteredVideowallsNode:
-    case Qn::FilteredShowreelsNode:
         return rootNode; // Always root node.
 
     case Qn::UserResourcesNode:

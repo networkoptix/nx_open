@@ -73,17 +73,6 @@ bool isAcceptableForModelVideowall(
         && resource->hasFlags(Qn::videowall);
 }
 
-/*
-bool isAcceptableForModelShowreel(
-    QnResourceTreeModel* model,
-    const QnResourcePtr& resource)
-{
-    const auto context = model->context();
-    return model->scope() == QnResourceTreeModel::FullScope
-        && context->resourceAccessProvider()->hasAccess(context->user(), resource)
-        && resource->hasFlags(Qn::layou);
-}
-*/
 } // namespace
 
 using namespace nx::client::desktop;
@@ -120,12 +109,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createNode(
             result.reset(new GenericResourceTreeModelNode(
                 model, isAcceptableForModelVideowall, Qn::FilteredVideowallsNode));
             break;
-/*
-        case Qn::FilteredShowreelsNode:
-            result.reset(new GenericResourceTreeModelNode(
-                model, isAcceptableForModelShowreels, Qn::FilteredShowreelssNode));
-            break;
-*/
+
         case Qn::UserResourcesNode:
             result.reset(new QnResourceTreeModelUserResourcesNode(model));
             break;
