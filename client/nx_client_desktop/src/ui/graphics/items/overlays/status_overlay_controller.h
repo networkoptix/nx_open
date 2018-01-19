@@ -38,7 +38,8 @@ public:
 
     static QString captionText(Qn::ResourceStatusOverlay overlay);
     static QString descriptionText(Qn::ResourceStatusOverlay overlay);
-    static QString statusIcon(Qn::ResourceStatusOverlay overlay);
+    static QString statusIconPath(Qn::ResourceStatusOverlay overlay);
+    static QPixmap statusIcon(Qn::ResourceStatusOverlay overlay);
 
 signals:
     void statusOverlayChanged(bool animated);
