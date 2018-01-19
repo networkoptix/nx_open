@@ -89,7 +89,7 @@ angular.module('cloudApp')
                                 return;
                             }
 
-                            var formatted = formatError(data ? data.data : data, errorCodes);
+                            var formatted = formatError(data && data.data || data, errorCodes);
                             if(formatted !== false){
                                 self.errorMessage = formatted;
                                 // Error handler here
