@@ -1,11 +1,13 @@
 FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
 
-ADD stage/qt /opt/networkoptix/qt
-ADD stage/cloud_db /opt/networkoptix/cloud_db
+COPY stage/qt /opt/networkoptix/qt
+COPY stage/cloud_db /opt/networkoptix/cloud_db
 
-ADD etc/authorization_rules.xml /opt/networkoptix/cloud_db/etc/authorization_rules.xml
-ADD etc/cloud_db.conf /opt/networkoptix/cloud_db/etc/cloud_db.conf
-ADD docker/entrypoint.sh /opt/networkoptix/cloud_db/bin
+COPY etc/authorization_rules.xml /opt/networkoptix/cloud_db/etc/authorization_rules.xml
+COPY etc/cloud_db.conf /opt/networkoptix/cloud_db/etc/cloud_db.conf
+COPY etc/cloud_modules_template.xml /opt/networkoptix/cloud_db/etc/cloud_modules_template.xml
+COPY etc/cloud_modules_new_template.xml /opt/networkoptix/cloud_db/etc/cloud_modules_new_template.xml
+COPY docker/entrypoint.sh /opt/networkoptix/cloud_db/bin
 
 EXPOSE 3346
 
