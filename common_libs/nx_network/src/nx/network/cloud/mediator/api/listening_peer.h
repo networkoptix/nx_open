@@ -11,7 +11,7 @@
 
 namespace nx {
 namespace hpm {
-namespace data {
+namespace api {
 
 struct ListeningPeer
 {
@@ -40,10 +40,10 @@ struct ListeningPeers
 
 #define ListeningPeers_Fields (systems)(clients)
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (ListeningPeer)(BoundClient)(ListeningPeers),
-    (json));
+QN_FUSION_DECLARE_FUNCTIONS(nx::hpm::api::ListeningPeer, (json), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::hpm::api::BoundClient, (json), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::hpm::api::ListeningPeers, (json), NX_NETWORK_API)
 
-} // namespace data
+} // namespace api {
 } // namespace hpm
 } // namespace nx

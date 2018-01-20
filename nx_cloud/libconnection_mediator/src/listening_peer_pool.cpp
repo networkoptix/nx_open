@@ -195,14 +195,14 @@ std::vector<MediaserverData> ListeningPeerPool::findPeersBySystemId(
     return std::move(foundPeers);
 }
 
-data::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
+api::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
 {
-    data::ListeningPeersBySystem result;
+    api::ListeningPeersBySystem result;
 
     QnMutexLocker lock(&m_mutex);
     for (const auto& peerPair: m_peers)
     {
-        data::ListeningPeer peerData;
+        api::ListeningPeer peerData;
         const auto peerConnetion = peerPair.second.peerConnection.lock();
         if (peerConnetion)
             peerData.connectionEndpoint = peerConnetion->getSourceAddress().toString().toUtf8();

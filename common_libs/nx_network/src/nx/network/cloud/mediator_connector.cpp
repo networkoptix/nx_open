@@ -20,8 +20,15 @@ static stun::AbstractAsyncClient::Settings s_stunClientSettings;
 } // namespace
 
 MediatorConnector::MediatorConnector():
+    MediatorConnector(std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>())
+{
+}
+
+MediatorConnector::MediatorConnector(
+    std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> customUrlFetcher)
+    :
     m_stunClient(std::make_shared<stun::AsyncClientWithHttpTunneling>(s_stunClientSettings)),
-    m_mediatorUrlFetcher(std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>()),
+    m_mediatorUrlFetcher(std::move(customUrlFetcher)),
     m_fetchEndpointRetryTimer(
         std::make_unique<nx::network::RetryTimer>(
             nx::network::RetryPolicy(
