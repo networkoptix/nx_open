@@ -19,8 +19,8 @@ var Helper = function () {
     var h = this;
 
     this.basePassword = 'qweasd123';
-    this.systemLink = '/98e40c07-a6d1-433f-b798-9065e3be96e5';
-    this.systemName = 'ek-U16';
+    this.systemLink = '/dd06f8bf-f7ea-49b3-96fc-fbc6742a2ad4';
+    this.systemName = 'Autotests';
 
     this.get = function (opt_url) {
         var url = opt_url || '/';
@@ -524,6 +524,7 @@ var Helper = function () {
         h.forms.account.lastNameInput.clear().sendKeys(lastName);
         h.forms.account.submitButton.click();
 
+        // This alert fails when run on local server.  Saving on the account page refreshes instead of giving alert.
         h.alert.catchAlert( h.alert.alertMessages.accountSuccess, h.alert.alertTypes.success);
     };
 
@@ -635,7 +636,7 @@ var Helper = function () {
     this.getEmailTo = function(emailAddress, emailSubject) {
         var deferred = protractor.promise.defer();
         console.log("Waiting for an email...");
-
+        
         function onMail(mail) {
             if((emailAddress === mail.headers.to) && (mail.subject.includes(emailSubject))) {
                 console.log("Catch email to: " + mail.headers.to);
