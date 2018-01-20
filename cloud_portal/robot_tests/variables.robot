@@ -10,13 +10,13 @@ ${CLOUD TEST REGISTER}          https://cloud-test.hdw.mx/register
 ${LOG IN MODAL}                 //div[contains(@class, 'modal-content')]
 ${EMAIL INPUT}                  //form[contains(@name, 'loginForm')]//input[@ng-model='auth.email']
 ${PASSWORD INPUT}               //form[contains(@name, 'loginForm')]//input[@ng-model='auth.password']
-${LOG IN BUTTON}                //form[contains(@name, "loginForm")]//button[@ng-bind-html='buttonText' and @ng-click='checkForm()']
+${LOG IN BUTTON}                //form[contains(@name, 'loginForm')]//button[@ng-click='checkForm()']
 ${REMEMBER ME CHECKBOX}         //form[contains(@name, 'loginForm')]//input[@ng-model='auth.remember']
 ${FORGOT PASSWORD}              //form[contains(@name, 'loginForm')]//a[@href='/restore_password']
 
 ${RESET PASSWORD EMAIL INPUT}   //form[@name='restorePassword']//input[@ng-model='data.email']
 
-${LOG IN NAV BAR}               //nav//a[@ng-click='login();$event.preventDefault();']
+${LOG IN NAV BAR}               //nav//a[contains(@ng-click, 'login())'']
 
 ${ACCOUNT DROPDOWN}             //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
 ${LOG OUT BUTTON}               //li[contains(@class, 'collapse-first')]//a[contains(text(), 'Log Out')]
@@ -56,7 +56,7 @@ ${300CHARS}    QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopa
 ${255CHARS}    QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopas
 
 ${EMAIL VIEWER}                 noptixqa+viewer@gmail.com
-${EMAIL OWNER}                 noptixqa+owner@gmail.com
+${EMAIL OWNER}                  noptixqa+owner@gmail.com
 ${BASE PASSWORD}                qweasd123
 
 ${AUTO TESTS}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..
