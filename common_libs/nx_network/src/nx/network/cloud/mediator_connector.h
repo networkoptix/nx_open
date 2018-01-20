@@ -38,6 +38,8 @@ class NX_NETWORK_API MediatorConnector:
 {
 public:
     MediatorConnector();
+    MediatorConnector(
+        std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> customUrlFetcher);
     virtual ~MediatorConnector() override;
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;

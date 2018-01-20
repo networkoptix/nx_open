@@ -4,13 +4,13 @@
 
 namespace nx {
 namespace hpm {
-namespace data {
+namespace api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (ListeningPeer)(BoundClient)(ListeningPeers),
     (json),
     _Fields);
 
-} // namespace data
+} // namespace api
 } // namespace hpm
 } // namespace nx
