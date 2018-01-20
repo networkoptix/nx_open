@@ -4,9 +4,9 @@ Resource          ../variables.robot
 Suite Teardown    Close All Browsers
 
 *** Variables ***
-${email}    noptixqa+owner@gmail.com
+${email}    ${EMAIL OWNER}
 ${email upppercase}    NOPTIXQA+OWNER@GMAIL.COM
-${password}    qweasd123
+${password}    ${BASE PASSWORD}
 ${url}         ${CLOUD TEST}
 
 *** Test Cases ***
@@ -23,12 +23,10 @@ can be closed after clicking on background
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${LOG IN MODAL}
-    Element Should be Visible    //div[contains(@class, "ng-isolate-scope")]
-    Click Element    //div[contains(@class, "ng-isolate-scope")]\
+    Element Should be Visible    //div[uib-modal-backdrop='modal-backdrop']
+    Click Element    //div[uib-modal-backdrop='modal-backdrop']
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
     Page Should Not Contain Element    ${LOG IN MODAL}
-    #Wait Until Element Is Not Visible    ${LOG IN MODAL}
-    #Element Should Not Be Visible    ${LOG IN MODAL}
     Close Browser
 
 allows to log in with existing credentials and to log out
