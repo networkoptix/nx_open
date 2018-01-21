@@ -22,6 +22,7 @@ public:
 
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+    virtual CameraDiagnostics::Result initInternal() override;
 };
 
 using QnWearableCameraResourcePtr = QnSharedResourcePointer<QnWearableCameraResource>;

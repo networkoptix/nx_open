@@ -8,14 +8,22 @@ QnWearableCameraResource::QnWearableCameraResource()
 {
     removeFlags(Qn::live | Qn::network | Qn::streamprovider | Qn::motion);
     addFlags(Qn::wearable_camera);
-
-    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, lit("1"));
-    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, lit("0"));
-    setProperty(Qn::SUPPORTED_MOTION_PARAM_NAME, lit("none"));
 }
 
 QnWearableCameraResource::~QnWearableCameraResource()
 {
+}
+
+CameraDiagnostics::Result QnWearableCameraResource::initInternal()
+{
+    CameraDiagnostics::Result result = base_type::initInternal();
+
+    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, lit("1"));
+    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, lit("0"));
+    setProperty(Qn::SUPPORTED_MOTION_PARAM_NAME, lit("none"));
+    saveParams();
+
+    return result;
 }
 
 QString QnWearableCameraResource::getDriverName() const
