@@ -434,10 +434,19 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
     }
     else
     {
+        bool isWearable = m_camera->hasFlags(Qn::wearable_camera);
         bool hasVideo = m_camera->hasVideo(0);
         bool hasAudio = m_camera->isAudioSupported();
 
-        ui->wearableUploadWidget->setVisible(m_camera->hasFlags(Qn::wearable_camera));
+        ui->wearableUploadWidget->setVisible(isWearable);
+        ui->modelEdit->setVisible(!isWearable);
+        ui->modelLabel->setVisible(!isWearable);
+        ui->firmwareEdit->setVisible(!isWearable);
+        ui->firmwareLabel->setVisible(!isWearable);
+        ui->vendorEdit->setVisible(!isWearable);
+        ui->vendorLabel->setVisible(!isWearable);
+        ui->addressGroupBox->setVisible(!isWearable);
+        ui->authenticationGroupBox->setVisible(!isWearable);
 
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
@@ -455,12 +464,12 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
 
         const bool dtsBased = m_camera->isDtsBased();
         const bool isIoModule = m_camera->isIOModule();
-        setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased && (hasAudio || hasVideo));
-        setTabEnabledSafe(Qn::MotionSettingsTab, !dtsBased && hasVideo);
-        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo && !isReadOnly());
-        setTabEnabledSafe(Qn::IOPortsSettingsTab, isIoModule);
+        setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased && (hasAudio || hasVideo) && !isWearable);
+        setTabEnabledSafe(Qn::MotionSettingsTab, !dtsBased && hasVideo && !isWearable);
+        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo && !isReadOnly() && !isWearable);
+        setTabEnabledSafe(Qn::IOPortsSettingsTab, isIoModule && !isWearable);
         setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, !isIoModule);
-
+        setTabEnabledSafe(Qn::AdvancedCameraSettingsTab, !isWearable);
 
         if (!dtsBased)
         {
