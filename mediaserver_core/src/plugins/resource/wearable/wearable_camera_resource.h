@@ -17,6 +17,9 @@ public:
 
     virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason) override;
 
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(
+        const QnAbstractStreamDataProvider* dataProvider = 0) const override;
+
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 };
