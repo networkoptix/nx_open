@@ -21,16 +21,18 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
-
 namespace api {
 
-uint qHash(const nx::api::AnalyticsEventType& t)
+uint qHash(const AnalyticsEventType& t)
 {
     return qHash(t.eventTypeId.toByteArray());
 }
 
 } // namespace api
+} // namespace nx
 
+
+namespace nx {
 namespace mediaserver {
 namespace metadata {
 
@@ -66,7 +68,7 @@ ManagerPool::~ManagerPool()
 
 void ManagerPool::init()
 {
-    NX_DEBUG(this, lit("Initializing metdata manager pool."));
+    NX_DEBUG(this, lit("Initializing metadata manager pool."));
     auto resourcePool = m_serverModule->commonModule()->resourcePool();
 
     connect(
@@ -458,9 +460,12 @@ void ManagerPool::addPluginManifestToServer(
     const nx::api::AnalyticsDriverManifest& manifest,
     const QnMediaServerResourcePtr& server)
 {
-    auto&& existingManifests = server->analyticsDrivers();
-    const auto& it = std::find_if(existingManifests.begin(), existingManifests.end(),
-        [&manifest](const nx::api::AnalyticsDriverManifest& m) { return m.driverId == manifest.driverId; });
+    auto existingManifests = server->analyticsDrivers();
+    auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
+        [&manifest](const nx::api::AnalyticsDriverManifest& m)
+        {
+            return m.driverId == manifest.driverId;
+        });
 
     if (it == existingManifests.cend())
     {
