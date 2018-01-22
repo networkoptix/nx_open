@@ -38,13 +38,13 @@ void QnBusinessTypesComparator::initLexOrdering()
 
     m_eventTypeToLexOrder = QVector<int>(maxType + 1, maxType); // put undefined events to the end of the list
     int count = 0;
-    for (int eventType : eventTypes)
+    for (int eventType: eventTypes)
         m_eventTypeToLexOrder[eventType] = count++;
 
     // action types to lex order
     maxType = 0;
     QMap<QString, int> actionTypes;
-    for (auto actionType : getAllActions())
+    for (auto actionType: getAllActions())
     {
         actionTypes.insert(helper.actionName(actionType), actionType);
         if (maxType < actionType)
@@ -53,7 +53,7 @@ void QnBusinessTypesComparator::initLexOrdering()
 
     m_actionTypeToLexOrder = QVector<int>(maxType + 1, maxType); // put undefined actions to the end of the list
     count = 0;
-    for (int actionType : actionTypes)
+    for (int actionType: actionTypes)
         m_actionTypeToLexOrder[actionType] = count++;
 }
 

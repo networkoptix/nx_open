@@ -156,14 +156,16 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     m_actionTypesModel(new QStandardItemModel(this)),
     m_helper(new vms::event::StringsHelper(commonModule()))
 {
-    auto addEventItem = [this](vms::event::EventType eventType)
+    auto addEventItem =
+        [this](vms::event::EventType eventType)
         {
             auto item = new QStandardItem(m_helper->eventName(eventType));
             item->setData(eventType);
             m_eventTypesModel->appendRow(item);
         };
 
-    auto addSeparator = [](QStandardItemModel* model)
+    auto addSeparator =
+        [](QStandardItemModel* model)
         {
             auto item = new QStandardItem(lit("-"));
             item->setData(lit("separator"), Qt::AccessibleDescriptionRole);
