@@ -10,16 +10,13 @@ ${url}         ${CLOUD TEST}
 *** Test Cases ***
 Register and Activate
     ${email}    Get Random Email
-    Set Global Variable    ${random email}    ${email}
     Open Browser and go to URL    ${url}/register
-    Register    'mark'    'hamill'    ${random email}    ${password}
-    Get Activation Link    ${random email}
+    Register    'mark'    'hamill'    ${email}    ${password}
+    Get Activation Link    ${email}
     Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
     Element Should Be Visible    ${ACTIVATION SUCCESS}
     ${location}    Get Location
     Should Be Equal    ${location}    ${url}/activate/success
-    Wait Until Element Is Visible    ${SUCCESS LOG IN BUTTON}
-    Click Link    ${SUCCESS LOG IN BUTTON}
-    Log In    ${email}    ${password}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Close Browser
