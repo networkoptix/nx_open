@@ -35,7 +35,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="resourcesTab">
       <attribute name="title">
@@ -74,7 +74,7 @@
         <number>0</number>
        </property>
        <property name="topMargin">
-        <number>8</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
         <number>0</number>

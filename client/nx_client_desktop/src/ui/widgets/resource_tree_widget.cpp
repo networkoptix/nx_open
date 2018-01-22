@@ -158,6 +158,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
 
 
     ui->resourcesTreeView->installEventFilter(this);
+    setFilterVisible(false);
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget()
