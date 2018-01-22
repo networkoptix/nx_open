@@ -282,7 +282,7 @@ handles two tabs, updates second tab state if logout is done on first
     Open Browser and go to URL    ${url}/register
     Wait Until Element Is Visible    ${TERMS AND CONDITIONS LINK}
     Click Link    ${TERMS AND CONDITIONS LINK}
-    ${tabs}    Get Window Titles
+    ${tabs}    Get Window Handles
     Select Window    @{tabs}[1]
     Location Should Be    ${url}/content/eula
     Validate Log Out
@@ -297,7 +297,7 @@ handles two tabs, updates second tab state if logout is done on first
     Validate Log In
     Log Out
     Validate Log Out
-    ${tabs}    Get Window Titles
+    ${tabs}    Get Window Handles
     Select Window    @{tabs}[1]
     Location Should Be    ${url}/systems
     Reload Page
