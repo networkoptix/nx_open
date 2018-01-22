@@ -33,6 +33,8 @@
 
 #include <utils/common/event_processors.h>
 
+#include <nx/utils/app_info.h>
+
 // -------------------------------------------------------------------------- //
 // QnResourceTreeSortProxyModel
 // -------------------------------------------------------------------------- //
@@ -571,9 +573,10 @@ void QnResourceTreeWidget::initializeFilter()
 
     ui->filter->setVisible(false);
 
+    const auto ctrlKey = nx::utils::AppInfo::isMacOsX() ? Qt::Key_Meta : Qt::Key_Control;
     ui->shortcutHintWidget->setDescriptions({
         {QKeySequence(Qt::Key_Enter), tr("add to current layout")},
-        {QKeySequence(Qt::Key_Control, Qt::Key_Enter), tr("open all at a new layout")}});
+        {QKeySequence(ctrlKey, Qt::Key_Enter), tr("open all at a new layout")}});
     updateShortcutHintVisibility();
 
     const auto filterEdit = ui->filterLineEdit;

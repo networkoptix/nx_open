@@ -36,7 +36,7 @@ QString getHintItemText(const nx::client::desktop::ShortcutHintWidget::Descripti
     }
 
     static const auto kPlusSeparator = makeLeftFloat(lit("&nbsp;+&nbsp;"));
-    static const auto kMDash = makeLeftFloat(lit("&nbsp;&mdash;&nbsp;")); // FIXME: make mdash
+    static const auto kMDash = makeLeftFloat(lit("&nbsp;&mdash;&nbsp;"));
     const auto keys = keyItemTexts.join(kPlusSeparator);
     const auto hint = makeLeftFloat(description.second);
     return lit("<table width=100% border = 0><tr><td>%1 %3 %2</td></tr></table>")
