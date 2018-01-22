@@ -16,7 +16,7 @@ ${FORGOT PASSWORD}              //form[contains(@name, 'loginForm')]//a[@href='/
 
 ${RESET PASSWORD EMAIL INPUT}   //form[@name='restorePassword']//input[@ng-model='data.email']
 
-${LOG IN NAV BAR}               //nav//a[contains(@ng-click, 'login())'']
+${LOG IN NAV BAR}               //nav//a[contains(@ng-click, 'login()')]
 
 ${ACCOUNT DROPDOWN}             //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
 ${LOG OUT BUTTON}               //li[contains(@class, 'collapse-first')]//a[contains(text(), 'Log Out')]
@@ -60,3 +60,9 @@ ${EMAIL OWNER}                  noptixqa+owner@gmail.com
 ${BASE PASSWORD}                qweasd123
 
 ${AUTO TESTS}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..
+
+#ASCII
+${ESCAPE}                       \\27
+${ENTER}                        \\13
+${TAB}                          \\9
+${SPACEBAR}                     \\32
