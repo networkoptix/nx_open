@@ -29,29 +29,21 @@ const QString kSoapPath("/vapix/services");
 const char* const kRuleEngine = "tns1:RuleEngine";
 const char* const kVideoSource = "tns1:VideoSource";
 
-const std::array<const char*, 4> kTestTopics = {
-    "tns1:RecordingConfig",
-    "tnsaxis:Storage",
-    "tns1:PTZController",
-    "tns1:Device",
-    };
-
 } // namespace
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
-
-//const QnUuid Plugin::kDriverId = QnUuid();
 
 Plugin::Plugin()
 {
     QFile f(":/axis/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
+
 #if 0
-    // In current version we get camera capabilies online from camera - not from previously
-    // prepared manifest file
-    m_driverManifest = QJson::deserialized<Axis::DriverManifest>(m_manifest);
+    // Definitely this will be useful after pluginManager modification
+    nx::api::AnalyticsDriverManifest pluginManifest =
+        QJson::deserialized<nx::api::AnalyticsDriverManifest>(m_manifest);
 #endif
 }
 
@@ -147,20 +139,8 @@ QList<IdentifiedSupportedEvent> Plugin::fetchSupportedEvents(
     if (!axisCameraController.readSupportedEvents())
         return result;
 
-//#define THIS_IS_FOR_TESTING_PURPOSES_ONLY__PLUGIN
-#ifdef THIS_IS_FOR_TESTING_PURPOSES_ONLY__PLUGIN
-    static int i = 0;
-    ++i;
-    if (i == kTestTopics.size())
-    {
-        i = 0;
-        return QList<IdentifiedSupportedEvent>();
-    }
-    else
-        axisCameraController.filterSupportedEvents({ kTestTopics[i] });
-#else
-    axisCameraController.filterSupportedEvents({ kRuleEngine });
-#endif
+    // Only some rules are useful.
+    axisCameraController.filterSupportedEvents({ kRuleEngine, kVideoSource });
     const auto& src = axisCameraController.suppotedEvents();
     std::transform(src.begin(), src.end(), std::back_inserter(result),
         [](const nx::axis::SupportedEvent& event) {return IdentifiedSupportedEvent(event); });

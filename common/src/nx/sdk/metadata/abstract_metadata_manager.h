@@ -64,9 +64,31 @@ public:
 
     /**
      * @brief provides null terminated UTF8 string containing json manifest
-     * according to nx_metadata_plugin_manifest.schema.json.
      * @return pointer to c-style string which MUST be valid till method "freeManifest"
-     * will be envoked,
+     * will be invoked
+     * Json manifest may have one of two schemas.
+     * First contains only event guids. Valid example:
+     * {
+     *     "supportedEventTypes":
+	 *     [
+	 *         "{b37730fe-3e2d-9eb7-bee0-7732877ec61f}",
+	 *         "{f83daede-7fae-6a51-2e90-69017dadfd62}",
+     *     ]
+     * }
+     * Second contains guids and descriptions. Valid example:
+     * {
+     *     "outputEventTypes":
+     *     [
+     *         {
+     *             "eventTypeId": "ae197d39-2fc5-d798-abe6-07329771417f",
+     *             "eventName": { "value": "Create Recording", "localization": { } }
+     *         },
+     *         {
+     *             "eventTypeId": "eae2bd46-1690-0c22-8096-53ed3f90ac14",
+     *             "eventName": { "value": "Delete Recording", "localization": { } }
+     *         }
+     *     ]
+     * }
      */
     virtual const char* capabilitiesManifest(Error* error) = 0;
 
@@ -74,7 +96,7 @@ public:
      * @brief tells manager that memory (previously returned by "capabilitiesManifest") pointed to
      * by "data" is no longer needed and may be disposed
      */
-    virtual void freeManifest(const char* data) const = 0;
+    virtual void freeManifest(const char* data) = 0;
 };
 
 } // namespace metadata

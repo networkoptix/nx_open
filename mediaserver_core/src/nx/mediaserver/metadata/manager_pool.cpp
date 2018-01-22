@@ -453,26 +453,29 @@ void ManagerPool::addPluginManifestToServer(
     const nx::api::AnalyticsDriverManifest& manifest,
     const QnMediaServerResourcePtr& server)
 {
-    bool expanded = false;
-    auto existingManifests = server->analyticsDrivers();
-    for (auto& existingManifest : existingManifests)
+    auto& existingManifests = server->analyticsDrivers();
+    auto& it = std::find_if(existingManifests.begin(), existingManifests.end(),
+        [&manifest](const nx::api::AnalyticsDriverManifest& m) { return m.driverId == manifest.driverId; });
+
+    if (it == existingManifests.cend())
     {
-        if (existingManifest.driverId == manifest.driverId)
-        {
-//#define THIS_IS_FOR_TESTING_PURPOSES_ONLY__SERVER
-#ifdef THIS_IS_FOR_TESTING_PURPOSES_ONLY__SERVER
-            existingManifest.outputEventTypes.clear();
-#else
-            existingManifest.outputEventTypes = existingManifest.outputEventTypes.toSet().
-                unite(manifest.outputEventTypes.toSet()).toList();
-#endif
-            expanded = true;
-            break;
-        }
+        existingManifests.push_back(manifest);
+    }
+    else
+    {
+        it->outputEventTypes = it->outputEventTypes.toSet().
+            unite(manifest.outputEventTypes.toSet()).toList();
     }
 
-    if (!expanded)
-        existingManifests.push_back(manifest);
+
+#if defined _DEBUG
+    // Sometimes in debug purposes we need do clean existingManifest.outputEventTypes list.
+    if (!manifest.outputEventTypes.empty() &&
+        manifest.outputEventTypes.front().eventTypeId == nx::api::kResetPluginManifestEventId)
+    {
+        it->outputEventTypes.clear();
+    }
+#endif
 
     server->setAnalyticsDrivers(existingManifests);
     server->saveParams();
@@ -515,7 +518,7 @@ ManagerPool::loadManagerManifest(
     if (deviceManifest && deviceManifest->supportedEventTypes.size())
         return std::make_pair(deviceManifest, boost::none);
 
-    // If manifest occured to be not AnalyticsDeviceManifest, we try to treat it as
+    // If manifest occurred to be not AnalyticsDeviceManifest, we try to treat it as
     // AnalyticsDriverManifest.
     auto driverManifest = deserializeManifest<nx::api::AnalyticsDriverManifest>(
         managerManifest.get());

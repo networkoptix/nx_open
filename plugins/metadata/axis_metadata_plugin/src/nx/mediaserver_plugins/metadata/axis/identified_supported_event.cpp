@@ -44,7 +44,7 @@ QnUuid guidFromEventName(const char* eventFullName)
 
 } // namespace
 
-IdentifiedSupportedEvent::IdentifiedSupportedEvent(const nx::axis::SupportedEvent& supportedEvent) :
+IdentifiedSupportedEvent::IdentifiedSupportedEvent(const nx::axis::SupportedEvent& supportedEvent):
     nx::axis::SupportedEvent(supportedEvent)
 {
     m_internalTypeId = guidFromEventName(supportedEvent.fullName().c_str());

@@ -29,9 +29,12 @@ Manager::Manager(
     {
         deviceManifest.supportedEventTypes.push_back(event.internalTypeId());
     }
-    m_deviceManifestPartial = QJson::serialized(deviceManifest);
 
-    m_deviceManifestFull = serializeEvents(events).toLatin1();
+    // We use m_deviceManifestFull to give server full manifest, m_deviceManifestPartial (that
+    // gives server only Uuids) may be users for test purposes.
+    //m_deviceManifestPartial = QJson::serialized(deviceManifest);
+
+    m_deviceManifestFull = serializeEvents(events).toUtf8();
 
     m_identifiedSupportedEvents = events;
 
@@ -75,7 +78,7 @@ nx::sdk::Error Manager::stopFetchingMetadata()
 
 const char* Manager::capabilitiesManifest(nx::sdk::Error* error)
 {
-    if (m_deviceManifestPartial.isEmpty())
+    if (m_deviceManifestFull.isEmpty())
     {
         *error = nx::sdk::Error::unknownError;
         return nullptr;
@@ -85,7 +88,7 @@ const char* Manager::capabilitiesManifest(nx::sdk::Error* error)
     return m_deviceManifestFull.constData();
 }
 
-void Manager::freeManifest(const char* data) const
+void Manager::freeManifest(const char* data)
 {
     // Do nothing. Memory allocated for Manifests is stored in m_givenManifests list and will be
     // released in Manager's destructor.
