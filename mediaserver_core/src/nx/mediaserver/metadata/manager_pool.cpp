@@ -411,7 +411,7 @@ bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, QSet<QnUuid
     {
         NX_DEBUG(
             this,
-            lm("Event list is empty, stopping metdata fetching for resource %1.")
+            lm("Event list is empty, stopping metadata fetching for resource %1.")
                 .arg(resourceId));
 
         result = manager->stopFetchingMetadata();

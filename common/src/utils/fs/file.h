@@ -26,10 +26,10 @@ public:
     virtual QString getFileName() const = 0;
 
     virtual bool open(
-        const QIODevice::OpenMode   &mode, 
+        const QIODevice::OpenMode   &mode,
         unsigned int                systemDependentFlags = 0
     ) = 0;
-    
+
     virtual void close() = 0;
     virtual qint64 read(char* buffer, qint64 count) = 0;
 
