@@ -44,8 +44,18 @@ function(nx_add_target name type)
 
         qt5_add_translation(qm_files ${ts_files})
 
-        list(APPEND resources ${qm_files})
-        set_source_files_properties(${qm_files}
+        set(needed_qm_files)
+        foreach(qm_file ${qm_files})
+            foreach(lang ${defaultTranslation} ${additionalTranslations})
+                if(qm_file MATCHES "${lang}\\.qm$")
+                    list(APPEND needed_qm_files ${qm_file})
+                    break()
+                endif()
+            endforeach()
+        endforeach()
+
+        list(APPEND resources ${needed_qm_files})
+        set_source_files_properties(${needed_qm_files}
             PROPERTIES RESOURCE_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/qm")
     endif()
 
