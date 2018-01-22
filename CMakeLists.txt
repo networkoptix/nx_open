@@ -33,8 +33,8 @@ if(targetDevice STREQUAL "none")
 endif()
 
 # Early loading rdep to download a toolchain if needed.
-include(build_utils/cmake/find_python.cmake)
-include(build_utils/cmake/rdep.cmake)
+include(cmake/find_python.cmake)
+include(cmake/rdep.cmake)
 nx_rdep_configure()
 
 if(targetDevice AND NOT targetDevice STREQUAL "ios")
@@ -58,7 +58,6 @@ set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 list(APPEND CMAKE_MODULE_PATH
-    ${PROJECT_SOURCE_DIR}/build_utils/cmake
     ${PROJECT_SOURCE_DIR}/cmake
 )
 
