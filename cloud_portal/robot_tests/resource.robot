@@ -1,6 +1,6 @@
 *** Settings ***
 
-Library           Selenium2Library    screenshot_root_directory=\Screenshots
+Library           Selenium2Library    screenshot_root_directory=\Screenshots    run_on_failure=Failure Tasks
 Library           ImapLibrary
 Resource          variables.robot
 
@@ -80,3 +80,7 @@ Edit User In System
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}') and contains(@class,'user-email')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']
     Click Link    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']
+
+Failure Tasks
+    Capture Page Screenshot    selenium-screenshot-{index}.png
+    Close Browser
