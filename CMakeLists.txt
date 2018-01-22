@@ -6,18 +6,6 @@ set(customization "default" CACHE STRING "Product customization")
 nx_option(beta "Is this build is beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
 
-option(analyzeMutexLocksForDeadlock
-    "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
-    OFF)
-
-option(rdepSync
-    "Whether rdep should sync packages or use only existing copies"
-    ON)
-
-option(addQtPdb
-    "Whether add Qt PDB files to debug libs"
-    OFF)
-
 nx_option(developerBuild
     "Disable this option for production builds (Jenkins)"
     ON)

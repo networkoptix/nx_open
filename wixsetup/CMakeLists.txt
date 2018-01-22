@@ -1,3 +1,7 @@
+option(addQtPdb
+    "Whether add Qt PDB files to debug libs"
+    OFF)
+
 # These variables must be defined first as they are going to config file
 set(project.build.directory "${CMAKE_CURRENT_BINARY_DIR}")
 set(bin_resources "${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources")

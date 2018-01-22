@@ -3,6 +3,10 @@ mark_as_advanced(RDEP_DIR)
 set(PACKAGES_DIR "$ENV{environment}/packages" CACHE STRING "Path to local rdep repository")
 mark_as_advanced(PACKAGES_DIR)
 
+option(rdepSync
+    "Whether rdep should sync packages or use only existing copies"
+    ON)
+
 function(nx_rdep_configure)
     execute_process(COMMAND ${PYTHON_EXECUTABLE} ${RDEP_DIR}/rdep_configure.py)
 endfunction()
