@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
 set(customization "default" CACHE STRING "Product customization")
 option(beta "Is this build is beta build" ON)
@@ -68,6 +68,7 @@ include(ExternalProject)
 include(target_detection)
 include(utils)
 include(find_sources)
+include(moc_utils)
 include(qrc_utils)
 include(precompiled_header)
 include(strip_target)
@@ -158,8 +159,6 @@ if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
 endif()
-
-set(CMAKE_AUTOMOC ON)
 
 if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
     add_subdirectory(common_libs)
