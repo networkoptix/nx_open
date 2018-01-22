@@ -448,6 +448,17 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         ui->addressGroupBox->setVisible(!isWearable);
         ui->authenticationGroupBox->setVisible(!isWearable);
 
+        if (isWearable)
+        {
+            ui->addressOrArchiveLengthWidget->setCurrentWidget(ui->wearableArchiveLengthPage);
+            ui->authenticationOrWearableInfoWidget->setCurrentWidget(ui->wearableInfoPage);
+        }
+        else
+        {
+            ui->addressOrArchiveLengthWidget->setCurrentWidget(ui->addressPage);
+            ui->authenticationOrWearableInfoWidget->setCurrentWidget(ui->authenticationPage);
+        }
+
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
         ui->firmwareEdit->setText(m_camera->getFirmware());
