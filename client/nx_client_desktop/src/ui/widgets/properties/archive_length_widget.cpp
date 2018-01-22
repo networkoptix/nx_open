@@ -101,7 +101,8 @@ void QnArchiveLengthWidget::submitToResources(const QnVirtualCameraResourceList&
     int maxDays = maxRecordedDays();
     int minDays = minRecordedDays();
 
-    for (const auto& camera: cameras) {
+    for (const auto& camera: cameras)
+    {
         if (maxDays != kRecordedDaysDontChange)
             camera->setMaxDays(maxDays);
 

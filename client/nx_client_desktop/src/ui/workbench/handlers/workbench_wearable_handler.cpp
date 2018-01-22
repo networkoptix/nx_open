@@ -24,11 +24,11 @@
 using namespace nx::client::desktop;
 
 namespace {
-/*
+/**
  * Using TTL of 10 mins for uploads. This shall be enough even for the most extreme cases.
  * Also note that undershooting is not a problem here as a file that's currently open won't be
  * deleted.
- **/
+ */
 const qint64 kDefaultUploadTtl = 1000 * 60 * 10;
 
 } // namespace
