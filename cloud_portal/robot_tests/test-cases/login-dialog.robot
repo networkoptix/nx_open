@@ -239,7 +239,7 @@ should respond to Esc key and close dialog
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${PASSWORD INPUT}
-    Press Key    ${PASSWORD INPUT}    \\27
+    Press Key    ${PASSWORD INPUT}    ${ESCAPE}
     Wait Until Element Is Not Visible    ${LOG IN MODAL}
     Element Should Not Be Visible    ${LOG IN MODAL}
     Close Browser
@@ -252,7 +252,7 @@ should respond to Enter key and log in
     Input Text    ${EMAIL INPUT}    ${email}
     Wait Until Element Is Visible    ${PASSWORD INPUT}
     Input Text    ${PASSWORD INPUT}    ${password}
-    Press Key    ${PASSWORD INPUT}    \\13
+    Press Key    ${PASSWORD INPUT}    ${ENTER}
     Validate Log In
     Close Browser
 
@@ -262,7 +262,7 @@ should respond to Tab key
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${EMAIL INPUT}
     Set Focus To Element    ${EMAIL INPUT}
-    Press Key    ${EMAIL INPUT}    \\9
+    Press Key    ${EMAIL INPUT}    ${TAB}
     Element Should Be Focused    ${PASSWORD INPUT}
     Close Browser
 
@@ -272,9 +272,9 @@ should respond to Space key and toggle checkbox
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX}
     Set Focus To Element    ${REMEMBER ME CHECKBOX}
-    Press Key    ${REMEMBER ME CHECKBOX}    \\32
+    Press Key    ${REMEMBER ME CHECKBOX}    ${SPACEBAR}
     Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}
-    Press Key    ${REMEMBER ME CHECKBOX}    \\32
+    Press Key    ${REMEMBER ME CHECKBOX}    ${SPACEBAR}
     Checkbox Should Be Selected    ${REMEMBER ME CHECKBOX}
     Close Browser
 
