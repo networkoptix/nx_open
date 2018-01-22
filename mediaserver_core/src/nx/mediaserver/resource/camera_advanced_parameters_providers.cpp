@@ -1,5 +1,7 @@
 #include "camera_advanced_parameters_providers.h"
 
+#include <camera/camera_pool.h>
+#include <camera/video_camera.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/log/log.h>
 
@@ -38,7 +40,12 @@ static boost::optional<QSize> sizeFromString(const QString& size)
 // TODO: Makes sense to move into QnCameraAdvancedParam
 static QString makeRange(QStringList list)
 {
-    std::sort(list.begin(), list.end());
+    QCollator collator;
+    collator.setNumericMode(true);
+
+    std::sort(list.begin(), list.end(),
+        [&](const QString& left, const QString& right) { return collator.compare(left, right) < 0; });
+
     return list.join(',');
 }
 
@@ -94,6 +101,40 @@ QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::getParameters() c
     return m_parameters;
 }
 
+bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStreamParams& value)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_parameters == value)
+            return true;
+    }
+
+    const auto json = QString::fromUtf8(QJson::serialized(value));
+    if (!m_camera->setProperty(proprtyName(), json) || !m_camera->saveParams())
+        return false;
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_parameters = value;
+    }
+
+    if (qnCameraPool)
+    {
+        if (const auto camera = qnCameraPool->getVideoCamera(toSharedPointer(m_camera)))
+        {
+            const auto stream =
+                (m_streamIndex == Qn::StreamIndex::primary)
+                    ? camera->getPrimaryReader()
+                    : camera->getSecondaryReader();
+
+            if (stream && stream->isRunning())
+                stream->pleaseReopenStream();
+        }
+    }
+
+    return true;
+}
+
 QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::descriptions()
 {
     return m_descriptions;
@@ -123,59 +164,49 @@ QnCameraAdvancedParamValueMap StreamCapabilityAdvancedParametersProvider::get(
 QSet<QString> StreamCapabilityAdvancedParametersProvider::set(
     const QnCameraAdvancedParamValueMap& values)
 {
-    QString newPropertyValue;
-    QSet<QString> ids;
-
+    decltype(m_parameters) parameters;
     {
         QnMutexLocker lock(&m_mutex);
-        if (const auto value = getValue(values, kCodec))
-        {
-            m_parameters.codec = *value;
-            ids.insert(parameterName(kCodec));
-        }
-
-        if (const auto value = getValue(values, kResolution))
-        {
-            if (auto resolution = sizeFromString(*value))
-            {
-                m_parameters.resolution = *resolution;
-                ids.insert(parameterName(kResolution));
-            }
-        }
-
-        if (const auto value = getValue(values, kBitrateKpbs))
-        {
-            const auto bitrateKbps = value->toInt();
-            if (bitrateKbps > 0)
-            {
-                m_parameters.bitrateKbps = bitrateKbps;
-                ids.insert(parameterName(kBitrateKpbs));
-            }
-        }
-
-        if (const auto value = getValue(values, kFps))
-        {
-            const auto fps = value->toFloat();
-            if (fps > 0)
-            {
-                m_parameters.fps = fps;
-                ids.insert(parameterName(kFps));
-            }
-        }
-
-        newPropertyValue = QJson::serialized(m_parameters);
+        parameters = m_parameters;
     }
 
-    if (!m_camera->setProperty(proprtyName(), newPropertyValue)
-        || !m_camera->saveParams())
+    QSet<QString> ids;
+    if (const auto value = getValue(values, kCodec))
     {
-        return QSet<QString>();
+        parameters.codec = *value;
+        ids.insert(parameterName(kCodec));
     }
 
-    NX_DEBUG(this, lm("Camera %1, updated %2 value: %3").args(
-        m_camera->getPhysicalId(), proprtyName(), newPropertyValue));
+    if (const auto value = getValue(values, kResolution))
+    {
+        if (auto resolution = sizeFromString(*value))
+        {
+            parameters.resolution = *resolution;
+            ids.insert(parameterName(kResolution));
+        }
+    }
 
-    return ids;
+    if (const auto value = getValue(values, kBitrateKpbs))
+    {
+        const auto bitrateKbps = value->toInt();
+        if (bitrateKbps > 0)
+        {
+            parameters.bitrateKbps = bitrateKbps;
+            ids.insert(parameterName(kBitrateKpbs));
+        }
+    }
+
+    if (const auto value = getValue(values, kFps))
+    {
+        const auto fps = value->toFloat();
+        if (fps > 0)
+        {
+            parameters.fps = fps;
+            ids.insert(parameterName(kFps));
+        }
+    }
+
+    return setParameters(parameters) ? ids : QSet<QString>();
 }
 
 QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::describeCapabilities(
@@ -351,7 +382,7 @@ QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::bestParameters(
 QString StreamCapabilityAdvancedParametersProvider::proprtyName() const
 {
     return m_streamIndex == Qn::StreamIndex::primary
-        ? lit("pramaryStreamConfiguration") : lit("secondaryStreamConfiguration");
+        ? lit("primaryStreamConfiguration") : lit("secondaryStreamConfiguration");
 }
 
 QString StreamCapabilityAdvancedParametersProvider::parameterName(const QString& baseName) const

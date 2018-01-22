@@ -22,25 +22,28 @@ public:
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     void setStreamCapabilityMaps(StreamCapabilityMap primary, StreamCapabilityMap secondary);
+    void enableSetProperty(bool isEnabled);
 
     static QnCameraAdvancedParams makeParameterDescriptions(const std::vector<QString>& parameters);
+
+public:
+    virtual QString getProperty(const QString& key) const override;
+    virtual bool setProperty(const QString& key, const QString& value, PropertyOptions options) override;
+    virtual bool saveParams() override;
 
 protected:
     virtual QString getDriverName() const override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual std::vector<AdvancedParametersProvider*> advancedParametersProviders() override;
-    virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(bool primaryStream) override;
-
-    virtual QString getProperty(const QString& key) const override;
-    virtual bool setProperty(const QString& key, const QString& value, PropertyOptions options) override;
-    virtual bool saveParams() override;
+    virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
 
 private:
     friend class CameraTest;
     std::map<QString, QString> m_apiAadvancedParameters;
     std::vector<std::unique_ptr<AdvancedParametersProvider>> m_advancedParametersProviders;
-    QMap<bool, StreamCapabilityMap> m_streamCapabilityMaps;
+    QMap<Qn::StreamIndex, StreamCapabilityMap> m_streamCapabilityMaps;
+    bool isSetProprtyEnabled = true;
     mutable std::map<QString, QString> m_properties;
 };
 

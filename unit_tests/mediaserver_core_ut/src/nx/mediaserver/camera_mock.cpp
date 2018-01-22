@@ -46,8 +46,13 @@ QSet<QString> CameraMock::setApiParameters(const QnCameraAdvancedParamValueMap& 
 
 void CameraMock::setStreamCapabilityMaps(StreamCapabilityMap primary, StreamCapabilityMap secondary)
 {
-    m_streamCapabilityMaps[true] = std::move(primary);
-    m_streamCapabilityMaps[false] = std::move(secondary);
+    m_streamCapabilityMaps[Qn::StreamIndex::primary] = std::move(primary);
+    m_streamCapabilityMaps[Qn::StreamIndex::secondary] = std::move(secondary);
+}
+
+void CameraMock::enableSetProperty(bool isEnabled)
+{
+    isSetProprtyEnabled = isEnabled;
 }
 
 static void addParameterToGroups(
@@ -118,9 +123,9 @@ std::vector<Camera::AdvancedParametersProvider*> CameraMock::advancedParametersP
     return rawPointers;
 }
 
-StreamCapabilityMap CameraMock::getStreamCapabilityMapFromDrives(bool primaryStream)
+StreamCapabilityMap CameraMock::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
 {
-    return m_streamCapabilityMaps.value(primaryStream);
+    return m_streamCapabilityMaps.value(streamIndex);
 }
 
 QString CameraMock::getProperty(const QString& key) const
@@ -130,6 +135,9 @@ QString CameraMock::getProperty(const QString& key) const
 
 bool CameraMock::setProperty(const QString& key, const QString& value, PropertyOptions /*options*/)
 {
+    if (!isSetProprtyEnabled)
+        return false;
+
     m_properties[key] = value;
     return true;
 }

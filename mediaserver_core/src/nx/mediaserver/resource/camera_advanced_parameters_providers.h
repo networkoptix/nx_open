@@ -73,6 +73,7 @@ public:
         const QSize& baseResolution);
 
     QnLiveStreamParams getParameters() const;
+    bool setParameters(const QnLiveStreamParams& value);
 
     virtual QnCameraAdvancedParams descriptions() override;
     virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
