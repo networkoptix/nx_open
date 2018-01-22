@@ -1563,16 +1563,18 @@ Qn::BitrateControl HanwhaResource::streamBitrateControl(Qn::ConnectionRole role)
     return result;
 }
 
-int HanwhaResource::streamBitrate(Qn::ConnectionRole role, const QnLiveStreamParams& streamParams) const
+int HanwhaResource::streamBitrate(Qn::ConnectionRole role, const QnLiveStreamParams& liveStreamParams) const
 {
+    QnLiveStreamParams streamParams = liveStreamParams;
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
         ? Qn::kPrimaryStreamBitrateParamName
         : Qn::kSecondaryStreamBitrateParamName;
 
     const QString bitrateString = getProperty(propertyName);
     int bitrateKbps = bitrateString.toInt();
+    streamParams.resolution = streamResolution(role);
     if (bitrateKbps == 0)
-        bitrateKbps = nx::mediaserver::resource::Camera::suggestBitrateKbps(streamResolution(role), streamParams, role);
+        bitrateKbps = nx::mediaserver::resource::Camera::suggestBitrateKbps(streamParams, role);
     auto streamCapability = cameraMediaCapability().streamCapabilities.value(role);
     return qBound(streamCapability.minBitrateKbps, bitrateKbps, streamCapability.maxBitrateKbps);
 }

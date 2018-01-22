@@ -59,8 +59,7 @@ qreal getBitrateForQuality(
     int decimals)
 {
     const auto resolution = camera->defaultStream().getResolution();
-    const auto bitrateMbps = camera->suggestBitrateForQualityKbps(quality, resolution, fps)
-        / kKbpsInMbps;
+    const auto bitrateMbps = camera->rawSuggestBitrateKbps(quality, resolution, fps) / kKbpsInMbps;
     const auto roundingStep = std::pow(0.1, decimals);
     return qRound(bitrateMbps, roundingStep);
 }
@@ -610,8 +609,7 @@ void QnCameraScheduleWidget::updateFromResources()
     updateMotionAvailable();
     updateRecordingParamsAvailable();
 
-    m_advancedSettingsSupported = m_cameras.size() == 1
-        && !m_cameras.front()->cameraMediaCapability().isNull();
+    m_advancedSettingsSupported = m_cameras.size() == 1;
 
     ui->advancedSettingsButton->setVisible(m_advancedSettingsSupported);
     ui->advancedSettingsWidget->setVisible(m_advancedSettingsSupported && m_advancedSettingsVisible);
@@ -1488,20 +1486,15 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked()
 
                 if (const auto bitrate = task.getBitrateKbps()) // Try to calculate new custom bitrate
                 {
-                    if (!camera->cameraMediaCapability().isNull())
-                    {
-                        // Target camera supports custom bitrate
-                        const auto normalBitrate = getBitrateForQuality(sourceCamera,
-                            task.getStreamQuality(), task.getFps(), ui->bitrateSpinBox->decimals());
-                        const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
+                    // Target camera supports custom bitrate
+                    const auto normalBitrate = getBitrateForQuality(sourceCamera,
+                        task.getStreamQuality(), task.getFps(), ui->bitrateSpinBox->decimals());
+                    const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
 
-                        const auto targetNormalBitrate = getBitrateForQuality(camera,
-                            task.getStreamQuality(), task.getFps(), ui->bitrateSpinBox->decimals());
-                        const auto targetBitrate = targetNormalBitrate * bitrateAspect;
-                        task.setBitrateKbps(targetBitrate);
-                    }
-                    else
-                        task.setBitrateKbps(0);
+                    const auto targetNormalBitrate = getBitrateForQuality(camera,
+                        task.getStreamQuality(), task.getFps(), ui->bitrateSpinBox->decimals());
+                    const auto targetBitrate = targetNormalBitrate * bitrateAspect;
+                    task.setBitrateKbps(targetBitrate);
                 }
                 tasks.append(task);
             }

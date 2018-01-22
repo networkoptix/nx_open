@@ -56,7 +56,10 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
     QSize resolution = m_actiRes->getResolution(m_role);
     QString resolutionStr = formatResolutionStr(resolution);
 
-    int bitrate = m_actiRes->suggestBitrateKbps(resolution, params, getRole());
+    // TODO: advanced params control is not implemented for this driver yet
+    params.resolution = resolution;
+
+    int bitrate = m_actiRes->suggestBitrateKbps(params, getRole());
     bitrate = m_actiRes->roundBitrate(bitrate);
     QString bitrateStr = m_actiRes->formatBitrateString(bitrate);
 

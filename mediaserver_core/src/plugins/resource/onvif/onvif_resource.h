@@ -281,7 +281,7 @@ public:
     virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true);
 
     CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
-    virtual int suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const override;
+    virtual int suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const override;
 
     QnMutex* getStreamConfMutex();
     virtual void beforeConfigureStream(Qn::ConnectionRole role);

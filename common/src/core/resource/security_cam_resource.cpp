@@ -1363,7 +1363,7 @@ bool QnSecurityCamResource::doesEventComeFromAnalyticsDriver(nx::vms::event::Eve
     return eventType == nx::vms::event::EventType::analyticsSdkEvent;
 }
 
-int QnSecurityCamResource::suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
+int QnSecurityCamResource::suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
 {
     if (streamParams.bitrateKbps > 0)
     {
@@ -1373,7 +1373,7 @@ int QnSecurityCamResource::suggestBitrateKbps(const QSize& resolution, const QnL
             result = qBound(streamCapability.minBitrateKbps, result, streamCapability.maxBitrateKbps);
         return result;
     }
-    return suggestBitrateForQualityKbps(streamParams.quality, resolution, streamParams.fps, role);
+    return suggestBitrateForQualityKbps(streamParams.quality, streamParams.resolution, streamParams.fps, role);
 }
 
 int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const

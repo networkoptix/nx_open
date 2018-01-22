@@ -154,8 +154,10 @@ void QnLiveStreamProvider::mergeWithAdvancedParams(QnLiveStreamParams params)
         params.resolution = advancedLiveStreamParams.resolution;
     if (params.codec.isEmpty())
         params.codec = advancedLiveStreamParams.codec;
-    if (advancedLiveStreamParams.bitrateKbps > 0)
+    if (m_role == Qn::CR_SecondaryLiveVideo)
         params.bitrateKbps = advancedLiveStreamParams.bitrateKbps;
+    if (params.bitrateKbps == 0)
+        params.bitrateKbps = m_cameraRes->rawSuggestBitrateKbps(params.quality, params.resolution, params.fps);
     m_newLiveParams = params;
 }
 
@@ -652,17 +654,13 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     const QnLiveStreamParams& liveParams,
     bool isCameraConfigured)
 {
-    QSize resoulution;
-    std::map<QString, QString> customParams;
-    extractMediaStreamParams(videoData, &resoulution, &customParams);
-
     auto now = qnSyncTime->currentDateTime().toUTC().toString(Qt::ISODate);
     CameraBitrateInfo info(encoderIndex(), std::move(now));
 
     info.rawSuggestedBitrate = m_cameraRes->rawSuggestBitrateKbps(
-        liveParams.quality, resoulution, liveParams.fps) / 1024;
+        liveParams.quality, liveParams.resolution, liveParams.fps) / 1024;
     info.suggestedBitrate = static_cast<float>(m_cameraRes->suggestBitrateKbps(
-        resoulution, liveParams, getRole())) / 1024;
+        liveParams, getRole())) / 1024;
     info.actualBitrate = getBitrateMbps() / getNumberOfChannels();
 
     info.bitratePerGop = m_cameraRes->bitratePerGopType();
@@ -672,7 +670,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     info.fps = liveParams.fps;
     info.actualFps = getFrameRate();
     info.averageGopSize = getAverageGopSize();
-    info.resolution = CameraMediaStreamInfo::resolutionToString(resoulution);
+    info.resolution = CameraMediaStreamInfo::resolutionToString(liveParams.resolution);
     info.isConfigured = isCameraConfigured;
 
     if (m_cameraRes->saveBitrateIfNeeded(info))

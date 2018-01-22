@@ -33,16 +33,19 @@ QnStardotStreamReader::~QnStardotStreamReader()
     stop();
 }
 
-CameraDiagnostics::Result QnStardotStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
+CameraDiagnostics::Result QnStardotStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& liveStreamParams)
 {
     // configure stream params
 
     // get URL
 
+    QnLiveStreamParams params = liveStreamParams;
+    // TODO: advanced params control is not implemented for this driver yet
+    params.resolution = m_stardotRes->getResolution();
     if (isCameraControlRequired)
     {
         QString request(lit("admin.cgi?image&h264_bitrate=%1&h264_framerate=%2"));
-        int bitrate = m_stardotRes->suggestBitrateKbps(m_stardotRes->getResolution(), params, getRole());
+        int bitrate = m_stardotRes->suggestBitrateKbps(params, getRole());
         request = request.arg(bitrate).arg(params.fps);
 
         CLHttpStatus status;
