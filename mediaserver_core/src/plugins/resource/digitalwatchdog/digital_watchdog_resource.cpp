@@ -473,7 +473,7 @@ nx::mediaserver::resource::StreamCapabilityMap QnDigitalWatchdogResource::getStr
         for (const auto& onvifKeys: onvifResult.keys())
         {
             StreamCapabilityKey key;
-            key.codec = QnAvCodecHelper::codecIdFromString(codec.toUpper());
+            key.codec = codec.toUpper();
             key.resolution = onvifKeys.resolution;
             result.insert(key, nx::media::CameraStreamCapability());
         }
