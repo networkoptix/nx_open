@@ -140,7 +140,7 @@ private:
     int m_channelNumber; // video/audio source number
     QElapsedTimer m_lastInitTime;
     QAuthenticator m_lastCredentials;
-    AdvancedParametersProvider* m_defaultAdvancedParametersProviders = nullptr;
+    AdvancedParametersProvider* m_defaultAdvancedParametersProvider = nullptr;
     std::map<QString, AdvancedParametersProvider*> m_advancedParametersProvidersByParameterId;
     std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>> m_streamCapabilityAdvancedProviders;
 };

@@ -49,18 +49,34 @@ public:
         const auto primary = videoStreams.groups.front();
         EXPECT_EQ(primary.name, QLatin1String("Primary"));
         EXPECT_EQ(primary.groups.size(), 0);
-        ASSERT_EQ(primary.params.size(), 2);
+        ASSERT_EQ(primary.params.size(), 3);
         expectParam(primary.params[0], "primaryStream.codec", "Codec", "H264,H265,MJPEG");
         expectParam(primary.params[1], "primaryStream.resolution", "Resolution");
+        expectParam(primary.params[2], "primaryStream.resetToDefaults", "Reset to Defaults");
 
         const auto secondary = videoStreams.groups.back();
         EXPECT_EQ(secondary.name, QLatin1String("Secondary"));
         EXPECT_EQ(secondary.groups.size(), 0);
-        ASSERT_EQ(secondary.params.size(), 4);
+        ASSERT_EQ(secondary.params.size(), 5);
         expectParam(secondary.params[0], "secondaryStream.codec", "Codec", "MJPEG");
         expectParam(secondary.params[1], "secondaryStream.resolution", "Resolution");
-        expectParam(secondary.params[2], "secondaryStream.bitrateKbps", "Bitrate (Kbps)");
-        expectParam(secondary.params[3], "secondaryStream.fps", "Frames per Second (FPS)");
+        expectParam(secondary.params[2], "secondaryStream.bitrateKbps", "Bitrate");
+        expectParam(secondary.params[3], "secondaryStream.fps", "FPS");
+        expectParam(secondary.params[4], "secondaryStream.resetToDefaults", "Reset to Defaults");
+    }
+
+    static void expectLiveParams(QnSharedResourcePointer<Camera> camera,
+        const char* primaryCodec, const QSize& primaryResolution,
+        const char* secondaryCodec, const QSize& secondaryResolution,
+        int secondaryBitrate, int secondaryFps)
+    {
+        const auto streamParams = camera->advancedLiveStreamParams();
+        EXPECT_EQ(streamParams.primaryStream.codec, QString::fromUtf8(primaryCodec));
+        EXPECT_EQ(toString(streamParams.primaryStream.resolution), toString(primaryResolution));
+        EXPECT_EQ(streamParams.secondaryStream.codec, QString::fromUtf8(secondaryCodec));
+        EXPECT_EQ(toString(streamParams.secondaryStream.resolution), toString(secondaryResolution));
+        EXPECT_EQ(streamParams.secondaryStream.bitrateKbps, secondaryBitrate);
+        EXPECT_EQ(streamParams.secondaryStream.fps, secondaryFps);
     }
 };
 
@@ -121,62 +137,55 @@ TEST_F(CameraAdvancedParametersProviders, StreamCapabilities)
         });
     NX_ASSERT(camera);
 
-    // Default values for streams.
-    {
-        const auto streamParams = camera->advancedLiveStreamParams();
-        EXPECT_EQ(streamParams.primaryStream.codec, QLatin1String("H264"));
-        EXPECT_EQ(streamParams.primaryStream.resolution, QSize(1920, 1080));
-        EXPECT_EQ(streamParams.secondaryStream.codec, QLatin1String("MJPEG"));
-        EXPECT_EQ(streamParams.secondaryStream.resolution, QSize(480, 270));
-        EXPECT_EQ(streamParams.secondaryStream.bitrateKbps, 192);
-        EXPECT_EQ(streamParams.secondaryStream.fps, 7);
-    }
-
     // Advanced parameters descriptions.
-    {
-        const auto parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
-        EXPECT_EQ(parameters.name, QLatin1String("primaryStreamConfiguration, secondaryStreamConfiguration"));
-        ASSERT_EQ(parameters.groups.size(), 1);
-        expectVideoStreams(parameters.groups.front());
-    }
+    const auto descriptions = QnCameraAdvancedParamsReader::paramsFromResource(camera);
+    EXPECT_EQ(descriptions.name, QLatin1String("primaryStreamConfiguration, secondaryStreamConfiguration"));
+    ASSERT_EQ(descriptions.groups.size(), 1);
+    expectVideoStreams(descriptions.groups.front());
+
+
+    // Default values for streams.
+    expectLiveParams(camera, "H264", QSize(1920, 1080), "MJPEG", QSize(480, 270), 192, 7);
+    EXPECT_TRUE(camera->getProperty(QString("primaryStreamConfiguration")).isEmpty());
+    EXPECT_TRUE(camera->getProperty(QString("secondaryStreamConfiguration")).isEmpty());
 
     // Advanced parameters get/set.
+    expectEq(QnCameraAdvancedParamValueMap{
+            {"primaryStream.codec", "H264"},
+            {"secondaryStream.resolution", "480x270"},
+            {"secondaryStream.bitrateKbps", "192"}},
+        camera->getAdvancedParameters(
+            {"primaryStream.codec", "secondaryStream.resolution", "secondaryStream.bitrateKbps"}));
+
+    expectEq(QSet<QString>{"secondaryStream.resolution", "secondaryStream.fps"},
+        camera->setAdvancedParameters({
+            {"primaryStream.codec", "MPEG4"}, //< Codec is not supported.
+            {"secondaryStream.resolution", "800x600"},
+            {"secondaryStream.fps", "15"}}));
+
+    expectLiveParams(camera, "H264", QSize(1920, 1080), "MJPEG", QSize(800, 600), 192, 15);
+    EXPECT_TRUE(camera->getProperty(QString("primaryStreamConfiguration")).isEmpty());
+    EXPECT_EQ(QString(
+            R"json({"bitrateKbps":192,"codec":"MJPEG","fps":15,"quality":"6","resolution":{"height":600,"width":800}})json"),
+        camera->getProperty(QString("secondaryStreamConfiguration")));
+
+    // Brocken setProperty().
+    camera->enableSetProperty(false);
     {
-        EXPECT_TRUE(camera->getProperty(QString("primaryStreamConfiguration")).isEmpty());
-        EXPECT_TRUE(camera->getProperty(QString("secondaryStreamConfiguration")).isEmpty());
-
-        expectEq(QnCameraAdvancedParamValueMap{
-                {"primaryStream.codec", "H264"},
-                {"secondaryStream.resolution", "480x270"}},
-            camera->getAdvancedParameters(
-                {"primaryStream.codec", "secondaryStream.resolution"}));
-
-        expectEq(QSet<QString>{"secondaryStream.resolution"},
-            camera->setAdvancedParameters({
-                {"primaryStream.codec", "MPEG4"}, //< Codec is not supported.
-                {"secondaryStream.resolution", "800x600"}}));
-
-        const auto streamParams = camera->advancedLiveStreamParams();
-        EXPECT_EQ(streamParams.primaryStream.codec, QLatin1String("H264"));
-        EXPECT_EQ(streamParams.primaryStream.resolution, QSize(1920, 1080));
-        EXPECT_EQ(streamParams.secondaryStream.codec, QLatin1String("MJPEG"));
-        EXPECT_EQ(streamParams.secondaryStream.resolution, QSize(800, 600));
-        EXPECT_EQ(streamParams.secondaryStream.bitrateKbps, 192);
-        EXPECT_EQ(streamParams.secondaryStream.fps, 7);
-
-        camera->enableSetProperty(false);
         expectEq(QSet<QString>{}, //< Failed to setProperty().
             camera->setAdvancedParameters({{"primaryStream.resolution", "800x600"}}));
         expectEq(QSet<QString>{"primaryStream.resolution"}, //< Property is already set.
             camera->setAdvancedParameters({{"primaryStream.resolution", "1920x1080"}}));
-
-        EXPECT_EQ(QString(
-                R"json()json"),
-            camera->getProperty(QString("primaryStreamConfiguration")));
-        EXPECT_EQ(QString(
-                R"json({"bitrateKbps":192,"codec":"MJPEG","fps":7,"quality":"6","resolution":{"height":600,"width":800}})json"),
-            camera->getProperty(QString("secondaryStreamConfiguration")));
     }
+
+    // Reset to defaults.
+    camera->enableSetProperty(true);
+    expectEq(QSet<QString>{"secondaryStream.resetToDefaults"},
+        camera->setAdvancedParameters({{"secondaryStream.resetToDefaults", "true"}}));
+
+    expectLiveParams(camera, "H264", QSize(1920, 1080), "MJPEG", QSize(480, 270), 192, 7);
+    EXPECT_TRUE(camera->getProperty(QString("primaryStreamConfiguration")).isEmpty());
+    EXPECT_TRUE(camera->getProperty(QString("secondaryStreamConfiguration")).isEmpty());
 }
 
 TEST_F(CameraAdvancedParametersProviders, MixedUpParameters)
@@ -184,6 +193,12 @@ TEST_F(CameraAdvancedParametersProviders, MixedUpParameters)
     const auto camera = newCamera(
         [](CameraMock* camera)
         {
+            camera->makeApiAdvancedParametersProvider<ApiMultiAdvancedParamitersProvider>({
+                "testGroup1.testParam1", "testGroup1.testParam2"});
+
+            camera->makeApiAdvancedParametersProvider<ApiSingleAdvancedParamitersProvider>({
+                "testGroup2.testParam3"});
+
             camera->setStreamCapabilityMaps({
                 {{"MJPEG", QSize(1920, 1080)}, { 10, 100, 20}},
                 {{"H264", QSize(1920, 1080)}, {10, 100, 30}},
@@ -191,35 +206,29 @@ TEST_F(CameraAdvancedParametersProviders, MixedUpParameters)
             },{
                 {{"MJPEG", QSize(800, 600)}, {10, 100, 15}},
             });
-
-            camera->makeApiAdvancedParametersProvider<ApiMultiAdvancedParamitersProvider>({
-                "testGroup1.testParam1", "testGroup1.testParam2"});
-
-            camera->makeApiAdvancedParametersProvider<ApiSingleAdvancedParamitersProvider>({
-                "testGroup2.testParam3"});
         });
     NX_ASSERT(camera);
 
     const auto parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
     EXPECT_EQ(parameters.name, QLatin1String(
-        "makeParameterDescriptions, makeParameterDescriptions, primaryStreamConfiguration, secondaryStreamConfiguration"));
+        "primaryStreamConfiguration, secondaryStreamConfiguration, makeParameterDescriptions, makeParameterDescriptions"));
     ASSERT_EQ(parameters.groups.size(), 3);
 
-    const auto testGroup1 = parameters.groups[0];
+    const auto videoStreams = parameters.groups[0];
+    expectVideoStreams(videoStreams);
+
+    const auto testGroup1 = parameters.groups[1];
     EXPECT_EQ(testGroup1.name, "testGroup1");
     EXPECT_EQ(testGroup1.groups.size(), 0);
     ASSERT_EQ(testGroup1.params.size(), 2);
     EXPECT_EQ(testGroup1.params[0].name, lit("testGroup1.testParam1"));
     EXPECT_EQ(testGroup1.params[1].name, lit("testGroup1.testParam2"));
 
-    const auto testGroup2 = parameters.groups[1];
+    const auto testGroup2 = parameters.groups[2];
     EXPECT_EQ(testGroup2.name, "testGroup2");
     EXPECT_EQ(testGroup2.groups.size(), 0);
     ASSERT_EQ(testGroup2.params.size(), 1);
     EXPECT_EQ(testGroup2.params[0].name, lit("testGroup2.testParam3"));
-
-    const auto videoStreams = parameters.groups[2];
-    expectVideoStreams(videoStreams);
 }
 
 } // namespace test

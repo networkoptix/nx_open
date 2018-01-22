@@ -154,7 +154,8 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (unit)\
     (notes)\
     (shouldKeepInitialValue)\
-    (bindDefaultToMinimum)
+    (bindDefaultToMinimum)\
+    (resync)
 
 struct QnCameraAdvancedParamGroup
 {

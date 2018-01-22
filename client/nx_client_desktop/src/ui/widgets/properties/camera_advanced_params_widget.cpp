@@ -309,15 +309,23 @@ void QnCameraAdvancedParamsWidget::at_advancedParam_saved(int status, const QnCa
     }
 
     /* Update stored parameters. */
+    bool needResync = false;
     for (const QnCameraAdvancedParamValue &value: params) {
         m_loadedValues[value.id] = m_currentValues[value.id];
         m_currentValues.remove(value.id);
+
+        const auto paramiters = m_advancedParamsReader->params(m_camera);
+        if (paramiters.getParameterById(value.id).resync)
+            needResync = true;
     }
 
     /* Update state. */
     setState(State::Init);
-
     emit hasChangesChanged();
+
+    /* Reload all values if one of paramiters requires resync. */
+    if (needResync)
+        loadValues();
 }
 
 QnCameraAdvancedParamsWidget::State QnCameraAdvancedParamsWidget::state() const {

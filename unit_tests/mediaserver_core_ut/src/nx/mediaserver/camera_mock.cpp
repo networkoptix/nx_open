@@ -142,6 +142,15 @@ bool CameraMock::setProperty(const QString& key, const QString& value, PropertyO
     return true;
 }
 
+bool CameraMock::removeProperty(const QString& key)
+{
+    if (!isSetProprtyEnabled)
+        return false;
+
+    m_properties.erase(key);
+    return true;
+}
+
 bool CameraMock::saveParams()
 {
     return true;

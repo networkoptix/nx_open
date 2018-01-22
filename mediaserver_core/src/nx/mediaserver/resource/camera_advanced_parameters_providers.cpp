@@ -15,6 +15,7 @@ static const auto kCodec = lit("codec");
 static const auto kResolution = lit("resolution");
 static const auto kBitrateKpbs = lit("bitrateKbps");
 static const auto kFps = lit("fps");
+static const auto kResetToDefaults = lit("resetToDefaults");
 
 // TODO: Makes sense to somewhere in nx::utils.
 static const QString sizeToString(const QSize& size)
@@ -83,7 +84,8 @@ StreamCapabilityAdvancedParametersProvider::StreamCapabilityAdvancedParametersPr
 :
     m_camera(camera),
     m_streamIndex(streamIndex),
-    m_descriptions(describeCapabilities(capabilities))
+    m_descriptions(describeCapabilities(capabilities)),
+    m_defaults(bestParameters(capabilities, baseResolution))
 {
     for (auto it = capabilities.begin(); it != capabilities.end(); ++it)
     {
@@ -92,7 +94,7 @@ StreamCapabilityAdvancedParametersProvider::StreamCapabilityAdvancedParametersPr
     }
 
     if (!QJson::deserialize(camera->getProperty(proprtyName()).toUtf8(), &m_parameters))
-        m_parameters = bestParameters(capabilities, baseResolution);
+        m_parameters = m_defaults;
 }
 
 QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::getParameters() const
@@ -109,9 +111,17 @@ bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStrea
             return true;
     }
 
-    const auto json = QString::fromUtf8(QJson::serialized(value));
-    if (!m_camera->setProperty(proprtyName(), json) || !m_camera->saveParams())
-        return false;
+    if (value == m_defaults)
+    {
+        if (!m_camera->removeProperty(proprtyName()) || !m_camera->saveParams())
+            return false;
+    }
+    else
+    {
+        const auto json = QString::fromUtf8(QJson::serialized(value));
+        if (!m_camera->setProperty(proprtyName(), json) || !m_camera->saveParams())
+            return false;
+    }
 
     {
         QnMutexLocker lock(&m_mutex);
@@ -164,13 +174,21 @@ QnCameraAdvancedParamValueMap StreamCapabilityAdvancedParametersProvider::get(
 QSet<QString> StreamCapabilityAdvancedParametersProvider::set(
     const QnCameraAdvancedParamValueMap& values)
 {
+    QSet<QString> ids;
+    if (const auto value = getValue(values, kResetToDefaults))
+    {
+        if (setParameters(m_defaults))
+            ids << parameterName(kResetToDefaults);
+
+        return ids;
+    }
+
     decltype(m_parameters) parameters;
     {
         QnMutexLocker lock(&m_mutex);
         parameters = m_parameters;
     }
 
-    QSet<QString> ids;
     if (const auto value = getValue(values, kCodec))
     {
         parameters.codec = *value;
@@ -221,6 +239,14 @@ QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::describeCapab
         ? lit("Primary") : lit("Secondary");
     streamParameters.params = describeCapabilities(codecResolutionCapabilities);
 
+    QnCameraAdvancedParameter resetToDefaults;
+    resetToDefaults.id = parameterName(kResetToDefaults);
+    resetToDefaults.name = lit("Reset to Defaults");
+    resetToDefaults.dataType = QnCameraAdvancedParameter::DataType::Button;
+    resetToDefaults.confirmation = lit("Are you sure you want to set defaults for this stream?");
+    resetToDefaults.resync = true;
+    streamParameters.params.push_back(resetToDefaults);
+
     QnCameraAdvancedParamGroup videoStreams;
     videoStreams.name = lit("Video Streams Configuration");
     videoStreams.groups.push_back(streamParameters);
@@ -263,13 +289,15 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
 
     QnCameraAdvancedParameter bitrate;
     bitrate.id = parameterName(kBitrateKpbs);
-    bitrate.name = lit("Bitrate (Kbps)");
+    bitrate.name = lit("Bitrate");
+    bitrate.unit = lit("Kbps");
     bitrate.dataType = QnCameraAdvancedParameter::DataType::Number;
     bitrate.range = lit("1,100000");
 
     QnCameraAdvancedParameter fps;
     fps.id = parameterName(kFps);
-    fps.name = lit("Frames per Second (FPS)");
+    fps.name = lit("FPS");
+    fps.unit = lit("Frames per Second");
     fps.dataType = QnCameraAdvancedParameter::DataType::Number;
     fps.range = lit("1,100");
 

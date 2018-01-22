@@ -98,6 +98,7 @@ private:
     Camera* const m_camera;
     const Qn::StreamIndex m_streamIndex;
     const QnCameraAdvancedParams m_descriptions;
+    const QnLiveStreamParams m_defaults;
 
     mutable QnMutex m_mutex;
     QnLiveStreamParams m_parameters;

@@ -29,6 +29,7 @@ public:
 public:
     virtual QString getProperty(const QString& key) const override;
     virtual bool setProperty(const QString& key, const QString& value, PropertyOptions options) override;
+    virtual bool removeProperty(const QString& key) override;
     virtual bool saveParams() override;
 
 protected:

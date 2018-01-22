@@ -127,7 +127,7 @@ void Camera::setUrl(const QString &urlStr)
 
 QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>& ids)
 {
-    if (m_defaultAdvancedParametersProviders == nullptr
+    if (m_defaultAdvancedParametersProvider == nullptr
         && m_advancedParametersProvidersByParameterId.empty())
     {
         NX_ASSERT(this, "Get advanced parameters from camera with no providers");
@@ -142,10 +142,10 @@ QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>&
         {
             idsByProvider[it->second].insert(id);
         }
-        else if (m_defaultAdvancedParametersProviders)
+        else if (m_defaultAdvancedParametersProvider)
         {
             NX_DEBUG(this, lm("Get undeclared advanced parameter: %1").arg(id));
-            idsByProvider[m_defaultAdvancedParametersProviders].insert(id);
+            idsByProvider[m_defaultAdvancedParametersProvider].insert(id);
         }
         else
         {
@@ -181,7 +181,7 @@ boost::optional<QString> Camera::getAdvancedParameter(const QString& id)
 
 QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap& values)
 {
-    if (m_defaultAdvancedParametersProviders == nullptr
+    if (m_defaultAdvancedParametersProvider == nullptr
         && m_advancedParametersProvidersByParameterId.empty())
     {
         NX_ASSERT(this, "Set advanced parameters from camera with no providers");
@@ -196,10 +196,10 @@ QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap&
         {
             valuesByProvider[it->second].push_back(value);
         }
-        else if (m_defaultAdvancedParametersProviders)
+        else if (m_defaultAdvancedParametersProvider)
         {
             NX_WARNING(this, lm("Set undeclared advanced parameter: %1").arg(value.id));
-            valuesByProvider[m_defaultAdvancedParametersProviders].push_back(value);
+            valuesByProvider[m_defaultAdvancedParametersProvider].push_back(value);
         }
         else
         {
@@ -375,7 +375,7 @@ CameraDiagnostics::Result Camera::initInternal()
     }
 
     m_streamCapabilityAdvancedProviders.clear();
-    m_defaultAdvancedParametersProviders = nullptr;
+    m_defaultAdvancedParametersProvider = nullptr;
     m_advancedParametersProvidersByParameterId.clear();
 
     const auto driverResult = initializeCameraDriver();
@@ -387,10 +387,7 @@ CameraDiagnostics::Result Camera::initInternal()
 
 CameraDiagnostics::Result Camera::initializaAdvancedParamitersProviders()
 {
-    auto allAdvancedParamitersProviders = advancedParametersProviders();
-    if (!allAdvancedParamitersProviders.empty())
-        m_defaultAdvancedParametersProviders = allAdvancedParamitersProviders.front();
-
+    std::vector<Camera::AdvancedParametersProvider*> allProviders;
     boost::optional<QSize> baseResolution;
     for (const auto streamType: {Qn::StreamIndex::primary, Qn::StreamIndex::secondary})
     {
@@ -405,13 +402,18 @@ CameraDiagnostics::Result Camera::initializaAdvancedParamitersProviders()
                 baseResolution = provider->getParameters().resolution;
 
             // TODO: It might make sence to insert these before driver specific providers.
-            allAdvancedParamitersProviders.push_back(provider.get());
+            allProviders.push_back(provider.get());
             m_streamCapabilityAdvancedProviders.emplace(streamType, std::move(provider));
         }
     }
 
+    auto driverProviders = advancedParametersProviders();
+    if (!driverProviders.empty())
+        m_defaultAdvancedParametersProvider = driverProviders.front();
+
+    allProviders.insert(allProviders.end(), driverProviders.begin(), driverProviders.end());
     QnCameraAdvancedParams advancedParameters;
-    for (const auto& provider: allAdvancedParamitersProviders)
+    for (const auto& provider: allProviders)
     {
         auto providerParameters = provider->descriptions();
         for (const auto& id: providerParameters.allParameterIds())
@@ -424,7 +426,7 @@ CameraDiagnostics::Result Camera::initializaAdvancedParamitersProviders()
     }
 
     NX_VERBOSE(this, lm("Default advanced parameters provider %1, providers by params: %2").args(
-        m_defaultAdvancedParametersProviders,
+        m_defaultAdvancedParametersProvider,
         containerString(m_advancedParametersProvidersByParameterId)));
 
     QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), advancedParameters);
