@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
+include(cmake/utils.cmake)
+
 set(customization "default" CACHE STRING "Product customization")
-option(beta "Is this build is beta build" ON)
+nx_option(beta "Is this build is beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
 
 option(analyzeMutexLocksForDeadlock
@@ -16,7 +18,7 @@ option(addQtPdb
     "Whether add Qt PDB files to debug libs"
     OFF)
 
-option(developerBuild
+nx_option(developerBuild
     "Disable this option for production builds (Jenkins)"
     ON)
 
@@ -65,7 +67,6 @@ include(CMakeParseArguments)
 include(CMakeDependentOption)
 include(ExternalProject)
 include(target_detection)
-include(utils)
 include(find_sources)
 include(moc_utils)
 include(qrc_utils)
