@@ -76,5 +76,5 @@ then
 fi
 
 security set-key-partition-list -S apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" \
-    > /dev/null 2> /dev/null
+    > /dev/null 2> /dev/null || true
 
