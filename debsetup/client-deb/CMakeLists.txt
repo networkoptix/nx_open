@@ -37,6 +37,7 @@ set(common_depends
     "libxi6"
     "libxrender1"
     "libxcomposite1"
+    "libxfixes3"
     "libxt6"
     "libfontconfig1"
     "libsm6"
