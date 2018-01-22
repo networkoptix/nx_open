@@ -151,6 +151,9 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
         &QnResourceTreeWidget::at_treeView_spacePressed);
     connect(ui->resourcesTreeView, &QnTreeView::clicked, this,
         &QnResourceTreeWidget::at_treeView_clicked);
+    connect(ui->resourcesTreeView, &QnTreeView::verticalScrollbarVisibilityChanged,
+        this, &QnResourceTreeWidget::updateShortcutHintVisibility);
+
 
     ui->resourcesTreeView->installEventFilter(this);
 }
@@ -443,13 +446,23 @@ void QnResourceTreeWidget::updateColumns()
     ui->resourcesTreeView->header()->setSectionResizeMode(Qn::NameColumn, QHeaderView::Stretch);
 }
 
+void QnResourceTreeWidget::updateShortcutHintVisibility()
+{
+
+    const bool hasFilterText = !ui->filterLineEdit->text().trimmed().isEmpty();
+    const bool hiddenScrollBar = !ui->resourcesTreeView->verticalScrollBarIsVisible();
+
+    ui->shortcutHintWidget->setVisible(hasFilterText && hiddenScrollBar);
+}
+
 void QnResourceTreeWidget::updateFilter()
 {
     QString filter = ui->filterLineEdit->text();
 
     /* Don't allow empty filters. */
     const auto trimmed = filter.trimmed();
-    ui->shortcutHintWidget->setVisible(!trimmed.isEmpty());
+    updateShortcutHintVisibility();
+
     if (!filter.isEmpty() && trimmed.isEmpty())
     {
         ui->filterLineEdit->clear(); /* Will call into this slot again, so it is safe to return. */
@@ -561,7 +574,7 @@ void QnResourceTreeWidget::initializeFilter()
     ui->shortcutHintWidget->setDescriptions({
         {QKeySequence(Qt::Key_Enter), tr("add to current layout")},
         {QKeySequence(Qt::Key_Control, Qt::Key_Enter), tr("open all at a new layout")}});
-    ui->shortcutHintWidget->setVisible(false);
+    updateShortcutHintVisibility();
 
     const auto filterEdit = ui->filterLineEdit;
     filterEdit->setTags(kFilterCategories);

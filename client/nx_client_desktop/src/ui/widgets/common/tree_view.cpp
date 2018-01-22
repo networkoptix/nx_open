@@ -4,6 +4,8 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QDragMoveEvent>
 
+#include <QtWidgets/QScrollBar>
+
 #include <utils/common/variant.h>
 
 #include <client/client_globals.h>
@@ -17,6 +19,9 @@ QnTreeView::QnTreeView(QWidget *parent):
     m_inDragDropEvent(false)
 {
     setDragDropOverwriteMode(true);
+
+    verticalScrollBar()->installEventFilter(this);
+    handleVerticalScrollbarVisibilityChanged();
 }
 
 QnTreeView::~QnTreeView()
@@ -61,6 +66,33 @@ void QnTreeView::keyPressEvent(QKeyEvent* event)
     }
 
     base_type::keyPressEvent(event);
+}
+
+bool QnTreeView::eventFilter(QObject* object, QEvent* event)
+{
+    if ((event->type() == QEvent::Show || event->type() == QEvent::Hide)
+        && object == verticalScrollBar())
+    {
+        handleVerticalScrollbarVisibilityChanged();
+    }
+
+    return base_type::eventFilter(object, event);
+}
+
+void QnTreeView::handleVerticalScrollbarVisibilityChanged()
+{
+    const auto scrollBar = verticalScrollBar();
+    const bool visible = scrollBar && scrollBar->isVisible();
+    if (visible == m_verticalScrollBarVisible)
+        return;
+
+    m_verticalScrollBarVisible = visible;
+    emit verticalScrollbarVisibilityChanged();
+}
+
+bool QnTreeView::verticalScrollBarIsVisible() const
+{
+    return m_verticalScrollBarVisible;
 }
 
 void QnTreeView::dragMoveEvent(QDragMoveEvent* event)

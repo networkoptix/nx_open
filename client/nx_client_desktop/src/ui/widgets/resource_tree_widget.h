@@ -162,6 +162,8 @@ private:
 
     void expandCheckedRecursively(const QModelIndex& from);
 
+    void updateShortcutHintVisibility();
+
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
 
