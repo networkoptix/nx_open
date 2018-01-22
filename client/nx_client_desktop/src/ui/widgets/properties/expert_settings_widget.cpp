@@ -152,8 +152,6 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     int supportedNativePtzCount = 0;
     int disabledNativePtzCount = 0;
 
-    m_qualityEditable = true;
-
     int camCnt = 0;
     for (const auto& camera: cameras)
     {
@@ -162,11 +160,8 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         if (!camera->supportedMotionType().testFlag(Qn::MT_SoftwareGrid))
             allCamerasSupportForceMotion = false;
 
-        const bool qualityEditable = camera->cameraMediaCapability().isNull();
         m_hasDualStreaming |= camera->hasDualStreaming();
         m_hasRemoteArchiveCapability |= camera->hasCameraCapabilities(Qn::RemoteArchiveCapability);
-
-        m_qualityEditable &= qualityEditable;
 
         if (camera->hasDualStreaming())
         {
@@ -250,7 +245,6 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         camCnt++;
     }
 
-    m_qualityEditable &= m_hasDualStreaming;
     ui->secondStreamGroupBox->setVisible(m_hasDualStreaming);
 
     if (m_hasDualStreaming)
@@ -466,9 +460,6 @@ void QnCameraExpertSettingsWidget::updateControlBlock()
 
 bool QnCameraExpertSettingsWidget::isSecondStreamEnabled() const
 {
-    if (!m_qualityEditable)
-        return true;
-
     if (ui->settingsDisableControlCheckBox->checkState() != Qt::Unchecked)
         return true;
 
@@ -480,9 +471,6 @@ bool QnCameraExpertSettingsWidget::isSecondStreamEnabled() const
 
 void QnCameraExpertSettingsWidget::setSecondStreamEnabled(bool value)
 {
-    if (!m_qualityEditable)
-        return;
-
     if (ui->settingsDisableControlCheckBox->checkState() != Qt::Unchecked)
         return;
 
