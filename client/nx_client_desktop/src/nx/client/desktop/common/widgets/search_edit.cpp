@@ -252,7 +252,14 @@ void SearchEdit::keyPressEvent(QKeyEvent* event)
 {
     m_lineEdit->event(event);
     if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+    {
+        if (event->modifiers().testFlag(Qt::ControlModifier))
+            emit ctrlEnterPressed();
+        else
+            emit enterPressed();
+
         event->accept();
+    }
 }
 
 void SearchEdit::inputMethodEvent(QInputMethodEvent* event)

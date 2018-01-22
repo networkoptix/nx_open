@@ -57,6 +57,9 @@ signals:
     void editingFinished();
     void selectedTagIndexChanged();
 
+    void enterPressed();
+    void ctrlEnterPressed();
+
 protected:
     void resizeEvent(QResizeEvent* event) override;
     void focusInEvent(QFocusEvent* event) override;

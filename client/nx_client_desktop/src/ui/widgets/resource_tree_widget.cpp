@@ -459,19 +459,26 @@ void QnResourceTreeWidget::updateShortcutHintVisibility()
 
 void QnResourceTreeWidget::updateFilter()
 {
-    QString filter = ui->filterLineEdit->text();
+    const auto filterEdit = ui->filterLineEdit;
+    const auto queryText = filterEdit->text();
 
     /* Don't allow empty filters. */
-    const auto trimmed = filter.trimmed();
+    const auto trimmed = queryText.trimmed();
     updateShortcutHintVisibility();
 
-    if (!filter.isEmpty() && trimmed.isEmpty())
+    if (trimmed.isEmpty())
+        filterEdit->clear();
+
+    static const auto kMapping = filterTagIndexToNodeMapping();
+    const auto index = filterEdit->selectedTagIndex();
+    if (index >= kMapping.size())
     {
-        ui->filterLineEdit->clear(); /* Will call into this slot again, so it is safe to return. */
+        NX_EXPECT(false, "Wrong tag index");
         return;
     }
 
-    m_resourceProxyModel->setQuery(filter);
+    const auto allowedNode = index == -1 ? -1 : kMapping.at(index);
+    m_resourceProxyModel->setQuery(QnResourceSearchQuery(trimmed, allowedNode));
 }
 
 
@@ -558,19 +565,42 @@ void QnResourceTreeWidget::expandNodeIfNeeded(const QModelIndex& index)
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }
 
-void QnResourceTreeWidget::initializeFilter()
+QStringList QnResourceTreeWidget::filterTags()
 {
     static const auto kFilterCategories = QStringList({
         tr("All types"),
-        QString(), // spliter
+        QString(), // splitter
         tr("Servers"),
         tr("Cameras & Devices"),
         tr("Layouts"),
         tr("Layout Tours"),
+        tr("Video Walls"),
         tr("Web Pages"),
         tr("Users"),
         tr("Local Files")});
 
+    return kFilterCategories;
+}
+
+QList<int> QnResourceTreeWidget::filterTagIndexToNodeMapping()
+{
+    static const auto kTagIndexToAllowedNodeMapping = QList<int>({
+        -1,
+        -1,
+        Qn::FilteredServersNode,
+        Qn::FilteredCamerasNode,
+        Qn::FilteredLayoutsNode,
+        Qn::LayoutToursNode,
+        Qn::FilteredVideowallsNode,
+        Qn::WebPagesNode,
+        Qn::FilteredUsersNode,
+        Qn::LocalResourcesNode});
+
+    return kTagIndexToAllowedNodeMapping;
+}
+
+void QnResourceTreeWidget::initializeFilter()
+{
     ui->filter->setVisible(false);
 
     const auto ctrlKey = nx::utils::AppInfo::isMacOsX() ? Qt::Key_Meta : Qt::Key_Control;
@@ -580,32 +610,20 @@ void QnResourceTreeWidget::initializeFilter()
     updateShortcutHintVisibility();
 
     const auto filterEdit = ui->filterLineEdit;
-    filterEdit->setTags(kFilterCategories);
+    filterEdit->setTags(filterTags());
     filterEdit->setClearingTagIndex(0);
 
     connect(filterEdit, &SearchEdit::textChanged,
         this, &QnResourceTreeWidget::updateFilter);
-
     connect(filterEdit, &SearchEdit::editingFinished,
         this, &QnResourceTreeWidget::updateFilter);
+    connect(filterEdit, &SearchEdit::selectedTagIndexChanged,
+        this, &QnResourceTreeWidget::updateFilter);
 
-    installEventHandler(filterEdit, QEvent::KeyPress, this,
-        [this](QObject* /*object*/, QEvent* event)
-        {
-            const auto keyEvent = static_cast<QKeyEvent*>(event);
-            switch (keyEvent->key())
-            {
-                case Qt::Key_Enter:
-                case Qt::Key_Return:
-                    if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
-                        emit filterCtrlEnterPressed();
-                    else
-                        emit filterEnterPressed();
-                    break;
-                default:
-                    break;
-            }
-        });
+    connect(filterEdit, &SearchEdit::enterPressed,
+        this, &QnResourceTreeWidget::filterEnterPressed);
+    connect(filterEdit, &SearchEdit::ctrlEnterPressed,
+        this, &QnResourceTreeWidget::filterCtrlEnterPressed);
 }
 
 void QnResourceTreeWidget::update(const QnResourcePtr& resource)

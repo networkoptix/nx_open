@@ -106,11 +106,22 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
             break;
     }
 
-    if (!searchMode && showAllMode)
-        return true;
-
     if (searchMode)
     {
+        const auto allowedNode = m_query.allowedNode;
+        static const auto searchGroupNodes = QSet<int>({
+            Qn::FilteredServersNode,
+            Qn::FilteredCamerasNode,
+            Qn::FilteredLayoutsNode,
+            Qn::LayoutToursNode,
+            Qn::FilteredVideowallsNode,
+            Qn::WebPagesNode,
+            Qn::FilteredUsersNode,
+            Qn::LocalResourcesNode});
+
+        if (searchGroupNodes.contains(nodeType) && allowedNode != -1 && allowedNode != nodeType)
+            return false; // Filter out all nodes except allowed one
+
         // We don't show servers and videowalls in case of search.
         if (const auto resource = this->resource(index))
         {
@@ -122,6 +133,8 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
                 return false;
         }
     }
+    else if (showAllMode)
+        return true;
 
     switch (nodeType)
     {

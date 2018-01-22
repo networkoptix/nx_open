@@ -16,6 +16,8 @@
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QGraphicsLinearLayout>
 
+#include <ini.h>
+
 #include <camera/camera_thumbnail_manager.h>
 
 #include <client/client_runtime_settings.h>
@@ -237,6 +239,9 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
 void QnResourceBrowserWidget::initNewSearch()
 {
+    if (!nx::client::desktop::ini().enableResourceFiltering)
+        return;
+
     ui->tabWidget->tabBar()->hide();
 
     ui->resourceTreeWidget->setFilterVisible();

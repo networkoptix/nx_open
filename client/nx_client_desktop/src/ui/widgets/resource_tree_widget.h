@@ -164,6 +164,10 @@ private:
 
     void updateShortcutHintVisibility();
 
+    static QStringList filterTags();
+
+    static QList<int> filterTagIndexToNodeMapping();
+
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
 
