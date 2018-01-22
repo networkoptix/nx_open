@@ -26,16 +26,15 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     , m_textChangedSignalFilterMs(0)
     , m_filterTimer()
 {
-    setAttribute(Qt::WA_InputMethodEnabled);
     setFocusPolicy(m_lineEdit->focusPolicy());
+    setAttribute(Qt::WA_InputMethodEnabled);
     setSizePolicy(m_lineEdit->sizePolicy());
     setBackgroundRole(m_lineEdit->backgroundRole());
-    QPalette p = m_lineEdit->palette();
-    setPalette(p);
-
     setMouseTracking(true);
     setAcceptDrops(true);
     setAttribute(Qt::WA_MacShowFocusRect, true);
+    QPalette p = m_lineEdit->palette();
+    setPalette(p);
 
 
     // line edit
@@ -46,8 +45,8 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     clearPalette.setBrush(QPalette::Base, QBrush(Qt::transparent));
     m_lineEdit->setPalette(clearPalette);
 
-//    m_lineEdit->setPlaceholderText(tr("Search"));
-//    m_lineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
+    m_lineEdit->setPlaceholderText(tr("Search"));
+    m_lineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
     m_lineEdit->setClearButtonEnabled(true);
 
     connect(m_lineEdit, &QLineEdit::returnPressed, this, &QnSearchLineEdit::enterKeyPressed);
