@@ -111,7 +111,7 @@ private:
         nx::sdk::metadata::AbstractMetadataManager* manager,
         const QnSecurityCamResourcePtr& camera);
 
-    void ManagerPool::addManifestToCamera(
+    void addManifestToCamera(
         const nx::api::AnalyticsDeviceManifest& manifest,
         const QnSecurityCamResourcePtr& camera);
 

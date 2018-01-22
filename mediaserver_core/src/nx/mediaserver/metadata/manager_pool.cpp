@@ -20,12 +20,17 @@
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
 #include <nx/utils/log/log.h>
 
+namespace nx {
+
+namespace api {
+
 uint qHash(const nx::api::AnalyticsEventType& t)
 {
     return qHash(t.eventTypeId.toByteArray());
 }
 
-namespace nx {
+} // namespace api
+
 namespace mediaserver {
 namespace metadata {
 
@@ -453,8 +458,8 @@ void ManagerPool::addPluginManifestToServer(
     const nx::api::AnalyticsDriverManifest& manifest,
     const QnMediaServerResourcePtr& server)
 {
-    auto& existingManifests = server->analyticsDrivers();
-    auto& it = std::find_if(existingManifests.begin(), existingManifests.end(),
+    auto&& existingManifests = server->analyticsDrivers();
+    const auto& it = std::find_if(existingManifests.begin(), existingManifests.end(),
         [&manifest](const nx::api::AnalyticsDriverManifest& m) { return m.driverId == manifest.driverId; });
 
     if (it == existingManifests.cend())
