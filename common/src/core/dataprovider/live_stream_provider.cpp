@@ -150,7 +150,6 @@ void QnLiveStreamProvider::mergeWithAdvancedParams(QnLiveStreamParams params)
     params.fps = qBound(
         (float) 1.0, params.fps, (float)m_cameraRes->getMaxFps());
 
-    NX_ASSERT(!advancedLiveStreamParams.resolution.isEmpty());
     if (params.resolution.isEmpty())
         params.resolution = advancedLiveStreamParams.resolution;
     if (params.codec.isEmpty())

@@ -116,7 +116,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
 {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    boost::optional<bool> isDualStreamingDisabled = false;
+    boost::optional<bool> isDualStreamingDisabled;
     bool sameIsDualStreamingDisabled = true;
 
     bool sameControlState = true;
