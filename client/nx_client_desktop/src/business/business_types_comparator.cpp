@@ -29,7 +29,7 @@ void QnBusinessTypesComparator::initLexOrdering()
     // event types to lex order
     int maxType = 0;
     QMap<QString, int> eventTypes;
-    for (auto eventType : allEvents())
+    for (auto eventType: allEvents())
     {
         eventTypes.insert(helper.eventName(eventType), eventType);
         if (maxType < eventType)
