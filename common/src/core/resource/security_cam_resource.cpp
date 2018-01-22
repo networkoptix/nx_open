@@ -1099,7 +1099,7 @@ void QnSecurityCamResource::setDisableDualStreaming(bool value)
     }
 
     m_cachedHasDualStreaming2.reset();
-    emit secondaryStreamQualityChanged(toSharedPointer());
+    emit disableDualStreamingChanged(toSharedPointer());
 }
 
 bool QnSecurityCamResource::isDualStreamingDisabled() const
@@ -1268,8 +1268,6 @@ Qn::MotionTypes QnSecurityCamResource::calculateSupportedMotionType() const
         else if (s1 == lit("motionwindow"))
             result |= Qn::MT_MotionWindow;
     }
-    //if ((!hasDualStreaming() || secondaryStreamQuality() == Qn::SSQualityDontUse) && !(getCameraCapabilities() &  Qn::PrimaryStreamSoftMotionCapability))
-    //    result &= ~Qn::MT_SoftwareGrid;
 
     return result;
 }
