@@ -1927,6 +1927,8 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     auto comparator = createComparator(channelProfiles);
     std::sort(optionsList.begin(), optionsList.end(), comparator);
 
+    if (optionsList[0].frameRateMax > 0)
+        setMaxFps(optionsList[0].frameRateMax);
     if (m_maxChannels == 1 && !trustMaxFPS() && !isCameraControlDisabled())
         checkMaxFps(confResponse, optionsList[0].id);
 

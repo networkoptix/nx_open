@@ -133,10 +133,6 @@ void QnLiveStreamProvider::setCameraControlDisabled(bool value)
 void QnLiveStreamProvider::mergeWithAdvancedParams(QnLiveStreamParams params)
 {
     QnMutexLocker mtx(&m_livemutex);
-    if (params.fps == QnLiveStreamParams::kFpsNotInitialized)
-        params.fps = getDefaultFps();
-    params.fps = qBound(
-        (float) 1.0, params.fps, (float)m_cameraRes->getMaxFps());
     if (params.bitrateKbps == 0 && params.quality == Qn::QualityNotDefined)
         params.quality = Qn::QualityNormal;
 
@@ -145,6 +141,16 @@ void QnLiveStreamProvider::mergeWithAdvancedParams(QnLiveStreamParams params)
     auto advancedLiveStreamParams = getRole() == Qn::CR_SecondaryLiveVideo
         ? advancedParams.secondaryStream : advancedParams.primaryStream;
 
+    if (params.fps == QnLiveStreamParams::kFpsNotInitialized)
+    {
+        params.fps = advancedLiveStreamParams.fps;
+        if (params.fps == QnLiveStreamParams::kFpsNotInitialized)
+            params.fps = getDefaultFps();
+    }
+    params.fps = qBound(
+        (float) 1.0, params.fps, (float)m_cameraRes->getMaxFps());
+
+    NX_ASSERT(!advancedLiveStreamParams.resolution.isEmpty());
     if (params.resolution.isEmpty())
         params.resolution = advancedLiveStreamParams.resolution;
     if (params.codec.isEmpty())
