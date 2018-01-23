@@ -10,8 +10,6 @@ nx_option(developerBuild
     "Disable this option for production builds (Jenkins)"
     ON)
 
-option(codeSigning "Enable code signing." ON)
-
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
@@ -92,6 +90,11 @@ include(maven_compatibility)
 include(generate_current_config)
 
 nx_create_dev_qt_conf()
+
+cmake_dependent_option(codeSigning "Enable code signing"
+    ON "NOT developerBuild"
+    OFF
+)
 
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
