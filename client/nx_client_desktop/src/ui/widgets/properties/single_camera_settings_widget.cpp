@@ -75,6 +75,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->wearableUploadWidget->initializeContext(this);
+    ui->wearableProgressWidget->initializeContext(this);
     ui->licensingWidget->initializeContext(this);
     ui->cameraScheduleWidget->initializeContext(this);
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
@@ -244,6 +245,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     ui->cameraScheduleWidget->setCameras(cameras);
     ui->licensingWidget->setCameras(cameras);
     ui->wearableUploadWidget->setCamera(camera);
+    ui->wearableProgressWidget->setCamera(camera);
 
     if (m_camera)
     {
@@ -431,6 +433,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         ui->motionControlsWidget->setVisible(false);
         ui->motionAvailableLabel->setVisible(true);
         ui->wearableUploadWidget->setVisible(false);
+        ui->wearableProgressWidget->setVisible(false);
     }
     else
     {
@@ -439,6 +442,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         bool hasAudio = m_camera->isAudioSupported();
 
         ui->wearableUploadWidget->setVisible(isWearable);
+        ui->wearableProgressWidget->setVisible(isWearable);
         ui->modelEdit->setVisible(!isWearable);
         ui->modelLabel->setVisible(!isWearable);
         ui->firmwareEdit->setVisible(!isWearable);
