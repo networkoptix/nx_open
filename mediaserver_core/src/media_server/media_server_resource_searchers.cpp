@@ -19,12 +19,15 @@
 #include <plugins/resource/flir/flir_resource_searcher.h>
 #include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
 #include <plugins/resource/isd/isd_resource_searcher.h>
-#include <plugins/resource/hanwha/hanwha_resource_searcher.h>
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
 #include <plugins/resource/stardot/stardot_resource_searcher.h>
 #include <plugins/resource/third_party/third_party_resource_searcher.h>
 #include <plugins/resource/wearable/wearable_camera_resource_searcher.h>
 #include <plugins/resource/archive_camera/archive_camera.h>
+
+#if defined(ENABLE_HANWHA)
+    #include <plugins/resource/hanwha/hanwha_resource_searcher.h>
+#endif // defined(ENABLE_HANWHA)
 
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <common/common_module.h>
