@@ -24,7 +24,7 @@ public:
 
     virtual ~AbstractRemoteArchiveSynchronizationTask() {};
     virtual QnUuid id() const = 0;
-    virtual void setDoneHandler(std::function<void()> handler) = 0;
+    virtual void setDoneHandler(std::function<void()> handler) = 0; // TODO #wearable Unused! Drop!
     virtual void cancel() = 0;
     virtual bool execute() = 0;
 };
