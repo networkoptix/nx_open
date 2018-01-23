@@ -2,6 +2,8 @@
 
 #include <nx/utils/std/cpp14.h>
 
+#include "upload_worker.h"
+
 namespace nx {
 namespace client {
 namespace desktop {
