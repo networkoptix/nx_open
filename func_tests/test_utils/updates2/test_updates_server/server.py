@@ -126,7 +126,7 @@ def save_data_to_files(root_obj, path_to_update_obj):
         key_splits = key.split('/')
         file_path = os.path.join(DATA_DIR, FILE_PATTERN.format(key_splits[1], key_splits[2]))
         with open(file_path, 'w') as f:
-            f.write(json.dumps(value))
+            f.write(json.dumps(value, indent=2))
 
 
 def load_data_from_files():
