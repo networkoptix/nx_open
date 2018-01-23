@@ -248,7 +248,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     ui->licensingWidget->setCameras(cameras);
     ui->wearableUploadWidget->setCamera(camera);
     ui->wearableProgressWidget->setCamera(camera);
-    ui->wearableArchiveLengthWidget->updateFromResources({camera});
+    ui->wearableArchiveLengthWidget->updateFromResources(cameras);
 
     if (m_camera)
     {
