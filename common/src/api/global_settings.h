@@ -281,6 +281,9 @@ public:
     int maxRemoteArchiveSynchronizationThreads() const;
     void setMaxRemoteArchiveSynchronizationThreads(int newValue);
 
+    int maxWearableArchiveSynchronizationThreads() const;
+    void setMaxWearableArchiveSynchronizationThreads(int newValue);
+
 signals:
     void initialized();
 
@@ -405,6 +408,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor;
 
     QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads;
+    QnResourcePropertyAdaptor<int>* m_maxWearableArchiveSynchronizationThreads;
 
     AdaptorList m_allAdaptors;
 
