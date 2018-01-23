@@ -34,7 +34,6 @@ _logger = logging.getLogger(__name__)
 UPDATE_PATH_PATTERN = '/{}/{}/update.json'
 UPDATES_PATH = '/updates.json'
 
-DATA_FOLDER_NAME = 'data'
 DATA_DIR = Path(__file__).parent / 'data'
 DUMMY_FILE_NAME = 'dummy.raw'
 DUMMY_FILE_PATH = DATA_DIR / DUMMY_FILE_NAME
