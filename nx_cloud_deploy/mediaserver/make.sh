@@ -4,7 +4,7 @@
 . ../common.sh
 
 MODULE=mediaserver
-VERSION=3.0.0.14670
+VERSION=3.1.0.17256
 
 function build ()
 {
