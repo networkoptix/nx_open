@@ -117,7 +117,7 @@ int QnWearableCameraRestHandler::executeConsume(
     }
 
     nx::mediaserver_core::recorder::WearableArchiveSynchronizationTask task(
-        owner->commonModule(),
+        qnServerModule,
         camera,
         std::move(file),
         startTimeMs);

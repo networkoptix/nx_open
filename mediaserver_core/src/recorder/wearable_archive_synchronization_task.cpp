@@ -18,12 +18,12 @@ namespace recorder {
 
 
 WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
-    QnCommonModule* commonModule,
+    QnMediaServerModule* serverModule,
     const QnSecurityCamResourcePtr& resource,
     std::unique_ptr<QIODevice> file,
     qint64 startTimeMs)
     :
-    base_type(commonModule),
+    base_type(serverModule),
     m_resource(resource),
     m_file(file.release()),
     m_startTimeMs(startTimeMs)
@@ -35,6 +35,25 @@ WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask()
     NX_ASSERT(!m_file);
     if (m_file)
         delete m_file.data();
+}
+
+QnUuid WearableArchiveSynchronizationTask::id() const
+{
+    return m_resource->getId();
+}
+
+void WearableArchiveSynchronizationTask::setDoneHandler(std::function<void()> handler)
+{
+    NX_CHECK(true, "Unimplemented", Crash);
+}
+
+void WearableArchiveSynchronizationTask::cancel()
+{
+    if (m_archiveReader)
+        m_archiveReader->pleaseStop();
+
+    if (m_recorder)
+        m_recorder->pleaseStop();
 }
 
 bool WearableArchiveSynchronizationTask::execute()
@@ -123,7 +142,6 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
             m_recorder->pleaseStop();
         });
 }
-
 
 } // namespace recorder
 } // namespace mediaserver_core
