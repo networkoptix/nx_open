@@ -36,6 +36,7 @@ public:
     using ConnectHandler = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
     using IndicationHandler = std::function<void(Message)>;
     using ReconnectHandler = std::function<void()>;
+    using OnConnectionClosedHandler = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
     using RequestHandler = utils::MoveOnlyFunc<void(SystemError::ErrorCode, Message)>;
     using TimerHandler = std::function<void()>;
 
@@ -52,7 +53,7 @@ public:
     /**
      * Subscribes for certain indications.
      *
-     * @param method Indication method of interest. 
+     * @param method Indication method of interest.
      *    Use kEveryIndicationMethod constant to install handler that will received all unhandled indications.
      * @param handler Will be called for each indication message.
      * @param client Can be used to cancel subscription.
@@ -69,6 +70,9 @@ public:
      */
     virtual void addOnReconnectedHandler(
         ReconnectHandler handler, void* client = 0) = 0;
+
+    virtual void setOnConnectionClosedHandler(
+        OnConnectionClosedHandler onConnectionClosedHandler) = 0;
 
     /** Sends message asynchronously
      *

@@ -1,3 +1,5 @@
+include(CMakeParseArguments)
+
 if(CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_MULTI_CONFIGURATION_MODE TRUE)
 

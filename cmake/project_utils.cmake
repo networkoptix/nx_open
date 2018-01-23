@@ -44,8 +44,18 @@ function(nx_add_target name type)
 
         qt5_add_translation(qm_files ${ts_files})
 
-        list(APPEND resources ${qm_files})
-        set_source_files_properties(${qm_files}
+        set(needed_qm_files)
+        foreach(qm_file ${qm_files})
+            foreach(lang ${defaultTranslation} ${additionalTranslations})
+                if(qm_file MATCHES "${lang}\\.qm$")
+                    list(APPEND needed_qm_files ${qm_file})
+                    break()
+                endif()
+            endforeach()
+        endforeach()
+
+        list(APPEND resources ${needed_qm_files})
+        set_source_files_properties(${needed_qm_files}
             PROPERTIES RESOURCE_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/qm")
     endif()
 
@@ -62,7 +72,7 @@ function(nx_add_target name type)
         )
     endif()
 
-    set(sources ${cpp_files} ${hpp_files} ${rcc_files} ${qm_files})
+    set(sources ${cpp_files} ${rcc_files} ${qm_files})
     if(NOT NX_NO_PCH)
         set(sources ${sources} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
     endif()
@@ -112,13 +122,14 @@ function(nx_add_target name type)
         nx_target_enable_werror(${name})
     endif()
 
-    if(NX_NO_MOC)
-        set_target_properties(${name} PROPERTIES AUTOMOC OFF)
-    else()
-        if(NOT NX_NO_PCH)
-            set_target_properties(${name} PROPERTIES AUTOMOC_MOC_OPTIONS
-                "-b;${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
-        endif()
+    if(NOT NX_NO_MOC)
+        nx_add_qt_mocables(${name} ${hpp_files}
+            INCLUDE_DIRS
+                ${CMAKE_CURRENT_SOURCE_DIR}/src
+                # TODO: #dklychkov Remove hardcoded nx_fusion after updating to a newer Qt which
+                # has Q_NAMESPACE macro which can avoid QN_DECLARE_METAOBJECT_HEADER.
+                ${CMAKE_SOURCE_DIR}/common_libs/nx_fusion/src
+        )
     endif()
 
     if(NOT NX_NO_PCH)

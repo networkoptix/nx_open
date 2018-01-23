@@ -6,6 +6,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
 
+option(analyzeMutexLocksForDeadlock
+    "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
+    OFF)
+
 add_definitions(
     -DUSE_NX_HTTP
     -D__STDC_CONSTANT_MACROS

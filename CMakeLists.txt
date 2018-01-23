@@ -1,22 +1,12 @@
-cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
+
+include(cmake/option.cmake)
 
 set(customization "default" CACHE STRING "Product customization")
-option(beta "Is this build is beta build" ON)
+nx_option(beta "Is this build is beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
 
-option(analyzeMutexLocksForDeadlock
-    "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
-    OFF)
-
-option(rdepSync
-    "Whether rdep should sync packages or use only existing copies"
-    ON)
-
-option(addQtPdb
-    "Whether add Qt PDB files to debug libs"
-    OFF)
-
-option(developerBuild
+nx_option(developerBuild
     "Disable this option for production builds (Jenkins)"
     ON)
 
@@ -33,8 +23,8 @@ if(targetDevice STREQUAL "none")
 endif()
 
 # Early loading rdep to download a toolchain if needed.
-include(build_utils/cmake/find_python.cmake)
-include(build_utils/cmake/rdep.cmake)
+include(cmake/find_python.cmake)
+include(cmake/rdep.cmake)
 nx_rdep_configure()
 
 if(targetDevice AND NOT targetDevice STREQUAL "ios")
@@ -58,7 +48,6 @@ set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 list(APPEND CMAKE_MODULE_PATH
-    ${PROJECT_SOURCE_DIR}/build_utils/cmake
     ${PROJECT_SOURCE_DIR}/cmake
 )
 
@@ -68,6 +57,7 @@ include(ExternalProject)
 include(target_detection)
 include(utils)
 include(find_sources)
+include(moc_utils)
 include(qrc_utils)
 include(precompiled_header)
 include(strip_target)
@@ -158,8 +148,6 @@ if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
 endif()
-
-set(CMAKE_AUTOMOC ON)
 
 if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
     add_subdirectory(common_libs)

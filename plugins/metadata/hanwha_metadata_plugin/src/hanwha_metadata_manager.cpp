@@ -114,7 +114,7 @@ Error HanwhaMetadataManager::stopFetchingMetadata()
     return Error::noError;
 }
 
-const char* HanwhaMetadataManager::capabilitiesManifest(Error* error) const
+const char* HanwhaMetadataManager::capabilitiesManifest(Error* error)
 {
     if (m_deviceManifest.isEmpty())
     {
@@ -124,6 +124,10 @@ const char* HanwhaMetadataManager::capabilitiesManifest(Error* error) const
 
     *error = Error::noError;
     return m_deviceManifest.constData();
+}
+
+void HanwhaMetadataManager::freeManifest(const char* data)
+{
 }
 
 void HanwhaMetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)

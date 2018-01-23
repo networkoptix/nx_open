@@ -60,7 +60,7 @@ function(nx_detect_package_versions)
     if(box STREQUAL "rpi")
         _set_version(qt "5.6.1")
         _set_version(quazip "0.7.2")
-        _set_version(openssl "1.0.1t")
+        _set_version(openssl "1.0.1t-deb8")
     endif()
 
     if(box STREQUAL "edge1")

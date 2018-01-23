@@ -38,8 +38,6 @@ class NX_NETWORK_API MediatorConnector:
 {
 public:
     MediatorConnector();
-    MediatorConnector(
-        std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> customUrlFetcher);
     virtual ~MediatorConnector() override;
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
@@ -83,6 +81,7 @@ private:
 
     std::shared_ptr<stun::AsyncClientWithHttpTunneling> m_stunClient;
     std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_mediatorUrlFetcher;
+    boost::optional<QUrl> m_cloudModulesXmlUrl;
     boost::optional<QUrl> m_mediatorUrl;
     boost::optional<SocketAddress> m_mediatorUdpEndpoint;
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
@@ -91,6 +90,7 @@ private:
 
     void fetchEndpoint();
     void connectToMediatorAsync();
+    void reconnectToMediator(SystemError::ErrorCode connectionClosureReason);
 };
 
 } // namespace api

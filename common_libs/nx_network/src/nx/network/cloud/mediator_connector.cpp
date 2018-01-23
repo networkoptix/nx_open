@@ -20,15 +20,7 @@ static stun::AbstractAsyncClient::Settings s_stunClientSettings;
 } // namespace
 
 MediatorConnector::MediatorConnector():
-    MediatorConnector(std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>())
-{
-}
-
-MediatorConnector::MediatorConnector(
-    std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> customUrlFetcher)
-    :
     m_stunClient(std::make_shared<stun::AsyncClientWithHttpTunneling>(s_stunClientSettings)),
-    m_mediatorUrlFetcher(std::move(customUrlFetcher)),
     m_fetchEndpointRetryTimer(
         std::make_unique<nx::network::RetryTimer>(
             nx::network::RetryPolicy(
@@ -37,11 +29,16 @@ MediatorConnector::MediatorConnector(
                 2,
                 kRetryIntervalMax)))
 {
-    bindToAioThread(getAioThread());
+    using namespace std::placeholders;
 
     NX_ASSERT(
         s_stunClientSettings.reconnectPolicy.maxRetryCount ==
         network::RetryPolicy::kInfiniteRetries);
+
+    bindToAioThread(getAioThread());
+
+    m_stunClient->setOnConnectionClosedHandler(
+        std::bind(&MediatorConnector::reconnectToMediator, this, _1));
 }
 
 MediatorConnector::~MediatorConnector()
@@ -55,7 +52,8 @@ void MediatorConnector::bindToAioThread(network::aio::AbstractAioThread* aioThre
     network::aio::BasicPollable::bindToAioThread(aioThread);
 
     m_stunClient->bindToAioThread(aioThread);
-    m_mediatorUrlFetcher->bindToAioThread(aioThread);
+    if (m_mediatorUrlFetcher)
+        m_mediatorUrlFetcher->bindToAioThread(aioThread);
     m_fetchEndpointRetryTimer->bindToAioThread(aioThread);
 }
 
@@ -91,8 +89,7 @@ std::unique_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection
 
 void MediatorConnector::mockupCloudModulesXmlUrl(const QUrl& cloudModulesXmlUrl)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_mediatorUrlFetcher->setModulesXmlUrl(cloudModulesXmlUrl);
+    m_cloudModulesXmlUrl = cloudModulesXmlUrl;
 }
 
 void MediatorConnector::mockupMediatorUrl(const QUrl& mediatorUrl)
@@ -171,6 +168,15 @@ void MediatorConnector::stopWhileInAioThread()
 
 void MediatorConnector::fetchEndpoint()
 {
+    if (!m_mediatorUrlFetcher)
+    {
+        m_mediatorUrlFetcher =
+            std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>();
+        m_mediatorUrlFetcher->bindToAioThread(getAioThread());
+        if (m_cloudModulesXmlUrl)
+            m_mediatorUrlFetcher->setModulesXmlUrl(*m_cloudModulesXmlUrl);
+    }
+
     m_mediatorUrlFetcher->get(
         [this](nx_http::StatusCode::Value status, QUrl tcpUrl, QUrl udpUrl)
         {
@@ -219,6 +225,17 @@ void MediatorConnector::connectToMediatorAsync()
 
             m_stunClient->addOnReconnectedHandler(std::move(setEndpoint));
         });
+}
+
+void MediatorConnector::reconnectToMediator(
+    SystemError::ErrorCode connectionClosureReason)
+{
+    NX_DEBUG(this, lm("Connection to mediator has been broken. Reconnecting..."));
+
+    // Preventing m_stunClient from automatically reconnecting to the mediator.
+    m_stunClient->closeConnection(connectionClosureReason);
+    m_mediatorUrlFetcher.reset();
+    fetchEndpoint();
 }
 
 } // namespace api
