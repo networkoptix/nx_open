@@ -212,21 +212,27 @@ def make_handler_class(root_obj, path_to_update, emulate_no_update_files=False):
     return TestHandler
 
 
-@click.command(help='Test updates server')
-@click.option('--generate-data', is_flag=True)
+@click.group(help='Test updates server')
+def main():
+    pass
+
+
+@main.command()
+def generate():
+    _logger.info('Loading and generating data. Be patient')
+    root_obj, path_to_update_obj = collect_actual_data()
+    new_versions = [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')]
+    new_root, new_path_to_update_obj = append_new_versions(root_obj, path_to_update_obj, new_versions)
+    save_data_to_files(new_root, new_path_to_update_obj)
+    with DUMMY_FILE_PATH.open('wb') as f:
+        f.seek(1024 * 1024 * 100)
+        f.write(b'\0')
+
+
+@main.command()
 @click.option('--emulate-no-update-files', is_flag=True)
-def main(generate_data, emulate_no_update_files):
-    if generate_data:
-        _logger.info('Loading and generating data. Be patient')
-        root_obj, path_to_update_obj = collect_actual_data()
-        new_versions = [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')]
-        new_root, new_path_to_update_obj = append_new_versions(root_obj, path_to_update_obj, new_versions)
-        save_data_to_files(new_root, new_path_to_update_obj)
-        with DUMMY_FILE_PATH.open('wb') as f:
-            f.seek(1024 * 1024 * 100)
-            f.write(b'\0')
-    else:
-        new_root, new_path_to_update_obj = load_data_from_files()
+def serve(emulate_no_update_files):
+    new_root, new_path_to_update_obj = load_data_from_files()
 
     server_address = ('', 8080)
     _logger.info('Starting HTTP server')
