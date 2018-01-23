@@ -244,6 +244,10 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         ? kDefaultThumbnailWidth
         : qMin(kDefaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
 
+    const auto roundMethod = previewCropRect.isEmpty()
+        ? QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod
+        : QnThumbnailRequestData::RoundMethod::PreciseMethod;
+
     tile->setPreview(new QnSingleThumbnailLoader(
         camera,
         previewTimeMs > 0 ? previewTimeMs : QnThumbnailRequestData::kLatestThumbnail,
@@ -251,7 +255,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         QSize(thumbnailWidth, 0),
         QnThumbnailRequestData::JpgFormat,
         QnThumbnailRequestData::AspectRatio::AutoAspectRatio,
-        QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod,
+        roundMethod,
         tile));
 
     tile->preview()->loadAsync();
