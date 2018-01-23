@@ -45,6 +45,13 @@ void AbstractAsyncSearchListModel::Private::setSelectedTimePeriod(const QnTimePe
     const auto oldTimePeriod = m_selectedTimePeriod;
     m_selectedTimePeriod = newTimePeriod;
 
+    if (!m_selectedTimePeriod.isValid())
+    {
+        clear();
+        m_fetchedAll = true;
+        return;
+    }
+
     if (newTimePeriod.endTimeMs() > oldTimePeriod.endTimeMs())
     {
         clear();
