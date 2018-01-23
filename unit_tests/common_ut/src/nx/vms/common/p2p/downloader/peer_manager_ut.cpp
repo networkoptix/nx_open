@@ -13,12 +13,13 @@ namespace p2p {
 namespace downloader {
 namespace test {
 
-class DistributedFileDownloaderPeerManagerTest: public ::testing::Test
+class DistributedFileDownloaderPeerManagerTest:
+    public ::testing::Test, public TestPeerManagerHandler
 {
 protected:
     virtual void SetUp() override
     {
-        peerManager.reset(new TestPeerManager());
+        peerManager.reset(new TestPeerManager(this));
 
         storageDir =
             (nx::utils::TestOptions::temporaryDirectoryPath().isEmpty()
@@ -32,6 +33,8 @@ protected:
     {
         NX_ASSERT(storageDir.removeRecursively());
     }
+
+    virtual void onRequestFileInfo() {}
 
     QScopedPointer<TestPeerManager> peerManager;
     QDir storageDir;

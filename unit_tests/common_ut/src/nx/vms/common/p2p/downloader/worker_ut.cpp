@@ -4,6 +4,7 @@
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/random_file.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/move_only_func.h>
 #include <nx/vms/common/p2p/downloader/private/storage.h>
 #include <nx/vms/common/p2p/downloader/private/worker.h>
 
@@ -69,7 +70,7 @@ private:
     //}
 };
 
-class DistributedFileDownloaderWorkerTest: public ::testing::Test
+class DistributedFileDownloaderWorkerTest: public ::testing::Test, public TestPeerManagerHandler
 {
 protected:
     virtual void SetUp() override
@@ -81,7 +82,7 @@ protected:
         workingDirectory.removeRecursively();
         NX_ASSERT(QDir().mkpath(workingDirectory.absolutePath()));
 
-        commonPeerManager.reset(new TestPeerManager());
+        commonPeerManager.reset(new TestPeerManager(this));
 
         defaultPeer = createPeer("Default Peer");
         peerById[defaultPeer->id] = defaultPeer;
@@ -182,9 +183,21 @@ protected:
         }
     };
 
+    void setOnRequestFileInfoCb(nx::utils::MoveOnlyFunc<void()> requestFileInfoCb)
+    {
+        m_onRequestFileInfoCb = std::move(requestFileInfoCb);
+    }
+
+    virtual void onRequestFileInfo()
+    {
+        if (m_onRequestFileInfoCb)
+            m_onRequestFileInfoCb();
+    }
+
     QHash<QnUuid, Peer*> peerById;
     Peer* defaultPeer = nullptr;
     int step = 0;
+    nx::utils::MoveOnlyFunc<void()> m_onRequestFileInfoCb = nullptr;
 };
 
 TEST_F(DistributedFileDownloaderWorkerTest, simplePeersSelection)
@@ -263,17 +276,15 @@ TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
     addPeerWithFile(fileInfo);
     defaultPeer->storage->addFile(fileInfo.name);
 
+    nx::utils::promise<void> readyPromise;
+    auto readyFuture = readyPromise.get_future();
+    setOnRequestFileInfoCb(
+        [readyPromise = std::move(readyPromise)]() mutable { readyPromise.set_value(); });
+
     defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
     defaultPeer->worker->start();
     //commonPeerManager->exec(2); //< Wait request, file info request.
 
-    nx::utils::promise<void> readyPromise;
-    auto readyFuture = readyPromise.get_future();
-    QObject::connect(commonPeerManager.data(), &TestPeerManager::requestFileInfoFired,
-        [readyPromise = std::move(readyPromise)]() mutable
-        {
-            readyPromise.set_value();
-        });
     readyFuture.wait();
 
     const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);

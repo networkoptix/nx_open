@@ -18,7 +18,8 @@ static constexpr int kDefaultRequestTime = 200;
 
 } // namespace
 
-TestPeerManager::TestPeerManager()
+TestPeerManager::TestPeerManager(TestPeerManagerHandler* handler):
+    m_handler(handler)
 {
 }
 
@@ -137,6 +138,7 @@ rest::Handle TestPeerManager::requestFileInfo(
         [this, fileInfo = fileInformation(peerId, fileName), callback](rest::Handle handle)
         {
             callback(fileInfo.isValid(), handle, fileInfo);
+            m_handler->onRequestFileInfo();
         });
 }
 

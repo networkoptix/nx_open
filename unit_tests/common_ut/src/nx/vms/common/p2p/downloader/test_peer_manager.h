@@ -45,6 +45,12 @@ struct RequestCounter
     std::array<QHash<QnUuid, int>, RequestTypesCount> counters;
 };
 
+class TestPeerManagerHandler
+{
+public:
+    virtual void onRequestFileInfo() = 0;
+};
+
 class TestPeerManager: public AbstractPeerManager, public QnLongRunnable
 {
 public:
@@ -58,7 +64,8 @@ public:
         QVector<QByteArray> checksums;
     };
 
-    TestPeerManager();
+    TestPeerManager(TestPeerManagerHandler* handler);
+    ~TestPeerManager() { stop(); }
 
     void setPeerList(const QList<QnUuid>& peerList) { m_peerList = peerList; }
     void addPeer(const QnUuid& peerId, const QString& peerName = QString());
@@ -142,6 +149,7 @@ private:
         bool hasInternetConnection = false;
     };
 
+    TestPeerManagerHandler* m_handler = nullptr;
     QHash<QnUuid, PeerInfo> m_peers;
     QMultiHash<QString, QnUuid> m_peersByGroup;
     int m_requestIndex = 0;

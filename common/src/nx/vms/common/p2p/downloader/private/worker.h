@@ -159,7 +159,6 @@ private:
 
     boost::optional<int> m_subsequentChunksToDownload;
     bool m_usingInternet = false;
-    bool m_needStop = false;
 };
 
 } // namespace downloader

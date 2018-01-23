@@ -228,6 +228,9 @@ void Worker::doWork()
         QnMutexLocker lock(&m_mutex);
         waitBeforeNextIteration(&lock);
 
+        if (needToStop())
+            return;
+
         const auto& fileInfo = fileInformation();
         if (!fileInfo.isValid())
             return;
@@ -1072,7 +1075,7 @@ void Worker::waitBeforeNextIteration(QnMutexLockerBase* lock)
 {
     NX_VERBOSE(m_logTag, lm("Start waiting for the next iteration."));
 
-    if (!m_shouldWait)
+    if (!m_shouldWait || m_needStop)
         return;
 
     while (m_shouldWait)
