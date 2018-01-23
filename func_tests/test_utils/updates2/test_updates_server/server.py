@@ -13,9 +13,10 @@ this behavior.
 import argparse
 import json
 import logging
-import os
 import shutil
 import sys
+
+from pathlib2 import Path
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
@@ -34,9 +35,9 @@ UPDATE_PATH_PATTERN = '/{}/{}/update.json'
 UPDATES_PATH = '/updates.json'
 
 DATA_FOLDER_NAME = 'data'
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), DATA_FOLDER_NAME)
+DATA_DIR = Path(__file__).parent / 'data'
 DUMMY_FILE_NAME = 'dummy.raw'
-DUMMY_FILE_PATH = os.path.join(DATA_DIR, DUMMY_FILE_NAME)
+DUMMY_FILE_PATH = DATA_DIR / DUMMY_FILE_NAME
 UPDATES_FILE_NAME = 'updates.json'
 FILE_PATTERN = '{}.{}.json'
 
@@ -117,37 +118,29 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
 
 
 def save_data_to_files(root_obj, path_to_update_obj):
-    shutil.rmtree(DATA_DIR, ignore_errors=True)
-    os.mkdir(DATA_DIR)
-    file_path = os.path.join(DATA_DIR, UPDATES_FILE_NAME)
-    with open(file_path, 'w') as f:
-        f.write(json.dumps(root_obj))
+    shutil.rmtree(str(DATA_DIR), ignore_errors=True)
+    DATA_DIR.mkdir()
+    file_path = DATA_DIR / UPDATES_FILE_NAME
+    file_path.write_bytes(json.dumps(root_obj))
     for key, value in path_to_update_obj.items():
         key_splits = key.split('/')
-        file_path = os.path.join(DATA_DIR, FILE_PATTERN.format(key_splits[1], key_splits[2]))
-        with open(file_path, 'w') as f:
-            f.write(json.dumps(value, indent=2))
+        file_path = DATA_DIR / FILE_PATTERN.format(key_splits[1], key_splits[2])
+        file_path.write_bytes(json.dumps(value, indent=2))
 
 
 def load_data_from_files():
-    if not os.path.exists(DATA_DIR):
+    if not DATA_DIR.exists():
         raise Exception('Generated data directory has not been found')
-    root_obj, path_to_update = None, None
-    for dir_name, dirs, files in os.walk(DATA_DIR):
-        path_to_update = dict()
-        for file_name in files:
-            if file_name == DUMMY_FILE_NAME:
-                continue
-            file_path = os.path.join(dir_name, file_name)
-            with open(file_path, 'r') as f:
-                json_obj = json.loads(f.read())
-                if file_name.lower() == UPDATES_FILE_NAME:
-                    root_obj = json_obj
-                else:
-                    file_name_splits = file_name.split('.')
-                    update_path = UPDATE_PATH_PATTERN.format(file_name_splits[0], file_name_splits[1])
-                    path_to_update[update_path] = json_obj
-    if root_obj is None or path_to_update is None:
+    root_obj, path_to_update = None, {}
+    for file_path in DATA_DIR.glob('**/*.json'):
+        json_obj = json.loads(file_path.read_bytes())
+        if file_path.name == UPDATES_FILE_NAME:
+            root_obj = json_obj
+        else:
+            file_name_splits = file_path.name.split('.')
+            update_path = UPDATE_PATH_PATTERN.format(file_name_splits[0], file_name_splits[1])
+            path_to_update[update_path] = json_obj
+    if root_obj is None or not path_to_update:
         raise Exception('Invalid generated data')
     return root_obj, path_to_update
 
@@ -211,19 +204,15 @@ def make_handler_class(root_obj, path_to_update, args):
                     self._send_not_found()
                     return
 
-                if not os.path.exists(DUMMY_FILE_PATH):
+                if not DUMMY_FILE_PATH.exists():
                     raise Exception('Dummy file not found')
 
-                self._send_ok_headers('application/zip', os.path.getsize(DUMMY_FILE_PATH))
+                self._send_ok_headers('application/zip', DUMMY_FILE_PATH.stat().st_size)
                 if not give_away_content:
                     return
 
-                with open(DUMMY_FILE_PATH, 'rb') as f:
-                    while True:
-                        read_buf = f.read(4096)
-                        if len(read_buf) <= 0:
-                            break
-                        self.wfile.write(read_buf)
+                with DUMMY_FILE_PATH.open('rb') as f:
+                    shutil.copyfileobj(f, self.wfile, length=4096)
             else:
                 self._send_not_found()
 
@@ -238,7 +227,7 @@ def main():
         new_versions = [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')]
         new_root, new_path_to_update_obj = append_new_versions(root_obj, path_to_update_obj, new_versions)
         save_data_to_files(new_root, new_path_to_update_obj)
-        with open(DUMMY_FILE_PATH, 'wb') as f:
+        with DUMMY_FILE_PATH.open('wb') as f:
             f.seek(1024 * 1024 * 100)
             f.write(b'\0')
     else:
