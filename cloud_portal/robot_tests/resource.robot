@@ -75,12 +75,44 @@ Select Auto Tests System
     Wait Until Element Is Visible    ${AUTO TESTS}
     Click Element    ${AUTO TESTS}
 
-Edit User In System
+Edit User Permissions In Systems
+    [arguments]    ${user email}    ${permissions}
+    Wait Until Element Is Not Visible    ${SHARE MODAL}
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
+    Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span['&nbsp&nbspEdit']
+    Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span['&nbsp&nbspEdit']
+    Wait Until Element Is Visible    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${permissions}']
+    Click Element    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${permissions}']
+    Wait Until Element Is Visible    ${EDIT PERMISSIONS SAVE}
+    Click Element    ${EDIT PERMISSIONS SAVE}
+    Wait Until Element Is Visible    ${ALERT}
+    Element Should Be Visible    ${ALERT}
+    Element Text Should Be    ${ALERT}    New permissions saved
+#This is essentially a wait in order to allow angular to update the order of the user list.  Ideally in the furture an angular library can be properly imported.
+    Wait Until Element Is Not Visible    ${ALERT}
+
+Check User Permissions
+    [arguments]    ${user email}    ${permissions}
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span['${permissions}']
+    Element Should Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span['${permissions}']
+
+Remove User Permissions
     [arguments]    ${user email}
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}') and contains(@class,'user-email')]
-    Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}') and contains(@class,'user-email')]
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']
-    Click Link    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
+    Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
+    Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
+    Wait Until Element Is Visible    ${DELETE USER BUTTON}
+    Click Button    ${DELETE USER BUTTON}
+    Check For Alert    Permissions were removed from ${user email}
+
+Check For Alert
+    [arguments]    ${alert text}
+    Wait Until Element Is Visible    ${ALERT}
+    Element Should Be Visible    ${ALERT}
+    Element Text Should Be    ${ALERT}    ${alert text}
+    Wait Until Element Is Not Visible    ${ALERT}
 
 Failure Tasks
     Capture Page Screenshot    selenium-screenshot-{index}.png
