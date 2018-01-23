@@ -61,7 +61,11 @@ include(qrc_utils)
 include(precompiled_header)
 include(strip_target)
 include(mercurial)
-include(windows_signing)
+
+if(WINDOWS)
+    include(windows_signing)
+endif()
+
 include(project_utils)
 include(test_utils)
 
