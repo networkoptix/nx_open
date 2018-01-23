@@ -197,7 +197,7 @@ void CompactTabBar::Private::paintTab(int index, QPainter* painter)
             return QPalette::WindowText;
         }()));
 
-    if (textRect.width() > 0)
+    if (textRect.isValid())
         painter->drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, text);
 
     // Draw underline.
