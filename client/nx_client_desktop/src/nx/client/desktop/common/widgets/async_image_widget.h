@@ -12,17 +12,22 @@ class QnBusyIndicatorWidget;
 class QnAutoscaledPlainText;
 class QnImageProvider;
 
-/*
+
+namespace nx {
+namespace client {
+namespace desktop {
+
+/**
  * The widget shows image from QnImageProvider
  */
-class QnResourcePreviewWidget: public Connective<QWidget>
+class AsyncImageWidget : public Connective<QWidget>
 {
     Q_OBJECT
-    typedef Connective<QWidget> base_type;
+    using base_type = Connective<QWidget>;
 
 public:
-    explicit QnResourcePreviewWidget(QWidget* parent = nullptr);
-    virtual ~QnResourcePreviewWidget();
+    explicit AsyncImageWidget(QWidget* parent = nullptr);
+    virtual ~AsyncImageWidget();
 
     QnImageProvider* imageProvider() const;
     void setImageProvider(QnImageProvider* provider);
@@ -56,3 +61,7 @@ private:
     QPointer<QnImageProvider> m_imageProvider;
     QPalette::ColorRole m_borderRole = QPalette::Shadow;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

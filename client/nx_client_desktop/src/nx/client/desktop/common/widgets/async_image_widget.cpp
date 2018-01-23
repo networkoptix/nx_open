@@ -1,4 +1,4 @@
-#include "resource_preview_widget.h"
+
 
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QStyle>
@@ -6,6 +6,7 @@
 #include <client/client_globals.h>
 
 #include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/client/desktop/common/widgets/async_image_widget.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -20,12 +21,17 @@
 #include <nx/client/desktop/image_providers/image_provider.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-namespace {
+namespace nx {
+namespace client {
+namespace desktop {
 
-static const QMargins kMinIndicationMargins(4, 2, 4, 2);
+namespace
+{
+    static const QMargins kMinIndicationMargins(4, 2, 4, 2);
 
-// Default size must be big enough to avoid layout flickering.
-static const QSize kDefaultThumbnailSize(1920, 1080);
+    // Default size must be big enough to avoid layout flickering.
+    static const QSize kDefaultThumbnailSize(1920, 1080);
+}
 
 /* QnBusyIndicatorWidget draws dots snapped to the pixel grid.
  * This descendant when it is downscaled draws dots generally not snapped. */
@@ -59,9 +65,7 @@ public:
     }
 };
 
-} // namespace
-
-QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent):
+AsyncImageWidget::AsyncImageWidget(QWidget* parent):
     base_type(parent),
     m_placeholder(new QnAutoscaledPlainText(this)),
     m_indicator(new QnAutoscaledBusyIndicatorWidget(this))
@@ -82,16 +86,16 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent):
     new QnWidgetAnchor(m_indicator);
 }
 
-QnResourcePreviewWidget::~QnResourcePreviewWidget()
+AsyncImageWidget::~AsyncImageWidget()
 {
 }
 
-QnImageProvider* QnResourcePreviewWidget::imageProvider() const
+QnImageProvider* AsyncImageWidget::imageProvider() const
 {
     return m_imageProvider.data();
 }
 
-void QnResourcePreviewWidget::setImageProvider(QnImageProvider* provider)
+void AsyncImageWidget::setImageProvider(QnImageProvider* provider)
 {
     if (m_imageProvider == provider)
         return;
@@ -104,13 +108,13 @@ void QnResourcePreviewWidget::setImageProvider(QnImageProvider* provider)
     if (m_imageProvider)
     {
         connect(m_imageProvider, &QnImageProvider::imageChanged, this,
-            &QnResourcePreviewWidget::updateThumbnailImage);
+            &AsyncImageWidget::updateThumbnailImage);
 
         connect(m_imageProvider, &QnImageProvider::statusChanged, this,
-            &QnResourcePreviewWidget::updateThumbnailStatus);
+            &AsyncImageWidget::updateThumbnailStatus);
 
         connect(m_imageProvider, &QnImageProvider::sizeHintChanged, this,
-            &QnResourcePreviewWidget::invalidateGeometry);
+            &AsyncImageWidget::invalidateGeometry);
 
         connect(m_imageProvider, &QObject::destroyed, this,
             [this]
@@ -124,17 +128,17 @@ void QnResourcePreviewWidget::setImageProvider(QnImageProvider* provider)
     invalidateGeometry();
 }
 
-QnBusyIndicatorWidget* QnResourcePreviewWidget::busyIndicator() const
+QnBusyIndicatorWidget* AsyncImageWidget::busyIndicator() const
 {
     return m_indicator;
 }
 
-QPalette::ColorRole QnResourcePreviewWidget::borderRole() const
+QPalette::ColorRole AsyncImageWidget::borderRole() const
 {
     return m_borderRole;
 }
 
-void QnResourcePreviewWidget::setBorderRole(QPalette::ColorRole role)
+void AsyncImageWidget::setBorderRole(QPalette::ColorRole role)
 {
     if (m_borderRole == role)
         return;
@@ -143,7 +147,7 @@ void QnResourcePreviewWidget::setBorderRole(QPalette::ColorRole role)
     update();
 }
 
-void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
+void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
     if (m_preview.isNull() || m_placeholder->isVisible())
@@ -174,7 +178,7 @@ void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
     }
 }
 
-void QnResourcePreviewWidget::changeEvent(QEvent* event)
+void AsyncImageWidget::changeEvent(QEvent* event)
 {
     switch (event->type())
     {
@@ -193,7 +197,7 @@ void QnResourcePreviewWidget::changeEvent(QEvent* event)
     base_type::changeEvent(event);
 }
 
-QSize QnResourcePreviewWidget::sizeHint() const
+QSize AsyncImageWidget::sizeHint() const
 {
     if (!m_cachedSizeHint.isValid())
     {
@@ -225,29 +229,29 @@ QSize QnResourcePreviewWidget::sizeHint() const
     return m_cachedSizeHint;
 }
 
-bool QnResourcePreviewWidget::hasHeightForWidth() const
+bool AsyncImageWidget::hasHeightForWidth() const
 {
     return true;
 }
 
-int QnResourcePreviewWidget::heightForWidth(int width) const
+int AsyncImageWidget::heightForWidth(int width) const
 {
     const QSizeF hint = sizeHint();
     return qRound(hint.height() / hint.width() * width);
 }
 
-void QnResourcePreviewWidget::retranslateUi()
+void AsyncImageWidget::retranslateUi()
 {
     m_placeholder->setText(tr("NO DATA"));
 }
 
-void QnResourcePreviewWidget::invalidateGeometry()
+void AsyncImageWidget::invalidateGeometry()
 {
     m_cachedSizeHint = QSize();
     updateGeometry();
 }
 
-void QnResourcePreviewWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
+void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
 {
     switch (status)
     {
@@ -268,7 +272,7 @@ void QnResourcePreviewWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
     }
 }
 
-void QnResourcePreviewWidget::updateThumbnailImage(const QImage& image)
+void AsyncImageWidget::updateThumbnailImage(const QImage& image)
 {
     const auto maxHeight = qMin(maximumHeight(), heightForWidth(maximumWidth()));
     m_preview = QPixmap::fromImage(image.size().height() > maxHeight
@@ -278,3 +282,8 @@ void QnResourcePreviewWidget::updateThumbnailImage(const QImage& image)
     invalidateGeometry();
     update();
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
