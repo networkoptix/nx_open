@@ -1,5 +1,3 @@
-﻿#if defined(ENABLE_HANWHA)
-
 #include <QtCore/QDateTime>
 #include <QtCore/QUrlQuery>
 
@@ -914,5 +912,3 @@ bool HanwhaChunkLoader::isNvr() const
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

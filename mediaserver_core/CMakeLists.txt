@@ -96,3 +96,17 @@ endif()
 if(WINDOWS)
     target_link_libraries(mediaserver_core PRIVATE Wldap32.dll Iphlpapi.dll Crypt32.lib)
 endif()
+
+if(customization STREQUAL "hanwha")
+    set_property(
+        SOURCE
+            src/media_server/media_server_resource_searchers.cpp
+            src/plugins/resource/onvif/onvif_resource_information_fetcher.cpp
+        APPEND PROPERTY COMPILE_DEFINITIONS
+            ENABLE_HANWHA
+    )
+else()
+    nx_exclude_sources_from_target(mediaserver_core
+        src/plugins/resource/hanwha/
+    )
+endif()

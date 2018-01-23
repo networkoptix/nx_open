@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
 
@@ -512,5 +510,3 @@ QDateTime toHanwhaDateTime(qint64 valueMs, std::chrono::seconds timeZoneShift)
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

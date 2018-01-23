@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_bytestream_filter.h"
 #include "hanwha_common.h"
 #include "hanwha_string_helper.h"
@@ -163,5 +161,3 @@ Hanwha::EventItemType HanwhaBytestreamFilter::eventItemType(
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

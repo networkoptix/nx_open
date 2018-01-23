@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_resource.h"
@@ -374,5 +372,3 @@ void HanwhaSharedResourceContext::setDateTime(const QDateTime& dateTime)
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

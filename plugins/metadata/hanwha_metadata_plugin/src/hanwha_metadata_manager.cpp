@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_common.h"
 #include "hanwha_metadata_manager.h"
 #include "hanwha_attributes_parser.h"
@@ -160,5 +158,3 @@ void HanwhaMetadataManager::setMonitor(HanwhaMetadataMonitor* monitor)
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

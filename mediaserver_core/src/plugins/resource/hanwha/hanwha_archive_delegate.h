@@ -4,8 +4,6 @@
 #include <recording/time_period_list.h>
 #include <plugins/resource/avi/thumbnails_archive_delegate.h>
 
-#if defined(ENABLE_HANWHA)
-
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -63,5 +61,3 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)
