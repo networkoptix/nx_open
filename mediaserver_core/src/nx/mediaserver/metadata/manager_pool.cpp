@@ -238,7 +238,7 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
             loadPluginManifest(plugin);
         if (!pluginManifest)
             return;
-        addPluginManifestToServer(*pluginManifest, server);
+        assignPluginManifestToServer(*pluginManifest, server);
 
         boost::optional<nx::api::AnalyticsDeviceManifest> managerManifest;
         boost::optional<nx::api::AnalyticsDriverManifest> auxiliaryPluginManifest;
@@ -250,7 +250,7 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
         if (auxiliaryPluginManifest)
         {
             auxiliaryPluginManifest->driverId = pluginManifest->driverId;
-            addPluginManifestToServer(*auxiliaryPluginManifest, server);
+            mergePluginManifestToServer(*auxiliaryPluginManifest, server);
         }
 
         auto handler = createMetadataHandler(camera, pluginManifest->driverId);
@@ -456,7 +456,31 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifes
     return pluginManifest;
 }
 
-void ManagerPool::addPluginManifestToServer(
+void ManagerPool::assignPluginManifestToServer(
+    const nx::api::AnalyticsDriverManifest& manifest,
+    const QnMediaServerResourcePtr& server)
+{
+    auto existingManifests = server->analyticsDrivers();
+    auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
+        [&manifest](const nx::api::AnalyticsDriverManifest& m)
+    {
+        return m.driverId == manifest.driverId;
+    });
+
+    if (it == existingManifests.cend())
+    {
+        existingManifests.push_back(manifest);
+    }
+    else
+    {
+        *it = manifest;
+    }
+
+    server->setAnalyticsDrivers(existingManifests);
+    server->saveParams();
+}
+
+void ManagerPool::mergePluginManifestToServer(
     const nx::api::AnalyticsDriverManifest& manifest,
     const QnMediaServerResourcePtr& server)
 {

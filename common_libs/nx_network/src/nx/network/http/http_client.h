@@ -16,7 +16,7 @@ namespace nx_http {
  * Synchronous http client.
  * This is a synchronous wrapper on top of AsyncHttpClient.
  * @note This class is not thread-safe.
- * WARNING: Message body is read ascynhronously to some internal buffer.
+ * WARNING: Message body is read asynchronously to some internal buffer.
  */
 class NX_NETWORK_API HttpClient:
     public QObject
@@ -92,10 +92,10 @@ public:
 
     /** See AsyncHttpClient::setResponseReadTimeoutMs */
     void setResponseReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
-    
+
     /** See AsyncHttpClient::setMessageBodyReadTimeoutMs */
     void setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
-    
+
     void setUserAgent(const QString& userAgent);
     void setUserName(const QString& userAgent);
     void setUserPassword(const QString& userAgent);
