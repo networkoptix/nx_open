@@ -76,6 +76,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     ui->setupUi(this);
     ui->wearableUploadWidget->initializeContext(this);
     ui->wearableProgressWidget->initializeContext(this);
+    ui->wearableArchiveLengthWidget->initializeContext(this);
     ui->licensingWidget->initializeContext(this);
     ui->cameraScheduleWidget->initializeContext(this);
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
@@ -204,6 +205,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
         ui->macAddressLabel,
         ui->loginLabel,
         ui->passwordLabel });
+    aligner->addAligner(ui->wearableArchiveLengthWidget->aligner());
 }
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget()
@@ -246,6 +248,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     ui->licensingWidget->setCameras(cameras);
     ui->wearableUploadWidget->setCamera(camera);
     ui->wearableProgressWidget->setCamera(camera);
+    ui->wearableArchiveLengthWidget->updateFromResources({camera});
 
     if (m_camera)
     {

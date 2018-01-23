@@ -9,6 +9,8 @@
 
 namespace Ui { class ArchiveLengthWidget; }
 
+class QnAligner;
+
 class QnArchiveLengthWidget: public QWidget, public QnUpdatable, public QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -19,6 +21,8 @@ class QnArchiveLengthWidget: public QWidget, public QnUpdatable, public QnWorkbe
 public:
     explicit QnArchiveLengthWidget(QWidget* parent = nullptr);
     virtual ~QnArchiveLengthWidget();
+
+    QnAligner* aligner() const;
 
     void updateFromResources(const QnVirtualCameraResourceList& cameras);
     void submitToResources(const QnVirtualCameraResourceList& cameras);
@@ -46,4 +50,5 @@ private:
     QScopedPointer<Ui::ArchiveLengthWidget> ui;
     bool m_readOnly;
     QString m_alert;
+    QnAligner* m_aligner = nullptr;
 };
