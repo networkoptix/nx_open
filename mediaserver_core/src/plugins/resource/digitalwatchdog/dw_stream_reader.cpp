@@ -10,7 +10,7 @@ CameraDiagnostics::Result QnDwStreamReader::openStreamInternal(
     const auto streamIndex = getRole() == Qn::CR_SecondaryLiveVideo
         ? Qn::StreamIndex::secondary : Qn::StreamIndex::primary;
     if (isCameraControlRequired)
-        getResource().dynamicCast<QnDigitalWatchdogResource>()->setVideoCodec(streamIndex, params.codec);
+        getResource().dynamicCast<QnDigitalWatchdogResource>()->setVideoCodec(streamIndex, params.codec.toLower());
     return base_type::openStreamInternal(isCameraControlRequired, params);
 }
 
