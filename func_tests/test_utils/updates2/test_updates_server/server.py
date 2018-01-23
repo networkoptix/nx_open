@@ -16,7 +16,9 @@ import shutil
 import sys
 
 import click
-from pathlib2 import Path
+from flask import Flask, send_file
+from pathlib2 import Path, PurePath
+from werkzeug.exceptions import NotFound
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
@@ -126,90 +128,6 @@ def save_data_to_files(root_obj, path_to_update_obj):
         file_path.write_bytes(json.dumps(value, indent=2))
 
 
-def load_data_from_files():
-    if not DATA_DIR.exists():
-        raise Exception('Generated data directory has not been found')
-    root_obj, path_to_update = None, {}
-    for abs_file_path in DATA_DIR.glob('**/*.json'):
-        json_obj = json.loads(abs_file_path.read_bytes())
-        file_path = abs_file_path.relative_to(DATA_DIR)
-        if file_path.name == UPDATES_FILE_NAME:
-            root_obj = json_obj
-        else:
-            update_path = UPDATE_PATH_PATTERN.format(file_path.parts[0], file_path.parts[1])
-            path_to_update[update_path] = json_obj
-    if root_obj is None or not path_to_update:
-        raise Exception('Invalid generated data')
-    return root_obj, path_to_update
-
-
-def make_handler_class(root_obj, path_to_update, emulate_no_update_files=False):
-    path_to_update[UPDATES_PATH] = root_obj
-
-    class TestHandler(BaseHTTPRequestHandler, object):
-        def __init__(self, *args, **kwargs):
-            self.path_to_update = path_to_update
-            super(TestHandler, self).__init__(*args, **kwargs)
-
-        def _send_ok_headers(self, content_type, content_length=None):
-            self.send_response(200)
-            self.send_header('Content-type', content_type)
-            if content_length:
-                self.send_header('Content-length', content_length)
-            self.end_headers()
-
-        def _send_not_found(self):
-            self.send_response(404)
-            self.end_headers()
-
-        def do_GET(self):
-            self._serve_get(True)
-
-        def do_HEAD(self):
-            self._serve_get(False)
-
-        def _serve_get(self, give_away_content):
-            if self.path in self.path_to_update:
-                self._send_ok_headers('application/json')
-                if give_away_content:
-                    self.wfile.write(json.dumps(self.path_to_update[self.path]).encode())
-            elif self.path.endswith('.zip') and not emulate_no_update_files:
-                path_components = self.path.split('/')
-                possible_path_key = '/'.join(path_components[:-1]) + '/update.json'
-                requested_file_name = path_components[-1]
-
-                if possible_path_key not in self.path_to_update:
-                    self._send_not_found()
-                    return
-
-                update_obj = self.path_to_update[possible_path_key]
-
-                def file_found_in_package(packages_name):
-                    for os_key, os_obj in update_obj[packages_name].items():
-                        for file_key, file_obj in os_obj.items():
-                            if file_obj['file'] == requested_file_name:
-                                return True
-                    return False
-
-                if not file_found_in_package('packages') and not file_found_in_package('clientPackages'):
-                    self._send_not_found()
-                    return
-
-                if not DUMMY_FILE_PATH.exists():
-                    raise Exception('Dummy file not found')
-
-                self._send_ok_headers('application/zip', DUMMY_FILE_PATH.stat().st_size)
-                if not give_away_content:
-                    return
-
-                with DUMMY_FILE_PATH.open('rb') as f:
-                    shutil.copyfileobj(f, self.wfile, length=4096)
-            else:
-                self._send_not_found()
-
-    return TestHandler
-
-
 @click.group(help='Test updates server')
 def main():
     pass
@@ -230,20 +148,39 @@ def generate():
 @main.command()
 @click.option('--emulate-no-update-files', is_flag=True)
 def serve(emulate_no_update_files):
-    new_root, new_path_to_update_obj = load_data_from_files()
+    app = Flask(__name__)
 
-    server_address = ('', 8080)
-    _logger.info('Starting HTTP server')
-    server = None
-    try:
-        server = HTTPServer(
-            server_address,
-            make_handler_class(new_root, new_path_to_update_obj, emulate_no_update_files=emulate_no_update_files))
-        server.serve_forever()
-    except KeyboardInterrupt:
-        _logger.info('Shutting down...')
-        if server:
-            server.shutdown()
+    @app.route('/<path:path>')
+    def serve(path):
+        path = PurePath(path)
+        if path.suffix == '.json':
+            return send_file(str(DATA_DIR / path))
+        elif path.suffix == '.zip' and not emulate_no_update_files:
+            possible_path_key = DATA_DIR / path.parent / 'update.json'
+
+            if not possible_path_key.exists():
+                raise NotFound()
+
+            update_obj = json.loads(possible_path_key.read_bytes())
+
+            def file_found_in_package(packages_name):
+                for os_key, os_obj in update_obj[packages_name].items():
+                    for file_key, file_obj in os_obj.items():
+                        if file_obj['file'] == path.name:
+                            return True
+                return False
+
+            if not file_found_in_package('packages') and not file_found_in_package('clientPackages'):
+                raise NotFound()
+
+            if not DUMMY_FILE_PATH.exists():
+                raise Exception('Dummy file not found')
+
+            return send_file(str(DUMMY_FILE_PATH), as_attachment=True, attachment_filename=path.name, conditional=True)
+        else:
+            raise NotFound()
+
+    app.run(port=8080)
 
 
 if __name__ == '__main__':
