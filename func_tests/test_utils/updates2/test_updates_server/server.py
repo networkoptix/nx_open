@@ -10,12 +10,12 @@ to test how mediaserver deals with update files absence. Run script with '--emul
 this behavior.
 """
 
-import argparse
 import json
 import logging
 import shutil
 import sys
 
+import click
 from pathlib2 import Path
 
 if sys.version_info[:2] == (2, 7):
@@ -145,14 +145,7 @@ def load_data_from_files():
     return root_obj, path_to_update
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description='Test updates server')
-    parser.add_argument('--generate_data', action="store_true", default=False)
-    parser.add_argument('--emulate_no_update_files', action="store_true", default=False)
-    return parser.parse_args()
-
-
-def make_handler_class(root_obj, path_to_update, args):
+def make_handler_class(root_obj, path_to_update, emulate_no_update_files=False):
     path_to_update[UPDATES_PATH] = root_obj
 
     class TestHandler(BaseHTTPRequestHandler, object):
@@ -182,7 +175,7 @@ def make_handler_class(root_obj, path_to_update, args):
                 self._send_ok_headers('application/json')
                 if give_away_content:
                     self.wfile.write(json.dumps(self.path_to_update[self.path]).encode())
-            elif self.path.endswith('.zip') and not args.emulate_no_update_files:
+            elif self.path.endswith('.zip') and not emulate_no_update_files:
                 path_components = self.path.split('/')
                 possible_path_key = '/'.join(path_components[:-1]) + '/update.json'
                 requested_file_name = path_components[-1]
@@ -219,9 +212,11 @@ def make_handler_class(root_obj, path_to_update, args):
     return TestHandler
 
 
-def main():
-    args = parse_args()
-    if args.generate_data:
+@click.command(help='Test updates server')
+@click.option('--generate-data', is_flag=True)
+@click.option('--emulate-no-update-files', is_flag=True)
+def main(generate_data, emulate_no_update_files):
+    if generate_data:
         _logger.info('Loading and generating data. Be patient')
         root_obj, path_to_update_obj = collect_actual_data()
         new_versions = [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')]
@@ -237,7 +232,9 @@ def main():
     _logger.info('Starting HTTP server')
     server = None
     try:
-        server = HTTPServer(server_address, make_handler_class(new_root, new_path_to_update_obj, args))
+        server = HTTPServer(
+            server_address,
+            make_handler_class(new_root, new_path_to_update_obj, emulate_no_update_files=emulate_no_update_files))
         server.serve_forever()
     except KeyboardInterrupt:
         _logger.info('Shutting down...')
