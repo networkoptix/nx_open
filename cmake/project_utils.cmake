@@ -146,3 +146,16 @@ function(nx_add_target name type)
         target_link_libraries(${name} PRIVATE ${NX_PRIVATE_LIBS})
     endif()
 endfunction()
+
+function(nx_exclude_sources_from_target target pattern)
+    get_property(sources TARGET ${target} PROPERTY SOURCES)
+
+    set(result)
+    foreach(src ${sources})
+        if(NOT src MATCHES "${pattern}")
+            list(APPEND result ${src})
+        endif()
+    endforeach()
+
+    set_PROPERTY(TARGET ${target} PROPERTY SOURCES ${result})
+endfunction()

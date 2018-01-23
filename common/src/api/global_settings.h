@@ -275,10 +275,8 @@ public:
     int maxRecorderQueueSizeBytes() const;
     int maxRecorderQueueSizePackets() const;
 
-    #if defined(ENABLE_HANWHA)
-        bool hanwhaDeleteProfilesOnInitIfNeeded() const;
-        void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
-    #endif
+    bool hanwhaDeleteProfilesOnInitIfNeeded() const;
+    void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
 
     bool isEdgeRecordingEnabled() const;
     void setEdgeRecordingEnabled(bool enabled);
@@ -408,9 +406,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_cloudConnectUdpHolePunchingEnabledAdaptor;
     QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor;
 
-    #if defined(ENABLE_HANWHA)
-        QnResourcePropertyAdaptor<bool>* m_hanwhaDeleteProfilesOnInitIfNeeded;
-    #endif
+    QnResourcePropertyAdaptor<bool>* m_hanwhaDeleteProfilesOnInitIfNeeded;
 
     QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor;
 

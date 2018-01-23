@@ -12,6 +12,9 @@ class QnBusyIndicatorWidget;
 class QnAutoscaledPlainText;
 class QnImageProvider;
 
+/*
+ * The widget shows image from QnImageProvider
+ */
 class QnResourcePreviewWidget: public Connective<QWidget>
 {
     Q_OBJECT

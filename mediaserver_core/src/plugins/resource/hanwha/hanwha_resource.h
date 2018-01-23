@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <core/ptz/ptz_limits.h>
 
 #include <plugins/resource/hanwha/hanwha_advanced_parameter_info.h>
@@ -298,5 +296,3 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

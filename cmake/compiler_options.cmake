@@ -69,9 +69,6 @@ if(enableAllVendors)
         -DENABLE_FLIR
         -DENABLE_ADVANTECH
     )
-    if(customization STREQUAL "hanwha")
-        add_definitions(-DENABLE_HANWHA)
-    endif()
 endif()
 
 if(WINDOWS)

@@ -21,7 +21,14 @@ nx_add_target(wix_custom_actions LIBRARY LIBRARY_TYPE SHARED
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/CustomActions.rc"
         "${CMAKE_CURRENT_LIST_DIR}/CustomActions.def"
+    PRIVATE_LIBS
+        userenv
+        Rpcrt4
+        Ws2_32
+        IPHLPAPI
+        comsuppw
+        msi
+        dutil
+        wcautil
+        Version
 )
-
-target_link_libraries(wix_custom_actions PRIVATE
-    userenv.lib;Rpcrt4.lib;Ws2_32.lib;IPHLPAPI.lib;comsuppw.lib;msi.lib;dutil.lib;wcautil.lib;Version.lib)

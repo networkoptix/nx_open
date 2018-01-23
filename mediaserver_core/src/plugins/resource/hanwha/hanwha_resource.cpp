@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_resource.h"
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
@@ -2666,5 +2664,3 @@ bool HanwhaResource::setCameraCredentialsSync(const QAuthenticator& auth, QStrin
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

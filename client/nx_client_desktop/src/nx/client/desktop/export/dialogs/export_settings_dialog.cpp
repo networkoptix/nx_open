@@ -146,10 +146,9 @@ ExportSettingsDialog::ExportSettingsDialog(
     ui->layoutPreviewWidget->busyIndicator()->dots()->setDotRadius(kBusyIndicatorDotRadius);
     ui->layoutPreviewWidget->busyIndicator()->dots()->setDotSpacing(kBusyIndicatorDotRadius * 2);
 
-    ui->mediaFrame->setFixedSize(kPreviewSize
-        + QSize(ui->mediaFrame->frameWidth(), ui->mediaFrame->frameWidth()) * 2);
-    ui->layoutFrame->setFixedSize(kPreviewSize
-        + QSize(ui->mediaFrame->frameWidth(), ui->mediaFrame->frameWidth()) * 2);
+    QSize frameSize(ui->mediaFrame->frameWidth(), ui->mediaFrame->frameWidth());
+    ui->mediaFrame->setFixedSize(kPreviewSize + frameSize * 2);
+    ui->layoutFrame->setFixedSize(kPreviewSize + frameSize * 2);
 
     ui->mediaExportSettingsWidget->setMaximumHeight(ui->mediaFrame->maximumHeight());
     ui->layoutExportSettingsWidget->setMaximumHeight(ui->layoutFrame->maximumHeight());
@@ -609,6 +608,14 @@ void ExportSettingsDialog::setMediaParams(
         namePart + L'_' + timePart, L'_');
 
     ui->mediaFilenamePanel->setFilename(suggestedFileName(baseFileName));
+
+    if (!mediaResource->hasVideo(nullptr))
+    {
+        ui->timestampButton->setEnabled(false);
+        ui->imageButton->setEnabled(false);
+        ui->textButton->setEnabled(false);
+        ui->speedButton->setEnabled(false);
+    }
 }
 
 void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)

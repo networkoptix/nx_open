@@ -2,6 +2,7 @@
 
 #include <api/global_settings.h>
 #include <core/resource_management/resource_discovery_manager.h>
+#include <nx/utils/app_info.h>
 
 #include <plugins/resource/desktop_camera/desktop_camera_resource_searcher.h>
 #include <plugins/resource/desktop_camera/desktop_camera_deleter.h>
