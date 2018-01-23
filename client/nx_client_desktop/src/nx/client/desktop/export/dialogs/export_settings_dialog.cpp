@@ -146,7 +146,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     ui->layoutPreviewWidget->busyIndicator()->dots()->setDotRadius(kBusyIndicatorDotRadius);
     ui->layoutPreviewWidget->busyIndicator()->dots()->setDotSpacing(kBusyIndicatorDotRadius * 2);
 
-    QSize frameSize(ui->mediaFrame->frameWidth(), ui->mediaFrame->frameWidth());
+    const QSize frameSize(ui->mediaFrame->frameWidth(), ui->mediaFrame->frameWidth());
     ui->mediaFrame->setFixedSize(kPreviewSize + frameSize * 2);
     ui->layoutFrame->setFixedSize(kPreviewSize + frameSize * 2);
 
@@ -609,7 +609,7 @@ void ExportSettingsDialog::setMediaParams(
 
     ui->mediaFilenamePanel->setFilename(suggestedFileName(baseFileName));
 
-    if (!mediaResource->hasVideo(nullptr))
+    if (!mediaResource->hasVideo())
     {
         ui->timestampButton->setEnabled(false);
         ui->imageButton->setEnabled(false);

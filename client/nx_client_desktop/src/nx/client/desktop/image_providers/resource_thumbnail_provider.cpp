@@ -26,7 +26,7 @@ struct ResourceThumbnailProvider::Private
 
         QnMediaResourcePtr mediaResource = request.resource.dynamicCast<QnMediaResource>();
         // Some cameras are actually provide only sound stream. So we draw sound icon for this.
-        if (mediaResource && !mediaResource->hasVideo(0))
+        if (mediaResource && !mediaResource->hasVideo())
         {
             QPixmap pixmap = qnSkin->pixmap(lit("item_placeholders/sound.png"), true);
             baseProvider.reset(new QnBasicImageProvider(pixmap.toImage()));
