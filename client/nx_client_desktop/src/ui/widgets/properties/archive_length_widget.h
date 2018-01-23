@@ -48,7 +48,7 @@ private:
 
 private:
     QScopedPointer<Ui::ArchiveLengthWidget> ui;
-    bool m_readOnly;
+    bool m_readOnly = false;
     QString m_alert;
     QnAligner* m_aligner = nullptr;
 };
