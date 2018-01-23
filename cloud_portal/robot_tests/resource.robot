@@ -2,6 +2,7 @@
 
 Library           Selenium2Library    screenshot_root_directory=\Screenshots    run_on_failure=Failure Tasks
 Library           ImapLibrary
+Library           NoptixLibrary
 Resource          variables.robot
 
 *** Keywords ***
