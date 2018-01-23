@@ -48,7 +48,8 @@ void AsyncClient::connect(
     const QUrl& url,
     ConnectHandler completionHandler)
 {
-    if (url.scheme() != nx::stun::kUrlSchemeName && url.scheme() != nx::stun::kSecureUrlSchemeName)
+    if (url.scheme() != nx::stun::kUrlSchemeName &&
+        url.scheme() != nx::stun::kSecureUrlSchemeName)
     {
         return post(
             [completionHandler = std::move(completionHandler)]()
@@ -57,14 +58,16 @@ void AsyncClient::connect(
             });
     }
 
-    const auto endpoint = nx::network::url::getEndpoint(url);
-
-    QnMutexLocker lock(&m_mutex);
-    m_endpoint = std::move(endpoint);
-    m_useSsl = url.scheme() == nx::stun::kSecureUrlSchemeName;
-    NX_ASSERT(!m_connectCompletionHandler);
-    m_connectCompletionHandler = std::move(completionHandler);
-    openConnectionImpl(&lock);
+    post(
+        [this, url, completionHandler = std::move(completionHandler)]() mutable
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_endpoint = nx::network::url::getEndpoint(url);
+            m_useSsl = url.scheme() == nx::stun::kSecureUrlSchemeName;
+            NX_ASSERT(!m_connectCompletionHandler);
+            m_connectCompletionHandler = std::move(completionHandler);
+            openConnectionImpl(&lock);
+        });
 }
 
 bool AsyncClient::setIndicationHandler(
@@ -80,6 +83,12 @@ void AsyncClient::addOnReconnectedHandler(
 {
     QnMutexLocker lock(&m_mutex);
     m_reconnectHandlers.emplace(client, std::move(handler));
+}
+
+void AsyncClient::setOnConnectionClosedHandler(
+    OnConnectionClosedHandler onConnectionClosedHandler)
+{
+    m_onConnectionClosedHandler.swap(onConnectionClosedHandler);
 }
 
 void AsyncClient::sendRequest(
@@ -117,7 +126,7 @@ bool AsyncClient::addConnectionTimer(
     {
         NX_LOGX(lm("Ignore timer from client(%1), state is %2")
             .args(client, static_cast<int>(m_state)), cl_logDEBUG1);
-     
+
         return false;
     }
 
@@ -203,12 +212,10 @@ void AsyncClient::closeConnection(
     BaseConnectionType* connection)
 {
 	std::unique_ptr< BaseConnectionType > baseConnection;
-    decltype(m_onConnectionClosedHandler) onConnectionClosedHandler;
     {
         QnMutexLocker lock( &m_mutex );
         closeConnectionImpl( &lock, errorCode );
 		baseConnection = std::move( m_baseConnection );
-        onConnectionClosedHandler.swap(m_onConnectionClosedHandler);
     }
 
     if (baseConnection)
@@ -218,14 +225,8 @@ void AsyncClient::closeConnection(
                 connection == baseConnection.get(),
                 Q_FUNC_INFO, "Incorrect closeConnection call" );
 
-    if (onConnectionClosedHandler)
-        onConnectionClosedHandler(errorCode);
-}
-
-void AsyncClient::setOnConnectionClosedHandler(
-    OnConnectionClosedHandler onConnectionClosedHandler)
-{
-    m_onConnectionClosedHandler.swap(onConnectionClosedHandler);
+    if (m_onConnectionClosedHandler)
+        m_onConnectionClosedHandler(errorCode);
 }
 
 void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
@@ -243,7 +244,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
         case State::disconnected:
         {
             // estabilish new connection
-            m_connectingSocket = 
+            m_connectingSocket =
                 SocketFactory::createStreamSocket(
                     m_useSsl, nx::network::NatTraversalSupport::disabled );
             m_connectingSocket->bindToAioThread(getAioThread());
@@ -350,7 +351,7 @@ void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* /*lock*/)
             [ this ]( SystemError::ErrorCode code ) mutable
             {
                 QnMutexLocker lock( &m_mutex );
-                // TODO #mu following code looks redundant since handler will be triggered 
+                // TODO #mu following code looks redundant since handler will be triggered
                 //   on connection closure (which is imminent).
                 if( code != SystemError::noError )
                 {
@@ -479,7 +480,7 @@ void AsyncClient::startTimer(
 {
     NX_LOGX(lm("Set timer(%1) for client(%2) after %3")
         .args(timer->second, timer->first, period), cl_logDEBUG2);
-    
+
     timer->second->start(
         period,
         [this, client = timer->first, period, handler = std::move(handler)]() mutable
