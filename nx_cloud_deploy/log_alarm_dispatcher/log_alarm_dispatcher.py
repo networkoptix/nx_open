@@ -187,10 +187,7 @@ def get_logs_and_send_email(cwl, ses, alarm_info, message, metric_filter_data):
     log.info('===SENDING EMAIL===')
 
     email = generate_email_content(events_grouped, alarm_info, message)
-    print(email)
-
-    result = ses.send_email(**email)
-    print(result)
+    ses.send_email(**email)
 
 
 def get_alarm_info(alarm_name, s3):
