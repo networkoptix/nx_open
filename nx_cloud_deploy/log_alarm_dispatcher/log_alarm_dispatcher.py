@@ -42,7 +42,7 @@ def render_template(template_file, context):
 
 
 def generate_email_content(events, alarm_info, message):
-    log.info('Events are: {}'.format(events))
+    log.debug('Events are: {}'.format(events))
 
     context = {
         'alarm_info': alarm_info,
@@ -83,7 +83,7 @@ def get_log_events(cwl, parameters):
             parameters['nextToken'] = next_token
 
         log_event_data = cwl.filter_log_events(**parameters)
-        log.info(log_event_data)
+        log.debug(log_event_data)
 
         events += log_event_data['events']
         next_token = log_event_data['nextToken'] if 'nextToken' in log_event_data else None
@@ -154,7 +154,7 @@ def get_logs_and_send_email(cwl, ses, alarm_info, message, metric_filter_data):
             'endTime': timestamp
         }
 
-        log.info('Filter parameters: {}'.format(parameters))
+        log.debug('Filter parameters: {}'.format(parameters))
 
         events = get_log_events(cwl, parameters)
 
@@ -182,70 +182,65 @@ def get_logs_and_send_email(cwl, ses, alarm_info, message, metric_filter_data):
 
         events_grouped = [{'logStreamName': stream, 'filterPattern': filter_pattern, 'messages': messages} for
                           stream, messages in matched_events_by_stream.items()]
-        log.info('Events Grouped: {}'.format(events_grouped))
-
-    # TODO: Handle errors
+        log.debug('Events Grouped: {}'.format(events_grouped))
 
     log.info('===SENDING EMAIL===')
 
     email = generate_email_content(events_grouped, alarm_info, message)
     print(email)
 
-    #
     result = ses.send_email(**email)
     print(result)
-    # TODO: Handle errors
 
 
-def get_alarm_info(alarm_name):
-    s3 = boto3.client('s3')
-
+def get_alarm_info(alarm_name, s3):
     response = s3.get_object(Bucket='nxcloud-instance-registry', Key='alarm_subscriptions.json')
     alarm_subscriptions = json.load(response['Body'])
-    log.info('Alarm subscriptions: {}'.format(alarm_subscriptions))
+    log.debug('Alarm subscriptions: {}'.format(alarm_subscriptions))
 
     alarm_info = None
 
     alarm_name_components = alarm_name.split('__')
     if len(alarm_name_components) == 3:
-        instance_name, module_name, alarm_name = alarm_name_components
-        log.info('Alarm name components: {}'.format(alarm_name_components))
+        log.debug('Alarm name components: {}'.format(alarm_name_components))
         alarm_info = next(
             filter(lambda x: alarm_name_components == [x['instance_name'], x['module_name'], x['alarm_name']],
                    alarm_subscriptions['alarms']), None)
-        log.info('Alarm info: {}'.format(alarm_info))
+        log.debug('Alarm info: {}'.format(alarm_info))
 
     return alarm_info
 
 
 def lambda_handler(event, context):
-    log.info("Event: {}".format(json.dumps(event)))
+    log.info('Starting handler')
+
+    s3 = boto3.client('s3')
+    cwl = boto3.client('logs')
+    ses = boto3.client('ses')
+
     message = json.loads(event['Records'][0]['Sns']['Message'])
-    log.info("Message: {}".format(json.dumps(message)))
+
+    log_file_name = '{}.json'.format(message['StateChangeTime'])
+    s3.put_object(Bucket='log-dispatcher-logs', Key=log_file_name, Body=json.dumps(event))
+
+    log.info('Saved source event to {}'.format(log_file_name))
 
     alarm_name = message['AlarmName']
-    alarm_info = get_alarm_info(alarm_name)
-
-    old_state = message['OldStateValue']
-    new_state = message['NewStateValue']
-    reason = message['NewStateReason']
+    alarm_info = get_alarm_info(alarm_name, s3)
 
     request_params = {
         'metricName': message['Trigger']['MetricName'],
         'metricNamespace': message['Trigger']['Namespace']
     }
 
-    cwl = boto3.client('logs')
-    ses = boto3.client('ses')
-
     metric_filter_data = cwl.describe_metric_filters(**request_params)
-    log.info('Metric Filter data is: {}'.format(metric_filter_data))
+    log.debug('Metric Filter data is: {}'.format(metric_filter_data))
     get_logs_and_send_email(cwl, ses, alarm_info, message, metric_filter_data)
 
 
 if __name__ == '__main__':
     event = json.load(open('event.json'))
-    message = json.load(open('message.json'))
+    message = json.loads(event['Records'][0]['Sns']['Message'])
 
     context = {
         'Records': [
