@@ -5,7 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <recording/time_period.h>
 
-#include <nx/client/desktop/common/models/subset_list_model.h>
+#include <nx/client/desktop/common/models/concatenation_list_model.h>
 #include <nx/vms/event/event_fwd.h>
 
 class QnSortFilterListModel;
@@ -17,10 +17,10 @@ namespace desktop {
 class AbstractAsyncSearchListModel;
 class BusyIndicatorModel;
 
-class UnifiedAsyncSearchListModel: public SubsetListModel
+class UnifiedAsyncSearchListModel: public ConcatenationListModel
 {
     Q_OBJECT
-    using base_type = SubsetListModel;
+    using base_type = ConcatenationListModel;
 
 public:
     explicit UnifiedAsyncSearchListModel(AbstractAsyncSearchListModel* sourceModel,

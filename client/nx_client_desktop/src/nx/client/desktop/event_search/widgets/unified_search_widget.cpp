@@ -92,6 +92,9 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
         this, &UnifiedSearchWidget::fetchMoreIfNeeded, Qt::QueuedConnection);
 
+    installEventHandler(ui->ribbon->scrollBar(), QEvent::Hide,
+        this, &UnifiedSearchWidget::fetchMoreIfNeeded, Qt::QueuedConnection);
+
     installEventHandler(ui->ribbon, QEvent::Show,
         this, &UnifiedSearchWidget::fetchMoreIfNeeded);
 
@@ -118,7 +121,7 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
 
     setupTimeSelection();
 
-    connect(ui->ribbon, &EventRibbon::countChanged, 
+    connect(ui->ribbon, &EventRibbon::countChanged,
         this, &UnifiedSearchWidget::updatePlaceholderVisibility);
 }
 

@@ -191,6 +191,7 @@ void AnalyticsSearchListModel::Private::clear()
     m_objectIdToTimestampUs.clear();
     m_currentUpdateId = rest::Handle();
     m_latestTimeMs = qMin(qnSyncTime->currentMSecsSinceEpoch(), selectedTimePeriod().endTimeMs());
+    m_filterRect = QRectF();
     base_type::clear();
 
     refreshUpdateTimer();

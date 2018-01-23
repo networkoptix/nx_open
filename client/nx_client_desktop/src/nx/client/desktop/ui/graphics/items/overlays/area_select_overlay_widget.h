@@ -21,6 +21,7 @@ public:
     void setActive(bool value);
 
     QRectF selectedArea() const; //< Selected area in normalized coordinates.
+    void setSelectedArea(const QRectF& value);
     void clearSelectedArea();
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;

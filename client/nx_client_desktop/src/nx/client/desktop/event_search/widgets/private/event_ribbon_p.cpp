@@ -418,7 +418,7 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
             animatedIndex = qMax(first, animatedIndex - count);
     }
 
-    if (first != m_tiles.size())
+    if (first != m_tiles.size() && m_model->data(m_model->index(first), Qn::AnimatedRole).toBool())
     {
         if (first == 0)
             m_positions[m_tiles[0]] = 0; //< Keep integrity: positions must start from 0.

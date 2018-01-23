@@ -179,6 +179,9 @@ void EventPanel::Private::setupAnalyticsSearch()
                 button->setText(tr("Select some area on video"));
             else if (state == ui::SelectableTextButton::State::unselected)
                 button->setText(tr("In selected area"));
+
+            if (state == ui::SelectableTextButton::State::deactivated)
+                m_currentMediaWidget->setAnalyticsSearchRect(QRectF());
     });
 }
 
@@ -230,16 +233,6 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
         return;
 
     m_mediaWidgetConnections.reset(new QnDisconnectHelper());
-
-    *m_mediaWidgetConnections << connect(
-        m_currentMediaWidget.data(), &QnMediaResourceWidget::motionSearchModeEnabled, this,
-        [this](bool enabled)
-        {
-            //if (enabled)
-            //    m_cameraTab->setCurrentWidget(m_motionWidget);
-            //else
-            //    m_cameraTab->setCurrentWidget(m_eventsWidget);
-        });
 
     *m_mediaWidgetConnections << connect(
         m_currentMediaWidget.data(), &QnMediaResourceWidget::analyticsSearchAreaSelected, this,
