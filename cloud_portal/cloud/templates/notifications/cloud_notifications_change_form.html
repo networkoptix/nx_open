@@ -16,7 +16,7 @@
             <input class="float-left" id="ignoreSubscriptions" name="ignore_subscriptions" type="checkbox">
             <button class="button" type="submit" name="Save">Save Draft</button>
             <button class="button" type="submit" name="Preview">Preview Draft</button>
-            <button class="button" type="submit" name="Send">Send Notification</button>
+            <button class="button" type="submit" name="Send" {%if not original %} disabled {% endif %}>Send Notification</button>
             <button class="button" type="reset"  name="Reset">Reset</button>
         </div>
         {% endif %}

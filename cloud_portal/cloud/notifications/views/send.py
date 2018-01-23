@@ -124,7 +124,7 @@ def cloud_notification_action(request):
         message = format_message(CloudNotification.objects.get(id=notification_id))
         message['full_name'] = request.user.get_full_name()
         api.send(request.user.email, 'cloud_notification', message, 'default')
-    elif 'Send' in request.data:
+    elif 'Send' in request.data and notification_id:
         force = 'ignore_subscriptions' in request.data
         notification = CloudNotification.objects.get(id=notification_id)
         send_to_all_users(request.user, notification, force)
