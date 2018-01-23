@@ -1,6 +1,7 @@
 #pragma once
 
 #include <set>
+#include <list>
 
 #include <recorder/remote_archive_worker.h>
 #include <recorder/abstract_remote_archive_synchronization_task.h>
@@ -20,6 +21,7 @@ public:
     virtual ~RemoteArchiveWorkerPool();
 
     void start();
+    void addTask(const RemoteArchiveTaskPtr& task);
     void cancelTask(const QnUuid& taskId);
 
     // Should be called before start
@@ -30,8 +32,11 @@ public:
 
 private:
     nx::utils::TimerId scheduleTaskGrabbing();
-    void processTasksUnsafe();
+    void processTaskMapUnsafe();
+    void processTaskQueueUnsafe();
     void cleanUpUnsafe();
+
+    bool startWorkerUnsafe(const RemoteArchiveTaskPtr& task);
 
 private:
     mutable QnMutex m_mutex;
@@ -39,6 +44,7 @@ private:
     std::atomic<bool> m_terminated{false};
     nx::utils::TimerId m_timerId = 0;
     std::map<QnUuid, std::unique_ptr<RemoteArchiveWorker>> m_workers;
+    std::list<RemoteArchiveTaskPtr> m_taskQueue;
     std::function<LockableTaskMap*()> m_taskMapAccessor;
 };
 
