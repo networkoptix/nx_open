@@ -1,5 +1,8 @@
 #pragma once
 
+#include <atomic>
+#include <memory>
+
 #include <nx/mediaserver/server_module_aware.h>
 
 #include <utils/common/connective.h>
