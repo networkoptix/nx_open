@@ -876,7 +876,11 @@
         "palette": {
             "default": {
                 "window": "dark9",
-                "midlight": "dark10"
+                "midlight": "dark10",
+                "light": "light10",
+                "windowText": "light16",
+                "text": "light4",
+                "highlight": "brand_core"
             }
         }
     },
@@ -928,7 +932,10 @@
     "nx::client::desktop::EventPanel": {
         "palette": {
             "default": {
-                "window": "dark6"
+                "dark": "dark4",
+                "window": "dark5",
+                "light": "dark8",
+                "midlight": "dark9.setAlpha(51)"
             }
         }
     }

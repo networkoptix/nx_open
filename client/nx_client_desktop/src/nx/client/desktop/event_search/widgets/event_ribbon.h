@@ -29,6 +29,9 @@ public:
 
     QScrollBar* scrollBar() const;
 
+signals:
+    void countChanged(int count);
+
 protected:
     virtual bool event(QEvent* event) override;
 

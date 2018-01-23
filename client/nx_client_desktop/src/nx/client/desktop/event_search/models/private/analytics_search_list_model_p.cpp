@@ -133,8 +133,12 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
     switch (role)
     {
         case Qt::DisplayRole:
-            return vms::event::AnalyticsHelper::objectName(camera(),
+        {
+            const auto name = vms::event::AnalyticsHelper::objectName(camera(),
                 object.objectTypeId, kDefaultLocale);
+
+            return name.isEmpty() ? tr("Unknown object") : name;
+        }
 
         case Qt::DecorationRole:
             return QVariant::fromValue(qnSkin->pixmap(lit("events/analytics.png")));
@@ -187,6 +191,7 @@ void AnalyticsSearchListModel::Private::clear()
     m_objectIdToTimestampUs.clear();
     m_currentUpdateId = rest::Handle();
     m_latestTimeMs = qMin(qnSyncTime->currentMSecsSinceEpoch(), selectedTimePeriod().endTimeMs());
+    m_filterRect = QRectF();
     base_type::clear();
 
     refreshUpdateTimer();

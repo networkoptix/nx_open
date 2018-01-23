@@ -45,6 +45,13 @@ void AbstractAsyncSearchListModel::Private::setSelectedTimePeriod(const QnTimePe
     const auto oldTimePeriod = m_selectedTimePeriod;
     m_selectedTimePeriod = newTimePeriod;
 
+    if (!m_selectedTimePeriod.isValid())
+    {
+        clear();
+        m_fetchedAll = true;
+        return;
+    }
+
     if (newTimePeriod.endTimeMs() > oldTimePeriod.endTimeMs())
     {
         clear();
@@ -68,6 +75,9 @@ void AbstractAsyncSearchListModel::Private::clear()
 
 void AbstractAsyncSearchListModel::Private::cancelPrefetch()
 {
+    if (m_currentFetchId && m_prefetchCompletionHandler)
+        m_prefetchCompletionHandler(-1);
+
     m_currentFetchId = rest::Handle();
     m_prefetchCompletionHandler = PrefetchCompletionHandler();
 }

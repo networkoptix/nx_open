@@ -12,12 +12,19 @@ class QStackedWidget;
 class QnMediaResourceWidget;
 
 namespace nx {
+
+namespace vms { namespace event { class StringsHelper; } }
+
 namespace client {
 namespace desktop {
 
+class EventSearchListModel;
+class BookmarkSearchListModel;
+class AnalyticsSearchListModel;
+
 class NotificationListWidget;
+class UnifiedSearchWidget;
 class MotionSearchWidget;
-class EventSearchWidget;
 
 class EventPanel::Private: public QObject
 {
@@ -30,28 +37,36 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
-    void paintBackground();
-
 private:
     void currentWorkbenchWidgetChanged(Qn::ItemRole role);
+
+    void addCameraTabs();
+    void removeCameraTabs();
+
+    void setupEventSearch();
+    void setupBookmarkSearch();
+    void setupAnalyticsSearch();
 
 private:
     EventPanel* q = nullptr;
     QTabWidget* m_tabs = nullptr;
 
-    NotificationListWidget* m_systemTab = nullptr;
-    QStackedWidget* m_cameraTab = nullptr;
-    EventSearchWidget* m_eventsWidget = nullptr;
-    MotionSearchWidget* m_motionWidget = nullptr;
+    NotificationListWidget* m_notificationsTab = nullptr;
+    MotionSearchWidget* m_motionTab = nullptr;
+    UnifiedSearchWidget* m_bookmarksTab = nullptr;
+    UnifiedSearchWidget* m_eventsTab = nullptr;
+    UnifiedSearchWidget* m_analyticsTab = nullptr;
 
     QPointer<QnMediaResourceWidget> m_currentMediaWidget;
     QScopedPointer<QnDisconnectHelper> m_mediaWidgetConnections;
 
-    enum class Tab
-    {
-        system,
-        camera
-    };
+    QnVirtualCameraResourcePtr m_camera;
+
+    EventSearchListModel* const m_eventsModel = nullptr;
+    BookmarkSearchListModel* const m_bookmarksModel = nullptr;
+    AnalyticsSearchListModel* const m_analyticsModel = nullptr;
+
+    QScopedPointer<vms::event::StringsHelper> m_helper;
 };
 
 } // namespace desktop

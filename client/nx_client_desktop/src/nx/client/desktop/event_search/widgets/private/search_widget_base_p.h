@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../event_search_widget.h"
-
 #include <ui/workbench/workbench_context_aware.h>
 
 class QAbstractListModel;
