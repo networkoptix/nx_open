@@ -125,6 +125,10 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
         this, &UnifiedSearchWidget::updatePlaceholderVisibility);
 }
 
+UnifiedSearchWidget::~UnifiedSearchWidget()
+{
+}
+
 UnifiedAsyncSearchListModel* UnifiedSearchWidget::model() const
 {
     return m_model;

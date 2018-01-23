@@ -34,7 +34,7 @@ class UnifiedSearchWidget:
 
 public:
     UnifiedSearchWidget(QWidget* parent);
-    virtual ~UnifiedSearchWidget() = default;
+    virtual ~UnifiedSearchWidget();
 
     UnifiedAsyncSearchListModel* model() const;
     void setModel(UnifiedAsyncSearchListModel* value);
