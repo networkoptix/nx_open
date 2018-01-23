@@ -142,6 +142,8 @@ public:
      */
     void joinAndDeleteTimer(const TimerId& timerId);
 
+    bool hasPendingTasks() const;
+
     void stop();
 
 protected:

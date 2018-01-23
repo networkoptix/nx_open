@@ -64,6 +64,7 @@ void DownloaderPrivate::createWorker(const QString& fileName)
 
         connect(worker, &Worker::finished, this, &DownloaderPrivate::at_workerFinished);
         connect(worker, &Worker::failed, this, &DownloaderPrivate::at_workerFinished);
+        connect(worker, &Worker::chunkDownloadFailed, this->q_ptr, &Downloader::chunkDownloadFailed);
 
         worker->start();
     }

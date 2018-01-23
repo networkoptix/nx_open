@@ -72,7 +72,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, fileInfo)
 
     peerManager->addPeer(peer);
 
-    TestPeerManager::TestFileInformation fileInformation("test");
+    TestPeerManager::FileInformation fileInformation("test");
     peerManager->setFileInformation(peer, fileInformation);
 
     bool ok = false;
@@ -111,17 +111,16 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, invalidChunk)
 
     peerManager->addPeer(peer);
 
-    TestPeerManager::TestFileInformation fileInformation("test");
+    TestPeerManager::FileInformation fileInformation("test");
     fileInformation.size = 1024;
     fileInformation.chunkSize = 1024;
     peerManager->setFileInformation(peer, fileInformation);
 
     bool ok = true;
     peerManager->downloadChunk(peer, fileInformation.name, 2,
-        [&](AbstractPeerManager::ChunkDownloadResult result,
-            rest::Handle /*handle*/, const QByteArray& data)
+        [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
         {
-            ok = result == AbstractPeerManager::ChunkDownloadResult::ok && !data.isEmpty();
+            ok = success && !data.isEmpty();
         });
 
     peerManager->processNextRequest();
@@ -149,7 +148,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
     const auto originalChecksums = storage->getChunkChecksums(fileName);
 
     bool fileInfoReceived = false;
-    TestPeerManager::TestFileInformation fileInfo;
+    TestPeerManager::FileInformation fileInfo;
 
     peerManager->requestFileInfo(peer, fileName,
         [&](bool success, rest::Handle /*handle*/, const FileInformation& peerFileInfo)
@@ -168,10 +167,9 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
     bool chunkDownloaded = false;
     QByteArray chunkData;
     peerManager->downloadChunk(peer, fileName, 0,
-        [&](AbstractPeerManager::ChunkDownloadResult result,
-            rest::Handle /*handle*/, const QByteArray& data)
+        [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
         {
-            chunkDownloaded = result == AbstractPeerManager::ChunkDownloadResult::ok;
+            chunkDownloaded = success;
             chunkData = data;
         });
     peerManager->processNextRequest();
@@ -210,15 +208,10 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, internetFile)
     bool chunkDownloaded = false;
     QByteArray chunkData;
 
-    downloader::FileInformation fileInformation(fileName);
-    fileInformation.url = url;
-    fileInformation.chunkSize = 1;
-
-    peerManager->downloadChunkFromInternet(fileInformation, peerId, 0,
-        [&](AbstractPeerManager::ChunkDownloadResult result,
-            rest::Handle /*handle*/, const QByteArray& data)
+    peerManager->downloadChunkFromInternet(peerId, fileName, url, 0, 1,
+    [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
         {
-            chunkDownloaded = result == AbstractPeerManager::ChunkDownloadResult::ok;
+            chunkDownloaded = success;
             chunkData = data;
         });
     peerManager->processNextRequest();

@@ -6,7 +6,7 @@
 #include <nx/utils/url.h>
 #include <api/server_rest_connection_fwd.h>
 
-#include "../file_information.h"
+#include <nx/vms/common/p2p/downloader/file_information.h>
 
 namespace nx {
 namespace vms {
@@ -17,13 +17,6 @@ namespace downloader {
 class AbstractPeerManager: public QObject
 {
 public:
-    enum class ChunkDownloadResult
-    {
-        ok,
-        recoverableError,
-        irrecoverableError
-    };
-
     AbstractPeerManager(QObject* parent = nullptr);
     virtual ~AbstractPeerManager();
 
@@ -51,7 +44,7 @@ public:
         ChecksumsCallback callback) = 0;
 
     using ChunkCallback =
-        std::function<void(ChunkDownloadResult, rest::Handle, const QByteArray&)>;
+        std::function<void(bool, rest::Handle, const QByteArray&)>;
     virtual rest::Handle downloadChunk(
         const QnUuid& peer,
         const QString& fileName,
@@ -59,10 +52,16 @@ public:
         ChunkCallback callback) = 0;
 
     virtual rest::Handle downloadChunkFromInternet(
-        const FileInformation& fileInformation,
         const QnUuid& peerId,
+        const QString& fileName,
+        const nx::utils::Url& url,
         int chunkIndex,
+        int chunkSize,
         ChunkCallback callback) = 0;
+
+    using ValidateCallback = std::function<void(bool, rest::Handle)>;
+    virtual rest::Handle validateFileInformation(
+        const FileInformation& fileInformation, ValidateCallback callback) = 0;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) = 0;
 };

@@ -41,7 +41,9 @@ private:
     void onFileDeleted(const QString& fileName);
     void onFileInformationChanged(
         const vms::common::p2p::downloader::FileInformation& fileInformation);
-    void onFileStatusChanged(const vms::common::p2p::downloader::FileInformation& fileInformation);
+    void onFileInformationStatusChanged(
+        const vms::common::p2p::downloader::FileInformation& fileInformation);
+    void onChunkDownloadFailed(const QString& fileName);
 };
 
 } // namespace updates2

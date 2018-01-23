@@ -7,6 +7,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/random.h>
+#include <utils/common/synctime.h>
 #include <nx/fusion/model_functions.h>
 
 #include "storage.h"
@@ -109,11 +110,10 @@ Worker::Worker(
     AbstractPeerManager* peerManager,
     QObject* parent)
     :
-    base_type(parent),
+    QnLongRunnable(parent),
     m_storage(storage),
     m_peerManager(peerManager),
     m_fileName(fileName),
-    m_stepDelayTimer(new QTimer(this)),
     m_peersPerOperation(kDefaultPeersPerOperation)
 {
     updateLogTag();
@@ -129,18 +129,16 @@ Worker::Worker(
     if (!peerManager->parent())
         peerManager->setParent(this);
 
-    m_stepDelayTimer->setSingleShot(true);
-    connect(m_stepDelayTimer, &QTimer::timeout, this, &Worker::nextStep);
-
     NX_VERBOSE(m_logTag, lm("Created. Self GUID: %1").arg(peerManager->selfId().toString()));
 }
 
 Worker::~Worker()
 {
+    stop();
     NX_VERBOSE(m_logTag, "Deleted.");
 }
 
-void Worker::start()
+void Worker::run()
 {
     if (m_started)
         return;
@@ -154,21 +152,31 @@ void Worker::start()
     m_availableChunks.resize(fileInfo.downloadedChunks.size());
 
     m_started = true;
-    waitForNextStep(kStartDelayMs);
+    doWork();
+}
+
+void Worker::pleaseStop()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_needStop = true;
+    m_waitCondition.wakeOne();
 }
 
 Worker::State Worker::state() const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_state;
 }
 
 int Worker::peersPerOperation() const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_peersPerOperation;
 }
 
 void Worker::setPeersPerOperation(int peersPerOperation)
 {
+    QnMutexLocker lock(&m_mutex);
     m_peersPerOperation = peersPerOperation;
 }
 
@@ -177,6 +185,11 @@ bool Worker::haveChunksToDownload()
     const auto& fileInfo = fileInformation();
     if (!fileInfo.isValid())
         return false;
+
+    bool locked = m_mutex.tryLock();
+    auto onExit = QnRaiiGuard::createEmpty();
+    if (locked)
+        onExit = QnRaiiGuard::createDestructible([this]() { m_mutex.unlock(); });
 
     const int chunksCount = fileInfo.downloadedChunks.size();
     if (m_availableChunks.size() != chunksCount)
@@ -203,66 +216,77 @@ void Worker::setState(State state)
 
     NX_VERBOSE(m_logTag, lm("Entering state %1...").arg(QnLexical::serialized(state)));
     m_state = state;
+    m_mutex.unlock();
     emit stateChanged(state);
+    m_mutex.lock();
 }
 
-void Worker::nextStep()
+void Worker::doWork()
 {
-    const auto& fileInfo = fileInformation();
-    if (!fileInfo.isValid())
-        return;
-
-    switch (m_state)
+    while (true)
     {
-        case State::initial:
-            if (fileInfo.status == FileInformation::Status::downloaded)
-                finish();
-            else if (fileInfo.size < 0 || fileInfo.md5.isEmpty())
-                requestFileInformation();
-            else if (fileInfo.status == FileInformation::Status::corrupted)
+        QnMutexLocker lock(&m_mutex);
+        waitBeforeNextIteration(&lock);
+
+        const auto& fileInfo = fileInformation();
+        if (!fileInfo.isValid())
+            return;
+
+        switch (m_state)
+        {
+            case State::initial:
+                if (fileInfo.status == FileInformation::Status::downloaded)
+                    finish();
+                else if (fileInfo.size < 0 || fileInfo.md5.isEmpty())
+                    requestFileInformation();
+                else if (fileInfo.status == FileInformation::Status::corrupted)
+                    requestChecksums();
+                else if (!haveChunksToDownload())
+                    requestAvailableChunks();
+                else if (fileInfo.status == FileInformation::Status::downloading)
+                    downloadNextChunk();
+                else
+                    NX_ASSERT(false, "Invalid state.");
+                break;
+
+            case State::requestingFileInformation:
+            case State::requestingAvailableChunks:
+                requestFileInformationInternal();
+                break;
+
+            case State::foundFileInformation:
+                if (haveChunksToDownload())
+                {
+                    downloadNextChunk();
+                }
+                else
+                {
+                    setState(State::requestingAvailableChunks);
+                    setShouldWait(true);
+                }
+                break;
+
+            case State::foundAvailableChunks:
+                validateFileInformation();
+                break;
+
+            case State::fileInformationChecked:
+                downloadNextChunk();
+                break;
+
+            case State::requestingChecksums:
                 requestChecksums();
-            else if (!haveChunksToDownload())
-                requestAvailableChunks();
-            else if (fileInfo.status == FileInformation::Status::downloading)
-                downloadNextChunk();
-            else
-                NX_ASSERT(false, "Invalid state.");
-            break;
+                break;
 
-        case State::requestingFileInformation:
-        case State::requestingAvailableChunks:
-            requestFileInformationInternal();
-            break;
-
-        case State::foundFileInformation:
-            if (haveChunksToDownload())
-            {
-                downloadNextChunk();
-            }
-            else
-            {
-                setState(State::requestingAvailableChunks);
-                waitForNextStep();
-            }
-            break;
-
-        case State::foundAvailableChunks:
-            downloadNextChunk();
-            break;
-
-        case State::requestingChecksums:
-            requestChecksums();
-            break;
-
-        case State::downloadingChunks:
-            switch (fileInfo.status)
-            {
+            case State::downloadingChunks:
+                switch (fileInfo.status)
+                {
                 case FileInformation::Status::downloaded:
                     finish();
-                    break;
+                    return;
                 case FileInformation::Status::corrupted:
                     requestChecksums();
-                    break;
+                    return;
                 case FileInformation::Status::downloading:
                     if (m_usingInternet)
                     {
@@ -283,18 +307,42 @@ void Worker::nextStep()
                     break;
                 default:
                     NX_ASSERT(false, "Should never get here.");
-            }
-            break;
+                }
+                break;
 
-        case State::finished:
-        case State::failed:
-            break;
+            case State::finished:
+            case State::failed:
+                return;
 
-        default:
-            NX_ASSERT(false, "Should never get here.");
-            waitForNextStep();
-            break;
+            default:
+                NX_ASSERT(false, "Should never get here.");
+                break;
+        }
     }
+}
+
+void Worker::validateFileInformation()
+{
+    const auto& fileInfo = fileInformation();
+    if (fileInfo.url.isValid())
+    {
+        auto handle = m_peerManager->validateFileInformation(fileInfo,
+            [owner = this](bool success, rest::Handle handle)
+            {
+                QnMutexLocker lock(&owner->m_mutex);
+
+                if (success)
+                    owner->setState(State::fileInformationChecked);
+                else
+                    owner->fail();
+
+                owner->setShouldWait(false);
+            });
+
+        m_peerByRequestHandle.insert(handle, m_peerManager->selfId());
+    }
+
+    setShouldWaitForCb();
 }
 
 void Worker::requestFileInformationInternal()
@@ -310,12 +358,10 @@ void Worker::requestFileInformationInternal()
             && !selectPeersForInternetDownload().isEmpty())
         {
             setState(State::foundAvailableChunks);
-            nextStep();
-            return;
+            return setShouldWait(false);
         }
 
-        waitForNextStep();
-        return;
+        return setShouldWait(true);
     }
 
     for (const auto& peer: peers)
@@ -335,7 +381,36 @@ void Worker::requestFileInformationInternal()
     }
 
     if (m_peerByRequestHandle.isEmpty())
-        waitForNextStep();
+        setShouldWait(true);
+    else
+        setShouldWaitForCb();
+}
+
+void Worker::setShouldWaitForCb()
+{
+    m_delay = 0;
+    m_shouldWait = true;
+}
+
+void Worker::setShouldWait(bool value)
+{
+    if (value && !m_stepDelayTimer.hasPendingTasks())
+    {
+        m_shouldWait = true;
+        m_stepDelayTimer.addTimer(
+            [this](utils::TimerId /*timerId*/)
+            {
+                QnMutexLocker lock(&m_mutex);
+                m_shouldWait = false;
+                m_waitCondition.wakeOne();
+            },
+            std::chrono::milliseconds(kDefaultStepDelayMs));
+    }
+    else
+    {
+        m_shouldWait = false;
+        m_waitCondition.wakeOne();
+    }
 }
 
 void Worker::requestFileInformation()
@@ -353,6 +428,8 @@ void Worker::requestAvailableChunks()
 void Worker::handleFileInformationReply(
     bool success, rest::Handle handle, const FileInformation& fileInfo)
 {
+    QnMutexLocker lock(&m_mutex);
+
     const auto peerId = m_peerByRequestHandle.take(handle);
     if (peerId.isNull())
         return;
@@ -377,16 +454,16 @@ void Worker::handleFileInformationReply(
                 {
 
                     setState(State::foundAvailableChunks);
-                    nextStep();
+                    setShouldWait(false);
                     return;
                 }
 
-                waitForNextStep();
+                setShouldWait(true);
                 return;
             }
 
-            nextStep();
-        });
+            setShouldWait(false);
+    });
 
     auto& peerInfo = m_peerInfoById[peerId];
 
@@ -445,7 +522,7 @@ void Worker::requestChecksums()
     const auto peers = selectPeersForOperation();
     if (peers.isEmpty())
     {
-        waitForNextStep();
+        setShouldWait(true);
         return;
     }
 
@@ -466,12 +543,16 @@ void Worker::requestChecksums()
     }
 
     if (m_peerByRequestHandle.isEmpty())
-        waitForNextStep();
+        setShouldWait(true);
+    else
+        setShouldWaitForCb();
 }
 
 void Worker::handleChecksumsReply(
     bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
 {
+    QnMutexLocker lock(&m_mutex);
+
     const auto peerId = m_peerByRequestHandle.take(handle);
     if (peerId.isNull())
         return;
@@ -488,11 +569,11 @@ void Worker::handleChecksumsReply(
             if (success)
             {
                 cancelRequests();
-                waitForNextStep();
+                setShouldWait(true);
                 return;
             }
 
-            nextStep();
+            setShouldWait(false);
         });
 
     auto& peerInfo = m_peerInfoById[peerId];
@@ -530,11 +611,13 @@ void Worker::downloadNextChunk()
 {
     setState(State::downloadingChunks);
 
+    if (m_downloadingChunksCount >= 1)
+        return setShouldWaitForCb();
+
     const int chunkIndex = selectNextChunk();
 
-    NX_ASSERT(chunkIndex >= 0);
     if (chunkIndex < 0)
-        return;
+        return setShouldWaitForCb();
 
     const auto& fileInfo = fileInformation();
 
@@ -556,10 +639,7 @@ void Worker::downloadNextChunk()
 
     peers = selectPeersForOperation(1, peers);
     if (peers.isEmpty())
-    {
-        waitForNextStep();
-        return;
-    }
+        return setShouldWait(true);
 
     NX_ASSERT(peers.size() == 1);
 
@@ -573,11 +653,11 @@ void Worker::downloadNextChunk()
 
     auto handleReply =
         [this, chunkIndex](
-            AbstractPeerManager::ChunkDownloadResult chunkDownloadResult,
+            bool result,
             rest::Handle handle,
             const QByteArray& data)
         {
-            handleDownloadChunkReply(chunkDownloadResult, handle, chunkIndex, data);
+            handleDownloadChunkReply(result, handle, chunkIndex, data);
         };
 
     if (m_subsequentChunksToDownload == boost::none || m_subsequentChunksToDownload == 0)
@@ -588,6 +668,8 @@ void Worker::downloadNextChunk()
             m_subsequentChunksToDownload = kSubsequentChunksToDownload;
     }
 
+    m_downloadingChunksCount++;
+
     rest::Handle handle;
 
     if (m_usingInternet)
@@ -595,7 +677,8 @@ void Worker::downloadNextChunk()
         NX_VERBOSE(m_logTag,
             lm("Requesting chunk %1 from the Internet via %2...")
                 .arg(chunkIndex).arg(m_peerManager->peerString(peerId)));
-        handle = m_peerManager->downloadChunkFromInternet(fileInfo, peerId, chunkIndex, handleReply);
+        handle = m_peerManager->downloadChunkFromInternet(
+            peerId, fileInfo.name, fileInfo.url, chunkIndex, fileInfo.chunkSize, handleReply);
     }
     else
     {
@@ -615,35 +698,34 @@ void Worker::downloadNextChunk()
 }
 
 void Worker::handleDownloadChunkReply(
-    AbstractPeerManager::ChunkDownloadResult chunkDownloadResult,
-    rest::Handle handle,
-    int chunkIndex,
-    const QByteArray& data)
+    bool success, rest::Handle handle, int chunkIndex, const QByteArray& data)
 {
+    QnMutexLocker lock(&m_mutex);
+
+    m_downloadingChunksCount--;
+
     const auto peerId = m_peerByRequestHandle.take(handle);
     if (peerId.isNull())
         return;
-
-    if (chunkDownloadResult == AbstractPeerManager::ChunkDownloadResult::irrecoverableError)
-    {
-        fail();
-        return;
-    }
 
     NX_VERBOSE(m_logTag,
         lm("Got chunk %1 from %2: %3")
             .arg(chunkIndex)
             .arg(m_peerManager->peerString(peerId))
-            .arg(statusString(chunkDownloadResult == AbstractPeerManager::ChunkDownloadResult::ok)));
+            .arg(statusString(success)));
 
     auto exitGuard = QnRaiiGuard::createDestructible(
-        [this, &chunkDownloadResult]()
+        [this, &success, &lock]()
         {
-            waitForNextStep(
-                chunkDownloadResult == AbstractPeerManager::ChunkDownloadResult::ok ? 0 : -1);
+            setShouldWait(!success);
+            if (!success)
+            {
+                lock.unlock();
+                emit chunkDownloadFailed(m_fileName);
+            }
         });
 
-    if (chunkDownloadResult == AbstractPeerManager::ChunkDownloadResult::recoverableError)
+    if (!success)
     {
         decreasePeerRank(peerId);
         return;
@@ -660,7 +742,7 @@ void Worker::handleDownloadChunkReply(
             lm("Cannot write chunk. Storage error: %1").arg(resultCode));
 
         // TODO: Implement error handling
-        // success = false;
+        success = false;
         return;
     }
 }
@@ -678,14 +760,18 @@ void Worker::finish()
 {
     setState(State::finished);
     NX_INFO(m_logTag, "Download finished.");
+    m_mutex.unlock();
     emit finished(m_fileName);
+    m_mutex.lock();
 }
 
 void Worker::fail()
 {
     setState(State::failed);
     NX_ERROR(m_logTag, "Download failed.");
+    m_mutex.unlock();
     emit failed(m_fileName);
+    m_mutex.lock();
 }
 
 void Worker::updateLogTag()
@@ -982,17 +1068,15 @@ bool Worker::needToFindBetterPeers() const
     return false;
 }
 
-void Worker::waitForNextStep(int delay)
+void Worker::waitBeforeNextIteration(QnMutexLockerBase* lock)
 {
-    if (delay < 0)
-        delay = kDefaultStepDelayMs;
+    NX_VERBOSE(m_logTag, lm("Start waiting for the next iteration."));
 
-    NX_VERBOSE(m_logTag, lm("Start waiting for next step."));
+    if (!m_shouldWait)
+        return;
 
-    if (delay == 0)
-        nextStep();
-    else
-        m_stepDelayTimer->start(delay);
+    while (m_shouldWait)
+        m_waitCondition.wait(lock->mutex());
 }
 
 void Worker::increasePeerRank(const QnUuid& peerId, int value)
