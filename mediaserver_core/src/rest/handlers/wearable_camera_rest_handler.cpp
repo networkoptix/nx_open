@@ -1,13 +1,11 @@
 #include "wearable_camera_rest_handler.h"
 
-#include <QtCore/QBuffer>
-#include <QtCore/QFile> // TODO: drop
+#include <QtCore/QFile>
 
 #include <nx_ec/ec_api.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <api/model/wearable_camera_reply.h>
-#include <network/tcp_connection_priv.h>
-#include <recorder/wearable_archive_synchronization_task.h>
+#include <recorder/wearable_archive_synchronizer.h>
 #include <rest/server/rest_connection_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -116,13 +114,35 @@ int QnWearableCameraRestHandler::executeConsume(
         return nx_http::StatusCode::internalServerError;
     }
 
-    nx::mediaserver_core::recorder::WearableArchiveSynchronizationTask task(
+    using namespace nx::mediaserver_core::recorder;
+    auto synchronizer = qnServerModule->findInstance<WearableArchiveSynchronizer>();
+    if (!synchronizer)
+    {
+        result.setError(QnJsonRestResult::CantProcessRequest,
+            lit("WearableArchiveSynchronizer is not initialized."));
+        return nx_http::StatusCode::internalServerError;
+    }
+
+    auto deleteHandler =
+        [uploadId]()
+        {
+            auto downloader = qnServerModule->findInstance<Downloader>();
+            if (!downloader)
+                return;
+
+            downloader->deleteFile(uploadId);
+        };
+
+    QnUuid taskId = QnUuid::createUuid();
+    WearableArchiveTaskPtr task(new WearableArchiveSynchronizationTask(
         qnServerModule,
+        taskId,
         camera,
         std::move(file),
-        startTimeMs);
-    task.execute();
-    downloader->deleteFile(uploadId);
+        startTimeMs));
+    task->setDoneHandler(deleteHandler);
+
+    synchronizer->addTask(camera, task);
 
     return nx_http::StatusCode::ok;
 }

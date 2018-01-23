@@ -19,6 +19,7 @@ namespace recorder {
 
 WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
     QnMediaServerModule* serverModule,
+    const QnUuid& id,
     const QnSecurityCamResourcePtr& resource,
     std::unique_ptr<QIODevice> file,
     qint64 startTimeMs)
@@ -39,12 +40,12 @@ WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask()
 
 QnUuid WearableArchiveSynchronizationTask::id() const
 {
-    return m_resource->getId();
+    return m_id;
 }
 
 void WearableArchiveSynchronizationTask::setDoneHandler(std::function<void()> handler)
 {
-    NX_CHECK(true, "Unimplemented", Crash);
+    m_doneHandler = handler;
 }
 
 void WearableArchiveSynchronizationTask::cancel()
@@ -68,12 +69,30 @@ bool WearableArchiveSynchronizationTask::execute()
     m_recorder->wait();
     m_archiveReader->wait();
 
+    m_recorder.reset();
+    m_archiveReader.reset();
+
+    setProgress(100);
+
+    if(m_doneHandler)
+        m_doneHandler();
+
     return true;
 }
 
 int WearableArchiveSynchronizationTask::progress() const
 {
     return m_progress;
+}
+
+void WearableArchiveSynchronizationTask::setProgress(int progress)
+{
+    bool changed = m_progress != progress;
+
+    m_progress = progress;
+
+    if (changed)
+        emit progressChanged(progress);
 }
 
 void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
@@ -106,7 +125,7 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
             m_archiveReader->pleaseStop();
             if (m_recorder)
                 m_recorder->pleaseStop();
-            m_progress = -1;
+            setProgress(-1);
         });
 
     m_archiveReader->setNoDataHandler(
@@ -115,7 +134,7 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
             m_archiveReader->pleaseStop();
             if (m_recorder)
                 m_recorder->pleaseStop();
-            m_progress = 100;
+            setProgress(99);
         });
 }
 
@@ -147,7 +166,7 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
             qint64 progressMs = (startTime + duration).count() - globalStartMs;
 
             int progress = progressMs * 100 / globalDurationMs;
-            m_progress = std::max(m_progress, progress == 100 ? 99 : progress);
+            setProgress(std::max(m_progress, progress == 100 ? 99 : progress));
         });
 
     m_recorder->setEndOfRecordingHandler(
@@ -156,7 +175,7 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
             m_recorder->pleaseStop();
             if (m_archiveReader)
                 m_archiveReader->pleaseStop();
-            m_progress = 100;
+            setProgress(99);
         });
 }
 

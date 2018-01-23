@@ -32,6 +32,7 @@
 #include <core/ptz/server_ptz_controller_pool.h>
 #include <recorder/storage_db_pool.h>
 #include <recorder/storage_manager.h>
+#include <recorder/wearable_archive_synchronizer.h>
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
 #include <nx/mediaserver/event/event_message_bus.h>
@@ -158,6 +159,8 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new nx::vms::common::p2p::downloader::Downloader(
         downloadsDirectory(), commonModule(), nullptr, this));
+
+    store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
