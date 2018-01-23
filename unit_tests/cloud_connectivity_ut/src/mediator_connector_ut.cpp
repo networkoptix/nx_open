@@ -190,14 +190,11 @@ private:
     {
         using namespace std::placeholders;
 
-        auto mediatorUrlFetcher =
-            std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>();
-        mediatorUrlFetcher->setModulesXmlUrl(
+        m_mediatorConnector = std::make_unique<api::MediatorConnector>();
+        m_mediatorConnector->mockupCloudModulesXmlUrl(
             nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
                 .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
                 .setPath(kCloudModulesXmlPath));
-        m_mediatorConnector =
-            std::make_unique<api::MediatorConnector>(std::move(mediatorUrlFetcher));
         m_mediatorConnector->setSystemCredentials(m_cloudSystemCredentials);
 
         // Using cloud server socket to register peer on mediator.
