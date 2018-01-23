@@ -6,6 +6,10 @@
         <p>
             <button class="btn btn-default" ng-click="rename()">Rename System</button>
         </p>
+        <p>
+            <button class="btn btn-default" ng-disabled="!canMerge" ng-click="mergeSystems()">Merge with Another System</button>
+        </p>
+        <hr></hr>
         <button class="btn btn-default" ng-click="disconnect()">Disconnect from
             <span class="product-name">%PRODUCT_NAME%</span></button>
     </div>

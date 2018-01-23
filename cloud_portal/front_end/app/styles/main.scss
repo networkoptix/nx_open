@@ -772,3 +772,45 @@ button .icon-caret{
   background-position: -32px 0;
 }
 
+.merge-button{
+  width: 102px;
+}
+
+.merge-modal{
+  .help-block{
+    color: $dark16;
+    min-height: 0px !important;
+  }
+  .merge-text{
+    color: $dark12;
+    font-weight:bold;
+  }
+  .form-group{
+    padding: 0 22px;
+  }
+  .merge-dropdown{
+    width: 100%;
+    height: 32px;
+    padding: 0 10px;
+
+    line-height: 32px;
+    text-align: right;
+    text-decoration: none !important;
+
+    border: 1px solid $dark9;
+    border-radius: 2px;
+
+    .dropdown-menu{
+      padding: 0;
+
+      margin:1px 0 0 -1px;
+    }
+
+    a.active{
+      background-color: $brand_core;
+    }
+  }
+  .radio label{
+    padding-left: 0;
+  }
+}

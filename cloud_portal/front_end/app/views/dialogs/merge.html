@@ -1,0 +1,52 @@
+<div ng-controller="MergeCtrl" class="merge-modal">
+    <div ng-if="!canMerge">
+        <div class="modal-body">
+            <div>
+                <p class="help-block">
+                    {{mergeSystemTextTop}}
+                </p>
+                <p class="help-block">
+                    {{mergeSystemTextBottom}}
+                </p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary merge-button" ng-click="close()">Ok</button>
+        </div>
+    </div>
+    <form ng-if="canMerge" name="mergeForm" novalidate>
+        <div class="modal-body">
+            <div class="merge-text">Merge current System with</div>
+            <div uib-dropdown class="merge-dropdown">
+                <a uib-dropdown-toggle href="#">
+                    <span>{{targetSystem.name}}</span><span class="icon-caret"></span>
+                </a>
+                <ul uib-dropdown-menu class="dropdown-menu">
+                    <li ng-repeat="system in systems">
+                        <a ng-class="{active:system.id == targetSystem.id}"
+                           ng-click="setTargetSystem(system)">
+                            <span>{{system.name}}</span>
+                            <span ng-if="system.stateOfHealth == 'offline'">(Offline)</span>
+                            <span ng-if="system.isOnline && 0">(incompatable)</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <p class="help-block">You can merge only Systems in which you have owner permissions.</p>
+            <div class="merge-text">Took system name and settings from</div>
+            <div class="form-group">
+                <div class="radio">
+                    <input type="radio" id="firstSystem" ng-model="masterSystem" value="system.id">
+                    <label for="firstSystem">{{system.info.name}}</label>
+                </div>
+                <div class="radio">
+                    <input type="radio" id="secondSystem" ng-model="masterSystem" value="targetSystem.id">
+                    <label for="secondSystem">{{targetSystem.name}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary merge-button" ng-click="close()">Merge</button>
+        </div>
+    </form>
+</div>

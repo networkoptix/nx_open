@@ -33,6 +33,7 @@ angular.module('cloudApp')
             },
             errorPrefix: L.errorCodes.cantGetSystemInfoPrefix
         }).then(function (){
+            $scope.canMerge = $scope.system.isOnline;
             $scope.systemNoAccess = false;
             loadUsers();
             if($scope.system.permissions.editUsers){
@@ -108,6 +109,10 @@ angular.module('cloudApp')
             return dialogs.rename(systemId, $scope.system.info.name).then(function(finalName){
                 $scope.system.info.name = finalName;
             });
+        };
+
+        $scope.mergeSystems = function(){
+            dialogs.merge($scope.system);
         };
 
         $scope.share = function(){
