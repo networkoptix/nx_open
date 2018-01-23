@@ -213,7 +213,7 @@ private:
     }
 };
 
-TEST_F(MediatorConnector, DISABLED_reloads_cloud_modules_list_after_loosing_connection_to_mediator)
+TEST_F(MediatorConnector, reloads_cloud_modules_list_after_loosing_connection_to_mediator)
 {
     givenPeerConnectedToMediator();
 
@@ -223,7 +223,7 @@ TEST_F(MediatorConnector, DISABLED_reloads_cloud_modules_list_after_loosing_conn
     andNewMediatorEndpointIsAvailable();
 }
 
-TEST_F(MediatorConnector, DISABLED_reloads_cloud_modules_list_after_each_failure_to_connect_to_mediator)
+TEST_F(MediatorConnector, reloads_cloud_modules_list_after_each_failure_to_connect_to_mediator)
 {
     givenPeerFailedToConnectToMediator();
     whenStartMediator();
