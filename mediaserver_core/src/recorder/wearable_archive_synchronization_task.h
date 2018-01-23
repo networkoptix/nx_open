@@ -38,6 +38,8 @@ public:
     virtual void cancel() override;
     virtual bool execute() override;
 
+    int progress() const;
+
 private:
     void createArchiveReader(qint64 startTimeMs);
     void createStreamRecorder(qint64 startTimeMs);
@@ -45,7 +47,8 @@ private:
 private:
     QnSecurityCamResourcePtr m_resource;
     QPointer<QIODevice> m_file;
-    qint64 m_startTimeMs;
+    qint64 m_startTimeMs = 0;
+    int m_progress = 0;
 
     std::unique_ptr<QnAbstractArchiveStreamReader> m_archiveReader;
     std::unique_ptr<QnServerEdgeStreamRecorder> m_recorder;
