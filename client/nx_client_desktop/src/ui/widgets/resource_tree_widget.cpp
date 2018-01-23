@@ -611,6 +611,7 @@ void QnResourceTreeWidget::initializeFilter()
     updateShortcutHintVisibility();
 
     const auto filterEdit = ui->filterLineEdit;
+    filterEdit->setPlaceholderText(tr("Cameras & Resources"));
     filterEdit->setTags(filterTags());
     filterEdit->setClearingTagIndex(0);
 

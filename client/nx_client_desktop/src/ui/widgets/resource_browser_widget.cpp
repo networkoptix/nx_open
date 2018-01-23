@@ -287,14 +287,14 @@ void QnResourceBrowserWidget::initNewSearch()
     connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterEnterPressed, this,
         [this, getFilteredResources]
         {
-            auto selected = getFilteredResources();
+            const auto selected = getFilteredResources();
             menu()->trigger(action::OpenInCurrentLayoutAction, {selected});
         });
 
     connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterCtrlEnterPressed, this,
         [this, getFilteredResources]
         {
-            auto selected = getFilteredResources();
+            const auto selected = getFilteredResources();
             menu()->trigger(action::OpenInNewTabAction, {selected});
         });
 }

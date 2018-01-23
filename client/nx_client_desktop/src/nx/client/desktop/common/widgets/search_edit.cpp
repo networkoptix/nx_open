@@ -11,14 +11,19 @@
 
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/workaround/hidpi_workarounds.h>
+#include <ui/common/palette.h>
+
 #include <utils/common/scoped_value_rollback.h>
 #include <nx/client/desktop/ui/common/selectable_text_button.h>
+#include <nx/client/desktop/ui/common/color_theme.h>
 
 namespace {
 
-QPalette transparentBrushPalette(QPalette palette)
+QPalette modifiedPalette(QPalette palette, const QColor& backgroundColor = Qt::transparent)
 {
-    palette.setBrush(QPalette::Base, QBrush(Qt::transparent));
+    palette.setBrush(QPalette::Base, QBrush(backgroundColor));
+    palette.setBrush(QPalette::Shadow, QBrush(backgroundColor));
     return palette;
 }
 
@@ -38,30 +43,25 @@ namespace desktop {
 
 SearchEdit::SearchEdit(QWidget* parent):
     base_type(parent),
-    m_lineEdit(new QLineEdit()),
+    m_lineEditHolder(new QWidget(this)),
+    m_lineEdit(new QLineEdit(this)),
+    m_menuButton(new QPushButton(this)),
     m_menu(new QMenu(this)),
     m_tagButton(new ui::SelectableTextButton(this))
 {
     setFocusPolicy(m_lineEdit->focusPolicy());
     setSizePolicy(m_lineEdit->sizePolicy());
     setBackgroundRole(m_lineEdit->backgroundRole());
-    setPalette(m_lineEdit->palette());
 
     setMouseTracking(true);
     setAcceptDrops(true);
     setAttribute(Qt::WA_InputMethodEnabled);
-    setAttribute(Qt::WA_MacShowFocusRect);
-
-    const auto menuAction = new QAction(qnSkin->icon("theme/search_drop.png"), QString(), this);
-    menuAction->setMenu(m_menu);
 
     m_lineEdit->setFrame(false);
     m_lineEdit->setFocusProxy(this);
     m_lineEdit->setFixedHeight(32);
     m_lineEdit->setAttribute(Qt::WA_MacShowFocusRect, false);
-    m_lineEdit->setPalette(transparentBrushPalette(m_lineEdit->palette()));
     m_lineEdit->setClearButtonEnabled(true);
-    m_lineEdit->addAction(menuAction, QLineEdit::LeadingPosition);
 
     connect(m_lineEdit, &QLineEdit::returnPressed, this, &SearchEdit::editingFinished);
     connect(m_lineEdit, &QLineEdit::editingFinished, this, &SearchEdit::editingFinished);
@@ -74,9 +74,8 @@ SearchEdit::SearchEdit(QWidget* parent):
 
     const auto holderLayout = new QVBoxLayout(this);
     holderLayout->setSpacing(0);
-
-    addLineTo(holderLayout);
     holderLayout->addLayout(marginsLayout);
+    addLineTo(holderLayout);
 
     const auto tagHolderWidget = new QWidget(this);
     tagHolderWidget->setFixedHeight(40);
@@ -89,19 +88,55 @@ SearchEdit::SearchEdit(QWidget* parent):
     connect(m_tagButton, &ui::SelectableTextButton::stateChanged,
         this, &SearchEdit::handleTagButtonStateChanged);
     connect(this, &SearchEdit::selectedTagIndexChanged, this, &SearchEdit::updateTagButton);
-    updateTagButton();
+
+
+    const auto searchLineLayout = new QHBoxLayout(this);
+    searchLineLayout->setSpacing(0);
+    searchLineLayout->addWidget(m_menuButton);
+    searchLineLayout->addWidget(m_lineEdit);
+
+    m_lineEditHolder->setLayout(searchLineLayout);
+    m_lineEditHolder->setAutoFillBackground(true);
 
     const auto layout = new QVBoxLayout(this);
     layout->setSpacing(0);
-    layout->addWidget(m_lineEdit);
-    layout->addWidget(tagHolderWidget);
-
+    layout->addWidget(m_lineEditHolder);
     addLineTo(layout);
+    layout->addWidget(tagHolderWidget);
     setLayout(layout);
+
+    setupMenuButton();
+    updateTagButton();
+    updatePalette();
 }
 
 SearchEdit::~SearchEdit()
 {
+}
+
+void SearchEdit::setupMenuButton()
+{
+    m_menuButton->setFlat(true);
+    m_menuButton->setFixedSize(40, 32);
+    m_menuButton->setFocusPolicy(Qt::NoFocus);
+    m_menuButton->setIcon(qnSkin->icon("theme/search_drop.png"));
+
+    connect(m_menuButton, &QPushButton::clicked, this,
+        [this]()
+        {
+            const auto buttonGeometry = m_menuButton->geometry();
+            const auto bottomPoint = QPoint(0, buttonGeometry.height());
+            const auto globalPoint = m_menuButton->mapToGlobal(bottomPoint);
+            QnHiDpiWorkarounds::showMenu(m_menu, globalPoint);
+        });
+
+    connect(m_lineEdit, &QLineEdit::textChanged, this,
+        [this]()
+        {
+            m_menuButton->setIcon(m_lineEdit->text().isEmpty()
+                ? qnSkin->icon("theme/search_drop.png")
+                : qnSkin->icon("theme/search_drop_selected.png"));
+        });
 }
 
 QString SearchEdit::text() const
@@ -171,6 +206,17 @@ int SearchEdit::selectedTagIndex() const
     return m_selectedTagIndex;
 }
 
+void SearchEdit::updatePalette()
+{
+    const auto backgroundColor = hasFocus()
+        ? ColorTheme::instance()->color(lit("dark2"))
+        : QColor(Qt::transparent);
+
+    const auto controlPalette = modifiedPalette(m_lineEdit->palette(), backgroundColor);
+    m_lineEditHolder->setPalette(controlPalette);
+    m_lineEdit->setPalette(controlPalette);
+}
+
 void SearchEdit::setSelectedTagIndex(int value)
 {
     if (value == m_clearingTagIndex)
@@ -213,7 +259,9 @@ QSize SearchEdit::sizeHint() const
         ? QSize()
         : QSize(0, m_tagButton->parentWidget()->sizeHint().height());
 
-    return m_lineEdit->sizeHint() + tagVerticalSize;
+    const auto menuButtonHorizontalSize = QSize(m_menuButton->sizeHint().width(), 0);
+    const auto result = m_lineEdit->sizeHint() + menuButtonHorizontalSize + tagVerticalSize;
+    return result;
 }
 
 QVariant SearchEdit::inputMethodQuery(Qt::InputMethodQuery property) const
@@ -231,7 +279,10 @@ void SearchEdit::focusInEvent(QFocusEvent* event)
 {
     m_lineEdit->event(event);
     m_lineEdit->selectAll();
+
     base_type::focusInEvent(event);
+
+    updatePalette();
 }
 
 void SearchEdit::focusOutEvent(QFocusEvent* event)
@@ -246,6 +297,8 @@ void SearchEdit::focusOutEvent(QFocusEvent* event)
     }
 
     base_type::focusOutEvent(event);
+
+    updatePalette();
 }
 
 void SearchEdit::keyPressEvent(QKeyEvent* event)

@@ -69,16 +69,23 @@ protected:
     bool event(QEvent* event) override;
 
 private:
+    void setupMenuButton();
+
+    void updatePalette();
     void setSelectedTagIndex(int value);
     void handleTagButtonStateChanged();
     void updateTagButton();
+
 private:
     QStringList m_tags;
 
+    QWidget* const m_lineEditHolder;
     QLineEdit* const m_lineEdit = nullptr;
+    QPushButton* const m_menuButton = nullptr;
     QMenu* const m_menu = nullptr;
     ui::SelectableTextButton* const m_tagButton = nullptr;
 
+    bool m_hightlighted = false;
     int m_selectedTagIndex = -1;
     int m_clearingTagIndex = -1;
 };

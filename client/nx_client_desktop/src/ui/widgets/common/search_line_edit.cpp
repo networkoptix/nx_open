@@ -36,7 +36,6 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     QPalette p = m_lineEdit->palette();
     setPalette(p);
 
-
     // line edit
     m_lineEdit->setFrame(false);
     m_lineEdit->setFocusProxy(this);

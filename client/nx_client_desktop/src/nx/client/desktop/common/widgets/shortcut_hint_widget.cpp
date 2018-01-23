@@ -2,9 +2,11 @@
 
 #include <QtGui/QFont>
 
-#include <ui/style/nx_style.h>
+#include <nx/client/desktop/ui/common/color_theme.h>
 
 namespace {
+
+using namespace nx::client::desktop;
 
 QString makeLeftFloat(const QString& text)
 {
@@ -23,8 +25,8 @@ QString keyToString(int key)
 
 QString getHintItemText(const nx::client::desktop::ShortcutHintWidget::Description& description)
 {
-    static const auto kBorderColor = QColor(
-        qnNxStyle->mainColor(QnNxStyle::Colors::kBase).lighter(1)).name(QColor::HexArgb);
+    static const auto kBorderColor = ColorTheme::instance()->color(lit("dark8"))
+        .name(QColor::HexArgb);
 
     static const auto kHtmlBorder = lit(
         "<table cellspacing=-1 cellpadding=2 border=1"
@@ -67,9 +69,8 @@ ShortcutHintWidget::ShortcutHintWidget(QWidget* parent):
 
 void ShortcutHintWidget::setDescriptions(const DescriptionList& descriptions)
 {
-    static const auto kTextColor = QColor(
-        qnNxStyle->mainColor(QnNxStyle::Colors::kBase).lighter(4)).name(QColor::HexArgb);
-
+    static const auto kTextColor = ColorTheme::instance()->color(lit("dark11"))
+        .name(QColor::HexArgb);
     static const auto kHtmlTemplate =
         lit("<html><body><center>"
             "   <font color=%1>%2</font>"
