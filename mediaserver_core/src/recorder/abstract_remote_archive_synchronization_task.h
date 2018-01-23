@@ -4,6 +4,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/mediaserver/server_module_aware.h>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace mediaserver_core {
