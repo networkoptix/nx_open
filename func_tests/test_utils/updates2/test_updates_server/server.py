@@ -38,7 +38,6 @@ DATA_DIR = Path(__file__).parent / 'data'
 DUMMY_FILE_NAME = 'dummy.raw'
 DUMMY_FILE_PATH = DATA_DIR / DUMMY_FILE_NAME
 UPDATES_FILE_NAME = 'updates.json'
-FILE_PATTERN = '{}.{}.json'
 
 
 def collect_actual_data():
@@ -122,8 +121,8 @@ def save_data_to_files(root_obj, path_to_update_obj):
     file_path = DATA_DIR / UPDATES_FILE_NAME
     file_path.write_bytes(json.dumps(root_obj))
     for key, value in path_to_update_obj.items():
-        key_splits = key.split('/')
-        file_path = DATA_DIR / FILE_PATTERN.format(key_splits[1], key_splits[2])
+        file_path = DATA_DIR / key.lstrip('/')
+        file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.write_bytes(json.dumps(value, indent=2))
 
 
@@ -131,13 +130,13 @@ def load_data_from_files():
     if not DATA_DIR.exists():
         raise Exception('Generated data directory has not been found')
     root_obj, path_to_update = None, {}
-    for file_path in DATA_DIR.glob('**/*.json'):
-        json_obj = json.loads(file_path.read_bytes())
+    for abs_file_path in DATA_DIR.glob('**/*.json'):
+        json_obj = json.loads(abs_file_path.read_bytes())
+        file_path = abs_file_path.relative_to(DATA_DIR)
         if file_path.name == UPDATES_FILE_NAME:
             root_obj = json_obj
         else:
-            file_name_splits = file_path.name.split('.')
-            update_path = UPDATE_PATH_PATTERN.format(file_name_splits[0], file_name_splits[1])
+            update_path = UPDATE_PATH_PATTERN.format(file_path.parts[0], file_path.parts[1])
             path_to_update[update_path] = json_obj
     if root_obj is None or not path_to_update:
         raise Exception('Invalid generated data')
