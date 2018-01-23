@@ -48,7 +48,7 @@ private:
         qint64 updateTime = 0;
     };
 
-    std::atomic<bool> m_terminated = false;
+    std::atomic<bool> m_terminated{false};
 
     mutable QnMutex m_mutex;
     QHash<QnUuid, TaskInfo> m_taskInfoById;
