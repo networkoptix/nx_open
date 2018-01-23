@@ -105,11 +105,9 @@ QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::getParameters() c
 
 bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStreamParams& value)
 {
-    {
-        QnMutexLocker lock(&m_mutex);
-        if (m_parameters == value)
-            return true;
-    }
+    QnMutexLocker lock(&m_mutex);
+    if (m_parameters == value)
+        return true;
 
     if (value == m_defaults)
     {
@@ -123,25 +121,7 @@ bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStrea
             return false;
     }
 
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_parameters = value;
-    }
-
-    if (qnCameraPool)
-    {
-        if (const auto camera = qnCameraPool->getVideoCamera(toSharedPointer(m_camera)))
-        {
-            const auto stream =
-                (m_streamIndex == Qn::StreamIndex::primary)
-                    ? camera->getPrimaryReader()
-                    : camera->getSecondaryReader();
-
-            if (stream && stream->isRunning())
-                stream->pleaseReopenStream();
-        }
-    }
-
+    m_parameters = value;
     return true;
 }
 
