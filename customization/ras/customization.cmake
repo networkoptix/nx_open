@@ -65,7 +65,6 @@ set(freeLicenseKey "0000-0000-0000-0027")
 # Installer Customizations
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation en_US)
