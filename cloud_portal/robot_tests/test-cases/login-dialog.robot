@@ -48,13 +48,13 @@ redirects to systems after log In
     Should Be True    '${current page}' == '${url}/systems'
     Close Browser
 
-redirects to systems after log In, (EXPECTED FAILURE)
-    Open Browser and go to URL    ${url}
-    Log In    ${email}    ${password}
-    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    ${current page}    Get Location
-    Should Be True    '${current page}' == '${url}/system'
-    Close Browser
+#redirects to systems after log In, (EXPECTED FAILURE)
+#    Open Browser and go to URL    ${url}
+#    Log In    ${email}    ${password}
+#    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
+#    ${current page}    Get Location
+#    Should Be True    '${current page}' == '${url}/system'
+#    Close Browser
 
 after log In, display user's email and menu in top right corner
     Open Browser and go to URL    ${url}
@@ -99,14 +99,14 @@ rejects log in without both email and password
     Should Contain    ${class}    has-error
     Close Browser
 
-rejects log in without both email and password, (EXPECTED FAILURE)
-    Open Browser and go to URL    ${url}
-    Log In    ${EMPTY}    ${EMPTY}
-    ${class}    Get Element Attribute    ${PASSWORD INPUT}/..    class
-    Should Contain    ${class}    has-eror
-    ${class}    Get Element Attribute    ${EMAIL INPUT}/..    class
-    Should Contain    ${class}    has-error
-    Close Browser
+#rejects log in without both email and password, (EXPECTED FAILURE)
+#    Open Browser and go to URL    ${url}
+#    Log In    ${EMPTY}    ${EMPTY}
+#    ${class}    Get Element Attribute    ${PASSWORD INPUT}/..    class
+#    Should Contain    ${class}    has-eror
+#    ${class}    Get Element Attribute    ${EMAIL INPUT}/..    class
+#    Should Contain    ${class}    has-error
+#    Close Browser
 
 rejects log in with email in non-email format but with password
     Open Browser and go to URL    ${url}
