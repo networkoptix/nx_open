@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-include(cmake/utils.cmake)
+include(cmake/option.cmake)
 
 set(customization "default" CACHE STRING "Product customization")
 nx_option(beta "Is this build is beta build" ON)
@@ -55,6 +55,7 @@ include(CMakeParseArguments)
 include(CMakeDependentOption)
 include(ExternalProject)
 include(target_detection)
+include(utils)
 include(find_sources)
 include(moc_utils)
 include(qrc_utils)
