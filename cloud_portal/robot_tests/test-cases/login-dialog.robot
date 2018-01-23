@@ -6,6 +6,7 @@ Suite Teardown    Close All Browsers
 *** Variables ***
 ${email}    ${EMAIL OWNER}
 ${email upppercase}    NOPTIXQA+OWNER@GMAIL.COM
+${email invalid}    aodehurgjaegir
 ${password}    ${BASE PASSWORD}
 ${url}         ${CLOUD TEST}
 
@@ -65,7 +66,7 @@ after log In, display user's email and menu in top right corner
 
 valid but unregistered email shows error message
     Open Browser and go to URL    ${url}
-    Log In    ${GOOD EMAIL UNREGISTERED}    ${password}
+    Log In    ${UNREGISTERED EMAIL}    ${password}
     wait until element is visible    ${ALERT}
     Element Should Be Visible    ${ALERT}
     Close Browser
@@ -110,7 +111,7 @@ rejects log in without both email and password
 
 rejects log in with email in non-email format but with password
     Open Browser and go to URL    ${url}
-    Log In    ${INVALID}    ${password}
+    Log In    ${email invalid}    ${password}
     ${class}    Get Element Attribute    ${EMAIL INPUT}/..    class
     Should Contain    ${class}    has-error
     Close Browser
@@ -127,6 +128,7 @@ shows red outline if field is wrong/empty after blur
     Should Contain    ${class}    has-error
     Click Element    ${REMEMBER ME CHECKBOX}
     ${class}    Get Element Attribute    ${PASSWORD INPUT}/..    class
+    Wait Until Element Contains    ${PASSWORD INPUT}    has-error
     Should Contain    ${class}    has-error
     Close Browser
 
@@ -162,7 +164,7 @@ passes email from email input to Restore password page, even without clicking 'L
     Wait Until Element Is Visible    ${EMAIL INPUT}
     Input Text    ${EMAIL INPUT}    ${email}
     Wait Until Element Is Visible    ${FORGOT PASSWORD}
-    Click Element    ${FORGOT PASSWORD}
+    Click Link    ${FORGOT PASSWORD}
     Wait Until Element Is Visible    ${RESET PASSWORD EMAIL INPUT}
     Textfield Should Contain    ${RESET PASSWORD EMAIL INPUT}    ${email}
     Close Browser
@@ -171,9 +173,9 @@ redirects to /activate and shows non-activated user message when not activated; 
     Open Browser and go to URL    ${url}/register
 # Created this keyword myself in python.  It's located in browsermanagement.py line 255
     ${random email}    get random email
-    Register    'mark'    'hamill'    ${random email}    ${GOOD PASSWORD}
+    Register    'mark'    'hamill'    ${random email}    ${BASE PASSWORD}
     Wait Until Element Is Visible    //h1[contains(@class,'process-success')]
-    Log In    ${random email}    ${GOOD PASSWORD}
+    Log In    ${random email}    ${BASE PASSWORD}
     Wait Until Element Is Visible    ${RESEND ACTIVATION LINK BUTTON}
     ${current page}    Get Location
     Should Be True    '${current page}' == '${url}/activate'

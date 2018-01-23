@@ -72,6 +72,7 @@ ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfg
 
 ${EMAIL VIEWER}                       noptixqa+viewer@gmail.com
 ${EMAIL OWNER}                        noptixqa+owner@gmail.com
+${UNREGISTERED EMAIL}                 noptixqa+unregistered@gmail.com
 ${BASE PASSWORD}                      qweasd123
 
 ${AUTO TESTS}                         //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..
