@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <oem name="CPRO_Edge">
+		<resource name = "CPRO" public="CPRO_Edge Camera">
+			<params>
+				<param name="supportedMotion" default_value="softwaregrid"/>
+				<param name="ptzCapabilities" default_value="0"/>
+			</params>
+		</resource>
+    </oem>
+</resources>
