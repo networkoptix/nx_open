@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>477</width>
-    <height>205</height>
+    <width>472</width>
+    <height>236</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -68,9 +68,59 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout">
+        <property name="horizontalSpacing">
+         <number>8</number>
+        </property>
         <property name="verticalSpacing">
          <number>4</number>
         </property>
+        <item row="4" column="0" colspan="2">
+         <widget class="QLabel" name="footerLabel">
+          <property name="text">
+           <string notr="true">&lt;Extra description&gt;</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+          <property name="openExternalLinks">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QWidget" name="actionHolder" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>2</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="nx::client::desktop::ActionPushButton" name="actionButton">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string notr="true">&lt;Action&gt;</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="nameLabel">
           <property name="sizePolicy">
@@ -116,19 +166,6 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
-         <widget class="nx::client::desktop::ActionPushButton" name="actionButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string notr="true">&lt;Action&gt;</string>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="0" colspan="2">
          <widget class="QnResourcePreviewWidget" name="previewWidget" native="true">
           <property name="sizePolicy">
@@ -141,6 +178,12 @@
            <size>
             <width>20</width>
             <height>20</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>104</height>
            </size>
           </property>
          </widget>

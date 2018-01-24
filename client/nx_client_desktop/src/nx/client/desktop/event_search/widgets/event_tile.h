@@ -60,6 +60,9 @@ public:
     QString description() const;
     void setDescription(const QString& value);
 
+    QString footerText() const;
+    void setFooterText(const QString& value);
+
     QString timestamp() const;
     void setTimestamp(const QString& value);
 

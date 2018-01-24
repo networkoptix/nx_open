@@ -26,10 +26,12 @@ static constexpr auto kRoundingRadius = 2;
 static constexpr int kTitleFontPixelSize = 13;
 static constexpr int kTimestampFontPixelSize = 11;
 static constexpr int kDescriptionFontPixelSize = 11;
+static constexpr int kFooterFontPixelSize = 11;
 
 static constexpr int kTitleFontWeight = QFont::Medium;
 static constexpr int kTimestampFontWeight = QFont::Normal;
 static constexpr int kDescriptionFontWeight = QFont::Normal;
+static constexpr int kFooterFontWeight = QFont::Normal;
 
 static constexpr int kProgressBarResolution = 1000;
 
@@ -59,12 +61,15 @@ EventTile::EventTile(QWidget* parent):
     ui->descriptionLabel->setHidden(true);
     ui->timestampLabel->setHidden(true);
     ui->previewWidget->setHidden(true);
+    ui->actionHolder->setHidden(true);
+    ui->footerLabel->setHidden(true);
 
     ui->previewWidget->setCropMode(QnResourcePreviewWidget::CropMode::notHovered);
 
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
     ui->descriptionLabel->setForegroundRole(QPalette::Light);
+    ui->footerLabel->setForegroundRole(QPalette::Light);
 
     QFont font;
     font.setWeight(kTitleFontWeight);
@@ -83,6 +88,12 @@ EventTile::EventTile(QWidget* parent):
     ui->descriptionLabel->setFont(font);
     ui->descriptionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->descriptionLabel->setOpenExternalLinks(false);
+
+    font.setWeight(kFooterFontWeight);
+    font.setPixelSize(kFooterFontPixelSize);
+    ui->footerLabel->setFont(font);
+    ui->footerLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
+    ui->footerLabel->setOpenExternalLinks(false);
 
     ui->busyIndicator->setContentsMargins(
         style::Metrics::kStandardPadding,
@@ -120,6 +131,7 @@ EventTile::EventTile(QWidget* parent):
 
     connect(ui->nameLabel, &QLabel::linkActivated, this, activateLink);
     connect(ui->descriptionLabel, &QLabel::linkActivated, this, activateLink);
+    connect(ui->footerLabel, &QLabel::linkActivated, this, activateLink);
 }
 
 EventTile::EventTile(
@@ -189,6 +201,17 @@ void EventTile::setDescription(const QString& value)
     ui->descriptionLabel->setHidden(value.isEmpty());
 }
 
+QString EventTile::footerText() const
+{
+    return ui->footerLabel->text();
+}
+
+void EventTile::setFooterText(const QString& value)
+{
+    ui->footerLabel->setText(value);
+    ui->footerLabel->setHidden(value.isEmpty());
+}
+
 QString EventTile::timestamp() const
 {
     return ui->timestampLabel->text();
@@ -248,6 +271,7 @@ void EventTile::setAction(const CommandActionPtr& value)
 {
     m_action = value;
     ui->actionButton->setAction(m_action.data());
+    ui->actionHolder->setHidden(m_action.isNull());
 }
 
 void EventTile::paintEvent(QPaintEvent* /*event*/)
