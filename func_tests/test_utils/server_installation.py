@@ -1,9 +1,19 @@
 """Manipulate directory to which server instance is installed."""
 
-import ConfigParser
-import StringIO
 import logging
 import os.path
+import sys
+
+if sys.version_info[:2] == (2, 7):
+    # noinspection PyCompatibility,PyUnresolvedReferences
+    from ConfigParser import SafeConfigParser
+    # noinspection PyCompatibility,PyUnresolvedReferences
+    from cStringIO import StringIO as BytesIO
+elif sys.version_info[:2] in {(3, 5), (3, 6)}:
+    # noinspection PyCompatibility,PyUnresolvedReferences
+    from configparser import SafeConfigParser
+    # noinspection PyCompatibility,PyUnresolvedReferences
+    from io import BytesIO
 
 log = logging.getLogger(__name__)
 
@@ -55,12 +65,12 @@ class ServerInstallation(object):
 
     @staticmethod
     def _modify_config(old_config, **kw):
-        config = ConfigParser.SafeConfigParser()
+        config = SafeConfigParser()
         config.optionxform = str  # make it case-sensitive, server treats it this way (yes, this is a bug)
-        config.readfp(StringIO.StringIO(old_config))
+        config.readfp(BytesIO(old_config))
         for name, value in kw.items():
-            config.set('General', name, unicode(value))
-        f = StringIO.StringIO()
+            config.set('General', name, value)
+        f = BytesIO()
         config.write(f)
         return f.getvalue()
 
