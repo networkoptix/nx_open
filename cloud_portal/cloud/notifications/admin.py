@@ -1,6 +1,4 @@
 from django.contrib import admin
-from django.urls import reverse
-from django.utils.html import format_html
 
 # Register your models here.
 
@@ -30,8 +28,7 @@ admin.site.register(Event, EventAdmin)
 
 
 class CloudNotificationAdmin(admin.ModelAdmin):
-    list_display = ('context_actions', 'id', 'sent_by', 'sent_date', 'subject', 'body')
-    list_display_links = ('id')
+    list_display = ('subject', 'body', 'sent_by', 'sent_date')
     change_form_template = 'notifications/cloud_notifications_change_form.html'
     readonly_fields = ('sent_by', 'sent_date')
     fieldsets = [
@@ -41,14 +38,6 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         }),
         ("When and who sent the notification", {'fields': (('sent_by', 'sent_date'))})
     ]
-
-    def context_actions(self, obj):
-        return format_html('<a class="button" href="{}">Open Notification</a>',
-                           reverse('admin:notifications_cloudnotification_change', args=[obj.id]))
-
-    context_actions.short_description = 'Edit cloud notification'
-    context_actions.allow_tags = True
-
 
     def has_delete_permission(self, request, obj=None):
         if not obj:
