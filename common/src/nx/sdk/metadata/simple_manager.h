@@ -16,13 +16,6 @@ namespace metadata {
  */
 class SimpleManager: public nxpt::CommonRefCounter<AbstractConsumingMetadataManager>
 {
-public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
-
-    virtual Error setHandler(AbstractMetadataHandler* handler) override;
-
-    virtual Error putData(AbstractDataPacket* dataPacket) override;
-
 protected:
     /**
      * Accept next video frame for processing.
@@ -35,6 +28,7 @@ protected:
     virtual bool pullMetadataPackets(std::vector<AbstractMetadataPacket*>* metadataPackets) = 0;
 
     /**
+     * Provides access to the Manager settings stored by the server for a particular Resource.
      * @return Param value, or an empty string if such param does not exist, having logged the
      * error.
      */
@@ -42,6 +36,16 @@ protected:
 
 protected:
     mutable std::mutex mutex;
+
+//-------------------------------------------------------------------------------------------------
+// Not intended to be used by a descendant.
+
+public:
+    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
+
+    virtual Error setHandler(AbstractMetadataHandler* handler) override;
+
+    virtual Error putData(AbstractDataPacket* dataPacket) override;
 
 private:
     AbstractMetadataHandler* m_handler = nullptr;

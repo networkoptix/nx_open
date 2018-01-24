@@ -14,6 +14,11 @@ SimplePlugin::SimplePlugin(const char* name):
     NX_PRINT << "Created \"" << m_name << "\"";
 }
 
+std::string SimplePlugin::getParamValue(const char* paramName)
+{
+    return m_settings[paramName];
+}
+
 SimplePlugin::~SimplePlugin()
 {
     NX_PRINT << "Destroyed \"" << m_name << "\"";
@@ -58,9 +63,10 @@ const char* SimplePlugin::name() const
     return m_name;
 }
 
-void SimplePlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+void SimplePlugin::setSettings(const nxpl::Setting* settings, int count)
 {
-    // Do nothing.
+    for (int i = 0; i < count; ++i)
+        m_settings[settings[i].name] = settings[i].value;
 }
 
 void SimplePlugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)

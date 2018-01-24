@@ -82,6 +82,7 @@ Error SimpleManager::putData(AbstractDataPacket* dataPacket)
 //-------------------------------------------------------------------------------------------------
 // Tools for the derived class.
 
+// TODO: #mike: Make a template with param type.
 std::string SimpleManager::getParamValue(const char* paramName)
 {
     if (!m_handler)
@@ -102,6 +103,7 @@ std::string SimpleManager::getParamValue(const char* paramName)
 
         case NX_MORE_DATA:
         {
+            value.resize(size);
             auto r =  m_handler->getParamValue(paramName, &value[0], &size);
             if (r != NX_NO_ERROR)
             {
