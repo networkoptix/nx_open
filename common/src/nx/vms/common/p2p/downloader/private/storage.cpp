@@ -388,9 +388,16 @@ ResultCode Storage::writeFileChunk(
 
 ResultCode Storage::deleteFile(const QString& fileName, bool deleteData)
 {
-    QnMutexLocker lock(&m_mutex);
+    {
+        QnMutexLocker lock(&m_mutex);
 
-    return deleteFileInternal(fileName, deleteData);
+        const auto resultCode = deleteFileInternal(fileName, deleteData);
+        if (resultCode != ResultCode::ok)
+            return resultCode;
+    }
+
+    emit fileDeleted(fileName);
+    return ResultCode::ok;
 }
 
 ResultCode Storage::deleteFileInternal(const QString& fileName, bool deleteData)
@@ -414,7 +421,6 @@ ResultCode Storage::deleteFileInternal(const QString& fileName, bool deleteData)
             return ResultCode::ioError;
     }
 
-
     QDir dir = QFileInfo(path).absoluteDir();
     while (dir != m_downloadsDirectory)
     {
@@ -431,10 +437,6 @@ ResultCode Storage::deleteFileInternal(const QString& fileName, bool deleteData)
     }
 
     m_fileInformationByName.erase(it);
-
-    lock.unlock();
-
-    emit fileDeleted(fileName);
 
     return ResultCode::ok;
 }
@@ -513,8 +515,17 @@ void Storage::cleanupExpiredFiles()
             expiredFiles.insert(data.name);
     }
 
+    QSet<QString> successfullyDeletedFiles;
     for (const QString& name: expiredFiles)
-        deleteFileInternal(name, /*deleteData*/ true);
+    {
+        if (deleteFileInternal(name, /*deleteData*/ true) == ResultCode::ok)
+            successfullyDeletedFiles.insert(name);
+    }
+
+    lock.unlock();
+
+    for (const auto& fileName: successfullyDeletedFiles)
+        emit fileDeleted(fileName);
 }
 
 void Storage::findDownloads()
