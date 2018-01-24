@@ -146,6 +146,9 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         case Qn::DescriptionTextRole:
             return description(object);
 
+        case Qn::AdditionalTextRole:
+            return attributes(object);
+
         case Qn::TimestampRole:
         case Qn::PreviewTimeRole:
             return startTimeMs(object);
@@ -567,15 +570,19 @@ QString AnalyticsSearchListModel::Private::description(
     //   Or we need to add some "lastAppearanceDurationUsec"?
     const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
 
-    result = lit("%1: %2<br>%3: %4")
+    return lit("%1: %2<br>%3: %4")
         .arg(tr("Start"))
         .arg(start.toString(Qt::RFC2822Date))
         .arg(tr("Duration"))
         .arg(core::HumanReadable::timeSpan(std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::microseconds(durationUs))));
+}
 
+QString AnalyticsSearchListModel::Private::attributes(
+    const DetectedObject& object) const
+{
     if (object.attributes.empty())
-        return result;
+        return QString();
 
     static const auto kCss = QString::fromLatin1(R"(
             <style type = 'text/css'>
@@ -592,9 +599,7 @@ QString AnalyticsSearchListModel::Private::description(
         rows += kRowTemplate.arg(attribute.name, attribute.value);
 
     const auto color = QPalette().color(QPalette::WindowText);
-    result += lit("<br>") + kCss.arg(color.name()) + kTableTemplate.arg(rows);
-
-    return result;
+    return kCss.arg(color.name()) + kTableTemplate.arg(rows);
 }
 
 qint64 AnalyticsSearchListModel::Private::startTimeMs(

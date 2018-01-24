@@ -218,6 +218,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     tile->setIcon(index.data(Qt::DecorationRole).value<QPixmap>());
     tile->setTimestamp(index.data(Qn::TimestampTextRole).toString());
     tile->setDescription(index.data(Qn::DescriptionTextRole).toString());
+    tile->setFooterText(index.data(Qn::AdditionalTextRole).toString());
     tile->setToolTip(index.data(Qt::ToolTipRole).toString());
     tile->setCloseable(index.data(Qn::RemovableRole).toBool());
     tile->setAutoCloseTimeMs(index.data(Qn::TimeoutRole).toInt());
