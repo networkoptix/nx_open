@@ -150,6 +150,13 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         case Qn::PreviewTimeRole:
             return startTimeMs(object);
 
+        case Qn::DurationRole:
+        {
+            using namespace std::chrono;
+            const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
+            return QVariant::fromValue(duration_cast<milliseconds>(microseconds(durationUs)).count());
+        }
+
         case Qn::HelpTopicIdRole:
             return Qn::Empty_Help;
 

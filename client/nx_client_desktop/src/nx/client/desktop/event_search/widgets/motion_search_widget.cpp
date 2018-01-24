@@ -38,11 +38,13 @@ protected:
         if (!m_selectedTimePeriod.isValid() || sourceParent.isValid() || !sourceModel())
             return false;
 
-        const auto timestampMs = sourceModel()->data(
-            sourceModel()->index(sourceRow, 0, QModelIndex()), Qn::TimestampRole)
-                .value<qint64>();
+        const auto index = sourceModel()->index(sourceRow, 0, QModelIndex());
 
-        return timestampMs > 0 && m_selectedTimePeriod.contains(timestampMs);
+        const auto timestampMs = sourceModel()->data(index, Qn::TimestampRole).value<qint64>();
+        const auto durationMs = sourceModel()->data(index, Qn::DurationRole).value<qint64>();
+
+        const QnTimePeriod period(timestampMs, durationMs);
+        return timestampMs > 0 && m_selectedTimePeriod.intersects(period);
     }
 
 private:
