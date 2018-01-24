@@ -228,11 +228,11 @@ std::vector<std::unique_ptr<MediaServerEmulator>>
     return systemServers;
 }
 
-std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
+std::tuple<nx::network::http::StatusCode::Value, api::ListeningPeers>
     MediatorFunctionalTest::getListeningPeers() const
 {
     api::Client mediatorClient(
-        nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+        nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
             .setEndpoint(httpEndpoint()).toUrl());
     return mediatorClient.getListeningPeers();
 }

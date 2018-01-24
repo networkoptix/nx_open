@@ -10,28 +10,28 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-Client::Client(const QUrl& baseMediatorApiUrl):
+Client::Client(const nx::utils::Url& baseMediatorApiUrl):
     m_baseMediatorApiUrl(baseMediatorApiUrl)
 {
 }
 
-std::tuple<nx_http::StatusCode::Value, ListeningPeers> Client::getListeningPeers() const
+std::tuple<nx::network::http::StatusCode::Value, ListeningPeers> Client::getListeningPeers() const
 {
     auto requestUrl = nx::network::url::Builder(m_baseMediatorApiUrl)
         .appendPath(kStatisticsListeningPeersPath).toUrl();
 
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     if (!httpClient.doGet(requestUrl))
     {
         return std::make_tuple(
-            nx_http::StatusCode::serviceUnavailable,
+            nx::network::http::StatusCode::serviceUnavailable,
             ListeningPeers());
     }
 
-    if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
         return std::make_tuple(
-            static_cast<nx_http::StatusCode::Value>(
+            static_cast<nx::network::http::StatusCode::Value>(
                 httpClient.response()->statusLine.statusCode),
             ListeningPeers());
     }
@@ -41,7 +41,7 @@ std::tuple<nx_http::StatusCode::Value, ListeningPeers> Client::getListeningPeers
         responseBody += httpClient.fetchMessageBodyBuffer();
 
     return std::make_tuple(
-        nx_http::StatusCode::ok,
+        nx::network::http::StatusCode::ok,
         QJson::deserialized<api::ListeningPeers>(responseBody));
 }
 

@@ -3,6 +3,7 @@
 #include <QtCore/QUrl>
 
 #include <nx/network/http/http_async_client.h>
+#include <nx/utils/url.h>
 
 #include "listening_peer.h"
 
@@ -14,12 +15,12 @@ namespace api {
 class NX_NETWORK_API Client
 {
 public:
-    Client(const QUrl& baseMediatorApiUrl);
+    Client(const nx::utils::Url& baseMediatorApiUrl);
 
-    std::tuple<nx_http::StatusCode::Value, ListeningPeers> getListeningPeers() const;
+    std::tuple<nx::network::http::StatusCode::Value, ListeningPeers> getListeningPeers() const;
 
 private:
-    const QUrl m_baseMediatorApiUrl;
+    const nx::utils::Url m_baseMediatorApiUrl;
 };
 
 } // namespace api

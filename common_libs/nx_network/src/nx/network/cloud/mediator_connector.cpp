@@ -183,7 +183,10 @@ void MediatorConnector::fetchEndpoint()
     }
 
     m_mediatorUrlFetcher->get(
-        [this](nx::network::http::StatusCode::Value status, nx::utils::Url tcpUrl, nx::utils::Url udpUrl)
+        [this](
+            nx::network::http::StatusCode::Value status,
+            nx::utils::Url tcpUrl,
+            nx::utils::Url udpUrl)
         {
             if (status != nx::network::http::StatusCode::ok)
             {

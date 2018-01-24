@@ -31,7 +31,7 @@ public:
         m_factoryFuncToRestore =
             AbstractCloudDataProviderFactory::setFactoryFunc(
                 [this](
-                    const boost::optional<QUrl>& /*cdbUrl*/,
+                    const boost::optional<nx::utils::Url>& /*cdbUrl*/,
                     const std::string& /*user*/,
                     const std::string& /*password*/,
                     std::chrono::milliseconds /*updateInterval*/,
@@ -96,9 +96,6 @@ protected:
     void thenConnectionToMediatorIsReestablished()
     {
         waitForPeerToRegisterOnMediator();
-
-        while (!m_mediatorConnector->isConnected())
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
     void waitForPeerToRegisterOnMediator()
@@ -106,10 +103,10 @@ protected:
         for (;;)
         {
             Client mediatorClient(nx::network::url::Builder()
-                .setScheme(nx_http::kUrlSchemeName)
+                .setScheme(nx::network::http::kUrlSchemeName)
                 .setEndpoint(m_mediator->moduleInstance()->impl()->httpEndpoints().front()));
             const auto response = mediatorClient.getListeningPeers();
-            ASSERT_EQ(nx_http::StatusCode::ok, std::get<0>(response));
+            ASSERT_EQ(nx::network::http::StatusCode::ok, std::get<0>(response));
             const auto listeningPeers = std::get<1>(response);
             if (listeningPeers.systems.find(QString::fromUtf8(m_cloudSystemCredentials.systemId)) !=
                 listeningPeers.systems.end())
@@ -135,7 +132,7 @@ private:
     std::unique_ptr<api::MediatorConnector> m_mediatorConnector;
     SystemCredentials m_cloudSystemCredentials;
     LocalCloudDataProvider m_localCloudDataProvider;
-    TestHttpServer m_cloudModulesXmlProvider;
+    nx::network::http::TestHttpServer m_cloudModulesXmlProvider;
     std::unique_ptr<nx::network::cloud::CloudServerSocket> m_cloudServerSocket;
 
     virtual void SetUp() override
@@ -161,9 +158,9 @@ private:
         ASSERT_TRUE(m_cloudModulesXmlProvider.bindAndListen());
     }
 
-    std::unique_ptr<nx_http::AbstractMsgBodySource> generateCloudModuleXml()
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> generateCloudModuleXml()
     {
-        SocketAddress mediatorStunEndpoint;
+        nx::network::SocketAddress mediatorStunEndpoint;
         if (m_mediator)
         {
             mediatorStunEndpoint =
@@ -171,8 +168,8 @@ private:
         }
         else
         {
-            mediatorStunEndpoint = SocketAddress(
-                HostAddress::localhost,
+            mediatorStunEndpoint = nx::network::SocketAddress(
+                nx::network::HostAddress::localhost,
                 nx::utils::random::number<int>(30000, 40000));
         }
 
@@ -181,7 +178,7 @@ private:
             "<sequence>\r\n"
                 "<set resName=\"hpm\" resValue=\"stun://%1\"/>\r\n"
             "</sequence>\r\n").args(mediatorStunEndpoint).toUtf8();
-        return std::make_unique<nx_http::BufferSource>(
+        return std::make_unique<nx::network::http::BufferSource>(
             "text/xml",
             std::move(modulesXml));
     }
@@ -192,7 +189,7 @@ private:
 
         m_mediatorConnector = std::make_unique<api::MediatorConnector>();
         m_mediatorConnector->mockupCloudModulesXmlUrl(
-            nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
                 .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
                 .setPath(kCloudModulesXmlPath));
         m_mediatorConnector->setSystemCredentials(m_cloudSystemCredentials);
@@ -207,7 +204,7 @@ private:
 
     void onSocketAccepted(
         SystemError::ErrorCode /*systemErrorCode*/,
-        std::unique_ptr<AbstractStreamSocket> /*streamSocket*/)
+        std::unique_ptr<nx::network::AbstractStreamSocket> /*streamSocket*/)
     {
         // TODO
     }

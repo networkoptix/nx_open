@@ -67,7 +67,7 @@ protected:
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
         nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
-        data::ListeningPeers listeningPeers;
+        api::ListeningPeers listeningPeers;
 
         for (;;)
         {
