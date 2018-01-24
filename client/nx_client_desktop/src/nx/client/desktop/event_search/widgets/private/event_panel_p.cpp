@@ -32,6 +32,8 @@ namespace {
 
 static constexpr int kPermanentTabCount = 1;
 
+using ButtonState = ui::SelectableTextButton::State;
+
 } // namespace
 
 EventPanel::Private::Private(EventPanel* q):
@@ -121,8 +123,8 @@ void EventPanel::Private::setupEventSearch()
                 {
                     m_eventsTab->typeButton()->setText(title);
                     m_eventsTab->typeButton()->setState(type == vms::event::undefinedEvent
-                        ? ui::SelectableTextButton::State::deactivated
-                        : ui::SelectableTextButton::State::unselected);
+                        ? ButtonState::deactivated
+                        : ButtonState::unselected);
 
                     m_eventsModel->setSelectedEventType(type);
                     m_eventsTab->requestFetch();
@@ -139,9 +141,9 @@ void EventPanel::Private::setupEventSearch()
     }
 
     connect(m_eventsTab->typeButton(), &ui::SelectableTextButton::stateChanged, this,
-        [defaultAction](ui::SelectableTextButton::State state)
+        [defaultAction](ButtonState state)
         {
-            if (state == ui::SelectableTextButton::State::deactivated)
+            if (state == ButtonState::deactivated)
                 defaultAction->trigger();
         });
 
@@ -167,20 +169,20 @@ void EventPanel::Private::setupAnalyticsSearch()
     button->show();
 
     connect(button, &ui::SelectableTextButton::stateChanged, this,
-        [this, button](ui::SelectableTextButton::State state)
+        [this, button](ButtonState state)
         {
             if (!m_currentMediaWidget)
                 return;
 
             m_currentMediaWidget->setAnalyticsSearchModeEnabled(
-                state != ui::SelectableTextButton::State::deactivated);
+                state != ButtonState::deactivated);
 
-            if (state == ui::SelectableTextButton::State::selected)
+            if (state == ButtonState::selected)
                 button->setText(tr("Select some area on video"));
-            else if (state == ui::SelectableTextButton::State::unselected)
+            else if (state == ButtonState::unselected)
                 button->setText(tr("In selected area"));
 
-            if (state == ui::SelectableTextButton::State::deactivated)
+            if (state == ButtonState::deactivated)
                 m_currentMediaWidget->setAnalyticsSearchRect(QRectF());
     });
 }
@@ -246,8 +248,8 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
         {
             m_analyticsModel->setFilterRect(relativeRect);
             m_analyticsTab->areaButton()->setState(relativeRect.isValid()
-                ? ui::SelectableTextButton::State::unselected
-                : ui::SelectableTextButton::State::deactivated);
+                ? ButtonState::unselected
+                : ButtonState::deactivated);
 
             m_analyticsTab->requestFetch();
         });
