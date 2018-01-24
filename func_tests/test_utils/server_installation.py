@@ -84,6 +84,9 @@ class ServerInstallation(object):
         if self._current_cloud_host and new_host == self._current_cloud_host:
             log.debug('Server binary at %s already has %r in it', self.host, new_host)
             return
+        path_to_patch = None
+        data = None
+        start_idx = -1
         for lib_path in MEDIASERVER_CLOUDHOST_LIB_PATH_LIST:
             path_to_patch = os.path.join(self.dir, lib_path)
             data = self.host.read_file(path_to_patch)
