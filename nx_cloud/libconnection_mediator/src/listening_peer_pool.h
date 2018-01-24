@@ -4,6 +4,7 @@
 
 #include <boost/optional.hpp>
 
+#include <nx/network/cloud/cloud_connect_version.h>
 #include <nx/network/cloud/data/connection_method.h>
 #include <nx/network/cloud/mediator/api/listening_peer.h>
 #include <nx/network/stun/abstract_server_connection.h>
@@ -27,12 +28,12 @@ struct ListeningPeerData
     /** Valid for locally-registered peer only. */
     std::shared_ptr<nx::network::stun::ServerConnection> peerConnection;
     std::list<network::SocketAddress> endpoints;
-    api::ConnectionMethods connectionMethods;
+    api::CloudConnectVersion cloudConnectVersion;
 
     ListeningPeerData():
         isLocal(true),
         isListening(false),
-        connectionMethods(0)
+        cloudConnectVersion(api::CloudConnectVersion::initial)
     {
     }
 
