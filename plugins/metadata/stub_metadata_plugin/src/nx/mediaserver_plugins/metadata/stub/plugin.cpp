@@ -95,6 +95,7 @@ const char* Plugin::capabilitiesManifest(Error* error) const
 {
     *error = Error::noError;
 
+    // TODO: #mike: Remove localizations; consider a dedicated mechanism for them.
     return R"json(
         {
             "driverId": "{B14A8D7B-8009-4D38-A60D-04139345432E}",

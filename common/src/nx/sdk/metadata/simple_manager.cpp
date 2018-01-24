@@ -36,7 +36,6 @@ void* SimpleManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 
 Error SimpleManager::setHandler(AbstractMetadataHandler* handler)
 {
-    std::lock_guard<std::mutex> lock(mutex);
     m_handler = handler;
     return Error::noError;
 }

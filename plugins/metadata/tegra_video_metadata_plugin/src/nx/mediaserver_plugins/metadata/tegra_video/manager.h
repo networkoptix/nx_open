@@ -81,7 +81,8 @@ private:
     nxpl::NX_GUID m_eventTypeId;
     nxpl::NX_GUID m_objectTypeId;
 
-    std::unique_ptr<TegraVideo> m_tegraVideo;
+    std::unique_ptr<TegraVideo, decltype(&tegraVideoDestroy)> m_tegraVideo{
+        nullptr, tegraVideoDestroy};
 
     mutable NaiveObjectTracker m_tracker;
     int64_t m_lastFramePtsUs;

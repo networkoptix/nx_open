@@ -35,19 +35,12 @@ Manager::Manager(Plugin* plugin):
 {
     NX_PRINT << __func__ << "(\"" << plugin->name() << "\") BEGIN";
 
-    m_tegraVideo.reset(TegraVideo::create());
-
-    // TODO: #mike: Move to a new start...() method after SDK is extended.
-    TegraVideo::Params params;
-    params.id = "metadata";
-    params.deployFile = ini().deployFile;
-    params.modelFile = ini().modelFile;
-    params.cacheFile = ini().cacheFile;
-    params.netWidth = ini().netWidth;
-    params.netHeight = ini().netHeight;
-
-    if (!m_tegraVideo->start(params))
-        NX_PRINT << "ERROR: TegraVideo::start() failed.";
+    m_tegraVideo.reset(tegraVideoCreate());
+    if (!m_tegraVideo)
+    {
+        NX_PRINT << "ERROR: Unable to create instance of TegraVideo.";
+        // Not much to do about this error.
+    }
 
     if (strcmp(ini().postprocType, "ped") == 0)
     {
@@ -69,17 +62,25 @@ Manager::~Manager()
 
     stopFetchingMetadata();
 
-    stopFetchingMetadataThreadUnsafe();
-
     NX_OUTPUT << __func__ << "() END";
 }
 
 Error Manager::startFetchingMetadata(nxpl::NX_GUID* /*eventTypeList*/, int /*eventTypeListSize*/)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
-    std::lock_guard<std::mutex> lock(mutex);
 
-    stopFetchingMetadataThreadUnsafe();
+    stopFetchingMetadata();
+
+    TegraVideo::Params params;
+    params.id = "metadata";
+    params.deployFile = ini().deployFile;
+    params.modelFile = ini().modelFile;
+    params.cacheFile = ini().cacheFile;
+    params.netWidth = ini().netWidth;
+    params.netHeight = ini().netHeight;
+
+    if (!m_tegraVideo->start(&params))
+        NX_PRINT << "ERROR: TegraVideo::start() failed.";
 
     NX_OUTPUT << __func__ << "() END -> noError";
     return Error::noError;
@@ -87,6 +88,12 @@ Error Manager::startFetchingMetadata(nxpl::NX_GUID* /*eventTypeList*/, int /*eve
 
 Error Manager::stopFetchingMetadata()
 {
+    if (!m_tegraVideo->stop())
+    {
+        NX_OUTPUT << __func__ << "() -> unknownError: TegraVideo::stop() failed";
+        return Error::unknownError;
+    }
+
     NX_OUTPUT << __func__ << "() -> noError";
     return Error::noError;
 }
@@ -95,11 +102,7 @@ const char* Manager::capabilitiesManifest(Error* /*error*/) const
 {
     return R"manifest(
         {
-            "supportedEventTypes": [
-                "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
-                "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}"
-            ],
-            "supportedObjectTypes": [
+             "supportedObjectTypes": [
                 "{58AE392F-8516-4B27-AEE1-311139B5A37A}",
                 "{3778A599-FB60-47E9-8EC6-A9949E8E0AE7}"
             ]
@@ -185,13 +188,6 @@ bool Manager::pullMetadataPackets(std::vector<AbstractMetadataPacket*>* metadata
 //-------------------------------------------------------------------------------------------------
 // private
 
-Error Manager::stopFetchingMetadataThreadUnsafe()
-{
-    if (!m_tegraVideo->stop())
-        return Error::unknownError;
-    return Error::noError;
-}
-
 bool Manager::makeMetadataPacketsFromRects(
     std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
@@ -246,27 +242,7 @@ bool Manager::makeMetadataPacketsFromRectsPostprocPed(
     int64_t ptsUs) const
 {
     // TODO: #dmishin: STUB
-
-    // Create metadata Objects directly from the rects; create no events.
-
-    auto objectPacket = new CommonObjectsMetadataPacket();
-    objectPacket->setTimestampUsec(ptsUs);
-    objectPacket->setDurationUsec(1000000LL * 10); //< TODO: #mike: Ask #rvasilenko.
-
-    for (const auto& rect: rects)
-    {
-        auto detectedObject = new CommonDetectedObject();
-
-        const auto objectId = nxpt::fromQnUuidToPluginGuid(QnUuid::createUuid());
-        detectedObject->setId(objectId);
-        detectedObject->setTypeId(m_objectTypeId);
-
-        detectedObject->setBoundingBox(Rect(rect.x, rect.y, rect.w, rect.h));
-        objectPacket->addItem(detectedObject);
-    }
-
-    metadataPackets->push_back(objectPacket);
-    return true;
+    return makeMetadataPacketsFromRectsPostprocNone(metadataPackets, rects, ptsUs);
 }
 
 bool Manager::makeMetadataPacketsFromRectsPostprocCar(

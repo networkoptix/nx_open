@@ -2,13 +2,14 @@
 
 #include <nx/kit/test.h>
 
-#include <tegra_video.h>
+#include <tegra_video_stub.h>
 
-static std::unique_ptr<TegraVideo> tegraVideo;
+static std::unique_ptr<TegraVideo, decltype(&tegraVideoDestroy)> tegraVideo{
+    nullptr, tegraVideoDestroy};
 
 TEST(tegra_video_stub, setup)
 {
-    tegraVideo.reset(TegraVideo::createStub());
+    tegraVideo.reset(tegraVideoCreateStub());
 }
 
 TEST(tegra_video_stub, start)
@@ -21,7 +22,7 @@ TEST(tegra_video_stub, start)
     params.netWidth = 0;
     params.netHeight= 0;
 
-    ASSERT_TRUE(tegraVideo->start(params));
+    ASSERT_TRUE(tegraVideo->start(&params));
 }
 
 void testRect(const TegraVideo::Rect& rect)

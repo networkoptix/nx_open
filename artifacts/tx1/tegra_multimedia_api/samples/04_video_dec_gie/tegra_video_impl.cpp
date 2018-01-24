@@ -19,14 +19,13 @@
 
 namespace {
 
-class Impl: public TegraVideo
+class Impl final: public TegraVideo
 {
 public:
     Impl();
+    ~Impl();
 
-    virtual ~Impl() override;
-
-    virtual bool start(const Params& params) override;
+    virtual bool start(const Params* params) override;
 
     virtual bool stop() override;
 
@@ -72,26 +71,26 @@ Impl::~Impl()
     NX_OUTPUT << __func__ << "() END";
 }
 
-bool Impl::start(const Params& params)
+bool Impl::start(const Params* params)
 {
-    m_id = params.id; //< Used for logging, thus, assigned before logging.
+    m_id = params->id; //< Used for logging, thus, assigned before logging.
 
     NX_OUTPUT << __func__ << "({";
-    NX_OUTPUT << "    id: " << params.id;
-    NX_OUTPUT << "    modelFile: " << params.modelFile;
-    NX_OUTPUT << "    deployFile: " << params.deployFile;
-    NX_OUTPUT << "    cacheFile: " << params.cacheFile;
-    NX_OUTPUT << "    netWidth: " << params.netWidth;
-    NX_OUTPUT << "    netHeight: " << params.netHeight;
+    NX_OUTPUT << "    id: " << params->id;
+    NX_OUTPUT << "    modelFile: " << params->modelFile;
+    NX_OUTPUT << "    deployFile: " << params->deployFile;
+    NX_OUTPUT << "    cacheFile: " << params->cacheFile;
+    NX_OUTPUT << "    netWidth: " << params->netWidth;
+    NX_OUTPUT << "    netHeight: " << params->netHeight;
     NX_OUTPUT << "}) BEGIN";
 
-    m_modelFile = params.modelFile;
-    m_deployFile = params.deployFile;
-    m_cacheFile = params.cacheFile;
+    m_modelFile = params->modelFile;
+    m_deployFile = params->deployFile;
+    m_cacheFile = params->cacheFile;
 
     auto fileStream = std::ifstream(m_deployFile);
     const NetDimensions dimensions = getNetDimensions(
-        fileStream, m_deployFile, {params.netWidth, params.netHeight});
+        fileStream, m_deployFile, {params->netWidth, params->netHeight});
     if (dimensions.isNull())
         return false;
     m_netWidth = dimensions.width;
@@ -293,12 +292,7 @@ bool Impl::hasMetadata() const
 
 //-------------------------------------------------------------------------------------------------
 
-#if !defined(TEGRA_VIDEO_STUB_ONLY)
-
-TegraVideo* TegraVideo::createImpl()
+TegraVideo* tegraVideoCreateImpl()
 {
-    ini().reload();
     return new Impl();
 }
-
-#endif // !defined(TEGRA_VIDEO_STUB_ONLY)
