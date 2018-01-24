@@ -6,7 +6,7 @@ Welkom bij {{PRODUCT_NAME}}
 
 {{^message.sharer_name}}
 U wordt uitgenodigd om deel te nemen aan {{PRODUCT_NAME}}.
-Het systeem {{message.system_name}} is met u gedeeld.
+You have been granted access to {{message.system_name}}.
 {{/message.sharer_name}}
 
 Registreer en bekijk het systeem: {{config.portal_url}} / register / {{message.code}}

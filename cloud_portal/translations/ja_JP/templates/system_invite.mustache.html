@@ -1,12 +1,16 @@
-<h1>{{PRODUCT_NAME}} へようこそ</h1>
+<h1>Hello, {{message.fullName}}</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> は、<a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a> に招待し、システム {{message.system_name}} を共有しています</p>
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> has shared access to video management system "{{message.system_name}}" with you.
+
+To view and manage it, please create account on <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a> using your current email address and follow further instructions.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>招待されて <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a> に参加します　システム {{message.system_name}} が共有されます</p>
+<p>You have been granted access to video management system "{{message.system_name}}".
+
+To view and manage it, please create account on <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a> using your current email address and follow further instructions.</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">登録してシステムを表示</a>
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Create Account</a>
 

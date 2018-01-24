@@ -6,7 +6,7 @@ Willkommen bei {{PRODUCT_NAME}}
 
 {{^message.sharer_name}}
 Sie wurden eingeladen sich bei {{PRODUCT_NAME}} anzuschließen.
-Das System {{message.system_name}} wurde mit Ihnen geteilt.
+You have been granted access to {{message.system_name}}.
 {{/message.sharer_name}}
 
 Registrieren und System ansehen: {{config.portal_url}}/register/{{message.code}}

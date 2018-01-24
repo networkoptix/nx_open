@@ -1,17 +1,20 @@
 {
   "activate_account": {
-    "emailSubject": "Fiók nyugtásása"
+    "emailSubject": "Activate your account"
   },
   "restore_password": {
-    "emailSubject": "Jelszó visszaállítása"
+    "emailSubject": "Reset your password"
   },
   "system_invite": {
-    "emailSubject": "Hozzáférést kapott {{message.system_name}} videó rendszerhez"
+    "emailSubject": "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "Hozzáférést kapott {{message.system_name}} videó rendszerhez"
+    "emailSubject": "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
   },
   "review_version": {
     "emailSubject": "{{message.id}} verzió készen áll a felülvizsgálatra"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
   }
 }

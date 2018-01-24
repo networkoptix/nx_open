@@ -6,7 +6,7 @@
 
 {{^message.sharer_name}}
 Sizi {{PRODUCT_NAME}}'e davet ettiniz.
-{{message.system_name}} sistemi sizinle paylaşıldı.
+You have been granted access to {{message.system_name}}.
 {{/message.sharer_name}}
 
 Sistemi kaydettirin ve görüntüleyin: {{config.portal_url}} / register / {{message.code}}
