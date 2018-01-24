@@ -15,8 +15,6 @@ function(nx_detect_package_versions)
     _set_version(openal "1.16")
     _set_version(libjpeg-turbo "1.4.2")
     _set_version(festival "2.4")
-    _set_version(gtest "1.7.0")
-    _set_version(gmock "1.7.0")
     _set_version(directx "JUN2010")
 
     if(WINDOWS)
@@ -89,7 +87,6 @@ function(nx_detect_package_versions)
         openal
         libjpeg-turbo
         festival festival-vox
-        gtest gmock
         directx
     )
         nx_set_variable_if_empty(${pkg}_version ${_${pkg}_version})
@@ -143,11 +140,6 @@ function(nx_get_dependencies)
 
     if(box STREQUAL "tx1")
         nx_rdep_add_package(sysroot)
-    endif()
-
-    if(haveTests)
-        nx_rdep_add_package(gtest)
-        nx_rdep_add_package(gmock)
     endif()
 
     if(ANDROID OR WINDOWS OR box MATCHES "bpi")

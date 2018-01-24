@@ -13,3 +13,7 @@ endif()
 if(withMobileClient)
     add_subdirectory(qtsingleguiapplication)
 endif()
+
+if(withTests)
+    add_subdirectory(googletest)
+endif()
