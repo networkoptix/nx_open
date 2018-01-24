@@ -10,7 +10,13 @@ nx_option(developerBuild
     "Disable this option for production builds (Jenkins)"
     ON)
 
-set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+if(developerBuild)
+    set(default_cmake_build_type "Debug")
+else()
+    set(default_cmake_build_type "Release")
+endif()
+
+set(CMAKE_BUILD_TYPE ${default_cmake_build_type} CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
 set(targetDevice "" CACHE STRING "Target device. For the list see cmake/toolchains.")
