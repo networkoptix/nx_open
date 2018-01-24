@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.html import format_html
 
 # Register your models here.
 
@@ -28,7 +30,8 @@ admin.site.register(Event, EventAdmin)
 
 
 class CloudNotificationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'sent_by', 'sent_date', 'subject', 'body')
+    list_display = ('context_actions', 'id', 'sent_by', 'sent_date', 'subject', 'body')
+    list_display_links = ('id')
     change_form_template = 'notifications/cloud_notifications_change_form.html'
     readonly_fields = ('sent_by', 'sent_date')
     fieldsets = [
@@ -39,16 +42,18 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         ("When and who sent the notification", {'fields': (('sent_by', 'sent_date'))})
     ]
 
+    def context_actions(self, obj):
+        return format_html('<a class="button" href="{}">Open Notification</a>',
+                           reverse('admin:notifications_cloudnotification_change', args=[obj.id]))
 
-    #Right now only superusers can add notifications
-    def has_add_permission(self, request):
-        return request.user.has_perm('notifications.send_cloud_notification')
+    context_actions.short_description = 'Edit cloud notification'
+    context_actions.allow_tags = True
 
 
     def has_delete_permission(self, request, obj=None):
         if not obj:
-            return request.user.has_perm('notifications.send_cloud_notification')
-        return request.user.has_perm('notifications.send_cloud_notification') and not obj.sent_date
+            return request.user.has_perm('notifications.delete_cloudnotification')
+        return request.user.has_perm('notifications.delete_cloudnotification') and not obj.sent_date
 
 
     def get_readonly_fields(self, request, obj=None):

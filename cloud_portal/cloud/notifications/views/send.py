@@ -1,10 +1,11 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, APINotAuthorisedException
 from notifications import api
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.contrib import messages
 
 from api.models import Account
 from notifications.models import *
@@ -114,22 +115,32 @@ def send_notification(request):
 
 
 @api_view(['GET','POST'])
-@permission_required('notifications.send_cloud_notification')
+@permission_classes((IsAuthenticated,))
 def cloud_notification_action(request):
     notification_id = str(request.data['id'])
-    if 'Save' in request.data:
+    can_add = request.user.has_perm('notifications.add_cloudnotification')
+    can_change = request.user.has_perm('notifications.change_cloudnotification')
+    can_send = request.user.has_perm('notifications.send_cloud_notification')
+
+    if can_add and can_change and 'Save' in request.data:
         notification_id = str(update_or_create_notification(request.data))
-    elif 'Preview' in request.data:
+        messages.success(request._request, "Changes have been saved")
+
+    elif can_add and can_change and 'Preview' in request.data:
         notification_id = str(update_or_create_notification(request.data))
         message = format_message(CloudNotification.objects.get(id=notification_id))
         message['full_name'] = request.user.get_full_name()
         api.send(request.user.email, 'cloud_notification', message, 'default')
-    elif 'Send' in request.data and notification_id:
+        messages.success(request._request, "Preview has been sent")
+
+    elif can_send and 'Send' in request.data and notification_id:
         force = 'ignore_subscriptions' in request.data
         notification = CloudNotification.objects.get(id=notification_id)
         send_to_all_users(request.user, notification, force)
+        messages.success(request._request, "Cloud notification has been sent")
+
     else:
-        return Response("Invalid")
+        messages.error(request._request, "Insufficient permission or invalid action")
 
     return redirect('/admin/notifications/cloudnotification/' + notification_id + '/change/')
 
