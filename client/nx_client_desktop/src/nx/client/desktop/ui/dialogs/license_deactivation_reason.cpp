@@ -67,12 +67,14 @@ LicenseDeactivationReason::LicenseDeactivationReason(
     const license::RequestInfo& info,
     QWidget* parent)
     :
-    base_type(QnMessageBoxIcon::Information,
-        tr("Please fill up information about yourself and reason for license deactivation"),
-        QString(), QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parent),
-    QnWorkbenchContextAware(parent),
+    base_type(parent),
     m_info(info)
 {
+    setIcon(QnMessageBoxIcon::Information);
+    setText(tr("Please fill up information about yourself and reason for license deactivation"));
+    setStandardButtons(QDialogButtonBox::Cancel);
+    setDefaultButton(QDialogButtonBox::NoButton);
+
     const auto nextButton = addButton(tr("Next"),
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
 
