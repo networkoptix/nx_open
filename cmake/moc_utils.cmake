@@ -39,6 +39,10 @@ endfunction()
 function(nx_add_qt_mocables target)
     cmake_parse_arguments(MOC "" "" "INCLUDE_DIRS" ${ARGN})
 
+    if(NOT MOC_UNPARSED_ARGUMENTS)
+        return()
+    endif()
+
     if(NOT Qt5Core_MOC_EXECUTABLE)
         message(FATAL_ERROR "Qt5 moc is not known: Qt5Core_MOC_EXECUTABLE is not set.")
     endif()

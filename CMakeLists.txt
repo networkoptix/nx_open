@@ -10,9 +10,13 @@ nx_option(developerBuild
     "Disable this option for production builds (Jenkins)"
     ON)
 
-option(codeSigning "Enable code signing." ON)
+if(developerBuild)
+    set(default_cmake_build_type "Debug")
+else()
+    set(default_cmake_build_type "Release")
+endif()
 
-set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+set(CMAKE_BUILD_TYPE ${default_cmake_build_type} CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
 set(targetDevice "" CACHE STRING "Target device. For the list see cmake/toolchains.")
@@ -55,6 +59,7 @@ include(CMakeParseArguments)
 include(CMakeDependentOption)
 include(ExternalProject)
 include(target_detection)
+include(parameters_validation)
 include(utils)
 include(find_sources)
 include(moc_utils)
@@ -62,9 +67,6 @@ include(qrc_utils)
 include(precompiled_header)
 include(strip_target)
 include(mercurial)
-include(project_utils)
-include(test_utils)
-
 include(ec_protocol)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
@@ -90,7 +92,18 @@ include(dependencies)
 include(maven_compatibility)
 include(generate_current_config)
 
+if(WINDOWS)
+    include(windows_signing)
+endif()
+include(project_utils)
+include(test_utils)
+
 nx_create_dev_qt_conf()
+
+cmake_dependent_option(codeSigning "Enable code signing"
+    ON "NOT developerBuild"
+    OFF
+)
 
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)

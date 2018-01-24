@@ -107,6 +107,11 @@ function(nx_add_target name type)
                 nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${name}.vcxproj.user
                     ${CMAKE_CURRENT_BINARY_DIR})
             endif()
+
+            if(codeSigning)
+                nx_sign_windows_executable(${name})
+            endif()
+
             project(${name})
             set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${name})
         endif()

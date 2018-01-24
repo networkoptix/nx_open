@@ -93,10 +93,8 @@ def sign_command(target_file):
         command += ['/d', environment.sign_description]
     if environment.sign_password:
         command += ['/p', environment.sign_password]
-    if environment.main_certificate:
-        command += ['/f', environment.main_certificate]
-    if environment.additional_certificate:
-        command += ['/ac', environment.additional_certificate]
+    if environment.certificate:
+        command += ['/f', environment.certificate]
     command += [target_file]
     return command
 

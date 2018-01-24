@@ -99,7 +99,11 @@ private:
     boost::optional<nx::api::AnalyticsDriverManifest> loadPluginManifest(
         nx::sdk::metadata::AbstractMetadataPlugin* plugin);
 
-    void addPluginManifestToServer(
+    void assignPluginManifestToServer(
+        const nx::api::AnalyticsDriverManifest& manifest,
+        const QnMediaServerResourcePtr& server);
+
+    void mergePluginManifestToServer(
         const nx::api::AnalyticsDriverManifest& manifest,
         const QnMediaServerResourcePtr& server);
 
