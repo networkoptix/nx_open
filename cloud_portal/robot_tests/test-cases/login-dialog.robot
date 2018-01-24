@@ -24,9 +24,9 @@ can be closed after clicking on background
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${LOG IN MODAL}
-    Wait Until Element Is Visible    //div[uib-modal-backdrop='modal-backdrop']
-    Element Should be Visible    //div[uib-modal-backdrop='modal-backdrop']
-    Click Element    //div[uib-modal-backdrop='modal-backdrop']
+    Wait Until Element Is Visible    //div[@uib-modal-backdrop='modal-backdrop']/..
+    Element Should be Visible    //div[@uib-modal-backdrop='modal-backdrop']/..
+    Click Element    //div[@uib-modal-backdrop='modal-backdrop']/..
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
     Page Should Not Contain Element    ${LOG IN MODAL}
     Close Browser
@@ -164,6 +164,8 @@ passes email from email input to Restore password page, even without clicking 'L
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${EMAIL INPUT}
     Input Text    ${EMAIL INPUT}    ${email}
+#the transition animations causes bad targeting on the link.  This is tentative.
+    sleep    .15
     Wait Until Element Is Visible    ${FORGOT PASSWORD}
     Click Link    ${FORGOT PASSWORD}
     Wait Until Element Is Visible    ${RESET PASSWORD EMAIL INPUT}
