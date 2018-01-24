@@ -14,8 +14,8 @@ Open Browser and go to URL
 
 Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
-    Run Keyword Unless    "${button}" == "None"    Wait Until Element Is Visible    ${button}
-    Run Keyword Unless    "${button}" == "None"    Click Link    ${button}
+    Run Keyword Unless    '''${button}''' == "None"    Wait Until Element Is Visible    ${button}
+    Run Keyword Unless    '''${button}''' == "None"    Click Link    ${button}
     Wait Until Element Is Visible    ${EMAIL INPUT}
     input text    ${EMAIL INPUT}    ${email}
 
@@ -62,13 +62,14 @@ Validate Register Email Received
     Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
     ${email}    Wait For Email    recipient=${recipient}    timeout=120
     Should Not Be Equal    ${email}    ${EMPTY}
-    Delete Email    ${email}
+    Close Mailbox
 
 Get Activation Link
     [arguments]    ${recipient}
     Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
     ${email}    Wait For Email    recipient=${recipient}    timeout=120
     ${links}    Get Links From Email    ${email}
+    Close Mailbox
     Go To    @{links}[1]
 
 Select Auto Tests System
