@@ -19,30 +19,16 @@ class MetadataMonitor;
 class BytestreamFilter: public nx::utils::bstream::AbstractByteStreamFilter
 {
 public:
-    using Handler = std::function<void(const HikvisionEventList&)>;
-
-    BytestreamFilter(const Hikvision::DriverManifest& manifest, Handler handler);
+    BytestreamFilter(const Hikvision::DriverManifest& manifest, HikvisionMetadataMonitor* monitor);
     virtual ~BytestreamFilter() = default;
     virtual bool processData(const QnByteArrayConstRef& notification) override;
+
+    bool processEvent(const HikvisionEvent hikvisionEvent);
 private:
     void addExpiredEvents(std::vector<HikvisionEvent>& result);
 private:
     const Hikvision::DriverManifest m_manifest;
-    Handler m_handler;
-
-    struct StartedEvent
-    {
-        StartedEvent(const HikvisionEvent& event = HikvisionEvent()):
-            event(event)
-        {
-            timer.restart();
-        }
-
-        HikvisionEvent event;
-        nx::utils::ElapsedTimer timer;
-    };
-
-    QMap<QString, StartedEvent> m_startedEvents;
+    HikvisionMetadataMonitor* m_monitor;
 };
 
 } // namespace hikvision
