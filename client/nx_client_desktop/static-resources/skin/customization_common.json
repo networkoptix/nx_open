@@ -875,8 +875,8 @@
     "nx::client::desktop::EventTile": {
         "palette": {
             "default": {
-                "window": "dark9",
-                "midlight": "dark10",
+                "window": "dark7",
+                "midlight": "dark8",
                 "light": "light10",
                 "windowText": "light16",
                 "text": "light4",
