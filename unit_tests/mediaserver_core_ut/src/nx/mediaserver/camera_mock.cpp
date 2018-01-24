@@ -1,4 +1,5 @@
 #include "camera_mock.h"
+#include "live_stream_provider_mock.h"
 
 namespace nx {
 namespace mediaserver {
@@ -106,7 +107,7 @@ QString CameraMock::getDriverName() const
 
 QnAbstractStreamDataProvider* CameraMock::createLiveDataProvider()
 {
-    return nullptr;
+    return new LiveStreamProviderMock(toSharedPointer(this));
 }
 
 CameraDiagnostics::Result CameraMock::initializeCameraDriver()
@@ -151,7 +152,27 @@ bool CameraMock::removeProperty(const QString& key)
     return true;
 }
 
+bool CameraMock::isCameraControlDisabled() const
+{
+    return false;
+}
+
+Qn::MotionType CameraMock::getMotionType() const
+{
+    return Qn::MT_SoftwareGrid;
+}
+
 bool CameraMock::saveParams()
+{
+    return true;
+}
+
+bool CameraMock::hasDualStreaming() const
+{
+    return true;
+}
+
+bool CameraMock::hasDualStreaming2() const
 {
     return true;
 }

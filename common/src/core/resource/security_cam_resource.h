@@ -57,7 +57,7 @@ public:
     bool hasTwoWayAudio() const;
 
     bool hasMotion() const;
-    Qn::MotionType getMotionType() const;
+    virtual Qn::MotionType getMotionType() const;
     void setMotionType(Qn::MotionType value);
 
     //!Returns driver (built-in or external) name, used to manage camera
@@ -95,7 +95,7 @@ public:
     virtual bool hasDualStreaming() const;
 
     /** Return true if dual streaming supported and don't blocked by user */
-    bool hasDualStreaming2() const;
+    virtual bool hasDualStreaming2() const;
 
     /** Returns true if camera stores archive on a external system */
     bool isDtsBased() const;
@@ -220,7 +220,7 @@ public:
     bool isDualStreamingDisabled() const;
 
     void setCameraControlDisabled(bool value);
-    bool isCameraControlDisabled() const;
+    virtual bool isCameraControlDisabled() const;
 
     int defaultSecondaryFps(Qn::StreamQuality quality) const;
 

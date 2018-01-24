@@ -70,13 +70,13 @@ public:
 
     virtual void onGotAudioFrame(const QnCompressedAudioDataPtr& audioData);
 
-    virtual void updateSoftwareMotion();
+    virtual virtual void updateSoftwareMotion();
     bool canChangeStatus() const;
 
     static bool hasRunningLiveProvider(QnNetworkResource* netRes);
     virtual void startIfNotRunning() override;
 
-    bool isCameraControlDisabled() const;
+    virtual bool isCameraControlDisabled() const;
     void filterMotionByMask(const QnMetaDataV1Ptr& motion);
     void updateSoftwareMotionStreamNum();
 

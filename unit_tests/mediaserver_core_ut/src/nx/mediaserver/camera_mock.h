@@ -25,7 +25,10 @@ public:
     void enableSetProperty(bool isEnabled);
 
     static QnCameraAdvancedParams makeParameterDescriptions(const std::vector<QString>& parameters);
-
+    virtual bool isCameraControlDisabled() const override;
+    virtual Qn::MotionType getMotionType() const override;
+    virtual bool hasDualStreaming() const override;
+    virtual bool hasDualStreaming2() const override;
 public:
     virtual QString getProperty(const QString& key) const override;
     virtual bool setProperty(const QString& key, const QString& value, PropertyOptions options) override;
