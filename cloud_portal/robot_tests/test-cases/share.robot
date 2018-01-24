@@ -134,6 +134,7 @@ Sharing works
     Input Text    ${SHARE EMAIL}    ${random email}
     Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
     Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    New permissions saved
     Check User Permissions    ${random email}    Custom
     Remove User Permissions    ${random email}
     Close Browser
