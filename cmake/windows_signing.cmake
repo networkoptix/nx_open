@@ -1,9 +1,9 @@
-find_program(SIGNTOOL_EXECUTABLE signtool.exe ${signtool_directory})
-if(NOT SIGNTOOL_EXECUTABLE)
-    message(FATAL_ERROR "Cannot find signtool.exe")
-endif()
-
 function(nx_sign_windows_executable target)
+    find_program(SIGNTOOL_EXECUTABLE signtool.exe ${signtool_directory})
+    if(NOT SIGNTOOL_EXECUTABLE)
+        message(FATAL_ERROR "Cannot find signtool.exe")
+    endif()
+
     nx_find_first_matching_file(certificate_file "${certificates_path}/wixsetup/*.p12")
     if(NOT certificate_file)
         message(FATAL_ERROR "Cannot find certificate file in ${certificates_path}/wixsetup/")
