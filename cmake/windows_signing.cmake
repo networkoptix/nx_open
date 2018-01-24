@@ -1,5 +1,8 @@
 function(nx_sign_windows_executable target)
-    find_program(SIGNTOOL_EXECUTABLE signtool.exe PATHS ${signtool_directory})
+    find_program(SIGNTOOL_EXECUTABLE signtool.exe
+        PATHS ${signtool_directory}/bin
+        NO_DEFAULT_PATH
+    )
     if(NOT SIGNTOOL_EXECUTABLE)
         message(FATAL_ERROR "Cannot find signtool.exe")
     endif()
