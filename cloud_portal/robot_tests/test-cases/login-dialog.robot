@@ -24,6 +24,7 @@ can be closed after clicking on background
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${LOG IN MODAL}
+    Wait Until Element Is Visible    //div[uib-modal-backdrop='modal-backdrop']
     Element Should be Visible    //div[uib-modal-backdrop='modal-backdrop']
     Click Element    //div[uib-modal-backdrop='modal-backdrop']
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
@@ -126,9 +127,9 @@ shows red outline if field is wrong/empty after blur
     Click Element    ${PASSWORD INPUT}
     ${class}    Get Element Attribute    ${EMAIL INPUT}/..    class
     Should Contain    ${class}    has-error
-    Click Element    ${REMEMBER ME CHECKBOX}
+    Wait Until Element Is Visible    ${LOG IN BUTTON}
+    Click Element    ${LOG IN BUTTON}
     ${class}    Get Element Attribute    ${PASSWORD INPUT}/..    class
-    Wait Until Element Contains    ${PASSWORD INPUT}    has-error
     Should Contain    ${class}    has-error
     Close Browser
 
