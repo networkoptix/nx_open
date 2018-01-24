@@ -266,12 +266,12 @@ TEST_F(FtHolePunchingProcessorServerFailure, server_failure)
 {
     using namespace nx::hpm;
 
-    const auto server1 = addRandomServer(m_system, boost::none);
+    const auto server1 = addRandomServer(m_system, boost::none, ServerTweak::noBindEndpoint);
 
     typedef MediaServerEmulator::ActionToTake MsAction;
     static const std::map<MsAction, api::ResultCode> kTestCases =
     {
-        { MsAction::ignoreIndication, api::ResultCode::noReplyFromServer },
+        { MsAction::ignoreIndication, api::ResultCode::noSuitableConnectionMethod },
         { MsAction::closeConnectionToMediator, api::ResultCode::notFound },
     };
 
@@ -336,6 +336,8 @@ TEST_F(FtHolePunchingProcessor, destruction)
     }
 }
 
+//-------------------------------------------------------------------------------------------------
+
 class DummyStatisticsCollector:
     public stats::AbstractCollector
 {
@@ -396,6 +398,16 @@ public:
     }
 
 protected:
+    void emulateRelayPresence()
+    {
+        m_relayUrl = "http://relay.host/relay/path?relay.query";
+        std::array<const char*, 2U> args{
+            "-trafficRelay/url",
+            m_relayUrl.constData()};
+
+        m_settings.load(args.size(), args.data());
+    }
+
     void givenSilentServer()
     {
         registerListeningPeer();
@@ -429,7 +441,7 @@ protected:
         using namespace std::placeholders;
 
         // Waiting initial response.
-        m_connectResponse = m_responses.pop();
+        m_prevConnectResponse = m_responses.pop();
 
         m_holePunchingProcessor.connect(
             m_originatingPeerConnection,
@@ -438,10 +450,23 @@ protected:
             std::bind(&HolePunchingProcessor::sendConnectResponse, this, _1, _2));
     }
 
-    void thenMediatorResponseMustBe(api::ResultCode expectedResultCode)
+    void thenMediatorReportsResult(api::ResultCode expectedResultCode)
     {
-        m_connectResponse = m_responses.pop();
-        ASSERT_EQ(expectedResultCode, m_connectResponse.first);
+        m_prevConnectResponse = m_responses.pop();
+        ASSERT_EQ(expectedResultCode, m_prevConnectResponse->first);
+    }
+
+    void andNoUdpEndpointIsReported()
+    {
+        ASSERT_TRUE(static_cast<bool>(m_prevConnectResponse));
+        ASSERT_TRUE(m_prevConnectResponse->second.udpEndpointList.empty());
+    }
+
+    void andRelayUrlIsReported()
+    {
+        ASSERT_TRUE(static_cast<bool>(m_prevConnectResponse));
+        ASSERT_TRUE(static_cast<bool>(m_prevConnectResponse->second.trafficRelayUrl));
+        ASSERT_EQ(m_relayUrl, *m_prevConnectResponse->second.trafficRelayUrl);
     }
 
     void thenMustReceiveResponseToRetransmit()
@@ -450,7 +475,7 @@ protected:
     }
 
 private:
-    using ConnectResponse = std::pair<api::ResultCode, api::ConnectResponse>;
+    using ConnectResult = std::pair<api::ResultCode, api::ConnectResponse>;
 
     conf::Settings m_settings;
     TestCloudDataProvider m_cloudData;
@@ -459,14 +484,15 @@ private:
     DummyStatisticsCollector m_statisticsCollector;
     RelayClusterClient m_relayClusterClient;
     hpm::HolePunchingProcessor m_holePunchingProcessor;
-    nx::utils::SyncQueue<ConnectResponse> m_responses;
+    nx::utils::SyncQueue<ConnectResult> m_responses;
+    nx::String m_relayUrl;
 
     nx::String m_listeningPeerName;
     std::shared_ptr<TestServerConnection> m_listeningPeerConnection;
     nx::String m_originatingPeerName;
     std::shared_ptr<TestClientConnection> m_originatingPeerConnection;
     api::ConnectRequest m_connectRequest;
-    ConnectResponse m_connectResponse;
+    boost::optional<ConnectResult> m_prevConnectResponse;
 
     void registerListeningPeer()
     {
@@ -489,21 +515,33 @@ private:
         auto locker = m_listeningPeerPool.insertAndLockPeerData(
             m_listeningPeerConnection, listeningPeer);
         locker.value().isListening = true;
-        locker.value().connectionMethods |= api::ConnectionMethod::udpHolePunching;
+        locker.value().cloudConnectVersion = api::kCurrentCloudConnectVersion;
     }
 
     void sendConnectResponse(api::ResultCode resultCode, api::ConnectResponse response)
     {
         ASSERT_NE(api::ResultCode::notFound, resultCode);
-        m_responses.push(ConnectResponse(resultCode, std::move(response)));
+        m_responses.push(ConnectResult(resultCode, std::move(response)));
     }
 };
 
-TEST_F(HolePunchingProcessor, correct_response_in_case_of_silent_server)
+TEST_F(HolePunchingProcessor, connecting_to_server_without_udp_is_ok_if_relay_is_present)
+{
+    emulateRelayPresence();
+    givenSilentServer();
+
+    whenSentConnectRequest();
+
+    thenMediatorReportsResult(api::ResultCode::ok);
+    andNoUdpEndpointIsReported();
+    andRelayUrlIsReported();
+}
+
+TEST_F(HolePunchingProcessor, connecting_to_server_without_udp_is_not_ok_if_relay_is_not_present)
 {
     givenSilentServer();
     whenSentConnectRequest();
-    thenMediatorResponseMustBe(api::ResultCode::noReplyFromServer);
+    thenMediatorReportsResult(api::ResultCode::noSuitableConnectionMethod);
 }
 
 TEST_F(HolePunchingProcessor, response_to_connect_retransmit)

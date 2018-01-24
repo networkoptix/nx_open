@@ -82,6 +82,8 @@ private:
     std::function<void(api::ResultCode, api::ConnectResponse)> m_connectResponseSender;
     const std::list<SocketAddress> m_serverPeerEndpoints;
     const nx::String m_serverPeerHostName;
+    const api::CloudConnectVersion m_serverPeerCloudConnectVersion;
+    api::ConnectionMethods m_serverPeerConnectionMethods;
     stats::ConnectSession m_sessionStatisticsInfo;
     api::ConnectResponse m_preparedConnectResponse;
     boost::optional<std::pair<api::ResultCode, api::ConnectResponse>> m_cachedConnectResponse;
@@ -118,6 +120,8 @@ private:
         const ConnectionStrongRef& connection,
         api::ConnectionAckRequest request,
         std::function<void(api::ResultCode)> completionHandler);
+
+    bool initiateCloudConnect(api::ConnectionAckRequest connectionAck);
 
     void initiateRelayInstanceSearch();
 
