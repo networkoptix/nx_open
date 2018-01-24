@@ -214,7 +214,7 @@ TEST_F(ListeningPeer, peer_disconnect)
     using namespace nx::hpm;
 
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
-    data::ListeningPeers listeningPeers;
+    api::ListeningPeers listeningPeers;
     std::tie(statusCode, listeningPeers) = getListeningPeers();
     ASSERT_EQ(nx::network::http::StatusCode::ok, statusCode);
     ASSERT_EQ(1U, listeningPeers.systems.size());

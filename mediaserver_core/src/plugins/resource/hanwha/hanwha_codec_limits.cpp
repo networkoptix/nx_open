@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_codec_limits.h"
 
 #include "hanwha_utils.h"
@@ -219,7 +217,7 @@ bool HanwhaCodecInfo::parseResponse(const HanwhaResponse& response)
             [split[2] /*Codec*/]
             [split[3] /*StreamType*/]
             [split[4].toLower() /*Resolution*/];
-        
+
         limits.setLimit(split[5], parameterValue);
     }
 
@@ -229,5 +227,3 @@ bool HanwhaCodecInfo::parseResponse(const HanwhaResponse& response)
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

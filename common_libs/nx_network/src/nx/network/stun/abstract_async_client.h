@@ -38,6 +38,7 @@ public:
     using ConnectHandler = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
     using IndicationHandler = std::function<void(Message)>;
     using ReconnectHandler = std::function<void()>;
+    using OnConnectionClosedHandler = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
     using RequestHandler = utils::MoveOnlyFunc<void(SystemError::ErrorCode, Message)>;
     using TimerHandler = std::function<void()>;
 
@@ -72,11 +73,14 @@ public:
     virtual void addOnReconnectedHandler(
         ReconnectHandler handler, void* client = 0) = 0;
 
-    /**
-     * Sends message asynchronously.
+    virtual void setOnConnectionClosedHandler(
+        OnConnectionClosedHandler onConnectionClosedHandler) = 0;
+
+    /** Sends message asynchronously
      *
-     * @param requestHandler Triggered after response has been received or error has occured.
-     *     Resulting Message object is valid only if error code is SystemError::noError.
+     * @param requestHandler Triggered after response has been received or error
+     *     has occured. Message attribute is valid only if first attribute value
+     *     is SystemError::noError.
      * @param client Can be used to cancel subscription.
      * @return false, if could not start asynchronous operation.
      *

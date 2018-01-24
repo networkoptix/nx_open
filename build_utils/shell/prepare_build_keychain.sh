@@ -59,7 +59,7 @@ if ! echo "$KEYCHAINS" | grep -q "$KEYCHAIN"
 then
     echo "Creating keychain $KEYCHAIN"
 
-    security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN" 2 > /dev/null || true
+    security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN" 2> /dev/null || true
     security list-keychains -d user -s "$KEYCHAIN" $KEYCHAINS
 fi
 
@@ -75,5 +75,6 @@ then
     security import "$CERT" -k "$KEYCHAIN" -P "$CERT_PASSWORD" -T "/usr/bin/codesign"
 fi
 
-security set-key-partition-list -S apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" > /dev/null
+security set-key-partition-list -S apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" \
+    > /dev/null 2> /dev/null || true
 

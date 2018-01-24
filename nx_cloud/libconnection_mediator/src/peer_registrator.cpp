@@ -6,7 +6,6 @@
 #include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/utils/log/log.h>
 
-#include "data/listening_peer.h"
 #include "listening_peer_pool.h"
 #include "relay/abstract_relay_cluster_client.h"
 
@@ -32,15 +31,15 @@ PeerRegistrator::~PeerRegistrator()
     m_asyncOperationGuard->terminate();
 }
 
-data::ListeningPeers PeerRegistrator::getListeningPeers() const
+api::ListeningPeers PeerRegistrator::getListeningPeers() const
 {
-    data::ListeningPeers result;
+    api::ListeningPeers result;
     result.systems = m_listeningPeerPool->getListeningPeers();
 
     QnMutexLocker lk(&m_mutex);
     for (const auto& client: m_boundClients)
     {
-        data::BoundClient info;
+        api::BoundClient info;
         if (const auto connetion = client.second.connection.lock())
             info.connectionEndpoint = connetion->getSourceAddress().toString();
 

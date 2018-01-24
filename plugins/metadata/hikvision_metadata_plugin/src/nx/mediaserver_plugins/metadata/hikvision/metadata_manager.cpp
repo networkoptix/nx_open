@@ -111,7 +111,7 @@ Error MetadataManager::stopFetchingMetadata()
     return Error::noError;
 }
 
-const char* MetadataManager::capabilitiesManifest(Error* error) const
+const char* MetadataManager::capabilitiesManifest(Error* error)
 {
     if (m_deviceManifest.isEmpty())
     {
@@ -121,6 +121,10 @@ const char* MetadataManager::capabilitiesManifest(Error* error) const
 
     *error = Error::noError;
     return m_deviceManifest.constData();
+}
+
+void MetadataManager::freeManifest(const char* data)
+{
 }
 
 void MetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)

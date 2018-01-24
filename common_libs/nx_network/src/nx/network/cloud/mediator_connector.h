@@ -93,6 +93,7 @@ private:
 
     std::shared_ptr<network::stun::AsyncClientWithHttpTunneling> m_stunClient;
     std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_mediatorUrlFetcher;
+    boost::optional<QUrl> m_cloudModulesXmlUrl;
     boost::optional<nx::utils::Url> m_mediatorUrl;
     boost::optional<network::SocketAddress> m_mediatorUdpEndpoint;
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
@@ -102,6 +103,7 @@ private:
 
     void fetchEndpoint();
     void connectToMediatorAsync();
+    void reconnectToMediator(SystemError::ErrorCode connectionClosureReason);
 };
 
 } // namespace api

@@ -7,6 +7,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/scope_guard.h>
+#include <utils/common/synctime.h>
 
 namespace {
 
@@ -28,6 +29,12 @@ Storage::Storage(const QDir& downloadsDirectory, QObject* parent):
     m_downloadsDirectory(downloadsDirectory)
 {
     findDownloads();
+    cleanupExpiredFiles();
+
+    /* Cleanup expired files every 5 mins. */
+    QTimer* timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &Storage::cleanupExpiredFiles);
+    timer->start(1000 * 60 * 5);
 }
 
 QDir Storage::downloadsDirectory() const
@@ -53,8 +60,11 @@ FileInformation Storage::fileInformation(
     return m_fileInformationByName.value(fileName);
 }
 
-ResultCode Storage::addFile(const FileInformation& fileInformation)
+ResultCode Storage::addFile(FileInformation fileInformation, bool updateTouchTime)
 {
+    if(updateTouchTime)
+        fileInformation.touchTime = qnSyncTime->currentMSecsSinceEpoch();
+
     if (fileInformation.status == FileInformation::Status::downloaded)
         return addDownloadedFile(fileInformation);
     else
@@ -369,6 +379,7 @@ ResultCode Storage::writeFileChunk(
         });
 
     it->downloadedChunks.setBit(chunkIndex);
+    it->touchTime = qnSyncTime->currentMSecsSinceEpoch();
     checkDownloadCompleted(it.value());
     saveMetadata(it.value());
 
@@ -379,6 +390,11 @@ ResultCode Storage::deleteFile(const QString& fileName, bool deleteData)
 {
     QnMutexLocker lock(&m_mutex);
 
+    return deleteFileInternal(fileName, deleteData);
+}
+
+ResultCode Storage::deleteFileInternal(const QString& fileName, bool deleteData)
+{
     auto it = m_fileInformationByName.find(fileName);
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
@@ -482,6 +498,23 @@ ResultCode Storage::setChunkChecksums(
     }
 
     return ResultCode::ok;
+}
+
+void Storage::cleanupExpiredFiles()
+{
+    QnMutexLocker lock(&m_mutex);
+
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+
+    QSet<QString> expiredFiles;
+    for (const FileMetadata& data: m_fileInformationByName)
+    {
+        if (data.ttl > 0 && data.touchTime + data.ttl <= currentTime)
+            expiredFiles.insert(data.name);
+    }
+
+    for (const QString& name: expiredFiles)
+        deleteFileInternal(name, /*deleteData*/ true);
 }
 
 void Storage::findDownloads()
@@ -619,7 +652,7 @@ ResultCode Storage::loadDownload(
     if (!fileInfo.isValid())
         return ResultCode::fileDoesNotExist;
 
-    return addFile(fileInfo);
+    return addFile(fileInfo, /*updateTouchTime*/ false);
 }
 
 void Storage::checkDownloadCompleted(FileMetadata& fileInfo)

@@ -4,3 +4,7 @@ cmake_dependent_option(useLoginKeychain "Use Login keychain and do not create a 
 )
 set(codeSigningKeychainName "nx_build" CACHE INTERNAL "")
 set(codeSigningKeychainPassword "qweasd123" CACHE INTERNAL "")
+
+if(useLoginKeychain)
+    set(codeSigningKeychainName)
+endif()

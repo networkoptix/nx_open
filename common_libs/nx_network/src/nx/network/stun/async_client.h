@@ -29,7 +29,6 @@ class NX_NETWORK_API AsyncClient:
 public:
     using BaseConnectionType = MessagePipeline;
     using ConnectionType = BaseConnectionType;
-    using OnConnectionClosedHandler = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
 
     AsyncClient(Settings timeouts = Settings());
     /**
@@ -50,7 +49,12 @@ public:
     virtual bool setIndicationHandler(
         int method, IndicationHandler handler, void* client = nullptr) override;
 
-    virtual void addOnReconnectedHandler(ReconnectHandler handler, void* client = nullptr) override;
+    virtual void addOnReconnectedHandler(
+        ReconnectHandler handler,
+        void* client = nullptr) override;
+    virtual void setOnConnectionClosedHandler(
+        OnConnectionClosedHandler onConnectionClosedHandler) override;
+
     virtual void sendRequest(Message request, RequestHandler handler, void* client = nullptr) override;
     // TODO: #ak This method does not seem to belong here. Remove it.
     virtual bool addConnectionTimer(
@@ -61,8 +65,6 @@ public:
     virtual void closeConnection(SystemError::ErrorCode errorCode) override;
     virtual void cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handler) override;
     virtual void setKeepAliveOptions(KeepAliveOptions options) override;
-
-    void setOnConnectionClosedHandler(OnConnectionClosedHandler onConnectionClosedHandler);
 
 private:
     enum class State

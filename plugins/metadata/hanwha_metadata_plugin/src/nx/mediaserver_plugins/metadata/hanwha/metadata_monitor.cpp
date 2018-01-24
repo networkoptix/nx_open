@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "metadata_monitor.h"
 
 #include <chrono>
@@ -189,5 +187,3 @@ void MetadataMonitor::at_connectionClosed(nx::network::http::AsyncHttpClientPtr 
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

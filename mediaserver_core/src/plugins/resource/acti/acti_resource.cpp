@@ -1052,7 +1052,7 @@ QMap<QString, QnCameraAdvancedParameter> QnActiResource::getParamsMap(const QSet
 
 /*
  * Replaces placeholders in param query with actual values retrieved from camera.
- * Needed when user changes not all params in agregate parameter.
+ * Needed when user changes not all params in aggregate parameter.
  * Example: WB_GAIN=127,%WB_R_GAIN becomes WB_GAIN=127,245
  */
 QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, QnCameraAdvancedParamQueryInfo> &queries) const

@@ -29,6 +29,7 @@
 #include <api/model/update_information_reply.h>
 #include <api/model/backup_status_reply.h>
 #include <api/model/getnonce_reply.h>
+#include <api/model/wearable_camera_reply.h>
 #include <api/runtime_info_manager.h>
 
 #include <core/resource_access/resource_access_subject.h>
@@ -244,6 +245,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnServersReply>();
     qRegisterMetaType<QnStatisticsData>();
     qRegisterMetaType<QnManualResourceSearchEntry>();
+    qRegisterMetaType<QnWearableCameraReply>();
 
     qRegisterMetaType<QnPtzPreset>();
     qRegisterMetaType<QnPtzPresetList>();

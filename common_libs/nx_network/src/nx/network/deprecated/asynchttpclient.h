@@ -29,10 +29,11 @@ class AsyncHttpClientPtr;
  * This class methods are not thread-safe
  * All signals are emitted from io::AIOService threads
  * State is changed just before emitting signal
- * WARNING: It is strongly recommended to listen for AsyncHttpClient::someMessageBodyAvailable() signal and
- *  read current message body buffer with AsyncHttpClient::fetchMessageBodyBuffer() call every time
- *  to avoid internal message body buffer to consume too much memory.
- * WARNING: It is strongly recommended to connect to signals using Qt::DirectConnection and slot MUST NOT use blocking calls.
+ * WARNING: It is strongly recommended to listen for AsyncHttpClient::someMessageBodyAvailable()
+ * signal and read current message body buffer with AsyncHttpClient::fetchMessageBodyBuffer() call
+ * every time to avoid internal message body buffer to consume too much memory.
+ * WARNING: It is strongly recommended to connect to signals using Qt::DirectConnection and
+ * slot MUST NOT use blocking calls.
  */
 class NX_NETWORK_API AsyncHttpClient:
     public QObject,
@@ -61,7 +62,7 @@ public:
     AsyncClient::State state() const;
 
     /**
-     * Returns true if no response has been recevied due to transport error.
+     * Returns true if no response has been received due to transport error.
      */
     bool failed() const;
     SystemError::ErrorCode lastSysErrorCode() const;
@@ -179,7 +180,9 @@ public:
 
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
-    /** If set to true client will not try to add Authorization header to the first request. false by default. */
+    /** If set to \a true client will not try to add Authorization header to the first request. false by default. */
+     * false by default.
+     */
     void setDisablePrecalculatedAuthorization(bool val);
 
     /** Set socket connect/send timeout. */
@@ -187,13 +190,15 @@ public:
     /**
      * @param responseReadTimeoutMs 0 means infinity.
      * By default, 3000 ms.
-     * If timeout has been met, connection is closed, state set to failed and AsyncHttpClient::done emitted.
+     * If timeout has been met, connection is closed, state set to failed and AsyncHttpClient::done
+     * emitted.
      */
     void setResponseReadTimeoutMs(unsigned int responseReadTimeoutMs);
     /**
      * @param messageBodyReadTimeoutMs 0 means infinity.
      * By default there is no timeout.
-     * If timeout has been met, connection is closed, state set to failed and AsyncHttpClient::done emitted.
+     * If timeout has been met, connection is closed, state set to failed and AsyncHttpClient::done
+     * emitted.
      */
     void setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
 
@@ -221,7 +226,7 @@ public:
     void forceEndOfMsgBody();
 
     /**
-     * Use this method to intanciate AsyncHttpClient class.
+     * Use this method to instantiate AsyncHttpClient class.
      * @return smart pointer to newly created instance.
      */
     static AsyncHttpClientPtr create();

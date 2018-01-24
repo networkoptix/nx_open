@@ -67,24 +67,21 @@ TEST_F(SyncQueue, MultiPushPop)
 TEST_F(SyncQueue, TimedPop)
 {
     const std::chrono::milliseconds kSmallDelay(100);
-    const std::chrono::milliseconds kLongDelay(10 * 1000);
+    const std::chrono::hours kLongDelay(1);
+
+    const auto syncPushAndPop =
+        [&](int value)
+        {
+            auto pusher = pushAsync({value}, kSmallDelay);
+            const auto popedValue = queue.pop(kLongDelay);
+            pusher.join();
+            return popedValue && popedValue == value;
+        };
 
     ASSERT_FALSE(static_cast<bool>(queue.pop(kSmallDelay)));
-
-    auto pusher1 = pushAsync({1}, kSmallDelay);
-    const auto value1 = queue.pop(kLongDelay);
-    ASSERT_TRUE(static_cast<bool>(value1));
-    ASSERT_EQ(*value1, 1);
-    pusher1.join();
-
+    syncPushAndPop(1);
     ASSERT_FALSE(static_cast<bool>(queue.pop(kSmallDelay)));
-
-    auto pusher2 = pushAsync({2}, kSmallDelay);
-    const auto value2 = queue.pop(kLongDelay);
-    ASSERT_TRUE(static_cast<bool>(value2));
-    ASSERT_EQ(*value2, 2);
-    pusher2.join();
-
+    syncPushAndPop(2);
     ASSERT_FALSE(static_cast<bool>(queue.pop(kSmallDelay)));
 }
 

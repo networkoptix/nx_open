@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <core/resource/resource_fwd.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 
@@ -75,5 +73,3 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

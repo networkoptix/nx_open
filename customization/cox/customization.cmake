@@ -60,7 +60,6 @@ set(freeLicenseKey "0000-0000-0000-0006")
 set(windows.skip.sign "true")
 set(sign.password "")
 set(sign.cer "")
-set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation en_US)

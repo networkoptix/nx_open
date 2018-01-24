@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <utils/common/synctime.h>
+
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/random_file.h>
 #include <nx/vms/common/p2p/downloader/private/storage.h>
@@ -35,6 +37,7 @@ protected:
 
     QScopedPointer<TestPeerManager> peerManager;
     QDir storageDir;
+    QnSyncTime syncTime;
 };
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, invalidPeerRequest)
