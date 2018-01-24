@@ -61,14 +61,6 @@ include(qrc_utils)
 include(precompiled_header)
 include(strip_target)
 include(mercurial)
-
-if(WINDOWS)
-    include(windows_signing)
-endif()
-
-include(project_utils)
-include(test_utils)
-
 include(ec_protocol)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
@@ -93,6 +85,12 @@ endif()
 include(dependencies)
 include(maven_compatibility)
 include(generate_current_config)
+
+if(WINDOWS)
+    include(windows_signing)
+endif()
+include(project_utils)
+include(test_utils)
 
 nx_create_dev_qt_conf()
 
