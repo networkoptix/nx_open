@@ -96,7 +96,7 @@ class ServerConfig(object):
 
 
 class Server(object):
-
+    """Mediaserver, same for physical and virtual machines."""
     _st_started = object()
     _st_stopped = object()
     _st_starting = object()
@@ -441,14 +441,9 @@ class Server(object):
     def stop_recording_camera(self, camera):
         self.set_camera_recording(camera, recording=False)
 
-    # if there are more than one return first
     @property
     def storage(self):
-        ## # following code requires server is started, which is not always the case;
-        ## #  so was commented-out and replaced with hardcoded one
-        ## storage_records = [record for record in self.rest_api.ec2.getStorages.GET() if record['parentId'] == self.ecs_guid]
-        ## assert len(storage_records) >= 1, 'No storages for server with ecs guid %s is returned by %s' % (self.ecs_guid, self.rest_api_url)
-        ## storage_path = storage_records[0]['url']
+        # GET /ec2/getStorages is not always possible: server sometimes is not started.
         storage_path = os.path.join(self._installation.dir, MEDIASERVER_STORAGE_PATH)
         return Storage(self.host, storage_path, self.timezone)
 
@@ -464,8 +459,8 @@ class Server(object):
     def get_recorded_time_periods(self, camera):
         assert camera.id, 'Camera %r is not yet registered on server' % camera.name
         periods = [TimePeriod(datetime.datetime.utcfromtimestamp(int(d['startTimeMs'])/1000.).replace(tzinfo=pytz.utc),
-                    datetime.timedelta(seconds=int(d['durationMs'])/1000.))
-                    for d in self.rest_api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
+                              datetime.timedelta(seconds=int(d['durationMs']) / 1000.))
+                   for d in self.rest_api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
         log.info('Server %r returned %d recorded periods:', self.name, len(periods))
         for period in periods:
             log.info('\t%s', period)
@@ -500,7 +495,7 @@ class Storage(object):
         log.info('Storing media sample %r to %r', sample.fpath, lowq_fpath)
         self.host.write_file(lowq_fpath, contents)
         log.info('Storing media sample %r to %r', sample.fpath, hiq_fpath)
-        self.host.write_file(hiq_fpath,  contents)
+        self.host.write_file(hiq_fpath, contents)
 
     def _read_with_start_time_metadata(self, sample, unixtime_utc_ms):
         _, ext = os.path.splitext(sample.fpath)
