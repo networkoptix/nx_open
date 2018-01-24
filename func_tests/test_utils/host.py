@@ -357,11 +357,14 @@ class RemoteSshHost(Host):
         return output == 'yes'
 
     def put_file(self, from_local_path, to_remote_path):
-        #assert not self._proxy_host, repr(self._proxy_host)  # Can not proxy this... Or can we?
-        cmd = ['rsync', '-aL', '-e', ' '.join(self._make_ssh_cmd(must_quote=True)),
-               from_local_path,
-               '{user_and_host}:{path}'.format(user_and_host=self._user_and_host, path=to_remote_path)]
-        self._local_host.run_command(cmd)
+        self._local_host.run_command([
+            'rsync',  # If file size and modification time is same, rsync doesn't copy file.
+            '--archive',  # Preserve directory structure, times, access rights.
+            '--copy-links',  # From help: "transform symlink into referent file/dir".
+            '--rsh=' + ' '.join(self._make_ssh_cmd(must_quote=True)),
+            from_local_path,
+            self._user_and_host + ':' + to_remote_path,
+            ])
 
     def get_file(self, from_remote_path, to_local_path):
         cmd = ['rsync', '-aL', '-e', subprocess.list2cmdline(self._make_ssh_cmd(must_quote=True)),
