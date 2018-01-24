@@ -255,7 +255,7 @@ int Helper::handleAddUpload(const QString& fileName)
     if (errorCode != ResultCode::ok)
         return makeDownloaderError(errorCode);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int Helper::handleRemoveDownload(const QString& fileName)
