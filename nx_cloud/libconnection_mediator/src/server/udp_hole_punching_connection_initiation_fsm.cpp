@@ -29,7 +29,9 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     m_relayClusterClient(relayClusterClient),
     m_serverConnectionWeakRef(serverPeerData.peerConnection),
     m_serverPeerEndpoints(serverPeerData.endpoints),
-    m_serverPeerHostName(serverPeerData.hostName)
+    m_serverPeerHostName(serverPeerData.hostName),
+    m_serverPeerCloudConnectVersion(serverPeerData.cloudConnectVersion),
+    m_serverPeerConnectionMethods(api::ConnectionMethod::all)
 {
     auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
     if (!serverConnectionStrongRef)
@@ -43,6 +45,8 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
 
     m_sessionStatisticsInfo.startTime = nx::utils::utcTime();
     m_sessionStatisticsInfo.sessionId = connectionID;
+    m_sessionStatisticsInfo.destinationHostEndpoint =
+        serverConnectionStrongRef->socket()->getForeignAddress().toString().toUtf8();
 
     bindToAioThread(serverConnectionStrongRef->socket()->getAioThread());
 }
@@ -226,6 +230,16 @@ void UDPHolePunchingConnectionInitiationFsm::noConnectionAckOnTime()
     NX_VERBOSE(this, lm("Connection %1. No connection ack has been reported on time")
         .args(m_connectionID));
 
+    m_timer.pleaseStopSync();
+
+    if (initiateCloudConnect(api::ConnectionAckRequest()))
+    {
+        NX_VERBOSE(this, "Proceeding without connection ack from listening peer");
+        return;
+    }
+
+    NX_VERBOSE(this, "Reporting connect failure");
+
     // Sending connect response.
     m_state = State::waitingConnectionResult;
 
@@ -258,6 +272,9 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
     m_sessionStatisticsInfo.destinationHostEndpoint =
         connection->getSourceAddress().toString().toUtf8();
 
+    if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
+        request.udpEndpointList.push_front(connection->getSourceAddress());
+
     m_timer.pleaseStopSync();
 
     if (m_state > State::waitingServerPeerUDPAddress)
@@ -268,36 +285,41 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
         return;
     }
 
-    if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
-        request.udpEndpointList.push_front(connection->getSourceAddress());
-
-    auto tcpEndpoints = std::move(request.forwardedTcpEndpointList);
-    tcpEndpoints.insert(
-        tcpEndpoints.begin(),
-        m_serverPeerEndpoints.begin(), m_serverPeerEndpoints.end());
-
-    if (request.udpEndpointList.empty() &&
-        tcpEndpoints.empty() &&
-        (request.connectionMethods & api::ConnectionMethod::proxy) == 0)
-    {
-        completionHandler(api::ResultCode::noSuitableConnectionMethod);
-        post(std::bind(
-            &UDPHolePunchingConnectionInitiationFsm::done,
-            this,
-            api::ResultCode::noSuitableConnectionMethod));
-        return;
-    }
-
-    m_preparedConnectResponse = prepareConnectResponse(
-        request,
-        std::move(tcpEndpoints),
-        boost::none);
+    m_serverPeerConnectionMethods = request.connectionMethods;
+    if (!initiateCloudConnect(std::move(request)))
+        return completionHandler(api::ResultCode::noSuitableConnectionMethod);
 
     // Saving completion handler so that client and server receive
     // connect and connectionAck responses simultaneously.
     m_connectionAckCompletionHandler = std::move(completionHandler);
+}
+
+bool UDPHolePunchingConnectionInitiationFsm::initiateCloudConnect(
+    api::ConnectionAckRequest connectionAck)
+{
+    auto tcpEndpoints = std::move(connectionAck.forwardedTcpEndpointList);
+    tcpEndpoints.insert(
+        tcpEndpoints.begin(),
+        m_serverPeerEndpoints.begin(), m_serverPeerEndpoints.end());
+
+    if (connectionAck.udpEndpointList.empty() &&
+        tcpEndpoints.empty() &&
+        (m_serverPeerConnectionMethods & api::ConnectionMethod::proxy) == 0)
+    {
+        post(std::bind(
+            &UDPHolePunchingConnectionInitiationFsm::done,
+            this,
+            api::ResultCode::noSuitableConnectionMethod));
+        return false;
+    }
+
+    m_preparedConnectResponse = prepareConnectResponse(
+        connectionAck,
+        std::move(tcpEndpoints),
+        boost::none);
 
     initiateRelayInstanceSearch();
+    return true;
 }
 
 void UDPHolePunchingConnectionInitiationFsm::initiateRelayInstanceSearch()
@@ -331,10 +353,19 @@ void UDPHolePunchingConnectionInitiationFsm::initiateRelayInstanceSearch()
 
 void UDPHolePunchingConnectionInitiationFsm::finishConnect()
 {
-    sendConnectResponse(api::ResultCode::ok, std::move(m_preparedConnectResponse));
+    api::ResultCode resultCode = api::ResultCode::ok;
+    if (m_preparedConnectResponse.udpEndpointList.empty()
+        && m_preparedConnectResponse.forwardedTcpEndpointList.empty()
+        && !static_cast<bool>(m_preparedConnectResponse.trafficRelayUrl))
+    {
+        resultCode = api::ResultCode::noSuitableConnectionMethod;
+    }
+
+    sendConnectResponse(resultCode, std::move(m_preparedConnectResponse));
     m_state = State::waitingConnectionResult;
 
-    nx::utils::swapAndCall(m_connectionAckCompletionHandler, api::ResultCode::ok);
+    if (m_connectionAckCompletionHandler)
+        nx::utils::swapAndCall(m_connectionAckCompletionHandler, api::ResultCode::ok);
 
     m_timer.start(
         m_settings.connectionParameters().connectionResultWaitTimeout,
@@ -379,7 +410,7 @@ api::ConnectResponse UDPHolePunchingConnectionInitiationFsm::prepareConnectRespo
     connectResponse.params = m_settings.connectionParameters();
     connectResponse.udpEndpointList = std::move(connectionAckRequest.udpEndpointList);
     connectResponse.forwardedTcpEndpointList = std::move(tcpEndpoints);
-    connectResponse.cloudConnectVersion = connectionAckRequest.cloudConnectVersion;
+    connectResponse.cloudConnectVersion = m_serverPeerCloudConnectVersion;
     connectResponse.destinationHostFullName = m_serverPeerHostName;
     if (relayInstanceUrl)
         connectResponse.trafficRelayUrl = relayInstanceUrl->toString().toUtf8();
