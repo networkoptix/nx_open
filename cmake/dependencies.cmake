@@ -122,11 +122,6 @@ function(nx_get_dependencies)
 
     nx_rdep_add_package(any/boost)
 
-    if(haveServer OR haveDesktopClient OR haveTests)
-        nx_rdep_add_package(any/qtservice)
-        nx_rdep_add_package(any/qtsinglecoreapplication)
-    endif()
-
     if(WIN32)
         set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
     endif()
@@ -185,13 +180,8 @@ function(nx_get_dependencies)
     endif()
 
     if(haveDesktopClient)
-        nx_rdep_add_package(any/qtsingleapplication)
         nx_rdep_add_package(any/help-${customization}-3.1 PATH_VARIABLE help_directory)
         set(help_directory ${help_directory} PARENT_SCOPE)
-    endif()
-
-    if(haveMobileClient)
-        nx_rdep_add_package(any/qtsingleguiapplication)
     endif()
 
     if(haveDesktopClient OR haveMobileClient)
