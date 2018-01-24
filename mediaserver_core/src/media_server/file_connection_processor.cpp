@@ -16,6 +16,13 @@
 #include <network/tcp_listener.h>
 #include <common/common_module.h>
 
+QString QnFileConnectionProcessor::externalPackagePath()
+{
+    //static const QString path = QDir(qApp->applicationDirPath()).filePath(lit("external.dat"));
+    static const QString path = QDir(lit("/opt/hanwha/mediaserver/bin")).filePath(lit("external.dat"));
+    return path;
+}
+
 namespace {
     static const qint64 CACHE_SIZE = 1024 * 1024;
 
@@ -50,42 +57,33 @@ namespace {
 
     const QByteArray kDefaultContentType = "text/html; charset=utf-8";
 
-    const QString kExternalResourcesPackageName = "external.dat";
-
     QIODevicePtr getStaticFile(const QString& relativePath)
     {
         if (!externalPackageNameMiss.contains(relativePath))
         {
-
-            {   /* Check external package. */
-                static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
-                QIODevicePtr result(new QuaZipFile(packageName, relativePath));
-                if (result->open(QuaZipFile::ReadOnly))
-                    return result;
-
-                externalPackageNameMiss.insert(relativePath, nullptr);
-            }
-        }
-
-        {   /* Check internal resources. */
-            QString fileName = ":" + relativePath;
-            QIODevicePtr result(new QFile(fileName));
-            if (result->open(QFile::ReadOnly))
+            QIODevicePtr result(new QuaZipFile(QnFileConnectionProcessor::externalPackagePath(), relativePath));
+            if (result->open(QuaZipFile::ReadOnly))
                 return result;
+
+            externalPackageNameMiss.insert(relativePath, nullptr);
         }
+
+        /* Check internal resources. */
+        QString fileName = ":" + relativePath;
+        QIODevicePtr result(new QFile(fileName));
+        if (result->open(QFile::ReadOnly))
+            return result;
 
         return QIODevicePtr();
     }
 
     QDateTime staticFileLastModified(const QIODevicePtr& device)
     {
-        static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
-
         QDateTime result;
         if (QFile* file = qobject_cast<QFile*>(device.get()))
             result = QFileInfo(*file).lastModified();
         else
-            result = QFileInfo(packageName).lastModified();
+            result = QFileInfo(QnFileConnectionProcessor::externalPackagePath()).lastModified();
 
         // zero msec in result
         return result.addMSecs(-result.time().msec());
