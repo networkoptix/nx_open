@@ -18,7 +18,7 @@ import sys
 import click
 from flask import Flask, send_file
 from pathlib2 import Path, PurePath
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, SecurityError
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
@@ -156,6 +156,8 @@ def serve(emulate_no_update_files):
         elif path.suffix == '.zip' and not emulate_no_update_files:
             possible_path_key = DATA_DIR / path.parent / 'update.json'
 
+            if DATA_DIR not in possible_path_key.resolve().parents:
+                raise SecurityError()
             if not possible_path_key.exists():
                 raise NotFound()
 
