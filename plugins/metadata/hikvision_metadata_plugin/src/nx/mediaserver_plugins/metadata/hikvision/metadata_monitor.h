@@ -43,7 +43,7 @@ public:
     void removeHandler(const QString& handlerId);
     void clearHandlers();
 
-    bool processEvent(const const HikvisionEvent& hikvisionEvent);
+    bool processEvent(const HikvisionEvent& hikvisionEvent);
 private:
     QUrl buildMonitoringUrl(
         const QUrl& resourceUrl,
