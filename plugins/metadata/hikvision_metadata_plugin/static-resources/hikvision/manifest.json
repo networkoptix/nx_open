@@ -275,12 +275,12 @@
         {
             "eventTypeId": "{71004AC7-D190-444E-888A-EA61997B6CD2}",
             "eventName": {
-                "value": "LPR - other list",
+                "value": "LPR - Other list",
                 "localization": {
                 }
             },
             "internalName": "otherlist",
-            "description": "other list"
+            "description": "Other list"
         },
         {
             "eventTypeId": "{4DAE9597-7A81-4A48-AEDC-37D5B184DB11}",

@@ -62,20 +62,20 @@ private:
 
     void addExpiredEvents(std::vector<HikvisionEvent>& result);
 private:
-    void at_responseReceived();
-    void at_someBytesAvailable();
+    void at_monitorResponseReceived();
+    void at_monitorSomeBytesAvailable();
     void at_connectionClosed();
 
     void at_LprRequestDone();
 private:
     const Hikvision::DriverManifest& m_manifest;
-    const QUrl m_url;
+    const QUrl m_monitorUrl;
     const QUrl m_lprUrl;
     const QAuthenticator m_auth;
-    nx::network::aio::Timer m_timer;
+    nx::network::aio::Timer m_monitorTimer;
     nx::network::aio::Timer m_lprTimer;
     QElapsedTimer m_timeSinceLastOpen;
-    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
+    std::unique_ptr<nx_http::AsyncClient> m_monitorHttpClient;
     std::unique_ptr<nx_http::AsyncClient> m_lprHttpClient;
     MultipartContentParserPtr m_contentParser;
     QString m_fromDateFilter;

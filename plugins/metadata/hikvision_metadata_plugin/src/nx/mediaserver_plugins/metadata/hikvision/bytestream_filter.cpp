@@ -22,7 +22,7 @@ BytestreamFilter::BytestreamFilter(
 
 bool BytestreamFilter::processData(const QnByteArrayConstRef& buffer)
 {
-    NX_WARNING(this, lm("Got XML data:\n %1").arg(buffer));
+    NX_VERBOSE(this, lm("Got XML data:\n %1").arg(buffer));
 
     using namespace nx::mediaserver::plugins::hikvision;
     auto hikvisionEvent = AttributesParser::parseEventXml(buffer, m_manifest);

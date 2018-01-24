@@ -110,7 +110,6 @@ boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
         }
     }
 
-    auto eventDescriptor = manifest.eventDescriptorById(result.typeId);
     result.caption = buildCaption(manifest, result);
     result.description = buildDescription(manifest, result);
 

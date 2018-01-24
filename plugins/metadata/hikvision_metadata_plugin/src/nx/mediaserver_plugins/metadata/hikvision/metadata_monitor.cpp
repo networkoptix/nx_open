@@ -35,11 +35,11 @@ HikvisionMetadataMonitor::HikvisionMetadataMonitor(
     const std::vector<QnUuid>& eventTypes)
     :
     m_manifest(manifest),
-    m_url(buildMonitoringUrl(url, eventTypes)),
+    m_monitorUrl(buildMonitoringUrl(url, eventTypes)),
     m_lprUrl(buildLprUrl(url)),
     m_auth(auth)
 {
-    m_lprTimer.bindToAioThread(m_timer.getAioThread());
+    m_lprTimer.bindToAioThread(m_monitorTimer.getAioThread());
 }
 
 HikvisionMetadataMonitor::~HikvisionMetadataMonitor()
@@ -50,21 +50,21 @@ HikvisionMetadataMonitor::~HikvisionMetadataMonitor()
 void HikvisionMetadataMonitor::startMonitoring()
 {
     NX_VERBOSE(this, "Started");
-    m_timer.post([this](){ initMonitorUnsafe(); });
+    m_monitorTimer.post([this](){ initMonitorUnsafe(); });
 }
 
 void HikvisionMetadataMonitor::stopMonitoring()
 {
     utils::promise<void> promise;
-    m_timer.post(
+    m_monitorTimer.post(
         [this, &promise]()
         {
-            if (m_httpClient)
-                m_httpClient->pleaseStopSync();
+            if (m_monitorHttpClient)
+                m_monitorHttpClient->pleaseStopSync();
             if (m_lprHttpClient)
                 m_lprHttpClient->pleaseStopSync();
 
-            m_timer.pleaseStopSync();
+            m_monitorTimer.pleaseStopSync();
             m_lprTimer.pleaseStopSync();
             promise.set_value();
         });
@@ -124,12 +124,12 @@ void HikvisionMetadataMonitor::initMonitorUnsafe()
 void HikvisionMetadataMonitor::initEventMonitor()
 {
     auto httpClient = std::make_unique<nx_http::AsyncClient>();
-    m_timer.pleaseStopSync();
-    httpClient->bindToAioThread(m_timer.getAioThread());
+    m_monitorTimer.pleaseStopSync();
+    httpClient->bindToAioThread(m_monitorTimer.getAioThread());
 
-    httpClient->setOnResponseReceived([this]() { at_responseReceived(); });
-    httpClient->setOnSomeMessageBodyAvailable([this]() { at_someBytesAvailable(); });
-    httpClient->setOnDone([this]() {reopenMonitorConnection();});
+    httpClient->setOnResponseReceived([this]() { at_monitorResponseReceived(); });
+    httpClient->setOnSomeMessageBodyAvailable([this]() { at_monitorSomeBytesAvailable(); });
+    httpClient->setOnDone([this]() { reopenMonitorConnection(); });
 
     m_timeSinceLastOpen.restart();
     httpClient->setTotalReconnectTries(nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES);
@@ -140,15 +140,15 @@ void HikvisionMetadataMonitor::initEventMonitor()
     m_contentParser = std::make_unique<nx_http::MultipartContentParser>();
     m_contentParser->setNextFilter(std::make_shared<BytestreamFilter>(m_manifest, this));
 
-    m_httpClient = std::move(httpClient);
-    m_httpClient->doGet(m_url);
+    m_monitorHttpClient = std::move(httpClient);
+    m_monitorHttpClient->doGet(m_monitorUrl);
 }
 
 void HikvisionMetadataMonitor::initLprMonitor()
 {
     auto httpClient = std::make_unique<nx_http::AsyncClient>();
-    m_timer.pleaseStopSync();
-    httpClient->bindToAioThread(m_timer.getAioThread());
+    m_lprTimer.pleaseStopSync();
+    httpClient->bindToAioThread(m_lprTimer.getAioThread());
 
     httpClient->setOnDone([this]() { at_LprRequestDone(); });
 
@@ -172,13 +172,13 @@ void HikvisionMetadataMonitor::sendLprRequest()
 
 }
 
-void HikvisionMetadataMonitor::at_responseReceived()
+void HikvisionMetadataMonitor::at_monitorResponseReceived()
 {
-    if (!m_httpClient)
+    if (!m_monitorHttpClient)
         return;
-    const auto response = m_httpClient->response();
+    const auto response = m_monitorHttpClient->response();
     if (response && response->statusLine.statusCode == nx_http::StatusCode::ok)
-        m_contentParser->setContentType(m_httpClient->contentType());
+        m_contentParser->setContentType(m_monitorHttpClient->contentType());
     else
         reopenMonitorConnection();
 }
@@ -208,11 +208,11 @@ void HikvisionMetadataMonitor::at_LprRequestDone()
     m_lprTimer.start(kLprRequestsTimeout, [this]() { sendLprRequest(); } );
 }
 
-void HikvisionMetadataMonitor::at_someBytesAvailable()
+void HikvisionMetadataMonitor::at_monitorSomeBytesAvailable()
 {
-    if (!m_httpClient)
+    if (!m_monitorHttpClient)
         return;
-    const auto& buffer = m_httpClient->fetchMessageBodyBuffer();
+    const auto& buffer = m_monitorHttpClient->fetchMessageBodyBuffer();
     m_contentParser->processData(buffer);
 }
 
@@ -226,7 +226,7 @@ std::chrono::milliseconds HikvisionMetadataMonitor::reopenDelay() const
 
 void HikvisionMetadataMonitor::reopenMonitorConnection()
 {
-    m_timer.start(reopenDelay(), [this]() { initEventMonitor(); });
+    m_monitorTimer.start(reopenDelay(), [this]() { initEventMonitor(); });
 }
 
 void HikvisionMetadataMonitor::reopenLprConnection()

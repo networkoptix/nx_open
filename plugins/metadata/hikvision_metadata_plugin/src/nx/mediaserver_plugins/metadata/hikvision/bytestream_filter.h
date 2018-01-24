@@ -28,7 +28,7 @@ private:
     void addExpiredEvents(std::vector<HikvisionEvent>& result);
 private:
     const Hikvision::DriverManifest m_manifest;
-    HikvisionMetadataMonitor* m_monitor;
+    HikvisionMetadataMonitor* m_monitor = nullptr;
 };
 
 } // namespace hikvision
