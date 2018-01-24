@@ -34,9 +34,6 @@ protected:
      */
     std::string getParamValue(const char* paramName);
 
-protected:
-    mutable std::mutex mutex;
-
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by a descendant.
 
