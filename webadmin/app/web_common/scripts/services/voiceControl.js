@@ -21,7 +21,7 @@ angular.module('nxCommon')
         };
     }])
     .service('voiceControl', function () {
-        if(!window.chrome){
+        if(jscd.browser.toLowerCase() != 'chrome'){
             return;
         }
         var self = this;

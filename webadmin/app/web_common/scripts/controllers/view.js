@@ -322,7 +322,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             }*/
         };
 
-        if($scope.betaMode && window.chrome){
+        if($scope.betaMode && jscd.browser.toLowerCase() != 'chrome'){
             $scope.voiceControls = {enabled:true,showCommands:true};
             voiceControl.initControls($scope);
         }
