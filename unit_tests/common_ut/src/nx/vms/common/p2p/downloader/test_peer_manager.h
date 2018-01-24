@@ -83,9 +83,6 @@ public:
 
     void addInternetFile(const nx::utils::Url& url, const QString& fileName);
 
-    bool processNextRequest();
-    void exec(int maxRequests = 0);
-
     const RequestCounter* requestCounter() const;
 
     using WaitCallback = std::function<void()>;
@@ -163,6 +160,7 @@ private:
         rest::Handle handle;
         RequestCallback callback;
         qint64 timeToReply;
+        bool cancelled = false;
     };
 
     QQueue<Request> m_requestsQueue;

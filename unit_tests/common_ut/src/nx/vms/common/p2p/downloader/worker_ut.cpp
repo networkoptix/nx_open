@@ -48,26 +48,11 @@ public:
         stop();
     }
 
-    //virtual void waitForNextStep(int delay) override
-    //{
-    //    if (delay == -1)
-    //        delay = defaultStepDelay();
-
-    //    if (delay > 0)
-    //    {
-    //        static_cast<ProxyTestPeerManager*>(peerManager())->requestWait(
-    //            delay, [this] { waitForNextStepBase(0); });
-    //        return;
-    //    }
-
-    //    Worker::waitForNextStep(0);
-    //}
-
 private:
-    //void waitForNextStepBase(int delay)
-    //{
-    //    Worker::waitForNextStep(delay);
-    //}
+    virtual qint64 delayMs() const override
+    {
+        return 3 * 1000;
+    }
 };
 
 class DistributedFileDownloaderWorkerTest: public ::testing::Test, public TestPeerManagerHandler
@@ -283,7 +268,6 @@ TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
 
     defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
     defaultPeer->worker->start();
-    //commonPeerManager->exec(2); //< Wait request, file info request.
 
     readyFuture.wait();
 
@@ -293,129 +277,123 @@ TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
     ASSERT_TRUE(newFileInfo.md5 == fileInfo.md5);
 }
 
-//TEST_F(DistributedFileDownloaderWorkerTest, simpleDownload)
-//{
-//    auto fileInfo = createTestFile();
-//    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
-//
-//    fileInfo.downloadedChunks.fill(true);
-//
-//    addPeerWithFile(fileInfo);
-//
-//    bool finished = false;
-//
-//    QObject::connect(defaultPeer->worker, &Worker::finished, [&finished] { finished = true; });
-//
-//    defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
-//    defaultPeer->worker->start();
-//
-//    const int maxRequests = fileInfo.downloadedChunks.size() + 4;
-//    commonPeerManager->exec(maxRequests);
-//
-//    ASSERT_TRUE(finished);
-//
-//    const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
-//    ASSERT_TRUE(newFileInfo.isValid());
-//    ASSERT_EQ(newFileInfo.size, fileInfo.size);
-//    ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
-//}
-//
-//TEST_F(DistributedFileDownloaderWorkerTest, corruptedFile)
-//{
-//    auto fileInfo = createTestFile();
-//    fileInfo.downloadedChunks.setBit(0); //< Making file corrupted.
-//
-//    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
-//
-//    fileInfo.downloadedChunks.fill(true);
-//
-//    addPeerWithFile(fileInfo);
-//
-//    bool finished = false;
-//    bool wasCorrupted = false;
-//
-//    QObject::connect(defaultPeer->worker, &Worker::finished, [&finished] { finished = true; });
-//    QObject::connect(defaultPeer->worker, &Worker::stateChanged,
-//        [this, &wasCorrupted, &fileInfo]
-//        {
-//            if (defaultPeer->worker->state() == Worker::State::requestingChecksums)
-//            {
-//                ASSERT_EQ(defaultPeer->storage->fileInformation(fileInfo.name).status,
-//                    FileInformation::Status::corrupted);
-//                wasCorrupted = true;
-//            }
-//        });
-//
-//    defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
-//    defaultPeer->worker->start();
-//
-//    const int maxRequests = fileInfo.downloadedChunks.size() + 8;
-//    commonPeerManager->exec(maxRequests);
-//
-//    ASSERT_TRUE(wasCorrupted);
-//    ASSERT_TRUE(finished);
-//
-//    const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
-//    ASSERT_TRUE(newFileInfo.isValid());
-//    ASSERT_EQ(newFileInfo.size, fileInfo.size);
-//    ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
-//}
-//
-//TEST_F(DistributedFileDownloaderWorkerTest, simpleDownloadFromInternet)
-//{
-//    auto fileInfo = createTestFile();
-//    fileInfo.url = "http://test.org/testFile";
-//    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
-//
-//    commonPeerManager->setHasInternetConnection(defaultPeer->peerManager->selfId());
-//    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
-//
-//    bool finished = false;
-//
-//    QObject::connect(defaultPeer->worker, &Worker::finished, [&finished] { finished = true; });
-//
-//    defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
-//    defaultPeer->worker->start();
-//
-//    const int maxRequests = fileInfo.downloadedChunks.size() + 4;
-//    commonPeerManager->exec(maxRequests);
-//
-//    ASSERT_TRUE(finished);
-//
-//    const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
-//    ASSERT_TRUE(newFileInfo.isValid());
-//    ASSERT_EQ(newFileInfo.size, fileInfo.size);
-//    ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
-//}
-//
-//TEST_F(DistributedFileDownloaderWorkerTest, downloadFromInternetViaNonSetPeer)
-//{
-//    auto fileInfo = createTestFile();
-//    fileInfo.url = "http://test.org/testFile";
-//    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
-//
-//    const auto proxyPeerId = commonPeerManager->addPeer("Proxy Peer");
-//
-//    commonPeerManager->setHasInternetConnection(proxyPeerId);
-//    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
-//
-//    bool finished = false;
-//
-//    QObject::connect(defaultPeer->worker, &Worker::finished, [&finished] { finished = true; });
-//
-//    defaultPeer->worker->start();
-//
-//    const int maxRequests = fileInfo.downloadedChunks.size() + 4;
-//    commonPeerManager->exec(maxRequests);
-//
-//    ASSERT_TRUE(finished);
-//
-//    const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
-//    ASSERT_TRUE(newFileInfo.isValid());
-//    ASSERT_EQ(newFileInfo.size, fileInfo.size);
-//    ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
-//}
-//
+TEST_F(DistributedFileDownloaderWorkerTest, simpleDownload)
+{
+    auto fileInfo = createTestFile();
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
+    fileInfo.downloadedChunks.fill(true);
+    addPeerWithFile(fileInfo);
+
+    bool finished = false;
+    defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
+    defaultPeer->worker->start();
+
+    nx::utils::promise<bool> readyPromise;
+    auto readyFuture = readyPromise.get_future();
+    QObject::connect(defaultPeer->worker, &Worker::finished,
+        [&readyPromise]() mutable { readyPromise.set_value(true); });
+
+    ASSERT_TRUE(readyFuture.get());
+
+    const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
+    ASSERT_TRUE(newFileInfo.isValid());
+    ASSERT_EQ(newFileInfo.size, fileInfo.size);
+    ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
+}
+
+
+TEST_F(DistributedFileDownloaderWorkerTest, corruptedFile)
+{
+    auto fileInfo = createTestFile();
+    fileInfo.downloadedChunks.setBit(0); //< Making file corrupted.
+
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
+
+    fileInfo.downloadedChunks.fill(true);
+
+    addPeerWithFile(fileInfo);
+
+    bool wasCorrupted = false;
+
+    nx::utils::promise<bool> readyPromise;
+    auto readyFuture = readyPromise.get_future();
+
+    QObject::connect(defaultPeer->worker, &Worker::finished,
+        [&readyPromise] { readyPromise.set_value(true); });
+    QObject::connect(defaultPeer->worker, &Worker::stateChanged,
+        [this, &wasCorrupted, &fileInfo]
+        {
+            if (defaultPeer->worker->state() == Worker::State::requestingChecksums)
+            {
+                ASSERT_EQ(defaultPeer->storage->fileInformation(fileInfo.name).status,
+                    FileInformation::Status::corrupted);
+                wasCorrupted = true;
+            }
+        });
+
+    defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
+    defaultPeer->worker->start();
+
+    ASSERT_TRUE(readyFuture.get());
+    ASSERT_TRUE(wasCorrupted);
+
+    const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
+    ASSERT_TRUE(newFileInfo.isValid());
+    ASSERT_EQ(newFileInfo.size, fileInfo.size);
+    ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
+}
+
+TEST_F(DistributedFileDownloaderWorkerTest, simpleDownloadFromInternet)
+{
+    auto fileInfo = createTestFile();
+    fileInfo.url = "http://test.org/testFile";
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
+
+    commonPeerManager->setHasInternetConnection(defaultPeer->peerManager->selfId());
+    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
+
+    nx::utils::promise<bool> readyPromise;
+    auto readyFuture = readyPromise.get_future();
+    QObject::connect(defaultPeer->worker, &Worker::finished,
+        [&readyPromise] { readyPromise.set_value(true); });
+
+    defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
+    defaultPeer->worker->start();
+
+    ASSERT_TRUE(readyFuture.get());
+
+    const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
+    ASSERT_TRUE(newFileInfo.isValid());
+    ASSERT_EQ(newFileInfo.size, fileInfo.size);
+    ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
+}
+
+TEST_F(DistributedFileDownloaderWorkerTest, downloadFromInternetViaNonSetPeer)
+{
+    auto fileInfo = createTestFile();
+    fileInfo.url = "http://test.org/testFile";
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
+
+    const auto proxyPeerId = commonPeerManager->addPeer("Proxy Peer");
+
+    commonPeerManager->setHasInternetConnection(proxyPeerId);
+    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
+
+    nx::utils::promise<bool> readyPromise;
+    auto readyFuture = readyPromise.get_future();
+    QObject::connect(defaultPeer->worker, &Worker::finished,
+        [&readyPromise] { readyPromise.set_value(true); });
+
+    defaultPeer->worker->start();
+
+    ASSERT_TRUE(readyFuture.get());
+
+    const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
+    ASSERT_TRUE(newFileInfo.isValid());
+    ASSERT_EQ(newFileInfo.size, fileInfo.size);
+    ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
+}
+
 //TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
 //{
 //    auto fileInfo = createTestFile();

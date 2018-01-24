@@ -102,6 +102,9 @@ private:
     void setShouldWaitForCb();
     virtual void run() override;
     virtual void pleaseStop() override;
+    void pleaseStopUnsafe();
+    bool haveChunksToDownloadUnsafe();
+    virtual qint64 delayMs() const;
 
 protected:
     FileInformation fileInformation() const;
@@ -144,7 +147,7 @@ private:
     QHash<rest::Handle, QnUuid> m_peerByRequestHandle;
 
     QBitArray m_availableChunks;
-    int m_downloadingChunksCount = 0;
+    QBitArray m_downloadingChunks;
 
     int m_peersPerOperation = 1;
     struct PeerInformation
@@ -157,8 +160,9 @@ private:
     };
     QHash<QnUuid, PeerInformation> m_peerInfoById;
 
-    boost::optional<int> m_subsequentChunksToDownload;
+    int m_subsequentChunksToDownload;
     bool m_usingInternet = false;
+    bool m_fileInfoValidated;
 };
 
 } // namespace downloader

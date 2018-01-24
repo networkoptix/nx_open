@@ -276,34 +276,11 @@ rest::Handle TestPeerManager::validateFileInformation(
 
 void TestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
 {
-    auto it = std::remove_if(m_requestsQueue.begin(), m_requestsQueue.end(),
-        [&peerId, &handle](const Request& request)
-        {
-            return request.peerId == peerId && request.handle == handle;
-        });
-    m_requestsQueue.erase(it, m_requestsQueue.end());
-}
-
-bool TestPeerManager::processNextRequest()
-{
-    if (m_requestsQueue.isEmpty())
-        return false;
-
-    const auto& request = m_requestsQueue.dequeue();
-    m_currentTime = request.timeToReply;
-    request.callback(request.handle);
-
-    return true;
-}
-
-void TestPeerManager::exec(int maxRequests)
-{
-    while (processNextRequest())
+    QnMutexLocker lock(&m_mutex);
+    for (auto& request: m_requestsQueue)
     {
-        if (maxRequests > 1)
-            --maxRequests;
-        else if (maxRequests == 1)
-            break;
+        if (request.peerId == peerId && request.handle == handle)
+            request.cancelled = true;
     }
 }
 
@@ -328,17 +305,9 @@ rest::Handle TestPeerManager::getRequestHandle()
 rest::Handle TestPeerManager::enqueueRequest(
     const QnUuid& peerId, qint64 time, RequestCallback callback)
 {
+    QnMutexLocker lock(&m_mutex);
     const auto handle = getRequestHandle();
     Request request{peerId, handle, callback, m_currentTime + time};
-
-    //auto it = std::lower_bound(m_requestsQueue.begin(), m_requestsQueue.end(), request,
-    //    [](const Request& left, const Request& right)
-    //    {
-    //        return left.timeToReply < right.timeToReply;
-    //    });
-
-    QnMutexLocker lock(&m_mutex);
-    //m_requestsQueue.insert(it, request);
     m_requestsQueue.push_back(request);
     m_condition.wakeOne();
     return handle;
@@ -354,12 +323,12 @@ void TestPeerManager::pleaseStop()
 void TestPeerManager::run()
 {
     QnMutexLocker lock(&m_mutex);
-    while (!needToStop())
+    while (true)
     {
         while (m_requestsQueue.isEmpty() && !needToStop())
             m_condition.wait(lock.mutex());
 
-        if (needToStop())
+        if (needToStop() && m_requestsQueue.isEmpty())
             return;
 
         const auto request = m_requestsQueue.front();
