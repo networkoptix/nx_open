@@ -22,12 +22,8 @@ from werkzeug.exceptions import NotFound
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
-    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-    # noinspection PyCompatibility,PyUnresolvedReferences
     from httplib import HTTPConnection
 elif sys.version_info[:2] in {(3, 5), (3, 6)}:
-    # noinspection PyCompatibility,PyUnresolvedReferences
-    from http.server import HTTPServer, BaseHTTPRequestHandler
     # noinspection PyCompatibility,PyUnresolvedReferences
     from http.client import HTTPConnection
 
@@ -59,14 +55,16 @@ def collect_actual_data():
             update_path = UPDATE_PATH_PATTERN.format(customization, build_num)
             conn.request('GET', update_path)
             response = conn.getresponse()
-            content = response.read()
+            response_contents = response.read()
             if response.status != 200:
+                _logger.warning("Ignore %s: HTTP status code %d.", update_path, response.status)
                 continue
             try:
-                path_to_update_obj[update_path] = json.loads(content)
-            except Exception as e:
-                # Some updates might be not valid jsons, we are just not interested in them
-                pass
+                update_metadata = json.loads(response_contents)
+            except ValueError:
+                _logger.warning("Ignore %s: not a valid JSON.", update_path)
+                continue
+            path_to_update_obj[update_path] = update_metadata
 
     return root_obj, path_to_update_obj
 
