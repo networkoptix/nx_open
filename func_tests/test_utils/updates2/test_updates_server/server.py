@@ -22,12 +22,8 @@ from werkzeug.exceptions import NotFound
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
-    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-    # noinspection PyCompatibility,PyUnresolvedReferences
     from httplib import HTTPConnection
 elif sys.version_info[:2] in {(3, 5), (3, 6)}:
-    # noinspection PyCompatibility,PyUnresolvedReferences
-    from http.server import HTTPServer, BaseHTTPRequestHandler
     # noinspection PyCompatibility,PyUnresolvedReferences
     from http.client import HTTPConnection
 
