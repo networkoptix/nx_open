@@ -73,7 +73,7 @@ TEST_F(SyncQueue, TimedPop)
         [&](int value)
         {
             auto pusher = pushAsync({value}, kSmallDelay);
-            const auto popedValue = queue.pop(kLongDelay);
+            const auto popedValue = queue.pop(std::chrono::duration_cast<std::chrono::milliseconds>(kLongDelay));
             pusher.join();
             return popedValue && popedValue == value;
         };
