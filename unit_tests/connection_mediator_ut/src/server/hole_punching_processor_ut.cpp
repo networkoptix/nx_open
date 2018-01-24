@@ -334,7 +334,7 @@ TEST_F(
 
     whenIssueConnectRequest();
 
-    thenConnectResultCodeIs(api::ResultCode::noReplyFromServer);
+    thenConnectResultCodeIs(api::ResultCode::noSuitableConnectionMethod);
     waitForMediatorToDropConnectSession();
 }
 
@@ -345,32 +345,6 @@ TEST_F(
     givenServerThatBreaksConnectionToMediatorOnIndication();
     whenIssueConnectRequest();
     thenConnectResultCodeIs(api::ResultCode::notFound);
-
-    ASSERT_EQ(api::ResultCode::ok, server1->listen().first);
-
-    for (int i = 0; i < 100; ++i)
-    {
-        reinitializeUdpClient();
-
-        api::ConnectRequest connectRequest;
-        connectRequest.originatingPeerId = QnUuid::createUuid().toByteArray();
-        connectRequest.connectSessionId = QnUuid::createUuid().toByteArray();
-        connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
-        connectRequest.destinationHostName = server1->serverId() + "." + m_system.id;
-        nx::utils::promise<void> connectResponsePromise;
-        m_udpClient->connect(
-            connectRequest,
-            [&connectResponsePromise](
-                stun::TransportHeader /*stunTransportHeader*/,
-                api::ResultCode /*resultCode*/,
-                api::ConnectResponse /*responseData*/)
-            {
-                connectResponsePromise.set_value();
-            });
-        connectResponsePromise.get_future().wait();
-
-        resetUdpClient();
-    }
 }
 
 //-------------------------------------------------------------------------------------------------
