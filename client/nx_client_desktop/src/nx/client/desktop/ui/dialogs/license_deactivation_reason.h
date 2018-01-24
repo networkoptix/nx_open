@@ -3,6 +3,7 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/message_box.h>
 #include <nx/client/desktop/license/license_helpers.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx {
 namespace client {
@@ -10,7 +11,7 @@ namespace desktop {
 namespace ui {
 namespace dialogs {
 
-class LicenseDeactivationReason: public QnMessageBox
+class LicenseDeactivationReason: public QnMessageBox, public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = QnMessageBox;
