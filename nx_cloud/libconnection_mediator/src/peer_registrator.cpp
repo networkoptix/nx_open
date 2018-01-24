@@ -133,12 +133,10 @@ void PeerRegistrator::listen(
         MediaserverData(requestData.systemId, requestData.serverId));
 
     peerDataLocker.value().isListening = true;
-    peerDataLocker.value().connectionMethods |= api::ConnectionMethod::udpHolePunching;
+    peerDataLocker.value().cloudConnectVersion = requestData.cloudConnectVersion;
 
-    NX_LOGX(lit("Peer %1.%2 started to listen")
-        .arg(QString::fromUtf8(requestData.serverId))
-        .arg(QString::fromUtf8(requestData.systemId)),
-        cl_logDEBUG1);
+    NX_DEBUG(this, lm("Peer %1.%2 started to listen")
+        .args(requestData.serverId, requestData.systemId));
 
     m_relayClusterClient->selectRelayInstanceForListeningPeer(
         lm("%1.%2").arg(requestData.serverId).arg(requestData.systemId).toStdString(),
