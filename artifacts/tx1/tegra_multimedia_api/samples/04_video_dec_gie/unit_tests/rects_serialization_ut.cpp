@@ -44,14 +44,14 @@ TEST(rects_serialization, twoRects)
 {
     Rect rects[2];
 
-    rects[0].x = 0.23;
-    rects[0].y = 0.373737;
-    rects[0].w = 0.19;
-    rects[0].h = 0.11;
-    rects[1].x = 0;
-    rects[1].y = 0;
-    rects[1].w = 1;
-    rects[1].h = 1;
+    rects[0].x = 0.23F;
+    rects[0].y = 0.373737F;
+    rects[0].w = 0.19F;
+    rects[0].h = 0.11F;
+    rects[1].x = 0.0F;
+    rects[1].y = 0.0F;
+    rects[1].w = 1.0F;
+    rects[1].h = 1.0F;
 
     testRects(rects, sizeof(rects) / sizeof(rects[0]));
 }
