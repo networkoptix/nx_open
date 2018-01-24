@@ -229,10 +229,16 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
 
     setCamera(camera);
 
+    m_motionTab->setMotionSearchEnabled(false);
+
     if (!camera)
         return;
 
     m_mediaWidgetConnections.reset(new QnDisconnectHelper());
+
+    *m_mediaWidgetConnections << connect(
+        m_currentMediaWidget.data(), &QnMediaResourceWidget::motionSearchModeEnabled,
+            m_motionTab, &MotionSearchWidget::setMotionSearchEnabled);
 
     *m_mediaWidgetConnections << connect(
         m_currentMediaWidget.data(), &QnMediaResourceWidget::analyticsSearchAreaSelected, this,

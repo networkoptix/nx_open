@@ -129,33 +129,37 @@ UnifiedSearchWidget::~UnifiedSearchWidget()
 {
 }
 
-UnifiedAsyncSearchListModel* UnifiedSearchWidget::model() const
+QAbstractListModel* UnifiedSearchWidget::model() const
 {
-    return m_model;
+    return ui->ribbon->model();
 }
 
-void UnifiedSearchWidget::setModel(UnifiedAsyncSearchListModel* value)
+void UnifiedSearchWidget::setModel(QAbstractListModel* value)
 {
-    if (m_model == value)
+    auto oldModel = model();
+
+    if (oldModel == value)
         return;
 
-    if (m_model)
+    if (oldModel)
     {
-        m_model->disconnect(this);
-        m_searchLineEdit->disconnect(m_model);
+        oldModel->disconnect(this);
+        m_searchLineEdit->disconnect(oldModel);
     }
 
-    m_model = value;
     ui->ribbon->setModel(value);
-
-    connect(m_searchLineEdit, &QnSearchLineEdit::textChanged,
-        m_model, &UnifiedAsyncSearchListModel::setTextFilter);
 
     connect(value, &QAbstractItemModel::rowsRemoved,
         this, &UnifiedSearchWidget::requestFetch, Qt::QueuedConnection);
 
     connect(value, &QAbstractItemModel::dataChanged,
         this, &UnifiedSearchWidget::updatePlaceholderVisibility);
+
+    if (auto asyncModel = qobject_cast<UnifiedAsyncSearchListModel*>(value))
+    {
+        connect(m_searchLineEdit, &QnSearchLineEdit::textChanged,
+            asyncModel, &UnifiedAsyncSearchListModel::setTextFilter);
+    }
 
     fetchMoreIfNeeded();
 }
@@ -214,17 +218,22 @@ void UnifiedSearchWidget::setSelectedPeriod(Period value)
         m_dayChangeTimer->stop();
 }
 
+void UnifiedSearchWidget::setCurrentTimePeriod(const QnTimePeriod& period)
+{
+    auto asyncModel = qobject_cast<UnifiedAsyncSearchListModel*>(model());
+    if (!asyncModel)
+        return;
+
+    if (asyncModel->selectedTimePeriod() == period)
+        return;
+
+    asyncModel->setSelectedTimePeriod(period);
+    requestFetch();
+}
+
 void UnifiedSearchWidget::updateCurrentTimePeriod()
 {
-    if (!m_model)
-        return;
-
-    const auto period = effectiveTimePeriod();
-    if (m_model->selectedTimePeriod() == period)
-        return;
-
-    m_model->setSelectedTimePeriod(period);
-    requestFetch();
+    setCurrentTimePeriod(effectiveTimePeriod());
 }
 
 QnTimePeriod UnifiedSearchWidget::effectiveTimePeriod() const
@@ -326,12 +335,12 @@ void UnifiedSearchWidget::fetchMoreIfNeeded()
 
 bool UnifiedSearchWidget::hasRelevantTiles() const
 {
-    const auto count = m_model ? m_model->rowCount() : 0;
+    const auto count = model() ? model()->rowCount() : 0;
     if (count == 0)
         return false;
 
     // Last tile is a busy indicator.
-    return (count > 1) || m_model->data(m_model->index(0), Qn::BusyIndicatorVisibleRole).toBool();
+    return (count > 1) || model()->data(model()->index(0), Qn::BusyIndicatorVisibleRole).toBool();
 }
 
 void UnifiedSearchWidget::updatePlaceholderVisibility()

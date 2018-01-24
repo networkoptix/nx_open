@@ -36,8 +36,8 @@ public:
     UnifiedSearchWidget(QWidget* parent);
     virtual ~UnifiedSearchWidget() override;
 
-    UnifiedAsyncSearchListModel* model() const;
-    void setModel(UnifiedAsyncSearchListModel* value);
+    QAbstractListModel* model() const;
+    void setModel(QAbstractListModel* value);
 
     QnSearchLineEdit* filterEdit() const;
     ui::SelectableTextButton* typeButton() const;
@@ -62,20 +62,23 @@ public:
 
     void requestFetch();
 
+protected:
+    virtual bool hasRelevantTiles() const;
+    virtual void setCurrentTimePeriod(const QnTimePeriod& period);
+
 private:
-    void fetchMoreIfNeeded();
     void updateCurrentTimePeriod();
     QnTimePeriod effectiveTimePeriod() const;
 
     void setupTimeSelection();
     void updatePlaceholderVisibility();
-    bool hasRelevantTiles() const;
+
+    void fetchMoreIfNeeded();
 
 private:
     QScopedPointer<Ui::UnifiedSearchWidget> ui;
     QnSearchLineEdit* m_searchLineEdit;
     QTimer* const m_dayChangeTimer = nullptr;
-    QPointer<UnifiedAsyncSearchListModel> m_model;
     nx::utils::PendingOperation* m_fetchMoreOperation;
     QnTimePeriod m_timelineSelection;
     Period m_period = Period::all;
