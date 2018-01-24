@@ -121,6 +121,8 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
 
     setupTimeSelection();
 
+    ui->areaButton->setIcon(qnSkin->icon(lit("text_buttons/area.png")));
+
     connect(ui->ribbon, &EventRibbon::countChanged,
         this, &UnifiedSearchWidget::updatePlaceholderVisibility);
 }
