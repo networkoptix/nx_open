@@ -138,7 +138,7 @@ protected:
 
     void verifyClientProcessedConnectionCloseProperly()
     {
-        ASSERT_NE(SystemError::noError, m_connectionClosedPromise.get_future().get());
+        ASSERT_NE(SystemError::noError, m_connectionClosedPromise.pop());
     }
 
     void thenResponseIsReceived()
@@ -187,7 +187,7 @@ private:
     static constexpr int kNumberOfRequestsToSend = 1024;
 
     std::shared_ptr<nx::network::stun::AsyncClient> m_stunClient;
-    nx::utils::promise<SystemError::ErrorCode> m_connectionClosedPromise;
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_connectionClosedPromise;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_requestResult;
     SocketAddress m_serverEndpoint;
     nx::network::stun::MessageDispatcher m_dispatcher;
@@ -254,7 +254,7 @@ private:
         m_stunClient->setOnConnectionClosedHandler(
             [this](SystemError::ErrorCode closeReason)
             {
-                m_connectionClosedPromise.set_value(closeReason);
+                m_connectionClosedPromise.push(closeReason);
             });
 
         ASSERT_EQ(SystemError::noError, connectToUrl(serverUrl()));

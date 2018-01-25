@@ -31,12 +31,14 @@ void AsyncClientWithHttpTunneling::bindToAioThread(
 
 void AsyncClientWithHttpTunneling::connect(const utils::Url &url, ConnectHandler handler)
 {
+    QnMutexLocker lock(&m_mutex);
+    m_url = url;
+
     post(
-        [this, url, handler = std::move(handler)]() mutable
+        [this, handler = std::move(handler)]() mutable
         {
             QnMutexLocker lock(&m_mutex);
 
-            m_url = url;
             m_reconnectTimer.reset();
 
             connectInternal(

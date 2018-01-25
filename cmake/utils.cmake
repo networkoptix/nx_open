@@ -112,9 +112,15 @@ function(nx_configure_file input output)
         set(output "${output}/${file_name}")
     endif()
 
-    message(STATUS "Generating ${output}")
+    file(TIMESTAMP "${output}" orig_ts)
     configure_file(${input} ${output} ${ARGN})
+    file(TIMESTAMP "${output}" new_ts)
+
     nx_store_known_file(${output})
+
+    if(NOT ${orig_ts} STREQUAL ${new_ts})
+        message(STATUS "Generated ${output}")
+    endif()
 endfunction()
 
 function(nx_configure_directory input output)

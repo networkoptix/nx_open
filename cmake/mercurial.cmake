@@ -1,10 +1,11 @@
 function(hg_changeset dir var)
     execute_process(
         COMMAND hg --repository "${dir}" id -i
-        OUTPUT_VARIABLE changeSet
+        OUTPUT_VARIABLE changeset
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    set(${var} ${changeSet} PARENT_SCOPE)
+    string(REPLACE "+" "" changeset ${changeset})
+    set(${var} ${changeset} PARENT_SCOPE)
 endfunction()
 
 function(hg_branch dir var)

@@ -86,8 +86,10 @@ if(MACOSX OR IOS)
     include(macosx_keychain)
 endif()
 
-if(NOT (WINDOWS OR ANDROID OR IOS))
-    set(BUILD_SHARED_LIBS ON)
+if(WINDOWS OR ANDROID OR IOS)
+    set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+else()
+    set(BUILD_SHARED_LIBS ON CACHE INTERNAL "")
 endif()
 
 include(dependencies)
@@ -152,6 +154,13 @@ if(withDesktopClient OR withMobileClient OR withNxTool)
         COMPONENTS
             Qml
             Quick)
+endif()
+
+if(withDesktopClient OR withNxTool)
+    find_package(Qt5
+        COMPONENTS
+            Widgets
+    )
 endif()
 
 set(QML_IMPORT_PATH

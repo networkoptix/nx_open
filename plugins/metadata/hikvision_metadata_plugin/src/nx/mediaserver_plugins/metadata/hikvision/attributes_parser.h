@@ -19,7 +19,15 @@ public:
     static boost::optional<std::vector<QString>> parseSupportedEventsXml(const QByteArray& content);
     static boost::optional<HikvisionEvent> parseEventXml(
         const QByteArray& content,
-        const Hikvision::DriverManifest manifest);
+        const Hikvision::DriverManifest& manifest);
+
+    static std::vector<HikvisionEvent> parseLprXml(
+        const QByteArray& content,
+        const Hikvision::DriverManifest& manifest);
+private:
+    static HikvisionEvent parsePlateData(
+        QXmlStreamReader& reader,
+        const Hikvision::DriverManifest& manifest);
 };
 
 } // namespace hikvision

@@ -1799,8 +1799,10 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
     // Change owner of all data files, so mediaserver can use them as different user.
     const std::vector<QString> chmodPaths =
     {
+        MSSettings::defaultConfigDirectory(),
         qnServerModule->roSettings()->fileName(),
         qnServerModule->runTimeSettings()->fileName(),
+        QnFileConnectionProcessor::externalPackagePath(),
         getDataDirectory(),
     };
     for (const auto& path: chmodPaths)

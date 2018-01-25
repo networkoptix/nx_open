@@ -95,6 +95,7 @@ private:
     std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_mediatorUrlFetcher;
     boost::optional<nx::utils::Url> m_cloudModulesXmlUrl;
     boost::optional<nx::utils::Url> m_mediatorUrl;
+    boost::optional<nx::utils::Url> m_mockedUpMediatorUrl;
     boost::optional<network::SocketAddress> m_mediatorUdpEndpoint;
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
     MediatorAvailabilityChangedHandler m_mediatorAvailabilityChangedHandler;
@@ -103,6 +104,7 @@ private:
 
     void fetchEndpoint();
     void connectToMediatorAsync();
+    void saveMediatorEndpoint();
     void reconnectToMediator(SystemError::ErrorCode connectionClosureReason);
 };
 

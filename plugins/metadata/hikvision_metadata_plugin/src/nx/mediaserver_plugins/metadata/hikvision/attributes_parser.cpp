@@ -13,6 +13,18 @@ namespace hikvision {
 
 namespace {
 
+QDateTime parseDateTime(QString stringDate)
+{
+    static const int kTimeOffsetLength = 5;
+
+    int timeOffset = stringDate.right(kTimeOffsetLength).toInt();
+    int timeOffsetMinutes = (timeOffset / 100) * 60 + timeOffset % 100;
+    stringDate = stringDate.left(stringDate.size() - kTimeOffsetLength);
+    auto dateTime = QDateTime::fromString(stringDate, "yyyyMMddThhmmss");
+    dateTime.setOffsetFromUtc(timeOffsetMinutes * 60);
+    return dateTime;
+}
+
 static QString normalizeInternalName(const QString& rawInternalName)
 {
 
@@ -50,8 +62,11 @@ boost::optional<std::vector<QString>> AttributesParser::parseSupportedEventsXml(
 
 boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
     const QByteArray& content,
-    const Hikvision::DriverManifest manifest)
+    const Hikvision::DriverManifest& manifest)
 {
+    using namespace nx::sdk::metadata;
+
+
     QString description;
     HikvisionEvent result;
     QXmlStreamReader reader(content);
@@ -101,6 +116,99 @@ boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
     if (reader.error() != QXmlStreamReader::NoError)
         return boost::optional<HikvisionEvent>();
     return result;
+}
+
+std::vector<HikvisionEvent> AttributesParser::parseLprXml(
+    const QByteArray& content,
+    const Hikvision::DriverManifest& manifest)
+{
+    std::vector<HikvisionEvent> result;
+    QXmlStreamReader reader(content);
+
+    while (!reader.atEnd() && reader.readNextStartElement())
+    {
+        if (reader.name().toString().toLower() == "plate")
+        {
+            auto hikvisionEvent = parsePlateData(reader, manifest);
+            if (!hikvisionEvent.typeId.isNull())
+            {
+                result.push_back(hikvisionEvent);
+                HikvisionEvent inactiveEvent(hikvisionEvent);
+                inactiveEvent.isActive = false;
+                result.push_back(inactiveEvent);
+            }
+        }
+    }
+    return result;
+}
+
+HikvisionEvent AttributesParser::parsePlateData(
+    QXmlStreamReader& reader,
+    const Hikvision::DriverManifest& manifest)
+{
+    QString plateNumber;
+    QString country;
+    QString eventType;
+    int laneNumber = 0;
+    QString direction;
+    QnUuid typeId;
+    QDateTime dateTime;
+    QString picName;
+
+    while (reader.readNextStartElement())
+    {
+        const auto name = reader.name().toString().toLower().trimmed();
+        if (name == "capturetime")
+        {
+            dateTime = parseDateTime(reader.readElementText());
+        }
+        else if (name == "platenumber")
+        {
+            plateNumber = reader.readElementText();
+        }
+        else if (name == "country")
+        {
+            country = reader.readElementText();
+        }
+        else if (name == "laneno")
+        {
+            laneNumber = reader.readElementText().toInt();
+        }
+        else if (name == "direction")
+        {
+            direction = reader.readElementText();
+        }
+        else if (name == "picname")
+        {
+            picName = reader.readElementText();
+        }
+        else if (name == "matchingresult")
+        {
+            const auto internalName = normalizeInternalName(reader.readElementText());
+            typeId = manifest.eventTypeByInternalName(internalName);
+            if (typeId.isNull())
+                NX_WARNING(typeid(AttributesParser), lm("Unknown analytics event name %1").arg(internalName));
+        }
+        else
+        {
+            reader.skipCurrentElement();
+        }
+    }
+
+    using namespace nx::sdk::metadata;
+    HikvisionEvent hikvisionEvent;
+    if (!typeId.isNull())
+    {
+        hikvisionEvent.caption = lm("Plate No. %1 (%2)").args(plateNumber, country);
+        hikvisionEvent.description = lm("%1, Lane No. %2, Direction: %3")
+            .args(hikvisionEvent.caption, laneNumber, direction);
+        hikvisionEvent.typeId = typeId;
+        hikvisionEvent.dateTime = dateTime;
+        hikvisionEvent.picName = picName;
+        hikvisionEvent.isActive = true;
+
+    }
+    return hikvisionEvent;
 }
 
 } // namespace hikvision

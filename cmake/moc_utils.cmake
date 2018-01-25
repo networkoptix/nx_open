@@ -27,6 +27,11 @@ function(_get_moc_file_name var src_file)
     get_filename_component(ext ${rel_moc_name} EXT)
     get_filename_component(path ${rel_moc_name} PATH)
 
+    if(ext STREQUAL ".cpp")
+        set(${var} ${CMAKE_CURRENT_BINARY_DIR}/${path}/${name}.moc PARENT_SCOPE)
+        return()
+    endif()
+
     if(NOT ext STREQUAL ".h" AND NOT ext STREQUAL ".hpp")
         string(REPLACE "." "_" suffix ${ext})
     else()
@@ -59,11 +64,15 @@ function(nx_add_qt_mocables target)
             OUTPUT ${moc_file}
             COMMAND ${Qt5Core_MOC_EXECUTABLE} -o ${moc_file} ${file} @${moc_parameters_file}
             DEPENDS ${file} ${moc_parameters_file}
-            ${_moc_working_dir}
             VERBATIM
         )
 
-        set_source_files_properties(${moc_file} PROPERTIES SKIP_AUTOMOC TRUE)
+        set_source_files_properties(${file} ${moc_file} PROPERTIES SKIP_AUTOMOC TRUE)
         set_property(TARGET ${target} APPEND PROPERTY SOURCES ${moc_file})
+
+        if(moc_file MATCHES ".moc$")
+            get_filename_component(path ${moc_file} PATH)
+            set_property(SOURCE ${file} APPEND PROPERTY COMPILE_FLAGS " -I${path}")
+        endif()
     endforeach()
 endfunction()
