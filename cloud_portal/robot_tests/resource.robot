@@ -42,11 +42,11 @@ Validate Log Out
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}
 
-    Wait Until Element Is Visible    ${FIRST NAME INPUT}
-    Input Text    ${FIRST NAME INPUT}    ${first name}
-
-    Wait Until Element Is Visible    ${LAST NAME INPUT}
-    Input Text    ${LAST NAME INPUT}    ${last name}
+    Wait Until Element Is Visible    ${REGISTER FIRST NAME INPUT}
+    Input Text    ${REGISTER FIRST NAME INPUT}    ${first name}
+    sleep    5
+    Wait Until Element Is Visible    ${REGISTER LAST NAME INPUT}
+    Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
 
     Wait Until Element Is Visible    ${REGISTER EMAIL INPUT}
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
