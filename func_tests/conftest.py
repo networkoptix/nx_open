@@ -4,6 +4,7 @@ import os.path
 
 import pytest
 from netaddr import IPAddress
+from pathlib2 import Path
 
 from test_utils.artifact import ArtifactFactory
 from test_utils.ca import CA
@@ -148,6 +149,16 @@ def run_options(request):
         log_level=request.config.getoption('--log-level'),
         tests_config=tests_config,
         )
+
+
+@pytest.fixture(scope='session')
+def work_dir(run_options):
+    return Path(run_options.work_dir)
+
+
+@pytest.fixture(scope='session')
+def bin_dir(run_options):
+    return Path(run_options.bin_dir)
 
 
 @pytest.fixture(scope='session')

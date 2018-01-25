@@ -4,6 +4,8 @@ import logging
 import os.path
 import sys
 
+from pathlib2 import PurePosixPath
+
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
     from ConfigParser import SafeConfigParser
@@ -121,3 +123,16 @@ class ServerInstallation(object):
         assert len(new_data) == len(data)
         self.host.write_file(path_to_patch, new_data)
         self._current_cloud_host = new_host
+
+
+def install_media_server(host, customization, deb_path):
+    remote_path = PurePosixPath('/tmp') / customization / deb_path.name
+    host.mk_dir(remote_path.parent)
+    host.put_file(deb_path, remote_path)
+    # Commands and dependencies for Ubuntu 14.04 (ubuntu/trusty64 from Vagrant's Atlas).
+    host.run_command(['sudo', 'DEBIAN_FRONTEND=noninteractive', 'dpkg', '--install', '--force-depends', remote_path])
+    host.run_command([
+        'sudo', 'apt-get',
+        '--fix-broken',  # Install dependencies left by Mediaserver.
+        '--assume-yes',
+        'install'])
