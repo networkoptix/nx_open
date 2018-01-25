@@ -16,9 +16,9 @@ import shutil
 import sys
 
 import click
-from flask import Flask, send_file
+from flask import Flask, request, send_file
 from pathlib2 import Path, PurePath
-from werkzeug.exceptions import NotFound, SecurityError
+from werkzeug.exceptions import BadRequest, NotFound, SecurityError
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
@@ -145,12 +145,17 @@ def generate():
 
 @main.command()
 @click.option('--emulate-no-update-files', is_flag=True)
-def serve(emulate_no_update_files):
+@click.option('--range-header', type=click.Choice(['support', 'ignore', 'err']), default='support')
+def serve(emulate_no_update_files, range_header):
     app = Flask(__name__)
 
     @app.route('/<path:path>')
     def serve(path):
         path = PurePath(path)
+
+        if 'Range' in request.headers and range_header == 'err':
+            raise BadRequest('Range header is not supported')
+
         if path.suffix == '.json':
             return send_file(str(DATA_DIR / path))
         elif path.suffix == '.zip' and not emulate_no_update_files:
@@ -176,7 +181,10 @@ def serve(emulate_no_update_files):
             if not DUMMY_FILE_PATH.exists():
                 raise Exception('Dummy file not found')
 
-            return send_file(str(DUMMY_FILE_PATH), as_attachment=True, attachment_filename=path.name, conditional=True)
+            return send_file(
+                str(DUMMY_FILE_PATH),
+                as_attachment=True, attachment_filename=path.name,
+                conditional=range_header == 'support')
         else:
             raise NotFound()
 
