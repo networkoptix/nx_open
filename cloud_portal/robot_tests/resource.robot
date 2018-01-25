@@ -113,7 +113,7 @@ Check For Alert
     Wait Until Element Is Visible    ${ALERT}
     Element Should Be Visible    ${ALERT}
     Element Text Should Be    ${ALERT}    ${alert text}
-    Wait Until Element Is Not Visible    ${ALERT}
+    Wait Until Page Does Not Contain Element    ${ALERT}
 
 Failure Tasks
     Capture Page Screenshot    selenium-screenshot-{index}.png
