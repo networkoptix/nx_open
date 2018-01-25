@@ -1362,10 +1362,8 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked()
         [this, sourceCamera = m_cameras.front(), copyArchiveLength, recordingEnabled]
             (const QnVirtualCameraResourcePtr &camera)
         {
-            QnVirtualCameraResourceList list;
-            list.push_back(camera);
             if (copyArchiveLength)
-                ui->archiveLengthWidget->submitToResources(list);
+                ui->archiveLengthWidget->submitToResources({camera});
 
             camera->setScheduleDisabled(!recordingEnabled);
             int maxFps = camera->getMaxFps();

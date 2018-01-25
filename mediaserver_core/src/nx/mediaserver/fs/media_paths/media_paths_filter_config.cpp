@@ -9,16 +9,17 @@ namespace mediaserver {
 namespace fs {
 namespace media_paths {
 
-FilterConfig FilterConfig::createDefault(NetworkDrives isNetworkDrivesAllowed)
+FilterConfig FilterConfig::createDefault(bool includeNonHdd)
 {
     FilterConfig result;
 
     const auto settings = qnServerModule->roSettings();
     result.isMultipleInstancesAllowed =
         static_cast<bool>(settings->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt());
-    result.isRemovableDrivesAllowed =
-        static_cast<bool>(settings->value(nx_ms_conf::ALLOW_REMOVABLE_STORAGES).toInt());
-    result.isNetworkDrivesAllowed = isNetworkDrivesAllowed;
+    result.isRemovableDrivesAllowed = includeNonHdd
+        ? true
+        : static_cast<bool>(settings->value(nx_ms_conf::ALLOW_REMOVABLE_STORAGES).toInt());
+    result.isNetworkDrivesAllowed = includeNonHdd;
 
     result.partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
     result.dataDirectory = getDataDirectory();

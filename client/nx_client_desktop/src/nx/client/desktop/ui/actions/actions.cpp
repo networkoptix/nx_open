@@ -1262,7 +1262,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Upload to Wearable Camera..."))
-        .condition(condition::hasFlags(Qn::wearable_camera, All)
+        .condition(condition::hasFlags(Qn::wearable_camera, MatchMode::All)
             && condition::isTrue(ini().enableWearableCameras));
 
     factory(CameraIssuesAction)
