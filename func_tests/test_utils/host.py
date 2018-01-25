@@ -17,7 +17,7 @@ import threading
 import pytz
 import tzlocal
 
-from .utils import quote, is_list_inst, RunningTime
+from .utils import RunningTime, quote
 
 log = logging.getLogger(__name__)
 
@@ -184,9 +184,8 @@ class LocalHost(Host):
         return 'localhost'
 
     def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
-        assert is_list_inst(args, (str, unicode)), repr(args)
         timeout = timeout or PROCESS_TIMEOUT
-        args = map(str, args)
+        args = [str(arg) for arg in args]
         if input:
             log.debug('executing: %s (with %d bytes input)', subprocess.list2cmdline(args), len(input))
             stdin = subprocess.PIPE
@@ -265,7 +264,7 @@ class LocalHost(Host):
         return os.path.isdir(self.expand_path(path))
 
     def put_file(self, from_local_path, to_remote_path):
-        self._copy(self.expand_path(from_local_path), to_remote_path)
+        self._copy(self.expand_path(str(from_local_path)), str(to_remote_path))
 
     def get_file(self, from_remote_path, to_local_path):
         self._copy(from_remote_path, self.expand_path(to_local_path))
@@ -362,8 +361,8 @@ class RemoteSshHost(Host):
             '--archive',  # Preserve directory structure, times, access rights.
             '--copy-links',  # From help: "transform symlink into referent file/dir".
             '--rsh=' + ' '.join(self._make_ssh_cmd(must_quote=True)),
-            from_local_path,
-            self._user_and_host + ':' + to_remote_path,
+            str(from_local_path),  # Support pathlib.
+            self._user_and_host + ':' + str(to_remote_path),  # Support pathlib.
             ])
 
     def get_file(self, from_remote_path, to_local_path):
@@ -387,7 +386,7 @@ class RemoteSshHost(Host):
         return self.run_command(['stat', '--format=%s', path])
 
     def mk_dir(self, path):
-        self.run_command(['mkdir', '-p', path])
+        self.run_command(['mkdir', '-p', str(path)])
 
     def rm_tree(self, path, ignore_errors=False):
         self.run_command(['rm', '-r', path], check_retcode=not ignore_errors)
@@ -427,13 +426,13 @@ class RemoteSshHost(Host):
 
     def _make_identity_args(self):
         if self._key_file_path:
-            return ['-i', self._key_file_path]
+            return ['-i', str(self._key_file_path)]
         else:
             return []
 
     def _make_config_args(self):
         if self._ssh_config_path:
-            return ['-F', self._ssh_config_path]
+            return ['-F', str(self._ssh_config_path)]
         else:
             return []
 
