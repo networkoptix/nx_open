@@ -241,6 +241,7 @@
         <rdep.ios.packages/>
         <rdep.global.packages/>
 
+        <CMAKE_CXX_COMPILER>g++</CMAKE_CXX_COMPILER>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
