@@ -32,7 +32,7 @@ private:
 private:
     QnMutex mutex;
     QScopedPointer<Storage> storage;
-    QHash<QString, Worker*> workers;
+    QHash<QString, std::shared_ptr<Worker>> workers;
     AbstractPeerManagerFactory* peerManagerFactory = nullptr;
     std::unique_ptr<AbstractPeerManagerFactory> peerManagerFactoryOwner;
 };
@@ -56,15 +56,15 @@ void DownloaderPrivate::createWorker(const QString& fileName)
         && status != FileInformation::Status::uploading)
     {
         auto peerPolicy = storage->fileInformation(fileName).peerPolicy;
-        auto worker = new Worker(
+        auto worker = std::make_shared<Worker>(
             fileName,
             storage.data(),
             peerManagerFactory->createPeerManager(peerPolicy));
         workers[fileName] = worker;
 
-        connect(worker, &Worker::finished, this, &DownloaderPrivate::at_workerFinished);
-        connect(worker, &Worker::failed, this, &DownloaderPrivate::at_workerFinished);
-        connect(worker, &Worker::chunkDownloadFailed, this->q_ptr, &Downloader::chunkDownloadFailed);
+        connect(worker.get(), &Worker::finished, this, &DownloaderPrivate::at_workerFinished);
+        connect(worker.get(), &Worker::failed, this, &DownloaderPrivate::at_workerFinished);
+        connect(worker.get(), &Worker::chunkDownloadFailed, this->q_ptr, &Downloader::chunkDownloadFailed);
 
         worker->start();
     }
@@ -84,7 +84,7 @@ void DownloaderPrivate::at_workerFinished(const QString& fileName)
     else
         emit q->downloadFailed(fileName);
 
-    delete worker;
+    worker->stop();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -128,7 +128,8 @@ void Downloader::atServerStart()
 Downloader::~Downloader()
 {
     Q_D(Downloader);
-    qDeleteAll(d->workers);
+    for (auto& worker: d->workers)
+        worker->stop();
 }
 
 QStringList Downloader::files() const

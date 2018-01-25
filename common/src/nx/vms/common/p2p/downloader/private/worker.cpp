@@ -25,7 +25,7 @@ constexpr int kDefaultStepDelayMs = milliseconds(minutes(1)).count();
 constexpr int kMaxAutoRank = 5;
 constexpr int kMinAutoRank = 0;
 constexpr int kDefaultRank = 0;
-static const int kMaxSimultaneousDownloads = 5;
+static const int kMaxSimultaneousDownloads = 10;
 
 QString statusString(bool success)
 {
@@ -238,17 +238,12 @@ void Worker::doWork()
         waitBeforeNextIteration(&lock);
 
         if (needToStop())
-        {
-            while (!m_peerByRequestHandle.isEmpty())
-                m_waitCondition.wait(lock.mutex());
             return;
-        }
 
         const auto& fileInfo = fileInformation();
         if (!fileInfo.isValid())
             return;
 
-        qWarning() << "Downloaded:" << fileInfo.downloadedChunks.count(true);
         switch (m_state)
         {
             case State::initial:
@@ -287,7 +282,7 @@ void Worker::doWork()
                 validateFileInformation();
                 break;
 
-            case State::fileInformationChecked:
+            case State::fileInformationValidated:
                 downloadNextChunk();
                 break;
 
@@ -312,7 +307,12 @@ void Worker::doWork()
                     else if (haveChunksToDownloadUnsafe())
                     {
                         if (m_subsequentChunksToDownload == 0 && needToFindBetterPeers())
-                            requestAvailableChunks();
+                        {
+                            if (m_downloadingChunks.count(true) == 0)
+                                requestAvailableChunks();
+                            else
+                                setShouldWaitForCb();
+                        }
                         else
                             downloadNextChunk();
                     }
@@ -352,16 +352,21 @@ void Worker::validateFileInformation()
     const auto& fileInfo = fileInformation();
     if (fileInfo.url.isValid() && !m_fileInfoValidated)
     {
+        setState(State::validatingFileInformation);
         auto handle = m_peerManager->validateFileInformation(fileInfo,
-            [this](bool success, rest::Handle handle)
+            [this, self = shared_from_this()](bool success, rest::Handle handle)
             {
                 QnMutexLocker lock(&m_mutex);
-                qWarning() << "Validate: take handle:" << handle;
-                auto peerId = m_peerByRequestHandle.take(handle);
-                NX_ASSERT(!peerId.isNull());
+
+                auto requestContext = m_contextByHandle.take(handle);
+                NX_ASSERT(!requestContext.peerId.isNull());
+                NX_ASSERT(m_state == State::validatingFileInformation);
+
+                if (requestContext.cancelled)
+                    return;
 
                 if (success)
-                    setState(State::fileInformationChecked);
+                    setState(State::fileInformationValidated);
                 else
                     fail();
 
@@ -369,12 +374,13 @@ void Worker::validateFileInformation()
                 setShouldWait(false);
             });
 
-        m_peerByRequestHandle.insert(handle, m_peerManager->selfId());
+        m_contextByHandle.insert(
+            handle, RequestContext(m_peerManager->selfId(), State::validatingFileInformation));
         setShouldWaitForCb();
     }
     else
     {
-        setState(State::fileInformationChecked);
+        setState(State::fileInformationValidated);
         setShouldWait(false);
     }
 }
@@ -406,15 +412,16 @@ void Worker::requestFileInformationInternal()
                 .arg(m_peerManager->peerString(peer)));
 
         const auto handle = m_peerManager->requestFileInfo(peer, m_fileName,
-            [this](bool success, rest::Handle handle, const FileInformation& fileInfo)
+            [this, self = shared_from_this()](
+                bool success, rest::Handle handle, const FileInformation& fileInfo)
             {
                 handleFileInformationReply(success, handle, fileInfo);
             });
         if (handle > 0)
-            m_peerByRequestHandle[handle] = peer;
+            m_contextByHandle[handle] = RequestContext(peer, State::requestingFileInformation);
     }
 
-    if (m_peerByRequestHandle.isEmpty())
+    if (m_contextByHandle.isEmpty())
         setShouldWait(true);
     else
         setShouldWaitForCb();
@@ -468,23 +475,25 @@ void Worker::handleFileInformationReply(
     bool success, rest::Handle handle, const FileInformation& fileInfo)
 {
     QnMutexLocker lock(&m_mutex);
-    qWarning() << "Information: take handle:" << handle;
-    const auto peerId = m_peerByRequestHandle.take(handle);
-    NX_ASSERT(!peerId.isNull());
-    if (peerId.isNull())
+
+    auto requestContext = m_contextByHandle.take(handle);
+    NX_ASSERT(!requestContext.peerId.isNull());
+    NX_ASSERT(requestContext.type == State::requestingFileInformation);
+
+    if (requestContext.cancelled)
         return;
 
     NX_VERBOSE(m_logTag,
         lm("Got %3 reply from %1: %2")
-            .arg(m_peerManager->peerString(peerId))
+            .arg(m_peerManager->peerString(requestContext.peerId))
             .arg(statusString(success))
             .arg(requestSubjectString(m_state)));
 
     auto exitGuard = QnRaiiGuard::createDestructible(
         [this]()
         {
-            if (!m_peerByRequestHandle.isEmpty())
-                return;
+            if (!m_contextByHandle.isEmpty())
+                return setShouldWaitForCb();
 
             if (m_state == State::requestingFileInformation
                 || m_state == State::requestingAvailableChunks)
@@ -505,11 +514,11 @@ void Worker::handleFileInformationReply(
             setShouldWait(false);
     });
 
-    auto& peerInfo = m_peerInfoById[peerId];
+    auto& peerInfo = m_peerInfoById[requestContext.peerId];
 
     if (!success || !fileInfo.isValid())
     {
-        decreasePeerRank(peerId);
+        decreasePeerRank(requestContext.peerId);
         return;
     }
 
@@ -544,19 +553,21 @@ void Worker::handleFileInformationReply(
     if (m_availableChunks.count(true) < fileInfo.downloadedChunks.size()
         && !addAvailableChunksInfo(fileInfo.downloadedChunks))
     {
-        decreasePeerRank(peerId);
+        decreasePeerRank(requestContext.peerId);
         return;
     }
 
-    increasePeerRank(peerId);
+    increasePeerRank(requestContext.peerId);
     if (m_state == State::requestingAvailableChunks)
         setState(State::foundAvailableChunks);
 }
 
 void Worker::requestChecksums()
 {
-    m_subsequentChunksToDownload = 0;
+    if (m_downloadingChunks.count(true) != 0)
+        return setShouldWaitForCb();
 
+    m_subsequentChunksToDownload = 0;
     setState(State::requestingChecksums);
 
     const auto peers = selectPeersForOperation();
@@ -574,15 +585,15 @@ void Worker::requestChecksums()
                 .arg(m_peerManager->peerString(peer)));
 
         const auto handle = m_peerManager->requestChecksums(peer, m_fileName,
-            [this](bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
+            [this, self = shared_from_this()](bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
             {
                 handleChecksumsReply(success, handle, checksums);
             });
         if (handle > 0)
-            m_peerByRequestHandle[handle] = peer;
+            m_contextByHandle[handle] = RequestContext(peer, State::requestingChecksums);
     }
 
-    if (m_peerByRequestHandle.isEmpty())
+    if (m_contextByHandle.isEmpty())
         setShouldWait(true);
     else
         setShouldWaitForCb();
@@ -592,14 +603,18 @@ void Worker::handleChecksumsReply(
     bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
 {
     QnMutexLocker lock(&m_mutex);
-    qWarning() << "Checksums: take handle:" << handle;
-    const auto peerId = m_peerByRequestHandle.take(handle);
-    NX_ASSERT(!peerId.isNull());
+
+    auto requestContext = m_contextByHandle.take(handle);
+    NX_ASSERT(!requestContext.peerId.isNull());
+    NX_ASSERT(requestContext.type == State::requestingChecksums);
+
+    if (requestContext.cancelled)
+        return;
 
     NX_VERBOSE(m_logTag,
         lm("Got %1 from %2: %3")
             .arg(requestSubjectString(State::requestingChecksums))
-            .arg(m_peerManager->peerString(peerId))
+            .arg(m_peerManager->peerString(requestContext.peerId))
             .arg(statusString(success)));
 
     auto exitGuard = QnRaiiGuard::createDestructible(
@@ -607,7 +622,7 @@ void Worker::handleChecksumsReply(
         {
             if (success)
             {
-                cancelRequests();
+                cancelRequestsByType(State::requestingChecksums);
                 setShouldWait(true);
                 return;
             }
@@ -621,12 +636,12 @@ void Worker::handleChecksumsReply(
         return;
     }
 
-    auto& peerInfo = m_peerInfoById[peerId];
+    auto& peerInfo = m_peerInfoById[requestContext.peerId];
 
     if (!success || checksums.isEmpty() || checksums.size() != m_availableChunks.size())
     {
         success = false;
-        decreasePeerRank(peerId);
+        decreasePeerRank(requestContext.peerId);
         return;
     }
 
@@ -697,7 +712,7 @@ void Worker::downloadNextChunk()
             .arg(m_peerManager->distanceTo(peerId)));
 
     auto handleReply =
-        [this, chunkIndex](
+        [this, chunkIndex, self = shared_from_this()](
             bool result,
             rest::Handle handle,
             const QByteArray& data)
@@ -739,10 +754,8 @@ void Worker::downloadNextChunk()
             lm("Cannot send request for chunk %1 to %2...")
                 .arg(chunkIndex).arg(m_peerManager->peerString(peerId)));
     }
-
-    qWarning() << "put handle:" << handle << peerId;
-    if (handle > 0)
-        m_peerByRequestHandle[handle] = peerId;
+    if (handle > 0)
+        m_contextByHandle[handle] = RequestContext(peerId, State::downloadingChunks);
 }
 
 void Worker::handleDownloadChunkReply(
@@ -750,9 +763,12 @@ void Worker::handleDownloadChunkReply(
 {
     QnMutexLocker lock(&m_mutex);
 
-    qWarning() << "Download: take handle:" << handle << "m_peerByRequestHandle size:" << m_peerByRequestHandle.size();
-    const auto peerId = m_peerByRequestHandle.take(handle);
-    NX_ASSERT(!peerId.isNull());
+    auto requestContext = m_contextByHandle.take(handle);
+    NX_ASSERT(!requestContext.peerId.isNull());
+    NX_ASSERT(requestContext.type == State::downloadingChunks);
+
+    if (requestContext.cancelled)
+        return;
 
     auto exitGuard = QnRaiiGuard::createDestructible(
         [this, &success, &lock]()
@@ -776,12 +792,12 @@ void Worker::handleDownloadChunkReply(
     NX_VERBOSE(m_logTag,
         lm("Got chunk %1 from %2: %3")
             .arg(chunkIndex)
-            .arg(m_peerManager->peerString(peerId))
+            .arg(m_peerManager->peerString(requestContext.peerId))
             .arg(statusString(success)));
 
     if (!success)
     {
-        decreasePeerRank(peerId);
+        decreasePeerRank(requestContext.peerId);
         return;
     }
 
@@ -803,8 +819,23 @@ void Worker::handleDownloadChunkReply(
 
 void Worker::cancelRequests()
 {
-    for (auto it = m_peerByRequestHandle.begin(); it != m_peerByRequestHandle.end(); ++it)
-        m_peerManager->cancelRequest(it.value(), it.key());
+    for (auto it = m_contextByHandle.begin(); it != m_contextByHandle.end(); ++it)
+    {
+        m_peerManager->cancelRequest(it.value().peerId, it.key());
+        it->cancelled = true;
+    }
+}
+
+void Worker::cancelRequestsByType(State type)
+{
+    for (auto it = m_contextByHandle.begin(); it != m_contextByHandle.end(); ++it)
+    {
+        if (it->type == type)
+        {
+            m_peerManager->cancelRequest(it.value().peerId, it.key());
+            it->cancelled = true;
+        }
+    }
 }
 
 void Worker::finish()

@@ -255,9 +255,6 @@ rest::Handle TestPeerManager::downloadChunkFromInternet(const QnUuid& peerId,
             m_requestCounter.incrementCounters(peerId,
                 RequestCounter::InternetDownloadRequestsPerformed);
 
-            if (storage)
-                storage->writeFileChunk(fileName, chunkIndex, result);
-
             callback(!result.isNull(), handle, result);
         });
 }
@@ -273,15 +270,21 @@ rest::Handle TestPeerManager::validateFileInformation(
         });
 }
 
+void TestPeerManager::setDelayBeforeRequest(qint64 delay)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_delayBeforeRequest = delay;
+}
 
 void TestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
 {
     QnMutexLocker lock(&m_mutex);
-    for (auto& request: m_requestsQueue)
-    {
-        if (request.peerId == peerId && request.handle == handle)
-            request.cancelled = true;
-    }
+    auto it = std::remove_if(m_requestsQueue.begin(), m_requestsQueue.end(),
+        [&peerId, &handle](const Request& request)
+        {
+            return request.peerId == peerId && request.handle == handle;
+        });
+    m_requestsQueue.erase(it, m_requestsQueue.end());
 }
 
 const RequestCounter* TestPeerManager::requestCounter() const
@@ -322,14 +325,36 @@ void TestPeerManager::pleaseStop()
 
 void TestPeerManager::run()
 {
+    qint64 requestTime = -1;
+
     QnMutexLocker lock(&m_mutex);
     while (true)
     {
         while (m_requestsQueue.isEmpty() && !needToStop())
             m_condition.wait(lock.mutex());
 
-        if (needToStop() && m_requestsQueue.isEmpty())
+        if (needToStop())
             return;
+
+        using namespace std::chrono;
+
+        qint64 nowMs = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        if (requestTime == -1)
+            requestTime = nowMs;
+
+        if (m_delayBeforeRequest != 0
+            && nowMs - requestTime < m_delayBeforeRequest)
+        {
+            lock.unlock();
+            std::this_thread::sleep_for(
+                std::chrono::milliseconds(m_delayBeforeRequest - (nowMs - requestTime)));
+            lock.relock();
+            requestTime = nowMs;
+        }
+        requestTime = nowMs;
+
+        if (m_requestsQueue.isEmpty())
+            continue;
 
         const auto request = m_requestsQueue.front();
         m_requestsQueue.pop_front();
@@ -504,6 +529,7 @@ TestPeerManager::FileInformation::FileInformation(const downloader::FileInformat
 void RequestCounter::incrementCounters(
     const QnUuid& peerId, RequestCounter::RequestType requestType)
 {
+    QnMutexLocker lock(&m_mutex);
     ++counters[requestType][peerId];
     ++counters[requestType][kNullGuid];
     ++counters[Total][peerId];
@@ -512,6 +538,7 @@ void RequestCounter::incrementCounters(
 
 int RequestCounter::totalRequests() const
 {
+    QnMutexLocker lock(&m_mutex);
     return counters[Total][kNullGuid];
 }
 

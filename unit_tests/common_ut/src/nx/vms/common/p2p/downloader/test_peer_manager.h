@@ -42,7 +42,9 @@ struct RequestCounter
 
     static QString requestTypeShortName(RequestType requestType);
 
+private:
     std::array<QHash<QnUuid, int>, RequestTypesCount> counters;
+    mutable QnMutex m_mutex;
 };
 
 class TestPeerManagerHandler
@@ -128,6 +130,7 @@ public:
     virtual void pleaseStop() override;
     virtual void run() override;
 
+    void setDelayBeforeRequest(qint64 delay);
 
 private:
     using RequestCallback = std::function<void(rest::Handle)>;
@@ -160,7 +163,6 @@ private:
         rest::Handle handle;
         RequestCallback callback;
         qint64 timeToReply;
-        bool cancelled = false;
     };
 
     QQueue<Request> m_requestsQueue;
@@ -168,6 +170,7 @@ private:
     QnWaitCondition m_condition;
     qint64 m_currentTime = 0;
     RequestCounter m_requestCounter;
+    qint64 m_delayBeforeRequest = 0;
 };
 
 class ProxyTestPeerManager: public AbstractPeerManager

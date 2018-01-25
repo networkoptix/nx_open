@@ -139,7 +139,7 @@ protected:
         peer->id = peerId;
         peer->peerManager = new ProxyTestPeerManager(commonPeerManager.data(), peerId, peerName);
         peer->storage = createStorage(peerId.toString());
-        peer->worker = new TestWorker(kTestFileName, peer->storage, peer->peerManager);
+        peer->worker = std::make_shared<TestWorker>(kTestFileName, peer->storage, peer->peerManager);
         return peer;
     }
 
@@ -158,11 +158,11 @@ protected:
         QnUuid id;
         ProxyTestPeerManager* peerManager = nullptr;
         Storage* storage = nullptr;
-        TestWorker* worker = nullptr;
+        std::shared_ptr<TestWorker> worker;
 
         ~Peer()
         {
-            delete worker;
+            worker->stop();
             delete storage;
             // peerManager is owned and deleted by worker.
         }
@@ -290,7 +290,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownload)
 
     nx::utils::promise<bool> readyPromise;
     auto readyFuture = readyPromise.get_future();
-    QObject::connect(defaultPeer->worker, &Worker::finished,
+    QObject::connect(defaultPeer->worker.get(), &Worker::finished,
         [&readyPromise]() mutable { readyPromise.set_value(true); });
 
     ASSERT_TRUE(readyFuture.get());
@@ -318,9 +318,9 @@ TEST_F(DistributedFileDownloaderWorkerTest, corruptedFile)
     nx::utils::promise<bool> readyPromise;
     auto readyFuture = readyPromise.get_future();
 
-    QObject::connect(defaultPeer->worker, &Worker::finished,
+    QObject::connect(defaultPeer->worker.get(), &Worker::finished,
         [&readyPromise] { readyPromise.set_value(true); });
-    QObject::connect(defaultPeer->worker, &Worker::stateChanged,
+    QObject::connect(defaultPeer->worker.get(), &Worker::stateChanged,
         [this, &wasCorrupted, &fileInfo]
         {
             if (defaultPeer->worker->state() == Worker::State::requestingChecksums)
@@ -354,7 +354,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownloadFromInternet)
 
     nx::utils::promise<bool> readyPromise;
     auto readyFuture = readyPromise.get_future();
-    QObject::connect(defaultPeer->worker, &Worker::finished,
+    QObject::connect(defaultPeer->worker.get(), &Worker::finished,
         [&readyPromise] { readyPromise.set_value(true); });
 
     defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
@@ -381,7 +381,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, downloadFromInternetViaNonSetPeer)
 
     nx::utils::promise<bool> readyPromise;
     auto readyFuture = readyPromise.get_future();
-    QObject::connect(defaultPeer->worker, &Worker::finished,
+    QObject::connect(defaultPeer->worker.get(), &Worker::finished,
         [&readyPromise] { readyPromise.set_value(true); });
 
     defaultPeer->worker->start();
@@ -394,152 +394,164 @@ TEST_F(DistributedFileDownloaderWorkerTest, downloadFromInternetViaNonSetPeer)
     ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
 }
 
-//TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
-//{
-//    auto fileInfo = createTestFile();
-//    fileInfo.url = "http://test.org/testFile";
-//    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
-//
-//    const QStringList groups{"default"};
-//
-//    QList<QnUuid> pendingPeers;
-//
-//    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
-//    commonPeerManager->setHasInternetConnection(defaultPeer->id);
-//    commonPeerManager->setPeerGroups(defaultPeer->id, groups);
-//    commonPeerManager->setPeerStorage(defaultPeer->id, defaultPeer->storage);
-//    QObject::connect(defaultPeer->worker, &Worker::finished,
-//        [this, &pendingPeers]
-//        {
-//            pendingPeers.removeOne(defaultPeer->id);
-//        });
-//
-//    const auto& baseId = QUuid::createUuid();
-//
-//    QList<Peer*> peers{defaultPeer};
-//
-//    for (int i = 1; i <= 10; ++i)
-//    {
-//        auto peer = createPeer(lit("Peer %1").arg(i), QnUuid::createUuidFromPool(baseId, i));
-//        peers.append(peer);
-//        peerById[peer->id] = peer;
-//        peer->storage->addFile(fileInfo);
-//        commonPeerManager->setPeerGroups(peer->id, groups);
-//        commonPeerManager->setPeerStorage(peer->id, peer->storage);
-//
-//        QObject::connect(peer->worker, &Worker::finished,
-//            [peer, &pendingPeers]
-//            {
-//                pendingPeers.removeOne(peer->id);
-//            });
-//    }
-//
-//    pendingPeers = commonPeerManager->getAllPeers();
-//
-//    for (const auto& peer: peerById)
-//    {
-//        peer->peerManager->setPeerList(peer->peerManager->getAllPeers());
-//        peer->peerManager->calculateDistances();
-//    }
-//
-//    const int maxRequests = fileInfo.downloadedChunks.size() * pendingPeers.size() * 3;
-//
-//    for (auto& peer: peerById)
-//        peer->worker->start();
-//
-//    commonPeerManager->exec(maxRequests);
-//
-//    for (auto& peer: peers)
-//    {
-//        peer->peerManager->requestCounter()->printCounters(
-//            "Outgoing requests from " + commonPeerManager->peerString(peer->id),
-//            commonPeerManager.data());
-//    }
-//
-//    commonPeerManager->requestCounter()->printCounters(
-//        "Incoming Requests:", commonPeerManager.data());
-//
-//    ASSERT_EQ(pendingPeers.size(), 0);
-//    ASSERT_LE(commonPeerManager->requestCounter()->totalRequests(), maxRequests);
-//}
-//
-//TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadNonFlatNetwork)
-//{
-//    auto fileInfo = createTestFile();
-//    fileInfo.url = "http://test.org/testFile";
-//    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
-//
-//    const QStringList groups{"A", "B", "C", "D", "E"};
-//
-//    QList<QnUuid> pendingPeers;
-//
-//    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
-//    commonPeerManager->setHasInternetConnection(defaultPeer->id);
-//    commonPeerManager->setPeerGroups(defaultPeer->id, {groups[0]});
-//    commonPeerManager->setPeerStorage(defaultPeer->id, defaultPeer->storage);
-//    QObject::connect(defaultPeer->worker, &Worker::finished,
-//        [this, &pendingPeers]
-//        {
-//            pendingPeers.removeOne(defaultPeer->id);
-//        });
-//
-//    QList<Peer*> peers{defaultPeer};
-//
-//    constexpr int kPeersPerGroup = 3;
-//
-//    for (int groupIndex = 0; groupIndex < groups.size(); ++groupIndex)
-//    {
-//        const auto& group = groups[groupIndex];
-//
-//        for (int i = 1; i <= kPeersPerGroup; ++i)
-//        {
-//            auto peer = createPeer(lit("Peer %1%2").arg(group).arg(i));
-//            peers.append(peer);
-//            peerById[peer->id] = peer;
-//            peer->storage->addFile(fileInfo);
-//            commonPeerManager->setPeerStorage(peer->id, peer->storage);
-//
-//            QStringList peerGroups{groups[groupIndex]};
-//            if (i == kPeersPerGroup && groupIndex < groups.size() - 1)
-//                peerGroups.append(groups[groupIndex + 1]);
-//            commonPeerManager->setPeerGroups(peer->id, peerGroups);
-//
-//            QObject::connect(peer->worker, &Worker::finished,
-//                [peer, &pendingPeers]
-//                {
-//                    pendingPeers.removeOne(peer->id);
-//                });
-//        }
-//    }
-//
-//    pendingPeers = commonPeerManager->getAllPeers();
-//
-//    for (const auto& peer: peerById)
-//    {
-//        peer->peerManager->setPeerList(peer->peerManager->getAllPeers());
-//        peer->peerManager->calculateDistances();
-//    }
-//
-//    const int maxRequests = fileInfo.downloadedChunks.size() * pendingPeers.size() * 3;
-//
-//    for (auto& peer: peerById)
-//        peer->worker->start();
-//
-//    commonPeerManager->exec(maxRequests);
-//
-//    for (auto& peer: peers)
-//    {
-//        peer->peerManager->requestCounter()->printCounters(
-//            "Outgoing requests from " + commonPeerManager->peerString(peer->id),
-//            commonPeerManager.data());
-//    }
-//
-//    commonPeerManager->requestCounter()->printCounters(
-//        "Incoming Requests:", commonPeerManager.data());
-//
-//    ASSERT_EQ(pendingPeers.size(), 0);
-//    ASSERT_LE(commonPeerManager->requestCounter()->totalRequests(), maxRequests);
-//}
+TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
+{
+    auto fileInfo = createTestFile();
+    fileInfo.url = "http://test.org/testFile";
+    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
+
+    const QStringList groups{"default"};
+
+    QList<QnUuid> pendingPeers;
+    nx::utils::promise<void> readyPromise;
+    auto readyFuture = readyPromise.get_future();
+
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
+    commonPeerManager->setHasInternetConnection(defaultPeer->id);
+    commonPeerManager->setPeerGroups(defaultPeer->id, groups);
+    commonPeerManager->setPeerStorage(defaultPeer->id, defaultPeer->storage);
+    QObject::connect(defaultPeer->worker.get(), &Worker::finished,
+        [this, &pendingPeers, &readyPromise]
+        {
+            pendingPeers.removeOne(defaultPeer->id);
+            if (pendingPeers.isEmpty())
+                readyPromise.set_value();
+        });
+
+    const auto& baseId = QUuid::createUuid();
+
+    QList<Peer*> peers{defaultPeer};
+
+    for (int i = 1; i <= 10; ++i)
+    {
+        auto peer = createPeer(lit("Peer %1").arg(i), QnUuid::createUuidFromPool(baseId, i));
+        peers.append(peer);
+        peerById[peer->id] = peer;
+        peer->storage->addFile(fileInfo);
+        commonPeerManager->setPeerGroups(peer->id, groups);
+        commonPeerManager->setPeerStorage(peer->id, peer->storage);
+
+        QObject::connect(peer->worker.get(), &Worker::finished,
+            [peer, &pendingPeers, &readyPromise]
+            {
+                pendingPeers.removeOne(peer->id);
+                if (pendingPeers.isEmpty())
+                    readyPromise.set_value();
+            });
+    }
+
+    pendingPeers = commonPeerManager->getAllPeers();
+
+    for (const auto& peer: peerById)
+    {
+        peer->peerManager->setPeerList(peer->peerManager->getAllPeers());
+        peer->peerManager->calculateDistances();
+    }
+
+    const int maxRequests = fileInfo.downloadedChunks.size() * pendingPeers.size() * 3;
+
+    for (auto& peer: peerById)
+        peer->worker->start();
+
+    readyFuture.wait();
+
+    for (auto& peer: peers)
+    {
+        peer->peerManager->requestCounter()->printCounters(
+            "Outgoing requests from " + commonPeerManager->peerString(peer->id),
+            commonPeerManager.data());
+    }
+
+    commonPeerManager->requestCounter()->printCounters(
+        "Incoming Requests:", commonPeerManager.data());
+
+    ASSERT_EQ(pendingPeers.size(), 0);
+    ASSERT_LE(commonPeerManager->requestCounter()->totalRequests(), maxRequests);
+}
+
+TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadNonFlatNetwork)
+{
+    auto fileInfo = createTestFile();
+    fileInfo.url = "http://test.org/testFile";
+    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
+
+    const QStringList groups{"A", "B", "C", "D", "E"};
+
+    QList<QnUuid> pendingPeers;
+    nx::utils::promise<void> readyPromise;
+    auto readyFuture = readyPromise.get_future();
+
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
+    commonPeerManager->setHasInternetConnection(defaultPeer->id);
+    commonPeerManager->setPeerGroups(defaultPeer->id, {groups[0]});
+    commonPeerManager->setPeerStorage(defaultPeer->id, defaultPeer->storage);
+    QObject::connect(defaultPeer->worker.get(), &Worker::finished,
+        [this, &pendingPeers, &readyPromise]
+        {
+            pendingPeers.removeOne(defaultPeer->id);
+            if (pendingPeers.isEmpty())
+                readyPromise.set_value();
+        });
+
+    QList<Peer*> peers{defaultPeer};
+
+    constexpr int kPeersPerGroup = 3;
+
+    for (int groupIndex = 0; groupIndex < groups.size(); ++groupIndex)
+    {
+        const auto& group = groups[groupIndex];
+
+        for (int i = 1; i <= kPeersPerGroup; ++i)
+        {
+            auto peer = createPeer(lit("Peer %1%2").arg(group).arg(i));
+            peers.append(peer);
+            peerById[peer->id] = peer;
+            peer->storage->addFile(fileInfo);
+            commonPeerManager->setPeerStorage(peer->id, peer->storage);
+
+            QStringList peerGroups{groups[groupIndex]};
+            if (i == kPeersPerGroup && groupIndex < groups.size() - 1)
+                peerGroups.append(groups[groupIndex + 1]);
+            commonPeerManager->setPeerGroups(peer->id, peerGroups);
+
+            QObject::connect(peer->worker.get(), &Worker::finished,
+                [peer, &pendingPeers, &readyPromise]
+                {
+                    pendingPeers.removeOne(peer->id);
+                    if (pendingPeers.isEmpty())
+                        readyPromise.set_value();
+                });
+        }
+    }
+
+    pendingPeers = commonPeerManager->getAllPeers();
+
+    for (const auto& peer: peerById)
+    {
+        peer->peerManager->setPeerList(peer->peerManager->getAllPeers());
+        peer->peerManager->calculateDistances();
+    }
+
+    const int maxRequests = fileInfo.downloadedChunks.size() * pendingPeers.size() * 3;
+
+    for (auto& peer: peerById)
+        peer->worker->start();
+
+    readyFuture.wait();
+
+    for (auto& peer: peers)
+    {
+        peer->peerManager->requestCounter()->printCounters(
+            "Outgoing requests from " + commonPeerManager->peerString(peer->id),
+            commonPeerManager.data());
+    }
+
+    commonPeerManager->requestCounter()->printCounters(
+        "Incoming Requests:", commonPeerManager.data());
+
+    ASSERT_EQ(pendingPeers.size(), 0);
+    ASSERT_LE(commonPeerManager->requestCounter()->totalRequests(), maxRequests);
+}
 
 } // namespace test
 } // namespace downloader

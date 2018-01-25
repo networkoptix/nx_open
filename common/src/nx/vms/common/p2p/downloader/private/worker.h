@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <boost/optional.hpp>
 
 #include <QtCore/QObject>
@@ -25,7 +26,7 @@ namespace downloader {
 class Storage;
 class AbstractPeerManager;
 
-class Worker: public QnLongRunnable
+class Worker: public QnLongRunnable, public ::std::enable_shared_from_this<Worker>
 {
     Q_OBJECT
 
@@ -37,7 +38,8 @@ public:
         foundFileInformation,
         requestingAvailableChunks,
         foundAvailableChunks,
-        fileInformationChecked,
+        validatingFileInformation,
+        fileInformationValidated,
         requestingChecksums,
         downloadingChunks,
         finished,
@@ -89,6 +91,7 @@ private:
         bool success, rest::Handle handle, int chunkIndex, const QByteArray& data);
 
     void cancelRequests();
+    void cancelRequestsByType(State type);
 
     void finish();
     void fail();
@@ -129,6 +132,20 @@ protected:
     AbstractPeerManager* peerManager() const;
 
 private:
+    struct RequestContext
+    {
+        QnUuid peerId;
+        State type = State::failed;
+        bool cancelled = false;
+
+        RequestContext(const QnUuid& peerId, State type):
+            peerId(peerId),
+            type(type)
+        {}
+
+        RequestContext() = default;
+    };
+
     bool m_shouldWait = false;
     int m_delay = -1;
     mutable QnMutex m_mutex;
@@ -144,7 +161,7 @@ private:
 
     bool m_started = false;
     utils::StandaloneTimerManager m_stepDelayTimer;
-    QHash<rest::Handle, QnUuid> m_peerByRequestHandle;
+    QHash<rest::Handle, RequestContext> m_contextByHandle;
 
     QBitArray m_availableChunks;
     QBitArray m_downloadingChunks;
