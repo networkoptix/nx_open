@@ -23,7 +23,7 @@ class Impl final: public TegraVideo
 {
 public:
     Impl();
-    ~Impl();
+    virtual ~Impl() override;
 
     virtual bool start(const Params* params) override;
 

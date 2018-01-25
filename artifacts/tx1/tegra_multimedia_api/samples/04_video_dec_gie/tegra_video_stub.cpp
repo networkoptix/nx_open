@@ -50,7 +50,7 @@ public:
         }
     }
 
-    ~Stub()
+    virtual ~Stub() override
     {
         NX_OUTPUT << __func__ << "()";
     }

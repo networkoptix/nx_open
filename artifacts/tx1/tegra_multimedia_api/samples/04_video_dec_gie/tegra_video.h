@@ -13,6 +13,8 @@
 class TEGRA_VIDEO_API TegraVideo
 {
 public:
+    virtual ~TegraVideo() = default;
+
     struct Params
     {
         const char* id = "undefined_id";
