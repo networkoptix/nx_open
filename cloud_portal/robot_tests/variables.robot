@@ -38,6 +38,8 @@ ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
 ${DELETE USER BUTTON}                 //button[@ng-click='ok()' and contains(text(), 'Delete')]
 ${DELETE USER CANCEL BUTTON}          //button[@ng-click='cancel()' and contains(text(), 'Cancel')]
 
+${ALREADY ACTIVATED}                  //h1[@ng-if='!activate.success' and contains(text(),'Account is already activated or confirmation code is incorrect')]
+
 #Share Elements (Note: Share and Permissions are the same form so these are the same variables.  Making two just in case they do diverge at some point.)
 ${SHARE MODAL}                        //div[@uib-modal-transclude]
 ${SHARE EMAIL}                        //form[@name='shareForm']//input[@ng-model='user.email']

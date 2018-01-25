@@ -70,7 +70,7 @@ Get Activation Link
     ${email}    Wait For Email    recipient=${recipient}    timeout=120
     ${links}    Get Links From Email    ${email}
     Close Mailbox
-    Go To    @{links}[1]
+    Return From Keyword    @{links}[1]
 
 Select Auto Tests System
     Wait Until Element Is Visible    ${AUTO TESTS}
