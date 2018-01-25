@@ -49,7 +49,7 @@ private:
     nx::utils::Url buildMonitoringUrl(
         const nx::utils::Url& resourceUrl,
         const std::vector<QnUuid>& eventTypes) const;
-    QUrl buildLprUrl(const QUrl& resourceUrl) const;
+    nx::utils::Url buildLprUrl(const nx::utils::Url& resourceUrl) const;
 
     void initMonitorUnsafe();
     void initEventMonitor();
