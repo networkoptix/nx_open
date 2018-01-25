@@ -65,10 +65,10 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
         highest_build = 0
         for path in path_to_update_obj.keys():
             path_parts = path.split('/')
-            if customization_name == path_parts[1] and int(path_parts[2]) > highest_build and \
-                    'packages' in path_to_update_obj[path]:
-                highest_build = int(path_parts[2])
-                new_update_obj = path_to_update_obj[path]
+            if customization_name == path_parts[1] and int(path_parts[2]) > highest_build:
+                if 'packages' in path_to_update_obj[path]:
+                    highest_build = int(path_parts[2])
+                    new_update_obj = path_to_update_obj[path]
 
         if not new_update_obj:
             continue
@@ -86,8 +86,10 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
                 new_file_name_prefix = list(old_file_name_splits[0])
                 new_file_name_prefix[-1] = new_version_splits[0]
                 new_file_name_prefix = ''.join(new_file_name_prefix)
-                new_file_name = '.'.join([new_file_name_prefix, new_version_splits[1], new_version_splits[2],
-                                          new_version_splits[3], 'zip'])
+                new_file_name = '.'.join([
+                    new_file_name_prefix,
+                    new_version_splits[1], new_version_splits[2], new_version_splits[3],
+                    'zip'])
                 file_info_obj['file'] = new_file_name
 
             def amend_packages(update_obj, packages_name):
