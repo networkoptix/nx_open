@@ -212,7 +212,7 @@ namespace client {
 namespace desktop {
 namespace license {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(RequestInfo, (json), (name)(email)(reason))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(RequestInfo, (json), (name)(email)(reason)(systemName)(localUser))
 
 void Deactivator::deactivateAsync(
     const RequestInfo& info,

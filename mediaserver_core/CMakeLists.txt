@@ -82,8 +82,8 @@ nx_add_target(mediaserver_core LIBRARY
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
     PUBLIC_LIBS
         qtservice qtsinglecoreapplication Qt5::WebSockets
-        onvif sigar
-        appserver2 nx_email nx_speech_synthesizer cloud_db_client)
+        sigar
+        appserver2 nx_onvif nx_email nx_speech_synthesizer cloud_db_client)
 
 if(LINUX)
     target_link_libraries(mediaserver_core PRIVATE ldap)

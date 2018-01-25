@@ -109,6 +109,7 @@ void MediatorConnector::mockupMediatorUrl(const QUrl& mediatorUrl)
     NX_DEBUG(this, lm("Mediator address is mocked up: %1").arg(mediatorUrl));
 
     m_mediatorUrl = mediatorUrl;
+    m_mockedUpMediatorUrl = mediatorUrl;
     m_mediatorUdpEndpoint = nx::network::url::getEndpoint(mediatorUrl);
     m_stunClient->connect(mediatorUrl, [](SystemError::ErrorCode) {});
     m_promise->set_value(true);
@@ -208,23 +209,30 @@ void MediatorConnector::connectToMediatorAsync()
         *m_mediatorUrl,
         [this](SystemError::ErrorCode code)
         {
-            auto setEndpoint =
-                [this]()
-                {
-                    QnMutexLocker lock(&m_mutex);
-                    // NOTE: Assuming that mediator's UDP and TCP interfaces are available on the same IP.
-                    m_mediatorUdpEndpoint->address = m_stunClient->remoteAddress().address;
-                    NX_DEBUG(this, lm("Connected to mediator at %1").arg(m_mediatorUrl));
-                };
-
             if (code == SystemError::noError)
-                setEndpoint();
+            {
+                saveMediatorEndpoint();
+            }
+            else
+            {
+                NX_DEBUG(this, lm("Failed to connect to mediator on %1")
+                    .args(*m_mediatorUrl));
+            }
 
             if (!isReady(*m_future))
                 m_promise->set_value(code == SystemError::noError);
 
-            m_stunClient->addOnReconnectedHandler(std::move(setEndpoint));
+            m_stunClient->addOnReconnectedHandler(
+                std::bind(&MediatorConnector::saveMediatorEndpoint, this));
         });
+}
+
+void MediatorConnector::saveMediatorEndpoint()
+{
+    QnMutexLocker lock(&m_mutex);
+    // NOTE: Assuming that mediator's UDP and TCP interfaces are available on the same IP.
+    m_mediatorUdpEndpoint->address = m_stunClient->remoteAddress().address;
+    NX_DEBUG(this, lm("Connected to mediator at %1").arg(m_mediatorUrl));
 }
 
 void MediatorConnector::reconnectToMediator(
@@ -232,10 +240,19 @@ void MediatorConnector::reconnectToMediator(
 {
     NX_DEBUG(this, lm("Connection to mediator has been broken. Reconnecting..."));
 
-    // Preventing m_stunClient from automatically reconnecting to the mediator.
-    m_stunClient->closeConnection(connectionClosureReason);
-    m_mediatorUrlFetcher.reset();
-    fetchEndpoint();
+    if (m_mockedUpMediatorUrl)
+    {
+        NX_DEBUG(this, lm("Using mocked up mediator URL %1").args(*m_mockedUpMediatorUrl));
+        connectToMediatorAsync();
+    }
+    else
+    {
+        // Fetching mediator URL again.
+        // Preventing m_stunClient from automatically reconnecting to the mediator.
+        m_stunClient->closeConnection(connectionClosureReason);
+        m_mediatorUrlFetcher.reset();
+        fetchEndpoint();
+    }
 }
 
 } // namespace api

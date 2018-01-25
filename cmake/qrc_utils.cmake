@@ -1,8 +1,6 @@
 function(nx_generate_qrc qrc_file)
     cmake_parse_arguments(QRC "" "" "USED_FILES_VARIABLE" ${ARGN})
 
-    message(STATUS "Generating ${qrc_file}")
-
     set(content
         "<!DOCTYPE RCC>\n"
         "<RCC version=\"1.0\">\n"
@@ -46,6 +44,8 @@ function(nx_generate_qrc qrc_file)
         "</RCC>\n")
 
     file(WRITE ${qrc_file}.copy ${content})
+
+    file(TIMESTAMP "${qrc_file}" orig_ts)
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${qrc_file}.copy ${qrc_file}
         RESULT_VARIABLE result)
@@ -53,6 +53,11 @@ function(nx_generate_qrc qrc_file)
         message(FATAL_ERROR "Cannot create ${qrc_file}")
     endif()
     file(REMOVE ${qrc_file}.copy)
+    file(TIMESTAMP "${qrc_file}" new_ts)
+
+    if(NOT ${orig_ts} STREQUAL ${new_ts})
+        message(STATUS "Generated ${qrc_file}")
+    endif()
 
     if(QRC_USED_FILES_VARIABLE)
         set(${QRC_USED_FILES_VARIABLE} ${used_files} PARENT_SCOPE)

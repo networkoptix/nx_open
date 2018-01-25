@@ -58,12 +58,14 @@ void AsyncClient::connect(
             });
     }
 
+    QnMutexLocker lock(&m_mutex);
+    m_endpoint = nx::network::url::getEndpoint(url);
+    m_useSsl = url.scheme() == nx::stun::kSecureUrlSchemeName;
+
     post(
-        [this, url, completionHandler = std::move(completionHandler)]() mutable
+        [this, completionHandler = std::move(completionHandler)]() mutable
         {
             QnMutexLocker lock(&m_mutex);
-            m_endpoint = nx::network::url::getEndpoint(url);
-            m_useSsl = url.scheme() == nx::stun::kSecureUrlSchemeName;
             NX_ASSERT(!m_connectCompletionHandler);
             m_connectCompletionHandler = std::move(completionHandler);
             openConnectionImpl(&lock);

@@ -51,6 +51,8 @@ set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+set(CMAKE_DEBUG_POSTFIX "" CACHE INTERNAL "" FORCE)
+
 list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/cmake
 )
@@ -84,8 +86,10 @@ if(MACOSX OR IOS)
     include(macosx_keychain)
 endif()
 
-if(NOT (WINDOWS OR ANDROID OR IOS))
-    set(BUILD_SHARED_LIBS ON)
+if(WINDOWS OR ANDROID OR IOS)
+    set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+else()
+    set(BUILD_SHARED_LIBS ON CACHE INTERNAL "")
 endif()
 
 include(dependencies)
@@ -147,6 +151,13 @@ if(withDesktopClient OR withMobileClient OR withNxTool)
             Quick)
 endif()
 
+if(withDesktopClient OR withNxTool)
+    find_package(Qt5
+        COMPONENTS
+            Widgets
+    )
+endif()
+
 set(QML_IMPORT_PATH
     "${QT_DIR}/qml"
     "${CMAKE_CURRENT_LIST_DIR}/client/mobile_client/static-resources/qml"
@@ -161,6 +172,8 @@ if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
 endif()
+
+add_subdirectory(dependencies)
 
 if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
     add_subdirectory(common_libs)
