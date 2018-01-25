@@ -40,8 +40,7 @@ bool isStatusValid(Qn::ResourceStatus status)
 
 QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /* = 0*/):
     base_type(parent),
-    ui(new Ui::CameraAdvancedSettingsWidget),
-    m_page(Page::Empty)
+    ui(new Ui::CameraAdvancedSettingsWidget)
 {
     ui->setupUi(this);
 
@@ -138,54 +137,34 @@ void QnCameraAdvancedSettingsWidget::updateFromResource()
     ui->secondaryStreamUrlInputField->setPlaceholderText(urlPlaceholder);
 }
 
-void QnCameraAdvancedSettingsWidget::setPage(Page page)
+
+bool QnCameraAdvancedSettingsWidget::hasManualPage() const
 {
-    if (m_page == page)
-        return;
-
-    m_page = page;
-
-    auto widgetByPage = [this]()-> QWidget*
-    {
-        switch (m_page)
-        {
-            case Page::Empty:
-                return ui->noSettingsPage;
-            case Page::Manual:
-                return ui->manualPage;
-            case Page::Web:
-                return ui->webPage;
-            case Page::Unavailable:
-                return ui->unavailablePage;
-        }
-        return nullptr;
-    };
-
-    ui->stackedWidget->setCurrentWidget(widgetByPage());
+    if (!m_camera || !isStatusValid(m_camera->getStatus()))
+        return false;
+    return !m_camera->getProperty(Qn::CAMERA_ADVANCED_PARAMETERS).isEmpty();
 }
 
+bool QnCameraAdvancedSettingsWidget::hasWebPage() const
+{
+    if (!m_camera || !isStatusValid(m_camera->getStatus()))
+        return false;
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(m_camera);
+    return resourceData.value<bool>(lit("showUrl"), false);
+}
 
 void QnCameraAdvancedSettingsWidget::updatePage()
 {
-    auto calculatePage =
-        [this]
-        {
-            if (!m_camera || !isStatusValid(m_camera->getStatus()))
-                return Page::Unavailable;
 
-        QnResourceData resourceData = qnStaticCommon->dataPool()->data(m_camera);
-        bool hasWebPage = resourceData.value<bool>(lit("showUrl"), false);
-        if (hasWebPage)
-            return Page::Web;
+    while (ui->tabWidget->count() > 0)
+        ui->tabWidget->removeTab(0);
 
-        if (!m_camera->getProperty(Qn::CAMERA_ADVANCED_PARAMETERS).isEmpty())
-            return Page::Manual;
-
-        return Page::Empty;
-    };
-
-    Page newPage = calculatePage();
-    setPage(newPage);
+    if (hasManualPage())
+        ui->tabWidget->addTab(ui->manualPage, lit("Settings"));
+    if (hasWebPage())
+        ui->tabWidget->addTab(ui->webPage, lit("Web"));
+    if (ui->tabWidget->count() == 0)
+        ui->tabWidget->addTab(ui->noSettingsPage, lit("No settings"));
 }
 
 void QnCameraAdvancedSettingsWidget::updateUrls()
@@ -219,7 +198,7 @@ void QnCameraAdvancedSettingsWidget::reloadData()
 {
     updatePage();
 
-    if (m_page == Page::Web)
+    if (hasWebPage())
     {
         NX_ASSERT(m_camera);
         if (!m_camera)
@@ -261,7 +240,8 @@ void QnCameraAdvancedSettingsWidget::reloadData()
         ui->webView->load(QNetworkRequest(targetUrl));
         ui->webView->show();
     }
-    else if (m_page == Page::Manual)
+
+    if (hasManualPage())
     {
         ui->cameraAdvancedParamsWidget->loadValues();
     }
@@ -269,7 +249,7 @@ void QnCameraAdvancedSettingsWidget::reloadData()
 
 bool QnCameraAdvancedSettingsWidget::hasChanges() const
 {
-    if (ui->stackedWidget->currentWidget() != ui->manualPage)
+    if (!hasManualPage())
         return false;
 
     return ui->cameraAdvancedParamsWidget->hasChanges();
@@ -286,7 +266,7 @@ void QnCameraAdvancedSettingsWidget::submitToResource()
 void QnCameraAdvancedSettingsWidget::hideEvent(QHideEvent *event)
 {
     Q_UNUSED(event);
-    if (m_page != Page::Web)
+    if (!hasWebPage())
         return;
 
     ui->webView->triggerPageAction(QWebPage::Stop);
