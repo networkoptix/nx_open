@@ -40,9 +40,9 @@ class CloudNotificationAdmin(admin.ModelAdmin):
     ]
 
     def has_delete_permission(self, request, obj=None):
-        if not obj:
-            return request.user.has_perm('notifications.delete_cloudnotification')
-        return request.user.has_perm('notifications.delete_cloudnotification') and not obj.sent_date
+        if obj and obj.sent_date:
+            return False
+        return super(CloudNotificationAdmin, self).has_delete_permission(request,obj=obj)
 
 
     def get_readonly_fields(self, request, obj=None):
