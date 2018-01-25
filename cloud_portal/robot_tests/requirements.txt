@@ -1,0 +1,9 @@
+decorator==4.1.2
+future==0.16.0
+robotframework==3.0.2
+robotframework-angularjs==0.0.6
+robotframework-extendedselenium2library==0.9.1
+robotframework-imaplibrary==0.3.0
+robotframework-selenium2library==3.0.0
+robotframework-seleniumlibrary==3.0.1
+selenium==3.8.1
