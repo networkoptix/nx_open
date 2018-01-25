@@ -1,19 +1,8 @@
-"""
-Test updates server. Replicates functionality of updates.networkoptix.com but appends new versions and cloud host
-information and corresponding specific updates links to the existing ones. You may specify what to add in the call to
-the append_new_versions() function (see main() for example).
-If started with '--generate_data' key collects actual data from updates.networkoptix.com, makes needed amendments and
-saves result to the 'data' folder before HTTP server start. Without that key - tries to read data from the 'data'
-folder.
-Server can serve update files requests. Pre-generated dummy file is given as a response. This option might be turned off
-to test how mediaserver deals with update files absence. Run script with '--emulate_no_update_files' key to achieve
-this behavior.
-"""
-
 import json
 import logging
 import shutil
 import sys
+from textwrap import dedent
 
 import click
 from flask import Flask, request, send_file
@@ -126,12 +115,17 @@ def save_data_to_files(root_obj, path_to_update_obj):
         file_path.write_bytes(json.dumps(value, indent=2))
 
 
-@click.group(help='Test updates server')
+@click.group(help='Test updates server', epilog=dedent("""
+    Replicates functionality of updates.networkoptix.com but
+    appends new versions and cloud host information and
+    corresponding specific updates links to the existing ones.
+    You may specify versions to add as arguments of append_new_versions(...)."""))
 def main():
     pass
 
 
-@main.command()
+@main.command(short_help="Collect data, add versions", help=dedent("""
+    Collect actual data from updates.networkoptix.com, add versions and save to the data dir."""))
 def generate():
     _logger.info('Loading and generating data. Be patient')
     root_obj, path_to_update_obj = collect_actual_data()
@@ -143,8 +137,10 @@ def generate():
         f.write(b'\0')
 
 
-@main.command()
-@click.option('--serve-update-archives/--no-serve-update-archives', default=True, show_default=True)
+@main.command(short_help="Start HTTP server", help="Serve update metadata and, optionally, archives by HTTP.")
+@click.option('--serve-update-archives/--no-serve-update-archives', default=True, show_default=True, help=dedent("""
+    Server can serve update files requests. Pre-generated dummy file is given as a response.
+    This option might be turned off to test how mediaserver deals with update files absence."""))
 @click.option('--range-header', type=click.Choice(['support', 'ignore', 'err']), default='support', show_default=True)
 def serve(serve_update_archives, range_header):
     app = Flask(__name__)
