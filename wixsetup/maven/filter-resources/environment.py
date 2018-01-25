@@ -21,8 +21,7 @@ client_background_source_dir = '${ClientBgSourceDir}'
 
 # Signing section
 signtool_directory = '${signtool_directory}/bin'
-main_certificate = '${certificates_path}/wixsetup/${sign.cer}'
-additional_certificate = '${sign.intermediate.cer}'
+certificate = '${certificates_path}/wixsetup/${sign.cer}'
 sign_password = '${sign.password}'
 sign_description = '"${company.name} ${display.product.name}"'
 

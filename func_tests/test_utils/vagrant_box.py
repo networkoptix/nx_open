@@ -299,6 +299,7 @@ class VagrantBox(object):
 
     @staticmethod
     def _patch_sshd_config(root_ssh_host):
+        """With default settings, connection takes ~1.5 sec."""
         sshd_config_path = '/etc/ssh/sshd_config'
         settings = root_ssh_host.read_file(sshd_config_path).split('\n')  # Preserve new line at the end!
         old_setting = 'UsePAM yes'

@@ -31,6 +31,7 @@
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
+#include <ui/widgets/properties/archive_length_widget.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -203,12 +204,10 @@ private:
     bool m_hasVideo;
 };
 
-static const int kDangerousMinArchiveDays = 5;
 static const int kRecordingTypeLabelFontSize = 12;
 static const int kRecordingTypeLabelFontWeight = QFont::DemiBold;
 static const int kDefaultBeforeThresholdSec = 5;
 static const int kDefaultAfterThresholdSec = 5;
-static const int kRecordedDaysDontChange = std::numeric_limits<int>::max();
 
 } // namespace
 
@@ -262,7 +261,6 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent):
     addQualityItem(Qn::QualityHighest);
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(Qn::QualityHigh));
 
-    setHelpTopic(ui->archiveGroupBox, Qn::CameraSettings_Recording_ArchiveLength_Help);
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
     // init buttons
@@ -274,8 +272,6 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent):
     ui->licensesUsageWidget->init(&helper);
 
     CheckboxUtils::autoClearTristate(ui->enableRecordingCheckBox);
-    CheckboxUtils::autoClearTristate(ui->checkBoxMinArchive);
-    CheckboxUtils::autoClearTristate(ui->checkBoxMaxArchive);
 
     QFont labelFont;
     labelFont.setPixelSize(kRecordingTypeLabelFontSize);
@@ -357,28 +353,13 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent):
     connect(ui->gridWidget, &QnScheduleGridWidget::cellActivated, this,
         &CameraScheduleWidget::at_gridWidget_cellActivated);
 
-    connect(ui->checkBoxMinArchive, &QCheckBox::stateChanged, this,
-        &CameraScheduleWidget::updateArchiveRangeEnabledState);
-    connect(ui->checkBoxMinArchive, &QCheckBox::stateChanged, this,
-        notifyAboutArchiveRangeChanged);
-
-    connect(ui->checkBoxMaxArchive, &QCheckBox::stateChanged, this,
-        &CameraScheduleWidget::updateArchiveRangeEnabledState);
-    connect(ui->checkBoxMaxArchive, &QCheckBox::stateChanged, this,
-        notifyAboutArchiveRangeChanged);
-
-    connect(ui->spinBoxMinDays, QnSpinboxIntValueChanged, this,
-        &CameraScheduleWidget::validateArchiveLength);
-    connect(ui->spinBoxMinDays, QnSpinboxIntValueChanged, this,
-        notifyAboutArchiveRangeChanged);
-
-    connect(ui->spinBoxMaxDays, QnSpinboxIntValueChanged, this,
-        &CameraScheduleWidget::validateArchiveLength);
-    connect(ui->spinBoxMaxDays, QnSpinboxIntValueChanged, this,
-        notifyAboutArchiveRangeChanged);
-
     connect(ui->exportScheduleButton, &QPushButton::clicked, this,
         &CameraScheduleWidget::at_exportScheduleButton_clicked);
+
+    connect(ui->archiveLengthWidget, &QnArchiveLengthWidget::alertChanged, this,
+        &QnCameraScheduleWidget::emitAlert);
+    connect(ui->archiveLengthWidget, &QnArchiveLengthWidget::changed, this,
+        notifyAboutArchiveRangeChanged);
 
     ui->exportWarningLabel->setVisible(false);
 
@@ -388,7 +369,6 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent):
     installEventHandler(ui->gridWidget, QEvent::MouseButtonRelease,
         this, &CameraScheduleWidget::controlsChangesApplied);
 
-    updateGridEnabledState();
     updateMotionButtons();
 
     auto updateLicensesIfNeeded =
@@ -570,11 +550,8 @@ void CameraScheduleWidget::setReadOnly(bool readOnly)
     setReadOnly(ui->gridWidget, readOnly);
     setReadOnly(ui->exportScheduleButton, readOnly);
     setReadOnly(ui->exportWarningLabel, readOnly);
+    setReadOnly(ui->archiveLengthWidget, readOnly);
 
-    setReadOnly(ui->checkBoxMaxArchive, readOnly);
-    setReadOnly(ui->checkBoxMinArchive, readOnly);
-    setReadOnly(ui->spinBoxMaxDays, readOnly);
-    setReadOnly(ui->spinBoxMinDays, readOnly);
     m_readOnly = readOnly;
 }
 
@@ -680,23 +657,23 @@ void CameraScheduleWidget::updateFromResources()
         setFps(m_cameras.first()->getMaxFps());
     syncBitrateWithFps();
 
+    ui->archiveLengthWidget->updateFromResources(m_cameras);
+
     updateScheduleEnabled();
-    updateMinDays();
-    updateMaxDays();
     updatePanicLabelText();
     updateMotionButtons();
     updateLicensesLabelText();
     updateGridParams();
     setScheduleAlert(QString());
+
     retranslateUi();
 }
 
 void CameraScheduleWidget::submitToResources()
 {
-    int maxDays = maxRecordedDays();
-    int minDays = minRecordedDays();
-
     bool scheduleChanged = ui->gridWidget->isActive();
+
+    ui->archiveLengthWidget->submitToResources(m_cameras);
 
     QnScheduleTaskList basicScheduleTasks;
     if (scheduleChanged)
@@ -711,12 +688,6 @@ void CameraScheduleWidget::submitToResources()
 
     for (const auto& camera: m_cameras)
     {
-        if (maxDays != kRecordedDaysDontChange)
-            camera->setMaxDays(maxDays);
-
-        if (minDays != kRecordedDaysDontChange)
-            camera->setMinDays(minDays);
-
         if (canChangeRecording)
         {
             camera->setLicenseUsed(enableRecording);
@@ -752,61 +723,6 @@ void CameraScheduleWidget::updateScheduleEnabled()
 
     CheckboxUtils::setupTristateCheckbox(ui->enableRecordingCheckBox,
         enabledCount == 0 || disabledCount == 0, enabledCount > 0);
-}
-
-void CameraScheduleWidget::updateMinDays()
-{
-    if (m_cameras.isEmpty())
-        return;
-
-    /* Any negative min days value means 'auto'. Storing absolute value to keep previous one. */
-    auto calcMinDays = [](int d) { return d == 0 ? ec2::kDefaultMinArchiveDays : qAbs(d); };
-
-    const int minDays = (*std::min_element(m_cameras.cbegin(), m_cameras.cend(),
-        [calcMinDays](const QnVirtualCameraResourcePtr &l, const QnVirtualCameraResourcePtr &r)
-        {
-            return calcMinDays(l->minDays()) < calcMinDays(r->minDays());
-        }))->minDays();
-
-    const bool isAuto = minDays <= 0;
-
-    bool sameMinDays = boost::algorithm::all_of(m_cameras,
-        [minDays, isAuto](const QnVirtualCameraResourcePtr &camera)
-        {
-            return isAuto
-                ? camera->minDays() <= 0
-                : camera->minDays() == minDays;
-        });
-
-    CheckboxUtils::setupTristateCheckbox(ui->checkBoxMinArchive, sameMinDays, isAuto);
-    ui->spinBoxMinDays->setValue(calcMinDays(minDays));
-}
-
-void CameraScheduleWidget::updateMaxDays()
-{
-    if (m_cameras.isEmpty())
-        return;
-
-    /* Any negative max days value means 'auto'. Storing absolute value to keep previous one. */
-    auto calcMaxDays = [](int d) { return d == 0 ? ec2::kDefaultMaxArchiveDays : qAbs(d); };
-
-    const int maxDays =(*std::max_element(m_cameras.cbegin(), m_cameras.cend(),
-        [calcMaxDays](const QnVirtualCameraResourcePtr &l, const QnVirtualCameraResourcePtr &r)
-        {
-            return calcMaxDays(l->maxDays()) < calcMaxDays(r->maxDays());
-        }))->maxDays();
-
-    const bool isAuto = maxDays <= 0;
-    bool sameMaxDays = boost::algorithm::all_of(m_cameras,
-        [maxDays, isAuto](const QnVirtualCameraResourcePtr &camera)
-        {
-        return isAuto
-            ? camera->maxDays() <= 0
-            : camera->maxDays() == maxDays;
-        });
-
-    CheckboxUtils::setupTristateCheckbox(ui->checkBoxMaxArchive, sameMaxDays, isAuto);
-    ui->spinBoxMaxDays->setValue(calcMaxDays(maxDays));
 }
 
 void CameraScheduleWidget::updateMaxFPS()
@@ -1186,13 +1102,6 @@ bool CameraScheduleWidget::isScheduleEnabled() const
     return ui->enableRecordingCheckBox->checkState() != Qt::Unchecked;
 }
 
-void CameraScheduleWidget::updateArchiveRangeEnabledState()
-{
-    ui->spinBoxMaxDays->setEnabled(ui->checkBoxMaxArchive->checkState() == Qt::Unchecked);
-    ui->spinBoxMinDays->setEnabled(ui->checkBoxMinArchive->checkState() == Qt::Unchecked);
-    validateArchiveLength();
-}
-
 void CameraScheduleWidget::updateGridEnabledState()
 {
     const bool recordingEnabled = ui->enableRecordingCheckBox->isChecked();
@@ -1201,7 +1110,6 @@ void CameraScheduleWidget::updateGridEnabledState()
     setLayoutEnabled(ui->scheduleSettingsLayout, recordingEnabled);
     setLayoutEnabled(ui->bottomParametersLayout, recordingEnabled);
     updateScheduleTypeControls();
-    updateArchiveRangeEnabledState();
 }
 
 void CameraScheduleWidget::updateLicensesLabelText()
@@ -1455,15 +1363,10 @@ void CameraScheduleWidget::at_exportScheduleButton_clicked()
         [this, sourceCamera = m_cameras.front(), copyArchiveLength, recordingEnabled]
             (const QnVirtualCameraResourcePtr &camera)
         {
+            QnVirtualCameraResourceList list;
+            list.push_back(camera);
             if (copyArchiveLength)
-            {
-                int maxDays = maxRecordedDays();
-                if (maxDays != kRecordedDaysDontChange)
-                    camera->setMaxDays(maxDays);
-                int minDays = minRecordedDays();
-                if (minDays != kRecordedDaysDontChange)
-                    camera->setMinDays(minDays);
-            }
+                ui->archiveLengthWidget->submitToResources(list);
 
             camera->setScheduleDisabled(!recordingEnabled);
             int maxFps = camera->getMaxFps();
@@ -1546,66 +1449,19 @@ bool CameraScheduleWidget::hasDualStreamingMotionOnGrid() const
     return false;
 }
 
-int CameraScheduleWidget::maxRecordedDays() const
-{
-    switch (ui->checkBoxMaxArchive->checkState())
-    {
-        case Qt::Unchecked:
-            return ui->spinBoxMaxDays->value();
-        case Qt::Checked:   //automatically manage but save for future use
-            return ui->spinBoxMaxDays->value() * -1;
-        default:
-            return kRecordedDaysDontChange;
-    }
-}
-
-int CameraScheduleWidget::minRecordedDays() const
-{
-    switch (ui->checkBoxMinArchive->checkState())
-    {
-        case Qt::Unchecked:
-            return ui->spinBoxMinDays->value();
-        case Qt::Checked:   //automatically manage but save for future use
-            return ui->spinBoxMinDays->value() * -1;
-        default:
-            return kRecordedDaysDontChange;
-    }
-}
-
-void CameraScheduleWidget::validateArchiveLength()
-{
-    if (ui->checkBoxMinArchive->checkState() == Qt::Unchecked && ui->checkBoxMaxArchive->checkState() == Qt::Unchecked)
-    {
-        if (ui->spinBoxMaxDays->value() < ui->spinBoxMinDays->value())
-            ui->spinBoxMaxDays->setValue(ui->spinBoxMinDays->value());
-    }
-
-    QString alertText;
-    bool alertVisible = ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() > kDangerousMinArchiveDays;
-
-    if (alertVisible)
-    {
-        alertText = QnDeviceDependentStrings::getDefaultNameFromSet(
-            resourcePool(),
-            tr("High minimum value can lead to archive length decrease on other devices."),
-            tr("High minimum value can lead to archive length decrease on other cameras."));
-    }
-
-    setArchiveLengthAlert(alertText);
-}
-
 void CameraScheduleWidget::setScheduleAlert(const QString& scheduleAlert)
 {
     /* We want to force update - emit a signal - even if the text didn't change: */
     m_scheduleAlert = scheduleAlert;
-    emit alert(m_scheduleAlert.isEmpty() ? m_archiveLengthAlert : m_scheduleAlert);
+    emitAlert();
 }
 
 void CameraScheduleWidget::setArchiveLengthAlert(const QString& archiveLengthAlert)
 {
-    /* We want to force update - emit a signal - even if the text didn't change: */
-    m_archiveLengthAlert = archiveLengthAlert;
-    emit alert(m_archiveLengthAlert.isEmpty() ? m_scheduleAlert : m_archiveLengthAlert);
+    if (!m_scheduleAlert.isEmpty())
+        emit alert(m_scheduleAlert);
+    else
+        emit alert(ui->archiveLengthWidget->alert());
 }
 
 void CameraScheduleWidget::updateAlert(AlertReason when)

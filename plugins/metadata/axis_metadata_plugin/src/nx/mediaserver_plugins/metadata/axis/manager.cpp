@@ -16,9 +16,6 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace axis {
 
-using namespace nx::sdk;
-using namespace nx::sdk::metadata;
-
 Manager::Manager(
     const nx::sdk::ResourceInfo& resourceInfo,
     const QList<IdentifiedSupportedEvent>& events)
@@ -32,7 +29,12 @@ Manager::Manager(
     {
         deviceManifest.supportedEventTypes.push_back(event.internalTypeId());
     }
-    m_deviceManifest = QJson::serialized(deviceManifest);
+
+    // We use m_deviceManifestFull to give server full manifest, m_deviceManifestPartial (that
+    // gives server only Uuids) may be users for test purposes.
+    //m_deviceManifestPartial = QJson::serialized(deviceManifest);
+
+    m_deviceManifestFull = serializeEvents(events).toUtf8();
 
     m_identifiedSupportedEvents = events;
 
@@ -47,7 +49,7 @@ Manager::~Manager()
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataManager)
+    if (interfaceId == nx::sdk::metadata::IID_MetadataManager)
     {
         addRef();
         return static_cast<AbstractMetadataManager*>(this);
@@ -72,23 +74,29 @@ Error Manager::startFetchingMetadata(nxpl::NX_GUID* eventTypeList, int eventType
     return m_monitor->startMonitoring(eventTypeList, eventTypeListSize);
 }
 
-Error Manager::stopFetchingMetadata()
+nx::sdk::Error Manager::stopFetchingMetadata()
 {
     delete m_monitor;
     m_monitor = nullptr;
-    return Error::noError;
+    return nx::sdk::Error::noError;
 }
 
-const char* Manager::capabilitiesManifest(Error* error) const
+const char* Manager::capabilitiesManifest(nx::sdk::Error* error)
 {
-    if (m_deviceManifest.isEmpty())
+    if (m_deviceManifestFull.isEmpty())
     {
-        *error = Error::unknownError;
+        *error = nx::sdk::Error::unknownError;
         return nullptr;
     }
+    *error = nx::sdk::Error::noError;
+    m_givenManifests.push_back(m_deviceManifestFull);
+    return m_deviceManifestFull.constData();
+}
 
-    *error = Error::noError;
-    return m_deviceManifest.constData();
+void Manager::freeManifest(const char* data)
+{
+    // Do nothing. Memory allocated for Manifests is stored in m_givenManifests list and will be
+    // released in Manager's destructor.
 }
 
 } // axis

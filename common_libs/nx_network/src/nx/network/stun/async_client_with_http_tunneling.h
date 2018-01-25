@@ -43,6 +43,8 @@ public:
     virtual void addOnReconnectedHandler(
         ReconnectHandler handler,
         void* client = nullptr) override;
+    virtual void setOnConnectionClosedHandler(
+        OnConnectionClosedHandler onConnectionClosedHandler) override;
 
     virtual void sendRequest(
         Message request,
@@ -94,6 +96,7 @@ private:
     int m_requestIdSequence = 0;
     /** map<request id, request context>. */
     std::map<int, RequestContext> m_activeRequests;
+    OnConnectionClosedHandler m_connectionClosedHandler;
 
     virtual void stopWhileInAioThread() override;
 
@@ -118,7 +121,7 @@ private:
         nx::network::stun::Message response,
         int requestId);
 
-    void onConnectionClosed(SystemError::ErrorCode closeReason);
+    void onStunConnectionClosed(SystemError::ErrorCode closeReason);
     void scheduleReconnect();
     void reconnect();
     void onReconnectDone(SystemError::ErrorCode sysErrorCode);

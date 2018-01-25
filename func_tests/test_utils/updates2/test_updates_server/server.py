@@ -1,30 +1,18 @@
-"""
-Test updates server. Replicates functionality of updates.networkoptix.com but appends new versions and cloud host
-information and corresponding specific updates links to the existing ones. You may specify what to add in the call to
-the append_new_versions() function (see main() for example).
-If started with '--generate_data' key collects actual data from updates.networkoptix.com, makes needed amendments and
-saves result to the 'data' folder before HTTP server start. Without that key - tries to read data from the 'data'
-folder.
-Server can serve update files requests. Pre-generated dummy file is given as a response. This option might be turned off
-to test how mediaserver deals with update files absence. Run script with '--emulate_no_update_files' key to achieve
-this behavior.
-"""
-
-import argparse
 import json
 import logging
-import os
 import shutil
 import sys
+from textwrap import dedent
+
+import click
+from flask import Flask, request, send_file
+from pathlib2 import Path, PurePath
+from werkzeug.exceptions import BadRequest, NotFound, SecurityError
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
-    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-    # noinspection PyCompatibility,PyUnresolvedReferences
     from httplib import HTTPConnection
 elif sys.version_info[:2] in {(3, 5), (3, 6)}:
-    # noinspection PyCompatibility,PyUnresolvedReferences
-    from http.server import HTTPServer, BaseHTTPRequestHandler
     # noinspection PyCompatibility,PyUnresolvedReferences
     from http.client import HTTPConnection
 
@@ -33,12 +21,10 @@ _logger = logging.getLogger(__name__)
 UPDATE_PATH_PATTERN = '/{}/{}/update.json'
 UPDATES_PATH = '/updates.json'
 
-DATA_FOLDER_NAME = 'data'
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), DATA_FOLDER_NAME)
+DATA_DIR = Path(__file__).parent / 'data'
 DUMMY_FILE_NAME = 'dummy.raw'
-DUMMY_FILE_PATH = os.path.join(DATA_DIR, DUMMY_FILE_NAME)
+DUMMY_FILE_PATH = DATA_DIR / DUMMY_FILE_NAME
 UPDATES_FILE_NAME = 'updates.json'
-FILE_PATTERN = '{}.{}.json'
 
 
 def collect_actual_data():
@@ -58,14 +44,16 @@ def collect_actual_data():
             update_path = UPDATE_PATH_PATTERN.format(customization, build_num)
             conn.request('GET', update_path)
             response = conn.getresponse()
-            content = response.read()
+            response_contents = response.read()
             if response.status != 200:
+                _logger.warning("Ignore %s: HTTP status code %d.", update_path, response.status)
                 continue
             try:
-                path_to_update_obj[update_path] = json.loads(content)
-            except Exception as e:
-                # Some updates might be not valid jsons, we are just not interested in them
-                pass
+                update_metadata = json.loads(response_contents)
+            except ValueError:
+                _logger.warning("Ignore %s: not a valid JSON.", update_path)
+                continue
+            path_to_update_obj[update_path] = update_metadata
 
     return root_obj, path_to_update_obj
 
@@ -77,10 +65,10 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
         highest_build = 0
         for path in path_to_update_obj.keys():
             path_parts = path.split('/')
-            if customization_name == path_parts[1] and int(path_parts[2]) > highest_build and \
-                    'packages' in path_to_update_obj[path]:
-                highest_build = int(path_parts[2])
-                new_update_obj = path_to_update_obj[path]
+            if customization_name == path_parts[1] and int(path_parts[2]) > highest_build:
+                if 'packages' in path_to_update_obj[path]:
+                    highest_build = int(path_parts[2])
+                    new_update_obj = path_to_update_obj[path]
 
         if not new_update_obj:
             continue
@@ -98,8 +86,10 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
                 new_file_name_prefix = list(old_file_name_splits[0])
                 new_file_name_prefix[-1] = new_version_splits[0]
                 new_file_name_prefix = ''.join(new_file_name_prefix)
-                new_file_name = '.'.join([new_file_name_prefix, new_version_splits[1], new_version_splits[2],
-                                          new_version_splits[3], 'zip'])
+                new_file_name = '.'.join([
+                    new_file_name_prefix,
+                    new_version_splits[1], new_version_splits[2], new_version_splits[3],
+                    'zip'])
                 file_info_obj['file'] = new_file_name
 
             def amend_packages(update_obj, packages_name):
@@ -117,143 +107,86 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
 
 
 def save_data_to_files(root_obj, path_to_update_obj):
-    shutil.rmtree(DATA_DIR, ignore_errors=True)
-    os.mkdir(DATA_DIR)
-    file_path = os.path.join(DATA_DIR, UPDATES_FILE_NAME)
-    with open(file_path, 'w') as f:
-        f.write(json.dumps(root_obj))
+    shutil.rmtree(str(DATA_DIR), ignore_errors=True)
+    DATA_DIR.mkdir()
+    file_path = DATA_DIR / UPDATES_FILE_NAME
+    file_path.write_bytes(json.dumps(root_obj))
     for key, value in path_to_update_obj.items():
-        key_splits = key.split('/')
-        file_path = os.path.join(DATA_DIR, FILE_PATTERN.format(key_splits[1], key_splits[2]))
-        with open(file_path, 'w') as f:
-            f.write(json.dumps(value, indent=2))
+        file_path = DATA_DIR / key.lstrip('/')
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.write_bytes(json.dumps(value, indent=2))
 
 
-def load_data_from_files():
-    if not os.path.exists(DATA_DIR):
-        raise Exception('Generated data directory has not been found')
-    root_obj, path_to_update = None, None
-    for dir_name, dirs, files in os.walk(DATA_DIR):
-        path_to_update = dict()
-        for file_name in files:
-            if file_name == DUMMY_FILE_NAME:
-                continue
-            file_path = os.path.join(dir_name, file_name)
-            with open(file_path, 'r') as f:
-                json_obj = json.loads(f.read())
-                if file_name.lower() == UPDATES_FILE_NAME:
-                    root_obj = json_obj
-                else:
-                    file_name_splits = file_name.split('.')
-                    update_path = UPDATE_PATH_PATTERN.format(file_name_splits[0], file_name_splits[1])
-                    path_to_update[update_path] = json_obj
-    if root_obj is None or path_to_update is None:
-        raise Exception('Invalid generated data')
-    return root_obj, path_to_update
-
-
-def parse_args():
-    parser = argparse.ArgumentParser(description='Test updates server')
-    parser.add_argument('--generate_data', action="store_true", default=False)
-    parser.add_argument('--emulate_no_update_files', action="store_true", default=False)
-    return parser.parse_args()
-
-
-def make_handler_class(root_obj, path_to_update, args):
-    path_to_update[UPDATES_PATH] = root_obj
-
-    class TestHandler(BaseHTTPRequestHandler, object):
-        def __init__(self, *args, **kwargs):
-            self.path_to_update = path_to_update
-            super(TestHandler, self).__init__(*args, **kwargs)
-
-        def _send_ok_headers(self, content_type, content_length=None):
-            self.send_response(200)
-            self.send_header('Content-type', content_type)
-            if content_length:
-                self.send_header('Content-length', content_length)
-            self.end_headers()
-
-        def _send_not_found(self):
-            self.send_response(404)
-            self.end_headers()
-
-        def do_GET(self):
-            self._serve_get(True)
-
-        def do_HEAD(self):
-            self._serve_get(False)
-
-        def _serve_get(self, give_away_content):
-            if self.path in self.path_to_update:
-                self._send_ok_headers('application/json')
-                if give_away_content:
-                    self.wfile.write(json.dumps(self.path_to_update[self.path]).encode())
-            elif self.path.endswith('.zip') and not args.emulate_no_update_files:
-                path_components = self.path.split('/')
-                possible_path_key = '/'.join(path_components[:-1]) + '/update.json'
-                requested_file_name = path_components[-1]
-
-                if possible_path_key not in self.path_to_update:
-                    self._send_not_found()
-                    return
-
-                update_obj = self.path_to_update[possible_path_key]
-
-                def file_found_in_package(packages_name):
-                    for os_key, os_obj in update_obj[packages_name].items():
-                        for file_key, file_obj in os_obj.items():
-                            if file_obj['file'] == requested_file_name:
-                                return True
-                    return False
-
-                if not file_found_in_package('packages') and not file_found_in_package('clientPackages'):
-                    self._send_not_found()
-                    return
-
-                if not os.path.exists(DUMMY_FILE_PATH):
-                    raise Exception('Dummy file not found')
-
-                self._send_ok_headers('application/zip', os.path.getsize(DUMMY_FILE_PATH))
-                if not give_away_content:
-                    return
-
-                with open(DUMMY_FILE_PATH, 'rb') as f:
-                    while True:
-                        read_buf = f.read(4096)
-                        if len(read_buf) <= 0:
-                            break
-                        self.wfile.write(read_buf)
-            else:
-                self._send_not_found()
-
-    return TestHandler
-
-
+@click.group(help='Test updates server', epilog=dedent("""
+    Replicates functionality of updates.networkoptix.com but
+    appends new versions and cloud host information and
+    corresponding specific updates links to the existing ones.
+    You may specify versions to add as arguments of append_new_versions(...)."""))
 def main():
-    args = parse_args()
-    if args.generate_data:
-        _logger.info('Loading and generating data. Be patient')
-        root_obj, path_to_update_obj = collect_actual_data()
-        new_versions = [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')]
-        new_root, new_path_to_update_obj = append_new_versions(root_obj, path_to_update_obj, new_versions)
-        save_data_to_files(new_root, new_path_to_update_obj)
-        with open(DUMMY_FILE_PATH, 'wb') as f:
-            f.seek(1024 * 1024 * 100)
-            f.write(b'\0')
-    else:
-        new_root, new_path_to_update_obj = load_data_from_files()
+    pass
 
-    server_address = ('', 8080)
-    _logger.info('Starting HTTP server')
-    server = None
-    try:
-        server = HTTPServer(server_address, make_handler_class(new_root, new_path_to_update_obj, args))
-        server.serve_forever()
-    except KeyboardInterrupt:
-        _logger.info('Shutting down...')
-        if server:
-            server.shutdown()
+
+@main.command(short_help="Collect data, add versions", help=dedent("""
+    Collect actual data from updates.networkoptix.com, add versions and save to the data dir."""))
+def generate():
+    _logger.info('Loading and generating data. Be patient')
+    root_obj, path_to_update_obj = collect_actual_data()
+    new_versions = [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')]
+    new_root, new_path_to_update_obj = append_new_versions(root_obj, path_to_update_obj, new_versions)
+    save_data_to_files(new_root, new_path_to_update_obj)
+    with DUMMY_FILE_PATH.open('wb') as f:
+        f.seek(1024 * 1024 * 100)
+        f.write(b'\0')
+
+
+@main.command(short_help="Start HTTP server", help="Serve update metadata and, optionally, archives by HTTP.")
+@click.option('--serve-update-archives/--no-serve-update-archives', default=True, show_default=True, help=dedent("""
+    Server can serve update files requests. Pre-generated dummy file is given as a response.
+    This option might be turned off to test how mediaserver deals with update files absence."""))
+@click.option('--range-header', type=click.Choice(['support', 'ignore', 'err']), default='support', show_default=True)
+def serve(serve_update_archives, range_header):
+    app = Flask(__name__)
+
+    @app.route('/<path:path>')
+    def serve(path):
+        path = PurePath(path)
+
+        if 'Range' in request.headers and range_header == 'err':
+            raise BadRequest('Range header is not supported')
+
+        if path.suffix == '.json':
+            return send_file(str(DATA_DIR / path))
+        elif path.suffix == '.zip' and not serve_update_archives:
+            possible_path_key = DATA_DIR / path.parent / 'update.json'
+
+            if DATA_DIR not in possible_path_key.resolve().parents:
+                raise SecurityError()
+            if not possible_path_key.exists():
+                raise NotFound()
+
+            update_obj = json.loads(possible_path_key.read_bytes())
+
+            def file_found_in_package(packages_name):
+                for os_key, os_obj in update_obj[packages_name].items():
+                    for file_key, file_obj in os_obj.items():
+                        if file_obj['file'] == path.name:
+                            return True
+                return False
+
+            if not file_found_in_package('packages') and not file_found_in_package('clientPackages'):
+                raise NotFound()
+
+            if not DUMMY_FILE_PATH.exists():
+                raise Exception('Dummy file not found')
+
+            return send_file(
+                str(DUMMY_FILE_PATH),
+                as_attachment=True, attachment_filename=path.name,
+                conditional=range_header == 'support')
+        else:
+            raise NotFound()
+
+    app.run(port=8080)
 
 
 if __name__ == '__main__':

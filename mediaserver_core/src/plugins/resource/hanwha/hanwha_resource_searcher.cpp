@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_data.h>
@@ -418,5 +416,3 @@ QAuthenticator HanwhaResourceSearcher::getDefaultAuth()
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

@@ -37,7 +37,7 @@ bool QnThumbnailsArchiveDelegate::open(const QnResourcePtr &resource,
             m_channelCount = videoLayout->channelCount();
     }
 
-    bool rez = m_baseDelegate->open(resource, nullptr);
+    bool rez = m_baseDelegate->open(resource);
     if (rez)
         m_currentPos = m_rangeStart;
     else

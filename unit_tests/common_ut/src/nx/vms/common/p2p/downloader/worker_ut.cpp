@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <utils/common/synctime.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/random_file.h>
@@ -183,6 +185,7 @@ protected:
     Peer* defaultPeer = nullptr;
     int step = 0;
     nx::utils::MoveOnlyFunc<void()> m_onRequestFileInfoCb = nullptr;
+	QnSyncTime syncTime;
 };
 
 TEST_F(DistributedFileDownloaderWorkerTest, simplePeersSelection)

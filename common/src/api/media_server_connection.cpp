@@ -192,8 +192,8 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processJsonReply<QnStatisticsReply>(this, response, handle);
             break;
         case GetParamsObject:
-	    case SetParamsObject:
-		    processJsonReply<QnCameraAdvancedParamValueList>(this, response, handle);
+        case SetParamsObject:
+            processJsonReply<QnCameraAdvancedParamValueList>(this, response, handle);
             break;
         case TimeObject:
             processJsonReply<QnTimeReply>(this, response, handle);
@@ -459,9 +459,9 @@ int QnMediaServerConnection::getTimePeriodsAsync(
 int QnMediaServerConnection::getParamsAsync(
     const QnNetworkResourcePtr& camera, const QStringList& keys, QObject* target, const char* slot)
 {
-	NX_ASSERT(!keys.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
+    NX_ASSERT(!keys.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
 
-	QnRequestParamList params;
+    QnRequestParamList params;
     params << QnRequestParam("cameraId", camera->getId());
     for(const QString &param: keys)
         params << QnRequestParam(param, QString());
@@ -474,7 +474,7 @@ int QnMediaServerConnection::setParamsAsync(
     const QnNetworkResourcePtr& camera, const QnCameraAdvancedParamValueList& values,
     QObject* target, const char* slot)
 {
-	NX_ASSERT(!values.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
+    NX_ASSERT(!values.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
 
     QnRequestParamList params;
     params << QnRequestParam("cameraId", camera->getId());

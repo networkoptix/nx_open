@@ -240,7 +240,7 @@
             </property>
             <layout class="QGridLayout" name="gridLayout">
              <item row="1" column="1">
-              <widget class="QnResourcePreviewWidget" name="mediaPreviewWidget" native="true">
+              <widget class="nx::client::desktop::AsyncImageWidget" name="mediaPreviewWidget" native="true">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -424,7 +424,7 @@
               </spacer>
              </item>
              <item row="1" column="1">
-              <widget class="QnResourcePreviewWidget" name="layoutPreviewWidget" native="true">
+              <widget class="nx::client::desktop::AsyncImageWidget" name="layoutPreviewWidget" native="true">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -636,9 +636,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnResourcePreviewWidget</class>
+   <class>nx::client::desktop::AsyncImageWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/resource_preview_widget.h</header>
+   <header location="global">nx/client/desktop/common/widgets/async_image_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

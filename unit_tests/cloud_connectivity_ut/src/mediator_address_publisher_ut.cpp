@@ -45,6 +45,11 @@ public:
             });
     }
 
+    virtual void setOnConnectionClosedHandler(
+        OnConnectionClosedHandler /*onConnectionClosedHandler*/) override
+    {
+    }
+
     virtual void sendRequest(
         stun::Message /*request*/,
         RequestHandler handler,

@@ -6,6 +6,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
 
+option(analyzeMutexLocksForDeadlock
+    "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
+    OFF)
+
 add_definitions(
     -DUSE_NX_HTTP
     -D__STDC_CONSTANT_MACROS
@@ -15,6 +19,7 @@ add_definitions(
     -DENABLE_SOFTWARE_MOTION_DETECTION
     -DENABLE_THIRD_PARTY
     -DENABLE_MDNS
+    -DENABLE_WEARABLE
 )
 
 if(WINDOWS)
@@ -64,9 +69,6 @@ if(enableAllVendors)
         -DENABLE_FLIR
         -DENABLE_ADVANTECH
     )
-    if(customization STREQUAL "hanwha")
-        add_definitions(-DENABLE_HANWHA)
-    endif()
 endif()
 
 if(WINDOWS)
@@ -117,6 +119,8 @@ if(WINDOWS)
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG")
 
+    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /DEBUG:FASTLINK")
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG:FASTLINK")
     if(NOT developerBuild)
         set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /SUBSYSTEM:WINDOWS /entry:mainCRTStartup")
     endif()

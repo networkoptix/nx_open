@@ -8,11 +8,13 @@ namespace hpm {
 QString ListeningPeerData::toString() const
 {
     QStringList opts;
-    if (isLocal) opts << lm("local");
-    if (isListening) opts << lm("listening");
-    if (endpoints.size()) opts << lm("endpoints=%1").container(endpoints);
-    if (connectionMethods) opts << lm("methods=%1")
-        .arg(api::ConnectionMethod::toString(connectionMethods));
+    if (isLocal)
+        opts << lm("local");
+    if (isListening)
+        opts << lm("listening");
+    if (endpoints.size())
+        opts << lm("endpoints=%1").container(endpoints);
+    opts << lm("cloudConnectVersion=%1").args(static_cast<int>(cloudConnectVersion));
 
     return lm("%1<%2>").arg(hostName).container(opts);
 }
@@ -210,14 +212,14 @@ std::vector<MediaserverData> ListeningPeerPool::findPeersBySystemId(
     return std::move(foundPeers);
 }
 
-data::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
+api::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
 {
-    data::ListeningPeersBySystem result;
+    api::ListeningPeersBySystem result;
 
     QnMutexLocker lock(&m_mutex);
     for (const auto& peerPair: m_peers)
     {
-        data::ListeningPeer peerData;
+        api::ListeningPeer peerData;
         peerData.connectionEndpoint =
             peerPair.second.peerConnection->getSourceAddress().toString().toUtf8();
 

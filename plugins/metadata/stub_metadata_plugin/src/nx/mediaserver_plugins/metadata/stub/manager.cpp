@@ -120,7 +120,7 @@ Error Manager::stopFetchingMetadata()
     return result;
 }
 
-const char* Manager::capabilitiesManifest(Error* error) const
+const char* Manager::capabilitiesManifest(Error* error)
 {
     *error = Error::noError;
 
@@ -136,6 +136,9 @@ const char* Manager::capabilitiesManifest(Error* error) const
             ]
         }
     )json";
+}
+void Manager::freeManifest(const char* data)
+{
 }
 
 Manager::~Manager()
