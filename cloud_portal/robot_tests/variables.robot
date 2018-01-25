@@ -22,8 +22,8 @@ ${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), 'Log Out')]
 
 #Register Form Elements
-${FIRST NAME INPUT}                   //form[@name= 'registerForm']//input[@ng-model='account.firstName']
-${LAST NAME INPUT}                    //form[@name= 'registerForm']//input[@ng-model='account.lastName']
+${REGISTER FIRST NAME INPUT}          //form[@name= 'registerForm']//input[@ng-model='account.firstName']
+${REGISTER LAST NAME INPUT}           //form[@name= 'registerForm']//input[@ng-model='account.lastName']
 ${REGISTER EMAIL INPUT}               //form[@name= 'registerForm']//input[@ng-model='account.email']
 ${REGISTER PASSWORD INPUT}            //form[@name= 'registerForm']//password-input[@ng-model='account.password']//input[@type='password']
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[@ng-bind-html='buttonText' and contains(text(), 'Create Account')]
@@ -65,6 +65,10 @@ ${EDIT PERMISSIONS VIEWER}            //form[@name='shareForm']//select[@ng-mode
 ${EDIT PERMISSIONS LIVE VIEWER}       //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Live Viewer']
 ${EDIT PERMISSIONS CUSTOM}            //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Custom']
 ${EDIT PERMISSIONS HINT}              //form[@name='shareForm']//span[contains(@class,'help-block')]
+
+#Account Page
+${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-model='account.first_name']
+${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
 
 ${CONTINUE BUTTON}                    //div[@uib-modal-window='modal-window']//button[@ng-class='settings.buttonClass' and @ng-click='ok()']
 ${CONTINUE MODAL}                     //div[@uib-modal-window='modal-window']
