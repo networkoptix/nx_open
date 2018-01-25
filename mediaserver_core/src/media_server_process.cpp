@@ -542,15 +542,11 @@ static int freeGB(QString drive)
 }
 #endif
 
-static QStringList listRecordFolders(bool includeNetwork = false)
+static QStringList listRecordFolders(bool includeNonHdd = false)
 {
     using namespace nx::mediaserver::fs::media_paths;
 
-    const NetworkDrives networkDrivesFlag = includeNetwork
-        ? NetworkDrives::allowed
-        : NetworkDrives::notAllowed;
-
-    auto mediaPathList = get(FilterConfig::createDefault(networkDrivesFlag));
+    auto mediaPathList = get(FilterConfig::createDefault(includeNonHdd));
     NX_VERBOSE(kLogTag, lm("Record folders: %1").container(mediaPathList));
     return mediaPathList;
 }
