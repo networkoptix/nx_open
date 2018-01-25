@@ -284,8 +284,8 @@ class VagrantBox(object):
                       rest_api_url, self._ca, server_config.rest_api_timeout, timezone=self.timezone)
         
     def _box_host(self, user, ssh_config_path=None):
-        return RemoteSshHost(self.name, self.name, user, self._vagrant_private_key_path,
-                             ssh_config_path or self._ssh_config_path, proxy_host=self._vm_host)
+        return RemoteSshHost(self.name, user=user, key_file_path=self._vagrant_private_key_path,
+                             ssh_config_path=ssh_config_path or self._ssh_config_path, proxy_host=self._vm_host)
 
     def _load_timezone(self):
         return self.host.get_timezone()

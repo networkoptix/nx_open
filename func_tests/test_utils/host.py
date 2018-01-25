@@ -83,7 +83,7 @@ class SshHostConfig(object):
 
 def host_from_config(config):
     if config:
-        return RemoteSshHost(config.name, config.host, config.user, config.key_file_path)
+        return RemoteSshHost(config.host, name=config.name, user=config.user, key_file_path=config.key_file_path)
     else:
         return LocalHost()
 
@@ -91,16 +91,6 @@ def host_from_config(config):
 class Host(object):
 
     __metaclass__ = abc.ABCMeta
-
-    @property
-    @abc.abstractmethod
-    def name(self):
-        pass
-
-    @property
-    @abc.abstractmethod
-    def host(self):
-        pass
 
     @abc.abstractmethod
     def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
@@ -168,20 +158,15 @@ class Host(object):
 
     
 class LocalHost(Host):
+    def __init__(self):
+        self.name = 'localhost'
+        self.host = 'localhost'
 
     def __str__(self):
         return 'localhost'
 
     def __repr__(self):
-        return 'LocalHost'
-
-    @property
-    def name(self):
-        return 'localhost'
-
-    @property
-    def host(self):
-        return 'localhost'
+        return '<LocalHost>'
 
     def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
         timeout = timeout or PROCESS_TIMEOUT
@@ -315,29 +300,24 @@ class LocalHost(Host):
 
 class RemoteSshHost(Host):
 
-    def __init__(self, name, host, user, key_file_path=None, ssh_config_path=None, proxy_host=None):
-        assert proxy_host is None or isinstance(proxy_host, Host), repr(proxy_host)
-        self._proxy_host = proxy_host or LocalHost()
-        self._name = name
-        self._host = host  # may be different from name, for example, IP address
-        self._user = user
+    def __init__(self, host, user=None, name=None, key_file_path=None, ssh_config_path=None, proxy_host=None):
+        self.host = host
+        self.name = name or self.host
+        if user is None:
+            self._user_and_host = self.host
+        else:
+            self._user_and_host = user + '@' + self.host
         self._key_file_path = key_file_path
         self._ssh_config_path = ssh_config_path
+        assert proxy_host is None or isinstance(proxy_host, Host), repr(proxy_host)
+        self._proxy_host = proxy_host or LocalHost()
         self._local_host = LocalHost()
 
     def __str__(self):
-        return '%s' % self._host
+        return '%s' % self.host
 
     def __repr__(self):
-        return 'RemoteSshHost(%s)' % self
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def host(self):
-        return self._host
+        return '<RemoteSshHost %s>' % self
 
     def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
         ssh_cmd = self._make_ssh_cmd() + [self._user_and_host]
@@ -413,13 +393,6 @@ class RemoteSshHost(Host):
         
     def make_proxy_command(self):
         return self._make_ssh_cmd() + [self._user_and_host, 'nc', '-q0', '%h', '%p']
-
-    @property
-    def _user_and_host(self):
-        if self._user:
-            return '{user}@{host}'.format(user=self._user, host=self._host)
-        else:
-            return self._host
 
     def _make_ssh_cmd(self, must_quote=False):
         return ['ssh'] + self._make_identity_args() + self._make_config_args() + self._make_proxy_args(must_quote)
