@@ -59,12 +59,10 @@ public:
         \param localAddress If not NULL, filled with local ip address, used to connect to camera
     */
     QByteArray makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status, bool keepAllData = false, QString* const localAddress = NULL) const;
-    QSize getResolution(Qn::ConnectionRole role) const;
     int roundFps(int srcFps, Qn::ConnectionRole role) const;
     int roundBitrate(int srcBitrateKbps) const;
     QString formatBitrateString(int bitrateKbps) const;
 
-    QSet<QString> getAvailableEncoders() const;
     RtpTransport::Value getDesiredTransport() const;
 
     bool isAudioSupported() const;
@@ -106,6 +104,7 @@ public:
     virtual bool allowRtspVideoLayout() const override { return false; }
     bool SetupAudioInput();
 
+    static QString toActiEncoderString(const QString& value);
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
@@ -201,7 +200,7 @@ private:
     };
 
 
-    QSize m_resolution[MAX_STREAMS]; // index 0 for primary, index 1 for secondary
+    QList<QSize> m_resolutionList[MAX_STREAMS];
     QList<int> m_availFps[MAX_STREAMS];
     QMap<int, QString> m_availableBitrates;
     QSet<QString> m_availableEncoders;

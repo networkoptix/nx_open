@@ -56,7 +56,7 @@ public:
     // for live providers only
     bool isMaxFps() const;
 
-    void onPrimaryParamsChanged(const QnLiveStreamParams& params);
+    void onPrimaryFpsChanged(int primaryFps);
     QnLiveStreamParams getLiveParams();
 
     bool needMetaData();
@@ -110,11 +110,11 @@ private:
         bool isCameraConfigured);
 
     void emitAnalyticsEventIfNeeded(const QnAbstractCompressedMetadataPtr& metadata);
-    void mergeWithAdvancedParams(QnLiveStreamParams params);
+    QnLiveStreamParams mergeWithAdvancedParams(const QnLiveStreamParams& params);
 private:
     // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened
     // TODO: find out the way to keep it in sync besides pleaseReopenStream() call (which causes delay)
-    QnLiveStreamParams m_newLiveParams;
+    QnLiveStreamParams m_liveParams;
 
     bool m_prevCameraControlDisabled;
     unsigned int m_framesSinceLastMetaData;

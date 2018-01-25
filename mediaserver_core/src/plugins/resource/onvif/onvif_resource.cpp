@@ -552,6 +552,8 @@ nx::mediaserver::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
 {
     using namespace nx::mediaserver::resource;
 
+    QnMutexLocker lock(&m_mutex);
+
     auto& capabilities = streamIndex == Qn::StreamIndex::primary
         ? m_primaryStreamCapabilities : m_secondaryStreamCapabilities;
 

@@ -130,9 +130,9 @@ void QnLiveStreamProvider::setCameraControlDisabled(bool value)
     m_prevCameraControlDisabled = value;
 }
 
-void QnLiveStreamProvider::mergeWithAdvancedParams(QnLiveStreamParams params)
+QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStreamParams& value)
 {
-    QnMutexLocker mtx(&m_livemutex);
+    QnLiveStreamParams params = value;
     if (params.bitrateKbps == 0 && params.quality == Qn::QualityNotDefined)
         params.quality = Qn::QualityNormal;
 
@@ -158,12 +158,15 @@ void QnLiveStreamProvider::mergeWithAdvancedParams(QnLiveStreamParams params)
         params.bitrateKbps = advancedLiveStreamParams.bitrateKbps;
     if (params.bitrateKbps == 0)
         params.bitrateKbps = m_cameraRes->rawSuggestBitrateKbps(params.quality, params.resolution, params.fps);
-    m_newLiveParams = params;
+    return params;
 }
 
 void QnLiveStreamProvider::setPrimaryStreamParams(const QnLiveStreamParams& params)
 {
-    mergeWithAdvancedParams(params);
+    QnMutexLocker lock(&m_mutex);
+    if (m_liveParams == params)
+        return;
+    m_liveParams = params;
 
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
@@ -172,7 +175,7 @@ void QnLiveStreamProvider::setPrimaryStreamParams(const QnLiveStreamParams& para
         {
             QnLiveStreamProviderPtr lp = owner->getSecondaryReader();
             if (lp)
-                lp->onPrimaryParamsChanged(m_newLiveParams);
+                lp->onPrimaryFpsChanged(params.fps);
         }
     }
 
@@ -255,7 +258,7 @@ bool QnLiveStreamProvider::needAnalyzeStream(Qn::ConnectionRole role)
 bool QnLiveStreamProvider::isMaxFps() const
 {
     QnMutexLocker mtx( &m_livemutex );
-    return m_newLiveParams.fps >= m_cameraRes->getMaxFps() - 0.1;
+    return m_liveParams.fps >= m_cameraRes->getMaxFps() - 0.1;
 }
 
 bool QnLiveStreamProvider::needMetaData()
@@ -394,57 +397,39 @@ void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audio
     }
 }
 
-void QnLiveStreamProvider::onPrimaryParamsChanged(const QnLiveStreamParams& primaryParams)
+void QnLiveStreamProvider::onPrimaryFpsChanged(int primaryFps)
 {
     NX_ASSERT(getRole() == Qn::CR_SecondaryLiveVideo);
     // now primary has newFps
     // this is secondary stream
     // need to adjust fps
 
-    Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
-    int maxPrimaryStreamFps = m_cameraRes->getMaxFps();
-    int newSecondaryStreamFps = 0;
-    auto params = m_newLiveParams;
+    QnLiveStreamParams params;
+    const Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
+    int newSecondaryStreamFps = m_cameraRes->defaultSecondaryFps(params.quality);
 
-    // TODO: #params check secondary resolution from the new getter here
-    if (0) //if (secondaryResolutionIsLarge())
+    if (sharingMethod == Qn::PixelsFpsSharing)
     {
-        newSecondaryStreamFps = MIN_SECOND_STREAM_FPS;
-    }
-    else if (sharingMethod == Qn::PixelsFpsSharing)
-    {
-        //Old comment: minimum between DESIRED_SECOND_STREAM_FPS and what is left;
-        newSecondaryStreamFps = qMin(
-            m_cameraRes->defaultSecondaryFps(params.quality),
-            maxPrimaryStreamFps);
-
-        if (maxPrimaryStreamFps - primaryParams.fps < 2 )
-        {
-            newSecondaryStreamFps = qMax(
-                m_cameraRes->defaultSecondaryFps(params.quality) / 2,
-                MIN_SECOND_STREAM_FPS);
-        }
+        if (m_cameraRes->getMaxFps() - primaryFps < 2 )
+            newSecondaryStreamFps /= 2;
     }
     else if (sharingMethod == Qn::BasicFpsSharing)
     {
         newSecondaryStreamFps = qMin(
-            m_cameraRes->defaultSecondaryFps(params.quality),
-            maxPrimaryStreamFps - primaryParams.fps);
+            newSecondaryStreamFps,
+            m_cameraRes->getMaxFps() - primaryFps);
     }
     else
     {
         // noSharing
-        newSecondaryStreamFps = qMin(m_cameraRes->defaultSecondaryFps(params.quality), maxPrimaryStreamFps);
     }
-    params.fps = qMax(1.0, newSecondaryStreamFps);
-    mergeWithAdvancedParams(params);
+    m_liveParams.fps = qBound(MIN_SECOND_STREAM_FPS, newSecondaryStreamFps, m_cameraRes->getMaxFps());
 }
 
 QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
 {
     QnMutexLocker lock(&m_livemutex);
-    mergeWithAdvancedParams(m_newLiveParams);
-    return m_newLiveParams;
+    return mergeWithAdvancedParams(m_liveParams);
 }
 
 QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetaData()

@@ -122,6 +122,21 @@ bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStrea
     }
 
     m_parameters = value;
+
+    if (qnCameraPool)
+    {
+        if (const auto camera = qnCameraPool->getVideoCamera(toSharedPointer(m_camera)))
+        {
+            const auto stream =
+                (m_streamIndex == Qn::StreamIndex::primary)
+                ? camera->getPrimaryReader()
+                : camera->getSecondaryReader();
+
+            if (stream && stream->isRunning())
+                stream->pleaseReopenStream();
+        }
+    }
+
     return true;
 }
 
@@ -311,7 +326,7 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
 }
 
 static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
-    const StreamCapabilityMap& capabilities, Qn::StreamIndex streamIndex)
+    const StreamCapabilityMap& capabilities, Qn::StreamIndex streamIndex, Camera* const camera)
 {
     std::map<QString, std::vector<QnLiveStreamParams>> optionsByCodec;
     for (auto it = capabilities.begin(); it != capabilities.end(); ++it)
@@ -320,9 +335,20 @@ static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
         option.codec = it.key().codec;
         option.resolution = it.key().resolution;
 
-        option.fps = streamIndex == Qn::StreamIndex::primary
-            ? it.value().maxFps
-            : QnSecurityCamResource::kDefaultSecondStreamFpsMedium;
+        if (streamIndex == Qn::StreamIndex::primary)
+        {
+            option.fps = it.value().maxFps;
+        }
+        else
+        {
+            static const int kIsBigSecondaryResolution = 720 * 480;
+            const bool secondaryResolutionIsLarge =
+                option.resolution.width() * option.resolution.height() >= kIsBigSecondaryResolution;
+
+            // Setup low fps if secondary resolution is large and there is no Hardware motion detector to save CPU usage
+            option.fps = secondaryResolutionIsLarge && !camera->supportedMotionType().testFlag(Qn::MT_HardwareGrid)
+                ? QnSecurityCamResource::kDefaultSecondStreamFpsLow : QnSecurityCamResource::kDefaultSecondStreamFpsMedium;
+        }
 
         option.bitrateKbps = static_cast<int>(QnSecurityCamResource::rawSuggestBitrateKbps(
             Qn::QualityNormal, option.resolution, option.fps));
@@ -345,7 +371,7 @@ static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
 QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::bestParameters(
     const StreamCapabilityMap& capabilities, const QSize& baseResolution)
 {
-    const auto recomendedOptions = calculateRecomendedOptions(capabilities, m_streamIndex);
+    const auto recomendedOptions = calculateRecomendedOptions(capabilities, m_streamIndex, m_camera);
     if (m_streamIndex == Qn::StreamIndex::primary)
     {
         QnLiveStreamParams bestOption = recomendedOptions.front();

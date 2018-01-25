@@ -426,6 +426,7 @@ nx::mediaserver::resource::StreamCapabilityMap QnPlAxisResource::getStreamCapabi
 {
     using namespace nx::mediaserver::resource;
 
+    QnMutexLocker lock(&m_mutex);
     StreamCapabilityKey key;
     StreamCapabilityMap result;
     for (const auto& resolution: m_resolutionList)

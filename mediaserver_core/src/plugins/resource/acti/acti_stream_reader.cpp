@@ -11,7 +11,7 @@
 #include "acti_resource.h"
 #include "acti_stream_reader.h"
 
-QnActiStreamReader::QnActiStreamReader(const QnResourcePtr& res) :
+QnActiStreamReader::QnActiStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res),
     m_multiCodec(res)
 {
@@ -33,7 +33,9 @@ QString QnActiStreamReader::formatResolutionStr(const QSize& resolution) const
     return QString(QLatin1String("N%1x%2")).arg(resolution.width()).arg(resolution.height());
 }
 
-CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& streamParams)
+CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
+    bool isCameraControlRequired,
+    const QnLiveStreamParams& streamParams)
 {
     // configure stream params
     QnLiveStreamParams params = streamParams;
@@ -53,24 +55,14 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
     params.fps = m_actiRes->roundFps(params.fps, m_role);
     int ch = getActiChannelNum();
 
-    QSize resolution = m_actiRes->getResolution(m_role);
-    QString resolutionStr = formatResolutionStr(resolution);
-
-    // TODO: advanced params control is not implemented for this driver yet
-    params.resolution = resolution;
+    QString resolutionStr = formatResolutionStr(params.resolution);
 
     int bitrate = m_actiRes->suggestBitrateKbps(params, getRole());
     bitrate = m_actiRes->roundBitrate(bitrate);
     QString bitrateStr = m_actiRes->formatBitrateString(bitrate);
 
-    auto encoders = m_actiRes->getAvailableEncoders();
-    QString encoderStr;
-
-    if (encoders.contains(lit("H264")))
-        encoderStr = lit("H264");
-    else if (encoders.contains(lit("MJPEG")))
-        encoderStr = lit("MJPEG");
-    else
+    QString encoderStr = QnActiResource::toActiEncoderString(params.codec);
+    if (encoderStr.isEmpty())
         return CameraDiagnostics::CannotConfigureMediaStreamResult(lit("encoder"));
 
     auto desiredTransport = m_actiRes->getDesiredTransport();

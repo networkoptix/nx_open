@@ -462,8 +462,8 @@ nx::mediaserver::resource::StreamCapabilityMap QnDigitalWatchdogResource::getStr
     Qn::StreamIndex streamIndex)
 {
     using namespace nx::mediaserver::resource;
-
     auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
+    QnMutexLocker lock(&m_mutex);
     const auto codecs = m_cproApiClient->getSupportedVideoCodecs(streamIndex);
     if (!codecs)
         return onvifResult;

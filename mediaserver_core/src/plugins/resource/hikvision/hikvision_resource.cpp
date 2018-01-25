@@ -49,6 +49,7 @@ nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapab
 {
     using namespace nx::mediaserver::resource;
     auto result = base_type::getStreamCapabilityMapFromDrives(streamIndex);
+    QnMutexLocker lock(&m_mutex);
     if (m_hevcSupported)
     {
         StreamCapabilityMap resultCopy = result;

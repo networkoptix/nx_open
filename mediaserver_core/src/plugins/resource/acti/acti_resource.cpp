@@ -335,8 +335,25 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
 
 nx::mediaserver::resource::StreamCapabilityMap QnActiResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
 {
-    // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    using namespace nx::mediaserver::resource;
+
+    QnMutexLocker lock(&m_mutex);
+
+    const auto& resolutionList = m_resolutionList[(int)streamIndex];
+
+    StreamCapabilityMap result;
+
+    for (const auto& codec: m_availableEncoders)
+    {
+        for (const auto& resolution: resolutionList)
+        {
+            StreamCapabilityKey key;
+            key.codec = codec;
+            key.resolution = resolution;
+            result.insert(key, nx::media::CameraStreamCapability());
+        }
+    }
+    return result;
 }
 
 CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
@@ -379,7 +396,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     {
         auto encoders = encodersStr.split(',');
         for (const auto& encoder: encoders)
-            m_availableEncoders.insert(encoder.trimmed());
+            m_availableEncoders.insert(toActiEncoderString(encoder.trimmed()));
     }
     else
     {
@@ -483,46 +500,33 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
             QString::fromUtf8(resolutions));
     }
 
-    QList<QSize> availResolutions = parseResolutionStr(resolutions);
-    if (availResolutions.isEmpty() || availResolutions[0].isEmpty())
+    auto availResolutions = parseResolutionStr(resolutions);
+    if (availResolutions.isEmpty() || availResolutions.isEmpty())
     {
         return CameraDiagnostics::CameraInvalidParams(
             lit("Resolution list is empty"));
     }
+    m_resolutionList[(int) Qn::StreamIndex::primary] = availResolutions;
 
-    m_resolution[0] = availResolutions.first();
-
-    if (dualStreaming) {
+    if (dualStreaming)
+    {
         resolutions = makeActiRequest(
             lit("system"),
             lit("CHANNEL=2&VIDEO_RESOLUTION_CAP"),
             status);
 
-        if (status == CL_HTTP_SUCCESS)
+        if (status != CL_HTTP_SUCCESS)
         {
-            availResolutions = parseResolutionStr(resolutions);
-            int maxSecondaryRes =
-                SECONDARY_STREAM_MAX_RESOLUTION.width()
-                * SECONDARY_STREAM_MAX_RESOLUTION.height();
-
-            float currentAspect = getResolutionAspectRatio(m_resolution[0]);
-
-            m_resolution[1] = getNearestResolution(
-                SECONDARY_STREAM_DEFAULT_RESOLUTION,
-                currentAspect,
-                maxSecondaryRes,
-                availResolutions);
-
-            if (m_resolution[1] == EMPTY_RESOLUTION_PAIR)
-            {
-                // try to get resolution ignoring aspect ration
-                m_resolution[1] = getNearestResolution(
-                    SECONDARY_STREAM_DEFAULT_RESOLUTION,
-                    0.0,
-                    maxSecondaryRes,
-                    availResolutions);
-            }
+            return CameraDiagnostics::RequestFailedResult(
+                lit("CHANNEL=2&VIDEO_RESOLUTION_CAP"),
+                QString::fromUtf8(resolutions));
         }
+
+        availResolutions = parseResolutionStr(resolutions);
+        int maxSecondaryRes =
+            SECONDARY_STREAM_MAX_RESOLUTION.width()
+            * SECONDARY_STREAM_MAX_RESOLUTION.height();
+        m_resolutionList[(int) Qn::StreamIndex::secondary] = availResolutions;
     }
 
     // disable extra data aka B2 frames for RTSP (disable value:1, enable: 2)
@@ -553,12 +557,11 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     {
         QList<QByteArray> fps = fpsList[i].split(',');
 
-        for(const QByteArray& data: fps)
+        for (const QByteArray& data : fps)
             m_availFps[i] << data.toInt();
 
         std::sort(m_availFps[i].begin(), m_availFps[i].end());
     }
-
     auto rtspPortString = makeActiRequest(lit("system"), lit("V2_PORT_RTSP"), status);
 
     if (status != CL_HTTP_SUCCESS)
@@ -589,7 +592,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0);
     setProperty(Qn::MAX_FPS_PARAM_NAME, getMaxFps());
-    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0);
+    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolutionList[1].isEmpty() ? 1 : 0);
     QString serialNumber = report.value(QnActiResourceSearcher::kSystemInfoProductionIdParamName);
     if (!serialNumber.isEmpty())
         setProperty(QnActiResourceSearcher::kSystemInfoProductionIdParamName, serialNumber);
@@ -841,19 +844,9 @@ QString QnActiResource::formatBitrateString(int bitrateKbps) const
     return bitrateToDefaultString(bitrateKbps);
 }
 
-QSet<QString> QnActiResource::getAvailableEncoders() const
-{
-    return m_availableEncoders;
-}
-
 RtpTransport::Value QnActiResource::getDesiredTransport() const
 {
     return m_desiredTransport;
-}
-
-QSize QnActiResource::getResolution(Qn::ConnectionRole role) const
-{
-    return (role == Qn::CR_LiveVideo ? m_resolution[0] : m_resolution[1]);
 }
 
 int QnActiResource::roundFps(int srcFps, Qn::ConnectionRole role) const
@@ -864,7 +857,9 @@ int QnActiResource::roundFps(int srcFps, Qn::ConnectionRole role) const
     for (int i = 0; i < availFps.size(); ++i)
     {
         int distance = qAbs(availFps[i] - srcFps);
-        if (distance <= minDistance) { // preffer higher fps if same distance
+        if (distance <= minDistance)
+        {
+            // Preffer higher fps if same distance
             minDistance = distance;
             result = availFps[i];
         }
@@ -1442,5 +1437,13 @@ std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
 {
     return {&m_advancedParametersProvider};
 }
+
+QString QnActiResource::toActiEncoderString(const QString& value)
+{
+    if (value.contains(lit("JPEG")))
+        return lit("MJPEG");
+    return "H264"; //< Default value.
+}
+
 
 #endif // #ifdef ENABLE_ACTI
