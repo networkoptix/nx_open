@@ -179,7 +179,7 @@ private:
 
     int m_subsequentChunksToDownload;
     bool m_usingInternet = false;
-    bool m_fileInfoValidated;
+    bool m_fileInfoValidated = false;
 };
 
 } // namespace downloader

@@ -585,7 +585,8 @@ void Worker::requestChecksums()
                 .arg(m_peerManager->peerString(peer)));
 
         const auto handle = m_peerManager->requestChecksums(peer, m_fileName,
-            [this, self = shared_from_this()](bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
+            [this, self = shared_from_this()](
+                bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
             {
                 handleChecksumsReply(success, handle, checksums);
             });

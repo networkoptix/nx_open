@@ -179,12 +179,16 @@ rest::Handle TestPeerManager::downloadChunk(
         return 0;
 
     return enqueueRequest(peerId, kDefaultRequestTime,
-        [this,
-            fileInfo = fileInformation(peerId, fileName),
-            chunkIndex,
-            callback]
-            (rest::Handle handle)
+        [this, fileInfo = fileInformation(peerId, fileName), chunkIndex, callback](
+            rest::Handle handle)
         {
+            if (m_downloadFailed)
+            {
+                callback(false, handle, QByteArray());
+                m_downloadFailed = false;
+                return;
+            }
+
             QByteArray result;
             if (fileInfo.isValid())
                 result = readFileChunk(fileInfo, chunkIndex);
@@ -266,13 +270,22 @@ rest::Handle TestPeerManager::validateFileInformation(
     return enqueueRequest(selfId(), kDefaultRequestTime,
         [this, callback](rest::Handle handle)
         {
-            callback(true, handle);
+            callback(!m_validateShouldFail, handle);
         });
+}
+
+void TestPeerManager::setValidateShouldFail()
+{
+    m_validateShouldFail = true;
+}
+
+void TestPeerManager::setOneShotDownloadFail()
+{
+    m_downloadFailed = true;
 }
 
 void TestPeerManager::setDelayBeforeRequest(qint64 delay)
 {
-    QnMutexLocker lock(&m_mutex);
     m_delayBeforeRequest = delay;
 }
 

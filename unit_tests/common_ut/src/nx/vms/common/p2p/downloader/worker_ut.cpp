@@ -284,14 +284,13 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownload)
     fileInfo.downloadedChunks.fill(true);
     addPeerWithFile(fileInfo);
 
-    bool finished = false;
-    defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
-    defaultPeer->worker->start();
-
     nx::utils::promise<bool> readyPromise;
     auto readyFuture = readyPromise.get_future();
     QObject::connect(defaultPeer->worker.get(), &Worker::finished,
         [&readyPromise]() mutable { readyPromise.set_value(true); });
+
+    defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
+    defaultPeer->worker->start();
 
     ASSERT_TRUE(readyFuture.get());
 
@@ -301,6 +300,56 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownload)
     ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
 }
 
+TEST_F(DistributedFileDownloaderWorkerTest, validateFail)
+{
+    auto fileInfo = createTestFile();
+    fileInfo.url = "http://test.org/testFile";
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
+
+    commonPeerManager->setHasInternetConnection(defaultPeer->peerManager->selfId());
+    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
+    commonPeerManager->setValidateShouldFail();
+
+    nx::utils::promise<bool> readyPromise;
+    auto readyFuture = readyPromise.get_future();
+    QObject::connect(defaultPeer->worker.get(), &Worker::failed,
+        [&readyPromise] { readyPromise.set_value(true); });
+
+    defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
+    defaultPeer->worker->start();
+
+    ASSERT_TRUE(readyFuture.get());
+}
+
+TEST_F(DistributedFileDownloaderWorkerTest, chunkDownloadFailedAndRecovered)
+{
+    auto fileInfo = createTestFile();
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
+    fileInfo.downloadedChunks.fill(true);
+    addPeerWithFile(fileInfo);
+    commonPeerManager->setOneShotDownloadFail();
+
+    nx::utils::promise<bool> readyPromise;
+    auto readyFuture = readyPromise.get_future();
+    nx::utils::promise<bool> failPromise;
+    auto failFuture = failPromise.get_future();
+
+    QObject::connect(defaultPeer->worker.get(), &Worker::finished,
+        [&readyPromise]() mutable { readyPromise.set_value(true); });
+    QObject::connect(defaultPeer->worker.get(), &Worker::chunkDownloadFailed,
+        [&failPromise]() { failPromise.set_value(true); });
+
+    defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
+    defaultPeer->worker->start();
+
+    ASSERT_TRUE(failFuture.get());
+    ASSERT_TRUE(readyFuture.get());
+
+    const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
+    ASSERT_TRUE(newFileInfo.isValid());
+    ASSERT_EQ(newFileInfo.size, fileInfo.size);
+    ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
+}
 
 TEST_F(DistributedFileDownloaderWorkerTest, corruptedFile)
 {

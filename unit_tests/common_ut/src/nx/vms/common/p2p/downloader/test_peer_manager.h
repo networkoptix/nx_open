@@ -131,6 +131,8 @@ public:
     virtual void run() override;
 
     void setDelayBeforeRequest(qint64 delay);
+    void setValidateShouldFail();
+    void setOneShotDownloadFail();
 
 private:
     using RequestCallback = std::function<void(rest::Handle)>;
@@ -171,6 +173,8 @@ private:
     qint64 m_currentTime = 0;
     RequestCounter m_requestCounter;
     qint64 m_delayBeforeRequest = 0;
+    bool m_validateShouldFail = false;
+    bool m_downloadFailed = false;
 };
 
 class ProxyTestPeerManager: public AbstractPeerManager
