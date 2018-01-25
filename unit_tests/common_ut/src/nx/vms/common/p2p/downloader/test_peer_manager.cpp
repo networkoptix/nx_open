@@ -1,5 +1,6 @@
 #include "test_peer_manager.h"
 
+#include <thread>
 #include <QtCore/QTextStream>
 
 #include <nx/utils/log/assert.h>
