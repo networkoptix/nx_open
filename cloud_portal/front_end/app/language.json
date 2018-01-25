@@ -115,7 +115,7 @@
     "cantActivatePrefix":"Cannot activate your account",
     "cantSendConfirmationPrefix":"Cannot send confirmation Email",
     "cloudInvalidResponse":"Cloud DB returned an unexpected response",
-    "notAuthorized":"Incorrect Email or password",
+    "notAuthorized":"Wrong password",
     "wrongParameters":"Some parameters on the form are incorrect",
     "wrongCode":"Account is already activated or confirmation code is incorrect",
     "wrongCodeRestore":"Confirmation code is already used or incorrect",
