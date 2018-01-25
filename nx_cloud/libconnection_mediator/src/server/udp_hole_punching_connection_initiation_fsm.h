@@ -89,6 +89,7 @@ private:
     boost::optional<std::pair<api::ResultCode, api::ConnectResponse>> m_cachedConnectResponse;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     std::function<void(api::ResultCode)> m_connectionAckCompletionHandler;
+    api::CloudConnectVersion m_originatingPeerCloudConnectVersion;
 
     virtual void stopWhileInAioThread() override;
 
@@ -137,6 +138,9 @@ private:
     void sendConnectResponse(
         api::ResultCode resultCode,
         api::ConnectResponse connectResponse);
+    void fixConnectResponseForBuggyClient(
+        api::ResultCode resultCode,
+        api::ConnectResponse* const connectResponse);
 
     void processConnectionResultRequest(
         api::ConnectionResultRequest request,
