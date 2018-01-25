@@ -217,6 +217,7 @@ cloud_portal/robot_tests/output.xml
 cloud_portal/robot_tests/chromedriver.exe
 cloud_portal/robot_tests/log.html
 cloud_portal/robot_tests/report.html
+cloud_portal/robot_tests/Screenshots
 syntax: regexp
 ^core$
 ^Makefile$
