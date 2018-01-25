@@ -13,11 +13,11 @@ namespace QnNotificationLevel {
 enum class Value
 {
     NoNotification,
-    OtherNotification,
     CommonNotification,
+    OtherNotification,
+    SuccessNotification,
     ImportantNotification,
     CriticalNotification,
-    SuccessNotification,
     LevelCount
 };
 
