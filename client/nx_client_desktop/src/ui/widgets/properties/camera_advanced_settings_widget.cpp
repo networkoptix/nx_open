@@ -160,11 +160,11 @@ void QnCameraAdvancedSettingsWidget::updatePage()
         ui->tabWidget->removeTab(0);
 
     if (hasManualPage())
-        ui->tabWidget->addTab(ui->manualPage, lit("Settings"));
+        ui->tabWidget->addTab(ui->manualPage, tr("Settings"));
     if (hasWebPage())
-        ui->tabWidget->addTab(ui->webPage, lit("Web"));
+        ui->tabWidget->addTab(ui->webPage, tr("Web"));
     if (ui->tabWidget->count() == 0)
-        ui->tabWidget->addTab(ui->noSettingsPage, lit("No settings"));
+        ui->tabWidget->addTab(ui->noSettingsPage, tr("No settings"));
 }
 
 void QnCameraAdvancedSettingsWidget::updateUrls()
