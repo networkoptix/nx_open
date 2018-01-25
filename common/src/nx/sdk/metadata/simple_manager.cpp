@@ -78,6 +78,19 @@ Error SimpleManager::putData(AbstractDataPacket* dataPacket)
     return Error::noError;
 }
 
+Error SimpleManager::startFetchingMetadata(
+    nxpl::NX_GUID* /*eventTypeList*/, int /*eventTypeListSize*/)
+{
+    NX_PRINT << __func__ << "() -> noError";
+    return Error::noError;
+}
+
+Error SimpleManager::stopFetchingMetadata()
+{
+    NX_PRINT << __func__ << "() -> noError";
+    return Error::noError;
+}
+
 //-------------------------------------------------------------------------------------------------
 // Tools for the derived class.
 

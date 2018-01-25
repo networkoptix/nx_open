@@ -53,22 +53,6 @@ Manager::Manager(Plugin* plugin):
         m_tracker.setObjectTypeId(kCarUuid);
     }
 
-    NX_OUTPUT << __func__ << "() END -> " << this;
-}
-
-Manager::~Manager()
-{
-    NX_OUTPUT << __func__ << "() BEGIN";
-
-    stopFetchingMetadata();
-
-    NX_OUTPUT << __func__ << "() END";
-}
-
-Error Manager::startFetchingMetadata(nxpl::NX_GUID* /*eventTypeList*/, int /*eventTypeListSize*/)
-{
-    NX_OUTPUT << __func__ << "() BEGIN";
-
     stopFetchingMetadata();
 
     TegraVideo::Params params;
@@ -82,20 +66,17 @@ Error Manager::startFetchingMetadata(nxpl::NX_GUID* /*eventTypeList*/, int /*eve
     if (!m_tegraVideo->start(&params))
         NX_PRINT << "ERROR: TegraVideo::start() failed.";
 
-    NX_OUTPUT << __func__ << "() END -> noError";
-    return Error::noError;
+    NX_OUTPUT << __func__ << "() END -> " << this;
 }
 
-Error Manager::stopFetchingMetadata()
+Manager::~Manager()
 {
-    if (!m_tegraVideo->stop())
-    {
-        NX_OUTPUT << __func__ << "() -> unknownError: TegraVideo::stop() failed";
-        return Error::unknownError;
-    }
+    NX_OUTPUT << __func__ << "() BEGIN";
 
-    NX_OUTPUT << __func__ << "() -> noError";
-    return Error::noError;
+    if (!m_tegraVideo->stop())
+        NX_OUTPUT << __func__ << "(): ERROR: TegraVideo::stop() failed";
+
+    NX_OUTPUT << __func__ << "() END";
 }
 
 const char* Manager::capabilitiesManifest(Error* /*error*/) const

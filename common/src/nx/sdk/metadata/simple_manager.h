@@ -44,6 +44,11 @@ public:
 
     virtual Error putData(AbstractDataPacket* dataPacket) override;
 
+    virtual Error startFetchingMetadata(
+        nxpl::NX_GUID* eventTypeList, int eventTypeListSize) override;
+
+    virtual Error stopFetchingMetadata() override;
+
 private:
     AbstractMetadataHandler* m_handler = nullptr;
 };

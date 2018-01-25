@@ -27,11 +27,6 @@ public:
     Manager(Plugin* plugin);
     virtual ~Manager() override;
 
-    virtual nx::sdk::Error startFetchingMetadata(
-        nxpl::NX_GUID* eventTypeList, int eventTypeListSize) override;
-
-    virtual nx::sdk::Error stopFetchingMetadata() override;
-
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
 
 protected:
