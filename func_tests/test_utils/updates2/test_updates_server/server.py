@@ -144,9 +144,9 @@ def generate():
 
 
 @main.command()
-@click.option('--emulate-no-update-files', is_flag=True)
+@click.option('--serve-update-archives/--no-serve-update-archives', default=True)
 @click.option('--range-header', type=click.Choice(['support', 'ignore', 'err']), default='support')
-def serve(emulate_no_update_files, range_header):
+def serve(serve_update_archives, range_header):
     app = Flask(__name__)
 
     @app.route('/<path:path>')
@@ -158,7 +158,7 @@ def serve(emulate_no_update_files, range_header):
 
         if path.suffix == '.json':
             return send_file(str(DATA_DIR / path))
-        elif path.suffix == '.zip' and not emulate_no_update_files:
+        elif path.suffix == '.zip' and not serve_update_archives:
             possible_path_key = DATA_DIR / path.parent / 'update.json'
 
             if DATA_DIR not in possible_path_key.resolve().parents:
