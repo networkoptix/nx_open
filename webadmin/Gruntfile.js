@@ -531,9 +531,6 @@ module.exports = function (grunt) {
                 branch:'',
                 command: 'python ../../devtools/util/merge_dev.py -t <%= shell.push.branch %>'
             },
-            version: {
-                command: 'hg parent > static/version.txt'
-            },
             print_version:{
                 command: 'hg parent'
             },
@@ -824,7 +821,6 @@ module.exports = function (grunt) {
         'rev',
         'usemin',
         'htmlmin',
-        'shell:version',
         'shell:localize'
     ]);
 
