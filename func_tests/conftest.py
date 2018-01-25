@@ -4,6 +4,7 @@ Loaded by pytest before running all functional tests. Adds common fixtures used 
 '''
 
 import logging
+import os
 import os.path
 
 import pytest
