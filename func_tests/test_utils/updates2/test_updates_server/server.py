@@ -144,8 +144,8 @@ def generate():
 
 
 @main.command()
-@click.option('--serve-update-archives/--no-serve-update-archives', default=True)
-@click.option('--range-header', type=click.Choice(['support', 'ignore', 'err']), default='support')
+@click.option('--serve-update-archives/--no-serve-update-archives', default=True, show_default=True)
+@click.option('--range-header', type=click.Choice(['support', 'ignore', 'err']), default='support', show_default=True)
 def serve(serve_update_archives, range_header):
     app = Flask(__name__)
 
