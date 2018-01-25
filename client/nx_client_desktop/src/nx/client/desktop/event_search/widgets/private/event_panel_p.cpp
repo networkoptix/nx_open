@@ -3,12 +3,14 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QScrollBar>
 #include <QtWidgets/QVBoxLayout>
 
 #include <core/resource/camera_resource.h>
+#include <ui/common/notification_levels.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 
@@ -22,6 +24,8 @@
 #include <nx/client/desktop/event_search/widgets/notification_list_widget.h>
 #include <nx/client/desktop/event_search/widgets/unified_search_widget.h>
 #include <nx/client/desktop/event_search/widgets/motion_search_widget.h>
+#include <nx/client/desktop/event_search/widgets/notification_counter_label.h>
+#include <nx/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/event/strings_helper.h>
 
 namespace nx {
@@ -45,6 +49,7 @@ EventPanel::Private::Private(EventPanel* q):
     m_bookmarksTab(new UnifiedSearchWidget(m_tabs)),
     m_eventsTab(new UnifiedSearchWidget(m_tabs)),
     m_analyticsTab(new UnifiedSearchWidget(m_tabs)),
+    m_counterLabel(new NotificationCounterLabel(m_tabs->tabBar())),
     m_eventsModel(new EventSearchListModel(this)),
     m_bookmarksModel(new BookmarkSearchListModel(this)),
     m_analyticsModel(new AnalyticsSearchListModel(this)),
@@ -56,10 +61,24 @@ EventPanel::Private::Private(EventPanel* q):
     m_tabs->addTab(m_notificationsTab, qnSkin->icon(lit("events/tabs/notifications.png")),
         tr("Notifications", "Notifications tab title"));
 
+    connect(m_notificationsTab, &NotificationListWidget::unreadCountChanged,
+        this, &Private::updateUnreadCounter);
+
+    connect(m_tabs->tabBar(), &QTabBar::tabBarClicked, this,
+        [this](int index)
+        {
+            if (m_tabs->currentIndex() != index || !m_tabs->currentWidget())
+                return;
+
+            if (auto ribbon = m_tabs->currentWidget()->findChild<EventRibbon*>())
+                ribbon->scrollBar()->setValue(0);
+        });
+
     m_motionTab->hide();
     m_bookmarksTab->hide();
     m_eventsTab->hide();
     m_analyticsTab->hide();
+    m_counterLabel->hide();
 
     static constexpr int kTabBarShift = 10;
     m_tabs->setProperty(style::Properties::kTabBarIndent, kTabBarShift);
@@ -253,6 +272,26 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
 
             m_analyticsTab->requestFetch();
         });
+}
+
+void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Value importance)
+{
+    m_counterLabel->setVisible(count > 0);
+    if (count == 0)
+        return;
+
+    const auto text = (count > 99) ? lit("99+") : lit("%1").arg(count);
+    const auto color = QnNotificationLevel::notificationTextColor(importance);
+
+    m_counterLabel->setText(text);
+    m_counterLabel->setBackgroundColor(color);
+
+    const auto width = m_counterLabel->minimumSizeHint().width();
+
+    static constexpr int kTopMargin = 6;
+    static constexpr int kRightBoundaryPosition = 32;
+    m_counterLabel->setGeometry(kRightBoundaryPosition - width, kTopMargin,
+        width, m_counterLabel->minimumHeight());
 }
 
 } // namespace desktop

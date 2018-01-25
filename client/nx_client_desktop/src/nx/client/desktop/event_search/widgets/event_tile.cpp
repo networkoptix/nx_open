@@ -380,9 +380,23 @@ void EventTile::setAutoCloseTimeMs(int value)
         };
 
     if (m_autoCloseTimer)
+    {
+        if (!m_isRead)
+            m_autoCloseTimer->stop();
+
         m_autoCloseTimer->setInterval(value);
+    }
     else
-        m_autoCloseTimer = executeDelayedParented(autoClose, value, this);
+    {
+        m_autoCloseTimer = new QTimer(this);
+        m_autoCloseTimer->setSingleShot(true);
+        m_autoCloseTimer->setInterval(value);
+
+        connect(m_autoCloseTimer, &QTimer::timeout, this, autoClose);
+
+        if (m_isRead)
+            m_autoCloseTimer->start();
+    }
 }
 
 bool EventTile::busyIndicatorVisible() const
@@ -424,6 +438,19 @@ QString EventTile::progressTitle() const
 void EventTile::setProgressTitle(const QString& value)
 {
     m_progressLabel->setText(value);
+}
+
+bool EventTile::isRead() const
+{
+    return m_isRead;
+}
+
+void EventTile::setRead(bool value)
+{
+    m_isRead = value;
+
+    if (m_isRead && m_autoCloseTimer)
+        m_autoCloseTimer->start();
 }
 
 } // namespace desktop

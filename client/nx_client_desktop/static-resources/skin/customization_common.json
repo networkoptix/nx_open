@@ -938,6 +938,15 @@
                 "midlight": "dark9.setAlpha(51)"
             }
         }
+    },
+
+    "nx::client::desktop::NotificationCounterLabel": {
+        "palette": {
+            "default": {
+                "window": "light10",
+                "windowText": "dark3"
+            }
+        }
     }
 }
 

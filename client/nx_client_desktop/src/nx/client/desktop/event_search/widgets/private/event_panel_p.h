@@ -11,6 +11,8 @@ class QTabWidget;
 class QStackedWidget;
 class QnMediaResourceWidget;
 
+namespace QnNotificationLevel { enum class Value; }
+
 namespace nx {
 
 namespace vms { namespace event { class StringsHelper; } }
@@ -25,6 +27,7 @@ class AnalyticsSearchListModel;
 class NotificationListWidget;
 class UnifiedSearchWidget;
 class MotionSearchWidget;
+class NotificationCounterLabel;
 
 class EventPanel::Private: public QObject
 {
@@ -47,15 +50,18 @@ private:
     void setupBookmarkSearch();
     void setupAnalyticsSearch();
 
-private:
-    EventPanel* q = nullptr;
-    QTabWidget* m_tabs = nullptr;
+    void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
 
-    NotificationListWidget* m_notificationsTab = nullptr;
-    MotionSearchWidget* m_motionTab = nullptr;
-    UnifiedSearchWidget* m_bookmarksTab = nullptr;
-    UnifiedSearchWidget* m_eventsTab = nullptr;
-    UnifiedSearchWidget* m_analyticsTab = nullptr;
+private:
+    EventPanel* const q = nullptr;
+    QTabWidget* const m_tabs = nullptr;
+
+    NotificationListWidget* const m_notificationsTab = nullptr;
+    MotionSearchWidget* const m_motionTab = nullptr;
+    UnifiedSearchWidget* const m_bookmarksTab = nullptr;
+    UnifiedSearchWidget* const m_eventsTab = nullptr;
+    UnifiedSearchWidget* const m_analyticsTab = nullptr;
+    NotificationCounterLabel* const m_counterLabel = nullptr;
 
     QPointer<QnMediaResourceWidget> m_currentMediaWidget;
     QScopedPointer<QnDisconnectHelper> m_mediaWidgetConnections;
