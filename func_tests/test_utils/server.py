@@ -21,7 +21,6 @@ from .camera import make_schedule_task, Camera, SampleMediaFile
 from .cloud_host import CloudAccount
 from .host import Host, LocalHost
 from .media_stream import open_media_stream
-from .network_error_interpretation import is_permanent
 from .rest_api import REST_API_USER, REST_API_PASSWORD, HttpError, RestApi
 from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now, RunningTime
 from .vagrant_box_config import MEDIASERVER_LISTEN_PORT
@@ -227,9 +226,7 @@ class Server(object):
     def is_server_online(self):
         try:
             return self.rest_api.api.ping.GET(timeout=datetime.timedelta(seconds=10))
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-            if is_permanent(e):
-                raise
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             return False
 
     def get_log_file(self):
