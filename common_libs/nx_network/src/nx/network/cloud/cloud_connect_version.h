@@ -17,6 +17,9 @@ enum class CloudConnectVersion
 
     /** #CLOUD-824 */
     serverChecksConnectionState,
+
+    /** #VMS-8224. */
+    clientSupportsConnectSessionWithoutUdpEndpoints,
 };
 
 constexpr const CloudConnectVersion kDefaultCloudConnectVersion =

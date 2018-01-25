@@ -29,7 +29,8 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     m_serverPeerEndpoints(serverPeerData.endpoints),
     m_serverPeerHostName(serverPeerData.hostName),
     m_serverPeerCloudConnectVersion(serverPeerData.cloudConnectVersion),
-    m_serverPeerConnectionMethods(api::ConnectionMethod::all)
+    m_serverPeerConnectionMethods(api::ConnectionMethod::all),
+    m_originatingPeerCloudConnectVersion(api::CloudConnectVersion::initial)
 {
     auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
     if (!serverConnectionStrongRef)
@@ -130,6 +131,8 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectRequest(
 
     NX_ASSERT(connectResponseSender);
     m_connectResponseSender = std::move(connectResponseSender);
+
+    m_originatingPeerCloudConnectVersion = request.cloudConnectVersion;
 
     if (!notifyListeningPeerAboutConnectRequest(originatingPeerConnection, request))
         return;
@@ -428,9 +431,26 @@ void UDPHolePunchingConnectionInitiationFsm::sendConnectResponse(
     decltype(m_connectResponseSender) connectResponseSender;
     connectResponseSender.swap(m_connectResponseSender);
 
-    m_cachedConnectResponse = std::make_pair(resultCode, connectResponse);
+    fixConnectResponseForBuggyClient(resultCode, &connectResponse);
 
+    m_cachedConnectResponse = std::make_pair(resultCode, connectResponse);
     connectResponseSender(resultCode, std::move(connectResponse));
+}
+
+void UDPHolePunchingConnectionInitiationFsm::fixConnectResponseForBuggyClient(
+    api::ResultCode resultCode,
+    api::ConnectResponse* const connectResponse)
+{
+    if (resultCode != api::ResultCode::ok)
+        return;
+
+    if (m_originatingPeerCloudConnectVersion <
+            api::CloudConnectVersion::clientSupportsConnectSessionWithoutUdpEndpoints &&
+        connectResponse->udpEndpointList.empty())
+    {
+        // Reporting dummy UDP endpoint to the buggy client.
+        connectResponse->udpEndpointList.push_back(SocketAddress("1.2.3.4:12345"));
+    }
 }
 
 void UDPHolePunchingConnectionInitiationFsm::processConnectionResultRequest(
