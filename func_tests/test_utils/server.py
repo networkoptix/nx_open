@@ -226,7 +226,7 @@ class Server(object):
     def is_server_online(self):
         try:
             return self.rest_api.api.ping.GET(timeout=datetime.timedelta(seconds=10))
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as e:
             return False
 
     def get_log_file(self):
