@@ -72,7 +72,7 @@ function(nx_add_target name type)
         )
     endif()
 
-    set(sources ${cpp_files} ${rcc_files} ${qm_files})
+    set(sources ${cpp_files} ${hpp_files} ${rcc_files} ${qm_files})
     if(NOT NX_NO_PCH)
         set(sources ${sources} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
     endif()
