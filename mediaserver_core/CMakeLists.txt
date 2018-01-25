@@ -1,3 +1,5 @@
+include(camera_vendors.cmake)
+
 find_package(Qt5 COMPONENTS WebSockets)
 
 set(product.title "${mediaserver.name}")
@@ -74,6 +76,8 @@ set_source_files_properties(
 nx_add_target(mediaserver_core LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mediaserver_core_app_info_impl.cpp"
+    SOURCE_EXCLUSIONS
+        ${vendor_source_exclusions}
     ADDITIONAL_RESOURCES
         "${customization_dir}/mediaserver_core/resources"
         "${customization_dir}/icons/all/favicon.ico"
@@ -83,7 +87,10 @@ nx_add_target(mediaserver_core LIBRARY
     PUBLIC_LIBS
         qtservice qtsinglecoreapplication Qt5::WebSockets
         sigar
-        appserver2 nx_onvif nx_email nx_speech_synthesizer cloud_db_client)
+        appserver2 nx_onvif nx_email nx_speech_synthesizer cloud_db_client
+)
+
+nx_add_vendor_macros(mediaserver_core)
 
 if(LINUX)
     target_link_libraries(mediaserver_core PRIVATE ldap)
@@ -95,18 +102,4 @@ endif()
 
 if(WINDOWS)
     target_link_libraries(mediaserver_core PRIVATE Wldap32.dll Iphlpapi.dll Crypt32.lib)
-endif()
-
-if(customization STREQUAL "hanwha")
-    set_property(
-        SOURCE
-            src/media_server/media_server_resource_searchers.cpp
-            src/plugins/resource/onvif/onvif_resource_information_fetcher.cpp
-        APPEND PROPERTY COMPILE_DEFINITIONS
-            ENABLE_HANWHA
-    )
-else()
-    nx_exclude_sources_from_target(mediaserver_core
-        src/plugins/resource/hanwha/
-    )
 endif()

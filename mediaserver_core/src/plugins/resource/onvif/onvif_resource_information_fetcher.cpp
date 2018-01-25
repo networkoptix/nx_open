@@ -5,6 +5,7 @@
 #include <memory>
 #include <mutex>
 
+#include <camera_vendors.h>
 #include <onvif/soapDeviceBindingProxy.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <plugins/resource/onvif/onvif_searcher_hooks.h>
