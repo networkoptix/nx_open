@@ -63,7 +63,13 @@ fi
 
 while [ -L "$FILE" ]
 do
-    FILE="$(dirname $FILE)/$(readlink $FILE)"
+    LINK="$(readlink $FILE)"
+    if [[ "$LINK" = /* ]]
+    then
+        FILE="$LINK"
+    else
+        FILE="$(dirname $FILE)/$LINK"
+    fi
 done
 
 if [ -L "$FILE" ]
