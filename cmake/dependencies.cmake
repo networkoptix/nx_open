@@ -58,7 +58,6 @@ function(nx_detect_package_versions)
     endif()
 
     if(box STREQUAL "edge1")
-        _set_version(ffmpeg "3.1.1")
         _set_version(qt "5.6.3")
         _set_version(openssl "1.0.1f")
     endif()

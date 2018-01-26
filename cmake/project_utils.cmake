@@ -23,12 +23,16 @@ function(nx_add_target name type)
     set(oneValueArgs LIBRARY_TYPE)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
+        SOURCE_EXCLUSIONS
         OTHER_SOURCES
-        PUBLIC_LIBS PRIVATE_LIBS)
+        PUBLIC_LIBS PRIVATE_LIBS
+    )
 
     cmake_parse_arguments(NX "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    find_sources("${CMAKE_CURRENT_SOURCE_DIR}/src" cpp_files hpp_files)
+    nx_find_sources("${CMAKE_CURRENT_SOURCE_DIR}/src" cpp_files hpp_files
+        EXCLUDE ${NX_SOURCE_EXCLUSIONS}
+    )
 
     set(resources ${NX_ADDITIONAL_RESOURCES})
     if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
@@ -72,7 +76,7 @@ function(nx_add_target name type)
         )
     endif()
 
-    set(sources ${cpp_files} ${rcc_files} ${qm_files})
+    set(sources ${cpp_files} ${hpp_files} ${rcc_files} ${qm_files})
     if(NOT NX_NO_PCH)
         set(sources ${sources} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
     endif()
