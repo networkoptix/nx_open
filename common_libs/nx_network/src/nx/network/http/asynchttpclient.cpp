@@ -537,7 +537,7 @@ void AsyncHttpClient::asyncConnectDone(SystemError::ErrorCode errorCode)
         return;
     }
 
-    NX_LOGX(lm("Failed to establish tcp connection to %1. %2")
+    NX_LOGX(lm("Failed to establish TCP connection to %1. %2")
         .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
     m_lastSysErrorCode = errorCode;
 
@@ -594,7 +594,7 @@ void AsyncHttpClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t byt
 
     const auto requestSequenceBak = m_requestSequence;
     emit requestHasBeenSent(sharedThis, m_authorizationTried);
-    if (m_terminated || //user cancelled futher action
+    if (m_terminated || // User canceled further action.
         (m_requestSequence != requestSequenceBak))  //user started new request within responseReceived handler
     {
         return;
@@ -906,7 +906,7 @@ void AsyncHttpClient::processResponseHeadersBytes(
     if (m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber ||       //still reading previous message
         m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders)     //still reading message headers
     {
-        //response has not been read yet, reading futher
+        //response has not been read yet, reading further
         m_responseBuffer.resize(0);
         if (m_connectionClosed)
         {
@@ -1157,7 +1157,7 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
         }
     }
 
-    // It is not correct just to replace headers because there 
+    // It is not correct just to replace headers because there
     // could be multiple headers with same name in m_additionalHeaders.
     for (const auto& header: m_additionalHeaders)
         m_request.headers.erase(header.first);
@@ -1184,9 +1184,9 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
     if (m_precalculatedAuthorizationDisabled)
         return;
 
-    //if that url has already been authenticated, adding same authentication info to the request
-    //first request per tcp-connection always uses authentication
-    //    This is done due to limited AuthInfoCache implementation
+    // If that url has already been authenticated, adding same authentication info to the request
+    // first request per TCP-connection always uses authentication.
+    // This is done due to limited AuthInfoCache implementation.
     if (m_authCacheItem.url.isEmpty() ||
         !AuthInfoCache::instance()->addAuthorizationHeader(
             m_contentLocationUrl,
@@ -1195,7 +1195,8 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
     {
         if (m_authType == AuthType::authBasic)
         {
-            header::BasicAuthorization basicAuthorization(m_userName.toLatin1(), m_userPassword.toLatin1());
+            header::BasicAuthorization basicAuthorization(m_userName.toLatin1(),
+                m_userPassword.toLatin1());
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 nx_http::HttpHeader(

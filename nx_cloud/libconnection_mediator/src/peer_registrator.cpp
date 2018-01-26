@@ -7,7 +7,6 @@
 #include <nx/utils/log/log.h>
 
 #include "listening_peer_pool.h"
-#include "data/listening_peer.h"
 
 namespace nx {
 namespace hpm {
@@ -89,15 +88,15 @@ PeerRegistrator::PeerRegistrator(
     NX_ASSERT(result, Q_FUNC_INFO, "Could not register one of processors");
 }
 
-data::ListeningPeers PeerRegistrator::getListeningPeers() const
+api::ListeningPeers PeerRegistrator::getListeningPeers() const
 {
-    data::ListeningPeers result;
+    api::ListeningPeers result;
     result.systems = m_listeningPeerPool->getListeningPeers();
 
     QnMutexLocker lk(&m_mutex);
     for (const auto& client: m_boundClients)
     {
-        data::BoundClient info;
+        api::BoundClient info;
         if (const auto connetion = client.second.connection.lock())
             info.connectionEndpoint = connetion->getSourceAddress().toString();
 
@@ -124,7 +123,7 @@ void PeerRegistrator::bind(
 
     MediaserverData mediaserverData;
     nx::String errorMessage;
-    const api::ResultCode resultCode = 
+    const api::ResultCode resultCode =
         getMediaserverData(connection, requestMessage, &mediaserverData, &errorMessage);
     if (resultCode != api::ResultCode::ok)
     {

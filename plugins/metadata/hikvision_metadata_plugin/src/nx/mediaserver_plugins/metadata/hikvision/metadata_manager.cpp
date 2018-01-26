@@ -67,7 +67,7 @@ Error MetadataManager::startFetchingMetadata(
                 event->setEventTypeId(
                     nxpt::NxGuidHelper::fromRawData(hikvisionEvent.typeId.toRfc4122()));
                 event->setCaption(hikvisionEvent.caption.toStdString());
-                event->setDescription(hikvisionEvent.caption.toStdString());
+                event->setDescription(hikvisionEvent.description.toStdString());
                 event->setIsActive(hikvisionEvent.isActive);
                 event->setConfidence(1.0);
                 //event->setAuxilaryData(hikvisionEvent.fullEventName.toStdString());
@@ -110,7 +110,7 @@ Error MetadataManager::stopFetchingMetadata()
     return Error::noError;
 }
 
-const char* MetadataManager::capabilitiesManifest(Error* error) const
+const char* MetadataManager::capabilitiesManifest(Error* error)
 {
     if (m_deviceManifest.isEmpty())
     {
@@ -120,6 +120,10 @@ const char* MetadataManager::capabilitiesManifest(Error* error) const
 
     *error = Error::noError;
     return m_deviceManifest.constData();
+}
+
+void MetadataManager::freeManifest(const char* data)
+{
 }
 
 void MetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)

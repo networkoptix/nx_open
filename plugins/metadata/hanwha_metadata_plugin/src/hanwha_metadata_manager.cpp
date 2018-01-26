@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_common.h"
 #include "hanwha_metadata_manager.h"
 #include "hanwha_attributes_parser.h"
@@ -114,7 +112,7 @@ Error HanwhaMetadataManager::stopFetchingMetadata()
     return Error::noError;
 }
 
-const char* HanwhaMetadataManager::capabilitiesManifest(Error* error) const
+const char* HanwhaMetadataManager::capabilitiesManifest(Error* error)
 {
     if (m_deviceManifest.isEmpty())
     {
@@ -124,6 +122,10 @@ const char* HanwhaMetadataManager::capabilitiesManifest(Error* error) const
 
     *error = Error::noError;
     return m_deviceManifest.constData();
+}
+
+void HanwhaMetadataManager::freeManifest(const char* data)
+{
 }
 
 void HanwhaMetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
@@ -156,5 +158,3 @@ void HanwhaMetadataManager::setMonitor(HanwhaMetadataMonitor* monitor)
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

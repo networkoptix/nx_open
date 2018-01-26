@@ -8,15 +8,12 @@ function(nx_detect_package_versions)
     _set_version(openssl "1.0.2e")
     _set_version(ffmpeg "3.1.1")
     _set_version(quazip "0.7.1")
-    _set_version(onvif "2.1.2-io2")
     _set_version(sigar "1.7")
     _set_version(openldap "2.4.42")
     _set_version(sasl2 "2.1.26")
     _set_version(openal "1.16")
     _set_version(libjpeg-turbo "1.4.2")
     _set_version(festival "2.4")
-    _set_version(gtest "1.7.0")
-    _set_version(gmock "1.7.0")
     _set_version(directx "JUN2010")
 
     if(WINDOWS)
@@ -53,18 +50,18 @@ function(nx_detect_package_versions)
 
     if(box STREQUAL "bananapi")
         _set_version(ffmpeg "3.1.1-bananapi")
-        _set_version(qt "5.6.1")
+        _set_version(qt "5.6.1-1")
         _set_version(openssl "1.0.0j")
     endif()
 
     if(box STREQUAL "rpi")
         _set_version(qt "5.6.1")
         _set_version(quazip "0.7.2")
-        _set_version(openssl "1.0.0j")
+        _set_version(openssl "1.0.1t-deb8")
     endif()
 
     if(box STREQUAL "edge1")
-        _set_version(qt "5.6.1")
+        _set_version(qt "5.6.3")
         _set_version(openssl "1.0.1f")
         _set_version(quazip "0.7.2")
     endif()
@@ -82,14 +79,12 @@ function(nx_detect_package_versions)
         openssl
         ffmpeg
         quazip
-        onvif
         sigar
         openldap
         sasl2
         openal
         libjpeg-turbo
         festival festival-vox
-        gtest gmock
         directx
     )
         nx_set_variable_if_empty(${pkg}_version ${_${pkg}_version})
@@ -122,11 +117,6 @@ function(nx_get_dependencies)
 
     nx_rdep_add_package(any/boost)
 
-    if(haveServer OR haveDesktopClient OR haveTests)
-        nx_rdep_add_package(any/qtservice)
-        nx_rdep_add_package(any/qtsinglecoreapplication)
-    endif()
-
     if(WIN32)
         set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
     endif()
@@ -139,7 +129,6 @@ function(nx_get_dependencies)
     if(box MATCHES "bpi|bananapi")
         nx_rdep_add_package(sysroot)
         nx_rdep_add_package(opengl-es-mali)
-        nx_rdep_add_package(libstdc++-6.0.19)
     endif()
 
     if(box MATCHES "rpi")
@@ -148,11 +137,6 @@ function(nx_get_dependencies)
 
     if(box STREQUAL "tx1")
         nx_rdep_add_package(sysroot)
-    endif()
-
-    if(haveTests)
-        nx_rdep_add_package(gtest)
-        nx_rdep_add_package(gmock)
     endif()
 
     if(ANDROID OR WINDOWS OR box MATCHES "bpi")
@@ -170,9 +154,9 @@ function(nx_get_dependencies)
 
     if(WINDOWS)
         nx_rdep_add_package(directx)
-        nx_rdep_add_package("vcredist-2015" PATH_VARIABLE vcredist_directory)
+        nx_rdep_add_package(vcredist-2015 PATH_VARIABLE vcredist_directory)
         set(vcredist_directory ${vcredist_directory} PARENT_SCOPE)
-        nx_rdep_add_package("vmaxproxy-2.1")
+        nx_rdep_add_package(vmaxproxy-2.1)
         nx_rdep_add_package(windows/wix-3.11 PATH_VARIABLE wix_directory)
         set(wix_directory ${wix_directory} PARENT_SCOPE)
         nx_rdep_add_package(windows/signtool PATH_VARIABLE signtool_directory)
@@ -185,13 +169,8 @@ function(nx_get_dependencies)
     endif()
 
     if(haveDesktopClient)
-        nx_rdep_add_package(any/qtsingleapplication)
         nx_rdep_add_package(any/help-${customization}-3.1 PATH_VARIABLE help_directory)
         set(help_directory ${help_directory} PARENT_SCOPE)
-    endif()
-
-    if(haveMobileClient)
-        nx_rdep_add_package(any/qtsingleguiapplication)
     endif()
 
     if(haveDesktopClient OR haveMobileClient)
@@ -214,7 +193,6 @@ function(nx_get_dependencies)
     if(haveServer)
         nx_rdep_add_package(any/nx_sdk-1.6.0)
         nx_rdep_add_package(any/nx_storage_sdk-1.6.0)
-        nx_rdep_add_package(onvif)
         nx_rdep_add_package(sigar)
 
         nx_rdep_add_package(any/apidoctool PATH_VARIABLE APIDOCTOOL_PATH)

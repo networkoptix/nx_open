@@ -20,6 +20,7 @@ const QnUuid QnResourceTypePool::kStorageTypeUuid(
 const QnUuid QnResourceTypePool::kLayoutTypeUuid(
     qnResTypePool->getFixedResourceTypeId(kLayoutTypeId));
 const QnUuid QnResourceTypePool::kDesktopCameraTypeUuid("{1657647e-f6e4-bc39-d5e8-563c93cb5e1c}");
+const QnUuid QnResourceTypePool::kWearableCameraTypeUuid("{f7f5ab66-7075-4d0b-a0b2-75e2fdd079a4}");
 
 QnResourceType::QnResourceType()
     : m_isCameraSet(false)

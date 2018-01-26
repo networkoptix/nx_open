@@ -326,10 +326,12 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
         filterMessageKey = QnSystemHealth::RemoteArchiveSyncStarted;
     }
 
-    /* Checking that we want to see this message */
-    const bool isAllowedByFilter = qnSettings->popupSystemHealth().contains(filterMessageKey);
-
-    canShow &= isAllowedByFilter;
+    // Checking that user wants to see this message (if he is able to hide it).
+    if (isMessageVisibleInSettings(filterMessageKey))
+    {
+        const bool isAllowedByFilter = qnSettings->popupSystemHealth().contains(filterMessageKey);
+        canShow &= isAllowedByFilter;
+    }
 
     if (visible && canShow)
         emit systemHealthEventAdded(message, params);

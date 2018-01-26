@@ -275,10 +275,8 @@ public:
     int maxRecorderQueueSizeBytes() const;
     int maxRecorderQueueSizePackets() const;
 
-    #if defined(ENABLE_HANWHA)
-        bool hanwhaDeleteProfilesOnInitIfNeeded() const;
-        void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
-    #endif
+    bool hanwhaDeleteProfilesOnInitIfNeeded() const;
+    void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
 
     bool isEdgeRecordingEnabled() const;
     void setEdgeRecordingEnabled(bool enabled);
@@ -328,93 +326,91 @@ private:
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
 private:
-    QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
-    QnResourcePropertyAdaptor<bool> *m_autoUpdateThumbnailsAdaptor;
-    QnResourcePropertyAdaptor<int>* m_maxSceneItemsAdaptor;
-    QnResourcePropertyAdaptor<bool> *m_useTextEmailFormatAdaptor;
-    QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
-    QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor;
-    QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool> *m_autoUpdateThumbnailsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_maxSceneItemsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool> *m_useTextEmailFormatAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
-    QnResourcePropertyAdaptor<bool> *m_autoDiscoveryEnabledAdaptor;
-    QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
-    QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor;
-    QnResourcePropertyAdaptor<bool> *m_synchronizeTimeWithInternetAdaptor;
-    QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor;
-    QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor;
-    QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor;
-    QnResourcePropertyAdaptor<bool> *m_backupNewCamerasByDefaultAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool> *m_autoDiscoveryEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool> *m_synchronizeTimeWithInternetAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor = nullptr;
+    QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool> *m_backupNewCamerasByDefaultAdaptor = nullptr;
 
     // set of statistics settings adaptors
-    QnResourcePropertyAdaptor<QnOptionalBool> *m_statisticsAllowedAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_statisticsReportLastTimeAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_statisticsReportLastVersionAdaptor;
-    QnResourcePropertyAdaptor<int> *m_statisticsReportLastNumberAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_statisticsReportTimeCycleAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_statisticsReportUpdateDelayAdaptor;
-    QnResourcePropertyAdaptor<bool> *m_upnpPortMappingEnabledAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_localSystemIdAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_statisticsReportServerApiAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_clientStatisticsSettingsUrlAdaptor;
+    QnResourcePropertyAdaptor<QnOptionalBool> *m_statisticsAllowedAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_statisticsReportLastTimeAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_statisticsReportLastVersionAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int> *m_statisticsReportLastNumberAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_statisticsReportTimeCycleAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_statisticsReportUpdateDelayAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool> *m_upnpPortMappingEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_localSystemIdAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_statisticsReportServerApiAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_clientStatisticsSettingsUrlAdaptor = nullptr;
 
     // set of email settings adaptors
-    QnResourcePropertyAdaptor<QString> *m_serverAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_fromAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_userAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_passwordAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_signatureAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_supportLinkAdaptor;
-    QnResourcePropertyAdaptor<QnEmail::ConnectionType> *m_connectionTypeAdaptor;
-    QnResourcePropertyAdaptor<int> *m_portAdaptor;
-    QnResourcePropertyAdaptor<int> *m_timeoutAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_serverAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_fromAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_userAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_passwordAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_signatureAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_supportLinkAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QnEmail::ConnectionType> *m_connectionTypeAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int> *m_portAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int> *m_timeoutAdaptor = nullptr;
     /** Flag that we are using simple smtp settings set */
-    QnResourcePropertyAdaptor<bool> *m_simpleAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_simpleAdaptor = nullptr;
 
     // set of ldap settings adaptors
-    QnResourcePropertyAdaptor<QUrl> *m_ldapUriAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_ldapAdminDnAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_ldapAdminPasswordAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_ldapSearchBaseAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_ldapSearchFilterAdaptor;
+    QnResourcePropertyAdaptor<QUrl> *m_ldapUriAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_ldapAdminDnAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_ldapAdminPasswordAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_ldapSearchBaseAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString> *m_ldapSearchFilterAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<int>* m_ec2ConnectionKeepAliveTimeoutAdaptor;
-    QnResourcePropertyAdaptor<int>* m_ec2KeepAliveProbeCountAdaptor;
-    QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor;
-    QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeoutAdaptor;
+    QnResourcePropertyAdaptor<int>* m_ec2ConnectionKeepAliveTimeoutAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_ec2KeepAliveProbeCountAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeoutAdaptor = nullptr;
     /** seconds */
-    QnResourcePropertyAdaptor<int>* m_proxyConnectTimeoutAdaptor;
-    QnResourcePropertyAdaptor<bool>* m_takeCameraOwnershipWithoutLock;
+    QnResourcePropertyAdaptor<int>* m_proxyConnectTimeoutAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_takeCameraOwnershipWithoutLock = nullptr;
 
     // set of cloud adaptors
-    QnResourcePropertyAdaptor<QString>* m_cloudAccountNameAdaptor;
-    QnResourcePropertyAdaptor<QString>* m_cloudSystemIdAdaptor;
-    QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor;
+    QnResourcePropertyAdaptor<QString>* m_cloudAccountNameAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_cloudSystemIdAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor = nullptr;
 
     // misc adaptors
-    QnResourcePropertyAdaptor<QString>* m_systemNameAdaptor;
-    QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor;
-    QnResourcePropertyAdaptor<bool>* m_sequentialFlirOnvifSearcherEnabledAdaptor;
-    QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor;
+    QnResourcePropertyAdaptor<QString>* m_systemNameAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_sequentialFlirOnvifSearcherEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes;
-    QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets;
+    QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes = nullptr;
+    QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets = nullptr;
 
-    QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount;
+    QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount = nullptr;
 
-    QnResourcePropertyAdaptor<int>* m_rtpFrameTimeoutMs;
-    QnResourcePropertyAdaptor<int>* m_maxRtspConnectDuration;
+    QnResourcePropertyAdaptor<int>* m_rtpFrameTimeoutMs = nullptr;
+    QnResourcePropertyAdaptor<int>* m_maxRtspConnectDuration = nullptr;
 
-    QnResourcePropertyAdaptor<bool>* m_cloudConnectUdpHolePunchingEnabledAdaptor;
-    QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool>* m_cloudConnectUdpHolePunchingEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor = nullptr;
 
-    #if defined(ENABLE_HANWHA)
-        QnResourcePropertyAdaptor<bool>* m_hanwhaDeleteProfilesOnInitIfNeeded;
-    #endif
+    QnResourcePropertyAdaptor<bool>* m_hanwhaDeleteProfilesOnInitIfNeeded = nullptr;
 
-    QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads;
+    QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads = nullptr;
 
     AdaptorList m_allAdaptors;
 

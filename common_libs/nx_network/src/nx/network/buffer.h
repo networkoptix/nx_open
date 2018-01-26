@@ -36,7 +36,7 @@ namespace nx
     /*!
         Some effective buffer is required. Following is desired:\n
             - all features of \class Buffer
-            - QString compartability (with checkups for non ASCII symbols)
+            - QString compatibility (with checkups for non ASCII symbols)
      */
     typedef QByteArray String;
 

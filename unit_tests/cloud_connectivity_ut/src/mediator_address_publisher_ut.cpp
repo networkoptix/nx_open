@@ -29,7 +29,7 @@ public:
         if (handler)
             post([handler = std::move(handler)]() { handler(SystemError::noError); });
     }
-    
+
     virtual bool setIndicationHandler(
         int /*method*/, IndicationHandler /*handler*/, void* /*client*/ = 0) override
     {
@@ -43,6 +43,11 @@ public:
             {
                 m_reconnectHandlers.push_back(std::move(handler));
             });
+    }
+
+    virtual void setOnConnectionClosedHandler(
+        OnConnectionClosedHandler /*onConnectionClosedHandler*/) override
+    {
     }
 
     virtual void sendRequest(
@@ -158,7 +163,7 @@ protected:
                 std::bind(&MediatorAddressPublisher::onUpdateAddressesCompleted, this, _1));
         }
     }
-    
+
     void thenErrorShouldBeReported()
     {
         for (int i = 0; i < requestCount; ++i)

@@ -1,8 +1,4 @@
-if(NOT WINDOWS)
-    add_compile_options("-Werror" "-Wall" "-Wextra")
-endif()
-
-nx_add_test(nx_network_ut
+nx_add_test(nx_network_ut WERROR
     PUBLIC_LIBS
         GTest GMock
         nx_network

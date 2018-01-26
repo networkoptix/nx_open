@@ -12,6 +12,7 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <QtCore/QElapsedTimer>
+#include <nx/utils/elapsed_timer.h>
 
 namespace nx {
 namespace mediaserver {
@@ -42,28 +43,59 @@ public:
     void removeHandler(const QString& handlerId);
     void clearHandlers();
 
+    bool processEvent(const HikvisionEvent& hikvisionEvent);
 private:
     QUrl buildMonitoringUrl(
         const QUrl& resourceUrl,
         const std::vector<QnUuid>& eventTypes) const;
-    void initMonitorUnsafe();
+    QUrl buildLprUrl(const QUrl& resourceUrl) const;
 
+    void initMonitorUnsafe();
+    void initEventMonitor();
+    void initLprMonitor();
+
+    void reopenMonitorConnection();
+    void reopenLprConnection();
+    void sendLprRequest();
+
+    std::chrono::milliseconds reopenDelay() const;
+
+    void addExpiredEvents(std::vector<HikvisionEvent>& result);
 private:
-    void at_responseReceived();
-    void at_someBytesAvailable();
+    void at_monitorResponseReceived();
+    void at_monitorSomeBytesAvailable();
     void at_connectionClosed();
 
+    void at_LprRequestDone();
 private:
     const Hikvision::DriverManifest& m_manifest;
-    const QUrl m_url;
+    const QUrl m_monitorUrl;
+    const QUrl m_lprUrl;
     const QAuthenticator m_auth;
-    nx::network::aio::Timer m_timer;
+    nx::network::aio::Timer m_monitorTimer;
+    nx::network::aio::Timer m_lprTimer;
     QElapsedTimer m_timeSinceLastOpen;
-    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
+    std::unique_ptr<nx_http::AsyncClient> m_monitorHttpClient;
+    std::unique_ptr<nx_http::AsyncClient> m_lprHttpClient;
     MultipartContentParserPtr m_contentParser;
+    QString m_fromDateFilter;
 
     mutable QnMutex m_mutex;
     QMap<QString, Handler> m_handlers;
+
+    struct StartedEvent
+    {
+        StartedEvent(const HikvisionEvent& event = HikvisionEvent()) :
+            event(event)
+        {
+            timer.restart();
+        }
+
+        HikvisionEvent event;
+        nx::utils::ElapsedTimer timer;
+    };
+
+    QMap<QString, StartedEvent> m_startedEvents;
 };
 
 } // namespace hikvision

@@ -16,6 +16,17 @@ class QnStaticCommonModule;
 class QnCloudStatusWatcher;
 class QnCameraDataManager;
 
+namespace nx {
+namespace client {
+namespace desktop {
+
+class UploadManager;
+class WearableManager;
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
 class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
     Q_OBJECT
@@ -32,6 +43,9 @@ public:
     QnCameraDataManager* cameraDataManager() const;
 
     nx::client::desktop::RadassController* radassController() const;
+    nx::client::desktop::UploadManager* uploadManager() const;
+    nx::client::desktop::WearableManager* wearableManager() const;
+
 private:
     void initApplication();
     void initThread();
@@ -51,6 +65,8 @@ private:
     QnCloudStatusWatcher* m_cloudStatusWatcher;
     QnCameraDataManager* m_cameraDataManager;
     nx::client::desktop::RadassController* m_radassController;
+    nx::client::desktop::UploadManager* m_uploadManager;
+    nx::client::desktop::WearableManager* m_wearableManager;
 };
 
 #define qnClientModule QnClientModule::instance()

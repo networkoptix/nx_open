@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_attributes_parser.h"
 
 #include <iostream>
@@ -113,5 +111,3 @@ bool HanwhaAttributesParser::readChannelEvents(QXmlStreamReader& reader)
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

@@ -10,7 +10,7 @@
 
 #include "core/resource/camera_resource.h"
 
-#include "onvif/wsaapi.h"
+#include <gsoap/wsaapi.h>
 #include "onvif_resource_searcher_wsdd.h"
 #include "onvif_resource.h"
 #include "onvif_helper.h"

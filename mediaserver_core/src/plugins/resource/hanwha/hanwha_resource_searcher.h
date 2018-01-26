@@ -1,12 +1,11 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <plugins/resource/hanwha/hanwha_common.h>
 
 #include <core/resource_management/resource_searcher.h>
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <nx/network/upnp/upnp_search_handler.h>
+#include <nx/network/mac_address.h>
 #include <core/resource/resource_fwd.h>
 #include "hanwha_shared_resource_context.h"
 
@@ -98,5 +97,3 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

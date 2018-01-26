@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <plugins/resource/hanwha/hanwha_mapped_preset_manager.h>
 
 #include <core/ptz/basic_ptz_controller.h>
@@ -79,5 +77,3 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

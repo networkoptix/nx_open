@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <QtCore/QXmlStreamReader>
 
 #include <boost/optional/optional.hpp>
@@ -111,5 +109,3 @@ boost::optional<double> HanwhaAttributes::attribute<double>(
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

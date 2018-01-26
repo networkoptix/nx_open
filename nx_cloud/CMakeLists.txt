@@ -5,9 +5,7 @@ if(withClouds OR withDesktopClient)
 endif()
 
 if(withClouds)
-    if(NOT WINDOWS)
-        add_compile_options("-Werror" "-Wall" "-Wextra")
-    endif()
+    set(nx_enable_werror ON)
 
     add_subdirectory(vms_gateway)
     add_subdirectory(libconnection_mediator)

@@ -72,6 +72,7 @@ public:
 
 protected:
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& motion) override;
+    virtual bool canAcceptData() const override;
     virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media) override;
     virtual void beforeProcessData(const QnConstAbstractMediaDataPtr& media) override;
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override;

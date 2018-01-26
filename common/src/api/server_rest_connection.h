@@ -19,6 +19,7 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 #include <api/model/time_reply.h>
+#include <api/model/wearable_camera_reply.h>
 
 /**
  * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -148,16 +149,25 @@ public:
     /* DistributedFileDownloader API */
     Handle addFileDownload(
         const QString& fileName,
-        int size,
+        qint64 size,
         const QByteArray& md5,
         const QUrl& url,
         GetCallback callback,
         QThread* targetThread = nullptr);
 
+    Handle addFileUpload(
+        const QString& fileName,
+        qint64 size,
+        qint64 chunkSize,
+        const QByteArray& md5,
+        qint64 ttl,
+        PostCallback callback,
+        QThread* targetThread = nullptr);
+
     Handle removeFileDownload(
         const QString& fileName,
         bool deleteData,
-        GetCallback callback,
+        PostCallback callback = nullptr,
         QThread* targetThread = nullptr);
 
     Handle fileChunkChecksums(
@@ -183,7 +193,7 @@ public:
         const QString& fileName,
         int index,
         const QByteArray& data,
-        GetCallback callback,
+        PostCallback callback,
         QThread* targetThread = nullptr);
 
     Handle downloadsStatus(
@@ -217,6 +227,37 @@ public:
         const QAuthenticator& auth,
         Result<QnRestResult>::type callback,
         QThread *targetThread = nullptr);
+
+    /**
+     * Adds a new wearable camera to this server.
+     *
+     * @param name                      Name of the camera.
+     */
+    Handle addWearableCameraAsync(
+        const QString& name,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    /**
+     * Makes the server consume a media file as a footage for a wearable camera.
+     * The file itself should be uploaded (or downloaded) to the server beforehand via
+     * file upload API.
+     *
+     * Note that once the import is completed, the server will delete the original
+     * uploaded file.
+     *
+     * @param camera                    Camera to add footage to.
+     * @param uploadId                  Name of the uploaded file to use.
+     * @param startTimeMs               Start time of the footage, in msecs since epoch.
+     *
+     * @see addFileUpload
+     */
+    Handle consumeWearableCameraFileAsync(
+        const QnNetworkResourcePtr& camera,
+        const QString& uploadId,
+        qint64 startTimeMs,
+        PostCallback callback,
+        QThread* targetThread = nullptr);
 
     /**
     * Cancel running request by known requestID. If request is canceled, callback isn't called.

@@ -8,6 +8,7 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(0, verboseAutoRequestForwarder, "Set log level to Verbose for AutoRequestForwarder.");
     NX_INI_FLAG(0, ignoreApiModuleInformationInAutoRequestForwarder, "");
+    NX_INI_FLAG(0, enableWearableCameras, "Enable wearable cameras.");
 };
 
 inline Ini& ini()

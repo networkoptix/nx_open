@@ -103,7 +103,7 @@
         <Property Id="SERVER_PASSWORD_CONFIRM" Value="admin" Secure="yes"/>
         <?endif?>
 
-        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="$(var.SourceDir)\wix_custom_actions.dll" />
 
         <!-- Custom actions -->
         <CustomAction Id="SetPreviousServerInstalled" BinaryKey="CustomActions.dll" DllEntry="SetPreviousServerInstalled" Execute="immediate" Return="check"/>

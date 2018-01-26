@@ -213,7 +213,7 @@ boost::optional<int> HikvisionHevcStreamReader::rescaleQuality(
 
     auto outputScaleSize = outputQuality.size();
     auto inputScale = (double)inputScaleSize / (inputQualityIndex + 1);
-    auto outputIndex = (int)std::round(outputQuality.size() / inputScale) - 1;
+    auto outputIndex = qRound(outputQuality.size() / inputScale) - 1;
 
     bool indexIsCorrect = outputIndex < outputQuality.size() && outputIndex >= 0;
     NX_ASSERT(indexIsCorrect, lit("Wrong Hikvision quality index."));
