@@ -250,7 +250,7 @@ public:
     void calcTimeDrift(int* outSoapRes = nullptr) const; // calculate clock diff between camera and local clock at seconds
     static int calcTimeDrift(const QString& deviceUrl, int* outSoapRes = nullptr, QTimeZone* timeZone = nullptr);
 
-    virtual QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
+    virtual QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     virtual QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
@@ -596,7 +596,7 @@ private:
     mutable QnResourceVideoLayoutPtr m_videoLayout;
 
 protected:
-    nx::mediaserver::resource::ApiMultiAdvancedParamitersProvider<QnPlOnvifResource> m_advancedParametersProvider;
+    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
 };

@@ -84,7 +84,7 @@ void QnCameraAdvancedParamsWidget::setCamera(const QnVirtualCameraResourcePtr &c
             }
         });
     }
-    
+
     /* Initialize state */
     initialize();
 }
@@ -238,7 +238,7 @@ QnMediaServerConnectionPtr QnCameraAdvancedParamsWidget::getServerConnection() c
 }
 
 
-void QnCameraAdvancedParamsWidget::at_advancedParamChanged(const QString &id, const QString &value) {  
+void QnCameraAdvancedParamsWidget::at_advancedParamChanged(const QString &id, const QString &value) {
     /* Check that we are in correct state. */
     if (state() != State::Init)
         return;
@@ -297,7 +297,7 @@ void QnCameraAdvancedParamsWidget::at_advancedParam_saved(int status, const QnCa
     /* Check that we are in the correct state. */
     if (state() != State::Applying)
         return;
-    
+
     /* Check that we are waiting for this request. */
     if (handle != m_paramRequestHandle)
         return;
@@ -314,8 +314,8 @@ void QnCameraAdvancedParamsWidget::at_advancedParam_saved(int status, const QnCa
         m_loadedValues[value.id] = m_currentValues[value.id];
         m_currentValues.remove(value.id);
 
-        const auto paramiters = m_advancedParamsReader->params(m_camera);
-        if (paramiters.getParameterById(value.id).resync)
+        const auto parameters = m_advancedParamsReader->params(m_camera);
+        if (parameters.getParameterById(value.id).resync)
             needResync = true;
     }
 
@@ -323,7 +323,7 @@ void QnCameraAdvancedParamsWidget::at_advancedParam_saved(int status, const QnCa
     setState(State::Init);
     emit hasChangesChanged();
 
-    /* Reload all values if one of paramiters requires resync. */
+    /* Reload all values if one of parameters requires resync. */
     if (needResync)
         loadValues();
 }

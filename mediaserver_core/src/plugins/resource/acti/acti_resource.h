@@ -44,7 +44,7 @@ public:
 
     virtual QString getDriverName() const override;
 
-    QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
+    QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
@@ -216,7 +216,7 @@ private:
     bool m_inputMonitored;
     QnMutex m_audioCfgMutex;
     boost::optional<bool> m_audioInputOn;
-    nx::mediaserver::resource::ApiMultiAdvancedParamitersProvider<QnActiResource> m_advancedParametersProvider;
+    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnActiResource> m_advancedParametersProvider;
 };
 
 #endif // #ifdef ENABLE_ACTI

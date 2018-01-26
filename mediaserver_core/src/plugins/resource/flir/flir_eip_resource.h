@@ -66,7 +66,7 @@ protected:
     virtual bool isInputPortMonitored() const override;
 
 private:
-    nx::mediaserver::resource::ApiSingleAdvancedParamitersProvider<QnFlirEIPResource> m_advancedParametersProvider;
+    nx::mediaserver::resource::ApiSingleAdvancedParametersProvider<QnFlirEIPResource> m_advancedParametersProvider;
     mutable QnMutex m_ioMutex;
     mutable QnMutex m_alarmMutex;
 

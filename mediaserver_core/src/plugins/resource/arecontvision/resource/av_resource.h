@@ -88,10 +88,10 @@ protected:
 
     virtual bool isRTSPSupported() const;
 
-    struct AvParamitersProvider: AdvancedParametersProvider
+    struct AvParametersProvider: AdvancedParametersProvider
     {
     public:
-        AvParamitersProvider(QnPlAreconVisionResource* resource): m_resource(resource) {}
+        AvParametersProvider(QnPlAreconVisionResource* resource): m_resource(resource) {}
         virtual QnCameraAdvancedParams descriptions() override;
         virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
         virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
@@ -113,7 +113,7 @@ private:
     bool m_dualsensor;
     bool m_inputPortState;
     nx_http::AsyncHttpClientPtr m_relayInputClient;
-    AvParamitersProvider m_advancedParamitersProvider;
+    AvParametersProvider m_advancedParametersProvider;
 
     bool getParamPhysical2(int channel, const QString& name, QString &val);
     void inputPortStateRequestDone(nx_http::AsyncHttpClientPtr client);

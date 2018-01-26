@@ -58,12 +58,12 @@ public:
     QSet<QString> setAdvancedParameters(const QnCameraAdvancedParamValueMap& values);
     bool setAdvancedParameter(const QString& id, const QString& value);
 
-    /** Gets advanced paramiters async, handler is called when it's done. */
+    /** Gets advanced parameters async, handler is called when it's done. */
     void getAdvancedParametersAsync(
         const QSet<QString>& ids,
         std::function<void(const QnCameraAdvancedParamValueMap&)> handler = nullptr);
 
-    /** Sets advanced paramiters async, handler is called when it's done. */
+    /** Sets advanced parameters async, handler is called when it's done. */
     void setAdvancedParametersAsync(
         const QnCameraAdvancedParamValueMap& values,
         std::function<void(const QSet<QString>&)> handler = nullptr);
@@ -125,7 +125,7 @@ protected:
     /** Is called during initInternal(). */
     virtual CameraDiagnostics::Result initializeCameraDriver() = 0;
 
-    /** Override to add support for advanced paramiters. */
+    /** Override to add support for advanced parameters. */
     virtual std::vector<AdvancedParametersProvider*>  advancedParametersProviders();
 
     /** Gets supported codecs and their resolution list. For each key optional CameraStreamCapability could be provided.
@@ -134,7 +134,7 @@ protected:
     virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) = 0;
 
 private:
-    CameraDiagnostics::Result initializaAdvancedParamitersProviders();
+    CameraDiagnostics::Result initializaAdvancedParametersProviders();
 
 private:
     int m_channelNumber; // video/audio source number

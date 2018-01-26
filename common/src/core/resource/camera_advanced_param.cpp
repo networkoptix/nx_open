@@ -111,7 +111,7 @@ bool QnCameraAdvancedParameter::isValid() const
 
 bool QnCameraAdvancedParameter::isValueValid(const QString& value) const
 {
-    if (dataType == DataType::None) 
+    if (dataType == DataType::None)
         return false;
 
     if (dataType == DataType::Bool)
@@ -424,7 +424,7 @@ static void mergeParams(
             [&](const QnCameraAdvancedParameter& p){ return p.id == sourceParam.id; });
 
         if (targetParamById != target->end())
-            NX_ASSERT(false, lm("Paramiter with name '%1' clash").arg(sourceParam.id));
+            NX_ASSERT(false, lm("Parameter with name '%1' clash").arg(sourceParam.id));
         else
             target->push_back(std::move(sourceParam));
     }

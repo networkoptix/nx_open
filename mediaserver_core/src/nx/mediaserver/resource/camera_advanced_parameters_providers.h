@@ -10,10 +10,10 @@ namespace resource {
  * Base Camera::AdvancedParametersProvider implementation helper.
  */
 template<typename ApiProvider>
-class ApiAdvancedParamitersProvider: public Camera::AdvancedParametersProvider
+class ApiAdvancedParametersProvider: public Camera::AdvancedParametersProvider
 {
 public:
-    ApiAdvancedParamitersProvider(ApiProvider* api);
+    ApiAdvancedParametersProvider(ApiProvider* api);
     virtual QnCameraAdvancedParams descriptions() override;
 
     void assign(QnCameraAdvancedParams values);
@@ -30,10 +30,10 @@ protected:
  * Automatic get/set redirector to resource getApiParameters/setApiParameters.
  */
 template<typename ApiProvider>
-class ApiMultiAdvancedParamitersProvider: public ApiAdvancedParamitersProvider<ApiProvider>
+class ApiMultiAdvancedParametersProvider: public ApiAdvancedParametersProvider<ApiProvider>
 {
 public:
-    using Base = ApiAdvancedParamitersProvider<ApiProvider>;
+    using Base = ApiAdvancedParametersProvider<ApiProvider>;
     using Base::Base;
 
     virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
@@ -44,10 +44,10 @@ public:
  * Automatic get/set redirector to resource getApiParameter/setApiParameter.
  */
 template<typename ApiProvider>
-class ApiSingleAdvancedParamitersProvider: public ApiAdvancedParamitersProvider<ApiProvider>
+class ApiSingleAdvancedParametersProvider: public ApiAdvancedParametersProvider<ApiProvider>
 {
 public:
-    using Base = ApiAdvancedParamitersProvider<ApiProvider>;
+    using Base = ApiAdvancedParametersProvider<ApiProvider>;
     using Base::Base;
 
     virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
@@ -107,27 +107,27 @@ private:
 // -------------------------------------------------------------------------------------------------
 
 template<typename ApiProvider>
-ApiAdvancedParamitersProvider<ApiProvider>::ApiAdvancedParamitersProvider(ApiProvider* api)
+ApiAdvancedParametersProvider<ApiProvider>::ApiAdvancedParametersProvider(ApiProvider* api)
     : m_api(api)
 {
 }
 
 template<typename ApiProvider>
-QnCameraAdvancedParams ApiAdvancedParamitersProvider<ApiProvider>::descriptions()
+QnCameraAdvancedParams ApiAdvancedParametersProvider<ApiProvider>::descriptions()
 {
     QnMutexLocker lock(&m_mutex);
     return m_parameters;
 }
 
 template<typename ApiProvider>
-void ApiAdvancedParamitersProvider<ApiProvider>::assign(QnCameraAdvancedParams values)
+void ApiAdvancedParametersProvider<ApiProvider>::assign(QnCameraAdvancedParams values)
 {
     QnMutexLocker lock(&m_mutex);
     m_parameters = std::move(values);
 }
 
 template<typename ApiProvider>
-QnCameraAdvancedParameter ApiAdvancedParamitersProvider<ApiProvider>::getParameterById(
+QnCameraAdvancedParameter ApiAdvancedParametersProvider<ApiProvider>::getParameterById(
     const QString &id) const
 {
     QnMutexLocker lock(&m_mutex);
@@ -135,28 +135,28 @@ QnCameraAdvancedParameter ApiAdvancedParamitersProvider<ApiProvider>::getParamet
 }
 
 template<typename ApiProvider>
-void ApiAdvancedParamitersProvider<ApiProvider>::clear()
+void ApiAdvancedParametersProvider<ApiProvider>::clear()
 {
     QnMutexLocker lock(&m_mutex);
     m_parameters.clear();
 }
 
 template<typename ApiProvider>
-QnCameraAdvancedParamValueMap ApiMultiAdvancedParamitersProvider<ApiProvider>::get(
+QnCameraAdvancedParamValueMap ApiMultiAdvancedParametersProvider<ApiProvider>::get(
     const QSet<QString>& ids)
 {
-    return this->m_api->getApiParamiters(ids);
+    return this->m_api->getApiParameters(ids);
 }
 
 template<typename ApiProvider>
-QSet<QString> ApiMultiAdvancedParamitersProvider<ApiProvider>::set(
+QSet<QString> ApiMultiAdvancedParametersProvider<ApiProvider>::set(
     const QnCameraAdvancedParamValueMap& values)
 {
     return this->m_api->setApiParameters(values);
 }
 
 template<typename ApiProvider>
-QnCameraAdvancedParamValueMap ApiSingleAdvancedParamitersProvider<ApiProvider>::get(
+QnCameraAdvancedParamValueMap ApiSingleAdvancedParametersProvider<ApiProvider>::get(
     const QSet<QString>& ids)
 {
     QnCameraAdvancedParamValueMap values;
@@ -170,7 +170,7 @@ QnCameraAdvancedParamValueMap ApiSingleAdvancedParamitersProvider<ApiProvider>::
 }
 
 template<typename ApiProvider>
-QSet<QString> ApiSingleAdvancedParamitersProvider<ApiProvider>::set(
+QSet<QString> ApiSingleAdvancedParametersProvider<ApiProvider>::set(
     const QnCameraAdvancedParamValueMap& values)
 {
     QSet<QString> ids;

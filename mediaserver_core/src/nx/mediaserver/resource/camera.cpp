@@ -248,7 +248,7 @@ void Camera::setAdvancedParametersAsync(
 
 QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
 {
-    const auto getStreamParamiters =
+    const auto getStreamParameters =
         [&](Qn::StreamIndex streamIndex)
         {
             const auto it = m_streamCapabilityAdvancedProviders.find(streamIndex);
@@ -258,10 +258,10 @@ QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
             return it->second->getParameters();
         };
 
-    QnAdvancedStreamParams paramiters;
-    paramiters.primaryStream = getStreamParamiters(Qn::StreamIndex::primary);
-    paramiters.secondaryStream = getStreamParamiters(Qn::StreamIndex::secondary);
-    return paramiters;
+    QnAdvancedStreamParams parameters;
+    parameters.primaryStream = getStreamParameters(Qn::StreamIndex::primary);
+    parameters.secondaryStream = getStreamParameters(Qn::StreamIndex::secondary);
+    return parameters;
 }
 
 float Camera::getResolutionAspectRatio(const QSize& resolution)
@@ -382,10 +382,10 @@ CameraDiagnostics::Result Camera::initInternal()
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return driverResult;
 
-    return initializaAdvancedParamitersProviders();
+    return initializaAdvancedParametersProviders();
 }
 
-CameraDiagnostics::Result Camera::initializaAdvancedParamitersProviders()
+CameraDiagnostics::Result Camera::initializaAdvancedParametersProviders()
 {
     std::vector<Camera::AdvancedParametersProvider*> allProviders;
     boost::optional<QSize> baseResolution;

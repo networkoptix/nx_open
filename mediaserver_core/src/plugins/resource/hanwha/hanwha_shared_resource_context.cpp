@@ -49,7 +49,7 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     const AbstractSharedResourceContext::SharedId& sharedId)
     :
     information([this](){ return loadInformation(); }, kCacheDataTimeout),
-    cgiParamiters([this](){ return loadCgiParamiters(); }, kCacheDataTimeout),
+    cgiParameters([this](){ return loadCgiParameters(); }, kCacheDataTimeout),
     eventStatuses([this](){ return loadEventStatuses(); }, kCacheDataTimeout),
     videoSources([this](){ return loadVideoSources(); }, kCacheDataTimeout),
     videoProfiles([this](){ return loadVideoProfiles(); }, kCacheDataTimeout),
@@ -76,7 +76,7 @@ void HanwhaSharedResourceContext::setRecourceAccess(
     }
 
     information.invalidate();
-    cgiParamiters.invalidate();
+    cgiParameters.invalidate();
     eventStatuses.invalidate();
     videoSources.invalidate();
     videoProfiles.invalidate();
@@ -289,16 +289,16 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
     return {CameraDiagnostics::NoErrorResult(), std::move(info)};
 }
 
-HanwhaResult<HanwhaCgiParameters> HanwhaSharedResourceContext::loadCgiParamiters()
+HanwhaResult<HanwhaCgiParameters> HanwhaSharedResourceContext::loadCgiParameters()
 {
     HanwhaRequestHelper helper(shared_from_this());
     helper.setIgnoreMutexAnalyzer(true);
 
-    auto cgiParamiters = helper.fetchCgiParameters(lit("cgis"));
-    if (!cgiParamiters.isValid())
+    auto cgiParameters = helper.fetchCgiParameters(lit("cgis"));
+    if (!cgiParameters.isValid())
         return {CameraDiagnostics::CameraInvalidParams(lit("Camera cgi parameters are invalid"))};
 
-    return {CameraDiagnostics::NoErrorResult(), std::move(cgiParamiters)};
+    return {CameraDiagnostics::NoErrorResult(), std::move(cgiParameters)};
 }
 
 HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadEventStatuses()

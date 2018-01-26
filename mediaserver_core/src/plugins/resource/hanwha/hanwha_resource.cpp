@@ -264,7 +264,7 @@ nx::core::resource::AbstractRemoteArchiveManager* HanwhaResource::remoteArchiveM
     return m_remoteArchiveManager.get();
 }
 
-QnCameraAdvancedParamValueMap HanwhaResource::getApiParamiters(const QSet<QString>& ids)
+QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QString>& ids)
 {
     QnCameraAdvancedParamValueMap result;
 
@@ -774,7 +774,7 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
 
     m_attributes = std::move(info->attributes);
 
-    if (auto parameters = sharedContext()->cgiParamiters())
+    if (auto parameters = sharedContext()->cgiParameters())
         m_cgiParameters = std::move(parameters.value);
     else
         return parameters.diagnostics;
@@ -2265,7 +2265,7 @@ QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
         return result;
 
     // fetch group leads;
-    QnCameraAdvancedParamValueList groupLeadValues = getApiParamiters(groupLeadsToFetch).toValueList();
+    QnCameraAdvancedParamValueList groupLeadValues = getApiParameters(groupLeadsToFetch).toValueList();
     for (const auto& lead: groupLeadValues)
     {
         const auto info = advancedParameterInfo(lead.id);

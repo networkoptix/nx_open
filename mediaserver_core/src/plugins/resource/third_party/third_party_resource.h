@@ -88,7 +88,7 @@ public:
 
     nxcip::Resolution getSelectedResolutionForEncoder(Qn::StreamIndex encoderIndex ) const;
 
-    QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
+    QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
 protected:
@@ -118,7 +118,7 @@ private:
     int m_encoderCount;
     std::vector<nxcip::Resolution> m_selectedEncoderResolutions;
     nxcip::BaseCameraManager3* m_cameraManager3;
-    nx::mediaserver::resource::ApiMultiAdvancedParamitersProvider<QnThirdPartyResource> m_advancedParametersProvider;
+    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnThirdPartyResource> m_advancedParametersProvider;
 
     bool initializeIOPorts();
     nxcip::Resolution getMaxResolution(Qn::StreamIndex encoderNumber) const;

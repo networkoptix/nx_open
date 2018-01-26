@@ -53,7 +53,7 @@ public:
     std::map<QString, QString> response() const;
     nx_http::StatusCode::Value statusCode() const;
     QString requestUrl() const;
-    
+
     template<typename T>
     boost::optional<T> parameter(const QString& parameterName, int channel = kNoChannel) const
     {
@@ -72,14 +72,14 @@ public:
         if (auto value = parameter<T>(name))
             return *value;
 
-        static const auto errorMessage = QStringLiteral("Paramiter %1 is not found in response");
+        static const auto errorMessage = QStringLiteral("Parameter %1 is not found in response");
         throw std::runtime_error(errorMessage.arg(name).toStdString()) ;
     }
 
 private:
     void parseBuffer(const nx::Buffer& rawBuffer, bool isListMode = false);
     boost::optional<QString> findParameter(const QString& parameterName, int channel) const;
-    
+
 private:
     int m_errorCode = HanwhaError::kNoError;
     QString m_errorString;

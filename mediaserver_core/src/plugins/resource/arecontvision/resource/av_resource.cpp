@@ -41,7 +41,7 @@ QnPlAreconVisionResource::QnPlAreconVisionResource()
       m_prevMotionChannel(0),
       m_dualsensor(false),
       m_inputPortState(false),
-      m_advancedParamitersProvider{this}
+      m_advancedParametersProvider{this}
 {
     setVendor(lit("ArecontVision"));
 }
@@ -761,12 +761,12 @@ bool QnPlAreconVisionResource::isRTSPSupported() const
         && ((cameraSupportsH264 && cameraSupportsRtsp) || rtspIsForcedOnCamera);
 }
 
-QnCameraAdvancedParams QnPlAreconVisionResource::AvParamitersProvider::descriptions()
+QnCameraAdvancedParams QnPlAreconVisionResource::AvParametersProvider::descriptions()
 {
     return {};
 }
 
-QnCameraAdvancedParamValueMap QnPlAreconVisionResource::AvParamitersProvider::get(const QSet<QString>& ids)
+QnCameraAdvancedParamValueMap QnPlAreconVisionResource::AvParametersProvider::get(const QSet<QString>& ids)
 {
     QnCameraAdvancedParamValueMap result;
     for (const auto id: ids)
@@ -779,7 +779,7 @@ QnCameraAdvancedParamValueMap QnPlAreconVisionResource::AvParamitersProvider::ge
     return result;
 }
 
-QSet<QString> QnPlAreconVisionResource::AvParamitersProvider::set(const QnCameraAdvancedParamValueMap& values)
+QSet<QString> QnPlAreconVisionResource::AvParametersProvider::set(const QnCameraAdvancedParamValueMap& values)
 {
     QSet<QString> result;
     for (auto it = values.begin(); it != values.end(); ++it)
@@ -795,7 +795,7 @@ QSet<QString> QnPlAreconVisionResource::AvParamitersProvider::set(const QnCamera
 std::vector<QnPlAreconVisionResource::AdvancedParametersProvider*>
     QnPlAreconVisionResource::advancedParametersProviders()
 {
-    return {&m_advancedParamitersProvider};
+    return {&m_advancedParametersProvider};
 }
 
 bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& name, QString &val)

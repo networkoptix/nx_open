@@ -1698,7 +1698,7 @@ std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
     return {&m_advancedParametersProvider};
 }
 
-QnCameraAdvancedParamValueMap QnPlAxisResource::getApiParamiters(const QSet<QString>& ids)
+QnCameraAdvancedParamValueMap QnPlAxisResource::getApiParameters(const QSet<QString>& ids)
 {
     bool success = true;
     const auto params = getParamsByIds(ids);

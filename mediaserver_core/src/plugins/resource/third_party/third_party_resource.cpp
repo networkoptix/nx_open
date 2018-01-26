@@ -76,7 +76,7 @@ std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
     return {&m_advancedParametersProvider};
 }
 
-QnCameraAdvancedParamValueMap QnThirdPartyResource::getApiParamiters(const QSet<QString>& ids)
+QnCameraAdvancedParamValueMap QnThirdPartyResource::getApiParameters(const QSet<QString>& ids)
 {
     QnMutexLocker lk( &m_mutex );
     if( !m_cameraManager3 )

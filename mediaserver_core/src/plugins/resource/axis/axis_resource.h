@@ -69,7 +69,7 @@ public:
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
-    QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
+    QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     virtual QnIOStateDataList ioStates() const override;
@@ -145,7 +145,7 @@ private:
 
     QnWaitCondition m_stopInputMonitoringWaitCondition;
 
-    nx::mediaserver::resource::ApiMultiAdvancedParamitersProvider<QnPlAxisResource> m_advancedParametersProvider;
+    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlAxisResource> m_advancedParametersProvider;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(

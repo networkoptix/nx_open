@@ -792,7 +792,7 @@ QString QnActiResource::getRtspUrl(int actiChannelNum) const
     return url.toString();
 }
 
-QnCameraAdvancedParamValueMap QnActiResource::getApiParamiters(const QSet<QString>& ids)
+QnCameraAdvancedParamValueMap QnActiResource::getApiParameters(const QSet<QString>& ids)
 {
     QnCameraAdvancedParamValueList result;
     bool success = true;

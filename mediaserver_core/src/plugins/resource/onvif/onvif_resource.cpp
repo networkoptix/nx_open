@@ -2533,7 +2533,7 @@ std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
     return {&m_advancedParametersProvider};
 }
 
-QnCameraAdvancedParamValueMap QnPlOnvifResource::getApiParamiters(const QSet<QString>& ids)
+QnCameraAdvancedParamValueMap QnPlOnvifResource::getApiParameters(const QSet<QString>& ids)
 {
     if (m_appStopping)
         return {};
