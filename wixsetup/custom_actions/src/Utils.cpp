@@ -3,6 +3,7 @@
 #include <vector>
 #include <set>
 #include <algorithm>
+#include <iterator>
 
 #define _WINSOCKAPI_
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
