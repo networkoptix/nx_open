@@ -4,7 +4,6 @@
 
 #include <nx/network/cloud/tunnel/cloud_tunnel_connector_executor.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
-#include <nx/network/socket_global.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -27,12 +26,6 @@ class ConnectorExecutor:
     public ::testing::Test
 {
 public:
-    ConnectorExecutor()
-    {
-        SocketGlobals::mediatorConnector().mockupMediatorUrl(
-            QUrl("stun://127.0.0.1:3345"));
-    }
-
     ~ConnectorExecutor()
     {
         stopConnectorExecutor();
