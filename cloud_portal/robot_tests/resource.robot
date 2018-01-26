@@ -26,8 +26,8 @@ Log In
     click button    ${LOG IN BUTTON}
 
 Validate Log In
-    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Element Should Be Visible    ${ACCOUNT DROPDOWN}
+    Wait Until Element Is Visible    ${AUTHORIZED BODY}
+    Element Should Be Visible    ${AUTHORIZED BODY}
 
 Log Out
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
@@ -44,7 +44,6 @@ Register
 
     Wait Until Element Is Visible    ${REGISTER FIRST NAME INPUT}
     Input Text    ${REGISTER FIRST NAME INPUT}    ${first name}
-    sleep    5
     Wait Until Element Is Visible    ${REGISTER LAST NAME INPUT}
     Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
 
