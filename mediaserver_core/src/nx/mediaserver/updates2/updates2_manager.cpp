@@ -126,7 +126,10 @@ void Updates2Manager::atServerStart()
         this, &Updates2Manager::onFileInformationChanged);
     connect(
         qnServerModule->findInstance<Downloader>(), &Downloader::fileStatusChanged,
-        this, &Updates2Manager::onFileStatusChanged);
+        this, &Updates2Manager::onFileInformationStatusChanged);
+    connect(
+        qnServerModule->findInstance<Downloader>(), &Downloader::chunkDownloadFailed,
+        this, &Updates2Manager::onChunkDownloadFailed);
 
     m_timerManager.addNonStopTimer(
         std::bind(&Updates2Manager::checkForRemoteUpdate, this, _1),
@@ -384,7 +387,12 @@ void Updates2Manager::onFileInformationChanged(const FileInformation& fileInform
 
 }
 
-void Updates2Manager::onFileStatusChanged(const FileInformation& fileInformation)
+void Updates2Manager::onFileInformationStatusChanged(const FileInformation& fileInformation)
+{
+
+}
+
+void Updates2Manager::onChunkDownloadFailed(const QString& fileName)
 {
 
 }

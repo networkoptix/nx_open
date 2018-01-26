@@ -69,6 +69,7 @@ signals:
         const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
     void fileStatusChanged(
         const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
+    void chunkDownloadFailed(const QString& fileName);
 
 private:
     QScopedPointer<DownloaderPrivate> const d_ptr;
