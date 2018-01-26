@@ -20,6 +20,9 @@ ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 
 ${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), 'Log Out')]
+${AUTHORIZED BODY}                    //body[@class='authorized']
+${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
+${CREATE ACCOUNT BODY}                //body//a[@href='/register']
 
 #Register Form Elements
 ${REGISTER FIRST NAME INPUT}          //form[@name= 'registerForm']//input[@ng-model='account.firstName']
@@ -69,6 +72,10 @@ ${EDIT PERMISSIONS HINT}              //form[@name='shareForm']//span[contains(@
 #Account Page
 ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-model='account.first_name']
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
+
+#Already logged in modal
+${LOGGED IN CONTINUE BUTTON}          //div[@uib-modal-transclude]//button[@ng-click='ok()']
+${LOGGED IN LOG OUT BUTTON}           //div[@uib-modal-transclude]//button[@ng-click='cancel()']
 
 ${CONTINUE BUTTON}                    //div[@uib-modal-window='modal-window']//button[@ng-class='settings.buttonClass' and @ng-click='ok()']
 ${CONTINUE MODAL}                     //div[@uib-modal-window='modal-window']
