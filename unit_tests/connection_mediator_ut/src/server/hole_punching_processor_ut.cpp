@@ -418,6 +418,16 @@ protected:
         m_settings.load(args.size(), args.data());
     }
 
+    void setClientCloudConnectVersion(api::CloudConnectVersion version)
+    {
+        m_clientCloudConnectVersion = version;
+    }
+
+    api::CloudConnectVersion clientCloudConnectVersion() const
+    {
+        return m_clientCloudConnectVersion;
+    }
+
     void givenSilentServer()
     {
         registerListeningPeer();
@@ -438,6 +448,7 @@ protected:
         m_connectRequest.destinationHostName = m_listeningPeerName;
         m_connectRequest.originatingPeerId = m_originatingPeerName;
         m_connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
+        m_connectRequest.cloudConnectVersion = m_clientCloudConnectVersion;
 
         m_holePunchingProcessor.connect(
             m_originatingPeerConnection,
@@ -502,6 +513,8 @@ private:
     std::shared_ptr<TestClientConnection> m_originatingPeerConnection;
     api::ConnectRequest m_connectRequest;
     boost::optional<ConnectResult> m_prevConnectResponse;
+    api::CloudConnectVersion m_clientCloudConnectVersion =
+        api::kCurrentCloudConnectVersion;
 
     void registerListeningPeer()
     {
@@ -534,25 +547,6 @@ private:
     }
 };
 
-TEST_F(HolePunchingProcessor, connecting_to_server_without_udp_is_ok_if_relay_is_present)
-{
-    emulateRelayPresence();
-    givenSilentServer();
-
-    whenSentConnectRequest();
-
-    thenMediatorReportsResult(api::ResultCode::ok);
-    andNoUdpEndpointIsReported();
-    andRelayUrlIsReported();
-}
-
-TEST_F(HolePunchingProcessor, connecting_to_server_without_udp_is_not_ok_if_relay_is_not_present)
-{
-    givenSilentServer();
-    whenSentConnectRequest();
-    thenMediatorReportsResult(api::ResultCode::noSuitableConnectionMethod);
-}
-
 TEST_F(HolePunchingProcessor, response_to_connect_retransmit)
 {
     givenSilentServer();
@@ -562,6 +556,59 @@ TEST_F(HolePunchingProcessor, response_to_connect_retransmit)
 
     thenMustReceiveResponseToRetransmit();
 }
+
+//-------------------------------------------------------------------------------------------------
+
+class HolePunchingProcessorCorrectlyHandlesServersWithoutUdp:
+    public HolePunchingProcessor,
+    public ::testing::WithParamInterface<api::CloudConnectVersion>
+{
+};
+
+TEST_P(
+    HolePunchingProcessorCorrectlyHandlesServersWithoutUdp,
+    connect_is_successful_if_relay_is_present)
+{
+    emulateRelayPresence();
+    givenSilentServer();
+
+    whenSentConnectRequest();
+
+    thenMediatorReportsResult(api::ResultCode::ok);
+
+    if (clientCloudConnectVersion() >=
+            api::CloudConnectVersion::clientSupportsConnectSessionWithoutUdpEndpoints)
+    {
+        andNoUdpEndpointIsReported();
+    }
+
+    andRelayUrlIsReported();
+}
+
+TEST_P(
+    HolePunchingProcessorCorrectlyHandlesServersWithoutUdp,
+    connect_is_not_successful_if_relay_is_present)
+{
+    givenSilentServer();
+    whenSentConnectRequest();
+    thenMediatorReportsResult(api::ResultCode::noSuitableConnectionMethod);
+}
+
+INSTANTIATE_TEST_CASE_P(
+    BeforeAddingEmptyUdpEndpointListSupportToClient,
+    HolePunchingProcessorCorrectlyHandlesServersWithoutUdp,
+    ::testing::Values(api::CloudConnectVersion::serverChecksConnectionState));
+
+INSTANTIATE_TEST_CASE_P(
+    AfterAddingEmptyUdpEndpointListSupportToClient,
+    HolePunchingProcessorCorrectlyHandlesServersWithoutUdp,
+    ::testing::Values(
+        api::CloudConnectVersion::clientSupportsConnectSessionWithoutUdpEndpoints));
+
+INSTANTIATE_TEST_CASE_P(
+    CurrentClient,
+    HolePunchingProcessorCorrectlyHandlesServersWithoutUdp,
+    ::testing::Values(api::kCurrentCloudConnectVersion));
 
 } // namespace test
 } // namespace hpm
