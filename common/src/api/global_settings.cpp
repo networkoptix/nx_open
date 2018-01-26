@@ -89,6 +89,10 @@ namespace
     const QString kMaxRemoteArchiveSynchronizationThreads(
         lit("maxRemoteArchiveSynchronizationThreads"));
     const int kMaxRemoteArchiveSynchronizationThreadsDefault(-1);
+
+    const QString kMaxWearableArchiveSynchronizationThreads(
+        lit("maxWearableArchiveSynchronizationThreads"));
+    const int kMaxWearableArchiveSynchronizationThreadsDefault(-1);
 }
 
 using namespace nx::settings_names;
@@ -432,6 +436,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kMaxRemoteArchiveSynchronizationThreadsDefault,
         this);
 
+    m_maxWearableArchiveSynchronizationThreads = new QnLexicalResourcePropertyAdaptor<int>(
+        kMaxWearableArchiveSynchronizationThreads,
+        kMaxWearableArchiveSynchronizationThreadsDefault,
+        this);
+
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
 
@@ -490,6 +499,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_cloudConnectRelayingEnabledAdaptor
         << m_edgeRecordingEnabledAdaptor
         << m_maxRemoteArchiveSynchronizationThreads
+        << m_maxWearableArchiveSynchronizationThreads
         ;
 
     if (m_hanwhaDeleteProfilesOnInitIfNeeded)
@@ -1120,6 +1130,16 @@ int QnGlobalSettings::maxRemoteArchiveSynchronizationThreads() const
 void QnGlobalSettings::setMaxRemoteArchiveSynchronizationThreads(int newValue)
 {
     m_maxRemoteArchiveSynchronizationThreads->setValue(newValue);
+}
+
+int QnGlobalSettings::maxWearableArchiveSynchronizationThreads() const
+{
+    return m_maxWearableArchiveSynchronizationThreads->value();
+}
+
+void QnGlobalSettings::setMaxWearableArchiveSynchronizationThreads(int newValue)
+{
+    m_maxWearableArchiveSynchronizationThreads->setValue(newValue);
 }
 
 std::chrono::seconds QnGlobalSettings::proxyConnectTimeout() const

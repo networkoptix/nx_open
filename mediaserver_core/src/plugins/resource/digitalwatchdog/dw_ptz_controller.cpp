@@ -19,19 +19,25 @@ QnDwPtzController::QnDwPtzController(const QnDigitalWatchdogResourcePtr &resourc
 void QnDwPtzController::updateFlipState() {
     Qt::Orientations flip = 0;
 
-    QString flipValue;
-    if(m_resource->getParamPhysical(flipParamId, flipValue)) {
-        if (flipValue.toInt() == 1)
+    const auto flipValue = m_resource->getAdvancedParameter(flipParamId);
+    if (flipValue)
+    {
+        if (flipValue->toInt() == 1)
             flip ^= Qt::Vertical | Qt::Horizontal;
-    } else {
+    }
+    else
+    {
         return;
     }
 
-    QString mirrorValue;
-    if (m_resource->getParamPhysical(mirrirParamId, mirrorValue)) {
-        if (mirrorValue.toInt() == 1)
+    const auto mirrorValue = m_resource->getAdvancedParameter(mirrirParamId);
+    if (mirrorValue)
+    {
+        if (mirrorValue->toInt() == 1)
             flip ^= Qt::Horizontal;
-    } else {
+    }
+    else
+    {
         return;
     }
 

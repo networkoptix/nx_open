@@ -19,6 +19,8 @@ public:
     QString name() const;
     const QnMediaServerResourcePtr server() const;
 
+    virtual void accept() override;
+
 private:
     QScopedPointer<Ui::NewWearableCameraDialog> ui;
     QnResourceListModel* m_model = nullptr;

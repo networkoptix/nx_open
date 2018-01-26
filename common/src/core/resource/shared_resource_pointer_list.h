@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iterator>
+#include <initializer_list>
 
 #include <QtCore/QList>
 #include <QtCore/QtAlgorithms>
@@ -14,6 +15,18 @@ class QnSharedResourcePointerList: public QList<QnSharedResourcePointer<Resource
 
 public:
     QnSharedResourcePointerList() {}
+
+    QnSharedResourcePointerList(std::initializer_list<QnSharedResourcePointer<Resource>> other):
+        base_type(other)
+    {
+    }
+
+    template<class OtherResource>
+    QnSharedResourcePointerList(std::initializer_list<QnSharedResourcePointer<OtherResource>> other)
+    {
+        this->reserve(other.size());
+        std::copy(other.begin(), other.end(), std::back_inserter(*this));
+    }
 
     QnSharedResourcePointerList(const QList<QnSharedResourcePointer<Resource> > &other): base_type(other) {}
 

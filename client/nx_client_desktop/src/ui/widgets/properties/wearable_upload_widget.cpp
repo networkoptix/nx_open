@@ -25,13 +25,6 @@ QnWearableUploadWidget::QnWearableUploadWidget(QWidget* parent):
                 menu()->trigger(ui::action::UploadWearableCameraFileAction, m_camera);
         }
     );
-
-    connect(qnClientModule->wearableManager(), &WearableManager::progress, this,
-        [this](qreal progress)
-        {
-            ui->uploadProgressBar->setValue(progress * 100);
-        }
-    );
 }
 
 QnWearableUploadWidget::~QnWearableUploadWidget()

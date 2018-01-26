@@ -70,6 +70,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->wearableUploadWidget->initializeContext(this);
+    ui->wearableProgressWidget->initializeContext(this);
+    ui->wearableArchiveLengthWidget->initializeContext(this);
     ui->licensingWidget->initializeContext(this);
     ui->cameraScheduleWidget->initializeContext(this);
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
@@ -202,6 +204,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
         ui->macAddressLabel,
         ui->loginLabel,
         ui->passwordLabel });
+    aligner->addAligner(ui->wearableArchiveLengthWidget->aligner());
 }
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget()
@@ -243,6 +246,8 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     ui->cameraScheduleWidget->setCameras(cameras);
     ui->licensingWidget->setCameras(cameras);
     ui->wearableUploadWidget->setCamera(camera);
+    ui->wearableProgressWidget->setCamera(camera);
+    ui->wearableArchiveLengthWidget->updateFromResources(cameras);
 
     if (m_camera)
     {
@@ -439,11 +444,36 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         ui->motionSensitivityGroupBox->setEnabled(false);
         ui->motionControlsWidget->setVisible(false);
         ui->motionAvailableLabel->setVisible(true);
+        ui->wearableUploadWidget->setVisible(false);
+        ui->wearableProgressWidget->setVisible(false);
     }
     else
     {
+        bool isWearable = m_camera->hasFlags(Qn::wearable_camera);
         bool hasVideo = m_camera->hasVideo(0);
         bool hasAudio = m_camera->isAudioSupported();
+
+        ui->wearableUploadWidget->setVisible(isWearable);
+        ui->wearableProgressWidget->setVisible(isWearable);
+        ui->modelEdit->setVisible(!isWearable);
+        ui->modelLabel->setVisible(!isWearable);
+        ui->firmwareEdit->setVisible(!isWearable);
+        ui->firmwareLabel->setVisible(!isWearable);
+        ui->vendorEdit->setVisible(!isWearable);
+        ui->vendorLabel->setVisible(!isWearable);
+        ui->addressGroupBox->setVisible(!isWearable);
+        ui->authenticationGroupBox->setVisible(!isWearable);
+
+        if (isWearable)
+        {
+            ui->addressOrArchiveLengthWidget->setCurrentWidget(ui->wearableArchiveLengthPage);
+            ui->authenticationOrWearableInfoWidget->setCurrentWidget(ui->wearableInfoPage);
+        }
+        else
+        {
+            ui->addressOrArchiveLengthWidget->setCurrentWidget(ui->addressPage);
+            ui->authenticationOrWearableInfoWidget->setCurrentWidget(ui->authenticationPage);
+        }
 
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
@@ -462,13 +492,13 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         const bool dtsBased = m_camera->isDtsBased();
         const bool isIoModule = m_camera->isIOModule();
 
-        setTabEnabledSafe(Qn::AdvancedCameraSettingsTab, !m_lockedMode);
-        setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased && (hasAudio || hasVideo) && !m_lockedMode);
-        setTabEnabledSafe(Qn::MotionSettingsTab, !dtsBased && hasVideo && !m_lockedMode);
-        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo && !isReadOnly() && !m_lockedMode);
-        setTabEnabledSafe(Qn::IOPortsSettingsTab, isIoModule && !m_lockedMode);
-        setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, !isIoModule && !m_lockedMode);
-
+        setTabEnabledSafe(Qn::AdvancedCameraSettingsTab, !m_lockedMode  && !isWearable);
+        setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased && (hasAudio || hasVideo) && !m_lockedMode  && !isWearable);
+        setTabEnabledSafe(Qn::MotionSettingsTab, !dtsBased && hasVideo && !m_lockedMode  && !isWearable);
+        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo && !isReadOnly() && !m_lockedMode  && !isWearable);
+        setTabEnabledSafe(Qn::IOPortsSettingsTab, isIoModule && !m_lockedMode  && !isWearable);
+        setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, !isIoModule && !m_lockedMode  && !isWearable);
+        setTabEnabledSafe(Qn::AdvancedCameraSettingsTab, !isWearable && !m_lockedMode  && !isWearable);
 
         if (!dtsBased)
         {

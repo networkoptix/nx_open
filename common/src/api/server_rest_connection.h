@@ -155,6 +155,20 @@ public:
         GetCallback callback,
         QThread* targetThread = nullptr);
 
+    /**
+     * Creates a new file upload that you can upload chunks into via `uploadFileChunk` function.
+     *
+     * A quick note on TTL. Countdown normally starts once you've uploaded the whole file, but
+     * since clients are unreliable and might stop an upload prematurely, the server actually
+     * restarts the countdown after each mutating command.
+     *
+     * @param fileName                  Unique file name that will be used in other calls.
+     * @param size                      Size of the file, in bytes.
+     * @param chunkSize                 Size of a single chunk as will be used in succeeding
+     *                                  `uploadFileChunk` calls.
+     * @param md5                       MD5 hash of the file, as text (32-character hex string).
+     * @param ttl                       TTL for the upload, in milliseconds. Pass 0 for infinity.
+     */
     Handle addFileUpload(
         const QString& fileName,
         qint64 size,

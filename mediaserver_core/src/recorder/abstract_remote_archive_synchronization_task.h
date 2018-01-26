@@ -6,6 +6,7 @@
 
 #include <nx/mediaserver/server_module_aware.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -22,7 +23,7 @@ public:
 
     virtual ~AbstractRemoteArchiveSynchronizationTask() {};
     virtual QnUuid id() const = 0;
-    virtual void setDoneHandler(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+    virtual void setDoneHandler(nx::utils::MoveOnlyFunc<void()> handler) = 0; // TODO #wearable Unused! Drop!
     virtual void cancel() = 0;
     virtual bool execute() = 0;
 };

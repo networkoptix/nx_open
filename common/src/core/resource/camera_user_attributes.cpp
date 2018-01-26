@@ -15,7 +15,7 @@ QnCameraUserAttributes::QnCameraUserAttributes()
     scheduleDisabled(true),
     audioEnabled(false),
     cameraControlDisabled(false),
-    secondaryQuality(Qn::SSQualityMedium),
+    disableDualStreaming(false),
     minDays(0),
     maxDays(0),
     failoverPriority(Qn::FP_Medium),

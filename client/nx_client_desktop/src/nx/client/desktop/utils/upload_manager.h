@@ -5,11 +5,13 @@
 #include <core/resource/resource_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 
-#include "upload_worker.h"
+#include "file_upload.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
+
+class UploadWorker;
 
 class UploadManager: public QObject
 {
