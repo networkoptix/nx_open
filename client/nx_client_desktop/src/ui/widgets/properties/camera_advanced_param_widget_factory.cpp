@@ -186,8 +186,11 @@ public:
 
     void setRange(const QStringList& range)
     {
+        const QString previousValue = m_comboBox->currentText();
         m_comboBox->clear();
         m_comboBox->addItems(range);
+        if (m_comboBox->findText(previousValue) != -1)
+            setValue(previousValue);
     }
 
     virtual QString value() const override
@@ -197,6 +200,8 @@ public:
 
     virtual void setValue(const QString& newValue) override
     {
+        if (m_comboBox->findText(newValue) == -1)
+            m_comboBox->addItem(newValue);
         m_comboBox->setCurrentText(newValue);
     }
 

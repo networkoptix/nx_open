@@ -40,12 +40,16 @@ void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)
 
 }
 
-CameraDiagnostics::Result QnPlIqResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnPlIqResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex /*streamIndex*/)
 {
-    QnPhysicalCameraResource::initInternal();
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
 
+CameraDiagnostics::Result QnPlIqResource::initializeCameraDriver()
+{
     updateDefaultAuthIfEmpty(lit("root"), lit("system"));
-
 
     const CLHttpStatus status = setOID(QLatin1String("1.2.6.5"), QLatin1String("1")); // Reset crop to maximum size
     switch( status )

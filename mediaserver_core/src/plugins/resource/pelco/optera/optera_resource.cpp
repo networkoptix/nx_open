@@ -9,6 +9,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <common/static_common_module.h>
+#include <plugins/resource/onvif/onvif_stream_reader.h>
 
 namespace
 {
@@ -78,7 +79,13 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
     return m_videoLayout;
 }
 
-CameraDiagnostics::Result QnOpteraResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnOpteraResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex streamIndex)
+{
+    return base_type::getStreamCapabilityMapFromDrives(streamIndex);
+}
+
+CameraDiagnostics::Result QnOpteraResource::initializeCameraDriver()
 {
     QString urlStr = getUrl();
 
@@ -95,7 +102,7 @@ CameraDiagnostics::Result QnOpteraResource::initInternal()
         .toInt();
 
     if (firmwareVersion < kMinimumTiledModeFirmwareVersion)
-        return base_type::initInternal();
+        return base_type::initializeCameraDriver();
 
     if (auth.isNull())
     {
@@ -120,7 +127,7 @@ CameraDiagnostics::Result QnOpteraResource::initInternal()
     currentStitchingMode = getCurrentStitchingMode(response);
 
     if (currentStitchingMode == kTiledMode)
-        return base_type::initInternal();
+        return base_type::initializeCameraDriver();
 
     status = makeSetStitchingModeRequest(http, kTiledMode);
 
@@ -138,7 +145,12 @@ QnAbstractStreamDataProvider* QnOpteraResource::createLiveDataProvider()
     if (!isInitialized())
         return nullptr;
 
-    return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer());
+    return new nx::plugins::utils::MultisensorDataProvider(
+        toSharedPointer(this),
+        [](const QnResourcePtr& resource)
+    {
+        return new QnOnvifStreamReader(resource);
+    });
 }
 
 

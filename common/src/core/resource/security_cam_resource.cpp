@@ -39,11 +39,11 @@ static const int kSharePixelsDefaultReservedSecondStreamFps = 0;
 static const Qn::StreamFpsSharingMethod kDefaultStreamFpsSharingMethod = Qn::PixelsFpsSharing;
 //static const Qn::MotionType defaultMotionType = Qn::MT_MotionWindow;
 
-static const int kDefaultSecondStreamFpsLow = 2;
-static const int kDefaultSecondStreamFpsMedium = 7;
-static const int kDefaultSecondStreamFpsHigh = 12;
-
 } // namespace
+
+const int QnSecurityCamResource::kDefaultSecondStreamFpsLow = 2;
+const int QnSecurityCamResource::kDefaultSecondStreamFpsMedium = 7;
+const int QnSecurityCamResource::kDefaultSecondStreamFpsHigh = 12;
 
 QnUuid QnSecurityCamResource::makeCameraIdFromUniqueId(const QString& uniqueId)
 {
@@ -64,7 +64,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_manuallyAdded(false),
     m_cachedLicenseType([this] { return calculateLicenseType(); }, &m_mutex),
     m_cachedHasDualStreaming2(
-        [this]()->bool{ return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse; },
+        [this]()->bool{ return hasDualStreaming() && !isDualStreamingDisabled(); },
         &m_mutex ),
     m_cachedSupportedMotionType(
         std::bind( &QnSecurityCamResource::calculateSupportedMotionType, this ),
@@ -596,7 +596,7 @@ void QnSecurityCamResource::inputPortListenerAttached()
     const int inputPortListenerCount = m_inputPortListenerCount.fetchAndAddOrdered( 1 );
     if( isInitialized() && (inputPortListenerCount == 0) )
         startInputPortMonitoringAsync( std::function<void(bool)>() );
-    //if resource is not initialized, input port monitoring will start just after initInternal completion
+    //if resource is not initialized, input port monitoring will start just after init() completion
 }
 
 void QnSecurityCamResource::inputPortListenerDetached()
@@ -1089,23 +1089,23 @@ Qn::CameraBackupQualities QnSecurityCamResource::getActualBackupQualities() cons
     return value;
 }
 
-void QnSecurityCamResource::setSecondaryStreamQuality(Qn::SecondStreamQuality quality)
+void QnSecurityCamResource::setDisableDualStreaming(bool value)
 {
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
-        if ((*userAttributesLock)->secondaryQuality == quality)
+        if ((*userAttributesLock)->disableDualStreaming == value)
             return;
-        (*userAttributesLock)->secondaryQuality = quality;
+        (*userAttributesLock)->disableDualStreaming = value;
     }
 
     m_cachedHasDualStreaming2.reset();
-    emit secondaryStreamQualityChanged(toSharedPointer());
+    emit disableDualStreamingChanged(toSharedPointer());
 }
 
-Qn::SecondStreamQuality QnSecurityCamResource::secondaryStreamQuality() const
+bool QnSecurityCamResource::isDualStreamingDisabled() const
 {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
-    return (*userAttributesLock)->secondaryQuality;
+    return (*userAttributesLock)->disableDualStreaming;
 }
 
 void QnSecurityCamResource::setCameraControlDisabled(bool value)
@@ -1124,28 +1124,22 @@ bool QnSecurityCamResource::isCameraControlDisabled() const
     return (*userAttributesLock)->cameraControlDisabled;
 }
 
-int QnSecurityCamResource::desiredSecondStreamFps() const
+int QnSecurityCamResource::defaultSecondaryFps(Qn::StreamQuality quality) const
 {
-    switch (secondaryStreamQuality())
+    switch (quality)
     {
-        case Qn::SSQualityMedium:
+        case Qn::QualityLowest:
+        case Qn::QualityLow:
             return kDefaultSecondStreamFpsMedium;
-        case Qn::SSQualityLow:
+        case Qn::QualityNormal:
             return kDefaultSecondStreamFpsLow;
-        case Qn::SSQualityHigh:
+        case Qn::QualityHigh:
+        case Qn::QualityHighest:
             return kDefaultSecondStreamFpsHigh;
         default:
             break;
     }
     return kDefaultSecondStreamFpsMedium;
-}
-
-Qn::StreamQuality QnSecurityCamResource::getSecondaryStreamQuality() const
-{
-    if (secondaryStreamQuality() != Qn::SSQualityHigh)
-        return Qn::QualityLowest;
-    else
-        return Qn::QualityNormal;
 }
 
 Qn::CameraStatusFlags QnSecurityCamResource::statusFlags() const
@@ -1274,8 +1268,6 @@ Qn::MotionTypes QnSecurityCamResource::calculateSupportedMotionType() const
         else if (s1 == lit("motionwindow"))
             result |= Qn::MT_MotionWindow;
     }
-    //if ((!hasDualStreaming() || secondaryStreamQuality() == Qn::SSQualityDontUse) && !(getCameraCapabilities() &  Qn::PrimaryStreamSoftMotionCapability))
-    //    result &= ~Qn::MT_SoftwareGrid;
 
     return result;
 }
@@ -1345,7 +1337,7 @@ void QnSecurityCamResource::analyticsEventEnded(const QString& caption, const QS
         qnSyncTime->currentMSecsSinceEpoch());
 }
 
-float QnSecurityCamResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
+float QnSecurityCamResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps)
 {
     float lowEnd = 0.1f;
     float hiEnd = 1.0f;
@@ -1371,7 +1363,7 @@ bool QnSecurityCamResource::doesEventComeFromAnalyticsDriver(nx::vms::event::Eve
     return eventType == nx::vms::event::EventType::analyticsSdkEvent;
 }
 
-int QnSecurityCamResource::suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
+int QnSecurityCamResource::suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
 {
     if (streamParams.bitrateKbps > 0)
     {
@@ -1381,7 +1373,7 @@ int QnSecurityCamResource::suggestBitrateKbps(const QSize& resolution, const QnL
             result = qBound(streamCapability.minBitrateKbps, result, streamCapability.maxBitrateKbps);
         return result;
     }
-    return suggestBitrateForQualityKbps(streamParams.quality, resolution, streamParams.fps, role);
+    return suggestBitrateForQualityKbps(streamParams.quality, streamParams.resolution, streamParams.fps, role);
 }
 
 int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
