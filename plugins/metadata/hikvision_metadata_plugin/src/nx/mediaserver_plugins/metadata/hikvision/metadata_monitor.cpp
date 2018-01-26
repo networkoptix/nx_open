@@ -108,9 +108,9 @@ nx::utils::Url HikvisionMetadataMonitor::buildMonitoringUrl(
     return monitorUrl;
 }
 
-QUrl HikvisionMetadataMonitor::buildLprUrl(const QUrl& resourceUrl) const
+nx::utils::Url HikvisionMetadataMonitor::buildLprUrl(const nx::utils::Url& resourceUrl) const
 {
-    QUrl lprUrl(resourceUrl);
+    nx::utils::Url lprUrl(resourceUrl);
     lprUrl.setPath(kLprUrlTemplate);
     return lprUrl;
 }
@@ -137,7 +137,7 @@ void HikvisionMetadataMonitor::initEventMonitor()
     httpClient->setUserPassword(m_auth.password());
     httpClient->setMessageBodyReadTimeout(kKeepAliveTimeout);
 
-    m_contentParser = std::make_unique<nx_http::MultipartContentParser>();
+    m_contentParser = std::make_unique<nx::network::http::MultipartContentParser>();
     m_contentParser->setNextFilter(std::make_shared<BytestreamFilter>(m_manifest, this));
 
     m_monitorHttpClient = std::move(httpClient);
@@ -146,13 +146,13 @@ void HikvisionMetadataMonitor::initEventMonitor()
 
 void HikvisionMetadataMonitor::initLprMonitor()
 {
-    auto httpClient = std::make_unique<nx_http::AsyncClient>();
+    auto httpClient = std::make_unique<nx::network::http::AsyncClient>();
     m_lprTimer.pleaseStopSync();
     httpClient->bindToAioThread(m_lprTimer.getAioThread());
 
     httpClient->setOnDone([this]() { at_LprRequestDone(); });
 
-    httpClient->setTotalReconnectTries(nx::network::http::AsyncClient::kUnlimitedReconnectTries);
+    httpClient->setTotalReconnectTries(nx::network::http::AsyncClient::UNLIMITED_RECONNECT_TRIES);
     httpClient->setUserName(m_auth.user());
     httpClient->setUserPassword(m_auth.password());
     httpClient->setMessageBodyReadTimeout(kKeepAliveTimeout);
@@ -165,7 +165,7 @@ void HikvisionMetadataMonitor::sendLprRequest()
     static const QString kLprRequest("<AfterTime><picTime>%1</picTime></AfterTime>");
     QByteArray requestBody = kLprRequest.arg(m_fromDateFilter).toLatin1();
     m_lprHttpClient->setRequestBody(
-        std::make_unique<nx_http::BufferSource>(
+        std::make_unique<nx::network::http::BufferSource>(
             Qn::serializationFormatToHttpContentType(Qn::XmlFormat),
             std::move(requestBody)));
     m_lprHttpClient->doPost(m_lprUrl);
@@ -189,7 +189,7 @@ void HikvisionMetadataMonitor::at_LprRequestDone()
         return;
 
     const auto response = m_lprHttpClient->response();
-    if (!response || response->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (!response || response->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
         reopenLprConnection();
         return;

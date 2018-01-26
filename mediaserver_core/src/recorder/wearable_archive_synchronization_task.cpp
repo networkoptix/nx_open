@@ -3,9 +3,9 @@
 #include <nx/utils/random.h>
 #include <nx/utils/log/log.h>
 #include <nx/streaming/archive_stream_reader.h>
-#include <plugins/storage/memory/ext_iodevice_storage.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/storage/memory/ext_iodevice_storage.h>
+#include <core/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_resource.h>
 #include <core/resource/security_cam_resource.h>
 
 #include "server_edge_stream_recorder.h"

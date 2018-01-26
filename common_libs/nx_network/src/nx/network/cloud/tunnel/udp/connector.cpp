@@ -77,9 +77,9 @@ void TunnelConnector::connect(
         NX_LOGX(lm("cross-nat %1. mediator reported empty UDP address list for host %2")
             .arg(m_connectSessionId).arg(m_targetHostAddress.host.toString()),
             cl_logDEBUG1);
-        return holePunchingDone(
+        return post(std::bind(&TunnelConnector::holePunchingDone, this,
             api::NatTraversalResultCode::targetPeerHasNoUdpAddress,
-            SystemError::connectionReset);
+            SystemError::connectionReset));
     }
 
     for (const SocketAddress& endpoint: response.udpEndpointList)
@@ -246,8 +246,8 @@ void TunnelConnector::holePunchingDone(
             std::move(m_udtConnection));
     }
 
-    auto completionHandler = std::move(m_completionHandler);
-    completionHandler(
+    nx::utils::swapAndCall(
+        m_completionHandler,
         resultCode,
         sysErrorCode,
         std::move(tunnelConnection));

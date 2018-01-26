@@ -132,7 +132,7 @@ const char* Manager::capabilitiesManifest(Error* error)
     return m_deviceManifest.constData();
 }
 
-void HanwhaMetadataManager::freeManifest(const char* data)
+void Manager::freeManifest(const char* data)
 {
 }
 

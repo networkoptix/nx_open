@@ -65,10 +65,10 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
 nx::sdk::Error Manager::setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler)
 {
     m_handler = handler;
-    return Error::noError;
+    return nx::sdk::Error::noError;
 }
 
-Error Manager::startFetchingMetadata(nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
+nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
 {
     m_monitor = new Monitor(this, m_url, m_auth, m_handler);
     return m_monitor->startMonitoring(eventTypeList, eventTypeListSize);

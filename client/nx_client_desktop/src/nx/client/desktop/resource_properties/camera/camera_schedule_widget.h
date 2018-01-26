@@ -96,7 +96,7 @@ private:
     void at_exportScheduleButton_clicked();
 
     void setScheduleAlert(const QString& scheduleAlert);
-    void emitAlert();
+    void setArchiveLengthAlert(const QString& archiveLengthAlert);
 
 private:
     /**

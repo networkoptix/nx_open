@@ -300,7 +300,7 @@
     #include "nx1/info.h"
 #endif
 
-#include "ini.h"
+#include "mediaserver_ini.h"
 
 
 using namespace nx;

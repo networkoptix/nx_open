@@ -216,23 +216,6 @@ if(withNxTool)
 endif()
 
 if(withTests)
-    set(_build_shared_libs ${BUILD_SHARED_LIBS})
-    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-
-    # Prevent overriding the parent project's compiler/linker settings on Windows.
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-    add_subdirectory(${CMAKE_SOURCE_DIR}/artifacts/googletest)
-
-    unset(BUILD_SHARED_LIBS CACHE)
-    set(BUILD_SHARED_LIBS ${_build_shared_libs})
-    unset(_build_shared_libs)
-
-    add_library(GTest INTERFACE)
-    target_link_libraries(GTest INTERFACE gtest gtest_main)
-    add_library(GMock INTERFACE)
-    target_link_libraries(GMock INTERFACE gmock gmock_main)
-
     add_subdirectory(unit_tests)
     add_subdirectory(tests)
 endif()

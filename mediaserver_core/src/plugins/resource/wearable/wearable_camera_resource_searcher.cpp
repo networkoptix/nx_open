@@ -55,7 +55,7 @@ QnResourceList QnWearableCameraResourceSearcher::findResources()
     return {};
 }
 
-QList<QnResourcePtr> QnWearableCameraResourceSearcher::checkHostAddr(const QUrl&, const QAuthenticator&, bool)
+QList<QnResourcePtr> QnWearableCameraResourceSearcher::checkHostAddr(const nx::utils::Url&, const QAuthenticator&, bool)
 {
     return {};
 }

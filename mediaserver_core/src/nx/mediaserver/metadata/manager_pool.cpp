@@ -1,6 +1,7 @@
 #include "manager_pool.h"
 
 #include <memory>
+#include <tuple>
 
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
@@ -30,7 +31,7 @@ namespace api {
 
 uint qHash(const AnalyticsEventType& t)
 {
-    return qHash(t.eventTypeId.toByteArray());
+    return qHash(t.typeId.toByteArray());
 }
 
 } // namespace api
@@ -211,7 +212,7 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
 
         boost::optional<nx::api::AnalyticsDeviceManifest> managerManifest;
         boost::optional<nx::api::AnalyticsDriverManifest> auxiliaryPluginManifest;
-        std::tie(managerManifest, auxiliaryPluginManifest) = loadManagerManifest(manager, camera);
+        std::tie(managerManifest, auxiliaryPluginManifest) = loadManagerManifest(manager.get(), camera);
         if (managerManifest)
         {
             addManifestToCamera(*managerManifest, camera);
@@ -401,7 +402,7 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
 
 uint qHash(const nx::api::AnalyticsEventType& t)// noexcept
 {
-    return qHash(t.eventTypeId.toByteArray());
+    return qHash(t.typeId.toByteArray());
 }
 
 boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifest(
@@ -429,7 +430,7 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifes
     {
         NX_ERROR(
             this,
-            lm("Cannot deserialize plugin manifest from plugin %1").arg(pluginManifest->name()));
+            lm("Cannot deserialize plugin manifest from plugin %1").arg(plugin->name()));
         return boost::none; //< Error already logged.
     }
     return pluginManifest;
@@ -484,7 +485,7 @@ void ManagerPool::mergePluginManifestToServer(
 #if defined _DEBUG
     // Sometimes in debug purposes we need do clean existingManifest.outputEventTypes list.
     if (!manifest.outputEventTypes.empty() &&
-        manifest.outputEventTypes.front().eventTypeId == nx::api::kResetPluginManifestEventId)
+        manifest.outputEventTypes.front().typeId == nx::api::kResetPluginManifestEventId)
     {
         it->outputEventTypes.clear();
     }
@@ -492,7 +493,6 @@ void ManagerPool::mergePluginManifestToServer(
 
     server->setAnalyticsDrivers(existingManifests);
     server->saveParams();
-    return pluginManifest;
 }
 
 std::pair<
@@ -546,7 +546,7 @@ ManagerPool::loadManagerManifest(
             std::back_inserter(deviceManifest->supportedEventTypes),
             [](const nx::api::AnalyticsEventType& driverManifestElement)
             {
-                return driverManifestElement.eventTypeId;
+                return driverManifestElement.typeId;
             });
         return std::make_pair(deviceManifest, driverManifest);
     }

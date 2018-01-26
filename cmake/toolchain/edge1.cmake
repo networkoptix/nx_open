@@ -13,7 +13,6 @@ string(APPEND common_link_flags " -latomic")
 string(APPEND common_link_flags " -O1")
 set(CMAKE_EXE_LINKER_FLAGS_INIT "${common_link_flags}")
 set(CMAKE_SHARED_LINKER_FLAGS_INIT "${common_link_flags}")
-set(CMAKE_MODULE_LINKER_FLAGS_INIT "${common_link_flags}")
 
 set(common_c_flags "-mcpu=cortex-a9 -mfpu=vfpv3 -mfpu=neon")
 string(APPEND common_c_flags " -I${zlib_dir}/include")

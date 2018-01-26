@@ -24,7 +24,7 @@ using namespace nx::client::desktop::ui;
 QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget* parent):
     base_type(parent),
     QnUpdatable(),
-    QnWorkbenchContextAware(parent, true),
+    QnWorkbenchContextAware(parent, InitializationMode::lazy),
     ui(new Ui::ArchiveLengthWidget),
     m_readOnly(false)
 {
