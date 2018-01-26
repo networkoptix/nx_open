@@ -45,7 +45,6 @@ endif()
 
 if(box MATCHES "isd|edge1")
     set(enableAllVendors OFF)
-    remove_definitions(-DENABLE_SOFTWARE_MOTION_DETECTION)
     add_definitions(-DEDGE_SERVER)
 endif()
 
