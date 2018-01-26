@@ -15,8 +15,8 @@
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/common/read_only.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_resource.h>
 #include <api/server_rest_connection.h>
 
 #include <client/client_module.h>
@@ -88,7 +88,9 @@ void QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered()
     if (!commonModule()->currentServer())
         return;
 
-    std::unique_ptr<QnNewWearableCameraDialog> dialog = std::make_unique<QnNewWearableCameraDialog>(mainWindow());
+    std::unique_ptr<QnNewWearableCameraDialog> dialog
+        = std::make_unique<QnNewWearableCameraDialog>(mainWindowWidget());
+
     if (dialog->exec() != QDialog::Accepted)
         return;
 
@@ -105,7 +107,7 @@ void QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered()
             if (!success)
             {
                 QnMessageBox::critical(
-                    mainWindow(),
+                    mainWindowWidget(),
                     tr("Could not add wearable camera to server \"%1\".").arg(server->getName())
                 );
                 return;
@@ -133,7 +135,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     QnMediaServerResourcePtr server = camera->getParentServer();
 
     QString fileName = QnFileDialog::getOpenFileName(
-        mainWindow(),
+        mainWindowWidget(),
         tr("Open Wearable Camera Recording..."),
         QString(),
         tr("All files (*.*)"),
@@ -150,7 +152,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     if (!opened || !delegate->hasVideo() || resource->hasFlags(Qn::still_image))
     {
         QnMessageBox::critical(
-            mainWindow(),
+            mainWindowWidget(),
             tr("File \"%1\" is not a video file.").arg(fileName)
         );
         return;
@@ -180,7 +182,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     if (upload.status == FileUpload::Error)
     {
         QnMessageBox::critical(
-            mainWindow(),
+            mainWindowWidget(),
             upload.errorMessage
         );
         return;

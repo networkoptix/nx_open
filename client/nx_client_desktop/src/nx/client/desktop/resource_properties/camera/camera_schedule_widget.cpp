@@ -357,7 +357,7 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent):
         &CameraScheduleWidget::at_exportScheduleButton_clicked);
 
     connect(ui->archiveLengthWidget, &QnArchiveLengthWidget::alertChanged, this,
-        &QnCameraScheduleWidget::emitAlert);
+        &nx::client::desktop::CameraScheduleWidget::alert);
     connect(ui->archiveLengthWidget, &QnArchiveLengthWidget::changed, this,
         notifyAboutArchiveRangeChanged);
 
@@ -1453,7 +1453,7 @@ void CameraScheduleWidget::setScheduleAlert(const QString& scheduleAlert)
 {
     /* We want to force update - emit a signal - even if the text didn't change: */
     m_scheduleAlert = scheduleAlert;
-    emitAlert();
+    emit alert(m_scheduleAlert);
 }
 
 void CameraScheduleWidget::setArchiveLengthAlert(const QString& archiveLengthAlert)

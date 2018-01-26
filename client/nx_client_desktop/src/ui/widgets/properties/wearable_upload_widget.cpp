@@ -13,7 +13,7 @@ using namespace nx::client::desktop;
 
 QnWearableUploadWidget::QnWearableUploadWidget(QWidget* parent):
     QWidget(parent),
-    QnWorkbenchContextAware(parent, true),
+    QnWorkbenchContextAware(parent, InitializationMode::lazy),
     ui(new Ui::WearableUploadWidget)
 {
     ui->setupUi(this);
