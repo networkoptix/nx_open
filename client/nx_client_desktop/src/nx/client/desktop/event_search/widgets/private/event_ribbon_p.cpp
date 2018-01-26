@@ -590,12 +590,18 @@ void EventRibbon::Private::doUpdateView()
 
     updateCurrentShifts();
 
+    static constexpr int kWidthThreshold = 200;
+    const auto mode = m_viewport->width() > kWidthThreshold
+        ? EventTile::Mode::wide
+        : EventTile::Mode::standard;
+
     while (iter != m_tiles.end() && currentPosition < positionLimit)
     {
         const auto tile = *iter;
         m_positions[tile] = currentPosition;
         currentPosition += m_currentShifts.value(iter - m_tiles.cbegin());
         tile->setGeometry(0, currentPosition - base, m_viewport->width(), calculateHeight(tile));
+        tile->setMode(mode);
         tile->setVisible(true);
         newVisible.insert(tile);
         currentPosition += tile->height() + kDefaultTileSpacing;
