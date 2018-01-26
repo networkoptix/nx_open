@@ -29,12 +29,6 @@ class ConnectorExecutor:
     public ::testing::Test
 {
 public:
-    ConnectorExecutor()
-    {
-        SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
-            nx::utils::Url("stun://127.0.0.1:3345"));
-    }
-
     ~ConnectorExecutor()
     {
         stopConnectorExecutor();
