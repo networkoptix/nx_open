@@ -428,7 +428,6 @@ void Worker::requestFileInformationInternal()
 
 void Worker::setShouldWaitForCb()
 {
-    m_delay = 0;
     m_shouldWait = true;
 }
 

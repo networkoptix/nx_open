@@ -147,7 +147,6 @@ private:
     };
 
     bool m_shouldWait = false;
-    int m_delay = -1;
     mutable QnMutex m_mutex;
     QnWaitCondition m_waitCondition;
     Storage* m_storage = nullptr;
