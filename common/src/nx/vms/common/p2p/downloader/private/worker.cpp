@@ -7,7 +7,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/random.h>
-#include <utils/common/synctime.h>
 #include <nx/fusion/model_functions.h>
 
 #include "storage.h"
