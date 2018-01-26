@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <oem name="CPRO_Edge">
+        <resource name = "CPRO_EDGE_COMMON" id = "8ee01d4f-79ec-4b42-86cd-94c4b54a9a56" type = "Camera"/>
+		<resource name = "CPRO" public="CPRO_EDGE_COMMON">
+			<params>
+				<param name="supportedMotion" default_value="softwaregrid"/>
+				<param name="ptzCapabilities" default_value="0"/>
+			</params>
+		</resource>
+    </oem>
+</resources>

@@ -17,8 +17,12 @@ public:
 
     virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason) override;
 
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(
+        const QnAbstractStreamDataProvider* dataProvider = 0) const override;
+
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+    virtual CameraDiagnostics::Result initInternal() override;
 };
 
 using QnWearableCameraResourcePtr = QnSharedResourcePointer<QnWearableCameraResource>;
