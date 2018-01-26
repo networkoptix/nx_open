@@ -70,7 +70,7 @@ public:
 
     virtual void onGotAudioFrame(const QnCompressedAudioDataPtr& audioData);
 
-    virtual virtual void updateSoftwareMotion();
+    virtual void updateSoftwareMotion();
     bool canChangeStatus() const;
 
     static bool hasRunningLiveProvider(QnNetworkResource* netRes);

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "core/resource/camera_resource.h"
+#include <nx/mediaserver/resource/camera.h>
 
-class QnWearableCameraResource: public QnPhysicalCameraResource
+class QnWearableCameraResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
-    using base_type = QnPhysicalCameraResource;
+    using base_type = nx::mediaserver::resource::Camera;
 
 public:
     static const QString kManufacture;
@@ -20,6 +20,9 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(
         const QnAbstractStreamDataProvider* dataProvider = 0) const override;
 
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual CameraDiagnostics::Result initInternal() override;

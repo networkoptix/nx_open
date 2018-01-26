@@ -3,6 +3,7 @@
 #include <plugins/resource/avi/avi_resource.h>
 
 const QString QnWearableCameraResource::kManufacture = lit("WEARABLE_CAMERA");
+using namespace nx::mediaserver::resource;
 
 QnWearableCameraResource::QnWearableCameraResource()
 {
@@ -55,3 +56,12 @@ QnAbstractStreamDataProvider* QnWearableCameraResource::createLiveDataProvider()
     return nullptr;
 }
 
+StreamCapabilityMap QnWearableCameraResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex /*streamIndex*/)
+{
+    return StreamCapabilityMap();
+}
+
+CameraDiagnostics::Result QnWearableCameraResource::initializeCameraDriver()
+{
+    return CameraDiagnostics::NoErrorResult();
+}
