@@ -16,6 +16,8 @@ static const auto kResolution = lit("resolution");
 static const auto kBitrateKpbs = lit("bitrateKbps");
 static const auto kFps = lit("fps");
 static const auto kResetToDefaults = lit("resetToDefaults");
+static const auto kStreamParametersProviderId = lit("971009D8-384D-43C1-85BF-44A2B99253D5");
+static const auto kStreamParametersProviderVersion = lit("1.0");
 
 // TODO: Makes sense to somewhere in nx::utils.
 static const QString sizeToString(const QSize& size)
@@ -248,8 +250,8 @@ QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::describeCapab
 
     QnCameraAdvancedParams descriptions;
     descriptions.name = proprtyName();
-    descriptions.unique_id = QnUuid::createUuid().toSimpleString();
-    descriptions.version = toString(this);
+    descriptions.unique_id = kStreamParametersProviderId;
+    descriptions.version = kStreamParametersProviderVersion;
     descriptions.groups.push_back(videoStreams);
     return descriptions;
 }
