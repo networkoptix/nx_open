@@ -3,10 +3,10 @@
         <div class="modal-body">
             <div>
                 <p class="help-block">
-                    {{mergeSystemTextTop}}
+                    You can merge cloud Systems, where you are owner.
                 </p>
                 <p class="help-block">
-                    {{mergeSystemTextBottom}}
+                    Connect System you want to merge with this one to Nx Cloud or merge locally using Nx Witness Client.
                 </p>
             </div>
         </div>
@@ -19,22 +19,26 @@
             <div class="merge-text">Merge current System with</div>
             <div uib-dropdown class="merge-dropdown">
                 <a uib-dropdown-toggle href="#">
-                    <span>{{targetSystem.name}}</span><span class="icon-caret"></span>
+                    <system-status system="targetSystem"></system-status><span class="icon-caret"></span>
                 </a>
                 <ul uib-dropdown-menu class="dropdown-menu">
                     <li ng-repeat="system in systems">
                         <a ng-class="{active:system.id == targetSystem.id}"
                            ng-click="setTargetSystem(system)">
-                            <span>{{system.name}}</span>
-                            <span ng-if="system.stateOfHealth == 'offline'">(Offline)</span>
-                            <span ng-if="system.isOnline && 0">(incompatable)</span>
+                            <system-status system="system"></system-status>
                         </a>
                     </li>
                 </ul>
             </div>
-            <p class="help-block">You can merge only Systems in which you have owner permissions.</p>
-            <div class="merge-text">Took system name and settings from</div>
-            <div class="form-group">
+            <p ng-if="systemStatus =='offline'"
+               class="help-block warning-label">System {{targetSystem.name}} is offline cannot be merged with the current one.</p>
+            <p ng-if="systemStatus =='incompatable'"
+               class="help-block warning-label">System {{targetSystem.name}} is incompatable cannot be merged with the current one.</p>
+            <p ng-if="systemStatus == ''"
+               class="help-block">You can merge only Systems in which you have owner permissions.</p>
+            <div ng-class="{'disabled-settings': systemStatus != ''}">
+                <div class="merge-text">Took system name and settings from</div>
+                <div class="form-group">
                 <div class="radio">
                     <input type="radio" id="firstSystem" ng-model="masterSystem" value="system.id">
                     <label for="firstSystem">{{system.info.name}}</label>
@@ -44,9 +48,11 @@
                     <label for="secondSystem">{{targetSystem.name}}</label>
                 </div>
             </div>
+            </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-primary merge-button" ng-click="close()">Merge</button>
+            <button type="button" class="btn btn-primary merge-button"
+                    ng-disabled="systemStatus != ''" ng-click="close()">Merge</button>
         </div>
     </form>
 </div>

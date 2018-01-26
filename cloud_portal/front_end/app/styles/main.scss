@@ -182,7 +182,7 @@ a.disabled {
 }
 
 .warning-label{
-    color: $brand-danger;
+    color: $brand-danger !important;
 }
 
 .loading .auth-visible,
@@ -794,23 +794,42 @@ button .icon-caret{
     padding: 0 10px;
 
     line-height: 32px;
-    text-align: right;
     text-decoration: none !important;
 
-    border: 1px solid $dark9;
+    border: 1px solid $light5;
     border-radius: 2px;
 
     .dropdown-menu{
       padding: 0;
-
       margin:1px 0 0 -1px;
     }
 
+    .system-compatibility{
+      @include ellipsis;
+      width:325px;
+      line-height: inherit;
+      display:inline-block;
+    }
+
+    .icon-caret{
+      margin-top: 7px;
+      float: right;
+    }
+
+    a{
+      color: $dark1 !important;
+      text-decoration: none !important;
+    }
     a.active{
       background-color: $brand_core;
     }
   }
   .radio label{
     padding-left: 0;
+  }
+  .disabled-settings
+  {
+    pointer-events: none;
+    opacity: 0.5;
   }
 }
