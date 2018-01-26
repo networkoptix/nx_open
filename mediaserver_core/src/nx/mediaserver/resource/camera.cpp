@@ -429,7 +429,8 @@ CameraDiagnostics::Result Camera::initializaAdvancedParametersProviders()
         m_defaultAdvancedParametersProvider,
         containerString(m_advancedParametersProvidersByParameterId)));
 
-    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), advancedParameters);
+    if (!advancedParameters.groups.empty())
+        QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), advancedParameters);
     return CameraDiagnostics::NoErrorResult();
 }
 
