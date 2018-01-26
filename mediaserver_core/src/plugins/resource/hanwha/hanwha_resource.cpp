@@ -1948,9 +1948,9 @@ bool HanwhaResource::addBitrateRanges(
                 : limits.maxVbrBitrate;
 
             QnCameraAdvancedParameterDependency dependency;
-            dependency.id = QnUuid::createUuid().toString();
             dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
             dependency.range = lit("%1,%2").arg(minLimit).arg(maxLimit);
+            dependency.autoFillId();
             return dependency;
         };
 
@@ -1968,9 +1968,9 @@ bool HanwhaResource::addFrameRateRanges(
         const QString& /*bitrateControl*/)
         {
             QnCameraAdvancedParameterDependency dependency;
-            dependency.id = QnUuid::createUuid().toString();
             dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
             dependency.range = lit("1,%2").arg(limits.maxFps);
+            dependency.autoFillId();
             return dependency;
         };
 

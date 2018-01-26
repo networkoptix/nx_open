@@ -68,11 +68,11 @@ static QnCameraAdvancedParameterDependency valueDependency(
     const QString& value, const std::map<QString, QString>& valueConditions)
 {
     QnCameraAdvancedParameterDependency dependency;
-    dependency.id = QnUuid::createUuid().toString();
     dependency.type = type;
     dependency.range = value;
     for (const auto& keyValue: valueConditions)
         dependency.conditions.push_back(valueCondition(keyValue.first, keyValue.second));
+    dependency.autoFillId();
     return dependency;
 }
 

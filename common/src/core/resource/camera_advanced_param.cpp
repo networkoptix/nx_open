@@ -496,6 +496,15 @@ bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck)
     }
 }
 
+void QnCameraAdvancedParameterDependency::autoFillId()
+{
+    static const QChar kDelimiter(L',');
+    QString hash = range + kDelimiter + internalRange;
+    for (const auto& condition: conditions)
+        hash += kDelimiter + condition.paramId + kDelimiter + condition.value;
+    id = guidFromArbitraryData(hash).toSimpleString();
+}
+
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameter, DataType,
     (QnCameraAdvancedParameter::DataType::Bool, "Bool")
     (QnCameraAdvancedParameter::DataType::String, "String")

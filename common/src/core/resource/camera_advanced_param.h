@@ -80,6 +80,9 @@ struct QnCameraAdvancedParameterDependency
     QString range;
     QString internalRange;
     std::vector<QnCameraAdvancedParameterCondition> conditions;
+
+    /** Auto fill id field as a hash of depended ids and values */
+    void autoFillId();
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterDependency::DependencyType, (lexical))
