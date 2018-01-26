@@ -245,7 +245,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
     {
         case State::disconnected:
         {
-            // estabilish new connection
+            // establish new connection
             m_connectingSocket =
                 SocketFactory::createStreamSocket(
                     m_useSsl, nx::network::NatTraversalSupport::disabled );

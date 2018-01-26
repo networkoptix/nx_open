@@ -7,8 +7,8 @@ else()
     set(nov_file_launcher_executable)
 endif()
 
-find_files(src "ui" UI_FILES)
-qt5_wrap_ui(UIC_FILES ${UI_FILES})
+nx_find_files(ui_files src "ui")
+qt5_wrap_ui(uic_files ${ui_files})
 
 nx_configure_file(
     maven/filter-resources/resources/globals.json
@@ -33,7 +33,7 @@ file(GLOB_RECURSE QML_FILES static-resources/src/qml/*.qml static-resources/src/
 nx_add_target(nx_client_desktop LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/client_app_info_impl.cpp"
-        ${UIC_FILES}
+        ${uic_files}
         ${mac_sources}
     ADDITIONAL_RESOURCES
         "${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}"
@@ -60,8 +60,6 @@ if(WINDOWS)
     )
     add_dependencies(nx_client_desktop nov_file_launcher)
 endif()
-
-set_target_properties(nx_client_desktop PROPERTIES PREFIX "")
 
 target_include_directories(nx_client_desktop
     PRIVATE

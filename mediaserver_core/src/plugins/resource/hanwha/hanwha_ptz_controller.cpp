@@ -334,13 +334,13 @@ std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
         x1 = QString::number(
             qBound(
                 0,
-                (int)std::round(((topLeft.x() + 0.5) * kHanwhaAbsoluteMoveCoefficient)),
+                qRound(((topLeft.x() + 0.5) * kHanwhaAbsoluteMoveCoefficient)),
                 kHanwhaAbsoluteMoveCoefficient));
 
         y1 = QString::number(
             qBound(
                 0,
-                (int)std::round(((topLeft.y() + 0.5) * kHanwhaAbsoluteMoveCoefficient)),
+                qRound(((topLeft.y() + 0.5) * kHanwhaAbsoluteMoveCoefficient)),
                 kHanwhaAbsoluteMoveCoefficient));
 
         x2 = x1;

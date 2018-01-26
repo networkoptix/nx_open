@@ -17,16 +17,11 @@ add_definitions(
     -DENABLE_SENDMAIL
     -DENABLE_DATA_PROVIDERS
     -DENABLE_SOFTWARE_MOTION_DETECTION
-    -DENABLE_THIRD_PARTY
-    -DENABLE_MDNS
-    -DENABLE_WEARABLE
 )
 
 if(WINDOWS)
     add_definitions(
         -D_WINSOCKAPI_=
-        -DENABLE_VMAX
-        -DENABLE_DESKTOP_CAMERA
     )
 endif()
 
@@ -34,41 +29,17 @@ if(UNIX)
     add_definitions(-DQN_EXPORT=)
 endif()
 
-set(enableAllVendors ON)
-
 if(ANDROID OR IOS)
     remove_definitions(
         -DENABLE_SENDMAIL
         -DENABLE_DATA_PROVIDERS
         -DENABLE_SOFTWARE_MOTION_DETECTION
-        -DENABLE_THIRD_PARTY
-        -DENABLE_MDNS
     )
-    set(enableAllVendors OFF)
 endif()
 
 if(box MATCHES "isd|edge1")
-    set(enableAllVendors OFF)
     remove_definitions(-DENABLE_SOFTWARE_MOTION_DETECTION)
     add_definitions(-DEDGE_SERVER)
-endif()
-
-if(enableAllVendors)
-    add_definitions(
-        -DENABLE_ONVIF
-        -DENABLE_AXIS
-        -DENABLE_ACTI
-        -DENABLE_ARECONT
-        -DENABLE_DLINK
-        -DENABLE_DROID
-        -DENABLE_TEST_CAMERA
-        -DENABLE_STARDOT
-        -DENABLE_IQE
-        -DENABLE_ISD
-        -DENABLE_PULSE_CAMERA
-        -DENABLE_FLIR
-        -DENABLE_ADVANTECH
-    )
 endif()
 
 if(WINDOWS)
