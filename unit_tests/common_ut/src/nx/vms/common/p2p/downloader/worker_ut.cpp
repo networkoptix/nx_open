@@ -89,7 +89,9 @@ protected:
     }
 
     TestPeerManager::FileInformation createTestFile(
-        const QString& fileName = kTestFileName, qint64 size = kTestFileSize)
+        bool predeterminedContent = false,
+        const QString& fileName = kTestFileName,
+        qint64 size = kTestFileSize)
     {
         const QFileInfo fileInfo(workingDirectory.absoluteFilePath(fileName));
         auto directory = fileInfo.absoluteDir();
@@ -102,7 +104,24 @@ protected:
             }
         }
 
-        utils::createRandomFile(fileInfo.absoluteFilePath(), size);
+        if (predeterminedContent)
+        {
+            QFile file(fileInfo.absoluteFilePath());
+            NX_ASSERT(file.open(QFile::WriteOnly));
+
+            const QByteArray pattern = "hello";
+            for (int written = 0; written != size;)
+            {
+                written += file.write(
+                    pattern.constData(), qMin((qint64)pattern.size(), size - written));
+            }
+
+            file.close();
+        }
+        else
+        {
+            utils::createRandomFile(fileInfo.absoluteFilePath(), size);
+        }
 
         TestPeerManager::FileInformation testFileInfo(kTestFileName);
         testFileInfo.filePath = workingDirectory.absoluteFilePath(fileName);
@@ -356,7 +375,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, chunkDownloadFailedAndRecovered)
 
 TEST_F(DistributedFileDownloaderWorkerTest, corruptedFile)
 {
-    auto fileInfo = createTestFile();
+    auto fileInfo = createTestFile(true);
     fileInfo.downloadedChunks.setBit(0); //< Making file corrupted.
 
     NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);

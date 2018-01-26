@@ -755,7 +755,8 @@ void Worker::downloadNextChunk()
             lm("Cannot send request for chunk %1 to %2...")
                 .arg(chunkIndex).arg(m_peerManager->peerString(peerId)));
     }
-    if (handle > 0)
+
+    if (handle > 0)
         m_contextByHandle[handle] = RequestContext(peerId, State::downloadingChunks);
 }
 
