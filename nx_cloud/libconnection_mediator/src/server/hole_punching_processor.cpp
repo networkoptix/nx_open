@@ -236,8 +236,7 @@ std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
         return std::make_tuple(api::ResultCode::notFound, boost::none);
     }
 
-    if (((targetPeerData.connectionMethods & request.connectionMethods) &
-        api::ConnectionMethod::udpHolePunching) == 0)
+    if (request.connectionMethods == 0)
     {
         NX_LOGX(lm("Failed connect request %1: no suitable connection method")
             .arg(logRequest(connection, request)), cl_logDEBUG1);
