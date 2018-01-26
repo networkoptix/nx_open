@@ -133,10 +133,8 @@ int QnWearableCameraRestHandler::executeConsume(
             downloader->deleteFile(uploadId);
         };
 
-    QnUuid taskId = QnUuid::createUuid();
-    WearableArchiveTaskPtr task(new WearableArchiveSynchronizationTask(
+    RemoteArchiveTaskPtr task(new WearableArchiveSynchronizationTask(
         qnServerModule,
-        taskId,
         camera,
         std::move(file),
         startTimeMs));

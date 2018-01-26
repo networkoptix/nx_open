@@ -19,7 +19,6 @@ namespace recorder {
 
 WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
     QnMediaServerModule* serverModule,
-    const QnUuid& id,
     const QnSecurityCamResourcePtr& resource,
     std::unique_ptr<QIODevice> file,
     qint64 startTimeMs)
@@ -40,7 +39,7 @@ WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask()
 
 QnUuid WearableArchiveSynchronizationTask::id() const
 {
-    return m_id;
+    return m_resource->getId();
 }
 
 void WearableArchiveSynchronizationTask::setDoneHandler(std::function<void()> handler)

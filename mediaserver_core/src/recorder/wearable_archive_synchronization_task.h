@@ -30,7 +30,6 @@ class WearableArchiveSynchronizationTask:
 public:
     WearableArchiveSynchronizationTask(
         QnMediaServerModule* serverModule,
-        const QnUuid& id,
         const QnSecurityCamResourcePtr& resource,
         std::unique_ptr<QIODevice> file,
         qint64 startTimeMs
@@ -53,7 +52,6 @@ private:
     void setProgress(int progress);
 
 private:
-    QnUuid m_id;
     QnSecurityCamResourcePtr m_resource;
     QPointer<QIODevice> m_file;
     qint64 m_startTimeMs = 0;
@@ -63,8 +61,6 @@ private:
     std::unique_ptr<QnAbstractArchiveStreamReader> m_archiveReader;
     std::unique_ptr<QnServerEdgeStreamRecorder> m_recorder;
 };
-
-using WearableArchiveTaskPtr = std::shared_ptr<WearableArchiveSynchronizationTask>;
 
 } // namespace recorder
 } // namespace mediaserver_core
