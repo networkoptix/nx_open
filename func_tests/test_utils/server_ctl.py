@@ -46,7 +46,11 @@ class ServerCtl(object):
 
 
 class VagrantBoxServerCtl(ServerCtl):
+    """Control mediaserver as Upstart service with `status`, `start` and `stop` shortcuts
 
+    SystemV's Upstart was deprecated several years ago and is not used by Debian/Ubuntu anymore.
+    These tests are running mostly on Ubuntu 14.04, that is stated as requirement.
+    """
     def __init__(self, customization_company_name, box):
         self._customization_company_name = customization_company_name
         self._box = box
@@ -82,7 +86,16 @@ class VagrantBoxServerCtl(ServerCtl):
 
 
 class PhysicalHostServerCtl(ServerCtl):
+    """Run multiple mediaservers on single machine
 
+    Service of any kind doesn't can only run one instance.
+    This functionality is used by scalability and load tests
+    and is not intended to be used by end users.
+
+    When multiple servers are installed,
+    shell script is created from templates.
+    Its interface mimic a `service` command.
+    """
     def __init__(self, host, dir):
         assert isinstance(host, Host), repr(host)
         self._host = host
