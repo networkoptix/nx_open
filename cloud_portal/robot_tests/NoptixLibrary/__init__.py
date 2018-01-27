@@ -26,4 +26,7 @@ class NoptixLibrary(object):
         locator.send_keys(Keys.CONTROL+'v')
 
     def get_random_email(self):
-         return "noptixqa+" + str(time.time()) + "@gmail.com"
+        return "noptixqa+" + str(time.time()) + "@gmail.com"
+
+    def  get_random_symbol_email(self):
+        return '''!#$%&'*+-/=?^_`{|}~''' + str(time.time()) + "@gmail.com"
