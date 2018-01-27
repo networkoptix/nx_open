@@ -66,6 +66,9 @@ EventTile::EventTile(QWidget* parent):
 
     ui->previewWidget->setCropMode(QnResourcePreviewWidget::CropMode::notHovered);
 
+    ui->wideHolder->setHidden(true);
+    ui->narrowHolder->setHidden(true);
+
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
     ui->descriptionLabel->setForegroundRole(QPalette::Light);
@@ -250,6 +253,7 @@ void EventTile::setPreview(QnImageProvider* value)
 {
     ui->previewWidget->setImageProvider(value);
     ui->previewWidget->setHidden(!value);
+    ui->previewWidget->parentWidget()->setHidden(!value);
 }
 
 QRectF EventTile::previewCropRect() const
@@ -451,6 +455,51 @@ void EventTile::setRead(bool value)
 
     if (m_isRead && m_autoCloseTimer)
         m_autoCloseTimer->start();
+}
+
+EventTile::Mode EventTile::mode() const
+{
+    if (ui->previewWidget->parentWidget() == ui->narrowHolder)
+        return Mode::standard;
+
+    NX_ASSERT(ui->previewWidget->parentWidget() == ui->wideHolder);
+    return Mode::wide;
+}
+
+void EventTile::setMode(Mode value)
+{
+    if (mode() == value)
+        return;
+
+    const auto reparentPreview =
+        [this](QWidget* newParent)
+        {
+            auto oldParent = ui->previewWidget->parentWidget();
+            const bool wasHidden = ui->previewWidget->isHidden();
+            oldParent->layout()->removeWidget(ui->previewWidget);
+            ui->previewWidget->setParent(newParent);
+            newParent->layout()->addWidget(ui->previewWidget);
+            ui->previewWidget->setHidden(wasHidden);
+        };
+
+    switch (value)
+    {
+        case Mode::standard:
+            reparentPreview(ui->narrowHolder);
+            ui->narrowHolder->setHidden(ui->previewWidget->isHidden());
+            ui->wideHolder->setHidden(true);
+            break;
+
+        case Mode::wide:
+            reparentPreview(ui->wideHolder);
+            ui->wideHolder->setHidden(ui->previewWidget->isHidden());
+            ui->narrowHolder->setHidden(false); //< There is a spacer child item.
+            break;
+
+        default:
+            NX_ASSERT(false); //< Should never happen.
+            break;
+    }
 }
 
 } // namespace desktop

@@ -100,6 +100,15 @@ public:
     bool isRead() const;
     void setRead(bool value);
 
+    enum class Mode
+    {
+        standard,
+        wide
+    };
+
+    Mode mode() const;
+    void setMode(Mode value);
+
 signals:
     void clicked();
 

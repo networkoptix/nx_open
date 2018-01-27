@@ -1199,6 +1199,8 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
         });
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
         &QnWorkbenchUi::updateNotificationsGeometry);
+    connect(m_notifications->item, &QGraphicsWidget::widthChanged, this,
+        &QnWorkbenchUi::updateNotificationsGeometry);
 
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);

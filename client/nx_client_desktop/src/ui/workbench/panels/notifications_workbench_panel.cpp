@@ -24,6 +24,7 @@
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
+#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_context.h>
@@ -40,7 +41,77 @@ namespace NxUi {
 
 namespace {
 
-static constexpr int kMinimumWidth = 280;
+static constexpr int kNarrowWidth = 280;
+static constexpr int kWideWidth = 430;
+
+class ResizerWidget: public QGraphicsWidget, public DragProcessHandler
+{
+public:
+    ResizerWidget(QGraphicsWidget* toResize, QGraphicsItem* parent):
+        QGraphicsWidget(parent),
+        DragProcessHandler(),
+        m_itemToResize(toResize)
+    {
+        NX_ASSERT(m_itemToResize);
+
+        setCursor(Qt::SizeHorCursor);
+        setFlag(QGraphicsItem::ItemHasNoContents);
+    }
+
+protected:
+    virtual void dragMove(DragInfo* info) override
+    {
+        if (!m_itemToResize)
+            return;
+
+        const auto delta = info->mouseItemPos().x() - info->mousePressItemPos().x();
+        const auto newWidth = m_itemToResize->minimumWidth() - delta;
+
+        static constexpr auto kThreshold = (kNarrowWidth + kWideWidth) / 2;
+        static constexpr int kBoundaryWidth = 8;
+
+        int newMinimumWidth = m_itemToResize->minimumWidth();
+
+        if (newWidth > kThreshold + kBoundaryWidth)
+            newMinimumWidth = kWideWidth;
+        else if (newWidth < kThreshold - kBoundaryWidth)
+            newMinimumWidth = kNarrowWidth;
+
+        const int sizeDelta = m_itemToResize->minimumWidth() - newMinimumWidth;
+        if (sizeDelta == 0)
+            return;
+
+        const QRect newGeometry(
+            m_itemToResize->pos().x() + sizeDelta,
+            m_itemToResize->pos().y(),
+            newMinimumWidth,
+            m_itemToResize->size().height());
+
+        m_itemToResize->setMinimumWidth(newMinimumWidth);
+        m_itemToResize->setGeometry(newGeometry);
+    }
+
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override
+    {
+        dragProcessor()->mousePressEvent(this, event);
+        event->accept();
+    }
+
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override
+    {
+        dragProcessor()->mouseMoveEvent(this, event);
+        event->accept();
+    }
+
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override
+    {
+        dragProcessor()->mouseReleaseEvent(this, event);
+        event->accept();
+    }
+
+private:
+    QGraphicsWidget* const m_itemToResize = nullptr;
+};
 
 } // namespace
 
@@ -76,7 +147,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &NotificationsWorkbenchPanel::updateControlsGeometry);
 
-    item->setMinimumWidth(kMinimumWidth);
+    item->setMinimumWidth(kNarrowWidth);
 
     if (nx::client::desktop::ini().unifiedEventPanel)
     {
@@ -86,11 +157,18 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
         // TODO: #vkutin Get rid of proxying.
         auto eventPanelContainer = new QnMaskedProxyWidget(parentWidget);
 
+        auto eventPanelResizer = new ResizerWidget(item, eventPanelContainer);
+        auto dragProcessor = new DragProcessor(this);
+        dragProcessor->setHandler(eventPanelResizer);
+
         connect(item, &QGraphicsWidget::geometryChanged, this,
-            [this, eventPanelContainer]()
+            [this, eventPanelContainer, eventPanelResizer]()
             {
                 // Add 1-pixel shift for notification panel frame.
-                eventPanelContainer->setGeometry(item->geometry().adjusted(1, 0, 0, 0));
+                const auto newGeometry = item->geometry().adjusted(1, 0, 0, 0);
+                eventPanelContainer->setGeometry(newGeometry);
+                eventPanelResizer->setGeometry(0, 0, style::Metrics::kStandardPadding,
+                    eventPanelContainer->size().height());
             });
 
         // TODO: #vkutin Test which mode is faster.
