@@ -4,7 +4,7 @@ Resource          ../variables.robot
 Suite Teardown    Close All Browsers
 
 *** Variables ***
-${password}    qweasd123
+${password}    ${BASE PASSWORD}
 ${url}         ${CLOUD TEST}
 
 *** Test Cases ***
@@ -16,8 +16,7 @@ Register and Activate
     Go To    ${link}
     Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
     Element Should Be Visible    ${ACTIVATION SUCCESS}
-    ${location}    Get Location
-    Should Be Equal    ${location}    ${url}/activate/success
+    Location Should Be    ${url}/activate/success
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Close Browser
@@ -43,8 +42,7 @@ should save user data to user account correctly
     Go To    ${link}
     Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
     Element Should Be Visible    ${ACTIVATION SUCCESS}
-    ${location}    Get Location
-    Should Be Equal    ${location}    ${url}/activate/success
+    Location Should Be    ${url}/activate/success
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
@@ -62,8 +60,7 @@ should allow to enter more than 256 symbols in First and Last names and cut it t
     Go To    ${link}
     Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
     Element Should Be Visible    ${ACTIVATION SUCCESS}
-    ${location}    Get Location
-    Should Be Equal    ${location}    ${url}/activate/success
+    Location Should Be    ${url}/activate/success
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
@@ -81,8 +78,7 @@ should trim leading and trailing spaces
     Go To    ${link}
     Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
     Element Should Be Visible    ${ACTIVATION SUCCESS}
-    ${location}    Get Location
-    Should Be Equal    ${location}    ${url}/activate/success
+    Location Should Be    ${url}/activate/success
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
@@ -104,8 +100,7 @@ link works and suggests to log out user, if he was logged in, buttons operate co
     Go To    ${link}
     Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
     Element Should Be Visible    ${ACTIVATION SUCCESS}
-    ${location}    Get Location
-    Should Be Equal    ${location}    ${url}/activate/success
+    Location Should Be    ${url}/activate/success
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${link}
