@@ -112,7 +112,15 @@ angular.module('cloudApp')
         };
 
         $scope.mergeSystems = function(){
-            dialogs.merge($scope.system);
+            dialogs.merge($scope.system).then(function(mergeIds){
+                $scope.currentlyMerging = true;
+                $scope.isMaster = $scope.system.id == mergeIds.masterSystemId;
+                var mergingSystemId = mergeIds.targetSystemId;
+
+                $scope.mergeTargetSystem = _.find(systemsProvider.systems, function(system){
+                    return mergingSystemId == system.id;
+                });
+            });
         };
 
         $scope.share = function(){

@@ -171,7 +171,9 @@
     "successDisconnected": "System is successfully disconnected from %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} is successfully deleted from your account",
     "permissionsRemoved": "Permissions were removed from {{email}}",
-    "mergeSystemTitle": "Merge systems"
+    "mergeSystemTitle": "Merge systems",
+    "mergeSystemSuccess": "System merge completed",
+    "confirmMergeAction": "Merge"
   },
   "account": {
     "accountSavedSuccess": "Your account is successfully saved",

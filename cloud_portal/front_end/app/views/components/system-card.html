@@ -14,14 +14,6 @@
             <span class="product-name">%PRODUCT_NAME%</span></button>
     </div>
 </div>
-<div class="panel panel-default" ng-if="system.isMine">
-    <div class="panel-body">
-        <div><bold>Mergeing System</bold> is being merged to this system</div>
-        <hr></hr>
-        <div>Depending of the size of the database it may take up to several hours</div>
-    </div>
-</div>
-
 <div class="panel panel-default" ng-if="!system.isMine">
     <div class="panel-body">
         <h2>Owner</h2>
@@ -37,5 +29,24 @@
             <button class="btn btn-default" ng-click="rename()">Rename System</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">Disconnect from my account</button>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="currentlyMerging">
+    <div class="panel-body" ng-if="isMaster && system.isMine">
+        <div><strong>{{mergeTargetSystem.name}}</strong>
+            is being merged to this system</div>
+        <hr></hr>
+        <div class="merge-info-text">Depending of the size of the database it may take up to several hours</div>
+    </div>
+    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+        <div>This system is being merged to
+            <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr></hr>
+        <div class="merge-info-text">
+            <p>Depending of the size of the database it may take up to several hours.</p>
+            <p>Until merge is finished you can log in to this system and watch video, but cannot change any settings.</p>
+            <p>When merge is finished, all users and cameras from this system will become available
+                in <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. System, and this system will be deleted.</p>
+        </div>
     </div>
 </div>

@@ -776,6 +776,14 @@ button .icon-caret{
   width: 102px;
 }
 
+.merge-info-text{
+  color: $dark16;
+  font-size: 13px;
+}
+.merge-system-name{
+  font-weight: bold;
+}
+
 .merge-modal{
   .help-block{
     color: $dark16;

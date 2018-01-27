@@ -55,7 +55,7 @@ angular.module('cloudApp')
 
         this.getMySystems = function(currentUserEmail, systemId){
             return _.filter(this.systems, function(system){
-                return true || system.ownerAccountEmail == currentUserEmail && system.id != systemId;
+                return system.ownerAccountEmail == currentUserEmail && system.id != systemId;
             });
         };
 

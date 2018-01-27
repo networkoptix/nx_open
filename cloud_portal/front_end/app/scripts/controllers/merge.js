@@ -8,7 +8,6 @@ angular.module('cloudApp')
 
         $scope.user = null;
         $scope.systems = null;
-        console.log($scope.system);
 
         //Add system can merge where added to systems form api call
         function checkMergeAbility(system){
@@ -23,13 +22,32 @@ angular.module('cloudApp')
             $scope.canMerge = $scope.system.accessRole.toLowerCase() === "owner" && $scope.systems.length > 0;
             $scope.targetSystem = $scope.systems[0];
             $scope.systemStatus = checkMergeAbility($scope.targetSystem);
-            console.log($scope.systems);
         });
 
         $scope.setTargetSystem = function(system){
             $scope.targetSystem = system;
             $scope.systemStatus = checkMergeAbility(system);
         };
+
+        $scope.mergingSystems = process.init(function(){
+            var masterSystemId = null;
+            var slaveSystemId = null;
+            if($scope.masterSystemId == $scope.system.id){
+                masterSystemId = $scope.system.id;
+                slaveSystemId = $scope.targetSystem.id;
+            }
+            else{
+                masterSystemId = $scope.targetSystem.id;
+                slaveSystemId = $scope.system.id;
+            }
+            //return cloudApi.systems(); //In for testing purposes with merging things
+            return cloudApi.merge(masterSystemId, slaveSystemId);
+        },{
+            successMessage: L.system.mergeSystemSuccess
+        }).then(function(){
+            systemsProvider.forceUpdateSystems();
+            dialogs.closeMe($scope, {"targetSystemId":$scope.targetSystem.id, "masterSystemId": $scope.masterSystemId});
+        });
 
         $scope.close = function(){
             dialogs.closeMe($scope);

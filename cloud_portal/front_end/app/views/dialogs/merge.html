@@ -38,21 +38,22 @@
                class="help-block">You can merge only Systems in which you have owner permissions.</p>
             <div ng-class="{'disabled-settings': systemStatus != ''}">
                 <div class="merge-text">Took system name and settings from</div>
-                <div class="form-group">
-                <div class="radio">
-                    <input type="radio" id="firstSystem" ng-model="masterSystem" value="system.id">
-                    <label for="firstSystem">{{system.info.name}}</label>
+                <div class="form-group" ng-init="$parent.masterSystemId=system.id">
+                    <div class="radio">
+                        <input type="radio" id="firstSystem" ng-model="$parent.masterSystemId" ng-value="system.id">
+                        <label for="firstSystem">{{system.info.name}}</label>
+                    </div>
+                    <div class="radio">
+                        <input type="radio" id="secondSystem" ng-model="$parent.masterSystemId" ng-value="targetSystem.id">
+                        <label for="secondSystem">{{targetSystem.name}}</label>
+                    </div>
                 </div>
-                <div class="radio">
-                    <input type="radio" id="secondSystem" ng-model="masterSystem" value="targetSystem.id">
-                    <label for="secondSystem">{{targetSystem.name}}</label>
-                </div>
-            </div>
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-primary merge-button"
-                    ng-disabled="systemStatus != ''" ng-click="close()">Merge</button>
+            <process-button button-disabled="systemStatus != ''" process="mergingSystems"
+                            form="mergeForm" action-type="'primary'"
+                            button-text="$root.L.system.confirmMergeAction"></process-button>
         </div>
     </form>
 </div>
