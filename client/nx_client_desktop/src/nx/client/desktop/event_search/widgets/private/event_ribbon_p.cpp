@@ -590,7 +590,7 @@ void EventRibbon::Private::doUpdateView()
 
     updateCurrentShifts();
 
-    static constexpr int kWidthThreshold = 200;
+    static constexpr int kWidthThreshold = 400;
     const auto mode = m_viewport->width() > kWidthThreshold
         ? EventTile::Mode::wide
         : EventTile::Mode::standard;
