@@ -6,6 +6,11 @@ ${LOCAL}                              https://localhost:9000/
 ${CLOUD TEST}                         https://cloud-test.hdw.mx
 ${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
 
+${CYRILLIC NAME}                     Кенгшщзх
+${SMILEY NAME}                       ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
+${GLYPH NAME}                        您都可以享受源源不絕的好禮及優惠
+${SYMBOL NAME}                       `~!@#$%^&*()_:";'{}[]+<>?,./\
+
 #Log In Elements
 ${LOG IN MODAL}                       //div[contains(@class, 'modal-content')]
 ${EMAIL INPUT}                        //form[contains(@name, 'loginForm')]//input[@ng-model='auth.email']
@@ -29,10 +34,12 @@ ${REGISTER FIRST NAME INPUT}          //form[@name= 'registerForm']//input[@ng-m
 ${REGISTER LAST NAME INPUT}           //form[@name= 'registerForm']//input[@ng-model='account.lastName']
 ${REGISTER EMAIL INPUT}               //form[@name= 'registerForm']//input[@ng-model='account.email']
 ${REGISTER PASSWORD INPUT}            //form[@name= 'registerForm']//password-input[@ng-model='account.password']//input[@type='password']
+${REGISTER SUBSCRIBE CHECKBOX}        //form[@name= 'registerForm']//input[@ng-model='account.subscribe']
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[@ng-bind-html='buttonText' and contains(text(), 'Create Account')]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula' and contains(text(), 'Terms and Conditions')]
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), 'Resend activation link')]
 
+${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || registerSuccess) && !activated']
 ${ACTIVATION SUCCESS}                 //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), 'Your account is successfully activated')]
 ${SUCCESS LOG IN BUTTON}              //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), 'Your account is successfully activated')]//a[@href='/login']
 
