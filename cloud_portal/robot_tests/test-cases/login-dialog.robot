@@ -46,8 +46,7 @@ redirects to systems after log In
     Open Browser and go to URL    ${url}
     Log In    ${email}    ${password}
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    ${current page}    Get Location
-    Should Be True    '${current page}' == '${url}/systems'
+    Location Should Be    ${url}/systems
     Close Browser
 
 #redirects to systems after log In, (EXPECTED FAILURE)
@@ -180,8 +179,7 @@ redirects to /activate and shows non-activated user message when not activated; 
     Wait Until Element Is Visible    //h1[contains(@class,'process-success')]
     Log In    ${random email}    ${BASE PASSWORD}
     Wait Until Element Is Visible    ${RESEND ACTIVATION LINK BUTTON}
-    ${current page}    Get Location
-    Should Be True    '${current page}' == '${url}/activate'
+    Location Should Be    ${url}/activate
     Validate Register Email Received    ${random email}
     Click Button    ${RESEND ACTIVATION LINK BUTTON}
     Validate Register Email Received    ${random email}
