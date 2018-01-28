@@ -15,6 +15,8 @@ UploadManager::UploadManager(QObject* parent):
 
 UploadManager::~UploadManager()
 {
+    qDeleteAll(m_workers);
+    m_workers.clear();
 }
 
 QString UploadManager::addUpload(
