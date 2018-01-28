@@ -4,6 +4,7 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/resource_fwd.h>
+#include <common/common_module_aware.h>
 #include <nx/utils/uuid.h>
 
 #include "wearable_state.h"
@@ -14,7 +15,9 @@ namespace desktop {
 
 class WearableWorker;
 
-class WearableManager: public QObject
+class WearableManager:
+    public QObject,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 public:
@@ -35,6 +38,7 @@ signals:
 
 private:
     WearableWorker* ensureWorker(const QnSecurityCamResourcePtr& camera);
+    void dropWorker(const QnResourcePtr& resource);
     void clearAllWorkers();
 
 private:

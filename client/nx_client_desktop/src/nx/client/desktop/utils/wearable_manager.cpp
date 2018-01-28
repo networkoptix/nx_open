@@ -2,6 +2,7 @@
 
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include "wearable_worker.h"
 
@@ -17,9 +18,10 @@ struct WearableManager::Private
 
 WearableManager::WearableManager(QObject* parent):
     QObject(parent),
+    QnCommonModuleAware(parent),
     d(new Private)
 {
-
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &WearableManager::dropWorker);
 }
 
 WearableManager::~WearableManager()
@@ -52,17 +54,24 @@ WearableState WearableManager::state(const QnSecurityCamResourcePtr& camera)
 
 void WearableManager::updateState(const QnSecurityCamResourcePtr& camera)
 {
-    ensureWorker(camera)->updateState();
+    if(WearableWorker* worker = ensureWorker(camera))
+        worker->updateState();
 }
 
 bool WearableManager::addUpload(const QnSecurityCamResourcePtr& camera, const QString& path, QString* errorMessage)
 {
-    return ensureWorker(camera)->addUpload(path, errorMessage);
+    if (WearableWorker* worker = ensureWorker(camera))
+        return worker->addUpload(path, errorMessage);
+    return true; //< Just ignore it silently.
 }
 
 WearableWorker* WearableManager::ensureWorker(const QnSecurityCamResourcePtr& camera)
 {
     NX_ASSERT(d->currentUser);
+
+    // If you're very lucky you may end up with dangling cameras getting passed in here.
+    if (!camera->getParentServer())
+        return nullptr;
 
     QnUuid cameraId = camera->getId();
 
@@ -77,6 +86,16 @@ WearableWorker* WearableManager::ensureWorker(const QnSecurityCamResourcePtr& ca
     connect(result, &WearableWorker::stateChanged, this, &WearableManager::stateChanged);
 
     return result;
+}
+
+void WearableManager::dropWorker(const QnResourcePtr& resource)
+{
+    auto pos = d->workers.find(resource->getId());
+    if (pos == d->workers.end())
+        return;
+
+    delete *pos;
+    d->workers.erase(pos);
 }
 
 void WearableManager::clearAllWorkers()
