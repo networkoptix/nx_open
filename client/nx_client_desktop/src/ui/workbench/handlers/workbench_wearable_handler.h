@@ -30,8 +30,7 @@ private slots:
     void at_uploadWearableCameraFileAction_triggered();
 
     void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
-
-    void at_upload_progress(const nx::client::desktop::UploadState& upload);
+    void at_context_userChanged();
 
 private:
     struct FootageInfo

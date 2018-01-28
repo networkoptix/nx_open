@@ -42,9 +42,9 @@ QnUuid WearableArchiveSynchronizationTask::id() const
     return m_resource->getId();
 }
 
-void WearableArchiveSynchronizationTask::setDoneHandler(std::function<void()> handler)
+void WearableArchiveSynchronizationTask::setDoneHandler(std::function<void()>)
 {
-    m_doneHandler = handler;
+    NX_ASSERT(false);
 }
 
 void WearableArchiveSynchronizationTask::cancel()
@@ -73,8 +73,7 @@ bool WearableArchiveSynchronizationTask::execute()
 
     setProgress(100);
 
-    if(m_doneHandler)
-        m_doneHandler();
+    emit finished();
 
     return true;
 }

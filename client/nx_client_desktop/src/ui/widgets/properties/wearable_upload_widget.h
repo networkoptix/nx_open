@@ -6,6 +6,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui { class WearableUploadWidget; }
+namespace nx { namespace client { namespace desktop { struct WearableState; }}}
 
 class QnWearableUploadWidget : public QWidget, public QnWorkbenchContextAware
 {
@@ -18,6 +19,12 @@ public:
 
     void setCamera(const QnVirtualCameraResourcePtr &camera);
     QnVirtualCameraResourcePtr camera() const;
+
+private:
+    void updateFromState(const nx::client::desktop::WearableState& state);
+
+    bool calculateEnabled(const nx::client::desktop::WearableState& state);
+    QString calculateMessage(const nx::client::desktop::WearableState& state);
 
 private:
     QScopedPointer<Ui::WearableUploadWidget> ui;

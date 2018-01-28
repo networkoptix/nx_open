@@ -191,6 +191,9 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->advancedSettingsWidget, &QnCameraAdvancedSettingsWidget::hasChangesChanged,
         this, &QnSingleCameraSettingsWidget::hasChangesChanged);
 
+    connect(ui->wearableProgressWidget, &QnWearableProgressWidget::activeChanged,
+        this, &QnSingleCameraSettingsWidget::updateWearableProgressVisibility);
+
     updateFromResource(true);
     retranslateUi();
 
@@ -418,6 +421,8 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
 
     ui->imageControlWidget->updateFromResources(cameras);
 
+    updateWearableProgressVisibility();
+
     if (!m_camera)
     {
         ui->nameEdit->clear();
@@ -436,7 +441,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         ui->motionControlsWidget->setVisible(false);
         ui->motionAvailableLabel->setVisible(true);
         ui->wearableUploadWidget->setVisible(false);
-        ui->wearableProgressWidget->setVisible(false);
     }
     else
     {
@@ -445,7 +449,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         bool hasAudio = m_camera->isAudioSupported();
 
         ui->wearableUploadWidget->setVisible(isWearable);
-        ui->wearableProgressWidget->setVisible(isWearable);
         ui->modelEdit->setVisible(!isWearable);
         ui->modelLabel->setVisible(!isWearable);
         ui->firmwareEdit->setVisible(!isWearable);
@@ -774,6 +777,16 @@ void QnSingleCameraSettingsWidget::updateAlertBar()
         default:
             ui->alertBar->setText(QString());
     }
+}
+
+void QnSingleCameraSettingsWidget::updateWearableProgressVisibility()
+{
+    if (!m_camera || !m_camera->hasFlags(Qn::wearable_camera)) {
+        ui->wearableProgressWidget->setVisible(false);
+        return;
+    }
+
+    ui->wearableProgressWidget->setVisible(ui->wearableProgressWidget->isActive());
 }
 
 bool QnSingleCameraSettingsWidget::isValidSecondStream()

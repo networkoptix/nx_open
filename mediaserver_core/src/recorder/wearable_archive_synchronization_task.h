@@ -41,10 +41,12 @@ public:
     virtual void cancel() override;
     virtual bool execute() override;
 
+    // TODO: STATUS NOT PROGRESS w/error
     int progress() const;
 
 signals:
     void progressChanged(int progress);
+    void finished();
 
 private:
     void createArchiveReader(qint64 startTimeMs);
@@ -56,11 +58,12 @@ private:
     QPointer<QIODevice> m_file;
     qint64 m_startTimeMs = 0;
     int m_progress = 0;
-    std::function<void()> m_doneHandler;
 
     std::unique_ptr<QnAbstractArchiveStreamReader> m_archiveReader;
     std::unique_ptr<QnServerEdgeStreamRecorder> m_recorder;
 };
+
+using WearableArchiveTaskPtr = std::shared_ptr<WearableArchiveSynchronizationTask>;
 
 } // namespace recorder
 } // namespace mediaserver_core

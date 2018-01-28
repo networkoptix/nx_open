@@ -44,6 +44,8 @@ public:
         QObject* context,
         Callback callback);
 
+    UploadState state(const QString& id);
+
     void cancelUpload(const QString& id);
 
 private:

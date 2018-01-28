@@ -54,6 +54,15 @@ QString UploadManager::addUpload(
     return state.id;
 }
 
+UploadState UploadManager::state(const QString& id)
+{
+    auto pos = m_workers.find(id);
+    if (pos == m_workers.end())
+        return UploadState();
+
+    return pos.value()->state();
+}
+
 void UploadManager::cancelUpload(const QString& id)
 {
     auto pos = m_workers.find(id);

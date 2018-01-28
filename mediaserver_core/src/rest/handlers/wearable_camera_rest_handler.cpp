@@ -5,6 +5,7 @@
 #include <nx_ec/ec_api.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <api/model/wearable_camera_reply.h>
+#include <api/model/wearable_status_reply.h>
 #include <recorder/wearable_archive_synchronizer.h>
 #include <rest/server/rest_connection_processor.h>
 #include <core/resource/media_server_resource.h>
@@ -13,12 +14,27 @@
 #include <common/common_module.h>
 #include <plugins/resource/wearable/wearable_camera_resource.h>
 #include <media_server/media_server_module.h>
+#include <media_server/wearable_upload_manager.h>
+#include <media_server/wearable_lock_manager.h>
 
 #include <nx/utils/std/cpp14.h>
 
 QStringList QnWearableCameraRestHandler::cameraIdUrlParams() const
 {
     return {lit("cameraId")};
+}
+
+int QnWearableCameraRestHandler::executeGet(
+    const QString& path,
+    const QnRequestParams& params,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
+{
+    QString action = extractAction(path);
+    if (action == "status")
+        return executeStatus(params, result, owner);
+
+    return nx_http::StatusCode::notFound;
 }
 
 int QnWearableCameraRestHandler::executePost(
@@ -34,6 +50,18 @@ int QnWearableCameraRestHandler::executePost(
 
     if (action == "consume")
         return executeConsume(params, result, owner);
+
+    if (action == "status")
+        return executeStatus(params, result, owner);
+
+    if (action == "lock")
+        return executeLock(params, result, owner);
+
+    if (action == "extend")
+        return executeExtend(params, result, owner);
+
+    if (action == "release")
+        return executeRelease(params, result, owner);
 
     return nx_http::StatusCode::notFound;
 }
@@ -74,6 +102,147 @@ int QnWearableCameraRestHandler::executeAdd(
     return nx_http::StatusCode::ok;
 }
 
+int QnWearableCameraRestHandler::executeStatus(const QnRequestParams& params,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
+{
+    QnUuid cameraId;
+    if (!requireParameter(params, lit("cameraId"), result, &cameraId))
+        return nx_http::StatusCode::invalidParameter;
+
+    QnWearableLockManager* locker = lockManager(result);
+    if (!locker)
+        return nx_http::StatusCode::internalServerError;
+
+    QnWearableUploadManager* uploader = uploadManager(result);
+    if (!uploader)
+        return nx_http::StatusCode::internalServerError;
+
+    QnWearableLockInfo info = locker->lockInfo(cameraId);
+
+    QnWearableStatusReply reply;
+    reply.success = true;
+    reply.locked = info.locked;
+    reply.consuming = uploader->isConsuming(cameraId);
+    reply.userId = info.userId;
+    reply.progress = 0; // TODO: #wearable
+    result.setReply(reply);
+
+    return nx_http::StatusCode::ok;
+}
+
+int QnWearableCameraRestHandler::executeLock(const QnRequestParams& params,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
+{
+    QnUuid cameraId;
+    if (!requireParameter(params, lit("cameraId"), result, &cameraId))
+        return nx_http::StatusCode::invalidParameter;
+
+    QnUuid userId;
+    if (!requireParameter(params, lit("userId"), result, &userId))
+        return nx_http::StatusCode::invalidParameter;
+
+    qint64 ttl;
+    if (!requireParameter(params, lit("ttl"), result, &ttl))
+        return nx_http::StatusCode::invalidParameter;
+
+    QnWearableLockManager* locker = lockManager(result);
+    if (!locker)
+        return nx_http::StatusCode::internalServerError;
+
+    QnWearableUploadManager* uploader = uploadManager(result);
+    if (!uploader)
+        return nx_http::StatusCode::internalServerError;
+
+    QnWearableStatusReply reply;
+    reply.success =
+        !uploader->isConsuming(cameraId)
+        && locker->acquireLock(cameraId, userId, ttl, &reply.token);
+
+    QnWearableLockInfo info = locker->lockInfo(cameraId);
+    reply.locked = info.locked;
+    reply.userId = info.userId;
+
+    reply.consuming = uploader->isConsuming(cameraId);
+    reply.progress = 0; // TODO: #wearable
+
+    result.setReply(reply);
+
+    return nx_http::StatusCode::ok;
+}
+
+int QnWearableCameraRestHandler::executeExtend(const QnRequestParams& params,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
+{
+    QnUuid cameraId;
+    if (!requireParameter(params, lit("cameraId"), result, &cameraId))
+        return nx_http::StatusCode::invalidParameter;
+
+    QnUuid token;
+    if (!requireParameter(params, lit("token"), result, &token))
+        return nx_http::StatusCode::invalidParameter;
+
+    qint64 ttl;
+    if (!requireParameter(params, lit("ttl"), result, &ttl))
+        return nx_http::StatusCode::invalidParameter;
+
+    QnWearableLockManager* locker = lockManager(result);
+    if (!locker)
+        return nx_http::StatusCode::internalServerError;
+
+    QnWearableUploadManager* uploader = uploadManager(result);
+    if (!uploader)
+        return nx_http::StatusCode::internalServerError;
+
+    QnWearableLockInfo info = locker->lockInfo(cameraId);
+
+    QnWearableStatusReply reply;
+    reply.success = locker->extendLock(cameraId, token, ttl);
+    reply.locked = info.locked;
+    reply.consuming = uploader->isConsuming(cameraId);
+    reply.userId = info.userId;
+    reply.progress = 0; // TODO: #wearable
+    result.setReply(reply);
+
+    return nx_http::StatusCode::ok;
+}
+
+int QnWearableCameraRestHandler::executeRelease(const QnRequestParams& params,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
+{
+    QnUuid cameraId;
+    if (!requireParameter(params, lit("cameraId"), result, &cameraId))
+        return nx_http::StatusCode::invalidParameter;
+
+    QnUuid token;
+    if (!requireParameter(params, lit("token"), result, &token))
+        return nx_http::StatusCode::invalidParameter;
+
+    QnWearableLockManager* locker = lockManager(result);
+    if (!locker)
+        return nx_http::StatusCode::internalServerError;
+
+    QnWearableUploadManager* uploader = uploadManager(result);
+    if (!uploader)
+        return nx_http::StatusCode::internalServerError;
+
+    QnWearableStatusReply reply;
+    reply.success = locker->releaseLock(cameraId, token);
+
+    QnWearableLockInfo info = locker->lockInfo(cameraId);
+    reply.locked = info.locked;
+    reply.userId = info.userId;
+
+    reply.consuming = uploader->isConsuming(cameraId);
+    reply.progress = 0; // TODO: #wearable
+    result.setReply(reply);
+
+    return nx_http::StatusCode::ok;
+}
+
 int QnWearableCameraRestHandler::executeConsume(
     const QnRequestParams& params,
     QnJsonRestResult& result,
@@ -91,56 +260,44 @@ int QnWearableCameraRestHandler::executeConsume(
     if (!requireParameter(params, lit("uploadId"), result, &uploadId))
         return nx_http::StatusCode::invalidParameter;
 
-    const auto camera = owner->resourcePool()->getResourceById(cameraId)
-        .dynamicCast<QnWearableCameraResource>();
-
-    if (!camera)
+    QnUuid token;
+    if (!requireParameter(params, lit("token"), result, &token))
         return nx_http::StatusCode::invalidParameter;
 
-    using namespace nx::vms::common::p2p::downloader;
-    auto downloader = qnServerModule->findInstance<Downloader>();
-    if (!downloader)
-    {
-        result.setError(QnJsonRestResult::CantProcessRequest,
-            lit("DistributedFileDownloader is not initialized."));
+    QnWearableUploadManager* uploader = uploadManager(result);
+    if (!uploader)
         return nx_http::StatusCode::internalServerError;
-    }
 
-    std::unique_ptr<QFile> file = std::make_unique<QFile>(downloader->filePath(uploadId));
-    if (!file->open(QIODevice::ReadOnly))
-    {
-        result.setError(QnJsonRestResult::CantProcessRequest,
-            lit("Couldn't open file \"%1\" for reading.").arg(uploadId));
+    QnWearableLockManager* locker = lockManager(result);
+    if (!locker)
         return nx_http::StatusCode::internalServerError;
-    }
 
-    using namespace nx::mediaserver_core::recorder;
-    auto synchronizer = qnServerModule->findInstance<WearableArchiveSynchronizer>();
-    if (!synchronizer)
-    {
-        result.setError(QnJsonRestResult::CantProcessRequest,
-            lit("WearableArchiveSynchronizer is not initialized."));
-        return nx_http::StatusCode::internalServerError;
-    }
+    if (!locker->extendLock(cameraId, token, 0))
+        return nx_http::StatusCode::notAllowed;
 
-    auto deleteHandler =
-        [uploadId]()
-        {
-            auto downloader = qnServerModule->findInstance<Downloader>();
-            if (!downloader)
-                return;
-
-            downloader->deleteFile(uploadId);
-        };
-
-    RemoteArchiveTaskPtr task(new WearableArchiveSynchronizationTask(
-        qnServerModule,
-        camera,
-        std::move(file),
-        startTimeMs));
-    task->setDoneHandler(deleteHandler);
-
-    synchronizer->addTask(camera, task);
+    if (!uploader->consume(cameraId, token, uploadId, startTimeMs))
+        return nx_http::StatusCode::invalidParameter;
 
     return nx_http::StatusCode::ok;
 }
+
+QnWearableLockManager* QnWearableCameraRestHandler::lockManager(QnJsonRestResult& result) const
+{
+    if (QnWearableLockManager* manager = qnServerModule->findInstance<QnWearableLockManager>())
+        return manager;
+
+    result.setError(QnJsonRestResult::CantProcessRequest,
+        lit("QnWearableLockManager is not initialized."));
+    return nullptr;
+}
+
+QnWearableUploadManager* QnWearableCameraRestHandler::uploadManager(QnJsonRestResult& result) const
+{
+    if (QnWearableUploadManager* manager = qnServerModule->findInstance<QnWearableUploadManager>())
+        return manager;
+
+    result.setError(QnJsonRestResult::CantProcessRequest,
+        lit("QnWearableUploadManager is not initialized."));
+    return nullptr;
+}
+

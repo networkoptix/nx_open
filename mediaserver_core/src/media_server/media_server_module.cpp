@@ -44,6 +44,9 @@
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 
+#include "wearable_lock_manager.h"
+#include "wearable_upload_manager.h"
+
 namespace {
 
 void installTranslations()
@@ -161,6 +164,10 @@ QnMediaServerModule::QnMediaServerModule(
         downloadsDirectory(), commonModule(), nullptr, this));
 
     store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
+
+    store(new QnWearableLockManager(this));
+
+    store(new QnWearableUploadManager(this));
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());

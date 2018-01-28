@@ -227,6 +227,31 @@ public:
         GetCallback callback,
         QThread* targetThread = nullptr);
 
+    Handle wearableCameraStatus(
+        const QnNetworkResourcePtr& camera,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle lockWearableCamera(
+        const QnNetworkResourcePtr& camera,
+        const QnUserResourcePtr& user,
+        qint64 ttl,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle extendWearableCameraLock(
+        const QnNetworkResourcePtr& camera,
+        const QnUuid& token,
+        qint64 ttl,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle releaseWearableCameraLock(
+        const QnNetworkResourcePtr& camera,
+        const QnUuid& token,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
     /**
      * Makes the server consume a media file as a footage for a wearable camera.
      * The file itself should be uploaded (or downloaded) to the server beforehand via
@@ -236,6 +261,7 @@ public:
      * uploaded file.
      *
      * @param camera                    Camera to add footage to.
+     * @param token                     Lock token.
      * @param uploadId                  Name of the uploaded file to use.
      * @param startTimeMs               Start time of the footage, in msecs since epoch.
      *
@@ -243,6 +269,7 @@ public:
      */
     Handle consumeWearableCameraFile(
         const QnNetworkResourcePtr& camera,
+        const QnUuid& token,
         const QString& uploadId,
         qint64 startTimeMs,
         PostCallback callback,
