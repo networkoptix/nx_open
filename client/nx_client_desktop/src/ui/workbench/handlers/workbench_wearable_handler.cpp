@@ -60,7 +60,7 @@ public:
                     resources.push_back(resource);
             }
 
-            if (!messages::Resources::stopWearableUploadAndExit(mainWindow(), resources))
+            if (!messages::Resources::stopWearableUploads(mainWindow(), resources))
                 return false;
         }
 

@@ -323,20 +323,19 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
     return result != QDialogButtonBox::Cancel;
 }
 
-bool Resources::stopWearableUploadAndExit(QWidget* parent, const QnResourceList& resources)
+bool Resources::stopWearableUploads(QWidget* parent, const QnResourceList& resources)
 {
     if (resources.isEmpty())
         return true;
 
     QString text = tr("Video uploading to %n camera(s) will stop:", "", resources.size());
-    QString extra = tr("Close %1 anyway?").arg(QnAppInfo::productNameLong());
+    QString extra = tr("Stop uploading?");
 
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Question);
     messageBox.setText(text);
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Close,
-        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+    messageBox.addButton(tr("Stop"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
     messageBox.addCustomWidget(new QLabel(extra, &messageBox));
 

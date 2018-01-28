@@ -37,7 +37,7 @@ public:
 
     static bool deleteResources(QWidget* parent, const QnResourceList& resources);
 
-    static bool stopWearableUploadAndExit(QWidget* parent, const QnResourceList& resources);
+    static bool stopWearableUploads(QWidget* parent, const QnResourceList& resources);
 };
 
 } // namespace messages
