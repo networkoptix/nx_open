@@ -84,7 +84,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     layout->addWidget(m_buttonBox);
 
     connect(m_settingsWidget, &QnCameraSettingsWidget::hasChangesChanged, this, &QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged);
-    connect(m_settingsWidget, &QnCameraSettingsWidget::modeChanged, this, &QnCameraSettingsDialog::at_settingsWidget_modeChanged);
+    connect(m_settingsWidget, &QnCameraSettingsWidget::modeChanged, this, &QnCameraSettingsDialog::updateButtonsVisibility);
 
     connect(m_openButton, &QPushButton::clicked, this, &QnCameraSettingsDialog::at_openButton_clicked);
     connect(m_diagnoseButton, &QPushButton::clicked, this, &QnCameraSettingsDialog::at_diagnoseButton_clicked);
@@ -190,14 +190,19 @@ void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged()
     m_settingsWidget->setExportScheduleButtonEnabled(!hasChanges);
 }
 
-void QnCameraSettingsDialog::at_settingsWidget_modeChanged()
+void QnCameraSettingsDialog::updateButtonsVisibility()
 {
     QnCameraSettingsWidget::Mode mode = m_settingsWidget->mode();
     bool isValidMode = (mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
+
+    bool hasWearable = false;
+    for (const QnVirtualCameraResourcePtr& camera : m_settingsWidget->cameras())
+        hasWearable |= camera->hasFlags(Qn::wearable_camera);
+
     m_okButton->setEnabled(isValidMode && !commonModule()->isReadOnly());
     m_openButton->setVisible(isValidMode);
-    m_diagnoseButton->setVisible(isValidMode);
-    m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);  // TODO: #GDM implement
+    m_diagnoseButton->setVisible(isValidMode && !hasWearable);
+    m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode && !hasWearable); // TODO: #GDM implement
 }
 
 void QnCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
@@ -276,6 +281,7 @@ bool QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& camer
 
     m_settingsWidget->setCameras(cameras);
     retranslateUi();
+    updateButtonsVisibility();
     return true;
 }
 
