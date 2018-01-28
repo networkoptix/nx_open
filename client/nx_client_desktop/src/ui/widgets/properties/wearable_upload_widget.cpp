@@ -42,6 +42,8 @@ QnWearableUploadWidget::QnWearableUploadWidget(QWidget* parent):
             if (m_camera && state.cameraId == m_camera->getId())
                 updateFromState(state);
         });
+
+    ui->uploadFolderButton->hide(); // TODO: #wearable
 }
 
 QnWearableUploadWidget::~QnWearableUploadWidget()
