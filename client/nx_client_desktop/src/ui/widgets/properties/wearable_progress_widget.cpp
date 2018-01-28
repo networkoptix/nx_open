@@ -1,6 +1,8 @@
 #include "wearable_progress_widget.h"
 #include "ui_wearable_progress_widget.h"
 
+#include <QtCore/QFileInfo>
+
 #include <client/client_module.h>
 
 #include <core/resource/camera_resource.h>
@@ -114,11 +116,11 @@ QString QnWearableProgressWidget::calculateMessage(const WearableState& state)
     case WearableState::Locked:
     case WearableState::Uploading:
         return tr("Uploading %1... %2\t%p%")
-            .arg(state.currentFile.path)
+            .arg(calculateFileName(state))
             .arg(calculateQueueMessage(state));
     case WearableState::Consuming:
         return tr("Finalizing %1... %2\t%p")
-            .arg(state.currentFile.path)
+            .arg(calculateFileName(state))
             .arg(calculateQueueMessage(state));;
     default:
         return QString();
@@ -131,6 +133,11 @@ QString QnWearableProgressWidget::calculateQueueMessage(const WearableState& sta
         return QString();
 
     return tr("(%n more file(s) in queue)", "", state.queue.size());
+}
+
+QString QnWearableProgressWidget::calculateFileName(const WearableState& state)
+{
+    return QFileInfo(state.currentFile.path).fileName();
 }
 
 int QnWearableProgressWidget::calculateProgress(const WearableState& state)
