@@ -1,5 +1,7 @@
 #include "resources_messages.h"
 
+#include <QtWidgets/QLabel>
+
 #include <boost/algorithm/cxx11/all_of.hpp>
 
 #include <common/common_module.h>
@@ -40,7 +42,7 @@ static const QString kRemoveItemsFromLayoutShowOnceKey(lit("RemoveItemsFromLayou
 /*  Batch delete resources. */
 static const QString kDeleteResourcesShowOnceKey(lit("DeleteResources"));
 
-static const QnResourceListView::Options kSimpleOptions(QnResourceListView::HideStatusOption 
+static const QnResourceListView::Options kSimpleOptions(QnResourceListView::HideStatusOption
     | QnResourceListView::ServerAsHealthMonitorOption
     | QnResourceListView::SortAsInTreeOption);
 
@@ -319,6 +321,26 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
         qnClientShowOnce->setFlag(kDeleteResourcesShowOnceKey);
 
     return result != QDialogButtonBox::Cancel;
+}
+
+bool Resources::stopWearableUploadAndExit(QWidget* parent, const QnResourceList& resources)
+{
+    if (resources.isEmpty())
+        return true;
+
+    QString text = tr("Video uploading to %n camera(s) will stop:", "", resources.size());
+    QString extra = tr("Close %1 anyway?").arg(QnAppInfo::productNameLong());
+
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
+    messageBox.setText(text);
+    messageBox.setStandardButtons(QDialogButtonBox::Cancel);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Close,
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+    messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
+    messageBox.addCustomWidget(new QLabel(extra, &messageBox));
+
+    return messageBox.exec() != QDialogButtonBox::Cancel;
 }
 
 } // namespace messages

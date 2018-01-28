@@ -36,6 +36,8 @@ public:
     static bool changeVideoWallLayout(QWidget* parent, const QnResourceList& inaccessible);
 
     static bool deleteResources(QWidget* parent, const QnResourceList& resources);
+
+    static bool stopWearableUploadAndExit(QWidget* parent, const QnResourceList& resources);
 };
 
 } // namespace messages

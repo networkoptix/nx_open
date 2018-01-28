@@ -37,6 +37,7 @@ enum class QnMessageBoxCustomButton
     Overwrite,                  //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
     Delete,                     //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
     Reset,                      //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
+    Close,                      //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
     Skip,                       //< QDialogButtonBox::RejectRole / Qn::ButtonAccent::NoAccent
 };
 

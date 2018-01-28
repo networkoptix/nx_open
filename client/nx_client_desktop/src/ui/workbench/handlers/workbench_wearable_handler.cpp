@@ -4,6 +4,7 @@
 
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/messages/resources_messages.h>
 #include <nx/client/desktop/utils/upload_manager.h>
 #include <nx/client/desktop/utils/wearable_manager.h>
 #include <api/model/wearable_camera_reply.h>
@@ -16,6 +17,7 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/common/read_only.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_state_manager.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <plugins/resource/avi/avi_resource.h>
 #include <api/server_rest_connection.h>
@@ -23,6 +25,7 @@
 #include <client/client_module.h>
 
 using namespace nx::client::desktop;
+using namespace nx::client::desktop::ui;
 
 namespace {
 /**
@@ -34,11 +37,50 @@ const qint64 kDefaultUploadTtl = 1000 * 60 * 10;
 
 } // namespace
 
+class QnWearableSessionDelegate:
+    public QObject,
+    public QnSessionAwareDelegate
+{
+public:
+    QnWearableSessionDelegate(QObject* parent) :
+        QObject(parent),
+        QnSessionAwareDelegate(parent)
+    {
+    }
+
+    virtual bool tryClose(bool force) override
+    {
+        if (!force)
+        {
+            QnResourceList resources;
+            for (const WearableState& state : qnClientModule->wearableManager()->runningUploads())
+            {
+                QnResourcePtr resource = resourcePool()->getResourceById(state.cameraId);
+                if (resource)
+                    resources.push_back(resource);
+            }
+
+            if (!messages::Resources::stopWearableUploadAndExit(mainWindow(), resources))
+                return false;
+        }
+
+        qnClientModule->wearableManager()->cancelAllUploads();
+        return true;
+    }
+
+    virtual void forcedUpdate() override
+    {
+        qnClientModule->wearableManager()->setCurrentUser(context()->user());
+    }
+};
+
 QnWorkbenchWearableHandler::QnWorkbenchWearableHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
     using namespace ui::action;
+
+    new QnWearableSessionDelegate(this);
 
     connect(action(NewWearableCameraAction), &QAction::triggered, this,
         &QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered);
