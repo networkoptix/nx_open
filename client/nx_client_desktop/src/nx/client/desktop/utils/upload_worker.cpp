@@ -47,6 +47,8 @@ UploadWorker::UploadWorker(const QnMediaServerResourcePtr& server, const QString
     QObject(parent),
     d(new Private(server))
 {
+    NX_ASSERT(server);
+
     d->file.reset(new QFile(path));
     d->ttl = ttl;
 
