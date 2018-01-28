@@ -45,6 +45,9 @@ const QnUserResourcePtr& WearableManager::currentUser() const
 
 WearableState WearableManager::state(const QnSecurityCamResourcePtr& camera)
 {
+    if (!camera)
+        return WearableState();
+
     auto pos = d->workers.find(camera->getId());
     if (pos == d->workers.end())
         return WearableState();
