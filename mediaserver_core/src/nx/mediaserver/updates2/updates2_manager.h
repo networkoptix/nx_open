@@ -19,7 +19,7 @@ private:
     virtual void loadStatusFromFile() override;
     virtual void connectToSignals() override;
     virtual update::info::AbstractUpdateRegistryPtr getGlobalRegistry() override;
-    update::info::AbstractUpdateRegistryPtr Updates2Manager::getRemoteRegistry() override;
+    update::info::AbstractUpdateRegistryPtr getRemoteRegistry() override;
     virtual QnUuid moduleGuid() override;
     virtual void updateGlobalRegistry(const QByteArray& serializedRegistry) override;
     virtual void writeStatusToFile(const detail::Updates2StatusDataEx& statusData) override;

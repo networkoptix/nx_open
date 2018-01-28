@@ -4,6 +4,7 @@
 #include <nx/mediaserver/updates2/updates2_manager.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/mediaserver/updates2/detail/update_request_data_factory.h>
 #include <nx/update/info/abstract_update_registry.h>
@@ -223,7 +224,7 @@ protected:
                 .WillRepeatedly(Return(QByteArray()));
         }
 
-        return updateRegistry;
+        return std::move(updateRegistry);
     }
 
     void expectingUpdateGlobalRegistryWillBeCalled()
