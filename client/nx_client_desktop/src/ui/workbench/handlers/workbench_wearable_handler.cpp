@@ -51,19 +51,19 @@ QnWorkbenchWearableHandler::~QnWorkbenchWearableHandler()
 {
 }
 
-qreal QnWorkbenchWearableHandler::calculateProgress(const FileUpload& upload, bool processed)
+qreal QnWorkbenchWearableHandler::calculateProgress(const UploadState& upload, bool processed)
 {
     if (processed)
         return 1.0;
 
     switch (upload.status)
     {
-        case FileUpload::CreatingUpload:
+        case UploadState::CreatingUpload:
             return 0.1;
-        case FileUpload::Uploading:
+        case UploadState::Uploading:
             return 0.1 + 0.8 * upload.uploaded / upload.size;
-        case FileUpload::Checking:
-        case FileUpload::Done:
+        case UploadState::Checking:
+        case UploadState::Done:
             return 0.9;
         default:
             return 0.0;
@@ -169,15 +169,15 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     if (startTimeMs == 0)
         startTimeMs = QFileInfo(fileName).created().toMSecsSinceEpoch();
 
-    FileUpload upload = qnClientModule->uploadManager()->addUpload(
+    UploadState upload = qnClientModule->uploadManager()->addUpload(
         server,
         fileName,
         kDefaultUploadTtl,
         this,
-        [this](const FileUpload& upload) { at_upload_progress(upload); }
+        [this](const UploadState& upload) { at_upload_progress(upload); }
     );
 
-    if (upload.status == FileUpload::Error)
+    if (upload.status == UploadState::Error)
     {
         QnMessageBox::critical(
             mainWindow(),
@@ -192,19 +192,19 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     m_infoByUploadId[upload.id] = info;
 }
 
-void QnWorkbenchWearableHandler::at_upload_progress(const FileUpload& upload)
+void QnWorkbenchWearableHandler::at_upload_progress(const UploadState& upload)
 {
     FootageInfo info = m_infoByUploadId.value(upload.id);
 
     qnClientModule->wearableManager()->tehProgress(calculateProgress(upload, /*processed*/ false));
 
-    if (upload.status == FileUpload::Error)
+    if (upload.status == UploadState::Error)
     {
         m_infoByUploadId.remove(upload.id);
         return;
     }
 
-    if (upload.status == FileUpload::Done)
+    if (upload.status == UploadState::Done)
     {
         /* Check if it's our download. */
         if (!info.camera)

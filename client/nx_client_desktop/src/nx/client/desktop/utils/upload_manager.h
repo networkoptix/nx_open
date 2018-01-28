@@ -5,7 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 
-#include "file_upload.h"
+#include "upload_state.h"
 
 namespace nx {
 namespace client {
@@ -18,7 +18,7 @@ class UploadManager: public QObject
     Q_OBJECT
 
 public:
-    using Callback = std::function<void(const FileUpload&)>;
+    using Callback = std::function<void(const UploadState&)>;
 
     UploadManager(QObject* parent = nullptr);
     virtual ~UploadManager() override;
@@ -36,7 +36,7 @@ public:
      * @returns                         Upload description. Don't forget to check for
      *                                  errors in the return value.
      */
-    FileUpload addUpload(
+    UploadState addUpload(
         const QnMediaServerResourcePtr& server,
         const QString& path,
         qint64 ttl,

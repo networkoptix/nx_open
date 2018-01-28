@@ -6,7 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 
-#include "file_upload.h"
+#include "upload_state.h"
 
 namespace nx {
 namespace client {
@@ -24,13 +24,13 @@ public:
         QObject* parent = nullptr);
     virtual ~UploadWorker() override;
 
-    FileUpload start();
+    UploadState start();
     void cancel();
 
-    FileUpload status() const;
+    UploadState status() const;
 
 signals:
-    void progress(const FileUpload&);
+    void progress(const UploadState&);
 
 private:
     void emitProgress();
