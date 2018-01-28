@@ -98,7 +98,7 @@ void WearableWorker::updateState()
 
     if (d->waitingForStatusReply)
         return; //< Too many updates.
-    waitingForStatusReply = true;
+    d->waitingForStatusReply = true;
 
     auto callback =
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
