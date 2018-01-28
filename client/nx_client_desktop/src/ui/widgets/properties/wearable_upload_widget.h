@@ -26,6 +26,8 @@ private:
     bool calculateEnabled(const nx::client::desktop::WearableState& state);
     QString calculateMessage(const nx::client::desktop::WearableState& state);
 
+    void maybePollState();
+
 private:
     QScopedPointer<Ui::WearableUploadWidget> ui;
     QnVirtualCameraResourcePtr m_camera;

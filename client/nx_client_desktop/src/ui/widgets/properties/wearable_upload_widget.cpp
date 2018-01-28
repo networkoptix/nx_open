@@ -1,6 +1,8 @@
 #include "wearable_upload_widget.h"
 #include "ui_wearable_upload_widget.h"
 
+#include <QtCore/QTimer>
+
 #include <client/client_module.h>
 
 #include <core/resource/camera_resource.h>
@@ -12,12 +14,20 @@
 
 using namespace nx::client::desktop;
 
+namespace {
+const int kStatePollPeriodMSec = 1000 * 2;
+}
+
 QnWearableUploadWidget::QnWearableUploadWidget(QWidget* parent):
     QWidget(parent),
     QnWorkbenchContextAware(parent, true),
     ui(new Ui::WearableUploadWidget)
 {
     ui->setupUi(this);
+
+    QTimer* timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &QnWearableUploadWidget::maybePollState);
+    timer->start(kStatePollPeriodMSec);
 
     connect(ui->uploadFileButton, &QPushButton::pressed, this,
         [this]()
@@ -45,15 +55,8 @@ void QnWearableUploadWidget::setCamera(const QnVirtualCameraResourcePtr &camera)
 
     m_camera = camera;
 
-    if (m_camera)
-    {
-        updateFromState(qnClientModule->wearableManager()->state(camera));
-        qnClientModule->wearableManager()->updateState(camera);
-    }
-    else
-    {
-        updateFromState(WearableState());
-    }
+    updateFromState(qnClientModule->wearableManager()->state(camera));
+    maybePollState();
 }
 
 QnVirtualCameraResourcePtr QnWearableUploadWidget::camera() const
@@ -84,4 +87,17 @@ QString QnWearableUploadWidget::calculateMessage(const WearableState& state)
         return tr("User \"%1\" is currently uploading footage to this camera.").arg(user->getName());
     else
         return tr("Another user is currently uploading footage to this camera.");
+}
+
+void QnWearableUploadWidget::maybePollState()
+{
+    if (!isVisible())
+        return;
+
+    if (!m_camera)
+        return;
+
+    WearableState state = qnClientModule->wearableManager()->state(m_camera);
+    if(state.status == WearableState::Unlocked || state.status == WearableState::LockedByOtherClient)
+        qnClientModule->wearableManager()->updateState(m_camera);
 }
