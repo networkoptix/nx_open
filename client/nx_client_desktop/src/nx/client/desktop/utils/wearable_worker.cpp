@@ -32,7 +32,7 @@ namespace {
  */
 const qint64 kDefaultUploadTtl = 1000 * 60 * 10;
 
-const qint64 kLockTtlMSec = 1000 * 60 * 60;
+const qint64 kLockTtlMSec = 1000 * 15;
 
 const qint64 kPollPeriodMSec = 1000 * 5;
 
@@ -61,6 +61,7 @@ struct WearableWorker::Private
     QnUuid lockToken;
 
     ServerRequestStorage requests;
+    bool waitingForStatusReply = false;
 };
 
 WearableWorker::WearableWorker(
@@ -77,12 +78,11 @@ WearableWorker::WearableWorker(
     QTimer* timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &WearableWorker::at_timer_timeout);
     timer->start(kPollPeriodMSec);
-
 }
 
 WearableWorker::~WearableWorker()
 {
-
+    d->requests.cancelAllRequests();
 }
 
 WearableState WearableWorker::state() const
@@ -95,6 +95,10 @@ void WearableWorker::updateState()
     WearableState::Status status = d->state.status;
     if (status != WearableState::Unlocked && status != WearableState::LockedByOtherClient)
         return; //< No point to update.
+
+    if (d->waitingForStatusReply)
+        return; //< Too many updates.
+    waitingForStatusReply = true;
 
     auto callback =
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
@@ -216,6 +220,8 @@ void WearableWorker::processNextFile()
 
 void WearableWorker::handleStatusFinished(bool success, const QnWearableStatusReply& result)
 {
+    d->waitingForStatusReply = false;
+
     if (!success || !result.success)
         return;
 
