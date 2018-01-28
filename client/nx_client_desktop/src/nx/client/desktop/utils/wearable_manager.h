@@ -28,9 +28,11 @@ public:
     const QnUserResourcePtr& currentUser() const;
 
     WearableState state(const QnSecurityCamResourcePtr& camera);
+    QList<WearableState> runningUploads();
 
     void updateState(const QnSecurityCamResourcePtr& camera);
     bool addUpload(const QnSecurityCamResourcePtr& camera, const QString& path, QString* errorMessage);
+    void cancelAllUploads();
 
 signals:
     void stateChanged(const WearableState& state);
@@ -39,7 +41,7 @@ signals:
 private:
     WearableWorker* ensureWorker(const QnSecurityCamResourcePtr& camera);
     void dropWorker(const QnResourcePtr& resource);
-    void clearAllWorkers();
+    void dropAllWorkers();
 
 private:
     struct Private;

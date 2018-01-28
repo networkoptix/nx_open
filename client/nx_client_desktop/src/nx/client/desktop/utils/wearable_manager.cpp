@@ -26,7 +26,7 @@ WearableManager::WearableManager(QObject* parent):
 
 WearableManager::~WearableManager()
 {
-    clearAllWorkers();
+    dropAllWorkers();
 }
 
 void WearableManager::setCurrentUser(const QnUserResourcePtr& user)
@@ -34,7 +34,7 @@ void WearableManager::setCurrentUser(const QnUserResourcePtr& user)
     if (d->currentUser == user)
         return;
 
-    clearAllWorkers();
+    dropAllWorkers();
     d->currentUser = user;
 }
 
@@ -52,6 +52,15 @@ WearableState WearableManager::state(const QnSecurityCamResourcePtr& camera)
     return (*pos)->state();
 }
 
+QList<WearableState> WearableManager::runningUploads()
+{
+    QList<WearableState> result;
+    for (WearableWorker* worker : d->workers)
+        if (worker->isWorking())
+            result.push_back(worker->state());
+    return result;
+}
+
 void WearableManager::updateState(const QnSecurityCamResourcePtr& camera)
 {
     if(WearableWorker* worker = ensureWorker(camera))
@@ -63,6 +72,11 @@ bool WearableManager::addUpload(const QnSecurityCamResourcePtr& camera, const QS
     if (WearableWorker* worker = ensureWorker(camera))
         return worker->addUpload(path, errorMessage);
     return true; //< Just ignore it silently.
+}
+
+void WearableManager::cancelAllUploads()
+{
+    dropAllWorkers();
 }
 
 WearableWorker* WearableManager::ensureWorker(const QnSecurityCamResourcePtr& camera)
@@ -98,7 +112,7 @@ void WearableManager::dropWorker(const QnResourcePtr& resource)
     d->workers.erase(pos);
 }
 
-void WearableManager::clearAllWorkers()
+void WearableManager::dropAllWorkers()
 {
     qDeleteAll(d->workers);
     d->workers.clear();
