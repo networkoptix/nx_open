@@ -89,13 +89,17 @@ void DownloaderPrivate::at_workerFinished(const QString& fileName)
 
 //-------------------------------------------------------------------------------------------------
 
+AbstractDownloader::AbstractDownloader(QObject* parent):
+    QObject(parent)
+{}
+
 Downloader::Downloader(
     const QDir& downloadsDirectory,
     QnCommonModule* commonModule,
     AbstractPeerManagerFactory* peerManagerFactory,
     QObject* parent)
     :
-    QObject(parent),
+    AbstractDownloader(parent),
     QnCommonModuleAware(commonModule),
     d_ptr(new DownloaderPrivate(this))
 {
@@ -116,7 +120,6 @@ Downloader::Downloader(
         d->peerManagerFactoryOwner = std::move(factory);
     }
 }
-
 
 void Downloader::atServerStart()
 {

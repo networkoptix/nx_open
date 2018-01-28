@@ -27,25 +27,25 @@ public:
     Q_ENUM(StatusCode)
 
     QnUuid serverId;
-    StatusCode status = StatusCode::notAvailable;
+    StatusCode state = StatusCode::notAvailable;
     QString message;
     double progress = 0.0;
 
     Updates2StatusData() = default;
     Updates2StatusData(
         const QnUuid& serverId,
-        StatusCode status,
+        StatusCode state,
         QString message = QString(),
         double progress = 0.0)
         :
         serverId(serverId),
-        status(status),
+        state(state),
         message(std::move(message)),
         progress(progress)
     {}
 };
 
-#define Updates2StatusData_Fields (serverId)(status)(message)(progress)
+#define Updates2StatusData_Fields (serverId)(state)(message)(progress)
 QN_FUSION_DECLARE_FUNCTIONS(Updates2StatusData::StatusCode, (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Updates2StatusData), (json))
 

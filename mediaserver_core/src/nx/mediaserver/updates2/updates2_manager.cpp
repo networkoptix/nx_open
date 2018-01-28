@@ -35,35 +35,11 @@ static QString filePath()
         + kFileName;
 }
 
-static qint64 refreshTimeout()
+static qint64 refreshTimeoutImpl()
 {
     const auto settingsValue = qnServerModule->roSettings()->value(
         nx_ms_conf::CHECK_FOR_UPDATE_TIMEOUT).toLongLong();
     return settingsValue == 0 ? kRefreshTimeoutMs : settingsValue;
-}
-
-static bool isNewRegistryBetter(
-    const update::info::AbstractUpdateRegistryPtr& oldRegistry,
-    const update::info::AbstractUpdateRegistryPtr& newRegistry)
-{
-    if (!oldRegistry)
-        return true;
-    QnSoftwareVersion newRegistryServerVersion;
-    if (newRegistry->latestUpdate(
-        detail::UpdateFileRequestDataFactory::create(),
-        &newRegistryServerVersion) != update::info::ResultCode::ok)
-    {
-        return false;
-    }
-    QnSoftwareVersion oldRegistryServerVersion;
-    if (oldRegistry->latestUpdate(
-        detail::UpdateFileRequestDataFactory::create(),
-        &oldRegistryServerVersion) != update::info::ResultCode::ok
-        || newRegistryServerVersion > oldRegistryServerVersion)
-    {
-        return true;
-    }
-    return false;
 }
 
 } // namespace
@@ -71,41 +47,29 @@ static bool isNewRegistryBetter(
 Updates2Manager::Updates2Manager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
-    loadStatusFromFile();
 }
 
-void Updates2Manager::atServerStart()
+qint64 Updates2Manager::refreshTimeout()
 {
-    using namespace std::placeholders;
+    return refreshTimeoutImpl();
+}
 
-    checkForGlobalDictionaryUpdate();
-
-    // Amending initial state
-    switch (m_currentStatus.status)
+void Updates2Manager::loadStatusFromFile()
+{
+    QFile file(filePath());
+    if (!file.open(QIODevice::ReadOnly))
     {
-        case api::Updates2StatusData::StatusCode::available:
-        case api::Updates2StatusData::StatusCode::error:
-        case api::Updates2StatusData::StatusCode::notAvailable:
-            break;
-        case api::Updates2StatusData::StatusCode::checking:
-            setStatusUnsafe(
-                api::Updates2StatusData::StatusCode::notAvailable,
-                "Update is unavailable");
-            break;
-        case api::Updates2StatusData::StatusCode::downloading:
-            setStatusUnsafe(
-                api::Updates2StatusData::StatusCode::available,
-                "Update is available");
-            download();
-            break;
-        case api::Updates2StatusData::StatusCode::preparing:
-            // TODO: implement
-            break;
-        case api::Updates2StatusData::StatusCode::readyToInstall:
-            // TODO: implement
-            break;
+        NX_VERBOSE(this, "Failed to open persistent update status data");
+        return;
     }
 
+    const QByteArray content = file.readAll();
+    if (!QJson::deserialize(content, &m_currentStatus))
+        NX_VERBOSE(this, "Failed to deserialize persistent update status data");
+}
+
+void Updates2Manager::connectToSignals()
+{
     connect(
         globalSettings(), &QnGlobalSettings::updates2RegistryChanged,
         this, &Updates2Manager::checkForGlobalDictionaryUpdate);
@@ -130,276 +94,50 @@ void Updates2Manager::atServerStart()
     connect(
         qnServerModule->findInstance<Downloader>(), &Downloader::chunkDownloadFailed,
         this, &Updates2Manager::onChunkDownloadFailed);
-
-    m_timerManager.addNonStopTimer(
-        std::bind(&Updates2Manager::checkForRemoteUpdate, this, _1),
-        std::chrono::milliseconds(refreshTimeout()),
-        std::chrono::milliseconds(0));
 }
 
-api::Updates2StatusData Updates2Manager::status()
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_currentStatus.base();
-}
-
-void Updates2Manager::loadStatusFromFile()
-{
-    QFile file(filePath());
-    if (!file.open(QIODevice::ReadOnly))
-    {
-        NX_VERBOSE(this, "Failed to open persistent update status data");
-        return;
-    }
-
-    const QByteArray content = file.readAll();
-    if (!QJson::deserialize(content, &m_currentStatus))
-        NX_VERBOSE(this, "Failed to deserialize persistent update status data");
-}
-
-void Updates2Manager::checkForGlobalDictionaryUpdate()
+update::info::AbstractUpdateRegistryPtr Updates2Manager::getGlobalRegistry()
 {
     auto globalRegistry = update::info::UpdateRegistryFactory::create();
     bool deserializeResult = globalRegistry->fromByteArray(globalSettings()->updates2Registry());
     if (!deserializeResult)
-        return;
-    swapRegistries(std::move(globalRegistry));
-    refreshStatusAfterCheck();
+        return update::info::AbstractUpdateRegistryPtr();
+    return globalRegistry;
 }
 
-void Updates2Manager::checkForRemoteUpdate(utils::TimerId /*timerId*/)
+QnUuid Updates2Manager::moduleGuid()
 {
-    {
-        QnMutexLocker lock(&m_mutex);
-        switch (m_currentStatus.status)
-        {
-            case api::Updates2StatusData::StatusCode::notAvailable:
-            case api::Updates2StatusData::StatusCode::available:
-            case api::Updates2StatusData::StatusCode::error:
-                m_currentStatus = api::Updates2StatusData(
-                    commonModule()->moduleGUID(),
-                    api::Updates2StatusData::StatusCode::checking,
-                    "Checking for update");
-                break;
-            default:
-                return;
-        }
-    }
-
-    auto updateUrl= qnServerModule->roSettings()->value(
-        nx_ms_conf::CHECK_FOR_UPDATE_URL).toString();
-    updateUrl = updateUrl.isNull() ? update::info::kDefaultUrl : updateUrl;
-    update::info::AbstractUpdateRegistryPtr updateRegistry = update::info::checkSync(updateUrl);
-
-    if (updateRegistry)
-    {
-        auto globalRegistry = update::info::UpdateRegistryFactory::create();
-        if (!globalRegistry->fromByteArray(globalSettings()->updates2Registry())
-            || isNewRegistryBetter(globalRegistry, updateRegistry))
-        {
-            globalSettings()->setUpdates2Registry(updateRegistry->toByteArray());
-            globalSettings()->synchronizeNow();
-        }
-        swapRegistries(std::move(updateRegistry));
-    }
-
-    refreshStatusAfterCheck();
+    return commonModule()->moduleGUID();
 }
 
-
-void Updates2Manager::swapRegistries(update::info::AbstractUpdateRegistryPtr otherRegistry)
+void Updates2Manager::updateGlobalRegistry(const QByteArray& serializedRegistry)
 {
-    QnMutexLocker lock(&m_mutex);
-    if (isNewRegistryBetter(m_updateRegistry, otherRegistry))
-        m_updateRegistry = std::move(otherRegistry);
+    globalSettings()->setUpdates2Registry(serializedRegistry);
+    globalSettings()->synchronizeNow();
 }
 
-void Updates2Manager::refreshStatusAfterCheck()
+void Updates2Manager::writeStatusToFile(const detail::Updates2StatusDataEx& statusData)
 {
-    QnMutexLocker lock(&m_mutex);
-    switch (m_currentStatus.status)
-    {
-        case api::Updates2StatusData::StatusCode::notAvailable:
-        case api::Updates2StatusData::StatusCode::available:
-        case api::Updates2StatusData::StatusCode::error:
-        case api::Updates2StatusData::StatusCode::checking:
-        {
-            QnSoftwareVersion version;
-            if (!m_updateRegistry)
-            {
-                setStatusUnsafe(
-                    api::Updates2StatusData::StatusCode::error,
-                    "Failed to get updates data");
-                return;
-            }
-
-            if (m_updateRegistry->latestUpdate(
-                detail::UpdateFileRequestDataFactory::create(),
-                &version) != update::info::ResultCode::ok)
-            {
-                setStatusUnsafe(
-                    api::Updates2StatusData::StatusCode::notAvailable,
-                    "Update is unavailable");
-                return;
-            }
-
-            nx::update::info::FileData fileData;
-            const auto result = m_updateRegistry->findUpdateFile(
-                detail::UpdateFileRequestDataFactory::create(),
-                &fileData);
-            NX_ASSERT(result == update::info::ResultCode::ok);
-            if (result != update::info::ResultCode::ok)
-            {
-                setStatusUnsafe(
-                    api::Updates2StatusData::StatusCode::error,
-                    lit("Failed to get update file information: %1")
-                        .arg(version.toString()));
-                return;
-            }
-
-            setStatusUnsafe(
-                api::Updates2StatusData::StatusCode::available,
-                lit("Update is available: %1").arg(version.toString()));
-
-            break;
-        }
-        default:
-            return;
-    }
-}
-
-api::Updates2StatusData Updates2Manager::download()
-{
-    QnMutexLocker lock(&m_mutex);
-    if (m_currentStatus.status != api::Updates2StatusData::StatusCode::available)
-        return m_currentStatus.base();
-
-    NX_ASSERT((bool) m_updateRegistry);
-
-    nx::update::info::FileData fileData;
-    const auto result = m_updateRegistry->findUpdateFile(
-        detail::UpdateFileRequestDataFactory::create(),
-        &fileData);
-    NX_ASSERT(result == update::info::ResultCode::ok);
-
-    if (result != update::info::ResultCode::ok)
-    {
-        setStatusUnsafe(
-            api::Updates2StatusData::StatusCode::error,
-            "Failed to get update file information");
-        return m_currentStatus.base();
-    }
-
-    using namespace vms::common::p2p::downloader;
-
-    FileInformation fileInformation;
-    fileInformation.md5 = fileData.md5;
-    fileInformation.name = fileData.file;
-    fileInformation.size = fileData.size;
-    fileInformation.url = fileData.url;
-    fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
-
-    for (const auto file: m_currentStatus.downloadedFiles)
-        qnServerModule->findInstance<Downloader>()->deleteFile(file);
-    m_currentStatus.downloadedFiles.append(fileData.file);
-
-    qnServerModule->findInstance<Downloader>()->addFile(fileInformation);
-    setStatusUnsafe(
-        api::Updates2StatusData::StatusCode::downloading,
-        lit("Downloading update file: %1").arg(fileData.file));
-
-    return m_currentStatus.base();
-}
-
-void Updates2Manager::setStatusUnsafe(
-    api::Updates2StatusData::StatusCode code,
-    const QString& message)
-{
-    auto newStatusData = detail::Updates2StatusDataEx(
-        qnSyncTime->currentMSecsSinceEpoch(),
-        commonModule()->moduleGUID(),
-        code,
-        message);
-
     QFile file(filePath());
-    if (!file.open(QIODevice::WriteOnly) || !file.write(QJson::serialized(newStatusData)))
+    if (!file.open(QIODevice::WriteOnly) || !file.write(QJson::serialized(statusData)))
     {
         NX_WARNING(this, "Failed to save persistent update status data");
         return;
     }
-
-    m_currentStatus = newStatusData;
 }
 
-void Updates2Manager::onDownloadFinished(const QString& fileName)
+vms::common::p2p::downloader::AbstractDownloader* Updates2Manager::downloader()
 {
-    QnMutexLocker lock(&m_mutex);
-    using namespace vms::common::p2p::downloader;
-    auto downloader = qnServerModule->findInstance<Downloader>();
-    NX_ASSERT(downloader);
-
-    auto onError = [this, downloader, &fileName](const QString& errorMessage)
-    {
-        setStatusUnsafe(api::Updates2StatusData::StatusCode::error, errorMessage);
-    };
-
-    NX_ASSERT(m_currentStatus.status == api::Updates2StatusData::StatusCode::downloading);
-    if (m_currentStatus.status != api::Updates2StatusData::StatusCode::downloading)
-        return onError("Unexpected update manager state");
-
-    auto fileInformation = downloader->fileInformation(fileName);
-    NX_ASSERT(fileInformation.isValid());
-    if (!fileInformation.isValid())
-        return onError(lit("Downloader internal error for file: %1").arg(fileName));
-
-    switch (fileInformation.status)
-    {
-        case FileInformation::Status::notFound:
-            return onError(lit("Failed to find update file: %1").arg(fileName));
-        case FileInformation::Status::corrupted:
-            return onError(lit("Update file is corrupted: %1").arg(fileName));
-        default:
-            NX_ASSERT(fileInformation.status == FileInformation::Status::downloaded);
-            setStatusUnsafe(
-                api::Updates2StatusData::StatusCode::preparing,
-                "Update has been downloaded and now is preparing for install");
-            break;
-    }
+    return qnServerModule->findInstance<vms::common::p2p::downloader::Downloader>();
 }
 
-void Updates2Manager::onDownloadFailed(const QString& fileName)
+update::info::AbstractUpdateRegistryPtr Updates2Manager::getRemoteRegistry()
 {
+    auto updateUrl =
+        qnServerModule->roSettings()->value(nx_ms_conf::CHECK_FOR_UPDATE_URL).toString();
+    updateUrl = updateUrl.isNull() ? update::info::kDefaultUrl : updateUrl;
 
-}
-
-void Updates2Manager::onFileAdded(const FileInformation& fileInformation)
-{
-
-}
-
-void Updates2Manager::onFileDeleted(const QString& fileName)
-{
-
-}
-
-void Updates2Manager::onFileInformationChanged(const FileInformation& fileInformation)
-{
-
-}
-
-void Updates2Manager::onFileInformationStatusChanged(const FileInformation& fileInformation)
-{
-
-}
-
-void Updates2Manager::onChunkDownloadFailed(const QString& fileName)
-{
-
-}
-
-void Updates2Manager::stopAsyncTasks()
-{
-    m_timerManager.stop();
+    return update::info::checkSync(updateUrl);
 }
 
 } // namespace updates2
