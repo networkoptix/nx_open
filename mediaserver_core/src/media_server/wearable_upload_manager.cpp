@@ -8,6 +8,8 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx/utils/std/cpp14.h>
+
 #include "media_server_module.h"
 
 QnWearableUploadManager::QnWearableUploadManager(QObject* parent): base_type(parent)
