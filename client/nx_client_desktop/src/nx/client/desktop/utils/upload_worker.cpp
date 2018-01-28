@@ -160,7 +160,7 @@ void UploadWorker::handleMd5Calculated()
         [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
         {
             d->requests.releaseHandle(handle);
-            this->handleFileUploadCreated(success);
+            handleFileUploadCreated(success);
         };
 
     d->requests.storeHandle(d->server->restConnection()->addFileUpload(
@@ -207,7 +207,7 @@ void UploadWorker::handleUpload()
         [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
         {
             d->requests.releaseHandle(handle);
-            this->handleChunkUploaded(success);
+            handleChunkUploaded(success);
         };
 
     d->requests.storeHandle(d->server->restConnection()->uploadFileChunk(
@@ -245,7 +245,7 @@ void UploadWorker::handleAllUploaded()
             using namespace nx::vms::common::p2p::downloader;
             FileInformation info = result.deserialized<FileInformation>();
             const bool fileStatusOk = info.status == FileInformation::Status::downloaded;
-            this->handleCheckFinished(success, fileStatusOk);
+            handleCheckFinished(success, fileStatusOk);
         };
 
     d->requests.storeHandle(d->server->restConnection()->fileDownloadStatus(
