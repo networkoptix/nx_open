@@ -39,10 +39,7 @@ void QnWearableProgressWidget::setCamera(const QnVirtualCameraResourcePtr &camer
 
     m_camera = camera;
 
-    if (m_camera)
-        updateFromState(qnClientModule->wearableManager()->state(camera));
-    else
-        updateFromState(WearableState());
+    updateFromState(qnClientModule->wearableManager()->state(camera));
 }
 
 QnVirtualCameraResourcePtr QnWearableProgressWidget::camera() const
