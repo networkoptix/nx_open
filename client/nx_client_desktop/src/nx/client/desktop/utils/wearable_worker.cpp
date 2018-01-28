@@ -233,7 +233,12 @@ void WearableWorker::handleStatusFinished(bool success, const QnWearableStatusRe
 {
     d->waitingForStatusReply = false;
 
+    // Errors are perfectly safe to ignore here.
     if (!success || !result.success)
+        return;
+
+    // Already in working state => we're not getting any new info from this message.
+    if (isWorking())
         return;
 
     if (result.locked)
