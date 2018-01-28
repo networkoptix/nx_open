@@ -169,27 +169,25 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     if (startTimeMs == 0)
         startTimeMs = QFileInfo(fileName).created().toMSecsSinceEpoch();
 
-    UploadState upload = qnClientModule->uploadManager()->addUpload(
+    QString errorMessage;
+    QString uploadId = qnClientModule->uploadManager()->addUpload(
         server,
         fileName,
         kDefaultUploadTtl,
+        &errorMessage,
         this,
         [this](const UploadState& upload) { at_upload_progress(upload); }
     );
-
-    if (upload.status == UploadState::Error)
+    if (uploadId.isEmpty())
     {
-        QnMessageBox::critical(
-            mainWindow(),
-            upload.errorMessage
-        );
+        QnMessageBox::critical(mainWindow(), errorMessage);
         return;
     }
 
     FootageInfo info;
     info.camera = camera;
     info.startTimeMs = startTimeMs;
-    m_infoByUploadId[upload.id] = info;
+    //m_infoByUploadId[upload.id] = info;
 }
 
 void QnWorkbenchWearableHandler::at_upload_progress(const UploadState& upload)

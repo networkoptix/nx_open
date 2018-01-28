@@ -59,7 +59,7 @@ UploadWorker::~UploadWorker()
     handleStop();
 }
 
-UploadState UploadWorker::start()
+void UploadWorker::start()
 {
     NX_ASSERT(d->upload.status == UploadState::Initial);
 
@@ -72,7 +72,7 @@ UploadState UploadWorker::start()
     {
         d->upload.status = UploadState::Error;
         d->upload.errorMessage = tr("Could not open file \"%1\"").arg(d->file->fileName());
-        return d->upload;
+        return;
     }
 
     d->upload.size = d->file->size();
@@ -93,8 +93,6 @@ UploadState UploadWorker::start()
         }
     );
     d->md5FutureWatcher.setFuture(d->md5Future);
-
-    return d->upload;
 }
 
 void UploadWorker::cancel()
@@ -111,7 +109,7 @@ void UploadWorker::cancel()
     /* We don't emit signals here as canceling is also a way of silencing the worker. */
 }
 
-UploadState UploadWorker::status() const
+UploadState UploadWorker::state() const
 {
     return d->upload;
 }

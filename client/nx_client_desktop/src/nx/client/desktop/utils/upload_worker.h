@@ -23,10 +23,10 @@ public:
         QObject* parent = nullptr);
     virtual ~UploadWorker() override;
 
-    UploadState start();
+    void start();
     void cancel();
 
-    UploadState status() const;
+    UploadState state() const;
 
 signals:
     void progress(const UploadState&);

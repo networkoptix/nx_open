@@ -33,13 +33,14 @@ public:
      * @param path                      Path to the file.
      * @param ttl                       TTL for the file, in milliseconds. File will be deleted
      *                                  from the server when TTL passes. -1 means infinite.
-     * @returns                         Upload description. Don't forget to check for
-     *                                  errors in the return value.
+     * @param[out] errorMessage         Error message, if any.
+     * @returns                         Upload id, or null in case of an error.
      */
-    UploadState addUpload(
+    QString addUpload(
         const QnMediaServerResourcePtr& server,
         const QString& path,
         qint64 ttl,
+        QString* errorMessage,
         QObject* context,
         Callback callback);
 
