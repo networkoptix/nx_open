@@ -35,6 +35,8 @@ public:
 
     WearableState state() const;
 
+    bool isWorking() const;
+
 signals:
     void stateChanged(const WearableState& state);
     void error(const WearableState& state, const QString& errorMessage);

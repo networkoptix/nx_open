@@ -90,10 +90,21 @@ WearableState WearableWorker::state() const
     return d->state;
 }
 
+bool WearableWorker::isWorking() const
+{
+    switch (d->state.status) {
+    case WearableState::Locked:
+    case WearableState::Uploading:
+    case WearableState::Consuming:
+        return true;
+    default:
+        return false;
+    }
+}
+
 void WearableWorker::updateState()
 {
-    WearableState::Status status = d->state.status;
-    if (status != WearableState::Unlocked && status != WearableState::LockedByOtherClient)
+    if (isWorking())
         return; //< No point to update.
 
     if (d->waitingForStatusReply)
@@ -270,8 +281,7 @@ void WearableWorker::handleExtendFinished(bool success, const QnWearableStatusRe
     if (!success)
         return;
 
-    WearableState::Status status = d->state.status;
-    if (status == WearableState::Unlocked || status == WearableState::LockedByOtherClient)
+    if (!isWorking())
         return;
 
     if (!result.success)
@@ -284,7 +294,7 @@ void WearableWorker::handleExtendFinished(bool success, const QnWearableStatusRe
         return;
     }
 
-    if(status == WearableState::Consuming)
+    if(d->state.status == WearableState::Consuming)
     {
         d->state.consumeProgress = result.progress;
 
@@ -345,7 +355,7 @@ void WearableWorker::handleConsumeStarted(bool success)
 void WearableWorker::at_timer_timeout()
 {
     WearableState::Status status = d->state.status;
-    if (status == WearableState::Unlocked || status == WearableState::LockedByOtherClient)
+    if (!isWorking())
         return;
 
     auto callback =
