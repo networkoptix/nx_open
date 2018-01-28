@@ -115,7 +115,7 @@ void QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered()
             maybeOpenCurrentSettings();
         };
 
-    server->restConnection()->addWearableCameraAsync(name, callback, thread());
+    server->restConnection()->addWearableCamera(name, callback, thread());
 }
 
 void QnWorkbenchWearableHandler::at_resourcePool_resourceAdded(const QnResourcePtr &resource)
@@ -222,7 +222,7 @@ void QnWorkbenchWearableHandler::at_upload_progress(const FileUpload& upload)
             };
 
         QnMediaServerResourcePtr server = info.camera->getParentServer();
-        server->restConnection()->consumeWearableCameraFileAsync(
+        server->restConnection()->consumeWearableCameraFile(
             info.camera,
             upload.id,
             info.startTimeMs,

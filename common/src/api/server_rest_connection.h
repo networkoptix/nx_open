@@ -222,7 +222,7 @@ public:
      *
      * @param name                      Name of the camera.
      */
-    Handle addWearableCameraAsync(
+    Handle addWearableCamera(
         const QString& name,
         GetCallback callback,
         QThread* targetThread = nullptr);
@@ -241,7 +241,7 @@ public:
      *
      * @see addFileUpload
      */
-    Handle consumeWearableCameraFileAsync(
+    Handle consumeWearableCameraFile(
         const QnNetworkResourcePtr& camera,
         const QString& uploadId,
         qint64 startTimeMs,

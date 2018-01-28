@@ -456,7 +456,7 @@ rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
     return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }
 
-Handle ServerConnection::addWearableCameraAsync(
+Handle ServerConnection::addWearableCamera(
     const QString& name,
     GetCallback callback,
     QThread* targetThread)
@@ -470,7 +470,7 @@ Handle ServerConnection::addWearableCameraAsync(
         targetThread);
 }
 
-Handle ServerConnection::consumeWearableCameraFileAsync(
+Handle ServerConnection::consumeWearableCameraFile(
     const QnNetworkResourcePtr& camera,
     const QString& uploadId,
     qint64 startTimeMs,
