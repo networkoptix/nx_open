@@ -357,6 +357,7 @@ namespace Qn
         ServerOfflineOverlay,
         ServerUnauthorizedOverlay,
         IoModuleDisabledOverlay,
+        NoLiveStreamOverlay,
 
         OverlayCount
     };

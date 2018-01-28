@@ -1978,6 +1978,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
         if (states.isUnauthorized)
             return Qn::UnauthorizedOverlay;
+
+        if (m_camera && m_camera->hasFlags(Qn::wearable_camera))
+            return Qn::NoLiveStreamOverlay;
     }
 
     if (m_camera && m_camera->hasFlags(Qn::io_module))
