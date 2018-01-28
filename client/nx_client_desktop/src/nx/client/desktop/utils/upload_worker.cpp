@@ -24,6 +24,11 @@ struct UploadWorker::Private
     {
     }
 
+    rest::QnConnectionPtr connection() const
+    {
+        return server->restConnection();
+    }
+
     UploadState upload;
     QnMediaServerResourcePtr server;
     QSharedPointer<QFile> file;
@@ -129,7 +134,7 @@ void UploadWorker::handleStop()
         || status == UploadState::Uploading
         || status == UploadState::Checking)
     {
-        d->server->restConnection()->removeFileDownload(d->upload.id, /*deleteData*/ true);
+        d->connection()->removeFileDownload(d->upload.id, /*deleteData*/ true);
     }
 }
 
@@ -163,7 +168,7 @@ void UploadWorker::handleMd5Calculated()
             handleFileUploadCreated(success);
         };
 
-    d->requests.storeHandle(d->server->restConnection()->addFileUpload(
+    d->requests.storeHandle(d->connection()->addFileUpload(
         d->upload.id,
         d->upload.size,
         d->chunkSize,
@@ -210,7 +215,7 @@ void UploadWorker::handleUpload()
             handleChunkUploaded(success);
         };
 
-    d->requests.storeHandle(d->server->restConnection()->uploadFileChunk(
+    d->requests.storeHandle(d->connection()->uploadFileChunk(
         d->upload.id,
         d->currentChunk,
         bytes,
@@ -248,7 +253,7 @@ void UploadWorker::handleAllUploaded()
             handleCheckFinished(success, fileStatusOk);
         };
 
-    d->requests.storeHandle(d->server->restConnection()->fileDownloadStatus(
+    d->requests.storeHandle(d->connection()->fileDownloadStatus(
         d->upload.id,
         callback,
         thread()));
