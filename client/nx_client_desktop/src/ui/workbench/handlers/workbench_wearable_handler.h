@@ -11,7 +11,9 @@
 class QnNewWearableCameraDialog;
 namespace nx { namespace client { namespace desktop { struct UploadState; }}}
 
-class QnWorkbenchWearableHandler: public Connective<QObject>, public QnWorkbenchContextAware
+class QnWorkbenchWearableHandler:
+    public Connective<QObject>,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
