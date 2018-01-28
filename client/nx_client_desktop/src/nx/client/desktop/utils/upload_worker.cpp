@@ -10,12 +10,20 @@
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 
+#include "server_request_storage.h"
+
 namespace nx {
 namespace client {
 namespace desktop {
 
 struct UploadWorker::Private
 {
+    Private(const QnMediaServerResourcePtr& server) :
+        server(server),
+        requests(server)
+    {
+    }
+
     UploadState upload;
     QnMediaServerResourcePtr server;
     QSharedPointer<QFile> file;
@@ -27,14 +35,13 @@ struct UploadWorker::Private
 
     QFuture<QByteArray> md5Future;
     QFutureWatcher<QByteArray> md5FutureWatcher;
-    rest::Handle runningHandle = 0;
+    ServerRequestStorage requests;
 };
 
 UploadWorker::UploadWorker(const QnMediaServerResourcePtr& server, const QString& path, qint64 ttl, QObject* parent):
     QObject(parent),
-    d(new Private)
+    d(new Private(server))
 {
-    d->server = server;
     d->file.reset(new QFile(path));
     d->ttl = ttl;
 
@@ -115,10 +122,7 @@ void UploadWorker::emitProgress()
 void UploadWorker::handleStop()
 {
     d->md5FutureWatcher.disconnect(this);
-
-    if (d->runningHandle)
-        d->server->restConnection()->cancelRequest(d->runningHandle);
-    d->runningHandle = 0;
+    d->requests.cancelAllRequests();
 
     UploadState::Status status = d->upload.status;
     if (status == UploadState::CreatingUpload
@@ -155,24 +159,22 @@ void UploadWorker::handleMd5Calculated()
     auto callback =
         [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
         {
-            this->handleFileUploadCreated(success, handle);
+            d->requests.releaseHandle(handle);
+            this->handleFileUploadCreated(success);
         };
 
-    d->runningHandle = d->server->restConnection()->addFileUpload(
+    d->requests.storeHandle(d->server->restConnection()->addFileUpload(
         d->upload.id,
         d->upload.size,
         d->chunkSize,
         d->md5.toHex(),
         d->ttl,
         callback,
-        thread());
+        thread()));
 }
 
-void UploadWorker::handleFileUploadCreated(bool success, rest::Handle handle)
+void UploadWorker::handleFileUploadCreated(bool success)
 {
-    NX_ASSERT(d->runningHandle == handle);
-    d->runningHandle = 0;
-
     if (!success)
     {
         handleError(tr("Could not create upload on the server side"));
@@ -204,23 +206,21 @@ void UploadWorker::handleUpload()
     auto callback =
         [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
         {
-            this->handleChunkUploaded(success, handle);
+            d->requests.releaseHandle(handle);
+            this->handleChunkUploaded(success);
         };
 
-    d->runningHandle = d->server->restConnection()->uploadFileChunk(
+    d->requests.storeHandle(d->server->restConnection()->uploadFileChunk(
         d->upload.id,
         d->currentChunk,
         bytes,
         callback,
-        thread());
+        thread()));
     d->currentChunk++;
 }
 
-void UploadWorker::handleChunkUploaded(bool success, rest::Handle handle)
+void UploadWorker::handleChunkUploaded(bool success)
 {
-    NX_ASSERT(d->runningHandle == handle);
-    d->runningHandle = 0;
-
     if (!success)
     {
         handleError(tr("Could not upload file chunk to the server"));
@@ -240,23 +240,22 @@ void UploadWorker::handleAllUploaded()
     auto callback =
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
+            d->requests.releaseHandle(handle);
+
             using namespace nx::vms::common::p2p::downloader;
             FileInformation info = result.deserialized<FileInformation>();
             const bool fileStatusOk = info.status == FileInformation::Status::downloaded;
-            this->handleCheckFinished(success, handle, fileStatusOk);
+            this->handleCheckFinished(success, fileStatusOk);
         };
 
-    d->runningHandle = d->server->restConnection()->fileDownloadStatus(
+    d->requests.storeHandle(d->server->restConnection()->fileDownloadStatus(
         d->upload.id,
         callback,
-        thread());
+        thread()));
 }
 
-void UploadWorker::handleCheckFinished(bool success, rest::Handle handle, bool ok)
+void UploadWorker::handleCheckFinished(bool success, bool ok)
 {
-    NX_ASSERT(d->runningHandle == handle);
-    d->runningHandle = 0;
-
     if (!success)
     {
         handleError(tr("Could not check uploaded file on the server"));

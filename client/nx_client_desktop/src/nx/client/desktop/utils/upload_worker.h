@@ -4,7 +4,6 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/resource_fwd.h>
-#include <api/server_rest_connection_fwd.h>
 
 #include "upload_state.h"
 
@@ -37,11 +36,11 @@ private:
     void handleStop();
     void handleError(const QString& message);
     void handleMd5Calculated();
-    void handleFileUploadCreated(bool success, rest::Handle handle);
+    void handleFileUploadCreated(bool success);
     void handleUpload();
-    void handleChunkUploaded(bool success, rest::Handle handle);
+    void handleChunkUploaded(bool success);
     void handleAllUploaded();
-    void handleCheckFinished(bool success, rest::Handle handle, bool ok);
+    void handleCheckFinished(bool success, bool ok);
 
 private:
     struct Private;
