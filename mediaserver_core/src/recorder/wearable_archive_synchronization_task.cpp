@@ -29,6 +29,8 @@ WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
     m_startTimeMs(startTimeMs)
 {
     qRegisterMetaType<WearableArchiveSynchronizationState>("WearableArchiveSynchronizationState");
+
+    m_state.status = WearableArchiveSynchronizationState::Consuming;
 }
 
 WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask()
@@ -60,8 +62,6 @@ void WearableArchiveSynchronizationTask::cancel()
 
 bool WearableArchiveSynchronizationTask::execute()
 {
-    m_state.status = WearableArchiveSynchronizationState::Consuming;
-
     createArchiveReader(m_startTimeMs);
     createStreamRecorder(m_startTimeMs);
 

@@ -294,6 +294,7 @@ void WearableWorker::handleExtendFinished(bool success, const QnWearableStatusRe
     if(d->state.status == WearableState::Consuming)
     {
         d->state.consumeProgress = result.progress;
+        emit stateChanged(d->state);
 
         if (!result.consuming)
             processNextFile();

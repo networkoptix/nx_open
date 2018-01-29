@@ -49,20 +49,17 @@ bool QnWearableUploadManager::consume(const QnUuid& cameraId, const QnUuid& toke
     if (!camera)
         return false;
 
-    {
-        QnMutexLocker locker(&d->mutex);
-
-        if (d->stateByCameraId.contains(cameraId))
-            return false;
-
-        d->stateByCameraId.insert(cameraId, WearableArchiveSynchronizationState());
-    }
-
     WearableArchiveTaskPtr task(new WearableArchiveSynchronizationTask(
         qnServerModule,
         camera,
         std::move(file),
         startTimeMs));
+
+    QnMutexLocker locker(&d->mutex);
+    if (d->stateByCameraId.contains(cameraId))
+        return false;
+    d->stateByCameraId.insert(cameraId, task->state());
+    locker.unlock();
 
     auto stateChangedHandler =
         [this, cameraId, token, uploadId](const WearableArchiveSynchronizationState& state)
