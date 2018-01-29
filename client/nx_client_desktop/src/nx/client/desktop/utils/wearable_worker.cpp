@@ -132,7 +132,7 @@ bool WearableWorker::addUpload(const QString& path, QString* errorMessage)
 
     QnAviResourcePtr resource(new QnAviResource(path));
     QnAviArchiveDelegatePtr delegate(resource->createArchiveDelegate());
-    bool opened = delegate->open(resource);
+    bool opened = delegate->open(resource, nullptr);
 
     if (!opened || !delegate->hasVideo() || resource->hasFlags(Qn::still_image))
     {
