@@ -25,7 +25,7 @@ bool CameraMock::setApiParameter(const QString& id, const QString& value)
     return true;
 }
 
-QnCameraAdvancedParamValueMap CameraMock::getApiParamiters(const QSet<QString>& ids)
+QnCameraAdvancedParamValueMap CameraMock::getApiParameters(const QSet<QString>& ids)
 {
     QnCameraAdvancedParamValueMap result;
     for (const auto& id: ids)
