@@ -9,9 +9,10 @@ ${url}         ${CLOUD TEST}
 
 *** Keywords ***
 Validate Register Success
+    [arguments]    ${location}
     Wait Until Element Is Visible    ${ACCOUNT CREATION SUCCESS}
     Element Should Be Visible    ${ACCOUNT CREATION SUCCESS}
-    Location Should Be    ${url}/register/success
+    Location Should Be    ${location}
 
 Check Bad Email Input
     [arguments]    ${email}
@@ -61,35 +62,35 @@ should register user with correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    Validate Register Success
+    Validate Register Success    ${url}/register/success
     Close Browser
 
 should register user with cyrillic First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    ${CYRILLIC NAME}    ${CYRILLIC NAME}    ${email}    ${password}
-    Validate Register Success
+    Validate Register Success    ${url}/register/success
     Close Browser
 
 should register user with smiley First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    ${SMILEY NAME}    ${SMILEY NAME}    ${email}    ${password}
-    Validate Register Success
+    Validate Register Success    ${url}/register/success
     Close Browser
 
 should register user with glyph First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    ${GLYPH NAME}    ${GLYPH NAME}    ${email}    ${password}
-    Validate Register Success
+    Validate Register Success    ${url}/register/success
     Close Browser
 
 should allow `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    ${SYMBOL NAME}    ${SYMBOL NAME}    ${email}    ${password}
-    Validate Register Success
+    Validate Register Success    ${url}/register/success
     Close Browser
 
 should not allow to register without all fields filled
@@ -121,7 +122,7 @@ should allow !#$%&'*+-/=?^_`{|}~ in email field
     ${email}    Get Random Symbol Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    Validate Register Success
+    Validate Register Success    ${url}/register/success
     Close Browser
 
 should not allow to register without email
@@ -150,7 +151,7 @@ should respond to Enter key and save data
     Wait Until Element Is Visible    ${REGISTER PASSWORD INPUT}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     Press Key    ${REGISTER PASSWORD INPUT}    ${ENTER}
-    Validate Register Success
+    Validate Register Success    ${url}/register/success
     Close Browser
 
 should respond to Tab key
@@ -167,7 +168,9 @@ should respond to Tab key
     Element Should Be Focused    ${REGISTER SUBSCRIBE CHECKBOX}
     Press Key    ${REGISTER SUBSCRIBE CHECKBOX}    ${TAB}
     Element Should Be Focused    ${CREATE ACCOUNT BUTTON}
+    Close Browser
 
+#May be moved into its own data driven testing
 should not allow to register with email in non-email format
     Open Browser and go to URL    ${url}/register
     Wait Until Element Is Visible    ${REGISTER FIRST NAME INPUT}
@@ -183,3 +186,63 @@ should not allow to register with email in non-email format
     Check Bad Email Input    noptixqa.@gmail.com
     Check Bad Email Input    noptixq..a@gmail.c
     Check Bad Email Input    noptixqa@-gmail.com
+    Close Browser
+
+should open Terms and conditions in a new page
+    Open Browser and go to URL    ${url}/register
+    Wait Until Element Is Visible    ${TERMS AND CONDITIONS LINK}
+    Click Link    ${TERMS AND CONDITIONS LINK}
+    ${tabs}    Get Window Handles
+    Select Window    @{tabs}[1]
+    Location Should Be    ${url}/content/eula
+    Close Browser
+
+should suggest user to log out, if he was logged in and goes to registration link
+    Open Browser and go to URL    ${url}
+    Log In    ${EMAIL VIEWER}    ${password}
+    Go To    ${url}/register
+    Wait Until Element Is Visible    ${LOGGED IN CONTINUE BUTTON}
+    Element Should Be Visible    ${LOGGED IN CONTINUE BUTTON}
+    Wait Until Element Is Visible    ${LOGGED IN LOG OUT BUTTON}
+    Element Should Be Visible    ${LOGGED IN LOG OUT BUTTON}
+    Close Browser
+
+should display promo-block, if user goes to registration from native app
+    Open Browser and go to URL    ${url}/register?from=client
+    Wait Until Element Is Visible    ${PROMO BLOCK}
+    Element Should Be Visible    ${PROMO BLOCK}
+    Go To    ${url}/register?from=mobile
+    Wait Until Element Is Visible    ${PROMO BLOCK}
+    Element Should Be Visible    ${PROMO BLOCK}
+    Close Browser
+
+should not display promo-block, if user goes to registration not from native app
+    Open Browser and go to URL    ${url}/register
+    Wait Until Element Is Visible    ${REGISTER FIRST NAME INPUT}
+    Element Should Not Be Visible    ${PROMO BLOCK}
+    Close Browser
+
+should remove promo-block on registration form successful submitting form when from=client
+    ${email}    Get Random Email
+    Open Browser and go to URL    ${url}/register?from=client
+    Register    mark    hamill    ${email}    ${password}
+    Validate Register Success    ${url}/register/success?from=client
+    Element Should Not Be Visible    ${PROMO BLOCK}
+    Close Browser
+
+should remove promo-block on registration form successful submitting form when from=mobile
+    ${email}    Get Random Email
+    Open Browser and go to URL    ${url}/register?from=mobile
+    Register    mark    hamill    ${email}    ${password}
+    Validate Register Success    ${url}/register/success?from=mobile
+    Element Should Not Be Visible    ${PROMO BLOCK}
+    Close Browser
+
+should not allow to access /register/success /activate/success by direct input
+    Open Browser and go to URL    ${url}/register/success
+    Wait Until Element Is Visible    ${JUMBOTRON}
+    Location Should Be    ${url}/
+    Go To    ${url}/activate/success
+    Wait Until Element Is Visible    ${JUMBOTRON}
+    Location Should Be    ${url}/
+    Close Browser

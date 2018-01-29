@@ -49,6 +49,8 @@ ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
 ${DELETE USER BUTTON}                 //button[@ng-click='ok()' and contains(text(), 'Delete')]
 ${DELETE USER CANCEL BUTTON}          //button[@ng-click='cancel()' and contains(text(), 'Cancel')]
 
+${JUMBOTRON}                          //div[@class='jumbotron']
+${PROMO BLOCK}                        //div[contains(@class,'promo-block') and not(contains(@class, 'col-sm-4'))]
 ${ALREADY ACTIVATED}                  //h1[@ng-if='!activate.success' and contains(text(),'Account is already activated or confirmation code is incorrect')]
 
 #Share Elements (Note: Share and Permissions are the same form so these are the same variables.  Making two just in case they do diverge at some point.)
