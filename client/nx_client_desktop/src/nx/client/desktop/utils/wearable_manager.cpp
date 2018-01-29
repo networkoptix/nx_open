@@ -110,8 +110,11 @@ void WearableManager::dropWorker(const QnResourcePtr& resource)
     auto pos = d->workers.find(resource->getId());
     if (pos == d->workers.end())
         return;
+    WearableWorker* worker = *pos;
 
-    delete *pos;
+    disconnect(worker, nullptr, this, nullptr);
+    delete worker;
+
     d->workers.erase(pos);
 }
 
