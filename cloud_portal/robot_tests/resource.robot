@@ -26,8 +26,8 @@ Log In
     click button    ${LOG IN BUTTON}
 
 Validate Log In
-    Wait Until Element Is Visible    ${AUTHORIZED BODY}
-    Element Should Be Visible    ${AUTHORIZED BODY}
+    Wait Until Page Contains Element    ${AUTHORIZED BODY}
+    Page Should Contain Element    ${AUTHORIZED BODY}
 
 Log Out
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
@@ -86,11 +86,7 @@ Edit User Permissions In Systems
     Click Element    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${permissions}']
     Wait Until Element Is Visible    ${EDIT PERMISSIONS SAVE}
     Click Element    ${EDIT PERMISSIONS SAVE}
-    Wait Until Element Is Visible    ${ALERT}
-    Element Should Be Visible    ${ALERT}
-    Element Text Should Be    ${ALERT}    New permissions saved
-#This is essentially a wait in order to allow angular to update the order of the user list.  Ideally in the furture an angular library can be properly imported.
-    Wait Until Element Is Not Visible    ${ALERT}
+    Check For Alert    New permissions saved
 
 Check User Permissions
     [arguments]    ${user email}    ${permissions}

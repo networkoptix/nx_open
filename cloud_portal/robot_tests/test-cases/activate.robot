@@ -37,7 +37,7 @@ should show error if same link is used twice
 should save user data to user account correctly
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    'mark'    'hamill'    ${email}    ${password}
+    Register    mark    hamill    ${email}    ${password}
     ${link}    Get Activation Link    ${email}
     Go To    ${link}
     Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
