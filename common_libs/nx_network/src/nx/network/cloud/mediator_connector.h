@@ -92,7 +92,7 @@ private:
     void fetchEndpoint();
     void connectToMediatorAsync();
     void saveMediatorEndpoint();
-    void reconnectToMediator(SystemError::ErrorCode connectionClosureReason);
+    void reconnectToMediator();
 };
 
 } // namespace api

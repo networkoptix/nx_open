@@ -102,7 +102,8 @@ protected:
 
     void givenBrokenServer()
     {
-        m_server.reset();
+        startServer();
+        whenStopServer();
     }
 
     void givenDisconnectedClient()
@@ -206,6 +207,11 @@ protected:
         waitForServerToHaveAtLeastOneConnection();
     }
 
+    void thenConnectFailed()
+    {
+        ASSERT_NE(SystemError::noError, m_connectResults.pop());
+    }
+
     void thenSameHandlerCannotBeAdded()
     {
         ASSERT_FALSE(addIndicationHandler());
@@ -258,6 +264,22 @@ protected:
     void thenClientReportsConnectionClosure()
     {
         m_connectionClosedEventsReceived.pop();
+    }
+
+    void thenClientDoesNotReportConnectionClosure()
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(25));
+        ASSERT_TRUE(m_connectionClosedEventsReceived.isEmpty());
+    }
+
+    void andReconnectHandlerIsInvoked()
+    {
+        m_reconnectEvents.pop();
+    }
+
+    typename AsyncClientTestTypes::ClientType& client()
+    {
+        return m_client;
     }
 
 private:
@@ -412,7 +434,17 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, reconnect_works)
     this->thenClientIsAbleToPerformRequests();
 }
 
-TYPED_TEST_P(StunAsyncClientAcceptanceTest, reconnect_occurs_after_initial_connect_failure)
+TYPED_TEST_P(
+    StunAsyncClientAcceptanceTest,
+    reconnect_handler_is_invoked_on_initial_connect)
+{
+    this->givenConnectedClient();
+    this->andReconnectHandlerIsInvoked();
+}
+
+TYPED_TEST_P(
+    StunAsyncClientAcceptanceTest,
+    reconnect_occurs_after_initial_connect_failure)
 {
     this->givenBrokenServer();
     this->givenClientFailedToConnect();
@@ -497,6 +529,18 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, connection_closure_is_reported)
 
 TYPED_TEST_P(
     StunAsyncClientAcceptanceTest,
+    connection_closure_is_not_reported_after_initial_connect_failure)
+{
+    this->givenBrokenServer();
+
+    this->whenConnectToServer();
+
+    this->thenConnectFailed();
+    this->thenClientDoesNotReportConnectionClosure();
+}
+
+TYPED_TEST_P(
+    StunAsyncClientAcceptanceTest,
     on_connection_closed_handler_triggered_more_than_once)
 {
     this->givenReconnectedClient();
@@ -537,6 +581,7 @@ REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     same_handler_cannot_be_added_twice,
     add_remove_indication_handler,
     reconnect_works,
+    reconnect_handler_is_invoked_on_initial_connect,
     reconnect_occurs_after_initial_connect_failure,
     client_receives_indication,
     subscription_to_every_indication,
@@ -545,6 +590,7 @@ REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     scheduled_request_is_completed_after_reconnect,
     request_result_is_reported_even_if_connect_always_fails,
     connection_closure_is_reported,
+    connection_closure_is_not_reported_after_initial_connect_failure,
     on_connection_closed_handler_triggered_more_than_once,
     reconnecting_to_another_server_after_original_has_failed,
     reconnecting_to_another_server_while_original_is_still_alive);

@@ -6,7 +6,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-struct FileUpload
+struct UploadState
 {
     enum Status
     {
@@ -40,4 +40,4 @@ struct FileUpload
 } // namespace client
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::client::desktop::FileUpload)
+Q_DECLARE_METATYPE(nx::client::desktop::UploadState)

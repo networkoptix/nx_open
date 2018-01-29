@@ -57,6 +57,20 @@ void RemoteArchiveWorkerPool::cancelTask(const QnUuid& taskId)
     const auto itr = m_workers.find(taskId);
     if (itr != m_workers.cend())
         itr->second->pleaseStop();
+
+    // Also clean up queue.
+    for (auto pos = m_taskQueue.begin(); pos != m_taskQueue.end();)
+    {
+        RemoteArchiveTaskPtr task = *pos;
+        if (task->id() == taskId)
+        {
+            pos = m_taskQueue.erase(pos);
+        }
+        else
+        {
+            ++pos;
+        }
+    }
 }
 
 void RemoteArchiveWorkerPool::setMaxTaskCount(int maxTaskCount)

@@ -38,7 +38,6 @@ WearableArchiveSynchronizer::WearableArchiveSynchronizer(QnMediaServerModule* se
 
 WearableArchiveSynchronizer::~WearableArchiveSynchronizer()
 {
-    QnMutexLocker lock(&m_mutex);
     disconnect(this);
     m_terminated = true;
     m_workerPool.reset();
@@ -99,64 +98,14 @@ void WearableArchiveSynchronizer::at_resource_parentIdChanged(const QnResourcePt
         cancelAllTasks(camera);
 }
 
-int WearableArchiveSynchronizer::progress(const QnUuid& taskId) const
+void WearableArchiveSynchronizer::addTask(const QnResourcePtr& resource, const RemoteArchiveTaskPtr& task)
 {
-    QnMutexLocker lock(&m_mutex);
-
-    auto pos = m_taskInfoById.find(taskId);
-    if (pos == m_taskInfoById.end())
-        return -1;
-
-    return pos->progress;
-}
-
-void WearableArchiveSynchronizer::addTask(const QnResourcePtr& resource, const WearableArchiveTaskPtr& task)
-{
-    QnUuid taskId = task->id();
-
-    connect(task, &WearableArchiveSynchronizationTask::progressChanged, this,
-        [this, taskId](int progress)
-        {
-            if (m_terminated)
-                return;
-
-            QnMutexLocker lock(&m_mutex);
-
-            auto pos = m_taskInfoById.find(taskId);
-            if (pos == m_taskInfoById.end())
-                return;
-
-            pos->progress = progress;
-            pos->updateTime = qnSyncTime->currentMSecsSinceEpoch();
-        }
-    );
-
-    QnMutexLocker lock(&m_mutex);
-    m_taskIdsByResourceId[resource->getId()].push_back(taskId);
-
-    TaskInfo info;
-    info.id = taskId;
-    info.resourceId = resource->getId();
-    info.progress = 0;
-    info.updateTime = qnSyncTime->currentMSecsSinceEpoch();
-    m_taskInfoById[taskId] = info;
-    lock.unlock();
-
     m_workerPool->addTask(task);
 }
 
 void WearableArchiveSynchronizer::cancelAllTasks(const QnResourcePtr& resource)
 {
-    QList<QnUuid> ids;
-
-    QnMutexLocker lock(&m_mutex);
-    ids = m_taskIdsByResourceId.take(resource->getId());
-    for (const QnUuid& id : ids)
-        m_taskInfoById.remove(id);
-    lock.unlock();
-
-    for (const QnUuid& id : ids)
-        m_workerPool->cancelTask(id);
+    m_workerPool->cancelTask(resource->getId());
 }
 
 } // namespace recorder

@@ -347,6 +347,7 @@ signals:
     void backupQualitiesChanged(const QnResourcePtr &resource);
     void capabilitiesChanged(const QnResourcePtr& resource);
     void disableDualStreamingChanged(const QnResourcePtr& resource);
+    void audioEnabledChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
 

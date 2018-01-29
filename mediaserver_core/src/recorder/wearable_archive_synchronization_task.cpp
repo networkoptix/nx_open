@@ -19,7 +19,6 @@ namespace recorder {
 
 WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
     QnMediaServerModule* serverModule,
-    const QnUuid& id,
     const QnSecurityCamResourcePtr& resource,
     std::unique_ptr<QIODevice> file,
     qint64 startTimeMs)
@@ -40,12 +39,12 @@ WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask()
 
 QnUuid WearableArchiveSynchronizationTask::id() const
 {
-    return m_id;
+    return m_resource->getId();
 }
 
-void WearableArchiveSynchronizationTask::setDoneHandler(nx::utils::MoveOnlyFunc<void()> handler)
+void WearableArchiveSynchronizationTask::setDoneHandler(nx::utils::MoveOnlyFunc<void()> /*handler*/)
 {
-    m_doneHandler = std::move(handler);
+    NX_ASSERT(false);
 }
 
 void WearableArchiveSynchronizationTask::cancel()
@@ -74,8 +73,7 @@ bool WearableArchiveSynchronizationTask::execute()
 
     setProgress(100);
 
-    if(m_doneHandler)
-        m_doneHandler();
+    emit finished();
 
     return true;
 }

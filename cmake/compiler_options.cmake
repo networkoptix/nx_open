@@ -37,8 +37,14 @@ if(ANDROID OR IOS)
     )
 endif()
 
-if(box MATCHES "isd|edge1")
-    remove_definitions(-DENABLE_SOFTWARE_MOTION_DETECTION)
+if(box MATCHES "isd")
+    set(enableAllVendors OFF)
+    remove_definitions(-DENABLE_MOTION_DETECTION)
+    add_definitions(-DEDGE_SERVER)
+endif()
+
+if(box MATCHES "edge1")
+    set(enableAllVendors OFF)
     add_definitions(-DEDGE_SERVER)
 endif()
 
