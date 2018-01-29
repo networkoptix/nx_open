@@ -86,6 +86,8 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
             .arg(QnAppInfo::licensingEmailAddress()));
     }
 
+    ui->manualActivationTextWidget->setOpenExternalLinks(true);
+
     setWarningStyle(ui->licenseKeyWarningLabel);
     ui->licenseKeyWarningLabel->setVisible(false);
 

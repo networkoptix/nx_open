@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <set>
 
 #include <boost/optional/optional.hpp>
@@ -79,5 +77,3 @@ private:
 } // namespace plugins
 } // namespace mediaserve_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

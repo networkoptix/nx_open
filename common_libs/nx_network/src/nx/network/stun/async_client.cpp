@@ -49,7 +49,8 @@ void AsyncClient::connect(
     const nx::utils::Url& url,
     ConnectHandler completionHandler)
 {
-    if (url.scheme() != nx::network::stun::kUrlSchemeName && url.scheme() != nx::network::stun::kSecureUrlSchemeName)
+    if (url.scheme() != nx::network::stun::kUrlSchemeName &&
+        url.scheme() != nx::network::stun::kSecureUrlSchemeName)
     {
         return post(
             [completionHandler = std::move(completionHandler)]()
@@ -58,14 +59,18 @@ void AsyncClient::connect(
             });
     }
 
-    const auto endpoint = nx::network::url::getEndpoint(url);
-
     QnMutexLocker lock(&m_mutex);
-    m_endpoint = std::move(endpoint);
+    m_endpoint = nx::network::url::getEndpoint(url);
     m_useSsl = url.scheme() == nx::network::stun::kSecureUrlSchemeName;
-    NX_ASSERT(!m_connectCompletionHandler);
-    m_connectCompletionHandler = std::move(completionHandler);
-    openConnectionImpl(&lock);
+
+    post(
+        [this, completionHandler = std::move(completionHandler)]() mutable
+        {
+            QnMutexLocker lock(&m_mutex);
+            NX_ASSERT(!m_connectCompletionHandler);
+            m_connectCompletionHandler = std::move(completionHandler);
+            openConnectionImpl(&lock);
+        });
 }
 
 bool AsyncClient::setIndicationHandler(
@@ -81,6 +86,12 @@ void AsyncClient::addOnReconnectedHandler(
 {
     QnMutexLocker lock(&m_mutex);
     m_reconnectHandlers.emplace(client, std::move(handler));
+}
+
+void AsyncClient::setOnConnectionClosedHandler(
+    OnConnectionClosedHandler onConnectionClosedHandler)
+{
+    m_onConnectionClosedHandler.swap(onConnectionClosedHandler);
 }
 
 void AsyncClient::sendRequest(
@@ -204,13 +215,11 @@ void AsyncClient::closeConnection(
     SystemError::ErrorCode errorCode,
     BaseConnectionType* connection)
 {
-    std::unique_ptr< BaseConnectionType > baseConnection;
-    decltype(m_onConnectionClosedHandler) onConnectionClosedHandler;
+	std::unique_ptr< BaseConnectionType > baseConnection;
     {
-        QnMutexLocker lock(&m_mutex);
-        closeConnectionImpl(&lock, errorCode);
-        baseConnection = std::move(m_baseConnection);
-        onConnectionClosedHandler.swap(m_onConnectionClosedHandler);
+        QnMutexLocker lock( &m_mutex );
+        closeConnectionImpl( &lock, errorCode );
+		baseConnection = std::move( m_baseConnection );
     }
 
     if (baseConnection)
@@ -220,14 +229,8 @@ void AsyncClient::closeConnection(
         connection == baseConnection.get(),
         Q_FUNC_INFO, "Incorrect closeConnection call");
 
-    if (onConnectionClosedHandler)
-        onConnectionClosedHandler(errorCode);
-}
-
-void AsyncClient::setOnConnectionClosedHandler(
-    OnConnectionClosedHandler onConnectionClosedHandler)
-{
-    m_onConnectionClosedHandler.swap(onConnectionClosedHandler);
+    if (m_onConnectionClosedHandler)
+        m_onConnectionClosedHandler(errorCode);
 }
 
 void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
@@ -244,7 +247,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
     {
         case State::disconnected:
         {
-            // estabilish new connection
+            // establish new connection
             m_connectingSocket =
                 SocketFactory::createStreamSocket(
                     m_useSsl, nx::network::NatTraversalSupport::disabled);

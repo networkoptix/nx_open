@@ -23,6 +23,7 @@
 #include "audit/audit_record.h"
 #include "licensing/hardware_info.h"
 #include "backup_status_reply.h"
+#include "wearable_camera_reply.h"
 #include <utils/email/email.h>
 
 #define QN_MS_API_DATA_TYPES \
@@ -49,12 +50,13 @@
     (QnUpdateFreeSpaceReply)\
     (QnCloudHostCheckReply)\
     (QnRecordingStatsData)\
-    (QnCamRecordingStatsData)\
+    (QnCamRecordingStatsData)
 
 #define QN_MS_API_COMPARABLE_DATA_TYPES \
     (QnStorageSpaceData)\
     (QnStorageScanData)\
-    (QnBackupStatusData)
+    (QnBackupStatusData)\
+    (QnWearableCameraReply)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_MS_API_DATA_TYPES, (ubjson)(xml)(json)(csv_record), _Fields)

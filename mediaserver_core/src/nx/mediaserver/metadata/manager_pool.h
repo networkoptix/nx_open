@@ -103,13 +103,28 @@ private:
         return deserialized;
     }
 
-    boost::optional<nx::api::AnalyticsDriverManifest> addManifestToServer(
+    boost::optional<nx::api::AnalyticsDriverManifest> loadPluginManifest(
         nx::sdk::metadata::AbstractMetadataPlugin* plugin);
 
-    boost::optional<nx::api::AnalyticsDeviceManifest> addManifestToCamera(
-        const QnSecurityCamResourcePtr& camera,
+    void assignPluginManifestToServer(
+        const nx::api::AnalyticsDriverManifest& manifest,
+        const QnMediaServerResourcePtr& server);
+
+    void mergePluginManifestToServer(
+        const nx::api::AnalyticsDriverManifest& manifest,
+        const QnMediaServerResourcePtr& server);
+
+    std::pair<
+        boost::optional<nx::api::AnalyticsDeviceManifest>,
+        boost::optional<nx::api::AnalyticsDriverManifest>
+    >
+    loadManagerManifest(
         nx::sdk::metadata::AbstractMetadataManager* manager,
-        const nx::sdk::metadata::AbstractMetadataPlugin* plugin);
+        const QnSecurityCamResourcePtr& camera);
+
+    void addManifestToCamera(
+        const nx::api::AnalyticsDeviceManifest& manifest,
+        const QnSecurityCamResourcePtr& camera);
 
     bool resourceInfoFromResource(
         const QnSecurityCamResourcePtr& camera,

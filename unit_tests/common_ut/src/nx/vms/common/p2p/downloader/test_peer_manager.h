@@ -7,6 +7,7 @@
 #include <QtCore/QQueue>
 
 #include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
+#include <nx/utils/thread/long_runnable.h>
 
 namespace nx {
 namespace vms {
@@ -41,30 +42,39 @@ struct RequestCounter
 
     static QString requestTypeShortName(RequestType requestType);
 
+private:
     std::array<QHash<QnUuid, int>, RequestTypesCount> counters;
+    mutable QnMutex m_mutex;
 };
 
-class TestPeerManager: public AbstractPeerManager
+class TestPeerManagerHandler
 {
 public:
-    struct TestFileInformation: downloader::FileInformation
+    virtual void onRequestFileInfo() = 0;
+};
+
+class TestPeerManager: public AbstractPeerManager, public QnLongRunnable
+{
+public:
+    struct FileInformation: downloader::FileInformation
     {
         using downloader::FileInformation::FileInformation;
-        TestFileInformation() = default;
-        TestFileInformation(const downloader::FileInformation& fileInfo);
+        FileInformation() = default;
+        FileInformation(const downloader::FileInformation& fileInfo);
 
         QString filePath;
         QVector<QByteArray> checksums;
     };
 
-    TestPeerManager();
+    TestPeerManager(TestPeerManagerHandler* handler);
+    ~TestPeerManager() { stop(); }
 
     void setPeerList(const QList<QnUuid>& peerList) { m_peerList = peerList; }
     void addPeer(const QnUuid& peerId, const QString& peerName = QString());
     QnUuid addPeer(const QString& peerName = QString());
 
-    void setFileInformation(const QnUuid& peerId, const TestFileInformation& fileInformation);
-    TestFileInformation fileInformation(const QnUuid& peerId, const QString& fileName) const;
+    void setFileInformation(const QnUuid& peerId, const FileInformation& fileInformation);
+    FileInformation fileInformation(const QnUuid& peerId, const QString& fileName) const;
 
     void setPeerStorage(const QnUuid& peerId, Storage* storage);
     void setHasInternetConnection(const QnUuid& peerId, bool hasInternetConnection = true);
@@ -74,9 +84,6 @@ public:
     void setPeerGroups(const QnUuid& peerId, const QStringList& groups);
 
     void addInternetFile(const nx::utils::Url& url, const QString& fileName);
-
-    bool processNextRequest();
-    void exec(int maxRequests = 0);
 
     const RequestCounter* requestCounter() const;
 
@@ -108,12 +115,24 @@ public:
         ChunkCallback callback) override;
 
     virtual rest::Handle downloadChunkFromInternet(
-        const FileInformation& fileInformation,
         const QnUuid& peerId,
+        const QString& fileName,
+        const nx::utils::Url& url,
         int chunkIndex,
+        int chunkSize,
         ChunkCallback callback) override;
 
+    virtual rest::Handle validateFileInformation(
+        const downloader::FileInformation& fileInformation, ValidateCallback callback) override;
+
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
+
+    virtual void pleaseStop() override;
+    virtual void run() override;
+
+    void setDelayBeforeRequest(qint64 delay);
+    void setValidateShouldFail();
+    void setOneShotDownloadFail();
 
 private:
     using RequestCallback = std::function<void(rest::Handle)>;
@@ -121,17 +140,18 @@ private:
     rest::Handle getRequestHandle();
     rest::Handle enqueueRequest(const QnUuid& peerId, qint64 time, RequestCallback callback);
 
-    static QByteArray readFileChunk(const TestFileInformation& fileInformation, int chunkIndex);
+    static QByteArray readFileChunk(const FileInformation& fileInformation, int chunkIndex);
 
     struct PeerInfo
     {
         QString name;
-        QHash<QString, TestFileInformation> fileInformationByName;
+        QHash<QString, FileInformation> fileInformationByName;
         QStringList groups;
         Storage* storage = nullptr;
         bool hasInternetConnection = false;
     };
 
+    TestPeerManagerHandler* m_handler = nullptr;
     QHash<QnUuid, PeerInfo> m_peers;
     QMultiHash<QString, QnUuid> m_peersByGroup;
     int m_requestIndex = 0;
@@ -148,8 +168,13 @@ private:
     };
 
     QQueue<Request> m_requestsQueue;
+    QnMutex m_mutex;
+    QnWaitCondition m_condition;
     qint64 m_currentTime = 0;
     RequestCounter m_requestCounter;
+    qint64 m_delayBeforeRequest = 0;
+    bool m_validateShouldFail = false;
+    bool m_downloadFailed = false;
 };
 
 class ProxyTestPeerManager: public AbstractPeerManager
@@ -191,10 +216,15 @@ public:
         ChunkCallback callback) override;
 
     virtual rest::Handle downloadChunkFromInternet(
-        const FileInformation& fileInformation,
         const QnUuid& peerId,
+        const QString& fileName,
+        const nx::utils::Url& url,
         int chunkIndex,
+        int chunkSize,
         ChunkCallback callback) override;
+
+    virtual rest::Handle validateFileInformation(
+        const FileInformation& fileInformation, ValidateCallback callback) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
 

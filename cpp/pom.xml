@@ -372,6 +372,23 @@
         </profile>
 
         <profile>
+            <id>bananapi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bananapi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.global.packages>qt any/boost sysroot gcc</rdep.global.packages>
+            </properties>
+        </profile>
+
+        <profile>
             <id>rpi</id>
             <activation>
                 <activeByDefault>false</activeByDefault>

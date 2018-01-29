@@ -1,4 +1,5 @@
 import logging
+import os
 import os.path
 
 import pytest
@@ -121,6 +122,7 @@ def run_options(request):
     mediaserver_dist_path = request.config.getoption('--mediaserver-dist-path')
     mediaserver_dist_path = os.path.join(bin_dir, mediaserver_dist_path or DEFAULT_MEDIASERVER_DIST_FNAME)
     assert os.path.isfile(mediaserver_dist_path), 'Mediaserver distributive is missing at %r' % mediaserver_dist_path
+    autotest_email_password = request.config.getoption('--autotest-email-password') or os.environ.get('AUTOTEST_EMAIL_PASSWORD')
     tests_config = TestsConfig.merge_config_list(
         request.config.getoption('--tests-config-file'),
         request.config.getoption('--test-parameters'),
@@ -128,7 +130,7 @@ def run_options(request):
     return SimpleNamespace(
         cloud_group=request.config.getoption('--cloud-group'),
         customization=request.config.getoption('--customization'),
-        autotest_email_password=request.config.getoption('--autotest-email-password'),
+        autotest_email_password=autotest_email_password,
         work_dir=request.config.getoption('--work-dir'),
         bin_dir=request.config.getoption('--bin-dir'),
         mediaserver_dist_path=mediaserver_dist_path,

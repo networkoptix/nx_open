@@ -73,7 +73,7 @@
         <!-- NXTOOL properties-->
         <Property Id="NXTOOL_VMS_MODE" Value="1"/>
 
-        <Binary Id="CustomActions.dll" SourceFile="CustomActions/Release/CustomActions.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="$(var.SourceDir)\wix_custom_actions.dll" />
 
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />

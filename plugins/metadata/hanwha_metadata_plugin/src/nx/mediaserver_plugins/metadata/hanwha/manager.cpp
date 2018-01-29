@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "manager.h"
 
 #include <chrono>
@@ -122,7 +120,7 @@ Error Manager::stopFetchingMetadata()
     return Error::noError;
 }
 
-const char* Manager::capabilitiesManifest(Error* error) const
+const char* Manager::capabilitiesManifest(Error* error)
 {
     if (m_deviceManifest.isEmpty())
     {
@@ -132,6 +130,10 @@ const char* Manager::capabilitiesManifest(Error* error) const
 
     *error = Error::noError;
     return m_deviceManifest.constData();
+}
+
+void Manager::freeManifest(const char* data)
+{
 }
 
 void Manager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
@@ -165,5 +167,3 @@ void Manager::setMonitor(MetadataMonitor* monitor)
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

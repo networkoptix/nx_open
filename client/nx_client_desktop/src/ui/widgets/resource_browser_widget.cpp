@@ -39,8 +39,9 @@
 #include <core/resource/videowall_matrix_index.h>
 
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
-
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/common/widgets/async_image_widget.h>
+
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
 #include <ui/delegates/resource_item_delegate.h>
@@ -57,7 +58,6 @@
 #include <ui/style/helper.h>
 #include <ui/widgets/common/busy_indicator.h>
 #include <ui/widgets/common/text_edit_label.h>
-#include <ui/widgets/resource_preview_widget.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>

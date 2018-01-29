@@ -74,6 +74,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     m_sensitivityButtons(new QButtonGroup(this))
 {
     ui->setupUi(this);
+    ui->wearableUploadWidget->initializeContext();
     ui->licensingWidget->initializeContext();
     ui->cameraScheduleWidget->initializeContext();
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
@@ -246,6 +247,7 @@ void SingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &cam
     ui->advancedSettingsWidget->setCamera(camera);
     ui->cameraScheduleWidget->setCameras(cameras);
     ui->licensingWidget->setCameras(cameras);
+    ui->wearableUploadWidget->setCamera(camera);
 
     if (m_camera)
     {

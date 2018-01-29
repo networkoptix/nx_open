@@ -1,5 +1,8 @@
 #include "manager_pool.h"
 
+#include <memory>
+#include <tuple>
+
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
 
@@ -21,8 +24,21 @@
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include "media_data_receptor.h"
 #include <nx/utils/log/log_main.h>
-
 #include <mediaserver_ini.h>
+
+namespace nx {
+namespace api {
+
+uint qHash(const AnalyticsEventType& t)
+{
+    return qHash(t.typeId.toByteArray());
+}
+
+} // namespace api
+} // namespace nx
+
+
+
 
 namespace nx {
 namespace mediaserver {
@@ -44,7 +60,7 @@ ManagerPool::~ManagerPool()
 
 void ManagerPool::init()
 {
-    NX_DEBUG(this, lit("Initializing metdata manager pool."));
+    NX_DEBUG(this, lit("Initializing metadata manager pool."));
     auto resourcePool = m_serverModule->commonModule()->resourcePool();
 
     connect(
@@ -170,6 +186,15 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
                 return;
         }
     }
+    QnMediaServerResourcePtr server = m_serverModule
+        ->commonModule()
+        ->resourcePool()
+        ->getResourceById<QnMediaServerResource>(
+            m_serverModule->commonModule()->moduleGUID());
+    NX_ASSERT(server, lm("Can not obtain current server resource."));
+    if (!server)
+        return;
+
 
     for (AbstractMetadataPlugin* const plugin: availablePlugins())
     {
@@ -179,14 +204,25 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
             createMetadataManager(camera, plugin), /*increaseRef*/ false);
         if (!manager)
             continue;
-
-        const auto pluginManifest = addManifestToServer(plugin);
+        boost::optional<nx::api::AnalyticsDriverManifest> pluginManifest =
+            loadPluginManifest(plugin);
         if (!pluginManifest)
-            continue; //< Error already logged.
+            return;
+        assignPluginManifestToServer(*pluginManifest, server);
 
-        const auto deviceManifest = addManifestToCamera(camera, manager.get(), plugin);
-        if (!deviceManifest)
-            continue; //< Error already logged.
+        boost::optional<nx::api::AnalyticsDeviceManifest> managerManifest;
+        boost::optional<nx::api::AnalyticsDriverManifest> auxiliaryPluginManifest;
+        std::tie(managerManifest, auxiliaryPluginManifest) = loadManagerManifest(manager.get(), camera);
+        if (managerManifest)
+        {
+            addManifestToCamera(*managerManifest, camera);
+        }
+        if (auxiliaryPluginManifest)
+        {
+            auxiliaryPluginManifest->driverId = pluginManifest->driverId;
+            mergePluginManifestToServer(*auxiliaryPluginManifest, server);
+        }
+
 
         auto& context = m_contexts[camera->getId()];
         std::unique_ptr<MetadataHandler> handler(
@@ -337,7 +373,7 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
         {
             NX_DEBUG(
                 this,
-                lm("Event list is empty, stopping metdata fetching for resource %1.")
+                lm("Event list is empty, stopping metadata fetching for resource %1.")
                     .arg(resourceId));
 
             auto result = data.manager->stopFetchingMetadata();
@@ -356,7 +392,7 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
                 eventTypeList.push_back(nxpt::NxGuidHelper::fromRawData(eventTypeId.toRfc4122()));
             auto result = data.manager->startFetchingMetadata(
                 !eventTypeList.empty() ? &eventTypeList[0] : nullptr,
-                eventTypeList.size()); //< TODO: #dmishin pass event types.
+                static_cast<int>(eventTypeList.size()));
 
             if (result != Error::noError)
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1").arg(data.manifest.driverName.value));
@@ -364,19 +400,14 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
     }
 }
 
-boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServer(
+uint qHash(const nx::api::AnalyticsEventType& t)// noexcept
+{
+    return qHash(t.typeId.toByteArray());
+}
+
+boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifest(
     AbstractMetadataPlugin* plugin)
 {
-    auto server = m_serverModule
-        ->commonModule()
-        ->resourcePool()
-        ->getResourceById<QnMediaServerResource>(
-            m_serverModule->commonModule()->moduleGUID());
-
-    NX_ASSERT(server, lm("Cannot obtain current server resource."));
-    if (!server)
-        return boost::none;
-
     Error error = Error::noError;
     const char* const manifestStr = plugin->capabilitiesManifest(&error);
     if (error != Error::noError)
@@ -392,72 +423,148 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServ
         return boost::none;
     }
 
-    auto manifest = deserializeManifest<nx::api::AnalyticsDriverManifest>(manifestStr);
-    if (!manifest)
+    auto pluginManifest = deserializeManifest<nx::api::AnalyticsDriverManifest>(
+        manifestStr);
+
+    if (!pluginManifest)
     {
         NX_ERROR(
             this,
             lm("Cannot deserialize plugin manifest from plugin %1").arg(plugin->name()));
         return boost::none; //< Error already logged.
     }
+    return pluginManifest;
+}
 
-    bool overwritten = false;
+void ManagerPool::assignPluginManifestToServer(
+    const nx::api::AnalyticsDriverManifest& manifest,
+    const QnMediaServerResourcePtr& server)
+{
     auto existingManifests = server->analyticsDrivers();
-    for (auto& existingManifest : existingManifests)
+    auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
+        [&manifest](const nx::api::AnalyticsDriverManifest& m)
     {
-        if (existingManifest.driverId == manifest->driverId)
-        {
-            existingManifest = *manifest;
-            overwritten = true;
-            break;
-        }
-    }
+        return m.driverId == manifest.driverId;
+    });
 
-    if (!overwritten)
-        existingManifests.push_back(*manifest);
+    if (it == existingManifests.cend())
+    {
+        existingManifests.push_back(manifest);
+    }
+    else
+    {
+        *it = manifest;
+    }
 
     server->setAnalyticsDrivers(existingManifests);
     server->saveParams();
-
-    return manifest;
 }
 
-boost::optional<nx::api::AnalyticsDeviceManifest> ManagerPool::addManifestToCamera(
-    const QnSecurityCamResourcePtr& camera,
+void ManagerPool::mergePluginManifestToServer(
+    const nx::api::AnalyticsDriverManifest& manifest,
+    const QnMediaServerResourcePtr& server)
+{
+    auto existingManifests = server->analyticsDrivers();
+    auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
+        [&manifest](const nx::api::AnalyticsDriverManifest& m)
+        {
+            return m.driverId == manifest.driverId;
+        });
+
+    if (it == existingManifests.cend())
+    {
+        existingManifests.push_back(manifest);
+    }
+    else
+    {
+        it->outputEventTypes = it->outputEventTypes.toSet().
+            unite(manifest.outputEventTypes.toSet()).toList();
+    }
+
+
+#if defined _DEBUG
+    // Sometimes in debug purposes we need do clean existingManifest.outputEventTypes list.
+    if (!manifest.outputEventTypes.empty() &&
+        manifest.outputEventTypes.front().typeId == nx::api::kResetPluginManifestEventId)
+    {
+        it->outputEventTypes.clear();
+    }
+#endif
+
+    server->setAnalyticsDrivers(existingManifests);
+    server->saveParams();
+}
+
+std::pair<
+    boost::optional<nx::api::AnalyticsDeviceManifest>,
+    boost::optional<nx::api::AnalyticsDriverManifest>
+    >
+ManagerPool::loadManagerManifest(
     AbstractMetadataManager* manager,
-    const nx::sdk::metadata::AbstractMetadataPlugin* plugin)
+    const QnSecurityCamResourcePtr& camera)
 {
     NX_ASSERT(manager);
     NX_ASSERT(camera);
 
     Error error = Error::noError;
-    const char *const manifestStr = manager->capabilitiesManifest(&error);
-    if (error != Error::noError)
-    {
-        NX_ERROR(this) << lm("Unable to receive Manager manifest for \"%1\": %2.")
-            .args(plugin->name(), error);
-        return boost::none;
-    }
-    if (manifestStr == nullptr)
-    {
-        NX_ERROR(this) << lm("Received null Manager manifest for \"%1\".")
-            .arg(plugin->name());
-        return boost::none;
-    }
 
-    auto manifest = deserializeManifest<nx::api::AnalyticsDeviceManifest>(manifestStr);
-    if (!manifest)
+    // "managerManifest" contains const char* representation of camera manifest.
+    // unique_ptr allows us to automatically ask manager to release it when memory is not needed more.
+    auto deleter = [manager](const char* ptr) { manager->freeManifest(ptr); };
+    std::unique_ptr<const char, decltype(deleter)> managerManifest(
+        manager->capabilitiesManifest(&error), deleter);
+
+    if (error != Error::noError)
     {
         NX_ERROR(
             this,
-            lm("Cannot fetch or deserialize manifest for resource %1 (%2)")
-                .args(camera->getUserDefinedName(), camera->getId()));
-        return boost::none; //< Error already logged.
+            lm("Can not fetch manifest for resource %1 (%2), plugin returned error.")
+            .args(camera->getUserDefinedName(), camera->getId()));
+        return std::make_pair(boost::none, boost::none);
     }
-    camera->setAnalyticsSupportedEvents(manifest->supportedEventTypes);
-    camera->saveParams();
 
-    return manifest;
+    // Manager::capabilitiesManifest can return data in two json formats: either
+    // AnalyticsDeviceManifest or AnalyticsDriverManifest.
+    // First we try AnalyticsDeviceManifest.
+    auto deviceManifest = deserializeManifest<nx::api::AnalyticsDeviceManifest>(
+        managerManifest.get());
+
+    if (deviceManifest && deviceManifest->supportedEventTypes.size())
+        return std::make_pair(deviceManifest, boost::none);
+
+    // If manifest occurred to be not AnalyticsDeviceManifest, we try to treat it as
+    // AnalyticsDriverManifest.
+    auto driverManifest = deserializeManifest<nx::api::AnalyticsDriverManifest>(
+        managerManifest.get());
+
+    if (driverManifest && driverManifest->outputEventTypes.size())
+    {
+        deviceManifest = nx::api::AnalyticsDeviceManifest();
+        std::transform(
+            driverManifest->outputEventTypes.cbegin(),
+            driverManifest->outputEventTypes.cend(),
+            std::back_inserter(deviceManifest->supportedEventTypes),
+            [](const nx::api::AnalyticsEventType& driverManifestElement)
+            {
+                return driverManifestElement.typeId;
+            });
+        return std::make_pair(deviceManifest, driverManifest);
+    }
+
+    // If manifest format is invalid.
+    NX_ERROR(
+        this,
+        lm("Can not deserialize manifest for resource %1 (%2)")
+        .args(camera->getUserDefinedName(), camera->getId()));
+    return std::make_pair(boost::none, boost::none);
+}
+
+void ManagerPool::addManifestToCamera(
+    const nx::api::AnalyticsDeviceManifest& manifest,
+    const QnSecurityCamResourcePtr& camera)
+{
+    camera->setAnalyticsSupportedEvents(manifest.supportedEventTypes);
+    camera->saveParams();
 }
 
 bool ManagerPool::resourceInfoFromResource(

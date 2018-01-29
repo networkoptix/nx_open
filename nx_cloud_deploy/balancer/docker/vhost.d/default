@@ -11,6 +11,10 @@
         proxy_pass http://cloud_db:3346/cdb/cloud_modules.xml;
     }
 
+    location = /discovery/v1/cloud_modules.xml {
+        proxy_pass http://cloud_db:3346/discovery/v1/cloud_modules.xml;
+    }
+
     location /mediator {
         proxy_pass http://connection_mediator:3355;
     }

@@ -10,7 +10,7 @@ namespace detail {
 struct Updates2StatusDataEx: api::Updates2StatusData
 {
     qint64 lastRefreshTime = 0;
-    QList<QString> downloadedFiles;
+    QSet<QString> files;
 
     const api::Updates2StatusData& base() const;
     Updates2StatusDataEx(
@@ -27,7 +27,7 @@ bool operator == (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& r
 bool operator != (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& rhs);
 
 
-#define Updates2StatusDataEx_Fields Updates2StatusData_Fields (lastRefreshTime)(downloadedFiles)
+#define Updates2StatusDataEx_Fields Updates2StatusData_Fields (lastRefreshTime)(files)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Updates2StatusDataEx), (json))
 
 } // namespace detail

@@ -44,7 +44,7 @@ QnUuid guidFromEventName(const char* eventFullName)
 
 } // namespace
 
-IdentifiedSupportedEvent::IdentifiedSupportedEvent(const nx::axis::SupportedEvent& supportedEvent) :
+IdentifiedSupportedEvent::IdentifiedSupportedEvent(const nx::axis::SupportedEvent& supportedEvent):
     nx::axis::SupportedEvent(supportedEvent)
 {
     m_internalTypeId = guidFromEventName(supportedEvent.fullName().c_str());
@@ -54,19 +54,13 @@ IdentifiedSupportedEvent::IdentifiedSupportedEvent(const nx::axis::SupportedEven
 QString serializeEvent(const IdentifiedSupportedEvent& identifiedSupportedEvent)
 {
     static const QString kEventPattern = R"json(
-    {
-        "eventTypeId": "%1",
-        "eventName": {
-            "value": "%2",
-            "localization": {
-            }
-        },
-        "internalName": "%3",
-        "stateMode": "%4",
-        "_": "machine-generated",
-        "source": "Axis P1405-E"
-    }
-    )json";
+        {
+            "eventTypeId": "%1",
+            "eventName": { "value": "%2", "localization": { } },
+            "internalName": "%3",
+            "stateMode": "%4",
+            "source": "Axis P1405-E"
+        })json";
     static const QString kStateful = "stateful";
     static const QString kStateless = "stateless";
 
@@ -85,11 +79,15 @@ QString serializeEvent(const IdentifiedSupportedEvent& identifiedSupportedEvent)
 QString serializeEvents(const QList<IdentifiedSupportedEvent>& identifiedSupportedEvents)
 {
     QStringList serializedEvents;
+    const QString kPrefix = "{\n    \"outputEventTypes\":\n    [";
+    const QString kPostfix = "\n    ]\n}";
     for (const auto& identifiedSupportedEvent : identifiedSupportedEvents)
     {
         serializedEvents << serializeEvent(identifiedSupportedEvent);
     }
-    return serializedEvents.join(',');
+    QString result = serializedEvents.join(',');
+
+    return kPrefix + result + kPostfix;
 }
 
 } // axis
