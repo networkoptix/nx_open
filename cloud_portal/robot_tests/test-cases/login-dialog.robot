@@ -203,7 +203,7 @@ requires log In, if the user has just logged out and pressed back button in brow
     Validate Log Out
     Close Browser
 
-handles more than 256 symbols email and password
+handles more than 255 symbols email and password
     Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}

@@ -52,7 +52,7 @@ should save user data to user account correctly
     Textfield Should Contain    ${ACCOUNT LAST NAME}    hamill
     Close Browser
 
-should allow to enter more than 256 symbols in First and Last names and cut it to 256
+should allow to enter more than 255 symbols in First and Last names and cut it to 255
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    ${300CHARS}    ${300CHARS}    ${email}    ${password}
