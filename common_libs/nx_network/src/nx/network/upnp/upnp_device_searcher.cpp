@@ -32,6 +32,10 @@ bool DeviceSearcherDefaultSettings::isUpnpMulticastEnabled() const
     return true;
 }
 
+bool DeviceSearcherDefaultSettings::isAutoDiscoveryEnabled() const
+{
+    return true;
+}
 
 static DeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
 
@@ -513,7 +517,8 @@ const DeviceSearcher::UPNPDescriptionCacheItem* DeviceSearcher::findDevDescripti
     if( it == m_upnpDescCache.end() )
         return NULL;
 
-    if( m_cacheTimer.elapsed() - it->second.creationTimestamp > m_settings.cacheTimeout() )
+    if(m_settings.isAutoDiscoveryEnabled() &&
+       m_cacheTimer.elapsed() - it->second.creationTimestamp > m_settings.cacheTimeout() )
     {
         //item has expired
         m_upnpDescCache.erase( it );
