@@ -36,14 +36,28 @@ struct WearableState
     /** Id of the user that has locked this camera. */
     QnUuid lockUserId;
 
+    /** File that's currently being processed. */
     EnqueuedFile currentFile;
 
+    /** Upload state for the current file. */
     UploadState currentUpload;
 
+    /** Consume progress for the current file. */
     int consumeProgress = 0;
 
     /** Upload queue. */
     QList<EnqueuedFile> queue;
+
+    /**
+     * @returns                         Whether this state represents an active worker.
+     */
+    bool isRunning() const;
+
+    /**
+     * @returns                         Progress of the current file being processed,
+     *                                  a number in [0, 100] range.
+     */
+    int progress() const;
 };
 
 } // namespace desktop

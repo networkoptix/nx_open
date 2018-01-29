@@ -92,14 +92,7 @@ WearableState WearableWorker::state() const
 
 bool WearableWorker::isWorking() const
 {
-    switch (d->state.status) {
-    case WearableState::Locked:
-    case WearableState::Uploading:
-    case WearableState::Consuming:
-        return true;
-    default:
-        return false;
-    }
+    return d->state.isRunning();
 }
 
 void WearableWorker::updateState()
