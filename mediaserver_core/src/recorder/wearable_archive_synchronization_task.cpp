@@ -27,7 +27,9 @@ WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
     m_resource(resource),
     m_file(file.release()),
     m_startTimeMs(startTimeMs)
-{}
+{
+    qRegisterMetaType<WearableArchiveSynchronizationState>("WearableArchiveSynchronizationState");
+}
 
 WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask()
 {
@@ -58,6 +60,8 @@ void WearableArchiveSynchronizationTask::cancel()
 
 bool WearableArchiveSynchronizationTask::execute()
 {
+    m_state.status = WearableArchiveSynchronizationState::Consuming;
+
     createArchiveReader(m_startTimeMs);
     createStreamRecorder(m_startTimeMs);
 
@@ -71,26 +75,15 @@ bool WearableArchiveSynchronizationTask::execute()
     m_recorder.reset();
     m_archiveReader.reset();
 
-    setProgress(100);
-
-    emit finished();
+    m_state.status = WearableArchiveSynchronizationState::Finished;
+    emit stateChanged(m_state);
 
     return true;
 }
 
-int WearableArchiveSynchronizationTask::progress() const
+WearableArchiveSynchronizationState WearableArchiveSynchronizationTask::state() const
 {
-    return m_progress;
-}
-
-void WearableArchiveSynchronizationTask::setProgress(int progress)
-{
-    bool changed = m_progress != progress;
-
-    m_progress = progress;
-
-    if (changed)
-        emit progressChanged(progress);
+    return m_state;
 }
 
 void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
@@ -108,9 +101,15 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
     delegate->setStartTimeUs(startTimeMs * 1000);
     delegate->setUseAbsolutePos(false);
 
-    QnAviResourcePtr aviResource(new QnAviResource(temporaryFilePath));
+    QnAviResourcePtr resource(new QnAviResource(temporaryFilePath));
+    delegate->open(resource);
+    delegate->findStreams();
 
-    m_archiveReader = std::make_unique<QnArchiveStreamReader>(aviResource);
+    qint64 duration = 0;
+    if(delegate->endTime() != AV_NOPTS_VALUE)
+        duration = (delegate->endTime() - delegate->startTime()) / 1000;
+
+    m_archiveReader = std::make_unique<QnArchiveStreamReader>(resource);
     m_archiveReader->setObjectName(lit("WearableCameraArchiveReader"));
     m_archiveReader->setArchiveDelegate(delegate.release());
     //m_archiveReader->setPlaybackMask(timePeriod);
@@ -123,7 +122,8 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
             m_archiveReader->pleaseStop();
             if (m_recorder)
                 m_recorder->pleaseStop();
-            setProgress(-1);
+
+            m_state.errorString = errorString;
         });
 
     m_archiveReader->setNoDataHandler(
@@ -132,8 +132,11 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
             m_archiveReader->pleaseStop();
             if (m_recorder)
                 m_recorder->pleaseStop();
-            setProgress(99);
+
+            m_state.processed = m_state.duration;
         });
+
+    m_state.duration = duration;
 }
 
 void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs)
@@ -154,17 +157,8 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
     m_recorder->setOnFileWrittenHandler(
         [this](milliseconds startTime, milliseconds duration)
         {
-            if (!m_archiveReader)
-                return;
-
-            QnAbstractArchiveDelegate* delegate = m_archiveReader->getArchiveDelegate();
-
-            qint64 globalStartMs = delegate->startTime() / 1000;
-            qint64 globalDurationMs = (delegate->endTime() - delegate->startTime()) / 1000;
-            qint64 progressMs = (startTime + duration).count() - globalStartMs;
-
-            int progress = progressMs * 100 / globalDurationMs;
-            setProgress(std::max(m_progress, progress == 100 ? 99 : progress));
+            m_state.processed = std::min(m_state.duration, m_state.processed + duration.count());
+            emit stateChanged(m_state);
         });
 
     m_recorder->setEndOfRecordingHandler(
@@ -173,7 +167,8 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
             m_recorder->pleaseStop();
             if (m_archiveReader)
                 m_archiveReader->pleaseStop();
-            setProgress(99);
+
+            m_state.processed = m_state.duration;
         });
 }
 
