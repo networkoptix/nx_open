@@ -4,7 +4,6 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/cloud/mediator_connector.h>
-#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/std/cpp14.h>
@@ -30,7 +29,6 @@ TunnelConnector::TunnelConnector(
     m_udpSocket(std::move(udpSocket)),
     m_remotePeerCloudConnectVersion(hpm::api::kDefaultCloudConnectVersion)
 {
-    NX_ASSERT(nx::network::SocketGlobals::cloud().mediatorConnector().udpEndpoint());
     NX_CRITICAL(m_udpSocket);
     m_localAddress = m_udpSocket->getLocalAddress();
 
