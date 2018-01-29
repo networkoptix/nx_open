@@ -43,7 +43,7 @@ public:
     PluginManager(
         QObject* parent,
         const QString& pluginDir = QString(),
-        nxpl::PluginInterface* const pluginContainer = nullptr);
+        nxpl::PluginInterface* pluginContainer = nullptr);
 
     virtual ~PluginManager();
 

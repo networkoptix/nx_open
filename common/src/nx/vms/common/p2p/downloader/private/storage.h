@@ -44,7 +44,7 @@ public:
 
     FileInformation fileInformation(const QString& fileName) const;
 
-    ResultCode addFile(const FileInformation& fileInformation);
+    ResultCode addFile(FileInformation fileInformation, bool updateTouchTime = true);
     ResultCode updateFileInformation(const QString& fileName, qint64 size, const QByteArray& md5);
     ResultCode setChunkSize(const QString& fileName, qint64 chunkSize);
 
@@ -56,6 +56,8 @@ public:
     QVector<QByteArray> getChunkChecksums(const QString& fileName);
     ResultCode setChunkChecksums(
         const QString& fileName, const QVector<QByteArray>& chunkChecksums);
+
+    void cleanupExpiredFiles();
 
     void findDownloads();
 
@@ -77,6 +79,7 @@ signals:
 private:
     ResultCode addDownloadedFile(const FileInformation& fileInformation);
     ResultCode addNewFile(const FileInformation& fileInformation);
+    ResultCode deleteFileInternal(const QString& fileName, bool deleteData = true);
 
     bool saveMetadata(const FileMetadata& fileInformation);
     FileMetadata loadMetadata(const QString& fileName);

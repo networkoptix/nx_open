@@ -118,7 +118,7 @@ class ServerFactory(object):
                 server.make_core_dump()
 
     def perform_post_checks(self):
-        log.info('----- performing post-test checks for servers ------------------------>8 -----------------------------------------')
+        log.info('Perform post-test checks.')
         self._check_if_servers_are_online()
         core_dumped_servers = []
         for server in self._allocated_servers:

@@ -8,35 +8,27 @@
 
 #include "connection_mediator_url_fetcher.h"
 
-static const std::chrono::milliseconds kRetryIntervalInitial = std::chrono::seconds(1);
-static const std::chrono::milliseconds kRetryIntervalMax = std::chrono::minutes(10);
-
 namespace nx {
 namespace hpm {
 namespace api {
 
-namespace {
-
-static network::stun::AbstractAsyncClient::Settings s_stunClientSettings;
-
-} // namespace
+namespace { static network::stun::AbstractAsyncClient::Settings s_stunClientSettings; }
 
 MediatorConnector::MediatorConnector():
-    m_stunClient(std::make_shared<network::stun::AsyncClientWithHttpTunneling>(s_stunClientSettings)),
-    m_mediatorUrlFetcher(std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>()),
     m_fetchEndpointRetryTimer(
         std::make_unique<nx::network::RetryTimer>(
-            nx::network::RetryPolicy(
-                nx::network::RetryPolicy::kInfiniteRetries,
-                kRetryIntervalInitial,
-                2,
-                kRetryIntervalMax)))
+            s_stunClientSettings.reconnectPolicy))
 {
+    // Reconnect to mediator is handled by this class, not by STUN client.
+    auto stunClientSettings = s_stunClientSettings;
+    stunClientSettings.reconnectPolicy = network::RetryPolicy::kNoRetries;
+    m_stunClient = std::make_shared<network::stun::AsyncClientWithHttpTunneling>(
+        s_stunClientSettings);
+
     bindToAioThread(getAioThread());
 
-    NX_ASSERT(
-        s_stunClientSettings.reconnectPolicy.maxRetryCount ==
-        network::RetryPolicy::kInfiniteRetries);
+    m_stunClient->setOnConnectionClosedHandler(
+        std::bind(&MediatorConnector::reconnectToMediator, this));
 }
 
 MediatorConnector::~MediatorConnector()
@@ -50,7 +42,8 @@ void MediatorConnector::bindToAioThread(network::aio::AbstractAioThread* aioThre
     network::aio::BasicPollable::bindToAioThread(aioThread);
 
     m_stunClient->bindToAioThread(aioThread);
-    m_mediatorUrlFetcher->bindToAioThread(aioThread);
+    if (m_mediatorUrlFetcher)
+        m_mediatorUrlFetcher->bindToAioThread(aioThread);
     m_fetchEndpointRetryTimer->bindToAioThread(aioThread);
 }
 
@@ -86,8 +79,7 @@ std::unique_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection
 
 void MediatorConnector::mockupCloudModulesXmlUrl(const nx::utils::Url& cloudModulesXmlUrl)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_mediatorUrlFetcher->setModulesXmlUrl(cloudModulesXmlUrl);
+    m_cloudModulesXmlUrl = cloudModulesXmlUrl;
 }
 
 void MediatorConnector::mockupMediatorUrl(const nx::utils::Url& mediatorUrl)
@@ -107,6 +99,7 @@ void MediatorConnector::mockupMediatorUrl(const nx::utils::Url& mediatorUrl)
     NX_DEBUG(this, lm("Mediator address is mocked up: %1").arg(mediatorUrl));
 
     m_mediatorUrl = mediatorUrl;
+    m_mockedUpMediatorUrl = mediatorUrl;
     m_mediatorUdpEndpoint = nx::network::url::getEndpoint(mediatorUrl);
     m_stunClient->connect(mediatorUrl, [](SystemError::ErrorCode) {});
     m_promise->set_value(true);
@@ -169,9 +162,23 @@ void MediatorConnector::stopWhileInAioThread()
 
 void MediatorConnector::fetchEndpoint()
 {
+    if (!m_mediatorUrlFetcher)
+    {
+        m_mediatorUrlFetcher =
+            std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>();
+        m_mediatorUrlFetcher->bindToAioThread(getAioThread());
+        if (m_cloudModulesXmlUrl)
+            m_mediatorUrlFetcher->setModulesXmlUrl(*m_cloudModulesXmlUrl);
+    }
+
     m_mediatorUrlFetcher->get(
-        [this](nx::network::http::StatusCode::Value status, nx::utils::Url tcpUrl, nx::utils::Url udpUrl)
+        [this](
+            nx::network::http::StatusCode::Value status,
+            nx::utils::Url tcpUrl,
+            nx::utils::Url udpUrl)
         {
+            m_mediatorUrlFetcher.reset();
+
             if (status != nx::network::http::StatusCode::ok)
             {
                 NX_LOGX(lit("Can not fetch mediator address: HTTP %1")
@@ -202,22 +209,50 @@ void MediatorConnector::connectToMediatorAsync()
         *m_mediatorUrl,
         [this](SystemError::ErrorCode code)
         {
-            auto setEndpoint =
-                [this]()
-                {
-                    QnMutexLocker lock(&m_mutex);
-                    // NOTE: Assuming that mediator's UDP and TCP interfaces are available on the same IP.
-                    m_mediatorUdpEndpoint->address = m_stunClient->remoteAddress().address;
-                    NX_DEBUG(this, lm("Connected to mediator at %1").arg(m_mediatorUrl));
-                };
-
             if (code == SystemError::noError)
-                setEndpoint();
+            {
+                m_fetchEndpointRetryTimer->reset();
+                saveMediatorEndpoint();
+                // TODO: ak m_stunClient is expected to invoke "reconnected" handler here.
+            }
+            else
+            {
+                NX_DEBUG(this, lm("Failed to connect to mediator on %1. %2")
+                    .args(*m_mediatorUrl, SystemError::toString(code)));
+                reconnectToMediator();
+            }
 
             if (!isReady(*m_future))
                 m_promise->set_value(code == SystemError::noError);
+        });
+}
 
-            m_stunClient->addOnReconnectedHandler(std::move(setEndpoint));
+void MediatorConnector::saveMediatorEndpoint()
+{
+    QnMutexLocker lock(&m_mutex);
+    // NOTE: Assuming that mediator's UDP and TCP interfaces are available on the same IP.
+    m_mediatorUdpEndpoint->address = m_stunClient->remoteAddress().address;
+    NX_DEBUG(this, lm("Connected to mediator at %1").arg(m_mediatorUrl));
+}
+
+void MediatorConnector::reconnectToMediator()
+{
+    NX_DEBUG(this, lm("Connection to mediator has been broken. Reconnecting..."));
+
+    m_fetchEndpointRetryTimer->scheduleNextTry(
+        [this]()
+        {
+            if (m_mockedUpMediatorUrl)
+            {
+                NX_DEBUG(this, lm("Using mocked up mediator URL %1")
+                    .args(*m_mockedUpMediatorUrl));
+                connectToMediatorAsync();
+            }
+            else
+            {
+                // Fetching mediator URL again.
+                fetchEndpoint();
+            }
         });
 }
 

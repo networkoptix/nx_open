@@ -235,7 +235,8 @@
                 }
             },
             "internalName": "SceneChange",
-            "description": "Scene has been changed"
+            "description": "Scene has been changed",
+            "flags": "stateDependent"
         },
         {
             "eventTypeId": "{7DDF49F1-2B50-4FF9-9FB7-3898EAAB0FE2}",
@@ -253,7 +254,7 @@
         {
             "eventTypeId": "{349DA8B8-6F8A-4F8F-8CD9-3D34E1DC5651}",
             "eventName": {
-                "value": "Black list",
+                "value": "LPR - Black list",
                 "localization": {
                 }
             },
@@ -263,12 +264,23 @@
         {
             "eventTypeId": "{F61119D1-BA55-4731-A541-232CB611DB1E}",
             "eventName": {
-                "value": "White list",
+                "value": "LPR - White list",
                 "localization": {
                 }
             },
             "internalName": "WhiteList",
-            "description": "White list"
+            "description": "White list",
+            "dependedEvent": "otherlist"
+        },
+        {
+            "eventTypeId": "{71004AC7-D190-444E-888A-EA61997B6CD2}",
+            "eventName": {
+                "value": "LPR - Other list",
+                "localization": {
+                }
+            },
+            "internalName": "otherlist",
+            "description": "Other list"
         },
         {
             "eventTypeId": "{4DAE9597-7A81-4A48-AEDC-37D5B184DB11}",
@@ -278,7 +290,8 @@
                 }
             },
             "internalName": "Vehicle",
-            "description": "Vehicle detected"
+            "description": "Vehicle detected",
+            "flags": "stateDependent"
         }
     ]
 }

@@ -4,6 +4,9 @@
 
 #include <nx/network/cloud/tunnel/cloud_tunnel_connector_executor.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -17,13 +20,101 @@ namespace cloud {
 namespace test {
 
 //-------------------------------------------------------------------------------------------------
-// ConnectorExecutorMethodPrioritization
+// ConnectorExecutor
 
 constexpr const int kPrioritizedMethodNumber = 1;
 constexpr const int kNonPrioritizedMethodNumber = 2;
 
-class ConnectorExecutorMethodPrioritization:
+class ConnectorExecutor:
     public ::testing::Test
+{
+public:
+    ~ConnectorExecutor()
+    {
+        stopConnectorExecutor();
+    }
+
+protected:
+    void givenMediatorResponseWithEmptyUdpEndpointList()
+    {
+        m_mediatorResponse.forwardedTcpEndpointList.push_back(
+            SocketAddress("127.0.0.1:12345"));
+    }
+
+    void givenEmptyMediatorResponse()
+    {
+    }
+
+    void whenInvokeConnector()
+    {
+        using namespace std::placeholders;
+
+        m_connectorExecutor = std::make_unique<cloud::ConnectorExecutor>(
+            AddressEntry("Some_cloud_peer"),
+            "connect_session_id",
+            m_mediatorResponse,
+            std::make_unique<UDPSocket>(AF_INET));
+        m_connectorExecutor->start(
+            std::bind(&ConnectorExecutor::onDone, this, _1, _2, _3));
+    }
+
+    void thenErrorIsReported()
+    {
+        m_prevConnectorResult = m_connectorResultQueue.pop();
+        ASSERT_NE(
+            nx::hpm::api::NatTraversalResultCode::ok,
+            m_prevConnectorResult->resultCode);
+    }
+
+    void stopConnectorExecutor()
+    {
+        if (m_connectorExecutor)
+            m_connectorExecutor->pleaseStopSync();
+    }
+
+private:
+    struct Result
+    {
+        nx::hpm::api::NatTraversalResultCode resultCode;
+        SystemError::ErrorCode sysErrorCode;
+        std::unique_ptr<AbstractOutgoingTunnelConnection> connection;
+
+        Result() = delete;
+    };
+
+    nx::hpm::api::ConnectResponse m_mediatorResponse;
+    std::unique_ptr<cloud::ConnectorExecutor> m_connectorExecutor;
+    nx::utils::SyncQueue<Result> m_connectorResultQueue;
+    boost::optional<Result> m_prevConnectorResult;
+
+    void onDone(
+        nx::hpm::api::NatTraversalResultCode resultCode,
+        SystemError::ErrorCode sysErrorCode,
+        std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
+    {
+        m_connectorResultQueue.push(
+            {resultCode, sysErrorCode, std::move(connection)});
+    }
+};
+
+TEST_F(ConnectorExecutor, empty_udp_endpoint_list_is_processed_properly)
+{
+    givenMediatorResponseWithEmptyUdpEndpointList();
+    whenInvokeConnector();
+    thenErrorIsReported();
+}
+
+TEST_F(ConnectorExecutor, empty_connect_response_is_processed_properly)
+{
+    givenEmptyMediatorResponse();
+    whenInvokeConnector();
+    thenErrorIsReported();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class ConnectorExecutorMethodPrioritization:
+    public ConnectorExecutor
 {
 public:
     ConnectorExecutorMethodPrioritization()
@@ -37,8 +128,7 @@ public:
 
     ~ConnectorExecutorMethodPrioritization()
     {
-        if (m_connectorExecutor)
-            m_connectorExecutor->pleaseStopSync();
+        stopConnectorExecutor();
 
         ConnectorFactory::instance().setCustomFunc(
             std::move(m_connectorFactoryBak));
@@ -50,11 +140,11 @@ protected:
         for (int i = 0; i < 2; ++i)
         {
             m_connectorPriorities.push_back(
-                {kNonPrioritizedMethodNumber, std::chrono::milliseconds(1)});
+                { kNonPrioritizedMethodNumber, std::chrono::milliseconds(1) });
         }
 
         m_connectorPriorities.push_back(
-            {kPrioritizedMethodNumber, std::chrono::milliseconds::zero()});
+            { kPrioritizedMethodNumber, std::chrono::milliseconds::zero() });
     }
 
     void givenMediatorResponseWithMultipleMethodsOfTheSamePriority()
@@ -62,21 +152,8 @@ protected:
         for (int i = 0; i < 3; ++i)
         {
             m_connectorPriorities.push_back(
-                {kPrioritizedMethodNumber, std::chrono::milliseconds::zero()});
+                { kPrioritizedMethodNumber, std::chrono::milliseconds::zero() });
         }
-    }
-
-    void whenInvokedConnector()
-    {
-        using namespace std::placeholders;
-
-        m_connectorExecutor = std::make_unique<cloud::ConnectorExecutor>(
-            AddressEntry("Some_cloud_peer"),
-            "connect_session_id",
-            m_mediatorResponse,
-            nullptr);
-        m_connectorExecutor->start(
-            std::bind(&ConnectorExecutorMethodPrioritization::onDone, this, _1, _2, _3));
     }
 
     void whenAnyMethodHasSucceeded()
@@ -109,22 +186,11 @@ private:
         std::chrono::milliseconds startDelay;
     };
 
-    nx::hpm::api::ConnectResponse m_mediatorResponse;
-    std::unique_ptr<cloud::ConnectorExecutor> m_connectorExecutor;
-    nx::utils::promise<void> m_done;
     ConnectorFactory::Function m_connectorFactoryBak;
-    std::vector<ConnectorPriority> m_connectorPriorities;
     nx::utils::SyncQueue<int> m_connectorInvocation;
     nx::utils::SyncQueue<int> m_destructionEventReceiver;
     std::vector<TunnelConnectorStub*> m_createdTunnelConnectors;
-
-    void onDone(
-        nx::hpm::api::NatTraversalResultCode /*resultCode*/,
-        SystemError::ErrorCode /*sysErrorCode*/,
-        std::unique_ptr<AbstractOutgoingTunnelConnection> /*connection*/)
-    {
-        m_done.set_value();
-    }
+    std::vector<ConnectorPriority> m_connectorPriorities;
 
     CloudConnectors connectorFactoryFunc(
         const AddressEntry& targetAddress,
@@ -155,28 +221,28 @@ private:
 TEST_F(ConnectorExecutorMethodPrioritization, prioritized_method_invoked_first)
 {
     givenMediatorResponseWithMethodsOfDifferentPriority();
-    whenInvokedConnector();
+    whenInvokeConnector();
     thenPrioritizedMethodHasBeenInvokedFirst();
 }
 
 TEST_F(ConnectorExecutorMethodPrioritization, multiple_methods_of_the_same_priority)
 {
     givenMediatorResponseWithMultipleMethodsOfTheSamePriority();
-    whenInvokedConnector();
+    whenInvokeConnector();
     thenEveryMethodHasBeenInvoked();
 }
 
 TEST_F(ConnectorExecutorMethodPrioritization, less_prioritized_method_is_still_invoked)
 {
     givenMediatorResponseWithMethodsOfDifferentPriority();
-    whenInvokedConnector();
+    whenInvokeConnector();
     thenEveryMethodHasBeenInvoked();
 }
 
 TEST_F(ConnectorExecutorMethodPrioritization, remaining_connectors_are_destroyed_on_success)
 {
     givenMediatorResponseWithMethodsOfDifferentPriority();
-    whenInvokedConnector();
+    whenInvokeConnector();
     whenAnyMethodHasSucceeded();
     thenAllMethodsAreDestroyed();
 }

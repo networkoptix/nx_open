@@ -210,6 +210,12 @@ bool StandaloneTimerManager::modifyTimerDelay(
     return true;
 }
 
+bool StandaloneTimerManager::hasPendingTasks() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return !m_timeToTask.empty() || m_runningTaskID != 0;
+}
+
 void StandaloneTimerManager::deleteTimer(const TimerId& timerId)
 {
     QnMutexLocker lk(&m_mutex);

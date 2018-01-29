@@ -52,9 +52,14 @@ public:
     Status status = Status::notFound;
     QBitArray downloadedChunks;
     PeerSelectionPolicy peerPolicy = PeerSelectionPolicy::none;
+    qint64 touchTime = 0;
+    qint64 ttl = 0;
 };
+
+bool operator==(const FileInformation& lhs, const FileInformation& rhs);
+
 #define FileInformation_Fields \
-    (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks)(peerPolicy)
+    (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks)(peerPolicy)(touchTime)(ttl)
 
 QN_FUSION_DECLARE_FUNCTIONS(FileInformation, (json))
 QN_FUSION_DECLARE_FUNCTIONS(FileInformation::Status, (lexical))

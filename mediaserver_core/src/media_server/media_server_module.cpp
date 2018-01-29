@@ -69,11 +69,7 @@ void installTranslations()
 
 QDir downloadsDirectory()
 {
-    const QString varDir = qnServerModule->roSettings()->value("varDir").toString();
-    if (varDir.isEmpty())
-        return QDir();
-
-    const QDir dir(varDir + lit("/downloads"));
+    const QDir dir(qnServerModule->settings()->getDataDirectory() + lit("/downloads"));
     if (!dir.exists())
         QDir().mkpath(dir.absolutePath());
 

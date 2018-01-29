@@ -1,3 +1,5 @@
+include(camera_vendors.cmake)
+
 find_package(Qt5 COMPONENTS WebSockets)
 
 set(product.title "${mediaserver.name}")
@@ -74,6 +76,8 @@ set_source_files_properties(
 nx_add_target(mediaserver_core LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mediaserver_core_app_info_impl.cpp"
+    SOURCE_EXCLUSIONS
+        ${vendor_source_exclusions}
     ADDITIONAL_RESOURCES
         "${customization_dir}/mediaserver_core/resources"
         "${customization_dir}/icons/all/favicon.ico"
@@ -83,8 +87,11 @@ nx_add_target(mediaserver_core LIBRARY
     PUBLIC_LIBS
         qtservice qtsinglecoreapplication Qt5::WebSockets
         ffmpeg nx_onvif quazip sigar openssl
-        common appserver2 cloud_db_client nx_email nx_speech_synthesizer nx_network nx_fusion 
-        nx_utils nx_kit nx_update)
+        common appserver2 cloud_db_client nx_email nx_speech_synthesizer nx_network nx_fusion
+        nx_utils nx_kit nx_update
+)
+
+nx_add_vendor_macros(mediaserver_core)
 
 if(LINUX)
     target_link_libraries(mediaserver_core PRIVATE ldap lber)

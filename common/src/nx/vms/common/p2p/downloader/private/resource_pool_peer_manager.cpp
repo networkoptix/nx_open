@@ -1,7 +1,7 @@
 #include "resource_pool_peer_manager.h"
 
 #include <nx/utils/log/assert.h>
-#include <nx/utils/std/future.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/async_http_client_reply.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -56,6 +56,16 @@ private:
         m_peerInfos.append(PeerInformation(server->getSystemInfo(), server->getId()));
     }
 };
+
+nx::network::http::AsyncHttpClientPtr createHttpClient()
+{
+    auto httpClient = nx::network::http::AsyncHttpClient::create();
+    httpClient->setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
+    httpClient->setSendTimeoutMs(kDownloadRequestTimeoutMs);
+    httpClient->setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);
+
+    return httpClient;
+}
 
 } // namespace
 
@@ -174,26 +184,45 @@ rest::Handle ResourcePoolPeerManager::downloadChunk(
     if (!connection)
         return -1;
 
-    return connection->downloadFileChunk(
-        fileName,
-        chunkIndex,
-        [callback](bool success, rest::Handle handle, const QByteArray& result)
+    return connection->downloadFileChunk(fileName, chunkIndex, callback, thread());
+}
+
+rest::Handle ResourcePoolPeerManager::validateFileInformation(
+    const FileInformation& fileInformation, AbstractPeerManager::ValidateCallback callback)
+{
+    const auto handle = ++m_currentSelfRequestHandle;
+    auto httpClient = createHttpClient();
+    httpClient->doHead(fileInformation.url,
+        [this, &fileInformation, callback, handle, httpClient](
+            network::http::AsyncHttpClientPtr asyncClient) mutable
         {
-            callback(
-                success
-                    ? AbstractPeerManager::ChunkDownloadResult::ok
-                    : AbstractPeerManager::ChunkDownloadResult::recoverableError,
-                handle,
-                result);
-        },
-        thread());
+            if (asyncClient->failed()
+                || asyncClient->response()->statusLine.statusCode != network::http::StatusCode::ok)
+            {
+                return callback(false, handle);
+            }
+
+            auto& responseHeaders = asyncClient->response()->headers;
+            auto contentLengthItr = responseHeaders.find("Content-Length");
+            if (contentLengthItr == responseHeaders.cend()
+                || contentLengthItr->second.toInt() != fileInformation.size)
+            {
+                return callback(false, handle);
+            }
+
+            callback(false, handle);
+        });
+
+    return handle;
 }
 
 rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
-    const FileInformation& fileInformation,
     const QnUuid& peerId,
+    const QString& fileName,
+    const nx::utils::Url& url,
     int chunkIndex,
-    ChunkCallback callback)
+    int chunkSize,
+    AbstractPeerManager::ChunkCallback callback)
 {
     if (peerId != selfId())
     {
@@ -205,93 +234,39 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
             [this, callback](bool success, rest::Handle handle, const QByteArray& result)
             {
                 if (!success)
-                    callback(ChunkDownloadResult::recoverableError, handle, QByteArray());
+                    callback(success, handle, QByteArray());
 
-                callback(ChunkDownloadResult::ok, handle, result);
+                callback(success, handle, result);
             };
 
         return connection->downloadFileChunkFromInternet(
-            fileInformation.name, fileInformation.url, chunkIndex, fileInformation.chunkSize,
-            handleReply, thread());
+            fileName, url, chunkIndex, chunkSize, handleReply, thread());
     }
+
+    const qint64 pos = chunkIndex * chunkSize;
+    auto httpClient = createHttpClient();
+    httpClient->addAdditionalHeader("Range",
+        lit("bytes=%1-%2").arg(pos).arg(pos + chunkSize - 1).toLatin1());
 
     const auto handle = ++m_currentSelfRequestHandle;
-
-    auto httpClient = nx::network::http::AsyncHttpClient::create();
-    httpClient->setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
-    httpClient->setSendTimeoutMs(kDownloadRequestTimeoutMs);
-    httpClient->setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);
-
-    // If not chunk has already been downloaded, check whether the file has a correct size. This
-    // check result is considered provided server can serve HEAD request and there is a
-    // Content-length header in response.
-    if (fileInformation.downloadedChunks.isEmpty()
-        || fileInformation.downloadedChunks.count(true) == 0)
-    {
-        utils::promise<bool> headReadyPromise;
-        utils::future<bool> headReadyFuture = headReadyPromise.get_future();
-
-        httpClient->doHead(fileInformation.url,
-            [headReadyPromise = std::move(headReadyPromise), this, &fileInformation](
-                network::http::AsyncHttpClientPtr asyncClient) mutable
-            {
-                if (asyncClient->response()->statusLine.statusCode != network::http::StatusCode::ok)
-                {
-                    // Treating failure to serve HEAD request as success for now
-                    headReadyPromise.set_value(true);
-                    return;
-                }
-
-                auto& responseHeaders = asyncClient->response()->headers;
-                auto contentLengthItr = responseHeaders.find("Content-Length");
-                if (contentLengthItr == responseHeaders.cend())
-                {
-                    headReadyPromise.set_value(true);
-                    return;
-                }
-
-                if (contentLengthItr->second.toInt() != fileInformation.size)
-                {
-                    headReadyPromise.set_value(false);
-                    return;
-                }
-
-                headReadyPromise.set_value(true);
-            });
-
-        if (!headReadyFuture.get())
+    m_httpClientByHandle[handle] = httpClient;
+    httpClient->doGet(url,
+        [this, handle, callback, httpClient](network::http::AsyncHttpClientPtr client)
         {
-            callback(ChunkDownloadResult::irrecoverableError, handle, QByteArray());
-            return handle;
-        }
-    }
-
-
-    const qint64 pos = chunkIndex * fileInformation.chunkSize;
-    httpClient->addAdditionalHeader("Range",
-        lit("bytes=%1-%2").arg(pos).arg(pos + fileInformation.chunkSize - 1).toLatin1());
-
-
-    auto reply = new QnAsyncHttpClientReply(httpClient, this);
-    m_replyByHandle[handle] = reply;
-
-    connect(reply, &QnAsyncHttpClientReply::finished, this,
-        [this, handle, callback](QnAsyncHttpClientReply* reply)
-        {
-            if (!m_replyByHandle.remove(handle))
+            if (!m_httpClientByHandle.remove(handle))
                 return;
 
             QByteArray result;
 
-            if (!reply->isFailed())
-                result = reply->data();
+            if (!client->failed()
+                && client->response()
+                && client->response()->statusLine.statusCode == network::http::StatusCode::ok)
+            {
+                result = client->fetchMessageBodyBuffer();
+            }
 
-            callback(
-                result.isNull() ? ChunkDownloadResult::recoverableError : ChunkDownloadResult::ok,
-                handle, result);
+            callback(!result.isNull(), handle, result);
         });
-
-    httpClient->doGet(fileInformation.url);
 
     return handle;
 }
@@ -300,7 +275,7 @@ void ResourcePoolPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle h
 {
     if (peerId == selfId())
     {
-        m_replyByHandle.remove(handle);
+        m_httpClientByHandle.remove(handle);
         return;
     }
 

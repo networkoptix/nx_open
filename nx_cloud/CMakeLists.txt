@@ -1,9 +1,6 @@
 add_subdirectory(cloud_db_client)
 
-if(LINUX)
-    add_compile_options("-Werror" "-Wall" "-Wextra")
-endif()
-
+set(nx_enable_werror ON)
 if(withClouds OR withDesktopClient)
     add_subdirectory(librelaying)
     add_subdirectory(libvms_gateway_core)

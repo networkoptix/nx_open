@@ -12,6 +12,8 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <ui/style/skin.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -21,7 +23,15 @@ struct ResourceThumbnailProvider::Private
     void updateRequest(const api::ResourceImageRequest& value)
     {
         request = value;
-        if (const auto camera = request.resource.dynamicCast<QnVirtualCameraResource>())
+
+        QnMediaResourcePtr mediaResource = request.resource.dynamicCast<QnMediaResource>();
+        // Some cameras are actually provide only sound stream. So we draw sound icon for this.
+        if (mediaResource && !mediaResource->hasVideo())
+        {
+            QPixmap pixmap = qnSkin->pixmap(lit("item_placeholders/sound.png"), true);
+            baseProvider.reset(new QnBasicImageProvider(pixmap.toImage()));
+        }
+        else if (const auto camera = request.resource.dynamicCast<QnVirtualCameraResource>())
         {
             api::CameraImageRequest cameraRequest(camera, request);
             baseProvider.reset(new CameraThumbnailProvider(cameraRequest));

@@ -20,7 +20,7 @@ class CA(object):
         if not os.path.exists(self.cert_path) or not os.path.exists(self._key_path):
             log.debug("Generating new CA certificate %s and key %s...", self.cert_path, self._key_path)
             check_call([
-                'openssl', 'req', '-x509',
+                'openssl', 'req', '-x509', '-days', '3650',
                 '-newkey', 'rsa:2048', '-nodes', '-keyout', self._key_path,
                 '-subj', '/C=US/O=NetworkOptix/CN=nxca',
                 '-out', self.cert_path])
