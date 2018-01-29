@@ -25,6 +25,7 @@ private:
     virtual void writeStatusToFile(const detail::Updates2StatusDataEx& statusData) override;
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() override;
     virtual void remoteUpdateCompleted() override {}
+    virtual void downloadFinished() override {}
 };
 
 } // namespace updates2

@@ -74,12 +74,12 @@ void Updates2ManagerBase::atServerStart()
         case api::Updates2StatusData::StatusCode::notAvailable:
             break;
         case api::Updates2StatusData::StatusCode::checking:
-            setStatusUnsafe(
+            setStatus(
                 api::Updates2StatusData::StatusCode::notAvailable,
                 "Update is unavailable");
             break;
         case api::Updates2StatusData::StatusCode::downloading:
-            setStatusUnsafe(
+            setStatus(
                 api::Updates2StatusData::StatusCode::available,
                 "Update is available");
             download();
@@ -168,7 +168,7 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
             QnSoftwareVersion version;
             if (!m_updateRegistry)
             {
-                setStatusUnsafe(
+                setStatus(
                     api::Updates2StatusData::StatusCode::error,
                     "Failed to get updates data");
                 return;
@@ -178,7 +178,7 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
                     detail::UpdateFileRequestDataFactory::create(),
                     &version) != update::info::ResultCode::ok)
             {
-                setStatusUnsafe(
+                setStatus(
                     api::Updates2StatusData::StatusCode::notAvailable,
                     "Update is unavailable");
                 return;
@@ -191,14 +191,14 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
             NX_ASSERT(result == update::info::ResultCode::ok);
             if (result != update::info::ResultCode::ok)
             {
-                setStatusUnsafe(
+                setStatus(
                     api::Updates2StatusData::StatusCode::error,
                     lit("Failed to get update file information: %1")
                         .arg(version.toString()));
                 return;
             }
 
-            setStatusUnsafe(
+            setStatus(
                 api::Updates2StatusData::StatusCode::available,
                 lit("Update is available: %1").arg(version.toString()));
 
@@ -225,7 +225,7 @@ api::Updates2StatusData Updates2ManagerBase::download()
 
     if (result != update::info::ResultCode::ok)
     {
-        setStatusUnsafe(
+        setStatus(
             api::Updates2StatusData::StatusCode::error,
             "Failed to get update file information");
         return m_currentStatus.base();
@@ -240,19 +240,36 @@ api::Updates2StatusData Updates2ManagerBase::download()
     fileInformation.url = fileData.url;
     fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
 
-    for (const auto file: m_currentStatus.downloadedFiles)
-        downloader()->deleteFile(file);
-    m_currentStatus.downloadedFiles.append(fileData.file);
-
-    downloader()->addFile(fileInformation);
-    setStatusUnsafe(
-        api::Updates2StatusData::StatusCode::downloading,
-        lit("Downloading update file: %1").arg(fileData.file));
+    ResultCode resultCode = downloader()->addFile(fileInformation);
+    switch (resultCode)
+    {
+        case ResultCode::fileAlreadyDownloaded:
+            setStatus(
+                api::Updates2StatusData::StatusCode::preparing,
+                lit("Preparing update file: %1").arg(fileData.file));
+            startPreparing();
+        case ResultCode::fileAlreadyExists:
+        case ResultCode::ok:
+            setStatus(
+                api::Updates2StatusData::StatusCode::downloading,
+                lit("Downloading update file: %1").arg(fileData.file));
+            m_currentStatus.files.insert(fileData.file);
+            break;
+        case ResultCode::fileDoesNotExist:
+        case ResultCode::ioError:
+        case ResultCode::invalidChecksum:
+        case ResultCode::invalidFileSize:
+            setStatus(
+                api::Updates2StatusData::StatusCode::error,
+                lit("Downloader failed to start downloading: %1").arg(fileData.file));
+            m_currentStatus.files.remove(fileData.file);
+            break;
+    }
 
     return m_currentStatus.base();
 }
 
-void Updates2ManagerBase::setStatusUnsafe(
+void Updates2ManagerBase::setStatus(
     api::Updates2StatusData::StatusCode code,
     const QString& message)
 {
@@ -266,15 +283,24 @@ void Updates2ManagerBase::setStatusUnsafe(
     m_currentStatus = newStatusData;
 }
 
+void Updates2ManagerBase::startPreparing()
+{
+}
+
 void Updates2ManagerBase::onDownloadFinished(const QString& fileName)
 {
     QnMutexLocker lock(&m_mutex);
+    auto onExitGuard = makeScopeGuard([this]() { downloadFinished(); });
+
     using namespace vms::common::p2p::downloader;
 
     auto onError = [this, &fileName](const QString& errorMessage)
     {
-        setStatusUnsafe(api::Updates2StatusData::StatusCode::error, errorMessage);
+        setStatus(api::Updates2StatusData::StatusCode::error, errorMessage);
     };
+
+    if (!m_currentStatus.files.contains(fileName))
+        return;
 
     NX_ASSERT(m_currentStatus.state == api::Updates2StatusData::StatusCode::downloading);
     if (m_currentStatus.state != api::Updates2StatusData::StatusCode::downloading)
@@ -283,7 +309,7 @@ void Updates2ManagerBase::onDownloadFinished(const QString& fileName)
     auto fileInformation = downloader()->fileInformation(fileName);
     NX_ASSERT(fileInformation.isValid());
     if (!fileInformation.isValid())
-        return onError(lit("Downloader internal error for file: %1").arg(fileName));
+        return onError(lit("Downloader internal error for the file: %1").arg(fileName));
 
     switch (fileInformation.status)
     {
@@ -293,9 +319,10 @@ void Updates2ManagerBase::onDownloadFinished(const QString& fileName)
             return onError(lit("Update file is corrupted: %1").arg(fileName));
         default:
             NX_ASSERT(fileInformation.status == FileInformation::Status::downloaded);
-            setStatusUnsafe(
+            setStatus(
                 api::Updates2StatusData::StatusCode::preparing,
                 "Update has been downloaded and now is preparing for install");
+            startPreparing();
             break;
     }
 }

@@ -55,6 +55,9 @@ public:
     qint64 touchTime = 0;
     qint64 ttl = 0;
 };
+
+bool operator==(const FileInformation& lhs, const FileInformation& rhs);
+
 #define FileInformation_Fields \
     (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks)(peerPolicy)(touchTime)(ttl)
 

@@ -29,13 +29,15 @@ protected:
     detail::Updates2StatusDataEx m_currentStatus;
     QnMutex m_mutex;
     update::info::AbstractUpdateRegistryPtr m_updateRegistry;
-    utils::TimerManager m_timerManager;
+    utils::StandaloneTimerManager m_timerManager;
 
     void checkForRemoteUpdate(utils::TimerId timerId);
     void checkForGlobalDictionaryUpdate();
     void swapRegistries(update::info::AbstractUpdateRegistryPtr otherRegistry);
     void refreshStatusAfterCheck();
-    void setStatusUnsafe(api::Updates2StatusData::StatusCode code, const QString& message);
+    void setStatus(api::Updates2StatusData::StatusCode code, const QString& message);
+    void startPreparing();
+
     void onDownloadFinished(const QString& fileName);
     void onDownloadFailed(const QString& fileName);
     void onFileAdded(const vms::common::p2p::downloader::FileInformation& fileInformation);
@@ -46,6 +48,7 @@ protected:
         const vms::common::p2p::downloader::FileInformation& fileInformation);
     void onChunkDownloadFailed(const QString& fileName);
 
+    // 'Real world' communication functions
     virtual qint64 refreshTimeout() = 0;
     virtual void loadStatusFromFile() = 0;
     virtual void connectToSignals() = 0;
@@ -55,7 +58,10 @@ protected:
     virtual void updateGlobalRegistry(const QByteArray& serializedRegistry) = 0;
     virtual void writeStatusToFile(const detail::Updates2StatusDataEx& statusData) = 0;
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
+
+    // Signals for mockup
     virtual void remoteUpdateCompleted() = 0;
+    virtual void downloadFinished() = 0;
 };
 
 } // namespace detail

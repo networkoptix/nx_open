@@ -39,7 +39,7 @@ bool operator == (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& r
         && lhs.message == rhs.message
         && std::abs(lhs.progress - rhs.progress) < std::numeric_limits<double>::epsilon()
         && lhs.state == rhs.state
-        && lhs.downloadedFiles == rhs.downloadedFiles;
+        && lhs.files == rhs.files;
 }
 
 bool operator != (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& rhs)
