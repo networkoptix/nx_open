@@ -13,6 +13,7 @@ ${share dialogue}
 Log in to Auto Tests System
     Open Browser and go to URL    ${url}
     Log In    ${email}    ${password}
+    Validate Log In
     Select Auto Tests System
 
 *** Test Cases ***
