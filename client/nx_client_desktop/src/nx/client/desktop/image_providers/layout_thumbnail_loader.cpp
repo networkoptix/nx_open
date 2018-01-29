@@ -83,9 +83,7 @@ struct LayoutThumbnailLoader::Private
             --data.numLoading;
             if(data.numLoading == 0)
             {
-                qDebug() << "LayoutThumbnailLoader::Private::notifyLoaderComplete(" << data.numLoading << ")";
                 data.status = Qn::ThumbnailStatus::Loaded;
-                emit q->imageChanged(data.image);
                 emit q->statusChanged(data.status);
             }
         }
@@ -145,6 +143,7 @@ struct LayoutThumbnailLoader::Private
                     painter.translate(-cellRect.center());
                     paintPixmapSharp(&painter, specialPixmap(status, targetRect.size().toSize()),
                         targetRect.topLeft());
+
                 }
                 loaderIsComplete = true;
                 break;
@@ -169,7 +168,6 @@ struct LayoutThumbnailLoader::Private
         {
             const auto targetRect = QnGeometry::expanded(aspectRatio,
                 cellRect, Qt::KeepAspectRatio);
-            qDebug() << "LayoutThumbnailLoader::drawTile - resizeOutput(" << targetRect << ")";
             QPainter painter(&data.image);
             painter.setRenderHints(QPainter::SmoothPixmapTransform);
             painter.drawImage(targetRect, tile, sourceRect);
@@ -187,14 +185,14 @@ struct LayoutThumbnailLoader::Private
             painter.translate(-cellRect.center());
             painter.drawImage(targetRect, tile, sourceRect);
         }
+
+        emit q->imageChanged(data.image);
     }
 
     void drawBackground(const QImage& background, const QRectF& targetRect)
     {
         if (background.isNull())
             return;
-
-        qDebug() << "LayoutThumbnailLoader::drawBackground(" << targetRect << ")";
 
         const auto loaded = data.image;
 
@@ -207,6 +205,8 @@ struct LayoutThumbnailLoader::Private
         painter.drawImage(targetRect, background, background.rect());
         painter.setOpacity(1.0);
         painter.drawImage(0, 0, loaded);
+
+        emit q->imageChanged(data.image);
     }
 
     QPixmap specialPixmap(Qn::ThumbnailStatus status, const QSize& size) const
@@ -388,7 +388,6 @@ void LayoutThumbnailLoader::doLoadAsync()
         connect(loader.data(), &QnImageProvider::statusChanged, this,
             [this](Qn::ThumbnailStatus status)
             {
-                qDebug() << "LayoutThumbnailLoader::backgroundStatusChanged(" << int(status) << ")";
                 if (status == Qn::ThumbnailStatus::Loaded)
                 {
                     d->notifyLoaderIsComplete();
@@ -398,7 +397,6 @@ void LayoutThumbnailLoader::doLoadAsync()
         connect(loader.data(), &QnImageProvider::imageChanged, this,
             [this, backgroundRect, xscale, yscale, bounding](const QImage& image)
             {
-                qDebug() << "LayoutThumbnailLoader::doneBackground";
                 const QRectF scaledBackgroundRect(
                     (backgroundRect.left() - bounding.left()) * xscale,
                     (backgroundRect.top() - bounding.top()) * yscale,
@@ -442,7 +440,6 @@ void LayoutThumbnailLoader::doLoadAsync()
         connect(loader.data(), &QnImageProvider::statusChanged, this,
             [this, loader, rotation, scaledCellRect](Qn::ThumbnailStatus status)
             {
-                qDebug() << "LayoutThumbnailLoader::imageStatusChanged(" << int(status) << ")";
                 QnAspectRatio aspectRatio(loader->sizeHint());
                 d->updateTileStatus(status, aspectRatio, scaledCellRect, rotation);
             });
@@ -450,7 +447,6 @@ void LayoutThumbnailLoader::doLoadAsync()
         connect(loader.data(), &QnImageProvider::imageChanged, this,
             [this, loader, rotation, scaledCellRect, zoomRect](const QImage& tile)
             {
-                qDebug() << "LayoutThumbnailLoader::doneImage";
                 const auto sourceAr = QnGeometry::aspectRatio(loader->sizeHint());
                 auto aspectRatio = zoomRect.isNull()
                     ? sourceAr
@@ -463,12 +459,12 @@ void LayoutThumbnailLoader::doLoadAsync()
         loader->loadAsync();
     }
 
-    if (d->data.numLoading)
-        return;
-
-    // If there's nothing to load.
-    d->data.status = Qn::ThumbnailStatus::Loaded;
-    emit statusChanged(d->data.status);
+    if (d->data.numLoading == 0)
+    {
+        // If there's nothing to load.
+        d->data.status = Qn::ThumbnailStatus::Loaded;
+        emit statusChanged(d->data.status);
+    }
 }
 
 } // namespace desktop
