@@ -15,29 +15,36 @@ UploadManager::UploadManager(QObject* parent):
 
 UploadManager::~UploadManager()
 {
+    qDeleteAll(m_workers);
+    m_workers.clear();
 }
 
-FileUpload UploadManager::addUpload(
+QString UploadManager::addUpload(
     const QnMediaServerResourcePtr& server,
     const QString& path,
     qint64 ttl,
+    QString* errorMessage,
     QObject* context,
     Callback callback)
 {
     std::unique_ptr<UploadWorker> worker = std::make_unique<UploadWorker>(server, path, ttl, this);
 
-    FileUpload result = worker->start();
-    if (result.status == FileUpload::Error)
-        return result;
+    worker->start();
+    UploadState state = worker->state();
+    if (state.status == UploadState::Error)
+    {
+        *errorMessage = state.errorMessage;
+        return QString();
+    }
 
     if (callback)
         connect(worker.get(), &UploadWorker::progress, context, callback);
 
     connect(worker.get(), &UploadWorker::progress, this,
-        [this](const FileUpload& upload)
+        [this](const UploadState& upload)
         {
-            FileUpload::Status status = upload.status;
-            if (status == FileUpload::Error || status == FileUpload::Done)
+            UploadState::Status status = upload.status;
+            if (status == UploadState::Error || status == UploadState::Done)
             {
                 m_workers[upload.id]->deleteLater();
                 m_workers.remove(upload.id);
@@ -45,8 +52,17 @@ FileUpload UploadManager::addUpload(
         }
     );
 
-    m_workers[result.id] = worker.release();
-    return result;
+    m_workers[state.id] = worker.release();
+    return state.id;
+}
+
+UploadState UploadManager::state(const QString& id)
+{
+    auto pos = m_workers.find(id);
+    if (pos == m_workers.end())
+        return UploadState();
+
+    return pos.value()->state();
 }
 
 void UploadManager::cancelUpload(const QString& id)

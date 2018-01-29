@@ -206,6 +206,7 @@ protected:
     float m_prevSpeed;
 
     bool m_playAudio;
+    bool m_shouldPlayAudio = false;
     bool m_needChangePriority;
     bool m_hadAudio; // got at least one audio packet
 

@@ -892,7 +892,7 @@
                 <openssl.version>1.0.1f</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA DISABLE_SOFTWARE_MOTION_DETECTION EDGE_SERVER</additional.defines>
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA EDGE_SERVER</additional.defines>
                 <modification>edge1</modification>
                 <rdep.target>isd_s2</rdep.target>
                 <qt.spec/>

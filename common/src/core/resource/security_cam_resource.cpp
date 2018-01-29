@@ -1026,9 +1026,16 @@ void QnSecurityCamResource::setFailoverPriority(Qn::FailoverPriority value)
 void QnSecurityCamResource::setAudioEnabled(bool enabled)
 {
     NX_ASSERT(!getId().isNull());
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
-    (*userAttributesLock)->audioEnabled = enabled;
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
+        if ((*userAttributesLock)->audioEnabled == enabled)
+            return;
+        (*userAttributesLock)->audioEnabled = enabled;
+    }
+
+    emit audioEnabledChanged(::toSharedPointer(this));
 }
+
 bool QnSecurityCamResource::isAudioEnabled() const
 {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );

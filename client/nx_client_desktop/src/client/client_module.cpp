@@ -367,6 +367,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     m_uploadManager = new nx::client::desktop::UploadManager(commonModule);
     m_wearableManager = new nx::client::desktop::WearableManager(commonModule);
 
+    commonModule->store(m_uploadManager);
+    commonModule->store(m_wearableManager);
+
 #ifdef Q_OS_WIN
     commonModule->store(new QnIexploreUrlHandler());
 #endif

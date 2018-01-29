@@ -457,7 +457,7 @@ rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
     return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }
 
-Handle ServerConnection::addWearableCameraAsync(
+Handle ServerConnection::addWearableCamera(
     const QString& name,
     GetCallback callback,
     QThread* targetThread)
@@ -471,8 +471,77 @@ Handle ServerConnection::addWearableCameraAsync(
         targetThread);
 }
 
-Handle ServerConnection::consumeWearableCameraFileAsync(
+Handle ServerConnection::wearableCameraStatus(
     const QnNetworkResourcePtr& camera,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/wearableCamera/status"),
+        QnRequestParamList{ { lit("cameraId"), camera->getId().toSimpleString() } },
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::lockWearableCamera(
+    const QnNetworkResourcePtr& camera,
+    const QnUserResourcePtr& user,
+    qint64 ttl,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executePost(
+        lit("/api/wearableCamera/lock"),
+        QnRequestParamList{
+            { lit("cameraId"), camera->getId().toSimpleString() },
+            { lit("userId"), user->getId().toSimpleString() },
+            { lit("ttl"), QString::number(ttl) } },
+        QByteArray(),
+        QByteArray(),
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::extendWearableCameraLock(
+    const QnNetworkResourcePtr& camera,
+    const QnUuid& token,
+    qint64 ttl,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executePost(
+        lit("/api/wearableCamera/extend"),
+        QnRequestParamList{
+            { lit("cameraId"), camera->getId().toSimpleString() },
+            { lit("token"), token.toSimpleString() },
+            { lit("ttl"), QString::number(ttl) } },
+        QByteArray(),
+        QByteArray(),
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::releaseWearableCameraLock(
+    const QnNetworkResourcePtr& camera,
+    const QnUuid& token,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executePost(
+        lit("/api/wearableCamera/release"),
+        QnRequestParamList{
+            { lit("cameraId"), camera->getId().toSimpleString() },
+            { lit("token"), token.toSimpleString() } },
+        QByteArray(),
+        QByteArray(),
+        callback,
+        targetThread);
+}
+
+
+Handle ServerConnection::consumeWearableCameraFile(
+    const QnNetworkResourcePtr& camera,
+    const QnUuid& token,
     const QString& uploadId,
     qint64 startTimeMs,
     PostCallback callback,
@@ -482,6 +551,7 @@ Handle ServerConnection::consumeWearableCameraFileAsync(
         lit("/api/wearableCamera/consume"),
         QnRequestParamList{
             { lit("cameraId"), camera->getId().toSimpleString() },
+            { lit("token"), token.toSimpleString() },
             { lit("uploadId"), uploadId },
             { lit("startTime"), QString::number(startTimeMs) } },
         QByteArray(),

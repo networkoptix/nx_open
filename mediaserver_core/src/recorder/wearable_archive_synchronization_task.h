@@ -30,7 +30,6 @@ class WearableArchiveSynchronizationTask:
 public:
     WearableArchiveSynchronizationTask(
         QnMediaServerModule* serverModule,
-        const QnUuid& id,
         const QnSecurityCamResourcePtr& resource,
         std::unique_ptr<QIODevice> file,
         qint64 startTimeMs
@@ -42,10 +41,12 @@ public:
     virtual void cancel() override;
     virtual bool execute() override;
 
+    // TODO: STATUS NOT PROGRESS w/error
     int progress() const;
 
 signals:
     void progressChanged(int progress);
+    void finished();
 
 private:
     void createArchiveReader(qint64 startTimeMs);
@@ -53,12 +54,10 @@ private:
     void setProgress(int progress);
 
 private:
-    QnUuid m_id;
     QnSecurityCamResourcePtr m_resource;
     QPointer<QIODevice> m_file;
     qint64 m_startTimeMs = 0;
     int m_progress = 0;
-    nx::utils::MoveOnlyFunc<void()> m_doneHandler;
 
     std::unique_ptr<QnAbstractArchiveStreamReader> m_archiveReader;
     std::unique_ptr<QnServerEdgeStreamRecorder> m_recorder;
