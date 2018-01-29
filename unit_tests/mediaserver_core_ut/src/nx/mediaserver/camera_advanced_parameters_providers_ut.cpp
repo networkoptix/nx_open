@@ -85,10 +85,10 @@ TEST_F(CameraAdvancedParametersProviders, ApiProviders)
     const auto camera = newCamera(
         [](CameraMock* camera)
         {
-            camera->makeApiAdvancedParametersProvider<ApiMultiAdvancedParamitersProvider>({
+            camera->makeApiAdvancedParametersProvider<ApiMultiAdvancedParametersProvider>({
                 "a.x", "a.y", "b.m.x"});
 
-            camera->makeApiAdvancedParametersProvider<ApiSingleAdvancedParamitersProvider>({
+            camera->makeApiAdvancedParametersProvider<ApiSingleAdvancedParametersProvider>({
                 "a.z", "b.m.y", "b.n.z", "c.d"});
         });
     NX_ASSERT(camera);
@@ -193,10 +193,10 @@ TEST_F(CameraAdvancedParametersProviders, MixedUpParameters)
     const auto camera = newCamera(
         [](CameraMock* camera)
         {
-            camera->makeApiAdvancedParametersProvider<ApiMultiAdvancedParamitersProvider>({
+            camera->makeApiAdvancedParametersProvider<ApiMultiAdvancedParametersProvider>({
                 "testGroup1.testParam1", "testGroup1.testParam2"});
 
-            camera->makeApiAdvancedParametersProvider<ApiSingleAdvancedParamitersProvider>({
+            camera->makeApiAdvancedParametersProvider<ApiSingleAdvancedParametersProvider>({
                 "testGroup2.testParam3"});
 
             camera->setStreamCapabilityMaps({

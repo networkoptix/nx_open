@@ -180,6 +180,7 @@ public:
     void setFailoverPriority(Qn::FailoverPriority value);
 
     bool isAudioEnabled() const;
+    bool isAudioForced() const;
     void setAudioEnabled(bool value);
 
     bool isAdvancedWorking() const;

@@ -18,7 +18,7 @@ public:
     boost::optional<QString> getApiParameter(const QString& id);
     bool setApiParameter(const QString& id, const QString& value);
 
-    QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
+    QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     void setStreamCapabilityMaps(StreamCapabilityMap primary, StreamCapabilityMap secondary);
