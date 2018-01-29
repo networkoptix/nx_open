@@ -347,6 +347,7 @@ namespace Qn
         IoModuleDisabledOverlay,
         TooManyOpenedConnectionsOverlay,
         PasswordRequiredOverlay,
+        NoLiveStreamOverlay,
 
         OverlayCount
     };

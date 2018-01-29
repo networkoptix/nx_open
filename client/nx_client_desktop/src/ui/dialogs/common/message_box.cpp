@@ -314,6 +314,8 @@ QPushButton* QnMessageBox::addCustomButton(
             return addButton(tr("Delete"), role, accent);
         case QnMessageBoxCustomButton::Reset:
             return addButton(tr("Reset"), role, accent);
+        case QnMessageBoxCustomButton::Close:
+            return addButton(tr("Close"), role, accent);
         case QnMessageBoxCustomButton::Skip:
             return addButton(tr("Skip"), role, accent);
         default:

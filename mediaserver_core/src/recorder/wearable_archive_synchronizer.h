@@ -26,10 +26,8 @@ public:
     WearableArchiveSynchronizer(QnMediaServerModule* serverModule);
     virtual ~WearableArchiveSynchronizer();
 
-    void addTask(const QnResourcePtr& resource, const WearableArchiveTaskPtr& task);
+    void addTask(const QnResourcePtr& resource, const RemoteArchiveTaskPtr& task);
     void cancelAllTasks(const QnResourcePtr& resource);
-
-    int progress(const QnUuid& taskId) const;
 
 private:
     void at_resourceAdded(const QnResourcePtr& resource);
@@ -40,19 +38,7 @@ private:
     int maxSynchronizationThreads() const;
 
 private:
-    struct TaskInfo
-    {
-        QnUuid id;
-        QnUuid resourceId;
-        int progress = 0;
-        qint64 updateTime = 0;
-    };
-
     std::atomic<bool> m_terminated{false};
-
-    mutable QnMutex m_mutex;
-    QHash<QnUuid, TaskInfo> m_taskInfoById;
-    QHash<QnUuid, QList<QnUuid>> m_taskIdsByResourceId;
     std::unique_ptr<RemoteArchiveWorkerPool> m_workerPool;
 };
 

@@ -5,7 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 
-#include "file_upload.h"
+#include "upload_state.h"
 
 namespace nx {
 namespace client {
@@ -18,7 +18,7 @@ class UploadManager: public QObject
     Q_OBJECT
 
 public:
-    using Callback = std::function<void(const FileUpload&)>;
+    using Callback = std::function<void(const UploadState&)>;
 
     UploadManager(QObject* parent = nullptr);
     virtual ~UploadManager() override;
@@ -33,15 +33,18 @@ public:
      * @param path                      Path to the file.
      * @param ttl                       TTL for the file, in milliseconds. File will be deleted
      *                                  from the server when TTL passes. -1 means infinite.
-     * @returns                         Upload description. Don't forget to check for
-     *                                  errors in the return value.
+     * @param[out] errorMessage         Error message, if any.
+     * @returns                         Upload id, or null in case of an error.
      */
-    FileUpload addUpload(
+    QString addUpload(
         const QnMediaServerResourcePtr& server,
         const QString& path,
         qint64 ttl,
+        QString* errorMessage,
         QObject* context,
         Callback callback);
+
+    UploadState state(const QString& id);
 
     void cancelUpload(const QString& id);
 
