@@ -36,8 +36,8 @@ Log Out
     Click Link    ${LOG OUT BUTTON}
 
 Validate Log Out
-    Wait Until Element Is Visible    ${LOG IN NAV BAR}
-    Element Should Be Visible    ${LOG IN NAV BAR}
+    Wait Until Element Is Visible    ${ANONYMOUS BODY}
+    Element Should Be Visible    ${ANONYMOUS BODY}
 
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}
