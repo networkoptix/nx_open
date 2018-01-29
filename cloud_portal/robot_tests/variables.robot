@@ -26,6 +26,7 @@ ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), 'Log Out')]
 ${AUTHORIZED BODY}                    //body[@class='authorized']
+${ANONYMOUS BODY}                     //body[@class='anonymous']
 ${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
 ${CREATE ACCOUNT BODY}                //body//a[@href='/register']
 
