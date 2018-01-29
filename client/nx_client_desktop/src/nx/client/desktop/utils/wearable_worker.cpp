@@ -23,7 +23,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-
 namespace {
 /**
  * Using TTL of 10 mins for uploads. This shall be enough even for the most extreme cases.
@@ -365,6 +364,7 @@ void WearableWorker::at_timer_timeout()
         };
     d->requests.storeHandle(d->connection()->extendWearableCameraLock(
         d->camera,
+        d->user,
         d->lockToken,
         kLockTtlMSec,
         callback,
