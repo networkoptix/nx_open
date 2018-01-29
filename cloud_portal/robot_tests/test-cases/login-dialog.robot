@@ -200,6 +200,7 @@ requires log In, if the user has just logged out and pressed back button in brow
     Validate Log In
     Log Out
     Go Back
+    Wait Until Page Contains Element    ${ANONYMOUS BODY}
     Validate Log Out
     Close Browser
 
