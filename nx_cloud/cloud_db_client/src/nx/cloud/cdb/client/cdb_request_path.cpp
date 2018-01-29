@@ -41,7 +41,7 @@ const char* const kMaintenanceGetStatistics = "/cdb/maintenance/statistics";
 
 const char* const kDeprecatedCloudModuleXmlPath = "/cdb/cloud_modules.xml";
 
-const char* const kDiscoveryCloudModuleXmlPath = "/discovery/cloud_modules.xml";
+const char* const kDiscoveryCloudModuleXmlPath = "/discovery/v1/cloud_modules.xml";
 
 } // namespace cdb
 } // namespace nx
