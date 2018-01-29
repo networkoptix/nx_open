@@ -2,8 +2,10 @@
 
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/stream_socket_server.h>
+#include <nx/network/url/url_builder.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -23,27 +25,28 @@ public:
         pleaseStopSync();
     }
 
-    QUrl getServerUrl() const
+    nx::utils::Url getServerUrl() const
     {
-        return nx::network::url::Builder()
-            .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address());
+        return url::Builder()
+            .setScheme(stun::kUrlSchemeName).setEndpoint(address());
     }
 
-    nx::stun::MessageDispatcher& dispatcher()
+    MessageDispatcher& dispatcher()
     {
         return m_dispatcher;
     }
 
-    void sendIndicationThroughEveryConnection(nx::stun::Message message)
+    void sendIndicationThroughEveryConnection(Message message)
     {
         forEachConnection(
-            nx::network::server::MessageSender<nx::stun::ServerConnection>(std::move(message)));
+            nx::network::server::MessageSender<ServerConnection>(std::move(message)));
     }
 
 private:
-    nx::stun::MessageDispatcher m_dispatcher;
+    MessageDispatcher m_dispatcher;
 };
 
 } // namespace test
 } // namespace stun
+} // namespace network
 } // namespace nx

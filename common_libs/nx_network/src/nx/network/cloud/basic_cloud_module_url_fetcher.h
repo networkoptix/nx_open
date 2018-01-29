@@ -203,7 +203,8 @@ private:
     {
         NX_ASSERT(isInSelfAioThread());
 
-        nx_http::StatusCode::Value resultCode = nx_http::StatusCode::ok;
+        nx::network::http::StatusCode::Value resultCode =
+            nx::network::http::StatusCode::ok;
         // Invoking handlers with mutex not locked.
         auto scope = makeScopeGuard(
             [this, &resultCode]() { signalWaitingHandlers(resultCode); });
