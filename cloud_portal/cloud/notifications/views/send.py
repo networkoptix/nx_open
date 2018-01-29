@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, APINotAuthorisedException
 from notifications import api
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 from django.conf import settings
 from django.contrib import messages
 
@@ -122,11 +123,11 @@ def cloud_notification_action(request):
     can_change = request.user.has_perm('notifications.change_cloudnotification')
     can_send = request.user.has_perm('notifications.send_cloud_notification')
 
-    if can_add and can_change and 'Save' in request.data:
+    if (can_add and not notification_id or can_change) and 'Save' in request.data:
         notification_id = str(update_or_create_notification(request.data))
         messages.success(request._request, "Changes have been saved")
 
-    elif can_add and can_change and 'Preview' in request.data:
+    elif (can_add and not notification_id or can_change) and 'Preview' in request.data:
         notification_id = str(update_or_create_notification(request.data))
         message = format_message(CloudNotification.objects.get(id=notification_id))
         message['full_name'] = request.user.get_full_name()
@@ -142,7 +143,9 @@ def cloud_notification_action(request):
     else:
         messages.error(request._request, "Insufficient permission or invalid action")
 
-    return redirect('/admin/notifications/cloudnotification/' + notification_id + '/change/')
+    if not can_change:
+        return redirect('/admin/notifications/')
+    return redirect(reverse('admin:notifications_cloudnotification_change', args=[notification_id]))
 
 
 @api_view(['GET'])
