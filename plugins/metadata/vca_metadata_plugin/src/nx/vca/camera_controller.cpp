@@ -342,13 +342,11 @@ void CameraController::setUserPassword(const char* user, const char* password)
 
 bool CameraController::readSupportedRules()
 {
-    // From time to time camera treats long queries incorrectly. So we need to make shorter queries:
-    // readSupportedRules don't ask about notification, readTcpServerEnabled does.
     static const QString kGetRulesCommand =
         "action=list&group=eventprofile.P*.name"
         ",eventprofile.P*.description"
         ",eventprofile.P*.enable"
-        //",eventprofile.P*.Notification.Tcp.enable" //< this job is for readTcpServerEnabled
+        ",eventprofile.P*.Notification.Tcp.enable"
         ;
 
     QByteArray ruleTable;
@@ -369,6 +367,54 @@ bool CameraController::readSupportedRules()
     }
 
     std::vector<std::string> lines = getRuleTableLines(ruleTable);
+    if (lines.empty())
+        return false;
+
+    std::map<int, SupportedRule> rules = parseRuleTableLines(lines);
+    if (rules.empty())
+        return false;
+
+    m_supportedRules = std::move(rules);
+    return true;
+}
+
+bool CameraController::readSupportedRules2()
+{
+    // From time to time camera treats long queries incorrectly. So we need to make shorter queries:
+    // readSupportedRules don't ask about notification, readTcpServerEnabled does.
+    static const int kGetRulesCommandCound = 4;
+    static const QString kGetRulesCommand[kGetRulesCommandCound] =
+    {
+        "action=list&group=eventprofile.P*.name",
+        "action=list&group=eventprofile.P*.description",
+        "action=list&group=eventprofile.P*.enable",
+        "action=list&group=eventprofile.P*.Notification.Tcp.enable"
+    };
+
+    std::vector<std::string> lines;
+    for (int i = 0; i < kGetRulesCommandCound; ++i)
+    {
+        QByteArray ruleTable;
+        if (!m_impl->execute(kGetRulesCommand[i], ruleTable))
+            continue;
+
+        if (ruleTable.isEmpty())
+            continue; //< response can't be empty, smth went wrong
+
+        static const std::string kNotFound = "not found group parameter";
+        if (ruleTable[0] == '#' &&
+            std::search(ruleTable.cbegin(), ruleTable.cend(), kNotFound.cbegin(), kNotFound.cend()) !=
+            ruleTable.cend())
+        {
+            // Camera have no rules at the moment.
+            m_supportedRules.clear();
+            return true;
+        }
+
+        std::vector<std::string> parameterLines = getRuleTableLines(ruleTable);
+        lines.insert(lines.end(), parameterLines.cbegin(), parameterLines.cend());
+    }
+
     if (lines.empty())
         return false;
 

@@ -261,7 +261,7 @@ Monitor::~Monitor()
 
 nx::sdk::Error Monitor::prepareVca(nx::vca::CameraController& vcaCameraConrtoller)
 {
-    if (!vcaCameraConrtoller.readSupportedRules() || !vcaCameraConrtoller.readTcpServerEnabled())
+    if (!vcaCameraConrtoller.readSupportedRules2())
     {
         NX_PRINT << "Failed to get VCA analytic rules.";
         return nx::sdk::Error::networkError;

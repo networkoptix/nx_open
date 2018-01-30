@@ -67,7 +67,17 @@ public:
     }
     unsigned short tcpServerPort() const noexcept { return m_tcpServerPort; }
 
+    /*
+     * readSupportedRules & readSupportedRules2 do the same thing - they read all necessary
+     * information about rules on the camera. Because of problems with HttpClient (during reading
+     * incorrect data from camera) readSupportedRules sometimes can't obtain rule information.
+     * readSupportedRules2 uses workaround and works fine (but slow). When HttpClient will be fixed
+     * readSupportedRules2 will become deprecated. Till that moment readSupportedRules is not
+     * recommended to be used.
+     */
     bool readSupportedRules();
+    bool readSupportedRules2();
+
     bool setHeartbeat(Heartbeat heartbeat) const;
     bool readTcpServerPort();
 
