@@ -36,7 +36,7 @@ ${REGISTER LAST NAME INPUT}           //form[@name= 'registerForm']//input[@ng-m
 ${REGISTER EMAIL INPUT}               //form[@name= 'registerForm']//input[@ng-model='account.email']
 ${REGISTER PASSWORD INPUT}            //form[@name= 'registerForm']//password-input[@ng-model='account.password']//input[@type='password']
 ${REGISTER SUBSCRIBE CHECKBOX}        //form[@name= 'registerForm']//input[@ng-model='account.subscribe']
-${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[@ng-bind-html='buttonText' and contains(text(), 'Create Account')]
+${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), 'Create Account')]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula' and contains(text(), 'Terms and Conditions')]
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), 'Resend activation link')]
 
