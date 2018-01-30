@@ -5,7 +5,6 @@ Suite Teardown    Close All Browsers
 
 *** Variables ***
 ${email}    ${EMAIL OWNER}
-${email upppercase}    NOPTIXQA+OWNER@GMAIL.COM
 ${email invalid}    aodehurgjaegir
 ${password}    ${BASE PASSWORD}
 ${url}         ${CLOUD TEST}
@@ -73,7 +72,8 @@ valid but unregistered email shows error message
 
 allows log in with existing email in uppercase
     Open Browser and go to URL    ${url}
-    Log In    ${email upppercase}    ${password}
+    ${email uppercase}    Convert To Uppercase    ${email}
+    Log In    ${email uppercase}    ${password}
     Validate Log In
     Close Browser
 

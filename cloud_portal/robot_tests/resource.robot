@@ -2,6 +2,7 @@
 
 Library           Selenium2Library    screenshot_root_directory=\Screenshots    run_on_failure=Failure Tasks
 Library           ImapLibrary
+Library           String
 Library           NoptixLibrary/
 Resource          variables.robot
 
@@ -10,7 +11,7 @@ Open Browser and go to URL
     [Arguments]    ${url}
     Open Browser    ${url}    Chrome
 #    Maximize Browser Window
-    Set Selenium Speed    0
+    Set Selenium Speed    .5
 
 Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
