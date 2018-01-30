@@ -329,7 +329,7 @@ class SshAccess(OsAccess):
 
     def get_file(self, from_remote_path, to_local_path):
         cmd = ['rsync', '-aL', '-e', subprocess.list2cmdline(self._make_ssh_cmd(must_quote=True)),
-               '{user_and_host}:{path}'.format(user_and_host=self._user_and_host, path=from_remote_path),
+               '{user_and_host}:"{path}"'.format(user_and_host=self._user_and_host, path=from_remote_path),
                to_local_path]
         self._local_os_access.run_command(cmd)
 
@@ -358,17 +358,14 @@ class SshAccess(OsAccess):
         return self.run_command(['echo', path]).strip()
 
     def expand_glob(self, path_mask, for_shell=False):
-        path_mask = str(path_mask)
-        assert not path_mask.startswith('~/'), repr(path_mask)  # this function is only for expanding '*' globs, use expand_path for that
+        if not path_mask.is_absolute():
+            raise ValueError("Path mask must be absolute, not %r", path_mask)
         if for_shell:
-            return [path_mask]  # ssh expands '*' masks automatically
+            return [str(path_mask)]  # ssh expands '*' masks automatically
         else:
-            assert ' ' not in path_mask  # spaces in path are not supported by the following command
-            output = self.run_command(['echo', path_mask]).strip()
-            if output == path_mask:
-                return []  # this means nothing is found
-            else:
-                return [PurePosixPath(path) for path in output.split()]
+            fixed_root = next(parent for parent in path_mask.parent.parents if '*' not in str(parent))
+            output = self.run_command(['find', fixed_root, '-wholename',  "'" + str(path_mask) + "'"]).strip()
+            return [PurePosixPath(path) for path in output.splitlines()]
 
     def get_timezone(self):
         tzname = self.read_file('/etc/timezone').strip()

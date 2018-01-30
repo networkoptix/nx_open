@@ -71,8 +71,12 @@ class ServerInstallation(object):
         return self.os_access.expand_glob(self.dir / 'bin' / '*core*')
 
     def cleanup_core_files(self):
-        for path in self.list_core_files():
-            self.os_access.run_command(['rm', path])
+        # When filename contain space, it's interpreted as several arguments.
+        self.os_access.run_command([
+            'rm',
+            '--force',  # Ignore non-existent files.
+            '--',  # Avoid confusion with options.
+            self.dir / '*core*'])
 
     def backup_config(self):
         self.os_access.run_command(['sudo', 'cp', self._config_path, self._config_path_initial])

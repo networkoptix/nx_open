@@ -83,8 +83,12 @@ class LightweightServersInstallation(object):
         return self.os_access.expand_glob(self.dir / '*core*')
 
     def cleanup_core_files(self):
-        for path in self.list_core_files():
-            self.os_access.run_command(['rm', path])
+        # When filename contain space, it's interpreted as several arguments.
+        self.os_access.run_command([
+            'rm',
+            '--force',  # Ignore non-existent files.
+            '--',  # Avoid confusion with options.
+            self.dir / '*core*'])
 
     def cleanup_test_tmp_dir(self):
         self.os_access.rm_tree(self.test_tmp_dir, ignore_errors=True)
