@@ -85,10 +85,10 @@ void Updates2ManagerBase::atServerStart()
             download();
             break;
         case api::Updates2StatusData::StatusCode::preparing:
-            // TODO: implement
+            // #TODO: #akulikov implement
             break;
         case api::Updates2StatusData::StatusCode::readyToInstall:
-            // TODO: implement
+            // #TODO: #akulikov implement
             break;
     }
 

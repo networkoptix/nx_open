@@ -193,7 +193,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
     m_updates2Manager = store(new nx::mediaserver::updates2::Updates2Manager(this->commonModule()));
-    
+
 	store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
 
 
@@ -201,7 +201,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new QnWearableUploadManager(this));
 
-    // Translations must be installed from the main applicaition thread.
+    // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
 }
 
