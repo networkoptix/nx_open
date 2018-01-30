@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <QtCore/QMap>
 #include <QtCore/QElapsedTimer>
 
@@ -140,14 +138,14 @@ public:
 
     // NOTE: function objects return HanwhaResult<T>.
     HanwhaCachedData<HanwhaInformation> information;
-    HanwhaCachedData<HanwhaCgiParameters> cgiParamiters;
+    HanwhaCachedData<HanwhaCgiParameters> cgiParameters;
     HanwhaCachedData<HanwhaResponse> eventStatuses;
     HanwhaCachedData<HanwhaResponse> videoSources;
     HanwhaCachedData<HanwhaResponse> videoProfiles;
 
 private:
     HanwhaResult<HanwhaInformation> loadInformation();
-    HanwhaResult<HanwhaCgiParameters> loadCgiParamiters();
+    HanwhaResult<HanwhaCgiParameters> loadCgiParameters();
     HanwhaResult<HanwhaResponse> loadEventStatuses();
     HanwhaResult<HanwhaResponse> loadVideoSources();
     HanwhaResult<HanwhaResponse> loadVideoProfiles();
@@ -178,5 +176,3 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

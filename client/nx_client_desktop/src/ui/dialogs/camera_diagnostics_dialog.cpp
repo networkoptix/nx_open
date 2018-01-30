@@ -1,5 +1,5 @@
-#include "ui_camera_diagnostics_dialog.h"
 #include "camera_diagnostics_dialog.h"
+#include "ui_camera_diagnostics_dialog.h"
 
 #include <QtGui/QClipboard>
 #include <QtWidgets/QApplication>

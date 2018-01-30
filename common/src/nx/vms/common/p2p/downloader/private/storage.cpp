@@ -7,11 +7,13 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/scope_guard.h>
+#include <utils/common/synctime.h>
 
 namespace {
 
 static constexpr qint64 kDefaultChunkSize = 1024 * 1024;
 static const QString kMetadataSuffix = lit(".vmsdownload");
+static const int kCleanupPeriodMSecs = 1000 * 60 * 5;
 
 } // namespace
 
@@ -28,6 +30,12 @@ Storage::Storage(const QDir& downloadsDirectory, QObject* parent):
     m_downloadsDirectory(downloadsDirectory)
 {
     findDownloads();
+    cleanupExpiredFiles();
+
+    /* Cleanup expired files every 5 mins. */
+    QTimer* timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &Storage::cleanupExpiredFiles);
+    timer->start(kCleanupPeriodMSecs);
 }
 
 QDir Storage::downloadsDirectory() const
@@ -53,8 +61,11 @@ FileInformation Storage::fileInformation(
     return m_fileInformationByName.value(fileName);
 }
 
-ResultCode Storage::addFile(const FileInformation& fileInformation)
+ResultCode Storage::addFile(FileInformation fileInformation, bool updateTouchTime)
 {
+    if(updateTouchTime)
+        fileInformation.touchTime = qnSyncTime->currentMSecsSinceEpoch();
+
     if (fileInformation.status == FileInformation::Status::downloaded)
         return addDownloadedFile(fileInformation);
     else
@@ -369,6 +380,7 @@ ResultCode Storage::writeFileChunk(
         });
 
     it->downloadedChunks.setBit(chunkIndex);
+    it->touchTime = qnSyncTime->currentMSecsSinceEpoch();
     checkDownloadCompleted(it.value());
     saveMetadata(it.value());
 
@@ -377,8 +389,20 @@ ResultCode Storage::writeFileChunk(
 
 ResultCode Storage::deleteFile(const QString& fileName, bool deleteData)
 {
-    QnMutexLocker lock(&m_mutex);
+    {
+        QnMutexLocker lock(&m_mutex);
 
+        const auto resultCode = deleteFileInternal(fileName, deleteData);
+        if (resultCode != ResultCode::ok)
+            return resultCode;
+    }
+
+    emit fileDeleted(fileName);
+    return ResultCode::ok;
+}
+
+ResultCode Storage::deleteFileInternal(const QString& fileName, bool deleteData)
+{
     auto it = m_fileInformationByName.find(fileName);
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
@@ -398,7 +422,6 @@ ResultCode Storage::deleteFile(const QString& fileName, bool deleteData)
             return ResultCode::ioError;
     }
 
-
     QDir dir = QFileInfo(path).absoluteDir();
     while (dir != m_downloadsDirectory)
     {
@@ -415,10 +438,6 @@ ResultCode Storage::deleteFile(const QString& fileName, bool deleteData)
     }
 
     m_fileInformationByName.erase(it);
-
-    lock.unlock();
-
-    emit fileDeleted(fileName);
 
     return ResultCode::ok;
 }
@@ -482,6 +501,32 @@ ResultCode Storage::setChunkChecksums(
     }
 
     return ResultCode::ok;
+}
+
+void Storage::cleanupExpiredFiles()
+{
+    QnMutexLocker lock(&m_mutex);
+
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+
+    QSet<QString> expiredFiles;
+    for (const FileMetadata& data: m_fileInformationByName)
+    {
+        if (data.ttl > 0 && data.touchTime + data.ttl <= currentTime)
+            expiredFiles.insert(data.name);
+    }
+
+    QSet<QString> successfullyDeletedFiles;
+    for (const QString& name: expiredFiles)
+    {
+        if (deleteFileInternal(name, /*deleteData*/ true) == ResultCode::ok)
+            successfullyDeletedFiles.insert(name);
+    }
+
+    lock.unlock();
+
+    for (const auto& fileName: successfullyDeletedFiles)
+        emit fileDeleted(fileName);
 }
 
 void Storage::findDownloads()
@@ -619,7 +664,7 @@ ResultCode Storage::loadDownload(
     if (!fileInfo.isValid())
         return ResultCode::fileDoesNotExist;
 
-    return addFile(fileInfo);
+    return addFile(fileInfo, /*updateTouchTime*/ false);
 }
 
 void Storage::checkDownloadCompleted(FileMetadata& fileInfo)

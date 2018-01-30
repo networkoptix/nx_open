@@ -123,7 +123,7 @@ QList<QnPlatformMonitor::PartitionSpace> Filter::filteredPartitions() const
     if (!m_filterConfig.isRemovableDrivesAllowed)
         filterOut(&partitions, QnPlatformMonitor::RemovableDiskPartition);
 
-    if (m_filterConfig.isNetworkDrivesAllowed == NetworkDrives::notAllowed)
+    if (!m_filterConfig.isNetworkDrivesAllowed)
         filterOut(&partitions, QnPlatformMonitor::NetworkPartition);
 
     return partitions;

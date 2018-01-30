@@ -36,7 +36,7 @@ public:
         bool primaryLiveStream,
         qint64 time,
         int channel,
-        QnThumbnailRequestData::RoundMethod roundMethod) const override;
+        nx::api::ImageRequest::RoundMethod roundMethod) const override;
 
     virtual void beforeStop() override;
     virtual bool isSomeActivity() const override;

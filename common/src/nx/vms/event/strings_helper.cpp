@@ -293,7 +293,7 @@ QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
 
     if (eventType >= userDefinedEvent || eventType == analyticsSdkEvent)
     {
-        if (!params.caption.isEmpty())
+        if (!params.caption.isEmpty() && !params.description.startsWith(params.caption))
             result << tr("Caption: %1").arg(params.caption);
     }
 

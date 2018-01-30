@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_resource.h"
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
@@ -17,7 +15,10 @@
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
 #include <plugins/plugin_internal_tools.h>
 #include <utils/xml/camera_advanced_param_reader.h>
+
 #include <camera/camera_pool.h>
+#include <camera/video_camera.h>
+
 #include <common/common_module.h>
 
 #include <nx/utils/log/log.h>
@@ -261,28 +262,10 @@ nx::core::resource::AbstractRemoteArchiveManager* HanwhaResource::remoteArchiveM
     return m_remoteArchiveManager.get();
 }
 
-bool HanwhaResource::getParamPhysical(const QString &id, QString &value)
+QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QString>& ids)
 {
-    QnCameraAdvancedParamValueList params;
-    bool result = getParamsPhysical({id}, params);
+    QnCameraAdvancedParamValueMap result;
 
-    if (!result)
-        return false;
-
-    if (params.isEmpty())
-        return false;
-
-    if (params[0].id != id)
-        return false;
-
-    value = params[0].value;
-    return true;
-}
-
-bool HanwhaResource::getParamsPhysical(
-    const QSet<QString> &idList,
-    QnCameraAdvancedParamValueList& result)
-{
     using ParameterList = std::vector<QString>;
     using SubmenuMap = std::map<QString, ParameterList>;
     using CgiMap = std::map<QString, SubmenuMap>;
@@ -290,9 +273,9 @@ bool HanwhaResource::getParamsPhysical(
     CgiMap requests;
     std::multimap<QString, QString> parameterNameToId;
 
-    for (const auto& id: idList)
+    for (const auto& id: ids)
     {
-        const auto parameter = m_advancedParameters.getParameterById(id);
+        const auto parameter = m_advancedParametersProvider.getParameterById(id);
         if (parameter.dataType == QnCameraAdvancedParameter::DataType::Button)
             continue;
 
@@ -331,7 +314,7 @@ bool HanwhaResource::getParamsPhysical(
                 {
                     QString parameterString;
                     const auto parameterId = itr->second;
-                    const auto parameter = m_advancedParameters.getParameterById(parameterId);
+                    const auto parameter = m_advancedParametersProvider.getParameterById(parameterId);
                     const auto info = advancedParameterInfo(parameterId);
                     if (!info)
                         continue;
@@ -366,29 +349,18 @@ bool HanwhaResource::getParamsPhysical(
                     if (!value)
                         continue;
 
-                    result.push_back(
-                        QnCameraAdvancedParamValue(
-                            parameterId,
-                            fromHanwhaAdvancedParameterValue(parameter, *info, *value)));
+                    result.insert(
+                        parameterId,
+                        fromHanwhaAdvancedParameterValue(parameter, *info, *value));
                 }
             }
         }
     }
 
-    return true;
+    return result;
 }
 
-bool HanwhaResource::setParamPhysical(const QString &id, const QString& value)
-{
-    QnCameraAdvancedParamValueList result;
-    return setParamsPhysical(
-        {QnCameraAdvancedParamValue(id, value)},
-        result);
-}
-
-bool HanwhaResource::setParamsPhysical(
-    const QnCameraAdvancedParamValueList &values,
-    QnCameraAdvancedParamValueList &result)
+QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueMap& values)
 {
     using ParameterMap = std::map<QString, QString>;
     using SubmenuMap = std::map<QString, ParameterMap>;
@@ -399,12 +371,12 @@ bool HanwhaResource::setParamsPhysical(
 
     std::map<UpdateInfo, ParameterMap> requests;
 
-    const auto buttonParameter = findButtonParameter(values);
+    const auto buttonParameter = findButtonParameter(values.toValueList());
     if (buttonParameter)
     {
         const auto buttonInfo = advancedParameterInfo(buttonParameter->id);
         if (!buttonInfo)
-            return false;
+            return {};
 
         const bool success = executeCommand(*buttonParameter);
         const auto streamsToReopen = buttonInfo->streamsToReopen();
@@ -412,10 +384,10 @@ bool HanwhaResource::setParamsPhysical(
             streamsToReopen.contains(Qn::ConnectionRole::CR_LiveVideo),
             streamsToReopen.contains(Qn::ConnectionRole::CR_SecondaryLiveVideo));
 
-        return success;
+        return success ? QSet<QString>{buttonParameter->id} : QSet<QString>();
     }
 
-    const auto filteredParameters = filterGroupParameters(values);
+    const auto filteredParameters = filterGroupParameters(values.toValueList());
     for (const auto& value: filteredParameters)
     {
         UpdateInfo updateInfo;
@@ -423,7 +395,7 @@ bool HanwhaResource::setParamsPhysical(
         if (!info)
             continue;
 
-        const auto parameter = m_advancedParameters.getParameterById(value.id);
+        const auto parameter = m_advancedParametersProvider.getParameterById(value.id);
         const auto resourceProperty = info->resourceProperty();
 
         if (!resourceProperty.isEmpty())
@@ -485,9 +457,6 @@ bool HanwhaResource::setParamsPhysical(
         }
     }
 
-    if (success)
-        result = values;
-
     if (reopenPrimaryStream || reopenSecondaryStream)
     {
         initMediaStreamCapabilities();
@@ -495,7 +464,7 @@ bool HanwhaResource::setParamsPhysical(
         reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
     }
 
-    return success;
+    return success ? values.ids() : QSet<QString>();
 }
 
 QnIOPortDataList HanwhaResource::getRelayOutputList() const
@@ -633,7 +602,14 @@ int HanwhaResource::maxProfileCount() const
     return m_maxProfileCount;
 }
 
-CameraDiagnostics::Result HanwhaResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap HanwhaResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex streamIndex)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
+CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
 {
     const auto result = initDevice();
 
@@ -796,7 +772,7 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
 
     m_attributes = std::move(info->attributes);
 
-    if (auto parameters = sharedContext()->cgiParamiters())
+    if (auto parameters = sharedContext()->cgiParameters())
         m_cgiParameters = std::move(parameters.value);
     else
         return parameters.diagnostics;
@@ -1114,14 +1090,7 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
     if (!success)
         return CameraDiagnostics::NoErrorResult();
 
-    parameters = filterParameters(parameters);
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_advancedParameters = parameters;
-    }
-
-    QnCameraAdvancedParamsReader::setParamsToResource(toSharedPointer(this), parameters);
+    m_advancedParametersProvider.assign(filterParameters(parameters));
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1592,16 +1561,18 @@ Qn::BitrateControl HanwhaResource::streamBitrateControl(Qn::ConnectionRole role)
     return result;
 }
 
-int HanwhaResource::streamBitrate(Qn::ConnectionRole role, const QnLiveStreamParams& streamParams) const
+int HanwhaResource::streamBitrate(Qn::ConnectionRole role, const QnLiveStreamParams& liveStreamParams) const
 {
+    QnLiveStreamParams streamParams = liveStreamParams;
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
         ? Qn::kPrimaryStreamBitrateParamName
         : Qn::kSecondaryStreamBitrateParamName;
 
     const QString bitrateString = getProperty(propertyName);
     int bitrateKbps = bitrateString.toInt();
+    streamParams.resolution = streamResolution(role);
     if (bitrateKbps == 0)
-        bitrateKbps = QnPhysicalCameraResource::suggestBitrateKbps(streamResolution(role), streamParams, role);
+        bitrateKbps = nx::mediaserver::resource::Camera::suggestBitrateKbps(streamParams, role);
     auto streamCapability = cameraMediaCapability().streamCapabilities.value(role);
     return qBound(streamCapability.minBitrateKbps, bitrateKbps, streamCapability.maxBitrateKbps);
 }
@@ -1736,7 +1707,7 @@ QString HanwhaResource::defaultCodecProfileForStream(Qn::ConnectionRole role) co
 int HanwhaResource::defaultFrameRateForStream(Qn::ConnectionRole role) const
 {
     if (role == Qn::ConnectionRole::CR_SecondaryLiveVideo)
-        closestFrameRate(role, desiredSecondStreamFps());
+        closestFrameRate(role, defaultSecondaryFps(Qn::QualityNormal));
 
     return kHanwhaInvalidFps;
 }
@@ -1975,9 +1946,9 @@ bool HanwhaResource::addBitrateRanges(
                 : limits.maxVbrBitrate;
 
             QnCameraAdvancedParameterDependency dependency;
-            dependency.id = QnUuid::createUuid().toString();
             dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
             dependency.range = lit("%1,%2").arg(minLimit).arg(maxLimit);
+            dependency.autoFillId();
             return dependency;
         };
 
@@ -1995,9 +1966,9 @@ bool HanwhaResource::addFrameRateRanges(
         const QString& /*bitrateControl*/)
         {
             QnCameraAdvancedParameterDependency dependency;
-            dependency.id = QnUuid::createUuid().toString();
             dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
             dependency.range = lit("1,%2").arg(limits.maxFps);
+            dependency.autoFillId();
             return dependency;
         };
 
@@ -2292,9 +2263,7 @@ QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
         return result;
 
     // fetch group leads;
-    QnCameraAdvancedParamValueList groupLeadValues;
-    bool success = getParamsPhysical(groupLeadsToFetch, groupLeadValues);
-
+    QnCameraAdvancedParamValueList groupLeadValues = getApiParameters(groupLeadsToFetch).toValueList();
     for (const auto& lead: groupLeadValues)
     {
         const auto info = advancedParameterInfo(lead.id);
@@ -2349,7 +2318,7 @@ boost::optional<QnCameraAdvancedParamValue> HanwhaResource::findButtonParameter(
 {
     for (const auto& parameterValue: parameterValues)
     {
-        const auto parameter = m_advancedParameters.getParameterById(parameterValue.id);
+        const auto parameter = m_advancedParametersProvider.getParameterById(parameterValue.id);
         if (!parameter.isValid())
             return boost::none;
 
@@ -2364,7 +2333,7 @@ boost::optional<QnCameraAdvancedParamValue> HanwhaResource::findButtonParameter(
 
 bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
 {
-    const auto parameter = m_advancedParameters.getParameterById(command.id);
+    const auto parameter = m_advancedParametersProvider.getParameterById(command.id);
     if (!parameter.isValid())
         return false;
 
@@ -2601,7 +2570,7 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
 QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(
     const QnAbstractStreamDataProvider* dataProvider) const
 {
-    auto defaultLayout = QnPhysicalCameraResource::getAudioLayout(dataProvider);
+    auto defaultLayout = nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
     if (!isAudioEnabled())
         return defaultLayout;
 
@@ -2663,5 +2632,3 @@ bool HanwhaResource::setCameraCredentialsSync(const QAuthenticator& auth, QStrin
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

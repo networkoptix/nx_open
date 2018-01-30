@@ -1,5 +1,3 @@
-﻿#if defined(ENABLE_HANWHA)
-
 #include "plugin.h"
 
 #include <QtCore/QString>
@@ -62,7 +60,7 @@ void Plugin::SharedResources::setResourceAccess(
 
 Plugin::Plugin()
 {
-    QFile f(":manifest.json");
+    QFile f(":/hanwha/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
     m_driverManifest = QJson::deserialized<Hanwha::DriverManifest>(m_manifest);
@@ -179,7 +177,7 @@ boost::optional<QList<QnUuid>> Plugin::fetchSupportedEvents(
 
     auto sharedRes = sharedResources(resourceInfo);
 
-    const auto& cgiParameters = sharedRes->sharedContext->cgiParamiters();
+    const auto& cgiParameters = sharedRes->sharedContext->cgiParameters();
     if (!cgiParameters.diagnostics || !cgiParameters.value.isValid())
         return boost::none;
 
@@ -340,6 +338,4 @@ NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
 }
 
 } // extern "C"
-
-#endif // defined(ENABLE_HANWHA)
 

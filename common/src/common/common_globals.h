@@ -17,9 +17,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
     StreamFpsSharingMethod MotionType TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
-    StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PeerType StatisticsDeviceType
+    StreamQuality PanicMode RebuildState BackupState RecordingType PeerType StatisticsDeviceType
     ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
-    RebuildAction BackupAction FailoverPriority MediaStreamEvent
+    RebuildAction BackupAction FailoverPriority MediaStreamEvent StreamIndex
     Permission GlobalPermission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
@@ -232,6 +232,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         exported                    = 0x20000000,   /**< Exported media file. */
         removed                     = 0x40000000,   /**< resource removed from pool. */
 
+        wearable_camera             = 0x80000000,   /**< Wearable camera resource. */
+
 
         local_media = local | media | url,
         exported_media = local_media | exported,
@@ -408,16 +410,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamQuality)
 
-
-    // TODO: #Elric #EC2 rename
-    enum SecondStreamQuality {
-        SSQualityLow = 0,
-        SSQualityMedium = 1,
-        SSQualityHigh = 2,
-        SSQualityNotDefined = 3,
-        SSQualityDontUse = 4
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SecondStreamQuality)
 
     enum class BitrateControl {
         undefined,
@@ -883,6 +875,14 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         TooManyOpenedConnections
     };
 
+    enum class StreamIndex
+    {
+        undefined = -1,
+        primary = 0,
+        secondary = 1
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamIndex)
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -911,7 +911,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)
-    (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
+    (Qn::StreamQuality)(Qn::StatisticsDeviceType)
     (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
     (Qn::PanicMode)(Qn::RecordingType)
     (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
@@ -919,7 +919,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-    (Qn::FailoverPriority)(Qn::MediaStreamEvent)
+    (Qn::FailoverPriority)(Qn::MediaStreamEvent)(Qn::StreamIndex)
     ,
     (metatype)(lexical)
 )

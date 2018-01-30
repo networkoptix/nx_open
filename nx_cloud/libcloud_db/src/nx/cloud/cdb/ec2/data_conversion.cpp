@@ -8,7 +8,9 @@ namespace cdb {
 namespace ec2 {
 
 namespace {
+
 static const QnUuid kUserResourceTypeGuid("{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}");
+
 } // namespace
 
 api::SystemAccessRole permissionsToAccessRole(Qn::GlobalPermissions permissions)

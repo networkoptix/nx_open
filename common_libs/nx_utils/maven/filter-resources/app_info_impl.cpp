@@ -8,10 +8,7 @@ namespace utils {
 
 bool AppInfo::beta()
 {
-    static const auto betaString = QStringLiteral("${beta}").toLower();
-    static const bool beta =
-        (betaString == lit("on") || betaString == lit("true"));
-    return beta;
+    return ${beta};
 }
 
 QString AppInfo::applicationVersion()

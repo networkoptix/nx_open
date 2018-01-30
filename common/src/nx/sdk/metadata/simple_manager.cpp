@@ -91,6 +91,19 @@ Error SimpleManager::stopFetchingMetadata()
     return Error::noError;
 }
 
+const char* SimpleManager::capabilitiesManifest(Error* /*error*/)
+{
+    const std::string manifest = capabilitiesManifest();
+    char* data = new char[manifest.size() + 1];
+    strncpy(data, manifest.c_str(), manifest.size() + 1);
+    return data;
+}
+
+void SimpleManager::freeManifest(const char* data)
+{
+    delete[] data;
+}
+
 //-------------------------------------------------------------------------------------------------
 // Tools for the derived class.
 
@@ -106,7 +119,7 @@ std::string SimpleManager::getParamValue(const char* paramName)
     static const int kInitialValueSize = 1000;
     std::string value;
     value.resize(kInitialValueSize);
-    int size = value.size();
+    int size = (int) value.size();
     switch (m_handler->getParamValue(paramName, &value[0], &size))
     {
         case NX_UNKNOWN_PARAMETER:

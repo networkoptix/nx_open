@@ -3,9 +3,10 @@ set(depends desktop_client)
 # Files copied to .deb by build-dist.sh.
 
 file(WRITE "${CMAKE_BINARY_DIR}/bin/${launcher.version.file}" "${releaseVersion.full}")
+nx_store_known_file(${CMAKE_BINARY_DIR}/bin/${launcher.version.file})
 
-file(COPY "${CMAKE_SOURCE_DIR}/build_environment/maven/bin-resources/backgrounds"
-    DESTINATION "${CMAKE_BINARY_DIR}/")
+nx_copy(${CMAKE_SOURCE_DIR}/build_environment/maven/bin-resources/backgrounds
+    DESTINATION ${CMAKE_BINARY_DIR})
 
 set(plugins
     imageformats
@@ -16,13 +17,13 @@ set(plugins
     platforms
 )
 foreach(plugin ${plugins})
-    file(COPY "${QT_DIR}/plugins/${plugin}" DESTINATION "${CMAKE_BINARY_DIR}/bin/")
+    nx_copy(${QT_DIR}/plugins/${plugin} DESTINATION ${CMAKE_BINARY_DIR}/bin)
 endforeach()
 
-file(COPY "${QT_DIR}/qml" DESTINATION "${CMAKE_BINARY_DIR}/bin/")
+nx_copy(${QT_DIR}/qml DESTINATION ${CMAKE_BINARY_DIR}/bin)
 
-file(COPY "${CMAKE_SOURCE_DIR}/common/maven/bin-resources/resources/qt/etc/qt.conf"
-    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+nx_copy(${CMAKE_SOURCE_DIR}/common/maven/bin-resources/resources/qt/etc/qt.conf
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Variables used by build-dist.sh.
 set(ClientHelpSourceDir "${help_directory}/bin/help")
@@ -37,6 +38,7 @@ set(common_depends
     "libxi6"
     "libxrender1"
     "libxcomposite1"
+    "libxfixes3"
     "libxt6"
     "libfontconfig1"
     "libsm6"

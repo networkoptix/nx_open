@@ -583,7 +583,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         boost::optional<CameraMediaStreams> mediaStreams;
-        if (const auto physicalResource = resource.dynamicCast<QnPhysicalCameraResource>())
+        if (const auto physicalResource = resource.dynamicCast<QnVirtualCameraResource>())
             mediaStreams = physicalResource->mediaStreams();
 
         QnServer::ChunksCatalog qualityToUse = QnServer::HiQualityCatalog;
@@ -602,7 +602,7 @@ void QnProgressiveDownloadingConsumer::run()
                     && (resolutionStr.isEmpty() ||
                         requestedResolutionStr == streamInfo.resolution))
                 {
-                    qualityToUse = streamInfo.encoderIndex == 0
+                    qualityToUse = streamInfo.encoderIndex == Qn::StreamIndex::primary
                         ? QnServer::HiQualityCatalog
                         : QnServer::LowQualityCatalog;
                     transcodeMethod = QnTranscoder::TM_DirectStreamCopy;

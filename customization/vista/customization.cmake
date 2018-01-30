@@ -12,6 +12,7 @@ set(short.company.name "vista")
 set(uri.protocol "qulu-vms")
 set(liteDeviceName "Q")
 set(cloudName "Qcloud")
+set(build_nxtool ON)
 
 # Support section
 set(companyUrl "http://www.vista-cctv.com")
@@ -81,7 +82,6 @@ set(freeLicenseKey "0000-0000-0000-0018")
 #set(sign.password "0987654321nb")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation en_GB)

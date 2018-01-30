@@ -41,18 +41,18 @@ QnNetworkResourcePtr
 QnPlArecontResourceSearcher::findResourceHelper(const MacArray &mac,
                                                 const nx::network::SocketAddress &addr)
 {
-    QnNetworkResourcePtr result;
+    QnPlAreconVisionResourcePtr result;
     QString macAddress = nx::network::QnMacAddress(mac.data()).toString();
     auto rpRes = resourcePool()->getResourceByUniqueId<QnPlAreconVisionResource>(macAddress);
 
     if (rpRes)
-        result = QnNetworkResourcePtr(QnPlAreconVisionResource::createResourceByName(rpRes->getModel()));
+        result.reset(QnPlAreconVisionResource::createResourceByName(rpRes->getModel()));
 
     if (result)
     {
         result->setMAC(nx::network::QnMacAddress(mac.data()));
         result->setHostAddress(addr.address.toString());
-        result.dynamicCast<QnPlAreconVisionResource>()->setModel(rpRes->getModel());
+        result->setModel(rpRes->getModel());
         result->setName(rpRes->getName());
         result->setFlags(rpRes->flags());
     }
@@ -61,14 +61,14 @@ QnPlArecontResourceSearcher::findResourceHelper(const MacArray &mac,
         QString model;
         QString model_release;
 
-        result = QnNetworkResourcePtr(new QnPlAreconVisionResource());
+        result.reset(new QnPlAreconVisionResource());
         result->setMAC(nx::network::QnMacAddress(mac.data()));
         result->setHostAddress(addr.address.toString());
 
-        if (!result->getParamPhysical(lit("model"), model))
+        if (!result->getApiParameter(lit("model"), model))
             return QnNetworkResourcePtr(0);
 
-        if (!result->getParamPhysical(lit("model=releasename"), model_release))
+        if (!result->getApiParameter(lit("model=releasename"), model_release))
             return QnNetworkResourcePtr(0);
 
         if (model_release != model) {
@@ -78,15 +78,15 @@ QnPlArecontResourceSearcher::findResourceHelper(const MacArray &mac,
         else
         {
             //old camera; does not support release name; but must support fullname
-            if (result->getParamPhysical(lit("model=fullname"), model_release))
+            if (result->getApiParameter(lit("model=fullname"), model_release))
                 model = model_release;
         }
 
-        result = QnNetworkResourcePtr(QnPlAreconVisionResource::createResourceByName(model));
+        result.reset(QnPlAreconVisionResource::createResourceByName(model));
         if (result)
         {
             result->setName(model);
-            (result.dynamicCast<QnPlAreconVisionResource>())->setModel(model);
+            result->setModel(model);
             result->setMAC(nx::network::QnMacAddress(mac.data()));
             result->setHostAddress(addr.address.toString());
         }

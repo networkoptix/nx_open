@@ -12,7 +12,6 @@ You have to prepare old-version database files for the test in the bin directory
 All necessary files are on the rsync://noptix.enk.me/buildenv/test
 """
 
-import os
 import time
 
 import pytest
@@ -67,11 +66,11 @@ def server(name, server_factory, bin_dir, db_version):
     return server
 
 def copy_database_file(server, bin_dir, backup_db_filename):
-    backup_db_path = os.path.abspath(os.path.join(bin_dir, backup_db_filename))
-    assert os.path.exists(backup_db_path), (
+    backup_db_path = bin_dir / backup_db_filename
+    assert backup_db_path.exists(), (
         "Binary artifact required for this test (database file) '%s' does not exist." % backup_db_path)
-    server_db_path = os.path.join(server.dir, MEDIASERVER_DATABASE_PATH)
-    server.host.put_file(backup_db_path, server_db_path)
+    server_db_path = server.dir / MEDIASERVER_DATABASE_PATH
+    server.os_access.put_file(backup_db_path, server_db_path)
 
 def check_camera(server, camera_guid):
     cameras = [c for c in server.rest_api.ec2.getCameras.GET() if c['id'] == camera_guid]
@@ -135,9 +134,9 @@ def test_backup_restore(artifact_factory, one, two, camera):
         assert full_info_after_backup_restore == full_info_initial
     except AssertionError:
         artifact_factory(['full_info_initial'],
-                             name='full_info_initial').save_json(full_info_initial)
+                         name='full_info_initial').save_as_json(full_info_initial)
         artifact_factory(['full_info_after_backup_restore'],
-                             name='full_info_after_backup_restore').save_json(full_info_after_backup_restore)
+                         name='full_info_after_backup_restore').save_as_json(full_info_after_backup_restore)
         raise
 
 

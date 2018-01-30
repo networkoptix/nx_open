@@ -48,7 +48,7 @@ NX_UPDATE_API OsVersion armBpi();
 NX_UPDATE_API OsVersion armRpi();
 NX_UPDATE_API OsVersion armBananapi();
 
-struct UpdateRequestData
+struct NX_UPDATE_API UpdateRequestData
 {
     QString cloudHost;
     QString customization;
@@ -73,7 +73,7 @@ struct UpdateRequestData
     }
 };
 
-struct UpdateFileRequestData: UpdateRequestData
+struct NX_UPDATE_API UpdateFileRequestData: UpdateRequestData
 {
     OsVersion osVersion;
 

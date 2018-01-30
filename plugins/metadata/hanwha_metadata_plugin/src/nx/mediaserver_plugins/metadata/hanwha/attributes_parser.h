@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <vector>
 
 #include <QtCore/QString>
@@ -31,5 +29,3 @@ private:
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

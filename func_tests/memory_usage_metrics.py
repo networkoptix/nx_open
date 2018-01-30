@@ -1,4 +1,4 @@
-"""Load memory usage metrics for a host
+"""Load memory usage metrics for a hostname
 """
 
 from collections import namedtuple
@@ -25,8 +25,8 @@ _PsMemory = namedtuple('_PsMemory', 'mediaserver lws')
 # Mem:       32850392    12854660      247240      477276    19748492    19052900
 # Swap:      33452028      586264    32865764
 
-def _load_host_free_memory(host):
-    lines = host.run_command(['free', '--bytes']).splitlines()
+def _load_host_free_memory(os_access):
+    lines = os_access.run_command(['free', '--bytes']).splitlines()
     key2line = dict([line.split(':') for line in lines[1:]])  # skip first line with titles
     mem_counts = key2line['Mem'].split()
     buf_cache_line = key2line.get('-/+ buffers/cache')
@@ -46,8 +46,8 @@ def _load_host_free_memory(host):
         used_swap=int(used_swap),
         )
 
-def _load_server_memory_usage(host):
-    lines = host.run_command(['ps', 'xl']).splitlines()
+def _load_server_memory_usage(os_access):
+    lines = os_access.run_command(['ps', 'xl']).splitlines()
     idx2column = dict(enumerate(lines[0].split()))
     mediaserver_usage = 0
     lws_usage = 0
@@ -64,9 +64,9 @@ def _load_server_memory_usage(host):
         lws=lws_usage,
         )
 
-def load_host_memory_usage(host):
-    free_memory = _load_host_free_memory(host)
-    ps_memory = _load_server_memory_usage(host)
+def load_host_memory_usage(os_access):
+    free_memory = _load_host_free_memory(os_access)
+    ps_memory = _load_server_memory_usage(os_access)
     return MemoryUsage(
         total=free_memory.total,
         used=free_memory.used,

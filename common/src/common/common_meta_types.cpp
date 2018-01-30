@@ -29,6 +29,8 @@
 #include <api/model/update_information_reply.h>
 #include <api/model/backup_status_reply.h>
 #include <api/model/getnonce_reply.h>
+#include <api/model/wearable_camera_reply.h>
+#include <api/model/wearable_status_reply.h>
 #include <api/runtime_info_manager.h>
 
 #include <core/resource_access/resource_access_subject.h>
@@ -110,6 +112,8 @@
 
 #include <core/resource/camera_advanced_param.h>
 #include <core/dataprovider/stream_mixer_data.h>
+
+#include <nx/vms/common/p2p/downloader/file_information.h>
 
 namespace {
     bool qn_commonMetaTypes_initialized = false;
@@ -242,6 +246,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnServersReply>();
     qRegisterMetaType<QnStatisticsData>();
     qRegisterMetaType<QnManualResourceSearchEntry>();
+    qRegisterMetaType<QnWearableCameraReply>();
+    qRegisterMetaType<QnWearableStatusReply>();
 
     qRegisterMetaType<QnPtzPreset>();
     qRegisterMetaType<QnPtzPresetList>();
@@ -386,6 +392,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QList<QnResourceChannelMapping>>();
 
     qRegisterMetaType<QnAbstractCompressedMetadataPtr>();
+
+    qRegisterMetaType<nx::vms::common::p2p::downloader::FileInformation>();
 
     QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();

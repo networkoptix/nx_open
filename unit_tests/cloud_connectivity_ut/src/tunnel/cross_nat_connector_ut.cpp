@@ -245,7 +245,7 @@ private:
         ++m_requestsRedirected;
 
         stun::Message response(stun::Header(
-            stun::MessageClass::errorResponse, 
+            stun::MessageClass::errorResponse,
             message.header.method,
             message.header.transactionId));
         response.newAttribute<stun::attrs::ErrorCode>(stun::error::tryAlternate);

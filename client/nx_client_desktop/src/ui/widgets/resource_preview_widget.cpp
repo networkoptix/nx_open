@@ -26,6 +26,9 @@ namespace {
 
 static const QMargins kMinIndicationMargins(4, 2, 4, 2);
 
+// Default size must be big enough to avoid layout flickering.
+static const QSize kDefaultThumbnailSize(1920, 1080);
+
 /* QnBusyIndicatorWidget draws dots snapped to the pixel grid.
  * This descendant when it is downscaled draws dots generally not snapped. */
 class QnAutoscaledBusyIndicatorWidget: public QnBusyIndicatorWidget
@@ -293,6 +296,9 @@ QSize QnResourcePreviewWidget::sizeHint() const
 
             if (m_cachedSizeHint.isNull())
                 m_cachedSizeHint = minimumSize();
+
+            if (m_cachedSizeHint.isNull())
+                m_cachedSizeHint = kDefaultThumbnailSize;
         }
 
         const QSize maxSize = maximumSize();

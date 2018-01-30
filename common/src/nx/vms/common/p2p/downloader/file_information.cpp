@@ -19,8 +19,9 @@ bool FileInformation::isValid() const
 }
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(FileInformation, Status)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(FileInformation, PeerPolicy)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileInformation, (json), FileInformation_Fields)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(FileInformation, PeerSelectionPolicy)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    FileInformation, (json)(eq), FileInformation_Fields, (optional, true)(brief, true))
 
 } // namespace downloader
 } // namespace p2p

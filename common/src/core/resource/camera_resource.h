@@ -11,8 +11,9 @@
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/aspect_ratio.h>
 
-#include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_media_stream_info.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource/security_cam_resource.h>
 
 class CameraMediaStreams;
 class CameraBitrates;
@@ -24,6 +25,7 @@ class QN_EXPORT QnVirtualCameraResource : public QnSecurityCamResource
     Q_FLAGS(Qn::CameraCapabilities)
     Q_PROPERTY(Qn::CameraCapabilities cameraCapabilities READ getCameraCapabilities WRITE setCameraCapabilities)
     using base_type = QnSecurityCamResource;
+
 public:
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
 
@@ -50,83 +52,37 @@ public:
 
     QnAspectRatio aspectRatio() const;
 
+    // TODO: saveMediaStreamInfoIfNeeded and saveBitrateIfNeeded should be moved into
+    // nx::mediaserver::resource::Camera, as soon as QnLiveStreamProvider moved into nx::mediaserver.
+
+    /** @return true if mediaStreamInfo differs from existing and has been saved. */
+    bool saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo );
+    bool saveMediaStreamInfoIfNeeded( const CameraMediaStreams& streams );
+
+    /** @return true if bitrateInfo.encoderIndex is not already saved. */
+    bool saveBitrateIfNeeded( const CameraBitrateInfo& bitrateInfo );
+
+    // TODO: Move to nx::mediaserver::resource::Camera, it should be used only on server cameras!
+    /**
+     * Returns advanced live stream parameters. These parameters are configured on advanced tab.
+     * For primary stream this parameters are merged with parameters on record schedule.
+     */
+    virtual QnAdvancedStreamParams advancedLiveStreamParams() const;
+
+private:
+    void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
+
 private:
     int m_issueCounter;
     QElapsedTimer m_lastIssueTimer;
     std::map<Qn::ConnectionRole, QString> m_cachedStreamUrls;
+    QnMutex m_mediaStreamsMutex;
 };
-
 
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);
 const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 360);
 const QSize SECONDARY_STREAM_MAX_RESOLUTION(1024, 768);
-
-class QN_EXPORT QnPhysicalCameraResource : public QnVirtualCameraResource
-{
-    Q_OBJECT
-public:
-    QnPhysicalCameraResource(QnCommonModule* commonModule = nullptr);
-
-    // the difference between desired and real is that camera can have multiple clients we do not know about or big exposure time
-    int getPrimaryStreamRealFps() const;
-
-    virtual void setUrl(const QString &url) override;
-    virtual int getChannel() const override;
-
-    /*!
-        \return \a true if \a mediaStreamInfo differs from existing and has been saved
-    */
-    bool saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo );
-    bool saveMediaStreamInfoIfNeeded( const CameraMediaStreams& streams );
-
-    /*!
-     *  \return \a true if \param bitrateInfo.encoderIndex is not already saved
-     */
-    bool saveBitrateIfNeeded( const CameraBitrateInfo& bitrateInfo );
-
-    static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
-
-    /**
-     * @param resolution Resolution for which we want to find the closest one.
-     * @param aspectRatio Ideal aspect ratio for resolution we want to find. If 0 than this
-     *  this parameter is not taken in account.
-     * @param maxResolutionArea Maximum area of found resolution.
-     * @param resolutionList List of resolutions from which we should choose closest
-     * @param outCoefficient Output parameter. Measure of similarity for original resolution
-     *  and a found one.
-     * @return Closest resolution or empty QSize if nothing found.
-     */
-    static QSize getNearestResolution(
-        const QSize& resolution,
-        float aspectRatio,
-        double maxResolutionArea,
-        const QList<QSize>& resolutionList,
-        double* outCoefficient = 0);
-
-    /**
-     * Simple wrapper for getNearestResolution(). Calls getNearestResolution() twice.
-     * First time it calls it with provided aspectRatio. If appropriate resolution is not found
-     * getNearestResolution() is called with 0 aspectRatio.
-     */
-    static QSize closestResolution(
-        const QSize& idealResolution,
-        float aspectRatio,
-        const QSize& maxResolution,
-        const QList<QSize>& resolutionList,
-        double* outCoefficient = 0);
-
-protected:
-    virtual CameraDiagnostics::Result initInternal() override;
-private:
-    void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
-private:
-    QnMutex m_mediaStreamsMutex;
-    int m_channelNumber; // video/audio source number
-    QElapsedTimer m_lastInitTime;
-    QAuthenticator m_lastCredentials;
-};
-
-
+const QSize UNLIMITED_RESOLUTION(INT_MAX, INT_MAX);
 
 Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
 Q_DECLARE_METATYPE(QnVirtualCameraResourceList);

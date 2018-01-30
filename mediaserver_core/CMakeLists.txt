@@ -1,3 +1,5 @@
+include(camera_vendors.cmake)
+
 find_package(Qt5 COMPONENTS WebSockets)
 
 set(product.title "${mediaserver.name}")
@@ -55,9 +57,13 @@ add_custom_command(
             "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
             "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
     COMMAND
+        ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
+    COMMAND
         ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_CURRENT_BINARY_DIR}/api.json"
             "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
+    COMMAND
+        ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_BINARY_DIR}/api.json"
 )
 
 set_source_files_properties(
@@ -70,6 +76,8 @@ set_source_files_properties(
 nx_add_target(mediaserver_core LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mediaserver_core_app_info_impl.cpp"
+    SOURCE_EXCLUSIONS
+        ${vendor_source_exclusions}
     ADDITIONAL_RESOURCES
         "${customization_dir}/mediaserver_core/resources"
         "${customization_dir}/icons/all/favicon.ico"
@@ -79,8 +87,11 @@ nx_add_target(mediaserver_core LIBRARY
     PUBLIC_LIBS
         qtservice qtsinglecoreapplication Qt5::WebSockets
         ffmpeg nx_onvif quazip sigar openssl
-        common appserver2 cloud_db_client nx_email nx_speech_synthesizer nx_network nx_fusion 
-        nx_utils nx_kit nx_update)
+        common appserver2 cloud_db_client nx_email nx_speech_synthesizer nx_network nx_fusion
+        nx_utils nx_kit nx_update
+)
+
+nx_add_vendor_macros(mediaserver_core)
 
 if(LINUX)
     target_link_libraries(mediaserver_core PRIVATE ldap lber)

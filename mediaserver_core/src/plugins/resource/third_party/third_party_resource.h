@@ -1,10 +1,4 @@
-/**********************************************************
-* 2 apr 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef THIRD_PARTY_RESOURCE_H
-#define THIRD_PARTY_RESOURCE_H
+#pragma once
 
 #ifdef ENABLE_THIRD_PARTY
 
@@ -13,19 +7,19 @@
 #include <QCoreApplication>
 #include <QSharedPointer>
 
-#include "core/resource/camera_resource.h"
-#include "plugins/camera_plugin_qt_wrapper.h"
-
+#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
+#include <nx/mediaserver/resource/camera.h>
+#include <plugins/camera_plugin_qt_wrapper.h>
 
 //!Camera resource, integrated via external driver. Routes requests to \a nxcip::BaseCameraManager interface
 class QnThirdPartyResource
 :
-    public QnPhysicalCameraResource,
+    public nx::mediaserver::resource::Camera,
     public nxcip::CameraInputEventHandler
 {
     Q_DECLARE_TR_FUNCTIONS(QnThirdPartyResource)
 
-    typedef QnPhysicalCameraResource base_type;
+    typedef nx::mediaserver::resource::Camera base_type;
 
 public:
     static const QString AUX_DATA_PARAM_NAME;
@@ -38,13 +32,6 @@ public:
 
     //!Implementation of QnResource::getPtzController
     virtual QnAbstractPtzController* createPtzControllerInternal() override;
-    
-    //!Implementation of QnResource::getParamPhysical
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-    //!Implementation of QnResource::setParamPhysical
-    virtual bool setParamPhysical(const QString &id, const QString &value) override;
-    virtual bool setParamsBegin() override;
-    virtual bool setParamsEnd() override;
 
     //!Implementation of QnNetworkResource::ping
     /*!
@@ -96,22 +83,24 @@ public:
         int newState,
         unsigned long int timestamp ) override;
 
-    const QList<nxcip::Resolution>& getEncoderResolutionList( int encoderNumber ) const;
+    const QList<nxcip::Resolution>& getEncoderResolutionList(Qn::StreamIndex encoderNumber) const;
     virtual bool hasDualStreaming() const override;
 
-    nxcip::Resolution getSelectedResolutionForEncoder( int encoderIndex ) const;
+    nxcip::Resolution getSelectedResolutionForEncoder(Qn::StreamIndex encoderIndex ) const;
+
+    QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
+    QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
 protected:
-    //!Implementation of QnResource::initInternal
-    virtual CameraDiagnostics::Result initInternal() override;
-    //!Implementation of QnSecurityCamResource::startInputPortMonitoringAsync
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
-    //!Implementation of QnSecurityCamResource::stopInputPortMonitoringAsync
     virtual void stopInputPortMonitoringAsync() override;
-    //!Implementation of QnSecurityCamResource::isInputPortMonitored
     virtual bool isInputPortMonitored() const override;
-    //!Implementation of QnSecurityCamResource::setMotionMaskPhysical
     virtual void setMotionMaskPhysical( int channel );
+
+    virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
 
 private:
     struct EncoderData
@@ -129,15 +118,14 @@ private:
     int m_encoderCount;
     std::vector<nxcip::Resolution> m_selectedEncoderResolutions;
     nxcip::BaseCameraManager3* m_cameraManager3;
+    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnThirdPartyResource> m_advancedParametersProvider;
 
     bool initializeIOPorts();
-    nxcip::Resolution getMaxResolution( int encoderNumber ) const;
+    nxcip::Resolution getMaxResolution(Qn::StreamIndex encoderNumber) const;
     //!Returns resolution with pixel count equal or less than \a desiredResolution
-    nxcip::Resolution getNearestResolution( int encoderNumber, const nxcip::Resolution& desiredResolution ) const;
+    nxcip::Resolution getNearestResolution(Qn::StreamIndex encoderNumber, const nxcip::Resolution& desiredResolution ) const;
     nxcip::Resolution getSecondStreamResolution() const;
     bool setParam(const char * id, const char * value);
 };
 
 #endif // ENABLE_THIRD_PARTY
-
-#endif  //THIRD_PARTY_RESOURCE_H

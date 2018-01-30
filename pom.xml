@@ -245,6 +245,7 @@
         <rdep.ios.packages/>
         <rdep.global.packages/>
 
+        <CMAKE_CXX_COMPILER>g++</CMAKE_CXX_COMPILER>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -912,7 +913,7 @@
                 <openssl.version>1.0.1f</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA DISABLE_SOFTWARE_MOTION_DETECTION EDGE_SERVER debug_in_release</additional.defines>
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>edge1</modification>
                 <rdep.target>isd_s2</rdep.target>
                 <rdep.packages>cpro</rdep.packages>
@@ -938,7 +939,7 @@
             </activation>
             <properties>
                 <toolchain.version>rpi</toolchain.version>
-                <openssl.version>1.0.0j</openssl.version>
+                <openssl.version>1.0.1t-deb8</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.4</gcc.version>
                 <qt.version>5.6.1-2</qt.version>
@@ -1009,6 +1010,7 @@
                 </property>
             </activation>
             <properties>
+                <qt.version>5.6.1-1</qt.version>
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>

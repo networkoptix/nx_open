@@ -68,7 +68,7 @@ private:
 
 namespace {
 
-const char* usualData = 
+const char* usualData =
     "#EXTM3U\r\n"
     "\r\n"
     "#EXTINF:123, Sample artist - Sample title\r\n"
@@ -88,19 +88,19 @@ const char* sameDataWithoutEmptyLines =
     "#EXTM3U\r\n"
     "C:\\Documents and Settings\\I\\My Music\\Sample.mp3\r\n";
 
-const char* usualDataWithoutEmptyLines = 
+const char* usualDataWithoutEmptyLines =
     "#EXTM3U\r\n"
     "#EXTINF:123, Sample artist - Sample title\r\n"
     "C:\\Documents and Settings\\I\\My Music\\Sample.mp3\r\n"
     "#EXTINF:321,Example Artist - Example title\r\n"
     "C:\\Documents and Settings\\I\\My Music\\Greatest Hits\\Example.ogg\r\n";
 
-} // namespace 
+} // namespace
 
 TEST_F(M3uPlayList, parse)
 {
     parse(usualData);
-    
+
     assertDirectiveIsPresent("#EXTM3U");
     assertDirectiveIsPresent("#EXTINF:123, Sample artist - Sample title");
     assertLocationIsPresent("C:\\Documents and Settings\\I\\My Music\\Sample.mp3");

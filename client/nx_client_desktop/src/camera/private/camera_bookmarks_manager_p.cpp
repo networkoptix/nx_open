@@ -235,7 +235,7 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
 
     if (!server)
     {
-        executeDelayedParented([this, callback] { callback(false); }, kDefaultDelay, this);
+        executeDelayedParented([this, callback] { callback(false); }, this);
         return;
     }
 
@@ -503,7 +503,7 @@ void QnCameraBookmarksManagerPrivate::executeCallbackDelayed(BookmarksInternalCa
             callback(false, QnCameraBookmarkList(), invalidRequestId);
         };
 
-    executeDelayedParented(timerCallback, kDefaultDelay, this);
+    executeDelayedParented(timerCallback, this);
 }
 
 void QnCameraBookmarksManagerPrivate::executeCallbackDelayed(BookmarksCallbackType callback)
@@ -517,7 +517,7 @@ void QnCameraBookmarksManagerPrivate::executeCallbackDelayed(BookmarksCallbackTy
             callback(false, QnCameraBookmarkList());
         };
 
-    executeDelayedParented(timerCallback, kDefaultDelay, this);
+    executeDelayedParented(timerCallback, this);
 }
 
 void QnCameraBookmarksManagerPrivate::addUpdatePendingBookmark(const QnCameraBookmark &bookmark)

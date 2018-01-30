@@ -27,9 +27,10 @@ public:
     Manager(Plugin* plugin);
     virtual ~Manager() override;
 
-    virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
 
 protected:
+    virtual std::string capabilitiesManifest() override;
+
     virtual bool pushVideoFrame(
         const nx::sdk::metadata::CommonCompressedVideoPacket* videoFrame) override;
 

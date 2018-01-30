@@ -28,7 +28,7 @@ Updates2StatusDataEx::Updates2StatusDataEx(
 Updates2StatusDataEx::Updates2StatusDataEx(const api::Updates2StatusData& other):
     Updates2StatusDataEx(
         qnSyncTime->currentMSecsSinceEpoch(),
-        other.serverId, other.status,
+        other.serverId, other.state,
         other.message, other.progress)
 {}
 
@@ -38,8 +38,8 @@ bool operator == (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& r
         && lhs.serverId == rhs.serverId
         && lhs.message == rhs.message
         && std::abs(lhs.progress - rhs.progress) < std::numeric_limits<double>::epsilon()
-        && lhs.status == rhs.status
-        && lhs.downloadedFiles == rhs.downloadedFiles;
+        && lhs.state == rhs.state
+        && lhs.files == rhs.files;
 }
 
 bool operator != (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& rhs)

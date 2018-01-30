@@ -780,6 +780,8 @@ int QnRtspConnectionProcessor::composeDescribe()
     if (!d->mediaRes)
         return CODE_NOT_FOUND;
 
+    d->playbackMode = getStreamingMode();
+
     createDataProvider();
 
     QString acceptMethods = nx::network::http::getHeaderValue(d->request.headers, "Accept");
@@ -871,9 +873,10 @@ int QnRtspConnectionProcessor::composeDescribe()
         auto mediaStreamIter = std::find_if(
             supportedMediaStreams.streams.cbegin(),
             supportedMediaStreams.streams.cend(),
-            [mediaStreamIndex]( const CameraMediaStreamInfo& streamInfo ) {
-                return streamInfo.encoderIndex == mediaStreamIndex;
-            } );
+            [mediaStreamIndex]( const CameraMediaStreamInfo& streamInfo )
+            {
+                return (int) streamInfo.encoderIndex == mediaStreamIndex;
+            });
         const std::map<QString, QString>& streamParams =
             mediaStreamIter != supportedMediaStreams.streams.cend()
             ? mediaStreamIter->customStreamParams

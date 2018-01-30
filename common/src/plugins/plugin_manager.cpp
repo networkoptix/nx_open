@@ -22,39 +22,34 @@ using namespace nx::sdk;
 PluginManager::PluginManager(
     QObject* parent,
     const QString& pluginDir,
-    nxpl::PluginInterface* const pluginContainer)
-:
+    nxpl::PluginInterface* pluginContainer)
+    :
     QObject(parent),
-    m_pluginDir( pluginDir ),
-    m_pluginContainer( pluginContainer )
+    m_pluginDir(pluginDir),
+    m_pluginContainer(pluginContainer)
 {
 }
 
 PluginManager::~PluginManager()
 {
-    for( QList<QSharedPointer<QPluginLoader> >::iterator
-        it = m_qtPlugins.begin();
-        it != m_qtPlugins.end();
-        ++it )
-    {
-        (*it)->unload();
-    }
+    for (auto& qtPlugin: m_qtPlugins)
+        qtPlugin->unload();
 
-    //releasing plugins
-    std::for_each( m_nxPlugins.begin(), m_nxPlugins.end(), std::mem_fun( &nxpl::PluginInterface::releaseRef ) );
+    for (auto& nxPlugin: m_nxPlugins)
+        nxPlugin->releaseRef();
 }
 
 void PluginManager::loadPlugins(
     const QSettings* settings,
-    PluginManager::PluginType pluginsToLoad )
+    PluginManager::PluginType pluginsToLoad)
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
 
     std::set<QString> directoriesToSearchForPlugins;
 
     //loading plugins
-    if( !m_pluginDir.isEmpty() )
-        directoriesToSearchForPlugins.insert( QDir(m_pluginDir).absolutePath() );
+    if(!m_pluginDir.isEmpty())
+        directoriesToSearchForPlugins.insert(QDir(m_pluginDir).absolutePath());
 
 #ifndef Q_OS_WIN32
     char* vmsPluginDir = getenv("VMS_PLUGIN_DIR");
@@ -63,80 +58,76 @@ void PluginManager::loadPlugins(
 #endif
 
     //directoriesToSearchForPlugins.insert( QDir(QDir::currentPath()).absolutePath() );
-    directoriesToSearchForPlugins.insert( QDir(QCoreApplication::applicationDirPath()).absolutePath() + lit("/plugins/") );
+    directoriesToSearchForPlugins.insert(QDir(QCoreApplication::applicationDirPath()).absolutePath()
+        + lit("/plugins/"));
 
     //preparing settings for NX plugins
     const auto& keys = settings->allKeys();
     std::vector<nxpl::Setting> settingsForPlugin;
-    for( const auto& key : keys )
+    for (const auto& key: keys)
     {
         const auto& keyUtf8 = key.toUtf8();
-        const auto& valueUtf8 = settings->value( key ).toString().toUtf8();
+        const auto& valueUtf8 = settings->value(key).toString().toUtf8();
 
         nxpl::Setting setting;
         setting.name = new char[keyUtf8.size() + 1];
-        strcpy( setting.name, keyUtf8.constData() );
+        strcpy(setting.name, keyUtf8.constData());
         setting.value = new char[valueUtf8.size() + 1];;
-        strcpy( setting.value, valueUtf8.constData() );
-        settingsForPlugin.push_back( std::move( setting ) );
+        strcpy(setting.value, valueUtf8.constData());
+        settingsForPlugin.push_back(std::move(setting));
     }
 
-    for( std::set<QString>::const_iterator
-        it = directoriesToSearchForPlugins.begin();
-        it != directoriesToSearchForPlugins.end();
-        ++it )
+    for (const QString& dir: directoriesToSearchForPlugins)
     {
-        loadPluginsFromDir( settingsForPlugin, *it, pluginsToLoad );
+        loadPluginsFromDir(settingsForPlugin, dir, pluginsToLoad);
     }
 
-    for( nxpl::Setting& setting : settingsForPlugin )
+    for (nxpl::Setting& setting: settingsForPlugin)
     {
         delete[] setting.name;
         delete[] setting.value;
     }
-
-    //loadPluginsFromDir( QCoreApplication::applicationDirPath(), pluginsToLoad );
 }
 
 void PluginManager::loadPluginsFromDir(
     const std::vector<nxpl::Setting>& settingsForPlugin,
     const QString& dirToSearchIn,
-    PluginType pluginsToLoad )
+    PluginType pluginsToLoad)
 {
-    QDir pluginDir( dirToSearchIn );
-    const QStringList& entries = pluginDir.entryList( QStringList(), QDir::Files | QDir::Readable );
-    for( const QString& entry: entries )
+    QDir pluginDir(dirToSearchIn);
+    const QStringList& entries = pluginDir.entryList(QStringList(), QDir::Files | QDir::Readable);
+    for (const QString& entry: entries)
     {
-        if( !QLibrary::isLibrary( entry ) )
+        if (!QLibrary::isLibrary(entry))
             continue;
 
-        if( pluginsToLoad & QtPlugin )
+        if(pluginsToLoad & QtPlugin)
             loadQtPlugin( pluginDir.path() + lit("/") + entry );
 
-        if( pluginsToLoad & NxPlugin )
+        if(pluginsToLoad & NxPlugin)
             loadNxPlugin( settingsForPlugin, pluginDir.path(), entry );
     }
 }
 
-bool PluginManager::loadQtPlugin( const QString& fullFilePath )
+bool PluginManager::loadQtPlugin(const QString& fullFilePath)
 {
-    QSharedPointer<QPluginLoader> plugin( new QPluginLoader( fullFilePath ) );
-    if( !plugin->load() )
+    QSharedPointer<QPluginLoader> plugin(new QPluginLoader(fullFilePath));
+    if(!plugin->load())
         return false;
 
     QObject* obj = plugin->instance();
     QnAbstractClientPlugin* clientPlugin = dynamic_cast<QnAbstractClientPlugin*>(obj);
-    if( !clientPlugin )
+    if (!clientPlugin)
         return false;
-    clientPlugin->initializeLog( QnLog::instance().get() );
-    if( !clientPlugin->initialized() )
+    clientPlugin->initializeLog(QnLog::instance().get());
+    if(!clientPlugin->initialized())
     {
-        NX_LOG( lit("Failed to initialize Qt plugin %1").arg(fullFilePath), cl_logERROR );
+        NX_LOG(lit("Failed to initialize Qt plugin %1").arg(fullFilePath), cl_logERROR);
         return false;
     }
 
-    NX_LOG( lit("Successfully loaded Qt plugin %1").arg(fullFilePath), cl_logWARNING );
-    m_qtPlugins.push_back( plugin );
+    NX_LOG(lit("Successfully loaded Qt plugin %1").arg(fullFilePath), cl_logWARNING);
+    m_qtPlugins.push_back(plugin);
 
     emit pluginLoaded();
     return true;

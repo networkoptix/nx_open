@@ -80,12 +80,13 @@ static bool readExtraFields(QnNetworkAddressEntryList& entryList, bool addFromCo
 QnNetworkAddressEntryList systemNetworkAddressEntryList(bool* isOk, bool addFromConfig)
 {
     QnNetworkAddressEntryList entryList;
-
-    const bool allInterfaces = (QnAppInfo::isBpi());
-    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces(allInterfaces))
+    using namespace nx::network;
+    const auto policy = QnAppInfo::isBpi()
+        ? InterfaceListPolicy::allowInterfacesWithoutAddress : InterfaceListPolicy::oneAddressPerInterface;
+    for (const auto& iface: getAllIPv4Interfaces(policy))
     {
         static const QChar kColon = ':';
-        if (allInterfaces && iface.name.contains(kColon))
+        if (policy == InterfaceListPolicy::allowInterfacesWithoutAddress && iface.name.contains(kColon))
             continue;
 
         QnNetworkAddressEntry entry;

@@ -1,14 +1,12 @@
-#ifndef pulse_resource_h_1947
-#define pulse_resource_h_1947
+#pragma once
 
 #ifdef ENABLE_PULSE_CAMERA
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/network/deprecated/simple_http_client.h>
-#include "nx/streaming/media_data_packet.h"
+#include <nx/streaming/media_data_packet.h>
 
-class QnPlPulseResource : public QnPhysicalCameraResource
+class QnPlPulseResource : public nx::mediaserver::resource::Camera
 {
 public:
     static const QString MANUFACTURE;
@@ -27,8 +25,9 @@ protected:
 
     virtual void setCroppingPhysical(QRect cropping);
 
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 };
 
 #endif // #ifdef ENABLE_PULSE_CAMERA
-#endif //pulse_resource_h_1947

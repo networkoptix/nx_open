@@ -79,7 +79,7 @@
                             Win64="no"/>
         </Property>
 
-        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="$(var.SourceDir)\wix_custom_actions.dll" />
 
         <CustomAction Id="CleanAutorunRegistryKeys" BinaryKey="CustomActions.dll" DllEntry="CleanAutorunRegistryKeys" Execute="immediate" Impersonate="yes"/>
 

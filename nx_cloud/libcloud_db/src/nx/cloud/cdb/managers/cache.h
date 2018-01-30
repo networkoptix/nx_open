@@ -1,10 +1,4 @@
-/**********************************************************
-* Aug 28, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CLOUD_DB_CACHE_H
-#define NX_CLOUD_DB_CACHE_H
+#pragma once
 
 #include <algorithm>
 #include <map>
@@ -13,25 +7,24 @@
 
 #include <nx/utils/thread/mutex.h>
 
-
 namespace nx {
 namespace cdb {
 
-//!Data cache to be used by managers to reduce number of data fetch requests to DB
-/*!
-    Should support:
-    - data update events
-    - custom indexes?
-*/
+/**
+ * Data cache to be used by managers to reduce number of data fetch requests to DB.
+ * Should support:
+ * - data update events.
+ * - custom indexes?
+ */
 template<class KeyType, class CachedType>
 class Cache
 {
 public:
     typedef typename std::map<KeyType, CachedType>::value_type value_type;
 
-    /*!
-        \return false if already exists
-    */
+    /**
+     * @return false if already exists
+     */
     bool insert(KeyType key, CachedType value)
     {
         QnMutexLocker lk(&m_mutex);
@@ -48,18 +41,20 @@ public:
         return it->second;
     }
 
-    //!Returns \a true if erased something
+    /**
+     * @return true if erased something.
+     */
     bool erase(const KeyType& key)
     {
         QnMutexLocker lk(&m_mutex);
         return m_data.erase(key) > 0;
     }
 
-    //!Executes \a updateFunc on item with \a key
-    /*!
-        \return \a true if item found and updated. \a false otherwise
-        \warning \a updateFunc is executed with internal mutex locked, so it MUST NOT BLOCK!
-    */
+    /**
+     * Executes updateFunc on item with key.
+     * @return True if item found and updated. False otherwise.
+     * WARNING: updateFunc is executed with internal mutex locked, so it MUST NOT BLOCK!
+     */
     template<class Func>
     bool atomicUpdate(
         const KeyType& key,
@@ -74,7 +69,9 @@ public:
         return true;
     }
 
-    //!Linear search through the cache
+    /**
+     * Linear search through the cache.
+     */
     template<class Func>
     boost::optional<CachedType> findIf(const Func& func) const
     {
@@ -104,7 +101,5 @@ private:
     std::map<KeyType, CachedType> m_data;
 };
 
-}   //cdb
-}   //nx
-
-#endif	//NX_CLOUD_DB_CACHE_H
+} // namespace cdb
+} // namespace nx

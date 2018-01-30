@@ -289,7 +289,7 @@ private:
     QMap<QnUuid, bool> m_diskFullWarned;
 
     QnStorageScanData m_archiveRebuildInfo;
-    bool m_rebuildCancelled;
+    std::atomic<bool> m_rebuildCancelled;
 
     friend class RebuildAsyncTask;
     friend class ScanMediaFilesTask;

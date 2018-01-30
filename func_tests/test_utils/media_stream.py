@@ -1,7 +1,6 @@
 import cv2
 import logging
 import math
-import os
 import struct
 import time
 import urllib
@@ -12,12 +11,17 @@ import requests
 from requests.auth import HTTPDigestAuth
 
 from .utils import datetime_utc_to_timestamp
+from .artifact import ArtifactType
 
 log = logging.getLogger(__name__)
 
 
 CHUNK_SIZE = 1024*100  # bytes
 RTSP_SPEED = 4  # maximum is 32, but only 4 is working with opencv shipped with ubuntu 14.04
+AVI_ARTIFACT_TYPE = ArtifactType(name='video-avi', content_type='video/avi', ext='.avi')
+WEBM_ARTIFACT_TYPE = ArtifactType(name='video-webm', content_type='video/webm', ext='.webm')
+MKV_ARTIFACT_TYPE = ArtifactType(name='video-mkv', content_type='video/x-matroska', ext='.mkv')
+MPEG_ARTIFCT_TYPE = ArtifactType(name='video-mpeg', content_type='video/mpeg', ext='.mpeg')
 
 
 def open_media_stream(server_url, user, password, stream_type, camera_mac_addr):
@@ -37,7 +41,7 @@ class Metadata(object):
 
     @classmethod
     def from_file(cls, file_path):
-        assert os.stat(file_path).st_size != 0, 'Server returned empty media stream'
+        assert file_path.stat().st_size != 0, 'Server returned empty media stream'
         cap = cv2.VideoCapture(file_path)
         assert cap.isOpened(), 'Media stream returned from server is invalid (saved to %r)' % file_path
         try:
@@ -78,7 +82,7 @@ class RtspMediaStream(object):
         self.password = password
 
     def load_archive_stream_metadata(self, artifact_factory, pos=None, duration=None):
-        temp_file_path = artifact_factory(ext='.avi', name='media-avi', type_name='video-avi', content_type='video/avi').produce_file_path()
+        temp_file_path = artifact_factory(name='media-avi', artifact_type=AVI_ARTIFACT_TYPE).produce_file_path()
         log.info('RTSP request: %r', self.url)
         from_cap = cv2.VideoCapture(self.url)
         assert from_cap.isOpened(), 'Failed to open RTSP url: %r' % self.url
@@ -101,7 +105,7 @@ class RtspMediaStream(object):
             frame_count = self._copy_cap(from_cap, to_cap, start_time)
         finally:
             to_cap.release()
-        size = os.stat(temp_file_path).st_size
+        size = temp_file_path.stat().st_size
         log.info('RTSP stream: completed loading %d frames in %.2f seconds, total size: %dB/%.2fKB/%.2fMB',
             frame_count, time.time() - start_time, size, size/1024., size/1024./1024)
 
@@ -137,7 +141,7 @@ def load_stream_metadata_from_http_response(stream_type, response, temp_file_pat
     start_time = log_time = time.time()
     chunk_count = 0
     size = 0
-    with open(temp_file_path, 'wb') as f:
+    with temp_file_path.open('wb') as f:
         for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
             f.write(chunk)
             size += len(chunk)
@@ -159,7 +163,7 @@ class WebmMediaStream(object):
         self.password = password
 
     def load_archive_stream_metadata(self, artifact_factory, pos=None, duration=None):
-        temp_file_path = artifact_factory(ext='.webm', name='media-webm', type_name='video-webm', content_type='video/webm').produce_file_path()
+        temp_file_path = artifact_factory(name='media-webm', artifact_type=WEBM_ARTIFACT_TYPE).produce_file_path()
         params = dict(pos=0)
         metadata = load_stream_metadata_from_http(
             'webm', self.url, self.user, self.password, params, temp_file_path)
@@ -176,7 +180,7 @@ class DirectHlsMediaStream(object):
     def load_archive_stream_metadata(self, artifact_factory, pos, duration):
         assert isinstance(pos, datetime), repr(pos)
         assert isinstance(duration, timedelta), repr(duration)
-        temp_file_path = artifact_factory(ext='.mkv', name='media-mkv', type_name='video-mkv', content_type='video/x-matroska').produce_file_path()
+        temp_file_path = artifact_factory(name='media-mkv', artifact_type=MKV_ARTIFACT_TYPE).produce_file_path()
         pos_ms = int(datetime_utc_to_timestamp(pos) * 1000)
         duration_sec = int(duration.total_seconds() + 1)  # round to next value
         params = dict(pos=pos_ms, duration=duration_sec)
@@ -238,8 +242,7 @@ class M3uHlsMediaMetainfoLoader(object):
     def _process_media_response(self, response):
         self.file_counter += 1
         artifact_factory = self.artifact_factory(
-            [str(self.file_counter)], ext='.mpeg',
-            name='media-%d-mpeg' % self.file_counter, type_name='video-mpeg', content_type='video/mpeg')
+            [str(self.file_counter)], name='media-%d-mpeg' % self.file_counter, artifact_type=MPEG_ARTIFCT_TYPE)
         temp_file_path = artifact_factory.produce_file_path()
         metadata = load_stream_metadata_from_http_response('hls', response, temp_file_path)
         self.collected_metainfo_list.append(metadata)

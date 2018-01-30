@@ -203,10 +203,8 @@ def log_diffs(x, y):
         log.warning('Strange, no diffs are found...')
 
 def save_json_artifact(artifact_factory, api_method, side_name, server, value):
-    file_path = artifact_factory(
-        ['result', api_method, side_name],
-        name='%s-%s' % (api_method, side_name)).save_json(
-            value, encoder=transaction_log.TransactionJsonEncoder)
+    artifact = artifact_factory(['result', api_method, side_name], name='%s-%s' % (api_method, side_name))
+    file_path = artifact.save_as_json(value, encoder=transaction_log.TransactionJsonEncoder)
     log.debug('results from %s from server %s %s is stored to %s', api_method, server.title, server, file_path)
 
 
@@ -271,13 +269,13 @@ def collect_additional_metrics(metrics_saver, servers, lightweight_servers):
         reply = lightweight_servers[0].rest_api.api.p2pStats.GET()
         metrics_saver.save('total_bytes_sent', int(reply['totalBytesSent']))
         # for test with lightweight servers pick only hosts with lightweight servers
-        host_set = set(server.host for server in lightweight_servers)
+        access_to_oses = set(server.os_access for server in lightweight_servers)
     else:
-        host_set = set(server.host for server in servers)
-    for host in host_set:
-        metrics = load_host_memory_usage(host)
+        access_to_oses = set(server.os_access for server in servers)
+    for os_access in access_to_oses:
+        metrics = load_host_memory_usage(os_access)
         for name in 'total used free used_swap mediaserver lws'.split():
-            metric_name = 'host_memory_usage.%s.%s' % (host.name, name)
+            metric_name = 'host_memory_usage.%s.%s' % (os_access.name, name)
             metric_value = getattr(metrics, name)
             metrics_saver.save(metric_name, metric_value)
 

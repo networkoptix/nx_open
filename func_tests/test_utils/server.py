@@ -7,22 +7,22 @@ import base64
 import datetime
 import hashlib
 import logging
-import os.path
+import tempfile
 import time
 import urllib
 import uuid
-import tempfile
 
 import pytest
 import pytz
 import requests.exceptions
+from pathlib2 import Path
 
-from .camera import make_schedule_task, Camera, SampleMediaFile
+from .camera import Camera, SampleMediaFile, make_schedule_task
 from .cloud_host import CloudAccount
-from .host import Host, LocalHost
+from .os_access import OsAccess, LocalAccess
 from .media_stream import open_media_stream
-from .rest_api import REST_API_USER, REST_API_PASSWORD, HttpError, RestApi
-from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now, RunningTime
+from .rest_api import HttpError, REST_API_PASSWORD, REST_API_USER, RestApi
+from .utils import RunningTime, datetime_utc_now, datetime_utc_to_timestamp, is_list_inst
 from .vagrant_box_config import MEDIASERVER_LISTEN_PORT
 
 DEFAULT_HTTP_SCHEMA = 'http'
@@ -84,7 +84,7 @@ class ServerConfig(object):
         # With leave_initial_cloud_host=True box will also be always recreated before this test to ensure
         # server binaries has original cloud host encoded by compilation step.
         self.leave_initial_cloud_host = leave_initial_cloud_host  # bool
-        self.box = box  # VagrantBox or None
+        self.box = box  # VagrantVirtualMachine or None
         self.config_file_params = config_file_params  # dict or None
         self.setup_settings = setup_settings or {}  # dict
         self.setup_cloud_account = setup_cloud_account  # CloudAccount or None
@@ -96,18 +96,20 @@ class ServerConfig(object):
 
 
 class Server(object):
-
+    """Mediaserver, same for physical and virtual machines."""
     _st_started = object()
     _st_stopped = object()
     _st_starting = object()
 
-    def __init__(self, name, host, installation, server_ctl, rest_api_url, ca,
-                 rest_api_timeout=None, internal_ip_port=None, timezone=None):
+    def __init__(
+            self,
+            name, os_access, server_ctl, installation, rest_api_url, ca,
+            rest_api_timeout=None, internal_ip_port=None):
         assert name, repr(name)
-        assert isinstance(host, Host), repr(host)
+        assert isinstance(os_access, OsAccess), repr(os_access)
         self.title = name.upper()
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
-        self.host = host
+        self.os_access = os_access
         self._installation = installation
         self._server_ctl = server_ctl
         self.rest_api_url = rest_api_url
@@ -118,7 +120,6 @@ class Server(object):
         self.ecs_guid = None
         self.internal_ip_port = internal_ip_port or MEDIASERVER_LISTEN_PORT
         self.internal_ip_address = None
-        self.timezone = timezone
         self._state = None  # self._st_*
 
     def __repr__(self):
@@ -226,7 +227,7 @@ class Server(object):
     def is_server_online(self):
         try:
             return self.rest_api.api.ping.GET(timeout=datetime.timedelta(seconds=10))
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as e:
             return False
 
     def get_log_file(self):
@@ -441,16 +442,11 @@ class Server(object):
     def stop_recording_camera(self, camera):
         self.set_camera_recording(camera, recording=False)
 
-    # if there are more than one return first
     @property
     def storage(self):
-        ## # following code requires server is started, which is not always the case;
-        ## #  so was commented-out and replaced with hardcoded one
-        ## storage_records = [record for record in self.rest_api.ec2.getStorages.GET() if record['parentId'] == self.ecs_guid]
-        ## assert len(storage_records) >= 1, 'No storages for server with ecs guid %s is returned by %s' % (self.ecs_guid, self.rest_api_url)
-        ## storage_path = storage_records[0]['url']
-        storage_path = os.path.join(self._installation.dir, MEDIASERVER_STORAGE_PATH)
-        return Storage(self.host, storage_path, self.timezone)
+        # GET /ec2/getStorages is not always possible: server sometimes is not started.
+        storage_path = self._installation.dir / MEDIASERVER_STORAGE_PATH
+        return Storage(self.os_access, storage_path, self.os_access.get_timezone())
 
     def rebuild_archive(self):
         self.rest_api.api.rebuildArchive.GET(mainPool=1, action='start')
@@ -464,8 +460,8 @@ class Server(object):
     def get_recorded_time_periods(self, camera):
         assert camera.id, 'Camera %r is not yet registered on server' % camera.name
         periods = [TimePeriod(datetime.datetime.utcfromtimestamp(int(d['startTimeMs'])/1000.).replace(tzinfo=pytz.utc),
-                    datetime.timedelta(seconds=int(d['durationMs'])/1000.))
-                    for d in self.rest_api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
+                              datetime.timedelta(seconds=int(d['durationMs']) / 1000.))
+                   for d in self.rest_api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
         log.info('Server %r returned %d recorded periods:', self.name, len(periods))
         for period in periods:
             log.info('\t%s', period)
@@ -479,10 +475,10 @@ class Server(object):
 
 class Storage(object):
 
-    def __init__(self, host, dir, timezone=None):
-        self.host = host
+    def __init__(self, os_access, dir, timezone=None):
+        self.os_access = os_access
         self.dir = dir
-        self.timezone = timezone or host.get_timezone()
+        self.timezone = timezone or os_access.get_timezone()
 
     def save_media_sample(self, camera, start_time, sample):
         assert isinstance(camera, Camera), repr(camera)
@@ -498,25 +494,24 @@ class Storage(object):
         hiq_fpath  = self._construct_fpath(camera_mac_addr, 'hi_quality',  start_time, unixtime_utc_ms, sample.duration)
 
         log.info('Storing media sample %r to %r', sample.fpath, lowq_fpath)
-        self.host.write_file(lowq_fpath, contents)
+        self.os_access.write_file(lowq_fpath, contents)
         log.info('Storing media sample %r to %r', sample.fpath, hiq_fpath)
-        self.host.write_file(hiq_fpath,  contents)
+        self.os_access.write_file(hiq_fpath, contents)
 
     def _read_with_start_time_metadata(self, sample, unixtime_utc_ms):
-        _, ext = os.path.splitext(sample.fpath)
-        _, path = tempfile.mkstemp(suffix=ext)
+        _, path = tempfile.mkstemp(suffix=sample.fpath.suffix)
+        path = Path(path)
         try:
-            LocalHost().run_command([
+            LocalAccess().run_command([
                 'ffmpeg',
                 '-i', sample.fpath,
                 '-codec', 'copy',
                 '-metadata', 'START_TIME=%s' % unixtime_utc_ms,
                 '-y',
                 path])
-            with open(path, 'rb') as f:
-                return f.read()
+            return path.read_bytes()
         finally:
-            os.remove(path)
+            path.unlink()
 
     # server stores media data in this format, using local time for directory parts:
     # <data dir>/<{hi_quality,low_quality}>/<camera-mac>/<year>/<month>/<day>/<hour>/<start,unix timestamp ms>_<duration,ms>.mkv
@@ -525,7 +520,7 @@ class Storage(object):
     def _construct_fpath(self, camera_mac_addr, quality_part, start_time, unixtime_utc_ms, duration):
         local_dt = start_time.astimezone(self.timezone)  # box local
         duration_ms = int(duration.total_seconds() * 1000)
-        return os.path.join(
-            self.dir, quality_part, camera_mac_addr,
+        return self.dir.joinpath(
+            quality_part, camera_mac_addr,
             '%02d' % local_dt.year, '%02d' % local_dt.month, '%02d' % local_dt.day, '%02d' % local_dt.hour,
             '%s_%s.mkv' % (unixtime_utc_ms, duration_ms))

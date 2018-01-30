@@ -1,5 +1,4 @@
-#ifndef QN_LAYOUT_NAME_DIALOG_H
-#define QN_LAYOUT_NAME_DIALOG_H
+#pragma once
 
 #include <QtWidgets/QDialog>
 #include <QtCore/QScopedPointer>
@@ -38,5 +37,3 @@ private:
 private:
     QScopedPointer<Ui::LayoutNameDialog> ui;
 };
-
-#endif // QN_LAYOUT_NAME_DIALOG_H

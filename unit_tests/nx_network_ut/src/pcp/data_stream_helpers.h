@@ -1,5 +1,4 @@
-#ifndef DATA_STREAM_HELPERS_H
-#define DATA_STREAM_HELPERS_H
+#pragma once
 
 #include <QDataStream>
 
@@ -49,5 +48,3 @@ QByteArray rawBytes(const T& data)
 }
 
 } // namespace dsh
-
-#endif // DATA_STREAM_HELPERS_H

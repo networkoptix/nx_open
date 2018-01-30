@@ -1,10 +1,19 @@
 import logging
-import os.path
 
+from pathlib2 import PurePosixPath
+
+from test_utils.server_ctl import VagrantBoxServerCtl
+from test_utils.server_installation import install_media_server, find_deb_installation
 from .core_file_traceback import create_core_file_traceback
-from .server import ServerConfig
+from .server import ServerConfig, Server
+from .artifact import ArtifactType
 
 log = logging.getLogger(__name__)
+
+
+SERVER_LOG_ARTIFACT_TYPE = ArtifactType(name='log', ext='.log')
+CORE_FILE_ARTIFACT_TYPE = ArtifactType(name='core')
+TRACEBACK_ARTIFACT_TYPE = ArtifactType(name='core-traceback')
 
 
 class ServerFactory(object):
@@ -12,18 +21,20 @@ class ServerFactory(object):
     def __init__(self,
                  reset_servers,
                  artifact_factory,
-                 customization_company_name,
                  cloud_host,
                  vagrant_box_factory,
                  physical_installation_ctl,
+                 deb,
+                 ca,
                  ):
         self._reset_servers = reset_servers
         self._artifact_factory = artifact_factory
-        self._customization_company_name = customization_company_name
         self._cloud_host = cloud_host
         self._vagrant_box_factory = vagrant_box_factory
         self._physical_installation_ctl = physical_installation_ctl  # PhysicalInstallationCtl or None
         self._allocated_servers = []
+        self._ca = ca
+        self._deb = deb
 
     def __call__(self, *args, **kw):
         config = ServerConfig(*args, **kw)
@@ -38,11 +49,21 @@ class ServerFactory(object):
                 box = config.box
             else:
                 box = self._vagrant_box_factory(must_be_recreated=config.leave_initial_cloud_host)
-            server = box.get_server(config)
+            installation = find_deb_installation(box.guest_os_access, self._deb, PurePosixPath('/opt'))
+            if installation is None:
+                installation = install_media_server(box.guest_os_access, self._deb)
+                installation.put_key_and_cert(self._ca.generate_key_and_cert())
+            api_url = '%s://%s:%d/' % (config.http_schema, box.host_os_access.hostname, box.config.rest_api_forwarded_port)
+            customization = self._deb.customization
+            server_ctl = VagrantBoxServerCtl(box.guest_os_access, customization.service_name)
+            server = Server(
+                config.name, box.guest_os_access, server_ctl, installation, api_url, self._ca,
+                rest_api_timeout=config.rest_api_timeout)
+
         self._allocated_servers.append(server)  # _prepare_server may fail, will need to save it's artifact in that case
         self._prepare_server(config, server)
         log.info('SERVER %s: %s at %s, rest_api=%s ecs_guid=%r local_system_id=%r',
-                 server.title, server.name, server.host, server.rest_api_url, server.ecs_guid, server.local_system_id)
+                 server.title, server.name, server.os_access, server.rest_api_url, server.ecs_guid, server.local_system_id)
         return server
 
     def _prepare_server(self, config, server):
@@ -79,30 +100,29 @@ class ServerFactory(object):
     def _save_server_log(self, server):
         server_name = server.title.lower()
         log_contents = server.get_log_file()
-        if not log_contents: return
+        if not log_contents:
+            return
         artifact_factory = self._artifact_factory(
-            ['server', server_name], ext='.log', name='server-%s' % server_name, type_name='log')
-        log_path = artifact_factory.produce_file_path()
-        with open(log_path, 'wb') as f:
-            f.write(log_contents)
+            ['server', server_name], name='server-%s' % server_name, artifact_type=SERVER_LOG_ARTIFACT_TYPE)
+        log_path = artifact_factory.produce_file_path().write_bytes(log_contents)
         log.debug('log file for server %s, %s is stored to %s', server.title, server, log_path)
 
     def _save_server_core_files(self, server):
         server_name = server.title.lower()
         for remote_core_path in server.list_core_files():
-            fname = os.path.basename(remote_core_path)
+            fname = remote_core_path.name
             artifact_factory = self._artifact_factory(
                 ['server', server_name, fname],
-                name='%s-%s' % (server_name, fname), is_error=True, type_name='core')
+                name='%s-%s' % (server_name, fname), is_error=True, artifact_type=CORE_FILE_ARTIFACT_TYPE)
             local_core_path = artifact_factory.produce_file_path()
-            server.host.get_file(remote_core_path, local_core_path)
+            server.os_access.get_file(remote_core_path, local_core_path)
             log.debug('core file for server %s, %s is stored to %s', server.title, server, local_core_path)
             traceback = create_core_file_traceback(
-                server.host, os.path.join(server.dir, 'bin/mediaserver-bin'), os.path.join(server.dir, 'lib'), remote_core_path)
+                server.os_access, server.dir / 'bin/mediaserver-bin', server.dir / 'lib', remote_core_path)
             artifact_factory = self._artifact_factory(
                 ['server', server_name, fname, 'traceback'],
-                name='%s-%s-tb' % (server_name, fname), is_error=True, type_name='core-traceback')
-            path = artifact_factory.write_file(traceback)
+                name='%s-%s-tb' % (server_name, fname), is_error=True, artifact_type=TRACEBACK_ARTIFACT_TYPE)
+            path = artifact_factory.produce_file_path().write_bytes(traceback)
             log.debug('core file traceback for server %s, %s is stored to %s', server.title, server, path)
 
     def _check_if_servers_are_online(self):
@@ -112,7 +132,7 @@ class ServerFactory(object):
                 server.make_core_dump()
 
     def perform_post_checks(self):
-        log.info('----- performing post-test checks for servers ------------------------>8 -----------------------------------------')
+        log.info('Perform post-test checks.')
         self._check_if_servers_are_online()
         core_dumped_servers = []
         for server in self._allocated_servers:

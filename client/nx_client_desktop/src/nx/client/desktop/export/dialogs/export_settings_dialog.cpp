@@ -26,7 +26,6 @@
 #include <utils/math/math.h>
 #include <nx/client/desktop/ui/common/selectable_text_button_group.h>
 #include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
-#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
 #include <nx/fusion/model_functions.h>
 
 namespace nx {
@@ -147,10 +146,9 @@ ExportSettingsDialog::ExportSettingsDialog(
     ui->layoutPreviewWidget->busyIndicator()->dots()->setDotRadius(kBusyIndicatorDotRadius);
     ui->layoutPreviewWidget->busyIndicator()->dots()->setDotSpacing(kBusyIndicatorDotRadius * 2);
 
-    ui->mediaFrame->setFixedSize(kPreviewSize
-        + QSize(ui->mediaFrame->frameWidth(), ui->mediaFrame->frameWidth()) * 2);
-    ui->layoutFrame->setFixedSize(kPreviewSize
-        + QSize(ui->mediaFrame->frameWidth(), ui->mediaFrame->frameWidth()) * 2);
+    const QSize frameSize(ui->mediaFrame->frameWidth(), ui->mediaFrame->frameWidth());
+    ui->mediaFrame->setFixedSize(kPreviewSize + frameSize * 2);
+    ui->layoutFrame->setFixedSize(kPreviewSize + frameSize * 2);
 
     ui->mediaExportSettingsWidget->setMaximumHeight(ui->mediaFrame->maximumHeight());
     ui->layoutExportSettingsWidget->setMaximumHeight(ui->layoutFrame->maximumHeight());
@@ -610,6 +608,14 @@ void ExportSettingsDialog::setMediaParams(
         namePart + L'_' + timePart, L'_');
 
     ui->mediaFilenamePanel->setFilename(suggestedFileName(baseFileName));
+
+    if (!mediaResource->hasVideo())
+    {
+        ui->timestampButton->setEnabled(false);
+        ui->imageButton->setEnabled(false);
+        ui->textButton->setEnabled(false);
+        ui->speedButton->setEnabled(false);
+    }
 }
 
 void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)

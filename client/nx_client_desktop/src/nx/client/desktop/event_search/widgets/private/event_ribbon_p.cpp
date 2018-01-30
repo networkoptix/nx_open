@@ -10,7 +10,6 @@
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QApplication>
 
-#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <utils/common/event_processors.h>
@@ -23,6 +22,8 @@
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/utils/log/assert.h>
+#include <nx/api/mediaserver/image_request.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_provider.h>
 
 namespace nx {
 namespace client {
@@ -253,19 +254,18 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         ? kDefaultThumbnailWidth
         : qMin(kDefaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
 
-    const auto roundMethod = previewCropRect.isEmpty()
-        ? QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod
-        : QnThumbnailRequestData::RoundMethod::PreciseMethod;
+    api::CameraImageRequest request;
+    request.camera = camera;
+    request.msecSinceEpoch = previewTimeMs > 0 ? previewTimeMs : nx::api::ImageRequest::kLatestThumbnail;
+    request.rotation = nx::api::ImageRequest::kDefaultRotation;
+    request.size = QSize(thumbnailWidth, 0);
+    request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
+    request.aspectRatio = nx::api::ImageRequest::AspectRatio::source;
+    request.roundMethod = previewCropRect.isEmpty()
+        ? nx::api::ImageRequest::RoundMethod::iFrameAfter
+        : nx::api::ImageRequest::RoundMethod::precise;
 
-    tile->setPreview(new QnSingleThumbnailLoader(
-        camera,
-        previewTimeMs > 0 ? previewTimeMs : QnThumbnailRequestData::kLatestThumbnail,
-        QnThumbnailRequestData::kDefaultRotation,
-        QSize(thumbnailWidth, 0),
-        QnThumbnailRequestData::JpgFormat,
-        QnThumbnailRequestData::AspectRatio::AutoAspectRatio,
-        roundMethod,
-        tile));
+    tile->setPreview(new CameraThumbnailProvider(request, tile));
 
     tile->preview()->loadAsync();
     tile->setPreviewCropRect(previewCropRect);

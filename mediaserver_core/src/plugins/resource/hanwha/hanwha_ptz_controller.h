@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <plugins/resource/hanwha/hanwha_mapped_preset_manager.h>
 
 #include <core/ptz/basic_ptz_controller.h>
@@ -23,6 +21,8 @@ public:
 
 public:
     HanwhaPtzController(const HanwhaResourcePtr& resource);
+    virtual ~HanwhaPtzController() override;
+
     virtual Ptz::Capabilities getCapabilities() const override;
     void setPtzCapabilities(Ptz::Capabilities capabilities);
     void setPtzLimits(const QnPtzLimits& limits);
@@ -77,5 +77,3 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

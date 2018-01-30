@@ -13,13 +13,6 @@ namespace test {
 class Filter: public ::testing::Test
 {
 protected:
-    enum TypesNotAllowed
-    {
-        none,
-        network = 1,
-        removable = 1 << 1
-    };
-
     enum class Os
     {
         windows,
@@ -48,19 +41,20 @@ protected:
         appendPartition("/mnt/flash", QnPlatformMonitor::RemovableDiskPartition);
     }
 
-    void whenTypesNotAllowed(int typeMask)
+    void whenNonHdd(bool allowed)
     {
-        m_filterConfig.isNetworkDrivesAllowed = NetworkDrives::allowed;
-        m_filterConfig.isRemovableDrivesAllowed = true;
+        whenNetwork(allowed);
+        whenRemovable(allowed);
+    }
 
-        if (typeMask == TypesNotAllowed::none)
-            return;
+    void whenNetwork(bool allowed)
+    {
+        m_filterConfig.isNetworkDrivesAllowed = allowed;
+    }
 
-        if (typeMask & TypesNotAllowed::network)
-            m_filterConfig.isNetworkDrivesAllowed = NetworkDrives::notAllowed;
-
-        if (typeMask & TypesNotAllowed::removable)
-            m_filterConfig.isRemovableDrivesAllowed = false;
+    void whenRemovable(bool allowed)
+    {
+        m_filterConfig.isRemovableDrivesAllowed = allowed;
     }
 
     void givenOsIs(Os os)
@@ -193,7 +187,7 @@ const QString Filter::kDataDirectory = "/opt/networkoptix/mediaserver/var";
 TEST_F(Filter, Windows_allAllowed_noMultipleInstances)
 {
     givenOsIs(Os::windows);
-    whenTypesNotAllowed(TypesNotAllowed::none);
+    whenNonHdd(true);
     whenMultipleInstancesFlagIs(false);
     whenPathsRequested();
 
@@ -201,10 +195,24 @@ TEST_F(Filter, Windows_allAllowed_noMultipleInstances)
     thenPathsShouldBeAmendedCorrectly();
 }
 
+TEST_F(Filter, Windows_nonHddNotAllowed_noMultipleInstances)
+{
+    givenOsIs(Os::windows);
+    whenNonHdd(false);
+    whenMultipleInstancesFlagIs(false);
+    whenPathsRequested();
+
+    thenNumberOfStoragesReturnedShouldBeEqualTo(2);
+    thenThereShouldBeNoThisPath("\\\\external");
+    thenThereShouldBeNoThisPath("E");
+    thenPathsShouldBeAmendedCorrectly();
+}
+
 TEST_F(Filter, Windows_networkNotAllowed_noMultipleInstances)
 {
     givenOsIs(Os::windows);
-    whenTypesNotAllowed(TypesNotAllowed::network);
+    whenNonHdd(true);
+    whenNetwork(false);
     whenMultipleInstancesFlagIs(false);
     whenPathsRequested();
 
@@ -216,19 +224,21 @@ TEST_F(Filter, Windows_networkNotAllowed_noMultipleInstances)
 TEST_F(Filter, Windows_removableNotAllowed_noMultipleInstances)
 {
     givenOsIs(Os::windows);
-    whenTypesNotAllowed(TypesNotAllowed::removable);
+    whenNonHdd(true);
+    whenRemovable(false);
     whenMultipleInstancesFlagIs(false);
     whenPathsRequested();
 
     thenNumberOfStoragesReturnedShouldBeEqualTo(3);
-    thenThereShouldBeNoThisPath("E:\\");
+    thenThereShouldBeNoThisPath("E");
     thenPathsShouldBeAmendedCorrectly();
 }
+
 
 TEST_F(Filter, Windows_allAllowed_MultipleInstances)
 {
     givenOsIs(Os::windows);
-    whenTypesNotAllowed(TypesNotAllowed::none);
+    whenNonHdd(true);
     whenMultipleInstancesFlagIs(true);
     whenPathsRequested();
 
@@ -239,7 +249,7 @@ TEST_F(Filter, Windows_allAllowed_MultipleInstances)
 TEST_F(Filter, Linux_allAllowed_noMultipleInstances)
 {
     givenOsIs(Os::other);
-    whenTypesNotAllowed(TypesNotAllowed::none);
+    whenNonHdd(true);
     whenMultipleInstancesFlagIs(false);
     whenPathsRequested();
 

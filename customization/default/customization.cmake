@@ -13,6 +13,7 @@ set(short.company.name "Nx")
 set(liteDeviceName "nx1")
 set(cloudName "Nx Cloud")
 set(uri.protocol "nx-vms")
+set(build_nxtool ON)
 
 # Default settings
 set(backgroundImage
@@ -78,7 +79,6 @@ set(freeLicenseKey "0000-0000-0000-0005")
 # Installer Customizations
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation en_US)

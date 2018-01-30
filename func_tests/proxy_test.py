@@ -1,6 +1,8 @@
 """Test proxy request feature (request with X-server-guid HTTP header)."""
+import pytest
 
 
+@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-8259")
 def test_proxy_light_request(server_factory, http_schema):
     one = server_factory('one', http_schema=http_schema)
     two = server_factory('two', http_schema=http_schema)

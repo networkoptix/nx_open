@@ -141,13 +141,16 @@ public:
     QString getDataDirectory() const;
 
     std::chrono::milliseconds hlsTargetDuration() const;
-
     std::chrono::milliseconds delayBeforeSettingMasterFlag() const;
+
+    void close();
+    void reopen(const QString& roFile, const QString& rwFile);
 
     nx::analytics::storage::Settings analyticEventsStorage() const;
 
     static QString defaultROSettingsFilePath();
     static QString defaultRunTimeSettingsFilePath();
+    static QString defaultConfigDirectory();
 
 private:
     void initializeROSettingsFromConfFile( const QString& fileName );

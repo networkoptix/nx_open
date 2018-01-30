@@ -33,7 +33,7 @@ public:
     bool licenseUsed; /* Is not used for now --gdm*/
     bool cameraControlDisabled;
     QnScheduleTaskList scheduleTasks;
-    Qn::SecondStreamQuality secondaryQuality;
+    bool disableDualStreaming;
     int minDays;
     int maxDays;
     QnUuid preferredServerId;

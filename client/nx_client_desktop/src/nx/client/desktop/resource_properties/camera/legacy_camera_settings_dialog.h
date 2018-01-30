@@ -46,7 +46,7 @@ protected:
 
 private slots:
     void at_settingsWidget_hasChangesChanged();
-    void at_settingsWidget_modeChanged();
+    void updateButtonsVisibility();
 
     void at_diagnoseButton_clicked();
     void at_rulesButton_clicked();

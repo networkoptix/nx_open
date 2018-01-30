@@ -21,9 +21,7 @@
 namespace nx {
 namespace cdb {
 
-namespace conf {
-class Settings;
-} // namespace conf
+namespace conf { class Settings; }
 
 class AbstractEmailManager
 {

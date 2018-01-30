@@ -291,7 +291,7 @@ private:
     {
         using namespace std::placeholders;
 
-        const auto createClientSessionPath = 
+        const auto createClientSessionPath =
             nx::network::http::rest::substituteParameters(
                 nx::cloud::relay::api::kServerClientSessionsPath, {kServerId});
 
@@ -299,13 +299,13 @@ private:
             nx::network::url::normalizePath(
                 kRelayApiPrefix + nx::String("/") +
                 createClientSessionPath),
-            QByteArray("{ \"sessionId\": \"") + kRelaySessionId + 
+            QByteArray("{ \"sessionId\": \"") + kRelaySessionId +
                 QByteArray("\", \"sessionTimeout\": \"100\" }"),
             "application/json");
 
         m_realRelay.registerRequestProcessorFunc(
             nx::network::url::normalizePath(
-                kRelayApiPrefix + nx::String("/") + 
+                kRelayApiPrefix + nx::String("/") +
                 nx::network::http::rest::substituteParameters(
                     nx::cloud::relay::api::kClientSessionConnectionsPath, {kRelaySessionId})),
             std::bind(&RelayConnectorRedirect::upgradeConnection, this, _1, _2, _3, _4, _5));

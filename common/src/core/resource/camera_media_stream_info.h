@@ -5,19 +5,19 @@ extern "C"
     #include <libavformat/avformat.h>
 }
 
+#include <QtCore/QSize>
+
+#include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
 
 class CameraMediaStreamInfo
 {
 public:
-    static const int PRIMARY_STREAM_INDEX = 0;
-    static const int SECONDARY_STREAM_INDEX = 1;
-
     static const QLatin1String anyResolution;
     static QString resolutionToString( const QSize& resolution = QSize() );
 
     //!0 - primary stream, 1 - secondary stream
-    int encoderIndex;
+    Qn::StreamIndex encoderIndex;
     //!has format "1920x1080" or "*" to notify that any resolution is supported
     QString resolution;
     //!transport method that can be used to receive this stream
@@ -35,7 +35,7 @@ public:
     std::map<QString, QString> customStreamParams;
 
     CameraMediaStreamInfo(
-        int _encoderIndex = -1,
+        Qn::StreamIndex _encoderIndex = Qn::StreamIndex::undefined,
         const QSize& _resolution = QSize(),
         AVCodecID _codec = AV_CODEC_ID_NONE)
         :
@@ -49,7 +49,7 @@ public:
 
     template<class CustomParamDictType>
     CameraMediaStreamInfo(
-        int _encoderIndex,
+        Qn::StreamIndex _encoderIndex,
         const QSize& _resolution,
         AVCodecID _codec,
         CustomParamDictType&& _customStreamParams )
@@ -82,7 +82,7 @@ public:
 class CameraBitrateInfo
 {
 public:
-    int encoderIndex;
+    Qn::StreamIndex encoderIndex;
     QString timestamp;
 
     float rawSuggestedBitrate;  //< Megabits per second
@@ -99,7 +99,7 @@ public:
     int numberOfChannels;
     bool isConfigured;
 
-    CameraBitrateInfo(int index = -1, QString time = QString())
+    CameraBitrateInfo(Qn::StreamIndex index = Qn::StreamIndex::undefined, QString time = QString())
         : encoderIndex(index)
         , timestamp(time)
         , rawSuggestedBitrate(-1)

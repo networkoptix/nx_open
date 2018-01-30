@@ -32,7 +32,6 @@ private:
 
     QString serializeStreamParams(
         const QnLiveStreamParams& params,
-        const QSize& resolution,
         int profileIndex) const;
 };
 

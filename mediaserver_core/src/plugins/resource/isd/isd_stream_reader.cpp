@@ -29,7 +29,6 @@ QnISDStreamReader::~QnISDStreamReader()
 
 QString QnISDStreamReader::serializeStreamParams(
     const QnLiveStreamParams& params,
-    const QSize& resolution,
     int profileIndex) const
 {
     QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
@@ -38,10 +37,10 @@ QString QnISDStreamReader::serializeStreamParams(
     QTextStream t(&result);
 
     static const int kMinBitrate = 256; //< kbps
-    const int desiredBitrateKbps = std::max(kMinBitrate, res->suggestBitrateKbps(resolution, params, getRole()));
+    const int desiredBitrateKbps = std::max(kMinBitrate, res->suggestBitrateKbps(params, getRole()));
 
-    t << "VideoInput.1.h264." << profileIndex << ".Resolution=" << resolution.width()
-      << "x" << resolution.height() << "\r\n";
+    t << "VideoInput.1.h264." << profileIndex << ".Resolution=" << params.resolution.width()
+      << "x" << params.resolution.height() << "\r\n";
     t << "VideoInput.1.h264." << profileIndex << ".FrameRate=" << params.fps << "\r\n";
     t << "VideoInput.1.h264." << profileIndex << ".BitrateControl=vbr\r\n";
     t << "VideoInput.1.h264." << profileIndex << ".BitrateVariableMin=" << desiredBitrateKbps / 5 << "\r\n";
@@ -50,8 +49,9 @@ QString QnISDStreamReader::serializeStreamParams(
     return result;
 }
 
-CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
+CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& liveStreamParams)
 {
+    QnLiveStreamParams params = liveStreamParams;
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
@@ -76,9 +76,11 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
         profileIndex = 1;
     }
 
+    params.resolution = resolution;
+
     if (isCameraControlRequired)
     {
-        QString streamProfileStr = serializeStreamParams(params, resolution, profileIndex);
+        QString streamProfileStr = serializeStreamParams(params, profileIndex);
         status = http.doPOST(QByteArray("/api/param.cgi"), streamProfileStr);
         QnSleep::msleep(100);
     }

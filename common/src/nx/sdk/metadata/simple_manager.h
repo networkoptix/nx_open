@@ -17,6 +17,8 @@ namespace metadata {
 class SimpleManager: public nxpt::CommonRefCounter<AbstractConsumingMetadataManager>
 {
 protected:
+    virtual std::string capabilitiesManifest() = 0;
+
     /**
      * Accept next video frame for processing.
      */
@@ -48,6 +50,10 @@ public:
         nxpl::NX_GUID* eventTypeList, int eventTypeListSize) override;
 
     virtual Error stopFetchingMetadata() override;
+
+    virtual const char* capabilitiesManifest(nx::sdk::Error* error) override;
+
+    virtual void freeManifest(const char* data) override;
 
 private:
     AbstractMetadataHandler* m_handler = nullptr;

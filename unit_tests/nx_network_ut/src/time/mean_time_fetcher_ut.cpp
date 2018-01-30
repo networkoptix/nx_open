@@ -26,5 +26,5 @@ INSTANTIATE_TYPED_TEST_CASE_P(
     MeanTimeFetcher);
 
 } // namespace test
-} // namespace nx
 } // namespace network
+} // namespace nx

@@ -96,8 +96,7 @@ def build_msi(
             target_file=output_file,
             sign_description=code_signing['sign_description'],
             sign_password=code_signing['sign_password'],
-            main_certificate=code_signing['main_certificate'],
-            additional_certificate=code_signing['additional_certificate'])
+            certificate=code_signing['certificate'])
 
 '''
 def build_exe(project, filename, components, candle_variables):

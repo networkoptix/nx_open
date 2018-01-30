@@ -38,7 +38,7 @@ using namespace nx::sdk::metadata;
 
 MetadataPlugin::MetadataPlugin()
 {
-    QFile file(":/manifest.json");
+    QFile file(":/hikvision/manifest.json");
     if (file.open(QFile::ReadOnly))
         m_manifest = file.readAll();
     {
@@ -150,6 +150,16 @@ const char* MetadataPlugin::capabilitiesManifest(Error* error) const
 
 QList<QnUuid> MetadataPlugin::parseSupportedEvents(const QByteArray& data)
 {
+    auto eventDescriptorByInternalName = [this](const QString& internalName)
+    {
+        for (const auto& hikvisionEvent : m_driverManifest.outputEventTypes)
+        {
+            if (hikvisionEvent.internalName == internalName)
+                return hikvisionEvent;
+        }
+        return Hikvision::EventDescriptor();
+    };
+
     QList<QnUuid> result;
     auto supportedEvents = hikvision::AttributesParser::parseSupportedEventsXml(data);
     if (!supportedEvents)
@@ -158,7 +168,13 @@ QList<QnUuid> MetadataPlugin::parseSupportedEvents(const QByteArray& data)
     {
         const QnUuid eventTypeId = m_driverManifest.eventTypeByInternalName(internalName);
         if (!eventTypeId.isNull())
+        {
             result << eventTypeId;
+            auto descriptor = m_driverManifest.eventDescriptorById(eventTypeId);
+            descriptor = eventDescriptorByInternalName(descriptor.dependedEvent);
+            if (!descriptor.typeId.isNull())
+                result << descriptor.typeId;
+        }
     }
     return result;
 }
@@ -187,7 +203,6 @@ boost::optional<QList<QnUuid>> MetadataPlugin::fetchSupportedEvents(
         arg(resourceInfo.url).arg(buffer));
 
     data.supportedEventTypes = parseSupportedEvents(buffer);
-
     return data.supportedEventTypes;
 }
 

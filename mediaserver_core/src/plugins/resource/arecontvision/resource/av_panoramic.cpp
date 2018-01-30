@@ -80,7 +80,8 @@ bool QnArecontPanoramicResource::getParamPhysicalByChannel(int channel, const QS
     return true;
 }
 
-bool QnArecontPanoramicResource::setParamPhysical(const QString &id, const QString &value) {
+bool QnArecontPanoramicResource::setApiParameter(const QString &id, const QString &value)
+{
     if (setSpecialParam(id, value))
         return true;
     QUrl devUrl(getUrl());
@@ -99,7 +100,8 @@ bool QnArecontPanoramicResource::setParamPhysical(const QString &id, const QStri
     return true;
 }
 
-bool QnArecontPanoramicResource::setSpecialParam(const QString &id, const QString& value) {
+bool QnArecontPanoramicResource::setSpecialParam(const QString &id, const QString& value)
+{
     if (id == lit("resolution"))
     {
         if (value == lit("half"))
@@ -117,16 +119,22 @@ bool QnArecontPanoramicResource::setSpecialParam(const QString &id, const QStrin
     return false;
 }
 
-CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnArecontPanoramicResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex streamIndex)
 {
-    QnPhysicalCameraResource::initInternal();
-    const CameraDiagnostics::Result result = QnPlAreconVisionResource::initInternal();
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
+CameraDiagnostics::Result QnArecontPanoramicResource::initializeCameraDriver()
+{
+    const CameraDiagnostics::Result result = QnPlAreconVisionResource::initializeCameraDriver();
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
 
     setRegister(3, 100, 10); // sets I frame frequency to 10
 
-    setParamPhysical(lit("cnannelenable"), QString::number(15)); // to enable all channels
+    setApiParameter(lit("cnannelenable"), QString::number(15)); // to enable all channels
 
     getVideoLayout(0);
 

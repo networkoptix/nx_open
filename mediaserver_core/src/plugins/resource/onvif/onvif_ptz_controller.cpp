@@ -22,22 +22,18 @@ namespace {
 static const Namespace kOverridenNamespaces[] = {
     {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", nullptr, nullptr},
     {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", nullptr, nullptr},
-    {"onvifPtz", "http://www.onvif.org/ver20/ptz/wsdl", nullptr, nullptr},
+    {"xsi", "http://www.w3.org/2001/XMLSchema-instance", nullptr, nullptr},
+    {"xsd", "http://www.w3.org/2001/XMLSchema", nullptr, nullptr},
     {
         "wsse",
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
         nullptr,
         nullptr
     },
+    {"onvifPtz", "http://www.onvif.org/ver20/ptz/wsdl", nullptr, nullptr},
     {
         "wsu",
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
-        nullptr,
-        nullptr
-    },
-    {
-        "xsi",
-        "http://www.w3.org/2001/XMLSchema-instance",
         nullptr,
         nullptr
     },
@@ -479,22 +475,13 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
     _onvifPtz__AbsoluteMoveResponse response;
 
     // Remove unneeded namespaces since they can cause request failure on some cameras.
-    const auto currentNamespaces = ptz.getProxy()->soap->namespaces;
-    const auto guard = makeScopeGuard(
-        [&ptz, currentNamespaces]()
-        {
-            // Restore namespaces on exit.
-            ptz.getProxy()->soap->namespaces = currentNamespaces;
-        });
+    soap_set_namespaces(ptz.getProxy()->soap, kOverridenNamespaces);
 
-    ptz.getProxy()->soap->namespaces = kOverridenNamespaces;
-
-    if (ptz.doAbsoluteMove(request, response) != SOAP_OK) {
+    const bool result = ptz.doAbsoluteMove(request, response) == SOAP_OK;
+    if (!result)
         qnWarning("Execution of PTZ absolute move command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
-        return false;
-    }
 
-    return true;
+    return result;
 }
 
 bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const

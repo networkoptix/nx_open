@@ -12,8 +12,8 @@
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/counter.h>
+#include <nx/network/cloud/mediator/api/listening_peer.h>
 
-#include "data/listening_peer.h"
 #include "request_processor.h"
 #include "settings.h"
 
@@ -39,7 +39,7 @@ public:
         AbstractRelayClusterClient* const relayClusterClient);
     virtual ~PeerRegistrator() override;
 
-    data::ListeningPeers getListeningPeers() const;
+    api::ListeningPeers getListeningPeers() const;
 
     void bind(
         const ConnectionStrongRef& connection,
