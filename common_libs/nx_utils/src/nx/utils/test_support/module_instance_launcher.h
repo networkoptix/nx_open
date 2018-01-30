@@ -24,7 +24,7 @@ public:
     {
     }
 
-    ~ModuleLauncher()
+    virtual ~ModuleLauncher()
     {
         stop();
         clearArgs();
