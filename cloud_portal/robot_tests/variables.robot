@@ -44,10 +44,14 @@ ${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || register
 ${ACTIVATION SUCCESS}                 //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), 'Your account is successfully activated')]
 ${SUCCESS LOG IN BUTTON}              //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), 'Your account is successfully activated')]//a[@href='/login']
 
+${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
 ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//button[@ng-click='share()']
 ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
 ${DELETE USER BUTTON}                 //button[@ng-click='ok()' and contains(text(), 'Delete')]
 ${DELETE USER CANCEL BUTTON}          //button[@ng-click='cancel()' and contains(text(), 'Cancel')]
+
+${DISCONNECT FORM}                    //form[@name='disconnectForm']
+${DISCONNECT FORM HEADER}            //h1['Disconnect System from Nx Cloud?']
 
 ${JUMBOTRON}                          //div[@class='jumbotron']
 ${PROMO BLOCK}                        //div[contains(@class,'promo-block') and not(contains(@class, 'col-sm-4'))]
@@ -95,10 +99,18 @@ ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfg
 
 ${EMAIL VIEWER}                       noptixqa+viewer@gmail.com
 ${EMAIL OWNER}                        noptixqa+owner@gmail.com
+${EMAIL ADMIN}                        noptixqa+admin@gmail.com
 ${UNREGISTERED EMAIL}                 noptixqa+unregistered@gmail.com
 ${BASE PASSWORD}                      qweasd123
 
 ${AUTO TESTS}                         //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..
+${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]
+${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/following-sibling::span[contains(@class,'user-name') and contains(text(),'TestFirstName TestLastName')]
+${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..//button[@ng-click='checkForm()']
+
+#AUTOTESTS (with no space) is an offline system used for testing offline status on the systems page
+${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/following-sibling::span[contains(text(), 'offline')]
+${AUTOTESTS OPEN NX OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/..//button[@ng-click='checkForm()']
 
 #ASCII
 ${ESCAPE}                             \\27
