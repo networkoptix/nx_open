@@ -3,6 +3,7 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
 #include <utils/xml/camera_advanced_param_reader.h>
+#include <providers/live_stream_provider.h>
 
 #include "camera_mock.h"
 
@@ -29,12 +30,12 @@ public:
         m_secondaryProvider->setOwner(toSharedPointer());
     }
 
-    virtual QSharedPointer<QnLiveStreamProvider> getPrimaryReader() override
+    QSharedPointer<QnLiveStreamProvider> getPrimaryReader()
     {
         return m_primaryProvider;
     }
 
-    virtual QSharedPointer<QnLiveStreamProvider> getSecondaryReader() override
+    QSharedPointer<QnLiveStreamProvider> getSecondaryReader()
     {
         return m_secondaryProvider;
     }

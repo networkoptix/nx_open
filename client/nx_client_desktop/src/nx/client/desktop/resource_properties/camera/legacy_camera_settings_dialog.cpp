@@ -97,7 +97,8 @@ LegacyCameraSettingsDialog::LegacyCameraSettingsDialog(QWidget *parent):
     layout->addWidget(m_buttonBox);
 
     connect(m_settingsWidget, &CameraSettingsWidget::hasChangesChanged, this, &LegacyCameraSettingsDialog::at_settingsWidget_hasChangesChanged);
-    connect(m_settingsWidget, &QnCameraSettingsWidget::modeChanged, this, &CameraSettingsDialog::updateButtonsVisibility);
+    connect(m_settingsWidget, &CameraSettingsWidget::modeChanged, this,
+        &LegacyCameraSettingsDialog::updateButtonsVisibility);
 
     connect(m_openButton, &QPushButton::clicked, this, &LegacyCameraSettingsDialog::at_openButton_clicked);
     connect(m_diagnoseButton, &QPushButton::clicked, this, &LegacyCameraSettingsDialog::at_diagnoseButton_clicked);

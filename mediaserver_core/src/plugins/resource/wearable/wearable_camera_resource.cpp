@@ -1,6 +1,6 @@
 #include "wearable_camera_resource.h"
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 const QString QnWearableCameraResource::kManufacture = lit("WEARABLE_CAMERA");
 using namespace nx::mediaserver::resource;

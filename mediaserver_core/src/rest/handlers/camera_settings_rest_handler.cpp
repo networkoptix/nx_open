@@ -24,6 +24,8 @@ static const QString kCameraIdParam = lit("cameraId");
 static const QString kDeprecatedResIdParam = lit("res_id");
 static const std::chrono::seconds kMaxWaitTimeout(15);
 
+using StatusCode = nx::network::http::StatusCode::Value;
+
 QnCameraSettingsRestHandler::QnCameraSettingsRestHandler():
     base_type(),
     m_paramsReader(new QnCachingCameraAdvancedParamsReader())
@@ -52,12 +54,12 @@ int QnCameraSettingsRestHandler::executeGet(
         if (notFoundCameraId.isNull())
         {
             result.setError(QnRestResult::MissingParameter, lit("Camera is not specified"));
-            return nx_http::StatusCode::ok;
+            return StatusCode::ok;
         }
         else
         {
             result.setError(QnRestResult::InvalidParameter, lm("No camera %1").arg(notFoundCameraId));
-            return nx_http::StatusCode::ok;
+            return StatusCode::ok;
         }
     }
 
@@ -66,7 +68,7 @@ int QnCameraSettingsRestHandler::executeGet(
         camera,
         Qn::Permission::ReadPermission))
     {
-        return nx::network::http::StatusCode::forbidden;
+        return StatusCode::forbidden;
     }
 
     // Clean params that are not keys.
@@ -90,7 +92,7 @@ int QnCameraSettingsRestHandler::executeGet(
     if (locParams.empty())
     {
         result.setError(QnRestResult::MissingParameter, lit("No valid camera parameters in request"));
-        return nx_http::StatusCode::ok;
+        return StatusCode::ok;
     }
 
     QnCameraAdvancedParamValueMap values;
@@ -137,19 +139,19 @@ int QnCameraSettingsRestHandler::executeGet(
     else
     {
         result.setError(QnRestResult::InvalidParameter, lm("Unknown command: %1").arg(action));
-        return nx_http::StatusCode::ok;
+        return StatusCode::ok;
     }
 
     if (operationPromise.get_future().wait_for(kMaxWaitTimeout) != std::future_status::ready)
     {
         operationGuard.reset();
         result.setError(QnRestResult::CantProcessRequest, lit("Timed out"));
-        return nx_http::StatusCode::ok;
+        return StatusCode::ok;
     }
 
     NX_DEBUG(this, lm("Request %1 processed successfully for camera %2: %3")
         .args(path, camera->getId(), containerString(values)));
 
     result.setReply(values.toValueList());
-    return nx_http::StatusCode::ok;
+    return StatusCode::ok;
 }

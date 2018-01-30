@@ -98,7 +98,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(QWidget* parent):
     connect(ui->checkBoxDisableNativePtzPresets, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
 
     connect(ui->secondStreamDisableCheckBox, &QCheckBox::stateChanged,
-        this, &QnCameraExpertSettingsWidget::at_dataChanged);
+        this, &CameraExpertSettingsWidget::at_dataChanged);
 
     connect(
         ui->checkBoxForceMotionDetection, &QCheckBox::stateChanged,

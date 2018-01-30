@@ -60,7 +60,7 @@ public:
                     resources.push_back(resource);
             }
 
-            if (!messages::Resources::stopWearableUploads(mainWindow(), resources))
+            if (!messages::Resources::stopWearableUploads(mainWindowWidget(), resources))
                 return false;
         }
 
@@ -187,7 +187,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     QString errorMessage;
     if (!qnClientModule->wearableManager()->addUpload(camera, fileName, &errorMessage))
     {
-        QnMessageBox::critical(mainWindow(), errorMessage);
+        QnMessageBox::critical(mainWindowWidget(), errorMessage);
         return;
     }
 }

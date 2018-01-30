@@ -42,7 +42,7 @@ const QString QnActiResourceSearcher::kSystemInfoProductionIdParamName("producti
 QnActiResourceSearcher::QnActiResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule),
-    nx_upnp::SearchAutoHandler(kUpnpBasicDeviceType)
+    base_type(kUpnpBasicDeviceType)
 {
     m_resTypeId = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
 }

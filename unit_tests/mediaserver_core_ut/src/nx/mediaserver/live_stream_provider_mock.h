@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/utils/std/cpp14.h>
+#include <providers/live_stream_provider.h>
 
 namespace nx {
 namespace mediaserver {

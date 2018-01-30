@@ -205,7 +205,7 @@ void QnLiveStreamProvider::setPrimaryStreamParams(const QnLiveStreamParams& para
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        if (auto owner = getOwner())
+        if (auto owner = getOwner().dynamicCast<QnVideoCamera>())
         {
             QnLiveStreamProviderPtr lp = owner->getSecondaryReader();
             if (lp)
@@ -446,12 +446,15 @@ void QnLiveStreamProvider::onPrimaryFpsChanged(int primaryFps)
     {
         // noSharing
     }
-    m_liveParams.fps = qBound(MIN_SECOND_STREAM_FPS, newSecondaryStreamFps, m_cameraRes->getMaxFps());
+    m_liveParams.fps = qBound(
+        QnLiveStreamParams::kMinSecondStreamFps,
+        newSecondaryStreamFps,
+        m_cameraRes->getMaxFps());
 }
 
 QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
 {
-    QnMutexLocker lock(&m_livemutex);
+    QnMutexLocker lock(&m_liveMutex);
     return mergeWithAdvancedParams(m_liveParams);
 }
 

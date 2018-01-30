@@ -143,14 +143,14 @@ void CameraAdvancedSettingsWidget::updateFromResource()
 }
 
 
-bool QnCameraAdvancedSettingsWidget::hasManualPage() const
+bool CameraAdvancedSettingsWidget::hasManualPage() const
 {
     if (!m_camera || !isStatusValid(m_camera->getStatus()))
         return false;
     return !m_camera->getProperty(Qn::CAMERA_ADVANCED_PARAMETERS).isEmpty();
 }
 
-bool QnCameraAdvancedSettingsWidget::hasWebPage() const
+bool CameraAdvancedSettingsWidget::hasWebPage() const
 {
     if (!m_camera || !isStatusValid(m_camera->getStatus()))
         return false;

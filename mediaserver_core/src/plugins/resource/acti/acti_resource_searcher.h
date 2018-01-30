@@ -10,9 +10,9 @@
 
 class QnActiResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx_upnp::SearchAutoHandler
+    public nx::network::upnp::SearchAutoHandler
 {
-    using base_type = nx_upnp::SearchAutoHandler;
+    using base_type = nx::network::upnp::SearchAutoHandler;
 public:
     QnActiResourceSearcher(QnCommonModule* commonModule);
     virtual ~QnActiResourceSearcher();

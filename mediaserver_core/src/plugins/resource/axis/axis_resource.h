@@ -11,9 +11,9 @@
 #include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/network/aio/timer.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/http/multipart_content_parser.h>
-#include <nx/network/simple_http_client.h>
 #include <nx/streaming/media_data_packet.h>
 
 class QnAxisPtzController;
