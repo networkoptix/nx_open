@@ -3,6 +3,7 @@
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/mediator/api/mediator_api_client.h>
+#include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_global.h>
@@ -23,6 +24,7 @@ namespace test {
 
 static const char* kCloudModulesXmlPath = "/MediatorConnector/cloud_modules.xml";
 
+template<typename CloudModuleListGenerator>
 class MediatorConnector:
     public ::testing::Test
 {
@@ -107,7 +109,8 @@ protected:
         {
             Client mediatorClient(nx::network::url::Builder()
                 .setScheme(nx_http::kUrlSchemeName)
-                .setEndpoint(m_mediator->moduleInstance()->impl()->httpEndpoints().front()));
+                .setEndpoint(m_mediator->moduleInstance()->impl()->httpEndpoints().front())
+                .setPath(api::kMediatorApiPrefix));
             const auto response = mediatorClient.getListeningPeers();
             ASSERT_EQ(nx_http::StatusCode::ok, std::get<0>(response));
             const auto listeningPeers = std::get<1>(response);
@@ -165,27 +168,8 @@ private:
 
     std::unique_ptr<nx_http::AbstractMsgBodySource> generateCloudModuleXml()
     {
-        SocketAddress mediatorStunEndpoint;
-        if (m_mediator)
-        {
-            mediatorStunEndpoint =
-                m_mediator->moduleInstance()->impl()->stunEndpoints().front();
-        }
-        else
-        {
-            mediatorStunEndpoint = SocketAddress(
-                HostAddress::localhost,
-                nx::utils::random::number<int>(30000, 40000));
-        }
-
-        auto modulesXml = lm(
-            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n"
-            "<sequence>\r\n"
-                "<set resName=\"hpm\" resValue=\"stun://%1\"/>\r\n"
-            "</sequence>\r\n").args(mediatorStunEndpoint).toUtf8();
-        return std::make_unique<nx_http::BufferSource>(
-            "text/xml",
-            std::move(modulesXml));
+        CloudModuleListGenerator cloudModuleListGenerator;
+        return cloudModuleListGenerator.get(m_mediator.get());
     }
 
     void intializeMediatorConnector()
@@ -215,24 +199,116 @@ private:
     }
 };
 
-TEST_F(MediatorConnector, reloads_cloud_modules_list_after_loosing_connection_to_mediator)
+TYPED_TEST_CASE_P(MediatorConnector);
+
+//-------------------------------------------------------------------------------------------------
+
+TYPED_TEST_P(
+    MediatorConnector,
+    reloads_cloud_modules_list_after_loosing_connection_to_mediator)
 {
-    givenPeerConnectedToMediator();
+    this->givenPeerConnectedToMediator();
 
-    whenMediatorUrlEndpointIsChanged();
+    this->whenMediatorUrlEndpointIsChanged();
 
-    thenConnectionToMediatorIsReestablished();
-    andNewMediatorEndpointIsAvailable();
+    this->thenConnectionToMediatorIsReestablished();
+    this->andNewMediatorEndpointIsAvailable();
 }
 
-TEST_F(MediatorConnector, reloads_cloud_modules_list_after_each_failure_to_connect_to_mediator)
+TYPED_TEST_P(
+    MediatorConnector,
+    reloads_cloud_modules_list_after_each_failure_to_connect_to_mediator)
 {
-    givenPeerFailedToConnectToMediator();
-    whenStartMediator();
+    this->givenPeerFailedToConnectToMediator();
+    this->whenStartMediator();
 
-    thenConnectionToMediatorIsReestablished();
-    andNewMediatorEndpointIsAvailable();
+    this->thenConnectionToMediatorIsReestablished();
+    this->andNewMediatorEndpointIsAvailable();
 }
+
+REGISTER_TYPED_TEST_CASE_P(MediatorConnector,
+    reloads_cloud_modules_list_after_loosing_connection_to_mediator,
+    reloads_cloud_modules_list_after_each_failure_to_connect_to_mediator);
+
+//-------------------------------------------------------------------------------------------------
+
+class MediatorStunEndpointListGenerator
+{
+public:
+    std::unique_ptr<nx_http::AbstractMsgBodySource> get(
+        nx::utils::test::ModuleLauncher<MediatorProcessPublic>* mediator)
+    {
+        SocketAddress mediatorStunEndpoint;
+        if (mediator)
+        {
+            mediatorStunEndpoint =
+                mediator->moduleInstance()->impl()->stunEndpoints().front();
+        }
+        else
+        {
+            mediatorStunEndpoint = SocketAddress(
+                HostAddress::localhost,
+                nx::utils::random::number<int>(30000, 40000));
+        }
+
+        auto modulesXml = lm(
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n"
+            "<sequence>\r\n"
+            "<set resName=\"hpm\" resValue=\"stun://%1\"/>\r\n"
+            "</sequence>\r\n").args(mediatorStunEndpoint).toUtf8();
+        return std::make_unique<nx_http::BufferSource>(
+            "text/xml",
+            std::move(modulesXml));
+    }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    UsingMediatorStunEndpoint,
+    MediatorConnector,
+    MediatorStunEndpointListGenerator);
+
+//-------------------------------------------------------------------------------------------------
+
+class MediatorHttpEndpointListGenerator
+{
+public:
+    std::unique_ptr<nx_http::AbstractMsgBodySource> get(
+        nx::utils::test::ModuleLauncher<MediatorProcessPublic>* mediator)
+    {
+        SocketAddress mediatorStunEndpoint;
+        SocketAddress mediatorHttpEndpoint;
+        if (mediator)
+        {
+            mediatorHttpEndpoint = mediator->moduleInstance()->impl()->httpEndpoints().front();
+            mediatorStunEndpoint = mediator->moduleInstance()->impl()->stunEndpoints().front();
+        }
+        else
+        {
+            mediatorStunEndpoint = SocketAddress(
+                HostAddress::localhost,
+                nx::utils::random::number<int>(30000, 40000));
+            mediatorHttpEndpoint = mediatorStunEndpoint;
+        }
+
+        auto modulesXml = lm(
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n"
+            "<sequence>\r\n"
+                "<sequence>\r\n"
+                    "<set resName=\"hpm.tcpUrl\" resValue=\"http://%1%2\"/>\r\n"
+                    "<set resName=\"hpm.udpUrl\" resValue=\"stun://%3\"/>\r\n"
+                "</sequence>\r\n"
+            "</sequence>\r\n"
+            ).args(mediatorHttpEndpoint, kMediatorApiPrefix, mediatorStunEndpoint).toUtf8();
+        return std::make_unique<nx_http::BufferSource>(
+            "text/xml",
+            std::move(modulesXml));
+    }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    UsingMediatorHttpEndpoint,
+    MediatorConnector,
+    MediatorHttpEndpointListGenerator);
 
 } // namespace test
 } // namespace api
