@@ -179,6 +179,11 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
         /*selectedFilter*/ nullptr,
         QnCustomFileDialog::fileDialogOptions()
     );
+
+    // TODO: #wearable requested by rvasilenko as copypaste from totalcmd doesn't work without
+    // this line. Maybe move directly to QnFileDialog?
+    fileName = fileName.trimmed();
+
     if (fileName.isEmpty())
         return;
 
