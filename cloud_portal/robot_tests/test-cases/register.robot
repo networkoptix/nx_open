@@ -200,6 +200,7 @@ should open Terms and conditions in a new page
 should suggest user to log out, if he was logged in and goes to registration link
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL VIEWER}    ${password}
+    Validate Log In
     Go To    ${url}/register
     Wait Until Element Is Visible    ${LOGGED IN CONTINUE BUTTON}
     Element Should Be Visible    ${LOGGED IN CONTINUE BUTTON}
