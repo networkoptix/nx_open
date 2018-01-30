@@ -1,10 +1,13 @@
 #include "mediator_connector.h"
 
 #include <nx/network/socket_factory.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
+
+#include "mediator/api/mediator_api_http_paths.h"
 
 namespace nx {
 namespace hpm {
@@ -195,9 +198,13 @@ void MediatorConnector::fetchEndpoint()
 
 void MediatorConnector::connectToMediatorAsync()
 {
+    auto createStunTunnelUrl =
+        nx::network::url::Builder(*m_mediatorUrl)
+            .appendPath(api::kStunOverHttpTunnelPath).toUrl();
+
     m_stunClient->connect(
-        *m_mediatorUrl,
-        [this](SystemError::ErrorCode code)
+        createStunTunnelUrl,
+        [this, createStunTunnelUrl](SystemError::ErrorCode code)
         {
             if (code == SystemError::noError)
             {
@@ -208,7 +215,7 @@ void MediatorConnector::connectToMediatorAsync()
             else
             {
                 NX_DEBUG(this, lm("Failed to connect to mediator on %1. %2")
-                    .args(*m_mediatorUrl, SystemError::toString(code)));
+                    .args(createStunTunnelUrl, SystemError::toString(code)));
                 reconnectToMediator();
             }
 
