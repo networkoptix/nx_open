@@ -872,6 +872,18 @@ to view more bookmarks</source>
       <source>Make Showreel</source>
       <translation>Làm Showreel</translation>
     </message>
+    <message>
+      <source>Wearable Camera...</source>
+      <translation type="unfinished">Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>Upload to Wearable Camera...</source>
+      <translation type="unfinished">Upload to Wearable Camera...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -1290,6 +1302,17 @@ to view more bookmarks</source>
     <message>
       <source>Folder not found</source>
       <translation>Không tìm thấy thư mục</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnArchiveLengthWidget</name>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices.</source>
+      <translation>Giá trị nhỏ nhất có thể dẫn đến giảm độ dài lưu trữ trên các thiết bị khác.</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras.</source>
+      <translation>Giá trị nhỏ nhất có thể dẫn đến giảm độ dài lưu trữ trên camera.</translation>
     </message>
   </context>
   <context>
@@ -2396,14 +2419,6 @@ to view more bookmarks</source>
       <translation>dựa trên thời gian máy chủ</translation>
     </message>
     <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>Giá trị nhỏ nhất có thể dẫn đến giảm độ dài lưu trữ trên các thiết bị khác.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>Giá trị nhỏ nhất có thể dẫn đến giảm độ dài lưu trữ trên camera.</translation>
-    </message>
-    <message>
       <source>Not enough licenses to enable recording</source>
       <translation>Phần mềm chưa đăng ký bản quyền để thực hiện ghi</translation>
     </message>
@@ -3219,6 +3234,10 @@ to %1</source>
     <message>
       <source>Auto</source>
       <translation>Tự động</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation>Cơ bản</translation>
     </message>
   </context>
   <context>
@@ -4357,6 +4376,10 @@ to %1</source>
       <source>Skip</source>
       <translation>Bỏ qua</translation>
     </message>
+    <message>
+      <source>Close</source>
+      <translation>Đóng cửa</translation>
+    </message>
   </context>
   <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -4429,6 +4452,25 @@ to %1</source>
     <message>
       <source>KB/s</source>
       <translation>KB/s</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnNewWearableCameraDialog</name>
+    <message>
+      <source>Wearable Camera</source>
+      <translation type="unfinished">Wearable Camera</translation>
+    </message>
+    <message>
+      <source>Wearable Camera %1</source>
+      <translation type="unfinished">Wearable Camera %1</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Tên</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty</source>
+      <translation>Tên không thể để trống</translation>
     </message>
   </context>
   <context>
@@ -5872,6 +5914,10 @@ to %1</source>
       <source>Please check authentication information</source>
       <translation>Vui lòng kiểm tra thông tin xác thực</translation>
     </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation type="unfinished">NO LIVE STREAM</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -5899,7 +5945,7 @@ to %1</source>
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
       <translation>
-        <numerusform>%n Tb</numerusform>
+        <numerusform>%n TB</numerusform>
       </translation>
     </message>
     <message>
@@ -6013,6 +6059,14 @@ to %1</source>
     <message>
       <source>Backup completed</source>
       <translation>Sao lưu đã hoàn tất</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>Sẽ không ghi hình khi vô hiệu hóa thiết bị lưu trữ. Tuy nhiên, xóa các video cũ từ bộ nhớ vấn được.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
     </message>
   </context>
   <context>
@@ -6873,6 +6927,34 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnWearableProgressWidget</name>
+    <message>
+      <source>Uploading %1... %2	%p%</source>
+      <translation type="unfinished">Uploading %1... %2	%p%</translation>
+    </message>
+    <message>
+      <source>Finalizing %1... %2	%p</source>
+      <translation type="unfinished">Finalizing %1... %2	%p</translation>
+    </message>
+    <message numerus="yes">
+      <source>(%n more file(s) in queue)</source>
+      <translation type="unfinished">
+        <numerusform>(%n more file(s) in queue)</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableUploadWidget</name>
+    <message>
+      <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Another user is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -7417,6 +7499,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnWorkbenchWearableHandler</name>
+    <message>
+      <source>Could not add wearable camera to server &quot;%1&quot;.</source>
+      <translation type="unfinished">Could not add wearable camera to server &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Open Wearable Camera Recording...</source>
+      <translation type="unfinished">Open Wearable Camera Recording...</translation>
+    </message>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>Tất cả các file(*.*)</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
       <source>New Web Page</source>
@@ -7587,6 +7684,20 @@ to %1</source>
         <numerusform>Xóa %n mục khỏi showreel?</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Video uploading to %n camera(s) will stop:</source>
+      <translation type="unfinished">
+        <numerusform>Video uploading to %n camera(s) will stop:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation type="unfinished">Stop uploading?</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>Dừng lại</translation>
+    </message>
   </context>
   <context>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
@@ -7622,6 +7733,48 @@ to %1</source>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>Để hiển thị các tập tin cục bộ trên bức Video wall, hãy gắn chúng bằng cách sử dụng máy tính nơi Video wall được lưu trữ.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::UploadWorker</name>
+    <message>
+      <source>Could not open file &quot;%1&quot;</source>
+      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not calculate md5 for file &quot;%1&quot;</source>
+      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not create upload on the server side</source>
+      <translation type="unfinished">Could not create upload on the server side</translation>
+    </message>
+    <message>
+      <source>Could not upload file chunk to the server</source>
+      <translation type="unfinished">Could not upload file chunk to the server</translation>
+    </message>
+    <message>
+      <source>Could not check uploaded file on the server</source>
+      <translation type="unfinished">Could not check uploaded file on the server</translation>
+    </message>
+    <message>
+      <source>File was corrupted while being uploaded to the server</source>
+      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WearableWorker</name>
+    <message>
+      <source>File &quot;%1&quot; is not a video file.</source>
+      <translation type="unfinished">File &quot;%1&quot; is not a video file.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
     </message>
   </context>
   <context>

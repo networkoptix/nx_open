@@ -873,6 +873,18 @@ to view more bookmarks</translation>
       <source>Make Showreel</source>
       <translation type="unfinished">Make Showreel</translation>
     </message>
+    <message>
+      <source>Wearable Camera...</source>
+      <translation type="unfinished">Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>Upload to Wearable Camera...</source>
+      <translation type="unfinished">Upload to Wearable Camera...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -1298,6 +1310,17 @@ to view more bookmarks</translation>
     </message>
   </context>
   <context>
+    <name>QnArchiveLengthWidget</name>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices.</source>
+      <translation type="unfinished">High minimum value can lead to archive length decrease on other devices.</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras.</source>
+      <translation type="unfinished">High minimum value can lead to archive length decrease on other cameras.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnAuditItemDelegate</name>
     <message>
       <source>Play</source>
@@ -1490,9 +1513,9 @@ to view more bookmarks</translation>
     </message>
     <message numerus="yes">
       <source>%n action(s)</source>
-      <translation>
-        <numerusform>%n acção</numerusform>
+      <translation type="unfinished">
         <numerusform>%n acções</numerusform>
+        <numerusform>%n action(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -1641,9 +1664,9 @@ to view more bookmarks</translation>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Tem %n notificações</numerusform>
-        <numerusform>Tem %n notificações</numerusform>
+        <numerusform>You have %n notifications</numerusform>
       </translation>
     </message>
   </context>
@@ -1701,16 +1724,16 @@ to view more bookmarks</translation>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 de %n dispositivos</numerusform>
-        <numerusform>%1 de %n dispositivos</numerusform>
+        <numerusform>%1 of %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 de %n câmaras</numerusform>
-        <numerusform>%1 de %n câmaras</numerusform>
+        <numerusform>%1 of %n cameras</numerusform>
       </translation>
     </message>
     <message>
@@ -1723,9 +1746,9 @@ to view more bookmarks</translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 de %n módulos I/O</numerusform>
-        <numerusform>%1 de %n módulos I/O</numerusform>
+        <numerusform>%1 of %n I/O modules</numerusform>
       </translation>
     </message>
     <message>
@@ -1748,9 +1771,9 @@ to view more bookmarks</translation>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
-      <translation>
-        <numerusform>%n Servidor</numerusform>
+      <translation type="unfinished">
         <numerusform>%n Servidores</numerusform>
+        <numerusform>%n Server(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -1787,9 +1810,9 @@ to view more bookmarks</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Câmara origem e mais %n câmaras</numerusform>
-        <numerusform>Câmara origem e mais %n câmaras</numerusform>
+        <numerusform>Source and %n more cameras</numerusform>
       </translation>
     </message>
     <message>
@@ -1992,9 +2015,9 @@ to view more bookmarks</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n dispositivos encontrados</numerusform>
-        <numerusform>%n dispositivos encontrados</numerusform>
+        <numerusform>%n devices found</numerusform>
       </translation>
     </message>
     <message>
@@ -2230,9 +2253,9 @@ to view more bookmarks</translation>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 não tem portas de entrada</numerusform>
-        <numerusform>%1 não tem portas de entrada</numerusform>
+        <numerusform>%1 have no input ports</numerusform>
       </translation>
     </message>
   </context>
@@ -2270,16 +2293,16 @@ to view more bookmarks</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n dispositivos encontrados</numerusform>
-        <numerusform>%n dispositivos encontrados</numerusform>
+        <numerusform>%n devices found</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n câmaras encontradas</numerusform>
-        <numerusform>%n câmaras encontradas</numerusform>
+        <numerusform>%n cameras found</numerusform>
       </translation>
     </message>
     <message>
@@ -2292,9 +2315,9 @@ to view more bookmarks</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n módulos I/O encontrados</numerusform>
-        <numerusform>%n módulos I/O encontrados</numerusform>
+        <numerusform>%n I/O modules found</numerusform>
       </translation>
     </message>
     <message>
@@ -2372,9 +2395,9 @@ to view more bookmarks</translation>
     <name>QnCameraMotionPolicy</name>
     <message numerus="yes">
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>A Gravação por detecção de movimento está desabilitada em %1</numerusform>
-        <numerusform>A Gravação por detecção de movimento está desabilitada em %1</numerusform>
+        <numerusform>Recording or motion detection is disabled for %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2389,9 +2412,9 @@ to view more bookmarks</translation>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 não tem portas de saída/relés</numerusform>
-        <numerusform>%1 não tem portas de saída/relés</numerusform>
+        <numerusform>%1 have no output relays</numerusform>
       </translation>
     </message>
   </context>
@@ -2399,9 +2422,9 @@ to view more bookmarks</translation>
     <name>QnCameraRecordingPolicy</name>
     <message numerus="yes">
       <source>Recording is disabled for %1</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Gravações desabilitadas para %1</numerusform>
-        <numerusform>Gravações desabilitadas para %1</numerusform>
+        <numerusform>Recording is disabled for %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2422,14 +2445,6 @@ to view more bookmarks</translation>
     <message>
       <source>based on server time</source>
       <translation type="unfinished">based on server time</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation type="unfinished">High minimum value can lead to archive length decrease on other devices.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation type="unfinished">High minimum value can lead to archive length decrease on other cameras.</translation>
     </message>
     <message>
       <source>Not enough licenses to enable recording</source>
@@ -3158,16 +3173,16 @@ to %1</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation>
-        <numerusform>Log de Eventos para período de %1 a %2 - %n evento encontrado</numerusform>
+      <translation type="unfinished">
         <numerusform>Log de Eventos para período de %1 a %2 - %n eventos encontrados</numerusform>
+        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation>
-        <numerusform>Log de Eventos para %1 - %n evento encontrado</numerusform>
+      <translation type="unfinished">
         <numerusform>Log de Eventos para %1 - %n eventos encontrados</numerusform>
+        <numerusform>Event log for %1 - %n event(s) found</numerusform>
       </translation>
     </message>
     <message>
@@ -3220,9 +3235,9 @@ to %1</translation>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 (%n vezes)</numerusform>
-        <numerusform>%1 (%n vezes)</numerusform>
+        <numerusform>%1 (%n times)</numerusform>
       </translation>
     </message>
     <message>
@@ -3260,6 +3275,10 @@ to %1</translation>
     <message>
       <source>Auto</source>
       <translation type="unfinished">Auto</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation type="unfinished">Basic</translation>
     </message>
   </context>
   <context>
@@ -3638,9 +3657,9 @@ to %1</translation>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation>
-        <numerusform>Teste terminado com sucesso: %n utilizador encontrado.</numerusform>
-        <numerusform>Teste terminado com sucesso: %n utilizador encontrado.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Teste terminado com sucesso: %n utilizadores encontrados.</numerusform>
+        <numerusform>Test completed successfully: %n users found.</numerusform>
       </translation>
     </message>
   </context>
@@ -4063,30 +4082,30 @@ to %1</translation>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
       <source>Use analog licenses to view these %n cameras</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Utilize licenças analógicas para ver estas %n câmaras</numerusform>
-        <numerusform>Utilize licenças analógicas para ver estas %n câmaras</numerusform>
+        <numerusform>Use analog licenses to view these %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Utilizar licenças para os %n dispositivos seleccionados</numerusform>
-        <numerusform>Utilizar licenças para os %n dispositivos seleccionados</numerusform>
+        <numerusform>Use licenses for selected %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Utilizar licenças para as %n câmaras seleccionadas</numerusform>
-        <numerusform>Utilizar licenças para as %n câmaras seleccionadas</numerusform>
+        <numerusform>Use licenses for selected %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Utilizar licenças para os %n módulos I/O seleccionados</numerusform>
-        <numerusform>Utilizar licenças para os %n módulos I/O seleccionados</numerusform>
+        <numerusform>Use licenses for selected %n I/O modules</numerusform>
       </translation>
     </message>
   </context>
@@ -4413,6 +4432,10 @@ to %1</translation>
       <source>Skip</source>
       <translation type="unfinished">Skip</translation>
     </message>
+    <message>
+      <source>Close</source>
+      <translation>Fechar</translation>
+    </message>
   </context>
   <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -4485,6 +4508,25 @@ to %1</translation>
     <message>
       <source>KB/s</source>
       <translation type="unfinished">KB/s</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnNewWearableCameraDialog</name>
+    <message>
+      <source>Wearable Camera</source>
+      <translation type="unfinished">Wearable Camera</translation>
+    </message>
+    <message>
+      <source>Wearable Camera %1</source>
+      <translation type="unfinished">Wearable Camera %1</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Nome</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty</source>
+      <translation type="unfinished">Name cannot be empty</translation>
     </message>
   </context>
   <context>
@@ -4685,23 +4727,23 @@ to %1</translation>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Este preset será activado após %n minutos de inactividade</numerusform>
-        <numerusform>Este preset será activado após %n minutos de inactividade</numerusform>
+        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>O Tour tem %n posições idênticas</numerusform>
-        <numerusform>O Tour tem %n posições idênticas</numerusform>
+        <numerusform>Tour has %n identical positions</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation>
-        <numerusform>cerca de %n minuto</numerusform>
+      <translation type="unfinished">
         <numerusform>cerca de %n minutos</numerusform>
+        <numerusform>about %n minute(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -5944,6 +5986,10 @@ to %1</translation>
       <source>Please check authentication information</source>
       <translation type="unfinished">Please check authentication information</translation>
     </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation type="unfinished">NO LIVE STREAM</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -5970,9 +6016,9 @@ to %1</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Tb</numerusform>
-        <numerusform>%n Tb</numerusform>
+        <numerusform>%n TB</numerusform>
       </translation>
     </message>
     <message>
@@ -6086,6 +6132,14 @@ to %1</translation>
     <message>
       <source>Backup completed</source>
       <translation type="unfinished">Backup completed</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
+      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
     </message>
   </context>
   <context>
@@ -6567,37 +6621,37 @@ to %1</translation>
     </message>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>O problema está a ser causado por %n servidores:</numerusform>
-        <numerusform>O problema está a ser causado por %n servidores:</numerusform>
+        <numerusform>The problem is caused by %n servers:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Sem espaço livre em %n servidores:</numerusform>
-        <numerusform>Sem espaço livre em %n servidores:</numerusform>
+        <numerusform>No free space left on %n servers:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Servidores não estão a responder:</numerusform>
-        <numerusform>%n Servidores não estão a responder:</numerusform>
+        <numerusform>%n servers are not responding:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Servidores ficaram offline:</numerusform>
-        <numerusform>%n Servidores ficaram offline:</numerusform>
+        <numerusform>%n servers have gone offline:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>A autenticação falhou para %n servidores:</numerusform>
-        <numerusform>A autenticação falhou para %n servidores:</numerusform>
+        <numerusform>Authentication failed for %n servers:</numerusform>
       </translation>
     </message>
     <message>
@@ -6950,6 +7004,35 @@ to %1</translation>
     <message>
       <source>Muted</source>
       <translation>Mudo</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableProgressWidget</name>
+    <message>
+      <source>Uploading %1... %2	%p%</source>
+      <translation type="unfinished">Uploading %1... %2	%p%</translation>
+    </message>
+    <message>
+      <source>Finalizing %1... %2	%p</source>
+      <translation type="unfinished">Finalizing %1... %2	%p</translation>
+    </message>
+    <message numerus="yes">
+      <source>(%n more file(s) in queue)</source>
+      <translation type="unfinished">
+        <numerusform>(%n more file(s) in queue)</numerusform>
+        <numerusform>(%n more file(s) in queue)</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableUploadWidget</name>
+    <message>
+      <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Another user is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
     </message>
   </context>
   <context>
@@ -7503,6 +7586,21 @@ to %1</translation>
     </message>
   </context>
   <context>
+    <name>QnWorkbenchWearableHandler</name>
+    <message>
+      <source>Could not add wearable camera to server &quot;%1&quot;.</source>
+      <translation type="unfinished">Could not add wearable camera to server &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Open Wearable Camera Recording...</source>
+      <translation type="unfinished">Open Wearable Camera Recording...</translation>
+    </message>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>Todos ficheiros (*.*)</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
       <source>New Web Page</source>
@@ -7690,6 +7788,21 @@ to %1</translation>
         <numerusform>Remove %n items from showreel?</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Video uploading to %n camera(s) will stop:</source>
+      <translation type="unfinished">
+        <numerusform>Video uploading to %n camera(s) will stop:</numerusform>
+        <numerusform>Video uploading to %n camera(s) will stop:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation type="unfinished">Stop uploading?</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>Pausa</translation>
+    </message>
   </context>
   <context>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
@@ -7726,6 +7839,48 @@ to %1</translation>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation type="unfinished">To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::UploadWorker</name>
+    <message>
+      <source>Could not open file &quot;%1&quot;</source>
+      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not calculate md5 for file &quot;%1&quot;</source>
+      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not create upload on the server side</source>
+      <translation type="unfinished">Could not create upload on the server side</translation>
+    </message>
+    <message>
+      <source>Could not upload file chunk to the server</source>
+      <translation type="unfinished">Could not upload file chunk to the server</translation>
+    </message>
+    <message>
+      <source>Could not check uploaded file on the server</source>
+      <translation type="unfinished">Could not check uploaded file on the server</translation>
+    </message>
+    <message>
+      <source>File was corrupted while being uploaded to the server</source>
+      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WearableWorker</name>
+    <message>
+      <source>File &quot;%1&quot; is not a video file.</source>
+      <translation type="unfinished">File &quot;%1&quot; is not a video file.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
     </message>
   </context>
   <context>
@@ -7987,9 +8142,9 @@ to %1</translation>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Tem a certeza que quer apagar permanentemente estes %n ficheiros?</numerusform>
-        <numerusform>Tem a certeza que quer apagar permanentemente estes %n ficheiros?</numerusform>
+        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
       </translation>
     </message>
     <message>

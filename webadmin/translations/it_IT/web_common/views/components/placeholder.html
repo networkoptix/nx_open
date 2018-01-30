@@ -1,0 +1,12 @@
+<div ng-if="condition || preloader" class="placeholder" ng-class="{'has-preloader':preloader}">
+    <div class="placeholder-content">
+        <div ng-if="preloader" class="placeholder-preloader">
+            <div class="circleG circleG_1"></div>
+            <div class="circleG circleG_2"></div>
+            <div class="circleG circleG_3"></div>
+        </div>
+        <div ng-if="!preloader && iconClass" class="placeholder-icon" ng-class="iconClass"></div>
+        <div ng-if="!preloader && title" class="placeholder-title" ng-bind-html="title"></div>
+        <div ng-if="!preloader && message" class="placeholder-message" ng-bind-html="message"></div>
+    </div>
+</div>

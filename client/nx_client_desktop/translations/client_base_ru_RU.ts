@@ -873,6 +873,18 @@ to view more bookmarks</source>
       <source>Make Showreel</source>
       <translation>Сделать прокрутку</translation>
     </message>
+    <message>
+      <source>Wearable Camera...</source>
+      <translation type="unfinished">Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>Upload to Wearable Camera...</source>
+      <translation type="unfinished">Upload to Wearable Camera...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -1047,10 +1059,12 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation>
-        <numerusform>Имя файла не должно содержать следующие зарезервированные символы: %1</numerusform>
+      <translation type="unfinished">
         <numerusform>Имена файлов не должны содержать следующие зарезервированные символы: %1</numerusform>
-        <numerusform>Имена файлов не должны содержать следующие зарезервированные символы: %1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
       </translation>
     </message>
     <message>
@@ -1261,10 +1275,10 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>...и ещё %n</numerusform>
-        <numerusform>...и ещё %n</numerusform>
-        <numerusform>...и ещё %n</numerusform>
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -1295,6 +1309,17 @@ to view more bookmarks</source>
     <message>
       <source>Folder not found</source>
       <translation>Папка не найдена</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnArchiveLengthWidget</name>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices.</source>
+      <translation>Высокое минимальное значение может привести к уменьшению размера архива на других устройствах.</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras.</source>
+      <translation>Высокое минимальное значение может привести к уменьшению размера архива на других камерах.</translation>
     </message>
   </context>
   <context>
@@ -1380,42 +1405,42 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation>
-        <numerusform>Это устройство было удалено из системы</numerusform>
+      <translation type="unfinished">
         <numerusform>Эти устройства были удалены из системы</numerusform>
-        <numerusform>Эти устройства были удалены из системы</numerusform>
+        <numerusform>These devices are removed from System</numerusform>
+        <numerusform>These devices are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Эти камеры были удалены из системы</numerusform>
-        <numerusform>Эти камеры были удалены из системы</numerusform>
-        <numerusform>Эти камеры были удалены из системы</numerusform>
+        <numerusform>These cameras are removed from System</numerusform>
+        <numerusform>These cameras are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Эти серверы были удалены из системы</numerusform>
-        <numerusform>Эти серверы были удалены из системы</numerusform>
-        <numerusform>Эти серверы были удалены из системы</numerusform>
+        <numerusform>These servers are removed from System</numerusform>
+        <numerusform>These servers are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation>
-        <numerusform>Этот сервер был удален из системы</numerusform>
+      <translation type="unfinished">
         <numerusform>Эти серверы были удалены из системы</numerusform>
-        <numerusform>Эти серверы были удалены из системы</numerusform>
+        <numerusform>These users are removed from System</numerusform>
+        <numerusform>These users are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Эти ресурсы были удалены из системы</numerusform>
-        <numerusform>Эти ресурсы были удалены из системы</numerusform>
-        <numerusform>Эти ресурсы были удалены из системы</numerusform>
+        <numerusform>These resources are removed from System</numerusform>
+        <numerusform>These resources are removed from System</numerusform>
       </translation>
     </message>
     <message>
@@ -1495,10 +1520,10 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n action(s)</source>
-      <translation>
-        <numerusform>%n действие</numerusform>
+      <translation type="unfinished">
         <numerusform>%n действия</numerusform>
-        <numerusform>%n действий</numerusform>
+        <numerusform>%n action(s)</numerusform>
+        <numerusform>%n action(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -1647,10 +1672,10 @@ to view more bookmarks</source>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation>
-        <numerusform>У вас %n оповещение</numerusform>
+      <translation type="unfinished">
         <numerusform>У вас %n оповещения</numerusform>
-        <numerusform>У вас %n оповещений</numerusform>
+        <numerusform>You have %n notifications</numerusform>
+        <numerusform>You have %n notifications</numerusform>
       </translation>
     </message>
   </context>
@@ -1708,18 +1733,18 @@ to view more bookmarks</source>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 из %n устройств</numerusform>
-        <numerusform>%1 из %n устройств</numerusform>
-        <numerusform>%1 из %n устройств</numerusform>
+        <numerusform>%1 of %n devices</numerusform>
+        <numerusform>%1 of %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 из %n камер</numerusform>
-        <numerusform>%1 из %n камер</numerusform>
-        <numerusform>%1 из %n камер</numerusform>
+        <numerusform>%1 of %n cameras</numerusform>
+        <numerusform>%1 of %n cameras</numerusform>
       </translation>
     </message>
     <message>
@@ -1732,10 +1757,10 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 из %n модулей ввода/вывода</numerusform>
-        <numerusform>%1 из %n модулей ввода/вывода</numerusform>
-        <numerusform>%1 из %n модулей ввода/вывода</numerusform>
+        <numerusform>%1 of %n I/O modules</numerusform>
+        <numerusform>%1 of %n I/O modules</numerusform>
       </translation>
     </message>
     <message>
@@ -1758,10 +1783,10 @@ to view more bookmarks</source>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
-      <translation>
-        <numerusform>%n Сервер</numerusform>
+      <translation type="unfinished">
         <numerusform>%n Сервера</numerusform>
-        <numerusform>%n Серверов</numerusform>
+        <numerusform>%n Server(s)</numerusform>
+        <numerusform>%n Server(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -1798,10 +1823,10 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Исходная камера и ещё %n камера</numerusform>
-        <numerusform>Исходная камера и ещё %n камеры</numerusform>
-        <numerusform>Исходная камера и ещё %n камер</numerusform>
+        <numerusform>Source and %n more cameras</numerusform>
+        <numerusform>Source and %n more cameras</numerusform>
       </translation>
     </message>
     <message>
@@ -2004,10 +2029,10 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Найдено %n устройство</numerusform>
-        <numerusform>Найдено %n устройства</numerusform>
-        <numerusform>Найдено %n устройств</numerusform>
+        <numerusform>%n devices found</numerusform>
+        <numerusform>%n devices found</numerusform>
       </translation>
     </message>
     <message>
@@ -2041,10 +2066,10 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices added.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n device added.</numerusform>
-        <numerusform>%n device added.</numerusform>
-        <numerusform>%n device added.</numerusform>
+        <numerusform>%n devices added.</numerusform>
+        <numerusform>%n devices added.</numerusform>
       </translation>
     </message>
     <message>
@@ -2053,10 +2078,10 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Failed to add %n device</numerusform>
-        <numerusform>Failed to add %n device</numerusform>
-        <numerusform>Failed to add %n device</numerusform>
+        <numerusform>Failed to add %n devices</numerusform>
+        <numerusform>Failed to add %n devices</numerusform>
       </translation>
     </message>
     <message>
@@ -2146,10 +2171,10 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 не поддерживают двусторонний звук</numerusform>
-        <numerusform>%1 не поддерживают двусторонний звук</numerusform>
-        <numerusform>%1 не поддерживают двусторонний звук</numerusform>
+        <numerusform>%1 does not support two-way audio</numerusform>
+        <numerusform>%1 does not support two-way audio</numerusform>
       </translation>
     </message>
   </context>
@@ -2246,10 +2271,10 @@ to view more bookmarks</source>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation>
-        <numerusform>%1 не имеет тревожных входов</numerusform>
+      <translation type="unfinished">
         <numerusform>%1 не имеют тревожных входов</numerusform>
-        <numerusform>%1 не имеют тревожных входов</numerusform>
+        <numerusform>%1 have no input ports</numerusform>
+        <numerusform>%1 have no input ports</numerusform>
       </translation>
     </message>
   </context>
@@ -2287,18 +2312,18 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Найдено %n устройство</numerusform>
-        <numerusform>Найдено %n устройства</numerusform>
-        <numerusform>Найдено %n устройств</numerusform>
+        <numerusform>%n devices found</numerusform>
+        <numerusform>%n devices found</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Найдено %n камера</numerusform>
-        <numerusform>Найдено %n камеры</numerusform>
-        <numerusform>Найдено %n камер</numerusform>
+        <numerusform>%n cameras found</numerusform>
+        <numerusform>%n cameras found</numerusform>
       </translation>
     </message>
     <message>
@@ -2311,10 +2336,10 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Найдено %n модуль ввода-вывода</numerusform>
-        <numerusform>Найдено %n модуля ввода-вывода</numerusform>
-        <numerusform>Найдено %n модулей ввода-вывода</numerusform>
+        <numerusform>%n I/O modules found</numerusform>
+        <numerusform>%n I/O modules found</numerusform>
       </translation>
     </message>
     <message>
@@ -2392,10 +2417,10 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message numerus="yes">
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Запись или детекция движения отключены для %1</numerusform>
-        <numerusform>Запись или детекция движения отключены для %1</numerusform>
-        <numerusform>Запись или детекция движения отключены для %1</numerusform>
+        <numerusform>Recording or motion detection is disabled for %1</numerusform>
+        <numerusform>Recording or motion detection is disabled for %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2410,10 +2435,10 @@ to view more bookmarks</source>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation>
-        <numerusform>%1 не имеет тревожных выходов</numerusform>
+      <translation type="unfinished">
         <numerusform>%1 не имеют тревожных выходов</numerusform>
-        <numerusform>%1 не имеют тревожных выходов</numerusform>
+        <numerusform>%1 have no output relays</numerusform>
+        <numerusform>%1 have no output relays</numerusform>
       </translation>
     </message>
   </context>
@@ -2421,10 +2446,10 @@ to view more bookmarks</source>
     <name>QnCameraRecordingPolicy</name>
     <message numerus="yes">
       <source>Recording is disabled for %1</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Запись для %1 отключена</numerusform>
-        <numerusform>Запись для %1 отключена</numerusform>
-        <numerusform>Запись для %1 отключена</numerusform>
+        <numerusform>Recording is disabled for %1</numerusform>
+        <numerusform>Recording is disabled for %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2445,14 +2470,6 @@ to view more bookmarks</source>
     <message>
       <source>based on server time</source>
       <translation>по времени сервера</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>Высокое минимальное значение может привести к уменьшению размера архива на других устройствах.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>Высокое минимальное значение может привести к уменьшению размера архива на других камерах.</translation>
     </message>
     <message>
       <source>Not enough licenses to enable recording</source>
@@ -2559,26 +2576,26 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Changes to the following %n device are not saved:</numerusform>
-        <numerusform>Changes to the following %n device are not saved:</numerusform>
-        <numerusform>Changes to the following %n device are not saved:</numerusform>
+        <numerusform>Changes to the following %n devices are not saved:</numerusform>
+        <numerusform>Changes to the following %n devices are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Changes to the following %n camera are not saved:</numerusform>
-        <numerusform>Changes to the following %n camera are not saved:</numerusform>
-        <numerusform>Changes to the following %n camera are not saved:</numerusform>
+        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Changes to the following %n I/O Module are not saved:</numerusform>
-        <numerusform>Changes to the following %n I/O Module are not saved:</numerusform>
-        <numerusform>Changes to the following %n I/O Module are not saved:</numerusform>
+        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
       </translation>
     </message>
     <message>
@@ -3184,18 +3201,18 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation>
-        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событие</numerusform>
+      <translation type="unfinished">
         <numerusform>Журнал событий за период с %1 по %2 - найдено %n события</numerusform>
-        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
+        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
+        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation>
-        <numerusform>Журнал событий за %1 - найдено %n событие</numerusform>
+      <translation type="unfinished">
         <numerusform>Журнал событий за %1 - найдено %n события</numerusform>
-        <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
+        <numerusform>Event log for %1 - %n event(s) found</numerusform>
+        <numerusform>Event log for %1 - %n event(s) found</numerusform>
       </translation>
     </message>
     <message>
@@ -3248,10 +3265,10 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%1 из (%n раза)</numerusform>
-        <numerusform>%1 из (%n раз)</numerusform>
-        <numerusform>%1 из (%n раз)</numerusform>
+        <numerusform>%1 (%n times)</numerusform>
+        <numerusform>%1 (%n times)</numerusform>
       </translation>
     </message>
     <message>
@@ -3260,26 +3277,26 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>and %n more users...</numerusform>
-        <numerusform>and %n more users...</numerusform>
-        <numerusform>and %n more users...</numerusform>
+        <numerusform>and %n users more...</numerusform>
+        <numerusform>and %n users more...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>и ещё %n...</numerusform>
-        <numerusform>и ещё %n...</numerusform>
-        <numerusform>и ещё %n...</numerusform>
+        <numerusform>and %n more...</numerusform>
+        <numerusform>and %n more...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation>
-        <numerusform>%n удаленный объект</numerusform>
-        <numerusform>%n удаленных объекта</numerusform>
+      <translation type="unfinished">
         <numerusform>%n удаленных объектов</numerusform>
+        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n Removed subjects</numerusform>
       </translation>
     </message>
     <message>
@@ -3292,6 +3309,10 @@ to %1</source>
     <message>
       <source>Auto</source>
       <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation>Основной</translation>
     </message>
   </context>
   <context>
@@ -3670,10 +3691,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Проверка завершилась успешно: найден %n пользователь.</numerusform>
-        <numerusform>Проверка завершилась успешно: найдены %n пользователя.</numerusform>
-        <numerusform>Проверка завершилась успешно: найдено %n пользователей.</numerusform>
+        <numerusform>Test completed successfully: %n users found.</numerusform>
+        <numerusform>Test completed successfully: %n users found.</numerusform>
       </translation>
     </message>
   </context>
@@ -3841,10 +3862,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>License expires in %n day</numerusform>
-        <numerusform>License expires in %n day</numerusform>
-        <numerusform>License expires in %n day</numerusform>
+        <numerusform>License expires in %n days</numerusform>
+        <numerusform>License expires in %n days</numerusform>
       </translation>
     </message>
     <message>
@@ -3936,18 +3957,18 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Требуется по крайней мере %n %1</numerusform>
-        <numerusform>Требуется по крайней мере %n %1</numerusform>
-        <numerusform>Требуется по крайней мере %n %1</numerusform>
+        <numerusform>At least %n %1 are required</numerusform>
+        <numerusform>At least %n %1 are required</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n %1 используeтся</numerusform>
-        <numerusform>%n %1 используeтся</numerusform>
-        <numerusform>%n %1 используeтся</numerusform>
+        <numerusform>%n %1 are currently in use</numerusform>
+        <numerusform>%n %1 are currently in use</numerusform>
       </translation>
     </message>
     <message>
@@ -3956,10 +3977,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>Деактивировать лицензию?</numerusform>
+      <translation type="unfinished">
         <numerusform>Деактивировать лицензии?</numerusform>
-        <numerusform>Деактивировать лицензии?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
       </translation>
     </message>
     <message>
@@ -3968,26 +3989,26 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation>
-        <numerusform>Не удалось деактивировать %n лицензию</numerusform>
-        <numerusform>Не удалось деактивировать %n лицензии</numerusform>
+      <translation type="unfinished">
         <numerusform>Не удалось деактивировать %n лицензий</numerusform>
+        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>Failed to deactivate %n licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation>
-        <numerusform>%1 из %n лицензий не может быть деактивирована</numerusform>
+      <translation type="unfinished">
         <numerusform>%1 из %n лицензий не могут быть деактивированы</numerusform>
-        <numerusform>%1 из %n лицензий не могут быть деактивированы</numerusform>
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Не удалось деактивировать лицензию</numerusform>
+      <translation type="unfinished">
         <numerusform>Не удалось деактивировать лицензии</numerusform>
-        <numerusform>Не удалось деактивировать лицензии</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
       </translation>
     </message>
     <message>
@@ -4008,10 +4029,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation>
-        <numerusform>%n лицензия деактивирована</numerusform>
-        <numerusform>%n лицензии деактивировано</numerusform>
+      <translation type="unfinished">
         <numerusform>%n лицензий деактивировано</numerusform>
+        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n licenses deactivated</numerusform>
       </translation>
     </message>
     <message>
@@ -4024,10 +4045,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation>
-        <numerusform>%n канал.</numerusform>
-        <numerusform>%n канала.</numerusform>
+      <translation type="unfinished">
         <numerusform>%n каналов.</numerusform>
+        <numerusform>%n channels.</numerusform>
+        <numerusform>%n channels.</numerusform>
       </translation>
     </message>
     <message>
@@ -4036,10 +4057,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Деактивировать еще %n</numerusform>
-        <numerusform>Деактивировать еще %n</numerusform>
-        <numerusform>Деактивировать еще %n</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
     <message>
@@ -4106,34 +4127,34 @@ to %1</source>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
       <source>Use analog licenses to view these %n cameras</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Использовать аналоговую лицензию для просмотра %n камеры</numerusform>
-        <numerusform>Использовать аналоговые лицензии для просмотра этих %n камер</numerusform>
-        <numerusform>Использовать аналоговые лицензии для просмотра этих %n камер</numerusform>
+        <numerusform>Use analog licenses to view these %n cameras</numerusform>
+        <numerusform>Use analog licenses to view these %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
-      <translation>
-        <numerusform>Использовать лицензии для %n выбранного устройства</numerusform>
+      <translation type="unfinished">
         <numerusform>Использовать лицензии для %n выбранных устройств</numerusform>
-        <numerusform>Использовать лицензии для %n выбранных устройств</numerusform>
+        <numerusform>Use licenses for selected %n devices</numerusform>
+        <numerusform>Use licenses for selected %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Использовать лицензии для %n выбранной камеры</numerusform>
-        <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
-        <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
+        <numerusform>Use licenses for selected %n cameras</numerusform>
+        <numerusform>Use licenses for selected %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
-      <translation>
-        <numerusform>Использовать лицензии для %n выбранного модуля ввода-вывода</numerusform>
+      <translation type="unfinished">
         <numerusform>Использовать лицензии для %n выбранный модулей ввода-вывода</numerusform>
-        <numerusform>Использовать лицензии для %n выбранный модулей ввода-вывода</numerusform>
+        <numerusform>Use licenses for selected %n I/O modules</numerusform>
+        <numerusform>Use licenses for selected %n I/O modules</numerusform>
       </translation>
     </message>
   </context>
@@ -4460,6 +4481,10 @@ to %1</source>
       <source>Skip</source>
       <translation>Пропустить</translation>
     </message>
+    <message>
+      <source>Close</source>
+      <translation>Закрыть</translation>
+    </message>
   </context>
   <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -4535,13 +4560,32 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnNewWearableCameraDialog</name>
+    <message>
+      <source>Wearable Camera</source>
+      <translation type="unfinished">Wearable Camera</translation>
+    </message>
+    <message>
+      <source>Wearable Camera %1</source>
+      <translation type="unfinished">Wearable Camera %1</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Имя</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty</source>
+      <translation>Имя не может быть пустым</translation>
+    </message>
+  </context>
+  <context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
       <source>%n more notifications</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n more notification</numerusform>
-        <numerusform>%n more notification</numerusform>
-        <numerusform>%n more notification</numerusform>
+        <numerusform>%n more notifications</numerusform>
+        <numerusform>%n more notifications</numerusform>
       </translation>
     </message>
   </context>
@@ -4733,26 +4777,26 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Будет активирована после %n минуту бездействия</numerusform>
-        <numerusform>Будет активирована после %n минуты бездействия</numerusform>
-        <numerusform>Будет активирована после %n минут бездействия</numerusform>
+        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation>
-        <numerusform>В маршруте обхода %n идентичная позиция</numerusform>
+      <translation type="unfinished">
         <numerusform>В маршруте обхода %n идентичные позиции</numerusform>
-        <numerusform>В маршруте обхода %n идентичных позиций</numerusform>
+        <numerusform>Tour has %n identical positions</numerusform>
+        <numerusform>Tour has %n identical positions</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation>
-        <numerusform>Около %n минуты</numerusform>
+      <translation type="unfinished">
         <numerusform>Около %n минут</numerusform>
-        <numerusform>Около %n минут</numerusform>
+        <numerusform>about %n minute(s)</numerusform>
+        <numerusform>about %n minute(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -4973,28 +5017,28 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Total %1 %n device</numerusform>
-        <numerusform>Total %1 %n device</numerusform>
-        <numerusform>Total %1 %n device</numerusform>
+        <numerusform>Total %1 %n devices</numerusform>
+        <numerusform>Total %1 %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Total %1 %n camera</numerusform>
-        <numerusform>Total %1 %n camera</numerusform>
-        <numerusform>Total %1 %n camera</numerusform>
+        <numerusform>Total %1 %n cameras</numerusform>
+        <numerusform>Total %1 %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Total %1 %n I/O module</numerusform>
-        <numerusform>Total %1 %n I/O module</numerusform>
-        <numerusform>Total %1 %n I/O module</numerusform>
+        <numerusform>Total %1 %n I/O modules</numerusform>
+        <numerusform>Total %1 %n I/O modules</numerusform>
       </translation>
     </message>
     <message>
@@ -5048,10 +5092,10 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n выбранная роль из %1 не имеет полномочий на %2</numerusform>
-        <numerusform>%n выбранные роли из %1 не имеют полномочий на %2</numerusform>
+      <translation type="unfinished">
         <numerusform>%n выбранных ролей из %1 не имеют полномочий на %2</numerusform>
+        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
       </translation>
     </message>
     <message>
@@ -5067,10 +5111,10 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n выбранный пользователь из %1 не имеет разрешения %2</numerusform>
-        <numerusform>%n выбранных пользователя из %1 не имеют разрешения %2</numerusform>
+      <translation type="unfinished">
         <numerusform>%n выбранных пользователей из %1 не имеют разрешения %2</numerusform>
+        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
       </translation>
     </message>
   </context>
@@ -5325,10 +5369,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Server</numerusform>
-        <numerusform>%n Server</numerusform>
-        <numerusform>%n Server</numerusform>
+        <numerusform>%n Servers</numerusform>
+        <numerusform>%n Servers</numerusform>
       </translation>
     </message>
   </context>
@@ -5348,10 +5392,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation>
-        <numerusform>%n User</numerusform>
-        <numerusform>%n User</numerusform>
+      <translation type="unfinished">
         <numerusform>%n пользователь</numerusform>
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
       </translation>
     </message>
   </context>
@@ -5359,10 +5403,10 @@ to %1</source>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>ещё %n</numerusform>
-        <numerusform>ещё %n</numerusform>
-        <numerusform>ещё %n</numerusform>
+        <numerusform>%n additional</numerusform>
+        <numerusform>%n additional</numerusform>
       </translation>
     </message>
     <message>
@@ -5371,10 +5415,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
-        <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
-        <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
+        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>%n of %1 users have invalid email address</numerusform>
       </translation>
     </message>
     <message>
@@ -5383,10 +5427,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
-        <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
-        <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
       </translation>
     </message>
     <message>
@@ -5637,10 +5681,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Not enough free space at %n Server:</numerusform>
-        <numerusform>Not enough free space at %n Server:</numerusform>
-        <numerusform>Not enough free space at %n Server:</numerusform>
+        <numerusform>Not enough free space at %n Servers:</numerusform>
+        <numerusform>Not enough free space at %n Servers:</numerusform>
       </translation>
     </message>
     <message>
@@ -6006,6 +6050,10 @@ to %1</source>
       <source>Please check authentication information</source>
       <translation>Пожалуйста, проверьте настройки аутентификации</translation>
     </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation type="unfinished">NO LIVE STREAM</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6032,10 +6080,10 @@ to %1</source>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n ТБ</numerusform>
-        <numerusform>%n ТБ</numerusform>
-        <numerusform>%n ТБ</numerusform>
+        <numerusform>%n TB</numerusform>
+        <numerusform>%n TB</numerusform>
       </translation>
     </message>
     <message>
@@ -6149,6 +6197,14 @@ to %1</source>
     <message>
       <source>Backup completed</source>
       <translation>Резервное копирование завершено</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>Запись на отключённое хранилище прекратится. Однако, удаление устаревших записей будет продолжаться.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
     </message>
   </context>
   <context>
@@ -6630,42 +6686,42 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>The problem is caused by %n server:</numerusform>
-        <numerusform>The problem is caused by %n server:</numerusform>
-        <numerusform>The problem is caused by %n server:</numerusform>
+        <numerusform>The problem is caused by %n servers:</numerusform>
+        <numerusform>The problem is caused by %n servers:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>No free space left on %n server:</numerusform>
-        <numerusform>No free space left on %n server:</numerusform>
-        <numerusform>No free space left on %n server:</numerusform>
+        <numerusform>No free space left on %n servers:</numerusform>
+        <numerusform>No free space left on %n servers:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n server is not responding:</numerusform>
-        <numerusform>%n server is not responding:</numerusform>
-        <numerusform>%n server is not responding:</numerusform>
+        <numerusform>%n servers are not responding:</numerusform>
+        <numerusform>%n servers are not responding:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n server has gone offline:</numerusform>
-        <numerusform>%n server has gone offline:</numerusform>
-        <numerusform>%n server has gone offline:</numerusform>
+        <numerusform>%n servers have gone offline:</numerusform>
+        <numerusform>%n servers have gone offline:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Authentication failed for %n server:</numerusform>
-        <numerusform>Authentication failed for %n server:</numerusform>
-        <numerusform>Authentication failed for %n server:</numerusform>
+        <numerusform>Authentication failed for %n servers:</numerusform>
+        <numerusform>Authentication failed for %n servers:</numerusform>
       </translation>
     </message>
     <message>
@@ -6812,10 +6868,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation>
-        <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователем с этой ролью</numerusform>
+      <translation type="unfinished">
         <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователями с этой ролью</numerusform>
-        <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователями с этой ролью</numerusform>
+        <numerusform>Please select an action to perform on %n users with this role</numerusform>
+        <numerusform>Please select an action to perform on %n users with this role</numerusform>
       </translation>
     </message>
   </context>
@@ -7008,10 +7064,10 @@ to %1</source>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>ПК %1 - дисплеи %2</numerusform>
-        <numerusform>ПК %1 - дисплеи %2</numerusform>
-        <numerusform>ПК %1 - дисплеи %2</numerusform>
+        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Displays %2</numerusform>
       </translation>
     </message>
   </context>
@@ -7020,6 +7076,36 @@ to %1</source>
     <message>
       <source>Muted</source>
       <translation>Беззвучный</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableProgressWidget</name>
+    <message>
+      <source>Uploading %1... %2	%p%</source>
+      <translation type="unfinished">Uploading %1... %2	%p%</translation>
+    </message>
+    <message>
+      <source>Finalizing %1... %2	%p</source>
+      <translation type="unfinished">Finalizing %1... %2	%p</translation>
+    </message>
+    <message numerus="yes">
+      <source>(%n more file(s) in queue)</source>
+      <translation type="unfinished">
+        <numerusform>(%n more file(s) in queue)</numerusform>
+        <numerusform>(%n more file(s) in queue)</numerusform>
+        <numerusform>(%n more file(s) in queue)</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableUploadWidget</name>
+    <message>
+      <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Another user is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
     </message>
   </context>
   <context>
@@ -7087,10 +7173,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation>
-        <numerusform>Удалить %n закладку?</numerusform>
-        <numerusform>Удалить %n закладки?</numerusform>
+      <translation type="unfinished">
         <numerusform>Удалить %n закладок?</numerusform>
+        <numerusform>Delete %n bookmarks?</numerusform>
+        <numerusform>Delete %n bookmarks?</numerusform>
       </translation>
     </message>
   </context>
@@ -7336,10 +7422,10 @@ to %1</source>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation>
-        <numerusform>%n элемент не сохранен:</numerusform>
-        <numerusform>%n элемента не сохранено:</numerusform>
+      <translation type="unfinished">
         <numerusform>%n элементов не сохранено:</numerusform>
+        <numerusform>The following %n items are not saved:</numerusform>
+        <numerusform>The following %n items are not saved:</numerusform>
       </translation>
     </message>
     <message>
@@ -7352,10 +7438,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation>
-        <numerusform>%n элемент не удален:</numerusform>
-        <numerusform>%n элемента не удалено:</numerusform>
+      <translation type="unfinished">
         <numerusform>%n элементов не удалено:</numerusform>
+        <numerusform>The following %n items are not deleted:</numerusform>
+        <numerusform>The following %n items are not deleted:</numerusform>
       </translation>
     </message>
     <message>
@@ -7364,10 +7450,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Failed to delete %n item:</numerusform>
-        <numerusform>Failed to delete %n item:</numerusform>
-        <numerusform>Failed to delete %n item:</numerusform>
+        <numerusform>Failed to delete %n items:</numerusform>
+        <numerusform>Failed to delete %n items:</numerusform>
       </translation>
     </message>
     <message>
@@ -7523,10 +7609,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Удалить %n элемент?</numerusform>
-        <numerusform>Удалить %n элемента?</numerusform>
+      <translation type="unfinished">
         <numerusform>Удалить %n элементов?</numerusform>
+        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Delete %n items?</numerusform>
       </translation>
     </message>
     <message>
@@ -7543,10 +7629,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Удалить %n матрицу?</numerusform>
-        <numerusform>Удалить %n матрицы?</numerusform>
+      <translation type="unfinished">
         <numerusform>Удалить %n матриц?</numerusform>
+        <numerusform>Delete %n matrices?</numerusform>
+        <numerusform>Delete %n matrices?</numerusform>
       </translation>
     </message>
     <message>
@@ -7576,6 +7662,21 @@ to %1</source>
     <message>
       <source>Activate one more license to start Video Wall.</source>
       <translation>Активируйте одну дополнительную лицензию, чтобы начать сеанс управления видеостеной.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchWearableHandler</name>
+    <message>
+      <source>Could not add wearable camera to server &quot;%1&quot;.</source>
+      <translation type="unfinished">Could not add wearable camera to server &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Open Wearable Camera Recording...</source>
+      <translation type="unfinished">Open Wearable Camera Recording...</translation>
+    </message>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>Все файлы (*.*)</translation>
     </message>
   </context>
   <context>
@@ -7609,10 +7710,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>User will still have access to %n removed resource:</numerusform>
-        <numerusform>User will still have access to %n removed resource:</numerusform>
-        <numerusform>User will still have access to %n removed resource:</numerusform>
+        <numerusform>User will still have access to %n removed resources:</numerusform>
+        <numerusform>User will still have access to %n removed resources:</numerusform>
       </translation>
     </message>
     <message>
@@ -7621,10 +7722,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>All users with this role will get access to %n resource:</numerusform>
-        <numerusform>All users with this role will get access to %n resource:</numerusform>
-        <numerusform>All users with this role will get access to %n resource:</numerusform>
+        <numerusform>All users with this role will get access to %n resources:</numerusform>
+        <numerusform>All users with this role will get access to %n resources:</numerusform>
       </translation>
     </message>
     <message>
@@ -7633,10 +7734,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
+        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
       </translation>
     </message>
     <message>
@@ -7649,42 +7750,42 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>User will lose access to %n resource:</numerusform>
-        <numerusform>User will lose access to %n resource:</numerusform>
-        <numerusform>User will lose access to %n resource:</numerusform>
+        <numerusform>User will lose access to %n resources:</numerusform>
+        <numerusform>User will lose access to %n resources:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>All users with this role will lose access to %n resource:</numerusform>
-        <numerusform>All users with this role will lose access to %n resource:</numerusform>
-        <numerusform>All users with this role will lose access to %n resource:</numerusform>
+        <numerusform>All users with this role will lose access to %n resources:</numerusform>
+        <numerusform>All users with this role will lose access to %n resources:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Удалить %n общую раскладку?</numerusform>
-        <numerusform>Удалить %n общую раскладку?</numerusform>
-        <numerusform>Удалить %n общую раскладку?</numerusform>
+        <numerusform>Delete %n shared layouts?</numerusform>
+        <numerusform>Delete %n shared layouts?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
-        <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
-        <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
+        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
+        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Remove %n item from layout?</numerusform>
-        <numerusform>Remove %n item from layout?</numerusform>
-        <numerusform>Remove %n item from layout?</numerusform>
+        <numerusform>Remove %n items from layout?</numerusform>
+        <numerusform>Remove %n items from layout?</numerusform>
       </translation>
     </message>
     <message>
@@ -7701,66 +7802,66 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Delete %n user?</numerusform>
-        <numerusform>Delete %n user?</numerusform>
-        <numerusform>Delete %n user?</numerusform>
+        <numerusform>Delete %n users?</numerusform>
+        <numerusform>Delete %n users?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Delete %n device?</numerusform>
-        <numerusform>Delete %n device?</numerusform>
-        <numerusform>Delete %n device?</numerusform>
+        <numerusform>Delete %n devices?</numerusform>
+        <numerusform>Delete %n devices?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Delete %n camera?</numerusform>
-        <numerusform>Delete %n camera?</numerusform>
-        <numerusform>Delete %n camera?</numerusform>
+        <numerusform>Delete %n cameras?</numerusform>
+        <numerusform>Delete %n cameras?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Delete %n I/O Module?</numerusform>
-        <numerusform>Delete %n I/O Module?</numerusform>
-        <numerusform>Delete %n I/O Module?</numerusform>
+        <numerusform>Delete %n I/O Modules?</numerusform>
+        <numerusform>Delete %n I/O Modules?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Удалить %n элементов?</numerusform>
-        <numerusform>Удалить %n элементов?</numerusform>
-        <numerusform>Удалить %n элементов?</numerusform>
+        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Delete %n items?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n of them is auto-discovered.</numerusform>
-        <numerusform>%n of them is auto-discovered.</numerusform>
-        <numerusform>%n of them is auto-discovered.</numerusform>
+        <numerusform>%n of them are auto-discovered.</numerusform>
+        <numerusform>%n of them are auto-discovered.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n camera is auto-discovered.</numerusform>
-        <numerusform>%n camera is auto-discovered.</numerusform>
-        <numerusform>%n camera is auto-discovered.</numerusform>
+        <numerusform>%n cameras are auto-discovered.</numerusform>
+        <numerusform>%n cameras are auto-discovered.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n I/O module is auto-discovered.</numerusform>
-        <numerusform>%n I/O module is auto-discovered.</numerusform>
-        <numerusform>%n I/O module is auto-discovered.</numerusform>
+        <numerusform>%n I/O modules are auto-discovered.</numerusform>
+        <numerusform>%n I/O modules are auto-discovered.</numerusform>
       </translation>
     </message>
     <message>
@@ -7777,21 +7878,37 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation>
-        <numerusform>Удалить %n элемент из прокрутки?</numerusform>
-        <numerusform>Удалить %n элемента из прокрутки?</numerusform>
+      <translation type="unfinished">
         <numerusform>Удалить %n элементов из прокрутки?</numerusform>
+        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>Remove %n items from showreel?</numerusform>
       </translation>
+    </message>
+    <message numerus="yes">
+      <source>Video uploading to %n camera(s) will stop:</source>
+      <translation type="unfinished">
+        <numerusform>Video uploading to %n camera(s) will stop:</numerusform>
+        <numerusform>Video uploading to %n camera(s) will stop:</numerusform>
+        <numerusform>Video uploading to %n camera(s) will stop:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation type="unfinished">Stop uploading?</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>Остановить</translation>
     </message>
   </context>
   <context>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n user</numerusform>
-        <numerusform>%n user</numerusform>
-        <numerusform>%n user</numerusform>
+        <numerusform>%n users</numerusform>
+        <numerusform>%n users</numerusform>
       </translation>
     </message>
   </context>
@@ -7820,6 +7937,48 @@ to %1</source>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>Для отображения локальных файлов на видеостене, пожалуйста, поместите их на видеостену на компьютере, с которого она управляется.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::UploadWorker</name>
+    <message>
+      <source>Could not open file &quot;%1&quot;</source>
+      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not calculate md5 for file &quot;%1&quot;</source>
+      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not create upload on the server side</source>
+      <translation type="unfinished">Could not create upload on the server side</translation>
+    </message>
+    <message>
+      <source>Could not upload file chunk to the server</source>
+      <translation type="unfinished">Could not upload file chunk to the server</translation>
+    </message>
+    <message>
+      <source>Could not check uploaded file on the server</source>
+      <translation type="unfinished">Could not check uploaded file on the server</translation>
+    </message>
+    <message>
+      <source>File was corrupted while being uploaded to the server</source>
+      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WearableWorker</name>
+    <message>
+      <source>File &quot;%1&quot; is not a video file.</source>
+      <translation type="unfinished">File &quot;%1&quot; is not a video file.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
     </message>
   </context>
   <context>
@@ -7983,26 +8142,26 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::ActionHandler</name>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Failed to move %n device</numerusform>
-        <numerusform>Failed to move %n device</numerusform>
-        <numerusform>Failed to move %n device</numerusform>
+        <numerusform>Failed to move %n devices</numerusform>
+        <numerusform>Failed to move %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Failed to move %n camera</numerusform>
-        <numerusform>Failed to move %n camera</numerusform>
-        <numerusform>Failed to move %n camera</numerusform>
+        <numerusform>Failed to move %n cameras</numerusform>
+        <numerusform>Failed to move %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Failed to move %n I/O Module</numerusform>
-        <numerusform>Failed to move %n I/O Module</numerusform>
-        <numerusform>Failed to move %n I/O Module</numerusform>
+        <numerusform>Failed to move %n I/O Modules</numerusform>
+        <numerusform>Failed to move %n I/O Modules</numerusform>
       </translation>
     </message>
     <message>
@@ -8011,26 +8170,26 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
       </translation>
     </message>
     <message>
@@ -8087,10 +8246,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Вы уверены, что хотите навсегда удалить %n файл?</numerusform>
-        <numerusform>Вы уверены, что хотите навсегда удалить эти %n файла?</numerusform>
-        <numerusform>Вы уверены, что хотите навсегда удалить эти %n файлов?</numerusform>
+        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
       </translation>
     </message>
     <message>

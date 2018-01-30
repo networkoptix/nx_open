@@ -147,6 +147,34 @@
     </message>
   </context>
   <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <source>Form</source>
+      <translation>Űrlap</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Fixed Archive Length</source>
+      <translation>Fix archiválási hossz</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. Days</source>
+      <translation>Min. napok</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Max. Days</source>
+      <translation>Max napok</translation>
+    </message>
+  </context>
+  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -790,26 +818,6 @@
     </message>
     <message>
       <location/>
-      <source>Fixed Archive Length</source>
-      <translation>Fix archiválási hossz</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation>Min. napok</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Max. Days</source>
-      <translation>Max napok</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Recording</source>
       <translation>Rögzítés mozgásra</translation>
     </message>
@@ -1016,6 +1024,16 @@
       <location/>
       <source>HTTP URL</source>
       <translation>HTTP URL</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation>Hitelesítés típusa</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation>Kérelem típusa</translation>
     </message>
   </context>
   <context>
@@ -1666,6 +1684,24 @@
       <location/>
       <source>Expert</source>
       <translation>Szakértő</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewWearableCameraDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessible by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessible by any user.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>To server</source>
+      <translation type="unfinished">To server</translation>
     </message>
   </context>
   <context>
@@ -2516,6 +2552,13 @@
       <source>TextLabel</source>
       <translation type="unfinished">TextLabel</translation>
     </message>
+    <message>
+      <location/>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
+The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
+The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -2689,11 +2732,6 @@
       <source>Backup Settings...</source>
       <translation>Biztonsági mentés beállításai...</translation>
     </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Rögzítés a lekapcsolt tárolóra leáll. A lejáró felvételek továbbra is törlésre kerülnek.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -2852,6 +2890,47 @@ Kattintson az &quot;Új szerepkör&quot; gombra a létrehozáshoz.</translation>
       <location/>
       <source>Edit Roles...</source>
       <translation>Szerepkörök szerkesztése...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableProgressWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
+      <source>Form</source>
+      <translation>Űrlap</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cancel</source>
+      <translation>Mégsem</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableUploadWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
+      <source>Form</source>
+      <translation>Űrlap</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Video</source>
+      <translation type="unfinished">Upload Video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload File...</source>
+      <translation type="unfinished">Upload File...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Folder...</source>
+      <translation type="unfinished">Upload Folder...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&lt;warning&gt;</source>
+      <translation type="unfinished">&lt;warning&gt;</translation>
     </message>
   </context>
   <context>
