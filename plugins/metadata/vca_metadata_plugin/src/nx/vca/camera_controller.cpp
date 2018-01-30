@@ -140,12 +140,12 @@ static const int kMaxRuleCount = 8;
 static_assert(kMaxRuleCount < 10, "rule profile number may have one digit");
 
 
-bool isResponseOK(const nx_http::HttpClient& client)
+bool isResponseOK(const nx::network::http::HttpClient& client)
 {
-    const nx_http::Response* response = client.response();
+    const nx::network::http::Response* response = client.response();
     if (!response)
         return false;
-    return response->statusLine.statusCode == nx_http::StatusCode::ok;
+    return response->statusLine.statusCode == nx::network::http::StatusCode::ok;
 }
 
 std::vector<std::string> getRuleTableLines(QByteArray& ruleTable)
@@ -269,7 +269,7 @@ std::map<int, bool> parseTcpTableLines(const std::vector<std::string>& lines)
 class CameraControllerImpl
 {
     nx::network::SocketGlobals::InitGuard m_initGuard;
-    nx_http::HttpClient m_client;
+    nx::network::http::HttpClient m_client;
     QString m_cgiPreamble;
     static const QString kProtocol;
     static const QString kPath;
@@ -292,7 +292,7 @@ public:
             return false;
 
         if (!m_client.response() ||
-            m_client.response()->statusLine.statusCode != nx_http::StatusCode::ok)
+            m_client.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
             return false;
 
         while (!m_client.eof())

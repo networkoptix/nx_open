@@ -12,7 +12,7 @@
 #include <nx/sdk/metadata/abstract_metadata_manager.h>
 #include <nx/sdk/metadata/common_detected_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/http/test_http_server.h>
 #include <common/common_module.h>

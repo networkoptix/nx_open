@@ -13,7 +13,7 @@
 #include <nx/fusion/model_functions.h>
 #include <plugins/plugin_internal_tools.h>
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include <nx/kit/debug.h>
 

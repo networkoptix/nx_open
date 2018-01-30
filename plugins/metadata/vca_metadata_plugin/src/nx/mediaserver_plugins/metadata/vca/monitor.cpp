@@ -342,7 +342,7 @@ nx::sdk::Error Monitor::startMonitoring(nxpl::NX_GUID* eventTypeList,
         m_url.host(), QString::number(vcaCameraConrtoller.tcpServerPort()));
 
 
-    SocketAddress vcaAddress(ipPort);
+    nx::network::SocketAddress vcaAddress(ipPort);
 
     m_tcpSocket = new nx::network::TCPSocket;
     std::unique_ptr<nx::network::TCPSocket> tcpSocketGuard(m_tcpSocket);

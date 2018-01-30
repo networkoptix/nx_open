@@ -189,7 +189,7 @@ int QnWearableCameraRestHandler::executeExtend(const QnRequestParams& params,
 
     QnUuid userId;
     if (!requireParameter(params, lit("userId"), result, &userId))
-        return nx_http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::invalidParameter;
 
     QnUuid token;
     if (!requireParameter(params, lit("token"), result, &token))
