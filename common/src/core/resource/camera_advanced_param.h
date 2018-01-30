@@ -15,15 +15,19 @@ struct QnCameraAdvancedParamValue
 
     QnCameraAdvancedParamValue() = default;
 	QnCameraAdvancedParamValue(const QString &id, const QString &value);
+    QString toString() const;
 };
 #define QnCameraAdvancedParamValue_Fields (id)(value)
 
 class QnCameraAdvancedParamValueMap: public QMap<QString, QString>
 {
-
 public:
+    QnCameraAdvancedParamValueMap(const QnCameraAdvancedParamValueList& list = {});
+    QnCameraAdvancedParamValueMap(std::initializer_list<std::pair<QString, QString>> values);
+
     QnCameraAdvancedParamValueList toValueList() const;
     void appendValueList(const QnCameraAdvancedParamValueList &list);
+    QSet<QString> ids() const;
 
     /** Get all values from this map that differs from corresponding values from other map. */
     QnCameraAdvancedParamValueList difference(const QnCameraAdvancedParamValueMap &other) const;
@@ -76,6 +80,9 @@ struct QnCameraAdvancedParameterDependency
     QString range;
     QString internalRange;
     std::vector<QnCameraAdvancedParameterCondition> conditions;
+
+    /** Auto fill id field as a hash of depended ids and values */
+    void autoFillId();
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterDependency::DependencyType, (lexical))
@@ -116,6 +123,7 @@ struct QnCameraAdvancedParameter
     bool bindDefaultToMinimum = false;
 
     bool isValid() const;
+    bool isValueValid(const QString& value) const;
     QStringList getRange() const;
     QStringList getInternalRange() const;
     QString fromInternalRange(const QString& value) const;
@@ -149,7 +157,8 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (unit)\
     (notes)\
     (shouldKeepInitialValue)\
-    (bindDefaultToMinimum)
+    (bindDefaultToMinimum)\
+    (resync)
 
 struct QnCameraAdvancedParamGroup
 {
@@ -191,6 +200,8 @@ struct QnCameraAdvancedParams
     void clear();
     QnCameraAdvancedParams filtered(const QSet<QString> &allowedIds) const;
     void applyOverloads(const std::vector<QnCameraAdvancedParameterOverload>& overloads);
+
+    void merge(QnCameraAdvancedParams params);
 };
 #define QnCameraAdvancedParams_Fields (name)(version)(unique_id)(packet_mode)(groups)
 

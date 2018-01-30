@@ -145,9 +145,8 @@ struct LayoutThumbnailLoader::Private
                     painter.translate(-cellRect.center());
                     paintPixmapSharp(&painter, specialPixmap(status, targetRect.size().toSize()),
                         targetRect.topLeft());
-                }
 
-                emit q->imageChanged(data.image);
+                }
                 loaderIsComplete = true;
                 break;
             }
@@ -171,7 +170,6 @@ struct LayoutThumbnailLoader::Private
         {
             const auto targetRect = Geometry::expanded(aspectRatio,
                 cellRect, Qt::KeepAspectRatio);
-
             QPainter painter(&data.image);
             painter.setRenderHints(QPainter::SmoothPixmapTransform);
             painter.drawImage(targetRect, tile, sourceRect);
@@ -209,6 +207,8 @@ struct LayoutThumbnailLoader::Private
         painter.drawImage(targetRect, background, background.rect());
         painter.setOpacity(1.0);
         painter.drawImage(0, 0, loaded);
+
+        emit q->imageChanged(data.image);
     }
 
     QPixmap specialPixmap(Qn::ThumbnailStatus status, const QSize& size) const
@@ -461,12 +461,12 @@ void LayoutThumbnailLoader::doLoadAsync()
         loader->loadAsync();
     }
 
-    if (d->data.numLoading)
-        return;
-
-    // If there's nothing to load.
-    d->data.status = Qn::ThumbnailStatus::Loaded;
-    emit statusChanged(d->data.status);
+    if (d->data.numLoading == 0)
+    {
+        // If there's nothing to load.
+        d->data.status = Qn::ThumbnailStatus::Loaded;
+        emit statusChanged(d->data.status);
+    }
 }
 
 } // namespace desktop

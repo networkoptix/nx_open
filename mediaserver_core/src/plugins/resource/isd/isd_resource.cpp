@@ -83,12 +83,16 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 }
 
-CameraDiagnostics::Result QnPlIsdResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnPlIsdResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex /*streamIndex*/)
 {
-    QnPhysicalCameraResource::initInternal();
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
 
+CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
+{
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("admin"));
-
 
     nx::utils::Url apiRequestUrl;
     apiRequestUrl.setScheme( lit("http") );
@@ -260,10 +264,10 @@ QnConstResourceAudioLayoutPtr QnPlIsdResource::getAudioLayout(const QnAbstractSt
         if (rtspReader && rtspReader->getDPAudioLayout())
             return rtspReader->getDPAudioLayout();
         else
-            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
     }
     else
-        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
 }
 
 

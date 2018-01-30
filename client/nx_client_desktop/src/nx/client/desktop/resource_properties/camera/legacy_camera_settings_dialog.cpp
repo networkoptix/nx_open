@@ -97,7 +97,7 @@ LegacyCameraSettingsDialog::LegacyCameraSettingsDialog(QWidget *parent):
     layout->addWidget(m_buttonBox);
 
     connect(m_settingsWidget, &CameraSettingsWidget::hasChangesChanged, this, &LegacyCameraSettingsDialog::at_settingsWidget_hasChangesChanged);
-    connect(m_settingsWidget, &CameraSettingsWidget::modeChanged, this, &LegacyCameraSettingsDialog::at_settingsWidget_modeChanged);
+    connect(m_settingsWidget, &QnCameraSettingsWidget::modeChanged, this, &CameraSettingsDialog::updateButtonsVisibility);
 
     connect(m_openButton, &QPushButton::clicked, this, &LegacyCameraSettingsDialog::at_openButton_clicked);
     connect(m_diagnoseButton, &QPushButton::clicked, this, &LegacyCameraSettingsDialog::at_diagnoseButton_clicked);
@@ -223,15 +223,20 @@ void LegacyCameraSettingsDialog::at_settingsWidget_hasChangesChanged()
     m_settingsWidget->setExportScheduleButtonEnabled(!hasChanges);
 }
 
-void LegacyCameraSettingsDialog::at_settingsWidget_modeChanged()
+void LegacyCameraSettingsDialog::updateButtonsVisibility()
 {
     CameraSettingsWidget::Mode mode = m_settingsWidget->mode();
     bool isValidMode = (mode == CameraSettingsWidget::SingleMode || mode == CameraSettingsWidget::MultiMode);
     m_settingsWidget->setExportScheduleButtonEnabled(!m_settingsWidget->hasDbChanges());
+
+    bool hasWearable = false;
+    for (const QnVirtualCameraResourcePtr& camera : m_settingsWidget->cameras())
+        hasWearable |= camera->hasFlags(Qn::wearable_camera);
+
     m_okButton->setEnabled(isValidMode && !commonModule()->isReadOnly());
     m_openButton->setVisible(isValidMode);
-    m_diagnoseButton->setVisible(isValidMode);
-    m_rulesButton->setVisible(mode == CameraSettingsWidget::SingleMode);  // TODO: #GDM implement
+    m_diagnoseButton->setVisible(isValidMode && !hasWearable);
+    m_rulesButton->setVisible(mode == CameraSettingsWidget::SingleMode && !hasWearable); // TODO: #GDM implement
 }
 
 void LegacyCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
@@ -314,6 +319,7 @@ bool LegacyCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& c
     handleCamerasWithDefaultPasswordChanged();
 
     retranslateUi();
+    updateButtonsVisibility();
     return true;
 }
 

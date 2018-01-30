@@ -23,7 +23,7 @@ QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnRes
     m_mediaResource = res;
     NX_ASSERT(dynamic_cast<QnMediaResource*>(m_mediaResource.data()));
     resetTimeCheck();
-    m_isCamera = dynamic_cast<const QnPhysicalCameraResource*>(res.data()) != nullptr;
+    m_isCamera = dynamic_cast<const QnSecurityCamResource*>(res.data()) != nullptr;
     //QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
     //m_NumaberOfVideoChannels = mr->getMediaLayout()->numberOfVideoChannels();
 }

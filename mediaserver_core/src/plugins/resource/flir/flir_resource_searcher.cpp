@@ -35,7 +35,7 @@ QnResourcePtr QnFlirResourceSearcher::createResource(const QnUuid &resourceTypeI
         return result;
     }
 
-    result = QnPhysicalCameraResourcePtr( new QnFlirEIPResource() );
+    result.reset(new QnFlirEIPResource());
     result->setTypeId(resourceTypeId);
 
     qDebug() << "Create FLIR camera resource. typeID:" << resourceTypeId.toString();

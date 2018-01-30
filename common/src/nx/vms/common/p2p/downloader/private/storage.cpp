@@ -13,6 +13,7 @@ namespace {
 
 static constexpr qint64 kDefaultChunkSize = 1024 * 1024;
 static const QString kMetadataSuffix = lit(".vmsdownload");
+static const int kCleanupPeriodMSecs = 1000 * 60 * 5;
 
 } // namespace
 
@@ -34,7 +35,7 @@ Storage::Storage(const QDir& downloadsDirectory, QObject* parent):
     /* Cleanup expired files every 5 mins. */
     QTimer* timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Storage::cleanupExpiredFiles);
-    timer->start(1000 * 60 * 5);
+    timer->start(kCleanupPeriodMSecs);
 }
 
 QDir Storage::downloadsDirectory() const

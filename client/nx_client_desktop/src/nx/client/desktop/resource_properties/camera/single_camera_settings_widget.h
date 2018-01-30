@@ -86,6 +86,7 @@ private slots:
     void updateIpAddressText();
     void updateWebPageText();
     void updateAlertBar();
+    void updateWearableProgressVisibility();
 
 private:
     void setHasDbChanges(bool hasChanges);

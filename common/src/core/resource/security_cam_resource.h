@@ -31,15 +31,15 @@ class QnDataProviderFactory;
 typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 #endif
 
-static const int PRIMARY_ENCODER_INDEX = 0;
-static const int SECONDARY_ENCODER_INDEX = 1;
-
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
 {
     typedef QnNetworkResource base_type;
     Q_OBJECT
 
 public:
+    static const int kDefaultSecondStreamFpsLow;
+    static const int kDefaultSecondStreamFpsMedium;
+    static const int kDefaultSecondStreamFpsHigh;
     static QnUuid makeCameraIdFromUniqueId(const QString& uniqueId);
 
 public:
@@ -58,7 +58,7 @@ public:
     bool hasTwoWayAudio() const;
 
     bool hasMotion() const;
-    Qn::MotionType getMotionType() const;
+    virtual Qn::MotionType getMotionType() const;
     void setMotionType(Qn::MotionType value);
 
     //!Returns driver (built-in or external) name, used to manage camera
@@ -96,7 +96,7 @@ public:
     virtual bool hasDualStreaming() const;
 
     /** Return true if dual streaming supported and don't blocked by user */
-    bool hasDualStreaming2() const;
+    virtual bool hasDualStreaming2() const;
 
     /** Returns true if camera stores archive on a external system */
     bool isDtsBased() const;
@@ -181,6 +181,7 @@ public:
     void setFailoverPriority(Qn::FailoverPriority value);
 
     bool isAudioEnabled() const;
+    bool isAudioForced() const;
     void setAudioEnabled(bool value);
 
     bool isAdvancedWorking() const;
@@ -216,14 +217,14 @@ public:
     virtual const QnResourcePtr toResourcePtr() const override;
     //!Implementation of QnMediaResource::toResource
     virtual QnResourcePtr toResourcePtr() override;
-    void setSecondaryStreamQuality(Qn::SecondStreamQuality  quality);
-    Qn::SecondStreamQuality  secondaryStreamQuality() const;
+
+    void setDisableDualStreaming(bool value);
+    bool isDualStreamingDisabled() const;
 
     void setCameraControlDisabled(bool value);
-    bool isCameraControlDisabled() const;
+    virtual bool isCameraControlDisabled() const;
 
-    int desiredSecondStreamFps() const;
-    Qn::StreamQuality getSecondaryStreamQuality() const;
+    int defaultSecondaryFps(Qn::StreamQuality quality) const;
 
     // TODO: #2.4 #rvasilenko #High Move to runtime data
     Qn::CameraStatusFlags statusFlags() const;
@@ -305,9 +306,8 @@ public:
     virtual void analyticsEventStarted(const QString& caption, const QString& description);
     virtual void analyticsEventEnded(const QString& caption, const QString& description);
 
-    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
-    virtual int suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
-    float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const;
+    virtual int suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
+    static float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps);
 
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
     virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const;
@@ -347,7 +347,8 @@ signals:
     void failoverPriorityChanged(const QnResourcePtr &resource);
     void backupQualitiesChanged(const QnResourcePtr &resource);
     void capabilitiesChanged(const QnResourcePtr& resource);
-    void secondaryStreamQualityChanged(const QnResourcePtr& resource);
+    void disableDualStreamingChanged(const QnResourcePtr& resource);
+    void audioEnabledChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
 
@@ -414,7 +415,7 @@ protected:
     virtual bool isInputPortMonitored() const;
 
     virtual Qn::LicenseType calculateLicenseType() const;
-
+    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
 protected:
 #ifdef ENABLE_DATA_PROVIDERS
     QnAudioTransmitterPtr m_audioTransmitter;

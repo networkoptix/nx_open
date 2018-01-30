@@ -70,7 +70,7 @@ public:
         if (auto value = parameter<T>(name))
             return *value;
 
-        static const auto errorMessage = QStringLiteral("Paramiter %1 is not found in response");
+        static const auto errorMessage = QStringLiteral("Parameter %1 is not found in response");
         throw std::runtime_error(errorMessage.arg(name).toStdString()) ;
     }
 

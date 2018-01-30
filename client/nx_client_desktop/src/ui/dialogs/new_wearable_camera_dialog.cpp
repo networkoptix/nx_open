@@ -3,8 +3,11 @@
 
 #include <algorithm>
 
+#include <QtWidgets/QPushButton>
+
 #include <nx/utils/string.h>
 #include <ui/models/resource/resource_list_model.h>
+#include <ui/common/aligner.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
@@ -43,7 +46,14 @@ QnNewWearableCameraDialog::QnNewWearableCameraDialog(QWidget* parent):
         tr("Wearable Camera"),
         tr("Wearable Camera %1"));
 
-    ui->nameEdit->setText(name);
+    ui->nameField->setTitle(tr("Name"));
+    ui->nameField->setText(name);
+    ui->nameField->setValidator(Qn::defaultNonEmptyValidator(tr("Name cannot be empty")));
+
+    QnAligner* aligner = new QnAligner(this);
+    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->addWidget(ui->serverLabel);
+    aligner->addWidget(ui->nameField);
 
     setResizeToContentsMode(Qt::Vertical);
 }
@@ -54,7 +64,7 @@ QnNewWearableCameraDialog::~QnNewWearableCameraDialog()
 
 QString QnNewWearableCameraDialog::name() const
 {
-    return ui->nameEdit->text();
+    return ui->nameField->text();
 }
 
 const QnMediaServerResourcePtr QnNewWearableCameraDialog::server() const
@@ -63,3 +73,12 @@ const QnMediaServerResourcePtr QnNewWearableCameraDialog::server() const
     return data.value<QnResourcePtr>().dynamicCast<QnMediaServerResource>();
 }
 
+void QnNewWearableCameraDialog::accept()
+{
+    if (!ui->nameField->isValid()) {
+        ui->buttonBox->button(QDialogButtonBox::Ok)->setFocus(Qt::TabFocusReason);
+        return;
+    }
+
+    base_type::accept();
+}

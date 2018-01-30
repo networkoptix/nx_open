@@ -37,17 +37,8 @@ public:
 
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager() override;
 
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-
-    virtual bool getParamsPhysical(
-        const QSet<QString> &idList,
-        QnCameraAdvancedParamValueList& result) override;
-
-    virtual bool setParamPhysical(const QString &id, const QString& value) override;
-
-    virtual bool setParamsPhysical(
-        const QnCameraAdvancedParamValueList &values,
-        QnCameraAdvancedParamValueList &result) override;
+    virtual QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids) override;
+    virtual QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values) override;
 
     virtual QnIOPortDataList getRelayOutputList() const override;
 
@@ -120,7 +111,9 @@ public:
 
     virtual bool setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString = nullptr) override;
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual QnAbstractPtzController* createPtzControllerInternal() override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;

@@ -192,6 +192,7 @@
                 <param name = "ioConfigCapability" default_value ="1"/>
                 <param name = "ioDisplayName" default_value ="A1,A2,A3,A4,B1,B2,B3,B4"/>  
                 <param name = "noVideoSupport" default_value ="1"/>
+                <param name = "forcedAudioStream" default_value ="1"/>
                 <param name = "hasDualStreaming" default_value ="0"/>
             </params>
         </resource> 
@@ -227,6 +228,7 @@
         <resource name = "AXISC3003E" public = "AXIS_COMMON">
             <params>
                 <param name = "noVideoSupport" default_value ="1"/>
+                <param name = "forcedAudioStream" default_value ="1"/>
             </params>
         </resource>
         <resource name = "AXISA8004VE" public = "AXIS_COMMON"/>

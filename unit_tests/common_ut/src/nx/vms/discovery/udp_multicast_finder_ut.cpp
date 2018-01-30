@@ -4,6 +4,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/sync_queue.h>
+#include <nx/utils/test_support/test_options.h>
 #include <nx/vms/discovery/udp_multicast_finder.h>
 
 namespace nx {
@@ -89,6 +90,25 @@ TEST_F(DiscoveryUdpMulticastFinder, Base)
     waitForDiscovery(information2); //< Replaced data.
 }
 
+TEST_F(DiscoveryUdpMulticastFinder, UpdateInterfacesAndModuleInformation)
+{
+    moduleFinder.setSendInterval(std::chrono::milliseconds(20));
+    moduleFinder.setUpdateInterfacesInterval(std::chrono::milliseconds(50));
+    moduleFinder.updateInterfaces();
+    moduleFinder.listen(
+        [this](QnModuleInformationWithAddresses module, SocketAddress endpoint)
+        {
+            NX_VERBOSE(this, lm("Found module %1 on %2").args(module.id, endpoint));
+        });
+
+    const auto count = nx::utils::TestOptions::applyLoadMode(100);
+    for (auto i = 0; i < count; ++i)
+    {
+        moduleFinder.multicastInformation(makeModuleInformation());
+        std::this_thread::sleep_for(std::chrono::milliseconds(nx::utils::random::number(10, 50)));
+    }
+}
+
 // Only makes sense to use across real network to test actual multicasts.
 TEST_F(DiscoveryUdpMulticastFinder, DISABLED_RealUse)
 {
@@ -96,7 +116,7 @@ TEST_F(DiscoveryUdpMulticastFinder, DISABLED_RealUse)
     moduleFinder.listen(
         [this](QnModuleInformationWithAddresses module, nx::network::SocketAddress endpoint)
         {
-            NX_LOGX(lm("Found module %1 on %2").args(module.id, endpoint), cl_logINFO);
+            NX_INFO(this, lm("Found module %1 on %2").args(module.id, endpoint));
         });
 
     for (;;)

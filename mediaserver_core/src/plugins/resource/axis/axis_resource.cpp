@@ -30,6 +30,7 @@
 #include <common/static_common_module.h>
 
 #include <algorithm>
+#include <utils/media/av_codec_helper.h>
 
 using namespace std;
 
@@ -121,7 +122,8 @@ private:
 QnPlAxisResource::QnPlAxisResource():
     m_lastMotionReadTime(0),
     m_inputIoMonitor(Qn::PT_Input),
-    m_outputIoMonitor(Qn::PT_Output)
+    m_outputIoMonitor(Qn::PT_Output),
+    m_advancedParametersProvider(this)
 {
     m_audioTransmitter.reset(new QnAxisAudioTransmitter(this));
     setVendor(lit("Axis"));
@@ -419,10 +421,25 @@ bool resolutionGreatThan(const QnPlAxisResource::AxisResolution& res1, const QnP
     return !(square1 < square2);
 }
 
-CameraDiagnostics::Result QnPlAxisResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnPlAxisResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex streamIndex)
 {
-    QnPhysicalCameraResource::initInternal();
+    using namespace nx::mediaserver::resource;
 
+    QnMutexLocker lock(&m_mutex);
+    StreamCapabilityKey key;
+    StreamCapabilityMap result;
+    for (const auto& resolution: m_resolutionList)
+    {
+        key.codec = QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H264);
+        key.resolution = resolution.size;
+        result.insert(key, nx::media::CameraStreamCapability());
+    }
+    return result;
+}
+
+CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
+{
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("root"));
     QAuthenticator auth = getAuth();
 
@@ -539,14 +556,6 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     {
         QnMutexLocker lock(&m_mutex);
         std::sort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
-
-        //detecting primary & secondary resolution
-        m_resolutions[PRIMARY_ENCODER_INDEX] = getMaxResolution();
-        m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(
-            QSize(480,316),
-            getResolutionAspectRatio(getMaxResolution()) );
-        if (m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty())
-            m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
     }
 
 
@@ -742,10 +751,10 @@ QnConstResourceAudioLayoutPtr QnPlAxisResource::getAudioLayout(const QnAbstractS
         if (axisReader && axisReader->getDPAudioLayout())
             return axisReader->getDPAudioLayout();
         else
-            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
     }
     else
-        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
 }
 
 int QnPlAxisResource::getChannelNumAxis() const
@@ -1368,13 +1377,6 @@ QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {
     return new QnAxisPtzController(toSharedPointer(this));
 }
 
-QnPlAxisResource::AxisResolution QnPlAxisResource::getResolution( int encoderIndex ) const
-{
-    return (unsigned int)encoderIndex < sizeof(m_resolutions)/sizeof(*m_resolutions)
-        ? m_resolutions[encoderIndex]
-        : QnPlAxisResource::AxisResolution();
-}
-
 int QnPlAxisResource::getChannel() const
 {
     return getChannelNumAxis() - 1;
@@ -1472,14 +1474,10 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
 QList<QnCameraAdvancedParameter> QnPlAxisResource::getParamsByIds(const QSet<QString>& ids) const
 {
     QList<QnCameraAdvancedParameter> params;
-
+    for (const auto& id: ids)
     {
-        QnMutexLocker lock(&m_mutex);
-        for (const auto& id: ids)
-        {
-            auto param = m_advancedParameters.getParameterById(id);
-            params.append(param);
-        }
+        auto param = m_advancedParametersProvider.getParameterById(id);
+        params.append(param);
     }
 
     return params;
@@ -1550,15 +1548,7 @@ void QnPlAxisResource::fetchAndSetAdvancedParameters()
     params.applyOverloads(overloads);
 
     auto supportedParams = calculateSupportedAdvancedParameters(params);
-
-    auto filteredParams = params.filtered(supportedParams);
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_advancedParameters = filteredParams;
-    }
-
-    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), filteredParams);
+    m_advancedParametersProvider.assign(params.filtered(supportedParams));
 }
 
 bool QnPlAxisResource::isMaintenanceParam(const QnCameraAdvancedParameter &param) const
@@ -1666,7 +1656,7 @@ QString QnPlAxisResource::buildSetParamsQuery(const QnCameraAdvancedParamValueLi
         QnMutexLocker lock(&m_mutex);
         for (const auto& paramIdAndValue: params)
         {
-            auto param = m_advancedParameters.getParameterById(paramIdAndValue.id);
+            auto param = m_advancedParametersProvider.getParameterById(paramIdAndValue.id);
             if (isMaintenanceParam(param))
                 continue;
 
@@ -1694,7 +1684,7 @@ QString QnPlAxisResource::buildMaintenanceQuery(const QnCameraAdvancedParamValue
         QnMutexLocker lock(&m_mutex);
         for (const auto& paramIdAndValue: params)
         {
-            auto param = m_advancedParameters.getParameterById(paramIdAndValue.id);
+            auto param = m_advancedParametersProvider.getParameterById(paramIdAndValue.id);
             if (isMaintenanceParam(param))
                 return query + param.readCmd;
         }
@@ -1702,58 +1692,46 @@ QString QnPlAxisResource::buildMaintenanceQuery(const QnCameraAdvancedParamValue
     return QString();
 }
 
-bool QnPlAxisResource::getParamPhysical(const QString &id, QString &value)
+std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+    QnPlAxisResource::advancedParametersProviders()
 {
-    QSet<QString> idList;
-    QnCameraAdvancedParamValueList paramValueList;
-    idList.insert(id);
-    auto result = getParamsPhysical(idList, paramValueList);
-    if (!paramValueList.isEmpty())
-        value = paramValueList.first().value;
-
-    return result;
+    return {&m_advancedParametersProvider};
 }
 
-bool QnPlAxisResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result)
+QnCameraAdvancedParamValueMap QnPlAxisResource::getApiParameters(const QSet<QString>& ids)
 {
     bool success = true;
-    const auto params = getParamsByIds(idList);
+    const auto params = getParamsByIds(ids);
     const auto queries = buildGetParamsQueries(params);
-
     const auto queriesResults = executeParamsQueries(queries, success);
-
-    result = parseParamsQueriesResult(queriesResults, params);
-
-    return result.size() == idList.size();
-
+    return parseParamsQueriesResult(queriesResults, params);
 }
 
-bool QnPlAxisResource::setParamPhysical(const QString &id, const QString& value)
+QSet<QString> QnPlAxisResource::setApiParameters(const QnCameraAdvancedParamValueMap& values)
 {
-    QnCameraAdvancedParamValueList inputParamList;
-    QnCameraAdvancedParamValueList resParamList;
-    inputParamList.append({ id, value });
-    return setParamsPhysical(inputParamList, resParamList);
-}
+    const auto valueList = values.toValueList();
+    const auto query = buildSetParamsQuery(valueList);
+    const auto maintenanceQuery = buildMaintenanceQuery(valueList);
 
-bool QnPlAxisResource::setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
-{
     bool success;
-    const auto query = buildSetParamsQuery(values);
-    const auto maintenanceQuery = buildMaintenanceQuery(values);
-
-    result.clear();
-
     if (!query.isEmpty())
         executeParamsQueries(query, success);
 
     if (!maintenanceQuery.isEmpty())
         executeParamsQueries(maintenanceQuery, success);
 
-    if (success)
-        result.append(values);
+    return success ? values.ids() : QSet<QString>();
+}
 
-    return success;
+QString QnPlAxisResource::resolutionToString(const QSize& resolution)
+{
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& axisResolution: m_resolutionList)
+    {
+        if (axisResolution.size == resolution)
+            return axisResolution.resolutionStr;
+    }
+    return lm("%1x%2").args(resolution.width(), resolution.height());
 }
 
 #endif // #ifdef ENABLE_AXIS

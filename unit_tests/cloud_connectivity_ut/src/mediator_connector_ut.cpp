@@ -7,6 +7,7 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/atomic_unique_ptr.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
@@ -83,8 +84,7 @@ protected:
     void whenMediatorUrlEndpointIsChanged()
     {
         // Launching another mediator to make sure it has different endpoint.
-        decltype(m_mediator) oldMediator;
-        oldMediator.swap(m_mediator);
+        decltype(m_mediator) oldMediator(m_mediator.release());
         startMediator();
     }
 
@@ -128,7 +128,7 @@ private:
     using Mediator = nx::utils::test::ModuleLauncher<MediatorProcessPublic>;
 
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
-    std::unique_ptr<Mediator> m_mediator;
+    nx::utils::AtomicUniquePtr<Mediator> m_mediator;
     std::unique_ptr<api::MediatorConnector> m_mediatorConnector;
     SystemCredentials m_cloudSystemCredentials;
     LocalCloudDataProvider m_localCloudDataProvider;
@@ -143,11 +143,13 @@ private:
 
     void startMediator()
     {
-        m_mediator = std::make_unique<Mediator>();
-        m_mediator->addArg("--cloud_db/runWithCloud=false");
-        m_mediator->addArg("--http/addrToListenList=127.0.0.1:0");
-        m_mediator->addArg("--stun/addrToListenList=127.0.0.1:0");
-        ASSERT_TRUE(m_mediator->startAndWaitUntilStarted());
+        auto mediator = nx::utils::make_atomic_unique<Mediator>();
+        mediator->addArg("--cloud_db/runWithCloud=false");
+        mediator->addArg("--http/addrToListenList=127.0.0.1:0");
+        mediator->addArg("--stun/addrToListenList=127.0.0.1:0");
+        ASSERT_TRUE(mediator->startAndWaitUntilStarted());
+
+        m_mediator = std::move(mediator);
     }
 
     void initializeCloudModulesXmlProvider()

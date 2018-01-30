@@ -73,10 +73,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QStackedWidget" name="stackedWidget">
-     <property name="currentIndex">
-      <number>1</number>
-     </property>
+    <widget class="QTabWidget" name="tabWidget">
      <widget class="QWidget" name="noSettingsPage">
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
@@ -106,20 +103,6 @@
           <url>
            <string/>
           </url>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="unavailablePage">
-      <layout class="QVBoxLayout" name="verticalLayout_5">
-       <item>
-        <widget class="QLabel" name="unavailableLabel">
-         <property name="text">
-          <string>Advanced settings are unavailable</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>

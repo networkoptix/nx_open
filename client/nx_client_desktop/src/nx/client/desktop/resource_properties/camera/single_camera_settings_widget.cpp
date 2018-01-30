@@ -75,6 +75,8 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->wearableUploadWidget->initializeContext();
+    ui->wearableProgressWidget->initializeContext();
+    ui->wearableArchiveLengthWidget->initializeContext();
     ui->licensingWidget->initializeContext();
     ui->cameraScheduleWidget->initializeContext();
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
@@ -193,6 +195,9 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->advancedSettingsWidget, &CameraAdvancedSettingsWidget::hasChangesChanged,
         this, &SingleCameraSettingsWidget::hasChangesChanged);
 
+    connect(ui->wearableProgressWidget, &QnWearableProgressWidget::activeChanged,
+        this, &SingleCameraSettingsWidget::updateWearableProgressVisibility);
+
     updateFromResource(true);
     retranslateUi();
 
@@ -207,6 +212,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
         ui->macAddressLabel,
         ui->loginLabel,
         ui->passwordLabel });
+    aligner->addAligner(ui->wearableArchiveLengthWidget->aligner());
 }
 
 SingleCameraSettingsWidget::~SingleCameraSettingsWidget()
@@ -248,6 +254,8 @@ void SingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &cam
     ui->cameraScheduleWidget->setCameras(cameras);
     ui->licensingWidget->setCameras(cameras);
     ui->wearableUploadWidget->setCamera(camera);
+    ui->wearableProgressWidget->setCamera(camera);
+    ui->wearableArchiveLengthWidget->updateFromResources(cameras);
 
     if (m_camera)
     {
@@ -428,6 +436,8 @@ void SingleCameraSettingsWidget::updateFromResource(bool silent)
 
     ui->imageControlWidget->updateFromResources(cameras);
 
+    updateWearableProgressVisibility();
+
     if (!m_camera)
     {
         ui->nameEdit->clear();
@@ -445,18 +455,41 @@ void SingleCameraSettingsWidget::updateFromResource(bool silent)
         ui->motionSensitivityGroupBox->setEnabled(false);
         ui->motionControlsWidget->setVisible(false);
         ui->motionAvailableLabel->setVisible(true);
+        ui->wearableUploadWidget->setVisible(false);
     }
     else
     {
+        bool isWearable = m_camera->hasFlags(Qn::wearable_camera);
         bool hasVideo = m_camera->hasVideo(0);
         bool hasAudio = m_camera->isAudioSupported();
+
+        ui->wearableUploadWidget->setVisible(isWearable);
+        ui->modelEdit->setVisible(!isWearable);
+        ui->modelLabel->setVisible(!isWearable);
+        ui->firmwareEdit->setVisible(!isWearable);
+        ui->firmwareLabel->setVisible(!isWearable);
+        ui->vendorEdit->setVisible(!isWearable);
+        ui->vendorLabel->setVisible(!isWearable);
+        ui->addressGroupBox->setVisible(!isWearable);
+        ui->authenticationGroupBox->setVisible(!isWearable);
+
+        if (isWearable)
+        {
+            ui->addressOrArchiveLengthWidget->setCurrentWidget(ui->wearableArchiveLengthPage);
+            ui->authenticationOrWearableInfoWidget->setCurrentWidget(ui->wearableInfoPage);
+        }
+        else
+        {
+            ui->addressOrArchiveLengthWidget->setCurrentWidget(ui->addressPage);
+            ui->authenticationOrWearableInfoWidget->setCurrentWidget(ui->authenticationPage);
+        }
 
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
         ui->firmwareEdit->setText(m_camera->getFirmware());
         ui->vendorEdit->setText(m_camera->getVendor());
         ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
-        ui->enableAudioCheckBox->setEnabled(hasAudio);
+        ui->enableAudioCheckBox->setEnabled(hasAudio && !m_camera->isAudioForced());
 
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
 
@@ -468,12 +501,12 @@ void SingleCameraSettingsWidget::updateFromResource(bool silent)
         const bool dtsBased = m_camera->isDtsBased();
         const bool isIoModule = m_camera->isIOModule();
 
-        setTabEnabledSafe(CameraSettingsTab::advanced, !m_lockedMode);
-        setTabEnabledSafe(CameraSettingsTab::recording, !dtsBased && (hasAudio || hasVideo) && !m_lockedMode);
-        setTabEnabledSafe(CameraSettingsTab::motion, !dtsBased && hasVideo && !m_lockedMode);
-        setTabEnabledSafe(CameraSettingsTab::expert, !dtsBased && hasVideo && !isReadOnly() && !m_lockedMode);
-        setTabEnabledSafe(CameraSettingsTab::io, isIoModule && !m_lockedMode);
-        setTabEnabledSafe(CameraSettingsTab::fisheye, !isIoModule && !m_lockedMode);
+        setTabEnabledSafe(CameraSettingsTab::advanced, !m_lockedMode && !isWearable);
+        setTabEnabledSafe(CameraSettingsTab::recording, !dtsBased && (hasAudio || hasVideo) && !m_lockedMode && !isWearable);
+        setTabEnabledSafe(CameraSettingsTab::motion, !dtsBased && hasVideo && !m_lockedMode && !isWearable);
+        setTabEnabledSafe(CameraSettingsTab::expert, !dtsBased && hasVideo && !isReadOnly() && !m_lockedMode && !isWearable);
+        setTabEnabledSafe(CameraSettingsTab::io, isIoModule && !m_lockedMode && !isWearable);
+        setTabEnabledSafe(CameraSettingsTab::fisheye, !isIoModule && !m_lockedMode && !isWearable);
 
 
         if (!dtsBased)
@@ -756,6 +789,16 @@ void SingleCameraSettingsWidget::updateAlertBar()
         default:
             ui->alertBar->setText(QString());
     }
+}
+
+void SingleCameraSettingsWidget::updateWearableProgressVisibility()
+{
+    if (!m_camera || !m_camera->hasFlags(Qn::wearable_camera)) {
+        ui->wearableProgressWidget->setVisible(false);
+        return;
+    }
+
+    ui->wearableProgressWidget->setVisible(ui->wearableProgressWidget->isActive());
 }
 
 bool SingleCameraSettingsWidget::isValidSecondStream()

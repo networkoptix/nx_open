@@ -9,11 +9,10 @@
 #include <nx/network/mac_address.h>
 
 class QnActiResourceSearcher:
-    public QObject,
-    public QnUpnpResourceSearcherAsync
+    public QnAbstractNetworkResourceSearcher,
+    public nx_upnp::SearchAutoHandler
 {
-    Q_OBJECT;
-    using base_type = QnUpnpResourceSearcherAsync;
+    using base_type = nx_upnp::SearchAutoHandler;
 public:
     QnActiResourceSearcher(QnCommonModule* commonModule);
     virtual ~QnActiResourceSearcher();
@@ -22,18 +21,17 @@ public:
 
     virtual QString manufacture() const;
 
+    virtual QnResourceList findResources() override;
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
-
-    virtual QnResourceList findResources(void) override;
 
     static const QString kSystemInfoProductionIdParamName;
 protected:
-    virtual void processPacket(
+    virtual bool processPacket(
         const QHostAddress& discoveryAddr,
         const nx::network::SocketAddress& deviceEndpoint,
         const nx::network::upnp::DeviceInfo& devInfo,
-        const QByteArray& xmlDevInfo,
-        QnResourceList& result) override;
+        const QByteArray& xmlDevInfo) override;
+
 
 private:
     struct CacheInfo
@@ -56,7 +54,6 @@ private:
     QnMutex m_mutex;
 
     nx::network::upnp::DeviceInfo parseDeviceXml(const QByteArray& rawData, bool* outStatus) const;
-    QByteArray getDeviceXmlAsync(const nx::utils::Url &url);
     nx::network::upnp::DeviceInfo getDeviceInfoSync(const nx::utils::Url& url, bool* outStatus) const;
 
     bool isNxDevice(const nx::network::upnp::DeviceInfo& devInfo) const;
@@ -76,23 +73,16 @@ private:
         const QAuthenticator &auth,
         QnResourceList& result );
 
-    void processDeviceXml(
-        const QByteArray& foundDeviceDescription,
-        const nx::network::HostAddress& host,
-        const nx::network::HostAddress& sender,
-        QnResourceList& result );
-
     boost::optional<QnActiResource::ActiSystemInfo> getActiSystemInfo(
         const QnActiResourcePtr& actiResource);
 
     QString retreiveModel(const QString& model, const QString& serialNumber) const;
 
-private slots:
-    void at_httpConnectionDone(nx::network::http::AsyncHttpClientPtr reply);
-
 private:
     QnUuid m_resTypeId;
     QMap<QString, std::shared_ptr<QnActiSystemInfoChecker>> m_systemInfoCheckers;
+    QnResourceList m_foundUpnpResources;
+    QSet<QString> m_alreadFoundMacAddresses;
 };
 
 #endif // #ifdef ENABLE_ACTI

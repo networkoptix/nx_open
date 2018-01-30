@@ -1,18 +1,16 @@
-#ifndef __STARDOT_RESOURCE_H__
-#define __STARDOT_RESOURCE_H__
+#pragma once
 
 #ifdef ENABLE_STARDOT
 
 #include <QtCore/QMap>
 #include <nx/utils/thread/mutex.h>
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
-#include "nx/streaming/media_data_packet.h"
+#include <nx/mediaserver/resource/camera.h>
+#include <nx/streaming/media_data_packet.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/deprecated/simple_http_client.h>
 
-class QnStardotResource : public QnPhysicalCameraResource
+class QnStardotResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
@@ -42,7 +40,9 @@ public:
     simd128i* getMotionMaskBinData() const;
 
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setMotionMaskPhysical(int channel) override;
 private:
@@ -60,4 +60,3 @@ private:
 };
 
 #endif // #ifdef ENABLE_STARDOT
-#endif // __STARDOT_RESOURCE_H__

@@ -42,12 +42,35 @@ void RemoteArchiveWorkerPool::start()
     m_timerId = scheduleTaskGrabbing();
 }
 
+void RemoteArchiveWorkerPool::addTask(const RemoteArchiveTaskPtr& task)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    m_taskQueue.push_back(task);
+
+    processTaskQueueUnsafe();
+}
+
 void RemoteArchiveWorkerPool::cancelTask(const QnUuid& taskId)
 {
     QnMutexLocker lock(&m_mutex);
     const auto itr = m_workers.find(taskId);
     if (itr != m_workers.cend())
         itr->second->pleaseStop();
+
+    // Also clean up queue.
+    for (auto pos = m_taskQueue.begin(); pos != m_taskQueue.end();)
+    {
+        RemoteArchiveTaskPtr task = *pos;
+        if (task->id() == taskId)
+        {
+            pos = m_taskQueue.erase(pos);
+        }
+        else
+        {
+            ++pos;
+        }
+    }
 }
 
 void RemoteArchiveWorkerPool::setMaxTaskCount(int maxTaskCount)
@@ -74,18 +97,17 @@ nx::utils::TimerId RemoteArchiveWorkerPool::scheduleTaskGrabbing()
                 return;
 
             cleanUpUnsafe();
-            processTasksUnsafe();
+            processTaskQueueUnsafe();
+            processTaskMapUnsafe();
+            m_timerId = scheduleTaskGrabbing();
         },
         kGrabTasksCycleDuration);
 }
 
-void RemoteArchiveWorkerPool::processTasksUnsafe()
+void RemoteArchiveWorkerPool::processTaskMapUnsafe()
 {
     if (!m_taskMapAccessor)
-    {
-        NX_ASSERT(false, lit("No task map accessor. Pool is useless"));
         return;
-    }
 
     auto lockableTaskMap = m_taskMapAccessor();
     if (!lockableTaskMap)
@@ -100,22 +122,45 @@ void RemoteArchiveWorkerPool::processTasksUnsafe()
         if (m_workers.size() >= m_maxTaskCount)
             break;
 
-        auto taskId = itr->first;
-        if (m_workers.find(taskId) != m_workers.cend())
+        if (startWorkerUnsafe(itr->second))
         {
-            // There is already running task with such Id. Ignore it.
-            ++itr;
-            continue;
+            itr = lockedMap->erase(itr);
         }
-
-        auto worker = std::make_unique<RemoteArchiveWorker>(itr->second);
-        m_workers[itr->first] = std::move(worker);
-        m_workers[itr->first]->start();
-
-        itr = lockedMap->erase(itr);
+        else
+        {
+            ++itr;
+        }
     }
+}
 
-    m_timerId = scheduleTaskGrabbing();
+void RemoteArchiveWorkerPool::processTaskQueueUnsafe()
+{
+    for (auto itr = m_taskQueue.begin(); itr != m_taskQueue.end();)
+    {
+        if (m_workers.size() >= m_maxTaskCount)
+            break;
+
+        if (startWorkerUnsafe(*itr))
+        {
+            itr = m_taskQueue.erase(itr);
+        }
+        else
+        {
+            ++itr;
+        }
+    }
+}
+
+bool RemoteArchiveWorkerPool::startWorkerUnsafe(const RemoteArchiveTaskPtr& task)
+{
+    QnUuid taskId = task->id();
+    if (m_workers.find(taskId) != m_workers.cend())
+        return false; //< There is already running task with such Id. Ignore it.
+
+    auto worker = std::make_unique<RemoteArchiveWorker>(task);
+    m_workers[taskId] = std::move(worker);
+    m_workers[taskId]->start();
+    return true;
 }
 
 void RemoteArchiveWorkerPool::cleanUpUnsafe()

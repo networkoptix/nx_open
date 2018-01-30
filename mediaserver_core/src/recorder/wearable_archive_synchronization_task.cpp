@@ -18,12 +18,12 @@ namespace recorder {
 
 
 WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
-    QnCommonModule* commonModule,
+    QnMediaServerModule* serverModule,
     const QnSecurityCamResourcePtr& resource,
     std::unique_ptr<QIODevice> file,
     qint64 startTimeMs)
     :
-    base_type(commonModule),
+    base_type(serverModule),
     m_resource(resource),
     m_file(file.release()),
     m_startTimeMs(startTimeMs)
@@ -35,6 +35,25 @@ WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask()
     NX_ASSERT(!m_file);
     if (m_file)
         delete m_file.data();
+}
+
+QnUuid WearableArchiveSynchronizationTask::id() const
+{
+    return m_resource->getId();
+}
+
+void WearableArchiveSynchronizationTask::setDoneHandler(nx::utils::MoveOnlyFunc<void()> /*handler*/)
+{
+    NX_ASSERT(false);
+}
+
+void WearableArchiveSynchronizationTask::cancel()
+{
+    if (m_archiveReader)
+        m_archiveReader->pleaseStop();
+
+    if (m_recorder)
+        m_recorder->pleaseStop();
 }
 
 bool WearableArchiveSynchronizationTask::execute()
@@ -49,7 +68,29 @@ bool WearableArchiveSynchronizationTask::execute()
     m_recorder->wait();
     m_archiveReader->wait();
 
+    m_recorder.reset();
+    m_archiveReader.reset();
+
+    setProgress(100);
+
+    emit finished();
+
     return true;
+}
+
+int WearableArchiveSynchronizationTask::progress() const
+{
+    return m_progress;
+}
+
+void WearableArchiveSynchronizationTask::setProgress(int progress)
+{
+    bool changed = m_progress != progress;
+
+    m_progress = progress;
+
+    if (changed)
+        emit progressChanged(progress);
 }
 
 void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
@@ -61,17 +102,17 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
     storage->setIsIoDeviceOwner(false);
 
     using namespace nx::mediaserver_core::plugins;
-    auto archiveDelegate = new QnAviArchiveDelegate();
-    archiveDelegate->setStorage(storage);
-    archiveDelegate->setAudioChannel(0);
-    archiveDelegate->setStartTimeUs(startTimeMs * 1000);
-    archiveDelegate->setUseAbsolutePos(false);
+    std::unique_ptr<QnAviArchiveDelegate> delegate = std::make_unique<QnAviArchiveDelegate>();
+    delegate->setStorage(storage);
+    delegate->setAudioChannel(0);
+    delegate->setStartTimeUs(startTimeMs * 1000);
+    delegate->setUseAbsolutePos(false);
 
     QnAviResourcePtr aviResource(new QnAviResource(temporaryFilePath));
 
     m_archiveReader = std::make_unique<QnArchiveStreamReader>(aviResource);
     m_archiveReader->setObjectName(lit("WearableCameraArchiveReader"));
-    m_archiveReader->setArchiveDelegate(archiveDelegate);
+    m_archiveReader->setArchiveDelegate(delegate.release());
     //m_archiveReader->setPlaybackMask(timePeriod);
 
     m_archiveReader->setErrorHandler(
@@ -82,6 +123,7 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
             m_archiveReader->pleaseStop();
             if (m_recorder)
                 m_recorder->pleaseStop();
+            setProgress(-1);
         });
 
     m_archiveReader->setNoDataHandler(
@@ -90,6 +132,7 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
             m_archiveReader->pleaseStop();
             if (m_recorder)
                 m_recorder->pleaseStop();
+            setProgress(99);
         });
 }
 
@@ -111,19 +154,28 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
     m_recorder->setOnFileWrittenHandler(
         [this](milliseconds startTime, milliseconds duration)
         {
-            int a = 10;
+            if (!m_archiveReader)
+                return;
+
+            QnAbstractArchiveDelegate* delegate = m_archiveReader->getArchiveDelegate();
+
+            qint64 globalStartMs = delegate->startTime() / 1000;
+            qint64 globalDurationMs = (delegate->endTime() - delegate->startTime()) / 1000;
+            qint64 progressMs = (startTime + duration).count() - globalStartMs;
+
+            int progress = progressMs * 100 / globalDurationMs;
+            setProgress(std::max(m_progress, progress == 100 ? 99 : progress));
         });
 
     m_recorder->setEndOfRecordingHandler(
         [this]()
         {
+            m_recorder->pleaseStop();
             if (m_archiveReader)
                 m_archiveReader->pleaseStop();
-
-            m_recorder->pleaseStop();
+            setProgress(99);
         });
 }
-
 
 } // namespace recorder
 } // namespace mediaserver_core

@@ -28,6 +28,10 @@ HanwhaPtzController::HanwhaPtzController(const HanwhaResourcePtr& resource):
 {
 }
 
+HanwhaPtzController::~HanwhaPtzController()
+{
+}
+
 Ptz::Capabilities HanwhaPtzController::getCapabilities() const
 {
     return m_ptzCapabilities;

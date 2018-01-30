@@ -1,5 +1,4 @@
-#ifndef axis_resource_h_2215
-#define axis_resource_h_2215
+#pragma once
 
 #ifdef ENABLE_AXIS
 
@@ -7,24 +6,25 @@
 #include <set>
 #include <nx/utils/thread/mutex.h>
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
-#include "nx/streaming/media_data_packet.h"
-#include <nx/network/deprecated/asynchttpclient.h>
-#include <nx/network/deprecated/simple_http_client.h>
 #include <api/model/api_ioport_data.h>
-#include <nx/network/http/multipart_content_parser.h>
 #include <core/resource/camera_advanced_param.h>
+#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/network/aio/timer.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/multipart_content_parser.h>
+#include <nx/network/simple_http_client.h>
+#include <nx/streaming/media_data_packet.h>
 
 class QnAxisPtzController;
 
-class QnPlAxisResource: public QnPhysicalCameraResource
+class QnPlAxisResource:
+    public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
 public:
-    typedef QnPhysicalCameraResource base_type;
+    typedef nx::mediaserver::resource::Camera base_type;
 
     struct AxisResolution
     {
@@ -69,14 +69,13 @@ public:
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-    virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result) override;
-    virtual bool setParamPhysical(const QString &id, const QString& value) override;
-    virtual bool setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result) override;
+    QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
+    QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
-    AxisResolution getResolution( int encoderIndex ) const;
     virtual QnIOStateDataList ioStates() const override;
 
+
+    QString resolutionToString(const QSize& resolution);
 public slots:
     void onMonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient );
     void onMonitorMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr httpClient );
@@ -86,7 +85,8 @@ public slots:
 
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual void setCroppingPhysical(QRect cropping);
@@ -108,6 +108,9 @@ private:
     void restartIOMonitorWithDelay();
     void startInputPortMonitoring();
     void stopInputPortMonitoringSync();
+
+    virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
+
 private:
     QList<AxisResolution> m_resolutionList;
 
@@ -139,11 +142,10 @@ private:
 
     nx::network::http::AsyncHttpClientPtr m_inputPortHttpMonitor;
     nx::network::http::BufferType m_currentMonitorData;
-    AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
 
     QnWaitCondition m_stopInputMonitoringWaitCondition;
 
-    QnCameraAdvancedParams m_advancedParameters;
+    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlAxisResource> m_advancedParametersProvider;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(
@@ -250,4 +252,3 @@ private:
 };
 
 #endif // #ifdef ENABLE_AXIS
-#endif //axis_resource_h_2215
