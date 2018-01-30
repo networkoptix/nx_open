@@ -511,6 +511,7 @@ Handle ServerConnection::lockWearableCamera(
 
 Handle ServerConnection::extendWearableCameraLock(
     const QnNetworkResourcePtr& camera,
+    const QnUserResourcePtr& user,
     const QnUuid& token,
     qint64 ttl,
     GetCallback callback,
@@ -521,6 +522,7 @@ Handle ServerConnection::extendWearableCameraLock(
         QnRequestParamList{
             { lit("cameraId"), camera->getId().toSimpleString() },
             { lit("token"), token.toSimpleString() },
+            { lit("userId"), user->getId().toSimpleString() },
             { lit("ttl"), QString::number(ttl) } },
         QByteArray(),
         QByteArray(),

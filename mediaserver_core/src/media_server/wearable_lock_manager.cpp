@@ -26,8 +26,9 @@ QnWearableLockManager::~QnWearableLockManager()
 {
 }
 
-bool QnWearableLockManager::acquireLock(const QnUuid& cameraId, const QnUuid& userId, qint64 ttl, QnUuid* token)
+bool QnWearableLockManager::acquireLock(const QnUuid& cameraId, const QnUuid& token, const QnUuid& userId, qint64 ttl)
 {
+
     QnMutexLocker locker(&m_mutex);
 
     cleanupExpiredLockUnsafe(cameraId);
@@ -38,11 +39,10 @@ bool QnWearableLockManager::acquireLock(const QnUuid& cameraId, const QnUuid& us
 
     Lock lock;
     lock.userId = userId;
-    lock.token = QnUuid::createUuid();
+    lock.token = token;
     lock.expiryTime = qnSyncTime->currentMSecsSinceEpoch() + ttl;
     m_lockByCameraId.insert(cameraId, lock);
 
-    *token = lock.token;
     return true;
 }
 

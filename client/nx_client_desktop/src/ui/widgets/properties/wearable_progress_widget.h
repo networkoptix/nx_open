@@ -33,7 +33,6 @@ private:
     QString calculateMessage(const nx::client::desktop::WearableState& state);
     QString calculateQueueMessage(const nx::client::desktop::WearableState& state);
     QString calculateFileName(const nx::client::desktop::WearableState& state);
-    int calculateProgress(const nx::client::desktop::WearableState& state);
 
     void setActive(bool active);
 
