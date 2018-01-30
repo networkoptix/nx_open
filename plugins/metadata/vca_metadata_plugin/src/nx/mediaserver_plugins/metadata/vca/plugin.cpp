@@ -26,8 +26,8 @@ namespace vca {
 
 namespace {
 
-const char* const kPluginName = "VCA metadata plugin";
-const QString kVcaVendor("cap");
+static const char* const kPluginName = "VCA metadata plugin";
+static const QString kVcaVendor("cap");
 
 } // namespace
 
@@ -39,6 +39,8 @@ Plugin::Plugin()
     QFile f(":/vca/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
+    else
+        NX_PRINT << kPluginName <<" can not open resource \":/vca/manifest.json\".";
 }
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -97,12 +99,17 @@ AbstractMetadataManager* Plugin::managerForResource(
     Error* outError)
 {
     *outError = Error::noError;
-
     const auto vendor = QString(resourceInfo.vendor).toLower();
     if (!vendor.startsWith(kVcaVendor))
+    {
+        NX_PRINT << kPluginName <<" got unsupported resource. Manager can not be created.";
         return nullptr;
-
-    return new Manager(resourceInfo, m_manifest);
+    }
+    else
+    {
+        NX_PRINT << kPluginName << " creates new manager.";
+        return new Manager(resourceInfo, m_manifest);
+    }
 }
 
 AbstractSerializer* Plugin::serializerForType(
@@ -119,7 +126,7 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-} // vca
+} // namespace vca
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx

@@ -28,7 +28,7 @@ struct EventMessage
 };
 
 nx::sdk::metadata::CommonDetectedEvent* createCommonDetectedEvent(
-    const nx::api::VcaAnalyticsEventType& event,
+    const Vca::VcaAnalyticsEventType& event,
     bool active)
 {
     auto detectedEvent = new nx::sdk::metadata::CommonDetectedEvent();
@@ -42,7 +42,7 @@ nx::sdk::metadata::CommonDetectedEvent* createCommonDetectedEvent(
 }
 
 nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
-    const nx::api::VcaAnalyticsEventType& event)
+    const Vca::VcaAnalyticsEventType& event)
 {
     using namespace std::chrono;
 
@@ -377,7 +377,7 @@ void Monitor::stopMonitoring()
     }
 }
 
-} // vca
+} // namespace vca
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx

@@ -1,25 +1,25 @@
 {
     "driverId": "{e177ffa9-9db9-f975-e4c2-760ce7b279da}",
-    "driverName": {
+    "driverName": 
+	{
         "value": "VCA driver",
-        "localization": {
-        }
+        "localization": {}
     },
-	    "outputEventTypes": 
+	"outputEventTypes": 
     [
         {
             "eventTypeId": "D16B2CFB-4DCA-4081-ACB9-F4B454C6873F",
-            "eventName": { "value": "motion detected", "localization": { } },
+            "eventName": { "value": "motion detected", "localization": {} },
             "internalName": "md"
         },
         {
             "eventTypeId": "93F513DE-41DD-4B4F-8623-E93D88B35174",
-            "eventName": { "value": "vca event", "localization": { } },
+            "eventName": { "value": "vca event", "localization": {} },
             "internalName": "vca"
         },
         {
             "eventTypeId": "0D5F107B-FC5E-47C2-917C-BE54795BF9D0",
-            "eventName": { "value": "face detected", "localization": { } },
+            "eventName": { "value": "face detected", "localization": {} },
             "internalName": "fd"
         }
 	]

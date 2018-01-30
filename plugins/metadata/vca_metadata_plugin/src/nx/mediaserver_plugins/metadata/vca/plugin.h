@@ -49,7 +49,7 @@ private:
     QByteArray m_manifest;
 };
 
-} // vca
+} // namespace vca
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx

@@ -10,7 +10,6 @@
 #include <nx/sdk/metadata/abstract_metadata_manager.h>
 
 #include "nx/api/vca_analytics_event.h"
-#include "nx/api/vca_driver_manifest.h"
 #include "monitor.h"
 
 namespace nx {
@@ -18,11 +17,8 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace vca {
 
-class Manager:
-    public QObject,
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
+class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
 {
-    Q_OBJECT;
 public:
     Manager(const nx::sdk::ResourceInfo& resourceInfo, const QByteArray& pluginManifest);
 
@@ -41,9 +37,9 @@ public:
 
     virtual void freeManifest(const char* data) override;
 
-    const nx::api::VcaAnalyticsEventType& getVcaAnalyticsEventTypeByEventTypeId(
-        const QnUuid& id) const;
-    const nx::api::VcaAnalyticsEventType& getVcaAnalyticsEventTypeByInternalName(
+    const Vca::VcaAnalyticsEventType&
+        getVcaAnalyticsEventTypeByEventTypeId(const QnUuid& id) const;
+    const Vca::VcaAnalyticsEventType& getVcaAnalyticsEventTypeByInternalName(
         const char* name) const;
 
 private:
@@ -53,11 +49,11 @@ private:
     Monitor* m_monitor = nullptr;
 
     QByteArray m_cameraManifest;
-    nx::api::VcaAnalyticsDriverManifest m_typedPluginManifest;
-    nx::api::VcaAnalyticsEventType m_emptyEvent;
+    Vca::VcaAnalyticsDriverManifest m_typedPluginManifest;
+    Vca::VcaAnalyticsEventType m_emptyEvent;
 };
 
-} // vca
+} // namespace vca
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx

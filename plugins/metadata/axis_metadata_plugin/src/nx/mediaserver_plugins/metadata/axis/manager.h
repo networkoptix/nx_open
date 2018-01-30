@@ -17,11 +17,8 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace axis {
 
-class Manager:
-    public QObject,
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
+class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
 {
-    Q_OBJECT;
 public:
     Manager(const nx::sdk::ResourceInfo& resourceInfo,
         const QList<IdentifiedSupportedEvent>& events);
@@ -52,8 +49,6 @@ private:
     QUrl m_url;
     QAuthenticator m_auth;
 
-    // Next two fields contains the same information but in different representation.
-    //
     QList<IdentifiedSupportedEvent> m_identifiedSupportedEvents;
 
     Monitor* m_monitor = nullptr;

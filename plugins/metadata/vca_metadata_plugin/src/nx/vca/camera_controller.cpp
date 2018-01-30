@@ -192,6 +192,35 @@ std::vector<std::string> getRuleTableLines(QByteArray& ruleTable)
     return lines;
 }
 
+
+//
+//const QList<QByteArray> processData(const QByteArray& data)
+//{
+//    QList<QByteArray> result;
+//    ruleTable.replace('\n', '\0'); //< Now every line is a null-terminated string.
+//    for (auto line: data.split('\n'))
+//    {
+//        line = line.trimmed();
+//
+//    }
+//}
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 std::map<int, SupportedRule> parseRuleTableLines(const std::vector<std::string>& lines)
 {
 
@@ -380,8 +409,6 @@ bool CameraController::readSupportedRules()
 
 bool CameraController::readSupportedRules2()
 {
-    // From time to time camera treats long queries incorrectly. So we need to make shorter queries:
-    // readSupportedRules don't ask about notification, readTcpServerEnabled does.
     static const int kGetRulesCommandCound = 4;
     static const QString kGetRulesCommand[kGetRulesCommandCound] =
     {
@@ -488,7 +515,7 @@ bool CameraController::readTcpServerEnabled(int eventProfileIndex)
 
     QByteArray value = extractCgiResponseValue(cgiResponse);
     bool enabled = (value.toStdString() == "yes");
-    m_supportedRules[eventProfileIndex].tcpServerNotificationEnabled = true;
+    m_supportedRules[eventProfileIndex].tcpServerNotificationEnabled = enabled;
 
     return true;
 }

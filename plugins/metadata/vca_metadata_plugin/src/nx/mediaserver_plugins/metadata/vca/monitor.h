@@ -26,17 +26,16 @@ namespace vca {
 
 class Manager;
 
-class Monitor: public QObject
+class Monitor final
 {
-    Q_OBJECT
-
 public:
     Monitor(
         Manager* manager,
         const QUrl& resourceUrl,
         const QAuthenticator& auth,
         nx::sdk::metadata::AbstractMetadataHandler* handler);
-    virtual ~Monitor() override;
+
+    ~Monitor();
 
     nx::sdk::Error startMonitoring(nxpl::NX_GUID* eventTypeList, int eventTypeListSize);
     void stopMonitoring();
@@ -55,7 +54,7 @@ private:
     QByteArray m_buffer;
 };
 
-} // vca
+} // namespace vca
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
