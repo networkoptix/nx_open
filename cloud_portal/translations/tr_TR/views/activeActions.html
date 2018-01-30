@@ -20,11 +20,11 @@
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>You have registered in {{PRODUCT_NAME}}</h1>
+            <h1>{{PRODUCT_NAME}} içinde kayıtlı</h1>
             <p>{{data.email}} adresine bir aktivasyon linki gönderdik<br>
             Lütfen bu bağlantıya tıklayıp hesabınızı etkinleştirin.</p>
         </div>
-        <h1 ng-if="!data.email">Hesabını onayla</h1>
+        <h1 ng-if="!data.email">Activate your account</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <label for="emailReactivate"  class="col-sm-4 control-label">E-posta</label>

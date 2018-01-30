@@ -3,7 +3,7 @@
     <set resName="cdb" resValue="https://%host%:443"/>
     <sequence>
         <set resName="hpm.tcpUrl" resValue="http://%host%:3345"/>
-        <set resName="hpm.udpUrl" resValue="stun://%host%:3346"/>
+        <set resName="hpm.udpUrl" resValue="stun://%host%:3345"/>
     </sequence>
     <set resName="notification_module" resValue="https://%host%:443"/>
 </sequence>

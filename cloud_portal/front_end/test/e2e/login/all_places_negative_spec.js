@@ -31,7 +31,7 @@ describe('Login with incorrect credentials', function () {
 
     it("works at registration page on account activation error", function() {
         var userEmail = p.helper.getRandomEmail();
-
+ 
         p.helper.register(null, null, userEmail);
         p.helper.getEmailedLink(userEmail, p.helper.emailSubjects.register, 'activate').then( function(url) {
             p.helper.get(url);

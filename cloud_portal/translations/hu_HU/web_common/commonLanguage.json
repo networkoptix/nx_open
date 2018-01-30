@@ -1,27 +1,47 @@
 {
-    "cameraLinks": {
-        "highStream": "Nagy stream",
-        "lowStream": "Másodlagos stream",
-        "transcoding": "Transzkódolás",
-        "unknown": "Ismeretlen",
-        "copyToClipboard": "másolás vágólapra",
-        "copyDefaultText": "másolás",
-        "copyActiveText": "vágólapra másolva"
-    },
-    "systemOffline": "A rendszer offline",
-    "cameraStates": {
-        "offline": "Offline",
-        "error": "Hiba",
-        "unauthorized": "Hitelesítés szükséges",
-        "noData": "Nincs adat",
-        "iosVideoTooLarge": "Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
-        "flashRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a> a videó ARM-alapú szerverről történő lejátszásához.",
-        "flashOrWebmRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a>vagy<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> a videó Internet Explorerben történő lejátszásához.",
-        "noArmSupport": "Ez a böngésző vagy eszköz nem támogatja az ARM-alapú szerverről történő videofájl lejátszást.",
-        "noFormat": "Ez a böngésző vagy eszköz nem támogatja erről a kameráról történő videofájl lejátszást.",
-        "ieNoWebm": "Kérjük telepítsen <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> at Internet Explorerben.",
-        "ieWin10": "Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.",
-        "ubuntuNX": "Ez a böngésző nem támogatja a videók ARM-alapú szerverről való lejátszását. Használjon helyette Chromium böngészőt."
-    },
-    "searchCamPlaceholder": "keresés"
+  "cameraLinks": {
+    "highStream": "Nagy stream",
+    "lowStream": "Másodlagos stream",
+    "transcoding": "Transzkódolás",
+    "unknown": "Ismeretlen",
+    "copyToClipboard": "másolás vágólapra",
+    "copyDefaultText": "másolás",
+    "copyActiveText": "vágólapra másolva"
+  },
+  "systemOffline": "A rendszer offline",
+  "cameraStates": {
+    "offline": "Offline",
+    "error": "Hiba",
+    "unauthorized": "Hitelesítés szükséges",
+    "noData": "Nincs adat",
+    "iosVideoTooLarge": "Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
+    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashOrWebmRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a>vagy<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> a videó Internet Explorerben történő lejátszásához.",
+    "noArmSupport": "Ez a böngésző vagy eszköz nem támogatja az ARM-alapú szerverről történő videofájl lejátszást.",
+    "noFormat": "This browser does not support video playback from this camera.",
+    "ieNoWebm": "Kérjük telepítsen <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> at Internet Explorerben.",
+    "ieWin10": "Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.",
+    "ubuntuNX": "Ez a böngésző nem támogatja a videók ARM-alapú szerverről való lejátszását. Használjon helyette Chromium böngészőt."
+  },
+  "searchCamPlaceholder": "Search",
+  "resolution": {
+    "auto": "Auto",
+    "high": "High",
+    "low": "Low"
+  },
+  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+  "voiceCommands": {
+    "play": "play",
+    "pause": "pause",
+    "live": "go to live | show me live",
+    "view": "view + [camera name]",
+    "search": "find + [text for searchbar]",
+    "clear search": "clear search",
+    "expand server": "expand server + [server name]",
+    "collapse server": "collapse server + [server name]",
+    "expand all servers": "expand all servers",
+    "collapse all servers": "collapse all servers",
+    "stop listening": "stop listening",
+    "help": "help | show commands"
+  }
 }

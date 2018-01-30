@@ -115,7 +115,7 @@
     "cantActivatePrefix": "Cannot activate your account",
     "cantSendConfirmationPrefix": "Cannot send confirmation Email",
     "cloudInvalidResponse": "Cloud DB returned an unexpected response",
-    "notAuthorized": "Incorrect Email or password",
+    "notAuthorized": "Wrong password",
     "wrongParameters": "Some parameters on the form are incorrect",
     "wrongCode": "Account is already activated or confirmation code is incorrect",
     "wrongCodeRestore": "Confirmation code is already used or incorrect",
@@ -157,6 +157,7 @@
     "unavailable": "System is unreachable",
     "offline": "System is offline",
     "openClient": "Open in %VMS_NAME%",
+    "openClientNoSystem": "Open %VMS_NAME%",
     "confirmRenameTitle": "System name",
     "confirmRenameAction": "Save",
     "successRename": "System name saved",
@@ -170,10 +171,7 @@
     "confirmUnshareAction": "Delete",
     "successDisconnected": "System is successfully disconnected from %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} is successfully deleted from your account",
-    "permissionsRemoved": "Permissions were removed from {{email}}",
-    "mergeSystemTitle": "Merge systems",
-    "mergeSystemSuccess": "System merge completed",
-    "confirmMergeAction": "Merge"
+    "permissionsRemoved": "Permissions were removed from {{email}}"
   },
   "account": {
     "accountSavedSuccess": "Your account is successfully saved",

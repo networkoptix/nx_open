@@ -236,7 +236,7 @@ describe('Registration suite', function () {
         expect(p.helper.htmlBody.$('.promo-block').isDisplayed()).toBe(true);
     });
 
-    it("should display promo-block, if user goes to registration not from native app", function () {
+    it("should not display promo-block, if user goes to registration not from native app", function () {
         p.helper.get(p.url);
         expect(p.helper.htmlBody.$('.promo-block').isPresent()).toBe(false);
     });

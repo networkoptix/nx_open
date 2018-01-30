@@ -61,7 +61,7 @@ angular.module('cloudApp')
         $scope.gettingSystemUsers = process.init(function(){
             return $scope.system.getUsers().then(function(users){
                 if($routeParams.callShare){
-                    return $scope.share().finally(cleanUrl);
+                    $scope.share().finally(cleanUrl);
                 }
             }).finally(delayedUpdateSystemInfo);
         },{

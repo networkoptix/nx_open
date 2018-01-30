@@ -5,7 +5,7 @@
             <!--<div class="webclient-panel-border"></div>-->
             <placeholder ng-if="loading" preloader="true" class="preloader-small"></placeholder>
             <div class="viewport"
-                 ng-class="{invisible:emptyArchive || !canViewArchive}"
+                 ng-class="{invisible:emptyArchive || !canViewArchive, 'add-cursor': isPointer}"
                  ng-mouseup="mouseUp($event)"
                  ng-mouseleave="mouseLeave($event)"
                  ng-mousemove="mouseMove($event)"
@@ -31,7 +31,8 @@
         <div class="text-left pull-left hidden-xs" ng-class="{'pp-only': !canViewArchive, 'shadows-off': emptyArchive}">
             <span class="webclient-button glyphicon-pp inline-block player-controls pull-left"
                   ng-class="{disabled: !canPlayLive && (emptyArchive || positionProvider.liveMode)}"
-                    ng-click="(!canPlayLive && (emptyArchive || positionProvider.liveMode)) || playPause()">
+                  ng-disable="(!canPlayLive && (emptyArchive || positionProvider.liveMode))"
+                  ng-click="playPause()">
                 <span class="glyphicon glyphicon-play"
                         ng-class="{'glyphicon-play':!positionProvider.playing,'glyphicon-pause':positionProvider.playing}"></span>
             </span>
@@ -53,8 +54,8 @@
         <div class="text-right pull-right" ng-class="{'no-volume':disableVolume}">
             <span class="live-button inline-block pull-left "
                 ng-class="{active:positionProvider.liveMode && canPlayLive,disabled:!canPlayLive}"
-                ng-click="goToLive()">
-                <div class="live-glyph"></div>实时流
+                  ng-click="goToLive()">
+                <div class="live-glyph"></div>LIVE
             </span>
             <span ng-if="!disableVolume" class="webclient-button volume inline-block pull-right" ng-click="toggleActive()">
                 <span class="glyphicon glyphicon-volume-up"></span>
@@ -63,7 +64,8 @@
         <div class="text-left pull-left pp-only">
             <span class="webclient-button glyphicon-pp inline-block player-controls pull-left"
                 ng-class="{disabled: !canPlayLive && (emptyArchive || positionProvider.liveMode)}"
-                ng-click="(!canPlayLive && (emptyArchive || positionProvider.liveMode)) || playPause()">
+                ng-disable="(!canPlayLive && (emptyArchive || positionProvider.liveMode))"
+                  ng-click="playPause();">
                 <span class="glyphicon glyphicon-play"
                       ng-class="{'glyphicon-play':!positionProvider.playing,'glyphicon-pause':positionProvider.playing}"></span>
             </span>

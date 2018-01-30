@@ -1,4 +1,4 @@
-Welcome to {{PRODUCT_NAME}}
+Hello,
 
   Please open the link below to confirm your email address and activate the account.
 

@@ -1,11 +1,11 @@
-A rendszert megosztották Önnel
+Hello, {{message.fullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) megosztotta {{message.system_name}} rendszerét Önnel.
+{{message.sharer_name}} ({{message.sharer_email}}) has shared access to video management system "{{message.system_name}}" with you.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-Hozzáférést kapott {{message.system_name}} videó rendszerhez.
+You have been granted access to video management system "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Nyissa meg a rendszert: {{config.portal_url}}/rendszer/{{message.system_id}}
+View in {{PRODUCT_NAME}} Portal: {{config.portal_url}}/systems/{{message.system_id}}

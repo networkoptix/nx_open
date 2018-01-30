@@ -30,7 +30,8 @@ angular.module('cloudApp')
                 accountNotActivated: function(){
                     $location.path('/activate');
                     return false;
-                }
+                },
+                notFound: L.errorCodes.emailNotFound
             }
         }).then(function(){
             if(dialogSettings.params.redirect){

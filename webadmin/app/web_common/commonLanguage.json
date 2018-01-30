@@ -1,27 +1,27 @@
 {
-    "cameraLinks": {
-        "highStream": "High stream",
-        "lowStream": "Low stream",
-        "transcoding": "Transcoding",
-        "unknown": "Unknown",
-        "copyToClipboard": "copy to clipboard",
-        "copyDefaultText": "copy",
-        "copyActiveText": "copied to clipboard"
-    },
-    "systemOffline":"System Offline",
-    "cameraStates":{
-        "offline": "Offline",
-        "error": "Error",
-        "unauthorized": "Authentication required",
-        "noData": "No data",
-        "iosVideoTooLarge": "iOS does not support video larger than fullHD (2MP: 1920x1080).",
-        "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
-        "flashOrWebmRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
-        "noArmSupport": "This browser or device does not support video playback from ARM-based servers.",
-        "noFormat": "This browser does not support video playback from this camera.",
-        "ieNoWebm": "Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
-        "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",
-        "ubuntuNX": "This browser does not support video from ARM-based servers. Please, use Chromium browser instead."
+  "cameraLinks": {
+    "highStream": "High stream",
+    "lowStream": "Low stream",
+    "transcoding": "Transcoding",
+    "unknown": "Unknown",
+    "copyToClipboard": "copy to clipboard",
+    "copyDefaultText": "copy",
+    "copyActiveText": "copied to clipboard"
+  },
+  "systemOffline":"System Offline",
+  "cameraStates":{
+    "offline": "Offline",
+    "error": "Error",
+    "unauthorized": "Authentication required",
+    "noData": "No data",
+    "iosVideoTooLarge": "iOS does not support video larger than fullHD (2MP: 1920x1080).",
+    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashOrWebmRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
+    "noArmSupport": "This browser or device does not support video playback from ARM-based servers.",
+    "noFormat": "This browser does not support video playback from this camera.",
+    "ieNoWebm": "Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
+    "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",
+    "ubuntuNX": "This browser does not support video from ARM-based servers. Please, use Chromium browser instead."
   },
   "searchCamPlaceholder": "Search",
   "resolution":{
@@ -29,5 +29,19 @@
     "high": "High",
     "low": "Low"
   },
-  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server."
+  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+  "voiceCommands":{
+    "play": "play",
+    "pause": "pause",
+    "live": "go to live | show me live",
+    "view": "view + [camera name]",
+    "search": "find + [text for searchbar]",
+    "clear search": "clear search",
+    "expand server": "expand server + [server name]",
+    "collapse server": "collapse server + [server name]",
+    "expand all servers": "expand all servers",
+    "collapse all servers": "collapse all servers",
+    "stop listening": "stop listening",
+    "help": "help | show commands"
+  }
 }

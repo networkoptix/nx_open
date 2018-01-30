@@ -1,11 +1,11 @@
-El sistema fue compartido contigo
+Hello, {{message.fullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) compartió el sistema {{message.system_name}} contigo.
+{{message.sharer_name}} ({{message.sharer_email}}) has shared access to video management system "{{message.system_name}}" with you.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-El sistema {{message.system_name}} fue compartido con usted.
+You have been granted access to video management system "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Abra el sistema: {{config.portal_url}} / systems / {{message.system_id}}
+View in {{PRODUCT_NAME}} Portal: {{config.portal_url}}/systems/{{message.system_id}}
