@@ -6,9 +6,9 @@ Test Template     Test Login Invalid
 
 *** Variables ***
 ${url}    ${CLOUD TEST}
-${good email}                   noptixqa+viewer@gmail.com
-${good email unregistered}      unregistered@notsignedup.com
-${good password}                qweasd123
+${good email}                   ${EMAIL VIEWER}
+${good email unregistered}      ${UNREGISTERED EMAIL}
+${good password}                ${BASE PASSWORD}
 ${invalid}                      aderljkadergoij
 
 *** Test Cases ***                EMAIL                         PASS                 EXPECTED
