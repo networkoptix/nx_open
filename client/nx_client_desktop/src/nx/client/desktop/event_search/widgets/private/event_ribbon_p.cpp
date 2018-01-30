@@ -21,9 +21,8 @@
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/utils/log/assert.h>
-#include <api/helpers/thumbnail_request_data.h>
 #include <nx/api/mediaserver/image_request.h>
-#include <nx/client/desktop/image_providers/resource_thumbnail_provider.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_provider.h>
 
 namespace nx {
 namespace client {
@@ -246,8 +245,8 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         ? kDefaultThumbnailWidth
         : qMin(kDefaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
 
-    api::ResourceImageRequest request;
-    request.resource = camera;
+    api::CameraImageRequest request;
+    request.camera = camera;
     request.msecSinceEpoch = previewTimeMs > 0 ? previewTimeMs : nx::api::ImageRequest::kLatestThumbnail;
     request.rotation = nx::api::ImageRequest::kDefaultRotation;
     request.size = QSize(thumbnailWidth, 0);
@@ -255,7 +254,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     request.aspectRatio = nx::api::ImageRequest::AspectRatio::source;
     request.roundMethod = nx::api::ImageRequest::RoundMethod::iFrameAfter;
 
-    tile->setPreview(new ResourceThumbnailProvider(request, tile));
+    tile->setPreview(new CameraThumbnailProvider(request, tile));
 
     tile->preview()->loadAsync();
     tile->setPreviewCropRect(previewCropRect);
