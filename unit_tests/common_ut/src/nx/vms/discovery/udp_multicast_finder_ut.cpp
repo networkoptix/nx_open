@@ -96,7 +96,7 @@ TEST_F(DiscoveryUdpMulticastFinder, UpdateInterfacesAndModuleInformation)
     moduleFinder.setUpdateInterfacesInterval(std::chrono::milliseconds(50));
     moduleFinder.updateInterfaces();
     moduleFinder.listen(
-        [this](QnModuleInformationWithAddresses module, SocketAddress endpoint)
+        [this](QnModuleInformationWithAddresses module, nx::network::SocketAddress endpoint)
         {
             NX_VERBOSE(this, lm("Found module %1 on %2").args(module.id, endpoint));
         });

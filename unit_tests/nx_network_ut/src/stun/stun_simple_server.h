@@ -28,22 +28,22 @@ public:
     nx::utils::Url getServerUrl() const
     {
         return nx::network::url::Builder()
-            .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address());
+            .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address());
     }
 
-    nx::stun::MessageDispatcher& dispatcher()
+    nx::network::stun::MessageDispatcher& dispatcher()
     {
         return m_dispatcher;
     }
 
-    void sendIndicationThroughEveryConnection(nx::stun::Message message)
+    void sendIndicationThroughEveryConnection(nx::network::stun::Message message)
     {
         forEachConnection(
-            nx::network::server::MessageSender<nx::stun::ServerConnection>(std::move(message)));
+            nx::network::server::MessageSender<nx::network::stun::ServerConnection>(std::move(message)));
     }
 
 private:
-    nx::stun::MessageDispatcher m_dispatcher;
+    nx::network::stun::MessageDispatcher m_dispatcher;
 };
 
 } // namespace test
