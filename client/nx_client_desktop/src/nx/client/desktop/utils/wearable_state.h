@@ -36,8 +36,11 @@ struct WearableState
     /** Id of the user that has locked this camera. */
     QnUuid lockUserId;
 
-    /** File that's currently being processed. */
-    EnqueuedFile currentFile;
+    /** Upload queue. */
+    QVector<EnqueuedFile> queue;
+
+    /** Index of the current file in queue. */
+    int currentIndex = 0;
 
     /** Upload state for the current file. */
     UploadState currentUpload;
@@ -45,17 +48,23 @@ struct WearableState
     /** Consume progress for the current file. */
     int consumeProgress = 0;
 
-    /** Upload queue. */
-    QList<EnqueuedFile> queue;
+    /**
+     * @returns                         File that is currently being processed.
+     */
+    EnqueuedFile currentFile() const;
 
     /**
-     * @returns                         Whether this state represents an active worker.
+     * @returns                         Whether this state represents an active operation.
      */
     bool isRunning() const;
 
     /**
-     * @returns                         Progress of the current file being processed,
-     *                                  a number in [0, 100] range.
+     * @returns                         Whether this state represents a finished operation.
+     */
+    bool isDone() const;
+
+    /**
+     * @returns                         Progress the whole operation, a number in [0, 100] range.
      */
     int progress() const;
 };

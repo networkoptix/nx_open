@@ -42,18 +42,17 @@ signals:
     void error(const WearableState& state, const QString& errorMessage);
 
 private:
+    void processCurrentFile();
     void processNextFile();
 
     void handleStatusFinished(bool success, const QnWearableStatusReply& result);
     void handleLockFinished(bool success, const QnWearableStatusReply& result);
     void handleExtendFinished(bool success, const QnWearableStatusReply& result);
     void handleUnlockFinished(bool success, const QnWearableStatusReply& result);
-
     void handleUploadProgress(const UploadState& state);
-
     void handleConsumeStarted(bool success);
 
-    void at_timer_timeout();
+    void pollExtend();
 
 private:
     QString calculateUserName(const QnUuid& userId);

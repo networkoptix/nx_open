@@ -75,7 +75,7 @@ WearableWorker::WearableWorker(
     d->user = user;
 
     QTimer* timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &WearableWorker::at_timer_timeout);
+    connect(timer, &QTimer::timeout, this, &WearableWorker::pollExtend);
     timer->start(kPollPeriodMSec);
 }
 
@@ -175,9 +175,13 @@ bool WearableWorker::addUpload(const QString& path, QString* errorMessage)
 
 void WearableWorker::processNextFile()
 {
-    d->state.currentFile = WearableState::EnqueuedFile();
+    d->state.currentIndex++;
+    processCurrentFile();
+}
 
-    if (d->state.queue.empty())
+void WearableWorker::processCurrentFile()
+{
+    if (d->state.isDone())
     {
         d->state.status = WearableState::Locked;
 
@@ -196,8 +200,7 @@ void WearableWorker::processNextFile()
         return;
     }
 
-    WearableState::EnqueuedFile file = d->state.queue.front();
-    d->state.queue.pop_front();
+    WearableState::EnqueuedFile file = d->state.currentFile();
 
     QString errorMessage;
     QString uploadId = qnClientModule->uploadManager()->addUpload(
@@ -215,7 +218,6 @@ void WearableWorker::processNextFile()
     }
 
     d->state.status = WearableState::Uploading;
-    d->state.currentFile = file;
     d->state.currentUpload = qnClientModule->uploadManager()->state(uploadId);
 
     emit stateChanged(d->state);
@@ -269,7 +271,7 @@ void WearableWorker::handleLockFinished(bool success, const QnWearableStatusRepl
         d->lockToken = result.token;
 
         emit stateChanged(d->state);
-        processNextFile();
+        processCurrentFile();
     }
 }
 
@@ -303,10 +305,12 @@ void WearableWorker::handleExtendFinished(bool success, const QnWearableStatusRe
 
 void WearableWorker::handleUnlockFinished(bool success, const QnWearableStatusReply& result)
 {
-    // Assume this one never fails.
     d->state.status = WearableState::Unlocked;
 
     emit stateChanged(d->state);
+
+    d->state.queue.clear();
+    d->state.currentIndex = 0;
 }
 
 void WearableWorker::handleUploadProgress(const UploadState& state)
@@ -334,7 +338,7 @@ void WearableWorker::handleUploadProgress(const UploadState& state)
             d->camera,
             d->lockToken,
             d->state.currentUpload.id,
-            d->state.currentFile.startTimeMs,
+            d->state.currentFile().startTimeMs,
             callback,
             thread()));
     }
@@ -350,7 +354,7 @@ void WearableWorker::handleConsumeStarted(bool success)
     // Do nothing here, polling is done in timer event.
 }
 
-void WearableWorker::at_timer_timeout()
+void WearableWorker::pollExtend()
 {
     WearableState::Status status = d->state.status;
     if (!isWorking())

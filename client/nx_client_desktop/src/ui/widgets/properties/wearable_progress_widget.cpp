@@ -126,14 +126,16 @@ QString QnWearableProgressWidget::calculateMessage(const WearableState& state)
 
 QString QnWearableProgressWidget::calculateQueueMessage(const WearableState& state)
 {
-    if (state.queue.empty())
-        return QString();
+    int left = state.queue.size() - (state.currentIndex + 1);
 
-    return tr("(%n more file(s) in queue)", "", state.queue.size());
+    if (left <= 0)
+        return QString();
+    else
+        return tr("(%n more file(s) in queue)", "", left);
 }
 
 QString QnWearableProgressWidget::calculateFileName(const WearableState& state)
 {
-    return QFileInfo(state.currentFile.path).fileName();
+    return QFileInfo(state.currentFile().path).fileName();
 }
 
