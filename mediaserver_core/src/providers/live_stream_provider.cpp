@@ -95,20 +95,22 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_dataReceptorMultiplexer->add(m_metadataReceptor);
 
     // Forwarding metadata to analytics events DB.
-    m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
-        new nx::analytics::storage::AnalyticsEventsReceptor(
-            qnServerModule->analyticsEventsStorage()));
-    m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
-        new ConditionalDataProxy(
-            m_analyticsEventsSaver,
-            [this](const QnAbstractDataPacketPtr& /*data*/)
-            {
-                return m_cameraRes->getStatus() == Qn::Recording;
-            }));
-    m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
-
-    auto pool = qnServerModule->metadataManagerPool();
-    pool->registerDataReceptor(getResource(), m_dataReceptorMultiplexer.toWeakRef());
+    if (qnServerModule)
+    {
+        m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
+            new nx::analytics::storage::AnalyticsEventsReceptor(
+                qnServerModule->analyticsEventsStorage()));
+        m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
+            new ConditionalDataProxy(
+                m_analyticsEventsSaver,
+                [this](const QnAbstractDataPacketPtr& /*data*/)
+                {
+                    return m_cameraRes->getStatus() == Qn::Recording;
+                }));
+        m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
+        auto pool = qnServerModule->metadataManagerPool();
+        pool->registerDataReceptor(getResource(), m_dataReceptorMultiplexer.toWeakRef());
+    }
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
@@ -138,7 +140,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
         ? Qn::ConnectionRole::CR_SecondaryLiveVideo
         : Qn::ConnectionRole::CR_LiveVideo;
 
-    if (role == roleForAnalytics)
+    if (role == roleForAnalytics && qnServerModule)
     {
         auto pool = qnServerModule->metadataManagerPool();
         m_videoDataReceptor = pool->mediaDataReceptor(m_cameraRes->getId());
@@ -205,7 +207,7 @@ void QnLiveStreamProvider::setPrimaryStreamParams(const QnLiveStreamParams& para
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        if (auto owner = getOwner().dynamicCast<QnVideoCamera>())
+        if (auto owner = getOwner().dynamicCast<QnAbstractMediaServerVideoCamera>())
         {
             QnLiveStreamProviderPtr lp = owner->getSecondaryReader();
             if (lp)

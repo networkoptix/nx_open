@@ -4,7 +4,7 @@
 #include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <providers/live_stream_provider.h>
-
+#include <camera/video_camera_mock.h>
 #include "camera_mock.h"
 
 namespace nx {
@@ -12,7 +12,7 @@ namespace mediaserver {
 namespace resource {
 namespace test {
 
-class VideoCameraMock: public QnAbstractVideoCamera
+class VideoCameraMock: public MediaServerVideoCameraMock
 {
 public:
     VideoCameraMock(QnSharedResourcePointer<CameraMock> camera)
@@ -30,12 +30,12 @@ public:
         m_secondaryProvider->setOwner(toSharedPointer());
     }
 
-    QSharedPointer<QnLiveStreamProvider> getPrimaryReader()
+    virtual QSharedPointer<QnLiveStreamProvider> getPrimaryReader() override
     {
         return m_primaryProvider;
     }
 
-    QSharedPointer<QnLiveStreamProvider> getSecondaryReader()
+    virtual QSharedPointer<QnLiveStreamProvider> getSecondaryReader() override
     {
         return m_secondaryProvider;
     }
