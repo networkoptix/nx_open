@@ -328,7 +328,7 @@ bool Resources::stopWearableUploads(QWidget* parent, const QnResourceList& resou
     if (resources.isEmpty())
         return true;
 
-    QString text = tr("Video uploading to %n camera(s) will stop:", "", resources.size());
+    QString text = tr("Some video file(s) are still being uploaded to %n wearable cameras:", "", resources.size());
     QString extra = tr("Stop uploading?");
 
     QnSessionAwareMessageBox messageBox(parent);
