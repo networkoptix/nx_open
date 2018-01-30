@@ -7,6 +7,7 @@
 #include <common/common_module_aware.h>
 
 #include "wearable_state.h"
+#include "wearable_error.h"
 
 struct QnWearableStatusReply;
 
@@ -31,7 +32,7 @@ public:
     virtual ~WearableWorker() override;
 
     void updateState();
-    bool addUpload(const QString& path, QString* errorMessage);
+    bool addUpload(const QString& path, WearableError* error);
 
     WearableState state() const;
 

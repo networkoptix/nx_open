@@ -70,10 +70,10 @@ void WearableManager::updateState(const QnSecurityCamResourcePtr& camera)
         worker->updateState();
 }
 
-bool WearableManager::addUpload(const QnSecurityCamResourcePtr& camera, const QString& path, QString* errorMessage)
+bool WearableManager::addUpload(const QnSecurityCamResourcePtr& camera, const QString& path, WearableError* error)
 {
     if (WearableWorker* worker = ensureWorker(camera))
-        return worker->addUpload(path, errorMessage);
+        return worker->addUpload(path, error);
     return true; //< Just ignore it silently.
 }
 

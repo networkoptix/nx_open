@@ -114,11 +114,11 @@ void WearableWorker::updateState()
     d->requests.storeHandle(d->connection()->wearableCameraStatus(d->camera, callback, thread()));
 }
 
-bool WearableWorker::addUpload(const QString& path, QString* errorMessage)
+bool WearableWorker::addUpload(const QString& path, WearableError* error)
 {
     if (d->state.status == WearableState::LockedByOtherClient)
     {
-        *errorMessage = calculateLockedMessage();
+        error->message = calculateLockedMessage();
         return false;
     }
 
@@ -128,7 +128,8 @@ bool WearableWorker::addUpload(const QString& path, QString* errorMessage)
 
     if (!opened || !delegate->hasVideo() || resource->hasFlags(Qn::still_image))
     {
-        *errorMessage = tr("File \"%1\" is not a video file.").arg(path);
+        error->message = tr("Selected file format is not supported");
+        error->extraMessage = tr("Use .MKV, .AVI, or .MP4 video files.");
         return false;
     }
 
@@ -143,7 +144,11 @@ bool WearableWorker::addUpload(const QString& path, QString* errorMessage)
     }
 
     if (startTimeMs == 0)
-        startTimeMs = QFileInfo(path).created().toMSecsSinceEpoch();
+    {
+        error->message = tr("Selected file does not have timestamp");
+        error->extraMessage = tr("Only video files with correct timestamp are supported.");
+        return false;
+    }
 
     WearableState::EnqueuedFile file;
     file.path = path;

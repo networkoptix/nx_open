@@ -187,12 +187,9 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     if (fileName.isEmpty())
         return;
 
-    QString errorMessage;
-    if (!qnClientModule->wearableManager()->addUpload(camera, fileName, &errorMessage))
-    {
-        QnMessageBox::critical(mainWindow(), errorMessage);
-        return;
-    }
+    WearableError error;
+    if (!qnClientModule->wearableManager()->addUpload(camera, fileName, &error))
+        QnMessageBox::critical(mainWindow(), error.message, error.extraMessage);
 }
 
 void QnWorkbenchWearableHandler::at_resourcePool_resourceAdded(const QnResourcePtr &resource)
