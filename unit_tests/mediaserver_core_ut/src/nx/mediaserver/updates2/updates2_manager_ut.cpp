@@ -110,6 +110,13 @@ public:
         return m_fileWrittenData;
     }
 
+    void setNeedToWaitForgetRemoteRegistry(bool value)
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_getRemoteRegistryFinished = !value;
+        m_getRemoteRegistryCondition.wakeOne();
+    }
+
     MOCK_METHOD0(refreshTimeout, qint64());
     MOCK_METHOD0(loadStatusFromFile, void());
     MOCK_METHOD0(connectToSignals, void());
@@ -121,6 +128,10 @@ public:
 
     virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() override
     {
+        QnMutexLocker lock(&m_mutex);
+        while (!m_getRemoteRegistryFinished)
+            m_getRemoteRegistryCondition.wait(lock.mutex());
+
         return m_remoteRegistryFactoryFunc();
     }
 
@@ -157,6 +168,8 @@ private:
     bool m_remoteUpdateFinished = false;
     bool m_downloadFinished = false;
     detail::Updates2StatusDataEx m_fileWrittenData;
+    QnWaitCondition m_getRemoteRegistryCondition;
+    bool m_getRemoteRegistryFinished = true;
 };
 
 using namespace ::testing;
@@ -256,6 +269,12 @@ protected:
         expectingStateWrittenToFile(state);
     }
 
+    void thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode state)
+    {
+        while (m_testUpdates2Manager.status().state != state)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+
     void whenServerStarted()
     {
         EXPECT_CALL(m_testUpdates2Manager, connectToSignals())
@@ -270,8 +289,14 @@ protected:
         m_testUpdates2Manager.atServerStart();
     }
 
+    void whenNeedToWaitForRemoteRegistryCompletion()
+    {
+        m_testUpdates2Manager.setNeedToWaitForgetRemoteRegistry(true);
+    }
+
     void whenRemoteUpdateDone()
     {
+        m_testUpdates2Manager.setNeedToWaitForgetRemoteRegistry(false);
         m_testUpdates2Manager.waitForRemoteUpdate();
     }
 
@@ -494,6 +519,7 @@ TEST_F(Updates2Manager, FoundRemoteUpdateRegistry_newVersion)
                 /*expectToByteArrayWillBeCalled*/ true);
         });
     expectingUpdateGlobalRegistryWillBeCalled();
+
     whenServerStarted();
     whenRemoteUpdateDone();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
@@ -501,6 +527,25 @@ TEST_F(Updates2Manager, FoundRemoteUpdateRegistry_newVersion)
 
 TEST_F(Updates2Manager, StatusWhileCheckingForUpdate)
 {
+    const auto newVersion = QnSoftwareVersion("1.0.0.2");
+    givenFileState(api::Updates2StatusData::StatusCode::notAvailable);
+    givenGlobalRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
+    givenRemoteRegistryFactoryFunc(
+        [this, &newVersion]()
+    {
+        return createUpdateRegistry(
+            /*version*/ &newVersion,
+            /*hasUpdate*/ true,
+            /*expectFindUpdateFileWillBeCalled*/ true,
+            /*expectToByteArrayWillBeCalled*/ true);
+    });
+    whenNeedToWaitForRemoteRegistryCompletion();
+    expectingUpdateGlobalRegistryWillBeCalled();
+    whenServerStarted();
+    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::checking);
+    whenRemoteUpdateDone();
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
+
     // #TODO: #akulikov implement
 }
 
