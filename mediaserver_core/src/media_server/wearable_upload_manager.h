@@ -6,6 +6,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/connective.h>
+#include <recorder/wearable_archive_synchronization_state.h>
 
 class QnWearableUploadManager: public Connective<QObject>
 {
@@ -18,9 +19,10 @@ public:
 
     bool consume(const QnUuid& cameraId, const QnUuid& token, const QString& uploadId, qint64 startTimeMs);
 
-    bool isConsuming(const QnUuid& cameraId);
+    bool isConsuming(const QnUuid& cameraId) const;
+    nx::mediaserver_core::recorder::WearableArchiveSynchronizationState state(const QnUuid& cameraId) const;
 
 private:
-    QnMutex m_mutex;
-    QSet<QnUuid> m_consuming;
+    struct Private;
+    QScopedPointer<Private> d;
 };

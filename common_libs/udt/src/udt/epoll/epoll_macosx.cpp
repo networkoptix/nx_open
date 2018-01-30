@@ -1,5 +1,7 @@
 #include "epoll_macosx.h"
 
+#include <iostream>
+
 #ifdef __APPLE__
 
 #include <sys/types.h>
@@ -113,7 +115,7 @@ int EpollMacosx::poll(
             continue;
         }
 
-        const bool failure = (ev[i].flags & EV_ERROR) > 0;
+        const bool failure = (ev[i].flags & (EV_ERROR | EV_EOF)) > 0;
         if ((NULL != lrfds) && (ev[i].filter == EVFILT_READ))
         {
             lrfds->emplace(

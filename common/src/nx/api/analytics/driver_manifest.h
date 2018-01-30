@@ -14,7 +14,6 @@ namespace api {
 /**
 * Description of the analytics driver, which can generate different events.
 */
-
 struct AnalyticsDriverManifestBase
 {
     QnUuid driverId;
@@ -37,4 +36,3 @@ QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
 
 } // namespace api
 } // namespace nx
-
