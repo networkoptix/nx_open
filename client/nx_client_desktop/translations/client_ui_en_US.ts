@@ -147,6 +147,34 @@
     </message>
 </context>
 <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Fixed Archive Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min. Days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max. Days</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AuditLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -790,26 +818,6 @@
     </message>
     <message>
         <location/>
-        <source>Fixed Archive Length</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Auto</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Min. Days</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Max. Days</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Motion Recording</source>
         <translation></translation>
     </message>
@@ -1015,6 +1023,16 @@
     <message>
         <location/>
         <source>HTTP URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Authentication type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Request type</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1666,6 +1684,24 @@
         <location/>
         <source>Expert</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>NewWearableCameraDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
+        <source>New Wearable Camera...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessible by any user.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>To server</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2516,6 +2552,12 @@
         <source>TextLabel</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
+The oldest footage among all cameras on the server will be deleted first.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -2689,11 +2731,6 @@
         <source>Backup Settings...</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location/>
-        <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>StorageRebuildWidget</name>
@@ -2850,6 +2887,47 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
         <location/>
         <source>Edit Roles...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WearableProgressWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WearableUploadWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Upload Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Upload File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Upload Folder...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;warning&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

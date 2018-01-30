@@ -872,6 +872,18 @@ to view more bookmarks</source>
         <source>Make Showreel</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Wearable Camera...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Wearable Camera...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upload to Wearable Camera...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CustomHorizontalHeader</name>
@@ -1293,6 +1305,17 @@ to view more bookmarks</source>
     <name>QnAdvancedSettingsWidget</name>
     <message>
         <source>Folder not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnArchiveLengthWidget</name>
+    <message>
+        <source>High minimum value can lead to archive length decrease on other devices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High minimum value can lead to archive length decrease on other cameras.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2423,14 +2446,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>High minimum value can lead to archive length decrease on other devices.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>High minimum value can lead to archive length decrease on other cameras.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Not enough licenses to enable recording</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3254,6 +3269,10 @@ to %1</source>
     <name>QnExecHttpRequestActionWidget</name>
     <message>
         <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Basic</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4408,6 +4427,10 @@ to %1</source>
         <source>Skip</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -4479,6 +4502,25 @@ to %1</source>
     </message>
     <message>
         <source>KB/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnNewWearableCameraDialog</name>
+    <message>
+        <source>Wearable Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wearable Camera %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5938,6 +5980,10 @@ to %1</source>
         <source>Please check authentication information</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>NO LIVE STREAM</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6079,6 +6125,14 @@ to %1</source>
     </message>
     <message>
         <source>Backup completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording was enabled on the USB storage</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6947,6 +7001,35 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnWearableProgressWidget</name>
+    <message>
+        <source>Uploading %1... %2	%p%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finalizing %1... %2	%p</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>(%n more file(s) in queue)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnWearableUploadWidget</name>
+    <message>
+        <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Another user is currently uploading footage to this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnWebResourceWidget</name>
     <message>
         <source>Fullscreen mode</source>
@@ -7497,6 +7580,21 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnWorkbenchWearableHandler</name>
+    <message>
+        <source>Could not add wearable camera to server &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Wearable Camera Recording...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All files (*.*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
         <source>New Web Page</source>
@@ -7684,6 +7782,21 @@ to %1</source>
             <numerusform>Remove %n items from showreel?</numerusform>
         </translation>
     </message>
+    <message numerus="yes">
+        <source>Video uploading to %n camera(s) will stop:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Stop uploading?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
@@ -7719,6 +7832,48 @@ to %1</source>
     </message>
     <message>
         <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::UploadWorker</name>
+    <message>
+        <source>Could not open file &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not calculate md5 for file &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create upload on the server side</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not upload file chunk to the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not check uploaded file on the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File was corrupted while being uploaded to the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::WearableWorker</name>
+    <message>
+        <source>File &quot;%1&quot; is not a video file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
