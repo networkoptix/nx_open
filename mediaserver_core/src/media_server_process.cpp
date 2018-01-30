@@ -1790,8 +1790,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getCameraParam", new QnCameraSettingsRestHandler());
     reg("api/setCameraParam", new QnCameraSettingsRestHandler());
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
-    if(ini().enableWearableCameras)
-        reg("api/wearableCamera", new QnWearableCameraRestHandler());
+    reg("api/wearableCamera", new QnWearableCameraRestHandler());
     reg("api/ptz", new QnPtzRestHandler());
     reg("api/image", new QnImageRestHandler()); //< deprecated
     reg("api/createEvent", new QnExternalEventRestHandler());
