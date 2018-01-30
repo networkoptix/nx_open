@@ -15,7 +15,7 @@
             <h1>You have registered in {{PRODUCT_NAME}}</h1>
             <p>שלחנו לך מייל עם קישור הפעלה אל {{data.email}} <br> אנא הפעל את חשבונך על ידי לחיצה על קישור זה.</p>
         </div>
-        <h1 ng-if="!data.email">אשר את החשבון שלך</h1>
+        <h1 ng-if="!data.email">Activate your account</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <label for="emailReactivate"  class="col-sm-4 control-label">דוא"ל</label>

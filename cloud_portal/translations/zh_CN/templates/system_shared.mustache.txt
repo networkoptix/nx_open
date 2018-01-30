@@ -1,11 +1,11 @@
-系统与你分享
+Hello, {{message.fullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) 共享系统 {{message.system_name}} 給你。
+{{message.sharer_name}} ({{message.sharer_email}}) has shared access to video management system "{{message.system_name}}" with you.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-与你分享系统 {{message.system_name}}。
+You have been granted access to video management system "{{message.system_name}}".
 {{/message.sharer_name}}
 
-打开系统︰ {{config.portal_url}}/系统/{{message.system_id}}
+View in {{PRODUCT_NAME}} Portal: {{config.portal_url}}/systems/{{message.system_id}}

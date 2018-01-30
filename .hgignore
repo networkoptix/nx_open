@@ -215,6 +215,12 @@ nx_cloud_deploy/cloud_modules/build
 nx_cloud_deploy/cloud_modules/.glide
 cmake_build/**
 
+cloud_portal/robot_tests/test-cases/looper.robot
+cloud_portal/robot_tests/chromedriver.exe
+cloud_portal/robot_tests/Screenshots
+cloud_portal/robot_tests/log*.html
+cloud_portal/robot_tests/output*.xml
+cloud_portal/robot_tests/report*.html
 syntax: regexp
 ^core$
 ^Makefile$

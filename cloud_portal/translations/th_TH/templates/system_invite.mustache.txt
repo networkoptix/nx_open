@@ -6,7 +6,7 @@
 
 {{^message.sharer_name}}
 คุณได้รับเชิญให้เข้าร่วม {{PRODUCT_NAME}}
-ระบบ {{message.system_name}} ถูกแชร์กับคุณ
+You have been granted access to {{message.system_name}}.
 {{/message.sharer_name}}
 
 ลงทะเบียนและใช้งานระบบ: {{config.portal_url}} / register / {{message.code}}

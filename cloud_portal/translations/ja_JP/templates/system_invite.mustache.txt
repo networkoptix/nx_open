@@ -6,7 +6,7 @@
 
 {{^message.sharer_name}}
 招待されて {{PRODUCT_NAME}} に参加します
-{{message.system_name}} が共有されました
+You have been granted access to {{message.system_name}}.
 {{/message.sharer_name}}
 
 登録してシステムを表示: {{config.portal_url}}/登録/{{message.code}}

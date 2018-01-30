@@ -1,27 +1,47 @@
 {
-    "cameraLinks": {
-        "highStream": "高流",
-        "lowStream": "低流",
-        "transcoding": "转码",
-        "unknown": "未知的",
-        "copyToClipboard": "复制到剪贴板",
-        "copyDefaultText": "复制",
-        "copyActiveText": "已复制到剪贴板"
-    },
-    "systemOffline": "系统处于离线状态",
-    "cameraStates": {
-        "offline": "离线",
-        "error": "错误",
-        "unauthorized": "需要身份验证",
-        "noData": "无数据",
-        "iosVideoTooLarge": "iOS不支持大于fullHD (2MP：1920x1080) 的视频。",
-        "flashRequired": "请 <a href=\"https://get.adobe.com/flashplayer/\" target=\"_blank\">安装 Adobe Flash</a> 播放视频从基于 ARM 的服务器。",
-        "flashOrWebmRequired": "请 <a href=\"https://get.adobe.com/flashplayer/\" target=\"_blank\">安装 Adobe Flash</a> 或 <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM 编解码器</a> 以在 Ie 中播放视频。",
-        "noArmSupport": "此浏览器或设备不支持基于ARM的服务器的视频播放。",
-        "noFormat": "此浏览器或设备不支持本相机的视频播放。",
-        "ieNoWebm": "请为 Ie 安装 <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM 编解码器</a>。",
-        "ieWin10": "请使用Microsoft Edge或Google Chrome浏览器。",
-        "ubuntuNX": "此浏览器不支持从基于 ARM 服务器的视频。请改为使用 Chromium 浏览器。"
-    },
-    "searchCamPlaceholder": "搜索"
+  "cameraLinks": {
+    "highStream": "高流",
+    "lowStream": "低流",
+    "transcoding": "转码",
+    "unknown": "未知的",
+    "copyToClipboard": "复制到剪贴板",
+    "copyDefaultText": "复制",
+    "copyActiveText": "已复制到剪贴板"
+  },
+  "systemOffline": "系统处于离线状态",
+  "cameraStates": {
+    "offline": "离线",
+    "error": "错误",
+    "unauthorized": "需要身份验证",
+    "noData": "无数据",
+    "iosVideoTooLarge": "iOS不支持大于fullHD (2MP：1920x1080) 的视频。",
+    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashOrWebmRequired": "请 <a href=\"https://get.adobe.com/flashplayer/\" target=\"_blank\">安装 Adobe Flash</a> 或 <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM 编解码器</a> 以在 Ie 中播放视频。",
+    "noArmSupport": "此浏览器或设备不支持基于ARM的服务器的视频播放。",
+    "noFormat": "This browser does not support video playback from this camera.",
+    "ieNoWebm": "请为 Ie 安装 <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM 编解码器</a>。",
+    "ieWin10": "请使用Microsoft Edge或Google Chrome浏览器。",
+    "ubuntuNX": "此浏览器不支持从基于 ARM 服务器的视频。请改为使用 Chromium 浏览器。"
+  },
+  "searchCamPlaceholder": "Search",
+  "resolution": {
+    "auto": "Auto",
+    "high": "High",
+    "low": "Low"
+  },
+  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+  "voiceCommands": {
+    "play": "play",
+    "pause": "pause",
+    "live": "go to live | show me live",
+    "view": "view + [camera name]",
+    "search": "find + [text for searchbar]",
+    "clear search": "clear search",
+    "expand server": "expand server + [server name]",
+    "collapse server": "collapse server + [server name]",
+    "expand all servers": "expand all servers",
+    "collapse all servers": "collapse all servers",
+    "stop listening": "stop listening",
+    "help": "help | show commands"
+  }
 }

@@ -20,7 +20,7 @@
                         <span class="user-name" ng-bind-html="getSystemOwnerName(system, account.email) | escape | highlight:search.value"></span>
                         <span ng-if="system.stateOfHealth!=$root.C.systemStatuses.onlineStatus" class="label"
                               ng-class="$root.C.systemStatuses[system.stateOfHealth].style || $root.C.systemStatuses.default.style"
-                              ng-bind-html="$root.C.systemStatuses[system.stateOfHealth].label||system.stateOfHealth | escape | highlight:search.value"></span>
+                              ng-bind-html="$root.L.systemStatuses[system.stateOfHealth]||system.stateOfHealth | escape | highlight:search.value"></span>
 
                         <open-client-button ng-if="system.stateOfHealth==$root.C.systemStatuses.onlineStatus" system="system"></open-client-button>
                     </div>
