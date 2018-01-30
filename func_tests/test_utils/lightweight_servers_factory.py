@@ -2,7 +2,6 @@
 
 import datetime
 import logging
-import os.path
 
 from requests.exceptions import ReadTimeout
 
@@ -52,7 +51,7 @@ class LightweightServersFactory(object):
         if not self._physical_installation_ctl:
             return None
         for config, host in zip(self._physical_installation_ctl.config_list,
-                                self._physical_installation_ctl.installation_hosts):
+                                     self._physical_installation_ctl.installations_access):
             if config.lightweight_servers_limit:
                 log.info('Lightweight host: %s %s', config, host)
                 return host
@@ -71,24 +70,24 @@ class LightweightServersFactory(object):
 class LightweightServersInstallation(object):
 
     def __init__(self, host, dir, ca):
-        self.host = host
+        self.os_access = host
         self.dir = dir
-        self.test_tmp_dir = os.path.join(dir, 'tmp')
-        self.log_path_base = os.path.join(dir, 'lws')
+        self.test_tmp_dir = dir / 'tmp'
+        self.log_path_base = dir / 'lws'
         self._ca = ca
 
     def cleanup_var_dir(self):
         self._not_supported()
 
     def list_core_files(self):
-        return self.host.expand_glob(os.path.join(self.dir, '*core*'))
+        return self.os_access.expand_glob(self.dir / '*core*')
 
     def cleanup_core_files(self):
         for path in self.list_core_files():
-            self.host.run_command(['rm', path])
+            self.os_access.run_command(['rm', path])
 
     def cleanup_test_tmp_dir(self):
-        self.host.rm_tree(self.test_tmp_dir, ignore_errors=True)
+        self.os_access.rm_tree(self.test_tmp_dir, ignore_errors=True)
 
     def reset_config(self, **kw):
         self._not_supported()
@@ -97,8 +96,8 @@ class LightweightServersInstallation(object):
         self._not_supported()
 
     def get_log_file(self):
-        if self.host.file_exists(self.log_path_base):
-            return self.host.read_file(self.log_path_base + '.log')
+        if self.os_access.file_exists(self.log_path_base):
+            return self.os_access.read_file(self.log_path_base + '.log')
         else:
             return None
 
@@ -108,10 +107,11 @@ class LightweightServersInstallation(object):
 
 class LightweightServer(Server):
 
-    def __init__(self, name, host, installation, server_ctl, rest_api_url, ca, internal_ip_port=None, timezone=None):
-        Server.__init__(self, name, host, installation, server_ctl, rest_api_url, ca,
-                            internal_ip_port=internal_ip_port, timezone=timezone)
-        self.internal_ip_address = host.host
+    def __init__(self, name, host, server_ctl, installation, rest_api_url, ca, rest_api_timeout=None,
+                 internal_ip_port=None):
+        Server.__init__(self, name, host, server_ctl, installation, rest_api_url, ca,
+                        rest_api_timeout=rest_api_timeout, internal_ip_port=internal_ip_port)
+        self.internal_ip_address = host.hostname
         self._state = self._st_started
 
     def load_system_settings(self, log_settings=False):
@@ -142,15 +142,15 @@ class LightweightServersHost(object):
         self._artifact_factory = artifact_factory
         self._test_binary_path = test_binary_path
         self._physical_installation_host = physical_installation_host
-        self._host = physical_installation_host.host
+        self._os_access = physical_installation_host.os_access
         self._host_name = physical_installation_host.name
         self._timezone = physical_installation_host.timezone
         self._ca = ca
         self._installation = LightweightServersInstallation(
-            self._host, os.path.join(physical_installation_host.root_dir, 'lws'), self._ca)
+            self._os_access, physical_installation_host.root_dir / 'lws', self._ca)
         self._template_renderer = TemplateRenderer()
         self._lws_dir = self._installation.dir
-        self._server_ctl = PhysicalHostServerCtl(self._host, self._lws_dir)
+        self._server_ctl = PhysicalHostServerCtl(self._os_access, self._lws_dir)
         self._allocated = False
         self._first_server = None
         self._init()
@@ -161,18 +161,18 @@ class LightweightServersHost(object):
         pih = self._physical_installation_host
         server_dir = pih.unpacked_mediaserver_dir
         pih.ensure_mediaserver_is_unpacked()
-        self._host.mk_dir(self._lws_dir)
+        self._os_access.mk_dir(self._lws_dir)
         self._cleanup_log_files()
-        self._host.put_file(self._test_binary_path, self._lws_dir)
+        self._os_access.put_file(self._test_binary_path, self._lws_dir)
         self._write_lws_ctl(server_dir, server_count, lws_params)
         self._server_ctl.set_state(is_started=True)
         # must be set before cycle following it so failure in that cycle won't prevent from artifacts collection from 'release' method
         self._allocated = True
         for idx in range(server_count):
             server_port = LWS_PORT_BASE + idx
-            rest_api_url = '%s://%s:%d/' % ('http', self._host.host, server_port)
-            server = LightweightServer('lws-%05d' % idx, self._host, self._installation, self._server_ctl, rest_api_url,
-                                       self._ca, internal_ip_port=server_port, timezone=self._timezone)
+            rest_api_url = '%s://%s:%d/' % ('http', self._os_access.hostname, server_port)
+            server = LightweightServer('lws-%05d' % idx, self._os_access, self._installation, self._server_ctl, self._ca,
+                                       rest_api_url, internal_ip_port=server_port)
             response = server.wait_for_server_become_online(timeout=LWS_START_TIMEOUT, check_interval_sec=2)
             server.local_system_id = response['localSystemId']
             if not self._first_server:
@@ -192,9 +192,9 @@ class LightweightServersHost(object):
         self._installation.cleanup_test_tmp_dir()
 
     def _cleanup_log_files(self):
-        file_list = self._host.expand_glob(os.path.join(self._installation.dir, 'lws*.log'))
+        file_list = self._os_access.expand_glob(self._installation.dir / 'lws*.log')
         if file_list:
-            self._host.run_command(['rm'] + file_list)
+            self._os_access.run_command(['rm'] + file_list)
 
     def _write_lws_ctl(self, server_dist_dir, server_count, lws_params):
         contents = self._template_renderer.render(
@@ -206,9 +206,9 @@ class LightweightServersHost(object):
             PORT_BASE=LWS_PORT_BASE,
             TEST_TMP_DIR=self._installation.test_tmp_dir,
             **lws_params)
-        lws_ctl_path = os.path.join(self._lws_dir, SERVER_CTL_TARGET_PATH)
-        self._host.write_file(lws_ctl_path, contents)
-        self._host.run_command(['chmod', '+x', lws_ctl_path])
+        lws_ctl_path = self._lws_dir / SERVER_CTL_TARGET_PATH
+        self._os_access.write_file(lws_ctl_path, contents)
+        self._os_access.run_command(['chmod', '+x', lws_ctl_path])
 
     def _save_lws_artifacts(self):
         self._check_if_server_is_online()
@@ -216,41 +216,39 @@ class LightweightServersHost(object):
         self._save_lws_core_files()
 
     def _save_lws_log(self):
-        log_contents = self._host.read_file(self._installation.log_path_base + '.log').strip()
+        log_contents = self._os_access.read_file(self._installation.log_path_base + '.log').strip()
         if log_contents:
             artifact_factory = self._artifact_factory(['lws', self._host_name], name='lws', artifact_type=SERVER_LOG_ARTIFACT_TYPE)
-            log_path = artifact_factory.produce_file_path()
-            with open(log_path, 'wb') as f:
-                f.write(log_contents)
+            log_path = artifact_factory.produce_file_path().write_bytes(log_contents)
             log.debug('log file for lws at %s is stored to %s', self._host_name, log_path)
 
     def _save_lws_core_files(self):
         for remote_core_path in self._installation.list_core_files():
-            fname = os.path.basename(remote_core_path)
+            fname = remote_core_path.name
             artifact_factory = self._artifact_factory(
                 ['lws', self._host_name, fname], name=fname, is_error=True, artifact_type=CORE_FILE_ARTIFACT_TYPE)
             local_core_path = artifact_factory.produce_file_path()
-            self._host.get_file(remote_core_path, local_core_path)
+            self._os_access.get_file(remote_core_path, local_core_path)
             log.debug('core file for lws at %s is stored to %s', self._host_name, local_core_path)
             traceback = create_core_file_traceback(
-                self._host, os.path.join(self._installation.dir, LWS_BINARY_NAME),
-                os.path.join(self._physical_installation_host.unpacked_mediaserver_dir, 'lib'), remote_core_path)
+                self._os_access, self._installation.dir / LWS_BINARY_NAME,
+                self._physical_installation_host.unpacked_mediaserver_dir / 'lib', remote_core_path)
             artifact_factory = self._artifact_factory(
                 ['lws', self._host_name, fname, 'traceback'],
                 name='%s-tb' % fname, is_error=True, artifact_type=TRACEBACK_ARTIFACT_TYPE)
-            path = artifact_factory.write_file(traceback)
+            path = artifact_factory.produce_file_path().write_text(traceback)
             log.debug('core file traceback for lws at %s is stored to %s', self._host_name, path)
 
     def _check_if_server_is_online(self):
-        if not self._allocated: return
+        if not self._allocated:
+            return
         if self._first_server and self._first_server.is_started() and not self._first_server.is_server_online():
             log.warning('Lightweight server at %s does not respond to ping - making core dump', self._host_name)
             self._first_server.make_core_dump()
 
     def perform_post_checks(self):
-        log.info('----- performing post-test checks for lightweight servers at %s'
-                     '---------------------->8 ---------------------------', self._host_name)
+        log.info('performing post-test checks for lightweight servers at %s', self._host_name)
         self._check_if_server_is_online()
         core_file_list = self._installation.list_core_files()
         assert not core_file_list, ('Lightweight server at %s left %d core dump(s): %s' %
-                                        (self._host_name, len(core_file_list), ', '.join(core_file_list)))
+                                    (self._host_name, len(core_file_list), ', '.join(core_file_list)))
