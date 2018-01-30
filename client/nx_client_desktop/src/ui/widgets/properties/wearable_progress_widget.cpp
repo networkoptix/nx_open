@@ -66,7 +66,7 @@ void QnWearableProgressWidget::updateFromState(const WearableState& state)
 {
     setActive(calculateActive(state));
     ui->cancelButton->setEnabled(calculateCancelable(state));
-    ui->uploadProgressBar->setValue(calculateProgress(state));
+    ui->uploadProgressBar->setValue(state.progress());
     ui->uploadProgressBar->setFormat(calculateMessage(state));
 }
 
@@ -137,19 +137,3 @@ QString QnWearableProgressWidget::calculateFileName(const WearableState& state)
     return QFileInfo(state.currentFile.path).fileName();
 }
 
-int QnWearableProgressWidget::calculateProgress(const WearableState& state)
-{
-    switch (state.status)
-    {
-    case WearableState::Unlocked:
-    case WearableState::LockedByOtherClient:
-    case WearableState::Locked:
-        return 0;
-    case WearableState::Uploading:
-        return 90 * state.currentUpload.uploaded / state.currentUpload.size;
-    case WearableState::Consuming:
-        return 90 + 10 * state.consumeProgress / 100;
-    default:
-        return 0;
-    }
-}

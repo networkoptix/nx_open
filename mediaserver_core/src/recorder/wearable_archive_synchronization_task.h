@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include "abstract_remote_archive_synchronization_task.h"
+#include "wearable_archive_synchronization_state.h"
 
 class QIODevice;
 
@@ -41,23 +42,20 @@ public:
     virtual void cancel() override;
     virtual bool execute() override;
 
-    // TODO: STATUS NOT PROGRESS w/error
-    int progress() const;
+    WearableArchiveSynchronizationState state() const;
 
 signals:
-    void progressChanged(int progress);
-    void finished();
+    void stateChanged(WearableArchiveSynchronizationState state);
 
 private:
     void createArchiveReader(qint64 startTimeMs);
     void createStreamRecorder(qint64 startTimeMs);
-    void setProgress(int progress);
 
 private:
     QnSecurityCamResourcePtr m_resource;
     QPointer<QIODevice> m_file;
     qint64 m_startTimeMs = 0;
-    int m_progress = 0;
+    WearableArchiveSynchronizationState m_state;
 
     std::unique_ptr<QnAbstractArchiveStreamReader> m_archiveReader;
     std::unique_ptr<QnServerEdgeStreamRecorder> m_recorder;
