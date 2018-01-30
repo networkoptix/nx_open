@@ -232,10 +232,10 @@ REGISTER_TYPED_TEST_CASE_P(MediatorConnector,
 class MediatorStunEndpointListGenerator
 {
 public:
-    std::unique_ptr<nx_http::AbstractMsgBodySource> get(
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> get(
         nx::utils::test::ModuleLauncher<MediatorProcessPublic>* mediator)
     {
-        SocketAddress mediatorStunEndpoint;
+        nx::network::SocketAddress mediatorStunEndpoint;
         if (mediator)
         {
             mediatorStunEndpoint =
@@ -243,8 +243,8 @@ public:
         }
         else
         {
-            mediatorStunEndpoint = SocketAddress(
-                HostAddress::localhost,
+            mediatorStunEndpoint = nx::network::SocketAddress(
+                nx::network::HostAddress::localhost,
                 nx::utils::random::number<int>(30000, 40000));
         }
 
@@ -269,11 +269,11 @@ INSTANTIATE_TYPED_TEST_CASE_P(
 class MediatorHttpEndpointListGenerator
 {
 public:
-    std::unique_ptr<nx_http::AbstractMsgBodySource> get(
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> get(
         nx::utils::test::ModuleLauncher<MediatorProcessPublic>* mediator)
     {
-        SocketAddress mediatorStunEndpoint;
-        SocketAddress mediatorHttpEndpoint;
+        nx::network::SocketAddress mediatorStunEndpoint;
+        nx::network::SocketAddress mediatorHttpEndpoint;
         if (mediator)
         {
             mediatorHttpEndpoint = mediator->moduleInstance()->impl()->httpEndpoints().front();
@@ -281,8 +281,8 @@ public:
         }
         else
         {
-            mediatorStunEndpoint = SocketAddress(
-                HostAddress::localhost,
+            mediatorStunEndpoint = nx::network::SocketAddress(
+                nx::network::HostAddress::localhost,
                 nx::utils::random::number<int>(30000, 40000));
             mediatorHttpEndpoint = mediatorStunEndpoint;
         }

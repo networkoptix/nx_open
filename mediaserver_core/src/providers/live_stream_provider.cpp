@@ -199,7 +199,7 @@ QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStr
 
 void QnLiveStreamProvider::setPrimaryStreamParams(const QnLiveStreamParams& params)
 {
-    QnMutexLocker lock(&m_livemutex);
+    QnMutexLocker lock(&m_liveMutex);
     if (m_liveParams == params)
         return;
     m_liveParams = params;
