@@ -134,7 +134,7 @@ protected:
     virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) = 0;
 
 private:
-    CameraDiagnostics::Result initializaAdvancedParametersProviders();
+    CameraDiagnostics::Result initializeAdvancedParametersProviders();
 
 private:
     int m_channelNumber; // video/audio source number

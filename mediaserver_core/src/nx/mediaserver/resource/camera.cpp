@@ -382,10 +382,10 @@ CameraDiagnostics::Result Camera::initInternal()
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return driverResult;
 
-    return initializaAdvancedParametersProviders();
+    return initializeAdvancedParametersProviders();
 }
 
-CameraDiagnostics::Result Camera::initializaAdvancedParametersProviders()
+CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
 {
     std::vector<Camera::AdvancedParametersProvider*> allProviders;
     boost::optional<QSize> baseResolution;

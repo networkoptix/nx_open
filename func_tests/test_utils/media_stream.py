@@ -1,7 +1,6 @@
 import cv2
 import logging
 import math
-import os
 import struct
 import time
 import urllib
@@ -42,7 +41,7 @@ class Metadata(object):
 
     @classmethod
     def from_file(cls, file_path):
-        assert os.stat(file_path).st_size != 0, 'Server returned empty media stream'
+        assert file_path.stat().st_size != 0, 'Server returned empty media stream'
         cap = cv2.VideoCapture(file_path)
         assert cap.isOpened(), 'Media stream returned from server is invalid (saved to %r)' % file_path
         try:
@@ -106,7 +105,7 @@ class RtspMediaStream(object):
             frame_count = self._copy_cap(from_cap, to_cap, start_time)
         finally:
             to_cap.release()
-        size = os.stat(temp_file_path).st_size
+        size = temp_file_path.stat().st_size
         log.info('RTSP stream: completed loading %d frames in %.2f seconds, total size: %dB/%.2fKB/%.2fMB',
             frame_count, time.time() - start_time, size, size/1024., size/1024./1024)
 
@@ -142,7 +141,7 @@ def load_stream_metadata_from_http_response(stream_type, response, temp_file_pat
     start_time = log_time = time.time()
     chunk_count = 0
     size = 0
-    with open(temp_file_path, 'wb') as f:
+    with temp_file_path.open('wb') as f:
         for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
             f.write(chunk)
             size += len(chunk)

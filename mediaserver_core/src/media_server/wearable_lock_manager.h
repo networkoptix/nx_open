@@ -20,7 +20,7 @@ public:
     QnWearableLockManager(QObject* parent = nullptr);
     virtual ~QnWearableLockManager() override;
 
-    bool acquireLock(const QnUuid& cameraId, const QnUuid& userId, qint64 ttl, QnUuid* token);
+    bool acquireLock(const QnUuid& cameraId, const QnUuid& token, const QnUuid& userId, qint64 ttl);
     bool extendLock(const QnUuid& cameraId, const QnUuid& token, qint64 ttl);
     bool releaseLock(const QnUuid& cameraId, const QnUuid& token);
 

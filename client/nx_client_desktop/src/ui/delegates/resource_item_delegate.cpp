@@ -22,6 +22,7 @@
 
 #include <client/client_meta_types.h>
 #include <client/client_settings.h>
+#include <client/client_module.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -32,6 +33,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
+
+#include <nx/client/desktop/utils/wearable_manager.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -729,6 +732,16 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
 
         if (resource->hasFlags(Qn::user) && !extInfo.isEmpty())
             extInfo = kCustomExtInfoTemplate.arg(extInfo);
+
+        if (resource->hasFlags(Qn::wearable_camera))
+        {
+            QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+
+            using namespace nx::client::desktop;
+            WearableState state = qnClientModule->wearableManager()->state(camera);
+            if (state.isRunning())
+                extInfo = kCustomExtInfoTemplate.arg(QString::number(state.progress()) + lit("%"));
+        }
     }
 }
 

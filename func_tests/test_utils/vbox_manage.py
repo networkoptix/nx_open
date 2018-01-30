@@ -2,8 +2,6 @@ import re
 
 from netaddr import IPNetwork
 
-from .host import Host
-
 INTERNAL_NETWORK_NAME_INFIX = 'net-'
 
 
@@ -38,9 +36,8 @@ class DhcpServer(object):
 class VBoxManage(object):
 
     def __init__(self, vm_name_prefix, host):
-        assert isinstance(host, Host), repr(host)
         self._vm_net_prefix = vm_name_prefix + INTERNAL_NETWORK_NAME_INFIX
-        self._host = host
+        self._os_access = host
         self._dhcp_server_list, self._dhcp_net_index = self._load_dhcp_server_list()
 
     def get_vms_list(self):
@@ -120,4 +117,4 @@ class VBoxManage(object):
                            ])
 
     def _run_command(self, args, log_output=True):
-        return self._host.run_command(['VBoxManage', '--nologo'] + args, log_output=log_output)
+        return self._os_access.run_command(['VBoxManage', '--nologo'] + args, log_output=log_output)

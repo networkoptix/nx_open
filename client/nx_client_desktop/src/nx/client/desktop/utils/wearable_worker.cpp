@@ -23,7 +23,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-
 namespace {
 /**
  * Using TTL of 10 mins for uploads. This shall be enough even for the most extreme cases.
@@ -92,14 +91,7 @@ WearableState WearableWorker::state() const
 
 bool WearableWorker::isWorking() const
 {
-    switch (d->state.status) {
-    case WearableState::Locked:
-    case WearableState::Uploading:
-    case WearableState::Consuming:
-        return true;
-    default:
-        return false;
-    }
+    return d->state.isRunning();
 }
 
 void WearableWorker::updateState()
@@ -132,7 +124,7 @@ bool WearableWorker::addUpload(const QString& path, QString* errorMessage)
 
     QnAviResourcePtr resource(new QnAviResource(path));
     QnAviArchiveDelegatePtr delegate(resource->createArchiveDelegate());
-    bool opened = delegate->open(resource, nullptr);
+    bool opened = delegate->open(resource, nullptr) && delegate->findStreams();
 
     if (!opened || !delegate->hasVideo() || resource->hasFlags(Qn::still_image))
     {
@@ -302,6 +294,7 @@ void WearableWorker::handleExtendFinished(bool success, const QnWearableStatusRe
     if(d->state.status == WearableState::Consuming)
     {
         d->state.consumeProgress = result.progress;
+        emit stateChanged(d->state);
 
         if (!result.consuming)
             processNextFile();
@@ -372,6 +365,7 @@ void WearableWorker::at_timer_timeout()
         };
     d->requests.storeHandle(d->connection()->extendWearableCameraLock(
         d->camera,
+        d->user,
         d->lockToken,
         kLockTtlMSec,
         callback,

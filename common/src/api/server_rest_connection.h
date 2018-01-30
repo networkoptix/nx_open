@@ -271,6 +271,7 @@ public:
 
     Handle extendWearableCameraLock(
         const QnNetworkResourcePtr& camera,
+        const QnUserResourcePtr& user,
         const QnUuid& token,
         qint64 ttl,
         GetCallback callback,

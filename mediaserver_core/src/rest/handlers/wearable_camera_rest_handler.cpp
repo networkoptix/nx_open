@@ -19,6 +19,8 @@
 
 #include <nx/utils/std/cpp14.h>
 
+using namespace nx::mediaserver_core::recorder;
+
 QStringList QnWearableCameraRestHandler::cameraIdUrlParams() const
 {
     return {lit("cameraId")};
@@ -155,17 +157,22 @@ int QnWearableCameraRestHandler::executeLock(const QnRequestParams& params,
     if (!uploader)
         return nx::network::http::StatusCode::internalServerError;
 
+    QnUuid token = QnUuid::createUuid();
+
     QnWearableStatusReply reply;
     reply.success =
         !uploader->isConsuming(cameraId)
-        && locker->acquireLock(cameraId, userId, ttl, &reply.token);
+        && locker->acquireLock(cameraId, token, userId, ttl);
+    if (reply.success)
+        reply.token = token;
 
     QnWearableLockInfo info = locker->lockInfo(cameraId);
     reply.locked = info.locked;
     reply.userId = info.userId;
 
-    reply.consuming = uploader->isConsuming(cameraId);
-    reply.progress = 0; // TODO: #wearable
+    WearableArchiveSynchronizationState state = uploader->state(cameraId);
+    reply.consuming = state.isConsuming();
+    reply.progress = state.progress();
 
     result.setReply(reply);
 
@@ -180,8 +187,14 @@ int QnWearableCameraRestHandler::executeExtend(const QnRequestParams& params,
     if (!requireParameter(params, lit("cameraId"), result, &cameraId))
         return nx::network::http::StatusCode::invalidParameter;
 
+    QnUuid userId;
+    if (!requireParameter(params, lit("userId"), result, &userId))
+        return nx_http::StatusCode::invalidParameter;
+
     QnUuid token;
     if (!requireParameter(params, lit("token"), result, &token))
+        return nx::network::http::StatusCode::invalidParameter;
+    if (token.isNull())
         return nx::network::http::StatusCode::invalidParameter;
 
     qint64 ttl;
@@ -196,14 +209,19 @@ int QnWearableCameraRestHandler::executeExtend(const QnRequestParams& params,
     if (!uploader)
         return nx::network::http::StatusCode::internalServerError;
 
+    bool success = locker->extendLock(cameraId, token, ttl);
+    if (!success)
+        success = locker->acquireLock(cameraId, token, userId, ttl);
+
     QnWearableLockInfo info = locker->lockInfo(cameraId);
+    WearableArchiveSynchronizationState state = uploader->state(cameraId);
 
     QnWearableStatusReply reply;
-    reply.success = locker->extendLock(cameraId, token, ttl);
+    reply.success = success;
     reply.locked = info.locked;
-    reply.consuming = uploader->isConsuming(cameraId);
+    reply.consuming = state.isConsuming();
     reply.userId = info.userId;
-    reply.progress = 0; // TODO: #wearable
+    reply.progress = state.progress();
     result.setReply(reply);
 
     return nx::network::http::StatusCode::ok;
@@ -236,8 +254,9 @@ int QnWearableCameraRestHandler::executeRelease(const QnRequestParams& params,
     reply.locked = info.locked;
     reply.userId = info.userId;
 
-    reply.consuming = uploader->isConsuming(cameraId);
-    reply.progress = 0; // TODO: #wearable
+    WearableArchiveSynchronizationState state = uploader->state(cameraId);
+    reply.consuming = state.isConsuming();
+    reply.progress = state.progress();
     result.setReply(reply);
 
     return nx::network::http::StatusCode::ok;
