@@ -1,5 +1,3 @@
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/mediaserver/updates2/updates2_manager.h>
 #include <utils/common/synctime.h>
@@ -8,6 +6,9 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/mediaserver/updates2/detail/update_request_data_factory.h>
 #include <nx/update/info/abstract_update_registry.h>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <thread>
 
 namespace nx {
 namespace mediaserver {
