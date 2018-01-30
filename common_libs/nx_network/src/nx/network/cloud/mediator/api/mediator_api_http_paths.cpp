@@ -4,7 +4,10 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-const char* kStatisticsListeningPeersPath = "/mediator/statistics/listening_peers";
+const char* const kMediatorApiPrefix = "/mediator";
+
+const char* const kStatisticsListeningPeersPath = "/statistics/listening_peers";
+const char* const kStunOverHttpTunnelPath = "/stun_tunnel";
 
 } // namespace api
 } // namespace hpm
