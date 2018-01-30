@@ -114,7 +114,8 @@ bool Manager::pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int64_t* o
 
     *outPtsUs = -1;
     int rectsCount = -1;
-    if (!m_tegraVideo->pullRectsForFrame(&rects->front(), rects->size(), &rectsCount, outPtsUs))
+    if (!m_tegraVideo->pullRectsForFrame(
+        &rects->front(), (int) rects->size(), &rectsCount, outPtsUs))
     {
         NX_PRINT << "ERROR: TegraVideo::pullRectsForFrame() failed";
         return false;
