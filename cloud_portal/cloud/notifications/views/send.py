@@ -115,7 +115,7 @@ def send_notification(request):
     return api_success()
 
 
-@api_view(['GET','POST'])
+@api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def cloud_notification_action(request):
     notification_id = str(request.data['id'])
