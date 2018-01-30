@@ -484,6 +484,10 @@ TEST_F(Updates2Manager, Download_successful)
     thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
 }
 
+TEST_F(Updates2Manager, Download_addFile_fail)
+{
+}
+
 TEST_F(Updates2Manager, Download_wrongState)
 {
 
