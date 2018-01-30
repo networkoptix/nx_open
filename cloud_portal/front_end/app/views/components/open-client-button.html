@@ -1,6 +1,12 @@
-<process-button process="openClient"
+<process-button process="openClient" ng-if="system"
                 action-type="'default'"
                 title="{{system.stateMessage}}"
                 button-disabled="!system.isOnline && system.stateOfHealth!==$root.C.systemStatuses.onlineStatus"
                 ng-click="$event.stopPropagation();"
                 button-text="$root.L.system.openClient"></process-button>
+
+<process-button process="openClient" ng-if="!system"
+                action-type="'primary'"
+                button-disabled="false"
+                ng-click="$event.stopPropagation();"
+                button-text="$root.L.system.openClientNoSystem"></process-button>
