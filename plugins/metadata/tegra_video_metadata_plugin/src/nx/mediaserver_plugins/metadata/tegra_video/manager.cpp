@@ -8,10 +8,8 @@
 
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_internal_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_plugin.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/sdk/metadata/common_detected_object.h>
-#include <nx/sdk/metadata/common_compressed_video_packet.h>
 
 #include "tegra_video_metadata_plugin_ini.h"
 #include "attribute_options.h"
@@ -24,8 +22,8 @@ namespace tegra_video {
 namespace {
 
 // TODO: #dmishin get rid of this. Pass object type id from TegraVideo.
-const QnUuid kCarUuid("{58AE392F-8516-4B27-AEE1-311139B5A37A}");
-const QnUuid kHumanUuid("{58AE392F-8516-4B27-AEE1-311139B5A37A}");
+static const QnUuid kCarUuid("{58AE392F-8516-4B27-AEE1-311139B5A37A}");
+static const QnUuid kHumanUuid("{58AE392F-8516-4B27-AEE1-311139B5A37A}");
 
 } // namespace
 
@@ -37,21 +35,12 @@ Manager::Manager(Plugin* plugin):
 {
     NX_PRINT << __func__ << "(\"" << plugin->name() << "\") BEGIN";
 
-    m_tegraVideo.reset(TegraVideo::create());
-
-    // TODO: #mike: Move to a new start...() method after SDK is extended.
-    TegraVideo::Params params;
-    params.id = "metadata";
-    params.deployFile = ini().deployFile;
-    params.modelFile = ini().modelFile;
-    params.cacheFile = ini().cacheFile;
-    params.netWidth = ini().netWidth;
-    params.netHeight = ini().netHeight;
-
-    if (!m_tegraVideo->start(params))
-        NX_PRINT << "ERROR: TegraVideo::start() failed.";
-
-    NX_OUTPUT << __func__ << "() END -> " << this;
+    m_tegraVideo.reset(tegraVideoCreate());
+    if (!m_tegraVideo)
+    {
+        NX_PRINT << "ERROR: Unable to create instance of TegraVideo.";
+        // Not much to do about this error.
+    }
 
     if (strcmp(ini().postprocType, "ped") == 0)
     {
@@ -63,94 +52,38 @@ Manager::Manager(Plugin* plugin):
         setTrackerAttributeOptions(kCarAttributeOptions);
         m_tracker.setObjectTypeId(kCarUuid);
     }
+
+    stopFetchingMetadata();
+
+    TegraVideo::Params params;
+    params.id = "metadata";
+    params.deployFile = ini().deployFile;
+    params.modelFile = ini().modelFile;
+    params.cacheFile = ini().cacheFile;
+    params.netWidth = ini().netWidth;
+    params.netHeight = ini().netHeight;
+
+    if (!m_tegraVideo->start(&params))
+        NX_PRINT << "ERROR: TegraVideo::start() failed.";
+
+    NX_OUTPUT << __func__ << "() END -> " << this;
 }
 
-void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_MetadataManager)
-    {
-        addRef();
-        return static_cast<AbstractMetadataManager*>(this);
-    }
-
-    if (interfaceId == IID_ConsumingMetadataManager)
-    {
-        addRef();
-        return static_cast<AbstractConsumingMetadataManager*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
-Error Manager::setHandler(AbstractMetadataHandler* handler)
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_handler = handler;
-    return Error::noError;
-}
-
-Error Manager::startFetchingMetadata(
-    nxpl::NX_GUID* /*eventTypeList*/,
-    int /*eventTypeListSize*/)
-{
-    NX_OUTPUT << __func__ << "() BEGIN";
-    std::lock_guard<std::mutex> lock(m_mutex);
-
-    stopFetchingMetadataThreadUnsafe();
-
-    NX_OUTPUT << __func__ << "() END -> noError";
-    return Error::noError;
-}
-
-Error Manager::putData(AbstractDataPacket* dataPacket)
+Manager::~Manager()
 {
     NX_OUTPUT << __func__ << "() BEGIN";
 
-    std::vector<AbstractMetadataPacket*> metadataPackets;
-    if (!pushFrameAndGetMetadataPackets(&metadataPackets, dataPacket))
-    {
-        NX_OUTPUT << __func__ << "() END -> unknownError";
-        return Error::unknownError;
-    }
+    if (!m_tegraVideo->stop())
+        NX_OUTPUT << __func__ << "(): ERROR: TegraVideo::stop() failed";
 
-    if (!metadataPackets.empty())
-    {
-        NX_OUTPUT << __func__ << "() Producing " << metadataPackets.size()
-            << " metadata packet(s)";
-    }
-
-    for (auto& metadataPacket: metadataPackets)
-    {
-        m_handler->handleMetadata(Error::noError, metadataPacket);
-        metadataPacket->releaseRef();
-    }
-
-    NX_OUTPUT << __func__ << "() END -> noError";
-    return Error::noError;
+    NX_OUTPUT << __func__ << "() END";
 }
 
-Error Manager::stopFetchingMetadata()
+std::string Manager::capabilitiesManifest()
 {
-    NX_OUTPUT << __func__ << "() -> noError";
-    return Error::noError;
-}
-
-const char* Manager::capabilitiesManifest(Error* error) 
-{
-    *error = Error::noError;
-
     return R"manifest(
         {
-            "supportedEventTypes": [
-                "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
-                "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}"
-            ],
-            "supportedObjectTypes": [
+             "supportedObjectTypes": [
                 "{58AE392F-8516-4B27-AEE1-311139B5A37A}",
                 "{3778A599-FB60-47E9-8EC6-A9949E8E0AE7}"
             ]
@@ -158,23 +91,83 @@ const char* Manager::capabilitiesManifest(Error* error)
     )manifest";
 }
 
-Manager::~Manager()
+bool Manager::pushCompressedFrame(const CommonCompressedVideoPacket* videoPacket)
 {
-    NX_OUTPUT << __func__ << "() BEGIN";
+    TegraVideo::CompressedFrame compressedFrame;
+    compressedFrame.dataSize = videoPacket->dataSize();
+    compressedFrame.data = (const uint8_t*) videoPacket->data();
+    compressedFrame.ptsUs = videoPacket->timestampUsec();
 
-    stopFetchingMetadata();
-
-    Error result = stopFetchingMetadataThreadUnsafe();
-
-    NX_OUTPUT << __func__ << "() END";
+    NX_OUTPUT << "Pushing frame to net: PTS " << compressedFrame.ptsUs;
+    if (!m_tegraVideo->pushCompressedFrame(&compressedFrame))
+    {
+        NX_PRINT << "ERROR: TegraVideo::pushCompressedFrame() failed";
+        return false;
+    }
+    return true;
 }
 
-Error Manager::stopFetchingMetadataThreadUnsafe()
+bool Manager::pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int64_t* outPtsUs)
 {
-    if (!m_tegraVideo->stop())
-        return Error::unknownError;
-    return Error::noError;
+    static constexpr int kMaxRects = 1000;
+    rects->resize(kMaxRects);
+
+    *outPtsUs = -1;
+    int rectsCount = -1;
+    if (!m_tegraVideo->pullRectsForFrame(&rects->front(), rects->size(), &rectsCount, outPtsUs))
+    {
+        NX_PRINT << "ERROR: TegraVideo::pullRectsForFrame() failed";
+        return false;
+    }
+
+    rects->resize(rectsCount);
+    return true;
 }
+
+bool Manager::pushVideoFrame(const CommonCompressedVideoPacket* videoFrame)
+{
+    if (!pushCompressedFrame(videoFrame))
+        return false;
+    m_lastFramePtsUs = videoFrame->timestampUsec();
+    return true;
+}
+
+bool Manager::pullMetadataPackets(std::vector<AbstractMetadataPacket*>* metadataPackets)
+{
+    while (m_tegraVideo->hasMetadata())
+    {
+        std::vector<TegraVideo::Rect> rects;
+        int64_t ptsUs;
+        if (!pullRectsForFrame(&rects, &ptsUs))
+            return false;
+
+        if (rects.empty())
+            return true; //< No error: no rects at this time.
+
+        if (NX_DEBUG_ENABLE_OUTPUT)
+        {
+            const int64_t dPts = ptsUs - m_lastFramePtsUs;
+            const std::string dPtsMsStr =
+                (dPts >= 0 ? "+" : "-") + nx::kit::debug::format("%lld", (500 + abs(dPts)) / 1000);
+
+            NX_OUTPUT << "Got " << rects.size() << " rect(s) for PTS " << ptsUs
+                << " (" << dPtsMsStr << " ms):";
+
+            for (const auto rect: rects)
+            {
+                NX_OUTPUT << "    x " << rect.x << ", y " << rect.y
+                    << ", w " << rect.w << ", h " << rect.h;
+            }
+        }
+
+        if (!makeMetadataPacketsFromRects(metadataPackets, rects, ptsUs))
+            NX_OUTPUT << "WARNING: makeMetadataPacketsFromRects() failed";
+    }
+    return true; //< No error: no more metadata.
+}
+
+//-------------------------------------------------------------------------------------------------
+// private
 
 bool Manager::makeMetadataPacketsFromRects(
     std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
@@ -230,27 +223,7 @@ bool Manager::makeMetadataPacketsFromRectsPostprocPed(
     int64_t ptsUs) const
 {
     // TODO: #dmishin: STUB
-
-    // Create metadata Objects directly from the rects; create no events.
-
-    auto objectPacket = new CommonObjectsMetadataPacket();
-    objectPacket->setTimestampUsec(ptsUs);
-    objectPacket->setDurationUsec(1000000LL * 10); //< TODO: #mike: Ask #rvasilenko.
-
-    for (const auto& rect: rects)
-    {
-        auto detectedObject = new CommonDetectedObject();
-
-        const auto objectId = nxpt::fromQnUuidToPluginGuid(QnUuid::createUuid());
-        detectedObject->setId(objectId);
-        detectedObject->setTypeId(m_objectTypeId);
-
-        detectedObject->setBoundingBox(Rect(rect.x, rect.y, rect.w, rect.h));
-        objectPacket->addItem(detectedObject);
-    }
-
-    metadataPackets->push_back(objectPacket);
-    return true;
+    return makeMetadataPacketsFromRectsPostprocNone(metadataPackets, rects, ptsUs);
 }
 
 bool Manager::makeMetadataPacketsFromRectsPostprocCar(
@@ -265,67 +238,6 @@ bool Manager::makeMetadataPacketsFromRectsPostprocCar(
     m_tracker.filterAndTrack(metadataPackets, rects, ptsUs);
 
     return true;
-}
-
-bool Manager::pushFrameAndGetMetadataPackets(
-    std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
-    AbstractDataPacket* mediaPacket) const
-{
-    nxpt::ScopedRef<CommonCompressedVideoPacket> videoPacket(
-        mediaPacket->queryInterface(IID_CompressedVideoPacket));
-    if (!videoPacket)
-        return true; //< No error: no video frame.
-
-    TegraVideo::CompressedFrame compressedFrame;
-    compressedFrame.dataSize = videoPacket->dataSize();
-    compressedFrame.data = (const uint8_t*) videoPacket->data();
-    compressedFrame.ptsUs = videoPacket->timestampUsec();
-
-    NX_OUTPUT << "Pushing frame to net: PTS " << compressedFrame.ptsUs;
-    if (!m_tegraVideo->pushCompressedFrame(&compressedFrame))
-    {
-        NX_PRINT << "ERROR: TegraVideo::pushCompressedFrame() failed";
-        return false;
-    }
-
-    while (m_tegraVideo->hasMetadata())
-    {
-        static constexpr int kMaxRects = 1000;
-        std::vector<TegraVideo::Rect> rects;
-        rects.resize(kMaxRects);
-
-        int64_t ptsUs = -1;
-        int rectsCount = -1;
-        if (!m_tegraVideo->pullRectsForFrame(&rects.front(), rects.size(), &rectsCount, &ptsUs))
-        {
-            NX_PRINT << "ERROR: TegraVideo::pullRectsForFrame() failed";
-            return false;
-        }
-
-        if (rectsCount <= 0)
-            return true; //< No error: no rects at this time.
-
-        rects.resize(rectsCount);
-        if (NX_DEBUG_ENABLE_OUTPUT)
-        {
-            const int64_t dPts = ptsUs - compressedFrame.ptsUs;
-            const std::string dPtsMsStr =
-                (dPts >= 0 ? "+" : "-") + nx::kit::debug::format("%lld", (500 + abs(dPts)) / 1000);
-
-            NX_OUTPUT << "Got " << rectsCount << " rect(s) for PTS " << ptsUs
-                << " (" << dPtsMsStr << " ms):";
-
-            for (const auto rect: rects)
-            {
-                NX_OUTPUT << "    x " << rect.x << ", y " << rect.y
-                    << ", w " << rect.w << ", h " << rect.h;
-            }
-        }
-
-        if (!makeMetadataPacketsFromRects(metadataPackets, rects, ptsUs))
-            NX_OUTPUT << "WARNING: makeMetadataPacketsFromRects() failed";
-    }
-    return true; //< No error: no more metadata.
 }
 
 int64_t Manager::usSinceEpoch() const

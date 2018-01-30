@@ -590,6 +590,16 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
         this, &QnMediaResourceWidget::analyticsSearchAreaSelected);
 }
 
+QRectF QnMediaResourceWidget::analyticsSearchRect() const
+{
+    return m_areaSelectOverlayWidget->selectedArea();
+}
+
+void QnMediaResourceWidget::setAnalyticsSearchRect(const QRectF& value)
+{
+    m_areaSelectOverlayWidget->setSelectedArea(value);
+}
+
 void QnMediaResourceWidget::initAreaHighlightOverlay()
 {
     if (!hasVideo())

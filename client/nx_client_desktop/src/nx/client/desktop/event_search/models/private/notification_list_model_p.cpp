@@ -183,11 +183,10 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.title = title;
     eventData.toolTip = tooltip.join(lit("<br>"));
     eventData.helpId = QnBusiness::eventHelpId(params.eventType);
+    eventData.level = QnNotificationLevel::valueOf(action);
     eventData.timestampMs = timestampMs;
     eventData.removable = true;
     eventData.extraData = qVariantFromValue(ExtraData(action->getRuleId(), resource));
-    eventData.titleColor = QnNotificationLevel::notificationTextColor(
-        QnNotificationLevel::valueOf(action));
 
     if (action->actionType() == vms::event::playSoundAction)
     {
@@ -295,6 +294,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     if (action->actionType() == vms::event::showPopupAction && camera)
         setupAcknowledgeAction(eventData, camera, action);
 
+    eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
     eventData.icon = pixmapForAction(action, eventData.titleColor);
 
     if (!q->addEvent(eventData))
@@ -368,8 +368,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
         return;
 
     eventData.removable = false;
-    eventData.titleColor = QnNotificationLevel::notificationColor(
-        QnNotificationLevel::Value::CriticalNotification);
+    eventData.level = QnNotificationLevel::Value::CriticalNotification;
 
     eventData.extraAction = CommandActionPtr(new CommandAction(this));
     eventData.extraAction->setIcon(qnSkin->icon("buttons/acknowledge.png"));

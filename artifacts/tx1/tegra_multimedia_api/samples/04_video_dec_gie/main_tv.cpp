@@ -102,8 +102,8 @@ public:
     {
         auto paramsWithId = params;
         paramsWithId.id = id.c_str();
-        m_tegraVideo.reset(TegraVideo::create());
-        m_tegraVideo->start(paramsWithId);
+        m_tegraVideo.reset(tegraVideoCreate());
+        m_tegraVideo->start(&paramsWithId);
     }
 
     bool execute()
@@ -208,7 +208,8 @@ private:
     std::unique_ptr<std::vector<uint8_t>> m_buf;
     const int m_bufSize;
     std::ifstream m_videoFile;
-    std::unique_ptr<TegraVideo> m_tegraVideo;
+    std::unique_ptr<TegraVideo, decltype(&tegraVideoDestroy)> m_tegraVideo{
+        nullptr, tegraVideoDestroy};
     int m_frameFileNumber = 0;
 };
 

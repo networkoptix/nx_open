@@ -7,6 +7,8 @@ class QAbstractListModel;
 class QModelIndex;
 class QScrollBar;
 
+namespace QnNotificationLevel { enum class Value; }
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -28,6 +30,13 @@ public:
     virtual QSize sizeHint() const override;
 
     QScrollBar* scrollBar() const;
+
+    int count() const;
+    int unreadCount() const;
+
+signals:
+    void countChanged(int count);
+    void unreadCountChanged(int unreadCount, QnNotificationLevel::Value importance);
 
 protected:
     virtual bool event(QEvent* event) override;

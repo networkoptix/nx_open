@@ -133,8 +133,12 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
     switch (role)
     {
         case Qt::DisplayRole:
-            return vms::event::AnalyticsHelper::objectName(camera(),
+        {
+            const auto name = vms::event::AnalyticsHelper::objectName(camera(),
                 object.objectTypeId, kDefaultLocale);
+
+            return name.isEmpty() ? tr("Unknown object") : name;
+        }
 
         case Qt::DecorationRole:
             return QVariant::fromValue(qnSkin->pixmap(lit("events/analytics.png")));
@@ -142,9 +146,19 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         case Qn::DescriptionTextRole:
             return description(object);
 
+        case Qn::AdditionalTextRole:
+            return attributes(object);
+
         case Qn::TimestampRole:
         case Qn::PreviewTimeRole:
             return startTimeMs(object);
+
+        case Qn::DurationRole:
+        {
+            using namespace std::chrono;
+            const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
+            return QVariant::fromValue(duration_cast<milliseconds>(microseconds(durationUs)).count());
+        }
 
         case Qn::HelpTopicIdRole:
             return Qn::Empty_Help;
@@ -187,6 +201,7 @@ void AnalyticsSearchListModel::Private::clear()
     m_objectIdToTimestampUs.clear();
     m_currentUpdateId = rest::Handle();
     m_latestTimeMs = qMin(qnSyncTime->currentMSecsSinceEpoch(), selectedTimePeriod().endTimeMs());
+    m_filterRect = QRectF();
     base_type::clear();
 
     refreshUpdateTimer();
@@ -555,15 +570,19 @@ QString AnalyticsSearchListModel::Private::description(
     //   Or we need to add some "lastAppearanceDurationUsec"?
     const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
 
-    result = lit("%1: %2<br>%3: %4")
+    return lit("%1: %2<br>%3: %4")
         .arg(tr("Start"))
         .arg(start.toString(Qt::RFC2822Date))
         .arg(tr("Duration"))
         .arg(core::HumanReadable::timeSpan(std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::microseconds(durationUs))));
+}
 
+QString AnalyticsSearchListModel::Private::attributes(
+    const DetectedObject& object) const
+{
     if (object.attributes.empty())
-        return result;
+        return QString();
 
     static const auto kCss = QString::fromLatin1(R"(
             <style type = 'text/css'>
@@ -580,9 +599,7 @@ QString AnalyticsSearchListModel::Private::description(
         rows += kRowTemplate.arg(attribute.name, attribute.value);
 
     const auto color = QPalette().color(QPalette::WindowText);
-    result += lit("<br>") + kCss.arg(color.name()) + kTableTemplate.arg(rows);
-
-    return result;
+    return kCss.arg(color.name()) + kTableTemplate.arg(rows);
 }
 
 qint64 AnalyticsSearchListModel::Private::startTimeMs(

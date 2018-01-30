@@ -14,6 +14,7 @@
 #include <core/resource/camera_resource.h>
 #include <utils/common/event_processors.h>
 #include <ui/common/custom_painted.h>
+#include <ui/common/notification_levels.h>
 #include <ui/common/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/helper.h>
@@ -161,6 +162,13 @@ EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
     auto tile = new EventTile(q);
     updateTile(tile, index);
 
+    const auto importance = index.data(Qn::NotificationLevelRole);
+
+    if (tile->progressBarVisible() || importance.isNull())
+        tile->setRead(true);
+    else
+        m_unread.insert(tile, QnNotificationLevel::Value(importance.toInt()));
+
     connect(tile, &EventTile::closeRequested, this,
         [this]()
         {
@@ -219,6 +227,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     tile->setIcon(index.data(Qt::DecorationRole).value<QPixmap>());
     tile->setTimestamp(index.data(Qn::TimestampTextRole).toString());
     tile->setDescription(index.data(Qn::DescriptionTextRole).toString());
+    tile->setFooterText(index.data(Qn::AdditionalTextRole).toString());
     tile->setToolTip(index.data(Qt::ToolTipRole).toString());
     tile->setCloseable(index.data(Qn::RemovableRole).toBool());
     tile->setAutoCloseTimeMs(index.data(Qn::TimeoutRole).toInt());
@@ -252,7 +261,9 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     request.size = QSize(thumbnailWidth, 0);
     request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
     request.aspectRatio = nx::api::ImageRequest::AspectRatio::source;
-    request.roundMethod = nx::api::ImageRequest::RoundMethod::iFrameAfter;
+    request.roundMethod = previewCropRect.isEmpty()
+        ? nx::api::ImageRequest::RoundMethod::iFrameAfter
+        : nx::api::ImageRequest::RoundMethod::precise;
 
     tile->setPreview(new CameraThumbnailProvider(request, tile));
 
@@ -305,6 +316,8 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
 
     int currentPosition = position;
     int nextIndex = index;
+
+    const auto oldUnreadCount = unreadCount();
 
     for (int i = 0; i < count; ++i)
     {
@@ -363,7 +376,7 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
             addAnimatedShift(nextIndex, -m_tiles[nextIndex - 1]->height());
     }
 
-    updateView();
+    doUpdateView();
 
     if (updateMode == UpdateMode::animated)
     {
@@ -373,6 +386,11 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
                highlightAppearance(m_tiles[index + i]);
         }
     }
+
+    if (unreadCount() != oldUnreadCount)
+        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance());
+
+    emit q->countChanged(m_tiles.size());
 }
 
 void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMode)
@@ -394,8 +412,11 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
     int delta = 0;
     const bool topmostTileWasVisible = m_tiles[first]->isVisible();
 
+    const auto oldUnreadCount = unreadCount();
     for (int i = first; i <= last; ++i)
     {
+        if (!m_tiles[first]->isRead())
+            m_unread.remove(m_tiles[first]);
         delta += m_tiles[first]->height() + kDefaultTileSpacing;
         m_tiles[first]->deleteLater();
         m_positions.remove(m_tiles[first]);
@@ -418,7 +439,7 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
             animatedIndex = qMax(first, animatedIndex - count);
     }
 
-    if (first != m_tiles.size())
+    if (first != m_tiles.size() && m_model->data(m_model->index(first), Qn::AnimatedRole).toBool())
     {
         if (first == 0)
             m_positions[m_tiles[0]] = 0; //< Keep integrity: positions must start from 0.
@@ -428,13 +449,21 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
             addAnimatedShift(first, delta);
     }
 
-    updateView();
+    doUpdateView();
+
+    if (unreadCount() != oldUnreadCount)
+        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance());
+
+    emit q->countChanged(m_tiles.size());
 }
 
 void EventRibbon::Private::clear()
 {
     for (auto& tile: m_tiles)
         tile->deleteLater();
+
+    const auto hadUnreadTiles = !m_unread.empty();
+    m_unread.clear();
 
     m_tiles.clear();
     m_positions.clear();
@@ -447,6 +476,11 @@ void EventRibbon::Private::clear()
     m_scrollBar->setValue(0);
 
     q->updateGeometry();
+
+    if (hadUnreadTiles)
+        emit q->unreadCountChanged(0, QnNotificationLevel::Value::NoNotification);
+
+    emit q->countChanged(m_tiles.size());
 }
 
 void EventRibbon::Private::clearShiftAnimations()
@@ -500,7 +534,35 @@ void EventRibbon::Private::updateScrollRange()
         m_scrollBar->setValue(0);
 }
 
+QnNotificationLevel::Value EventRibbon::Private::highestUnreadImportance() const
+{
+    QnNotificationLevel::Value result = QnNotificationLevel::Value::NoNotification;
+
+    // TODO: #vkutin Redo it differently if it visibly impacts performance.
+    for (const auto importance: m_unread)
+    {
+        if (importance < result)
+            continue;
+
+        result = importance;
+        if (int(result) == int(QnNotificationLevel::Value::LevelCount) - 1)
+            break;
+    }
+
+    qDebug() << "Highest level is" << int(result);
+    return result;
+}
+
 void EventRibbon::Private::updateView()
+{
+    const auto oldUnreadCount = unreadCount();
+    doUpdateView();
+
+    if (unreadCount() != oldUnreadCount)
+        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance());
+}
+
+void EventRibbon::Private::doUpdateView()
 {
     if (m_tiles.empty())
     {
@@ -528,15 +590,28 @@ void EventRibbon::Private::updateView()
 
     updateCurrentShifts();
 
+    static constexpr int kWidthThreshold = 400;
+    const auto mode = m_viewport->width() > kWidthThreshold
+        ? EventTile::Mode::wide
+        : EventTile::Mode::standard;
+
     while (iter != m_tiles.end() && currentPosition < positionLimit)
     {
-        m_positions[*iter] = currentPosition;
+        const auto tile = *iter;
+        m_positions[tile] = currentPosition;
         currentPosition += m_currentShifts.value(iter - m_tiles.cbegin());
-        (*iter)->setVisible(true);
-        (*iter)->setGeometry(0, currentPosition - base,
-            m_viewport->width(), calculateHeight(*iter));
-        newVisible.insert((*iter));
-        currentPosition += (*iter)->height() + kDefaultTileSpacing;
+        tile->setGeometry(0, currentPosition - base, m_viewport->width(), calculateHeight(tile));
+        tile->setMode(mode);
+        tile->setVisible(true);
+        newVisible.insert(tile);
+        currentPosition += tile->height() + kDefaultTileSpacing;
+
+        if (!tile->isRead() && shouldSetTileRead(tile))
+        {
+            tile->setRead(true);
+            m_unread.remove(tile);
+        }
+
         ++iter;
     }
 
@@ -570,6 +645,16 @@ void EventRibbon::Private::updateView()
 
     if (!m_currentShifts.empty()) //< If has running animations.
         qApp->postEvent(m_viewport, new QEvent(QEvent::LayoutRequest));
+}
+
+bool EventRibbon::Private::shouldSetTileRead(const EventTile* tile) const
+{
+    const auto rect = tile->geometry();
+    const auto height = m_viewport->height();
+
+    return rect.bottom() < height
+        ? (rect.top() >= 0)
+        : (rect.top() <= 0); //< Case for hypothetical tiles bigger than viewport.
 }
 
 void EventRibbon::Private::highlightAppearance(EventTile* tile)
@@ -639,6 +724,16 @@ void EventRibbon::Private::updateCurrentShifts()
         if (shift != 0)
             m_currentShifts[iter.value()] += shift;
     }
+}
+
+int EventRibbon::Private::count() const
+{
+    return m_tiles.size();
+}
+
+int EventRibbon::Private::unreadCount() const
+{
+    return m_unread.size();
 }
 
 } // namespace desktop

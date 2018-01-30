@@ -67,6 +67,9 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
         case Qn::PreviewTimeRole:
             return QVariant::fromValue(bookmark.startTimeMs);
 
+        case Qn::DurationRole:
+            return QVariant::fromValue(bookmark.durationMs);
+
         case Qn::UuidRole:
             return QVariant::fromValue(bookmark.guid);
 

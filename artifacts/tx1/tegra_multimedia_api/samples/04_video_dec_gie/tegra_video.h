@@ -7,18 +7,12 @@
 #endif
 
 /**
- * Interface to an external lib "libtegra_video.so", which performs processing of video frames.
+ * Interface to the library "libtegra_video.so", which performs processing of video frames.
  * ATTENTION: This interface is intentionally kept pure C++ and does not depend on other libs.
  */
 class TEGRA_VIDEO_API TegraVideo
 {
 public:
-    // TODO: #mike: Eliminate createImpl() and createStub(); delete on the same level.
-    static TegraVideo* create();
-    static TegraVideo* createImpl();
-    static TegraVideo* createStub();
-
-    TegraVideo() = default;
     virtual ~TegraVideo() = default;
 
     struct Params
@@ -31,7 +25,7 @@ public:
         int netHeight = 0; /**< Net input height (pixels). If 0, try to parse from deployFile. */
     };
 
-    virtual bool start(const Params& params) = 0;
+    virtual bool start(const Params* params) = 0;
 
     virtual bool stop() = 0;
 
@@ -59,3 +53,13 @@ public:
 
     virtual bool hasMetadata() const = 0;
 };
+
+extern "C" {
+
+/** @return Null on error. */
+TEGRA_VIDEO_API TegraVideo* tegraVideoCreate();
+
+/** NOTE: Errors are ignored because there is not much to do on error besides logging. */
+TEGRA_VIDEO_API void tegraVideoDestroy(TegraVideo* instance);
+
+} // extern "C"

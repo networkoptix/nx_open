@@ -6,8 +6,7 @@
 #include <mutex>
 #include <vector>
 
-#include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_consuming_metadata_manager.h>
+#include <nx/sdk/metadata/simple_manager.h>
 
 #include <tegra_video.h> //< libtegra_video.so - analytics lib for Tx1 and Tx2.
 
@@ -15,39 +14,36 @@
 
 #include <nx/mediaserver_plugins/metadata/tegra_video/naive_object_tracker.h>
 #include <nx/mediaserver_plugins/metadata/tegra_video/naive_detection_smoother.h>
+#include <nx/sdk/metadata/common_compressed_video_packet.h>
 
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
 namespace tegra_video {
 
-class Manager:
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractConsumingMetadataManager>
+class Manager: public nx::sdk::metadata::SimpleManager
 {
 public:
     Manager(Plugin* plugin);
-    virtual ~Manager();
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
-
-    virtual nx::sdk::Error startFetchingMetadata(
-        nxpl::NX_GUID* /*eventTypeList*/,
-        int /*eventTypeListSize*/) override;
+    virtual ~Manager() override;
 
 
-    virtual nx::sdk::Error setHandler(
-        nx::sdk::metadata::AbstractMetadataHandler* handler) override;
+protected:
+    virtual std::string capabilitiesManifest() override;
 
-    virtual nx::sdk::Error stopFetchingMetadata() override;
+    virtual bool pushVideoFrame(
+        const nx::sdk::metadata::CommonCompressedVideoPacket* videoFrame) override;
 
-    virtual const char* capabilitiesManifest(
-        nx::sdk::Error* error) override;
-    virtual void freeManifest(const char* data) override {}
-
-    virtual nx::sdk::Error putData(nx::sdk::metadata::AbstractDataPacket* dataPacket) override;
+    virtual bool pullMetadataPackets(
+        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets) override;
 
 private:
     nx::sdk::Error stopFetchingMetadataThreadUnsafe();
+
+    bool pushCompressedFrame(
+        const nx::sdk::metadata::CommonCompressedVideoPacket* videoPacket);
+
+    bool pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int64_t* outPtsUs);
 
     bool makeMetadataPacketsFromRects(
         std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
@@ -69,10 +65,6 @@ private:
         const std::vector<TegraVideo::Rect>& rects,
         int64_t ptsUs) const;
 
-    bool pushFrameAndGetMetadataPackets(
-        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
-        nx::sdk::metadata::AbstractDataPacket* mediaPacket) const;
-
     int64_t usSinceEpoch() const;
 
     void setTrackerAttributeOptions(
@@ -80,16 +72,16 @@ private:
 
 private:
     Plugin* const m_plugin;
-    mutable std::mutex m_mutex;
-    nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
     int m_counter = 0;
     int m_counterObjects = 0;
     nxpl::NX_GUID m_eventTypeId;
     nxpl::NX_GUID m_objectTypeId;
 
-    std::unique_ptr<TegraVideo> m_tegraVideo;
+    std::unique_ptr<TegraVideo, decltype(&tegraVideoDestroy)> m_tegraVideo{
+        nullptr, tegraVideoDestroy};
 
     mutable NaiveObjectTracker m_tracker;
+    int64_t m_lastFramePtsUs;
 };
 
 } // namespace tegra_video

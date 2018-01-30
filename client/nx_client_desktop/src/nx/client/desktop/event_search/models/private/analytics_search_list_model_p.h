@@ -69,6 +69,7 @@ private:
         int limit = std::numeric_limits<int>::max());
 
     QString description(const analytics::storage::DetectedObject& object) const;
+    QString attributes(const analytics::storage::DetectedObject& object) const;
     static qint64 startTimeMs(const analytics::storage::DetectedObject& object);
 
 private:

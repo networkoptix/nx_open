@@ -53,6 +53,16 @@ bool EventRibbon::event(QEvent* event)
     return true;
 }
 
+int EventRibbon::count() const
+{
+    return d->count();
+}
+
+int EventRibbon::unreadCount() const
+{
+    return d->unreadCount();
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

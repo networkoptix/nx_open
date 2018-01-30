@@ -2,6 +2,7 @@
 #include "private/system_health_list_model_p.h"
 
 #include <core/resource/resource.h>
+#include <ui/common/notification_levels.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
@@ -60,6 +61,9 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
 
         case Qn::PriorityRole:
             return d->priority(index.row());
+
+        case Qn::NotificationLevelRole:
+            return int(QnNotificationLevel::valueOf(d->message(index.row())));
 
         case Qn::TimeoutRole:
             return d->locked(index.row()) ? -1 : static_cast<qint64>(kDisplayTimeout.count());

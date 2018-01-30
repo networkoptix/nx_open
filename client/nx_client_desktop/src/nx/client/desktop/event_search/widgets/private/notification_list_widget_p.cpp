@@ -87,6 +87,9 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
 
     m_eventRibbon->setModel(new ConcatenationListModel(
         {systemHealthListModel, progressModel, m_notificationsModel}, this));
+
+    connect(m_eventRibbon, &EventRibbon::unreadCountChanged,
+        q, &NotificationListWidget::unreadCountChanged);
 }
 
 NotificationListWidget::Private::~Private()

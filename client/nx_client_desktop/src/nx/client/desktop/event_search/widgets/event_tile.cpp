@@ -26,10 +26,12 @@ static constexpr auto kRoundingRadius = 2;
 static constexpr int kTitleFontPixelSize = 13;
 static constexpr int kTimestampFontPixelSize = 11;
 static constexpr int kDescriptionFontPixelSize = 11;
+static constexpr int kFooterFontPixelSize = 11;
 
 static constexpr int kTitleFontWeight = QFont::Medium;
 static constexpr int kTimestampFontWeight = QFont::Normal;
 static constexpr int kDescriptionFontWeight = QFont::Normal;
+static constexpr int kFooterFontWeight = QFont::Normal;
 
 static constexpr int kProgressBarResolution = 1000;
 
@@ -59,12 +61,18 @@ EventTile::EventTile(QWidget* parent):
     ui->descriptionLabel->setHidden(true);
     ui->timestampLabel->setHidden(true);
     ui->previewWidget->setHidden(true);
+    ui->actionHolder->setHidden(true);
+    ui->footerLabel->setHidden(true);
 
     ui->previewWidget->setCropMode(QnResourcePreviewWidget::CropMode::notHovered);
+
+    ui->wideHolder->setHidden(true);
+    ui->narrowHolder->setHidden(true);
 
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
     ui->descriptionLabel->setForegroundRole(QPalette::Light);
+    ui->footerLabel->setForegroundRole(QPalette::Light);
 
     QFont font;
     font.setWeight(kTitleFontWeight);
@@ -83,6 +91,12 @@ EventTile::EventTile(QWidget* parent):
     ui->descriptionLabel->setFont(font);
     ui->descriptionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->descriptionLabel->setOpenExternalLinks(false);
+
+    font.setWeight(kFooterFontWeight);
+    font.setPixelSize(kFooterFontPixelSize);
+    ui->footerLabel->setFont(font);
+    ui->footerLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
+    ui->footerLabel->setOpenExternalLinks(false);
 
     ui->busyIndicator->setContentsMargins(
         style::Metrics::kStandardPadding,
@@ -120,6 +134,7 @@ EventTile::EventTile(QWidget* parent):
 
     connect(ui->nameLabel, &QLabel::linkActivated, this, activateLink);
     connect(ui->descriptionLabel, &QLabel::linkActivated, this, activateLink);
+    connect(ui->footerLabel, &QLabel::linkActivated, this, activateLink);
 }
 
 EventTile::EventTile(
@@ -189,6 +204,17 @@ void EventTile::setDescription(const QString& value)
     ui->descriptionLabel->setHidden(value.isEmpty());
 }
 
+QString EventTile::footerText() const
+{
+    return ui->footerLabel->text();
+}
+
+void EventTile::setFooterText(const QString& value)
+{
+    ui->footerLabel->setText(value);
+    ui->footerLabel->setHidden(value.isEmpty());
+}
+
 QString EventTile::timestamp() const
 {
     return ui->timestampLabel->text();
@@ -227,6 +253,7 @@ void EventTile::setPreview(QnImageProvider* value)
 {
     ui->previewWidget->setImageProvider(value);
     ui->previewWidget->setHidden(!value);
+    ui->previewWidget->parentWidget()->setHidden(!value);
 }
 
 QRectF EventTile::previewCropRect() const
@@ -248,6 +275,7 @@ void EventTile::setAction(const CommandActionPtr& value)
 {
     m_action = value;
     ui->actionButton->setAction(m_action.data());
+    ui->actionHolder->setHidden(m_action.isNull());
 }
 
 void EventTile::paintEvent(QPaintEvent* /*event*/)
@@ -356,9 +384,23 @@ void EventTile::setAutoCloseTimeMs(int value)
         };
 
     if (m_autoCloseTimer)
+    {
+        if (!m_isRead)
+            m_autoCloseTimer->stop();
+
         m_autoCloseTimer->setInterval(value);
+    }
     else
-        m_autoCloseTimer = executeDelayedParented(autoClose, value, this);
+    {
+        m_autoCloseTimer = new QTimer(this);
+        m_autoCloseTimer->setSingleShot(true);
+        m_autoCloseTimer->setInterval(value);
+
+        connect(m_autoCloseTimer, &QTimer::timeout, this, autoClose);
+
+        if (m_isRead)
+            m_autoCloseTimer->start();
+    }
 }
 
 bool EventTile::busyIndicatorVisible() const
@@ -400,6 +442,64 @@ QString EventTile::progressTitle() const
 void EventTile::setProgressTitle(const QString& value)
 {
     m_progressLabel->setText(value);
+}
+
+bool EventTile::isRead() const
+{
+    return m_isRead;
+}
+
+void EventTile::setRead(bool value)
+{
+    m_isRead = value;
+
+    if (m_isRead && m_autoCloseTimer)
+        m_autoCloseTimer->start();
+}
+
+EventTile::Mode EventTile::mode() const
+{
+    if (ui->previewWidget->parentWidget() == ui->narrowHolder)
+        return Mode::standard;
+
+    NX_ASSERT(ui->previewWidget->parentWidget() == ui->wideHolder);
+    return Mode::wide;
+}
+
+void EventTile::setMode(Mode value)
+{
+    if (mode() == value)
+        return;
+
+    const auto reparentPreview =
+        [this](QWidget* newParent)
+        {
+            auto oldParent = ui->previewWidget->parentWidget();
+            const bool wasHidden = ui->previewWidget->isHidden();
+            oldParent->layout()->removeWidget(ui->previewWidget);
+            ui->previewWidget->setParent(newParent);
+            newParent->layout()->addWidget(ui->previewWidget);
+            ui->previewWidget->setHidden(wasHidden);
+        };
+
+    switch (value)
+    {
+        case Mode::standard:
+            reparentPreview(ui->narrowHolder);
+            ui->narrowHolder->setHidden(ui->previewWidget->isHidden());
+            ui->wideHolder->setHidden(true);
+            break;
+
+        case Mode::wide:
+            reparentPreview(ui->wideHolder);
+            ui->wideHolder->setHidden(ui->previewWidget->isHidden());
+            ui->narrowHolder->setHidden(false); //< There is a spacer child item.
+            break;
+
+        default:
+            NX_ASSERT(false); //< Should never happen.
+            break;
+    }
 }
 
 } // namespace desktop

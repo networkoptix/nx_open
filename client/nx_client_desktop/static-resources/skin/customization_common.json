@@ -875,8 +875,12 @@
     "nx::client::desktop::EventTile": {
         "palette": {
             "default": {
-                "window": "dark9",
-                "midlight": "dark10"
+                "window": "dark7",
+                "midlight": "dark8",
+                "light": "light10",
+                "windowText": "light16",
+                "text": "light4",
+                "highlight": "brand_core"
             }
         }
     },
@@ -928,7 +932,19 @@
     "nx::client::desktop::EventPanel": {
         "palette": {
             "default": {
-                "window": "dark6"
+                "dark": "dark4",
+                "window": "dark5",
+                "light": "dark8",
+                "midlight": "dark9.setAlpha(51)"
+            }
+        }
+    },
+
+    "nx::client::desktop::NotificationCounterLabel": {
+        "palette": {
+            "default": {
+                "window": "light10",
+                "windowText": "dark3"
             }
         }
     }

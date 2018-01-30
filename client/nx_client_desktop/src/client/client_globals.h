@@ -277,6 +277,7 @@ namespace Qn
         TimestampRole,                              /**< Role for timestamp in milliseconds since epoch (qint64). */
         TimestampTextRole,                          /**< Role for timestamp text (QString). */
         DescriptionTextRole,                        /**< Role for generic description text (QString). */
+        AdditionalTextRole,                         /**< Role for additional description text (QString). */
         RemovableRole,                              /**< An item is removable (bool). */
         CommandActionRole,                          /**< Command action (QSharedPointer<QAction>). */
         ResourceListRole,                           /**< Resource list (QnResourceList). */
@@ -285,6 +286,8 @@ namespace Qn
         BusyIndicatorVisibleRole,                   /**< Role for toggling busy indicator (bool). */
         ProgressValueRole,                          /**< Role for specifying progress value [0..1] (float). */
         AnimatedRole,                               /**< Role for specifying whether item animation is allowed (bool). */
+        DurationRole,                               /**< Role for duration in milliseconds (qint64). */
+        NotificationLevelRole,                      /**< Role for notification level (int in correspondence to QnNotificationLevel::Value). */
 
         // Model notification roles. Do not necessarily pass any data but implement
         // item-related view-to-model notifications via setData which can be proxied.

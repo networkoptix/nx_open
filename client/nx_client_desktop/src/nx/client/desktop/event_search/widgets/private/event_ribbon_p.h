@@ -34,8 +34,14 @@ public:
 
     QScrollBar* scrollBar() const;
 
+    int count() const;
+
+    int unreadCount() const;
+    QnNotificationLevel::Value highestUnreadImportance() const;
+
 private:
-    void updateView();
+    void updateView(); //< Calls doUpdateView and emits q->unreadCountChanged if needed.
+    void doUpdateView();
     void updateScrollRange();
 
     int calculateHeight(QWidget* widget) const;
@@ -67,6 +73,8 @@ private:
     EventTile* createTile(const QModelIndex& index);
     static void updateTile(EventTile* tile, const QModelIndex& index);
 
+    bool shouldSetTileRead(const EventTile* tile) const;
+
     void debugCheckGeometries();
     void debugCheckVisibility();
 
@@ -83,6 +91,7 @@ private:
     int m_totalHeight = 0;
 
     QSet<EventTile*> m_visible;
+    QHash<EventTile*, QnNotificationLevel::Value> m_unread;
 
     // Maps animation object to item index. Duplicate indices are allowed.
     // Animation objects are owned by EventRibbon::Private object.

@@ -141,6 +141,25 @@ void MetadataHandler::handleMetadataEvent(
     qnEventRuleConnector->at_analyticsSdkEvent(sdkEvent);
 }
 
+int MetadataHandler::getParamValue(
+    const char* paramName, char* valueBuf, int* valueBufSize) const
+{
+    // TODO: STUB: Always return a fixed value, or an error if paramName is null or empty.
+
+    if (!paramName || !paramName[0])
+        return NX_UNKNOWN_PARAMETER;
+
+    static const char kStubValue[] = "Stub Value";
+    if (*valueBufSize < sizeof(kStubValue))
+    {
+        *valueBufSize = sizeof(kStubValue);
+        return NX_MORE_DATA;
+    }
+
+    strncpy(valueBuf, kStubValue, sizeof(kStubValue));
+    return NX_NO_ERROR;
+}
+
 void MetadataHandler::setResource(const QnSecurityCamResourcePtr& resource)
 {
     m_resource = resource;

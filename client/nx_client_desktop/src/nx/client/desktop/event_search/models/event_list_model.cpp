@@ -57,6 +57,9 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::DescriptionTextRole:
             return QVariant::fromValue(event.description);
 
+        case Qn::NotificationLevelRole:
+            return int(event.level);
+
         case Qt::ForegroundRole:
             return event.titleColor.isValid()
                 ? QVariant::fromValue(event.titleColor)
