@@ -124,7 +124,7 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->areaButton->setIcon(qnSkin->icon(lit("text_buttons/area.png")));
 
     connect(ui->ribbon, &EventRibbon::countChanged,
-        this, &UnifiedSearchWidget::updatePlaceholderVisibility);
+        this, &UnifiedSearchWidget::updatePlaceholderState);
 }
 
 UnifiedSearchWidget::~UnifiedSearchWidget()
@@ -155,7 +155,7 @@ void UnifiedSearchWidget::setModel(QAbstractListModel* value)
         this, &UnifiedSearchWidget::requestFetch, Qt::QueuedConnection);
 
     connect(value, &QAbstractItemModel::dataChanged,
-        this, &UnifiedSearchWidget::updatePlaceholderVisibility);
+        this, &UnifiedSearchWidget::updatePlaceholderState);
 
     if (auto asyncModel = qobject_cast<UnifiedAsyncSearchListModel*>(value))
     {
@@ -196,9 +196,18 @@ void UnifiedSearchWidget::setPlaceholderIcon(const QPixmap& value)
     ui->placeholderIcon->setPixmap(value);
 }
 
-void UnifiedSearchWidget::setPlaceholderText(const QString& value)
+void UnifiedSearchWidget::setPlaceholderTexts(
+    const QString& constrained,
+    const QString& unconstrained)
 {
-    ui->placeholderText->setText(value);
+    m_placeholderTextConstrained = constrained;
+    m_placeholderTextUnconstrained = unconstrained;
+}
+
+bool UnifiedSearchWidget::isConstrained() const
+{
+    auto asyncModel = qobject_cast<UnifiedAsyncSearchListModel*>(model());
+    return asyncModel && asyncModel->isConstrained();
 }
 
 UnifiedSearchWidget::Period UnifiedSearchWidget::selectedPeriod() const
@@ -345,9 +354,20 @@ bool UnifiedSearchWidget::hasRelevantTiles() const
     return (count > 1) || model()->data(model()->index(0), Qn::BusyIndicatorVisibleRole).toBool();
 }
 
-void UnifiedSearchWidget::updatePlaceholderVisibility()
+void UnifiedSearchWidget::updatePlaceholderState()
 {
-    ui->placeholder->setHidden(hasRelevantTiles());
+    const bool hidden = hasRelevantTiles();
+    if (ui->placeholder->isHidden() == hidden)
+        return;
+
+    if (!hidden)
+    {
+        ui->placeholderText->setText(isConstrained()
+            ? m_placeholderTextConstrained
+            : m_placeholderTextUnconstrained);
+    }
+
+    ui->placeholder->setHidden(hidden);
 }
 
 } // namespace desktop

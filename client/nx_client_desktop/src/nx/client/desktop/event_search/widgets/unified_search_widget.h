@@ -46,7 +46,7 @@ public:
     ui::SelectableTextButton* cameraButton() const;
 
     void setPlaceholderIcon(const QPixmap& value);
-    void setPlaceholderText(const QString& value);
+    void setPlaceholderTexts(const QString& constrained, const QString& unconstrained);
 
     enum class Period
     {
@@ -65,13 +65,14 @@ public:
 protected:
     virtual bool hasRelevantTiles() const;
     virtual void setCurrentTimePeriod(const QnTimePeriod& period);
+    virtual bool isConstrained() const;
 
 private:
     void updateCurrentTimePeriod();
     QnTimePeriod effectiveTimePeriod() const;
 
     void setupTimeSelection();
-    void updatePlaceholderVisibility();
+    void updatePlaceholderState();
 
     void fetchMoreIfNeeded();
 
@@ -82,6 +83,8 @@ private:
     nx::utils::PendingOperation* m_fetchMoreOperation;
     QnTimePeriod m_timelineSelection;
     Period m_period = Period::all;
+    QString m_placeholderTextConstrained;
+    QString m_placeholderTextUnconstrained;
 };
 
 } // namespace desktop

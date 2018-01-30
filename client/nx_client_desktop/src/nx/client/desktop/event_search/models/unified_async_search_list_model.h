@@ -37,6 +37,8 @@ public:
     QnTimePeriod selectedTimePeriod() const;
     void setSelectedTimePeriod(const QnTimePeriod& value);
 
+    bool isConstrained() const;
+
 private:
     AbstractAsyncSearchListModel* const m_sourceModel = nullptr;
     QnSortFilterListModel* const m_filterModel = nullptr;

@@ -86,6 +86,12 @@ bool AbstractAsyncSearchListModel::fetchInProgress() const
     return d->fetchInProgress();
 }
 
+bool AbstractAsyncSearchListModel::isConstrained() const
+{
+    const auto period = selectedTimePeriod();
+    return period.startTimeMs > 0 || !period.isInfinite();
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

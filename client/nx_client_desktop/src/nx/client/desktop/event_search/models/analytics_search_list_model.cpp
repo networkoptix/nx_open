@@ -36,6 +36,11 @@ bool AnalyticsSearchListModel::setData(const QModelIndex& index, const QVariant&
     }
 }
 
+bool AnalyticsSearchListModel::isConstrained() const
+{
+    return filterRect().isValid() || base_type::isConstrained();
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

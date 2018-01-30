@@ -19,6 +19,8 @@ public:
     vms::event::EventType selectedEventType() const;
     void setSelectedEventType(vms::event::EventType value);
 
+    virtual bool isConstrained() const override;
+
 private:
     class Private;
     Private* const d = nullptr;

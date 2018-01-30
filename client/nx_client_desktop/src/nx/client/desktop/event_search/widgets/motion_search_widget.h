@@ -26,7 +26,8 @@ public:
 
 protected:
     virtual bool hasRelevantTiles() const override;
-    void setCurrentTimePeriod(const QnTimePeriod& period) override;
+    virtual void setCurrentTimePeriod(const QnTimePeriod& period) override;
+    virtual bool isConstrained() const override;
 
 private:
     using base_type::model;

@@ -122,7 +122,7 @@ void EventPanel::Private::removeCameraTabs()
 void EventPanel::Private::setupEventSearch()
 {
     m_eventsTab->setModel(new UnifiedAsyncSearchListModel(m_eventsModel, this));
-    m_eventsTab->setPlaceholderText(tr("No events"));
+    m_eventsTab->setPlaceholderTexts(tr("No events"), tr("No events occured"));
     m_eventsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/events.png")));
 
     auto button = m_eventsTab->typeButton();
@@ -172,15 +172,20 @@ void EventPanel::Private::setupEventSearch()
 
 void EventPanel::Private::setupBookmarkSearch()
 {
+    static const QString kHtmlPlaceholder =
+        lit("<center><p>%1</p><p><font size='-3'>%2</font></p></center>")
+            .arg(tr("No bookmarks"))
+            .arg(tr("Select some period on timeline and click "
+                "with right mouse button on it to create a bookmark."));
     m_bookmarksTab->setModel(new UnifiedAsyncSearchListModel(m_bookmarksModel, this));
-    m_bookmarksTab->setPlaceholderText(tr("No bookmarks"));
+    m_bookmarksTab->setPlaceholderTexts(tr("No bookmarks"), kHtmlPlaceholder);
     m_bookmarksTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/bookmarks.png")));
 }
 
 void EventPanel::Private::setupAnalyticsSearch()
 {
     m_analyticsTab->setModel(new UnifiedAsyncSearchListModel(m_analyticsModel, this));
-    m_analyticsTab->setPlaceholderText(tr("No objects"));
+    m_analyticsTab->setPlaceholderTexts(tr("No objects"), tr("No objects detected"));
     m_analyticsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/analytics.png")));
 
     auto button = m_analyticsTab->areaButton();

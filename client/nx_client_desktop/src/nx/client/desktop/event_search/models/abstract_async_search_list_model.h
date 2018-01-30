@@ -51,6 +51,8 @@ public:
     virtual void commitPrefetch(qint64 earliestTimeToCommitMs);
     virtual bool fetchInProgress() const;
 
+    virtual bool isConstrained() const;
+
 private:
     QScopedPointer<Private> d;
 };

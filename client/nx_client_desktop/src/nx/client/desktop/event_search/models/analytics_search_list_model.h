@@ -22,6 +22,8 @@ public:
 
     virtual bool setData(const QModelIndex& index, const QVariant& /*value*/, int role) override;
 
+    virtual bool isConstrained() const override;
+
 private:
     class Private;
     Private* const d = nullptr;

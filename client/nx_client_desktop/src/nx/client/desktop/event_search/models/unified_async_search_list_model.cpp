@@ -52,6 +52,11 @@ void UnifiedAsyncSearchListModel::setSelectedTimePeriod(const QnTimePeriod& valu
     m_sourceModel->setSelectedTimePeriod(value);
 }
 
+bool UnifiedAsyncSearchListModel::isConstrained() const
+{
+    return m_sourceModel && (!textFilter().isEmpty() || m_sourceModel->isConstrained());
+}
+
 bool UnifiedAsyncSearchListModel::canFetchMore(const QModelIndex& /*parent*/) const
 {
     return m_sourceModel && m_sourceModel->canFetchMore();
