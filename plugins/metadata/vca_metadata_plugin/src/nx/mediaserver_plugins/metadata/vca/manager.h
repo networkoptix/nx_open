@@ -9,7 +9,7 @@
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/abstract_metadata_manager.h>
 
-#include "nx/api/vca_analytics_event.h"
+#include "common.h"
 #include "monitor.h"
 
 namespace nx {

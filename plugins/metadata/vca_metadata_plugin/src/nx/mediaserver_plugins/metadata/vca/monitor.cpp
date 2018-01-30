@@ -10,7 +10,7 @@
 #include <nx/kit/debug.h>
 
 #include "manager.h"
-#include "nx/api/vca_analytics_event.h"
+#include "common.h"
 
 namespace nx {
 namespace mediaserver_plugins {
