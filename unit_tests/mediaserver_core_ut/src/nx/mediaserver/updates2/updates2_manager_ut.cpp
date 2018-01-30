@@ -180,7 +180,9 @@ protected:
     {
         success_fileNotExists,
         success_fileAlreadyExists,
-        fail,
+        success_fileAlreadyDownloaded,
+        fail_addFileFailed,
+        fail_downloadFailed,
     };
 
     virtual void SetUp() override
@@ -300,11 +302,15 @@ protected:
                     .Times(1).WillOnce(Return(responseFileInformation));
                 break;
             }
-            case DownloadExpectedOutcome::fail:
+            case DownloadExpectedOutcome::fail_downloadFailed:
                 EXPECT_CALL(m_testDownloader, addFile(requestFileInformation))
                     .Times(1).WillOnce(Return(downloader::ResultCode::ok));
                 EXPECT_CALL(m_testDownloader, deleteFile(kFileName, _))
                     .Times(1).WillOnce(Return(downloader::ResultCode::ok));
+                break;
+            case DownloadExpectedOutcome::fail_addFileFailed:
+                EXPECT_CALL(m_testDownloader, addFile(requestFileInformation))
+                    .Times(1).WillOnce(Return(downloader::ResultCode::ioError));
                 break;
             case DownloadExpectedOutcome::success_fileAlreadyExists:
                 EXPECT_CALL(m_testDownloader, addFile(requestFileInformation))
@@ -476,6 +482,10 @@ TEST_F(Updates2Manager, FoundRemoteUpdateRegistry_newVersion)
     thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
 }
 
+TEST_F(Updates2Manager, StatusWhileChecking)
+{
+}
+
 TEST_F(Updates2Manager, Download_successful)
 {
     givenAvailableUpdate();
@@ -486,11 +496,31 @@ TEST_F(Updates2Manager, Download_successful)
 
 TEST_F(Updates2Manager, Download_addFile_fail)
 {
+    givenAvailableUpdate();
+    whenDownloadRequestIssued(DownloadExpectedOutcome::success_fileNotExists);
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::error);
+
+    whenRemoteUpdateDone();
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
 }
 
-TEST_F(Updates2Manager, Download_wrongState)
+TEST_F(Updates2Manager, Download_notAvailableState)
 {
+    givenFileState(api::Updates2StatusData::StatusCode::notAvailable);
+    givenGlobalRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
+    givenRemoteRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
+    whenServerStarted();
+    whenRemoteUpdateDone();
 
+}
+
+TEST_F(Updates2Manager, Download_alreadyDownloadingState)
+{
+    //givenFileState(api::Updates2StatusData::StatusCode::notAvailable);
+    //givenGlobalRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
+    //givenRemoteRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
+    //whenServerStarted();
+    //whenRemoteUpdateDone();
 }
 
 TEST_F(Updates2Manager, Download_failed)

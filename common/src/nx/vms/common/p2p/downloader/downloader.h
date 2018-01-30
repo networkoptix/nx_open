@@ -23,7 +23,6 @@ class AbstractDownloader: public QObject
 
 public:
     AbstractDownloader(QObject* parent);
-    virtual ~AbstractDownloader() = default;
 
     virtual QStringList files() const = 0;
     virtual QString filePath(const QString& fileName) const = 0;
