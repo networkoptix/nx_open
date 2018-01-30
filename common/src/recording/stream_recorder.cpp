@@ -136,7 +136,7 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_startDateTime(AV_NOPTS_VALUE),
     m_currentTimeZone(-1),
     m_waitEOF(false),
-    m_forceDefaultCtx(true),
+    m_forceDefaultCtx(false),
     m_packetWrited(false),
     m_currentChunkLen(0),
     m_prebufferingUsec(0),
@@ -935,6 +935,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             if (m_dstAudioCodec == AV_CODEC_ID_NONE || m_dstAudioCodec == srcAudioCodec)
             {
                 QnFfmpegHelper::mediaContextToAvCodecContext(audioStream->codec, mediaContext);
+                // codec_tag from another source container can cause an issue. Reset value.
+                context.formatCtx->streams[1]->codec->codec_tag = 0;
 
                 // avoid FFMPEG bug for MP3 mono. block_align hardcoded inside ffmpeg for stereo channels and it is cause problem
                 if (srcAudioCodec == AV_CODEC_ID_MP3 && audioStream->codec->channels == 1)
@@ -1169,9 +1171,9 @@ bool QnStreamRecorder::addSignatureFrame()
 void QnStreamRecorder::setRole(StreamRecorderRole role)
 {
     m_role = role;
-    m_forceDefaultCtx =
-        (m_role == StreamRecorderRole::serverRecording)
-        || (m_role == StreamRecorderRole::fileExportWithEmptyContext);
+    // TODO: it seems we don't need to force default context either for client or server.
+    // Get rid of this field and fileExportWithEmptyContext enum value (need to recheck NOV export/double export).
+    m_forceDefaultCtx = (m_role == StreamRecorderRole::fileExportWithEmptyContext);
 }
 
 #ifdef SIGN_FRAME_ENABLED
