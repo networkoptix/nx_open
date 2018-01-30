@@ -1,0 +1,11 @@
+<a href="" id="language-dropdown" dropdown-toggle>
+    <span class="lang-sm" lang="{{activeLanguage.language}}"></span>
+</a>
+
+<ul class="dropdown-menu dropup" ng-class="{'two-columns':languages.length>12}" dropdown-menu aria-labelledby="language-dropdown">
+    <li ng-repeat="lang in languages" ng-class="{active:lang.language == activeLanguage.language}">
+        <a href="" ng-click="changeLanguage(lang.language)">
+            <span class="lang-sm" lang="{{lang.language}}"></span> {{lang.name}}
+        </a>
+    </li>
+</ul>

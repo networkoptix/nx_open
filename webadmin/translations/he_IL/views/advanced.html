@@ -167,9 +167,11 @@
         <b>אזהרה!</b> כל שינוי בדף זה עלול לגרום לשרת לעבוד בצורה לא תקינה.
     </div>
 
-    <form class="form row" role="form" name="systemSettings" novalidate>
+    <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting]}}</label>
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting] || setting}}
+                    <small ng-if="L.settingsConfig[setting]" class="text-muted">&nbsp;&nbsp;{{setting}}</small>
+            </label>
             <div class="col-sm-6">
                 <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
                        style="height: 22px"

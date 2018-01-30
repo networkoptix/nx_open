@@ -1,0 +1,209 @@
+
+<form class="form-horizontal" novalidate ng-if="!activeGroup.urlPrefix">
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{{apiMethod.method}}:</label>
+        <div class="col-sm-10">
+            <p class="form-control-static">{{activeFunction.url}}</p>
+        </div>
+    </div>
+
+    <div class="form-group"
+         ng-repeat="param in activeFunction.params | orderBy:'proprietary':true| orderBy:'optional'"
+         ng-if="!param.proprietary || allowProprietary"
+         ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false'}">
+        <label class="col-sm-2 control-label" for="{{param.name}}">
+            {{param.name}}
+            <small ng-if="param.optional=='false'">(required)</small>
+            <small ng-if="param.proprietary">(proprietary)</small>
+        </label>
+        <div class="col-sm-10">
+            <p class="form-control-static" ng-if="param.description.xml"
+               ng-bind-html="param.description.xml"></p>
+            <div class="help-block" ng-if="param.values && param.values.length>0">
+                <ul>
+                    <li ng-repeat="value in param.values">
+                        <b>{{value.name}}</b><span ng-if="value.description.xml">: </span>
+                        <span ng-bind-html="value.description.xml"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Requesting URL</label>
+        <div class="col-sm-10">
+            <p class="form-control-static">{{getDebugUrl()}}</p>
+        </div>
+    </div>
+</form>
+
+<form class="form-horizontal" novalidate ng-if="activeGroup.urlPrefix">
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{{apiMethod.method}}:</label>
+        <div class="col-sm-10">
+            <p class="form-control-static">{{activeFunction.url}}</p>
+        </div>
+    </div>
+
+    <div class="form-group"
+         ng-repeat="param in activeFunction.params | orderBy:['-proprietary','optional']"
+         ng-if="!param.proprietary || allowProprietary"
+         ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false' && param.type != 'info'}">
+        <label class="col-sm-2 control-label" for="{{param.name}}">
+            {{param.name}}
+            <small ng-if="param.optional=='false'">(required)</small>
+            <small ng-if="param.proprietary">(proprietary)</small>
+        </label>
+        <div class="col-sm-10">
+
+            <div ng-switch on="param.type">
+
+                <select class="form-control input-sm"
+                        ng-switch-when="enum"
+                        ng-options="value.name as value.label for value in param.values"
+                        id="{{param.name}}"
+                        ng-required="param.optional=='false'"
+                        ng-model="apiMethod.params[param.name]">
+                </select>
+
+                <div class="input-group input-group-sm"
+                     ng-switch-when="timestamp">
+                    <input type="text"
+                           id="{{param.name}}"
+                           class="form-control"
+                           placeholder="YYYY-MM-DDTHH:mm:ss"
+                           datepicker-popup="{{Config.dateInternalFormat}}"
+                           ng-model="apiMethod.params[param.name]"
+                           ng-required="param.optional=='false'"
+                           is-open="openDate[param.name]"
+                           close-text="Close" />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default"
+                                ng-click="openDatePicker($event, param.name)"><i
+                                class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </div>
+                <p class="help-block" ng-switch-when="timestamp">
+                    <i>Timestamp: {{apiMethod.params[param.name].getTime()}}</i>
+                </p>
+
+                <input type="text"
+                       ng-switch-when="camera"
+                       id="{{param.name}}"
+                       ng-model="apiMethod.params[param.name]"
+                       typeahead="camera.id as camera.id +': ' + camera.name for camera in cameras | filter:{searchLabel:$viewValue} | limitTo:10 "
+                       typeahead-focus-on-select="false"
+                       typeahead-min-length="0"
+                       typeahead-show-hint="true"
+                       typeahead-focus-first="false"
+                       typeahead-editable="false"
+                       typeahead-focus
+ class="form-control input-sm">
+                <p class="help-block" ng-switch-when="camera">
+                    <i>Selected camera: {{cameraIds[apiMethod.params[param.name]].name}}</i>
+                </p>
+
+                <span ng-switch-when="info"></span>
+
+                <input type="text" class="form-control input-sm"
+                       ng-switch-default
+ id="{{param.name}}"
+                       ng-required="param.optional=='false'"
+                       ng-model="apiMethod.params[param.name]"
+                       placeholder="{{}}">
+            </div>
+
+            <p class="help-block" ng-if="param.description.xml"
+               ng-bind-html="param.description.xml"></p>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="apiMethod.addCredentials"> Use credentials
+                </label>
+                <p class="help-block">Add login and password to url</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group" ng-if="apiMethod.addCredentials">
+        <label class="col-sm-2 control-label" for="useLogin">Login</label>
+        <div class="col-sm-10">
+            <input id="useLogin" type="text" class="form-control input-sm"
+                   ng-model="apiMethod.login">
+            <p class="help-block">It is recommended to create dedicated user for integrations</p>
+        </div>
+    </div>
+
+    <div class="form-group" ng-if="apiMethod.addCredentials">
+        <label class="col-sm-2 control-label" for="usePassword">Password</label>
+        <div class="col-sm-10">
+            <input id="usePassword" type="text" class="form-control input-sm"
+                   ng-model="apiMethod.password">
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Requesting URL</label>
+        <div class="col-sm-10">
+            <p class="form-control-static">{{getDebugUrl()}}</p>
+            <p class="help-block" ng-if="clipboardSupported">
+                <a clipboard
+ supported="clipboardSupported"
+                   text="getDebugUrl()" href="">Copy to clipboard</a>
+            </p>
+        </div>
+    </div>
+    <div class="form-group" ng-if="apiMethod.method=='POST'">
+        <label class="col-sm-2 control-label">POST data</label>
+        <div class="col-sm-10">
+            <textarea class="form-control" rows="10" readonly>{{getPostData()}}</textarea>
+            <p class="help-block">
+                <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
+            </p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit"
+                    ng-if="apiMethod.method=='GET' || apiMethod.method=='POST'"
+                    class="btn btn-primary" ng-click="testMethod()">Test method</button>
+            <a class="btn btn-default" ng-if="apiMethod.method=='GET'"
+               ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
+        </div>
+    </div>
+
+
+    <div class="form-group" ng-if="result.result || result.image" ng-class="{'has-error':result.error}">
+        <label class="col-sm-2 control-label">Status</label>
+        <div class="col-sm-10">
+            <p class="form-control-static">{{result.status}}</p>
+        </div>
+    </div>
+    <div class="form-group" ng-if="result.image">
+        <label class="col-sm-2 control-label">Response</label>
+        <div class="col-sm-10">
+            <img style="max-width:100%" ng-src="{{result.image}}">
+            <div class="col-sm-10">
+                <p class="help-block">Content-type: {{result.contentType}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="form-group" ng-if="result.result" ng-class="{'has-error':result.error}">
+        <label class="col-sm-2 control-label">Response</label>
+        <div class="col-sm-10">
+            <textarea class="form-control" rows="10" readonly>{{result.result}}</textarea>
+            <p class="help-block">
+                <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
+            </p>
+        </div>
+    </div>
+
+</form>
