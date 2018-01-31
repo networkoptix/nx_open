@@ -18,6 +18,7 @@ public:
     virtual ~HikvisionAudioTransmitter();
     virtual bool isCompatible(const QnAudioFormat& format) const override;
     void setChannelId(QString channelId);
+    void enable(bool value);
 
 protected:
     virtual bool sendData(const QnAbstractMediaDataPtr& data) override;
@@ -38,6 +39,7 @@ private:
 
 private:
     QString m_channelId;
+    bool m_isEnabled = false;
 };
 
 } // namespace plugins
