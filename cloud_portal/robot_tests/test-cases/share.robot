@@ -158,15 +158,16 @@ Edit permission works
 
 Share with registered user - sends him notification
     Log in to Auto Tests System
+    Verify In System    Auto Tests
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE EMAIL}
-    Input Text    ${SHARE EMAIL}    ${EMAIL VIEWER}
+    Input Text    ${SHARE EMAIL}    ${EMAIL NOPERM}
     Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    New permissions saved
-    Check User Permissions    ${EMAIL VIEWER}    Custom
+    Check User Permissions    ${EMAIL NOPERM}    Custom
     Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
-    ${email}    Wait For Email    recipient=${EMAIL VIEWER}    subject=TestFirstName TestLastName invites you to Nx Cloud    timeout=120
-    Remove User Permissions    ${EMAIL VIEWER}
+    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    subject=TestFirstName TestLastName invites you to Nx Cloud    timeout=120
+    Remove User Permissions    ${EMAIL NOPERM}
     Close Browser
