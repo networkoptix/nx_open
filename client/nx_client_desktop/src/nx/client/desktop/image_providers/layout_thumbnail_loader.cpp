@@ -143,8 +143,9 @@ struct LayoutThumbnailLoader::Private
                     painter.translate(-cellRect.center());
                     paintPixmapSharp(&painter, specialPixmap(status, targetRect.size().toSize()),
                         targetRect.topLeft());
-
                 }
+
+                emit q->imageChanged(data.image);
                 loaderIsComplete = true;
                 break;
             }
@@ -160,9 +161,9 @@ struct LayoutThumbnailLoader::Private
         if (tile.isNull())
             return;
 
-        const auto sourceRect = zoomRect.isNull()
-            ? tile.rect()
-            : QnGeometry::subRect(tile.rect(), zoomRect).toRect();
+        QRectF sourceRect = tile.rect();
+        if (!zoomRect.isNull())
+            sourceRect = QnGeometry::subRect(tile.rect(), zoomRect).toRect();
 
         if (qFuzzyIsNull(rotation))
         {
@@ -434,6 +435,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         request.resource = resource;
         request.msecSinceEpoch = d->msecSinceEpoch;
         request.size = thumbnailSize;
+        request.rotation = 0;
 
         ResourceThumbnailProviderPtr loader(new ResourceThumbnailProvider(request));
 
