@@ -7,6 +7,9 @@ set(quicksync "false")
 set(dynamic.customization "false")
 set(display.mobile.name "${display.product.name} Mobile")
 
+# Some customization (e.g. ionetworks) may have company name, which is not valid windows path.
+set(windowsInstallPath "${company.name}")
+
 set(uri.protocol "nx-vms")
 
 set(nxtoolUpgradeCode "cc740987-5070-4750-b853-327417176031")

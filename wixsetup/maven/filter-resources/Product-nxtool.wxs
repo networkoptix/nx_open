@@ -2,6 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+     <?include BuildVars.wxi ?>
     <Product Id="*" Name="${short.company.name} Server Tool" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${nxtoolUpgradeCode}">
         <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${short.company.name} Server Tool Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
@@ -98,7 +99,7 @@
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="$(var.ProgramFilesFolder)">
-                <Directory Id="NetworkOptix" Name="${company.name}">
+                <Directory Id="NetworkOptix" Name="$(var.companyInstallPath)">
                     <Directory Id="INSTALLDIR" Name="${display.product.name}">
                     </Directory>
                 </Directory>
