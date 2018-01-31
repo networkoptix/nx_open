@@ -16,8 +16,10 @@ public:
     static const QLatin1String anyResolution;
     static QString resolutionToString( const QSize& resolution = QSize() );
 
-    //!0 - primary stream, 1 - secondary stream
-    Qn::StreamIndex encoderIndex;
+    Qn::StreamIndex getEncoderIndex() const;
+
+    // We have to keep compatibility with previous version. So, this field stay int
+    int encoderIndex;
     //!has format "1920x1080" or "*" to notify that any resolution is supported
     QString resolution;
     //!transport method that can be used to receive this stream
@@ -39,7 +41,7 @@ public:
         const QSize& _resolution = QSize(),
         AVCodecID _codec = AV_CODEC_ID_NONE)
         :
-        encoderIndex( _encoderIndex ),
+        encoderIndex((int) _encoderIndex ),
         resolution( resolutionToString( _resolution ) ),
         transcodingRequired( false ),
         codec( _codec )
@@ -54,7 +56,7 @@ public:
         AVCodecID _codec,
         CustomParamDictType&& _customStreamParams )
         :
-        encoderIndex( _encoderIndex ),
+        encoderIndex((int) _encoderIndex ),
         resolution( _resolution.isValid()
             ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height())
             : anyResolution ),

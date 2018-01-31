@@ -1,0 +1,106 @@
+<div class="webclient">
+    <table>
+        <tbody>
+            <tr>
+                <td>
+                    <div class="view-wrapper">
+                        <div class="cameras-panel">
+                            <div class="cameras-search" ng-class="{active:searchFunc!=''}"
+                                 ng-model-options="{ updateOn: 'default', debounce: 0 }">
+                                <input type="search" placeholder="{{inputPlaceholder}}" ng-model="searchFunc">
+                                <div class="icon-left" ><span class="glyphicon glyphicon-search"></span></div>
+                                <div class="icons-right" ng-class="{'active':toggleInfo}">
+                                    <div class="clear-divider" ng-hide="!searchFunc || searchFunc==''"></div>
+                                    <div ng-hide="!searchFunc || searchFunc==''" class="clear-button" ng-click="searchFunc=''" >
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </div>
+                                    <div class="info-icon" ng-click="toggleInfo= !toggleInfo">
+                                        <span ng-class="{'active':toggleInfo}" class="glyphicon glyphicon-info-sign"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div ng-repeat="group in apiGroups">
+                                <b>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></b>
+                                <ul>
+                                    <li ng-repeat="function in group.functions | orderBy:'name' | filter: {searchLabel:searchFunc}"
+                                        ng-if="!function.proprietary || allowProprietary">
+                                        <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
+                                        <b><a ng-click="setActiveFunction(group,function,$event)"
+                                              ng-href="#/developers/api{{function.url}}"
+                                              ng-bind-html="(function.caption || function.name) | escape | highlight:searchFunc"></a></b>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td width="100%">
+                    <div class="view-wrapper">
+                        <div class="cameras-panel api-view">
+
+                            <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
+
+                            <div ng-if="!activeFunction">
+                                <div ng-repeat="group in apiGroups">
+                                    <h3>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></h3>
+                                    <p>{{group.groupDescription}}</p>
+                                    <ul>
+                                        <li ng-repeat="function in group.functions | orderBy:'name' | filter: {$:searchFunc}"
+                                            ng-if="!function.proprietary || allowProprietary">
+                                            <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
+                                            <a ng-click="setActiveFunction(group,function,$event)"
+                                               ng-href="#/developers/api{{function.url}}">
+                                                <b ng-if="function.caption"
+                                                   ng-bind-html="function.caption | escape | highlight:searchFunc"></b>
+                                                <span ng-if="function.method">{{function.method}}:</span>
+                                                <b ng-bind-html="function.url | escape | highlight:searchFunc" ></b>
+                                            </a>
+                                            <span ng-bind-html="function.description.xml | highlight:searchFunc" class="api-description-strip"></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div ng-if="activeFunction">
+                                <h2>
+                                    {{activeFunction.caption || activeFunction.name}}
+                                    <small><a ng-click="clearActiveFunction($event)"
+                                              title="back to functions list"
+                                              href="#/developers/api">(X)</a></small>
+                                </h2>
+                                <span class="label label-danger" ng-if="activeFunction.proprietary">proprietary</span>
+                                <div ng-bind-html="activeFunction.description.xml"></div>
+
+                                <ng-include src="Config.viewsDir + 'devtools/api_form.html'"
+                                            ng-if="apiMethod.method"></ng-include>
+
+                                <div ng-if="activeFunction.result.params || activeFunction.result.caption">
+                                    <h3>Result</h3>
+                                    <p>{{activeFunction.result.caption}}</p>
+                                    <ul ng-if="activeFunction.result.params">
+                                        <li ng-repeat="param in activeFunction.result.params">
+                                            <div class="label label-danger" ng-if="param.proprietary">proprietary</div>
+                                            <div class="label label-danger" ng-if="!param.optional">required</div>
+                                            <b>{{param.name}}</b>
+                                            <span ng-if="param.description.xml" ng-bind-html="param.description.xml"></span>
+                                            <span ng-if="param.values">
+                                                Values:
+                                                <ul>
+                                                    <li ng-repeat="value in param.values">
+                                                        <b>{{value.name}}</b>
+                                                        <span ng-if="value.description.xml"
+                                                              ng-bind-html="value.description.xml"></span>
+                                                    </li>
+                                                </ul>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
