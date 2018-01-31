@@ -160,7 +160,7 @@ void UnifiedSearchWidget::setModel(QAbstractListModel* value)
     if (auto asyncModel = qobject_cast<UnifiedAsyncSearchListModel*>(value))
     {
         connect(m_searchLineEdit, &QnSearchLineEdit::textChanged,
-            asyncModel, &UnifiedAsyncSearchListModel::setTextFilter);
+            asyncModel, &UnifiedAsyncSearchListModel::setClientsideTextFilter);
     }
 
     fetchMoreIfNeeded();
