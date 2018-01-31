@@ -5,7 +5,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-EventPanel::EventPanel(QWidget* parent): EventPanel(nullptr, parent)
+EventPanel::EventPanel(QWidget* parent):
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
+    d(new Private(this))
 {
 }
 
@@ -18,11 +21,6 @@ EventPanel::EventPanel(QnWorkbenchContext* context, QWidget* parent):
 
 EventPanel::~EventPanel()
 {
-}
-
-void EventPanel::paintEvent(QPaintEvent* /*event*/)
-{
-    d->paintBackground();
 }
 
 } // namespace desktop

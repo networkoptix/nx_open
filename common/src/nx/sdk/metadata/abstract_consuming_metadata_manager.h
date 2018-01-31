@@ -22,6 +22,7 @@ static const nxpl::NX_GUID IID_ConsumingMetadataManager =
 class AbstractConsumingMetadataManager: public AbstractMetadataManager
 {
 public:
+    // TODO: #mike: Rename.
     /**
      * @brief pushData provides data to the plugin.
      * @param dataPacket packet of data.

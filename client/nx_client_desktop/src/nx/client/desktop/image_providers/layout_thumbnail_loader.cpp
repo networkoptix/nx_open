@@ -163,15 +163,14 @@ struct LayoutThumbnailLoader::Private
         if (tile.isNull())
             return;
 
-        const auto sourceRect = zoomRect.isNull()
-            ? tile.rect()
-            : Geometry::subRect(tile.rect(), zoomRect).toRect();
+        QRectF sourceRect = tile.rect();
+        if (!zoomRect.isNull())
+            sourceRect = Geometry::subRect(tile.rect(), zoomRect).toRect();
 
         if (qFuzzyIsNull(rotation))
         {
             const auto targetRect = Geometry::expanded(aspectRatio,
                 cellRect, Qt::KeepAspectRatio);
-
             QPainter painter(&data.image);
             painter.setRenderHints(QPainter::SmoothPixmapTransform);
             painter.drawImage(targetRect, tile, sourceRect);
@@ -209,6 +208,8 @@ struct LayoutThumbnailLoader::Private
         painter.drawImage(targetRect, background, background.rect());
         painter.setOpacity(1.0);
         painter.drawImage(0, 0, loaded);
+
+        emit q->imageChanged(data.image);
     }
 
     QPixmap specialPixmap(Qn::ThumbnailStatus status, const QSize& size) const
@@ -436,6 +437,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         request.resource = resource;
         request.msecSinceEpoch = d->msecSinceEpoch;
         request.size = thumbnailSize;
+        request.rotation = 0;
 
         ResourceThumbnailProviderPtr loader(new ResourceThumbnailProvider(request));
 
@@ -461,12 +463,12 @@ void LayoutThumbnailLoader::doLoadAsync()
         loader->loadAsync();
     }
 
-    if (d->data.numLoading)
-        return;
-
-    // If there's nothing to load.
-    d->data.status = Qn::ThumbnailStatus::Loaded;
-    emit statusChanged(d->data.status);
+    if (d->data.numLoading == 0)
+    {
+        // If there's nothing to load.
+        d->data.status = Qn::ThumbnailStatus::Loaded;
+        emit statusChanged(d->data.status);
+    }
 }
 
 } // namespace desktop

@@ -127,7 +127,14 @@ QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
     return new QnVMax480ArchiveDelegate(toSharedPointer());
 }
 
-CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnPlVmax480Resource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex /*streamIndex*/)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
+CameraDiagnostics::Result QnPlVmax480Resource::initializeCameraDriver()
 {
     QUrl url = getUrl();
     int httpPort = url.port(80);
@@ -139,7 +146,6 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
     if (!QnPlVmax480ResourceSearcher::vmaxAuthenticate(client, getAuth()))
         return CameraDiagnostics::CannotEstablishConnectionResult(httpPort);
 
-    QnPhysicalCameraResource::initInternal();
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
 
@@ -193,14 +199,14 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
     {
         for (int i = 0; i < VMAX_MAX_CH; ++i)
         {
-            QnPhysicalCameraResourcePtr otherRes = getOtherResource(i);
+            QnSecurityCamResourcePtr otherRes = getOtherResource(i);
             if (otherRes && otherRes.data() != this)
                 otherRes.dynamicCast<QnPlVmax480Resource>()->setArchiveRange(startTimeUsec, endTimeUsec, false);
         }
     }
 }
 
-QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
+QnSecurityCamResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
 {
     QUrl url(getUrl());
     QUrlQuery urlQuery(url.query());
@@ -213,7 +219,7 @@ QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
     urlQuery.setQueryItems(items);
     url.setQuery(urlQuery);
     QString urlStr = url.toString();
-    return resourcePool()->getResourceByUrl(urlStr).dynamicCast<QnPhysicalCameraResource>();
+    return resourcePool()->getResourceByUrl(urlStr).dynamicCast<nx::mediaserver::resource::Camera>();
 }
 
 void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)
@@ -221,7 +227,7 @@ void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)
     if (channel == getChannel())
         setChunks(chunks);
     else {
-        QnPhysicalCameraResourcePtr otherRes = getOtherResource(channel);
+        QnSecurityCamResourcePtr otherRes = getOtherResource(channel);
         if (otherRes)
             otherRes.dynamicCast<QnPlVmax480Resource>()->setChunks(chunks);
     }

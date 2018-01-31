@@ -10,6 +10,11 @@ namespace nx {
 namespace sdk {
 namespace metadata {
 
+// TODO: Consider renaming and moving. Used by AbstractMetadataHandler::getParamValue().
+static const int NX_NO_ERROR = 0;
+static const int NX_UNKNOWN_PARAMETER = -41;
+static const int NX_MORE_DATA = -23;
+
 /**
  * Interface for handler that processes metadata incoming from the plugin.
  */
@@ -25,6 +30,17 @@ public:
     virtual void handleMetadata(
         Error error,
         AbstractMetadataPacket* metadata) = 0;
+
+    /**
+     * Reads a parameter value from the manager settings stored by the server.
+     * @param paramName Unique id of the parameter as a nul-terminated utf-8 string.
+     * @param valueBufSize In-out parameter. Should be set by the caller to the size available in
+     *     the buffer including nul-terminator, and if this size is not enough, will be set to the
+     *     size required to accomodate the string.
+     * @return NX_NO_ERROR on success, NX_UNKNOWN_PARAMETER if paramName is unknown, or
+     *     NX_MORE_DATA if *valueBufSize is too small.
+     */
+    virtual int getParamValue(const char* paramName, char* valueBuf, int* valueBufSize) const = 0;
 };
 
 /**
@@ -53,10 +69,10 @@ public:
         int eventTypeListSize) = 0;
 
     /**
-     * Starts fetching metadata from the resource.
      * @param handler Processes event metadata and object metadata fetched by the plugin. The
      *     plugin will fetch events metadata after startFetchingMetadata() call. Errors should also
-     *     be reported via this handler.
+     *     be reported via this handler. Also provides other services to the manager, e.g.
+     *     reading settings that are stored by the server.
      * @return noError in case of success, other value otherwise.
      */
     virtual Error setHandler(AbstractMetadataHandler* handler) = 0;

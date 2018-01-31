@@ -590,6 +590,16 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
         this, &QnMediaResourceWidget::analyticsSearchAreaSelected);
 }
 
+QRectF QnMediaResourceWidget::analyticsSearchRect() const
+{
+    return m_areaSelectOverlayWidget->selectedArea();
+}
+
+void QnMediaResourceWidget::setAnalyticsSearchRect(const QRectF& value)
+{
+    m_areaSelectOverlayWidget->setSelectedArea(value);
+}
+
 void QnMediaResourceWidget::initAreaHighlightOverlay()
 {
     if (!hasVideo())
@@ -2166,6 +2176,10 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     {
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
+			
+        if (d->camera->hasFlags(Qn::wearable_camera))
+            return Qn::NoLiveStreamOverlay;
+			
 
         const Qn::Permission requiredPermission = d->isPlayingLive()
             ? Qn::ViewLivePermission

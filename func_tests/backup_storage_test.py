@@ -1,19 +1,19 @@
 import logging
-import os
 import time
 from datetime import datetime
 
 import pytest
 import pytz
+from pathlib2 import Path
 
 import server_api_data_generators as generator
 import test_utils.utils as utils
-from test_utils.host import ProcessError
+from test_utils.os_access import ProcessError
 
 log = logging.getLogger(__name__)
 
 
-BACKUP_STORAGE_PATH = '/tmp/bstorage'
+BACKUP_STORAGE_PATH = Path('/tmp/bstorage')
 BACKUP_STORAGE_READY_TIMEOUT_SEC = 60  # seconds
 BACKUP_SCHEDULE_TIMEOUT_SEC = 60       # seconds
 
@@ -78,8 +78,8 @@ def second_camera_backup_type(request):
 @pytest.fixture
 def server(server_factory, system_backup_type):
     server = server_factory('server', start=False)
-    server.host.run_command(['rm', '-rfv', BACKUP_STORAGE_PATH])
-    server.host.run_command(['mkdir', '-p', BACKUP_STORAGE_PATH])
+    server.os_access.run_command(['rm', '-rfv', BACKUP_STORAGE_PATH])
+    server.os_access.run_command(['mkdir', '-p', BACKUP_STORAGE_PATH])
     server.start_service()
     server.setup_local_system()
     server.set_system_settings(
@@ -163,22 +163,19 @@ def add_camera(camera_factory, server, camera_id, backup_type):
 def assert_path_does_not_exist(server, path):
     assert_message = "'%r': unexpected existen path '%s'" % (server, path)
     with pytest.raises(ProcessError, message=assert_message) as x_info:
-        server.host.run_command(['[ -e %s ]' % path])
+        server.os_access.run_command(['[ -e %s ]' % path])
     assert x_info.value.returncode == 1, assert_message
 
 
 def assert_paths_are_equal(server, path_1, path_2):
-    server.host.run_command(['diff',
-                             '--recursive',
-                             '--report-identical-files',
-                             path_1,  path_2])
+    server.os_access.run_command(['diff', '--recursive', '--report-identical-files', path_1, path_2])
 
 
 def assert_backup_equal_to_archive(server, camera, system_backup_type, backup_new_camera, camera_backup_type):
-    hi_quality_backup_path = os.path.join(BACKUP_STORAGE_PATH, HI_QUALITY_PATH, camera.mac_addr)
-    hi_quality_server_archive_path = os.path.join(server.storage.dir, HI_QUALITY_PATH, camera.mac_addr)
-    low_quality_backup_path = os.path.join(BACKUP_STORAGE_PATH, LOW_QUALITY_PATH, camera.mac_addr)
-    low_quality_server_archive_path = os.path.join(server.storage.dir, LOW_QUALITY_PATH, camera.mac_addr)
+    hi_quality_backup_path = BACKUP_STORAGE_PATH / HI_QUALITY_PATH / camera.mac_addr
+    hi_quality_server_archive_path = server.storage.dir / HI_QUALITY_PATH / camera.mac_addr
+    low_quality_backup_path = BACKUP_STORAGE_PATH / LOW_QUALITY_PATH / camera.mac_addr
+    low_quality_server_archive_path = server.storage.dir / LOW_QUALITY_PATH / camera.mac_addr
     if ((camera_backup_type and camera_backup_type == BACKUP_DISABLED) or
             (not camera_backup_type and not backup_new_camera)):
         assert_path_does_not_exist(server, hi_quality_backup_path)

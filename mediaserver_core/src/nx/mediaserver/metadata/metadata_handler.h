@@ -31,6 +31,9 @@ public:
     void registerDataReceptor(QnAbstractDataReceptor* dataReceptor);
     void removeDataReceptor(QnAbstractDataReceptor* dataReceptor);
 
+    virtual int getParamValue(
+       const char* paramName, char* valueBuf, int* valueBufSize) const override;
+
 private:
     nx::vms::event::EventState lastEventState(const QnUuid& eventId) const;
 

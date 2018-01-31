@@ -6,6 +6,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <ui/common/read_only.h>
+#include <ui/common/aligner.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -25,8 +26,7 @@ QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget* parent):
     base_type(parent),
     QnUpdatable(),
     QnWorkbenchContextAware(parent, InitializationMode::lazy),
-    ui(new Ui::ArchiveLengthWidget),
-    m_readOnly(false)
+    ui(new Ui::ArchiveLengthWidget)
 {
     ui->setupUi(this);
 
@@ -39,7 +39,7 @@ QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget* parent):
         [this]
         {
             if (!isUpdating())
-            emit changed();
+                emit changed();
         };
 
     connect(ui->checkBoxMinArchive,
@@ -79,10 +79,20 @@ QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget* parent):
             notifyChanged);
 
     updateArchiveRangeEnabledState();
+
+    m_aligner = new QnAligner(this);
+    m_aligner->addWidgets({
+        ui->labelMinDays,
+        ui->labelMaxDays });
 }
 
 QnArchiveLengthWidget::~QnArchiveLengthWidget()
 {
+}
+
+QnAligner* QnArchiveLengthWidget::aligner() const
+{
+    return m_aligner;
 }
 
 void QnArchiveLengthWidget::updateFromResources(const QnVirtualCameraResourceList& cameras)
@@ -101,7 +111,8 @@ void QnArchiveLengthWidget::submitToResources(const QnVirtualCameraResourceList&
     int maxDays = maxRecordedDays();
     int minDays = minRecordedDays();
 
-    for (const auto& camera: cameras) {
+    for (const auto& camera: cameras)
+    {
         if (maxDays != kRecordedDaysDontChange)
             camera->setMaxDays(maxDays);
 

@@ -11,6 +11,7 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/mediator/api/mediator_api_client.h>
+#include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
@@ -233,7 +234,7 @@ std::tuple<nx::network::http::StatusCode::Value, api::ListeningPeers>
 {
     api::Client mediatorClient(
         nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
-            .setEndpoint(httpEndpoint()).toUrl());
+            .setEndpoint(httpEndpoint()).setPath(api::kMediatorApiPrefix).toUrl());
     return mediatorClient.getListeningPeers();
 }
 

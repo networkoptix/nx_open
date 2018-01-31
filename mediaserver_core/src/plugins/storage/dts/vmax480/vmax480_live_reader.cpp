@@ -134,7 +134,7 @@ void QnVMax480LiveProvider::afterRun()
 
 int QnVMax480LiveProvider::getChannel() const
 {
-    return m_resource.dynamicCast<QnPhysicalCameraResource>()->getChannel();
+    return m_resource.dynamicCast<nx::mediaserver::resource::Camera>()->getChannel();
 }
 
 #endif // #ifdef ENABLE_VMAX

@@ -25,25 +25,25 @@ public:
         pleaseStopSync();
     }
 
-    nx::utils::Url getServerUrl() const
+    nx::utils::Url url() const
     {
-        return url::Builder()
-            .setScheme(stun::kUrlSchemeName).setEndpoint(address());
+        return nx::network::url::Builder()
+            .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address());
     }
 
-    MessageDispatcher& dispatcher()
+    nx::network::stun::MessageDispatcher& dispatcher()
     {
         return m_dispatcher;
     }
 
-    void sendIndicationThroughEveryConnection(Message message)
+    void sendIndicationThroughEveryConnection(nx::network::stun::Message message)
     {
         forEachConnection(
-            nx::network::server::MessageSender<ServerConnection>(std::move(message)));
+            nx::network::server::MessageSender<nx::network::stun::ServerConnection>(std::move(message)));
     }
 
 private:
-    MessageDispatcher m_dispatcher;
+    nx::network::stun::MessageDispatcher m_dispatcher;
 };
 
 } // namespace test

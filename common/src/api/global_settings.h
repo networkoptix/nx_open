@@ -290,6 +290,9 @@ public:
     QByteArray updates2Registry() const;
     void setUpdates2Registry(const QByteArray& serializedRegistry);
 
+    int maxWearableArchiveSynchronizationThreads() const;
+    void setMaxWearableArchiveSynchronizationThreads(int newValue);
+
 signals:
     void initialized();
 
@@ -418,6 +421,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads = nullptr;
+    QnResourcePropertyAdaptor<int>* m_maxWearableArchiveSynchronizationThreads = nullptr;
 
     QnResourcePropertyAdaptor<QByteArray>* m_updates2InfoAdaptor;
 

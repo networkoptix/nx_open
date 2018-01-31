@@ -1,7 +1,6 @@
 """Produce file names for storing artifacts."""
 
 import logging
-import os.path
 import json
 
 from .utils import is_list_inst
@@ -42,7 +41,7 @@ class Artifact(object):
     def path(self):
         path = self.path_root
         if self.artifact_type and self.artifact_type.ext:
-            return path + self.artifact_type.ext
+            return path.with_suffix(self.artifact_type.ext)
         else:
             return path
 
@@ -65,9 +64,9 @@ class ArtifactFactory(object):
     def make_artifact(self, path_part_list=None, name=None, full_name=None, is_error=None, artifact_type=None):
         assert path_part_list is None or is_list_inst(path_part_list, str), repr(path_part_list)
         assert artifact_type is None or isinstance(artifact_type, ArtifactType), repr(artifact_type)
-        path_root = '-'.join([self._artifact.path_root] + (path_part_list or []))
+        name = '-'.join([self._artifact.path_root.name] + (path_part_list or []))
         artifact = Artifact(
-            path_root,
+            self._artifact.path_root.parent / name,
             name or self._artifact.name,
             full_name or self._artifact.full_name,
             is_error if is_error is not None else self._artifact.is_error,
@@ -81,25 +80,20 @@ class ArtifactFactory(object):
 
     def save_as_json(self, value, encoder=None):
         path = self.make_artifact(artifact_type=JSON_ARTIFACT_TYPE).produce_file_path()
-        with open(path, 'w') as f:
-            json.dump(value, f, indent=4, cls=encoder)
-        return path
-
-    def write_file(self, contents):
-        path = self.produce_file_path()
-        with open(path, 'w') as f:
-            f.write(contents)
+        path.write_bytes(json.dumps(value, indent=4, cls=encoder))
         return path
 
     def release(self):
         repository = self._db_capture_repository
-        if not repository: return
+        if not repository:
+            return
         for artifact in sorted(self._artifact_set, key=lambda artifact: artifact.name):
             assert artifact.artifact_type, repr(artifact)
             log.info('Storing artifact: %r', artifact)
-            if not os.path.exists(artifact.path):
+            if not artifact.path.exists():
                 log.warning('Artifact file is missing, skipping: %s' % artifact.path)
                 continue
+            data = artifact.path.read_bytes
             with open(artifact.path, 'rb') as f:
                 data = f.read()
             repository_artifact_type = artifact.artifact_type.produce_repository_type(repository)

@@ -18,7 +18,7 @@ public:
     LilinResource();
     virtual ~LilinResource() override;
 
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager() override;
 

@@ -2,11 +2,10 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
 #include <nx/network/stun/async_client_with_http_tunneling.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>
-
-#include <http/http_api_path.h>
 
 #include "functional_tests/mediator_functional_test.h"
 
@@ -35,7 +34,8 @@ protected:
 
         m_stunClient.connect(
             nx::network::url::Builder().setScheme("http")
-                .setEndpoint(httpEndpoint()).setPath(http::kStunOverHttpTunnelPath).toUrl(),
+                .setEndpoint(httpEndpoint()).appendPath(api::kMediatorApiPrefix)
+                .appendPath(api::kStunOverHttpTunnelPath).toUrl(),
             [](SystemError::ErrorCode) {});
     }
 

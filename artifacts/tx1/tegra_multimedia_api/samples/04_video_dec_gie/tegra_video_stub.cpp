@@ -23,7 +23,7 @@ struct PointF
     float y = 0;
 };
 
-class Stub: public TegraVideo
+class Stub final: public TegraVideo
 {
 public:
     Stub()
@@ -55,25 +55,25 @@ public:
         NX_OUTPUT << __func__ << "()";
     }
 
-    virtual bool start(const Params& params) override
+    virtual bool start(const Params* params) override
     {
-        m_id = params.id; //< Used for logging, thus, assigned before logging.
+        m_id = params->id; //< Used for logging, thus, assigned before logging.
 
         NX_OUTPUT << __func__ << "({";
-        NX_OUTPUT << "    id: " << params.id;
-        NX_OUTPUT << "    modelFile: " << params.modelFile;
-        NX_OUTPUT << "    deployFile: " << params.deployFile;
-        NX_OUTPUT << "    cacheFile: " << params.cacheFile;
-        NX_OUTPUT << "    cacheFile: " << params.cacheFile;
-        NX_OUTPUT << "    netWidth: " << params.netWidth;
-        NX_OUTPUT << "    netHeight: " << params.netHeight;
+        NX_OUTPUT << "    id: " << params->id;
+        NX_OUTPUT << "    modelFile: " << params->modelFile;
+        NX_OUTPUT << "    deployFile: " << params->deployFile;
+        NX_OUTPUT << "    cacheFile: " << params->cacheFile;
+        NX_OUTPUT << "    cacheFile: " << params->cacheFile;
+        NX_OUTPUT << "    netWidth: " << params->netWidth;
+        NX_OUTPUT << "    netHeight: " << params->netHeight;
         NX_OUTPUT << "})";
 
-        m_modelFile = params.modelFile;
-        m_deployFile = params.deployFile;
-        m_cacheFile = params.cacheFile;
-        m_netWidth = params.netWidth;
-        m_netHeight = params.netHeight;
+        m_modelFile = params->modelFile;
+        m_deployFile = params->deployFile;
+        m_cacheFile = params->cacheFile;
+        m_netWidth = params->netWidth;
+        m_netHeight = params->netHeight;
 
         return true;
     }
@@ -161,7 +161,7 @@ private:
         for (int i = 0; i < rectangleCount; ++i)
         {
             auto& center = m_currentRectangleCenters[i];
-            center.y += 0.02 * frequencyCoefficient;
+            center.y += (float) 0.02 * frequencyCoefficient;
             if (center.y > 1)
                 center.y = 0;
 
@@ -206,8 +206,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-TegraVideo* TegraVideo::createStub()
+TegraVideo* tegraVideoCreateStub()
 {
-    ini().reload();
     return new Stub();
 }

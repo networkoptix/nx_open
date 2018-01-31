@@ -67,6 +67,15 @@ void AsyncClient::connect(
         [this, completionHandler = std::move(completionHandler)]() mutable
         {
             QnMutexLocker lock(&m_mutex);
+
+            if (m_state == State::connected)
+            {
+                lock.unlock();
+                if (completionHandler)
+                    completionHandler(SystemError::noError);
+                return;
+            }
+
             NX_ASSERT(!m_connectCompletionHandler);
             m_connectCompletionHandler = std::move(completionHandler);
             openConnectionImpl(&lock);

@@ -29,3 +29,11 @@ bool GlobalSettingsToDeviceSearcherSettingsAdapter::isUpnpMulticastEnabled() con
         m_globalSettings->isAutoDiscoveryEnabled() ||
         m_globalSettings->isUpnpPortMappingEnabled();
 }
+
+bool GlobalSettingsToDeviceSearcherSettingsAdapter::isAutoDiscoveryEnabled() const
+{
+    if (m_globalSettings->isNewSystem())
+        return false;
+
+    return m_globalSettings->isAutoDiscoveryEnabled();
+}

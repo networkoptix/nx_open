@@ -1,13 +1,10 @@
-#ifndef __TEST_CAMERA_RESOURCE_H__
-#define __TEST_CAMERA_RESOURCE_H__
+#pragma once
 
 #ifdef ENABLE_TEST_CAMERA
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
+#include <nx/mediaserver/resource/camera.h>
 
-
-class QnTestCameraResource : public QnPhysicalCameraResource
+class QnTestCameraResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
@@ -24,7 +21,11 @@ public:
 
     virtual QString getHostAddress() const override;
     virtual void setHostAddress(const QString &ip) override;
+
 protected:
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
 private:
@@ -33,4 +34,3 @@ private:
 typedef QnSharedResourcePointer<QnTestCameraResource> QnTestCameraResourcePtr;
 
 #endif // #ifdef ENABLE_TEST_CAMERA
-#endif //__TEST_CAMERA_RESOURCE_H__

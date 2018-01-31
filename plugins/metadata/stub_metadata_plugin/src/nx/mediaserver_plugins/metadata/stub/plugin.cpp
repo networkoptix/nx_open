@@ -95,6 +95,7 @@ const char* Plugin::capabilitiesManifest(Error* error) const
 {
     *error = Error::noError;
 
+    // TODO: #mike: Remove localizations; consider a dedicated mechanism for them.
     return R"json(
         {
             "driverId": "{B14A8D7B-8009-4D38-A60D-04139345432E}",
@@ -144,7 +145,24 @@ const char* Plugin::capabilitiesManifest(Error* error) const
                     }
                 }
             ],
-            "capabilities": "needDeepCopyForMediaFrame"
+            "capabilities": "needDeepCopyForMediaFrame",
+            "parameters": {
+                "params": [
+                    {
+                        "id": "paramAId",
+                        "dataType": "Number",
+                        "name": "Param A",
+                        "description": "Number A"
+                    },
+                    {
+                        "id": "paramBId",
+                        "dataType": "Enumeration",
+                        "range": "b1,b3",
+                        "name": "Param B",
+                        "description": "Enumeration B"
+                    }
+                ]
+            }
         }
     )json";
 }
