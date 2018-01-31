@@ -5,6 +5,8 @@
 #include <providers/stream_mixer.h>
 #include <providers/spush_media_stream_provider.h>
 
+class QnOnvifStreamReader;
+
 namespace nx {
 namespace plugins {
 namespace utils {
@@ -12,7 +14,9 @@ namespace utils {
 class MultisensorDataProvider : public CLServerPushStreamReader
 {
 public:
-    MultisensorDataProvider(const QnResourcePtr& res);
+    using DataProviderFactory = std::function<QnOnvifStreamReader* (const QnResourcePtr&)>;
+
+    MultisensorDataProvider(const QnResourcePtr& res, DataProviderFactory factory);
     virtual ~MultisensorDataProvider();
 
 protected:
@@ -32,7 +36,7 @@ protected:
 private:
     QnPlOnvifResourcePtr m_onvifRes;
     QnStreamMixer m_dataSource;
-
+    DataProviderFactory m_factory;
 private:
     void initSubChannels();
 

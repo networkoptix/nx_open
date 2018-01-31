@@ -48,6 +48,7 @@ CameraThumbnailProvider::CameraThumbnailProvider(
 
             emit imageChanged(m_image);
             emit sizeHintChanged(sizeHint());
+            emit statusChanged(status());
         }, Qt::QueuedConnection);
 }
 
@@ -88,8 +89,8 @@ void CameraThumbnailProvider::doLoadAsync()
 
     if (!commonModule()->currentServer())
     {
-        setStatus(Qn::ThumbnailStatus::NoData);
         emit imageDataLoadedInternal(QByteArray());
+        setStatus(Qn::ThumbnailStatus::NoData);
         return;
     }
 
@@ -100,16 +101,15 @@ void CameraThumbnailProvider::doLoadAsync()
         {
             if (!guard)
                 return;
-
-            setStatus(success ? Qn::ThumbnailStatus::Loaded : Qn::ThumbnailStatus::NoData);
             if (success)
                 emit imageDataLoadedInternal(imageData);
+            setStatus(success ? Qn::ThumbnailStatus::Loaded : Qn::ThumbnailStatus::NoData);
         });
 
     if (handle <= 0)
     {
-        setStatus(Qn::ThumbnailStatus::NoData);
         emit imageDataLoadedInternal(QByteArray());
+        setStatus(Qn::ThumbnailStatus::NoData);
     }
 }
 

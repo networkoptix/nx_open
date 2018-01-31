@@ -1,25 +1,25 @@
 import logging
 import os
-import os.path
 
 import pytest
 from netaddr import IPAddress
+from pathlib2 import Path
 
 from test_utils.artifact import ArtifactFactory
 from test_utils.ca import CA
 from test_utils.camera import SampleMediaFile, CameraFactory
 from test_utils.cloud_host import CloudAccountFactory, resolve_cloud_host_from_registry
 from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
-from test_utils.customization import detect_customization_company_name
-from test_utils.host import SshHostConfig
+from test_utils.deb import Deb
+from test_utils.os_access import SshAccessConfig
 from test_utils.internet_time import TimeProtocolRestriction
 from test_utils.lightweight_servers_factory import LWS_BINARY_NAME, LightweightServersFactory
 from test_utils.metrics_saver import MetricsSaver
 from test_utils.server_factory import ServerFactory
 from test_utils.server_physical_host import PhysicalInstallationCtl
 from test_utils.utils import SimpleNamespace
-from test_utils.vagrant_box import VagrantBoxFactory
-from test_utils.vagrant_box_config import BoxConfigFactory
+from test_utils.vagrant_vm import VagrantVMsFactory
+from test_utils.vagrant_vm_config import VagrantVMConfigFactory
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
@@ -28,7 +28,7 @@ DEFAULT_CUSTOMIZATION = 'default'
 
 DEFAULT_WORK_DIR = '/tmp/funtest'
 DEFAULT_MEDIASERVER_DIST_FNAME = 'mediaserver.deb'  # in bin dir
-DEFAULT_VM_NAME_PREFIX = 'funtest-'
+DEFAULT_VIRTUALBOX_NAME_PREFIX = 'vagrant_func_tests-'  # Default Vagrant's prefix is "vagrant_".
 DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
 
 DEFAULT_VM_HOST_USER = 'root'
@@ -42,10 +42,6 @@ MEDIA_STREAM_FPATH = 'sample.testcam-stream.data'
 
 log = logging.getLogger(__name__)
 
-
-def expand_path(path):
-    if path is None: return None
-    return os.path.expandvars(os.path.expanduser(path))
 
 def pytest_addoption(parser):
     log_levels = [logging.getLevelName(logging.DEBUG),
@@ -62,24 +58,24 @@ def pytest_addoption(parser):
     parser.addoption('--autotest-email-password',
                      help='Password for accessing service account via IMAP protocol. '
                           'Used for activation cloud accounts for different cloud groups and customizations.')
-    parser.addoption('--work-dir', default=DEFAULT_WORK_DIR, type=expand_path,
+    parser.addoption('--work-dir', default=DEFAULT_WORK_DIR, type=Path,
                      help='working directory for tests: all generated files will be placed there')
-    parser.addoption('--bin-dir', type=expand_path,
+    parser.addoption('--bin-dir', type=Path,
                      help='directory with binary files for tests:'
                           ' debian distributive and media sample are expected there')
-    parser.addoption('--mediaserver-dist-path', type=expand_path,
+    parser.addoption('--mediaserver-dist-path', type=Path, default=DEFAULT_MEDIASERVER_DIST_FNAME,
                      help='path to mediaserver distributive (.deb), default is %s in bin-dir' % DEFAULT_MEDIASERVER_DIST_FNAME)
-    parser.addoption('--media-sample-path', default=MEDIA_SAMPLE_FPATH, type=expand_path,
+    parser.addoption('--media-sample-path', default=MEDIA_SAMPLE_FPATH, type=Path,
                      help='media sample file path, default is %s at binary directory' % MEDIA_SAMPLE_FPATH)
-    parser.addoption('--media-stream-path', default=MEDIA_STREAM_FPATH, type=expand_path,
+    parser.addoption('--media-stream-path', default=MEDIA_STREAM_FPATH, type=Path,
                      help='media sample test camera stream file path, default is %s at binary directory' % MEDIA_STREAM_FPATH)
     parser.addoption('--no-servers-reset', action='store_true',
                      help='skip servers reset/cleanup on test setup')
-    parser.addoption('--recreate-boxes', action='store_true', help='destroy and create again vagrant boxes')
+    parser.addoption('--recreate-vms', action='store_true', help='destroy and create again vagrant VMs')
     parser.addoption('--reinstall', action='store_true',
                      help='Take and install new distrubutive.'
-                     ' Recreate all vagrant boxes and reinstall server on physical servers.')
-    parser.addoption('--vm-name-prefix', default=DEFAULT_VM_NAME_PREFIX,
+                     ' Recreate all vagrant VMs and reinstall server on physical servers.')
+    parser.addoption('--vm-name-prefix', default=DEFAULT_VIRTUALBOX_NAME_PREFIX,
                      help='prefix for virtualenv machine names')
     parser.addoption('--vm-port-base', type=int, default=DEFAULT_REST_API_FORWARDED_PORT_BASE,
                      help='base REST API port forwarded to host')
@@ -87,14 +83,14 @@ def pytest_addoption(parser):
                      help='IP address virtual machines bind to.'
                      ' Test camera discovery will answer only to this address if this option is specified.')
     parser.addoption('--vm-host',
-                     help='hostname or IP address for host with virtualbox,'
+                     help='hostname or IP address for host with VirtualBox,'
                           ' used to start virtual machines (by default it is local host)')
     parser.addoption('--vm-host-user', default=DEFAULT_VM_HOST_USER,
-                     help='User to use for ssh to login to virtualbox host')
+                     help='User to use for ssh to login to VirtualBox host')
     parser.addoption('--vm-host-key',
-                     help='Identity file to use for ssh to login to virtualbox host')
+                     help='Identity file to use for ssh to login to VirtualBox host')
     parser.addoption('--vm-host-dir', default=DEFAULT_VM_HOST_DIR,
-                     help='Working directory at host with virtualbox, used to store vagrant files')
+                     help='Working directory at host with VirtualBox, used to store vagrant files')
     parser.addoption('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int,
                      help='Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH)
     parser.addoption('--log-level', default=log_levels[0], type=str.upper,
@@ -110,18 +106,16 @@ def pytest_addoption(parser):
 def run_options(request):
     vm_host = request.config.getoption('--vm-host')
     if vm_host:
-        vm_ssh_host_config = SshHostConfig(
+        vm_ssh_host_config = SshAccessConfig(
             name='vm_host',
-            host=vm_host,
+            hostname=vm_host,
             user=request.config.getoption('--vm-host-user'),
             key_file_path=request.config.getoption('--vm-host-key'))
     else:
         vm_ssh_host_config = None
-    bin_dir = request.config.getoption('--bin-dir')
+    bin_dir = request.config.getoption('--bin-dir').expanduser()
     assert bin_dir, 'Argument --bin-dir is required'
-    mediaserver_dist_path = request.config.getoption('--mediaserver-dist-path')
-    mediaserver_dist_path = os.path.join(bin_dir, mediaserver_dist_path or DEFAULT_MEDIASERVER_DIST_FNAME)
-    assert os.path.isfile(mediaserver_dist_path), 'Mediaserver distributive is missing at %r' % mediaserver_dist_path
+    deb = Deb(bin_dir / request.config.getoption('--mediaserver-dist-path'))
     autotest_email_password = request.config.getoption('--autotest-email-password') or os.environ.get('AUTOTEST_EMAIL_PASSWORD')
     tests_config = TestsConfig.merge_config_list(
         request.config.getoption('--tests-config-file'),
@@ -131,13 +125,13 @@ def run_options(request):
         cloud_group=request.config.getoption('--cloud-group'),
         customization=request.config.getoption('--customization'),
         autotest_email_password=autotest_email_password,
-        work_dir=request.config.getoption('--work-dir'),
-        bin_dir=request.config.getoption('--bin-dir'),
-        mediaserver_dist_path=mediaserver_dist_path,
+        work_dir=request.config.getoption('--work-dir').expanduser(),
+        bin_dir=bin_dir,
+        deb=deb,
         media_sample_path=request.config.getoption('--media-sample-path'),
         media_stream_path=request.config.getoption('--media-stream-path'),
         reset_servers=not request.config.getoption('--no-servers-reset'),
-        recreate_boxes=request.config.getoption('--recreate-boxes'),
+        recreate_vms=request.config.getoption('--recreate-vms'),
         reinstall=request.config.getoption('--reinstall'),
         vm_name_prefix=request.config.getoption('--vm-name-prefix'),
         vm_port_base=request.config.getoption('--vm-port-base'),
@@ -148,6 +142,16 @@ def run_options(request):
         log_level=request.config.getoption('--log-level'),
         tests_config=tests_config,
         )
+
+
+@pytest.fixture(scope='session')
+def work_dir(run_options):
+    return run_options.work_dir
+
+
+@pytest.fixture(scope='session')
+def bin_dir(run_options):
+    return run_options.bin_dir
 
 
 @pytest.fixture(scope='session')
@@ -179,9 +183,9 @@ def junk_shop_repository(request, init_logging):
 @pytest.fixture
 def artifact_factory(request, run_options, junk_shop_repository):
     db_capture_repository, current_test_run = junk_shop_repository
-    artifact_path_prefix = os.path.join(
-        run_options.work_dir,
-        os.path.basename(request.node.nodeid.replace('::', '-').replace('.py', '')))
+    test_file_path_as_str, test_function_name = request.node.nodeid.split('::', 1)
+    test_file_stem = Path(test_file_path_as_str).stem  # Name without extension.
+    artifact_path_prefix = run_options.work_dir / (test_file_stem + '-' + test_function_name)
     artifact_set = set()
     artifact_factory = ArtifactFactory.from_path(db_capture_repository, current_test_run, artifact_set, artifact_path_prefix)
     yield artifact_factory
@@ -197,7 +201,7 @@ def metrics_saver(junk_shop_repository):
 
 @pytest.fixture(scope='session')
 def customization_company_name(run_options):
-    company_name = detect_customization_company_name(run_options.mediaserver_dist_path)
+    company_name = run_options.deb.customization.company_name
     log.info('Customization company name: %r', company_name)
     return company_name
 
@@ -217,54 +221,58 @@ def cloud_host(init_logging, run_options):
     return resolve_cloud_host_from_registry(run_options.cloud_group, run_options.customization)
 
 @pytest.fixture(scope='session')
-def box_factory(request, run_options, init_logging, customization_company_name):
-    config_factory = BoxConfigFactory(run_options.mediaserver_dist_path, customization_company_name)
-    factory = VagrantBoxFactory(
+def session_vm_factory(request, run_options, init_logging, customization_company_name):
+    """Create factory once per session, don't release VMs"""
+    config_factory = VagrantVMConfigFactory(customization_company_name)
+    factory = VagrantVMsFactory(
         request.config.cache,
         run_options,
         config_factory,
         )
-    if run_options.recreate_boxes or run_options.reinstall:
+    if run_options.recreate_vms or run_options.reinstall:
         factory.destroy_all()
     return factory
 
 @pytest.fixture
-def box(box_factory):
-    yield box_factory
-    box_factory.release_all_boxes()
+def vm_factory(session_vm_factory):
+    """Return same factory by release allocated VMs after each test"""
+    yield session_vm_factory
+    session_vm_factory.release_all_vms()
 
 @pytest.fixture(scope='session')
 def physical_installation_ctl(run_options, init_logging, customization_company_name):
     if not run_options.tests_config:
         return None
     pic = PhysicalInstallationCtl(
-        run_options.mediaserver_dist_path,
+        run_options.deb.path,
         customization_company_name,
         run_options.tests_config.physical_installation_host_list,
-        CA(os.path.join(run_options.work_dir, 'ca')),
+        CA(run_options.work_dir / 'ca'),
         )
     if run_options.reinstall:
         pic.reset_all_installations()
     return pic
 
 @pytest.fixture
-def server_factory(run_options, init_logging, artifact_factory, customization_company_name,
-                   cloud_host, box, physical_installation_ctl):
+def server_factory(run_options, init_logging, artifact_factory,
+                   cloud_host, vm_factory, physical_installation_ctl):
     server_factory = ServerFactory(
         run_options.reset_servers,
         artifact_factory,
-        customization_company_name,
         cloud_host,
-        box,
-        physical_installation_ctl)
+        vm_factory,
+        physical_installation_ctl,
+        run_options.deb,
+        CA(run_options.work_dir / 'ca'),
+        )
     yield server_factory
     server_factory.release()
 
 @pytest.fixture
 def lightweight_servers_factory(run_options, artifact_factory, physical_installation_ctl):
-    test_binary_path = os.path.join(run_options.bin_dir, LWS_BINARY_NAME)
-    assert os.path.isfile(test_binary_path), 'Test binary for lightweight servers is missing at %s' % test_binary_path
-    ca = CA(os.path.join(run_options.work_dir, 'ca'))
+    test_binary_path = run_options.bin_dir / LWS_BINARY_NAME
+    assert test_binary_path.exists(), 'Test binary for lightweight servers is missing at %s' % test_binary_path
+    ca = CA(run_options.work_dir / 'ca')
     lwsf = LightweightServersFactory(artifact_factory, physical_installation_ctl, test_binary_path, ca)
     yield lwsf
     lwsf.release()
@@ -282,8 +290,8 @@ def cloud_account(cloud_account_factory):
 
 @pytest.fixture
 def camera_factory(run_options, init_logging):
-    stream_path = os.path.abspath(os.path.join(run_options.bin_dir, run_options.media_stream_path))
-    assert os.path.isfile(stream_path), '%s is expected at %s' % (os.path.basename(stream_path), os.path.dirname(stream_path))
+    stream_path = run_options.bin_dir / run_options.media_stream_path
+    assert stream_path.exists(), '%s is expected at %s' % (stream_path.name, stream_path.parent)
     factory = CameraFactory(run_options.vm_address, stream_path)
     yield factory
     factory.close()
@@ -295,8 +303,8 @@ def camera(camera_factory):
 
 @pytest.fixture
 def sample_media_file(run_options):
-    fpath = os.path.abspath(os.path.join(run_options.bin_dir, run_options.media_sample_path))
-    assert os.path.isfile(fpath), '%s is expected at %s' % (os.path.basename(fpath), os.path.dirname(fpath))
+    fpath = run_options.bin_dir / run_options.media_sample_path
+    assert fpath.exists(), '%s is expected at %s' % (fpath.name, fpath.parent)
     return SampleMediaFile(fpath)
 
 
@@ -323,10 +331,10 @@ def pytest_pyfunc_call(pyfuncitem):
 
 
 @pytest.fixture()
-def timeless_server(box, server_factory, server_name='timeless_server'):
-    box = box('timeless', sync_time=False)
+def timeless_server(vm_factory, server_factory, server_name='timeless_server'):
+    vm = vm_factory('timeless', sync_time=False)
     config_file_params = dict(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
-    server = server_factory(server_name, box=box, start=False, config_file_params=config_file_params)
+    server = server_factory(server_name, vm=vm, start=False, config_file_params=config_file_params)
     TimeProtocolRestriction(server).enable()
     server.start_service()
     server.setup_local_system()

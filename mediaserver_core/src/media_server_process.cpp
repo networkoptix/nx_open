@@ -558,15 +558,11 @@ static int freeGB(QString drive)
 }
 #endif
 
-static QStringList listRecordFolders(bool includeNetwork = false)
+static QStringList listRecordFolders(bool includeNonHdd = false)
 {
     using namespace nx::mediaserver::fs::media_paths;
 
-    const NetworkDrives networkDrivesFlag = includeNetwork
-        ? NetworkDrives::allowed
-        : NetworkDrives::notAllowed;
-
-    auto mediaPathList = get(FilterConfig::createDefault(networkDrivesFlag));
+    auto mediaPathList = get(FilterConfig::createDefault(includeNonHdd));
     NX_VERBOSE(kLogTag, lm("Record folders: %1").container(mediaPathList));
     return mediaPathList;
 }
@@ -1557,8 +1553,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getCameraParam", new QnCameraSettingsRestHandler());
     reg("api/setCameraParam", new QnCameraSettingsRestHandler());
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
-    if(ini().enableWearableCameras)
-        reg("api/wearableCamera", new QnWearableCameraRestHandler());
+    reg("api/wearableCamera", new QnWearableCameraRestHandler());
     reg("api/ptz", new QnPtzRestHandler());
     reg("api/createEvent", new QnExternalEventRestHandler());
     static const char kGetTimePath[] = "api/gettime";

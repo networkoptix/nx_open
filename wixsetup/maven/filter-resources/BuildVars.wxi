@@ -47,6 +47,7 @@
         <?define mirrorListUrl = "${mirrorListUrl}"?>
         <?define quicksync = "${quicksync}"?>
         <?define defaultTranslation = "${defaultTranslation}"?>
+        <?define companyInstallPath = "${windowsInstallPath}"?>
 
 
         <?if $(var.arch) = x86?>
@@ -57,8 +58,8 @@
             <?define SystemFolderActual = "System64Folder"?>
         <?endif?>
 
-        <?define clientInstallFullPath="[$(var.ProgramFilesFolder)]${company.name}\${display.product.name}\Client" ?>
-        <?define nxtoolInstallFullPath="[$(var.ProgramFilesFolder)]${company.name}\${display.product.name}\Nxtool" ?>
+        <?define clientInstallFullPath="[$(var.ProgramFilesFolder)]${windowsInstallPath}\${display.product.name}\Client" ?>
+        <?define nxtoolInstallFullPath="[$(var.ProgramFilesFolder)]${windowsInstallPath}\${display.product.name}\Nxtool" ?>
 
         <!-- Wix Variables -->
 

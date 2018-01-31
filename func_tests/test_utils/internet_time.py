@@ -5,7 +5,7 @@ import struct
 
 import pytz
 
-from test_utils.host import ProcessError
+from test_utils.os_access import ProcessError
 from test_utils.utils import wait_until, RunningTime
 
 RFC868_SERVER_ADDRESS = 'time.rfc868server.com'
@@ -27,7 +27,7 @@ class TimeProtocolRestriction(object):
         self.server = server
 
     def _run_iptables_command(self, iptables_rule_command):
-        self.server.host.run_command([
+        self.server.os_access.run_command([
             'iptables', iptables_rule_command, 'OUTPUT',
             '--protocol', 'tcp', '--dport', '37',
             '--jump', 'REJECT'])
@@ -35,7 +35,7 @@ class TimeProtocolRestriction(object):
     def _can_connect_to_time_server(self):
         command = ['nc', '-w', str(RFC868_SERVER_TIMEOUT_SEC), RFC868_SERVER_ADDRESS, str(RFC868_SERVER_PORT)]
         try:
-            self.server.host.run_command(command)
+            self.server.os_access.run_command(command)
         except ProcessError as e:
             assert e.returncode == 1, "Unexpected return code when checking connection to internet time server."
             return False

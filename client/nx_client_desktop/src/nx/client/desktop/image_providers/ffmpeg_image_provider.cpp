@@ -102,6 +102,7 @@ void FfmpegImageProvider::doLoadAsync()
         {
             emit imageChanged(d->image);
             emit sizeHintChanged(sizeHint());
+            emit statusChanged(d->status);
         }, this);
 }
 

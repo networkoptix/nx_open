@@ -6,7 +6,6 @@
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/mediator_connector.h>
-#include <nx/network/socket_global.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/sync_queue.h>

@@ -7,7 +7,7 @@
 #include <utils/common/synctime.h>
 
 static const std::chrono::milliseconds kMaxServerTimeDifference(50);
-static const std::chrono::milliseconds kSteadyExpirationPeriod(200);
+static const std::chrono::milliseconds kSteadyExpirationPeriod(300);
 
 struct TimeBasedNonceProviderTest: ::testing::Test
 {
@@ -34,7 +34,7 @@ struct TimeBasedNonceProviderTest: ::testing::Test
     void testNonceExpiration(const QByteArray& nonce)
     {
         ASSERT_TRUE(nonceProvider.isNonceValid(nonce));
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < 2; ++i)
         {
             std::this_thread::sleep_for(kSteadyExpirationPeriod / 2);
             ASSERT_TRUE(nonceProvider.isNonceValid(nonce));

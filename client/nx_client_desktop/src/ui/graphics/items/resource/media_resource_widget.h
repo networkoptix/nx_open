@@ -173,6 +173,8 @@ public:
     void setAnalyticsEnabled(bool analyticsEnabled);
 
     void setAnalyticsSearchModeEnabled(bool enabled);
+    QRectF analyticsSearchRect() const;
+    void setAnalyticsSearchRect(const QRectF& value);
 
     nx::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider() const;
 

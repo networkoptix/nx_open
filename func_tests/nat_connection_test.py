@@ -20,32 +20,32 @@ def nat_schema(request):
 
 
 @pytest.fixture
-def env(box, server_factory, http_schema, nat_schema):
+def env(vm_factory, server_factory, http_schema, nat_schema):
     if nat_schema == 'direct':
         env_factory = direct_env
     elif nat_schema == 'nat':
         env_factory = nat_env
     else:
         assert False, "nat_schema must be either 'direct' or 'nat'"
-    return env_factory(box, server_factory, http_schema)
+    return env_factory(vm_factory, server_factory, http_schema)
 
-def direct_env(box, server_factory, http_schema):
+def direct_env(vm_factory, server_factory, http_schema):
     in_front = server_factory('in_front', http_schema=http_schema)
     behind = server_factory('behind', http_schema=http_schema)
     behind.merge([in_front])
     return SimpleNamespace(in_front=in_front, behind=behind)
 
-def nat_env(box, server_factory, http_schema):
+def nat_env(vm_factory, server_factory, http_schema):
     in_front_net    = '10.10.1/24'
     in_front_net_gw = '10.10.1.1/24'
     behind_net      = '10.10.2/24'
     behind_net_gw   = '10.10.2.1/24'
-    router = box('router', ip_address_list=[in_front_net_gw, behind_net_gw],
-                 install_server=False, provision_scripts=['box-provision-nat-router.sh'])
-    behind_box = box('behind', ip_address_list=[behind_net], provision_scripts=['box-provision-nat-behind.sh'])
-    in_front_box = box('in-front', ip_address_list=[in_front_net])
-    in_front = server_factory('in_front', box=in_front_box, http_schema=http_schema)
-    behind = server_factory('behind', box=behind_box, http_schema=http_schema)
+    router = vm_factory('router', ip_address_list=[in_front_net_gw, behind_net_gw],
+                        provision_scripts=['vm-provision-nat-router.sh'])
+    behind_vm = vm_factory('behind', ip_address_list=[behind_net], provision_scripts=['vm-provision-nat-behind.sh'])
+    in_front_vm = vm_factory('in-front', ip_address_list=[in_front_net])
+    in_front = server_factory('in_front', vm=in_front_vm, http_schema=http_schema)
+    behind = server_factory('behind', vm=behind_vm, http_schema=http_schema)
     # behind must initiate merge, it can reach sever in_front, but not vise-versa
     behind.merge([in_front])
     return SimpleNamespace(in_front=in_front, behind=behind)

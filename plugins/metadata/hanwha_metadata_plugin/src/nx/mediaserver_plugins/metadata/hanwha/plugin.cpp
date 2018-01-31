@@ -177,7 +177,7 @@ boost::optional<QList<QnUuid>> Plugin::fetchSupportedEvents(
 
     auto sharedRes = sharedResources(resourceInfo);
 
-    const auto& cgiParameters = sharedRes->sharedContext->cgiParamiters();
+    const auto& cgiParameters = sharedRes->sharedContext->cgiParameters();
     if (!cgiParameters.diagnostics || !cgiParameters.value.isValid())
         return boost::none;
 

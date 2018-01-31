@@ -30,10 +30,10 @@ class ServerBindInfo(object):
 
 class CloudAccount(object):
 
-    def __init__(self, name, customization, host, user, password):
+    def __init__(self, name, customization, hostname, user, password):
         self.name = name
         self.customization = customization
-        self.host = host
+        self.hostname = hostname
         self.rest_api = RestApi('cloud-host:%s' % name, self.url, username=user, password=password)
 
     def __repr__(self):
@@ -49,7 +49,7 @@ class CloudAccount(object):
 
     @property
     def url(self):
-        return 'http://%s/' % self.host
+        return 'http://%s/' % self.hostname
 
     def ping(self):
         unused_realm = self.rest_api.cdb.ping.GET()
@@ -148,7 +148,7 @@ class CloudAccountFactory(object):
                     cloud_account.register_user(cloud_email.first_name, cloud_email.last_name)
                 else:
                     cloud_account.resend_activation_code()
-                code = imap_connection.fetch_activation_code(cloud_account.host, cloud_email.email, FETCH_ACTIVATION_EMAIL_TIMEOUT)
+                code = imap_connection.fetch_activation_code(cloud_account.os_access, cloud_email.email, FETCH_ACTIVATION_EMAIL_TIMEOUT)
             cloud_account.activate_user(code)
             user_info = cloud_account.get_user_info()
         assert user_info.get('statusCode') == 'activated'

@@ -64,10 +64,6 @@ typedef QnSharedResourcePointer<QnVirtualCameraResource> QnVirtualCameraResource
 typedef QnSharedResourcePointerList<QnVirtualCameraResource> QnVirtualCameraResourceList;
 typedef QSet<QnVirtualCameraResourcePtr> QnVirtualCameraResourceSet;
 
-class QnPhysicalCameraResource;
-typedef QnSharedResourcePointer<QnPhysicalCameraResource> QnPhysicalCameraResourcePtr;
-typedef QnSharedResourcePointerList<QnPhysicalCameraResource> QnPhysicalCameraResourceList;
-
 class QnDesktopCameraResource;
 typedef QnSharedResourcePointer<QnDesktopCameraResource> QnDesktopCameraResourcePtr;
 typedef QnSharedResourcePointerList<QnDesktopCameraResource> QnDesktopCameraResourceList;

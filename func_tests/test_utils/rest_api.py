@@ -196,7 +196,7 @@ class RestApi(object):
                 method, self._root_url + path,
                 auth=self._auth,
                 timeout=(timeout or self._default_timeout).total_seconds(),
-                verify=self.ca_cert, **kwargs)
+                verify=str(self.ca_cert), **kwargs)
         except requests.ConnectionError as e:
             if not new_connection:
                 log.error("Try new connection after %r.", e)

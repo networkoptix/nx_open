@@ -2209,6 +2209,53 @@
                     }
                 }
             }
+        },
+        {
+            "keys":[
+            "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28"
+            ],
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 1,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 4,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [3]
+                        }
+                    ]
+                }
+            ],
+            "doNotConfigureCamera": false,
+            "ignoreMultisensors": true,
+            "shouldAppearAsSingleChannel": true,
+            "videoLayout": "width=2;height=2;sensors=0,1,2,3"
         }      
     ]
 }

@@ -20,6 +20,7 @@
 class QnResourceTreeModelCustomColumnDelegate;
 class QnResourceTreeModelNodeManager;
 class QnResourceTreeModelLayoutNodeManager;
+namespace nx { namespace client { namespace desktop { struct WearableState; } } }
 
 class QnResourceTreeModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware
 {
@@ -124,6 +125,8 @@ private slots:
     void at_systemNameChanged();
 
     void at_autoDiscoveryEnabledChanged();
+
+    void at_wearableManager_stateChanged(const nx::client::desktop::WearableState& state);
 
 private:
     friend class QnResourceTreeModelNode;

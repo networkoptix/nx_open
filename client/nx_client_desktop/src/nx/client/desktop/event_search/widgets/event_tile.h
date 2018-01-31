@@ -34,6 +34,7 @@ class EventTile: public Customized<QWidget>
     Q_PROPERTY(bool progressBarVisible READ progressBarVisible WRITE setProgressBarVisible)
     Q_PROPERTY(QString progressTitle READ progressTitle WRITE setProgressTitle)
     Q_PROPERTY(qreal progressValue READ progressValue WRITE setProgressValue)
+    Q_PROPERTY(bool isRead READ isRead WRITE setRead)
 
     using base_type = Customized<QWidget>;
 
@@ -59,6 +60,9 @@ public:
 
     QString description() const;
     void setDescription(const QString& value);
+
+    QString footerText() const;
+    void setFooterText(const QString& value);
 
     QString timestamp() const;
     void setTimestamp(const QString& value);
@@ -93,6 +97,18 @@ public:
     QString progressTitle() const;
     void setProgressTitle(const QString& value);
 
+    bool isRead() const;
+    void setRead(bool value);
+
+    enum class Mode
+    {
+        standard,
+        wide
+    };
+
+    Mode mode() const;
+    void setMode(Mode value);
+
 signals:
     void clicked();
 
@@ -117,6 +133,7 @@ private:
     QnElidedLabel* const m_progressLabel = nullptr;
     QTimer* m_autoCloseTimer = nullptr;
     qreal m_progressValue = 0.0;
+    bool m_isRead = false;
 };
 
 } // namespace desktop

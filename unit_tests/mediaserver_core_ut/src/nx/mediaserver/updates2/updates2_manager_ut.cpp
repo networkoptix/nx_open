@@ -1,5 +1,3 @@
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/mediaserver/updates2/updates2_manager.h>
 #include <utils/common/synctime.h>
@@ -8,6 +6,9 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/mediaserver/updates2/detail/update_request_data_factory.h>
 #include <nx/update/info/abstract_update_registry.h>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <thread>
 
 namespace nx {
 namespace mediaserver {
@@ -89,6 +90,7 @@ public:
         QnMutexLocker lock(&m_mutex);
         while (!m_remoteUpdateFinished)
             m_remoteUpdateCondition.wait(lock.mutex());
+        m_remoteUpdateFinished = false;
     }
 
     void waitForDownloadFinished()
@@ -109,6 +111,13 @@ public:
         return m_fileWrittenData;
     }
 
+    void setNeedToWaitForgetRemoteRegistry(bool value)
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_getRemoteRegistryFinished = !value;
+        m_getRemoteRegistryCondition.wakeOne();
+    }
+
     MOCK_METHOD0(refreshTimeout, qint64());
     MOCK_METHOD0(loadStatusFromFile, void());
     MOCK_METHOD0(connectToSignals, void());
@@ -120,6 +129,10 @@ public:
 
     virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() override
     {
+        QnMutexLocker lock(&m_mutex);
+        while (!m_getRemoteRegistryFinished)
+            m_getRemoteRegistryCondition.wait(lock.mutex());
+
         return m_remoteRegistryFactoryFunc();
     }
 
@@ -156,6 +169,8 @@ private:
     bool m_remoteUpdateFinished = false;
     bool m_downloadFinished = false;
     detail::Updates2StatusDataEx m_fileWrittenData;
+    QnWaitCondition m_getRemoteRegistryCondition;
+    bool m_getRemoteRegistryFinished = true;
 };
 
 using namespace ::testing;
@@ -180,7 +195,10 @@ protected:
     {
         success_fileNotExists,
         success_fileAlreadyExists,
-        fail,
+        success_fileAlreadyDownloaded,
+        fail_addFileFailed,
+        fail_downloadFailed,
+        fail_wrongState,
     };
 
     virtual void SetUp() override
@@ -223,19 +241,20 @@ protected:
         m_testUpdates2Manager.setRemoteRegistryFactoryFunc(remoteRegistryFactoryFunc);
     }
 
-    void givenAvailableUpdate()
+    void givenAvailableRemoteUpdate()
     {
         const auto newVersion = QnSoftwareVersion("1.0.0.2");
         givenFileState(api::Updates2StatusData::StatusCode::notAvailable);
         givenGlobalRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
         givenRemoteRegistryFactoryFunc(
             [this, &newVersion]()
-        {
-            return createUpdateRegistry(
-                /*version*/ &newVersion,
-                /*hasUpdate*/ true,
-                /*expectToByteArrayWillBeCalled*/ true);
-        });
+            {
+                return createUpdateRegistry(
+                    /*version*/ &newVersion,
+                    /*hasUpdate*/ true,
+                    /*expectFindUpdateFileWillBeCalled*/ true,
+                    /*expectToByteArrayWillBeCalled*/ true);
+            });
         expectingUpdateGlobalRegistryWillBeCalled();
         whenServerStarted();
         whenRemoteUpdateDone();
@@ -249,6 +268,12 @@ protected:
         ASSERT_EQ(state, m_testUpdates2Manager.status().state);
         ASSERT_TRUE(m_testUpdates2Manager.status().message.toLower().contains(message));
         expectingStateWrittenToFile(state);
+    }
+
+    void thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode state)
+    {
+        while (m_testUpdates2Manager.status().state != state)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 
     void whenServerStarted()
@@ -265,22 +290,32 @@ protected:
         m_testUpdates2Manager.atServerStart();
     }
 
+    void whenNeedToWaitForRemoteRegistryCompletion()
+    {
+        m_testUpdates2Manager.setNeedToWaitForgetRemoteRegistry(true);
+    }
+
     void whenRemoteUpdateDone()
     {
+        m_testUpdates2Manager.setNeedToWaitForgetRemoteRegistry(false);
         m_testUpdates2Manager.waitForRemoteUpdate();
     }
 
     void whenDownloadRequestIssued(DownloadExpectedOutcome expectedOutcome)
     {
-        EXPECT_CALL(m_testUpdates2Manager, downloader())
-            .Times(AtLeast(1))
-            .WillRepeatedly(Return((downloader::AbstractDownloader*)&m_testDownloader));
         prepareDownloadExpectations(expectedOutcome);
         m_testUpdates2Manager.download();
     }
 
     void prepareDownloadExpectations(DownloadExpectedOutcome expectedOutcome)
     {
+        if (expectedOutcome != DownloadExpectedOutcome::fail_wrongState)
+        {
+            EXPECT_CALL(m_testUpdates2Manager, downloader())
+                .Times(AtLeast(1))
+                .WillRepeatedly(Return((downloader::AbstractDownloader*)&m_testDownloader));
+        }
+
         downloader::FileInformation requestFileInformation(kFileName);
         requestFileInformation.url = kFileUrl;
         requestFileInformation.md5 = kFileMd5;
@@ -300,15 +335,21 @@ protected:
                     .Times(1).WillOnce(Return(responseFileInformation));
                 break;
             }
-            case DownloadExpectedOutcome::fail:
+            case DownloadExpectedOutcome::fail_downloadFailed:
                 EXPECT_CALL(m_testDownloader, addFile(requestFileInformation))
                     .Times(1).WillOnce(Return(downloader::ResultCode::ok));
                 EXPECT_CALL(m_testDownloader, deleteFile(kFileName, _))
                     .Times(1).WillOnce(Return(downloader::ResultCode::ok));
                 break;
+            case DownloadExpectedOutcome::fail_addFileFailed:
+                EXPECT_CALL(m_testDownloader, addFile(requestFileInformation))
+                    .Times(1).WillOnce(Return(downloader::ResultCode::ioError));
+                break;
             case DownloadExpectedOutcome::success_fileAlreadyExists:
                 EXPECT_CALL(m_testDownloader, addFile(requestFileInformation))
                     .Times(1).WillOnce(Return(downloader::ResultCode::fileAlreadyExists));
+                break;
+            case DownloadExpectedOutcome::fail_wrongState:
                 break;
         }
     }
@@ -322,6 +363,7 @@ protected:
     update::info::AbstractUpdateRegistryPtr createUpdateRegistry(
         const QnSoftwareVersion* version,
         bool hasUpdate,
+        bool expectFindUpdateFileWillBeCalled,
         bool expectToByteArrayWillBeCalled)
     {
         auto updateRegistry = std::make_unique<TestUpdateRegistry>();
@@ -335,11 +377,14 @@ protected:
                 .WillRepeatedly(
                     DoAll(SetArgPointee<1>(*version), Return(update::info::ResultCode::ok)));
 
-            update::info::FileData fileData(kFileName, kFileUrl, kFileSize, kFileMd5);
-            EXPECT_CALL(*updateRegistry, findUpdateFile(_, NotNull()))
-                .Times(AtLeast(1))
-                .WillRepeatedly(
-                    DoAll(SetArgPointee<1>(fileData), Return(update::info::ResultCode::ok)));
+            if (expectFindUpdateFileWillBeCalled)
+            {
+                update::info::FileData fileData(kFileName, kFileUrl, kFileSize, kFileMd5);
+                EXPECT_CALL(*updateRegistry, findUpdateFile(_, NotNull()))
+                    .Times(AtLeast(1))
+                    .WillRepeatedly(
+                        DoAll(SetArgPointee<1>(fileData), Return(update::info::ResultCode::ok)));
+            }
         }
         else
         {
@@ -412,6 +457,7 @@ TEST_F(Updates2Manager, FoundGlobalUpdateRegistry_noNewVersion)
             return createUpdateRegistry(
                 /*version*/ nullptr,
                 /*hasUpdate*/ false,
+                /*expectFindUpdateFileWillBeCalled*/ true,
                 /*expectToByteArrayWillBeCalled*/ false);
         });
     givenRemoteRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
@@ -430,6 +476,7 @@ TEST_F(Updates2Manager, FoundGlobalUpdateRegistry_newVersion)
             return createUpdateRegistry(
                 &newVersion,
                 /*hasUpdate*/ true,
+                /*expectFindUpdateFileWillBeCalled*/ true,
                 /*expectToByteArrayWillBeCalled*/ false);
         });
     givenRemoteRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
@@ -449,6 +496,7 @@ TEST_F(Updates2Manager, FoundRemoteUpdateRegistry_noNewVersion)
             return createUpdateRegistry(
                 /*version*/ nullptr,
                 /*hasUpdate*/ false,
+                /*expectFindUpdateFileWillBeCalled*/ true,
                 /*expectToByteArrayWillBeCalled*/ true);
         });
     expectingUpdateGlobalRegistryWillBeCalled();
@@ -468,40 +516,135 @@ TEST_F(Updates2Manager, FoundRemoteUpdateRegistry_newVersion)
             return createUpdateRegistry(
                 /*version*/ &newVersion,
                 /*hasUpdate*/ true,
+                /*expectFindUpdateFileWillBeCalled*/ true,
                 /*expectToByteArrayWillBeCalled*/ true);
         });
     expectingUpdateGlobalRegistryWillBeCalled();
+
     whenServerStarted();
     whenRemoteUpdateDone();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
 }
 
+TEST_F(Updates2Manager, StatusWhileCheckingForUpdate)
+{
+    const auto newVersion = QnSoftwareVersion("1.0.0.2");
+    givenFileState(api::Updates2StatusData::StatusCode::notAvailable);
+    givenGlobalRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
+    givenRemoteRegistryFactoryFunc(
+        [this, &newVersion]()
+    {
+        return createUpdateRegistry(
+            /*version*/ &newVersion,
+            /*hasUpdate*/ true,
+            /*expectFindUpdateFileWillBeCalled*/ true,
+            /*expectToByteArrayWillBeCalled*/ true);
+    });
+    whenNeedToWaitForRemoteRegistryCompletion();
+    expectingUpdateGlobalRegistryWillBeCalled();
+    whenServerStarted();
+    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::checking);
+    whenRemoteUpdateDone();
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
+
+    // #TODO: #akulikov implement
+}
+
 TEST_F(Updates2Manager, Download_successful)
 {
-    givenAvailableUpdate();
+    givenAvailableRemoteUpdate();
     whenDownloadRequestIssued(DownloadExpectedOutcome::success_fileNotExists);
     whenDownloadFinishedSuccessfully();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
 }
 
-TEST_F(Updates2Manager, Download_wrongState)
+TEST_F(Updates2Manager, Download_addFile_fail)
 {
+    givenAvailableRemoteUpdate();
+    whenDownloadRequestIssued(DownloadExpectedOutcome::fail_addFileFailed);
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::error);
 
+    // now update registry with a new version should already be in global settings
+    const auto newVersion = QnSoftwareVersion("1.0.0.2");
+    givenGlobalRegistryFactoryFunc(
+        [this, &newVersion]()
+        {
+            return createUpdateRegistry(
+                &newVersion,
+                /*hasUpdate*/ true,
+                /*expectFindUpdateFileWillBeCalled*/ false,
+                /*expectToByteArrayWillBeCalled*/ false);
+        });
+
+    givenRemoteRegistryFactoryFunc(
+        [this, &newVersion]()
+        {
+            return createUpdateRegistry(
+                /*version*/ &newVersion,
+                /*hasUpdate*/ true,
+                /*expectFindUpdateFileWillBeCalled*/ false,
+                /*expectToByteArrayWillBeCalled*/ false);
+        });
+
+    whenRemoteUpdateDone();
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
+}
+
+TEST_F(Updates2Manager, Download_notAvailableState_failedToGetUpdateInfo)
+{
+    givenFileState(api::Updates2StatusData::StatusCode::notAvailable);
+    givenGlobalRegistryFactoryFunc(
+        [this]()
+        {
+            return createUpdateRegistry(
+                /*version*/ nullptr,
+                /*hasUpdate*/ false,
+                /*expectFindUpdateFileWillBeCalled*/ true,
+                /*expectToByteArrayWillBeCalled*/ false);
+        });
+    givenRemoteRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
+    whenServerStarted();
+    whenRemoteUpdateDone();
+    whenDownloadRequestIssued(DownloadExpectedOutcome::fail_wrongState);
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::notAvailable);
+}
+
+TEST_F(Updates2Manager, Download_notAvailableState_GotUpdateInfo_noNewVersions)
+{
+    givenFileState(api::Updates2StatusData::StatusCode::notAvailable);
+    givenGlobalRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
+    givenRemoteRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
+    whenServerStarted();
+    whenRemoteUpdateDone();
+    whenDownloadRequestIssued(DownloadExpectedOutcome::fail_wrongState);
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::error);
+}
+
+TEST_F(Updates2Manager, Download_alreadyDownloadingState)
+{
+    givenAvailableRemoteUpdate();
+    whenDownloadRequestIssued(DownloadExpectedOutcome::success_fileNotExists);
+
+    whenDownloadRequestIssued(DownloadExpectedOutcome::fail_wrongState);
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::downloading);
+
+    whenDownloadFinishedSuccessfully();
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
 }
 
 TEST_F(Updates2Manager, Download_failed)
 {
-
+    // #TODO: #akulikov implement
 }
 
 TEST_F(Updates2Manager, Download_chunkFailedAndRecovered)
 {
-
+    // #TODO: #akulikov implement
 }
 
 TEST_F(Updates2Manager, Download_addAlreadyExistingFile)
 {
-
+    // #TODO: #akulikov implement
 }
 
 } // namespace test

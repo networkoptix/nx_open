@@ -1,22 +1,16 @@
 import argparse
 import datetime
 import logging
-import os.path
 import re
 
 import yaml
+from pathlib2 import Path
 
 from .server_physical_host import PhysicalInstallationHostConfig
 from .utils import SimpleNamespace
 
 log = logging.getLogger(__name__)
 
-
-def expand_path(path):
-    path = os.path.expandvars(path)
-    path = os.path.expanduser(path)
-    path = os.path.abspath(path)
-    return path
 
 TIMEDELTA_REGEXP = re.compile(r'^((?P<days>\d+?)d)?((?P<hours>\d+?)h)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?$')
 
@@ -74,10 +68,10 @@ class TestsConfig(object):
 
     @classmethod
     def from_yaml_file(cls, file_path):
-        full_path = expand_path(file_path)
-        if not os.path.isfile(full_path):
+        full_path = Path(file_path).expanduser()  # Accepts option value.
+        if not full_path.exists():
             raise argparse.ArgumentTypeError('file does not exist: %s' % full_path)
-        with open(full_path) as f:
+        with full_path.open() as f:
             d = yaml.load(f)
         return cls.from_dict(d)
 
@@ -114,8 +108,8 @@ class TestsConfig(object):
         self.physical_installation_host_list += other.physical_installation_host_list
 
     def get_test_config(self, full_node_id):
-        module_path, test_name = full_node_id.split('::')
-        module_name = os.path.splitext(os.path.basename(module_path))[0]
+        module_path_as_str, test_name = full_node_id.split('::')
+        module_name = Path(module_path_as_str).stem
         node_id = module_name + '::' + test_name
         while node_id:
             config = self.tests.get(node_id)

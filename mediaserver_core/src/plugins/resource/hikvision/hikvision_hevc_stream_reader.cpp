@@ -8,6 +8,7 @@
 
 #include <nx/network/http/http_client.h>
 #include <plugins/resource/hikvision/hikvision_resource.h>
+#include <utils/media/av_codec_helper.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -31,7 +32,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
         return result;
 
     auto role = getRole();
-    if (role == Qn::CR_LiveVideo && 
+    if (role == Qn::CR_LiveVideo &&
         !m_hikvisionResource->getPtzConfigurationToken().isEmpty() &&
         m_hikvisionResource->getPtzProfileToken().isEmpty())
     {
@@ -57,15 +58,15 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
     }
 
     auto channelCapabilities = optionalChannelCapabilities.get();
-    auto resolution = chooseResolution(channelCapabilities, m_hikvisionResource->getPrimaryResolution());
-    auto codec = chooseCodec(channelCapabilities);
+    auto resolutionList = m_hikvisionResource->primaryVideoCapabilities().resolutions;
+    auto resolution = chooseResolution(channelCapabilities, liveStreamParameters.resolution);
+    auto codec = chooseCodec(
+        channelCapabilities,
+        QnAvCodecHelper::codecIdFromString(liveStreamParameters.codec));
     auto fps = chooseFps(channelCapabilities, liveStreamParameters.fps);
 
     boost::optional<int> quality = boost::none;
-    if (getRole() == Qn::ConnectionRole::CR_LiveVideo)
-        quality = chooseQuality(liveStreamParameters.quality, channelCapabilities);
-    else
-        quality = chooseQuality(liveStreamParameters.secondaryQuality, channelCapabilities);
+    quality = chooseQuality(liveStreamParameters.quality, channelCapabilities);
 
     result = configureChannel(resolution, codec, fps, quality);
     if (!result)
@@ -109,18 +110,18 @@ QSize HikvisionHevcStreamReader::chooseResolution(
     if (getRole() == Qn::ConnectionRole::CR_LiveVideo)
         return primaryResolution;
 
-    const int maxArea = SECONDARY_STREAM_MAX_RESOLUTION.width() 
+    const int maxArea = SECONDARY_STREAM_MAX_RESOLUTION.width()
         * SECONDARY_STREAM_MAX_RESOLUTION.height();
 
-    auto secondaryResolution = QnPhysicalCameraResource::getNearestResolution(
+    auto secondaryResolution = nx::mediaserver::resource::Camera::getNearestResolution(
         SECONDARY_STREAM_DEFAULT_RESOLUTION,
-        QnPhysicalCameraResource::getResolutionAspectRatio(primaryResolution),
+        nx::mediaserver::resource::Camera::getResolutionAspectRatio(primaryResolution),
         maxArea,
         QList<QSize>::fromVector(QVector<QSize>::fromStdVector(resolutions)));
 
     if (secondaryResolution.isEmpty())
     {
-        secondaryResolution = QnPhysicalCameraResource::getNearestResolution(
+        secondaryResolution = nx::mediaserver::resource::Camera::getNearestResolution(
             SECONDARY_STREAM_DEFAULT_RESOLUTION,
             0.0,
             maxArea,
@@ -130,19 +131,36 @@ QSize HikvisionHevcStreamReader::chooseResolution(
     return secondaryResolution;
 }
 
-QString HikvisionHevcStreamReader::chooseCodec(
-    const ChannelCapabilities& channelCapabilities) const
+QString codecToHikvisionString(AVCodecID codec)
 {
-    // TODO: #dmishin use constants instead of literals 
-    if (codecSupported(AV_CODEC_ID_HEVC, channelCapabilities))
+    switch (codec)
+    {
+    case AV_CODEC_ID_HEVC:
         return lit("H.265");
-    else if (codecSupported(AV_CODEC_ID_H264, channelCapabilities))
+    case AV_CODEC_ID_H264:
         return lit("H.264");
-    else if (codecSupported(AV_CODEC_ID_MJPEG, channelCapabilities))
+    case AV_CODEC_ID_MJPEG:
         return lit("MJPEG");
+    default:
+        NX_ASSERT(0, "Unsupported codec");
+        return QString();
+    }
+}
+
+QString HikvisionHevcStreamReader::chooseCodec(
+    const ChannelCapabilities& channelCapabilities,
+    AVCodecID codec) const
+{
+    if (codecSupported(codec, channelCapabilities))
+        return codecToHikvisionString(codec);
+    else if (codecSupported(AV_CODEC_ID_HEVC, channelCapabilities))
+        return codecToHikvisionString(AV_CODEC_ID_HEVC);
+    else if (codecSupported(AV_CODEC_ID_H264, channelCapabilities))
+        return codecToHikvisionString(AV_CODEC_ID_H264);
+    else if (codecSupported(AV_CODEC_ID_MJPEG, channelCapabilities))
+        return codecToHikvisionString(AV_CODEC_ID_MJPEG);
 
     return QString();
-
 }
 
 int HikvisionHevcStreamReader::chooseFps(
@@ -179,20 +197,6 @@ boost::optional<int> HikvisionHevcStreamReader::chooseQuality(
         (int)quality);
 }
 
-boost::optional<int> HikvisionHevcStreamReader::chooseQuality(
-    Qn::SecondStreamQuality quality,
-    const ChannelCapabilities& channelCapabilities) const
-{
-    const int kSecondStreamQualityCount = 3;
-    if (quality > Qn::SecondStreamQuality::SSQualityHigh)
-        return boost::none;
-
-    return rescaleQuality(
-        channelCapabilities.quality,
-        kSecondStreamQualityCount,
-        (int)quality);
-}
-
 boost::optional<int> HikvisionHevcStreamReader::rescaleQuality(
     const std::vector<int>& outputQuality,
     int inputScaleSize,
@@ -211,7 +215,7 @@ boost::optional<int> HikvisionHevcStreamReader::rescaleQuality(
     auto inputScale = (double)inputScaleSize / (inputQualityIndex + 1);
     auto outputIndex = qRound(outputQuality.size() / inputScale) - 1;
 
-    bool indexIsCorrect = outputIndex < outputQuality.size() && outputIndex >= 0; 
+    bool indexIsCorrect = outputIndex < outputQuality.size() && outputIndex >= 0;
     NX_ASSERT(indexIsCorrect, lit("Wrong Hikvision quality index."));
     if (!indexIsCorrect)
         return boost::none;
@@ -272,7 +276,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
 
     QDomDocument videoChannelConfiguration;
     videoChannelConfiguration.setContent(responseBuffer);
-    
+
     result = updateVideoChannelConfiguration(
         &videoChannelConfiguration,
         resolution,

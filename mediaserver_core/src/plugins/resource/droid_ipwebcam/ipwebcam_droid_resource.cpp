@@ -21,6 +21,18 @@ void QnPlDriodIpWebCamResource::setIframeDistance(int /*frames*/, int /*timems*/
 
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnPlDriodIpWebCamResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex /*streamIndex*/)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
+CameraDiagnostics::Result QnPlDriodIpWebCamResource::initializeCameraDriver()
+{
+    return CameraDiagnostics::NoErrorResult();
+}
+
 QnAbstractStreamDataProvider* QnPlDriodIpWebCamResource::createLiveDataProvider()
 {
     return new QnPlDroidIpWebCamReader(toSharedPointer());

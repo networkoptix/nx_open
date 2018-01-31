@@ -1,13 +1,10 @@
-#ifndef droid_resource_h_18_04
-#define droid_resource_h_18_04
+#pragma once
 
 #ifdef ENABLE_DROID
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
+#include <nx/mediaserver/resource/camera.h>
 
-
-class QnDroidResource : public QnPhysicalCameraResource
+class QnDroidResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
@@ -16,20 +13,21 @@ public:
 
     QnDroidResource();
 
-    virtual int getMaxFps() const override; 
+    virtual int getMaxFps() const override;
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
 
 
     virtual QString getHostAddress() const override;
     virtual void setHostAddress(const QString &ip) override;
-protected:
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
-private:
+protected:
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 };
 
 typedef QnSharedResourcePointer<QnDroidResource> QnDroidResourcePtr;
 
 #endif // #ifdef ENABLE_DROID
-#endif //droid_resource_h_18_04
