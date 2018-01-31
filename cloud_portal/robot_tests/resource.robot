@@ -73,8 +73,8 @@ Get Activation Link
     Return From Keyword    @{links}[1]
 
 Select Auto Tests System
-    Wait Until Element Is Visible    ${AUTO TESTS}
     Wait Until Element Is Enabled    ${AUTO TESTS}
+    Wait Until Element Is Visible    ${AUTO TESTS}
     Click Element    ${AUTO TESTS}
 
 Edit User Permissions In Systems

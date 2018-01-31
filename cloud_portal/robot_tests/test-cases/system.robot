@@ -10,9 +10,8 @@ ${url}         ${CLOUD TEST}
 *** Keywords ***
 Log in to Auto Tests System
     [arguments]    ${email}
-    Log In    ${email}    ${password}
-    Validate Log In
-    Select Auto Tests System
+    Go To    ${url}/systems/${AUTO TESTS URL}
+    Log In    ${email}    ${password}    None
 
 *** Test Cases ***
 has system name, owner and OpenInNx button visible on systems page
@@ -106,13 +105,11 @@ does not show Share button to viewer, advanced viewer, live viewer
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
-    Log In    ${EMAIL ADV VIEWER}    ${password}
-    Select Auto Tests System
+    Log in to Auto Tests System    ${EMAIL ADV VIEWER}
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
-    Log In    ${EMAIL LIVE VIEWER}    ${password}
-    Select Auto Tests System
+    Log in to Auto Tests System    ${EMAIL LIVE VIEWER}
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Close Browser
