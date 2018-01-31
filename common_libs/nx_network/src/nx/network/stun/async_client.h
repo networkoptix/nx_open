@@ -27,7 +27,6 @@ class NX_NETWORK_API AsyncClient:
 public:
     using BaseConnectionType = MessagePipeline;
     using ConnectionType = BaseConnectionType;
-    using OnConnectionClosedHandler = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
 
     AsyncClient(Settings timeouts = Settings());
     /**
@@ -47,19 +46,22 @@ public:
 
     virtual bool setIndicationHandler(
         int method, IndicationHandler handler, void* client = nullptr) override;
-    
-    virtual void addOnReconnectedHandler(ReconnectHandler handler, void* client = nullptr) override;
+
+    virtual void addOnReconnectedHandler(
+        ReconnectHandler handler,
+        void* client = nullptr) override;
+    virtual void setOnConnectionClosedHandler(
+        OnConnectionClosedHandler onConnectionClosedHandler) override;
+
     virtual void sendRequest(Message request, RequestHandler handler, void* client = nullptr) override;
     virtual bool addConnectionTimer(
         std::chrono::milliseconds period, TimerHandler handler, void* client) override;
-    
+
     virtual SocketAddress localAddress() const override;
     virtual SocketAddress remoteAddress() const override;
     virtual void closeConnection(SystemError::ErrorCode errorCode) override;
     virtual void cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handler) override;
     virtual void setKeepAliveOptions(KeepAliveOptions options) override;
-
-    void setOnConnectionClosedHandler(OnConnectionClosedHandler onConnectionClosedHandler);
 
 private:
     enum class State

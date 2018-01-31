@@ -37,7 +37,7 @@ TEST_F(StatisticsApi, listening_peer_list)
     bindPromise.get_future().wait();
 
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
-    data::ListeningPeers listeningPeers;
+    api::ListeningPeers listeningPeers;
     std::tie(statusCode, listeningPeers) = getListeningPeers();
     ASSERT_EQ(nx_http::StatusCode::ok, statusCode);
 

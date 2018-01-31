@@ -35,7 +35,6 @@ public:
     virtual ~QnOnvifStreamReader();
     QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
     virtual void pleaseStop() override;
-    virtual bool secondaryResolutionIsLarge() const override;
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
 
     void setMustNotConfigureResource(bool mustNotConfigureResource);
@@ -63,7 +62,7 @@ private:
     //Returned pointers are valid while response object is living. (For all functions in the following block)
     CameraDiagnostics::Result fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired, const QnLiveStreamParams& params) const;
     CameraDiagnostics::Result fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
-    
+
     CameraDiagnostics::Result fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
     Profile* fetchExistingProfile(const ProfilesResp& response, bool isPrimary, CameraInfoParams& info) const;
     CameraDiagnostics::Result sendProfileToCamera(CameraInfoParams& info, Profile* profile) const;
@@ -76,7 +75,6 @@ private:
     void fetchProfile(ProfilesResp& response, ProfilePair& profiles, bool isPrimary) const;
     AudioSource* fetchAudioSource(AudioSrcConfigsResp& response, bool isPrimary) const;
 
-    void updateVideoEncoder(VideoEncoder& encoder, bool isPrimary, const QnLiveStreamParams& params) const;
     void updateAudioEncoder(AudioEncoder& encoder, bool isPrimary) const;
 
     CameraDiagnostics::Result sendProfileToCamera(CameraInfoParams& info, Profile& profile, bool create = false) const;
@@ -100,13 +98,10 @@ private:
     QByteArray NETOPTIX_SECONDARY_NAME;
     QByteArray NETOPTIX_PRIMARY_TOKEN;
     QByteArray NETOPTIX_SECONDARY_TOKEN;
-    onvifXsd__H264Configuration* m_tmpH264Conf;
 
     QString m_streamUrl;
-    int m_cachedFps;
-    Qn::StreamQuality m_cachedQuality;
     QElapsedTimer m_cachedTimer;
-    Qn::StreamQuality m_cachedSecondaryQuality;
+    QnLiveStreamParams m_previousStreamParams;
     bool m_mustNotConfigureResource;
 };
 

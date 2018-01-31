@@ -10,8 +10,8 @@
 #include <nx/network/cloud/data/resolve_domain_data.h>
 #include <nx/network/cloud/data/resolve_peer_data.h>
 #include <nx/network/cloud/data/result_code.h>
+#include <nx/network/cloud/mediator/api/listening_peer.h>
 
-#include "data/listening_peer.h"
 #include "request_processor.h"
 #include "settings.h"
 
@@ -37,7 +37,7 @@ public:
         nx::stun::MessageDispatcher* dispatcher,
         ListeningPeerPool* const listeningPeerPool);
 
-    data::ListeningPeers getListeningPeers() const;
+    api::ListeningPeers getListeningPeers() const;
 
 private:
     void bind(

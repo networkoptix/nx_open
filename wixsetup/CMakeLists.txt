@@ -1,3 +1,7 @@
+option(addQtPdb
+    "Whether add Qt PDB files to debug libs"
+    OFF)
+
 # These variables must be defined first as they are going to config file
 set(project.build.directory "${CMAKE_CURRENT_BINARY_DIR}")
 set(bin_resources "${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources")
@@ -35,7 +39,7 @@ nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
 if (withMediaServer OR withDesktopClient)
     add_custom_target(wixsetup ALL
         DEPENDS
-            customactions
+            wix_custom_actions
         COMMENT "Creating installer..."
         COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
         COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
@@ -65,7 +69,7 @@ if(withNxTool)
     add_custom_target(collect_nxtool_qml_dependencies
         DEPENDS
             nxtool
-            customactions
+            wix_custom_actions
         COMMENT "Collecting NxTool QML libraries..."
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
         COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py

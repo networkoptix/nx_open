@@ -1,40 +1,35 @@
 #include "mediator_connector.h"
 
 #include <nx/network/socket_factory.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-static const std::chrono::milliseconds kRetryIntervalInitial = std::chrono::seconds(1);
-static const std::chrono::milliseconds kRetryIntervalMax = std::chrono::minutes(10);
+#include "mediator/api/mediator_api_http_paths.h"
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-namespace {
-
-static stun::AbstractAsyncClient::Settings s_stunClientSettings;
-
-} // namespace
+namespace { static stun::AbstractAsyncClient::Settings s_stunClientSettings; }
 
 MediatorConnector::MediatorConnector():
-    m_stunClient(std::make_shared<stun::AsyncClientWithHttpTunneling>(s_stunClientSettings)),
-    m_mediatorUrlFetcher(std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>()),
     m_fetchEndpointRetryTimer(
         std::make_unique<nx::network::RetryTimer>(
-            nx::network::RetryPolicy(
-                nx::network::RetryPolicy::kInfiniteRetries,
-                kRetryIntervalInitial,
-                2,
-                kRetryIntervalMax)))
+            s_stunClientSettings.reconnectPolicy))
 {
+    // Reconnect to mediator is handled by this class, not by STUN client.
+    auto stunClientSettings = s_stunClientSettings;
+    stunClientSettings.reconnectPolicy = network::RetryPolicy::kNoRetries;
+    m_stunClient = std::make_shared<stun::AsyncClientWithHttpTunneling>(
+        s_stunClientSettings);
+
     bindToAioThread(getAioThread());
 
-    NX_ASSERT(
-        s_stunClientSettings.reconnectPolicy.maxRetryCount ==
-        network::RetryPolicy::kInfiniteRetries);
+    m_stunClient->setOnConnectionClosedHandler(
+        std::bind(&MediatorConnector::reconnectToMediator, this));
 }
 
 MediatorConnector::~MediatorConnector()
@@ -48,7 +43,8 @@ void MediatorConnector::bindToAioThread(network::aio::AbstractAioThread* aioThre
     network::aio::BasicPollable::bindToAioThread(aioThread);
 
     m_stunClient->bindToAioThread(aioThread);
-    m_mediatorUrlFetcher->bindToAioThread(aioThread);
+    if (m_mediatorUrlFetcher)
+        m_mediatorUrlFetcher->bindToAioThread(aioThread);
     m_fetchEndpointRetryTimer->bindToAioThread(aioThread);
 }
 
@@ -84,8 +80,7 @@ std::unique_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection
 
 void MediatorConnector::mockupCloudModulesXmlUrl(const QUrl& cloudModulesXmlUrl)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_mediatorUrlFetcher->setModulesXmlUrl(cloudModulesXmlUrl);
+    m_cloudModulesXmlUrl = cloudModulesXmlUrl;
 }
 
 void MediatorConnector::mockupMediatorUrl(const QUrl& mediatorUrl)
@@ -105,6 +100,7 @@ void MediatorConnector::mockupMediatorUrl(const QUrl& mediatorUrl)
     NX_DEBUG(this, lm("Mediator address is mocked up: %1").arg(mediatorUrl));
 
     m_mediatorUrl = mediatorUrl;
+    m_mockedUpMediatorUrl = mediatorUrl;
     m_mediatorUdpEndpoint = nx::network::url::getEndpoint(mediatorUrl);
     m_stunClient->connect(mediatorUrl, [](SystemError::ErrorCode) {});
     m_promise->set_value(true);
@@ -164,9 +160,20 @@ void MediatorConnector::stopWhileInAioThread()
 
 void MediatorConnector::fetchEndpoint()
 {
+    if (!m_mediatorUrlFetcher)
+    {
+        m_mediatorUrlFetcher =
+            std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>();
+        m_mediatorUrlFetcher->bindToAioThread(getAioThread());
+        if (m_cloudModulesXmlUrl)
+            m_mediatorUrlFetcher->setModulesXmlUrl(*m_cloudModulesXmlUrl);
+    }
+
     m_mediatorUrlFetcher->get(
         [this](nx_http::StatusCode::Value status, QUrl tcpUrl, QUrl udpUrl)
         {
+            m_mediatorUrlFetcher.reset();
+
             if (status != nx_http::StatusCode::ok)
             {
                 NX_LOGX(lit("Can not fetch mediator address: HTTP %1")
@@ -191,26 +198,58 @@ void MediatorConnector::fetchEndpoint()
 
 void MediatorConnector::connectToMediatorAsync()
 {
-    m_stunClient->connect(
-        *m_mediatorUrl,
-        [this](SystemError::ErrorCode code)
-        {
-            auto setEndpoint =
-                [this]()
-                {
-                    QnMutexLocker lock(&m_mutex);
-                    // NOTE: Assuming that mediator's UDP and TCP interfaces are available on the same IP.
-                    m_mediatorUdpEndpoint->address = m_stunClient->remoteAddress().address;
-                    NX_DEBUG(this, lm("Connected to mediator at %1").arg(m_mediatorUrl));
-                };
+    auto createStunTunnelUrl =
+        nx::network::url::Builder(*m_mediatorUrl)
+            .appendPath(api::kStunOverHttpTunnelPath).toUrl();
 
+    m_stunClient->connect(
+        createStunTunnelUrl,
+        [this, createStunTunnelUrl](SystemError::ErrorCode code)
+        {
             if (code == SystemError::noError)
-                setEndpoint();
+            {
+                m_fetchEndpointRetryTimer->reset();
+                saveMediatorEndpoint();
+                // TODO: ak m_stunClient is expected to invoke "reconnected" handler here.
+            }
+            else
+            {
+                NX_DEBUG(this, lm("Failed to connect to mediator on %1. %2")
+                    .args(createStunTunnelUrl, SystemError::toString(code)));
+                reconnectToMediator();
+            }
 
             if (!isReady(*m_future))
                 m_promise->set_value(code == SystemError::noError);
+        });
+}
 
-            m_stunClient->addOnReconnectedHandler(std::move(setEndpoint));
+void MediatorConnector::saveMediatorEndpoint()
+{
+    QnMutexLocker lock(&m_mutex);
+    // NOTE: Assuming that mediator's UDP and TCP interfaces are available on the same IP.
+    m_mediatorUdpEndpoint->address = m_stunClient->remoteAddress().address;
+    NX_DEBUG(this, lm("Connected to mediator at %1").arg(m_mediatorUrl));
+}
+
+void MediatorConnector::reconnectToMediator()
+{
+    NX_DEBUG(this, lm("Connection to mediator has been broken. Reconnecting..."));
+
+    m_fetchEndpointRetryTimer->scheduleNextTry(
+        [this]()
+        {
+            if (m_mockedUpMediatorUrl)
+            {
+                NX_DEBUG(this, lm("Using mocked up mediator URL %1")
+                    .args(*m_mockedUpMediatorUrl));
+                connectToMediatorAsync();
+            }
+            else
+            {
+                // Fetching mediator URL again.
+                fetchEndpoint();
+            }
         });
 }
 

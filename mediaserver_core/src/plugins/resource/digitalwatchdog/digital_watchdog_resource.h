@@ -29,8 +29,10 @@ public:
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
     CLSimpleHTTPClient httpClient() const;
+
+    void setVideoCodec(Qn::StreamIndex streamIndex, const QString& codec);
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const override;
     virtual void initAdvancedParametersProviders(QnCameraAdvancedParams &params) override;
@@ -40,6 +42,10 @@ protected:
     virtual bool loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) override;
     virtual bool setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value) override;
     virtual bool setAdvancedParametersUnderLock(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result) override;
+
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 private:
     bool isDualStreamingEnabled(bool& unauth);
     void enableOnvifSecondStream();
@@ -47,7 +53,6 @@ private:
     bool disableB2FramesForActiDW();
     bool isCproChipset() const;
     bool useOnvifAdvancedParameterProviders() const;
-    bool loadCproAdvancedParameters(QnCameraAdvancedParams& params) const;
 
 private:
     bool m_hasZoom;

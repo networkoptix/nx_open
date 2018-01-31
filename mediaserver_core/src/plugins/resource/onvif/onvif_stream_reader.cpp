@@ -43,19 +43,14 @@ struct CameraInfoParams
 QnOnvifStreamReader::QnOnvifStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res),
     m_multiCodec(res),
-    m_cachedFps(-1),
-    m_cachedQuality(Qn::QualityNotDefined),
-    m_cachedSecondaryQuality(Qn::QualityNotDefined),
     m_mustNotConfigureResource(false)
 {
     m_onvifRes = getResource().dynamicCast<QnPlOnvifResource>();
-    m_tmpH264Conf = new onvifXsd__H264Configuration();
 }
 
 QnOnvifStreamReader::~QnOnvifStreamReader()
 {
     stop();
-    delete m_tmpH264Conf;
 }
 
 CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
@@ -118,7 +113,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraC
 void QnOnvifStreamReader::setCameraControlDisabled(bool value)
 {
     if (!value)
-        m_cachedQuality = Qn::QualityNotDefined;
+        m_previousStreamParams = QnLiveStreamParams();
     CLServerPushStreamReader::setCameraControlDisabled(value);
 }
 
@@ -126,9 +121,6 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
 {
     //QnMutexLocker lock( m_onvifRes->getStreamConfMutex() );
 
-    int currentFps = params.fps;
-    Qn::StreamQuality currentQuality = params.quality;
-    Qn::StreamQuality secondaryQuality = m_onvifRes->getSecondaryStreamQuality();
 
     if (!m_streamUrl.isEmpty() && !isCameraControlRequired)
     {
@@ -137,9 +129,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     }
 
     if (!m_streamUrl.isEmpty() &&
-        currentFps == m_cachedFps &&
-        currentQuality == m_cachedQuality &&
-        (secondaryQuality == m_cachedSecondaryQuality || getRole() != Qn::CR_SecondaryLiveVideo) &&
+        params == m_previousStreamParams &&
         m_cachedTimer.elapsed() < MAX_CAHCE_URL_TIME)
     {
         *streamUrl = m_streamUrl;
@@ -151,18 +141,14 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     m_onvifRes->customStreamConfiguration(getRole());
     m_onvifRes->afterConfigureStream(getRole());
 
-    if (result.errorCode == CameraDiagnostics::ErrorCode::noError) {
+    if (result.errorCode == CameraDiagnostics::ErrorCode::noError)
+    {
         // cache value
         m_streamUrl = *streamUrl;
-        if (isCameraControlRequired) {
-            m_cachedQuality = currentQuality;
-            m_cachedFps = currentFps;
-            m_cachedTimer.restart();
-            m_cachedSecondaryQuality = secondaryQuality;
-        }
-        else {
-            m_cachedFps = -1;
-        }
+        if (isCameraControlRequired)
+            m_previousStreamParams = params;
+        else
+            m_previousStreamParams = QnLiveStreamParams();
     }
     return result;
 }
@@ -340,88 +326,6 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
     return true;
 }
 
-void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrimary, const QnLiveStreamParams& streamParams) const
-{
-    QnLiveStreamParams params = streamParams;
-    auto resData = qnStaticCommon->dataPool()->data(m_onvifRes);
-    bool useEncodingInterval = resData.value<bool>
-        (Qn::CONTROL_FPS_VIA_ENCODING_INTERVAL_PARAM_NAME);
-
-    encoder.Encoding = m_onvifRes->getCodec(isPrimary) == QnPlOnvifResource::H264? onvifXsd__VideoEncoding__H264: onvifXsd__VideoEncoding__JPEG;
-    //encoder.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
-
-    Qn::StreamQuality quality = params.quality;
-    QSize resolution = isPrimary? m_onvifRes->getPrimaryResolution(): m_onvifRes->getSecondaryResolution();
-
-    if (encoder.Encoding == onvifXsd__VideoEncoding__H264)
-    {
-        if (encoder.H264 == 0)
-            encoder.H264 = m_tmpH264Conf;
-
-        encoder.H264->GovLength = m_onvifRes->getGovLength();
-        int profile = isPrimary? m_onvifRes->getPrimaryH264Profile(): m_onvifRes->getSecondaryH264Profile();
-        if (profile != -1)
-            encoder.H264->H264Profile = onvifXsd__H264Profile(profile);
-        if (encoder.RateControl)
-            encoder.RateControl->EncodingInterval = 1;
-    }
-
-    if (!encoder.RateControl)
-    {
-#ifdef PL_ONVIF_DEBUG
-        qWarning() << "QnOnvifStreamReader::updateVideoEncoderParams: RateControl is NULL. UniqueId: " << m_onvifRes->getUniqueId();
-#endif
-    }
-    else
-    {
-        if (!useEncodingInterval)
-        {
-            encoder.RateControl->FrameRateLimit = params.fps;
-        }
-        else
-        {
-            int fpsBase = resData.value<int>(Qn::FPS_BASE_PARAM_NAME);
-            params.fps = m_onvifRes->getClosestAvailableFps(params.fps);
-            encoder.RateControl->FrameRateLimit = fpsBase;
-            encoder.RateControl->EncodingInterval = static_cast<int>(
-                fpsBase / params.fps + 0.5);
-        }
-
-        encoder.RateControl->BitrateLimit = m_onvifRes
-            ->suggestBitrateKbps(resolution, params, getRole());
-    }
-
-
-    if (quality != Qn::QualityPreSet)
-    {
-        encoder.Quality = m_onvifRes->innerQualityToOnvif(quality);
-    }
-
-    if (!encoder.Resolution)
-    {
-#ifdef PL_ONVIF_DEBUG
-        qWarning() << "QnOnvifStreamReader::updateVideoEncoderParams: Resolution is NULL. UniqueId: " << m_onvifRes->getUniqueId();
-#endif
-    }
-    else
-    {
-
-        if (resolution == EMPTY_RESOLUTION_PAIR)
-        {
-#ifdef PL_ONVIF_DEBUG
-            qWarning() << "QnOnvifStreamReader::updateVideoEncoderParams: : Can't determine (" << (isPrimary? "primary": "secondary")
-                << ") resolution " << "for ONVIF device (UniqueId: " << m_onvifRes->getUniqueId() << "). Default resolution will be used.";
-#endif
-        }
-        else
-        {
-
-            encoder.Resolution->Width = resolution.width();
-            encoder.Resolution->Height = resolution.height();
-        }
-    }
-}
-
 CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper, const QString& profileToken, bool isPrimary, QString* const mediaUrl) const
 {
     Q_UNUSED( isPrimary );
@@ -514,7 +418,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
     if (!isCameraControlRequired || m_mustNotConfigureResource)
         return CameraDiagnostics::NoErrorResult(); // do not update video encoder params
 
-    updateVideoEncoder(*encoderParamsToSet, isPrimary, params);
+    m_onvifRes->updateVideoEncoder(*encoderParamsToSet, isPrimary, params);
 
     int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
     CameraDiagnostics::Result result = CameraDiagnostics::UnknownErrorResult();
@@ -529,26 +433,16 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
 
 VideoEncoder* QnOnvifStreamReader::fetchVideoEncoder(VideoConfigsResp& response, bool isPrimary) const
 {
-    std::vector<VideoEncoder*>::const_iterator iter = response.Configurations.begin();
-    QString id = isPrimary  ? m_onvifRes->getPrimaryVideoEncoderId() : m_onvifRes->getSecondaryVideoEncoderId();
+    QString id = isPrimary  ? m_onvifRes->primaryVideoCapabilities().id : m_onvifRes->secondaryVideoCapabilities().id;
 
-    for (;iter != response.Configurations.end(); ++iter)
+    for (auto itr = response.Configurations.begin(); itr != response.Configurations.end(); ++itr)
     {
-        VideoEncoder* conf = *iter;
-        // TODO: #vasilenko UTF unuse std::string
-        if (conf && id == QString::fromStdString(conf->token)) {
-            /*
-            if (!isPrimary && m_onvifRes->forcePrimaryEncoderCodec())
-            {
-                // get codec list from primary encoder, but use ID of secondary encoder
-                conf->token = m_onvifRes->getSecondaryVideoEncoderId().toStdString();
-            }
-            */
+        VideoEncoder* conf = *itr;
+        if (conf && id == QString::fromStdString(conf->token))
             return conf;
-        }
     }
 
-    return 0;
+    return nullptr;
 }
 
 CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
@@ -724,10 +618,10 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
 
     if (getRole() == Qn::CR_LiveVideo)
     {
-        if(!m_onvifRes->getPtzUrl().isEmpty() && !m_onvifRes->getPtzConfigurationToken().isEmpty()) 
+        if(!m_onvifRes->getPtzUrl().isEmpty() && !m_onvifRes->getPtzConfigurationToken().isEmpty())
         {
             bool ptzMatched = profile && profile->PTZConfiguration;
-            if (!ptzMatched) 
+            if (!ptzMatched)
             {
                 AddPTZConfigReq request;
                 AddPTZConfigResp response;
@@ -736,7 +630,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
                 request.ConfigurationToken = m_onvifRes->getPtzConfigurationToken().toStdString();
 
                 int soapRes = soapWrapper.addPTZConfiguration(request, response);
-                if (soapRes != SOAP_OK) 
+                if (soapRes != SOAP_OK)
                 {
 #ifdef PL_ONVIF_DEBUG
                     qCritical() << "QnOnvifStreamReader::addPTZConfiguration: can't add ptz configuration to profile. Gsoap error: "
@@ -946,11 +840,6 @@ void QnOnvifStreamReader::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
     m_multiCodec.pleaseStop();
-}
-
-bool QnOnvifStreamReader::secondaryResolutionIsLarge() const
-{
-    return m_onvifRes->secondaryResolutionIsLarge();
 }
 
 QnConstResourceVideoLayoutPtr QnOnvifStreamReader::getVideoLayout() const

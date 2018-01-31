@@ -43,7 +43,7 @@ TEST_F(ListeningPeer, connection_override)
     ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen().first);
     ASSERT_EQ(nx::hpm::api::ResultCode::ok, server2->listen().first);
 
-    //TODO #ak checking that server2 connection has overridden server1 
+    //TODO #ak checking that server2 connection has overridden server1
         //since both servers have same server id
 
     auto dataLocker = moduleInstance()->impl()->listeningPeerPool()->
@@ -93,7 +93,7 @@ TEST_F(ListeningPeer, peer_disconnect)
     ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen().first);
 
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
-    data::ListeningPeers listeningPeers;
+    api::ListeningPeers listeningPeers;
     std::tie(statusCode, listeningPeers) = getListeningPeers();
     ASSERT_EQ(nx_http::StatusCode::ok, statusCode);
 

@@ -9,8 +9,6 @@
 
 #include <utils/common/property_storage.h>
 
-#include <client/client_meta_types.h>
-
 #include <nx/utils/singleton.h>
 
 /**

@@ -5,8 +5,6 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/stun/async_client_user.h>
-#include <nx/network/stun/message_dispatcher.h>
-#include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/stun_types.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
@@ -15,6 +13,7 @@
 #include <nx/utils/test_support/sync_queue.h>
 
 #include "stun_async_client_acceptance_tests.h"
+#include "stun_simple_server.h"
 
 namespace nx {
 namespace stun {
@@ -108,7 +107,7 @@ protected:
         m_tcpConnectionToTheServer = std::make_unique<nx::network::TCPSocket>(AF_INET);
         ASSERT_TRUE(m_tcpConnectionToTheServer->connect(m_server->address()));
     }
-    
+
     void givenStunClientWithPredefinedConnection()
     {
         m_stunClient = std::make_shared<nx::stun::AsyncClient>(
@@ -136,7 +135,7 @@ protected:
 
     void verifyClientProcessedConnectionCloseProperly()
     {
-        ASSERT_NE(SystemError::noError, m_connectionClosedPromise.get_future().get());
+        ASSERT_NE(SystemError::noError, m_connectionClosedPromise.pop());
     }
 
     void thenResponseIsReceived()
@@ -185,7 +184,7 @@ private:
     static constexpr int kNumberOfRequestsToSend = 1024;
 
     std::shared_ptr<nx::stun::AsyncClient> m_stunClient;
-    nx::utils::promise<SystemError::ErrorCode> m_connectionClosedPromise;
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_connectionClosedPromise;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_requestResult;
     SocketAddress m_serverEndpoint;
     nx::stun::MessageDispatcher m_dispatcher;
@@ -252,7 +251,7 @@ private:
         m_stunClient->setOnConnectionClosedHandler(
             [this](SystemError::ErrorCode closeReason)
             {
-                m_connectionClosedPromise.set_value(closeReason);
+                m_connectionClosedPromise.push(closeReason);
             });
 
         ASSERT_EQ(SystemError::noError, connectToUrl(serverUrl()));
@@ -395,47 +394,10 @@ TEST_F(StunClientUser, correct_cancellation)
 
 namespace {
 
-class TestServer:
-    public stun::SocketServer
-{
-    using base_type = stun::SocketServer;
-
-public:
-    TestServer():
-        base_type(&m_dispatcher, false)
-    {
-    }
-
-    ~TestServer()
-    {
-        pleaseStopSync();
-    }
-
-    QUrl getServerUrl() const
-    {
-        return nx::network::url::Builder()
-            .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address());
-    }
-
-    nx::stun::MessageDispatcher& dispatcher()
-    {
-        return m_dispatcher;
-    }
-
-    void sendIndicationThroughEveryConnection(nx::stun::Message message)
-    {
-        forEachConnection(
-            nx::network::server::MessageSender<nx::stun::ServerConnection>(std::move(message)));
-    }
-
-private:
-    nx::stun::MessageDispatcher m_dispatcher;
-};
-
 struct AsyncClientTestTypes
 {
     using ClientType = stun::AsyncClient;
-    using ServerType = TestServer;
+    using ServerType = SimpleServer;
 };
 
 } // namespace

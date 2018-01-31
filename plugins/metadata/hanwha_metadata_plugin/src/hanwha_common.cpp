@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_common.h"
 
 #include <nx/fusion/model_functions.h>
@@ -59,5 +57,3 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hanwha::DriverManifest, (json), DriverManifest_
 } // plugins
 } // mediaserver
 } // nx
-
-#endif // defined(ENABLE_HANWHA)

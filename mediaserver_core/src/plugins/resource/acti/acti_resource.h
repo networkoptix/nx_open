@@ -1,34 +1,30 @@
-#ifndef __ACTI_RESOURCE_H__
-#define __ACTI_RESOURCE_H__
+#pragma once
 
 #ifdef ENABLE_ACTI
+
 #include <QtCore/QFile>
 #include <QtCore/QMap>
-#include <nx/utils/thread/mutex.h>
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
-#include "nx/streaming/media_data_packet.h"
-#include "utils/common/request_param.h"
-#include <nx/utils/timer_manager.h>
+#include <network/multicodec_rtp_reader.h>
+#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/simple_http_client.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/timer_manager.h>
+#include <utils/common/request_param.h>
 #include <utils/xml/camera_advanced_param_reader.h>
-#include <network/multicodec_rtp_reader.h>
-
-
 
 class QnActiPtzController;
 
-class QnActiResource
-:
-    public QnPhysicalCameraResource,
+class QnActiResource:
+    public nx::mediaserver::resource::Camera,
     public nx::utils::TimerEventHandler
 {
     Q_OBJECT
 
 public:
-
     typedef QMap<QString, QString> ActiSystemInfo;
 
     static const QString MANUFACTURE;
@@ -48,10 +44,8 @@ public:
 
     virtual QString getDriverName() const override;
 
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-    virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result) override;
-    virtual bool setParamPhysical(const QString &id, const QString& value) override;
-    virtual bool setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result) override;
+    QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
+    QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
@@ -65,12 +59,10 @@ public:
         \param localAddress If not NULL, filled with local ip address, used to connect to camera
     */
     QByteArray makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status, bool keepAllData = false, QString* const localAddress = NULL) const;
-    QSize getResolution(Qn::ConnectionRole role) const;
     int roundFps(int srcFps, Qn::ConnectionRole role) const;
     int roundBitrate(int srcBitrateKbps) const;
     QString formatBitrateString(int bitrateKbps) const;
 
-    QSet<QString> getAvailableEncoders() const;
     RtpTransport::Value getDesiredTransport() const;
 
     bool isAudioSupported() const;
@@ -111,8 +103,11 @@ public:
 
     virtual bool allowRtspVideoLayout() const override { return false; }
     bool SetupAudioInput();
+
+    static QString toActiEncoderString(const QString& value);
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     //!Implementation of QnSecurityCamResource::startInputPortMonitoringAsync
@@ -126,7 +121,7 @@ private:
     QSize extractResolution(const QByteArray& resolutionStr) const;
     QList<QSize> parseResolutionStr(const QByteArray& resolutions);
     QMap<int, QString> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
-    QString bitrateToDefaultString(int bitrateKbps) const; 
+    QString bitrateToDefaultString(int bitrateKbps) const;
 
     void initialize2WayAudio( const ActiSystemInfo& systemInfo );
     void initializeIO( const ActiSystemInfo& systemInfo );
@@ -166,6 +161,7 @@ private:
 
     boost::optional<QString> tryToGetSystemInfoValue(const ActiSystemInfo& report, const QString& key) const;
 
+    virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
 
 private:
     class TriggerOutputTask
@@ -204,7 +200,7 @@ private:
     };
 
 
-    QSize m_resolution[MAX_STREAMS]; // index 0 for primary, index 1 for secondary
+    QList<QSize> m_resolutionList[MAX_STREAMS];
     QList<int> m_availFps[MAX_STREAMS];
     QMap<int, QString> m_availableBitrates;
     QSet<QString> m_availableEncoders;
@@ -219,12 +215,8 @@ private:
     int m_inputCount;
     bool m_inputMonitored;
     QnMutex m_audioCfgMutex;
-    QnMutex m_physicalParamsMutex;
     boost::optional<bool> m_audioInputOn;
-    QnCameraAdvancedParams m_advancedParameters;
-    QnCameraAdvancedParams m_advancedParametersCache;
-
+    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnActiResource> m_advancedParametersProvider;
 };
 
 #endif // #ifdef ENABLE_ACTI
-#endif // __ACTI_RESOURCE_H__

@@ -37,7 +37,9 @@ public:
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
-    virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
+    virtual const char* capabilitiesManifest(nx::sdk::Error* error) override;
+
+    virtual void freeManifest(const char* data) override;
 
     void setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo);
     void setDeviceManifest(const QByteArray& manifest);

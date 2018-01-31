@@ -14,6 +14,10 @@
 #include <plugins/utils/xml_request_helper.h>
 #include <nx/utils/log/log.h>
 #include <camera/camera_pool.h>
+#include <utils/media/av_codec_helper.h>
+#include "dw_stream_reader.h"
+#include <nx/fusion/model_functions.h>
+#include <plugins/utils/multisensor_data_provider.h>
 
 static const std::chrono::seconds kCproApiCacheTimeout(5);
 
@@ -45,9 +49,9 @@ public:
         return (bool) m_videoConfig;
     }
 
-    boost::optional<QStringList> getSupportedVideoCodecs(bool isPrimary)
+    boost::optional<QStringList> getSupportedVideoCodecs(Qn::StreamIndex streamIndex)
     {
-        auto stream = indexOfStream(isPrimary);
+        auto stream = indexOfStream(streamIndex);
         if (stream == -1)
             return boost::none;
 
@@ -55,7 +59,7 @@ public:
         if (!types)
         {
             NX_DEBUG(this, lm("Unable to find %1 stream capabilities on %2")
-                .args(isPrimary, m_resource->getUrl()));
+                .args(QnLexical::serialized(streamIndex), m_resource->getUrl()));
             return boost::none;
         }
 
@@ -69,7 +73,7 @@ public:
         if (values.isEmpty())
         {
             NX_DEBUG(this, lm("Unable to find %1 stream supported codecs on %2")
-                .args(isPrimary, m_resource->getUrl()));
+                .args(QnLexical::serialized(streamIndex), m_resource->getUrl()));
             return boost::none;
         }
 
@@ -77,9 +81,9 @@ public:
         return values;
     }
 
-    boost::optional<QString> getVideoCodec(bool isPrimary)
+    boost::optional<QString> getVideoCodec(Qn::StreamIndex streamIndex)
     {
-        auto stream = indexOfStream(isPrimary);
+        auto stream = indexOfStream(streamIndex);
         if (stream == -1)
             return boost::none;
 
@@ -87,16 +91,16 @@ public:
         if (!type)
         {
             NX_DEBUG(this, lm("Unable to find %1 stream codec on %2")
-                .args(isPrimary, m_resource->getUrl()));
+                .args(QnLexical::serialized(streamIndex), m_resource->getUrl()));
             return boost::none;
         }
 
         return QString::fromUtf8(m_videoConfig->mid(type->first, type->second));
     }
 
-    bool setVideoCodec(bool isPrimary, const QString& value)
+    bool setVideoCodec(Qn::StreamIndex streamIndex, const QString& value)
     {
-        auto stream = indexOfStream(isPrimary);
+        auto stream = indexOfStream(streamIndex);
         if (stream == -1)
             return false;
 
@@ -104,12 +108,12 @@ public:
         if (!type)
         {
             NX_DEBUG(this, lm("Unable to find %1 stream codec on %2")
-                .args(isPrimary, m_resource->getUrl()));
+                .args(QnLexical::serialized(streamIndex), m_resource->getUrl()));
             return false;
         }
 
         NX_DEBUG(this, lm("Set %1 stream codec to %2 on %3")
-            .args(isPrimary, value, m_resource->getUrl()));
+            .args(QnLexical::serialized(streamIndex), value, m_resource->getUrl()));
 
         auto requestHelper = makeRequestHelper();
         m_videoConfig->replace(type->first, type->second, value.toUtf8());
@@ -123,16 +127,17 @@ private:
             m_resource->getUrl(), m_resource->getAuth(), nx_http::AsyncHttpClient::authBasic);
     }
 
-    int indexOfStream(bool isPrimary)
+    int indexOfStream(Qn::StreamIndex streamIndex)
     {
         if (!updateVideoConfig())
             return -1;
 
-        const auto i = m_videoConfig->indexOf(isPrimary ? "<item id=\"1\"" : "<item id=\"3\"");
+        const auto i = m_videoConfig->indexOf(streamIndex == Qn::StreamIndex::primary
+            ? "<item id=\"1\"" : "<item id=\"3\"");
         if (i == -1)
         {
             NX_DEBUG(this, lm("Unable to find %1 stream on %2")
-                .args(isPrimary, m_resource->getUrl()));
+                .args(QnLexical::serialized(streamIndex), m_resource->getUrl()));
         }
 
         return i;
@@ -234,7 +239,7 @@ bool QnDigitalWatchdogResource::isDualStreamingEnabled(bool& unauth)
     return true; // ignore other error (for cameras with non standart HTTP port)
 }
 
-CameraDiagnostics::Result QnDigitalWatchdogResource::initInternal()
+CameraDiagnostics::Result QnDigitalWatchdogResource::initializeCameraDriver()
 {
     bool unauth = false;
     if (!isDualStreamingEnabled(unauth) && unauth==false)
@@ -248,8 +253,7 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::initInternal()
     }
     disableB2FramesForActiDW();
 
-    const CameraDiagnostics::Result result = QnPlOnvifResource::initInternal();
-
+    const CameraDiagnostics::Result result = QnPlOnvifResource::initializeCameraDriver();
     return result;
 }
 
@@ -323,41 +327,12 @@ bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedP
             return false;
     }
 
-    return loadCproAdvancedParameters(params);
+    return true;
 }
 
 static const QString kCproPrimaryVideoCodec = lit("cproPrimaryVideoCodec");
 static const QString kCproSecondaryVideoCodec = lit("cproSecondaryVideoCodec");
 static const QStringList kCproParameters{kCproPrimaryVideoCodec, kCproSecondaryVideoCodec};
-
-bool QnDigitalWatchdogResource::loadCproAdvancedParameters(QnCameraAdvancedParams& params) const
-{
-    // Those parameters are hardcoded as they are supposed to be applied on top of templates.
-    // TODO: Makes sence to move into some template as soon as it supports parameter merge.
-    QnCameraAdvancedParamGroup streams;
-    streams.name = lit("Video Streams");
-    const auto addStream =
-        [&](const QString& name, bool isPrimary, const QString& codecParamId)
-        {
-            QnCameraAdvancedParamGroup group;
-            group.name = name;
-            if (const auto codecs = m_cproApiClient->getSupportedVideoCodecs(isPrimary))
-            {
-                QnCameraAdvancedParameter codec;
-                codec.id = codecParamId;
-                codec.name = lit("Codec");
-                codec.dataType = QnCameraAdvancedParameter::DataType::Enumeration;
-                codec.range = codecs->join(",");
-                group.params.push_back(codec);
-            }
-            streams.groups.push_back(group);
-        };
-
-    addStream(lit("Primary"), /*isPrimary*/ true, kCproPrimaryVideoCodec);
-    addStream(lit("Secondary"), /*isPrimary*/ false, kCproSecondaryVideoCodec);
-    params.groups.insert(params.groups.begin(), streams);
-    return true;
-}
 
 void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params)
 {
@@ -377,13 +352,7 @@ void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvanced
 
 QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() const
 {
-    QSet<QString> result;
-    if (m_cproApiClient->getVideoCodec(/*isPrimary*/ true))
-        result.insert(kCproPrimaryVideoCodec);
-    if (m_cproApiClient->getVideoCodec(/*isPrimary*/ false))
-        result.insert(kCproSecondaryVideoCodec);
-
-    result += base_type::calculateSupportedAdvancedParameters();
+    QSet<QString> result = base_type::calculateSupportedAdvancedParameters();
     if (useOnvifAdvancedParameterProviders())
         return result;
 
@@ -426,14 +395,7 @@ QString QnDigitalWatchdogResource::fetchCameraModel() {
 
 bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values)
 {
-    QSet<QString> result;
-    if (const auto codec = m_cproApiClient->getVideoCodec(/*isPrimary*/ true))
-        values.insert(kCproPrimaryVideoCodec, *codec);
-    if (const auto codec = m_cproApiClient->getVideoCodec(/*isPrimary*/ false))
-        values.insert(kCproSecondaryVideoCodec, *codec);
-
     bool baseResult = base_type::loadAdvancedParamsUnderLock(values);
-
     if (!m_cameraProxy)
         return baseResult;
 
@@ -444,11 +406,6 @@ bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedPara
 bool QnDigitalWatchdogResource::setAdvancedParameterUnderLock(
     const QnCameraAdvancedParameter &parameter, const QString &value)
 {
-    if (parameter.id == kCproPrimaryVideoCodec)
-        return m_cproApiClient->setVideoCodec(/*isPrimary*/ true, value);
-    if (parameter.id == kCproSecondaryVideoCodec)
-        return m_cproApiClient->setVideoCodec(/*isPrimary*/ false, value);
-
     if (base_type::setAdvancedParameterUnderLock(parameter, value))
         return true;
 
@@ -471,7 +428,7 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
     QVector<QPair<QnCameraAdvancedParameter, QString>> moreParamsToProcess;
     for(const QnCameraAdvancedParamValue &value: values)
     {
-        QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(value.id);
+        QnCameraAdvancedParameter parameter = m_advancedParametersProvider.getParameterById(value.id);
         if (parameter.isValid())
         {
             if (kCproParameters.contains(parameter.id))
@@ -499,6 +456,53 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
     }
 
     return success && m_cameraProxy->setParams(moreParamsToProcess, &result);
+}
+
+nx::mediaserver::resource::StreamCapabilityMap QnDigitalWatchdogResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex streamIndex)
+{
+    using namespace nx::mediaserver::resource;
+    auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
+    QnMutexLocker lock(&m_mutex);
+    const auto codecs = m_cproApiClient->getSupportedVideoCodecs(streamIndex);
+    if (!codecs)
+        return onvifResult;
+    nx::mediaserver::resource::StreamCapabilityMap result;
+    for (const auto& codec: *codecs)
+    {
+        for (const auto& onvifKeys: onvifResult.keys())
+        {
+            StreamCapabilityKey key;
+            key.codec = codec.toUpper();
+            key.resolution = onvifKeys.resolution;
+            result.insert(key, nx::media::CameraStreamCapability());
+        }
+    }
+    return result;
+}
+
+QnAbstractStreamDataProvider* QnDigitalWatchdogResource::createLiveDataProvider()
+{
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    bool shouldAppearAsSingleChannel = resData.value<bool>(
+        Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+
+    if (shouldAppearAsSingleChannel)
+    {
+        return new nx::plugins::utils::MultisensorDataProvider(
+            toSharedPointer(this),
+            [](const QnResourcePtr& resource)
+            {
+                return new QnDwStreamReader(resource);
+            });
+    }
+
+    return new QnDwStreamReader(toSharedPointer());
+}
+
+void QnDigitalWatchdogResource::setVideoCodec(Qn::StreamIndex streamIndex, const QString& codec)
+{
+    m_cproApiClient->setVideoCodec(streamIndex, codec);
 }
 
 #endif //ENABLE_ONVIF

@@ -14,8 +14,7 @@ set(build_nxtool OFF)
 
 set(backgroundImage "{}")
 set(defaultWebPages "{}")
-set(installer.language "en_US")
-set(installer.cultures "en-us")
+set(defaultSkin "dark_blue")
 
 set(freeLicenseCount "4")
 set(freeLicenseIsTrial "true")

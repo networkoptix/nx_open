@@ -77,7 +77,7 @@ Error StubMetadataManager::stopFetchingMetadata()
     return stopFetchingMetadataUnsafe();
 }
 
-const char* StubMetadataManager::capabilitiesManifest(Error* error) const
+const char* StubMetadataManager::capabilitiesManifest(Error* error)
 {
     *error = Error::noError;
 
@@ -89,6 +89,10 @@ const char* StubMetadataManager::capabilitiesManifest(Error* error) const
             ]
         }
     )manifest";
+}
+
+void StubMetadataManager::freeManifest(const char* data)
+{
 }
 
 StubMetadataManager::~StubMetadataManager()

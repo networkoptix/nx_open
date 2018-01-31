@@ -471,12 +471,9 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param audioEnabled Whether audio is enabled on the camera.
      *     %value false
      *     %value true
-     * %param secondaryStreamQuality
-     *     %value SSQualityLow Low quality second stream.
-     *     %value SSQualityMedium Medium quality second stream.
-     *     %value SSQualityHigh High quality second stream.
-     *     %value SSQualityNotDefined Second stream quality is not defined.
-     *     %value SSQualityDontUse Second stream is not used for the camera.
+     * %param disableDualStreaming
+     *     %value false turn of dual streaming.
+     *     %value true enable dual streaming if it supported by camera.
      * %param controlEnabled Whether server manages the camera (changes resolution, FPS, create
      *     profiles, etc).
      *     %value false
@@ -574,12 +571,9 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param audioEnabled Whether audio is enabled on the camera.
      *     %value false
      *     %value true
-     * %param secondaryStreamQuality
-     *     %value SSQualityLow Low quality second stream.
-     *     %value SSQualityMedium Medium quality second stream.
-     *     %value SSQualityHigh High quality second stream.
-     *     %value SSQualityNotDefined Second stream quality is not defined.
-     *     %value SSQualityDontUse Second stream is not used for the camera.
+     * %param disableDualStreaming
+     *     %value false turn of dual streaming.
+     *     %value true enable dual streaming if it supported by camera.
      * %param controlEnabled Whether server manages the camera (changes resolution, FPS, create
      *     profiles, etc).
      *     %value false
@@ -675,12 +669,9 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %param audioEnabled Whether audio is enabled on the camera.
      *         %value false
      *         %value true
-     *     %param secondaryStreamQuality
-     *         %value SSQualityLow Low quality second stream.
-     *         %value SSQualityMedium Medium quality second stream.
-     *         %value SSQualityHigh High quality second stream.
-     *         %value SSQualityNotDefined Second stream quality is not defined.
-     *         %value SSQualityDontUse Second stream is not used for the camera.
+     *     %param disableDualStreaming
+     *         %value false turn of dual streaming.
+     *         %value true enable dual streaming if it supported by camera.
      *     %param controlEnabled Whether server manages the camera (changes resolution, FPS, create
      *         profiles, etc).
      *         %value false
@@ -814,12 +805,9 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %param audioEnabled Whether audio is enabled on the camera.
      *         %value false
      *         %value true
-     *     %param secondaryStreamQuality
-     *         %value SSQualityLow Low quality second stream.
-     *         %value SSQualityMedium Medium quality second stream.
-     *         %value SSQualityHigh High quality second stream.
-     *         %value SSQualityNotDefined Second stream quality is not defined.
-     *         %value SSQualityDontUse Second stream is not used for the camera.
+     *     %param disableDualStreaming
+     *         %value false turn of dual streaming.
+     *         %value true enable dual streaming if it supported by camera.
      *     %param controlEnabled Whether server manages the camera (changes resolution, FPS, create
      *         profiles, etc).
      *         %value false

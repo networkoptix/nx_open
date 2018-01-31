@@ -39,10 +39,11 @@ class AsyncHttpClientPtr;
  * This class methods are not thread-safe
  * All signals are emitted from io::AIOService threads
  * State is changed just before emitting signal
- * WARNING: It is strongly recommended to listen for AsyncHttpClient::someMessageBodyAvailable() signal and
- *  read current message body buffer with AsyncHttpClient::fetchMessageBodyBuffer() call every time
- *  to avoid internal message body buffer to consume too much memory.
- * WARNING: It is strongly recommended to connect to signals using Qt::DirectConnection and slot MUST NOT use blocking calls.
+ * WARNING: It is strongly recommended to listen for AsyncHttpClient::someMessageBodyAvailable()
+ * signal and read current message body buffer with AsyncHttpClient::fetchMessageBodyBuffer() call
+ * every time to avoid internal message body buffer to consume too much memory.
+ * WARNING: It is strongly recommended to connect to signals using Qt::DirectConnection and
+ * slot MUST NOT use blocking calls.
  */
 class NX_NETWORK_API AsyncHttpClient:
     public QObject,
@@ -112,7 +113,7 @@ public:
     State state() const;
 
     /**
-     * Returns true if no response has been recevied due to transport error.
+     * Returns true if no response has been received due to transport error.
      */
     bool failed() const;
     SystemError::ErrorCode lastSysErrorCode() const;
@@ -225,7 +226,9 @@ public:
     void setProxyVia(const SocketAddress& proxyEndpoint);
     void setConnectionHeader(const StringType& value);
 
-    /** If set to \a true client will not try to add Authorization header to the first request. false by default. */
+    /** If set to \a true client will not try to add Authorization header to the first request.
+     * false by default.
+     */
     void setDisablePrecalculatedAuthorization(bool val);
 
     /** Set socket connect/send timeout. */
@@ -233,13 +236,15 @@ public:
     /**
      * @param responseReadTimeoutMs 0 means infinity.
      * By default, 3000 ms.
-     * If timeout has been met, connection is closed, state set to failed and AsyncHttpClient::done emitted.
+     * If timeout has been met, connection is closed, state set to failed and AsyncHttpClient::done
+     * emitted.
      */
     void setResponseReadTimeoutMs(unsigned int responseReadTimeoutMs);
     /**
      * @param messageBodyReadTimeoutMs 0 means infinity.
      * By default there is no timeout.
-     * If timeout has been met, connection is closed, state set to failed and AsyncHttpClient::done emitted.
+     * If timeout has been met, connection is closed, state set to failed and AsyncHttpClient::done
+     * emitted.
      */
     void setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
 
@@ -264,14 +269,15 @@ public:
 
     AuthInfoCache::AuthorizationCacheItem authCacheItem() const;
     /**
-     * Caller uses it to report that message body has ended (it may be tricky to detect message body end in some cases).
+     * Caller uses it to report that message body has ended (it may be tricky to detect message body
+     * end in some cases).
      * @note May be invoked within someMessageBodyAvailable handler only.
      * WARNING: It is a hack. Use it only if you strongly know what you are doing.
      */
     void forceEndOfMsgBody();
 
     /**
-     * Use this method to intanciate AsyncHttpClient class.
+     * Use this method to instantiate AsyncHttpClient class.
      * @return smart pointer to newly created instance.
      */
     static AsyncHttpClientPtr create();
@@ -282,19 +288,20 @@ signals:
     void tcpConnectionEstablished(nx_http::AsyncHttpClientPtr);
     /**
      * Invoked after request has been sent.
-     * @param isRetryAfterUnauthorized set to true if request has been sent as after receiving 401 unauthorized response.
+     * @param isRetryAfterUnauthorized set to true if request has been sent as after receiving 401
+     * unauthorized response.
      */
     void requestHasBeenSent(nx_http::AsyncHttpClientPtr, bool isRetryAfterUnauthorizedResponse);
     /** Emitted when response headers has been read. */
     void responseReceived(nx_http::AsyncHttpClientPtr);
     /**
      * Message body buffer is not empty.
-     * Received message body buffer is appended to internal buffer which
-     *   can be read with AsyncHttpClient::fetchMessageBodyBuffer() call.
-     * Responsibility for preventing internal message body buffer
-     *   to grow beyond reasonable sizes lies on user of this class.
+     * Received message body buffer is appended to internal buffer which can be read
+     * with AsyncHttpClient::fetchMessageBodyBuffer() call.
+     * Responsibility for preventing internal message body buffer to grow beyond reasonable sizes
+     * lies on user of this class.
      * WARNING: It is strongly recommended to call AsyncHttpClient::fetchMessageBodyBuffer()
-     *   every time on receiving this signal
+     * every time on receiving this signal
     */
     void someMessageBodyAvailable(nx_http::AsyncHttpClientPtr);
     /**
@@ -514,12 +521,14 @@ private:
  * @param completionHandler <OS error code, status code, message body>.
  * "Status code" and "message body" are valid only if "OS error code" is SystemError::noError
  * @return true if started async download, false otherwise.
- * @note It is strongly recommended to use this for downloading only small files (e.g., camera params).
+ * @note It is strongly recommended to use this for downloading only small files (e.g., camera
+*  params).
  * For real files better to use nx_http::AsyncHttpClient directly.
  */
 void NX_NETWORK_API downloadFileAsync(
     const QUrl& url,
-    std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
+    std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)>
+        completionHandler,
     const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
     AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
     AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
@@ -537,14 +546,16 @@ SystemError::ErrorCode NX_NETWORK_API downloadFileSync(
  */
 void NX_NETWORK_API downloadFileAsyncEx(
     const QUrl& url,
-    std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::StringType /*contentType*/, nx_http::BufferType /*msgBody */)> completionHandler,
+    std::function<void(SystemError::ErrorCode, int /*statusCode*/,
+        nx_http::StringType /*contentType*/, nx_http::BufferType /*msgBody */)> completionHandler,
     const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
     AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
     AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
 
 void downloadFileAsyncEx(
     const QUrl& url,
-    std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
+    std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)>
+        completionHandler,
     nx_http::AsyncHttpClientPtr httpClientCaptured);
 
 typedef std::function<void(SystemError::ErrorCode, int httpStatus)> UploadCompletionHandler;

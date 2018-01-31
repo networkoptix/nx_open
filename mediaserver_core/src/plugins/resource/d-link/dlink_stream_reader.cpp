@@ -289,6 +289,8 @@ QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, c
         resolution = info.primaryStreamResolution();
     }
     m_resolution = resolution;
+    // TODO: advanced params control is not implemented for this driver yet
+    params.resolution = resolution;
 
     QString result;
     QTextStream t(&result);
@@ -306,7 +308,7 @@ QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, c
         {
             // just CBR fo mpeg so far
             t << "qualitymode=CBR" << "&";
-            t << "bitrate=" <<  info.bitrateCloseTo(res->suggestBitrateKbps(resolution, params, getRole()));
+            t << "bitrate=" <<  info.bitrateCloseTo(res->suggestBitrateKbps(params, getRole()));
         }
         else
         {

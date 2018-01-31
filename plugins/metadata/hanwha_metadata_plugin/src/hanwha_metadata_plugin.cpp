@@ -1,5 +1,3 @@
-﻿#if defined(ENABLE_HANWHA)
-
 #include "hanwha_metadata_plugin.h"
 #include "hanwha_metadata_manager.h"
 #include "hanwha_common.h"
@@ -178,7 +176,7 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
 
     auto sharedRes = sharedResources(resourceInfo);
 
-    const auto cgiParameters = sharedRes->sharedContext->cgiParamiters();
+    const auto cgiParameters = sharedRes->sharedContext->cgiParameters();
     if (!cgiParameters.diagnostics || !cgiParameters.value.isValid())
         return boost::none;
 
@@ -340,5 +338,3 @@ extern "C" {
     }
 
 } // extern "C"
-
-#endif // defined(ENABLE_HANWHA)

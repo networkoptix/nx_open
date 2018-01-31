@@ -230,7 +230,7 @@ public:
             ++fdIndex;
         }
 
-        //win32 select moves signalled socket handles to the beginning of fd_array and 
+        //win32 select moves signalled socket handles to the beginning of fd_array and
         //    sets fd_count properly, so it actually does like epoll
 
         //NOTE fdIndex points to current next fd. It does not correspond to \a currentSocket and \a currentSocketREvent
@@ -368,7 +368,7 @@ PollSet::PollSet()
         PollSetImpl::SockCtx( m_impl->dummySocket.get(), aio::etRead ) );
     m_impl->dummySocket->setNonBlockingMode( true );
     m_impl->dummySocket->bind( SocketAddress( HostAddress::localhost, 0 ) );
-        
+
     m_impl->modified = true;
 }
 

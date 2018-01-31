@@ -239,13 +239,13 @@ private:
 
         for (const auto& stream: mediaStreams().streams)
         {
-            if (stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX) //< High
+            if (stream.encoderIndex == Qn::StreamIndex::primary) //< High
             {
                 NX_LOG(lit("[TEST] Camera High stream: %1 x %2, AVCodecID %3")
                     .arg(stream.getResolution().width()).arg(stream.getResolution().height())
                     .arg(stream.codec), cl_logDEBUG1);
             }
-            else if (stream.encoderIndex == CameraMediaStreamInfo::SECONDARY_STREAM_INDEX) //< Low
+            else if (stream.encoderIndex == Qn::StreamIndex::secondary) //< Low
             {
                 NX_LOG(lit("[TEST] Camera Low stream: %1 x %2, AVCodecID %3")
                     .arg(stream.getResolution().width()).arg(stream.getResolution().height())

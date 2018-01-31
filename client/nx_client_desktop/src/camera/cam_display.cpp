@@ -175,6 +175,12 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (camera && camera->getMaxFps() >= 50)
         m_forceMtDecoding = true; // we can get render speed limit instead. MT decoding and displaying frame queue turn on simultaneously
+
+    if (camera && camera->hasFlags(Qn::wearable_camera))
+    {
+        auto handler = [this] { playAudio(m_shouldPlayAudio); };
+        connect(camera.data(), &QnSecurityCamResource::audioEnabledChanged, this, handler);
+    }
 }
 
 QnCamDisplay::~QnCamDisplay()
@@ -1661,6 +1667,15 @@ void QnCamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
 
 void QnCamDisplay::playAudio(bool play)
 {
+    if (m_resource->toResourcePtr()->hasFlags(Qn::wearable_camera))
+    {
+        m_shouldPlayAudio = play;
+        QnSecurityCamResourcePtr camera =
+            m_resource->toResourcePtr().dynamicCast<QnSecurityCamResource>();
+        if (camera && !camera->isAudioEnabled())
+            play = false; //< Ignore audio for wearable cameras if it is disabled in UI.
+    }
+
     if (m_playAudio == play)
         return;
 

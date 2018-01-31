@@ -846,7 +846,7 @@ void RadassController::registerConsumer(QnCamDisplay* display)
                     }
                 });
 
-            connect(camera, &QnSecurityCamResource::secondaryStreamQualityChanged, this,
+            connect(camera, &QnSecurityCamResource::disableDualStreamingChanged, this,
                 updateHasDualStreaming);
         }
 

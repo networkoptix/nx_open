@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <QtCore/QSize>
 
 #include <boost/optional/optional.hpp>
@@ -47,7 +45,7 @@ struct HanwhaVideoProfile
 
     boost::optional<QString> codecProfile;
     boost::optional<Qn::EntropyCoding> entropyCoding;
-    
+
     bool audioEnabled = false;
     bool fixed = false;
     QString token;
@@ -60,5 +58,3 @@ struct HanwhaVideoProfile
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

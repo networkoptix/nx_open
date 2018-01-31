@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include <QtCore/QUrlQuery>
 
 #include <chrono>
@@ -495,5 +493,3 @@ QnAbstractMediaDataPtr HanwhaStreamReader::getNextData()
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

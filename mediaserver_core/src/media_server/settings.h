@@ -131,11 +131,14 @@ public:
     QSettings* runTimeSettings();
 
     std::chrono::milliseconds hlsTargetDuration() const;
-
     std::chrono::milliseconds delayBeforeSettingMasterFlag() const;
+
+    void close();
+    void reopen(const QString& roFile, const QString& rwFile);
 
     static QString defaultROSettingsFilePath();
     static QString defaultRunTimeSettingsFilePath();
+    static QString defaultConfigDirectory();
 
 private:
     void initializeROSettingsFromConfFile( const QString& fileName );

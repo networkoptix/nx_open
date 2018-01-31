@@ -68,7 +68,6 @@ set(installer.language "ru_RU")
 set(installer.cultures "ru-ru")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation ru_RU)

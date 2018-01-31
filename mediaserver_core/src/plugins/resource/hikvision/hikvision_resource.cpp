@@ -15,6 +15,8 @@
 #include <onvif/soapMediaBindingProxy.h>
 #include <nx/utils/log/log.h>
 #include <plugins/utils/xml_request_helper.h>
+#include <utils/media/av_codec_helper.h>
+#include <utils/media/av_codec_helper.h>
 
 namespace {
 
@@ -42,11 +44,31 @@ HikvisionResource::~HikvisionResource()
     m_audioTransmitter.reset();
 }
 
-CameraDiagnostics::Result HikvisionResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex streamIndex)
+{
+    using namespace nx::mediaserver::resource;
+    auto result = base_type::getStreamCapabilityMapFromDrives(streamIndex);
+    QnMutexLocker lock(&m_mutex);
+    if (m_hevcSupported)
+    {
+        StreamCapabilityMap resultCopy = result;
+        for (const auto& onvifKeys: resultCopy.keys())
+        {
+            StreamCapabilityKey key;
+            key.codec = QnAvCodecHelper::codecIdToString(AV_CODEC_ID_HEVC);
+            key.resolution = onvifKeys.resolution;
+            result.insert(key, nx::media::CameraStreamCapability());
+        }
+    }
+    return result;
+}
+
+CameraDiagnostics::Result HikvisionResource::initializeCameraDriver()
 {
     tryToEnableOnvifSupport(getDeviceOnvifUrl(), getAuth());
 
-    auto result = QnPlOnvifResource::initInternal();
+    auto result = QnPlOnvifResource::initializeCameraDriver();
     if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
         return result;
 
@@ -58,10 +80,7 @@ CameraDiagnostics::Result HikvisionResource::initInternal()
 
 QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
 {
-    if (m_hevcSupported)
-        return new plugins::HikvisionHevcStreamReader(toSharedPointer(this));
-
-    return base_type::createLiveDataProvider();
+    return new plugins::HikvisionHevcStreamReader(toSharedPointer(this));
 }
 
 CameraDiagnostics::Result HikvisionResource::initializeMedia(
@@ -83,26 +102,37 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
             m_hevcSupported = hikvision::codecSupported(
                 AV_CODEC_ID_HEVC,
                 channelCapabilities);
-            if (m_hevcSupported && role == Qn::ConnectionRole::CR_LiveVideo)
+            if (m_hevcSupported)
             {
-                setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, 1);
-                if (!channelCapabilities.resolutions.empty())
+                if (role == Qn::ConnectionRole::CR_LiveVideo)
                 {
-                    const auto primaryResolution = channelCapabilities.resolutions.front();
-                    setPrimaryResolution(primaryResolution);
-                    if (qFuzzyIsNull(customAspectRatio()))
-                        setCustomAspectRatio(primaryResolution.width() / (qreal)primaryResolution.height());
+                    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, 1);
+                    if (!channelCapabilities.fps.empty())
+                        setMaxFps(channelCapabilities.fps[0] / 100);
                 }
-                if (!channelCapabilities.fps.empty())
-                    setMaxFps(channelCapabilities.fps[0] / 100);
+                if (!channelCapabilities.resolutions.empty())
+                    setResolutionList(channelCapabilities, role);
             }
         }
     }
+    if (m_hevcSupported)
+        return CameraDiagnostics::NoErrorResult();
+    return base_type::initializeMedia(onvifCapabilities);
+}
 
-    if (!m_hevcSupported)
-        return base_type::initializeMedia(onvifCapabilities);
-
-    return fetchChannelCount();
+void HikvisionResource::setResolutionList(
+    const hikvision::ChannelCapabilities& channelCapabilities,
+    Qn::ConnectionRole role)
+{
+    auto capabilities = role == Qn::CR_SecondaryLiveVideo
+        ? secondaryVideoCapabilities() : primaryVideoCapabilities();
+    capabilities.resolutions = QList<QSize>::fromVector(QVector<QSize>::fromStdVector(
+        channelCapabilities.resolutions));
+    capabilities.isH264 = true;
+    if (role == Qn::CR_SecondaryLiveVideo)
+        setSecondaryVideoCapabilities(capabilities);
+    else
+        setPrimaryVideoCapabilities(capabilities);
 }
 
 std::unique_ptr<nx_http::HttpClient> HikvisionResource::getHttpClient()

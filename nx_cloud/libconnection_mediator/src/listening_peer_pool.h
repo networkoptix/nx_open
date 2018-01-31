@@ -5,10 +5,10 @@
 #include <boost/optional.hpp>
 
 #include <nx/network/cloud/data/connection_method.h>
+#include <nx/network/cloud/mediator/api/listening_peer.h>
 #include <nx/network/stun/abstract_server_connection.h>
 #include <nx/utils/thread/mutex.h>
 
-#include "data/listening_peer.h"
 #include "request_processor.h"
 #include "server/stun_request_processing_helper.h"
 
@@ -103,7 +103,7 @@ public:
         const nx::String& systemId) const;
 
     // TODO: rename to getListeningPeersBySystem
-    data::ListeningPeersBySystem getListeningPeers() const;
+    api::ListeningPeersBySystem getListeningPeers() const;
     std::vector<ConnectionWeakRef> getAllConnections() const;
 
 private:

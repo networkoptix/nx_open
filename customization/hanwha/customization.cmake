@@ -59,7 +59,7 @@ set(ios.sign.identity "iPhone Distribution: Samsung Opto-Electronics America, In
 set(ios.old_app_appstore_id "")
 
 set(mac.skip.sign "false")
-set(mac.sign.identity "Developer ID Application: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
+set(mac.sign.identity "3rd Party Mac Developer Application: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
 set(mac.app.sign.identity "3rd Party Mac Developer Application: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
 set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
 set(mac.bundle.identifier "com.hanwhasecurity.wisenetwave2")
@@ -73,7 +73,6 @@ set(freeLicenseKey "0000-0000-0000-0028")
 # Installer Customizations
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation en_US)

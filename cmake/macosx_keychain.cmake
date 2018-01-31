@@ -8,4 +8,3 @@ set(codeSigningKeychainPassword "qweasd123" CACHE INTERNAL "")
 if(useLoginKeychain)
     set(codeSigningKeychainName)
 endif()
-

@@ -14,6 +14,12 @@ Qn::ResourceFlags QnClientCameraResource::flags() const {
     Qn::ResourceFlags result = base_type::flags();
     if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
         result |= Qn::motion;
+
+    // TODO: #wearable There seems to be no way to set supportedMotionType into MT_NoMotion,
+    // so we hack it here.
+    if (result & Qn::wearable_camera)
+        result &= ~Qn::motion;
+
     return result;
 }
 

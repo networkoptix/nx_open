@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #ifdef ENABLE_FLIR
 
@@ -7,7 +7,7 @@
 #include "flir_fc_private.h"
 #include "flir_web_socket_io_manager.h"
 
-#include <core/resource/camera_resource.h>
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/network/http/http_client.h>
 
 namespace nx {
@@ -17,7 +17,7 @@ namespace flir {
 /**
  * Flir FC-series resource.
  */
-class FcResource: public QnPhysicalCameraResource
+class FcResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
@@ -31,7 +31,9 @@ public:
     FcResource();
     virtual ~FcResource();
 
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;
     virtual void stopInputPortMonitoringAsync() override;

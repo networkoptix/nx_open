@@ -2095,6 +2095,10 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     {
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
+			
+        if (d->camera->hasFlags(Qn::wearable_camera))
+            return Qn::NoLiveStreamOverlay;
+			
 
         const Qn::Permission requiredPermission = d->isPlayingLive()
             ? Qn::ViewLivePermission

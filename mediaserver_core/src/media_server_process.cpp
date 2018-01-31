@@ -546,15 +546,11 @@ static int freeGB(QString drive)
 }
 #endif
 
-static QStringList listRecordFolders(bool includeNetwork = false)
+static QStringList listRecordFolders(bool includeNonHdd = false)
 {
     using namespace nx::mediaserver::fs::media_paths;
 
-    const NetworkDrives networkDrivesFlag = includeNetwork
-        ? NetworkDrives::allowed
-        : NetworkDrives::notAllowed;
-
-    auto mediaPathList = get(FilterConfig::createDefault(networkDrivesFlag));
+    auto mediaPathList = get(FilterConfig::createDefault(includeNonHdd));
     NX_VERBOSE(kLogTag, lm("Record folders: %1").container(mediaPathList));
     return mediaPathList;
 }
@@ -2039,8 +2035,10 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
     // Change owner of all data files, so mediaserver can use them as different user.
     const std::vector<QString> chmodPaths =
     {
+        MSSettings::defaultConfigDirectory(),
         qnServerModule->roSettings()->fileName(),
         qnServerModule->runTimeSettings()->fileName(),
+        QnFileConnectionProcessor::externalPackagePath(),
         getDataDirectory(),
     };
     for (const auto& path: chmodPaths)

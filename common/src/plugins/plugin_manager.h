@@ -36,14 +36,14 @@ public:
     {
         QtPlugin = 1, //< Qt-based plugins.
         NxPlugin = 2, //< Plugins, implementing plugin_api.h.
-        
+
         AllPlugins = QtPlugin | NxPlugin
     };
 
     PluginManager(
         QObject* parent,
         const QString& pluginDir = QString(),
-        nxpl::PluginInterface* const pluginContainer = nullptr);
+        nxpl::PluginInterface* pluginContainer = nullptr);
 
     virtual ~PluginManager();
 

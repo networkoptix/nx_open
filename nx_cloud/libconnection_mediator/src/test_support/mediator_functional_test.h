@@ -6,12 +6,12 @@
 #include <QtCore/QFile>
 
 #include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/cloud/mediator/api/listening_peer.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 
 #include "../cloud_data_provider.h"
-#include "../data/listening_peer.h"
 #include "../mediator_process_public.h"
 #include "local_cloud_data_provider.h"
 #include "mediaserver_emulator.h"
@@ -70,8 +70,7 @@ public:
         const AbstractCloudDataProvider::System& system,
         size_t count, ServerTweak::Value tweak = ServerTweak::defaultBehavior);
 
-    std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
-        getListeningPeers() const;
+    std::tuple<nx_http::StatusCode::Value, api::ListeningPeers> getListeningPeers() const;
 
 protected:
     virtual void beforeModuleCreation() override;

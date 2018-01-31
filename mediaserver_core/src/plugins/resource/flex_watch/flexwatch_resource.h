@@ -18,7 +18,7 @@ public:
     virtual ~QnFlexWatchResource();
 
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 private:
     CameraDiagnostics::Result fetchUpdateVideoEncoder();
     bool rebootDevice();

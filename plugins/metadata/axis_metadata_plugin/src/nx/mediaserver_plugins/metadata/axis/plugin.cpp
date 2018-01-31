@@ -1,7 +1,8 @@
 ﻿#include "plugin.h"
 
-#include <string>
+#include <array>
 #include <fstream>
+#include <string>
 
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
@@ -38,10 +39,11 @@ Plugin::Plugin()
     QFile f(":/axis/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
+
 #if 0
-    // In current version we get camera capabilies online from camera - not from previously
-    // prepared manifest file
-    m_driverManifest = QJson::deserialized<Axis::DriverManifest>(m_manifest);
+    // Definitely this will be useful after pluginManager modification
+    nx::api::AnalyticsDriverManifest pluginManifest =
+        QJson::deserialized<nx::api::AnalyticsDriverManifest>(m_manifest);
 #endif
 }
 
@@ -136,8 +138,9 @@ QList<IdentifiedSupportedEvent> Plugin::fetchSupportedEvents(
         resourceInfo.password);
     if (!axisCameraController.readSupportedEvents())
         return result;
-    axisCameraController.filterSupportedEvents({ kRuleEngine, kVideoSource });
 
+    // Only some rules are useful.
+    axisCameraController.filterSupportedEvents({ kRuleEngine, kVideoSource });
     const auto& src = axisCameraController.suppotedEvents();
     std::transform(src.begin(), src.end(), std::back_inserter(result),
         [](const nx::axis::SupportedEvent& event) {return IdentifiedSupportedEvent(event); });

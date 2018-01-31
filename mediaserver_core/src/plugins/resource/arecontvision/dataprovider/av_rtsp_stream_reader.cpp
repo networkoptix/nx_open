@@ -26,8 +26,9 @@ QnArecontRtspStreamReader::~QnArecontRtspStreamReader()
 
 CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     bool /*isCameraControlRequired*/,
-    const QnLiveStreamParams& params)
+    const QnLiveStreamParams& liveStreamParams)
 {
+    QnLiveStreamParams params = liveStreamParams;
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
@@ -54,12 +55,13 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
         //    res);
     }
 
+    // TODO: advanced params control is not implemented for this driver yet
     const auto maxResolution = getMaxSensorSize();
     if (getRole() == Qn::CR_SecondaryLiveVideo)
     {
+        params.resolution = QSize(maxResolution.width() / 2, maxResolution.height() / 2);
         requestStr += lit("&FPS=%1").arg((int)params.fps);
         const int desiredBitrateKbps = res->suggestBitrateKbps(
-            QSize(maxResolution.width()/2, maxResolution.height()/2),
             params,
             getRole());
         requestStr += lit("&Ratelimit=%1").arg(desiredBitrateKbps);
@@ -67,8 +69,8 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     else
     {
         requestStr += lit("&FPS=%1").arg((int)params.fps);
+        params.resolution = QSize(maxResolution.width(), maxResolution.height());
         const int desiredBitrateKbps = res->suggestBitrateKbps(
-            QSize(maxResolution.width(), maxResolution.height()),
             params,
             getRole());
         requestStr += lit("&Ratelimit=%1").arg(desiredBitrateKbps);
@@ -127,7 +129,7 @@ QnAbstractMediaDataPtr QnArecontRtspStreamReader::getNextData()
     for (int i = 0; i < 10; ++i)
     {
         rez = m_rtpStreamParser.getNextData();
-        if (rez) 
+        if (rez)
             break;
 
         errorCount++;

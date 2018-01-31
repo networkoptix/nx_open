@@ -1,13 +1,10 @@
-#ifndef dlink_resource_h_2215
-#define dlink_resource_h_2215
+#pragma once
 
 #ifdef ENABLE_DLINK
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
 #include <nx/network/simple_http_client.h>
-#include "nx/streaming/media_data_packet.h"
-
+#include <nx/streaming/media_data_packet.h>
+#include <nx/mediaserver/resource/camera.h>
 
 struct QnDlink_ProfileInfo
 {
@@ -27,10 +24,10 @@ struct QnDlink_cam_info
     // returns resolution with width not less than width
     QSize resolutionCloseTo(int width) const;
 
-    // returns next up bitrate 
+    // returns next up bitrate
     QByteArray bitrateCloseTo(int val);
 
-    // returns next up frame rate 
+    // returns next up frame rate
     int frameRateCloseTo(int fr);
 
     QSize primaryStreamResolution() const;
@@ -46,7 +43,7 @@ struct QnDlink_cam_info
     QVector<QnDlink_ProfileInfo> profiles;
 };
 
-class QnPlDlinkResource : public QnPhysicalCameraResource
+class QnPlDlinkResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
@@ -64,15 +61,17 @@ public:
 
     QnDlink_cam_info getCamInfo() const;
 
-    
+
     virtual void setMotionMaskPhysical(int channel) override;
 
 protected:
-    virtual CameraDiagnostics::Result initInternal() override; // does a lot of physical work 
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override; // does a lot of physical work
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCroppingPhysical(QRect cropping);
 
-    
+
 
 protected:
     QnDlink_cam_info  m_camInfo;
@@ -81,4 +80,3 @@ protected:
 typedef QnSharedResourcePointer<QnPlDlinkResource> QnPlDlinkResourcePtr;
 
 #endif // ENABLE_DLINK
-#endif //dlink_resource_h_2215

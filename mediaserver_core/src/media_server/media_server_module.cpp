@@ -34,6 +34,7 @@
 #include <recorder/storage_db_pool.h>
 #include <recorder/storage_manager.h>
 #include <recorder/archive_integrity_watcher.h>
+#include <recorder/wearable_archive_synchronizer.h>
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
 #include <nx/mediaserver/event/event_message_bus.h>
@@ -49,6 +50,9 @@
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
+
+#include "wearable_lock_manager.h"
+#include "wearable_upload_manager.h"
 
 namespace {
 
@@ -183,6 +187,13 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
+    
+	store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
+
+
+    store(new QnWearableLockManager(this));
+
+    store(new QnWearableUploadManager(this));
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());

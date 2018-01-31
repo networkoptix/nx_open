@@ -28,7 +28,8 @@ nx_configure_directory(
     OUTPUT_FILES_VARIABLE customization_files
 )
 
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/launcher.version "${releaseVersion.full}")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file} "${releaseVersion.full}")
+nx_store_known_file(${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file})
 
 add_custom_target(desktop_client_dmg ALL
     DEPENDS desktop_client applauncher
@@ -62,7 +63,8 @@ add_custom_target(desktop_client_dmg ALL
         ${QT_DIR}/plugins/audio ${libdir}/bin/audio
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${QT_DIR}/plugins/mediaservice ${libdir}/bin/mediaservice
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/launcher.version ${libdir}/bin
+    COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file} ${libdir}/bin
 
     COMMAND ${CMAKE_CURRENT_BINARY_DIR}/build_dmg.sh
 
@@ -71,7 +73,7 @@ add_custom_target(desktop_client_dmg ALL
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/plugins/platforms
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/plugins/audio
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/plugins/mediaservice
-    COMMAND ${CMAKE_COMMAND} -E remove ${libdir}/launcher.version
+    COMMAND ${CMAKE_COMMAND} -E remove ${libdir}/bin/${launcher.version.file}
 
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/${dmg_file_name} ${distribution_output_dir}

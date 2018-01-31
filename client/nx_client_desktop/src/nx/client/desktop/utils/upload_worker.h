@@ -4,41 +4,12 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/resource_fwd.h>
-#include <api/server_rest_connection_fwd.h>
+
+#include "upload_state.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
-
-struct FileUpload
-{
-    enum Status
-    {
-        Initial,
-        CalculatingMD5,
-        CreatingUpload,
-        Uploading,
-        Checking,
-        Done,
-        Error,
-        Canceled
-    };
-
-    /** Upload id, also serves as the filename on the server. */
-    QString id;
-
-    /** Upload size, in bytes. */
-    qint64 size = 0;
-
-    /** Total bytes uploaded. */
-    qint64 uploaded = 0;
-
-    /** Current status of the upload. */
-    Status status = Initial;
-
-    /** Error message, if any. */
-    QString errorMessage;
-};
 
 class UploadWorker: public QObject
 {
@@ -52,24 +23,24 @@ public:
         QObject* parent = nullptr);
     virtual ~UploadWorker() override;
 
-    FileUpload start();
+    void start();
     void cancel();
 
-    FileUpload status() const;
+    UploadState state() const;
 
 signals:
-    void progress(const FileUpload&);
+    void progress(const UploadState&);
 
 private:
     void emitProgress();
     void handleStop();
     void handleError(const QString& message);
     void handleMd5Calculated();
-    void handleFileUploadCreated(bool success, rest::Handle handle);
+    void handleFileUploadCreated(bool success);
     void handleUpload();
-    void handleChunkUploaded(bool success, rest::Handle handle);
+    void handleChunkUploaded(bool success);
     void handleAllUploaded();
-    void handleCheckFinished(bool success, rest::Handle handle, bool ok);
+    void handleCheckFinished(bool success, bool ok);
 
 private:
     struct Private;
@@ -80,4 +51,3 @@ private:
 } // namespace client
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::client::desktop::FileUpload)

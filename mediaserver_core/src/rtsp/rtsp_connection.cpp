@@ -873,9 +873,10 @@ int QnRtspConnectionProcessor::composeDescribe()
         auto mediaStreamIter = std::find_if(
             supportedMediaStreams.streams.cbegin(),
             supportedMediaStreams.streams.cend(),
-            [mediaStreamIndex]( const CameraMediaStreamInfo& streamInfo ) {
-                return streamInfo.encoderIndex == mediaStreamIndex;
-            } );
+            [mediaStreamIndex]( const CameraMediaStreamInfo& streamInfo )
+            {
+                return (int) streamInfo.encoderIndex == mediaStreamIndex;
+            });
         const std::map<QString, QString>& streamParams =
             mediaStreamIter != supportedMediaStreams.streams.cend()
             ? mediaStreamIter->customStreamParams

@@ -31,7 +31,9 @@ public:
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
     virtual const char* capabilitiesManifest(
-        nx::sdk::Error* error) const override;
+        nx::sdk::Error* error) override;
+
+    virtual void freeManifest(const char* data) override;
 
 private:
     nx::sdk::Error stopFetchingMetadataUnsafe();

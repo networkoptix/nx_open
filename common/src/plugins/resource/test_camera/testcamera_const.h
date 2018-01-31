@@ -1,10 +1,6 @@
-#ifndef __TEST_CAMERA_CONST_H__
-#define __TEST_CAMERA_CONST_H__
-
-#ifdef ENABLE_TEST_CAMERA
+#pragma once
 
 #include <QtCore/QByteArray>
-
 
 class TestCamConst
 {
@@ -15,7 +11,3 @@ public:
     static const QByteArray TEST_CAMERA_FIND_MSG;
     static const QByteArray TEST_CAMERA_ID_MSG;
 };
-
-
-#endif // #ifdef ENABLE_TEST_CAMERA
-#endif // __TEST_CAMERA_CONST_H__

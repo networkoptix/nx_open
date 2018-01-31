@@ -15,6 +15,9 @@ struct AnalyticsEventType
     QnUuid eventTypeId;
     TranslatableString eventName;
 };
+
+bool operator==(const AnalyticsEventType& lh, const AnalyticsEventType& rh);
+
 #define AnalyticsEventType_Fields (eventTypeId)(eventName)
 
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEventType, (json))

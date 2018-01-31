@@ -13,7 +13,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <onvif/stdsoap2.h>
+#include <gsoap/stdsoap2.h>
 
 #include <nx/utils/thread/joinable.h>
 #include <nx/utils/thread/stoppable.h>

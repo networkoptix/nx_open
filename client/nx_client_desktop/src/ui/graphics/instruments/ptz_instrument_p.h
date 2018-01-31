@@ -8,7 +8,7 @@
 #include <ui/graphics/items/standard/graphics_path_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/text_button_widget.h>
-#include <ui/graphics/items/generic/ui_elements_widget.h>
+#include <ui/graphics/items/generic/gui_elements_widget.h>
 #include <ui/graphics/items/generic/framed_widget.h>
 #include <ui/graphics/items/generic/splash_item.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -398,9 +398,9 @@ private:
 // -------------------------------------------------------------------------- //
 // PtzElementsWidget
 // -------------------------------------------------------------------------- //
-class PtzElementsWidget: public QnUiElementsWidget {
+class PtzElementsWidget: public QnGuiElementsWidget {
     Q_OBJECT
-    typedef QnUiElementsWidget base_type;
+    typedef QnGuiElementsWidget base_type;
 
 public:
     PtzElementsWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):

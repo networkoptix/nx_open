@@ -1,9 +1,10 @@
 #include "stun_server.h"
 
+#include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "http/http_api_path.h"
 #include "http/http_server.h"
 #include "settings.h"
 
@@ -64,7 +65,8 @@ void StunServer::initializeHttpTunnelling(http::Server* httpServer)
 {
     m_stunOverHttpServer.setupHttpTunneling(
         &httpServer->messageDispatcher(),
-        http::kStunOverHttpTunnelPath);
+        nx::network::url::normalizePath(
+            lm("/%1/%2").args(api::kMediatorApiPrefix, api::kStunOverHttpTunnelPath)).toUtf8());
 }
 
 bool StunServer::bind()

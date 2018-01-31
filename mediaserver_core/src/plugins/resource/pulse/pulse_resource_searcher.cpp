@@ -35,18 +35,15 @@ QnResourceList QnPlPulseSearcher::findResources()
         if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
             continue; // model forced by ONVIF
 
-        QnPhysicalCameraResourcePtr cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
-
         res->setName(r.name);
-        if (cameraRes)
-            cameraRes->setModel(r.name);
+        if (auto camera = res.dynamicCast<nx::mediaserver::resource::Camera>())
+            camera->setModel(r.name);
+
         res->setMAC(QnMacAddress(r.mac));
         res->setHostAddress(r.ip);
 
         result.push_back(res);
-
     }
-
 
     return result;
 }

@@ -34,7 +34,7 @@ CloudConnectors ConnectorFactory::defaultFactoryFunction(
     CloudConnectors connectors;
 
     if (((s_cloudConnectTypeMask & (int)CloudConnectType::udpHp) > 0) &&
-        (udpSocket || !response.udpEndpointList.empty()))
+        (udpSocket && !response.udpEndpointList.empty()))
     {
         TunnelConnectorContext context;
         context.connector = std::make_unique<udp::TunnelConnector>(

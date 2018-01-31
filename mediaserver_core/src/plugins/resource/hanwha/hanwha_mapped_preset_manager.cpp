@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_mapped_preset_manager.h"
 #include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
@@ -223,5 +221,3 @@ QString HanwhaMappedPresetManager::channel() const
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

@@ -23,12 +23,16 @@ function(nx_add_target name type)
     set(oneValueArgs LIBRARY_TYPE)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
+        SOURCE_EXCLUSIONS
         OTHER_SOURCES
-        PUBLIC_LIBS PRIVATE_LIBS)
+        PUBLIC_LIBS PRIVATE_LIBS
+    )
 
     cmake_parse_arguments(NX "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    find_sources("${CMAKE_CURRENT_SOURCE_DIR}/src" cpp_files hpp_files)
+    nx_find_sources("${CMAKE_CURRENT_SOURCE_DIR}/src" cpp_files hpp_files
+        EXCLUDE ${NX_SOURCE_EXCLUSIONS}
+    )
 
     set(resources ${NX_ADDITIONAL_RESOURCES})
     if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
@@ -44,8 +48,18 @@ function(nx_add_target name type)
 
         qt5_add_translation(qm_files ${ts_files})
 
-        list(APPEND resources ${qm_files})
-        set_source_files_properties(${qm_files}
+        set(needed_qm_files)
+        foreach(qm_file ${qm_files})
+            foreach(lang ${defaultTranslation} ${additionalTranslations})
+                if(qm_file MATCHES "${lang}\\.qm$")
+                    list(APPEND needed_qm_files ${qm_file})
+                    break()
+                endif()
+            endforeach()
+        endforeach()
+
+        list(APPEND resources ${needed_qm_files})
+        set_source_files_properties(${needed_qm_files}
             PROPERTIES RESOURCE_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/qm")
     endif()
 
@@ -62,7 +76,7 @@ function(nx_add_target name type)
         )
     endif()
 
-    set(sources ${cpp_files} ${rcc_files} ${qm_files})
+    set(sources ${cpp_files} ${hpp_files} ${rcc_files} ${qm_files})
     if(NOT NX_NO_PCH)
         set(sources ${sources} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
     endif()
@@ -97,6 +111,11 @@ function(nx_add_target name type)
                 nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${name}.vcxproj.user
                     ${CMAKE_CURRENT_BINARY_DIR})
             endif()
+
+            if(codeSigning)
+                nx_sign_windows_executable(${name})
+            endif()
+
             project(${name})
             set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${name})
         endif()
@@ -135,4 +154,17 @@ function(nx_add_target name type)
     if(NX_PRIVATE_LIBS)
         target_link_libraries(${name} PRIVATE ${NX_PRIVATE_LIBS})
     endif()
+endfunction()
+
+function(nx_exclude_sources_from_target target pattern)
+    get_property(sources TARGET ${target} PROPERTY SOURCES)
+
+    set(result)
+    foreach(src ${sources})
+        if(NOT src MATCHES "${pattern}")
+            list(APPEND result ${src})
+        endif()
+    endforeach()
+
+    set_PROPERTY(TARGET ${target} PROPERTY SOURCES ${result})
 endfunction()
