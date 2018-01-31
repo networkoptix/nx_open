@@ -195,6 +195,9 @@
             <property name="text">
              <string notr="true">&lt;placeholder&gt;</string>
             </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -212,13 +215,9 @@
           </item>
          </layout>
         </widget>
-        <zorder>placeholder</zorder>
-        <zorder>placeholder</zorder>
        </widget>
       </item>
      </layout>
-     <zorder>ribbon</zorder>
-     <zorder>ribbon</zorder>
     </widget>
    </item>
    <item>

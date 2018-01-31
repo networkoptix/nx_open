@@ -202,6 +202,7 @@ void UnifiedSearchWidget::setPlaceholderTexts(
 {
     m_placeholderTextConstrained = constrained;
     m_placeholderTextUnconstrained = unconstrained;
+    updatePlaceholderState();
 }
 
 bool UnifiedSearchWidget::isConstrained() const
