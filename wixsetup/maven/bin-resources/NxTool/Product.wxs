@@ -97,7 +97,7 @@
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="$(var.ProgramFilesFolder)">
-                <Directory Id="NetworkOptix" Name="$(var.companyName)">
+                <Directory Id="NetworkOptix" Name="$(var.companyInstallPath)">
                     <Directory Id="INSTALLDIR" Name="$(var.productName)">
                     </Directory>
                 </Directory>

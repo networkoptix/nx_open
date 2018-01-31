@@ -954,7 +954,7 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
         if (infoMode)
         {
             QnLicenseErrorCode errCode = m_validator->validate(license,
-                QnLicenseValidator::VM_CheckInfo);
+                QnLicenseValidator::VM_CanActivate);
 
             if (errCode != QnLicenseErrorCode::NoError && errCode != QnLicenseErrorCode::Expired)
             {

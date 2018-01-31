@@ -251,6 +251,7 @@ void ExportSettingsDialog::Private::updateThumbnail(const QnMediaResourcePtr& re
     m_mediaImageProvider.reset(new ProxyImageProvider());
 
     api::ResourceImageRequest request;
+    request.rotation = 0;
     request.resource = resource->toResourcePtr();
     request.msecSinceEpoch = m_exportMediaSettings.timePeriod.startTimeMs;
     request.aspectRatio = api::ImageRequest::AspectRatio::source;

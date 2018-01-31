@@ -226,7 +226,7 @@ nx::sdk::Error Monitor::startMonitoring(nxpl::NX_GUID* eventTypeList,
 
     if (localIp == nx::network::HostAddress())
     {
-        //warning message has been output int "getLocalIp" function
+        // Warning message is already printed by getLocalIp().
         return nx::sdk::Error::networkError;
     }
 

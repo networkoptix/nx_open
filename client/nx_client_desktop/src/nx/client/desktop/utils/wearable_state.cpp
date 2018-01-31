@@ -4,6 +4,14 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+WearableState::EnqueuedFile WearableState::currentFile() const
+{
+    if (currentIndex >= queue.size() || currentIndex < 0)
+        return EnqueuedFile();
+
+    return queue[currentIndex];
+}
+
 bool WearableState::isRunning() const
 {
     switch (status)
@@ -17,21 +25,33 @@ bool WearableState::isRunning() const
     }
 }
 
+bool WearableState::isDone() const
+{
+    return currentIndex >= queue.size();
+}
+
 int WearableState::progress() const
 {
+    if (queue.isEmpty())
+        return 0;
+
+    int filePercent = 0;
     switch (status)
     {
-    case Unlocked:
-    case LockedByOtherClient:
-    case Locked:
-        return 0;
     case Uploading:
-        return 90 * currentUpload.uploaded / currentUpload.size;
+        if (currentUpload.size == 0)
+            filePercent = 0;
+        else
+            filePercent = 90 * currentUpload.uploaded / currentUpload.size;
+        break;
     case Consuming:
-        return 90 + 10 * consumeProgress / 100;
+        filePercent = 90 + 10 * consumeProgress / 100;
+        break;
     default:
-        return 0;
+        break;
     }
+
+    return (100 * currentIndex + filePercent) / queue.size();
 }
 
 } // namespace desktop

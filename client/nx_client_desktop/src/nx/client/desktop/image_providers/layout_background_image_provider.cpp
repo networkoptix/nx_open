@@ -56,8 +56,8 @@ LayoutBackgroundImageProvider::LayoutBackgroundImageProvider(const QnLayoutResou
         {
             d->image = image;
             emit imageChanged(image);
-            emit statusChanged(status());
             emit sizeHintChanged(sizeHint());
+            emit statusChanged(status());
         });
 }
 

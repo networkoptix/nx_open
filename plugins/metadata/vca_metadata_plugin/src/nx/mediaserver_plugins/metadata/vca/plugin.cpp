@@ -26,8 +26,8 @@ namespace vca {
 
 namespace {
 
-const char* const kPluginName = "VCA metadata plugin";
-const QString kVcaVendor("cap");
+static const char* const kPluginName = "VCA metadata plugin";
+static const QString kVcaVendor("cap");
 
 } // namespace
 
@@ -39,6 +39,10 @@ Plugin::Plugin()
     QFile f(":/vca/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
+    else
+        NX_PRINT << kPluginName <<" can not open resource \":/vca/manifest.json\".";
+
+    m_typedManifest = QJson::deserialized<Vca::VcaAnalyticsDriverManifest>(m_manifest);
 }
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -97,12 +101,17 @@ AbstractMetadataManager* Plugin::managerForResource(
     Error* outError)
 {
     *outError = Error::noError;
-
     const auto vendor = QString(resourceInfo.vendor).toLower();
     if (!vendor.startsWith(kVcaVendor))
+    {
+        NX_PRINT << kPluginName <<" got unsupported resource. Manager can not be created.";
         return nullptr;
-
-    return new Manager(resourceInfo, m_manifest);
+    }
+    else
+    {
+        NX_PRINT << kPluginName << " creates new manager.";
+        return new Manager(this, resourceInfo, m_typedManifest);
+    }
 }
 
 AbstractSerializer* Plugin::serializerForType(
@@ -119,7 +128,25 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-} // vca
+const Vca::VcaAnalyticsEventType& Plugin::eventByInternalName(
+    const QString& internalName) const noexcept
+{
+    // There are only few elements, so linear search is the fastest and the most simple.
+    const auto it = std::find_if(
+        m_typedManifest.outputEventTypes.cbegin(),
+        m_typedManifest.outputEventTypes.cend(),
+        [&internalName](const Vca::VcaAnalyticsEventType& event)
+    {
+        return event.internalName == internalName;
+    });
+
+    return
+        (it != m_typedManifest.outputEventTypes.cend())
+        ? *it
+        : m_emptyEvent;
+}
+
+} // namespace vca
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx

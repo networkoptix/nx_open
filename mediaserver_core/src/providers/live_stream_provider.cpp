@@ -199,10 +199,12 @@ QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStr
 
 void QnLiveStreamProvider::setPrimaryStreamParams(const QnLiveStreamParams& params)
 {
-    QnMutexLocker lock(&m_liveMutex);
-    if (m_liveParams == params)
-        return;
-    m_liveParams = params;
+    {
+        QnMutexLocker lock(&m_liveMutex);
+        if (m_liveParams == params)
+            return;
+        m_liveParams = params;
+    }
 
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
@@ -424,6 +426,7 @@ void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audio
 
 void QnLiveStreamProvider::onPrimaryFpsChanged(int primaryFps)
 {
+    QnMutexLocker lock(&m_liveMutex);
     NX_ASSERT(getRole() == Qn::CR_SecondaryLiveVideo);
     // now primary has newFps
     // this is secondary stream
