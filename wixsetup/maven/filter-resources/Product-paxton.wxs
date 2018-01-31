@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <?include BuildVars.wxi ?>
     <Product Id="*" Name="${display.product.name} Paxton Plugin" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${ax.upgradeCode}">
         <Package InstallerVersion="405" Compressed="yes" InstallScope="perMachine" />
 
@@ -55,7 +56,7 @@
     <Fragment>
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFilesFolder">
-                <Directory Id="CompanyDir" Name="${company.name}">
+                <Directory Id="CompanyDir" Name="$(var.companyInstallPath)">
                     <Directory Id="INSTALLDIR" Name="${display.product.name}">
                         <Directory Id="AxClientParentDir" Name="AxClient">
                         </Directory>

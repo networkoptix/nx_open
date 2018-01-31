@@ -23,7 +23,7 @@ public:
 
     virtual bool bind(const SocketAddress&) = 0;
     virtual bool listen() = 0;
-    virtual QUrl getServerUrl() const = 0;
+    virtual QUrl url() const = 0;
     virtual void sendIndicationThroughEveryConnection(nx::stun::Message) = 0;
     virtual nx::stun::MessageDispatcher& dispatcher() = 0;
     virtual std::size_t connectionCount() const = 0;
@@ -336,8 +336,8 @@ private:
             std::bind(&StunAsyncClientAcceptanceTest::sendResponse, this, _1, _2));
 
         ASSERT_TRUE(m_server->bind(m_serverEndpoint));
-        m_serverEndpoint = nx::network::url::getEndpoint(m_server->getServerUrl());
-        m_serverUrl = m_server->getServerUrl();
+        m_serverEndpoint = nx::network::url::getEndpoint(m_server->url());
+        m_serverUrl = m_server->url();
         ASSERT_TRUE(m_server->listen());
     }
 

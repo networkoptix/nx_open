@@ -9,6 +9,17 @@ AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client):
     m_client(std::move(client))
 {
     NX_LOGX("AsyncClientUser()", cl_logDEBUG2);
+
+    m_client->addOnReconnectedHandler(
+        [this, guard = m_asyncGuard.sharedGuard()]()
+        {
+            if (auto lock = guard->lock())
+                return post(std::bind(&AsyncClientUser::reportReconnect, this));
+
+            NX_LOG(lm("AsyncClientUser(%1). Ignoring reconnect handler")
+                .arg(this), cl_logDEBUG1);
+        },
+        m_asyncGuard.sharedGuard().get());
 }
 
 AsyncClientUser::~AsyncClientUser()
@@ -69,16 +80,7 @@ bool AsyncClientUser::setIndicationHandler(
 void AsyncClientUser::setOnReconnectedHandler(
     AbstractAsyncClient::ReconnectHandler handler)
 {
-    m_client->addOnReconnectedHandler(
-        [this, guard = m_asyncGuard.sharedGuard(), handler = std::move(handler)]()
-        {
-            if (auto lock = guard->lock())
-                return post(std::move(handler));
-
-            NX_LOG(lm("AsyncClientUser(%1). Ignoring reconnect handler")
-                .arg(this), cl_logDEBUG1);
-        },
-        m_asyncGuard.sharedGuard().get());
+    m_reconnectHandler.swap(handler);
 }
 
 bool AsyncClientUser::setConnectionTimer(
@@ -129,6 +131,12 @@ void AsyncClientUser::disconnectFromClient()
 
     m_asyncGuard.reset();
     NX_LOG(lm("AsyncClientUser(%1). Disconnected from client").arg(this), cl_logDEBUG2);
+}
+
+void AsyncClientUser::reportReconnect()
+{
+    if (m_reconnectHandler)
+        m_reconnectHandler();
 }
 
 } // namespace stun

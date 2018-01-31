@@ -72,6 +72,16 @@ public:
         return get();
     }
 
+    T& operator*()
+    {
+        return *get();
+    }
+
+    const T& operator*() const
+    {
+        return *get();
+    }
+
     operator bool_type() const
     {
         return m_ptr.load()

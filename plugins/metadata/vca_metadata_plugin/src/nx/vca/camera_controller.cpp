@@ -150,6 +150,16 @@ bool isResponseOK(const nx_http::HttpClient& client)
 
 std::vector<std::string> getRuleTableLines(QByteArray& ruleTable)
 {
+    std::vector<std::string> result;
+    for (auto line: ruleTable.split('\n'))
+    {
+        result.push_back(line.trimmed().toStdString());
+    }
+    return result;
+}
+
+std::map<int, SupportedRule> parseRuleTableLines(const std::vector<std::string>& lines)
+{
 /*
     There can be no more then 8 rules. Each rule property takes one line.
     Lines are separated with \r\n.
@@ -166,35 +176,9 @@ std::vector<std::string> getRuleTableLines(QByteArray& ruleTable)
     Eventprofile.P1.name=Rule_2 (motion detected)
     Eventprofile.P2.name=FD Rule
     Eventprofile.P3.name=Rule 4 (one more VCA)
+
+    We'll read rule id at position kIdOffset, and property name at position kPropertyOffset.
 */
-
-    ruleTable.replace('\n', '\0'); //< Now every line is a null-terminated string.
-    const char* begin = ruleTable.begin();
-    const char* end = ruleTable.begin() + ruleTable.size();
-
-    std::vector<std::string> lines; //< vector<string_view> would be perfect, unfortunately we have
-                                    // not it yet... waiting for c++17
-    const char* cur = begin;
-    while (cur != end)
-    {
-        const char* lineBegin = cur;
-
-        // This loop is safe as we know that QByteArray::data always have termination 0
-        while (*cur)
-            ++cur;
-
-        if (cur>lineBegin)
-            lines.emplace_back(lineBegin, cur - 1); //< lines end with '\r', so we cut it off
-
-        if (cur != end)
-            ++cur; //< go to next line
-    }
-    return lines;
-}
-
-std::map<int, SupportedRule> parseRuleTableLines(const std::vector<std::string>& lines)
-{
-
     std::map<int, SupportedRule> rules;
     for (const auto& line : lines)
     {
@@ -275,15 +259,25 @@ class CameraControllerImpl
     static const QString kPath;
 
 public:
+    CameraControllerImpl()
+    {
+        // VCA-camera executes cgi-commands very slow (especially complex commands), so read
+        // intervals must be really huge.
+        m_client.setResponseReadTimeoutMs(10000);
+        m_client.setMessageBodyReadTimeoutMs(5000);
+    }
+
     void setCgiPreamble(const std::string& ip)
     {
         m_cgiPreamble = kProtocol + QString::fromUtf8(ip.c_str()) + kPath;
     }
+
     void setUserPassword(const std::string& user, const std::string& password)
     {
         m_client.setUserName(user.c_str());
         m_client.setUserPassword(password.c_str());
     }
+
     bool execute(const QString& command, QByteArray& report)
     {
         QString url = m_cgiPreamble + command;
@@ -300,10 +294,6 @@ public:
 
         return true;
     }
-
-    //client.setResponseReadTimeoutMs(10000);
-    //client.setSendTimeoutMs(10000);
-    //client.setMessageBodyReadTimeoutMs(10000);
 };
 const QString CameraControllerImpl::kProtocol("http://");
 const QString CameraControllerImpl::kPath("/nvc-cgi/admin/param.fcgi?");
@@ -380,8 +370,6 @@ bool CameraController::readSupportedRules()
 
 bool CameraController::readSupportedRules2()
 {
-    // From time to time camera treats long queries incorrectly. So we need to make shorter queries:
-    // readSupportedRules don't ask about notification, readTcpServerEnabled does.
     static const int kGetRulesCommandCound = 4;
     static const QString kGetRulesCommand[kGetRulesCommandCound] =
     {
@@ -488,7 +476,7 @@ bool CameraController::readTcpServerEnabled(int eventProfileIndex)
 
     QByteArray value = extractCgiResponseValue(cgiResponse);
     bool enabled = (value.toStdString() == "yes");
-    m_supportedRules[eventProfileIndex].tcpServerNotificationEnabled = true;
+    m_supportedRules[eventProfileIndex].tcpServerNotificationEnabled = enabled;
 
     return true;
 }
