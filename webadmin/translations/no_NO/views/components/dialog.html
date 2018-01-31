@@ -1,0 +1,59 @@
+
+<div class="modal-header" ng-if="settings.title">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="close()" ng-if="settings.closable"><span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{{settings.title}}</h4>
+</div>
+<div class="modal-body" ng-if="settings.content || settings.needOldPassword || settings.createLoginAndPassword">
+    <p ng-if="settings.content" ng-bind-html="settings.content"></p>
+    <div ng-if="settings.createLoginAndPassword">
+
+        <form class="master-controls" name="forms.localForm" novalidate disable-autocomplete>
+            <div class="form-group" validate-field>
+                <input ng-model="settings.localLogin" name="localLogin" class="form-control"
+                       type="text" placeholder="Login" required readonly>
+            </div>
+            <password-input ng-model="settings.localPassword"></password-input>
+            <div class="form-group" validate-field ng-class="{'has-error':forms.localForm.passwordInput.$valid &&
+                     forms.localForm.localPasswordConfirmation.$valid &&
+                     forms.localForm.localPasswordConfirmation.$touched &&
+                     settings.localPasswordConfirmation != settings.localPassword}">
+                <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
+                       type="password" autocomplete="new-password" placeholder="Repeat password" required>
+            </div>
+
+            <div class="form-group has-error"
+                 ng-if="forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
+                    forms.localForm.passwordInput.password.$touched && forms.localForm.passwordInput.$error.required ||
+                    forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
+                <div class="help-block">
+                    All fields are required
+                </div>
+            </div>
+
+            <div class="form-group has-error"
+                 ng-if= "forms.localForm.passwordInput.$valid &&
+                     forms.localForm.localPasswordConfirmation.$valid &&
+                     forms.localForm.localPasswordConfirmation.$touched &&
+                     settings.localPasswordConfirmation != settings.localPassword">
+                <div class="help-block">
+                    Passwords do not match
+                </div>
+            </div>
+        </form>
+    </div>
+    <div ng-if="settings.needOldPassword">
+        <form class="form" name="oldPasswordForm" novalidate>
+            <label for="oldSystemPassword" class="control-label">Enter the current password to continue.</label>
+            <input id="oldSystemPassword" type="password" ng-model="settings.oldPassword"
+                   class="form-control" placeholder="password" required auto-focus>
+        </form>
+    </div>
+</div>
+<ng-include ng-if="settings.template" src="settings.template"></ng-include>
+<div class="modal-footer" ng-if="settings.hasFooter">
+    <button type="button" class="btn btn-default" data-dismiss="modal" ng-if="!settings.cancellable" ng-click="cancel()" >Cancel</button>
+    <button type="button" class="btn" ng-class="settings.buttonClass" enter-button
+ ng-disabled="settings.needOldPassword && !settings.oldPassword || settings.createLoginAndPassword && !forms.localForm.$valid"
+            ng-if="!settings.cancellable" ng-click="ok()" >{{settings.actionLabel}}</button>
+    <button type="button" class="btn" ng-class="settings.buttonClass" enter-button auto-focus ng-if="settings.cancellable" ng-click="close()" >Close</button>
+</div>
