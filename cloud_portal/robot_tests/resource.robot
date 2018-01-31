@@ -112,6 +112,11 @@ Check For Alert
     Element Text Should Be    ${ALERT}    ${alert text}
     Wait Until Page Does Not Contain Element    ${ALERT}
 
+Verify In System
+    [arguments]    ${system name}
+    Wait Until Element Is Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
+    Element Should Be Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
+
 Failure Tasks
     Capture Page Screenshot    selenium-screenshot-{index}.png
     Close Browser

@@ -18,10 +18,12 @@ ${PASSWORD INPUT}                     //form[contains(@name, 'loginForm')]//inpu
 ${LOG IN BUTTON}                      //form[contains(@name, 'loginForm')]//button[@ng-click='checkForm()']
 ${REMEMBER ME CHECKBOX}               //form[contains(@name, 'loginForm')]//input[@ng-model='auth.remember']
 ${FORGOT PASSWORD}                    //form[contains(@name, 'loginForm')]//a[@href='/restore_password']
+${LOG IN CLOSE BUTTON}                //button[@ng-click='close()']
 
 ${RESET PASSWORD EMAIL INPUT}         //form[@name='restorePassword']//input[@ng-model='data.email']
 
 ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
+${YOU HAVE NO SYSTEMS}                //span[contains(text(),'You have no Systems connected to Nx Cloud')]
 
 ${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), 'Log Out')]
@@ -44,14 +46,24 @@ ${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || register
 ${ACTIVATION SUCCESS}                 //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), 'Your account is successfully activated')]
 ${SUCCESS LOG IN BUTTON}              //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), 'Your account is successfully activated')]//a[@href='/login']
 
+#In system settings
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
+${DISCONNECT FROM MY ACCOUNT}         //button[@ng-click='delete()']
 ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//button[@ng-click='share()']
 ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
 ${DELETE USER BUTTON}                 //button[@ng-click='ok()' and contains(text(), 'Delete')]
 ${DELETE USER CANCEL BUTTON}          //button[@ng-click='cancel()' and contains(text(), 'Cancel')]
 
+${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains(text(), 'Failed to access System')]
+
+#Disconnect from clout portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
 ${DISCONNECT FORM HEADER}            //h1['Disconnect System from Nx Cloud?']
+
+#Disconnect from my account
+${DISCONNECT MODAL TEXT}              //p[contains(text(), 'You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?')]
+${DISCONNECT MODAL CANCEL}            //button[@ng-click='cancel()']
+${DISCONNECT MODAL DISCONNECT BUTTON}    //button[@ng-click='ok()']
 
 ${JUMBOTRON}                          //div[@class='jumbotron']
 ${PROMO BLOCK}                        //div[contains(@class,'promo-block') and not(contains(@class, 'col-sm-4'))]
@@ -86,6 +98,7 @@ ${EDIT PERMISSIONS HINT}              //form[@name='shareForm']//span[contains(@
 #Account Page
 ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-model='account.first_name']
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
+${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
 
 #Already logged in modal
 ${LOGGED IN CONTINUE BUTTON}          //div[@uib-modal-transclude]//button[@ng-click='ok()']
@@ -97,12 +110,19 @@ ${CONTINUE MODAL}                     //div[@uib-modal-window='modal-window']
 ${300CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmyy
 ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopas
 
+#Emails
 ${EMAIL VIEWER}                       noptixqa+viewer@gmail.com
+${EMAIL ADV VIEWER}                   noptixqa+advviewer@gmail.com
+${EMAIL LIVE VIEWER}                  noptixqa+liveviewer@gmail.com
 ${EMAIL OWNER}                        noptixqa+owner@gmail.com
+${EMAIL NOT OWNER}                    noptixqa+notowner@gmail.com
 ${EMAIL ADMIN}                        noptixqa+admin@gmail.com
 ${UNREGISTERED EMAIL}                 noptixqa+unregistered@gmail.com
+${EMAIL NOPERM}                       noptixqa+noperm@gmail.com
 ${BASE PASSWORD}                      qweasd123
 
+#Related to Auto Tests system
+${AUTO TESTS URL}                     b4939b35-5b98-492b-a092-27fe8efeef38
 ${AUTO TESTS}                         //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/following-sibling::span[contains(@class,'user-name') and contains(text(),'TestFirstName TestLastName')]
