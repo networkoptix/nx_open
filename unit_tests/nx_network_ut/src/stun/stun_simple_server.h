@@ -23,7 +23,7 @@ public:
         pleaseStopSync();
     }
 
-    QUrl getServerUrl() const
+    QUrl url() const
     {
         return nx::network::url::Builder()
             .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address());
