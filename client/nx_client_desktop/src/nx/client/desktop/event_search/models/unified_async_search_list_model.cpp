@@ -57,6 +57,15 @@ bool UnifiedAsyncSearchListModel::isConstrained() const
     return m_sourceModel && (!clientsideTextFilter().isEmpty() || m_sourceModel->isConstrained());
 }
 
+int UnifiedAsyncSearchListModel::relevantCount() const
+{
+    int count = m_filterModel->rowCount();
+    if (m_busyIndicatorModel->active())
+        ++count;
+
+    return count;
+}
+
 bool UnifiedAsyncSearchListModel::canFetchMore(const QModelIndex& /*parent*/) const
 {
     return m_sourceModel && m_sourceModel->canFetchMore();

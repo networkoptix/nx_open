@@ -18,6 +18,7 @@
 #include <utils/common/synctime.h>
 
 #include <nx/client/desktop/event_search/models/unified_async_search_list_model.h>
+#include <nx/utils/disconnect_helper.h>
 #include <nx/utils/pending_operation.h>
 
 namespace nx {
@@ -122,13 +123,11 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     setupTimeSelection();
 
     ui->areaButton->setIcon(qnSkin->icon(lit("text_buttons/area.png")));
-
-    connect(ui->ribbon, &EventRibbon::countChanged,
-        this, &UnifiedSearchWidget::updatePlaceholderState);
 }
 
 UnifiedSearchWidget::~UnifiedSearchWidget()
 {
+    m_modelConnections.reset();
 }
 
 QAbstractListModel* UnifiedSearchWidget::model() const
@@ -143,23 +142,34 @@ void UnifiedSearchWidget::setModel(QAbstractListModel* value)
     if (oldModel == value)
         return;
 
-    if (oldModel)
-    {
-        oldModel->disconnect(this);
-        m_searchLineEdit->disconnect(oldModel);
-    }
+    m_modelConnections.reset();
 
     ui->ribbon->setModel(value);
 
-    connect(value, &QAbstractItemModel::rowsRemoved,
+    if (!value)
+        return;
+
+    m_modelConnections.reset(new QnDisconnectHelper());
+
+    *m_modelConnections << connect(value, &QAbstractItemModel::rowsRemoved,
         this, &UnifiedSearchWidget::requestFetch, Qt::QueuedConnection);
 
-    connect(value, &QAbstractItemModel::dataChanged,
+    *m_modelConnections << connect(value, &QAbstractItemModel::modelReset,
+        this, &UnifiedSearchWidget::updatePlaceholderState);
+
+    *m_modelConnections << connect(value, &QAbstractItemModel::rowsRemoved,
+        this, &UnifiedSearchWidget::updatePlaceholderState);
+
+    *m_modelConnections << connect(value, &QAbstractItemModel::rowsInserted,
+        this, &UnifiedSearchWidget::updatePlaceholderState);
+
+    // For busy indicator going on/off.
+    *m_modelConnections << connect(value, &QAbstractItemModel::dataChanged,
         this, &UnifiedSearchWidget::updatePlaceholderState);
 
     if (auto asyncModel = qobject_cast<UnifiedAsyncSearchListModel*>(value))
     {
-        connect(m_searchLineEdit, &QnSearchLineEdit::textChanged,
+        *m_modelConnections << connect(m_searchLineEdit, &QnSearchLineEdit::textChanged,
             asyncModel, &UnifiedAsyncSearchListModel::setClientsideTextFilter);
     }
 
@@ -347,12 +357,10 @@ void UnifiedSearchWidget::fetchMoreIfNeeded()
 
 bool UnifiedSearchWidget::hasRelevantTiles() const
 {
-    const auto count = model() ? model()->rowCount() : 0;
-    if (count == 0)
-        return false;
-
-    // Last tile is a busy indicator.
-    return (count > 1) || model()->data(model()->index(0), Qn::BusyIndicatorVisibleRole).toBool();
+    auto asyncModel = qobject_cast<UnifiedAsyncSearchListModel*>(model());
+    return asyncModel
+        ? asyncModel->relevantCount() > 0
+        : model() && model()->rowCount() > 0;
 }
 
 void UnifiedSearchWidget::updatePlaceholderState()

@@ -109,6 +109,13 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
 
     m_modelConnections.reset(new QnDisconnectHelper());
 
+    *m_modelConnections << connect(m_model, &QObject::destroyed, this,
+        [this]()
+        {
+            m_model = nullptr;
+            clear();
+        });
+
     *m_modelConnections << connect(m_model, &QAbstractListModel::modelReset, this,
         [this]()
         {

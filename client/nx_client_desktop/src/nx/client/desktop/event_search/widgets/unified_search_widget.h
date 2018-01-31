@@ -11,6 +11,7 @@
 class QAbstractListModel;
 class QnSearchLineEdit;
 class QMenu;
+class QnDisconnectHelper;
 
 namespace Ui { class UnifiedSearchWidget; }
 
@@ -85,6 +86,7 @@ private:
     Period m_period = Period::all;
     QString m_placeholderTextConstrained;
     QString m_placeholderTextUnconstrained;
+    QScopedPointer<QnDisconnectHelper> m_modelConnections;
 };
 
 } // namespace desktop

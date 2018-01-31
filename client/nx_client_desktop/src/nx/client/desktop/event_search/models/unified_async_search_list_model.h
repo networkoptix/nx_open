@@ -39,6 +39,8 @@ public:
 
     bool isConstrained() const;
 
+    int relevantCount() const;
+
 private:
     AbstractAsyncSearchListModel* const m_sourceModel = nullptr;
     QnSortFilterListModel* const m_filterModel = nullptr;
