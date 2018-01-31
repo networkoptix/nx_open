@@ -26,7 +26,7 @@ function crash_gdb_bt() {
         echo "t apply all bt 25" | gdb $BIN_PATH $CORE >/tmp/$REPORT 2>&1 && \
             mkdir -p $CRASH_DIR && mv /tmp/$REPORT $CRASH_DIR/$REPORT &
 
-        chmod 666 $CRASH_DIR/$REPORT
+        chmod -R 666 $CRASH_DIR
         ls $CORE_ORIG.* | grep -v $CORE | xargs rm 2>/dev/null
     fi
 }
