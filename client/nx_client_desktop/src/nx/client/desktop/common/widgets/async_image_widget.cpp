@@ -251,6 +251,27 @@ void AsyncImageWidget::invalidateGeometry()
     updateGeometry();
 }
 
+void AsyncImageWidget::setAutoScaleDown(bool value)
+{
+    m_autoScaleDown = value;
+}
+
+bool AsyncImageWidget::autoScaleDown() const
+{
+    return m_autoScaleDown;
+}
+
+// Enable automatic upscaling of the image up to widget's size
+void AsyncImageWidget::setAutoScaleUp(bool value)
+{
+    m_autoScaleUp = value;
+}
+
+bool AsyncImageWidget::autoScaleUp() const
+{
+    return m_autoScaleUp;
+}
+
 void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
 {
     switch (status)
@@ -274,10 +295,30 @@ void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
 
 void AsyncImageWidget::updateThumbnailImage(const QImage& image)
 {
+    QSize sourceSize = image.size();
     const auto maxHeight = qMin(maximumHeight(), heightForWidth(maximumWidth()));
-    m_preview = QPixmap::fromImage(image.size().height() > maxHeight
-        ? image.scaled(maximumSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation)
-        : image);
+
+    bool scale = false;
+    QSize targetSize;
+
+    if (sourceSize.height() > maxHeight && m_autoScaleDown)
+    {
+        scale = true;
+        targetSize = maximumSize();
+    }
+
+    if (sourceSize.height() < maxHeight && m_autoScaleUp)
+    {
+        scale = true;
+        targetSize = maximumSize();
+    }
+
+    if (scale)
+    {
+        m_preview = QPixmap::fromImage(image.scaled(maximumSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
+    else
+        m_preview = QPixmap::fromImage(image);
 
     invalidateGeometry();
     update();

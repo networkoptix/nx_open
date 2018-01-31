@@ -42,6 +42,16 @@ public:
     QPalette::ColorRole borderRole() const;
     void setBorderRole(QPalette::ColorRole role);
 
+    // Enable automatic downscaling of the image if it does not fit to widget's bounds.
+    // Will not cause existing image to be resized
+    void setAutoScaleDown(bool value);
+    bool autoScaleDown() const;
+
+    // Enable automatic upscaling of the image up to widget's size
+    // Will not cause existing image to be resized
+    void setAutoScaleUp(bool value);
+    bool autoScaleUp() const;
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void changeEvent(QEvent* event) override;
@@ -60,6 +70,10 @@ private:
     QPixmap m_preview;
     QPointer<QnImageProvider> m_imageProvider;
     QPalette::ColorRole m_borderRole = QPalette::Shadow;
+    // Should widget scale image to fit to the size of the widget
+    bool m_autoScaleDown = true;
+    // Should the widget enlarge image up to size of the widget
+    bool m_autoScaleUp = false;
 };
 
 } // namespace desktop

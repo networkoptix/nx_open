@@ -32,6 +32,8 @@ namespace desktop {
 class LayoutThumbnailLoader;
 class ProxyImageProvider;
 class TranscodingImageProcessor;
+class ResourceThumbnailProvider;
+class AsyncImageWidget;
 
 class ExportSettingsDialog::Private: public Connective<QObject>
 {
@@ -46,15 +48,14 @@ public:
     void loadSettings();
     void saveSettings();
 
-    void setMediaResource(const QnMediaResourcePtr& media);
-    void setLayout(const QnLayoutResourcePtr& layout);
-    void setTimePeriod(const QnTimePeriod& period);
+    void setMediaResource(const QnMediaResourcePtr& media, const nx::core::transcoding::Settings& settings);
+    void setLayout(const QnLayoutResourcePtr& layout, const QPalette& palette);
+    void setTimePeriod(const QnTimePeriod& period, bool forceValidate = false);
     void setMediaFilename(const Filename& filename);
     void setLayoutFilename(const Filename& filename);
     void setRapidReviewFrameStep(qint64 frameStepMs);
     void setServerTimeZoneOffsetMs(qint64 offsetMs);
     void setTimestampOffsetMs(qint64 offsetMs);
-    void setAvailableTranscodingSettings(const nx::core::transcoding::Settings& settings);
     void setApplyFilters(bool value);
     void setLayoutReadOnly(bool value);
 
@@ -74,8 +75,8 @@ public:
 
     void createOverlays(QWidget* overlayContainer);
 
-    QnImageProvider* mediaImageProvider() const;
-    LayoutThumbnailLoader* layoutImageProvider() const;
+   void setMediaPreviewWidget(nx::client::desktop::AsyncImageWidget* widget);
+   void setLayoutPreviewWidget(nx::client::desktop::AsyncImageWidget* widget);
     QSize fullFrameSize() const;
 
     const ExportRapidReviewPersistentSettings& storedRapidReviewSettings() const;
@@ -95,7 +96,11 @@ public:
 
     QString timestampText(qint64 timeMs) const;
 
-    bool isTranscodingAllowed() const;
+    bool isTranscodingRequested() const;
+
+    // In some cases video is not present, but there can be audio stream
+    // We should update overlays and filtering according to this case
+    bool isMediaEmpty() const;
 
 signals:
     void validated(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
@@ -113,14 +118,11 @@ private:
     void updateBookmarkText();
     void updateTimestampText();
     void overlayPositionChanged(ExportOverlayType type);
-    void updateTranscodingSettings();
-    void updateMediaImageProcessor();
+    void refreshMediaPreview();
     void updateOverlaysVisibility(bool transcodingIsAllowed);
     QString cachedImageFileName() const;
 
     void setFrameSize(const QSize& size);
-
-    void updateThumbnail(const QnMediaResourcePtr& media);
 
     static void generateAlerts(ExportMediaValidator::Results results,
         QStringList& weakAlerts, QStringList& severeAlerts);
@@ -133,14 +135,31 @@ private:
     const QString m_bookmarkDescription;
     ExportSettingsDialog::Mode m_mode = Mode::Media;
 
-    ExportMediaValidator::Results m_mediaValidationResults;
-    ExportMediaValidator::Results m_layoutValidationResults;
+    // Media group
 
+    ExportMediaValidator::Results m_mediaValidationResults;
     ExportMediaSettings m_exportMediaSettings;
     ExportMediaPersistentSettings m_exportMediaPersistentSettings;
+    bool m_needValidateMedia = false;
+    // Applies filters to make media thumbnails
+    // look the same way as on real output
+    QScopedPointer<TranscodingImageProcessor> m_mediaPreviewProcessor;
+    // Image provider for media preview
+    std::unique_ptr<QnImageProvider> m_mediaPreviewProvider;
+    nx::client::desktop::AsyncImageWidget* m_mediaPreviewWidget;
 
+    // This one provides raw image without any transforms
+    std::unique_ptr<ResourceThumbnailProvider> m_mediaRawImageProvider;
+
+    // Layout group
+
+    ExportMediaValidator::Results m_layoutValidationResults;
     ExportLayoutSettings m_exportLayoutSettings;
     ExportLayoutPersistentSettings m_exportLayoutPersistentSettings;
+    bool m_needValidateLayout = false;
+    // Image provider for layout preview
+    std::unique_ptr<QnImageProvider> m_layoutPreviewProvider;
+    nx::client::desktop::AsyncImageWidget* m_layoutPreviewWidget;
 
     nx::core::transcoding::Settings m_availableTranscodingSettings;
 
@@ -148,7 +167,6 @@ private:
     std::array<ExportOverlayWidget*, overlayCount> m_overlays {};
 
     QPointer<ExportOverlayWidget> m_selectedOverlay;
-
     QScopedPointer<ProxyImageProvider> m_mediaImageProvider;
     QScopedPointer<LayoutThumbnailLoader> m_layoutImageProvider;
     QScopedPointer<TranscodingImageProcessor> m_mediaImageProcessor;

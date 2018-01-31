@@ -13,6 +13,10 @@ namespace desktop {
 
 class AbstractImageProcessor;
 
+/**
+ * This image provider takes input from another ImageProvider
+ * and calls AbstractImageProcessor to produce output image
+ */
 class ProxyImageProvider: public QnImageProvider
 {
     Q_OBJECT

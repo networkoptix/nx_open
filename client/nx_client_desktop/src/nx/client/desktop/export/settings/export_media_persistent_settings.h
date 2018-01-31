@@ -128,9 +128,14 @@ struct ExportMediaPersistentSettings
     ExportOverlayPersistentSettings* overlaySettings(ExportOverlayType type);
     const ExportOverlayPersistentSettings* overlaySettings(ExportOverlayType type) const;
 
+    // Enable transcoding
+    // @returns true if transcoding value was changed
+    bool setTranscoding(bool value);
+    bool isTranscodingForced() const;
     void updateRuntimeSettings(ExportMediaSettings& runtimeSettings) const;
     void setDimension(int newDimension);
 };
+
 #define ExportMediaPersistentSettings_Fields (applyFilters)(fileFormat)(dimension)(rapidReview)\
     (usedOverlays)(imageOverlay)(timestampOverlay)(textOverlay)(bookmarkOverlay)
 

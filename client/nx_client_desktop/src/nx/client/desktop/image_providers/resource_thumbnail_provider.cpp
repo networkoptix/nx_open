@@ -39,20 +39,13 @@ struct ResourceThumbnailProvider::Private
             QPixmap pixmap = qnSkin->pixmap(lit("item_placeholders/sound.png"), true);
             QSize size = pixmap.size();
             QPixmap dst(size);
-            // We fill in background and draw border.
-            // Icon looks completely weird without this.
+            // We fill in background.
             dst.fill(backgroundColor);
             QPainter painter(&dst);
             painter.setRenderHints(QPainter::SmoothPixmapTransform);
             painter.setOpacity(0.7);
             painter.drawPixmap(0, 0, pixmap);
             painter.setOpacity(1.0);
-            QPen pen(frameColor);
-            const int lineWidth = 2;
-            pen.setWidth(lineWidth);
-            painter.setPen(pen);
-            painter.drawRect(floor(lineWidth*0.5), floor(lineWidth*0.5),
-                size.width() - ceil(lineWidth*0.5), size.height() - ceil(lineWidth*0.5));
 
             baseProvider.reset(new QnBasicImageProvider(dst.toImage()));
         }
