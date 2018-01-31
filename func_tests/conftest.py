@@ -18,8 +18,8 @@ from test_utils.metrics_saver import MetricsSaver
 from test_utils.server_factory import ServerFactory
 from test_utils.server_physical_host import PhysicalInstallationCtl
 from test_utils.utils import SimpleNamespace
-from test_utils.vagrant_box import VagrantBoxFactory
-from test_utils.vagrant_box_config import BoxConfigFactory
+from test_utils.vagrant_vm import VagrantVMsFactory
+from test_utils.vagrant_vm_config import VagrantVMConfigFactory
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
@@ -28,7 +28,7 @@ DEFAULT_CUSTOMIZATION = 'default'
 
 DEFAULT_WORK_DIR = '/tmp/funtest'
 DEFAULT_MEDIASERVER_DIST_FNAME = 'mediaserver.deb'  # in bin dir
-DEFAULT_VM_NAME_PREFIX = 'funtest-'
+DEFAULT_VIRTUALBOX_NAME_PREFIX = 'vagrant_func_tests-'  # Default Vagrant's prefix is "vagrant_".
 DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
 
 DEFAULT_VM_HOST_USER = 'root'
@@ -71,11 +71,11 @@ def pytest_addoption(parser):
                      help='media sample test camera stream file path, default is %s at binary directory' % MEDIA_STREAM_FPATH)
     parser.addoption('--no-servers-reset', action='store_true',
                      help='skip servers reset/cleanup on test setup')
-    parser.addoption('--recreate-boxes', action='store_true', help='destroy and create again vagrant boxes')
+    parser.addoption('--recreate-vms', action='store_true', help='destroy and create again vagrant VMs')
     parser.addoption('--reinstall', action='store_true',
                      help='Take and install new distrubutive.'
-                     ' Recreate all vagrant boxes and reinstall server on physical servers.')
-    parser.addoption('--vm-name-prefix', default=DEFAULT_VM_NAME_PREFIX,
+                     ' Recreate all vagrant VMs and reinstall server on physical servers.')
+    parser.addoption('--vm-name-prefix', default=DEFAULT_VIRTUALBOX_NAME_PREFIX,
                      help='prefix for virtualenv machine names')
     parser.addoption('--vm-port-base', type=int, default=DEFAULT_REST_API_FORWARDED_PORT_BASE,
                      help='base REST API port forwarded to host')
@@ -83,14 +83,14 @@ def pytest_addoption(parser):
                      help='IP address virtual machines bind to.'
                      ' Test camera discovery will answer only to this address if this option is specified.')
     parser.addoption('--vm-host',
-                     help='hostname or IP address for host with virtualbox,'
+                     help='hostname or IP address for host with VirtualBox,'
                           ' used to start virtual machines (by default it is local host)')
     parser.addoption('--vm-host-user', default=DEFAULT_VM_HOST_USER,
-                     help='User to use for ssh to login to virtualbox host')
+                     help='User to use for ssh to login to VirtualBox host')
     parser.addoption('--vm-host-key',
-                     help='Identity file to use for ssh to login to virtualbox host')
+                     help='Identity file to use for ssh to login to VirtualBox host')
     parser.addoption('--vm-host-dir', default=DEFAULT_VM_HOST_DIR,
-                     help='Working directory at host with virtualbox, used to store vagrant files')
+                     help='Working directory at host with VirtualBox, used to store vagrant files')
     parser.addoption('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int,
                      help='Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH)
     parser.addoption('--log-level', default=log_levels[0], type=str.upper,
@@ -131,7 +131,7 @@ def run_options(request):
         media_sample_path=request.config.getoption('--media-sample-path'),
         media_stream_path=request.config.getoption('--media-stream-path'),
         reset_servers=not request.config.getoption('--no-servers-reset'),
-        recreate_boxes=request.config.getoption('--recreate-boxes'),
+        recreate_vms=request.config.getoption('--recreate-vms'),
         reinstall=request.config.getoption('--reinstall'),
         vm_name_prefix=request.config.getoption('--vm-name-prefix'),
         vm_port_base=request.config.getoption('--vm-port-base'),
@@ -221,21 +221,23 @@ def cloud_host(init_logging, run_options):
     return resolve_cloud_host_from_registry(run_options.cloud_group, run_options.customization)
 
 @pytest.fixture(scope='session')
-def box_factory(request, run_options, init_logging, customization_company_name):
-    config_factory = BoxConfigFactory(customization_company_name)
-    factory = VagrantBoxFactory(
+def session_vm_factory(request, run_options, init_logging, customization_company_name):
+    """Create factory once per session, don't release VMs"""
+    config_factory = VagrantVMConfigFactory(customization_company_name)
+    factory = VagrantVMsFactory(
         request.config.cache,
         run_options,
         config_factory,
         )
-    if run_options.recreate_boxes or run_options.reinstall:
+    if run_options.recreate_vms or run_options.reinstall:
         factory.destroy_all()
     return factory
 
 @pytest.fixture
-def box(box_factory):
-    yield box_factory
-    box_factory.release_all_boxes()
+def vm_factory(session_vm_factory):
+    """Return same factory by release allocated VMs after each test"""
+    yield session_vm_factory
+    session_vm_factory.release_all_vms()
 
 @pytest.fixture(scope='session')
 def physical_installation_ctl(run_options, init_logging, customization_company_name):
@@ -253,12 +255,12 @@ def physical_installation_ctl(run_options, init_logging, customization_company_n
 
 @pytest.fixture
 def server_factory(run_options, init_logging, artifact_factory,
-                   cloud_host, box, physical_installation_ctl):
+                   cloud_host, vm_factory, physical_installation_ctl):
     server_factory = ServerFactory(
         run_options.reset_servers,
         artifact_factory,
         cloud_host,
-        box,
+        vm_factory,
         physical_installation_ctl,
         run_options.deb,
         CA(run_options.work_dir / 'ca'),
@@ -329,10 +331,10 @@ def pytest_pyfunc_call(pyfuncitem):
 
 
 @pytest.fixture()
-def timeless_server(box, server_factory, server_name='timeless_server'):
-    box = box('timeless', sync_time=False)
+def timeless_server(vm_factory, server_factory, server_name='timeless_server'):
+    vm = vm_factory('timeless', sync_time=False)
     config_file_params = dict(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
-    server = server_factory(server_name, box=box, start=False, config_file_params=config_file_params)
+    server = server_factory(server_name, vm=vm, start=False, config_file_params=config_file_params)
     TimeProtocolRestriction(server).enable()
     server.start_service()
     server.setup_local_system()

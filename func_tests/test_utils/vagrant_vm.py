@@ -8,8 +8,8 @@ import vagrant.compat
 from pathlib2 import Path
 
 from .os_access import ProcessError, SshAccess, host_from_config
-from .vagrant_box_config import DEFAULT_NATNET1, BoxConfig
-from .vbox_manage import VBoxManage
+from .vagrant_vm_config import DEFAULT_NATNET1, VagrantVMConfig
+from .virtualbox_management import VirtualboxManagement
 
 log = logging.getLogger(__name__)
 
@@ -41,8 +41,8 @@ class RemotableVagrant(vagrant.Vagrant):
             self._os_access.run_command(cmd, cwd=self.root))
 
 
-class VagrantBoxFactory(object):
-    _vagrant_boxes_cache_key = 'nx/vagrant_boxes'
+class VagrantVMsFactory(object):
+    _vagrant_vms_cache_key = 'nx/vagrant_vms'
 
     def __init__(self, cache, options, config_factory):
         self._cache = cache
@@ -52,7 +52,7 @@ class VagrantBoxFactory(object):
         self._host_os_access = host_from_config(options.vm_ssh_host_config)
         self._vm_name_prefix = options.vm_name_prefix
         self._vm_port_base = options.vm_port_base
-        self._vbox_manage = VBoxManage(self._vm_name_prefix, self._host_os_access)
+        self._virtualbox_vm = VirtualboxManagement(self._vm_name_prefix, self._host_os_access)
         if options.vm_ssh_host_config:
             self._vagrant_dir = options.vm_host_work_dir / 'vagrant'
             self._vagrant_private_key_path = options.work_dir / 'vagrant_insecure_private_key'
@@ -61,37 +61,37 @@ class VagrantBoxFactory(object):
             self._vagrant_dir = options.work_dir / 'vagrant'
         self._vagrant_file_path = self._vagrant_dir / 'Vagrantfile'
         self._ssh_config_path = options.work_dir / 'ssh.config'
-        self._existing_vms_list = set(self._vbox_manage.get_vms_list())
+        self._existing_vm_list = set(self._virtualbox_vm.get_vms_list())
         options.work_dir.mkdir(parents=True, exist_ok=True)
         self._vagrant = RemotableVagrant(
             self._host_os_access, root=str(self._vagrant_dir), quiet_stdout=False, quiet_stderr=False)
-        self._boxes = self._discover_existing_boxes()  # box name -> VagrantVirtualMachine
+        self._vms = self._discover_existing_vms()  # VM name -> VagrantVM
         self._write_ssh_config()
-        self._init_running_boxes()
-        if self._boxes:
-            self._last_box_idx = max(box.config.idx for box in self._boxes.values())
+        self._init_running_vms()
+        if self._vms:
+            self._last_vm_idx = max(vm.config.idx for vm in self._vms.values())
         else:
-            self._last_box_idx = 0
+            self._last_vm_idx = 0
 
     def _copy_vagrant_insecure_ssh_key(self, to_local_path):
         log.debug('picking vagrant insecure ssh key:')
         self._host_os_access.get_file('.vagrant.d/insecure_private_key', to_local_path)
 
-    def _discover_existing_boxes(self):
-        box_config_list = self._load_boxes_config_from_cache()
-        self._write_vagrantfile(box_config_list)
+    def _discover_existing_vms(self):
+        vm_config_list = self._load_vms_config_from_cache()
+        self._write_vagrantfile(vm_config_list)
         name2running = {status.name: status.state == 'running' for status in self._vagrant.status()}
-        return {config.box_name: self._make_vagrant_box(config, is_running=name2running.get(config.box_name, False))
-                for config in box_config_list}
+        return {config.vagrant_name: self._make_vagrant_vm(config, is_running=name2running.get(config.vagrant_name, False))
+                for config in vm_config_list}
 
-    def _load_boxes_config_from_cache(self):
-        return [BoxConfig.from_dict(d) for d in self._cache.get(self._vagrant_boxes_cache_key, [])]
+    def _load_vms_config_from_cache(self):
+        return [VagrantVMConfig.from_dict(d) for d in self._cache.get(self._vagrant_vms_cache_key, [])]
 
-    def _save_boxes_config_to_cache(self):
-        self._cache.set(self._vagrant_boxes_cache_key, [box.config.to_dict() for box in self._boxes.values()])
+    def _save_vms_config_to_cache(self):
+        self._cache.set(self._vagrant_vms_cache_key, [vm.config.to_dict() for vm in self._vms.values()])
 
-    def _make_vagrant_box(self, config, is_running):
-        return VagrantVirtualMachine(
+    def _make_vagrant_vm(self, config, is_running):
+        return VagrantVM(
             self._bin_dir,
             self._vagrant_dir,
             self._vagrant,
@@ -101,102 +101,102 @@ class VagrantBoxFactory(object):
             config,
             is_running)
 
-    def _init_running_boxes(self):
-        for box in self._boxes.values():
-            if box.is_running:
-                box.init(safe=True)
+    def _init_running_vms(self):
+        for vm in self._vms.values():
+            if vm.is_running:
+                vm.init(safe=True)
 
     def destroy_all(self):
-        if not self._boxes:
+        if not self._vms:
             return
         self._vagrant.destroy()
-        self._boxes.clear()
-        self._save_boxes_config_to_cache()
-        self._last_box_idx = 0
-        self._existing_vms_list = set(self._vbox_manage.get_vms_list())
+        self._vms.clear()
+        self._save_vms_config_to_cache()
+        self._last_vm_idx = 0
+        self._existing_vm_list = set(self._virtualbox_vm.get_vms_list())
 
     def __call__(self, *args, **kw):
         config = self._config_factory(*args, **kw)
-        return self._allocate_box(config)
+        return self._allocate_vm(config)
 
-    def release_all_boxes(self):
-        log.debug('Releasing all boxes: %s', ', '.join(box.name for box in self._boxes.values() if box.is_allocated))
-        for box in self._boxes.values():
-            box.is_allocated = False
+    def release_all_vms(self):
+        log.debug('Releasing all VMs: %s', ', '.join(vm.vagrant_name for vm in self._vms.values() if vm.is_allocated))
+        for vm in self._vms.values():
+            vm.is_allocated = False
 
-    def _allocate_box(self, config):
-        box = self._find_matching_box(config)
-        if not box:
-            box = self._create_box(config)
-        box.is_allocated = True
-        if config.must_be_recreated and box.is_running:
-            box.destroy()
-            self._existing_vms_list.remove(box.vm_name)
-        if not box.is_running and box.vm_name in self._existing_vms_list:
-            self._remove_vms(box.vm_name)
-        if not box.is_running:
-            box.start()
-            self._existing_vms_list.add(box.vm_name)
-            self._write_ssh_config()  # with newly added box; box must be already running for this
-            box.init()
-        log.info('BOX: %s', box)
-        return box
+    def _allocate_vm(self, config):
+        vm = self._find_matching_vm(config)
+        if not vm:
+            vm = self._create_vm(config)
+        vm.is_allocated = True
+        if config.must_be_recreated and vm.is_running:
+            vm.destroy()
+            self._existing_vm_list.remove(vm.virtualbox_name)
+        if not vm.is_running and vm.virtualbox_name in self._existing_vm_list:
+            self._remove_vms(vm.virtualbox_name)
+        if not vm.is_running:
+            vm.start()
+            self._existing_vm_list.add(vm.virtualbox_name)
+            self._write_ssh_config()  # with newly added vm; vm must be already running for this
+            vm.init()
+        log.info('VM: %s', vm)
+        return vm
 
     def _remove_vms(self, vms_name):
         log.info('Removing old vm %s...', vms_name)
-        if self._vbox_manage.get_vms_state(vms_name) not in ['poweroff', 'aborted']:
-            self._vbox_manage.poweroff_vms(vms_name)
-        self._vbox_manage.delete_vms(vms_name)
+        if self._virtualbox_vm.get_vms_state(vms_name) not in ['poweroff', 'aborted']:
+            self._virtualbox_vm.poweroff_vms(vms_name)
+        self._virtualbox_vm.delete_vms(vms_name)
 
-    def _create_box(self, config_template):
-        self._last_box_idx += 1
+    def _create_vm(self, config_template):
+        self._last_vm_idx += 1
         config = config_template.clone(
-            idx=self._last_box_idx,
+            idx=self._last_vm_idx,
             vm_name_prefix=self._vm_name_prefix,
             vm_port_base=self._vm_port_base,
             )
-        box = self._make_vagrant_box(config, is_running=False)
-        self._boxes[box.name] = box
-        self._save_boxes_config_to_cache()
-        self._write_vagrantfile([b.config for b in self._boxes.values()])
-        return box
+        vm = self._make_vagrant_vm(config, is_running=False)
+        self._vms[vm.vagrant_name] = vm
+        self._save_vms_config_to_cache()
+        self._write_vagrantfile([b.config for b in self._vms.values()])
+        return vm
 
-    def _find_matching_box(self, config_template):
+    def _find_matching_vm(self, config_template):
         def find(pred=None):
-            for name, box in sorted(self._boxes.items(), key=lambda (name, box): box.config.idx):
-                if box.is_allocated:
+            for name, vm in sorted(self._vms.items(), key=lambda (name, vm): vm.config.idx):
+                if vm.is_allocated:
                     continue
-                if not box.config.matches(config_template):
+                if not vm.config.matches(config_template):
                     continue
                 if config_template.must_be_recreated:
-                    return box
-                if pred and not pred(box):
+                    return vm
+                if pred and not pred(vm):
                     continue
-                return box
+                return vm
             return None
 
         # first try running ones
-        return find(lambda box: box.is_running) or find()
+        return find(lambda vm: vm.is_running) or find()
 
-    def _write_vagrantfile(self, box_config_list):
-        expanded_boxes_config_list = [
-            config.expand(self._vbox_manage) for config in box_config_list]
+    def _write_vagrantfile(self, vm_config_list):
+        expanded_vms_config_list = [
+            config.expand(self._virtualbox_vm) for config in vm_config_list]
         template_file_path = TEST_UTILS_DIR / 'Vagrantfile.jinja2'
         template = jinja2.Template(template_file_path.read_text())
         vagrantfile = template.render(
             natnet1=DEFAULT_NATNET1,
             template_file_path=template_file_path,
-            boxes=expanded_boxes_config_list)
+            vms=expanded_vms_config_list)
         self._host_os_access.write_file(self._vagrant_file_path, vagrantfile.encode())
 
     def _write_ssh_config(self):
         with self._ssh_config_path.open('w') as f:
-            for box in self._boxes.values():
-                if box.is_running:
-                    f.write(self._vagrant.ssh_config(box.name).decode())
+            for vm in self._vms.values():
+                if vm.is_running:
+                    f.write(self._vagrant.ssh_config(vm.vagrant_name).decode())
 
 
-class VagrantVirtualMachine(object):
+class VagrantVM(object):
     def __init__(self, bin_dir, vagrant_dir, vagrant, vagrant_private_key_path,
                  ssh_config_path, host_os_access, config, is_running):
         self._bin_dir = bin_dir
@@ -212,18 +212,18 @@ class VagrantVirtualMachine(object):
         self.is_running = is_running
 
     def __str__(self):
-        return '%s vm_name=%s timezone=%s' % (self.name, self.vm_name, self.timezone or '?')
+        return '%s virtualbox_name=%s timezone=%s' % (self.vagrant_name, self.virtualbox_name, self.timezone or '?')
 
     def __repr__(self):
         return '<%s>' % self
 
     @property
-    def name(self):
-        return self.config.box_name
+    def vagrant_name(self):
+        return self.config.vagrant_name
 
     @property
-    def vm_name(self):
-        return self.config.vm_box_name
+    def virtualbox_name(self):
+        return self.config.virtualbox_name
 
     def init(self, safe=False):
         assert self.is_running
@@ -233,7 +233,7 @@ class VagrantVirtualMachine(object):
         except ProcessError as x:
             if safe and 'Permission denied' in x.output:
                 log.info('Unable to access machine %s as root, will reinit it',
-                         self.name)  # .ssh copying to root was missing?
+                         self.vagrant_name)  # .ssh copying to root was missing?
                 self.guest_os_access = None
                 self.is_running = False
             else:
@@ -241,11 +241,11 @@ class VagrantVirtualMachine(object):
 
     def start(self):
         assert not self.is_running
-        log.info('Starting box: %s...', self)
+        log.info('Starting VM: %s...', self)
         self._copy_required_files_to_vagrant_dir()
-        self._vagrant.up(vm_name=self.name)
+        self._vagrant.up(vm_name=self.vagrant_name)
         with tempfile.NamedTemporaryFile() as f:
-            f.write(self._vagrant.ssh_config(self.name))
+            f.write(self._vagrant.ssh_config(self.vagrant_name))
             f.flush()
             self._make_os_access('vagrant', f.name).run_command(['sudo', 'cp', '-r', '/home/vagrant/.ssh', '/root/'])
             self._patch_sshd_config(self._make_os_access('root', f.name))
@@ -253,11 +253,12 @@ class VagrantVirtualMachine(object):
 
     def destroy(self):
         assert self.is_running
-        self._vagrant.destroy(self.name)
+        self._vagrant.destroy(self.vagrant_name)
         self.is_running = False
 
     def _make_os_access(self, user, ssh_config_path=None):
-        return SshAccess(self.name, user=user, key_path=self._vagrant_private_key_path,
+        # Vagrant VM name is tied to hostname and port in SSH config which is mandatory here.
+        return SshAccess(self.vagrant_name, user=user, key_path=self._vagrant_private_key_path,
                          config_path=ssh_config_path or self._ssh_config_path,
                          proxy_os_access=self.host_os_access)
 

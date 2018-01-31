@@ -1,6 +1,6 @@
 """Server controller
 
-Setup/start/stop server on vagrant boxes, remote or local hosts.
+Setup/start/stop server on vagrant VMs, remote or local hosts.
 """
 
 import abc
@@ -10,7 +10,7 @@ MEDIASERVER_SERVICE_NAME = '{customization_company_name}-mediaserver'
 SERVER_CTL_TARGET_PATH = 'server_ctl.sh'
 
 
-class ServerCtl(object):
+class Service(object):
 
     __metaclass__ = abc.ABCMeta
 
@@ -27,7 +27,7 @@ class ServerCtl(object):
         return self.get_state() == True
 
 
-class VagrantBoxServerCtl(ServerCtl):
+class UpstartService(Service):
     """Control mediaserver as Upstart service with `status`, `start` and `stop` shortcuts
 
     SystemV's Upstart was deprecated several years ago and is not used by Debian/Ubuntu anymore.
@@ -53,7 +53,7 @@ class VagrantBoxServerCtl(ServerCtl):
         return self.os_access.run_command([action, self._service_name])
 
 
-class PhysicalHostServerCtl(ServerCtl):
+class ManualService(Service):
     """Run multiple mediaservers on single machine
 
     Service of any kind doesn't can only run one instance.

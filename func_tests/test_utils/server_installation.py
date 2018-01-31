@@ -7,7 +7,7 @@ from pathlib2 import PurePosixPath
 
 from test_utils.build_info import build_info_from_text, customizations_from_paths
 from test_utils.os_access import ProcessError
-from test_utils.server_ctl import VagrantBoxServerCtl
+from test_utils.server_ctl import UpstartService
 from test_utils.utils import wait_until
 
 if sys.version_info[:2] == (2, 7):
@@ -207,7 +207,7 @@ def install_media_server(os_access, deb, installation_root=DEFAULT_INSTALLATION_
     installation = ServerInstallation(os_access, installation_root / customization.installation_subdir)
 
     assert installation.is_valid
-    assert VagrantBoxServerCtl(os_access, customization.service_name).is_running()  # Must run when installation ends.
+    assert UpstartService(os_access, customization.service_name).is_running()  # Must run when installation ends.
     assert wait_until(lambda: _port_is_opened_on_server_machine(os_access, 7001))  # Opens after a while.
 
     installation.backup_config()

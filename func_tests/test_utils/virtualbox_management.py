@@ -33,11 +33,11 @@ class DhcpServer(object):
         return self.ip.network == network.network
 
 
-class VBoxManage(object):
+class VirtualboxManagement(object):
 
-    def __init__(self, vm_name_prefix, host):
+    def __init__(self, vm_name_prefix, os_access):
         self._vm_net_prefix = vm_name_prefix + INTERNAL_NETWORK_NAME_INFIX
-        self._os_access = host
+        self._os_access = os_access
         self._dhcp_server_list, self._dhcp_net_index = self._load_dhcp_server_list()
 
     def get_vms_list(self):

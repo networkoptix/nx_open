@@ -10,7 +10,7 @@ from .utils import GrowingSleep
 from .core_file_traceback import create_core_file_traceback
 from .server_factory import SERVER_LOG_ARTIFACT_TYPE, CORE_FILE_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
 from .server import Server
-from .server_ctl import SERVER_CTL_TARGET_PATH, PhysicalHostServerCtl
+from .server_ctl import SERVER_CTL_TARGET_PATH, ManualService
 from .template_renderer import TemplateRenderer
 
 log = logging.getLogger(__name__)
@@ -154,7 +154,7 @@ class LightweightServersHost(object):
             self._os_access, physical_installation_host.root_dir / 'lws', self._ca)
         self._template_renderer = TemplateRenderer()
         self._lws_dir = self._installation.dir
-        self._server_ctl = PhysicalHostServerCtl(self._os_access, self._lws_dir)
+        self._server_ctl = ManualService(self._os_access, self._lws_dir)
         self._allocated = False
         self._first_server = None
         self._init()

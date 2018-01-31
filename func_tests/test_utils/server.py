@@ -23,7 +23,7 @@ from .os_access import OsAccess, LocalAccess
 from .media_stream import open_media_stream
 from .rest_api import HttpError, REST_API_PASSWORD, REST_API_USER, RestApi
 from .utils import RunningTime, datetime_utc_now, datetime_utc_to_timestamp, is_list_inst
-from .vagrant_box_config import MEDIASERVER_LISTEN_PORT
+from .vagrant_vm_config import MEDIASERVER_LISTEN_PORT
 
 DEFAULT_HTTP_SCHEMA = 'http'
 
@@ -68,7 +68,7 @@ def generate_auth_key(method, user, password, nonce, realm):
 class ServerConfig(object):
 
     def __init__(self, name, start=True, setup=True, leave_initial_cloud_host=False,
-                 box=None, config_file_params=None, setup_settings=None, setup_cloud_account=None,
+                 vm=None, config_file_params=None, setup_settings=None, setup_cloud_account=None,
                  http_schema=None, rest_api_timeout=None):
         assert name, repr(name)
         assert type(setup) is bool, repr(setup)
@@ -81,10 +81,10 @@ class ServerConfig(object):
         self.setup = setup  # setup as local system if setup_cloud_account is None, to cloud if it is set
         # By default, by Server's 'init' method  it's hardcoded cloud host will be patched/restored to the one
         # deduced from --cloud-group option. With leave_initial_cloud_host=True, this step will be skipped.
-        # With leave_initial_cloud_host=True box will also be always recreated before this test to ensure
+        # With leave_initial_cloud_host=True VM will also be always recreated before this test to ensure
         # server binaries has original cloud host encoded by compilation step.
         self.leave_initial_cloud_host = leave_initial_cloud_host  # bool
-        self.box = box  # VagrantVirtualMachine or None
+        self.vm = vm  # VagrantVM or None
         self.config_file_params = config_file_params  # dict or None
         self.setup_settings = setup_settings or {}  # dict
         self.setup_cloud_account = setup_cloud_account  # CloudAccount or None
@@ -92,7 +92,7 @@ class ServerConfig(object):
         self.rest_api_timeout = rest_api_timeout
 
     def __repr__(self):
-        return 'ServerConfig(%r @ %s)' % (self.name, self.box)
+        return 'ServerConfig(%r @ %s)' % (self.name, self.vm)
 
 
 class Server(object):
@@ -518,7 +518,7 @@ class Storage(object):
     # for example:
     # server/var/data/data/low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/2017/01/27/12/1485511093576_21332.mkv
     def _construct_fpath(self, camera_mac_addr, quality_part, start_time, unixtime_utc_ms, duration):
-        local_dt = start_time.astimezone(self.timezone)  # box local
+        local_dt = start_time.astimezone(self.timezone)  # Local to VM.
         duration_ms = int(duration.total_seconds() * 1000)
         return self.dir.joinpath(
             quality_part, camera_mac_addr,
