@@ -29,7 +29,7 @@ public:
     enum ValidationMode
     {
         VM_Regular,
-        VM_CheckInfo,
+        VM_CanActivate,
         VM_JustCreated
     };
 

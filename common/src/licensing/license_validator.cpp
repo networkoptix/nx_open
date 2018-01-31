@@ -42,7 +42,7 @@ QnLicenseErrorCode QnLicenseValidator::validate(const QnLicensePtr& license,
      * v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
      * We just allow empty brand for all, because we believe license is correct.
      */
-    if (!license->isValidSignature() && mode != VM_CheckInfo)
+    if (!license->isValidSignature() && mode != VM_CanActivate)
         return QnLicenseErrorCode::InvalidSignature;
 
     const auto& manager = runtimeInfoManager();
@@ -164,7 +164,7 @@ QnLicenseErrorCode QnLicenseValidator::isValidStartLicense(const QnLicensePtr& l
             continue;
 
         // Do not allow to activate new start license when there is one already.
-        if (mode == ValidationMode::VM_CheckInfo)
+        if (mode == ValidationMode::VM_CanActivate)
             return QnLicenseErrorCode::TooManyLicensesPerDevice;
 
         // Skip other licenses if they have less channels.

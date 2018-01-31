@@ -190,7 +190,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
 
         license = QnLicense::readFromStream(is);
         QnLicenseValidator validator(owner->commonModule());
-        auto licenseErrCode = validator.validate(license, QnLicenseValidator::VM_CheckInfo);
+        auto licenseErrCode = validator.validate(license, QnLicenseValidator::VM_CanActivate);
         if (licenseErrCode != QnLicenseErrorCode::NoError)
         {
             result.setError(
