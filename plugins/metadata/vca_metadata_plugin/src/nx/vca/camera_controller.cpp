@@ -261,7 +261,9 @@ class CameraControllerImpl
 public:
     CameraControllerImpl()
     {
-        m_client.setResponseReadTimeoutMs(5000);
+        // VCA-camera executes cgi-commands very slow (especially complex commands), so read
+        // intervals must be really huge.
+        m_client.setResponseReadTimeoutMs(10000);
         m_client.setMessageBodyReadTimeoutMs(5000);
     }
 

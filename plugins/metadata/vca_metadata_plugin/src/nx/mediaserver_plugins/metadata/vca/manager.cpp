@@ -133,7 +133,8 @@ void cleanBuffer(QByteArray& buffer, int size)
 
 nx::sdk::Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
 {
-    if (!vcaCameraConrtoller.readSupportedRules2())
+//    if (!vcaCameraConrtoller.readSupportedRules2()) //< A spare option.
+    if (!vcaCameraConrtoller.readSupportedRules())
     {
         NX_PRINT << "Failed to get VCA analytic rules.";
         return nx::sdk::Error::networkError;
