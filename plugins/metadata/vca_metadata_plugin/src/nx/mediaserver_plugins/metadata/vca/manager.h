@@ -10,7 +10,7 @@
 #include <nx/sdk/metadata/abstract_metadata_manager.h>
 
 #include "common.h"
-#include "monitor.h"
+#include "plugin.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -20,11 +20,16 @@ namespace vca {
 class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
 {
 public:
-    Manager(const nx::sdk::ResourceInfo& resourceInfo, const QByteArray& pluginManifest);
+    Manager(Plugin* plugin,
+        const nx::sdk::ResourceInfo& resourceInfo,
+        const Vca::VcaAnalyticsDriverManifest& typedManifest);
 
     virtual ~Manager();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
+
+
+    void onReceive(SystemError::ErrorCode, size_t);
 
     virtual nx::sdk::Error startFetchingMetadata(
         nx::sdk::metadata::AbstractMetadataHandler* handler,
@@ -37,20 +42,15 @@ public:
 
     virtual void freeManifest(const char* data) override;
 
-    const Vca::VcaAnalyticsEventType&
-        getVcaAnalyticsEventTypeByEventTypeId(const QnUuid& id) const;
-    const Vca::VcaAnalyticsEventType& getVcaAnalyticsEventTypeByInternalName(
-        const char* name) const;
-
 private:
     QUrl m_url;
     QAuthenticator m_auth;
-
-    Monitor* m_monitor = nullptr;
-
+    Plugin* m_plugin;
     QByteArray m_cameraManifest;
-    Vca::VcaAnalyticsDriverManifest m_typedPluginManifest;
-    Vca::VcaAnalyticsEventType m_emptyEvent;
+    std::vector<QnUuid> m_eventsToCatch;
+    QByteArray m_buffer;
+    nx::network::TCPSocket* m_tcpSocket = nullptr;
+    nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
 };
 
 } // namespace vca
