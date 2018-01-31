@@ -56,6 +56,7 @@ public:
 protected:
     QnLicenseErrorCode isValidEdgeLicense(const QnLicensePtr& license,
         ValidationMode mode = VM_Regular) const;
-    QnLicenseErrorCode isValidStartLicense(const QnLicensePtr& license, ValidationMode mode) const;
+    QnLicenseErrorCode isValidStartLicense(const QnLicensePtr& license,
+        ValidationMode mode = VM_Regular) const;
     bool isAllowedForArm(const QnLicensePtr& license) const;
 };
