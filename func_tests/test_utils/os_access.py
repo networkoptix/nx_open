@@ -251,7 +251,7 @@ class LocalAccess(OsAccess):
         from_path = self.expand_path(from_path)
         to_path = self.expand_path(to_path)
         log.debug('copying %s -> %s', from_path, to_path)
-        shutil.copy2(from_path, to_path)
+        shutil.copy2(str(from_path), str(to_path))
 
     def read_file(self, from_remote_path, ofs=None):
         with from_remote_path.open('rb') as f:

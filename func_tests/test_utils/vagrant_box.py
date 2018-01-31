@@ -267,7 +267,7 @@ class VagrantVirtualMachine(object):
     def _copy_required_files_to_vagrant_dir(self):
         test_dir = TEST_UTILS_DIR.parent
         for file_path_format in self.config.required_file_list:
-            file_path = file_path_format.format(test_dir=test_dir, bin_dir=self._bin_dir)
+            file_path = Path(file_path_format.format(test_dir=test_dir, bin_dir=self._bin_dir))
             assert file_path.is_file(), '%s is expected but is missing' % file_path
             self.host_os_access.put_file(file_path, self._vagrant_dir)
 

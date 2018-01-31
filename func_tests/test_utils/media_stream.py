@@ -42,7 +42,7 @@ class Metadata(object):
     @classmethod
     def from_file(cls, file_path):
         assert file_path.stat().st_size != 0, 'Server returned empty media stream'
-        cap = cv2.VideoCapture(file_path)
+        cap = cv2.VideoCapture(str(file_path))
         assert cap.isOpened(), 'Media stream returned from server is invalid (saved to %r)' % file_path
         try:
             metadata = cls(cap)
@@ -99,7 +99,7 @@ class RtspMediaStream(object):
         fps = metadata.fps
         if math.isnan(fps):
             fps = 15  # Use at least something if we are unable to get it from opencv
-        to_cap = cv2.VideoWriter(temp_file_path, metadata.fourcc, fps, (metadata.width, metadata.height))
+        to_cap = cv2.VideoWriter(str(temp_file_path), metadata.fourcc, fps, (metadata.width, metadata.height))
         assert to_cap.isOpened(), 'Failed to open OpenCV media writer to file %r' % temp_file_path
         try:
             frame_count = self._copy_cap(from_cap, to_cap, start_time)
