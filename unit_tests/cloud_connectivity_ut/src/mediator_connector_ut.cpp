@@ -125,9 +125,8 @@ protected:
 
     void andNewMediatorEndpointIsAvailable()
     {
-        ASSERT_EQ(
-            m_mediator->moduleInstance()->impl()->stunEndpoints().front(),
-            *m_mediatorConnector->udpEndpoint());
+        while (*m_mediatorConnector->udpEndpoint() != m_mediator->moduleInstance()->impl()->stunEndpoints().front())
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
 private:
