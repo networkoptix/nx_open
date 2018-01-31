@@ -70,7 +70,7 @@ QnLicenseErrorCode QnLicenseValidator::validate(const QnLicensePtr& license,
         return isValidEdgeLicense(license, mode);
 
     if (license->type() == Qn::LC_Start)
-        return isValidStartLicense(license);
+        return isValidStartLicense(license, mode);
 
     if (license->type() == Qn::LC_Invalid)
         return QnLicenseErrorCode::FutureLicense;
@@ -153,25 +153,30 @@ QnLicenseErrorCode QnLicenseValidator::isValidEdgeLicense(const QnLicensePtr& li
     return QnLicenseErrorCode::NoError;
 }
 
-QnLicenseErrorCode QnLicenseValidator::isValidStartLicense(const QnLicensePtr& license) const
+QnLicenseErrorCode QnLicenseValidator::isValidStartLicense(const QnLicensePtr& license,
+    ValidationMode mode) const
 {
     // Only single Start license per system is allowed
     for (const QnLicensePtr& otherLicense: licensePool()->getLicenses())
     {
-        // skip other license types and current license itself
+        // Skip other license types and current license itself.
         if (otherLicense->type() != license->type() || otherLicense->key() == license->key())
             continue;
 
-        // skip other licenses if they have less channels
+        // Do not allow to activate new start license when there is one already.
+        if (mode == ValidationMode::VM_CheckInfo)
+            return QnLicenseErrorCode::TooManyLicensesPerDevice;
+
+        // Skip other licenses if they have less channels.
         if (otherLicense->cameraCount() < license->cameraCount())
             continue;
 
-        // mark current as invalid if it has less channels
+        // Mark current as invalid if it has less channels.
         if (otherLicense->cameraCount() > license->cameraCount())
             return QnLicenseErrorCode::TooManyLicensesPerDevice;
 
-        // we found another license with the same number of channels
-        // mark the most least license as valid
+        // We found another license with the same number of channels.
+        // Mark the least license as valid.
         if (otherLicense->key() < license->key())
             return QnLicenseErrorCode::TooManyLicensesPerDevice;
     }
