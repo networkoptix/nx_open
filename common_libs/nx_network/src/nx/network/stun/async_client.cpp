@@ -229,15 +229,18 @@ void AsyncClient::closeConnection(
 		baseConnection = std::move( m_baseConnection );
     }
 
+    NX_ASSERT(!baseConnection || !connection ||
+        connection == baseConnection.get(),
+        Q_FUNC_INFO, "Incorrect closeConnection call");
+
     if (baseConnection)
+    {
         baseConnection->pleaseStopSync(false);
 
-    NX_ASSERT( !baseConnection || !connection ||
-                connection == baseConnection.get(),
-                Q_FUNC_INFO, "Incorrect closeConnection call" );
-
-    if (m_onConnectionClosedHandler)
-        m_onConnectionClosedHandler(errorCode);
+        // Reporting connection close only if actually closed some connection.
+        if (m_onConnectionClosedHandler)
+            m_onConnectionClosedHandler(errorCode);
+    }
 }
 
 void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
