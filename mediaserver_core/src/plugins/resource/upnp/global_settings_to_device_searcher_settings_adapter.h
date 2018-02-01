@@ -12,6 +12,7 @@ public:
 
     virtual int cacheTimeout() const override;
     virtual bool isUpnpMulticastEnabled() const override;
+    virtual bool isAutoDiscoveryEnabled() const override;
 
 private:
     QnGlobalSettings* m_globalSettings;
