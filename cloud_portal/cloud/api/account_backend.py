@@ -23,7 +23,8 @@ class AccountBackend(ModelBackend):
 
     @staticmethod
     def authenticate(username=None, password=None):
-        AccountBackend.check_email_in_portal(username, True)
+        if username.find('@') > -1:
+            AccountBackend.check_email_in_portal(username, True)
         user = Account.get(username, password)
         if user and 'email' in user:
             try:
