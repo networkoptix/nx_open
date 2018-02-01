@@ -125,18 +125,34 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
     std::vector<HikvisionEvent> result;
     QXmlStreamReader reader(content);
 
+    auto addEvent = [&](HikvisionEvent hikvisionEvent)
+    {
+        hikvisionEvent.isActive = true;
+        result.push_back(hikvisionEvent);
+        hikvisionEvent.isActive = false;
+        result.push_back(hikvisionEvent);
+    };
+
     while (!reader.atEnd() && reader.readNextStartElement())
     {
         if (reader.name().toString().toLower() == "plate")
         {
             auto hikvisionEvent = parsePlateData(reader, manifest);
-            if (!hikvisionEvent.typeId.isNull())
+            if (hikvisionEvent.typeId.isNull())
+                continue;
+
+            addEvent(hikvisionEvent);
+            const auto descriptor = manifest.eventDescriptorById(hikvisionEvent.typeId);
+            for (const auto& dependedName: descriptor.dependedEvent.split(','))
             {
-                result.push_back(hikvisionEvent);
-                HikvisionEvent inactiveEvent(hikvisionEvent);
-                inactiveEvent.isActive = false;
-                result.push_back(inactiveEvent);
+                const auto childDescriptor = manifest.eventDescriptorByInternalName(dependedName);
+                if (childDescriptor.flags.testFlag(Hikvision::EventTypeFlag::forced))
+                {
+                    hikvisionEvent.typeId = childDescriptor.eventTypeId;
+                    addEvent(hikvisionEvent);
+                }
             }
+
         }
     }
     return result;

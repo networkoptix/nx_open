@@ -51,7 +51,11 @@ MetadataPlugin::MetadataPlugin()
         }
     }
 
-    m_driverManifest = QJson::deserialized<Hikvision::DriverManifest>(m_manifest);
+    bool success = false;
+    m_driverManifest = QJson::deserialized<Hikvision::DriverManifest>(
+        m_manifest, Hikvision::DriverManifest(), &success);
+    if (!success)
+        NX_WARNING(this, lm("Can't deserialize driver manifest file"));
 }
 
 void* MetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -150,16 +154,6 @@ const char* MetadataPlugin::capabilitiesManifest(Error* error) const
 
 QList<QnUuid> MetadataPlugin::parseSupportedEvents(const QByteArray& data)
 {
-    auto eventDescriptorByInternalName = [this](const QString& internalName)
-    {
-        for (const auto& hikvisionEvent : m_driverManifest.outputEventTypes)
-        {
-            if (hikvisionEvent.internalName == internalName)
-                return hikvisionEvent;
-        }
-        return Hikvision::EventDescriptor();
-    };
-
     QList<QnUuid> result;
     auto supportedEvents = hikvision::AttributesParser::parseSupportedEventsXml(data);
     if (!supportedEvents)
@@ -170,10 +164,13 @@ QList<QnUuid> MetadataPlugin::parseSupportedEvents(const QByteArray& data)
         if (!eventTypeId.isNull())
         {
             result << eventTypeId;
-            auto descriptor = m_driverManifest.eventDescriptorById(eventTypeId);
-            descriptor = eventDescriptorByInternalName(descriptor.dependedEvent);
-            if (!descriptor.eventTypeId.isNull())
-                result << descriptor.eventTypeId;
+            const auto descriptor = m_driverManifest.eventDescriptorById(eventTypeId);
+            for (const auto& dependedName: descriptor.dependedEvent.split(','))
+            {
+                auto descriptor = m_driverManifest.eventDescriptorByInternalName(dependedName);
+                if (!descriptor.eventTypeId.isNull())
+                    result << descriptor.eventTypeId;
+            }
         }
     }
     return result;
