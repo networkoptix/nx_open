@@ -1,5 +1,4 @@
 #pragma once
-#if defined(ENABLE_IQE)
 
 #include <core/resource_management/resource_searcher.h>
 #include "../mdns/mdns_resource_searcher.h"
@@ -32,5 +31,3 @@ protected:
 private:
     void processNativePacket(QnResourceList& result, const QByteArray& responseData);
 };
-
-#endif // defined(ENABLE_IQE)

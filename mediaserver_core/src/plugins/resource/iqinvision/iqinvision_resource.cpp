@@ -1,5 +1,3 @@
-#ifdef ENABLE_IQE
-
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "iqinvision_resource.h"
 #include "../onvif/dataprovider/rtp_stream_provider.h"
@@ -137,5 +135,3 @@ bool QnPlIqResource::isRtp() const
         //name == QLatin1String("IQ765N") ||
         name == QLatin1String("IQM32S");
 }
-
-#endif // #ifdef ENABLE_IQE
