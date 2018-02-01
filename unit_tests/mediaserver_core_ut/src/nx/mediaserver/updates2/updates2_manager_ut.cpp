@@ -700,6 +700,17 @@ TEST_F(Updates2Manager, Download_addAlreadyExistingFile)
     thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
 }
 
+TEST_F(Updates2Manager, Prepare_successfulAndReadyForInstall)
+{
+    givenAvailableRemoteUpdate();
+    whenDownloadRequestIssued(DownloadExpectedOutcome::success_fileNotExists);
+    whenDownloadFinishedSuccessfully();
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
+
+    // #TODO: #akulikov uncomment and implement
+    // whenPrepareRequestIssued();
+}
+
 } // namespace test
 } // namespace detail
 } // namespace updates2
