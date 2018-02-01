@@ -180,7 +180,7 @@
         <openal.version>1.16</openal.version>
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <vmux.version>1.0.0</vmux.version>
-        <cpro.version>1.0.0</cpro.version>
+        <cpro.version>1.0.0-1</cpro.version>
         <server-external.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</server-external.version>
         <gcc.version>4.9.4</gcc.version>
 
