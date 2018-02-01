@@ -24,7 +24,7 @@ class AbstractMetadataPlugin: public nxpl::Plugin3
 {
 public:
     /**
-     * @brief obtainManagerForCamera creates (or return already existing)
+     * @brief obtainCameraManager creates (or return already existing)
      * metadata manager for the given resource.
      * There MUST be only one manager per resource at the same time.
      * It means that if we pass resource infos with the same UID multiple times
@@ -35,10 +35,10 @@ public:
      * @param resourceInfo information about resource for which metadata manager should be created.
      * @param error status of operation.
      * noError in case of success and some other value in case of failure.
-     * @return pointer to object that implements AbstractMetadataManager interface
+     * @return pointer to object that implements AbstractCameraManager interface
      * or nullptr in case of failure.
      */
-    virtual AbstractMetadataManager* obtainManagerForCamera(
+    virtual AbstractCameraManager* obtainCameraManager(
         const CameraInfo& cameraInfo,
         Error* outError) = 0;
 

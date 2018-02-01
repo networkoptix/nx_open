@@ -32,10 +32,10 @@ StubMetadataManager::StubMetadataManager():
 
 void* StubMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataManager)
+    if (interfaceId == IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractMetadataManager*>(this);
+        return static_cast<AbstractCameraManager*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)

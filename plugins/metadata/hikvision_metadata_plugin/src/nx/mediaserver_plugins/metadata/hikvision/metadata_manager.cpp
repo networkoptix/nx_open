@@ -30,10 +30,10 @@ MetadataManager::~MetadataManager()
 
 void* MetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataManager)
+    if (interfaceId == IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractMetadataManager*>(this);
+        return static_cast<AbstractCameraManager*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)
@@ -46,8 +46,8 @@ void* MetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 
 Error MetadataManager::startFetchingMetadata(
     AbstractMetadataHandler* handler,
-    nxpl::NX_GUID* eventTypeList,
-    int eventTypeListSize)
+    nxpl::NX_GUID* typeList,
+    int typeListSize)
 {
     auto monitorHandler =
         [this](const HikvisionEventList& events)
@@ -84,8 +84,8 @@ Error MetadataManager::startFetchingMetadata(
 
     NX_ASSERT(m_plugin);
     std::vector<QnUuid> eventTypes;
-    for (int i = 0; i < eventTypeListSize; ++i)
-        eventTypes.push_back(nxpt::fromPluginGuidToQnUuid(eventTypeList[i]));
+    for (int i = 0; i < typeListSize; ++i)
+        eventTypes.push_back(nxpt::fromPluginGuidToQnUuid(typeList[i]));
     m_monitor =
         std::make_unique<HikvisionMetadataMonitor>(m_plugin->driverManifest(), m_url, m_auth, eventTypes);
 

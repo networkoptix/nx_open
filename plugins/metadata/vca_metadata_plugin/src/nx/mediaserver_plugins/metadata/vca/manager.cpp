@@ -206,10 +206,10 @@ Manager::~Manager()
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == nx::sdk::metadata::IID_MetadataManager)
+    if (interfaceId == nx::sdk::metadata::IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractMetadataManager*>(this);
+        return static_cast<AbstractCameraManager*>(this);
     }
     if (interfaceId == nxpl::IID_PluginInterface)
     {
@@ -306,7 +306,7 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
 }
 
 nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::AbstractMetadataHandler* handler,
-    nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
+    nxpl::NX_GUID* typeList, int typeListSize)
 {
     QString host = m_url.host();
     nx::vca::CameraController vcaCameraConrtoller(host, m_auth.user(), m_auth.password());
@@ -315,10 +315,10 @@ nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::AbstractMetadat
     if (error != nx::sdk::Error::noError)
         return error;
 
-    m_eventsToCatch.resize(eventTypeListSize);
-    for (int i = 0; i < eventTypeListSize; ++i)
+    m_eventsToCatch.resize(typeListSize);
+    for (int i = 0; i < typeListSize; ++i)
     {
-        m_eventsToCatch[i] = nxpt::fromPluginGuidToQnUuid(eventTypeList[i]);
+        m_eventsToCatch[i] = nxpt::fromPluginGuidToQnUuid(typeList[i]);
     }
 
     if (!vcaCameraConrtoller.readTcpServerPort())

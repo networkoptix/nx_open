@@ -14,7 +14,7 @@ namespace mediaserver {
 namespace plugins {
 
 class StubMetadataManager:
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
+    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractCameraManager>
 {
 public:
     StubMetadataManager();

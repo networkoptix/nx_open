@@ -49,10 +49,10 @@ Manager::~Manager()
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == nx::sdk::metadata::IID_MetadataManager)
+    if (interfaceId == nx::sdk::metadata::IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractMetadataManager*>(this);
+        return static_cast<AbstractCameraManager*>(this);
     }
     if (interfaceId == nxpl::IID_PluginInterface)
     {
@@ -63,10 +63,10 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
 }
 
 nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::AbstractMetadataHandler* handler,
-    nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
+    nxpl::NX_GUID* typeList, int typeListSize)
 {
     m_monitor = new Monitor(this, m_url, m_auth, handler);
-    return m_monitor->startMonitoring(eventTypeList, eventTypeListSize);
+    return m_monitor->startMonitoring(typeList, typeListSize);
 }
 
 nx::sdk::Error Manager::stopFetchingMetadata()

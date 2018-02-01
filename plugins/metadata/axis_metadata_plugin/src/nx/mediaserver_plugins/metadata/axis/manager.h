@@ -17,7 +17,7 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace axis {
 
-class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
+class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractCameraManager>
 {
 public:
     Manager(const nx::sdk::CameraInfo& cameraInfo,
@@ -29,8 +29,8 @@ public:
 
     virtual nx::sdk::Error startFetchingMetadata(
         nx::sdk::metadata::AbstractMetadataHandler* handler,
-        nxpl::NX_GUID* eventTypeList,
-        int eventTypeListSize) override;
+        nxpl::NX_GUID* typeList,
+        int typeListSize) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 

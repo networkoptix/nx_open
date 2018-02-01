@@ -112,7 +112,7 @@ void MetadataPlugin::setLocale(const char* locale)
     // Do nothing.
 }
 
-AbstractMetadataManager* MetadataPlugin::obtainManagerForCamera(
+AbstractCameraManager* MetadataPlugin::obtainCameraManager(
     const CameraInfo& cameraInfo,
     Error* outError)
 {

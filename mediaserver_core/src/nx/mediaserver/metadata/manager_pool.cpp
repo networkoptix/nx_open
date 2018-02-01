@@ -40,14 +40,14 @@ using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
 ResourceMetadataContext::ResourceMetadataContext(
-    AbstractMetadataManager* metadataManager,
+    AbstractCameraManager* metadataManager,
     AbstractMetadataHandler* metadataHandler)
 :
     handler(metadataHandler),
     manager(
         metadataManager,
         ManagerDeleter(
-            [](AbstractMetadataManager* metadataManager)
+            [](AbstractCameraManager* metadataManager)
             {
                 metadataManager->stopFetchingMetadata();
                 metadataManager->releaseRef();
@@ -232,7 +232,7 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
                     .args(plugin->name(), camera->getUserDefinedName(), camera->getId()));
             continue;
         }
-        nxpt::ScopedRef<AbstractMetadataManager> managerGuard(manager, false);
+        nxpt::ScopedRef<AbstractCameraManager> managerGuard(manager, false);
 
         boost::optional<nx::api::AnalyticsDriverManifest> pluginManifest =
             loadPluginManifest(plugin);
@@ -272,7 +272,7 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
     }
 }
 
-AbstractMetadataManager* ManagerPool::createMetadataManager(
+AbstractCameraManager* ManagerPool::createMetadataManager(
     const QnSecurityCamResourcePtr& camera,
     AbstractMetadataPlugin* plugin) const
 {
@@ -302,7 +302,7 @@ AbstractMetadataManager* ManagerPool::createMetadataManager(
         lm("Resource info for resource %1 (%2): %3")
         .args(camera->getUserDefinedName(), camera->getId(), cameraInfo));
 
-    return plugin->obtainManagerForCamera(cameraInfo, &error);
+    return plugin->obtainCameraManager(cameraInfo, &error);
 }
 
 void ManagerPool::releaseResourceMetadataManagers(const QnSecurityCamResourcePtr& resource)
@@ -520,7 +520,7 @@ std::pair<
     boost::optional<nx::api::AnalyticsDriverManifest>
     >
 ManagerPool::loadManagerManifest(
-    AbstractMetadataManager* manager,
+    AbstractCameraManager* manager,
     const QnSecurityCamResourcePtr& camera)
 {
     NX_ASSERT(manager);

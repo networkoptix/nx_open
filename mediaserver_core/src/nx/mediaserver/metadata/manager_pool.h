@@ -28,16 +28,16 @@ namespace metadata {
 struct ResourceMetadataContext
 {
 public:
-    using ManagerDeleter = std::function<void(nx::sdk::metadata::AbstractMetadataManager*)>;
+    using ManagerDeleter = std::function<void(nx::sdk::metadata::AbstractCameraManager*)>;
 
     ResourceMetadataContext(
-        nx::sdk::metadata::AbstractMetadataManager*,
+        nx::sdk::metadata::AbstractCameraManager*,
         nx::sdk::metadata::AbstractMetadataHandler*);
 
     std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler> handler;
 
     std::unique_ptr<
-        nx::sdk::metadata::AbstractMetadataManager,
+        nx::sdk::metadata::AbstractCameraManager,
         ManagerDeleter> manager;
 };
 
@@ -65,7 +65,7 @@ private:
 
     void createMetadataManagersForResource(const QnSecurityCamResourcePtr& camera);
 
-    nx::sdk::metadata::AbstractMetadataManager* createMetadataManager(
+    nx::sdk::metadata::AbstractCameraManager* createMetadataManager(
         const QnSecurityCamResourcePtr& camera,
         nx::sdk::metadata::AbstractMetadataPlugin* plugin) const;
 
@@ -112,7 +112,7 @@ private:
         boost::optional<nx::api::AnalyticsDriverManifest>
     >
     loadManagerManifest(
-        nx::sdk::metadata::AbstractMetadataManager* manager,
+        nx::sdk::metadata::AbstractCameraManager* manager,
         const QnSecurityCamResourcePtr& camera);
 
     void addManifestToCamera(

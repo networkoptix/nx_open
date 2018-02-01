@@ -19,7 +19,7 @@ static const nxpl::NX_GUID IID_ConsumingMetadataManager =
  * metadata manager that requires input (e.g. audio or video stream) from the
  * plugin container.
  */
-class AbstractConsumingMetadataManager: public AbstractMetadataManager
+class AbstractConsumingMetadataManager: public AbstractCameraManager
 {
 public:
     /**
