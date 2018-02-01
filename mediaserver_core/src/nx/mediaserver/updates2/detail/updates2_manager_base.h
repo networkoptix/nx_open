@@ -61,7 +61,6 @@ protected:
 
     // Signals for mockup
     virtual void remoteUpdateCompleted() = 0;
-    virtual void downloadFinished() = 0;
 };
 
 } // namespace detail

@@ -103,7 +103,7 @@ class Server(object):
 
     def __init__(
             self,
-            name, os_access, server_ctl, installation, rest_api_url, ca,
+            name, os_access, service, installation, rest_api_url, ca,
             rest_api_timeout=None, internal_ip_port=None):
         assert name, repr(name)
         assert isinstance(os_access, OsAccess), repr(os_access)
@@ -111,7 +111,7 @@ class Server(object):
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
         self.os_access = os_access
         self._installation = installation
-        self._server_ctl = server_ctl
+        self._service = service
         self.rest_api_url = rest_api_url
         self._ca = ca
         self.rest_api = RestApi(self.title, self.rest_api_url, timeout=rest_api_timeout, ca_cert=self._ca.cert_path)
@@ -146,7 +146,7 @@ class Server(object):
 
     def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None, config_file_params=None):
         if self._state is None:
-            was_started = self._server_ctl.get_state()
+            was_started = self._service.get_state()
             self._state = self._st_starting if was_started else self._st_stopped
         else:
             was_started = self._state in [self._st_starting, self._st_started]
@@ -199,7 +199,7 @@ class Server(object):
         assert self._state != self._bool2final_state(is_started), (
             'Service for %s is already %s' % (self, is_started and 'started' or 'stopped'))
         if not (is_started and self._state == self._st_starting):
-            self._server_ctl.set_state(is_started)
+            self._service.set_state(is_started)
         self._state = self._st_starting if is_started else self._st_stopped
         if is_started:
             self.wait_for_server_become_online()
@@ -261,7 +261,7 @@ class Server(object):
             return 'local'
 
     def reset(self):
-        was_started = self._server_ctl.is_running()
+        was_started = self._service.is_running()
         if was_started:
             self.stop_service()
         self._installation.cleanup_var_dir()
@@ -299,7 +299,7 @@ class Server(object):
             break
 
     def make_core_dump(self):
-        self._server_ctl.make_core_dump()
+        self._service.make_core_dump()
         self._state = self._st_stopped
 
     def get_time(self):

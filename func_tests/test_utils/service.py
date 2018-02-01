@@ -69,7 +69,7 @@ class ManualService(Service):
         self._dir = dir
 
     def get_state(self):
-        if not self._os_access.file_exists(self._server_ctl_path):
+        if not self._os_access.file_exists(self._service_path):
             return False  # not even installed
         return self._run_service_action('is_active') == 'active'
 
@@ -80,8 +80,8 @@ class ManualService(Service):
         self._run_service_action('make_core_dump')
 
     def _run_service_action(self, action):
-        return self._os_access.run_command([self._server_ctl_path, action]).strip()
+        return self._os_access.run_command([self._service_path, action]).strip()
 
     @property
-    def _server_ctl_path(self):
+    def _service_path(self):
         return self._dir / 'server_ctl.sh'

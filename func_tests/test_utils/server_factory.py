@@ -2,7 +2,7 @@ import logging
 
 from pathlib2 import PurePosixPath
 
-from test_utils.server_ctl import UpstartService
+from test_utils.service import UpstartService
 from test_utils.server_installation import install_media_server, find_deb_installation
 from .core_file_traceback import create_core_file_traceback
 from .server import ServerConfig, Server
@@ -55,9 +55,9 @@ class ServerFactory(object):
                 installation.put_key_and_cert(self._ca.generate_key_and_cert())
             api_url = '%s://%s:%d/' % (config.http_schema, vm.host_os_access.hostname, vm.config.rest_api_forwarded_port)
             customization = self._deb.customization
-            server_ctl = UpstartService(vm.guest_os_access, customization.service_name)
+            service = UpstartService(vm.guest_os_access, customization.service_name)
             server = Server(
-                config.name, vm.guest_os_access, server_ctl, installation, api_url, self._ca,
+                config.name, vm.guest_os_access, service, installation, api_url, self._ca,
                 rest_api_timeout=config.rest_api_timeout)
 
         self._allocated_servers.append(server)  # _prepare_server may fail, will need to save it's artifact in that case
