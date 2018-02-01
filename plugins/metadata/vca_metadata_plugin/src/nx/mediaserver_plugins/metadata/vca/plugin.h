@@ -20,6 +20,10 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace vca {
 
+/*
+ * Plugin for work with VCA-camera. Deals with three events: motion-detected, vca-event and
+ * face-detected.
+*/
 class Plugin: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
 {
 public:
@@ -46,7 +50,7 @@ public:
     virtual const char* capabilitiesManifest(
         nx::sdk::Error* error) const override;
 
-    // Managers can safely ask plugin about events. In no event found m_emptyEvent is returned.
+    // Managers can safely ask plugin about events. If no event found, m_emptyEvent is returned.
     const Vca::VcaAnalyticsEventType& eventByInternalName(
         const QString& internalName) const noexcept;
 private:
