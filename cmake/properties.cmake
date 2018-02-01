@@ -19,6 +19,7 @@ set(nxtool.name "${company.name} ${display.product.name} Server Tool")
 if(NOT windowsInstallPath)
     set(windowsInstallPath "${company.name}")
 endif()
+set(nxCopyright "Copyright (c) 2011-2018 Network Optix")
 
 if(WINDOWS)
     set(client.binary.name "${product.name}.exe")
