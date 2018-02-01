@@ -55,24 +55,17 @@ class AccountManager(db.models.Manager):
         :return custom_user.models.Account user: user
         :raise ValueError: email is not set
         """
-        now = timezone.now()
         if not email:
             raise APIRequestException('Email code is absent', ErrorCodes.wrong_parameters,
                                       error_data={'email': ['This field is required.']})
         email = email.lower()
 
-        logger.debug('AccountManager._create_user called: ' + email)
-        # email = self.normalize_email(email)
         first_name = extra_fields.pop("first_name")
         last_name = extra_fields.pop("last_name")
-
         code = extra_fields.pop("code", None)
 
-        logger.debug('AccountManager._create_user calling /cdb/account/register: ' + email)
-        result = Account.register(email, password, first_name, last_name, code=code)
-        logger.debug('AccountManager._create_user calling /cdb/account/register - success')
-
-        logger.debug('AccountManager._create_user saving user to cloud_portal: ' + email)
+        # this line will send request to cloud_db and raise an exception if fails:
+        Account.register(email, password, first_name, last_name, code=code)
         user = self.model(email=email,
                           first_name=first_name,
                           last_name=last_name,
@@ -80,7 +73,6 @@ class AccountManager(db.models.Manager):
                           **extra_fields)
         user.save(using=self._db)
 
-        logger.debug('AccountManager._create_user completed: ' + email)
         return user
 
     def create_user(self, email, password, **extra_fields):
