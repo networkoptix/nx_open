@@ -1,6 +1,6 @@
 #pragma once
 
-#include <plugins/metadata/abstract_data_packet.h>
+#include <plugins/metadata/data_packet.h>
 
 namespace nx {
 namespace sdk {

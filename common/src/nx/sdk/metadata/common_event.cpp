@@ -1,4 +1,4 @@
-#include "common_detected_event.h"
+#include "common_event.h"
 #include <nx/utils/log/log_main.h>
 
 namespace nx {
@@ -20,7 +20,6 @@ void* CommonEvent::queryInterface(const nxpl::NX_GUID& interfaceId)
     }
     return nullptr;
 }
-
 
 nxpl::NX_GUID CommonEvent::eventTypeId() const
 {

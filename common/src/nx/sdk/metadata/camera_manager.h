@@ -3,8 +3,8 @@
 #include <plugins/plugin_api.h>
 
 #include <nx/sdk/common.h>
-#include <nx/sdk/metadata/abstract_data_packet.h>
-#include <nx/sdk/metadata/abstract_metadata_packet.h>
+#include <nx/sdk/metadata/data_packet.h>
+#include <nx/sdk/metadata/metadata_packet.h>
 
 namespace nx {
 namespace sdk {

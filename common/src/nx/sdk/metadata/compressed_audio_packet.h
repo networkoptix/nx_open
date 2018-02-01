@@ -1,6 +1,6 @@
 #pragma once
 
-#include <plugins/metadata/abstract_compressed_media_packet.h>
+#include <plugins/metadata/compressed_media_packet.h>
 
 namespace nx {
 namespace sdk {

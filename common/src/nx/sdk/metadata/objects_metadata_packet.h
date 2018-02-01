@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/sdk/common.h>
-#include <nx/sdk/metadata/abstract_iterable_metadata_packet.h>
+#include <nx/sdk/metadata/iterable_metadata_packet.h>
 
 namespace nx {
 namespace sdk {
