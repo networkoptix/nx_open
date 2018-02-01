@@ -41,7 +41,7 @@ public:
 
     virtual void freeManifest(const char* data) override;
 
-    void setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo);
+    void setCameraInfo(const nx::sdk::CameraInfo& cameraInfo);
     void setDeviceManifest(const QByteArray& manifest);
     void setDriverManifest(const Hikvision::DriverManifest& manifest);
 private:

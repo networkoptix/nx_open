@@ -17,12 +17,12 @@ namespace metadata {
 namespace axis {
 
 Manager::Manager(
-    const nx::sdk::ResourceInfo& resourceInfo,
+    const nx::sdk::CameraInfo& cameraInfo,
     const QList<IdentifiedSupportedEvent>& events)
 {
-    m_url = resourceInfo.url;
-    m_auth.setUser(resourceInfo.login);
-    m_auth.setPassword(resourceInfo.password);
+    m_url = cameraInfo.url;
+    m_auth.setUser(cameraInfo.login);
+    m_auth.setPassword(cameraInfo.password);
 
     nx::api::AnalyticsDeviceManifest deviceManifest;
     for (const auto& event : events)

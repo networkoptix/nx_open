@@ -119,9 +119,9 @@ private:
         const nx::api::AnalyticsDeviceManifest& manifest,
         const QnSecurityCamResourcePtr& camera);
 
-    bool resourceInfoFromResource(
+    bool cameraInfoFromResource(
         const QnSecurityCamResourcePtr& camera,
-        nx::sdk::ResourceInfo* outResourceInfo) const;
+        nx::sdk::CameraInfo* outCameraInfo) const;
 
 private:
     ResourceMetadataContextMap m_contexts;

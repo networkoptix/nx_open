@@ -286,8 +286,8 @@ AbstractMetadataManager* ManagerPool::createMetadataManager(
             .args(camera->getUserDefinedName(), camera->getId()));
 
     Error error = Error::noError;
-    ResourceInfo resourceInfo;
-    bool success = resourceInfoFromResource(camera, &resourceInfo);
+    CameraInfo cameraInfo;
+    bool success = cameraInfoFromResource(camera, &cameraInfo);
     if (!success)
     {
         NX_WARNING(
@@ -300,9 +300,9 @@ AbstractMetadataManager* ManagerPool::createMetadataManager(
     NX_DEBUG(
         this,
         lm("Resource info for resource %1 (%2): %3")
-        .args(camera->getUserDefinedName(), camera->getId(), resourceInfo));
+        .args(camera->getUserDefinedName(), camera->getId(), cameraInfo));
 
-    return plugin->managerForResource(resourceInfo, &error);
+    return plugin->obtainManagerForCamera(cameraInfo, &error);
 }
 
 void ManagerPool::releaseResourceMetadataManagers(const QnSecurityCamResourcePtr& resource)
@@ -587,9 +587,9 @@ void ManagerPool::addManifestToCamera(
     camera->saveParams();
 }
 
-bool ManagerPool::resourceInfoFromResource(
+bool ManagerPool::cameraInfoFromResource(
     const QnSecurityCamResourcePtr& camera,
-    ResourceInfo* outResourceInfo) const
+    CameraInfo* outResourceInfo) const
 {
     NX_ASSERT(camera);
     NX_ASSERT(outResourceInfo);
@@ -597,43 +597,43 @@ bool ManagerPool::resourceInfoFromResource(
     strncpy(
         outResourceInfo->vendor,
         camera->getVendor().toUtf8().data(),
-        ResourceInfo::kStringParameterMaxLength);
+        CameraInfo::kStringParameterMaxLength);
 
     strncpy(
         outResourceInfo->model,
         camera->getModel().toUtf8().data(),
-        ResourceInfo::kStringParameterMaxLength);
+        CameraInfo::kStringParameterMaxLength);
 
     strncpy(
         outResourceInfo->firmware,
         camera->getFirmware().toUtf8().data(),
-        ResourceInfo::kStringParameterMaxLength);
+        CameraInfo::kStringParameterMaxLength);
 
     strncpy(
         outResourceInfo->uid,
         camera->getId().toByteArray().data(),
-        ResourceInfo::kStringParameterMaxLength);
+        CameraInfo::kStringParameterMaxLength);
 
     strncpy(
         outResourceInfo->sharedId,
         camera->getSharedId().toStdString().c_str(),
-        ResourceInfo::kStringParameterMaxLength);
+        CameraInfo::kStringParameterMaxLength);
 
     strncpy(
         outResourceInfo->url,
         camera->getUrl().toUtf8().data(),
-        ResourceInfo::kTextParameterMaxLength);
+        CameraInfo::kTextParameterMaxLength);
 
     auto auth = camera->getAuth();
     strncpy(
         outResourceInfo->login,
         auth.user().toUtf8().data(),
-        ResourceInfo::kStringParameterMaxLength);
+        CameraInfo::kStringParameterMaxLength);
 
     strncpy(
         outResourceInfo->password,
         auth.password().toUtf8().data(),
-        ResourceInfo::kStringParameterMaxLength);
+        CameraInfo::kStringParameterMaxLength);
 
     outResourceInfo->channel = camera->getChannel();
 

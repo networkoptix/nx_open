@@ -180,12 +180,12 @@ nx::sdk::Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
 } // namespace
 
 Manager::Manager(Plugin* plugin,
-    const nx::sdk::ResourceInfo& resourceInfo,
+    const nx::sdk::CameraInfo& cameraInfo,
     const Vca::VcaAnalyticsDriverManifest& typedManifest)
 {
-    m_url = resourceInfo.url;
-    m_auth.setUser(resourceInfo.login);
-    m_auth.setPassword(resourceInfo.password);
+    m_url = cameraInfo.url;
+    m_auth.setUser(cameraInfo.login);
+    m_auth.setPassword(cameraInfo.password);
     m_plugin = plugin;
 
     nx::api::AnalyticsDeviceManifest typedCameraManifest;

@@ -62,20 +62,13 @@ void StubMetadataPlugin::setLocale(const char* locale)
     // Do nothing.
 }
 
-AbstractMetadataManager* StubMetadataPlugin::managerForResource(
-    const ResourceInfo& resourceInfo,
+AbstractMetadataManager* StubMetadataPlugin::obtainManagerForCamera(
+    const CameraInfo& /*cameraInfo*/,
     Error* outError)
 {
     *outError = Error::noError;
 
     return new StubMetadataManager();
-}
-
-AbstractSerializer* StubMetadataPlugin::serializerForType(
-    const nxpl::NX_GUID& typeGuid,
-    Error* outError)
-{
-    return nullptr;
 }
 
 const char* StubMetadataPlugin::capabilitiesManifest(Error* error) const

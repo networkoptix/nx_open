@@ -126,16 +126,16 @@ void MetadataManager::freeManifest(const char* data)
 {
 }
 
-void MetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
+void MetadataManager::setCameraInfo(const nx::sdk::CameraInfo& cameraInfo)
 {
-    m_url = resourceInfo.url;
-    m_model = resourceInfo.model;
-    m_firmware = resourceInfo.firmware;
-    m_auth.setUser(resourceInfo.login);
-    m_auth.setPassword(resourceInfo.password);
-    m_uniqueId = resourceInfo.uid;
-    m_sharedId = resourceInfo.sharedId;
-    m_channel = resourceInfo.channel;
+    m_url = cameraInfo.url;
+    m_model = cameraInfo.model;
+    m_firmware = cameraInfo.firmware;
+    m_auth.setUser(cameraInfo.login);
+    m_auth.setPassword(cameraInfo.password);
+    m_uniqueId = cameraInfo.uid;
+    m_sharedId = cameraInfo.sharedId;
+    m_channel = cameraInfo.channel;
 }
 
 void MetadataManager::setDeviceManifest(const QByteArray& manifest)

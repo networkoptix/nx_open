@@ -20,7 +20,7 @@ namespace axis {
 class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
 {
 public:
-    Manager(const nx::sdk::ResourceInfo& resourceInfo,
+    Manager(const nx::sdk::CameraInfo& cameraInfo,
         const QList<IdentifiedSupportedEvent>& events);
 
     virtual ~Manager();

@@ -25,8 +25,8 @@ public:
 
     virtual nx::sdk::Error startFetchingMetadata(
         nx::sdk::metadata::AbstractMetadataHandler* handler,
-        nxpl::NX_GUID* /*eventTypeList*/,
-        int /*eventTypeListSize*/) override;
+        nxpl::NX_GUID* /*typeList*/,
+        int /*typeListSize*/) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 

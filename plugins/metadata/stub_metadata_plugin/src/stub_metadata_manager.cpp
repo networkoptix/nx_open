@@ -48,8 +48,8 @@ void* StubMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 
 Error StubMetadataManager::startFetchingMetadata(
     AbstractMetadataHandler* handler,
-    nxpl::NX_GUID* /*eventTypeList*/,
-    int /*eventTypeListSize*/)
+    nxpl::NX_GUID* /*typeList*/,
+    int /*typeListSize*/)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 

@@ -21,7 +21,7 @@ class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadata
 {
 public:
     Manager(Plugin* plugin,
-        const nx::sdk::ResourceInfo& resourceInfo,
+        const nx::sdk::CameraInfo& cameraInfo,
         const Vca::VcaAnalyticsDriverManifest& typedManifest);
 
     virtual ~Manager();

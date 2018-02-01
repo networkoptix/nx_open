@@ -14,19 +14,15 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual const char* name() const override;
-    
+
     virtual void setSettings( const nxpl::Setting* settings, int count ) override;
 
     virtual void setPluginContainer(nxpl::PluginInterface* pluginContainer) override;
 
     virtual void setLocale(const char* locale) override;
 
-    virtual nx::sdk::metadata::AbstractMetadataManager* managerForResource(
-        const nx::sdk::ResourceInfo& resourceInfo,
-        nx::sdk::Error* outError) override;
-
-    virtual nx::sdk::metadata::AbstractSerializer* serializerForType(
-        const nxpl::NX_GUID& typeGuid,
+    virtual nx::sdk::metadata::AbstractMetadataManager* obtainManagerForCamera(
+        const nx::sdk::CameraInfo& cameraInfo,
         nx::sdk::Error* outError) override;
 
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
