@@ -8,7 +8,7 @@ SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [ "$SOURCE_DIR" = "$PWD" ]
 then
-    echo "Error: $0 must not be executed from the sources directory."
+    echo "Error: $0 must not be executed from the sources directory." >&2
     exit 1
 fi
 
