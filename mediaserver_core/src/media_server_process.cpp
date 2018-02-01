@@ -3245,6 +3245,7 @@ void MediaServerProcess::run()
     videoCameraPool.reset();
 
     commonModule()->resourceDiscoveryManager()->stop();
+    qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics event.
     QnResource::stopAsyncTasks();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now

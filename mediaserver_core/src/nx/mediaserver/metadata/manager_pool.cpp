@@ -49,7 +49,13 @@ ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
 ManagerPool::~ManagerPool()
 {
     NX_DEBUG(this, lit("Destroying metadata manager pool."));
+    stop();
+}
+
+void ManagerPool::stop()
+{
     disconnect(this);
+    m_contexts.clear();
 }
 
 void ManagerPool::init()
