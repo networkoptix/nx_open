@@ -36,11 +36,12 @@ using namespace nx::sdk::metadata;
 
 Plugin::Plugin()
 {
-    QFile f(":/vca/manifest.json");
+    static const char* const kResourceName=":/vca/manifest.json";
+    QFile f(kResourceName);
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
     else
-        NX_PRINT << kPluginName <<" can not open resource \":/vca/manifest.json\".";
+        NX_PRINT << kPluginName << " can not open resource \"" << kResourceName << "\".";
 
     m_typedManifest = QJson::deserialized<Vca::VcaAnalyticsDriverManifest>(m_manifest);
 }
@@ -104,7 +105,7 @@ AbstractMetadataManager* Plugin::managerForResource(
     const auto vendor = QString(resourceInfo.vendor).toLower();
     if (!vendor.startsWith(kVcaVendor))
     {
-        NX_PRINT << kPluginName <<" got unsupported resource. Manager can not be created.";
+        NX_PRINT << kPluginName << " got unsupported resource. Manager can not be created.";
         return nullptr;
     }
     else
@@ -136,14 +137,14 @@ const Vca::VcaAnalyticsEventType& Plugin::eventByInternalName(
         m_typedManifest.outputEventTypes.cbegin(),
         m_typedManifest.outputEventTypes.cend(),
         [&internalName](const Vca::VcaAnalyticsEventType& event)
-    {
-        return event.internalName == internalName;
-    });
+        {
+            return event.internalName == internalName;
+        });
 
     return
         (it != m_typedManifest.outputEventTypes.cend())
-        ? *it
-        : m_emptyEvent;
+            ? *it
+            : m_emptyEvent;
 }
 
 } // namespace vca
