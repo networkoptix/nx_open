@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef ENABLE_IQE
-
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/network/simple_http_client.h>
 #include "nx/streaming/media_data_packet.h"
@@ -34,5 +32,3 @@ protected:
     QSize getMaxResolution() const;
     bool isRtp() const;
 };
-
-#endif // #ifdef ENABLE_IQE
