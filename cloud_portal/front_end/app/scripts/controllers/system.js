@@ -33,6 +33,7 @@ angular.module('cloudApp')
             },
             errorPrefix: L.errorCodes.cantGetSystemInfoPrefix
         }).then(function (){
+            $scope.canMerge = $scope.system.isOnline;
             $scope.systemNoAccess = false;
             loadUsers();
             if($scope.system.permissions.editUsers){
@@ -60,7 +61,7 @@ angular.module('cloudApp')
         $scope.gettingSystemUsers = process.init(function(){
             return $scope.system.getUsers().then(function(users){
                 if($routeParams.callShare){
-                    return $scope.share().finally(cleanUrl);
+                    $scope.share().finally(cleanUrl);
                 }
             }).finally(delayedUpdateSystemInfo);
         },{
@@ -107,6 +108,18 @@ angular.module('cloudApp')
         $scope.rename = function(){
             return dialogs.rename(systemId, $scope.system.info.name).then(function(finalName){
                 $scope.system.info.name = finalName;
+            });
+        };
+
+        $scope.mergeSystems = function(){
+            dialogs.merge($scope.system).then(function(mergeIds){
+                $scope.currentlyMerging = true;
+                $scope.isMaster = $scope.system.id == mergeIds.masterSystemId;
+                var mergingSystemId = mergeIds.targetSystemId;
+
+                $scope.mergeTargetSystem = _.find(systemsProvider.systems, function(system){
+                    return mergingSystemId == system.id;
+                });
             });
         };
 

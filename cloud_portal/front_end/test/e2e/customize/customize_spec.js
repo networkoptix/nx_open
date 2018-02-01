@@ -12,7 +12,7 @@ describe('Check that for any language', function () {
             expect(p.welcomeElem.getText()).toContain(p.brandText);
         });
     });
-
+/*
     it("user creation works", function () {
         p.helper.get();
 
@@ -73,7 +73,7 @@ describe('Check that for any language', function () {
             browser.sleep(2000);
         });
     }, 720000);
-
+*/
     // I have no clue why this fails and I'm tired
     // it("invite works", function () {
     //     p.helper.get();

@@ -10,13 +10,17 @@
         {% block submit_buttons_bottom %}{% endblock %}
         {% if not original.sent_date %}
         <div class="submit-row">
+            {% if perms.notifications.delete_cloudnotification %}
             {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
             <p class="deletelink-box"><a href="{% add_preserved_filters delete_url %}" class="deletelink">{% trans "Delete" %}</a></p>
+            {% endif %}
             <label for="ignoreSubscriptions">Ignore Subscriptions:</label>
             <input class="float-left" id="ignoreSubscriptions" name="ignore_subscriptions" type="checkbox">
             <button class="button" type="submit" name="Save">Save Draft</button>
             <button class="button" type="submit" name="Preview">Preview Draft</button>
-            <button class="button" type="submit" name="Send">Send Notification</button>
+            {% if perms.notifications.send_cloud_notification %}
+            <button class="button" type="submit" name="Send" {%if not original %} disabled {% endif %}>Send Notification</button>
+            {% endif %}
             <button class="button" type="reset"  name="Reset">Reset</button>
         </div>
         {% endif %}

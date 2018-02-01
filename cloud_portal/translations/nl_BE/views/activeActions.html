@@ -15,7 +15,7 @@
             <h1>U heeft zich geregistreerd in {{PRODUCT_NAME}}</h1>
             <p>We hebben u een e-mail met activatielink naar {{data.email}} gestuurd. <br>Activeer uw account via deze link.</p>
         </div>
-        <h1 ng-if="!data.email">Bevestig uw account</h1>
+        <h1 ng-if="!data.email">Activate your account</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <label for="emailReactivate"  class="col-sm-4 control-label">E-mailadres</label>

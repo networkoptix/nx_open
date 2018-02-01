@@ -28,7 +28,7 @@ admin.site.register(Event, EventAdmin)
 
 
 class CloudNotificationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'sent_by', 'sent_date', 'subject', 'body')
+    list_display = ('subject', 'body', 'sent_by', 'sent_date')
     change_form_template = 'notifications/cloud_notifications_change_form.html'
     readonly_fields = ('sent_by', 'sent_date')
     fieldsets = [
@@ -39,16 +39,10 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         ("When and who sent the notification", {'fields': (('sent_by', 'sent_date'))})
     ]
 
-
-    #Right now only superusers can add notifications
-    def has_add_permission(self, request):
-        return request.user.has_perm('notifications.send_cloud_notification')
-
-
     def has_delete_permission(self, request, obj=None):
-        if not obj:
-            return request.user.has_perm('notifications.send_cloud_notification')
-        return request.user.has_perm('notifications.send_cloud_notification') and not obj.sent_date
+        if obj and obj.sent_date:
+            return False
+        return super(CloudNotificationAdmin, self).has_delete_permission(request,obj=obj)
 
 
     def get_readonly_fields(self, request, obj=None):

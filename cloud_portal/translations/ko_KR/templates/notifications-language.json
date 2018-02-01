@@ -1,17 +1,20 @@
 {
   "activate_account": {
-    "emailSubject": "계정을 확인 하십시요"
+    "emailSubject": "Activate your account"
   },
   "restore_password": {
-    "emailSubject": "패스워드 복원"
+    "emailSubject": "Reset your password"
   },
   "system_invite": {
-    "emailSubject": "비디오 시스템 {{message.system_name}} 공유 되었습니다."
+    "emailSubject": "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "비디오 시스템 {{message.system_name}} 공유 되었습니다."
+    "emailSubject": "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
   },
   "review_version": {
     "emailSubject": "{{message.id}} 버전을 검토 할 준비가되었습니다."
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
   }
 }

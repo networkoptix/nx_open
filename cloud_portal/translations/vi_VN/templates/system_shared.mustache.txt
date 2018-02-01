@@ -1,11 +1,11 @@
-Hệ thống đã được chia sẻ với bạn
+Hello, {{message.fullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) hệ thống chia sẻ {{message.system_name}} với bạn.
+{{message.sharer_name}} ({{message.sharer_email}}) has shared access to video management system "{{message.system_name}}" with you.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-Hệ thống {{message.system_name}} đã được chia sẻ với bạn.
+You have been granted access to video management system "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Mở hệ thống: {{config.portal_url}} / systems / {{message.system_id}}
+View in {{PRODUCT_NAME}} Portal: {{config.portal_url}}/systems/{{message.system_id}}

@@ -1,11 +1,11 @@
-ระบบถูกแชร์กับคุณ
+Hello, {{message.fullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) ระบบที่ใช้ร่วมกัน {{message.system_name}} กับคุณ
+{{message.sharer_name}} ({{message.sharer_email}}) has shared access to video management system "{{message.system_name}}" with you.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-ระบบ {{message.system_name}} ถูกแชร์กับคุณ
+You have been granted access to video management system "{{message.system_name}}".
 {{/message.sharer_name}}
 
-เปิดระบบ: {{config.portal_url}} / systems / {{message.system_id}}
+View in {{PRODUCT_NAME}} Portal: {{config.portal_url}}/systems/{{message.system_id}}

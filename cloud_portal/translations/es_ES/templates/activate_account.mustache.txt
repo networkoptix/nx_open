@@ -1,8 +1,8 @@
-Bienvenido a {{PRODUCT_NAME}}
+Hello,
 
-Gracias por unirse a {{PRODUCT_NAME}}. Por favor, visite el siguiente botón para confirmar su dirección de correo electrónico y activar la cuenta.
+  Please open the link below to confirm your email address and activate the account.
 
-Activar cuenta: {{config.portal_url}} / activate / {{message.code}}
+{{config.portal_url}}/activate/{{message.code}}
 
 Si no se registró en {{PRODUCT_NAME}}, solo ignore este correo electrónico.
-No comparta el mensaje o el enlace con terceros.
+Do not share the message or the link with anyone.

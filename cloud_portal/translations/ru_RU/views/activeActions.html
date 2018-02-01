@@ -24,7 +24,7 @@
             <p>Мы отправили вам письмо с ссылкой активации на адрес {{data.email}}.<br>
             Пожалуйста, активируйте свою учетную запись, перейдя по этой ссылке.</p>
         </div>
-        <h1 ng-if="!data.email">Подтвердить свою учетную запись</h1>
+        <h1 ng-if="!data.email">Activate your account</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>

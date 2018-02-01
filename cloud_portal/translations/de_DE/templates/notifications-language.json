@@ -1,17 +1,20 @@
 {
   "activate_account": {
-    "emailSubject": "Bestätigen Sie Ihren Account"
+    "emailSubject": "Activate your account"
   },
   "restore_password": {
-    "emailSubject": "Passwortwiederherstellung"
+    "emailSubject": "Reset your password"
   },
   "system_invite": {
-    "emailSubject": "Videosystem {{message.system_name}} wurde mit Ihnen geteilt"
+    "emailSubject": "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "Videosystem {{message.system_name}} wurde mit Ihnen geteilt"
+    "emailSubject": "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
   },
   "review_version": {
     "emailSubject": "Version {{message.id}} ist bereit, überprüft zu werden"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
   }
 }

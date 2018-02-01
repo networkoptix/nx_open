@@ -1,17 +1,20 @@
 {
   "activate_account": {
-    "emailSubject": "确认您的帐户"
+    "emailSubject": "Activate your account"
   },
   "restore_password": {
-    "emailSubject": "恢复您的密码"
+    "emailSubject": "Reset your password"
   },
   "system_invite": {
-    "emailSubject": "与你分享了视频系统 {{message.system_name}}"
+    "emailSubject": "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "与你分享了视频系统 {{message.system_name}}"
+    "emailSubject": "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
   },
   "review_version": {
     "emailSubject": "版本{{message.id}}已准备好审核"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
   }
 }

@@ -1,27 +1,47 @@
 {
-    "cameraLinks": {
-        "highStream": "Выс. кач-во",
-        "lowStream": "Низ. кач-во",
-        "transcoding": "Перекодирование",
-        "unknown": "Неизвестный",
-        "copyToClipboard": "копировать в буфер",
-        "copyDefaultText": "копировать",
-        "copyActiveText": "скопировано в буфер обмена"
-    },
-    "systemOffline": "Система не в сети",
-    "cameraStates": {
-        "offline": "Не в сети",
-        "error": "Ошибка",
-        "unauthorized": "Требуется аутентификация",
-        "noData": "Нет данных",
-        "iosVideoTooLarge": "iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
-        "flashRequired": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> для воспроизведения видео с серверов на базе ARM.",
-        "flashOrWebmRequired": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> или <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для воспроизведения видео с серверов в Internet Explorer.",
-        "noArmSupport": "Этот браузер или устройство не поддерживает воспроизведение видео с серверов на базе ARM.",
-        "noFormat": "Этот браузер или устройство не поддерживает воспроизведение видео с этой камеры.",
-        "ieNoWebm": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
-        "ieWin10": "Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
-        "ubuntuNX": "Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium."
-    },
-    "searchCamPlaceholder": "поиск"
+  "cameraLinks": {
+    "highStream": "Выс. кач-во",
+    "lowStream": "Низ. кач-во",
+    "transcoding": "Перекодирование",
+    "unknown": "Неизвестный",
+    "copyToClipboard": "копировать в буфер",
+    "copyDefaultText": "копировать",
+    "copyActiveText": "скопировано в буфер обмена"
+  },
+  "systemOffline": "Система не в сети",
+  "cameraStates": {
+    "offline": "Не в сети",
+    "error": "Ошибка",
+    "unauthorized": "Требуется аутентификация",
+    "noData": "Нет данных",
+    "iosVideoTooLarge": "iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
+    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashOrWebmRequired": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> или <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для воспроизведения видео с серверов в Internet Explorer.",
+    "noArmSupport": "Этот браузер или устройство не поддерживает воспроизведение видео с серверов на базе ARM.",
+    "noFormat": "This browser does not support video playback from this camera.",
+    "ieNoWebm": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
+    "ieWin10": "Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
+    "ubuntuNX": "Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium."
+  },
+  "searchCamPlaceholder": "Search",
+  "resolution": {
+    "auto": "Auto",
+    "high": "High",
+    "low": "Low"
+  },
+  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+  "voiceCommands": {
+    "play": "play",
+    "pause": "pause",
+    "live": "go to live | show me live",
+    "view": "view + [camera name]",
+    "search": "find + [text for searchbar]",
+    "clear search": "clear search",
+    "expand server": "expand server + [server name]",
+    "collapse server": "collapse server + [server name]",
+    "expand all servers": "expand all servers",
+    "collapse all servers": "collapse all servers",
+    "stop listening": "stop listening",
+    "help": "help | show commands"
+  }
 }
