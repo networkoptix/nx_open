@@ -35,7 +35,7 @@ public:
         Manager* manager,
         const QUrl& resourceUrl,
         const QAuthenticator& auth,
-        nx::sdk::metadata::AbstractMetadataHandler* handler);
+        nx::sdk::metadata::MetadataHandler* handler);
     virtual ~Monitor();
 
     void addRules(const SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
@@ -52,7 +52,7 @@ public:
     const QUrl m_url;
     const QUrl m_endpoint;
     const QAuthenticator m_auth;
-    nx::sdk::metadata::AbstractMetadataHandler* m_handler;
+    nx::sdk::metadata::MetadataHandler* m_handler;
     TestHttpServer* m_httpServer;
     mutable QnMutex m_mutex;
 };

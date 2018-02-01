@@ -10,12 +10,12 @@ namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-class EventHandler: public nx::sdk::metadata::AbstractMetadataHandler
+class EventHandler: public nx::sdk::metadata::MetadataHandler
 {
 public:
     virtual void handleMetadata(
         nx::sdk::Error error,
-        nx::sdk::metadata::AbstractMetadataPacket* metadata) override;
+        nx::sdk::metadata::MetadataPacket* metadata) override;
 
     void setResource(const QnSecurityCamResourcePtr& resource);
 

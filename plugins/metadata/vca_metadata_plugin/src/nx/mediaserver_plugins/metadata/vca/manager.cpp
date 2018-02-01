@@ -36,18 +36,18 @@ struct EventMessage
     std::map<QByteArray, QByteArray> parameters;
 };
 
-nx::sdk::metadata::CommonDetectedEvent* createCommonDetectedEvent(
+nx::sdk::metadata::CommonEvent* createCommonEvent(
     const Vca::VcaAnalyticsEventType& event,
     bool active)
 {
-    auto detectedEvent = new nx::sdk::metadata::CommonDetectedEvent();
-    detectedEvent->setEventTypeId(nxpt::fromQnUuidToPluginGuid(event.eventTypeId));
-    detectedEvent->setCaption(event.eventName.value.toStdString());
-    detectedEvent->setDescription(event.eventName.value.toStdString());
-    detectedEvent->setIsActive(active);
-    detectedEvent->setConfidence(1.0);
-    detectedEvent->setAuxilaryData(event.internalName.toStdString());
-    return detectedEvent;
+    auto commonEvent = new nx::sdk::metadata::CommonEvent();
+    commonEvent->setEventTypeId(nxpt::fromQnUuidToPluginGuid(event.eventTypeId));
+    commonEvent->setCaption(event.eventName.value.toStdString());
+    commonEvent->setDescription(event.eventName.value.toStdString());
+    commonEvent->setIsActive(active);
+    commonEvent->setConfidence(1.0);
+    commonEvent->setAuxilaryData(event.internalName.toStdString());
+    return commonEvent;
 }
 
 nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
@@ -56,10 +56,10 @@ nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
     using namespace std::chrono;
 
     auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
-    auto detectedEvent1 = createCommonDetectedEvent(event, /*active*/ true);
-    packet->addEvent(detectedEvent1);
-    auto detectedEvent2 = createCommonDetectedEvent(event, /*active*/ false);
-    packet->addEvent(detectedEvent2);
+    auto commonEvent1 = createCommonEvent(event, /*active*/ true);
+    packet->addEvent(commonEvent1);
+    auto commonEvent2 = createCommonEvent(event, /*active*/ false);
+    packet->addEvent(commonEvent2);
     packet->setTimestampUsec(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
     packet->setDurationUsec(-1);
@@ -209,7 +209,7 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
     if (interfaceId == nx::sdk::metadata::IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractCameraManager*>(this);
+        return static_cast<CameraManager*>(this);
     }
     if (interfaceId == nxpl::IID_PluginInterface)
     {
@@ -305,7 +305,7 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         });
 }
 
-nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::AbstractMetadataHandler* handler,
+nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler* handler,
     nxpl::NX_GUID* typeList, int typeListSize)
 {
     QString host = m_url.host();

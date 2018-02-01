@@ -17,7 +17,7 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace vca {
 
-class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractCameraManager>
+class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 {
 public:
     Manager(Plugin* plugin,
@@ -32,7 +32,7 @@ public:
     void onReceive(SystemError::ErrorCode, size_t);
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nx::sdk::metadata::AbstractMetadataHandler* handler,
+        nx::sdk::metadata::MetadataHandler* handler,
         nxpl::NX_GUID* typeList,
         int typeListSize) override;
 
@@ -50,7 +50,7 @@ private:
     std::vector<QnUuid> m_eventsToCatch;
     QByteArray m_buffer;
     nx::network::TCPSocket* m_tcpSocket = nullptr;
-    nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
+    nx::sdk::metadata::MetadataHandler* m_handler = nullptr;
 };
 
 } // namespace vca

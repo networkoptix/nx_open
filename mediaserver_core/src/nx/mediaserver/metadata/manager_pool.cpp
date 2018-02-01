@@ -40,14 +40,14 @@ using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
 ResourceMetadataContext::ResourceMetadataContext(
-    AbstractCameraManager* metadataManager,
-    AbstractMetadataHandler* metadataHandler)
+    CameraManager* metadataManager,
+    MetadataHandler* metadataHandler)
 :
     handler(metadataHandler),
     manager(
         metadataManager,
         ManagerDeleter(
-            [](AbstractCameraManager* metadataManager)
+            [](CameraManager* metadataManager)
             {
                 metadataManager->stopFetchingMetadata();
                 metadataManager->releaseRef();
@@ -232,7 +232,7 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
                     .args(plugin->name(), camera->getUserDefinedName(), camera->getId()));
             continue;
         }
-        nxpt::ScopedRef<AbstractCameraManager> managerGuard(manager, false);
+        nxpt::ScopedRef<CameraManager> managerGuard(manager, false);
 
         boost::optional<nx::api::AnalyticsDriverManifest> pluginManifest =
             loadPluginManifest(plugin);
@@ -272,7 +272,7 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
     }
 }
 
-AbstractCameraManager* ManagerPool::createMetadataManager(
+CameraManager* ManagerPool::createMetadataManager(
     const QnSecurityCamResourcePtr& camera,
     Plugin* plugin) const
 {
@@ -312,7 +312,7 @@ void ManagerPool::releaseResourceMetadataManagers(const QnSecurityCamResourcePtr
     NX_DEBUG(this, lm("Camera %1 lost all %2 managers %2").args(id, removedCount));
 }
 
-AbstractMetadataHandler* ManagerPool::createMetadataHandler(
+MetadataHandler* ManagerPool::createMetadataHandler(
     const QnResourcePtr& resource,
     const QnUuid& pluginId)
 {
@@ -520,7 +520,7 @@ std::pair<
     boost::optional<nx::api::AnalyticsDriverManifest>
     >
 ManagerPool::loadManagerManifest(
-    AbstractCameraManager* manager,
+    CameraManager* manager,
     const QnSecurityCamResourcePtr& camera)
 {
     NX_ASSERT(manager);

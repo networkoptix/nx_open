@@ -20,7 +20,7 @@ namespace hikvision {
 
 class MetadataManager:
     public QObject,
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractCameraManager>
+    public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 {
     Q_OBJECT;
 public:
@@ -31,7 +31,7 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nx::sdk::metadata::AbstractMetadataHandler* handler,
+        nx::sdk::metadata::MetadataHandler* handler,
         nxpl::NX_GUID* typeList,
         int typeListSize) override;
 
@@ -58,7 +58,7 @@ private:
 
     MetadataPlugin* m_plugin = nullptr;
     std::unique_ptr<HikvisionMetadataMonitor> m_monitor;
-    nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
+    nx::sdk::metadata::MetadataHandler* m_handler = nullptr;
 };
 
 } // namespace hikvision

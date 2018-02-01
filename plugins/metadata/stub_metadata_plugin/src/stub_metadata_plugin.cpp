@@ -62,7 +62,7 @@ void StubMetadataPlugin::setLocale(const char* locale)
     // Do nothing.
 }
 
-AbstractCameraManager* StubMetadataPlugin::obtainCameraManager(
+CameraManager* StubMetadataPlugin::obtainCameraManager(
     const CameraInfo& /*cameraInfo*/,
     Error* outError)
 {

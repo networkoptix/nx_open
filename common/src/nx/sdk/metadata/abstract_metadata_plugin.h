@@ -3,7 +3,6 @@
 #include <plugins/plugin_api.h>
 #include <nx/sdk/common.h>
 #include <nx/sdk/metadata/abstract_metadata_manager.h>
-#include <nx/sdk/metadata/abstract_serializer.h>
 
 namespace nx {
 namespace sdk {
@@ -35,10 +34,10 @@ public:
      * @param resourceInfo information about resource for which metadata manager should be created.
      * @param error status of operation.
      * noError in case of success and some other value in case of failure.
-     * @return pointer to object that implements AbstractCameraManager interface
+     * @return pointer to object that implements CameraManager interface
      * or nullptr in case of failure.
      */
-    virtual AbstractCameraManager* obtainCameraManager(
+    virtual CameraManager* obtainCameraManager(
         const CameraInfo& cameraInfo,
         Error* outError) = 0;
 

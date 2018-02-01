@@ -20,22 +20,22 @@ using namespace nx::sdk::metadata;
 
 void EventHandler::handleMetadata(
     Error error,
-    AbstractMetadataPacket* metadata)
+    MetadataPacket* metadata)
 {
-    nxpt::ScopedRef<AbstractMetadataPacket> metadataPacket(metadata, false);
+    nxpt::ScopedRef<MetadataPacket> metadataPacket(metadata, false);
     if (error != Error::noError)
         return;
 
-    nxpt::ScopedRef<AbstractEventMetadataPacket> eventPacket(
-        (AbstractEventMetadataPacket*)
-        metadata->queryInterface(IID_EventMetadataPacket), false);
+    nxpt::ScopedRef<EventsMetadataPacket> eventPacket(
+        (EventsMetadataPacket*)
+        metadata->queryInterface(IID_EventsMetadataPacket), false);
 
     if (!eventPacket)
         return;
 
     while(true)
     {
-        nxpt::ScopedRef<AbstractDetectedEvent> eventData(
+        nxpt::ScopedRef<Event> eventData(
             eventPacket->nextItem(), false);
 
         if (!eventData)

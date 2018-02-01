@@ -35,7 +35,7 @@ void* StubMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     if (interfaceId == IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractCameraManager*>(this);
+        return static_cast<CameraManager*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)
@@ -47,7 +47,7 @@ void* StubMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 }
 
 Error StubMetadataManager::startFetchingMetadata(
-    AbstractMetadataHandler* handler,
+    MetadataHandler* handler,
     nxpl::NX_GUID* /*typeList*/,
     int /*typeListSize*/)
 {
@@ -115,7 +115,7 @@ Error StubMetadataManager::stopFetchingMetadataUnsafe()
     return Error::noError;
 }
 
-AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
+MetadataPacket* StubMetadataManager::cookSomeEvents()
 {
     ++m_counter;
     if (m_counter > 1)
@@ -128,12 +128,12 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
         m_counter = 0;
     }
 
-    auto detectedEvent = new CommonDetectedEvent();
-    detectedEvent->setCaption("Line crossing (caption)");
-    detectedEvent->setDescription("Line crossing (description)");
-    detectedEvent->setAuxilaryData(R"json({"auxilaryData": "someJson"})json");
-    detectedEvent->setIsActive(m_counter == 1);
-    detectedEvent->setEventTypeId(m_eventTypeId);
+    auto commonEvent = new CommonEvent();
+    commonEvent->setCaption("Line crossing (caption)");
+    commonEvent->setDescription("Line crossing (description)");
+    commonEvent->setAuxilaryData(R"json({"auxilaryData": "someJson"})json");
+    commonEvent->setIsActive(m_counter == 1);
+    commonEvent->setEventTypeId(m_eventTypeId);
 
     std::cout << "#### Firing event!!!! "
         << "Type: " << (m_eventTypeId == kLineCrossingEventGuid ? "Line crossing" :  "Object detection") << " "
@@ -144,7 +144,7 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
 
     auto eventPacket = new CommonEventMetadataPacket();
     eventPacket->setTimestampUsec(usSinceEpoch());
-    eventPacket->addEvent(detectedEvent);
+    eventPacket->addEvent(commonEvent);
     return eventPacket;
 }
 

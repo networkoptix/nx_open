@@ -97,7 +97,7 @@ void Plugin::setLocale(const char* locale)
 {
 }
 
-AbstractCameraManager* Plugin::obtainCameraManager(
+CameraManager* Plugin::obtainCameraManager(
     const CameraInfo& cameraInfo,
     Error* outError)
 {

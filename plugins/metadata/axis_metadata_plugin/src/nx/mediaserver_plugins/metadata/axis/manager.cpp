@@ -52,7 +52,7 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
     if (interfaceId == nx::sdk::metadata::IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractCameraManager*>(this);
+        return static_cast<CameraManager*>(this);
     }
     if (interfaceId == nxpl::IID_PluginInterface)
     {
@@ -62,7 +62,7 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::AbstractMetadataHandler* handler,
+nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler* handler,
     nxpl::NX_GUID* typeList, int typeListSize)
 {
     m_monitor = new Monitor(this, m_url, m_auth, handler);

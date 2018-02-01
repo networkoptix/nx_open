@@ -17,7 +17,7 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace axis {
 
-class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractCameraManager>
+class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 {
 public:
     Manager(const nx::sdk::CameraInfo& cameraInfo,
@@ -28,7 +28,7 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nx::sdk::metadata::AbstractMetadataHandler* handler,
+        nx::sdk::metadata::MetadataHandler* handler,
         nxpl::NX_GUID* typeList,
         int typeListSize) override;
 

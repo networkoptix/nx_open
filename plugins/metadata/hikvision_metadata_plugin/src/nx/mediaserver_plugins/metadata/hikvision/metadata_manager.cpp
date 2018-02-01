@@ -33,7 +33,7 @@ void* MetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     if (interfaceId == IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractCameraManager*>(this);
+        return static_cast<CameraManager*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)
@@ -45,7 +45,7 @@ void* MetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 }
 
 Error MetadataManager::startFetchingMetadata(
-    AbstractMetadataHandler* handler,
+    MetadataHandler* handler,
     nxpl::NX_GUID* typeList,
     int typeListSize)
 {
@@ -60,7 +60,7 @@ Error MetadataManager::startFetchingMetadata(
                 if (hikvisionEvent.channel.is_initialized() && hikvisionEvent.channel != m_channel)
                     return;
 
-                auto event = new CommonDetectedEvent();
+                auto event = new CommonEvent();
                 NX_VERBOSE(this, lm("Got event: %1 %2 Channel %3")
                     .arg(hikvisionEvent.caption).arg(hikvisionEvent.description).arg(m_channel));
 
