@@ -11,14 +11,15 @@ ${share dialogue}
 
 *** Keywords ***
 Log in to Auto Tests System
-    Open Browser and go to URL    ${url}
-    Log In    ${email}    ${password}
+    [arguments]    ${email}
+    Go To    ${url}/systems/${AUTO TESTS URL}
+    Log In    ${email}    ${password}    None
     Validate Log In
-    Select Auto Tests System
 
 *** Test Cases ***
 Share button - opens dialog
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE MODAL}
@@ -26,7 +27,8 @@ Share button - opens dialog
     Close Browser
 
 Sharing link /systems/{system_id}/share - opens dialog
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     ${location}    Get Location
     Go To    ${location}/share
     Wait Until Element Is Visible    ${SHARE MODAL}
@@ -34,7 +36,8 @@ Sharing link /systems/{system_id}/share - opens dialog
     Close Browser
 
 Sharing link for anonymous - first ask login, then show share dialog
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     ${location}    Get Location
     Log Out
     Validate Log Out
@@ -45,7 +48,8 @@ Sharing link for anonymous - first ask login, then show share dialog
     Close Browser
 
 After closing dialog, called by link - clear link
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     ${location}    Get Location
 
 #Check Cancel Button
@@ -77,7 +81,8 @@ After closing dialog, called by link - clear link
     Close Browser
 
 Sharing roles are ordered: more access is on top of the list with options
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
@@ -86,7 +91,8 @@ Sharing roles are ordered: more access is on top of the list with options
     Close Browser
 
 When user selects role - special hint appears
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
 #Adminstrator check
@@ -127,7 +133,8 @@ When user selects role - special hint appears
     Close Browser
 
 Sharing works
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     ${random email}    Get Random Email
@@ -141,7 +148,8 @@ Sharing works
     Close Browser
 
 Edit permission works
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     ${random email}    Get Random Email
@@ -157,7 +165,8 @@ Edit permission works
     Close Browser
 
 Share with registered user - sends him notification
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
