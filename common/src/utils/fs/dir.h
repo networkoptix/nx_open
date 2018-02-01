@@ -40,4 +40,6 @@ struct PartitionInfo
 SystemError::ErrorCode readPartitions(
     std::list<PartitionInfo>* const partitionInfoList);
 
+void decodeOctalEncodedPath(char* path);
+
 #endif  //NX_DIR_H

@@ -71,6 +71,8 @@ SystemError::ErrorCode readPartitions(
                 continue; /* Skip unrecognized lines. */
         }
 
+        decodeOctalEncodedPath(cPath);
+
         const QString& devName = QString::fromUtf8(cDevName);
         const QString& path = QString::fromUtf8(cPath);
         const QString& fsName = QString::fromUtf8(cFSName);
@@ -109,4 +111,26 @@ SystemError::ErrorCode readPartitions(
     Q_UNUSED(partitionInfoList);
     return SystemError::notImplemented;
 #endif
+}
+
+void decodeOctalEncodedPath(char* path)
+{
+    for (char* cPathPtr = path; *cPathPtr != '\0'; ++cPathPtr)
+    {
+        if (*cPathPtr == '\\' && *(cPathPtr + 1) == '0')
+        {
+            unsigned long charCode;
+            char* patternEnd;
+            if ((charCode = strtoul(cPathPtr + 1, &patternEnd, 8)) == 0)
+                continue;
+
+            *cPathPtr = (char) charCode;
+            char* ptrCopy = cPathPtr + 1;
+
+            for (; *patternEnd != '\0'; ++patternEnd)
+                *ptrCopy++ = *patternEnd;
+
+            *ptrCopy = '\0';
+        }
+    }
 }

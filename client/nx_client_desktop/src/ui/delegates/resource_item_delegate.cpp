@@ -146,7 +146,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
     /* Select icon and text color by item state: */
     QColor mainColor, extraColor;
-    QIcon::Mode iconMode;
+    QIcon::Mode iconMode(QIcon::Normal);
 
     switch (itemState(index))
     {

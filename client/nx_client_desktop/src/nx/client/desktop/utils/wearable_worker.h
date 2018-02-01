@@ -33,6 +33,7 @@ public:
 
     void updateState();
     bool addUpload(const QString& path, WearableError* error);
+    void cancel();
 
     WearableState state() const;
 
@@ -41,6 +42,7 @@ public:
 signals:
     void stateChanged(const WearableState& state);
     void error(const WearableState& state, const QString& errorMessage);
+    void finished();
 
 private:
     void processCurrentFile();
