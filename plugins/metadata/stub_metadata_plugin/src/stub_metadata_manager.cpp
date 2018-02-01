@@ -5,7 +5,7 @@
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
-#include <nx/sdk/metadata/common_detected_event.h>
+#include <nx/sdk/metadata/common_event.h>
 
 namespace nx {
 namespace mediaserver {

@@ -3,8 +3,8 @@
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_internal_tools.h>
 
-#include <nx/sdk/metadata/abstract_event_metadata_packet.h>
-#include <nx/sdk/metadata/abstract_detection_metadata_packet.h>
+#include <nx/sdk/metadata/events_metadata_packet.h>
+#include <nx/sdk/metadata/objects_metadata_packet.h>
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/events/events_fwd.h>
 

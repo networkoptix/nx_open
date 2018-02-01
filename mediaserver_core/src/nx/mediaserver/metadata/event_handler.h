@@ -3,7 +3,7 @@
 #include <QtCore/QMap>
 
 #include <core/resource/resource.h>
-#include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/sdk/metadata/camera_manager.h>
 #include <nx/vms/event/event_fwd.h>
 
 namespace nx {

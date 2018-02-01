@@ -7,7 +7,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/sdk/metadata/camera_manager.h>
 
 #include "common.h"
 #include "plugin.h"

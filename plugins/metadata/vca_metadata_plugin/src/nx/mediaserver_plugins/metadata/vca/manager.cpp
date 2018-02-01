@@ -6,7 +6,7 @@
 
 #include <plugins/plugin_internal_tools.h> //< nxpt::fromQnUuidToPluginGuid
 
-#include <nx/sdk/metadata/common_detected_event.h>
+#include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
 #include <nx/api/analytics/device_manifest.h>
 

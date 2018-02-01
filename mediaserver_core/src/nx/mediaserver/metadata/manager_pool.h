@@ -12,8 +12,8 @@
 #include <utils/common/connective.h>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/sdk/metadata/abstract_metadata_plugin.h>
-#include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/sdk/metadata/plugin.h>
+#include <nx/sdk/metadata/camera_manager.h>
 #include <nx/api/analytics/driver_manifest.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/mediaserver/metadata/rule_holder.h>

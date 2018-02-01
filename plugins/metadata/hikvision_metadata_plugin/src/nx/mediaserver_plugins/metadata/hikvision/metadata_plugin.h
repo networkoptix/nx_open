@@ -12,7 +12,7 @@
 #include <boost/optional/optional.hpp>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <nx/sdk/metadata/plugin.h>
 #include <nx/utils/elapsed_timer.h>
 #include <chrono>
 

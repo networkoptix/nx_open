@@ -3,8 +3,7 @@
 #include <vector>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_packet.h>
-#include <nx/sdk/metadata/abstract_event_metadata_packet.h>
+#include <nx/sdk/metadata/events_metadata_packet.h>
 
 namespace nx {
 namespace sdk {

@@ -4,7 +4,7 @@
 
 #include <QtCore/QUrl>
 
-#include <nx/sdk/metadata/common_detected_event.h>
+#include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/kit/debug.h>

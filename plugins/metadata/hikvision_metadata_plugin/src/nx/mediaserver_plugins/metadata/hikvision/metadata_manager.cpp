@@ -5,7 +5,7 @@
 
 #include <chrono>
 
-#include <nx/sdk/metadata/common_detected_event.h>
+#include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
 #include <plugins/plugin_internal_tools.h>
 #include <nx/utils/log/log_main.h>

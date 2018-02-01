@@ -1,7 +1,7 @@
 #pragma once
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <nx/sdk/metadata/plugin.h>
 
 namespace nx {
 namespace mediaserver {

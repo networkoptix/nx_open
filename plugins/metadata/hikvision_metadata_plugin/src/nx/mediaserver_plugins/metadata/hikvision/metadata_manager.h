@@ -11,7 +11,7 @@
 #include "metadata_plugin.h"
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/sdk/metadata/camera_manager.h>
 
 namespace nx {
 namespace mediaserver {

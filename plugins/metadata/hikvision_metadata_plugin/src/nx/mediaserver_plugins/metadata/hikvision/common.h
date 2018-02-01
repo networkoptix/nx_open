@@ -11,7 +11,7 @@
 #include <nx/api/analytics/driver_manifest.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/sdk/metadata/abstract_event_metadata_packet.h>
+#include <nx/sdk/metadata/events_metadata_packet.h>
 
 namespace nx {
 namespace mediaserver {
