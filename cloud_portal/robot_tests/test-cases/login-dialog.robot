@@ -58,6 +58,7 @@ redirects to systems after log In
 
 after log In, display user's email and menu in top right corner
     Open Browser and go to URL    ${url}
+    Maximize Browser Window
     Log In    ${email}    ${password}
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Element Text Should Be    ${ACCOUNT DROPDOWN}    ${email}
