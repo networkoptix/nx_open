@@ -10,17 +10,17 @@ namespace sdk {
 namespace metadata {
 
 /**
- * Each class that implements AbstractMetadataPlugin interface
+ * Each class that implements Plugin interface
  * should properly handle this GUID in its queryInterface method
  */
-static const nxpl::NX_GUID IID_MetadataPlugin = {{0x6d, 0x73, 0x71, 0x36, 0x17, 0xad, 0x43, 0xf9,
+static const nxpl::NX_GUID IID_Plugin = {{0x6d, 0x73, 0x71, 0x36, 0x17, 0xad, 0x43, 0xf9,
     0x9f, 0x80, 0x7d, 0x56, 0x91, 0x36, 0x82, 0x94}};
 
 /**
- * @brief The AbstractMetadataPlugin class is a main interface for metadata plugins.
+ * @brief The Plugin class is a main interface for metadata plugins.
  * Each metadata plugin should implement this interface.
  */
-class AbstractMetadataPlugin: public nxpl::Plugin3
+class Plugin: public nxpl::Plugin3
 {
 public:
     /**

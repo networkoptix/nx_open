@@ -45,7 +45,7 @@ class ManagerPool final:
     public Connective<QObject>
 {
     using ResourceMetadataContextMap = std::multimap<QnUuid, ResourceMetadataContext>;
-    using PluginList = QList<nx::sdk::metadata::AbstractMetadataPlugin*>;
+    using PluginList = QList<nx::sdk::metadata::Plugin*>;
 
     Q_OBJECT
 public:
@@ -67,7 +67,7 @@ private:
 
     nx::sdk::metadata::AbstractCameraManager* createMetadataManager(
         const QnSecurityCamResourcePtr& camera,
-        nx::sdk::metadata::AbstractMetadataPlugin* plugin) const;
+        nx::sdk::metadata::Plugin* plugin) const;
 
     void releaseResourceMetadataManagers(const QnSecurityCamResourcePtr& camera);
 
@@ -97,7 +97,7 @@ private:
     }
 
     boost::optional<nx::api::AnalyticsDriverManifest> loadPluginManifest(
-        nx::sdk::metadata::AbstractMetadataPlugin* plugin);
+        nx::sdk::metadata::Plugin* plugin);
 
     void assignPluginManifestToServer(
         const nx::api::AnalyticsDriverManifest& manifest,

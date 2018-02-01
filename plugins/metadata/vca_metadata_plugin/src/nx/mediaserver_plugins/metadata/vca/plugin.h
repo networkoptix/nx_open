@@ -24,7 +24,7 @@ namespace vca {
  * Plugin for work with VCA-camera. Deals with three events: motion-detected, vca-event and
  * face-detected.
 */
-class Plugin: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
+class Plugin: public nxpt::CommonRefCounter<nx::sdk::metadata::Plugin>
 {
 public:
     Plugin();

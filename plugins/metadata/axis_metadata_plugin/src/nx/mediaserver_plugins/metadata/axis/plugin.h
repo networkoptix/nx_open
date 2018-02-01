@@ -21,7 +21,7 @@ namespace metadata {
 namespace axis {
 
 class Plugin:
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
+    public nxpt::CommonRefCounter<nx::sdk::metadata::Plugin>
 {
 public:
     Plugin();

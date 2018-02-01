@@ -22,7 +22,7 @@ namespace plugins {
 namespace hikvision {
 
 class MetadataPlugin:
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
+    public nxpt::CommonRefCounter<nx::sdk::metadata::Plugin>
 {
 public:
     MetadataPlugin();

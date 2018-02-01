@@ -8,7 +8,7 @@ namespace mediaserver {
 namespace plugins {
 
 class StubMetadataPlugin:
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
+    public nxpt::CommonRefCounter<nx::sdk::metadata::Plugin>
 {
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;

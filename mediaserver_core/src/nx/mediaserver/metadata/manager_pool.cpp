@@ -178,8 +178,8 @@ nx::mediaserver::metadata::ManagerPool::PluginList ManagerPool::availablePlugins
     if (!pluginManager)
         return PluginList();
 
-    return pluginManager->findNxPlugins<AbstractMetadataPlugin>(
-        IID_MetadataPlugin);
+    return pluginManager->findNxPlugins<Plugin>(
+        IID_Plugin);
 }
 
 void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourcePtr& camera)
@@ -216,7 +216,7 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
         if (!plugin)
             continue;
 
-        nxpt::ScopedRef<AbstractMetadataPlugin> pluginGuard(plugin, /*releaseRef*/ false);
+        nxpt::ScopedRef<Plugin> pluginGuard(plugin, /*releaseRef*/ false);
 
         NX_DEBUG(
             this,
@@ -274,7 +274,7 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
 
 AbstractCameraManager* ManagerPool::createMetadataManager(
     const QnSecurityCamResourcePtr& camera,
-    AbstractMetadataPlugin* plugin) const
+    Plugin* plugin) const
 {
     NX_ASSERT(camera && plugin);
     if (!camera || !plugin)
@@ -441,7 +441,7 @@ uint qHash(const nx::api::AnalyticsEventType& t)// noexcept
 }
 
 boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifest(
-    AbstractMetadataPlugin* plugin)
+    Plugin* plugin)
 {
     Error error = Error::noError;
     auto pluginManifest = deserializeManifest<nx::api::AnalyticsDriverManifest>(
