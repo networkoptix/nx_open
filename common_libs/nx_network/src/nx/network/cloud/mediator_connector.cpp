@@ -24,7 +24,7 @@ MediatorConnector::MediatorConnector():
     auto stunClientSettings = s_stunClientSettings;
     stunClientSettings.reconnectPolicy = network::RetryPolicy::kNoRetries;
     m_stunClient = std::make_shared<stun::AsyncClientWithHttpTunneling>(
-        s_stunClientSettings);
+        stunClientSettings);
 
     bindToAioThread(getAioThread());
 
