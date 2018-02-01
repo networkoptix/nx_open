@@ -14,7 +14,9 @@ Log in to Auto Tests System
     [arguments]    ${email}
     Go To    ${url}/systems/${AUTO TESTS URL}
     Log In    ${email}    ${password}    None
-    Validate Log In
+    Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait For    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait For    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait For    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 *** Test Cases ***
 Share button - opens dialog
@@ -93,6 +95,7 @@ Sharing roles are ordered: more access is on top of the list with options
 When user selects role - special hint appears
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${email}
+    Wait Until Element Is Visible    ${OPEN IN NX BUTTON}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
 #Adminstrator check
@@ -157,6 +160,7 @@ Edit permission works
     Input Text    ${SHARE EMAIL}    ${random email}
     Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
     Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    New permissions saved
     Edit User Permissions In Systems    ${random email}    Viewer
     Check User Permissions    ${random email}    Viewer
     Edit User Permissions In Systems    ${random email}    Custom

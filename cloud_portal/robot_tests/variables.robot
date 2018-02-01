@@ -48,8 +48,10 @@ ${SUCCESS LOG IN BUTTON}              //div[@ng-model-options="{ updateOn: 'blur
 
 #In system settings
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
+${RENAME SYSTEM}                      //button[@ng-click='rename()']
 ${DISCONNECT FROM MY ACCOUNT}         //button[@ng-click='delete()']
 ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//button[@ng-click='share()']
+${OPEN IN NX BUTTON}                  //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()']
 ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
 ${DELETE USER BUTTON}                 //button[@ng-click='ok()' and contains(text(), 'Delete')]
 ${DELETE USER CANCEL BUTTON}          //button[@ng-click='cancel()' and contains(text(), 'Cancel')]

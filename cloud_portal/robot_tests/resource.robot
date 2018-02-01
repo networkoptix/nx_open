@@ -120,3 +120,8 @@ Verify In System
 Failure Tasks
     Capture Page Screenshot    selenium-screenshot-{index}.png
     Close Browser
+
+Wait For
+    [arguments]    @{elements}
+    :FOR     ${element}  IN  @{elements}
+    \  Wait Until Element Is Visible    ${element}

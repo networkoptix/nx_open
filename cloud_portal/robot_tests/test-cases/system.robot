@@ -12,16 +12,17 @@ Log in to Auto Tests System
     [arguments]    ${email}
     Go To    ${url}/systems/${AUTO TESTS URL}
     Log In    ${email}    ${password}    None
+    Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait For    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait For    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait For    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 *** Test Cases ***
 has system name, owner and OpenInNx button visible on systems page
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
-    Wait Until Element Is Visible    ${AUTO TESTS TITLE}
+    Wait For    //div[@ng-if='systems.length']    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
-    Wait Until Element Is Visible    ${AUTO TESTS USER}
     Element Should Be Visible    ${AUTO TESTS USER}
-    Wait Until Element Is Visible    ${AUTO TESTS OPEN NX}
     Element Should Be Visible    ${AUTO TESTS OPEN NX}
     Close Browser
 
@@ -75,15 +76,17 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Click Button    ${DISCONNECT MODAL DISCONNECT BUTTON}
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
     Element Should Be Visible    ${YOU HAVE NO SYSTEMS}
-
     Log Out
-    Log in to Auto Tests System    ${EMAIL OWNER}
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO TESTS URL}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE EMAIL}
     Input Text    ${SHARE EMAIL}    ${EMAIL NOT OWNER}
     Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
     Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    New permissions saved
     Close Browser
 
 has Share button, visible for admin and owner
@@ -112,6 +115,7 @@ does not show Share button to viewer, advanced viewer, live viewer
     Log in to Auto Tests System    ${EMAIL LIVE VIEWER}
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
+    Register Keyword To Run On Failure    Failure Tasks
     Close Browser
 
 should open System page by link to not authorized user and redirect to homepage, if he does not log in
@@ -176,6 +180,7 @@ should display same user data as user provided during registration (stress to cy
     Element Should Be Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
 
 #remove new user from system
+
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
     Remove User Permissions    ${email}
@@ -194,6 +199,7 @@ should display same user data as showed in user account (stress to cyrillic)
 
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${OPEN IN NX BUTTON}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE EMAIL}
