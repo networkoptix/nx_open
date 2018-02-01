@@ -13,6 +13,8 @@ from api.account_backend import AccountBackend
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, \
     APIInternalException, api_success, ErrorCodes, require_params
 
+import api.models
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -196,3 +198,14 @@ def restore_password(request):
                                   error_data={'code': ['This field is required.'],
                                               'user_email': ['This field is required.']})
     return api_success()
+
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+@handle_exceptions
+def check_code_in_portal(request):
+    require_params(request, ('code',))
+    code = request.data['code']
+    (temp_password, email) = base64.b64decode(code).split(":")
+    email_exists = api.models.Account.objects.filter(email=email.lower()).count() > 0
+    return api_success({'emailExists': email_exists})
