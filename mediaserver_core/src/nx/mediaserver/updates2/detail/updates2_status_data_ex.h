@@ -19,8 +19,14 @@ struct Updates2StatusDataEx: api::Updates2StatusData
         StatusCode status,
         QString message = QString(),
         double progress = 0.0);
-    Updates2StatusDataEx(const api::Updates2StatusData& other);
+    Updates2StatusDataEx(const api::Updates2StatusData& other) = delete;
+    Updates2StatusDataEx& operator=(const api::Updates2StatusData& other) = delete;
+    Updates2StatusDataEx& operator=(const Updates2StatusDataEx& other) = delete;
+    Updates2StatusDataEx& operator=(Updates2StatusDataEx&& other) = delete;
     Updates2StatusDataEx() = default;
+
+    void fromBase(const api::Updates2StatusData& other);
+    void clone(const Updates2StatusDataEx& other);
 };
 
 bool operator == (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& rhs);

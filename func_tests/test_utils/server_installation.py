@@ -7,7 +7,7 @@ from pathlib2 import PurePosixPath
 
 from test_utils.build_info import build_info_from_text, customizations_from_paths
 from test_utils.os_access import ProcessError
-from test_utils.server_ctl import UpstartService
+from test_utils.service import UpstartService
 from test_utils.utils import wait_until
 
 if sys.version_info[:2] == (2, 7):

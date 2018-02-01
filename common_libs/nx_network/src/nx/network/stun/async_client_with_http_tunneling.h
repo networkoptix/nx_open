@@ -97,6 +97,7 @@ private:
     /** map<request id, request context>. */
     std::map<int, RequestContext> m_activeRequests;
     OnConnectionClosedHandler m_connectionClosedHandler;
+    ConnectHandler m_userConnectHandler;
 
     virtual void stopWhileInAioThread() override;
 
