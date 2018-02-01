@@ -26,151 +26,19 @@ constexpr int kTotalConnections = 77;
 
 } // namespace
 
+/**
+ * Adapted group of old socket tests.
+ */
 template<typename SocketTypeSet>
-class StreamSocketAcceptance:
-    public ::testing::Test
+class SocketStreamingTestGroupFixture
 {
-public:
-    StreamSocketAcceptance():
-        m_addressResolver(&nx::network::SocketGlobals::addressResolver()),
-        m_startedConnectionsCount(0),
-        m_completedConnectionsCount(0),
-        m_serverMessage(nx::utils::random::generateName(17))
-    {
-    }
-
-    ~StreamSocketAcceptance()
-    {
-        if (m_connection)
-            m_connection->pleaseStopSync();
-        if (m_serverSocket)
-            m_serverSocket->pleaseStopSync();
-        if (m_server)
-            m_server->pleaseStopSync();
-    }
-
 protected:
-    std::mutex m_mutex;
-    AddressResolver* m_addressResolver = nullptr;
-    std::atomic<int> m_startedConnectionsCount;
-    std::atomic<int> m_completedConnectionsCount;
-    std::deque<std::unique_ptr<AbstractStreamSocket>> m_connections;
-
-    void givenListeningServer()
-    {
-        m_serverSocket = std::make_unique<typename SocketTypeSet::ServerSocket>(
-            SocketFactory::tcpClientIpVersion());
-        ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true));
-        ASSERT_TRUE(m_serverSocket->bind(SocketAddress::anyPrivateAddress));
-        ASSERT_TRUE(m_serverSocket->listen());
-    }
-
-    void givenRandomNameMappedToServerHostIp()
-    {
-        givenRandomHostName();
-        m_mappedEndpoint.port = m_serverSocket->getLocalAddress().port;
-
-        m_addressResolver->addFixedAddress(
-            m_mappedEndpoint.address,
-            m_serverSocket->getLocalAddress());
-    }
-
-    void givenRandomHostName()
-    {
-        m_mappedEndpoint.address = nx::utils::random::generateName(7).toStdString();
-        m_mappedEndpoint.port = nx::utils::random::number<std::uint16_t>();
-    }
-
-    void givenMessageServer()
-    {
-        m_server = std::make_unique<server::SimpleMessageServer>(
-            std::make_unique<typename SocketTypeSet::ServerSocket>(
-                SocketFactory::tcpClientIpVersion()));
-        m_server->setStaticMessage(m_serverMessage);
-        m_server->setKeepConnection(true);
-        ASSERT_TRUE(m_server->bind(SocketAddress::anyPrivateAddress));
-        ASSERT_TRUE(m_server->listen());
-    }
-
-    void givenConnectedSocket()
-    {
-        m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
-        ASSERT_TRUE(m_connection->connect(
-            m_server->address(), nx::network::kNoTimeout));
-    }
-
-    void whenReceivedMessageFromServerAsync(
-        nx::utils::MoveOnlyFunc<void()> auxiliaryHandler)
-    {
-        m_auxiliaryRecvHandler.swap(auxiliaryHandler);
-
-        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
-        continueReceiving();
-
-        thenServerMessageIsReceived();
-    }
-
-    void whenConnectUsingHostName()
-    {
-        using namespace std::placeholders;
-
-        m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
-        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
-        m_connection->connectAsync(
-            m_mappedEndpoint,
-            std::bind(&StreamSocketAcceptance::saveConnectResult, this, _1));
-    }
-
-    void continueReceiving()
-    {
-        using namespace std::placeholders;
-
-        m_readBuffer.reserve(m_readBuffer.size() + 1024);
-        m_connection->readSomeAsync(
-            &m_readBuffer,
-            std::bind(&StreamSocketAcceptance::saveReadResult, this, _1, _2));
-    }
-
-    void whenCancelAllSocketOperations()
-    {
-        m_connection->pleaseStopSync();
-    }
-
-    void thenConnetionIsEstablished()
-    {
-        ASSERT_EQ(SystemError::noError, m_connectResultQueue.pop());
-    }
-
-    void assertConnectionToServerCanBeEstablishedUsingMappedName()
-    {
-        whenConnectUsingHostName();
-        thenConnetionIsEstablished();
-    }
-
-    void setClientSocketRecvTimeout(std::chrono::milliseconds timeout)
-    {
-        ASSERT_TRUE(m_connection->setRecvTimeout(timeout.count()));
-    }
-
-    void thenServerMessageIsReceived()
-    {
-        const auto prevRecvResult = m_recvResultQueue.pop();
-        ASSERT_EQ(SystemError::noError, std::get<0>(prevRecvResult));
-        ASSERT_EQ(m_serverMessage, std::get<1>(prevRecvResult));
-    }
-
-    void thenClientSocketReportedTimedout()
-    {
-        const auto prevRecvResult = m_recvResultQueue.pop();
-        ASSERT_EQ(SystemError::timedOut, std::get<0>(prevRecvResult));
-    }
-
     void runStreamingTest(bool doServerDelay, bool doClientDelay)
     {
         using namespace std::chrono;
 
         nx::utils::thread serverThread(
-            std::bind(&StreamSocketAcceptance::streamingServerMain, this, doServerDelay));
+            std::bind(&SocketStreamingTestGroupFixture::streamingServerMain, this, doServerDelay));
 
         typename SocketTypeSet::ClientSocket clientSocket;
         SocketAddress addr("127.0.0.1", m_serverPort.get_future().get());
@@ -210,111 +78,12 @@ protected:
         serverThread.join();
     }
 
-    //---------------------------------------------------------------------------------------------
-    // Stopping multiple connections test.
-
-    void startMaximumConcurrentConnections()
-    {
-        m_startedConnectionsCount = kConcurrentConnections;
-        {
-            std::unique_lock<std::mutex> lk(m_mutex);
-            for (int i = 0; i < kConcurrentConnections; ++i)
-                startAnotherSocketNonSafe();
-        }
-    }
-
-    void startAnotherSocketNonSafe()
-    {
-        using namespace std::placeholders;
-
-        auto connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
-
-        ASSERT_TRUE(connection->setNonBlockingMode(true));
-        AbstractStreamSocket* connectionPtr = connection.get();
-        m_connections.push_back(std::move(connection));
-        connectionPtr->connectAsync(
-            m_mappedEndpoint,
-            std::bind(&StreamSocketAcceptance::onConnectionComplete, this, connectionPtr, _1));
-    }
-
-    void onConnectionComplete(
-        AbstractStreamSocket* connectionPtr,
-        SystemError::ErrorCode errorCode)
-    {
-        ASSERT_TRUE(errorCode == SystemError::noError);
-
-        std::unique_lock<std::mutex> lk(m_mutex);
-
-        auto iterToRemove = std::remove_if(
-            m_connections.begin(), m_connections.end(),
-            [connectionPtr](const std::unique_ptr<AbstractStreamSocket>& elem) -> bool
-            {
-                return elem.get() == connectionPtr;
-            });
-        if (iterToRemove != m_connections.end())
-        {
-            ++m_completedConnectionsCount;
-            m_connections.erase(iterToRemove, m_connections.end());
-        }
-
-        while (m_connections.size() < kConcurrentConnections)
-        {
-            if ((++m_startedConnectionsCount) <= kTotalConnections)
-                startAnotherSocketNonSafe();
-            else
-                break;
-        }
-    }
-
-    //---------------------------------------------------------------------------------------------
-    // (end) Stopping multiple connections test.
-
 private:
-    using RecvResult = std::tuple<SystemError::ErrorCode, nx::Buffer>;
-
-    SocketAddress m_mappedEndpoint;
-    nx::utils::SyncQueue<SystemError::ErrorCode> m_connectResultQueue;
-    const nx::Buffer m_serverMessage;
-    nx::Buffer m_readBuffer;
-    nx::utils::SyncQueue<RecvResult> m_recvResultQueue;
     nx::utils::promise<int> m_serverPort;
-    std::unique_ptr<typename SocketTypeSet::ServerSocket> m_serverSocket;
-    std::unique_ptr<typename SocketTypeSet::ClientSocket> m_connection;
-    std::unique_ptr<server::SimpleMessageServer> m_server;
-    nx::utils::MoveOnlyFunc<void()> m_auxiliaryRecvHandler;
-
-    void saveConnectResult(SystemError::ErrorCode connectResult)
-    {
-        m_connectResultQueue.push(connectResult);
-    }
-
-    void saveReadResult(SystemError::ErrorCode systemErrorCode, std::size_t bytesRead)
-    {
-        if (systemErrorCode == SystemError::noError && bytesRead > 0)
-        {
-            if (m_readBuffer != m_serverMessage)
-            {
-                continueReceiving();
-                return;
-            }
-
-            m_recvResultQueue.push(
-                std::make_tuple(SystemError::noError, m_readBuffer));
-            m_readBuffer.clear();
-        }
-        else
-        {
-            m_recvResultQueue.push(std::make_tuple(systemErrorCode, nx::Buffer()));
-        }
-
-        if (m_auxiliaryRecvHandler)
-            nx::utils::swapAndCall(m_auxiliaryRecvHandler);
-    }
 
     void streamingServerMain(bool doServerDelay)
     {
-        const auto server = std::make_unique<typename SocketTypeSet::ServerSocket>(
-            SocketFactory::tcpClientIpVersion());
+        const auto server = std::make_unique<typename SocketTypeSet::ServerSocket>();
 
         ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
         ASSERT_TRUE(server->listen());
@@ -363,7 +132,342 @@ private:
     }
 };
 
+//-------------------------------------------------------------------------------------------------
+
+template<typename SocketTypeSet>
+class StreamSocketStoppingMultipleConnectionsTestFixture
+{
+public:
+    StreamSocketStoppingMultipleConnectionsTestFixture():
+        m_startedConnectionsCount(0),
+        m_completedConnectionsCount(0)
+    {
+    }
+
+protected:
+    void startMaximumConcurrentConnections(const SocketAddress& serverEndpoint)
+    {
+        m_serverEndpoint = serverEndpoint;
+        m_startedConnectionsCount = kConcurrentConnections;
+        {
+            std::unique_lock<std::mutex> lk(m_mutex);
+            for (int i = 0; i < kConcurrentConnections; ++i)
+                startAnotherSocketNonSafe();
+        }
+    }
+
+    void startAnotherSocketNonSafe()
+    {
+        using namespace std::placeholders;
+
+        auto connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
+
+        ASSERT_TRUE(connection->setNonBlockingMode(true));
+        AbstractStreamSocket* connectionPtr = connection.get();
+        m_connections.push_back(std::move(connection));
+        connectionPtr->connectAsync(
+            m_serverEndpoint,
+            std::bind(&StreamSocketStoppingMultipleConnectionsTestFixture::onConnectionComplete,
+                this, connectionPtr, _1));
+    }
+
+    void onConnectionComplete(
+        AbstractStreamSocket* connectionPtr,
+        SystemError::ErrorCode errorCode)
+    {
+        ASSERT_TRUE(errorCode == SystemError::noError);
+
+        std::unique_lock<std::mutex> lk(m_mutex);
+
+        auto iterToRemove = std::remove_if(
+            m_connections.begin(), m_connections.end(),
+            [connectionPtr](const std::unique_ptr<AbstractStreamSocket>& elem) -> bool
+            {
+                return elem.get() == connectionPtr;
+            });
+        if (iterToRemove != m_connections.end())
+        {
+            ++m_completedConnectionsCount;
+            m_connections.erase(iterToRemove, m_connections.end());
+        }
+
+        while (m_connections.size() < kConcurrentConnections)
+        {
+            if ((++m_startedConnectionsCount) <= kTotalConnections)
+                startAnotherSocketNonSafe();
+            else
+                break;
+        }
+    }
+
+    int startedConnectionsCount() const
+    {
+        return m_startedConnectionsCount;
+    }
+
+    int completedConnectionsCount() const
+    {
+        return m_completedConnectionsCount;
+    }
+
+    std::mutex m_mutex;
+    std::deque<std::unique_ptr<AbstractStreamSocket>> m_connections;
+
+private:
+    SocketAddress m_serverEndpoint;
+    std::atomic<int> m_startedConnectionsCount;
+    std::atomic<int> m_completedConnectionsCount;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+template<typename SocketTypeSet>
+class StreamSocketAcceptance:
+    public ::testing::Test,
+    public SocketStreamingTestGroupFixture<SocketTypeSet>,
+    public StreamSocketStoppingMultipleConnectionsTestFixture<SocketTypeSet>
+{
+public:
+    StreamSocketAcceptance():
+        m_addressResolver(&nx::network::SocketGlobals::addressResolver()),
+        m_clientMessage(nx::utils::random::generateName(17)),
+        m_serverMessage(nx::utils::random::generateName(17))
+    {
+    }
+
+    ~StreamSocketAcceptance()
+    {
+        if (m_connection)
+            m_connection->pleaseStopSync();
+        if (m_serverSocket)
+            m_serverSocket->pleaseStopSync();
+        if (m_server)
+            m_server->pleaseStopSync();
+    }
+
+protected:
+    AddressResolver* m_addressResolver = nullptr;
+
+    void givenListeningServer()
+    {
+        m_serverSocket = std::make_unique<typename SocketTypeSet::ServerSocket>();
+        ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true));
+        ASSERT_TRUE(m_serverSocket->bind(SocketAddress::anyPrivateAddress));
+        ASSERT_TRUE(m_serverSocket->listen());
+    }
+
+    void givenRandomNameMappedToServerHostIp()
+    {
+        givenRandomHostName();
+        m_mappedEndpoint.port = m_serverSocket->getLocalAddress().port;
+
+        m_addressResolver->addFixedAddress(
+            m_mappedEndpoint.address,
+            m_serverSocket->getLocalAddress());
+    }
+
+    void givenRandomHostName()
+    {
+        m_mappedEndpoint.address = nx::utils::random::generateName(7).toStdString();
+        m_mappedEndpoint.port = nx::utils::random::number<std::uint16_t>();
+    }
+
+    void givenMessageServer()
+    {
+        m_server = std::make_unique<server::SimpleMessageServer>(
+            std::make_unique<typename SocketTypeSet::ServerSocket>());
+        m_server->setResponse(m_serverMessage);
+        m_server->setKeepConnection(true);
+        ASSERT_TRUE(m_server->bind(SocketAddress::anyPrivateAddress));
+        ASSERT_TRUE(m_server->listen());
+    }
+
+    void givenConnectedSocket()
+    {
+        m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
+        ASSERT_TRUE(m_connection->connect(
+            m_server->address(), nx::network::kNoTimeout));
+    }
+
+    void givenPingPongServer()
+    {
+        givenMessageServer();
+        m_server->setRequest(m_clientMessage);
+    }
+
+    void whenReceivedMessageFromServerAsync(
+        nx::utils::MoveOnlyFunc<void()> auxiliaryHandler)
+    {
+        m_auxiliaryRecvHandler.swap(auxiliaryHandler);
+
+        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
+        continueReceiving();
+
+        thenServerMessageIsReceived();
+    }
+
+    void whenConnectUsingHostName()
+    {
+        using namespace std::placeholders;
+
+        m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
+        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
+        m_connection->connectAsync(
+            m_mappedEndpoint,
+            std::bind(&StreamSocketAcceptance::saveConnectResult, this, _1));
+    }
+
+    void continueReceiving()
+    {
+        using namespace std::placeholders;
+
+        m_readBuffer.reserve(m_readBuffer.size() + 1024);
+        m_connection->readSomeAsync(
+            &m_readBuffer,
+            std::bind(&StreamSocketAcceptance::saveReadResult, this, _1, _2));
+    }
+
+    void whenCancelAllSocketOperations()
+    {
+        m_connection->pleaseStopSync();
+    }
+
+    void whenSendMultiplePingsViaMultipleConnections()
+    {
+        m_expectedResponseCount = 7;
+        for (int i = 0; i < m_expectedResponseCount; ++i)
+        {
+            m_clientConnections.push_back(
+                std::make_unique<ClientConnectionContext>());
+            ASSERT_TRUE(m_clientConnections.back()->connection.connect(
+                m_server->address(), kNoTimeout));
+            ASSERT_TRUE(m_clientConnections.back()->connection.setNonBlockingMode(true));
+            m_clientConnections.back()->buffer.reserve(m_serverMessage.size());
+
+            m_clientConnections.back()->connection.sendAsync(
+                m_clientMessage,
+                [this, connectionCtx = m_clientConnections.back().get()](
+                    SystemError::ErrorCode errorCode,
+                    std::size_t bytesTransferred)
+                {
+                    if (errorCode != SystemError::noError ||
+                        bytesTransferred != m_clientMessage.size())
+                    {
+                        // m_recvResultQueue serves as result storage in this particular test.
+                        m_recvResultQueue.push(std::make_tuple(errorCode, nx::Buffer()));
+                        return;
+                    }
+
+                    connectionCtx->connection.readAsyncAtLeast(
+                        &connectionCtx->buffer, m_serverMessage.size(),
+                        [this, connectionCtx](
+                            SystemError::ErrorCode errorCode, size_t /*size*/)
+                        {
+                            m_recvResultQueue.push(
+                                std::make_tuple(errorCode, connectionCtx->buffer));
+                        });
+                });
+        }
+    }
+
+    void thenConnectionIsEstablished()
+    {
+        ASSERT_EQ(SystemError::noError, m_connectResultQueue.pop());
+    }
+
+    void assertConnectionToServerCanBeEstablishedUsingMappedName()
+    {
+        whenConnectUsingHostName();
+        thenConnectionIsEstablished();
+    }
+
+    void setClientSocketRecvTimeout(std::chrono::milliseconds timeout)
+    {
+        ASSERT_TRUE(m_connection->setRecvTimeout(timeout.count()));
+    }
+
+    void thenServerMessageIsReceived()
+    {
+        const auto prevRecvResult = m_recvResultQueue.pop();
+        ASSERT_EQ(SystemError::noError, std::get<0>(prevRecvResult));
+        ASSERT_EQ(m_serverMessage, std::get<1>(prevRecvResult));
+    }
+
+    void thenClientSocketReportedTimedout()
+    {
+        const auto prevRecvResult = m_recvResultQueue.pop();
+        ASSERT_EQ(SystemError::timedOut, std::get<0>(prevRecvResult));
+    }
+
+    void thenPongIsReceivedViaEachConnection()
+    {
+        for (int i = 0; i < m_expectedResponseCount; ++i)
+        {
+            auto recvResult = m_recvResultQueue.pop();
+            ASSERT_EQ(SystemError::noError, std::get<0>(recvResult));
+            ASSERT_EQ(m_serverMessage, std::get<1>(recvResult));
+        }
+    }
+
+    SocketAddress mappedEndpoint() const
+    {
+        return m_mappedEndpoint;
+    }
+
+private:
+    using RecvResult = std::tuple<SystemError::ErrorCode, nx::Buffer>;
+
+    struct ClientConnectionContext
+    {
+        typename SocketTypeSet::ClientSocket connection;
+        nx::Buffer buffer;
+    };
+
+    int m_expectedResponseCount = 0;
+    SocketAddress m_mappedEndpoint;
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_connectResultQueue;
+    const nx::Buffer m_clientMessage;
+    const nx::Buffer m_serverMessage;
+    nx::Buffer m_readBuffer;
+    nx::utils::SyncQueue<RecvResult> m_recvResultQueue;
+    std::unique_ptr<typename SocketTypeSet::ServerSocket> m_serverSocket;
+    std::unique_ptr<typename SocketTypeSet::ClientSocket> m_connection;
+    std::unique_ptr<server::SimpleMessageServer> m_server;
+    nx::utils::MoveOnlyFunc<void()> m_auxiliaryRecvHandler;
+    std::vector<std::unique_ptr<ClientConnectionContext>> m_clientConnections;
+
+    void saveConnectResult(SystemError::ErrorCode connectResult)
+    {
+        m_connectResultQueue.push(connectResult);
+    }
+
+    void saveReadResult(SystemError::ErrorCode systemErrorCode, std::size_t bytesRead)
+    {
+        if (systemErrorCode == SystemError::noError && bytesRead > 0)
+        {
+            if (m_readBuffer != m_serverMessage)
+            {
+                continueReceiving();
+                return;
+            }
+
+            m_recvResultQueue.push(
+                std::make_tuple(SystemError::noError, m_readBuffer));
+            m_readBuffer.clear();
+        }
+        else
+        {
+            m_recvResultQueue.push(std::make_tuple(systemErrorCode, nx::Buffer()));
+        }
+
+        if (m_auxiliaryRecvHandler)
+            nx::utils::swapAndCall(m_auxiliaryRecvHandler);
+    }
+};
+
 TYPED_TEST_CASE_P(StreamSocketAcceptance);
+
+//-------------------------------------------------------------------------------------------------
 
 // Windows 8/10 doesn't support client->server send timeout.
 // It close connection automatically with error 10053 after client send timeout.
@@ -415,15 +519,17 @@ TYPED_TEST_P(StreamSocketAcceptance, randomly_stopping_multiple_simultaneous_con
     this->givenListeningServer();
     this->givenRandomNameMappedToServerHostIp();
 
-    this->startMaximumConcurrentConnections();
+    this->startMaximumConcurrentConnections(mappedEndpoint());
+
+    // TODO: #ak Refactor this test
 
     int canCancelIndex = 0;
     int cancelledConnectionsCount = 0;
     std::unique_lock<std::mutex> lk(this->m_mutex);
-    while ((this->m_completedConnectionsCount + cancelledConnectionsCount) < kTotalConnections)
+    while ((this->completedConnectionsCount() + cancelledConnectionsCount) < kTotalConnections)
     {
         std::unique_ptr<AbstractStreamSocket> connectionToCancel;
-        if (this->m_connections.size() > 1 && (canCancelIndex < this->m_startedConnectionsCount))
+        if (this->m_connections.size() > 1 && (canCancelIndex < this->startedConnectionsCount()))
         {
             auto connectionToCancelIter = this->m_connections.begin();
             size_t index = nx::utils::random::number<size_t>(0, this->m_connections.size() - 1);
@@ -461,6 +567,13 @@ TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
     this->thenClientSocketReportedTimedout();
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, transfer_async)
+{
+    this->givenPingPongServer();
+    this->whenSendMultiplePingsViaMultipleConnections();
+    this->thenPongIsReceivedViaEachConnection();
+}
+
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_receiveDelay,
     sendDelay,
@@ -468,7 +581,8 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     connect_including_resolve_is_cancelled_correctly,
     connect_including_resolving_unknown_name_is_cancelled_correctly,
     randomly_stopping_multiple_simultaneous_connections,
-    receive_timeout_change_is_not_ignored);
+    receive_timeout_change_is_not_ignored,
+    transfer_async);
 
 } // namespace test
 } // namespace network
