@@ -507,7 +507,7 @@ module.exports = function (grunt) {
         compress: {
             external: {
                 options: {
-                    archive: '<%= yeoman.app %>/../external.dat',
+                    archive: '<%= yeoman.app %>/../server-external/bin/external.dat',
                     mode: 'zip'
                 },
                 files: [
@@ -526,6 +526,9 @@ module.exports = function (grunt) {
             push:{
                 branch:'',
                 command: 'python ../../devtools/util/merge_dev.py -t <%= shell.push.branch %>'
+            },
+            version:{
+                command: 'cp version.txt static || (hg log -r . > static/version.txt)'
             },
             print_version:{
                 command: 'hg parent'
@@ -817,6 +820,7 @@ module.exports = function (grunt) {
         'rev',
         'usemin',
         'htmlmin',
+        'shell:version',
         'shell:localize'
     ]);
 
