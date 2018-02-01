@@ -66,7 +66,7 @@ void SimpleMessageServerConnection::stopWhileInAioThread()
 
 void SimpleMessageServerConnection::onDataRead(
     SystemError::ErrorCode errorCode,
-    size_t bytesRead)
+    size_t /*bytesRead*/)
 {
     using namespace std::placeholders;
 

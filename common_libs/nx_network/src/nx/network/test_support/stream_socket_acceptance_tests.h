@@ -519,7 +519,7 @@ TYPED_TEST_P(StreamSocketAcceptance, randomly_stopping_multiple_simultaneous_con
     this->givenListeningServer();
     this->givenRandomNameMappedToServerHostIp();
 
-    this->startMaximumConcurrentConnections(mappedEndpoint());
+    this->startMaximumConcurrentConnections(this->mappedEndpoint());
 
     // TODO: #ak Refactor this test
 
