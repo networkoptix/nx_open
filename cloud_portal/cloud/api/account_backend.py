@@ -27,6 +27,8 @@ class AccountBackend(ModelBackend):
             AccountBackend.check_email_in_portal(username, True)
         user = Account.get(username, password)
         if user and 'email' in user:
+            if username.find('@') > -1 and username != user['email']:
+                return None
             try:
                 return models.Account.objects.get(email=user['email'])
             except ObjectDoesNotExist:
