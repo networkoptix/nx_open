@@ -351,7 +351,7 @@ protected:
                     std::size_t bytesTransferred)
                 {
                     if (errorCode != SystemError::noError ||
-                        bytesTransferred != m_clientMessage.size())
+                        (int)bytesTransferred != m_clientMessage.size())
                     {
                         // m_recvResultQueue serves as result storage in this particular test.
                         m_recvResultQueue.push(std::make_tuple(errorCode, nx::Buffer()));
