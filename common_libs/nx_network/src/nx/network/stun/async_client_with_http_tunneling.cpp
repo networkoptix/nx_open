@@ -42,10 +42,11 @@ void AsyncClientWithHttpTunneling::connect(const utils::Url &url, ConnectHandler
 
             m_reconnectTimer.reset();
 
+            m_userConnectHandler = std::move(handler);
+
             connectInternal(
                 lock,
-                [this, handler = std::move(handler)](
-                    SystemError::ErrorCode systemErrorCode)
+                [this](SystemError::ErrorCode systemErrorCode)
                 {
                     if (systemErrorCode == SystemError::noError)
                         reportReconnect();
@@ -53,7 +54,6 @@ void AsyncClientWithHttpTunneling::connect(const utils::Url &url, ConnectHandler
                         scheduleReconnect();
                     //< TODO: ak reportReconnect() call looks strange here.
                     // But, that is how stun::AsyncClient works and some code relies on that.
-                    handler(systemErrorCode);
                 });
         });
 }
@@ -226,6 +226,8 @@ void AsyncClientWithHttpTunneling::connectInternal(
             if (sysErrorCode == SystemError::noError)
                 applyConnectionSettings();
             handler(sysErrorCode);
+            if (m_userConnectHandler)
+                nx::utils::swapAndCall(m_userConnectHandler, sysErrorCode);
         };
 
     if (m_url.scheme() == nx::network::http::kUrlSchemeName ||
@@ -242,7 +244,11 @@ void AsyncClientWithHttpTunneling::connectInternal(
     }
     else
     {
-        post([onConnected = std::move(onConnected)]() { onConnected(SystemError::invalidData); });
+        post(
+            [onConnected = std::move(onConnected)]()
+            {
+                onConnected(SystemError::invalidData);
+            });
     }
 }
 

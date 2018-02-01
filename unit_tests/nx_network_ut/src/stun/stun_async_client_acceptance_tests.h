@@ -59,9 +59,16 @@ class StunAsyncClientAcceptanceTest:
     public BasicStunAsyncClientAcceptanceTest
 {
 public:
+    StunAsyncClientAcceptanceTest()
+    {
+        AbstractAsyncClient::Settings clientSettings;
+        clientSettings.reconnectPolicy.initialDelay = std::chrono::milliseconds(1);
+        m_client = std::make_unique<typename AsyncClientTestTypes::ClientType>(clientSettings);
+    }
+
     ~StunAsyncClientAcceptanceTest()
     {
-        m_client.pleaseStopSync();
+        m_client->pleaseStopSync();
     }
 
 protected:
@@ -74,7 +81,7 @@ protected:
     void doInClientAioThread(Func func)
     {
         nx::utils::promise<void> done;
-        m_client.post(
+        m_client->post(
             [&func, &done]()
             {
                 func();
@@ -124,7 +131,7 @@ protected:
     void whenRemoveHandler()
     {
         nx::utils::promise<void> done;
-        m_client.cancelHandlers(this, [&done]() { done.set_value(); });
+        m_client->cancelHandlers(this, [&done]() { done.set_value(); });
         done.get_future().wait();
     }
 
@@ -147,14 +154,14 @@ protected:
         stun::Message request(stun::Header(
             stun::MessageClass::request,
             m_testMethodNumber));
-        m_client.sendRequest(
+        m_client->sendRequest(
             std::move(request),
             std::bind(&StunAsyncClientAcceptanceTest::storeRequestResult, this, _1, _2));
     }
 
     void whenForciblyCloseClientConnection()
     {
-        m_client.closeConnection(SystemError::connectionReset);
+        m_client->closeConnection(SystemError::connectionReset);
     }
 
     void whenServerSendsIndication()
@@ -175,7 +182,7 @@ protected:
 
     void whenConnectToServer()
     {
-        m_client.connect(
+        m_client->connect(
             m_serverUrl,
             [this](SystemError::ErrorCode systemErrorCode)
             {
@@ -195,7 +202,7 @@ protected:
 
     void whenDisconnectClient()
     {
-        m_client.closeConnection(SystemError::connectionReset);
+        m_client->closeConnection(SystemError::connectionReset);
     }
 
     void whenConnectToNewServer()
@@ -301,7 +308,7 @@ private:
         }
     };
 
-    typename AsyncClientTestTypes::ClientType m_client;
+    std::unique_ptr<typename AsyncClientTestTypes::ClientType> m_client;
     std::unique_ptr<typename AsyncClientTestTypes::ServerType> m_server;
     std::vector<std::unique_ptr<typename AsyncClientTestTypes::ServerType>> m_oldServers;
     SocketAddress m_serverEndpoint = SocketAddress::anyPrivateAddress;
@@ -321,9 +328,9 @@ private:
 
         startServer();
 
-        m_client.addOnReconnectedHandler(
+        m_client->addOnReconnectedHandler(
             std::bind(&StunAsyncClientAcceptanceTest::onReconnected, this));
-        m_client.setOnConnectionClosedHandler(
+        m_client->setOnConnectionClosedHandler(
             std::bind(&StunAsyncClientAcceptanceTest::saveConnectionClosedEvent, this, _1));
     }
 
@@ -347,12 +354,12 @@ private:
     {
         using namespace std::placeholders;
 
-        ASSERT_TRUE(m_client.setIndicationHandler(
+        ASSERT_TRUE(m_client->setIndicationHandler(
             m_indictionMethodToSubscribeTo,
             std::bind(&StunAsyncClientAcceptanceTest::saveIndication, this, _1),
             this));
 
-        m_client.connect(
+        m_client->connect(
             m_serverUrl,
             [this](SystemError::ErrorCode systemErrorCode)
             {
@@ -381,7 +388,7 @@ private:
 
     bool addIndicationHandler()
     {
-        return m_client.setIndicationHandler(
+        return m_client->setIndicationHandler(
             m_testMethodNumber + 1,
             [](nx::network::stun::Message) {},
             this);
