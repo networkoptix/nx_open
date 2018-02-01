@@ -314,42 +314,42 @@ protected:
                 .WillRepeatedly(Return((downloader::AbstractDownloader*)&m_testDownloader));
         }
 
-        downloader::FileInformation requestFileInformation(kFileName);
-        requestFileInformation.url = kFileUrl;
-        requestFileInformation.md5 = kFileMd5;
-        requestFileInformation.size = kFileSize;
-        requestFileInformation.peerPolicy =
+        downloader::FileInformation fileInformation(kFileName);
+        fileInformation.url = kFileUrl;
+        fileInformation.md5 = kFileMd5;
+        fileInformation.size = kFileSize;
+        fileInformation.peerPolicy =
             downloader::FileInformation::PeerSelectionPolicy::byPlatform;
 
         switch (expectedOutcome)
         {
             case DownloadExpectedOutcome::success_fileNotExists:
-            {
-                EXPECT_CALL(m_testDownloader, addFile(requestFileInformation))
+                EXPECT_CALL(m_testDownloader, addFile(fileInformation))
                     .Times(1).WillOnce(Return(downloader::ResultCode::ok));
-                auto responseFileInformation = requestFileInformation;
-                responseFileInformation.status = downloader::FileInformation::Status::downloaded;
+                fileInformation.status = downloader::FileInformation::Status::downloaded;
                 EXPECT_CALL(m_testDownloader, fileInformation(kFileName))
-                    .Times(1).WillOnce(Return(responseFileInformation));
+                    .Times(1).WillOnce(Return(fileInformation));
                 break;
-            }
             case DownloadExpectedOutcome::fail_downloadFailed:
-                EXPECT_CALL(m_testDownloader, addFile(requestFileInformation))
+                EXPECT_CALL(m_testDownloader, addFile(fileInformation))
                     .Times(1).WillOnce(Return(downloader::ResultCode::ok));
                 EXPECT_CALL(m_testDownloader, deleteFile(kFileName, _))
                     .Times(1).WillOnce(Return(downloader::ResultCode::ok));
 
-                requestFileInformation.status = downloader::FileInformation::Status::corrupted;
+                fileInformation.status = downloader::FileInformation::Status::corrupted;
                 EXPECT_CALL(m_testDownloader, fileInformation(kFileName))
-                    .Times(1).WillOnce(Return(requestFileInformation));
+                    .Times(1).WillOnce(Return(fileInformation));
                 break;
             case DownloadExpectedOutcome::fail_addFileFailed:
-                EXPECT_CALL(m_testDownloader, addFile(requestFileInformation))
+                EXPECT_CALL(m_testDownloader, addFile(fileInformation))
                     .Times(1).WillOnce(Return(downloader::ResultCode::ioError));
                 break;
             case DownloadExpectedOutcome::success_fileAlreadyExists:
-                EXPECT_CALL(m_testDownloader, addFile(requestFileInformation))
+                EXPECT_CALL(m_testDownloader, addFile(fileInformation))
                     .Times(1).WillOnce(Return(downloader::ResultCode::fileAlreadyExists));
+                fileInformation.status = downloader::FileInformation::Status::downloaded;
+                EXPECT_CALL(m_testDownloader, fileInformation(kFileName))
+                    .Times(1).WillOnce(Return(fileInformation));
                 break;
             case DownloadExpectedOutcome::fail_wrongState:
                 break;
@@ -691,7 +691,13 @@ TEST_F(Updates2Manager, Download_chunkFailedAndRecovered)
 
 TEST_F(Updates2Manager, Download_addAlreadyExistingFile)
 {
-    // #TODO: #akulikov implement
+    givenAvailableRemoteUpdate();
+    whenDownloadRequestIssued(DownloadExpectedOutcome::success_fileAlreadyExists);
+
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::downloading);
+
+    whenDownloadFinishedSuccessfully();
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
 }
 
 } // namespace test
