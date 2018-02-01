@@ -33,6 +33,7 @@ public:
 
     void updateState(const QnSecurityCamResourcePtr& camera);
     bool addUpload(const QnSecurityCamResourcePtr& camera, const QString& path, WearableError* error);
+    void cancelUploads(const QnSecurityCamResourcePtr& camera);
     void cancelAllUploads();
 
 signals:
