@@ -48,72 +48,6 @@ void setMaxOverlayWidth(Widget* settingsWidget, int width)
 } // namespace
 
 ExportSettingsDialog::ExportSettingsDialog(
-    QnMediaResourceWidget* widget,
-    bool allowLayoutExport,
-    const QnTimePeriod& timePeriod,
-    FileNameValidator isFileNameValid,
-    QWidget* parent)
-    :
-    ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
-{
-    setMediaParams(widget->resource(), widget->item()->data(), widget->context());
-    if (allowLayoutExport)
-        setLayout(widget->item()->layout()->resource());
-    else
-        hideTab(Mode::Layout);
-}
-
-ExportSettingsDialog::ExportSettingsDialog(const QnLayoutResourcePtr& layout,
-    const QString& mediaForbiddenReason,
-    const QnTimePeriod& timePeriod,
-    FileNameValidator isFileNameValid,
-    QWidget* parent)
-    :
-    ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
-{
-    disableTab(Mode::Media, mediaForbiddenReason);
-    setLayout(layout);
-}
-
-ExportSettingsDialog::ExportSettingsDialog(
-    const QnMediaResourcePtr& mediaResource,
-    QnWorkbenchContext* context,
-    const QnTimePeriod& timePeriod,
-    FileNameValidator isFileNameValid,
-    QWidget* parent)
-    :
-    ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
-{
-    setMediaParams(mediaResource, QnLayoutItemData(), context);
-    hideTab(Mode::Layout);
-}
-
-ExportSettingsDialog::ExportSettingsDialog(
-    QnMediaResourceWidget* widget,
-    const QnCameraBookmark& bookmark,
-    FileNameValidator isFileNameValid,
-    QWidget* parent)
-    :
-    ExportSettingsDialog({bookmark.startTimeMs, bookmark.durationMs}, bookmark, isFileNameValid, parent)
-{
-    setMediaParams(widget->resource(), widget->item()->data(), widget->context());
-    hideTab(Mode::Layout);
-}
-
-ExportSettingsDialog::ExportSettingsDialog(
-    const QnMediaResourcePtr& mediaResource,
-    QnWorkbenchContext* context,
-    const QnCameraBookmark& bookmark,
-    FileNameValidator isFileNameValid,
-    QWidget* parent)
-    :
-    ExportSettingsDialog({bookmark.startTimeMs, bookmark.durationMs}, bookmark, isFileNameValid, parent)
-{
-    setMediaParams(mediaResource, QnLayoutItemData(), context);
-    hideTab(Mode::Layout);
-}
-
-ExportSettingsDialog::ExportSettingsDialog(
     const QnTimePeriod& timePeriod,
     const QnCameraBookmark& bookmark,
     FileNameValidator isFileNameValid,
@@ -124,6 +58,8 @@ ExportSettingsDialog::ExportSettingsDialog(
     ui(new Ui::ExportSettingsDialog),
     isFileNameValid(isFileNameValid)
 {
+
+    qDebug() << "ExportSettingsDialog::ExportSettingsDialog(...) start";
     ui->setupUi(this);
     setHelpTopic(this, Qn::Exporting_Help);
 
@@ -136,6 +72,7 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     ui->mediaFrame->ensurePolished();
     ui->layoutFrame->ensurePolished();
+
     const auto background = qApp->palette().color(QPalette::Shadow);
     setPaletteColor(ui->mediaFrame, QPalette::Window, background);
     setPaletteColor(ui->layoutFrame, QPalette::Window, background);
@@ -145,6 +82,14 @@ ExportSettingsDialog::ExportSettingsDialog(
     ui->mediaPreviewWidget->busyIndicator()->dots()->setDotSpacing(kBusyIndicatorDotRadius * 2);
     ui->layoutPreviewWidget->busyIndicator()->dots()->setDotRadius(kBusyIndicatorDotRadius);
     ui->layoutPreviewWidget->busyIndicator()->dots()->setDotSpacing(kBusyIndicatorDotRadius * 2);
+
+    ui->mediaPreviewWidget->setAutoScaleUp(true);
+    ui->mediaPreviewWidget->setAutoScaleDown(true);
+    ui->layoutPreviewWidget->setAutoScaleUp(true);
+    ui->layoutPreviewWidget->setAutoScaleDown(true);
+
+    d->setMediaPreviewWidget(ui->mediaPreviewWidget);
+    d->setLayoutPreviewWidget(ui->layoutPreviewWidget);
 
     const QSize frameSize(ui->mediaFrame->frameWidth(), ui->mediaFrame->frameWidth());
     ui->mediaFrame->setFixedSize(kPreviewSize + frameSize * 2);
@@ -179,27 +124,15 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     updateSettingsWidgets();
 
-    ui->bookmarkButton->setVisible(bookmark.isValid());
-    if (!bookmark.isValid()) // Just in case...
-        ui->bookmarkButton->setState(ui::SelectableTextButton::State::deactivated);
-
-    ui->speedButton->setState(d->storedRapidReviewSettings().enabled
-        ? ui::SelectableTextButton::State::unselected
-        : ui::SelectableTextButton::State::deactivated);
-
     connect(ui->exportMediaSettingsPage, &ExportMediaSettingsWidget::dataChanged,
         d, &Private::setApplyFilters);
-
     connect(ui->exportLayoutSettingsPage, &ExportLayoutSettingsWidget::dataChanged,
         d, &Private::setLayoutReadOnly);
 
-    connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged, d,
-        &Private::setLayoutFilename);
-    connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged, this,
-        [this](const Filename& fileName)
-        {
-            d->setMediaFilename(fileName);
-        });
+    connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged,
+        d, &Private::setMediaFilename);
+    connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged,
+        d, &Private::setLayoutFilename);
 
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::dataChanged,
         d, &Private::setTimestampOverlaySettings);
@@ -212,6 +145,14 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     connect(ui->bookmarkSettingsPage, &BookmarkOverlaySettingsWidget::dataChanged,
         d, &Private::setBookmarkOverlaySettings);
+
+    ui->bookmarkButton->setVisible(bookmark.isValid());
+    if (!bookmark.isValid()) // Just in case...
+        ui->bookmarkButton->setState(ui::SelectableTextButton::State::deactivated);
+
+    ui->speedButton->setState(d->storedRapidReviewSettings().enabled
+        ? ui::SelectableTextButton::State::unselected
+        : ui::SelectableTextButton::State::deactivated);
 
     const auto updateRapidReviewData =
         [this](int absoluteSpeed, qint64 frameStepMs)
@@ -256,7 +197,7 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     connect(d, &Private::transcodingAllowedChanged, this,
         &ExportSettingsDialog::updateTranscodingWidgets);
-    updateTranscodingWidgets(d->isTranscodingAllowed());
+    updateTranscodingWidgets(d->isTranscodingRequested());
 
     connect(d, &Private::frameSizeChanged, this,
         [this](const QSize& size)
@@ -270,7 +211,9 @@ ExportSettingsDialog::ExportSettingsDialog(
     if (ui->bookmarkButton->state() != ui::SelectableTextButton::State::deactivated)
         ui->bookmarkButton->click(); //< Set current page to bookmark info.
     else
-        ui->cameraExportSettingsButton->click(); //< Set current page to settings.
+        ui->cameraExportSettingsButton->click(); //< Set current page to settings
+
+    qDebug() << "ExportSettingsDialog::ExportSettingsDialog(...) exit";
 }
 
 void ExportSettingsDialog::setupSettingsButtons()
@@ -460,13 +403,16 @@ ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
 
 void ExportSettingsDialog::updateSettingsWidgets()
 {
+    const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();
+
     ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
-    ui->exportMediaSettingsPage->setApplyFilters(d->exportMediaPersistentSettings().applyFilters);
-    ui->timestampSettingsPage->setData(d->exportMediaPersistentSettings().timestampOverlay);
+    ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
+    ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
     ui->timestampSettingsPage->setFormatEnabled(d->mediaSupportsUtc());
-    ui->bookmarkSettingsPage->setData(d->exportMediaPersistentSettings().bookmarkOverlay);
-    ui->imageSettingsPage->setData(d->exportMediaPersistentSettings().imageOverlay);
-    ui->textSettingsPage->setData(d->exportMediaPersistentSettings().textOverlay);
+    ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
+    ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
+    ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
+
     ui->rapidReviewSettingsPage->setSpeed(d->storedRapidReviewSettings().speed);
     ui->mediaFilenamePanel->setFilename(d->selectedFileName(Mode::Media));
     ui->layoutFilenamePanel->setFilename(d->selectedFileName(Mode::Layout));
@@ -548,19 +494,27 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
         setAlertText(i, texts[i]);
 }
 
-void ExportSettingsDialog::updateTranscodingWidgets(bool transcodingIsAllowed)
+void ExportSettingsDialog::updateTranscodingWidgets(bool unused)
 {
-    ui->exportMediaSettingsPage->setTranscodingAllowed(transcodingIsAllowed);
-    if (transcodingIsAllowed)
+    // Gather all data to apply to UI
+    bool transcodingLocked = d->exportMediaPersistentSettings().isTranscodingForced();
+    bool transcodingChecked = d->exportMediaPersistentSettings().applyFilters;
+    bool transcodingIsHidden = d->mode() == Mode::Layout;
+
+    if (d->mode() == Mode::Media && d->isMediaEmpty())
     {
-        ui->exportMediaSettingsPage->setApplyFilters(
-            d->exportMediaPersistentSettings().applyFilters);
+        transcodingLocked = true;
+        transcodingChecked = false;
     }
-    else
-    {
+
+    // Applying data to UI
+    ui->exportMediaSettingsPage->setTranscodingAllowed(!transcodingLocked);
+    ui->exportMediaSettingsPage->setApplyFilters(transcodingChecked);
+
+    if (transcodingChecked && !transcodingIsHidden)
         ui->cameraExportSettingsButton->click();
-    }
-    ui->transcodingButtonsWidget->setHidden(!transcodingIsAllowed);
+
+    ui->transcodingButtonsWidget->setHidden(transcodingIsHidden);
 }
 
 void ExportSettingsDialog::setMediaParams(
@@ -568,9 +522,6 @@ void ExportSettingsDialog::setMediaParams(
     const QnLayoutItemData& itemData,
     QnWorkbenchContext* context)
 {
-    d->setMediaResource(mediaResource);
-    ui->mediaPreviewWidget->setImageProvider(d->mediaImageProvider());
-
     const auto timeWatcher = context->instance<QnWorkbenchServerTimeWatcher>();
     d->setServerTimeZoneOffsetMs(timeWatcher->utcOffset(mediaResource, Qn::InvalidUtcOffset));
 
@@ -580,52 +531,61 @@ void ExportSettingsDialog::setMediaParams(
     updateSettingsWidgets();
 
     const auto resource = mediaResource->toResourcePtr();
+    const auto currentSettings = d->exportMediaSettings();
+    const auto startTimeMs = currentSettings.timePeriod.startTimeMs;
+
+    QString timePart;
+    if (resource->hasFlags(Qn::utc))
+    {
+        QDateTime time = QDateTime::fromMSecsSinceEpoch(startTimeMs + timestampOffsetMs);
+        timePart = time.toString(lit("yyyy_MMM_dd_hh_mm_ss"));
+    }
+    else
+    {
+        QTime time = QTime(0, 0, 0, 0).addMSecs(startTimeMs);
+        timePart = time.toString(lit("hh_mm_ss"));
+    }
+
+    Filename baseFileName = currentSettings.fileName;
+    QString namePart = resource->getName();
+    baseFileName.name = nx::utils::replaceNonFileNameCharacters(namePart + L'_' + timePart, L'_');
+    // Changing filename causes signal that rebuilds filter chain
+
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     const auto customAr = mediaResource->customAspectRatio();
 
-    nx::core::transcoding::Settings available;
-    available.rotation = resource->hasProperty(QnMediaResource::rotationKey())
-        ? resource->getProperty(QnMediaResource::rotationKey()).toInt()
-        : 0;
-    available.aspectRatio = qFuzzyIsNull(customAr)
+    nx::core::transcoding::Settings settings;
+    settings.aspectRatio = qFuzzyIsNull(customAr)
         ? QnAspectRatio()
         : QnAspectRatio::closestStandardRatio(customAr);
-    available.enhancement = itemData.contrastParams;
-    available.dewarping = itemData.dewarpingParams;
-    available.zoomWindow = itemData.zoomRect;
-    d->setAvailableTranscodingSettings(available);
+    settings.enhancement = itemData.contrastParams;
+    settings.dewarping = itemData.dewarpingParams;
+    settings.zoomWindow = itemData.zoomRect;
 
-    const auto currentSettings = d->exportMediaSettings();
-    const auto namePart = resource->getName();
-    const auto timePart = resource->hasFlags(Qn::utc)
-        ? QDateTime::fromMSecsSinceEpoch(currentSettings.timePeriod.startTimeMs
-            + timestampOffsetMs).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
-        : QTime(0, 0, 0, 0).addMSecs(currentSettings.timePeriod.startTimeMs)
-            .toString(lit("hh_mm_ss"));
+    d->setMediaResource(mediaResource, settings);
 
-    Filename baseFileName = currentSettings.fileName;
-    baseFileName.name = nx::utils::replaceNonFileNameCharacters(
-        namePart + L'_' + timePart, L'_');
-
+    // That also emits ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
+    //      and then emits ExportSettingsDialog::Private::transcodingAllowedChanged
     ui->mediaFilenamePanel->setFilename(suggestedFileName(baseFileName));
 
+    // Disabling additional filters if we have no video
+    // TODO: this case is mapped to d->isMediaEmpty()
     if (!mediaResource->hasVideo())
     {
         ui->timestampButton->setEnabled(false);
         ui->imageButton->setEnabled(false);
         ui->textButton->setEnabled(false);
         ui->speedButton->setEnabled(false);
+        ui->exportMediaSettingsPage->setApplyFilters(true);
+        ui->exportMediaSettingsPage->setTranscodingAllowed(false);
     }
 }
 
 void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
 {
-    d->setLayout(layout);
-    ui->layoutPreviewWidget->setImageProvider(d->layoutImageProvider());
-
     const auto palette = ui->layoutPreviewWidget->palette();
-    d->layoutImageProvider()->setItemBackgroundColor(palette.color(QPalette::Window));
-    d->layoutImageProvider()->setFontColor(palette.color(QPalette::WindowText));
+    d->setLayout(layout, palette);
+    //ui->layoutPreviewWidget->setImageProvider(d->layoutImageProvider());
 
     auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
     if (qnRuntime->isActiveXMode() || baseName.isEmpty())
@@ -639,10 +599,8 @@ void ExportSettingsDialog::disableTab(Mode mode, const QString& reason)
 {
     NX_EXPECT(ui->tabWidget->count() > 1);
 
-    const auto tabIndex = mode == Mode::Media
-        ? ui->tabWidget->indexOf(ui->cameraTab)
-        : ui->tabWidget->indexOf(ui->layoutTab);
-
+    QWidget* tab = (mode == Mode::Media) ? ui->cameraTab : ui->layoutTab;
+    int tabIndex = ui->tabWidget->indexOf(tab);
     ui->tabWidget->setTabEnabled(tabIndex, false);
     ui->tabWidget->setTabToolTip(tabIndex, reason);
     updateMode();
@@ -651,10 +609,8 @@ void ExportSettingsDialog::disableTab(Mode mode, const QString& reason)
 void ExportSettingsDialog::hideTab(Mode mode)
 {
     NX_EXPECT(ui->tabWidget->count() > 1);
-    ui->tabWidget->removeTab(mode == Mode::Media
-        ? ui->tabWidget->indexOf(ui->cameraTab)
-        : ui->tabWidget->indexOf(ui->layoutTab));
-
+    QWidget* tabToRemove = (mode == Mode::Media ? ui->cameraTab : ui->layoutTab);
+    ui->tabWidget->removeTab(ui->tabWidget->indexOf(tabToRemove));
     updateMode();
 }
 

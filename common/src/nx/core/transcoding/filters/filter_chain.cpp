@@ -91,21 +91,18 @@ void FilterChain::prepareForImage(const QnMediaResourcePtr& resource,
 bool FilterChain::isImageTranscodingRequired(const QSize& fullImageResolution,
     const QSize& resolutionLimit) const
 {
-    return isTranscodingRequired(QnConstResourceVideoLayoutPtr())
+    return isTranscodingRequested()
         || fullImageResolution.width() > resolutionLimit.width()
         || fullImageResolution.height() > resolutionLimit.height();
 }
 
-bool FilterChain::isTranscodingRequired(const QnConstResourceVideoLayoutPtr& videoLayout) const
+bool FilterChain::isTranscodingRequested() const
 {
     //TODO: #GDM #3.2 Remove when legacy will gone.
     if (!m_legacyFilters.empty())
         return true;
 
     if (m_settings.aspectRatio.isValid())
-        return true;
-
-    if (videoLayout && videoLayout->channelCount() > 1)
         return true;
 
     if (!m_settings.zoomWindow.isEmpty())
@@ -126,9 +123,11 @@ bool FilterChain::isTranscodingRequired(const QnConstResourceVideoLayoutPtr& vid
 bool FilterChain::isTranscodingRequired(const QnMediaResourcePtr& resource) const
 {
     NX_ASSERT(resource);
-    return isTranscodingRequired(resource
-        ? resource->getVideoLayout()
-        : QnConstResourceVideoLayoutPtr());
+
+    QnConstResourceVideoLayoutPtr layout = resource ? resource->getVideoLayout() : QnConstResourceVideoLayoutPtr();
+    if (layout && layout->channelCount() > 1)
+        return true;
+    return isTranscodingRequested();
 }
 
 bool FilterChain::isDownscaleRequired(const QSize& srcResolution) const

@@ -15,5 +15,8 @@ endif()
 
 if(withMediaServer OR withClouds)
     add_subdirectory(nx_email)
+endif()
+
+if(withMediaServer)
     add_subdirectory(nx_onvif)
 endif()

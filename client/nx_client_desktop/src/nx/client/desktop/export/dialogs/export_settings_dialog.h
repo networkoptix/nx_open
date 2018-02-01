@@ -44,41 +44,7 @@ public:
     };
 
     using FileNameValidator = std::function<bool (const Filename& fileName, bool quiet)>;
-
-    /** Default mode. Will have both "Single camera" and "Layout" tabs. */
-    ExportSettingsDialog(QnMediaResourceWidget* widget,
-        bool allowLayoutExport,
-        const QnTimePeriod& timePeriod,
-        FileNameValidator isFileNameValid,
-        QWidget* parent = nullptr);
-
-    /**
-     * Layout export mode. Will have only "Layout" tabs. Actual when we have no permissions to
-     * export currently selected 'central' widget.
-     * @param mediaForbiddenReason Reason of disabling 'Single camera' tab. Displayed as tooltip.
-     */
-    ExportSettingsDialog(const QnLayoutResourcePtr& layout,
-        const QString& mediaForbiddenReason,
-        const QnTimePeriod& timePeriod,
-        FileNameValidator isFileNameValid,
-        QWidget* parent = nullptr);
-
-    /** Not opened media mode. Will have only "Single camera" tab. */
-    ExportSettingsDialog(const QnMediaResourcePtr& mediaResource,
-        QnWorkbenchContext* context,
-        const QnTimePeriod& timePeriod,
-        FileNameValidator isFileNameValid,
-        QWidget* parent = nullptr);
-
-    /** Bookmark mode. Will have only "Single camera" tab. */
-    ExportSettingsDialog(QnMediaResourceWidget* widget,
-        const QnCameraBookmark& bookmark,
-        FileNameValidator isFileNameValid,
-        QWidget* parent = nullptr);
-
-    /** Not opened bookmark mode. Will have only "Single camera" tab. */
-    ExportSettingsDialog(const QnMediaResourcePtr& mediaResource,
-        QnWorkbenchContext* context,
+    ExportSettingsDialog(const QnTimePeriod& timePeriod,
         const QnCameraBookmark& bookmark,
         FileNameValidator isFileNameValid,
         QWidget* parent = nullptr);
@@ -92,27 +58,21 @@ public:
 
     virtual void accept() override;
 
-private:
-    ExportSettingsDialog(const QnTimePeriod& timePeriod,
-        const QnCameraBookmark& bookmark,
-        FileNameValidator isFileNameValid,
-        QWidget* parent = nullptr);
-
+    // Making this methods private causes pointless code bloat
+    void disableTab(Mode mode, const QString& reason);
+    void hideTab(Mode mode);
+    void setLayout(const QnLayoutResourcePtr& layout);
     void setMediaParams(const QnMediaResourcePtr& mediaResource, const QnLayoutItemData& itemData,
         QnWorkbenchContext* context);
-
-    void setLayout(const QnLayoutResourcePtr& layout);
+private:
 
     void setupSettingsButtons();
     void updateSettingsWidgets();
     void updateMode();
     void updateTabWidgetSize();
     void updateAlerts(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
-    void updateAlertsInternal(QLayout* layout, const QStringList& texts, bool severe);
+    static void updateAlertsInternal(QLayout* layout, const QStringList& texts, bool severe);
     void updateTranscodingWidgets(bool transcodingIsAllowed);
-
-    void disableTab(Mode mode, const QString& reason);
-    void hideTab(Mode mode);
 
     Filename suggestedFileName(const Filename& baseName) const;
 
