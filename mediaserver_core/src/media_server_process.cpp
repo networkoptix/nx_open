@@ -1123,8 +1123,7 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
 
 void MediaServerProcess::stopSync()
 {
-    qWarning()<<"Stopping server";
-    NX_LOG( lit("Stopping server"), cl_logALWAYS );
+    qWarning() << "Stopping server";
 
     const int kStopTimeoutMs = 100 * 1000;
 
