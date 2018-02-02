@@ -13,8 +13,6 @@ from api.account_backend import AccountBackend
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, \
     APIInternalException, api_success, ErrorCodes, require_params
 
-import api.models
-
 import logging
 logger = logging.getLogger(__name__)
 
@@ -207,5 +205,5 @@ def check_code_in_portal(request):
     require_params(request, ('code',))
     code = request.data['code']
     (temp_password, email) = base64.b64decode(code).split(":")
-    email_exists = api.models.Account.objects.filter(email=email.lower()).count() > 0
+    email_exists = AccountBackend.is_email_in_portal(email)
     return api_success({'emailExists': email_exists})
