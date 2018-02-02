@@ -7,8 +7,8 @@
 #include <nx/vms/event/event_fwd.h>
 #include <plugins/plugin_tools.h>
 
-#include <nx/sdk/metadata/abstract_event_metadata_packet.h>
-#include <nx/sdk/metadata/abstract_detection_metadata_packet.h>
+#include <nx/sdk/metadata/objects_metadata_packet.h>
+#include <nx/sdk/metadata/events_metadata_packet.h>
 
 class QnAbstractDataReceptor;
 
@@ -40,13 +40,13 @@ private:
     void setLastEventState(const QnUuid& eventId, nx::vms::event::EventState eventState);
 
     void handleEventsPacket(
-        nxpt::ScopedRef<nx::sdk::metadata::AbstractEventMetadataPacket> packet);
+        nxpt::ScopedRef<nx::sdk::metadata::EventsMetadataPacket> packet);
 
     void handleObjectsPacket(
-        nxpt::ScopedRef<nx::sdk::metadata::AbstractObjectsMetadataPacket> packet);
+        nxpt::ScopedRef<nx::sdk::metadata::ObjectsMetadataPacket> packet);
 
     void handleMetadataEvent(
-        nxpt::ScopedRef<nx::sdk::metadata::AbstractDetectedEvent> eventData,
+        nxpt::ScopedRef<nx::sdk::metadata::Event> eventData,
         qint64 timestampUsec);
 
 private:

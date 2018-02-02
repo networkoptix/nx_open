@@ -3,7 +3,7 @@
 #include <map>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <nx/sdk/metadata/plugin.h>
 
 namespace nx {
 namespace sdk {
@@ -13,7 +13,7 @@ namespace metadata {
  * Base class for a typical implementation of the metadata plugin. Hides many technical details of
  * the Metadata Plugin SDK, but may limit plugin capabilities - use only when suitable.
  */
-class SimplePlugin: public nxpt::CommonRefCounter<AbstractMetadataPlugin>
+class SimplePlugin: public nxpt::CommonRefCounter<Plugin>
 {
 protected:
     SimplePlugin(const char* name);
@@ -37,10 +37,6 @@ public:
     virtual void setSettings(const nxpl::Setting* settings, int count) override;
     virtual void setPluginContainer(nxpl::PluginInterface* pluginContainer) override;
     virtual void setLocale(const char* locale) override;
-
-    virtual AbstractSerializer* serializerForType(
-        const nxpl::NX_GUID& typeGuid,
-        Error* outError) override;
 
 private:
     const char* const m_name;

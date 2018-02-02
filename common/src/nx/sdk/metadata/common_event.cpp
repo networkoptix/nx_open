@@ -51,7 +51,7 @@ bool CommonEvent::isActive() const
     return m_isActive;
 }
 
-void CommonEvent::setTypeId(const nxpl::NX_GUID& eventTypeId)
+void CommonEvent::setTypeId(const nxpl::NX_GUID& typeId)
 {
     m_typeId = typeId;
 }

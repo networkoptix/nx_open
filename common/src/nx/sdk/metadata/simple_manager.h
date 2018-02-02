@@ -3,7 +3,7 @@
 #include <string>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_consuming_metadata_manager.h>
+#include <nx/sdk/metadata/consuming_camera_manager.h>
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
 
 namespace nx {
@@ -14,7 +14,7 @@ namespace metadata {
  * Base class for a typical implementation of the metadata manager. Hides many technical details of
  * the Metadata Plugin SDK, but may limit manager capabilities - use only when suitable.
  */
-class SimpleManager: public nxpt::CommonRefCounter<AbstractConsumingMetadataManager>
+class SimpleManager: public nxpt::CommonRefCounter<ConsumingCameraManager>
 {
 protected:
     virtual std::string capabilitiesManifest() = 0;
@@ -27,7 +27,7 @@ protected:
     /**
      * Retrieve constructed metadata packets (if any) to the given list.
      */
-    virtual bool pullMetadataPackets(std::vector<AbstractMetadataPacket*>* metadataPackets) = 0;
+    virtual bool pullMetadataPackets(std::vector<MetadataPacket*>* metadataPackets) = 0;
 
     /**
      * Provides access to the Manager settings stored by the server for a particular Resource.
@@ -42,9 +42,9 @@ protected:
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual Error setHandler(AbstractMetadataHandler* handler) override;
+    virtual Error setHandler(MetadataHandler* handler) override;
 
-    virtual Error putData(AbstractDataPacket* dataPacket) override;
+    virtual Error pushDataPacket(DataPacket* dataPacket) override;
 
     virtual Error startFetchingMetadata(
         nxpl::NX_GUID* eventTypeList, int eventTypeListSize) override;
@@ -56,7 +56,7 @@ public:
     virtual void freeManifest(const char* data) override;
 
 private:
-    AbstractMetadataHandler* m_handler = nullptr;
+    MetadataHandler* m_handler = nullptr;
 };
 
 } // namespace metadata

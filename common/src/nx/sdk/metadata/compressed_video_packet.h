@@ -20,7 +20,7 @@ static const nxpl::NX_GUID IID_CompressedVideoPacket
  */
 class CompressedVideoPacket: public CompressedMediaPacket
 {
-    using base_type = AbstractCompressedMediaPacket;
+    using base_type = CompressedMediaPacket;
 public:
     /**
      * @return width of video frame in pixels.

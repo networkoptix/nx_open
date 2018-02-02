@@ -4,7 +4,7 @@
 #include <chrono>
 
 #include <nx/sdk/metadata/common_event.h>
-#include <nx/sdk/metadata/common_event_metadata_packet.h>
+#include <nx/sdk/metadata/common_events_metadata_packet.h>
 #include <plugins/plugin_internal_tools.h>
 #include <nx/utils/log/log_main.h>
 
@@ -42,7 +42,7 @@ void* MetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nx::sdk::Error MetadataManager::setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler)
+nx::sdk::Error MetadataManager::setHandler(nx::sdk::metadata::MetadataHandler* handler)
 {
     m_handler = handler;
     return nx::sdk::Error::noError;
@@ -56,7 +56,7 @@ Error MetadataManager::startFetchingMetadata(
         [this](const HikvisionEventList& events)
         {
             using namespace std::chrono;
-            auto packet = new CommonEventMetadataPacket();
+            auto packet = new CommonEventsMetadataPacket();
 
             for (const auto& hikvisionEvent : events)
             {

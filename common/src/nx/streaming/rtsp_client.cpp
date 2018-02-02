@@ -485,7 +485,7 @@ static std::atomic<int> RTPSessionInstanceCounter(0);
 QnRtspClient::QnRtspClient(
     bool shoulGuessAuthDigest,
     std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock)
-:
+    :
     m_csec(2),
     //m_rtpIo(*this),
     m_transport(TRANSPORT_UDP),
@@ -514,8 +514,6 @@ QnRtspClient::QnRtspClient(
         m_tcpSock = nx::network::SocketFactory::createStreamSocket();
 
     m_additionalReadBuffer = new char[ADDITIONAL_READ_BUFFER_CAPACITY];
-
-    // todo: debug only remove me
 }
 
 QnRtspClient::~QnRtspClient()
@@ -750,7 +748,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
             nx::network::http::header::WWWAuthenticate(m_defaultAuthScheme));
     }
 
-    std::unique_ptr<AbstractStreamSocket> previousSocketHolder;
+    std::unique_ptr<nx::network::AbstractStreamSocket> previousSocketHolder;
     {
         QnMutexLocker lock(&m_socketMutex);
         previousSocketHolder = std::move(m_tcpSock);

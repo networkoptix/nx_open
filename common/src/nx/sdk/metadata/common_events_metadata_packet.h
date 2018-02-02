@@ -9,10 +9,10 @@ namespace nx {
 namespace sdk {
 namespace metadata {
 
-class CommonEventMetadataPacket: public nxpt::CommonRefCounter<EventsMetadataPacket>
+class CommonEventsMetadataPacket: public nxpt::CommonRefCounter<EventsMetadataPacket>
 {
 public:
-    virtual ~CommonEventMetadataPacket();
+    virtual ~CommonEventsMetadataPacket();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 

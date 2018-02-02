@@ -37,12 +37,12 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(
     return commonEvent;
 }
 
-nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
+nx::sdk::metadata::CommonEventsMetadataPacket* createCommonEventsMetadataPacket(
     const IdentifiedSupportedEvent& identifiedSupportedEvents)
 {
     using namespace std::chrono;
 
-    auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
+    auto packet = new nx::sdk::metadata::CommonEventsMetadataPacket();
     auto commonEvent1 = createCommonEvent(identifiedSupportedEvents, /*active*/ true);
     packet->addEvent(commonEvent1);
     auto commonEvent2 = createCommonEvent(identifiedSupportedEvents, /*active*/ false);
@@ -77,7 +77,7 @@ public:
         {
             if (memcmp(&axisEvent.externalTypeId(), &guid, 16) == 0)
             {
-                auto packet = createCommonEventMetadataPacket(axisEvent);
+                auto packet = createCommonEventsMetadataPacket(axisEvent);
                 m_handler->handleMetadata(nx::sdk::Error::noError, packet);
                 NX_PRINT << "Event detected and sent to server: "
                     << axisEvent.base().fullName();

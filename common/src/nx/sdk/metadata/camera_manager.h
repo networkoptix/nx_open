@@ -10,7 +10,7 @@ namespace nx {
 namespace sdk {
 namespace metadata {
 
-// TODO: Consider renaming and moving. Used by AbstractMetadataHandler::getParamValue().
+// TODO: Consider renaming and moving. Used by MetadataHandler::getParamValue().
 static const int NX_NO_ERROR = 0;
 static const int NX_UNKNOWN_PARAMETER = -41;
 static const int NX_MORE_DATA = -23;
@@ -42,13 +42,13 @@ public:
 };
 
 /**
- * Each class that implements MetadataManager interface should properly handle this GUID in
+ * Each class that implements CameraManager interface should properly handle this GUID in
  * its queryInterface method.
  */
 static const nxpl::NX_GUID IID_CameraManager =
     {{0x48, 0x5a, 0x23, 0x51, 0x55, 0x73, 0x4f, 0xb5, 0xa9, 0x11, 0xe4, 0xfb, 0x22, 0x87, 0x79, 0x24}};
 
-class AbstractMetadataPlugin;
+class Plugin;
 
 /**
  * Interface used to control the process of fetching metadata from the resource.
@@ -71,7 +71,7 @@ public:
      *     reading settings that are stored by the server.
      * @return noError in case of success, other value otherwise.
      */
-    virtual Error setHandler(AbstractMetadataHandler* handler) = 0;
+    virtual Error setHandler(MetadataHandler* handler) = 0;
 
     /**
      * Stops fetching metadata from the resource synchronously

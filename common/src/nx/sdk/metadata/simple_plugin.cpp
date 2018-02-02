@@ -26,10 +26,10 @@ SimplePlugin::~SimplePlugin()
 
 void* SimplePlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataPlugin)
+    if (interfaceId == IID_Plugin)
     {
         addRef();
-        return static_cast<AbstractMetadataPlugin*>(this);
+        return static_cast<Plugin*>(this);
     }
 
     if (interfaceId == nxpl::IID_Plugin3)
@@ -77,13 +77,6 @@ void SimplePlugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/
 void SimplePlugin::setLocale(const char* /*locale*/)
 {
     // Do nothing.
-}
-
-AbstractSerializer* SimplePlugin::serializerForType(
-    const nxpl::NX_GUID& /*typeGuid*/,
-    Error* /*outError*/)
-{
-    return nullptr;
 }
 
 } // namespace metadata

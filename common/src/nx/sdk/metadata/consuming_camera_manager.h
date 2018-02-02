@@ -1,7 +1,7 @@
 #pragma once
 
 #include "data_packet.h"
-#include "metadata_manager.h"
+#include "camera_manager.h"
 
 namespace nx {
 namespace sdk {
@@ -27,7 +27,7 @@ public:
      * @param dataPacket packet of data.
      * @return noError in case of success, other value in case of failure.
      */
-    virtual Error pushDataPacket(const DataPacket* dataPacket) = 0;
+    virtual Error pushDataPacket(DataPacket* dataPacket) = 0;
 };
 
 } // namespace metadata

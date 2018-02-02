@@ -45,8 +45,8 @@ struct Rect
 
 
 /**
- * Each class that implements AbstractDetectedObject interface
- * should properly handle this GUID in its queryInterface method
+ * Each class that implements Object interface should properly handle this GUID in its
+ * queryInterface().
  */
 static const nxpl::NX_GUID IID_Object
     = {{0x0f, 0xf4, 0xa4, 0x6f, 0xfd, 0x08, 0x4f, 0x4a, 0x97, 0x88, 0x16, 0xa0, 0x8c, 0xd6, 0x4a, 0x29}};

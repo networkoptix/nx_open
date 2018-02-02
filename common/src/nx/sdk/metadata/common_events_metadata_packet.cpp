@@ -1,11 +1,11 @@
-#include "common_event_metadata_packet.h"
+#include "common_events_metadata_packet.h"
 #include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace sdk {
 namespace metadata {
 
-void* CommonEventMetadataPacket::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* CommonEventsMetadataPacket::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_EventsMetadataPacket)
     {
@@ -21,17 +21,17 @@ void* CommonEventMetadataPacket::queryInterface(const nxpl::NX_GUID& interfaceId
     return nullptr;
 }
 
-int64_t CommonEventMetadataPacket::timestampUsec() const
+int64_t CommonEventsMetadataPacket::timestampUsec() const
 {
     return m_timestampUsec;
 }
 
-int64_t CommonEventMetadataPacket::durationUsec() const
+int64_t CommonEventsMetadataPacket::durationUsec() const
 {
     return m_durationUsec;
 }
 
-Event* CommonEventMetadataPacket::nextItem()
+Event* CommonEventsMetadataPacket::nextItem()
 {
     if (m_currentEventIndex < m_events.size())
         return m_events[m_currentEventIndex++];
@@ -39,28 +39,28 @@ Event* CommonEventMetadataPacket::nextItem()
     return nullptr;
 }
 
-void CommonEventMetadataPacket::setTimestampUsec(int64_t timestampUsec)
+void CommonEventsMetadataPacket::setTimestampUsec(int64_t timestampUsec)
 {
     m_timestampUsec = timestampUsec;
 }
 
-void CommonEventMetadataPacket::setDurationUsec(int64_t durationUsec)
+void CommonEventsMetadataPacket::setDurationUsec(int64_t durationUsec)
 {
     m_durationUsec = durationUsec;
 }
 
-void CommonEventMetadataPacket::addEvent(Event* event)
+void CommonEventsMetadataPacket::addEvent(Event* event)
 {
     m_events.push_back(event);
 }
 
-void CommonEventMetadataPacket::resetEvents()
+void CommonEventsMetadataPacket::resetEvents()
 {
     m_events.clear();
     m_currentEventIndex = 0;
 }
 
-CommonEventMetadataPacket::~CommonEventMetadataPacket()
+CommonEventsMetadataPacket::~CommonEventsMetadataPacket()
 {
     NX_VERBOSE(this, "DESTROYING PACKET");
 }

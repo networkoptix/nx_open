@@ -21,7 +21,7 @@ static const nxpl::NX_GUID IID_CompressedMediaPacket
  */
 class CompressedMediaPacket: public DataPacket
 {
-    using base_type = AbstractDataPacket;
+    using base_type = DataPacket;
 public:
     /**
      * @return Null terminated ASCII string containing

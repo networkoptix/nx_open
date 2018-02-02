@@ -3,18 +3,18 @@
 #include <string>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_detection_metadata_packet.h>
-#include <nx/sdk/metadata/abstract_event_metadata_packet.h>
+#include <nx/sdk/metadata/objects_metadata_packet.h>
+#include <nx/sdk/metadata/events_metadata_packet.h>
 #include <nx/sdk/metadata/common_attribute.h>
 
 namespace nx {
 namespace sdk {
 namespace metadata {
 
-class CommonDetectedObject: public nxpt::CommonRefCounter<AbstractDetectedObject>
+class CommonObject: public nxpt::CommonRefCounter<Object>
 {
 public:
-    virtual ~CommonDetectedObject();
+    virtual ~CommonObject();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 

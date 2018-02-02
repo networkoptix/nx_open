@@ -7,7 +7,7 @@
 #include <plugins/plugin_internal_tools.h> //< nxpt::fromQnUuidToPluginGuid
 
 #include <nx/sdk/metadata/common_event.h>
-#include <nx/sdk/metadata/common_event_metadata_packet.h>
+#include <nx/sdk/metadata/common_events_metadata_packet.h>
 #include <nx/api/analytics/device_manifest.h>
 
 #include "nx/vca/camera_controller.h"
@@ -50,12 +50,12 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(
     return commonEvent;
 }
 
-nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
+nx::sdk::metadata::CommonEventsMetadataPacket* createCommonEventsMetadataPacket(
     const Vca::VcaAnalyticsEventType& event)
 {
     using namespace std::chrono;
 
-    auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
+    auto packet = new nx::sdk::metadata::CommonEventsMetadataPacket();
     auto commonEvent1 = createCommonEvent(event, /*active*/ true);
     packet->addEvent(commonEvent1);
     auto commonEvent2 = createCommonEvent(event, /*active*/ false);
@@ -285,7 +285,7 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         if (std::find(m_eventsToCatch.cbegin(), m_eventsToCatch.cend(), event.eventTypeId)
             != m_eventsToCatch.cend())
         {
-            auto packet = createCommonEventMetadataPacket(event);
+            auto packet = createCommonEventsMetadataPacket(event);
             m_handler->handleMetadata(nx::sdk::Error::noError, packet);
             NX_PRINT << "Event " << it->second.constData() << " sent to server";
         }

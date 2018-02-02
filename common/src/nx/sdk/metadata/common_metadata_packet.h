@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/metadata/objects_metadata_packet.h>
 #include <nx/sdk/metadata/events_metadata_packet.h>
 
 namespace nx {
@@ -19,7 +20,7 @@ public:
 
     virtual int64_t durationUsec() const override { return m_durationUsec; }
 
-    virtual Type* nextItem() override
+    virtual Item* nextItem() override
     {
         return m_index < m_items.size() ? m_items[m_index++] : nullptr;
     }
@@ -28,7 +29,7 @@ public:
 
     void setDurationUsec(int64_t durationUsec) { m_durationUsec = durationUsec; }
 
-    void addItem(Type* item) { m_items.push_back(item); }
+    void addItem(Item* item) { m_items.push_back(item); }
 
     void resetItems() { m_index = 0; m_items.clear(); }
 
@@ -41,7 +42,7 @@ private:
 };
 
 class CommonEventsMetadataPacket:
-    public CommonMetadataPacketBase<EventMetadataPacket, Event>
+    public CommonMetadataPacketBase<EventsMetadataPacket, Event>
 {
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 

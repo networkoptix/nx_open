@@ -67,7 +67,6 @@ public:
      */
     virtual int handle() const = 0;
 
-    // TODO: declare bits()
     /**
      * @brief maps the contents of a video frame to system (CPU addressable) memory.
      * @return true if map success. If handle is not zero function 'bits' should be called only after map call.
