@@ -117,6 +117,7 @@
     "cloudInvalidResponse":"Cloud DB returned an unexpected response",
     "notAuthorized":"Wrong password",
     "wrongParameters":"Some parameters on the form are incorrect",
+    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode":"Account is already activated or confirmation code is incorrect",
     "wrongCodeRestore":"Confirmation code is already used or incorrect",
     "forbidden":"You do not have permissions to perform this action",
