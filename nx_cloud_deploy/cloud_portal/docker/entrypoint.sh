@@ -6,6 +6,14 @@ echo "Environment:"
 env
 echo "---------------------------"
 
+function update_with_module_configuration()
+{
+    local config_file=$1
+    local configuration=$2
+
+    /usr/local/bin/merge_config.py "$config_file" "$configuration"
+}
+
 function instantiate_config()
 {
     export CUSTOMIZATION=$1
@@ -17,6 +25,11 @@ function instantiate_config()
     tmp=$(tempfile)
     envsubst < $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml > $tmp
     mv $tmp $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml
+
+    if [ -n "$MODULE_CONFIGURATION" ]
+    then
+        update_with_module_configuration $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml "$MODULE_CONFIGURATION"
+    fi
 }
 
 function write_my_cnf()
