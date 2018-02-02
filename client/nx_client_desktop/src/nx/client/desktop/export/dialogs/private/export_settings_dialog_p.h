@@ -75,8 +75,8 @@ public:
 
     void createOverlays(QWidget* overlayContainer);
 
-   void setMediaPreviewWidget(nx::client::desktop::AsyncImageWidget* widget);
-   void setLayoutPreviewWidget(nx::client::desktop::AsyncImageWidget* widget);
+    void setMediaPreviewWidget(nx::client::desktop::AsyncImageWidget* widget);
+    void setLayoutPreviewWidget(nx::client::desktop::AsyncImageWidget* widget);
     QSize fullFrameSize() const;
 
     const ExportRapidReviewPersistentSettings& storedRapidReviewSettings() const;
@@ -100,13 +100,13 @@ public:
 
     // In some cases video is not present, but there can be audio stream
     // We should update overlays and filtering according to this case
-    bool isMediaEmpty() const;
+    bool hasVideo() const;
 
 signals:
     void validated(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
     void overlaySelected(ExportOverlayType type);
     void frameSizeChanged(const QSize& size);
-    void transcodingAllowedChanged(bool allowed);
+    void transcodingModeChanged();
 
 private:
     ExportOverlayWidget* overlay(ExportOverlayType type);
@@ -119,7 +119,7 @@ private:
     void updateTimestampText();
     void overlayPositionChanged(ExportOverlayType type);
     void refreshMediaPreview();
-    void updateOverlaysVisibility(bool transcodingIsAllowed);
+    void updateOverlaysVisibility();
     QString cachedImageFileName() const;
 
     void setFrameSize(const QSize& size);
@@ -141,12 +141,11 @@ private:
     ExportMediaSettings m_exportMediaSettings;
     ExportMediaPersistentSettings m_exportMediaPersistentSettings;
     bool m_needValidateMedia = false;
-    // Applies filters to make media thumbnails
-    // look the same way as on real output
+    // Applies filters to make media thumbnails look the same way as on real output
     QScopedPointer<TranscodingImageProcessor> m_mediaPreviewProcessor;
     // Image provider for media preview
     std::unique_ptr<QnImageProvider> m_mediaPreviewProvider;
-    nx::client::desktop::AsyncImageWidget* m_mediaPreviewWidget;
+    QPointer<nx::client::desktop::AsyncImageWidget> m_mediaPreviewWidget;
 
     // This one provides raw image without any transforms
     std::unique_ptr<ResourceThumbnailProvider> m_mediaRawImageProvider;
@@ -159,7 +158,7 @@ private:
     bool m_needValidateLayout = false;
     // Image provider for layout preview
     std::unique_ptr<QnImageProvider> m_layoutPreviewProvider;
-    nx::client::desktop::AsyncImageWidget* m_layoutPreviewWidget;
+    QPointer<nx::client::desktop::AsyncImageWidget> m_layoutPreviewWidget;
 
     nx::core::transcoding::Settings m_availableTranscodingSettings;
 

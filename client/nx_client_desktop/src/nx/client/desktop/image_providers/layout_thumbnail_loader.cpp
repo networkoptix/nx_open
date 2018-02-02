@@ -372,9 +372,8 @@ void LayoutThumbnailLoader::doLoadAsync()
         xscale = yscale * cellAspectRatio;
     }
 
-    d->data.image = QImage(QSize(bounding.width() * xscale, bounding.height() * yscale),
-        QImage::Format_ARGB32_Premultiplied);
-
+    QSize outputSize(bounding.width() * xscale, bounding.height() * yscale);
+    d->data.image = QImage(outputSize, QImage::Format_ARGB32_Premultiplied);
     d->data.image.fill(Qt::transparent);
     d->data.status = Qn::ThumbnailStatus::Loading;
 
