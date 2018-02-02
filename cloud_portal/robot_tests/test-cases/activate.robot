@@ -46,9 +46,8 @@ should save user data to user account correctly
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
-    Wait Until Element Is Visible    ${ACCOUNT FIRST NAME}
+    Wait Until Elements Are Visible    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}
     Textfield Should Contain    ${ACCOUNT FIRST NAME}    mark
-    Wait Until Element Is Visible    ${ACCOUNT LAST NAME}
     Textfield Should Contain    ${ACCOUNT LAST NAME}    hamill
     Close Browser
 
@@ -64,9 +63,8 @@ should allow to enter more than 255 symbols in First and Last names and cut it t
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
-    Wait Until Element Is Visible    ${ACCOUNT FIRST NAME}
+    Wait Until Elements Are Visible    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}
     Textfield Should Contain    ${ACCOUNT FIRST NAME}    ${255CHARS}
-    Wait Until Element Is Visible    ${ACCOUNT LAST NAME}
     Textfield Should Contain    ${ACCOUNT LAST NAME}    ${255CHARS}
     Close Browser
 
@@ -82,9 +80,8 @@ should trim leading and trailing spaces
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
-    Wait Until Element Is Visible    ${ACCOUNT FIRST NAME}
+    Wait Until Elements Are Visible    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}
     Textfield Value Should Be    ${ACCOUNT FIRST NAME}    mark
-    Wait Until Element Is Visible    ${ACCOUNT LAST NAME}
     Textfield Value Should Be    ${ACCOUNT LAST NAME}    hamill
     Close Browser
 
@@ -104,16 +101,14 @@ link works and suggests to log out user, if he was logged in, buttons operate co
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${link}
-    Wait Until Element Is Visible    ${LOGGED IN CONTINUE BUTTON}
+    Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
     Element Should Be Visible    ${LOGGED IN CONTINUE BUTTON}
-    Wait Until Element Is Visible    ${LOGGED IN LOG OUT BUTTON}
     Element Should Be Visible    ${LOGGED IN LOG OUT BUTTON}
     Click Button    ${LOGGED IN CONTINUE BUTTON}
     Validate Log In
     Go To    ${link}
-    Wait Until Element Is Visible    ${LOGGED IN CONTINUE BUTTON}
+    Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
     Element Should Be Visible    ${LOGGED IN CONTINUE BUTTON}
-    Wait Until Element Is Visible    ${LOGGED IN LOG OUT BUTTON}
     Element Should Be Visible    ${LOGGED IN LOG OUT BUTTON}
     Click Button    ${LOGGED IN LOG OUT BUTTON}
     Validate Log Out

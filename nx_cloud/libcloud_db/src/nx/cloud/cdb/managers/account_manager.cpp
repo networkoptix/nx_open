@@ -728,6 +728,18 @@ nx::utils::db::DBResult AccountManager::verifyAccount(
     if (dbResult != nx::utils::db::DBResult::ok)
         return dbResult;
 
+    data::AccountData account;
+    dbResult = m_dao->fetchAccountByEmail(queryContext, accountEmail, &account);
+    if (dbResult != nx::utils::db::DBResult::ok)
+        return dbResult;
+
+    // TODO: #ak Have to call some method like afterChangingAccountStatus -
+    // will do it in default branch to minimize this change.
+    m_extensions.invoke(
+        &AbstractAccountManagerExtension::afterUpdatingAccountPassword,
+        queryContext,
+        account);
+
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         std::bind(&AccountManager::activateAccountInCache, this,
             accountEmail, accountActivationTime));

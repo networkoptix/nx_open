@@ -4,11 +4,12 @@
 #include <gtest/gtest.h>
 
 #include <nx/cloud/cdb/client/data/auth_data.h>
+#include <nx/cloud/cdb/test_support/business_data_generator.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/utils/string.h>
 
 #include "mediaserver_cloud_integration_test_setup.h"
-#include <nx/utils/string.h>
 
 namespace {
 
@@ -60,7 +61,7 @@ protected:
         }
     }
 
-    void whenSystemWentOffline()
+    void whenVmsLostConnectionToTheCloud()
     {
         waitForCloudDataSynchronizedToTheMediaServer();
 
@@ -92,6 +93,28 @@ protected:
                 &m_invitedAccount));
     }
 
+    void whenUserRegistersInCloudSkippingInviteEmail()
+    {
+        m_invitedAccount = nx::cdb::test::BusinessDataGenerator::generateRandomAccount(
+            m_invitedUserEc2Data.email.toStdString());
+
+        waitForUserToAppearInCloud(m_invitedAccount.email);
+
+        m_prevActivationCode = nx::cdb::api::AccountConfirmationCode();
+        ASSERT_EQ(
+            nx::cdb::api::ResultCode::ok,
+            cdb()->addAccount(&m_invitedAccount, &m_invitedAccount.password, &*m_prevActivationCode));
+    }
+
+    void whenUserActivatesAccountByFollowingActivationLink()
+    {
+        ASSERT_TRUE(static_cast<bool>(m_prevActivationCode));
+        std::string accountEmail;
+        ASSERT_EQ(
+            nx::cdb::api::ResultCode::ok,
+            cdb()->activateAccount(*m_prevActivationCode, &accountEmail));
+    }
+
     void thenUserCanStillLogin()
     {
         auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
@@ -115,20 +138,19 @@ protected:
 
     void thenInvitedUserCanLoginToTheSystem()
     {
-        auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
+        ASSERT_EQ(ec2::ErrorCode::ok, checkInvitedUserLoginToVms());
+    }
 
-        mediaServerClient->setUserCredentials(nx::network::http::Credentials(
-            m_invitedAccount.email.c_str(),
-            nx::network::http::PasswordAuthToken(m_invitedAccount.password.c_str())));
-
-        ec2::ApiUserDataList users;
-        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
+    void thenInvitedUserCannotLoginToTheSystem()
+    {
+        ASSERT_NE(ec2::ErrorCode::ok, checkInvitedUserLoginToVms());
     }
 
 private:
     std::vector<nx::cdb::AccountWithPassword> m_additionalCloudUsers;
     ::ec2::ApiUserData m_invitedUserEc2Data;
     nx::cdb::AccountWithPassword m_invitedAccount;
+    boost::optional<nx::cdb::api::AccountConfirmationCode> m_prevActivationCode;
 
     virtual void SetUp() override
     {
@@ -176,18 +198,30 @@ private:
             nx::cdb::api::ResultCode::ok,
             cdb()->updateAccount(email, tmpPassword, accountUpdate));
     }
+
+    ec2::ErrorCode checkInvitedUserLoginToVms()
+    {
+        auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
+        mediaServerClient->setUserCredentials(nx::network::http::Credentials(
+            m_invitedAccount.email.c_str(),
+            nx::network::http::PasswordAuthToken(m_invitedAccount.password.c_str())));
+        ec2::ApiUserDataList users;
+        return mediaServerClient.ec2GetUsers(&users);
+    }
 };
+
+//-------------------------------------------------------------------------------------------------
 
 TEST_P(CloudUserOfflineLogin, login_works_on_offline_server_after_restart)
 {
-    whenSystemWentOffline();
+    whenVmsLostConnectionToTheCloud();
     thenUserCanStillLogin();
 }
 
 TEST_P(CloudUserOfflineLogin, multiple_users_can_login)
 {
     whenAddedMultipleCloudUsers();
-    whenSystemWentOffline();
+    whenVmsLostConnectionToTheCloud();
 
     thenAllUsersCanStillLogin();
 }
@@ -199,19 +233,47 @@ TEST_P(CloudUserOfflineLogin, multiple_users_can_login)
 TEST_P(CloudUserOfflineLogin, user_can_login_after_password_change)
 {
     whenCloudUserPasswordHasBeenChanged();
-    whenSystemWentOffline();
+    whenVmsLostConnectionToTheCloud();
 
     thenUserCanStillLogin();
 }
 
-TEST_P(CloudUserOfflineLogin, invited_user_can_login_after_completing_registration_in_cloud)
+TEST_P(
+    CloudUserOfflineLogin,
+    invited_user_can_login_after_registering_by_following_invite_link)
 {
     givenUserInvitedFromDesktopClient();
 
     whenUserCompletesRegistrationInCloud();
-    whenSystemWentOffline();
+    whenVmsLostConnectionToTheCloud();
 
     thenInvitedUserCanLoginToTheSystem();
+}
+
+TEST_P(
+    CloudUserOfflineLogin,
+    invited_user_can_login_after_missing_invite_email_and_completing_registration_in_cloud)
+{
+    givenUserInvitedFromDesktopClient();
+
+    whenUserRegistersInCloudSkippingInviteEmail();
+    whenUserActivatesAccountByFollowingActivationLink();
+    whenVmsLostConnectionToTheCloud();
+
+    thenInvitedUserCanLoginToTheSystem();
+}
+
+TEST_P(
+    CloudUserOfflineLogin,
+    invited_and_registered_but_not_activated_user_cannot_login_to_the_system)
+{
+    givenUserInvitedFromDesktopClient();
+
+    whenUserRegistersInCloudSkippingInviteEmail();
+    // User does not follow activation link from corresponding email.
+    whenVmsLostConnectionToTheCloud();
+
+    thenInvitedUserCannotLoginToTheSystem();
 }
 
 INSTANTIATE_TEST_CASE_P(P2pMode, CloudUserOfflineLogin,

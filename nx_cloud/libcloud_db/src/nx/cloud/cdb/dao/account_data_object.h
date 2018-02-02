@@ -5,7 +5,6 @@
 #include <boost/optional.hpp>
 
 #include <nx/utils/basic_factory.h>
-
 #include <nx/utils/db/types.h>
 #include <nx/utils/db/query_context.h>
 
@@ -14,6 +13,8 @@
 namespace nx {
 namespace cdb {
 namespace dao {
+
+// TODO: #ak Get rid of duplicate update and updateAccount methods.
 
 class AbstractAccountDataObject
 {
