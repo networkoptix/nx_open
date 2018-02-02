@@ -67,10 +67,10 @@ HanwhaMetadataPlugin::HanwhaMetadataPlugin()
 
 void* HanwhaMetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataPlugin)
+    if (interfaceId == IID_Plugin)
     {
         addRef();
-        return static_cast<AbstractMetadataPlugin*>(this);
+        return static_cast<Plugin*>(this);
     }
 
     if (interfaceId == nxpl::IID_Plugin3)
@@ -119,26 +119,26 @@ void HanwhaMetadataPlugin::setLocale(const char* locale)
     // Do nothing.
 }
 
-AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
-    const ResourceInfo& resourceInfo,
+CameraManager* HanwhaMetadataPlugin::obtainCameraManager(
+    const CameraInfo& cameraInfo,
     Error* outError)
 {
     *outError = Error::noError;
 
-    const auto vendor = QString(resourceInfo.vendor).toLower();
+    const auto vendor = QString(cameraInfo.vendor).toLower();
 
     if (!vendor.startsWith(kHanwhaTechwinVendor) && !vendor.startsWith(kSamsungTechwinVendor))
         return nullptr;
 
-    auto sharedRes = sharedResources(resourceInfo);
+    auto sharedRes = sharedResources(cameraInfo);
     auto sharedResourceGuard = makeScopeGuard(
-        [&sharedRes, &resourceInfo, this]()
+        [&sharedRes, &cameraInfo, this]()
         {
             if (sharedRes->managerCounter == 0)
-                m_sharedResources.remove(QString::fromUtf8(resourceInfo.sharedId));
+                m_sharedResources.remove(QString::fromUtf8(cameraInfo.sharedId));
         });
 
-    auto supportedEvents = fetchSupportedEvents(resourceInfo);
+    auto supportedEvents = fetchSupportedEvents(cameraInfo);
     if (!supportedEvents)
         return nullptr;
 
@@ -146,21 +146,13 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
     deviceManifest.supportedEventTypes = *supportedEvents;
 
     auto manager = new HanwhaMetadataManager(this);
-    manager->setResourceInfo(resourceInfo);
+    manager->setCameraInfo(cameraInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
 
     ++sharedRes->managerCounter;
 
     return manager;
-}
-
-AbstractSerializer* HanwhaMetadataPlugin::serializerForType(
-    const nxpl::NX_GUID& typeGuid,
-    Error* outError)
-{
-    *outError = Error::typeIsNotSupported;
-    return nullptr;
 }
 
 const char* HanwhaMetadataPlugin::capabilitiesManifest(Error* error) const
@@ -170,11 +162,11 @@ const char* HanwhaMetadataPlugin::capabilitiesManifest(Error* error) const
 }
 
 boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
-    const ResourceInfo& resourceInfo)
+    const CameraInfo& cameraInfo)
 {
     using namespace nx::mediaserver_core::plugins;
 
-    auto sharedRes = sharedResources(resourceInfo);
+    auto sharedRes = sharedResources(cameraInfo);
 
     const auto cgiParameters = sharedRes->sharedContext->cgiParameters();
     if (!cgiParameters.diagnostics || !cgiParameters.value.isValid())
@@ -184,7 +176,7 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
     if (!eventStatuses || !eventStatuses->isSuccessful())
         return boost::none;
 
-    return eventsFromParameters(cgiParameters.value, eventStatuses.value, resourceInfo.channel);
+    return eventsFromParameters(cgiParameters.value, eventStatuses.value, cameraInfo.channel);
 }
 
 boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
@@ -298,22 +290,22 @@ void HanwhaMetadataPlugin::managerIsAboutToBeDestroyed(const QString& sharedId)
 }
 
 std::shared_ptr<HanwhaMetadataPlugin::SharedResources> HanwhaMetadataPlugin::sharedResources(
-    const nx::sdk::ResourceInfo& resourceInfo)
+    const nx::sdk::CameraInfo& cameraInfo)
 {
-    const QUrl url(resourceInfo.url);
+    const QUrl url(cameraInfo.url);
 
     QAuthenticator auth;
-    auth.setUser(resourceInfo.login);
-    auth.setPassword(resourceInfo.password);
+    auth.setUser(cameraInfo.login);
+    auth.setPassword(cameraInfo.password);
 
     QnMutexLocker lock(&m_mutex);
-    auto sharedResourcesItr = m_sharedResources.find(resourceInfo.sharedId);
+    auto sharedResourcesItr = m_sharedResources.find(cameraInfo.sharedId);
     if (sharedResourcesItr == m_sharedResources.cend())
     {
         sharedResourcesItr = m_sharedResources.insert(
-            resourceInfo.sharedId,
+            cameraInfo.sharedId,
             std::make_shared<SharedResources>(
-                resourceInfo.sharedId,
+                cameraInfo.sharedId,
                 driverManifest(),
                 url,
                 auth));

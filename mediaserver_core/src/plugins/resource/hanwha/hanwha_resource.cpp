@@ -25,6 +25,7 @@
 #include <nx/fusion/fusion/fusion.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/vms/event/events/events.h>
+#include <nx/sdk/metadata/plugin.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 

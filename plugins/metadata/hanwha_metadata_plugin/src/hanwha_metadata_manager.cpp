@@ -6,7 +6,7 @@
 
 #include <chrono>
 
-#include <nx/sdk/metadata/common_detected_event.h>
+#include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
 
 namespace nx {
@@ -29,10 +29,10 @@ HanwhaMetadataManager::~HanwhaMetadataManager()
 
 void* HanwhaMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataManager)
+    if (interfaceId == IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractMetadataManager*>(this);
+        return static_cast<CameraManager*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)
@@ -44,9 +44,9 @@ void* HanwhaMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 }
 
 Error HanwhaMetadataManager::startFetchingMetadata(
-    AbstractMetadataHandler* handler,
-    nxpl::NX_GUID* /*eventTypeList*/,
-    int /*eventTypeListSize*/)
+    MetadataHandler* handler,
+    nxpl::NX_GUID* /*typeList*/,
+    int /*typeListSize*/)
 {
     auto monitorHandler =
         [this](const HanwhaEventList& events)
@@ -59,7 +59,7 @@ Error HanwhaMetadataManager::startFetchingMetadata(
                 if (hanwhaEvent.channel.is_initialized() && hanwhaEvent.channel != m_channel)
                     return;
 
-                auto event = new CommonDetectedEvent();
+                auto event = new CommonEvent();
                 std::cout
                     << "---------------- (Metadata manager handler) Got event: "
                     << hanwhaEvent.caption.toStdString() << " "
@@ -128,16 +128,16 @@ void HanwhaMetadataManager::freeManifest(const char* data)
 {
 }
 
-void HanwhaMetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
+void HanwhaMetadataManager::setCameraInfo(const nx::sdk::CameraInfo& cameraInfo)
 {
-    m_url = resourceInfo.url;
-    m_model = resourceInfo.model;
-    m_firmware = resourceInfo.firmware;
-    m_auth.setUser(resourceInfo.login);
-    m_auth.setPassword(resourceInfo.password);
-    m_uniqueId = resourceInfo.uid;
-    m_sharedId = resourceInfo.sharedId;
-    m_channel = resourceInfo.channel;
+    m_url = cameraInfo.url;
+    m_model = cameraInfo.model;
+    m_firmware = cameraInfo.firmware;
+    m_auth.setUser(cameraInfo.login);
+    m_auth.setPassword(cameraInfo.password);
+    m_uniqueId = cameraInfo.uid;
+    m_sharedId = cameraInfo.sharedId;
+    m_channel = cameraInfo.channel;
 }
 
 void HanwhaMetadataManager::setDeviceManifest(const QByteArray& manifest)
