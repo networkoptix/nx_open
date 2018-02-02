@@ -1,5 +1,3 @@
-#pragma once
-
 #include <nx/utils/compiler_options.h>
 
 /* Windows headers. */

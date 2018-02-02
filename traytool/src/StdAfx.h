@@ -1,5 +1,3 @@
-#pragma once
-
 #define QT_NO_CAST_FROM_ASCII
 
 #include <nx/utils/compiler_options.h>
