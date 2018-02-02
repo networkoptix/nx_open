@@ -36,7 +36,7 @@ class AccountBackend(ModelBackend):
             if not AccountBackend.is_email_in_portal(user['email']):
                 # so - user is in cloud_db, but not in cloud_portal
                 raise APILogicException('User is not in portal', ErrorCodes.portal_critical_error)
-        return None
+        return models.Account.objects.get(email=user['email'])
 
     @staticmethod
     def get_user(user_id):
