@@ -60,6 +60,11 @@ protected:
             ASSERT_EQ(std::tolower(c), c);
     }
 
+    void assertTemporaryLoginIsEqualToAccountEmail()
+    {
+        ASSERT_EQ(m_account.email, m_temporaryCredentials.login);
+    }
+
 private:
     AccountWithPassword m_account;
     api::TemporaryCredentials m_temporaryCredentials;
@@ -277,6 +282,12 @@ TEST_F(AccountTemporaryCredentials, temporary_credentials_are_low_case)
 {
     allocateAccountTemporaryCredentials();
     assertTemporaryCredentialsAreLowCase();
+}
+
+TEST_F(AccountTemporaryCredentials, account_email_is_used_as_a_temporary_login)
+{
+    allocateAccountTemporaryCredentials();
+    assertTemporaryLoginIsEqualToAccountEmail();
 }
 
 } // namespace cdb
