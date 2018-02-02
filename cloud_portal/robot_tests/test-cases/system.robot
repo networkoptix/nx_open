@@ -12,15 +12,15 @@ Log in to Auto Tests System
     [arguments]    ${email}
     Go To    ${url}/systems/${AUTO TESTS URL}
     Log In    ${email}    ${password}    None
-    Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait For    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
-    Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait For    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
-    Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait For    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
+    Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 *** Test Cases ***
 has system name, owner and OpenInNx button visible on systems page
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
-    Wait For    //div[@ng-if='systems.length']    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Wait Until Elements Are Visible    //div[@ng-if='systems.length']    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
     Element Should Be Visible    ${AUTO TESTS USER}
     Element Should Be Visible    ${AUTO TESTS OPEN NX}
@@ -38,11 +38,9 @@ shows offline status and does not show open in nx button when offline
 should confirm, if owner deletes system (You are going to disconnect your system from cloud)
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Wait Until Element Is Visible    ${DISCONNECT FROM NX}
     Click Button    ${DISCONNECT FROM NX}
-    Wait Until Element Is Visible    ${DISCONNECT FORM}
+    Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}
     Element Should Be Visible    ${DISCONNECT FORM}
-    Wait Until Element Is Visible    ${DISCONNECT FORM HEADER}
     Element Should Be Visible    ${DISCONNECT FORM HEADER}
     Close Browser
 
@@ -62,17 +60,15 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
-    Wait Until Element Is Visible    ${DISCONNECT MODAL TEXT}
+    Wait Until Elements Are Visible    ${DISCONNECT MODAL TEXT}    ${DISCONNECT MODAL CANCEL}
     Element Should Be Visible    ${DISCONNECT MODAL TEXT}
-    Wait Until Element Is Visible    ${DISCONNECT MODAL CANCEL}
     Click Button    ${DISCONNECT MODAL CANCEL}
     Wait Until Element Is Not Visible    ${DISCONNECT MODAL TEXT}
     Wait Until Page Does Not Contain Element    //div[@modal-render='true']
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
-    Wait Until Element Is Visible    ${DISCONNECT MODAL TEXT}
+    Wait Until Elements Are Visible    ${DISCONNECT MODAL TEXT}    ${DISCONNECT MODAL DISCONNECT BUTTON}
     Element Should Be Visible    ${DISCONNECT MODAL TEXT}
-    Wait Until Element Is Visible    ${DISCONNECT MODAL DISCONNECT BUTTON}
     Click Button    ${DISCONNECT MODAL DISCONNECT BUTTON}
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
     Element Should Be Visible    ${YOU HAVE NO SYSTEMS}
@@ -82,9 +78,8 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Go To    ${url}/systems/${AUTO TESTS URL}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
-    Wait Until Element Is Visible    ${SHARE EMAIL}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${EMAIL NOT OWNER}
-    Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    New permissions saved
     Close Browser
@@ -92,11 +87,9 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
 has Share button, visible for admin and owner
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Element Should Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
     Log in to Auto Tests System    ${EMAIL ADMIN}
-    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Element Should Be Visible    ${SHARE BUTTON SYSTEMS}
     Close Browser
 
@@ -129,7 +122,7 @@ should open System page by link to not authorized user and redirect to homepage,
 should open System page by link to not authorized user and show it, after owner logs in
     Open Browser and go to URL    ${url}/systems/${AUTO TESTS URL}
     Log In    ${EMAIL OWNER}   ${password}    None
-    VERIFY IN SYSTEM    Auto Tests
+    Verify In System    Auto Tests
     Close Browser
 
 should open System page by link to user without permission and show alert (System info is unavailable: You have no access to this system)
@@ -163,9 +156,8 @@ should display same user data as user provided during registration (stress to cy
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
-    Wait Until Element Is Visible    ${SHARE EMAIL}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE PERMISSIONS DROPDOWN}
     Input Text    ${SHARE EMAIL}    ${email}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS ADMINISTRATOR}
     Click Element    ${SHARE PERMISSIONS ADMINISTRATOR}
@@ -180,7 +172,6 @@ should display same user data as user provided during registration (stress to cy
     Element Should Be Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
 
 #remove new user from system
-
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
     Remove User Permissions    ${email}
@@ -199,12 +190,9 @@ should display same user data as showed in user account (stress to cyrillic)
 
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Wait Until Element Is Visible    ${OPEN IN NX BUTTON}
-    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
-    Wait Until Element Is Visible    ${SHARE EMAIL}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE PERMISSIONS DROPDOWN}
     Input Text    ${SHARE EMAIL}    ${email}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS ADMINISTRATOR}
     Click Element    ${SHARE PERMISSIONS ADMINISTRATOR}
@@ -216,10 +204,9 @@ should display same user data as showed in user account (stress to cyrillic)
     Log In    ${email}    ${password}
     Validate Log In
     Go To    ${url}/account
-    Wait Until Element Is Visible    ${ACCOUNT FIRST NAME}
+    Wait Until Elements Are Visible    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${CYRILLIC NAME}
-    Wait Until Element Is Visible    ${ACCOUNT LAST NAME}
     Clear Element Text    ${ACCOUNT LAST NAME}
     Input Text    ${ACCOUNT LAST NAME}    ${CYRILLIC NAME}
     sleep    .15
@@ -228,4 +215,9 @@ should display same user data as showed in user account (stress to cyrillic)
     Go To    ${url}/systems/${AUTO TESTS URL}
     Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
     Element Should Be Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
+
+    #remove new user from system
+    Log Out
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Remove User Permissions    ${email}
     Close Browser

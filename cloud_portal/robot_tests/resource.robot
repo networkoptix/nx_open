@@ -17,14 +17,12 @@ Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
     Run Keyword Unless    '''${button}''' == "None"    Wait Until Element Is Visible    ${button}
     Run Keyword Unless    '''${button}''' == "None"    Click Link    ${button}
-    Wait Until Element Is Visible    ${EMAIL INPUT}
-    input text    ${EMAIL INPUT}    ${email}
-
-    Wait Until Element Is Visible    ${PASSWORD INPUT}
-    input text    ${PASSWORD INPUT}    ${password}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
+    Input Text    ${EMAIL INPUT}    ${email}
+    Input Text    ${PASSWORD INPUT}    ${password}
 
     Wait Until Element Is Visible    ${LOG IN BUTTON}
-    click button    ${LOG IN BUTTON}
+    Click Button    ${LOG IN BUTTON}
 
 Validate Log In
     Wait Until Page Contains Element    ${AUTHORIZED BODY}
@@ -43,18 +41,11 @@ Validate Log Out
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}
 
-    Wait Until Element Is Visible    ${REGISTER FIRST NAME INPUT}
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Input Text    ${REGISTER FIRST NAME INPUT}    ${first name}
-    Wait Until Element Is Visible    ${REGISTER LAST NAME INPUT}
     Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
-
-    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT}
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
-
-    Wait Until Element Is Visible    ${REGISTER PASSWORD INPUT}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
-
-    Wait Until Element Is Visible    ${CREATE ACCOUNT BUTTON}
     Click Button    ${CREATE ACCOUNT BUTTON}
 
 Validate Register Email Received
@@ -71,11 +62,6 @@ Get Activation Link
     ${links}    Get Links From Email    ${email}
     Close Mailbox
     Return From Keyword    @{links}[1]
-
-Select Auto Tests System
-    Wait Until Element Is Enabled    ${AUTO TESTS}
-    Wait Until Element Is Visible    ${AUTO TESTS}
-    Click Element    ${AUTO TESTS}
 
 Edit User Permissions In Systems
     [arguments]    ${user email}    ${permissions}
@@ -121,7 +107,7 @@ Failure Tasks
     Capture Page Screenshot    selenium-screenshot-{index}.png
     Close Browser
 
-Wait For
+Wait Until Elements Are Visible
     [arguments]    @{elements}
     :FOR     ${element}  IN  @{elements}
     \  Wait Until Element Is Visible    ${element}

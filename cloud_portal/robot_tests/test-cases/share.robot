@@ -14,9 +14,9 @@ Log in to Auto Tests System
     [arguments]    ${email}
     Go To    ${url}/systems/${AUTO TESTS URL}
     Log In    ${email}    ${password}    None
-    Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait For    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
-    Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait For    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
-    Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait For    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
+    Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 *** Test Cases ***
 Share button - opens dialog
@@ -56,16 +56,15 @@ After closing dialog, called by link - clear link
 
 #Check Cancel Button
     Go To    ${location}/share
-    Wait Until Element Is Visible    ${SHARE MODAL}
+    Wait Until Elements Are Visible    ${SHARE MODAL}    ${SHARE CANCEL}
     Element Should Be Visible    ${SHARE MODAL}
-    Wait Until Element Is Visible    ${SHARE CANCEL}
     Click Button    ${SHARE CANCEL}
     Wait Until Element Is Not Visible    ${SHARE MODAL}
     Location Should Be    ${location}
 
 #Check 'X' Button
     Go To    ${location}/share
-    Wait Until Element Is Visible    ${SHARE MODAL}
+    Wait Until Elements Are Visible    ${SHARE MODAL}    ${SHARE CLOSE}
     Element Should Be Visible    ${SHARE MODAL}
     Wait Until Element Is Visible    ${SHARE CLOSE}
     Click Button    ${SHARE CLOSE}
@@ -74,9 +73,8 @@ After closing dialog, called by link - clear link
 
 #Check Background Click
     Go To    ${location}/share
-    Wait Until Element Is Visible    ${SHARE MODAL}
+    Wait Until Elements Are Visible    ${SHARE MODAL}    //div[@uib-modal-window="modal-window"]
     Element Should Be Visible    ${SHARE MODAL}
-    Wait Until Element Is Visible    //div[@uib-modal-window="modal-window"]
     Click Element    //div[@uib-modal-window="modal-window"]
     Wait Until Element Is Not Visible    ${SHARE MODAL}
     Location Should Be    ${location}
@@ -95,8 +93,6 @@ Sharing roles are ordered: more access is on top of the list with options
 When user selects role - special hint appears
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${email}
-    Wait Until Element Is Visible    ${OPEN IN NX BUTTON}
-    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
 #Adminstrator check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
@@ -141,9 +137,8 @@ Sharing works
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     ${random email}    Get Random Email
-    Wait Until Element Is Visible    ${SHARE EMAIL}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
-    Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    New permissions saved
     Check User Permissions    ${random email}    Custom
@@ -156,9 +151,8 @@ Edit permission works
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     ${random email}    Get Random Email
-    Wait Until Element Is Visible    ${SHARE EMAIL}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
-    Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    New permissions saved
     Edit User Permissions In Systems    ${random email}    Viewer
@@ -174,9 +168,8 @@ Share with registered user - sends him notification
     Verify In System    Auto Tests
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
-    Wait Until Element Is Visible    ${SHARE EMAIL}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${EMAIL NOPERM}
-    Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    New permissions saved
     Check User Permissions    ${EMAIL NOPERM}    Custom

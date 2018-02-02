@@ -16,9 +16,8 @@ Validate Register Success
 
 Check Bad Email Input
     [arguments]    ${email}
-    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT}
+    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT}    ${CREATE ACCOUNT BUTTON}
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
-    Wait Until Element Is Visible    ${CREATE ACCOUNT BUTTON}
     Click Button    ${CREATE ACCOUNT BUTTON}
     ${class}    Get Element Attribute    ${REGISTER EMAIL INPUT}/../..    class
     Should Contain    ${class}    has-error
@@ -142,13 +141,10 @@ should not allow to register without email
 should respond to Enter key and save data
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Wait Until Element Is Visible    ${REGISTER FIRST NAME INPUT}
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}
     Input Text    ${REGISTER FIRST NAME INPUT}    mark
-    Wait Until Element Is Visible    ${REGISTER LAST NAME INPUT}
     Input Text    ${REGISTER LAST NAME INPUT}    hamil
-    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT}
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
-    Wait Until Element Is Visible    ${REGISTER PASSWORD INPUT}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     Press Key    ${REGISTER PASSWORD INPUT}    ${ENTER}
     Validate Register Success    ${url}/register/success
@@ -173,11 +169,9 @@ should respond to Tab key
 #May be moved into its own data driven testing
 should not allow to register with email in non-email format
     Open Browser and go to URL    ${url}/register
-    Wait Until Element Is Visible    ${REGISTER FIRST NAME INPUT}
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER PASSWORD INPUT}
     Input Text    ${REGISTER FIRST NAME INPUT}    mark
-    Wait Until Element Is Visible    ${REGISTER LAST NAME INPUT}
     Input Text    ${REGISTER LAST NAME INPUT}    hamil
-    Wait Until Element Is Visible    ${REGISTER PASSWORD INPUT}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     Check Bad Email Input    noptixqagmail.com
     Check Bad Email Input    @gmail.com
@@ -202,9 +196,8 @@ should suggest user to log out, if he was logged in and goes to registration lin
     Log In    ${EMAIL VIEWER}    ${password}
     Validate Log In
     Go To    ${url}/register
-    Wait Until Element Is Visible    ${LOGGED IN CONTINUE BUTTON}
+    Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
     Element Should Be Visible    ${LOGGED IN CONTINUE BUTTON}
-    Wait Until Element Is Visible    ${LOGGED IN LOG OUT BUTTON}
     Element Should Be Visible    ${LOGGED IN LOG OUT BUTTON}
     Close Browser
 
