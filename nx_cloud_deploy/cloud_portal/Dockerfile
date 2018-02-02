@@ -1,5 +1,6 @@
 FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
 
+COPY docker/merge_config.py /usr/local/bin/
 COPY docker/pip.conf /root/.config/pip/pip.conf
 COPY docker/entrypoint.sh /app/
 COPY stage/cloud /app/app
