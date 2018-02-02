@@ -52,6 +52,7 @@ public:
     ManagerPool(QnMediaServerModule* commonModule);
     ~ManagerPool();
     void init();
+    void stop();
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_propertyChanged(const QnResourcePtr& resource, const QString& name);
     void at_resourceRemoved(const QnResourcePtr& resource);
