@@ -3,16 +3,16 @@
 #include <string>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_event_metadata_packet.h>
+#include <nx/sdk/metadata/events_metadata_packet.h>
 
 namespace nx {
 namespace sdk {
 namespace metadata {
 
-class CommonDetectedEvent: public nxpt::CommonRefCounter<AbstractDetectedEvent>
+class CommonEvent: public nxpt::CommonRefCounter<Event>
 {
 public:
-    virtual ~CommonDetectedEvent();
+    virtual ~CommonEvent();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 

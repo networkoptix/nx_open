@@ -1,30 +1,30 @@
 #pragma once
 
 #include <plugins/plugin_api.h>
-#include "abstract_data_packet.h"
-#include "abstract_media_context.h"
+#include "data_packet.h"
+#include "media_context.h"
 
 namespace nx {
 namespace sdk {
 namespace metadata {
 
 /**
- * Each class that implements AbstractCompressedMediaPacket interface
+ * Each class that implements CompressedMediaPacket interface
  * should properly handle this GUID in its queryInterface method.
  */
 static const nxpl::NX_GUID IID_CompressedMediaPacket
     = {{0xf9, 0xa4, 0x59, 0x8b, 0xd7, 0x18, 0x42, 0x29, 0x98, 0xdd, 0xff, 0xe5, 0x41, 0x28, 0xfa, 0xf8}};
 
 /**
- * @brief The AbstractCompressedMediaPacket class is an interface for the packet
+ * @brief The CompressedMediaPacket class is an interface for the packet
  * containing compressed media data (audio or video).
  */
-class AbstractCompressedMediaPacket: public AbstractDataPacket
+class CompressedMediaPacket: public DataPacket
 {
     using base_type = AbstractDataPacket;
 public:
     /**
-     * @return Null terminated ASCII string containig
+     * @return Null terminated ASCII string containing
      * MIME type corresponding to the packet data compression.
      */
     virtual const char* codec() const = 0;
@@ -42,13 +42,12 @@ public:
     /**
      * @return pointer to the codec context.
      */
-    virtual const AbstractMediaContext* context() const = 0;
+    virtual const MediaContext* context() const = 0;
 
     /**
      * @return UTC timestamp in microseconds of the media data
      */
     virtual int64_t timestampUsec() const = 0;
-
 };
 
 } // namespace metadata

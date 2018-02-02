@@ -3,7 +3,7 @@
 
 #include <chrono>
 
-#include <nx/sdk/metadata/common_detected_event.h>
+#include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
 #include <plugins/plugin_internal_tools.h>
 #include <nx/utils/log/log_main.h>
@@ -28,10 +28,10 @@ MetadataManager::~MetadataManager()
 
 void* MetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataManager)
+    if (interfaceId == IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractMetadataManager*>(this);
+        return static_cast<CameraManager*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)
@@ -49,8 +49,8 @@ nx::sdk::Error MetadataManager::setHandler(nx::sdk::metadata::AbstractMetadataHa
 }
 
 Error MetadataManager::startFetchingMetadata(
-    nxpl::NX_GUID* eventTypeList,
-    int eventTypeListSize)
+    nxpl::NX_GUID* typeList,
+    int typeListSize)
 {
     auto monitorHandler =
         [this](const HikvisionEventList& events)
@@ -63,7 +63,7 @@ Error MetadataManager::startFetchingMetadata(
                 if (hikvisionEvent.channel.is_initialized() && hikvisionEvent.channel != m_channel)
                     return;
 
-                auto event = new CommonDetectedEvent();
+                auto event = new CommonEvent();
                 NX_VERBOSE(this, lm("Got event: %1 %2 Channel %3")
                     .arg(hikvisionEvent.caption).arg(hikvisionEvent.description).arg(m_channel));
 
@@ -87,8 +87,8 @@ Error MetadataManager::startFetchingMetadata(
 
     NX_ASSERT(m_plugin);
     std::vector<QnUuid> eventTypes;
-    for (int i = 0; i < eventTypeListSize; ++i)
-        eventTypes.push_back(nxpt::fromPluginGuidToQnUuid(eventTypeList[i]));
+    for (int i = 0; i < typeListSize; ++i)
+        eventTypes.push_back(nxpt::fromPluginGuidToQnUuid(typeList[i]));
     m_monitor =
         std::make_unique<HikvisionMetadataMonitor>(m_plugin->driverManifest(), m_url, m_auth, eventTypes);
 
@@ -127,16 +127,16 @@ void MetadataManager::freeManifest(const char* data)
 {
 }
 
-void MetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
+void MetadataManager::setCameraInfo(const nx::sdk::CameraInfo& cameraInfo)
 {
-    m_url = resourceInfo.url;
-    m_model = resourceInfo.model;
-    m_firmware = resourceInfo.firmware;
-    m_auth.setUser(resourceInfo.login);
-    m_auth.setPassword(resourceInfo.password);
-    m_uniqueId = resourceInfo.uid;
-    m_sharedId = resourceInfo.sharedId;
-    m_channel = resourceInfo.channel;
+    m_url = cameraInfo.url;
+    m_model = cameraInfo.model;
+    m_firmware = cameraInfo.firmware;
+    m_auth.setUser(cameraInfo.login);
+    m_auth.setPassword(cameraInfo.password);
+    m_uniqueId = cameraInfo.uid;
+    m_sharedId = cameraInfo.sharedId;
+    m_channel = cameraInfo.channel;
 }
 
 void MetadataManager::setDeviceManifest(const QByteArray& manifest)

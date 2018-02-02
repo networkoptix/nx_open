@@ -3,7 +3,7 @@
 #include <QtCore/QMap>
 
 #include <core/resource/resource.h>
-#include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/sdk/metadata/camera_manager.h>
 #include <nx/vms/event/event_fwd.h>
 #include <plugins/plugin_tools.h>
 
@@ -16,13 +16,13 @@ namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-class MetadataHandler: public nx::sdk::metadata::AbstractMetadataHandler
+class MetadataHandler: public nx::sdk::metadata::MetadataHandler
 {
 public:
     // TODO: #mike: Separate error handling from metadata handling.
     virtual void handleMetadata(
         nx::sdk::Error error,
-        nx::sdk::metadata::AbstractMetadataPacket* metadata) override;
+        nx::sdk::metadata::MetadataPacket* metadata) override;
 
     void setResource(const QnSecurityCamResourcePtr& resource);
 

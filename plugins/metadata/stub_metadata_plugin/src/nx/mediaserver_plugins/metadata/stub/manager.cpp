@@ -6,8 +6,8 @@
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
-#include <nx/sdk/metadata/common_detected_event.h>
-#include <nx/sdk/metadata/common_detected_object.h>
+#include <nx/sdk/metadata/common_event.h>
+#include <nx/sdk/metadata/common_object.h>
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
 
 #define NX_DEBUG_ENABLE_OUTPUT true
@@ -44,10 +44,10 @@ Manager::Manager(Plugin* plugin):
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataManager)
+    if (interfaceId == IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractMetadataManager*>(this);
+        return static_cast<CameraManager*>(this);
     }
 
     if (interfaceId == IID_ConsumingMetadataManager)
@@ -64,7 +64,7 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-Error Manager::setHandler(AbstractMetadataHandler* handler)
+Error Manager::setHandler(MetadataHandler* handler)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -74,8 +74,8 @@ Error Manager::setHandler(AbstractMetadataHandler* handler)
 }
 
 Error Manager::startFetchingMetadata(
-    nxpl::NX_GUID* /*eventTypeList*/,
-    int /*eventTypeListSize*/)
+    nxpl::NX_GUID* /*typeList*/,
+    int /*typeListSize*/)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -161,7 +161,7 @@ Error Manager::stopFetchingMetadataUnsafe()
     return Error::noError;
 }
 
-AbstractMetadataPacket* Manager::cookSomeEvents()
+MetadataPacket* Manager::cookSomeEvents()
 {
     ++m_counter;
     if (m_counter > 1)
@@ -174,16 +174,16 @@ AbstractMetadataPacket* Manager::cookSomeEvents()
         m_counter = 0;
     }
 
-    auto detectedEvent = new CommonDetectedEvent();
-    detectedEvent->setCaption("Line crossing (caption)");
-    detectedEvent->setDescription("Line crossing (description)");
-    detectedEvent->setAuxilaryData(R"json({ "auxilaryData": "someJson" })json");
-    detectedEvent->setIsActive(m_counter == 1);
-    detectedEvent->setTypeId(m_eventTypeId);
+    auto commonEvent = new CommonEvent();
+    commonEvent->setCaption("Line crossing (caption)");
+    commonEvent->setDescription("Line crossing (description)");
+    commonEvent->setAuxilaryData(R"json({ "auxilaryData": "someJson" })json");
+    commonEvent->setIsActive(m_counter == 1);
+    commonEvent->setTypeId(m_eventTypeId);
 
     auto eventPacket = new CommonEventsMetadataPacket();
     eventPacket->setTimestampUsec(usSinceEpoch());
-    eventPacket->addItem(detectedEvent);
+    eventPacket->addItem(commonEvent);
 
     NX_PRINT << "Firing event: "
         << "type: " << (
@@ -198,34 +198,34 @@ AbstractMetadataPacket* Manager::cookSomeEvents()
     return eventPacket;
 }
 
-AbstractMetadataPacket* Manager::cookSomeObjects(
-    nx::sdk::metadata::AbstractDataPacket* mediaPacket)
+MetadataPacket* Manager::cookSomeObjects(
+    nx::sdk::metadata::DataPacket* mediaPacket)
 {
     nxpt::ScopedRef<CommonCompressedVideoPacket> videoPacket(
         mediaPacket->queryInterface(IID_CompressedVideoPacket));
     if (!videoPacket)
         return nullptr;
 
-    auto detectedObject = new CommonDetectedObject();
+    auto commonObject = new CommonObject();
     nxpl::NX_GUID objectId =
         {{0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47, 0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1}};
 
-    detectedObject->setAuxilaryData(R"json({ "auxilaryData": "someJson2" })json");
-    detectedObject->setTypeId(kCarDetectedEventGuid);
+    commonObject->setAuxilaryData(R"json({ "auxilaryData": "someJson2" })json");
+    commonObject->setTypeId(kCarDetectedEventGuid);
 
     double dt = m_counterObjects++ / 32.0;
     double intPart;
     dt = modf(dt, &intPart) * 0.75;
 
     *reinterpret_cast<int*>(objectId.bytes) = static_cast<int>(intPart);
-    detectedObject->setId(objectId);
+    object->setId(objectId);
 
-    detectedObject->setBoundingBox(Rect(dt, dt, 0.25, 0.25));
+    object->setBoundingBox(Rect(dt, dt, 0.25, 0.25));
 
-    auto eventPacket = new CommonObjectsMetadataPacket();
-    eventPacket->setTimestampUsec(videoPacket->timestampUsec());
-    eventPacket->setDurationUsec(1000000LL * 10);
-    eventPacket->addItem(detectedObject);
+    auto objectPacket = new CommonObjectsMetadataPacket();
+    objectPacket->setTimestampUsec(videoPacket->timestampUsec());
+    objectPacket->setDurationUsec(1000000LL * 10);
+    objectPacket->addItem(commonObject);
     return eventPacket;
 }
 

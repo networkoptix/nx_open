@@ -4,7 +4,7 @@
 
 #include <QtCore/QUrl>
 
-#include <nx/sdk/metadata/common_detected_event.h>
+#include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/kit/debug.h>
@@ -17,12 +17,12 @@ namespace metadata {
 namespace axis {
 
 Manager::Manager(
-    const nx::sdk::ResourceInfo& resourceInfo,
+    const nx::sdk::CameraInfo& cameraInfo,
     const QList<IdentifiedSupportedEvent>& events)
 {
-    m_url = resourceInfo.url;
-    m_auth.setUser(resourceInfo.login);
-    m_auth.setPassword(resourceInfo.password);
+    m_url = cameraInfo.url;
+    m_auth.setUser(cameraInfo.login);
+    m_auth.setPassword(cameraInfo.password);
 
     nx::api::AnalyticsDeviceManifest deviceManifest;
     for (const auto& event : events)
@@ -49,10 +49,10 @@ Manager::~Manager()
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == nx::sdk::metadata::IID_MetadataManager)
+    if (interfaceId == nx::sdk::metadata::IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractMetadataManager*>(this);
+        return static_cast<CameraManager*>(this);
     }
     if (interfaceId == nxpl::IID_PluginInterface)
     {
@@ -62,16 +62,16 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nx::sdk::Error Manager::setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler)
+nx::sdk::Error Manager::setHandler(nx::sdk::metadata::MetadataHandler* handler)
 {
     m_handler = handler;
     return nx::sdk::Error::noError;
 }
 
-nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
+nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* typeList, int typeListSize)
 {
     m_monitor = new Monitor(this, m_url, m_auth, m_handler);
-    return m_monitor->startMonitoring(eventTypeList, eventTypeListSize);
+    return m_monitor->startMonitoring(typeList, typeListSize);
 }
 
 nx::sdk::Error Manager::stopFetchingMetadata()

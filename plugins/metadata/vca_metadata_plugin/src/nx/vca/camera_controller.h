@@ -1,18 +1,20 @@
 ﻿#pragma once
 
-#include <string>
 #include <vector>
 #include <map>
 #include <memory>
+#include <chrono>
+
+#include <QString>
 
 namespace nx {
 namespace vca {
 
 struct SupportedRule
 {
-    std::string name;
-    std::string description;
-    int profileId=0; //< VCA-camera rules are stored in profiles with numbers in the range 0..7
+    QByteArray name;
+    QByteArray description;
+    int profileId = 0; //< VCA-camera rules are stored in profiles with numbers in the range 0..7.
     bool ruleEnabled = false;
     bool tcpServerNotificationEnabled = false;
 
@@ -33,33 +35,68 @@ struct SupportedRule
     {
     }
 
-    std::string profileName() const { return std::string("P") + std::to_string(profileId); }
+    QByteArray profileName() const { return QByteArray("P") + QByteArray::number(profileId); }
     bool isActive() const { return ruleEnabled & tcpServerNotificationEnabled; }
 };
 
 struct Heartbeat
 {
-    int seconds;
+    std::chrono::seconds interval;
     bool enabled;
-    Heartbeat(int seconds, bool enabled): seconds(seconds < 300 ? seconds : 300), enabled(enabled) {}
+
+    Heartbeat(std::chrono::seconds interval, bool enabled)
+        :
+        interval(interval),
+        enabled(enabled)
+    {
+        // VCA-camera documentation set the allowable range of heartbeat interval.
+        static const std::chrono::seconds kMinInterval(1);
+        static const std::chrono::seconds kMaxInterval(300);
+
+        if (interval > kMaxInterval)
+            interval = kMaxInterval;
+
+        if (interval < kMinInterval)
+            interval = kMinInterval;
+    }
 };
 
 class CameraControllerImpl;
+
+
+/*
+ Class to work with VCA-camera settings.
+
+ * Methods which names start with "read" obtains appropriate information from camera and save it
+   into class private members. Further information may be accessed with corresponding methods.
+
+   All read methods are synchronous and may last quite long (depending on the request and camera
+   performance). Default read timeout is set to 10 seconds, longer requests will fail. Read timeout
+   may be enlarged with setReadTimeout method. Timeout also may be reduces though it is not
+   recommended.
+
+   All read methods return boolean value (true - in case of successful reading).
+
+
+
+
+ */
 
 class CameraController
 {
 public:
     CameraController();
-    CameraController(const char* ip);
-    CameraController(const char* ip, const char* user, const char* password);
+    CameraController(const QString& ip);
+    CameraController(const QString& ip, const QString& user, const QString& password);
     ~CameraController() = default;
 
-    void setIp(const char* ip);
-    void setUserPassword(const char* user, const char* password);
+    void setIp(const QString& ip);
+    void setUserPassword(const QString& user, const QString& password);
+    void setReadTimeout(std::chrono::seconds readTimeout);
 
-    const char* ip() const noexcept { return m_ip.c_str(); }
-    const char* user() const noexcept { return m_user.c_str(); }
-    const char* password() const noexcept { return m_password.c_str(); }
+    QString ip() const noexcept { return m_ip; }
+    QString user() const noexcept { return m_user; }
+    QString password() const noexcept { return m_password; }
 
     const std::map<int, SupportedRule>& suppotedRules() const noexcept
     {
@@ -69,27 +106,42 @@ public:
 
     /*
      * readSupportedRules & readSupportedRules2 do the same thing - they read all necessary
-     * information about rules on the camera. Because of problems with HttpClient (during reading
-     * incorrect data from camera) readSupportedRules sometimes can't obtain rule information.
-     * readSupportedRules2 uses workaround and works fine (but slow). When HttpClient will be fixed
-     * readSupportedRules2 will become deprecated. Till that moment readSupportedRules is not
-     * recommended to be used.
+     * information about rules on the camera and save it into the internal rule table of a class.
+     * This rule table may be accessed with suppotedRules() method.
+     * readSupportedRules reads data at once, readSupportedRules2 reads data in chunks.
      */
     bool readSupportedRules();
     bool readSupportedRules2();
 
+    /** Read information about supported rules enable/disable state and update current rule
+     * table.
+     */
+    bool readSupportedRulesState();
+
+    /** Read information about supported rules names and update current rule table. */
+    bool readSupportedRulesNames();
+
+    /** Read information about supported rules tcp server notification, if it is enabled or not. */
+    bool readSupportedRulesTcpNotificationState();
+
     bool setHeartbeat(Heartbeat heartbeat) const;
+
+    /* Read the number of tcp port through which camera server sends notifications when events
+     * occur. To obtain port number use tcpServerPort() after readTcpServerPort().
+     */
     bool readTcpServerPort();
 
     bool readTcpServerEnabled(int eventProfileIndex);
-    bool readTcpServerEnabled();
 
     bool setTcpServerEnabled(int eventProfileIndex, bool enabled);
 
 private:
-    std::string m_ip;
-    std::string m_user;
-    std::string m_password;
+    bool readRules(const QString& cgiCommand, std::map<int, SupportedRule>& rules);
+
+private:
+    QString m_ip;
+    QString m_user;
+    QString m_password;
 
     std::map<int, SupportedRule> m_supportedRules;
     unsigned short m_tcpServerPort = 0;

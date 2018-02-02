@@ -23,7 +23,7 @@ using namespace nx::sdk::metadata;
 
 void MetadataHandler::handleMetadata(
     Error error,
-    AbstractMetadataPacket* metadata)
+    MetadataPacket* metadata)
 {
     if (metadata == nullptr)
         return;

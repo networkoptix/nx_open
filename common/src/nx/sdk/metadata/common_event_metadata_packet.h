@@ -3,14 +3,13 @@
 #include <vector>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_packet.h>
-#include <nx/sdk/metadata/abstract_event_metadata_packet.h>
+#include <nx/sdk/metadata/events_metadata_packet.h>
 
 namespace nx {
 namespace sdk {
 namespace metadata {
 
-class CommonEventMetadataPacket: public nxpt::CommonRefCounter<AbstractEventMetadataPacket>
+class CommonEventMetadataPacket: public nxpt::CommonRefCounter<EventsMetadataPacket>
 {
 public:
     virtual ~CommonEventMetadataPacket();
@@ -21,13 +20,13 @@ public:
 
     virtual int64_t durationUsec() const override;
 
-    virtual AbstractDetectedEvent* nextItem() override;
+    virtual Event* nextItem() override;
 
     void setTimestampUsec(int64_t timestampUsec);
 
     void setDurationUsec(int64_t durationUsec);
 
-    void addEvent(AbstractDetectedEvent* event);
+    void addEvent(Event* event);
 
     void resetEvents();
 
@@ -35,9 +34,9 @@ private:
     int64_t m_timestampUsec = -1;
     int64_t m_durationUsec = -1;
 
-    std::vector<AbstractDetectedEvent*> m_events;
+    std::vector<Event*> m_events;
     int m_currentEventIndex = 0;
-    
+
 };
 
 } // namespace metadata

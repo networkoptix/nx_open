@@ -7,7 +7,7 @@ namespace sdk {
 namespace metadata {
 
 /**
- * Each class that implements AbstractDataPacket interface should properly handle this GUID in its
+ * Each class that implements DataPacket interface should properly handle this GUID in its
  * queryInterface() method.
  */
 static const nxpl::NX_GUID IID_DataPacket
@@ -16,7 +16,7 @@ static const nxpl::NX_GUID IID_DataPacket
 /**
  * Base class for every class that represents the packet of the data (e.g. audio, video, metadata).
  */
-class AbstractDataPacket: public nxpl::PluginInterface
+class DataPacket: public nxpl::PluginInterface
 {
 };
 

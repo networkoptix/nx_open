@@ -3,8 +3,8 @@
 #include <plugins/plugin_api.h>
 
 #include <nx/sdk/common.h>
-#include <nx/sdk/metadata/abstract_data_packet.h>
-#include <nx/sdk/metadata/abstract_metadata_packet.h>
+#include <nx/sdk/metadata/data_packet.h>
+#include <nx/sdk/metadata/metadata_packet.h>
 
 namespace nx {
 namespace sdk {
@@ -18,18 +18,16 @@ static const int NX_MORE_DATA = -23;
 /**
  * Interface for handler that processes metadata incoming from the plugin.
  */
-class AbstractMetadataHandler
+class MetadataHandler
 {
 public:
-    virtual ~AbstractMetadataHandler() = default;
+    virtual ~MetadataHandler() = default;
 
     /**
      * @param error Used for reporting errors to the outer code.
      * @param metadata Incoming from the plugin.
      */
-    virtual void handleMetadata(
-        Error error,
-        AbstractMetadataPacket* metadata) = 0;
+    virtual void handleMetadata(Error error, MetadataPacket* metadata) = 0;
 
     /**
      * Reads a parameter value from the manager settings stored by the server.
@@ -44,10 +42,10 @@ public:
 };
 
 /**
- * Each class that implements AbstractMetadataManager interface should properly handle this GUID in
+ * Each class that implements MetadataManager interface should properly handle this GUID in
  * its queryInterface method.
  */
-static const nxpl::NX_GUID IID_MetadataManager =
+static const nxpl::NX_GUID IID_CameraManager =
     {{0x48, 0x5a, 0x23, 0x51, 0x55, 0x73, 0x4f, 0xb5, 0xa9, 0x11, 0xe4, 0xfb, 0x22, 0x87, 0x79, 0x24}};
 
 class AbstractMetadataPlugin;
@@ -55,7 +53,7 @@ class AbstractMetadataPlugin;
 /**
  * Interface used to control the process of fetching metadata from the resource.
  */
-class AbstractMetadataManager: public nxpl::PluginInterface
+class CameraManager: public nxpl::PluginInterface
 {
 public:
     /**
@@ -64,9 +62,7 @@ public:
      * @param eventTypeListSize guid array size.
      * @return noError in case of success, other value otherwise.
      */
-    virtual Error startFetchingMetadata(
-        nxpl::NX_GUID* eventTypeList,
-        int eventTypeListSize) = 0;
+    virtual Error startFetchingMetadata(nxpl::NX_GUID* typeList, int typeListSize) = 0;
 
     /**
      * @param handler Processes event metadata and object metadata fetched by the plugin. The

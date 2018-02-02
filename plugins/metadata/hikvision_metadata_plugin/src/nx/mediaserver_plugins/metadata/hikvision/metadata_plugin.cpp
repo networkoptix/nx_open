@@ -51,15 +51,19 @@ MetadataPlugin::MetadataPlugin()
         }
     }
 
-    m_driverManifest = QJson::deserialized<Hikvision::DriverManifest>(m_manifest);
+    bool success = false;
+    m_driverManifest = QJson::deserialized<Hikvision::DriverManifest>(
+        m_manifest, Hikvision::DriverManifest(), &success);
+    if (!success)
+        NX_WARNING(this, lm("Can't deserialize driver manifest file"));
 }
 
 void* MetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataPlugin)
+    if (interfaceId == IID_Plugin)
     {
         addRef();
-        return static_cast<AbstractMetadataPlugin*>(this);
+        return static_cast<Plugin*>(this);
     }
 
     if (interfaceId == nxpl::IID_Plugin3)
@@ -108,18 +112,18 @@ void MetadataPlugin::setLocale(const char* locale)
     // Do nothing.
 }
 
-AbstractMetadataManager* MetadataPlugin::managerForResource(
-    const ResourceInfo& resourceInfo,
+CameraManager* MetadataPlugin::obtainCameraManager(
+    const CameraInfo& cameraInfo,
     Error* outError)
 {
     *outError = Error::noError;
 
-    const auto vendor = QString(resourceInfo.vendor).toLower();
+    const auto vendor = QString(cameraInfo.vendor).toLower();
 
     if (!vendor.startsWith(kHikvisionTechwinVendor))
         return nullptr;
 
-    auto supportedEvents = fetchSupportedEvents(resourceInfo);
+    auto supportedEvents = fetchSupportedEvents(cameraInfo);
     if (!supportedEvents)
         return nullptr;
 
@@ -127,19 +131,11 @@ AbstractMetadataManager* MetadataPlugin::managerForResource(
     deviceManifest.supportedEventTypes = *supportedEvents;
 
     auto manager = new MetadataManager(this);
-    manager->setResourceInfo(resourceInfo);
+    manager->setCameraInfo(cameraInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
 
     return manager;
-}
-
-AbstractSerializer* MetadataPlugin::serializerForType(
-    const nxpl::NX_GUID& typeGuid,
-    Error* outError)
-{
-    *outError = Error::typeIsNotSupported;
-    return nullptr;
 }
 
 const char* MetadataPlugin::capabilitiesManifest(Error* error) const
@@ -150,16 +146,6 @@ const char* MetadataPlugin::capabilitiesManifest(Error* error) const
 
 QList<QnUuid> MetadataPlugin::parseSupportedEvents(const QByteArray& data)
 {
-    auto eventDescriptorByInternalName = [this](const QString& internalName)
-    {
-        for (const auto& hikvisionEvent : m_driverManifest.outputEventTypes)
-        {
-            if (hikvisionEvent.internalName == internalName)
-                return hikvisionEvent;
-        }
-        return Hikvision::EventDescriptor();
-    };
-
     QList<QnUuid> result;
     auto supportedEvents = hikvision::AttributesParser::parseSupportedEventsXml(data);
     if (!supportedEvents)
@@ -170,37 +156,40 @@ QList<QnUuid> MetadataPlugin::parseSupportedEvents(const QByteArray& data)
         if (!eventTypeId.isNull())
         {
             result << eventTypeId;
-            auto descriptor = m_driverManifest.eventDescriptorById(eventTypeId);
-            descriptor = eventDescriptorByInternalName(descriptor.dependedEvent);
-            if (!descriptor.typeId.isNull())
-                result << descriptor.typeId;
+            const auto descriptor = m_driverManifest.eventDescriptorById(eventTypeId);
+            for (const auto& dependedName: descriptor.dependedEvent.split(','))
+            {
+                auto descriptor = m_driverManifest.eventDescriptorByInternalName(dependedName);
+                if (!descriptor.typeId.isNull())
+                    result << descriptor.typeId;
+            }
         }
     }
     return result;
 }
 
 boost::optional<QList<QnUuid>> MetadataPlugin::fetchSupportedEvents(
-    const ResourceInfo& resourceInfo)
+    const CameraInfo& cameraInfo)
 {
-    auto& data = m_cachedDeviceData[resourceInfo.sharedId];
+    auto& data = m_cachedDeviceData[cameraInfo.sharedId];
     if (!data.hasExpired())
         return data.supportedEventTypes;
 
-    nx::utils::Url url(resourceInfo.url);
+    nx::utils::Url url(cameraInfo.url);
     url.setPath("/ISAPI/Event/triggersCap");
-    url.setUserInfo(resourceInfo.login);
-    url.setPassword(resourceInfo.password);
+    url.setUserInfo(cameraInfo.login);
+    url.setPassword(cameraInfo.password);
     int statusCode = 0;
     QByteArray buffer;
     if (nx::network::http::downloadFileSync(url, &statusCode, &buffer) != SystemError::noError ||
         statusCode != nx::network::http::StatusCode::ok)
     {
         NX_WARNING(this,lm("Can't fetch supported events for device %1. HTTP status code: %2").
-            arg(resourceInfo.url).arg(statusCode));
+            arg(cameraInfo.url).arg(statusCode));
         return boost::optional<QList<QnUuid>>();
     }
     NX_DEBUG(this, lm("Device url %1. RAW list of supported analytics events: %2").
-        arg(resourceInfo.url).arg(buffer));
+        arg(cameraInfo.url).arg(buffer));
 
     data.supportedEventTypes = parseSupportedEvents(buffer);
     return data.supportedEventTypes;
@@ -218,9 +207,9 @@ const Hikvision::DriverManifest& MetadataPlugin::driverManifest() const
 
 extern "C" {
 
-    NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
-    {
-        return new nx::mediaserver::plugins::hikvision::MetadataPlugin();
-    }
+NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
+{
+    return new nx::mediaserver::plugins::hikvision::MetadataPlugin();
+}
 
 } // extern "C"

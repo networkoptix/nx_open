@@ -77,6 +77,16 @@ bool WearableManager::addUpload(const QnSecurityCamResourcePtr& camera, const QS
     return true; //< Just ignore it silently.
 }
 
+void WearableManager::cancelUploads(const QnSecurityCamResourcePtr& camera)
+{
+    QnUuid cameraId = camera->getId();
+
+    if (!d->workers.contains(cameraId))
+        return;
+
+    d->workers[cameraId]->cancel();
+}
+
 void WearableManager::cancelAllUploads()
 {
     dropAllWorkers();
@@ -101,6 +111,12 @@ WearableWorker* WearableManager::ensureWorker(const QnSecurityCamResourcePtr& ca
 
     connect(result, &WearableWorker::error, this, &WearableManager::error);
     connect(result, &WearableWorker::stateChanged, this, &WearableManager::stateChanged);
+    connect(result, &WearableWorker::finished, this,
+        [this, result, cameraId]()
+        {
+            result->deleteLater();
+            d->workers.remove(cameraId);
+        });
 
     return result;
 }

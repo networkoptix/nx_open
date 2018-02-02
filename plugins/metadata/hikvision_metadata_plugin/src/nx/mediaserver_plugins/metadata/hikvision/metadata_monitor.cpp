@@ -12,7 +12,7 @@
 #include <nx/fusion/serialization_format.h>
 #include "attributes_parser.h"
 #include "string_helper.h"
-#include <nx/sdk/metadata/abstract_event_metadata_packet.h>
+#include <nx/sdk/metadata/events_metadata_packet.h>
 
 namespace nx {
 namespace mediaserver {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/sdk/common.h>
-#include <nx/sdk/metadata/abstract_iterable_metadata_packet.h>
+#include "iterable_metadata_packet.h"
 
 namespace nx {
 namespace sdk {
@@ -48,13 +48,13 @@ struct Rect
  * Each class that implements AbstractDetectedObject interface
  * should properly handle this GUID in its queryInterface method
  */
-static const nxpl::NX_GUID IID_DetectedObject
+static const nxpl::NX_GUID IID_Object
     = {{0x0f, 0xf4, 0xa4, 0x6f, 0xfd, 0x08, 0x4f, 0x4a, 0x97, 0x88, 0x16, 0xa0, 0x8c, 0xd6, 0x4a, 0x29}};
 
 /**
  * Represents a single object detected on the scene.
  */
-class AbstractDetectedObject: public AbstractMetadataItem
+class Object: public MetadataItem
 {
 public:
     /**
@@ -90,25 +90,23 @@ public:
 };
 
 /**
- * Each class that implements AbstractObjectsMetadataPacket interface
+ * Each class that implements ObjectsMetadataPacket interface
  * should properly handle this GUID in its queryInterface method
  */
-static const nxpl::NX_GUID IID_DetectionMetadataPacket
+static const nxpl::NX_GUID IID_ObjectsMetadataPacket
     = {{0x89, 0x89, 0xa1, 0x84, 0x72, 0x09, 0x4c, 0xde, 0xbb, 0x46, 0x09, 0xc1, 0x23, 0x2e, 0x31, 0x85}};
 
 /**
- * @brief The AbstractObjectsMetadataPacket class is an interface for metadata packet
- * that contains the data about detected on the scene objects.
+ * Interface for metadata packet that contains data about objects detected on the scene.
  */
-class AbstractObjectsMetadataPacket: public AbstractIterableMetadataPacket
+class ObjectsMetadataPacket: public IterableMetadataPacket
 {
 public:
-
     /**
      * @return next detected object or null if no more objects left.
      * This functions should not modify objects and behave like a constant iterator.
      */
-    virtual AbstractDetectedObject* nextItem() = 0;
+    virtual Object* nextItem() = 0;
 };
 
 } // namespace metadata

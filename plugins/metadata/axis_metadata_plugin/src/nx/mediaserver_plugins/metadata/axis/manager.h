@@ -7,7 +7,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/sdk/metadata/metadata_manager.h>
 
 #include "identified_supported_event.h"
 #include "monitor.h"
@@ -17,12 +17,12 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace axis {
 
-class AbstractMetadataHandler;
+class MetadataHandler;
 
-class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
+class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::MetadataManager>
 {
 public:
-    Manager(const nx::sdk::ResourceInfo& resourceInfo,
+    Manager(const nx::sdk::CameraInfo& cameraInfo,
         const QList<IdentifiedSupportedEvent>& events);
 
     virtual ~Manager();
@@ -31,9 +31,10 @@ public:
 
     virtual nx::sdk::Error setHandler(
         nx::sdk::metadata::AbstractMetadataHandler* handler) override;
+
     virtual nx::sdk::Error startFetchingMetadata(
-        nxpl::NX_GUID* eventTypeList,
-        int eventTypeListSize) override;
+        nxpl::NX_GUID* typeList,
+        int typeListSize) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
@@ -57,7 +58,7 @@ private:
     Monitor* m_monitor = nullptr;
     QList<QByteArray> m_givenManifests; //< Place to store manifests we gave to caller
     // to provide 1) sufficient lifetime and 2) memory releasing in destructor.
-    nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
+    nx::sdk::metadata::MetadataHandler* m_handler = nullptr;
 };
 
 } // axis

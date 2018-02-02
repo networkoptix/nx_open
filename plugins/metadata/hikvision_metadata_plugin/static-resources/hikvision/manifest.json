@@ -21,7 +21,7 @@
             "negativeState": "is not detected",
             "flags": "stateDependent"
         },
-		
+
         {
             "eventTypeId": "{4168BB12-3005-4855-A5A2-A5753C0894A0}",
             "eventName": {
@@ -259,7 +259,8 @@
                 }
             },
             "internalName": "BlackList",
-            "description": "Black list"
+            "description": "Black list",
+            "dependedEvent": "lpr,otherlist"
         },
         {
             "eventTypeId": "{F61119D1-BA55-4731-A541-232CB611DB1E}",
@@ -270,7 +271,7 @@
             },
             "internalName": "WhiteList",
             "description": "White list",
-            "dependedEvent": "otherlist"
+            "dependedEvent": "lpr,otherlist"
         },
         {
             "eventTypeId": "{71004AC7-D190-444E-888A-EA61997B6CD2}",
@@ -280,7 +281,19 @@
                 }
             },
             "internalName": "otherlist",
-            "description": "Other list"
+            "description": "Other list",
+            "dependedEvent": "lpr"
+        },
+        {
+            "eventTypeId": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}",
+            "eventName": {
+                "value": "LPR - Any",
+                "localization": {
+                }
+            },
+            "internalName": "lpr",
+            "description": "LPR",
+            "flags": "forced"
         },
         {
             "eventTypeId": "{4DAE9597-7A81-4A48-AEDC-37D5B184DB11}",

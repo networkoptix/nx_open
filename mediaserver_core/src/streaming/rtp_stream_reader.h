@@ -1,7 +1,5 @@
-#ifndef h264_stream_provider_h_2015
-#define h264_stream_provider_h_2015
-
-#ifdef ENABLE_DATA_PROVIDERS
+#pragma once
+#if defined(ENABLE_DATA_PROVIDERS)
 
 #include <providers/spush_media_stream_provider.h>
 #include "network/multicodec_rtp_reader.h"
@@ -32,7 +30,4 @@ private:
     size_t m_dataPassed = 0;
 };
 
-#endif // ENABLE_DATA_PROVIDERS
-
-#endif //h264_stream_provider_h_2015
-
+#endif // defined(ENABLE_DATA_PROVIDERS)

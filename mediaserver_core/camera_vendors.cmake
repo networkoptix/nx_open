@@ -33,7 +33,7 @@ set(camera_vendors
     droid
     test_camera
     stardot
-    iqe
+    iqinvision
     isd
     pulse_camera
     flir
@@ -55,7 +55,7 @@ if(NOT targetDevice MATCHES "android|ios|edge1")
     nx_enable_camera_vendor_old(droid)
     nx_enable_camera_vendor_old(test_camera)
     nx_enable_camera_vendor_old(stardot)
-    nx_enable_camera_vendor_old(iqe)
+    nx_enable_camera_vendor(iqinvision)
     nx_enable_camera_vendor_old(isd)
     nx_enable_camera_vendor_old(pulse_camera)
     nx_enable_camera_vendor_old(flir)

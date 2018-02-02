@@ -1,13 +1,10 @@
-#ifndef cl_mjpeg_dataprovider_h_1140
-#define cl_mjpeg_dataprovider_h_1140
-
-#ifdef ENABLE_DATA_PROVIDERS
+#pragma once
+#if defined(ENABLE_DATA_PROVIDERS)
 
 #include <memory>
 
 #include <providers/spush_media_stream_provider.h>
 #include <nx/network/deprecated/simple_http_client.h>
-
 
 class MJPEGStreamReader: public CLServerPushStreamReader
 {
@@ -33,6 +30,4 @@ private:
     QString m_request;
 };
 
-#endif // ENABLE_DATA_PROVIDERS
-
-#endif //cl_mjpeg_dataprovider_h_1140
+#endif // defined(ENABLE_DATA_PROVIDERS)
