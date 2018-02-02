@@ -16,7 +16,7 @@ Validate Register Success
 
 Check Bad Email Input
     [arguments]    ${email}
-    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT}    ${CREATE ACCOUNT BUTTON}
+    Wait Until Elements Are Visible    ${REGISTER EMAIL INPUT}    ${CREATE ACCOUNT BUTTON}
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Click Button    ${CREATE ACCOUNT BUTTON}
     ${class}    Get Element Attribute    ${REGISTER EMAIL INPUT}/../..    class
