@@ -43,9 +43,9 @@ nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
     using namespace std::chrono;
 
     auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
-    auto commonEvent1 = createCommonEvent(identifiedSupportedEvents, /*active*/true);
+    auto commonEvent1 = createCommonEvent(identifiedSupportedEvents, /*active*/ true);
     packet->addEvent(commonEvent1);
-    auto commonEvent2 = createCommonEvent(identifiedSupportedEvents, /*active*/false);
+    auto commonEvent2 = createCommonEvent(identifiedSupportedEvents, /*active*/ false);
     packet->addEvent(commonEvent2);
     packet->setTimestampUsec(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
