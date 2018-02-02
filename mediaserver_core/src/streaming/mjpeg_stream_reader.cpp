@@ -1,6 +1,5 @@
-#include "onvif_mjpeg.h"
-
-#ifdef ENABLE_DATA_PROVIDERS
+#include "mjpeg_stream_reader.h"
+#if defined(ENABLE_DATA_PROVIDERS)
 
 #include "nx/streaming/video_data_packet.h"
 #include <core/resource/camera_resource.h>
@@ -172,7 +171,7 @@ CameraDiagnostics::Result MJPEGStreamReader::openStreamInternal(bool isCameraCon
 
 	if (virtRes)
 		virtRes->updateSourceUrl(requestedUrl.toString(), getRole());
-	
+
     switch( httpStatus )
     {
         case CL_HTTP_SUCCESS:
@@ -194,4 +193,4 @@ bool MJPEGStreamReader::isStreamOpened() const
     return ( mHttpClient.get() && mHttpClient->isOpened() );
 }
 
-#endif // ENABLE_DATA_PROVIDERS
+#endif // defined(ENABLE_DATA_PROVIDERS)

@@ -1,8 +1,8 @@
-#include "rtp_stream_provider.h"
+#include "rtp_stream_reader.h"
+#if defined(ENABLE_DATA_PROVIDERS)
+
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/log.h>
-
-#ifdef ENABLE_DATA_PROVIDERS
 
 static const size_t kPacketCountToOmitLog = 50;
 
@@ -111,4 +111,4 @@ void QnRtpStreamReader::pleaseStop()
     m_rtpReader.pleaseStop();
 }
 
-#endif // ENABLE_DATA_PROVIDERS
+#endif // defined(ENABLE_DATA_PROVIDERS)

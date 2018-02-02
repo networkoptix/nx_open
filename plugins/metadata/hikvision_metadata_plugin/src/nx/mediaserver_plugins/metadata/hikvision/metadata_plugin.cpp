@@ -60,10 +60,10 @@ MetadataPlugin::MetadataPlugin()
 
 void* MetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataPlugin)
+    if (interfaceId == IID_Plugin)
     {
         addRef();
-        return static_cast<AbstractMetadataPlugin*>(this);
+        return static_cast<Plugin*>(this);
     }
 
     if (interfaceId == nxpl::IID_Plugin3)
@@ -112,18 +112,18 @@ void MetadataPlugin::setLocale(const char* locale)
     // Do nothing.
 }
 
-AbstractMetadataManager* MetadataPlugin::managerForResource(
-    const ResourceInfo& resourceInfo,
+CameraManager* MetadataPlugin::obtainCameraManager(
+    const CameraInfo& cameraInfo,
     Error* outError)
 {
     *outError = Error::noError;
 
-    const auto vendor = QString(resourceInfo.vendor).toLower();
+    const auto vendor = QString(cameraInfo.vendor).toLower();
 
     if (!vendor.startsWith(kHikvisionTechwinVendor))
         return nullptr;
 
-    auto supportedEvents = fetchSupportedEvents(resourceInfo);
+    auto supportedEvents = fetchSupportedEvents(cameraInfo);
     if (!supportedEvents)
         return nullptr;
 
@@ -131,19 +131,11 @@ AbstractMetadataManager* MetadataPlugin::managerForResource(
     deviceManifest.supportedEventTypes = *supportedEvents;
 
     auto manager = new MetadataManager(this);
-    manager->setResourceInfo(resourceInfo);
+    manager->setCameraInfo(cameraInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
 
     return manager;
-}
-
-AbstractSerializer* MetadataPlugin::serializerForType(
-    const nxpl::NX_GUID& typeGuid,
-    Error* outError)
-{
-    *outError = Error::typeIsNotSupported;
-    return nullptr;
 }
 
 const char* MetadataPlugin::capabilitiesManifest(Error* error) const
@@ -177,27 +169,27 @@ QList<QnUuid> MetadataPlugin::parseSupportedEvents(const QByteArray& data)
 }
 
 boost::optional<QList<QnUuid>> MetadataPlugin::fetchSupportedEvents(
-    const ResourceInfo& resourceInfo)
+    const CameraInfo& cameraInfo)
 {
-    auto& data = m_cachedDeviceData[resourceInfo.sharedId];
+    auto& data = m_cachedDeviceData[cameraInfo.sharedId];
     if (!data.hasExpired())
         return data.supportedEventTypes;
 
-    QUrl url(resourceInfo.url);
+    QUrl url(cameraInfo.url);
     url.setPath("/ISAPI/Event/triggersCap");
-    url.setUserInfo(resourceInfo.login);
-    url.setPassword(resourceInfo.password);
+    url.setUserInfo(cameraInfo.login);
+    url.setPassword(cameraInfo.password);
     int statusCode = 0;
     QByteArray buffer;
     if (nx_http::downloadFileSync(url, &statusCode, &buffer) != SystemError::noError ||
         statusCode != nx_http::StatusCode::ok)
     {
         NX_WARNING(this,lm("Can't fetch supported events for device %1. HTTP status code: %2").
-            arg(resourceInfo.url).arg(statusCode));
+            arg(cameraInfo.url).arg(statusCode));
         return boost::optional<QList<QnUuid>>();
     }
     NX_DEBUG(this, lm("Device url %1. RAW list of supported analytics events: %2").
-        arg(resourceInfo.url).arg(buffer));
+        arg(cameraInfo.url).arg(buffer));
 
     data.supportedEventTypes = parseSupportedEvents(buffer);
     return data.supportedEventTypes;

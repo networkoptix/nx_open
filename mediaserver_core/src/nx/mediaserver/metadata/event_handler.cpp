@@ -3,8 +3,8 @@
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_internal_tools.h>
 
-#include <nx/sdk/metadata/abstract_event_metadata_packet.h>
-#include <nx/sdk/metadata/abstract_detection_metadata_packet.h>
+#include <nx/sdk/metadata/events_metadata_packet.h>
+#include <nx/sdk/metadata/objects_metadata_packet.h>
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/events/events_fwd.h>
 
@@ -20,22 +20,22 @@ using namespace nx::sdk::metadata;
 
 void EventHandler::handleMetadata(
     Error error,
-    AbstractMetadataPacket* metadata)
+    MetadataPacket* metadata)
 {
-    nxpt::ScopedRef<AbstractMetadataPacket> metadataPacket(metadata, false);
+    nxpt::ScopedRef<MetadataPacket> metadataPacket(metadata, false);
     if (error != Error::noError)
         return;
 
-    nxpt::ScopedRef<AbstractEventMetadataPacket> eventPacket(
-        (AbstractEventMetadataPacket*)
-        metadata->queryInterface(IID_EventMetadataPacket), false);
+    nxpt::ScopedRef<EventsMetadataPacket> eventPacket(
+        (EventsMetadataPacket*)
+        metadata->queryInterface(IID_EventsMetadataPacket), false);
 
     if (!eventPacket)
         return;
 
     while(true)
     {
-        nxpt::ScopedRef<AbstractDetectedEvent> eventData(
+        nxpt::ScopedRef<Event> eventData(
             eventPacket->nextItem(), false);
 
         if (!eventData)

@@ -48,10 +48,10 @@ Plugin::Plugin()
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataPlugin)
+    if (interfaceId == IID_Plugin)
     {
         addRef();
-        return static_cast<AbstractMetadataPlugin*>(this);
+        return static_cast<Plugin*>(this);
     }
 
     if (interfaceId == nxpl::IID_Plugin3)
@@ -97,12 +97,12 @@ void Plugin::setLocale(const char* locale)
 {
 }
 
-AbstractMetadataManager* Plugin::managerForResource(
-    const ResourceInfo& resourceInfo,
+CameraManager* Plugin::obtainCameraManager(
+    const CameraInfo& cameraInfo,
     Error* outError)
 {
     *outError = Error::noError;
-    const auto vendor = QString(resourceInfo.vendor).toLower();
+    const auto vendor = QString(cameraInfo.vendor).toLower();
     if (!vendor.startsWith(kVcaVendor))
     {
         NX_PRINT << kPluginName << " got unsupported resource. Manager can not be created.";
@@ -111,16 +111,8 @@ AbstractMetadataManager* Plugin::managerForResource(
     else
     {
         NX_PRINT << kPluginName << " creates new manager.";
-        return new Manager(this, resourceInfo, m_typedManifest);
+        return new Manager(this, cameraInfo, m_typedManifest);
     }
-}
-
-AbstractSerializer* Plugin::serializerForType(
-    const nxpl::NX_GUID& typeGuid,
-    Error* outError)
-{
-    *outError = Error::typeIsNotSupported;
-    return nullptr;
 }
 
 const char* Plugin::capabilitiesManifest(Error* error) const

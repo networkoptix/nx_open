@@ -77,16 +77,16 @@ public:
     int getChannel() const;
 
 private:
-    QString getFilePrefix(const QDate& datetime);
-    void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate);
-    void fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile);
+    QString getFilePrefix(const QDate& datetime) const;
+    void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate) const;
+    void fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile) const;
     bool saveToArchiveInternal(QnConstMetaDataV1Ptr data);
-    QString getChannelPrefix();
+    QString getChannelPrefix() const;
 
-    bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDateTime& time);
-    bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDate& time);
-    bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, qint64 msTime);
-    bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, QFile& indexFile);
+    bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDateTime& time) const;
+    bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDate& time) const;
+    bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, qint64 msTime) const;
+    bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, QFile& indexFile) const;
 
     void loadRecordedRange();
     int getSizeForTime(qint64 timeMs, bool reloadIndex);
@@ -101,12 +101,11 @@ private:
     QFile m_detailedMotionFile;
     QFile m_detailedIndexFile;
     qint64 m_firstTime;
-    QnMutex m_fileAccessMutex;
-    QnMutex m_maskMutex;
+    QnMutex m_writeMutex;
     QnMetaDataV1Ptr m_lastDetailedData;
 
-    qint64 m_minMotionTime;
-    qint64 m_maxMotionTime;
+    std::atomic<qint64> m_minMotionTime;
+    std::atomic<qint64> m_maxMotionTime;
     qint64 m_lastRecordedTime;
     qint64 m_lastTimestamp;
     int m_middleRecordNum;

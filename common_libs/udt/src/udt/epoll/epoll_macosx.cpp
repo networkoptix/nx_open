@@ -115,7 +115,12 @@ int EpollMacosx::poll(
             continue;
         }
 
-        const bool failure = (ev[i].flags & (EV_ERROR | EV_EOF)) > 0;
+        // EV_EOF is OK in case of reading socket. Because it signals EOF is present somewhere in the read buffer.
+        // There may still be some data to read.
+        // At the same time, while writing this signals connection reset.
+
+        const bool failure = (ev[i].flags & EV_ERROR) > 0;
+        const bool eof = (ev[i].flags & EV_EOF) > 0;
         if ((NULL != lrfds) && (ev[i].filter == EVFILT_READ))
         {
             lrfds->emplace(
@@ -126,7 +131,7 @@ int EpollMacosx::poll(
         {
             lwfds->emplace(
                 ev[i].ident,
-                UDT_EPOLL_OUT | (failure ? UDT_EPOLL_ERR : 0));
+                UDT_EPOLL_OUT | ((failure || eof) ? UDT_EPOLL_ERR : 0));
         }
     }
 

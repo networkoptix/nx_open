@@ -151,14 +151,15 @@ namespace aio {
     */
     aio::EventType PollSet::const_iterator::eventType() const
     {
-        const int kFilterType = m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].filter;
+        const int filterType = m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].filter;
+        const bool failure = (m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].flags & EV_ERROR) > 0;
+        const bool eof = (m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].flags & EV_EOF) > 0;
+
         aio::EventType revents = aio::etNone;
-        if( m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].flags & EV_ERROR )
-            revents = aio::etError;
-        else if( kFilterType == EVFILT_READ )
-            revents = aio::etRead;
-        else if( kFilterType == EVFILT_WRITE )
-            revents = aio::etWrite;
+        if( filterType == EVFILT_READ )
+            revents = failure ? aio::etError : aio::etRead;
+        else if( filterType == EVFILT_WRITE )
+            revents = (failure || eof) ? aio::etError : aio::etWrite;
         return revents;
     }
 

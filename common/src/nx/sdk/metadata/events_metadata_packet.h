@@ -1,20 +1,20 @@
 #pragma once
 
-#include <nx/sdk/metadata/abstract_iterable_metadata_packet.h>
-#include <nx/sdk/metadata/abstract_metadata_item.h>
+#include <nx/sdk/metadata/iterable_metadata_packet.h>
+#include <nx/sdk/metadata/metadata_item.h>
 
 namespace nx {
 namespace sdk {
 namespace metadata {
 
 /**
- * Each class that implements AbstractDetectedEvent interface
+ * Each class that implements Event interface
  * should properly handle this GUID in its queryInterface method
  */
-static const nxpl::NX_GUID IID_DetectedEvent
+static const nxpl::NX_GUID IID_Event
     = {{0xd5, 0xe1, 0x49, 0x96, 0x63, 0x33, 0x42, 0x5a, 0x8f, 0xee, 0xbc, 0x23, 0x50, 0x03, 0xc8, 0x0f}};
 
-class AbstractDetectedEvent: public AbstractMetadataItem
+class Event: public MetadataItem
 {
 
 public:
@@ -41,24 +41,24 @@ public:
 
 
 /**
-* Each class that implements AbstractEventMetadataPacket interface
+* Each class that implements EventsMetadataPacket interface
 * should properly handle this GUID in its queryInterface method
 */
-static const nxpl::NX_GUID IID_EventMetadataPacket
+static const nxpl::NX_GUID IID_EventsMetadataPacket
     = {{0x20, 0xfc, 0xa8, 0x08, 0x17, 0x6b, 0x48, 0xa6, 0x92, 0xfd, 0xba, 0xb5, 0x9d, 0x37, 0xd7, 0xc0}};
 
 /**
- * @brief The AbstractEventMetadataPacket class is an interface for metadata packet
+ * @brief The EventsMetadataPacket class is an interface for metadata packet
  * containing information about some event.
  */
-class AbstractEventMetadataPacket: public AbstractIterableMetadataPacket
+class EventsMetadataPacket: public IterableMetadataPacket
 {
 public:
     /**
     * @return next detected object or null if no more objects left.
     * This functions should not modify objects and behave like a constant iterator.
     */
-    virtual AbstractDetectedEvent* nextItem() = 0;
+    virtual Event* nextItem() = 0;
 };
 
 } // namespace metadata
