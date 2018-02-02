@@ -1,6 +1,6 @@
 #ifdef ENABLE_DROID
 
-#include "../onvif/dataprovider/onvif_mjpeg.h"
+#include <streaming/mjpeg_stream_reader.h>
 #include "ipwebcam_droid_resource.h"
 #include "ipwebcam_droid_stream_reader.h"
 

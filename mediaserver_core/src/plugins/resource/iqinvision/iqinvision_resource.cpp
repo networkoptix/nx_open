@@ -1,6 +1,6 @@
-#include "../onvif/dataprovider/onvif_mjpeg.h"
+#include <streaming/mjpeg_stream_reader.h>
 #include "iqinvision_resource.h"
-#include "../onvif/dataprovider/rtp_stream_provider.h"
+#include <streaming/rtp_stream_reader.h>
 #include <common/static_common_module.h>
 
 const QString QnPlIqResource::MANUFACTURE(lit("IqEye"));

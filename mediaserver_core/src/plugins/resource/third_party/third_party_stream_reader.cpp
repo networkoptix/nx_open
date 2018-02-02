@@ -13,7 +13,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <plugins/resource/third_party/motion_data_picture.h>
-#include <plugins/resource/onvif/dataprovider/onvif_mjpeg.h>
+#include <streaming/mjpeg_stream_reader.h>
 #include <network/multicodec_rtp_reader.h>
 
 #include <utils/common/app_info.h>

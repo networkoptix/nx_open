@@ -11,7 +11,7 @@
 #include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
 
-#include <plugins/resource/onvif/dataprovider/onvif_mjpeg.h>
+#include <streaming/mjpeg_stream_reader.h>
 #include <core/resource_management/resource_pool.h>
 
 #include "axis_stream_reader.h"
