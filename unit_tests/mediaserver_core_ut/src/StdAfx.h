@@ -1,3 +1,5 @@
+#pragma once
+
 #include <nx/utils/compiler_options.h>
 #include "custom_printers.h"
 
