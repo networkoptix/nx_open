@@ -50,10 +50,10 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
         return static_cast<CameraManager*>(this);
     }
 
-    if (interfaceId == IID_ConsumingMetadataManager)
+    if (interfaceId == IID_ConsumingCameraManager)
     {
         addRef();
-        return static_cast<AbstractConsumingMetadataManager*>(this);
+        return static_cast<ConsumingCameraManager*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)
@@ -100,7 +100,7 @@ Error Manager::startFetchingMetadata(
     return Error::noError;
 }
 
-nx::sdk::Error Manager::putData(nx::sdk::metadata::AbstractDataPacket* dataPacket)
+nx::sdk::Error Manager::pushDataPacket(nx::sdk::metadata::DataPacket* dataPacket)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
     m_handler->handleMetadata(Error::noError, cookSomeObjects(dataPacket));
@@ -218,15 +218,15 @@ MetadataPacket* Manager::cookSomeObjects(
     dt = modf(dt, &intPart) * 0.75;
 
     *reinterpret_cast<int*>(objectId.bytes) = static_cast<int>(intPart);
-    object->setId(objectId);
+    commonObject->setId(objectId);
 
-    object->setBoundingBox(Rect(dt, dt, 0.25, 0.25));
+    commonObject->setBoundingBox(Rect(dt, dt, 0.25, 0.25));
 
     auto objectPacket = new CommonObjectsMetadataPacket();
     objectPacket->setTimestampUsec(videoPacket->timestampUsec());
     objectPacket->setDurationUsec(1000000LL * 10);
     objectPacket->addItem(commonObject);
-    return eventPacket;
+    return objectPacket;
 }
 
 int64_t Manager::usSinceEpoch() const

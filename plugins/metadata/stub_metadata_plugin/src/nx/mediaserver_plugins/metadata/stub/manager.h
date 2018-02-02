@@ -28,7 +28,7 @@ public:
         int /*typeListSize*/) override;
 
     virtual nx::sdk::Error setHandler(
-        nx::sdk::metadata::AbstractMetadataHandler* handler) override;
+        nx::sdk::metadata::MetadataHandler* handler) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
@@ -37,7 +37,7 @@ public:
 
     virtual void freeManifest(const char* data) override;
 
-    virtual nx::sdk::Error putData(nx::sdk::metadata::AbstractDataPacket* dataPacket) override;
+    virtual nx::sdk::Error pushDataPacket(nx::sdk::metadata::DataPacket* dataPacket) override;
 
 private:
     nx::sdk::Error stopFetchingMetadataUnsafe();

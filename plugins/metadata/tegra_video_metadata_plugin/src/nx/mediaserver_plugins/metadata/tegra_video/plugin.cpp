@@ -12,8 +12,8 @@ namespace tegra_video {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-AbstractMetadataManager* Plugin::managerForResource(
-    const ResourceInfo& /*resourceInfo*/, Error* /*outError*/)
+CameraManager* Plugin::obtainCameraManager(
+    const CameraInfo& /*cameraInfo*/, Error* /*outError*/)
 {
     return new Manager(this);
 }

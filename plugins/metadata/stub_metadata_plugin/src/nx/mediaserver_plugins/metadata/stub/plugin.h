@@ -8,7 +8,7 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace stub {
 
-class Plugin: public nxpt::CommonRefCounter<nx::sdk::metadata::MetadataPlugin>
+class Plugin: public nxpt::CommonRefCounter<nx::sdk::metadata::Plugin>
 {
 public:
     Plugin();

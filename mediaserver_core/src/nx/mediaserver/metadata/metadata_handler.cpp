@@ -31,26 +31,26 @@ void MetadataHandler::handleMetadata(
     if (error != Error::noError)
         return;
 
-    nxpt::ScopedRef<AbstractEventMetadataPacket> eventsPacket(
-        metadata->queryInterface(IID_EventMetadataPacket));
+    nxpt::ScopedRef<EventsMetadataPacket> eventsPacket(
+        metadata->queryInterface(IID_EventsMetadataPacket));
     if (eventsPacket)
         handleEventsPacket(std::move(eventsPacket));
 
-    nxpt::ScopedRef<AbstractObjectsMetadataPacket> objectsPacket(
-        metadata->queryInterface(IID_DetectionMetadataPacket));
+    nxpt::ScopedRef<ObjectsMetadataPacket> objectsPacket(
+        metadata->queryInterface(IID_MetadataPacket));
     if (objectsPacket)
         handleObjectsPacket(std::move(objectsPacket));
 }
 
-void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<AbstractEventMetadataPacket> packet)
+void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> packet)
 {
     while (true)
     {
-        nxpt::ScopedRef<AbstractMetadataItem> item(packet->nextItem(), /*increaseRef*/ false);
+        nxpt::ScopedRef<MetadataItem> item(packet->nextItem(), /*increaseRef*/ false);
         if (!item)
             break;
 
-        nxpt::ScopedRef<AbstractDetectedEvent> eventData(item->queryInterface(IID_DetectedEvent));
+        nxpt::ScopedRef<Event> eventData(item->queryInterface(IID_Event));
         if (eventData)
         {
             auto timestampUsec = packet->timestampUsec();
@@ -58,17 +58,17 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<AbstractEventMetadataPa
         }
         else
         {
-            NX_VERBOSE(this) << "ERROR: Received event does not implement AbstractDetectedEvent";
+            NX_VERBOSE(this) << "ERROR: Received event does not implement Event";
         }
     }
 }
 
-void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<AbstractObjectsMetadataPacket> packet)
+void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket> packet)
 {
     nx::common::metadata::DetectionMetadataPacket data;
     while (true)
     {
-        nxpt::ScopedRef<AbstractDetectedObject> item(packet->nextItem(), /*increaseRef*/ false);
+        nxpt::ScopedRef<Object> item(packet->nextItem(), /*increaseRef*/ false);
         if (!item)
             break;
         nx::common::metadata::DetectedObject object;
@@ -100,7 +100,7 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<AbstractObjectsMetadat
 }
 
 void MetadataHandler::handleMetadataEvent(
-    nxpt::ScopedRef<AbstractDetectedEvent> eventData,
+    nxpt::ScopedRef<Event> eventData,
     qint64 timestampUsec)
 {
     const auto eventState = eventData->isActive()

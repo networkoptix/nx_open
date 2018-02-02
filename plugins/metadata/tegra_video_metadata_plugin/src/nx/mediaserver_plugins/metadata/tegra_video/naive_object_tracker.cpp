@@ -12,7 +12,7 @@
 
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_internal_tools.h>
-#include <nx/sdk/metadata/common_detected_object.h>
+#include <nx/sdk/metadata/common_object.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/sdk/metadata/common_attribute.h>
 
@@ -26,7 +26,7 @@ namespace tegra_video {
 namespace sdk = nx::sdk::metadata;
 
 void NaiveObjectTracker::filterAndTrack(
-    std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* outMetadataPackets,
+    std::vector<nx::sdk::metadata::MetadataPacket*>* outMetadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs)
 {
@@ -183,7 +183,7 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
 {
     for (auto& item: m_cachedObjects)
     {
-        auto object = new nx::sdk::metadata::CommonDetectedObject();
+        auto object = new nx::sdk::metadata::CommonObject();
         auto& cached = item.second;
 
         bool needToApplySpeed = ini().postprocApplySpeedToCachedRectangles

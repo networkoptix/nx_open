@@ -9,7 +9,7 @@
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_internal_tools.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
-#include <nx/sdk/metadata/common_detected_object.h>
+#include <nx/sdk/metadata/common_object.h>
 
 #include "tegra_video_metadata_plugin_ini.h"
 #include "attribute_options.h"
@@ -133,7 +133,7 @@ bool Manager::pushVideoFrame(const CommonCompressedVideoPacket* videoFrame)
     return true;
 }
 
-bool Manager::pullMetadataPackets(std::vector<AbstractMetadataPacket*>* metadataPackets)
+bool Manager::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPackets)
 {
     while (m_tegraVideo->hasMetadata())
     {
@@ -171,7 +171,7 @@ bool Manager::pullMetadataPackets(std::vector<AbstractMetadataPacket*>* metadata
 // private
 
 bool Manager::makeMetadataPacketsFromRects(
-    std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+    std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
 {
@@ -191,7 +191,7 @@ bool Manager::makeMetadataPacketsFromRects(
 }
 
 bool Manager::makeMetadataPacketsFromRectsPostprocNone(
-    std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+    std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
 {
@@ -203,14 +203,14 @@ bool Manager::makeMetadataPacketsFromRectsPostprocNone(
 
     for (const auto& rect: rects)
     {
-        auto detectedObject = new CommonDetectedObject();
+        auto commonObject = new CommonObject();
 
         const auto objectId = nxpt::fromQnUuidToPluginGuid(QnUuid::createUuid());
-        detectedObject->setId(objectId);
-        detectedObject->setTypeId(m_objectTypeId);
+        commonObject->setId(objectId);
+        commonObject->setTypeId(m_objectTypeId);
 
-        detectedObject->setBoundingBox(Rect(rect.x, rect.y, rect.w, rect.h));
-        objectPacket->addItem(detectedObject);
+        commonObject->setBoundingBox(Rect(rect.x, rect.y, rect.w, rect.h));
+        objectPacket->addItem(commonObject);
     }
     metadataPackets->push_back(objectPacket);
 
@@ -219,7 +219,7 @@ bool Manager::makeMetadataPacketsFromRectsPostprocNone(
 }
 
 bool Manager::makeMetadataPacketsFromRectsPostprocPed(
-    std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+    std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
 {
@@ -228,7 +228,7 @@ bool Manager::makeMetadataPacketsFromRectsPostprocPed(
 }
 
 bool Manager::makeMetadataPacketsFromRectsPostprocCar(
-    std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+    std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
 {

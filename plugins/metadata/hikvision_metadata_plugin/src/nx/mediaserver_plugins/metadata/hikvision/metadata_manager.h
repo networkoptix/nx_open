@@ -19,6 +19,7 @@ namespace mediaserver {
 namespace plugins {
 namespace hikvision {
 
+// TODO: Rename and change namespaces the same way as e.g. Stub plugin.
 class MetadataManager:
     public QObject,
     public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
@@ -35,7 +36,7 @@ public:
         nxpl::NX_GUID* typeList,
         int typeListSize) override;
 
-    virtual nx::sdk::Error setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler) override;
+    virtual nx::sdk::Error setHandler(nx::sdk::metadata::MetadataHandler* handler) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 

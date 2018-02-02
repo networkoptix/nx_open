@@ -7,7 +7,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/metadata_manager.h>
+#include <nx/sdk/metadata/camera_manager.h>
 
 #include "identified_supported_event.h"
 #include "monitor.h"
@@ -19,7 +19,7 @@ namespace axis {
 
 class MetadataHandler;
 
-class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::MetadataManager>
+class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 {
 public:
     Manager(const nx::sdk::CameraInfo& cameraInfo,
@@ -30,7 +30,7 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error setHandler(
-        nx::sdk::metadata::AbstractMetadataHandler* handler) override;
+        nx::sdk::metadata::MetadataHandler* handler) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
         nxpl::NX_GUID* typeList,

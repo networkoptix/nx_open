@@ -1,4 +1,4 @@
-﻿#include "metadata_plugin.h"
+#include "metadata_plugin.h"
 #include "metadata_manager.h"
 #include "common.h"
 #include "string_helper.h"
@@ -160,8 +160,8 @@ QList<QnUuid> MetadataPlugin::parseSupportedEvents(const QByteArray& data)
             for (const auto& dependedName: descriptor.dependedEvent.split(','))
             {
                 auto descriptor = m_driverManifest.eventDescriptorByInternalName(dependedName);
-                if (!descriptor.typeId.isNull())
-                    result << descriptor.typeId;
+                if (!descriptor.eventTypeId.isNull())
+                    result << descriptor.eventTypeId;
             }
         }
     }

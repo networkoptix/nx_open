@@ -306,7 +306,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
             return true;
         };
 
-    QWidget* main = mainWindow();
+    QWidget* main = mainWindowWidget();
     QScopedPointer<ExportSettingsDialog> dialog;
 
     if (!hasPermission)
