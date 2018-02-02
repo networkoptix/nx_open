@@ -98,6 +98,13 @@ Check For Alert
     Element Text Should Be    ${ALERT}    ${alert text}
     Wait Until Page Does Not Contain Element    ${ALERT}
 
+Check For Alert Dismissable
+    [arguments]    ${alert text}
+    Wait Until Elements Are Visible    ${ALERT}    ${ALERT CLOSE}
+    Element Should Be Visible    ${ALERT}
+    Element Text Should Be    ${ALERT}    ${alert text}
+
+
 Verify In System
     [arguments]    ${system name}
     Wait Until Element Is Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]

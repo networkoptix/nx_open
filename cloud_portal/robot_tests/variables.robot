@@ -1,5 +1,6 @@
 *** Variables ***
 ${ALERT}                              //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']
+${ALERT CLOSE}                        //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']/../preceding-sibling::button[@ng-click='!message.dismissOnClick && dismiss()']
 
 ${LOCAL}                              https://localhost:9000/
 
@@ -31,6 +32,13 @@ ${AUTHORIZED BODY}                    //body[@class='authorized']
 ${ANONYMOUS BODY}                     //body[@class='anonymous']
 ${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
 ${CREATE ACCOUNT BODY}                //body//a[@href='/register']
+
+${RESTORE PASSWORD EMAIL INPUT}       //form[@name='restorePassword']//input[@type='email']
+${RESET PASSWORD BUTTON}              //form[@name='restorePassword']//button[@ng-click='checkForm()']
+${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//input[@type='password']
+${SAVE PASSWORD}                      //form[@name='restorePasswordWithCode']//button[@ng-click='checkForm()']
+${RESET SUCCESS MESSAGE}              //h1[@ng-if='change.success || changeSuccess ' and contains(text(), 'Password successfully saved')]
+${RESET SUCCESS LOG IN LINK}          //h1[@ng-if='change.success || changeSuccess ' and contains(text(), 'Password successfully saved')]/a[@href='/login']
 
 #Register Form Elements
 ${REGISTER FIRST NAME INPUT}          //form[@name= 'registerForm']//input[@ng-model='account.firstName']
@@ -122,6 +130,7 @@ ${EMAIL ADMIN}                        noptixqa+admin@gmail.com
 ${UNREGISTERED EMAIL}                 noptixqa+unregistered@gmail.com
 ${EMAIL NOPERM}                       noptixqa+noperm@gmail.com
 ${BASE PASSWORD}                      qweasd123
+${ALT PASSWORD}                       qweasd1234
 
 #Related to Auto Tests system
 ${AUTO TESTS URL}                     b4939b35-5b98-492b-a092-27fe8efeef38
