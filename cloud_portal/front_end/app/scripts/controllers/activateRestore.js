@@ -29,7 +29,7 @@ angular.module('cloudApp')
             }
             if($scope.data.restoreCode || $scope.data.activateCode){
                 account.logoutAuthorised();
-                code = $scope.data.restoreCode || $scope.data.activateCode;
+                var code = $scope.data.restoreCode || $scope.data.activateCode;
                 account.checkCode(code).then(function(registered){
                     if(!registered){
                         // send to registration form with the code
