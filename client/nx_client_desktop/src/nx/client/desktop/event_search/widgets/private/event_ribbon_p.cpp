@@ -171,10 +171,10 @@ EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
 
     const auto importance = index.data(Qn::NotificationLevelRole);
 
-    if (tile->progressBarVisible() || importance.isNull())
+    if (tile->progressBarVisible() || !importance.canConvert<QnNotificationLevel::Value>())
         tile->setRead(true);
     else
-        m_unread.insert(tile, QnNotificationLevel::Value(importance.toInt()));
+        m_unread.insert(tile, importance.value<QnNotificationLevel::Value>());
 
     connect(tile, &EventTile::closeRequested, this,
         [this]()

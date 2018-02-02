@@ -13,6 +13,7 @@
 
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
+#include <ui/common/notification_levels.h>
 #include <ui/common/weak_graphics_item_pointer.h>
 #include <ui/customization/customization.h>
 #include <ui/customization/palette_data.h>
@@ -141,6 +142,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<nx::client::desktop::ExportMediaPersistentSettings>();
 
     qRegisterMetaType<LayoutTemplate>();
+
+    qRegisterMetaType<QnNotificationLevel::Value>();
 
     QMetaType::registerComparators<QnUuid>();
 
