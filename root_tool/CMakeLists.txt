@@ -1,4 +1,4 @@
-nx_add_target(root_tool EXECUTABLE NO_PCH
+nx_add_target(root_tool EXECUTABLE
     PUBLIC_LIBS boost)
 
 if(LINUX)
