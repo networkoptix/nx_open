@@ -30,12 +30,12 @@ class AccountBackend(ModelBackend):
         user = Account.get(username, password)  # first - check cloud_db
 
         if user and 'email' in user:
-            if username.find('@') > -1 and username != user['email']: #
-                return None
+            if username.find('@') > -1 and username != user['email']:  # code and email from cloud_db are wrong
+                raise APILogicException('Login does not match users email', ErrorCodes.wrong_code)
 
             if not AccountBackend.is_email_in_portal(user['email']):
                 # so - user is in cloud_db, but not in cloud_portal
-                raise APILogicException('User is not in portal', ErrorCodes.not_found)
+                raise APILogicException('User is not in portal', ErrorCodes.portal_critical_error)
         return None
 
     @staticmethod
