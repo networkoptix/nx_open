@@ -585,8 +585,8 @@ TEST_F(SchedulerIntegrationTest, SubscribeFromExpiredTask)
 
     andWhenTimeToFireComesButServerIsOffline();
     andWhenSystemRestarts();
-    whenFirstUserInitializedAndRegisteredToScheduler();
     whenUserDecidesToSubscribeFromTimerFunction();
+    whenFirstUserInitializedAndRegisteredToScheduler();
     andWhenSchedulerWorksForSomeVeryShortTime();
     thenFirstTaskShouldFireAndSecondTaskShouldBeSubscribed();
 
