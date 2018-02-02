@@ -47,7 +47,15 @@ static const QVector<QColor> kFrameColors{
     Qt::darkYellow
 };
 
-QString objectDescription(const common::metadata::DetectedObject& object)
+enum class DescriptionType
+{
+    basic,
+    full,
+};
+
+QString objectDescription(
+    const common::metadata::DetectedObject& object,
+    DescriptionType descriptionType)
 {
     QString result;
 
@@ -55,6 +63,12 @@ QString objectDescription(const common::metadata::DetectedObject& object)
 
     for (const auto& attribute: object.labels)
     {
+        // TODO: #dklychkov Implement when attribute visibility policy is implemented in Attribute
+        // of DetectedObject.
+        bool fieldAlwaysVisible = true;
+        if (descriptionType == DescriptionType::basic && !fieldAlwaysVisible)
+            continue;
+
         if (first)
             first = false;
         else
@@ -121,6 +135,7 @@ public:
         QnUuid zoomWindowItemUuid;
         QRectF rectangle;
         qint64 metadataTimestamp = -1;
+        QString basicDescription;
         QString description;
 
         QRectF futureRectangle;
@@ -243,7 +258,8 @@ WidgetAnalyticsController::Private::ObjectInfo&
         objectInfo.color = utils::random::choice(kFrameColors);
 
     objectInfo.rectangle = object.boundingBox;
-    objectInfo.description = objectDescription(object);
+    objectInfo.basicDescription = objectDescription(object, DescriptionType::basic);
+    objectInfo.description = objectDescription(object, DescriptionType::full);
     objectInfo.active = true;
 
     return objectInfo;
@@ -278,11 +294,12 @@ void WidgetAnalyticsController::Private::updateObjectAreas(qint64 timestamp)
         AreaHighlightOverlayWidget::AreaInformation areaInfo;
         areaInfo.id = it.key();
         areaInfo.color = objectInfo.color;
-        areaInfo.text = objectInfo.description;
+        areaInfo.text = objectInfo.basicDescription;
+        areaInfo.hoverText = objectInfo.description;
 
         if (ini().displayAnalyticsDelay && objectInfo.metadataTimestamp > 0)
         {
-            areaInfo.text +=
+            areaInfo.hoverText +=
                 lit("\nDelay\t%1").arg((timestamp - objectInfo.metadataTimestamp) / 1000);
         }
 
