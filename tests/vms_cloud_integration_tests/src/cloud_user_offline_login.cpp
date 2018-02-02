@@ -206,7 +206,7 @@ private:
             m_invitedAccount.email.c_str(),
             nx::network::http::PasswordAuthToken(m_invitedAccount.password.c_str())));
         ec2::ApiUserDataList users;
-        return mediaServerClient.ec2GetUsers(&users);
+        return mediaServerClient->ec2GetUsers(&users);
     }
 };
 
