@@ -117,11 +117,8 @@ nx::utils::db::DBResult AuthenticationProvider::afterSharingSystem(
     if (sharingType == SharingType::invite)
         return nx::utils::db::DBResult::ok;
 
-    NX_DEBUG(this, lm("Updating authentication information of user %1 of system %2")
-        .arg(sharing.accountEmail).arg(sharing.systemId));
-
     const auto nonce = fetchOrCreateNonce(queryContext, sharing.systemId);
-        
+
     const auto account = m_accountManager->findAccountByUserName(sharing.accountEmail);
     if (!account)
         throw nx::utils::db::Exception(nx::utils::db::DBResult::notFound);
@@ -295,6 +292,10 @@ void AuthenticationProvider::addUserAuthRecord(
     const api::AccountData& account,
     const std::string& nonce)
 {
+    NX_DEBUG(this,
+        lm("Updating authentication information of user %1 (vms user id %2) of system %3")
+        .arg(account.email).arg(vmsUserId).arg(systemId));
+
     auto authRecord = generateAuthRecord(account, nonce);
 
     api::AuthInfo userAuthRecords;
@@ -314,7 +315,7 @@ api::AuthInfoRecord AuthenticationProvider::generateAuthRecord(
     authInfo.nonce = nonce;
     authInfo.intermediateResponse = nx_http::calcIntermediateResponse(
         account.passwordHa1.c_str(), nonce.c_str()).toStdString();
-    authInfo.expirationTime = 
+    authInfo.expirationTime =
         nx::utils::utcTime() + m_settings.auth().offlineUserHashValidityPeriod;
     return authInfo;
 }
@@ -333,9 +334,9 @@ void AuthenticationProvider::generateUpdateUserAuthInfoTransaction(
 {
     ::ec2::ApiResourceParamWithRefData userAuthenticationInfoAttribute;
     userAuthenticationInfoAttribute.name = api::kVmsUserAuthInfoAttributeName;
-    userAuthenticationInfoAttribute.resourceId = 
+    userAuthenticationInfoAttribute.resourceId =
         QnUuid::fromStringSafe(vmsUserId.c_str());
-    userAuthenticationInfoAttribute.value = 
+    userAuthenticationInfoAttribute.value =
         QString::fromUtf8(QJson::serialized(userAuthenticationRecords));
     const auto dbResult = m_vmsP2pCommandBus->saveResourceAttribute(
         queryContext,
