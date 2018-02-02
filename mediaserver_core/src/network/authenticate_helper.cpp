@@ -542,10 +542,6 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
             responseHeaders,
             accessRights);
     }
-    else
-    {
-        NX_ASSERT(false);
-    }
 
     return authResult;
 }
