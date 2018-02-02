@@ -5,7 +5,7 @@
 
 #include <nx/vms/event/event_fwd.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <nx/sdk/metadata/plugin.h>
 #include <common/common_module_aware.h>
 #include <core/resource/resource.h>
 

@@ -12,13 +12,13 @@ namespace api {
  */
 struct AnalyticsEventType
 {
-    QnUuid typeId;
+    QnUuid eventTypeId;
     TranslatableString name;
 };
 
 bool operator==(const AnalyticsEventType& lh, const AnalyticsEventType& rh);
 
-#define AnalyticsEventType_Fields (typeId)(name)
+#define AnalyticsEventType_Fields (eventTypeId)(name)
 
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEventType, (json))
 

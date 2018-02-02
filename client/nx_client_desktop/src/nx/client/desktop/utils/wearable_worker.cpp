@@ -178,6 +178,32 @@ bool WearableWorker::addUpload(const QString& path, WearableError* error)
     return true;
 }
 
+void WearableWorker::cancel()
+{
+    d->requests.cancelAllRequests();
+
+    WearableState::Status status = d->state.status;
+    if (status == WearableState::Unlocked || status == WearableState::LockedByOtherClient)
+    {
+        emit finished();
+        return;
+    }
+
+    auto callback =
+        [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        {
+            d->requests.releaseHandle(handle);
+            QnWearableStatusReply reply = result.deserialized<QnWearableStatusReply>();
+            handleUnlockFinished(success, reply);
+        };
+    d->requests.storeHandle(d->connection()->releaseWearableCameraLock(
+        d->camera,
+        d->lockToken,
+        callback,
+        thread()));
+        return;
+}
+
 void WearableWorker::processNextFile()
 {
     d->state.currentIndex++;
@@ -316,6 +342,8 @@ void WearableWorker::handleUnlockFinished(bool success, const QnWearableStatusRe
 
     d->state.queue.clear();
     d->state.currentIndex = 0;
+
+    emit finished();
 }
 
 void WearableWorker::handleUploadProgress(const UploadState& state)

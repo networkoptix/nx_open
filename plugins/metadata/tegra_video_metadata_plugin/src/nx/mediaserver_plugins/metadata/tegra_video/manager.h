@@ -35,7 +35,7 @@ protected:
         const nx::sdk::metadata::CommonCompressedVideoPacket* videoFrame) override;
 
     virtual bool pullMetadataPackets(
-        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets) override;
+        std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets) override;
 
 private:
     nx::sdk::Error stopFetchingMetadataThreadUnsafe();
@@ -46,22 +46,22 @@ private:
     bool pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int64_t* outPtsUs);
 
     bool makeMetadataPacketsFromRects(
-        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+        std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets,
         const std::vector<TegraVideo::Rect>& rects,
         int64_t ptsUs) const;
 
     bool makeMetadataPacketsFromRectsPostprocNone(
-        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+        std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets,
         const std::vector<TegraVideo::Rect>& rects,
         int64_t ptsUs) const;
 
     bool makeMetadataPacketsFromRectsPostprocPed(
-        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+        std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets,
         const std::vector<TegraVideo::Rect>& rects,
         int64_t ptsUs) const;
 
     bool makeMetadataPacketsFromRectsPostprocCar(
-        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+        std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets,
         const std::vector<TegraVideo::Rect>& rects,
         int64_t ptsUs) const;
 

@@ -1,0 +1,70 @@
+#include "common_events_metadata_packet.h"
+#include <nx/utils/log/log_main.h>
+
+namespace nx {
+namespace sdk {
+namespace metadata {
+
+void* CommonEventsMetadataPacket::queryInterface(const nxpl::NX_GUID& interfaceId)
+{
+    if (interfaceId == IID_EventsMetadataPacket)
+    {
+        addRef();
+        return static_cast<EventsMetadataPacket*>(this);
+    }
+
+    if (interfaceId == nxpl::IID_PluginInterface)
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
+    }
+    return nullptr;
+}
+
+int64_t CommonEventsMetadataPacket::timestampUsec() const
+{
+    return m_timestampUsec;
+}
+
+int64_t CommonEventsMetadataPacket::durationUsec() const
+{
+    return m_durationUsec;
+}
+
+Event* CommonEventsMetadataPacket::nextItem()
+{
+    if (m_currentEventIndex < m_events.size())
+        return m_events[m_currentEventIndex++];
+
+    return nullptr;
+}
+
+void CommonEventsMetadataPacket::setTimestampUsec(int64_t timestampUsec)
+{
+    m_timestampUsec = timestampUsec;
+}
+
+void CommonEventsMetadataPacket::setDurationUsec(int64_t durationUsec)
+{
+    m_durationUsec = durationUsec;
+}
+
+void CommonEventsMetadataPacket::addEvent(Event* event)
+{
+    m_events.push_back(event);
+}
+
+void CommonEventsMetadataPacket::resetEvents()
+{
+    m_events.clear();
+    m_currentEventIndex = 0;
+}
+
+CommonEventsMetadataPacket::~CommonEventsMetadataPacket()
+{
+    NX_VERBOSE(this, "DESTROYING PACKET");
+}
+
+} // namespace metadata
+} // namespace sdk
+} // namespace nx

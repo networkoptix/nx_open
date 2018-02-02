@@ -11,7 +11,7 @@
 #include <nx/api/analytics/driver_manifest.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/sdk/metadata/abstract_event_metadata_packet.h>
+#include <nx/sdk/metadata/events_metadata_packet.h>
 
 namespace nx {
 namespace mediaserver {
@@ -27,9 +27,9 @@ public:
     enum EventTypeFlag
     {
         none = 0,
-        stateDependent = 1 << 0,
-        regionDependent = 1 << 1,
-        itemDependent = 1 << 2,
+        stateDependent = 1 << 0, //< Pulse or prolonged event
+        regionDependent = 1 << 1, //< Event has region
+        forced = 1 << 2, //< Event should be emitted together with parent event
     };
     Q_DECLARE_FLAGS(EventTypeFlags, EventTypeFlag)
 
@@ -59,6 +59,7 @@ public:
 
         QnUuid eventTypeByInternalName(const QString& internalEventName) const;
         const Hikvision::EventDescriptor& eventDescriptorById(const QnUuid& id) const;
+        const Hikvision::EventDescriptor eventDescriptorByInternalName(const QString& internalName) const;
     private:
         static QnMutex m_cachedIdMutex;
         static QMap<QString, QnUuid> m_idByInternalName;

@@ -43,9 +43,9 @@ public:
         const QSize& fullImageResolution,
         const QSize& resolutionLimit = kDefaultResolutionLimit);
 
+    bool isTranscodingRequested() const;
     bool isImageTranscodingRequired(const QSize& fullImageResolution,
         const QSize& resolutionLimit = kDefaultResolutionLimit) const;
-    bool isTranscodingRequired(const QnConstResourceVideoLayoutPtr& videoLayout) const;
     bool isTranscodingRequired(const QnMediaResourcePtr& resource) const;
 
     bool isDownscaleRequired(const QSize& srcResolution) const;

@@ -12,8 +12,8 @@ class Plugin: public nx::sdk::metadata::SimplePlugin
 public:
     Plugin(): SimplePlugin("Tegra Video metadata plugin") {}
 
-    virtual nx::sdk::metadata::AbstractMetadataManager* managerForResource(
-        const nx::sdk::ResourceInfo& resourceInfo,
+    virtual nx::sdk::metadata::CameraManager* obtainCameraManager(
+        const nx::sdk::CameraInfo& cameraInfo,
         nx::sdk::Error* outError) override;
 
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;

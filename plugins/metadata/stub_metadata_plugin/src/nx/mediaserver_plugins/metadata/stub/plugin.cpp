@@ -24,10 +24,10 @@ Plugin::~Plugin()
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataPlugin)
+    if (interfaceId == IID_Plugin)
     {
         addRef();
-        return static_cast<AbstractMetadataPlugin*>(this);
+        return static_cast<Plugin*>(this);
     }
 
     if (interfaceId == nxpl::IID_Plugin3)
@@ -76,19 +76,12 @@ void Plugin::setLocale(const char* /*locale*/)
     // Do nothing.
 }
 
-AbstractMetadataManager* Plugin::managerForResource(
-    const ResourceInfo& /*resourceInfo*/,
+CameraManager* Plugin::obtainCameraManager(
+    const CameraInfo& /*cameraInfo*/,
     Error* outError)
 {
     *outError = Error::noError;
     return new Manager(this);
-}
-
-AbstractSerializer* Plugin::serializerForType(
-    const nxpl::NX_GUID& /*typeGuid*/,
-    Error* /*outError*/)
-{
-    return nullptr;
 }
 
 const char* Plugin::capabilitiesManifest(Error* error) const

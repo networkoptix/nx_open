@@ -3,8 +3,8 @@
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
 
-#include "abstract_data_packet.h"
-#include "abstract_media_context.h"
+#include "data_packet.h"
+#include "media_context.h"
 
 #include <vector>
 #include <string>
@@ -46,7 +46,7 @@ public:
         m_data.reset();
     }
 
-    virtual const AbstractMediaContext* context() const { return nullptr; }
+    virtual const MediaContext* context() const { return nullptr; }
     virtual int64_t timestampUsec() const { return m_timestampUsec; }
 
     void setCodec(const std::string& value) { m_codec = value; }

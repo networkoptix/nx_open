@@ -14,16 +14,16 @@ namespace metadata {
 
 void* SimpleManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataManager)
+    if (interfaceId == IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractMetadataManager*>(this);
+        return static_cast<CameraManager*>(this);
     }
 
-    if (interfaceId == IID_ConsumingMetadataManager)
+    if (interfaceId == IID_ConsumingCameraManager)
     {
         addRef();
-        return static_cast<AbstractConsumingMetadataManager*>(this);
+        return static_cast<ConsumingCameraManager*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)
@@ -34,13 +34,13 @@ void* SimpleManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-Error SimpleManager::setHandler(AbstractMetadataHandler* handler)
+Error SimpleManager::setHandler(MetadataHandler* handler)
 {
     m_handler = handler;
     return Error::noError;
 }
 
-Error SimpleManager::putData(AbstractDataPacket* dataPacket)
+Error SimpleManager::pushDataPacket(DataPacket* dataPacket)
 {
     NX_PRINT << __func__ << "() BEGIN";
 
@@ -55,7 +55,7 @@ Error SimpleManager::putData(AbstractDataPacket* dataPacket)
         return Error::unknownError;
     }
 
-    std::vector<AbstractMetadataPacket*> metadataPackets;
+    std::vector<MetadataPacket*> metadataPackets;
     if (!pullMetadataPackets(&metadataPackets))
     {
         NX_PRINT << __func__ << "() END -> unknownError: pullMetadataPackets() failed";
