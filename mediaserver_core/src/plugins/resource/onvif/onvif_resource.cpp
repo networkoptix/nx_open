@@ -4276,8 +4276,8 @@ bool QnPlOnvifResource::initializeTwoWayAudioByResourceData()
         else
             audioTransmitter->setAuthPolicy(QnBasicAudioTransmitter::AuthPolicy::digestAndBasicAuth);
 
-        QUrl srcUrl(getUrl());
-        QUrl url(lit("http://%1:%2%3").arg(srcUrl.host()).arg(srcUrl.port()).arg(params.urlPath));
+        QUrl url(getUrl());
+        url.setPath(params.urlPath);
         audioTransmitter->setTransmissionUrl(url);
 
         m_audioTransmitter.reset(audioTransmitter.release());
