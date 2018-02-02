@@ -14,7 +14,7 @@ BEGIN
             VALUE "FileDescription",    "${product.display.title}"
             VALUE "FileVersion",        "${release.version}.${buildNumber}"
             VALUE "InternalName",       "${product.title}"
-            VALUE "LegalCopyright",     "${nxCopyright}"
+            VALUE "LegalCopyright",     "${nx_copyright}"
             VALUE "LegalTrademarks1",   "All Rights Reserved"
             VALUE "LegalTrademarks2",   "All Rights Reserved"
             VALUE "OriginalFilename",   "${project.artifactId}.exe"

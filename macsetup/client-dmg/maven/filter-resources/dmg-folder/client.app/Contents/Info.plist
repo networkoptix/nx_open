@@ -31,6 +31,6 @@
 	<key>LSUIElement</key>
 	<false/>
 	<key>NSHumanReadableCopyright</key>
-	<string>@nxCopyright@</string>
+	<string>@nx_copyright@</string>
 </dict>
 </plist>
