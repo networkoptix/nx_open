@@ -11,7 +11,7 @@ function update_with_module_configuration()
     local config_file=$1
     local configuration=$2
 
-    /usr/local/bin/merge_config.py "$config_file" "$configuration"
+    echo "$configuration" | /usr/local/bin/merge_config.py "$config_file" 
 }
 
 function instantiate_config()
