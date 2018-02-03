@@ -108,7 +108,6 @@ does not show Share button to viewer, advanced viewer, live viewer
     Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
-    Validate Log Out
     Log in to Auto Tests System    ${EMAIL LIVE VIEWER}
     Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
@@ -213,7 +212,6 @@ should display same user data as showed in user account (stress to cyrillic)
 
     #remove new user from system
     Log Out
-    Validate Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
     Remove User Permissions    ${email}
     Close Browser
