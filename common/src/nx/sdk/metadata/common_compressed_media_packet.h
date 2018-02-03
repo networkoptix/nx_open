@@ -21,7 +21,7 @@ public:
 
     virtual const int dataSize() const
     {
-        return m_data ? m_data->size() : m_externalDataSize;
+        return m_data ? (int) m_data->size() : m_externalDataSize;
     }
 
     virtual const char* data() const

@@ -1,5 +1,7 @@
-#include "simple_manager.h"
+#include "common_video_frame_processing_camera_manager.h"
 
+#define NX_DEBUG_ENABLE_OUTPUT m_enableOutput
+#define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
 #include <nx/kit/debug.h>
 
 namespace nx {
@@ -9,10 +11,7 @@ namespace metadata {
 //-------------------------------------------------------------------------------------------------
 // Implementations of interface methods.
 
-// TODO: #mike: Decide on NX_PRINT_PREFIX to reflect actual plugin class, and change NX_PRINT to
-// NX_OUTPUT, having decided on ini().
-
-void* SimpleManager::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* CommonVideoFrameProcessingCameraManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_CameraManager)
     {
@@ -34,15 +33,15 @@ void* SimpleManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-Error SimpleManager::setHandler(MetadataHandler* handler)
+Error CommonVideoFrameProcessingCameraManager::setHandler(MetadataHandler* handler)
 {
     m_handler = handler;
     return Error::noError;
 }
 
-Error SimpleManager::pushDataPacket(DataPacket* dataPacket)
+Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPacket)
 {
-    NX_PRINT << __func__ << "() BEGIN";
+    NX_OUTPUT << __func__ << "() BEGIN";
 
     nxpt::ScopedRef<CommonCompressedVideoPacket> videoFrame(
         dataPacket->queryInterface(IID_CompressedVideoPacket));
@@ -51,20 +50,20 @@ Error SimpleManager::pushDataPacket(DataPacket* dataPacket)
 
     if (!pushVideoFrame(videoFrame.get()))
     {
-        NX_PRINT << __func__ << "() END -> unknownError: pushVideoFrame() failed";
+        NX_OUTPUT << __func__ << "() END -> unknownError: pushVideoFrame() failed";
         return Error::unknownError;
     }
 
     std::vector<MetadataPacket*> metadataPackets;
     if (!pullMetadataPackets(&metadataPackets))
     {
-        NX_PRINT << __func__ << "() END -> unknownError: pullMetadataPackets() failed";
+        NX_OUTPUT << __func__ << "() END -> unknownError: pullMetadataPackets() failed";
         return Error::unknownError;
     }
 
     if (!metadataPackets.empty())
     {
-        NX_PRINT << __func__ << "() Producing " << metadataPackets.size()
+        NX_OUTPUT << __func__ << "() Producing " << metadataPackets.size()
             << " metadata packet(s)";
     }
 
@@ -74,24 +73,24 @@ Error SimpleManager::pushDataPacket(DataPacket* dataPacket)
         metadataPacket->releaseRef();
     }
 
-    NX_PRINT << __func__ << "() END -> noError";
+    NX_OUTPUT << __func__ << "() END -> noError";
     return Error::noError;
 }
 
-Error SimpleManager::startFetchingMetadata(
-    nxpl::NX_GUID* /*eventTypeList*/, int /*eventTypeListSize*/)
+Error CommonVideoFrameProcessingCameraManager::startFetchingMetadata(
+    nxpl::NX_GUID* /*typeList*/, int /*typeListSize*/)
 {
     NX_PRINT << __func__ << "() -> noError";
     return Error::noError;
 }
 
-Error SimpleManager::stopFetchingMetadata()
+Error CommonVideoFrameProcessingCameraManager::stopFetchingMetadata()
 {
     NX_PRINT << __func__ << "() -> noError";
     return Error::noError;
 }
 
-const char* SimpleManager::capabilitiesManifest(Error* /*error*/)
+const char* CommonVideoFrameProcessingCameraManager::capabilitiesManifest(Error* /*error*/)
 {
     const std::string manifest = capabilitiesManifest();
     char* data = new char[manifest.size() + 1];
@@ -99,7 +98,7 @@ const char* SimpleManager::capabilitiesManifest(Error* /*error*/)
     return data;
 }
 
-void SimpleManager::freeManifest(const char* data)
+void CommonVideoFrameProcessingCameraManager::freeManifest(const char* data)
 {
     delete[] data;
 }
@@ -107,8 +106,15 @@ void SimpleManager::freeManifest(const char* data)
 //-------------------------------------------------------------------------------------------------
 // Tools for the derived class.
 
-// TODO: #mike: Make a template with param type.
-std::string SimpleManager::getParamValue(const char* paramName)
+void CommonVideoFrameProcessingCameraManager::pushMetadataPacket(
+    sdk::metadata::MetadataPacket* metadataPacket)
+{
+    m_handler->handleMetadata(Error::noError, metadataPacket);
+    metadataPacket->releaseRef();
+}
+
+// TODO: Consider making a template with param type, checked according to the manifest.
+std::string CommonVideoFrameProcessingCameraManager::getParamValue(const char* paramName)
 {
     if (!m_handler)
     {

@@ -6,7 +6,7 @@
 #include <mutex>
 #include <vector>
 
-#include <nx/sdk/metadata/simple_manager.h>
+#include <nx/sdk/metadata/common_video_frame_processing_camera_manager.h>
 
 #include <tegra_video.h> //< libtegra_video.so - analytics lib for Tx1 and Tx2.
 
@@ -21,12 +21,11 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace tegra_video {
 
-class Manager: public nx::sdk::metadata::SimpleManager
+class CameraManager: public nx::sdk::metadata::CommonVideoFrameProcessingCameraManager
 {
 public:
-    Manager(Plugin* plugin);
-    virtual ~Manager() override;
-
+    CameraManager(Plugin* plugin);
+    virtual ~CameraManager() override;
 
 protected:
     virtual std::string capabilitiesManifest() override;
@@ -38,8 +37,6 @@ protected:
         std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets) override;
 
 private:
-    nx::sdk::Error stopFetchingMetadataThreadUnsafe();
-
     bool pushCompressedFrame(
         const nx::sdk::metadata::CommonCompressedVideoPacket* videoPacket);
 
@@ -71,7 +68,6 @@ private:
         const std::map<QString, std::vector<QString>>& options);
 
 private:
-    Plugin* const m_plugin;
     int m_counter = 0;
     int m_counterObjects = 0;
     nxpl::NX_GUID m_eventTypeId;

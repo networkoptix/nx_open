@@ -54,9 +54,9 @@ class EventsMetadataPacket: public IterableMetadataPacket
 {
 public:
     /**
-    * @return next detected object or null if no more objects left.
-    * This functions should not modify objects and behave like a constant iterator.
-    */
+     * Should not modify the object, and should behave like a constant iterator.
+     * @return Next item in the list, or null if no more.
+     */
     virtual Event* nextItem() = 0;
 };
 

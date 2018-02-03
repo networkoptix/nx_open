@@ -1,30 +1,29 @@
-#include "simple_plugin.h"
+#include "common_plugin.h"
 
+#define NX_PRINT_PREFIX (std::string("[") + m_name + "] ")
 #include <nx/kit/debug.h>
 
 namespace nx {
 namespace sdk {
 namespace metadata {
 
-// TODO: #mike: Decide on NX_PRINT_PREFIX to reflect actual plugin class.
-
-SimplePlugin::SimplePlugin(const char* name):
+CommonPlugin::CommonPlugin(const char* name):
     m_name(name)
 {
-    NX_PRINT << "Created \"" << m_name << "\"";
+    NX_PRINT << "Created " << this;
 }
 
-std::string SimplePlugin::getParamValue(const char* paramName)
+std::string CommonPlugin::getParamValue(const char* paramName)
 {
     return m_settings[paramName];
 }
 
-SimplePlugin::~SimplePlugin()
+CommonPlugin::~CommonPlugin()
 {
-    NX_PRINT << "Destroyed \"" << m_name << "\"";
+    NX_PRINT << "Destroyed " << this;
 }
 
-void* SimplePlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* CommonPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_Plugin)
     {
@@ -58,25 +57,31 @@ void* SimplePlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-const char* SimplePlugin::name() const
+const char* CommonPlugin::name() const
 {
     return m_name;
 }
 
-void SimplePlugin::setSettings(const nxpl::Setting* settings, int count)
+void CommonPlugin::setSettings(const nxpl::Setting* settings, int count)
 {
     for (int i = 0; i < count; ++i)
         m_settings[settings[i].name] = settings[i].value;
 }
 
-void SimplePlugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
+void CommonPlugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
 {
     // Do nothing.
 }
 
-void SimplePlugin::setLocale(const char* /*locale*/)
+void CommonPlugin::setLocale(const char* /*locale*/)
 {
     // Do nothing.
+}
+
+const char* CommonPlugin::capabilitiesManifest(Error* error) const
+{
+    m_manifest = capabilitiesManifest();
+    return m_manifest.c_str();
 }
 
 } // namespace metadata

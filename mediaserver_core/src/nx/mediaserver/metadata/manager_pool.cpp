@@ -37,9 +37,6 @@ uint qHash(const AnalyticsEventType& t)
 } // namespace api
 } // namespace nx
 
-
-
-
 namespace nx {
 namespace mediaserver {
 namespace metadata {
@@ -382,16 +379,23 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
                 lm("Event list is empty, stopping metadata fetching for resource %1.")
                     .arg(resourceId));
 
-            auto result = data.manager->stopFetchingMetadata();
-            if (result != Error::noError)
-                NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1").arg(data.manifest.driverName.value));
+            if (data.manager->stopFetchingMetadata() != Error::noError)
+            {
+                NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
+                    .arg(data.manifest.driverName.value));
+            }
         }
         else
         {
-            NX_DEBUG(
-                this,
-                lm("Starting metadata fetching for resource %1. Event list is %2")
-                    .args(resourceId, eventTypeIds));
+            NX_DEBUG(this, lm("Statopping metadata fetching for resource %1").args(resourceId));
+            if (data.manager->stopFetchingMetadata() != Error::noError)
+            {
+                NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
+                    .arg(data.manifest.driverName.value));
+            }
+
+            NX_DEBUG(this, lm("Starting metadata fetching for resource %1. Event list is %2")
+                .args(resourceId, eventTypeIds));
 
             std::vector<nxpl::NX_GUID> eventTypeList;
             for (const auto& eventTypeId: eventTypeIds)
@@ -415,6 +419,9 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifes
     Plugin* plugin)
 {
     Error error = Error::noError;
+    // TODO: #mike: Consider a dedicated mechanism for localization.
+    // TODO: #mike: Refactor GUIDs to be string-based hierarchical ids (e.g. "nx.eventType.LineCrossing").
+
     const char* const manifestStr = plugin->capabilitiesManifest(&error);
     if (error != Error::noError)
     {

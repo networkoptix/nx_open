@@ -11,6 +11,7 @@
 namespace nx {
 namespace api {
 
+// TODO: Rename all classes replacing "driver" with "plugin".
 /**
  * Description of the analytics driver, which can generate different events.
  */

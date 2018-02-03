@@ -1,12 +1,11 @@
-#include "manager.h"
+#include "camera_manager.h"
 
 #include <iostream>
 #include <chrono>
 
-#define NX_PRINT_PREFIX "metadata::tegra_video::Manager::"
+#define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
 #include <nx/kit/debug.h>
 
-#include <plugins/plugin_tools.h>
 #include <plugins/plugin_internal_tools.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/sdk/metadata/common_object.h>
@@ -23,6 +22,9 @@ namespace {
 
 // TODO: #dmishin get rid of this. Pass object type id from TegraVideo.
 static const QnUuid kCarUuid("{58AE392F-8516-4B27-AEE1-311139B5A37A}");
+//kCarObjectType = "visionlabs.objectType.Car"
+//kCarObjectType = "nvidia.metropolis.objectType.Car"
+
 static const QnUuid kHumanUuid("{58AE392F-8516-4B27-AEE1-311139B5A37A}");
 
 } // namespace
@@ -30,10 +32,12 @@ static const QnUuid kHumanUuid("{58AE392F-8516-4B27-AEE1-311139B5A37A}");
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Manager::Manager(Plugin* plugin):
-    m_plugin(plugin)
+CameraManager::CameraManager(Plugin* plugin): CommonVideoFrameProcessingCameraManager(plugin)
 {
-    NX_PRINT << __func__ << "(\"" << plugin->name() << "\") BEGIN";
+    NX_PRINT << __func__ << "() BEGIN -> " << this;
+
+    ini().reload();
+    setEnableOutput(NX_DEBUG_ENABLE_OUTPUT); //< Base class is verbose when this descendant is.
 
     m_tegraVideo.reset(tegraVideoCreate());
     if (!m_tegraVideo)
@@ -53,6 +57,8 @@ Manager::Manager(Plugin* plugin):
         m_tracker.setObjectTypeId(kCarUuid);
     }
 
+    // TODO: Move all the ctor code below to startFetchingMetadata() when it starts being called.
+
     stopFetchingMetadata();
 
     TegraVideo::Params params;
@@ -69,17 +75,17 @@ Manager::Manager(Plugin* plugin):
     NX_OUTPUT << __func__ << "() END -> " << this;
 }
 
-Manager::~Manager()
+CameraManager::~CameraManager()
 {
-    NX_OUTPUT << __func__ << "() BEGIN";
+    NX_OUTPUT << __func__ << "(" << this << ") BEGIN";
 
     if (!m_tegraVideo->stop())
         NX_OUTPUT << __func__ << "(): ERROR: TegraVideo::stop() failed";
 
-    NX_OUTPUT << __func__ << "() END";
+    NX_OUTPUT << __func__ << "(" << this << ") END";
 }
 
-std::string Manager::capabilitiesManifest()
+std::string CameraManager::capabilitiesManifest()
 {
     return R"manifest(
         {
@@ -91,7 +97,7 @@ std::string Manager::capabilitiesManifest()
     )manifest";
 }
 
-bool Manager::pushCompressedFrame(const CommonCompressedVideoPacket* videoPacket)
+bool CameraManager::pushCompressedFrame(const CommonCompressedVideoPacket* videoPacket)
 {
     TegraVideo::CompressedFrame compressedFrame;
     compressedFrame.dataSize = videoPacket->dataSize();
@@ -107,7 +113,7 @@ bool Manager::pushCompressedFrame(const CommonCompressedVideoPacket* videoPacket
     return true;
 }
 
-bool Manager::pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int64_t* outPtsUs)
+bool CameraManager::pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int64_t* outPtsUs)
 {
     static constexpr int kMaxRects = 1000;
     rects->resize(kMaxRects);
@@ -125,7 +131,7 @@ bool Manager::pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int64_t* o
     return true;
 }
 
-bool Manager::pushVideoFrame(const CommonCompressedVideoPacket* videoFrame)
+bool CameraManager::pushVideoFrame(const CommonCompressedVideoPacket* videoFrame)
 {
     if (!pushCompressedFrame(videoFrame))
         return false;
@@ -133,7 +139,7 @@ bool Manager::pushVideoFrame(const CommonCompressedVideoPacket* videoFrame)
     return true;
 }
 
-bool Manager::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPackets)
+bool CameraManager::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPackets)
 {
     while (m_tegraVideo->hasMetadata())
     {
@@ -170,7 +176,7 @@ bool Manager::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPackets)
 //-------------------------------------------------------------------------------------------------
 // private
 
-bool Manager::makeMetadataPacketsFromRects(
+bool CameraManager::makeMetadataPacketsFromRects(
     std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
@@ -190,7 +196,7 @@ bool Manager::makeMetadataPacketsFromRects(
     return makeMetadataPacketsFromRectsPostprocNone(metadataPackets, rects, ptsUs);
 }
 
-bool Manager::makeMetadataPacketsFromRectsPostprocNone(
+bool CameraManager::makeMetadataPacketsFromRectsPostprocNone(
     std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
@@ -218,7 +224,7 @@ bool Manager::makeMetadataPacketsFromRectsPostprocNone(
     return true;
 }
 
-bool Manager::makeMetadataPacketsFromRectsPostprocPed(
+bool CameraManager::makeMetadataPacketsFromRectsPostprocPed(
     std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
@@ -227,7 +233,7 @@ bool Manager::makeMetadataPacketsFromRectsPostprocPed(
     return makeMetadataPacketsFromRectsPostprocNone(metadataPackets, rects, ptsUs);
 }
 
-bool Manager::makeMetadataPacketsFromRectsPostprocCar(
+bool CameraManager::makeMetadataPacketsFromRectsPostprocCar(
     std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets,
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
@@ -241,14 +247,14 @@ bool Manager::makeMetadataPacketsFromRectsPostprocCar(
     return true;
 }
 
-int64_t Manager::usSinceEpoch() const
+int64_t CameraManager::usSinceEpoch() const
 {
     using namespace std::chrono;
     return duration_cast<microseconds>(
         system_clock::now().time_since_epoch()).count();
 }
 
-void Manager::setTrackerAttributeOptions(
+void CameraManager::setTrackerAttributeOptions(
     const std::map<QString, std::vector<QString>>& options)
 {
     for (const auto& entry : options)

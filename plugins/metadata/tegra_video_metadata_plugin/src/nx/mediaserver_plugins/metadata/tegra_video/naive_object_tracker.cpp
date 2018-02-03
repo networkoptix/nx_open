@@ -378,7 +378,7 @@ QString NaiveObjectTracker::randomAttributeValue(const QString& attributeName) c
         return QString();
 
     const auto& options = itr->second;
-    const auto index = nx::utils::random::number<int>(0, options.size() - 1);
+    const auto index = nx::utils::random::number<int>(0, (int) options.size() - 1);
     NX_ASSERT(index >= 0 && index < options.size());
     if (index < 0 && index >= options.size())
         return QString();

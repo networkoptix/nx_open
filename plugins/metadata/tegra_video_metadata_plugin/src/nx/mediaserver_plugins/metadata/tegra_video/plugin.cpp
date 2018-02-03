@@ -2,7 +2,7 @@
 
 #include <plugins/plugin_tools.h>
 
-#include "manager.h"
+#include "camera_manager.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -12,13 +12,13 @@ namespace tegra_video {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-CameraManager* Plugin::obtainCameraManager(
+nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
     const CameraInfo& /*cameraInfo*/, Error* /*outError*/)
 {
-    return new Manager(this);
+    return new CameraManager(this);
 }
 
-const char* Plugin::capabilitiesManifest(Error* /*error*/) const
+std::string Plugin::capabilitiesManifest() const
 {
     return R"json(
         {
