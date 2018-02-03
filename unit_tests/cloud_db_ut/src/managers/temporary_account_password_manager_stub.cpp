@@ -30,6 +30,7 @@ nx::utils::db::DBResult TemporaryAccountPasswordManagerStub::fetchTemporaryCrede
 }
 
 void TemporaryAccountPasswordManagerStub::addRandomCredentials(
+    const std::string& /*accountEmail*/,
     data::TemporaryAccountCredentials* const /*data*/)
 {
 }
