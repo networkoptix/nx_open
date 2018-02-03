@@ -22,8 +22,7 @@ can be closed after clicking on background
     Open Browser and Go To URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Element Is Visible    ${LOG IN MODAL}
-    Wait Until Element Is Visible    //div[@uib-modal-backdrop='modal-backdrop']/..
+    Wait Until Elements Are Visible    ${LOG IN MODAL}    //div[@uib-modal-backdrop='modal-backdrop']/..
     Element Should be Visible    //div[@uib-modal-backdrop='modal-backdrop']/..
     Click Element    //div[@uib-modal-backdrop='modal-backdrop']/..
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
@@ -58,6 +57,7 @@ redirects to systems after log In
 
 after log In, display user's email and menu in top right corner
     Open Browser and go to URL    ${url}
+    Maximize Browser Window
     Log In    ${email}    ${password}
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Element Text Should Be    ${ACCOUNT DROPDOWN}    ${email}
@@ -66,7 +66,7 @@ after log In, display user's email and menu in top right corner
 valid but unregistered email shows error message
     Open Browser and go to URL    ${url}
     Log In    ${UNREGISTERED EMAIL}    ${password}
-    wait until element is visible    ${ALERT}
+    Wait Until Element Is Visible    ${ALERT}
     Element Should Be Visible    ${ALERT}
     Close Browser
 
@@ -120,9 +120,8 @@ shows red outline if field is wrong/empty after blur
     Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Element Is Visible    ${EMAIL INPUT}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
     Click Element    ${EMAIL INPUT}
-    Wait Until Element Is Visible    ${PASSWORD INPUT}
     Click Element    ${PASSWORD INPUT}
     ${class}    Get Element Attribute    ${EMAIL INPUT}/..    class
     Should Contain    ${class}    has-error
@@ -136,14 +135,11 @@ allows log in with 'Remember Me checkmark' switched off
     Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX}
+    Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX}   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
     Click Element    ${REMEMBER ME CHECKBOX}
     Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}
-    Wait Until Element Is Visible    ${EMAIL INPUT}
     input text    ${EMAIL INPUT}    ${email}
-    Wait Until Element Is Visible    ${PASSWORD INPUT}
     input text    ${PASSWORD INPUT}    ${password}
-    Wait Until Element Is Visible    ${LOG IN BUTTON}
     click button    ${LOG IN BUTTON}
     Validate Log In
     Close Browser
@@ -208,9 +204,8 @@ handles more than 255 symbols email and password
     Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Element Is Visible    ${EMAIL INPUT}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
     Input Text    ${EMAIL INPUT}    ${300CHARS}
-    Wait Until Element Is Visible    ${PASSWORD INPUT}
     Input Text    ${PASSWORD INPUT}    ${300CHARS}
     Textfield Should Contain    ${EMAIL INPUT}    ${255CHARS}
     Textfield Should Contain    ${PASSWORD INPUT}    ${255CHARS}
@@ -252,9 +247,8 @@ should respond to Enter key and log in
     Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Element Is Visible    ${EMAIL INPUT}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
     Input Text    ${EMAIL INPUT}    ${email}
-    Wait Until Element Is Visible    ${PASSWORD INPUT}
     Input Text    ${PASSWORD INPUT}    ${password}
     Press Key    ${PASSWORD INPUT}    ${ENTER}
     Validate Log In

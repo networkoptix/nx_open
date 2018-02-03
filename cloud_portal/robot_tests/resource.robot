@@ -17,14 +17,12 @@ Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
     Run Keyword Unless    '''${button}''' == "None"    Wait Until Element Is Visible    ${button}
     Run Keyword Unless    '''${button}''' == "None"    Click Link    ${button}
-    Wait Until Element Is Visible    ${EMAIL INPUT}
-    input text    ${EMAIL INPUT}    ${email}
-
-    Wait Until Element Is Visible    ${PASSWORD INPUT}
-    input text    ${PASSWORD INPUT}    ${password}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
+    Input Text    ${EMAIL INPUT}    ${email}
+    Input Text    ${PASSWORD INPUT}    ${password}
 
     Wait Until Element Is Visible    ${LOG IN BUTTON}
-    click button    ${LOG IN BUTTON}
+    Click Button    ${LOG IN BUTTON}
 
 Validate Log In
     Wait Until Page Contains Element    ${AUTHORIZED BODY}
@@ -42,19 +40,11 @@ Validate Log Out
 
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}
-
-    Wait Until Element Is Visible    ${REGISTER FIRST NAME INPUT}
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Input Text    ${REGISTER FIRST NAME INPUT}    ${first name}
-    Wait Until Element Is Visible    ${REGISTER LAST NAME INPUT}
     Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
-
-    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT}
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
-
-    Wait Until Element Is Visible    ${REGISTER PASSWORD INPUT}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
-
-    Wait Until Element Is Visible    ${CREATE ACCOUNT BUTTON}
     Click Button    ${CREATE ACCOUNT BUTTON}
 
 Validate Register Email Received
@@ -72,10 +62,13 @@ Get Activation Link
     Close Mailbox
     Return From Keyword    @{links}[1]
 
-Select Auto Tests System
-    Wait Until Element Is Visible    ${AUTO TESTS}
-    Wait Until Element Is Enabled    ${AUTO TESTS}
-    Click Element    ${AUTO TESTS}
+Activate
+    [arguments]    ${email}
+    ${link}    Get Activation Link    ${email}
+    Go To    ${link}
+    Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
+    Element Should Be Visible    ${ACTIVATION SUCCESS}
+    Location Should Be    ${url}/activate/success
 
 Edit User Permissions In Systems
     [arguments]    ${user email}    ${permissions}
@@ -112,6 +105,23 @@ Check For Alert
     Element Text Should Be    ${ALERT}    ${alert text}
     Wait Until Page Does Not Contain Element    ${ALERT}
 
+Check For Alert Dismissable
+    [arguments]    ${alert text}
+    Wait Until Elements Are Visible    ${ALERT}    ${ALERT CLOSE}
+    Element Should Be Visible    ${ALERT}
+    Element Text Should Be    ${ALERT}    ${alert text}
+
+
+Verify In System
+    [arguments]    ${system name}
+    Wait Until Element Is Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
+    Element Should Be Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
+
 Failure Tasks
     Capture Page Screenshot    selenium-screenshot-{index}.png
     Close Browser
+
+Wait Until Elements Are Visible
+    [arguments]    @{elements}
+    :FOR     ${element}  IN  @{elements}
+    \  Wait Until Element Is Visible    ${element}

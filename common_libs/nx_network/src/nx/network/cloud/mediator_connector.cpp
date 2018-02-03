@@ -103,8 +103,8 @@ void MediatorConnector::mockupMediatorUrl(const nx::utils::Url& mediatorUrl)
     m_mediatorUrl = mediatorUrl;
     m_mockedUpMediatorUrl = mediatorUrl;
     m_mediatorUdpEndpoint = nx::network::url::getEndpoint(mediatorUrl);
-    m_stunClient->connect(mediatorUrl, [](SystemError::ErrorCode) {});
     m_promise->set_value(true);
+    connectToMediatorAsync();
 
     if (m_mediatorAvailabilityChangedHandler)
         m_mediatorAvailabilityChangedHandler(true);

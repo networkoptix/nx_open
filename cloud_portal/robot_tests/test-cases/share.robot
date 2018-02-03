@@ -11,14 +11,17 @@ ${share dialogue}
 
 *** Keywords ***
 Log in to Auto Tests System
-    Open Browser and go to URL    ${url}
-    Log In    ${email}    ${password}
-    Validate Log In
-    Select Auto Tests System
+    [arguments]    ${email}
+    Go To    ${url}/systems/${AUTO TESTS URL}
+    Log In    ${email}    ${password}    None
+    Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 *** Test Cases ***
 Share button - opens dialog
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE MODAL}
@@ -26,7 +29,8 @@ Share button - opens dialog
     Close Browser
 
 Sharing link /systems/{system_id}/share - opens dialog
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     ${location}    Get Location
     Go To    ${location}/share
     Wait Until Element Is Visible    ${SHARE MODAL}
@@ -34,7 +38,8 @@ Sharing link /systems/{system_id}/share - opens dialog
     Close Browser
 
 Sharing link for anonymous - first ask login, then show share dialog
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     ${location}    Get Location
     Log Out
     Validate Log Out
@@ -45,21 +50,21 @@ Sharing link for anonymous - first ask login, then show share dialog
     Close Browser
 
 After closing dialog, called by link - clear link
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     ${location}    Get Location
 
 #Check Cancel Button
     Go To    ${location}/share
-    Wait Until Element Is Visible    ${SHARE MODAL}
+    Wait Until Elements Are Visible    ${SHARE MODAL}    ${SHARE CANCEL}
     Element Should Be Visible    ${SHARE MODAL}
-    Wait Until Element Is Visible    ${SHARE CANCEL}
     Click Button    ${SHARE CANCEL}
     Wait Until Element Is Not Visible    ${SHARE MODAL}
     Location Should Be    ${location}
 
 #Check 'X' Button
     Go To    ${location}/share
-    Wait Until Element Is Visible    ${SHARE MODAL}
+    Wait Until Elements Are Visible    ${SHARE MODAL}    ${SHARE CLOSE}
     Element Should Be Visible    ${SHARE MODAL}
     Wait Until Element Is Visible    ${SHARE CLOSE}
     Click Button    ${SHARE CLOSE}
@@ -68,16 +73,16 @@ After closing dialog, called by link - clear link
 
 #Check Background Click
     Go To    ${location}/share
-    Wait Until Element Is Visible    ${SHARE MODAL}
+    Wait Until Elements Are Visible    ${SHARE MODAL}    //div[@uib-modal-window="modal-window"]
     Element Should Be Visible    ${SHARE MODAL}
-    Wait Until Element Is Visible    //div[@uib-modal-window="modal-window"]
     Click Element    //div[@uib-modal-window="modal-window"]
     Wait Until Element Is Not Visible    ${SHARE MODAL}
     Location Should Be    ${location}
     Close Browser
 
 Sharing roles are ordered: more access is on top of the list with options
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
@@ -86,8 +91,8 @@ Sharing roles are ordered: more access is on top of the list with options
     Close Browser
 
 When user selects role - special hint appears
-    Log in to Auto Tests System
-    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     Click Button    ${SHARE BUTTON SYSTEMS}
 #Adminstrator check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
@@ -127,13 +132,13 @@ When user selects role - special hint appears
     Close Browser
 
 Sharing works
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     ${random email}    Get Random Email
-    Wait Until Element Is Visible    ${SHARE EMAIL}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
-    Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    New permissions saved
     Check User Permissions    ${random email}    Custom
@@ -141,14 +146,15 @@ Sharing works
     Close Browser
 
 Edit permission works
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     ${random email}    Get Random Email
-    Wait Until Element Is Visible    ${SHARE EMAIL}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
-    Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
     Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    New permissions saved
     Edit User Permissions In Systems    ${random email}    Viewer
     Check User Permissions    ${random email}    Viewer
     Edit User Permissions In Systems    ${random email}    Custom
@@ -157,16 +163,17 @@ Edit permission works
     Close Browser
 
 Share with registered user - sends him notification
-    Log in to Auto Tests System
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
+    Verify In System    Auto Tests
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
-    Wait Until Element Is Visible    ${SHARE EMAIL}
-    Input Text    ${SHARE EMAIL}    ${EMAIL VIEWER}
-    Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
+    Input Text    ${SHARE EMAIL}    ${EMAIL NOPERM}
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    New permissions saved
-    Check User Permissions    ${EMAIL VIEWER}    Custom
+    Check User Permissions    ${EMAIL NOPERM}    Custom
     Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
-    ${email}    Wait For Email    recipient=${EMAIL VIEWER}    subject=TestFirstName TestLastName invites you to Nx Cloud    timeout=120
-    Remove User Permissions    ${EMAIL VIEWER}
+    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    subject=TestFirstName TestLastName invites you to Nx Cloud    timeout=120
+    Remove User Permissions    ${EMAIL NOPERM}
     Close Browser
