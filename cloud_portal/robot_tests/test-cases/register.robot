@@ -34,11 +34,7 @@ should open register page from register success page by clicking Register button
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    'mark'    'hamill'    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
-    Go To    ${link}
-    Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
-    Element Should Be Visible    ${ACTIVATION SUCCESS}
-    Location Should Be    ${url}/activate/success
+    Activate    ${email}
     Wait Until Element Is Visible    ${CREATE ACCOUNT HEADER}
     Click Link    ${CREATE ACCOUNT HEADER}
     Location Should Be    ${url}/register

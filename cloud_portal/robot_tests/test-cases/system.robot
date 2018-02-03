@@ -95,20 +95,25 @@ has Share button, visible for admin and owner
 
 does not show Share button to viewer, advanced viewer, live viewer
 #This allows the expected error to not run the close browser action
-    Register Keyword To Run On Failure    NONE
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL VIEWER}
+    Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
     Log in to Auto Tests System    ${EMAIL ADV VIEWER}
+    Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
+    Validate Log Out
     Log in to Auto Tests System    ${EMAIL LIVE VIEWER}
+    Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
-    Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Register Keyword To Run On Failure    Failure Tasks
+    Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Close Browser
 
 should open System page by link to not authorized user and redirect to homepage, if he does not log in
@@ -146,12 +151,7 @@ should display same user data as user provided during registration (stress to cy
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    ${CYRILLIC NAME}    ${CYRILLIC NAME}    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
-    Go To    ${link}
-    Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
-    Element Should Be Visible    ${ACTIVATION SUCCESS}
-    Location Should Be    ${url}/activate/success
-
+    Activate    ${email}
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
@@ -182,12 +182,7 @@ should display same user data as showed in user account (stress to cyrillic)
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
-    Go To    ${link}
-    Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
-    Element Should Be Visible    ${ACTIVATION SUCCESS}
-    Location Should Be    ${url}/activate/success
-
+    Activate    ${email}
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
     Click Button    ${SHARE BUTTON SYSTEMS}
@@ -218,6 +213,7 @@ should display same user data as showed in user account (stress to cyrillic)
 
     #remove new user from system
     Log Out
+    Validate Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
     Remove User Permissions    ${email}
     Close Browser

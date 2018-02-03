@@ -17,7 +17,7 @@
             <label for="ignoreSubscriptions">Ignore Subscriptions:</label>
             <input class="float-left" id="ignoreSubscriptions" name="ignore_subscriptions" type="checkbox">
             <button class="button" type="submit" name="Save">Save Draft</button>
-            <button class="button" type="submit" name="Preview">Preview Draft</button>
+            <button class="button" type="submit" name="Save Draft and Preview">Preview Draft</button>
             {% if perms.notifications.send_cloud_notification %}
             <button class="button" type="submit" name="Send" {%if not original %} disabled {% endif %}>Send Notification</button>
             {% endif %}

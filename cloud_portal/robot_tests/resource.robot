@@ -40,7 +40,6 @@ Validate Log Out
 
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}
-
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Input Text    ${REGISTER FIRST NAME INPUT}    ${first name}
     Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
@@ -62,6 +61,14 @@ Get Activation Link
     ${links}    Get Links From Email    ${email}
     Close Mailbox
     Return From Keyword    @{links}[1]
+
+Activate
+    [arguments]    ${email}
+    ${link}    Get Activation Link    ${email}
+    Go To    ${link}
+    Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
+    Element Should Be Visible    ${ACTIVATION SUCCESS}
+    Location Should Be    ${url}/activate/success
 
 Edit User Permissions In Systems
     [arguments]    ${user email}    ${permissions}

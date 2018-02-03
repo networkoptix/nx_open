@@ -106,10 +106,11 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
 }
 
 void TemporaryAccountPasswordManager::addRandomCredentials(
+    const std::string& accountEmail,
     data::TemporaryAccountCredentials* const data)
 {
     if (data->login.empty())
-        data->login = generateRandomPassword();
+        data->login = accountEmail;
 
     data->password = generateRandomPassword();
     data->passwordHa1 = nx::network::http::calcHa1(
