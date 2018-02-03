@@ -112,3 +112,6 @@ class CloudNotification(models.Model):
     sent_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True,
         related_name='accepted_%(class)s')
+
+    def __str__(self):
+        return self.subject

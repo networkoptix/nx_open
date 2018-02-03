@@ -71,7 +71,9 @@ public:
         data::TemporaryAccountCredentials tmpPasswordData,
         std::function<void(api::ResultCode)> completionHandler) = 0;
 
-    virtual void addRandomCredentials(data::TemporaryAccountCredentials* const data) = 0;
+    virtual void addRandomCredentials(
+        const std::string& accountEmail,
+        data::TemporaryAccountCredentials* const data) = 0;
 
     virtual nx::utils::db::DBResult registerTemporaryCredentials(
         nx::utils::db::QueryContext* const queryContext,
@@ -85,7 +87,7 @@ public:
     virtual nx::utils::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
         nx::utils::db::QueryContext* const queryContext,
         std::string accountEmail) = 0;
-    
+
     virtual void removeTemporaryPasswordsFromCacheByAccountEmail(
         std::string accountEmail) = 0;
 
@@ -120,7 +122,9 @@ public:
      * Adds password and password digest.
      * If data->login is empty, random login is generated.
      */
-    virtual void addRandomCredentials(data::TemporaryAccountCredentials* const data) override;
+    virtual void addRandomCredentials(
+        const std::string& accountEmail,
+        data::TemporaryAccountCredentials* const data) override;
 
     virtual nx::utils::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
         nx::utils::db::QueryContext* const queryContext,
@@ -187,7 +191,7 @@ private:
     nx::utils::db::DBResult deleteTempPassword(
         nx::utils::db::QueryContext* const queryContext,
         std::string tempPasswordID);
-   
+
     boost::optional<const TemporaryAccountCredentialsEx&> findMatchingCredentials(
         const QnMutexLockerBase& lk,
         const std::string& username,

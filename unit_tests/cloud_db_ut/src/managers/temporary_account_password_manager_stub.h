@@ -24,7 +24,9 @@ public:
         data::TemporaryAccountCredentials tmpPasswordData,
         std::function<void(api::ResultCode)> completionHandler) override;
 
-    virtual void addRandomCredentials(data::TemporaryAccountCredentials* const data) override;
+    virtual void addRandomCredentials(
+        const std::string& /*accountEmail*/,
+        data::TemporaryAccountCredentials* const data) override;
 
     virtual nx::utils::db::DBResult registerTemporaryCredentials(
         nx::utils::db::QueryContext* const queryContext,

@@ -12,11 +12,7 @@ Register and Activate
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    'mark'    'hamill'    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
-    Go To    ${link}
-    Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
-    Element Should Be Visible    ${ACTIVATION SUCCESS}
-    Location Should Be    ${url}/activate/success
+    Activate    ${email}
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Close Browser
@@ -38,11 +34,7 @@ should save user data to user account correctly
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
-    Go To    ${link}
-    Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
-    Element Should Be Visible    ${ACTIVATION SUCCESS}
-    Location Should Be    ${url}/activate/success
+    Activate    ${email}
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
@@ -55,11 +47,7 @@ should allow to enter more than 255 symbols in First and Last names and cut it t
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    ${300CHARS}    ${300CHARS}    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
-    Go To    ${link}
-    Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
-    Element Should Be Visible    ${ACTIVATION SUCCESS}
-    Location Should Be    ${url}/activate/success
+    Activate    ${email}
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
@@ -72,11 +60,7 @@ should trim leading and trailing spaces
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    ${SPACE}mark${SPACE}    ${SPACE}hamill${SPACE}    ${email}    ${password}
-    ${link}    Get Activation Link    ${email}
-    Go To    ${link}
-    Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
-    Element Should Be Visible    ${ACTIVATION SUCCESS}
-    Location Should Be    ${url}/activate/success
+    Activate    ${email}
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
@@ -95,9 +79,6 @@ link works and suggests to log out user, if he was logged in, buttons operate co
     Register    mark    hamill    ${email}    ${password}
     ${link}    Get Activation Link    ${email}
     Go To    ${link}
-    Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
-    Element Should Be Visible    ${ACTIVATION SUCCESS}
-    Location Should Be    ${url}/activate/success
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${link}

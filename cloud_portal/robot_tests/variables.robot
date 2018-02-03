@@ -37,6 +37,7 @@ ${RESTORE PASSWORD EMAIL INPUT}       //form[@name='restorePassword']//input[@ty
 ${RESET PASSWORD BUTTON}              //form[@name='restorePassword']//button[@ng-click='checkForm()']
 ${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//input[@type='password']
 ${SAVE PASSWORD}                      //form[@name='restorePasswordWithCode']//button[@ng-click='checkForm()']
+${RESET EMAIL SENT MESSAGE}           //div[@ng-if='restoringSuccess']/h1[contains(text(),'Password reset instructions are sent to Email')]
 ${RESET SUCCESS MESSAGE}              //h1[@ng-if='change.success || changeSuccess ' and contains(text(), 'Password successfully saved')]
 ${RESET SUCCESS LOG IN LINK}          //h1[@ng-if='change.success || changeSuccess ' and contains(text(), 'Password successfully saved')]/a[@href='/login']
 
