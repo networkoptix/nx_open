@@ -77,18 +77,20 @@ int QnWearableCameraRestHandler::executeAdd(
     if (!requireParameter(params, lit("name"), result, &name))
         return nx_http::StatusCode::invalidParameter;
 
-    ec2::ApiCameraData camera;
-    camera.physicalId = QnUuid::createUuid().toSimpleString();
-    camera.fillId();
-    camera.manuallyAdded = true;
-    camera.typeId = QnResourceTypePool::kWearableCameraTypeUuid;
-    camera.parentId = owner->commonModule()->moduleGUID();
-    camera.name = name;
-    // Note that physical id is in path, not in host.
-    camera.url = lit("wearable:///") + camera.physicalId;
+    ec2::ErrorCode code = ec2::ErrorCode::ok;
 
-    const ec2::ErrorCode code = owner->commonModule()->ec2Connection()
-        ->getCameraManager(Qn::kSystemAccess)->addCameraSync(camera);
+    ec2::ApiCameraData apiCamera;
+    apiCamera.physicalId = QnUuid::createUuid().toSimpleString();
+    apiCamera.fillId();
+    apiCamera.manuallyAdded = true;
+    apiCamera.typeId = QnResourceTypePool::kWearableCameraTypeUuid;
+    apiCamera.parentId = owner->commonModule()->moduleGUID();
+    apiCamera.name = name;
+    // Note that physical id is in path, not in host.
+    apiCamera.url = lit("wearable:///") + apiCamera.physicalId;
+
+    code = owner->commonModule()->ec2Connection()
+        ->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
 
     if (code != ec2::ErrorCode::ok)
     {
@@ -98,7 +100,7 @@ int QnWearableCameraRestHandler::executeAdd(
     }
 
     QnWearableCameraReply reply;
-    reply.id = camera.id;
+    reply.id = apiCamera.id;
     result.setReply(reply);
 
     return nx_http::StatusCode::ok;
