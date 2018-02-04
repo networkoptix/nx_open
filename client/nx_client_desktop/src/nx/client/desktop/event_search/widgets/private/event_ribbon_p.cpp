@@ -7,6 +7,7 @@
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QVariantAnimation>
 #include <QtGui/QWheelEvent>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QApplication>
 
@@ -18,6 +19,7 @@
 #include <ui/common/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/helper.h>
+#include <ui/workaround/hidpi_workarounds.h>
 
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/client/desktop/ui/actions/action.h>
@@ -167,6 +169,7 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
 EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
 {
     auto tile = new EventTile(q);
+    tile->setContextMenuPolicy(Qt::CustomContextMenu);
     updateTile(tile, index);
 
     const auto importance = index.data(Qn::NotificationLevelRole);
@@ -198,6 +201,9 @@ EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
             if (m_model)
                 m_model->setData(m_model->index(indexOf(tile)), QVariant(), Qn::DefaultNotificationRole);
         });
+
+    connect(tile, &QWidget::customContextMenuRequested, this,
+        [this](const QPoint &pos) { showContextMenu(static_cast<EventTile*>(sender()), pos); });
 
     return tile;
 }
@@ -276,6 +282,21 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
 
     tile->preview()->loadAsync();
     tile->setPreviewCropRect(previewCropRect);
+}
+
+void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRelativeToTile)
+{
+    if (!m_model)
+        return;
+
+    const auto index = m_model->index(indexOf(tile));
+    const auto menu = index.data(Qn::ContextMenuRole).value<QSharedPointer<QMenu>>();
+
+    if (!menu)
+        return;
+
+    const auto globalPos = QnHiDpiWorkarounds::safeMapToGlobal(tile, posRelativeToTile);
+    menu->exec(globalPos);
 }
 
 void EventRibbon::Private::debugCheckGeometries()

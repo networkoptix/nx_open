@@ -61,6 +61,8 @@ private:
     void updateCurrentShifts(); //< Updates m_currentShifts from m_itemShiftAnimations.
     void clearShiftAnimations();
 
+    void showContextMenu(EventTile* tile, const QPoint& posRelativeToTile);
+
     int indexOf(EventTile* tile) const;
 
     // Creates a tile widget for a data model item using the following roles:

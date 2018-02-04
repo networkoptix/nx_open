@@ -288,6 +288,7 @@ namespace Qn
         AnimatedRole,                               /**< Role for specifying whether item animation is allowed (bool). */
         DurationRole,                               /**< Role for duration in milliseconds (qint64). */
         NotificationLevelRole,                      /**< Role for notification level (QnNotificationLevel::Value). */
+        ContextMenuRole,                            /**< Role for context menu (QSharedPointer<QMenu>). */
 
         // Model notification roles. Do not necessarily pass any data but implement
         // item-related view-to-model notifications via setData which can be proxied.
