@@ -204,6 +204,6 @@ def restore_password(request):
 def check_code_in_portal(request):
     require_params(request, ('code',))
     code = request.data['code']
-    (temp_password, email) = Account.extract_temp_credentials(code).split(":")
+    (temp_password, email) = Account.extract_temp_credentials(code)
     email_exists = AccountBackend.is_email_in_portal(email)
     return api_success({'emailExists': email_exists})
