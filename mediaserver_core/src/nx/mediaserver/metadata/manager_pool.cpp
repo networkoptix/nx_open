@@ -23,7 +23,7 @@
 namespace nx {
 namespace api {
 
-uint qHash(const AnalyticsEventType& t)
+uint qHash(const Analytics::EventType& t)
 {
     return qHash(t.eventTypeId.toByteArray());
 }
@@ -441,7 +441,7 @@ bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, QSet<QnUuid
     return result == Error::noError;
 }
 
-uint qHash(const nx::api::AnalyticsEventType& t)// noexcept
+uint qHash(const nx::api::Analytics::EventType& t)// noexcept
 {
     return qHash(t.eventTypeId.toByteArray());
 }
@@ -570,7 +570,7 @@ ManagerPool::loadManagerManifest(
             driverManifest->outputEventTypes.cbegin(),
             driverManifest->outputEventTypes.cend(),
             std::back_inserter(deviceManifest->supportedEventTypes),
-            [](const nx::api::AnalyticsEventType& driverManifestElement)
+            [](const nx::api::Analytics::EventType& driverManifestElement)
             {
                 return driverManifestElement.eventTypeId;
             });

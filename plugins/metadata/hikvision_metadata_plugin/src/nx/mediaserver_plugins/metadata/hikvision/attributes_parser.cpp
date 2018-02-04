@@ -122,6 +122,8 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
     const QByteArray& content,
     const Hikvision::DriverManifest& manifest)
 {
+    using namespace nx::api;
+
     std::vector<HikvisionEvent> result;
     QXmlStreamReader reader(content);
 
@@ -143,16 +145,12 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
 
             addEvent(hikvisionEvent);
             const auto descriptor = manifest.eventDescriptorById(hikvisionEvent.typeId);
-            for (const auto& dependedName: descriptor.dependedEvent.split(','))
+            for (const auto& dependedName: descriptor.forcedEvent.split(','))
             {
                 const auto childDescriptor = manifest.eventDescriptorByInternalName(dependedName);
-                if (childDescriptor.flags.testFlag(Hikvision::EventTypeFlag::forced))
-                {
-                    hikvisionEvent.typeId = childDescriptor.eventTypeId;
-                    addEvent(hikvisionEvent);
-                }
+                hikvisionEvent.typeId = childDescriptor.eventTypeId;
+                addEvent(hikvisionEvent);
             }
-
         }
     }
     return result;

@@ -2,9 +2,6 @@
 
 #include <nx/fusion/model_functions.h>
 
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hikvision, EventTypeFlag)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hikvision, EventTypeFlags)
-
 namespace nx {
 namespace mediaserver {
 namespace plugins {
@@ -60,7 +57,6 @@ const Hikvision::EventDescriptor Hikvision::DriverManifest::eventDescriptorByInt
 {
     return eventDescriptorById(eventTypeByInternalName(internalName));
 };
-
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hikvision::EventDescriptor, (json), EventDescriptor_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hikvision::DriverManifest, (json), DriverManifest_Fields)

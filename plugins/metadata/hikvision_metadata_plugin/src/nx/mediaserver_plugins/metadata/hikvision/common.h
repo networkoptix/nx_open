@@ -19,39 +19,26 @@ namespace plugins {
 
 struct Hikvision
 {
-    Q_GADGET
-    Q_ENUMS(EventTypeFlag EventItemType)
-    Q_FLAGS(EventTypeFlags)
-
 public:
-    enum EventTypeFlag
-    {
-        none = 0,
-        stateDependent = 1 << 0, //< Pulse or prolonged event
-        regionDependent = 1 << 1, //< Event has region
-        forced = 1 << 2, //< Event should be emitted together with parent event
-    };
-    Q_DECLARE_FLAGS(EventTypeFlags, EventTypeFlag)
-
-    struct EventDescriptor: public nx::api::AnalyticsEventType
+    struct EventDescriptor: public nx::api::Analytics::EventType
     {
         QString internalName;
         QString internalMonitoringName;
         QString description;
         QString positiveState;
         QString negativeState;
-        EventTypeFlags flags;
         QString regionDescription;
         QString dependedEvent;
+        QString forcedEvent;
     };
     #define EventDescriptor_Fields AnalyticsEventType_Fields (internalName)\
         (internalMonitoringName)\
         (description)\
         (positiveState)\
         (negativeState)\
-        (flags)\
         (regionDescription)\
-        (dependedEvent)
+        (dependedEvent)\
+        (forcedEvent)
 
     struct DriverManifest: public nx::api::AnalyticsDriverManifestBase
     {
@@ -69,9 +56,6 @@ public:
     #define DriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
 
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(Hikvision::EventTypeFlags)
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Hikvision::EventTypeFlag)
-
 struct HikvisionEvent
 {
     QDateTime dateTime;
@@ -95,9 +79,3 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (nx::mediaserver::plugins::Hikvision::EventTypeFlag)
-    (nx::mediaserver::plugins::Hikvision::EventTypeFlags),
-    (metatype)(numeric)(lexical)
-)

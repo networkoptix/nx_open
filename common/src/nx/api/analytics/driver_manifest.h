@@ -28,7 +28,7 @@ struct AnalyticsDriverManifestBase
 
 struct AnalyticsDriverManifest: AnalyticsDriverManifestBase
 {
-   QList<AnalyticsEventType> outputEventTypes;
+   QList<Analytics::EventType> outputEventTypes;
 };
 #define AnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
 
