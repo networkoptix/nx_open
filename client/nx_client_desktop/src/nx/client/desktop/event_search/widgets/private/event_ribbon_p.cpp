@@ -567,13 +567,14 @@ QnNotificationLevel::Value EventRibbon::Private::highestUnreadImportance() const
     QnNotificationLevel::Value result = QnNotificationLevel::Value::NoNotification;
 
     // TODO: #vkutin Redo it differently if it visibly impacts performance.
+    static constexpr auto kMaxNotificationLevel = int(QnNotificationLevel::Value::LevelCount) - 1;
     for (const auto importance: m_unread)
     {
         if (importance < result)
             continue;
 
         result = importance;
-        if (int(result) == int(QnNotificationLevel::Value::LevelCount) - 1)
+        if (int(result) == kMaxNotificationLevel)
             break;
     }
 

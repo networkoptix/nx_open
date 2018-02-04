@@ -285,7 +285,7 @@ void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Va
     if (count == 0)
         return;
 
-    const auto text = (count > 99) ? lit("99+") : lit("%1").arg(count);
+    const auto text = (count > 99) ? lit("99+") : QString::number(count);
     const auto color = QnNotificationLevel::notificationTextColor(importance);
 
     m_counterLabel->setText(text);
