@@ -18,6 +18,8 @@
 #include <media_server/wearable_lock_manager.h>
 
 #include <nx/utils/std/cpp14.h>
+#include "core/resource/camera_user_attribute_pool.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 using namespace nx::mediaserver_core::recorder;
 
@@ -98,6 +100,18 @@ int QnWearableCameraRestHandler::executeAdd(
             lit("Error while adding camera '%1'.").arg(toString(code)));
         return nx_http::StatusCode::internalServerError;
     }
+
+    ec2::ApiCameraAttributesData apiAttributes;
+    {
+        QnCameraUserAttributePool::ScopedLock attributesLock(
+            owner->commonModule()->cameraUserAttributesPool(), apiCamera.id);
+        (*attributesLock)->audioEnabled = true;
+        fromResourceToApi(*attributesLock, apiAttributes);
+    }
+
+    owner->commonModule()->ec2Connection()
+        ->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync({apiAttributes});
+    // We don't care about return code here as wearable camera is already added.
 
     QnWearableCameraReply reply;
     reply.id = apiCamera.id;
