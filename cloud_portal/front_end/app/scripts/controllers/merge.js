@@ -42,7 +42,7 @@ angular.module('cloudApp')
                 masterSystemId = $scope.targetSystem.id;
                 slaveSystemId = $scope.system.id;
             }
-            return cloudApi.systems(); //In for testing purposes with merging things
+            //return cloudApi.systems(); //In for testing purposes with merging things
             return cloudApi.merge(masterSystemId, slaveSystemId);
         },{
             successMessage: L.system.mergeSystemSuccess
