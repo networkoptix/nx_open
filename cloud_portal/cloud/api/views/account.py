@@ -11,7 +11,7 @@ import api
 from api.controllers.cloud_api import Account
 from api.account_backend import AccountBackend
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, \
-    APIInternalException, api_success, ErrorCodes, require_params
+    APIInternalException, APINotFoundException, api_success, ErrorCodes, require_params
 
 import logging
 logger = logging.getLogger(__name__)
@@ -46,7 +46,7 @@ def login(request):
         password = request.session['password']
         try:
             user = django.contrib.auth.authenticate(username=email, password=password)
-        except APINotAuthorisedException:
+        except APINotAuthorisedException:  # old credentials expired - try new one
             pass
 
     if user is None:
@@ -55,7 +55,13 @@ def login(request):
         require_params(request, ('email', 'password'))
         email = request.data['email'].lower()
         password = request.data['password']
-        user = django.contrib.auth.authenticate(username=email, password=password)
+        try:
+            user = django.contrib.auth.authenticate(username=email, password=password)
+        except APINotAuthorisedException:  # two possible reasons here - user not found or password incorrect
+            # try to find user in the DB
+            if not AccountBackend.is_email_in_portal(user['email']):
+                raise APINotFoundException("User not in cloud portal") # user not found here
+            raise  # wrong password - just - re-raise the exception
 
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
@@ -66,8 +72,6 @@ def login(request):
     django.contrib.auth.login(request, user)
     request.session['login'] = email
     request.session['password'] = password
-    # TODO: This is awful security hole! But I can't remove it now, because I need password for future requests
-
     serializer = AccountSerializer(user, many=False)
     return api_success(serializer.data)
 
