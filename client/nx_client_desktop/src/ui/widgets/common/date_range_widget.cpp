@@ -30,8 +30,8 @@ QDate minAllowedDate()
 
 QDate maxAllowedDate()
 {
-    // 1 month forward should cover all local timezones diffs.
-    return QDate::currentDate().addMonths(1);
+    // 1 day forward should cover all local timezones diffs.
+    return QDate::currentDate().addDays(1);
 }
 
 }
