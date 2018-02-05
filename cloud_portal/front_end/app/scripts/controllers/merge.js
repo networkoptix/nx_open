@@ -13,7 +13,9 @@ angular.module('cloudApp')
         function checkMergeAbility(system){
             if(system.stateOfHealth == 'offline')
                 return 'offline'
-            return ''
+            if(!system.capabilities || system.capabilities.indexOf('cloudMerge') < 0)
+                return 'cannotMerge';
+            return '';
         }
 
         account.get().then(function(user){
@@ -40,13 +42,13 @@ angular.module('cloudApp')
                 masterSystemId = $scope.targetSystem.id;
                 slaveSystemId = $scope.system.id;
             }
-            //return cloudApi.systems(); //In for testing purposes with merging things
+            return cloudApi.systems(); //In for testing purposes with merging things
             return cloudApi.merge(masterSystemId, slaveSystemId);
         },{
             successMessage: L.system.mergeSystemSuccess
         }).then(function(){
             systemsProvider.forceUpdateSystems();
-            dialogs.closeMe($scope, {"targetSystemId":$scope.targetSystem.id, "masterSystemId": $scope.masterSystemId});
+            dialogs.closeMe($scope, {"anotherSystemId":$scope.targetSystem.id, "role": $scope.masterSystemId == $scope.system.id ? 'master' : 'slave'});
         });
 
         $scope.close = function(){

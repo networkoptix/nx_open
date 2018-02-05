@@ -32,7 +32,7 @@
             </div>
             <p ng-if="systemStatus =='offline'"
                class="help-block warning-label">System {{targetSystem.name}} is offline cannot be merged with the current one.</p>
-            <p ng-if="systemStatus =='incompatable'"
+            <p ng-if="systemStatus =='cannotMerge'"
                class="help-block warning-label">System {{targetSystem.name}} is incompatable cannot be merged with the current one.</p>
             <p ng-if="systemStatus == ''"
                class="help-block">You can merge only Systems in which you have owner permissions.</p>
