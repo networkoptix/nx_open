@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_attributes.h"
 #include "hanwha_common.h"
 #include "hanwha_utils.h"
@@ -119,5 +117,3 @@ boost::optional<double> HanwhaAttributes::attribute<double>(
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

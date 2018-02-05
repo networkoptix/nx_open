@@ -17,12 +17,15 @@ enum class CloudConnectVersion
 
     /** #CLOUD-824 */
     serverChecksConnectionState,
+
+    /** #VMS-8224. */
+    clientSupportsConnectSessionWithoutUdpEndpoints,
 };
 
 constexpr const CloudConnectVersion kDefaultCloudConnectVersion =
     CloudConnectVersion::initial;
 constexpr const CloudConnectVersion kCurrentCloudConnectVersion =
-    CloudConnectVersion::tryingEveryAddressOfPeer;
+    CloudConnectVersion::clientSupportsConnectSessionWithoutUdpEndpoints;
 
 } // namespace api
 } // namespace hpm

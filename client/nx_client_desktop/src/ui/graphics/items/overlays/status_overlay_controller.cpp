@@ -30,6 +30,7 @@ bool isErrorOverlayCheck(Qn::ResourceStatusOverlay overlay)
         case Qn::LoadingOverlay:
         case Qn::NoDataOverlay:
         case Qn::NoVideoDataOverlay:
+        case Qn::NoLiveStreamOverlay:
             return false;
         default:
             return true;
@@ -110,10 +111,7 @@ void QnStatusOverlayController::updateWidgetItems()
     auto items = visibleItems();
     m_widget->setVisibleControls(items);
 
-    const auto pixmapPath = statusIcon(statusOverlay());
-    m_widget->setIconOverlayPixmap(pixmapPath.isEmpty()
-        ? QPixmap()
-        : qnSkin->pixmap(pixmapPath, true));
+    m_widget->setIconOverlayPixmap(statusIcon(statusOverlay()));
 }
 
 void QnStatusOverlayController::onStatusOverlayChanged(bool /*animated*/)
@@ -136,8 +134,7 @@ void QnStatusOverlayController::onStatusOverlayChanged(bool /*animated*/)
     m_widget->setCaption(captionText(m_statusOverlay));
     m_widget->setDescription(descriptionText(m_statusOverlay));
 
-    const auto pixmapPath = statusIcon(m_statusOverlay);
-    m_widget->setIcon(pixmapPath.isEmpty() ? QPixmap() : qnSkin->pixmap(pixmapPath, true));
+    m_widget->setIcon(statusIcon(m_statusOverlay));
 
     updateErrorState();
     updateVisibleItems();
@@ -149,7 +146,7 @@ QnStatusOverlayWidget::Controls QnStatusOverlayController::errorVisibleItems() c
 
     QnStatusOverlayWidget::Controls result = QnStatusOverlayWidget::Control::kCaption;
 
-    if (!statusIcon(overlay).isEmpty())
+    if (!statusIconPath(overlay).isEmpty())
         result |= QnStatusOverlayWidget::Control::kIcon;
 
     if (m_currentButton != Qn::ResourceOverlayButton::Empty)
@@ -174,6 +171,7 @@ QnStatusOverlayWidget::Controls QnStatusOverlayController::normalVisibleItems() 
         case Qn::NoVideoDataOverlay:
             return QnStatusOverlayWidget::Control::kImageOverlay;
         case Qn::NoDataOverlay:
+        case Qn::NoLiveStreamOverlay:
             return QnStatusOverlayWidget::Control::kCaption;
         default:
             return QnStatusOverlayWidget::Control::kNoControl;
@@ -245,24 +243,21 @@ QString QnStatusOverlayController::currentButtonText() const
 
 QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay)
 {
-    static const auto kCaptions =
-        []() -> IntStringHash
-        {
-            const auto kNotEnoughLicenses = tr("NOT ENOUGH LICENCES");
-            IntStringHash result;
-            result[toInt(Qn::NoDataOverlay)] = tr("NO DATA");
-            result[toInt(Qn::UnauthorizedOverlay)] = tr("UNAUTHORIZED");
-            result[toInt(Qn::OfflineOverlay)] = tr("NO SIGNAL");
-            result[toInt(Qn::AnalogWithoutLicenseOverlay)] = kNotEnoughLicenses;
-            result[toInt(Qn::VideowallWithoutLicenseOverlay)] = kNotEnoughLicenses;
-            result[toInt(Qn::ServerOfflineOverlay)] = tr("SERVER UNAVAILABLE");
-            result[toInt(Qn::ServerUnauthorizedOverlay)] = tr("NO ACCESS");
-            result[toInt(Qn::IoModuleDisabledOverlay)] = tr("DEVICE DISABLED");
-            result[toInt(Qn::TooManyOpenedConnectionsOverlay)] = tr("TOO MANY CONNECTIONS");
-            result[toInt(Qn::PasswordRequiredOverlay)] = tr("PASSWORD REQUIRED");
-            return result;
-        }();
-
+    static const auto kNotEnoughLicenses = tr("NOT ENOUGH LICENCES");
+    static const IntStringHash kCaptions
+    {
+        { Qn::NoDataOverlay, tr("NO DATA") },
+        { Qn::UnauthorizedOverlay, tr("UNAUTHORIZED") },
+        { Qn::OfflineOverlay, tr("NO SIGNAL") },
+        { Qn::AnalogWithoutLicenseOverlay, kNotEnoughLicenses },
+        { Qn::VideowallWithoutLicenseOverlay, kNotEnoughLicenses },
+        { Qn::ServerOfflineOverlay, tr("SERVER UNAVAILABLE") },
+        { Qn::ServerUnauthorizedOverlay, tr("NO ACCESS") },
+        { Qn::IoModuleDisabledOverlay, tr("DEVICE DISABLED") },
+        { Qn::TooManyOpenedConnectionsOverlay, tr("TOO MANY CONNECTIONS") },
+        { Qn::PasswordRequiredOverlay, tr("PASSWORD REQUIRED") },
+        { Qn::NoLiveStreamOverlay, tr("NO LIVE STREAM") },
+    };
     return extractValue(overlay, kCaptions);
 }
 
@@ -273,26 +268,29 @@ QString QnStatusOverlayController::descriptionText(Qn::ResourceStatusOverlay ove
         : QString());
 }
 
-QString QnStatusOverlayController::statusIcon(Qn::ResourceStatusOverlay overlay)
+QString QnStatusOverlayController::statusIconPath(Qn::ResourceStatusOverlay overlay)
 {
-    static const auto kIconPaths =
-        []() -> IntStringHash
-        {
-            const auto kLicenceIconPath = lit("item_placeholders/license.png");;
-            IntStringHash result;
-            result[toInt(Qn::UnauthorizedOverlay)] = lit("item_placeholders/unauthorized.png");
-            result[toInt(Qn::OfflineOverlay)] = lit("item_placeholders/no_signal.png");
-            result[toInt(Qn::AnalogWithoutLicenseOverlay)] = kLicenceIconPath;
-            result[toInt(Qn::VideowallWithoutLicenseOverlay)] = kLicenceIconPath;
-            result[toInt(Qn::ServerUnauthorizedOverlay)] = lit("item_placeholders/no_access.png");
-            result[toInt(Qn::IoModuleDisabledOverlay)] = lit("item_placeholders/disabled.png");
-            result[toInt(Qn::NoVideoDataOverlay)] = lit("legacy/io_speaker.png");
-            result[toInt(Qn::PausedOverlay)] = lit("item_placeholders/pause.png");
-            result[toInt(Qn::PasswordRequiredOverlay)] = lit("item_placeholders/alert.png");
-            return result;
-        }();
+    static const auto kLicenceIconPath = lit("item_placeholders/license.png");
+    static const IntStringHash kIconPaths
+    {
+        { Qn::UnauthorizedOverlay, lit("item_placeholders/unauthorized.png") },
+        { Qn::OfflineOverlay, lit("item_placeholders/no_signal.png") },
+        { Qn::AnalogWithoutLicenseOverlay, kLicenceIconPath },
+        { Qn::VideowallWithoutLicenseOverlay, kLicenceIconPath },
+        { Qn::ServerUnauthorizedOverlay, lit("item_placeholders/no_access.png") },
+        { Qn::IoModuleDisabledOverlay, lit("item_placeholders/disabled.png") },
+        { Qn::NoVideoDataOverlay, lit("item_placeholders/sound.png") },
+        { Qn::PausedOverlay, lit("item_placeholders/pause.png") },
+        { Qn::PasswordRequiredOverlay, lit("item_placeholders/alert.png") },
+    };
 
     return extractValue(overlay, kIconPaths);
+}
+
+QPixmap QnStatusOverlayController::statusIcon(Qn::ResourceStatusOverlay status)
+{
+    const auto pixmapPath = statusIconPath(status);
+    return pixmapPath.isEmpty() ? QPixmap() : qnSkin->pixmap(pixmapPath, true);
 }
 
 QnStatusOverlayController::IntStringHash

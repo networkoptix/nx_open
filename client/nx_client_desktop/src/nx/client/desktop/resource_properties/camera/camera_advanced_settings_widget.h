@@ -58,18 +58,19 @@ private:
 
     void at_authenticationRequired(QNetworkReply* reply, QAuthenticator* authenticator);
     void at_proxyAuthenticationRequired(const QNetworkProxy& proxy, QAuthenticator* authenticator);
+
+    bool hasManualPage() const;
+    bool hasWebPage() const;
 private:
-    enum class Page
+    enum Page
     {
         Empty,
         Manual,
         Web,
-        Unavailable
     };
-    void setPage(Page page);
+    //void setPage(Page page);
 
     QScopedPointer<Ui::CameraAdvancedSettingsWidget> ui;
-    Page m_page;
     QnVirtualCameraResourcePtr m_camera;
     QnMutex m_cameraMutex;
     CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;

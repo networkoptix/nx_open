@@ -6,10 +6,10 @@
     "emailSubject": "Restaurar su contraseña"
   },
   "system_invite": {
-    "emailSubject": "Sistema de video {{message.system_name}} fue compartido con usted"
+    "emailSubject": "El sistema de video {{message.system_name}} fue compartido contigo"
   },
   "system_shared": {
-    "emailSubject": "Sistema de video {{message.system_name}} fue compartido con usted"
+    "emailSubject": "El sistema de video {{message.system_name}} fue compartido contigo"
   },
   "review_version": {
     "emailSubject": "La versión {{message.id}} está lista para ser revisada"

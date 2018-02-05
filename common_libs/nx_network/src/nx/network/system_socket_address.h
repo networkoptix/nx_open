@@ -14,11 +14,11 @@ public:
 
     SocketAddress toSocketAddress() const;
 
-    const struct sockaddr* addr() const;
-    struct sockaddr* addr();
+    const struct sockaddr* get() const;
+    struct sockaddr* get();
 
-    const socklen_t& addrLen() const;
-    socklen_t& addrLen();
+    const socklen_t& length() const;
+    socklen_t& length();
 
 private:
     union

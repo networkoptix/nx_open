@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_cgi_parameters.h"
 #include "hanwha_common.h"
 #include "hanwha_utils.h"
@@ -139,7 +137,7 @@ bool HanwhaCgiParameters::parseActions(
     {
         auto actionName = reader.attributes().value(kHanwhaNameAttribute).toString();
         actionName.replace(L'/', L'_');
-        
+
         while (!reader.hasError() && !reader.atEnd())
         {
             const auto tokenType = reader.readNext();
@@ -205,7 +203,7 @@ bool HanwhaCgiParameters::parseParameters(
             if (isElement)
                 break;
         }
-        
+
         if (reader.isEndElement())
         {
             READ_NEXT_AND_RETURN_IF_NEEDED(reader);
@@ -217,7 +215,7 @@ bool HanwhaCgiParameters::parseParameters(
             if (!parseDataType(reader, cgi, submenu, action, parameter))
                 return false;
         }
-        
+
         READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
 
@@ -266,7 +264,7 @@ bool HanwhaCgiParameters::parseDataType(
         parameter.setType(HanwhaCgiParameterType::integer);
         const auto& attributes = reader.attributes();
         bool success = false;
-        
+
         const int min = attributes.value(kHanwhaMinValueAttribute).toInt(&success);
         if (success)
             parameter.setMin(min);
@@ -306,7 +304,7 @@ bool HanwhaCgiParameters::parseDataType(
         parameter.setType(HanwhaCgiParameterType::boolean);
         parameter.setFalseValue(falseValue);
         parameter.setTrueValue(trueValue);
-        
+
         m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
         READ_NEXT_AND_RETURN_IF_NEEDED(reader);
@@ -338,5 +336,3 @@ bool HanwhaCgiParameters::parseDataType(
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

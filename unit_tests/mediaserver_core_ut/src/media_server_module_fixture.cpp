@@ -4,6 +4,7 @@
 
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/std/cpp14.h>
+#include <recorder/storage_manager.h>
 
 MediaServerModuleFixture::MediaServerModuleFixture():
     nx::utils::test::TestWithTemporaryDirectory("MediaServerModuleTest", QString())
@@ -29,4 +30,10 @@ void MediaServerModuleFixture::SetUp()
 
     const QnUuid moduleGuid("{A680980C-70D1-4545-A5E5-72D89E33648B}");
     m_serverModule->commonModule()->setModuleGUID(moduleGuid);
+}
+
+void MediaServerModuleFixture::TearDown()
+{
+    qnNormalStorageMan->stopAsyncTasks();
+    qnBackupStorageMan->stopAsyncTasks();
 }

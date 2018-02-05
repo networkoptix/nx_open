@@ -14,7 +14,11 @@ namespace kit {
  * Mechanism for configuration variables that can alter the behavior of the code for the purpose of
  * debugging and experimenting, with very little performance overhead. The default (initial) values
  * are defined in the code and lead to the nominal behavior, which can be overridden by creating
- * .ini files (with name=value lines) in the system temp directory (or /sdcard on Android).
+ * .ini files (with name=value lines) in the directory determined by the platform:
+ * - Windows: "%NX_INI_DIR%\" (if env var defined), or "%LOCALAPPDATA%\nx_ini\" (otherwise).
+ * - Unix-like: "$NX_INI_DIR/" (if env var defined), or "$HOME/.config/nx_ini/" (otherwise).
+ * - Android: "/sdcard/".
+ * - iOS: Not supported yet.
  *
  * This unit can be compiled in the context of any C++ project.
  *

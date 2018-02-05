@@ -500,7 +500,7 @@ TEST_F(OutgoingTunnel, general)
                     connectionWillSucceed,
                     singleShotConnection);
             });
-    
+
         for (int i = 0; i < connectionsToCreate; ++i)
         {
             ConnectionCompletedPromise connectedPromise;
@@ -740,7 +740,7 @@ TEST_F(OutgoingTunnel, connectTimeout2)
         [/*connectorTimeout,*/ &tunnelConnectionInvokedPromise](
             const AddressEntry& targetAddress) -> std::unique_ptr<AbstractCrossNatConnector>
         {
-            auto connector = 
+            auto connector =
                 std::make_unique<DummyConnector>(
                     targetAddress,
                     /*connectorTimeout*/ nullptr);

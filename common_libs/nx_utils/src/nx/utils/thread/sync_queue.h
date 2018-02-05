@@ -30,14 +30,17 @@ public:
     QueueReaderId generateReaderId();
 
     Result pop();
+
     boost::optional<Result> pop(QueueReaderId readerId);
+
     boost::optional<Result> pop(
-        std::chrono::milliseconds timeout,
+        boost::optional<std::chrono::milliseconds> timeout,
         QueueReaderId readerId = kInvalidQueueReaderId);
+
     template<typename ConditionFunc>
     boost::optional<Result> popIf(
         ConditionFunc conditionFunc,
-        std::chrono::milliseconds timeout = std::chrono::milliseconds::zero(),
+        boost::optional<std::chrono::milliseconds> timeout = boost::none,
         QueueReaderId readerId = kInvalidQueueReaderId);
 
     void push(Result result);
@@ -105,7 +108,7 @@ QueueReaderId SyncQueue<Result>::generateReaderId()
 template< typename Result>
 Result SyncQueue<Result>::pop()
 {
-    auto value = pop(std::chrono::milliseconds::zero());
+    auto value = pop(boost::none);
     NX_ASSERT(value);
     return std::move(*value);
 }
@@ -113,15 +116,12 @@ Result SyncQueue<Result>::pop()
 template< typename Result>
 boost::optional<Result> SyncQueue<Result>::pop(QueueReaderId readerId)
 {
-    return pop(std::chrono::milliseconds(0), readerId);
+    return pop(boost::none, readerId);
 }
 
-/**
- * @param timeout std::chrono::milliseconds::zero() means "no timeout"
- */
 template< typename Result>
 boost::optional<Result> SyncQueue<Result>::pop(
-    std::chrono::milliseconds timeout,
+    boost::optional<std::chrono::milliseconds> timeout,
     QueueReaderId readerId)
 {
     return popIf([](const Result&) { return true; }, timeout, readerId);
@@ -131,7 +131,7 @@ template<typename Result>
 template<typename ConditionFunc>
 boost::optional<Result> SyncQueue<Result>::popIf(
     ConditionFunc conditionFunc,
-    std::chrono::milliseconds timeout,
+    boost::optional<std::chrono::milliseconds> timeout,
     QueueReaderId readerId)
 {
     using namespace std::chrono;
@@ -139,8 +139,8 @@ boost::optional<Result> SyncQueue<Result>::popIf(
     QnMutexLocker lock(&m_mutex);
 
     boost::optional<steady_clock::time_point> deadline;
-    if (timeout.count())
-        deadline = steady_clock::now() + timeout;
+    if (timeout)
+        deadline = steady_clock::now() + *timeout;
 
     for (;;)
     {

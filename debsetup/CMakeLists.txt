@@ -8,7 +8,13 @@ elseif(arch STREQUAL "x86")
     set(arch.dir "i386-linux-gnu/")
 endif()
 set(target.arch "${os.arch}")
-set(license.text "TODO license.text") #< TODO: #dklychkov: Include license text to cmake build.
+
+# Read license.txt and properly format it to be included into deb templates file:
+#  - All lines but the first one must start with a space.
+#  - Empty lines must contain a single period (preceeded by a space too).
+file(READ ${customization_dir}/license.txt license.text)
+string(REGEX REPLACE "\n\n" "\n.\n" license.text "${license.text}")
+string(REGEX REPLACE "\n" "\n " license.text "${license.text}")
 
 nx_configure_file(
     ${CMAKE_SOURCE_DIR}/build_environment/maven/filter-resources/version.py

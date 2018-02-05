@@ -490,7 +490,7 @@ void QnStorageConfigWidget::loadDataToUi()
     m_backupSchedule = m_server->getBackupSchedule();
     m_camerasToBackup = getCurrentSelectedCameras(resourcePool());
 
-    updateDisabledStoragesWarning(false);
+    setWarningText(QString());
 
     updateRebuildInfo();
     updateBackupInfo();
@@ -551,8 +551,7 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
     }
     else if (index.column() == QnStorageListModel::CheckBoxColumn)
     {
-        updateDisabledStoragesWarning(
-            index.data(Qt::CheckStateRole).toInt() == Qt::Unchecked && hasChanges());
+        setWarningText(calculateWarningMessage());
     }
 
     emit hasChangesChanged();
@@ -686,14 +685,8 @@ void QnStorageConfigWidget::applyChanges()
             { server->setBackupSchedule(m_backupSchedule); });
     }
 
-    updateDisabledStoragesWarning(false);
+    setWarningText(QString());
     emit hasChangesChanged();
-}
-
-void QnStorageConfigWidget::updateDisabledStoragesWarning(bool visible)
-{
-    ui->storagesWarningLabel->setVisible(visible);
-    ui->storagesGroupBox->layout()->activate();
 }
 
 void QnStorageConfigWidget::startRebuid(bool isMain)
@@ -957,6 +950,48 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int 
             ui->backupPages->setCurrentWidget(ui->backupInformationPage);
         }
     }
+}
+
+QString QnStorageConfigWidget::calculateWarningMessage() const
+{
+    bool hasDisabledStorage = false;
+    bool hasUsbStorage = false;
+    for (const auto& storageData: m_model->storages())
+    {
+        const auto storage = resourcePool()->getResourceById<QnStorageResource>(storageData.id);
+        if (!storage || storage->getParentId() != m_server->getId())
+            continue;
+
+        // Storage was not modified.
+        if (storageData.isUsed == storage->isUsedForWriting())
+            continue;
+
+        if (!storageData.isUsed)
+            hasDisabledStorage = true;
+
+        if (storageData.isUsed && storageData.storageType == lit("usb"))
+            hasUsbStorage = true;
+    }
+
+    QStringList errorMessages;
+    if (hasDisabledStorage)
+    {
+        errorMessages << tr("Recording to disabled storage will stop. "
+            "However, deleting outdated footage from it will continue.");
+    }
+    if (hasUsbStorage)
+        errorMessages << tr("Recording was enabled on the USB storage");
+
+    return errorMessages.join(L'\n');
+}
+
+void QnStorageConfigWidget::setWarningText(const QString& message)
+{
+    const bool wasHidden = ui->storagesWarningLabel->isHidden();
+    ui->storagesWarningLabel->setHidden(message.isEmpty());
+    ui->storagesWarningLabel->setText(message);
+    if (wasHidden != ui->storagesWarningLabel->isHidden())
+        ui->storagesGroupBox->layout()->activate();
 }
 
 void QnStorageConfigWidget::updateIntervalLabels()

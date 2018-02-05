@@ -1,4 +1,3 @@
-
 #include <gtest/gtest.h>
 
 #include <random>
@@ -9,7 +8,6 @@
 #include <nx/network/stun/udp_server.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
 #include <nx/utils/test_support/sync_queue.h>
-
 
 namespace nx {
 namespace network {
@@ -23,8 +21,7 @@ const std::chrono::milliseconds kSocketTimeout(2000);
 const std::chrono::milliseconds kUdpRetryTimeout(500);
 const size_t kPleaseStopRunCount(10);
 
-class DummyCloudSystemCredentialsProvider
-:
+class DummyCloudSystemCredentialsProvider:
     public hpm::api::AbstractCloudSystemCredentialsProvider
 {
     boost::optional<hpm::api::SystemCredentials> getSystemCredentials() const override
@@ -35,16 +32,15 @@ class DummyCloudSystemCredentialsProvider
         c.key = String("SomeAuthKey");
         return std::move(c);
     }
-}
-dummyCloudSystemCredentialsProvider;
+};
 
-class UdpHolePunchingTunnelAcceptorTest
-:
+static DummyCloudSystemCredentialsProvider dummyCloudSystemCredentialsProvider;
+
+class UdpHolePunchingTunnelAcceptorTest:
     public ::testing::Test
 {
 protected:
-    UdpHolePunchingTunnelAcceptorTest()
-    :
+    UdpHolePunchingTunnelAcceptorTest():
         stunClientMock(std::make_shared<stun::test::AsyncClientMock>()),
         manualAcceptorStop(false),
         udpStunServer(&stunMessageDispatcher),
@@ -60,7 +56,7 @@ protected:
                 onUdpRequest(std::move(c), std::move(m));
             });
 
-        NX_CRITICAL(udpStunServer.bind(nx::network::SocketAddress("127.0.0.1:0")));
+        NX_CRITICAL(udpStunServer.bind(nx::network::SocketAddress::anyPrivateAddress));
         NX_CRITICAL(udpStunServer.listen());
         EXPECT_CALL(*stunClientMock, remoteAddress())
             .Times(::testing::AnyNumber())
@@ -72,14 +68,14 @@ protected:
         if (mediatorConnection)
             mediatorConnection->pleaseStopSync();
 
-        mediatorConnection.reset(new hpm::api::MediatorServerTcpConnection(
-            stunClientMock, &dummyCloudSystemCredentialsProvider));
+        mediatorConnection = std::make_unique<hpm::api::MediatorServerTcpConnection>(
+            stunClientMock, &dummyCloudSystemCredentialsProvider);
 
         nx::hpm::api::ConnectionParameters connectionParameters;
         connectionParameters.rendezvousConnectTimeout = kSocketTimeout;
         tunnelAcceptor.reset(new TunnelAcceptor(
             mediatorConnection->remoteAddress(),
-            {get2ndPeerAddress()}, 
+            {get2ndPeerAddress()},
             connectionParameters));
         tunnelAcceptor->setConnectionInfo(kConnectionSessionId, kRemotePeerId);
         tunnelAcceptor->setMediatorConnection(mediatorConnection.get());
@@ -270,7 +266,7 @@ protected:
     }
 
     std::shared_ptr<stun::test::AsyncClientMock> stunClientMock;
-    std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection;
+    std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection;
 
     bool manualAcceptorStop;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_udtAddressKeeper;
@@ -350,7 +346,7 @@ TEST_F(UdpHolePunchingTunnelAcceptorTest, MultiUdtConnect)
     ASSERT_EQ(acceptResults.pop(), SystemError::noError); // connection
     for (size_t i = 0; i < 5; ++i)
     {
-        ASSERT_EQ(acceptResults.pop(), SystemError::noError) 
+        ASSERT_EQ(acceptResults.pop(), SystemError::noError)
             << "i = " << i; // socket
         ASSERT_EQ(connectResults.pop(), SystemError::noError);
     }

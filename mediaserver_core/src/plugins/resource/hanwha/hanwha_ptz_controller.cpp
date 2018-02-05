@@ -1,5 +1,3 @@
-﻿#if defined(ENABLE_HANWHA)
-
 #include "hanwha_ptz_controller.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_resource.h"
@@ -27,6 +25,10 @@ HanwhaPtzController::HanwhaPtzController(const HanwhaResourcePtr& resource):
     QnBasicPtzController(resource),
     m_hanwhaResource(resource),
     m_presetManager(std::make_unique<HanwhaMappedPresetManager>(resource))
+{
+}
+
+HanwhaPtzController::~HanwhaPtzController()
 {
 }
 
@@ -160,7 +162,7 @@ bool HanwhaPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* p
     const auto x = response.parameter<double>(kHanwhaPanProperty);
     const auto y = response.parameter<double>(kHanwhaTiltProperty);
     const auto z = response.parameter<double>(kHanwhaZoomProperty);
-    
+
     if (x.is_initialized())
         position->setX(x.get());
 
@@ -253,7 +255,7 @@ bool HanwhaPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait& trait, co
         auto response = helper.control(lit("image/focus"), parameters);
         return response.isSuccessful();
     }
-    
+
     return false;
 }
 
@@ -317,7 +319,7 @@ std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
         result.emplace(lit("Type"), lit("1x"));
         return result;
     }
-    
+
     result.emplace(lit("Type"), lit("ZoomIn"));
 
     auto topLeft = rect.topLeft();
@@ -386,5 +388,3 @@ std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

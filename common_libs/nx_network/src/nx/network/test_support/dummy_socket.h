@@ -45,7 +45,6 @@ public:
         nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
     virtual void cancelIOSync(aio::EventType eventType) override;
 
-    virtual bool reopen() override;
     virtual bool setNoDelay( bool value ) override;
     virtual bool getNoDelay( bool* value ) const override;
     virtual bool toggleStatisticsCollection( bool val ) override;

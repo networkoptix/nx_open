@@ -10,8 +10,6 @@ StreamTransformingAsyncChannel::StreamTransformingAsyncChannel(
     :
     m_rawDataChannel(std::move(rawDataChannel)),
     m_converter(converter),
-    m_userReadBuffer(nullptr),
-    m_bytesEncodedOnPreviousStep(0),
     m_asyncReadInProgress(false)
 {
     using namespace std::placeholders;

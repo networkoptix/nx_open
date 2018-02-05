@@ -22,7 +22,8 @@ var AlertSuite = function () {
         'System may be disconnected from Nx Cloud,\nAccess to this System may be revoked,\n'+
         'or you may be logged into a different account',
         permissionDeleteSuccess: 'Permissions were removed from ',
-        permissionAddSuccess: 'New permissions saved'
+        permissionAddSuccess: 'New permissions saved',
+        activationLinkSent: 'Activation Link Sent'
     };
 
     this.submitButton = element(by.css('process-button')).element(by.css('button'));

@@ -159,10 +159,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     QnAbstractMediaDataPtr result;
     do {
-        if (m_RtpSession.getTransport() == QnRtspClient::TRANSPORT_UDP)
-            result = getNextDataUDP();
-        else
+        if (m_RtpSession.isTcpMode())
             result = getNextDataTCP();
+        else
+            result = getNextDataUDP();
 
     } while(result && !gotKeyData(result));
 
@@ -550,7 +550,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     //m_timeHelper.reset();
     m_gotSomeFrame = false;
     m_RtpSession.setTransport(getRtpTransport());
-    if (m_RtpSession.getTransport() != QnRtspClient::TRANSPORT_UDP)
+    if (m_RtpSession.isTcpMode())
         m_RtpSession.setTCPReadBufferSize(SOCKET_READ_BUFFER_SIZE);
 
 
@@ -569,7 +569,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
 
-    if (m_RtpSession.getTransport() != QnRtspClient::TRANSPORT_UDP)
+    if (m_RtpSession.isTcpMode())
         m_RtpSession.setTCPReadBufferSize(SOCKET_READ_BUFFER_SIZE);
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(getResource());
@@ -664,7 +664,7 @@ void QnMulticodecRtpReader::createTrackParsers()
                 else
                     m_tracks[i].parser->setLogicalChannelNum(m_numberOfVideoChannels);
 
-                if (m_RtpSession.getTransport() == QnRtspClient::TRANSPORT_UDP)
+                if (!m_RtpSession.isTcpMode())
                 {
                     m_tracks[i].ioDevice->getMediaSocket()->setRecvBufferSize(SOCKET_READ_BUFFER_SIZE);
                     m_tracks[i].ioDevice->getMediaSocket()->setNonBlockingMode(true);
@@ -832,6 +832,10 @@ boost::optional<std::chrono::microseconds> QnMulticodecRtpReader::parseOnvifNtpE
 
     const int extWords = ((int(ptr[2]) << 8) + ptr[3]);
     if (extWords < kOnvifNtpExtensionWordsNumber)
+        return boost::none;
+
+    const quint8* bufferEnd = bufferStart + length;
+    if (ptr + kOnvifNtpExtensionWordsNumber * 4 > bufferEnd)
         return boost::none;
 
     ptr += RtpHeaderExtension::kRtpExtensionHeaderLength;

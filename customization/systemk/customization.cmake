@@ -76,7 +76,6 @@ set(installer.language "ja_JP")
 set(installer.cultures "ja-jp")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation ja_JP)

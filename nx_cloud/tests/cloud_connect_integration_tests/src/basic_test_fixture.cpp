@@ -2,11 +2,11 @@
 
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
+#include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 
-#include <libconnection_mediator/src/http/http_api_path.h>
 #include <libconnection_mediator/src/listening_peer_pool.h>
 #include <libconnection_mediator/src/mediator_service.h>
 #include <nx/cloud/relay/model/remote_relay_peer_pool.h>
@@ -366,7 +366,7 @@ void BasicTestFixture::initializeCloudModulesXmlWithStunOverHttp()
     m_cloudModulesXmlProvider.registerStaticProcessor(
         kCloudModulesXmlPath,
         lm(kCloudModulesXmlTemplate)
-            .arg(m_mediator.httpEndpoint()).arg(nx::hpm::http::kStunOverHttpTunnelPath)
+            .arg(m_mediator.httpEndpoint()).arg(nx::hpm::api::kMediatorApiPrefix)
             .arg(m_mediator.stunEndpoint()).toUtf8(),
         "application/xml");
 }

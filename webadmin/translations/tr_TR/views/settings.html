@@ -42,7 +42,7 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                             Sunucu geçerli sistemden ayrılacaktır. Video arşivi bozulmadan kalacaktır.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Fabrika ayarlarına geri yükle</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>Sunucuyu mevcut sistemden ayır</h3>
                         <p>Bu eylem, sunucuyu veritabanını, yerel kullanıcıları ve yapılandırmayı koruyan sistemden ayırır. Video arşivi bozulmadan kalacaktır. <b> Bulut kullanıcıları silinir. </b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Sunucuyu mevcut sistemden ayır</button></p>

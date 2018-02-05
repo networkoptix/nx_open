@@ -379,11 +379,6 @@ class NX_NETWORK_API AbstractStreamSocket:
 {
 public:
     /**
-     * Reopenes previously closed socket.
-     * TODO #ak this class is not a right place for this method.
-     */
-    virtual bool reopen() = 0;
-    /**
      * Set TCP_NODELAY option (disable data aggregation).
      * @return false on error.
      */

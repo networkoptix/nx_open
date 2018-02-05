@@ -5,9 +5,14 @@
 #include <QtWidgets/QPushButton>
 
 #include <ui/widgets/common/input_field.h>
+#include <ui/workbench/workbench_context.h>
 
 #include <nx/client/desktop/ui/common/text_edit_field.h>
 #include <nx/client/desktop/ui/common/combo_box_field.h>
+
+#include <core/resource/user_resource.h>
+#include <api/global_settings.h>
+#include <common/common_module.h>
 
 namespace {
 
@@ -62,11 +67,14 @@ LicenseDeactivationReason::LicenseDeactivationReason(
     const license::RequestInfo& info,
     QWidget* parent)
     :
-    base_type(QnMessageBoxIcon::Information,
-        tr("Please fill up information about yourself and reason for license deactivation"),
-        QString(), QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parent),
+    base_type(parent),
     m_info(info)
 {
+    setIcon(QnMessageBoxIcon::Information);
+    setText(tr("Please fill up information about yourself and reason for license deactivation"));
+    setStandardButtons(QDialogButtonBox::Cancel);
+    setDefaultButton(QDialogButtonBox::NoButton);
+
     const auto nextButton = addButton(tr("Next"),
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
 
@@ -136,6 +144,7 @@ QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
             handleFieldChanges(reasonField);
         };
 
+
     connect(reasonComboBox, &ComboBoxField::currentIndexChanged, this, updateReasonFieldState);
     updateReasonFieldState();
 
@@ -145,8 +154,11 @@ QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
             const auto reasonText = isLastSelectedOption(reasonComboBox)
                 ? reasonField->text().split(lit("\n"))
                 : QStringList(reasonComboBox->text());
+
+            const auto systemName = qnGlobalSettings->systemName();
+            const auto userName = context()->user()->getName();
             m_info = nx::client::desktop::license::RequestInfo({
-                nameField->text(), emailField->text(), reasonText});
+                nameField->text(), emailField->text(), reasonText, systemName, userName});
         });
 
     addLabel(tr("Name"));

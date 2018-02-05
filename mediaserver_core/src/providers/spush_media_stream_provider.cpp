@@ -1,5 +1,4 @@
 #include "spush_media_stream_provider.h"
-#include "nx/streaming/ini.h"
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -10,6 +9,8 @@
 
 #include <core/resource/camera_resource.h>
 #include <nx/fusion//model_functions.h>
+
+#include "mediaserver_ini.h"
 
 namespace {
 static const qint64 CAM_NEED_CONTROL_CHECK_TIME = 1000 * 1;
@@ -200,8 +201,7 @@ void CLServerPushStreamReader::run()
         if (getResource()->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag;
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
 
-        if (!nxStreamingIni().disableTimeCorrection)
-            checkTime(data);
+        checkAndFixTimeFromCamera(data);
 
         if (canChangeStatus())
         {

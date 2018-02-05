@@ -1,5 +1,4 @@
 import logging
-import os
 import time
 import warnings
 from datetime import datetime, timedelta
@@ -71,7 +70,6 @@ def test_server_should_pick_archive_file_with_time_after_db_time(server, camera,
 
 def assert_server_has_resource(server, method, **kw):
     def is_subset(subset, superset):
-        '''Test that [subset] is a subset of [superset]'''
         return all(item in superset.items() for item in subset.items())
     resources = [r for r in server.rest_api.get_api_fn('GET', 'ec2', method)()
                  if is_subset(kw, r)]
@@ -169,8 +167,8 @@ def test_http_header_server(server):
 
 # https://networkoptix.atlassian.net/browse/VMS-3069
 def test_static_vulnerability(server):
-    filepath = os.path.join(server.dir, 'var', 'web', 'static', 'test.file')
-    server.host.write_file(filepath, 'This is just a test file')
+    filepath = server.dir / 'var' / 'web' / 'static' / 'test.file'
+    server.os_access.write_file(filepath, 'This is just a test file')
     url = server.rest_api.url + 'static/../../test.file'
     response = requests.get(url)
     assert response.status_code == 403
@@ -180,7 +178,7 @@ def test_static_vulnerability(server):
 def test_auth_with_time_changed(timeless_server):
     url = timeless_server.rest_api.url + 'ec2/getCurrentTime'
 
-    timeless_server.host.set_time(datetime.now(pytz.utc))
+    timeless_server.os_access.set_time(datetime.now(pytz.utc))
     assert wait_until(lambda: timeless_server.get_time().is_close_to(datetime.now(pytz.utc)))
 
     shift = timedelta(days=3)
@@ -191,7 +189,7 @@ def test_auth_with_time_changed(timeless_server):
     response = requests.get(url, headers={'Authorization': authorization_header_value})
     response.raise_for_status()
 
-    timeless_server.host.set_time(datetime.now(pytz.utc) + shift)
+    timeless_server.os_access.set_time(datetime.now(pytz.utc) + shift)
     assert wait_until(lambda: timeless_server.get_time().is_close_to(datetime.now(pytz.utc) + shift))
 
     response = requests.get(url, headers={'Authorization': authorization_header_value})
@@ -200,11 +198,11 @@ def test_auth_with_time_changed(timeless_server):
 
 
 def test_uptime_is_monotonic(timeless_server):
-    timeless_server.host.set_time(datetime.now(pytz.utc))
+    timeless_server.os_access.set_time(datetime.now(pytz.utc))
     first_uptime = timeless_server.rest_api.api.statistics.GET()['uptimeMs']
     if not isinstance(first_uptime, (int, float)):
         log.warning("Type of uptimeMs is %s but expected to be numeric.", type(first_uptime).__name__)
-    new_time = timeless_server.host.set_time(datetime.now(pytz.utc) - timedelta(minutes=1))
+    new_time = timeless_server.os_access.set_time(datetime.now(pytz.utc) - timedelta(minutes=1))
     assert wait_until(lambda: timeless_server.get_time().is_close_to(new_time))
     second_uptime = timeless_server.rest_api.api.statistics.GET()['uptimeMs']
     if not isinstance(first_uptime, (int, float)):
@@ -235,7 +233,7 @@ def test_https_verification(server_factory):
     server = server_factory('server', http_schema='https')
     url = server.rest_api_url.rstrip('/') + '/api/ping'
     with warnings.catch_warnings(record=True) as warning_list:
-        response = requests.get(url, verify=server.rest_api.ca_cert)
+        response = requests.get(url, verify=str(server.rest_api.ca_cert))
     assert response.status_code == 200
     for warning in warning_list:
         log.warning("Warning collected: %s.", warning)

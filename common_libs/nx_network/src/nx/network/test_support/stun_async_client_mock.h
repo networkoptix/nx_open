@@ -37,7 +37,13 @@ public:
     MOCK_METHOD1(closeConnection, void(SystemError::ErrorCode));
     MOCK_METHOD1(setKeepAliveOptions, void(KeepAliveOptions));
 
-    void sendRequest(Message request, RequestHandler handler, void*) override
+    virtual void setOnConnectionClosedHandler(
+        OnConnectionClosedHandler /*onConnectionClosedHandler*/) override
+    {
+        // TODO
+    }
+
+    virtual void sendRequest(Message request, RequestHandler handler, void*) override
     {
         QnMutexLocker lock(&m_mutex);
         const auto it = m_requestHandlers.find(request.header.method);
@@ -49,7 +55,7 @@ public:
         requestHandler(std::move(request), std::move(handler));
     }
 
-    void cancelHandlers(void*, utils::MoveOnlyFunc<void()> handler) override
+    virtual void cancelHandlers(void*, utils::MoveOnlyFunc<void()> handler) override
     {
         handler();
     }

@@ -14,8 +14,7 @@ constexpr const unsigned int kMaxConcurrentConnectionsFromSystemDefault = 2;
 
 } // namespace
 
-Settings::Settings()
-:
+Settings::Settings():
     maxConcurrentConnectionsFromSystem(
         kMaxConcurrentConnectionsFromSystemDefault)
 {

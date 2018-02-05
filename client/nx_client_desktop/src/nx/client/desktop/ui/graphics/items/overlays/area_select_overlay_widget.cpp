@@ -122,13 +122,20 @@ QRectF AreaSelectOverlayWidget::selectedArea() const
     return d->relativeRect;
 }
 
-void AreaSelectOverlayWidget::clearSelectedArea()
+void AreaSelectOverlayWidget::setSelectedArea(const QRectF& value)
 {
-    if (d->relativeRect.isEmpty())
+    if (d->relativeRect == value)
         return;
 
-    d->relativeRect = QRectF();
+    d->relativeRect = value;
+    emit selectedAreaChanged(d->relativeRect);
+
     update();
+}
+
+void AreaSelectOverlayWidget::clearSelectedArea()
+{
+    setSelectedArea(QRectF());
 }
 
 void AreaSelectOverlayWidget::paint(

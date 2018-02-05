@@ -1,8 +1,7 @@
 #pragma once
 
+#include <nx/network/cloud/mediator/api/listening_peer.h>
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
-
-#include "data/listening_peer.h"
 
 namespace nx {
 namespace hpm {
@@ -13,7 +12,7 @@ namespace http {
 
 class GetListeningPeerListHandler
 :
-    public nx::network::http::AbstractFusionRequestHandler<void, data::ListeningPeers>
+    public nx::network::http::AbstractFusionRequestHandler<void, api::ListeningPeers>
 {
 public:
     static const char* kHandlerPath;

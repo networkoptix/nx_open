@@ -7,10 +7,12 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/fake_media_server.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/resource_directory_browser.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/fake_media_server.h>
+#include <core/resource_management/resource_discovery_manager.h>
 
 #include <nx/client/desktop/resource_properties/camera/legacy_camera_settings_dialog.h>
 #include <nx/client/desktop/resource_properties/camera/camera_settings_dialog.h>
@@ -23,17 +25,14 @@
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 
 #include <nx/utils/raii_guard.h>
 #include <nx/client/desktop/utils/parameter_helper.h>
 
-/// For local resource discovery
-#include <core/resource_management/resource_discovery_manager.h>
-#include <ui/workbench/workbench_context.h>
 #include <common/common_module.h>
 #include <client/client_settings.h>
-#include <core/resource/resource_directory_browser.h>
 
 
 using namespace nx::client::desktop;
@@ -226,7 +225,7 @@ void QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered()
         localFilesSearcher->setPathCheckList(dirs);
     }
 
-    discoveryManager->queryLocalDiscovery();
+    emit localFilesSearcher->startLocalDiscovery();
 }
 
 void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(

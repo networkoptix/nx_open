@@ -1,7 +1,5 @@
 #include "layout_preview_painter.h"
 
-#include <camera/camera_thumbnail_manager.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -14,6 +12,8 @@
 #include <ui/widgets/common/busy_indicator.h>
 #include <ui/widgets/common/autoscaled_plain_text.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
+
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 #include <nx/client/core/utils/geometry.h>
 
@@ -326,15 +326,12 @@ void LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
 }
 
 LayoutPreviewPainter::ThumbnailInfo::ThumbnailInfo():
-    status(Qn::ThumbnailStatus::Invalid),
-    ignoreTrasformation(true)
+    ThumbnailInfo(Qn::ThumbnailStatus::Invalid, true, QPixmap())
 {
 }
 
 LayoutPreviewPainter::ThumbnailInfo::ThumbnailInfo(const QPixmap& pixmap):
-    status(Qn::ThumbnailStatus::Loaded),
-    ignoreTrasformation(true),
-    pixmap(pixmap)
+    ThumbnailInfo(Qn::ThumbnailStatus::Loaded, true, pixmap)
 {
 }
 

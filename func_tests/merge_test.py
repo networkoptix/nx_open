@@ -1,6 +1,7 @@
-'''Merge test
-   Initial task https://networkoptix.atlassian.net/browse/TEST-177
-'''
+"""Merge test
+
+Initial task https://networkoptix.atlassian.net/browse/TEST-177
+"""
 
 import logging
 import time
@@ -8,9 +9,9 @@ import time
 import pytest
 
 import server_api_data_generators as generator
-from test_utils.rest_api import RestApiError, HttpError
+from test_utils.rest_api import HttpError
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
-from test_utils.utils import bool_to_str, str_to_bool, datetime_utc_now
+from test_utils.utils import bool_to_str, datetime_utc_now, str_to_bool
 
 log = logging.getLogger(__name__)
 
@@ -24,7 +25,7 @@ def test_system_settings():
 
 
 def check_system_settings(server, **kw):
-    settings_to_check = {k: v for k, v in server.settings.iteritems() if k in kw.keys()}
+    settings_to_check = {k: v for k, v in server.settings.items() if k in kw.keys()}
     assert settings_to_check == kw
 
 

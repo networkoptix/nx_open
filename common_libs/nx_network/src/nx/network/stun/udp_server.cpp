@@ -12,8 +12,6 @@ namespace nx {
 namespace network {
 namespace stun {
 
-static const std::chrono::seconds kRetryReadAfterFailureTimeout(1);
-
 UdpServer::UdpServer(const MessageDispatcher* dispatcher):
     m_messagePipeline(this),
     m_boundToLocalAddress(false),

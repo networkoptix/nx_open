@@ -10,7 +10,8 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include "camera/video_camera.h"
+
+#include "camera_fwd.h"
 
 #define qnCameraPool QnVideoCameraPool::instance()
 

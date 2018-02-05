@@ -11,13 +11,13 @@ namespace nx {
 namespace utils {
 
 /**
-* Random access container with associated keys for fast lookup by key.
-* Insertion is allowed only at front and back and has amortized O(1) complexity.
-* Removal is allowed from any place and has O(N) complexity (QList removal).
-* Obtaining key or value by index has O(1) complexity.
-* Check whether a key exists has O(1) complexity.
-* Obtaining index or value by key has O(logN) complexity.
-*/
+ * Random access container with associated keys for fast lookup by key.
+ * Insertion is allowed only at front and back and has amortized O(1) complexity.
+ * Removal is allowed from any place and has O(N) complexity (QList removal).
+ * Obtaining key or value by index has O(1) complexity.
+ * Check whether a key exists has O(1) complexity.
+ * Obtaining index or value by key has O(logN) complexity.
+ */
 template<typename Key, typename Value>
 class KeyedList
 {
@@ -70,13 +70,13 @@ private:
 };
 
 /**
-* Random access container of keys with fast lookup by key.
-* Insertion is allowed only at front and back and has amortized O(1) complexity.
-* Removal is allowed from any place and has O(N) complexity (QList removal).
-* Obtaining key by index has O(1) complexity.
-* Check whether a key exists has O(1) complexity.
-* Obtaining index of key has O(logN) complexity.
-*/
+ * Random access container of keys with fast lookup by key.
+ * Insertion is allowed only at front and back and has amortized O(1) complexity.
+ * Removal is allowed from any place and has O(N) complexity (QList removal).
+ * Obtaining key by index has O(1) complexity.
+ * Check whether a key exists has O(1) complexity.
+ * Obtaining index of key has O(logN) complexity.
+ */
 template<typename Key>
 class KeyList
 {

@@ -138,6 +138,11 @@ TEST(HostAddress, IsLocal)
     ASSERT_FALSE(HostAddress("::ffff:12.34.56.78").isLocal());
 }
 
+TEST(HostAddress, isIpAddress)
+{
+    ASSERT_FALSE(HostAddress("127.0.0.1").isIpAddress());
+}
+
 #if 0 // TODO: #ak CLOUD-1124
 
 TEST(HostAddress, string_that_is_valid_ipv4)

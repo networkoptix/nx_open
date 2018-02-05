@@ -24,6 +24,7 @@ public:
     bool applyFilters() const;
     void setApplyFilters(bool value);
 
+    // Check if transcoding settings are locked and can't be changed by the user.
     bool transcodingAllowed() const;
     void setTranscodingAllowed(bool value);
 

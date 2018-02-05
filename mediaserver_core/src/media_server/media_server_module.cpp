@@ -35,6 +35,7 @@
 #include <recorder/storage_db_pool.h>
 #include <recorder/storage_manager.h>
 #include <recorder/archive_integrity_watcher.h>
+#include <recorder/wearable_archive_synchronizer.h>
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
 #include <nx/mediaserver/event/event_message_bus.h>
@@ -52,6 +53,10 @@
 #include <plugins/plugin_manager.h>
 #include <nx/mediaserver/server_meta_types.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <nx/mediaserver/updates2/updates2_manager.h>
+
+#include "wearable_lock_manager.h"
+#include "wearable_upload_manager.h"
 
 namespace {
 
@@ -68,11 +73,7 @@ void installTranslations()
 
 QDir downloadsDirectory()
 {
-    const QString varDir = qnServerModule->roSettings()->value("varDir").toString();
-    if (varDir.isEmpty())
-        return QDir();
-
-    const QDir dir(varDir + lit("/downloads"));
+    const QDir dir(qnServerModule->settings()->getDataDirectory() + lit("/downloads"));
     if (!dir.exists())
         QDir().mkpath(dir.absolutePath());
 
@@ -153,15 +154,21 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_context.reset(new UniquePtrContext());
 
+    m_analyticsEventsStorage =
+        nx::analytics::storage::EventsStorageFactory::instance()
+            .create(m_settings->analyticEventsStorage());
+
     m_context->normalStorageManager.reset(
         new QnStorageManager(
             commonModule(),
+            m_analyticsEventsStorage.get(),
             QnServer::StoragePool::Normal
         ));
 
     m_context->backupStorageManager.reset(
         new QnStorageManager(
             commonModule(),
+            nullptr,
             QnServer::StoragePool::Backup
         ));
 
@@ -178,18 +185,23 @@ QnMediaServerModule::QnMediaServerModule(
             commonModule()->eventRuleManager()));
 
     m_metadataManagerPoolThread = new QThread(this);
+    m_metadataManagerPoolThread->setObjectName(lit("MetadataManagerPool"));
     m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(this));
     m_metadataManagerPool->moveToThread(m_metadataManagerPoolThread);
     m_metadataManagerPoolThread->start();
 
-    m_analyticsEventsStorage =
-        nx::analytics::storage::EventsStorageFactory::instance()
-            .create(m_settings->analyticEventsStorage());
-
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
+    m_updates2Manager = store(new nx::mediaserver::updates2::Updates2Manager(this->commonModule()));
 
-    // Translations must be installed from the main applicaition thread.
+	store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
+
+
+    store(new QnWearableLockManager(this));
+
+    store(new QnWearableUploadManager(this));
+
+    // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
 }
 
@@ -297,4 +309,9 @@ void QnMediaServerModule::initializeRootTool()
 nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
 {
     return m_rootTool.get();
+}
+
+nx::mediaserver::updates2::Updates2Manager* QnMediaServerModule::updates2Manager() const
+{
+    return m_updates2Manager;
 }

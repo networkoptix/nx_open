@@ -1,10 +1,8 @@
-'''
-  Failover enable test cases
+"""Failover enable test cases
 
-  Based on testrail "Server failover"
-
-  https://networkoptix.testrail.net/index.php?/suites/view/5&group_by=cases:section_id&group_id=13&group_order=asc
-'''
+Based on testrail "Server failover".
+https://networkoptix.testrail.net/index.php?/suites/view/5&group_by=cases:section_id&group_id=13&group_order=asc
+"""
 
 import logging
 import time

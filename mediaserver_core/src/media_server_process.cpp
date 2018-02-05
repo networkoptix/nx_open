@@ -104,10 +104,14 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
 
+#include <camera_vendors.h>
+
 #include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
 #include <core/resource/avi/avi_resource.h>
-#include <plugins/resource/flir/flir_io_executor.h>
+#if defined(ENABLE_FLIR)
+    #include <plugins/resource/flir/flir_io_executor.h>
+#endif
 
 #include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
 
@@ -134,7 +138,6 @@
 #include <rest/handlers/crash_server_handler.h>
 #include <rest/handlers/external_event_rest_handler.h>
 #include <rest/handlers/favicon_rest_handler.h>
-#include <rest/handlers/image_rest_handler.h>
 #include <rest/handlers/log_rest_handler.h>
 #include <rest/handlers/manual_camera_addition_rest_handler.h>
 #include <rest/handlers/ping_rest_handler.h>
@@ -194,6 +197,7 @@
 #include <rest/handlers/downloads_rest_handler.h>
 #include <rest/handlers/get_hardware_ids_rest_handler.h>
 #include <rest/handlers/multiserver_get_hardware_ids_rest_handler.h>
+#include <rest/handlers/wearable_camera_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -283,6 +287,8 @@
 #include <rest/handlers/change_camera_password_rest_handler.h>
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
+#include <nx/mediaserver/updates2/updates2_manager.h>
+#include <nx/vms/common/p2p/downloader/downloader.h>
 
 
 #if !defined(EDGE_SERVER)
@@ -292,10 +298,13 @@
 
 #include <streaming/audio_streamer_pool.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
+#include "nx/mediaserver/rest/updates2/updates2_rest_handler.h"
 
 #if defined(__arm__)
     #include "nx1/info.h"
 #endif
+
+#include "mediaserver_ini.h"
 
 
 using namespace nx;
@@ -553,15 +562,11 @@ static int freeGB(QString drive)
 }
 #endif
 
-static QStringList listRecordFolders(bool includeNetwork = false)
+static QStringList listRecordFolders(bool includeNonHdd = false)
 {
     using namespace nx::mediaserver::fs::media_paths;
 
-    const NetworkDrives networkDrivesFlag = includeNetwork
-        ? NetworkDrives::allowed
-        : NetworkDrives::notAllowed;
-
-    auto mediaPathList = get(FilterConfig::createDefault(networkDrivesFlag));
+    auto mediaPathList = get(FilterConfig::createDefault(includeNonHdd));
     NX_VERBOSE(kLogTag, lm("Record folders: %1").container(mediaPathList));
     return mediaPathList;
 }
@@ -1146,8 +1151,7 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
 
 void MediaServerProcess::stopSync()
 {
-    qWarning()<<"Stopping server";
-    NX_LOG( lit("Stopping server"), cl_logALWAYS );
+    qWarning() << "Stopping server";
 
     const int kStopTimeoutMs = 100 * 1000;
 
@@ -1188,6 +1192,8 @@ void MediaServerProcess::stopObjects()
 
     qnNormalStorageMan->cancelRebuildCatalogAsync();
     qnBackupStorageMan->cancelRebuildCatalogAsync();
+    qnNormalStorageMan->stopAsyncTasks();
+    qnBackupStorageMan->stopAsyncTasks();
 
     if (qnFileDeletor)
         qnFileDeletor->stop();
@@ -1203,6 +1209,8 @@ void MediaServerProcess::stopObjects()
         delete m_universalTcpListener;
         m_universalTcpListener = 0;
     }
+
+    qnServerModule->updates2Manager()->stopAsyncTasks();
 }
 
 void MediaServerProcess::updateDisabledVendorsIfNeeded()
@@ -1548,8 +1556,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getCameraParam", new QnCameraSettingsRestHandler());
     reg("api/setCameraParam", new QnCameraSettingsRestHandler());
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
+    reg("api/wearableCamera", new QnWearableCameraRestHandler());
     reg("api/ptz", new QnPtzRestHandler());
-    reg("api/image", new QnImageRestHandler()); //< deprecated
     reg("api/createEvent", new QnExternalEventRestHandler());
     static const char kGetTimePath[] = "api/gettime";
     reg(kGetTimePath, new QnTimeRestHandler());
@@ -1628,7 +1636,7 @@ void MediaServerProcess::registerRestHandlers(
     reg(
         "ec2/analyticsLookupDetectedObjects",
         new QnMultiserverAnalyticsLookupDetectedObjects(
-            "ec2/analyticsLookupDetectedObjects",
+            commonModule(),
             qnServerModule->analyticsEventsStorage()));
 
     reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(cloudManagerGroup));
@@ -1647,6 +1655,9 @@ void MediaServerProcess::registerRestHandlers(
     static const char kGetHardwareIdsPath[] = "api/getHardwareIds";
     reg(kGetHardwareIdsPath, new QnGetHardwareIdsRestHandler());
     reg("ec2/getHardwareIdsOfServers", new QnMultiserverGetHardwareIdsRestHandler(QLatin1String("/") + kGetHardwareIdsPath));
+
+    using namespace mediaserver::rest::updates2;
+    reg(kUpdates2Path, new Updates2RestHandler());
 }
 
 template<class TcpConnectionProcessor, typename... ExtraParam>
@@ -1786,8 +1797,10 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
     // Change owner of all data files, so mediaserver can use them as different user.
     const std::vector<QString> chmodPaths =
     {
+        MSSettings::defaultConfigDirectory(),
         qnServerModule->roSettings()->fileName(),
         qnServerModule->runTimeSettings()->fileName(),
+        QnFileConnectionProcessor::externalPackagePath(),
         getDataDirectory(),
     };
     for (const auto& path: chmodPaths)
@@ -1807,7 +1820,7 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
         nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
     if (m_preparedTcpServerSockets.empty())
     {
-        qWarning().noquote() << "WARNING: Unable to prealocate TCP sockets on port" << port << ":"
+        qWarning().noquote() << "WARNING: Unable to preallocate TCP sockets on port" << port << ":"
             << SystemError::getLastOSErrorText();
     }
 
@@ -1922,10 +1935,17 @@ void MediaServerProcess::initPublicIpDiscovery()
     m_ipDiscovery->update();
     m_ipDiscovery->waitForFinished();
     at_updatePublicAddress(m_ipDiscovery->publicIP());
+}
 
+void MediaServerProcess::initPublicIpDiscoveryUpdate()
+{
     m_updatePiblicIpTimer.reset(new QTimer());
-    connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::update);
-    connect(m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
+    connect(m_updatePiblicIpTimer.get(), &QTimer::timeout,
+        m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::update);
+
+    connect(m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::found,
+        this, &MediaServerProcess::at_updatePublicAddress);
+
     m_updatePiblicIpTimer->start(kPublicIpUpdateTimeoutMs);
 }
 
@@ -2245,6 +2265,16 @@ void MediaServerProcess::run()
         m_cmdLineArguments.configFilePath,
         m_cmdLineArguments.rwConfigFilePath));
 
+    connect(
+        this, &MediaServerProcess::started,
+        [&serverModule]() { serverModule->updates2Manager()->atServerStart(); });
+
+    using namespace nx::vms::common::p2p::downloader;
+    connect(
+        this, &MediaServerProcess::started,
+        [&serverModule]() {serverModule->findInstance<Downloader>()->atServerStart(); });
+
+
     qnServerModule->runTimeSettings()->remove("rebuild");
 
     if (m_serviceMode)
@@ -2489,6 +2519,7 @@ void MediaServerProcess::run()
             case Qn::IncompatibleVersionConnectionResult:
             case Qn::IncompatibleProtocolConnectionResult:
                 NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
+                stopObjects();
                 return;
             default:
                 break;
@@ -2519,7 +2550,10 @@ void MediaServerProcess::run()
         this, &MediaServerProcess::at_runtimeInfoChanged, Qt::QueuedConnection);
 
     if (needToStop())
+    {
+        stopObjects();
         return; //TODO #ak correctly deinitialize what has been initialised
+    }
 
     qnServerModule->roSettings()->setValue(QnServer::kRemoveDbParamName, "0");
 
@@ -2529,6 +2563,7 @@ void MediaServerProcess::run()
     if (qnServerModule->roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes")
     {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
+        stopObjects();
         nx::SystemName systemName(connectInfo.systemName);
         systemName.saveToConfig(); //< migrate system name from foreign database via config
         nx::ServerSetting::setSysIdTime(0);
@@ -2600,7 +2635,10 @@ void MediaServerProcess::run()
     }
 
     if (needToStop())
+    {
+        stopObjects();
         return;
+    }
 
     if (qnServerModule->roSettings()->value("disableTranscoding").toBool())
         commonModule()->setTranscodeDisabled(true);
@@ -2613,6 +2651,7 @@ void MediaServerProcess::run()
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
+        stopObjects();
         return;
     }
 
@@ -2802,7 +2841,10 @@ void MediaServerProcess::run()
     auto resourceSearchers = std::make_unique<QnMediaServerResourceSearchers>(commonModule());
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool(commonModule()));
-    auto flirExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
+
+    #if defined(ENABLE_FLIR)
+        auto flirExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
+    #endif
 
     auto upnpPortMapper = initializeUpnpPortMapper();
 
@@ -2824,6 +2866,7 @@ void MediaServerProcess::run()
 
     qnServerModule->metadataManagerPool()->init();
     at_runtimeInfoChanged(runtimeManager->localInfo());
+    initPublicIpDiscoveryUpdate();
 
     saveServerInfo(m_mediaServer);
     m_mediaServer->setStatus(Qn::Online);
@@ -3050,6 +3093,7 @@ void MediaServerProcess::run()
     videoCameraPool.reset();
 
     commonModule()->resourceDiscoveryManager()->stop();
+    qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics event.
     QnResource::stopAsyncTasks();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
@@ -3070,12 +3114,10 @@ void MediaServerProcess::run()
 
     motionHelper.reset();
 
-    qnNormalStorageMan->stopAsyncTasks();
-    qnBackupStorageMan->stopAsyncTasks();
-
     //ptzPool.reset();
 
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
+    ec2ConnectionFactory->shutdown();
 
     //disconnecting from EC2
     clearEc2ConnectionGuard.reset();

@@ -81,11 +81,12 @@ public:
 
     /**
      * In some undefined time after this call deprecated data will be removed from persistent storage.
+     * NOTE: Call is non-blocking.
      * @param deviceId Can be null.
      */
     virtual void markDataAsDeprecated(
         QnUuid deviceId,
-        qint64 oldestNeededDataTimestamp) = 0;
+        std::chrono::milliseconds oldestDataToKeepTimestamp) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -117,7 +118,7 @@ public:
 
     virtual void markDataAsDeprecated(
         QnUuid deviceId,
-        qint64 oldestNeededDataTimestamp) override;
+        std::chrono::milliseconds oldestDataToKeepTimestamp) override;
 
 private:
     const Settings& m_settings;
@@ -186,6 +187,11 @@ private:
         nx::utils::db::SqlQuery& query,
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
+
+    nx::utils::db::DBResult cleanupData(
+        nx::utils::db::QueryContext* queryContext,
+        const QnUuid& deviceId,
+        std::chrono::milliseconds oldestDataToKeepTimestamp);
 };
 
 //-------------------------------------------------------------------------------------------------

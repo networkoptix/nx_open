@@ -1,8 +1,3 @@
-/**********************************************************
-* May 11, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include "event_manager.h"
 
 #include <chrono>
@@ -61,8 +56,8 @@ EventManager::EventManager(const conf::Settings& settings)
 
 EventManager::~EventManager()
 {
-    //assuming no public methods of this class can be called anymore,
-    //  but we have to wait for all scheduled async calls to finish
+    // Assuming no public methods of this class can be called anymore,
+    // but we have to wait for all scheduled async calls to finish.
     m_startedAsyncCallsCounter.wait();
 }
 
@@ -106,7 +101,7 @@ void EventManager::subscribeToEvents(
     {
         QnMutexLocker lk(&m_mutex);
 
-        //checking if such connection is already present
+        // Checking if such connection is already present.
         const auto iterAndInsertionFlag = m_activeMediaServerConnections.emplace(
             ServerConnectionContext(httpConnection, systemId));
 
@@ -152,7 +147,7 @@ bool EventManager::isSystemOnline(const std::string& systemId) const
 void EventManager::beforeMsgBodySourceDestruction(
     nx::network::http::HttpServerConnection* connection)
 {
-    //element can already be removed, but connection object is still alive
+    // Element can already be removed, but connection object is still alive.
 
     QnMutexLocker lk(&m_mutex);
 
@@ -181,7 +176,7 @@ void EventManager::onConnectionToPeerLost(
 void EventManager::onMediaServerIdlePeriodExpired(
     EventManager::MediaServerConnectionContainer::iterator serverConnectionIter)
 {
-    //closing event stream to force mediaserver send us a new request
+    // Closing event stream to force mediaserver send us a new request.
 
     //NOTE we do not need synchronization here since all events
     //    related to a single connection are always invoked within same aio thread
@@ -193,5 +188,5 @@ void EventManager::onMediaServerIdlePeriodExpired(
         });
 }
 
-}   //namespace cdb
-}   //namespace nx
+} // namespace cdb
+} // namespace nx

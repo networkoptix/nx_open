@@ -40,7 +40,7 @@
                             サーバーは現在のシステムから切り離されます ビデオのアーカイブはそのまま残ります</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">出荷時のデフォルトに戻す</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>システムからサーバーを切離す</h3>
                         <p>これにより、データベース、ローカルユーザー、および構成を保持しているサーバーがシステムから切り離されます。ビデオのアーカイブはそのまま残されます <b>クラウドユーザーは削除されます </b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">システムからサーバーを切離す</button></p>

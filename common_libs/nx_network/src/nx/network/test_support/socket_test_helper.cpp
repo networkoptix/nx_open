@@ -133,10 +133,6 @@ SocketAddress TestConnection::getLocalAddress() const
     return m_socket->getLocalAddress();
 }
 
-const std::chrono::milliseconds kDefaultSendTimeout(17000);
-const std::chrono::milliseconds kDefaultRecvTimeout(17000);
-const size_t kDefaultMaxTimeoutsInARow(5);
-
 void TestConnection::start(std::chrono::milliseconds rwTimeout)
 {
     if (!m_socket->setNonBlockingMode(true) ||

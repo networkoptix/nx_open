@@ -1,4 +1,4 @@
-var customization = require('./test-customization.json');
+var customization = require('./test-customizations.json');
 exports.config = {
 
 
@@ -20,6 +20,17 @@ exports.config = {
             'args': ['--test-type','--ignore-certificate-errors']
         }
     },
+
+/*    multiCapabilities: [{
+        'browserName': 'chrome',
+        'chromeOptions': {
+            'args': ['--test-type']
+        }
+    }, {
+        'browserName': 'firefox'
+    }],
+*/
+
     seleniumAddress: 'http://localhost:4444/wd/hub',
 
     // Spec patterns are relative to the current working directly when

@@ -14,6 +14,7 @@
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/dummy_handler.h>
+#include <nx/kit/debug.h>
 
 #include <nx/vms/utils/vms_utils.h>
 
@@ -40,6 +41,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/scope_guard.h>
 #include <api/resource_property_adaptor.h>
 

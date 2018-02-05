@@ -41,7 +41,7 @@
                             서버가 현재 시스템에서 분리됩니다. 저장된 비디오는 그대로 유지됩니다.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">공장 기본값 복원</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>시스템에서 서버 분리</h3>
                         <p>이 작업은 데이터베이스, 로컬 사용자 및 구성을 유지하면서 서버를 시스템에서 분리합니다. 저장된 비디오는 그대로 유지됩니다. <b> 클라우드 사용자는 삭제됩니다. </b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">시스템에서 분리</button></p>

@@ -42,7 +42,7 @@
                             De server zal worden losgemaakt van het huidige systeem. Videoarchief zal intact blijven.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Fabrieksinstellingen herstellen</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>Maak de server los van het systeem</h3>
                         <p>Met deze actie wordt de server losgemaakt van de systeemdatabase, lokale gebruikers en configuratie. Videoarchief blijft intact. <b> Cloud gebruikers worden verwijderd. </b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Maak los van het systeem</button></p>

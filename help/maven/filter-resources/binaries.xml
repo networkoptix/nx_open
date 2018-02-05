@@ -7,11 +7,11 @@
 		<dependencySet>
 			<useTransitiveDependencies>false</useTransitiveDependencies>
 		</dependencySet>
-	</dependencySets>	
+	</dependencySets>
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
 		<fileSet>
-			<directory>${ClientHelpSourceDir}</directory>
+			<directory>${project.build.directory}//${customization}</directory>
 			<outputDirectory>../help</outputDirectory>
 		</fileSet>
 	</fileSets>

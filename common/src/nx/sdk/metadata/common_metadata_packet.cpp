@@ -6,10 +6,10 @@ namespace metadata {
 
 void* CommonEventsMetadataPacket::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_EventMetadataPacket)
+    if (interfaceId == IID_EventsMetadataPacket)
     {
         addRef();
-        return static_cast<AbstractEventMetadataPacket*>(this);
+        return static_cast<EventsMetadataPacket*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)
@@ -22,10 +22,10 @@ void* CommonEventsMetadataPacket::queryInterface(const nxpl::NX_GUID& interfaceI
 
 void* CommonObjectsMetadataPacket::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_DetectionMetadataPacket)
+    if (interfaceId == IID_ObjectsMetadataPacket)
     {
         addRef();
-        return static_cast<AbstractObjectsMetadataPacket*>(this);
+        return static_cast<ObjectsMetadataPacket*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)

@@ -10,7 +10,7 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
     list_display = ('short_email', 'short_first_name', 'short_last_name', 'created_date', 'last_login',
                     'subscribe', 'is_staff', 'language', 'customization')
     # forbid changing all fields which can be edited by user in cloud portal except sub
-    readonly_fields = ('short_email', 'short_first_name', 'short_last_name', 'created_date', 'activated_date', 'last_login',
+    readonly_fields = ('email', 'first_name', 'last_name', 'created_date', 'activated_date', 'last_login',
                        'subscribe', 'language')
 
     list_filter = ('subscribe', 'is_staff', 'created_date', 'last_login',)

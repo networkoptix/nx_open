@@ -1,8 +1,6 @@
-#ifdef ENABLE_IQE
-
-#include "../onvif/dataprovider/onvif_mjpeg.h"
+#include <streaming/mjpeg_stream_reader.h>
 #include "iqinvision_resource.h"
-#include "../onvif/dataprovider/rtp_stream_provider.h"
+#include <streaming/rtp_stream_reader.h>
 #include <common/static_common_module.h>
 
 const QString QnPlIqResource::MANUFACTURE(lit("IqEye"));
@@ -40,12 +38,16 @@ void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)
 
 }
 
-CameraDiagnostics::Result QnPlIqResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnPlIqResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex /*streamIndex*/)
 {
-    QnPhysicalCameraResource::initInternal();
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
 
+CameraDiagnostics::Result QnPlIqResource::initializeCameraDriver()
+{
     updateDefaultAuthIfEmpty(lit("root"), lit("system"));
-
 
     const CLHttpStatus status = setOID(QLatin1String("1.2.6.5"), QLatin1String("1")); // Reset crop to maximum size
     switch( status )
@@ -133,5 +135,3 @@ bool QnPlIqResource::isRtp() const
         //name == QLatin1String("IQ765N") ||
         name == QLatin1String("IQM32S");
 }
-
-#endif // #ifdef ENABLE_IQE

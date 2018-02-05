@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_response.h"
 #include "hanwha_utils.h"
 
@@ -243,5 +241,3 @@ boost::optional<QString> HanwhaResponse::parameter<QString>(const QString& param
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

@@ -5,6 +5,7 @@
 #include <nx/network/ssl/ssl_stream_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
+#include <nx/network/test_support/stream_socket_acceptance_tests.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -12,6 +13,57 @@
 
 namespace nx {
 namespace network {
+
+#if 0
+namespace test {
+
+namespace {
+
+class SslOverTcpServerSocket:
+    public ssl::StreamServerSocket
+{
+    using base_type = ssl::StreamServerSocket;
+
+public:
+    SslOverTcpServerSocket(int ipVersion):
+        base_type(
+            std::make_unique<TCPServerSocket>(ipVersion),
+            ssl::EncryptionUse::always)
+    {
+    }
+};
+
+class SslOverTcpStreamSocket:
+    public ssl::StreamSocket
+{
+    using base_type = ssl::StreamSocket;
+
+public:
+    SslOverTcpStreamSocket(int ipVersion = AF_INET):
+        base_type(std::make_unique<TCPSocket>(ipVersion), false)
+    {
+    }
+};
+
+struct SslSocketTypeSet
+{
+    using ClientSocket = SslOverTcpStreamSocket;
+    using ServerSocket = SslOverTcpServerSocket;
+};
+
+} // namespace
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    SslSocketStream,
+    StreamSocketAcceptance,
+    SslSocketTypeSet);
+
+} // namespace test
+#endif
+
+//-------------------------------------------------------------------------------------------------
+
+
 namespace ssl {
 namespace test {
 

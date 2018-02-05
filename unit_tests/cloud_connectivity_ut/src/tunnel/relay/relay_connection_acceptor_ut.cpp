@@ -34,7 +34,8 @@ protected:
     };
 
     ServerType m_serverType = ServerType::happy;
-    utils::SyncQueue<std::unique_ptr<nx::network::AbstractStreamSocket>> m_serverConnections;
+    utils::SyncQueue<std::unique_ptr<nx::network::AbstractStreamSocket>>
+        m_listeningPeerConnectionsToRelay;
 
     virtual void SetUp() override
     {
@@ -113,7 +114,7 @@ private:
         auto socket = connection->takeSocket();
         NX_ASSERT(socket->isInSelfAioThread());
         socket->cancelIOSync(aio::etNone);
-        m_serverConnections.push(std::move(socket));
+        m_listeningPeerConnectionsToRelay.push(std::move(socket));
     }
 };
 
@@ -178,7 +179,7 @@ protected:
 
     void whenRelayActivatesConnection()
     {
-        m_serverConnection = m_serverConnections.pop();
+        m_serverConnection = m_listeningPeerConnectionsToRelay.pop();
 
         api::OpenTunnelNotification openTunnelNotification;
         openTunnelNotification.setClientPeerName("test_client_name");
@@ -191,7 +192,7 @@ protected:
 
     void whenRelayClosesConnection()
     {
-        m_serverConnection = m_serverConnections.pop();
+        m_serverConnection = m_listeningPeerConnectionsToRelay.pop();
         m_serverConnection->pleaseStopSync();
         m_serverConnection.reset();
     }
@@ -426,7 +427,9 @@ protected:
 
     void thenAcceptorIsRegisteredOnRelay()
     {
-        m_serverConnections.pop();
+        auto connection = m_listeningPeerConnectionsToRelay.pop();
+        ASSERT_NE(nullptr, connection.get());
+        connection->pleaseStopSync();
     }
 
 private:

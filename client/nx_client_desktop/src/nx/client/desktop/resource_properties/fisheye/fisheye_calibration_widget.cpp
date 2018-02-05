@@ -8,7 +8,7 @@
 
 #include <ui/fisheye/fisheye_calibrator.h>
 
-#include <utils/image_provider.h>
+#include <nx/client/desktop/image_providers/image_provider.h>
 #include <nx/utils/math/fuzzy.h>
 
 #include "fisheye_calibration_image_widget.h"

@@ -13,6 +13,8 @@ FULLVERSION=@release.version@.@buildNumber@
 MINORVERSION=@parsedVersion.majorVersion@.@parsedVersion.minorVersion@
 ARCHITECTURE=@os.arch@
 
+COMPILER=@CMAKE_CXX_COMPILER@
+SOURCE_ROOT_PATH="@root.dir@"
 TARGET=/opt/$COMPANY_NAME/client/$FULLVERSION
 USRTARGET=/usr
 BINTARGET=$TARGET/bin
@@ -26,7 +28,7 @@ INITDTARGET=/etc/init.d
 FINALNAME=@artifact.name.client@
 UPDATE_NAME=@artifact.name.client_update@.zip
 
-STAGEBASE=deb
+STAGEBASE=stagebase
 STAGE=$STAGEBASE/$FINALNAME
 STAGETARGET=$STAGE/$TARGET
 BINSTAGE=$STAGE$BINTARGET
@@ -51,6 +53,11 @@ CLIENT_LIB_PATH=@libdir@/lib/@build.configuration@
 BUILD_INFO_TXT=@libdir@/build_info.txt
 LOGS_DIR="@libdir@/build_logs"
 LOG_FILE="$LOGS_DIR/client-build-dist.log"
+
+cp_sys_lib()
+{
+    "$SOURCE_ROOT_PATH"/build_utils/copy_system_library -c "$COMPILER" "$@"
+}
 
 buildDistribution()
 {
@@ -108,7 +115,8 @@ buildDistribution()
         LIB_BASENAME=$(basename "$LIB")
         if [[ "$LIB_BASENAME" != libQt5* \
             && "$LIB_BASENAME" != libEnginio.so* \
-            && "$LIB_BASENAME" !=  libqgsttools_p.* ]]
+            && "$LIB_BASENAME" != libqgsttools_p.* \
+            && "$LIB_BASENAME" != libmediaserver* ]]
         then
             echo "Copying $LIB_BASENAME"
             cp -P "$LIB" "$LIBSTAGE/"
@@ -151,13 +159,15 @@ buildDistribution()
         cp -P @qt.dir@/lib/$qtlib* $LIBSTAGE
     done
 
+    cp_sys_lib libstdc++.so.6 "$LIBSTAGE"
+
     if [ '@arch@' != 'arm' ]
     then
         echo "Copying additional libs"
-        cp -r /usr/lib/@arch.dir@/libXss.so.1* $LIBSTAGE
-        cp -r /lib/@arch.dir@/libpng12.so* $LIBSTAGE
-        cp -r /usr/lib/@arch.dir@/libopenal.so.1* $LIBSTAGE
-        cp -P @qt.dir@/lib/libicu*.so* $LIBSTAGE
+        cp_sys_lib libXss.so.1 "$LIBSTAGE"
+        cp_sys_lib libpng12.so.0 "$LIBSTAGE" || cp_sys_lib libpng.so "$LIBSTAGE"
+        cp_sys_lib libopenal.so.1 "$LIBSTAGE"
+        cp -P @qt.dir@/lib/libicu*.so* "$LIBSTAGE"
     fi
 
     echo "Setting permissions"

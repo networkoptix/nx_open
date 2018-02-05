@@ -222,7 +222,7 @@ static std::string relativeSrcFilename(const std::string& file)
     std::string result = r;
     std::replace(result.begin(), result.end(),
         debug::pathSeparator(), '/');
-    return r;
+    return result;
 }
 
 static bool stringEndsWithSuffix(const std::string& str, const std::string& suffix)
@@ -250,8 +250,6 @@ TEST(debug, relativeSrcFilename)
 
     static const std::string suffix =
         thisFileFolder() + "/" + debug::fileBaseNameWithoutExt(__FILE__) + "." + thisFileExt();
-    NX_PRINT_VALUE(thisFileFolder());
-    NX_PRINT_VALUE(suffix);
     ASSERT_TRUE(stringEndsWithSuffix(thisFile, suffix));
 
     const std::string commonPrefix = std::string(thisFile, 0, thisFile.size() - suffix.size());

@@ -120,14 +120,6 @@ AbstractSocket::SOCKET_HANDLE CloudStreamSocket::handle() const
     return -1;
 }
 
-bool CloudStreamSocket::reopen()
-{
-    if (m_socketDelegate)
-        return m_socketDelegate->reopen();
-
-    return false;
-}
-
 bool CloudStreamSocket::connect(
     const SocketAddress& remoteAddress,
     std::chrono::milliseconds timeout)

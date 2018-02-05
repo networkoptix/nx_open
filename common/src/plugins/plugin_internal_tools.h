@@ -7,6 +7,7 @@
 namespace nxpt {
 
 QnUuid fromPluginGuidToQnUuid(const nxpl::NX_GUID& guid);
+nxpl::NX_GUID fromQnUuidToPluginGuid(const QnUuid& uuid);
 
 nxpl::NX_GUID fromQnUuidToPluginGuid(const QnUuid& uuid);
 
@@ -15,7 +16,7 @@ nxpl::NX_GUID fromQnUuidToPluginGuid(const QnUuid& uuid);
 namespace nx {
 namespace sdk {
 
-QString toString(const nx::sdk::ResourceInfo& resourceInfo);
+QString toString(const nx::sdk::CameraInfo& cameraInfo);
 
 } // namespace sdk
 } // namespace nx

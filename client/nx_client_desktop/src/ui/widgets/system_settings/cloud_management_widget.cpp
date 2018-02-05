@@ -27,7 +27,6 @@
 
 namespace {
 
-const bool kShowPromoBar = true;
 const int kAccountFontPixelSize = 24;
 
 } // namespace
@@ -81,26 +80,6 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     QnCloudUrlHelper urlHelper(
         SystemUri::ReferralSource::DesktopClient,
         SystemUri::ReferralContext::SettingsDialog);
-
-    const QString kLimitationsLink = makeHref(tr("Known limitations"), urlHelper.faqUrl());
-    const QString kPromoText = tr("%1 is in Beta.", "%1 is the cloud name (like 'Nx Cloud')")
-        .arg(nx::network::AppInfo::cloudName());
-
-    /* Realign content in intro panel if promo bar is shown: */
-    if (kShowPromoBar)
-    {
-        ui->promoBar->setText(kPromoText + L' ' + kLimitationsLink);
-
-        QMargins margins = ui->introLayout->contentsMargins();
-        margins.setTop(margins.top() - style::Metrics::kHeaderSize / 2);
-        ui->introLayout->setContentsMargins(margins);
-
-        ui->introSpacer->changeSize(
-            ui->introSpacer->sizeHint().width(),
-            ui->introSpacer->sizeHint().height() - style::Metrics::kHeaderSize / 2,
-            ui->introSpacer->sizePolicy().horizontalPolicy(),
-            ui->introSpacer->sizePolicy().verticalPolicy());
-    }
 
     ui->learnMoreLabel->setText(
         makeHref(tr("Learn more about %1", "%1 is the cloud name (like 'Nx Cloud')").arg(

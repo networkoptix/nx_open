@@ -71,7 +71,7 @@ void QnThumbnailsStreamReader::run()
     NX_INFO(this, "Started");
     beforeRun();
 
-    m_delegate->open(getResource(), /*archiveIntegrityWatcher*/ nullptr);
+    m_delegate->open(getResource());
 
     while(!needToStop())
     {

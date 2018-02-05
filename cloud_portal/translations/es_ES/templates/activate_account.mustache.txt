@@ -1,8 +1,8 @@
 Bienvenido a {{PRODUCT_NAME}}
 
-Gracias por unirse a {{PRODUCT_NAME}}. Visite el siguiente botón para confirmar su dirección de correo electrónico y activar la cuenta.
+Gracias por unirse a {{PRODUCT_NAME}}. Por favor, visite el siguiente botón para confirmar su dirección de correo electrónico y activar la cuenta.
 
-Activar cuenta: {{config.portal_url}}/activar/{{message.code}}
+Activar cuenta: {{config.portal_url}} / activate / {{message.code}}
 
 Si no se registró en {{PRODUCT_NAME}}, solo ignore este correo electrónico.
-Por favor no comparta el mensaje o el enlace con terceras partes.
+No comparta el mensaje o el enlace con terceros.

@@ -4,6 +4,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/server/fusion_request_result.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/app_info.h>
 
 #include <nx/cloud/cdb/client/data/account_data.h>
@@ -163,15 +164,14 @@ TEST_F(ApiConventions, api_conventions_ok)
     ASSERT_EQ(api::ResultCode::ok, result);
 
     nx::network::http::HttpClient client;
-    for (int i = 0; i < 200; ++i)
+    client.setResponseReadTimeoutMs(60000);
+    for (int i = 0; i < 27; ++i)
     {
-        nx::utils::Url url;
-        url.setHost(endpoint().address.toString());
-        url.setPort(endpoint().port);
-        url.setScheme("http");
-        url.setPath("/cdb/account/get");
-        url.setUserName(QString::fromStdString(account1.email));
-        url.setPassword(QString::fromStdString(account1Password));
+        nx::utils::Url url =
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+                .setEndpoint(endpoint()).setPath("/cdb/account/get")
+                .setUserName(QString::fromStdString(account1.email))
+                .setPassword(QString::fromStdString(account1Password)).toUrl();
         ASSERT_TRUE(client.doGet(url));
         ASSERT_TRUE(client.response() != nullptr);
         ASSERT_EQ(
@@ -183,15 +183,6 @@ TEST_F(ApiConventions, api_conventions_ok)
             msgBody += client.fetchMessageBodyBuffer();
 
         ASSERT_FALSE(msgBody.isEmpty());
-        //nx::network::http::FusionRequestResult requestResult =
-        //    QJson::deserialized<nx::network::http::FusionRequestResult>(msgBody);
-
-        //ASSERT_EQ(
-        //    nx::network::http::FusionRequestErrorClass::unauthorized,
-        //    requestResult.errorClass);
-        //ASSERT_EQ(
-        //    QnLexical::serialized(api::ResultCode::notAuthorized),
-        //    requestResult.resultCode);
     }
 }
 

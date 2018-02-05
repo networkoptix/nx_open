@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <utils/common/util.h>
@@ -285,5 +283,3 @@ bool HanwhaArchiveDelegate::setQuality(
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

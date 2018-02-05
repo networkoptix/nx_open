@@ -89,10 +89,8 @@ private:
 
     std::unique_ptr<AbstractAsyncChannel> m_rawDataChannel;
     nx::utils::bstream::Converter* m_converter;
-    nx::Buffer* m_userReadBuffer;
     nx::Buffer m_readBuffer;
     nx::Buffer m_encodedDataBuffer;
-    std::size_t m_bytesEncodedOnPreviousStep;
     std::function<void(SystemError::ErrorCode, size_t)> m_userReadHandler;
     std::function<void(SystemError::ErrorCode, size_t)> m_userWriteHandler;
     std::unique_ptr<utils::bstream::AbstractInput> m_inputPipeline;

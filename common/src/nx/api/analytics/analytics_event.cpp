@@ -2,10 +2,22 @@
 
 #include <nx/fusion/model_functions.h>
 
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::api::Analytics, EventTypeFlag)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::api::Analytics, EventTypeFlags)
+
 namespace nx {
 namespace api {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventType, (json), AnalyticsEventType_Fields, (brief, true))
+bool operator==(const Analytics::EventType& lh, const Analytics::EventType& rh)
+{
+    return lh.eventTypeId == rh.eventTypeId;
+}
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    Analytics::EventType,
+    (json),
+    AnalyticsEventType_Fields,
+    (brief, true))
 
 } // namespace api
 } // namespace nx

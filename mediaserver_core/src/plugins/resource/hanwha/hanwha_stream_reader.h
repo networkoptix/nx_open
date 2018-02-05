@@ -1,11 +1,9 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <core/resource/resource_fwd.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 
-#include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
+#include <streaming/rtp_stream_reader.h>
 #include <plugins/resource/hanwha/hanwha_video_profile.h>
 #include <plugins/resource/hanwha/hanwha_response.h>
 #include <plugins/resource/hanwha/hanwha_utils.h>
@@ -75,5 +73,3 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

@@ -41,7 +41,7 @@ static std::deque<HostAddress> convertAddrInfo(addrinfo* addressInfo)
     if (ipAddresses.empty())
         SystemError::setLastErrorCode(SystemError::hostNotFound);
 
-    return std::move(ipAddresses);
+    return ipAddresses;
 }
 
 } // namespace

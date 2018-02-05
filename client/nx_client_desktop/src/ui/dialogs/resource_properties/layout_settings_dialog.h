@@ -1,16 +1,11 @@
-#ifndef LAYOUT_SETTINGS_DIALOG_H
-#define LAYOUT_SETTINGS_DIALOG_H
-
-#include <QtWidgets/QDialog>
-#include <QtWidgets/QLabel>
+#pragma once
 
 #include <core/resource/resource_fwd.h>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <utils/common/aspect_ratio.h>
 
-namespace Ui {
-    class LayoutSettingsDialog;
-}
+namespace Ui { class LayoutSettingsDialog; }
 
 namespace nx {
 namespace client {
@@ -61,7 +56,7 @@ private slots:
 
 private:
     /** Aspect ratio of the current screen. */
-    qreal screenAspectRatio() const;
+    QnAspectRatio screenAspectRatio() const;
 
     /**
      * Aspect ratio that is optimal for cells to best fit the current image.
@@ -89,5 +84,3 @@ private:
 
     bool m_isUpdating;
 };
-
-#endif // LAYOUT_SETTINGS_DIALOG_H

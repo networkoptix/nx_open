@@ -11,11 +11,6 @@ StreamSocketDelegate::StreamSocketDelegate(AbstractStreamSocket* target):
 {
 }
 
-bool StreamSocketDelegate::reopen()
-{
-    return m_target->reopen();
-}
-
 bool StreamSocketDelegate::setNoDelay(bool value)
 {
     return m_target->setNoDelay(value);

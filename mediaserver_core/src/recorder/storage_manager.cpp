@@ -7,6 +7,7 @@
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
 
+#include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/resource.h>
@@ -174,7 +175,7 @@ private:
     QQueue<ScanData> m_scanTasks;
     mutable QnMutex m_mutex;
     QnWaitCondition m_waitCond;
-    bool m_fullScanCanceled;
+    std::atomic<bool> m_fullScanCanceled;
 
 public:
     ScanMediaFilesTask(QnStorageManager* owner): QnLongRunnable(), m_owner(owner), m_fullScanCanceled(false)
@@ -378,8 +379,13 @@ public:
                 }
             }
 
-            NX_ASSERT(qnBackupStorageMan->scheduleSync());
-            qnBackupStorageMan->scheduleSync()->updateLastSyncChunk();
+            NX_ASSERT(m_owner);
+            if (m_owner && m_owner->m_role == QnServer::StoragePool::Backup)
+            {
+                NX_ASSERT(m_owner->scheduleSync());
+                if (m_owner->scheduleSync())
+                    m_owner->scheduleSync()->updateLastSyncChunk();
+            }
         }
     }
 };
@@ -449,9 +455,11 @@ static QnStorageManager* QnBackupStorageManager_instance = nullptr;
 
 QnStorageManager::QnStorageManager(
     QnCommonModule* commonModule,
+    nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
     QnServer::StoragePool role)
 :
     QnCommonModuleAware(commonModule),
+    m_analyticsEventsStorage(analyticsEventsStorage),
     m_role(role),
     m_mutexStorages(QnMutex::Recursive),
     m_mutexCatalog(QnMutex::Recursive),
@@ -891,9 +899,9 @@ QnStorageScanData QnStorageManager::rebuildInfo() const
 QnStorageScanData QnStorageManager::rebuildCatalogAsync()
 {
     QnStorageScanData result = rebuildInfo();
+    QnMutexLocker lock(&m_mutexRebuild);
     if (!m_rebuildArchiveThread->hasFullScanTasks())
     {
-        QnMutexLocker lock( &m_mutexRebuild );
         m_rebuildCancelled = false;
         QVector<QnStorageResourcePtr> storagesToScan;
         for(const QnStorageResourcePtr& storage: getStoragesInLexicalOrder()) {
@@ -1204,12 +1212,23 @@ void QnStorageManager::removeAbsentStorages(const QnStorageResourceList &newStor
 
 QnStorageManager::~QnStorageManager()
 {
+    // These threads below should've been stopped and destroyed manually by this moment.
+    {
+        QnMutexLocker lock(&m_testStorageThreadMutex);
+        NX_ASSERT(!m_testStorageThread);
+    }
+
+    {
+        QnMutexLocker lock(&m_mutexRebuild);
+        NX_ASSERT(!m_rebuildArchiveThread);
+    }
+
+    stopAsyncTasks();
+
     if (m_role == QnServer::StoragePool::Normal)
         QnNormalStorageManager_instance = nullptr;
     else if (m_role == QnServer::StoragePool::Backup)
         QnBackupStorageManager_instance = nullptr;
-
-    stopAsyncTasks();
 }
 
 QnStorageManager* QnStorageManager::normalInstance()
@@ -1709,17 +1728,39 @@ void QnStorageManager::clearSpace(bool forced)
     // 6. Cleanup bookmarks
     if (m_clearBookmarksTimer.elapsed() > BOOKMARK_CLEANUP_INTERVAL) {
         m_clearBookmarksTimer.restart();
-        clearBookmarks();
+
+        const auto oldestDataTimestampByCamera = calculateOldestDataTimestampByCamera();
+        if (!oldestDataTimestampByCamera.isEmpty())
+        {
+            qnServerDb->deleteBookmarksToTime(oldestDataTimestampByCamera);
+
+            if (m_analyticsEventsStorage)
+                clearAnalyticsEvents(oldestDataTimestampByCamera);
+        }
     }
 }
 
-void QnStorageManager::clearBookmarks()
+void QnStorageManager::clearAnalyticsEvents(
+    const QMap<QnUuid, qint64>& dataToDelete)
+{
+    for (auto itr = dataToDelete.begin(); itr != dataToDelete.end(); ++itr)
+    {
+        const QnUuid& cameraId = itr.key();
+        qint64 timestampMs = itr.value();
+
+        m_analyticsEventsStorage->markDataAsDeprecated(
+            cameraId,
+            std::chrono::milliseconds(timestampMs));
+    }
+}
+
+QMap<QnUuid, qint64> QnStorageManager::calculateOldestDataTimestampByCamera()
 {
     QMap<QString, qint64> minTimes; // key - unique id, value - timestamp to delete
     if (!qnNormalStorageMan->getMinTimes(minTimes))
-        return;
+        return QMap<QnUuid, qint64>();
     if (!qnBackupStorageMan->getMinTimes(minTimes))
-        return;
+        return QMap<QnUuid, qint64>();
 
     QMap<QnUuid, qint64> dataToDelete;
     for (auto itr = minTimes.begin(); itr != minTimes.end(); ++itr)
@@ -1740,6 +1781,8 @@ void QnStorageManager::clearBookmarks()
         qnServerDb->deleteBookmarksToTime(dataToDelete);
 
     m_lastCatalogTimes = minTimes;
+
+    return dataToDelete;
 }
 
 bool QnStorageManager::getMinTimes(QMap<QString, qint64>& lastTime)
@@ -1972,9 +2015,11 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     qint64 toDelete = storage->getSpaceLimit() - freeSpace;
 
     if (toDelete > 0)
+    {
       NX_LOG(lit("Cleanup. Starting for storage %1. %2 Mb to clean")
               .arg(storage->getUrl())
-              .arg(toDelete / (1024 * 1024)), cl_logINFO);
+              .arg(toDelete / (1024 * 1024)), cl_logDEBUG1);
+    }
 
     DeviceFileCatalog::Chunk deletedChunk;
 
@@ -2153,7 +2198,11 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
         migrateSqliteDatabase(fileStorage);
         addDataFromDatabase(fileStorage);
         NX_LOG(lit("[Storage, scan]: storage %1 - finished loading data from DB. Ready for scan").arg(fileStorage->getUrl()), cl_logDEBUG2);
-        m_rebuildArchiveThread->addStorageToScan(fileStorage, true);
+        {
+            QnMutexLocker lock(&m_mutexRebuild);
+            if (m_rebuildArchiveThread)
+                m_rebuildArchiveThread->addStorageToScan(fileStorage, true);
+        }
         m_spaceInfo.storageAdded(qnStorageDbPool->getStorageIndex(fileStorage), fileStorage->getTotalSpace());
     }
 
@@ -2202,7 +2251,8 @@ void QnStorageManager::stopAsyncTasks()
 {
     {
         QnMutexLocker lock( &m_testStorageThreadMutex );
-        if (m_testStorageThread) {
+        if (m_testStorageThread)
+        {
             m_testStorageThread->stop();
             delete m_testStorageThread;
             m_testStorageThread = 0;
@@ -2210,10 +2260,14 @@ void QnStorageManager::stopAsyncTasks()
     }
 
     m_rebuildCancelled = true;
-    if (m_rebuildArchiveThread) {
-        m_rebuildArchiveThread->stop();
-        delete m_rebuildArchiveThread;
-        m_rebuildArchiveThread = 0;
+    {
+        QnMutexLocker lock(&m_mutexRebuild);
+        if (m_rebuildArchiveThread)
+        {
+            m_rebuildArchiveThread->stop();
+            delete m_rebuildArchiveThread;
+            m_rebuildArchiveThread = 0;
+        }
     }
 
     m_auxTasksTimerManager.stop();

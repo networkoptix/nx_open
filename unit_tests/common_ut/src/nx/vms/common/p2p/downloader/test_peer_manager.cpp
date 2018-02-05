@@ -1,5 +1,6 @@
 #include "test_peer_manager.h"
 
+#include <thread>
 #include <QtCore/QTextStream>
 
 #include <nx/utils/log/assert.h>
@@ -18,7 +19,8 @@ static constexpr int kDefaultRequestTime = 200;
 
 } // namespace
 
-TestPeerManager::TestPeerManager()
+TestPeerManager::TestPeerManager(TestPeerManagerHandler* handler):
+    m_handler(handler)
 {
 }
 
@@ -137,6 +139,7 @@ rest::Handle TestPeerManager::requestFileInfo(
         [this, fileInfo = fileInformation(peerId, fileName), callback](rest::Handle handle)
         {
             callback(fileInfo.isValid(), handle, fileInfo);
+            m_handler->onRequestFileInfo();
         });
 }
 
@@ -177,12 +180,16 @@ rest::Handle TestPeerManager::downloadChunk(
         return 0;
 
     return enqueueRequest(peerId, kDefaultRequestTime,
-        [this,
-            fileInfo = fileInformation(peerId, fileName),
-            chunkIndex,
-            callback]
-            (rest::Handle handle)
+        [this, fileInfo = fileInformation(peerId, fileName), chunkIndex, callback](
+            rest::Handle handle)
         {
+            if (m_downloadFailed)
+            {
+                callback(false, handle, QByteArray());
+                m_downloadFailed = false;
+                return;
+            }
+
             QByteArray result;
             if (fileInfo.isValid())
                 result = readFileChunk(fileInfo, chunkIndex);
@@ -253,44 +260,45 @@ rest::Handle TestPeerManager::downloadChunkFromInternet(const QnUuid& peerId,
             m_requestCounter.incrementCounters(peerId,
                 RequestCounter::InternetDownloadRequestsPerformed);
 
-            if (storage)
-                storage->writeFileChunk(fileName, chunkIndex, result);
-
             callback(!result.isNull(), handle, result);
         });
 }
 
+rest::Handle TestPeerManager::validateFileInformation(
+    const downloader::FileInformation& fileInformation,
+    AbstractPeerManager::ValidateCallback callback)
+{
+    return enqueueRequest(selfId(), kDefaultRequestTime,
+        [this, callback](rest::Handle handle)
+        {
+            callback(!m_validateShouldFail, handle);
+        });
+}
+
+void TestPeerManager::setValidateShouldFail()
+{
+    m_validateShouldFail = true;
+}
+
+void TestPeerManager::setOneShotDownloadFail()
+{
+    m_downloadFailed = true;
+}
+
+void TestPeerManager::setDelayBeforeRequest(qint64 delay)
+{
+    m_delayBeforeRequest = delay;
+}
+
 void TestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
 {
+    QnMutexLocker lock(&m_mutex);
     auto it = std::remove_if(m_requestsQueue.begin(), m_requestsQueue.end(),
         [&peerId, &handle](const Request& request)
         {
             return request.peerId == peerId && request.handle == handle;
         });
     m_requestsQueue.erase(it, m_requestsQueue.end());
-}
-
-bool TestPeerManager::processNextRequest()
-{
-    if (m_requestsQueue.isEmpty())
-        return false;
-
-    const auto& request = m_requestsQueue.dequeue();
-    m_currentTime = request.timeToReply;
-    request.callback(request.handle);
-
-    return true;
-}
-
-void TestPeerManager::exec(int maxRequests)
-{
-    while (processNextRequest())
-    {
-        if (maxRequests > 1)
-            --maxRequests;
-        else if (maxRequests == 1)
-            break;
-    }
 }
 
 const RequestCounter* TestPeerManager::requestCounter() const
@@ -314,18 +322,63 @@ rest::Handle TestPeerManager::getRequestHandle()
 rest::Handle TestPeerManager::enqueueRequest(
     const QnUuid& peerId, qint64 time, RequestCallback callback)
 {
+    QnMutexLocker lock(&m_mutex);
     const auto handle = getRequestHandle();
     Request request{peerId, handle, callback, m_currentTime + time};
-
-    auto it = std::lower_bound(m_requestsQueue.begin(), m_requestsQueue.end(), request,
-        [](const Request& left, const Request& right)
-        {
-            return left.timeToReply < right.timeToReply;
-        });
-
-    m_requestsQueue.insert(it, request);
+    m_requestsQueue.push_back(request);
+    m_condition.wakeOne();
     return handle;
 }
+
+void TestPeerManager::pleaseStop()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_needStop = true;
+    m_condition.wakeOne();
+}
+
+void TestPeerManager::run()
+{
+    qint64 requestTime = -1;
+
+    QnMutexLocker lock(&m_mutex);
+    while (true)
+    {
+        while (m_requestsQueue.isEmpty() && !needToStop())
+            m_condition.wait(lock.mutex());
+
+        if (needToStop())
+            return;
+
+        using namespace std::chrono;
+
+        qint64 nowMs = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        if (requestTime == -1)
+            requestTime = nowMs;
+
+        if (m_delayBeforeRequest != 0
+            && nowMs - requestTime < m_delayBeforeRequest)
+        {
+            lock.unlock();
+            std::this_thread::sleep_for(
+                std::chrono::milliseconds(m_delayBeforeRequest - (nowMs - requestTime)));
+            lock.relock();
+            requestTime = nowMs;
+        }
+        requestTime = nowMs;
+
+        if (m_requestsQueue.isEmpty())
+            continue;
+
+        const auto request = m_requestsQueue.front();
+        m_requestsQueue.pop_front();
+
+        lock.unlock();
+        request.callback(request.handle);
+        lock.relock();
+    }
+}
+
 
 QByteArray TestPeerManager::readFileChunk(
     const FileInformation& fileInformation, int chunkIndex)
@@ -467,6 +520,14 @@ rest::Handle ProxyTestPeerManager::downloadChunkFromInternet(const QnUuid& peerI
         peerId, fileName, url, chunkIndex, chunkSize, callback);
 }
 
+rest::Handle ProxyTestPeerManager::validateFileInformation(
+    const FileInformation& fileInformation, ValidateCallback callback)
+{
+    m_requestCounter.incrementCounters(selfId(), RequestCounter::DownloadChunkFromInternetRequest);
+    return m_peerManager->validateFileInformation(fileInformation, callback);
+}
+
+
 void ProxyTestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
 {
     m_peerManager->cancelRequest(peerId, handle);
@@ -482,6 +543,7 @@ TestPeerManager::FileInformation::FileInformation(const downloader::FileInformat
 void RequestCounter::incrementCounters(
     const QnUuid& peerId, RequestCounter::RequestType requestType)
 {
+    QnMutexLocker lock(&m_mutex);
     ++counters[requestType][peerId];
     ++counters[requestType][kNullGuid];
     ++counters[Total][peerId];
@@ -490,6 +552,7 @@ void RequestCounter::incrementCounters(
 
 int RequestCounter::totalRequests() const
 {
+    QnMutexLocker lock(&m_mutex);
     return counters[Total][kNullGuid];
 }
 

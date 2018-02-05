@@ -5,7 +5,7 @@
 #include <QtWidgets/QGraphicsAnchorLayout>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>

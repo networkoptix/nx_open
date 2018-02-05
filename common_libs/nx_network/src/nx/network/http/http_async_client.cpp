@@ -25,7 +25,7 @@ namespace {
 
 static bool logTraffic()
 {
-    return nx::network::SocketGlobals::debugIni().httpClientTraffic;
+    return nx::network::SocketGlobals::ini().httpClientTraffic;
 }
 
 } // namespace
@@ -186,6 +186,20 @@ void AsyncClient::doGet(
     m_onDone = std::move(completionHandler);
     doGet(url);
 }
+
+void AsyncClient::doHead(const nx::utils::Url& url)
+{
+    doRequest(nx::network::http::Method::head, url);
+}
+
+void AsyncClient::doHead(
+    const nx::utils::Url& url,
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    m_onDone = std::move(completionHandler);
+    doHead(url);
+}
+
 
 void AsyncClient::doPost(const nx::utils::Url& url)
 {
@@ -568,9 +582,20 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
         return;
     }
 
-    m_socket->readSomeAsync(
-        &m_responseBuffer,
-        std::bind(&AsyncClient::onSomeBytesReadAsync, this, _1, _2));
+    if (!m_receivedBytesLeft.isEmpty())
+    {
+        // Processing what we have in the buffer first.
+        NX_ASSERT(m_responseBuffer.isEmpty());
+        m_responseBuffer.swap(m_receivedBytesLeft);
+        m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
+        processReceivedBytes(m_responseBuffer.size());
+    }
+    else
+    {
+        m_socket->readSomeAsync(
+            &m_responseBuffer,
+            std::bind(&AsyncClient::onSomeBytesReadAsync, this, _1, _2));
+    }
 }
 
 void AsyncClient::onSomeBytesReadAsync(

@@ -10,13 +10,11 @@ But for POST method keyword parameters are translated to json request body.
 import datetime
 import json
 import logging
-import warnings
 import pprint
 
 import requests
 import requests.exceptions
 from requests.auth import HTTPDigestAuth
-from urllib3.exceptions import InsecureRequestWarning
 
 REST_API_USER = 'admin'
 REST_API_PASSWORD = 'admin'
@@ -198,7 +196,7 @@ class RestApi(object):
                 method, self._root_url + path,
                 auth=self._auth,
                 timeout=(timeout or self._default_timeout).total_seconds(),
-                verify=self.ca_cert, **kwargs)
+                verify=str(self.ca_cert), **kwargs)
         except requests.ConnectionError as e:
             if not new_connection:
                 log.error("Try new connection after %r.", e)

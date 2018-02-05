@@ -56,8 +56,7 @@ static SocketGlobals* s_instance = nullptr;
 struct SocketGlobalsImpl
 {
     int m_initializationFlags = 0;
-    SocketGlobals::Ini m_ini;
-    SocketGlobals::DebugIni m_debugIni;
+    Ini m_ini;
 
     /**
      * Regular networking services. (AddressResolver should be split to cloud and non-cloud).
@@ -76,7 +75,13 @@ struct SocketGlobalsImpl
 
 //-------------------------------------------------------------------------------------------------
 
-bool SocketGlobals::Ini::isHostDisabled(const HostAddress& host) const
+Ini::Ini():
+    IniConfig("nx_network.ini")
+{
+    reload();
+}
+
+bool Ini::isHostDisabled(const HostAddress& host) const
 {
     if (s_initState != InitState::done)
         return false;
@@ -129,14 +134,9 @@ SocketGlobals::~SocketGlobals()
     }
 }
 
-SocketGlobals::Ini& SocketGlobals::ini()
+const Ini& SocketGlobals::ini()
 {
     return s_instance->m_impl->m_ini;
-}
-
-SocketGlobals::DebugIni& SocketGlobals::debugIni()
-{
-    return s_instance->m_impl->m_debugIni;
 }
 
 aio::AIOService& SocketGlobals::aioService()
@@ -242,7 +242,7 @@ void SocketGlobals::setDebugIniReloadTimer()
         kDebugIniReloadInterval,
         [this]()
         {
-            m_impl->m_debugIni.reload();
+            m_impl->m_ini.reload();
             setDebugIniReloadTimer();
         });
 }

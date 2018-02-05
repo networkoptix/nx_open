@@ -65,4 +65,4 @@ void setLastErrorCode(ErrorCode errorCode)
 #endif
 }
 
-} // SystemError
+} // namespace SystemError

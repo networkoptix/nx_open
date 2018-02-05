@@ -7,8 +7,6 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
-#include <camera/camera_thumbnail_manager.h>
-#include <camera/single_thumbnail_loader.h>
 #include <camera/thumbnails_loader.h>
 #include <client/client_settings.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
@@ -20,9 +18,11 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/file_system.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/client/desktop/utils/layout_thumbnail_loader.h>
-#include <nx/client/desktop/utils/proxy_image_provider.h>
+#include <nx/client/desktop/common/widgets/async_image_widget.h>
+#include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
+#include <nx/client/desktop/image_providers/proxy_image_provider.h>
 #include <nx/client/desktop/utils/transcoding_image_processor.h>
+#include <nx/client/desktop/image_providers/resource_thumbnail_provider.h>
 
 namespace {
 
@@ -66,7 +66,7 @@ ExportSettingsDialog::Private::Private(const QnCameraBookmark& bookmark, const Q
     m_previewSize(previewSize),
     m_bookmarkName(bookmark.name),
     m_bookmarkDescription(bookmark.description),
-    m_mediaImageProcessor(new TranscodingImageProcessor())
+    m_mediaPreviewProcessor(new TranscodingImageProcessor())
 {
     m_exportLayoutSettings.mode = ExportLayoutSettings::Mode::Export;
 }
@@ -75,9 +75,9 @@ ExportSettingsDialog::Private::~Private()
 {
 }
 
-void ExportSettingsDialog::Private::updateOverlaysVisibility(bool transcodingIsAllowed)
+void ExportSettingsDialog::Private::updateOverlaysVisibility()
 {
-    if (transcodingIsAllowed)
+    if (m_exportMediaPersistentSettings.applyFilters)
     {
         for (const auto overlayType: m_exportMediaPersistentSettings.usedOverlays)
             overlay(overlayType)->setHidden(false);
@@ -87,8 +87,6 @@ void ExportSettingsDialog::Private::updateOverlaysVisibility(bool transcodingIsA
         for (const auto overlayWidget: m_overlays)
             overlayWidget->setHidden(true);
     }
-
-    updateMediaImageProcessor();
 }
 
 void ExportSettingsDialog::Private::loadSettings()
@@ -131,8 +129,9 @@ void ExportSettingsDialog::Private::loadSettings()
     for (const auto type: used)
         selectOverlay(type);
 
-    updateTranscodingSettings();
-    updateOverlaysVisibility(isTranscodingAllowed());
+    // Should we call it right here? There are no valid resource links here
+    refreshMediaPreview();
+    updateOverlaysVisibility();
 }
 
 void ExportSettingsDialog::Private::saveSettings()
@@ -176,53 +175,90 @@ void ExportSettingsDialog::Private::setTimestampOffsetMs(qint64 offsetMs)
     updateTimestampText();
 }
 
-void ExportSettingsDialog::Private::setAvailableTranscodingSettings(
-    const nx::core::transcoding::Settings& settings)
+void ExportSettingsDialog::Private::refreshMediaPreview()
 {
-    m_availableTranscodingSettings = settings;
-    if (!m_exportMediaPersistentSettings.applyFilters)
+    if (!m_exportMediaSettings.mediaResource)
+    {
+        // It is likely we got here from Private::loadSettings.
+        // We do not have any valid resource reference here
         return;
+    }
 
-    updateTranscodingSettings();
-    validateSettings(Mode::Media);
-}
+    // Fixing settings for preview transcoding
+    nx::core::transcoding::Settings& settings = m_exportMediaSettings.transcodingSettings;
 
-void ExportSettingsDialog::Private::updateTranscodingSettings()
-{
-    // TODO: #vkutin #gdm Separate transcoding settings and overlay settings.
     if (m_exportMediaPersistentSettings.applyFilters)
     {
-        m_exportMediaSettings.transcodingSettings.rotation =
-            m_availableTranscodingSettings.rotation;
-        m_exportMediaSettings.transcodingSettings.aspectRatio =
-            m_availableTranscodingSettings.aspectRatio;
-        m_exportMediaSettings.transcodingSettings.enhancement =
-            m_availableTranscodingSettings.enhancement;
-        m_exportMediaSettings.transcodingSettings.dewarping =
-            m_availableTranscodingSettings.dewarping;
-        m_exportMediaSettings.transcodingSettings.zoomWindow =
-            m_availableTranscodingSettings.zoomWindow;
+        auto resource = m_exportMediaSettings.mediaResource->toResourcePtr();
+        QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
+        if (!forcedRotation.isEmpty())
+            settings.rotation = forcedRotation.toInt();
+
+        settings.aspectRatio = m_availableTranscodingSettings.aspectRatio;
+        settings.enhancement = m_availableTranscodingSettings.enhancement;
+        settings.dewarping = m_availableTranscodingSettings.dewarping;
+        settings.zoomWindow = m_availableTranscodingSettings.zoomWindow;
     }
     else
     {
-        m_exportMediaSettings.transcodingSettings.rotation = 0;
-        m_exportMediaSettings.transcodingSettings.aspectRatio = QnAspectRatio();
-        m_exportMediaSettings.transcodingSettings.enhancement = ImageCorrectionParams();
-        m_exportMediaSettings.transcodingSettings.dewarping = QnItemDewarpingParams();
-        m_exportMediaSettings.transcodingSettings.zoomWindow = QRectF();
+        settings.rotation = 0;
+        settings.aspectRatio = QnAspectRatio();
+        settings.enhancement = ImageCorrectionParams();
+        settings.dewarping = QnItemDewarpingParams();
+        settings.zoomWindow = QRectF();
     }
 
-    updateMediaImageProcessor();
+    m_fullFrameSize = QSize();
+
+    // Requesting base resource image. We will apply transcoding later
+    if (!m_mediaRawImageProvider)
+    {
+        // Requesting an image without any additional transforms
+        // We do have our own image processor, so we do not bother server with transcoding
+        api::ResourceImageRequest request;
+        request.resource = m_exportMediaSettings.mediaResource->toResourcePtr();
+        request.msecSinceEpoch = m_exportMediaSettings.timePeriod.startTimeMs;
+        request.roundMethod = api::ImageRequest::RoundMethod::precise;
+        request.rotation = 0;
+        request.aspectRatio = api::ImageRequest::AspectRatio::source;
+
+        m_mediaRawImageProvider.reset(new ResourceThumbnailProvider(request, this));
+    }
+
+    // Initializing a wrapper, that will provide image, processed by m_mediaPreviewProcessor
+    if (!m_mediaPreviewProvider)
+    {
+        std::unique_ptr<ProxyImageProvider> provider(
+            new ProxyImageProvider(m_mediaRawImageProvider.get()));
+        provider->setImageProcessor(m_mediaPreviewProcessor.data());
+        m_mediaPreviewProvider = std::move(provider);
+        connect(m_mediaPreviewProvider.get(), &QnImageProvider::sizeHintChanged, this, &Private::setFrameSize);
+    }
+
+    m_mediaPreviewProcessor->setTranscodingSettings(settings, m_exportMediaSettings.mediaResource);
+
+    m_mediaPreviewProvider->loadAsync();
+    m_mediaPreviewWidget->setImageProvider(m_mediaPreviewProvider.get());
+    validateSettings(Mode::Media);
 }
 
 void ExportSettingsDialog::Private::setApplyFilters(bool value)
 {
-    if (m_exportMediaPersistentSettings.applyFilters == value)
-        return;
+    bool transcode = false;
+    if (m_exportMediaPersistentSettings.areFiltersForced())
+        transcode = true;
+    else
+        transcode = value;
 
-    m_exportMediaPersistentSettings.applyFilters = value;
-    updateTranscodingSettings();
-    validateSettings(Mode::Media);
+    if (m_exportMediaPersistentSettings.setTranscoding(transcode))
+    {
+        refreshMediaPreview();
+    }
+}
+
+bool ExportSettingsDialog::Private::hasVideo() const
+{
+    return m_exportMediaSettings.mediaResource != nullptr && m_exportMediaSettings.mediaResource->hasVideo();
 }
 
 void ExportSettingsDialog::Private::setLayoutReadOnly(bool value)
@@ -230,95 +266,18 @@ void ExportSettingsDialog::Private::setLayoutReadOnly(bool value)
     m_exportLayoutPersistentSettings.readOnly = value;
 }
 
-void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media)
+void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media, const nx::core::transcoding::Settings& settings)
 {
+    // We land here once, when ExportSettingsDialog is constructed
+    m_availableTranscodingSettings = settings;
     m_exportMediaSettings.mediaResource = media;
-    m_mediaImageProvider.reset();
-    m_fullFrameSize = QSize();
 
-    if (const auto camera = media->toResourcePtr().dynamicCast<QnVirtualCameraResource>())
-        setCamera(camera);
-    else
-        setLocalFile(media);
-
-    validateSettings(Mode::Media);
-    updateMediaImageProcessor();
-
-    if (!m_mediaImageProvider) //< Just in case.
-        return;
-
-    m_mediaImageProvider->setImageProcessor(m_mediaImageProcessor.data());
-    m_mediaImageProvider->loadAsync();
-}
-
-void ExportSettingsDialog::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
-{
-    setFrameSize(QnCameraThumbnailManager::sizeHintForCamera(camera, QSize()));
-
-    m_mediaImageProvider.reset(new ProxyImageProvider());
-
-    m_mediaImageProvider->setSourceProvider(new QnSingleThumbnailLoader(
-        camera,
-        m_exportMediaSettings.timePeriod.startTimeMs,
-        0,
-        QSize(),
-        QnThumbnailRequestData::JpgFormat,
-        QnThumbnailRequestData::AspectRatio::SourceAspectRatio,
-        QnThumbnailRequestData::RoundMethod::PreciseMethod,
-        m_mediaImageProvider.data()));
-
-    connect(m_mediaImageProvider.data(), &QnImageProvider::sizeHintChanged,
-        this, &Private::setFrameSize);
-}
-
-void ExportSettingsDialog::Private::setLocalFile(const QnMediaResourcePtr& other)
-{
-    // TODO: #vkutin #gdm Do not use QnThumbnailsLoader here,
-    // implement QnSingleLocalThumbnailLoader as image provider
-    // or better support local files in QnSingleThumbnailLoader.
-
-    if (!QnThumbnailsLoader::supportedResource(other))
-    {
-        NX_ASSERT(false, Q_FUNC_INFO, "Incompatible media resource.");
-        return;
-    }
-
-    m_mediaImageProvider.reset(new ProxyImageProvider());
-
-    const auto startTimeMs = m_exportMediaSettings.timePeriod.startTimeMs;
-    static constexpr auto kSensibleDurationMs = 1000;
-
-    const auto loader = new QnThumbnailsLoader(other);
-    loader->setTimePeriod(QnTimePeriod(startTimeMs, kSensibleDurationMs));
-    loader->setTimeStep(kSensibleDurationMs);
-    loader->setBoundingSize(m_previewSize);
-
-    connect(loader, &QnThumbnailsLoader::thumbnailLoaded, this,
-        [this, loader = QPointer<QnThumbnailsLoader>(loader)](const QnThumbnail& thumbnail)
-        {
-            if (!loader)
-                return;
-
-            // At this point we can update frame size.
-            setFrameSize(loader->sourceSize());
-
-            // Delete old source provider after setting a new one.
-            QScopedPointer<QnImageProvider> oldSource(m_mediaImageProvider->sourceProvider());
-
-            // Set new source provider.
-            m_mediaImageProvider->setSourceProvider(new QnBasicImageProvider(
-                thumbnail.image(), m_mediaImageProvider.data()));
-
-            // We don't need more than one thumbnail.
-            loader->stop();
-            loader->disconnect(this);
-        });
-
-    loader->start();
+    refreshMediaPreview();
 }
 
 void ExportSettingsDialog::Private::setFrameSize(const QSize& size)
 {
+    qDebug() << "ExportSettingsDialog::Private::setFrameSize(" << size << ")";
     if (m_fullFrameSize == size)
         return;
 
@@ -345,40 +304,54 @@ void ExportSettingsDialog::Private::setFrameSize(const QSize& size)
     emit frameSizeChanged(size);
 }
 
-void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
+void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout, const QPalette& palette)
 {
     m_exportLayoutSettings.layout = layout;
-    m_layoutImageProvider.reset();
+    m_layoutPreviewProvider.reset();
+
     if (!layout)
         return;
 
-    m_layoutImageProvider.reset(new LayoutThumbnailLoader(
-        layout,
-        /*allowNonCameraResources*/ false,
-        m_previewSize,
-        m_exportLayoutSettings.period.startTimeMs));
+    std::unique_ptr<LayoutThumbnailLoader> provider( new LayoutThumbnailLoader(
+            layout,
+            m_previewSize,
+            m_exportLayoutSettings.period.startTimeMs));
 
-    m_layoutImageProvider->loadAsync();
+    provider->setItemBackgroundColor(palette.color(QPalette::Window));
+    provider->setFontColor(palette.color(QPalette::WindowText));
+    provider->loadAsync();
+
+    m_layoutPreviewProvider = std::move(provider);
+    m_layoutPreviewWidget->setImageProvider(m_layoutPreviewProvider.get());
 }
 
-void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period)
+void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period, bool forceValidate)
 {
     m_exportMediaSettings.timePeriod = period;
     m_exportLayoutSettings.period = period;
-    validateSettings(Mode::Media);
-    validateSettings(Mode::Layout);
+    m_needValidateMedia = true;
+    m_needValidateLayout = true;
+
+    if (forceValidate)
+    {
+        validateSettings(Mode::Media);
+        validateSettings(Mode::Layout);
+    }
 }
 
 void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 {
-    const auto transcodingWasAllowed = isTranscodingAllowed();
     m_exportMediaSettings.fileName = filename;
     m_exportMediaPersistentSettings.fileFormat = FileSystemStrings::suffix(filename.extension);
-    validateSettings(Mode::Media);
 
-    const bool transcodingIsAllowed = isTranscodingAllowed();
-    if (transcodingIsAllowed != transcodingWasAllowed)
-        emit transcodingAllowedChanged(transcodingIsAllowed);
+    bool needTranscoding =
+        isTranscodingRequested() || m_exportMediaPersistentSettings.areFiltersForced();
+
+    if (m_exportMediaPersistentSettings.setTranscoding(needTranscoding))
+    {
+        refreshMediaPreview();
+    }
+    emit transcodingModeChanged();
 }
 
 void ExportSettingsDialog::Private::setLayoutFilename(const Filename& filename)
@@ -420,9 +393,9 @@ void ExportSettingsDialog::Private::setMode(Mode mode)
     validateSettings(m_mode);
 }
 
-bool ExportSettingsDialog::Private::isTranscodingAllowed() const
+bool ExportSettingsDialog::Private::isTranscodingRequested() const
 {
-    return !FileExtensionUtils::isLayout(m_exportMediaSettings.fileName.extension);
+    return m_exportMediaPersistentSettings.applyFilters;
 }
 
 FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(Mode mode)
@@ -579,36 +552,35 @@ void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
 
 void ExportSettingsDialog::Private::validateSettings(Mode mode)
 {
+    ExportMediaValidator::Results results;
     if (mode == Mode::Media)
     {
         if (!m_exportMediaSettings.mediaResource)
             return;
 
-        const auto results = ExportMediaValidator::validateSettings(exportMediaSettings());
+        m_needValidateMedia = false;
+        results = ExportMediaValidator::validateSettings(exportMediaSettings());
         if (m_mediaValidationResults == results)
             return;
 
         m_mediaValidationResults = results;
-
-        QStringList weakAlerts, severeAlerts;
-        generateAlerts(results, weakAlerts, severeAlerts);
-        emit validated(Mode::Media, weakAlerts, severeAlerts);
     }
     else
     {
         if (!m_exportLayoutSettings.layout)
             return;
 
-        const auto results = ExportMediaValidator::validateSettings(exportLayoutSettings());
+        m_needValidateLayout = false;
+        results = ExportMediaValidator::validateSettings(exportLayoutSettings());
         if (m_layoutValidationResults == results)
             return;
 
         m_layoutValidationResults = results;
-
-        QStringList weakAlerts, severeAlerts;
-        generateAlerts(results, weakAlerts, severeAlerts);
-        emit validated(Mode::Layout, weakAlerts, severeAlerts);
     }
+
+    QStringList weakAlerts, severeAlerts;
+    generateAlerts(results, weakAlerts, severeAlerts);
+    emit validated(mode, weakAlerts, severeAlerts);
 }
 
 void ExportSettingsDialog::Private::updateOverlays()
@@ -729,7 +701,7 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
             });
     }
 
-    connect(this, &Private::transcodingAllowedChanged, this, &Private::updateOverlaysVisibility);
+    connect(this, &Private::transcodingModeChanged, this, &Private::updateOverlaysVisibility);
 }
 
 void ExportSettingsDialog::Private::updateBookmarkText()
@@ -762,15 +734,6 @@ void ExportSettingsDialog::Private::updateTimestampText()
         m_exportMediaSettings.timePeriod.startTimeMs));
 }
 
-void ExportSettingsDialog::Private::updateMediaImageProcessor()
-{
-    const auto& settings = isTranscodingAllowed()
-        ? m_exportMediaSettings.transcodingSettings
-        : nx::core::transcoding::Settings();
-
-    m_mediaImageProcessor->setTranscodingSettings(settings, m_exportMediaSettings.mediaResource);
-}
-
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayType type)
 {
     const auto index = int(type);
@@ -783,14 +746,14 @@ const ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayT
     return index < m_overlays.size() ? m_overlays[index] : nullptr;
 }
 
-QnImageProvider* ExportSettingsDialog::Private::mediaImageProvider() const
+void ExportSettingsDialog::Private::setMediaPreviewWidget(nx::client::desktop::AsyncImageWidget* widget)
 {
-    return m_mediaImageProvider.data();
+    m_mediaPreviewWidget = widget;
 }
 
-LayoutThumbnailLoader* ExportSettingsDialog::Private::layoutImageProvider() const
+void ExportSettingsDialog::Private::setLayoutPreviewWidget(nx::client::desktop::AsyncImageWidget* widget)
 {
-    return m_layoutImageProvider.data();
+    m_layoutPreviewWidget = widget;
 }
 
 QSize ExportSettingsDialog::Private::fullFrameSize() const

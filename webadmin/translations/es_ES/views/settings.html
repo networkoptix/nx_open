@@ -40,7 +40,7 @@
                             El servidor se separará del sistema actual. El archivo de vídeo permanecerá intacto.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restaurar valores predeterminados de fábrica</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>Separar el servidor del sistema</h3>
                         <p>Esta acción separará el servidor de la base de datos de mantenimiento del sistema, los usuarios locales y la configuración. El archivo de vídeo permanecerá intacto. <b>Los usuarios de la nube se eliminarán.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Separar del sistema</button></p>

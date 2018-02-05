@@ -242,6 +242,8 @@ void ProxyHandler::onConnected(
                 : nx::network::http::StatusCode::serviceUnavailable);
     }
 
+    connection->bindToAioThread(m_targetPeerConnector->getAioThread());
+
     if (!connection->setRecvTimeout(m_settings.tcp().recvTimeout) ||
         !connection->setSendTimeout(m_settings.tcp().sendTimeout))
     {
@@ -276,6 +278,7 @@ void ProxyHandler::onConnected(
         std::move(m_request),
         this,
         std::move(connection));
+    m_requestProxyWorker->start();
 }
 
 } // namespace gateway

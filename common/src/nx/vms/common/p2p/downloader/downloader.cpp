@@ -32,7 +32,7 @@ private:
 private:
     QnMutex mutex;
     QScopedPointer<Storage> storage;
-    QHash<QString, Worker*> workers;
+    QHash<QString, std::shared_ptr<Worker>> workers;
     AbstractPeerManagerFactory* peerManagerFactory = nullptr;
     std::unique_ptr<AbstractPeerManagerFactory> peerManagerFactoryOwner;
 };
@@ -47,7 +47,6 @@ void DownloaderPrivate::createWorker(const QString& fileName)
 {
     QnMutexLocker lock(&mutex);
 
-    NX_ASSERT(!workers.contains(fileName));
     if (workers.contains(fileName))
         return;
 
@@ -56,12 +55,16 @@ void DownloaderPrivate::createWorker(const QString& fileName)
     if (status != FileInformation::Status::downloaded
         && status != FileInformation::Status::uploading)
     {
-        auto worker = new Worker(
-            fileName, storage.data(), peerManagerFactory->createPeerManager());
+        auto peerPolicy = storage->fileInformation(fileName).peerPolicy;
+        auto worker = std::make_shared<Worker>(
+            fileName,
+            storage.data(),
+            peerManagerFactory->createPeerManager(peerPolicy));
         workers[fileName] = worker;
 
-        connect(worker, &Worker::finished, this, &DownloaderPrivate::at_workerFinished);
-        connect(worker, &Worker::failed, this, &DownloaderPrivate::at_workerFinished);
+        connect(worker.get(), &Worker::finished, this, &DownloaderPrivate::at_workerFinished);
+        connect(worker.get(), &Worker::failed, this, &DownloaderPrivate::at_workerFinished);
+        connect(worker.get(), &Worker::chunkDownloadFailed, this->q_ptr, &Downloader::chunkDownloadFailed);
 
         worker->start();
     }
@@ -81,10 +84,14 @@ void DownloaderPrivate::at_workerFinished(const QString& fileName)
     else
         emit q->downloadFailed(fileName);
 
-    delete worker;
+    worker->stop();
 }
 
 //-------------------------------------------------------------------------------------------------
+
+AbstractDownloader::AbstractDownloader(QObject* parent):
+    QObject(parent)
+{}
 
 Downloader::Downloader(
     const QDir& downloadsDirectory,
@@ -92,12 +99,18 @@ Downloader::Downloader(
     AbstractPeerManagerFactory* peerManagerFactory,
     QObject* parent)
     :
-    QObject(parent),
+    AbstractDownloader(parent),
     QnCommonModuleAware(commonModule),
     d_ptr(new DownloaderPrivate(this))
 {
     Q_D(Downloader);
     d->storage.reset(new Storage(downloadsDirectory));
+
+    connect(d->storage.data(), &Storage::fileAdded, this, &Downloader::fileAdded);
+    connect(d->storage.data(), &Storage::fileDeleted, this, &Downloader::fileDeleted);
+    connect(d->storage.data(), &Storage::fileInformationChanged, this,
+        &Downloader::fileInformationChanged);
+    connect(d->storage.data(), &Storage::fileStatusChanged, this, &Downloader::fileStatusChanged);
 
     d->peerManagerFactory = peerManagerFactory;
     if (!d->peerManagerFactory)
@@ -106,15 +119,20 @@ Downloader::Downloader(
         d->peerManagerFactory = factory.get();
         d->peerManagerFactoryOwner = std::move(factory);
     }
+}
 
-    for (const auto& fileName: d->storage->files())
+void Downloader::atServerStart()
+{
+    Q_D(Downloader);
+    for (const auto& fileName : d->storage->files())
         d->createWorker(fileName);
 }
 
 Downloader::~Downloader()
 {
     Q_D(Downloader);
-    qDeleteAll(d->workers);
+    for (auto& worker: d->workers)
+        worker->stop();
 }
 
 QStringList Downloader::files() const

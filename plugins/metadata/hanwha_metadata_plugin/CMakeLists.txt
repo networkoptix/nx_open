@@ -1,4 +1,4 @@
-nx_add_target(hanwha_metadata_plugin LIBRARY NO_PCH
+nx_add_server_plugin(hanwha_metadata_plugin
     PUBLIC_LIBS
         Qt5::Core Qt5::Network Qt5::Sql
         ffmpeg openssl

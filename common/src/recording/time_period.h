@@ -12,7 +12,7 @@ class QN_EXPORT QnTimePeriod
 {
 public:
 
-    static const qint64 UnlimitedPeriod = -1;
+    static const qint64 UnlimitedPeriod;
     static const qint64 kMaxTimeValue;
     static const qint64 kMinTimeValue;
 

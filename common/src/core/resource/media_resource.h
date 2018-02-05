@@ -39,9 +39,9 @@ public:
     virtual QImage getImage(int channel, QDateTime time, Qn::StreamQuality quality) const;
 
     // resource can use DataProvider for addition info (optional)
-    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
-    virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider) const;
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = nullptr) const;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = nullptr) const;
+    virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider = nullptr) const;
 
     virtual const QnResource* toResource() const = 0;
     virtual QnResource* toResource() = 0;

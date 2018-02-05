@@ -110,7 +110,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     rez->m_data.finishWriting(size);
 
     if (isPtsIncluded)
-        rez->timestamp = pts; //< TODO: Consider an option to convert looped PTS to monotonous.
+        rez->timestamp = pts;
     else
         rez->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 

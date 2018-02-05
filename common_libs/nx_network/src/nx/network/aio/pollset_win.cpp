@@ -15,39 +15,40 @@ namespace aio {
 static const size_t INITIAL_FDSET_SIZE = 1024;
 static const size_t FDSET_INCREASE_STEP = 1024;
 
-typedef struct my_fd_set {
-    u_int fd_count;               /* how many are SET? */
-    //!an array of SOCKETs. Actually, this array has size PollSetImpl::fdSetSize
+typedef struct my_fd_set
+{
+    u_int fd_count; /** how many are SET? */
+                    /** An array of SOCKETs. Actually, this array has size PollSetImpl::fdSetSize. */
     SOCKET fd_array[INITIAL_FDSET_SIZE];
 } my_fd_set;
 
-static my_fd_set* allocFDSet( size_t setSize )
+static my_fd_set* allocFDSet(size_t setSize)
 {
     //NOTE: SOCKET is a pointer
-    return (my_fd_set*)malloc( sizeof(my_fd_set) + sizeof(SOCKET)*(setSize-INITIAL_FDSET_SIZE) );
+    return (my_fd_set*)malloc(sizeof(my_fd_set) + sizeof(SOCKET)*(setSize - INITIAL_FDSET_SIZE));
 }
 
-static void freeFDSet( my_fd_set* fdSet )
+static void freeFDSet(my_fd_set* fdSet)
 {
-    ::free( fdSet );
+    ::free(fdSet);
 }
 
-//!Reallocs fdSet to be of size newSize while preseving existing data
-/*!
-    in case of allocation error *fdSet is freed and set to NULL
-*/
-static void reallocFDSet( my_fd_set** fdSet, size_t newSize )
+/**
+ * Reallocs fdSet to be of size newSize while preseving existing data.
+ * In case of allocation error *fdSet is freed and set to NULL.
+ */
+static void reallocFDSet(my_fd_set** fdSet, size_t newSize)
 {
-    my_fd_set* newSet = allocFDSet( newSize );
+    my_fd_set* newSet = allocFDSet(newSize);
 
-    //copying existing data
-    if( *fdSet && newSet )
+    // Copying existing data.
+    if (*fdSet && newSet)
     {
         newSet->fd_count = (*fdSet)->fd_count;
-        memcpy( newSet->fd_array, (*fdSet)->fd_array, (*fdSet)->fd_count*sizeof(*((*fdSet)->fd_array)) );
+        memcpy(newSet->fd_array, (*fdSet)->fd_array, (*fdSet)->fd_count * sizeof(*((*fdSet)->fd_array)));
     }
 
-    freeFDSet( *fdSet );
+    freeFDSet(*fdSet);
     *fdSet = newSet;
 }
 
@@ -61,49 +62,47 @@ public:
         void* userData[aio::etMax];
         size_t polledEventsMask;
 
-        SockCtx()
-        :
-            sock( nullptr ),
-            polledEventsMask( 0 )
+        SockCtx():
+            sock(nullptr),
+            polledEventsMask(0)
         {
-            memset( userData, 0, sizeof(userData) );
+            memset(userData, 0, sizeof(userData));
         }
 
         SockCtx(
             Pollable* sock,
-            size_t polledEventsMask )
-        :
-            sock( sock ),
-            polledEventsMask( polledEventsMask )
+            size_t polledEventsMask)
+            :
+            sock(sock),
+            polledEventsMask(polledEventsMask)
         {
-            memset( userData, 0, sizeof(userData) );
+            memset(userData, 0, sizeof(userData));
         }
     };
 
     std::map<SOCKET, SockCtx> sockets;
-    //!Size of fd sets
+    /** Size of fd sets. */
     size_t fdSetSize;
     my_fd_set* readfds;
     my_fd_set* writefds;
     my_fd_set* exceptfds;
     //readfdsOriginal (and other *Original) represent fdset before select call
-        //These are used for optimization: for easy restoring fdset state after select call
+    //These are used for optimization: for easy restoring fdset state after select call
     my_fd_set* readfdsOriginal;
     my_fd_set* writefdsOriginal;
     my_fd_set* exceptfdsOriginal;
     std::unique_ptr<UDPSocket> dummySocket;
     bool modified;
 
-    PollSetImpl()
-    :
-        fdSetSize( INITIAL_FDSET_SIZE ),
-        readfds( allocFDSet( fdSetSize ) ),
-        writefds( allocFDSet( fdSetSize ) ),
-        exceptfds( allocFDSet( fdSetSize ) ),
-        readfdsOriginal( allocFDSet( fdSetSize ) ),
-        writefdsOriginal( allocFDSet( fdSetSize ) ),
-        exceptfdsOriginal( allocFDSet( fdSetSize ) ),
-        modified( true )
+    PollSetImpl():
+        fdSetSize(INITIAL_FDSET_SIZE),
+        readfds(allocFDSet(fdSetSize)),
+        writefds(allocFDSet(fdSetSize)),
+        exceptfds(allocFDSet(fdSetSize)),
+        readfdsOriginal(allocFDSet(fdSetSize)),
+        writefdsOriginal(allocFDSet(fdSetSize)),
+        exceptfdsOriginal(allocFDSet(fdSetSize)),
+        modified(true)
     {
         readfds->fd_count = 0;
         writefds->fd_count = 0;
@@ -113,29 +112,29 @@ public:
         writefdsOriginal->fd_count = 0;
         exceptfdsOriginal->fd_count = 0;
 
-        dummySocket.reset( new UDPSocket(AF_INET) );
+        dummySocket.reset(new UDPSocket(AF_INET));
     }
 
     ~PollSetImpl()
     {
-        freeFDSet( readfds );
+        freeFDSet(readfds);
         readfds = NULL;
-        freeFDSet( writefds );
+        freeFDSet(writefds);
         writefds = NULL;
-        freeFDSet( exceptfds );
+        freeFDSet(exceptfds);
         exceptfds = NULL;
 
-        freeFDSet( readfdsOriginal );
+        freeFDSet(readfdsOriginal);
         readfdsOriginal = NULL;
-        freeFDSet( writefdsOriginal );
+        freeFDSet(writefdsOriginal);
         writefdsOriginal = NULL;
-        freeFDSet( exceptfdsOriginal );
+        freeFDSet(exceptfdsOriginal);
         exceptfdsOriginal = NULL;
     }
 
     void fillFDSets()
     {
-        if( modified )
+        if (modified)
         {
             //pollset has been modified, re-generating fdsets
 
@@ -144,34 +143,34 @@ public:
             exceptfdsOriginal->fd_count = 0;
 
             //expanding arrays if necessary
-            if( fdSetSize < sockets.size() )
+            if (fdSetSize < sockets.size())
             {
-                while( fdSetSize < sockets.size() )
+                while (fdSetSize < sockets.size())
                     fdSetSize += FDSET_INCREASE_STEP;
 
-                reallocFDSet( &readfdsOriginal, fdSetSize );
-                reallocFDSet( &writefdsOriginal, fdSetSize );
-                reallocFDSet( &exceptfdsOriginal, fdSetSize );
+                reallocFDSet(&readfdsOriginal, fdSetSize);
+                reallocFDSet(&writefdsOriginal, fdSetSize);
+                reallocFDSet(&exceptfdsOriginal, fdSetSize);
 
-                reallocFDSet( &readfds, fdSetSize );
-                reallocFDSet( &writefds, fdSetSize );
-                reallocFDSet( &exceptfds, fdSetSize );
+                reallocFDSet(&readfds, fdSetSize);
+                reallocFDSet(&writefds, fdSetSize);
+                reallocFDSet(&exceptfds, fdSetSize);
             }
 
-            for( const std::pair<SOCKET, SockCtx>& val: sockets )
+            for (const std::pair<SOCKET, SockCtx>& val : sockets)
             {
-                if( val.second.polledEventsMask & aio::etRead )
+                if (val.second.polledEventsMask & aio::etRead)
                     readfdsOriginal->fd_array[readfdsOriginal->fd_count++] = val.first;
-                if( val.second.polledEventsMask & aio::etWrite )
+                if (val.second.polledEventsMask & aio::etWrite)
                     writefdsOriginal->fd_array[writefdsOriginal->fd_count++] = val.first;
                 exceptfdsOriginal->fd_array[exceptfdsOriginal->fd_count++] = val.first;
             }
 
-            memcpy( readfds->fd_array, readfdsOriginal->fd_array, fdSetSize*sizeof(*readfdsOriginal->fd_array) );
+            memcpy(readfds->fd_array, readfdsOriginal->fd_array, fdSetSize * sizeof(*readfdsOriginal->fd_array));
             readfds->fd_count = readfdsOriginal->fd_count;
-            memcpy( writefds->fd_array, writefdsOriginal->fd_array, fdSetSize*sizeof(*writefdsOriginal->fd_array) );
+            memcpy(writefds->fd_array, writefdsOriginal->fd_array, fdSetSize * sizeof(*writefdsOriginal->fd_array));
             writefds->fd_count = writefdsOriginal->fd_count;
-            memcpy( exceptfds->fd_array, exceptfdsOriginal->fd_array, fdSetSize*sizeof(*exceptfdsOriginal->fd_array) );
+            memcpy(exceptfds->fd_array, exceptfdsOriginal->fd_array, fdSetSize * sizeof(*exceptfdsOriginal->fd_array));
             exceptfds->fd_count = exceptfdsOriginal->fd_count;
 
             modified = false;
@@ -179,17 +178,17 @@ public:
         else
         {
             //just restoring fdset state after select call
-            restoreFDSet( readfds, readfdsOriginal );
-            restoreFDSet( writefds, writefdsOriginal );
-            restoreFDSet( exceptfds, exceptfdsOriginal );
+            restoreFDSet(readfds, readfdsOriginal);
+            restoreFDSet(writefds, writefdsOriginal);
+            restoreFDSet(exceptfds, exceptfdsOriginal);
         }
     }
 
-    void restoreFDSet( my_fd_set* const fds, my_fd_set* const fdsOriginal )
+    void restoreFDSet(my_fd_set* const fds, my_fd_set* const fdsOriginal)
     {
         //select on win32 writes signaled socket handlers to beginning of fd set
-        if( fds->fd_count > 0 )
-            memcpy( fds->fd_array, fdsOriginal->fd_array, fds->fd_count*sizeof(*fdsOriginal->fd_array) );
+        if (fds->fd_count > 0)
+            memcpy(fds->fd_array, fdsOriginal->fd_array, fds->fd_count * sizeof(*fdsOriginal->fd_array));
         fds->fd_count = fdsOriginal->fd_count;
     }
 };
@@ -199,28 +198,27 @@ class ConstIteratorImplOld
 public:
     Pollable* sock;
     void* userData;
-    //!bitmask of aio::EventType
+    /** bitmask of aio::EventType. */
     aio::EventType currentSocketREvent;
     PollSetImpl* pollSetImpl;
     my_fd_set* curFdSet;
-    //!Index in curFdSet.fd_array
+    /** Index in curFdSet.fd_array. */
     size_t fdIndex;
 
-    ConstIteratorImplOld()
-    :
-        sock( nullptr ),
-        userData( nullptr ),
-        currentSocketREvent( aio::etNone ),
-        pollSetImpl( nullptr ),
-        curFdSet( nullptr ),
-        fdIndex( 0 )
+    ConstIteratorImplOld():
+        sock(nullptr),
+        userData(nullptr),
+        currentSocketREvent(aio::etNone),
+        pollSetImpl(nullptr),
+        curFdSet(nullptr),
+        fdIndex(0)
     {
     }
 
     void findNextSignalledSocket()
     {
         //moving to the next socket
-        if( curFdSet == nullptr )
+        if (curFdSet == nullptr)
         {
             curFdSet = pollSetImpl->readfds;
             fdIndex = 0;
@@ -234,18 +232,22 @@ public:
         //    sets fd_count properly, so it actually does like epoll
 
         //NOTE fdIndex points to current next fd. It does not correspond to currentSocket and currentSocketREvent
-        NX_ASSERT( fdIndex <= curFdSet->fd_count );
+        NX_ASSERT(fdIndex <= curFdSet->fd_count);
         //there may be INVALID_SOCKET in fd arrays due to PollSet::remove call
-        for( ;; )
+        for (;; )
         {
-            if( fdIndex == curFdSet->fd_count )
+            if (fdIndex == curFdSet->fd_count)
             {
                 //taking next fds
-                if( curFdSet == pollSetImpl->readfds )
+                if (curFdSet == pollSetImpl->readfds)
+                {
                     curFdSet = pollSetImpl->writefds;
-                else if( curFdSet == pollSetImpl->writefds )
+                }
+                else if (curFdSet == pollSetImpl->writefds)
+                {
                     curFdSet = pollSetImpl->exceptfds;
-                else if( curFdSet == pollSetImpl->exceptfds )
+                }
+                else if (curFdSet == pollSetImpl->exceptfds)
                 {
                     sock = nullptr;
                     userData = nullptr;
@@ -256,42 +258,40 @@ public:
                 continue;
             }
 
-            if( curFdSet->fd_array[fdIndex] != INVALID_SOCKET )
+            if (curFdSet->fd_array[fdIndex] != INVALID_SOCKET)
                 break;  //found valid socket handler
             ++fdIndex;
         }
 
-        //NOTE curFdSet->fd_array[fdIndex] is a valid socket handler
+        // NOTE curFdSet->fd_array[fdIndex] is a valid socket handler.
 
-        //TODO #ak remove following find call. Finding socket MUST be constant-time operation
-        auto sockIter = pollSetImpl->sockets.find( curFdSet->fd_array[fdIndex] );
-        NX_ASSERT( sockIter != pollSetImpl->sockets.end() );
+        // TODO: #ak Remove following find call. Finding socket MUST be constant-time operation.
+        auto sockIter = pollSetImpl->sockets.find(curFdSet->fd_array[fdIndex]);
+        NX_ASSERT(sockIter != pollSetImpl->sockets.end());
 
         sock = sockIter->second.sock;
-        if( curFdSet == pollSetImpl->readfds )
+        if (curFdSet == pollSetImpl->readfds)
             currentSocketREvent = aio::etRead;
-        else if( curFdSet == pollSetImpl->writefds )
+        else if (curFdSet == pollSetImpl->writefds)
             currentSocketREvent = aio::etWrite;
-        else if( curFdSet == pollSetImpl->exceptfds )
+        else if (curFdSet == pollSetImpl->exceptfds)
             currentSocketREvent = aio::etError;
 
-        //TODO #ak which user data report in case of etError?
+        // TODO: #ak Which user data report in case of etError?
         userData = sockIter->second.userData[currentSocketREvent];
     }
 };
 
-//////////////////////////////////////////////////////////
-// PollSet::const_iterator
-//////////////////////////////////////////////////////////
-PollSet::const_iterator::const_iterator()
-:
-    m_impl( new ConstIteratorImplOld() )
+//-------------------------------------------------------------------------------------------------
+// PollSet::const_iterator.
+
+PollSet::const_iterator::const_iterator():
+    m_impl(new ConstIteratorImplOld())
 {
 }
 
-PollSet::const_iterator::const_iterator( const PollSet::const_iterator& right )
-:
-    m_impl( new ConstIteratorImplOld( *right.m_impl ) )
+PollSet::const_iterator::const_iterator(const PollSet::const_iterator& right):
+    m_impl(new ConstIteratorImplOld(*right.m_impl))
 {
 }
 
@@ -301,22 +301,20 @@ PollSet::const_iterator::~const_iterator()
     m_impl = NULL;
 }
 
-PollSet::const_iterator& PollSet::const_iterator::operator=( const PollSet::const_iterator& right )
+PollSet::const_iterator& PollSet::const_iterator::operator=(const PollSet::const_iterator& right)
 {
     *m_impl = *right.m_impl;
     return *this;
 }
 
-//!Selects next socket which state has been changed with previous poll call
-PollSet::const_iterator PollSet::const_iterator::operator++(int)    //it++
+PollSet::const_iterator PollSet::const_iterator::operator++(int) //< it++
 {
-    const_iterator bak( *this );
+    const_iterator bak(*this);
     m_impl->findNextSignalledSocket();
     return bak;
 }
 
-//!Selects next socket which state has been changed with previous poll call
-PollSet::const_iterator& PollSet::const_iterator::operator++()       //++it
+PollSet::const_iterator& PollSet::const_iterator::operator++() //< ++it
 {
     m_impl->findNextSignalledSocket();
     return *this;
@@ -342,32 +340,30 @@ void* PollSet::const_iterator::userData()
     return m_impl->userData;
 }
 
-bool PollSet::const_iterator::operator==( const const_iterator& right ) const
+bool PollSet::const_iterator::operator==(const const_iterator& right) const
 {
-    NX_ASSERT( m_impl->pollSetImpl == right.m_impl->pollSetImpl );
+    NX_ASSERT(m_impl->pollSetImpl == right.m_impl->pollSetImpl);
     return (m_impl->pollSetImpl == right.m_impl->pollSetImpl)
         && (m_impl->curFdSet == right.m_impl->curFdSet)
         && (m_impl->fdIndex == right.m_impl->fdIndex);
 }
 
-bool PollSet::const_iterator::operator!=( const const_iterator& right ) const
+bool PollSet::const_iterator::operator!=(const const_iterator& right) const
 {
     return !(*this == right);
 }
 
+//-------------------------------------------------------------------------------------------------
+// PollSet.
 
-//////////////////////////////////////////////////////////
-// PollSet
-//////////////////////////////////////////////////////////
-PollSet::PollSet()
-:
-    m_impl( new PollSetImpl() )
+PollSet::PollSet():
+    m_impl(new PollSetImpl())
 {
     m_impl->sockets.emplace(
         m_impl->dummySocket->handle(),
-        PollSetImpl::SockCtx( m_impl->dummySocket.get(), aio::etRead ) );
-    m_impl->dummySocket->setNonBlockingMode( true );
-    m_impl->dummySocket->bind( SocketAddress( HostAddress::localhost, 0 ) );
+        PollSetImpl::SockCtx(m_impl->dummySocket.get(), aio::etRead));
+    m_impl->dummySocket->setNonBlockingMode(true);
+    m_impl->dummySocket->bind(SocketAddress(HostAddress::localhost, 0));
 
     m_impl->modified = true;
 }
@@ -385,15 +381,15 @@ bool PollSet::isValid() const
 
 void PollSet::interrupt()
 {
-    //TODO #ak introduce overlapped IO
+    // TODO: #ak Introduce overlapped I/O.
     quint8 buf[128];
-    m_impl->dummySocket->sendTo( buf, sizeof(buf), m_impl->dummySocket->getLocalAddress() );
+    m_impl->dummySocket->sendTo(buf, sizeof(buf), m_impl->dummySocket->getLocalAddress());
 }
 
 bool PollSet::add(
     Pollable* const sock,
     aio::EventType eventType,
-    void* userData )
+    void* userData)
 {
     PollSetImpl::SockCtx& ctx = m_impl->sockets[sock->handle()];
     ctx.sock = sock;
@@ -403,38 +399,42 @@ bool PollSet::add(
     return true;
 }
 
-void PollSet::remove( Pollable* const sock, aio::EventType eventType )
+void PollSet::remove(Pollable* const sock, aio::EventType eventType)
 {
 #ifdef _DEBUG
     sock->handle(); //checking that socket object is still alive, since linux and mac implementation use socket in PollSet::remove
 #endif
 
     auto sockIter = m_impl->sockets.find(sock->handle());
-    NX_ASSERT( sockIter != m_impl->sockets.end()
-        && (sockIter->second.polledEventsMask & eventType) > 0 );    //minor optimization
-    if( sockIter == m_impl->sockets.end()
-        || (sockIter->second.polledEventsMask & eventType) == 0 )
+    NX_ASSERT(sockIter != m_impl->sockets.end()
+        && (sockIter->second.polledEventsMask & eventType) > 0);    //minor optimization
+    if (sockIter == m_impl->sockets.end()
+        || (sockIter->second.polledEventsMask & eventType) == 0)
     {
         //socket is not polled for eventType
         return;
     }
 
     //removing socket from already occured events list
-    if( eventType == aio::etRead )
+    if (eventType == aio::etRead)
+    {
         std::replace(
             m_impl->readfds->fd_array, m_impl->readfds->fd_array + m_impl->readfds->fd_count,
-            sock->handle(), INVALID_SOCKET );
-    else if( eventType == aio::etWrite )
+            sock->handle(), INVALID_SOCKET);
+    }
+    else if (eventType == aio::etWrite)
+    {
         std::replace(
             m_impl->writefds->fd_array, m_impl->writefds->fd_array + m_impl->writefds->fd_count,
-            sock->handle(), INVALID_SOCKET );
+            sock->handle(), INVALID_SOCKET);
+    }
     std::replace(
         m_impl->exceptfds->fd_array, m_impl->exceptfds->fd_array + m_impl->exceptfds->fd_count,
-        sock->handle(), INVALID_SOCKET );
+        sock->handle(), INVALID_SOCKET);
 
     sockIter->second.polledEventsMask &= ~eventType;
-    if( sockIter->second.polledEventsMask == 0 )
-        m_impl->sockets.erase( sockIter );
+    if (sockIter->second.polledEventsMask == 0)
+        m_impl->sockets.erase(sockIter);
     else
         sockIter->second.userData[eventType] = nullptr;
 
@@ -446,30 +446,30 @@ size_t PollSet::size() const
     return m_impl->sockets.size();
 }
 
-int PollSet::poll( int millisToWait )
+int PollSet::poll(int millisToWait)
 {
     m_impl->fillFDSets();
 
     struct timeval timeout;
-    if( millisToWait >= 0 )
+    if (millisToWait >= 0)
     {
-        memset( &timeout, 0, sizeof(timeout) );
+        memset(&timeout, 0, sizeof(timeout));
         timeout.tv_sec = millisToWait / 1000;
         timeout.tv_usec = (millisToWait % 1000) * 1000;
     }
-    int result = select( 0, (fd_set*)m_impl->readfds, (fd_set*)m_impl->writefds,
-                        (fd_set*)m_impl->exceptfds, millisToWait >= 0 ? &timeout : NULL );
-    if( result <= 0 )
+    int result = select(0, (fd_set*)m_impl->readfds, (fd_set*)m_impl->writefds,
+        (fd_set*)m_impl->exceptfds, millisToWait >= 0 ? &timeout : NULL);
+    if (result <= 0)
         return result;
 
-    for( size_t i = 0; i < m_impl->readfds->fd_count; ++i )
+    for (size_t i = 0; i < m_impl->readfds->fd_count; ++i)
     {
-        if( m_impl->readfds->fd_array[i] == m_impl->dummySocket->handle() )
+        if (m_impl->readfds->fd_array[i] == m_impl->dummySocket->handle())
         {
             //reading dummy socket
             quint8 buf[128];
-            m_impl->dummySocket->recv( buf, sizeof(buf), 0 );   //ignoring result and data...
-                --result;
+            m_impl->dummySocket->recv(buf, sizeof(buf), 0);   //ignoring result and data...
+            --result;
             m_impl->readfds->fd_array[i] = INVALID_SOCKET;
             break;
         }

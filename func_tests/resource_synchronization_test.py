@@ -1,7 +1,3 @@
-'''Resource synchronization tests
-
-   It tests that servers of the same system sinchronize its data correctly
-'''
 import itertools
 import logging
 import time
@@ -149,7 +145,7 @@ def wait_entity_merge_done(servers, method, api_object, api_method):
             for srv in servers:
                 result = get_response(srv, method, api_object, api_method)
                 if result != result_expected:
-                    return (srv, result)
+                    return srv, result
             return None
 
         result = check(servers[1:], result_expected)
@@ -174,7 +170,7 @@ def check_transaction_log(env):
         return ', '.join("%r" % s for s in servers)
 
     def transactions_to_str(transactions):
-        return '\n  '.join("%s: [%s]" % (k, servers_to_str(v)) for k, v in transactions.iteritems())
+        return '\n  '.join("%s: [%s]" % (k, servers_to_str(v)) for k, v in transactions.items())
 
     start_time = datetime_utc_now()
     while True:
@@ -184,7 +180,7 @@ def check_transaction_log(env):
                 srv.rest_api.ec2.getTransactionLog.GET())
             for t in transactions:
                 srv_transactions.setdefault(t, []).append(srv)
-        unmatched_transactions = {t: l for t, l in srv_transactions.iteritems()
+        unmatched_transactions = {t: l for t, l in srv_transactions.items()
                                   if len(l) != len(env.servers)}
         if not unmatched_transactions:
             return
@@ -208,10 +204,10 @@ def merge_system_if_unmerged(env):
 
 
 def get_servers_admins(env):
-    '''Return list of pairs (mediaserver, user data).
+    """Return list of pairs (mediaserver, user data).
 
     Get admin users from all tested servers
-    '''
+    """
     admins = []
     for server in env.servers:
         users = server.rest_api.ec2.getUsers.GET()
@@ -220,19 +216,19 @@ def get_servers_admins(env):
 
 
 def get_server_by_index(env, i):
-    '''Return Server object.'''
+    """Return Server object."""
     server_i = i % len(env.servers)
     return env.servers[server_i]
 
 
 def prepare_call_list(env, api_method, sequence=None):
-    '''Return list of tupples (mediaserver, REST API function name, data to POST).
+    """Return list of tupples (mediaserver, REST API function name, data to POST).
 
     Prepare data for the NX media server POST request:
       * env - test environment
       * api_method - media server REST API function name
       * sequence - list of pairs (server, data for resource generation)
-    '''
+    """
     data_generator = env.resource_generators[api_method]
     sequence = sequence or [(None, i) for i in range(env.test_size)]
     call_list = []
@@ -241,12 +237,12 @@ def prepare_call_list(env, api_method, sequence=None):
     # If we have already merged system, we can use any server to create/remove/modify resource,
     # otherwise we have to use only resource owner for modification.
     def get_server_for_modification(env, i, server):
-        '''Return server for modification.
+        """Return server for modification.
 
         * env - test environment
         * i - index for getting server by index
         * server - server where resource have been created
-        '''
+        """
         if not server or env.system_is_merged:
             # If the resource's server isn't specified or system is already merged,
             # get server for modification request by index
@@ -269,10 +265,10 @@ def prepare_call_list(env, api_method, sequence=None):
 
 
 def make_async_post_calls(env, call_list):
-    '''Return list of pairs (mediaserver, posted data).
+    """Return list of pairs (mediaserver, posted data).
 
     Make async NX media server REST API POST requests.
-    '''
+    """
     pool = ThreadPool(env.thread_number)
     pool.map(server_api_post, call_list)
     pool.close()

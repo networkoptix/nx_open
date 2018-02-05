@@ -40,7 +40,7 @@
                             Tách máy chủ ra khỏi hệ thống hiện tại. Lưu trữ video sẽ vẫn còn nguyên vẹn.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Khôi phục mặc định của nha sản xuât</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>Tách máy chủ khỏi hệ thống</h3>
                         <p>Việc này sẽ tách các máy chủ ra khỏi hệ thống lưu trữ dữ liệu, người dùng, cấu hình nội bộ.                             Video Lưu trữ vẫn tồn tại. <b>Tài khoản người dùng Cloud sẽ bị xóa.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Tách máy chủ khỏi hệ thống</button></p>

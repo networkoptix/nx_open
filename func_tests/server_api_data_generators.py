@@ -1,7 +1,3 @@
-"""
-  Generate data for mediaserver's API calls
-"""
-
 from hashlib import md5
 
 from netaddr import IPAddress
@@ -77,7 +73,7 @@ def generate_ip_v4_endpoint(id):
 def generate_password_and_digest(name):
     password = name
     d = md5("%s:NetworkOptix:%s" % (name, password)).digest()
-    return (password, ''.join('%02x' % ord(i) for i in d))
+    return password, ''.join('%02x' % ord(i) for i in d)
 
 
 def generate_password_hash(password):

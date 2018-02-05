@@ -1,29 +1,29 @@
-'''mediaserver presentation class
+"""Mediaserver presentation class
 
-Allows working with servers from functional tests - start/stop, setup, configure, access rest api, storage, etc.
-'''
+Allow working with servers from functional tests: start/stop, setup, configure, access rest api, storage, etc...
+"""
 
 import base64
 import datetime
 import hashlib
 import logging
-import os.path
+import tempfile
 import time
 import urllib
 import uuid
-import tempfile
 
 import pytest
 import pytz
 import requests.exceptions
+from pathlib2 import Path
 
-from .camera import make_schedule_task, Camera, SampleMediaFile
+from .camera import Camera, SampleMediaFile, make_schedule_task
 from .cloud_host import CloudAccount
-from .host import Host, LocalHost
+from .os_access import OsAccess, LocalAccess
 from .media_stream import open_media_stream
-from .rest_api import REST_API_USER, REST_API_PASSWORD, HttpError, RestApi
-from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now, RunningTime
-from .vagrant_box_config import MEDIASERVER_LISTEN_PORT
+from .rest_api import HttpError, REST_API_PASSWORD, REST_API_USER, RestApi
+from .utils import RunningTime, datetime_utc_now, datetime_utc_to_timestamp, is_list_inst
+from .vagrant_vm_config import MEDIASERVER_LISTEN_PORT
 
 DEFAULT_HTTP_SCHEMA = 'http'
 
@@ -68,7 +68,7 @@ def generate_auth_key(method, user, password, nonce, realm):
 class ServerConfig(object):
 
     def __init__(self, name, start=True, setup=True, leave_initial_cloud_host=False,
-                 box=None, config_file_params=None, setup_settings=None, setup_cloud_account=None,
+                 vm=None, config_file_params=None, setup_settings=None, setup_cloud_account=None,
                  http_schema=None, rest_api_timeout=None):
         assert name, repr(name)
         assert type(setup) is bool, repr(setup)
@@ -81,10 +81,10 @@ class ServerConfig(object):
         self.setup = setup  # setup as local system if setup_cloud_account is None, to cloud if it is set
         # By default, by Server's 'init' method  it's hardcoded cloud host will be patched/restored to the one
         # deduced from --cloud-group option. With leave_initial_cloud_host=True, this step will be skipped.
-        # With leave_initial_cloud_host=True box will also be always recreated before this test to ensure
+        # With leave_initial_cloud_host=True VM will also be always recreated before this test to ensure
         # server binaries has original cloud host encoded by compilation step.
         self.leave_initial_cloud_host = leave_initial_cloud_host  # bool
-        self.box = box  # VagrantBox or None
+        self.vm = vm  # VagrantVM or None
         self.config_file_params = config_file_params  # dict or None
         self.setup_settings = setup_settings or {}  # dict
         self.setup_cloud_account = setup_cloud_account  # CloudAccount or None
@@ -92,24 +92,26 @@ class ServerConfig(object):
         self.rest_api_timeout = rest_api_timeout
 
     def __repr__(self):
-        return 'ServerConfig(%r @ %s)' % (self.name, self.box)
+        return 'ServerConfig(%r @ %s)' % (self.name, self.vm)
 
 
 class Server(object):
-
+    """Mediaserver, same for physical and virtual machines."""
     _st_started = object()
     _st_stopped = object()
     _st_starting = object()
 
-    def __init__(self, name, host, installation, server_ctl, rest_api_url, ca,
-                 rest_api_timeout=None, internal_ip_port=None, timezone=None):
+    def __init__(
+            self,
+            name, os_access, service, installation, rest_api_url, ca,
+            rest_api_timeout=None, internal_ip_port=None):
         assert name, repr(name)
-        assert isinstance(host, Host), repr(host)
+        assert isinstance(os_access, OsAccess), repr(os_access)
         self.title = name.upper()
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
-        self.host = host
+        self.os_access = os_access
         self._installation = installation
-        self._server_ctl = server_ctl
+        self._service = service
         self.rest_api_url = rest_api_url
         self._ca = ca
         self.rest_api = RestApi(self.title, self.rest_api_url, timeout=rest_api_timeout, ca_cert=self._ca.cert_path)
@@ -118,7 +120,6 @@ class Server(object):
         self.ecs_guid = None
         self.internal_ip_port = internal_ip_port or MEDIASERVER_LISTEN_PORT
         self.internal_ip_address = None
-        self.timezone = timezone
         self._state = None  # self._st_*
 
     def __repr__(self):
@@ -145,7 +146,7 @@ class Server(object):
 
     def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None, config_file_params=None):
         if self._state is None:
-            was_started = self._server_ctl.get_state()
+            was_started = self._service.get_state()
             self._state = self._st_starting if was_started else self._st_stopped
         else:
             was_started = self._state in [self._st_starting, self._st_started]
@@ -198,7 +199,7 @@ class Server(object):
         assert self._state != self._bool2final_state(is_started), (
             'Service for %s is already %s' % (self, is_started and 'started' or 'stopped'))
         if not (is_started and self._state == self._st_starting):
-            self._server_ctl.set_state(is_started)
+            self._service.set_state(is_started)
         self._state = self._st_starting if is_started else self._st_stopped
         if is_started:
             self.wait_for_server_become_online()
@@ -226,7 +227,7 @@ class Server(object):
     def is_server_online(self):
         try:
             return self.rest_api.api.ping.GET(timeout=datetime.timedelta(seconds=10))
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.SSLError) as e:
             return False
 
     def get_log_file(self):
@@ -260,7 +261,7 @@ class Server(object):
             return 'local'
 
     def reset(self):
-        was_started = self._server_ctl.is_running()
+        was_started = self._service.is_running()
         if was_started:
             self.stop_service()
         self._installation.cleanup_var_dir()
@@ -298,7 +299,7 @@ class Server(object):
             break
 
     def make_core_dump(self):
-        self._server_ctl.make_core_dump()
+        self._service.make_core_dump()
         self._state = self._st_stopped
 
     def get_time(self):
@@ -413,7 +414,7 @@ class Server(object):
 
     def get_nonce(self):
         response = self.rest_api.api.getNonce.GET()
-        return (response['realm'], response['nonce'])
+        return response['realm'], response['nonce']
 
     def change_system_id(self, new_guid):
         old_local_system_id = self.local_system_id
@@ -441,16 +442,11 @@ class Server(object):
     def stop_recording_camera(self, camera):
         self.set_camera_recording(camera, recording=False)
 
-    # if there are more than one return first
     @property
     def storage(self):
-        ## # following code requires server is started, which is not always the case;
-        ## #  so was commented-out and replaced with hardcoded one
-        ## storage_records = [record for record in self.rest_api.ec2.getStorages.GET() if record['parentId'] == self.ecs_guid]
-        ## assert len(storage_records) >= 1, 'No storages for server with ecs guid %s is returned by %s' % (self.ecs_guid, self.rest_api_url)
-        ## storage_path = storage_records[0]['url']
-        storage_path = os.path.join(self._installation.dir, MEDIASERVER_STORAGE_PATH)
-        return Storage(self.host, storage_path, self.timezone)
+        # GET /ec2/getStorages is not always possible: server sometimes is not started.
+        storage_path = self._installation.dir / MEDIASERVER_STORAGE_PATH
+        return Storage(self.os_access, storage_path, self.os_access.get_timezone())
 
     def rebuild_archive(self):
         self.rest_api.api.rebuildArchive.GET(mainPool=1, action='start')
@@ -464,8 +460,8 @@ class Server(object):
     def get_recorded_time_periods(self, camera):
         assert camera.id, 'Camera %r is not yet registered on server' % camera.name
         periods = [TimePeriod(datetime.datetime.utcfromtimestamp(int(d['startTimeMs'])/1000.).replace(tzinfo=pytz.utc),
-                    datetime.timedelta(seconds=int(d['durationMs'])/1000.))
-                    for d in self.rest_api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
+                              datetime.timedelta(seconds=int(d['durationMs']) / 1000.))
+                   for d in self.rest_api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
         log.info('Server %r returned %d recorded periods:', self.name, len(periods))
         for period in periods:
             log.info('\t%s', period)
@@ -479,10 +475,10 @@ class Server(object):
 
 class Storage(object):
 
-    def __init__(self, host, dir, timezone=None):
-        self.host = host
+    def __init__(self, os_access, dir, timezone=None):
+        self.os_access = os_access
         self.dir = dir
-        self.timezone = timezone or host.get_timezone()
+        self.timezone = timezone or os_access.get_timezone()
 
     def save_media_sample(self, camera, start_time, sample):
         assert isinstance(camera, Camera), repr(camera)
@@ -498,34 +494,33 @@ class Storage(object):
         hiq_fpath  = self._construct_fpath(camera_mac_addr, 'hi_quality',  start_time, unixtime_utc_ms, sample.duration)
 
         log.info('Storing media sample %r to %r', sample.fpath, lowq_fpath)
-        self.host.write_file(lowq_fpath, contents)
+        self.os_access.write_file(lowq_fpath, contents)
         log.info('Storing media sample %r to %r', sample.fpath, hiq_fpath)
-        self.host.write_file(hiq_fpath,  contents)
+        self.os_access.write_file(hiq_fpath, contents)
 
     def _read_with_start_time_metadata(self, sample, unixtime_utc_ms):
-        _, ext = os.path.splitext(sample.fpath)
-        _, path = tempfile.mkstemp(suffix=ext)
+        _, path = tempfile.mkstemp(suffix=sample.fpath.suffix)
+        path = Path(path)
         try:
-            LocalHost().run_command([
+            LocalAccess().run_command([
                 'ffmpeg',
                 '-i', sample.fpath,
                 '-codec', 'copy',
                 '-metadata', 'START_TIME=%s' % unixtime_utc_ms,
                 '-y',
                 path])
-            with open(path, 'rb') as f:
-                return f.read()
+            return path.read_bytes()
         finally:
-            os.remove(path)
+            path.unlink()
 
     # server stores media data in this format, using local time for directory parts:
     # <data dir>/<{hi_quality,low_quality}>/<camera-mac>/<year>/<month>/<day>/<hour>/<start,unix timestamp ms>_<duration,ms>.mkv
     # for example:
     # server/var/data/data/low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/2017/01/27/12/1485511093576_21332.mkv
     def _construct_fpath(self, camera_mac_addr, quality_part, start_time, unixtime_utc_ms, duration):
-        local_dt = start_time.astimezone(self.timezone)  # box local
+        local_dt = start_time.astimezone(self.timezone)  # Local to VM.
         duration_ms = int(duration.total_seconds() * 1000)
-        return os.path.join(
-            self.dir, quality_part, camera_mac_addr,
+        return self.dir.joinpath(
+            quality_part, camera_mac_addr,
             '%02d' % local_dt.year, '%02d' % local_dt.month, '%02d' % local_dt.day, '%02d' % local_dt.hour,
             '%s_%s.mkv' % (unixtime_utc_ms, duration_ms))

@@ -1,5 +1,4 @@
-#ifndef __VIDEO_CAMERA_H__
-#define __VIDEO_CAMERA_H__
+#pragma once
 
 #include <memory>
 
@@ -10,11 +9,15 @@
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 
-#include <api/helpers/thumbnail_request_data.h>
+
+#include <nx/api/mediaserver/image_request.h>
+
+#include "camera_fwd.h"
 #include <core/resource/resource_consumer.h>
 #include <providers/live_stream_provider.h>
 #include <server/server_globals.h>
 #include <nx/mediaserver/hls/hls_live_playlist_manager.h>
+#include <api/helpers/thumbnail_request_data.h>
 
 class QnVideoCameraGopKeeper;
 class MediaStreamCache;
@@ -54,7 +57,7 @@ public:
         bool primaryLiveStream,
         qint64 time,
         int channel,
-        QnThumbnailRequestData::RoundMethod roundMethod) const = 0;
+        nx::api::ImageRequest::RoundMethod roundMethod) const = 0;
 
     virtual void beforeStop() = 0;
     virtual bool isSomeActivity() const = 0;
@@ -85,8 +88,6 @@ public:
         qint64 targetDurationUSec) = 0;
     virtual QnResourcePtr resource() const = 0;
 };
-
-typedef QnSharedResourcePointer<QnAbstractMediaServerVideoCamera> QnVideoCameraPtr;
 
 class QnVideoCamera:
     public QObject,
@@ -122,7 +123,7 @@ public:
         bool primaryLiveStream,
         qint64 time,
         int channel,
-        QnThumbnailRequestData::RoundMethod roundMethod) const override;
+        nx::api::ImageRequest::RoundMethod roundMethod) const;
 
     virtual void beforeStop() override;
     virtual bool isSomeActivity() const override;
@@ -173,5 +174,3 @@ private:
 private slots:
     void at_camera_resourceChanged();
 };
-
-#endif // __VIDEO_CAMERA_H__

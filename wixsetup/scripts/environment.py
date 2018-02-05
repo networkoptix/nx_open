@@ -9,11 +9,16 @@ def print_command(command):
     print '>> {0}'.format(subprocess.list2cmdline(command))
 
 
-def execute_command(command, verbose=False):
+def execute_command(command, verbose=False, working_directory=None):
     if verbose:
         print_command(command)
     try:
+        current_directory = os.getcwd()
+        if working_directory:
+            os.chdir(working_directory)
         subprocess.check_output(command, stderr=subprocess.STDOUT)
+        if working_directory:
+            os.chdir(current_directory)
     except Exception as e:
         if not verbose:
             print_command(command)
@@ -72,9 +77,9 @@ def icu_files(qt_bin_dir):
         yield file
 
 
-def qt_files(qt_bin_dir, libs):
+def qt_files(qt_bin_dir, libs, extension='dll'):
     for lib in libs:
-        yield os.path.join(qt_bin_dir, 'Qt5{}.dll'.format(lib))
+        yield os.path.join(qt_bin_dir, 'Qt5{0}.{1}'.format(lib, extension))
 
 
 def qt_plugins_files(qt_plugins_dir, libs):

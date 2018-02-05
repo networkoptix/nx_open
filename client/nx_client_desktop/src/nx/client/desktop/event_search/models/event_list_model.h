@@ -4,6 +4,7 @@
 #include <QtGui/QPixmap>
 
 #include <core/resource/resource_fwd.h>
+#include <ui/common/notification_levels.h>
 
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
@@ -34,6 +35,7 @@ public:
         bool removable = false;
         int lifetimeMs = -1;
         int helpId = -1;
+        QnNotificationLevel::Value level = QnNotificationLevel::Value::NoNotification;
         QnVirtualCameraResourcePtr previewCamera;
         QnVirtualCameraResourceList cameras;
         qint64 previewTimeMs = 0; //< The latest thumbnail is used if previewTimeMs <= 0.

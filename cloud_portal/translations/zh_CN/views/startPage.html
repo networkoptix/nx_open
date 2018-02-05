@@ -2,6 +2,6 @@
     <div class="jumbotron">
         <ng-include src="$root.C.viewsDir + 'static/landing.html'"></ng-include>
         <p ng-if='!userEmail'><a class="btn btn-lg btn-primary auth-hidden" href="/register" role="button">创建帐户</a></p>
-        <p ng-if='userEmail'><a class="btn btn-lg btn-primary auth-hidden" href="/login" ng-click="login();$event.preventDefault();" role="button">登录</a></p>
+        <p ng-if='userEmail'><a class="btn btn-lg btn-primary auth-hidden" href="/login" ng-click="login();$event.preventDefault();" role="button">Log In</a></p>
     </div>
 </div>

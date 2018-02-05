@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_time_synchronizer.h"
 
 #include <map>
@@ -244,5 +242,3 @@ void HanwhaTimeSyncronizer::doRequest(
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

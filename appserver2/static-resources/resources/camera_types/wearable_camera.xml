@@ -1,0 +1,6 @@
+<resources>
+    <oem name = "WEARABLE_CAMERA">
+    <resource name = "WEARABLE_CAMERA" id="f7f5ab66-7075-4d0b-a0b2-75e2fdd079a4" type="Camera">
+    </resource>
+    </oem>
+</resources>

@@ -6,6 +6,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
 
+option(analyzeMutexLocksForDeadlock
+    "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
+    OFF)
+
 add_definitions(
     -DUSE_NX_HTTP
     -D__STDC_CONSTANT_MACROS
@@ -13,15 +17,11 @@ add_definitions(
     -DENABLE_SENDMAIL
     -DENABLE_DATA_PROVIDERS
     -DENABLE_SOFTWARE_MOTION_DETECTION
-    -DENABLE_THIRD_PARTY
-    -DENABLE_MDNS
 )
 
 if(WINDOWS)
     add_definitions(
         -D_WINSOCKAPI_=
-        -DENABLE_VMAX
-        -DENABLE_DESKTOP_CAMERA
     )
 endif()
 
@@ -29,44 +29,23 @@ if(UNIX)
     add_definitions(-DQN_EXPORT=)
 endif()
 
-set(enableAllVendors ON)
-
 if(ANDROID OR IOS)
     remove_definitions(
         -DENABLE_SENDMAIL
         -DENABLE_DATA_PROVIDERS
         -DENABLE_SOFTWARE_MOTION_DETECTION
-        -DENABLE_THIRD_PARTY
-        -DENABLE_MDNS
     )
-    set(enableAllVendors OFF)
 endif()
 
-if(box MATCHES "isd|edge1")
+if(box MATCHES "isd")
     set(enableAllVendors OFF)
-    remove_definitions(-DENABLE_SOFTWARE_MOTION_DETECTION)
+    remove_definitions(-DENABLE_MOTION_DETECTION)
     add_definitions(-DEDGE_SERVER)
 endif()
 
-if(enableAllVendors)
-    add_definitions(
-        -DENABLE_ONVIF
-        -DENABLE_AXIS
-        -DENABLE_ACTI
-        -DENABLE_ARECONT
-        -DENABLE_DLINK
-        -DENABLE_DROID
-        -DENABLE_TEST_CAMERA
-        -DENABLE_STARDOT
-        -DENABLE_IQE
-        -DENABLE_ISD
-        -DENABLE_PULSE_CAMERA
-        -DENABLE_FLIR
-        -DENABLE_ADVANTECH
-    )
-    if(customization STREQUAL "hanwha")
-        add_definitions(-DENABLE_HANWHA)
-    endif()
+if(box MATCHES "edge1")
+    set(enableAllVendors OFF)
+    add_definitions(-DEDGE_SERVER)
 endif()
 
 if(WINDOWS)
@@ -116,6 +95,12 @@ if(WINDOWS)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG")
+
+    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /DEBUG:FASTLINK")
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG:FASTLINK")
+    if(NOT developerBuild)
+        set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /SUBSYSTEM:WINDOWS /entry:mainCRTStartup")
+    endif()
     unset(_extra_linker_flags)
 endif()
 

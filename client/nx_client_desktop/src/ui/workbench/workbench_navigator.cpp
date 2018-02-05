@@ -174,7 +174,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& res)
     {
         if (res.dynamicCast<QnStorageResource>())
-            m_cameraDataManager->clearCache();	// TODO:#GDM #bookmarks check if should be placed into camera manager
+            m_cameraDataManager->clearCache(); // TODO:#GDM #bookmarks check if should be placed into camera manager
     });
     discardCacheTimer->start();
 
@@ -1209,7 +1209,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
                 updateSpeed();
             };
 
-        executeDelayedParented(callback, kDefaultDelay, this);
+        executeDelayedParented(callback, this);
     }
 
     updateLocalOffset();
@@ -1258,6 +1258,9 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags()
 
         if (m_currentWidget->resource()->flags().testFlag(Qn::sync))
             flags |= WidgetSupportsSync;
+
+        if (m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
+            flags &= ~WidgetSupportsLive;
 
         if (workbench()->currentLayout()->isSearchLayout()) /* Is a thumbnails search layout. */
             flags &= ~(WidgetSupportsLive | WidgetSupportsSync);

@@ -20,7 +20,7 @@
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>Te has registrado en Nx Cloud</h1>
+            <h1>Te has registrado en {{PRODUCT_NAME}}</h1>
             <p>Te hemos enviado un correo con el enlace de activación a {{data.email}}. <br> Activa tu cuenta visitando este enlace.</p>
         </div>
         <h1 ng-if="!data.email">Confirme su cuenta</h1>

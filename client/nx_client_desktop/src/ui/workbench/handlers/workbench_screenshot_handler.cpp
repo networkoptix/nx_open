@@ -11,7 +11,7 @@
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
-#include <camera/single_thumbnail_loader.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_provider.h>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -617,11 +617,13 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         NX_ASSERT(camera, Q_FUNC_INFO, "Camera must exist here");
         if (camera)
         {
-            auto provider = new QnSingleThumbnailLoader(camera, localParameters.utcTimestampMsec, 0);
-            auto params = provider->requestData();
-            params.roundMethod = QnThumbnailRequestData::PreciseMethod;
-            provider->setRequestData(params);
-            imageProvider = provider;
+            nx::api::CameraImageRequest request;
+            request.camera = camera;
+            request.msecSinceEpoch = localParameters.utcTimestampMsec;
+            request.roundMethod = nx::api::ImageRequest::RoundMethod::precise;
+            request.rotation = 0;
+
+            imageProvider = new nx::client::desktop::CameraThumbnailProvider(request);;
         }
         else
             imageProvider = getLocalScreenshotProvider(widget, localParameters, true);

@@ -43,7 +43,7 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                             A szerver leválik a jelenlegi rendszerről. A videóarchívum sértetlen marad.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Gyári beállítások visszaállítása</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>Szerver leválasztása a rendszerről</h3>
                         <p>Ez a művelet le fogja választani a szervert a rendszerről. Az adatbázis, a helyi felhasználók és a konfiguráció sértetlen marad.
                             A videóarchívum sértetlen marad. <b> A felhőfelhasználók törlődnek. </b></p>

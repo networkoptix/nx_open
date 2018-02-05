@@ -1,8 +1,8 @@
 Welkom bij {{PRODUCT_NAME}}
 
-Bedankt voor het deelnemen aan {{PRODUCT_NAME}}. Druk op onderstaande knop om uw e-mailadres te bevestigen en uw account te activeren.
+Bedankt voor uw deelname aan {{PRODUCT_NAME}}. Klik op de onderstaande knop om uw e-mailadres te bevestigen en het account te activeren.
 
 Activeer account: {{config.portal_url}} / activeer / {{message.code}}
 
 Als je niet in {{PRODUCT_NAME}} hebt aangemeld, negeer en verwijder dan deze e-mail.
-Gelieve te het bericht of de link niet met derden delen.
+Gelieve het bericht of de link niet met derden te delen.

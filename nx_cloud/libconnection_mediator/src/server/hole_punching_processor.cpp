@@ -130,8 +130,8 @@ void HolePunchingProcessor::onConnectionAckRequest(
         return completionHandler(api::ResultCode::notFound);
     }
 
-    NX_LOGX(lm("Connect ACK from %1, connection id %2")
-        .args(connection->getSourceAddress(), request.connectSessionId), cl_logDEBUG1);
+    NX_VERBOSE(this, lm("Connect ACK from %1, connection id %2")
+        .args(connection->getSourceAddress(), request.connectSessionId));
 
     connectionIter->second->onConnectionAckRequest(
         connection,
@@ -201,8 +201,7 @@ std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
         return std::make_tuple(api::ResultCode::notFound, boost::none);
     }
 
-    if (((targetPeerData.connectionMethods & request.connectionMethods) &
-        api::ConnectionMethod::udpHolePunching) == 0)
+    if (request.connectionMethods == 0)
     {
         NX_LOGX(lm("Failed connect request %1: no suitable connection method")
             .arg(logRequest(connection, request)), cl_logDEBUG1);

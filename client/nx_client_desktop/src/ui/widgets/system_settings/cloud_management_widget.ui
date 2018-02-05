@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>495</width>
+    <width>519</width>
     <height>347</height>
    </rect>
   </property>
@@ -48,9 +48,6 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item>
-        <widget class="QnPromoBar" name="promoBar" native="true"/>
-       </item>
        <item>
         <widget class="QnPanel" name="introWidget" native="true">
          <layout class="QGridLayout" name="introLayout" columnstretch="1,0,1,0,1">
@@ -392,11 +389,6 @@ Cloud Account&gt;</string>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/common/panel.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QnPromoBar</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/alert_bar.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

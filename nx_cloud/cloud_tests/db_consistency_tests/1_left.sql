@@ -1,4 +1,4 @@
-SELECT COUNT(*) 
+SELECT clouddb.account.email
 	FROM clouddb.account
 LEFT JOIN cloudportal.api_account 
 	ON clouddb.account.email = cloudportal.api_account.email

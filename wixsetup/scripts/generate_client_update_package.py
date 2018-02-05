@@ -43,6 +43,7 @@ nx_libraries = ['nx_vms_utils', 'nx_utils', 'nx_network', 'nx_kit', 'udt']
 
 def create_client_update_file(
     binaries_dir,
+    current_binary_dir,
     qt_dir,
     vcredist_directory,
     vox_dir,
@@ -81,6 +82,7 @@ def create_client_update_file(
         zip.write(os.path.join(binaries_dir, 'applauncher.exe'), 'applauncher.exe')
         zip.write(os.path.join(binaries_dir, launcher_version_name), launcher_version_name)
         zip.write(os.path.join(binaries_dir, 'minilauncher.exe'), minilauncher_binary_name)
+        zip.write(os.path.join(current_binary_dir, 'qt.conf'), 'qt.conf')
 
 
 '''
@@ -104,6 +106,7 @@ def main():
         args.output, config['client_update_distribution_name']) + '.zip'
     create_client_update_file(
         binaries_dir=config['bin_source_dir'],
+        current_binary_dir=config['current_binary_dir'],
         qt_dir=config['qt_directory'],
         vcredist_directory=config['vcredist_directory'],
         vox_dir=config['festival_vox_directory'],

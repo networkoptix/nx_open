@@ -76,12 +76,6 @@ void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
     m_discoveryManager->doResourceDiscoverIteration();
 }
 
-void QnResourceDiscoveryManagerTimeoutDelegate::onForceSearch()
-{
-    m_discoveryManager->doLocalSearch();
-}
-
-
 // ------------------------------------ QnResourceDiscoveryManager -----------------------------
 
 QnResourceDiscoveryManager::QnResourceDiscoveryManager(QObject* parent)
@@ -125,27 +119,27 @@ void QnResourceDiscoveryManager::start( Priority priority )
 
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
-    QnMutexLocker locker( &m_searchersListMutex );
+    QnMutexLocker lock( &m_searchersListMutex );
     m_searchersList.push_back(serv);
 }
 
 void QnResourceDiscoveryManager::addDTSServer(QnAbstractDTSSearcher* serv)
 {
-    QnMutexLocker locker( &m_searchersListMutex );
+    QnMutexLocker lock( &m_searchersListMutex );
     m_dstList.push_back(serv);
 }
 
 
 void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* processor)
 {
-    QnMutexLocker locker( &m_searchersListMutex );
+    QnMutexLocker lock( &m_searchersListMutex );
     m_resourceProcessor = processor;
 }
 
 QnAbstractResourceSearcher* QnResourceDiscoveryManager::searcherByManufacture(
     const QString& manufacture) const
 {
-    QnMutexLocker locker(&m_searchersListMutex);
+    QnMutexLocker lock(&m_searchersListMutex);
     for (const auto& searcher: m_searchersList)
     {
         if (searcher && searcher->manufacture() == manufacture)
@@ -173,7 +167,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
     {
         ResourceSearcherList searchersList;
         {
-            QnMutexLocker locker( &m_searchersListMutex );
+            QnMutexLocker lock( &m_searchersListMutex );
             searchersList = m_searchersList;
         }
 
@@ -192,7 +186,7 @@ void QnResourceDiscoveryManager::pleaseStop()
 {
     if (isRunning())
     {
-        QnMutexLocker locker( &m_searchersListMutex );
+        QnMutexLocker lock( &m_searchersListMutex );
         for (QnAbstractResourceSearcher *searcher: m_searchersList)
             searcher->pleaseStop();
     }
@@ -206,16 +200,13 @@ void QnResourceDiscoveryManager::run()
 {
     initSystemThreadId();
     m_runNumber = 0;
-    // dkargin: I really want to move m_timer inside QnResourceDiscoveryManagerTimeoutDelegate
+    // #dkargin: I really want to move m_timer inside QnResourceDiscoveryManagerTimeoutDelegate.
     m_timer.reset( new QTimer() );
     m_timer->setSingleShot( true );
 
     m_state = InitialSearch;
 
     QnResourceDiscoveryManagerTimeoutDelegate timoutDelegate( this );
-
-    connect(this, &QnResourceDiscoveryManager::forceLocalSearch,
-        &timoutDelegate, &QnResourceDiscoveryManagerTimeoutDelegate::onForceSearch, Qt::QueuedConnection);
 
     connect(m_timer, &QTimer::timeout,
         &timoutDelegate, &QnResourceDiscoveryManagerTimeoutDelegate::onTimeout);
@@ -227,23 +218,18 @@ void QnResourceDiscoveryManager::run()
     m_timer.reset();
 }
 
-void QnResourceDiscoveryManager::queryLocalDiscovery()
-{
-    emit forceLocalSearch();
-}
-
 static const int GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS = 1000;
 static const int MIN_DISCOVERY_SEARCH_MS = 1000 * 15;
 
-void QnResourceDiscoveryManager::doLocalSearch()
+void QnResourceDiscoveryManager::doInitialSearch()
 {
     ResourceSearcherList searchersList;
     {
-        QnMutexLocker locker(&m_searchersListMutex);
+        QnMutexLocker lock(&m_searchersListMutex);
         searchersList = m_searchersList;
     }
 
-    for (QnAbstractResourceSearcher *searcher : searchersList)
+    for (QnAbstractResourceSearcher* searcher: searchersList)
     {
         if ((searcher->discoveryMode() != DiscoveryMode::disabled) && searcher->isLocal())
         {
@@ -262,12 +248,11 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
     switch( m_state )
     {
         case InitialSearch:
-            this->doLocalSearch();
+            doInitialSearch();
             m_state = PeriodicSearch;
             break;
 
         case PeriodicSearch:
-        {
             if( !m_ready )
                 break;
 
@@ -282,7 +267,6 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 
             ++m_runNumber;
             break;
-        }
     }
 
     m_timer->start( qMax(GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS, int(MIN_DISCOVERY_SEARCH_MS - discoveryTime.elapsed()) ));
@@ -399,7 +383,7 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
 {
     decltype(m_manualCameraByUniqueId) manualCameraByUniqueId;
     {
-        QnMutexLocker locker(&m_searchersListMutex);
+        QnMutexLocker lock(&m_searchersListMutex);
         if (m_manualCameraByUniqueId.empty())
             return;
 
@@ -802,7 +786,7 @@ void QnResourceDiscoveryManager::updateSearchersUsage()
 {
     ResourceSearcherList searchers;
     {
-        QnMutexLocker locker( &m_searchersListMutex );
+        QnMutexLocker lock( &m_searchersListMutex );
         searchers = m_searchersList;
     }
 

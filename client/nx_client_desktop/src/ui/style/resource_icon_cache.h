@@ -35,6 +35,7 @@ public:
         LayoutTours,
 
         Camera,
+        WearableCamera,
         Cameras,
 
         Recorder,

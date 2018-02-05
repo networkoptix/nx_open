@@ -12,7 +12,7 @@
 
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
-#include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <nx/sdk/metadata/plugin.h>
 
 
 //!Loads custom application plugins and provides plugin management methods
@@ -43,7 +43,7 @@ public:
     PluginManager(
         QObject* parent,
         const QString& pluginDir = QString(),
-        nxpl::PluginInterface* const pluginContainer = nullptr);
+        nxpl::PluginInterface* pluginContainer = nullptr);
 
     virtual ~PluginManager();
 

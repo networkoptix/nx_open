@@ -5,6 +5,7 @@ INCLUDEPATH += ${root.dir}/common_libs/nx_email/src/
 INCLUDEPATH += ${root.dir}/common_libs/nx_network/src/
 INCLUDEPATH += ${root.dir}/common_libs/nx_speech_synthesizer/src/
 INCLUDEPATH += ${root.dir}/common_libs/nx_onvif/src/
+INCLUDEPATH += ${root.dir}/common_libs/nx_update/src
 
 SOURCES += ${project.build.directory}/mediaserver_core_app_info_impl.cpp
 

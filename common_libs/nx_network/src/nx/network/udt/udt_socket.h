@@ -138,7 +138,6 @@ public:
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
     // AbstractStreamSocket ------ interface
-    virtual bool reopen() override;
     virtual bool setNoDelay(bool value) override;
     virtual bool getNoDelay(bool* /*value*/) const override;
     virtual bool toggleStatisticsCollection(bool val) override;

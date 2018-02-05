@@ -34,6 +34,26 @@ struct ServerQueryProcessorAccess
     {
     }
 
+    void waitForAsyncTasks()
+    {
+        QnMutexLocker lock(&m_runnigAsyncOperationsMutex);
+        while (m_runnigAsyncOperationsCount > 0)
+            m_runnigAsyncOperationsCondition.wait(lock.mutex());
+    }
+
+    void incRunningAsyncOperationsCount()
+    {
+        QnMutexLocker lock(&m_runnigAsyncOperationsMutex);
+        ++m_runnigAsyncOperationsCount;
+    }
+
+    void decRunningAsyncOperationsCount()
+    {
+        QnMutexLocker lock(&m_runnigAsyncOperationsMutex);
+        --m_runnigAsyncOperationsCount;
+        m_runnigAsyncOperationsCondition.wakeOne();
+    }
+
     detail::ServerQueryProcessor getAccess(const Qn::UserAccessData userAccessData);
 
     detail::QnDbManager* getDb() const { return m_db; }
@@ -46,6 +66,9 @@ private:
     TransactionMessageBusAdapter* m_messageBus;
     PostProcessList m_postProcessList;
     QnMutex m_updateMutex;
+    QnMutex m_runnigAsyncOperationsMutex;
+    QnWaitCondition m_runnigAsyncOperationsCondition;
+    int m_runnigAsyncOperationsCount = 0;
 };
 
 namespace detail {
@@ -105,8 +128,7 @@ struct PostProcessTransactionFunction
 class ServerQueryProcessor
 {
 public:
-
-    virtual ~ServerQueryProcessor() {}
+     virtual ~ServerQueryProcessor() {}
 
     ServerQueryProcessor(
         ServerQueryProcessorAccess* owner,
@@ -135,6 +157,7 @@ public:
     void processUpdateAsync(
         QnTransaction<QueryDataType>& tran, HandlerType handler, void* /*dummy*/ = 0)
     {
+        m_owner->incRunningAsyncOperationsCount();
         nx::utils::concurrent::run(Ec2ThreadPool::instance(),
             [self = *this, tran = std::move(tran), handler = std::move(handler)]() mutable
             {
@@ -145,8 +168,10 @@ public:
                         QnTransaction<QueryDataType>& tran,
                         PostProcessList* const transactionsPostProcessList) mutable -> ErrorCode
                     {
-                        return self.processUpdateSync(tran, transactionsPostProcessList);
+                        auto errorCode = self.processUpdateSync(tran, transactionsPostProcessList);
+                        return errorCode;
                     });
+                self.m_owner->decRunningAsyncOperationsCount();
             });
     }
 
@@ -310,12 +335,14 @@ public:
         QN_UNUSED(cmdCode);
 
         QnDbManagerAccess accessDataCopy(m_db);
+        m_owner->incRunningAsyncOperationsCount();
         nx::utils::concurrent::run(Ec2ThreadPool::instance(),
-            [accessDataCopy, input, handler]() mutable
+            [self = *this, accessDataCopy, input, handler]() mutable
             {
                 OutputData output;
                 const ErrorCode errorCode = accessDataCopy.doQuery(input, output);
                 handler(errorCode, output);
+                self.m_owner->decRunningAsyncOperationsCount();
             });
     }
 
@@ -332,13 +359,15 @@ public:
         QN_UNUSED(cmdCode);
 
         QnDbManagerAccess accessDataCopy(m_db);
+        m_owner->incRunningAsyncOperationsCount();
         nx::utils::concurrent::run(Ec2ThreadPool::instance(),
-            [accessDataCopy, input1, input2, handler]()
+            [self = *this, accessDataCopy, input1, input2, handler]()
             {
                 OutputData output;
                 const ErrorCode errorCode = accessDataCopy.doQuery(
                     input1, input2, output);
                 handler(errorCode, output);
+                self.m_owner->decRunningAsyncOperationsCount();
             });
     }
 
@@ -796,6 +825,7 @@ public:
         HandlerType handler,
         ApiCommand::Value subCommand)
     {
+        m_owner->incRunningAsyncOperationsCount();
         nx::utils::concurrent::run(Ec2ThreadPool::instance(),
             [self = *this, multiTran = std::move(multiTran), handler = std::move(handler), subCommand]() mutable
             {
@@ -806,11 +836,13 @@ public:
                         QnTransaction<QueryDataType>& multiTran,
                         PostProcessList* const transactionsPostProcessList) mutable -> ErrorCode
                     {
-                        return self.processMultiUpdateSync(
+                        auto errorCode = self.processMultiUpdateSync(
                             subCommand, multiTran.transactionType, multiTran.params,
                             transactionsPostProcessList);
+                        return errorCode;
                     });
-        });
+                self.m_owner->decRunningAsyncOperationsCount();
+            });
     }
 
 

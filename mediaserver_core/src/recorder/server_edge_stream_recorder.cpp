@@ -19,6 +19,7 @@ QnServerEdgeStreamRecorder::QnServerEdgeStreamRecorder(
     QnServerStreamRecorder(dev, catalog, mediaProvider)
 {
     setPrebufferingUsec(duration_cast<microseconds>(kDefaultPrebuffering).count());
+    setCanDropPackets(false);
 }
 
 QnServerEdgeStreamRecorder::~QnServerEdgeStreamRecorder()
@@ -29,6 +30,11 @@ QnServerEdgeStreamRecorder::~QnServerEdgeStreamRecorder()
 void QnServerEdgeStreamRecorder::setOnFileWrittenHandler(FileWrittenHandler handler)
 {
     m_fileWrittenHandler = std::move(handler);
+}
+
+bool QnServerEdgeStreamRecorder::canAcceptData() const 
+{
+    return !isQueueFull();
 }
 
 void QnServerEdgeStreamRecorder::setSaveMotionHandler(MotionHandler handler)

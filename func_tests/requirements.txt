@@ -1,5 +1,5 @@
 urllib3>=1.22
-pytest
+pytest==3.0.7
 pytest-timeout
 pytest-cpp
 pytz
@@ -14,3 +14,4 @@ hachoir-parser
 hachoir-metadata
 pytest-instafail
 pyyaml
+pathlib2

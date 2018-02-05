@@ -22,6 +22,7 @@
     <modules>
         <module>cloud_connectivity_ut</module>
         <module>nx_network_ut</module>
+        <module>nx_update_ut</module>
         <module>utils_ut</module>
         <module>appserver2_ut</module>
         <module>common_ut</module>

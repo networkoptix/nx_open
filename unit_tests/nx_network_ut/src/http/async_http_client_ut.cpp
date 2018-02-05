@@ -161,6 +161,43 @@ protected:
         promise.get_future().wait();
     }
 
+    static std::vector<QByteArray> partitionDataRandomly(const QByteArray& testData)
+    {
+        const int minChunkSize = testData.size() / 10;
+
+        // Randomly partioning test data.
+        std::vector<QByteArray> partitionedData;
+        int bytesLeft = testData.size();
+        int testDataPos = 0;
+        while (bytesLeft > 0)
+        {
+            const int chunkSize = bytesLeft <= minChunkSize
+                ? bytesLeft
+                : nx::utils::random::number<int>(minChunkSize, bytesLeft);
+            partitionedData.push_back(testData.mid(testDataPos, chunkSize));
+            testDataPos += chunkSize;
+            bytesLeft -= chunkSize;
+        }
+
+        return partitionedData;
+    }
+
+    static std::vector<QByteArray> partitionDataToPredefinedChunks(
+        const QByteArray& testData,
+        const std::vector<int>& chunkSizes)
+    {
+        NX_ASSERT(std::accumulate(chunkSizes.begin(), chunkSizes.end(), 0) == testData.size());
+
+        std::vector<QByteArray> partitionedData;
+        int currentPos = 0;
+        for (const auto chunkSize : chunkSizes)
+        {
+            partitionedData.push_back(testData.mid(currentPos, chunkSize));
+            currentPos += chunkSize;
+        }
+        return partitionedData;
+    }
+
 private:
     nx::utils::SyncQueue<nx::network::http::Request> m_receivedRequests;
 
@@ -1133,8 +1170,7 @@ public:
     TestTcpServer(std::vector<QByteArray> dataToSend):
         m_delayAfterSend(200),
         m_dataToSend(std::move(dataToSend)),
-        m_serverSocket(SocketFactory::tcpClientIpVersion()),
-        m_terminated(false)
+        m_serverSocket(SocketFactory::tcpClientIpVersion())
     {
     }
 
@@ -1162,24 +1198,24 @@ public:
 protected:
     virtual void run() override
     {
-        constexpr const std::chrono::milliseconds recvTimeout =
-            std::chrono::milliseconds(500);
+        constexpr const std::chrono::milliseconds acceptTimeout =
+            std::chrono::milliseconds(1);
 
-        m_serverSocket.setRecvTimeout(recvTimeout.count());
+        m_serverSocket.setRecvTimeout(acceptTimeout.count());
         while (!m_terminated)
         {
             std::unique_ptr<AbstractStreamSocket> connection(m_serverSocket.accept());
             if (!connection)
-            {
-                std::this_thread::sleep_for(recvTimeout);
                 continue;
 
-            }
             for (const auto& buf: m_dataToSend)
             {
-                ASSERT_EQ(buf.size(), connection->send(buf));
-                std::this_thread::sleep_for(m_delayAfterSend);
+                if (connection->send(buf) != buf.size())
+                    break; //< Client could close connection.
             }
+
+            if (m_keepConnection)
+                m_connections.push_back(std::move(connection));
         }
     }
 
@@ -1187,15 +1223,14 @@ private:
     const std::chrono::milliseconds m_delayAfterSend;
     std::vector<QByteArray> m_dataToSend;
     nx::network::TCPServerSocket m_serverSocket;
-    bool m_terminated;
+    bool m_terminated = false;
+    const bool m_keepConnection = true;
+    std::vector<std::unique_ptr<AbstractStreamSocket>> m_connections;
 };
 
 TEST_F(AsyncHttpClient, PartionedIncomingData)
 {
-    std::vector<QByteArray> dataToSend;
-
-    dataToSend.push_back(
-    R"http(
+    const QByteArray testData(R"http(
 HTTP/1.1 401 Unauthorized
 Date: Wed, 19 Oct 2016 13:24:10 +0000
 Server: Nx Witness/3.0.0.13295 (Network Optix) Apache/2.4.16 (Unix)
@@ -1204,10 +1239,6 @@ Content-Length: 103
 WWW-Authenticate: Digest algorithm="MD5", nonce="15185146660140348415", realm="VMS"
 X-Nx-Result-Code: notAuthorized
 
-)http");
-
-    dataToSend.push_back(
-    R"http(
 {"errorClass":"unauthorized","errorDetail":100,"errorText":"unauthorized","resultCode":"notAuthorized"}HTTP/1.1 200 OK
 Date: Wed, 19 Oct 2016 13:24:10 +0000
 Server: Nx Witness/3.0.0.13295 (Network Optix) Apache/2.4.16 (Unix)
@@ -1215,14 +1246,12 @@ Content-Type: application/json
 Content-Length: 103
 X-Nx-Result-Code: ok
 
+{"errorClass":"unauthorized","errorDetail":100,"errorText":"unauthorized","resultCode":"notAuthorized"}
 )http");
 
-    dataToSend.push_back(
-    R"http(
-{"errorClass":"unauthorized","errorDetail":100,"errorText":"unauthorized","resultCode":"notAuthorized"}
-    )http");
+    auto dataToSend = partitionDataRandomly(testData);
 
-    TestTcpServer testTcpServer(std::move(dataToSend));
+    TestTcpServer testTcpServer(dataToSend);
     ASSERT_TRUE(testTcpServer.bindAndListen())
         << SystemError::getLastOSErrorText().toStdString();
     testTcpServer.start();
@@ -1231,6 +1260,7 @@ X-Nx-Result-Code: ok
     url.setUserName("don't tell");
     url.setPassword("anyone");
     nx::network::http::HttpClient httpClient;
+    httpClient.setResponseReadTimeoutMs(nx::network::kNoTimeout.count());
     ASSERT_TRUE(httpClient.doGet(url));
     ASSERT_NE(nullptr, httpClient.response());
     ASSERT_EQ(nx::network::http::StatusCode::ok, httpClient.response()->statusLine.statusCode);

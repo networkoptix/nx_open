@@ -75,6 +75,9 @@ struct Filter
      */
     int maxObjectsToSelect = 0;
     int maxTrackSize = 1;
+    /**
+     * Found objects are sorted by minimal track time using this order.
+     */
     Qt::SortOrder sortOrder = Qt::SortOrder::DescendingOrder;
 
     bool operator==(const Filter& right) const;

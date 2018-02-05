@@ -9,7 +9,7 @@
     "emailSubject": "Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı"
   },
   "system_shared": {
-    "emailSubject": "Video sistemi {{message.system_name}} sizinle paylaşıldı"
+    "emailSubject": "Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı"
   },
   "review_version": {
     "emailSubject": "Sürüm {{message.id}} incelenmeye hazır"

@@ -20,6 +20,7 @@ public:
         QRectF rectangle;
         QColor color;
         QString text;
+        QString hoverText;
     };
 
     AreaHighlightOverlayWidget(QGraphicsWidget* parent);

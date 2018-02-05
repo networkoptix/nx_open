@@ -56,6 +56,11 @@ TEST(ini_config_c_ut)
     ASSERT_EQ(defaultInt, ini.testInt);
     ASSERT_STREQ(defaultString, ini.testString);
 
+    // Create directory for ini files. Works for Windows as well.
+    char mkdirCommand[1000] = "mkdir ";
+    strncat(mkdirCommand, nx_ini_iniFileDir(), sizeof(mkdirCommand) - 1);
+    system(mkdirCommand); //< Ignore possible errors.
+
     createFile(nx_ini_iniFilePath(),
         "testFlag=" STR(NEW_FLAG) "\n"
         "testInt=" STR(NEW_INT) "\n"

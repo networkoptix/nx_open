@@ -113,6 +113,7 @@ private:
             std::move(translatedRequest),
             this,
             std::move(tcpSocket));
+        m_requestProxyWorker->start();
     }
 
     void startReadingMessageBody()

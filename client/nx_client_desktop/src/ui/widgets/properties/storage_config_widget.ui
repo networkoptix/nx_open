@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>812</width>
-    <height>391</height>
+    <height>493</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0">
@@ -75,7 +75,7 @@
       <item>
        <widget class="QLabel" name="storagesWarningLabel">
         <property name="text">
-         <string>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</string>
+         <string/>
         </property>
        </widget>
       </item>

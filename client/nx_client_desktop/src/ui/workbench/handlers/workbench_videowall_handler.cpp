@@ -1867,7 +1867,6 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
         {
             saveVideowallAndReviewLayout(videoWall, layout);
         },
-        kDefaultDelay,
         this);
 }
 

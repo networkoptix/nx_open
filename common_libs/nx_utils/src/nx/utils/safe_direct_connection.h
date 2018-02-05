@@ -101,7 +101,7 @@ public:
 
     /**
      * NOTE: By using std::shared_ptr we ensure that SafeDirectConnectionGlobalHelper instance
-     *   is destroyed not earlier then last EnableSafeDirectConnection instance.
+     *     is destroyed not earlier then last EnableSafeDirectConnection instance.
      */
     static std::shared_ptr<SafeDirectConnectionGlobalHelper> instance();
 

@@ -1,19 +1,15 @@
-/**********************************************************
-* 6 may 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_ATTR_NS_H
-#define NX_CDB_ATTR_NS_H
+#pragma once
 
 #include <nx/utils/stree/resourcenameset.h>
-
 
 namespace nx {
 namespace cdb {
 
-//!Attributes to be used with stree
+/**
+ * Attributes to be used with stree.
+ */
 namespace attr {
+
 enum Value
 {
     operation = 1,
@@ -60,18 +56,18 @@ enum Value
     credentialsExpirationPeriod,
     credentialsProlongationPeriod
 };
-}   //namespace attr
 
-//!Contains description of stree attributes used by cloud_db
-class CdbAttrNameSet
-:
+} // namespace attr
+
+/**
+ * Contains description of stree attributes used by cloud_db.
+ */
+class CdbAttrNameSet:
     public nx::utils::stree::ResourceNameSet
 {
 public:
     CdbAttrNameSet();
 };
 
-}   //namespace cdb
-}   //namespace nx
-
-#endif  //NX_CDB_ATTR_NS_H
+} // namespace cdb
+} // namespace nx

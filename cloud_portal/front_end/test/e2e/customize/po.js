@@ -12,7 +12,7 @@ var Customization = function () {
     var AlertSuite = require('../alerts_check.js');
     this.alert = new AlertSuite();
 
-    var brandObj = require('../../../test-customization.json');
+    var brandObj = require('../../../test-customizations.json');
     this.brandText = brandObj.text;
 
     this.languageDropdown = element(by.id('language-dropdown'));

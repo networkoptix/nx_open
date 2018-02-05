@@ -29,8 +29,12 @@ public:
     static QnLayoutResourcePtr layoutFromFile(const QString& filename, QnResourcePool* resourcePool);
     static QnResourcePtr resourceFromFile(const QString& filename, QnResourcePool* resourcePool);
 
+signals:
+    void startLocalDiscovery();
+    void trackResources(const QnResourceList& resources, const QStringList& paths);
+
 protected:
-    typedef QMap<QString, QnResourcePtr> ResourceCache;
+    using ResourceCache = QMap<QString, QnResourcePtr>;
     bool m_resourceReady{false};
 
     static QnResourcePtr createArchiveResource(const QString& filename, QnResourcePool* resourcePool);
@@ -46,16 +50,22 @@ protected:
     /**
      * Recursive search for resources
      * @param directory - directory for the search
-     * @param cache - current resource cache. Files, that are already in the cache are ignored
-     * @param hadler - handler to be called for each discovered directort and file
+     * @param cache - current resource cache. Files, that are already in the cache are ignored.
+     * @param handler - handler to be called for each discovered directory and file
      * @param maxResources - limit to number of resources to discover. Set to -1 to get all the resources
      * @return number of resources discovered
      */
-    int findResources(const QString& directory, const ResourceCache& cache, BrowseHandler& handler, int maxResources);
-protected slots:
+    int findResources(const QString& directory, const ResourceCache& cache, BrowseHandler handler, int maxResources);
+
+protected:
     void at_filesystemDirectoryChanged(const QString& path);
     void at_filesystemFileChanged(const QString& path);
-    void trackResources(const QnResourceList& resources, const QStringList& paths);
+    void at_trackResources(const QnResourceList& resources, const QStringList& paths);
+    void at_startLocalDiscovery();
+
+private:
+    BrowseHandler makeDiscoveryHandler(QnResourceList& output, QStringList& paths);
+
 private:
     QFileSystemWatcher m_fsWatcher;
 

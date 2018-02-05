@@ -6,6 +6,7 @@
 #include <cstdarg>
 #include <vector>
 #include <cstring>
+#include <cstdlib>
 
 namespace nx {
 namespace kit {

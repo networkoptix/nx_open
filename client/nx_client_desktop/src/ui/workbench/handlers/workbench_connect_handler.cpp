@@ -678,7 +678,7 @@ void QnWorkbenchConnectHandler::showWarnMessagesOnce()
 
     auto watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
     if (watcher->hasMismatches())
-        menu()->trigger(action::VersionMismatchMessageAction);       
+        menu()->trigger(action::VersionMismatchMessageAction);
 
     context()->instance<QnWorkbenchLicenseNotifier>()->checkLicenses();
 }
@@ -1220,13 +1220,13 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection()
     }
 
     m_reconnectDialog = new QnReconnectInfoDialog(mainWindowWidget());
+    m_reconnectDialog->setCurrentServer(m_reconnectHelper->currentServer());
     connect(m_reconnectDialog, &QDialog::rejected, this,
         [this]
         {
             stopReconnecting();
             disconnectFromServer(DisconnectFlag::Force);
         });
-    m_reconnectDialog->setServers(m_reconnectHelper->servers());
     QnDialog::show(m_reconnectDialog);
 
     reconnectStep();

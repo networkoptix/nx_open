@@ -87,6 +87,7 @@
         "maxRecordQueueSizeBytes": "최대 기록 용량 (byte)",
         "maxRecordQueueSizeElements": "최대 기록 용량 (elements)",
         "maxRemoteArchiveSynchronizationThreads": "최대 원격 보관 동기화 스레드",
+        "maxRtspConnectDurationSeconds": "Max Rtsp connect duration seconds",
         "maxSceneItems": "최대 장면수(기본값 0)",
         "proxyConnectTimeoutSec": "프록시 연결 시간 초과 (초)",
         "rtpTimeoutMs": "RTP 휴식시간 (1/1000초)",

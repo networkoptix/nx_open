@@ -1,0 +1,32 @@
+<h1>
+    <b>{{release.version}}</b> <small>{{release.productDescription}}</small><br>
+    <small>PUBLISHED {{release.date}}</small>
+</h1>
+<div ng-if="release.releaseNotes">
+    <h4>
+        Release Notes
+    </h4>
+    <div ng-bind-html="release.releaseNotes"></div>
+</div>
+
+<h4>In-Client Upgrade:</h4>
+<table>
+    <tr><td>빌드 번호:</td><td>&nbsp;</td><td><b>{{release.buildNumber}}</b></td></tr>
+    <tr><td>비밀번호:</td><td>&nbsp;</td><td><b>{{release.password}}</b></td></tr>
+</table>
+
+<h4>Download Links:</h4>
+<div ng-repeat="platform in release.platforms">
+    <h5>
+        <a href =1 ng-click="expand[platform.name] = !expand[platform.name]">
+            {{$root.L.downloads.groups[platform.name].label || platform.name}}
+        </a>
+    </h5>
+
+    <ul uib-collapse="!expand[platform.name]">
+        <li ng-repeat="file in platform.files">
+            {{file.niceName}}
+            <a ng-href="{{linkbase}}/{{release.buildNumber}}/{{file.path}}">{{file.fileName}}</a>
+        </li>
+    </ul>
+</div>

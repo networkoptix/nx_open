@@ -1,4 +1,4 @@
-set(depends mediaserver)
+set(depends mediaserver server_plugins)
 
 # Variables used by build-dist.sh.
 set(common_depends

@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <map>
 
 #include <boost/optional/optional.hpp>
@@ -53,7 +51,7 @@ public:
     std::map<QString, QString> response() const;
     nx::network::http::StatusCode::Value statusCode() const;
     QString requestUrl() const;
-    
+
     template<typename T>
     boost::optional<T> parameter(const QString& parameterName, int channel = kNoChannel) const
     {
@@ -72,14 +70,14 @@ public:
         if (auto value = parameter<T>(name))
             return *value;
 
-        static const auto errorMessage = QStringLiteral("Paramiter %1 is not found in response");
+        static const auto errorMessage = QStringLiteral("Parameter %1 is not found in response");
         throw std::runtime_error(errorMessage.arg(name).toStdString()) ;
     }
 
 private:
     void parseBuffer(const nx::Buffer& rawBuffer, bool isListMode = false);
     boost::optional<QString> findParameter(const QString& parameterName, int channel) const;
-    
+
 private:
     int m_errorCode = HanwhaError::kNoError;
     QString m_errorString;
@@ -110,5 +108,3 @@ boost::optional<QString> HanwhaResponse::parameter<QString>(const QString& param
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

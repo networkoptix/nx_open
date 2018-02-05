@@ -81,7 +81,10 @@ angular.module('webadminApp')
         $scope.reduceArchiveWarning = false;
 
         mediaserver.getStorages().then(function (r) {
-            $scope.storages = _.sortBy(r.data.reply.storages,function(storage){
+            $scope.storages = _.filter(r.data.reply.storages, function(storage){
+                return storage.storageId != '{00000000-0000-0000-0000-000000000000}';
+            });
+            $scope.storages = _.sortBy($scope.storages, function(storage){
                 return formatUrl(storage.url);
             });
             for(var i = 0; i<$scope.storages.length;i++){

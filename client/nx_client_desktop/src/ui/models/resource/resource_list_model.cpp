@@ -53,6 +53,19 @@ void QnResourceListModel::setUserCheckable(bool value)
     m_userCheckable = value;
 }
 
+bool QnResourceListModel::hasStatus() const
+{
+    return m_hasStatus;
+}
+
+void QnResourceListModel::setHasStatus(bool value)
+{
+    if (m_hasStatus == value)
+        return;
+    ScopedReset resetModel(this);
+    m_hasStatus = value;
+}
+
 QnResourceListModel::Options QnResourceListModel::options() const
 {
     return m_options;
@@ -134,10 +147,15 @@ void QnResourceListModel::setCheckedResources(const QSet<QnUuid>& ids)
 int QnResourceListModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
+    // Added name column by default
+    int result = 1;
     if (m_hasCheckboxes)
-        return ColumnCount;
-    return ColumnCount - 1; //CheckColumn is the last
+        result++;
+    if (m_hasStatus)
+        result++;
+    return result;
 }
+
 
 int QnResourceListModel::rowCount(const QModelIndex &parent) const
 {
@@ -179,6 +197,9 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
     const QnResourcePtr &resource = m_resources[index.row()];
     if(!resource)
         return QVariant();
+
+    if (m_customAccessors.contains(column))
+        return m_customAccessors[column](resource, role);
 
     switch(role)
     {
@@ -227,6 +248,11 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
     }
 
     return QVariant();
+}
+
+void QnResourceListModel::setCustomColumnAccessor(int column, ColumnDataAccessor dataAccessor)
+{
+    m_customAccessors[column] = dataAccessor;
 }
 
 bool QnResourceListModel::setData(const QModelIndex &index, const QVariant &value, int role)

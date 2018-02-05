@@ -56,7 +56,6 @@ set(installer.language "zh_TW")
 set(installer.cultures "zh-tw")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-set(sign.intermediate.cer "")
 
 # Localization
 set(help.language "chinese")
@@ -64,4 +63,4 @@ set(defaultTranslation zh_TW)
 set(additionalTranslations zh_CN)
 
 # this is required because of strange maven replacement (_ > -)
-set(customization "vmsdemoblue_cn")
+set(customization "default_cn")

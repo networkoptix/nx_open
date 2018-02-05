@@ -88,7 +88,7 @@ class AnyAccessibleAddressConnector:
 public:
     AnyAccessibleAddressConnector()
     {
-        m_socketAttributes.recvTimeout = 
+        m_socketAttributes.recvTimeout =
             nx::utils::random::number<unsigned int>(1, 100000);
         m_socketAttributes.sendTimeout =
             nx::utils::random::number<unsigned int>(1, 100000);

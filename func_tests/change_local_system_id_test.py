@@ -1,7 +1,4 @@
-'''Change local system id
-
-   It tests servers disconnection if one of them change local system id
-'''
+"""Change local system id. Test servers disconnection if one of them change local system id."""
 
 import logging
 

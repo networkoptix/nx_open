@@ -2,6 +2,7 @@
 
 #include <core/ptz/ptz_preset.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace mediaserver {

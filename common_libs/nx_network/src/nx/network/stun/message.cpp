@@ -90,7 +90,7 @@ static Buffer hmacSha1( const String& key, const String& baseString )
     HMAC_CTX_cleanup( &ctx );
 
     result.resize( len );
-    return std::move( result );
+    return result;
 }
 
 static Buffer hmacSha1( const String& key, const Message* message )

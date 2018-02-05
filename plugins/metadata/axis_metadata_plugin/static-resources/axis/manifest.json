@@ -1,0 +1,46 @@
+{
+    "driverId": "{190ed57a-b435-a80b-1f7b-9f31c52ad63e}",
+    "driverName": {
+        "value": "Axis driver",
+        "localization": {
+        }
+    },
+    "outputEventTypes": 
+    [
+        {
+            "eventTypeId": "f83daede-7fae-6a51-2e90-69017dadfd62",
+            "eventName": { "value": "Camera tampering", "localization": { } },
+            "internalName": "tns1:VideoSource/tnsaxis:Tampering",
+            "stateMode": "stateless",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "b37730fe-3e2d-9eb7-bee0-7732877ec61f",
+            "eventName": { "value": "ImagingService", "localization": { } },
+            "internalName": "tns1:VideoSource/GlobalSceneChange/ImagingService",
+            "stateMode": "stateful",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "7ef7f596-3831-201a-6093-da4ae8f70e08",
+            "eventName": { "value": "Day night vision", "localization": { } },
+            "internalName": "tns1:VideoSource/tnsaxis:DayNightVision",
+            "stateMode": "stateful",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "0d50994b-0126-a437-3b7f-5bff70d14424",
+            "eventName": { "value": "timer", "localization": { } },
+            "internalName": "tns1:RuleEngine/tnsaxis:CrossLineDetection/timer",
+            "stateMode": "stateless",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "ed203a0c-2eae-9ce5-1022-87e993224816",
+            "eventName": { "value": "linetouched", "localization": { } },
+            "internalName": "tns1:RuleEngine/tnsaxis:CrossLineDetection/linetouched",
+            "stateMode": "stateless",
+            "source": "Axis P1405-E"
+        }
+    ]
+}

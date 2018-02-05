@@ -1,5 +1,6 @@
 #include "plugin_internal_tools.h"
 #include <nx/utils/log/log.h>
+#include <plugins/plugin_tools.h>
 
 #ifdef Q_OS_WIN
 #include <WinSock2.h>
@@ -29,14 +30,7 @@ QnUuid fromPluginGuidToQnUuid(const nxpl::NX_GUID& guid)
 
 nxpl::NX_GUID fromQnUuidToPluginGuid(const QnUuid& uuid)
 {
-    nxpl::NX_GUID result;
-    const auto binary = uuid.toRfc4122();
-
-    NX_ASSERT(sizeof(result.bytes) == binary.size());
-    for (auto i = 0; i < binary.size(); ++i)
-        result.bytes[i] = binary.at(i);
-
-    return result;
+    return nxpt::NxGuidHelper::fromRawData(uuid.toRfc4122());
 }
 
 } // namespace nxpt
@@ -44,18 +38,18 @@ nxpl::NX_GUID fromQnUuidToPluginGuid(const QnUuid& uuid)
 namespace nx {
 namespace sdk {
 
-QString toString(const nx::sdk::ResourceInfo& resourceInfo)
+QString toString(const nx::sdk::CameraInfo& cameraInfo)
 {
     return lm(
         "Vendor: %1, Model: %2, Firmware: %3, UID: %4, Shared ID: %5, URL: %6, Channel: %7")
         .args(
-            resourceInfo.vendor,
-            resourceInfo.model,
-            resourceInfo.firmware,
-            resourceInfo.uid,
-            resourceInfo.sharedId,
-            resourceInfo.url,
-            resourceInfo.channel).toQString();
+            cameraInfo.vendor,
+            cameraInfo.model,
+            cameraInfo.firmware,
+            cameraInfo.uid,
+            cameraInfo.sharedId,
+            cameraInfo.url,
+            cameraInfo.channel).toQString();
 }
 
 } // namespace sdk

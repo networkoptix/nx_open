@@ -61,7 +61,7 @@ std::unique_ptr<AbstractStreamSocket> IncomingTunnelPool::getNextSocketIfAny()
 
     auto socket = std::move(m_acceptedSockets.front());
     m_acceptedSockets.pop_front();
-    return std::move(socket);
+    return socket;
 }
 
 void IncomingTunnelPool::setAcceptTimeout(

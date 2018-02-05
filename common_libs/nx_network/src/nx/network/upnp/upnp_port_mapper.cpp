@@ -8,7 +8,6 @@
 
 static const size_t BREAK_FAULTS_COUNT = 5; // faults in a row
 static const size_t BREAK_TIME_PER_FAULT = 1 * 60; // wait 1 minute per fault in a row
-static const size_t BREAK_TIME_MAX = 2 * 60 * 60; // dont wait more than 2 hours
 
 static const quint16 PORT_SAFE_RANGE_BEGIN = 4096; // begining of range to peak rnd port
 static const quint16 PORT_SAFE_RANGE_END = 49151;

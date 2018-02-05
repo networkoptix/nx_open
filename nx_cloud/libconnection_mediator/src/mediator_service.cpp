@@ -63,16 +63,30 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     nx::utils::TimerManager timerManager;
 
+    NX_INFO(this, lm("Initializating controller"));
+
     Controller controller(settings);
     m_controller = &controller;
+
+    NX_INFO(this, lm("Initializating view"));
 
     View view(settings, &controller);
     m_view = &view;
 
+    NX_INFO(this, lm("Initializating view"));
+
     // Process privilege reduction.
-    nx::utils::CurrentProcess::changeUser(settings.general().systemUserToRunUnder);
+    if (!settings.general().systemUserToRunUnder.isEmpty())
+    {
+        NX_INFO(this, lm("Changing active user"));
+        nx::utils::CurrentProcess::changeUser(settings.general().systemUserToRunUnder);
+    }
+
+    NX_INFO(this, lm("Starting view"));
 
     view.start();
+
+    NX_INFO(this, lm("Initialization completed. Running..."));
 
     const int result = runMainLoop();
 

@@ -40,7 +40,7 @@
                             Le serveur sera détaché du système actuel. Les archives vidéo resteront intactes.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restaurer les paramètres par défaut</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>Détacher le serveur du système</h3>
                         <p>Cette action détachera le serveur de la base de données système, des utilisateurs locaux et de la configuration. Les archives vidéo resteront intactes. <b>Les utilisateurs Cloud seront supprimés.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Détacher du système</button></p>

@@ -21,28 +21,28 @@ Vagrant.configure("2") do |config|
   end
 
 
-  {% for box in boxes -%}
+  {% for vm in vms -%}
 
-  config.vm.define "{{ box.box_name }}" do |box|
+  config.vm.define "{{ vm.vagrant_name }}" do |node|
 
-    box.vm.provider :virtualbox do |vb|
-      vb.name = "{{ box.vm_box_name }}"
+    node.vm.provider :virtualbox do |vb|
+      vb.name = "{{ vm.virtualbox_name }}"
 
-      {%- for command in box.vbox_commands %}
+      {%- for command in vm.virtualbox_conf %}
 
       vb.{{ command }}
 
       {%- endfor %}
     end
 
-    box.vm.hostname = "{{ box.box_name }}"
-    # Uncomment it to provide access to a box by forwarding ssh port
-    # box.vm.network :forwarded_port, guest: 22, host: {{ box.ssh_forwarded_port }},  host_ip: "0.0.0.0", id: "ssh", auto_correct: true
-    box.vm.network :forwarded_port, guest: {{ box.rest_api_internal_port }}, host: {{ box.rest_api_forwarded_port }}
+    node.vm.hostname = "{{ vm.vagrant_name }}"
+    # Uncomment it to provide access to a node by forwarding ssh port
+    # node.vm.network :forwarded_port, guest: 22, host: {{ vm.ssh_forwarded_port }},  host_ip: "0.0.0.0", id: "ssh", auto_correct: true
+    node.vm.network :forwarded_port, guest: {{ vm.rest_api_internal_port }}, host: {{ vm.rest_api_forwarded_port }}
 
-    {% for command in box.vm_commands -%}
+    {% for command in vm.vagrant_conf -%}
 
-    box.{{ command }}
+    node.{{ command }}
 
     {% endfor %}
   

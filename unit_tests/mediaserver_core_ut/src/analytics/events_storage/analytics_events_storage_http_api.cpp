@@ -90,7 +90,7 @@ public:
 
     virtual void markDataAsDeprecated(
         QnUuid /*deviceId*/,
-        qint64 /*oldestNeededDataTimestamp*/) override
+        std::chrono::milliseconds /*oldestNeededDataTimestamp*/) override
     {
     }
 

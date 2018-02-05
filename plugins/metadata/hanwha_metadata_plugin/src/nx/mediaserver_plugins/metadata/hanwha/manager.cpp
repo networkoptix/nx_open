@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "manager.h"
 
 #include <chrono>
@@ -9,7 +7,7 @@
 #define NX_PRINT_PREFIX "[metadata::hanwha::Manager] "
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/metadata/common_detected_event.h>
+#include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 
 #include "common.h"
@@ -35,10 +33,10 @@ Manager::~Manager()
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataManager)
+    if (interfaceId == IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractMetadataManager*>(this);
+        return static_cast<CameraManager*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)
@@ -49,15 +47,15 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nx::sdk::Error Manager::setHandler(AbstractMetadataHandler* handler)
+nx::sdk::Error Manager::setHandler(MetadataHandler* handler)
 {
     m_handler = handler;
     return Error::noError;
 }
 
 Error Manager::startFetchingMetadata(
-    nxpl::NX_GUID* /*eventTypeList*/,
-    int /*eventTypeListSize*/)
+    nxpl::NX_GUID* /*typeList*/,
+    int /*typeListSize*/)
 {
     const auto monitorHandler =
         [this](const EventList& events)
@@ -70,7 +68,7 @@ Error Manager::startFetchingMetadata(
                 if (hanwhaEvent.channel.is_initialized() && hanwhaEvent.channel != m_channel)
                     return;
 
-                auto event = new CommonDetectedEvent();
+                auto event = new CommonEvent();
                 NX_PRINT
                     << "Got event: caption ["
                     << hanwhaEvent.caption.toStdString() << "], description ["
@@ -122,7 +120,7 @@ Error Manager::stopFetchingMetadata()
     return Error::noError;
 }
 
-const char* Manager::capabilitiesManifest(Error* error) const
+const char* Manager::capabilitiesManifest(Error* error)
 {
     if (m_deviceManifest.isEmpty())
     {
@@ -134,16 +132,20 @@ const char* Manager::capabilitiesManifest(Error* error) const
     return m_deviceManifest.constData();
 }
 
-void Manager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
+void Manager::freeManifest(const char* data)
 {
-    m_url = resourceInfo.url;
-    m_model = resourceInfo.model;
-    m_firmware = resourceInfo.firmware;
-    m_auth.setUser(resourceInfo.login);
-    m_auth.setPassword(resourceInfo.password);
-    m_uniqueId = resourceInfo.uid;
-    m_sharedId = resourceInfo.sharedId;
-    m_channel = resourceInfo.channel;
+}
+
+void Manager::setCameraInfo(const nx::sdk::CameraInfo& cameraInfo)
+{
+    m_url = cameraInfo.url;
+    m_model = cameraInfo.model;
+    m_firmware = cameraInfo.firmware;
+    m_auth.setUser(cameraInfo.login);
+    m_auth.setPassword(cameraInfo.password);
+    m_uniqueId = cameraInfo.uid;
+    m_sharedId = cameraInfo.sharedId;
+    m_channel = cameraInfo.channel;
 }
 
 void Manager::setDeviceManifest(const QByteArray& manifest)
@@ -165,5 +167,3 @@ void Manager::setMonitor(MetadataMonitor* monitor)
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

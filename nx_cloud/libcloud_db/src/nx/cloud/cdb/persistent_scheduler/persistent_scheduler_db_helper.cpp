@@ -1,6 +1,9 @@
 #include <string>
+
 #include <QtSql>
+
 #include <nx/utils/log/log.h>
+
 #include "persistent_scheduler_db_helper.h"
 
 namespace nx {

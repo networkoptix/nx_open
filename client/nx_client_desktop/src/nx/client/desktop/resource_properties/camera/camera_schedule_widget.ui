@@ -697,7 +697,7 @@
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="bottomParametersLayout" stretch="1,1,1">
+        <layout class="QHBoxLayout" name="bottomParametersLayout" stretch="0,1,1">
          <property name="spacing">
           <number>24</number>
          </property>
@@ -708,118 +708,13 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QGroupBox" name="archiveGroupBox">
-           <property name="title">
-            <string>Fixed Archive Length</string>
+          <widget class="QnArchiveLengthWidget" name="archiveLengthWidget" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>50</width>
+             <height>0</height>
+            </size>
            </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
-            <property name="spacing">
-             <number>16</number>
-            </property>
-            <item>
-             <widget class="QWidget" name="widget_2" native="true">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_3">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_7">
-                 <property name="text">
-                  <string>Min. Days</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                 <property name="buddy">
-                  <cstring>spinBoxMinDays</cstring>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QSpinBox" name="spinBoxMinDays">
-                 <property name="minimum">
-                  <number>1</number>
-                 </property>
-                 <property name="maximum">
-                  <number>1000</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <widget class="QCheckBox" name="checkBoxMinArchive">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="text">
-                  <string>Auto</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_6">
-                 <property name="text">
-                  <string>Max. Days</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                 <property name="buddy">
-                  <cstring>spinBoxMaxDays</cstring>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QSpinBox" name="spinBoxMaxDays">
-                 <property name="minimum">
-                  <number>1</number>
-                 </property>
-                 <property name="maximum">
-                  <number>9999</number>
-                 </property>
-                 <property name="value">
-                  <number>30</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="2">
-                <widget class="QCheckBox" name="checkBoxMaxArchive">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="text">
-                  <string>Auto</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_6">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>0</width>
-                <height>0</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
           </widget>
          </item>
          <item>
@@ -1016,6 +911,12 @@
    <header location="global">ui/widgets/licensing/licenses_usage_widget.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QnArchiveLengthWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/properties/archive_length_widget.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>enableRecordingCheckBox</tabstop>
@@ -1028,10 +929,6 @@
   <tabstop>noRecordButton</tabstop>
   <tabstop>displayQualityCheckBox</tabstop>
   <tabstop>displayFpsCheckBox</tabstop>
-  <tabstop>spinBoxMinDays</tabstop>
-  <tabstop>checkBoxMinArchive</tabstop>
-  <tabstop>spinBoxMaxDays</tabstop>
-  <tabstop>checkBoxMaxArchive</tabstop>
   <tabstop>recordBeforeSpinBox</tabstop>
   <tabstop>recordAfterSpinBox</tabstop>
  </tabstops>

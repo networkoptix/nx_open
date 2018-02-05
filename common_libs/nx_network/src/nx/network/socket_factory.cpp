@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/network/system_socket.h>
@@ -49,7 +50,7 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
         result.reset(new deprecated::SslSocket(std::move(result), false));
 #endif // ENABLE_SSL
 
-    return std::move(result);
+    return result;
 }
 
 std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerSocket(
@@ -76,7 +77,7 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
             result.reset(new deprecated::SslServerSocket(std::move(result), true));
 #endif // ENABLE_SSL
 
-    return std::move(result);
+    return result;
 }
 
 QString SocketFactory::toString(SocketType type)
@@ -247,7 +248,7 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::defaultStreamSocketFactoryF
             switch (nttType)
             {
                 case NatTraversalSupport::enabled:
-                    if (SocketGlobals::ini().disableCloudSockets)
+                    if (SocketGlobals::cloud().ini().disableCloudSockets)
                         return std::make_unique<TCPSocket>(ipVersion);
                     return std::make_unique<cloud::CloudStreamSocket>(ipVersion);
 

@@ -14,7 +14,7 @@
         and nxpl::PluginInterface::releaseRef MUST be called by user to free up resources
 
     \note Use in multithreaded environment:\n
-        - \a PluginInterface::releaseRef is not guaranteed to be called from thread that called \a PluginInterface::addRef, 
+        - \a PluginInterface::releaseRef is not guaranteed to be called from thread that called \a PluginInterface::addRef,
             so reference counting - related functionality MUST be thread-safe
 */
 namespace nxpl
@@ -97,7 +97,7 @@ namespace nxpl
     {
     public:
         virtual ~Plugin() {}
-    
+
         //!Name of plugin
         /*!
             This name is used for information purpose only

@@ -666,7 +666,7 @@ namespace ec2
 
         ErrorCode saveSystemMergeHistoryRecord(const ec2::ApiSystemMergeHistoryRecord& param)
         {
-            int(AbstractMiscManager::*fn)(const ec2::ApiSystemMergeHistoryRecord&, impl::SimpleHandlerPtr) = 
+            int(AbstractMiscManager::*fn)(const ec2::ApiSystemMergeHistoryRecord&, impl::SimpleHandlerPtr) =
                 &AbstractMiscManager::saveSystemMergeHistoryRecord;
             return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, param, std::placeholders::_1));
         }
@@ -875,6 +875,7 @@ namespace ec2
         virtual TransactionMessageBusAdapter* messageBus() const = 0;
         virtual QnDistributedMutexManager* distributedMutex() const = 0;
         virtual TimeSynchronizationManager* timeSyncManager() const = 0;
+        virtual void shutdown() {}
     protected:
         virtual int testConnectionAsync( const nx::utils::Url& addr, impl::TestConnectionHandlerPtr handler ) = 0;
         virtual int connectAsync( const nx::utils::Url& addr, const ApiClientInfoData& clientInfo,

@@ -26,7 +26,7 @@ TunnelConnector::~TunnelConnector()
 void TunnelConnector::setConnectorFactoryFunc(
     CrossNatConnectorFactory::Function newFactoryFunc)
 {
-    auto oldFunc = 
+    auto oldFunc =
         CrossNatConnectorFactory::instance().setCustomFunc(
             std::move(newFactoryFunc));
     if (!m_oldFactoryFunc)

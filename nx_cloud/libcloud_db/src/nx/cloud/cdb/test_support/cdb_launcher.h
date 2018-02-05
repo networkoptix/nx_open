@@ -27,7 +27,6 @@ class CdbLauncher:
     public nx::utils::db::test::TestWithDbHelper
 {
 public:
-    //!Calls \a start
     CdbLauncher(QString tmpDir = QString());
     ~CdbLauncher();
 

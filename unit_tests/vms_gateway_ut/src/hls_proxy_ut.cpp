@@ -2,7 +2,7 @@
 
 #include <nx/network/address_resolver.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
-#include <nx/mediaserver/hls/hls_types.h>
+#include <nx/network/hls/hls_types.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/http_content_type.h>
 #include <nx/network/http/test_http_server.h>
@@ -76,7 +76,7 @@ protected:
         nx::network::http::BufferType msgBody;
         nx::network::http::StringType contentType;
         ASSERT_TRUE(nx::network::http::HttpClient::fetchResource(
-            playlistProxyUrl(), &msgBody, &contentType));
+            playlistProxyUrl(), &msgBody, &contentType, nx::network::kNoTimeout));
         ASSERT_TRUE(m_receivedPlaylist.parse(msgBody));
     }
 
@@ -99,7 +99,7 @@ protected:
         nx::network::http::BufferType msgBody;
         nx::network::http::StringType contentType;
         ASSERT_TRUE(nx::network::http::HttpClient::fetchResource(
-            chunkUrl, &msgBody, &contentType));
+            chunkUrl, &msgBody, &contentType, nx::network::kNoTimeout));
 
         ASSERT_EQ(kHlsChunkContents, msgBody);
         ASSERT_EQ(kHlsChunkContentType, contentType);

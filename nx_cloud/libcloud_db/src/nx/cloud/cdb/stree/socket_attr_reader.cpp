@@ -1,18 +1,13 @@
-/**********************************************************
-* Sep 15, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "socket_attr_reader.h"
 
 #include "cdb_ns.h"
 
-
 namespace nx {
 namespace cdb {
 
-SocketResourceReader::SocketResourceReader(const network::AbstractCommunicatingSocket& sock)
-:
+SocketResourceReader::SocketResourceReader(
+    const network::AbstractCommunicatingSocket& sock)
+    :
     m_socket(sock)
 {
 }
@@ -32,5 +27,5 @@ bool SocketResourceReader::getAsVariant(int resID, QVariant* const value) const
     }
 }
 
-}   //cdb
-}   //nx
+} // namespace cdb
+} // namespace nx

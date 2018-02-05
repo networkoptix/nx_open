@@ -87,22 +87,22 @@ SocketAddress SystemSocketAddress::toSocketAddress() const
     return SocketAddress();
 }
 
-const struct sockaddr* SystemSocketAddress::addr() const
+const struct sockaddr* SystemSocketAddress::get() const
 {
     return m_sockaddrLen == 0 ? nullptr : &m_sockaddr.untyped;
 }
 
-struct sockaddr* SystemSocketAddress::addr()
+struct sockaddr* SystemSocketAddress::get()
 {
     return m_sockaddrLen == 0 ? nullptr : &m_sockaddr.untyped;
 }
 
-const socklen_t& SystemSocketAddress::addrLen() const
+const socklen_t& SystemSocketAddress::length() const
 {
     return m_sockaddrLen;
 }
 
-socklen_t& SystemSocketAddress::addrLen()
+socklen_t& SystemSocketAddress::length()
 {
     return m_sockaddrLen;
 }

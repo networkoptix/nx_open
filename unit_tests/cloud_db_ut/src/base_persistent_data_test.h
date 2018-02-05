@@ -53,7 +53,7 @@ protected:
             [&queryDonePromise](
                 nx::utils::db::QueryContext*,
                 nx::utils::db::DBResult dbResult,
-                OutputData... outputData)
+                OutputData... /*outputData*/)
             {
                 queryDonePromise.set_value(dbResult);
             });

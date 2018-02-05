@@ -34,6 +34,7 @@ include ../Rules.mk
 
 APP := video_dec_gie
 SO := libtegra_video.so
+# TODO: #mike: Add other test(s).
 TEST := unit_tests/net_dimensions_ut
 
 CLASS_DIR := ../common/classes

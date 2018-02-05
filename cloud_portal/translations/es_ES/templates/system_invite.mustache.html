@@ -1,13 +1,11 @@
 <h1>Bienvenido a {{PRODUCT_NAME}}</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> le invita a unirse a <a href="{{config.portal_url}}"> {{PRODUCT_NAME}}</a> Y 
-compartió su sistema {{message.system_name}} con usted.</p>
+<p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> te invita a unirte <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> y compartió su sistema {{message.system_name}} contigo.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>Es invitado a unirse <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>.
-El sistema {{message.system_name}} fue compartido con usted.</p>
+<p>Usted está invitado a unirse <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>. El sistema {{message.system_name}} fue compartido con usted.</p>
 {{/message.sharer_name}}
 
 <a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Registrar y ver el sistema</a>
