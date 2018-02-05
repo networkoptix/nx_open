@@ -62,15 +62,15 @@ class PhysicalInstallationCtl(object):
     def __init__(self, deb_path, customization_company_name, config_list, ca):
         assert is_list_inst(config_list, PhysicalInstallationHostConfig), repr(config_list)
         self.config_list = config_list
-        self.installations = [
+        self.installation_hosts = [
             PhysicalInstallationHost.from_config(
                 config, deb_path, customization_from_company_name(customization_company_name), ca)
             for config in config_list]
-        self._available_hosts = self.installations[:]
+        self._available_hosts = self.installation_hosts[:]
 
     # will unpack [new] distributive and reinstall servers
     def reset_all_installations(self):
-        for host in self.installations:
+        for host in self.installation_hosts:
             host.set_reset_installation_flag()
 
     def allocate_server(self, config):
@@ -87,9 +87,9 @@ class PhysicalInstallationCtl(object):
 
     def release_all_servers(self):
         log.info('Releasing all physical installations')
-        for host in self.installations:
+        for host in self.installation_hosts:
             host.release_all_servers()
-        self._available_hosts = self.installations[:]
+        self._available_hosts = self.installation_hosts[:]
 
 
 class PhysicalInstallationHost(object):
