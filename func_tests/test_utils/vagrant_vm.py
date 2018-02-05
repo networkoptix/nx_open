@@ -41,7 +41,7 @@ class RemotableVagrant(vagrant.Vagrant):
             self._os_access.run_command(cmd, cwd=self.root))
 
 
-class VagrantVMsFactory(object):
+class VagrantVMFactory(object):
     _vagrant_vms_cache_key = 'nx/vagrant_vms'
 
     def __init__(self, cache, options, config_factory):

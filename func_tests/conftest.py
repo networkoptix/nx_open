@@ -18,7 +18,7 @@ from test_utils.metrics_saver import MetricsSaver
 from test_utils.server_factory import ServerFactory
 from test_utils.server_physical_host import PhysicalInstallationCtl
 from test_utils.utils import SimpleNamespace
-from test_utils.vagrant_vm import VagrantVMsFactory
+from test_utils.vagrant_vm import VagrantVMFactory
 from test_utils.vagrant_vm_config import VagrantVMConfigFactory
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
@@ -224,7 +224,7 @@ def cloud_host(init_logging, run_options):
 def session_vm_factory(request, run_options, init_logging, customization_company_name):
     """Create factory once per session, don't release VMs"""
     config_factory = VagrantVMConfigFactory(customization_company_name)
-    factory = VagrantVMsFactory(
+    factory = VagrantVMFactory(
         request.config.cache,
         run_options,
         config_factory,
