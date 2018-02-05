@@ -43,7 +43,7 @@ public:
     ~QnResourceTreeWidget();
 
     QAbstractItemModel *model() const;
-    void setModel(QAbstractItemModel *model);
+    void setModel(QAbstractItemModel *model, bool allowNewSearch);
 
     QSortFilterProxyModel* searchModel() const;
 
@@ -158,9 +158,17 @@ private:
 
     void initializeFilter();
     void updateColumns();
-    void updateFilter();
+    void updateOldFilter();
+    void updateNewFilter();
+    void initializeNewFilter();
 
     void expandCheckedRecursively(const QModelIndex& from);
+
+    void updateShortcutHintVisibility();
+
+    static QStringList filterTags();
+
+    static QList<int> filterTagIndexToNodeMapping();
 
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
