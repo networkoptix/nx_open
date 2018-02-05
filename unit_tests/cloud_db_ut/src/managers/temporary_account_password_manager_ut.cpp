@@ -16,7 +16,6 @@ class TemporaryAccountPasswordManager:
 public:
     TemporaryAccountPasswordManager():
         m_tempPasswordManager(
-            m_settings,
             &persistentDbManager()->queryExecutor())
     {
         m_email = BusinessDataGenerator::generateRandomEmailAddress();
@@ -35,7 +34,6 @@ protected:
     }
 
 private:
-    conf::Settings m_settings;
     cdb::TemporaryAccountPasswordManager m_tempPasswordManager;
     data::TemporaryAccountCredentials m_credentials;
     std::string m_email;

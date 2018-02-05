@@ -33,6 +33,7 @@ Log Out
     Click Element    ${ACCOUNT DROPDOWN}
     Wait Until Element Is Visible    ${LOG OUT BUTTON}
     Click Link    ${LOG OUT BUTTON}
+    Validate Log Out
 
 Validate Log Out
     Wait Until Element Is Visible    ${ANONYMOUS BODY}
