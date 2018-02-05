@@ -121,15 +121,6 @@ public slots:
     void at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId,
         const QnUuid& userId, qint64 timeStamp, vms::event::EventState toggleState);
 
-    void at_analyticsSdkEvent(const QnResourcePtr& resource,
-        const QnUuid& driverId,
-        const QnUuid& eventId,
-        vms::event::EventState toggleState,
-        const QString& caption,
-        const QString& description,
-        const QString& auxiliaryData,
-        qint64 timeStampUsec);
-
     void at_analyticsSdkEvent(const nx::vms::event::AnalyticsSdkEventPtr& event);
 
     void at_fileIntegrityCheckFailed(const QnResourcePtr& resource);
