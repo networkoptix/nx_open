@@ -59,7 +59,7 @@ def login(request):
             user = django.contrib.auth.authenticate(username=email, password=password)
         except APINotAuthorisedException:  # two possible reasons here - user not found or password incorrect
             # try to find user in the DB
-            if not AccountBackend.is_email_in_portal(user['email']):
+            if not AccountBackend.is_email_in_portal(email):
                 raise APINotFoundException("User not in cloud portal") # user not found here
             raise  # wrong password - just - re-raise the exception
 
