@@ -187,6 +187,7 @@ void QnAboutDialog::retranslateUi()
     else if (!supportAddress.isEmpty() && !supportAddress.startsWith(lit("+")))
         supportLink = lit("<a href=%1>%1</a>").arg(supportAddress);
     ui->supportEmailLabel->setText(lit("<b>%1</b>: %2").arg(tr("Customer Support")).arg(supportLink));
+    ui->supportEmailLabel->setOpenExternalLinks(true);
 }
 
 // -------------------------------------------------------------------------- //

@@ -11,7 +11,7 @@ QString nameInternal(
     const QnVirtualCameraResourcePtr& camera,
     const QnUuid& eventTypeId,
     const QString& locale,
-    QList<nx::api::AnalyticsEventType> nx::api::AnalyticsDriverManifest::* list)
+    QList<nx::api::Analytics::EventType> nx::api::AnalyticsDriverManifest::* list)
 {
     NX_ASSERT(camera);
     if (!camera)
@@ -64,7 +64,7 @@ public:
     {}
 
     void addUnique(const nx::api::AnalyticsDriverManifest& manifest,
-        const nx::api::AnalyticsEventType& eventType)
+        const nx::api::Analytics::EventType& eventType)
     {
 AnalyticsEventTypeId id{manifest.driverId, eventType.eventTypeId};
         if (keys.contains(id))

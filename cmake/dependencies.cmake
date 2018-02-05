@@ -166,7 +166,7 @@ function(nx_get_dependencies)
     endif()
 
     if(box STREQUAL "edge1")
-        nx_rdep_add_package(cpro-1.0.0)
+        nx_rdep_add_package(cpro-1.0.0-1)
         nx_rdep_add_package(gdb)
     endif()
 

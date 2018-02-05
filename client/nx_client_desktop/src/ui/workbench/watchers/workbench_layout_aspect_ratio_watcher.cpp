@@ -8,6 +8,8 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 
+#include <nx/client/core/utils/geometry.h>
+
 #include <utils/common/aspect_ratio.h>
 
 QnWorkbenchLayoutAspectRatioWatcher::QnWorkbenchLayoutAspectRatioWatcher(QObject *parent) :
@@ -37,11 +39,16 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_widgetChanged(QnResou
     const auto hasAspectRatio = widget->hasAspectRatio();
     if (hasAspectRatio)
     {
-        const auto ar = widget->visualAspectRatio();
-        if (m_watchedLayout->flags().testFlag(QnLayoutFlag::FillViewport))
-            m_watchedLayout->setCellAspectRatio(ar);
-        else
-            m_watchedLayout->setCellAspectRatio(QnAspectRatio::closestStandardRatio(ar).toFloat());
+        float ar = widget->visualAspectRatio();
+
+        QRect geometry = widget->item()->geometry();
+        if (!geometry.isEmpty())
+            ar /= nx::client::core::Geometry::aspectRatio(geometry);
+
+        if (!m_watchedLayout->flags().testFlag(QnLayoutFlag::FillViewport))
+            ar = QnAspectRatio::closestStandardRatio(ar).toFloat();
+
+        m_watchedLayout->setCellAspectRatio(ar);
     }
 
     if (m_monitoring || !hasAspectRatio) {

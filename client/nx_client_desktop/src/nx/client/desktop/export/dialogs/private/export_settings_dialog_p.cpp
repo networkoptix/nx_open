@@ -75,9 +75,9 @@ ExportSettingsDialog::Private::~Private()
 {
 }
 
-void ExportSettingsDialog::Private::updateOverlaysVisibility(bool transcodingIsAllowed)
+void ExportSettingsDialog::Private::updateOverlaysVisibility()
 {
-    if (transcodingIsAllowed)
+    if (m_exportMediaPersistentSettings.applyFilters)
     {
         for (const auto overlayType: m_exportMediaPersistentSettings.usedOverlays)
             overlay(overlayType)->setHidden(false);
@@ -131,7 +131,7 @@ void ExportSettingsDialog::Private::loadSettings()
 
     // Should we call it right here? There are no valid resource links here
     refreshMediaPreview();
-    updateOverlaysVisibility(isTranscodingRequested());
+    updateOverlaysVisibility();
 }
 
 void ExportSettingsDialog::Private::saveSettings()
@@ -211,7 +211,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
     m_fullFrameSize = QSize();
 
     // Requesting base resource image. We will apply transcoding later
-    if (m_mediaRawImageProvider == nullptr)
+    if (!m_mediaRawImageProvider)
     {
         // Requesting an image without any additional transforms
         // We do have our own image processor, so we do not bother server with transcoding
@@ -245,7 +245,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
 void ExportSettingsDialog::Private::setApplyFilters(bool value)
 {
     bool transcode = false;
-    if (m_exportMediaPersistentSettings.isTranscodingForced())
+    if (m_exportMediaPersistentSettings.areFiltersForced())
         transcode = true;
     else
         transcode = value;
@@ -256,9 +256,9 @@ void ExportSettingsDialog::Private::setApplyFilters(bool value)
     }
 }
 
-bool ExportSettingsDialog::Private::isMediaEmpty() const
+bool ExportSettingsDialog::Private::hasVideo() const
 {
-    return m_exportMediaSettings.mediaResource == nullptr || !m_exportMediaSettings.mediaResource->hasVideo(0);
+    return m_exportMediaSettings.mediaResource != nullptr && m_exportMediaSettings.mediaResource->hasVideo();
 }
 
 void ExportSettingsDialog::Private::setLayoutReadOnly(bool value)
@@ -345,13 +345,13 @@ void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
     m_exportMediaPersistentSettings.fileFormat = FileSystemStrings::suffix(filename.extension);
 
     bool needTranscoding =
-        isTranscodingRequested() || m_exportMediaPersistentSettings.isTranscodingForced();
+        isTranscodingRequested() || m_exportMediaPersistentSettings.areFiltersForced();
 
     if (m_exportMediaPersistentSettings.setTranscoding(needTranscoding))
     {
         refreshMediaPreview();
     }
-    emit transcodingAllowedChanged(needTranscoding);
+    emit transcodingModeChanged();
 }
 
 void ExportSettingsDialog::Private::setLayoutFilename(const Filename& filename)
@@ -701,7 +701,7 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
             });
     }
 
-    connect(this, &Private::transcodingAllowedChanged, this, &Private::updateOverlaysVisibility);
+    connect(this, &Private::transcodingModeChanged, this, &Private::updateOverlaysVisibility);
 }
 
 void ExportSettingsDialog::Private::updateBookmarkText()

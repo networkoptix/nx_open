@@ -64,13 +64,6 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
     return dynamic_cast<QnMediaResourceWidget *>(display->activeWidget());
 }
 
-QnLayoutResourcePtr constructLayoutForWidget(QnMediaResourceWidget* widget)
-{
-    QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->addItem(widget->item()->data());
-    return layout;
-}
-
 static bool informersEnabled()
 {
     return ini().enableProgressInformers && ini().unifiedEventPanel;
@@ -376,7 +369,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
             {
                 ExportLayoutSettings layoutSettings;
                 layoutSettings.filename = settings.fileName;
-                layoutSettings.layout = constructLayoutForWidget(widget);
+                layoutSettings.layout = QnLayoutResource::createFromResource(mediaResource->toResourcePtr());
                 layoutSettings.mode = ExportLayoutSettings::Mode::Export;
                 layoutSettings.period = period;
                 layoutSettings.readOnly = false;

@@ -195,9 +195,10 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &ExportSettingsDialog::updateMode);
 
-    connect(d, &Private::transcodingAllowedChanged, this,
+    connect(d, &Private::transcodingModeChanged, this,
         &ExportSettingsDialog::updateTranscodingWidgets);
-    updateTranscodingWidgets(d->isTranscodingRequested());
+
+    updateTranscodingWidgets();
 
     connect(d, &Private::frameSizeChanged, this,
         [this](const QSize& size)
@@ -494,27 +495,33 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
         setAlertText(i, texts[i]);
 }
 
-void ExportSettingsDialog::updateTranscodingWidgets(bool unused)
+void ExportSettingsDialog::updateTranscodingWidgets()
 {
     // Gather all data to apply to UI
-    bool transcodingLocked = d->exportMediaPersistentSettings().isTranscodingForced();
+    bool transcodingLocked = d->exportMediaPersistentSettings().areFiltersForced();
     bool transcodingChecked = d->exportMediaPersistentSettings().applyFilters;
-    bool transcodingIsHidden = d->mode() == Mode::Layout;
+    bool overlayOptionsAvailable = d->mode() == Mode::Media;
 
-    if (d->mode() == Mode::Media && d->isMediaEmpty())
+    if (d->mode() == Mode::Media && !d->hasVideo())
     {
         transcodingLocked = true;
         transcodingChecked = false;
+    }
+
+    // Should hide additional overlay buttons of transcoding is disabled
+    if (!transcodingChecked || transcodingLocked)
+    {
+        overlayOptionsAvailable = false;
     }
 
     // Applying data to UI
     ui->exportMediaSettingsPage->setTranscodingAllowed(!transcodingLocked);
     ui->exportMediaSettingsPage->setApplyFilters(transcodingChecked);
 
-    if (transcodingChecked && !transcodingIsHidden)
+    if (transcodingChecked && overlayOptionsAvailable)
         ui->cameraExportSettingsButton->click();
 
-    ui->transcodingButtonsWidget->setHidden(transcodingIsHidden);
+    ui->transcodingButtonsWidget->setHidden(!overlayOptionsAvailable);
 }
 
 void ExportSettingsDialog::setMediaParams(

@@ -210,7 +210,7 @@ void ExportMediaPersistentSettings::updateRuntimeSettings(ExportMediaSettings& r
         overlays << overlaySettings(type)->createRuntimeSettings();
 }
 
-bool ExportMediaPersistentSettings::isTranscodingForced() const
+bool ExportMediaPersistentSettings::areFiltersForced() const
 {
     auto extension = FileSystemStrings::extension(fileFormat);
     return FileExtensionUtils::isLayout(extension);
@@ -218,12 +218,11 @@ bool ExportMediaPersistentSettings::isTranscodingForced() const
 
 bool ExportMediaPersistentSettings::setTranscoding(bool value)
 {
-    if (applyFilters != value)
-    {
-        applyFilters = value;
-        return true;
-    }
-    return false;
+    if (applyFilters == value)
+        return false;
+
+    applyFilters = value;
+    return true;
 }
 
 ExportRapidReviewPersistentSettings::ExportRapidReviewPersistentSettings(bool enabled, int speed):

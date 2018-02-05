@@ -14,7 +14,7 @@ struct Vca //< This struct substitutes namespace because of fusion problems with
     /**
      * Description of the vca analytics event.
      */
-    struct VcaAnalyticsEventType: nx::api::AnalyticsEventType
+    struct VcaAnalyticsEventType: nx::api::Analytics::EventType
     {
         // VCA-camera event type name (this name is sent by VCA-camera tcp notification server).
         QString internalName;

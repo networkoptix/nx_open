@@ -221,7 +221,7 @@ public:
                     manifest.driverName.localization[lit("ru_RU")] = lit("Russian %1").arg(i);
                     for (int j = 0; j < 3; ++j)
                     {
-                        nx::api::AnalyticsEventType eventType;
+                        nx::api::Analytics::EventType eventType;
                         eventType.eventTypeId = QnUuid::createUuid();
                         eventType.name.value = lit("Event %1").arg(j);
                         eventType.name.localization[lit("ru_RU")] = lit("Russion %1").arg(j);
@@ -255,7 +255,7 @@ public:
                             std::transform(randomDriver.outputEventTypes.cbegin(),
                                 randomDriver.outputEventTypes.cend(),
                                 std::back_inserter(supported),
-                                [](const nx::api::AnalyticsEventType& eventType)
+                                [](const nx::api::Analytics::EventType& eventType)
                                 {
                                     return eventType.eventTypeId;
                                 });

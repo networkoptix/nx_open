@@ -18,17 +18,9 @@ namespace hanwha {
 struct Hanwha //< Used as a namespace; struct is required for Qt serialization of inner types.
 {
     Q_GADGET
-    Q_ENUMS(EventTypeFlag EventItemType)
-    Q_FLAGS(EventTypeFlags)
+    Q_ENUMS(EventItemType)
 
 public:
-    enum EventTypeFlag
-    {
-        stateDependent = 1 << 0,
-        regionDependent = 1 << 1,
-        itemDependent = 1 << 2,
-    };
-    Q_DECLARE_FLAGS(EventTypeFlags, EventTypeFlag)
 
     enum class EventItemType
     {
@@ -39,14 +31,13 @@ public:
         t3,
     };
 
-    struct EventDescriptor: public nx::api::AnalyticsEventType
+    struct EventDescriptor: public nx::api::Analytics::EventType
     {
         QString internalName;
         QString internalMonitoringName;
         QString description;
         QString positiveState;
         QString negativeState;
-        EventTypeFlags flags;
         QString regionDescription;
     };
     #define EventDescriptor_Fields AnalyticsEventType_Fields \
@@ -55,7 +46,6 @@ public:
         (description) \
         (positiveState) \
         (negativeState) \
-        (flags) \
         (regionDescription)
 
     struct DriverManifest: public nx::api::AnalyticsDriverManifestBase
@@ -71,9 +61,7 @@ public:
     };
     #define DriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(Hanwha::EventTypeFlags)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Hanwha::EventItemType)
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Hanwha::EventTypeFlag)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Hanwha::EventDescriptor)
@@ -101,8 +89,6 @@ using EventList = std::vector<Event>;
 } // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (nx::mediaserver_plugins::metadata::hanwha::Hanwha::EventTypeFlag)
-    (nx::mediaserver_plugins::metadata::hanwha::Hanwha::EventTypeFlags)
     (nx::mediaserver_plugins::metadata::hanwha::Hanwha::EventItemType),
     (metatype)(numeric)(lexical)
 )
