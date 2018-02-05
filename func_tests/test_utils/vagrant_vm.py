@@ -259,7 +259,7 @@ class VagrantVM(object):
     def _make_os_access(self, user, ssh_config_path=None):
         # Vagrant VM name is tied to hostname and port in SSH config which is mandatory here.
         return SshAccess(self.vagrant_name, user=user, key_path=self._vagrant_private_key_path,
-                         config_path=ssh_config_path or self._ssh_config_path,
+                         ssh_config_path=ssh_config_path or self._ssh_config_path,
                          proxy_os_access=self.host_os_access)
 
     def _load_timezone(self):
