@@ -1,4 +1,4 @@
-// Copyright 2017 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 #pragma once
 
 /**@file
