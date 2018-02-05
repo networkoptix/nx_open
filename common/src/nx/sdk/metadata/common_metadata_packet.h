@@ -45,7 +45,6 @@ class CommonEventsMetadataPacket:
     public CommonMetadataPacketBase<EventsMetadataPacket, Event>
 {
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
-
 };
 
 class CommonObjectsMetadataPacket:
