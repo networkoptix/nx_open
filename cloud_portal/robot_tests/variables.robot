@@ -21,8 +21,6 @@ ${REMEMBER ME CHECKBOX}               //form[contains(@name, 'loginForm')]//inpu
 ${FORGOT PASSWORD}                    //form[contains(@name, 'loginForm')]//a[@href='/restore_password']
 ${LOG IN CLOSE BUTTON}                //button[@ng-click='close()']
 
-${RESET PASSWORD EMAIL INPUT}         //form[@name='restorePassword']//input[@ng-model='data.email']
-
 ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${YOU HAVE NO SYSTEMS}                //span[contains(text(),'You have no Systems connected to Nx Cloud')]
 
