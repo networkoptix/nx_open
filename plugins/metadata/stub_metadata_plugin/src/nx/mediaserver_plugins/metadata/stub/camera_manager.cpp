@@ -35,54 +35,39 @@ CameraManager::~CameraManager()
 
 std::string CameraManager::capabilitiesManifest()
 {
-    static const std::string kLineCrossingEventGuidStr = nxpt::NxGuidHelper::toStdString(
-        kLineCrossingEventGuid);
-    static const std::string kCarObjectGuidStr = nxpt::NxGuidHelper::toStdString(
-        kCarObjectGuid);
-
     return R"json(
         {
             "supportedEventTypes": [
-                ")json" + kLineCrossingEventGuidStr + R"json("
+                ")json" + kLineCrossingEventGuid + R"json("
                 "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}"
             ],
             "supportedObjectTypes": [
-                ")json" + kCarObjectGuidStr + R"json("
-            ]
-            "objectActions": [
-                {
-                    "id": "nx.stub.addToList",
-                    "name": {
-                        "value": "Add to list"
+                ")json" + kCarObjectGuid + R"json("
+            ],
+            "settings": {
+                "params": [
+                    {
+                        "id": "paramAId",
+                        "dataType": "Number",
+                        "name": "Param A",
+                        "description": "Number A"
                     },
-                    "params": [
-                        {
-                            "id": "paramA",
-                            "dataType": "Number",
-                            "name": "Param A",
-                            "description": "Number A"
-                        },
-                        {
-                            "id": "paramB",
-                            "dataType": "Enumeration",
-                            "range": "b1,b3",
-                            "name": "Param B",
-                            "description": "Enumeration B"
-                        }
-                    ],
-                },
-                {
-                    "id": "nx.stub.addPerson",
-                    "name": {
-                        "value": "Add person (URL-based)"
-                    },
-                    "supportedObjectTypes": [
-                        ")json" + kCarObjectGuidStr + R"json("
-                    ]
-                }
-            ]
+                    {
+                        "id": "paramBId",
+                        "dataType": "Enumeration",
+                        "range": "b1,b3",
+                        "name": "Param B",
+                        "description": "Enumeration B"
+                    }
+                ]
+            }
         }
     )json";
+}
+
+void CameraManager::settingsChanged()
+{
+    NX_PRINT << __func__ << "()";
 }
 
 bool CameraManager::pushVideoFrame(const CommonCompressedVideoPacket* videoFrame)
@@ -139,35 +124,6 @@ Error CameraManager::stopFetchingMetadata()
     return Error::noError;
 }
 
-void CameraManager::executeAction(
-    const std::string& actionId,
-    const nx::sdk::metadata::Object* object,
-    const std::map<std::string, std::string>& params,
-    std::string* outActionUrl,
-    std::string* outMessageToUser,
-    Error* error)
-{
-    if (actionId == "nx.stub.addToList")
-    {
-        NX_PRINT << __func__ << "(): nx.stub.addToList; returning a message with param values.";
-        *outMessageToUser = std::string("Your param values are: ")
-            + "paramA: [" + params.at("paramA") + "], "
-            + "paramB: [" + params.at("paramB") + "]";
-
-    }
-    else if (actionId == "nx.stub.addPerson")
-    {
-        *outActionUrl = "http://internal.server/addPerson?objectId=" +
-            nxpt::NxGuidHelper::toStdString(object->id());
-        NX_PRINT << __func__ << "(): nx.stub.addPerson; returning URL: [" << *outActionUrl << "]";
-    }
-    else
-    {
-        NX_PRINT << __func__ << "(): ERROR: Unsupported action: [" << actionId << "]";
-        *error = Error::unknownError;
-    }
-}
-
 //-------------------------------------------------------------------------------------------------
 // private
 
@@ -189,7 +145,7 @@ MetadataPacket* CameraManager::cookSomeEvents()
     commonEvent->setDescription("Line crossing (description)");
     commonEvent->setAuxilaryData(R"json({ "auxilaryData": "someJson" })json");
     commonEvent->setIsActive(m_counter == 1);
-    commonEvent->setTypeId(m_eventTypeId);
+    commonEvent->setTypeId(nxpt::NxGuidHelper::fromRawData(m_eventTypeId.c_str()));
 
     auto eventPacket = new CommonEventsMetadataPacket();
     eventPacket->setTimestampUsec(usSinceEpoch());
@@ -214,16 +170,16 @@ MetadataPacket* CameraManager::cookSomeObjects()
         return nullptr;
 
     auto commonObject = new CommonObject();
-    nxpl::NX_GUID objectId = //< To be binary modified to be unique for each object.
-        {{0xB5,0x29,0x4F,0x25,0x4F,0xE6,0x46,0x47,0xB8,0xD1,0xA0,0x72,0x9F,0x70,0xF2,0xD1}};
 
     commonObject->setAuxilaryData(R"json({ "auxilaryData": "someJson2" })json");
-    commonObject->setTypeId(kCarObjectGuid);
+    commonObject->setTypeId(nxpt::NxGuidHelper::fromRawData(kCarObjectGuid.c_str()));
 
+    // To be binary modified to be unique for each object.
+    nxpl::NX_GUID objectId = nxpt::NxGuidHelper::fromRawData(
+        "{B5294F25-4FE6-4647-B8D1-A0729F70F2D1}");
     double dt = m_counterObjects++ / 32.0;
     double intPart;
     dt = modf(dt, &intPart) * 0.75;
-
     *reinterpret_cast<int*>(objectId.bytes) = static_cast<int>(intPart);
     commonObject->setId(objectId);
 

@@ -26,13 +26,6 @@ nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
 
 std::string Plugin::capabilitiesManifest() const
 {
-    static const std::string kLineCrossingEventGuidStr = nxpt::NxGuidHelper::toStdString(
-        kLineCrossingEventGuid);
-    static const std::string kObjectInTheAreaEventGuidStr = nxpt::NxGuidHelper::toStdString(
-        kObjectInTheAreaEventGuid);
-    static const std::string kCarObjectGuidStr = nxpt::NxGuidHelper::toStdString(
-        kCarObjectGuid);
-
     return R"json(
         {
             "driverId": "{B14A8D7B-8009-4D38-A60D-04139345432E}",
@@ -41,13 +34,13 @@ std::string Plugin::capabilitiesManifest() const
             },
             "outputEventTypes": [
                 {
-                    "typeId": ")json" + kLineCrossingEventGuidStr + R"json(",
+                    "typeId": ")json" + kLineCrossingEventGuid + R"json(",
                     "name":
                         "value": "Line crossing"
                     }
                 },
                 {
-                    "typeId": ")json" + kObjectInTheAreaEventGuidStr + R"json(",
+                    "typeId": ")json" + kObjectInTheAreaEventGuid + R"json(",
                     "name": {
                         "value": "Object in the area"
                     },
@@ -56,7 +49,7 @@ std::string Plugin::capabilitiesManifest() const
             ],
             "outputObjectTypes": [
                 {
-                    "typeId": ")json" + kCarObjectGuidStr + R"json(",
+                    "typeId": ")json" + kCarObjectGuid + R"json(",
                     "name": {
                         "value": "Car"
                     }
@@ -69,45 +62,112 @@ std::string Plugin::capabilitiesManifest() const
                 }
             ],
             "capabilities": "needDeepCopyForMediaFrame",
-            "parameters": {
+            "settings": {
+                "params": [
+                    {
+                        "id": "paramAId",
+                        "dataType": "Number",
+                        "name": "Param A",
+                        "description": "Number A"
+                    },
+                    {
+                        "id": "paramBId",
+                        "dataType": "Enumeration",
+                        "range": "b1,b3",
+                        "name": "Param B",
+                        "description": "Enumeration B"
+                    }
+                ],
                 "groups": [
                     {
+                        "id": "groupA"
+                        "name": "Group name",
                         "params": [
                             {
-                                "id": "paramAId",
+                                "id": "groupA.paramA",
+                                "dataType": "String",
+                                "name": "Some string",
+                                "description": "Some string param in a group"
+                            }
+                        ],
+                        "groups": [
+                        ]
+                    }
+                ]
+            },
+            "objectActions": [
+                {
+                    "id": "nx.stub.addToList",
+                    "name": {
+                        "value": "Add to list"
+                    },
+                    "supportedObjectTypes": [
+                        ")json" + kCarObjectGuid + R"json("
+                    ],
+                    settings: {
+                        "params": [
+                            {
+                                "id": "paramA",
                                 "dataType": "Number",
                                 "name": "Param A",
                                 "description": "Number A"
                             },
                             {
-                                "id": "paramBId",
+                                "id": "paramB",
                                 "dataType": "Enumeration",
                                 "range": "b1,b3",
                                 "name": "Param B",
                                 "description": "Enumeration B"
                             }
-                        ],
-                        "groups": [
-                            {
-                                "id": "groupA"
-                                "name": "Group name",
-                                "params": [
-                                    {
-                                        "id": "groupA.paramA",
-                                        "dataType": "String",
-                                        "name": "Some string",
-                                        "description": "Some string param in a group"
-                                    }
-                                ],
-                                "groups": [
-                                ]
-                            }
                         ]
                     }
-                ]
-            }
+                },
+                {
+                    "id": "nx.stub.addPerson",
+                    "name": {
+                        "value": "Add person (URL-based)"
+                    },
+                    "supportedObjectTypes": [
+                        ")json" + kCarObjectGuid + R"json("
+                    ]
+                }
+            ]
         }
     )json";
+}
+
+void Plugin::settingsChanged()
+{
+    NX_PRINT << __func__ << "()";
+}
+
+void Plugin::executeAction(
+    const std::string& actionId,
+    const nx::sdk::metadata::Object* object,
+    const std::map<std::string, std::string>& params,
+    std::string* outActionUrl,
+    std::string* outMessageToUser,
+    Error* error)
+{
+    if (actionId == "nx.stub.addToList")
+    {
+        NX_PRINT << __func__ << "(): nx.stub.addToList; returning a message with param values.";
+        *outMessageToUser = std::string("Your param values are: ")
+            + "paramA: [" + params.at("paramA") + "], "
+            + "paramB: [" + params.at("paramB") + "]";
+
+    }
+    else if (actionId == "nx.stub.addPerson")
+    {
+        *outActionUrl = "http://internal.server/addPerson?objectId=" +
+            nxpt::NxGuidHelper::toStdString(object->id());
+        NX_PRINT << __func__ << "(): nx.stub.addPerson; returning URL: [" << *outActionUrl << "]";
+    }
+    else
+    {
+        NX_PRINT << __func__ << "(): ERROR: Unsupported action: [" << actionId << "]";
+        *error = Error::unknownError;
+    }
 }
 
 } // namespace stub

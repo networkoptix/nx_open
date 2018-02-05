@@ -116,6 +116,8 @@ void CommonVideoFrameProcessingCameraManager::setDeclaredSettings(
             << ((i < count - 1) ? "," : "");
     }
     NX_OUTPUT << "}";
+
+    settingsChanged();
 }
 
 //-------------------------------------------------------------------------------------------------

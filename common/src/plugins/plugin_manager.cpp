@@ -195,7 +195,7 @@ bool PluginManager::loadNxPlugin(
     {
         // Report settings to the plugin.
         if (!settingsForPlugin.empty())
-            pluginObj->setSettings(&settingsForPlugin[0], settingsForPlugin.size());
+            pluginObj->setSettings(&settingsForPlugin[0], (int) settingsForPlugin.size());
     }
 
     if (auto plugin2Obj = nxpt::ScopedRef<nxpl::Plugin2>(obj->queryInterface(nxpl::IID_Plugin2)))

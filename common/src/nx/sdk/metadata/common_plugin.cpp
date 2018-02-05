@@ -81,6 +81,8 @@ void CommonPlugin::setDeclaredSettings(const nxpl::Setting* settings, int count)
             << ((i < count - 1) ? "," : "");
     }
     NX_OUTPUT << "}";
+
+    settingsChanged();
 }
 
 void CommonPlugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)

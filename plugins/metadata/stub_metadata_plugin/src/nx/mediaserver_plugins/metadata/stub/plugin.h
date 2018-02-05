@@ -17,6 +17,16 @@ public:
 
 protected:
     virtual std::string capabilitiesManifest() const override;
+
+    virtual void settingsChanged() override;
+
+    virtual void executeAction(
+        const std::string& actionId,
+        const nx::sdk::metadata::Object* object,
+        const std::map<std::string, std::string>& params,
+        std::string* outActionUrl,
+        std::string* outMessageToUser,
+        nx::sdk::Error* error) override;
 };
 
 } // namespace stub

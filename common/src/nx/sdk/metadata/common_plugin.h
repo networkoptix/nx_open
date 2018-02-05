@@ -4,7 +4,9 @@
 #include <map>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/plugin.h>
+
+#include "plugin.h"
+#include "objects_metadata_packet.h"
 
 namespace nx {
 namespace sdk {
@@ -22,6 +24,11 @@ protected:
     virtual std::string capabilitiesManifest() const = 0;
 
     /**
+     * Called when any of the seetings (param values) change.
+     */
+    virtual void settingsChanged() {}
+
+    /**
      * Provides access to the Plugin global settings stored by the server.
      * @return Param value, or an empty string if such param does not exist, having logged the
      * error.
@@ -30,6 +37,24 @@ protected:
 
     /** Enable or disable verbose debug output via NX_OUTPUT from methods of this class. */
     void setEnableOutput(bool value) { m_enableOutput = value; }
+
+    /**
+     * Action handler. Called when some action defined by this plugin is triggered by Server.
+     * @param actionId Id of an action being triggered.
+     * @param object An object for which an action has been triggered.
+     * @param params If the plugin manifest defines params for the action being triggered,
+     *     contains their values after they are filled by the user via Client form. Otherwise,
+     *     empty.
+     * @param outActionUrl If set by this call, Client will open this URL in an embedded browser.
+     * @param outMessageToUser If set by this call, Client will show this text to the user.
+     */
+    virtual void executeAction(
+        const std::string& actionId,
+        const nx::sdk::metadata::Object* object,
+        const std::map<std::string, std::string>& params,
+        std::string* outActionUrl,
+        std::string* outMessageToUser,
+        Error* error) {}
 
 public:
     virtual ~CommonPlugin() override;

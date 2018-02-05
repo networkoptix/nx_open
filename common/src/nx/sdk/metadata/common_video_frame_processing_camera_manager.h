@@ -3,8 +3,9 @@
 #include <string>
 #include <map>
 
-#include <nx/sdk/metadata/plugin.h>
 #include <plugins/plugin_tools.h>
+
+#include "plugin.h"
 #include "consuming_camera_manager.h"
 #include "common_compressed_video_packet.h"
 #include "objects_metadata_packet.h"
@@ -25,24 +26,6 @@ protected:
     CommonVideoFrameProcessingCameraManager(Plugin* plugin): m_plugin(plugin) {}
 
     virtual std::string capabilitiesManifest() = 0;
-
-    /**
-     * Action handler. Called when some action defined by this plugin is triggered by Server.
-     * @param actionId Id of an action being triggered.
-     * @param object An object for which an action has been triggered.
-     * @param params If the plugin manifest defines params for the action being triggered,
-     *     contains their values after they are filled by the user via Client form. Otherwise,
-     *     empty.
-     * @param outActionUrl If set by this call, Client will open this URL in an embedded browser.
-     * @param outMessageToUser If set by this call, Client will show this text to the user.
-     */
-    virtual void executeAction(
-        const std::string& actionId,
-        const nx::sdk::metadata::Object* object,
-        const std::map<std::string, std::string>& params,
-        std::string* outActionUrl,
-        std::string* outMessageToUser,
-        Error* error) {}
 
     /**
      * Override to accept next video frame for processing. The provided pointer is valid only until
@@ -67,6 +50,11 @@ protected:
      * thread. As an alternative, send metadata to Server by implementing pullMetadataPackets().
      */
     void pushMetadataPacket(sdk::metadata::MetadataPacket* metadataPacket);
+
+    /**
+     * Called when any of the seetings (param values) change.
+     */
+    virtual void settingsChanged() {}
 
     /**
      * Provides access to the Manager settings stored by the server for a particular Resource.
