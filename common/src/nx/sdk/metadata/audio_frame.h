@@ -1,6 +1,6 @@
 #pragma once
 
-#include <plugins/metadata/media_frame.h>
+#include <nx/sdk/metadata/media_frame.h>
 
 namespace nx {
 namespace sdk {

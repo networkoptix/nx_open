@@ -1,7 +1,7 @@
 #pragma once
 
-#include <plugins/metadata/media_frame.h>
-#include <plugins/metadata/utils.h>
+#include <nx/sdk/metadata/media_frame.h>
+#include <nx/sdk/common.h>
 
 namespace nx {
 namespace sdk {
