@@ -219,7 +219,13 @@ QRectF QnNotificationsCollectionWidget::visibleGeometry() const
 
 void QnNotificationsCollectionWidget::setToolTipsEnclosingRect(const QRectF& rect)
 {
-    m_list->setToolTipsEnclosingRect(mapRectToItem(m_list, rect));
+    m_toolTipsEnclosingRect = mapRectToItem(m_list, rect);
+    m_list->setToolTipsEnclosingRect(m_toolTipsEnclosingRect);
+}
+
+QRectF QnNotificationsCollectionWidget::toolTipsEnclosingRect() const
+{
+    return m_toolTipsEnclosingRect;
 }
 
 QnBlinkingImageButtonWidget* QnNotificationsCollectionWidget::blinker() const

@@ -19,6 +19,7 @@
 #include <ui/common/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/helper.h>
+#include <ui/style/nx_style_p.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
@@ -63,6 +64,9 @@ EventRibbon::Private::Private(EventRibbon* q):
     m_scrollBar(new QScrollBar(Qt::Vertical, q)),
     m_viewport(new QWidget(q))
 {
+    q->setAttribute(Qt::WA_Hover);
+    m_viewport->setAttribute(Qt::WA_Hover);
+
     m_scrollBar->setHidden(true);
     m_scrollBar->setSingleStep(kScrollBarStep);
     m_scrollBar->setFixedWidth(m_scrollBar->sizeHint().width());
@@ -596,12 +600,14 @@ void EventRibbon::Private::doUpdateView()
     if (m_tiles.empty())
     {
         clear();
+        updateHover(false, QPoint());
         return;
     }
 
     if (!q->isVisible())
     {
         clearShiftAnimations();
+        updateHover(false, QPoint());
         return;
     }
 
@@ -671,6 +677,9 @@ void EventRibbon::Private::doUpdateView()
 
     updateScrollRange();
     debugCheckVisibility();
+
+    const auto pos = QnNxStylePrivate::mapFromGlobal(q, QCursor::pos());
+    updateHover(q->rect().contains(pos), pos);
 
     if (!m_currentShifts.empty()) //< If has running animations.
         qApp->postEvent(m_viewport, new QEvent(QEvent::LayoutRequest));
@@ -763,6 +772,52 @@ int EventRibbon::Private::count() const
 int EventRibbon::Private::unreadCount() const
 {
     return m_unread.size();
+}
+
+void EventRibbon::Private::updateHover(bool hovered, const QPoint& mousePos)
+{
+    if (hovered)
+    {
+        if (m_hoveredTile && m_hoveredTile->underMouse()) //< Nothing changed.
+            return;
+
+        const int index = indexAtPos(mousePos);
+        const auto tile = index >= 0 ? m_tiles[index] : nullptr;
+
+        if (tile == m_hoveredTile)
+            return;
+
+        m_hoveredTile = tile;
+
+        const auto modelIndex = (m_model && tile) ? m_model->index(index) : QModelIndex();
+        emit q->tileHovered(modelIndex, tile);
+    }
+    else
+    {
+        if (m_hoveredTile)
+        {
+            m_hoveredTile = nullptr;
+            emit q->tileHovered(QModelIndex(), nullptr);
+        }
+    }
+}
+
+int EventRibbon::Private::indexAtPos(const QPoint& pos) const
+{
+    const auto viewportPos = m_viewport->mapFrom(q, pos);
+    const int base = m_scrollBar->isHidden() ? 0 : m_scrollBar->value();
+
+    const auto next = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), base + viewportPos.y(),
+        [this](int left, EventTile* right) { return left < m_positions.value(right); });
+
+    if (next == m_tiles.cbegin())
+        return -1;
+
+    const auto candidate = next - 1;
+
+    return (*candidate)->geometry().contains(viewportPos)
+        ? std::distance(m_tiles.cbegin(), candidate)
+        : -1;
 }
 
 } // namespace desktop

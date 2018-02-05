@@ -5,6 +5,7 @@
 #include <ui/workbench/panels/abstract_workbench_panel.h>
 
 class QnControlBackgroundWidget;
+class QnNotificationToolTipWidget;
 class QnNotificationsCollectionWidget;
 class QnImageButtonWidget;
 class QnBlinkingImageButtonWidget;
@@ -12,7 +13,16 @@ class HoverFocusProcessor;
 class AnimatorGroup;
 class VariantAnimator;
 
-namespace nx { namespace client { namespace desktop { class EventPanel; }}}
+namespace nx {
+namespace client {
+namespace desktop {
+
+class EventPanel;
+class EventTileToolTip;
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
 
 namespace NxUi {
 
@@ -59,7 +69,7 @@ private:
 private:
     void at_showingProcessor_hoverEntered();
 
-    void updateEventPanel();
+    void createEventPanel(QGraphicsWidget* parentWidget);
 
 private:
     bool m_ignoreClickEvent;
@@ -81,6 +91,7 @@ private:
 
     // New event panel.
     QScopedPointer<nx::client::desktop::EventPanel> m_eventPanel;
+    QPointer<QnNotificationToolTipWidget> m_eventPanelToolTip;
 };
 
 } //namespace NxUi

@@ -93,6 +93,12 @@ EventPanel::Private::Private(EventPanel* q):
     setupEventSearch();
     setupBookmarkSearch();
     setupAnalyticsSearch();
+
+    connect(m_eventsTab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
+    connect(m_motionTab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
+    connect(m_bookmarksTab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
+    connect(m_analyticsTab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
+    connect(m_notificationsTab, &NotificationListWidget::tileHovered, q, &EventPanel::tileHovered);
 }
 
 EventPanel::Private::~Private()

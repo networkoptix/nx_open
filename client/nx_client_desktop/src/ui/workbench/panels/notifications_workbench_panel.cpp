@@ -21,11 +21,14 @@
 #include <ui/graphics/items/generic/blinking_image_widget.h>
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/notifications/notifications_collection_widget.h>
+#include <ui/graphics/items/notifications/notification_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/helper.h>
+#include <ui/style/nx_style_p.h>
 #include <ui/style/skin.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_pane_settings.h>
@@ -34,6 +37,7 @@
 #include <utils/common/scoped_value_rollback.h>
 
 #include <nx/client/desktop/event_search/widgets/event_panel.h>
+#include <nx/client/desktop/event_search/widgets/event_tile.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -43,6 +47,7 @@ namespace {
 
 static constexpr int kNarrowWidth = 280;
 static constexpr int kWideWidth = 430;
+static const QSize kToolTipMaxThumbnailSize(480, 480);
 
 class ResizerWidget: public QGraphicsWidget, public DragProcessHandler
 {
@@ -152,28 +157,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     if (nx::client::desktop::ini().unifiedEventPanel)
     {
         item->setVisible(false);
-        m_eventPanel.reset(new nx::client::desktop::EventPanel(context()));
-
-        // TODO: #vkutin Get rid of proxying.
-        auto eventPanelContainer = new QnMaskedProxyWidget(parentWidget);
-
-        auto eventPanelResizer = new ResizerWidget(item, eventPanelContainer);
-        auto dragProcessor = new DragProcessor(this);
-        dragProcessor->setHandler(eventPanelResizer);
-
-        connect(item, &QGraphicsWidget::geometryChanged, this,
-            [this, eventPanelContainer, eventPanelResizer]()
-            {
-                // Add 1-pixel shift for notification panel frame.
-                const auto newGeometry = item->geometry().adjusted(1, 0, 0, 0);
-                eventPanelContainer->setGeometry(newGeometry);
-                eventPanelResizer->setGeometry(0, 0, style::Metrics::kStandardPadding,
-                    eventPanelContainer->size().height());
-            });
-
-        // TODO: #vkutin Test which mode is faster.
-        //eventPanelContainer->setCacheMode(QGraphicsItem::NoCache);
-        eventPanelContainer->setWidget(m_eventPanel.data());
+        createEventPanel(parentWidget);
     }
 
     action(action::PinNotificationsAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
@@ -393,6 +377,70 @@ void NotificationsWorkbenchPanel::at_showingProcessor_hoverEntered()
 
     m_hidingProcessor->forceHoverEnter();
     m_opacityProcessor->forceHoverEnter();
+}
+
+void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget)
+{
+    using namespace nx::client::desktop;
+
+    m_eventPanel.reset(new EventPanel(context()));
+
+    // TODO: #vkutin Get rid of proxying.
+    auto eventPanelContainer = new QnMaskedProxyWidget(parentWidget);
+
+    auto eventPanelResizer = new ResizerWidget(item, eventPanelContainer);
+    auto dragProcessor = new DragProcessor(this);
+    dragProcessor->setHandler(eventPanelResizer);
+
+    connect(item, &QGraphicsWidget::geometryChanged, this,
+        [this, eventPanelContainer, eventPanelResizer]()
+        {
+            // Add 1-pixel shift for notification panel frame.
+            const auto newGeometry = item->geometry().adjusted(1, 0, 0, 0);
+            eventPanelContainer->setGeometry(newGeometry);
+            eventPanelResizer->setGeometry(0, 0, style::Metrics::kStandardPadding,
+                eventPanelContainer->size().height());
+        });
+
+    // TODO: #vkutin Test which mode is faster.
+    //eventPanelContainer->setCacheMode(QGraphicsItem::NoCache);
+    eventPanelContainer->setWidget(m_eventPanel.data());
+
+    connect(m_eventPanel.data(), &EventPanel::tileHovered, this,
+        [this](const QModelIndex& index, const EventTile* tile)
+        {
+            if (m_eventPanelToolTip)
+            {
+                auto animator = opacityAnimator(m_eventPanelToolTip, 2.0);
+                animator->animateTo(0.0);
+                connect(animator, &VariantAnimator::finished,
+                    m_eventPanelToolTip, &QObject::deleteLater);
+            }
+
+            if (!tile || !index.isValid())
+                return;
+
+            const auto parentWidget = m_eventPanel->graphicsProxyWidget();
+            const auto imageProvider = tile->preview();
+            const auto text = tile->toolTip().isEmpty() ? tile->title() : tile->toolTip();
+
+            const auto tilePos = (tile->rect().topLeft() + tile->rect().bottomLeft()) / 2;
+            const auto globalPos = QnHiDpiWorkarounds::safeMapToGlobal(tile, tilePos);
+            const auto tooltipPos = QnNxStylePrivate::mapFromGlobal(parentWidget, globalPos);
+
+            m_eventPanelToolTip = new QnNotificationToolTipWidget(parentWidget);
+            m_eventPanelToolTip->setOpacity(0.0);
+            m_eventPanelToolTip->setEnclosingGeometry(item->toolTipsEnclosingRect());
+            m_eventPanelToolTip->setMaxThumbnailSize(kToolTipMaxThumbnailSize);
+            m_eventPanelToolTip->setText(text);
+            m_eventPanelToolTip->setImageProvider(imageProvider);
+            m_eventPanelToolTip->setThumbnailVisible(imageProvider != nullptr);
+            m_eventPanelToolTip->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
+            m_eventPanelToolTip->updateTailPos();
+            m_eventPanelToolTip->pointTo(tooltipPos);
+
+            opacityAnimator(m_eventPanelToolTip, 2.0)->animateTo(1.0);
+        });
 }
 
 } //namespace NxUi

@@ -11,6 +11,7 @@ namespace desktop {
 
 class EventListModel;
 class EventRibbon;
+class EventTile;
 
 class NotificationListWidget: public QWidget
 {
@@ -23,6 +24,7 @@ public:
 
 signals:
     void unreadCountChanged(int count, QnNotificationLevel::Value importance);
+    void tileHovered(const QModelIndex& index, const EventTile* tile);
 
 private:
     class Private;

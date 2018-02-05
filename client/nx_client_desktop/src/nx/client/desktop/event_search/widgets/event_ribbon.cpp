@@ -2,6 +2,7 @@
 #include "private/event_ribbon_p.h"
 
 #include <QtWidgets/QScrollBar>
+#include <QtGui/QHoverEvent>
 
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
 
@@ -41,16 +42,32 @@ QSize EventRibbon::sizeHint() const
 
 bool EventRibbon::event(QEvent* event)
 {
-    if (event->type() != QEvent::Wheel)
-        return base_type::event(event);
+    switch (event->type())
+    {
+        case QEvent::Wheel:
+        {
+            // TODO: #vkutin Implement smooth animated scroll.
+            if (d->scrollBar()->isVisible())
+                d->scrollBar()->event(event);
 
-    // TODO: #vkutin Implement smooth animated scroll.
+            event->accept();
+            return true;
+        }
 
-    if (d->scrollBar()->isVisible())
-        d->scrollBar()->event(event);
+        case QEvent::HoverEnter:
+        case QEvent::HoverMove:
+            d->updateHover(true, static_cast<QHoverEvent*>(event)->pos());
+            break;
 
-    event->accept();
-    return true;
+        case QEvent::HoverLeave:
+            d->updateHover(false, QPoint());
+            break;
+
+        default:
+            break;
+    }
+
+    return base_type::event(event);
 }
 
 int EventRibbon::count() const

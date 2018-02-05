@@ -123,6 +123,8 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     setupTimeSelection();
 
     ui->areaButton->setIcon(qnSkin->icon(lit("text_buttons/area.png")));
+
+    connect(ui->ribbon, &EventRibbon::tileHovered, this, &UnifiedSearchWidget::tileHovered);
 }
 
 UnifiedSearchWidget::~UnifiedSearchWidget()

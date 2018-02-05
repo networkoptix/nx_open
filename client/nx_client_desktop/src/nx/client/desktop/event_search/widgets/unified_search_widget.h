@@ -25,6 +25,7 @@ namespace desktop {
 namespace ui { class SelectableTextButton; }
 
 class UnifiedAsyncSearchListModel;
+class EventTile;
 
 class UnifiedSearchWidget:
     public QWidget,
@@ -62,6 +63,9 @@ public:
     void setSelectedPeriod(Period value);
 
     void requestFetch();
+
+signals:
+    void tileHovered(const QModelIndex& index, const EventTile* tile);
 
 protected:
     virtual bool hasRelevantTiles() const;

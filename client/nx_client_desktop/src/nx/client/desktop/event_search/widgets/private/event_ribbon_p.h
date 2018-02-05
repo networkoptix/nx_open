@@ -3,6 +3,7 @@
 #include "../event_ribbon.h"
 
 #include <QtCore/QModelIndex>
+#include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QHash>
 #include <QtCore/QList>
@@ -16,8 +17,6 @@ class QVariantAnimation;
 namespace nx {
 namespace client {
 namespace desktop {
-
-class EventTile;
 
 class EventRibbon::Private: public QObject
 {
@@ -39,6 +38,8 @@ public:
 
     int unreadCount() const;
     QnNotificationLevel::Value highestUnreadImportance() const;
+
+    void updateHover(bool hovered, const QPoint& mousePos);
 
 private:
     void updateView(); //< Calls doUpdateView and emits q->unreadCountChanged if needed.
@@ -65,6 +66,7 @@ private:
     void showContextMenu(EventTile* tile, const QPoint& posRelativeToTile);
 
     int indexOf(EventTile* tile) const;
+    int indexAtPos(const QPoint& pos) const;
 
     // Creates a tile widget for a data model item using the following roles:
     //     Qt::UuidRole for unique id
@@ -95,6 +97,8 @@ private:
 
     QSet<EventTile*> m_visible;
     QHash<EventTile*, QnNotificationLevel::Value> m_unread;
+
+    QPointer<EventTile> m_hoveredTile;
 
     // Maps animation object to item index. Duplicate indices are allowed.
     // Animation objects are owned by EventRibbon::Private object.
