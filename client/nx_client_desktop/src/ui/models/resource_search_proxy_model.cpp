@@ -7,6 +7,7 @@
 #include <nx/utils/string.h>
 
 #include <utils/common/delayed.h>
+#include <ui/models/resource/resource_tree_model.h>
 
 QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject* parent):
     base_type(parent)
@@ -67,6 +68,10 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& sourceParent) const
 {
+    const auto model = qobject_cast<QnResourceTreeModel*>(sourceModel());
+    if (!model)
+        return false;
+
     const bool searchMode = !m_query.text.isEmpty();
     if (!searchMode && m_defaultBehavior != DefaultBehavior::showAll)
         return false;
@@ -77,7 +82,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         ? sourceParent.sibling(sourceParent.row(), Qn::NameColumn)
         : sourceParent;
 
-    QModelIndex index = sourceModel()->index(sourceRow, 0, root);
+    QModelIndex index = model->index(sourceRow, 0, root);
     if (!index.isValid())
         return true;
 
@@ -119,11 +124,12 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
             Qn::FilteredUsersNode,
             Qn::LocalResourcesNode});
 
-        if (searchGroupNodes.contains(nodeType) && allowedNode != -1 && allowedNode != nodeType)
+        if (allowedNode != -1 && allowedNode != nodeType && searchGroupNodes.contains(nodeType))
             return false; // Filter out all nodes except allowed one
 
         // We don't show servers and videowalls in case of search.
-        if (const auto resource = this->resource(index))
+        const auto resource = this->resource(index);
+        if (resource && model->scope() == QnResourceTreeModel::FullScope)
         {
             const auto parentNodeType = sourceParent.data(Qn::NodeTypeRole).value<Qn::NodeType>();
             if (parentNodeType != Qn::FilteredServersNode && resource->hasFlags(Qn::server))
@@ -150,7 +156,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
             break;
     }
 
-    const int childCount = sourceModel()->rowCount(index);
+    const int childCount = model->rowCount(index);
     const bool hasChildren = childCount > 0;
     if (hasChildren)
     {

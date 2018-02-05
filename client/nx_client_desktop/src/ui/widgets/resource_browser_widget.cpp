@@ -133,7 +133,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     m_thumbnailManager->setThumbnailSize(QSize(0, kMaxThumbnailSize.height()));
 
     m_resourceModel = new QnResourceTreeModel(QnResourceTreeModel::FullScope, this);
-    ui->resourceTreeWidget->setModel(m_resourceModel);
+    ui->resourceTreeWidget->setModel(m_resourceModel, true);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BypassGraphicsProxy);
     ui->resourceTreeWidget->setEditingEnabled();
@@ -923,7 +923,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged()
     if (auto synchronizer = layoutSynchronizer(layout, false))
         synchronizer->disableUpdates();
 
-    ui->searchTreeWidget->setModel(nullptr);
+    ui->searchTreeWidget->setModel(nullptr, true);
     setQuery({});
     killSearchTimer();
 }
@@ -979,7 +979,7 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index)
         layoutSynchronizer(layout, true); /* Just initialize the synchronizer. */
         auto model = layoutModel(layout, true);
 
-        ui->searchTreeWidget->setModel(model);
+        ui->searchTreeWidget->setModel(model, true);
         ui->searchTreeWidget->expandAll();
 
         /* View re-creates selection model for each model that is supplied to it,

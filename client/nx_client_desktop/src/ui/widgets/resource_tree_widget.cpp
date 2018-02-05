@@ -145,10 +145,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    if (ini().enableResourceFiltering)
-        initializeNewFilter();
-    else
-        initializeFilter();
+    initializeNewFilter();
+    initializeFilter();
 
     m_itemDelegate = new QnResourceItemDelegate(this);
     m_itemDelegate->setFixedHeight(0); // automatic height
@@ -177,9 +175,6 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
         this, &QnResourceTreeWidget::updateShortcutHintVisibility);
 
     ui->resourcesTreeView->installEventFilter(this);
-    static constexpr int kOldFilterPage = 0;
-    static constexpr int kNewFilterPage = 1;
-    ui->filter->setCurrentIndex(ini().enableResourceFiltering ? kNewFilterPage : kOldFilterPage);
     setFilterVisible(false);
 }
 
@@ -195,7 +190,7 @@ QAbstractItemModel *QnResourceTreeWidget::model() const
         : nullptr;
 }
 
-void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
+void QnResourceTreeWidget::setModel(QAbstractItemModel *model, bool allowNewSearch)
 {
     if (m_resourceProxyModel)
     {
@@ -226,10 +221,19 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
             &QnResourceTreeWidget::afterRecursiveOperation);
         expandNodeIfNeeded(QModelIndex());
 
-        if (ini().enableResourceFiltering)
+        static constexpr int kOldFilterPage = 0;
+        static constexpr int kNewFilterPageIndex = 1;
+        if (ini().enableResourceFiltering && allowNewSearch)
+        {
+            ui->filter->setCurrentIndex(kNewFilterPageIndex);
             updateNewFilter();
+        }
         else
+        {
+            ui->filter->setCurrentIndex(kOldFilterPage);
             updateOldFilter();
+        }
+
         updateColumns();
     }
     else
@@ -647,22 +651,22 @@ void QnResourceTreeWidget::initializeFilter()
         &QnResourceTreeWidget::updateOldFilter);
 
     installEventHandler(ui->oldFilterLineEdit, QEvent::KeyPress, this,
-            [this](QObject* /*object*/, QEvent* event)
+        [this](QObject* /*object*/, QEvent* event)
+        {
+            const auto keyEvent = static_cast<QKeyEvent*>(event);
+            switch (keyEvent->key())
             {
-                const auto keyEvent = static_cast<QKeyEvent*>(event);
-                switch (keyEvent->key())
-                {
-                    case Qt::Key_Enter:
-                    case Qt::Key_Return:
-                        if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
-                            emit filterCtrlEnterPressed();
-                        else
-                            emit filterEnterPressed();
-                        break;
-                    default:
-                        break;
-                }
-            });
+                case Qt::Key_Enter:
+                case Qt::Key_Return:
+                    if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
+                        emit filterCtrlEnterPressed();
+                    else
+                        emit filterEnterPressed();
+                    break;
+                default:
+                    break;
+            }
+        });
 }
 
 void QnResourceTreeWidget::initializeNewFilter()

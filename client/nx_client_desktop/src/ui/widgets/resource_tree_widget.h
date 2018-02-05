@@ -43,7 +43,7 @@ public:
     ~QnResourceTreeWidget();
 
     QAbstractItemModel *model() const;
-    void setModel(QAbstractItemModel *model);
+    void setModel(QAbstractItemModel *model, bool allowNewSearch);
 
     QSortFilterProxyModel* searchModel() const;
 
