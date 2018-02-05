@@ -141,6 +141,8 @@ std::string toString(char c)
 {
     if (!isAsciiPrintable(c))
         return format("'\\x%02X'", (unsigned char) c);
+    if (c == '\'')
+        return "'\\''";
     return std::string("'") + c + "'";
 }
 

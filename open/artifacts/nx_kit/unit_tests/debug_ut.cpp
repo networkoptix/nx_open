@@ -191,6 +191,25 @@ TEST(debug, disabledTime)
     NX_TIME_END(testTag);
 }
 
+TEST(debug, toString_char)
+{
+    ASSERT_STREQ("'C'", nx::kit::debug::toString('C'));
+    ASSERT_STREQ(R"('\'')", nx::kit::debug::toString('\''));
+    ASSERT_STREQ(R"('\xFF')", nx::kit::debug::toString('\xFF'));
+}
+
+TEST(debug, toString_char_ptr)
+{
+    ASSERT_STREQ("\"str\"", nx::kit::debug::toString("str"));
+    ASSERT_STREQ(R"("str\"with_quote")", nx::kit::debug::toString("str\"with_quote"));
+    ASSERT_STREQ(R"("str\\with_backslash")", nx::kit::debug::toString("str\\with_backslash"));
+    ASSERT_STREQ(R"("str\twith_tab")", nx::kit::debug::toString("str\twith_tab"));
+    ASSERT_STREQ(R"("str\nwith_newline")", nx::kit::debug::toString("str\nwith_newline"));
+    ASSERT_STREQ(R"("str\x7Fwith_127")", nx::kit::debug::toString("str\x7Fwith_127"));
+    ASSERT_STREQ(R"("str\x1Fwith_31")", nx::kit::debug::toString("str\x1Fwith_31"));
+    ASSERT_STREQ(R"("str\xFFwith_255")", nx::kit::debug::toString("str\xFFwith_255"));
+}
+
 /**
  * Call debug::pathSeparator(), converting its argument to use platform-dependent
  * slashes, and its result to use forward slashes.
