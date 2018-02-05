@@ -416,9 +416,9 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     }
 
     if (unreadCount() != oldUnreadCount)
-        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance());
+        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance(), PrivateSignal());
 
-    emit q->countChanged(m_tiles.size());
+    emit q->countChanged(m_tiles.size(), PrivateSignal());
 }
 
 void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMode)
@@ -480,9 +480,9 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
     doUpdateView();
 
     if (unreadCount() != oldUnreadCount)
-        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance());
+        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance(), PrivateSignal());
 
-    emit q->countChanged(m_tiles.size());
+    emit q->countChanged(m_tiles.size(), PrivateSignal());
 }
 
 void EventRibbon::Private::clear()
@@ -506,9 +506,9 @@ void EventRibbon::Private::clear()
     q->updateGeometry();
 
     if (hadUnreadTiles)
-        emit q->unreadCountChanged(0, QnNotificationLevel::Value::NoNotification);
+        emit q->unreadCountChanged(0, QnNotificationLevel::Value::NoNotification, PrivateSignal());
 
-    emit q->countChanged(m_tiles.size());
+    emit q->countChanged(m_tiles.size(), PrivateSignal());
 }
 
 void EventRibbon::Private::clearShiftAnimations()
@@ -588,7 +588,7 @@ void EventRibbon::Private::updateView()
     doUpdateView();
 
     if (unreadCount() != oldUnreadCount)
-        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance());
+        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance(), PrivateSignal());
 }
 
 void EventRibbon::Private::doUpdateView()

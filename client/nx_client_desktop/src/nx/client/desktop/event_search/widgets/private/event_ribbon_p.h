@@ -22,6 +22,7 @@ class EventTile;
 class EventRibbon::Private: public QObject
 {
     Q_OBJECT
+    using PrivateSignal = EventRibbon::QPrivateSignal;
 
 public:
     Private(EventRibbon* q);

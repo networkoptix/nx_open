@@ -35,8 +35,9 @@ public:
     int unreadCount() const;
 
 signals:
-    void countChanged(int count);
-    void unreadCountChanged(int unreadCount, QnNotificationLevel::Value importance);
+    void countChanged(int count, QPrivateSignal);
+    void unreadCountChanged(int unreadCount, QnNotificationLevel::Value importance, QPrivateSignal);
+    void itemHovered(const QModelIndex& index, const QRect& rect, QPrivateSignal);
 
 protected:
     virtual bool event(QEvent* event) override;
