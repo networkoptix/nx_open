@@ -12,7 +12,7 @@ from test_utils.utils import wait_until
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
-    from ConfigParser import ConfigParser
+    from ConfigParser import SafeConfigParser as ConfigParser
     # noinspection PyCompatibility,PyUnresolvedReferences
     from cStringIO import StringIO as BytesIO
 elif sys.version_info[:2] in {(3, 5), (3, 6)}:
