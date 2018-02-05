@@ -35,6 +35,8 @@ angular.module('cloudApp')
                         // send to registration form with the code
                         $location.path('/register/' + code);
                     }
+                },function(){
+                    // Wrong activation code or some error - do nothing, keep user on this page
                 });
             }
 

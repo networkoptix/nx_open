@@ -42,7 +42,6 @@ Sharing link for anonymous - first ask login, then show share dialog
     Log in to Auto Tests System    ${email}
     ${location}    Get Location
     Log Out
-    Validate Log Out
     Go To    ${location}/share
     Log In    ${email}    ${password}    button=None
     Wait Until Element Is Visible    ${SHARE MODAL}

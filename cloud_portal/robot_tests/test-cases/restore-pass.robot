@@ -149,7 +149,27 @@ should allow logged in user visit restore password page
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Close Browser
 
-#should log user out if he visits restore password link from email
+should prompt log user out if he visits restore password link from email
+    ${email}    Get Random Email
+    Open Browser and go to URL    ${url}/register
+    Register    mark    hamill    ${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}
+    Validate Log In
+    Go To    ${url}/restore_password
+    Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
+    Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
+    Click Button    ${RESET PASSWORD BUTTON}
+    ${link}    Get Reset Password Link    ${email}
+    Go To    ${link}
+    Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
+    Click Button    ${LOGGED IN CONTINUE BUTTON}
+    Validate Log In
+    Go To    ${link}
+    Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
+    Click Button    ${LOGGED IN LOG OUT BUTTON}
+    Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
+    Close Browser
 
 should handle click I forgot my password link at restore password page
     Open Browser and go to URL    ${url}/restore_password
