@@ -38,12 +38,12 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Analytics::EventTypeFlag)
 
 bool operator==(const Analytics::EventType& lh, const Analytics::EventType& rh);
 
+QN_FUSION_DECLARE_FUNCTIONS(Analytics::EventType, (json))
+
 } // namespace api
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::api::Analytics::EventType, (json))
-
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (nx::api::Analytics::EventTypeFlag)
-     (nx::api::Analytics::EventTypeFlags),
+    (nx::api::Analytics::EventTypeFlags),
     (metatype)(numeric)(lexical))
