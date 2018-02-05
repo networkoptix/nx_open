@@ -6,7 +6,7 @@ import uuid
 from test_utils.build_info import customization_from_company_name
 from .os_access import SshAccessConfig, host_from_config
 from .server import Server
-from .service import MEDIASERVER_DIR, ManualService, SERVER_CTL_TARGET_PATH
+from .service import MEDIASERVER_DIR, AdHocService, SERVER_CTL_TARGET_PATH
 from .server_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, ServerInstallation
 from .template_renderer import TemplateRenderer
 from .utils import is_list_inst
@@ -147,7 +147,7 @@ class PhysicalInstallationHost(object):
                 return None
         server_port = self._installation_server_port(self._installations.index(installation))
         rest_api_url = '%s://%s:%d/' % (config.http_schema, self.os_access.hostname, server_port)
-        service = ManualService(self.os_access, installation.dir)
+        service = AdHocService(self.os_access, installation.dir)
         server = Server(config.name, self.os_access, service, installation, rest_api_url, self._ca,
                         rest_api_timeout=config.rest_api_timeout, internal_ip_port=server_port)
         self._allocated_server_list.append(server)
@@ -188,7 +188,7 @@ class PhysicalInstallationHost(object):
 
     def _ensure_servers_are_stopped(self):
         for installation in self._installations:
-            service = ManualService(self.os_access, installation.dir)
+            service = AdHocService(self.os_access, installation.dir)
             if service.get_state():
                 service.set_state(is_started=False)
 
