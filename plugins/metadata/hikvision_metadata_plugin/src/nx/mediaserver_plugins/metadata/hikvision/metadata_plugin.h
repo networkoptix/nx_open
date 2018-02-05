@@ -46,6 +46,8 @@ public:
 
     const Hikvision::DriverManifest& driverManifest() const;
 
+    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
+
 private:
     boost::optional<QList<QnUuid>> fetchSupportedEvents(
         const nx::sdk::CameraInfo& cameraInfo);

@@ -47,6 +47,8 @@ public:
         return m_identifiedSupportedEvents;
     }
 
+    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
+
 private:
     // QByteArray m_deviceManifestPartial; //< Guids only - for test purposes.
     QByteArray m_deviceManifestFull; //< Guids and description.

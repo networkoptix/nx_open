@@ -28,6 +28,9 @@ protected:
      */
     std::string getParamValue(const char* paramName);
 
+    /** Enable or disable verbose debug output via NX_OUTPUT from methods of this class. */
+    void setEnableOutput(bool value) { m_enableOutput = value; }
+
 public:
     virtual ~CommonPlugin() override;
 
@@ -40,10 +43,11 @@ public:
     virtual void setSettings(const nxpl::Setting* settings, int count) override;
     virtual void setPluginContainer(nxpl::PluginInterface* pluginContainer) override;
     virtual void setLocale(const char* locale) override;
-
+    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
     virtual const char* capabilitiesManifest(Error* error) const override;
 
 private:
+    bool m_enableOutput = false;
     const char* const m_name;
     std::map<std::string, std::string> m_settings;
     mutable std::string m_manifest; //< Cache the manifest to guarantee a lifetime for char*.

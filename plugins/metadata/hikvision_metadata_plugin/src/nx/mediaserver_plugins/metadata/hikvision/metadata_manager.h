@@ -24,7 +24,8 @@ class MetadataManager:
     public QObject,
     public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 {
-    Q_OBJECT;
+    Q_OBJECT
+
 public:
     MetadataManager(MetadataPlugin* plugin);
 
@@ -33,8 +34,7 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nxpl::NX_GUID* typeList,
-        int typeListSize) override;
+        nxpl::NX_GUID* typeList, int typeListSize) override;
 
     virtual nx::sdk::Error setHandler(nx::sdk::metadata::MetadataHandler* handler) override;
 
@@ -47,6 +47,8 @@ public:
     void setCameraInfo(const nx::sdk::CameraInfo& cameraInfo);
     void setDeviceManifest(const QByteArray& manifest);
     void setDriverManifest(const Hikvision::DriverManifest& manifest);
+    void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
+
 private:
     Hikvision::DriverManifest m_driverManifest;
     QByteArray m_deviceManifest;

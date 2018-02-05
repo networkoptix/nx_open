@@ -53,9 +53,12 @@ nx::sdk::Error Manager::setHandler(MetadataHandler* handler)
     return Error::noError;
 }
 
-Error Manager::startFetchingMetadata(
-    nxpl::NX_GUID* /*typeList*/,
-    int /*typeListSize*/)
+void Manager::setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+{
+    // There are no Manager settings for this plugin.
+}
+
+Error Manager::startFetchingMetadata(nxpl::NX_GUID* /*typeList*/, int /*typeListSize*/)
 {
     const auto monitorHandler =
         [this](const EventList& events)

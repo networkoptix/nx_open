@@ -1,4 +1,4 @@
-﻿#include "plugin.h"
+#include "plugin.h"
 
 #include <array>
 #include <fstream>
@@ -87,6 +87,10 @@ const char* Plugin::name() const
 }
 
 void Plugin::setSettings(const nxpl::Setting* settings, int count)
+{
+}
+
+void Plugin::setDeclaredSettings(const nxpl::Setting* settings, int count)
 {
 }
 

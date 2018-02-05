@@ -10,7 +10,7 @@ namespace stub {
 class Plugin: public sdk::metadata::CommonPlugin
 {
 public:
-    Plugin(): CommonPlugin("Stub metadata plugin") {}
+    Plugin();
 
     virtual nx::sdk::metadata::CameraManager* obtainCameraManager(
         const nx::sdk::CameraInfo& cameraInfo, nx::sdk::Error* outError) override;

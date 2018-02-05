@@ -68,6 +68,11 @@ nx::sdk::Error Manager::setHandler(nx::sdk::metadata::MetadataHandler* handler)
     return nx::sdk::Error::noError;
 }
 
+void Manager::setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+{
+    // There are no Manager settings for this plugin.
+}
+
 nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* typeList, int typeListSize)
 {
     m_monitor = new Monitor(this, m_url, m_auth, m_handler);

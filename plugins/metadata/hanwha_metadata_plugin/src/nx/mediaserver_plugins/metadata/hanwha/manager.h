@@ -46,6 +46,8 @@ public:
 
     void setMonitor(MetadataMonitor* monitor);
 
+    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
+
 private:
     Hanwha::DriverManifest m_driverManifest;
     QByteArray m_deviceManifest;

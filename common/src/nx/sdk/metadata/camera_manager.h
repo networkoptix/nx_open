@@ -28,17 +28,6 @@ public:
      * @param metadata Incoming from the plugin.
      */
     virtual void handleMetadata(Error error, MetadataPacket* metadata) = 0;
-
-    /**
-     * Reads a parameter value from the manager settings stored by the server.
-     * @param paramName Unique id of the parameter as a nul-terminated utf-8 string.
-     * @param valueBufSize In-out parameter. Should be set by the caller to the size available in
-     *     the buffer including nul-terminator, and if this size is not enough, will be set to the
-     *     size required to accomodate the string.
-     * @return NX_NO_ERROR on success, NX_UNKNOWN_PARAMETER if paramName is unknown, or
-     *     NX_MORE_DATA if *valueBufSize is too small.
-     */
-    virtual int getParamValue(const char* paramName, char* valueBuf, int* valueBufSize) const = 0;
 };
 
 /**
@@ -87,9 +76,9 @@ public:
      * First contains only event guids. Valid example:
      * {
      *     "supportedEventTypes":
-	 *     [
-	 *         "{b37730fe-3e2d-9eb7-bee0-7732877ec61f}",
-	 *         "{f83daede-7fae-6a51-2e90-69017dadfd62}",
+     *     [
+     *         "{b37730fe-3e2d-9eb7-bee0-7732877ec61f}",
+     *         "{f83daede-7fae-6a51-2e90-69017dadfd62}",
      *     ]
      * }
      * Second contains guids and descriptions. Valid example:
@@ -114,6 +103,14 @@ public:
      * by "data" is no longer needed and may be disposed
      */
     virtual void freeManifest(const char* data) = 0;
+
+    /**
+     * Called before other methods. Server provides the set of settings stored in its database for
+     * the combination of a resource instance and a plugin type.
+     * @param settings Values of settings declared in the manifest. The pointer is valid only
+     *     during the call.
+     */
+    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) = 0;
 };
 
 } // namespace metadata

@@ -1,5 +1,6 @@
 #include "common_plugin.h"
 
+#define NX_DEBUG_ENABLE_OUTPUT m_enableOutput
 #define NX_PRINT_PREFIX (std::string("[") + m_name + "] ")
 #include <nx/kit/debug.h>
 
@@ -62,10 +63,24 @@ const char* CommonPlugin::name() const
     return m_name;
 }
 
-void CommonPlugin::setSettings(const nxpl::Setting* settings, int count)
+void CommonPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 {
+   // TODO: Here roSettings are passed from Server. Currently, they are not used by metadata
+   // plugins, thus, do nothing.
+}
+
+void CommonPlugin::setDeclaredSettings(const nxpl::Setting* settings, int count)
+{
+    NX_OUTPUT << "Received Plugin settings:";
+    NX_OUTPUT << "{";
     for (int i = 0; i < count; ++i)
+    {
         m_settings[settings[i].name] = settings[i].value;
+        NX_OUTPUT << "    " << nx::kit::debug::toString(settings[i].name)
+            << ": " << nx::kit::debug::toString(settings[i].value)
+            << ((i < count - 1) ? "," : "");
+    }
+    NX_OUTPUT << "}";
 }
 
 void CommonPlugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)

@@ -65,6 +65,13 @@ private:
 
     PluginList availablePlugins() const;
 
+    void loadSettingsFromFile(std::vector<nxpl::Setting>* settings, const char* filename);
+
+    void setManagerDeclaredSettings(
+        sdk::metadata::CameraManager* manager, const QnSecurityCamResourcePtr& camera);
+
+    void setPluginDeclaredSettings(sdk::metadata::Plugin* plugin);
+
     void createCameraManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera);
 
     nx::sdk::metadata::CameraManager* createCameraManager(

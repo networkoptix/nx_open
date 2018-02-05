@@ -103,6 +103,21 @@ void CommonVideoFrameProcessingCameraManager::freeManifest(const char* data)
     delete[] data;
 }
 
+void CommonVideoFrameProcessingCameraManager::setDeclaredSettings(
+    const nxpl::Setting* settings, int count)
+{
+    NX_OUTPUT << "Received CameraManager settings:";
+    NX_OUTPUT << "{";
+    for (int i = 0; i < count; ++i)
+    {
+        m_settings[settings[i].name] = settings[i].value;
+        NX_OUTPUT << "    \"" << nx::kit::debug::toString(settings[i].name)
+            << "\": \"" << nx::kit::debug::toString(settings[i].value) << "\""
+            << ((i < count - 1) ? "," : "");
+    }
+    NX_OUTPUT << "}";
+}
+
 //-------------------------------------------------------------------------------------------------
 // Tools for the derived class.
 
@@ -116,46 +131,7 @@ void CommonVideoFrameProcessingCameraManager::pushMetadataPacket(
 // TODO: Consider making a template with param type, checked according to the manifest.
 std::string CommonVideoFrameProcessingCameraManager::getParamValue(const char* paramName)
 {
-    if (!m_handler)
-    {
-        NX_PRINT << __func__ << "(): INTERNAL ERROR: Handler was not set.";
-        return "";
-    }
-
-    static const int kInitialValueSize = 1000;
-    std::string value;
-    value.resize(kInitialValueSize);
-    int size = (int) value.size();
-    switch (m_handler->getParamValue(paramName, &value[0], &size))
-    {
-        case NX_UNKNOWN_PARAMETER:
-            NX_PRINT << "ERROR: Manager requested unknown settings param [" << paramName << "].";
-            return "";
-
-        case NX_MORE_DATA:
-        {
-            value.resize(size);
-            auto r =  m_handler->getParamValue(paramName, &value[0], &size);
-            if (r != NX_NO_ERROR)
-            {
-                NX_PRINT << "INTERNAL ERROR: m_handler->getParamValue() failed (" << r
-                    << ") when supplied the previously returned size " << size
-                    << " for param [" << paramName << "].";
-                return "";
-            }
-            break;
-        }
-
-        case NX_NO_ERROR:
-            break;
-
-        default:
-            NX_PRINT << __func__ << "INTERNAL ERROR";
-            return "";
-    }
-
-    value.resize(strlen(value.c_str())); //< Strip unused allocated bytes.
-    return value;
+    return m_settings[paramName];
 }
 
 } // namespace metadata

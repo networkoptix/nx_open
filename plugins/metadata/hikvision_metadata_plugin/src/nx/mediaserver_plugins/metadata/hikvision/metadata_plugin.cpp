@@ -102,6 +102,11 @@ void MetadataPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*
     // Do nothing.
 }
 
+void MetadataPlugin::setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+{
+    // Do nothing.
+}
+
 void MetadataPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
     // Do nothing.

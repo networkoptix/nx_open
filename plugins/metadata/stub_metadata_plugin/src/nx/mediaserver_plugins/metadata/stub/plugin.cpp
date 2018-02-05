@@ -1,5 +1,8 @@
 #include "plugin.h"
 
+#define NX_DEBUG_ENABLE_OUTPUT true //< Stub plugin is itself a debug feature, thus is verbose.
+#include <nx/kit/debug.h>
+
 #include "camera_manager.h"
 
 namespace nx {
@@ -9,6 +12,11 @@ namespace stub {
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
+
+Plugin::Plugin(): CommonPlugin("Stub metadata plugin")
+{
+    setEnableOutput(NX_DEBUG_ENABLE_OUTPUT); //< Base class is verbose when this descendant is.
+}
 
 nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
     const CameraInfo& /*cameraInfo*/, Error* /*outError*/)
@@ -42,7 +50,8 @@ std::string Plugin::capabilitiesManifest() const
                     "typeId": ")json" + kObjectInTheAreaEventGuidStr + R"json(",
                     "name": {
                         "value": "Object in the area"
-                    }
+                    },
+                    "flags": "stateDependent|regionDependent"
                 }
             ],
             "outputObjectTypes": [
@@ -61,33 +70,38 @@ std::string Plugin::capabilitiesManifest() const
             ],
             "capabilities": "needDeepCopyForMediaFrame",
             "parameters": {
-                "params": [
-                    {
-                        "id": "paramAId",
-                        "dataType": "Number",
-                        "name": "Param A",
-                        "description": "Number A"
-                    },
-                    {
-                        "id": "paramBId",
-                        "dataType": "Enumeration",
-                        "range": "b1,b3",
-                        "name": "Param B",
-                        "description": "Enumeration B"
-                    }
-                ],
                 "groups": [
                     {
-                        "name": "Group name",
                         "params": [
                             {
-                                "id": "paramInAGroup",
-                                "dataType": "String",
-                                "name": "Some string",
-                                "description": "Some string param in a group"
+                                "id": "paramAId",
+                                "dataType": "Number",
+                                "name": "Param A",
+                                "description": "Number A"
+                            },
+                            {
+                                "id": "paramBId",
+                                "dataType": "Enumeration",
+                                "range": "b1,b3",
+                                "name": "Param B",
+                                "description": "Enumeration B"
                             }
                         ],
                         "groups": [
+                            {
+                                "id": "groupA"
+                                "name": "Group name",
+                                "params": [
+                                    {
+                                        "id": "groupA.paramA",
+                                        "dataType": "String",
+                                        "name": "Some string",
+                                        "description": "Some string param in a group"
+                                    }
+                                ],
+                                "groups": [
+                                ]
+                            }
                         ]
                     }
                 ]

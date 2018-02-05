@@ -37,16 +37,22 @@ public:
      * @return pointer to object that implements CameraManager interface
      * or nullptr in case of failure.
      */
-    virtual CameraManager* obtainCameraManager(
-        const CameraInfo& cameraInfo,
-        Error* outError) = 0;
+    virtual CameraManager* obtainCameraManager(const CameraInfo& cameraInfo, Error* outError) = 0;
 
     /**
-     * @brief provides null terminated UTF8 string containing json manifest
+     * @brief provides null terminated UTF-8 string containing json manifest
      * according to nx_metadata_plugin_manifest.schema.json.
      * @return pointer to c-style string which MUST be valid till plugin object exists
      */
     virtual const char* capabilitiesManifest(Error* error) const = 0;
+
+    /**
+     * Called before other methods. Server provides the set of settings stored in its database for
+     * the plugin type.
+     * @param settings Values of settings declared in the manifest. The pointer is valid only
+     *     during the call.
+     */
+    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) = 0;
 };
 
 typedef nxpl::PluginInterface* (*CreateNxMetadataPluginProc)();

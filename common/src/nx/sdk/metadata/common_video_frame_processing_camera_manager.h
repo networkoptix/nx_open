@@ -91,11 +91,13 @@ public:
     virtual Error stopFetchingMetadata() override;
     virtual const char* capabilitiesManifest(Error* error) override;
     virtual void freeManifest(const char* data) override;
+    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
 
 private:
     bool m_enableOutput = false;
     Plugin* m_plugin;
     MetadataHandler* m_handler = nullptr;
+    std::map<std::string, std::string> m_settings;
 };
 
 } // namespace metadata

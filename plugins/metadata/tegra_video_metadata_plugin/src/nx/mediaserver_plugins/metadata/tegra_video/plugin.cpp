@@ -1,7 +1,9 @@
 #include "plugin.h"
 
+#include <nx/kit/debug.h>
 #include <plugins/plugin_tools.h>
 
+#include "tegra_video_metadata_plugin_ini.h"
 #include "camera_manager.h"
 
 namespace nx {
@@ -11,6 +13,11 @@ namespace tegra_video {
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
+
+Plugin::Plugin(): CommonPlugin("Tegra Video metadata plugin")
+{
+    setEnableOutput(NX_DEBUG_ENABLE_OUTPUT); //< Base class is verbose when this descendant is.
+}
 
 nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
     const CameraInfo& /*cameraInfo*/, Error* /*outError*/)

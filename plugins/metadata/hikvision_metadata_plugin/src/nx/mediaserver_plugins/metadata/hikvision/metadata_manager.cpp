@@ -42,6 +42,11 @@ void* MetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
+void MetadataManager::setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+{
+    // There are no Manager settings for this plugin.
+}
+
 nx::sdk::Error MetadataManager::setHandler(nx::sdk::metadata::MetadataHandler* handler)
 {
     m_handler = handler;
