@@ -1,7 +1,4 @@
-"""Mediaserver presentation class
-
-Allow working with servers from functional tests: start/stop, setup, configure, access rest api, storage, etc...
-"""
+"""Work with mediaserver as single entity: start/stop, setup, configure, access HTTP api, storage, etc..."""
 
 import base64
 import datetime

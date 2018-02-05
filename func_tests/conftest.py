@@ -115,7 +115,7 @@ def run_options(request):
         vm_ssh_host_config = None
     bin_dir = request.config.getoption('--bin-dir').expanduser()
     assert bin_dir, 'Argument --bin-dir is required'
-    deb = Deb(bin_dir / request.config.getoption('--mediaserver-dist-path'))
+    mediaserver_deb = Deb(bin_dir / request.config.getoption('--mediaserver-dist-path'))
     autotest_email_password = request.config.getoption('--autotest-email-password') or os.environ.get('AUTOTEST_EMAIL_PASSWORD')
     tests_config = TestsConfig.merge_config_list(
         request.config.getoption('--tests-config-file'),
@@ -127,7 +127,7 @@ def run_options(request):
         autotest_email_password=autotest_email_password,
         work_dir=request.config.getoption('--work-dir').expanduser(),
         bin_dir=bin_dir,
-        deb=deb,
+        mediaserver_deb=mediaserver_deb,
         media_sample_path=request.config.getoption('--media-sample-path'),
         media_stream_path=request.config.getoption('--media-stream-path'),
         reset_servers=not request.config.getoption('--no-servers-reset'),
@@ -201,7 +201,7 @@ def metrics_saver(junk_shop_repository):
 
 @pytest.fixture(scope='session')
 def customization_company_name(run_options):
-    company_name = run_options.deb.customization.company_name
+    company_name = run_options.mediaserver_deb.customization.company_name
     log.info('Customization company name: %r', company_name)
     return company_name
 
@@ -244,7 +244,7 @@ def physical_installation_ctl(run_options, init_logging, customization_company_n
     if not run_options.tests_config:
         return None
     pic = PhysicalInstallationCtl(
-        run_options.deb.path,
+        run_options.mediaserver_deb.path,
         customization_company_name,
         run_options.tests_config.physical_installation_host_list,
         CA(run_options.work_dir / 'ca'),
@@ -262,7 +262,7 @@ def server_factory(run_options, init_logging, artifact_factory,
         cloud_host,
         vm_factory,
         physical_installation_ctl,
-        run_options.deb,
+        run_options.mediaserver_deb,
         CA(run_options.work_dir / 'ca'),
         )
     yield server_factory
