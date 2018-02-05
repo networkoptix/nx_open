@@ -7,7 +7,7 @@
 #include <plugins/plugin_internal_tools.h> //< nxpt::fromQnUuidToPluginGuid
 
 #include <nx/sdk/metadata/common_event.h>
-#include <nx/sdk/metadata/common_events_metadata_packet.h>
+#include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/api/analytics/device_manifest.h>
 
 #include "nx/vca/camera_controller.h"

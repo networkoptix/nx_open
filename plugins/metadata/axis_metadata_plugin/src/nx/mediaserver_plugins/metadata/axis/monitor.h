@@ -9,7 +9,7 @@
 
 #include <nx/sdk/metadata/camera_manager.h>
 #include <nx/sdk/metadata/common_event.h>
-#include <nx/sdk/metadata/common_events_metadata_packet.h>
+#include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/http/test_http_server.h>
