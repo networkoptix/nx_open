@@ -32,19 +32,21 @@ QString HanwhaStringHelper::buildDescription(
     Hanwha::EventItemType eventItemType,
     bool isActive)
 {
+    using namespace nx::api;
+
     const auto descriptor = manifest.eventDescriptorById(eventTypeId);
     auto description = descriptor.description;
     if (description.isEmpty())
         return QString();
 
-    if (descriptor.flags.testFlag(Hanwha::EventTypeFlag::stateDependent))
+    if (descriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
     {
         auto stateStr = isActive ? descriptor.positiveState : descriptor.negativeState;
         if (!stateStr.isEmpty())
             description = description.arg(stateStr);
     }
 
-    if (descriptor.flags.testFlag(Hanwha::EventTypeFlag::regionDependent))
+    if (descriptor.flags.testFlag(Analytics::EventTypeFlag::regionDependent))
     {
         auto regionStr = descriptor.regionDescription.arg(eventRegion ? *eventRegion : 0);
         description = description.arg(regionStr);

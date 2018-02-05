@@ -91,12 +91,12 @@ void FilterChain::prepareForImage(const QnMediaResourcePtr& resource,
 bool FilterChain::isImageTranscodingRequired(const QSize& fullImageResolution,
     const QSize& resolutionLimit) const
 {
-    return isTranscodingRequested()
+    return isTranscodingRequired()
         || fullImageResolution.width() > resolutionLimit.width()
         || fullImageResolution.height() > resolutionLimit.height();
 }
 
-bool FilterChain::isTranscodingRequested() const
+bool FilterChain::isTranscodingRequired() const
 {
     //TODO: #GDM #3.2 Remove when legacy will gone.
     if (!m_legacyFilters.empty())
@@ -127,7 +127,7 @@ bool FilterChain::isTranscodingRequired(const QnMediaResourcePtr& resource) cons
     QnConstResourceVideoLayoutPtr layout = resource ? resource->getVideoLayout() : QnConstResourceVideoLayoutPtr();
     if (layout && layout->channelCount() > 1)
         return true;
-    return isTranscodingRequested();
+    return isTranscodingRequired();
 }
 
 bool FilterChain::isDownscaleRequired(const QSize& srcResolution) const

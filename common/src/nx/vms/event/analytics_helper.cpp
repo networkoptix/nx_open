@@ -37,7 +37,7 @@ public:
     {}
 
     void addUnique(const nx::api::AnalyticsDriverManifest& manifest,
-        const nx::api::AnalyticsEventType& eventType)
+        const nx::api::Analytics::EventType& eventType)
     {
         AnalyticsEventTypeId id{manifest.driverId, eventType.eventTypeId};
         if (keys.contains(id))
