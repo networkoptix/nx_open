@@ -79,7 +79,7 @@ Error MetadataManager::startFetchingMetadata(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
 
                 packet->setDurationUsec(-1);
-                packet->addEvent(event);
+                packet->addItem(event);
             }
 
             m_handler->handleMetadata(Error::noError, packet);
