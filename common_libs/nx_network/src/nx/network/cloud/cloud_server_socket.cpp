@@ -316,7 +316,7 @@ void CloudServerSocket::startAcceptor(
             }
             else
             {
-                NX_INFO(this, lm("Cloud connection (session %1) from %2 has not been accepted with error %3. Info %4")
+                NX_DEBUG(this, lm("Cloud connection (session %1) from %2 has not been accepted with error %3. Info %4")
                     .args(acceptorPtr->connectionId(), acceptorPtr->remotePeerId(),
                         SystemError::toString(code), acceptorPtr->toString()));
             }

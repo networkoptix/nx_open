@@ -260,11 +260,11 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupPostProcess()
     {
         m_speexPreprocess = speex_preprocess_state_init(m_owner->m_audioCodecCtx->frame_size * m_owner->m_audioCodecCtx->channels, m_owner->m_audioCodecCtx->sample_rate);
         int denoiseEnabled = 1;
-        int agcEnabled = 1;
-        float agcLevel = 16000;
         speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_DENOISE, &denoiseEnabled);
-        speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_AGC, &agcEnabled);
-        speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_AGC_LEVEL, &agcLevel);
+
+        int gainLevel = 16;
+        speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_AGC_INCREMENT, &gainLevel);
+        speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_AGC_MAX_GAIN, &gainLevel);
     }
     return true;
 }
