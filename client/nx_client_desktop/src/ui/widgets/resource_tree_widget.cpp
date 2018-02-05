@@ -35,11 +35,28 @@
 
 #include <nx/utils/app_info.h>
 
+#include <ini.h>
+
 // -------------------------------------------------------------------------- //
 // QnResourceTreeSortProxyModel
 // -------------------------------------------------------------------------- //
 
 using namespace nx::client::desktop;
+
+namespace {
+
+void setFlag(QWidget* widget, int flag, bool value)
+{
+    auto flags = widget->windowFlags();
+    if (value)
+        flags |= Qt::BypassGraphicsProxyWidget;
+    else
+        flags & ~Qt::BypassGraphicsProxyWidget;
+
+    widget->setWindowFlags(flags);
+}
+
+} // namespace
 
 class QnResourceTreeSortProxyModel: public QnResourceSearchProxyModel
 {
@@ -128,7 +145,10 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    initializeFilter();
+    if (ini().enableResourceFiltering)
+        initializeNewFilter();
+    else
+        initializeFilter();
 
     m_itemDelegate = new QnResourceItemDelegate(this);
     m_itemDelegate->setFixedHeight(0); // automatic height
@@ -156,8 +176,10 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     connect(ui->resourcesTreeView, &QnTreeView::verticalScrollbarVisibilityChanged,
         this, &QnResourceTreeWidget::updateShortcutHintVisibility);
 
-
     ui->resourcesTreeView->installEventFilter(this);
+    static constexpr int kOldFilterPage = 0;
+    static constexpr int kNewFilterPage = 1;
+    ui->filter->setCurrentIndex(ini().enableResourceFiltering ? kNewFilterPage : kOldFilterPage);
     setFilterVisible(false);
 }
 
@@ -204,7 +226,10 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
             &QnResourceTreeWidget::afterRecursiveOperation);
         expandNodeIfNeeded(QModelIndex());
 
-        updateFilter();
+        if (ini().enableResourceFiltering)
+            updateNewFilter();
+        else
+            updateOldFilter();
         updateColumns();
     }
     else
@@ -339,17 +364,11 @@ void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags)
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, QVariant());
     */
 
-    if (flags & Qn::BypassGraphicsProxy)
-    {
-        ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
-        ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
-    }
-    else
-    {
-        ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() &~Qt::BypassGraphicsProxyWidget);
-        ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() &~Qt::BypassGraphicsProxyWidget);
-    }
-
+    const bool setBypassFlag = flags & Qn::BypassGraphicsProxy;
+    const auto widgets = QList<QWidget*>(
+        {ui->resourcesTreeView, ui->oldFilterLineEdit, ui->newFilterLineEdit});
+    for (const auto widget: widgets)
+        setFlag(widget, Qn::BypassGraphicsProxy, setBypassFlag);
 }
 
 Qn::GraphicsTweaksFlags QnResourceTreeWidget::graphicsTweaks()
@@ -451,16 +470,30 @@ void QnResourceTreeWidget::updateColumns()
 
 void QnResourceTreeWidget::updateShortcutHintVisibility()
 {
-
-    const bool hasFilterText = !ui->filterLineEdit->text().trimmed().isEmpty();
+    const bool hasFilterText = !ui->newFilterLineEdit->text().trimmed().isEmpty();
     const bool hiddenScrollBar = !ui->resourcesTreeView->verticalScrollBarIsVisible();
 
-    ui->shortcutHintWidget->setVisible(hasFilterText && hiddenScrollBar);
+    const bool hintIsVisible = ini().enableResourceFiltering && hasFilterText && hiddenScrollBar;
+    ui->shortcutHintWidget->setVisible(hintIsVisible);
 }
 
-void QnResourceTreeWidget::updateFilter()
+void QnResourceTreeWidget::updateOldFilter()
 {
-    const auto filterEdit = ui->filterLineEdit;
+    QString filter = ui->oldFilterLineEdit->text();
+
+    /* Don't allow empty filters. */
+    if (!filter.isEmpty() && filter.trimmed().isEmpty())
+    {
+        ui->oldFilterLineEdit->clear(); /* Will call into this slot again, so it is safe to return. */
+        return;
+    }
+
+    m_resourceProxyModel->setQuery(filter);
+}
+
+void QnResourceTreeWidget::updateNewFilter()
+{
+    const auto filterEdit = ui->newFilterLineEdit;
     const auto queryText = filterEdit->text();
 
     /* Don't allow empty filters. */
@@ -602,6 +635,38 @@ QList<int> QnResourceTreeWidget::filterTagIndexToNodeMapping()
 
 void QnResourceTreeWidget::initializeFilter()
 {
+    // TODO: #vkutin replace with SearchLineEdit
+    ui->oldFilterLineEdit->addAction(qnSkin->icon("theme/input_search.png"),
+        QLineEdit::LeadingPosition);
+    ui->oldFilterLineEdit->setClearButtonEnabled(true);
+    ui->filter->setVisible(false);
+
+    connect(ui->oldFilterLineEdit, &QLineEdit::textChanged, this,
+        &QnResourceTreeWidget::updateOldFilter);
+    connect(ui->oldFilterLineEdit, &QLineEdit::editingFinished, this,
+        &QnResourceTreeWidget::updateOldFilter);
+
+    installEventHandler(ui->oldFilterLineEdit, QEvent::KeyPress, this,
+            [this](QObject* /*object*/, QEvent* event)
+            {
+                const auto keyEvent = static_cast<QKeyEvent*>(event);
+                switch (keyEvent->key())
+                {
+                    case Qt::Key_Enter:
+                    case Qt::Key_Return:
+                        if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
+                            emit filterCtrlEnterPressed();
+                        else
+                            emit filterEnterPressed();
+                        break;
+                    default:
+                        break;
+                }
+            });
+}
+
+void QnResourceTreeWidget::initializeNewFilter()
+{
     ui->filter->setVisible(false);
 
     const auto ctrlKey = nx::utils::AppInfo::isMacOsX() ? Qt::Key_Meta : Qt::Key_Control;
@@ -610,17 +675,17 @@ void QnResourceTreeWidget::initializeFilter()
         {QKeySequence(ctrlKey, Qt::Key_Enter), tr("open all at a new layout")}});
     updateShortcutHintVisibility();
 
-    const auto filterEdit = ui->filterLineEdit;
+    const auto filterEdit = ui->newFilterLineEdit;
     filterEdit->setPlaceholderText(tr("Cameras & Resources"));
     filterEdit->setTags(filterTags());
     filterEdit->setClearingTagIndex(0);
 
     connect(filterEdit, &SearchEdit::textChanged,
-        this, &QnResourceTreeWidget::updateFilter);
+        this, &QnResourceTreeWidget::updateNewFilter);
     connect(filterEdit, &SearchEdit::editingFinished,
-        this, &QnResourceTreeWidget::updateFilter);
+        this, &QnResourceTreeWidget::updateNewFilter);
     connect(filterEdit, &SearchEdit::selectedTagIndexChanged,
-        this, &QnResourceTreeWidget::updateFilter);
+        this, &QnResourceTreeWidget::updateNewFilter);
 
     connect(filterEdit, &SearchEdit::enterPressed,
         this, &QnResourceTreeWidget::filterEnterPressed);

@@ -158,7 +158,9 @@ private:
 
     void initializeFilter();
     void updateColumns();
-    void updateFilter();
+    void updateOldFilter();
+    void updateNewFilter();
+    void initializeNewFilter();
 
     void expandCheckedRecursively(const QModelIndex& from);
 

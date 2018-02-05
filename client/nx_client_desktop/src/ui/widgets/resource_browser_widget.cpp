@@ -16,8 +16,6 @@
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QGraphicsLinearLayout>
 
-#include <ini.h>
-
 #include <camera/camera_thumbnail_manager.h>
 
 #include <client/client_runtime_settings.h>
@@ -75,6 +73,8 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+#include <ini.h>
 
 using namespace nx::client::desktop::ui;
 
