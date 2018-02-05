@@ -286,12 +286,3 @@ class VagrantVM(object):
         settings[old_setting_line_index] = new_setting
         root_ssh_host.write_file(sshd_config_path, '\n'.join(settings))
         root_ssh_host.run_command(['service', 'ssh', 'reload'])
-
-
-def port_is_accessible_from_this_machine(this_machine_port):
-    try:
-        socket.socket(('localhost', this_machine_port))
-    except socket.error:
-        return False
-    else:
-        return True
