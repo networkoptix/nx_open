@@ -20,7 +20,6 @@ using namespace nx::sdk::metadata;
 
 EventHandler::EventHandler()
 {
-    qRegisterMetaType<nx::vms::event::AnalyticsSdkEventPtr>();
     connect(this, &EventHandler::sdkEventTriggered,
         qnEventRuleConnector, &event::EventConnector::at_analyticsSdkEvent,
         Qt::QueuedConnection);

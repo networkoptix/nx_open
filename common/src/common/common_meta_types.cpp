@@ -71,9 +71,10 @@
 #include <core/onvif/onvif_config_data.h>
 
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/events/abstract_event.h>
-#include <nx/vms/event/rule.h>
 #include <nx/vms/event/event_fwd.h>
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/events/analytics_sdk_event.h>
+#include <nx/vms/event/rule.h>
 
 #include <licensing/license.h>
 
@@ -144,6 +145,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::ResourceStatus>();
     qRegisterMetaType<Qn::BitratePerGopType>();
     qRegisterMetaType<nx::vms::event::EventReason>();
+    qRegisterMetaType<nx::vms::event::AnalyticsSdkEventPtr>();
 
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();
