@@ -936,7 +936,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             {
                 QnFfmpegHelper::mediaContextToAvCodecContext(audioStream->codec, mediaContext);
                 // codec_tag from another source container can cause an issue. Reset value.
-                context.formatCtx->streams[1]->codec->codec_tag = 0;
+                audioStream->codec->codec_tag = 0;
 
                 // avoid FFMPEG bug for MP3 mono. block_align hardcoded inside ffmpeg for stereo channels and it is cause problem
                 if (srcAudioCodec == AV_CODEC_ID_MP3 && audioStream->codec->channels == 1)
