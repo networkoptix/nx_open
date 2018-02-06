@@ -15,7 +15,7 @@ using namespace nx::client::desktop;
 
 QnWearableProgressWidget::QnWearableProgressWidget(QWidget* parent):
     QWidget(parent),
-    QnWorkbenchContextAware(parent, InitializationMode::lazy),
+    QnWorkbenchContextAware(parent, InitializationMode::manual),
     ui(new Ui::WearableProgressWidget)
 {
     ui->setupUi(this);

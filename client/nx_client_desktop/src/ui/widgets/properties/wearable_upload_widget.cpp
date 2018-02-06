@@ -20,7 +20,7 @@ const int kStatePollPeriodMSec = 1000 * 2;
 
 QnWearableUploadWidget::QnWearableUploadWidget(QWidget* parent):
     QWidget(parent),
-    QnWorkbenchContextAware(parent, InitializationMode::lazy),
+    QnWorkbenchContextAware(parent, InitializationMode::manual),
     ui(new Ui::WearableUploadWidget)
 {
     ui->setupUi(this);
