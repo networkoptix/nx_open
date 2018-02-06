@@ -1,6 +1,7 @@
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/mediaserver/updates2/updates2_manager.h>
 #include <utils/common/synctime.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -63,6 +64,90 @@ public:
         downloader::ResultCode(const QString& fileName, bool deleteData));
     MOCK_METHOD1(
         getChunkChecksums, QVector<QByteArray>(const QString& fileName));
+};
+
+enum class PrepareExpectedOutcome
+{
+    success,
+    fail_noFreeSpace
+};
+
+const static QString kFileName = "test.file.name";
+
+class TestInstaller: public AbstractUpdates2Installer, public QnLongRunnable
+{
+public:
+//    MOCK_METHOD2(prepareAsync, void(const QString& path, PrepareUpdateCompletionHandler handler));
+    virtual void prepareAsync(
+        const QString& /*path*/,
+        PrepareUpdateCompletionHandler handler) override
+    {
+        put(handler);
+    }
+
+    MOCK_METHOD1(install, void(const QString& updateId));
+
+    void setExpectedOutcome(PrepareExpectedOutcome expectedOutcome)
+    {
+        m_expectedOutcome = expectedOutcome;
+    }
+
+    ~TestInstaller()
+    {
+        stop();
+    }
+
+private:
+    const static int s_timeoutBeforeTaskMs = 300;
+    QnMutex m_mutex;
+    QnWaitCondition m_condition;
+    QQueue<PrepareUpdateCompletionHandler> m_queue;
+    PrepareExpectedOutcome m_expectedOutcome = PrepareExpectedOutcome::success;
+
+    virtual void run() override
+    {
+        QnMutexLocker lock(&m_mutex);
+        while (!needToStop())
+        {
+            while (m_queue.isEmpty() && !needToStop())
+                m_condition.wait(lock.mutex());
+
+            if (needToStop())
+                return;
+
+            const auto handler = m_queue.front();
+            m_queue.pop_front();
+
+            lock.unlock();
+            QThread::msleep(s_timeoutBeforeTaskMs);
+
+            switch (m_expectedOutcome)
+            {
+                case PrepareExpectedOutcome::success:
+                    handler(PrepareResult::ok , kFileName);
+                    break;
+                case PrepareExpectedOutcome::fail_noFreeSpace:
+                    handler(PrepareResult::noFreeSpace , kFileName);
+                    break;
+            }
+
+            lock.relock();
+        }
+    }
+
+    virtual void pleaseStop() override
+    {
+        QnMutexLocker lock(&m_mutex);
+        QnLongRunnable::pleaseStop();
+        m_condition.wakeOne();
+    }
+
+    void put(PrepareUpdateCompletionHandler taskFunc)
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_queue.push_back(taskFunc);
+        m_condition.wakeOne();
+    }
 };
 
 class TestUpdates2Manager: public Updates2ManagerBase
@@ -147,6 +232,7 @@ public:
     }
 
     MOCK_METHOD0(downloader, vms::common::p2p::downloader::AbstractDownloader*());
+    MOCK_METHOD0(installer, AbstractUpdates2InstallerPtr());
 
     virtual void remoteUpdateCompleted() override
     {
@@ -179,7 +265,6 @@ protected:
     const static QString kArch;
     const static QString kModification;
 
-    const static QString kFileName;
     const static QString kFileUrl;
     const static int kFileSize;
     const static QByteArray kFileMd5;
@@ -203,6 +288,7 @@ protected:
                     kCloudHost, kCustomization, kVersion,
                     update::info::OsVersion(kPlatform, kArch, kModification));
             });
+        m_testInstaller.start();
     }
 
     virtual void TearDown() override
@@ -252,6 +338,11 @@ protected:
         whenServerStarted();
         whenRemoteUpdateDone();
         thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
+    }
+
+    void givenInstallerInstallWithTheOutcome(PrepareExpectedOutcome outcome)
+    {
+        m_testInstaller.setExpectedOutcome(outcome);
     }
 
     void thenStateShouldBe(
@@ -321,14 +412,25 @@ protected:
         fileInformation.peerPolicy =
             downloader::FileInformation::PeerSelectionPolicy::byPlatform;
 
-        switch (expectedOutcome)
-        {
-            case DownloadExpectedOutcome::success_fileNotExists:
+        auto setSuccessfulExpectations =
+            [this, &fileInformation](downloader::ResultCode downloadResult)
+            {
                 EXPECT_CALL(m_testDownloader, addFile(fileInformation))
-                    .Times(1).WillOnce(Return(downloader::ResultCode::ok));
+                    .Times(1).WillOnce(Return(downloadResult));
                 fileInformation.status = downloader::FileInformation::Status::downloaded;
                 EXPECT_CALL(m_testDownloader, fileInformation(kFileName))
                     .Times(1).WillOnce(Return(fileInformation));
+                EXPECT_CALL(m_testDownloader, filePath(_))
+                    .Times(1).WillOnce(Return(kFileName));
+                EXPECT_CALL(m_testUpdates2Manager, installer())
+                    .Times(1)
+                    .WillOnce(Return(AbstractUpdates2InstallerPtr(&m_testInstaller, [](void*){})));
+            };
+
+        switch (expectedOutcome)
+        {
+            case DownloadExpectedOutcome::success_fileNotExists:
+                setSuccessfulExpectations(downloader::ResultCode::ok);
                 break;
             case DownloadExpectedOutcome::fail_downloadFailed:
                 EXPECT_CALL(m_testDownloader, addFile(fileInformation))
@@ -345,11 +447,7 @@ protected:
                     .Times(1).WillOnce(Return(downloader::ResultCode::ioError));
                 break;
             case DownloadExpectedOutcome::success_fileAlreadyExists:
-                EXPECT_CALL(m_testDownloader, addFile(fileInformation))
-                    .Times(1).WillOnce(Return(downloader::ResultCode::fileAlreadyExists));
-                fileInformation.status = downloader::FileInformation::Status::downloaded;
-                EXPECT_CALL(m_testDownloader, fileInformation(kFileName))
-                    .Times(1).WillOnce(Return(fileInformation));
+                setSuccessfulExpectations(downloader::ResultCode::fileAlreadyExists);
                 break;
             case DownloadExpectedOutcome::fail_wrongState:
                 break;
@@ -421,6 +519,7 @@ private:
     QnSyncTime m_syncTimeInstance;
     TestDownloader m_testDownloader;
     TestUpdates2Manager m_testUpdates2Manager;
+    TestInstaller m_testInstaller;
 
     static QnUuid thisId()
     {
@@ -442,7 +541,6 @@ const QString Updates2Manager::kPlatform = "test.platform";
 const QString Updates2Manager::kArch = "test.arch";
 const QString Updates2Manager::kModification = "test.modification";
 
-const QString Updates2Manager::kFileName = "test.file.name";
 const QString Updates2Manager::kFileUrl = "test.file.url";
 const int Updates2Manager::kFileSize = 42;
 const QByteArray Updates2Manager::kFileMd5 = "test.file.md5";
@@ -565,6 +663,7 @@ TEST_F(Updates2Manager, Download_successful)
     whenDownloadRequestIssued(DownloadExpectedOutcome::success_fileNotExists);
     whenDownloadFinishedSuccessfully();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
+    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::readyToInstall);
 }
 
 TEST_F(Updates2Manager, Download_addFile_fail)
@@ -639,6 +738,7 @@ TEST_F(Updates2Manager, Download_alreadyDownloadingState)
 
     whenDownloadFinishedSuccessfully();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
+    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::readyToInstall);
 }
 
 TEST_F(Updates2Manager, Download_failed)
@@ -687,6 +787,7 @@ TEST_F(Updates2Manager, Download_chunkFailedAndRecovered)
 
     whenDownloadFinishedSuccessfully();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
+    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::readyToInstall);
 }
 
 TEST_F(Updates2Manager, Download_addAlreadyExistingFile)
@@ -698,17 +799,18 @@ TEST_F(Updates2Manager, Download_addAlreadyExistingFile)
 
     whenDownloadFinishedSuccessfully();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
+    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::readyToInstall);
 }
 
 TEST_F(Updates2Manager, Prepare_successfulAndReadyForInstall)
 {
     givenAvailableRemoteUpdate();
+    givenInstallerInstallWithTheOutcome(PrepareExpectedOutcome::success);
+
     whenDownloadRequestIssued(DownloadExpectedOutcome::success_fileNotExists);
     whenDownloadFinishedSuccessfully();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
-
-    // #TODO: #akulikov uncomment and implement
-    // whenPrepareRequestIssued();
+    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::readyToInstall);
 }
 
 } // namespace test
