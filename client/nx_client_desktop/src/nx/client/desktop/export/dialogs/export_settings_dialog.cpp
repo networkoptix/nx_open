@@ -198,15 +198,12 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(d, &Private::transcodingModeChanged, this,
         &ExportSettingsDialog::updateTranscodingWidgets);
 
-    updateTranscodingWidgets();
-
     connect(d, &Private::frameSizeChanged, this,
         [this](const QSize& size)
         {
             setMaxOverlayWidth(ui->bookmarkSettingsPage, size.width());
             setMaxOverlayWidth(ui->imageSettingsPage, size.width());
             setMaxOverlayWidth(ui->textSettingsPage, size.width());
-            updateSettingsWidgets();
         });
 
     if (ui->bookmarkButton->state() != ui::SelectableTextButton::State::deactivated)
@@ -515,8 +512,9 @@ void ExportSettingsDialog::updateTranscodingWidgets()
     }
 
     // Applying data to UI
+    // All UI events should be locked here
     ui->exportMediaSettingsPage->setTranscodingAllowed(!transcodingLocked);
-    ui->exportMediaSettingsPage->setApplyFilters(transcodingChecked);
+    ui->exportMediaSettingsPage->setApplyFilters(transcodingChecked, true);
 
     if (transcodingChecked && overlayOptionsAvailable)
         ui->cameraExportSettingsButton->click();
@@ -534,8 +532,6 @@ void ExportSettingsDialog::setMediaParams(
 
     const auto timestampOffsetMs = timeWatcher->displayOffset(mediaResource);
     d->setTimestampOffsetMs(timestampOffsetMs);
-
-    updateSettingsWidgets();
 
     const auto resource = mediaResource->toResourcePtr();
     const auto currentSettings = d->exportMediaSettings();
@@ -592,7 +588,6 @@ void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
 {
     const auto palette = ui->layoutPreviewWidget->palette();
     d->setLayout(layout, palette);
-    //ui->layoutPreviewWidget->setImageProvider(d->layoutImageProvider());
 
     auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
     if (qnRuntime->isActiveXMode() || baseName.isEmpty())

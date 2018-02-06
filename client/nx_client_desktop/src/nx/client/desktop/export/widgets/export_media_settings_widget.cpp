@@ -27,9 +27,17 @@ bool ExportMediaSettingsWidget::applyFilters() const
     return ui->filtersCheckBox->isChecked();
 }
 
-void ExportMediaSettingsWidget::setApplyFilters(bool value)
+void ExportMediaSettingsWidget::setApplyFilters(bool value, bool suppressSignal)
 {
-    ui->filtersCheckBox->setChecked(value);
+    if (suppressSignal)
+    {
+        QSignalBlocker blocker(ui->filtersCheckBox);
+        ui->filtersCheckBox->setChecked(value);
+    }
+    else
+    {
+        ui->filtersCheckBox->setChecked(value);
+    }
 }
 
 bool ExportMediaSettingsWidget::transcodingAllowed() const

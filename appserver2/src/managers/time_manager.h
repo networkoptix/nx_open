@@ -65,11 +65,11 @@ class AbstractTransactionMessageBus;
 class TimePriorityKey
 {
 public:
-        //!sequence number. Incremented with each peer selection by user
+    //!sequence number. Incremented with each peer selection by user
     quint16 sequence;
-        //!bitset of flags from \a TimeSynchronizationManager class
+    //!bitset of flags from \a TimeSynchronizationManager class
     quint16 flags;
-        //!some random number
+    //!some random number
     quint32 seed;
 
     TimePriorityKey();
@@ -101,10 +101,10 @@ public:
     TimeSyncInfo(
         qint64 _monotonicClockValue = 0,
         qint64 _syncTime = 0,
-        const TimePriorityKey& _timePriorityKey = TimePriorityKey() );
+        const TimePriorityKey& _timePriorityKey = TimePriorityKey());
 
     QByteArray toString() const;
-    bool fromString( const QByteArray& str );
+    bool fromString(const QByteArray& str);
 };
 
 /**
@@ -162,7 +162,7 @@ public:
 
 signals:
     /** Emitted when synchronized time has been changed. */
-    void timeChanged( qint64 syncTime );
+    void timeChanged(qint64 syncTime);
 
 private:
     struct RemotePeerTimeInfo
@@ -175,11 +175,11 @@ private:
         RemotePeerTimeInfo(
             const QnUuid& _peerID = QnUuid(),
             qint64 _localMonotonicClock = 0,
-            qint64 _remotePeerSyncTime = 0 )
-        :
-            peerID( _peerID ),
-            localMonotonicClock( _localMonotonicClock ),
-            remotePeerSyncTime( _remotePeerSyncTime )
+            qint64 _remotePeerSyncTime = 0)
+            :
+            peerID(_peerID),
+            localMonotonicClock(_localMonotonicClock),
+            remotePeerSyncTime(_remotePeerSyncTime)
         {
         }
     };
@@ -195,23 +195,25 @@ private:
 
         PeerContext(
             nx::network::SocketAddress _peerAddress,
-            nx::network::http::AuthInfoCache::AuthorizationCacheItem _authData )
-        :
-            peerAddress( std::move( _peerAddress ) ),
-            authData( std::move(_authData) )
-        {}
+            nx::network::http::AuthInfoCache::AuthorizationCacheItem _authData)
+            :
+            peerAddress(std::move(_peerAddress)),
+            authData(std::move(_authData))
+        {
+        }
 
-            //PeerContext( PeerContext&& right ) = default;
-        PeerContext( PeerContext&& right )
-        :
-            peerAddress( std::move(right.peerAddress) ),
-            authData( std::move(right.authData) ),
-            syncTimerID( std::move(right.syncTimerID) ),
-            httpClient( std::move(right.httpClient) )
-        {}
+        //PeerContext( PeerContext&& right ) = default;
+        PeerContext(PeerContext&& right)
+            :
+            peerAddress(std::move(right.peerAddress)),
+            authData(std::move(right.authData)),
+            syncTimerID(std::move(right.syncTimerID)),
+            httpClient(std::move(right.httpClient))
+        {
+        }
 
-            //PeerContext& operator=( PeerContext&& right ) = default;
-        PeerContext& operator=( PeerContext&& right )
+        //PeerContext& operator=( PeerContext&& right ) = default;
+        PeerContext& operator=(PeerContext&& right)
         {
             peerAddress = std::move(right.peerAddress);
             syncTimerID = std::move(right.syncTimerID);
@@ -265,11 +267,11 @@ private:
         qint64 localMonotonicClock,
         qint64 remotePeerSyncTime,
         const TimePriorityKey& remotePeerTimePriorityKey,
-        qint64 timeErrorEstimation );
-    void checkIfManualTimeServerSelectionIsRequired( quint64 taskID );
+        qint64 timeErrorEstimation);
+    void checkIfManualTimeServerSelectionIsRequired(quint64 taskID);
     /** Periodically synchronizing time with internet (if possible). */
-    void syncTimeWithInternet( quint64 taskID );
-    void onTimeFetchingDone( qint64 millisFromEpoch, SystemError::ErrorCode errorCode );
+    void syncTimeWithInternet(quint64 taskID);
+    void onTimeFetchingDone(qint64 millisFromEpoch, SystemError::ErrorCode errorCode);
     void initializeTimeFetcher();
     void addInternetTimeSynchronizationTask();
     /** Returns time received from the internet or current local system time. */
@@ -280,9 +282,9 @@ private:
     void startSynchronizingTimeWithPeer(
         const QnUuid& peerID,
         nx::network::SocketAddress peerAddress,
-        nx::network::http::AuthInfoCache::AuthorizationCacheItem authData );
-    void stopSynchronizingTimeWithPeer( const QnUuid& peerID );
-    void synchronizeWithPeer( const QnUuid& peerID );
+        nx::network::http::AuthInfoCache::AuthorizationCacheItem authData);
+    void stopSynchronizingTimeWithPeer(const QnUuid& peerID);
+    void synchronizeWithPeer(const QnUuid& peerID);
     void timeSyncRequestDone(
         const QnUuid& peerID,
         nx::network::http::AsyncHttpClientPtr clientPtr,
@@ -312,8 +314,8 @@ private:
         qint64 syncTimeToLocalDelta,
         const TimePriorityKey& syncTimeKey);
 
-private slots:
-    void onNewConnectionEstablished(QnAbstractTransactionTransport* transport );
+    private slots:
+    void onNewConnectionEstablished(QnAbstractTransactionTransport* transport);
     void onPeerLost(QnUuid peer, Qn::PeerType peerType);
     void onDbManagerInitialized();
     void onTimeSynchronizationSettingsChanged();

@@ -38,7 +38,7 @@
 #include <utils/common/html.h>
 #include <nx/audio/audiodevice.h>
 #include <utils/common/app_info.h>
-
+#include <utils/common/html.h>
 #include <nx/client/desktop/ui/common/clipboard_button.h>
 
 using namespace nx::client::desktop::ui;
@@ -181,10 +181,10 @@ void QnAboutDialog::retranslateUi()
 
     // Check if email is provided
     if (supportEmail.isValid())
-        supportLink = lit("<a href=mailto:%1>%1</a>").arg(supportEmail.value());
+        supportLink = makeMailHref(supportAddress, supportAddress);
     // simple check if phone is provided
     else if (!supportAddress.isEmpty() && !supportAddress.startsWith(lit("+")))
-        supportLink = lit("<a href=%1>%1</a>").arg(supportAddress);
+        supportLink = makeHref(supportAddress, supportAddress);
     ui->supportEmailLabel->setText(lit("<b>%1</b>: %2").arg(tr("Customer Support")).arg(supportLink));
     ui->supportEmailLabel->setOpenExternalLinks(true);
 }

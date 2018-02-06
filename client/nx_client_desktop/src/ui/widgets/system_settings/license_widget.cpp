@@ -18,6 +18,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
+#include <utils/common/html.h>
 
 #include <nx/client/desktop/ui/common/clipboard_button.h>
 
@@ -76,14 +77,14 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     QString activationText;
     if (licensingEmail.isValid())
     {
-        const QString emailLink = lit("<a href=\"mailto:%1\">%1</a>").arg(licensingEmail.value());
+        const QString emailLink = makeMailHref(emailUrl, emailUrl);
         activationText =
             tr("Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.")
             .arg(emailLink);
     }
     else
     {
-        const QString siteLink = lit("<a href=\"%1\">%1</a>").arg(emailUrl);
+        const QString siteLink = makeHref(emailUrl, emailUrl);
         activationText =
             tr("Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.")
             .arg(siteLink);
