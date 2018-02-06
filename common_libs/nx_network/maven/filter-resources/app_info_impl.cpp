@@ -34,7 +34,7 @@ QString AppInfo::defaultCloudPortalUrl()
 
 QString AppInfo::defaultCloudModulesXmlUrl()
 {
-    return QString::fromLatin1("http://%1/api/cloud_modules.xml").arg(defaultCloudHost());
+    return QString::fromLatin1("http://%1/discovery/v1/cloud_modules.xml").arg(defaultCloudHost());
 }
 
 QString AppInfo::cloudName()
