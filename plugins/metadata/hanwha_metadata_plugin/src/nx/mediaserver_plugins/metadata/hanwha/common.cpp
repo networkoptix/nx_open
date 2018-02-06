@@ -23,8 +23,8 @@ QnUuid Hanwha::DriverManifest::eventTypeByInternalName(const QString& internalEv
         {
             if (internalEventName.contains(name))
             {
-                m_idByInternalName.insert(internalEventName, eventDescriptor.typeId);
-                return eventDescriptor.typeId;
+                m_idByInternalName.insert(internalEventName, eventDescriptor.eventTypeId);
+                return eventDescriptor.eventTypeId;
             }
         }
     }
@@ -41,7 +41,7 @@ const Hanwha::EventDescriptor& Hanwha::DriverManifest::eventDescriptorById(const
         return itr.value();
     for (const auto& eventDescriptor: outputEventTypes)
     {
-        if (eventDescriptor.typeId == id)
+        if (eventDescriptor.eventTypeId == id)
         {
             itr = m_recordById.insert(id, eventDescriptor);
             return itr.value();

@@ -162,6 +162,10 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
+void Plugin::setDeclaredSettings(const nxpl::Setting* settings, int count)
+{
+}
+
 boost::optional<QList<QnUuid>> Plugin::fetchSupportedEvents(
     const CameraInfo& cameraInfo)
 {

@@ -43,6 +43,8 @@ public:
     virtual const char* capabilitiesManifest(
         nx::sdk::Error* error) const override;
 
+    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
+
     const Hanwha::DriverManifest& driverManifest() const;
 
     MetadataMonitor* monitor(

@@ -28,7 +28,7 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error setHandler(
-        nx::sdk::metadata::AbstractMetadataHandler* handler) override;
+        nx::sdk::metadata::MetadataHandler* handler) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
         nxpl::NX_GUID* typeList,
