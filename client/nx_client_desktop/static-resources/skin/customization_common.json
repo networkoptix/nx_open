@@ -324,18 +324,6 @@
         }
     },
 
-    "QnResourcePreviewWidget": {
-        "palette": {
-            "default": {
-                "shadow":        "dark7",
-                "window":        "dark9",
-                "windowText":    "light16",
-                "highlight":     "brand_core",
-                "alternateBase": "dark1.setAlpha(110)"
-            }
-        }
-    },
-
     "QnPanel": {
         "palette": {
             "default": {
@@ -936,6 +924,18 @@
                 "window": "dark5",
                 "light": "dark8",
                 "midlight": "dark9.setAlpha(51)"
+            }
+        }
+    },
+
+    "nx::client::desktop::AsyncImageWidget": {
+        "palette": {
+            "default": {
+                "shadow":        "dark7",
+                "window":        "dark9",
+                "windowText":    "light16",
+                "highlight":     "brand_core",
+                "alternateBase": "dark1.setAlpha(110)"
             }
         }
     },
