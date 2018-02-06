@@ -22,7 +22,7 @@ public:
     virtual ~ExportMediaSettingsWidget();
 
     bool applyFilters() const;
-    void setApplyFilters(bool value);
+    void setApplyFilters(bool value, bool suppressSignal=false);
 
     // Check if transcoding settings are locked and can't be changed by the user.
     bool transcodingAllowed() const;
