@@ -473,7 +473,7 @@ protected:
                         return readOnClient(socket, peer);
 
                     socket->registerTimer(
-                        delay, [=](){ connectClient(socket, peer); });
+                        delay, [=](){ startClient(peer); });
                 });
         }
         else
