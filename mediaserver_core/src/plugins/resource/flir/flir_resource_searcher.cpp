@@ -44,7 +44,9 @@ QnResourcePtr QnFlirResourceSearcher::createResource(const QnUuid &resourceTypeI
 
 }
 
-QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QnResourceList QnFlirResourceSearcher::checkEndpoint(
+    const QUrl& url, const QAuthenticator& auth,
+    const QString& /*physicalId*/, QnResouceSearchMode mode)
 {
     QList<QnResourcePtr> result;
     FlirDeviceInfo deviceInfo;
@@ -54,7 +56,7 @@ QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(const QUrl& url, cons
 
     SimpleEIPClient eipClient(hostname);
 
-    if(!url.scheme().isEmpty() && doMultichannelCheck)
+    if(!url.scheme().isEmpty() && mode == QnResouceSearchMode::multichannel)
         return result;
 
     if(!eipClient.registerSession())

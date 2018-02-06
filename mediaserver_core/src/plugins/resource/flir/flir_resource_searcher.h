@@ -23,7 +23,10 @@ public:
 
     static const quint16 kFlirVendorId = 1161;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+    virtual QnResourceList checkEndpoint(
+        const QUrl& url, const QAuthenticator& auth,
+        const QString& physicalId, QnResouceSearchMode mode) override;
+
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
     virtual QString manufacture() const override;
 

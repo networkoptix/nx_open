@@ -25,10 +25,9 @@ public:
 
     virtual QnResourceList findResources(void) override;
 
-    virtual QList<QnResourcePtr> checkHostAddr(
-        const QUrl& url,
-        const QAuthenticator& auth,
-        bool doMultichannelCheck) override;
+    virtual QnResourceList checkEndpoint(
+        const QUrl& url, const QAuthenticator& authOriginal,
+        const QString& physicalId, QnResouceSearchMode mode) override;
 
     //Upnp resource searcher
     virtual bool processPacket(

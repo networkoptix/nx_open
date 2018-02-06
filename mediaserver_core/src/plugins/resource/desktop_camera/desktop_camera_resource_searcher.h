@@ -25,9 +25,9 @@ public:
     // return the manufacture of the server
     virtual QString manufacture() const override;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url,
-        const QAuthenticator& auth,
-        bool doMultichannelCheck) override;
+    virtual QnResourceList checkEndpoint(
+        const QUrl& url, const QAuthenticator& auth,
+        const QString& physicalId, QnResouceSearchMode mode) override;
 
     virtual QnResourceList findResources() override;
 

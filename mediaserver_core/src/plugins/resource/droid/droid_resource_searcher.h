@@ -20,7 +20,9 @@ public:
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+    virtual QnResourceList checkEndpoint(
+        const QUrl& url, const QAuthenticator& auth,
+        const QString& physicalId, QnResouceSearchMode mode) override;
 
 protected:
     // return the manufacture of the server

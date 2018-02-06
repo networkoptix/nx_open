@@ -550,7 +550,7 @@ void QnProgressiveDownloadingConsumer::run()
         if (!resource)
             resource = resourcePool()->getResourceByMacAddress(resId);
         if (!resource)
-            resource = resourcePool()->getResourceByUrl(resId);
+            resource = resourcePool()->getResourceByUniqueUrl(resId); // TODO: Error message if there is more than one?
         if (!resource)
         {
             d->response.messageBody = QByteArray("Resource with id ") + QByteArray(resId.toLatin1()) + QByteArray(" not found ");

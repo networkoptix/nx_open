@@ -55,10 +55,9 @@ FcResourceSearcher::~FcResourceSearcher()
         httpClient.second->pleaseStopSync();
 }
 
-QList<QnResourcePtr> FcResourceSearcher::checkHostAddr(
-    const QUrl& url,
-    const QAuthenticator& auth,
-    bool doMultichannelCheck)
+QnResourceList FcResourceSearcher::checkEndpoint(
+    const QUrl& url, const QAuthenticator& auth,
+    const QString& /*physicalId*/, QnResouceSearchMode /*mode*/)
 {
     QList<QnResourcePtr> result;
     nx_http::HttpClient httpClient;

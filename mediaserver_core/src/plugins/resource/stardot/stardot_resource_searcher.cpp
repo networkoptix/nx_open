@@ -183,11 +183,12 @@ QnResourcePtr QnStardotResourceSearcher::createResource(const QnUuid &resourceTy
     return result;
 }
 
-
-QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
+QnResourceList QnStardotResourceSearcher::checkEndpoint(
+    const QUrl& url, const QAuthenticator& auth,
+    const QString& /*physicalId*/, QnResouceSearchMode mode)
 {
-    if( !url.scheme().isEmpty() && isSearchAction )
-        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+    if (!url.scheme().isEmpty() && mode == QnResouceSearchMode::multichannel)
+        return QList<QnResourcePtr>();
 
     QString host = url.host();
     int port = url.port();

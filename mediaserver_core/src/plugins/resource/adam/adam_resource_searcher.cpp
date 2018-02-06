@@ -125,13 +125,12 @@ QString QnAdamResourceSearcher::getAdamModuleFirmware(nx::modbus::QnModbusClient
     return QString::fromLatin1(response).trimmed();
 }
 
-QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
-    const QUrl &url,
-    const QAuthenticator &auth,
-    bool doMultichannelCheck)
+QnResourceList QnAdamResourceSearcher::checkEndpoint(
+    const QUrl& url, const QAuthenticator& auth,
+    const QString& /*physicalId*/, QnResouceSearchMode mode)
 {
     QList<QnResourcePtr> result;
-    if( !url.scheme().isEmpty() && doMultichannelCheck )
+    if (!url.scheme().isEmpty() && mode == QnResouceSearchMode::multichannel)
         return result;
 
     SocketAddress endpoint(url.host(), url.port(nx::modbus::kDefaultModbusPort));
@@ -270,7 +269,8 @@ QnResourceList QnAdamResourceSearcher::findResources()
                 // No user/password required.
                 QAuthenticator auth;
 
-                auto res = checkHostAddr(url, auth, false);
+                auto res = checkEndpoint(
+                    url, auth, /*physicalId*/ QString(), QnResouceSearchMode::basic);
 
                 result.append(res);
             }

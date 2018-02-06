@@ -25,15 +25,16 @@ public:
 
     virtual QString manufacture() const override;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+    virtual QnResourceList checkEndpoint(
+        const QUrl& url, const QAuthenticator& auth,
+        const QString& physicalId, QnResouceSearchMode mode) override;
+
 protected:
     std::unique_ptr<OnvifResourceInformationFetcher> m_informationFetcher;
+
 private:
     std::unique_ptr<OnvifResourceSearcherWsdd> m_wsddSearcher;
     int autoDetectDevicePort(const QUrl& url);
-    //OnvifResourceSearcherMdns m_mdnsSearcher;
-
-    QList<QnResourcePtr> checkHostAddrInternal( const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck );
 };
 
 #endif //ENABLE_ONVIF

@@ -157,7 +157,8 @@ public:
 
     bool hasSuchResource(const QString &uniqid) const;
 
-    QnResourcePtr getResourceByUrl(const QString &url) const;
+    QnResourceList getResourcesByUrl(const QString &url) const;
+    QnResourcePtr getResourceByUniqueUrl(const QString &url) const;
 
     QnNetworkResourcePtr getNetResourceByPhysicalId(const QString &physicalId) const;
     QnNetworkResourcePtr getResourceByMacAddress(const QString &mac) const;

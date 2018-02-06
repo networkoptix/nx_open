@@ -16,6 +16,9 @@ public:
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
     virtual QnResourceList findResources() override;
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction) override;
+
+    virtual QnResourceList checkEndpoint(
+        const QUrl& url, const QAuthenticator& auth,
+        const QString& physicalId, QnResouceSearchMode mode) override;
 };
 

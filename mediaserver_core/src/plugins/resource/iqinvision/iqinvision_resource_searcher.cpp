@@ -78,12 +78,10 @@ bool QnPlIqResourceSearcher::isIqeModel(const QString& model)
     return kCameraModelPattern.exactMatch(model);
 }
 
-QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
-    const QUrl& url, const QAuthenticator& /*auth*/, bool isSearchAction)
+QnResourceList QnPlIqResourceSearcher::checkEndpoint(
+    const QUrl& /*url*/, const QAuthenticator& /*auth*/,
+    const QString& /*physicalId*/, QnResouceSearchMode /*mode*/)
 {
-    if (!url.scheme().isEmpty() && isSearchAction)
-        return QList<QnResourcePtr>(); //< Search if only host is present, not specific protocol.
-
     return QList<QnResourcePtr>();
 }
 

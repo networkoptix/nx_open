@@ -61,12 +61,12 @@ QString QnPlAxisResourceSearcher::manufacture() const
     return QnPlAxisResource::MANUFACTURE;
 }
 
-
-QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
+QnResourceList QnPlAxisResourceSearcher::checkEndpoint(
+    const QUrl& url, const QAuthenticator& auth,
+    const QString& /*physicalId*/, QnResouceSearchMode mode)
 {
-    if( !url.scheme().isEmpty() && isSearchAction )
-
-        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+    if (!url.scheme().isEmpty() && mode == QnResouceSearchMode::multichannel)
+        return QList<QnResourcePtr>();
 
     QString host = url.host();
     int port = url.port();
@@ -140,7 +140,8 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     QList<QnResourcePtr> result;
     result << resource;
 
-    if (!isSearchAction)
+    // TODO: WTF?
+    if (mode != QnResouceSearchMode::multichannel)
         addMultichannelResources(result);
 
     return result;

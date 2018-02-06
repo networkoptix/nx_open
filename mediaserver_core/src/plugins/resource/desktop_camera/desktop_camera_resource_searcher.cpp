@@ -110,10 +110,9 @@ void QnDesktopCameraResourceSearcher::registerCamera(
     log("register desktop camera", info);
 }
 
-QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(
-    const QUrl& /*url*/,
-    const QAuthenticator& /*auth*/,
-    bool /*doMultichannelCheck*/)
+QnResourceList QnDesktopCameraResourceSearcher::checkEndpoint(
+    const QUrl& /*url*/, const QAuthenticator& /*auth*/,
+    const QString& /*physicalId*/, QnResouceSearchMode /*mode*/)
 {
     return QList<QnResourcePtr>();
 }
