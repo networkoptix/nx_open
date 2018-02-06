@@ -125,7 +125,7 @@ void ExportSettingsDialog::Private::loadSettings()
 
     updateOverlays();
 
-    const auto used = m_exportMediaPersistentSettings.usedOverlays;
+    const auto& used = m_exportMediaPersistentSettings.usedOverlays;
     for (const auto type: used)
         selectOverlay(type);
 
@@ -134,6 +134,7 @@ void ExportSettingsDialog::Private::loadSettings()
     updateOverlaysVisibility();
 }
 
+// Called outside from ExportSettingsDialog
 void ExportSettingsDialog::Private::saveSettings()
 {
     qnSettings->setLastExportMode(QnLexical::serialized(m_mode));
@@ -208,7 +209,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
         settings.zoomWindow = QRectF();
     }
 
-    m_fullFrameSize = QSize();
+    //m_fullFrameSize = QSize();
 
     // Requesting base resource image. We will apply transcoding later
     if (!m_mediaRawImageProvider)
@@ -242,6 +243,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
     validateSettings(Mode::Media);
 }
 
+// Used as ui signal handler in ExportSettingsDialog
 void ExportSettingsDialog::Private::setApplyFilters(bool value)
 {
     bool transcode = false;
@@ -254,6 +256,8 @@ void ExportSettingsDialog::Private::setApplyFilters(bool value)
     {
         refreshMediaPreview();
     }
+
+    emit transcodingModeChanged();
 }
 
 bool ExportSettingsDialog::Private::hasVideo() const
@@ -273,6 +277,9 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     m_exportMediaSettings.mediaResource = media;
 
     refreshMediaPreview();
+    updateOverlays();
+
+    emit transcodingModeChanged();
 }
 
 void ExportSettingsDialog::Private::setFrameSize(const QSize& size)
@@ -425,7 +432,7 @@ void ExportSettingsDialog::Private::overlayPositionChanged(ExportOverlayType typ
     if (!overlayWidget || overlayWidget->isHidden())
         return;
 
-    auto settings = m_exportMediaPersistentSettings.overlaySettings(type);
+    const auto& settings = m_exportMediaPersistentSettings.overlaySettings(type);
     NX_EXPECT(settings);
     if (!settings)
         return;
@@ -638,14 +645,14 @@ void ExportSettingsDialog::Private::updateOverlayWidget(ExportOverlayType type)
 // Computes absolute pixel position by relative offset-alignment pair
 void ExportSettingsDialog::Private::updateOverlayPosition(ExportOverlayType type)
 {
-    if (!m_fullFrameSize.isValid())
-        return;
-
     auto overlay = this->overlay(type);
     const auto settings = m_exportMediaPersistentSettings.overlaySettings(type);
 
     NX_EXPECT(overlay && settings);
     if (!overlay || !settings)
+        return;
+
+    if (!m_fullFrameSize.isValid())
         return;
 
     QPointF position;

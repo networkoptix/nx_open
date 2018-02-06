@@ -25,6 +25,7 @@
 #include <ui/common/aligner.h>
 #include <ui/common/read_only.h>
 
+
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
@@ -45,8 +46,9 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/license_usage_helper.h>
 #include <utils/common/delayed.h>
+#include <utils/common/html.h>
+#include <utils/license_usage_helper.h>
 
 #include "client/client_settings.h"
 
@@ -951,7 +953,7 @@ void QnSingleCameraSettingsWidget::updateWebPageText()
                 webPageAddress += QLatin1Char(':') + QString::number(url.port());
         }
 
-        ui->webPageLink->setText(lit("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
+        ui->webPageLink->setText(makeHref(webPageAddress, webPageAddress));
     }
     else
     {
