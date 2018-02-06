@@ -36,7 +36,7 @@
                class="help-block warning-label">System {{targetSystem.name}} is incompatable cannot be merged with the current one.</p>
             <p ng-if="systemStatus == ''"
                class="help-block">You can merge only Systems in which you have owner permissions.</p>
-            <div ng-class="{'disabled-settings': systemStatus != ''}">
+            <div ng-class="{'disabled-settings': systemMergeable != ''}">
                 <div class="merge-text">Took system name and settings from</div>
                 <div class="form-group" ng-init="$parent.masterSystemId=system.id">
                     <div class="radio">
