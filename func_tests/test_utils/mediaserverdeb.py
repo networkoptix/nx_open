@@ -7,7 +7,7 @@ from pathlib2 import PurePosixPath
 from test_utils.build_info import customizations_from_paths, build_info_from_text
 
 
-class Deb(object):
+class MediaserverDeb(object):
     def __init__(self, path, installation_root=PurePosixPath('/opt')):
         self.path = path.expanduser()
         try:

@@ -10,7 +10,7 @@ from test_utils.ca import CA
 from test_utils.camera import SampleMediaFile, CameraFactory
 from test_utils.cloud_host import CloudAccountFactory, resolve_cloud_host_from_registry
 from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
-from test_utils.deb import Deb
+from test_utils.mediaserverdeb import MediaserverDeb
 from test_utils.os_access import SshAccessConfig
 from test_utils.internet_time import TimeProtocolRestriction
 from test_utils.lightweight_servers_factory import LWS_BINARY_NAME, LightweightServersFactory
@@ -115,7 +115,7 @@ def run_options(request):
         vm_ssh_host_config = None
     bin_dir = request.config.getoption('--bin-dir').expanduser()
     assert bin_dir, 'Argument --bin-dir is required'
-    mediaserver_deb = Deb(bin_dir / request.config.getoption('--mediaserver-dist-path'))
+    mediaserver_deb = MediaserverDeb(bin_dir / request.config.getoption('--mediaserver-dist-path'))
     autotest_email_password = request.config.getoption('--autotest-email-password') or os.environ.get('AUTOTEST_EMAIL_PASSWORD')
     tests_config = TestsConfig.merge_config_list(
         request.config.getoption('--tests-config-file'),
