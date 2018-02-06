@@ -11,10 +11,12 @@ angular.module('cloudApp')
 
         //Add system can merge where added to systems form api call
         function checkMergeAbility(system){
-            if(system.stateOfHealth == 'offline')
+            if(system.stateOfHealth == 'offline'){
                 return 'offline'
-            if(!system.capabilities || system.capabilities.indexOf('cloudMerge') < 0)
+            }
+            if(!system.capabilities || system.capabilities.indexOf('cloudMerge') < 0){
                 return 'cannotMerge';
+            }
             return '';
         }
 
@@ -29,6 +31,17 @@ angular.module('cloudApp')
         $scope.setTargetSystem = function(system){
             $scope.targetSystem = system;
             $scope.systemMergeable = checkMergeAbility(system);
+        };
+
+        $scope.addStatus = function(system){
+            var status = "";
+            if(system.stateOfHealth == 'offline'){
+                status = ' (offline)';
+            }
+            else if(system.stateOfHealth == 'online' && (!system.capabilities || system.capabilities.indexOf('cloudMerge') < 0)){
+                status = ' (incompatable)';
+            }
+            return system.name + status;
         };
 
         $scope.mergingSystems = process.init(function(){
