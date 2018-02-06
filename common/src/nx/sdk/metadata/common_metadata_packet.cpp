@@ -11,7 +11,21 @@ void* CommonEventsMetadataPacket::queryInterface(const nxpl::NX_GUID& interfaceI
         addRef();
         return static_cast<EventsMetadataPacket*>(this);
     }
-
+    if (interfaceId == IID_IterableMetadataPacket)
+    {
+        addRef();
+        return static_cast<IterableMetadataPacket*>(this);
+    }
+    if (interfaceId == IID_MetadataPacket)
+    {
+        addRef();
+        return static_cast<MetadataPacket*>(this);
+    }
+    if (interfaceId == IID_DataPacket)
+    {
+        addRef();
+        return static_cast<DataPacket*>(this);
+    }
     if (interfaceId == nxpl::IID_PluginInterface)
     {
         addRef();
@@ -27,7 +41,21 @@ void* CommonObjectsMetadataPacket::queryInterface(const nxpl::NX_GUID& interface
         addRef();
         return static_cast<ObjectsMetadataPacket*>(this);
     }
-
+    if (interfaceId == IID_IterableMetadataPacket)
+    {
+        addRef();
+        return static_cast<ObjectsMetadataPacket*>(this);
+    }
+    if (interfaceId == IID_MetadataPacket)
+    {
+        addRef();
+        return static_cast<MetadataPacket*>(this);
+    }
+    if (interfaceId == IID_DataPacket)
+    {
+        addRef();
+        return static_cast<DataPacket*>(this);
+    }
     if (interfaceId == nxpl::IID_PluginInterface)
     {
         addRef();

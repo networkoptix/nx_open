@@ -28,14 +28,14 @@ std::string Plugin::capabilitiesManifest() const
 {
     return R"json(
         {
-            "driverId": "{B14A8D7B-8009-4D38-A60D-04139345432E}",
+            "driverId": ")json" + kDriverGuid + R"json(",
             "driverName": {
                 "value": "Stub Driver"
             },
             "outputEventTypes": [
                 {
                     "typeId": ")json" + kLineCrossingEventGuid + R"json(",
-                    "name":
+                    "name": {
                         "value": "Line crossing"
                     }
                 },
@@ -55,9 +55,9 @@ std::string Plugin::capabilitiesManifest() const
                     }
                 },
                 {
-                    "typeId": "{C23DEF4D-04F7-4B4C-994E-0C0E6E8B12CB}",
+                    "typeId": ")json" + kHumanFaceObjectGuid + R"json(",
                     "name": {
-                        "value": "Human face detected"
+                        "value": "Human face"
                     }
                 }
             ],
@@ -80,7 +80,7 @@ std::string Plugin::capabilitiesManifest() const
                 ],
                 "groups": [
                     {
-                        "id": "groupA"
+                        "id": "groupA",
                         "name": "Group name",
                         "params": [
                             {
@@ -104,7 +104,7 @@ std::string Plugin::capabilitiesManifest() const
                     "supportedObjectTypes": [
                         ")json" + kCarObjectGuid + R"json("
                     ],
-                    settings: {
+                    "settings": {
                         "params": [
                             {
                                 "id": "paramA",

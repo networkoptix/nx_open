@@ -61,7 +61,7 @@ The included `Stub Metadata Plugin` source files can be compiled and linked usin
 Prerequisites:
 ```
 CMake >= 3.3.2
-Windows: Microsoft Visual Studio >= 12 (recommended) or Cygwin
+Windows: Microsoft Visual Studio >= 12
 Linux: gcc >= 4.8.4, make or Ninja (recommended)
 ```
 
@@ -73,16 +73,13 @@ cd .../stub_metadata_plugin-build
 
 Then, generate build system files (they depend on the platform and chosen build tool) via CMake:
 ```
-# Windows with Visual Studio: Generate .vcxproj and .sln:
+# Windows - generating .vcxproj and .sln:
 cmake .../stub_metadata_plugin -Ax64
 
-# Windows with Cygwin:
-cmake .../stub_metadata_plugin -G 'Unix Makefiles'
-
-# Linux with Ninja:
+# Linux - generating Ninja files:
 cmake .../stub_metadata_plugin -GNinja
 
-# Linux with make:
+# Linux - generating makefiles:
 cmake .../stub_metadata_plugin
 ```
 
@@ -97,11 +94,8 @@ cmake --build .
 
 Locate the main built artifact:
 ```
-# Windows with Visual Studio:
+# Windows:
 stub_metadata_plugin.dll
-
-# Windows with Cygwin:
-libstub_metadata_plugin.dll
 
 # Linux:
 libstub_metadata_plugin.so

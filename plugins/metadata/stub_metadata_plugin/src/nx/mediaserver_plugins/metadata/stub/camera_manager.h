@@ -50,9 +50,11 @@ private:
     const sdk::metadata::CommonCompressedVideoPacket* m_videoFrame;
 };
 
+const std::string kDriverGuid = "{B14A8D7B-8009-4D38-A60D-04139345432E}";
 const std::string kLineCrossingEventGuid = "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}";
 const std::string kObjectInTheAreaEventGuid = "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}";
 const std::string kCarObjectGuid = "{153DD879-1CD2-46B7-ADD6-7C6B48EAC1FC}";
+const std::string kHumanFaceObjectGuid = "{C23DEF4D-04F7-4B4C-994E-0C0E6E8B12CB}";
 
 } // namespace stub
 } // namespace metadata

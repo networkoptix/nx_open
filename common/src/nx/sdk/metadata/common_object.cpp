@@ -15,7 +15,11 @@ void* CommonObject::queryInterface(const nxpl::NX_GUID& interfaceId)
         addRef();
         return static_cast<Object*>(this);
     }
-
+    if (interfaceId == IID_MetadataItem)
+    {
+        addRef();
+        return static_cast<MetadataItem*>(this);
+    }
     if (interfaceId == nxpl::IID_PluginInterface)
     {
         addRef();
@@ -51,7 +55,7 @@ NX_LOCALE_DEPENDENT const Attribute* CommonObject::attribute(int index) const
 
 int CommonObject::attributeCount() const
 {
-    return m_attributes.size();
+    return (int) m_attributes.size();
 }
 
 Rect CommonObject::boundingBox() const

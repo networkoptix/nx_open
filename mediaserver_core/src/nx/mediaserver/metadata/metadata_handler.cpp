@@ -37,7 +37,7 @@ void MetadataHandler::handleMetadata(
         handleEventsPacket(std::move(eventsPacket));
 
     nxpt::ScopedRef<ObjectsMetadataPacket> objectsPacket(
-        metadata->queryInterface(IID_MetadataPacket));
+        metadata->queryInterface(IID_ObjectsMetadataPacket));
     if (objectsPacket)
         handleObjectsPacket(std::move(objectsPacket));
 }

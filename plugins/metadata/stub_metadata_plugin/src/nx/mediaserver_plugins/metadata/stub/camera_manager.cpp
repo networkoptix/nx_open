@@ -38,8 +38,8 @@ std::string CameraManager::capabilitiesManifest()
     return R"json(
         {
             "supportedEventTypes": [
-                ")json" + kLineCrossingEventGuid + R"json("
-                "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}"
+                ")json" + kLineCrossingEventGuid + R"json(",
+                ")json" + kObjectInTheAreaEventGuid + R"json("
             ],
             "supportedObjectTypes": [
                 ")json" + kCarObjectGuid + R"json("
