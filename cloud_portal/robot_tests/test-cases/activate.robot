@@ -38,8 +38,8 @@ should save user data to user account correctly
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
-    Wait For Condition    return ${JQ ACCOUNT FIRST NAME} == 'mark'
-    Wait For Condition    return ${JQ ACCOUNT LAST NAME} == 'hamill'
+    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    mark
+    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    hamill
     Close Browser
 
 should allow to enter more than 255 symbols in First and Last names and cut it to 255
@@ -50,8 +50,8 @@ should allow to enter more than 255 symbols in First and Last names and cut it t
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
-    Wait For Condition    return ${JQ ACCOUNT FIRST NAME} == '${255CHARS}'
-    Wait For Condition    return ${JQ ACCOUNT LAST NAME} == '${255CHARS}'
+    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    ${255CHARS}
+    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    ${255CHARS}
     Close Browser
 
 should trim leading and trailing spaces
@@ -62,8 +62,8 @@ should trim leading and trailing spaces
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
-    Wait For Condition    return ${JQ ACCOUNT FIRST NAME} == 'mark'
-    Wait For Condition    return ${JQ ACCOUNT LAST NAME} == 'hamill'
+    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    mark
+    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    hamill
     Close Browser
 
 #These are blocked by CLOUD-1624
