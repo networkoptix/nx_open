@@ -161,6 +161,7 @@ public:
     QSharedPointer<QnAbstractPictureDataRef> picData;
 
     CLVideoDecoderOutput();
+    CLVideoDecoderOutput(int targetWidth, int targetHeight, int targetFormat);
     CLVideoDecoderOutput(QImage image);
     ~CLVideoDecoderOutput();
 
