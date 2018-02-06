@@ -45,7 +45,7 @@ angular.module('cloudApp')
             errorPrefix: L.errorCodes.cantGetSystemInfoPrefix
         }).then(function (){
             $scope.canMerge = $scope.system.capabilities && $scope.system.capabilities.indexOf('cloudMerge') > -1
-                                                         && $scope.system.mergeInfo  
+                                                         && $scope.system.mergeInfo
                                                          || Config.allowDebugMode 
                                                          || Config.allowBetaMode;
             if($scope.canMerge && $scope.system.mergeInfo){

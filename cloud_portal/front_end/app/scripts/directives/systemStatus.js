@@ -7,6 +7,9 @@ angular.module('cloudApp')
             templateUrl: Config.viewsDir + 'components/system-status.html',
             scope:{
                 system:'='
+            },
+            link:function(scope){
+            	scope.cannotMerge = !scope.system.capabilities || scope.system.capabilities.indexOf('cloudMerge') < 0;
             }
         };
     });
