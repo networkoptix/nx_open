@@ -1,5 +1,7 @@
 #include "area_tooltip_item.h"
 
+#include <array>
+
 #include <QtGui/QPainter>
 
 #include <ui/workaround/sharp_pixmap_painting.h>
@@ -15,9 +17,9 @@ namespace desktop {
 namespace {
 
 static constexpr qreal kRoundingRadius = 2;
-static constexpr QSizeF kArrowSize(8, 4);
+static const QSizeF kArrowSize(8, 4);
 static constexpr qreal kArrowMargin = 6;
-static constexpr QMarginsF kTooltipMargins(6, 4, 6, 4);
+static const QMarginsF kTooltipMargins(6, 4, 6, 4);
 
 struct ArrowPosition
 {
@@ -53,7 +55,7 @@ ArrowPosition arrowPosition(const QRectF& tooltipRect, const QRectF& objectRect)
         arrowPos.position.setY(tooltipRect.bottom() + kArrowSize.height() / 2 + 1);
     }
 
-    constexpr qreal margin = kArrowMargin + kArrowSize.width() / 2;
+    const qreal margin = kArrowMargin + kArrowSize.width() / 2;
 
     switch (arrowPos.edge)
     {
@@ -82,7 +84,7 @@ void paintArrow(QPainter* painter, const QRectF& rect, const Qt::Edge edge)
         rect.topLeft(), rect.topRight(), rect.bottomRight(), rect.bottomLeft()
     }};
 
-    auto point = [&points](size_t i) { return points[i % kPointsCount]; };
+    auto point = [&points, &kPointsCount](size_t i) { return points[i % kPointsCount]; };
 
     size_t firstCorner = 0;
     switch (edge)
