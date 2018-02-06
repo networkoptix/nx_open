@@ -428,6 +428,7 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     const QModelIndex& index,
     const nx::client::desktop::EventTile* tile)
 {
+    qDebug() << "HoverEvent" << tile;
     if (m_eventPanelHoverProcessor)
     {
         if (m_lastHoveredTile == tile)
@@ -459,6 +460,7 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     toolTip->setMaxThumbnailSize(kToolTipMaxThumbnailSize);
     toolTip->setText(text);
     toolTip->setImageProvider(imageProvider);
+    toolTip->setHighlightRect(tile->previewCropRect());
     toolTip->setThumbnailVisible(imageProvider != nullptr);
     toolTip->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
     toolTip->updateTailPos();
