@@ -106,6 +106,8 @@ public:
 
     static const QString kNormalizedSpeedPtzTrait;
     static const QString kHas3AxisPtz;
+    static const QString kHanwhaAlternativeZoomTrait;
+    static const QString kHanwhaAlternativeFocusTrait;
 
     std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
 
@@ -124,6 +126,7 @@ private:
     CameraDiagnostics::Result initMedia();
     CameraDiagnostics::Result initIo();
     CameraDiagnostics::Result initPtz();
+    CameraDiagnostics::Result initAlternativePtz();
     CameraDiagnostics::Result initAdvancedParameters();
     CameraDiagnostics::Result initTwoWayAudio();
     CameraDiagnostics::Result initRemoteArchive();
@@ -269,6 +272,7 @@ private:
     Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
     QnPtzLimits m_ptzLimits;
     QnPtzAuxilaryTraitList m_ptzTraits;
+    std::map<QString, std::set<int>> m_alternativePtzRanges;
 
     std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
     HanwhaAttributes m_attributes;
