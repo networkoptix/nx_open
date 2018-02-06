@@ -61,9 +61,9 @@ QnResourceList searchCameraResources(const QnManualCameraInfo& camera)
 {
     try
     {
-        if (const auto seracher = dynamic_cast<QnAbstractNetworkResourceSearcher*>(camera.searcher))
+        if (const auto searcher = dynamic_cast<QnAbstractNetworkResourceSearcher*>(camera.searcher))
         {
-            return seracher->checkEndpoint(camera.url.toString(),
+            return searcher->checkEndpoint(camera.url.toString(),
                 camera.auth, camera.uniqueId, QnResouceSearchMode::basic);
         }
     }
