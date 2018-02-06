@@ -135,7 +135,7 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
         break;
     }
 
-    ui->sdkEventTypeComboBox->setCurrentIndex(index);    
+    ui->sdkEventTypeComboBox->setCurrentIndex(index);
 }
 
 nx::vms::event::EventParameters AnalyticsSdkEventWidget::createEventParameters(

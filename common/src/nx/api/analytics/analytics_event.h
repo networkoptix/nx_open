@@ -16,6 +16,7 @@ struct Analytics
 public:
     enum EventTypeFlag
     {
+        noFlags = 0,
         stateDependent = 1 << 0, //< Prolonged event with active and non-active states.
         regionDependent = 1 << 1, //< Event has reference to a region.
     };
@@ -28,7 +29,7 @@ public:
     {
         QnUuid eventTypeId;
         TranslatableString eventName;
-        EventTypeFlags flags;
+        EventTypeFlags flags = EventTypeFlag::noFlags;
     };
 };
 #define AnalyticsEventType_Fields (eventTypeId)(eventName)(flags)

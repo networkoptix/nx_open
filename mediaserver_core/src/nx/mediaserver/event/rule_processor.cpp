@@ -422,6 +422,7 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
         // If toggle event goes to 'off', stop action.
         if (!condOK || event->getToggleState() == vms::event::EventState::inactive)
             action = vms::event::ActionFactory::instantiateAction(
+                commonModule(),
                 rule,
                 event,
                 commonModule()->moduleGUID(),
@@ -432,6 +433,7 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
     else if (condOK)
     {
         action = vms::event::ActionFactory::instantiateAction(
+            commonModule(),
             rule,
             event,
             commonModule()->moduleGUID());
@@ -481,7 +483,11 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
 
 
     if (rule->aggregationPeriod() == 0 || !vms::event::allowsAggregation(rule->actionType()))
-        return vms::event::ActionFactory::instantiateAction(rule, event, commonModule()->moduleGUID());
+    {
+        return vms::event::ActionFactory::instantiateAction(
+            commonModule(),
+            rule, event, commonModule()->moduleGUID());
+    }
 
     QString eventKey = rule->getUniqueId();
     if (event->getResource() && event->getEventType() != vms::event::softwareTriggerEvent)
@@ -496,6 +502,7 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
     if (aggInfo.isExpired())
     {
         vms::event::AbstractActionPtr result = vms::event::ActionFactory::instantiateAction(
+            commonModule(),
             aggInfo.rule(),
             aggInfo.event(),
             commonModule()->moduleGUID(),
@@ -517,6 +524,7 @@ void RuleProcessor::at_timer()
         if (aggInfo.totalCount() > 0 && aggInfo.isExpired())
         {
             executeAction(vms::event::ActionFactory::instantiateAction(
+                commonModule(),
                 aggInfo.rule(),
                 aggInfo.event(),
                 commonModule()->moduleGUID(),
@@ -540,7 +548,7 @@ bool RuleProcessor::checkEventCondition(const vms::event::AbstractEventPtr& even
     if (!event->checkEventParams(rule->eventParams()))
         return false;
 
-    if (!vms::event::hasToggleState(event->getEventType()))
+    if (!vms::event::hasToggleState(event->getEventType(), rule->eventParams(), commonModule()))
         return true;
 
     // For continuing event put information to m_eventsInProgress.
@@ -701,6 +709,7 @@ void RuleProcessor::terminateRunningRule(const vms::event::RulePtr& rule)
             if (event)
             {
                 vms::event::AbstractActionPtr action = vms::event::ActionFactory::instantiateAction(
+                    commonModule(),
                     rule,
                     event,
                     commonModule()->moduleGUID(),

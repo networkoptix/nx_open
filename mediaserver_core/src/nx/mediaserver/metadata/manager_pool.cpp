@@ -259,7 +259,7 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
             mergePluginManifestToServer(*auxiliaryPluginManifest, server);
         }
 
-        auto handler = createMetadataHandler(camera, pluginManifest->driverId);
+        auto handler = createMetadataHandler(camera, *pluginManifest);
         if (!handler)
         {
             NX_DEBUG(
@@ -320,7 +320,7 @@ void ManagerPool::releaseResourceMetadataManagers(const QnSecurityCamResourcePtr
 
 MetadataHandler* ManagerPool::createMetadataHandler(
     const QnResourcePtr& resource,
-    const QnUuid& pluginId)
+    const nx::api::AnalyticsDriverManifest& manifest)
 {
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
@@ -334,7 +334,7 @@ MetadataHandler* ManagerPool::createMetadataHandler(
 
     auto handler = new EventHandler();
     handler->setResource(camera);
-    handler->setPluginId(pluginId);
+    handler->setManifest(manifest);
 
     return handler;
 }

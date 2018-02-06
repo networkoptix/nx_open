@@ -471,7 +471,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                 result = m_stringsHelper->eventDetails(action.eventParams).join(L'\n');
             }
 
-            if (!vms::event::hasToggleState(eventType))
+            if (!vms::event::hasToggleState(eventType, action.eventParams, commonModule()))
             {
                 int count = action.aggregationCount;
                 if (count > 1)

@@ -74,7 +74,7 @@ private:
 
     nx::sdk::metadata::MetadataHandler* createMetadataHandler(
         const QnResourcePtr& resource,
-        const QnUuid& pluginId);
+        const nx::api::AnalyticsDriverManifest& manifest);
 
     void handleResourceChanges(const QnResourcePtr& resource);
 
