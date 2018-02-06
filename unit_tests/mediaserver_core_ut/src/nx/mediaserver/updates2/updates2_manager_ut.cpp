@@ -813,6 +813,41 @@ TEST_F(Updates2Manager, Prepare_successfulAndReadyForInstall)
     thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::readyToInstall);
 }
 
+TEST_F(Updates2Manager, Prepare_failedNoFreeSpace)
+{
+    givenAvailableRemoteUpdate();
+    givenInstallerInstallWithTheOutcome(PrepareExpectedOutcome::fail_noFreeSpace);
+
+    whenDownloadRequestIssued(DownloadExpectedOutcome::success_fileNotExists);
+    whenDownloadFinishedSuccessfully();
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
+    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::error);
+
+    const auto newVersion = QnSoftwareVersion("1.0.0.2");
+    givenGlobalRegistryFactoryFunc(
+        [this, &newVersion]()
+        {
+            return createUpdateRegistry(
+                &newVersion,
+                /*hasUpdate*/ true,
+                /*expectFindUpdateFileWillBeCalled*/ false,
+                /*expectToByteArrayWillBeCalled*/ false);
+        });
+
+    givenRemoteRegistryFactoryFunc(
+        [this, &newVersion]()
+        {
+            return createUpdateRegistry(
+                /*version*/ &newVersion,
+                /*hasUpdate*/ true,
+                /*expectFindUpdateFileWillBeCalled*/ false,
+                /*expectToByteArrayWillBeCalled*/ false);
+        });
+
+    whenRemoteUpdateDone();
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
+}
+
 } // namespace test
 } // namespace detail
 } // namespace updates2

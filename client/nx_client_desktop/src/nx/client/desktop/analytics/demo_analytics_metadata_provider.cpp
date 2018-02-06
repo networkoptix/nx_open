@@ -1,5 +1,7 @@
 #include "demo_analytics_metadata_provider.h"
 
+#include <chrono>
+
 #include <QtCore/QFile>
 
 #include <nx/fusion/model_functions.h>
@@ -27,15 +29,34 @@ static QRectF randomRect()
         h);
 }
 
-static QRectF shiftedRect(const QRectF& rect, qint64 timestamp)
+struct DemoAnalyticsObject: common::metadata::DetectedObject
 {
-    const auto kSpeed = 0.025; //< Per second.
+    QPointF movementSpeed;
 
-    QRectF result = rect;
-    result.moveLeft(qMod(rect.x() + timestamp / 1000000.0 * kSpeed, 1.0 - rect.width()));
-    return result;
-}
+    DemoAnalyticsObject animated(std::chrono::milliseconds dt)
+    {
+        // Ping-pong movement animation.
 
+        auto movedCoordinate = [dt](qreal value, qreal speed, qreal space)
+            {
+                value = std::abs(value + speed * (dt.count() / 1000.0));
+
+                int reflections = static_cast<int>(value / space);
+                value -= space * reflections;
+
+                return (reflections % 2 == 1) ? space - value : value;
+            };
+
+        DemoAnalyticsObject animatedObject = *this;
+        animatedObject.boundingBox.moveTo(
+            movedCoordinate(boundingBox.x(), movementSpeed.x(), 1.0 - boundingBox.width()),
+            movedCoordinate(boundingBox.y(), movementSpeed.y(), 1.0 - boundingBox.height()));
+        return animatedObject;
+    }
+};
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DemoAnalyticsObject, (json),
+    DetectedObject_Fields (movementSpeed));
 } // namespace
 
 class DemoAnalyticsMetadataProvider::Private
@@ -44,7 +65,8 @@ public:
     int objectsCount = 0;
     qint64 duration = kDefaultDuration;
 
-    QVector<common::metadata::DetectedObject> objects;
+    QVector<DemoAnalyticsObject> objects;
+    std::chrono::milliseconds startTimestamp = std::chrono::milliseconds::zero();
 
 public:
     Private():
@@ -87,11 +109,12 @@ public:
 
         for (int i = 0; i < objectsCount; ++i)
         {
-            common::metadata::DetectedObject object;
+            DemoAnalyticsObject object;
             object.objectId = QnUuid::createUuid();
             object.boundingBox = randomRect();
             object.labels.emplace_back(
                 common::metadata::Attribute{lit("Object %1").arg(i), QString()});
+            object.movementSpeed = QPointF(1.0, 1.0);
 
             objects.append(object);
         }
@@ -104,8 +127,10 @@ DemoAnalyticsMetadataProvider::DemoAnalyticsMetadataProvider():
 }
 
 common::metadata::DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::metadata(
-    qint64 timestamp, int /*channel*/) const
+    qint64 timestampUs, int /*channel*/) const
 {
+    using namespace std::chrono;
+
     if (d->objectsCount <= 0)
         return common::metadata::DetectionMetadataPacketPtr();
 
@@ -117,17 +142,18 @@ common::metadata::DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::meta
 
     const auto precision = ini().demoAnalyticsProviderTimestampPrecisionUs;
     if (precision > 0)
-        timestamp -= timestamp % precision;
+        timestampUs -= timestampUs % precision;
 
-    metadata->timestampUsec = timestamp;
+    const auto timestamp = duration_cast<milliseconds>(microseconds(timestampUs));
+    if (d->startTimestamp == milliseconds::zero())
+        d->startTimestamp = timestamp;
+    const auto dt = timestamp - d->startTimestamp;
+
+    metadata->timestampUsec = timestampUs;
     metadata->durationUsec = d->duration * 1000;
 
-    for (const auto& object: d->objects)
-    {
-        auto movedObject = object;
-        movedObject.boundingBox = shiftedRect(object.boundingBox, timestamp);
-        metadata->objects.push_back(movedObject);
-    }
+    for (auto& object: d->objects)
+        metadata->objects.push_back(object.animated(dt));
 
     return metadata;
 }

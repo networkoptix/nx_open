@@ -312,7 +312,21 @@ void Updates2ManagerBase::startPreparing(const QString& updateFilePath)
                         api::Updates2StatusData::StatusCode::readyToInstall,
                         lit("Update is ready for installation: %1").arg(updateId));
                     return;
-                default:
+                case PrepareResult::corruptedArchive:
+                    setStatus(
+                        api::Updates2StatusData::StatusCode::error,
+                        lit("Update archive is corrupted: %1").arg(updateId));
+                    return;
+                case PrepareResult::noFreeSpace:
+                    setStatus(
+                        api::Updates2StatusData::StatusCode::error,
+                        lit("Failed to prepare update file (%1), no space left on device")
+                            .arg(updateId));
+                    return;
+                case PrepareResult::unknownError:
+                    setStatus(
+                        api::Updates2StatusData::StatusCode::error,
+                        lit("Failed to prepare update files: %1").arg(updateId));
                     return;
             }
         });
