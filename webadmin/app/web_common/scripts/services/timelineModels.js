@@ -1355,7 +1355,7 @@ ScaleManager.prototype.scroll = function(value){
 
     So we use this relativePosition as a scroll value
 */
-    if(typeof (value) == "undefined"){
+    if(typeof (value) == "undefined" || isNaN(value)){
         //instead of scrolling by center - we always determine scroll value by left position
         return this.getRelativePosition();
     }
@@ -1367,6 +1367,9 @@ ScaleManager.prototype.scroll = function(value){
 
 ScaleManager.prototype.getScrollByPixelsTarget = function(pixels){
     var availableWidth = (this.end - this.start) - (this.visibleEnd - this.visibleStart);
+    if( availableWidth < 1){
+        return 0;
+    }
     var relativeValue = (this.visibleEnd - this.visibleStart) / availableWidth;
     return this.bound(0,this.scroll() + pixels / this.viewportWidth * relativeValue,1);
 };

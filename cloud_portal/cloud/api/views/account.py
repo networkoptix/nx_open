@@ -165,7 +165,6 @@ def activate(request):
         return api_success()
     elif 'user_email' in request.data:
         user_email = request.data['user_email'].lower()
-        AccountBackend.check_email_in_portal(user_email, True)  # Check if account is in Cloud_db
         Account.reactivate(user_email)
     else:
         raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
@@ -191,11 +190,20 @@ def restore_password(request):
         Account.restore_password(code, new_password)
     elif 'user_email' in request.data:
         user_email = request.data['user_email'].lower()
-        AccountBackend.check_email_in_portal(user_email, True)  # Check if account is in Cloud_db
-
         Account.reset_password(user_email)
     else:
         raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
                                   error_data={'code': ['This field is required.'],
                                               'user_email': ['This field is required.']})
     return api_success()
+
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+@handle_exceptions
+def check_code_in_portal(request):
+    require_params(request, ('code',))
+    code = request.data['code']
+    (temp_password, email) = Account.extract_temp_credentials(code)
+    email_exists = AccountBackend.is_email_in_portal(email)
+    return api_success({'emailExists': email_exists})

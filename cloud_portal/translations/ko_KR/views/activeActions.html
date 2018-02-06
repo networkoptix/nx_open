@@ -12,11 +12,11 @@
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>You have registered in {{PRODUCT_NAME}}</h1>
+            <h1>{{PRODUCT_NAME}} 에 등록했습니다.</h1>
             <p>우리는 다음과 같이 활성화 링크를 보내드렸습니다. {{data.email}}.<br>
             상기 링크를 방문 하셔서 활성화 하시기 바랍니다.</p>
         </div>
-        <h1 ng-if="!data.email">계정을 확인 하십시요</h1>
+        <h1 ng-if="!data.email">Activate your account</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <label for="emailReactivate"  class="col-sm-4 control-label">이메일</label>

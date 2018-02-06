@@ -53,6 +53,12 @@ angular.module('cloudApp')
             });
         };
 
+        this.getMySystems = function(currentUserEmail, systemId){
+            return _.filter(this.systems, function(system){
+                return system.ownerAccountEmail == currentUserEmail && system.id != systemId;
+            });
+        };
+
         this.forceUpdateSystems();
         this.delayedUpdateSystems();
     }]);

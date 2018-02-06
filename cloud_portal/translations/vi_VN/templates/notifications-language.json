@@ -1,17 +1,20 @@
 {
   "activate_account": {
-    "emailSubject": "Xác nhận tài khoản của bạn"
+    "emailSubject": "Activate your account"
   },
   "restore_password": {
-    "emailSubject": "Khôi phục mật khẩu của bạn"
+    "emailSubject": "Reset your password"
   },
   "system_invite": {
-    "emailSubject": "Hệ thống video {{message.system_name}} đã được chia sẻ với bạn"
+    "emailSubject": "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "Hệ thống video {{message.system_name}} đã được chia sẻ với bạn"
+    "emailSubject": "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
   },
   "review_version": {
     "emailSubject": "Phiên bản {{message.id}} đã sẵn sàng xem"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
   }
 }

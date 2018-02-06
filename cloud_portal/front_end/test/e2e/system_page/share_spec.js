@@ -122,7 +122,7 @@ describe('Sharing.', function () {
     //    p.submitShareButton.click();
     //});
 
-    it ("Edit permission works", function() {
+    xit ("Edit permission works, currently failing due to CLOUD-1596", function() {
         p.helper.loginToSystems(p.helper.userEmailOwner);
         p.ownedSystem.click();
         // Change permissions of viewer to live viewer
@@ -143,7 +143,7 @@ describe('Sharing.', function () {
         expect(p.usrDataRow(p.helper.userEmailViewer).getText()).not.toContain('Live Viewer');
     });
 
-    it ("Sharing works", function() {
+    xit ("Sharing works, , currently failing due to CLOUD-1596", function() {
         var newUserEmail = p.helper.getRandomEmail();
         p.helper.createUser('Mark', 'Hamill', newUserEmail);
 

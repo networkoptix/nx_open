@@ -1,11 +1,11 @@
-<h1>System wurde mit Ihnen geteilt</h1>
+<h1>Hello, {{message.fullName}}</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> hat sein System {{message.system_name}} mit Ihnen geteilt.</p>
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> has shared access to video management system "{{message.system_name}}" with you.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>Das System {{message.system_name}} wurde mit Ihnen geteilt.</p>
+<p>You have been granted access to video management system "{{message.system_name}}".</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">System öffnen</a>
+<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">View in {{PRODUCT_NAME}} Portal</a>

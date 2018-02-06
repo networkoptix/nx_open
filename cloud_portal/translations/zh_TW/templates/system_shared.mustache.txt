@@ -1,11 +1,11 @@
-系統與您共用
+Hello, {{message.fullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) 共用系統 {{message.system_name}} 給您.
+{{message.sharer_name}} ({{message.sharer_email}}) has shared access to video management system "{{message.system_name}}" with you.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-與您共用系統 {{message.system_name}}.
+You have been granted access to video management system "{{message.system_name}}".
 {{/message.sharer_name}}
 
-開啟系統: {{config.portal_url}}/系統/{{message.system_id}}
+View in {{PRODUCT_NAME}} Portal: {{config.portal_url}}/systems/{{message.system_id}}

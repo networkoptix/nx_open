@@ -1,8 +1,8 @@
-{{PRODUCT_NAME}} へようこそ
+Hello,
 
-{{PRODUCT_NAME}} に参加いただきありがとうございます メール アドレスを確認し、アカウントをアクティブにするには、以下のボタンを参照してください
+  Please open the link below to confirm your email address and activate the account.
 
-アクティベート アカウント: {{config.portal_url}}/アクティブ/{{message.code}}
+{{config.portal_url}}/activate/{{message.code}}
 
 {{PRODUCT_NAME}} で登録していない場合はこのメールを無視してください
-メッセージまたはリンクを第三者と共有しないでください
+Do not share the message or the link with anyone.

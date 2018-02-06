@@ -1,27 +1,47 @@
 {
-    "cameraLinks": {
-        "highStream": "Wysoki strumień",
-        "lowStream": "Niski strumień",
-        "transcoding": "Transkodowanie",
-        "unknown": "Nieznany",
-        "copyToClipboard": "kopiuj do schowka",
-        "copyDefaultText": "kopiuj",
-        "copyActiveText": "skopiowano do schowka"
-    },
-    "systemOffline": "Serwer jest odłączony",
-    "cameraStates": {
-        "offline": "Offline",
-        "error": "Błąd",
-        "unauthorized": "Wymagane uwierzytelnienie",
-        "noData": "Brak danych",
-        "iosVideoTooLarge": "iOS nie obsługuje wideo większego niż FullHD (2MP: 1920x1080).",
-        "flashRequired": "Proszę <a href='https://get.adobe.com/flashplayer/' target='_blank'>zainstalować Adobe Flash</a> w celu odtwarzania wideo na serwerach bazujących na architekturze ARM.",
-        "flashOrWebmRequired": "Proszę <a href='https://get.adobe.com/flashplayer/' target='_blank'>zainstalować Adobe Flash</a> lub <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodek WebM</a> w celu odtwarzania wideo w przeglądarce Internet Explorer.",
-        "noArmSupport": "Ta przeglądarka lub system nie obsługują odtwarzania wideo na serwerze bazującym na architekturze ARM.",
-        "noFormat": "Ta przeglądarka lub system nie obsługują odtwarzania wideo z tej kamery.",
-        "ieNoWebm": "Proszę <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>zainstalować kodek WebM</a> do Internet Explorera.",
-        "ieWin10": "Proszę użyć przeglądarki Microsoft Edge lub Google Chrome.",
-        "ubuntuNX": "Ta przeglądarka nie obsługuje wideo z serwerów opartych na architekturze ARM. Proszę użyć przeglądarki Chromium."
-    },
-    "searchCamPlaceholder": "szukanie"
+  "cameraLinks": {
+    "highStream": "Wysoki strumień",
+    "lowStream": "Niski strumień",
+    "transcoding": "Transkodowanie",
+    "unknown": "Nieznany",
+    "copyToClipboard": "kopiuj do schowka",
+    "copyDefaultText": "kopiuj",
+    "copyActiveText": "skopiowano do schowka"
+  },
+  "systemOffline": "Serwer jest odłączony",
+  "cameraStates": {
+    "offline": "Offline",
+    "error": "Błąd",
+    "unauthorized": "Wymagane uwierzytelnienie",
+    "noData": "Brak danych",
+    "iosVideoTooLarge": "iOS nie obsługuje wideo większego niż FullHD (2MP: 1920x1080).",
+    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashOrWebmRequired": "Proszę <a href='https://get.adobe.com/flashplayer/' target='_blank'>zainstalować Adobe Flash</a> lub <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodek WebM</a> w celu odtwarzania wideo w przeglądarce Internet Explorer.",
+    "noArmSupport": "Ta przeglądarka lub system nie obsługują odtwarzania wideo na serwerze bazującym na architekturze ARM.",
+    "noFormat": "This browser does not support video playback from this camera.",
+    "ieNoWebm": "Proszę <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>zainstalować kodek WebM</a> do Internet Explorera.",
+    "ieWin10": "Proszę użyć przeglądarki Microsoft Edge lub Google Chrome.",
+    "ubuntuNX": "Ta przeglądarka nie obsługuje wideo z serwerów opartych na architekturze ARM. Proszę użyć przeglądarki Chromium."
+  },
+  "searchCamPlaceholder": "Search",
+  "resolution": {
+    "auto": "Auto",
+    "high": "High",
+    "low": "Low"
+  },
+  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+  "voiceCommands": {
+    "play": "play",
+    "pause": "pause",
+    "live": "go to live | show me live",
+    "view": "view + [camera name]",
+    "search": "find + [text for searchbar]",
+    "clear search": "clear search",
+    "expand server": "expand server + [server name]",
+    "collapse server": "collapse server + [server name]",
+    "expand all servers": "expand all servers",
+    "collapse all servers": "collapse all servers",
+    "stop listening": "stop listening",
+    "help": "help | show commands"
+  }
 }

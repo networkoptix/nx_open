@@ -1,8 +1,8 @@
-{{PRODUCT_NAME}}에 오신 것을 환영합니다.
+Hello,
 
-{{PRODUCT_NAME}}에 가입 해 주셔서 감사합니다. 아래 버튼을 클릭하여 이메일 주소를 확인하고 계정을 활성화하십시오.
+  Please open the link below to confirm your email address and activate the account.
 
-계정 활성화: {{config.portal_url}}/activate/{{message.code}}
+{{config.portal_url}}/activate/{{message.code}}
 
 {{PRODUCT_NAME}} 에 등록하지 않았다면 상기 이메일을 무시하십시오.
-제 3 자와 메시지 또는 링크를 공유하지 마십시오.
+Do not share the message or the link with anyone.

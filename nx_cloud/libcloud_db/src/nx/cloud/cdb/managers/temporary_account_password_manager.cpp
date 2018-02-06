@@ -12,11 +12,11 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/cryptographic_random_device.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/string.h>
 #include <nx/utils/time.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/uuid.h>
 
 #include "../stree/cdb_ns.h"
 
@@ -106,10 +106,11 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
 }
 
 void TemporaryAccountPasswordManager::addRandomCredentials(
+    const std::string& accountEmail,
     data::TemporaryAccountCredentials* const data)
 {
     if (data->login.empty())
-        data->login = generateRandomPassword();
+        data->login = accountEmail;
 
     data->password = generateRandomPassword();
     data->passwordHa1 = nx::network::http::calcHa1(
@@ -219,18 +220,9 @@ boost::optional<TemporaryAccountCredentialsEx>
 
 std::string TemporaryAccountPasswordManager::generateRandomPassword() const
 {
-    std::string password(
-        nx::utils::random::number(
-            nx::utils::random::CryptographicRandomDevice::instance(), 10U, 20U),
-        'a');
-    std::generate(
-        password.begin(), password.end(),
-        [this]()
-        {
-            return nx::utils::random::number(
-                nx::utils::random::CryptographicRandomDevice::instance(), (int)'a', (int)'z');
-        });
-    return password;
+    auto str = QnUuid::createUuid().toSimpleByteArray();
+    str.replace('-', "");
+    return str.toStdString();
 }
 
 bool TemporaryAccountPasswordManager::isTemporaryPasswordExpired(

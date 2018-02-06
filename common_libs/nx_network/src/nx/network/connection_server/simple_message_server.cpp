@@ -7,11 +7,13 @@ namespace server {
 SimpleMessageServerConnection::SimpleMessageServerConnection(
     StreamConnectionHolder<SimpleMessageServerConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> _socket,
-    nx::Buffer staticMessage)
+    nx::Buffer request,
+    nx::Buffer response)
     :
     m_socketServer(socketServer),
     m_socket(std::move(_socket)),
-    m_staticMessage(std::move(staticMessage)),
+    m_request(std::move(request)),
+    m_response(std::move(response)),
     m_creationTimestamp(std::chrono::steady_clock::now())
 {
     bindToAioThread(m_socket->getAioThread());
@@ -25,9 +27,20 @@ void SimpleMessageServerConnection::startReadingConnection(
     if (!m_socket->setNonBlockingMode(true))
         return m_socketServer->closeConnection(SystemError::getLastOSErrorCode(), this);
 
-    m_socket->sendAsync(
-        m_staticMessage,
-        std::bind(&SimpleMessageServerConnection::onDataSent, this, _1, _2));
+    if (m_request.isEmpty())
+    {
+        m_socket->sendAsync(
+            m_response,
+            std::bind(&SimpleMessageServerConnection::onDataSent, this, _1, _2));
+    }
+    else
+    {
+        m_readBuffer.reserve(m_response.size());
+        // Reading request
+        m_socket->readAsyncAtLeast(
+            &m_readBuffer, m_response.size(),
+            std::bind(&SimpleMessageServerConnection::onDataRead, this, _1, _2));
+    }
 }
 
 void SimpleMessageServerConnection::setKeepConnection(bool val)
@@ -49,6 +62,33 @@ int SimpleMessageServerConnection::messagesReceivedCount() const
 void SimpleMessageServerConnection::stopWhileInAioThread()
 {
     m_socket.reset();
+}
+
+void SimpleMessageServerConnection::onDataRead(
+    SystemError::ErrorCode errorCode,
+    size_t /*bytesRead*/)
+{
+    using namespace std::placeholders;
+
+    if (errorCode != SystemError::noError)
+    {
+        NX_VERBOSE(this, lm("Failure while reading connection from %1. %2")
+            .args(m_socket->getForeignAddress(), SystemError::toString(errorCode)));
+        m_socketServer->closeConnection(errorCode, this);
+        return;
+    }
+
+    if (!m_readBuffer.startsWith(m_request))
+    {
+        NX_VERBOSE(this, lm("Received unexpected message %1 from %2 while expecting %3")
+            .args(m_readBuffer, m_socket->getForeignAddress(), m_request));
+        m_socketServer->closeConnection(SystemError::invalidData, this);
+        return;
+    }
+
+    m_socket->sendAsync(
+        m_response,
+        std::bind(&SimpleMessageServerConnection::onDataSent, this, _1, _2));
 }
 
 void SimpleMessageServerConnection::onDataSent(

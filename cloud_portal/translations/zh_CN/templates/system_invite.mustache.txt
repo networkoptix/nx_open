@@ -6,7 +6,7 @@
 
 {{^message.sharer_name}}
 你被邀请加入 {{PRODUCT_NAME}}。
-与你分享系统 {{message.system_name}}。
+You have been granted access to {{message.system_name}}.
 {{/message.sharer_name}}
 
 注册并查看系统︰ {{config.portal_url}}/注册/{{message.code}}

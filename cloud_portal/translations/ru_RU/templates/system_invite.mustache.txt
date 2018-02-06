@@ -6,7 +6,7 @@
 
 {{^message.sharer_name}}
 Приглашаем вас присоединиться к {{PRODUCT_NAME}}.
-Вам открыт доступ к системе {{message.system_name}}.
+You have been granted access to {{message.system_name}}.
 {{/message.sharer_name}}
 
 Регистрация и просмотр системы: {{config.portal_url}}/register/{{message.code}}
