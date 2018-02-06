@@ -32,6 +32,7 @@ can be closed after clicking on background
 allows to log in with existing credentials and to log out
     Open Browser and go to URL    ${url}
     Log In    ${email}    ${password}
+    Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Click Element    ${ACCOUNT DROPDOWN}
     Wait Until Element Is Visible    ${LOG OUT BUTTON}
@@ -59,6 +60,7 @@ after log In, display user's email and menu in top right corner
     Open Browser and go to URL    ${url}
     Maximize Browser Window
     Log In    ${email}    ${password}
+    Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Element Text Should Be    ${ACCOUNT DROPDOWN}    ${email}
     Close Browser
@@ -149,8 +151,8 @@ contains 'I forgot password' link that leads to Restore Password page with pre-f
     Log In    ${email}    'aderhgadehf'
     Wait Until Element Is Visible    ${FORGOT PASSWORD}
     Click Link    ${FORGOT PASSWORD}
-    Wait Until Element Is Visible    ${RESET PASSWORD EMAIL INPUT}
-    Textfield Should Contain    ${RESET PASSWORD EMAIL INPUT}    ${email}
+    Wait Until Element Is Visible    ${RESTORE PASSWORD EMAIL INPUT}
+    Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Close Browser
 
 passes email from email input to Restore password page, even without clicking 'Log in' button
@@ -163,8 +165,8 @@ passes email from email input to Restore password page, even without clicking 'L
     sleep    .15
     Wait Until Element Is Visible    ${FORGOT PASSWORD}
     Click Link    ${FORGOT PASSWORD}
-    Wait Until Element Is Visible    ${RESET PASSWORD EMAIL INPUT}
-    Textfield Should Contain    ${RESET PASSWORD EMAIL INPUT}    ${email}
+    Wait Until Element Is Visible    ${RESTORE PASSWORD EMAIL INPUT}
+    Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Close Browser
 
 redirects to /activate and shows non-activated user message when not activated; Resend activation button sends email

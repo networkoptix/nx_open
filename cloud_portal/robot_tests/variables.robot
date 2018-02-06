@@ -5,6 +5,7 @@ ${ALERT CLOSE}                        //div[contains(@class, 'ng-toast')]//span[
 ${LOCAL}                              https://localhost:9000/
 
 ${CLOUD TEST}                         https://cloud-test.hdw.mx
+${CLOUD DEV}                          https://cloud-dev2.hdw.mx
 ${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
 
 ${CYRILLIC NAME}                     Кенгшщзх
@@ -26,7 +27,7 @@ ${YOU HAVE NO SYSTEMS}                //span[contains(text(),'You have no System
 
 ${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), 'Log Out')]
-${AUTHORIZED BODY}                    //body[@class='authorized']
+${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
 ${ANONYMOUS BODY}                     //body[@class='anonymous']
 ${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
 ${CREATE ACCOUNT BODY}                //body//a[@href='/register']

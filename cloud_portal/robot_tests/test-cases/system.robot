@@ -29,6 +29,7 @@ has system name, owner and OpenInNx button visible on systems page
 shows offline status and does not show open in nx button when offline
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
     Wait Until Element Is Visible    ${AUTOTESTS OFFLINE}
     Element Should Be Visible    ${AUTOTESTS OFFLINE}
     Wait Until Element Is Not Visible    ${AUTOTESTS OPEN NX OFFLINE}

@@ -22,7 +22,7 @@ Log in to Auto Tests System
 Share button - opens dialog
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${email}
-    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Wait Until Elements Are Visible    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE MODAL}
     Element Should Be Visible    ${SHARE MODAL}

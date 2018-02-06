@@ -39,8 +39,8 @@ should save user data to user account correctly
     Validate Log In
     Go To    ${url}/account
     Wait Until Elements Are Visible    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}
-    Textfield Should Contain    ${ACCOUNT FIRST NAME}    mark
-    Textfield Should Contain    ${ACCOUNT LAST NAME}    hamill
+    Wait For Condition    return $("form[name='accountForm'] input[ng-model='account.first_name']").val() == 'mark'
+    Wait For Condition    return $("form[name='accountForm'] input[ng-model='account.last_name']").val() == 'hamill'
     Close Browser
 
 should allow to enter more than 255 symbols in First and Last names and cut it to 255
@@ -52,8 +52,8 @@ should allow to enter more than 255 symbols in First and Last names and cut it t
     Validate Log In
     Go To    ${url}/account
     Wait Until Elements Are Visible    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}
-    Textfield Should Contain    ${ACCOUNT FIRST NAME}    ${255CHARS}
-    Textfield Should Contain    ${ACCOUNT LAST NAME}    ${255CHARS}
+    Wait For Condition    return $("form[name='accountForm'] input[ng-model='account.first_name']").val() == '${255CHARS}'
+    Wait For Condition    return $("form[name='accountForm'] input[ng-model='account.last_name']").val() == '${255CHARS}'
     Close Browser
 
 should trim leading and trailing spaces
@@ -64,9 +64,8 @@ should trim leading and trailing spaces
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
-    Wait Until Elements Are Visible    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}
-    Textfield Value Should Be    ${ACCOUNT FIRST NAME}    mark
-    Textfield Value Should Be    ${ACCOUNT LAST NAME}    hamill
+    Wait For Condition    return $("form[name='accountForm'] input[ng-model='account.first_name']").val() == 'mark'
+    Wait For Condition    return $("form[name='accountForm'] input[ng-model='account.last_name']").val() == 'hamill'
     Close Browser
 
 #These are blocked by CLOUD-1624
