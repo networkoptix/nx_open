@@ -49,6 +49,9 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
         [this] { qApp->clipboard()->setText(ui->primaryStreamLabel->text()); });
     connect(ui->secondaryStreamCopyButton, &ui::ClipboardButton::clicked, this,
         [this] { qApp->clipboard()->setText(ui->secondaryStreamLabel->text()); });
+
+    connect(ui->nameLabel, &QnEditableLabel::textChanged, this,
+        &CameraInfoWidget::hasChangesChanged);
 }
 
 CameraInfoWidget::~CameraInfoWidget()
@@ -85,7 +88,10 @@ void CameraInfoWidget::setModel(CameraSettingsModel* model)
 
 bool CameraInfoWidget::hasChanges() const
 {
-    return false;
+    if (!m_model->isSingleCameraMode())
+        return false;
+
+    return m_model->name() != ui->nameLabel->text();
 }
 
 void CameraInfoWidget::loadDataToUi()
