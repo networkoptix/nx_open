@@ -1,5 +1,4 @@
-#ifndef PLUGIN_TOOLS_H
-#define PLUGIN_TOOLS_H
+#pragma once
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -407,5 +406,3 @@ struct hash<nxpl::NX_GUID>
 };
 
 } // namespace std
-
-#endif  //PLUGIN_TOOLS_H

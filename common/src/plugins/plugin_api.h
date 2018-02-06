@@ -1,6 +1,4 @@
-#ifndef NX_PLUGIN_API_H
-#define NX_PLUGIN_API_H
-
+#pragma once
 
 //!VMS dynamic plugin API (c++)
 /*!
@@ -160,4 +158,3 @@ namespace nxpl
 //!Define to mark ascii only output parameters and return values.
 #define NX_ASCII
 
-#endif  //NX_PLUGIN_API_H

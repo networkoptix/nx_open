@@ -1,7 +1,5 @@
 #pragma once
 
-#include <plugins/plugin_api.h>
-
 namespace nx {
 namespace sdk {
 

@@ -1,10 +1,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/objects_metadata_packet.h>
-#include <nx/sdk/metadata/events_metadata_packet.h>
 #include <nx/sdk/metadata/common_attribute.h>
 
 namespace nx {
@@ -31,7 +31,7 @@ public:
     void setConfidence(float confidence);
     void setId(const nxpl::NX_GUID& value);
     void setObjectSubType(const std::string& value);
-    void setAttributes(const std::vector<nx::sdk::metadata::CommonAttribute>& value);
+    void setAttributes(const std::vector<CommonAttribute>& value);
     void setAuxilaryData(const std::string& value);
     void setBoundingBox(const Rect& rect);
 
@@ -42,7 +42,7 @@ private:
 
     nxpl::NX_GUID m_id;
     std::string m_objectSubType;
-    std::vector<nx::sdk::metadata::CommonAttribute> m_attributes;
+    std::vector<CommonAttribute> m_attributes;
     std::string m_auxilaryData;
     Rect m_rect;
 };

@@ -143,7 +143,7 @@ void Plugin::settingsChanged()
 
 void Plugin::executeAction(
     const std::string& actionId,
-    const nx::sdk::metadata::Object* object,
+    const Object* object,
     const std::map<std::string, std::string>& params,
     std::string* outActionUrl,
     std::string* outMessageToUser,

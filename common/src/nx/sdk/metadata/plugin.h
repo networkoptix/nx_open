@@ -2,7 +2,8 @@
 
 #include <plugins/plugin_api.h>
 #include <nx/sdk/common.h>
-#include <nx/sdk/metadata/camera_manager.h>
+
+#include "camera_manager.h"
 
 namespace nx {
 namespace sdk {

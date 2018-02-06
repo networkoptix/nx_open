@@ -32,7 +32,7 @@ protected:
      * a subsequent call to pullMetadataPackets(), as well as the actual byte data pointer inside,
      * regardless of the frame-deep-copy policy defined by the manifest.
      */
-    virtual bool pushVideoFrame(const CommonCompressedVideoPacket* videoFrame) { return true; }
+    virtual bool pushVideoFrame(const CommonCompressedVideoPacket* /*videoFrame*/) { return true; }
 
     /**
      * Override to send the newly constructed metadata packets to Server - add the packets to the
@@ -40,7 +40,7 @@ protected:
      * the moment (not necessarily referring to that frame). As an alternative, send metadata to
      * Server by calling pushMetadataPacket() instead of implementing this method.
      */
-    virtual bool pullMetadataPackets(std::vector<MetadataPacket*>* metadataPackets)
+    virtual bool pullMetadataPackets(std::vector<MetadataPacket*>* /*metadataPackets*/)
     {
         return true;
     }
@@ -49,7 +49,7 @@ protected:
      * Send a newly constructed metadata packet to Server. Can be called at any time, from any
      * thread. As an alternative, send metadata to Server by implementing pullMetadataPackets().
      */
-    void pushMetadataPacket(sdk::metadata::MetadataPacket* metadataPacket);
+    void pushMetadataPacket(MetadataPacket* metadataPacket);
 
     /**
      * Called when any of the seetings (param values) change.

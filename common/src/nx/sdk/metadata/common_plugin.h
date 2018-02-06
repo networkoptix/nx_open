@@ -49,12 +49,14 @@ protected:
      * @param outMessageToUser If set by this call, Client will show this text to the user.
      */
     virtual void executeAction(
-        const std::string& actionId,
-        const nx::sdk::metadata::Object* object,
-        const std::map<std::string, std::string>& params,
-        std::string* outActionUrl,
-        std::string* outMessageToUser,
-        Error* error) {}
+        const std::string& /*actionId*/,
+        const Object* /*object*/,
+        const std::map<std::string, std::string>& /*params*/,
+        std::string* /*outActionUrl*/,
+        std::string* /*outMessageToUser*/,
+        Error* /*error*/)
+    {
+    }
 
 public:
     virtual ~CommonPlugin() override;

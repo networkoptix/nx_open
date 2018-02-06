@@ -5,7 +5,7 @@ namespace sdk {
 namespace metadata {
 
 CommonAttribute::CommonAttribute(
-    nx::sdk::AttributeType attributeType,
+    AttributeType attributeType,
     const std::string& attributeName,
     const std::string& attributeValue)
     :
@@ -15,7 +15,7 @@ CommonAttribute::CommonAttribute(
 {
 }
 
-const nx::sdk::AttributeType CommonAttribute::type() const
+const AttributeType CommonAttribute::type() const
 {
     return m_type;
 }

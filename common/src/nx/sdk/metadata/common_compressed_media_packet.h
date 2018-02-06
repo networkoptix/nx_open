@@ -1,11 +1,10 @@
 #pragma once
 
-#include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
 
-#include "data_packet.h"
 #include "media_context.h"
 
+#include <memory>
 #include <vector>
 #include <string>
 

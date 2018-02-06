@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include <nx/sdk/metadata/data_packet.h>
+#include "data_packet.h"
 
 namespace nx {
 namespace sdk {
