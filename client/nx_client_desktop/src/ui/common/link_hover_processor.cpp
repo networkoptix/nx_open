@@ -5,14 +5,13 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLabel>
 
-#include <nx/utils/log/assert.h>
-
 #include <ui/style/helper.h>
 #include <ui/workaround/label_link_tabstop_workaround.h>
-
 #include <utils/common/delayed.h>
+#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/event_processors.h>
 
+#include <nx/utils/log/assert.h>
 
 QnLinkHoverProcessor::QnLinkHoverProcessor(QLabel* parent) :
     QObject(parent),
@@ -55,7 +54,15 @@ QnLinkHoverProcessor::QnLinkHoverProcessor(QLabel* parent) :
                     // enters control and hovers the link again, they don't emit linkHovered(link)
                     // To fix that we send fake MouseMove upon leaving the control:
                     const int kFarFarAway = -1.0e8;
-                    QMouseEvent kFakeMouseMove(QEvent::MouseMove, QPointF(kFarFarAway, kFarFarAway), Qt::NoButton, 0, 0);
+                    QMouseEvent kFakeMouseMove(QEvent::MouseMove, QPointF(kFarFarAway, kFarFarAway),
+                        Qt::NoButton, 0, 0);
+
+                    QnScopedTypedPropertyRollback<bool, QLabel> propagationGuard(
+                        m_label,
+                        [](QLabel* label, bool value) { label->setAttribute(Qt::WA_NoMousePropagation, value); },
+                        [](const QLabel* label) { return label->testAttribute(Qt::WA_NoMousePropagation); },
+                        true);
+
                     QApplication::sendEvent(m_label, &kFakeMouseMove);
                     break;
                 }
