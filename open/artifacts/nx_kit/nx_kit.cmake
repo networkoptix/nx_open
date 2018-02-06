@@ -10,12 +10,15 @@ add_library(nx_kit ${nxKitLibraryType}
 target_include_directories(nx_kit
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src)
 
+set(NX_KIT_API_IMPORT_MACRO "")
+set(NX_KIT_API_EXPORT_MACRO "")
 if(WIN32)
-    set(NX_KIT_API_IMPORT_MACRO "__declspec(dllimport)")
-    set(NX_KIT_API_EXPORT_MACRO "__declspec(dllexport)")
+    if (nxKitLibraryType STREQUAL "SHARED")
+        set(NX_KIT_API_IMPORT_MACRO "__declspec(dllimport)")
+        set(NX_KIT_API_EXPORT_MACRO "__declspec(dllexport)")
+    endif()
 else()
     set_target_properties(nx_kit PROPERTIES CXX_VISIBILITY_PRESET hidden)
-    set(NX_KIT_API_IMPORT_MACRO "")
     set(NX_KIT_API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
 endif()
 
