@@ -140,10 +140,9 @@ void QnAboutDialog::retranslateUi()
 
     QStringList credits;
     credits << tr("%1 uses the following external libraries:").arg(appName);
-    credits << lit("<b>Qt v.%1</b> - Copyright &copy; 2012 Nokia Corporation.").arg(QLatin1String(QT_VERSION_STR));
+    credits << lit("<b>Qt v.%1</b> - Copyright &copy; 2015 The Qt Company Ltd.").arg(QLatin1String(QT_VERSION_STR));
     credits << QString();
-    credits << lit("<b>FFMpeg %1</b> - Copyright &copy; 2000-2012 FFmpeg developers.").arg(versionString(QnAppInfo::ffmpegVersion()));
-    credits << lit("<b>LAME 3.99.0</b> - Copyright &copy; 1998-2012 LAME developers.");
+    credits << lit("<b>FFMpeg %1</b> - Copyright &copy; 2000-2018 FFmpeg developers.").arg(versionString(QnAppInfo::ffmpegVersion()));
     credits << lit("<b>OpenAL %1</b> - Copyright &copy; 2000-2006 %2.")
         .arg(nx::audio::AudioDevice::instance()->versionString())
         .arg(nx::audio::AudioDevice::instance()->company());

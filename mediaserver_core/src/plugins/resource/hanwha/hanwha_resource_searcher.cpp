@@ -11,6 +11,8 @@
 #include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_common.h"
+#include "hanwha_ini_config.h"
+
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 
@@ -51,6 +53,7 @@ HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
     nx_upnp::SearchAutoHandler(kUpnpBasicDeviceType),
     m_sunapiProbePackets(createProbePackets())
 {
+    ini().reload();
 }
 
 std::vector<std::vector<quint8>> HanwhaResourceSearcher::createProbePackets()
