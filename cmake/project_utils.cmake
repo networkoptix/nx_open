@@ -19,7 +19,7 @@ function(nx_target_enable_werror target)
 endfunction()
 
 function(nx_add_target name type)
-    set(options NO_MOC NO_PCH WERROR NO_WERROR)
+    set(options NO_MOC WERROR NO_WERROR)
     set(oneValueArgs LIBRARY_TYPE)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
@@ -77,8 +77,11 @@ function(nx_add_target name type)
     endif()
 
     set(sources ${cpp_files} ${hpp_files} ${rcc_files} ${qm_files})
-    if(NOT NX_NO_PCH)
-        set(sources ${sources} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h)
+        set(has_pch TRUE)
+        list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h)
+    else()
+        set(has_pch FALSE)
     endif()
 
     set(sources ${sources} ${NX_ADDITIONAL_SOURCES} ${NX_OTHER_RESOURCES} ${NX_OTHER_SOURCES})
@@ -141,8 +144,8 @@ function(nx_add_target name type)
         )
     endif()
 
-    if(NOT NX_NO_PCH)
-        add_precompiled_header(${name} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h" ${pch_flags})
+    if(has_pch)
+        add_precompiled_header(${name} ${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h)
     endif()
 
     target_include_directories(${name} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")

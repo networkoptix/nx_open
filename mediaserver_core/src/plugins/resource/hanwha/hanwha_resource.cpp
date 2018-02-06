@@ -25,7 +25,7 @@
 #include <nx/fusion/fusion/fusion.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/vms/event/events/events.h>
-#include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <nx/sdk/metadata/plugin.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 
@@ -997,7 +997,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         }
     }
 
-    if (m_ptzCapabilities ==Ptz::NoPtzCapabilities)
+    if (m_ptzCapabilities == Ptz::NoPtzCapabilities)
         return CameraDiagnostics::NoErrorResult();
 
     auto hasNormalizedSpeedParam = m_cgiParameters.parameter(lit("ptzcontrol/continuous/control/NormalizedSpeed"));
@@ -1029,16 +1029,14 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     if ((m_ptzCapabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities)
         m_ptzCapabilities |= Ptz::DevicePositioningPtzCapability;
 
-
     auto autoFocusParameter = m_cgiParameters.parameter(lit("image/focus/control/Mode"));
-
     if (!autoFocusParameter)
         return CameraDiagnostics::NoErrorResult();
 
     auto possibleValues = autoFocusParameter->possibleValues();
     m_focusMode = QString();
-    // TODO: Ducumentation says we should check (attributes/Image/Support/SimpleFocus is True)
-    //     and (image/focus/control/Mode contains SimpleFocus).
+    // TODO: Documentation says we should check (attributes/Image/Support/SimpleFocus is True)
+    // and (image/focus/control/Mode contains SimpleFocus).
     // However 2nd true with 1st false does not seem to be valid behavior, so we do not check
     // it for now.
     for (const auto& mode: {lit("SimpleFocus"), lit("AutoFocus")})
@@ -1057,7 +1055,6 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
 
     if (maxPresetParameter)
         m_ptzLimits.maxPresetNumber = maxPresetParameter.get();
-
 
     return CameraDiagnostics::NoErrorResult();
 }

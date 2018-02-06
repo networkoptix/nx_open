@@ -12,8 +12,8 @@
 #include <utils/common/connective.h>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/sdk/metadata/abstract_metadata_plugin.h>
-#include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/sdk/metadata/plugin.h>
+#include <nx/sdk/metadata/camera_manager.h>
 #include <nx/api/analytics/driver_manifest.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/mediaserver/metadata/rule_holder.h>
@@ -28,16 +28,16 @@ namespace metadata {
 struct ResourceMetadataContext
 {
 public:
-    using ManagerDeleter = std::function<void(nx::sdk::metadata::AbstractMetadataManager*)>;
+    using ManagerDeleter = std::function<void(nx::sdk::metadata::CameraManager*)>;
 
     ResourceMetadataContext(
-        nx::sdk::metadata::AbstractMetadataManager*,
-        nx::sdk::metadata::AbstractMetadataHandler*);
+        nx::sdk::metadata::CameraManager*,
+        nx::sdk::metadata::MetadataHandler*);
 
-    std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler> handler;
+    std::unique_ptr<nx::sdk::metadata::MetadataHandler> handler;
 
     std::unique_ptr<
-        nx::sdk::metadata::AbstractMetadataManager,
+        nx::sdk::metadata::CameraManager,
         ManagerDeleter> manager;
 };
 
@@ -45,13 +45,14 @@ class ManagerPool final:
     public Connective<QObject>
 {
     using ResourceMetadataContextMap = std::multimap<QnUuid, ResourceMetadataContext>;
-    using PluginList = QList<nx::sdk::metadata::AbstractMetadataPlugin*>;
+    using PluginList = QList<nx::sdk::metadata::Plugin*>;
 
     Q_OBJECT
 public:
     ManagerPool(QnMediaServerModule* commonModule);
     ~ManagerPool();
     void init();
+    void stop();
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_propertyChanged(const QnResourcePtr& resource, const QString& name);
     void at_resourceRemoved(const QnResourcePtr& resource);
@@ -65,13 +66,13 @@ private:
 
     void createMetadataManagersForResource(const QnSecurityCamResourcePtr& camera);
 
-    nx::sdk::metadata::AbstractMetadataManager* createMetadataManager(
+    nx::sdk::metadata::CameraManager* createMetadataManager(
         const QnSecurityCamResourcePtr& camera,
-        nx::sdk::metadata::AbstractMetadataPlugin* plugin) const;
+        nx::sdk::metadata::Plugin* plugin) const;
 
     void releaseResourceMetadataManagers(const QnSecurityCamResourcePtr& camera);
 
-    nx::sdk::metadata::AbstractMetadataHandler* createMetadataHandler(
+    nx::sdk::metadata::MetadataHandler* createMetadataHandler(
         const QnResourcePtr& resource,
         const QnUuid& pluginId);
 
@@ -97,7 +98,7 @@ private:
     }
 
     boost::optional<nx::api::AnalyticsDriverManifest> loadPluginManifest(
-        nx::sdk::metadata::AbstractMetadataPlugin* plugin);
+        nx::sdk::metadata::Plugin* plugin);
 
     void assignPluginManifestToServer(
         const nx::api::AnalyticsDriverManifest& manifest,
@@ -112,16 +113,16 @@ private:
         boost::optional<nx::api::AnalyticsDriverManifest>
     >
     loadManagerManifest(
-        nx::sdk::metadata::AbstractMetadataManager* manager,
+        nx::sdk::metadata::CameraManager* manager,
         const QnSecurityCamResourcePtr& camera);
 
     void addManifestToCamera(
         const nx::api::AnalyticsDeviceManifest& manifest,
         const QnSecurityCamResourcePtr& camera);
 
-    bool resourceInfoFromResource(
+    bool cameraInfoFromResource(
         const QnSecurityCamResourcePtr& camera,
-        nx::sdk::ResourceInfo* outResourceInfo) const;
+        nx::sdk::CameraInfo* outCameraInfo) const;
 
 private:
     ResourceMetadataContextMap m_contexts;

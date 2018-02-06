@@ -11,6 +11,8 @@
 #include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_common.h"
+#include "hanwha_ini_config.h"
+
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 
@@ -51,6 +53,7 @@ HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
     nx_upnp::SearchAutoHandler(kUpnpBasicDeviceType),
     m_sunapiProbePackets(createProbePackets())
 {
+    ini().reload();
 }
 
 std::vector<std::vector<quint8>> HanwhaResourceSearcher::createProbePackets()
@@ -250,9 +253,10 @@ void HanwhaResourceSearcher::readSunApiResponse(QnResourceList& resultResourceLi
             SunApiData sunApiData;
             if (parseSunApiData(datagram.left(bytesRead), &sunApiData))
             {
-                m_sunapiDiscoveredDevices[sunApiData.macAddress] = sunApiData;
                 if (!resourceAlreadyFound(resultResourceList, sunApiData.macAddress))
                     createResource(sunApiData, sunApiData.macAddress, resultResourceList);
+                QnMutexLocker lock(&m_mutex);
+                m_sunapiDiscoveredDevices[sunApiData.macAddress] = sunApiData;
             }
         }
     }
@@ -295,19 +299,20 @@ bool HanwhaResourceSearcher::processPacket(
         return false;
     }
 
-    // Due to some bugs in UPnP implementation higher priority is given
-    // to the native SUNAPI discovery protocol.
-    auto itr = m_sunapiDiscoveredDevices.find(cameraMac);
-    if (itr != m_sunapiDiscoveredDevices.end()
-        && !itr->timer.hasExpired(kSunApiDiscoveryTimeoutMs))
-    {
-        return false;
-    }
-
     QString model(devInfo.modelName);
 
 	{
 		QnMutexLocker lock(&m_mutex);
+
+        // Due to some bugs in UPnP implementation higher priority is given
+        // to the native SUNAPI discovery protocol.
+        auto itr = m_sunapiDiscoveredDevices.find(cameraMac);
+        if (itr != m_sunapiDiscoveredDevices.end()
+            && !itr->timer.hasExpired(kSunApiDiscoveryTimeoutMs))
+        {
+            return false;
+        }
+
         const bool alreadyFound = m_alreadFoundMacAddresses.find(cameraMac.toString())
             != m_alreadFoundMacAddresses.end();
 

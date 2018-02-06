@@ -11,6 +11,15 @@ namespace mediaserver {
 namespace resource {
 namespace test {
 
+template <typename T>
+std::set<T> toStdSet(const QSet<T> data)
+{
+    std::set<T> result;
+    for (const auto& value: data)
+        result.insert(value);
+    return result;
+}
+
 class CameraAdvancedParametersProviders: public CameraTest
 {
 public:
@@ -22,7 +31,7 @@ public:
 
     static void expectEq(const QSet<QString>& expected, const QSet<QString>& actual)
     {
-        EXPECT_EQ(containerString(expected), containerString(actual));
+        EXPECT_EQ(containerString(toStdSet(expected)), containerString(toStdSet(actual)));
     }
 
     static void expectEq(

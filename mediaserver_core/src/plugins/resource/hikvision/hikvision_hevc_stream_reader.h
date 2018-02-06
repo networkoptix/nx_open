@@ -6,7 +6,7 @@
 
 #include <nx/network/http/http_client.h>
 #include <core/resource/resource_fwd.h>
-#include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
+#include <streaming/rtp_stream_reader.h>
 #include <plugins/resource/hikvision/hikvision_utils.h>
 
 namespace nx {

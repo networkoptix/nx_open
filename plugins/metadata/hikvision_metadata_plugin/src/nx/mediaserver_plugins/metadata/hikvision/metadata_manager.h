@@ -11,7 +11,7 @@
 #include "metadata_plugin.h"
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/sdk/metadata/camera_manager.h>
 
 namespace nx {
 namespace mediaserver {
@@ -20,7 +20,7 @@ namespace hikvision {
 
 class MetadataManager:
     public QObject,
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
+    public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 {
     Q_OBJECT;
 public:
@@ -31,9 +31,9 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nx::sdk::metadata::AbstractMetadataHandler* handler,
-        nxpl::NX_GUID* eventTypeList,
-        int eventTypeListSize) override;
+        nx::sdk::metadata::MetadataHandler* handler,
+        nxpl::NX_GUID* typeList,
+        int typeListSize) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
@@ -41,7 +41,7 @@ public:
 
     virtual void freeManifest(const char* data) override;
 
-    void setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo);
+    void setCameraInfo(const nx::sdk::CameraInfo& cameraInfo);
     void setDeviceManifest(const QByteArray& manifest);
     void setDriverManifest(const Hikvision::DriverManifest& manifest);
 private:
@@ -58,7 +58,7 @@ private:
 
     MetadataPlugin* m_plugin = nullptr;
     std::unique_ptr<HikvisionMetadataMonitor> m_monitor;
-    nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
+    nx::sdk::metadata::MetadataHandler* m_handler = nullptr;
 };
 
 } // namespace hikvision

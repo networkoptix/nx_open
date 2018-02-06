@@ -750,8 +750,10 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
             nx_http::header::WWWAuthenticate(m_defaultAuthScheme));
     }
 
+    std::unique_ptr<AbstractStreamSocket> previousSocketHolder;
     {
         QnMutexLocker lock(&m_socketMutex);
+        previousSocketHolder = std::move(m_tcpSock);
         m_tcpSock = SocketFactory::createStreamSocket();
         m_additionalReadBufferSize = 0;
     }
@@ -766,6 +768,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
 
     if (!m_tcpSock->connect(targetAddress, TCP_CONNECT_TIMEOUT_MS))
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
+    previousSocketHolder.reset();
 
     m_tcpSock->setNoDelay(true);
 

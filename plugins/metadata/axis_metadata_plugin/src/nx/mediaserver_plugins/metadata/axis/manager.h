@@ -7,7 +7,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/sdk/metadata/camera_manager.h>
 
 #include "identified_supported_event.h"
 #include "monitor.h"
@@ -17,13 +17,10 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace axis {
 
-class Manager:
-    public QObject,
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
+class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 {
-    Q_OBJECT;
 public:
-    Manager(const nx::sdk::ResourceInfo& resourceInfo,
+    Manager(const nx::sdk::CameraInfo& cameraInfo,
         const QList<IdentifiedSupportedEvent>& events);
 
     virtual ~Manager();
@@ -31,9 +28,9 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nx::sdk::metadata::AbstractMetadataHandler* handler,
-        nxpl::NX_GUID* eventTypeList,
-        int eventTypeListSize) override;
+        nx::sdk::metadata::MetadataHandler* handler,
+        nxpl::NX_GUID* typeList,
+        int typeListSize) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
@@ -52,8 +49,6 @@ private:
     QUrl m_url;
     QAuthenticator m_auth;
 
-    // Next two fields contains the same information but in different representation.
-    //
     QList<IdentifiedSupportedEvent> m_identifiedSupportedEvents;
 
     Monitor* m_monitor = nullptr;

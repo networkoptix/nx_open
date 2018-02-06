@@ -5,7 +5,7 @@
 #include <nx/network/http/asynchttpclient.h>
 
 #include "dlink_stream_reader.h"
-#include "../onvif/dataprovider/onvif_mjpeg.h"
+#include <streaming/mjpeg_stream_reader.h>
 
 #include <motion/motion_detection.h>
 

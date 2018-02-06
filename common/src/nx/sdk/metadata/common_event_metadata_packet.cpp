@@ -7,10 +7,10 @@ namespace metadata {
 
 void* CommonEventMetadataPacket::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_EventMetadataPacket)
+    if (interfaceId == IID_EventsMetadataPacket)
     {
         addRef();
-        return static_cast<AbstractEventMetadataPacket*>(this);
+        return static_cast<EventsMetadataPacket*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)
@@ -31,7 +31,7 @@ int64_t CommonEventMetadataPacket::durationUsec() const
     return m_durationUsec;
 }
 
-AbstractDetectedEvent* CommonEventMetadataPacket::nextItem()
+Event* CommonEventMetadataPacket::nextItem()
 {
     if (m_currentEventIndex < m_events.size())
         return m_events[m_currentEventIndex++];
@@ -49,7 +49,7 @@ void CommonEventMetadataPacket::setDurationUsec(int64_t durationUsec)
     m_durationUsec = durationUsec;
 }
 
-void CommonEventMetadataPacket::addEvent(AbstractDetectedEvent* event)
+void CommonEventMetadataPacket::addEvent(Event* event)
 {
     m_events.push_back(event);
 }

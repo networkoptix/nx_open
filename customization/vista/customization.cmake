@@ -91,5 +91,4 @@ set(additionalTranslations
     es_ES
     ru_RU
     hu_HU
-    nl_NL
 )

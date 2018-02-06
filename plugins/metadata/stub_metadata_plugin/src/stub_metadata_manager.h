@@ -6,7 +6,7 @@
 #include <mutex>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/sdk/metadata/camera_manager.h>
 
 
 namespace nx {
@@ -14,7 +14,7 @@ namespace mediaserver {
 namespace plugins {
 
 class StubMetadataManager:
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
+    public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 {
 public:
     StubMetadataManager();
@@ -24,9 +24,9 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nx::sdk::metadata::AbstractMetadataHandler* handler,
-        nxpl::NX_GUID* /*eventTypeList*/,
-        int /*eventTypeListSize*/) override;
+        nx::sdk::metadata::MetadataHandler* handler,
+        nxpl::NX_GUID* /*typeList*/,
+        int /*typeListSize*/) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
@@ -37,7 +37,7 @@ public:
 
 private:
     nx::sdk::Error stopFetchingMetadataUnsafe();
-    nx::sdk::metadata::AbstractMetadataPacket* cookSomeEvents();
+    nx::sdk::metadata::MetadataPacket* cookSomeEvents();
 
     int64_t usSinceEpoch() const;
 
@@ -45,7 +45,7 @@ private:
     mutable std::mutex m_mutex;
     std::unique_ptr<std::thread> m_thread;
     std::atomic<bool> m_stopping;
-    nx::sdk::metadata::AbstractMetadataHandler* m_handler;
+    nx::sdk::metadata::MetadataHandler* m_handler;
     int m_counter = 0;
     nxpl::NX_GUID m_eventTypeId;
 };

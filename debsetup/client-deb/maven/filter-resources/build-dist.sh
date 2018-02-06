@@ -115,7 +115,8 @@ buildDistribution()
         LIB_BASENAME=$(basename "$LIB")
         if [[ "$LIB_BASENAME" != libQt5* \
             && "$LIB_BASENAME" != libEnginio.so* \
-            && "$LIB_BASENAME" !=  libqgsttools_p.* ]]
+            && "$LIB_BASENAME" != libqgsttools_p.* \
+            && "$LIB_BASENAME" != libmediaserver* ]]
         then
             echo "Copying $LIB_BASENAME"
             cp -P "$LIB" "$LIBSTAGE/"

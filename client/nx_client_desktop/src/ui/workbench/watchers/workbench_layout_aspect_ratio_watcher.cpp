@@ -37,11 +37,16 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_widgetChanged(QnResou
     const auto hasAspectRatio = widget->hasAspectRatio();
     if (hasAspectRatio)
     {
-        const auto ar = widget->visualAspectRatio();
-        if (m_watchedLayout->flags().testFlag(QnLayoutFlag::FillViewport))
-            m_watchedLayout->setCellAspectRatio(ar);
-        else
-            m_watchedLayout->setCellAspectRatio(QnAspectRatio::closestStandardRatio(ar).toFloat());
+        float ar = widget->visualAspectRatio();
+
+        QRect geometry = widget->item()->geometry();
+        if (!geometry.isEmpty())
+            ar /= QnGeometry::aspectRatio(geometry);
+
+        if (!m_watchedLayout->flags().testFlag(QnLayoutFlag::FillViewport))
+            ar = QnAspectRatio::closestStandardRatio(ar).toFloat();
+
+        m_watchedLayout->setCellAspectRatio(ar);
     }
 
     if (m_monitoring || !hasAspectRatio) {

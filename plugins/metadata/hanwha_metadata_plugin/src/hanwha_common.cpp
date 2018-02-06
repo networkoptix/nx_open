@@ -2,8 +2,6 @@
 
 #include <nx/fusion/model_functions.h>
 
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hanwha, EventTypeFlag)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hanwha, EventTypeFlags)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hanwha, EventItemType)
 
 namespace nx {

@@ -179,15 +179,17 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
         /*selectedFilter*/ nullptr,
         QnCustomFileDialog::fileDialogOptions()
     );
+
+    // TODO: #wearable requested by rvasilenko as copypaste from totalcmd doesn't work without
+    // this line. Maybe move directly to QnFileDialog?
+    fileName = fileName.trimmed();
+
     if (fileName.isEmpty())
         return;
 
-    QString errorMessage;
-    if (!qnClientModule->wearableManager()->addUpload(camera, fileName, &errorMessage))
-    {
-        QnMessageBox::critical(mainWindow(), errorMessage);
-        return;
-    }
+    WearableError error;
+    if (!qnClientModule->wearableManager()->addUpload(camera, fileName, &error))
+        QnMessageBox::critical(mainWindow(), error.message, error.extraMessage);
 }
 
 void QnWorkbenchWearableHandler::at_resourcePool_resourceAdded(const QnResourcePtr &resource)
