@@ -19,6 +19,7 @@ namespace desktop {
 
 class EventPanel;
 class EventTileToolTip;
+class EventTile;
 
 } // namespace desktop
 } // namespace client
@@ -71,6 +72,8 @@ private:
 
     void createEventPanel(QGraphicsWidget* parentWidget);
 
+    void at_eventTileHovered(const QModelIndex& index, const nx::client::desktop::EventTile* tile);
+
 private:
     bool m_ignoreClickEvent;
     bool m_visible;
@@ -89,9 +92,10 @@ private:
     /** Animator group for panel's opacity. */
     AnimatorGroup* m_opacityAnimatorGroup;
 
-    // New event panel.
+    /** New event panel. */
     QScopedPointer<nx::client::desktop::EventPanel> m_eventPanel;
-    QPointer<QnNotificationToolTipWidget> m_eventPanelToolTip;
+    QPointer<HoverFocusProcessor> m_eventPanelHoverProcessor;
+    const nx::client::desktop::EventTile* m_lastHoveredTile = nullptr;
 };
 
 } //namespace NxUi

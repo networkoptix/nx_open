@@ -14,8 +14,10 @@
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
+#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
+#include <ui/graphics/instruments/tool_tip_instrument.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/blinking_image_widget.h>
@@ -47,7 +49,11 @@ namespace {
 
 static constexpr int kNarrowWidth = 280;
 static constexpr int kWideWidth = 430;
+
 static const QSize kToolTipMaxThumbnailSize(480, 480);
+static constexpr int kToolTipShowDelayMs = 250;
+static constexpr int kToolTipHideDelayMs = 250;
+static constexpr qreal kToolTipFadeSpeedFactor = 2.0;
 
 class ResizerWidget: public QGraphicsWidget, public DragProcessHandler
 {
@@ -406,44 +412,91 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
     //eventPanelContainer->setCacheMode(QGraphicsItem::NoCache);
     eventPanelContainer->setWidget(m_eventPanel.data());
 
-    connect(m_eventPanel.data(), &EventPanel::tileHovered, this,
-        [this](const QModelIndex& index, const EventTile* tile)
-        {
-            if (m_eventPanelToolTip)
-            {
-                auto animator = opacityAnimator(m_eventPanelToolTip, 2.0);
-                animator->animateTo(0.0);
-                connect(animator, &VariantAnimator::finished,
-                    m_eventPanelToolTip, &QObject::deleteLater);
-            }
+    m_hidingProcessor->addTargetItem(eventPanelContainer);
 
-            if (!tile || !index.isValid())
+    auto toolTipInstrument = InstrumentManager::instance(parentWidget->scene())
+        ->instrument<ToolTipInstrument>();
+
+    if (toolTipInstrument)
+        toolTipInstrument->addIgnoredItem(eventPanelContainer);
+
+    connect(m_eventPanel.data(), &EventPanel::tileHovered,
+        this, &NotificationsWorkbenchPanel::at_eventTileHovered);
+}
+
+void NotificationsWorkbenchPanel::at_eventTileHovered(
+    const QModelIndex& index,
+    const nx::client::desktop::EventTile* tile)
+{
+    if (m_eventPanelHoverProcessor)
+    {
+        if (m_lastHoveredTile == tile)
+            m_eventPanelHoverProcessor->forceHoverEnter();
+        else
+            m_eventPanelHoverProcessor->forceHoverLeave();
+    }
+
+    if (!tile || !index.isValid())
+    {
+        m_eventPanelHoverProcessor = nullptr;
+        return;
+    }
+
+    m_lastHoveredTile = tile;
+
+    const auto parentWidget = m_eventPanel->graphicsProxyWidget();
+    const auto imageProvider = tile->preview();
+    const auto text = tile->toolTip().isEmpty() ? tile->title() : tile->toolTip();
+
+    const auto tilePos = (tile->rect().topLeft() + tile->rect().bottomLeft()) / 2;
+    const auto globalPos = QnHiDpiWorkarounds::safeMapToGlobal(tile, tilePos);
+    const auto tooltipPos = QnNxStylePrivate::mapFromGlobal(parentWidget, globalPos);
+
+    QPointer<QnNotificationToolTipWidget> toolTip(
+        new QnNotificationToolTipWidget(parentWidget));
+    toolTip->setOpacity(0.0);
+    toolTip->setEnclosingGeometry(item->toolTipsEnclosingRect());
+    toolTip->setMaxThumbnailSize(kToolTipMaxThumbnailSize);
+    toolTip->setText(text);
+    toolTip->setImageProvider(imageProvider);
+    toolTip->setThumbnailVisible(imageProvider != nullptr);
+    toolTip->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
+    toolTip->updateTailPos();
+    toolTip->pointTo(tooltipPos);
+
+    connect(toolTip.data(), &QnNotificationToolTipWidget::thumbnailClicked,
+        tile, &nx::client::desktop::EventTile::clicked);
+
+    m_eventPanelHoverProcessor = new HoverFocusProcessor(parentWidget);
+    m_eventPanelHoverProcessor->addTargetItem(toolTip);
+    m_eventPanelHoverProcessor->setHoverEnterDelay(kToolTipShowDelayMs);
+    m_eventPanelHoverProcessor->setHoverLeaveDelay(kToolTipHideDelayMs);
+
+    connect(m_eventPanelHoverProcessor.data(), &HoverFocusProcessor::hoverEntered, this,
+        [this, toolTip]()
+        {
+            if (toolTip)
+                opacityAnimator(toolTip, kToolTipFadeSpeedFactor)->animateTo(1.0);
+        });
+
+    connect(m_eventPanelHoverProcessor.data(), &HoverFocusProcessor::hoverLeft, this,
+        [this, toolTip]
+        {
+            if (m_eventPanelHoverProcessor == sender())
+                m_eventPanelHoverProcessor = nullptr;
+
+            sender()->deleteLater();
+
+            if (!toolTip)
                 return;
 
-            const auto parentWidget = m_eventPanel->graphicsProxyWidget();
-            const auto imageProvider = tile->preview();
-            const auto text = tile->toolTip().isEmpty() ? tile->title() : tile->toolTip();
-
-            const auto tilePos = (tile->rect().topLeft() + tile->rect().bottomLeft()) / 2;
-            const auto globalPos = QnHiDpiWorkarounds::safeMapToGlobal(tile, tilePos);
-            const auto tooltipPos = QnNxStylePrivate::mapFromGlobal(parentWidget, globalPos);
-
-            m_eventPanelToolTip = new QnNotificationToolTipWidget(parentWidget);
-            m_eventPanelToolTip->setOpacity(0.0);
-            m_eventPanelToolTip->setEnclosingGeometry(item->toolTipsEnclosingRect());
-            m_eventPanelToolTip->setMaxThumbnailSize(kToolTipMaxThumbnailSize);
-            m_eventPanelToolTip->setText(text);
-            m_eventPanelToolTip->setImageProvider(imageProvider);
-            m_eventPanelToolTip->setThumbnailVisible(imageProvider != nullptr);
-            m_eventPanelToolTip->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
-            m_eventPanelToolTip->updateTailPos();
-            m_eventPanelToolTip->pointTo(tooltipPos);
-
-            opacityAnimator(m_eventPanelToolTip, 2.0)->animateTo(1.0);
-
-            connect(m_eventPanelToolTip, &QnNotificationToolTipWidget::thumbnailClicked,
-                tile, &EventTile::clicked);
+            auto animator = opacityAnimator(toolTip, kToolTipFadeSpeedFactor);
+            animator->animateTo(0.0);
+            connect(animator, &VariantAnimator::finished,
+                toolTip.data(), &QObject::deleteLater);
         });
+
+    m_eventPanelHoverProcessor->forceHoverEnter();
 }
 
 } //namespace NxUi

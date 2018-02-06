@@ -34,12 +34,18 @@ public:
 
     QScrollBar* scrollBar() const;
 
+    bool showDefaultToolTips() const;
+    void setShowDefaultToolTips(bool value);
+
     int count() const;
 
     int unreadCount() const;
     QnNotificationLevel::Value highestUnreadImportance() const;
 
     void updateHover(bool hovered, const QPoint& mousePos);
+
+protected:
+    virtual bool eventFilter(QObject* object, QEvent* event) override;
 
 private:
     void updateView(); //< Calls doUpdateView and emits q->unreadCountChanged if needed.
@@ -106,6 +112,8 @@ private:
     QHash<QVariantAnimation*, int> m_itemShiftAnimations;
 
     QHash<int, int> m_currentShifts; //< Maps item index to shift value.
+
+    bool m_showDefaultToolTips = false;
 };
 
 } // namespace desktop

@@ -27,6 +27,9 @@ public:
     QAbstractListModel* model() const;
     void setModel(QAbstractListModel* model); //< Use SubsetListModel to proxy non-list model.
 
+    bool showDefaultToolTips() const;
+    void setShowDefaultToolTips(bool value);
+
     virtual QSize sizeHint() const override;
 
     QScrollBar* scrollBar() const;

@@ -174,6 +174,7 @@ EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
 {
     auto tile = new EventTile(q);
     tile->setContextMenuPolicy(Qt::CustomContextMenu);
+    tile->installEventFilter(this);
     updateTile(tile, index);
 
     const auto importance = index.data(Qn::NotificationLevelRole);
@@ -548,6 +549,16 @@ QScrollBar* EventRibbon::Private::scrollBar() const
     return m_scrollBar;
 }
 
+bool EventRibbon::Private::showDefaultToolTips() const
+{
+    return m_showDefaultToolTips;
+}
+
+void EventRibbon::Private::setShowDefaultToolTips(bool value)
+{
+    m_showDefaultToolTips = value;
+}
+
 int EventRibbon::Private::calculateHeight(QWidget* widget) const
 {
     NX_EXPECT(widget);
@@ -818,6 +829,20 @@ int EventRibbon::Private::indexAtPos(const QPoint& pos) const
     return (*candidate)->geometry().contains(viewportPos)
         ? std::distance(m_tiles.cbegin(), candidate)
         : -1;
+}
+
+bool EventRibbon::Private::eventFilter(QObject* object, QEvent* event)
+{
+    if (qobject_cast<EventTile*>(object) && object->parent() == m_viewport)
+    {
+        if (!m_showDefaultToolTips && event->type() == QEvent::ToolTip)
+        {
+            event->ignore();
+            return true; //< Ignore tooltip events.
+        }
+    }
+
+    return QObject::eventFilter(object, event);
 }
 
 } // namespace desktop

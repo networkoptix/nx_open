@@ -30,6 +30,16 @@ void EventRibbon::setModel(QAbstractListModel* model)
     d->setModel(model);
 }
 
+bool EventRibbon::showDefaultToolTips() const
+{
+    return d->showDefaultToolTips();
+}
+
+void EventRibbon::setShowDefaultToolTips(bool value)
+{
+    d->setShowDefaultToolTips(value);
+}
+
 QScrollBar* EventRibbon::scrollBar() const
 {
     return d->scrollBar();
