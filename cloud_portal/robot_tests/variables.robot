@@ -28,7 +28,7 @@ ${YOU HAVE NO SYSTEMS}                //span[contains(text(),'You have no System
 ${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), 'Log Out')]
 ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
-${ANONYMOUS BODY}                     //body[@class='anonymous']
+${ANONYMOUS BODY}                     //body[contains(@class,'anonymous')]
 ${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
 ${CREATE ACCOUNT BODY}                //body//a[@href='/register']
 
@@ -107,7 +107,9 @@ ${EDIT PERMISSIONS HINT}              //form[@name='shareForm']//span[contains(@
 
 #Account Page
 ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-model='account.first_name']
+${JQ ACCOUNT FIRST NAME}              $("form[name='accountForm'] input[ng-model='account.first_name']").val()
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
+${JQ ACCOUNT LAST NAME}               $("form[name='accountForm'] input[ng-model='account.last_name']").val()
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
 
 #Already logged in modal

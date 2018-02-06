@@ -168,6 +168,7 @@ should prompt log user out if he visits restore password link from email
     Go To    ${link}
     Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
     Click Button    ${LOGGED IN LOG OUT BUTTON}
+    Validate Log Out
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Close Browser
 

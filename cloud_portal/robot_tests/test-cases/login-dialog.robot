@@ -44,6 +44,7 @@ allows to log in with existing credentials and to log out
 redirects to systems after log In
     Open Browser and go to URL    ${url}
     Log In    ${email}    ${password}
+    Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Location Should Be    ${url}/systems
     Close Browser
@@ -252,6 +253,7 @@ should respond to Enter key and log in
     Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${password}
+    sleep    .15
     Press Key    ${PASSWORD INPUT}    ${ENTER}
     Validate Log In
     Close Browser
