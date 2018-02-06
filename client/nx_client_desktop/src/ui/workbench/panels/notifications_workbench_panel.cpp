@@ -440,6 +440,9 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
             m_eventPanelToolTip->pointTo(tooltipPos);
 
             opacityAnimator(m_eventPanelToolTip, 2.0)->animateTo(1.0);
+
+            connect(m_eventPanelToolTip, &QnNotificationToolTipWidget::thumbnailClicked,
+                tile, &EventTile::clicked);
         });
 }
 
