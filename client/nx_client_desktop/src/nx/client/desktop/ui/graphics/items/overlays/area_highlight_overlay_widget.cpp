@@ -22,18 +22,21 @@ namespace desktop {
 
 namespace {
 
-static QPointF calculateLabelPosition(
-    const QRectF& boundingRect,
-    const QSizeF& labelSize,
-    const QRectF& objectRect)
+static QRectF calculateLabelGeometry(
+    QRectF boundingRect,
+    QSizeF labelSize,
+    QMarginsF labelMargins,
+    QRectF objectRect)
 {
-    static constexpr int kSpacing = 4;
+    constexpr qreal kTitleAreaHeight = 24;
+    boundingRect = boundingRect.adjusted(0, kTitleAreaHeight, 0, 0);
+    labelSize = Geometry::bounded(labelSize, boundingRect.size());
 
     const QMarginsF space(
-        objectRect.left() - boundingRect.left() - kSpacing,
-        objectRect.top() - boundingRect.top() - kSpacing,
-        boundingRect.right() - objectRect.right() - kSpacing,
-        boundingRect.bottom() - objectRect.bottom() - kSpacing);
+        objectRect.left() - boundingRect.left(),
+        objectRect.top() - boundingRect.top(),
+        boundingRect.right() - objectRect.right(),
+        boundingRect.bottom() - objectRect.bottom());
 
     auto bestSide = Qt::BottomEdge;
     qreal bestSpaceProportion = 0;
@@ -50,18 +53,19 @@ static QPointF calculateLabelPosition(
         };
 
     checkSide(Qt::LeftEdge, labelSize.width(), space.left());
-    checkSide(Qt::TopEdge, labelSize.height(), space.top());
     checkSide(Qt::RightEdge, labelSize.width(), space.right());
+    checkSide(Qt::TopEdge, labelSize.height(), space.top());
     checkSide(Qt::BottomEdge, labelSize.height(), space.bottom());
 
-    if (bestSpaceProportion < 1.0
-        && labelSize.width() < objectRect.width() && labelSize.height() < objectRect.height())
-    {
-        static constexpr qreal kMargin = 2.0;
+    static constexpr qreal kLabelPadding = 2.0;
+    QRectF availableRect = Geometry::dilated(boundingRect.intersected(objectRect), kLabelPadding);
 
-        return QPointF(
-            objectRect.right() - labelSize.width() - kMargin,
-            objectRect.top() + kMargin);
+    if (bestSpaceProportion < 1.0
+        && availableRect.width() / labelSize.width() > bestSpaceProportion
+        && availableRect.height() / labelSize.height() > bestSpaceProportion)
+    {
+        labelSize = Geometry::bounded(labelSize, availableRect.size());
+        return Geometry::aligned(labelSize, availableRect, Qt::AlignTop | Qt::AlignRight);
     }
 
     QPointF pos;
@@ -70,27 +74,40 @@ static QPointF calculateLabelPosition(
     {
         case Qt::LeftEdge:
             pos = QPointF(
-                objectRect.left() - labelSize.width() - kSpacing,
-                objectRect.top());
+                objectRect.left() - labelSize.width(),
+                objectRect.top() - labelMargins.top());
+            availableRect = QRectF(
+                boundingRect.left(), boundingRect.top(),
+                space.left(), boundingRect.height());
             break;
         case Qt::RightEdge:
             pos = QPointF(
-                objectRect.right() + kSpacing,
-                objectRect.top());
+                objectRect.right(),
+                objectRect.top() - labelMargins.top());
+            availableRect = QRectF(
+                objectRect.right(), boundingRect.top(),
+                space.right(), boundingRect.height());
             break;
         case Qt::TopEdge:
             pos = QPointF(
-                objectRect.left(),
-                objectRect.top() - labelSize.height() - kSpacing);
+                objectRect.left() - labelMargins.left(),
+                objectRect.top() - labelSize.height());
+            availableRect = QRectF(
+                boundingRect.left(), boundingRect.top(),
+                boundingRect.width(), space.top());
             break;
         case Qt::BottomEdge:
             pos = QPointF(
-                objectRect.left(),
-                objectRect.bottom() + kSpacing);
+                objectRect.left() - labelMargins.left(),
+                objectRect.bottom());
+            availableRect = QRectF(
+                boundingRect.left(), std::max(objectRect.bottom(), boundingRect.top()),
+                boundingRect.width(), space.bottom());
             break;
     }
 
-    return pos;
+    labelSize = Geometry::bounded(labelSize, availableRect.size());
+    return Geometry::movedInto(QRectF(pos, labelSize), availableRect);
 }
 
 static QColor calculateTooltipColor(const QColor& frameColor)
@@ -179,13 +196,17 @@ void AreaHighlightOverlayWidget::Private::updateArea(
     area.tooltipItem->setText(highlighted ? area.info.hoverText : area.info.text);
 
     const auto& rect = area.actualRect(q->size());
-    const auto& pos = calculateLabelPosition(
-        q->rect(), area.tooltipItem->boundingRect().size(), rect);
-    area.tooltipItem->setPos(pos);
+    const auto& naturalTooltipSize = area.tooltipItem->boundingRect().size();
+    const auto& tooltipGeometry = calculateLabelGeometry(
+        q->rect(), naturalTooltipSize, area.tooltipItem->textMargins(), rect);
+    area.tooltipItem->setPos(tooltipGeometry.topLeft());
+    area.tooltipItem->setScale(
+        std::min(1.0, Geometry::scaleFactor(naturalTooltipSize, tooltipGeometry.size())));
+    area.tooltipItem->setTargetObjectGeometry(rect);
     area.tooltipItem->setBackgroundColor(
-        (rect.contains(pos) || !highlighted)
+        (Geometry::eroded(rect, 0.5).contains(tooltipGeometry.center()) || !highlighted)
             ? calculateTooltipColor(area.info.color)
-            : Qt::transparent);
+            : QColor());
 }
 
 void AreaHighlightOverlayWidget::Private::updateArea(const QnUuid& areaId)
@@ -269,6 +290,7 @@ void AreaHighlightOverlayWidget::addOrUpdateArea(
         tooltipItem.reset(new AreaTooltipItem(this));
         tooltipItem->setTextColor(colorTheme->color(lit("light1")));
         tooltipItem->setFont(font());
+        tooltipItem->stackBefore(rectItem.data());
     }
 
     d->updateArea(area);

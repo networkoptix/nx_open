@@ -14,8 +14,100 @@ namespace desktop {
 
 namespace {
 
-static const qreal kRoundingRadius = 2.0;
-static const QMarginsF kTooltipMargins(6, 4, 6, 4);
+static constexpr qreal kRoundingRadius = 2;
+static constexpr QSizeF kArrowSize(8, 4);
+static constexpr qreal kArrowMargin = 6;
+static constexpr QMarginsF kTooltipMargins(6, 4, 6, 4);
+
+struct ArrowPosition
+{
+    static constexpr int kNoEdge = 0;
+
+    int edge = kNoEdge;
+    QPointF position;
+};
+
+ArrowPosition arrowPosition(const QRectF& tooltipRect, const QRectF& objectRect)
+{
+    const auto tooltipCenter = tooltipRect.center();
+    ArrowPosition arrowPos;
+
+    if (tooltipCenter.x() > objectRect.right())
+    {
+        arrowPos.edge = Qt::LeftEdge;
+        arrowPos.position.setX(tooltipRect.left() - kArrowSize.width() / 2 + 1);
+    }
+    else if (tooltipCenter.x() < objectRect.left())
+    {
+        arrowPos.edge = Qt::RightEdge;
+        arrowPos.position.setX(tooltipRect.right() + kArrowSize.width() / 2 - 1);
+    }
+    else if (tooltipCenter.y() > objectRect.bottom())
+    {
+        arrowPos.edge = Qt::TopEdge;
+        arrowPos.position.setY(tooltipRect.top() - kArrowSize.height() / 2 - 1);
+    }
+    else if (tooltipCenter.y() < objectRect.top())
+    {
+        arrowPos.edge = Qt::BottomEdge;
+        arrowPos.position.setY(tooltipRect.bottom() + kArrowSize.height() / 2 + 1);
+    }
+
+    constexpr qreal margin = kArrowMargin + kArrowSize.width() / 2;
+
+    switch (arrowPos.edge)
+    {
+        case Qt::LeftEdge:
+        case Qt::RightEdge:
+            arrowPos.position.setY(std::max(tooltipRect.top(), objectRect.top()) + margin);
+            break;
+        case Qt::TopEdge:
+        case Qt::BottomEdge:
+            arrowPos.position.setX(std::max(tooltipRect.left(), objectRect.left()) + margin);
+            break;
+        default:
+            break;
+    }
+
+    return arrowPos;
+}
+
+void paintArrow(QPainter* painter, const QRectF& rect, const Qt::Edge edge)
+{
+    QPainterPath path;
+
+    constexpr size_t kPointsCount = 4;
+
+    std::array<QPointF, kPointsCount> points{{
+        rect.topLeft(), rect.topRight(), rect.bottomRight(), rect.bottomLeft()
+    }};
+
+    auto point = [&points](size_t i) { return points[i % kPointsCount]; };
+
+    size_t firstCorner = 0;
+    switch (edge)
+    {
+        case Qt::BottomEdge:
+            firstCorner = 2;
+            break;
+        case Qt::LeftEdge:
+            firstCorner = 3;
+            break;
+        case Qt::RightEdge:
+            firstCorner = 1;
+            break;
+        default:
+            break;
+    }
+
+    const auto tip = (point(firstCorner) + point(firstCorner + 1)) / 2;
+    path.moveTo(tip);
+    path.lineTo(point(firstCorner + 2));
+    path.lineTo(point(firstCorner + 3));
+    path.lineTo(tip);
+
+    painter->drawPath(path);
+}
 
 } // namespace
 
@@ -30,6 +122,7 @@ public:
 public:
     QString text;
     QColor backgroundColor;
+    QRectF targetObjectGeometry;
 
     QPixmap textPixmap;
     HighlightedAreaTextPainter textPainter;
@@ -128,7 +221,7 @@ QRectF AreaTooltipItem::boundingRect() const
     if (d->textPixmap.isNull())
         return QRectF();
 
-    return QRectF(QPoint(), Geometry::dilated(d->textPixmap.size(), kTooltipMargins));
+    return QRectF(QPoint(), Geometry::dilated(d->textPixmap.size(), textMargins()));
 }
 
 void AreaTooltipItem::paint(
@@ -143,18 +236,61 @@ void AreaTooltipItem::paint(
 
     if (d->backgroundColor.isValid())
     {
+        const auto rect = Geometry::eroded(boundingRect(), kArrowSize.height());
+
         QnScopedPainterBrushRollback brushRollback(painter, d->backgroundColor);
         QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
         QnScopedPainterAntialiasingRollback(painter, true);
 
         const ui::PainterTransformScaleStripper scaleStripper(painter);
 
-        painter->drawRoundedRect(
-            scaleStripper.mapRect(boundingRect()), kRoundingRadius, kRoundingRadius);
+        painter->drawRoundedRect(scaleStripper.mapRect(rect), kRoundingRadius, kRoundingRadius);
+
+        const auto arrowPos = arrowPosition(rect.translated(pos()), d->targetObjectGeometry);
+        if (arrowPos.edge != ArrowPosition::kNoEdge)
+        {
+            const QSizeF arrowSize =
+                (arrowPos.edge == Qt::TopEdge || arrowPos.edge == Qt::BottomEdge)
+                    ? kArrowSize
+                    : QSizeF(kArrowSize.height(), kArrowSize.width());
+
+            const QRectF arrowRect = scaleStripper.mapRect(QRectF(
+                arrowPos.position - pos() - Geometry::toPoint(arrowSize / 2),
+                arrowSize));
+
+            paintArrow(painter, arrowRect, static_cast<Qt::Edge>(arrowPos.edge));
+        }
     }
 
     paintPixmapSharp(
-        painter, d->textPixmap, QPointF(kTooltipMargins.left(), kTooltipMargins.top()));
+        painter,
+        d->textPixmap,
+        QPointF(
+            kTooltipMargins.left() + kArrowSize.height(),
+                    kTooltipMargins.top() + kArrowSize.height()));
+}
+
+QMarginsF AreaTooltipItem::textMargins() const
+{
+    return QMarginsF(
+        kTooltipMargins.left() + kArrowSize.height(),
+        kTooltipMargins.top() + kArrowSize.height(),
+        kTooltipMargins.right() + kArrowSize.height(),
+        kTooltipMargins.bottom() + kArrowSize.height());
+}
+
+QRectF AreaTooltipItem::targetObjectGeometry() const
+{
+    return d->targetObjectGeometry;
+}
+
+void AreaTooltipItem::setTargetObjectGeometry(const QRectF& geometry)
+{
+    if (d->targetObjectGeometry == geometry)
+        return;
+
+    d->targetObjectGeometry = geometry;
+    update();
 }
 
 } // namespace desktop

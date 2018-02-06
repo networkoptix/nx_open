@@ -35,6 +35,11 @@ public:
         const QStyleOptionGraphicsItem* option,
         QWidget* widget = nullptr) override;
 
+    QMarginsF textMargins() const;
+
+    QRectF targetObjectGeometry() const;
+    void setTargetObjectGeometry(const QRectF& geometry);
+
 private:
     class Private;
     const std::unique_ptr<Private> d;
