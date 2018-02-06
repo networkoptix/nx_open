@@ -1,11 +1,11 @@
-Hello, {{message.fullName}}
+Xin chào, {{message.fullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) has shared access to video management system "{{message.system_name}}" with you.
+<a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> đã chia sẻ quyền truy cập vào hệ thống quản lý hình ảnh "{{message.system_name}}" với bạn.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-You have been granted access to video management system "{{message.system_name}}".
+Bạn đã được cấp quyền truy cập vào hệ thống quản lý hình ảnh "{{message.system_name}}".
 {{/message.sharer_name}}
 
-View in {{PRODUCT_NAME}} Portal: {{config.portal_url}}/systems/{{message.system_id}}
+Xem ở {{PRODUCT_NAME}} Cổng thông tin: {{config.portal_url}} / systems / {{message.system_id}}
