@@ -21,7 +21,7 @@ angular.module('cloudApp')
         account.get().then(function(user){
             $scope.user = user;
             $scope.systems = systemsProvider.getMySystems(user.email, $scope.system.id);
-            $scope.canMerge = $scope.system.accessRole.toLowerCase() === "owner" && $scope.systems.length > 0;
+            $scope.canMerge = $scope.system.isMine && $scope.systems.length > 0;
             $scope.targetSystem = $scope.systems[0];
             $scope.systemMergeable = checkMergeAbility($scope.targetSystem);
         });
