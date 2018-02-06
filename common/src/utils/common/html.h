@@ -34,6 +34,9 @@ QString htmlFormattedParagraph(const QString &text
 
 QString makeHref(const QString& text, const QUrl& url);
 QString makeHref(const QString& text, const QString& link);
+QString makeMailHref(const QString& text, const QString& mail);
+QString makeMailHref(const QString& text, const QUrl& mail);
+
 
 QString escapeHtml(const QString& input);
 

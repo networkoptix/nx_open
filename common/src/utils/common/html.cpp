@@ -152,6 +152,16 @@ QString makeHref(const QString& text, const QString& link)
     return lit("<a href=\"%2\">%1</a>").arg(text, link);
 }
 
+QString makeMailHref(const QString& text, const QString& mail)
+{
+    return lit("<a href=\"mailto:%2\">%1</a>").arg(text, mail);
+}
+
+QString makeMailHref(const QString& text, const QUrl& mail)
+{
+    return makeMailHref(text, mail.toString());
+}
+
 QString escapeHtml(const QString& input)
 {
     QString escaped(input);
