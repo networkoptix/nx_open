@@ -1,3 +1,5 @@
+#include <cmath>
+#include <cstdlib>
 #include <limits>
 
 #include <gtest/gtest.h>
@@ -184,9 +186,9 @@ protected:
         {
             const auto syncTime = m_peers.front()->getSyncTime();
             const auto osTime = nx::utils::millisSinceEpoch();
-            if (std::chrono::abs(syncTime - osTime) <=
+            if (std::abs((syncTime - osTime).count()) <=
                 m_peers.front()->commonModule()->globalSettings()
-                    ->maxDifferenceBetweenSynchronizedAndLocalTime())
+                    ->maxDifferenceBetweenSynchronizedAndLocalTime().count())
             {
                 break;
             }
