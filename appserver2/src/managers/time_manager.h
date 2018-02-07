@@ -58,6 +58,15 @@ class Ec2DirectConnection;
 class Settings;
 class AbstractTransactionMessageBus;
 
+// TODO: #ak This class should be removed when we can use m_miscManager to save parameters.
+class AbstractWorkAroundMiscDataSaver
+{
+public:
+    virtual ~AbstractWorkAroundMiscDataSaver() = default;
+
+    virtual ErrorCode saveSync(const ApiMiscData& data) = 0;
+};
+
 /**
  * Sequence has less priority than TimeSynchronizationManager::peerIsServer and
  * TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
@@ -125,9 +134,10 @@ public:
      */
     TimeSynchronizationManager(
         Qn::PeerType peerType,
-        nx::utils::TimerManager* const timerManager,
+        nx::utils::StandaloneTimerManager* const timerManager,
         AbstractTransactionMessageBus* messageBus,
-        Settings* settings);
+        Settings* settings,
+        std::shared_ptr<AbstractWorkAroundMiscDataSaver> workAroundMiscDataSaver = nullptr);
     virtual ~TimeSynchronizationManager();
 
     /** Implemenattion of QnStoppable::pleaseStop. */
@@ -138,7 +148,7 @@ public:
      * @note Cannot do it in constructor to keep valid object destruction order.
      * TODO #ak look like incapsulation failure. Better remove this method.
      */
-    void start(const std::shared_ptr<Ec2DirectConnection>& connection);
+    void start(const std::shared_ptr<AbstractMiscManager>& miscManager);
 
     /** Returns synchronized time (millis from epoch, UTC). */
     qint64 getSyncTime() const;
@@ -188,7 +198,7 @@ private:
     {
         nx::network::SocketAddress peerAddress;
         nx::network::http::AuthInfoCache::AuthorizationCacheItem authData;
-        nx::utils::TimerManager::TimerGuard syncTimerID;
+        nx::utils::StandaloneTimerManager::TimerGuard syncTimerID;
         nx::network::http::AsyncHttpClientPtr httpClient;
         /** Request round-trip time. */
         boost::optional<qint64> rttMillis;
@@ -236,10 +246,10 @@ private:
     boost::optional<qint64> m_prevSysTime;
     boost::optional<qint64> m_prevMonotonicClock;
     bool m_terminated;
-    std::shared_ptr<Ec2DirectConnection> m_connection;
+    std::shared_ptr<AbstractMiscManager> m_miscManager;
     AbstractTransactionMessageBus* m_messageBus;
     const Qn::PeerType m_peerType;
-    nx::utils::TimerManager* const m_timerManager;
+    nx::utils::StandaloneTimerManager* const m_timerManager;
     std::unique_ptr<AbstractAccurateTimeFetcher> m_timeSynchronizer;
     size_t m_internetTimeSynchronizationPeriod;
     bool m_timeSynchronized;
@@ -248,6 +258,7 @@ private:
     Settings* m_settings;
     std::atomic<size_t> m_asyncOperationsInProgress;
     QnWaitCondition m_asyncOperationsWaitCondition;
+    std::shared_ptr<AbstractWorkAroundMiscDataSaver> m_workAroundMiscDataSaver;
 
     void selectLocalTimeAsSynchronized(
         QnMutexLockerBase* const lock,
@@ -314,7 +325,7 @@ private:
         qint64 syncTimeToLocalDelta,
         const TimePriorityKey& syncTimeKey);
 
-    private slots:
+private slots:
     void onNewConnectionEstablished(QnAbstractTransactionTransport* transport);
     void onPeerLost(QnUuid peer, Qn::PeerType peerType);
     void onDbManagerInitialized();
