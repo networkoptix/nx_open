@@ -53,9 +53,10 @@ namespace desktop {
 
 class MimeData;
 
+class DeviceAdditionDialog;
+
 namespace ui {
 
-class DeviceAdditionDialog;
 
 namespace experimental { class MainWindow; }
 

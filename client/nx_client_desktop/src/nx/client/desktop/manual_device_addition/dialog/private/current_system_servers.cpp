@@ -67,8 +67,6 @@ void CurrentSystemServers::tryAddServer(const QnResourcePtr& resource)
         return;
 
     m_servers.append(server);
-    connect(server, &QnResource::flagsChanged, this,
-        [this, server]() { handleFlagsChanged(server); });
 
     emit serverAdded(server);
     emit serversCountChanged();
@@ -91,14 +89,6 @@ void CurrentSystemServers::tryRemoveServer(const QnResourcePtr& resource)
 
     emit serverRemoved(server->getId());
     emit serversCountChanged();
-}
-
-void CurrentSystemServers::handleFlagsChanged(const QnMediaServerResourcePtr& server)
-{
-    if (server->hasFlags(Qn::fake_server))
-        tryRemoveServer(server);
-    else
-        tryAddServer(server);
 }
 
 } // namespace desktop

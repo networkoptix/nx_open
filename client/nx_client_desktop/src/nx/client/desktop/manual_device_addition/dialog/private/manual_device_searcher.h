@@ -32,7 +32,7 @@ public:
         const QString& password,
         int port);
 
-    virtual ~ManualDeviceSearcher();
+    virtual ~ManualDeviceSearcher() override;
 
     QnManualResourceSearchStatus::State progress() const;
 

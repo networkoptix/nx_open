@@ -36,12 +36,12 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
     const int first = rowCount();
     const int last = rowCount() + truncatedIds.size() - 1;
     const ScopedInsertRows guard(this, QModelIndex(), first, last);
-    bool hasNewDeivces = false;
+    bool hasNewDevices = false;
     for (const auto& newDevice: devices)
     {
         if (truncatedIds.contains(newDevice.uniqueId))
         {
-            hasNewDeivces = true;
+            hasNewDevices = true;
             m_devices.append(newDevice);
             m_checked.insert(newDevice.uniqueId, false);
             m_presentedState.insert(newDevice.uniqueId,
@@ -50,7 +50,7 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
     }
 
     // Update numbers in header
-    if (hasNewDeivces)
+    if (hasNewDevices)
     {
         headerDataChanged(Qt::Horizontal,
             FoundDevicesModel::presentedStateColumn, FoundDevicesModel::presentedStateColumn);
@@ -193,13 +193,12 @@ bool FoundDevicesModel::setData(
     if (index.column() == checkboxColumn && role == Qt::CheckStateRole)
     {
         const auto uniqueId = m_devices[index.row()].uniqueId;
-        m_checked[uniqueId] = value.value<Qt::CheckState>() == Qt::Unchecked ? false : true;
+        m_checked[uniqueId] = value.value<Qt::CheckState>() != Qt::Unchecked;
         emit dataChanged(index, index, {Qt::CheckStateRole});
         return true;
     }
     else if (index.column() == presentedStateColumn && role == presentedStateRole)
     {
-
         const auto uniqueId = device(index).uniqueId;
         m_presentedState[uniqueId] = value.value<PresentedState>();
         emit dataChanged(index, index, {presentedStateRole});

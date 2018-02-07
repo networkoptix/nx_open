@@ -24,7 +24,7 @@ public:
 
     QnItemViewHoverTracker* hoverTracker() const;
 
-    // Takes ownership of delegate
+    // Takes ownership of delegate.
     void setPersistentDelegateForColumn(int column, QAbstractItemDelegate* delegate);
 
 protected:

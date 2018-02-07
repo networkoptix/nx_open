@@ -15,7 +15,7 @@ void removeLayout(QLayout* layout)
     if (!layout)
         return;
 
-    while(const auto item = layout->takeAt(0))
+    while (const auto item = layout->takeAt(0))
     {
         if (const auto widget = item->widget())
             delete widget;

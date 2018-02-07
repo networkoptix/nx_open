@@ -97,8 +97,11 @@ void DeviceAdditionDialog::initializeControls()
 
     ui->hintLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
     ui->hintLabel->setToolTip(tr("Examples:")
-        + lit("\n192.168.1.15\nwww.example.com:8080\nhttp://example.com:7090/image.jpg"
-            "\nrtsp://example.com:554/video\nudp://239.250.5.5:1234"));
+        + lit("\n192.168.1.15\n"
+              "www.example.com:8080\n"
+              "http://example.com:7090/image.jpg\n"
+              "rtsp://example.com:554/video\n"
+              "udp://239.250.5.5:1234"));
 
     installEventHandler(ui->serverChoosePanel, QEvent::PaletteChange, ui->serverChoosePanel,
         [this]()

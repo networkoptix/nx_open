@@ -31,7 +31,6 @@ signals:
 private:
     void tryAddServer(const QnResourcePtr& resource);
     void tryRemoveServer(const QnResourcePtr& resource);
-    void handleFlagsChanged(const QnMediaServerResourcePtr& server);
 
 private:
     QnMediaServerResourceList m_servers;
