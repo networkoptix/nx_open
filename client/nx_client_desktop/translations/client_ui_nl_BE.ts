@@ -1691,17 +1691,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Nieuwe draagbare camera...</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessible by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessible by any user.</translation>
+      <translation>&quot;Draagbare Camera&quot; is een virtuele opslag voor videobestanden, die kan worden geüpload naar elke server op uw systeem en toegankelijk is voor elke gebruiker.</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>Naar server</translation>
     </message>
   </context>
   <context>
@@ -2556,8 +2556,7 @@
       <location/>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
 The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation>Het geüploade archief kan automatisch worden verwijderd als er geen vrije ruimte meer is op de serveropslag. De oudste beelden van alle camera's op de server worden eerst verwijderd.</translation>
     </message>
   </context>
   <context>
@@ -2914,22 +2913,22 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>Upload Video</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Upload bestand...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Upload map...</translation>
     </message>
     <message>
       <location/>
       <source>&lt;warning&gt;</source>
-      <translation type="unfinished">&lt;warning&gt;</translation>
+      <translation>&lt;waarschuwing&gt;</translation>
     </message>
   </context>
   <context>
