@@ -65,22 +65,22 @@ Windows: Microsoft Visual Studio >= 12
 Linux: gcc >= 4.8.4, make or Ninja (recommended)
 ```
 
-First, create a build directory at any convenient location, presumably outside this package:
+First, create a build directory at any convenient location:
 ```
-mkdir .../stub_metadata_plugin-build
-cd .../stub_metadata_plugin-build
+mkdir .../build
+cd .../build
 ```
 
 Then, generate build system files (they depend on the platform and chosen build tool) via CMake:
 ```
 # Windows - generating .vcxproj and .sln:
-cmake .../stub_metadata_plugin -Ax64
+cmake ...\nx_metadata_sdk\samples\stub_metadata_plugin -Ax64
 
 # Linux - generating Ninja files:
-cmake .../stub_metadata_plugin -GNinja
+cmake .../nx_metadata_sdk/samples/stub_metadata_plugin -GNinja
 
 # Linux - generating makefiles:
-cmake .../stub_metadata_plugin
+cmake .../nx_metadata_sdk/samples/stub_metadata_plugin
 ```
 
 Finally, compile and link the library:
@@ -89,25 +89,25 @@ Finally, compile and link the library:
 cmake --build .
 
 # Windows via Visual Studio GUI:
-# Open stub_metadata_plugin.sln and build ALL_BUILD project.
+# Open .../build/stub_metadata_plugin.sln and build ALL_BUILD project.
 ```
 
 Locate the main built artifact:
 ```
 # Windows:
-stub_metadata_plugin.dll
+...\build\Debug\stub_metadata_plugin.dll
 
 # Linux:
-libstub_metadata_plugin.so
+.../build/libstub_metadata_plugin.so
 ```
 
 The above steps are automated in the provided scripts:
 ```
 # Windows:
-build_sample.bat
+...\nx_metadata_sdk\build_sample.bat
 
 # Linux or Windows with Cygwin:
-build_sample.sh
+.../nx_metadata_sdk/build_sample.sh
 ```
 
 To install the plugin, just copy its library file to the dedicated folder in the Nx Witness
