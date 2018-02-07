@@ -537,15 +537,17 @@
                 <module>nx_storage_sdk</module>
 
                 <module>common_libs/nx_speech_synthesizer</module>
-                <module>mediaserver</module>
                 <module>mediaserver_core</module>
 
+<!--
+                <module>mediaserver</module>
                 <module>plugins/genericrtspplugin</module>
                 <module>plugins/generic_multicast_plugin</module>
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>plugins/metadata/hanwha_metadata_plugin</module>
                 <module>plugins/metadata/hikvision_metadata_plugin</module>
+-->
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
