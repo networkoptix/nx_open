@@ -210,13 +210,10 @@ QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
         if (items[i].first == lit("channel"))
             items[i].second = QString::number(channel+1);
     }
-
     urlQuery.setQueryItems(items);
     url.setQuery(urlQuery);
     QString urlStr = url.toString();
-
-    // TODO: Use getResourceByUniqueUrl() and check for physicalId.
-    return resourcePool()->getResourceByUniqueUrl(urlStr).dynamicCast<QnPhysicalCameraResource>();
+    return resourcePool()->getResourceByUrl(urlStr).dynamicCast<QnPhysicalCameraResource>();
 }
 
 void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)

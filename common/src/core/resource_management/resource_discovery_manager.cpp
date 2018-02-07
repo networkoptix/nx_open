@@ -57,33 +57,17 @@ QnManualCameraInfo::QnManualCameraInfo(const QUrl& url, const QAuthenticator& au
     this->uniqueId = uniqueId;
 }
 
-QnResourceList searchCameraResources(const QnManualCameraInfo& camera)
+QList<QnResourcePtr> QnManualCameraInfo::checkHostAddr() const
 {
-    try
-    {
-        if (const auto searcher = dynamic_cast<QnAbstractNetworkResourceSearcher*>(camera.searcher))
-        {
-            return searcher->checkEndpoint(camera.url.toString(),
-                camera.auth, camera.uniqueId, QnResouceSearchMode::basic);
-        }
-    }
-    catch (const std::exception& e)
-    {
-        qWarning()
-            << "searchCameraResources exception ("<<e.what()<<") caught\n"
-            << "\t\tresource type:" << camera.resType->getName() << "\n"
-            << "\t\tresource url:" << camera.url << "\n";
-    }
-    catch (...)
-    {
-        qWarning()
-            << "searchCameraResources exception caught\n"
-            << "\t\tresource type:" << camera.resType->getName() << "\n"
-            << "\t\tresource url:" << camera.url << "\n";
-    }
-
-    return QnResourceList();
+    QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(searcher);
+    QString urlStr = url.toString();
+    if (ns)
+        return ns->checkHostAddr(url, auth, false);
+    else
+        return QList<QnResourcePtr>();
 }
+
+
 
 QnResourceDiscoveryManagerTimeoutDelegate::QnResourceDiscoveryManagerTimeoutDelegate( QnResourceDiscoveryManager* discoveryManager )
 :
@@ -305,6 +289,32 @@ void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
     }
 }
 
+static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input)
+{
+    try
+    {
+        return input.checkHostAddr();
+    }
+    catch (const std::exception& e)
+    {
+        qWarning()
+            << "CheckHostAddrAsync exception ("<<e.what()<<") caught\n"
+            << "\t\tresource type:" << input.resType->getName() << "\n"
+            << "\t\tresource url:" << input.url << "\n";
+
+        return QnResourceList();
+    }
+    catch (...)
+    {
+        qWarning()
+            << "CheckHostAddrAsync exception caught\n"
+            << "\t\tresource type:" << input.resType->getName() << "\n"
+            << "\t\tresource url:" << input.url << "\n";
+
+        return QnResourceList();
+    }
+}
+
 bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt)
 {
     if (!camera)
@@ -374,7 +384,7 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
             NX_VERBOSE(this, lm("Manual camera %1 check host address %2")
                 .args(manualCamera.uniqueId, manualCamera.url));
 
-            searchFutures.push_back(QtConcurrent::run(&searchCameraResources, manualCamera));
+            searchFutures.push_back(QtConcurrent::run(&CheckHostAddrAsync, manualCamera));
         }
     }
 

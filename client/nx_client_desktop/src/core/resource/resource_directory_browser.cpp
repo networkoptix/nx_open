@@ -332,7 +332,7 @@ QnResourcePtr QnResourceDirectoryBrowser::resourceFromFile(const QString &filena
 
     if (resourcePool)
     {
-        if (const auto& existing = resourcePool->getResourceByUniqueUrl(path))
+        if (const auto& existing = resourcePool->getResourceByUrl(path))
             return existing;
     }
 

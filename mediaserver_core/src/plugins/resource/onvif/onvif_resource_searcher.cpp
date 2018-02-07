@@ -139,18 +139,21 @@ int OnvifResourceSearcher::autoDetectDevicePort(const QUrl& url)
     return result > 0 ? result : kDefaultOnvifPort;
 }
 
-QnResourceList OnvifResourceSearcher::checkEndpoint(
-    const QUrl& _url, const QAuthenticator& auth,
-    const QString& physicalId, QnResouceSearchMode mode)
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& _url, const QAuthenticator& auth, bool isSearchAction)
 {
     QUrl url(_url);
 
-    if (!url.scheme().isEmpty() && mode == QnResouceSearchMode::multichannel)
-        return QList<QnResourcePtr>();
+    if( !url.scheme().isEmpty() && isSearchAction)
+        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
     if (url.port() == -1)
         url.setPort(autoDetectDevicePort(url));
 
+    return checkHostAddrInternal(url, auth, isSearchAction);
+}
+
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
+{
     if (shouldStop())
         return QList<QnResourcePtr>();
 
@@ -165,49 +168,49 @@ QnResourceList OnvifResourceSearcher::checkEndpoint(
     QString onvifUrl(QLatin1String("onvif/device_service"));
 
     QString urlBase = urlStr.left(urlStr.indexOf(QLatin1String("?")));
-    QnPlOnvifResourcePtr pooledResource = resourcePool()
-        ->getResourceByUniqueId(physicalId).dynamicCast<QnPlOnvifResource>();
+    QnPlOnvifResourcePtr rpResource = resourcePool()->getResourceByUrl(urlBase).dynamicCast<QnPlOnvifResource>();
 
-    QnPlOnvifResourcePtr resource = createResource(pooledResource
-        ? pooledResource->getTypeId()
-        : typePtr->getId(), QnResourceParams()).dynamicCast<QnPlOnvifResource>();
-
+    QnPlOnvifResourcePtr resource = createResource(rpResource ? rpResource->getTypeId() : typePtr->getId(), QnResourceParams()).dynamicCast<QnPlOnvifResource>();
     resource->setDefaultAuth(auth);
     QString deviceUrl = QString(QLatin1String("http://%1:%2/%3")).arg(url.host()).arg(onvifPort).arg(onvifUrl);
     resource->setUrl(deviceUrl);
     resource->setDeviceOnvifUrl(deviceUrl);
 
     // TODO: Move out to some helper class, to remove direct link to hikvision.
-    if (mode == QnResouceSearchMode::multichannel)
-        nx::mediaserver_core::plugins::HikvisionResource::tryToEnableOnvifSupport(deviceUrl, auth);
+    if (isSearchAction)
+    {
+        nx::mediaserver_core::plugins::HikvisionResource::tryToEnableIntegrationProtocols(
+            deviceUrl,
+            auth);
+    }
 
     // optimization. do not pull resource every time if resource already in pool
-    if (pooledResource)
+    if (rpResource)
     {
         int channel = QUrlQuery(url.query()).queryItemValue(QLatin1String("channel")).toInt();
 
-        if (channel == 0 && !hasRunningLiveProvider(pooledResource)) {
+        if (channel == 0 && !hasRunningLiveProvider(rpResource)) {
             resource->calcTimeDrift();
             if (!resource->readDeviceInformation())
                 return resList; // no answer from camera
         }
-        else if (pooledResource->getStatus() == Qn::Offline)
+        else if (rpResource->getStatus() == Qn::Offline)
             return resList; // do not add 1..N channels if resource is offline
 
-        resource->setPhysicalId(pooledResource->getPhysicalId());
-        resource->update(pooledResource);
+        resource->setPhysicalId(rpResource->getPhysicalId());
+        resource->update(rpResource);
         if (channel > 0)
             resource->updateToChannel(channel-1);
 
         auto resData = qnStaticCommon
             ->dataPool()
-            ->data(pooledResource->getVendor(), pooledResource->getModel());
+            ->data(rpResource->getVendor(), rpResource->getModel());
 
         bool shouldAppearAsSingleChannel = resData.value<bool>(
             Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
-        if (pooledResource->getMaxChannels() > 1  && !shouldAppearAsSingleChannel) {
-            resource->setGroupId(pooledResource->getPhysicalId());
+        if (rpResource->getMaxChannels() > 1  && !shouldAppearAsSingleChannel) {
+            resource->setGroupId(rpResource->getPhysicalId());
             resource->setGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
         }
 
@@ -285,7 +288,7 @@ QnResourceList OnvifResourceSearcher::checkEndpoint(
                 .value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
             // checking for multichannel encoders
-            if (mode == QnResouceSearchMode::multichannel && !shouldAppearAsSingleChannel)
+            if (isSearchAction && !shouldAppearAsSingleChannel)
             {
                 if (resource->getMaxChannels() > 1)
                 {

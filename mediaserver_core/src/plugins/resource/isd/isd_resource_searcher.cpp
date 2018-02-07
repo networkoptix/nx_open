@@ -83,12 +83,13 @@ QString QnPlISDResourceSearcher::manufacture() const
     return QnPlIsdResource::MANUFACTURE;
 }
 
-QnResourceList QnPlISDResourceSearcher::checkEndpoint(
-    const QUrl& url, const QAuthenticator& authOriginal,
-    const QString& /*physicalId*/, QnResouceSearchMode mode)
+QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
+    const QUrl& url,
+    const QAuthenticator& authOriginal,
+    bool isSearchAction)
 {
-    if (!url.scheme().isEmpty() && mode == QnResouceSearchMode::multichannel)
-        return QList<QnResourcePtr>();
+    if( !url.scheme().isEmpty() && isSearchAction )
+        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
     bool needRecheck =
         authOriginal.user().isEmpty() &&

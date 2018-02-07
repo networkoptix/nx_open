@@ -14,17 +14,12 @@ public:
 
     // returns all available devices
     virtual QnResourceList findResources() override;
-
 protected:
-    virtual QnResourceList checkEndpoint(
-        const QUrl& url, const QAuthenticator& auth,
-        const QString& physicalId, QnResouceSearchMode mode) override;
-
+    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 private:
     bool updateSocketList();
     void clearSocketList();
     void sendBroadcast();
-
 private:
     QList<AbstractDatagramSocket*> m_sockList;
     qint64 m_sockUpdateTime;

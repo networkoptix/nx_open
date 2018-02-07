@@ -1701,7 +1701,7 @@
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>Szerverhez</translation>
     </message>
   </context>
   <context>
@@ -2915,17 +2915,17 @@ Kattintson az &quot;Új szerepkör&quot; gombra a létrehozáshoz.</translation>
     <message>
       <location/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>Video feltöltése</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Fájl feltöltése...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Mappa feltöltése...</translation>
     </message>
     <message>
       <location/>

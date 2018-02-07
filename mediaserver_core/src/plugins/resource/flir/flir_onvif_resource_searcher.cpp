@@ -20,15 +20,16 @@ OnvifResourceSearcher::OnvifResourceSearcher(QnCommonModule* commonModule):
 
 }
 
-QnResourceList OnvifResourceSearcher::checkEndpoint(
-        const QUrl& url, const QAuthenticator& auth,
-        const QString& physicalId, QnResouceSearchMode mode)
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(
+    const QUrl& url,
+    const QAuthenticator& auth,
+    bool doMultichannelCheck)
 {
     auto port = url.port(kFlirDefaultOnvifPort);
     auto urlCopy = url;
     urlCopy.setPort(port);
 
-    return ::OnvifResourceSearcher::checkEndpoint(urlCopy, auth, physicalId, mode);
+    return ::OnvifResourceSearcher::checkHostAddr(urlCopy, auth, doMultichannelCheck);
 }
 
 QnResourceList OnvifResourceSearcher::findResources()

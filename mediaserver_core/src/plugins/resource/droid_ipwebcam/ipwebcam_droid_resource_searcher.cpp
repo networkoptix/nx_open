@@ -54,12 +54,15 @@ QString QnPlIpWebCamResourceSearcher::manufacture() const
     return QnPlDriodIpWebCamResource::MANUFACTURE;
 }
 
-QnResourceList QnPlIpWebCamResourceSearcher::checkEndpoint(
-    const QUrl& /*url*/, const QAuthenticator& /*auth*/,
-    const QString& /*physicalId*/, QnResouceSearchMode /*mode*/)
+
+QList<QnResourcePtr> QnPlIpWebCamResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    Q_UNUSED(url)
+    Q_UNUSED(auth)
+    Q_UNUSED(doMultichannelCheck)
     return QList<QnResourcePtr>();
 }
+
 
 struct AnDroidDev
 {
@@ -130,8 +133,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 
         while(curr <= max_ip)
         {
-            // TODO: Use getResourceByUniqueUrl() and check for physicalId.
-            QnResourcePtr nd = resourcePool()->getResourceByUniqueUrl(QHostAddress(curr).toString());
+            QnResourcePtr nd = resourcePool()->getResourceByUrl(QHostAddress(curr).toString());
             if (nd)
             {
                 // such dev alredy exists;

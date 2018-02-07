@@ -309,7 +309,7 @@ void QnRtspConnectionProcessor::parseRequest()
         if (!resource)
             resource = resourcePool()->getResourceByMacAddress(resId);
         if (!resource)
-            resource = resourcePool()->getResourceByUniqueUrl(resId); // TODO: Error message if there is more than one?
+            resource = resourcePool()->getResourceByUrl(resId);
         if (!resource)
             return;
 

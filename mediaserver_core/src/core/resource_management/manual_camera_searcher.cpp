@@ -160,8 +160,7 @@ void QnSearchTask::doSearch()
     QnManualResourceSearchList results;
     for (const auto& checker: m_searchers)
     {
-        auto seqResults = checker->checkEndpoint(m_url, m_auth,
-            /*physicalId*/ QString(), QnResouceSearchMode::multichannel);
+        auto seqResults = checker->checkHostAddr(m_url, m_auth, true);
 
         for (const auto& res: seqResults)
         {

@@ -20,9 +20,7 @@ public:
 
     virtual QString manufacture() const override;
 
-    virtual QnResourceList checkEndpoint(
-        const QUrl& url, const QAuthenticator& auth,
-        const QString& physicalId, QnResouceSearchMode mode) override;
+    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 };
 
 class QnArchiveCamResource

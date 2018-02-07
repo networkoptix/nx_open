@@ -23,9 +23,7 @@ QnResourcePtr QnArchiveCamResourceSearcher::createResource(const QnUuid &resourc
 
 QString QnArchiveCamResourceSearcher::manufacture() const  { return kArchiveCamName; }
 
-QnResourceList QnArchiveCamResourceSearcher::checkEndpoint(
-    const QUrl& /*url*/, const QAuthenticator& /*auth*/,
-    const QString& /*physicalId*/, QnResouceSearchMode /*mode*/)
+QList<QnResourcePtr> QnArchiveCamResourceSearcher::checkHostAddr(const QUrl& /*url*/, const QAuthenticator& /*auth*/, bool /*doMultichannelCheck*/)
 {
     return QList<QnResourcePtr>();
 }

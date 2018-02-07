@@ -14,6 +14,11 @@
 #include "core/resource_management/resource_pool.h"
 #include <rest/server/rest_connection_processor.h>
 
+
+static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) {
+    return input.checkHostAddr();
+}
+
 int QnCanAcceptCameraRestHandler::executePost(
     const QString &path,
     const QnRequestParams &params,
@@ -59,7 +64,7 @@ int QnCanAcceptCameraRestHandler::executePost(
     }
 
     // add manual cameras
-    QFuture<QnResourceList> manualDiscoveryResults = QtConcurrent::mapped(manualCameraList, &searchCameraResources);
+    QFuture<QnResourceList> manualDiscoveryResults = QtConcurrent::mapped(manualCameraList, &CheckHostAddrAsync);
     //checking cameras with unicast
     nx::utils::concurrent::Future<bool> camerasToPingResults( camerasToPing.size() );
     for( size_t i = 0; i < camerasToPing.size(); ++i )
