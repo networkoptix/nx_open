@@ -76,11 +76,6 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     m_sensitivityButtons(new QButtonGroup(this))
 {
     ui->setupUi(this);
-    ui->wearableUploadWidget->initializeContext();
-    ui->wearableProgressWidget->initializeContext();
-    ui->wearableArchiveLengthWidget->initializeContext();
-    ui->licensingWidget->initializeContext();
-    ui->cameraScheduleWidget->initializeContext();
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->motionDetectionCheckBox->setForegroundRole(QPalette::ButtonText);
 
@@ -403,7 +398,7 @@ void SingleCameraSettingsWidget::submitToResource()
         if (m_camera->getAuth() != loginEditAuth)
             m_camera->setAuth(loginEditAuth);
 
-        ui->cameraScheduleWidget->submitToResources();
+        ui->cameraScheduleWidget->applyChanges();
 
         if (!m_camera->isDtsBased())
         {
@@ -537,7 +532,7 @@ void SingleCameraSettingsWidget::updateFromResource(bool silent)
     }
 
     /* After overrideMotionType is set. */
-    ui->cameraScheduleWidget->updateFromResources();
+    ui->cameraScheduleWidget->loadDataToUi();
 
     updateIpAddressText();
     updateWebPageText();

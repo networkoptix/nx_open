@@ -19,6 +19,7 @@
 #include "camera_settings_tab.h"
 #include "camera_settings_model.h"
 #include "camera_settings_general_tab_widget.h"
+#include "camera_schedule_widget.h"
 
 namespace nx {
 namespace client {
@@ -34,6 +35,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget *parent) :
     addPage(int(CameraSettingsTab::general),
         new CameraSettingsGeneralTabWidget(m_model.data(), this),
         tr("General"));
+
+    m_cameraScheduleWidget = new CameraScheduleWidget(ui->tabWidget, false);
+    addPage(int(CameraSettingsTab::recording),
+        m_cameraScheduleWidget,
+        tr("Recording"));
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this,
@@ -94,6 +100,8 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
         return false;
 
     m_model->setCameras(cameras);
+    m_cameraScheduleWidget->setCameras(cameras);
+
     loadDataToUi();
     return true;
 }

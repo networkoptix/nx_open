@@ -216,25 +216,20 @@ namespace desktop {
 
 using namespace ui;
 
-CameraScheduleWidget::CameraScheduleWidget(QWidget* parent):
+CameraScheduleWidget::CameraScheduleWidget(QWidget* parent, bool snapScrollbarToParent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::manual),
-    ui(new Ui::CameraScheduleWidget),
-    m_disableUpdateGridParams(false),
-    m_motionAvailable(true),
-    m_recordingParamsAvailable(true),
-    m_readOnly(false),
-    m_maxFps(0),
-    m_maxDualStreamingFps(0),
-    m_motionTypeOverride(Qn::MT_Default),
-    m_updating(false)
+    QnWorkbenchContextAware(parent, InitializationMode::lazy),
+    ui(new Ui::CameraScheduleWidget)
 {
     ui->setupUi(this);
     ui->recordBeforeSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
     ui->recordAfterSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
 
     NX_ASSERT(parent);
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
+    QWidget* scrollbarOwner = snapScrollbarToParent
+        ? window()
+        : this;
+    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(scrollbarOwner);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseMaximumSpace(true);
 
@@ -520,25 +515,27 @@ void CameraScheduleWidget::retranslateUi()
 
 void CameraScheduleWidget::afterContextInitialized()
 {
-    connect(context()->instance<QnWorkbenchPanicWatcher>(), &QnWorkbenchPanicWatcher::panicModeChanged, this, &CameraScheduleWidget::updatePanicLabelText);
-    connect(context(), &QnWorkbenchContext::userChanged, this, &CameraScheduleWidget::updateLicensesButtonVisible);
+    connect(
+        context()->instance<QnWorkbenchPanicWatcher>(),
+        &QnWorkbenchPanicWatcher::panicModeChanged,
+        this,
+        &CameraScheduleWidget::updatePanicLabelText);
     updatePanicLabelText();
+
+    connect(
+        context(),
+        &QnWorkbenchContext::userChanged,
+        this,
+        &CameraScheduleWidget::updateLicensesButtonVisible);
     updateLicensesButtonVisible();
 }
 
-bool CameraScheduleWidget::isReadOnly() const
+void CameraScheduleWidget::setReadOnlyInternal(bool readOnly)
 {
-    return m_readOnly;
-}
-
-void CameraScheduleWidget::setReadOnly(bool readOnly)
-{
-    if (m_readOnly == readOnly)
-        return;
-
     using ::setReadOnly;
     setReadOnly(ui->recordAlwaysButton, readOnly);
-    setReadOnly(ui->recordMotionButton, readOnly); // TODO: #GDM #Common this is not valid. Camera may not support HW motion, we need to check for this.
+    // TODO: #GDM This is not valid. Camera may not support HW motion, we need to check for this.
+    setReadOnly(ui->recordMotionButton, readOnly);
     setReadOnly(ui->recordMotionPlusLQButton, readOnly);
     setReadOnly(ui->noRecordButton, readOnly);
     setReadOnly(ui->qualityComboBox, readOnly);
@@ -550,8 +547,6 @@ void CameraScheduleWidget::setReadOnly(bool readOnly)
     setReadOnly(ui->exportScheduleButton, readOnly);
     setReadOnly(ui->exportWarningLabel, readOnly);
     setReadOnly(ui->archiveLengthWidget, readOnly);
-
-    m_readOnly = readOnly;
 }
 
 const QnVirtualCameraResourceList &CameraScheduleWidget::cameras() const
@@ -579,7 +574,12 @@ void CameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &cameras
     }
 }
 
-void CameraScheduleWidget::updateFromResources()
+bool CameraScheduleWidget::hasChanges() const
+{
+    return false;
+}
+
+void CameraScheduleWidget::loadDataToUi()
 {
     QScopedValueRollback<bool> updateRollback(m_updating, true);
 
@@ -667,7 +667,7 @@ void CameraScheduleWidget::updateFromResources()
     retranslateUi();
 }
 
-void CameraScheduleWidget::submitToResources()
+void CameraScheduleWidget::applyChanges()
 {
     bool scheduleChanged = ui->gridWidget->isActive();
 
@@ -1049,7 +1049,7 @@ void CameraScheduleWidget::updateGridParams(bool pickedFromGrid)
     ui->advancedSettingsWidget->setEnabled(enabled && m_recordingParamsAvailable);
     updateRecordSpinboxes();
 
-    if (!(m_readOnly && pickedFromGrid))
+    if (!(isReadOnly() && pickedFromGrid))
     {
         QnScheduleGridWidget::CellParams brush;
         brush.recordingType = recordType;

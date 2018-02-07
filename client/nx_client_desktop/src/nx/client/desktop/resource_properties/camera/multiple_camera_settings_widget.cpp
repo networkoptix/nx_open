@@ -41,8 +41,6 @@ MultipleCameraSettingsWidget::MultipleCameraSettingsWidget(QWidget *parent):
     m_updating(false)
 {
     ui->setupUi(this);
-    ui->licensingWidget->initializeContext();
-    ui->cameraScheduleWidget->initializeContext();
 
     CheckboxUtils::autoClearTristate(ui->enableAudioCheckBox);
 
@@ -202,7 +200,7 @@ void MultipleCameraSettingsWidget::submitToResources()
             camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
     }
 
-    ui->cameraScheduleWidget->submitToResources();
+    ui->cameraScheduleWidget->applyChanges();
     ui->imageControlWidget->submitToResources(m_cameras);
     ui->expertSettingsWidget->submitToResources(m_cameras);
 
@@ -269,7 +267,7 @@ void MultipleCameraSettingsWidget::updateFromResources()
 
     ui->imageControlWidget->updateFromResources(m_cameras);
     ui->licensingWidget->updateFromResources();
-    ui->cameraScheduleWidget->updateFromResources();
+    ui->cameraScheduleWidget->loadDataToUi();
 
     if (m_cameras.empty())
     {

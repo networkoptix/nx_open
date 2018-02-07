@@ -21,6 +21,7 @@ namespace client {
 namespace desktop {
 
 class CameraSettingsModel;
+class CameraScheduleWidget;
 
 class CameraSettingsDialog: public QnSessionAwareTabbedDialog
 {
@@ -41,6 +42,7 @@ private:
     Q_DISABLE_COPY(CameraSettingsDialog)
     QScopedPointer<Ui::CameraSettingsDialog> ui;
     QScopedPointer<CameraSettingsModel> m_model;
+    CameraScheduleWidget* m_cameraScheduleWidget = nullptr;
 };
 
 } // namespace desktop
