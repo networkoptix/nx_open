@@ -31,44 +31,47 @@ struct ArrowPosition
 
 ArrowPosition arrowPosition(const QRectF& tooltipRect, const QRectF& objectRect)
 {
-    const auto tooltipCenter = tooltipRect.center();
     ArrowPosition arrowPos;
 
-    if (tooltipCenter.x() > objectRect.right())
+    if (tooltipRect.left() > objectRect.right())
     {
         arrowPos.edge = Qt::LeftEdge;
         arrowPos.geometry = QRectF(
             tooltipRect.left() - kArrowSize.height(),
-            tooltipRect.top() + kArrowMargin,
+            std::min(tooltipRect.bottom() - kArrowMargin - kArrowSize.width(),
+                std::max(tooltipRect.top() + kArrowMargin, objectRect.top())),
             kArrowSize.height(),
             kArrowSize.width()
         );
     }
-    else if (tooltipCenter.x() < objectRect.left())
+    else if (tooltipRect.right() < objectRect.left())
     {
         arrowPos.edge = Qt::RightEdge;
         arrowPos.geometry = QRectF(
             tooltipRect.right(),
-            tooltipRect.top() + kArrowMargin,
+            std::min(tooltipRect.bottom() - kArrowMargin - kArrowSize.width(),
+                std::max(tooltipRect.top() + kArrowMargin, objectRect.top())),
             kArrowSize.height(),
             kArrowSize.width()
         );
     }
-    else if (tooltipCenter.y() > objectRect.bottom())
+    else if (tooltipRect.top() > objectRect.bottom())
     {
         arrowPos.edge = Qt::TopEdge;
         arrowPos.geometry = QRectF(
-            tooltipRect.left() + kArrowMargin,
+            std::min(tooltipRect.right() - kArrowMargin - kArrowSize.width(),
+                std::max(tooltipRect.left() + kArrowMargin, objectRect.left())),
             tooltipRect.top() - kArrowSize.height(),
             kArrowSize.width(),
             kArrowSize.height()
         );
     }
-    else if (tooltipCenter.y() < objectRect.top())
+    else if (tooltipRect.bottom() < objectRect.top())
     {
         arrowPos.edge = Qt::BottomEdge;
         arrowPos.geometry = QRectF(
-            tooltipRect.left() + kArrowMargin,
+            std::min(tooltipRect.right() - kArrowMargin - kArrowSize.width(),
+                std::max(tooltipRect.left() + kArrowMargin, objectRect.left())),
             tooltipRect.bottom(),
             kArrowSize.width(),
             kArrowSize.height()
