@@ -59,12 +59,7 @@ public:
     bool isRecordingScheduled() const;
 
 signals:
-    void archiveRangeChanged();
-    void scheduleTasksChanged();
-    void recordingSettingsChanged();
     void scheduleEnabledChanged(int);
-    void gridParamsChanged();
-    void controlsChangesApplied();
     void alert(const QString& text);
 
 protected:
@@ -129,7 +124,7 @@ private:
     QPair<Qn::StreamQuality, bool> qualityForBitrate(qreal bitrateMbps) const;
     qreal bitrateForQuality(Qn::StreamQuality quality) const;
 
-    void retranslateUi();
+    virtual void retranslateUi() override;
 
     enum AlertReason
     {

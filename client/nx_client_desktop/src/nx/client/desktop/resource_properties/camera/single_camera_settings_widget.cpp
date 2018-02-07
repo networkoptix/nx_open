@@ -129,15 +129,12 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->passwordEdit, &QLineEdit::textChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleTasksChanged,
-        this, &SingleCameraSettingsWidget::at_dbDataChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::recordingSettingsChanged,
-        this, &SingleCameraSettingsWidget::at_dbDataChanged);
+    connect(ui->cameraScheduleWidget, &QnAbstractPreferencesWidget::hasChangesChanged, this,
+        &SingleCameraSettingsWidget::at_dbDataChanged);
+
     connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleEnabledChanged,
         this, &SingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged);
     connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleEnabledChanged,
-        this, &SingleCameraSettingsWidget::at_dbDataChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::archiveRangeChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
     connect(ui->cameraScheduleWidget, &CameraScheduleWidget::alert, this,
         [this](const QString& text) { m_recordingAlert = text; updateAlertBar(); });

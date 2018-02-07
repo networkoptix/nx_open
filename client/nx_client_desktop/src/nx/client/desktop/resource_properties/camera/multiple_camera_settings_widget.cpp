@@ -36,7 +36,6 @@ MultipleCameraSettingsWidget::MultipleCameraSettingsWidget(QWidget *parent):
     m_hasDbChanges(false),
     m_loginWasEmpty(true),
     m_passwordWasEmpty(true),
-    m_hasScheduleControlsChanges(false),
     m_readOnly(false),
     m_updating(false)
 {
@@ -53,18 +52,11 @@ MultipleCameraSettingsWidget::MultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->passwordEdit, &QLineEdit::textChanged, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleTasksChanged, this,
-        &MultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::recordingSettingsChanged, this,
+    connect(ui->cameraScheduleWidget, &QnAbstractPreferencesWidget::hasChangesChanged, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::controlsChangesApplied, this,
-        [this] { m_hasScheduleControlsChanges = false; });
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::gridParamsChanged, this,
-        [this] { m_hasScheduleControlsChanges = true; });
+
     connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleEnabledChanged, this,
         &MultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::archiveRangeChanged, this,
-        &MultipleCameraSettingsWidget::at_dbDataChanged);
     connect(ui->cameraScheduleWidget, &CameraScheduleWidget::alert, this,
         [this](const QString& text) { m_alertText = text; updateAlertBar(); });
 
@@ -430,14 +422,6 @@ void MultipleCameraSettingsWidget::at_dbDataChanged()
         return;
 
     setHasDbChanges(true);
-}
-
-void MultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged()
-{
-    if (m_updating)
-        return;
-
-    at_dbDataChanged();
 }
 
 void MultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged(int state)

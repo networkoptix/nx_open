@@ -291,7 +291,7 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent, bool snapScrollbarTo
         [this]
         {
             if (!m_updating)
-                emit archiveRangeChanged();
+                emit hasChangesChanged();
         };
 
     auto handleCellValuesChanged =
@@ -301,7 +301,7 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent, bool snapScrollbarTo
                 return;
 
             updateAlert(ScheduleChange);
-            emit scheduleTasksChanged();
+            emit hasChangesChanged();
         };
 
     connect(ui->gridWidget, &QnScheduleGridWidget::cellValuesChanged,
@@ -322,13 +322,11 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent, bool snapScrollbarTo
         &CameraScheduleWidget::updateGridParams);
     connect(ui->fpsSpinBox, QnSpinboxIntValueChanged, this,
         &CameraScheduleWidget::updateGridParams);
-    connect(this, &CameraScheduleWidget::scheduleTasksChanged, this,
-        &CameraScheduleWidget::updateRecordSpinboxes);
 
     connect(ui->recordBeforeSpinBox, QnSpinboxIntValueChanged, this,
-        &CameraScheduleWidget::recordingSettingsChanged);
+        &CameraScheduleWidget::hasChangesChanged);
     connect(ui->recordAfterSpinBox, QnSpinboxIntValueChanged, this,
-        &CameraScheduleWidget::recordingSettingsChanged);
+        &CameraScheduleWidget::hasChangesChanged);
 
     connect(ui->licensesButton, &QPushButton::clicked, this,
         &CameraScheduleWidget::at_licensesButton_clicked);
@@ -359,9 +357,6 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent, bool snapScrollbarTo
 
     installEventHandler({ ui->recordMotionButton, ui->recordMotionPlusLQButton },
         QEvent::MouseButtonRelease, this, &CameraScheduleWidget::at_releaseSignalizer_activated);
-
-    installEventHandler(ui->gridWidget, QEvent::MouseButtonRelease,
-        this, &CameraScheduleWidget::controlsChangesApplied);
 
     updateMotionButtons();
 
@@ -740,7 +735,7 @@ void CameraScheduleWidget::updateMaxFPS()
         m_maxFps = maxFps;
         int currentMaxFps = getGridMaxFps();
         if (currentMaxFps > m_maxFps)
-            emit scheduleTasksChanged();
+            emit hasChangesChanged();
     }
 
     if (m_maxDualStreamingFps != maxDualStreamingFps)
@@ -748,7 +743,7 @@ void CameraScheduleWidget::updateMaxFPS()
         m_maxDualStreamingFps = maxDualStreamingFps;
         int currentMaxDualStreamingFps = getGridMaxFps(true);
         if (currentMaxDualStreamingFps > m_maxDualStreamingFps)
-            emit scheduleTasksChanged();
+            emit hasChangesChanged();
     }
 
     updateMaxFpsValue(ui->recordMotionPlusLQButton->isChecked());
@@ -840,6 +835,7 @@ void CameraScheduleWidget::updateMotionAvailable()
     m_motionAvailable = available;
 
     updateMotionButtons();
+    updateRecordSpinboxes();
 }
 
 void CameraScheduleWidget::setExportScheduleButtonEnabled(bool enabled)
@@ -990,7 +986,7 @@ void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
     }
 
     if (!m_updating)
-        emit scheduleTasksChanged();
+        emit hasChangesChanged();
 }
 
 bool CameraScheduleWidget::canEnableRecording() const
@@ -1077,7 +1073,6 @@ void CameraScheduleWidget::updateGridParams(bool pickedFromGrid)
         return;
 
     updateAlert(CurrentParamsChange);
-    emit gridParamsChanged();
 }
 
 void CameraScheduleWidget::setFps(int value)
