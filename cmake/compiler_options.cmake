@@ -10,6 +10,12 @@ option(analyzeMutexLocksForDeadlock
     "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
     OFF)
 
+if(MSVC)
+    # MSVC does not support compiler feature detection macros, so Qt fails to enable constexpr
+    # for some its claasses like QRect, QMargins, etc.
+    add_definitions(-D__cpp_constexpr=201304)
+endif()
+
 add_definitions(
     -DUSE_NX_HTTP
     -D__STDC_CONSTANT_MACROS

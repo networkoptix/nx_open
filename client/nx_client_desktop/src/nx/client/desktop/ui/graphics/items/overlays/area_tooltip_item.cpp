@@ -17,9 +17,9 @@ namespace desktop {
 namespace {
 
 static constexpr qreal kRoundingRadius = 2;
-static const QSizeF kArrowSize(8, 4);
+static constexpr QSizeF kArrowSize(8, 4);
 static constexpr qreal kArrowMargin = 6;
-static const QMarginsF kTooltipMargins(6, 4, 6, 4);
+static constexpr QMarginsF kTooltipMargins(6, 4, 6, 4);
 
 struct ArrowPosition
 {
