@@ -133,7 +133,7 @@
             },
             "internalName": "RegionEntrance",
             "description": "Object has entered %1",
-            "flags": "regionDependent | stateDependent",
+            "flags": "regionDependent",
             "regionDescription": " the region #%1"
         },
         {
@@ -145,7 +145,7 @@
             },
             "internalName": "RegionExiting",
             "description": "Object has exited %1",
-            "flags": "regionDependent | stateDependent",
+            "flags": "regionDependent",
             "regionDescription": " the region #%1"
         },
         {
