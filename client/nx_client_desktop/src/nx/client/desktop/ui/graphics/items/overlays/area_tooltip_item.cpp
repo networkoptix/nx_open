@@ -78,13 +78,11 @@ void paintArrow(QPainter* painter, const QRectF& rect, const Qt::Edge edge)
 {
     QPainterPath path;
 
-    constexpr size_t kPointsCount = 4;
-
-    std::array<QPointF, kPointsCount> points{{
+    std::array<QPointF, 4> points{{
         rect.topLeft(), rect.topRight(), rect.bottomRight(), rect.bottomLeft()
     }};
 
-    auto point = [&points, &kPointsCount](size_t i) { return points[i % kPointsCount]; };
+    auto point = [&points](size_t i) { return points[i % points.size()]; };
 
     size_t firstCorner = 0;
     switch (edge)
