@@ -178,17 +178,21 @@ void AreaTooltipItem::setText(const QString& text)
 
 QFont AreaTooltipItem::font() const
 {
-    return d->textPainter.font();
+    return d->textPainter.nameFont();
 }
 
 void AreaTooltipItem::setFont(const QFont& font)
 {
-    if (d->textPainter.font() == font)
+    if (d->textPainter.nameFont() == font)
         return;
 
     prepareGeometryChange();
 
-    d->textPainter.setFont(font);
+    auto valueFont = font;
+    valueFont.setWeight(QFont::Medium);
+    d->textPainter.setNameFont(font);
+    d->textPainter.setValueFont(valueFont);
+
     d->invalidateTextPixmap();
 }
 
