@@ -110,7 +110,10 @@ void TemporaryAccountPasswordManager::addRandomCredentials(
     data::TemporaryAccountCredentials* const data)
 {
     if (data->login.empty())
-        data->login = accountEmail;
+    {
+        data->login =
+            QByteArray::fromStdString(accountEmail).toHex().toLower().toStdString();
+    }
 
     data->password = generateRandomPassword();
     data->passwordHa1 = nx::network::http::calcHa1(
@@ -220,7 +223,7 @@ boost::optional<TemporaryAccountCredentialsEx>
 
 std::string TemporaryAccountPasswordManager::generateRandomPassword() const
 {
-    auto str = QnUuid::createUuid().toSimpleByteArray();
+    auto str = QnUuid::createUuid().toSimpleByteArray().toLower();
     str.replace('-', "");
     return str.toStdString();
 }
