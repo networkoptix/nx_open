@@ -20,6 +20,9 @@ public:
     QRectF filterRect() const;
     void setFilterRect(const QRectF& relativeRect);
 
+    QString filterText() const;
+    void setFilterText(const QString& value);
+
     virtual bool setData(const QModelIndex& index, const QVariant& /*value*/, int role) override;
 
     virtual bool isConstrained() const override;

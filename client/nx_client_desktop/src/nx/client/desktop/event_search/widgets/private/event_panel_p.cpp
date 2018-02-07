@@ -11,6 +11,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
+#include <ui/widgets/common/search_line_edit.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 
@@ -127,9 +128,13 @@ void EventPanel::Private::removeCameraTabs()
 
 void EventPanel::Private::setupEventSearch()
 {
-    m_eventsTab->setModel(new UnifiedAsyncSearchListModel(m_eventsModel, this));
+    auto model = new UnifiedAsyncSearchListModel(m_eventsModel, this);
+    m_eventsTab->setModel(model);
     m_eventsTab->setPlaceholderTexts(tr("No events"), tr("No events occured"));
     m_eventsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/events.png")));
+
+    connect(m_eventsTab->filterEdit(), &QnSearchLineEdit::textChanged,
+        model, &UnifiedAsyncSearchListModel::setClientsideTextFilter);
 
     auto button = m_eventsTab->typeButton();
     button->setIcon(qnSkin->icon(lit("text_buttons/event_rules.png")));
@@ -186,6 +191,13 @@ void EventPanel::Private::setupBookmarkSearch()
     m_bookmarksTab->setModel(new UnifiedAsyncSearchListModel(m_bookmarksModel, this));
     m_bookmarksTab->setPlaceholderTexts(tr("No bookmarks"), kHtmlPlaceholder);
     m_bookmarksTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/bookmarks.png")));
+
+    connect(m_bookmarksTab->filterEdit(), &QnSearchLineEdit::textChanged, m_bookmarksModel,
+        [this](const QString& text)
+        {
+            m_bookmarksModel->setFilterText(text);
+            m_bookmarksTab->requestFetch();
+        });
 }
 
 void EventPanel::Private::setupAnalyticsSearch()
@@ -193,6 +205,13 @@ void EventPanel::Private::setupAnalyticsSearch()
     m_analyticsTab->setModel(new UnifiedAsyncSearchListModel(m_analyticsModel, this));
     m_analyticsTab->setPlaceholderTexts(tr("No objects"), tr("No objects detected"));
     m_analyticsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/analytics.png")));
+
+    connect(m_analyticsTab->filterEdit(), &QnSearchLineEdit::textChanged, m_analyticsModel,
+        [this](const QString& text)
+        {
+            m_analyticsModel->setFilterText(text);
+            m_analyticsTab->requestFetch();
+        });
 
     auto button = m_analyticsTab->areaButton();
     button->setDeactivatedText(tr("Anywhere on the video"));

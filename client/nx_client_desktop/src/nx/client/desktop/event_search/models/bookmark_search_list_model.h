@@ -15,8 +15,12 @@ public:
     explicit BookmarkSearchListModel(QObject* parent = nullptr);
     virtual ~BookmarkSearchListModel() override = default;
 
+    QString filterText() const;
+    void setFilterText(const QString& value);
+
 private:
     class Private;
+    Private* const d = nullptr;
 };
 
 } // namespace desktop

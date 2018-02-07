@@ -21,6 +21,15 @@ void AnalyticsSearchListModel::setFilterRect(const QRectF& relativeRect)
     d->setFilterRect(relativeRect);
 }
 
+QString AnalyticsSearchListModel::filterText() const
+{
+    return d->filterText();
+}
+void AnalyticsSearchListModel::setFilterText(const QString& value)
+{
+    d->setFilterText(value);
+}
+
 bool AnalyticsSearchListModel::setData(const QModelIndex& index, const QVariant& /*value*/, int role)
 {
     if (!index.isValid() || index.model() != this)

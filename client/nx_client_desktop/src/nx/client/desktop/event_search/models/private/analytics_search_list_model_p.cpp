@@ -191,6 +191,20 @@ void AnalyticsSearchListModel::Private::setFilterRect(const QRectF& relativeRect
     m_filterRect = relativeRect;
 }
 
+QString AnalyticsSearchListModel::Private::filterText() const
+{
+    return m_filterText;
+}
+
+void AnalyticsSearchListModel::Private::setFilterText(const QString& value)
+{
+    if (m_filterText == value)
+        return;
+
+    clear();
+    m_filterText = value;
+}
+
 void AnalyticsSearchListModel::Private::clear()
 {
     qDebug() << "Clear analytics model";
@@ -420,6 +434,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(qint64 startMs, qint6
     request.sortOrder = Qt::DescendingOrder;
     request.maxObjectsToSelect = kFetchBatchSize;
     request.boundingBox = m_filterRect;
+    request.freeText = m_filterText;
 
     const auto internalCallback =
         [callback, guard = QPointer<Private>(this)]

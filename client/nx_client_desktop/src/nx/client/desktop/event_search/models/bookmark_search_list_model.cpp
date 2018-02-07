@@ -6,8 +6,18 @@ namespace client {
 namespace desktop {
 
 BookmarkSearchListModel::BookmarkSearchListModel(QObject* parent):
-    base_type([this]() { return new Private(this); }, parent)
+    base_type([this]() { return new Private(this); }, parent),
+    d(qobject_cast<Private*>(d_func()))
 {
+}
+
+QString BookmarkSearchListModel::filterText() const
+{
+    return d->filterText();
+}
+void BookmarkSearchListModel::setFilterText(const QString& value)
+{
+    d->setFilterText(value);
 }
 
 } // namespace desktop

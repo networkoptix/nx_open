@@ -30,6 +30,7 @@ namespace {
 static constexpr int kPlaceholderFontPixelSize = 15;
 static constexpr int kQueuedFetchMoreDelayMs = 50;
 static constexpr int kTimeSelectionDelayMs = 250;
+static constexpr int kTextFilterDelayMs = 250;
 
 QnSearchLineEdit* createSearchLineEdit(QWidget* parent)
 {
@@ -51,6 +52,7 @@ QnSearchLineEdit* createSearchLineEdit(QWidget* parent)
     result->setAttribute(Qt::WA_TranslucentBackground);
     result->setAttribute(Qt::WA_Hover);
     result->setAutoFillBackground(false);
+    result->setTextChangedSignalFilterMs(kTextFilterDelayMs);
     setPaletteColor(result, QPalette::Shadow, Qt::transparent);
     return result;
 }
@@ -168,12 +170,6 @@ void UnifiedSearchWidget::setModel(QAbstractListModel* value)
     // For busy indicator going on/off.
     *m_modelConnections << connect(value, &QAbstractItemModel::dataChanged,
         this, &UnifiedSearchWidget::updatePlaceholderState);
-
-    if (auto asyncModel = qobject_cast<UnifiedAsyncSearchListModel*>(value))
-    {
-        *m_modelConnections << connect(m_searchLineEdit, &QnSearchLineEdit::textChanged,
-            asyncModel, &UnifiedAsyncSearchListModel::setClientsideTextFilter);
-    }
 
     fetchMoreIfNeeded();
 }
