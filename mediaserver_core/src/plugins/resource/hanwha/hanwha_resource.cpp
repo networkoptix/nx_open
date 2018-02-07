@@ -128,7 +128,7 @@ struct HanwhaAlternativePtzTrait
     Ptz::Capabilities capabilities;
 };
 
-static const std::map<HanwhaTraitName, HanwhaAlternativePtzTrait>
+static const std::map<QString, HanwhaAlternativePtzTrait>
 kHanwhaAlternativePtzTraits = {
     {
         HanwhaResource::kHanwhaAlternativeZoomTrait,
@@ -1120,9 +1120,14 @@ CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
         if (!success)
             continue;
 
+        const auto split = trait.valueAttribute.split('/');
+        NX_ASSERT(!split.isEmpty());
+        if (split.isEmpty())
+            continue;
+
         m_ptzTraits.append(traitName);
         m_ptzCapabilities |= trait.capabilities;
-        m_alternativePtzRanges[traitName] = std::move(possibleValues);
+        m_alternativePtzRanges[split.last()] = std::move(possibleValues);
     }
 
     return CameraDiagnostics::NoErrorResult();

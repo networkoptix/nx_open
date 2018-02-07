@@ -8,38 +8,37 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-struct HanwhaAlternativePtzParameterContext
-{
-    std::set<int> range;
-    int speed = 0;
-    std::unique_ptr<nx_http::AsyncClient> httpClient;
-    std::unique_ptr<nx::network::aio::Timer> timer;
-};
-
 class HanwhaPtzExecutor
 {
+    struct ParameterContext
+    {
+        std::set<int> range;
+        int speed = 0;
+        std::unique_ptr<nx_http::AsyncClient> httpClient;
+        std::unique_ptr<nx::network::aio::Timer> timer;
+    };
+
 public:
-    HanwhaPtzExecutor(const HanwhaResourcePtr& hanwhaResource);
+    HanwhaPtzExecutor(
+        const HanwhaResourcePtr& hanwhaResource,
+        const std::map<QString, std::set<int>>& ranges);
     virtual ~HanwhaPtzExecutor();
 
-    // Should not be called after first call to setSpeed
-    void setRange(const QString& parameterName, const std::set<int>& range);
     void setSpeed(const QString& parameterName, qreal speed);
 
 private:
     void startMovement(const QString& parameterName);
     void scheduleNextRequest(const QString& parameterName);
-    void doRequest(const QString& parameterName, int parameterValue);
+    void sendValueToDevice(const QString& parameterName, int parameterValue);
 
-    QUrl makeUrl(const QString& parameterName, int parameterValue) const;
     std::unique_ptr<nx_http::AsyncClient> makeHttpClient() const;
     boost::optional<int> toHanwhaSpeed(const QString& parameterName, qreal speed) const;
-    HanwhaAlternativePtzParameterContext& context(const QString& parameterName);
+    ParameterContext& context(const QString& parameterName);
     std::set<int> range(const QString& parameterName) const;
 
 private:
     HanwhaResourcePtr m_hanwhaResource;
-    std::map<QString, HanwhaAlternativePtzParameterContext> m_parameterContexts;
+    std::map<QString, ParameterContext> m_parameterContexts;
 };
 
 } // namespace plugins
