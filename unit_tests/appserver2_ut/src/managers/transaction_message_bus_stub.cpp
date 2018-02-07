@@ -13,10 +13,10 @@ const ec2::ApiPeerData& TransactionTransportStub::remotePeer() const
     return m_remotePeer;
 }
 
-QUrl TransactionTransportStub::remoteAddr() const
+nx::utils::Url TransactionTransportStub::remoteAddr() const
 {
     // TODO
-    return QUrl();
+    return nx::utils::Url();
 }
 
 bool TransactionTransportStub::isIncoming() const
@@ -25,10 +25,10 @@ bool TransactionTransportStub::isIncoming() const
     return false;
 }
 
-nx_http::AuthInfoCache::AuthorizationCacheItem TransactionTransportStub::authData() const
+nx::network::http::AuthInfoCache::AuthorizationCacheItem TransactionTransportStub::authData() const
 {
     // TODO
-    return nx_http::AuthInfoCache::AuthorizationCacheItem();
+    return nx::network::http::AuthInfoCache::AuthorizationCacheItem();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -56,6 +56,12 @@ QSet<QnUuid> TransactionMessageBusStub::directlyConnectedClientPeers() const
     return QSet<QnUuid>();
 }
 
+QSet<QnUuid> TransactionMessageBusStub::directlyConnectedServerPeers() const
+{
+    // TODO
+    return QSet<QnUuid>();
+}
+
 QnUuid TransactionMessageBusStub::routeToPeerVia(
     const QnUuid& /*dstPeer*/,
     int* /*distance*/) const
@@ -72,7 +78,7 @@ int TransactionMessageBusStub::distanceToPeer(const QnUuid& /*dstPeer*/) const
 
 void TransactionMessageBusStub::addOutgoingConnectionToPeer(
     const QnUuid& /*id*/,
-    const QUrl& /*url*/)
+    const nx::utils::Url& /*url*/)
 {
     // TODO
 }
