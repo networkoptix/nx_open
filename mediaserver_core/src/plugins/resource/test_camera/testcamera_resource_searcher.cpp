@@ -152,10 +152,13 @@ QString QnTestCameraResourceSearcher::manufacture() const
     return QLatin1String(QnTestCameraResource::kManufacturer);
 }
 
-QnResourceList QnTestCameraResourceSearcher::checkEndpoint(
-    const QUrl& /*url*/, const QAuthenticator& /*auth*/,
-    const QString& /*physicalId*/, QnResouceSearchMode /*mode*/)
+QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
 {
+    if( !url.scheme().isEmpty() && isSearchAction )
+        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+
+    Q_UNUSED(url)
+    Q_UNUSED(auth)
     return QList<QnResourcePtr>();
 }
 

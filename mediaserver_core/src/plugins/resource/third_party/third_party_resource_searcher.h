@@ -44,10 +44,11 @@ public:
     virtual QnResourcePtr createResource( const QnUuid &resourceTypeId, const QnResourceParams &params ) override;
     // return the manufacture of the server
     virtual QString manufacture() const override;
-
-    virtual QnResourceList checkEndpoint(
-        const QUrl& url, const QAuthenticator& auth,
-        const QString& physicalId, QnResouceSearchMode mode) override;
+    //!Implementation of QnAbstractNetworkResourceSearcher::checkHostAddr
+    virtual QList<QnResourcePtr> checkHostAddr(
+        const QUrl& url,
+        const QAuthenticator& auth,
+        bool doMultichannelCheck ) override;
 
     static void initStaticInstance( ThirdPartyResourceSearcher* _instance );
     static ThirdPartyResourceSearcher* instance();

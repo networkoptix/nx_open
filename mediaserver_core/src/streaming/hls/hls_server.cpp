@@ -289,7 +289,7 @@ namespace nx_hls
         if (!resource)
             resource = resourcePool()->getResourceByMacAddress(resId);
         if (!resource)
-            resource = resourcePool()->getResourceByUniqueUrl(resId); // TODO: Error message if there is more than one?
+            resource = resourcePool()->getResourceByUrl(resId);
         if (!resource)
         {
             NX_LOG(lit("HLS. Requested resource %1 not found").arg(resId), cl_logDEBUG1);

@@ -223,11 +223,10 @@ QString QnActiResourceSearcher::manufacture() const
     return QnActiResource::MANUFACTURE;
 }
 
-QnResourceList QnActiResourceSearcher::checkEndpoint(
-    const QUrl& url, const QAuthenticator& auth,
-    const QString& /*physicalId*/, QnResouceSearchMode mode)
+
+QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
-    if (!url.scheme().isEmpty() && mode == QnResouceSearchMode::multichannel)
+    if (!url.scheme().isEmpty() && doMultichannelCheck)
         return QList<QnResourcePtr>();
 
     QnResourceList result;

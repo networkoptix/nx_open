@@ -140,10 +140,11 @@ QString QnPlDroidResourceSearcher::manufacture() const
     return QnDroidResource::MANUFACTURE;
 }
 
-QnResourceList QnPlDroidResourceSearcher::checkEndpoint(
-    const QUrl& /*url*/, const QAuthenticator& /*auth*/,
-    const QString& /*physicalId*/, QnResouceSearchMode /*mode*/)
+QList<QnResourcePtr> QnPlDroidResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    Q_UNUSED(url)
+    Q_UNUSED(auth)
+    Q_UNUSED(doMultichannelCheck)
     return QList<QnResourcePtr>();
 }
 

@@ -334,7 +334,7 @@ void QnLayoutExportTool::finishExport(bool success)
     if (m_realFilename != m_targetFilename)
         m_storage->renameFile(m_storage->getUrl(), m_targetFilename);
 
-    auto existing = resourcePool()->getResourceByUniqueUrl(m_targetFilename)
+    auto existing = resourcePool()->getResourceByUrl(m_targetFilename)
         .dynamicCast<QnLayoutResource>();
 
     switch (m_mode)

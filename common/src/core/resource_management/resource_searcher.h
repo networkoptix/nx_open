@@ -108,21 +108,15 @@ private:
 
 
 // =====================================================================
-enum class QnResouceSearchMode
-{
-    basic,
-    multichannel,
-};
-
 class QnAbstractNetworkResourceSearcher: virtual public QnAbstractResourceSearcher
 {
 protected:
     QnAbstractNetworkResourceSearcher(QnCommonModule* commonModule);
-
 public:
-    virtual QnResourceList checkEndpoint(
-        const QUrl& url, const QAuthenticator& auth,
-        const QString& physicalId, QnResouceSearchMode mode) = 0;
+    // TODO: #wearable use QnResourceList for return type!
+    // checks this QHostAddress and creates a QnResource in case of success
+    // this function is designed for manual resource addition
+    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) = 0;
 };
 
 // =====================================================================

@@ -310,24 +310,15 @@ QnResourcePtr QnResourcePool::getResourceById(const QnUuid &id) const {
     return QnResourcePtr(NULL);
 }
 
-QnResourceList QnResourcePool::getResourcesByUrl(const QString& url) const
+QnResourcePtr QnResourcePool::getResourceByUrl(const QString &url) const
 {
-    QnResourceList resources;
-
-    QnMutexLocker locker(&m_resourcesMtx);
-    for (const QnResourcePtr& resource: m_resources)
-    {
+    QnMutexLocker locker( &m_resourcesMtx );
+    for (const QnResourcePtr &resource: m_resources) {
         if (resource->getUrl() == url)
-            resources.push_back(resource);
+            return resource;
     }
 
-    return resources;
-}
-
-QnResourcePtr QnResourcePool::getResourceByUniqueUrl(const QString& url) const
-{
-    const auto resourses = getResourcesByUrl(url);
-    return resourses.size() == 1 ? resourses.front() : QnResourcePtr();
+    return QnResourcePtr(0);
 }
 
 QnNetworkResourcePtr QnResourcePool::getNetResourceByPhysicalId(const QString &physicalId) const
