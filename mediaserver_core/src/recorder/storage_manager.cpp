@@ -936,6 +936,8 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
 void QnStorageManager::cancelRebuildCatalogAsync()
 {
     QnMutexLocker lock( &m_mutexRebuild );
+    if (!m_rebuildArchiveThread)
+        return;
     m_rebuildCancelled = true;
     m_rebuildArchiveThread->cancelFullScanTasks();
     NX_LOG("Catalog rebuild operation is canceled", cl_logINFO);
