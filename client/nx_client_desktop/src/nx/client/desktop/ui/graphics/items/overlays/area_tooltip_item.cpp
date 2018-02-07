@@ -55,7 +55,7 @@ ArrowPosition arrowPosition(const QRectF& tooltipRect, const QRectF& objectRect)
         arrowPos.position.setY(tooltipRect.bottom() + kArrowSize.height() / 2 + 1);
     }
 
-    const qreal margin = kArrowMargin + kArrowSize.width() / 2;
+    constexpr qreal margin = kArrowMargin + kArrowSize.width() / 2;
 
     switch (arrowPos.edge)
     {
