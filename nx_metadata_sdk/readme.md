@@ -101,12 +101,25 @@ stub_metadata_plugin.dll
 libstub_metadata_plugin.so
 ```
 
-To install the plugin library, just copy its file to the dedicated folder in the Nx Witness
-Mediaserver installation directory:
+The above steps are automated in the provided scripts:
 ```
 # Windows:
+build_sample.bat
+
+# Linux or Windows with Cygwin:
+build_sample.sh
+```
+
+To install the plugin, just copy its library file to the dedicated folder in the Nx Witness
+Mediaserver installation directory:
+```
+# Windows, portable installation:
+...\nx_vms-win64\plugins\
+
+# Windows, default installation path:
 C:\Program Files\Network Optix\Nx Witness\MediaServer\plugins\
 
-# Linux:
+# Linux, default installation path:
 /opt/networkoptix/mediaserver/bin/plugins/
 ```
+ATTENTION: After copying the plugin library, Mediaserver has to be restarted.

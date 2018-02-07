@@ -5,6 +5,8 @@ rmdir /S /Q %TARGET_DIR%
 mkdir %TARGET_DIR%
 
 copy readme.md %TARGET_DIR%\
+copy build_sample.bat %TARGET_DIR%\
+copy build_sample.sh %TARGET_DIR%\
 
 @rem Copying nx_kit and removing unneeded part of the copyright notice
 set NX_KIT_DST=%TARGET_DIR%\nx_kit
