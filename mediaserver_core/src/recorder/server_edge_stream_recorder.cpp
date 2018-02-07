@@ -22,7 +22,7 @@ void QnServerEdgeStreamRecorder::setOnFileWrittenHandler(FileWrittenHandler hand
     m_fileWrittenHandler = handler;
 }
 
-bool QnServerEdgeStreamRecorder::canAcceptData() const 
+bool QnServerEdgeStreamRecorder::canAcceptData() const
 {
     return !isQueueFull();
 }
@@ -86,10 +86,10 @@ void QnServerEdgeStreamRecorder::fileFinished(
                     QDateTime::fromMSecsSinceEpoch(m_lastfileStartedInfo.startTimeMs + durationMs),
                     m_lastfileStartedInfo.startTimeMs + durationMs,
                     durationMs,
-                    QDateTime::fromMSecsSinceEpoch(m_startRecordingBound->count() / 1000),
-                    m_startRecordingBound->count() / 1000,
-                    QDateTime::fromMSecsSinceEpoch(m_endRecordingBound->count() / 1000),
-                    m_endRecordingBound->count() / 1000));
+                    m_startRecordingBound ? QDateTime::fromMSecsSinceEpoch(m_startRecordingBound->count() / 1000) : QDateTime(),
+                    m_startRecordingBound ? m_startRecordingBound->count() / 1000 : -1,
+                    m_endRecordingBound ? QDateTime::fromMSecsSinceEpoch(m_endRecordingBound->count() / 1000) : QDateTime(),
+                    m_endRecordingBound ? m_endRecordingBound->count() / 1000 : -1));
 
         if (m_fileWrittenHandler)
         {
