@@ -24,19 +24,16 @@ class Plugin: public nxpl::Plugin3
 {
 public:
     /**
-     * @brief obtainCameraManager creates (or return already existing)
-     * metadata manager for the given resource.
-     * There MUST be only one manager per resource at the same time.
-     * It means that if we pass resource infos with the same UID multiple times
-     * then pointer to exactly the same object MUST be returned.
-     * Multiple resources MUST NOT share the same manager.
-     * It means that if we pass resource infos with different UIDs
-     * then pointers to different objects MUST be returned.
-     * @param resourceInfo information about resource for which metadata manager should be created.
-     * @param error status of operation.
-     * noError in case of success and some other value in case of failure.
-     * @return pointer to object that implements CameraManager interface
-     * or nullptr in case of failure.
+     * Creates, or returns already existing, a CameraManager for the given camera. There must be
+     * only one instance of the CameraManager per camera at any given time. It means that if we
+     * pass CameraInfo objects with the same UID multiple times, then the pointer to exactly the
+     * same object must be returned. Also, multiple cameras must not share the same CameraManager.
+     * It means that if we pass CameraInfo objects with different UIDs, then pointers to different
+     * objects must be returned.
+     * @param cameraInfo Information about the camera for which a CameraManager should be created.
+     * @param outError Status of the operation; set to noError before this call.
+     * @return Pointer to an object that implements CameraManager interface, or null in case of
+     * failure.
      */
     virtual CameraManager* obtainCameraManager(const CameraInfo& cameraInfo, Error* outError) = 0;
 
