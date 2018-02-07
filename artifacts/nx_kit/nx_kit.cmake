@@ -1,4 +1,4 @@
-# Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+# Copyright 2018 Network Optix, Inc.
 
 set(nxKitLibraryType "" CACHE STRING "nx_kit library type (STATIC or SHARED or empty)")
 
@@ -18,7 +18,10 @@ if(WIN32)
         set(NX_KIT_API_EXPORT_MACRO "__declspec(dllexport)")
     endif()
 else()
-    set_target_properties(nx_kit PROPERTIES CXX_VISIBILITY_PRESET hidden)
+    set_target_properties(nx_kit PROPERTIES
+        CXX_VISIBILITY_PRESET hidden
+        POSITION_INDEPENDENT_CODE ON
+    )
     set(NX_KIT_API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
 endif()
 
