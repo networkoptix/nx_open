@@ -854,16 +854,16 @@
                 <module>nx_cloud/librelaying</module>
                 <module>nx_cloud/libtraffic_relay</module>
                 <module>common_libs/nx_cassandra</module>
-                <module>media_db_util</module>
-                <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway_core</module>
                 <module>nx_cloud/vms_gateway</module>
                 <module>nx_cloud/time_server</module>
-                <module>plugins/it930x_plugin</module>
                 <!--
+                <module>plugins/it930x_plugin</module>
+                <module>media_db_util</module>
+                <module>testcamera</module>
                 <module>debsetup/client-deb</module>
-                -->
                 <module>debsetup/mediaserver-deb</module>
+                -->
                 <module>root_tool</module>
                 <!-- <module>storage_plugins/teststorageplugin/test</module> -->
             </modules>
