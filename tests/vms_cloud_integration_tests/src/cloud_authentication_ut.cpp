@@ -189,6 +189,10 @@ TEST_P(CloudAuthentication, authenticating_on_mediaserver_using_temporary_cloud_
     assertServerAuthorizesCloudUserCredentials();
 }
 
+INSTANTIATE_TEST_CASE_P(P2pMode, CloudAuthentication,
+    ::testing::Values(TestParams(false), TestParams(true)
+));
+
 //-------------------------------------------------------------------------------------------------
 // CloudAuthenticationInviteUser
 
