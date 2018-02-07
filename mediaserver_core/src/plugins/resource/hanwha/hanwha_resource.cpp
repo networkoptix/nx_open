@@ -129,24 +129,25 @@ struct HanwhaAlternativePtzTrait
 };
 
 static const std::map<QString, HanwhaAlternativePtzTrait>
-kHanwhaAlternativePtzTraits = {
+    kHanwhaAlternativePtzTraits =
     {
-        HanwhaResource::kHanwhaAlternativeZoomTrait,
         {
-            lit("Image/FocusAdjust"),
-            lit("image/focus/control/Focus"),
-            Ptz::ContinuousFocusCapability
-        }
-    },
-    {
-        HanwhaResource::kHanwhaAlternativeFocusTrait,
+            HanwhaResource::kHanwhaAlternativeZoomTrait,
+            {
+                lit("Image/FocusAdjust"),
+                lit("image/focus/control/Focus"),
+                Ptz::ContinuousFocusCapability
+            }
+        },
         {
-            lit("Image/ZoomAdjust"),
-            lit("image/focus/control/Zoom"),
-            Ptz::ContinuousZoomCapability
+            HanwhaResource::kHanwhaAlternativeFocusTrait,
+            {
+                lit("Image/ZoomAdjust"),
+                lit("image/focus/control/Zoom"),
+                Ptz::ContinuousZoomCapability
+            }
         }
-    }
-};
+    };
 
 static const QString kAdvancedParametersTemplateFile = lit(":/camera_advanced_params/hanwha.xml");
 
