@@ -17,15 +17,23 @@ main()
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
 
+
+    local GEN_OPTIONS=""
+    local SOURCE_DIR="$BASE_DIR/$PLUGIN_PATH"
     case "$(uname -s)" in
-        CYGWIN*) GEN_OPTIONS="-Ax64";; #< Generate for Visual Studio if on Cygwin.
-        *) GEN_OPTIONS="-GNinja";;
+        CYGWIN*)
+            if [[ $(which cmake) != /usr/bin/* ]] #< Using Windows native cmake rather than Cygwin.
+            then
+                GEN_OPTIONS="-Ax64" #< Generate for Visual Studio and x64.
+                SOURCE_DIR=$(cygpath -w "$SOURCE_DIR") #< Windows cmake requires Windows path.
+            fi
+            ;;
+        *)
+            GEN_OPTIONS="-GNinja"
+            ;;
     esac
 
-    # Relative path needed when using Windows CMake from Cygwin.
-    local -r SOURCE_RELATIVE_PATH=$(realpath --relative-to="." "$BASE_DIR/$PLUGIN_PATH")
-
-    cmake "$SOURCE_RELATIVE_PATH" $GEN_OPTIONS
+    cmake "$SOURCE_DIR" $GEN_OPTIONS #< Works for any cmake: Linux, Cygwin, and Windows native.
     cmake --build .
 
     { set +x; } 2>/dev/null #< Silently turn off logging each command.
