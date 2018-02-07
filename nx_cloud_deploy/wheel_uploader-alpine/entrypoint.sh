@@ -2,11 +2,15 @@
 
 set -e
 
-LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pip3 wheel --no-cache-dir -r /dev/stdin -w wheelhouse"
+cat > requirements.txt
+
+LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pip3 wheel -r requirements.txt -w wheelhouse"
 
 devpi use http://la.hdw.mx:3141/root/public --set-cfg
 devpi login root --password=SuGiYaOfJ0L8OREl
 devpi upload --from-dir --formats=* wheelhouse
+
+LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pip install --no-index -f wheelhouse -r requirements.txt"
 
 echo Package dependencies:
 
