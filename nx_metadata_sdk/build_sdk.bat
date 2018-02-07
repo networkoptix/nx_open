@@ -11,7 +11,7 @@ copy build_sample.sh %TARGET_DIR%\
 @rem Copying nx_kit and removing unneeded part of the copyright notice
 set NX_KIT_DST=%TARGET_DIR%\nx_kit
 xcopy /S ..\open\artifacts\nx_kit %NX_KIT_DST%\
-@rem ATTENTION: For the following statements, Cygwin is required, a "repl" tool.
+@rem ATTENTION: For the following statements, Cygwin is required, and "repl" tool.
 set REPL=~/develop/devtools/util/repl.sh
 set TEXT_TO_REPLACE=" Licensed under GNU Lesser General Public License version 3."
 zsh -c '%REPL% %TEXT_TO_REPLACE% "" "%NX_KIT_DST%"/**/*'
