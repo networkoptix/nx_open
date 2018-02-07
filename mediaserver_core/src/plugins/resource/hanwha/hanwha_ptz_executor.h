@@ -31,10 +31,11 @@ private:
     void scheduleNextRequest(const QString& parameterName);
     void doRequest(const QString& parameterName, int parameterValue);
 
-    QUrl makeUrl(const QString& parameterName, int parameterValue);
-    std::unique_ptr<nx_http::AsyncClient> makeHttpClient();
-    boost::optional<int> toHanwhaSpeed(const QString& parameterName, qreal speed);
+    QUrl makeUrl(const QString& parameterName, int parameterValue) const;
+    std::unique_ptr<nx_http::AsyncClient> makeHttpClient() const;
+    boost::optional<int> toHanwhaSpeed(const QString& parameterName, qreal speed) const;
     HanwhaAlternativePtzParameterContext& context(const QString& parameterName);
+    std::set<int> range(const QString& parameterName) const;
 
 private:
     HanwhaResourcePtr m_hanwhaResource;

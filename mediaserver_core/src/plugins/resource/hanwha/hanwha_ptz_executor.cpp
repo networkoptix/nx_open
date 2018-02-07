@@ -108,7 +108,7 @@ void HanwhaPtzExecutor::doRequest(const QString& parameterName, int parameterVal
         });
 }
 
-QUrl HanwhaPtzExecutor::makeUrl(const QString& parameterName, int parameterValue)
+QUrl HanwhaPtzExecutor::makeUrl(const QString& parameterName, int parameterValue) const
 {
     QUrl url(m_hanwhaResource->getUrl());
     url.setPath(lit("/stw-cgi/image.cgi"));
@@ -121,7 +121,7 @@ QUrl HanwhaPtzExecutor::makeUrl(const QString& parameterName, int parameterValue
     return url;
 }
 
-std::unique_ptr<nx_http::AsyncClient> HanwhaPtzExecutor::makeHttpClient()
+std::unique_ptr<nx_http::AsyncClient> HanwhaPtzExecutor::makeHttpClient() const
 {
     auto auth = m_hanwhaResource->getAuth();
     auto httpClient = std::make_unique<nx_http::AsyncClient>();
@@ -132,13 +132,15 @@ std::unique_ptr<nx_http::AsyncClient> HanwhaPtzExecutor::makeHttpClient()
     return httpClient;
 }
 
-boost::optional<int> HanwhaPtzExecutor::toHanwhaSpeed(const QString& parameterName, qreal speed)
+boost::optional<int> HanwhaPtzExecutor::toHanwhaSpeed(
+    const QString& parameterName,
+    qreal speed) const
 {
     if (qFuzzyIsNull(speed))
         return 0;
 
-    const auto& range = context(parameterName).range;
-    if (range.empty())
+    const auto& parameterRange = range(parameterName);
+    if (parameterRange.empty())
         return boost::none;
 
     const auto resData = qnStaticCommon->dataPool()->data(m_hanwhaResource);
@@ -153,24 +155,24 @@ boost::optional<int> HanwhaPtzExecutor::toHanwhaSpeed(const QString& parameterNa
 
     // Always use the maximum speed value for zoom, since others are too slow.
     if (parameterName == kHanwhaZoomProperty)
-        return speed > 0 ? *range.rbegin() : *range.begin();
+        return speed > 0 ? *parameterRange.rbegin() : *parameterRange.begin();
 
     // For focus use the next value after the maximum/minimum one.
     if (parameterName == kHanwhaFocusProperty)
     {
         if (speed > 0)
         {
-            const auto nextPositiveValue = ++range.rbegin();
-            return nextPositiveValue != range.rend() && *nextPositiveValue > 0
+            const auto nextPositiveValue = ++parameterRange.rbegin();
+            return nextPositiveValue != parameterRange.rend() && *nextPositiveValue > 0
                 ? *nextPositiveValue
-                : *range.rbegin();
+                : *parameterRange.rbegin();
         }
         else
         {
-            const auto nextNegativeValue = ++range.begin();
-            return nextNegativeValue != range.end() && *nextNegativeValue < 0
+            const auto nextNegativeValue = ++parameterRange.begin();
+            return nextNegativeValue != parameterRange.end() && *nextNegativeValue < 0
                 ? *nextNegativeValue
-                : *range.begin();
+                : *parameterRange.begin();
         }
     }
 
@@ -182,6 +184,15 @@ HanwhaAlternativePtzParameterContext& HanwhaPtzExecutor::context(const QString& 
 {
     NX_ASSERT(m_parameterContexts.find(parameterName) != m_parameterContexts.cend());
     return m_parameterContexts[parameterName];
+}
+
+std::set<int> HanwhaPtzExecutor::range(const QString& parameterName) const
+{
+    NX_ASSERT(m_parameterContexts.find(parameterName) != m_parameterContexts.cend());
+    if (m_parameterContexts.find(parameterName) != m_parameterContexts.cend())
+        return m_parameterContexts.at(parameterName).range;
+
+    return std::set<int>();
 }
 
 } // namespace plugins
