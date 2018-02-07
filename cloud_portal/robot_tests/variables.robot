@@ -139,9 +139,11 @@ ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filt
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/following-sibling::span[contains(@class,'user-name') and contains(text(),'TestFirstName TestLastName')]
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..//button[@ng-click='checkForm()']
 
+${SYSTEMS SEARCH INPUT}               //div[@ng-if='systems.length']
+
 #AUTOTESTS (with no space) is an offline system used for testing offline status on the systems page
 ${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/following-sibling::span[contains(text(), 'offline')]
-${AUTOTESTS OPEN NX OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/..//button[@ng-click='checkForm()']
+${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/..//button[@ng-click='checkForm()']
 
 #ASCII
 ${ESCAPE}                             \\27

@@ -20,7 +20,7 @@ Log in to Auto Tests System
 has system name, owner and OpenInNx button visible on systems page
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
-    Wait Until Elements Are Visible    //div[@ng-if='systems.length']    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
     Close Browser
 
@@ -28,9 +28,9 @@ shows offline status and does not show open in nx button when offline
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
-    Wait Until Element Is Visible    ${AUTOTESTS OFFLINE}
-    Wait Until Element Is Not Visible    ${AUTOTESTS OPEN NX OFFLINE}
-    Element Should Not Be Visible    ${AUTOTESTS OPEN NX OFFLINE}
+    Wait Until Elements Are Visible    //input[@ng-model='search.value']    ${AUTOTESTS OFFLINE}
+    Wait Until Element Is Not Visible    ${AUTOTESTS OFFLINE OPEN NX}
+    Element Should Not Be Visible    ${AUTOTESTS OFFLINE OPEN NX}
     Close Browser
 
 should confirm, if owner deletes system (You are going to disconnect your system from cloud)
