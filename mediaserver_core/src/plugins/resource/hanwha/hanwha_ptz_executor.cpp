@@ -108,9 +108,9 @@ void HanwhaPtzExecutor::doRequest(const QString& parameterName, int parameterVal
         });
 }
 
-QUrl HanwhaPtzExecutor::makeUrl(const QString& parameterName, int parameterValue)
+nx::utils::Url HanwhaPtzExecutor::makeUrl(const QString& parameterName, int parameterValue)
 {
-    QUrl url(m_hanwhaResource->getUrl());
+    nx::utils::Url url(m_hanwhaResource->getUrl());
     url.setPath(lit("/stw-cgi/image.cgi"));
 
     QUrlQuery query;
@@ -121,11 +121,12 @@ QUrl HanwhaPtzExecutor::makeUrl(const QString& parameterName, int parameterValue
     return url;
 }
 
-std::unique_ptr<nx_http::AsyncClient> HanwhaPtzExecutor::makeHttpClient()
+std::unique_ptr<nx::network::http::AsyncClient> HanwhaPtzExecutor::makeHttpClient()
 {
     auto auth = m_hanwhaResource->getAuth();
-    auto httpClient = std::make_unique<nx_http::AsyncClient>();
-    httpClient->setAuth({auth.user(), auth.password()});
+    auto httpClient = std::make_unique<nx::network::http::AsyncClient>();
+    httpClient->setUserName(auth.user());
+    httpClient->setUserPassword(auth.password());
     httpClient->setSendTimeout(kHanwhaExecutorSendTimeout);
     httpClient->setMessageBodyReadTimeout(kHanwhaExecutorReceiveTimeout);
 

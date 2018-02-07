@@ -12,7 +12,7 @@ struct HanwhaAlternativePtzParameterContext
 {
     std::set<int> range;
     int speed = 0;
-    std::unique_ptr<nx_http::AsyncClient> httpClient;
+    std::unique_ptr<nx::network::http::AsyncClient> httpClient;
     std::unique_ptr<nx::network::aio::Timer> timer;
 };
 
@@ -31,8 +31,8 @@ private:
     void scheduleNextRequest(const QString& parameterName);
     void doRequest(const QString& parameterName, int parameterValue);
 
-    QUrl makeUrl(const QString& parameterName, int parameterValue);
-    std::unique_ptr<nx_http::AsyncClient> makeHttpClient();
+    nx::utils::Url makeUrl(const QString& parameterName, int parameterValue);
+    std::unique_ptr<nx::network::http::AsyncClient> makeHttpClient();
     boost::optional<int> toHanwhaSpeed(const QString& parameterName, qreal speed);
     HanwhaAlternativePtzParameterContext& context(const QString& parameterName);
 
