@@ -338,7 +338,6 @@ void MultipleCameraSettingsWidget::updateFromResources()
     }
 
     setHasDbChanges(false);
-    m_hasScheduleControlsChanges = false;
 
     setTabEnabledSafe(CameraSettingsTab::general, !m_lockedMode);
 }
