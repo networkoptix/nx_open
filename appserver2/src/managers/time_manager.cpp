@@ -316,8 +316,6 @@ static const int MAX_DESIRED_TIME_DRIFT_MS = 1000;
 * This should help against redundant clock resync.
 */
 static const int MIN_GET_TIME_ERROR_MS = 100;
-/** Once per this interval we check if local OS time has been changed. */
-static const int SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS = 10 * MILLIS_PER_SEC;
 /** This coefficient applied to request round-trip time when comparing sync time from different servers. */
 static const int SYNC_TIME_DRIFT_MAX_ERROR_COEFF = 5;
 
@@ -451,7 +449,7 @@ void TimeSynchronizationManager::start(
 
             m_checkSystemTimeTaskID = m_timerManager->addTimer(
                 std::bind(&TimeSynchronizationManager::checkSystemTimeForChange, this),
-                std::chrono::milliseconds(SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS));
+                m_messageBus->commonModule()->globalSettings()->osTimeChangeCheckPeriod());
         }
         else
         {
@@ -1382,7 +1380,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
         return;
     m_checkSystemTimeTaskID = m_timerManager->addTimer(
         std::bind(&TimeSynchronizationManager::checkSystemTimeForChange, this),
-        std::chrono::milliseconds(SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS));
+        m_messageBus->commonModule()->globalSettings()->osTimeChangeCheckPeriod());
 }
 
 void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(
