@@ -125,6 +125,16 @@ ClipboardButton* ClipboardButton::createInline(QLineEdit* parent, StandardType t
     return button;
 }
 
+QString ClipboardButton::clipboardText()
+{
+    return qApp->clipboard()->text();
+}
+
+void ClipboardButton::setClipboardText(const QString& value)
+{
+    qApp->clipboard()->setText(value);
+}
+
 } // namespace ui
 } // namespace desktop
 } // namespace client

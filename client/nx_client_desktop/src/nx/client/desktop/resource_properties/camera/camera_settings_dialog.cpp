@@ -129,6 +129,32 @@ QDialogButtonBox::StandardButton CameraSettingsDialog::showConfirmationDialog()
     return QDialogButtonBox::StandardButton(messageBox.exec());
 }
 
+void CameraSettingsDialog::retranslateUi()
+{
+    base_type::retranslateUi();
+    updateWindowTitle();
+}
+
+void CameraSettingsDialog::updateWindowTitle()
+{
+    static const QString kWindowTitlePattern = lit("%1 - %2");
+
+    const auto cameras = m_model->cameras();
+    const QString caption = QnDeviceDependentStrings::getNameFromSet(
+        resourcePool(),
+        QnCameraDeviceStringSet(
+            tr("Device Settings"), tr("Devices Settings"),
+            tr("Camera Settings"), tr("Cameras Settings"),
+            tr("I/O Module Settings"), tr("I/O Modules Settings")
+        ), cameras);
+
+    const QString description = cameras.size() == 1
+        ? cameras.first()->getName()
+        : QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
+
+    setWindowTitle(kWindowTitlePattern.arg(caption).arg(description));
+}
+
 /*
 void CameraSettingsDialog::loadDataToUi()
 {

@@ -26,7 +26,6 @@ class CameraScheduleWidget;
 class CameraSettingsDialog: public QnSessionAwareTabbedDialog
 {
     Q_OBJECT
-
     typedef QnSessionAwareTabbedDialog base_type;
 
 public:
@@ -37,6 +36,10 @@ public:
 
 protected:
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
+    virtual void retranslateUi() override;
+
+private:
+    void updateWindowTitle();
 
 private:
     Q_DISABLE_COPY(CameraSettingsDialog)

@@ -31,6 +31,9 @@ public:
         QWidget* parent = nullptr);
 
     static ClipboardButton* createInline(QLineEdit* parent, StandardType type);
+
+    static QString clipboardText();
+    static void setClipboardText(const QString& value);
 };
 
 } // namespace ui

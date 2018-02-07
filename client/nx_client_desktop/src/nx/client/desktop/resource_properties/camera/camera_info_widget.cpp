@@ -1,15 +1,16 @@
 #include "camera_info_widget.h"
 #include "ui_camera_info_widget.h"
 
-#include <QtGui/QClipboard>
-#include <QtWidgets/QApplication>
+#include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 
 #include <nx/utils/log/assert.h>
 
-#include "camera_settings_model.h"
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 #include <ui/common/aligner.h>
+
+#include "camera_settings_model.h"
 
 namespace nx {
 namespace client {
@@ -46,9 +47,9 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
         });
 
     connect(ui->primaryStreamCopyButton, &ui::ClipboardButton::clicked, this,
-        [this] { qApp->clipboard()->setText(ui->primaryStreamLabel->text()); });
+        [this] { ui::ClipboardButton::setClipboardText(ui->primaryStreamLabel->text()); });
     connect(ui->secondaryStreamCopyButton, &ui::ClipboardButton::clicked, this,
-        [this] { qApp->clipboard()->setText(ui->secondaryStreamLabel->text()); });
+        [this] { ui::ClipboardButton::setClipboardText(ui->secondaryStreamLabel->text()); });
 
     connect(ui->nameLabel, &QnEditableLabel::textChanged, this,
         &CameraInfoWidget::hasChangesChanged);
@@ -73,22 +74,26 @@ void CameraInfoWidget::setModel(CameraSettingsModel* model)
 
     m_model = model;
 
-    connect(m_model, &CameraSettingsModel::networkInfoChanged, this,
-        &CameraInfoWidget::updateNetworkInfo);
+    if (m_model)
+    {
+        connect(m_model, &CameraSettingsModel::networkInfoChanged, this,
+            &CameraInfoWidget::updateNetworkInfo);
 
-    connect(ui->pingButton, &QPushButton::clicked, m_model,
-        &CameraSettingsModel::pingCamera);
-    connect(ui->showOnLayoutButton, &QPushButton::clicked, m_model,
-        &CameraSettingsModel::showCamerasOnLayout);
-    connect(ui->eventLogButton, &QPushButton::clicked, m_model,
-        &CameraSettingsModel::openEventLog);
-    connect(ui->cameraRulesButton, &QPushButton::clicked, m_model,
-        &CameraSettingsModel::openCameraRules);
+        connect(ui->pingButton, &QPushButton::clicked, m_model,
+            &CameraSettingsModel::pingCamera);
+        connect(ui->showOnLayoutButton, &QPushButton::clicked, m_model,
+            &CameraSettingsModel::showCamerasOnLayout);
+        connect(ui->eventLogButton, &QPushButton::clicked, m_model,
+            &CameraSettingsModel::openEventLog);
+        connect(ui->cameraRulesButton, &QPushButton::clicked, m_model,
+            &CameraSettingsModel::openCameraRules);
+    }
 }
 
 bool CameraInfoWidget::hasChanges() const
 {
-    if (!m_model->isSingleCameraMode())
+    NX_EXPECT(m_model);
+    if (!m_model || !m_model->isSingleCameraMode())
         return false;
 
     return m_model->name() != ui->nameLabel->text();
@@ -96,6 +101,10 @@ bool CameraInfoWidget::hasChanges() const
 
 void CameraInfoWidget::loadDataToUi()
 {
+    NX_EXPECT(m_model);
+    if (!m_model)
+        return;
+
     const bool singleCamera = m_model->isSingleCameraMode();
     ui->nameLabel->setVisible(singleCamera);
     ui->controlsStackedWidget->setCurrentWidget(singleCamera
@@ -103,6 +112,21 @@ void CameraInfoWidget::loadDataToUi()
         : ui->multipleCamerasNamePage);
 
     ui->stackedWidget->setVisible(singleCamera);
+    ui->cameraRulesButton->setVisible(singleCamera);
+    if (singleCamera)
+    {
+        const auto camera = m_model->singleCamera();
+        NX_EXPECT(camera);
+        const QString rulesTitle = QnDeviceDependentStrings::getNameFromSet(
+            camera->resourcePool(),
+            QnCameraDeviceStringSet(
+                tr("Device Rules..."),
+                tr("Camera Rules..."),
+                tr("I/O Module Rules...")
+            ), camera);
+
+        ui->cameraRulesButton->setText(rulesTitle);
+    }
 
     ui->nameLabel->setText(m_model->name());
     ui->multipleNameLabel->setText(m_model->name());
@@ -120,6 +144,10 @@ void CameraInfoWidget::loadDataToUi()
 
 void CameraInfoWidget::applyChanges()
 {
+    NX_EXPECT(m_model);
+    if (!m_model)
+        return;
+
     if (m_model->isSingleCameraMode())
         m_model->setName(ui->nameLabel->text());
 }
@@ -177,6 +205,7 @@ void CameraInfoWidget::updatePageSwitcher()
 
 void CameraInfoWidget::updateNetworkInfo()
 {
+    NX_EXPECT(m_model);
     ui->ipAddressLabel->setText(m_model->networkInfo().ipAddress);
     ui->ipAddressDetailLabel->setText(m_model->networkInfo().ipAddress);
     ui->webPageLabel->setText(m_model->networkInfo().webPage);
