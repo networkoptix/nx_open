@@ -3,6 +3,8 @@
 #include <QtCore/QHash>
 
 #include <nx/utils/random.h>
+#include <nx/fusion/model_functions.h>
+#include <client/client_settings.h>
 
 namespace nx {
 namespace client {
@@ -25,18 +27,25 @@ static const QVector<QColor> kFrameColors{
     Qt::darkYellow
 };
 
-enum class AttributeVisibilityPolicy
-{
-    always,
-    hover,
-    never
-};
-
 struct ObjectDisplaySettingsItem
 {
+    enum class AttributeVisibilityPolicy
+    {
+        always,
+        hover,
+        never
+    };
+
     QColor color;
     QHash<QString, AttributeVisibilityPolicy> attributeVisibility;
 };
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ObjectDisplaySettingsItem, (json), (color)(attributeVisibility))
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ObjectDisplaySettingsItem, AttributeVisibilityPolicy,
+    (ObjectDisplaySettingsItem::AttributeVisibilityPolicy::always, "always")
+    (ObjectDisplaySettingsItem::AttributeVisibilityPolicy::hover, "hover")
+    (ObjectDisplaySettingsItem::AttributeVisibilityPolicy::never, "never"))
 
 } // namespace
 
@@ -44,12 +53,24 @@ class ObjectDisplaySettings::Private
 {
 public:
     QHash<QnUuid, ObjectDisplaySettingsItem> settingsByTypeId;
+
+    void loadSettings()
+    {
+        settingsByTypeId = QJson::deserialized<decltype(settingsByTypeId)>(
+            qnSettings->detectedObjectDisplaySettings().toUtf8());
+    }
+
+    void saveSettings()
+    {
+        qnSettings->setDetectedObjectDisplaySettings(
+            QString::fromUtf8(QJson::serialized(settingsByTypeId)));
+    }
 };
 
 ObjectDisplaySettings::ObjectDisplaySettings():
     d(new Private())
 {
-    // TODO: #dklychkov Implement saving settings.
+    d->loadSettings();
 }
 
 ObjectDisplaySettings::~ObjectDisplaySettings()
@@ -60,7 +81,10 @@ QColor ObjectDisplaySettings::objectColor(const QnUuid& objectTypeId)
 {
     auto& settings = d->settingsByTypeId[objectTypeId];
     if (!settings.color.isValid())
+    {
         settings.color = utils::random::choice(kFrameColors);
+        d->saveSettings();
+    }
     return settings.color;
 }
 
@@ -78,8 +102,8 @@ std::vector<common::metadata::Attribute> ObjectDisplaySettings::briefAttributes(
 
     for (const auto& attribute: object.labels)
     {
-        if (settings.attributeVisibility.value(attribute.name, AttributeVisibilityPolicy::always)
-            == AttributeVisibilityPolicy::always)
+        if (settings.attributeVisibility.value(attribute.name)
+            == ObjectDisplaySettingsItem::AttributeVisibilityPolicy::always)
         {
             result.push_back(attribute);
         }
@@ -97,14 +121,15 @@ std::vector<common::metadata::Attribute> ObjectDisplaySettings::visibleAttribute
 
     for (const auto& attribute: object.labels)
     {
-        if (settings.attributeVisibility.value(attribute.name, AttributeVisibilityPolicy::always)
-            != AttributeVisibilityPolicy::never)
+        if (settings.attributeVisibility.value(attribute.name)
+            != ObjectDisplaySettingsItem::AttributeVisibilityPolicy::never)
         {
             result.push_back(attribute);
         }
     }
 
-    return result;}
+    return result;
+}
 
 } // namespace desktop
 } // namespace client
