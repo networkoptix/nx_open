@@ -61,9 +61,11 @@ protected:
             ASSERT_EQ(std::tolower(c), c);
     }
 
-    void assertTemporaryLoginIsEqualToAccountEmail()
+    void assertTemporaryLoginIsEncodedAccountEmail()
     {
-        ASSERT_EQ(m_account.email, m_temporaryCredentials.login);
+        ASSERT_EQ(
+            QByteArray::fromStdString(m_account.email).toHex().toLower().toStdString(),
+            m_temporaryCredentials.login);
     }
 
 private:
@@ -288,7 +290,7 @@ TEST_F(AccountTemporaryCredentials, temporary_credentials_are_low_case)
 TEST_F(AccountTemporaryCredentials, account_email_is_used_as_a_temporary_login)
 {
     allocateAccountTemporaryCredentials();
-    assertTemporaryLoginIsEqualToAccountEmail();
+    assertTemporaryLoginIsEncodedAccountEmail();
 }
 
 } // namespace test
