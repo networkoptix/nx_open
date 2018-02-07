@@ -50,7 +50,7 @@ NX_ASCII const char* CommonObject::objectSubType() const
 
 NX_LOCALE_DEPENDENT const Attribute* CommonObject::attribute(int index) const
 {
-    return index < m_attributes.size() ? &m_attributes[index] : nullptr;
+    return (index < (int) m_attributes.size()) ? &m_attributes[index] : nullptr;
 }
 
 int CommonObject::attributeCount() const

@@ -22,7 +22,7 @@ public:
 
     virtual Item* nextItem() override
     {
-        return m_index < m_items.size() ? m_items[m_index++] : nullptr;
+        return (m_index < (int) m_items.size()) ? m_items[m_index++] : nullptr;
     }
 
     void setTimestampUsec(int64_t timestampUsec) { m_timestampUsec = timestampUsec; }

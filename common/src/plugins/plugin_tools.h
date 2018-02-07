@@ -398,7 +398,7 @@ struct hash<nxpl::NX_GUID>
     {
         std::size_t h;
 
-        for (auto i = 0; i < sizeof(guid.bytes); ++i)
+        for (size_t i = 0; i < sizeof(guid.bytes); ++i)
             h = (h + (324723947 + guid.bytes[i])) ^ 93485734985;
 
         return h;
