@@ -16,6 +16,10 @@
 
 using namespace std::chrono;
 
+static_assert(
+    std::chrono::system_clock::period::den / std::chrono::system_clock::period::num >= 1000,
+    "Insufficient std::chrono::system_clock resolution.");
+
 namespace nx {
 namespace utils {
 
@@ -55,6 +59,11 @@ system_clock::time_point utcTime()
 seconds timeSinceEpoch()
 {
     return seconds(system_clock::to_time_t(utcTime()));
+}
+
+std::chrono::milliseconds millisSinceEpoch()
+{
+    return duration_cast<milliseconds>(utcTime().time_since_epoch());
 }
 
 steady_clock::time_point monotonicTime()
