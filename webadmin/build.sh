@@ -1,48 +1,39 @@
 #!/bin/bash
 
-SOURCE_PATH=$1
-# echo "clean sources directory affecting build process"
-rm -R app
-rm -R translation
-rm -R translations
+set -e
 
-# echo "copy everything"
-cp -Rf $SOURCE_PATH/webadmin/* .
+SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# echo "clean build directory - moved from Gruntfile.js"
-rm -R static
-mkdir static # Make sure directory exists
+# Check prerequisites.
 
+if [ "$SOURCE_DIR" = "$PWD" ]
+then
+    echo "Error: $0 must not be executed from the sources directory." >&2
+    exit 1
+fi
 
-rvm version || ( echo "Error: rvm not installed" && exit $? )
+compass --version &> /dev/null || (echo "Error: Ruby Compass is not installed." >&2 && exit 1)
 
-#rvm install ruby-2.3.0
-rvm use 2.3.0 --default
+# Update sources.
 
-# export PATH=$PATH:~/.rvm/bin:~/.rvm/rubies/ruby-2.3.0/bin:~/.rvm/gems/ruby-2.3.0/bin:$PWD/node_modules/.bin
-# ~/.rvm/bin/rvm install 2.3.0
-# source ~/.rvm/scripts/rvm
-# rvm use 2.3.0 --default
-compass version || gem install compass
+for entry in $(ls -A "$SOURCE_DIR")
+do
+    [ -e "$entry" ] && rm -r "$entry"
+    cp -pr "$SOURCE_DIR/$entry" "$entry"
+done
 
+[ -e static ] && rm -r static
+[ -e server-external ] && rm -r server-external
 
-echo "+++++++++++++++++++++++++ Running NPM... +++++++++++++++++++++++++"
-npm install || ( echo "Error: can't install npm packages:" $? && exit $? )
+# Save the repository info.
 
+hg log -r . --repository "$SOURCE_DIR/.." > version.txt
 
-echo "+++++++++++++++++++++++++ Running BOWER... +++++++++++++++++++++++++"
-bower install  || (echo "Error: can't install bower packages:" $? && exit $? )
+# Install dependencies.
 
-# echo "copy bower components - it is a hack, we will fix it with new build process for webadmin"
-cp -a bower_components app/bower_components/
-echo "+++++++++++++++++++++++++ Running GRUNT... +++++++++++++++++++++++++"
-cp -f ./target/version_maven.txt ./static/
+npm install
+node_modules/bower/bin/bower install
 
+# Build webadmin.
 
-# echo "create version.txt for the build"
-hg log -r "p1()" $SOURCE_PATH > static/version.txt
-
-# echo "run grunt build process"
-grunt pub  || ( echo "Error: grunt pub failed" $? && exit $? )
-
-if [ ! -f ./external.dat ]; then echo "Error: no external.dat" && rm ./target/rdep.sh && exit 1; fi
+node_modules/grunt-cli/bin/grunt publish

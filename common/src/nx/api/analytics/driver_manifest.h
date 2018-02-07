@@ -11,6 +11,7 @@
 namespace nx {
 namespace api {
 
+// TODO: Rename all classes replacing "driver" with "plugin".
 /**
  * Description of the analytics driver, which can generate different events.
  */
@@ -45,8 +46,8 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AnalyticsDriverManifestBase::Capability)
 // TODO: #mike: Eliminate the class.
 struct AnalyticsDriverManifest: AnalyticsDriverManifestBase
 {
-   QList<AnalyticsEventType> outputEventTypes;
-   QList<AnalyticsEventType> outputObjectTypes;
+   QList<Analytics::EventType> outputEventTypes;
+   QList<Analytics::EventType> outputObjectTypes;
 };
 #define AnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)(outputObjectTypes)
 

@@ -23,30 +23,30 @@ static const std::string kWebServerPath("/axiscam");
 static const std::string kActionNamePrefix("NX_ACTION_");
 static const std::string kRuleNamePrefix("NX_RULE_");
 
-nx::sdk::metadata::CommonDetectedEvent* createCommonDetectedEvent(
+nx::sdk::metadata::CommonEvent* createCommonEvent(
     const IdentifiedSupportedEvent& identifiedSupportedEvents,
     bool active)
 {
-    auto detectedEvent = new nx::sdk::metadata::CommonDetectedEvent();
-    detectedEvent->setTypeId(identifiedSupportedEvents.externalTypeId());
-    detectedEvent->setCaption(identifiedSupportedEvents.base().name);
-    detectedEvent->setDescription(identifiedSupportedEvents.base().description);
-    detectedEvent->setIsActive(active);
-    detectedEvent->setConfidence(1.0);
-    detectedEvent->setAuxilaryData(identifiedSupportedEvents.base().fullName());
-    return detectedEvent;
+    auto commonEvent = new nx::sdk::metadata::CommonEvent();
+    commonEvent->setTypeId(identifiedSupportedEvents.externalTypeId());
+    commonEvent->setCaption(identifiedSupportedEvents.base().name);
+    commonEvent->setDescription(identifiedSupportedEvents.base().description);
+    commonEvent->setIsActive(active);
+    commonEvent->setConfidence(1.0);
+    commonEvent->setAuxilaryData(identifiedSupportedEvents.base().fullName());
+    return commonEvent;
 }
 
-nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
+nx::sdk::metadata::CommonEventsMetadataPacket* createCommonEventsMetadataPacket(
     const IdentifiedSupportedEvent& identifiedSupportedEvents)
 {
     using namespace std::chrono;
 
-    auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
-    auto detectedEvent1 = createCommonDetectedEvent(identifiedSupportedEvents, /*active*/true);
-    packet->addEvent(detectedEvent1);
-    auto detectedEvent2 = createCommonDetectedEvent(identifiedSupportedEvents, /*active*/false);
-    packet->addEvent(detectedEvent2);
+    auto packet = new nx::sdk::metadata::CommonEventsMetadataPacket();
+    auto commonEvent1 = createCommonEvent(identifiedSupportedEvents, /*active*/ true);
+    packet->addItem(commonEvent1);
+    auto commonEvent2 = createCommonEvent(identifiedSupportedEvents, /*active*/ false);
+    packet->addItem(commonEvent2);
     packet->setTimestampUsec(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
     packet->setDurationUsec(-1);
@@ -77,7 +77,7 @@ public:
         {
             if (memcmp(&axisEvent.externalTypeId(), &guid, 16) == 0)
             {
-                auto packet = createCommonEventMetadataPacket(axisEvent);
+                auto packet = createCommonEventsMetadataPacket(axisEvent);
                 m_handler->handleMetadata(nx::sdk::Error::noError, packet);
                 NX_PRINT << "Event detected and sent to server: "
                     << axisEvent.base().fullName();
@@ -88,7 +88,7 @@ public:
         NX_PRINT << "unknown uuid :(";
     }
 
-    axisHandler(nx::sdk::metadata::AbstractMetadataHandler* handler,
+    axisHandler(nx::sdk::metadata::MetadataHandler* handler,
         const QList<IdentifiedSupportedEvent>& identifiedSupportedEvents)
         :
         m_handler(handler),
@@ -97,7 +97,7 @@ public:
     }
 
 private:
-    nx::sdk::metadata::AbstractMetadataHandler* m_handler;
+    nx::sdk::metadata::MetadataHandler* m_handler;
 
     // events are actually stored in manager
     const QList<IdentifiedSupportedEvent>& m_identifiedSupportedEvents;
@@ -109,7 +109,7 @@ Monitor::Monitor(
     Manager* manager,
     const QUrl& url,
     const QAuthenticator& auth,
-    nx::sdk::metadata::AbstractMetadataHandler* handler)
+    nx::sdk::metadata::MetadataHandler* handler)
     :
     m_manager(manager),
     m_url(url),

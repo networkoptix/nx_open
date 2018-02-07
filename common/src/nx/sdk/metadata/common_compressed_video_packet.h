@@ -1,14 +1,13 @@
 #pragma once
 
-#include "abstract_compressed_video_packet.h"
+#include "compressed_video_packet.h"
 #include "common_compressed_media_packet.h"
 
 namespace nx {
 namespace sdk {
 namespace metadata {
 
-// TODO: #mike: Consider renaming to GenericCompressed...VideoFrame.
-class CommonCompressedVideoPacket: public CommonCompressedMediaPacket<AbstractCompressedVideoPacket>
+class CommonCompressedVideoPacket: public CommonCompressedMediaPacket<CompressedVideoPacket>
 {
 public:
     CommonCompressedVideoPacket() {}

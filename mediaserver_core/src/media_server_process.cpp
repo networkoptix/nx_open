@@ -104,10 +104,14 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
 
+#include <camera_vendors.h>
+
 #include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
 #include <core/resource/avi/avi_resource.h>
-#include <plugins/resource/flir/flir_io_executor.h>
+#if defined(ENABLE_FLIR)
+    #include <plugins/resource/flir/flir_io_executor.h>
+#endif
 
 #include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
 
@@ -1147,8 +1151,7 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
 
 void MediaServerProcess::stopSync()
 {
-    qWarning()<<"Stopping server";
-    NX_LOG( lit("Stopping server"), cl_logALWAYS );
+    qWarning() << "Stopping server";
 
     const int kStopTimeoutMs = 100 * 1000;
 
@@ -2838,7 +2841,10 @@ void MediaServerProcess::run()
     auto resourceSearchers = std::make_unique<QnMediaServerResourceSearchers>(commonModule());
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool(commonModule()));
-    auto flirExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
+
+    #if defined(ENABLE_FLIR)
+        auto flirExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
+    #endif
 
     auto upnpPortMapper = initializeUpnpPortMapper();
 
@@ -3087,6 +3093,7 @@ void MediaServerProcess::run()
     videoCameraPool.reset();
 
     commonModule()->resourceDiscoveryManager()->stop();
+    qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics event.
     QnResource::stopAsyncTasks();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now

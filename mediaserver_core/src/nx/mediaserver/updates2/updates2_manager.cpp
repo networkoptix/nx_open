@@ -1,3 +1,5 @@
+#include "updates2_manager.h"
+#include "detail/updates2_installer.h"
 #include "detail/update_request_data_factory.h"
 #include <nx/api/updates2/updates2_status_data.h>
 #include <nx/update/info/sync_update_checker.h>
@@ -15,7 +17,6 @@
 #include <api/global_settings.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 
-#include "updates2_manager.h"
 
 namespace nx {
 namespace mediaserver {
@@ -129,6 +130,11 @@ void Updates2Manager::writeStatusToFile(const detail::Updates2StatusDataEx& stat
 vms::common::p2p::downloader::AbstractDownloader* Updates2Manager::downloader()
 {
     return qnServerModule->findInstance<vms::common::p2p::downloader::Downloader>();
+}
+
+detail::AbstractUpdates2InstallerPtr Updates2Manager::installer()
+{
+    return std::make_shared<detail::Updates2Installer>();
 }
 
 update::info::AbstractUpdateRegistryPtr Updates2Manager::getRemoteRegistry()

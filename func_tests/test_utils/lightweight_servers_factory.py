@@ -10,7 +10,7 @@ from .utils import GrowingSleep
 from .core_file_traceback import create_core_file_traceback
 from .server_factory import SERVER_LOG_ARTIFACT_TYPE, CORE_FILE_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
 from .server import Server
-from .service import SERVER_CTL_TARGET_PATH, ManualService
+from .service import SERVER_CTL_TARGET_PATH, AdHocService
 from .template_renderer import TemplateRenderer
 
 log = logging.getLogger(__name__)
@@ -154,7 +154,7 @@ class LightweightServersHost(object):
             self._os_access, physical_installation_host.root_dir / 'lws', self._ca)
         self._template_renderer = TemplateRenderer()
         self._lws_dir = self._installation.dir
-        self._service = ManualService(self._os_access, self._lws_dir)
+        self._service = AdHocService(self._os_access, self._lws_dir)
         self._allocated = False
         self._first_server = None
         self._init()
@@ -251,7 +251,8 @@ class LightweightServersHost(object):
             self._first_server.make_core_dump()
 
     def perform_post_checks(self):
-        log.info('performing post-test checks for lightweight servers at %s', self._host_name)
+        log.info('----- performing post-test checks for lightweight servers at %s'
+                     '---------------------->8 ---------------------------', self._host_name)
         self._check_if_server_is_online()
         core_file_list = self._installation.list_core_files()
         assert not core_file_list, ('Lightweight server at %s left %d core dump(s): %s' %

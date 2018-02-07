@@ -36,21 +36,22 @@ using namespace nx::sdk::metadata;
 
 Plugin::Plugin()
 {
-    QFile f(":/vca/manifest.json");
+    static const char* const kResourceName=":/vca/manifest.json";
+    QFile f(kResourceName);
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
     else
-        NX_PRINT << kPluginName <<" can not open resource \":/vca/manifest.json\".";
+        NX_PRINT << kPluginName << " can not open resource \"" << kResourceName << "\".";
 
     m_typedManifest = QJson::deserialized<Vca::VcaAnalyticsDriverManifest>(m_manifest);
 }
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataPlugin)
+    if (interfaceId == IID_Plugin)
     {
         addRef();
-        return static_cast<AbstractMetadataPlugin*>(this);
+        return static_cast<Plugin*>(this);
     }
 
     if (interfaceId == nxpl::IID_Plugin3)
@@ -96,30 +97,22 @@ void Plugin::setLocale(const char* locale)
 {
 }
 
-AbstractMetadataManager* Plugin::managerForResource(
-    const ResourceInfo& resourceInfo,
+CameraManager* Plugin::obtainCameraManager(
+    const CameraInfo& cameraInfo,
     Error* outError)
 {
     *outError = Error::noError;
-    const auto vendor = QString(resourceInfo.vendor).toLower();
+    const auto vendor = QString(cameraInfo.vendor).toLower();
     if (!vendor.startsWith(kVcaVendor))
     {
-        NX_PRINT << kPluginName <<" got unsupported resource. Manager can not be created.";
+        NX_PRINT << kPluginName << " got unsupported resource. Manager can not be created.";
         return nullptr;
     }
     else
     {
         NX_PRINT << kPluginName << " creates new manager.";
-        return new Manager(this, resourceInfo, m_typedManifest);
+        return new Manager(this, cameraInfo, m_typedManifest);
     }
-}
-
-AbstractSerializer* Plugin::serializerForType(
-    const nxpl::NX_GUID& typeGuid,
-    Error* outError)
-{
-    *outError = Error::typeIsNotSupported;
-    return nullptr;
 }
 
 const char* Plugin::capabilitiesManifest(Error* error) const
@@ -136,14 +129,14 @@ const Vca::VcaAnalyticsEventType& Plugin::eventByInternalName(
         m_typedManifest.outputEventTypes.cbegin(),
         m_typedManifest.outputEventTypes.cend(),
         [&internalName](const Vca::VcaAnalyticsEventType& event)
-    {
-        return event.internalName == internalName;
-    });
+        {
+            return event.internalName == internalName;
+        });
 
     return
         (it != m_typedManifest.outputEventTypes.cend())
-        ? *it
-        : m_emptyEvent;
+            ? *it
+            : m_emptyEvent;
 }
 
 } // namespace vca

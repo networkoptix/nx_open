@@ -12,7 +12,7 @@ from test_utils.utils import wait_until
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
-    from ConfigParser import ConfigParser
+    from ConfigParser import SafeConfigParser as ConfigParser
     # noinspection PyCompatibility,PyUnresolvedReferences
     from cStringIO import StringIO as BytesIO
 elif sys.version_info[:2] in {(3, 5), (3, 6)}:
@@ -166,9 +166,9 @@ def find_all_installations(os_access, installation_root=DEFAULT_INSTALLATION_ROO
     return installations
 
 
-def find_deb_installation(os_access, deb, installation_root=DEFAULT_INSTALLATION_ROOT):
+def find_deb_installation(os_access, mediaserver_deb, installation_root=DEFAULT_INSTALLATION_ROOT):
     for installation in find_all_installations(os_access, installation_root=installation_root):
-        if installation.build_info() == deb.build_info:
+        if installation.build_info() == mediaserver_deb.build_info:
             return installation
     return None
 
@@ -183,11 +183,11 @@ def _port_is_opened_on_server_machine(hostname, port):
         return True
 
 
-def install_media_server(os_access, deb, installation_root=DEFAULT_INSTALLATION_ROOT):
-    customization = deb.customization
-    remote_path = PurePosixPath('/tmp') / 'func_tests' / customization.company_name / deb.path.name
+def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_INSTALLATION_ROOT):
+    customization = mediaserver_deb.customization
+    remote_path = PurePosixPath('/tmp') / 'func_tests' / customization.company_name / mediaserver_deb.path.name
     os_access.mk_dir(remote_path.parent)
-    os_access.put_file(deb.path, remote_path)
+    os_access.put_file(mediaserver_deb.path, remote_path)
     # Commands and dependencies for Ubuntu 14.04 (ubuntu/trusty64 from Vagrant's Atlas).
     os_access.run_command([
         'DEBIAN_FRONTEND=noninteractive',  # Bypass EULA on install.

@@ -26,6 +26,7 @@
 #include <ui/common/aligner.h>
 #include <ui/common/read_only.h>
 
+
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
@@ -44,8 +45,9 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/license_usage_helper.h>
 #include <utils/common/delayed.h>
+#include <utils/common/html.h>
+#include <utils/license_usage_helper.h>
 
 #include "camera_schedule_widget.h"
 #include "camera_motion_mask_widget.h"
@@ -74,11 +76,6 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     m_sensitivityButtons(new QButtonGroup(this))
 {
     ui->setupUi(this);
-    ui->wearableUploadWidget->initializeContext();
-    ui->wearableProgressWidget->initializeContext();
-    ui->wearableArchiveLengthWidget->initializeContext();
-    ui->licensingWidget->initializeContext();
-    ui->cameraScheduleWidget->initializeContext();
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->motionDetectionCheckBox->setForegroundRole(QPalette::ButtonText);
 
@@ -132,15 +129,12 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->passwordEdit, &QLineEdit::textChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleTasksChanged,
-        this, &SingleCameraSettingsWidget::at_dbDataChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::recordingSettingsChanged,
-        this, &SingleCameraSettingsWidget::at_dbDataChanged);
+    connect(ui->cameraScheduleWidget, &QnAbstractPreferencesWidget::hasChangesChanged, this,
+        &SingleCameraSettingsWidget::at_dbDataChanged);
+
     connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleEnabledChanged,
         this, &SingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged);
     connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleEnabledChanged,
-        this, &SingleCameraSettingsWidget::at_dbDataChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::archiveRangeChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
     connect(ui->cameraScheduleWidget, &CameraScheduleWidget::alert, this,
         [this](const QString& text) { m_recordingAlert = text; updateAlertBar(); });
@@ -401,7 +395,7 @@ void SingleCameraSettingsWidget::submitToResource()
         if (m_camera->getAuth() != loginEditAuth)
             m_camera->setAuth(loginEditAuth);
 
-        ui->cameraScheduleWidget->submitToResources();
+        ui->cameraScheduleWidget->applyChanges();
 
         if (!m_camera->isDtsBased())
         {
@@ -535,7 +529,7 @@ void SingleCameraSettingsWidget::updateFromResource(bool silent)
     }
 
     /* After overrideMotionType is set. */
-    ui->cameraScheduleWidget->updateFromResources();
+    ui->cameraScheduleWidget->loadDataToUi();
 
     updateIpAddressText();
     updateWebPageText();
@@ -957,7 +951,7 @@ void SingleCameraSettingsWidget::updateWebPageText()
                 webPageAddress += QLatin1Char(':') + QString::number(url.port());
         }
 
-        ui->webPageLink->setText(lit("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
+        ui->webPageLink->setText(makeHref(webPageAddress, webPageAddress));
     }
     else
     {

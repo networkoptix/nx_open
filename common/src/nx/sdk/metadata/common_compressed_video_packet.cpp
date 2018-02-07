@@ -9,25 +9,25 @@ void* CommonCompressedVideoPacket::queryInterface(const nxpl::NX_GUID& interface
     if (interfaceId == IID_CompressedVideoPacket)
     {
         addRef();
-        return static_cast<AbstractCompressedVideoPacket*>(this);
+        return static_cast<CompressedVideoPacket*>(this);
     }
 
     if (interfaceId == IID_CompressedMediaPacket)
     {
         addRef();
-        return static_cast<AbstractCompressedMediaPacket*>(this);
+        return static_cast<CompressedMediaPacket*>(this);
     }
 
     if (interfaceId == IID_CompressedMediaPacket)
     {
         addRef();
-        return static_cast<AbstractCompressedMediaPacket*>(this);
+        return static_cast<CompressedMediaPacket*>(this);
     }
 
     if (interfaceId == IID_DataPacket)
     {
         addRef();
-        return static_cast<AbstractDataPacket*>(this);
+        return static_cast<DataPacket*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)

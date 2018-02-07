@@ -4,7 +4,7 @@
 #include "common/common_module.h"
 #include <utils/common/synctime.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
+#include <streaming/rtp_stream_reader.h>
 #include <nx/utils/log/log.h>
 #include <common/static_common_module.h>
 

@@ -1630,7 +1630,10 @@ int Ec2DirectConnectionFactory::establishDirectConnection(
             if (m_directConnection->initialized())
             {
                 if (m_timeSynchronizationManager)
-                    m_timeSynchronizationManager->start(m_directConnection);
+                {
+                    m_timeSynchronizationManager->start(
+                        m_directConnection->getMiscManager(Qn::kSystemAccess));
+                }
             }
             else
             {

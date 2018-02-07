@@ -1,7 +1,7 @@
 #ifdef ENABLE_PULSE_CAMERA
 
-#include "../onvif/dataprovider/rtp_stream_provider.h"
 #include "pulse_resource.h"
+#include <streaming/rtp_stream_reader.h>
 
 
 const QString QnPlPulseResource::MANUFACTURE(lit("Pulse"));

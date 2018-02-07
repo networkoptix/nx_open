@@ -16,7 +16,6 @@ link_directories("${wix_directory}/sdk/${vsPath}/lib/${arch}")
 add_compile_options(/MT)
 
 nx_add_target(wix_custom_actions LIBRARY LIBRARY_TYPE SHARED
-    NO_PCH
     NO_MOC
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/CustomActions.rc"

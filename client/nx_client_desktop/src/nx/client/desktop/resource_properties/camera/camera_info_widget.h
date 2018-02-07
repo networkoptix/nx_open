@@ -26,6 +26,10 @@ public:
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
 
+signals:
+    /** Signal is emitted whenever hasChanges() is changed. */
+    void hasChangesChanged();
+
 private:
     void alignLabels();
     void updatePalette();

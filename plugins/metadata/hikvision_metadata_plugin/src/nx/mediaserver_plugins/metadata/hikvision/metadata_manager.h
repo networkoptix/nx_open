@@ -11,7 +11,7 @@
 #include "metadata_plugin.h"
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/sdk/metadata/camera_manager.h>
 #include <nx/utils/url.h>
 
 namespace nx {
@@ -19,11 +19,13 @@ namespace mediaserver {
 namespace plugins {
 namespace hikvision {
 
+// TODO: Rename and change namespaces the same way as e.g. Stub plugin.
 class MetadataManager:
     public QObject,
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
+    public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 {
-    Q_OBJECT;
+    Q_OBJECT
+
 public:
     MetadataManager(MetadataPlugin* plugin);
 
@@ -32,10 +34,9 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nxpl::NX_GUID* eventTypeList,
-        int eventTypeListSize) override;
+        nxpl::NX_GUID* typeList, int typeListSize) override;
 
-    virtual nx::sdk::Error setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler) override;
+    virtual nx::sdk::Error setHandler(nx::sdk::metadata::MetadataHandler* handler) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
@@ -43,9 +44,11 @@ public:
 
     virtual void freeManifest(const char* data) override;
 
-    void setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo);
+    void setCameraInfo(const nx::sdk::CameraInfo& cameraInfo);
     void setDeviceManifest(const QByteArray& manifest);
     void setDriverManifest(const Hikvision::DriverManifest& manifest);
+    void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
+
 private:
     Hikvision::DriverManifest m_driverManifest;
     QByteArray m_deviceManifest;
@@ -60,7 +63,7 @@ private:
 
     MetadataPlugin* m_plugin = nullptr;
     std::unique_ptr<HikvisionMetadataMonitor> m_monitor;
-    nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
+    nx::sdk::metadata::MetadataHandler* m_handler = nullptr;
 };
 
 } // namespace hikvision

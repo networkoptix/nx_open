@@ -97,8 +97,8 @@ protected:
 
     void andWhenFirstUsersUnsubscribesAllTasks()
     {
-        nx::utils::promise<int> u1t1p;
-        nx::utils::promise<int> u1t2p;
+        nx::utils::promise<QnUuid> u1t1p;
+        nx::utils::promise<QnUuid> u1t2p;
 
         auto u1t1f = u1t1p.get_future();
         auto u1t2f = u1t2p.get_future();
@@ -108,20 +108,20 @@ protected:
 
         user1->unsubscribe(
             user1Task1Id,
-            [u1t1p = std::move(u1t1p)](const QnUuid&, const SchedulerUser::Task& task) mutable
+            [u1t1p = std::move(u1t1p)](const QnUuid& taskId, const SchedulerUser::Task& /*task*/) mutable
             {
-                u1t1p.set_value(task.fired);
+                u1t1p.set_value(taskId);
             });
 
         user1->unsubscribe(
             user1Task2Id,
-            [u1t2p = std::move(u1t2p)](const QnUuid&, const SchedulerUser::Task& task) mutable
+            [u1t2p = std::move(u1t2p)](const QnUuid& taskId, const SchedulerUser::Task& /*task*/) mutable
             {
-                u1t2p.set_value(task.fired);
+                u1t2p.set_value(taskId);
             });
 
-        user1Task1FiredWhileUnsubscribe = u1t1f.get();
-        user1Task2FiredWhileUnsubscribe = u1t2f.get();
+        user1Task1FiredWhileUnsubscribe = user1->tasks()[u1t1f.get()].fired;
+        user1Task2FiredWhileUnsubscribe = user1->tasks()[u1t2f.get()].fired;
     }
 
     void andWhenFirstUsersUnsubscribesFirstTask()
@@ -199,6 +199,7 @@ protected:
             user1Task1Id,
             [this](const QnUuid& taskId, const SchedulerUser::Task& task)
             {
+                QnMutexLocker lock(&m_mutex);
                 unsubsribeCalledIds.emplace(taskId);
                 user1Task1FiredWhileUnsubscribe = task.fired;
             });
@@ -431,14 +432,23 @@ protected:
 
     void thenFirstTaskShouldFireAndSecondTaskShouldBeSubscribed()
     {
-        auto user1Tasks = user1->tasks();
-        ASSERT_EQ(2U, user1Tasks.size());
+        waitForPredicateBecomeTrue(
+            [this]()
+            {
+                return 2U == user1->tasks().size();
+            },
+            "2 tasks should've been subscribed");
     }
 
     void thenTaskShouldHaveAlreadyUnsubscribed()
     {
-        auto user1Tasks = user1->tasks();
-        ASSERT_NE(unsubsribeCalledIds.find(user1Task1Id), unsubsribeCalledIds.cend());
+        waitForPredicateBecomeTrue(
+            [this]()
+            {
+                QnMutexLocker lock(&m_mutex);
+                return unsubsribeCalledIds.find(user1Task1Id) != unsubsribeCalledIds.cend();
+            },
+            "task should has been unsubscribed");
     }
 
     void thenNoNewFires()
@@ -465,6 +475,7 @@ protected:
     int user1Task2FiredWhileUnsubscribe = 0;
 
     std::unordered_set<QnUuid> unsubsribeCalledIds;
+    QnMutex m_mutex;
 };
 
 TEST_F(SchedulerIntegrationTest, TwoUsersScheduleTasks)

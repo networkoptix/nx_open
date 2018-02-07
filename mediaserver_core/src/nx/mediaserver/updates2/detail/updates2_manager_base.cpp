@@ -80,13 +80,11 @@ void Updates2ManagerBase::atServerStart()
                 "Update is unavailable");
             break;
         case api::Updates2StatusData::StatusCode::downloading:
+        case api::Updates2StatusData::StatusCode::preparing:
             setStatus(
                 api::Updates2StatusData::StatusCode::available,
                 "Update is available");
             download();
-            break;
-        case api::Updates2StatusData::StatusCode::preparing:
-            // #TODO: #akulikov implement
             break;
         case api::Updates2StatusData::StatusCode::readyToInstall:
             // #TODO: #akulikov implement
@@ -243,7 +241,7 @@ api::Updates2StatusData Updates2ManagerBase::download()
             setStatus(
                 api::Updates2StatusData::StatusCode::preparing,
                 lit("Preparing update file: %1").arg(fileData.file));
-            startPreparing();
+            startPreparing(downloader()->filePath(fileData.file));
         case ResultCode::fileAlreadyExists:
         case ResultCode::ok:
             setStatus(
@@ -300,8 +298,38 @@ void Updates2ManagerBase::setStatus(
     m_currentStatus.state = newStatusData.state;
 }
 
-void Updates2ManagerBase::startPreparing()
+void Updates2ManagerBase::startPreparing(const QString& updateFilePath)
 {
+    AbstractUpdates2InstallerPtr updateInstaller = installer();
+    updateInstaller->prepareAsync(
+        updateFilePath,
+        [this](PrepareResult prepareResult, const QString& updateId)
+        {
+            switch (prepareResult)
+            {
+                case PrepareResult::ok:
+                    setStatus(
+                        api::Updates2StatusData::StatusCode::readyToInstall,
+                        lit("Update is ready for installation: %1").arg(updateId));
+                    return;
+                case PrepareResult::corruptedArchive:
+                    setStatus(
+                        api::Updates2StatusData::StatusCode::error,
+                        lit("Update archive is corrupted: %1").arg(updateId));
+                    return;
+                case PrepareResult::noFreeSpace:
+                    setStatus(
+                        api::Updates2StatusData::StatusCode::error,
+                        lit("Failed to prepare update file (%1), no space left on device")
+                            .arg(updateId));
+                    return;
+                case PrepareResult::unknownError:
+                    setStatus(
+                        api::Updates2StatusData::StatusCode::error,
+                        lit("Failed to prepare update files: %1").arg(updateId));
+                    return;
+            }
+        });
 }
 
 void Updates2ManagerBase::onDownloadFinished(const QString& fileName)
@@ -331,7 +359,7 @@ void Updates2ManagerBase::onDownloadFinished(const QString& fileName)
     setStatus(
         api::Updates2StatusData::StatusCode::preparing,
         "Update has been downloaded and now is preparing for install");
-    startPreparing();
+    startPreparing(downloader()->filePath(fileName));
 }
 
 void Updates2ManagerBase::onDownloadFailed(const QString& fileName)

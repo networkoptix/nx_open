@@ -3921,7 +3921,10 @@ bool QnPlOnvifResource::initializeTwoWayAudioByResourceData()
             audioTransmitter->setAuthPolicy(QnBasicAudioTransmitter::AuthPolicy::digestAndBasicAuth);
 
         nx::utils::Url srcUrl(getUrl());
-        nx::utils::Url url(lit("http://%1:%2%3").arg(srcUrl.host()).arg(srcUrl.port()).arg(params.urlPath));
+        nx::utils::Url url(lit("http://%1:%2%3")
+            .arg(srcUrl.host())
+            .arg(srcUrl.port(nx::network::http::DEFAULT_HTTP_PORT))
+            .arg(params.urlPath));
         audioTransmitter->setTransmissionUrl(url);
 
         m_audioTransmitter.reset(audioTransmitter.release());
