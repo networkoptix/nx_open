@@ -32,6 +32,7 @@ ${ANONYMOUS BODY}                     //body[contains(@class,'anonymous')]
 ${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
 ${CREATE ACCOUNT BODY}                //body//a[@href='/register']
 
+#Forgot Password
 ${RESTORE PASSWORD EMAIL INPUT}       //form[@name='restorePassword']//input[@type='email']
 ${RESET PASSWORD BUTTON}              //form[@name='restorePassword']//button[@ng-click='checkForm()']
 ${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//input[@type='password']
@@ -39,6 +40,11 @@ ${SAVE PASSWORD}                      //form[@name='restorePasswordWithCode']//b
 ${RESET EMAIL SENT MESSAGE}           //div[@ng-if='restoringSuccess']/h1[contains(text(),'Password reset instructions are sent to Email')]
 ${RESET SUCCESS MESSAGE}              //h1[@ng-if='change.success || changeSuccess ' and contains(text(), 'Password successfully saved')]
 ${RESET SUCCESS LOG IN LINK}          //h1[@ng-if='change.success || changeSuccess ' and contains(text(), 'Password successfully saved')]/a[@href='/login']
+
+#Change Password
+${CURRENT PASSWORD INPUT}             //form[@name='passwordForm']//input[@ng-model='pass.password']
+${NEW PASSWORD INPUT}                 //form[@name='passwordForm']//password-input[@ng-model='pass.newPassword']//input[@id='newPassword']
+${CHANGE PASSWORD BUTTON}             //form[@name='passwordForm']//button[@ng-click='checkForm()']
 
 #Register Form Elements
 ${REGISTER FIRST NAME INPUT}          //form[@name= 'registerForm']//input[@ng-model='account.firstName']
