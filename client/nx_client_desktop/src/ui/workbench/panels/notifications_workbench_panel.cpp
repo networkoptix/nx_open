@@ -428,7 +428,6 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     const QModelIndex& index,
     const nx::client::desktop::EventTile* tile)
 {
-    qDebug() << "HoverEvent" << tile;
     if (m_eventPanelHoverProcessor)
     {
         if (m_lastHoveredTile == tile)
