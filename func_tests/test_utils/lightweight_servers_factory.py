@@ -251,7 +251,8 @@ class LightweightServersHost(object):
             self._first_server.make_core_dump()
 
     def perform_post_checks(self):
-        log.info('performing post-test checks for lightweight servers at %s', self._host_name)
+        log.info('----- performing post-test checks for lightweight servers at %s'
+                     '---------------------->8 ---------------------------', self._host_name)
         self._check_if_server_is_online()
         core_file_list = self._installation.list_core_files()
         assert not core_file_list, ('Lightweight server at %s left %d core dump(s): %s' %
