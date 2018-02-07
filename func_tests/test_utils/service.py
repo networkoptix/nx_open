@@ -53,7 +53,7 @@ class UpstartService(Service):
         return self.os_access.run_command([action, self._service_name])
 
 
-class ManualService(Service):
+class AdHocService(Service):
     """Run multiple mediaservers on single machine
 
     Service of any kind doesn't can only run one instance.
@@ -64,12 +64,13 @@ class ManualService(Service):
     shell script is created from templates.
     Its interface mimic a `service` command.
     """
-    def __init__(self, hostname, dir):
-        self._os_access = hostname
+    def __init__(self, os_access, dir):
+        self._os_access = os_access
         self._dir = dir
+        self._service_script_path = self._dir / 'server_ctl.sh'
 
     def get_state(self):
-        if not self._os_access.file_exists(self._service_path):
+        if not self._os_access.file_exists(self._service_script_path):
             return False  # not even installed
         return self._run_service_action('is_active') == 'active'
 
@@ -80,8 +81,4 @@ class ManualService(Service):
         self._run_service_action('make_core_dump')
 
     def _run_service_action(self, action):
-        return self._os_access.run_command([self._service_path, action]).strip()
-
-    @property
-    def _service_path(self):
-        return self._dir / 'server_ctl.sh'
+        return self._os_access.run_command([self._service_script_path, action]).strip()

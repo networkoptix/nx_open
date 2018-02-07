@@ -10,7 +10,7 @@
 #include <nx_ec/dummy_handler.h>
 
 #include <api/app_server_connection.h>
-#include <plugins/resource/onvif/dataprovider/onvif_mjpeg.h>
+#include <streaming/mjpeg_stream_reader.h>
 #include <utils/common/synctime.h>
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>

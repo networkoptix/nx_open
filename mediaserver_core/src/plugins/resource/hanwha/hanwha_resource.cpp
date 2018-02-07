@@ -25,7 +25,7 @@
 #include <nx/fusion/fusion/fusion.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/vms/event/events/events.h>
-#include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <nx/sdk/metadata/plugin.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 
@@ -45,6 +45,8 @@ namespace plugins {
 
 const QString HanwhaResource::kNormalizedSpeedPtzTrait("NormalizedSpeed");
 const QString HanwhaResource::kHas3AxisPtz("3AxisPTZ");
+const QString HanwhaResource::kHanwhaAlternativeZoomTrait("AlternativeZoomTrait");
+const QString HanwhaResource::kHanwhaAlternativeFocusTrait("AlternativeFocusTrait");
 
 namespace {
 
@@ -116,6 +118,33 @@ static const std::map<QString, PtzDescriptor> kHanwhaNvrPtzCapabilities =
             Ptz::Capability::ContinuousPanCapability,
             PtzOperation::remove
         )
+    }
+};
+
+struct HanwhaAlternativePtzTrait
+{
+    QString supportAttribute;
+    QString valueAttribute;
+    Ptz::Capabilities capabilities;
+};
+
+static const std::map<HanwhaTraitName, HanwhaAlternativePtzTrait>
+kHanwhaAlternativePtzTraits = {
+    {
+        HanwhaResource::kHanwhaAlternativeZoomTrait,
+        {
+            lit("Image/FocusAdjust"),
+            lit("image/focus/control/Focus"),
+            Ptz::ContinuousFocusCapability
+        }
+    },
+    {
+        HanwhaResource::kHanwhaAlternativeFocusTrait,
+        {
+            lit("Image/ZoomAdjust"),
+            lit("image/focus/control/Zoom"),
+            Ptz::ContinuousZoomCapability
+        }
     }
 };
 
@@ -750,6 +779,7 @@ QnAbstractPtzController* HanwhaResource::createPtzControllerInternal()
     controller->setPtzCapabilities(m_ptzCapabilities);
     controller->setPtzLimits(m_ptzLimits);
     controller->setPtzTraits(m_ptzTraits);
+    controller->setAlternativePtzRanges(m_alternativePtzRanges);
 
     return controller;
 }
@@ -997,8 +1027,8 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         }
     }
 
-    if (m_ptzCapabilities ==Ptz::NoPtzCapabilities)
-        return CameraDiagnostics::NoErrorResult();
+    if (m_ptzCapabilities == Ptz::NoPtzCapabilities)
+        return initAlternativePtz();
 
     auto hasNormalizedSpeedParam = m_cgiParameters.parameter(lit("ptzcontrol/continuous/control/NormalizedSpeed"));
     if (isTrue(hasNormalizedSpeedParam))
@@ -1029,16 +1059,14 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     if ((m_ptzCapabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities)
         m_ptzCapabilities |= Ptz::DevicePositioningPtzCapability;
 
-
     auto autoFocusParameter = m_cgiParameters.parameter(lit("image/focus/control/Mode"));
-
     if (!autoFocusParameter)
         return CameraDiagnostics::NoErrorResult();
 
     auto possibleValues = autoFocusParameter->possibleValues();
     m_focusMode = QString();
-    // TODO: Ducumentation says we should check (attributes/Image/Support/SimpleFocus is True)
-    //     and (image/focus/control/Mode contains SimpleFocus).
+    // TODO: Documentation says we should check (attributes/Image/Support/SimpleFocus is True)
+    // and (image/focus/control/Mode contains SimpleFocus).
     // However 2nd true with 1st false does not seem to be valid behavior, so we do not check
     // it for now.
     for (const auto& mode: {lit("SimpleFocus"), lit("AutoFocus")})
@@ -1058,6 +1086,44 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     if (maxPresetParameter)
         m_ptzLimits.maxPresetNumber = maxPresetParameter.get();
 
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
+{
+    const auto channel = getChannel();
+
+    for (const auto& item: kHanwhaAlternativePtzTraits)
+    {
+        bool success = false;
+        std::set<int> possibleValues;
+        const auto& traitName = item.first;
+        const auto& trait = item.second;
+
+        const auto hasTrait = m_attributes
+            .attribute<bool>(lit("%1/%2").arg(trait.supportAttribute).arg(channel));
+
+        if (hasTrait == boost::none || !hasTrait.get())
+            continue;
+
+        const auto valuesParameter = m_cgiParameters.parameter(trait.valueAttribute);
+        if (valuesParameter == boost::none || !valuesParameter->isValid())
+            continue;
+
+        for (const auto& value: valuesParameter->possibleValues())
+        {
+            possibleValues.insert(value.toInt(&success));
+            if (!success)
+                break;
+        }
+
+        if (!success)
+            continue;
+
+        m_ptzTraits.append(traitName);
+        m_ptzCapabilities |= trait.capabilities;
+        m_alternativePtzRanges[traitName] = std::move(possibleValues);
+    }
 
     return CameraDiagnostics::NoErrorResult();
 }

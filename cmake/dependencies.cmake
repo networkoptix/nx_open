@@ -1,3 +1,6 @@
+set(customWebAdminPackageDirectory "" CACHE STRING
+    "Custom location of server-external package")
+
 macro(_set_version pkg version)
     set(_${pkg}_version ${version})
 endmacro()
@@ -163,7 +166,7 @@ function(nx_get_dependencies)
     endif()
 
     if(box STREQUAL "edge1")
-        nx_rdep_add_package(cpro-1.0.0)
+        nx_rdep_add_package(cpro-1.0.0-1)
         nx_rdep_add_package(gdb)
     endif()
 
@@ -196,7 +199,9 @@ function(nx_get_dependencies)
         nx_rdep_add_package(any/apidoctool PATH_VARIABLE APIDOCTOOL_PATH)
         set(APIDOCTOOL_PATH ${APIDOCTOOL_PATH} PARENT_SCOPE)
 
-        if(server-external_version)
+        if(customWebAdminPackageDirectory)
+            nx_copy_package(${customWebAdminPackageDirectory})
+        elseif(server-external_version)
             nx_rdep_add_package(any/server-external)
         else()
             nx_rdep_add_package(any/server-external-${branch} OPTIONAL

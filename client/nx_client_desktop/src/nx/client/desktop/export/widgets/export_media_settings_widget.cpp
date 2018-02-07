@@ -27,12 +27,17 @@ bool ExportMediaSettingsWidget::applyFilters() const
     return ui->filtersCheckBox->isChecked();
 }
 
-void ExportMediaSettingsWidget::setApplyFilters(bool value)
+void ExportMediaSettingsWidget::setApplyFilters(bool value, bool suppressSignal)
 {
-    if (value && !transcodingAllowed())
-        return;
-
-    ui->filtersCheckBox->setChecked(value);
+    if (suppressSignal)
+    {
+        QSignalBlocker blocker(ui->filtersCheckBox);
+        ui->filtersCheckBox->setChecked(value);
+    }
+    else
+    {
+        ui->filtersCheckBox->setChecked(value);
+    }
 }
 
 bool ExportMediaSettingsWidget::transcodingAllowed() const
@@ -43,11 +48,6 @@ bool ExportMediaSettingsWidget::transcodingAllowed() const
 void ExportMediaSettingsWidget::setTranscodingAllowed(bool value)
 {
     ui->filtersCheckBox->setEnabled(value);
-    if (value)
-        return;
-
-    QSignalBlocker scopedBlocker(ui->filtersCheckBox);
-    ui->filtersCheckBox->setChecked(false);
 }
 
 } // namespace desktop

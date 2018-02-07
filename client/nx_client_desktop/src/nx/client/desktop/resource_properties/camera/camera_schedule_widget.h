@@ -5,6 +5,8 @@
 #include <core/misc/schedule_task.h>
 #include <core/resource/resource_fwd.h>
 
+#include <ui/widgets/common/abstract_preferences_widget.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
@@ -17,16 +19,17 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraScheduleWidget: public Connective<QWidget>,
+class CameraScheduleWidget: public Connective<QnAbstractPreferencesWidget>,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
-    using base_type = Connective<QWidget>;
+    using base_type = Connective<QnAbstractPreferencesWidget>;
 
 public:
-    explicit CameraScheduleWidget(QWidget* parent = 0);
+    // TODO: #GDM Remove snapScrollbarToParent hacky parameter when legacy camera settings gone.
+    explicit CameraScheduleWidget(QWidget* parent = nullptr, bool snapScrollbarToParent = true);
     virtual ~CameraScheduleWidget();
 
     void overrideMotionType(Qn::MotionType motionTypeOverride = Qn::MT_Default);
@@ -37,14 +40,12 @@ public:
     void setScheduleEnabled(bool enabled);
     bool isScheduleEnabled() const;
 
-    bool isReadOnly() const;
-    void setReadOnly(bool readOnly);
-
     const QnVirtualCameraResourceList &cameras() const;
     void setCameras(const QnVirtualCameraResourceList &cameras);
 
-    void updateFromResources();
-    void submitToResources();
+    virtual bool hasChanges() const override;
+    virtual void loadDataToUi() override;
+    virtual void applyChanges() override;
 
     /** Returns true if there is at least one "record-motion" square on the grid */
     bool hasMotionOnGrid() const;
@@ -58,15 +59,11 @@ public:
     bool isRecordingScheduled() const;
 
 signals:
-    void archiveRangeChanged();
-    void scheduleTasksChanged();
-    void recordingSettingsChanged();
     void scheduleEnabledChanged(int);
-    void gridParamsChanged();
-    void controlsChangesApplied();
     void alert(const QString& text);
 
 protected:
+    virtual void setReadOnlyInternal(bool readOnly) override;
     virtual void afterContextInitialized() override;
 
 private:
@@ -127,7 +124,7 @@ private:
     QPair<Qn::StreamQuality, bool> qualityForBitrate(qreal bitrateMbps) const;
     qreal bitrateForQuality(Qn::StreamQuality quality) const;
 
-    void retranslateUi();
+    virtual void retranslateUi() override;
 
     enum AlertReason
     {
@@ -144,25 +141,24 @@ private:
     QScopedPointer<Ui::CameraScheduleWidget> ui;
 
     QnVirtualCameraResourceList m_cameras;
-    bool m_disableUpdateGridParams;
-    bool m_motionAvailable;
-    bool m_recordingParamsAvailable;
-    bool m_readOnly;
+    bool m_disableUpdateGridParams = false;
+    bool m_motionAvailable = true;
+    bool m_recordingParamsAvailable = true;
 
     /**
-     * @brief m_maxFps                  Maximum fps value for record types "always" and "motion only"
+     * Maximum fps value for record types "always" and "motion only"
      */
-    int m_maxFps;
+    int m_maxFps = 0;
 
     /**
-     * @brief m_maxDualStreamingFps     Maximum fps value for record types "motion-plus-lq"
+     * Maximum fps value for record types "motion-plus-lq"
      */
-    int m_maxDualStreamingFps;
+    int m_maxDualStreamingFps = 0;
 
     bool m_advancedSettingsSupported = false;
     bool m_advancedSettingsVisible = false;
 
-    Qn::MotionType m_motionTypeOverride;
+    Qn::MotionType m_motionTypeOverride = Qn::MT_Default;
 
     QString m_scheduleAlert;
 

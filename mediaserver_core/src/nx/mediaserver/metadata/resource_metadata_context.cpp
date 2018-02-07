@@ -1,4 +1,7 @@
 #include "resource_metadata_context.h"
+
+#include <nx/utils/log/log.h>
+
 #include "media_data_receptor.h"
 
 namespace nx {
@@ -36,6 +39,14 @@ void ResourceMetadataContext::putData(const QnAbstractDataPacketPtr& data)
 
 void ResourceMetadataContext::clearManagers()
 {
+    for (auto& managerContext: m_managers)
+    {
+        if (managerContext.manager->stopFetchingMetadata() != Error::noError)
+        {
+            NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
+                .arg(managerContext.manifest.driverName.value));
+        }
+    }
     m_managers.clear();
 }
 

@@ -26,6 +26,13 @@ QnWearableProgressWidget::QnWearableProgressWidget(QWidget* parent):
             if (m_camera && state.cameraId == m_camera->getId())
                 updateFromState(state);
         });
+
+    connect(ui->cancelButton, &QPushButton::clicked, this,
+        [this]
+        {
+            if (m_camera)
+                qnClientModule->wearableManager()->cancelUploads(m_camera);
+        });
 }
 
 QnWearableProgressWidget::~QnWearableProgressWidget()
@@ -88,19 +95,11 @@ bool QnWearableProgressWidget::calculateActive(const WearableState& state)
 
 bool QnWearableProgressWidget::calculateCancelable(const WearableState& state)
 {
-    switch (state.status)
-    {
-    case WearableState::Unlocked:
-    case WearableState::LockedByOtherClient:
+    if (state.currentIndex + 1 == state.queue.size())
+        return state.status != WearableState::Consuming;
+    if (state.currentIndex >= state.queue.size())
         return false;
-    case WearableState::Locked:
-    case WearableState::Uploading:
-        return true;
-    case WearableState::Consuming:
-        return false;
-    default:
-        return false;
-    }
+    return true;
 }
 
 QString QnWearableProgressWidget::calculateMessage(const WearableState& state)

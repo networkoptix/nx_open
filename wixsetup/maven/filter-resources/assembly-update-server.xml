@@ -10,15 +10,15 @@
 			<outputDirectory>..</outputDirectory>
 			<includes>
 				<include>${artifact.name.server}.exe</include>
-			</includes>		
-		</fileSet>				
+			</includes>
+		</fileSet>
 		<fileSet>
 			<directory>${project.build.directory}/server</directory>
 			<outputDirectory>..</outputDirectory>
 			<includes>
 				<include>update.json</include>
 				<include>install.bat</include>
-			</includes>		
-		</fileSet>				
+			</includes>
+		</fileSet>
 	</fileSets>
 </assembly>

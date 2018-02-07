@@ -41,7 +41,7 @@ class RemotableVagrant(vagrant.Vagrant):
             self._os_access.run_command(cmd, cwd=self.root))
 
 
-class VagrantVMsFactory(object):
+class VagrantVMFactory(object):
     _vagrant_vms_cache_key = 'nx/vagrant_vms'
 
     def __init__(self, cache, options, config_factory):
@@ -259,7 +259,7 @@ class VagrantVM(object):
     def _make_os_access(self, user, ssh_config_path=None):
         # Vagrant VM name is tied to hostname and port in SSH config which is mandatory here.
         return SshAccess(self.vagrant_name, user=user, key_path=self._vagrant_private_key_path,
-                         config_path=ssh_config_path or self._ssh_config_path,
+                         ssh_config_path=ssh_config_path or self._ssh_config_path,
                          proxy_os_access=self.host_os_access)
 
     def _load_timezone(self):
@@ -286,12 +286,3 @@ class VagrantVM(object):
         settings[old_setting_line_index] = new_setting
         root_ssh_host.write_file(sshd_config_path, '\n'.join(settings))
         root_ssh_host.run_command(['service', 'ssh', 'reload'])
-
-
-def port_is_accessible_from_this_machine(this_machine_port):
-    try:
-        socket.socket(('localhost', this_machine_port))
-    except socket.error:
-        return False
-    else:
-        return True

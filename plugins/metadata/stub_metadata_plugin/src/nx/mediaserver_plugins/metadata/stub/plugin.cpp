@@ -1,8 +1,9 @@
 #include "plugin.h"
 
+#define NX_DEBUG_ENABLE_OUTPUT true //< Stub plugin is itself a debug feature, thus is verbose.
 #include <nx/kit/debug.h>
 
-#include "manager.h"
+#include "camera_manager.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -12,141 +13,56 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Plugin::Plugin()
+Plugin::Plugin(): CommonPlugin("Stub metadata plugin")
 {
-    NX_PRINT << "Created \"" << name() << "\"";
+    setEnableOutput(NX_DEBUG_ENABLE_OUTPUT); //< Base class is verbose when this descendant is.
 }
 
-Plugin::~Plugin()
+nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
+    const CameraInfo& /*cameraInfo*/, Error* /*outError*/)
 {
-    NX_PRINT << "Destroyed \"" << name() << "\"";
+    return new CameraManager(this);
 }
 
-void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
+std::string Plugin::capabilitiesManifest() const
 {
-    if (interfaceId == IID_MetadataPlugin)
-    {
-        addRef();
-        return static_cast<AbstractMetadataPlugin*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin3)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin3*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin2)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin2*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
-const char* Plugin::name() const
-{
-    return "Stub metadata plugin";
-}
-
-void Plugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
-{
-    // Do nothing.
-}
-
-void Plugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
-{
-    // Do nothing.
-}
-
-void Plugin::setLocale(const char* /*locale*/)
-{
-    // Do nothing.
-}
-
-AbstractMetadataManager* Plugin::managerForResource(
-    const ResourceInfo& /*resourceInfo*/,
-    Error* outError)
-{
-    *outError = Error::noError;
-    return new Manager(this);
-}
-
-AbstractSerializer* Plugin::serializerForType(
-    const nxpl::NX_GUID& /*typeGuid*/,
-    Error* /*outError*/)
-{
-    return nullptr;
-}
-
-const char* Plugin::capabilitiesManifest(Error* error) const
-{
-    *error = Error::noError;
-
-    // TODO: #mike: Remove localizations; consider a dedicated mechanism for them.
     return R"json(
         {
-            "driverId": "{B14A8D7B-8009-4D38-A60D-04139345432E}",
+            "driverId": ")json" + kDriverGuid + R"json(",
             "driverName": {
-                "value": "Stub Driver",
-                "localization": {
-                    "ru_RU": "Stub driver (translated to Russian)"
-                }
+                "value": "Stub Driver"
             },
             "outputEventTypes": [
                 {
-                    "typeId": "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
+                    "typeId": ")json" + kLineCrossingEventGuid + R"json(",
                     "name": {
-                        "value": "Line crossing",
-                        "localization": {
-                            "ru_RU": "Line crossing (translated to Russian)"
-                        }
+                        "value": "Line crossing"
                     }
                 },
                 {
-                    "typeId": "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}",
+                    "typeId": ")json" + kObjectInTheAreaEventGuid + R"json(",
                     "name": {
-                        "value": "Object in the area",
-                        "localization": {
-                            "ru_RU": "Object in the area (translated to Russian)"
-                        }
-                    }
+                        "value": "Object in the area"
+                    },
+                    "flags": "stateDependent|regionDependent"
                 }
             ],
             "outputObjectTypes": [
                 {
-                    "typeId": "{153DD879-1CD2-46B7-ADD6-7C6B48EAC1FC}",
+                    "typeId": ")json" + kCarObjectGuid + R"json(",
                     "name": {
-                        "value": "Car detected",
-                        "localization": {
-                            "ru_RU": "Car detected (translated to Russian)"
-                        }
+                        "value": "Car"
                     }
                 },
                 {
-                    "typeId": "{C23DEF4D-04F7-4B4C-994E-0C0E6E8B12CB}",
+                    "typeId": ")json" + kHumanFaceObjectGuid + R"json(",
                     "name": {
-                        "value": "Human face detected",
-                        "localization": {
-                            "ru_RU": "Human face detected (translated to Russian)"
-                        }
+                        "value": "Human face"
                     }
                 }
             ],
             "capabilities": "needDeepCopyForMediaFrame",
-            "parameters": {
+            "settings": {
                 "params": [
                     {
                         "id": "paramAId",
@@ -161,10 +77,97 @@ const char* Plugin::capabilitiesManifest(Error* error) const
                         "name": "Param B",
                         "description": "Enumeration B"
                     }
+                ],
+                "groups": [
+                    {
+                        "id": "groupA",
+                        "name": "Group name",
+                        "params": [
+                            {
+                                "id": "groupA.paramA",
+                                "dataType": "String",
+                                "name": "Some string",
+                                "description": "Some string param in a group"
+                            }
+                        ],
+                        "groups": [
+                        ]
+                    }
                 ]
-            }
+            },
+            "objectActions": [
+                {
+                    "id": "nx.stub.addToList",
+                    "name": {
+                        "value": "Add to list"
+                    },
+                    "supportedObjectTypes": [
+                        ")json" + kCarObjectGuid + R"json("
+                    ],
+                    "settings": {
+                        "params": [
+                            {
+                                "id": "paramA",
+                                "dataType": "Number",
+                                "name": "Param A",
+                                "description": "Number A"
+                            },
+                            {
+                                "id": "paramB",
+                                "dataType": "Enumeration",
+                                "range": "b1,b3",
+                                "name": "Param B",
+                                "description": "Enumeration B"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nx.stub.addPerson",
+                    "name": {
+                        "value": "Add person (URL-based)"
+                    },
+                    "supportedObjectTypes": [
+                        ")json" + kCarObjectGuid + R"json("
+                    ]
+                }
+            ]
         }
     )json";
+}
+
+void Plugin::settingsChanged()
+{
+    NX_PRINT << __func__ << "()";
+}
+
+void Plugin::executeAction(
+    const std::string& actionId,
+    const Object* object,
+    const std::map<std::string, std::string>& params,
+    std::string* outActionUrl,
+    std::string* outMessageToUser,
+    Error* error)
+{
+    if (actionId == "nx.stub.addToList")
+    {
+        NX_PRINT << __func__ << "(): nx.stub.addToList; returning a message with param values.";
+        *outMessageToUser = std::string("Your param values are: ")
+            + "paramA: [" + params.at("paramA") + "], "
+            + "paramB: [" + params.at("paramB") + "]";
+
+    }
+    else if (actionId == "nx.stub.addPerson")
+    {
+        *outActionUrl = "http://internal.server/addPerson?objectId=" +
+            nxpt::NxGuidHelper::toStdString(object->id());
+        NX_PRINT << __func__ << "(): nx.stub.addPerson; returning URL: [" << *outActionUrl << "]";
+    }
+    else
+    {
+        NX_PRINT << __func__ << "(): ERROR: Unsupported action: [" << actionId << "]";
+        *error = Error::unknownError;
+    }
 }
 
 } // namespace stub

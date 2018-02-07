@@ -6,7 +6,7 @@ import uuid
 from test_utils.build_info import customization_from_company_name
 from .os_access import SshAccessConfig, host_from_config
 from .server import Server
-from .service import MEDIASERVER_DIR, ManualService, SERVER_CTL_TARGET_PATH
+from .service import MEDIASERVER_DIR, AdHocService, SERVER_CTL_TARGET_PATH
 from .server_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, ServerInstallation
 from .template_renderer import TemplateRenderer
 from .utils import is_list_inst
@@ -62,15 +62,15 @@ class PhysicalInstallationCtl(object):
     def __init__(self, deb_path, customization_company_name, config_list, ca):
         assert is_list_inst(config_list, PhysicalInstallationHostConfig), repr(config_list)
         self.config_list = config_list
-        self.installations = [
+        self.installation_hosts = [
             PhysicalInstallationHost.from_config(
                 config, deb_path, customization_from_company_name(customization_company_name), ca)
             for config in config_list]
-        self._available_hosts = self.installations[:]
+        self._available_hosts = self.installation_hosts[:]
 
     # will unpack [new] distributive and reinstall servers
     def reset_all_installations(self):
-        for host in self.installations:
+        for host in self.installation_hosts:
             host.set_reset_installation_flag()
 
     def allocate_server(self, config):
@@ -87,9 +87,9 @@ class PhysicalInstallationCtl(object):
 
     def release_all_servers(self):
         log.info('Releasing all physical installations')
-        for host in self.installations:
+        for host in self.installation_hosts:
             host.release_all_servers()
-        self._available_hosts = self.installations[:]
+        self._available_hosts = self.installation_hosts[:]
 
 
 class PhysicalInstallationHost(object):
@@ -147,7 +147,7 @@ class PhysicalInstallationHost(object):
                 return None
         server_port = self._installation_server_port(self._installations.index(installation))
         rest_api_url = '%s://%s:%d/' % (config.http_schema, self.os_access.hostname, server_port)
-        service = ManualService(self.os_access, installation.dir)
+        service = AdHocService(self.os_access, installation.dir)
         server = Server(config.name, self.os_access, service, installation, rest_api_url, self._ca,
                         rest_api_timeout=config.rest_api_timeout, internal_ip_port=server_port)
         self._allocated_server_list.append(server)
@@ -188,7 +188,7 @@ class PhysicalInstallationHost(object):
 
     def _ensure_servers_are_stopped(self):
         for installation in self._installations:
-            service = ManualService(self.os_access, installation.dir)
+            service = AdHocService(self.os_access, installation.dir)
             if service.get_state():
                 service.set_state(is_started=False)
 

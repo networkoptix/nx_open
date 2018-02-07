@@ -212,14 +212,23 @@ QnCommonModule::~QnCommonModule()
 void QnCommonModule::bindModuleInformation(const QnMediaServerResourcePtr &server)
 {
     /* Can't use resourceChanged signal because it's not emited when we are saving server locally. */
-    connect(server.data(),  &QnMediaServerResource::nameChanged,    this,   &QnCommonModule::resetCachedValue);
-    connect(server.data(),  &QnMediaServerResource::apiUrlChanged,  this,   &QnCommonModule::resetCachedValue);
-    connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::resetCachedValue);
-    connect(server.data(),  &QnMediaServerResource::primaryAddressChanged,  this,   &QnCommonModule::resetCachedValue);
+    connect(server.data(), &QnMediaServerResource::nameChanged, this,
+        &QnCommonModule::resetCachedValue);
+    connect(server.data(), &QnMediaServerResource::apiUrlChanged, this,
+        &QnCommonModule::resetCachedValue);
+    connect(server.data(), &QnMediaServerResource::serverFlagsChanged, this,
+        &QnCommonModule::resetCachedValue);
+    connect(server.data(), &QnMediaServerResource::primaryAddressChanged, this,
+        &QnCommonModule::resetCachedValue);
 
-    connect(m_globalSettings, &QnGlobalSettings::systemNameChanged, this, &QnCommonModule::resetCachedValue);
-    connect(m_globalSettings, &QnGlobalSettings::localSystemIdChanged, this, &QnCommonModule::resetCachedValue);
-    connect(m_globalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &QnCommonModule::resetCachedValue);
+    connect(m_globalSettings, &QnGlobalSettings::systemNameChanged, this,
+        &QnCommonModule::resetCachedValue);
+    connect(m_globalSettings, &QnGlobalSettings::localSystemIdChanged, this,
+        &QnCommonModule::resetCachedValue);
+    connect(m_globalSettings, &QnGlobalSettings::cloudSettingsChanged, this,
+        &QnCommonModule::resetCachedValue);
+    connect(m_globalSettings, &QnGlobalSettings::initialized, this,
+        &QnCommonModule::resetCachedValue);
 
     resetCachedValue();
 }
@@ -324,18 +333,17 @@ void QnCommonModule::updateModuleInformationUnsafe()
     m_moduleInformation.id = m_uuid;
     m_moduleInformation.runtimeId = m_runUuid;
 
+    m_moduleInformation.systemName = m_globalSettings->systemName();
+    m_moduleInformation.localSystemId = m_globalSettings->localSystemId();
+    m_moduleInformation.cloudSystemId = m_globalSettings->cloudSystemId();
+
     QnMediaServerResourcePtr server = m_resourcePool->getResourceById<QnMediaServerResource>(moduleGUID());
-    //NX_ASSERT(server);
     if (!server)
         return;
     if (server->getPort())
         m_moduleInformation.port = server->getPort();
     m_moduleInformation.name = server->getName();
     m_moduleInformation.serverFlags = server->getServerFlags();
-
-    m_moduleInformation.systemName = m_globalSettings->systemName();
-    m_moduleInformation.localSystemId = m_globalSettings->localSystemId();
-    m_moduleInformation.cloudSystemId = m_globalSettings->cloudSystemId();
 }
 
 void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)

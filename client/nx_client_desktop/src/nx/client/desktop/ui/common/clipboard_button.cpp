@@ -112,7 +112,7 @@ ClipboardButton* ClipboardButton::createInline(QLineEdit* parent, StandardType t
             const auto onClipboardChanged =
                 [button]() { button->setEnabled(!qApp->clipboard()->text().isEmpty()); };
 
-            connect(qApp->clipboard(), &QClipboard::dataChanged, onClipboardChanged);
+            connect(qApp->clipboard(), &QClipboard::dataChanged, button, onClipboardChanged);
 
             connect(button, &QPushButton::clicked,
                 [parent]() { parent->setText(qApp->clipboard()->text()); });
@@ -123,6 +123,16 @@ ClipboardButton* ClipboardButton::createInline(QLineEdit* parent, StandardType t
     }
 
     return button;
+}
+
+QString ClipboardButton::clipboardText()
+{
+    return qApp->clipboard()->text();
+}
+
+void ClipboardButton::setClipboardText(const QString& value)
+{
+    qApp->clipboard()->setText(value);
 }
 
 } // namespace ui

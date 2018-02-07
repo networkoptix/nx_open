@@ -31,6 +31,6 @@
 	<key>LSUIElement</key>
 	<false/>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 2011-2014 @company.name@</string>
+	<string>@nx_copyright@</string>
 </dict>
 </plist>

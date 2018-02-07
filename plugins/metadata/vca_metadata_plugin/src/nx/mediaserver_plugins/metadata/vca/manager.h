@@ -7,7 +7,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/sdk/metadata/camera_manager.h>
 
 #include "common.h"
 #include "plugin.h"
@@ -17,11 +17,11 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace vca {
 
-class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
+class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 {
 public:
     Manager(Plugin* plugin,
-        const nx::sdk::ResourceInfo& resourceInfo,
+        const nx::sdk::CameraInfo& cameraInfo,
         const Vca::VcaAnalyticsDriverManifest& typedManifest);
 
     virtual ~Manager();
@@ -32,9 +32,9 @@ public:
     void onReceive(SystemError::ErrorCode, size_t);
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nx::sdk::metadata::AbstractMetadataHandler* handler,
-        nxpl::NX_GUID* eventTypeList,
-        int eventTypeListSize) override;
+        nx::sdk::metadata::MetadataHandler* handler,
+        nxpl::NX_GUID* typeList,
+        int typeListSize) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
@@ -50,7 +50,7 @@ private:
     std::vector<QnUuid> m_eventsToCatch;
     QByteArray m_buffer;
     nx::network::TCPSocket* m_tcpSocket = nullptr;
-    nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
+    nx::sdk::metadata::MetadataHandler* m_handler = nullptr;
 };
 
 } // namespace vca

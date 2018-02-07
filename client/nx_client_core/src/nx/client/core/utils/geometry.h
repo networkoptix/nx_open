@@ -309,6 +309,9 @@ public:
     /** Dilates the given size by the given amount. */
     Q_INVOKABLE static QSizeF dilated(const QSizeF& size, const QMarginsF& amount);
 
+    /** Dilates the given size by the given amount. */
+    Q_INVOKABLE static QSizeF dilated(const QSizeF& size, qreal amount);
+
     /** Erodes the given size by the given amount. */
     Q_INVOKABLE static QRectF eroded(const QRectF& rect, const QMarginsF& amount);
 

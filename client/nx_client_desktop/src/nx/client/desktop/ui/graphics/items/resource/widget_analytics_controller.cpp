@@ -5,6 +5,8 @@
 #include <QtCore/QPointer>
 #include <QtCore/QElapsedTimer>
 
+#include <common/common_module.h>
+
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -14,9 +16,9 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
-#include <nx/utils/random.h>
 #include <nx/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/client/desktop/ui/graphics/items/overlays/area_highlight_overlay_widget.h>
+#include <nx/client/desktop/analytics/object_display_settings.h>
 
 #include <utils/math/linear_combination.h>
 
@@ -32,28 +34,13 @@ static constexpr std::chrono::milliseconds kObjectTimeToLive = std::chrono::minu
 static constexpr std::chrono::microseconds kFutureMetadataLength = std::chrono::seconds(2);
 static constexpr int kMaxFutureMetadataPackets = 4;
 
-static const QVector<QColor> kFrameColors{
-    Qt::red,
-    Qt::green,
-    Qt::blue,
-    Qt::cyan,
-    Qt::magenta,
-    Qt::yellow,
-    Qt::darkRed,
-    Qt::darkGreen,
-    Qt::darkBlue,
-    Qt::darkCyan,
-    Qt::darkMagenta,
-    Qt::darkYellow
-};
-
-QString objectDescription(const common::metadata::DetectedObject& object)
+QString objectDescription(const std::vector<common::metadata::Attribute>& attributes)
 {
     QString result;
 
     bool first = true;
 
-    for (const auto& attribute: object.labels)
+    for (const auto& attribute: attributes)
     {
         if (first)
             first = false;
@@ -110,7 +97,7 @@ QRectF interpolatedRectangle(
 
 } // namespace
 
-class WidgetAnalyticsController::Private: public QObject
+class WidgetAnalyticsController::Private: public QObject, public QnCommonModuleAware
 {
 public:
     struct ObjectInfo
@@ -121,11 +108,14 @@ public:
         QnUuid zoomWindowItemUuid;
         QRectF rectangle;
         qint64 metadataTimestamp = -1;
+        QString basicDescription;
         QString description;
 
         QRectF futureRectangle;
         qint64 futureRectangleTimestamp = -1;
     };
+
+    Private(QnCommonModule* commonModule);
 
     void at_areaClicked(const QnUuid& areaId);
 
@@ -148,6 +138,11 @@ public:
     QHash<QnUuid, ObjectInfo> objectInfoById;
     QElapsedTimer timer;
 };
+
+WidgetAnalyticsController::Private::Private(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
+{
+}
 
 void WidgetAnalyticsController::Private::at_areaClicked(const QnUuid& areaId)
 {
@@ -238,12 +233,14 @@ WidgetAnalyticsController::Private::ObjectInfo&
     WidgetAnalyticsController::Private::addOrUpdateObject(
         const common::metadata::DetectedObject& object)
 {
+    const auto settings = commonModule()->findInstance<ObjectDisplaySettings>();
+
     auto& objectInfo = objectInfoById[object.objectId];
-    if (objectInfo.lastUsedTime < 0)
-        objectInfo.color = utils::random::choice(kFrameColors);
+    objectInfo.color = settings->objectColor(object);
 
     objectInfo.rectangle = object.boundingBox;
-    objectInfo.description = objectDescription(object);
+    objectInfo.basicDescription = objectDescription(settings->briefAttributes(object));
+    objectInfo.description = objectDescription(settings->visibleAttributes(object));
     objectInfo.active = true;
 
     return objectInfo;
@@ -278,11 +275,12 @@ void WidgetAnalyticsController::Private::updateObjectAreas(qint64 timestamp)
         AreaHighlightOverlayWidget::AreaInformation areaInfo;
         areaInfo.id = it.key();
         areaInfo.color = objectInfo.color;
-        areaInfo.text = objectInfo.description;
+        areaInfo.text = objectInfo.basicDescription;
+        areaInfo.hoverText = objectInfo.description;
 
         if (ini().displayAnalyticsDelay && objectInfo.metadataTimestamp > 0)
         {
-            areaInfo.text +=
+            areaInfo.hoverText +=
                 lit("\nDelay\t%1").arg((timestamp - objectInfo.metadataTimestamp) / 1000);
         }
 
@@ -314,7 +312,7 @@ void WidgetAnalyticsController::Private::updateObjectAreas(qint64 timestamp)
 
 WidgetAnalyticsController::WidgetAnalyticsController(QnMediaResourceWidget* mediaResourceWidget):
     base_type(mediaResourceWidget),
-    d(new Private())
+    d(new Private(commonModule()))
 {
     NX_ASSERT(mediaResourceWidget);
     d->mediaResourceWidget = mediaResourceWidget;

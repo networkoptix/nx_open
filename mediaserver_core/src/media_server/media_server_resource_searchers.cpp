@@ -19,7 +19,9 @@
 #include <plugins/resource/d-link/dlink_resource_searcher.h>
 #include <plugins/resource/flex_watch/flexwatch_resource_searcher.h>
 #include <plugins/resource/flir/flir_resource_searcher.h>
-#include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
+#if defined(ENABLE_IQINVISION)
+    #include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
+#endif
 #include <plugins/resource/isd/isd_resource_searcher.h>
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
 #include <plugins/resource/stardot/stardot_resource_searcher.h>
@@ -73,7 +75,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
     #ifdef ENABLE_STARDOT
         m_searchers << new QnStardotResourceSearcher(commonModule);
     #endif
-    #ifdef ENABLE_IQE
+    #ifdef ENABLE_IQINVISION
         m_searchers << new QnPlIqResourceSearcher(commonModule);
     #endif
     #ifdef ENABLE_ISD

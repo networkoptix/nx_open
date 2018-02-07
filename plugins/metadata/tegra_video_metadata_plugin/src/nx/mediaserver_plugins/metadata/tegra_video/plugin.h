@@ -1,22 +1,22 @@
 #pragma once
 
-#include <nx/sdk/metadata/simple_plugin.h>
+#include <nx/sdk/metadata/common_plugin.h>
 
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
 namespace tegra_video {
 
-class Plugin: public nx::sdk::metadata::SimplePlugin
+class Plugin: public nx::sdk::metadata::CommonPlugin
 {
 public:
-    Plugin(): SimplePlugin("Tegra Video metadata plugin") {}
+    Plugin();
 
-    virtual nx::sdk::metadata::AbstractMetadataManager* managerForResource(
-        const nx::sdk::ResourceInfo& resourceInfo,
-        nx::sdk::Error* outError) override;
+    virtual nx::sdk::metadata::CameraManager* obtainCameraManager(
+        const nx::sdk::CameraInfo& cameraInfo, nx::sdk::Error* outError) override;
 
-    virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
+protected:
+    virtual std::string capabilitiesManifest() const override;
 };
 
 } // namespace tegra_video

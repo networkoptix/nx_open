@@ -38,18 +38,18 @@ nxpl::NX_GUID fromQnUuidToPluginGuid(const QnUuid& uuid)
 namespace nx {
 namespace sdk {
 
-QString toString(const nx::sdk::ResourceInfo& resourceInfo)
+QString toString(const nx::sdk::CameraInfo& cameraInfo)
 {
     return lm(
         "Vendor: %1, Model: %2, Firmware: %3, UID: %4, Shared ID: %5, URL: %6, Channel: %7")
         .args(
-            resourceInfo.vendor,
-            resourceInfo.model,
-            resourceInfo.firmware,
-            resourceInfo.uid,
-            resourceInfo.sharedId,
-            resourceInfo.url,
-            resourceInfo.channel).toQString();
+            cameraInfo.vendor,
+            cameraInfo.model,
+            cameraInfo.firmware,
+            cameraInfo.uid,
+            cameraInfo.sharedId,
+            cameraInfo.url,
+            cameraInfo.channel).toQString();
 }
 
 } // namespace sdk

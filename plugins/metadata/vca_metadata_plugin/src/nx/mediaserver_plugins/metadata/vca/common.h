@@ -9,14 +9,14 @@ namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
 
-struct Vca//< This struct substitutes namespace because of fusion problems with namespaces.
+struct Vca //< This struct substitutes namespace because of fusion problems with namespaces.
 {
     /**
      * Description of the vca analytics event.
      */
-    struct VcaAnalyticsEventType: nx::api::AnalyticsEventType
+    struct VcaAnalyticsEventType: nx::api::Analytics::EventType
     {
-        // VCA event type name (this name is sent by vca tcp notification server)
+        // VCA-camera event type name (this name is sent by VCA-camera tcp notification server).
         QString internalName;
     };
     #define VcaAnalyticsEventType_Fields AnalyticsEventType_Fields(internalName)

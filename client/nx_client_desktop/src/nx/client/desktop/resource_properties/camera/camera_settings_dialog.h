@@ -21,11 +21,11 @@ namespace client {
 namespace desktop {
 
 class CameraSettingsModel;
+class CameraScheduleWidget;
 
 class CameraSettingsDialog: public QnSessionAwareTabbedDialog
 {
     Q_OBJECT
-
     typedef QnSessionAwareTabbedDialog base_type;
 
 public:
@@ -36,11 +36,16 @@ public:
 
 protected:
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
+    virtual void retranslateUi() override;
+
+private:
+    void updateWindowTitle();
 
 private:
     Q_DISABLE_COPY(CameraSettingsDialog)
     QScopedPointer<Ui::CameraSettingsDialog> ui;
     QScopedPointer<CameraSettingsModel> m_model;
+    CameraScheduleWidget* m_cameraScheduleWidget = nullptr;
 };
 
 } // namespace desktop

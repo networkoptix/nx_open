@@ -114,7 +114,7 @@
 
             "2WayAudio":
             {
-                "codec": "ALAW",
+                "codec": "MULAW",
                 "bitrateKbps": 64,
                 "sampleRate": 8,
                 "urlPath": "/audio-out/g711_64.cgi",
@@ -2256,6 +2256,10 @@
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=2;height=2;sensors=0,1,2,3"
-        }      
+        },
+        {
+            "keys": ["*|CMD-C244"],
+            "onvifManufacturerReplacement": "Hikvision"
+        }
     ]
 }

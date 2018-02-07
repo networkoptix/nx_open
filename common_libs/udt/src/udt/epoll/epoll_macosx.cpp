@@ -115,9 +115,9 @@ int EpollMacosx::poll(
             continue;
         }
 
-        // EV_EOF is OK in case of reading socket. Because it signals EOF is present somewhere in the read buffer.
-        // There may still be some data to read.
-        // At the same time, while writing this signals connection reset.
+        // EV_EOF means:
+        // When reading: EOF is already in the buffer, but there still may be some data to read.
+        // When writing: Connection is closed.
 
         const bool failure = (ev[i].flags & EV_ERROR) > 0;
         const bool eof = (ev[i].flags & EV_EOF) > 0;

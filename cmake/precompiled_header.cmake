@@ -124,6 +124,10 @@ function(_add_gcc_clang_precompiled_header target input)
         set(pch_flags "-include \"${CMAKE_CURRENT_BINARY_DIR}/${target}\" -Winvalid-pch")
     endif()
 
+    # This is not necessary, but it helps Clang based static analyzers (like on in Qt Creator)
+    # parse sources correctly.
+    string(APPEND pch_flags " -include ${input}")
+
     get_target_property(sources ${target} SOURCES)
     foreach(source ${sources})
         if(NOT source MATCHES "\\.\(cpp|cxx|cc\)$")

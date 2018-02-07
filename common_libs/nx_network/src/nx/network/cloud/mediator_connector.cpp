@@ -105,7 +105,6 @@ void MediatorConnector::mockupMediatorUrl(const nx::utils::Url& mediatorUrl)
     m_mediatorUdpEndpoint = nx::network::url::getEndpoint(mediatorUrl);
     m_promise->set_value(true);
     connectToMediatorAsync();
-
     if (m_mediatorAvailabilityChangedHandler)
         m_mediatorAvailabilityChangedHandler(true);
 }

@@ -19,6 +19,7 @@
 #include "camera_settings_tab.h"
 #include "camera_settings_model.h"
 #include "camera_settings_general_tab_widget.h"
+#include "camera_schedule_widget.h"
 
 namespace nx {
 namespace client {
@@ -34,6 +35,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget *parent) :
     addPage(int(CameraSettingsTab::general),
         new CameraSettingsGeneralTabWidget(m_model.data(), this),
         tr("General"));
+
+    m_cameraScheduleWidget = new CameraScheduleWidget(ui->tabWidget, false);
+    addPage(int(CameraSettingsTab::recording),
+        m_cameraScheduleWidget,
+        tr("Recording"));
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this,
@@ -94,6 +100,8 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
         return false;
 
     m_model->setCameras(cameras);
+    m_cameraScheduleWidget->setCameras(cameras);
+
     loadDataToUi();
     return true;
 }
@@ -119,6 +127,32 @@ QDialogButtonBox::StandardButton CameraSettingsDialog::showConfirmationDialog()
 
     messageBox.addCustomWidget(new QnResourceListView(oldCameras, &messageBox));
     return QDialogButtonBox::StandardButton(messageBox.exec());
+}
+
+void CameraSettingsDialog::retranslateUi()
+{
+    base_type::retranslateUi();
+    updateWindowTitle();
+}
+
+void CameraSettingsDialog::updateWindowTitle()
+{
+    static const QString kWindowTitlePattern = lit("%1 - %2");
+
+    const auto cameras = m_model->cameras();
+    const QString caption = QnDeviceDependentStrings::getNameFromSet(
+        resourcePool(),
+        QnCameraDeviceStringSet(
+            tr("Device Settings"), tr("Devices Settings"),
+            tr("Camera Settings"), tr("Cameras Settings"),
+            tr("I/O Module Settings"), tr("I/O Modules Settings")
+        ), cameras);
+
+    const QString description = cameras.size() == 1
+        ? cameras.first()->getName()
+        : QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
+
+    setWindowTitle(kWindowTitlePattern.arg(caption).arg(description));
 }
 
 /*

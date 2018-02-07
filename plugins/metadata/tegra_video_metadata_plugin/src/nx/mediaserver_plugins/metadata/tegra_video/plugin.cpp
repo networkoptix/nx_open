@@ -1,8 +1,10 @@
 #include "plugin.h"
 
+#include <nx/kit/debug.h>
 #include <plugins/plugin_tools.h>
 
-#include "manager.h"
+#include "tegra_video_metadata_plugin_ini.h"
+#include "camera_manager.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -12,13 +14,18 @@ namespace tegra_video {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-AbstractMetadataManager* Plugin::managerForResource(
-    const ResourceInfo& /*resourceInfo*/, Error* /*outError*/)
+Plugin::Plugin(): CommonPlugin("Tegra Video metadata plugin")
 {
-    return new Manager(this);
+    setEnableOutput(NX_DEBUG_ENABLE_OUTPUT); //< Base class is verbose when this descendant is.
 }
 
-const char* Plugin::capabilitiesManifest(Error* /*error*/) const
+nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
+    const CameraInfo& /*cameraInfo*/, Error* /*outError*/)
+{
+    return new CameraManager(this);
+}
+
+std::string Plugin::capabilitiesManifest() const
 {
     return R"json(
         {

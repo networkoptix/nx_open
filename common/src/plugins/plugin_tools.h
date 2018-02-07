@@ -1,5 +1,4 @@
-#ifndef PLUGIN_TOOLS_H
-#define PLUGIN_TOOLS_H
+#pragma once
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -399,7 +398,7 @@ struct hash<nxpl::NX_GUID>
     {
         std::size_t h;
 
-        for (auto i = 0; i < sizeof(guid.bytes); ++i)
+        for (size_t i = 0; i < sizeof(guid.bytes); ++i)
             h = (h + (324723947 + guid.bytes[i])) ^ 93485734985;
 
         return h;
@@ -407,5 +406,3 @@ struct hash<nxpl::NX_GUID>
 };
 
 } // namespace std
-
-#endif  //PLUGIN_TOOLS_H

@@ -12,7 +12,7 @@
 #include <boost/optional/optional.hpp>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <nx/sdk/metadata/plugin.h>
 #include <nx/utils/elapsed_timer.h>
 #include <chrono>
 
@@ -22,7 +22,7 @@ namespace plugins {
 namespace hikvision {
 
 class MetadataPlugin:
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
+    public nxpt::CommonRefCounter<nx::sdk::metadata::Plugin>
 {
 public:
     MetadataPlugin();
@@ -37,12 +37,8 @@ public:
 
     virtual void setLocale(const char* locale) override;
 
-    virtual nx::sdk::metadata::AbstractMetadataManager* managerForResource(
-        const nx::sdk::ResourceInfo& resourceInfo,
-        nx::sdk::Error* outError) override;
-
-    virtual nx::sdk::metadata::AbstractSerializer* serializerForType(
-        const nxpl::NX_GUID& typeGuid,
+    virtual nx::sdk::metadata::CameraManager* obtainCameraManager(
+        const nx::sdk::CameraInfo& cameraInfo,
         nx::sdk::Error* outError) override;
 
     virtual const char* capabilitiesManifest(
@@ -50,9 +46,11 @@ public:
 
     const Hikvision::DriverManifest& driverManifest() const;
 
+    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
+
 private:
     boost::optional<QList<QnUuid>> fetchSupportedEvents(
-        const nx::sdk::ResourceInfo& resourceInfo);
+        const nx::sdk::CameraInfo& cameraInfo);
     QList<QnUuid> parseSupportedEvents(const QByteArray& data);
 private:
     mutable QnMutex m_mutex;
