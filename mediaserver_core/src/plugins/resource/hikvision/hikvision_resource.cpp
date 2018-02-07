@@ -44,7 +44,7 @@ HikvisionResource::~HikvisionResource()
 
 CameraDiagnostics::Result HikvisionResource::initInternal()
 {
-    tryToEnableOnvifSupport(getDeviceOnvifUrl(), getAuth());
+    tryToEnableIntegrationProtocols(getDeviceOnvifUrl(), getAuth());
 
     auto result = QnPlOnvifResource::initInternal();
     if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
@@ -246,10 +246,10 @@ bool HikvisionResource::findDefaultPtzProfileToken()
 }
 
 static const auto kIntegratePath = lit("ISAPI/System/Network/Integrate");
-static const auto kEnableOnvifXml = QString::fromUtf8(R"xml(
+static const auto kEnableProtocolsXmlTemplate = QString::fromUtf8(R"xml(
 <?xml version:"1.0" encoding="UTF-8"?>
 <Integrate>
-    <ONVIF><enable>true</enable><certificateType/></ONVIF>
+    %1
 </Integrate>
 )xml").trimmed();
 
@@ -264,34 +264,82 @@ static const auto kSetOnvifUserXml = QString::fromUtf8(R"xml(
 </User>
 )xml").trimmed();
 
+struct HikvisionProtocolSwitch
+{
+    QString protocolName;
+    bool supported = false;
+    bool enabled = false;
+};
+
+static const std::map<QString, QString> kHikvisionIntegrationProtocols = {
+    {lit("ONVIF"), lit("<ONVIF><enable>true</enable><certificateType/></ONVIF>")},
+    {lit("ISAPI"), lit("<ISAPI><enable>true</enable></ISAPI>")},
+    {lit("CGI"), lit("<CGI><enable>true</enable><certificateType/></CGI>")}
+};
+
 class HikvisionRequestHelper: protected XmlRequestHelper
 {
 public:
     using XmlRequestHelper::XmlRequestHelper;
 
-    boost::optional<bool> isOnvifSupported()
+    std::vector<HikvisionProtocolSwitch> fetchIntegrationProtocolInfo()
     {
+        std::vector<HikvisionProtocolSwitch> integrationProtocolStates;
         const auto document = get(kIntegratePath);
         if (!document)
-            return boost::none;
+            return integrationProtocolStates;
 
-        const auto value = document->documentElement()
-            .firstChildElement(lit("ONVIF")).firstChildElement(lit("enable")).text();
+        for (const auto& entry: kHikvisionIntegrationProtocols)
+        {
+            const auto& protocolName = entry.first;
+            const auto protocolElement = document->documentElement()
+                .firstChildElement(protocolName);
 
-        if (value == lit("true"))
-            return true;
+            HikvisionProtocolSwitch protocolSwitch;
+            protocolSwitch.protocolName = protocolName;
 
-        if (value == lit("false"))
-            return false;
+            if (!protocolElement.isNull())
+            {
+                const auto value = protocolElement.firstChildElement(lit("enable")).text();
+                protocolSwitch.supported = true;
+                protocolSwitch.enabled = value == lit("true");
+            }
 
-        NX_WARNING(this, lm("Unexpected ONVIF.enable value '%1' on %2").args(value, m_client->url()));
-        return boost::none;
+            integrationProtocolStates.push_back(protocolSwitch);
+        }
+
+        return integrationProtocolStates;
     }
 
-    bool enableOnvif()
+    bool enableIntegrationProtocols(
+        const std::vector<HikvisionProtocolSwitch>& integrationProtocolStates)
     {
-        const auto result = put(kIntegratePath, kEnableOnvifXml);
-        NX_DEBUG(this, lm("Enable ONVIF result=%1 on %2").args(result, m_client->url()));
+        QString enableProtocolsXmlString;
+        for (const auto& protocolState: integrationProtocolStates)
+        {
+            if (!protocolState.supported || protocolState.enabled)
+                continue;
+
+            const auto itr = kHikvisionIntegrationProtocols.find(protocolState.protocolName);
+            NX_ASSERT(itr != kHikvisionIntegrationProtocols.cend());
+            if (itr == kHikvisionIntegrationProtocols.cend())
+                continue;
+
+            enableProtocolsXmlString.append(itr->second);
+        }
+
+        if (enableProtocolsXmlString.isEmpty())
+            return true;
+
+        const auto result = put(
+            kIntegratePath,
+            kEnableProtocolsXmlTemplate.arg(enableProtocolsXmlString));
+
+        NX_DEBUG(
+            this,
+            lm("Enable integration protocols result=%1 on %2")
+                .args(result, m_client->url()));
+
         return result;
     }
 
@@ -334,16 +382,16 @@ public:
     }
 };
 
-bool HikvisionResource::tryToEnableOnvifSupport(const QUrl& url, const QAuthenticator& authenticator)
+bool HikvisionResource::tryToEnableIntegrationProtocols(
+    const QUrl& url,
+    const QAuthenticator& authenticator)
 {
     HikvisionRequestHelper requestHelper(url, authenticator);
-    const auto isOnvifSupported = requestHelper.isOnvifSupported();
-    if (!isOnvifSupported)
-        return false;
+    const auto supportedProtocolSwitches = requestHelper.fetchIntegrationProtocolInfo();
 
-    if (*isOnvifSupported == false)
+    if (!supportedProtocolSwitches.empty())
     {
-        if (!requestHelper.enableOnvif())
+        if (!requestHelper.enableIntegrationProtocols(supportedProtocolSwitches))
             return false;
     }
 

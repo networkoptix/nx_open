@@ -25,7 +25,7 @@ public:
     channelCapabilities(Qn::ConnectionRole role);
     bool findDefaultPtzProfileToken();
 
-    static bool tryToEnableOnvifSupport(const QUrl& url, const QAuthenticator& authenticator);
+    static bool tryToEnableIntegrationProtocols(const QUrl& url, const QAuthenticator& authenticator);
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
