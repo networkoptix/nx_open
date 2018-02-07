@@ -560,7 +560,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 
     if (md->flags & AV_PKT_FLAG_KEY)
         m_gotKeyFrame[channel] = true;
-    if ((md->flags & AV_PKT_FLAG_KEY) || !mediaDev->hasVideo(m_mediaProvider))
+    if (((md->flags & AV_PKT_FLAG_KEY) && md->dataType == QnAbstractMediaData::VIDEO) || !mediaDev->hasVideo(m_mediaProvider))
     {
         if (m_truncateInterval > 0
             && md->timestamp - m_startDateTime > (m_truncateInterval + m_truncateIntervalEps))
