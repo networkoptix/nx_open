@@ -25,7 +25,6 @@ Share button - opens dialog
     Wait Until Elements Are Visible    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE MODAL}
-    Element Should Be Visible    ${SHARE MODAL}
     Close Browser
 
 Sharing link /systems/{system_id}/share - opens dialog
@@ -34,7 +33,6 @@ Sharing link /systems/{system_id}/share - opens dialog
     ${location}    Get Location
     Go To    ${location}/share
     Wait Until Element Is Visible    ${SHARE MODAL}
-    Element Should Be Visible    ${SHARE MODAL}
     Close Browser
 
 Sharing link for anonymous - first ask login, then show share dialog
@@ -45,7 +43,6 @@ Sharing link for anonymous - first ask login, then show share dialog
     Go To    ${location}/share
     Log In    ${email}    ${password}    button=None
     Wait Until Element Is Visible    ${SHARE MODAL}
-    Element Should Be Visible    ${SHARE MODAL}
     Close Browser
 
 After closing dialog, called by link - clear link
@@ -56,7 +53,6 @@ After closing dialog, called by link - clear link
 #Check Cancel Button
     Go To    ${location}/share
     Wait Until Elements Are Visible    ${SHARE MODAL}    ${SHARE CANCEL}
-    Element Should Be Visible    ${SHARE MODAL}
     Click Button    ${SHARE CANCEL}
     Wait Until Element Is Not Visible    ${SHARE MODAL}
     Location Should Be    ${location}
@@ -64,7 +60,6 @@ After closing dialog, called by link - clear link
 #Check 'X' Button
     Go To    ${location}/share
     Wait Until Elements Are Visible    ${SHARE MODAL}    ${SHARE CLOSE}
-    Element Should Be Visible    ${SHARE MODAL}
     Wait Until Element Is Visible    ${SHARE CLOSE}
     Click Button    ${SHARE CLOSE}
     Wait Until Element Is Not Visible    ${SHARE MODAL}
@@ -73,7 +68,6 @@ After closing dialog, called by link - clear link
 #Check Background Click
     Go To    ${location}/share
     Wait Until Elements Are Visible    ${SHARE MODAL}    //div[@uib-modal-window="modal-window"]
-    Element Should Be Visible    ${SHARE MODAL}
     Click Element    //div[@uib-modal-window="modal-window"]
     Wait Until Element Is Not Visible    ${SHARE MODAL}
     Location Should Be    ${location}

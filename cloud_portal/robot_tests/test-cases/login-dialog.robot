@@ -15,7 +15,6 @@ can be opened in anonymous state
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${LOG IN MODAL}
-    Element Should be Visible    ${LOG IN MODAL}
     Close Browser
 
 can be closed after clicking on background
@@ -23,7 +22,6 @@ can be closed after clicking on background
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${LOG IN MODAL}    //div[@uib-modal-backdrop='modal-backdrop']/..
-    Element Should be Visible    //div[@uib-modal-backdrop='modal-backdrop']/..
     Click Element    //div[@uib-modal-backdrop='modal-backdrop']/..
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
     Page Should Not Contain Element    ${LOG IN MODAL}
@@ -38,7 +36,6 @@ allows to log in with existing credentials and to log out
     Wait Until Element Is Visible    ${LOG OUT BUTTON}
     Click Link    ${LOG OUT BUTTON}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
-    Element Should Be Visible    ${LOG IN NAV BAR}
     Close Browser
 
 redirects to systems after log In
@@ -70,7 +67,6 @@ valid but unregistered email shows error message
     Open Browser and go to URL    ${url}
     Log In    ${UNREGISTERED EMAIL}    ${password}
     Wait Until Element Is Visible    ${ALERT}
-    Element Should Be Visible    ${ALERT}
     Close Browser
 
 allows log in with existing email in uppercase
@@ -84,7 +80,6 @@ rejects log in with wrong password
     Open Browser and go to URL    ${url}
     Log In    ${email}    'arthahrtrthjsrtjy'
     wait until element is visible    ${ALERT}
-    Element Should Be Visible    ${ALERT}
     Close Browser
 
 rejects log in without password

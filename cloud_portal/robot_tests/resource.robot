@@ -37,7 +37,6 @@ Log Out
 
 Validate Log Out
     Wait Until Element Is Visible    ${ANONYMOUS BODY}
-    Element Should Be Visible    ${ANONYMOUS BODY}
 
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}

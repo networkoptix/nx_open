@@ -107,9 +107,7 @@ ${EDIT PERMISSIONS HINT}              //form[@name='shareForm']//span[contains(@
 
 #Account Page
 ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-model='account.first_name']
-${JQ ACCOUNT FIRST NAME}              $("form[name='accountForm'] input[ng-model='account.first_name']").val()
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
-${JQ ACCOUNT LAST NAME}               $("form[name='accountForm'] input[ng-model='account.last_name']").val()
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
 
 #Already logged in modal
