@@ -1,0 +1,46 @@
+<form name="settingsForm" class="widest form-horizontal" >
+    <div class="form-group">
+        <div class="col-xs-offset-4 col-xs-8">
+            <div class="checkbox text-left">
+                <label>
+                    <input type="checkbox" ng-model="settings.dhcp"> Use DHCP
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-4" for="ip">IP</label>
+        <div class="col-xs-8">
+            <input type="text" name="ip" id="ip" ng-model="settings.ipAddr"
+                   class="form-control"
+                   ng-required="!settings.dhcp"
+                   placeholder='xxx.xxx.xxx.xxx' ng-disabled="settings.dhcp">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-4" for="mask">Subnet mask</label>
+        <div class="col-xs-8">
+            <input type="text" name="mask" id="mask" ng-model="settings.netMask"
+                   class="form-control"
+                   ng-required="!settings.dhcp"
+                   ip-address placeholder='xxx.xxx.xxx.xxx' ng-disabled="settings.dhcp">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-4" for="gateway">Default gateway</label>
+        <div class="col-xs-8">
+            <input type="text" name="gateway" id="gateway" ng-model="settings.gateway"
+                   class="form-control"
+                   ng-required="!settings.dhcp"
+                   ip-address placeholder='xxx.xxx.xxx.xxx' ng-disabled="settings.dhcp">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-4" for="dns">DNS server</label>
+        <div class="col-xs-8">
+            <input type="text" name="dns" id="dns" ng-model="settings.dns_servers"
+                   class="form-control"
+                   ip-address placeholder='xxx.xxx.xxx.xxx' >
+        </div>
+    </div>
+</form>
