@@ -106,13 +106,13 @@ dir=../customizations/$CUSTOMIZATION/
         cp -rf $lang_dir/views/* $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/views/ || true
 
 
-        mkdir -p $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/views/
+        mkdir -p $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/
 
         echo "Copy web_common default views - with default language"
-        cp -rf $TARGET_DIR/$CUSTOMIZATION/source/static/web_common/views/* $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/views/
+        cp -rf $TARGET_DIR/$CUSTOMIZATION/source/static/web_common/* $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/
 
         echo "Overwrite them with localized sources"
-        cp -rf $lang_dir/web_common/views/* $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/views/ || true
+        cp -rf $lang_dir/web_common/* $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/ || true
 
     done
     rm -rf $TARGET_DIR/$CUSTOMIZATION/source/static/views
