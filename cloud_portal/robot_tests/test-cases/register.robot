@@ -12,7 +12,6 @@ Validate Register Success
     [arguments]    ${location}
     Wait Until Element Is Visible    ${ACCOUNT CREATION SUCCESS}
     Location Should Be    ${location}
-    Close Browser
 
 Check Bad Email Input
     [arguments]    ${email}
