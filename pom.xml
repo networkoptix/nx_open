@@ -863,8 +863,8 @@
                 <module>testcamera</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
-                -->
                 <module>root_tool</module>
+                -->
                 <!-- <module>storage_plugins/teststorageplugin/test</module> -->
             </modules>
             <properties>
