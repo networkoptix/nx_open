@@ -429,11 +429,67 @@ nx::mediaserver::resource::StreamCapabilityMap QnPlAxisResource::getStreamCapabi
     QnMutexLocker lock(&m_mutex);
     StreamCapabilityKey key;
     StreamCapabilityMap result;
-    for (const auto& resolution: m_resolutionList)
+    for (const auto& codec: m_supportedCodecs)
     {
-        key.codec = QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H264);
-        key.resolution = resolution.size;
-        result.insert(key, nx::media::CameraStreamCapability());
+        for (const auto& resolution: m_resolutionList)
+        {
+            key.codec = QnAvCodecHelper::codecIdToString(codec);
+            key.resolution = resolution.size;
+            result.insert(key, nx::media::CameraStreamCapability());
+        }
+    }
+    return result;
+}
+
+CameraDiagnostics::Result QnPlAxisResource::getParameterValue(
+    const QString& path,
+    QByteArray* outResult)
+{
+    CLSimpleHTTPClient httpClient(getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
+
+    QList<QPair<QByteArray, QByteArray>> result;
+    auto status = readAxisParameters(path, &httpClient, result);
+    if (status != CL_HTTP_SUCCESS)
+        return CameraDiagnostics::RequestFailedResult(path, QString());
+    if (result.isEmpty())
+        return CameraDiagnostics::RequestFailedResult(path, QString("There is no such parameter on camera"));
+
+    *outResult = result.first().second;
+    return CameraDiagnostics::NoErrorResult();
+}
+
+void QnPlAxisResource::setSupportedCodecs(const QSet<AVCodecID>& value)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_supportedCodecs = value;
+}
+
+QString QnPlAxisResource::toAxisCodecString(AVCodecID codecId)
+{
+    switch (codecId)
+    {
+    case AV_CODEC_ID_MJPEG:
+        return "jpeg";
+    case AV_CODEC_ID_HEVC:
+        return "h265";
+    case AV_CODEC_ID_H264:
+    default:
+        return "h264";
+    }
+}
+
+QSet<AVCodecID> QnPlAxisResource::filterSupportedCodecs(const QList<QByteArray>& values) const
+{
+    QSet<AVCodecID> result;
+    for (auto value: values)
+    {
+        value = value.toLower().trimmed();
+        if (value == "jpeg" || value == "mjpeg")
+            result.insert(AV_CODEC_ID_MJPEG);
+        else if (value == "h264")
+            result.insert(AV_CODEC_ID_H264);
+        else if (value == "h265" || value == "hevc")
+            result.insert(AV_CODEC_ID_HEVC);
     }
     return result;
 }
@@ -469,51 +525,35 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
 
     {
         //reading RTSP port
-        CLSimpleHTTPClient http( getHostAddress(), QUrl( getUrl() ).port( DEFAULT_AXIS_API_PORT ), getNetworkTimeout(), auth );
-        CLHttpStatus status = http.doGET( QByteArray( "axis-cgi/param.cgi?action=list&group=Network.RTSP.Port" ) );
-        if( status != CL_HTTP_SUCCESS )
-        {
-            if( status == CL_HTTP_AUTH_REQUIRED )
-                setStatus( Qn::Unauthorized );
-            return CameraDiagnostics::UnknownErrorResult();
-        }
         QByteArray paramStr;
-        http.readAll( paramStr );
+        auto result = getParameterValue("Network.RTSP.Port", &paramStr);
         bool ok = false;
-        const int rtspPort = paramStr.trimmed().mid( paramStr.indexOf( '=' ) + 1 ).toInt( &ok );
+        const int rtspPort = paramStr.toInt( &ok );
         if( ok )
             setMediaPort( rtspPort );
     }
 
     readMotionInfo();
 
-    // Determine camera max resolution.
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), auth);
-    CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution"));
-    if (status != CL_HTTP_SUCCESS) {
-        if (status == CL_HTTP_AUTH_REQUIRED)
-            setStatus(Qn::Unauthorized);
-        return CameraDiagnostics::UnknownErrorResult();
-    }
-
-    QByteArray body;
-    http.readAll(body);
     if (hasVideo(0))
     {
-        QnMutexLocker lock( &m_mutex );
+        QByteArray codecList;
+        auto result = getParameterValue("Properties.Image.Format", &codecList);
+        if (result.errorCode != CameraDiagnostics::ErrorCode::Value::noError)
+            return result;
+        setSupportedCodecs(filterSupportedCodecs(codecList.split(',')));
 
+        QByteArray rawResolutionList;
+        result = getParameterValue("Properties.Image.Resolution", &rawResolutionList);
+        if (result.errorCode != CameraDiagnostics::ErrorCode::Value::noError)
+            return result;
+
+        QnMutexLocker lock(&m_mutex);
         m_resolutionList.clear();
-        int paramValuePos = body.indexOf('=');
-        if (paramValuePos == -1)
-        {
-            qWarning() << Q_FUNC_INFO << "Unexpected server answer. Can't read resolution list";
-            return CameraDiagnostics::UnknownErrorResult();
-        }
 
-        QList<QByteArray> rawResolutionList = body.mid(paramValuePos+1).split(',');
-        for (int i = 0; i < rawResolutionList.size(); ++i)
+        for(QByteArray resolutionStr: rawResolutionList.split(','))
         {
-            QByteArray resolutionStr = rawResolutionList[i].toLower().trimmed();
+            resolutionStr = resolutionStr.toLower().trimmed();
 
             if (resolutionStr == "qcif")
             {
@@ -564,11 +604,12 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
     //root.Properties.Motion.MaxNbrOfWindows=10
 
-    if (!initializeIOPorts( &http ))
+    CLSimpleHTTPClient httpClient(getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
+    if (!initializeIOPorts( &httpClient))
         return CameraDiagnostics::CameraInvalidParams(tr("Can't initialize IO port settings"));
 
 
-    if(!initializeAudio(&http))
+    if(!initializeAudio(&httpClient))
         return CameraDiagnostics::UnknownErrorResult();
 
     enableDuplexMode();
@@ -847,13 +888,15 @@ CLHttpStatus QnPlAxisResource::readAxisParameters(
         {
             const auto& paramItems = line.split('=');
             if( paramItems.size() == 2)
-                params << QPair<QByteArray, QByteArray>(paramItems[0], paramItems[1]);
+                params << QPair<QByteArray, QByteArray>(paramItems[0].trimmed(), paramItems[1].trimmed());
         }
     }
     else
     {
         NX_LOG( lit("Failed to read params from path %1 of camera %2. Result: %3").
             arg(rootPath).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+        if (status == CL_HTTP_AUTH_REQUIRED)
+            setStatus(Qn::Unauthorized);
     }
     return status;
 }
