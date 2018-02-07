@@ -125,7 +125,7 @@
                     <option value="ALWAYS">Altijd: Meld fouten, waarschuwingen en de meest belangrijke berichten.</option>
                     <option value="ERROR">Fout: Alleen logboek fouten.</option>
                     <option value="WARNING">Waarschuwing: Meld waarschuwingen en fouten.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
+                    <option value="INFO">Info: Log fouten, waarschuwingen en alle berichten.</option>
                     <option value="DEBUG">Foutopsporing: Log elk systeembericht en foutopsporing.</option>
                     <option value="DEBUG2">Foutopsporing 2: Log elk systeembericht en foutopsporing.</option>
                 </select>
@@ -139,7 +139,7 @@
                     <option value="ALWAYS">Altijd: Meld fouten, waarschuwingen en de meest belangrijke berichten.</option>
                     <option value="ERROR">Fout: Alleen logboek fouten.</option>
                     <option value="WARNING">Waarschuwing: Meld waarschuwingen en fouten.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
+                    <option value="INFO">Info: Log fouten, waarschuwingen en alle berichten.</option>
                     <option value="DEBUG">Foutopsporing: Log elk systeembericht en foutopsporing.</option>
                     <option value="DEBUG2">Foutopsporing 2: Log elk systeembericht en foutopsporing.</option>
                 </select>
@@ -169,7 +169,7 @@
 
     <form class="form row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{Config.settingsConfig[setting].label}}</label>
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting]}}</label>
             <div class="col-sm-6">
                 <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
                        style="height: 22px"

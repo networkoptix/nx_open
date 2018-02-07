@@ -12,7 +12,7 @@
                 </tab>
                 <tab heading="{{L.info.tabs.storage}}" ng-if="user.isAdmin">
                     <br>
-                    <p>Below is a list of storage locations available on this server</p>
+                    <p>ด้านล่างนี้คือรายการที่เก็บข้อมูลที่พร้อมใช้งานบนเซิร์ฟเวอร์นี้</p>
                     <table class="table">
                         <thead>
                         <tr>
@@ -43,8 +43,7 @@
                 <tab heading="{{L.info.tabs.log}}" ng-if="user.isAdmin">
                     <br>
                     <iframe class="log-frame" name="log-frame" ng-src="{{logUrl + '?lines=1000'}}"></iframe>
-                    <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary">Refresh</a>
-                    <a ng-if="!mode.liteClient" ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default">Open in new window</a>
+                    <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary"> รีเฟรช </a> <a ng-if="!mode.liteClient" ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default"> เปิดในหน้าต่างใหม่ </a>
                 </tab>
             </tabset>
         </div>

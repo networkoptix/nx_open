@@ -117,7 +117,7 @@
     "cloudInvalidResponse": "クラウド DB が予期しない応答を返しました",
     "notAuthorized": "間違ったパスワード",
     "wrongParameters": "フォーム上のいくつかのパラメーターが正しくありません",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
+    "brokenAccount": "次のアカウントで予期しない問題 <a href=\"/restore_password\"> アカウントの復元</a>",
     "wrongCode": "アカウントは既にアクティブ済か確認コードが正しくありません",
     "wrongCodeRestore": "確認コードは既に使用されているかまたは不正です",
     "forbidden": "この操作を実行するアクセス権限がありません",

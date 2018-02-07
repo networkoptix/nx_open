@@ -125,7 +125,7 @@
                     <option value="ALWAYS">Всегда: Записывать ошибки, предупреждения и самые важные сообщения.</option>
                     <option value="ERROR">Ошибки: Записывать ошибки.</option>
                     <option value="WARNING">Предупреждение: Записывать ошибки и предупреждения.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
+                    <option value="INFO">Инфо: Записывать ошибки, предупреждения и все сообщения.</option>
                     <option value="DEBUG">Отладка: Записывать все системные сообщения и отладочную информацию.</option>
                     <option value="DEBUG2">Отладка2: Записывать все системные сообщения и расширенную отладочную информацию.</option>
                 </select>
@@ -139,7 +139,7 @@
                     <option value="ALWAYS">Всегда: Записывать ошибки, предупреждения и самые важные сообщения.</option>
                     <option value="ERROR">Ошибки: Записывать ошибки.</option>
                     <option value="WARNING">Предупреждение: Записывать ошибки и предупреждения.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
+                    <option value="INFO">Инфо: Записывать ошибки, предупреждения и все сообщения.</option>
                     <option value="DEBUG">Отладка: Записывать все системные сообщения и отладочную информацию.</option>
                     <option value="DEBUG2">Отладка2: Записывать все системные сообщения и расширенную отладочную информацию.</option>
                 </select>
@@ -169,7 +169,7 @@
 
     <form class="form row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{Config.settingsConfig[setting].label}}</label>
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting]}}</label>
             <div class="col-sm-6">
                 <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
                        style="height: 22px"
@@ -208,7 +208,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Внимание!</b> Некоторые изменения требуют перезапуска всех серверов в системе <b>всех</b> серверов в системе.<br><br>
+        <b>Предупреждение!</b> Некоторые изменения требуют перезапуска всех серверов в системе <b>всех</b> серверов в системе.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Перезапуск текущего сервера</button>
         </div>

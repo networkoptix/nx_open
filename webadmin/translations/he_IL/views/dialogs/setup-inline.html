@@ -77,12 +77,12 @@
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
                 <label>
                     <input type="checkbox" id="{{setting}}"
-                           ng-model="systemSettings[setting]"> <span>{{Config.settingsConfig[setting].label}}</span>
+                           ng-model="systemSettings[setting]"> <span>{{L.settingsConfig[setting]}}</span>
                 </label>
             </div>
 
             <label ng-if="Config.settingsConfig[setting].type != 'checkbox' "
-                   for="{{setting}}" >{{Config.settingsConfig[setting].label}}</label>
+                   for="{{setting}}" >{{L.settingsConfig[setting]}}</label>
             <input ng-if="Config.settingsConfig[setting].type == 'number' " type="number"
                    id="{{setting}}"
                    placeholder="{{}}"
@@ -223,7 +223,7 @@
                      forms.localForm.localPasswordConfirmation.$touched &&
                      settings.localPasswordConfirmation != settings.localPassword}">
             <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
-                   type="password" autocomplete="new-password" placeholder="הקלד סיסמא בשנית" required>
+                   type="password" autocomplete="new-password" placeholder="הקלד סיסמה בשנית" required>
         </div>
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
@@ -296,7 +296,7 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="כניסה" required>
+                   placeholder="שם משתמש" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
@@ -462,7 +462,7 @@
             <div class="col-xs-6 text-right">שרת</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
             <div class="col-xs-6 text-right">פורט</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
             <div class="col-xs-6 text-right">כניסה</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
-            <div class="col-xs-6 text-right">סיסמא</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
+            <div class="col-xs-6 text-right">סיסמה</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>
 </div>
@@ -471,19 +471,16 @@
     <button class="btn btn-default"
             ng-if="activeStep.cancel"
             ng-disabled="lockNextButton"
-            ng-click="cancel()">בטל</button>
-    <button class="btn btn-default"
+            ng-click="cancel()">בטל</button>     <button class="btn btn-default"
             ng-if="activeStep.back"
             ng-disabled="lockNextButton"
-            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
-    <button class="btn btn-primary pull-right"
+            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button> <button class="btn btn-primary pull-right"
             ng-if="activeStep.next"
             ng-disabled="lockNextButton"
             auto-focus
- ng-click="next()">הבא<span class="glyphicon glyphicon-arrow-right"></span></button>
-    <button class="btn btn-primary pull-right"
+ ng-click="next()">הבא <span class="glyphicon glyphicon-arrow-right"></span></button> <button class="btn btn-primary pull-right"
             ng-if="activeStep.finish"
             ng-disabled="lockNextButton"
             auto-focus
- ng-click="finish()">סיום</button>
+ ng-click="finish()">סיים</button>
 </div>

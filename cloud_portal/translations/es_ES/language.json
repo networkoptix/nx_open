@@ -117,7 +117,7 @@
     "cloudInvalidResponse": "El BD de la Nube ha devuelto una respuesta inesperada",
     "notAuthorized": "Contraseña incorrecta",
     "wrongParameters": "Algunos parámetros en el formulario son incorrectos",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
+    "brokenAccount": "Problema inesperado con cuenta. <a href=\"/restore_password\"> restaurar cuenta</a>",
     "wrongCode": "Ya está activada la cuenta o el código de confirmación es incorrecto",
     "wrongCodeRestore": "El código de confirmación ya ha sido utlizado o está incorrecto",
     "forbidden": "No tiene permisos para realizar esta acción",

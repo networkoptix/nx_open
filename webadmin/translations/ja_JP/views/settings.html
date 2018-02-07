@@ -36,8 +36,14 @@
 
                     <div>
                         <h3>サーバーをリセット</h3>
-                        <p>このアクションは、このサーバー (データベースとリセットの構成を消去) の既定値に戻ります　サーバーは、現在のシステムから切断されますがビデオアーカイブはそのまま残ります</p>
+                        <p>この操作は、このサーバーをデフォルトに戻します(データベースのクリアと構成のリセット)
+                            サーバーは現在のシステムから切り離されます ビデオのアーカイブはそのまま残ります</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">出荷時のデフォルトに戻す</button></p>
+                    </div>
+                    <div>
+                        <h3>システムからサーバーを切離す</h3>
+                        <p>これにより、データベース、ローカルユーザー、および構成を保持しているサーバーがシステムから切り離されます。ビデオのアーカイブはそのまま残されます <b>クラウドユーザーは削除されます </b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">システムからサーバーを切離す</button></p>
                     </div>
                     <div>
                         <h3>再起動</h3>
@@ -45,7 +51,7 @@
 <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">再起動</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form" >
+                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
                             <h3>adminパスワードの変更</h3>
                             <p>ローカルシステム(クラウドに接続されていない) のユーザー"admin"のパスワードとリカバリー(root) パスワードが変更されます<br>　　
 それ以外は回復パスワードのみを変更</p>

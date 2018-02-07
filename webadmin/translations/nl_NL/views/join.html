@@ -33,7 +33,7 @@
                 <label for="otherSystemLogin" class="control-label">Login van het andere systeem</label>
                 <div class="">
                     <input ng-model="settings.login" name="otherSystemLogin" id="otherSystemLogin" class="form-control" type="text"
-                           placeholder="Login" required>
+                           placeholder="Gebruikersnaam" required>
                 </div>
             </div>
 
@@ -42,7 +42,7 @@
                 <div class="">
                     <input type="password" ng-model="settings.password"  class="form-control" id="otherSystemPassword"
                            autocomplete="new-password"
-                           placeholder="Wachtwoord"/>
+                           placeholder="Password"/>
                 </div>
             </div>
         </ng-form>
@@ -50,7 +50,7 @@
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
             <label for="currentSystemPassword" class="control-label">Huidige wachtwoord (voor dit systeem)</label>
             <div class="">
-                <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="Wachtwoord" required />
+                <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="Password" required />
             </div>
         </div>
 
