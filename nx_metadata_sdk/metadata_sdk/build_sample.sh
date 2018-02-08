@@ -17,7 +17,6 @@ main()
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
 
-
     local GEN_OPTIONS=""
     local SOURCE_DIR="$BASE_DIR/$PLUGIN_PATH"
     case "$(uname -s)" in
@@ -38,9 +37,16 @@ main()
 
     { set +x; } 2>/dev/null #< Silently turn off logging each command.
     sleep 1 #< Workaround from strange behavior of Windows CMake in Cygwin console.
-    echo
-    echo "Plugin built successfully:"
-    find `# Show absolute path #` "$(pwd)" -name "*$PLUGIN_NAME.dll" -o -name "*$PLUGIN_NAME.so"
+    local -r ARTIFACT=$(find "$BUILD_DIR" -name "*$PLUGIN_NAME.dll" -o -name "*$PLUGIN_NAME.so")
+    if [ -f "$ARTIFACT" ]
+    then
+        echo
+        echo "Plugin built successfully:"
+        echo "$ARTIFACT"
+    else
+        echo
+        echo "ERROR: Failed to build plugin."
+    fi
 }
 
 main "$@"

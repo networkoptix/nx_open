@@ -14,4 +14,7 @@ cmake --build .
     @echo:
     @echo Plugin built successfully:
     @echo %ARTIFACT%
+) else (
+    @echo:
+    @echo ERROR: Failed to build plugin.
 )
