@@ -15,7 +15,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 
-#include <nx/client/desktop/common/widgets/tab_widget.h>
+#include <nx/client/desktop/common/widgets/animated_tab_widget.h>
 #include <nx/client/desktop/common/widgets/compact_tab_bar.h>
 #include <nx/client/desktop/ui/common/selectable_text_button.h>
 #include <nx/client/desktop/event_search/models/unified_async_search_list_model.h>
@@ -44,7 +44,7 @@ using ButtonState = ui::SelectableTextButton::State;
 EventPanel::Private::Private(EventPanel* q):
     QObject(q),
     q(q),
-    m_tabs(new TabWidget(new CompactTabBar(), q)),
+    m_tabs(new AnimatedTabWidget(new CompactTabBar(), q)),
     m_notificationsTab(new NotificationListWidget(m_tabs)),
     m_motionTab(new MotionSearchWidget(m_tabs)),
     m_bookmarksTab(new UnifiedSearchWidget(m_tabs)),
