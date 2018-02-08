@@ -25,6 +25,9 @@ public:
     QColor color(const char* name) const;
     QColor color(const QLatin1String& name) const;
 
+    QList<QColor> groupColors(const char* groupName) const;
+    QList<QColor> groupColors(const QLatin1String& groupName) const;
+
     static Q_INVOKABLE QColor transparent(const QColor& color, qreal alpha);
     Q_INVOKABLE QColor darker(const QColor& color, int offset) const;
     Q_INVOKABLE QColor lighter(const QColor& color, int offset) const;

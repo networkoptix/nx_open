@@ -133,6 +133,16 @@ QColor ColorTheme::color(const QLatin1String& name) const
     return d->colors.value(name).value<QColor>();
 }
 
+QList<QColor> ColorTheme::groupColors(const char* groupName) const
+{
+    return d->groups[QLatin1String(groupName)];
+}
+
+QList<QColor> ColorTheme::groupColors(const QLatin1String& groupName) const
+{
+    return d->groups[groupName];
+}
+
 QColor ColorTheme::transparent(const QColor& color, qreal alpha)
 {
     auto newColor = color;
