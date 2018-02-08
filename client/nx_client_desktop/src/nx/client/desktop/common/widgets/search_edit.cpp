@@ -209,7 +209,7 @@ int SearchEdit::selectedTagIndex() const
 void SearchEdit::updatePalette()
 {
     const auto backgroundColor = hasFocus()
-        ? ColorTheme::instance()->color("dark2")
+        ? colorTheme()->color("dark2")
         : QColor(Qt::transparent);
 
     const auto controlPalette = modifiedPalette(m_lineEdit->palette(), backgroundColor);

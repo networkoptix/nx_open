@@ -25,8 +25,7 @@ QString keyToString(int key)
 
 QString getHintItemText(const nx::client::desktop::ShortcutHintWidget::Description& description)
 {
-    static const auto kBorderColor = ColorTheme::instance()->color("dark8")
-        .name(QColor::HexArgb);
+    static const auto kBorderColor = colorTheme()->color("dark8").name(QColor::HexArgb);
 
     static const auto kHtmlBorder = lit(
         "<table cellspacing=-1 cellpadding=2 border=1"
@@ -69,7 +68,7 @@ ShortcutHintWidget::ShortcutHintWidget(QWidget* parent):
 
 void ShortcutHintWidget::setDescriptions(const DescriptionList& descriptions)
 {
-    static const auto kTextColor = ColorTheme::instance()->color("dark11")
+    static const auto kTextColor = colorTheme()->color("dark11")
         .name(QColor::HexArgb);
     static const auto kHtmlTemplate =
         lit("<html><body><center>"

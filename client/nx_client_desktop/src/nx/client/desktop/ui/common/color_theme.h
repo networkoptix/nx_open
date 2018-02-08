@@ -40,6 +40,8 @@ private:
     QScopedPointer<Private> const d;
 };
 
+inline ColorTheme* colorTheme() { return ColorTheme::instance(); }
+
 } // namespace desktop
 } // namespace client
 } // namespace nx
