@@ -96,7 +96,7 @@ private:
 
 TEST_F(CrossNatConnector, timeout)
 {
-    const std::chrono::milliseconds connectTimeout(nx::utils::random::number(1000, 4000));
+    const std::chrono::milliseconds connectTimeout(nx::utils::random::number(100, 400));
 
     // Timing out mediator response by providing incorrect mediator address to connector.
     const auto connectResult = doSimpleConnectTest(
@@ -106,9 +106,6 @@ TEST_F(CrossNatConnector, timeout)
 
     ASSERT_EQ(SystemError::timedOut, connectResult.errorCode);
     ASSERT_EQ(nullptr, connectResult.connection);
-    //ASSERT_TRUE(
-    //    connectResult.executionTime > connectTimeout*0.8 &&
-    //    connectResult.executionTime < connectTimeout*1.2);
 }
 
 TEST_F(CrossNatConnector, target_host_not_found)

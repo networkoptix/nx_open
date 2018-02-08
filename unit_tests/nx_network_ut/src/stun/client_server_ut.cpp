@@ -72,8 +72,8 @@ protected:
     static AbstractAsyncClient::Settings defaultSettings()
     {
         AbstractAsyncClient::Settings settings;
-        settings.sendTimeout = std::chrono::seconds(1);
-        settings.recvTimeout = std::chrono::seconds(1);
+        settings.sendTimeout = std::chrono::seconds::zero();
+        settings.recvTimeout = std::chrono::seconds::zero();
 
         settings.reconnectPolicy.delayMultiplier = 2;
         settings.reconnectPolicy.initialDelay = std::chrono::milliseconds(500);
@@ -298,10 +298,10 @@ TEST_F(StunClientServerTest, AsyncClientUser)
     for (size_t uc = 0; uc <USER_COUNT; ++uc)
     {
         auto user = std::make_shared<TestUser>(client);
-        for (size_t rc = 0; rc <REQUEST_COUNT * REQUEST_RATIO; ++rc)
+        for (size_t rc = 0; rc < REQUEST_COUNT * REQUEST_RATIO; ++rc)
             user->request();
-        for (size_t rc = 0; rc <REQUEST_COUNT; ++rc) // only part is waited
-            EXPECT_EQ(user->responses.pop().first, SystemError::noError);
+        for (size_t rc = 0; rc < REQUEST_COUNT; ++rc) // only part is waited
+            ASSERT_EQ(SystemError::noError, user->responses.pop().first);
         user->pleaseStopSync();
     }
 }
