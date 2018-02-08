@@ -31,7 +31,11 @@ public:
     {
         QString group;
         int index = -1;
+
+        ColorInfo() = default;
+        ColorInfo(const QString& group, int index): group(group), index(index) {}
     };
+
     QHash<QColor, ColorInfo> colorInfoByColor;
 
 public:
