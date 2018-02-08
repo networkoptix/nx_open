@@ -10,7 +10,7 @@ from django.contrib import messages
 
 from api.models import Account
 from notifications.models import *
-from datetime import datetime
+from django.utils import timezone
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import permission_required
 import re
@@ -48,7 +48,7 @@ def send_to_all_users(sent_by, notification, force=False):
 
     message = format_message(notification)
     notification.sent_by = sent_by
-    notification.sent_date = datetime.now()
+    notification.sent_date = timezone.now()
     notification.save()
     for user in users:
         message['full_name'] = user.get_full_name()
