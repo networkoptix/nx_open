@@ -30,8 +30,15 @@ class AccountBackend(ModelBackend):
         user = Account.get(username, password)  # first - check cloud_db
 
         if user and 'email' in user:
-            if username.find('@') > -1 and username != user['email']:  # code and email from cloud_db are wrong
-                raise APILogicException('Login does not match users email', ErrorCodes.wrong_code)
+            if username.find('@') > -1:
+                if username != user['email']:  # code and email from cloud_db are wrong
+                    raise APILogicException('Login does not match users email', ErrorCodes.wrong_code)
+            elif username.find('-') > -1:  # CLOUD-1661 - temp login now has format: guid-crc32(accountEmail)
+                import zlib
+                (uuid, temp_crc32) = username.split('-')
+                email_crc32 = zlib.crc32(user['email']) & 0xffffffff  # convert signed to unsigned crc32
+                if email_crc32 != temp_crc32:
+                    raise APILogicException('Login does not match users email', ErrorCodes.wrong_code)
 
             if not AccountBackend.is_email_in_portal(user['email']):
                 # so - user is in cloud_db, but not in cloud_portal
