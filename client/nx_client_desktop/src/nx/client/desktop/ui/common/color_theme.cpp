@@ -133,6 +133,16 @@ QColor ColorTheme::color(const QLatin1String& name) const
     return d->colors.value(name).value<QColor>();
 }
 
+QColor ColorTheme::color(const char* name, qreal alpha) const
+{
+    return transparent(color(name), alpha);
+}
+
+QColor ColorTheme::color(const QLatin1String& name, qreal alpha) const
+{
+    return transparent(color(name), alpha);
+}
+
 QList<QColor> ColorTheme::groupColors(const char* groupName) const
 {
     return d->groups[QLatin1String(groupName)];

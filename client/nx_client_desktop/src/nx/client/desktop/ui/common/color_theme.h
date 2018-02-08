@@ -25,6 +25,9 @@ public:
     QColor color(const char* name) const;
     QColor color(const QLatin1String& name) const;
 
+    QColor color(const char* name, qreal alpha) const;
+    QColor color(const QLatin1String& name, qreal alpha) const;
+
     QList<QColor> groupColors(const char* groupName) const;
     QList<QColor> groupColors(const QLatin1String& groupName) const;
 

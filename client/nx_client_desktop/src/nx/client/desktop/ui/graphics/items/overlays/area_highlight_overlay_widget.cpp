@@ -316,7 +316,7 @@ void AreaHighlightOverlayWidget::setHighlightedArea(const QnUuid& areaId)
 void AreaHighlightOverlayWidget::paint(
     QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*w*/)
 {
-    const auto dimmerColor = colorTheme()->transparent(colorTheme()->color("dark1"), 0.5);
+    const auto dimmerColor = colorTheme()->color("dark1", 0.5);
 
     const auto it = d->areaById.find(d->highlightedAreaId);
     if (it == d->areaById.end())
