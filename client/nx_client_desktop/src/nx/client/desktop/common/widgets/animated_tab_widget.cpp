@@ -1,5 +1,7 @@
 #include "animated_tab_widget.h"
 
+#include <utils/common/scoped_value_rollback.h>
+
 #include <nx/client/desktop/common/widgets/transitioner_widget.h>
 
 namespace nx {
@@ -34,6 +36,12 @@ void AnimatedTabWidget::handleCurrentChanged()
     if (!newTab && !m_currentTab)
         return; //< Just to be safe.
 
+    if (!isVisible())
+    {
+        m_currentTab = newTab;
+        return;
+    }
+
     const auto sourceRect = tabRect(m_currentTab);
     const auto targetRect = tabRect(newTab);
 
@@ -45,13 +53,14 @@ void AnimatedTabWidget::handleCurrentChanged()
 
     if (!m_transitioner->running())
     {
+        m_transitioner->setSource(grabTab(m_currentTab, rect.size(), sourceOffset));
+
         if (!m_tabsParent)
             m_tabsParent = newTab ? newTab->parentWidget() : m_currentTab->parentWidget();
 
         NX_ASSERT(m_tabsParent);
         m_tabsParent->hide();
 
-        m_transitioner->setSource(grabTab(m_currentTab, rect.size(), sourceOffset));
         m_transitioner->setGeometry(rect);
         m_transitioner->show();
         m_transitioner->raise();
@@ -78,6 +87,12 @@ QPixmap AnimatedTabWidget::grabTab(QWidget* tab, const QSize& size, const QPoint
     QPixmap pixmap(size * devicePixelRatio());
     pixmap.setDevicePixelRatio(devicePixelRatio());
     pixmap.fill(Qt::transparent);
+
+    QnScopedTypedPropertyRollback<bool, QWidget> visibilityGuard(
+        tab,
+        [](QWidget* widget, bool value) { widget->setHidden(value); },
+        [](const QWidget* widget) { return widget->isHidden(); },
+        false);
 
     tab->render(&pixmap, offset, QRegion(), QWidget::DrawChildren);
     return pixmap;
