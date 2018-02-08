@@ -15,6 +15,8 @@
 #include <core/resource/media_server_resource.h>
 #include <utils/common/event_processors.h>
 
+#include <api/server_rest_connection.h>
+
 namespace {
 
 using namespace nx::client::desktop;
@@ -321,44 +323,35 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     if (devices.isEmpty())
         return;
 
-    QnConnectionRequestResult result;
-    server->apiConnection()->addCameraAsync(devices,
-        m_currentSearch->login(), m_currentSearch->password(),
-        &result, SLOT(processReply(int, const QVariant &, int)));
+    const auto login = m_currentSearch->login();
+    const auto password = m_currentSearch->password();
+    server->restConnection()->addCamera(devices, login, password,
+        [this, prevStates, devices, guard = QPointer<DeviceAdditionDialog>(this)]
+            (bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
+        {
+            if (!guard)
+                return;
 
-    QEventLoop loop;
-    connect(&result, &QnConnectionRequestResult::replyProcessed, &loop, &QEventLoop::quit);
-    connect(this, &DeviceAdditionDialog::rejected, &loop, &QEventLoop::quit);
-
-    const auto connection =
-        connect(&m_serverStatusWatcher, &ServerOnlineStatusWatcher::statusChanged, this,
-            [this, &loop]()
+            auto states = prevStates;
+            if (success && result.error == QnRestResult::NoError)
             {
-                if (!m_serverStatusWatcher.isOnline())
-                    loop.quit();
-            });
+                for (auto& state: states)
+                    state = FoundDevicesModel::alreadyAddedState;
+            }
+            else
+            {
+                showAdditionFailedDialog(toFakeResourcesList(devices));
+            }
 
-    loop.exec();
-    disconnect(connection);
-
-    if (result.status() == 0)
-    {
-        for (auto& state: prevStates)
-            state = FoundDevicesModel::alreadyAddedState;
-    }
-    else
-    {
-        showAdditionFailedDialog(toFakeResourcesList(devices));
-    }
-
-    for (auto it = prevStates.begin(); it != prevStates.end(); ++it)
-    {
-        const auto id = it.key();
-        const auto state = it.value();
-        const auto index = m_model->indexByUniqueId(
-            id, FoundDevicesModel::presentedStateColumn);
-        m_model->setData(index, state, FoundDevicesModel::presentedStateRole);
-    }
+            for (auto it = states.begin(); it != states.end(); ++it)
+            {
+                const auto id = it.key();
+                const auto state = it.value();
+                const auto index = m_model->indexByUniqueId(
+                    id, FoundDevicesModel::presentedStateColumn);
+                m_model->setData(index, state, FoundDevicesModel::presentedStateRole);
+            }
+        }, QThread::currentThread());
 }
 
 void DeviceAdditionDialog::showAdditionFailedDialog(const FakeResourceList& resources)

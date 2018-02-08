@@ -3,6 +3,7 @@
 #include <QtNetwork/QHostAddress>
 
 #include <core/resource/media_server_resource.h>
+#include <api/server_rest_connection.h>
 
 namespace {
 
@@ -85,8 +86,23 @@ void ManualDeviceSearcher::stop()
     if (!m_server || !searching())
         return;
 
-    m_server->apiConnection()->searchCameraAsyncStop(m_searchProcessId,
-        this, SLOT(handleStopSearchReply(int, const QVariant&, int)));
+    const auto stopCallback =
+        [this, guard = QPointer<ManualDeviceSearcher>(this)](
+            bool success,
+            rest::Handle /*handle*/,
+            const QnJsonRestResult& result)
+        {
+            if (!guard)
+                return;
+
+            if (!success || result.error != QnRestResult::NoError)
+                stop(); //< Try to stop one more time.
+            else if (m_progress != QnManualResourceSearchStatus::Finished)
+                setProgress(QnManualResourceSearchStatus::Aborted);
+        };
+
+    m_server->restConnection()->searchCameraStop(
+        m_searchProcessId, stopCallback, QThread::currentThread());
 }
 
 const QString& ManualDeviceSearcher::login() const
@@ -163,57 +179,31 @@ void ManualDeviceSearcher::searchForDevices(
     const QString& password,
     int port)
 {
-    m_server->apiConnection()->searchCameraAsyncStart(
-        startAddress, endAddress,
-        login, password, port,
-        this, SLOT(handleStartSearchReply(int, const QVariant&, int)));
-}
+    const auto startCallback =
+        [this, guard = QPointer<ManualDeviceSearcher>(this)](
+            bool success,
+            rest::Handle /*handle*/,
+            const QnJsonRestResult& result)
+        {
+            if (!guard)
+                return;
 
-void ManualDeviceSearcher::handleStartSearchReply(
-    int status,
-    const QVariant& reply,
-    int /*handle*/)
-{
-    if (status != 0)
-    {
-        setLastErrorText(tr("Can't start searching process"));
-        setProgress(QnManualResourceSearchStatus::Aborted);
-        return;
-    }
+            if (!success || result.error != QnRestResult::NoError)
+            {
+                setLastErrorText(tr("Can't start searching process"));
+                setProgress(QnManualResourceSearchStatus::Aborted);
+            }
+            else
+            {
+                const auto reply = result.deserialized<QnManualCameraSearchReply>();
+                m_searchProcessId = reply.processUuid;
+                m_updateProgressTimer.start();
+            }
+        };
 
-    const auto result = reply.value<QnManualCameraSearchReply>();
-    m_searchProcessId = result.processUuid;
-    m_updateProgressTimer.start();
-}
 
-void ManualDeviceSearcher::handleStopSearchReply(
-    int status,
-    const QVariant& /*reply*/,
-    int /*handle*/)
-{
-    if (status != 0)
-    {
-        stop(); //< Try to stop one more time.
-        return;
-    }
-
-    if (m_progress != QnManualResourceSearchStatus::Finished)
-        setProgress(QnManualResourceSearchStatus::Aborted);
-}
-
-void ManualDeviceSearcher::handleUpdateStatusReply(
-    int status,
-    const QVariant& reply,
-    int /*handle*/)
-{
-    if (status != 0)
-        return;
-
-    NX_EXPECT(!m_searchProcessId.isNull());
-
-    const auto result = reply.value<QnManualCameraSearchReply>();
-    setProgress(static_cast<QnManualResourceSearchStatus::State>(result.status.state));
-    updateDevices(result.cameras);
+    m_server->restConnection()->searchCameraStart(
+        startAddress, endAddress, login, password, port, startCallback, QThread::currentThread());
 }
 
 bool ManualDeviceSearcher::searching() const
@@ -272,8 +262,27 @@ void ManualDeviceSearcher::updateProgress()
     if (!searching())
         return;
 
-    m_server->apiConnection()->searchCameraAsyncStatus(m_searchProcessId, this,
-        SLOT(handleUpdateStatusReply(int, const QVariant &, int)));
+    const auto updateProgressCallback =
+        [this, guard = QPointer<ManualDeviceSearcher>(this)](
+            bool success,
+            rest::Handle /*handle*/,
+            const QnJsonRestResult& result)
+        {
+            if (!guard)
+                return;
+
+            if (!success || result.error != QnRestResult::NoError)
+                return;
+
+            NX_EXPECT(!m_searchProcessId.isNull());
+
+            const auto reply = result.deserialized<QnManualCameraSearchReply>();
+            setProgress(static_cast<QnManualResourceSearchStatus::State>(reply.status.state));
+            updateDevices(reply.cameras);
+        };
+
+    m_server->restConnection()->searchCameraStatus(
+        m_searchProcessId, updateProgressCallback, QThread::currentThread());
 }
 
 } // namespace desktop

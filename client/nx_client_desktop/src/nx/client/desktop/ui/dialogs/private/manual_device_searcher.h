@@ -82,11 +82,6 @@ signals:
     void devicesRemoved(const QStringList& deviceIds);
 
 private:
-    Q_SLOT void handleStartSearchReply(int status, const QVariant& reply, int handle);
-    Q_SLOT void handleStopSearchReply(int status, const QVariant& reply, int handle);
-    Q_SLOT void handleUpdateStatusReply(int status, const QVariant& reply, int handle);
-
-private:
     const QnMediaServerResourcePtr m_server;
     const QString m_login;
     const QString m_password;
