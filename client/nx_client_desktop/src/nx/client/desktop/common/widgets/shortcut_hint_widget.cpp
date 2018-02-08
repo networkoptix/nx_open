@@ -25,7 +25,7 @@ QString keyToString(int key)
 
 QString getHintItemText(const nx::client::desktop::ShortcutHintWidget::Description& description)
 {
-    static const auto kBorderColor = ColorTheme::instance()->color(lit("dark8"))
+    static const auto kBorderColor = ColorTheme::instance()->color("dark8")
         .name(QColor::HexArgb);
 
     static const auto kHtmlBorder = lit(
@@ -69,7 +69,7 @@ ShortcutHintWidget::ShortcutHintWidget(QWidget* parent):
 
 void ShortcutHintWidget::setDescriptions(const DescriptionList& descriptions)
 {
-    static const auto kTextColor = ColorTheme::instance()->color(lit("dark11"))
+    static const auto kTextColor = ColorTheme::instance()->color("dark11")
         .name(QColor::HexArgb);
     static const auto kHtmlTemplate =
         lit("<html><body><center>"
@@ -77,7 +77,7 @@ void ShortcutHintWidget::setDescriptions(const DescriptionList& descriptions)
             "</center></body></html>").arg(kTextColor);
 
     QStringList items;
-    for (const auto description: descriptions)
+    for (const auto& description: descriptions)
         items.append(getHintItemText(description));
 
     setText(kHtmlTemplate.arg(items.join(QString())));

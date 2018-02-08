@@ -25,12 +25,12 @@ class ColorTheme::Private
 public:
     QVariantMap colors;
 
-    QHash<QString, QList<QColor>> groups;
+    QHash<QLatin1String, QList<QColor>> groups;
 
     struct ColorInfo
     {
-        QString group;
-        int index;
+        QLatin1String group;
+        int index = -1;
     };
     QHash<QColor, ColorInfo> colorInfoByColor;
 
@@ -88,7 +88,7 @@ void ColorTheme::Private::loadColors()
         if (groupRegExp.exactMatch(colorName))
         {
             const auto& group = groupRegExp.cap(1);
-            groups[group].append(color);
+            groups[QLatin1String(group.toLatin1())].append(color);
         }
     }
 
@@ -123,7 +123,12 @@ QVariantMap ColorTheme::colors() const
     return d->colors;
 }
 
-QColor ColorTheme::color(const QString& name) const
+QColor ColorTheme::color(const char* name) const
+{
+    return d->colors.value(QLatin1String(name)).value<QColor>();
+}
+
+QColor ColorTheme::color(const QLatin1String& name) const
 {
     return d->colors.value(name).value<QColor>();
 }
@@ -144,7 +149,7 @@ QColor ColorTheme::lighter(const QColor& color, int offset) const
 {
     const auto& info = d->colorInfoByColor.value(transparent(color, 1.0));
 
-    if (info.group.isEmpty())
+    if (!info.group.data())
     {
         auto hsl = color.toHsl();
         hsl.setHsl(

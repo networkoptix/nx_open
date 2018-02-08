@@ -22,7 +22,8 @@ public:
 
     QVariantMap colors() const;
 
-    QColor color(const QString& name) const;
+    QColor color(const char* name) const;
+    QColor color(const QLatin1String& name) const;
 
     static Q_INVOKABLE QColor transparent(const QColor& color, qreal alpha);
     Q_INVOKABLE QColor darker(const QColor& color, int offset) const;
