@@ -20,6 +20,3 @@ telegraf_plugins_default:
     config:
       - interfaces = ["{{ ansible_default_ipv4.interface }}"]
   - plugin: system
-  - plugin: httpjson
-    config:
-      - servers = ["http://localhost/relay/statistics/metrics/"]
