@@ -40,7 +40,8 @@ def detect_format(filename):
     """
     formats = {
         'json': (json_read, json_write),
-        'yaml': (yaml_read, yaml_write)
+        'yaml': (yaml_read, yaml_write),
+        'yml': (yaml_read, yaml_write),
     }
 
     extension = os.path.splitext(filename)[1][1:]
