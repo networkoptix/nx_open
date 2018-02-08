@@ -217,12 +217,12 @@
         {
             "eventTypeId": "{6E62AA61-6308-467E-AF0D-C5DC34A86C42}",
             "eventName": {
-                "value": "Attended baggage",
+                "value": "Object removal",
                 "localization": {
                 }
             },
             "internalName": "AttendedBaggage",
-            "description": "Attended baggage %1",
+            "description": "Object removal %1",
             "positiveState": "has been detected",
             "negativeState": "has ended",
             "flags": "stateDependent"
