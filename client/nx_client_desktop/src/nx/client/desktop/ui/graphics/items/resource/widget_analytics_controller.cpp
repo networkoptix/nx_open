@@ -17,6 +17,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include <nx/client/core/media/abstract_analytics_metadata_provider.h>
+#include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/ui/graphics/items/overlays/area_highlight_overlay_widget.h>
 #include <nx/client/desktop/analytics/object_display_settings.h>
 
@@ -129,6 +130,8 @@ public:
 
     void updateObjectAreas(qint64 timestamp);
 
+    QRectF zoomWindowRectangle(const QRectF& objectRect) const;
+
 public:
     QnMediaResourceWidget* mediaResourceWidget = nullptr;
     QnUuid layoutId;
@@ -171,7 +174,7 @@ void WidgetAnalyticsController::Private::at_areaClicked(const QnUuid& areaId)
     const auto targetPoint = mediaResourceWidget->item()->combinedGeometry().bottomRight();
     item.combinedGeometry = QRectF(targetPoint, targetPoint);
     item.resource.id = mediaResourceWidget->resource()->toResourcePtr()->getId();
-    item.zoomRect = object.rectangle;
+    item.zoomRect = zoomWindowRectangle(object.rectangle);
     item.zoomTargetUuid = mediaResourceWidget->resource()->toResourcePtr()->getId();
 
     qnResourceRuntimeDataManager->setLayoutItemData(
@@ -304,10 +307,17 @@ void WidgetAnalyticsController::Private::updateObjectAreas(qint64 timestamp)
         {
             const auto& layout = layoutResource();
             auto item = layout->getItem(objectInfo.zoomWindowItemUuid);
-            item.zoomRect = areaInfo.rectangle;
+            item.zoomRect = zoomWindowRectangle(areaInfo.rectangle);
             layout->updateItem(item);
         }
     }
+}
+
+QRectF WidgetAnalyticsController::Private::zoomWindowRectangle(const QRectF& objectRect) const
+{
+    return core::Geometry::movedInto(
+        core::Geometry::expanded(1.0, objectRect, Qt::KeepAspectRatioByExpanding),
+        QRectF(0, 0, 1, 1));
 }
 
 WidgetAnalyticsController::WidgetAnalyticsController(QnMediaResourceWidget* mediaResourceWidget):
