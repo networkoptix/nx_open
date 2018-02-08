@@ -1648,6 +1648,8 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
 
     if (isAnalyticsEnabled())
         d->analyticsController->updateAreas(timestamp, channel);
+    else
+        d->analyticsController->updateAreaForZoomWindow();
 
     if (ini().enableOldAnalyticsController && d->analyticsMetadataProvider)
     {
