@@ -15,7 +15,7 @@
     "unauthorized": "需要身份驗證",
     "noData": "無資料",
     "iosVideoTooLarge": "iOS不支援大於 fullHD (2MP：1920x1080) 的影像。",
-    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashRequired": "請<a href='https://get.adobe.com/flashplayer/' target='_blank'> 安裝Adobe Flash </a>來播放影像.",
     "flashOrWebmRequired": "要在 Internet Explorer 上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a> 或 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>.",
     "noArmSupport": "此瀏覽器或設備不支援從 ARM 伺服器上回放影像。",
     "noFormat": "此瀏覽器不支援從此攝影機回放影像.",
