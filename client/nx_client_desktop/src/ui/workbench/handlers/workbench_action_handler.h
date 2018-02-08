@@ -53,8 +53,6 @@ namespace desktop {
 
 class MimeData;
 
-class DeviceAdditionDialog;
-
 namespace ui {
 
 
@@ -247,7 +245,6 @@ private:
     QPointer<QnAuditLogDialog> m_auditLogDialog;
     QPointer<QnCameraListDialog> m_cameraListDialog;
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
-    QPointer<DeviceAdditionDialog> m_deviceAdditionDialog;
     QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
     QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
 
