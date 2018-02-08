@@ -150,7 +150,9 @@ protected:
         for (int i = 0; i < 2; ++i)
         {
             if (i == 1)
+            {
                 ASSERT_TRUE(restart());
+            }
 
             assertTemporaryCredentialsCannotBeUsedToAuthenticateToVms();
         }
