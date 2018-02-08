@@ -20,24 +20,28 @@ Log in to System
 should show list of Systems
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
     Wait Until Element Is Visible    ${SYSTEMS TILE}
     Close Browser
 
 should show Open in NX client button for online system
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Close Browser
 
 should not show Open in NX client button for offline system
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
     Wait Until Elements Are Visible    ${AUTOTESTS OFFLINE}
     Close Browser
 
 should show system's state for systems if they are offline. Otherwise - button Open in Nx
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     ${systems}    Get WebElements    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']
     Check Online Or Offline    ${systems}
@@ -46,6 +50,7 @@ should show system's state for systems if they are offline. Otherwise - button O
 should open system page (users list) when clicked on system
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Click Element    ${AUTO TESTS TITLE}
     Verify In System    Auto Tests

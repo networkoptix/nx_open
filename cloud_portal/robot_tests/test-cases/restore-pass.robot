@@ -140,6 +140,7 @@ should allow logged in user visit restore password page
     Register    mark    hamill    ${email}    ${password}
     Activate    ${email}
     Log In    ${email}    ${password}
+    Validate Log In
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Close Browser
