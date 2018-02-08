@@ -47,6 +47,26 @@ private:
 };
 
 
+class LiveStreamParametersWithoutAdvancedParams: public CameraTest
+{
+public:
+    LiveStreamParametersWithoutAdvancedParams()
+    {
+        m_camera = newCamera(
+            [](CameraMock* camera)
+            {
+            });
+        NX_ASSERT(m_camera);
+        m_camera->setId(QnUuid::createUuid());
+
+        m_videoCamera.reset(new VideoCameraMock(m_camera));
+        m_videoCamera->init();
+    }
+
+    QnSharedResourcePointer<CameraMock> m_camera;
+    QnSharedResourcePointer<VideoCameraMock> m_videoCamera;
+};
+
 class LiveStreamParameters: public CameraTest
 {
 public:
@@ -78,6 +98,7 @@ public:
     QnSharedResourcePointer<CameraMock> m_camera;
     QnSharedResourcePointer<VideoCameraMock> m_videoCamera;
 };
+
 
 TEST_F(LiveStreamParameters, mergeWithEmptyParams)
 {
@@ -128,9 +149,18 @@ TEST_F(LiveStreamParameters, mergeWithNonEmptyParams)
     m_videoCamera->getPrimaryReader()->setPrimaryStreamParams(params);
     updatedParams = m_videoCamera->getPrimaryReader()->getLiveParams();
     EXPECT_EQ(updatedParams.bitrateKbps, 1000);
+
+    EXPECT_TRUE(m_camera->setAdvancedParameter("secondaryStream.fps", "15"));
+    EXPECT_EQ(15, m_videoCamera->getSecondaryReader()->getLiveParams().fps);
+
+    EXPECT_TRUE(m_camera->setAdvancedParameter("secondaryStream.fps", "10"));
+    EXPECT_EQ(10, m_videoCamera->getSecondaryReader()->getLiveParams().fps);
+
+    EXPECT_TRUE(m_camera->setAdvancedParameter("secondaryStream.fps", "20"));
+    EXPECT_EQ(15, m_videoCamera->getSecondaryReader()->getLiveParams().fps); //< Max fps exceeded.
 }
 
-TEST_F(LiveStreamParameters, secondaryFps)
+TEST_F(LiveStreamParametersWithoutAdvancedParams, secondaryFps)
 {
     QnLiveStreamParams params;
 
