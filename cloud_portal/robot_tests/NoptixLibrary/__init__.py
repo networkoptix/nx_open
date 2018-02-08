@@ -8,6 +8,7 @@ from robot.utils import NormalizedDict
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
+from selenium.common.exceptions import NoSuchElementException
 from SeleniumLibrary.base import keyword, LibraryComponent
 from SeleniumLibrary.locators import WindowManager
 from SeleniumLibrary.utils import (is_falsy, is_truthy, secs_to_timestr,
@@ -48,3 +49,14 @@ class NoptixLibrary(object):
                 not_found = None
             time.sleep(.2)  
         raise AssertionError(not_found)
+
+    def check_online_or_offline(self, elements):
+        for element in elements:
+            try:
+                if element.find_element_by_xpath(".//button[@ng-click='checkForm()']"): 
+                    print "online"
+            except NoSuchElementException:
+                try:
+                    if element.find_element_by_xpath(".//span[contains(text(),'offline')]"):                    
+                        print "offline"
+                except: raise NoSuchElementException
