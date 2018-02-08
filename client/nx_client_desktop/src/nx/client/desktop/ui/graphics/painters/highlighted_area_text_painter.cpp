@@ -70,6 +70,9 @@ void HighlightedAreaTextPainter::setColor(const QColor& color)
 
 QPixmap HighlightedAreaTextPainter::paintText(const QString& text) const
 {
+    if (text.isEmpty())
+        return QPixmap();
+
     const auto lines = splitLines(text);
 
     QFontMetrics nameFontMetrics(m_nameFont);
