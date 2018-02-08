@@ -413,10 +413,13 @@ copyAdditionalSysrootFilesIfNeeded()
             echo "Copying (sysroot) $LIB"
             cp -r "$SYSROOT_LIB_DIR/$LIB"* "$LIB_INSTALL_DIR/"
         done
-    elif [ "$BOX" = "bananapi" ] || [ "$BOX" = "rpi" ]; then
+    elif [ "$BOX" = "bananapi" ]; then
         echo "Copying (sysroot) libglib required for bananapi on Debian 8 \"Jessie\""
         cp -r "$SYSROOT_LIB_DIR/libglib"* "$LIB_INSTALL_DIR/"
         echo "Copying (sysroot) hdparm required for bananapi on Debian 8 \"Jessie\""
+        cp -r "$PACKAGES_DIR/sysroot/usr/bin/hdparm" "$INSTALL_DIR/mediaserver/bin/"
+    elif [ "$BOX" = "rpi" ]; then
+        echo "Copying (sysroot) hdparm"
         cp -r "$PACKAGES_DIR/sysroot/usr/bin/hdparm" "$INSTALL_DIR/mediaserver/bin/"
     fi
 }
