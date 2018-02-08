@@ -71,7 +71,7 @@ protected:
     {
         std::string account1NewPassword = m_account.password + "new";
         api::AccountUpdateData accountUpdateData;
-        accountUpdateData.passwordHa1 = nx_http::calcHa1(
+        accountUpdateData.passwordHa1 = nx::network::http::calcHa1(
             m_account.email.c_str(),
             moduleInfo().realm.c_str(),
             account1NewPassword.c_str()).constData();
@@ -120,12 +120,12 @@ protected:
             ASSERT_EQ(api::ResultCode::ok, resultCode);
             ASSERT_EQ(m_account.email, authResponse.authenticatedAccountData.accountEmail);
 
-            const auto ha1 = nx_http::calcHa1(
+            const auto ha1 = nx::network::http::calcHa1(
                 credentials.login.c_str(),
                 nx::network::AppInfo::realm().toStdString().c_str(),
                 credentials.password.c_str());
             ASSERT_EQ(
-                nx_http::calcIntermediateResponse(
+                nx::network::http::calcIntermediateResponse(
                     ha1,
                     QByteArray::fromStdString(authRequest.nonce)).toStdString(),
                 authResponse.intermediateResponse);
@@ -290,5 +290,6 @@ TEST_F(AccountTemporaryCredentials, temporary_credentials_are_low_case)
     assertTemporaryCredentialsAreLowCase();
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx
