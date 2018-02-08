@@ -16,7 +16,7 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle">
+  <property name="windowTitle">so
    <string>Add device(s)...</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -507,7 +507,7 @@
         <number>16</number>
        </property>
        <item>
-        <widget class="QnSimpleSelectionTableView" name="foundDevicesTable">
+        <widget class="nx::client::desktop::SimpleSelectionTableView" name="foundDevicesTable">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -633,14 +633,14 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnSimpleSelectionTableView</class>
+   <class>nx::client::desktop::SimpleSelectionTableView</class>
    <extends>QTableView</extends>
-   <header location="global">ui/widgets/common/simple_selection_table_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/simple_selection_table_view.h</header>
   </customwidget>
   <customwidget>
    <class>QnChooseServerButton</class>
    <extends>QPushButton</extends>
-   <header location="global">nx/client/desktop/ui/dialogs/private/choose_server_button.h</header>
+   <header location="global">nx/client/desktop/manual_device_addition/dialog/private/choose_server_button.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

@@ -5,7 +5,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 class PresentedStateDelegate: public QStyledItemDelegate
 {
@@ -23,7 +22,6 @@ public:
         const QModelIndex &index) const override;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

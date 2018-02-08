@@ -52,7 +52,6 @@ FakeResourceList toFakeResourcesList(const QnManualResourceSearchList& devices)
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
     base_type(parent),
@@ -515,7 +514,7 @@ void DeviceAdditionDialog::updateResultsWidgetState()
         QnMessageBox::critical(this, tr("Device search failed"));
     }
 }
-} // namespace ui
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

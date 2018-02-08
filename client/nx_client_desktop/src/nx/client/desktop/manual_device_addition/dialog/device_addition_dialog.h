@@ -19,8 +19,6 @@ namespace desktop {
 
 class ManualDeviceSearcher;
 
-namespace ui {
-
 class FoundDevicesModel;
 
 class DeviceAdditionDialog: public Connective<QnSessionAwareDialog>
@@ -82,7 +80,6 @@ private:
     QScopedPointer<FoundDevicesModel> m_model;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

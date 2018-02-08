@@ -4,11 +4,11 @@
 #include <QtWidgets/QPushButton>
 
 #include <ui/style/skin.h>
-#include <nx/client/desktop/ui/dialogs/private/found_devices_model.h>
+#include <nx/client/desktop/manual_device_addition/dialog/private/found_devices_model.h>
 
 namespace {
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 void removeLayout(QLayout* layout)
 {
@@ -88,7 +88,6 @@ void CellWidget::setState(FoundDevicesModel::PresentedState value)
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 PresentedStateDelegate::PresentedStateDelegate(QObject* parent):
     base_type(parent)
@@ -112,7 +111,6 @@ void PresentedStateDelegate::setEditorData(QWidget *editor,
     }
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

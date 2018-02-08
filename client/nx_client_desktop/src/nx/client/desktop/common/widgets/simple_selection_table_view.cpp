@@ -4,18 +4,22 @@
 
 #include <ui/widgets/views/checkboxed_header_view.h>
 
-QnSimpleSelectionTableView::QnSimpleSelectionTableView(QWidget* parent):
+namespace nx {
+namespace client {
+namespace desktop {
+
+SimpleSelectionTableView::SimpleSelectionTableView(QWidget* parent):
     base_type(parent)
 {
-    connect(this, &QnSimpleSelectionTableView::clicked,
-        this, &QnSimpleSelectionTableView::handleClicked);
+    connect(this, &SimpleSelectionTableView::clicked,
+        this, &SimpleSelectionTableView::handleClicked);
 }
 
-QnSimpleSelectionTableView::~QnSimpleSelectionTableView()
+SimpleSelectionTableView::~SimpleSelectionTableView()
 {
 }
 
-void QnSimpleSelectionTableView::setCheckboxColumn(int column, bool checkboxInHeader)
+void SimpleSelectionTableView::setCheckboxColumn(int column, bool checkboxInHeader)
 {
     m_checkboxColumn = column;
 
@@ -32,7 +36,7 @@ void QnSimpleSelectionTableView::setCheckboxColumn(int column, bool checkboxInHe
     }
 }
 
-int QnSimpleSelectionTableView::getCheckedCount() const
+int SimpleSelectionTableView::getCheckedCount() const
 {
     const auto currentModel = model();
     if (!currentModel)
@@ -50,14 +54,14 @@ int QnSimpleSelectionTableView::getCheckedCount() const
     return result;
 }
 
-void QnSimpleSelectionTableView::setupHeader()
+void SimpleSelectionTableView::setupHeader()
 {
     const auto currentModel = model();
     if (!currentModel || !m_checkableHeader)
         return;
 
     connect(m_checkableHeader, &QnCheckBoxedHeaderView::checkStateChanged,
-        this, &QnSimpleSelectionTableView::handleHeaderCheckedStateChanged);
+        this, &SimpleSelectionTableView::handleHeaderCheckedStateChanged);
 
     const auto dataChangedHandler =
         [this, currentModel](
@@ -84,7 +88,7 @@ void QnSimpleSelectionTableView::setupHeader()
     dataChangedHandler(QModelIndex(), QModelIndex(), QVector<int>() << Qt::CheckStateRole);
 }
 
-void QnSimpleSelectionTableView::handleHeaderCheckedStateChanged(Qt::CheckState state)
+void SimpleSelectionTableView::handleHeaderCheckedStateChanged(Qt::CheckState state)
 {
     const auto currentModel = model();
     if (!currentModel)
@@ -101,7 +105,7 @@ void QnSimpleSelectionTableView::handleHeaderCheckedStateChanged(Qt::CheckState 
     }
 }
 
-void QnSimpleSelectionTableView::keyPressEvent(QKeyEvent* event)
+void SimpleSelectionTableView::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Space)
         handleSpacePressed();
@@ -109,7 +113,7 @@ void QnSimpleSelectionTableView::keyPressEvent(QKeyEvent* event)
     base_type::keyPressEvent(event);
 }
 
-void QnSimpleSelectionTableView::setModel(QAbstractItemModel *newModel)
+void SimpleSelectionTableView::setModel(QAbstractItemModel *newModel)
 {
     const auto currentModel = model();
     if (currentModel == newModel)
@@ -123,7 +127,7 @@ void QnSimpleSelectionTableView::setModel(QAbstractItemModel *newModel)
     setupHeader();
 }
 
-void QnSimpleSelectionTableView::handleClicked(const QModelIndex& index)
+void SimpleSelectionTableView::handleClicked(const QModelIndex& index)
 {
     const auto currentModel = model();
     if (!currentModel || !index.isValid())
@@ -133,7 +137,7 @@ void QnSimpleSelectionTableView::handleClicked(const QModelIndex& index)
     currentModel->setData(checkboxIndex(index), checkState, Qt::CheckStateRole);
 }
 
-void QnSimpleSelectionTableView::handleSpacePressed()
+void SimpleSelectionTableView::handleSpacePressed()
 {
     const auto currentModel = model();
     if (!currentModel)
@@ -148,7 +152,7 @@ void QnSimpleSelectionTableView::handleSpacePressed()
         currentModel->setData(checkboxIndex(index), newState);
 }
 
-QModelIndex QnSimpleSelectionTableView::checkboxIndex(const QModelIndex& index)
+QModelIndex SimpleSelectionTableView::checkboxIndex(const QModelIndex& index)
 {
     const auto currentModel = model();
     return currentModel && index.isValid()
@@ -156,7 +160,7 @@ QModelIndex QnSimpleSelectionTableView::checkboxIndex(const QModelIndex& index)
         : QModelIndex();
 }
 
-bool QnSimpleSelectionTableView::isChecked(const QModelIndex& index)
+bool SimpleSelectionTableView::isChecked(const QModelIndex& index)
 {
     const auto currentModel = model();
     if (!currentModel)
@@ -166,3 +170,7 @@ bool QnSimpleSelectionTableView::isChecked(const QModelIndex& index)
 
     return state != Qt::Unchecked;
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

@@ -19,7 +19,6 @@ IdsSet extractIds(const QnManualResourceSearchList& devices)
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 FoundDevicesModel::FoundDevicesModel(QObject* parent):
     base_type(parent)
@@ -250,7 +249,6 @@ int FoundDevicesModel::newDevicesCount() const
     return rowCount() - addedDevicesCount;
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

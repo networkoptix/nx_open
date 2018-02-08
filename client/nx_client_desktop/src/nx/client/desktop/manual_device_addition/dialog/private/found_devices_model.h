@@ -8,7 +8,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 class FoundDevicesModel: public ScopedModelOperations<QAbstractListModel>
 {
@@ -90,9 +89,8 @@ private:
     QnManualResourceSearchList m_devices;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::client::desktop::ui::FoundDevicesModel::PresentedState)
+Q_DECLARE_METATYPE(nx::client::desktop::FoundDevicesModel::PresentedState)

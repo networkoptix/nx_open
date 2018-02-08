@@ -4,15 +4,19 @@
 
 class QnCheckBoxedHeaderView;
 
-class QnSimpleSelectionTableView: public QnTableView
+namespace nx {
+namespace client {
+namespace desktop {
+
+class SimpleSelectionTableView: public QnTableView
 {
     Q_OBJECT
     using base_type = QnTableView;
 
 public:
-    QnSimpleSelectionTableView(QWidget* parent = nullptr);
+    SimpleSelectionTableView(QWidget* parent = nullptr);
 
-    ~QnSimpleSelectionTableView();
+    virtual ~SimpleSelectionTableView() override;
 
     void setCheckboxColumn(int column, bool checkboxInHeader = true);
 
@@ -40,3 +44,7 @@ private:
     QnCheckBoxedHeaderView* m_checkableHeader = nullptr;
     int m_checkboxColumn = 0;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
