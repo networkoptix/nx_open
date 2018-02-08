@@ -64,11 +64,16 @@ bool EventRibbon::event(QEvent* event)
             return true;
         }
 
+        case QEvent::Enter:
+            d->updateHover(true, static_cast<QEnterEvent*>(event)->pos());
+            break;
+
         case QEvent::HoverEnter:
         case QEvent::HoverMove:
             d->updateHover(true, static_cast<QHoverEvent*>(event)->pos());
             break;
 
+        case QEvent::Leave:
         case QEvent::HoverLeave:
             d->updateHover(false, QPoint());
             break;
