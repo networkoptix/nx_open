@@ -5,6 +5,7 @@
 
 #include <ui/style/skin.h>
 #include <nx/client/desktop/manual_device_addition/dialog/private/found_devices_model.h>
+#include <nx/client/desktop/utils/widget_utils.h>
 
 namespace {
 
@@ -12,19 +13,7 @@ using namespace nx::client::desktop;
 
 void removeLayout(QLayout* layout)
 {
-    if (!layout)
-        return;
-
-    while (const auto item = layout->takeAt(0))
-    {
-        if (const auto widget = item->widget())
-            delete widget;
-        else if (const auto childLayout = item->layout())
-            removeLayout(childLayout);
-
-        delete item;
-    }
-
+    WidgetUtils::clearLayout(layout);
     delete layout;
 }
 

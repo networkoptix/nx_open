@@ -291,7 +291,7 @@ void SearchEdit::focusOutEvent(QFocusEvent* event)
 
     if (const auto completer = m_lineEdit->completer())
     {
-        connect(completer, QCompleterActivated, m_lineEdit, &QLineEdit::setText);
+        connect(completer, QnCompleterActivated, m_lineEdit, &QLineEdit::setText);
         connect(completer, SIGNAL(highlighted(QString)),
             m_lineEdit, SLOT(_q_completionHighlighted));
     }
