@@ -23,13 +23,13 @@ public:
     QVariantMap colors() const;
 
     QColor color(const char* name) const;
-    QColor color(const QLatin1String& name) const;
+    QColor color(const QString& name) const;
 
     QColor color(const char* name, qreal alpha) const;
-    QColor color(const QLatin1String& name, qreal alpha) const;
+    QColor color(const QString& name, qreal alpha) const;
 
     QList<QColor> groupColors(const char* groupName) const;
-    QList<QColor> groupColors(const QLatin1String& groupName) const;
+    QList<QColor> groupColors(const QString& groupName) const;
 
     static Q_INVOKABLE QColor transparent(const QColor& color, qreal alpha);
     Q_INVOKABLE QColor darker(const QColor& color, int offset) const;

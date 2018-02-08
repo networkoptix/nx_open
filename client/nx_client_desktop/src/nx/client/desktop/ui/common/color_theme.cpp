@@ -25,11 +25,11 @@ class ColorTheme::Private
 public:
     QVariantMap colors;
 
-    QHash<QLatin1String, QList<QColor>> groups;
+    QHash<QString, QList<QColor>> groups;
 
     struct ColorInfo
     {
-        QLatin1String group;
+        QString group;
         int index = -1;
     };
     QHash<QColor, ColorInfo> colorInfoByColor;
@@ -88,7 +88,7 @@ void ColorTheme::Private::loadColors()
         if (groupRegExp.exactMatch(colorName))
         {
             const auto& group = groupRegExp.cap(1);
-            groups[QLatin1String(group.toLatin1())].append(color);
+            groups[group].append(color);
         }
     }
 
@@ -128,7 +128,7 @@ QColor ColorTheme::color(const char* name) const
     return d->colors.value(QLatin1String(name)).value<QColor>();
 }
 
-QColor ColorTheme::color(const QLatin1String& name) const
+QColor ColorTheme::color(const QString& name) const
 {
     return d->colors.value(name).value<QColor>();
 }
@@ -138,7 +138,7 @@ QColor ColorTheme::color(const char* name, qreal alpha) const
     return transparent(color(name), alpha);
 }
 
-QColor ColorTheme::color(const QLatin1String& name, qreal alpha) const
+QColor ColorTheme::color(const QString& name, qreal alpha) const
 {
     return transparent(color(name), alpha);
 }
@@ -148,7 +148,7 @@ QList<QColor> ColorTheme::groupColors(const char* groupName) const
     return d->groups[QLatin1String(groupName)];
 }
 
-QList<QColor> ColorTheme::groupColors(const QLatin1String& groupName) const
+QList<QColor> ColorTheme::groupColors(const QString& groupName) const
 {
     return d->groups[groupName];
 }
@@ -169,7 +169,7 @@ QColor ColorTheme::lighter(const QColor& color, int offset) const
 {
     const auto& info = d->colorInfoByColor.value(transparent(color, 1.0));
 
-    if (!info.group.data())
+    if (info.group.isEmpty())
     {
         auto hsl = color.toHsl();
         hsl.setHsl(
