@@ -18,21 +18,21 @@
     "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
     "flashOrWebmRequired": "<a href='https://get.adobe.com/flashplayer/' target='_blank'>instale Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para reproducir vídeo en Internet Explorer.",
     "noArmSupport": "Este navegador o dispositivo no admite la reproducción de vídeo desde servidores basados ​​en ARM.",
-    "noFormat": "This browser does not support video playback from this camera.",
+    "noFormat": "Este navegador no admite reproducción de video desde esta cámara.",
     "ieNoWebm": "Por favor, instale <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para Internet Explorer.",
     "ieWin10": "Utilice navegadores Microsoft Edge o Google Chrome.",
     "ubuntuNX": "Este navegador no admite vídeo de servidores basados ​​en ARM. Por favor, utilice el navegador Chromium en su lugar."
   },
-  "searchCamPlaceholder": "Search",
+  "searchCamPlaceholder": "Búsqueda",
   "resolution": {
     "auto": "Auto",
-    "high": "High",
-    "low": "Low"
+    "high": "Alto",
+    "low": "Bajo"
   },
   "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
   "voiceCommands": {
-    "play": "play",
-    "pause": "pause",
+    "play": "reproducir",
+    "pause": "pausa",
     "live": "go to live | show me live",
     "view": "view + [camera name]",
     "search": "find + [text for searchbar]",

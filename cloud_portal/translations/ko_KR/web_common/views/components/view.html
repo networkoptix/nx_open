@@ -67,7 +67,7 @@
                                                         <span>
                                                             <span ng-class="{'voice-active': voiceControls.enabled}"
                                                                   class="glyphicon glyphicon-bullhorn"></span>
-                                                            &nbsp;Voice Commands
+                                                            &nbsp;음성 명령
                                                         </span>
                                                     </li>
                                                 </ul>
@@ -96,7 +96,7 @@
                             </div>
                             <div class="float-size">
                                 <div ng-if="isFullscreen && enableFullscreenNotification" class="fullscreen-notification fade-out">
-                                    <span>Press ESC to exit fullscreen</span>
+                                    <span>전체 화면을 나가려면 ESC를 누르세요</span>
                                 </div>
                                 <voice-control ng-if="voiceControls.showCommands" voice-controls="voiceControls"></voice-control>
                                 <camera-links ng-if="cameraLinks.enabled"

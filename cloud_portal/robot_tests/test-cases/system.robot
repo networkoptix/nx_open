@@ -20,19 +20,16 @@ Log in to Auto Tests System
 has system name, owner and OpenInNx button visible on systems page
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
-    Wait Until Elements Are Visible    //div[@ng-if='systems.length']    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
-    Element Should Be Visible    ${AUTO TESTS USER}
-    Element Should Be Visible    ${AUTO TESTS OPEN NX}
     Close Browser
 
 shows offline status and does not show open in nx button when offline
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
-    Wait Until Element Is Visible    ${AUTOTESTS OFFLINE}
-    Element Should Be Visible    ${AUTOTESTS OFFLINE}
-    Wait Until Element Is Not Visible    ${AUTOTESTS OPEN NX OFFLINE}
-    Element Should Not Be Visible    ${AUTOTESTS OPEN NX OFFLINE}
+    Validate Log In
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTOTESTS OFFLINE}
+    Wait Until Element Is Not Visible    ${AUTOTESTS OFFLINE OPEN NX}
     Close Browser
 
 should confirm, if owner deletes system (You are going to disconnect your system from cloud)
@@ -40,8 +37,6 @@ should confirm, if owner deletes system (You are going to disconnect your system
     Log in to Auto Tests System    ${EMAIL OWNER}
     Click Button    ${DISCONNECT FROM NX}
     Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}
-    Element Should Be Visible    ${DISCONNECT FORM}
-    Element Should Be Visible    ${DISCONNECT FORM HEADER}
     Close Browser
 
 should confirm, if not owner deletes system (You will loose access to this system)
@@ -51,7 +46,6 @@ should confirm, if not owner deletes system (You will loose access to this syste
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
     Wait Until Element Is Visible    ${DISCONNECT MODAL TEXT}
-    Element Should Be Visible    ${DISCONNECT MODAL TEXT}
     Close Browser
 
 Cancel should cancel disconnection and disconnect should remove it when not owner
@@ -61,17 +55,14 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
     Wait Until Elements Are Visible    ${DISCONNECT MODAL TEXT}    ${DISCONNECT MODAL CANCEL}
-    Element Should Be Visible    ${DISCONNECT MODAL TEXT}
     Click Button    ${DISCONNECT MODAL CANCEL}
     Wait Until Element Is Not Visible    ${DISCONNECT MODAL TEXT}
     Wait Until Page Does Not Contain Element    //div[@modal-render='true']
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
     Wait Until Elements Are Visible    ${DISCONNECT MODAL TEXT}    ${DISCONNECT MODAL DISCONNECT BUTTON}
-    Element Should Be Visible    ${DISCONNECT MODAL TEXT}
     Click Button    ${DISCONNECT MODAL DISCONNECT BUTTON}
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
-    Element Should Be Visible    ${YOU HAVE NO SYSTEMS}
     Log Out
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
@@ -87,10 +78,8 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
 has Share button, visible for admin and owner
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Element Should Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
     Log in to Auto Tests System    ${EMAIL ADMIN}
-    Element Should Be Visible    ${SHARE BUTTON SYSTEMS}
     Close Browser
 
 does not show Share button to viewer, advanced viewer, live viewer
@@ -120,7 +109,6 @@ should open System page by link to not authorized user and redirect to homepage,
     Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
     Click Button    ${LOG IN CLOSE BUTTON}
     Wait Until Element Is Visible    ${JUMBOTRON}
-    Element Should Be Visible    ${JUMBOTRON}
     Close Browser
 
 should open System page by link to not authorized user and show it, after owner logs in
@@ -135,14 +123,12 @@ should open System page by link to user without permission and show alert (Syste
     Validate Log In
     Go To    ${url}/systems/${AUTO TESTS URL}
     Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
-    Element Should Be Visible    ${SYSTEM NO ACCESS}
     Close Browser
 
 should open System page by link not authorized user, and show alert if logs in and has no permission
     Open Browser and go to URL    ${url}/systems/${AUTO TESTS URL}
     Log In    ${EMAIL NOPERM}   ${password}    None
     Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
-    Element Should Be Visible    ${SYSTEM NO ACCESS}
     Close Browser
 
 should display same user data as user provided during registration (stress to cyrillic)
@@ -168,7 +154,6 @@ should display same user data as user provided during registration (stress to cy
 #verify user was added with appropriate name
     Log In    ${email}    ${password}
     Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
-    Element Should Be Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
 
 #remove new user from system
     Log Out
@@ -208,7 +193,6 @@ should display same user data as showed in user account (stress to cyrillic)
     Click Button    ${ACCOUNT SAVE}
     Go To    ${url}/systems/${AUTO TESTS URL}
     Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
-    Element Should Be Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
 
     #remove new user from system
     Log Out

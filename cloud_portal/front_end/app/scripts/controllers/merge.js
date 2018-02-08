@@ -11,22 +11,37 @@ angular.module('cloudApp')
 
         //Add system can merge where added to systems form api call
         function checkMergeAbility(system){
-            if(system.stateOfHealth == 'offline')
+            if(system.stateOfHealth == 'offline'){
                 return 'offline'
-            return ''
+            }
+            if(!system.capabilities || system.capabilities.indexOf('cloudMerge') < 0){
+                return 'cannotMerge';
+            }
+            return '';
         }
 
         account.get().then(function(user){
             $scope.user = user;
             $scope.systems = systemsProvider.getMySystems(user.email, $scope.system.id);
-            $scope.canMerge = $scope.system.accessRole.toLowerCase() === "owner" && $scope.systems.length > 0;
+            $scope.canMerge = $scope.system.isMine && $scope.systems.length > 0;
             $scope.targetSystem = $scope.systems[0];
-            $scope.systemStatus = checkMergeAbility($scope.targetSystem);
+            $scope.systemMergeable = checkMergeAbility($scope.targetSystem);
         });
 
         $scope.setTargetSystem = function(system){
             $scope.targetSystem = system;
-            $scope.systemStatus = checkMergeAbility(system);
+            $scope.systemMergeable = checkMergeAbility(system);
+        };
+
+        $scope.addStatus = function(system){
+            var status = "";
+            if(system.stateOfHealth == 'offline'){
+                status = ' (offline)';
+            }
+            else if(system.stateOfHealth == 'online' && (!system.capabilities || system.capabilities.indexOf('cloudMerge') < 0)){
+                status = ' (incompatable)';
+            }
+            return system.name + status;
         };
 
         $scope.mergingSystems = process.init(function(){
@@ -46,7 +61,7 @@ angular.module('cloudApp')
             successMessage: L.system.mergeSystemSuccess
         }).then(function(){
             systemsProvider.forceUpdateSystems();
-            dialogs.closeMe($scope, {"targetSystemId":$scope.targetSystem.id, "masterSystemId": $scope.masterSystemId});
+            dialogs.closeMe($scope, {"anotherSystemId":$scope.targetSystem.id, "role": $scope.masterSystemId == $scope.system.id ? 'master' : 'slave'});
         });
 
         $scope.close = function(){

@@ -1355,7 +1355,7 @@ ScaleManager.prototype.scroll = function(value){
 
     So we use this relativePosition as a scroll value
 */
-    if(typeof (value) == "undefined" || isNaN(value)){
+    if(typeof (value) == "undefined"){
         //instead of scrolling by center - we always determine scroll value by left position
         return this.getRelativePosition();
     }

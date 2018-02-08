@@ -24,10 +24,8 @@ should show error if same link is used twice
     ${link}    Get Activation Link    ${email}
     Go To    ${link}
     Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
-    Element Should Be Visible    ${ACTIVATION SUCCESS}
     Go To    ${link}
     Wait Until Element Is Visible    ${ALREADY ACTIVATED}
-    Element Should Be Visible    ${ALREADY ACTIVATED}
     Close Browser
 
 should save user data to user account correctly
@@ -38,9 +36,8 @@ should save user data to user account correctly
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
-    Wait Until Elements Are Visible    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}
-    Textfield Should Contain    ${ACCOUNT FIRST NAME}    mark
-    Textfield Should Contain    ${ACCOUNT LAST NAME}    hamill
+    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    mark
+    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    hamill
     Close Browser
 
 should allow to enter more than 255 symbols in First and Last names and cut it to 255
@@ -51,9 +48,8 @@ should allow to enter more than 255 symbols in First and Last names and cut it t
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
-    Wait Until Elements Are Visible    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}
-    Textfield Should Contain    ${ACCOUNT FIRST NAME}    ${255CHARS}
-    Textfield Should Contain    ${ACCOUNT LAST NAME}    ${255CHARS}
+    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    ${255CHARS}
+    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    ${255CHARS}
     Close Browser
 
 should trim leading and trailing spaces
@@ -64,9 +60,8 @@ should trim leading and trailing spaces
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
     Go To    ${url}/account
-    Wait Until Elements Are Visible    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}
-    Textfield Value Should Be    ${ACCOUNT FIRST NAME}    mark
-    Textfield Value Should Be    ${ACCOUNT LAST NAME}    hamill
+    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    mark
+    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    hamill
     Close Browser
 
 #These are blocked by CLOUD-1624
@@ -83,14 +78,10 @@ link works and suggests to log out user, if he was logged in, buttons operate co
     Validate Log In
     Go To    ${link}
     Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
-    Element Should Be Visible    ${LOGGED IN CONTINUE BUTTON}
-    Element Should Be Visible    ${LOGGED IN LOG OUT BUTTON}
     Click Button    ${LOGGED IN CONTINUE BUTTON}
     Validate Log In
     Go To    ${link}
     Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
-    Element Should Be Visible    ${LOGGED IN CONTINUE BUTTON}
-    Element Should Be Visible    ${LOGGED IN LOG OUT BUTTON}
     Click Button    ${LOGGED IN LOG OUT BUTTON}
     Validate Log Out
     Close Browser
@@ -105,8 +96,7 @@ email can be sent again
     Wait Until Element Is Visible    //h1[contains(@class,'process-success')]
     Log In    ${random email}    ${BASE PASSWORD}
     Wait Until Element Is Visible    ${RESEND ACTIVATION LINK BUTTON}
-    ${current page}    Get Location
-    Should Be True    '${current page}' == '${url}/activate'
+    Location Should Be    ${url}/activate
     Validate Register Email Received    ${random email}
     Click Button    ${RESEND ACTIVATION LINK BUTTON}
     Validate Register Email Received    ${random email}
