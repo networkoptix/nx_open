@@ -28,18 +28,48 @@ struct ResourceThumbnailProvider::Private
     {
         request = value;
 
-        QnMediaResourcePtr mediaResource = request.resource.dynamicCast<QnMediaResource>();
-        // Some cameras are actually provide only sound stream. So we draw sound icon for this.
-        if (mediaResource && !mediaResource->hasVideo())
+        QnResourcePtr resource = value.resource;
+
+        NX_ASSERT(resource);
+
+        QnMediaResourcePtr mediaResource = value.resource.dynamicCast<QnMediaResource>();
+        bool useCustomSoundIcon = mediaResource && !mediaResource->hasVideo();
+
+        QString placeholderIconPath;
+
+        if (resource->hasFlags(Qn::server))
         {
+            placeholderIconPath = lit("item_placeholders/videowall_server_placeholder.png");
+        }
+        else if (resource->hasFlags(Qn::web_page))
+        {
+            placeholderIconPath = lit("item_placeholders/videowall_webpage_placeholder.png");
+        }
+        else if(useCustomSoundIcon)
+        {
+            // Some cameras are actually provide only sound stream. So we draw sound icon for this.
+            placeholderIconPath = lit("item_placeholders/sound.png");
+        }
+        else if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+        {
+            api::CameraImageRequest cameraRequest(camera, request);
+            baseProvider.reset(new CameraThumbnailProvider(cameraRequest));
+        }
+        else if (request.resource)
+        {
+            baseProvider.reset(new FfmpegImageProvider(request.resource));
+        }
+
+        if (!baseProvider && !placeholderIconPath.isEmpty())
+        {
+            QPixmap pixmap = qnSkin->pixmap(placeholderIconPath, true);
             // TODO: vms 4.0 has a new way to get preset colors
             const auto& palette = QnNxStyle::instance()->genericPalette();
             const auto& backgroundColor = palette.color(lit("dark"), 4);
             const auto& frameColor = palette.color(lit("dark"), 6);
-            QPixmap pixmap = qnSkin->pixmap(lit("item_placeholders/sound.png"), true);
             QSize size = pixmap.size();
             QPixmap dst(size);
-            // We fill in background.
+            // We fill in the background.
             dst.fill(backgroundColor);
             QPainter painter(&dst);
             painter.setRenderHints(QPainter::SmoothPixmapTransform);
@@ -48,15 +78,6 @@ struct ResourceThumbnailProvider::Private
             painter.setOpacity(1.0);
 
             baseProvider.reset(new QnBasicImageProvider(dst.toImage()));
-        }
-        else if (const auto camera = request.resource.dynamicCast<QnVirtualCameraResource>())
-        {
-            api::CameraImageRequest cameraRequest(camera, request);
-            baseProvider.reset(new CameraThumbnailProvider(cameraRequest));
-        }
-        else if (request.resource)
-        {
-            baseProvider.reset(new FfmpegImageProvider(request.resource));
         }
     }
 
