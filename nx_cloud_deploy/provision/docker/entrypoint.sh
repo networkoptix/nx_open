@@ -5,6 +5,11 @@ if [[ ! -d /hostssh ]]; then
     exit 1
 fi
 
+if [ -n "$MODULE_CONFIGURATION" ]
+then
+    echo "$MODULE_CONFIGURATION" | /usr/local/bin/merge_config.py /playbooks/vars/telegraf.yml
+fi
+
 # Generate temporary SSH key to allow access to the host machine.
 mkdir -p /root/.ssh
 ssh-keygen -f /root/.ssh/id_rsa -P ""
