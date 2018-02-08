@@ -6,7 +6,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-void WidgetUtils::clearLayout(QLayout* layout)
+void WidgetUtils::removeLayout(QLayout* layout)
 {
     if (!layout)
         return;

@@ -7,7 +7,7 @@ namespace desktop {
 class WidgetUtils
 {
 public:
-    static void clearLayout(QLayout* layout);
+    static void removeLayout(QLayout* layout);
 };
 
 } // namespace desktop

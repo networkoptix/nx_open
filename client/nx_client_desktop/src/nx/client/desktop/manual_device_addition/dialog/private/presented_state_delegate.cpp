@@ -11,12 +11,6 @@ namespace {
 
 using namespace nx::client::desktop;
 
-void removeLayout(QLayout* layout)
-{
-    WidgetUtils::clearLayout(layout);
-    delete layout;
-}
-
 class CellWidget: public QWidget
 {
     using base_type = QWidget;
@@ -34,7 +28,7 @@ CellWidget::CellWidget(QWidget* parent):
 
 void CellWidget::setState(FoundDevicesModel::PresentedState value)
 {
-    removeLayout(layout());
+    WidgetUtils::removeLayout(layout());
     if (value == FoundDevicesModel::notPresentedState)
         return;
 
