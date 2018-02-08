@@ -15,33 +15,33 @@
     "unauthorized": "Wymagane uwierzytelnienie",
     "noData": "Brak danych",
     "iosVideoTooLarge": "iOS nie obsługuje wideo większego niż FullHD (2MP: 1920x1080).",
-    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashRequired": "Aby odtwarzać filmy wideo, proszę <a href='https://get.adobe.com/flashplayer/' target='_blank'>zainstalować Adobe Flash</a>.",
     "flashOrWebmRequired": "Proszę <a href='https://get.adobe.com/flashplayer/' target='_blank'>zainstalować Adobe Flash</a> lub <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodek WebM</a> w celu odtwarzania wideo w przeglądarce Internet Explorer.",
     "noArmSupport": "Ta przeglądarka lub system nie obsługują odtwarzania wideo na serwerze bazującym na architekturze ARM.",
-    "noFormat": "This browser does not support video playback from this camera.",
+    "noFormat": "Ta przeglądarka nie obsługuje odtwarzania wideo z tej kamery.",
     "ieNoWebm": "Proszę <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>zainstalować kodek WebM</a> do Internet Explorera.",
     "ieWin10": "Proszę użyć przeglądarki Microsoft Edge lub Google Chrome.",
     "ubuntuNX": "Ta przeglądarka nie obsługuje wideo z serwerów opartych na architekturze ARM. Proszę użyć przeglądarki Chromium."
   },
-  "searchCamPlaceholder": "Search",
+  "searchCamPlaceholder": "Szukaj",
   "resolution": {
     "auto": "Auto",
-    "high": "High",
-    "low": "Low"
+    "high": "Wysoka",
+    "low": "Niska"
   },
-  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+  "chromeCastWarning": "Chromecast wymaga dużej ilości zasobów i może powodować problemy na serwerze.",
   "voiceCommands": {
-    "play": "play",
-    "pause": "pause",
-    "live": "go to live | show me live",
-    "view": "view + [camera name]",
-    "search": "find + [text for searchbar]",
-    "clear search": "clear search",
-    "expand server": "expand server + [server name]",
-    "collapse server": "collapse server + [server name]",
-    "expand all servers": "expand all servers",
-    "collapse all servers": "collapse all servers",
-    "stop listening": "stop listening",
-    "help": "help | show commands"
+    "play": "odtwarzaj",
+    "pause": "pauza",
+    "live": "podgląd na żywo | pokaż na żywo",
+    "view": "pokaż + [nazwa kamery]",
+    "search": "szukaj + [tekst paska wyszukiwania]",
+    "clear search": "wyczyść wyszukiwanie",
+    "expand server": "rozwiń serwer + [nazwa serwera]",
+    "collapse server": "zwiń serwer + [nazwa serwera]",
+    "expand all servers": "rozwiń wszystkie serwery",
+    "collapse all servers": "zwiń wszystkie serwery",
+    "stop listening": "przestań słuchać",
+    "help": "pomoc | pokaż polecenia"
   }
 }

@@ -6,7 +6,7 @@ angular.module('nxCommon')
 			restrict: 'E',
         	scope:{
         	    iconClass: "=",
-        	    title: "=",
+        	    placeholderTitle: "=",
         	    message: "=",
         	    preloader: "=",
         	    condition: "=ngIf"

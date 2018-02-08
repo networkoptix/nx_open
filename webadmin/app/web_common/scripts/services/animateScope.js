@@ -77,6 +77,10 @@ angular.module('nxCommon')
             var proportion = time/duration;
             var delta = proportion * (2 - proportion);
             var result =start + (stop - start) * delta;
+            if(Number.isNaN(result)){
+                console.error('dryResistance-error',result,start,stop,time,duration);
+                throw "Animation value is not a number";
+            }
             return result;
         };
 
@@ -192,7 +196,6 @@ angular.module('nxCommon')
                 if(Number.isNaN(value)){
                     throw 'Animation target is not a number';
                 }
-
                 var targetAnimation = this.animating(scope, value);
                 if(targetAnimation){
                     targetAnimation.breakAnimation();

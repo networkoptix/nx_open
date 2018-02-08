@@ -43,7 +43,7 @@
 
                             <div ng-if="!activeFunction">
                                 <div ng-repeat="group in apiGroups">
-                                    <h3>{{group.groupName}}<span ng-if="group.urlPrefix">:{{group.urlPrefix}}/</span></h3>
+                                    <h3>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></h3>
                                     <p>{{group.groupDescription}}</p>
                                     <ul>
                                         <li ng-repeat="function in group.functions | orderBy:'name' | filter: {$:searchFunc}"

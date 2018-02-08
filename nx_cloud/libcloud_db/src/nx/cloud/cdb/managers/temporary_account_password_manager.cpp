@@ -1,5 +1,11 @@
 #include "temporary_account_password_manager.h"
 
+#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#include <zlib.h>
+#else
+#include <QtZlib/zlib.h>
+#endif
+
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -10,6 +16,7 @@
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/fusion/serialization/sql.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/utils/crc32.h>
 #include <nx/utils/cryptographic_random_device.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
@@ -112,7 +119,11 @@ void TemporaryAccountPasswordManager::addRandomCredentials(
     data::TemporaryAccountCredentials* const data)
 {
     if (data->login.empty())
-        data->login = accountEmail;
+    {
+        data->login = generateRandomPassword();
+        const auto loginCrc32 = std::to_string(nx::utils::crc32(accountEmail));
+        data->login += "-" + loginCrc32;
+    }
 
     data->password = generateRandomPassword();
     data->passwordHa1 = nx_http::calcHa1(
@@ -222,7 +233,7 @@ boost::optional<TemporaryAccountCredentialsEx>
 
 std::string TemporaryAccountPasswordManager::generateRandomPassword() const
 {
-    auto str = QnUuid::createUuid().toSimpleByteArray();
+    auto str = QnUuid::createUuid().toSimpleByteArray().toLower();
     str.replace('-', "");
     return str.toStdString();
 }

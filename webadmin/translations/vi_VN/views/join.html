@@ -56,7 +56,9 @@
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
             <p>Hệ thống hiện tại sắp sáp nhập <b> {{systems.systemName}} </b> Với Hệ thống <b> {{systems.joinSystemName}} </b></p>
             <p>
-                Hệ thống mới sẽ có mật khẩu và tên từ hệ thống sau: <0 /> <label> <2 /> {{systems.systemName}} (hiện tại) </label> <0 /> <label ng-if="!systems.remoteSystemIsNew"> <4 /> {{systems.joinSystemName}} </label>
+                Hệ thống mới sẽ có mật khẩu và tên từ hệ thống sau:<br/>
+<label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (current)</label> <br/>
+<label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>

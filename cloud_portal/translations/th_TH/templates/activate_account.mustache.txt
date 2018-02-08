@@ -1,8 +1,8 @@
-Hello,
+สวัสดี,
 
-  Please open the link below to confirm your email address and activate the account.
+  โปรดเปิดลิงก์ด้านล่างเพื่อยืนยันที่อยู่อีเมลของคุณและเปิดใช้งานบัญชี
 
 {{config.portal_url}}/activate/{{message.code}}
 
 หากคุณไม่ได้ลงทะเบียนใน {{PRODUCT_NAME}} แค่ไม่สนใจอีเมลนี้
-Do not share the message or the link with anyone.
+อย่าแชร์ข้อความหรือลิงก์กับทุกคน

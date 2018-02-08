@@ -1,18 +1,18 @@
 <form class="form" role="form" novalidate name="form" id="mergeDialog">
     <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"> <span aria-hidden="true"> &times;</span> <span class="sr-only"> cerrar</span></button>         <h3 class="modal-title"> fusionar sistemas de</h3>
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"> <span aria-hidden="true"> &times;</span> <span class="sr-only"> cerrar</span></button>         <h3 class="modal-title"> Unir Sistemas </h3>
     </div>
 
     <div class="col-sm-12">
         <ng-form name="findSystemForm">
             <div class="form-group">
-                <label for="otherSystemUrl" class="control-label">Otro enlace de sistema</label>
+                <label for="otherSystemUrl" class="control-label">Otro URL del sistema</label>
                 <div class="">
                     <div class="input-group" dropdown>
                         <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="host:Puerto" required />
 
                         <ul class="dropdown-menu" role="menu" id="discoveredUrls">
-                            <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>Sistemas no encontrados</a></li>
+                            <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>Ningún sistemas encontrado</a></li>
                             <li ng-repeat="system in systems.discoveredUrls"
                                 ng-class="{disabled:!system.compatible}">
                                 <a ng-click="system.compatible && selectSystem(system);">{{system.visibleName}}</a>
@@ -37,7 +37,7 @@
             </div>
 
             <div class="form-group">
-                <label for="otherSystemPassword" class="control-label">Otro sistema de contraseñas</label>
+                <label for="otherSystemPassword" class="control-label">Contraseña de otro Sistema</label>
                 <div class="">
                     <input type="password" ng-model="settings.password"  class="form-control" id="otherSystemPassword"
                            autocomplete="new-password"
@@ -61,6 +61,6 @@
         </div>
     </div>
     <div class="modal-footer" >
-        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid">Encontrar el sistema</button>         <button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid">Combinar con {{systems.joinSystemName}}</button>
+        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid">Encontrar el sistema</button>         <button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid">Unir con {{systems.joinSystemName}}</button>
     </div>
 </form>

@@ -39,8 +39,15 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
 
                     <div>
                         <h3>Szerver visszaállítása</h3>
-                        <p>Ez a művelet visszaállítja a szerver alapértelmezett beállításait, (töröli az adatbázist és visszaállítja a gyári beállításokat). A szerver leválik a jelenlegi rendszerről. A rögzített videók érintetlenek maradnak.</p>
+                        <p>Ez a művelet visszaállítja ezt a szervert az alapértelmezett értékekre (törli az adatbázist és visszaállítja a gyári konfigurációt).
+                            A szerver leválik a jelenlegi rendszerről. A videóarchívum sértetlen marad.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Gyári beállítások visszaállítása</button></p>
+                    </div>
+                    <div>
+                        <h3>Szerver leválasztása a rendszerről</h3>
+                        <p>Ez a művelet le fogja választani a szervert a rendszerről. Az adatbázis, a helyi felhasználók és a konfiguráció sértetlen marad.
+                            A videóarchívum sértetlen marad. <b> A felhőfelhasználók törlődnek. </b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Leválasztása a rendszerről</button></p>
                     </div>
                     <div>
                         <h3>Újraindítás</h3>
@@ -48,10 +55,10 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form" >
+                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
                             <h3>Admin jelszó módosítása</h3>
                             <p>Ha a rendszer helyi (nem kapcsolódik a felhő) az "admin" felhasználó és a helyreállítási (root) jelszó fog megváltozni egyes szervereken. <br>
-Egyébként csak a helyreállítási jelszó fog megváltozni.</p>
+                                Egyébként csak a helyreállítási jelszó fog megváltozni.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>

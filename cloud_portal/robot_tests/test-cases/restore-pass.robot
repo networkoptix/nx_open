@@ -44,16 +44,14 @@ restores password
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
-    Element Should Be Visible    ${RESET EMAIL SENT MESSAGE}
     Close Browser
 
 should not allow to access /restore_password/sent /restore_password/success by direct input
     Open Browser and go to URL    ${url}/restore_password/sent
     Wait Until Element Is Visible    ${JUMBOTRON}
-    Element Should Be Visible    ${JUMBOTRON}
     Go To    ${url}/restore_password/success
     Wait Until Element Is Visible    ${JUMBOTRON}
-    Element Should Be Visible    ${JUMBOTRON}
+    Close Browser
 
 should be able to set new password (which is same as old), redirect
     ${email}    Get Random Email
@@ -71,7 +69,7 @@ should be able to set new password (which is same as old), redirect
     Input Text    ${RESET PASSWORD INPUT}    ${password}
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
-    Element Should Be Visible    ${RESET SUCCESS MESSAGE}
+    Close Browser
 
 should set new password, login with new password
     ${email}    Get Random Email
@@ -89,7 +87,6 @@ should set new password, login with new password
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
-    Element Should Be Visible    ${RESET SUCCESS MESSAGE}
     Click Link    ${RESET SUCCESS LOG IN LINK}
     Log In    ${email}    ${ALT PASSWORD}    None
     Validate Log In
@@ -111,7 +108,6 @@ should not allow to use one restore link twice
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
-    Element Should Be Visible    ${RESET SUCCESS MESSAGE}
     Go To    ${link}[1]
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
@@ -133,7 +129,6 @@ should make not-activated user active by restoring password
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
-    Element Should Be Visible    ${RESET SUCCESS MESSAGE}
     Click Link    ${RESET SUCCESS LOG IN LINK}
     Log In    ${email}    ${ALT PASSWORD}    None
     Validate Log In
@@ -145,6 +140,7 @@ should allow logged in user visit restore password page
     Register    mark    hamill    ${email}    ${password}
     Activate    ${email}
     Log In    ${email}    ${password}
+    Validate Log In
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Close Browser
@@ -168,6 +164,7 @@ should prompt log user out if he visits restore password link from email
     Go To    ${link}
     Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
     Click Button    ${LOGGED IN LOG OUT BUTTON}
+    Validate Log Out
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Close Browser
 

@@ -37,15 +37,21 @@
 
                     <div>
                         <h3>서버를 리셋</h3>
-                        <p>이 작업은 서버 (데이터베이스 및 리셋 구성 지우기) 를 기본값으로 되돌립니다.. 서버는 현재 시스템에서 분리 될 것입니다. 비디오 녹화데이터는 그대로 유지 됩니다.</p>
+                        <p>이 작업은이 서버를 기본값으로 되돌립니다 (데이터베이스를 지우고 구성을 다시 설정).
+                            서버가 현재 시스템에서 분리됩니다. 저장된 비디오는 그대로 유지됩니다.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">공장 기본값 복원</button></p>
+                    </div>
+                    <div>
+                        <h3>시스템에서 서버 분리</h3>
+                        <p>이 작업은 데이터베이스, 로컬 사용자 및 구성을 유지하면서 서버를 시스템에서 분리합니다. 저장된 비디오는 그대로 유지됩니다. <b> 클라우드 사용자는 삭제됩니다. </b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">시스템에서 분리</button></p>
                     </div>
                     <div>
                         <h3>재시작</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()"> 서버 다시 시작</button>                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()"> 재 부 팅</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form" >
+                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
                             <h3>관리자 암호 변경</h3>
                             <p>If System is local (not connected to the cloud) this will change the password for user "admin" and the recovery (root) password on some servers.<br>
                                 Otherwise this will change the recovery password only.</p>
@@ -55,7 +61,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">암호 변경</button>
+                                        ng-click="changePassword()">패스워드 변경</button>
                             </div>
                         </form>
                     </div>
