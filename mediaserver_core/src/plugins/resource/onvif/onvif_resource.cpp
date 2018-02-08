@@ -3981,8 +3981,9 @@ void QnPlOnvifResource::updateVideoEncoder(
     }
     auto capabilities = isPrimary ? m_primaryStreamCapabilities : m_secondaryStreamCapabilities;
 
-    encoder.Encoding = capabilities.isH264 ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
-    //encoder.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
+    const auto codecId = QnAvCodecHelper::codecIdFromString(streamParams.codec);
+    encoder.Encoding = capabilities.isH264 && codecId != AV_CODEC_ID_MJPEG
+        ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
 
     Qn::StreamQuality quality = params.quality;
 
