@@ -4,6 +4,7 @@
 
 #include <nx/utils/random.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/client/desktop/ui/common/color_theme.h>
 #include <client/client_settings.h>
 
 namespace nx {
@@ -11,21 +12,6 @@ namespace client {
 namespace desktop {
 
 namespace  {
-
-static const QVector<QColor> kFrameColors{
-    Qt::red,
-    Qt::green,
-    Qt::blue,
-    Qt::cyan,
-    Qt::magenta,
-    Qt::yellow,
-    Qt::darkRed,
-    Qt::darkGreen,
-    Qt::darkBlue,
-    Qt::darkCyan,
-    Qt::darkMagenta,
-    Qt::darkYellow
-};
 
 struct ObjectDisplaySettingsItem
 {
@@ -82,7 +68,7 @@ QColor ObjectDisplaySettings::objectColor(const QnUuid& objectTypeId)
     auto& settings = d->settingsByTypeId[objectTypeId];
     if (!settings.color.isValid())
     {
-        settings.color = utils::random::choice(kFrameColors);
+        settings.color = utils::random::choice(colorTheme()->groupColors("detectedObject"));
         d->saveSettings();
     }
     return settings.color;
