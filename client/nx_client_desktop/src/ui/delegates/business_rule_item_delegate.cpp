@@ -371,7 +371,9 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         }
         case Column::action:
         {
-            bool instantOnly = !vms::event::hasToggleState(index.data(Qn::EventTypeRole).value<vms::event::EventType>());
+            auto eventType = index.data(Qn::EventTypeRole).value<vms::event::EventType>();
+            auto eventParams = index.data(Qn::EventParamsRole).value<nx::vms::event::EventParameters>();
+            bool instantOnly = !vms::event::hasToggleState(eventType, eventParams, commonModule());
             QComboBox* comboBox = new QComboBox(parent);
             comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
             for (vms::event::ActionType actionType : m_lexComparator->lexSortedActions())

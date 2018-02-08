@@ -128,25 +128,26 @@ struct HanwhaAlternativePtzTrait
     Ptz::Capabilities capabilities;
 };
 
-static const std::map<HanwhaTraitName, HanwhaAlternativePtzTrait>
-kHanwhaAlternativePtzTraits = {
+static const std::map<QString, HanwhaAlternativePtzTrait>
+    kHanwhaAlternativePtzTraits =
     {
-        HanwhaResource::kHanwhaAlternativeZoomTrait,
         {
-            lit("Image/FocusAdjust"),
-            lit("image/focus/control/Focus"),
-            Ptz::ContinuousFocusCapability
-        }
-    },
-    {
-        HanwhaResource::kHanwhaAlternativeFocusTrait,
+            HanwhaResource::kHanwhaAlternativeZoomTrait,
+            {
+                lit("Image/FocusAdjust"),
+                lit("image/focus/control/Focus"),
+                Ptz::ContinuousFocusCapability
+            }
+        },
         {
-            lit("Image/ZoomAdjust"),
-            lit("image/focus/control/Zoom"),
-            Ptz::ContinuousZoomCapability
+            HanwhaResource::kHanwhaAlternativeFocusTrait,
+            {
+                lit("Image/ZoomAdjust"),
+                lit("image/focus/control/Zoom"),
+                Ptz::ContinuousZoomCapability
+            }
         }
-    }
-};
+    };
 
 static const QString kAdvancedParametersTemplateFile = lit(":/camera_advanced_params/hanwha.xml");
 
@@ -1120,9 +1121,14 @@ CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
         if (!success)
             continue;
 
+        const auto split = trait.valueAttribute.split('/');
+        NX_ASSERT(!split.isEmpty());
+        if (split.isEmpty())
+            continue;
+
         m_ptzTraits.append(traitName);
         m_ptzCapabilities |= trait.capabilities;
-        m_alternativePtzRanges[traitName] = std::move(possibleValues);
+        m_alternativePtzRanges[split.last()] = std::move(possibleValues);
     }
 
     return CameraDiagnostics::NoErrorResult();

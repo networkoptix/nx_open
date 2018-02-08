@@ -627,7 +627,7 @@ void QnBusinessRulesDialog::testRule(const QnBusinessRuleViewModelPtr& ruleModel
         };
 
     auto eventType = ruleModel->eventType();
-    if (nx::vms::event::hasToggleState(eventType))
+    if (nx::vms::event::hasToggleState(eventType, ruleModel->eventParams(), commonModule()))
     {
         connection->testEventRule(ruleModel->id(), nx::vms::event::EventState::active,
             [this, id = ruleModel->id(), connection, makeCallback]

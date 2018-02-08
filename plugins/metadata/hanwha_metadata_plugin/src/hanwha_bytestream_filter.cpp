@@ -71,15 +71,21 @@ boost::optional<HanwhaEvent> HanwhaBytestreamFilter::createEvent(
     const QString& eventSource,
     const QString& eventState) const
 {
+    using namespace nx::api;
+
     auto eventTypeId = m_manifest.eventTypeByInternalName(eventSource);
     if (eventTypeId.isNull())
         return boost::none;
+    const auto eventDescriptor = m_manifest.eventDescriptorById(eventTypeId);
 
     HanwhaEvent event;
     event.typeId = nxpt::NxGuidHelper::fromRawData(eventTypeId.toRfc4122());
     event.channel = eventChannel(eventSource);
     event.region = eventRegion(eventSource);
-    event.isActive = isEventActive(eventState);
+    if (eventDescriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
+        event.isActive = isEventActive(eventState);  //< Event start/stop.
+    else
+        event.isActive = true; //< Event occurred.
     event.itemType = eventItemType(eventSource, eventState);
     event.fullEventName = eventSource;
 

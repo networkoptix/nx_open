@@ -44,11 +44,9 @@ public:
             return;
 
         keys.insert(id);
-        EventDescriptor ref;
+        EventDescriptor ref(eventType);
         ref.driverId = manifest.driverId;
         ref.driverName = manifest.driverName;
-        ref.eventTypeId = eventType.eventTypeId;
-        ref.eventName = eventType.eventName;
         data->push_back(ref);
     }
 
@@ -67,6 +65,33 @@ AnalyticsHelper::AnalyticsHelper(QnCommonModule* commonModule, QObject* parent):
     base_type(parent),
     QnCommonModuleAware(commonModule)
 {
+}
+
+AnalyticsHelper::EventDescriptor AnalyticsHelper::eventDescriptor(const QnUuid& eventId) const
+{
+    static QnMutex mutex;
+    static QMap<QnUuid, AnalyticsHelper::EventDescriptor> cachedData;
+
+    QnMutexLocker lock(&mutex);
+    auto itr = cachedData.find(eventId);
+    if (itr != cachedData.end())
+        return *itr;
+
+    for (const auto& server: resourcePool()->getAllServers(Qn::AnyStatus))
+    {
+        for (const auto& manifest: server->analyticsDrivers())
+        {
+            for (const auto& eventType: manifest.outputEventTypes)
+            {
+                if (eventType.eventTypeId == eventId)
+                {
+                    cachedData[eventId] = eventType;
+                    return eventType;
+                }
+            }
+        }
+    }
+    return AnalyticsHelper::EventDescriptor();
 }
 
 QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::systemSupportedAnalyticsEvents() const

@@ -272,6 +272,8 @@ QVariant QnBusinessRuleViewModel::data(Column column, const int role) const
 
         case Qn::EventTypeRole:
             return qVariantFromValue(m_eventType);
+        case Qn::EventParamsRole:
+            return qVariantFromValue(m_eventParams);
         case Qn::EventResourcesRole:
             return qVariantFromValue(filterEventResources(m_eventResources, m_eventType));
         case Qn::ActionTypeRole:
@@ -454,6 +456,22 @@ void QnBusinessRuleViewModel::setEventType(const vms::event::EventType value)
     m_eventType = value;
     m_modified = true;
 
+    switch (m_eventType)
+    {
+    case vms::event::cameraInputEvent:
+        m_eventParams.inputPortId = QString();
+        break;
+
+    case vms::event::softwareTriggerEvent:
+        m_eventParams.inputPortId = QnUuid::createUuid().toSimpleString();
+        m_eventParams.description = QnSoftwareTriggerPixmaps::defaultPixmapName();
+        m_eventParams.caption = QString();
+        break;
+
+    default:
+        m_eventParams.caption = m_eventParams.description = QString();
+    }
+
     Fields fields = Field::eventType | Field::modified;
 
     if (vms::event::requiresCameraResource(m_eventType) != cameraRequired ||
@@ -462,11 +480,20 @@ void QnBusinessRuleViewModel::setEventType(const vms::event::EventType value)
         fields |= Field::eventResources;
     }
 
-    if (vms::event::hasToggleState(m_eventType))
+    fields |= updateEventClassRelatedParams();
+
+    emit dataChanged(fields);
+    // TODO: #GDM #Business check others, params and resources should be merged
+}
+
+QnBusinessRuleViewModel::Fields QnBusinessRuleViewModel::updateEventClassRelatedParams()
+{
+    Fields fields = Field::modified;
+    if (vms::event::hasToggleState(m_eventType, m_eventParams, commonModule()))
     {
         if (!isActionProlonged())
         {
-            const auto allowedStates = allowedEventStates(m_eventType);
+            const auto allowedStates = allowedEventStates(m_eventType, m_eventParams, commonModule());
             if (!allowedStates.contains(m_eventState))
             {
                 m_eventState = allowedStates.first();
@@ -494,27 +521,10 @@ void QnBusinessRuleViewModel::setEventType(const vms::event::EventType value)
         }
     }
 
-    switch (m_eventType)
-    {
-        case vms::event::cameraInputEvent:
-            m_eventParams.inputPortId = QString();
-            break;
-
-        case vms::event::softwareTriggerEvent:
-            m_eventParams.inputPortId = QnUuid::createUuid().toSimpleString();
-            m_eventParams.description = QnSoftwareTriggerPixmaps::defaultPixmapName();
-            m_eventParams.caption = QString();
-            break;
-
-        default:
-            m_eventParams.caption = m_eventParams.description = QString();
-    }
-
     updateActionTypesModel();
     updateEventStateModel();
 
-    emit dataChanged(fields);
-    // TODO: #GDM #Business check others, params and resources should be merged
+    return fields;
 }
 
 
@@ -549,10 +559,16 @@ void QnBusinessRuleViewModel::setEventParams(const vms::event::EventParameters &
     if (!hasChanges)
         return;
 
+    bool hasAnalyticsChanges = m_eventParams.analyticsEventId() != params.analyticsEventId();
     m_eventParams = params;
     m_modified = true;
-
-    emit dataChanged(Field::eventParams | Field::modified);
+    auto fields = Field::eventParams | Field::modified;
+    if (hasAnalyticsChanges)
+    {
+        updateEventClassRelatedParams();
+        fields |= Field::eventType;
+    }
+    emit dataChanged(fields);
 }
 
 vms::event::EventState QnBusinessRuleViewModel::eventState() const
@@ -639,12 +655,14 @@ void QnBusinessRuleViewModel::setActionType(const vms::event::ActionType value)
         }
     }
 
-    if (vms::event::hasToggleState(m_eventType) && !isActionProlonged() && m_eventState == vms::event::EventState::undefined)
+    if (vms::event::hasToggleState(m_eventType, m_eventParams, commonModule()) &&
+        !isActionProlonged() && m_eventState == vms::event::EventState::undefined)
     {
-        m_eventState = allowedEventStates(m_eventType).first();
+        m_eventState = allowedEventStates(m_eventType, m_eventParams, commonModule()).first();
         fields |= Field::eventState;
     }
-    else if (!vms::event::hasToggleState(m_eventType) && vms::event::supportsDuration(m_actionType) && m_actionParams.durationMs <= 0)
+    else if (!vms::event::hasToggleState(m_eventType, m_eventParams, commonModule()) &&
+        vms::event::supportsDuration(m_actionType) && m_actionParams.durationMs <= 0)
     {
         m_actionParams.durationMs = defaultActionDurationMs;
         fields |= Field::actionParams;
@@ -1090,7 +1108,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
 void QnBusinessRuleViewModel::updateEventStateModel()
 {
     m_eventStatesModel->clear();
-    foreach(vms::event::EventState val, vms::event::allowedEventStates(m_eventType))
+    foreach(vms::event::EventState val, vms::event::allowedEventStates(m_eventType, m_eventParams, commonModule()))
     {
         QStandardItem *item = new QStandardItem(toggleStateToModelString(val));
         item->setData(int(val));
@@ -1107,7 +1125,7 @@ void QnBusinessRuleViewModel::updateActionTypesModel()
         ProlongedActionRole, true, -1, Qt::MatchExactly);
 
     // what type of actions to show: prolonged or instant
-    bool enableProlongedActions = vms::event::hasToggleState(m_eventType);
+    bool enableProlongedActions = vms::event::hasToggleState(m_eventType, m_eventParams, commonModule());
     foreach(QModelIndex idx, prolongedActions)
     {
         m_actionTypesModel->item(idx.row())->setEnabled(enableProlongedActions);

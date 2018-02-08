@@ -12,8 +12,6 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-using HanwhaTraitName = QString;
-
 class HanwhaPtzController: public QnBasicPtzController
 {
     Q_OBJECT
@@ -31,7 +29,7 @@ public:
     void setPtzCapabilities(Ptz::Capabilities capabilities);
     void setPtzLimits(const QnPtzLimits& limits);
     void setPtzTraits(const QnPtzAuxilaryTraitList& traits);
-    void setAlternativePtzRanges(const std::map<HanwhaTraitName, std::set<int>>& ranges);
+    void setAlternativePtzRanges(const std::map<QString, std::set<int>>& ranges);
 
     virtual bool continuousMove(const QVector3D& speed) override;
     virtual bool continuousFocus(qreal speed) override;
@@ -65,8 +63,6 @@ private:
         qreal aspectRatio,
         const QRectF rect) const;
 
-    QString traitToParameterName(const QString& traitName) const;
-
     bool alternativeContinuousMove(const QString& parameterName, qreal speed);
 
 private:
@@ -80,7 +76,7 @@ private:
     QnPtzAuxilaryTraitList m_ptzTraits;
     mutable std::unique_ptr<HanwhaMappedPresetManager> m_presetManager;
     QMap<QString, float> m_lastParamValue;
-    HanwhaPtzExecutor m_alternativePtzExecutor;
+    std::unique_ptr<HanwhaPtzExecutor> m_alternativePtzExecutor;
 
 };
 

@@ -64,7 +64,7 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(Fields fields)
 
     if (fields.testFlag(Field::eventType))
     {
-        bool hasToggleState = nx::vms::event::hasToggleState(model()->eventType());
+        bool hasToggleState = nx::vms::event::hasToggleState(model()->eventType(), model()->eventParams(), commonModule());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);

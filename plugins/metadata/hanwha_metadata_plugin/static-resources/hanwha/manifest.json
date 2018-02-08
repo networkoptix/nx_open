@@ -80,8 +80,6 @@
             "internalName": "VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing",
             "description": "Object %1 ",
             "positiveState": "appeared",
-            "negativeState": "disappeared",
-            "flags": "stateDependent",
             "regionDescription": "  in the region #%1"
         },
         {
@@ -93,9 +91,7 @@
             },
             "internalName": "VideoAnalytics.Intrusion",
             "description": "Intrusion %1",
-            "positiveState": "has been detected",
-            "negativeState": "has ended",
-            "flags": "stateDependent"
+            "positiveState": "has been detected"
         },
         {
             "eventTypeId": "{CABB4644-F6C2-4F09-8EDF-E0FAFCC4F833}",
@@ -119,9 +115,7 @@
             },
             "internalName": "Tampering",
             "description": "Tampering %1",
-            "positiveState": "has been detected",
-            "negativeState": "has ended",
-            "flags": "stateDependent"
+            "positiveState": "has been detected"
         },
         {
             "eventTypeId": "{216668D9-EA9B-483A-A43E-9414ED760A01}",
@@ -185,9 +179,7 @@
             },
             "internalName": "AudioAnalytics.Gunshot",
             "description": "Gun shot %1",
-            "positiveState": "has been detected",
-            "negativeState": "sound has ended",
-            "flags": "stateDependent"
+            "positiveState": "has been detected"
         },
         {
             "eventTypeId": "{BD275A24-F758-4FD5-9239-FBE87B1331CE}",
@@ -198,9 +190,7 @@
             },
             "internalName": "AudioAnalytics.Explosion",
             "description": "Explosion %1",
-            "positiveState": "has been detected",
-            "negativeState": "sound has ended",
-            "flags": "stateDependent"
+            "positiveState": "has been detected"
         },
         {
             "eventTypeId": "{BA9DFE3C-55E6-4298-BC8E-CAA947CB9440}",
@@ -211,9 +201,7 @@
             },
             "internalName": "AudioAnalytics.GlassBreak",
             "description": "Glass break %1",
-            "positiveState": "has been detected",
-            "negativeState": "sound has ended",
-            "flags": "stateDependent"
+            "positiveState": "has been detected"
         },
         {
             "eventTypeId": "{1B541CB7-E377-4818-8801-323281530E7B}",
@@ -225,8 +213,7 @@
             "internalName": "VideoAnalytics.Loitering",
             "description": "Loitering %1%2",
             "positiveState": "has been detected",
-            "negativeState": "has ended",
-            "flags": "stateDependent | regionDependent",
+            "flags": "regionDependent",
             "regionDescription": " in the region #%1"
         }
     ]

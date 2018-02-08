@@ -18,6 +18,16 @@ namespace metadata {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
+nx::api::Analytics::EventType EventHandler::eventDescriptor(const QnUuid& eventId) const
+{
+    for (const auto& descriptor: m_manifest.outputEventTypes)
+    {
+        if (descriptor.eventTypeId == eventId)
+            return descriptor;
+    }
+    return nx::api::Analytics::EventType();
+}
+
 void EventHandler::handleMetadata(
     Error error,
     MetadataPacket* metadata)
@@ -41,23 +51,29 @@ void EventHandler::handleMetadata(
         if (!eventData)
             return;
 
-        const auto eventState = eventData->isActive()
-            ? nx::vms::event::EventState::active
-            : nx::vms::event::EventState::inactive;
+        auto eventState = nx::vms::event::EventState::undefined;
 
         const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->eventTypeId());
 
-        const bool dublicate = eventState == nx::vms::event::EventState::inactive
-            && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;
+        auto descriptor = eventDescriptor(eventTypeId);
+        if (descriptor.flags.testFlag(nx::api::Analytics::EventTypeFlag::stateDependent))
+        {
+            eventState = eventData->isActive()
+                ? nx::vms::event::EventState::active
+                : nx::vms::event::EventState::inactive;
 
-        if (dublicate)
-            continue;
+            const bool isDublicate = eventState == nx::vms::event::EventState::inactive
+                && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;
+
+            if (isDublicate)
+                continue;
+        }
 
         setLastEventState(eventTypeId, eventState);
 
         auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
             m_resource,
-            m_pluginId,
+            m_manifest.driverId,
             eventTypeId,
             eventState,
             eventData->caption(),
@@ -77,9 +93,9 @@ void EventHandler::setResource(const QnSecurityCamResourcePtr& resource)
     m_resource = resource;
 }
 
-void EventHandler::setPluginId(const QnUuid& pluginId)
+void EventHandler::setManifest(const nx::api::AnalyticsDriverManifest& manifest)
 {
-    m_pluginId = pluginId;
+    m_manifest = manifest;
 }
 
 nx::vms::event::EventState EventHandler::lastEventState(const QnUuid& eventId) const

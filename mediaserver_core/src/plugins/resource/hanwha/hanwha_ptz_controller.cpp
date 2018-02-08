@@ -19,18 +19,12 @@ namespace {
 static const float kNormilizedLimit = 100;
 static const int kHanwhaAbsoluteMoveCoefficient = 10000;
 
-static const QMap<QString, QString> kHanwhaTraitToParameterName = {
-    {HanwhaResource::kHanwhaAlternativeZoomTrait, kHanwhaZoomProperty},
-    {HanwhaResource::kHanwhaAlternativeFocusTrait, kHanwhaFocusProperty}
-};
-
 } // namespace
 
 HanwhaPtzController::HanwhaPtzController(const HanwhaResourcePtr& resource):
     QnBasicPtzController(resource),
     m_hanwhaResource(resource),
-    m_presetManager(std::make_unique<HanwhaMappedPresetManager>(resource)),
-    m_alternativePtzExecutor(resource)
+    m_presetManager(std::make_unique<HanwhaMappedPresetManager>(resource))
 {
 }
 
@@ -59,10 +53,10 @@ void HanwhaPtzController::setPtzTraits(const QnPtzAuxilaryTraitList& traits)
     m_ptzTraits = traits;
 }
 
-void HanwhaPtzController::setAlternativePtzRanges(const std::map<HanwhaTraitName, std::set<int>>& ranges)
+void HanwhaPtzController::setAlternativePtzRanges(
+    const std::map<QString, std::set<int>>& ranges)
 {
-    for (auto itr = ranges.cbegin(); itr != ranges.cend(); ++itr)
-        m_alternativePtzExecutor.setRange(traitToParameterName(itr->first), itr->second);
+    m_alternativePtzExecutor = std::make_unique<HanwhaPtzExecutor>(m_hanwhaResource, ranges);
 }
 
 bool HanwhaPtzController::continuousMove(const QVector3D& speed)
@@ -70,7 +64,7 @@ bool HanwhaPtzController::continuousMove(const QVector3D& speed)
     if (m_ptzTraits.contains(HanwhaResource::kHanwhaAlternativeZoomTrait))
     {
         return alternativeContinuousMove(
-            traitToParameterName(HanwhaResource::kHanwhaAlternativeZoomTrait),
+            kHanwhaZoomProperty,
             speed.z());
     }
 
@@ -116,7 +110,7 @@ bool HanwhaPtzController::continuousFocus(qreal speed)
     if (m_ptzTraits.contains(HanwhaResource::kHanwhaAlternativeFocusTrait))
     {
         return alternativeContinuousMove(
-            traitToParameterName(HanwhaResource::kHanwhaAlternativeFocusTrait),
+            kHanwhaFocusProperty,
             speed);
     }
 
@@ -411,15 +405,13 @@ std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
     return result;
 }
 
-QString HanwhaPtzController::traitToParameterName(const QString& traitName) const
-{
-    NX_ASSERT(kHanwhaTraitToParameterName.contains(traitName));
-    return kHanwhaTraitToParameterName[traitName];
-}
-
 bool HanwhaPtzController::alternativeContinuousMove(const QString& parameterName, qreal speed)
 {
-    m_alternativePtzExecutor.setSpeed(parameterName, speed);
+    NX_ASSERT(m_alternativePtzExecutor);
+    if (!m_alternativePtzExecutor)
+        return false;
+
+    m_alternativePtzExecutor->setSpeed(parameterName, speed);
     return true;
 }
 
