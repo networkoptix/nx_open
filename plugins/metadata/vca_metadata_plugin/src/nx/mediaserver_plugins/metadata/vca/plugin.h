@@ -47,12 +47,12 @@ public:
         nx::sdk::Error* error) const override;
 
     // Managers can safely ask plugin about events. If no event found, m_emptyEvent is returned.
-    const Vca::VcaAnalyticsEventType& eventByInternalName(
+    const VcaAnalyticsEventType& eventByInternalName(
         const QString& internalName) const noexcept;
 private:
     QByteArray m_manifest;
-    Vca::VcaAnalyticsDriverManifest m_typedManifest;
-    Vca::VcaAnalyticsEventType m_emptyEvent;
+    VcaAnalyticsDriverManifest m_typedManifest;
+    VcaAnalyticsEventType m_emptyEvent;
 
 };
 

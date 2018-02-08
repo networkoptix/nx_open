@@ -43,7 +43,7 @@ Plugin::Plugin()
     else
         NX_PRINT << kPluginName << " can not open resource \"" << kResourceName << "\".";
 
-    m_typedManifest = QJson::deserialized<Vca::VcaAnalyticsDriverManifest>(m_manifest);
+    m_typedManifest = QJson::deserialized<VcaAnalyticsDriverManifest>(m_manifest);
 }
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -121,14 +121,14 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-const Vca::VcaAnalyticsEventType& Plugin::eventByInternalName(
+const VcaAnalyticsEventType& Plugin::eventByInternalName(
     const QString& internalName) const noexcept
 {
     // There are only few elements, so linear search is the fastest and the most simple.
     const auto it = std::find_if(
         m_typedManifest.outputEventTypes.cbegin(),
         m_typedManifest.outputEventTypes.cend(),
-        [&internalName](const Vca::VcaAnalyticsEventType& event)
+        [&internalName](const VcaAnalyticsEventType& event)
         {
             return event.internalName == internalName;
         });

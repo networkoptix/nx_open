@@ -4,8 +4,15 @@
 #include "gsoap/generated_with_soapcpp2/soapActionBindingProxy.h"
 #include "gsoap/generated_with_soapcpp2/EventBinding.nsmap"
 
-#include <iomanip>
+#include <memory>
+#include <vector>
+#include <tuple>
+#include <utility>
+#include <algorithm>
 #include <sstream>
+#include <iomanip>
+
+#include "httpda.h"
 
 namespace nx {
 namespace axis {
@@ -15,14 +22,102 @@ namespace {
 template<class T>
 struct ServiceGuard
 {
-    ServiceGuard(T& service): m_service(service) {}
+    ServiceGuard(T& service) : m_service(service) {}
     ~ServiceGuard() { m_service.destroy(); }
 private:
     T& m_service;
 };
-
 using EventServiceGuard = ServiceGuard<EventBindingProxy>;
 using ActionServiceGuard = ServiceGuard<ActionBindingProxy>;
+
+class SoapAuthentificator
+{
+public:
+    SoapAuthentificator(struct soap* soap, const char* user, const char* password):
+        m_soap(soap)
+    {
+        http_da_save(soap, &info, soap->authrealm, user, password);
+    }
+    ~SoapAuthentificator()
+    {
+        http_da_release(m_soap, &info);
+    }
+private:
+    soap* m_soap;
+    http_da_info info;
+};
+
+template<class Service, class Request, class Response>
+bool makeSoapRequest(
+    Service& service,
+    int(Service::*method)(Request*, Response&),
+    Request& request,
+    Response& response,
+    const char* user,
+    const char* password)
+{
+    static const int kAuthenticationError = 401;
+
+    // Plugin deregistering actions and memory deallocation run in ServiceGuard destructor.
+    soap_register_plugin(service.soap, http_da);
+    if ((service.*method)(&request, response) == kAuthenticationError)
+    {
+        // One more try with advanced authentication.
+        SoapAuthentificator authentificator(service.soap, user, password);
+        (service.*method)(&request, response);
+    }
+    return (service.soap->error == SOAP_OK);
+}
+
+#if 0
+//This is the obsolete variant of ScopedGC.
+/**
+* Simple Scoped Garbage Collector.
+* Usage:
+* 1. Instantiate the class with the types, you are going to create, i.e.
+*     <code>ScopedGc<int, std::string, MyClass> scopedGc;</code>
+* 2. Create objects with "create" member-function, i.e.
+* <pre><code>
+*     int* i = scopedGc.create<int>;
+*     std::string* s1 = scopedGc.create<std::string>("Hello!");
+*     auto s2 = scopedGc.create<std::string>("Bye!");
+*     MyClass* myClass = scopedGc.create<MyClass>(100, 200, "Ok");
+* </code></pre>
+* 3. Objects will be deleted when scopedGC leaves it scope.
+* 4. WARNING: The order of objects destruction is not specified!
+*/
+template<class ...Ts>
+class ScopedGc
+{
+    // Tuple's element type.
+    template<class T>
+    using Element = std::vector<std::unique_ptr<T>>;
+
+    //Tuple. Each element in it is a guard for a separate type.
+    std::tuple<Element<Ts>...> guards;
+
+    //@return An appropriate guard for a type.
+    template<class T>
+    Element<T>& giveMeGuard()
+    {
+        return std::get<Element<T>>(guards);
+    }
+
+public:
+    /**
+    * Creates an object of class T using its constructor with parameters "args...",
+    * and stores a unique pointer to the object in a corresponding guard.
+    * All guards delete all their creatred objects when ScopedGC leaves its scope.
+    */
+    template<class T, class ...Args>
+    T* create(Args&&... args)
+    {
+        auto& guard = this->giveMeGuard<T>();
+        guard.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+        return guard.back().get();
+    }
+};
+#endif
 
 /**
 * RAII helper class that sets a value to a variable in constructor and restores variable's
@@ -40,7 +135,7 @@ template<class T>
 class ValueRestorer
 {
 public:
-    ValueRestorer(T& variable, T newValue): m_variable(variable)
+    ValueRestorer(T& variable, T newValue) : m_variable(variable)
     {
         variable = newValue;
         m_oldValue = m_variable;
@@ -56,7 +151,7 @@ private:
     T m_oldValue;
 };
 
-// Concatinates vector elements into a string, interleaving them with a separator.
+// Concatenates vector elements into a string, interleaving them with a separator.
 std::string joinTags(const std::vector<const char*>& st, char separator = '/')
 {
     std::string result;
@@ -70,7 +165,7 @@ std::string joinTags(const std::vector<const char*>& st, char separator = '/')
     return result;
 }
 
-// Recusively finds all events in subtree "element" (if any) and appends them to "events" vector.
+// Recursively finds all events in subtree "element" (if any) and appends them to "events" vector.
 // A "topic" member of every found event gets "topicName" value.
 void replanishEventsFromElement(const soap_dom_element* element, const char* topicName,
     std::vector<const char*>& tagStack, std::vector<nx::axis::SupportedEvent>& events)
@@ -223,12 +318,10 @@ bool CameraController::readSupportedActions()
 {
     ActionBindingProxy service(endpoint());
     ActionServiceGuard serviceGuard(service);
-    service.soap->userid = m_user.c_str();
-    service.soap->passwd = m_password.c_str();
     _ns5__GetActionTemplates request;
     _ns5__GetActionTemplatesResponse response;
-
-    if (service.GetActionTemplates(&request, response) != SOAP_OK)
+    if (!makeSoapRequest(service, &ActionBindingProxy::GetActionTemplates, request, response,
+        m_user.c_str(), m_password.c_str()))
         return false;
 
     std::vector<SupportedAction> actions;
@@ -257,11 +350,11 @@ void CameraController::filterSupportedEvents(const std::vector<std::string>& nee
         return;
     std::vector<SupportedEvent> events;
     std::copy_if(m_supportedEvents.cbegin(), m_supportedEvents.cend(), std::back_inserter(events),
-        [&neededTopics](const SupportedEvent& event)
-        {
-            return find(neededTopics.cbegin(), neededTopics.cend(), event.topic) !=
-                neededTopics.cend();
-        });
+        [&neededTopics](const auto& event)
+    {
+        return find(neededTopics.cbegin(), neededTopics.cend(), event.topic) !=
+            neededTopics.cend();
+    });
     m_supportedEvents = std::move(events);
 }
 
@@ -277,12 +370,10 @@ bool CameraController::readSupportedEvents()
 {
     EventBindingProxy service(endpoint());
     EventServiceGuard serviceGuard(service);
-    service.soap->userid = m_user.c_str();
-    service.soap->passwd = m_password.c_str();
     _ns1__GetEventInstances request;
     _ns1__GetEventInstancesResponse response;
-
-    if (service.GetEventInstances(&request, response) != SOAP_OK)
+    if (!makeSoapRequest(service, &EventBindingProxy::GetEventInstances, request, response,
+        m_user.c_str(), m_password.c_str()))
         return false;
 
     std::vector<SupportedEvent> events;
@@ -298,12 +389,10 @@ bool CameraController::readSupportedRecipients()
 {
     ActionBindingProxy service(endpoint());
     ActionServiceGuard serviceGuard(service);
-    service.soap->userid = m_user.c_str();
-    service.soap->passwd = m_password.c_str();
     _ns5__GetRecipientTemplates request;
     _ns5__GetRecipientTemplatesResponse response;
-
-    if (service.GetRecipientTemplates(&request, response) != SOAP_OK)
+    if (!makeSoapRequest(service, &ActionBindingProxy::GetRecipientTemplates, request, response,
+        m_user.c_str(), m_password.c_str()))
         return false;
 
     std::vector<SupportedRecipient> recipients;
@@ -327,12 +416,10 @@ bool CameraController::readActiveActions()
 {
     ActionBindingProxy service(endpoint());
     ActionServiceGuard serviceGuard(service);
-    service.soap->userid = m_user.c_str();
-    service.soap->passwd = m_password.c_str();
     _ns5__GetActionConfigurations request;
     _ns5__GetActionConfigurationsResponse response;
-
-    if (service.GetActionConfigurations(&request, response) != SOAP_OK)
+    if (!makeSoapRequest(service, &ActionBindingProxy::GetActionConfigurations, request, response,
+        m_user.c_str(), m_password.c_str()))
         return false;
 
     std::vector<ActiveAction> actions;
@@ -361,12 +448,10 @@ bool CameraController::readActiveRules()
 {
     ActionBindingProxy service(endpoint());
     ActionServiceGuard serviceGuard(service);
-    service.soap->userid = m_user.c_str();
-    service.soap->passwd = m_password.c_str();
     _ns5__GetActionRules request;
     _ns5__GetActionRulesResponse response;
-
-    if (service.GetActionRules(&request, response) != SOAP_OK)
+    if (!makeSoapRequest(service, &ActionBindingProxy::GetActionRules, request, response,
+        m_user.c_str(), m_password.c_str()))
         return false;
 
     std::vector<ActiveRule> rules;
@@ -390,12 +475,10 @@ bool CameraController::readActiveRecipients()
 {
     ActionBindingProxy service(endpoint());
     ActionServiceGuard serviceGuard(service);
-    service.soap->userid = m_user.c_str();
-    service.soap->passwd = m_password.c_str();
     _ns5__GetRecipientConfigurations request;
     _ns5__GetRecipientConfigurationsResponse response;
-
-    if (service.GetRecipientConfigurations(&request, response) != SOAP_OK)
+    if (!makeSoapRequest(service, &ActionBindingProxy::GetRecipientConfigurations, request,
+        response, m_user.c_str(), m_password.c_str()))
         return false;
 
     std::vector<ActiveRecipient> recipients;
@@ -424,9 +507,6 @@ int CameraController::addActiveAction(const ActiveAction& action)
 {
     ActionBindingProxy service(endpoint());
     ActionServiceGuard serviceGuard(service);
-    service.soap->userid = m_user.c_str();
-    service.soap->passwd = m_password.c_str();
-
     _ns5__AddActionConfiguration addCommand;
     _ns5__AddActionConfigurationResponse response;
 
@@ -447,7 +527,9 @@ int CameraController::addActiveAction(const ActiveAction& action)
         params[i]->Name = action.parameters[i].name;
         params[i]->Value = action.parameters[i].value;
     }
-    if (service.AddActionConfiguration(&addCommand, response) != SOAP_OK)
+
+    if (!makeSoapRequest(service, &ActionBindingProxy::AddActionConfiguration, addCommand,
+        response, m_user.c_str(), m_password.c_str()))
         return 0;
 
     // If "response.ConfigurationID" is not an integer atoi returns 0. It suits us because 0 means
@@ -474,7 +556,6 @@ int CameraController::addActiveHttpNotificationAction(const char* name, const ch
         //{"validate_server_cert", ""}, //< In practice, should not be added.
         {"qos", "0"},
     };
-
     const ActiveAction action(name, kNotificationToken, parameters);
     return addActiveAction(action);
 }
@@ -483,24 +564,17 @@ bool CameraController::removeActiveAction(int actionId)
 {
     ActionBindingProxy service(endpoint());
     ActionServiceGuard serviceGuard(service);
-    service.soap->userid = m_user.c_str();
-    service.soap->passwd = m_password.c_str();
-
     _ns5__RemoveActionConfiguration removeCommand;
     _ns5__RemoveActionConfigurationResponse response;
     removeCommand.ConfigurationID = std::to_string(actionId);
-
-    const int responseCode = service.RemoveActionConfiguration(&removeCommand, response);
-    return responseCode == SOAP_OK;
+    return makeSoapRequest(service, &ActionBindingProxy::RemoveActionConfiguration, removeCommand,
+        response, m_user.c_str(), m_password.c_str());
 }
 
 int CameraController::addActiveRecipient(const ActiveRecipient& recipient)
 {
     ActionBindingProxy service(endpoint());
     ActionServiceGuard serviceGuard(service);
-    service.soap->userid = m_user.c_str();
-    service.soap->passwd = m_password.c_str();
-
     _ns5__AddRecipientConfiguration addCommand;
     _ns5__AddRecipientConfigurationResponse response;
 
@@ -519,7 +593,9 @@ int CameraController::addActiveRecipient(const ActiveRecipient& recipient)
         params[i]->Name = recipient.parameters[i].name;
         params[i]->Value = recipient.parameters[i].value;
     }
-    if (service.AddRecipientConfiguration(&addCommand, response) != SOAP_OK)
+
+    if (!makeSoapRequest(service, &ActionBindingProxy::AddRecipientConfiguration, addCommand,
+        response, m_user.c_str(), m_password.c_str()))
         return 0;
 
     // If "response.ConfigurationID" is not an integer atoi returns 0. It suits us because 0 means
@@ -531,24 +607,17 @@ bool CameraController::removeActiveRecipient(int recipientId)
 {
     ActionBindingProxy service(endpoint());
     ActionServiceGuard serviceGuard(service);
-    service.soap->userid = m_user.c_str();
-    service.soap->passwd = m_password.c_str();
-
     _ns5__RemoveRecipientConfiguration removeCommand;
     _ns5__RemoveRecipientConfigurationResponse response;
     removeCommand.ConfigurationID = std::to_string(recipientId);
-
-    const int responseCode = service.RemoveRecipientConfiguration(&removeCommand, response);
-    return responseCode == SOAP_OK;
+    return makeSoapRequest(service, &ActionBindingProxy::RemoveRecipientConfiguration,
+        removeCommand, response, m_user.c_str(), m_password.c_str());
 }
 
 int CameraController::addActiveRule(const ActiveRule& rule)
 {
     ActionBindingProxy service(endpoint());
     ActionServiceGuard serviceGuard(service);
-    service.soap->userid = m_user.c_str();
-    service.soap->passwd = m_password.c_str();
-
     _ns5__AddActionRule addCommand;
     _ns5__AddActionRuleResponse response;
 
@@ -585,7 +654,8 @@ int CameraController::addActiveRule(const ActiveRule& rule)
     const ValueRestorer<const Namespace*> valueRestorer(
         service.soap->namespaces, &extendedNamespaceArray.front());
 
-    if (service.AddActionRule(&addCommand, response) != SOAP_OK)
+    if (!makeSoapRequest(service, &ActionBindingProxy::AddActionRule, addCommand,
+        response, m_user.c_str(), m_password.c_str()))
         return 0;
 
     // If "response.RuleID" is not an integer atoi returns 0. It suits us because 0 means that
@@ -597,15 +667,11 @@ bool CameraController::removeActiveRule(int ruleId)
 {
     ActionBindingProxy service(endpoint());
     ActionServiceGuard serviceGuard(service);
-    service.soap->userid = m_user.c_str();
-    service.soap->passwd = m_password.c_str();
-
     _ns5__RemoveActionRule removeCommand;
     _ns5__RemoveActionRuleResponse response;
     removeCommand.RuleID = std::to_string(ruleId);
-
-    int responseCode = service.RemoveActionRule(&removeCommand, response);
-    return responseCode == SOAP_OK;
+    return makeSoapRequest(service, &ActionBindingProxy::RemoveActionRule, removeCommand, response,
+        m_user.c_str(), m_password.c_str());
 }
 
 int CameraController::removeAllActiveActions(const char* namePrefix)
