@@ -383,7 +383,7 @@ void QnEventLogDialog::updateData()
     if (serverIssue)
         setCameraList(QSet<QnUuid>());
 
-    bool istantOnly = !hasToggleState(eventType)
+    bool istantOnly = !hasToggleState(eventType, vms::event::EventParameters(), commonModule())
         && eventType != undefinedEvent;
 
     updateActionList(istantOnly);

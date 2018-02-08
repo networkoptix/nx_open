@@ -5,6 +5,7 @@
 #include <core/resource/resource.h>
 #include <nx/sdk/metadata/camera_manager.h>
 #include <nx/vms/event/event_fwd.h>
+#include <nx/api/analytics/driver_manifest.h>
 
 namespace nx {
 namespace mediaserver {
@@ -19,15 +20,15 @@ public:
 
     void setResource(const QnSecurityCamResourcePtr& resource);
 
-    void setPluginId(const QnUuid& pluginId);
+    void setManifest(const nx::api::AnalyticsDriverManifest& manifest);
 
 private:
     nx::vms::event::EventState lastEventState(const QnUuid& eventId) const;
     void setLastEventState(const QnUuid& eventId, nx::vms::event::EventState eventState);
-
+    nx::api::Analytics::EventType eventDescriptor(const QnUuid& eventId) const;
 private:
     QnSecurityCamResourcePtr m_resource;
-    QnUuid m_pluginId;
+    nx::api::AnalyticsDriverManifest m_manifest;
     QMap<QnUuid, nx::vms::event::EventState> m_eventStateMap;
 
 };

@@ -19,9 +19,12 @@ static const char* kCloudHostName = kCloudHostNameWithPrefix + sizeof("this_is_c
 QString AppInfo::defaultCloudHost()
 {
 #ifdef _DEBUG
-    const QString overriddenHost = SocketGlobals::debugIni().cloudHost;
-    if (!overriddenHost.isEmpty())
-        return overriddenHost;
+    if (SocketGlobals::isInitialized())
+    {
+        const QString overriddenHost = SocketGlobals::debugIni().cloudHost;
+        if (!overriddenHost.isEmpty())
+            return overriddenHost;
+    }
 #endif
 
     return QString::fromUtf8(kCloudHostName);
@@ -34,7 +37,7 @@ QString AppInfo::defaultCloudPortalUrl()
 
 QString AppInfo::defaultCloudModulesXmlUrl()
 {
-    return QString::fromLatin1("http://%1/api/cloud_modules.xml").arg(defaultCloudHost());
+    return QString::fromLatin1("http://%1/discovery/v1/cloud_modules.xml").arg(defaultCloudHost());
 }
 
 QString AppInfo::cloudName()

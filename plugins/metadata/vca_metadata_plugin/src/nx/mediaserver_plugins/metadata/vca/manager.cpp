@@ -58,8 +58,6 @@ nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
     auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
     auto commonEvent1 = createCommonEvent(event, /*active*/ true);
     packet->addEvent(commonEvent1);
-    auto commonEvent2 = createCommonEvent(event, /*active*/ false);
-    packet->addEvent(commonEvent2);
     packet->setTimestampUsec(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
     packet->setDurationUsec(-1);

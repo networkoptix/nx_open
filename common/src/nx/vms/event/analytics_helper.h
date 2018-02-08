@@ -18,18 +18,23 @@ class AnalyticsHelper: public QObject, public QnCommonModuleAware
     using base_type = QObject;
     Q_OBJECT
 public:
-    struct EventDescriptor
+    struct EventDescriptor: public nx::api::Analytics::EventType
     {
+        using base_type = nx::api::Analytics::EventType;
+
+        EventDescriptor() {}
+        EventDescriptor(const base_type& value): base_type(value) {}
+
         QnUuid driverId;
         nx::api::TranslatableString driverName;
-        QnUuid eventTypeId;
-        nx::api::TranslatableString eventName;
     };
 
     AnalyticsHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
 
     /** Get list of all supported analytics events in the system. */
     QList<EventDescriptor> systemSupportedAnalyticsEvents() const;
+
+    EventDescriptor eventDescriptor(const QnUuid& eventId) const;
 
     /** Get list of all supported analytics events for the given cameras. */
     static QList<EventDescriptor> supportedAnalyticsEvents(

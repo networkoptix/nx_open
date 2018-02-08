@@ -34,8 +34,9 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#include <utils/common/warnings.h>
+#include <utils/common/html.h>
 #include <utils/common/synctime.h>
+#include <utils/common/warnings.h>
 #include <utils/math/math.h>
 
 using namespace nx;
@@ -470,7 +471,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                 result = m_stringsHelper->eventDetails(action.eventParams).join(L'\n');
             }
 
-            if (!vms::event::hasToggleState(eventType))
+            if (!vms::event::hasToggleState(eventType, action.eventParams, commonModule()))
             {
                 int count = action.aggregationCount;
                 if (count > 1)
@@ -689,7 +690,7 @@ QVariant QnEventLogModel::data(const QModelIndex& index, int role) const
             if (url.isEmpty())
                 return text;
             else
-                return lit("<a href=\"%1\">%2</a>").arg(url, text);
+                return makeHref(text, url);
         }
 
         case Qn::HelpTopicIdRole:

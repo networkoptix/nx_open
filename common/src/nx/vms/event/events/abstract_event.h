@@ -8,6 +8,9 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/event_parameters.h>
 #include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/analytics_helper.h>
+
+class QnCommonModule;
 
 namespace nx {
 namespace vms {
@@ -24,9 +27,15 @@ EventType parentEvent(EventType eventType);
 /** Check if resource required to SETUP rule on this event. */
 bool isResourceRequired(EventType eventType);
 
-bool hasToggleState(EventType eventType);
+bool hasToggleState(
+    EventType eventType,
+    const EventParameters& runtimeParams,
+    QnCommonModule* commonModule);
 
-QList<EventState> allowedEventStates(EventType eventType);
+QList<EventState> allowedEventStates(
+    EventType eventType,
+    const EventParameters& runtimeParams,
+    QnCommonModule* commonModule);
 
 /** Check if camera required for this event to setup a rule. */
 bool requiresCameraResource(EventType eventType);
@@ -132,3 +141,4 @@ private:
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::event::AbstractEventPtr)
+Q_DECLARE_METATYPE(nx::vms::event::EventParameters)

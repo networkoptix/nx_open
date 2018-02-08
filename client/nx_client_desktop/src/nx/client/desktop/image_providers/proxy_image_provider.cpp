@@ -133,7 +133,10 @@ void ProxyImageProvider::setImage(const QImage& image)
     m_image = image;
 
     if (changed)
+    {
+        emit sizeHintChanged(m_image.size());
         emit imageChanged(m_image);
+    }
 }
 
 void ProxyImageProvider::setSourceSizeHint(const QSize& sourceSizeHint)

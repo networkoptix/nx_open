@@ -54,6 +54,7 @@ const QString kMaxDifferenceBetweenSynchronizedAndInternetTime(
     lit("maxDifferenceBetweenSynchronizedAndInternetTime"));
 const QString kMaxDifferenceBetweenSynchronizedAndLocalTime(
     lit("maxDifferenceBetweenSynchronizedAndLocalTimeMs"));
+const QString kOsTimeChangeCheckPeriod(lit("osTimeChangeCheckPeriodMs"));
 const QString kNameAutoDiscoveryEnabled(lit("autoDiscoveryEnabled"));
 const QString kNameBackupQualities(lit("backupQualities"));
 const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
@@ -219,6 +220,10 @@ public:
 
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndInternetTime() const;
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndLocalTime() const;
+
+    std::chrono::milliseconds osTimeChangeCheckPeriod() const;
+    void setOsTimeChangeCheckPeriod(std::chrono::milliseconds value);
+
     bool takeCameraOwnershipWithoutLock() const;
 
     // -- Cloud settings
@@ -344,6 +349,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_synchronizeTimeWithInternetAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int> *m_osTimeChangeCheckPeriodAdaptor = nullptr;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_backupNewCamerasByDefaultAdaptor = nullptr;
 

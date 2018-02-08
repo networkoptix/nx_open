@@ -76,6 +76,7 @@ public:
 
 
     QString resolutionToString(const QSize& resolution);
+    static QString toAxisCodecString(AVCodecID codecId);
 public slots:
     void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
     void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
@@ -110,9 +111,11 @@ private:
     void stopInputPortMonitoringSync();
 
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
-
+    void setSupportedCodecs(const QSet<AVCodecID>& value);
+    QSet<AVCodecID> filterSupportedCodecs(const QList<QByteArray>& values) const;
 private:
     QList<AxisResolution> m_resolutionList;
+    QSet<AVCodecID> m_supportedCodecs;
 
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;
@@ -246,6 +249,7 @@ private:
         const QList<QnCameraAdvancedParameter>& params) const;
 
     bool isMaintenanceParam(const QnCameraAdvancedParameter& param) const;
+    CameraDiagnostics::Result getParameterValue(const QString& path, QByteArray* outResult);
 
     friend class QnAxisPtzController;
     friend class AxisIOMessageBodyParser;
