@@ -6,8 +6,11 @@
 #include <QtZlib/zlib.h>
 #endif
 
+// On some platforms zconf.h defined crc32 as z_crc32, sometimes - not.
 #ifdef crc32
-#undef crc32
+#   undef crc32
+#else
+#   define z_crc32 crc32
 #endif
 
 namespace nx {
