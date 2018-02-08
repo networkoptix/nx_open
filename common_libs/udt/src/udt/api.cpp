@@ -465,7 +465,7 @@ ERR_ROLLBACK:
     return 1;
 }
 
-CUDT* CUDTUnited::lookup(const UDTSOCKET u) throw (CUDTException)
+CUDT* CUDTUnited::lookup(const UDTSOCKET u)
 {
     // protects the m_Sockets structure
     CGuard cg(m_ControlLock);

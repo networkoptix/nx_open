@@ -36,8 +36,8 @@ void Server::listen()
                 .arg(SystemError::toString(osErrorCode)).toStdString());
     }
 
-    NX_LOGX(lit("HTTP server is listening on %1")
-        .arg(containerString(m_settings.http().addrToListenList)), cl_logALWAYS);
+    NX_ALWAYS(this, lm("HTTP server is listening on %1")
+        .args(containerString(m_multiAddressHttpServer->endpoints())));
 }
 
 void Server::stopAcceptingNewRequests()
