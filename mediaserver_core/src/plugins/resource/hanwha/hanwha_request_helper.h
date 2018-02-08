@@ -23,7 +23,9 @@ class HanwhaRequestHelper
 public:
     using Parameters = std::map<QString, QString>;
 
-    HanwhaRequestHelper(const std::shared_ptr<HanwhaSharedResourceContext>& resourceContext);
+    HanwhaRequestHelper(
+        const std::shared_ptr<HanwhaSharedResourceContext>& resourceContext,
+        int bypassChannel = kHanwhaNoBypassChannel);
 
     HanwhaAttributes fetchAttributes(const QString& attributesPath);
 
@@ -104,9 +106,8 @@ private:
 
 private:
     const std::shared_ptr<HanwhaSharedResourceContext> m_resourceContext;
-    const QString m_channel;
     bool m_ignoreMutexAnalyzer = false;
-    bool m_bypass = false;
+    int m_bypassChannel;
 };
 
 } // namespace plugins
