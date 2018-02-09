@@ -85,25 +85,6 @@ QnWorkbenchWearableHandler::~QnWorkbenchWearableHandler()
 {
 }
 
-qreal QnWorkbenchWearableHandler::calculateProgress(const UploadState& upload, bool processed)
-{
-    if (processed)
-        return 1.0;
-
-    switch (upload.status)
-    {
-        case UploadState::CreatingUpload:
-            return 0.1;
-        case UploadState::Uploading:
-            return 0.1 + 0.8 * upload.uploaded / upload.size;
-        case UploadState::Checking:
-        case UploadState::Done:
-            return 0.9;
-        default:
-            return 0.0;
-    }
-}
-
 void QnWorkbenchWearableHandler::maybeOpenCurrentSettings()
 {
     if (m_currentCameraUuid.isNull())

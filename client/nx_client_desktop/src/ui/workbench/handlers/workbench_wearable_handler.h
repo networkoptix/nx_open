@@ -8,9 +8,6 @@
 #include <utils/common/connective.h>
 #include <nx/utils/uuid.h>
 
-class QnNewWearableCameraDialog;
-namespace nx { namespace client { namespace desktop { struct UploadState; }}}
-
 class QnWorkbenchWearableHandler:
     public Connective<QObject>,
     public QnWorkbenchContextAware
@@ -23,8 +20,6 @@ public:
     virtual ~QnWorkbenchWearableHandler() override;
 
 private:
-    qreal calculateProgress(const nx::client::desktop::UploadState& upload, bool processed);
-
     void maybeOpenCurrentSettings();
 
 private slots:
