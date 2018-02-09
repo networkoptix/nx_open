@@ -2876,7 +2876,7 @@ QnAbstractPtzController* QnPlOnvifResource::createSpecialPtzController()
         return 0;
 }
 
-QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal()
+QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal() const
 {
     QScopedPointer<QnAbstractPtzController> result;
     result.reset(createSpecialPtzController());

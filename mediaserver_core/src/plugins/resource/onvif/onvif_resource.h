@@ -253,7 +253,6 @@ public:
     virtual QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     virtual QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
-    virtual QnAbstractPtzController *createPtzControllerInternal() override;
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
     static CameraDiagnostics::Result readDeviceInformation(const QString& onvifUrl, const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
     CameraDiagnostics::Result readDeviceInformation();
@@ -298,7 +297,9 @@ public:
     VideoOptionsLocal secondaryVideoCapabilities() const;
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
+
 protected:
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     int strictBitrate(int bitrate, Qn::ConnectionRole role) const;
     void setAudioCodec(AUDIO_CODECS c);
 

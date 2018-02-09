@@ -67,8 +67,6 @@ public:
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
 
-    virtual QnAbstractPtzController *createPtzControllerInternal() override;
-
     QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
@@ -85,7 +83,9 @@ public slots:
     void onCurrentIOStateResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
 
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
+
 protected:
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();

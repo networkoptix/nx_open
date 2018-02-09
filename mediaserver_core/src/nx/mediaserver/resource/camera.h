@@ -50,6 +50,8 @@ public:
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
 
+    QnAbstractPtzController* createPtzController() const;
+
     /** Returns id-value pairs. */
     QnCameraAdvancedParamValueMap getAdvancedParameters(const QSet<QString>& ids);
     boost::optional<QString> getAdvancedParameter(const QString& id);
@@ -133,6 +135,7 @@ protected:
     */
     virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) = 0;
 
+    virtual QnAbstractPtzController* createPtzControllerInternal() const;
 private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
 

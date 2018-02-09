@@ -1,9 +1,12 @@
 #include "camera.h"
 
 #include <common/static_common_module.h>
+
+#include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/resource_command.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <utils/xml/camera_advanced_param_reader.h>
@@ -111,6 +114,41 @@ int Camera::getChannel() const
 {
     QnMutexLocker lock( &m_mutex );
     return m_channelNumber;
+}
+
+QnAbstractPtzController* Camera::createPtzController() const
+{
+    QnAbstractPtzController* result = createPtzControllerInternal();
+    if (!result)
+        return result;
+
+    /* Do some sanity checking. */
+    Ptz::Capabilities capabilities = result->getCapabilities();
+    if((capabilities & Ptz::LogicalPositioningPtzCapability)
+        && !(capabilities & Ptz::AbsolutePtzCapabilities))
+    {
+        auto message =
+            lit("Logical position space capability is defined for a PTZ controller that does not support absolute movement. %1 %2")
+            .arg(getName())
+            .arg(getUrl());
+
+        qDebug() << message;
+        NX_LOG(message, cl_logWARNING);
+    }
+
+    if((capabilities & Ptz::DevicePositioningPtzCapability)
+        && !(capabilities & Ptz::AbsolutePtzCapabilities))
+    {
+        auto message =
+            lit("Device position space capability is defined for a PTZ controller that does not support absolute movement. %1 %2")
+            .arg(getName())
+            .arg(getUrl());
+
+        qDebug() << message;
+        NX_LOG(message.toLatin1(), cl_logERROR);
+    }
+
+    return result;
 }
 
 void Camera::setUrl(const QString &urlStr)
@@ -383,6 +421,11 @@ CameraDiagnostics::Result Camera::initInternal()
         return driverResult;
 
     return initializeAdvancedParametersProviders();
+}
+
+QnAbstractPtzController* Camera::createPtzControllerInternal() const
+{
+    return nullptr;
 }
 
 CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()

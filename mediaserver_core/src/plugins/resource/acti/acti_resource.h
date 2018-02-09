@@ -66,7 +66,6 @@ public:
     RtpTransport::Value getDesiredTransport() const;
 
     bool isAudioSupported() const;
-    virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QnIOPortDataList getRelayOutputList() const override;
@@ -105,7 +104,9 @@ public:
     bool SetupAudioInput();
 
     static QString toActiEncoderString(const QString& value);
+
 protected:
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

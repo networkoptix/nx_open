@@ -17,7 +17,6 @@
 #include <core/resource/camera_advanced_param.h>
 #include <utils/common/warnings.h>
 #include "core/resource_management/resource_pool.h"
-#include "core/ptz/abstract_ptz_controller.h"
 
 #include "resource_command_processor.h"
 #include "resource_consumer.h"
@@ -70,7 +69,6 @@ QnResource::QnResource(const QnResource& right)
     m_id(right.m_id),
     m_typeId(right.m_typeId),
     m_flags(right.m_flags),
-    m_lastDiscoveredTime(right.m_lastDiscoveredTime),
     m_initialized(right.m_initialized),
     m_lastInitTime(right.m_lastInitTime),
     m_prevInitializationResult(right.m_prevInitializationResult),
@@ -127,7 +125,6 @@ void QnResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& no
     NX_ASSERT(toSharedPointer(this));
 
     m_typeId = other->m_typeId;
-    m_lastDiscoveredTime = other->m_lastDiscoveredTime;
 
     if (m_url != other->m_url)
     {
@@ -430,18 +427,6 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     doStatusChanged(oldStatus, newStatus, reason);
 }
 
-QDateTime QnResource::getLastDiscoveredTime() const
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    return m_lastDiscoveredTime;
-}
-
-void QnResource::setLastDiscoveredTime(const QDateTime &time)
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    m_lastDiscoveredTime = time;
-}
-
 QnUuid QnResource::getId() const
 {
     QnMutexLocker mutexLocker(&m_mutex);
@@ -546,44 +531,6 @@ QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(Qn::Connect
     return NULL;
 }
 #endif
-
-QnAbstractPtzController *QnResource::createPtzController()
-{
-    QnAbstractPtzController *result = createPtzControllerInternal();
-    if (!result)
-        return result;
-
-    /* Do some sanity checking. */
-    Ptz::Capabilities capabilities = result->getCapabilities();
-    if((capabilities & Ptz::LogicalPositioningPtzCapability) && !(capabilities & Ptz::AbsolutePtzCapabilities))
-    {
-        auto message =
-            lit("Logical position space capability is defined for a PTZ controller that does not support absolute movement. %1 %2")
-                .arg(getName())
-                .arg(getUrl());
-
-        qDebug() << message;
-        NX_LOG(message, cl_logWARNING);
-    }
-
-    if((capabilities & Ptz::DevicePositioningPtzCapability) && !(capabilities & Ptz::AbsolutePtzCapabilities))
-    {
-        auto message =
-            lit("Device position space capability is defined for a PTZ controller that does not support absolute movement. %1 %2")
-                .arg(getName())
-                .arg(getUrl());
-
-        qDebug() << message;
-        NX_LOG(message.toLatin1(), cl_logERROR);
-    }
-
-    return result;
-}
-
-QnAbstractPtzController *QnResource::createPtzControllerInternal()
-{
-    return NULL;
-}
 
 CameraDiagnostics::Result QnResource::initInternal()
 {

@@ -1416,7 +1416,8 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
     updateIOState(portId, isOnState, timestampMs, true);
 }
 
-QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {
+QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() const
+{
     return new QnAxisPtzController(toSharedPointer(this));
 }
 

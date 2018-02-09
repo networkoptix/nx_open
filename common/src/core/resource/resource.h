@@ -1,17 +1,15 @@
 #pragma once
+
 #include <atomic>
-#include <QtCore/QDateTime>
-#include <QtCore/QMap>
+
 #include <QtCore/QMetaType>
 #include <QtCore/QSet>
-#include <QtCore/QStringList>
 #include <QtCore/QThreadPool>
 
 #include <api/model/kvpair.h>
 
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/from_this_to_shared.h>
-#include <nx/fusion/model_functions_fwd.h>
 
 #include <utils/common/id.h>
 #include <utils/common/functional.h>
@@ -23,7 +21,6 @@
 #include "shared_resource_pointer.h"
 #include "resource_fwd.h"
 #include "resource_type.h"
-#include "param.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
@@ -49,7 +46,6 @@ class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource
     Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId)
     Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
-    Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
     Q_PROPERTY(Ptz::Capabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
 public:
 
@@ -76,7 +72,6 @@ public:
 
     virtual Qn::ResourceStatus getStatus() const;
     virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local);
-    QDateTime getLastStatusUpdateTime() const;
 
     //!this function is called if resource changes state from offline to online or so
     /*!
@@ -122,11 +117,6 @@ public:
     //just a simple resource name
     virtual QString getName() const;
     virtual void setName(const QString& name);
-
-
-    // this value is updated by discovery process
-    QDateTime getLastDiscoveredTime() const;
-    void setLastDiscoveredTime(const QDateTime &time);
 
     QnResourcePool *resourcePool() const;
     virtual void setResourcePool(QnResourcePool *resourcePool);
@@ -194,7 +184,7 @@ public:
     bool hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const;
     void setPtzCapabilities(Ptz::Capabilities capabilities);
     void setPtzCapability(Ptz::Capabilities capability, bool value);
-    QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here
+
 
     /* Note that these functions hide property API inherited from QObject.
      * This is intended as this API cannot be used with QnResource anyway
@@ -287,8 +277,6 @@ protected:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
 #endif
 
-    virtual QnAbstractPtzController *createPtzControllerInternal(); // TODO: #Elric does not belong here
-
     virtual CameraDiagnostics::Result initInternal();
     //!Called just after successful \a initInternal()
     /*!
@@ -373,9 +361,6 @@ private:
 
     /** Flags of this resource that determine its type. */
     Qn::ResourceFlags m_flags;
-
-    QDateTime m_lastDiscoveredTime;
-
 
     bool m_initialized;
     static QnMutex m_initAsyncMutex;

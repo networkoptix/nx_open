@@ -60,7 +60,7 @@ QnThirdPartyResource::~QnThirdPartyResource()
     stopInputPortMonitoringAsync();
 }
 
-QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
+QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal() const
 {
     if( !m_camManager )
         return nullptr;
