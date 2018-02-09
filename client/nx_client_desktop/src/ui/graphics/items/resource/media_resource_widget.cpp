@@ -1,5 +1,7 @@
 #include "media_resource_widget.h"
 
+#include <chrono>
+
 #include <QtCore/QTimer>
 #include <QtCore/QVarLengthArray>
 #include <QtGui/QPainter>
@@ -117,6 +119,8 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <ini.h>
+
+using namespace std::chrono;
 
 using namespace nx;
 using namespace client::desktop;
@@ -2775,7 +2779,14 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
         return;
 
     if (!analyticsEnabled)
+    {
         d->analyticsController->clearAreas();
+    }
+    else
+    {
+        display()->camDisplay()->setForcedVideoBufferLength(
+            milliseconds(ini().analyticsVideoBufferLengthMs));
+    }
 
     titleBar()->rightButtonsBar()->button(Qn::AnalyticsButton)->setChecked(analyticsEnabled);
 }
