@@ -45,7 +45,7 @@ should confirm, if not owner deletes system (You will loose access to this syste
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
-    Wait Until Element Is Visible    ${DISCONNECT MODAL TEXT}
+    Wait Until Element Is Visible    ${DISCONNECT MODAL WARNING}
     Close Browser
 
 Cancel should cancel disconnection and disconnect should remove it when not owner
@@ -54,13 +54,13 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
-    Wait Until Elements Are Visible    ${DISCONNECT MODAL TEXT}    ${DISCONNECT MODAL CANCEL}
+    Wait Until Elements Are Visible    ${DISCONNECT MODAL WARNING}    ${DISCONNECT MODAL CANCEL}
     Click Button    ${DISCONNECT MODAL CANCEL}
-    Wait Until Element Is Not Visible    ${DISCONNECT MODAL TEXT}
+    Wait Until Element Is Not Visible    ${DISCONNECT MODAL WARNING}
     Wait Until Page Does Not Contain Element    //div[@modal-render='true']
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
-    Wait Until Elements Are Visible    ${DISCONNECT MODAL TEXT}    ${DISCONNECT MODAL DISCONNECT BUTTON}
+    Wait Until Elements Are Visible    ${DISCONNECT MODAL WARNING}    ${DISCONNECT MODAL DISCONNECT BUTTON}
     Click Button    ${DISCONNECT MODAL DISCONNECT BUTTON}
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
     Log Out

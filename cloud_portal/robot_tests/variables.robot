@@ -1,5 +1,5 @@
 *** Settings ***
-Variables    getvars.py    en_US
+Variables    getvars.py    language
 
 *** Variables ***
 ${ALERT}                              //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']
@@ -81,7 +81,7 @@ ${DISCONNECT FORM HEADER}            //h1['Disconnect System from Nx Cloud?']
 
 #Disconnect from my account
 ${DISCONNECT MODAL WARNING}              //p[contains(text(), '${DISCONNECT MODAL WARNING TEXT}')]
-${DISCONNECT MODAL CANCEL}            //button[@ng-click='cancel()']
+${DISCONNECT MODAL CANCEL}               //button[@ng-click='cancel()']
 ${DISCONNECT MODAL DISCONNECT BUTTON}    //button[@ng-click='ok()']
 
 ${JUMBOTRON}                          //div[@class='jumbotron']
