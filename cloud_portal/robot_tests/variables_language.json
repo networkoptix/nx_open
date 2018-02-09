@@ -3,7 +3,7 @@
     "LOG OUT BUTTON TEXT"                :     "Log Out",
     "RESET EMAIL SENT MESAGE TEXT"       :     "Password reset instructions are sent to Email",
     "RESET SUCCESS MESAGE TEXT"          :     "Password successfully saved",
-    "RESET SUCCESS LOG IN INK TEXT"      :     "Password successfully saved')]/a[@href='/login']",
+    "RESET SUCCESS LOG IN LINK TEXT"      :     "Password successfully saved",
     "CREATE ACCOUNT BUTTON TEXT"         :     "Create Account",
     "TERMS AND CONDITIONS LINK TEXT"     :     "Terms and Conditions",
     "RESEND ACTIVATION LINK BUTTON TEXT" :     "Resend activation link",
