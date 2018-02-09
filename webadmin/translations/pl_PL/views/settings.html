@@ -42,7 +42,8 @@
                     </div>
                     <div>
                         <h3>Odłącz serwer z systemu</h3>
-                        <p>Ta czynność spowoduje odłączenie serwera od systemu utrzymującego bazę danych, użytkowników lokalnych i konfigurację. Archiwum wideo pozostanie nienaruszone. <b>Użytkownicy chmury zostaną usunięci.</b></p>
+                        <p>This action will detach server from the system keeping database, local users and configuration.
+                            Archiwum wideo pozostanie nienaruszone. <b>Cloud users will be deleted.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Odłącz od systemu</button></p>
                     </div>
                     <div>
@@ -114,7 +115,9 @@
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Ustawienia sieciowe urządzenia</h3> <network-settings settings="networkSettings[0]" ng-if="networkSettings"> </network-settings> <button class="btn btn-default" ng-click="saveNetworkSettings()">Zapisz ustawienia i uruchom ponownie urządzenie</button>
+                        <h3>Device Network Settings</h3>
+                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Data i czas</h3>

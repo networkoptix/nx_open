@@ -44,7 +44,8 @@
                     </div>
                     <div>
                         <h3>Maak de server los van het systeem</h3>
-                        <p>Met deze actie wordt de server losgemaakt van de systeemdatabase, lokale gebruikers en configuratie. Videoarchief blijft intact. <b> Cloud gebruikers worden verwijderd. </b></p>
+                        <p>This action will detach server from the system keeping database, local users and configuration.
+                            Videoarchief zal intact blijven. <b>Cloud users will be deleted.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Maak los van het systeem</button></p>
                     </div>
                     <div>
@@ -120,7 +121,9 @@ Anders zal alleen het recovery wachtwoord gewijzigd worden.</p>
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Netwerk apparaatinstellingen</h3>                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings> <button class="btn btn-default" ng-click="saveNetworkSettings()">-Instellingen opslaan en herstarten van het apparaat</button>
+                        <h3>Device Network Settings</h3>
+                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Datum en tijd</h3>

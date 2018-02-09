@@ -45,7 +45,8 @@ Bitte an das Netzwerk anschließen oder eine korrekte IP-Adresse vergeben.
                     </div>
                     <div>
                         <h3>Server aus dem System trennen</h3>
-                        <p>Diese Aktion löscht den Server vom System. Die Datenbank, die lokalen Benutzer und die Konfiguration wird beibehalten. Videoarchiv bleibt intakt. <b>Cloud-Benutzer werden gelöscht.</b></p>
+                        <p>This action will detach server from the system keeping database, local users and configuration.
+                            Videoarchiv bleibt intakt. <b>Cloud users will be deleted.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Vom System trennen</button></p>
                     </div>
                     <div>
@@ -121,9 +122,9 @@ Andernfalls ändert sich nur das Wiederherstellungskennwort.</p>
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Netzwerkeinstellungen des Geräts</h3>
-<network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-<button class="btn btn-default" ng-click="saveNetworkSettings()">Einstellungen speichern und Gerät neu starten</button>
+                        <h3>Device Network Settings</h3>
+                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Datum und Uhrzeit</h3>
