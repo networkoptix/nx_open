@@ -908,7 +908,7 @@ nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::Con
     return capability;
 }
 
-QnAbstractPtzController* HanwhaResource::createPtzControllerInternal()
+QnAbstractPtzController* HanwhaResource::createPtzControllerInternal() const
 {
     if (m_ptzCapabilities == Ptz::NoPtzCapabilities)
         return nullptr;

@@ -111,7 +111,7 @@ protected:
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
-    virtual QnAbstractPtzController* createPtzControllerInternal() override;
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     virtual bool allowRtspVideoLayout() const override { return false; }
 private:
