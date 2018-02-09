@@ -99,6 +99,7 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         NX_ASSERT(!resource->getId().isNull());
         NX_ASSERT(!resource->resourcePool() || resource->resourcePool() == this);
         resource->setResourcePool(this);
+        resource->moveToThread(thread());
     }
 
     QMap<QnUuid, QnResourcePtr> newResources; // sort by id
