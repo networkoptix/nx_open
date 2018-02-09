@@ -159,6 +159,8 @@
     "offline": "System is offline",
     "openClient": "Open in %VMS_NAME%",
     "openClientNoSystem": "Open %VMS_NAME%",
+    "confirmMergeAction": "Merge",
+    "mergeSystemTitle": "Merge Systems",
     "confirmRenameTitle": "System name",
     "confirmRenameAction": "Save",
     "successRename": "System name saved",

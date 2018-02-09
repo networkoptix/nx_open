@@ -87,16 +87,14 @@
                                                 <span class="glyphicon glyphicon-arrow-left"></span>
                                             </span>
                                             <camera-status camera="activeCamera" type="'video'"></camera-status>
-                                            <span class="caption-row video-name">
-                                                {{activeCamera.name + " (" + activeResolution + ")"}}
-                                            </span>
+                                            <span class="caption-row video-name"> {{activeCamera.name + "(" + activeResolution + ")"}} </span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="float-size">
                                 <div ng-if="isFullscreen && enableFullscreenNotification" class="fullscreen-notification fade-out">
-                                    <span>Press ESC to exit fullscreen</span>
+                                    <span>Presione ESC para salir de pantalla completa</span>
                                 </div>
                                 <voice-control ng-if="voiceControls.showCommands" voice-controls="voiceControls"></voice-control>
                                 <camera-links ng-if="cameraLinks.enabled"

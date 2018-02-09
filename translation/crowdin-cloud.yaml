@@ -38,3 +38,18 @@ files:
     dest: '/cloud_portal/cloud/notifications/static/templates/container.mustache.template.html'
     translation: '/cloud_portal/translations/%locale_with_underscore%/templates/container.mustache.template'
     type: 'html'
+  -
+    source: '/webadmin/app/language.json'
+    translation: '/webadmin/translations/%locale_with_underscore%/language.json'
+  -
+    source: '/webadmin/app/views/**/*.*'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/**/%original_file_name%'
+    ignore:
+      - /webadmin/app/views/debug.html
+      - /webadmin/app/views/viewdebug.html
+  -
+    source: '/webadmin/app/web_common/commonLanguage.json'
+    translation: '/webadmin/translations/%locale_with_underscore%/web_common/commonLanguage.json'
+  -
+    source: '/webadmin/app/web_common/views/**/*.*'
+    translation: '/webadmin/translations/%locale_with_underscore%/web_common/views/**/%original_file_name%'

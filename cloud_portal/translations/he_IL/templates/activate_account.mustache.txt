@@ -1,8 +1,8 @@
-Hello,
+שלום,
 
-  Please open the link below to confirm your email address and activate the account.
+  לחץ על הלחצן למטה כדי לאשר את כתובת הדוא"ל שלך ולהפעיל את החשבון.
 
-{{config.portal_url}}/activate/{{message.code}}
+הפעל חשבון: {{config.portal_url}} / הפעל / {{message.code}}
 
 אם לא נרשמת ל- {{PRODUCT_NAME}}, פשוט התעלם מדוא"ל זה.
-Do not share the message or the link with anyone.
+אל תשתף את ההודעה או את הקישור עם אף אחד.
