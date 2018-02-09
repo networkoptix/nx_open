@@ -45,6 +45,10 @@
 // TODO: Does it make sense to move into some config?
 static const bool kVerifyDigestUriWithParams = false;
 
+namespace {
+    static const QByteArray kCookieAuthMethod("GET");
+}
+
 void QnAuthHelper::UserDigestData::parse(const nx_http::Request& request)
 {
     ha1Digest = nx_http::getHeaderValue(request.headers, Qn::HA1_DIGEST_HEADER_NAME);
@@ -547,7 +551,8 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     // TODO: Verify UUID and CSRF token against some cache as well.
     return authenticateByUrl(
         QUrl::fromPercentEncoding(auth).toUtf8(),
-        method, responseHeaders, accessRights);
+        kCookieAuthMethod,
+        responseHeaders, accessRights);
 
 }
 
@@ -663,7 +668,7 @@ bool QnAuthHelper::checkUserPassword(const QnUserResourcePtr& user, const QStrin
         qnAuthHelper->generateNonce());
 
     nx_http::Response response;
-    return authenticateByUrl(auth, QByteArray("GET"), response) == Qn::Auth_OK;
+    return authenticateByUrl(auth, kCookieAuthMethod, response) == Qn::Auth_OK;
 }
 
 QnLdapManager* QnAuthHelper::ldapManager() const
