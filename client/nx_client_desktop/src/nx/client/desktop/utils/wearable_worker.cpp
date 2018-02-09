@@ -119,7 +119,8 @@ bool WearableWorker::addUploads(const WearablePayloadList& uploads)
     {
         WearableState::EnqueuedFile file;
         file.path = upload.path;
-        file.startTimeMs = upload.startTimeMs;
+        file.startTimeMs = upload.local.period.startTimeMs;
+        file.uploadPeriod = upload.remote.period;
         d->state.queue.push_back(file);
     }
 

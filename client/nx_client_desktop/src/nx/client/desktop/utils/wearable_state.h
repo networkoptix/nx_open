@@ -3,6 +3,7 @@
 #include <QtCore/QString>
 
 #include <nx/utils/uuid.h>
+#include <recording/time_period.h>
 
 #include "upload_state.h"
 
@@ -24,7 +25,8 @@ struct WearableState
     struct EnqueuedFile
     {
         QString path;
-        qint64 startTimeMs = 0;
+        qint64 startTimeMs;
+        QnTimePeriod uploadPeriod;
     };
 
     /** Current wearable status of the camera. */

@@ -140,28 +140,22 @@ int QnWearableCameraRestHandler::executeCheck(const QnRequestParams& params,
         return nx_http::StatusCode::invalidParameter;
 
     QnWearableCheckData data;
-    if(!QJson::deserialize(body, &data))
+    if(!QJson::deserialize(body, &data) || data.elements.empty())
         return nx_http::StatusCode::invalidParameter;
 
     QnResourcePtr resource = owner->resourcePool()->getResourceById(cameraId);
     if (!resource)
         return nx_http::StatusCode::invalidParameter;
 
-    qint64 startTimeMs = std::numeric_limits<qint64>::max();
-    qint64 endTimeMs = std::numeric_limits<qint64>::min();
+    QnTimePeriod unionPeriod;
     for (const QnWearableCheckDataElement& element : data.elements)
-    {
-        startTimeMs = std::min(startTimeMs, element.startTimeMs);
-        endTimeMs = std::max(endTimeMs, element.startTimeMs + element.durationMs);
-    }
-    if (startTimeMs >= endTimeMs)
-        return nx_http::StatusCode::invalidParameter;
+        unionPeriod.addPeriod(element.period);
 
     QnTimePeriodList serverTimePeriods = qnNormalStorageMan
         ->getFileCatalog(resource->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
         ->getTimePeriods(
-            startTimeMs,
-            endTimeMs,
+            unionPeriod.startTimeMs,
+            unionPeriod.endTimeMs(),
             kDetalizationLevelMs,
             /*keepSmallChunks*/ false,
             std::numeric_limits<int>::max());
@@ -170,16 +164,12 @@ int QnWearableCameraRestHandler::executeCheck(const QnRequestParams& params,
 
     for (const QnWearableCheckDataElement& element : data.elements)
     {
-        QnTimePeriodList periods;
-        periods.push_back(QnTimePeriod(element.startTimeMs, element.durationMs));
+        QnTimePeriodList periods{element.period};
         periods.excludeTimePeriods(serverTimePeriods);
 
         QnWearableCheckReplyElement replyElement;
         if (!periods.empty())
-        {
-            replyElement.startTimeMs = periods[0].startTimeMs;
-            replyElement.durationMs = periods[0].durationMs;
-        }
+            replyElement.period = periods[0];
         reply.elements.push_back(replyElement);
     }
 

@@ -16,6 +16,12 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+namespace
+{
+    qint64 kMaxIgnoredOverlapMs = 200;
+}
+
+
 struct WearableChecker::Private
 {
     Private(const QnSecurityCamResourcePtr& camera) :
@@ -42,6 +48,8 @@ WearableChecker::WearableChecker(const QnSecurityCamResourcePtr& camera, QObject
     QnCommonModuleAware(parent),
     d(new Private(camera))
 {
+    connect(this, &WearableChecker::finishedLater, this,
+        &WearableChecker::finished, Qt::QueuedConnection);
 }
 
 WearableChecker::~WearableChecker()
@@ -49,30 +57,51 @@ WearableChecker::~WearableChecker()
     d->requests.cancelAllRequests();
 }
 
-WearablePayloadList WearableChecker::checkUploads(const QStringList& filePaths)
+void WearableChecker::checkUploads(const QStringList& filePaths)
 {
     NX_ASSERT(d->result.isEmpty());
     NX_ASSERT(!filePaths.isEmpty());
 
     for (const QString& path : filePaths)
-        checkLocally(path);
+    {
+        WearablePayload payload;
+        payload.path = path;
+        d->result.push_back(payload);
+    }
 
-    return d->result;
+    for (WearablePayload& payload : d->result)
+        checkLocally(payload);
+
+    if (!WearablePayload::someHaveStatus(d->result, WearablePayload::Valid))
+    {
+        emit finishedLater(d->result);
+        return;
+    }
+
+    QnWearableCheckData request;
+    for (const WearablePayload& payload : d->result)
+        request.elements.push_back(payload.local);
+
+    auto callback =
+        [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        {
+            d->requests.releaseHandle(handle);
+            QnWearableCheckReply reply = result.deserialized<QnWearableCheckReply>();
+            handleCheckFinished(success, reply);
+        };
+
+    d->requests.storeHandle(d->connection()->checkWearableUploads(d->camera, request, callback, thread()));
 }
 
-void WearableChecker::checkLocally(const QString& filePath)
+void WearableChecker::checkLocally(WearablePayload& payload)
 {
-    d->result.push_back(WearablePayload());
-    WearablePayload& payload = d->result.back();
-    payload.path = filePath;
-
-    if (!QFile::exists(filePath))
+    if (!QFile::exists(payload.path))
     {
         payload.status = WearablePayload::FileDoesntExist;
         return;
     }
 
-    QnAviResourcePtr resource(new QnAviResource(filePath));
+    QnAviResourcePtr resource(new QnAviResource(payload.path));
     QnAviArchiveDelegatePtr delegate(resource->createArchiveDelegate());
     bool opened = delegate->open(resource) && delegate->findStreams();
 
@@ -106,10 +135,39 @@ void WearableChecker::checkLocally(const QString& filePath)
         return;
     }
 
-    payload.startTimeMs = startTimeMs;
-    payload.durationMs = durationMs;
-    payload.size = QFileInfo(filePath).size();
+    payload.local.period = QnTimePeriod(startTimeMs, durationMs);
+    payload.local.size = QFileInfo(payload.path).size();
     payload.status = WearablePayload::Valid;
+}
+
+void WearableChecker::handleCheckFinished(bool success, const QnWearableCheckReply& reply)
+{
+    if (!success || reply.elements.size() != d->result.size())
+    {
+        for (WearablePayload& payload : d->result)
+            payload.status = WearablePayload::ServerError;
+
+        emit finished(d->result);
+        return;
+    }
+
+    for (int i = 0; i < reply.elements.size(); i++)
+    {
+        WearablePayload& payload = d->result[i];
+        payload.remote = reply.elements[i];
+
+        if (payload.local.period != payload.remote.period)
+        {
+            QnTimePeriod remoteExtended = payload.remote.period;
+            remoteExtended.startTimeMs -= kMaxIgnoredOverlapMs;
+            remoteExtended.durationMs += 2 * kMaxIgnoredOverlapMs;
+
+            if (!remoteExtended.contains(payload.local.period))
+                payload.status = WearablePayload::ChunksTakenOnServer;
+        }
+    }
+
+    emit finished(d->result);
 }
 
 } // namespace desktop

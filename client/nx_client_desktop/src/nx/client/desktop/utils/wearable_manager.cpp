@@ -65,17 +65,24 @@ QList<WearableState> WearableManager::runningUploads()
     return result;
 }
 
+void WearableManager::checkUploads(
+    const QnSecurityCamResourcePtr& camera,
+    const QStringList& filePaths,
+    QObject* target,
+    std::function<void(const WearablePayloadList&)> callback)
+{
+    WearableChecker* checker = new WearableChecker(camera, this);
+
+    connect(checker, &WearableChecker::finished, target, callback);
+    connect(checker, &WearableChecker::finished, checker, &QObject::deleteLater);
+
+    checker->checkUploads(filePaths);
+}
+
 void WearableManager::updateState(const QnSecurityCamResourcePtr& camera)
 {
     if(WearableWorker* worker = cameraWorker(camera))
         worker->updateState();
-}
-
-WearablePayloadList WearableManager::checkUploads(const QnSecurityCamResourcePtr& camera, const QStringList& filePaths)
-{
-    QScopedPointer<WearableChecker> checker(new WearableChecker(camera, this));
-
-    return checker->checkUploads(filePaths);
 }
 
 bool WearableManager::addUploads(const QnSecurityCamResourcePtr& camera, const WearablePayloadList& uploads)

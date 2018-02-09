@@ -3,6 +3,9 @@
 #include <QtCore/QVector>
 #include <QtCore/QString>
 
+#include <api/model/wearable_check_data.h>
+#include <api/model/wearable_check_reply.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -18,25 +21,39 @@ struct WearablePayload
         FileDoesntExist,
         UnsupportedFormat,
         NoTimestamp,
-        NoSpaceOnServer,
+        ChunksTakenByFileInQueue,
         ChunksTakenOnServer,
+        NoSpaceOnServer,
+        ServerError
     };
 
     QString path;
     Status status = Valid;
-    qint64 size = 0;
-    qint64 startTimeMs = 0;
-    qint64 durationMs = 0;
+    QnWearableCheckDataElement local;
+    QnWearableCheckReplyElement remote;
 
     static bool allHaveStatus(const WearablePayloadList& list, Status status)
     {
-        if (list.isEmpty())
+        if (list.empty())
             return false;
 
         for (const WearablePayload& payload : list)
             if (payload.status != status)
                 return false;
+
         return true;
+    }
+
+    static bool someHaveStatus(const WearablePayloadList& list, Status status)
+    {
+        if (list.empty())
+            return false;
+
+        for (const WearablePayload& payload : list)
+            if (payload.status == status)
+                return true;
+
+        return false;
     }
 };
 

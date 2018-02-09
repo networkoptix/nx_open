@@ -31,8 +31,14 @@ public:
     WearableState state(const QnSecurityCamResourcePtr& camera);
     QList<WearableState> runningUploads();
 
+    void checkUploads(
+        const QnSecurityCamResourcePtr& camera,
+        const QStringList& filePaths,
+        QObject* target,
+        std::function<void(const WearablePayloadList&)> callback);
+
     void updateState(const QnSecurityCamResourcePtr& camera);
-    WearablePayloadList checkUploads(const QnSecurityCamResourcePtr& camera, const QStringList& filePaths);
+
     bool addUploads(const QnSecurityCamResourcePtr& camera, const WearablePayloadList& uploads);
     void cancelUploads(const QnSecurityCamResourcePtr& camera);
     void cancelAllUploads();

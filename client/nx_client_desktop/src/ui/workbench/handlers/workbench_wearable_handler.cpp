@@ -136,7 +136,7 @@ void QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered()
 void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    auto camera = parameters.resource().dynamicCast<QnSecurityCamResource>();
+    QnSecurityCamResourcePtr camera = parameters.resource().dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return;
     QnMediaServerResourcePtr server = camera->getParentServer();
@@ -160,25 +160,96 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     for(QString& path: paths)
         path = path.trimmed();
 
-    WearablePayloadList uploads = qnClientModule->wearableManager()->checkUploads(camera, paths);
+    qnClientModule->wearableManager()->checkUploads(camera, paths, this,
+        [this, camera](const WearablePayloadList& uploads)
+        {
+            at_checkUploads_finished(camera, uploads);
+        });
+}
+
+void QnWorkbenchWearableHandler::at_checkUploads_finished(
+    const QnSecurityCamResourcePtr& camera,
+    const WearablePayloadList& uploads)
+{
     int count = uploads.size();
 
     if (WearablePayload::allHaveStatus(uploads, WearablePayload::UnsupportedFormat))
     {
         QnMessageBox::critical(mainWindow(),
-            tr("Selected file format(s) are not supported", 0, count));
+            tr("Selected file format(s) are not supported", 0, count),
+            tr("Only video files are supported."));
         return;
     }
 
     if (WearablePayload::allHaveStatus(uploads, WearablePayload::NoTimestamp))
     {
         QnMessageBox::critical(mainWindow(),
-            tr("Selected file(s) do not have timestamp", 0, count),
+            tr("Selected file(s) do not have timestamp(s)", 0, count),
             tr("Only video files with correct timestamp are supported."));
         return;
     }
 
-    if (!qnClientModule->wearableManager()->addUploads(camera, uploads))
+    if (WearablePayload::allHaveStatus(uploads, WearablePayload::ChunksTakenByFileInQueue))
+    {
+        QnMessageBox::critical(mainWindow(),
+            tr("Selected file(s) cover periods for which videos are already being uploaded", 0, count),
+            tr("You can upload these file(s) to a different instance of a Wearable Camera.", 0, count));
+        return;
+    }
+
+    if (WearablePayload::allHaveStatus(uploads, WearablePayload::ChunksTakenOnServer))
+    {
+        QnMessageBox::critical(mainWindow(),
+            tr("Selected file(s) cover periods for which videos have already been uploaded", 0, count),
+            tr("You can upload these file(s) to a different instance of a Wearable Camera.", 0, count));
+        return;
+    }
+
+    if (WearablePayload::allHaveStatus(uploads, WearablePayload::NoSpaceOnServer))
+    {
+        QnMessageBox::critical(mainWindow(),
+            tr("Not enough space on server storage", 0, count),
+            tr("TODO."));
+        return;
+    }
+
+    if (WearablePayload::allHaveStatus(uploads, WearablePayload::ServerError))
+        return; //< Ignore it as the user is likely already seeing "reconnecting to server" dialog.
+
+    if (!WearablePayload::allHaveStatus(uploads, WearablePayload::Valid))
+    {
+        QString extendedMessage;
+        for (const WearablePayload& upload : uploads)
+        {
+            QString line = calculateExtendedErrorMessage(upload);
+            if (!line.isEmpty())
+                extendedMessage += line + lit("\n");
+        }
+
+        if (!WearablePayload::someHaveStatus(uploads, WearablePayload::Valid))
+        {
+            QnMessageBox::critical(mainWindow(),
+                tr("Selected file(s) will not be uploaded", 0, count),
+                extendedMessage);
+            return;
+        }
+        else
+        {
+            QDialogButtonBox::StandardButton button = QnMessageBox::critical(mainWindow(),
+                tr("Some files will not be uploaded", 0, count),
+                extendedMessage,
+                QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+            if (button == QDialogButtonBox::Cancel)
+                return;
+        }
+    }
+
+    WearablePayloadList realUploads;
+    for (const WearablePayload& upload : uploads)
+        if (upload.status == WearablePayload::Valid)
+            realUploads.push_back(upload);
+
+    if (!qnClientModule->wearableManager()->addUploads(camera, realUploads))
     {
         WearableState state = qnClientModule->wearableManager()->state(camera);
         NX_ASSERT(state.status == WearableState::LockedByOtherClient);
@@ -204,4 +275,25 @@ void QnWorkbenchWearableHandler::at_resourcePool_resourceAdded(const QnResourceP
 void QnWorkbenchWearableHandler::at_context_userChanged()
 {
     qnClientModule->wearableManager()->setCurrentUser(context()->user());
+}
+
+QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const WearablePayload& upload)
+{
+    QString fileName = QFileInfo(upload.path).fileName();
+
+    switch (upload.status)
+    {
+    case WearablePayload::UnsupportedFormat:
+        return tr("File format of \"%1\" is not supported.").arg(fileName);
+    case WearablePayload::NoTimestamp:
+        return tr("File \"%1\" does not have timestamp.").arg(fileName);
+    case WearablePayload::ChunksTakenByFileInQueue:
+        return tr("File \"%1\" cover period for which video is already being uploaded.").arg(fileName);
+    case WearablePayload::ChunksTakenOnServer:
+        return tr("File \"%1\" cover periods for which video has already been uploaded.").arg(fileName);
+    case WearablePayload::NoSpaceOnServer:
+        return tr("There is no space on server for file \"%1\".").arg(fileName);
+    default:
+        return QString();
+    }
 }

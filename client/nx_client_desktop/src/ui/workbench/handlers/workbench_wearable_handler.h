@@ -7,6 +7,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 #include <nx/utils/uuid.h>
+#include <nx/client/desktop/utils/wearable_payload.h>
 
 class QnWorkbenchWearableHandler:
     public Connective<QObject>,
@@ -25,9 +26,15 @@ private:
 private slots:
     void at_newWearableCameraAction_triggered();
     void at_uploadWearableCameraFileAction_triggered();
+    void at_checkUploads_finished(
+        const QnSecurityCamResourcePtr& camera,
+        const nx::client::desktop::WearablePayloadList& uploads);
 
     void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
     void at_context_userChanged();
+
+private:
+    QString calculateExtendedErrorMessage(const nx::client::desktop::WearablePayload& upload);
 
 private:
     QnUuid m_currentCameraUuid;

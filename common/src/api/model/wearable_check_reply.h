@@ -6,10 +6,9 @@
 
 struct QnWearableCheckReplyElement
 {
-    qint64 startTimeMs = 0;
-    qint64 durationMs = 0;
+    QnTimePeriod period;
 };
-#define QnWearableCheckReplyElement_Fields (startTimeMs)(durationMs)
+#define QnWearableCheckReplyElement_Fields (period)
 
 struct QnWearableCheckReply
 {

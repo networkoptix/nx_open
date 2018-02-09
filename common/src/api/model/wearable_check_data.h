@@ -3,14 +3,14 @@
 #include <QtCore/QMetaType>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <recording/time_period.h>
 
 struct QnWearableCheckDataElement
 {
     qint64 size = 0;
-    qint64 startTimeMs = 0;
-    qint64 durationMs = 0;
+    QnTimePeriod period;
 };
-#define QnWearableCheckDataElement_Fields (size)(startTimeMs)(durationMs)
+#define QnWearableCheckDataElement_Fields (size)(period)
 
 struct QnWearableCheckData
 {

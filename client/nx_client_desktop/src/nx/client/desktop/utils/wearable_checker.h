@@ -23,10 +23,15 @@ public:
     WearableChecker(const QnSecurityCamResourcePtr& camera, QObject* parent = nullptr);
     virtual ~WearableChecker() override;
 
-    WearablePayloadList checkUploads(const QStringList& filePaths);
+    void checkUploads(const QStringList& filePaths);
 
 private:
-    void checkLocally(const QString& filePath);
+    void checkLocally(WearablePayload& payload);
+    void handleCheckFinished(bool success, const QnWearableCheckReply& reply);
+
+signals:
+    void finished(const WearablePayloadList& result);
+    void finishedLater(const WearablePayloadList& result);
 
 private:
     struct Private;
