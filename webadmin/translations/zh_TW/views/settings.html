@@ -45,8 +45,8 @@
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>將伺服器從系統中脫離</h3>
-                        <p>此動作將使伺服器脫離系統但保留資料庫, 使用者訊資以及設定.
-                            影像資料將保持完好. <b>雲端使用者將被刪除.</b></p>
+                        <p>This action will detach server from the system keeping database, local users and configuration.
+                            影像資料將保持完好. <b>Cloud users will be deleted.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">從系統中脫離</button></p>
                     </div>
                     <div>
@@ -122,9 +122,9 @@
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>設備網路設置</h3>
+                        <h3>Device Network Settings</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">保存設定並重新啟動設備</button>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>日期和時間</h3>

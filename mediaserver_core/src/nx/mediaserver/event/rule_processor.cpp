@@ -27,6 +27,7 @@
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/event/actions/send_mail_action.h>
 #include <nx/vms/event/actions/camera_output_action.h>
+#include <nx/network/socket_global.h>
 
 namespace {
 
@@ -375,10 +376,12 @@ void RuleProcessor::addRule(const vms::event::RulePtr& value)
 
 void RuleProcessor::processEvent(const vms::event::AbstractEventPtr& event)
 {
+    // TODO: Introduce a thread pool so actions could do not block a single event queue.
+    NX_CRITICAL(!nx::network::SocketGlobals::aioService().isInAnyAioThread(),
+        "Processing event from an AIO thread will sooner or later lead to a deadlock!");
+
     QnMutexLocker lock(&m_mutex);
-
     const auto actions = matchActions(event);
-
     for (const auto& action: actions)
         executeAction(action);
 }

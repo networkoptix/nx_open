@@ -6,14 +6,21 @@
 #include <nx/sdk/metadata/camera_manager.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/api/analytics/driver_manifest.h>
+#include <nx/vms/event/events/events_fwd.h>
 
 namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-class EventHandler: public nx::sdk::metadata::MetadataHandler
+class EventHandler:
+    public QObject,
+    public nx::sdk::metadata::MetadataHandler
 {
+    Q_OBJECT
+
 public:
+    EventHandler();
+
     virtual void handleMetadata(
         nx::sdk::Error error,
         nx::sdk::metadata::MetadataPacket* metadata) override;
@@ -21,6 +28,9 @@ public:
     void setResource(const QnSecurityCamResourcePtr& resource);
 
     void setManifest(const nx::api::AnalyticsDriverManifest& manifest);
+
+signals:
+    void sdkEventTriggered(const nx::vms::event::AnalyticsSdkEventPtr& event);
 
 private:
     nx::vms::event::EventState lastEventState(const QnUuid& eventId) const;
