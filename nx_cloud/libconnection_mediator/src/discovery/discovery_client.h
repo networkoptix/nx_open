@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <deque>
 #include <string>
 #include <type_traits>
@@ -237,6 +238,9 @@ public:
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
+    void setResponseReadTimeout(std::chrono::milliseconds timeout);
+    std::chrono::milliseconds responseReadTimeout() const;
+
     template<typename InstanceInformation>
     void fetchModules(
         nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<InstanceInformation>)> handler)
@@ -252,6 +256,7 @@ public:
                 auto httpClient =
                     std::make_unique<nx::network::http::FusionDataHttpClient<void, std::vector<InstanceInformation>>>(
                         url, nx::network::http::AuthInfo());
+                httpClient->setRequestTimeout(m_responseReadTimeout);
                 httpClient->bindToAioThread(getAioThread());
                 httpClient->execute(
                     [this, handler = std::move(handler), httpClientPtr = httpClient.get()](
@@ -276,6 +281,7 @@ protected:
 private:
     const nx::utils::Url m_baseUrl;
     std::vector<std::unique_ptr<nx::network::aio::BasicPollable>> m_runningRequests;
+    std::chrono::milliseconds m_responseReadTimeout;
 
     template<typename InstanceInformation>
     void processRequestResult(

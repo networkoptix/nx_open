@@ -6,6 +6,7 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/dns_resolver.h>
+#include <nx/network/http/test_http_server.h>
 #include <nx/network/resolve/custom_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_factory.h>
@@ -35,29 +36,48 @@ protected:
     std::atomic<int> m_startedConnectionsCount;
     std::atomic<int> m_completedConnectionsCount;
     std::deque<std::unique_ptr<AbstractStreamSocket>> m_connections;
+    nx::network::http::TestHttpServer m_testServer;
+    SocketAddress m_serverEndpoint;
+
+    virtual void SetUp() override
+    {
+        ASSERT_TRUE(m_testServer.bindAndListen(SocketAddress::anyPrivateAddress))
+            << SystemError::getLastOSErrorText().toStdString();
+
+        m_serverEndpoint.address =
+            nx::utils::generateRandomName(7).toStdString();
+        m_serverEndpoint.port = m_testServer.serverAddress().port;
+        SocketGlobals::addressResolver().dnsResolver().addEtcHost(
+            m_serverEndpoint.address.toString(),
+            {{ m_testServer.serverAddress().address }});
+    }
 
     void startAnotherSocketNonSafe()
     {
-        std::unique_ptr<AbstractStreamSocket> connection(SocketFactory::createStreamSocket());
+        using namespace std::placeholders;
+
+        auto connection = SocketFactory::createStreamSocket();
         ASSERT_TRUE(connection->setNonBlockingMode(true));
         AbstractStreamSocket* connectionPtr = connection.get();
         m_connections.push_back(std::move(connection));
         connectionPtr->connectAsync(
-            SocketAddress(QString::fromLatin1("ya.ru"), nx::network::http::DEFAULT_HTTP_PORT),
-            std::bind(&AddressResolverDeprecatedTests::onConnectionComplete, this, connectionPtr, std::placeholders::_1));
+            m_serverEndpoint,
+            std::bind(&AddressResolverDeprecatedTests::onConnectionComplete, this,
+                connectionPtr, _1));
     }
 
     void onConnectionComplete(
         AbstractStreamSocket* connectionPtr,
         SystemError::ErrorCode errorCode)
     {
-        ASSERT_TRUE(errorCode == SystemError::noError);
+        ASSERT_EQ(SystemError::noError, errorCode)
+            << SystemError::toString(errorCode).toStdString();
 
         std::unique_lock<std::mutex> lk(m_mutex);
 
         auto iterToRemove = std::remove_if(
             m_connections.begin(), m_connections.end(),
-            [connectionPtr](const std::unique_ptr<AbstractStreamSocket>& elem) -> bool
+            [connectionPtr](const std::unique_ptr<AbstractStreamSocket>& elem)
             {
                 return elem.get() == connectionPtr;
             });

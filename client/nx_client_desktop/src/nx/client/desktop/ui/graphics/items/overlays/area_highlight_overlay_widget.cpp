@@ -285,10 +285,8 @@ void AreaHighlightOverlayWidget::addOrUpdateArea(
     auto& tooltipItem = area.tooltipItem;
     if (!tooltipItem)
     {
-        const auto colorTheme = ColorTheme::instance();
-
         tooltipItem.reset(new AreaTooltipItem(this));
-        tooltipItem->setTextColor(colorTheme->color(lit("light1")));
+        tooltipItem->setTextColor(colorTheme()->color("light1"));
         tooltipItem->setFont(font());
         tooltipItem->stackBefore(rectItem.data());
     }
@@ -318,9 +316,7 @@ void AreaHighlightOverlayWidget::setHighlightedArea(const QnUuid& areaId)
 void AreaHighlightOverlayWidget::paint(
     QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*w*/)
 {
-    const auto colorTheme = ColorTheme::instance();
-
-    const auto dimmerColor = colorTheme->transparent(colorTheme->color(lit("dark1")), 0.5);
+    const auto dimmerColor = colorTheme()->color("dark1", 0.5);
 
     const auto it = d->areaById.find(d->highlightedAreaId);
     if (it == d->areaById.end())

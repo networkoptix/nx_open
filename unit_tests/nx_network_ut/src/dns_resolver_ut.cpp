@@ -177,7 +177,7 @@ TEST_F(DnsResolver, old_and_unclear_test_to_be_refactored)
     auto& dnsResolver = SocketGlobals::addressResolver().dnsResolver();
     {
         std::deque<HostAddress> ips;
-        const auto resultCode = dnsResolver.resolveSync(QLatin1String("ya.ru"), AF_INET, &ips);
+        const auto resultCode = dnsResolver.resolveSync("localhost", AF_INET, &ips);
         ASSERT_EQ(SystemError::noError, resultCode);
         ASSERT_GE(ips.size(), 1U);
         ASSERT_TRUE(ips.front().isIpAddress());
@@ -188,13 +188,13 @@ TEST_F(DnsResolver, old_and_unclear_test_to_be_refactored)
 
     {
         std::deque<HostAddress> ips;
-        const auto resultCode = dnsResolver.resolveSync(QLatin1String("hren2349jf234.ru"), AF_INET, &ips);
+        const auto resultCode = dnsResolver.resolveSync("hren2349jf234.ru", AF_INET, &ips);
         ASSERT_EQ(SystemError::hostNotFound, resultCode);
         ASSERT_EQ(0U, ips.size());
     }
 
     {
-        const QString kTestHost = QLatin1String("some-test-host-543242145.com");
+        const QString kTestHost("some-test-host-543242145.com");
         std::vector<HostAddress> kTestAddresses;
         kTestAddresses.push_back(*HostAddress::ipV4from("12.34.56.78"));
         kTestAddresses.push_back(*HostAddress::ipV6from("1234::abcd").first);

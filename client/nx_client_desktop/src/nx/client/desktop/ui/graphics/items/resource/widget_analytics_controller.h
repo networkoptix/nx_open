@@ -22,6 +22,8 @@ public:
     void updateAreas(qint64 timestamp, int channel);
     void clearAreas();
 
+    void updateAreaForZoomWindow();
+
     void setAnalyticsMetadataProvider(const core::AbstractAnalyticsMetadataProviderPtr& provider);
     void setAreaHighlightOverlayWidget(AreaHighlightOverlayWidget* widget);
 

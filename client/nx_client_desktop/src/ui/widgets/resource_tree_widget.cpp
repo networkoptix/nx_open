@@ -190,7 +190,7 @@ QAbstractItemModel *QnResourceTreeWidget::model() const
         : nullptr;
 }
 
-void QnResourceTreeWidget::setModel(QAbstractItemModel *model, bool allowNewSearch)
+void QnResourceTreeWidget::setModel(QAbstractItemModel *model, NewSearchOption searchOption)
 {
     if (m_resourceProxyModel)
     {
@@ -223,7 +223,7 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model, bool allowNewSear
 
         static constexpr int kOldFilterPage = 0;
         static constexpr int kNewFilterPageIndex = 1;
-        if (ini().enableResourceFiltering && allowNewSearch)
+        if (ini().enableResourceFiltering && searchOption == allowNewSearch)
         {
             ui->filter->setCurrentIndex(kNewFilterPageIndex);
             updateNewFilter();

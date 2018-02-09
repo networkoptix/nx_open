@@ -1,9 +1,0 @@
-#!/bin/bash -e
-
-SERVICE=cloud_db
-COMPANY=${deb.customization.company.name}
-
-useradd $SERVICE
-chgrp -R $SERVICE /opt/$COMPANY/$SERVICE
-service $COMPANY-$SERVICE start
-

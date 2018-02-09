@@ -107,7 +107,7 @@
 #include <utils/screen_manager.h>
 
 #include <nx/client/core/utils/geometry.h>
-
+#include <nx/client/desktop/manual_device_addition/workbench/workbench_manual_device_addition_handler.h>
 #include <nx/utils/app_info.h>
 
 #include "resource_browser_widget.h"
@@ -262,6 +262,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchIncompatibleServersActionHandler>();
     context->instance<QnWorkbenchResourcesSettingsHandler>();
     context->instance<QnWorkbenchBookmarksHandler>();
+    context->instance<nx::client::desktop::WorkbenchManualDeviceAdditionHandler>();
     context->instance<QnWorkbenchAlarmLayoutHandler>();
     context->instance<QnWorkbenchTextOverlaysHandler>();
     context->instance<QnWorkbenchCloudHandler>();
