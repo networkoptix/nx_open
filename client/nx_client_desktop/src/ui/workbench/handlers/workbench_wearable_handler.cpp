@@ -171,25 +171,58 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
         return;
     QnMediaServerResourcePtr server = camera->getParentServer();
 
-    QString fileName = QnFileDialog::getOpenFileName(
-        mainWindow(),
-        tr("Open Wearable Camera Recording..."),
+    QStringList filters;
+    filters << tr("Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
+    filters << tr("All files (*.*)");
+
+    QStringList paths = QnFileDialog::getOpenFileNames(mainWindow(),
+        tr("Open Wearable Camera Recordings..."),
         QString(),
-        tr("All files (*.*)"),
+        filters.join(lit(";;")),
         /*selectedFilter*/ nullptr,
         QnCustomFileDialog::fileDialogOptions()
     );
+    if (paths.isEmpty())
+        return;
 
     // TODO: #wearable requested by rvasilenko as copypaste from totalcmd doesn't work without
     // this line. Maybe move directly to QnFileDialog?
-    fileName = fileName.trimmed();
+    for(QString& path: paths)
+        path = path.trimmed();
 
-    if (fileName.isEmpty())
+    WearablePayloadList uploads = qnClientModule->wearableManager()->checkUploads(camera, paths);
+    int count = uploads.size();
+
+    if (WearablePayload::allHaveStatus(uploads, WearablePayload::UnsupportedFormat))
+    {
+        QnMessageBox::critical(mainWindow(),
+            tr("Selected file format(s) are not supported", 0, count));
         return;
+    }
 
-    WearableError error;
-    if (!qnClientModule->wearableManager()->addUpload(camera, fileName, &error))
-        QnMessageBox::critical(mainWindow(), error.message, error.extraMessage);
+    if (WearablePayload::allHaveStatus(uploads, WearablePayload::NoTimestamp))
+    {
+        QnMessageBox::critical(mainWindow(),
+            tr("Selected file(s) do not have timestamp", 0, count),
+            tr("Only video files with correct timestamp are supported."));
+        return;
+    }
+
+    if (!qnClientModule->wearableManager()->addUploads(camera, uploads))
+    {
+        WearableState state = qnClientModule->wearableManager()->state(camera);
+        NX_ASSERT(state.status == WearableState::LockedByOtherClient);
+
+        QString message;
+        QnResourcePtr resource = resourcePool()->getResourceById(state.lockUserId);
+        if (resource)
+            message = tr("Could not start upload as user \"%1\" is currently uploading footage to this camera.").arg(resource->getName());
+        else
+            message = tr("Could not start upload as another user is currently uploading footage to this camera.");
+
+        QnMessageBox::critical(mainWindow(), message);
+        return;
+    }
 }
 
 void QnWorkbenchWearableHandler::at_resourcePool_resourceAdded(const QnResourcePtr &resource)

@@ -7,7 +7,7 @@
 #include <common/common_module_aware.h>
 
 #include "wearable_state.h"
-#include "wearable_error.h"
+#include "wearable_payload.h"
 
 struct QnWearableStatusReply;
 
@@ -32,7 +32,7 @@ public:
     virtual ~WearableWorker() override;
 
     void updateState();
-    bool addUpload(const QString& path, WearableError* error);
+    bool addUploads(const WearablePayloadList& uploads);
     void cancel();
 
     WearableState state() const;
@@ -56,10 +56,6 @@ private:
     void handleConsumeStarted(bool success);
 
     void pollExtend();
-
-private:
-    QString calculateUserName(const QnUuid& userId);
-    QString calculateLockedMessage();
 
 private:
     struct Private;

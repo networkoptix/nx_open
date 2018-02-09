@@ -114,46 +114,18 @@ void WearableWorker::updateState()
     d->requests.storeHandle(d->connection()->wearableCameraStatus(d->camera, callback, thread()));
 }
 
-bool WearableWorker::addUpload(const QString& path, WearableError* error)
+bool WearableWorker::addUploads(const WearablePayloadList& uploads)
 {
     if (d->state.status == WearableState::LockedByOtherClient)
-    {
-        error->message = calculateLockedMessage();
         return false;
-    }
 
-    QnAviResourcePtr resource(new QnAviResource(path));
-    QnAviArchiveDelegatePtr delegate(resource->createArchiveDelegate());
-    bool opened = delegate->open(resource) && delegate->findStreams();
-
-    if (!opened || !delegate->hasVideo() || resource->hasFlags(Qn::still_image))
+    for (const WearablePayload& upload : uploads)
     {
-        error->message = tr("Selected file format is not supported");
-        error->extraMessage = tr("Use .MKV, .AVI, or .MP4 video files.");
-        return false;
+        WearableState::EnqueuedFile file;
+        file.path = upload.path;
+        file.startTimeMs = upload.startTimeMs;
+        d->state.queue.push_back(file);
     }
-
-    qint64 startTimeMs = delegate->startTime() / 1000;
-
-    if (startTimeMs == 0)
-    {
-        QString startTimeString = QLatin1String(delegate->getTagValue("creation_time"));
-        QDateTime startDateTime = QDateTime::fromString(startTimeString, Qt::ISODate);
-        if (startDateTime.isValid())
-            startTimeMs = startDateTime.toMSecsSinceEpoch();
-    }
-
-    if (startTimeMs == 0)
-    {
-        error->message = tr("Selected file does not have timestamp");
-        error->extraMessage = tr("Only video files with correct timestamp are supported.");
-        return false;
-    }
-
-    WearableState::EnqueuedFile file;
-    file.path = path;
-    file.startTimeMs = startTimeMs;
-    d->state.queue.push_back(file);
 
     if (d->state.status != WearableState::Unlocked)
     {
@@ -293,7 +265,7 @@ void WearableWorker::handleLockFinished(bool success, const QnWearableStatusRepl
         d->state.lockUserId = result.userId;
         d->state.queue.clear();
 
-        emit error(d->state, calculateLockedMessage());
+        emit error(d->state, lit("LOCKED")); // TODO
         emit stateChanged(d->state);
     }
     else
@@ -407,24 +379,6 @@ void WearableWorker::pollExtend()
         kLockTtlMSec,
         callback,
         thread()));
-}
-
-QString WearableWorker::calculateUserName(const QnUuid& userId)
-{
-    QnResourcePtr resource = resourcePool()->getResourceById(userId);
-    if (!resource)
-        return QString();
-    return resource->getName();
-}
-
-QString WearableWorker::calculateLockedMessage()
-{
-    QString userName = calculateUserName(d->state.lockUserId);
-    if (userName.isEmpty())
-        return tr("Could not start upload as another user is currently uploading footage to this camera.");
-    else
-        return tr("Could not start upload as user \"%1\" is currently uploading footage to this camera.").arg(userName);
-
 }
 
 } // namespace desktop
