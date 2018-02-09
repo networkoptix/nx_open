@@ -22,6 +22,18 @@ void QnTestCameraResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnTestCameraResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex /*streamIndex*/)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
+CameraDiagnostics::Result QnTestCameraResource::initializeCameraDriver()
+{
+    return CameraDiagnostics::NoErrorResult();
+}
+
 QnAbstractStreamDataProvider* QnTestCameraResource::createLiveDataProvider()
 {
     return new QnTestCameraStreamReader(toSharedPointer());

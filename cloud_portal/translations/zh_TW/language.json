@@ -115,8 +115,9 @@
     "cantActivatePrefix": "無法啟動您的帳號",
     "cantSendConfirmationPrefix": "無法發送確認郵件",
     "cloudInvalidResponse": "雲端 DB 回覆預期外的回應",
-    "notAuthorized": "不正確的電子郵件或密碼",
+    "notAuthorized": "密碼不正確",
     "wrongParameters": "表單上的一些參數不正確",
+    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "帳號已經啟動或確認碼不正確",
     "wrongCodeRestore": "確認代碼已使用或不正確",
     "forbidden": "您沒有權限執行此操作",
@@ -157,6 +158,7 @@
     "unavailable": "無法連接至系統",
     "offline": "系統處於離線狀態",
     "openClient": "在 {{VMS_NAME}} 中打開",
+    "openClientNoSystem": "開啟 {{VMS_NAME}}",
     "confirmRenameTitle": "系統名稱",
     "confirmRenameAction": "儲存",
     "successRename": "系統名稱已儲存",
@@ -200,19 +202,14 @@
         "label": "Mac OS",
         "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
-      },
       "linux": {
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
         "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      "macos": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -221,6 +218,11 @@
       "android": {
         "label": "Android",
         "shortLabel": "Android"
+      },
+      "arm": {
+        "label": "ARM",
+        "shortLabel": "ARM",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms": {

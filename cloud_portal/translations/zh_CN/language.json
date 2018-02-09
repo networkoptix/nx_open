@@ -115,8 +115,9 @@
     "cantActivatePrefix": "无法激活您的帐户",
     "cantSendConfirmationPrefix": "不能发送确认电子邮件",
     "cloudInvalidResponse": "云 DB 返回了意外的响应",
-    "notAuthorized": "错误的邮箱或密码",
+    "notAuthorized": "错误的密码。",
     "wrongParameters": "窗体上的一些参数不正确",
+    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "已经激活帐户或确认码不正确",
     "wrongCodeRestore": "确认代码已使用或不正确",
     "forbidden": "您没有权限执行此操作",
@@ -157,6 +158,7 @@
     "unavailable": "系统无法访问",
     "offline": "系统处于离线状态",
     "openClient": "在 {{VMS_NAME}} 中打开",
+    "openClientNoSystem": "打开 {{VMS_NAME}}",
     "confirmRenameTitle": "系统名称",
     "confirmRenameAction": "保存",
     "successRename": "保存的系统名称",
@@ -200,19 +202,14 @@
         "label": "Mac OS",
         "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
-      },
       "linux": {
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
         "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      "macos": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -221,6 +218,11 @@
       "android": {
         "label": "Android",
         "shortLabel": "Android"
+      },
+      "arm": {
+        "label": "ARM",
+        "shortLabel": "ARM",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms": {

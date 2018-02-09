@@ -25,12 +25,30 @@ Updates2StatusDataEx::Updates2StatusDataEx(
     lastRefreshTime(lastRefreshTime)
 {}
 
-Updates2StatusDataEx::Updates2StatusDataEx(const api::Updates2StatusData& other):
-    Updates2StatusDataEx(
-        qnSyncTime->currentMSecsSinceEpoch(),
-        other.serverId, other.status,
-        other.message, other.progress)
-{}
+//Updates2StatusDataEx::Updates2StatusDataEx(const api::Updates2StatusData& other):
+//    Updates2StatusDataEx(
+//        qnSyncTime->currentMSecsSinceEpoch(),
+//        other.serverId, other.state,
+//        other.message, other.progress)
+//{}
+
+//Updates2StatusDataEx& Updates2StatusDataEx::operator=(const api::Updates2StatusData& other)
+//{
+
+//}
+
+void Updates2StatusDataEx::fromBase(const api::Updates2StatusData& other)
+{
+    lastRefreshTime = qnSyncTime->currentMSecsSinceEpoch();
+    static_cast<Updates2StatusData&>(*this) = other;
+}
+
+void Updates2StatusDataEx::clone(const Updates2StatusDataEx& other)
+{
+    lastRefreshTime = other.lastRefreshTime;
+    files = other.files;
+    static_cast<Updates2StatusData&>(*this) = other;
+}
 
 bool operator == (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& rhs)
 {
@@ -38,8 +56,8 @@ bool operator == (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& r
         && lhs.serverId == rhs.serverId
         && lhs.message == rhs.message
         && std::abs(lhs.progress - rhs.progress) < std::numeric_limits<double>::epsilon()
-        && lhs.status == rhs.status
-        && lhs.downloadedFiles == rhs.downloadedFiles;
+        && lhs.state == rhs.state
+        && lhs.files == rhs.files;
 }
 
 bool operator != (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& rhs)

@@ -115,8 +115,9 @@
     "cantActivatePrefix": "Impossible d'activer votre compte",
     "cantSendConfirmationPrefix": "Impossible d’envoyer courriel de confirmation",
     "cloudInvalidResponse": "BD Nuage a retourné une réponse inattendue",
-    "notAuthorized": "Courriel ou mot de passe incorrect",
+    "notAuthorized": "Mot de passe incorrect",
     "wrongParameters": "Certains paramètres dans le formulaire sont incorrects",
+    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "Compte déjà activé ou le code de confirmation est incorrect",
     "wrongCodeRestore": "Code de confirmation est déjà utilisé ou incorrecte",
     "forbidden": "Vous n’avez pas l'autorisation nécessaire pour effectuer cette action",
@@ -157,6 +158,7 @@
     "unavailable": "Le système est inaccessible",
     "offline": "System Hors ligne",
     "openClient": "Ouvert à {{VMS_NAME}}",
+    "openClientNoSystem": "Ouvrir {{VMS_NAME}}",
     "confirmRenameTitle": "Nom système",
     "confirmRenameAction": "Enregistrer",
     "successRename": "Nom du système sauvegardé",
@@ -200,19 +202,14 @@
         "label": "Mac OS",
         "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
-      },
       "linux": {
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
         "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      "macos": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -221,6 +218,11 @@
       "android": {
         "label": "Android",
         "shortLabel": "Android"
+      },
+      "arm": {
+        "label": "ARM",
+        "shortLabel": "ARM",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms": {

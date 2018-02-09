@@ -10,6 +10,7 @@
 #include "media_server_process.h"
 #include "common/common_module.h"
 #include <test_support/mediaserver_launcher.h>
+#include <recorder/storage_manager.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #define GTEST_HAS_TR1_TUPLE     0
@@ -62,6 +63,12 @@ class UnmountedLocalStoragesFilterTest:
     public MediaServerModuleFixture
 {
 protected:
+
+    virtual void TearDown() override
+    {
+        qnNormalStorageMan->stopAsyncTasks();
+        qnBackupStorageMan->stopAsyncTasks();
+    }
     enum class PathFound
     {
         yes,

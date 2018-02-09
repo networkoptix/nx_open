@@ -220,15 +220,24 @@ class CloudSession(object):
 
     @testmethod()
     def test_cloud_connect(self):
-        command = '--http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers'.format(
+        command = '--log-level=DEBUG2 --http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers'.format(
             user=quote(self.email),
             password=quote(self.password),
             system_id=self.system_id)
 
         client = docker.client.from_env()
-        output = client.containers.run(
-            '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:3.1.0.13200', command, remove=True)
-        assert b'HTTP/1.1 200 OK' in output, 'Received invalid output from cloud connect'
+        container = client.containers.run(
+            '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:3.1.0.13200', command, detach=True)
+        status = container.wait()
+        log.info('Container exited with exit status {}'.format(status))
+        stdout = container.logs(stdout=True, stderr=False)
+        stderr = container.logs(stdout=False, stderr=True)
+
+        log.info('Stdout:\n{}'.format(stdout.decode('utf-8')))
+        log.info('Stderr:\n{}'.format(stderr.decode('utf-8')))
+        container.remove()
+
+        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect'
 
 
 def main():

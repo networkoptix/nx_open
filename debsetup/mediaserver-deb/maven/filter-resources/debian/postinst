@@ -288,6 +288,6 @@ if [ $(which systemctl) ]; then
     systemctl enable $COMPANY_NAME-mediaserver || exit $?
 fi
 
-service $COMPANY_NAME-mediaserver start || exit $?
+service $COMPANY_NAME-mediaserver restart || exit $?
 
 display_complete_setup_hint $PORT

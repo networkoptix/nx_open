@@ -87,6 +87,7 @@
         "maxRecordQueueSizeBytes": "Tamaño máximo de cola de grabación (bytes)",
         "maxRecordQueueSizeElements": "Tamaño máximo de cola de grabación (elementos)",
         "maxRemoteArchiveSynchronizationThreads": "Máximo hilos de sincronización remota de archivos",
+        "maxRtspConnectDurationSeconds": "Max Rtsp connect duration seconds",
         "maxSceneItems": "Elementos máximos de escena (0 significa predeterminado)",
         "proxyConnectTimeoutSec": "Tiempo de espera de conexión proxy (segundos)",
         "rtpTimeoutMs": "Tiempo de espera RTP (milisegundos)",

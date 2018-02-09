@@ -17,7 +17,7 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <nx/client/desktop/ui/actions/actions.h>
-#include <api/helpers/thumbnail_request_data.h>
+#include <nx/api/mediaserver/image_request.h>
 
 class QGraphicsLinearLayout;
 class QnNotificationListWidget;
@@ -93,10 +93,10 @@ private:
      */
     void loadThumbnailForItem(QnNotificationWidget* item,
         const QnVirtualCameraResourcePtr& camera,
-        qint64 msecSinceEpoch = QnThumbnailRequestData::kLatestThumbnail);
+        qint64 msecSinceEpoch = nx::api::ImageRequest::kLatestThumbnail);
     void loadThumbnailForItem(QnNotificationWidget* item,
         const QnVirtualCameraResourceList& cameraList,
-        qint64 msecSinceEpoch = QnThumbnailRequestData::kLatestThumbnail);
+        qint64 msecSinceEpoch = nx::api::ImageRequest::kLatestThumbnail);
 
     QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
     QnNotificationWidget* findItem(const QnUuid& eventRuleId, const QnResourcePtr &resource);

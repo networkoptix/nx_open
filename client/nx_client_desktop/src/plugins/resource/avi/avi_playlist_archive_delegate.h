@@ -16,8 +16,8 @@ public:
     virtual ~QnAVIPlaylistArchiveDelegate();
 
     virtual bool open(
-        const QnResourcePtr &resource,
-        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
+        const QnResourcePtr& resource,
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher = nullptr) override;
     virtual void close() override;
     virtual qint64 seek(qint64 time, bool findIFrame) override;
     virtual qint64 endTime() const override;
@@ -43,7 +43,7 @@ protected:
     virtual bool switchToFile(int newFileIndex);
     virtual AVIOContext* getIOContext();
     virtual qint32 readPacket(quint8* buf, int size);
-    
+
     // seek to specified position. If functionis not implemeted, ffmpeg seek method is used (may be more slow)
     virtual bool directSeekToPosition(qint64 /*pos_mks*/) { return false;}
 
@@ -53,7 +53,7 @@ protected:
     quint8* m_ioBuffer;
     AVIOContext* m_ffmpegIOContext;
     int m_currentFileIndex;
-    QVector<CLFileInfo*> m_fileList;   
+    QVector<CLFileInfo*> m_fileList;
     bool m_inSeek;
 private:
     friend struct CLAVIPlaylistStreamReaderPriv;

@@ -38,14 +38,24 @@ HighlightedAreaTextPainter::HighlightedAreaTextPainter()
 {
 }
 
-QFont HighlightedAreaTextPainter::font() const
+QFont HighlightedAreaTextPainter::nameFont() const
 {
-    return m_font;
+    return m_nameFont;
 }
 
-void HighlightedAreaTextPainter::setFont(const QFont& font)
+void HighlightedAreaTextPainter::setNameFont(const QFont& font)
 {
-    m_font = font;
+    m_nameFont = font;
+}
+
+QFont HighlightedAreaTextPainter::valueFont() const
+{
+    return m_valueFont;
+}
+
+void HighlightedAreaTextPainter::setValueFont(const QFont& font)
+{
+    m_valueFont = font;
 }
 
 QColor HighlightedAreaTextPainter::color() const
@@ -62,7 +72,8 @@ QPixmap HighlightedAreaTextPainter::paintText(const QString& text) const
 {
     const auto lines = splitLines(text);
 
-    QFontMetrics fontMetrics(m_font);
+    QFontMetrics nameFontMetrics(m_nameFont);
+    QFontMetrics valueFontMetrics(m_valueFont);
 
     int maxNameWidth = 0;
     int maxValueWidth = 0;
@@ -70,12 +81,15 @@ QPixmap HighlightedAreaTextPainter::paintText(const QString& text) const
     for (const auto& line: lines)
     {
         if (!line.first.isEmpty())
-            maxNameWidth = qMax(maxNameWidth, fontMetrics.width(line.first));
+            maxNameWidth = qMax(maxNameWidth, nameFontMetrics.width(line.first));
         if (!line.second.isEmpty())
-            maxValueWidth = qMax(maxValueWidth, fontMetrics.width(line.second));
+            maxValueWidth = qMax(maxValueWidth, valueFontMetrics.width(line.second));
     }
 
-    const int lineSpacing = fontMetrics.lineSpacing();
+    const int nameLineSpacing = nameFontMetrics.lineSpacing();
+    const int valueLineSpacing = valueFontMetrics.lineSpacing();
+    const int lineSpacing =
+        std::max(nameLineSpacing, valueLineSpacing);
 
     QPixmap pixmap(
         maxNameWidth + maxValueWidth + kSpacing,
@@ -84,14 +98,25 @@ QPixmap HighlightedAreaTextPainter::paintText(const QString& text) const
 
     QPainter painter(&pixmap);
     painter.setPen(m_color);
-    painter.setFont(m_font);
 
-    int y = fontMetrics.ascent();
+    int nameYShift = 0;
+    int valueYShift = (nameLineSpacing - valueLineSpacing) / 2;
+    if (valueYShift < 0)
+    {
+        nameYShift = -valueYShift;
+        valueYShift = 0;
+    }
+    nameYShift += nameFontMetrics.ascent();
+    valueYShift += valueFontMetrics.ascent();
+
     int valueX = maxNameWidth + kSpacing;
+    int y = 0;
     for (const auto& line: lines)
     {
-        painter.drawText(0, y, line.first);
-        painter.drawText(valueX, y, line.second);
+        painter.setFont(m_nameFont);
+        painter.drawText(0, y + nameYShift, line.first);
+        painter.setFont(m_valueFont);
+        painter.drawText(valueX, y + valueYShift, line.second);
         y += lineSpacing;
     }
 

@@ -156,6 +156,8 @@ public:
         EXPORT_BOOKMARK_SETTINGS,
         LAST_EXPORT_MODE,
 
+        DETECTED_OBJECT_DISPLAY_SETTINGS,
+
         VARIABLE_COUNT
     };
 
@@ -246,6 +248,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMSecs, setInitialLiveBufferMSecs,  INITIAL_LIVE_BUFFER_MSECS,  300)
         QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMSecs, setMaximumLiveBufferMSecs,  MAXIMUM_LIVE_BUFFER_MSECS,  600)
+        QN_DECLARE_RW_PROPERTY(QString,                     detectedObjectDisplaySettings, setDetectedObjectDisplaySettings, DETECTED_OBJECT_DISPLAY_SETTINGS, QString())
 
         // Was used earlier. Kept to migrate old settings.
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())

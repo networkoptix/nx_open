@@ -15,14 +15,14 @@ namespace peer_selection {
 
 using PeerSelectorFactoryFactoryFunc =
     utils::MoveOnlyFunc<AbstractPeerSelectorPtr(
-        FileInformation::PeerPolicy,
+        FileInformation::PeerSelectionPolicy,
         QnCommonModule* commonModule)>;
 
 class PeerSelectorFactory
 {
 public:
     static AbstractPeerSelectorPtr create(
-        FileInformation::PeerPolicy peerPolicy,
+        FileInformation::PeerSelectionPolicy peerPolicy,
         QnCommonModule* commonModule);
     static void setFactoryFunc(PeerSelectorFactoryFactoryFunc peerSelectorFactoryFactoryFunc);
 private:

@@ -118,7 +118,7 @@ namespace nx_ms_conf
     static const QLatin1String SYSTEM_USER("systemUser");
     static const QLatin1String ALLOW_REMOVABLE_STORAGES("allowRemovableStorages");
 
-    static const QLatin1String CHECK_FOR_UPDATE_REFRESH_TIMEOUT("checkForUpdateRefreshTimeout");
+    static const QLatin1String CHECK_FOR_UPDATE_TIMEOUT("checkForUpdateTimeout");
     static const QLatin1String CHECK_FOR_UPDATE_URL("checkForUpdateUrl");
 }
 
@@ -141,13 +141,16 @@ public:
     QString getDataDirectory() const;
 
     std::chrono::milliseconds hlsTargetDuration() const;
-
     std::chrono::milliseconds delayBeforeSettingMasterFlag() const;
+
+    void close();
+    void reopen(const QString& roFile, const QString& rwFile);
 
     nx::analytics::storage::Settings analyticEventsStorage() const;
 
     static QString defaultROSettingsFilePath();
     static QString defaultRunTimeSettingsFilePath();
+    static QString defaultConfigDirectory();
 
 private:
     void initializeROSettingsFromConfFile( const QString& fileName );

@@ -1,11 +1,10 @@
 #pragma once
 
-#include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
 
-#include "abstract_data_packet.h"
-#include "abstract_media_context.h"
+#include "media_context.h"
 
+#include <memory>
 #include <vector>
 #include <string>
 
@@ -21,7 +20,7 @@ public:
 
     virtual const int dataSize() const
     {
-        return m_data ? m_data->size() : m_externalDataSize;
+        return m_data ? (int) m_data->size() : m_externalDataSize;
     }
 
     virtual const char* data() const
@@ -46,7 +45,7 @@ public:
         m_data.reset();
     }
 
-    virtual const AbstractMediaContext* context() const { return nullptr; }
+    virtual const MediaContext* context() const { return nullptr; }
     virtual int64_t timestampUsec() const { return m_timestampUsec; }
 
     void setCodec(const std::string& value) { m_codec = value; }

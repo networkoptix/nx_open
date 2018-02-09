@@ -176,10 +176,10 @@ class DiscoveryUdpListener(object):
     def _start(self):
         listen_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        host = '0.0.0.0'
+        hostname = '0.0.0.0'
         port = TEST_CAMERA_DISCOVERY_PORT
-        listen_socket.bind((host, port))
-        log.info('Test camera discoverer: UDP Listening on %s:%d', host, port)
+        listen_socket.bind((hostname, port))
+        log.info('Test camera discoverer: UDP Listening on %s:%d', hostname, port)
         self._thread = threading.Thread(target=self._thread_main, args=(listen_socket,))
         self._thread.daemon = True
         self._thread.start()
@@ -216,13 +216,13 @@ class MediaListener(object):
         listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         listen_socket.bind((listen_host, 0))
         listen_socket.listen(5)
-        self.host, self.port = listen_socket.getsockname()
+        self.hostname, self.port = listen_socket.getsockname()
         self._thread = threading.Thread(target=self._thread_main, args=(listen_socket,))
         self._thread.daemon = True
         self._thread.start()
 
     def __str__(self):
-        return 'Test camera media listener at %s:%d' % (self.host, self.port)
+        return 'Test camera media listener at %s:%d' % (self.hostname, self.port)
 
     def stop(self):
         log.info('%s with %d active streamers: stopping...', self, len(self._streamers))
@@ -257,8 +257,8 @@ class MediaStreamer(object):
         self._thread.start()
 
     def __str__(self):
-        host, port = self._peer_address
-        return 'Test camera media streamer for %s:%d' % (host, port)
+        hostname, port = self._peer_address
+        return 'Test camera media streamer for %s:%d' % (hostname, port)
 
     def stop(self):
         self._stop_flag = True
@@ -275,7 +275,7 @@ class MediaStreamer(object):
         request = sock.recv(1024)            
         log.info('%s: received request %r; starting streaming %s', self, request, self._media_stream_path)
         while not self._stop_flag:
-            with open(self._media_stream_path, 'rb') as f:
+            with self._media_stream_path.open('rb') as f:
                 while True:
                     data = f.read(1024)
                     if not data:
@@ -304,7 +304,3 @@ class SampleMediaFile(object):
     def _read_metadata(self, fpath):
         parser = hachoir_parser.createParser(unicode(fpath))
         return hachoir_metadata.extractMetadata(parser)
-
-    def get_contents(self):
-        with open(self.fpath, 'rb') as f:
-            return f.read()

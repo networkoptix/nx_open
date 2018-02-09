@@ -1,3 +1,5 @@
+#pragma once
+
 #include "io_module_overlay_widget.h"
 
 #include <functional>

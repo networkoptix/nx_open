@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <map>
 #include <vector>
 
@@ -73,5 +71,3 @@ private:
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

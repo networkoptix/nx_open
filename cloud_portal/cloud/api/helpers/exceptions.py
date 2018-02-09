@@ -138,7 +138,7 @@ class APIServiceException(APIException):
 
 class APINotFoundException(APIException):
     # 404 error - service unavailable
-    def __init__(self, error_text, error_code, error_data=None):
+    def __init__(self, error_text, error_code=ErrorCodes.not_found, error_data=None):
         super(APINotFoundException, self).__init__(error_text, error_code, error_data=error_data,
                                                    status_code=status.HTTP_404_NOT_FOUND)
 

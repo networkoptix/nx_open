@@ -194,7 +194,6 @@ static const QString kFileKey = "file";
 static const QString kSizeKey = "size";
 static const QString kMd5Key = "md5";
 
-
 class Serializer
 {
 public:

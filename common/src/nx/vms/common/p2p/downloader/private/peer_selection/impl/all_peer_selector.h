@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <nx/vms/common/p2p/downloader/private/peer_selection/abstract_peer_selector.h>
 #include "network/module_information.h"
 
@@ -12,7 +11,7 @@ namespace downloader {
 namespace peer_selection {
 namespace impl {
 
-class AllPeerSelector : public AbstractPeerSelector
+class AllPeerSelector: public AbstractPeerSelector
 {
 public:
     virtual QList<QnUuid> peers(const PeerInformationList& allOtherPeers) const override;

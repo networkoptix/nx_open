@@ -28,7 +28,6 @@ QnCameraThumbnailCache::QnCameraThumbnailCache(QObject *parent)
     : QObject(parent)
     , m_decompressThread(new QThread(this))
 {
-    m_request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
     m_request.size = defaultSize;
     m_decompressThread->setObjectName(lit("QnCameraThumbnailCache_decompressThread"));
     m_decompressThread->start();

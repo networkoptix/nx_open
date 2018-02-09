@@ -1,10 +1,9 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_utils.h"
 
 #include <QtCore/QUrlQuery>
+#include <QtNetwork/QAuthenticator>
 
 #include <chrono>
 
@@ -272,5 +271,3 @@ nx::utils::Url HanwhaRequestHelper::makeBypassUrl(const nx::utils::Url& url) con
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

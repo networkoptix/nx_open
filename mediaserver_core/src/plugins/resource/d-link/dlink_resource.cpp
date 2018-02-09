@@ -5,7 +5,7 @@
 #include <nx/network/deprecated/asynchttpclient.h>
 
 #include "dlink_stream_reader.h"
-#include "../onvif/dataprovider/onvif_mjpeg.h"
+#include <streaming/mjpeg_stream_reader.h>
 
 #include <motion/motion_detection.h>
 
@@ -229,10 +229,15 @@ QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
     return m_camInfo;
 }
 
-CameraDiagnostics::Result QnPlDlinkResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnPlDlinkResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex /*streamIndex*/)
 {
-    QnPhysicalCameraResource::initInternal();
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
 
+CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
+{
     updateDefaultAuthIfEmpty(QLatin1String("admin"), QLatin1String(""));
 
     CLHttpStatus status;

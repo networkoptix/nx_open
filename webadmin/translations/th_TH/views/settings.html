@@ -40,7 +40,7 @@
                             เซิร์ฟเวอร์ที่จะแยกออกจากระบบปัจจุบัน ที่เก็บวิดีโอจะยังคงเดิม</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">เรียกคืนค่าเริ่มต้นจากโรงงาน</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>แยกออกจากระบบเซิร์ฟเวอร์</h3>
                         <p>การดำเนินการนี้จะแยกเซิร์ฟเวอร์จากระบบที่เก็บรักษาฐานข้อมูลผู้ใช้ภายในและการกำหนดค่า ที่เก็บวิดีโอจะยังคงเดิม <b> ผู้ใช้ระบบคลาวด์จะถูกลบ </b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">แยกออกจากระบบ</button></p>

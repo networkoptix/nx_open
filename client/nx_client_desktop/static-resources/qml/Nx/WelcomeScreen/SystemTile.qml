@@ -124,7 +124,7 @@ BaseTile
 
     onCollapsedTileClicked:
     {
-        if (!menuButton.visible)
+        if (!control.isAvailable)
             return;
 
         if (buttons == Qt.RightButton)

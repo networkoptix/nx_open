@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 
@@ -144,6 +142,7 @@ private:
     qint64 m_endTimeUs = AV_NOPTS_VALUE;
     qint64 m_lastParsedStartTimeMs = AV_NOPTS_VALUE;
 
+    OverlappedId m_lastNvrOverlappedId = -1;
     OverlappedIdList m_overlappedIds;
     OverlappedIdList::const_iterator m_currentOverlappedId;
 
@@ -170,5 +169,3 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

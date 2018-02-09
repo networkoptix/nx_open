@@ -24,19 +24,21 @@ QString buildDescription(
     const Hikvision::DriverManifest& manifest,
     const HikvisionEvent& event)
 {
+    using namespace nx::api;
+
     const auto descriptor = manifest.eventDescriptorById(event.typeId);
     auto description = descriptor.description;
     if (description.isEmpty())
         return QString();
 
-    if (descriptor.flags.testFlag(Hikvision::EventTypeFlag::stateDependent))
+    if (descriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
     {
         auto stateStr = event.isActive ? descriptor.positiveState : descriptor.negativeState;
         if (!stateStr.isEmpty())
             description = description.arg(stateStr);
     }
 
-    if (descriptor.flags.testFlag(Hikvision::EventTypeFlag::regionDependent))
+    if (descriptor.flags.testFlag(Analytics::EventTypeFlag::regionDependent))
     {
         auto regionStr = descriptor.regionDescription.arg(event.region ? *event.region : 0);
         description = description.arg(regionStr);

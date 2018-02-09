@@ -8,6 +8,8 @@ COMPANY_NAME=@deb.customization.company.name@
 VERSION=@release.version@
 ARCHITECTURE=@os.arch@
 
+COMPILER=@CMAKE_CXX_COMPILER@
+SOURCE_ROOT_PATH=@root.dir@
 TARGET=/opt/$COMPANY_NAME/mediaserver
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
@@ -43,6 +45,11 @@ BUILD_INFO_TXT=@libdir@/build_info.txt
 LOGS_DIR="@libdir@/build_logs"
 LOG_FILE="$LOGS_DIR/server-build-dist.log"
 
+cp_sys_lib()
+{
+    "$SOURCE_ROOT_PATH"/build_utils/copy_system_library -c "$COMPILER" "$@"
+}
+
 buildDistribution()
 {
     echo "Creating directories"
@@ -72,7 +79,8 @@ buildDistribution()
         LIB_BASENAME=$(basename "$LIB")
         if [[ "$LIB_BASENAME" != libQt5* \
             && "$LIB_BASENAME" != libEnginio.so* \
-            && "$LIB_BASENAME" !=  libqgsttools_p.* ]]
+            && "$LIB_BASENAME" != libqgsttools_p.* \
+            && "$LIB_BASENAME" != libnx_client* ]]
         then
             echo "Copying $LIB_BASENAME"
             cp -P "$LIB" "$LIBSTAGE/"
@@ -96,11 +104,11 @@ buildDistribution()
     echo "Copying Festival VOX files"
     cp -r $SERVER_VOX_PATH $BINSTAGE
 
-    # libstdc++.so.6 is needed on some machines
+    cp_sys_lib libstdc++.so.6 "$LIBSTAGE"
+
     if [ '@arch@' != 'arm' ]
     then
-        echo "Copying libstdc++ and libicu"
-        cp -r /usr/lib/@arch.dir@/libstdc++.so.6* $LIBSTAGE
+        echo "Copying libicu"
         cp -P @qt.dir@/lib/libicu*.so* $LIBSTAGE
     fi
 

@@ -56,7 +56,7 @@ void QnCheckableTableView::reset()
                     setUpdatesEnabled(true);
                     update();
                 };
-            executeDelayedParented(callback, kDefaultDelay, this);
+            executeDelayedParented(callback, this);
         }
 
         /* Connect to model's dataChanged: */

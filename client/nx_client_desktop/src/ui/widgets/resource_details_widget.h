@@ -8,8 +8,8 @@
 
 class QLabel;
 class QnTextEditLabel;
-class QnResourcePreviewWidget;
 class QnCameraThumbnailManager;
+namespace nx { namespace client { namespace desktop { class AsyncImageWidget; } } }
 
 class QnResourceDetailsWidget : public Connective<QnPanel>
 {
@@ -31,7 +31,7 @@ public:
 
 private:
     QScopedPointer<QnCameraThumbnailManager> m_thumbnailManager;
-    QnResourcePreviewWidget* m_preview;
+    nx::client::desktop::AsyncImageWidget* m_preview;
     QnTextEditLabel* m_nameTextEdit;
     QLabel* m_descriptionLabel;
 };

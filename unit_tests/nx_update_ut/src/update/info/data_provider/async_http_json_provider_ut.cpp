@@ -32,7 +32,7 @@ public:
         QnMutexLocker lock(&m_mutex);
         m_lastResultCode = resultCode;
         m_specificData = std::make_unique<QByteArray>(std::move(rawData));
-        m_condition.wakeOne();;
+        m_condition.wakeOne();
     }
 
     QByteArray metaData()

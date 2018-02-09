@@ -115,9 +115,9 @@ protected:
     }
 
 private:
+    utils::SyncMultiQueue<String, std::unique_ptr<nx::network::AbstractStreamSocket>> m_acceptResults;
     ReverseAcceptor m_acceptor;
     nx::network::SocketAddress m_acceptorAddress;
-    utils::SyncMultiQueue<String, std::unique_ptr<nx::network::AbstractStreamSocket>> m_acceptResults;
     nx::String m_originatingHostName;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_prevAcceptedConnection;
 

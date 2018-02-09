@@ -115,8 +115,9 @@
     "cantActivatePrefix": "Kan uw account niet activeren",
     "cantSendConfirmationPrefix": "Kan geen bevestigingsmail versturen",
     "cloudInvalidResponse": "Cloud DB heeft een onverwacht antwoord teruggezonden",
-    "notAuthorized": "Onjuiste e-mail of wachtwoord",
+    "notAuthorized": "Wachtwoord onjuist",
     "wrongParameters": "Sommige parameters op het formulier zijn onjuist",
+    "brokenAccount": "Onverwacht probleem met account. <a href=\"/restore_password\"> account herstellen</a>",
     "wrongCode": "Account is al geactiveerd of de bevestigingscode is onjuist",
     "wrongCodeRestore": "Bevestigingscode is al gebruikt of niet correct",
     "forbidden": "U hebt geen rechten om deze actie uit te voeren",
@@ -157,6 +158,7 @@
     "unavailable": "Systeem is onbereikbaar",
     "offline": "Systeem is offline",
     "openClient": "Open in {{VMS_NAME}}",
+    "openClientNoSystem": "Open {{VMS_NAME}}",
     "confirmRenameTitle": "Systeemnaam",
     "confirmRenameAction": "Opslaan",
     "successRename": "Systeemnaam opgeslagen",
@@ -200,19 +202,14 @@
         "label": "Mac OS",
         "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
-      },
       "linux": {
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
         "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      "macos": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -221,6 +218,11 @@
       "android": {
         "label": "Android",
         "shortLabel": "Android"
+      },
+      "arm": {
+        "label": "ARM",
+        "shortLabel": "ARM",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms": {

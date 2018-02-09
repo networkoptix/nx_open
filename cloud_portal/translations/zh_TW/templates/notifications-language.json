@@ -1,17 +1,20 @@
 {
   "activate_account": {
-    "emailSubject": "確認您的帳號"
+    "emailSubject": "啟動您的帳號"
   },
   "restore_password": {
-    "emailSubject": "還原您的密碼"
+    "emailSubject": "重設您的密碼"
   },
   "system_invite": {
-    "emailSubject": "有人分享影像 {{message.system_name}} 給您"
+    "emailSubject": "{{message.sharer_name}} 邀請您至 {{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "有人分享影像 {{message.system_name}} 給您"
+    "emailSubject": "{{message.sharer_name}} 邀請您至 {{PRODUCT_NAME}}"
   },
   "review_version": {
     "emailSubject": "版本 {{message.id}} 已準備好審查"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
   }
 }

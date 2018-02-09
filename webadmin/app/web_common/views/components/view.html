@@ -22,7 +22,7 @@
         <tr>
             <td>
                 <div class="view-wrapper">
-                    <camera-panel cameras-provider="camerasProvider" active-camera="activeCamera"
+                    <camera-panel cameras-provider="camerasProvider" active-camera="activeCamera" search-cams="searchCams"
                                   show-camera-panel="showCameraPanel" class="cameras-panel-wrapper"
                                   ng-class="{'hide-panel':!showCameraPanel}"></camera-panel>
                 </div>
@@ -63,6 +63,15 @@
                                                         ng-click="cameraLinks.enabled=!cameraLinks.enabled">
                                                         <span class="glyphicon glyphicon-cog"></span>Camera Details
                                                     </li>
+                                                    <li class="video-settings-divider buffer" ng-if="betaMode || debugMode"></li>
+                                                    <li class="video-settings-button" ng-if="betaMode || debugMode"
+                                                        ng-click="voiceControls.showCommands=!voiceControls.showCommands">
+                                                        <span>
+                                                            <span ng-class="{'voice-active': voiceControls.enabled}"
+                                                                  class="glyphicon glyphicon-bullhorn"></span>
+                                                            &nbsp;Voice Commands
+                                                        </span>
+                                                    </li>
                                                 </ul>
                                             </div>
                                             <span ng-if="enableFullScreen && !isFullscreen" class="video-icon"
@@ -91,6 +100,7 @@
                                 <div ng-if="isFullscreen && enableFullscreenNotification" class="fullscreen-notification fade-out">
                                     <span>Press ESC to exit fullscreen</span>
                                 </div>
+                                <voice-control ng-if="voiceControls.showCommands" voice-controls="voiceControls"></voice-control>
                                 <camera-links ng-if="cameraLinks.enabled"
                                               system="systemAPI" position="positionProvider.playedPosition"
                                               live-mode="positionProvider.liveMode" active-camera="activeCamera"

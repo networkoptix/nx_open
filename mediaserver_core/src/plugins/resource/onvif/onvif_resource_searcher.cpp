@@ -228,6 +228,15 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
         QString modelName = resource->getModel();
 
         auto resData = qnStaticCommon->dataPool()->data(manufacturer, modelName);
+        const auto manufacturerReplacement = resData.value<QString>(
+            Qn::ONVIF_MANUFACTURER_REPLACEMENT);
+
+        if (!manufacturerReplacement.isEmpty())
+        {
+            manufacturer = manufacturerReplacement;
+            resData = qnStaticCommon->dataPool()->data(manufacturer, modelName);
+        }
+
         if (resource->getMAC().isNull() && resData.value<bool>(lit("isMacAddressMandatory"), true))
             return resList;
 

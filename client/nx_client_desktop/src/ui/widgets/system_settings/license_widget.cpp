@@ -18,6 +18,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
+#include <utils/common/html.h>
 
 #include <nx/client/desktop/ui/common/clipboard_button.h>
 
@@ -71,20 +72,26 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     setPaletteColor(ui->manualActivationTextWidget, QPalette::WindowText,
         ui->manualActivationTextWidget->palette().color(QPalette::Light));
 
-    QnEmailAddress licensingEmail(QnAppInfo::licensingEmailAddress());
+    QString emailUrl(QnAppInfo::licensingEmailAddress());
+    QnEmailAddress licensingEmail(emailUrl);
+    QString activationText;
     if (licensingEmail.isValid())
     {
-        const QString emailLink = lit("<a href=\"mailto:%1\">%1</a>").arg(licensingEmail.value());
-        ui->manualActivationTextWidget->setText(
+        const QString emailLink = makeMailHref(emailUrl, emailUrl);
+        activationText =
             tr("Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.")
-            .arg(emailLink));
+            .arg(emailLink);
     }
     else
     {
-        ui->manualActivationTextWidget->setText(
+        const QString siteLink = makeHref(emailUrl, emailUrl);
+        activationText =
             tr("Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.")
-            .arg(QnAppInfo::licensingEmailAddress()));
+            .arg(siteLink);
     }
+
+    ui->manualActivationTextWidget->setText(activationText);
+    ui->manualActivationTextWidget->setOpenExternalLinks(true);
 
     setWarningStyle(ui->licenseKeyWarningLabel);
     ui->licenseKeyWarningLabel->setVisible(false);

@@ -71,14 +71,12 @@ private:
     void logError(const QString& actionName) const
     {
         auto& customizationData = m_metaData.customizationDataList[m_customizationIndex];
-        QString errorString =
-            lm("Failed to %1 update data for %2 : %3")
-            .args(
+        NX_ERROR(
+            this,
+            lm("Failed to %1 update data for %2 : %3").args(
                 actionName,
                 customizationData.name,
-                customizationData.versions[m_versionIndex].toString());
-
-        NX_ERROR(this, errorString);
+                customizationData.versions[m_versionIndex].toString()));
     }
 
     void fetchVersionData()
@@ -199,9 +197,7 @@ AsyncUpdateChecker::AsyncUpdateChecker(): m_impl(new detail::AsyncUpdateCheckerI
 {
 }
 
-AsyncUpdateChecker::~AsyncUpdateChecker()
-{
-}
+AsyncUpdateChecker::~AsyncUpdateChecker() = default;
 
 void AsyncUpdateChecker::check(UpdateCheckCallback callback, const QString& baseUrl)
 {

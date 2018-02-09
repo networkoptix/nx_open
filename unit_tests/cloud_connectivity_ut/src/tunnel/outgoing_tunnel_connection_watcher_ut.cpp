@@ -34,10 +34,6 @@ public:
         m_connectionParameters.tunnelInactivityTimeout =
             tunnelInactivityTimeout;
     }
-    
-    ~OutgoingTunnelConnectionWatcher()
-    {
-    }
 
 protected:
     InitializationGuard initializeTunnel()
@@ -83,7 +79,7 @@ protected:
         m_connectionParameters.tunnelInactivityTimeout = std::chrono::seconds(1);
         m_initializationGuard = initializeTunnel();
     }
-    
+
     void whenTunnelHasBeenClosedByTimeout()
     {
         ASSERT_EQ(SystemError::timedOut, m_tunnelClosedPromise.get_future().get());
@@ -118,7 +114,7 @@ TEST_F(OutgoingTunnelConnectionWatcher, using_tunnel)
 
     auto tunnelClosedFuture = m_tunnelClosedPromise.get_future();
 
-    const auto deadline = 
+    const auto deadline =
         std::chrono::steady_clock::now() +
         tunnelInactivityTimeout + allowedTimerError;
 

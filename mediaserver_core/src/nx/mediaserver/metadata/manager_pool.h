@@ -13,8 +13,8 @@
 #include <utils/common/connective.h>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/sdk/metadata/abstract_metadata_plugin.h>
-#include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/sdk/metadata/plugin.h>
+#include <nx/sdk/metadata/camera_manager.h>
 #include <nx/api/analytics/driver_manifest.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/mediaserver/metadata/rule_holder.h>
@@ -41,6 +41,7 @@ public:
     ManagerPool(QnMediaServerModule* commonModule);
     ~ManagerPool();
     void init();
+    void stop();
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_propertyChanged(const QnResourcePtr& resource, const QString& name);
     void at_resourceRemoved(const QnResourcePtr& resource);
@@ -60,17 +61,24 @@ public slots:
     void initExistingResources();
 
 private:
-    using PluginList = QList<nx::sdk::metadata::AbstractMetadataPlugin*>;
+    using PluginList = QList<nx::sdk::metadata::Plugin*>;
 
     PluginList availablePlugins() const;
 
-    void createMetadataManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera);
+    void loadSettingsFromFile(std::vector<nxpl::Setting>* settings, const char* filename);
 
-    nx::sdk::metadata::AbstractMetadataManager* createMetadataManager(
+    void setManagerDeclaredSettings(
+        sdk::metadata::CameraManager* manager, const QnSecurityCamResourcePtr& camera);
+
+    void setPluginDeclaredSettings(sdk::metadata::Plugin* plugin);
+
+    void createCameraManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera);
+
+    nx::sdk::metadata::CameraManager* createCameraManager(
         const QnSecurityCamResourcePtr& camera,
-        nx::sdk::metadata::AbstractMetadataPlugin* plugin) const;
+        nx::sdk::metadata::Plugin* plugin) const;
 
-    void releaseResourceMetadataManagersUnsafe(const QnSecurityCamResourcePtr& camera);
+    void releaseResourceCameraManagersUnsafe(const QnSecurityCamResourcePtr& camera);
 
     MetadataHandler* createMetadataHandler(
         const QnResourcePtr& resource,
@@ -103,17 +111,32 @@ private:
         return deserialized;
     }
 
-    boost::optional<nx::api::AnalyticsDriverManifest> addManifestToServer(
-        nx::sdk::metadata::AbstractMetadataPlugin* plugin);
+    boost::optional<nx::api::AnalyticsDriverManifest> loadPluginManifest(
+        nx::sdk::metadata::Plugin* plugin);
 
-    boost::optional<nx::api::AnalyticsDeviceManifest> addManifestToCamera(
-        const QnSecurityCamResourcePtr& camera,
-        nx::sdk::metadata::AbstractMetadataManager* manager,
-        const nx::sdk::metadata::AbstractMetadataPlugin* plugin);
+    void assignPluginManifestToServer(
+        const nx::api::AnalyticsDriverManifest& manifest,
+        const QnMediaServerResourcePtr& server);
 
-    bool resourceInfoFromResource(
+    void mergePluginManifestToServer(
+        const nx::api::AnalyticsDriverManifest& manifest,
+        const QnMediaServerResourcePtr& server);
+
+    std::pair<
+        boost::optional<nx::api::AnalyticsDeviceManifest>,
+        boost::optional<nx::api::AnalyticsDriverManifest>
+    >
+    loadManagerManifest(
+        nx::sdk::metadata::CameraManager* manager,
+        const QnSecurityCamResourcePtr& camera);
+
+    void addManifestToCamera(
+        const nx::api::AnalyticsDeviceManifest& manifest,
+        const QnSecurityCamResourcePtr& camera);
+
+    bool cameraInfoFromResource(
         const QnSecurityCamResourcePtr& camera,
-        nx::sdk::ResourceInfo* outResourceInfo) const;
+        nx::sdk::CameraInfo* outCameraInfo) const;
 
     void putVideoData(const QnUuid& id, const QnCompressedVideoData* data);
 private:

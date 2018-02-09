@@ -8,8 +8,27 @@
 
 class QnResourcePool;
 
-struct QnMultiserverRequestData
+struct QnBaseMultiserverRequestData
 {
+    static const Qn::SerializationFormat kDefaultFormat;
+
+    bool isLocal = false; //< If set, the request should not be redirected to another server.
+    Qn::SerializationFormat format = kDefaultFormat;
+    bool extraFormatting = false;
+
+    QnBaseMultiserverRequestData() = default;
+    QnBaseMultiserverRequestData(const QnRequestParamList& params);
+    QnBaseMultiserverRequestData(const QnRequestParams& params);
+
+protected:
+    void loadFromParams(const QnRequestParamList& params);
+    void loadFromParams(const QnRequestParams& params);
+};
+
+struct QnMultiserverRequestData: QnBaseMultiserverRequestData
+{
+    virtual ~QnMultiserverRequestData();
+
     template<typename T, typename Params>
     static T fromParams(QnResourcePool* resourcePool, const Params& params)
     {
@@ -17,8 +36,6 @@ struct QnMultiserverRequestData
         request.loadFromParams(resourcePool, params);
         return request;
     }
-
-    QnMultiserverRequestData(QnResourcePool* resourcePool, const QnRequestParamList& params);
 
     virtual void loadFromParams(QnResourcePool* resourcePool, const QnRequestParamList& params);
     virtual void loadFromParams(QnResourcePool* resourcePool, const QnRequestParams& params);
@@ -29,12 +46,10 @@ struct QnMultiserverRequestData
     /** Fix fields to make local request. */
     void makeLocal(Qn::SerializationFormat localFormat = Qn::UbjsonFormat);
 
-    bool isLocal; //< If set, the request should not be redirected to another server.
-    Qn::SerializationFormat format;
-    bool extraFormatting;
-
 protected:
     // Avoid creating invalid instances when making local requests.
-    QnMultiserverRequestData();
-    QnMultiserverRequestData(const QnMultiserverRequestData& src);
+    QnMultiserverRequestData() = default;
+    QnMultiserverRequestData(const QnMultiserverRequestData& src) = default;
+    QnMultiserverRequestData(QnMultiserverRequestData&& src) = default;
 };
+

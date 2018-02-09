@@ -6,7 +6,6 @@
 #include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/utils/log/log.h>
 
-#include "data/listening_peer.h"
 #include "listening_peer_pool.h"
 #include "relay/abstract_relay_cluster_client.h"
 
@@ -32,15 +31,15 @@ PeerRegistrator::~PeerRegistrator()
     m_asyncOperationGuard->terminate();
 }
 
-data::ListeningPeers PeerRegistrator::getListeningPeers() const
+api::ListeningPeers PeerRegistrator::getListeningPeers() const
 {
-    data::ListeningPeers result;
+    api::ListeningPeers result;
     result.systems = m_listeningPeerPool->getListeningPeers();
 
     QnMutexLocker lk(&m_mutex);
     for (const auto& client: m_boundClients)
     {
-        data::BoundClient info;
+        api::BoundClient info;
         if (const auto connetion = client.second.connection.lock())
             info.connectionEndpoint = connetion->getSourceAddress().toString();
 
@@ -133,19 +132,17 @@ void PeerRegistrator::listen(
         MediaserverData(requestData.systemId, requestData.serverId));
 
     peerDataLocker.value().isListening = true;
-    peerDataLocker.value().connectionMethods |= api::ConnectionMethod::udpHolePunching;
+    peerDataLocker.value().cloudConnectVersion = requestData.cloudConnectVersion;
 
-    NX_LOGX(lit("Peer %1.%2 started to listen")
-        .arg(QString::fromUtf8(requestData.serverId))
-        .arg(QString::fromUtf8(requestData.systemId)),
-        cl_logDEBUG1);
+    NX_DEBUG(this, lm("Peer %1.%2 started to listen")
+        .args(requestData.serverId, requestData.systemId));
 
     m_relayClusterClient->selectRelayInstanceForListeningPeer(
         lm("%1.%2").arg(requestData.serverId).arg(requestData.systemId).toStdString(),
         [this, serverConnection, completionHandler = std::move(completionHandler),
             asyncCallLocker = m_counter.getScopedIncrement()](
                 nx::cloud::relay::api::ResultCode resultCode,
-                QUrl relayInstanceUrl)
+                QUrl relayInstanceUrl) mutable
         {
             sendListenResponse(
                 serverConnection,
@@ -153,6 +150,12 @@ void PeerRegistrator::listen(
                     ? boost::make_optional(relayInstanceUrl)
                     : boost::none,
                 std::move(completionHandler));
+
+            // Releasing shared pointer will can cause serverConnection to be deleted.
+            // Since that can safely be done only within serverConnection's aio thread, doing post.
+            auto serverConnectionPtr = serverConnection.get();
+            serverConnectionPtr->post(
+                [serverConnection = std::move(serverConnection)]() {});
         });
 }
 

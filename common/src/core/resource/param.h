@@ -90,7 +90,8 @@ namespace Qn
     static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");
     static const QString SPROP_PARAMETER_SETS_PARAM_NAME = lit("sprop-parameter-sets");
     static const QString FIRMWARE_PARAM_NAME = lit("firmware");
-	static const QString VIDEO_DISABLED_PARAM_NAME = lit("noVideoSupport");
+    static const QString IS_AUDIO_FORCED_PARAM_NAME = lit("forcedAudioStream");
+    static const QString VIDEO_DISABLED_PARAM_NAME = lit("noVideoSupport");
     static const QString IO_SETTINGS_PARAM_NAME = lit("ioSettings");
     static const QString IO_CONFIG_PARAM_NAME = lit("ioConfigCapability");
     static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");

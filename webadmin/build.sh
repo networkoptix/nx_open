@@ -1,37 +1,39 @@
 #!/bin/bash
-#rvm install ruby-2.3.0
-rvm use 2.3.0 --default
 
-export PATH=$PATH:~/.rvm/bin:~/.rvm/rubies/ruby-2.3.0/bin:~/.rvm/gems/ruby-2.3.0/bin:$PWD/node_modules/.bin
+set -e
 
-#sleep 2
-#echo $PATH
-#sleep 2
-echo "+++++++++++++++++++++++++ Running NPM... +++++++++++++++++++++++++"
-#gem install compass
-#sleep 2
+SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Check prerequisites.
+
+if [ "$SOURCE_DIR" = "$PWD" ]
+then
+    echo "Error: $0 must not be executed from the sources directory." >&2
+    exit 1
+fi
+
+compass --version &> /dev/null || (echo "Error: Ruby Compass is not installed." >&2 && exit 1)
+
+# Update sources.
+
+for entry in $(ls -A "$SOURCE_DIR")
+do
+    [ -e "$entry" ] && rm -r "$entry"
+    cp -pr "$SOURCE_DIR/$entry" "$entry"
+done
+
+[ -e static ] && rm -r static
+[ -e server-external ] && rm -r server-external
+
+# Save the repository info.
+
+hg log -r . --repository "$SOURCE_DIR/.." > version.txt
+
+# Install dependencies.
+
 npm install
-if [ $? -gt 0 ]; then 
-   echo "+++++++++++++++++++++++++ NPM errorlevel:" $? "+++++++++++++++++++++++++"
-   exit $?
-fi
-~/.rvm/bin/rvm install 2.3.0
-source ~/.rvm/scripts/rvm
-rvm use 2.3.0 --default
-gem install compass
-#sleep 2
-echo "+++++++++++++++++++++++++ Running BOWER... +++++++++++++++++++++++++"
-bower install
-if [ $? -gt 0 ]; then
-   echo "+++++++++++++++++++++++++ BOWER errorlevel:" $? "+++++++++++++++++++++++++"
-   exit $?
-fi
-#sleep 2
-echo "+++++++++++++++++++++++++ Running GRUNT... +++++++++++++++++++++++++"
-cp -f ./target/version_maven.txt ./static/
-grunt pub
-if [ $? -gt 0 ]; then
-   echo "+++++++++++++++++++++++++ GRUNT errorlevel:" $? "+++++++++++++++++++++++++"
-   exit $?
-fi
-if [ ! -f ./external.dat ]; then rm ./target/rdep.sh && exit 1; fi
+node_modules/bower/bin/bower install
+
+# Build webadmin.
+
+node_modules/grunt-cli/bin/grunt publish

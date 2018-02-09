@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <QtCore/QUrl>
 
 #include <nx/utils/thread/semaphore.h>
@@ -11,6 +9,8 @@
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <plugins/resource/hanwha/hanwha_response.h>
 #include <plugins/resource/hanwha/hanwha_common.h>
+
+class QAuthenticator;
 
 namespace nx {
 namespace mediaserver_core {
@@ -112,5 +112,3 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

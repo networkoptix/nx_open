@@ -211,9 +211,7 @@ void TunnelAcceptor::executeAcceptHandler(
         return;
     }
 
-    const auto handler = std::move(m_acceptHandler);
-    m_acceptHandler = nullptr;
-    return handler(code, std::move(connection));
+    nx::utils::swapAndCall(m_acceptHandler, code, std::move(connection));
 }
 
 } // namespace udp

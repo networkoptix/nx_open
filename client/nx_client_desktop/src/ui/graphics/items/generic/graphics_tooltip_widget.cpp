@@ -8,7 +8,7 @@
 #include <ui/style/helper.h>
 #include <ui/widgets/common/text_edit_label.h>
 #include <ui/widgets/common/busy_indicator.h>
-#include <ui/widgets/resource_preview_widget.h>
+#include <nx/client/desktop/common/widgets/async_image_widget.h>
 
 namespace {
 
@@ -22,7 +22,7 @@ QnGraphicsToolTipWidget::QnGraphicsToolTipWidget(QGraphicsItem* parent):
     m_proxyWidget(new Clickable<QnMaskedProxyWidget>(this)),
     m_embeddedWidget(new QWidget()),
     m_textLabel(new QnTextEditLabel(m_embeddedWidget)),
-    m_previewWidget(new QnResourcePreviewWidget(m_embeddedWidget))
+    m_previewWidget(new nx::client::desktop::AsyncImageWidget(m_embeddedWidget))
 {
     m_proxyWidget->setVisible(false);
     m_proxyWidget->setWidget(m_embeddedWidget);

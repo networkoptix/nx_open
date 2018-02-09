@@ -19,8 +19,8 @@ var Helper = function () {
     var h = this;
 
     this.basePassword = 'qweasd123';
-    this.systemLink = '/f52c704d-0398-475e-bfc2-ccd88c44e20e';
-    this.systemName = 'autotest';
+    this.systemLink = '/dd06f8bf-f7ea-49b3-96fc-fbc6742a2ad4';
+    this.systemName = 'Autotests';
 
     this.get = function (opt_url) {
         var url = opt_url || '/';
@@ -100,7 +100,6 @@ var Helper = function () {
             navbar: element(by.css('header')).element(by.css('.navbar')),
             dropdownToggle: h.getParentOf(element(by.css('span.glyphicon-user'))),
             dropdownMenu: h.getGrandParentOf(element(by.css('span.glyphicon-user'))).element(by.css('[uib-dropdown-menu]')),
-	    dropdownParent: h.getGrandParentOf(element(by.css('span.glyphicon-user'))),
             //dropdownMenu: element(by.css('header')).element(by.css('.navbar')).element(by.css('[uib-dropdown-menu]')),
             logoutLink: element(by.css('header')).element(by.css('.navbar')).all(by.css('a[ng-click="logout()"]')).first(),
             alreadyLoggedIn: element(by.css('.authorized.modal-open')),
@@ -525,6 +524,7 @@ var Helper = function () {
         h.forms.account.lastNameInput.clear().sendKeys(lastName);
         h.forms.account.submitButton.click();
 
+        // This alert fails when run on local server.  Saving on the account page refreshes instead of giving alert.
         h.alert.catchAlert( h.alert.alertMessages.accountSuccess, h.alert.alertTypes.success);
     };
 
@@ -625,7 +625,7 @@ var Helper = function () {
             console.log("Open email to: " + mail.headers.to);
             deferred.fulfill(mail);
             // Commented out because it was causing "ReferenceError: self is not defined"
-            //notifier.stop();
+            // notifier.stop();
             notifier.removeListener("mail", onPrevMail);
         }
         notifier.on("mail", onPrevMail);
@@ -636,12 +636,12 @@ var Helper = function () {
     this.getEmailTo = function(emailAddress, emailSubject) {
         var deferred = protractor.promise.defer();
         console.log("Waiting for an email...");
-
+        
         function onMail(mail) {
             if((emailAddress === mail.headers.to) && (mail.subject.includes(emailSubject))) {
                 console.log("Catch email to: " + mail.headers.to);
                 deferred.fulfill(mail);
-                //notifier.stop();
+                // notifier.stop();
                 // commented out because causes  "ReferenceError: self is not defined" at Notifier.stop
                 // (/home/ekorneeva/develop/nx_vms/cloud_portal/front_end/node_modules/mail-notifier/index.js:106:5)
                 notifier.removeListener("mail", onMail);

@@ -2,7 +2,9 @@
 #include <future>
 #include <atomic>
 #include <thread>
+
 #include <gtest/gtest.h>
+
 #include <nx/network/websocket/websocket.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/network/socket_factory.h>

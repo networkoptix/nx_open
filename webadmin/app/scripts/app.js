@@ -13,8 +13,8 @@ angular.module('webadminApp', [
     'ui.timepicker',
     'angular-clipboard'
 ]).config(['$httpProvider', function ($httpProvider) {
-    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+    $httpProvider.defaults.xsrfCookieName = 'nx-vms-csrf-token';
+    $httpProvider.defaults.xsrfHeaderName = 'Nx-Vms-Csrf-Token';
 }]).config(['$routeProvider', function ($routeProvider) {
 
     var universalResolves = {

@@ -93,8 +93,7 @@ def sign_command(
     target_file,
     sign_description=None,
     sign_password=None,
-    main_certificate=None,
-    additional_certificate=None
+    certificate=None
 ):
     command = [signtool_executable(signtool_directory), 'sign']
     command += common_signtool_options()
@@ -102,10 +101,8 @@ def sign_command(
         command += ['/d', sign_description]
     if sign_password:
         command += ['/p', sign_password]
-    if main_certificate:
-        command += ['/f', main_certificate]
-    if additional_certificate:
-        command += ['/ac', additional_certificate]
+    if certificate:
+        command += ['/f', certificate]
     command += [target_file]
     return command
 
@@ -115,13 +112,11 @@ def sign(
     target_file,
     sign_description=None,
     sign_password=None,
-    main_certificate=None,
-    additional_certificate=None
+    certificate=None
 ):
     execute_command(sign_command(
         signtool_directory=signtool_directory,
         target_file=target_file,
         sign_description=sign_description,
         sign_password=sign_password,
-        main_certificate=main_certificate,
-        additional_certificate=additional_certificate))
+        certificate=certificate))

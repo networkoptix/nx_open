@@ -315,11 +315,12 @@ qint64 QnFileStorageResource::calculateAndSetTotalSpaceWithoutInit()
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
 {
+    QString url = getUrl();
     if (m_valid)
         return Qn::StorageInit_Ok;
 
     Qn::StorageInitResult result = Qn::StorageInit_CreateFailed;
-    QString url = getUrl();
+
 
     if (url.isEmpty())
     {
@@ -360,7 +361,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
     if (!sysPath.isNull())
         m_isSystem = getDevicePath(url).startsWith(sysPath);
     else
-	    m_isSystem = false;
+        m_isSystem = false;
 
     m_valid = result == Qn::StorageInit_Ok;
 

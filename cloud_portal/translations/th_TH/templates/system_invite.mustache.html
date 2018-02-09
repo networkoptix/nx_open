@@ -1,14 +1,16 @@
-<h1>ยินดีต้อนรับสู่ {{PRODUCT_NAME}}</h1>
+<h1>สวัสดี {{message.fullName}}</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> เชิญคุณเข้าร่วม <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>
-และแชร์ระบบ {{message.system_name}} กับคุณю</p>
+<p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> ได้แชร์การเข้าถึงระบบการจัดการวิดีโอ "{{message.system_name}}" กับคุณ
+
+หากต้องการดูและจัดการโปรดสร้างบัญชีใน <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> ใช้ที่อยู่อีเมลปัจจุบันของคุณและทำตามคำแนะนำเพิ่มเติม</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>คุณได้รับเชิญให้เข้าร่วม <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>
-ระบบ {{message.system_name}} ถูกแชร์กับคุณ</p>
+<p>คุณได้รับสิทธิ์เข้าถึงระบบการจัดการวิดีโอ "{{message.system_name}}"
+
+หากต้องการดูและจัดการโปรดสร้างบัญชีใน <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> ใช้ที่อยู่อีเมลปัจจุบันของคุณและทำตามคำแนะนำเพิ่มเติม</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">ลงทะเบียนและใช้งานระบบ</a>
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">สร้างบัญชี</a>
 

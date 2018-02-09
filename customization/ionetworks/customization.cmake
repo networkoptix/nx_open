@@ -8,6 +8,7 @@ set(mobile_bundle_name "EZPro")
 set(product.name.short "ionetworks")
 set(product.appName "ezpro")
 set(company.name "ioEZ INC.")
+set(windowsInstallPath "ioEZ INC")
 set(short.company.name "ioEZ")
 set(uri.protocol "ez-vms")
 set(cloudName "EZ Pro Cloud")
@@ -58,7 +59,6 @@ set(freeLicenseKey "0000-0000-0000-0024")
 # Installer Customizations
 set(sign.password "ioezio")
 set(sign.cer "app.p12")
-set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation en_US)

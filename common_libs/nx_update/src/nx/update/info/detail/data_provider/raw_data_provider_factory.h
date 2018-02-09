@@ -17,7 +17,7 @@ public:
     static void setFactoryFunction(AsyncRawDataProviderFactoryFunction function);
 
 private:
-    static AsyncRawDataProviderFactoryFunction m_factoryFunction;
+    static AsyncRawDataProviderFactoryFunction s_factoryFunction;
 };
 
 } // namespace data_provider

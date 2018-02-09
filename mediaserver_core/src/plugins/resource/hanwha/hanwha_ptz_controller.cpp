@@ -1,5 +1,3 @@
-﻿#if defined(ENABLE_HANWHA)
-
 #include "hanwha_ptz_controller.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_resource.h"
@@ -21,12 +19,22 @@ namespace {
 static const float kNormilizedLimit = 100;
 static const int kHanwhaAbsoluteMoveCoefficient = 10000;
 
+static const QMap<QString, QString> kHanwhaTraitToParameterName = {
+    {HanwhaResource::kHanwhaAlternativeZoomTrait, kHanwhaZoomProperty},
+    {HanwhaResource::kHanwhaAlternativeFocusTrait, kHanwhaFocusProperty}
+};
+
 } // namespace
 
 HanwhaPtzController::HanwhaPtzController(const HanwhaResourcePtr& resource):
     QnBasicPtzController(resource),
     m_hanwhaResource(resource),
-    m_presetManager(std::make_unique<HanwhaMappedPresetManager>(resource))
+    m_presetManager(std::make_unique<HanwhaMappedPresetManager>(resource)),
+    m_alternativePtzExecutor(resource)
+{
+}
+
+HanwhaPtzController::~HanwhaPtzController()
 {
 }
 
@@ -51,8 +59,21 @@ void HanwhaPtzController::setPtzTraits(const QnPtzAuxilaryTraitList& traits)
     m_ptzTraits = traits;
 }
 
+void HanwhaPtzController::setAlternativePtzRanges(const std::map<HanwhaTraitName, std::set<int>>& ranges)
+{
+    for (auto itr = ranges.cbegin(); itr != ranges.cend(); ++itr)
+        m_alternativePtzExecutor.setRange(traitToParameterName(itr->first), itr->second);
+}
+
 bool HanwhaPtzController::continuousMove(const QVector3D& speed)
 {
+    if (m_ptzTraits.contains(HanwhaResource::kHanwhaAlternativeZoomTrait))
+    {
+        return alternativeContinuousMove(
+            traitToParameterName(HanwhaResource::kHanwhaAlternativeZoomTrait),
+            speed.z());
+    }
+
     const auto hanwhaSpeed = toHanwhaSpeed(speed);
 
     std::map<QString, QString> params;
@@ -74,7 +95,7 @@ bool HanwhaPtzController::continuousMove(const QVector3D& speed)
             m_lastParamValue[paramName] = value;
         };
 
-        if (m_ptzTraits.contains(QnPtzAuxilaryTrait(HanwhaResource::kNormalizedSpeedPtzTrait)))
+        if (m_ptzTraits.contains(HanwhaResource::kNormalizedSpeedPtzTrait))
             params.emplace(kHanwhaNormalizedSpeedProperty, kHanwhaTrue);
 
         addIfNeed(kHanwhaPanProperty, hanwhaSpeed.x());
@@ -92,6 +113,13 @@ bool HanwhaPtzController::continuousMove(const QVector3D& speed)
 
 bool HanwhaPtzController::continuousFocus(qreal speed)
 {
+    if (m_ptzTraits.contains(HanwhaResource::kHanwhaAlternativeFocusTrait))
+    {
+        return alternativeContinuousMove(
+            traitToParameterName(HanwhaResource::kHanwhaAlternativeFocusTrait),
+            speed);
+    }
+
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
 
     const auto response = helper.control(
@@ -160,7 +188,7 @@ bool HanwhaPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* p
     const auto x = response.parameter<double>(kHanwhaPanProperty);
     const auto y = response.parameter<double>(kHanwhaTiltProperty);
     const auto z = response.parameter<double>(kHanwhaZoomProperty);
-    
+
     if (x.is_initialized())
         position->setX(x.get());
 
@@ -253,7 +281,7 @@ bool HanwhaPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait& trait, co
         auto response = helper.control(lit("image/focus"), parameters);
         return response.isSuccessful();
     }
-    
+
     return false;
 }
 
@@ -317,7 +345,7 @@ std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
         result.emplace(lit("Type"), lit("1x"));
         return result;
     }
-    
+
     result.emplace(lit("Type"), lit("ZoomIn"));
 
     auto topLeft = rect.topLeft();
@@ -383,8 +411,18 @@ std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
     return result;
 }
 
+QString HanwhaPtzController::traitToParameterName(const QString& traitName) const
+{
+    NX_ASSERT(kHanwhaTraitToParameterName.contains(traitName));
+    return kHanwhaTraitToParameterName[traitName];
+}
+
+bool HanwhaPtzController::alternativeContinuousMove(const QString& parameterName, qreal speed)
+{
+    m_alternativePtzExecutor.setSpeed(parameterName, speed);
+    return true;
+}
+
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

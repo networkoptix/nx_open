@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include "hanwha_resource.h"
 #include "hanwha_remote_archive_manager.h"
 #include "hanwha_archive_delegate.h"
@@ -121,5 +119,3 @@ RemoteArchiveSynchronizationSettings HanwhaRemoteArchiveManager::settings() cons
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

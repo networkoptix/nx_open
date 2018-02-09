@@ -19,6 +19,7 @@ public:
 
 protected:
     virtual void SetUp() override;
+    virtual void TearDown() override;
 
 private:
     std::unique_ptr<QnMediaServerModule> m_serverModule;

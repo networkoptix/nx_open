@@ -11,14 +11,14 @@ namespace media_db
 
 const size_t kMaxWriteQueueSize = 1000;
 
-namespace
-{
-
 template<typename StructToWrite>
-QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
+static QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
 {
     return stream << s.part1 << s.part2;
 }
+
+namespace
+{
 
 class RecordVisitor : public boost::static_visitor<>
 {
@@ -350,6 +350,8 @@ Error DbHelper::getError() const
         return Error::ReadError;
     case QDataStream::Status::WriteFailed:
         return Error::WriteError;
+    case QDataStream::Status::Ok:
+        break;
     }
 
     if (m_stream.atEnd())

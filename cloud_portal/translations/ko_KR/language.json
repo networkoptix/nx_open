@@ -115,8 +115,9 @@
     "cantActivatePrefix": "계정을 활성화 할 수 없습니다.",
     "cantSendConfirmationPrefix": "확인 이메일을 보낼 수 없습니다.",
     "cloudInvalidResponse": "Cloud DB에서 예기치 않은 응답을 반환했습니다.",
-    "notAuthorized": "이메일 또는 패스워드가 잘못 되었습니다",
+    "notAuthorized": "패스워드가 틀립니다.",
     "wrongParameters": "양식의 일부 매개 변수가 잘못되었습니다.",
+    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "계정이 이미 활성화되었거나 확인 코드가 잘못되었습니다.",
     "wrongCodeRestore": "확인 코드가 이미 사용되었거나 잘못되었습니다.",
     "forbidden": "이 작업을 수행 할 수있는 권한이 없습니다.",
@@ -157,6 +158,7 @@
     "unavailable": "시스템에 연결할 수 없습니다.",
     "offline": "시스템이 오프라인 상태입니다.",
     "openClient": "{{VMS_NAME}} 에서 열기",
+    "openClientNoSystem": "Open {{VMS_NAME}}",
     "confirmRenameTitle": "시스템 이름",
     "confirmRenameAction": "저장",
     "successRename": "시스템 이름 저장",
@@ -200,27 +202,27 @@
         "label": "Mac OS",
         "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
-      },
       "linux": {
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
         "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      "macos": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "ios": {
         "label": "iOS",
         "shortLabel": "iOS"
       },
       "android": {
-        "label": "Android",
-        "shortLabel": "Android"
+        "label": "안드로이드",
+        "shortLabel": "안드로이드"
+      },
+      "arm": {
+        "label": "ARM",
+        "shortLabel": "ARM",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms": {
@@ -237,13 +239,13 @@
       "servertool": "구성 도구"
     },
     "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
+      "beta": "베타",
+      "betas": "베타들",
+      "rc": "릴리스 후보",
+      "release": "릴리스",
+      "releases": "릴리스",
+      "patch": "패치",
+      "patches": "패치들"
     }
   },
   "activeActions": {

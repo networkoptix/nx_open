@@ -8,7 +8,7 @@ namespace info {
 namespace detail {
 namespace data_provider {
 
-AsyncRawDataProviderFactoryFunction RawDataProviderFactory::m_factoryFunction = nullptr;
+AsyncRawDataProviderFactoryFunction RawDataProviderFactory::s_factoryFunction = nullptr;
 
 namespace {
 
@@ -25,15 +25,15 @@ AbstractAsyncRawDataProviderPtr RawDataProviderFactory::create(
     const QString& baseUrl,
     AbstractAsyncRawDataProviderHandler* handler)
 {
-    if (m_factoryFunction)
-        return m_factoryFunction(baseUrl, handler);
+    if (s_factoryFunction)
+        return s_factoryFunction(baseUrl, handler);
 
     return createHttpJsonProvider(baseUrl, handler);
 }
 
 void RawDataProviderFactory::setFactoryFunction(AsyncRawDataProviderFactoryFunction function)
 {
-    m_factoryFunction = std::move(function);
+    s_factoryFunction = std::move(function);
 }
 
 } // namespace data_provider

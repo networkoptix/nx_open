@@ -35,6 +35,7 @@
 #include <recorder/storage_db_pool.h>
 #include <recorder/storage_manager.h>
 #include <recorder/archive_integrity_watcher.h>
+#include <recorder/wearable_archive_synchronizer.h>
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
 #include <nx/mediaserver/event/event_message_bus.h>
@@ -54,6 +55,9 @@
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <nx/mediaserver/updates2/updates2_manager.h>
 
+#include "wearable_lock_manager.h"
+#include "wearable_upload_manager.h"
+
 namespace {
 
 const auto kLastRunningTime = lit("lastRunningTime");
@@ -69,11 +73,7 @@ void installTranslations()
 
 QDir downloadsDirectory()
 {
-    const QString varDir = qnServerModule->roSettings()->value("varDir").toString();
-    if (varDir.isEmpty())
-        return QDir();
-
-    const QDir dir(varDir + lit("/downloads"));
+    const QDir dir(qnServerModule->settings()->getDataDirectory() + lit("/downloads"));
     if (!dir.exists())
         QDir().mkpath(dir.absolutePath());
 
@@ -194,7 +194,14 @@ QnMediaServerModule::QnMediaServerModule(
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
     m_updates2Manager = store(new nx::mediaserver::updates2::Updates2Manager(this->commonModule()));
 
-    // Translations must be installed from the main applicaition thread.
+	store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
+
+
+    store(new QnWearableLockManager(this));
+
+    store(new QnWearableUploadManager(this));
+
+    // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
 }
 

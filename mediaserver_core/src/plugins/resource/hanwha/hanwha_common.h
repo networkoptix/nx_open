@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -200,5 +198,3 @@ static const QString kHanwhaNvrDeviceType = lit("NVR");
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

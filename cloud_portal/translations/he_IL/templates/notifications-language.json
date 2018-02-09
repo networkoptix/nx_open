@@ -1,17 +1,20 @@
 {
   "activate_account": {
-    "emailSubject": "אשר את החשבון שלך"
+    "emailSubject": "הפעל את חשבונך"
   },
   "restore_password": {
-    "emailSubject": "שחזר את הסיסמא שלך"
+    "emailSubject": "אפס את סיסמתך"
   },
   "system_invite": {
-    "emailSubject": "מערכת הווידאו {{message.system_name}} שותפה איתך"
+    "emailSubject": "{{message.sharer_name}} מזמין אותך אל {{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "מערכת הווידאו {{message.system_name}} שותפה איתך"
+    "emailSubject": "{{message.sharer_name}} מזמין אותך אל {{PRODUCT_NAME}}"
   },
   "review_version": {
     "emailSubject": "גרסה {{message.id}} מוכנה לבדיקה"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
   }
 }

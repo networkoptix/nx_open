@@ -1,17 +1,20 @@
 {
   "activate_account": {
-    "emailSubject": "ยืนยันบัญชีของคุณ"
+    "emailSubject": "เปิดใช้งานบัญชีของคุณ"
   },
   "restore_password": {
-    "emailSubject": "เรียกคืนรหัสผ่านของคุณ"
+    "emailSubject": "รีเซ็ตรหัสผ่านของคุณ"
   },
   "system_invite": {
-    "emailSubject": "ใช้ระบบวีดีโอร่วมกัน {{message.system_name}}"
+    "emailSubject": "{{message.sharer_name}} เชิญคุณมาที่ {{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "ใช้ระบบวีดีโอร่วมกัน {{message.system_name}}"
+    "emailSubject": "{{message.sharer_name}} เชิญคุณมาที่ {{PRODUCT_NAME}}"
   },
   "review_version": {
     "emailSubject": "ตรวจสอบความพร้อมของ Version {{message.id}}"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
   }
 }

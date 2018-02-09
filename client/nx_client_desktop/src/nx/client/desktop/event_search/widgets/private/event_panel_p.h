@@ -11,13 +11,23 @@ class QTabWidget;
 class QStackedWidget;
 class QnMediaResourceWidget;
 
+namespace QnNotificationLevel { enum class Value; }
+
 namespace nx {
+
+namespace vms { namespace event { class StringsHelper; } }
+
 namespace client {
 namespace desktop {
 
+class EventSearchListModel;
+class BookmarkSearchListModel;
+class AnalyticsSearchListModel;
+
 class NotificationListWidget;
+class UnifiedSearchWidget;
 class MotionSearchWidget;
-class EventSearchWidget;
+class NotificationCounterLabel;
 
 class EventPanel::Private: public QObject
 {
@@ -30,28 +40,39 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
-    void paintBackground();
-
 private:
     void currentWorkbenchWidgetChanged(Qn::ItemRole role);
 
-private:
-    EventPanel* q = nullptr;
-    QTabWidget* m_tabs = nullptr;
+    void addCameraTabs();
+    void removeCameraTabs();
 
-    NotificationListWidget* m_systemTab = nullptr;
-    QStackedWidget* m_cameraTab = nullptr;
-    EventSearchWidget* m_eventsWidget = nullptr;
-    MotionSearchWidget* m_motionWidget = nullptr;
+    void setupEventSearch();
+    void setupBookmarkSearch();
+    void setupAnalyticsSearch();
+
+    void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
+
+private:
+    EventPanel* const q = nullptr;
+    QTabWidget* const m_tabs = nullptr;
+
+    NotificationListWidget* const m_notificationsTab = nullptr;
+    MotionSearchWidget* const m_motionTab = nullptr;
+    UnifiedSearchWidget* const m_bookmarksTab = nullptr;
+    UnifiedSearchWidget* const m_eventsTab = nullptr;
+    UnifiedSearchWidget* const m_analyticsTab = nullptr;
+    NotificationCounterLabel* const m_counterLabel = nullptr;
 
     QPointer<QnMediaResourceWidget> m_currentMediaWidget;
     QScopedPointer<QnDisconnectHelper> m_mediaWidgetConnections;
 
-    enum class Tab
-    {
-        system,
-        camera
-    };
+    QnVirtualCameraResourcePtr m_camera;
+
+    EventSearchListModel* const m_eventsModel = nullptr;
+    BookmarkSearchListModel* const m_bookmarksModel = nullptr;
+    AnalyticsSearchListModel* const m_analyticsModel = nullptr;
+
+    QScopedPointer<vms::event::StringsHelper> m_helper;
 };
 
 } // namespace desktop

@@ -13,8 +13,15 @@ struct QnResourceSearchQuery
 {
     QString text;
     Qn::ResourceFlags flags = 0;
+    int allowedNode = -1;
 
     QnResourceSearchQuery()
+    {
+    }
+
+    QnResourceSearchQuery(const QString& text, int allowedNode):
+        text(text),
+        allowedNode(allowedNode)
     {
     }
 
@@ -26,7 +33,7 @@ struct QnResourceSearchQuery
 
     bool operator==(const QnResourceSearchQuery& other) const
     {
-        return text == other.text && flags == other.flags;
+        return text == other.text && flags == other.flags && allowedNode == other.allowedNode;
     }
 
     bool isEmpty() const

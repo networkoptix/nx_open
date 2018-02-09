@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_HANWHA)
-
 #include <core/ptz/ptz_limits.h>
 
 #include <plugins/resource/hanwha/hanwha_advanced_parameter_info.h>
@@ -39,17 +37,8 @@ public:
 
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager() override;
 
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-
-    virtual bool getParamsPhysical(
-        const QSet<QString> &idList,
-        QnCameraAdvancedParamValueList& result) override;
-
-    virtual bool setParamPhysical(const QString &id, const QString& value) override;
-
-    virtual bool setParamsPhysical(
-        const QnCameraAdvancedParamValueList &values,
-        QnCameraAdvancedParamValueList &result) override;
+    virtual QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids) override;
+    virtual QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values) override;
 
     virtual QnIOPortDataList getRelayOutputList() const override;
 
@@ -117,12 +106,16 @@ public:
 
     static const QString kNormalizedSpeedPtzTrait;
     static const QString kHas3AxisPtz;
+    static const QString kHanwhaAlternativeZoomTrait;
+    static const QString kHanwhaAlternativeFocusTrait;
 
     std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
 
     virtual bool setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString = nullptr) override;
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual QnAbstractPtzController* createPtzControllerInternal() override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
@@ -133,6 +126,7 @@ private:
     CameraDiagnostics::Result initMedia();
     CameraDiagnostics::Result initIo();
     CameraDiagnostics::Result initPtz();
+    CameraDiagnostics::Result initAlternativePtz();
     CameraDiagnostics::Result initAdvancedParameters();
     CameraDiagnostics::Result initTwoWayAudio();
     CameraDiagnostics::Result initRemoteArchive();
@@ -278,6 +272,7 @@ private:
     Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
     QnPtzLimits m_ptzLimits;
     QnPtzAuxilaryTraitList m_ptzTraits;
+    std::map<QString, std::set<int>> m_alternativePtzRanges;
 
     std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
     HanwhaAttributes m_attributes;
@@ -298,5 +293,3 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

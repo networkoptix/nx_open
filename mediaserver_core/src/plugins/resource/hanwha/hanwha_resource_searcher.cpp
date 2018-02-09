@@ -1,5 +1,3 @@
-#if defined(ENABLE_HANWHA)
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_data.h>
@@ -13,6 +11,8 @@
 #include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_common.h"
+#include "hanwha_ini_config.h"
+
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 
@@ -53,6 +53,7 @@ HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
     nx::network::upnp::SearchAutoHandler(kUpnpBasicDeviceType),
     m_sunapiProbePackets(createProbePackets())
 {
+    ini().reload();
 }
 
 std::vector<std::vector<quint8>> HanwhaResourceSearcher::createProbePackets()
@@ -175,9 +176,9 @@ void HanwhaResourceSearcher::updateSocketList()
 
 bool HanwhaResourceSearcher::isHostBelongsToValidSubnet(const QHostAddress& address) const
 {
-    const auto interfaceList = nx::network::getAllIPv4Interfaces(
-        false, /*allowInterfacesWithoutAddress*/
-        true /*keepAllAddressesPerInterface*/);
+    using namespace nx::network;
+    const auto interfaceList = getAllIPv4Interfaces(
+        InterfaceListPolicy::keepAllAddressesPerInterface);
     return std::any_of(
         interfaceList.begin(), interfaceList.end(),
         [&address](const nx::network::QnInterfaceAndAddr& netInterface)
@@ -253,9 +254,10 @@ void HanwhaResourceSearcher::readSunApiResponse(QnResourceList& resultResourceLi
             SunApiData sunApiData;
             if (parseSunApiData(datagram.left(bytesRead), &sunApiData))
             {
-                m_sunapiDiscoveredDevices[sunApiData.macAddress] = sunApiData;
                 if (!resourceAlreadyFound(resultResourceList, sunApiData.macAddress))
                     createResource(sunApiData, sunApiData.macAddress, resultResourceList);
+                QnMutexLocker lock(&m_mutex);
+                m_sunapiDiscoveredDevices[sunApiData.macAddress] = sunApiData;
             }
         }
     }
@@ -298,19 +300,20 @@ bool HanwhaResourceSearcher::processPacket(
         return false;
     }
 
-    // Due to some bugs in UPnP implementation higher priority is given
-    // to the native SUNAPI discovery protocol.
-    auto itr = m_sunapiDiscoveredDevices.find(cameraMac);
-    if (itr != m_sunapiDiscoveredDevices.end()
-        && !itr->timer.hasExpired(kSunApiDiscoveryTimeoutMs))
-    {
-        return false;
-    }
-
     QString model(devInfo.modelName);
 
 	{
 		QnMutexLocker lock(&m_mutex);
+
+        // Due to some bugs in UPnP implementation higher priority is given
+        // to the native SUNAPI discovery protocol.
+        auto itr = m_sunapiDiscoveredDevices.find(cameraMac);
+        if (itr != m_sunapiDiscoveredDevices.end()
+            && !itr->timer.hasExpired(kSunApiDiscoveryTimeoutMs))
+        {
+            return false;
+        }
+
         const bool alreadyFound = m_alreadFoundMacAddresses.find(cameraMac.toString())
             != m_alreadFoundMacAddresses.end();
 
@@ -366,8 +369,8 @@ void HanwhaResourceSearcher::createResource(
     auto auth = rpRes ? rpRes->getAuth() : getDefaultAuth();
     resource->setDefaultAuth(auth);
     result << resource;
-
-    addMultichannelResources(result, auth);
+    if (rpRes)
+        addMultichannelResources(result, auth);
 }
 
 template <typename T>
@@ -418,5 +421,3 @@ QAuthenticator HanwhaResourceSearcher::getDefaultAuth()
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)

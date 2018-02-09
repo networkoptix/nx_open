@@ -43,12 +43,13 @@ int QnMultiserverThumbnailRestHandler::executeGet(
 {
     auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(
         processor->commonModule()->resourcePool(), params);
+    const auto& imageRequest = request.request;
 
-    auto requiredPermission = QnThumbnailRequestData::isSpecialTimeValue(request.msecSinceEpoch)
+    auto requiredPermission = nx::api::CameraImageRequest::isSpecialTimeValue(imageRequest.msecSinceEpoch)
             ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
 
     if (!processor->commonModule()->resourceAccessManager()->hasPermission(
-        processor->accessRights(), request.camera, requiredPermission))
+        processor->accessRights(), imageRequest.camera, requiredPermission))
     {
         return makeError(nx::network::http::StatusCode::forbidden,
             lit("Access denied: Insufficent access rights"),
@@ -66,7 +67,9 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(
     QByteArray& contentType,
     int ownerPort)
 {
-    if (request.camera && !request.camera->hasVideo(nullptr))
+    const auto& imageRequest = request.request;
+
+    if (imageRequest.camera && !imageRequest.camera->hasVideo(nullptr))
     {
         return makeError(
             nx::network::http::StatusCode::badRequest
@@ -104,27 +107,24 @@ QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer(
     if (request.isLocal)
         return currentServer;
 
-    if (QnThumbnailRequestData::isSpecialTimeValue(request.msecSinceEpoch))
-        return request.camera->getParentServer();
+    const auto& imageRequest = request.request;
+    if (nx::api::CameraImageRequest::isSpecialTimeValue(imageRequest.msecSinceEpoch))
+        return imageRequest.camera->getParentServer();
 
-    return commonModule->cameraHistoryPool()->getMediaServerOnTimeSync(request.camera, request.msecSinceEpoch);
+    return commonModule->cameraHistoryPool()->getMediaServerOnTimeSync(imageRequest.camera,
+        imageRequest.msecSinceEpoch);
 }
 
 int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType ) const
 {
     static const qint64 kUsecPerMs = 1000;
+    const auto& imageRequest = request.request;
 
-    qint64 timeUSec = QnThumbnailRequestData::isSpecialTimeValue(request.msecSinceEpoch)
-        ? request.msecSinceEpoch
-        : request.msecSinceEpoch * kUsecPerMs;
+    qint64 timeUSec = nx::api::CameraImageRequest::isSpecialTimeValue(imageRequest.msecSinceEpoch)
+        ? imageRequest.msecSinceEpoch
+        : imageRequest.msecSinceEpoch * kUsecPerMs;
 
-    CLVideoDecoderOutputPtr outFrame = QnGetImageHelper::getImage(
-        request.camera,
-        timeUSec,
-        request.size,
-        request.roundMethod,
-        request.rotation,
-        request.aspectRatio);
+    CLVideoDecoderOutputPtr outFrame = QnGetImageHelper::getImage(request.request);
 
     if (!outFrame)
     {
@@ -133,14 +133,14 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
         return nx::network::http::StatusCode::noContent;
     }
 
-    QByteArray imageFormat = QnLexical::serialized<QnThumbnailRequestData::ThumbnailFormat>(request.imageFormat).toUtf8();
+    QByteArray imageFormat = QnLexical::serialized<nx::api::CameraImageRequest::ThumbnailFormat>(imageRequest.imageFormat).toUtf8();
 
-    if (request.imageFormat == QnThumbnailRequestData::JpgFormat)
+    if (imageRequest.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::jpg)
     {
         QByteArray encodedData = QnGetImageHelper::encodeImage(outFrame, imageFormat);
         result.append(encodedData);
     }
-    else if (request.imageFormat == QnThumbnailRequestData::RawFormat)
+    else if (imageRequest.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::raw)
     {
         NX_ASSERT(false, Q_FUNC_INFO, "Method is not implemeted");
         // TODO: #rvasilenko implement me!!!
@@ -242,7 +242,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
     {
         result = std::move(response.body);
         contentType = (response.httpStatus == nx::network::http::StatusCode::ok)
-            ? QByteArray("image/") + QnLexical::serialized(request.imageFormat).toUtf8()
+            ? QByteArray("image/") + QnLexical::serialized(request.request.imageFormat).toUtf8()
             : QByteArray("application/json"); //< TODO: Provide content type from response.
     }
 

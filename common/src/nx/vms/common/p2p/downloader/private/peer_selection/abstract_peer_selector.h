@@ -32,6 +32,7 @@ public:
 };
 
 using AbstractPeerSelectorPtr = std::unique_ptr<AbstractPeerSelector>;
+
 } // namespace peer_selection
 } // namespace downloader
 } // namespace p2p

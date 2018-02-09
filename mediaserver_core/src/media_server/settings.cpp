@@ -19,9 +19,10 @@
 #include <media_server/serverutil.h>
 
 #ifndef _WIN32
-static QString templateConfigFileName = QString("/opt/%1/mediaserver/etc/mediaserver.conf.template").arg(QnAppInfo::linuxOrganizationName());
-static QString defaultConfigFileName = QString("/opt/%1/mediaserver/etc/mediaserver.conf").arg(QnAppInfo::linuxOrganizationName());
-static QString defaultConfigFileNameRunTime = QString("/opt/%1/mediaserver/etc/running_time.conf").arg(QnAppInfo::linuxOrganizationName());
+static QString configDirectory = lit("/opt/%1/mediaserver/etc").arg(QnAppInfo::linuxOrganizationName());
+static QString templateConfigFileName = QString("%1/mediaserver.conf.template").arg(configDirectory);
+static QString defaultConfigFileName = QString("%1/mediaserver.conf").arg(configDirectory);
+static QString defaultConfigFileNameRunTime = QString("%1/running_time.conf").arg(configDirectory);
 #endif
 
 MSSettings::MSSettings(
@@ -130,6 +131,21 @@ nx::analytics::storage::Settings MSSettings::analyticEventsStorage() const
     return m_analyticEventsStorage;
 }
 
+void MSSettings::close()
+{
+    m_rwSettings->sync();
+    m_roSettings->sync();
+}
+
+void MSSettings::reopen(const QString& roFile, const QString& rwFile)
+{
+    if (!roFile.isEmpty())
+        m_roSettings.reset(new QSettings(roFile, QSettings::IniFormat));
+
+    if (!rwFile.isEmpty())
+        m_rwSettings.reset(new QSettings(rwFile, QSettings::IniFormat));
+}
+
 QString MSSettings::defaultRunTimeSettingsFilePath()
 {
 #ifdef _WIN32
@@ -137,6 +153,15 @@ QString MSSettings::defaultRunTimeSettingsFilePath()
 #else
     return defaultConfigFileNameRunTime;
 #endif
+}
+
+QString MSSettings::defaultConfigDirectory()
+{
+    #ifdef _WIN32
+        return "windows registry is used";
+    #else
+        return configDirectory;
+    #endif
 }
 
 void MSSettings::initializeRunTimeSettingsFromConfFile( const QString& fileName )

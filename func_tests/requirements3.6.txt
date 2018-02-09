@@ -11,3 +11,4 @@ python-debian>=0.1.28
 netaddr
 pytest-instafail
 pyyaml
+pathlib2

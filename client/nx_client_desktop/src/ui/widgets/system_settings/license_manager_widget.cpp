@@ -222,6 +222,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->gridLicenses->header()->setSectionsMovable(false);
     ui->gridLicenses->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->gridLicenses->header()->setSectionResizeMode(QnLicenseListModel::ServerColumn, QHeaderView::Stretch);
+    ui->gridLicenses->header()->setSectionResizeMode(QnLicenseListModel::LicenseKeyColumn, QHeaderView::ResizeMode::ResizeToContents);
     ui->gridLicenses->header()->setSortIndicator(QnLicenseListModel::LicenseKeyColumn, Qt::AscendingOrder);
 
     /* By [Delete] key remove licenses. */
@@ -953,7 +954,7 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
         if (infoMode)
         {
             QnLicenseErrorCode errCode = m_validator->validate(license,
-                QnLicenseValidator::VM_CheckInfo);
+                QnLicenseValidator::VM_CanActivate);
 
             if (errCode != QnLicenseErrorCode::NoError && errCode != QnLicenseErrorCode::Expired)
             {

@@ -1,5 +1,10 @@
 #include "demo_analytics_metadata_provider.h"
 
+#include <chrono>
+
+#include <QtCore/QFile>
+
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/random.h>
 #include <utils/math/math.h>
 #include <ini.h>
@@ -10,50 +15,108 @@ namespace desktop {
 
 namespace {
 
-static constexpr int kDefaultObjectsNumber = 4;
 static constexpr qint64 kDefaultDuration = 100;
 
-static QRectF shiftedRect(const QRectF& rect, qint64 timestamp)
+static QRectF randomRect()
 {
-    const auto kSpeed = 0.025; //< Per second.
+    const auto w = utils::random::number(0.1, 0.4);
+    const auto h = utils::random::number(0.1, 0.4);
 
-    QRectF result = rect;
-    result.moveLeft(qMod(rect.x() + timestamp / 1000000.0 * kSpeed, 1.0 - rect.width()));
-    return result;
+    return QRectF(
+        utils::random::number(0.0, 1.0 - w),
+        utils::random::number(0.0, 1.0 - h),
+        w,
+        h);
 }
 
+struct DemoAnalyticsObject: common::metadata::DetectedObject
+{
+    QPointF movementSpeed;
+
+    DemoAnalyticsObject animated(std::chrono::milliseconds dt)
+    {
+        // Ping-pong movement animation.
+
+        auto movedCoordinate = [dt](qreal value, qreal speed, qreal space)
+            {
+                value = std::abs(value + speed * (dt.count() / 1000.0));
+
+                int reflections = static_cast<int>(value / space);
+                value -= space * reflections;
+
+                return (reflections % 2 == 1) ? space - value : value;
+            };
+
+        DemoAnalyticsObject animatedObject = *this;
+        animatedObject.boundingBox.moveTo(
+            movedCoordinate(boundingBox.x(), movementSpeed.x(), 1.0 - boundingBox.width()),
+            movedCoordinate(boundingBox.y(), movementSpeed.y(), 1.0 - boundingBox.height()));
+        return animatedObject;
+    }
+};
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DemoAnalyticsObject, (json),
+    DetectedObject_Fields (movementSpeed));
 } // namespace
 
 class DemoAnalyticsMetadataProvider::Private
 {
 public:
-    int objectsNumber = kDefaultObjectsNumber;
+    int objectsCount = 0;
     qint64 duration = kDefaultDuration;
 
-    struct Object
-    {
-        QnUuid id;
-        QRectF initialGeometry;
-    };
-    QVector<Object> objects;
+    QVector<DemoAnalyticsObject> objects;
+    std::chrono::milliseconds startTimestamp = std::chrono::milliseconds::zero();
 
 public:
+    Private():
+        objectsCount(ini().demoAnalyticsProviderObjectsCount)
+    {
+    }
+
     void createObjects()
     {
-        objects.reserve(objectsNumber);
+        const auto& descriptionsFileName =
+            QString::fromUtf8(ini().demoAnalyticsProviderObjectDescriptionsFile);
 
-        for (int i = 0; i < objectsNumber; ++i)
+        if (!descriptionsFileName.isEmpty())
         {
-            const auto w = utils::random::number(0.1, 0.4);
-            const auto h = utils::random::number(0.1, 0.4);
+            QFile file(descriptionsFileName);
+            if (!file.open(QFile::ReadOnly))
+                return;
 
-            objects.append(Object{
-                QnUuid::createUuid(),
-                QRectF(
-                    utils::random::number(0.0, 1.0 - w),
-                    utils::random::number(0.0, 1.0 - h),
-                    w,
-                    h)});
+            const QByteArray& jsonData = file.readAll();
+            file.close();
+
+            objects = QJson::deserialized<decltype(objects)>(jsonData);
+
+            for (auto& object: objects)
+            {
+                if (object.objectId.isNull())
+                    object.objectId = QnUuid::createUuid();
+
+                if (object.objectTypeId.isNull())
+                    object.objectTypeId = QnUuid::createUuid();
+
+                if (object.boundingBox.isNull())
+                    object.boundingBox = randomRect();
+            }
+
+            return;
+        }
+
+        objects.reserve(objectsCount);
+
+        for (int i = 0; i < objectsCount; ++i)
+        {
+            DemoAnalyticsObject object;
+            object.objectId = QnUuid::createUuid();
+            object.boundingBox = randomRect();
+            object.labels.emplace_back(
+                common::metadata::Attribute{lit("Object %1").arg(i), QString()});
+            object.movementSpeed = QPointF(1.0, 1.0);
+
+            objects.append(object);
         }
     }
 };
@@ -64,9 +127,11 @@ DemoAnalyticsMetadataProvider::DemoAnalyticsMetadataProvider():
 }
 
 common::metadata::DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::metadata(
-    qint64 timestamp, int /*channel*/) const
+    qint64 timestampUs, int /*channel*/) const
 {
-    if (d->objectsNumber <= 0)
+    using namespace std::chrono;
+
+    if (d->objectsCount <= 0)
         return common::metadata::DetectionMetadataPacketPtr();
 
     if (d->objects.isEmpty())
@@ -77,21 +142,18 @@ common::metadata::DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::meta
 
     const auto precision = ini().demoAnalyticsProviderTimestampPrecisionUs;
     if (precision > 0)
-        timestamp -= timestamp % precision;
+        timestampUs -= timestampUs % precision;
 
-    metadata->timestampUsec = timestamp;
+    const auto timestamp = duration_cast<milliseconds>(microseconds(timestampUs));
+    if (d->startTimestamp == milliseconds::zero())
+        d->startTimestamp = timestamp;
+    const auto dt = timestamp - d->startTimestamp;
+
+    metadata->timestampUsec = timestampUs;
     metadata->durationUsec = d->duration * 1000;
 
-    for (int i = 0; i < d->objectsNumber; ++i)
-    {
-        common::metadata::DetectedObject object;
-        object.objectId = d->objects[i].id;
-        object.labels.emplace_back(
-            common::metadata::Attribute{lit("Object %1").arg(i), QString()});
-        object.boundingBox = shiftedRect(d->objects[i].initialGeometry, timestamp);
-
-        metadata->objects.push_back(object);
-    }
+    for (auto& object: d->objects)
+        metadata->objects.push_back(object.animated(dt));
 
     return metadata;
 }

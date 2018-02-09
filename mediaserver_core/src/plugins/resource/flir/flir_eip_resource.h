@@ -2,13 +2,14 @@
 
 #ifdef ENABLE_FLIR
 
-#include <core/resource/security_cam_resource.h>
-#include <core/resource/camera_resource.h>
+#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
+#include <nx/mediaserver/resource/camera.h>
+#include <nx/utils/timer_manager.h>
 #include <utils/xml/camera_advanced_param_reader.h>
-#include "simple_eip_client.h"
+
 #include "eip_async_client.h"
 #include "flir_eip_data.h"
-#include <nx/utils/timer_manager.h>
+#include "simple_eip_client.h"
 
 enum class FlirAlarmMonitoringState
 {
@@ -18,7 +19,8 @@ enum class FlirAlarmMonitoringState
     WaitingForMeasFuncId
 };
 
-class QnFlirEIPResource : public QnPhysicalCameraResource
+class QnFlirEIPResource:
+    public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 public:
@@ -39,10 +41,12 @@ public:
     static QByteArray PASSTHROUGH_EPATH();
     static const QString MANUFACTURE;
 
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-    virtual bool setParamPhysical(const QString &id, const QString& value) override;
+    boost::optional<QString> getApiParameter(const QString& id);
+    bool setApiParameter(const QString& id, const QString& value);
 
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int, int) override;
@@ -62,8 +66,7 @@ protected:
     virtual bool isInputPortMonitored() const override;
 
 private:
-    QnCameraAdvancedParams m_advancedParameters;
-    mutable QnMutex m_physicalParamsMutex;
+    nx::mediaserver::resource::ApiSingleAdvancedParametersProvider<QnFlirEIPResource> m_advancedParametersProvider;
     mutable QnMutex m_ioMutex;
     mutable QnMutex m_alarmMutex;
 
@@ -137,6 +140,9 @@ private:
     void getAlarmMeasurementFuncId();
     void getAlarmMeasurementFuncIdDone();
     void checkInputPortStatus();
+
+    virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
+
 private slots:
     void checkInputPortStatusDone();
     void routeAlarmMonitoringFlow();

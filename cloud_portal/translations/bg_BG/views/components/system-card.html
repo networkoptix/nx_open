@@ -1,0 +1,30 @@
+
+<div class="panel panel-default" ng-if="system.isMine">
+    <div class="panel-body">
+        <h2>Your System</h2>
+        <p></p>
+        <p>
+            <button class="btn btn-default" ng-click="rename()">Rename System</button>
+        </p>
+        <button class="btn btn-default" ng-click="disconnect()">Disconnect from
+            <span class="product-name">{{PRODUCT_NAME}}</span></button>
+    </div>
+</div>
+
+<div class="panel panel-default" ng-if="!system.isMine">
+    <div class="panel-body">
+        <h2>Owner</h2>
+        <h3 class="user-name">{{system.info.ownerFullName}}</h3>
+        <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
+        <hr>
+        <p>
+            Your permissions:
+            <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
+        </p>
+
+        <p ng-if="system.permissions.isAdmin">
+            <button class="btn btn-default" ng-click="rename()">Rename System</button>
+        </p>
+        <button class="btn btn-default" ng-click="delete()">Disconnect from my account</button>
+    </div>
+</div>

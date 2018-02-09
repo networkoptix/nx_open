@@ -1,11 +1,11 @@
-Sistem sizinle paylaşıldı
+Merhaba, {{message.fullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) paylaşılan sistem {{message.system_name}}.
+{{message.sharer_name}}({{message.sharer_email}})video yönetim sistemini sizinle paylaştı {{message.system_name}}.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-{{message.system_name}} sistemi sizinle paylaşıldı.
+Video yönetim sistemine "{{message.system_name}}" erişim izni verildi.
 {{/message.sharer_name}}
 
-Sistemi açın: {{config.portal_url}} / systems / {{message.system_id}}
+{{PRODUCT_NAME}} Portalı'nda görüntüle: {{config.portal_url}} / systems / {{message.system_id}}

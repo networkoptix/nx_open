@@ -157,6 +157,9 @@ void fromApiToResource(const ApiCameraData& src, QnVirtualCameraResourcePtr& dst
     if (src.typeId == QnResourceTypePool::kDesktopCameraTypeUuid)
         dst->addFlags(Qn::desktop_camera);
 
+    if (src.typeId == QnResourceTypePool::kWearableCameraTypeUuid)
+        dst->addFlags(Qn::wearable_camera);
+
     dst->setPhysicalId(src.physicalId);
     dst->setMAC(nx::network::QnMacAddress(src.mac));
     dst->setManuallyAdded(src.manuallyAdded);
@@ -262,7 +265,7 @@ void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAtt
 
     dst->audioEnabled = src.audioEnabled;
 
-    dst->secondaryQuality = src.secondaryStreamQuality;
+    dst->disableDualStreaming = src.disableDualStreaming;
     dst->cameraControlDisabled = !src.controlEnabled;
     dst->dewarpingParams = QJson::deserialized<QnMediaDewarpingParams>(src.dewarpingParams);
     dst->minDays = src.minArchiveDays;
@@ -292,7 +295,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     }
 
     dst.audioEnabled = src->audioEnabled;
-    dst.secondaryStreamQuality = src->secondaryQuality;
+    dst.disableDualStreaming = src->disableDualStreaming;
     dst.controlEnabled = !src->cameraControlDisabled;
     dst.dewarpingParams = QJson::serialized(src->dewarpingParams);
     dst.minArchiveDays = src->minDays;

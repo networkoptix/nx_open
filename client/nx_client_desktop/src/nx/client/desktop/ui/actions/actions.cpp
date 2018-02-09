@@ -342,6 +342,15 @@ void initialize(Manager* manager, Action* root)
             )
             .autoRepeat(false);
 
+        factory(NewWearableCameraAction)
+            .flags(Main | NoTarget)
+            .text(ContextMenu::tr("Wearable Camera..."))
+            .pulledText(ContextMenu::tr("New Wearable Camera..."))
+            .condition(condition::isLoggedIn()
+                && !condition::isSafeMode()
+                && condition::isTrue(ini().enableWearableCameras)
+            )
+            .autoRepeat(false);
     }
     factory.endSubMenu();
 
@@ -1247,6 +1256,13 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(condition::treeNodeType({Qn::UsersNode, Qn::RoleNode}));
 
+    factory(UploadWearableCameraFileAction)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Upload to Wearable Camera..."))
+        .condition(condition::hasFlags(Qn::wearable_camera, MatchMode::All)
+            && condition::isTrue(ini().enableWearableCameras));
+
     factory(CameraIssuesAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
@@ -1258,6 +1274,7 @@ void initialize(Manager* manager, Action* root)
             ), manager))
         .requiredGlobalPermission(Qn::GlobalViewLogsPermission)
         .condition(condition::hasFlags(Qn::live_cam, MatchMode::Any)
+            && !condition::hasFlags(Qn::wearable_camera, MatchMode::All)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
@@ -1274,6 +1291,7 @@ void initialize(Manager* manager, Action* root)
             ), manager))
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(condition::hasFlags(Qn::live_cam, MatchMode::ExactlyOne)
+            && !condition::hasFlags(Qn::wearable_camera, MatchMode::All)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()

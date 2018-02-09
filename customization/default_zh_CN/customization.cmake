@@ -58,7 +58,6 @@ set(installer.language "zh_CN")
 set(installer.cultures "zh-cn")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-set(sign.intermediate.cer "")
 
 # Localization
 set(help.language "chinese")

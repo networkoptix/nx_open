@@ -53,7 +53,7 @@ std::unique_ptr<QnConstDataPacketQueue> MediaServerVideoCameraMock::getFrameSequ
     bool /*primaryLiveStream*/,
     qint64 /*time*/,
     int /*channel*/,
-    QnThumbnailRequestData::RoundMethod /*roundMethod*/) const
+    nx::api::ImageRequest::RoundMethod /*roundMethod*/) const
 {
     return nullptr;
 }

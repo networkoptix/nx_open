@@ -38,7 +38,7 @@
 #include <utils/common/html.h>
 #include <nx/audio/audiodevice.h>
 #include <utils/common/app_info.h>
-
+#include <utils/common/html.h>
 #include <nx/client/desktop/ui/common/clipboard_button.h>
 
 using namespace nx::client::desktop::ui;
@@ -150,10 +150,9 @@ void QnAboutDialog::retranslateUi()
 
     QStringList credits;
     credits << tr("%1 uses the following external libraries:").arg(appName);
-    credits << lit("<b>Qt v.%1</b> - Copyright &copy; 2012 Nokia Corporation.").arg(QLatin1String(QT_VERSION_STR));
+    credits << lit("<b>Qt v.%1</b> - Copyright &copy; 2015 The Qt Company Ltd.").arg(QLatin1String(QT_VERSION_STR));
     credits << QString();
-    credits << lit("<b>FFMpeg %1</b> - Copyright &copy; 2000-2012 FFmpeg developers.").arg(versionString(QnAppInfo::ffmpegVersion()));
-    credits << lit("<b>LAME 3.99.0</b> - Copyright &copy; 1998-2012 LAME developers.");
+    credits << lit("<b>FFMpeg %1</b> - Copyright &copy; 2000-2018 FFmpeg developers.").arg(versionString(QnAppInfo::ffmpegVersion()));
     credits << lit("<b>OpenAL %1</b> - Copyright &copy; 2000-2006 %2.")
         .arg(nx::audio::AudioDevice::instance()->versionString())
         .arg(nx::audio::AudioDevice::instance()->company());
@@ -182,11 +181,12 @@ void QnAboutDialog::retranslateUi()
 
     // Check if email is provided
     if (supportEmail.isValid())
-        supportLink = lit("<a href=mailto:%1>%1</a>").arg(supportEmail.value());
+        supportLink = makeMailHref(supportAddress, supportAddress);
     // simple check if phone is provided
     else if (!supportAddress.isEmpty() && !supportAddress.startsWith(lit("+")))
-        supportLink = lit("<a href=%1>%1</a>").arg(supportAddress);
+        supportLink = makeHref(supportAddress, supportAddress);
     ui->supportEmailLabel->setText(lit("<b>%1</b>: %2").arg(tr("Customer Support")).arg(supportLink));
+    ui->supportEmailLabel->setOpenExternalLinks(true);
 }
 
 // -------------------------------------------------------------------------- //

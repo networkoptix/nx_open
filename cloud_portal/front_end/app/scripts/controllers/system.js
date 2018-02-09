@@ -15,6 +15,17 @@ angular.module('cloudApp')
             $scope.gettingSystem.run();
         });
 
+        function getMergeTarget(targetSystemId){
+            return _.find(systemsProvider.systems, function(system){
+                return targetSystemId == system.id;
+            });
+        }
+
+        function setMergeStatus(mergeInfo){
+            $scope.currentlyMerging = true;
+            $scope.isMaster = mergeInfo.role ? mergeInfo.role != 'slave' : mergeInfo.masterSystemId == $scope.system.id;
+            $scope.mergeTargetSystem = getMergeTarget(mergeInfo.anotherSystemId);
+        }
         // Retrieve system info
         $scope.gettingSystem = process.init(function(){
             return $scope.system.getInfo(true); // Force reload system info when opening page
@@ -33,6 +44,13 @@ angular.module('cloudApp')
             },
             errorPrefix: L.errorCodes.cantGetSystemInfoPrefix
         }).then(function (){
+            $scope.canMerge = $scope.system.capabilities && $scope.system.capabilities.indexOf('cloudMerge') > -1
+                                                         && $scope.system.mergeInfo
+                                                         || Config.allowDebugMode 
+                                                         || Config.allowBetaMode;
+            if($scope.canMerge && $scope.system.mergeInfo){
+                setMergeStatus($scope.system.mergeInfo);
+            }
             $scope.systemNoAccess = false;
             loadUsers();
             if($scope.system.permissions.editUsers){
@@ -60,7 +78,7 @@ angular.module('cloudApp')
         $scope.gettingSystemUsers = process.init(function(){
             return $scope.system.getUsers().then(function(users){
                 if($routeParams.callShare){
-                    return $scope.share().finally(cleanUrl);
+                    $scope.share().finally(cleanUrl);
                 }
             }).finally(delayedUpdateSystemInfo);
         },{
@@ -107,6 +125,12 @@ angular.module('cloudApp')
         $scope.rename = function(){
             return dialogs.rename(systemId, $scope.system.info.name).then(function(finalName){
                 $scope.system.info.name = finalName;
+            });
+        };
+
+        $scope.mergeSystems = function(){
+            dialogs.merge($scope.system).then(function(mergeInfo){
+                setMergeStatus(mergeInfo);
             });
         };
 

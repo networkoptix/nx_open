@@ -39,8 +39,9 @@
 #include <core/resource/videowall_matrix_index.h>
 
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
-
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/common/widgets/async_image_widget.h>
+
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
 #include <ui/delegates/resource_item_delegate.h>
@@ -57,7 +58,6 @@
 #include <ui/style/helper.h>
 #include <ui/widgets/common/busy_indicator.h>
 #include <ui/widgets/common/text_edit_label.h>
-#include <ui/widgets/resource_preview_widget.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
@@ -73,6 +73,8 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+#include <ini.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -131,7 +133,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     m_thumbnailManager->setThumbnailSize(QSize(0, kMaxThumbnailSize.height()));
 
     m_resourceModel = new QnResourceTreeModel(QnResourceTreeModel::FullScope, this);
-    ui->resourceTreeWidget->setModel(m_resourceModel);
+    ui->resourceTreeWidget->setModel(m_resourceModel, true);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BypassGraphicsProxy);
     ui->resourceTreeWidget->setEditingEnabled();
@@ -147,6 +149,12 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
                 }
                 case Qn::ServersNode:
                 case Qn::UserResourcesNode:
+
+                case Qn::FilteredServersNode:
+                case Qn::FilteredCamerasNode:
+                case Qn::FilteredLayoutsNode:
+                case Qn::FilteredUsersNode:
+                case Qn::FilteredVideowallsNode:
                     return true;
                 default:
                     break;
@@ -155,61 +163,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
         }
     );
 
-#ifdef _TREE_SEARCH_32
-    ui->resourceTreeWidget->setFilterVisible();
-
-    auto getFilteredResources =
-        [this]()
-        {
-            const auto model = ui->resourceTreeWidget->searchModel();
-            QnResourceList result;
-            if (!model)
-                return result;
-
-            QSet<QnResourcePtr> resources;
-            std::function<void(const QModelIndex& index)> getRecursive;
-            getRecursive =
-                [model, &resources, &result, &getRecursive](const QModelIndex& index)
-                {
-                    const int childCount = model->rowCount(index);
-                    const bool hasChildren = childCount > 0;
-                    if (hasChildren)
-                    {
-                        for (int i = 0; i < childCount; i++)
-                            getRecursive(model->index(i, 0, index));
-                    }
-                    else
-                    {
-                        const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-                        if (!resource || !QnResourceAccessFilter::isOpenableInLayout(resource))
-                            return;
-
-                        if (resources.contains(resource))
-                            return;
-
-                        resources.insert(resource); //< Avoid duplicates.
-                        result.push_back(resource); //< Keep sort order.
-                    }
-                };
-
-            getRecursive(QModelIndex());
-            return result;
-        };
-
-    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterEnterPressed, this,
-        [this, getFilteredResources]
-        {
-            auto selected = getFilteredResources();
-            menu()->trigger(action::OpenInCurrentLayoutAction, {selected});
-        });
-
-    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterCtrlEnterPressed, this,
-        [this, getFilteredResources]
-        {
-            auto selected = getFilteredResources();
-            menu()->trigger(action::OpenInNewTabAction, {selected});
-        });
-#endif
+    initNewSearch();
 
     ui->searchTreeWidget->setCheckboxesVisible(false);
 
@@ -281,6 +235,68 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     updateIcons();
 
     at_workbench_currentLayoutChanged();
+}
+
+void QnResourceBrowserWidget::initNewSearch()
+{
+    if (!nx::client::desktop::ini().enableResourceFiltering)
+        return;
+
+    ui->tabWidget->tabBar()->hide();
+
+    ui->resourceTreeWidget->setFilterVisible();
+
+    auto getFilteredResources =
+        [this]()
+        {
+            const auto model = ui->resourceTreeWidget->searchModel();
+            QnResourceList result;
+            if (!model)
+                return result;
+
+            QSet<QnResourcePtr> resources;
+            std::function<void(const QModelIndex& index)> getRecursive;
+            getRecursive =
+                [model, &resources, &result, &getRecursive](const QModelIndex& index)
+                {
+                    const int childCount = model->rowCount(index);
+                    const bool hasChildren = childCount > 0;
+                    if (hasChildren)
+                    {
+                        for (int i = 0; i < childCount; i++)
+                            getRecursive(model->index(i, 0, index));
+                    }
+                    else
+                    {
+                        const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+                        if (!resource || !QnResourceAccessFilter::isOpenableInLayout(resource))
+                            return;
+
+                        if (resources.contains(resource))
+                            return;
+
+                        resources.insert(resource); //< Avoid duplicates.
+                        result.push_back(resource); //< Keep sort order.
+                    }
+                };
+
+            getRecursive(QModelIndex());
+            return result;
+        };
+
+    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterEnterPressed, this,
+        [this, getFilteredResources]
+        {
+            const auto selected = getFilteredResources();
+            menu()->trigger(action::OpenInCurrentLayoutAction, {selected});
+        });
+
+    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterCtrlEnterPressed, this,
+        [this, getFilteredResources]
+        {
+            const auto selected = getFilteredResources();
+            menu()->trigger(action::OpenInNewTabAction, {selected});
+        });
 }
 
 QnResourceBrowserWidget::~QnResourceBrowserWidget()
@@ -907,7 +923,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged()
     if (auto synchronizer = layoutSynchronizer(layout, false))
         synchronizer->disableUpdates();
 
-    ui->searchTreeWidget->setModel(nullptr);
+    ui->searchTreeWidget->setModel(nullptr, true);
     setQuery({});
     killSearchTimer();
 }
@@ -963,7 +979,7 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index)
         layoutSynchronizer(layout, true); /* Just initialize the synchronizer. */
         auto model = layoutModel(layout, true);
 
-        ui->searchTreeWidget->setModel(model);
+        ui->searchTreeWidget->setModel(model, true);
         ui->searchTreeWidget->expandAll();
 
         /* View re-creates selection model for each model that is supplied to it,

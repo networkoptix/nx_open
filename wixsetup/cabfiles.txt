@@ -90,6 +90,7 @@ Server cab files:
         Qt5WebSockets
         acs_stream_source_mr
         VmaxProxyPid
+        nx_update
     11: srvexec.cab: Server Executables
         mediaserver.exe
 

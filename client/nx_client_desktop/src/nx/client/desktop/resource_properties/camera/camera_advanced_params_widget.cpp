@@ -248,7 +248,8 @@ QnMediaServerConnectionPtr CameraAdvancedParamsWidget::getServerConnection() con
 }
 
 
-void CameraAdvancedParamsWidget::at_advancedParamChanged(const QString &id, const QString &value) {
+void CameraAdvancedParamsWidget::at_advancedParamChanged(const QString& id, const QString& value)
+{
     /* Check that we are in correct state. */
     if (state() != State::Init)
         return;
@@ -319,15 +320,23 @@ void CameraAdvancedParamsWidget::at_advancedParam_saved(int status, const QnCame
     }
 
     /* Update stored parameters. */
+    bool needResync = false;
     for (const QnCameraAdvancedParamValue &value: params) {
         m_loadedValues[value.id] = m_currentValues[value.id];
         m_currentValues.remove(value.id);
+
+        const auto parameters = m_advancedParamsReader->params(m_camera);
+        if (parameters.getParameterById(value.id).resync)
+            needResync = true;
     }
 
     /* Update state. */
     setState(State::Init);
-
     emit hasChangesChanged();
+
+    /* Reload all values if one of parameters requires resync. */
+    if (needResync)
+        loadValues();
 }
 
 CameraAdvancedParamsWidget::State CameraAdvancedParamsWidget::state() const {

@@ -4,6 +4,8 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QScopedPointer>
 
+class QIODevice;
+
 namespace nx {
 namespace utils {
 
@@ -29,6 +31,7 @@ public:
 
     void addData(const char *data, int length);
     void addData(const QByteArray &data);
+    bool addData(QIODevice* device);
 
     void reset();
 

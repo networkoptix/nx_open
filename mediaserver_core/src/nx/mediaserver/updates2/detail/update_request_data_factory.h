@@ -3,7 +3,6 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/update/info/update_request_data.h>
 
-
 namespace nx {
 namespace mediaserver {
 namespace updates2 {

@@ -22,7 +22,7 @@ public:
         const UpdateFileRequestData& updateFileRequestData,
         FileData* outFileData) const override;
     virtual ResultCode latestUpdate(
-        const UpdateRequestData& updateRequestData, 
+        const UpdateRequestData& updateRequestData,
         QnSoftwareVersion* outSoftwareVersion) const override;
     virtual QList<QString> alternativeServers() const override;
     virtual QByteArray toByteArray() const override;

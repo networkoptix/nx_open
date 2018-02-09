@@ -115,8 +115,9 @@
     "cantActivatePrefix": "ไม่สามารถเปิดใช้งานบัญชีของคุณได้",
     "cantSendConfirmationPrefix": "ไม่สามารถส่งอีเมลยืนยัน",
     "cloudInvalidResponse": "คลาวด์ DB การส่งคืนการตอบสนองที่ไม่คาดคิด",
-    "notAuthorized": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "notAuthorized": "รหัสผ่านผิด",
     "wrongParameters": "พารามิเตอร์บางอย่างในแบบฟอร์มไม่ถูกต้อง",
+    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "บัญชีถูกเปิดใช้งานหรือรหัสยืนยันไม่ถูกต้อง",
     "wrongCodeRestore": "ใช้รหัสยืนยันแล้วหรือไม่ถูกต้อง",
     "forbidden": "การเข้าถึงถูกปฏิเสธ คุณไม่มีสิทธิ์ดำเนินการนี้.",
@@ -157,6 +158,7 @@
     "unavailable": "ระบบไม่สามารถเข้าถึงได้",
     "offline": "ระบบออฟไลน์",
     "openClient": "เปิดใน {{VMS_NAME}}",
+    "openClientNoSystem": "เปิด {{VMS_NAME}}",
     "confirmRenameTitle": "ชื่อระบบ",
     "confirmRenameAction": "บันทึก",
     "successRename": "ระบบเปลี่ยนชื่อ",
@@ -200,19 +202,14 @@
         "label": "Mac OS",
         "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
-      },
       "linux": {
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
         "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      "macos": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -221,6 +218,11 @@
       "android": {
         "label": "Android",
         "shortLabel": "Android"
+      },
+      "arm": {
+        "label": "ARM",
+        "shortLabel": "ARM",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms": {

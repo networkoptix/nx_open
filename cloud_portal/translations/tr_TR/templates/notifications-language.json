@@ -1,17 +1,20 @@
 {
   "activate_account": {
-    "emailSubject": "Hesabını onayla"
+    "emailSubject": "Hesabınızı Aktifleştirin"
   },
   "restore_password": {
-    "emailSubject": "Parolanı sıfırla"
+    "emailSubject": "Parolanızı sıfırlayın"
   },
   "system_invite": {
-    "emailSubject": "Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı"
+    "emailSubject": "{{message.sharer_name}} sizi {{PRODUCT_NAME}} e davet ediyor"
   },
   "system_shared": {
-    "emailSubject": "Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı"
+    "emailSubject": "{{message.sharer_name}} sizi {{PRODUCT_NAME}} e davet ediyor"
   },
   "review_version": {
     "emailSubject": "Sürüm {{message.id}} incelenmeye hazır"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
   }
 }

@@ -1,3 +1,6 @@
+set(customWebAdminPackageDirectory "" CACHE STRING
+    "Custom location of server-external package")
+
 macro(_set_version pkg version)
     set(_${pkg}_version ${version})
 endmacro()
@@ -49,17 +52,16 @@ function(nx_detect_package_versions)
 
     if(box STREQUAL "bananapi")
         _set_version(ffmpeg "3.1.1-bananapi")
-        _set_version(qt "5.6.1")
+        _set_version(qt "5.6.1-1")
         _set_version(openssl "1.0.0j")
     endif()
 
     if(box STREQUAL "rpi")
         _set_version(qt "5.6.1")
-        _set_version(openssl "1.0.0j")
+        _set_version(openssl "1.0.1t-deb8")
     endif()
 
     if(box STREQUAL "edge1")
-        _set_version(ffmpeg "3.1.1")
         _set_version(qt "5.6.3")
         _set_version(openssl "1.0.1f")
     endif()
@@ -123,11 +125,6 @@ function(nx_get_dependencies)
 
     nx_rdep_add_package(any/boost)
 
-    if(haveServer OR haveDesktopClient OR haveTests)
-        nx_rdep_add_package(any/qtservice)
-        nx_rdep_add_package(any/qtsinglecoreapplication)
-    endif()
-
     nx_rdep_add_package(any/detection_plugin_interface)
 
     nx_rdep_add_package(openssl)
@@ -160,9 +157,9 @@ function(nx_get_dependencies)
 
     if(WINDOWS)
         nx_rdep_add_package(directx)
-        nx_rdep_add_package("vcredist-2015" PATH_VARIABLE vcredist_directory)
+        nx_rdep_add_package(vcredist-2015 PATH_VARIABLE vcredist_directory)
         set(vcredist_directory ${vcredist_directory} PARENT_SCOPE)
-        nx_rdep_add_package("vmaxproxy-2.1")
+        nx_rdep_add_package(vmaxproxy-2.1)
         nx_rdep_add_package(windows/wix-3.11 PATH_VARIABLE wix_directory)
         set(wix_directory ${wix_directory} PARENT_SCOPE)
         nx_rdep_add_package(windows/signtool PATH_VARIABLE signtool_directory)
@@ -170,18 +167,13 @@ function(nx_get_dependencies)
     endif()
 
     if(box STREQUAL "edge1")
-        nx_rdep_add_package(cpro-1.0.0)
+        nx_rdep_add_package(cpro-1.0.0-1)
         nx_rdep_add_package(gdb)
     endif()
 
     if(haveDesktopClient)
-        nx_rdep_add_package(any/qtsingleapplication)
         nx_rdep_add_package(any/help-${customization}-3.1 PATH_VARIABLE help_directory)
         set(help_directory ${help_directory} PARENT_SCOPE)
-    endif()
-
-    if(haveMobileClient)
-        nx_rdep_add_package(any/qtsingleguiapplication)
     endif()
 
     if(haveDesktopClient OR haveMobileClient)
@@ -208,7 +200,9 @@ function(nx_get_dependencies)
         nx_rdep_add_package(any/apidoctool PATH_VARIABLE APIDOCTOOL_PATH)
         set(APIDOCTOOL_PATH ${APIDOCTOOL_PATH} PARENT_SCOPE)
 
-        if(server-external_version)
+        if(customWebAdminPackageDirectory)
+            nx_copy_package(${customWebAdminPackageDirectory})
+        elseif(server-external_version)
             nx_rdep_add_package(any/server-external)
         else()
             nx_rdep_add_package(any/server-external-${branch} OPTIONAL

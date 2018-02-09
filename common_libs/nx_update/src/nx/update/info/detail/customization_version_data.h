@@ -21,7 +21,7 @@ struct CustomizationVersionData
     CustomizationVersionData() = default;
 };
 
-inline bool operator < (const CustomizationVersionData& lhs, const CustomizationVersionData& rhs)
+inline bool operator<(const CustomizationVersionData& lhs, const CustomizationVersionData& rhs)
 {
     return lhs.name < rhs.name
         ? true

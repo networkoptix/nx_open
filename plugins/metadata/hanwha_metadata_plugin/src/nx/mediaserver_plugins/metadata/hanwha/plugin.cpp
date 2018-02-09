@@ -1,5 +1,3 @@
-﻿#if defined(ENABLE_HANWHA)
-
 #include "plugin.h"
 
 #include <QtCore/QString>
@@ -62,7 +60,7 @@ void Plugin::SharedResources::setResourceAccess(
 
 Plugin::Plugin()
 {
-    QFile f(":manifest.json");
+    QFile f(":/hanwha/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
     m_driverManifest = QJson::deserialized<Hanwha::DriverManifest>(m_manifest);
@@ -70,10 +68,10 @@ Plugin::Plugin()
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataPlugin)
+    if (interfaceId == IID_Plugin)
     {
         addRef();
-        return static_cast<AbstractMetadataPlugin*>(this);
+        return static_cast<Plugin*>(this);
     }
 
     if (interfaceId == nxpl::IID_Plugin3)
@@ -122,26 +120,26 @@ void Plugin::setLocale(const char* /*locale*/)
     // Do nothing.
 }
 
-AbstractMetadataManager* Plugin::managerForResource(
-    const ResourceInfo& resourceInfo,
+CameraManager* Plugin::obtainCameraManager(
+    const CameraInfo& cameraInfo,
     Error* outError)
 {
     *outError = Error::noError;
 
-    const QString vendor = QString(resourceInfo.vendor).toLower();
+    const QString vendor = QString(cameraInfo.vendor).toLower();
 
     if (!vendor.startsWith(kHanwhaTechwinVendor) && !vendor.startsWith(kSamsungTechwinVendor))
         return nullptr;
 
-    auto sharedRes = sharedResources(resourceInfo);
+    auto sharedRes = sharedResources(cameraInfo);
     auto sharedResourceGuard = makeScopeGuard(
-        [&sharedRes, &resourceInfo, this]()
+        [&sharedRes, &cameraInfo, this]()
         {
             if (sharedRes->managerCounter == 0)
-                m_sharedResources.remove(QString::fromUtf8(resourceInfo.sharedId));
+                m_sharedResources.remove(QString::fromUtf8(cameraInfo.sharedId));
         });
 
-    auto supportedEvents = fetchSupportedEvents(resourceInfo);
+    auto supportedEvents = fetchSupportedEvents(cameraInfo);
     if (!supportedEvents)
         return nullptr;
 
@@ -149,7 +147,7 @@ AbstractMetadataManager* Plugin::managerForResource(
     deviceManifest.supportedEventTypes = *supportedEvents;
 
     auto manager = new Manager(this);
-    manager->setResourceInfo(resourceInfo);
+    manager->setCameraInfo(cameraInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
 
@@ -158,28 +156,24 @@ AbstractMetadataManager* Plugin::managerForResource(
     return manager;
 }
 
-AbstractSerializer* Plugin::serializerForType(
-    const nxpl::NX_GUID& /*typeGuid*/,
-    Error* outError)
-{
-    *outError = Error::typeIsNotSupported;
-    return nullptr;
-}
-
 const char* Plugin::capabilitiesManifest(Error* error) const
 {
     *error = Error::noError;
     return m_manifest.constData();
 }
 
+void Plugin::setDeclaredSettings(const nxpl::Setting* settings, int count)
+{
+}
+
 boost::optional<QList<QnUuid>> Plugin::fetchSupportedEvents(
-    const ResourceInfo& resourceInfo)
+    const CameraInfo& cameraInfo)
 {
     using namespace nx::mediaserver_core::plugins;
 
-    auto sharedRes = sharedResources(resourceInfo);
+    auto sharedRes = sharedResources(cameraInfo);
 
-    const auto& cgiParameters = sharedRes->sharedContext->cgiParamiters();
+    const auto& cgiParameters = sharedRes->sharedContext->cgiParameters();
     if (!cgiParameters.diagnostics || !cgiParameters.value.isValid())
         return boost::none;
 
@@ -187,7 +181,7 @@ boost::optional<QList<QnUuid>> Plugin::fetchSupportedEvents(
     if (!eventStatuses || !eventStatuses->isSuccessful())
         return boost::none;
 
-    return eventsFromParameters(cgiParameters.value, eventStatuses.value, resourceInfo.channel);
+    return eventsFromParameters(cgiParameters.value, eventStatuses.value, cameraInfo.channel);
 }
 
 boost::optional<QList<QnUuid>> Plugin::eventsFromParameters(
@@ -299,22 +293,22 @@ void Plugin::managerIsAboutToBeDestroyed(const QString& sharedId)
 }
 
 std::shared_ptr<Plugin::SharedResources> Plugin::sharedResources(
-    const nx::sdk::ResourceInfo& resourceInfo)
+    const nx::sdk::CameraInfo& cameraInfo)
 {
-    const nx::utils::Url url(resourceInfo.url);
+    const nx::utils::Url url(cameraInfo.url);
 
     QAuthenticator auth;
-    auth.setUser(resourceInfo.login);
-    auth.setPassword(resourceInfo.password);
+    auth.setUser(cameraInfo.login);
+    auth.setPassword(cameraInfo.password);
 
     QnMutexLocker lock(&m_mutex);
-    auto sharedResourcesItr = m_sharedResources.find(resourceInfo.sharedId);
+    auto sharedResourcesItr = m_sharedResources.find(cameraInfo.sharedId);
     if (sharedResourcesItr == m_sharedResources.cend())
     {
         sharedResourcesItr = m_sharedResources.insert(
-            resourceInfo.sharedId,
+            cameraInfo.sharedId,
             std::make_shared<SharedResources>(
-                resourceInfo.sharedId,
+                cameraInfo.sharedId,
                 driverManifest(),
                 url,
                 auth));
@@ -340,6 +334,4 @@ NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
 }
 
 } // extern "C"
-
-#endif // defined(ENABLE_HANWHA)
 

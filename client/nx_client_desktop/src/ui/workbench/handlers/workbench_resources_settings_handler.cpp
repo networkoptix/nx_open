@@ -89,21 +89,21 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
             m_cameraSettingsDialog->setCurrentPage(tab);
         }
     }
-    else
+
+    QnNonModalDialogConstructor<LegacyCameraSettingsDialog> dialogConstructor(
+        m_legacyCameraSettingsDialog,
+        parent);
+    dialogConstructor.disableAutoFocus();
+
+    if (!m_legacyCameraSettingsDialog->setCameras(cameras))
+        return;
+
+    if (parameters.hasArgument(Qn::FocusTabRole))
     {
-        QnNonModalDialogConstructor<LegacyCameraSettingsDialog> dialogConstructor(
-            m_legacyCameraSettingsDialog, parent);
-        dialogConstructor.disableAutoFocus();
-
-        if (!m_legacyCameraSettingsDialog->setCameras(cameras))
-            return;
-
-        if (parameters.hasArgument(Qn::FocusTabRole))
-        {
-            const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
-            m_legacyCameraSettingsDialog->setCurrentTab(static_cast<CameraSettingsTab>(tab));
-        }
+        const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
+        m_legacyCameraSettingsDialog->setCurrentTab(static_cast<CameraSettingsTab>(tab));
     }
+
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()

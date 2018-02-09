@@ -35,6 +35,7 @@ add_library(tegra_video SHARED
     samples/04_video_dec_gie/tegra_video_ini.h
     samples/04_video_dec_gie/tegra_video.h
     samples/04_video_dec_gie/tegra_video.cpp
+    samples/04_video_dec_gie/tegra_video_stub.h
     samples/04_video_dec_gie/tegra_video_stub.cpp
     samples/04_video_dec_gie/rects_serialization.h
     samples/04_video_dec_gie/rects_serialization.cpp
@@ -70,7 +71,9 @@ if(withTests)
         samples/04_video_dec_gie/rects_serialization.h
         samples/04_video_dec_gie/rects_serialization.cpp
         samples/04_video_dec_gie/unit_tests/rects_serialization_ut.cpp
-        samples/04_video_dec_gie/unit_tests/tegra_video_stub_ut.cpp
+        samples/04_video_dec_gie/tegra_video_stub.h
+		samples/04_video_dec_gie/tegra_video_stub.cpp
+		samples/04_video_dec_gie/unit_tests/tegra_video_stub_ut.cpp
     )
     target_link_libraries(tegra_video_ut nx_kit tegra_video)
 

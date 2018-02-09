@@ -1,0 +1,52 @@
+<div class="container">
+    <div class="row">
+
+        <div class="col-md-4 col-md-push-8">
+            <system-info></system-info>
+        </div>
+        <div class="col-md-8 col-md-pull-4">
+            <tabset>
+                <tab heading="{{L.info.tabs.healthMonitoring}}" ng-if="user.hasAllResources">
+                    <br>
+                    <ng-include src="Config.viewsDir + 'components/health.html'"></ng-include>
+                </tab>
+                <tab heading="{{L.info.tabs.storage}}" ng-if="user.isAdmin">
+                    <br>
+                    <p>Below is a list of storage locations available on this server</p>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>
+                                URL
+                            </th>
+                            <th >
+                                Space
+                            </th>
+                            <th width="54">
+                                &nbsp;
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="storage in storages">
+                            <td class="storage-url">{{storage.url}}</td>
+                            <td class="storage-total-space">{{formatSpace(storage.totalSpace)}}</td>
+                            <td class="storage-indicators">
+                                <icon for="storage.isExternal" on-true="globe" on-false="hdd" title-true="External" title-false="Internal" />
+                                <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"/>
+                                <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"/>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </tab>
+                <tab heading="{{L.info.tabs.log}}" ng-if="user.isAdmin">
+                    <br>
+                    <iframe class="log-frame" name="log-frame" ng-src="{{logUrl + '?lines=1000'}}"></iframe>
+                    <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary">Refresh</a>
+                    <a ng-if="!mode.liteClient" ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default">Open in new window</a>
+                </tab>
+            </tabset>
+        </div>
+    </div>
+</div>

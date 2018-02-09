@@ -32,6 +32,7 @@
 #include <media_server/media_server_module.h>
 #include <nx/utils/cryptographic_hash.h>
 #include "archive_integrity_watcher.h"
+#include <nx/mediaserver/resource/camera.h>
 
 namespace {
 static const int kMotionPrebufferSize = 8;
@@ -61,7 +62,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_queuedSize(0),
     m_lastMediaTime(AV_NOPTS_VALUE),
     m_diskErrorWarned(false),
-    m_rebuildBlocked(false)
+    m_rebuildBlocked(false),
+    m_canDropPackets(false)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
@@ -104,7 +106,7 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
 
 void QnServerStreamRecorder::at_camera_propertyChanged(const QnResourcePtr &, const QString & key)
 {
-    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(m_device.data());
+    const auto camera = dynamic_cast<nx::mediaserver::resource::Camera*>(m_device.data());
     m_usePrimaryRecorder = (camera->getProperty(QnMediaResource::dontRecordPrimaryStreamKey()).toInt() == 0);
     m_useSecondaryRecorder = (camera->getProperty(QnMediaResource::dontRecordSecondaryStreamKey()).toInt() == 0);
 
@@ -150,7 +152,8 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
     if (!isRunning())
         return;
 
-    cleanupQueueIfOverflow();
+    if(m_canDropPackets && isQueueFull())
+        cleanupQueue();
     updateRebuildState(); //< pause/resume archive rebuild
 
     const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(nonConstData.get());
@@ -200,24 +203,36 @@ void QnServerStreamRecorder::resumeRebuildIfLowDataNoLock()
     }
 }
 
-bool QnServerStreamRecorder::cleanupQueueIfOverflow()
+bool QnServerStreamRecorder::isQueueFull() const
 {
-    {
-        QnMutexLocker lock( &m_queueSizeMutex );
+    QnMutexLocker lock(&m_queueSizeMutex);
 
-        bool needCleanup = m_dataQueue.size() > m_maxRecordQueueSizeElements;
-        if (!needCleanup)
-        {
-            // check for global overflow bytes between all recorders
-            const qint64 totalAllowedBytes = m_maxRecordQueueSizeBytes * m_totalRecorders;
-            if (totalAllowedBytes > m_totalQueueSize)
-                return false; //< no need to cleanup
+    if (m_dataQueue.size() > m_maxRecordQueueSizeElements)
+        return true;
 
-            if (m_queuedSize < m_maxRecordQueueSizeBytes)
-                return false; //< no need to cleanup
-        }
-    }
+    // check for global overflow bytes between all recorders
+    const qint64 totalAllowedBytes = m_maxRecordQueueSizeBytes * m_totalRecorders;
+    if (totalAllowedBytes > m_totalQueueSize)
+        return false; //< no need to cleanup
 
+    if (m_queuedSize < m_maxRecordQueueSizeBytes)
+        return false; //< no need to cleanup
+
+    return true;
+}
+
+void QnServerStreamRecorder::setCanDropPackets(bool canDrop)
+{
+    m_canDropPackets = canDrop;
+}
+
+bool QnServerStreamRecorder::canDropPackets() const
+{
+    return m_canDropPackets;
+}
+
+bool QnServerStreamRecorder::cleanupQueue()
+{
     if (!m_recordingContextVector.empty())
     {
         size_t slowestStorageIndex;
@@ -321,7 +336,7 @@ int QnServerStreamRecorder::getBufferSize() const
 
 void QnServerStreamRecorder::updateStreamParams()
 {
-    const QnPhysicalCameraResource* camera = dynamic_cast<const QnPhysicalCameraResource*>(m_device.data());
+    const nx::mediaserver::resource::Camera* camera = dynamic_cast<const nx::mediaserver::resource::Camera*>(m_device.data());
     if (m_mediaProvider)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
@@ -341,8 +356,7 @@ void QnServerStreamRecorder::updateStreamParams()
                 params.quality = Qn::QualityHighest;
                 params.bitrateKbps = 0;
             }
-            params.secondaryQuality = (camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
-            liveProvider->setParams(params);
+            liveProvider->setPrimaryStreamParams(params);
         }
         liveProvider->setCameraControlDisabled(camera->isCameraControlDisabled());
     }
@@ -350,7 +364,7 @@ void QnServerStreamRecorder::updateStreamParams()
 
 bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 {
-    const QnSecurityCamResource* camera = static_cast<const QnPhysicalCameraResource*>(m_device.data());
+    const QnSecurityCamResource* camera = static_cast<const nx::mediaserver::resource::Camera*>(m_device.data());
     return recType == Qn::RT_MotionOnly ||
            (m_catalog == QnServer::HiQualityCatalog && recType == Qn::RT_MotionAndLowQuality && camera->hasDualStreaming2());
 }
@@ -485,20 +499,20 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
 
 int QnServerStreamRecorder::getFpsForValue(int fps)
 {
-    const QnPhysicalCameraResource* camera = dynamic_cast<const QnPhysicalCameraResource*>(m_device.data());
+    const nx::mediaserver::resource::Camera* camera = dynamic_cast<const nx::mediaserver::resource::Camera*>(m_device.data());
     if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
     {
         if (m_catalog == QnServer::HiQualityCatalog)
             return fps ? qMin(fps, camera->getMaxFps()-2) : camera->getMaxFps()-2;
         else
-            return fps ? qMax(2, qMin(camera->desiredSecondStreamFps(), camera->getMaxFps()-fps)) : 2;
+            return QnLiveStreamParams::kFpsNotInitialized;
     }
     else
     {
         if (m_catalog == QnServer::HiQualityCatalog)
             return fps ? fps : camera->getMaxFps();
         else
-            return camera->desiredSecondStreamFps();
+            return QnLiveStreamParams::kFpsNotInitialized;
     }
 }
 
@@ -876,6 +890,6 @@ void QnServerStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, in
 
 bool QnServerStreamRecorder::needConfigureProvider() const
 {
-    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(m_device.data());
+    const nx::mediaserver::resource::Camera* camera = dynamic_cast<nx::mediaserver::resource::Camera*>(m_device.data());
     return !camera->isScheduleDisabled();
 }
