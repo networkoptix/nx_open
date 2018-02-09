@@ -56,10 +56,10 @@ QString objectDescription(const std::vector<common::metadata::Attribute>& attrib
     return result;
 }
 
-QnUuid findItemForObject(const QnLayoutResourcePtr& layout, const QnUuid& objectId)
+QnLayoutItemData findItemForObject(const QnLayoutResourcePtr& layout, const QnUuid& objectId)
 {
     if (objectId.isNull())
-        return QnUuid();
+        return {};
 
     for (const auto& item: layout->getItems())
     {
@@ -67,10 +67,10 @@ QnUuid findItemForObject(const QnLayoutResourcePtr& layout, const QnUuid& object
             item.uuid, Qn::ItemAnalyticsModeRegionIdRole).value<QnUuid>();
 
         if (id == objectId)
-            return item.uuid;
+            return item;
     }
 
-    return QnUuid();
+    return {};
 }
 
 QRectF interpolatedRectangle(
@@ -150,44 +150,55 @@ WidgetAnalyticsController::Private::Private(QnCommonModule* commonModule):
 
 void WidgetAnalyticsController::Private::at_areaClicked(const QnUuid& areaId)
 {
+    auto item = findItemForObject(layoutResource(), areaId);
+
     auto it = objectInfoById.find(areaId);
     if (it == objectInfoById.end())
     {
-        const auto& itemId = findItemForObject(layoutResource(), areaId);
-        if (!itemId.isNull())
+        if (item.uuid.isNull())
             return;
 
-        updateObjectInfoFromLayoutItem(itemId);
+        updateObjectInfoFromLayoutItem(item.uuid);
     }
 
     auto& object = *it;
 
-    if (!object.zoomWindowItemUuid.isNull())
-        return;
+    bool newItem = item.uuid.isNull();
 
-    const auto layout = layoutResource();
+    if (newItem)
+    {
+        if (!object.zoomWindowItemUuid.isNull())
+        {
+            item.uuid = object.zoomWindowItemUuid;
+        }
+        else
+        {
+            item.uuid = QnUuid::createUuid();
+            object.zoomWindowItemUuid = item.uuid;
+        }
+        item.flags = Qn::PendingGeometryAdjustment;
+        item.resource.id = mediaResourceWidget->resource()->toResourcePtr()->getId();
+        item.zoomTargetUuid = mediaResourceWidget->resource()->toResourcePtr()->getId();
+        const auto targetPoint = mediaResourceWidget->item()->combinedGeometry().bottomRight();
+        item.combinedGeometry = QRectF(targetPoint, targetPoint);
 
-    QnLayoutItemData item;
-    item.uuid = QnUuid::createUuid();
-    object.zoomWindowItemUuid = item.uuid;
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            item.uuid, Qn::ItemAnalyticsModeRegionIdRole, areaId);
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            item.uuid, Qn::ItemZoomWindowRectangleVisibleRole, false);
+    }
 
-    item.flags = Qn::PendingGeometryAdjustment;
-    const auto targetPoint = mediaResourceWidget->item()->combinedGeometry().bottomRight();
-    item.combinedGeometry = QRectF(targetPoint, targetPoint);
-    item.resource.id = mediaResourceWidget->resource()->toResourcePtr()->getId();
     item.zoomRect = zoomWindowRectangle(object.rectangle);
-    item.zoomTargetUuid = mediaResourceWidget->resource()->toResourcePtr()->getId();
 
     qnResourceRuntimeDataManager->setLayoutItemData(
         item.uuid, Qn::ItemFrameDistinctionColorRole, object.color);
     qnResourceRuntimeDataManager->setLayoutItemData(
-        item.uuid, Qn::ItemZoomWindowRectangleVisibleRole, false);
-    qnResourceRuntimeDataManager->setLayoutItemData(
-        item.uuid, Qn::ItemAnalyticsModeRegionIdRole, areaId);
-    qnResourceRuntimeDataManager->setLayoutItemData(
         item.uuid, Qn::ItemAnalyticsModeSourceRegionRole, object.rectangle);
 
-    layout->addItem(item);
+    if (newItem)
+        layoutResource()->addItem(item);
+    else
+        layoutResource()->updateItem(item);
 }
 
 void WidgetAnalyticsController::Private::findExistingItems()
@@ -468,7 +479,7 @@ void WidgetAnalyticsController::setAreaHighlightOverlayWidget(AreaHighlightOverl
 
     d->areaHighlightWidget = widget;
 
-    if (widget)
+    if (widget && d->zoomWindowObjectId.isNull())
     {
         QObject::connect(widget, &AreaHighlightOverlayWidget::areaClicked, d.data(),
             &Private::at_areaClicked);
