@@ -125,7 +125,7 @@ public:
 
 
     template<class Resource>
-    static QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource);
+    static QnSharedResourcePointer<Resource> toSharedPointer(const Resource *resource);
 
     QnResourcePtr getParentResource() const;
 
@@ -376,7 +376,7 @@ private:
 };
 
 template<class Resource>
-QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource)
+QnSharedResourcePointer<Resource> toSharedPointer(const Resource *resource)
 {
     if (!resource)
         return QnSharedResourcePointer<Resource>();
@@ -384,7 +384,7 @@ QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource)
 }
 
 template<class Resource>
-QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource)
+QnSharedResourcePointer<Resource> QnResource::toSharedPointer(const Resource *resource)
 {
     using ::toSharedPointer; /* Let ADL kick in. */
     return toSharedPointer(resource);

@@ -577,7 +577,7 @@ private:
         bool active,
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
-    QnAbstractPtzController* createSpecialPtzController();
+    QnAbstractPtzController* createSpecialPtzController() const;
     bool trustMaxFPS();
     CameraDiagnostics::Result fetchOnvifCapabilities(
         DeviceSoapWrapper* const soapWrapper,
