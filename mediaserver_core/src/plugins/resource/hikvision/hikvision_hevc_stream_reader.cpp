@@ -59,7 +59,9 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
 
     auto channelCapabilities = optionalChannelCapabilities.get();
     auto resolutionList = m_hikvisionResource->primaryVideoCapabilities().resolutions;
-    auto resolution = chooseResolution(channelCapabilities, liveStreamParameters.resolution);
+    QSize resolution = liveStreamParameters.resolution;
+    if (resolution.isEmpty())
+        resolution = chooseResolution(channelCapabilities, liveStreamParameters.resolution);
     auto codec = chooseCodec(
         channelCapabilities,
         QnAvCodecHelper::codecIdFromString(liveStreamParameters.codec));
