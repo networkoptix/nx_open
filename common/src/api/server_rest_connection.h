@@ -21,6 +21,7 @@
 #include <api/model/time_reply.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <api/model/wearable_camera_reply.h>
+#include <api/model/manual_camera_seach_reply.h>
 
 /**
  * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -312,12 +313,39 @@ public:
         Result<nx::analytics::storage::LookupResult>::type callback,
         QThread* targetThread = nullptr);
 
+    Handle addCamera(
+        const QnManualResourceSearchList& cameras,
+        const QString& userName,
+        const QString& password,
+        GetCallback callback,
+        QThread* thread = nullptr);
+
+    Handle searchCameraStart(
+        const QString& startAddress,
+        const QString& endAddress,
+        const QString& userName,
+        const QString& password,
+        int port,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle searchCameraStatus(
+        const QnUuid& processUuid,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle searchCameraStop(
+        const QnUuid& processUuid,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
     /**
     * Cancel running request by known requestID. If request is canceled, callback isn't called.
     * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.
     * If QnServerRestConnection is destroyed all running requests are canceled, no callbacks called.
     */
     void cancelRequest(const Handle& requestId);
+
 
 private slots:
     void onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient);

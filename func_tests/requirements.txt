@@ -14,4 +14,4 @@ hachoir-parser
 hachoir-metadata
 pytest-instafail
 pyyaml
-pathlib2
+pathlib2==2.3.0

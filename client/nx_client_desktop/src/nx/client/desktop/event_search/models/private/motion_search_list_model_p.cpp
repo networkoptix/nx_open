@@ -4,6 +4,9 @@
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <ui/workbench/workbench_navigator.h>
 
+#include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/event/event_fwd.h>
 
 namespace nx {
@@ -69,6 +72,19 @@ int MotionSearchListModel::Private::count() const
 const QnTimePeriod& MotionSearchListModel::Private::period(int index) const
 {
     return *(m_data.crbegin() + index); //< Reverse!
+}
+
+QSharedPointer<QMenu> MotionSearchListModel::Private::contextMenu(int index) const
+{
+    QSharedPointer<QMenu> menu(new QMenu());
+    menu->addAction(tr("Bookmark it..."),
+        [this, camera = m_camera, period = period(index)]()
+        {
+            q->menu()->triggerForced(ui::action::AddCameraBookmarkAction,
+                ui::action::Parameters(camera).withArgument(Qn::TimePeriodRole, period));
+        });
+
+    return menu;
 }
 
 void MotionSearchListModel::Private::reset()

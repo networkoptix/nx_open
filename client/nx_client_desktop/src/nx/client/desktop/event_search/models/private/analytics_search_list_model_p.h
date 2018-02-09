@@ -40,6 +40,9 @@ public:
     QRectF filterRect() const;
     void setFilterRect(const QRectF& relativeRect);
 
+    QString filterText() const;
+    void setFilterText(const QString& value);
+
     virtual void clear() override;
 
     bool defaultAction(int index) const;
@@ -75,6 +78,7 @@ private:
 private:
     AnalyticsSearchListModel* const q = nullptr;
     QRectF m_filterRect;
+    QString m_filterText;
     const QScopedPointer<QTimer> m_updateTimer;
     const QScopedPointer<QTimer> m_dataChangedTimer;
     QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.

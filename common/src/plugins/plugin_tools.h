@@ -56,7 +56,7 @@ namespace nxpt
 
         operator bool() const
         {
-            return m_ptr;
+            return m_ptr != nullptr;
         }
 
         //!Returns protected pointer without releasing it

@@ -68,6 +68,9 @@ QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
         case Qn::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(d->camera());
 
+        case Qn::ContextMenuRole:
+            return QVariant::fromValue(d->contextMenu(index.row()));
+
         case Qn::DescriptionTextRole:
         {
             const auto& period = d->period(index.row());

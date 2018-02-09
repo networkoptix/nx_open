@@ -31,11 +31,15 @@ public:
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
 
-    QString textFilter() const;
-    void setTextFilter(const QString& value);
+    QString clientsideTextFilter() const;
+    void setClientsideTextFilter(const QString& value);
 
     QnTimePeriod selectedTimePeriod() const;
     void setSelectedTimePeriod(const QnTimePeriod& value);
+
+    bool isConstrained() const;
+
+    int relevantCount() const;
 
 private:
     AbstractAsyncSearchListModel* const m_sourceModel = nullptr;

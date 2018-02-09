@@ -63,7 +63,7 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
             return d->priority(index.row());
 
         case Qn::NotificationLevelRole:
-            return int(QnNotificationLevel::valueOf(d->message(index.row())));
+            return QVariant::fromValue(QnNotificationLevel::valueOf(d->message(index.row())));
 
         case Qn::TimeoutRole:
             return d->locked(index.row()) ? -1 : static_cast<qint64>(kDisplayTimeout.count());

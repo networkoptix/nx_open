@@ -495,10 +495,12 @@ TEST_F(SocketUdtNew, simpleTest)
         ASSERT_NE(nullptr, acceptedSocket);
 
         std::array<char, 128> testBuf;
-        ASSERT_EQ((int)testBuf.size(), m_clientSock->send(testBuf.data(), testBuf.size()));
+        ASSERT_EQ((int)testBuf.size(), m_clientSock->send(testBuf.data(), testBuf.size()))
+            << SystemError::getLastOSErrorText().toStdString();
 
         std::array<char, testBuf.size()> readBuf;
-        ASSERT_EQ((int)readBuf.size(), acceptedSocket->recv(readBuf.data(), readBuf.size(), 0));
+        ASSERT_EQ((int)readBuf.size(), acceptedSocket->recv(readBuf.data(), readBuf.size(), 0))
+            << SystemError::getLastOSErrorText().toStdString();
 
         closeConnection();
     }
