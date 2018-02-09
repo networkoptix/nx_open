@@ -10,6 +10,8 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+class EventTile;
+
 class EventPanel:
     public QWidget,
     public QnWorkbenchContextAware
@@ -22,6 +24,9 @@ public:
     explicit EventPanel(QnWorkbenchContext* context, QWidget* parent = nullptr);
 
     virtual ~EventPanel() override;
+
+signals:
+    void tileHovered(const QModelIndex& index, const EventTile* tile);
 
 private:
     class Private;

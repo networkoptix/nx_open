@@ -4,6 +4,9 @@
 
 #include <deque>
 
+#include <QtCore/QSharedPointer>
+#include <QtWidgets/QMenu>
+
 #include <camera/camera_data_manager.h>
 #include <recording/time_period_list.h>
 
@@ -24,6 +27,8 @@ public:
 
     int count() const;
     const QnTimePeriod& period(int index) const;
+
+    QSharedPointer<QMenu> contextMenu(int index) const;
 
     bool canFetchMore() const;
     void fetchMore();

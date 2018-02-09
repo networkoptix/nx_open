@@ -72,9 +72,16 @@ MotionSearchWidget::~MotionSearchWidget()
 
 void MotionSearchWidget::setMotionSearchEnabled(bool value)
 {
-    setPlaceholderText(value
-        ? tr("No motion")
-        : tr("Motion search is turned off"));
+    if (value)
+        setPlaceholderTexts(tr("No motion"), tr("No motion detected"));
+    else
+        setPlaceholderTexts(tr("Motion search is turned off"), tr("Motion search is turned off"));
+}
+
+bool MotionSearchWidget::isConstrained() const
+{
+    const auto period = m_filterModel->selectedTimePeriod();
+    return period.startTimeMs > 0 || !period.isInfinite();
 }
 
 QnVirtualCameraResourcePtr MotionSearchWidget::camera() const

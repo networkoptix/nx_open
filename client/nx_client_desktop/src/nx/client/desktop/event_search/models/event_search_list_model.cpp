@@ -21,6 +21,12 @@ void EventSearchListModel::setSelectedEventType(vms::event::EventType value)
     d->setSelectedEventType(value);
 }
 
+bool EventSearchListModel::isConstrained() const
+{
+    return selectedEventType() != vms::event::undefinedEvent
+        || base_type::isConstrained();
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx
