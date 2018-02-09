@@ -1,9 +1,5 @@
 #include "resource_pool.h"
 
-#include <algorithm>
-
-#include <QtCore/QMetaObject>
-
 #include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/layout_resource.h>
@@ -14,7 +10,6 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
 
-#include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 
 #ifdef QN_RESOURCE_POOL_DEBUG
@@ -108,17 +103,11 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
 
     QMap<QnUuid, QnResourcePtr> newResources; // sort by id
 
-    for (const QnResourcePtr &resource: resources)
+    for (const QnResourcePtr& resource: resources)
     {
+        NX_ASSERT(!resource->getId().isNull(), "Got resource with empty id.");
         if (resource->getId().isNull())
-        {
-            // ignore invalid resource in release mode
-            qWarning() << "Got resource with empty ID. ignoring."
-                       << "type=" << resource->getTypeId().toString()
-                       << "name=" << resource->getName()
-                       << "url=" << resource->getUrl();
             continue;
-        }
 
         if (!flags.testFlag(UseIncompatibleServerPool))
         {
@@ -289,7 +278,7 @@ QnResourcePtr QnResourcePool::getResourceById(const QnUuid &id) const {
     if( resIter != m_resources.end() )
         return resIter.value();
 
-    return QnResourcePtr(NULL);
+    return QnResourcePtr();
 }
 
 QnSecurityCamResourceList QnResourcePool::getResourcesBySharedId(const QString& sharedId) const

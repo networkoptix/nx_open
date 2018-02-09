@@ -7,8 +7,8 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/resource.h>
 
+#include <common/common_globals.h>
 #include <common/common_module_aware.h>
 
 #include <utils/common/connective.h>

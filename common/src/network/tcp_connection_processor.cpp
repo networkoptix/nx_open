@@ -17,7 +17,10 @@
 #ifndef Q_OS_WIN
 #   include <netinet/tcp.h>
 #endif
-#include "core/resource_management/resource_pool.h"
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
+
 #include <nx/network/http/custom_headers.h>
 #include "common/common_module.h"
 

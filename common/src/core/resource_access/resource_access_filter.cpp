@@ -1,6 +1,7 @@
 #include "resource_access_filter.h"
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
 
 namespace {
 
