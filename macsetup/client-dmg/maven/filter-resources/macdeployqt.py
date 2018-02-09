@@ -60,6 +60,7 @@ def prepare(binary, sbindir, tlibdir):
 
     shutil.copyfile(join(sbindir, 'desktop_client'), binary)
     shutil.copyfile(join(sbindir, 'applauncher'), applauncher_binary)
+    shutil.copyfile(join(sbindir, 'qt.conf'), join(tbindir, 'qt.conf'))
 
     os.chmod(binary, 0755)
     os.chmod(applauncher_binary, 0755)
