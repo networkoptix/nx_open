@@ -132,12 +132,14 @@ private:
 
     nx::cloud::discovery::PeerStatus fetchPeerStatus()
     {
-        nx::cloud::discovery::ModuleFinder moduleFinder(
-            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
-                .setEndpoint(httpEndpoint()).toUrl());
         nx::utils::promise<
             std::tuple<nx::cloud::discovery::ResultCode, std::vector<InstanceInformation>>
         > done;
+
+        nx::cloud::discovery::ModuleFinder moduleFinder(
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+                .setEndpoint(httpEndpoint()).toUrl());
+        moduleFinder.setResponseReadTimeout(nx::network::kNoTimeout);
         moduleFinder.fetchModules<InstanceInformation>(
             [&done](
                 nx::cloud::discovery::ResultCode resultCode,

@@ -209,7 +209,7 @@ int SearchEdit::selectedTagIndex() const
 void SearchEdit::updatePalette()
 {
     const auto backgroundColor = hasFocus()
-        ? ColorTheme::instance()->color(lit("dark2"))
+        ? colorTheme()->color("dark2")
         : QColor(Qt::transparent);
 
     const auto controlPalette = modifiedPalette(m_lineEdit->palette(), backgroundColor);
@@ -291,7 +291,7 @@ void SearchEdit::focusOutEvent(QFocusEvent* event)
 
     if (const auto completer = m_lineEdit->completer())
     {
-        connect(completer, QCompleterActivated, m_lineEdit, &QLineEdit::setText);
+        connect(completer, QnCompleterActivated, m_lineEdit, &QLineEdit::setText);
         connect(completer, SIGNAL(highlighted(QString)),
             m_lineEdit, SLOT(_q_completionHighlighted));
     }

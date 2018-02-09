@@ -1,4 +1,0 @@
-#!/bin/bash -e
-
-service ${deb.customization.company.name}-connection_mediator stop
-

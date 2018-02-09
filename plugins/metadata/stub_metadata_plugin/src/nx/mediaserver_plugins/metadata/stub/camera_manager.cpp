@@ -183,7 +183,7 @@ MetadataPacket* CameraManager::cookSomeObjects()
     *reinterpret_cast<int*>(objectId.bytes) = static_cast<int>(intPart);
     commonObject->setId(objectId);
 
-    commonObject->setBoundingBox(Rect(dt, dt, 0.25, 0.25));
+    commonObject->setBoundingBox(Rect((float) dt, (float) dt, 0.25F, 0.25F));
 
     auto objectPacket = new CommonObjectsMetadataPacket();
     objectPacket->setTimestampUsec(m_videoFrame->timestampUsec());

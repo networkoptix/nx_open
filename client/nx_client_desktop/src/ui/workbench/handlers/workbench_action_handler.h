@@ -55,7 +55,6 @@ class MimeData;
 
 namespace ui {
 
-class DeviceAdditionDialog;
 
 namespace experimental { class MainWindow; }
 
@@ -197,8 +196,6 @@ protected slots:
     void at_changeDefaultCameraPassword_triggered();
 
     void at_openNewScene_triggered();
-    void at_addDeviceManually_triggered();
-    void at_mainMenuAddDeviceManually_triggered();
 
 private:
     void showSingleCameraErrorMessage(const QString& explanation = QString());
@@ -248,7 +245,6 @@ private:
     QPointer<QnAuditLogDialog> m_auditLogDialog;
     QPointer<QnCameraListDialog> m_cameraListDialog;
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
-    QPointer<DeviceAdditionDialog> m_deviceAdditionDialog;
     QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
     QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
 
