@@ -198,7 +198,7 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
 
     prepareAdditionActionParams(action);
 
-    auto resources = resourcePool()->getResources<QnNetworkResource>(action->getResources());
+    auto resources = resourcePool()->getResourcesByIds<QnNetworkResource>(action->getResources());
 
     switch (action->actionType())
     {
@@ -206,7 +206,7 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
         case vms::event::showOnAlarmLayoutAction:
         {
             if (action->getParams().useSource)
-                resources << resourcePool()->getResources<QnNetworkResource>(action->getSourceResources());
+                resources << resourcePool()->getResourcesByIds<QnNetworkResource>(action->getSourceResources());
             break;
         }
 
