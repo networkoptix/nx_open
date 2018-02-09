@@ -133,7 +133,7 @@ Sharing works
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
     Click Button    ${SHARE BUTTON MODAL}
-    Check For Alert    New permissions saved
+    Check For Alert    ${NEW PERMISSIONS SAVED}
     Check User Permissions    ${random email}    Custom
     Remove User Permissions    ${random email}
     Close Browser
@@ -147,7 +147,7 @@ Edit permission works
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
     Click Button    ${SHARE BUTTON MODAL}
-    Check For Alert    New permissions saved
+    Check For Alert    ${NEW PERMISSIONS SAVED}
     Edit User Permissions In Systems    ${random email}    Viewer
     Check User Permissions    ${random email}    Viewer
     Edit User Permissions In Systems    ${random email}    Custom
@@ -164,7 +164,7 @@ Share with registered user - sends him notification
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${EMAIL NOPERM}
     Click Button    ${SHARE BUTTON MODAL}
-    Check For Alert    New permissions saved
+    Check For Alert    ${NEW PERMISSIONS SAVED}
     Check User Permissions    ${EMAIL NOPERM}    Custom
     Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
     ${email}    Wait For Email    recipient=${EMAIL NOPERM}    subject=TestFirstName TestLastName invites you to Nx Cloud    timeout=120

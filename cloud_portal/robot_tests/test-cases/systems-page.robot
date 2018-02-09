@@ -57,7 +57,7 @@ should update owner name in systems list, if it's changed
     Clear Element Text    ${ACCOUNT LAST NAME}
     Input Text    ${ACCOUNT LAST NAME}    newLastName
     Click Button    ${ACCOUNT SAVE}
-    Check For Alert    Your account is successfully saved
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Go To    ${url}/systems
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS USER}    newFirstName newLastName
@@ -69,5 +69,5 @@ should update owner name in systems list, if it's changed
     Clear Element Text    ${ACCOUNT LAST NAME}
     Input Text    ${ACCOUNT LAST NAME}    testLastName
     Click Button    ${ACCOUNT SAVE}
-    Check For Alert    Your account is successfully saved
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser

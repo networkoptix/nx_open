@@ -55,8 +55,8 @@ Outline Error
 
 Alert Error
     [arguments]    ${email}    ${pass}
-    Run Keyword If    "${email}" == "${good email unregistered}"    Check For Alert    Account does not exist
-    Run Keyword If    "${pass}" == "${bad password}"    Check For Alert    Wrong password
+    Run Keyword If    "${email}" == "${good email unregistered}"    Check For Alert    ${ACCOUNT DOES NOT EXIST}
+    Run Keyword If    "${pass}" == "${bad password}"    Check For Alert    ${WRONG PASSWORD}
 
 Check Email Outline
     ${class}    Get Element Attribute    ${EMAIL INPUT}/..    class

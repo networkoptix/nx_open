@@ -81,7 +81,7 @@ Edit User Permissions In Systems
     Click Element    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${permissions}']
     Wait Until Element Is Visible    ${EDIT PERMISSIONS SAVE}
     Click Element    ${EDIT PERMISSIONS SAVE}
-    Check For Alert    New permissions saved
+    Check For Alert    ${NEW PERMISSIONS SAVED}
 
 Check User Permissions
     [arguments]    ${user email}    ${permissions}
@@ -96,7 +96,7 @@ Remove User Permissions
     Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
     Wait Until Element Is Visible    ${DELETE USER BUTTON}
     Click Button    ${DELETE USER BUTTON}
-    Check For Alert    Permissions were removed from ${user email}
+    Check For Alert    ${PERMISSIONS WERE REMOVED FROM} ${user email}
 
 Check For Alert
     [arguments]    ${alert text}

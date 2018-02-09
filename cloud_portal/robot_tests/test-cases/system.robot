@@ -72,7 +72,7 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${EMAIL NOT OWNER}
     Click Button    ${SHARE BUTTON MODAL}
-    Check For Alert    New permissions saved
+    Check For Alert    ${NEW PERMISSIONS SAVED}
     Close Browser
 
 has Share button, visible for admin and owner
@@ -148,7 +148,7 @@ should display same user data as user provided during registration (stress to cy
     Click Element    ${SHARE PERMISSIONS ADMINISTRATOR}
     Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
     Click Button    ${SHARE BUTTON MODAL}
-    Check For Alert    New permissions saved
+    Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 
 #verify user was added with appropriate name
@@ -177,7 +177,7 @@ should display same user data as showed in user account (stress to cyrillic)
     Click Element    ${SHARE PERMISSIONS ADMINISTRATOR}
     Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
     Click Button    ${SHARE BUTTON MODAL}
-    Check For Alert    New permissions saved
+    Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 
     Log In    ${email}    ${password}
