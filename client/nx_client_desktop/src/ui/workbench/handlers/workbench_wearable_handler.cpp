@@ -26,6 +26,10 @@
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
+namespace {
+const int kMaxLinesInExtendedErrorMessage = 10;
+}
+
 class QnWearableSessionDelegate:
     public QObject,
     public QnSessionAwareDelegate
@@ -219,11 +223,18 @@ void QnWorkbenchWearableHandler::at_checkUploads_finished(
     if (!WearablePayload::allHaveStatus(uploads, WearablePayload::Valid))
     {
         QString extendedMessage;
+        int lines = 0;
         for (const WearablePayload& upload : uploads)
         {
             QString line = calculateExtendedErrorMessage(upload);
             if (!line.isEmpty())
+            {
                 extendedMessage += line + lit("\n");
+                lines++;
+            }
+
+            if (lines == kMaxLinesInExtendedErrorMessage)
+                break;
         }
 
         if (!WearablePayload::someHaveStatus(uploads, WearablePayload::Valid))
