@@ -25,6 +25,7 @@ QString AnalyticsSearchListModel::filterText() const
 {
     return d->filterText();
 }
+
 void AnalyticsSearchListModel::setFilterText(const QString& value)
 {
     d->setFilterText(value);
