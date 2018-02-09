@@ -146,9 +146,9 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         }
 #endif
 
-        connect(resource, &QnResource::statusChanged,      this, &QnResourcePool::statusChanged,     Qt::QueuedConnection);
-        connect(resource, &QnResource::statusChanged,      this, &QnResourcePool::resourceChanged,   Qt::QueuedConnection);
-        connect(resource, &QnResource::resourceChanged,    this, &QnResourcePool::resourceChanged,   Qt::QueuedConnection);
+        connect(resource, &QnResource::statusChanged, this, &QnResourcePool::statusChanged);
+        connect(resource, &QnResource::statusChanged, this, &QnResourcePool::resourceChanged);
+        connect(resource, &QnResource::resourceChanged, this, &QnResourcePool::resourceChanged);
 
         if (!resource->hasFlags(Qn::foreigner))
         {
