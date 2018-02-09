@@ -1,12 +1,8 @@
 #include "resource.h"
 
-#include <climits>
-
 #include <typeinfo>
 
-#include <QtCore/QCoreApplication>
 #include <QtCore/QMetaObject>
-#include <QtCore/QMetaProperty>
 #include <QtCore/QRunnable>
 
 #include <nx_ec/data/api_resource_data.h>
@@ -45,23 +41,13 @@ static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 // QnResource
 // -------------------------------------------------------------------------- //
 QnResource::QnResource(QnCommonModule* commonModule):
-    QObject(),
     m_mutex(QnMutex::Recursive),
     m_initMutex(QnMutex::Recursive),
-    m_resourcePool(NULL),
-    m_flags(0),
-    m_initialized(false),
-    m_lastInitTime(0),
-    m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
-    m_lastMediaIssue(CameraDiagnostics::NoErrorResult()),
-    m_initInProgress(false),
     m_commonModule(commonModule)
 {
 }
 
-QnResource::QnResource(const QnResource& right)
-    :
-    QObject(),
+QnResource::QnResource(const QnResource& right):
     m_parentId(right.m_parentId),
     m_name(right.m_name),
     m_url(right.m_url),
@@ -226,12 +212,11 @@ QnUuid QnResource::getParentId() const
 void QnResource::setParentId(const QnUuid& parent)
 {
     bool initializedChanged = false;
-    QnUuid oldParentId;
     {
         QnMutexLocker locker(&m_mutex);
         if (m_parentId == parent)
             return;
-        oldParentId = m_parentId;
+
         m_parentId = parent;
         if (m_initialized)
         {
@@ -319,18 +304,10 @@ QString QnResource::toSearchString() const
 
 QnResourcePtr QnResource::getParentResource() const
 {
-    QnUuid parentID;
-    QnResourcePool* resourcePool = NULL;
-    {
-        QnMutexLocker mutexLocker(&m_mutex);
-        parentID = getParentId();
-        resourcePool = m_resourcePool;
-    }
+    if (const auto resourcePool = this->resourcePool())
+        return resourcePool->getResourceById(getParentId());
 
-    if (resourcePool)
-        return resourcePool->getResourceById(parentID);
-    else
-        return QnResourcePtr();
+    return QnResourcePtr();
 }
 
 bool QnResource::hasParam(const QString &name) const
@@ -439,7 +416,7 @@ void QnResource::setId(const QnUuid& id)
 
     // TODO: #dmishin it seems really wrong. Think about how to do it in another way.
     NX_ASSERT(
-        dynamic_cast<QnSecurityCamResource*>(this) || m_locallySavedProperties.size() == 0,
+        dynamic_cast<QnSecurityCamResource*>(this) || m_locallySavedProperties.empty(),
         lit("Only camera resources are allowed to set properties if id is not set."));
 
     m_id = id;
@@ -708,19 +685,6 @@ ec2::ApiResourceParamDataList QnResource::getAllProperties() const
             result.emplace_back(it.key(), it.value());
     }
 
-#if 0
-    printf("\n==== Camera: %s ====\n", getName().toLatin1().constData());
-    printf("\tStatic properties:\n");
-    for (auto it = staticDefaultProperties.cbegin(); it != staticDefaultProperties.cend(); ++it)
-        printf("\t\t%s = %s\n", it.key().toLatin1().constData(), it.value().toLatin1().constData());
-
-    printf("\tRuntime properties:\n");
-    for (auto it = runtimeProperties.cbegin(); it != runtimeProperties.cend(); ++it)
-        printf("\t\t%s = %s\n", it->name.toLatin1().constData(), it->value.toLatin1().constData());
-
-    printf("\n");
-#endif
-
     std::copy(runtimeProperties.cbegin(), runtimeProperties.cend(), std::back_inserter(result));
     return result;
 }
@@ -728,7 +692,6 @@ ec2::ApiResourceParamDataList QnResource::getAllProperties() const
 void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
 {
     emit resourceChanged(toSharedPointer(this));
-    //modifiedFields << "resourceChanged";
 
     const QnResourcePtr & _t1 = toSharedPointer(this);
     void *_a[] = {0, const_cast<void*>(reinterpret_cast<const void*>(&_t1))};

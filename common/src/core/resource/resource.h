@@ -293,7 +293,6 @@ private:
     void disconnectAllConsumers();
     void initAndEmit();
 
-    void updateUrlName(const QString &oldUrl, const QString &newUrl);
     bool emitDynamicSignal(const char *signal, void **arguments);
 
     void emitPropertyChanged(const QString& key);
@@ -351,7 +350,7 @@ private:
     };
 
     /** Resource pool this this resource belongs to. */
-    QnResourcePool* m_resourcePool;
+    QnResourcePool* m_resourcePool = nullptr;
 
     /** Identifier of this resource. */
     QnUuid m_id;
@@ -360,18 +359,19 @@ private:
     QnUuid m_typeId;
 
     /** Flags of this resource that determine its type. */
-    Qn::ResourceFlags m_flags;
+    Qn::ResourceFlags m_flags = 0;
 
-    bool m_initialized;
+    bool m_initialized = false;
     static QnMutex m_initAsyncMutex;
 
-    qint64 m_lastInitTime;
-    CameraDiagnostics::Result m_prevInitializationResult;
-    CameraDiagnostics::Result m_lastMediaIssue;
+    qint64 m_lastInitTime = 0;
+    CameraDiagnostics::Result m_prevInitializationResult = CameraDiagnostics::Result(
+        CameraDiagnostics::ErrorCode::unknown);
+    CameraDiagnostics::Result m_lastMediaIssue = CameraDiagnostics::NoErrorResult();
     QAtomicInt m_initializationAttemptCount;
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
-    bool m_initInProgress;
+    bool m_initInProgress = false;
     QnCommonModule* m_commonModule;
 };
 
