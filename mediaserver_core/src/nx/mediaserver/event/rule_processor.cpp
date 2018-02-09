@@ -758,7 +758,7 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     {
         if (businessRule->eventType() == vms::event::cameraInputEvent)
         {
-            auto resList = resourcePool()->getResources<QnVirtualCameraResource>(
+            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                 businessRule->eventResources());
             if (resList.isEmpty())
                 resList = resourcePool()->getAllCameras(QnResourcePtr(), true);
@@ -777,7 +777,7 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     {
         if (businessRule->actionType() == vms::event::cameraRecordingAction)
         {
-            auto resList = resourcePool()->getResources<QnVirtualCameraResource>(
+            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                 businessRule->actionResources());
             for (const auto& camera: resList)
             {
