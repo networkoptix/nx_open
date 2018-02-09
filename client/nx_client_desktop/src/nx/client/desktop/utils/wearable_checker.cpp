@@ -1,6 +1,7 @@
 #include "wearable_checker.h"
 
 #include <QtCore/QFile>
+#include <QtCore/QFileInfo>
 
 #include <api/server_rest_connection.h>
 #include <core/resource/security_cam_resource.h>
@@ -107,6 +108,7 @@ void WearableChecker::checkLocally(const QString& filePath)
 
     payload.startTimeMs = startTimeMs;
     payload.durationMs = durationMs;
+    payload.size = QFileInfo(filePath).size();
     payload.status = WearablePayload::Valid;
 }
 

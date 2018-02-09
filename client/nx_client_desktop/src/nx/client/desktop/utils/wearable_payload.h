@@ -24,6 +24,7 @@ struct WearablePayload
 
     QString path;
     Status status = Valid;
+    qint64 size = 0;
     qint64 startTimeMs = 0;
     qint64 durationMs = 0;
 
