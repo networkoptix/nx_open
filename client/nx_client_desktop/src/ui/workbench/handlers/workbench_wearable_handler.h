@@ -35,13 +35,6 @@ private slots:
     void at_context_userChanged();
 
 private:
-    struct FootageInfo
-    {
-        QnSecurityCamResourcePtr camera;
-        qint64 startTimeMs;
-    };
-
     QnUuid m_currentCameraUuid;
-    QHash<QString, FootageInfo> m_infoByUploadId;
 };
 
