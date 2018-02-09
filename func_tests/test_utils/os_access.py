@@ -249,20 +249,18 @@ class LocalAccess(OsAccess):
             return '.'
 
     def file_exists(self, path):
-        return self.expand_path(path).exists()
+        return path.exists()
 
     def dir_exists(self, path):
-        return self.expand_path(path).is_dir()
+        return path.is_dir()
 
     def put_file(self, from_local_path, to_remote_path):
-        self._copy(self.expand_path(str(from_local_path)), str(to_remote_path))
+        self._copy(from_local_path, to_remote_path)
 
     def get_file(self, from_remote_path, to_local_path):
-        self._copy(from_remote_path, self.expand_path(to_local_path))
+        self._copy(from_remote_path, to_local_path)
 
     def _copy(self, from_path, to_path):
-        from_path = self.expand_path(from_path)
-        to_path = self.expand_path(to_path)
         log.debug('copying %s -> %s', from_path, to_path)
         shutil.copy2(str(from_path), str(to_path))
 
@@ -278,16 +276,16 @@ class LocalAccess(OsAccess):
         to_remote_path.write_bytes(contents)
 
     def get_file_size(self, path):
-        return self.expand_path(path).st_size
+        return path.stat().st_size
 
     def mk_dir(self, path):
-        self.expand_path(path).mkdir(parents=True, exist_ok=True)
+        path.mkdir(parents=True, exist_ok=True)
 
     def iter_dir(self, path):
         return path.iterdir()
 
     def rm_tree(self, path, ignore_errors=False):
-        shutil.rmtree(str(self.expand_path(path)), ignore_errors=ignore_errors)
+        shutil.rmtree(str(path), ignore_errors=ignore_errors)
 
     def expand_path(self, path):
         return Path(path).expanduser().resolve()
