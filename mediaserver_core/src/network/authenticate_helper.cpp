@@ -46,8 +46,10 @@
 static const bool kVerifyDigestUriWithParams = false;
 
 namespace {
-    static const QByteArray kCookieAuthMethod("GET");
-}
+
+static const QByteArray kCookieAuthMethod("GET");
+
+} // namespace
 
 void QnAuthHelper::UserDigestData::parse(const nx_http::Request& request)
 {
@@ -664,7 +666,7 @@ bool QnAuthHelper::checkUserPassword(const QnUserResourcePtr& user, const QStrin
         user->getName(),
         password,
         user->getRealm(),
-        "GET",
+        kCookieAuthMethod,
         qnAuthHelper->generateNonce());
 
     nx_http::Response response;
