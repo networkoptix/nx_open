@@ -8,6 +8,7 @@
 #include <nx/utils/uuid.h>
 
 #include "wearable_state.h"
+#include "wearable_error.h"
 
 namespace nx {
 namespace client {
@@ -31,7 +32,8 @@ public:
     QList<WearableState> runningUploads();
 
     void updateState(const QnSecurityCamResourcePtr& camera);
-    bool addUpload(const QnSecurityCamResourcePtr& camera, const QString& path, QString* errorMessage);
+    bool addUpload(const QnSecurityCamResourcePtr& camera, const QString& path, WearableError* error);
+    void cancelUploads(const QnSecurityCamResourcePtr& camera);
     void cancelAllUploads();
 
 signals:

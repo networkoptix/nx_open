@@ -182,7 +182,7 @@ a.disabled {
 }
 
 .warning-label{
-    color: $brand-danger;
+    color: $brand-danger !important;
 }
 
 .loading .auth-visible,
@@ -772,3 +772,72 @@ button .icon-caret{
   background-position: -32px 0;
 }
 
+.merge-button{
+  width: 102px;
+}
+
+.merge-info-text{
+  color: $dark16;
+  font-size: 13px;
+}
+.merge-system-name{
+  font-weight: bold;
+}
+
+.merge-modal{
+  .help-block{
+    color: $dark16;
+    min-height: 0px !important;
+  }
+  .merge-text{
+    color: $dark12;
+    font-weight:bold;
+  }
+  .form-group{
+    padding: 0 22px;
+  }
+  .merge-dropdown{
+    width: 100%;
+    height: 32px;
+    padding: 0 10px;
+
+    line-height: 32px;
+    text-decoration: none !important;
+
+    border: 1px solid $light5;
+    border-radius: 2px;
+
+    .dropdown-menu{
+      padding: 0;
+      margin:1px 0 0 -1px;
+    }
+
+    .system-compatibility{
+      @include ellipsis;
+      width:325px;
+      line-height: inherit;
+      display:inline-block;
+    }
+
+    .icon-caret{
+      margin-top: 7px;
+      float: right;
+    }
+
+    a{
+      color: $dark1 !important;
+      text-decoration: none !important;
+    }
+    a.active{
+      background-color: $brand_core;
+    }
+  }
+  .radio label{
+    padding-left: 0;
+  }
+  .disabled-settings
+  {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+}

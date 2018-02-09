@@ -64,6 +64,7 @@ void Updates2ManagerBase::atServerStart()
     using namespace std::placeholders;
 
     loadStatusFromFile();
+    NX_ASSERT(m_currentStatus.files.size() <= 1);
     checkForGlobalDictionaryUpdate();
 
     // Amending initial state
@@ -79,13 +80,11 @@ void Updates2ManagerBase::atServerStart()
                 "Update is unavailable");
             break;
         case api::Updates2StatusData::StatusCode::downloading:
+        case api::Updates2StatusData::StatusCode::preparing:
             setStatus(
                 api::Updates2StatusData::StatusCode::available,
                 "Update is available");
             download();
-            break;
-        case api::Updates2StatusData::StatusCode::preparing:
-            // #TODO: #akulikov implement
             break;
         case api::Updates2StatusData::StatusCode::readyToInstall:
             // #TODO: #akulikov implement
@@ -125,10 +124,8 @@ void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/)
             case api::Updates2StatusData::StatusCode::notAvailable:
             case api::Updates2StatusData::StatusCode::available:
             case api::Updates2StatusData::StatusCode::error:
-                m_currentStatus = api::Updates2StatusData(
-                    moduleGuid(),
-                    api::Updates2StatusData::StatusCode::checking,
-                    "Checking for update");
+                m_currentStatus.fromBase(api::Updates2StatusData(moduleGuid(),
+                    api::Updates2StatusData::StatusCode::checking, "Checking for update"));
                 break;
             default:
                 return;
@@ -186,8 +183,7 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
 
             nx::update::info::FileData fileData;
             const auto result = m_updateRegistry->findUpdateFile(
-                detail::UpdateFileRequestDataFactory::create(),
-                &fileData);
+                detail::UpdateFileRequestDataFactory::create(), &fileData);
             NX_ASSERT(result == update::info::ResultCode::ok);
             if (result != update::info::ResultCode::ok)
             {
@@ -219,15 +215,13 @@ api::Updates2StatusData Updates2ManagerBase::download()
 
     nx::update::info::FileData fileData;
     const auto result = m_updateRegistry->findUpdateFile(
-        detail::UpdateFileRequestDataFactory::create(),
-        &fileData);
+        detail::UpdateFileRequestDataFactory::create(), &fileData);
     NX_ASSERT(result == update::info::ResultCode::ok);
 
     if (result != update::info::ResultCode::ok)
     {
         setStatus(
-            api::Updates2StatusData::StatusCode::error,
-            "Failed to get update file information");
+            api::Updates2StatusData::StatusCode::error,  "Failed to get update file information");
         return m_currentStatus.base();
     }
 
@@ -247,21 +241,37 @@ api::Updates2StatusData Updates2ManagerBase::download()
             setStatus(
                 api::Updates2StatusData::StatusCode::preparing,
                 lit("Preparing update file: %1").arg(fileData.file));
-            startPreparing();
+            startPreparing(downloader()->filePath(fileData.file));
         case ResultCode::fileAlreadyExists:
         case ResultCode::ok:
             setStatus(
                 api::Updates2StatusData::StatusCode::downloading,
                 lit("Downloading update file: %1").arg(fileData.file));
+
+            for (const auto& fileName: m_currentStatus.files)
+            {
+                if (fileName != fileData.file)
+                    downloader()->deleteFile(fileName);
+            }
+
             m_currentStatus.files.insert(fileData.file);
             break;
         case ResultCode::fileDoesNotExist:
         case ResultCode::ioError:
         case ResultCode::invalidChecksum:
         case ResultCode::invalidFileSize:
+        case ResultCode::invalidChunkIndex:
+        case ResultCode::invalidChunkSize:
             setStatus(
                 api::Updates2StatusData::StatusCode::error,
-                lit("Downloader failed to start downloading: %1").arg(fileData.file));
+                lit("Downloader failed to start downloading: %1. Result code: %2")
+                    .arg(fileData.file).arg(static_cast<int>(resultCode)));
+            m_currentStatus.files.remove(fileData.file);
+            break;
+        case ResultCode::noFreeSpace:
+            setStatus(
+                api::Updates2StatusData::StatusCode::error,
+                lit("No free space on device. Failed to download: %1").arg(fileData.file));
             m_currentStatus.files.remove(fileData.file);
             break;
     }
@@ -273,31 +283,95 @@ void Updates2ManagerBase::setStatus(
     api::Updates2StatusData::StatusCode code,
     const QString& message)
 {
-    auto newStatusData = detail::Updates2StatusDataEx(
+    detail::Updates2StatusDataEx newStatusData(
         qnSyncTime->currentMSecsSinceEpoch(),
         moduleGuid(),
         code,
         message);
 
     writeStatusToFile(newStatusData);
-    m_currentStatus = newStatusData;
+
+    m_currentStatus.lastRefreshTime = newStatusData.lastRefreshTime;
+    m_currentStatus.message = newStatusData.message;
+    m_currentStatus.progress = newStatusData.progress;
+    m_currentStatus.serverId = newStatusData.serverId;
+    m_currentStatus.state = newStatusData.state;
 }
 
-void Updates2ManagerBase::startPreparing()
+void Updates2ManagerBase::startPreparing(const QString& updateFilePath)
 {
+    AbstractUpdates2InstallerPtr updateInstaller = installer();
+    updateInstaller->prepareAsync(
+        updateFilePath,
+        [this](PrepareResult prepareResult, const QString& updateId)
+        {
+            switch (prepareResult)
+            {
+                case PrepareResult::ok:
+                    setStatus(
+                        api::Updates2StatusData::StatusCode::readyToInstall,
+                        lit("Update is ready for installation: %1").arg(updateId));
+                    return;
+                case PrepareResult::corruptedArchive:
+                    setStatus(
+                        api::Updates2StatusData::StatusCode::error,
+                        lit("Update archive is corrupted: %1").arg(updateId));
+                    return;
+                case PrepareResult::noFreeSpace:
+                    setStatus(
+                        api::Updates2StatusData::StatusCode::error,
+                        lit("Failed to prepare update file (%1), no space left on device")
+                            .arg(updateId));
+                    return;
+                case PrepareResult::unknownError:
+                    setStatus(
+                        api::Updates2StatusData::StatusCode::error,
+                        lit("Failed to prepare update files: %1").arg(updateId));
+                    return;
+            }
+        });
 }
 
 void Updates2ManagerBase::onDownloadFinished(const QString& fileName)
 {
     QnMutexLocker lock(&m_mutex);
-    auto onExitGuard = makeScopeGuard([this]() { downloadFinished(); });
-
     using namespace vms::common::p2p::downloader;
 
-    auto onError = [this, &fileName](const QString& errorMessage)
-    {
-        setStatus(api::Updates2StatusData::StatusCode::error, errorMessage);
-    };
+    auto onError =
+        [this, &fileName](const QString& errorMessage)
+        {
+            setStatus(api::Updates2StatusData::StatusCode::error, errorMessage);
+        };
+
+    if (!m_currentStatus.files.contains(fileName))
+        return;
+
+    NX_ASSERT(m_currentStatus.state == api::Updates2StatusData::StatusCode::downloading);
+    if (m_currentStatus.state != api::Updates2StatusData::StatusCode::downloading)
+        return onError("Unexpected update manager state");
+
+    auto fileInformation = downloader()->fileInformation(fileName);
+    NX_ASSERT(fileInformation.isValid());
+    if (!fileInformation.isValid())
+        return onError(lit("Downloader internal error for the file: %1").arg(fileName));
+
+    NX_ASSERT(fileInformation.status == FileInformation::Status::downloaded);
+    setStatus(
+        api::Updates2StatusData::StatusCode::preparing,
+        "Update has been downloaded and now is preparing for install");
+    startPreparing(downloader()->filePath(fileName));
+}
+
+void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
+{
+    QnMutexLocker lock(&m_mutex);
+    using namespace vms::common::p2p::downloader;
+
+    auto onError =
+        [this, &fileName](const QString& errorMessage)
+        {
+            setStatus(api::Updates2StatusData::StatusCode::error, errorMessage);
+        };
 
     if (!m_currentStatus.files.contains(fileName))
         return;
@@ -314,22 +388,18 @@ void Updates2ManagerBase::onDownloadFinished(const QString& fileName)
     switch (fileInformation.status)
     {
         case FileInformation::Status::notFound:
-            return onError(lit("Failed to find update file: %1").arg(fileName));
+            onError(lit("Failed to find update file: %1").arg(fileName));
+            break;
         case FileInformation::Status::corrupted:
-            return onError(lit("Update file is corrupted: %1").arg(fileName));
+            onError(lit("Update file is corrupted: %1").arg(fileName));
+            break;
         default:
-            NX_ASSERT(fileInformation.status == FileInformation::Status::downloaded);
-            setStatus(
-                api::Updates2StatusData::StatusCode::preparing,
-                "Update has been downloaded and now is preparing for install");
-            startPreparing();
+            NX_ASSERT(false, "Wrong file information state");
             break;
     }
-}
 
-void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
-{
-
+    downloader()->deleteFile(fileName, /*deleteTrue*/ true);
+    m_currentStatus.files.remove(fileName);
 }
 
 void Updates2ManagerBase::onFileAdded(const FileInformation& fileInformation)
@@ -354,7 +424,17 @@ void Updates2ManagerBase::onFileInformationStatusChanged(const FileInformation& 
 
 void Updates2ManagerBase::onChunkDownloadFailed(const QString& fileName)
 {
+    QnMutexLocker lock(&m_mutex);
+    if (!m_currentStatus.files.contains(fileName))
+        return;
 
+    NX_ASSERT(m_currentStatus.files.size() == 1);
+    NX_ASSERT(m_currentStatus.state == api::Updates2StatusData::StatusCode::downloading);
+
+    setStatus(
+        api::Updates2StatusData::StatusCode::downloading,
+        lit("Problems detected while downloading update file: %1. Trying to recover")
+            .arg(fileName));
 }
 
 void Updates2ManagerBase::stopAsyncTasks()

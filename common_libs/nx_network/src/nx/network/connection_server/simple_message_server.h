@@ -15,7 +15,8 @@ public:
     SimpleMessageServerConnection(
         StreamConnectionHolder<SimpleMessageServerConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> _socket,
-        nx::Buffer staticMessage);
+        nx::Buffer request,
+        nx::Buffer response);
 
     void startReadingConnection(
         boost::optional<std::chrono::milliseconds> /*inactivityTimeout*/);
@@ -31,10 +32,15 @@ protected:
 private:
     network::server::StreamConnectionHolder<SimpleMessageServerConnection>* m_socketServer;
     std::unique_ptr<AbstractStreamSocket> m_socket;
-    nx::Buffer m_staticMessage;
+    nx::Buffer m_request;
+    nx::Buffer m_response;
+    nx::Buffer m_readBuffer;
     const std::chrono::steady_clock::time_point m_creationTimestamp;
     bool m_keepConnection = false;
 
+    void onDataRead(
+        SystemError::ErrorCode errorCode,
+        size_t bytesRead);
     void onDataSent(
         SystemError::ErrorCode errorCode,
         size_t bytesSent);
@@ -42,6 +48,10 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+/**
+ * Sends predefined response after receiving expected request via every connection accepted.
+ * If no request is defined, than response is sent immediately after accepting connection.
+ */
 class SimpleMessageServer:
     public server::StreamSocketServer<SimpleMessageServer, SimpleMessageServerConnection>
 {
@@ -55,9 +65,14 @@ public:
     {
     }
 
-    void setStaticMessage(nx::Buffer message)
+    void setRequest(nx::Buffer message)
     {
-        m_staticMessage.swap(message);
+        m_request.swap(message);
+    }
+
+    void setResponse(nx::Buffer message)
+    {
+        m_response.swap(message);
     }
 
     void setKeepConnection(bool val)
@@ -72,13 +87,15 @@ protected:
         auto connection = std::make_shared<SimpleMessageServerConnection>(
             this,
             std::move(_socket),
-            m_staticMessage);
+            m_request,
+            m_response);
         connection->setKeepConnection(m_keepConnection);
         return connection;
     }
 
 private:
-    nx::Buffer m_staticMessage;
+    nx::Buffer m_request;
+    nx::Buffer m_response;
     bool m_keepConnection = false;
 };
 

@@ -64,9 +64,8 @@ class ArtifactFactory(object):
     def make_artifact(self, path_part_list=None, name=None, full_name=None, is_error=None, artifact_type=None):
         assert path_part_list is None or is_list_inst(path_part_list, str), repr(path_part_list)
         assert artifact_type is None or isinstance(artifact_type, ArtifactType), repr(artifact_type)
-        name = '-'.join([self._artifact.path_root.name] + (path_part_list or []))
         artifact = Artifact(
-            self._artifact.path_root.parent / name,
+            self._artifact.path_root.parent / '-'.join([self._artifact.path_root.name] + (path_part_list or [])),
             name or self._artifact.name,
             full_name or self._artifact.full_name,
             is_error if is_error is not None else self._artifact.is_error,

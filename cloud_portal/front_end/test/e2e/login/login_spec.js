@@ -213,11 +213,12 @@ describe('Login dialog', function () {
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.dialogLoginButton.click();
         //p.alert.catchAlert(p.alert.alertMessages.loginNotActive, p.alert.alertTypes.danger);
-        expect(p.htmlBody.getText()).toContain('You have registered in Nx Cloud');
+        expect(p.htmlBody.getText()).toContain('You have registered in');
         expect(p.htmlBody.getText()).toContain("We've sent you a letter with activation link to " + userEmail + ".");
         expect(p.htmlBody.getText()).toContain("Please activate your account by visiting this link.");
         expect(p.helper.forms.register.resendActivation.isDisplayed()).toBe(true);
     });
+
     p.alert.checkAlert(function(){
         var deferred = protractor.promise.defer();
         var userEmail = p.helper.getRandomEmail();
@@ -240,7 +241,10 @@ describe('Login dialog', function () {
 
     it("displays password masked", function () {
         p.passwordInput.sendKeys(p.helper.userPassword);
+        browser.sleep(5000);
+        console.log(p.passwordInput.getText.text);
         expect(p.passwordInput.getText()).not.toContain(p.helper.userPassword);
+        browser.sleep(5000);
         //browser.takeScreenshot().then(function (png) {
         //    p.helper.writeScreenShot(png, '...../masked_password.png');
         //});
@@ -328,7 +332,7 @@ describe('Login dialog', function () {
     });
 
     // Disabled because current chromedriver does not support it
-    xit("should respond to Space key and toggle checkbox", function () {
+    it("should respond to Space key and toggle checkbox", function () {
         p.passwordInput.sendKeys(protractor.Key.TAB);
         p.rememberCheckbox.sendKeys(protractor.Key.SPACE);
         expect(p.rememberCheckbox.isSelected()).toBe(false); // verify that it is switched off

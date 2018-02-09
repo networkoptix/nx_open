@@ -1,4 +1,4 @@
-﻿#include "plugin.h"
+#include "plugin.h"
 
 #include <array>
 #include <fstream>
@@ -49,10 +49,10 @@ Plugin::Plugin()
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataPlugin)
+    if (interfaceId == IID_Plugin)
     {
         addRef();
-        return static_cast<AbstractMetadataPlugin*>(this);
+        return static_cast<Plugin*>(this);
     }
 
     if (interfaceId == nxpl::IID_Plugin3)
@@ -90,6 +90,10 @@ void Plugin::setSettings(const nxpl::Setting* settings, int count)
 {
 }
 
+void Plugin::setDeclaredSettings(const nxpl::Setting* settings, int count)
+{
+}
+
 void Plugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
 }
@@ -98,29 +102,21 @@ void Plugin::setLocale(const char* locale)
 {
 }
 
-AbstractMetadataManager* Plugin::managerForResource(
-    const ResourceInfo& resourceInfo,
+CameraManager* Plugin::obtainCameraManager(
+    const CameraInfo& cameraInfo,
     Error* outError)
 {
     *outError = Error::noError;
 
-    const auto vendor = QString(resourceInfo.vendor).toLower();
+    const auto vendor = QString(cameraInfo.vendor).toLower();
     if (!vendor.startsWith(kAxisVendor))
         return nullptr;
 
-    QList<IdentifiedSupportedEvent> events = fetchSupportedEvents(resourceInfo);
+    QList<IdentifiedSupportedEvent> events = fetchSupportedEvents(cameraInfo);
     if (events.empty())
         return nullptr;
 
-    return new Manager(resourceInfo, events);
-}
-
-AbstractSerializer* Plugin::serializerForType(
-    const nxpl::NX_GUID& typeGuid,
-    Error* outError)
-{
-    *outError = Error::typeIsNotSupported;
-    return nullptr;
+    return new Manager(cameraInfo, events);
 }
 
 const char* Plugin::capabilitiesManifest(Error* error) const
@@ -130,12 +126,12 @@ const char* Plugin::capabilitiesManifest(Error* error) const
 }
 
 QList<IdentifiedSupportedEvent> Plugin::fetchSupportedEvents(
-    const ResourceInfo& resourceInfo)
+    const CameraInfo& cameraInfo)
 {
     QList<IdentifiedSupportedEvent> result;
-    const char* const ip_port = resourceInfo.url + sizeof("http://") - 1;
-    nx::axis::CameraController axisCameraController(ip_port, resourceInfo.login,
-        resourceInfo.password);
+    const char* const ip_port = cameraInfo.url + sizeof("http://") - 1;
+    nx::axis::CameraController axisCameraController(ip_port, cameraInfo.login,
+        cameraInfo.password);
     if (!axisCameraController.readSupportedEvents())
         return result;
 

@@ -1648,6 +1648,8 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
 
     if (isAnalyticsEnabled())
         d->analyticsController->updateAreas(timestamp, channel);
+    else
+        d->analyticsController->updateAreaForZoomWindow();
 
     if (ini().enableOldAnalyticsController && d->analyticsMetadataProvider)
     {
@@ -2176,10 +2178,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     {
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
-			
-        if (d->camera->hasFlags(Qn::wearable_camera))
+
+        if (d->isPlayingLive() && d->camera->hasFlags(Qn::wearable_camera))
             return Qn::NoLiveStreamOverlay;
-			
 
         const Qn::Permission requiredPermission = d->isPlayingLive()
             ? Qn::ViewLivePermission

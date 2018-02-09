@@ -14,7 +14,8 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, analyzeSecondaryStream, "Use secondary stream for analytics instead of primary.");
     NX_INI_FLAG(1, enablePersistentMetadataManager,
         "Don't recreate metadata managers on resource changes (workaround of libtegra_video.so bug).");
-    NX_INI_FLAG(0, enableWearableCameras, "Enable wearable cameras.");
+    NX_INI_STRING("", stubPluginSettings, "Filename for a JSON Object with Stub Metadata Plugin param values.");
+    NX_INI_STRING("", stubCameraManagerSettings, "Filename for a JSON Object with Stub Metadata CameraManager param values.");
 };
 
 inline Ini& ini()

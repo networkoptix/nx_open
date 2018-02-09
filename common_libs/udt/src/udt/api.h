@@ -156,7 +156,7 @@ public:
     // Returned value:
     //    Pointer to the UDT entity.
 
-    CUDT* lookup(const UDTSOCKET u) throw (CUDTException);
+    CUDT* lookup(const UDTSOCKET u);
 
     // Functionality:
     //    Check the status of the UDT socket.

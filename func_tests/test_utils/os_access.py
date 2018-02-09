@@ -21,6 +21,12 @@ log = logging.getLogger(__name__)
 PROCESS_TIMEOUT = datetime.timedelta(hours=1)
 
 
+def args_from_env(env):
+    if env is None:
+        return []
+    return [name + '=' + '\'' + arg.replace('\\', '\\\\').replace('\'', '\\\'') + '\'' for name, arg in env.items()]
+
+
 class ProcessError(subprocess.CalledProcessError):
 
     def __str__(self):
@@ -89,7 +95,7 @@ class OsAccess(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
+    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None, env=None):
         pass
 
     @abc.abstractmethod
@@ -161,7 +167,7 @@ class LocalAccess(OsAccess):
     def __repr__(self):
         return '<LocalAccess>'
 
-    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
+    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None, env=None):
         timeout = timeout or PROCESS_TIMEOUT
         args = [str(arg) for arg in args]
         if input:
@@ -176,6 +182,7 @@ class LocalAccess(OsAccess):
             stderr=subprocess.PIPE,
             stdin=stdin,
             close_fds=True,
+            env=env,
             )
         stdout_buffer = []
         stderr_buffer = []
@@ -251,7 +258,7 @@ class LocalAccess(OsAccess):
         from_path = self.expand_path(from_path)
         to_path = self.expand_path(to_path)
         log.debug('copying %s -> %s', from_path, to_path)
-        shutil.copy2(from_path, to_path)
+        shutil.copy2(str(from_path), str(to_path))
 
     def read_file(self, from_remote_path, ofs=None):
         with from_remote_path.open('rb') as f:
@@ -285,7 +292,7 @@ class LocalAccess(OsAccess):
 
 class SshAccess(OsAccess):
 
-    def __init__(self, hostname, user=None, name=None, key_path=None, config_path=None, proxy_os_access=None):
+    def __init__(self, hostname, user=None, name=None, key_path=None, ssh_config_path=None, proxy_os_access=None):
         self.hostname = hostname
         self.name = name or self.hostname
         if user is None:
@@ -293,19 +300,26 @@ class SshAccess(OsAccess):
         else:
             self._user_and_host = user + '@' + self.hostname
         self._key_file_path = key_path
-        self._config_path = config_path
+        self._config_path = ssh_config_path
         assert proxy_os_access is None or isinstance(proxy_os_access, OsAccess), repr(proxy_os_access)
         self._proxy_os_access = proxy_os_access or LocalAccess()
         self._local_os_access = LocalAccess()
 
     def __repr__(self):
-        return '<{} {} config_path={}>'.format(self.__class__.__name__, self._user_and_host, self._config_path)
+        return '<{} {} ssh_config_path={}>'.format(self.__class__.__name__, self._user_and_host, self._config_path)
 
-    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
+    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None, env=None):
         ssh_cmd = self._make_ssh_cmd() + [self._user_and_host]
         if cwd:
-            args = [subprocess.list2cmdline(['cd', str(cwd), '&&'] + [str(arg) for arg in args])]
-        return self._local_os_access.run_command(ssh_cmd + args, input, check_retcode=check_retcode, log_output=log_output, timeout=timeout)
+            cwd_args = ['cd', str(cwd), ';']
+        else:
+            cwd_args = []
+        return self._local_os_access.run_command(
+            ssh_cmd + cwd_args + args_from_env(env) + [str(arg) for arg in args],
+            input,
+            check_retcode=check_retcode,
+            log_output=log_output,
+            timeout=timeout)
 
     def file_exists(self, path):
         output = self.run_command(['[', '-f', path, ']', '&&', 'echo', 'yes', '||', 'echo', 'no']).strip()

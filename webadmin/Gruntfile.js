@@ -237,7 +237,6 @@ module.exports = function (grunt) {
                         dot: true,
                         src: [
                             '.tmp',
-                            '<%= yeoman.dist %>/*',
                             '!<%= yeoman.dist %>/.git*'
                         ]
                     }
@@ -508,7 +507,7 @@ module.exports = function (grunt) {
         compress: {
             external: {
                 options: {
-                    archive: '<%= yeoman.app %>/../external.dat',
+                    archive: '<%= yeoman.app %>/../server-external/bin/external.dat',
                     mode: 'zip'
                 },
                 files: [
@@ -517,9 +516,6 @@ module.exports = function (grunt) {
             }
         },
         shell: {
-            deploy: {
-                command: 'cd ~/networkoptix/develop/' + package_dir + '; python ~/networkoptix/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
-            },
             merge: {
                 command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;python ../../devtools/util/merge_dev.py -t vms_3.1;hg push;'
             },
@@ -530,6 +526,9 @@ module.exports = function (grunt) {
             push:{
                 branch:'',
                 command: 'python ../../devtools/util/merge_dev.py -t <%= shell.push.branch %>'
+            },
+            version:{
+                command: 'cp version.txt static || (hg log -r . > static/version.txt)'
             },
             print_version:{
                 command: 'hg parent'
@@ -821,6 +820,7 @@ module.exports = function (grunt) {
         'rev',
         'usemin',
         'htmlmin',
+        'shell:version',
         'shell:localize'
     ]);
 
@@ -845,16 +845,6 @@ module.exports = function (grunt) {
 
     grunt.registerTask('merge_release', [
         'shell:merge_release'
-    ]);
-
-    
-
-    grunt.registerTask('deploy', [
-        'publish',
-        'copy:zip',
-        'shell:deploy',
-        'clean:zip',
-        'clean:publish'
     ]);
 
     grunt.registerTask('demo', [

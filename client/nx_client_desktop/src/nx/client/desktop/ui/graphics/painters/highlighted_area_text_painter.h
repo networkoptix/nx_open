@@ -12,8 +12,11 @@ class HighlightedAreaTextPainter
 public:
     HighlightedAreaTextPainter();
 
-    QFont font() const;
-    void setFont(const QFont& font);
+    QFont nameFont() const;
+    void setNameFont(const QFont& font);
+
+    QFont valueFont() const;
+    void setValueFont(const QFont& font);
 
     QColor color() const;
     void setColor(const QColor& color);
@@ -21,7 +24,8 @@ public:
     QPixmap paintText(const QString& text) const;
 
 private:
-    QFont m_font;
+    QFont m_nameFont;
+    QFont m_valueFont;
     QColor m_color;
 };
 

@@ -6,7 +6,7 @@ import uuid
 from test_utils.build_info import customization_from_company_name
 from .os_access import SshAccessConfig, host_from_config
 from .server import Server
-from .server_ctl import MEDIASERVER_DIR, PhysicalHostServerCtl, SERVER_CTL_TARGET_PATH
+from .service import MEDIASERVER_DIR, AdHocService, SERVER_CTL_TARGET_PATH
 from .server_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, ServerInstallation
 from .template_renderer import TemplateRenderer
 from .utils import is_list_inst
@@ -62,15 +62,15 @@ class PhysicalInstallationCtl(object):
     def __init__(self, deb_path, customization_company_name, config_list, ca):
         assert is_list_inst(config_list, PhysicalInstallationHostConfig), repr(config_list)
         self.config_list = config_list
-        self.installations = [
+        self.installation_hosts = [
             PhysicalInstallationHost.from_config(
                 config, deb_path, customization_from_company_name(customization_company_name), ca)
             for config in config_list]
-        self._available_hosts = self.installations[:]
+        self._available_hosts = self.installation_hosts[:]
 
     # will unpack [new] distributive and reinstall servers
     def reset_all_installations(self):
-        for host in self.installations:
+        for host in self.installation_hosts:
             host.set_reset_installation_flag()
 
     def allocate_server(self, config):
@@ -87,9 +87,9 @@ class PhysicalInstallationCtl(object):
 
     def release_all_servers(self):
         log.info('Releasing all physical installations')
-        for host in self.installations:
+        for host in self.installation_hosts:
             host.release_all_servers()
-        self._available_hosts = self.installations[:]
+        self._available_hosts = self.installation_hosts[:]
 
 
 class PhysicalInstallationHost(object):
@@ -147,8 +147,8 @@ class PhysicalInstallationHost(object):
                 return None
         server_port = self._installation_server_port(self._installations.index(installation))
         rest_api_url = '%s://%s:%d/' % (config.http_schema, self.os_access.hostname, server_port)
-        server_ctl = PhysicalHostServerCtl(self.os_access, installation.dir)
-        server = Server(config.name, self.os_access, server_ctl, installation, rest_api_url, self._ca,
+        service = AdHocService(self.os_access, installation.dir)
+        server = Server(config.name, self.os_access, service, installation, rest_api_url, self._ca,
                         rest_api_timeout=config.rest_api_timeout, internal_ip_port=server_port)
         self._allocated_server_list.append(server)
         return server
@@ -188,9 +188,9 @@ class PhysicalInstallationHost(object):
 
     def _ensure_servers_are_stopped(self):
         for installation in self._installations:
-            server_ctl = PhysicalHostServerCtl(self.os_access, installation.dir)
-            if server_ctl.get_state():
-                server_ctl.set_state(is_started=False)
+            service = AdHocService(self.os_access, installation.dir)
+            if service.get_state():
+                service.set_state(is_started=False)
 
     def _create_installation(self):
         if self._limit and len(self._installations) >= self._limit:
@@ -216,17 +216,17 @@ class PhysicalInstallationHost(object):
         self.os_access.run_command(['cp', '-a'] +
                                    self.os_access.expand_glob(self.unpacked_mediaserver_dir / '*', for_shell=True) +
                                    [str(dir) + '/'])
-        self._write_server_ctl(dir)
+        self._write_control_script(dir)
         self._write_server_conf(dir, server_port)
 
-    def _write_server_ctl(self, dir):
+    def _write_control_script(self, dir):
         contents = self._template_renderer.render(
             SERVER_CTL_TEMPLATE_PATH,
             SERVER_DIR=dir,
             )
-        server_ctl_path = dir / SERVER_CTL_TARGET_PATH
-        self.os_access.write_file(server_ctl_path, contents)
-        self.os_access.run_command(['chmod', '+x', server_ctl_path])
+        service_path = dir / SERVER_CTL_TARGET_PATH
+        self.os_access.write_file(service_path, contents)
+        self.os_access.run_command(['chmod', '+x', service_path])
 
     def _write_server_conf(self, dir, server_port):
         contents = self._template_renderer.render(

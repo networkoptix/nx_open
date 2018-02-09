@@ -5,7 +5,7 @@ namespace
 {
     static const auto kHtmlTemplate = lit("<html><body>%1</body></html>");
     static const auto kSpacerTag = lit("<span style= \"font-size:13px; vertical-align: middle\">&nbsp;<span style= \"vertical-align: middle; font-size:11px; font-weight: bold\">%1</span>&nbsp;</span></span>");
-    static const auto kTableTag = lit("<table cellspacing = \"1\" cellpadding=\"3\" style = \"margin-top: 0;float: left;display:inline-block; border-style: none;border-width:0;\"><tr><td bgcolor = %1><a href = \"%3\" style = \"text-decoration: none; color: %2\">%4</a></td></tr></table></tr></table>");
+    static const auto kTableTag = lit("<table cellspacing = \"1\" cellpadding=\"3\" style = \"margin-top: 0;float: left;display:inline-block; border-style: none;border-width:0;\"><tr><td bgcolor = %1><a href = \"%3\" style = \"text-decoration: none; color: %2\">%4</a></td></tr></table>");
 
     QString getColorName(const QColor &color)
     {

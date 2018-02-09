@@ -1,7 +1,4 @@
-"""Mediaserver presentation class
-
-Allow working with servers from functional tests: start/stop, setup, configure, access rest api, storage, etc...
-"""
+"""Work with mediaserver as single entity: start/stop, setup, configure, access HTTP api, storage, etc..."""
 
 import base64
 import datetime
@@ -23,7 +20,7 @@ from .os_access import OsAccess, LocalAccess
 from .media_stream import open_media_stream
 from .rest_api import HttpError, REST_API_PASSWORD, REST_API_USER, RestApi
 from .utils import RunningTime, datetime_utc_now, datetime_utc_to_timestamp, is_list_inst
-from .vagrant_box_config import MEDIASERVER_LISTEN_PORT
+from .vagrant_vm_config import MEDIASERVER_LISTEN_PORT
 
 DEFAULT_HTTP_SCHEMA = 'http'
 
@@ -68,7 +65,7 @@ def generate_auth_key(method, user, password, nonce, realm):
 class ServerConfig(object):
 
     def __init__(self, name, start=True, setup=True, leave_initial_cloud_host=False,
-                 box=None, config_file_params=None, setup_settings=None, setup_cloud_account=None,
+                 vm=None, config_file_params=None, setup_settings=None, setup_cloud_account=None,
                  http_schema=None, rest_api_timeout=None):
         assert name, repr(name)
         assert type(setup) is bool, repr(setup)
@@ -81,10 +78,10 @@ class ServerConfig(object):
         self.setup = setup  # setup as local system if setup_cloud_account is None, to cloud if it is set
         # By default, by Server's 'init' method  it's hardcoded cloud host will be patched/restored to the one
         # deduced from --cloud-group option. With leave_initial_cloud_host=True, this step will be skipped.
-        # With leave_initial_cloud_host=True box will also be always recreated before this test to ensure
+        # With leave_initial_cloud_host=True VM will also be always recreated before this test to ensure
         # server binaries has original cloud host encoded by compilation step.
         self.leave_initial_cloud_host = leave_initial_cloud_host  # bool
-        self.box = box  # VagrantVirtualMachine or None
+        self.vm = vm  # VagrantVM or None
         self.config_file_params = config_file_params  # dict or None
         self.setup_settings = setup_settings or {}  # dict
         self.setup_cloud_account = setup_cloud_account  # CloudAccount or None
@@ -92,7 +89,7 @@ class ServerConfig(object):
         self.rest_api_timeout = rest_api_timeout
 
     def __repr__(self):
-        return 'ServerConfig(%r @ %s)' % (self.name, self.box)
+        return 'ServerConfig(%r @ %s)' % (self.name, self.vm)
 
 
 class Server(object):
@@ -103,7 +100,7 @@ class Server(object):
 
     def __init__(
             self,
-            name, os_access, server_ctl, installation, rest_api_url, ca,
+            name, os_access, service, installation, rest_api_url, ca,
             rest_api_timeout=None, internal_ip_port=None):
         assert name, repr(name)
         assert isinstance(os_access, OsAccess), repr(os_access)
@@ -111,7 +108,7 @@ class Server(object):
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
         self.os_access = os_access
         self._installation = installation
-        self._server_ctl = server_ctl
+        self._service = service
         self.rest_api_url = rest_api_url
         self._ca = ca
         self.rest_api = RestApi(self.title, self.rest_api_url, timeout=rest_api_timeout, ca_cert=self._ca.cert_path)
@@ -146,7 +143,7 @@ class Server(object):
 
     def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None, config_file_params=None):
         if self._state is None:
-            was_started = self._server_ctl.get_state()
+            was_started = self._service.get_state()
             self._state = self._st_starting if was_started else self._st_stopped
         else:
             was_started = self._state in [self._st_starting, self._st_started]
@@ -199,7 +196,7 @@ class Server(object):
         assert self._state != self._bool2final_state(is_started), (
             'Service for %s is already %s' % (self, is_started and 'started' or 'stopped'))
         if not (is_started and self._state == self._st_starting):
-            self._server_ctl.set_state(is_started)
+            self._service.set_state(is_started)
         self._state = self._st_starting if is_started else self._st_stopped
         if is_started:
             self.wait_for_server_become_online()
@@ -261,7 +258,7 @@ class Server(object):
             return 'local'
 
     def reset(self):
-        was_started = self._server_ctl.is_running()
+        was_started = self._service.is_running()
         if was_started:
             self.stop_service()
         self._installation.cleanup_var_dir()
@@ -299,7 +296,7 @@ class Server(object):
             break
 
     def make_core_dump(self):
-        self._server_ctl.make_core_dump()
+        self._service.make_core_dump()
         self._state = self._st_stopped
 
     def get_time(self):
@@ -518,7 +515,7 @@ class Storage(object):
     # for example:
     # server/var/data/data/low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/2017/01/27/12/1485511093576_21332.mkv
     def _construct_fpath(self, camera_mac_addr, quality_part, start_time, unixtime_utc_ms, duration):
-        local_dt = start_time.astimezone(self.timezone)  # box local
+        local_dt = start_time.astimezone(self.timezone)  # Local to VM.
         duration_ms = int(duration.total_seconds() * 1000)
         return self.dir.joinpath(
             quality_part, camera_mac_addr,

@@ -25,7 +25,7 @@ public:
         pleaseStopSync();
     }
 
-    nx::utils::Url getServerUrl() const
+    nx::utils::Url url() const
     {
         return nx::network::url::Builder()
             .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address());

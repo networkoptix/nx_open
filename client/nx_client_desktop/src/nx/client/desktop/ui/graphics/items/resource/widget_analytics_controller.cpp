@@ -5,6 +5,8 @@
 #include <QtCore/QPointer>
 #include <QtCore/QElapsedTimer>
 
+#include <common/common_module.h>
+
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -14,9 +16,10 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
-#include <nx/utils/random.h>
 #include <nx/client/core/media/abstract_analytics_metadata_provider.h>
+#include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/ui/graphics/items/overlays/area_highlight_overlay_widget.h>
+#include <nx/client/desktop/analytics/object_display_settings.h>
 
 #include <utils/math/linear_combination.h>
 
@@ -32,28 +35,13 @@ static constexpr std::chrono::milliseconds kObjectTimeToLive = std::chrono::minu
 static constexpr std::chrono::microseconds kFutureMetadataLength = std::chrono::seconds(2);
 static constexpr int kMaxFutureMetadataPackets = 4;
 
-static const QVector<QColor> kFrameColors{
-    Qt::red,
-    Qt::green,
-    Qt::blue,
-    Qt::cyan,
-    Qt::magenta,
-    Qt::yellow,
-    Qt::darkRed,
-    Qt::darkGreen,
-    Qt::darkBlue,
-    Qt::darkCyan,
-    Qt::darkMagenta,
-    Qt::darkYellow
-};
-
-QString objectDescription(const common::metadata::DetectedObject& object)
+QString objectDescription(const std::vector<common::metadata::Attribute>& attributes)
 {
     QString result;
 
     bool first = true;
 
-    for (const auto& attribute: object.labels)
+    for (const auto& attribute: attributes)
     {
         if (first)
             first = false;
@@ -68,10 +56,10 @@ QString objectDescription(const common::metadata::DetectedObject& object)
     return result;
 }
 
-QnUuid findItemForObject(const QnLayoutResourcePtr& layout, const QnUuid& objectId)
+QnLayoutItemData findItemForObject(const QnLayoutResourcePtr& layout, const QnUuid& objectId)
 {
     if (objectId.isNull())
-        return QnUuid();
+        return {};
 
     for (const auto& item: layout->getItems())
     {
@@ -79,10 +67,10 @@ QnUuid findItemForObject(const QnLayoutResourcePtr& layout, const QnUuid& object
             item.uuid, Qn::ItemAnalyticsModeRegionIdRole).value<QnUuid>();
 
         if (id == objectId)
-            return item.uuid;
+            return item;
     }
 
-    return QnUuid();
+    return {};
 }
 
 QRectF interpolatedRectangle(
@@ -110,7 +98,7 @@ QRectF interpolatedRectangle(
 
 } // namespace
 
-class WidgetAnalyticsController::Private: public QObject
+class WidgetAnalyticsController::Private: public QObject, public QnCommonModuleAware
 {
 public:
     struct ObjectInfo
@@ -121,11 +109,14 @@ public:
         QnUuid zoomWindowItemUuid;
         QRectF rectangle;
         qint64 metadataTimestamp = -1;
+        QString basicDescription;
         QString description;
 
         QRectF futureRectangle;
         qint64 futureRectangleTimestamp = -1;
     };
+
+    Private(QnCommonModule* commonModule);
 
     void at_areaClicked(const QnUuid& areaId);
 
@@ -133,15 +124,18 @@ public:
 
     QnLayoutResourcePtr layoutResource() const;
 
-    void updateObjectInfoFromLayoutItem(const QnUuid& itemId);
+    QnUuid updateObjectInfoFromLayoutItem(const QnUuid& itemId);
     ObjectInfo& addOrUpdateObject(const nx::common::metadata::DetectedObject& object);
     void removeObject(const QnUuid& objectId);
 
     void updateObjectAreas(qint64 timestamp);
 
+    QRectF zoomWindowRectangle(const QRectF& objectRect) const;
+
 public:
     QnMediaResourceWidget* mediaResourceWidget = nullptr;
     QnUuid layoutId;
+    QnUuid zoomWindowObjectId;
     core::AbstractAnalyticsMetadataProviderPtr metadataProvider;
     QPointer<AreaHighlightOverlayWidget> areaHighlightWidget;
 
@@ -149,63 +143,91 @@ public:
     QElapsedTimer timer;
 };
 
+WidgetAnalyticsController::Private::Private(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
+{
+}
+
 void WidgetAnalyticsController::Private::at_areaClicked(const QnUuid& areaId)
 {
+    auto item = findItemForObject(layoutResource(), areaId);
+
     auto it = objectInfoById.find(areaId);
     if (it == objectInfoById.end())
     {
-        const auto& itemId = findItemForObject(layoutResource(), areaId);
-        if (!itemId.isNull())
+        if (item.uuid.isNull())
             return;
 
-        updateObjectInfoFromLayoutItem(itemId);
+        updateObjectInfoFromLayoutItem(item.uuid);
     }
 
     auto& object = *it;
 
-    if (!object.zoomWindowItemUuid.isNull())
-        return;
+    bool newItem = item.uuid.isNull();
 
-    const auto layout = layoutResource();
+    if (newItem)
+    {
+        if (!object.zoomWindowItemUuid.isNull())
+        {
+            item.uuid = object.zoomWindowItemUuid;
+        }
+        else
+        {
+            item.uuid = QnUuid::createUuid();
+            object.zoomWindowItemUuid = item.uuid;
+        }
+        item.flags = Qn::PendingGeometryAdjustment;
+        item.resource.id = mediaResourceWidget->resource()->toResourcePtr()->getId();
+        item.zoomTargetUuid = mediaResourceWidget->resource()->toResourcePtr()->getId();
+        const auto targetPoint = mediaResourceWidget->item()->combinedGeometry().bottomRight();
+        item.combinedGeometry = QRectF(targetPoint, targetPoint);
 
-    QnLayoutItemData item;
-    item.uuid = QnUuid::createUuid();
-    object.zoomWindowItemUuid = item.uuid;
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            item.uuid, Qn::ItemAnalyticsModeRegionIdRole, areaId);
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            item.uuid, Qn::ItemZoomWindowRectangleVisibleRole, false);
+    }
 
-    item.flags = Qn::PendingGeometryAdjustment;
-    const auto targetPoint = mediaResourceWidget->item()->combinedGeometry().bottomRight();
-    item.combinedGeometry = QRectF(targetPoint, targetPoint);
-    item.resource.id = mediaResourceWidget->resource()->toResourcePtr()->getId();
-    item.zoomRect = object.rectangle;
-    item.zoomTargetUuid = mediaResourceWidget->resource()->toResourcePtr()->getId();
+    item.zoomRect = zoomWindowRectangle(object.rectangle);
 
     qnResourceRuntimeDataManager->setLayoutItemData(
         item.uuid, Qn::ItemFrameDistinctionColorRole, object.color);
     qnResourceRuntimeDataManager->setLayoutItemData(
-        item.uuid, Qn::ItemZoomWindowRectangleVisibleRole, false);
-    qnResourceRuntimeDataManager->setLayoutItemData(
-        item.uuid, Qn::ItemAnalyticsModeRegionIdRole, areaId);
+        item.uuid, Qn::ItemAnalyticsModeSourceRegionRole, object.rectangle);
 
-    layout->addItem(item);
+    if (newItem)
+        layoutResource()->addItem(item);
+    else
+        layoutResource()->updateItem(item);
 }
 
 void WidgetAnalyticsController::Private::findExistingItems()
 {
     const auto currentTime = timer.elapsed();
 
-    for (const auto& item: layoutResource()->getItems())
+    auto handleLayoutItem = [this, currentTime](const QnUuid& itemId)
+        {
+            const auto id = qnResourceRuntimeDataManager->layoutItemData(
+                itemId, Qn::ItemAnalyticsModeRegionIdRole).value<QnUuid>();
+
+            if (id.isNull())
+                return;
+
+            updateObjectInfoFromLayoutItem(itemId);
+
+            auto& objectInfo = objectInfoById[id];
+            objectInfo.active = true;
+            objectInfo.lastUsedTime = currentTime;
+        };
+
+    if (!zoomWindowObjectId.isNull())
     {
-        const auto id = qnResourceRuntimeDataManager->layoutItemData(
-            item.uuid, Qn::ItemAnalyticsModeRegionIdRole).value<QnUuid>();
-
-        if (id.isNull())
-            continue;
-
-        updateObjectInfoFromLayoutItem(item.uuid);
-
-        auto& objectInfo = objectInfoById[id];
-        objectInfo.active = true;
-        objectInfo.lastUsedTime = currentTime;
+        handleLayoutItem(mediaResourceWidget->item()->uuid());
+    }
+    else
+    {
+        for (const auto& item: layoutResource()->getItems())
+            handleLayoutItem(item.uuid);
     }
 }
 
@@ -214,36 +236,44 @@ QnLayoutResourcePtr WidgetAnalyticsController::Private::layoutResource() const
     return mediaResourceWidget->item()->layout()->resource();
 }
 
-void WidgetAnalyticsController::Private::updateObjectInfoFromLayoutItem(const QnUuid& itemId)
+QnUuid WidgetAnalyticsController::Private::updateObjectInfoFromLayoutItem(const QnUuid& itemId)
 {
     const auto item = layoutResource()->getItem(itemId);
 
     if (item.uuid.isNull())
-        return;
+        return QnUuid();
 
     const auto objectId = qnResourceRuntimeDataManager->layoutItemData(
         itemId, Qn::ItemAnalyticsModeRegionIdRole).value<QnUuid>();
 
     if (objectId.isNull())
-        return;
+        return objectId;
 
     auto& objectInfo = objectInfoById[objectId];
-    objectInfo.rectangle = item.zoomRect;
+    objectInfo.rectangle = qnResourceRuntimeDataManager->layoutItemData(
+        itemId, Qn::ItemAnalyticsModeSourceRegionRole).value<QRectF>();
+    if (objectInfo.rectangle.isEmpty())
+        objectInfo.rectangle = item.zoomRect;
+
     objectInfo.zoomWindowItemUuid = item.zoomTargetUuid;
     objectInfo.color = qnResourceRuntimeDataManager->layoutItemData(
         item.uuid, Qn::ItemFrameDistinctionColorRole).value<QColor>();
+
+    return objectId;
 }
 
 WidgetAnalyticsController::Private::ObjectInfo&
     WidgetAnalyticsController::Private::addOrUpdateObject(
         const common::metadata::DetectedObject& object)
 {
+    const auto settings = commonModule()->findInstance<ObjectDisplaySettings>();
+
     auto& objectInfo = objectInfoById[object.objectId];
-    if (objectInfo.lastUsedTime < 0)
-        objectInfo.color = utils::random::choice(kFrameColors);
+    objectInfo.color = settings->objectColor(object);
 
     objectInfo.rectangle = object.boundingBox;
-    objectInfo.description = objectDescription(object);
+    objectInfo.basicDescription = objectDescription(settings->briefAttributes(object));
+    objectInfo.description = objectDescription(settings->visibleAttributes(object));
     objectInfo.active = true;
 
     return objectInfo;
@@ -278,46 +308,70 @@ void WidgetAnalyticsController::Private::updateObjectAreas(qint64 timestamp)
         AreaHighlightOverlayWidget::AreaInformation areaInfo;
         areaInfo.id = it.key();
         areaInfo.color = objectInfo.color;
-        areaInfo.text = objectInfo.description;
+        areaInfo.text = objectInfo.basicDescription;
+        areaInfo.hoverText = objectInfo.description;
 
         if (ini().displayAnalyticsDelay && objectInfo.metadataTimestamp > 0)
         {
-            areaInfo.text +=
+            areaInfo.hoverText +=
                 lit("\nDelay\t%1").arg((timestamp - objectInfo.metadataTimestamp) / 1000);
         }
 
-        if (ini().enableDetectedObjectsInterpolation)
+        if (!zoomWindowObjectId.isNull())
         {
-            areaInfo.rectangle = interpolatedRectangle(
-                objectInfo.rectangle,
-                objectInfo.metadataTimestamp,
-                objectInfo.futureRectangle,
-                objectInfo.futureRectangleTimestamp,
-                timestamp);
+            areaInfo.rectangle = core::Geometry::toSubRect(
+                mediaResourceWidget->zoomRect(), objectInfo.rectangle);
         }
         else
         {
-            areaInfo.rectangle = objectInfo.rectangle;
+            if (ini().enableDetectedObjectsInterpolation)
+            {
+                areaInfo.rectangle = interpolatedRectangle(
+                    objectInfo.rectangle,
+                    objectInfo.metadataTimestamp,
+                    objectInfo.futureRectangle,
+                    objectInfo.futureRectangleTimestamp,
+                    timestamp);
+            }
+            else
+            {
+                areaInfo.rectangle = objectInfo.rectangle;
+            }
+
+            if (!objectInfo.zoomWindowItemUuid.isNull())
+            {
+                const auto& layout = layoutResource();
+                auto item = layout->getItem(objectInfo.zoomWindowItemUuid);
+                if (!item.uuid.isNull())
+                {
+                    item.zoomRect = zoomWindowRectangle(areaInfo.rectangle);
+                    qnResourceRuntimeDataManager->setLayoutItemData(
+                        item.uuid, Qn::ItemAnalyticsModeSourceRegionRole, objectInfo.rectangle);
+                    layout->updateItem(item);
+                }
+            }
         }
 
         areaHighlightWidget->addOrUpdateArea(areaInfo);
-
-        if (!objectInfo.zoomWindowItemUuid.isNull())
-        {
-            const auto& layout = layoutResource();
-            auto item = layout->getItem(objectInfo.zoomWindowItemUuid);
-            item.zoomRect = areaInfo.rectangle;
-            layout->updateItem(item);
-        }
     }
+}
+
+QRectF WidgetAnalyticsController::Private::zoomWindowRectangle(const QRectF& objectRect) const
+{
+    return core::Geometry::movedInto(
+        core::Geometry::expanded(1.0, objectRect, Qt::KeepAspectRatioByExpanding),
+        QRectF(0, 0, 1, 1));
 }
 
 WidgetAnalyticsController::WidgetAnalyticsController(QnMediaResourceWidget* mediaResourceWidget):
     base_type(mediaResourceWidget),
-    d(new Private())
+    d(new Private(commonModule()))
 {
     NX_ASSERT(mediaResourceWidget);
     d->mediaResourceWidget = mediaResourceWidget;
+
+    d->zoomWindowObjectId = qnResourceRuntimeDataManager->layoutItemData(
+        mediaResourceWidget->item()->uuid(), Qn::ItemAnalyticsModeRegionIdRole).value<QnUuid>();
 
     d->timer.restart();
 
@@ -330,7 +384,7 @@ WidgetAnalyticsController::~WidgetAnalyticsController()
 
 void WidgetAnalyticsController::updateAreas(qint64 timestamp, int channel)
 {
-    if (!d->metadataProvider || !d->areaHighlightWidget)
+    if (!d->metadataProvider || !d->areaHighlightWidget || !d->zoomWindowObjectId.isNull())
         return;
 
     const auto elapsed = d->timer.elapsed();
@@ -389,8 +443,27 @@ void WidgetAnalyticsController::updateAreas(qint64 timestamp, int channel)
 
 void WidgetAnalyticsController::clearAreas()
 {
+    if (!d->zoomWindowObjectId.isNull())
+        return;
+
     for (auto it = d->objectInfoById.begin(); it != d->objectInfoById.end(); ++it)
         d->removeObject(it.key());
+}
+
+void WidgetAnalyticsController::updateAreaForZoomWindow()
+{
+    if (d->zoomWindowObjectId.isNull())
+        return;
+
+    auto it = d->objectInfoById.find(d->zoomWindowObjectId);
+    if (it == d->objectInfoById.end())
+        return;
+
+    it->rectangle = qnResourceRuntimeDataManager->layoutItemData(
+        d->mediaResourceWidget->item()->uuid(),
+        Qn::ItemAnalyticsModeSourceRegionRole).value<QRectF>();
+    d->updateObjectAreas(it->metadataTimestamp);
+    d->areaHighlightWidget->setHighlightedArea(d->zoomWindowObjectId);
 }
 
 void WidgetAnalyticsController::setAnalyticsMetadataProvider(
@@ -406,7 +479,7 @@ void WidgetAnalyticsController::setAreaHighlightOverlayWidget(AreaHighlightOverl
 
     d->areaHighlightWidget = widget;
 
-    if (widget)
+    if (widget && d->zoomWindowObjectId.isNull())
     {
         QObject::connect(widget, &AreaHighlightOverlayWidget::areaClicked, d.data(),
             &Private::at_areaClicked);

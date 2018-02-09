@@ -127,6 +127,8 @@ private:
 
     void selectIndices(const QModelIndexList& indices);
 
+    void initNewSearch();
+
 private slots:
     void updateFilter(bool force = false);
     void updateToolTipPosition();

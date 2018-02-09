@@ -20,27 +20,29 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
 
     ui->licensingWidget->setVisible(false);
     ui->overLicensingLine->setVisible(false);
+
+    connect(ui->cameraInfoWidget, &CameraInfoWidget::hasChangesChanged, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
 CameraSettingsGeneralTabWidget::~CameraSettingsGeneralTabWidget()
 {
-
 }
 
 bool CameraSettingsGeneralTabWidget::hasChanges() const
 {
-    return false;
+    return ui->cameraInfoWidget->hasChanges();
 }
 
 void CameraSettingsGeneralTabWidget::loadDataToUi()
 {
     ui->cameraInfoWidget->loadDataToUi();
-
     ui->imageControlWidget->updateFromResources(m_model->cameras());
 }
 
 void CameraSettingsGeneralTabWidget::applyChanges()
 {
+    ui->cameraInfoWidget->applyChanges();
     ui->imageControlWidget->submitToResources(m_model->cameras());
 }
 

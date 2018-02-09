@@ -5,6 +5,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/mediaserver/updates2/detail/updates2_status_data_ex.h>
+#include <nx/mediaserver/updates2/detail/abstract_updates2_installer.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 
@@ -36,7 +37,7 @@ protected:
     void swapRegistries(update::info::AbstractUpdateRegistryPtr otherRegistry);
     void refreshStatusAfterCheck();
     void setStatus(api::Updates2StatusData::StatusCode code, const QString& message);
-    void startPreparing();
+    void startPreparing(const QString& updateFilePath);
 
     void onDownloadFinished(const QString& fileName);
     void onDownloadFailed(const QString& fileName);
@@ -58,10 +59,10 @@ protected:
     virtual void updateGlobalRegistry(const QByteArray& serializedRegistry) = 0;
     virtual void writeStatusToFile(const detail::Updates2StatusDataEx& statusData) = 0;
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
+    virtual AbstractUpdates2InstallerPtr installer() = 0;
 
     // Signals for mockup
     virtual void remoteUpdateCompleted() = 0;
-    virtual void downloadFinished() = 0;
 };
 
 } // namespace detail

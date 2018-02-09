@@ -10,7 +10,7 @@ from .utils import GrowingSleep
 from .core_file_traceback import create_core_file_traceback
 from .server_factory import SERVER_LOG_ARTIFACT_TYPE, CORE_FILE_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
 from .server import Server
-from .server_ctl import SERVER_CTL_TARGET_PATH, PhysicalHostServerCtl
+from .service import SERVER_CTL_TARGET_PATH, AdHocService
 from .template_renderer import TemplateRenderer
 
 log = logging.getLogger(__name__)
@@ -111,9 +111,9 @@ class LightweightServersInstallation(object):
 
 class LightweightServer(Server):
 
-    def __init__(self, name, host, server_ctl, installation, rest_api_url, ca, rest_api_timeout=None,
+    def __init__(self, name, host, service, installation, rest_api_url, ca, rest_api_timeout=None,
                  internal_ip_port=None):
-        Server.__init__(self, name, host, server_ctl, installation, rest_api_url, ca,
+        Server.__init__(self, name, host, service, installation, rest_api_url, ca,
                         rest_api_timeout=rest_api_timeout, internal_ip_port=internal_ip_port)
         self.internal_ip_address = host.hostname
         self._state = self._st_started
@@ -154,7 +154,7 @@ class LightweightServersHost(object):
             self._os_access, physical_installation_host.root_dir / 'lws', self._ca)
         self._template_renderer = TemplateRenderer()
         self._lws_dir = self._installation.dir
-        self._server_ctl = PhysicalHostServerCtl(self._os_access, self._lws_dir)
+        self._service = AdHocService(self._os_access, self._lws_dir)
         self._allocated = False
         self._first_server = None
         self._init()
@@ -169,13 +169,13 @@ class LightweightServersHost(object):
         self._cleanup_log_files()
         self._os_access.put_file(self._test_binary_path, self._lws_dir)
         self._write_lws_ctl(server_dir, server_count, lws_params)
-        self._server_ctl.set_state(is_started=True)
+        self._service.set_state(is_started=True)
         # must be set before cycle following it so failure in that cycle won't prevent from artifacts collection from 'release' method
         self._allocated = True
         for idx in range(server_count):
             server_port = LWS_PORT_BASE + idx
             rest_api_url = '%s://%s:%d/' % ('http', self._os_access.hostname, server_port)
-            server = LightweightServer('lws-%05d' % idx, self._os_access, self._installation, self._server_ctl, self._ca,
+            server = LightweightServer('lws-%05d' % idx, self._os_access, self._installation, self._service, self._ca,
                                        rest_api_url, internal_ip_port=server_port)
             response = server.wait_for_server_become_online(timeout=LWS_START_TIMEOUT, check_interval_sec=2)
             server.local_system_id = response['localSystemId']
@@ -190,8 +190,8 @@ class LightweightServersHost(object):
         self._allocated = False
 
     def _init(self):
-        if self._server_ctl.get_state():
-            self._server_ctl.set_state(is_started=False)
+        if self._service.get_state():
+            self._service.set_state(is_started=False)
         self._installation.cleanup_core_files()
         self._installation.cleanup_test_tmp_dir()
 
@@ -251,7 +251,8 @@ class LightweightServersHost(object):
             self._first_server.make_core_dump()
 
     def perform_post_checks(self):
-        log.info('performing post-test checks for lightweight servers at %s', self._host_name)
+        log.info('----- performing post-test checks for lightweight servers at %s'
+                     '---------------------->8 ---------------------------', self._host_name)
         self._check_if_server_is_online()
         core_file_list = self._installation.list_core_files()
         assert not core_file_list, ('Lightweight server at %s left %d core dump(s): %s' %

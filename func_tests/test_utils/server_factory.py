@@ -2,8 +2,8 @@ import logging
 
 from pathlib2 import PurePosixPath
 
-from test_utils.server_ctl import VagrantBoxServerCtl
-from test_utils.server_installation import install_media_server, find_deb_installation
+from test_utils.service import UpstartService
+from test_utils.server_installation import install_mediaserver, find_deb_installation
 from .core_file_traceback import create_core_file_traceback
 from .server import ServerConfig, Server
 from .artifact import ArtifactType
@@ -22,19 +22,19 @@ class ServerFactory(object):
                  reset_servers,
                  artifact_factory,
                  cloud_host,
-                 vagrant_box_factory,
+                 vagrant_vm_factory,
                  physical_installation_ctl,
-                 deb,
+                 mediaserver_deb,
                  ca,
                  ):
         self._reset_servers = reset_servers
         self._artifact_factory = artifact_factory
         self._cloud_host = cloud_host
-        self._vagrant_box_factory = vagrant_box_factory
+        self._vagrant_vm_factory = vagrant_vm_factory
         self._physical_installation_ctl = physical_installation_ctl  # PhysicalInstallationCtl or None
         self._allocated_servers = []
         self._ca = ca
-        self._deb = deb
+        self._mediaserver_deb = mediaserver_deb
 
     def __call__(self, *args, **kw):
         config = ServerConfig(*args, **kw)
@@ -42,22 +42,22 @@ class ServerFactory(object):
 
     def _allocate(self, config):
         server = None
-        if self._physical_installation_ctl and not config.box:  # this server requires specific vm box, can not allocate it on physical one
+        if self._physical_installation_ctl and not config.vm:  # this server requires specific vm, can not allocate it on physical one
             server = self._physical_installation_ctl.allocate_server(config)
         if not server:
-            if config.box:
-                box = config.box
+            if config.vm:
+                vm = config.vm
             else:
-                box = self._vagrant_box_factory(must_be_recreated=config.leave_initial_cloud_host)
-            installation = find_deb_installation(box.guest_os_access, self._deb, PurePosixPath('/opt'))
+                vm = self._vagrant_vm_factory(must_be_recreated=config.leave_initial_cloud_host)
+            installation = find_deb_installation(vm.guest_os_access, self._mediaserver_deb, PurePosixPath('/opt'))
             if installation is None:
-                installation = install_media_server(box.guest_os_access, self._deb)
+                installation = install_mediaserver(vm.guest_os_access, self._mediaserver_deb)
                 installation.put_key_and_cert(self._ca.generate_key_and_cert())
-            api_url = '%s://%s:%d/' % (config.http_schema, box.host_os_access.hostname, box.config.rest_api_forwarded_port)
-            customization = self._deb.customization
-            server_ctl = VagrantBoxServerCtl(box.guest_os_access, customization.service_name)
+            api_url = '%s://%s:%d/' % (config.http_schema, vm.host_os_access.hostname, vm.config.rest_api_forwarded_port)
+            customization = self._mediaserver_deb.customization
+            service = UpstartService(vm.guest_os_access, customization.service_name)
             server = Server(
-                config.name, box.guest_os_access, server_ctl, installation, api_url, self._ca,
+                config.name, vm.guest_os_access, service, installation, api_url, self._ca,
                 rest_api_timeout=config.rest_api_timeout)
 
         self._allocated_servers.append(server)  # _prepare_server may fail, will need to save it's artifact in that case

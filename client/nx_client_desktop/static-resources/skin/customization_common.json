@@ -86,6 +86,16 @@
         "orange_main":  "#d65029",
         "orange_d3":    "#743320",
 
+        "detectedObject1":  "#65991c",
+        "detectedObject2":  "#994998",
+        "detectedObject3":  "#029eb0",
+        "detectedObject4":  "#5d82bf",
+        "detectedObject6":  "#f38282",
+        "detectedObject7":  "#b13016",
+        "detectedObject8":  "#dcb428",
+        "detectedObject9":  "#9c6b50",
+        "detectedObject10": "#cbcbcb",
+
         "timeline_main":    "#3a911e",
         "timeline_bg":      "#223925",
 

@@ -602,7 +602,7 @@ void QnProgressiveDownloadingConsumer::run()
                     && (resolutionStr.isEmpty() ||
                         requestedResolutionStr == streamInfo.resolution))
                 {
-                    qualityToUse = streamInfo.encoderIndex == Qn::StreamIndex::primary
+                    qualityToUse = streamInfo.getEncoderIndex() == Qn::StreamIndex::primary
                         ? QnServer::HiQualityCatalog
                         : QnServer::LowQualityCatalog;
                     transcodeMethod = QnTranscoder::TM_DirectStreamCopy;

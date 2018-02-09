@@ -1,5 +1,5 @@
 nx_find_files(c_files src "c")
-nx_add_target(nx_onvif LIBRARY LIBRARY_TYPE STATIC NO_MOC NO_PCH
+nx_add_target(nx_onvif LIBRARY LIBRARY_TYPE STATIC NO_MOC
     ADDITIONAL_SOURCES ${c_files}
     PUBLIC_LIBS openssl
 )

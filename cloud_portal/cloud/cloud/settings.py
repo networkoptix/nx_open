@@ -35,7 +35,7 @@ if not CUSTOMIZATION:
 SECRET_KEY = '03-b9bxxpjxsga(qln0@3szw3+xnu%6ph_l*sz-xr_4^xxrj!_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = 'debug' in conf and conf['debug']
 
 ALLOWED_HOSTS = ['*']
 
@@ -376,9 +376,9 @@ BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = True
 NOTIFICATIONS_AUTO_SUBSCRIBE = False
 
 
-UPDATE_JSON = 'http://updates.networkoptix.com/updates.json'
+UPDATE_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/updates.json'
 DOWNLOADS_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}}/downloads.json'
-DOWNLOADS_VERSION_JSON = 'http://updates.networkoptix.com/{{customization}}/{{build}}/downloads.json'
+DOWNLOADS_VERSION_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}}/{{build}}/downloads.json'
 
 MAX_RETRIES = conf['max_retries']
 

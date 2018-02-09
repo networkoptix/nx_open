@@ -26,7 +26,7 @@
 
 namespace {
 
-nx::api::AnalyticsEventType analyticsEventType(const QnVirtualCameraResourcePtr& camera,
+nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePtr& camera,
     const QnUuid& driverId, const QnUuid& eventTypeId)
 {
     NX_EXPECT(camera);
@@ -54,13 +54,13 @@ nx::api::AnalyticsEventType analyticsEventType(const QnVirtualCameraResourcePtr&
 
     const auto types = driver->outputEventTypes;
     const auto eventType = std::find_if(types.cbegin(), types.cend(),
-        [eventTypeId](const nx::api::AnalyticsEventType eventType)
+        [eventTypeId](const nx::api::Analytics::EventType eventType)
         {
-            return eventType.typeId == eventTypeId;
+            return eventType.eventTypeId == eventTypeId;
         });
 
     return eventType == types.cend()
-        ? nx::api::AnalyticsEventType()
+        ? nx::api::Analytics::EventType()
         : *eventType;
 }
 

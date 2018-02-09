@@ -15,6 +15,12 @@ set(installation.root "/opt/${deb.customization.company.name}")
 set(launcher.version.file "launcher.version")
 set(client.mediafolder.name "${product.name} Media")
 set(nxtool.name "${company.name} ${display.product.name} Server Tool")
+# Some customization (e.g. ionetworks) may have company name, which is not valid windows path.
+if(NOT windowsInstallPath)
+    set(windowsInstallPath "${company.name}")
+endif()
+string(TIMESTAMP current_year %Y UTC)
+set(nx_copyright "Copyright (c) 2011-${current_year} Network Optix")
 
 if(WINDOWS)
     set(client.binary.name "${product.name}.exe")

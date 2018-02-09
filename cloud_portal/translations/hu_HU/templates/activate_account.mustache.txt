@@ -1,8 +1,8 @@
-{{PRODUCT_NAME}} üdvözli Önt
+Hello,
 
-{{PRODUCT_NAME}} köszöni részvételét. E-mail címe visszaigazolásához és fiókja aktiválásához kattintson az alábbi gombra.
+  Please open the link below to confirm your email address and activate the account.
 
-Fiók aktiválása: {{config.portal_url}}/hatékonnyá tesz/{{message.code}}
+{{config.portal_url}}/activate/{{message.code}}
 
 Ha nem regisztrált {{PRODUCT_NAME}} alkalmazásban ne foglalkozzon ezzel az e-maillel.
-Kérjük senkinek se továbbítsa ezt az üzenetet.
+Do not share the message or the link with anyone.

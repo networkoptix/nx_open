@@ -1,5 +1,7 @@
 #include "resource_thumbnail_provider.h"
 
+#include <QtGui/QPainter>
+
 #include <api/server_rest_connection.h>
 
 #include <nx/client/desktop/image_providers/camera_thumbnail_provider.h>
@@ -12,7 +14,9 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <ui/style/nx_style.h>
 
 namespace nx {
 namespace client {
@@ -28,8 +32,22 @@ struct ResourceThumbnailProvider::Private
         // Some cameras are actually provide only sound stream. So we draw sound icon for this.
         if (mediaResource && !mediaResource->hasVideo())
         {
+            // TODO: vms 4.0 has a new way to get preset colors
+            const auto& palette = QnNxStyle::instance()->genericPalette();
+            const auto& backgroundColor = palette.color(lit("dark"), 4);
+            const auto& frameColor = palette.color(lit("dark"), 6);
             QPixmap pixmap = qnSkin->pixmap(lit("item_placeholders/sound.png"), true);
-            baseProvider.reset(new QnBasicImageProvider(pixmap.toImage()));
+            QSize size = pixmap.size();
+            QPixmap dst(size);
+            // We fill in background.
+            dst.fill(backgroundColor);
+            QPainter painter(&dst);
+            painter.setRenderHints(QPainter::SmoothPixmapTransform);
+            painter.setOpacity(0.7);
+            painter.drawPixmap(0, 0, pixmap);
+            painter.setOpacity(1.0);
+
+            baseProvider.reset(new QnBasicImageProvider(dst.toImage()));
         }
         else if (const auto camera = request.resource.dynamicCast<QnVirtualCameraResource>())
         {

@@ -192,7 +192,7 @@
         <openal.version>1.16</openal.version>
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <vmux.version>1.0.0</vmux.version>
-        <cpro.version>1.0.0</cpro.version>
+        <cpro.version>1.0.0-1</cpro.version>
         <server-external.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</server-external.version>
         <gcc.version>4.9.4</gcc.version>
 
@@ -537,15 +537,17 @@
                 <module>nx_storage_sdk</module>
 
                 <module>common_libs/nx_speech_synthesizer</module>
-                <module>mediaserver</module>
                 <module>mediaserver_core</module>
 
+<!--
+                <module>mediaserver</module>
                 <module>plugins/genericrtspplugin</module>
                 <module>plugins/generic_multicast_plugin</module>
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>plugins/metadata/hanwha_metadata_plugin</module>
                 <module>plugins/metadata/hikvision_metadata_plugin</module>
+-->
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
@@ -699,19 +701,21 @@
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
-                <module>media_db_util</module>
                 <module>nx_cloud/libvms_gateway_core</module>
                 <module>nx_cloud/vms_gateway</module>
                 <module>common_libs/nx_cassandra</module>
                 <module>nx_cloud/librelaying</module>
                 <module>nx_cloud/libtraffic_relay</module>
                 <module>nx_cloud/traffic_relay</module>
-                <module>client/minilauncher</module>
-                <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
                 <!--<module>nxtool</module>-->
+		<!--
                 <module>testcamera</module>
+                <module>media_db_util</module>
+                <module>client/minilauncher</module>
+                <module>traytool</module>
+		-->
                 <!-- <module>wixsetup</module> -->
             </modules>
         </profile>
@@ -852,17 +856,17 @@
                 <module>nx_cloud/librelaying</module>
                 <module>nx_cloud/libtraffic_relay</module>
                 <module>common_libs/nx_cassandra</module>
-                <module>media_db_util</module>
-                <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway_core</module>
                 <module>nx_cloud/vms_gateway</module>
                 <module>nx_cloud/time_server</module>
-                <module>plugins/it930x_plugin</module>
                 <!--
+                <module>plugins/it930x_plugin</module>
+                <module>media_db_util</module>
+                <module>testcamera</module>
                 <module>debsetup/client-deb</module>
-                -->
                 <module>debsetup/mediaserver-deb</module>
                 <module>root_tool</module>
+                -->
                 <!-- <module>storage_plugins/teststorageplugin/test</module> -->
             </modules>
             <properties>

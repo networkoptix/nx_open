@@ -2,9 +2,6 @@
 
 #include <nx/fusion/model_functions.h>
 
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hikvision, EventTypeFlag)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hikvision, EventTypeFlags)
-
 namespace nx {
 namespace mediaserver {
 namespace plugins {
@@ -28,8 +25,8 @@ QnUuid Hikvision::DriverManifest::eventTypeByInternalName(const QString& value) 
         {
             if (internalEventName.contains(name))
             {
-                m_idByInternalName.insert(internalEventName, eventDescriptor.typeId);
-                return eventDescriptor.typeId;
+                m_idByInternalName.insert(internalEventName, eventDescriptor.eventTypeId);
+                return eventDescriptor.eventTypeId;
             }
         }
     }
@@ -45,7 +42,7 @@ const Hikvision::EventDescriptor& Hikvision::DriverManifest::eventDescriptorById
         return itr.value();
     for (const auto& eventDescriptor: outputEventTypes)
     {
-        if (eventDescriptor.typeId == id)
+        if (eventDescriptor.eventTypeId == id)
         {
             itr = m_recordById.insert(id, eventDescriptor);
             return itr.value();
@@ -55,6 +52,11 @@ const Hikvision::EventDescriptor& Hikvision::DriverManifest::eventDescriptorById
     static const Hikvision::EventDescriptor kEmptyDescriptor;
     return kEmptyDescriptor;
 }
+
+const Hikvision::EventDescriptor Hikvision::DriverManifest::eventDescriptorByInternalName(const QString& internalName) const
+{
+    return eventDescriptorById(eventTypeByInternalName(internalName));
+};
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hikvision::EventDescriptor, (json), EventDescriptor_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hikvision::DriverManifest, (json), DriverManifest_Fields)

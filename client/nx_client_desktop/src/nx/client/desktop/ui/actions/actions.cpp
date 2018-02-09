@@ -1365,7 +1365,7 @@ void initialize(Manager* manager, Action* root)
             && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
 
     factory(AddDeviceManuallyAction)
-        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
+        .flags(Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Add Device..."))   //intentionally hardcode devices here
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)

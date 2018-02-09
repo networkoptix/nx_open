@@ -52,7 +52,6 @@ signals:
 
 private slots:
     void at_dbDataChanged();
-    void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged(int state);
 
 private:
@@ -72,9 +71,6 @@ private:
 
     bool m_loginWasEmpty;
     bool m_passwordWasEmpty;
-
-    /** Indicates that the user changed controls but not applied them to the schedule */
-    bool m_hasScheduleControlsChanges;
 
     bool m_readOnly;
 

@@ -5,7 +5,7 @@
 
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
-#include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
+#include <streaming/rtp_stream_reader.h>
 
 namespace {
 

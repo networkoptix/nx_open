@@ -25,7 +25,7 @@ MediatorConnector::MediatorConnector():
     auto stunClientSettings = s_stunClientSettings;
     stunClientSettings.reconnectPolicy = network::RetryPolicy::kNoRetries;
     m_stunClient = std::make_shared<network::stun::AsyncClientWithHttpTunneling>(
-        s_stunClientSettings);
+        stunClientSettings);
 
     bindToAioThread(getAioThread());
 
@@ -103,9 +103,8 @@ void MediatorConnector::mockupMediatorUrl(const nx::utils::Url& mediatorUrl)
     m_mediatorUrl = mediatorUrl;
     m_mockedUpMediatorUrl = mediatorUrl;
     m_mediatorUdpEndpoint = nx::network::url::getEndpoint(mediatorUrl);
-    m_stunClient->connect(mediatorUrl, [](SystemError::ErrorCode) {});
     m_promise->set_value(true);
-
+    connectToMediatorAsync();
     if (m_mediatorAvailabilityChangedHandler)
         m_mediatorAvailabilityChangedHandler(true);
 }

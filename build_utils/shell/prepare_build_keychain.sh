@@ -53,6 +53,8 @@ done
 
 [[ $KEYCHAIN == *.keychain ]] && KEYCHAIN="${KEYCHAIN%.keychain}"
 
+KEYCHAIN="$HOME/Library/Keychains/$KEYCHAIN"
+
 KEYCHAINS=$(security list-keychains -d user | sed 's/"//g')
 
 if ! echo "$KEYCHAINS" | grep -q "$KEYCHAIN"

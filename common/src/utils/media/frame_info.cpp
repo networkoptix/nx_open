@@ -7,6 +7,8 @@
 
 #include <utils/math/math.h>
 
+#include <nx/utils/app_info.h>
+
 extern "C" {
 #ifdef WIN32
 #   define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
@@ -18,6 +20,29 @@ extern "C" {
 #endif
 };
 
+
+namespace {
+
+void convertImageFormat(
+    int width,
+    int height,
+    uint8_t* const sourceSlice[],
+    const int sourceStride[],
+    AVPixelFormat sourceFormat,
+    uint8_t* const targetSlice[],
+    const int targetStride[],
+    AVPixelFormat targetFormat)
+{
+    const auto context = sws_getContext(
+        width, height, sourceFormat,
+        width, height, targetFormat,
+        SWS_BILINEAR, nullptr, nullptr, nullptr);
+
+    sws_scale(context, sourceSlice, sourceStride, 0, height, targetSlice, targetStride);
+    sws_freeContext(context);
+}
+
+} // namespace
 
 /////////////////////////////////////////////////////
 //  class QnSysMemPictureData
@@ -57,6 +82,11 @@ unsigned int QnOpenGLPictureData::glTexture() const
 CLVideoDecoderOutput::CLVideoDecoderOutput()
 {
     memset( this, 0, sizeof(AVFrame) );
+}
+CLVideoDecoderOutput::CLVideoDecoderOutput(int targetWidth, int targetHeight, int targetFormat):
+    CLVideoDecoderOutput()
+{
+    reallocate(targetWidth, targetHeight, targetFormat);
 }
 
 CLVideoDecoderOutput::~CLVideoDecoderOutput()
@@ -341,27 +371,38 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
     for (int y = 0; y < height; ++y)
         memcpy(src.data[0] + src.linesize[0]*y, image.scanLine(y), width * 4);
 
-    SwsContext* scaleContext = sws_getContext(width, height, AV_PIX_FMT_BGRA,
-                                              width, height, AV_PIX_FMT_YUV420P,
-                                              SWS_BICUBIC, NULL, NULL, NULL);
-    sws_scale(scaleContext, src.data, src.linesize, 0, height, data, linesize);
-    sws_freeContext(scaleContext);
+    convertImageFormat(width, height,
+        src.data, src.linesize, AV_PIX_FMT_BGRA,
+        data, linesize, AV_PIX_FMT_YUV420P);
 }
 
 QImage CLVideoDecoderOutput::toImage() const
 {
-    CLVideoDecoderOutput dst;
-    dst.reallocate(width, height, AV_PIX_FMT_BGRA);
+    // In some cases direct conversion to AV_PIX_FMT_BGRA in MacOS X causes crash in sws_scale
+    // function. As workaround we can temporary convert to AV_PIX_FMT_ARGB format and then convert
+    // to target AV_PIX_FMT_BGRA
 
-    SwsContext* scaleContext = sws_getContext(width, height, (AVPixelFormat) format,
-                                              width, height, AV_PIX_FMT_BGRA,
-                                              SWS_BICUBIC, NULL, NULL, NULL);
-    sws_scale(scaleContext, data, linesize, 0, height, dst.data, dst.linesize);
-    sws_freeContext(scaleContext);
+    const AVPixelFormat targetFormat =
+        nx::utils::AppInfo::isMacOsX() ? AV_PIX_FMT_ARGB : AV_PIX_FMT_BGRA;
+
+    CLVideoDecoderOutputPtr target(new CLVideoDecoderOutput(width, height, targetFormat));
+
+    convertImageFormat(width, height,
+        data, linesize, (AVPixelFormat) format,
+        target->data, target->linesize, targetFormat);
+
+    if (nx::utils::AppInfo::isMacOsX()) // Workaround for MacOS X.
+    {
+        const CLVideoDecoderOutputPtr converted(new CLVideoDecoderOutput(width, height, AV_PIX_FMT_BGRA));
+        convertImageFormat(width, height,
+            target->data, target->linesize, targetFormat,
+            converted->data, converted->linesize, AV_PIX_FMT_BGRA);
+        target = converted;
+    }
 
     QImage img(width, height, QImage::Format_ARGB32);
     for (int y = 0; y < height; ++y)
-        memcpy(img.scanLine(y), dst.data[0] + dst.linesize[0]*y, width * 4);
+        memcpy(img.scanLine(y), target->data[0] + target->linesize[0] * y, width * 4);
 
     return img;
 }

@@ -9,9 +9,9 @@ namespace {
 
 QString nameInternal(
     const QnVirtualCameraResourcePtr& camera,
-    const QnUuid& typeId,
+    const QnUuid& eventTypeId,
     const QString& locale,
-    QList<nx::api::AnalyticsEventType> nx::api::AnalyticsDriverManifest::* list)
+    QList<nx::api::Analytics::EventType> nx::api::AnalyticsDriverManifest::* list)
 {
     NX_ASSERT(camera);
     if (!camera)
@@ -26,7 +26,7 @@ QString nameInternal(
     {
         for (const auto& eventType: manifest.*list)
         {
-            if (eventType.typeId == typeId)
+            if (eventType.eventTypeId == eventTypeId)
                 return eventType.name.text(locale);
         };
     }
@@ -64,9 +64,9 @@ public:
     {}
 
     void addUnique(const nx::api::AnalyticsDriverManifest& manifest,
-        const nx::api::AnalyticsEventType& eventType)
+        const nx::api::Analytics::EventType& eventType)
     {
-        AnalyticsEventTypeId id{manifest.driverId, eventType.typeId};
+AnalyticsEventTypeId id{manifest.driverId, eventType.eventTypeId};
         if (keys.contains(id))
             return;
 
@@ -74,7 +74,7 @@ public:
         EventDescriptor ref;
         ref.driverId = manifest.driverId;
         ref.driverName = manifest.driverName;
-        ref.eventTypeId = eventType.typeId;
+        ref.eventTypeId = eventType.eventTypeId;
         ref.eventName = eventType.name;
         data->push_back(ref);
     }
@@ -131,7 +131,7 @@ QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::supportedAnalyticsEvent
         {
             for (const auto& eventType: manifest.outputEventTypes)
             {
-                if (!allowedEvents.contains(eventType.typeId))
+                if (!allowedEvents.contains(eventType.eventTypeId))
                     continue;
 
                 storage.addUnique(manifest, eventType);

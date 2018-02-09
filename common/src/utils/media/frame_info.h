@@ -161,6 +161,7 @@ public:
     //!Stores picture data. If NULL, picture data is stored in \a AVFrame fields
 
     CLVideoDecoderOutput();
+    CLVideoDecoderOutput(int targetWidth, int targetHeight, int targetFormat);
     CLVideoDecoderOutput(QImage image);
     ~CLVideoDecoderOutput();
 
