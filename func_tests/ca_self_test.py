@@ -19,7 +19,7 @@ def temp_ca(run_options):
 @pytest.fixture
 def gen_dir(run_options):
     path = run_options.work_dir / 'ca_self_test_gen'
-    path.mkdir(parents=True, exists_ok=True)
+    path.mkdir(parents=True, exist_ok=True)
     return path
 
 
