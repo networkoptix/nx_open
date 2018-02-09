@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QString>
@@ -36,6 +38,8 @@ public:
         int typeListSize) override;
 
     bool timerNeeded();
+
+    std::chrono::milliseconds timeTillCheck();
 
     void sendEventStartedPacket(const AnalyticsEventType& event);
 

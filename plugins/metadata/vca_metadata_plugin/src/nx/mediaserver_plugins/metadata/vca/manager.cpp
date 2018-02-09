@@ -285,8 +285,8 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
             != m_eventsToCatch.cend())
         {
             sendEventStartedPacket(event);
-            if (timerNeeded() && !m_timer.timeToEvent())
-                m_timer.start(kMinTimeBetweenEvents, [this](){ onTimer(); });
+            if (timerNeeded())
+                m_timer.start(timeTillCheck(), [this](){ onTimer(); });
         }
 
         cleanBuffer(m_buffer, size);
@@ -302,6 +302,26 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         {
             this->onReceive(errorCode, size);
         });
+}
+
+std::chrono::milliseconds Manager::timeTillCheck()
+{
+    qint64 maxElapsed = 0;
+    for (const QnUuid& id: m_eventsToCatch)
+    {
+        const AnalyticsEventType& event = m_plugin->eventByUuid(id);
+        if ((event.flags & nx::api::Analytics::EventTypeFlag::stateDependent)
+            && event.elapsedTimer.isValid())
+        {
+            if (maxElapsed < event.elapsedTimer.elapsed())
+                maxElapsed = event.elapsedTimer.elapsed();
+        }
+    }
+    using std::chrono::milliseconds;
+    auto result = kMinTimeBetweenEvents - milliseconds(maxElapsed);
+    if (result < milliseconds::zero())
+        result = milliseconds::zero();
+    return result;
 }
 
 void Manager::sendEventStartedPacket(const AnalyticsEventType& event)
@@ -324,7 +344,11 @@ void Manager::sendEventStartedPacket(const AnalyticsEventType& event)
     {
         auto packet = createCommonEventMetadataPacket(event, /*active*/ true);
         m_handler->handleMetadata(nx::sdk::Error::noError, packet);
-        NX_PRINT << "Event [start] " << event.internalName.toUtf8().constData()
+        NX_PRINT
+            << ((event.flags & nx::api::Analytics::EventTypeFlag::stateDependent)
+                ? "Event [start] "
+                : "Event [pulse] ")
+            << event.internalName.toUtf8().constData()
             << " sent to server";
     }
 }
@@ -348,11 +372,12 @@ void Manager::onTimer()
     for (const QnUuid& id: m_eventsToCatch)
     {
         const AnalyticsEventType& event = m_plugin->eventByUuid(id);
-        sendEventStoppedPacket(event);
+        if (std::chrono::milliseconds(event.elapsedTimer.elapsed()) >= kMinTimeBetweenEvents)
+            sendEventStoppedPacket(event);
     }
 
     if (timerNeeded())
-        m_timer.start(kMinTimeBetweenEvents, [this](){ onTimer(); });
+        m_timer.start(timeTillCheck(), [this](){ onTimer(); });
 }
 
 /*
