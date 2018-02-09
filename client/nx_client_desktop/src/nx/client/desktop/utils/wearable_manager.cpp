@@ -3,6 +3,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <recording/time_period_list.h>
 
 #include "wearable_worker.h"
 #include "wearable_checker.h"
@@ -76,7 +77,7 @@ void WearableManager::checkUploads(
     connect(checker, &WearableChecker::finished, target, callback);
     connect(checker, &WearableChecker::finished, checker, &QObject::deleteLater);
 
-    checker->checkUploads(filePaths);
+    checker->checkUploads(filePaths, state(camera).periods());
 }
 
 void WearableManager::updateState(const QnSecurityCamResourcePtr& camera)

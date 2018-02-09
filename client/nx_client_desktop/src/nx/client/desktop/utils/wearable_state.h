@@ -7,6 +7,8 @@
 
 #include "upload_state.h"
 
+class QnTimePeriodList;
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -69,6 +71,11 @@ struct WearableState
      * @returns                         Progress the whole operation, a number in [0, 100] range.
      */
     int progress() const;
+
+    /**
+     * @returns                         A union of all time periods for the files in this state.
+     */
+    QnTimePeriodList periods() const;
 };
 
 } // namespace desktop

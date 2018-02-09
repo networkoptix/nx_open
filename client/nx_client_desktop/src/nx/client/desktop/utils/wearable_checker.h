@@ -8,6 +8,8 @@
 
 #include "wearable_payload.h"
 
+class QnTimePeriodList;
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -23,7 +25,7 @@ public:
     WearableChecker(const QnSecurityCamResourcePtr& camera, QObject* parent = nullptr);
     virtual ~WearableChecker() override;
 
-    void checkUploads(const QStringList& filePaths);
+    void checkUploads(const QStringList& filePaths, const QnTimePeriodList& queue);
 
 private:
     void checkLocally(WearablePayload& payload);

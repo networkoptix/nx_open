@@ -6,6 +6,7 @@
 #include <api/server_rest_connection.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <recording/time_period_list.h>
 
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
@@ -16,10 +17,33 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-namespace
+namespace {
+
+bool canUpload(const QnTimePeriod& local, const QnTimePeriod& remote)
 {
-    qint64 kMaxIgnoredOverlapMs = 200;
+    const qint64 kMaxIgnoredOverlapMs = 200;
+
+    if (local == remote)
+        return true;
+
+    QnTimePeriod remoteExtended = remote;
+    remoteExtended.startTimeMs -= kMaxIgnoredOverlapMs;
+    remoteExtended.durationMs += 2 * kMaxIgnoredOverlapMs;
+
+    return remoteExtended.contains(local);
 }
+
+QnTimePeriod shrinkPeriod(const QnTimePeriod& local, const QnTimePeriodList& remote)
+{
+    QnTimePeriodList locals{local};
+    locals.excludeTimePeriods(remote);
+
+    if (!locals.empty())
+        return locals[0];
+    return QnTimePeriod();
+}
+
+} // namespace
 
 
 struct WearableChecker::Private
@@ -38,6 +62,7 @@ struct WearableChecker::Private
 
     QnSecurityCamResourcePtr camera;
     QnMediaServerResourcePtr server;
+    QnTimePeriodList queuePeriods;
     WearablePayloadList result;
 
     ServerRequestStorage requests;
@@ -57,7 +82,7 @@ WearableChecker::~WearableChecker()
     d->requests.cancelAllRequests();
 }
 
-void WearableChecker::checkUploads(const QStringList& filePaths)
+void WearableChecker::checkUploads(const QStringList& filePaths, const QnTimePeriodList& queue)
 {
     NX_ASSERT(d->result.isEmpty());
     NX_ASSERT(!filePaths.isEmpty());
@@ -69,6 +94,8 @@ void WearableChecker::checkUploads(const QStringList& filePaths)
         d->result.push_back(payload);
     }
 
+    d->queuePeriods = queue;
+
     for (WearablePayload& payload : d->result)
         checkLocally(payload);
 
@@ -78,6 +105,7 @@ void WearableChecker::checkUploads(const QStringList& filePaths)
         return;
     }
 
+    // Note that we don't meddle with sending only valid files here as this way it's just simpler.
     QnWearableCheckData request;
     for (const WearablePayload& payload : d->result)
         request.elements.push_back(payload.local);
@@ -135,9 +163,19 @@ void WearableChecker::checkLocally(WearablePayload& payload)
         return;
     }
 
-    payload.local.period = QnTimePeriod(startTimeMs, durationMs);
+    QnTimePeriod localPeriod = QnTimePeriod(startTimeMs, durationMs);
+    QnTimePeriod expectedRemotePeriod = shrinkPeriod(localPeriod, d->queuePeriods);
+    if (!canUpload(localPeriod, expectedRemotePeriod))
+    {
+        payload.status = WearablePayload::ChunksTakenByFileInQueue;
+        return;
+    }
+
+    payload.local.period = localPeriod;
     payload.local.size = QFileInfo(payload.path).size();
     payload.status = WearablePayload::Valid;
+
+    d->queuePeriods.includeTimePeriod(payload.local.period);
 }
 
 void WearableChecker::handleCheckFinished(bool success, const QnWearableCheckReply& reply)
@@ -154,17 +192,12 @@ void WearableChecker::handleCheckFinished(bool success, const QnWearableCheckRep
     for (int i = 0; i < reply.elements.size(); i++)
     {
         WearablePayload& payload = d->result[i];
+        if(payload.status != WearablePayload::Valid)
+            continue; //< That's a file that was locally invalid.
+
         payload.remote = reply.elements[i];
-
-        if (payload.local.period != payload.remote.period)
-        {
-            QnTimePeriod remoteExtended = payload.remote.period;
-            remoteExtended.startTimeMs -= kMaxIgnoredOverlapMs;
-            remoteExtended.durationMs += 2 * kMaxIgnoredOverlapMs;
-
-            if (!remoteExtended.contains(payload.local.period))
-                payload.status = WearablePayload::ChunksTakenOnServer;
-        }
+        if (!canUpload(payload.local.period, payload.remote.period))
+            payload.status = WearablePayload::ChunksTakenOnServer;
     }
 
     emit finished(d->result);
