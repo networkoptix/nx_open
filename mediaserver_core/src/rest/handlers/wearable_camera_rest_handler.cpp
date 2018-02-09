@@ -26,10 +26,20 @@
 #include <media_server/wearable_lock_manager.h>
 #include <rest/server/rest_connection_processor.h>
 
-namespace
-{
+namespace {
 const qint64 kDetalizationLevelMs = 1;
+
+QnTimePeriod shrinkPeriod(const QnTimePeriod& local, const QnTimePeriodList& remote)
+{
+    QnTimePeriodList locals{ local };
+    locals.excludeTimePeriods(remote);
+
+    if (!locals.empty())
+        return locals[0];
+    return QnTimePeriod();
 }
+
+} // namespace
 
 using namespace nx::mediaserver_core::recorder;
 
@@ -164,12 +174,8 @@ int QnWearableCameraRestHandler::executeCheck(const QnRequestParams& params,
 
     for (const QnWearableCheckDataElement& element : data.elements)
     {
-        QnTimePeriodList periods{element.period};
-        periods.excludeTimePeriods(serverTimePeriods);
-
         QnWearableCheckReplyElement replyElement;
-        if (!periods.empty())
-            replyElement.period = periods[0];
+        replyElement.period = shrinkPeriod(element.period, serverTimePeriods);
         reply.elements.push_back(replyElement);
     }
 
