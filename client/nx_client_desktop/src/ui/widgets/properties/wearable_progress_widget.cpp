@@ -115,7 +115,7 @@ QString QnWearableProgressWidget::calculateMessage(const WearableState& state)
             .arg(calculateFileName(state))
             .arg(calculateQueueMessage(state));
     case WearableState::Consuming:
-        return tr("Finalizing %1... %2\t%p")
+        return tr("Finalizing %1... %2\t%p%")
             .arg(calculateFileName(state))
             .arg(calculateQueueMessage(state));;
     default:
