@@ -80,7 +80,7 @@ Sharing roles are ordered: more access is on top of the list with options
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
-    Element Text Should Be    ${SHARE PERMISSIONS DROPDOWN}    Administrator\nAdvanced Viewer\nViewer\nLive Viewer\nCustom
+    Element Text Should Be    ${SHARE PERMISSIONS DROPDOWN}    ${SHARE PERMISSIONS DROPDOWN CHOICES}
     Close Browser
 
 When user selects role - special hint appears
@@ -93,35 +93,35 @@ When user selects role - special hint appears
     Wait Until Element Is Visible    ${SHARE PERMISSIONS ADMINISTRATOR}
     Click Element    ${SHARE PERMISSIONS ADMINISTRATOR}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
-    Element Text Should Be    ${SHARE PERMISSIONS HINT}    Unrestricted access including the ability to share
+    Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADMIN}
 #Advanced Viewer Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS ADVANCED VIEWER}
     Click Element    ${SHARE PERMISSIONS ADVANCED VIEWER}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
-    Element Text Should Be    ${SHARE PERMISSIONS HINT}    Can view live video, browse the archive, configure cameras, control PTZ etc
+    Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADV VIEWER}
 #Viewer Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS VIEWER}
     Click Element    ${SHARE PERMISSIONS VIEWER}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
-    Element Text Should Be    ${SHARE PERMISSIONS HINT}    Can view live video and browse the archive
+    Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT VIEWER}
 #Live Viewer Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS LIVE VIEWER}
     Click Element    ${SHARE PERMISSIONS LIVE VIEWER}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
-    Element Text Should Be    ${SHARE PERMISSIONS HINT}    Can only view live video
+    Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT LIVE VIEWER}
 #Custom Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS CUSTOM}
     Click Element    ${SHARE PERMISSIONS CUSTOM}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
-    Element Text Should Be    ${SHARE PERMISSIONS HINT}    Use the Nx Cloud Client application to set up custom permissions
+    Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT CUSTOM}
     Close Browser
 
 Sharing works
