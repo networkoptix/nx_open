@@ -5,9 +5,7 @@
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/messages/resources_messages.h>
-#include <nx/client/desktop/utils/upload_manager.h>
 #include <nx/client/desktop/utils/wearable_manager.h>
-#include <api/model/wearable_camera_reply.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
@@ -15,11 +13,8 @@
 #include <ui/dialogs/new_wearable_camera_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/common/read_only.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
-#include <plugins/resource/avi/avi_resource.h>
 #include <api/server_rest_connection.h>
 
 #include <client/client_module.h>

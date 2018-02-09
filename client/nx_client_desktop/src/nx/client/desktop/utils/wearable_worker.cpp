@@ -1,6 +1,5 @@
 #include "wearable_worker.h"
 
-#include <QtCore/QFileInfo>
 #include <QtCore/QTimer>
 
 #include <rest/server/json_rest_result.h>
@@ -10,9 +9,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <plugins/resource/avi/avi_resource.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
 
 #include <client/client_module.h>
 
