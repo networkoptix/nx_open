@@ -16,7 +16,7 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 #include <api/model/time_reply.h>
-#include <api/model/wearable_camera_reply.h>
+#include <api/model/wearable_check_data.h>
 
 /**
  * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -224,6 +224,12 @@ public:
      */
     Handle addWearableCamera(
         const QString& name,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle checkWearableUploads(
+        const QnNetworkResourcePtr& camera,
+        const QnWearableCheckData& data,
         GetCallback callback,
         QThread* targetThread = nullptr);
 

@@ -2,24 +2,34 @@
 
 #include <QtCore/QFile>
 
+#include <nx/utils/std/cpp14.h>
+
+#include <common/common_module.h>
+
 #include <nx_ec/ec_api.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
+
 #include <api/model/wearable_camera_reply.h>
 #include <api/model/wearable_status_reply.h>
-#include <recorder/wearable_archive_synchronizer.h>
-#include <rest/server/rest_connection_processor.h>
+#include <api/model/wearable_check_data.h>
+#include <api/model/wearable_check_reply.h>
+
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_access/user_access_data.h>
-#include <common/common_module.h>
-#include <plugins/resource/wearable/wearable_camera_resource.h>
+
+#include <recorder/storage_manager.h>
 #include <media_server/media_server_module.h>
 #include <media_server/wearable_upload_manager.h>
 #include <media_server/wearable_lock_manager.h>
+#include <rest/server/rest_connection_processor.h>
 
-#include <nx/utils/std/cpp14.h>
-#include "core/resource/camera_user_attribute_pool.h"
-#include "nx_ec/data/api_conversion_functions.h"
+namespace
+{
+const qint64 kDetalizationLevelMs = 1;
+}
 
 using namespace nx::mediaserver_core::recorder;
 
@@ -44,13 +54,16 @@ int QnWearableCameraRestHandler::executeGet(
 int QnWearableCameraRestHandler::executePost(
     const QString& path,
     const QnRequestParams& params,
-    const QByteArray& /*body*/,
+    const QByteArray& body,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
     QString action = extractAction(path);
     if (action == "add")
         return executeAdd(params, result, owner);
+
+    if (action == "check")
+        return executeCheck(params, body, result, owner);
 
     if (action == "consume")
         return executeConsume(params, result, owner);
@@ -114,6 +127,63 @@ int QnWearableCameraRestHandler::executeAdd(
     reply.id = apiCamera.id;
     result.setReply(reply);
 
+    return nx_http::StatusCode::ok;
+}
+
+int QnWearableCameraRestHandler::executeCheck(const QnRequestParams& params,
+    const QByteArray& body,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
+{
+    QnUuid cameraId;
+    if (!requireParameter(params, lit("cameraId"), result, &cameraId))
+        return nx_http::StatusCode::invalidParameter;
+
+    QnWearableCheckData data;
+    if(!QJson::deserialize(body, &data))
+        return nx_http::StatusCode::invalidParameter;
+
+    QnResourcePtr resource = owner->resourcePool()->getResourceById(cameraId);
+    if (!resource)
+        return nx_http::StatusCode::invalidParameter;
+
+    qint64 startTimeMs = std::numeric_limits<qint64>::max();
+    qint64 endTimeMs = std::numeric_limits<qint64>::min();
+    for (const QnWearableCheckDataElement& element : data.elements)
+    {
+        startTimeMs = std::min(startTimeMs, element.startTimeMs);
+        endTimeMs = std::max(endTimeMs, element.startTimeMs + element.durationMs);
+    }
+    if (startTimeMs >= endTimeMs)
+        return nx_http::StatusCode::invalidParameter;
+
+    QnTimePeriodList serverTimePeriods = qnNormalStorageMan
+        ->getFileCatalog(resource->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
+        ->getTimePeriods(
+            startTimeMs,
+            endTimeMs,
+            kDetalizationLevelMs,
+            /*keepSmallChunks*/ false,
+            std::numeric_limits<int>::max());
+
+    QnWearableCheckReply reply;
+
+    for (const QnWearableCheckDataElement& element : data.elements)
+    {
+        QnTimePeriodList periods;
+        periods.push_back(QnTimePeriod(element.startTimeMs, element.durationMs));
+        periods.excludeTimePeriods(serverTimePeriods);
+
+        QnWearableCheckReplyElement replyElement;
+        if (!periods.empty())
+        {
+            replyElement.startTimeMs = periods[0].startTimeMs;
+            replyElement.durationMs = periods[0].durationMs;
+        }
+        reply.elements.push_back(replyElement);
+    }
+
+    result.setReply(reply);
     return nx_http::StatusCode::ok;
 }
 
