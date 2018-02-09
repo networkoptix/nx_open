@@ -108,9 +108,10 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
     if (m_lockInProgress.contains(name))
         return; // camera already adding (in progress)
 
-    if (!cameraResource->hasFlags(Qn::parent_change)) {
-        if (!resourcePool()->getAllNetResourceByPhysicalId(name).isEmpty())
-            return; // already added. Camera has been found twice
+    if (!cameraResource->hasFlags(Qn::parent_change))
+    {
+        if (resourcePool()->getNetResourceByPhysicalId(name))
+            return; //< Already added. Camera has been found twice.
     }
 
     ec2::QnDistributedMutex* mutex = m_distributedMutexManager->createMutex(name);
@@ -130,8 +131,9 @@ void QnAppserverResourceProcessor::at_mutexLocked()
 
     if (mutex->checkUserData())
     {
-        // add camera if and only if it absent on the other server
-        NX_ASSERT(data.cameraResource->hasFlags(Qn::parent_change) || resourcePool()->getAllNetResourceByPhysicalId(mutex->name()).isEmpty());
+        // Add camera if and only if it absent on the other server.
+        NX_ASSERT(data.cameraResource->hasFlags(Qn::parent_change)
+            || !resourcePool()->getNetResourceByPhysicalId(mutex->name()));
         addNewCameraInternal(data.cameraResource);
     }
 

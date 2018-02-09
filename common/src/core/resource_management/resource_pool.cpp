@@ -53,20 +53,10 @@ QnResourcePool::QnResourcePool(QObject* parent):
     m_resourcesMtx(QnMutex::Recursive),
     m_tranInProgress(false)
 {
-    connect(this, &QnResourcePool::resourceAddedInternal, this,
-        [this](const QnResourcePtr &resource)
-        {
-            emit resourceAdded(resource); //< always emit resourceAdded from own thread
-        }
-    );
 }
 
 QnResourcePool::~QnResourcePool()
 {
-    bool signalsBlocked = blockSignals(false);
-    //emit aboutToBeDestroyed();
-    blockSignals(signalsBlocked);
-
     QnMutexLocker locker( &m_resourcesMtx );
     m_adminResource.clear();
     m_resources.clear();
@@ -177,18 +167,10 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         }
     }
 
-    const bool isOwnThread = QThread::currentThread() == thread();
     for (const auto& resource : addedResources)
     {
         TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
-#if 0
-        if (isOwnThread)
-            emit resourceAdded(resource);
-        else
-            emit resourceAddedInternal(resource);
-#else
         emit resourceAdded(resource);
-#endif
     }
 }
 
@@ -351,18 +333,6 @@ QnNetworkResourcePtr QnResourcePool::getNetResourceByPhysicalId(const QString &p
     return QnNetworkResourcePtr(0);
 }
 
-QnResourcePtr QnResourcePool::getResourceByParam(const QString &key, const QString &value) const
-{
-    QnMutexLocker locker( &m_resourcesMtx );
-    for (const QnResourcePtr &resource: m_resources)
-    {
-        if (resource->getProperty(key) == value)
-            return resource;
-    }
-
-    return QnResourcePtr(0);
-}
-
 QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac) const
 {
     QnMacAddress macAddress(mac);
@@ -421,41 +391,6 @@ QnResourceList QnResourcePool::getResourcesByParentId(const QnUuid& parentId) co
     return result;
 }
 
-QnResourceList QnResourcePool::getAllResourceByTypeName(const QString &typeName) const
-{
-    QnResourceList result;
-
-    const QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(typeName);
-    if (!resType)
-        return result;
-
-    QnMutexLocker locker( &m_resourcesMtx );
-    for (const QnResourcePtr &resource: m_resources) {
-        if (resource->getTypeId() == resType->getId())
-            result << resource;
-    }
-
-    return result;
-}
-
-QnNetworkResourceList QnResourcePool::getAllNetResourceByPhysicalId(const QString &physicalId) const
-{
-    QnNetworkResourceList result;
-    QnMutexLocker locker( &m_resourcesMtx );
-    for (const QnResourcePtr &resource: m_resources) {
-        QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
-        if (netResource != 0 && netResource->getPhysicalId() == physicalId)
-            result << netResource;
-    }
-
-    return result;
-}
-
-QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const
-{
-    return getAllNetResourceByHostAddress(hostAddress.toString());
-}
-
 QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QString &hostAddress) const
 {
     QnNetworkResourceList result;
@@ -485,17 +420,6 @@ QnResourcePtr QnResourcePool::getResourceByDescriptor(const QnLayoutItemResource
     return result;
 }
 
-void QnResourcePool::updateUniqId(const QnResourcePtr& res, const QString &newUniqId)
-{
-    QnMutexLocker locker( &m_resourcesMtx );
-    res->setUniqId(newUniqId);
-}
-
-bool QnResourcePool::hasSuchResource(const QString &uniqid) const
-{
-    return !getResourceByUniqueId(uniqid).isNull();
-}
-
 QnResourceList QnResourcePool::getResourcesWithFlag(Qn::ResourceFlag flag) const
 {
     QnResourceList result;
@@ -505,31 +429,6 @@ QnResourceList QnResourcePool::getResourcesWithFlag(Qn::ResourceFlag flag) const
         if (resource->hasFlags(flag))
             result.append(resource);
 
-    return result;
-}
-
-QnResourceList QnResourcePool::getResourcesWithParentId(QnUuid id) const
-{
-    QnMutexLocker locker( &m_resourcesMtx );
-
-    // TODO: #Elric cache it, but remember that id and parentId of a resource may change
-    // while it's in the pool.
-
-    QnResourceList result;
-    for(const QnResourcePtr &resource: m_resources)
-        if(resource->getParentId() == id)
-            result.push_back(resource);
-    return result;
-}
-
-QnResourceList QnResourcePool::getResourcesWithTypeId(QnUuid id) const
-{
-    QnMutexLocker locker( &m_resourcesMtx );
-
-    QnResourceList result;
-    for(const QnResourcePtr &resource: m_resources)
-        if(resource->getTypeId() == id)
-            result.push_back(resource);
     return result;
 }
 
@@ -549,17 +448,6 @@ QnUserResourcePtr QnResourcePool::getAdministrator() const
         }
     }
     return QnUserResourcePtr();
-}
-
-QStringList QnResourcePool::allTags() const
-{
-    QStringList result;
-
-    QnMutexLocker locker( &m_resourcesMtx );
-    for (const QnResourcePtr &resource: m_resources.values())
-        result << resource->getTags();
-
-    return result;
 }
 
 void QnResourcePool::clear()

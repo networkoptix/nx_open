@@ -50,7 +50,6 @@ class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource
     Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
-    Q_PROPERTY(QStringList tags READ getTags WRITE setTags)
     Q_PROPERTY(Ptz::Capabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
 public:
 
@@ -175,12 +174,6 @@ public:
 
     virtual QString getUrl() const;
     virtual void setUrl(const QString &url);
-
-    void addTag(const QString& tag);
-    void setTags(const QStringList& tags);
-    void removeTag(const QString& tag);
-    bool hasTag(const QString& tag) const;
-    QStringList getTags() const;
 
     bool hasConsumer(QnResourceConsumer *consumer) const;
 #ifdef ENABLE_DATA_PROVIDERS
@@ -383,7 +376,6 @@ private:
 
     QDateTime m_lastDiscoveredTime;
 
-    QStringList m_tags;
 
     bool m_initialized;
     static QnMutex m_initAsyncMutex;

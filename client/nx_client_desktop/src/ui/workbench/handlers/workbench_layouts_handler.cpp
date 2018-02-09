@@ -99,7 +99,7 @@ QnLayoutResourceList alreadyExistingLayouts(
     const QnLayoutResourcePtr &layout = QnLayoutResourcePtr())
 {
     QnLayoutResourceList result;
-    for (const auto& existingLayout : resourcePool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>())
+    for (const auto& existingLayout : resourcePool->getResourcesByParentId(parentId).filtered<QnLayoutResource>())
     {
         if (existingLayout == layout)
             continue;

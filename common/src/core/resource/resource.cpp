@@ -71,7 +71,6 @@ QnResource::QnResource(const QnResource& right)
     m_typeId(right.m_typeId),
     m_flags(right.m_flags),
     m_lastDiscoveredTime(right.m_lastDiscoveredTime),
-    m_tags(right.m_tags),
     m_initialized(right.m_initialized),
     m_lastInitTime(right.m_lastInitTime),
     m_prevInitializationResult(right.m_prevInitializationResult),
@@ -129,8 +128,6 @@ void QnResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& no
 
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
-
-    m_tags = other->m_tags;
 
     if (m_url != other->m_url)
     {
@@ -478,37 +475,6 @@ void QnResource::setUrl(const QString &url)
         m_url = url;
     }
     emit urlChanged(toSharedPointer(this));
-}
-
-void QnResource::addTag(const QString& tag)
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    if (!m_tags.contains(tag))
-        m_tags.push_back(tag);
-}
-
-void QnResource::setTags(const QStringList& tags)
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    m_tags = tags;
-}
-
-void QnResource::removeTag(const QString& tag)
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    m_tags.removeAll(tag);
-}
-
-bool QnResource::hasTag(const QString& tag) const
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    return m_tags.contains(tag);
-}
-
-QStringList QnResource::getTags() const
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    return m_tags;
 }
 
 void QnResource::addConsumer(QnResourceConsumer *consumer)

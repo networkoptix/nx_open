@@ -4,21 +4,18 @@
 
 #include <QtCore/QList>
 #include <QtCore/QHash>
-#include <nx/utils/thread/mutex.h>
 #include <QtCore/QObject>
-#include <nx/utils/uuid.h>
-#include <QtNetwork/QHostAddress>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
 
-#include <nx/utils/singleton.h>
-#include <utils/common/connective.h>
 #include <common/common_module_aware.h>
 
-class QnResource;
-class QnNetworkResource;
-class CLRecorderDevice;
+#include <utils/common/connective.h>
+
+#include <nx/utils/singleton.h>
+#include <nx/utils/uuid.h>
+#include <nx/utils/thread/mutex.h>
 
 /**
  * This class holds all resources in the system that are READY TO BE USED
@@ -29,13 +26,12 @@ class CLRecorderDevice;
  * Resource pool can also give a list of resources based on some criteria
  * and helps to administrate resources.
  *
- * If resource is conflicting it must not be placed in resource pool.
  */
 class QN_EXPORT QnResourcePool: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
+    using base_type = Connective<QObject>;
 
-    typedef Connective<QObject> base_type;
 public:
     enum Filter
     {
@@ -45,7 +41,7 @@ public:
         AllResources
     };
 
-    QnResourcePool(QObject* parent);
+    explicit QnResourcePool(QObject* parent = nullptr);
     ~QnResourcePool();
 
     enum AddResourceFlag
@@ -153,24 +149,17 @@ public:
     // Shared id is groupId for multichannel resources and uniqueId for single channel resources.
     QnSecurityCamResourceList getResourcesBySharedId(const QString& sharedId) const;
 
-    QnResourcePtr getResourceByUniqueId(const QString &id) const;
-    void updateUniqId(const QnResourcePtr& res, const QString &newUniqId);
+    QnResourcePtr getResourceByUniqueId(const QString& uniqueId) const;
 
     QnResourcePtr getResourceByDescriptor(const QnLayoutItemResourceDescriptor& descriptor) const;
-
-    bool hasSuchResource(const QString &uniqid) const;
 
     QnResourcePtr getResourceByUrl(const QString &url) const;
 
     QnNetworkResourcePtr getNetResourceByPhysicalId(const QString &physicalId) const;
     QnNetworkResourcePtr getResourceByMacAddress(const QString &mac) const;
-    QnResourcePtr getResourceByParam(const QString &key, const QString &value) const;
 
-    QnResourceList getAllResourceByTypeName(const QString &typeName) const;
-
-    QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
-    QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
+
     QnVirtualCameraResourceList getAllCameras(const QnResourcePtr &mServer = QnResourcePtr(),
         bool ignoreDesktopCameras = false) const;
 
@@ -181,9 +170,6 @@ public:
 
     // returns list of resources with such flag
     QnResourceList getResourcesWithFlag(Qn::ResourceFlag flag) const;
-
-    QnResourceList getResourcesWithParentId(QnUuid id) const;
-    QnResourceList getResourcesWithTypeId(QnUuid id) const;
 
     QnMediaServerResourcePtr getIncompatibleServerById(const QnUuid& id,
         bool useCompatible = false) const;
@@ -221,8 +207,6 @@ public:
      */
     QnVideoWallMatrixIndexList getVideoWallMatricesByUuid(const QList<QnUuid> &uuids) const;
 
-    QStringList allTags() const;
-
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();
 
@@ -242,15 +226,6 @@ signals:
     void statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason);
 
     void aboutToBeDestroyed();
-private:
-signals:
-    void resourceAddedInternal(const QnResourcePtr &resource);
-private:
-    /*!
-        \note MUST be called with \a m_resourcesMtx locked
-    */
-    void invalidateCache();
-    void ensureCache() const;
 
 private:
     mutable struct Cache
