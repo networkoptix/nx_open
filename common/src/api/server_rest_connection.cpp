@@ -37,6 +37,7 @@ namespace {
 
 static const size_t ResponseReadTimeoutMs = 15 * 1000;
 static const size_t TcpConnectTimeoutMs = 5 * 1000;
+static const nx_http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
 
 void trace(const QString& serverId, int handle, const QString& message)
 {
@@ -168,7 +169,6 @@ Handle ServerConnection::sendStatisticsAsync(
     PostCallback callback,
     QThread *targetThread)
 {
-    static const nx_http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     static const auto path = lit("/ec2/statistics/send");
 
     auto server = getServerWithInternetAccess();
