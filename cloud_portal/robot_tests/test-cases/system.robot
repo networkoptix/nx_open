@@ -10,7 +10,7 @@ ${url}         ${CLOUD TEST}
 *** Keywords ***
 Log in to Auto Tests System
     [arguments]    ${email}
-    Go To    ${url}/systems/${AUTO TESTS URL}
+    Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${email}    ${password}    None
     Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
@@ -66,7 +66,7 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Log Out
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
-    Go To    ${url}/systems/${AUTO TESTS URL}
+    Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
@@ -105,14 +105,14 @@ does not show Share button to viewer, advanced viewer, live viewer
     Close Browser
 
 should open System page by link to not authorized user and redirect to homepage, if he does not log in
-    Open Browser and go to URL    ${url}/systems/${AUTO TESTS URL}
+    Open Browser and go to URL    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
     Click Button    ${LOG IN CLOSE BUTTON}
     Wait Until Element Is Visible    ${JUMBOTRON}
     Close Browser
 
 should open System page by link to not authorized user and show it, after owner logs in
-    Open Browser and go to URL    ${url}/systems/${AUTO TESTS URL}
+    Open Browser and go to URL    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${EMAIL OWNER}   ${password}    None
     Verify In System    Auto Tests
     Close Browser
@@ -121,12 +121,12 @@ should open System page by link to user without permission and show alert (Syste
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
-    Go To    ${url}/systems/${AUTO TESTS URL}
+    Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
     Close Browser
 
 should open System page by link not authorized user, and show alert if logs in and has no permission
-    Open Browser and go to URL    ${url}/systems/${AUTO TESTS URL}
+    Open Browser and go to URL    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${EMAIL NOPERM}   ${password}    None
     Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
     Close Browser
@@ -191,7 +191,7 @@ should display same user data as showed in user account (stress to cyrillic)
     sleep    .15
     Wait Until Element Is Visible    ${ACCOUNT SAVE}
     Click Button    ${ACCOUNT SAVE}
-    Go To    ${url}/systems/${AUTO TESTS URL}
+    Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
 
     #remove new user from system

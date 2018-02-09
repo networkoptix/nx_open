@@ -26,11 +26,14 @@ class NoptixLibrary(object):
     def paste_text(self, locator):
         locator.send_keys(Keys.CONTROL+'v')
 
+
     def get_random_email(self):
         return "noptixqa+" + str(time.time()) + "@gmail.com"
 
+
     def get_random_symbol_email(self):
         return '''!#$%&'*+-/=?^_`{|}~''' + str(time.time()) + "@gmail.com"
+
 
     def wait_until_textfield_contains(self, locator, expected, timeout=5):
         seleniumlib = BuiltIn().get_library_instance('Selenium2Library')
@@ -49,6 +52,7 @@ class NoptixLibrary(object):
                 not_found = None
             time.sleep(.2)  
         raise AssertionError(not_found)
+
 
     def check_online_or_offline(self, elements):
         for element in elements:

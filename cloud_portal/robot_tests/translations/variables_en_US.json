@@ -1,0 +1,15 @@
+{
+    "YOU HAVE NO SYSTEMS TEXT"           :     "You have no Systems connected to Nx Cloud",
+    "LOG OUT BUTTON TEXT"                :     "Log Out",
+    "RESET EMAIL SENT MESAGE TEXT"       :     "Password reset instructions are sent to Email",
+    "RESET SUCCESS MESAGE TEXT"          :     "Password successfully saved",
+    "RESET SUCCESS LOG IN INK TEXT"      :     "Password successfully saved')]/a[@href='/login']",
+    "CREATE ACCOUNT BUTTON TEXT"         :     "Create Account",
+    "TERMS AND CONDITIONS LINK TEXT"     :     "Terms and Conditions",
+    "RESEND ACTIVATION LINK BUTTON TEXT" :     "Resend activation link",
+    "DELETE USER BUTTON TEXT"            :     "Delete",
+    "DELETE USER CANCEL BUTTON TEXT"     :     "Cancel",
+    "SYSTEM NO ACCESS TEXT"              :     "Failed to access System",
+    "DISCONNECT MODAL WARNING TEXT"      :     "You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
+    "ALREADY ACTIVATED TEXT"             :     "Account is already activated or confirmation code is incorrect",
+    "AUTOTESTS OFFLINE TEXT"             :     "offline"}
