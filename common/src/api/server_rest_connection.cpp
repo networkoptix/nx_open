@@ -47,7 +47,7 @@ void trace(const QString& serverId, int handle, const QString& message)
         .arg(message));
 }
 
-} // namepspace
+} // namespace
 
 // --------------------------- public methods -------------------------------------------
 
