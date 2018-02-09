@@ -1744,7 +1744,12 @@ int HanwhaResource::streamBitrate(Qn::ConnectionRole role, const QnLiveStreamPar
     streamParams.resolution = streamResolution(role);
     if (bitrateKbps == 0)
         bitrateKbps = nx::mediaserver::resource::Camera::suggestBitrateKbps(streamParams, role);
-    auto streamCapability = cameraMediaCapability().streamCapabilities.value(role);
+    auto streamCapability = cameraMediaCapability()
+        .streamCapabilities
+        .value(role == Qn::ConnectionRole::CR_LiveVideo
+            ? Qn::StreamIndex::primary
+            : Qn::StreamIndex::secondary);
+
     return qBound(streamCapability.minBitrateKbps, bitrateKbps, streamCapability.maxBitrateKbps);
 }
 
