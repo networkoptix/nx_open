@@ -37,27 +37,34 @@ struct EventMessage
 };
 
 nx::sdk::metadata::CommonEvent* createCommonEvent(
-    const Vca::VcaAnalyticsEventType& event,
-    bool active)
+    const VcaAnalyticsEventType& event)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
     commonEvent->setEventTypeId(nxpt::fromQnUuidToPluginGuid(event.eventTypeId));
     commonEvent->setCaption(event.eventName.value.toStdString());
     commonEvent->setDescription(event.eventName.value.toStdString());
-    commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
     commonEvent->setAuxilaryData(event.internalName.toStdString());
     return commonEvent;
 }
 
+nx::sdk::metadata::CommonEvent* createCommonEvent(
+    const VcaAnalyticsEventType& event,
+    bool active)
+{
+    auto commonEvent = createCommonEvent(event);
+    commonEvent->setIsActive(active);
+    return commonEvent;
+}
+
 nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
-    const Vca::VcaAnalyticsEventType& event)
+    const VcaAnalyticsEventType& event)
 {
     using namespace std::chrono;
 
     auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
-    auto commonEvent1 = createCommonEvent(event, /*active*/ true);
-    packet->addEvent(commonEvent1);
+    auto commonEvent = createCommonEvent(event);
+    packet->addEvent(commonEvent);
     packet->setTimestampUsec(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
     packet->setDurationUsec(-1);
@@ -179,7 +186,7 @@ nx::sdk::Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
 
 Manager::Manager(Plugin* plugin,
     const nx::sdk::CameraInfo& cameraInfo,
-    const Vca::VcaAnalyticsDriverManifest& typedManifest)
+    const VcaAnalyticsDriverManifest& typedManifest)
 {
     m_url = cameraInfo.url;
     m_auth.setUser(cameraInfo.login);
@@ -276,7 +283,7 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         if (it != message.parameters.end())
             NX_PRINT << "Message received, type=" << it->second.constData() << ".";
         else
-            NX_PRINT << "Message with unknown type got.";
+            NX_PRINT << "Message with unknown type received.";
 
         const auto& event = m_plugin->eventByInternalName(it->second);
 

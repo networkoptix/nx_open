@@ -101,13 +101,7 @@ public:
     void updateToChannel(int value);
 
     bool isNvr() const;
-    QString focusMode() const;
     QString nxProfileName(Qn::ConnectionRole role) const;
-
-    static const QString kNormalizedSpeedPtzTrait;
-    static const QString kHas3AxisPtz;
-    static const QString kHanwhaAlternativeZoomTrait;
-    static const QString kHanwhaAlternativeFocusTrait;
 
     std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
 
@@ -275,10 +269,15 @@ private:
     std::map<QString, std::set<int>> m_alternativePtzRanges;
 
     std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
+
     HanwhaAttributes m_attributes;
+    HanwhaAttributes m_bypassDeviceAttributes;
+
     HanwhaCgiParameters m_cgiParameters;
+    HanwhaCgiParameters m_bypassDeviceCgiParameters;
+
     bool m_isNvr = false;
-    QString m_focusMode;
+    bool m_isChannelConnectedBySunapi = false;
 
     nx::media::CameraMediaCapability m_capabilities;
     QMap<QString, QnIOPortData> m_ioPortTypeById;

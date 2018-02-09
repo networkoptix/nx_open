@@ -24,16 +24,23 @@ static const std::string kActionNamePrefix("NX_ACTION_");
 static const std::string kRuleNamePrefix("NX_RULE_");
 
 nx::sdk::metadata::CommonEvent* createCommonEvent(
-    const IdentifiedSupportedEvent& identifiedSupportedEvents,
-    bool active)
+    const IdentifiedSupportedEvent& identifiedSupportedEvent)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
-    commonEvent->setEventTypeId(identifiedSupportedEvents.externalTypeId());
-    commonEvent->setCaption(identifiedSupportedEvents.base().name);
-    commonEvent->setDescription(identifiedSupportedEvents.base().description);
-    commonEvent->setIsActive(active);
+    commonEvent->setEventTypeId(identifiedSupportedEvent.externalTypeId());
+    commonEvent->setCaption(identifiedSupportedEvent.base().name);
+    commonEvent->setDescription(identifiedSupportedEvent.base().description);
     commonEvent->setConfidence(1.0);
-    commonEvent->setAuxilaryData(identifiedSupportedEvents.base().fullName());
+    commonEvent->setAuxilaryData(identifiedSupportedEvent.base().fullName());
+    return commonEvent;
+}
+
+nx::sdk::metadata::CommonEvent* createCommonEvent(
+    const IdentifiedSupportedEvent& identifiedSupportedEvent,
+    bool active)
+{
+    auto commonEvent = createCommonEvent(identifiedSupportedEvent);
+    commonEvent->setIsActive(active);
     return commonEvent;
 }
 
@@ -43,8 +50,8 @@ nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
     using namespace std::chrono;
 
     auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
-    auto commonEvent1 = createCommonEvent(identifiedSupportedEvents, /*active*/ true);
-    packet->addEvent(commonEvent1);
+    auto commonEvent = createCommonEvent(identifiedSupportedEvents);
+    packet->addEvent(commonEvent);
     packet->setTimestampUsec(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
     packet->setDurationUsec(-1);
@@ -64,7 +71,7 @@ public:
         NX_PRINT << "Received from Axis: " << request.requestLine.toString().data();
 
         const QString kMessage = "?Message=";
-        const int kGuidStringLength = 36; //sizeof guid string
+        const int kGuidStringLength = 36; //< Size of guid string.
         int startIndex = request.toString().indexOf(kMessage);
         QString uuidString = request.toString().
             mid(startIndex + kMessage.size(), kGuidStringLength);

@@ -28,9 +28,11 @@ const QString kAction = lit("action");
 } // namespace
 
 HanwhaRequestHelper::HanwhaRequestHelper(
-    const std::shared_ptr<HanwhaSharedResourceContext>& resourceContext)
+    const std::shared_ptr<HanwhaSharedResourceContext>& resourceContext,
+    int bypassChannel)
 :
-    m_resourceContext(resourceContext)
+    m_resourceContext(resourceContext),
+    m_bypassChannel(bypassChannel)
 {
 }
 
@@ -200,9 +202,9 @@ bool HanwhaRequestHelper::doRequestInternal(
     httpClient.setMessageBodyReadTimeoutMs(kHttpTimeout.count());
     httpClient.setResponseReadTimeoutMs(kHttpTimeout.count());
 
-    auto realUrl = m_bypass
-        ? makeBypassUrl(url)
-        : url;
+    auto realUrl = m_bypassChannel == kHanwhaNoBypassChannel
+        ? url
+        : makeBypassUrl(url);
 
     QnSemaphoreLocker lock(m_resourceContext->requestSemaphore());
     if (!httpClient.doGet(realUrl))
@@ -260,11 +262,16 @@ QUrl HanwhaRequestHelper::makeBypassUrl(const QUrl& url) const
     QUrlQuery bypassQuery;
     bypassQuery.addQueryItem(lit("msubmenu"), lit("bypass"));
     bypassQuery.addQueryItem(lit("action"), lit("control"));
-    bypassQuery.addQueryItem(lit("Channel"), m_channel);
-    bypassQuery.addQueryItem(lit("BypassURI"), url.path() + lit("?") + url.query());
+    bypassQuery.addQueryItem(lit("Channel"), QString::number(m_bypassChannel));
+
+    QString bypassUriString = url.path();
+    auto query = url.query();
+    if (!query.isEmpty())
+        bypassUriString.append(lit("?")).append(query);
+
+    bypassQuery.addQueryItem(lit("BypassURI"), bypassUriString);
 
     bypassUrl.setQuery(bypassQuery);
-
     return bypassUrl;
 }
 

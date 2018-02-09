@@ -8,31 +8,31 @@
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
-
-struct Vca //< This struct substitutes namespace because of fusion problems with namespaces.
+namespace vca //< This struct substitutes namespace because of fusion problems with namespaces.
 {
-    /**
-     * Description of the vca analytics event.
-     */
-    struct VcaAnalyticsEventType: nx::api::Analytics::EventType
-    {
-        // VCA-camera event type name (this name is sent by VCA-camera tcp notification server).
-        QString internalName;
-    };
-    #define VcaAnalyticsEventType_Fields AnalyticsEventType_Fields(internalName)
 
-    struct VcaAnalyticsDriverManifest: nx::api::AnalyticsDriverManifestBase
-    {
-        QList<VcaAnalyticsEventType> outputEventTypes;
-    };
-    #define VcaAnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
+/**
+ * Description of the vca analytics event.
+ */
+struct VcaAnalyticsEventType: nx::api::Analytics::EventType
+{
+    // VCA-camera event type name (this name is sent by VCA-camera tcp notification server).
+    QString internalName;
 };
+#define VcaAnalyticsEventType_Fields AnalyticsEventType_Fields(internalName)
 
-QN_FUSION_DECLARE_FUNCTIONS(Vca::VcaAnalyticsEventType, (json))
-QN_FUSION_DECLARE_FUNCTIONS(Vca::VcaAnalyticsDriverManifest, (json))
+struct VcaAnalyticsDriverManifest: nx::api::AnalyticsDriverManifestBase
+{
+    QList<VcaAnalyticsEventType> outputEventTypes;
+};
+#define VcaAnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
 
-bool operator==(const Vca::VcaAnalyticsEventType& lh, const Vca::VcaAnalyticsEventType& rh);
+QN_FUSION_DECLARE_FUNCTIONS(VcaAnalyticsEventType, (json))
+QN_FUSION_DECLARE_FUNCTIONS(VcaAnalyticsDriverManifest, (json))
 
+bool operator==(const VcaAnalyticsEventType& lh, const VcaAnalyticsEventType& rh);
+
+} // namespace vca
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx

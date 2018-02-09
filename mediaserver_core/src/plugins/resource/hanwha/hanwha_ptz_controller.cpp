@@ -61,7 +61,7 @@ void HanwhaPtzController::setAlternativePtzRanges(
 
 bool HanwhaPtzController::continuousMove(const QVector3D& speed)
 {
-    if (m_ptzTraits.contains(HanwhaResource::kHanwhaAlternativeZoomTrait))
+    if (m_ptzTraits.contains(kHanwhaAlternativeZoomTrait))
     {
         return alternativeContinuousMove(
             kHanwhaZoomProperty,
@@ -89,7 +89,7 @@ bool HanwhaPtzController::continuousMove(const QVector3D& speed)
             m_lastParamValue[paramName] = value;
         };
 
-        if (m_ptzTraits.contains(HanwhaResource::kNormalizedSpeedPtzTrait))
+        if (m_ptzTraits.contains(kHanwhaNormalizedSpeedPtzTrait))
             params.emplace(kHanwhaNormalizedSpeedProperty, kHanwhaTrue);
 
         addIfNeed(kHanwhaPanProperty, hanwhaSpeed.x());
@@ -107,7 +107,7 @@ bool HanwhaPtzController::continuousMove(const QVector3D& speed)
 
 bool HanwhaPtzController::continuousFocus(qreal speed)
 {
-    if (m_ptzTraits.contains(HanwhaResource::kHanwhaAlternativeFocusTrait))
+    if (m_ptzTraits.contains(kHanwhaAlternativeFocusTrait))
     {
         return alternativeContinuousMove(
             kHanwhaFocusProperty,
@@ -267,7 +267,11 @@ bool HanwhaPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait& trait, co
 
     if (trait.standardTrait() == Ptz::ManualAutoFocusPtzTrait)
     {
-        HanwhaRequestHelper::Parameters parameters{{lit("Mode"), m_hanwhaResource->focusMode()}};
+        const auto focusMode = m_ptzTraits.contains(QnPtzAuxilaryTrait(kHanwhaSimpleFocusTrait))
+            ? lit("SimpleFocus")
+            : lit("AutoFocus");
+
+        HanwhaRequestHelper::Parameters parameters{{lit("Mode"), focusMode}};
         if (m_hanwhaResource->isNvr())
             parameters.emplace(lit("Channel"), QString::number(m_hanwhaResource->getChannel()));
 
@@ -296,7 +300,7 @@ QVector3D HanwhaPtzController::toHanwhaSpeed(const QVector3D& speed) const
             return normalizedValue * qAbs(maxNegativeSpeed);
     };
 
-    if (m_ptzTraits.contains(QnPtzAuxilaryTrait(HanwhaResource::kNormalizedSpeedPtzTrait)))
+    if (m_ptzTraits.contains(QnPtzAuxilaryTrait(kHanwhaNormalizedSpeedPtzTrait)))
     {
         outSpeed.setX(toNativeSpeed(-kNormilizedLimit, kNormilizedLimit, speed.x()));
         outSpeed.setY(toNativeSpeed(-kNormilizedLimit, kNormilizedLimit, speed.y()));
