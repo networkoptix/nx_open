@@ -311,31 +311,37 @@ void WidgetAnalyticsController::Private::updateObjectAreas(qint64 timestamp)
             areaInfo.rectangle = core::Geometry::toSubRect(
                 mediaResourceWidget->zoomRect(), objectInfo.rectangle);
         }
-        else if (ini().enableDetectedObjectsInterpolation)
-        {
-            areaInfo.rectangle = interpolatedRectangle(
-                objectInfo.rectangle,
-                objectInfo.metadataTimestamp,
-                objectInfo.futureRectangle,
-                objectInfo.futureRectangleTimestamp,
-                timestamp);
-        }
         else
         {
-            areaInfo.rectangle = objectInfo.rectangle;
+            if (ini().enableDetectedObjectsInterpolation)
+            {
+                areaInfo.rectangle = interpolatedRectangle(
+                    objectInfo.rectangle,
+                    objectInfo.metadataTimestamp,
+                    objectInfo.futureRectangle,
+                    objectInfo.futureRectangleTimestamp,
+                    timestamp);
+            }
+            else
+            {
+                areaInfo.rectangle = objectInfo.rectangle;
+            }
+
+            if (!objectInfo.zoomWindowItemUuid.isNull())
+            {
+                const auto& layout = layoutResource();
+                auto item = layout->getItem(objectInfo.zoomWindowItemUuid);
+                if (!item.uuid.isNull())
+                {
+                    item.zoomRect = zoomWindowRectangle(areaInfo.rectangle);
+                    qnResourceRuntimeDataManager->setLayoutItemData(
+                        item.uuid, Qn::ItemAnalyticsModeSourceRegionRole, objectInfo.rectangle);
+                    layout->updateItem(item);
+                }
+            }
         }
 
         areaHighlightWidget->addOrUpdateArea(areaInfo);
-
-        if (!objectInfo.zoomWindowItemUuid.isNull())
-        {
-            const auto& layout = layoutResource();
-            auto item = layout->getItem(objectInfo.zoomWindowItemUuid);
-            item.zoomRect = zoomWindowRectangle(areaInfo.rectangle);
-            layout->updateItem(item);
-            qnResourceRuntimeDataManager->setLayoutItemData(
-                item.uuid, Qn::ItemAnalyticsModeSourceRegionRole, areaInfo.rectangle);
-        }
     }
 }
 
@@ -438,8 +444,14 @@ void WidgetAnalyticsController::updateAreaForZoomWindow()
     if (d->zoomWindowObjectId.isNull())
         return;
 
-    const auto& objectInfo = d->objectInfoById.value(d->zoomWindowObjectId);
-    d->updateObjectAreas(objectInfo.metadataTimestamp);
+    auto it = d->objectInfoById.find(d->zoomWindowObjectId);
+    if (it == d->objectInfoById.end())
+        return;
+
+    it->rectangle = qnResourceRuntimeDataManager->layoutItemData(
+        d->mediaResourceWidget->item()->uuid(),
+        Qn::ItemAnalyticsModeSourceRegionRole).value<QRectF>();
+    d->updateObjectAreas(it->metadataTimestamp);
     d->areaHighlightWidget->setHighlightedArea(d->zoomWindowObjectId);
 }
 
