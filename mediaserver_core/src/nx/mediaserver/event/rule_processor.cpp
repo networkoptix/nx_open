@@ -681,7 +681,7 @@ void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, boo
 
         if (rule->eventType() == vms::event::cameraInputEvent)
         {
-            auto resList = resourcePool()->getResources<QnVirtualCameraResource>(rule->eventResources());
+            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(rule->eventResources());
             if (resList.isEmpty() ||            //< Listening to all cameras.
                 resList.contains(camResource))
             {
