@@ -23,8 +23,8 @@ struct CameraStreamCapability
 
 struct CameraMediaCapability
 {
-    bool isNull() const { return streamCapabilities.isEmpty(); }
-
+    // Todo: It should be a StreamIndex here. But it is unsafe because it is saved to a database and we need
+    // compatibility with old DB version for mobile client.
     QMap<int, CameraStreamCapability> streamCapabilities;
     bool hasDualStreaming = false;
     bool hasAudio = false;

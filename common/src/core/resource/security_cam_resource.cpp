@@ -214,8 +214,9 @@ void QnSecurityCamResource::updateInternal(const QnResourcePtr &other, Qn::Notif
 int QnSecurityCamResource::getMaxFps() const
 {
     const auto capabilities = cameraMediaCapability();
-    if (!capabilities.isNull())
-        return capabilities.streamCapabilities.value(Qn::CR_LiveVideo).maxFps;
+    int result = capabilities.streamCapabilities.value(Qn::CR_LiveVideo).maxFps;
+    if (result > 0)
+        return result;
 
     // Compatibility with version < 3.1.2
     QString value = getProperty(Qn::MAX_FPS_PARAM_NAME);
@@ -453,11 +454,19 @@ nx::media::CameraMediaCapability QnSecurityCamResource::cameraMediaCapability() 
     return m_cachedCameraMediaCapabilities.get();
 }
 
+void QnSecurityCamResource::setCameraMediaCapability(const nx::media::CameraMediaCapability& value)
+{
+    setProperty(
+        nx::media::kCameraMediaCapabilityParamName, QString::fromLatin1(QJson::serialized(value)));
+    m_cachedCameraMediaCapabilities.reset();
+    saveParams();
+}
+
 bool QnSecurityCamResource::hasDualStreaming() const
 {
     const auto capabilities = cameraMediaCapability();
-    if (!capabilities.isNull())
-        return capabilities.hasDualStreaming;
+    if (capabilities.hasDualStreaming)
+        return true;
 
     // Compatibility with version < 3.1.2
     QString val = getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME);
@@ -662,8 +671,8 @@ bool QnSecurityCamResource::hasTwoWayAudio() const
 bool QnSecurityCamResource::isAudioSupported() const
 {
     const auto capabilities = cameraMediaCapability();
-    if (!capabilities.isNull())
-        return capabilities.hasAudio;
+    if (capabilities.hasAudio)
+        return true;
 
     // Compatibility with version < 3.1.2
     QString val = getProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME);
@@ -1304,13 +1313,15 @@ void QnSecurityCamResource::resetCachedValues()
 
 Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
 {
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    if (resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP))
-        return Qn::BPG_Predefined;
+    if (qnStaticCommon)
+    {
+        QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+        if (resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP))
+            return Qn::BPG_Predefined;
 
-    if (getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt() > 0)
-        return Qn::BPG_User;
-
+        if (getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt() > 0)
+            return Qn::BPG_User;
+    }
     return Qn::BPG_None;
 }
 
@@ -1432,7 +1443,15 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
     if (bitratePerGopType() != Qn::BPG_None)
         result = result * (30.0 / (qreal)fps);
 
-    return (int)result;
+    if (streamCapability.maxBitrateKbps > 0)
+    {
+        result = qBound(
+            (float)streamCapability.minBitrateKbps,
+            result,
+            (float)streamCapability.maxBitrateKbps);
+    }
+
+    return result;
 }
 
 bool QnSecurityCamResource::setCameraCredentialsSync(

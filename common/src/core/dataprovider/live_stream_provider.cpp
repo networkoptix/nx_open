@@ -157,7 +157,10 @@ QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStr
     if (m_role == Qn::CR_SecondaryLiveVideo)
         params.bitrateKbps = advancedLiveStreamParams.bitrateKbps;
     if (params.bitrateKbps == 0)
-        params.bitrateKbps = m_cameraRes->rawSuggestBitrateKbps(params.quality, params.resolution, params.fps);
+    {
+        params.bitrateKbps = m_cameraRes->suggestBitrateForQualityKbps(
+            params.quality, params.resolution, params.fps, m_role);
+    }
     return params;
 }
 

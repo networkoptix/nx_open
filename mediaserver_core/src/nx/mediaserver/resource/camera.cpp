@@ -445,12 +445,23 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
         return result;
     };
 
+    using namespace nx::media;
+    auto mergeField = [](int& dst, const int& src)
+    {
+        if (dst == 0)
+            dst = src;
+    };
+
     StreamCapabilityMap result = getStreamCapabilityMapFromDrives(streamIndex);
     for (auto itr = result.begin(); itr != result.end(); ++itr)
     {
         auto& value = itr.value();
-        if (value.isNull())
-            value = defaultStreamCapability(itr.key());
+        const auto defaultValue = defaultStreamCapability(itr.key());
+        mergeField(value.minBitrateKbps, defaultValue.minBitrateKbps);
+        mergeField(value.maxBitrateKbps, defaultValue.maxBitrateKbps);
+        mergeField(value.defaultBitrateKbps, defaultValue.defaultBitrateKbps);
+        mergeField(value.defaultFps, defaultValue.defaultFps);
+        mergeField(value.maxFps, defaultValue.maxFps);
     }
     return result;
 }

@@ -56,14 +56,16 @@ private:
         QSize resolution,
         QString codec,
         int fps,
-        boost::optional<int> quality);
+        boost::optional<int> quality,
+        boost::optional<int> bitrateKbps);
 
     bool updateVideoChannelConfiguration(
         QDomDocument* outVideoChannelConfiguration,
         const QSize& resolution,
         const QString& codec,
         int fps,
-        boost::optional<int> quality) const;
+        boost::optional<int> quality,
+        boost::optional<int> bitrateKbps) const;
 
 private:
     QnHikvisionResourcePtr m_hikvisionResource;

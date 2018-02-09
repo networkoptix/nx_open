@@ -20,9 +20,16 @@
 
 namespace {
 
-const std::array<Qn::ConnectionRole, 2> kRoles = {
+const std::array<Qn::ConnectionRole, 2> kRoles =
+{
     Qn::ConnectionRole::CR_LiveVideo,
-    Qn::ConnectionRole::CR_SecondaryLiveVideo};
+    Qn::ConnectionRole::CR_SecondaryLiveVideo
+};
+
+Qn::ConnectionRole toRole(Qn::StreamIndex streamIndex)
+{
+    return streamIndex == Qn::StreamIndex::primary ? Qn::CR_LiveVideo : Qn::CR_SecondaryLiveVideo;
+}
 
 } // namespace
 
@@ -49,16 +56,24 @@ nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapab
 {
     using namespace nx::mediaserver::resource;
     auto result = base_type::getStreamCapabilityMapFromDrives(streamIndex);
+
     QnMutexLocker lock(&m_mutex);
+
+    auto bitrateRange = m_channelCapabilitiesByRole[toRole(streamIndex)].bitrateRange;
+    for (auto& value: result)
+    {
+        value.minBitrateKbps = bitrateRange.first;
+        value.maxBitrateKbps = bitrateRange.second;
+    }
+
     if (m_hevcSupported)
     {
         StreamCapabilityMap resultCopy = result;
-        for (const auto& onvifKeys: resultCopy.keys())
+        for (auto itr = resultCopy.begin(); itr != resultCopy.end(); ++itr)
         {
-            StreamCapabilityKey key;
+            StreamCapabilityKey key(itr.key());
             key.codec = QnAvCodecHelper::codecIdToString(AV_CODEC_ID_HEVC);
-            key.resolution = onvifKeys.resolution;
-            result.insert(key, nx::media::CameraStreamCapability());
+            result.insert(key, itr.value());
         }
     }
     return result;
@@ -91,7 +106,7 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
 
     if (!hevcIsDisabled)
     {
-        for (const auto& role : kRoles)
+        for (const auto& role: kRoles)
         {
             hikvision::ChannelCapabilities channelCapabilities;
             auto result = fetchChannelCapabilities(role, &channelCapabilities);
