@@ -95,7 +95,7 @@ const int kQueryTimeoutMs = 15000;
 QnVirtualCameraResourceList cameras(const QSet<QnUuid>& ids)
 {
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    return resourcePool->getResources<QnVirtualCameraResource>(ids);
+    return resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids);
 }
 
 } // namespace

@@ -614,7 +614,7 @@ QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) c
         if (resource)
             result << resource;
     }
-    result << resourcePool()->getResources(action.eventParams.metadata.cameraRefs);
+    result << resourcePool()->getResourcesByIds(action.eventParams.metadata.cameraRefs);
     return result;
 }
 

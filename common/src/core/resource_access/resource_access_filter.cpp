@@ -104,7 +104,7 @@ QSet<QnUuid> QnResourceAccessFilter::filteredResources(
     const QSet<QnUuid>& source)
 {
     QSet<QnUuid> result;
-    for (const auto& resource : filteredResources(filter, resPool->getResources(source)))
+    for (const auto& resource : filteredResources(filter, resPool->getResourcesByIds(source)))
         result << resource->getId();
     return result;
 }

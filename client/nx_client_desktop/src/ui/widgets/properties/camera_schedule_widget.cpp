@@ -149,7 +149,7 @@ public:
 
     virtual bool validate(const QSet<QnUuid>& selected) override
     {
-        auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(selected);
+        auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(selected);
 
         QnCamLicenseUsageHelper helper(cameras, m_recordingEnabled, commonModule());
 
@@ -1404,7 +1404,7 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked()
             camera->setScheduleTasks(tasks);
         };
 
-    auto selectedCameras = resourcePool()->getResources<QnVirtualCameraResource>(
+    auto selectedCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
         dialog->selectedResources());
     qnResourcesChangesManager->saveCameras(selectedCameras, applyChanges);
     updateLicensesLabelText();

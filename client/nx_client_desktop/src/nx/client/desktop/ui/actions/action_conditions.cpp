@@ -1202,7 +1202,7 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
         }();
 
     // Filter our non-camera items and I/O modules.
-    const auto cameras = context->resourcePool()->getResources<QnVirtualCameraResource>(itemIds)
+    const auto cameras = context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(itemIds)
         .filtered([](const QnVirtualCameraResourcePtr& camera) { return camera->hasVideo(nullptr);});
 
     if (cameras.empty())
