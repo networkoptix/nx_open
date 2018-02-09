@@ -1199,7 +1199,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
       <translation>
-        <numerusform>Das Passwort darf keine %n oder mehr wiederholte Zeichen enthalten.</numerusform>
+        <numerusform>Passwort darf keine %n oder mehr wiederholte Zeichen enthalten.</numerusform>
         <numerusform>Passwort darf keine %n oder mehr wiederholte Zeichen enthalten.</numerusform>
       </translation>
     </message>
@@ -1798,13 +1798,13 @@ to view more bookmarks</source>
       <source>%1 of %n devices</source>
       <translation>
         <numerusform>%1 von %n Gerät</numerusform>
-        <numerusform>%1 von %n Geräten</numerusform>
+        <numerusform>%1 von %n Geräte</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
       <translation>
-        <numerusform>%1 von %n Kameras</numerusform>
+        <numerusform>%1 von %n Kamera</numerusform>
         <numerusform>%1 von %n Kameras</numerusform>
       </translation>
     </message>
@@ -2218,7 +2218,7 @@ to view more bookmarks</source>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>Analytik ist nicht verfügbar für %1</translation>
     </message>
   </context>
   <context>
@@ -2688,21 +2688,21 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
       <translation>
-        <numerusform>Die Änderungen an %n Gerät wurden nicht gespeichert:</numerusform>
+        <numerusform>Die Änderungen an %n Gerät wurde nicht gespeichert:</numerusform>
         <numerusform>Die Änderungen an %n Geräten wurden nicht gespeichert:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
       <translation>
-        <numerusform>Die Änderungen an %n Kamera wurden nicht gespeichert:</numerusform>
+        <numerusform>Die Änderungen an %n Kamera wurde nicht gespeichert:</numerusform>
         <numerusform>Die Änderungen an %n Kameras wurden nicht gespeichert:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
       <translation>
-        <numerusform>Die Änderungen an %n I/O-Modul wurden nicht gespeichert:</numerusform>
+        <numerusform>Die Änderungen an %n I/O-Modul wurde nicht gespeichert:</numerusform>
         <numerusform>Die Änderungen an %n I/O-Modulen wurden nicht gespeichert:</numerusform>
       </translation>
     </message>
@@ -4136,7 +4136,7 @@ to %1</source>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
       <translation>
-        <numerusform>Deaktivieren Sie %n Andere</numerusform>
+        <numerusform>Deaktivieren Sie %n Anderes</numerusform>
         <numerusform>Deaktivieren Sie %n Andere</numerusform>
       </translation>
     </message>
@@ -5151,8 +5151,8 @@ to %1</source>
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
       <translation>
-        <numerusform>%n von %1 ausgewählte Rolle hat keine %2 Berechtigungen</numerusform>
-        <numerusform>%n von %1 ausgewählte Rollen haben keine %2 Berechtigungen</numerusform>
+        <numerusform>%n von %1 ausgewählte Rolle hat keine %2 Berechtigung</numerusform>
+        <numerusform>%n von %1 ausgewählte Rollen haben keine %2 Berechtigung</numerusform>
       </translation>
     </message>
     <message>
@@ -5169,8 +5169,8 @@ to %1</source>
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
       <translation>
-        <numerusform>%n von %1 ausgewählter Benutzer hat keine %2 Berechtigungen</numerusform>
-        <numerusform>%n von %1 ausgewählte Benutzer haben keine %2 Berechtigungen</numerusform>
+        <numerusform>%n von %1 ausgewählter Benutzer hat keine %2 Berechtigung</numerusform>
+        <numerusform>%n von %1 ausgewählte Benutzer haben keine %2 Berechtigung</numerusform>
       </translation>
     </message>
   </context>
@@ -5469,7 +5469,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
       <translation>
-        <numerusform>%n von %1 Benutzer hat eine ungültige Emailadresse</numerusform>
+        <numerusform>%n von %1 Benutzern hat eine ungültige Emailadresse</numerusform>
         <numerusform>%n von %1 Benutzern haben eine ungültige Emailadresse</numerusform>
       </translation>
     </message>
@@ -6917,7 +6917,7 @@ to %1</source>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
       <translation>
-        <numerusform>Bitte wählen Sie eine Aktion aus, die bei %n Benutzer mit dieser Rolle durchgeführt werden soll</numerusform>
+        <numerusform>Bitte wählen Sie eine Aktion aus, die bei %n Benutzer mit dieser Rolle durchgeführt werden sollen</numerusform>
         <numerusform>Bitte wählen Sie eine Aktion aus, die bei %n Benutzern mit dieser Rolle durchgeführt werden sollen</numerusform>
       </translation>
     </message>
@@ -7268,7 +7268,7 @@ to %1</source>
       <source>The following %n items are not saved:</source>
       <translation>
         <numerusform>%n Item wurde nicht gespeichert:</numerusform>
-        <numerusform>%n Items wurde nicht gespeichert:</numerusform>
+        <numerusform>%n Items wurden nicht gespeichert:</numerusform>
       </translation>
     </message>
     <message>
@@ -7535,7 +7535,7 @@ to %1</source>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
       <translation>
-        <numerusform>Benutzer haben weiterhin Zugriff auf %n gelöschte Ressourcen:</numerusform>
+        <numerusform>Benutzer haben weiterhin Zugriff auf %n gelöschte Ressource:</numerusform>
         <numerusform>Benutzer haben weiterhin Zugriff auf %n gelöschte Ressourcen:</numerusform>
       </translation>
     </message>
@@ -7546,7 +7546,7 @@ to %1</source>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
       <translation>
-        <numerusform>Alle Benutzer mit dieser Rolle erhalten Zugriff auf %n Ressourcen:</numerusform>
+        <numerusform>Alle Benutzer mit dieser Rolle erhalten Zugriff auf %n Ressource:</numerusform>
         <numerusform>Alle Benutzer mit dieser Rolle erhalten Zugriff auf %n Ressourcen:</numerusform>
       </translation>
     </message>
@@ -7557,7 +7557,7 @@ to %1</source>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
       <translation>
-        <numerusform>Alle Benutzer mit dieser Rolle haben weiterhin Zugriff auf %n gelöschte Ressourcen:</numerusform>
+        <numerusform>Alle Benutzer mit dieser Rolle haben weiterhin Zugriff auf %n gelöschte Ressource:</numerusform>
         <numerusform>Alle Benutzer mit dieser Rolle haben weiterhin Zugriff auf %n gelöschte Ressourcen:</numerusform>
       </translation>
     </message>
@@ -7572,35 +7572,35 @@ to %1</source>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
       <translation>
-        <numerusform>Benutzer wird den Zugriff zu %n Ressourcen verlieren:</numerusform>
+        <numerusform>Benutzer wird den Zugriff zu %n Ressource verlieren:</numerusform>
         <numerusform>Benutzer wird den Zugriff zu %n Ressourcen verlieren:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
       <translation>
-        <numerusform>Alle Benutzer mit dieser Rolle werden den Zugriff zu %n Ressourcen verlieren:</numerusform>
-        <numerusform>Alle Benutzer mit dieser Rolle werden den Zugriff zu %n Ressourcen verlieren:</numerusform>
+        <numerusform>Alle Benutzer mit dieser Rolle werden den Zugriff auf %n Ressource verlieren:</numerusform>
+        <numerusform>Alle Benutzer mit dieser Rolle werden den Zugriff auf %n Ressourcen verlieren:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
       <translation>
-        <numerusform>%n freigegebene Layouts löschen?</numerusform>
+        <numerusform>%n freigegebenes Layout löschen?</numerusform>
         <numerusform>%n freigegebene Layouts löschen?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
       <translation>
-        <numerusform>Diese %n Layouts sind für andere Benutzer freigegeben. Layouts werden auch bei diesen Benutzern gelöscht.</numerusform>
-        <numerusform>Diese %n Layouts sind für andere Benutzer freigegeben. Layouts werden auch bei diesen Benutzern gelöscht.</numerusform>
+        <numerusform>Dieses %n Layout ist für andere Benutzer freigegeben. Das Layout wird auch bei diesen Benutzern gelöscht.</numerusform>
+        <numerusform>Diese %n Layouts sind für andere Benutzer freigegeben. Die Layouts werden auch bei diesen Benutzern gelöscht.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
       <translation>
-        <numerusform>%n Items vom Layout entfernen?</numerusform>
+        <numerusform>%n Item vom Layout entfernen?</numerusform>
         <numerusform>%n Items vom Layout entfernen?</numerusform>
       </translation>
     </message>
@@ -7626,21 +7626,21 @@ to %1</source>
     <message numerus="yes">
       <source>Delete %n devices?</source>
       <translation>
-        <numerusform>%n Geräte löschen?</numerusform>
+        <numerusform>%n Gerät löschen?</numerusform>
         <numerusform>%n Geräte löschen?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
       <translation>
-        <numerusform>%n Kameras löschen?</numerusform>
+        <numerusform>%n Kamera löschen?</numerusform>
         <numerusform>%n Kameras löschen?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
       <translation>
-        <numerusform>%n I/O-Module löschen?</numerusform>
+        <numerusform>%n I/O-Modul löschen?</numerusform>
         <numerusform>%n I/O-Module löschen?</numerusform>
       </translation>
     </message>
@@ -7654,21 +7654,21 @@ to %1</source>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
       <translation>
-        <numerusform>%n von denen werden automatisch erkannt.</numerusform>
+        <numerusform>%n von denen wird automatisch erkannt.</numerusform>
         <numerusform>%n von denen werden automatisch erkannt.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
       <translation>
-        <numerusform>%n Kameras werden automatisch erkannt.</numerusform>
+        <numerusform>%n Kamera wird automatisch erkannt.</numerusform>
         <numerusform>%n Kameras werden automatisch erkannt.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
       <translation>
-        <numerusform>%n I/O-Module werden automatisch erkannt.</numerusform>
+        <numerusform>%n I/O-Modul wird automatisch erkannt.</numerusform>
         <numerusform>%n I/O-Module werden automatisch erkannt.</numerusform>
       </translation>
     </message>
@@ -7795,7 +7795,7 @@ to %1</source>
     </message>
     <message>
       <source>Timestamp</source>
-      <translation>Zeitmarke</translation>
+      <translation>Zeitstempel</translation>
     </message>
     <message>
       <source>Add Image</source>
@@ -7918,7 +7918,7 @@ to %1</source>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
       <translation>
-        <numerusform>Für den Rapid-Review-Export sollte die Videolänge mindestens %n Sekunden betragen.</numerusform>
+        <numerusform>Für den Rapid-Review-Export sollte die Videolänge mindestens %n Sekunde betragen.</numerusform>
         <numerusform>Für den Rapid-Review-Export sollte die Videolänge mindestens %n Sekunden betragen.</numerusform>
       </translation>
     </message>

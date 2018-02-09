@@ -2988,7 +2988,6 @@ void MediaServerProcess::run()
     loadResourcesFromEc(ec2Connection, messageProcessor);
     qnServerModule->metadataManagerPool()->init();
     at_runtimeInfoChanged(runtimeManager->localInfo());
-    initPublicIpDiscoveryUpdate();
 
     saveServerInfo(m_mediaServer);
     m_mediaServer->setStatus(Qn::Online);

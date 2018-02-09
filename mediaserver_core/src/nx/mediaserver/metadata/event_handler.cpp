@@ -18,6 +18,13 @@ namespace metadata {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
+EventHandler::EventHandler()
+{
+    connect(this, &EventHandler::sdkEventTriggered,
+        qnEventRuleConnector, &event::EventConnector::at_analyticsSdkEvent,
+        Qt::QueuedConnection);
+}
+
 void EventHandler::handleMetadata(
     Error error,
     AbstractMetadataPacket* metadata)
@@ -68,7 +75,7 @@ void EventHandler::handleMetadata(
         if (m_resource->captureEvent(sdkEvent))
             continue;
 
-        qnEventRuleConnector->at_analyticsSdkEvent(sdkEvent);
+        emit sdkEventTriggered(sdkEvent);
     }
 }
 

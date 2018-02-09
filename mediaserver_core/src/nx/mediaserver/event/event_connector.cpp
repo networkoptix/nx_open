@@ -37,9 +37,10 @@ void EventConnector::onNewResource(const QnResourcePtr& resource)
         connect(camera.data(), &QnSecurityCamResource::cameraInput,
             this, &EventConnector::at_cameraInput);
 
+        // TODO: Remove these signals from camera and other places as theay are deprecated and
+        // newer used (ask #dmishin).
         connect(camera.data(), &QnSecurityCamResource::analyticsEventStart,
             this, &EventConnector::at_analyticsEventStart);
-
         connect(camera.data(), &QnSecurityCamResource::analyticsEventEnd,
             this, &EventConnector::at_analyticsEventEnd);
     }
@@ -207,31 +208,6 @@ void EventConnector::at_softwareTrigger(const QnResourcePtr& resource,
 
     vms::event::SoftwareTriggerEventPtr event(new vms::event::SoftwareTriggerEvent(
         resource->toSharedPointer(), triggerId, userId, timeStamp, toggleState));
-
-    qnEventRuleProcessor->processEvent(event);
-}
-
-void EventConnector::at_analyticsSdkEvent(const QnResourcePtr& resource,
-    const QnUuid& driverId,
-    const QnUuid& eventId,
-    vms::event::EventState toggleState,
-    const QString& caption,
-    const QString& description,
-    const QString& auxiliaryData,
-    qint64 timeStampUsec)
-{
-    if (!resource)
-        return;
-
-    vms::event::AnalyticsSdkEventPtr event(new vms::event::AnalyticsSdkEvent(
-        resource->toSharedPointer(),
-        driverId,
-        eventId,
-        toggleState,
-        caption,
-        description,
-        auxiliaryData,
-        timeStampUsec));
 
     qnEventRuleProcessor->processEvent(event);
 }
@@ -550,13 +526,17 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
             if (!check(resource, lit("'AnalyticsSdkEvent' requires 'resource' parameter")))
                 return false;
 
-            at_analyticsSdkEvent(resource, params.analyticsDriverId(), params.analyticsEventId(),
+            vms::event::AnalyticsSdkEventPtr event(new vms::event::AnalyticsSdkEvent(
+                resource->toSharedPointer(),
+                params.analyticsDriverId(),
+                params.analyticsEventId(),
                 eventState,
                 params.caption,
                 params.description,
-                /*auxiliary data*/QString(),
-                params.eventTimestampUsec);
+                /*auxiliaryData*/ QString(),
+                params.eventTimestampUsec));
 
+            at_analyticsSdkEvent(event);
             return true;
         }
 
