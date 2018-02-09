@@ -63,6 +63,7 @@ void RoundPanelLabel::paintEvent(QPaintEvent* event)
     painter.setBrush(effectiveBackgroundColor());
     painter.setPen(Qt::NoPen);
     painter.drawRoundedRect(rect(), radius, radius);
+    painter.end(); //< For QGraphicsProxyWidget compatibility.
     base_type::paintEvent(event);
 }
 

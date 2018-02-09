@@ -11,6 +11,7 @@
 
 class QInputDialog;
 class QScrollBar;
+class QGraphicsWidget;
 
 class QnNxStylePrivate: public QCommonStylePrivate
 {
@@ -71,15 +72,19 @@ public:
     /** TextButton is a PushButton which looks like a simple text (without bevel). */
     static bool isTextButton(const QStyleOption* option);
 
-    /* Insert horizontal separator line into QInputDialog above its button box. */
+    /** Insert horizontal separator line into QInputDialog above its button box. */
     bool polishInputDialog(QInputDialog* inputDialog) const;
 
-    /* Update QScrollArea hover if scrollBar is parented by one. */
+    /** Update QScrollArea hover if scrollBar is parented by one. */
     void updateScrollAreaHover(QScrollBar* scrollBar) const;
 
-    /* Unlike QWidget::graphicsProxyWidget finds proxy recursively. */
+    /** Unlike QWidget::graphicsProxyWidget finds proxy recursively. */
     static QGraphicsProxyWidget* graphicsProxyWidget(const QWidget* widget);
     static const QWidget* graphicsProxiedWidget(const QWidget* widget);
+
+    /** Workaround while Qt's QWidget::mapFromGlobal is broken: */
+    static QPoint mapFromGlobal(const QWidget* to, const QPoint& globalPos);
+    static QPoint mapFromGlobal(const QGraphicsWidget* to, const QPoint& globalPos);
 
 public:
     QnGenericPalette palette;

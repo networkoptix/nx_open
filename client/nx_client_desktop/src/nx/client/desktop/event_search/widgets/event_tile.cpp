@@ -64,7 +64,7 @@ EventTile::EventTile(QWidget* parent):
     ui->actionHolder->setHidden(true);
     ui->footerLabel->setHidden(true);
 
-    ui->previewWidget->setCropMode(QnResourcePreviewWidget::CropMode::notHovered);
+    ui->previewWidget->setCropMode(AsyncImageWidget::CropMode::notHovered);
 
     ui->wideHolder->setHidden(true);
     ui->narrowHolder->setHidden(true);

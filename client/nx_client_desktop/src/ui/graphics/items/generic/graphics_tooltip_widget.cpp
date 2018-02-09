@@ -109,6 +109,15 @@ void QnGraphicsToolTipWidget::setImageProvider(QnImageProvider* provider)
     forceLayoutUpdate();
 }
 
+void QnGraphicsToolTipWidget::setHighlightRect(const QRectF& relativeRect)
+{
+    if (m_previewWidget->highlightRect() == relativeRect)
+        return;
+
+    m_previewWidget->setHighlightRect(relativeRect);
+    forceLayoutUpdate();
+}
+
 QSize QnGraphicsToolTipWidget::maxThumbnailSize() const
 {
     return m_maxThumbnailSize;

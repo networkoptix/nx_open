@@ -32,6 +32,8 @@ public:
 
     void setImageProvider(QnImageProvider* provider);
 
+    void setHighlightRect(const QRectF& relativeRect);
+
     QSize maxThumbnailSize() const;
     void setMaxThumbnailSize(const QSize& value);
 

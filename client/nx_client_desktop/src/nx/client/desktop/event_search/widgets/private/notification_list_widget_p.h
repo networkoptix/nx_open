@@ -15,7 +15,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class EventTile;
 class EventRibbon;
 class AbstractEventListModel;
 

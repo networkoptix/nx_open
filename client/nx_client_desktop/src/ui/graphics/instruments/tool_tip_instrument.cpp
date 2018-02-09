@@ -40,7 +40,7 @@ namespace {
         if(QGraphicsProxyWidget *proxyWidget = dynamic_cast<QGraphicsProxyWidget *>(item))
             if(QWidget *widget = proxyWidget->widget())
                 return widgetToolTip(widget, pos.toPoint());
-        
+
         return item->toolTip();
     }
 
@@ -53,6 +53,16 @@ ToolTipInstrument::ToolTipInstrument(QObject *parent):
 
 ToolTipInstrument::~ToolTipInstrument() {
     return;
+}
+
+void ToolTipInstrument::addIgnoredItem(QGraphicsItem* item)
+{
+    m_ignoredItems.insert(item);
+}
+
+bool ToolTipInstrument::removeIgnoredItem(QGraphicsItem* item)
+{
+    return m_ignoredItems.remove(item);
 }
 
 bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
@@ -69,6 +79,8 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     ToolTipQueryable* targetAsToolTipQueryable = NULL;
     foreach(QGraphicsItem *item, scene()->items(scenePos, Qt::IntersectsItemShape, Qt::DescendingOrder, view->viewportTransform())) {
         if(!item->toolTip().isEmpty() || dynamic_cast<ToolTipQueryable *>(item) || dynamic_cast<QGraphicsProxyWidget *>(item) ) {
+            if (!satisfiesItemConditions(item) || m_ignoredItems.contains(item))
+                continue;
             targetItem = item;
             targetAsToolTipQueryable = dynamic_cast<ToolTipQueryable *>(item);
             QGraphicsProxyWidget* targetAsGraphicsProxy = dynamic_cast<QGraphicsProxyWidget *>(item);

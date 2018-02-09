@@ -85,6 +85,20 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
     }
 }
 
+QString BookmarkSearchListModel::Private::filterText() const
+{
+    return m_filterText;
+}
+
+void BookmarkSearchListModel::Private::setFilterText(const QString& value)
+{
+    if (m_filterText == value)
+        return;
+
+    clear();
+    m_filterText = value;
+}
+
 void BookmarkSearchListModel::Private::clear()
 {
     qDebug() << "Clear bookmarks model";
@@ -101,6 +115,7 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(qint64 fromMs, qi
     QnCameraBookmarkSearchFilter filter;
     filter.startTimeMs = fromMs;
     filter.endTimeMs = toMs;
+    filter.text = m_filterText;
     filter.orderBy.column = Qn::BookmarkStartTime;
     filter.orderBy.order = Qt::DescendingOrder;
     filter.limit = kFetchBatchSize;
