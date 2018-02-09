@@ -153,7 +153,7 @@ void StreamCapabilityAdvancedParametersProvider::updateMediaCapabilities()
     auto streamCapabilities = m_capabilities.value(key);
 
     auto mediaCapabilities = m_camera->cameraMediaCapability();
-    mediaCapabilities.streamCapabilities[(int)m_streamIndex] = streamCapabilities;
+    mediaCapabilities.streamCapabilities[m_streamIndex] = streamCapabilities;
     m_camera->setCameraMediaCapability(mediaCapabilities);
 }
 

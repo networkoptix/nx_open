@@ -862,9 +862,9 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
 
 void HanwhaResource::initMediaStreamCapabilities()
 {
-    m_capabilities.streamCapabilities[Qn::ConnectionRole::CR_LiveVideo] =
+    m_capabilities.streamCapabilities[Qn::StreamIndex::primary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_LiveVideo);
-    m_capabilities.streamCapabilities[Qn::ConnectionRole::CR_SecondaryLiveVideo] =
+    m_capabilities.streamCapabilities[Qn::StreamIndex::secondary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_SecondaryLiveVideo);
     setProperty(
         nx::media::kCameraMediaCapabilityParamName,

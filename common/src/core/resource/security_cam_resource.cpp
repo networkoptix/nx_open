@@ -214,7 +214,7 @@ void QnSecurityCamResource::updateInternal(const QnResourcePtr &other, Qn::Notif
 int QnSecurityCamResource::getMaxFps() const
 {
     const auto capabilities = cameraMediaCapability();
-    int result = capabilities.streamCapabilities.value(Qn::CR_LiveVideo).maxFps;
+    int result = capabilities.streamCapabilities.value(Qn::StreamIndex::primary).maxFps;
     if (result > 0)
         return result;
 
@@ -1389,12 +1389,17 @@ bool QnSecurityCamResource::doesEventComeFromAnalyticsDriver(nx::vms::event::Eve
     return eventType == nx::vms::event::EventType::analyticsSdkEvent;
 }
 
+Qn::StreamIndex QnSecurityCamResource::toStreamIndex(Qn::ConnectionRole role)
+{
+    return role == Qn::CR_SecondaryLiveVideo ? Qn::StreamIndex::secondary : Qn::StreamIndex::primary;
+}
+
 int QnSecurityCamResource::suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
 {
     if (streamParams.bitrateKbps > 0)
     {
         auto result = streamParams.bitrateKbps;
-        auto streamCapability = cameraMediaCapability().streamCapabilities.value(role);
+        auto streamCapability = cameraMediaCapability().streamCapabilities.value(toStreamIndex(role));
         if (streamCapability.maxBitrateKbps > 0)
             result = qBound(streamCapability.minBitrateKbps, result, streamCapability.maxBitrateKbps);
         return result;
@@ -1426,7 +1431,8 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
     };
     if (role == Qn::CR_Default)
         role = Qn::CR_LiveVideo;
-    auto streamCapability = cameraMediaCapability().streamCapabilities.value(role);
+    auto mediaCaps = cameraMediaCapability();
+    auto streamCapability = mediaCaps.streamCapabilities.value(toStreamIndex(role));
     if (streamCapability.defaultBitrateKbps > 0)
     {
         double coefficient = bitrateCoefficient(quality);

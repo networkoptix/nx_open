@@ -23,9 +23,7 @@ struct CameraStreamCapability
 
 struct CameraMediaCapability
 {
-    // Todo: It should be a StreamIndex here. But it is unsafe because it is saved to a database and we need
-    // compatibility with old DB version for mobile client.
-    QMap<int, CameraStreamCapability> streamCapabilities;
+    QMap<Qn::StreamIndex, CameraStreamCapability> streamCapabilities;
     bool hasDualStreaming = false;
     bool hasAudio = false;
     // TODO: move more fields to here like io port settings e.t.c

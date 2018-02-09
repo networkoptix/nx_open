@@ -329,6 +329,8 @@ public:
     virtual bool isRemoteArchiveMotionDetectionEnabled() const;
 
     virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
+
+    static Qn::StreamIndex toStreamIndex(Qn::ConnectionRole role);
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
