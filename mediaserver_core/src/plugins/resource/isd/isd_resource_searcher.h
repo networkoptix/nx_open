@@ -36,7 +36,7 @@ public:
         const SocketAddress& deviceEndpoint,
         const nx_upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) override;
-
+    virtual bool isEnabled() const override;
 private:
 
     void createResource(

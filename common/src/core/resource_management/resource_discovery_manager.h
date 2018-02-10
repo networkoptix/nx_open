@@ -23,6 +23,7 @@
 #include <utils/common/connective.h>
 #include <nx/utils/log/log.h>
 #include <common/common_module_aware.h>
+#include "resource_searcher.h"
 
 //#define DISCOVERY_DBG
 
@@ -137,7 +138,7 @@ public:
     static QnNetworkResourcePtr findSameResource(const QnNetworkResourcePtr& netRes);
 
     QThreadPool* threadPool();
-
+    DiscoveryMode discoveryMode() const;
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 protected:

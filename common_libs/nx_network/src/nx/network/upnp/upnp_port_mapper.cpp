@@ -76,6 +76,11 @@ bool PortMapper::disableMapping( quint16 port, Protocol protocol )
     return true;
 }
 
+bool PortMapper::isEnabled() const
+{
+    return m_isEnabled;
+}
+
 void PortMapper::setIsEnabled( bool isEnabled )
 {
     QnMutexLocker lock( &m_mutex );
@@ -251,7 +256,7 @@ void PortMapper::updateExternalIp( Device& device )
     if (!device.failCounter.isOk())
         return;
 
-    m_upnpClient->externalIp(device.url, 
+    m_upnpClient->externalIp(device.url,
         [this, &device](HostAddress externalIp)
         {
             std::list<Guard> callbackGuards;
