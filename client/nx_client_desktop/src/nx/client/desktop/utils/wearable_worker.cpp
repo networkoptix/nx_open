@@ -92,11 +92,13 @@ bool WearableWorker::isWorking() const
 
 void WearableWorker::updateState()
 {
+    // No point to update if we're already sending extend requests non-stop.
     if (isWorking())
-        return; //< No point to update.
+        return;
 
+    // Make sure we don't spam the server.
     if (d->waitingForStatusReply)
-        return; //< Too many updates.
+        return;
     d->waitingForStatusReply = true;
 
     auto callback =
@@ -124,7 +126,7 @@ bool WearableWorker::addUploads(const WearablePayloadList& uploads)
         d->state.queue.push_back(file);
     }
 
-    if (d->state.status != WearableState::Unlocked)
+    if (isWorking())
     {
         emit stateChanged(d->state);
         return true;
@@ -149,28 +151,13 @@ bool WearableWorker::addUploads(const WearablePayloadList& uploads)
 
 void WearableWorker::cancel()
 {
-    d->requests.cancelAllRequests();
+    handleStop();
 
-    WearableState::Status status = d->state.status;
-    if (status == WearableState::Unlocked || status == WearableState::LockedByOtherClient)
-    {
-        emit finished();
-        return;
-    }
+    if(isWorking())
+        d->state.status = WearableState::Unlocked;
 
-    auto callback =
-        [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
-        {
-            d->requests.releaseHandle(handle);
-            QnWearableStatusReply reply = result.deserialized<QnWearableStatusReply>();
-            handleUnlockFinished(success, reply);
-        };
-    d->requests.storeHandle(d->connection()->releaseWearableCameraLock(
-        d->camera,
-        d->lockToken,
-        callback,
-        thread()));
-        return;
+    emit stateChanged(d->state);
+    emit finished();
 }
 
 void WearableWorker::processNextFile()
@@ -223,6 +210,61 @@ void WearableWorker::processCurrentFile()
     emit stateChanged(d->state);
 }
 
+WearableState::Status WearableWorker::calculateNewStatus(FailReason reason)
+{
+    switch (reason)
+    {
+    case LockRequestFailed:
+    case CameraSnatched:
+        return WearableState::LockedByOtherClient;
+    case UploadFailed:
+    case ConsumeRequestFailed:
+        return WearableState::Unlocked;
+    default:
+        return WearableState::Unlocked;
+    }
+}
+
+QString WearableWorker::calculateErrorMessage(FailReason reason, const QString& errorMessage)
+{
+    if (!errorMessage.isEmpty())
+        return errorMessage;
+
+    // There really is no reason to explain what went wrong in the FSM.
+    return tr("Failed to send request to the server.");
+}
+
+void WearableWorker::handleFailure(FailReason reason, const QString& errorMessage)
+{
+    handleStop();
+
+    d->state.queue.clear();
+    d->state.status = calculateNewStatus(reason);
+
+    emit stateChanged(d->state);
+    emit error(d->state, calculateErrorMessage(reason, errorMessage));
+    emit finished();
+}
+
+void WearableWorker::handleStop()
+{
+    d->requests.cancelAllRequests();
+
+    if (!isWorking())
+        return;
+
+    if (d->state.status == WearableState::Uploading)
+        qnClientModule->uploadManager()->cancelUpload(d->state.currentUpload.id);
+
+    auto callback =
+        [this](bool, rest::Handle, const QnJsonRestResult&) { /* Just do nothing. */ };
+    d->connection()->releaseWearableCameraLock(
+        d->camera,
+        d->lockToken,
+        callback,
+        thread());
+}
+
 void WearableWorker::handleStatusFinished(bool success, const QnWearableStatusReply& result)
 {
     d->waitingForStatusReply = false;
@@ -254,16 +296,19 @@ void WearableWorker::handleStatusFinished(bool success, const QnWearableStatusRe
 void WearableWorker::handleLockFinished(bool success, const QnWearableStatusReply& result)
 {
     if (!success)
+    {
+        handleFailure(LockRequestFailed);
+        return;
+    }
+
+    // Already working => that's a stray reply, ignore it.
+    if (isWorking())
         return;
 
     if (!result.success)
     {
-        d->state.status = WearableState::LockedByOtherClient;
         d->state.lockUserId = result.userId;
-        d->state.queue.clear();
-
-        emit error(d->state, lit("LOCKED")); // TODO
-        emit stateChanged(d->state);
+        handleFailure(CameraSnatched);
     }
     else
     {
@@ -277,19 +322,17 @@ void WearableWorker::handleLockFinished(bool success, const QnWearableStatusRepl
 
 void WearableWorker::handleExtendFinished(bool success, const QnWearableStatusReply& result)
 {
+    // Errors are safe to ignore here as we'll resend the command soon anyway.
     if (!success)
         return;
 
+    // Already done & sorted => that's a stray reply, ignore it.
     if (!isWorking())
         return;
 
     if (!result.success)
     {
-        // Extend finished with an error => someone has snatched our camera! Not likely to happen.
-        d->state.status = WearableState::LockedByOtherClient;
-        d->state.lockUserId = result.userId;
-
-        emit stateChanged(d->state);
+        handleFailure(CameraSnatched);
         return;
     }
 
@@ -305,6 +348,14 @@ void WearableWorker::handleExtendFinished(bool success, const QnWearableStatusRe
 
 void WearableWorker::handleUnlockFinished(bool success, const QnWearableStatusReply& result)
 {
+    // Not working => that's a stray reply, ignore it.
+    if (!isWorking())
+        return;
+
+    // User has started another upload while we were waiting for a reply, ignore this one.
+    if (!d->state.isDone())
+        return;
+
     d->state.status = WearableState::Unlocked;
 
     emit stateChanged(d->state);
@@ -317,11 +368,16 @@ void WearableWorker::handleUnlockFinished(bool success, const QnWearableStatusRe
 
 void WearableWorker::handleUploadProgress(const UploadState& state)
 {
+    // In theory we should never get here in non-working state, but we want to feel safe.
+    if (!isWorking())
+        return;
+
     d->state.currentUpload = state;
 
     if (state.status == UploadState::Error)
     {
-        emit error(d->state, state.errorMessage);
+        handleFailure(UploadFailed, state.errorMessage);
+        return;
     }
 
     if (state.status == UploadState::Done)
@@ -351,14 +407,14 @@ void WearableWorker::handleUploadProgress(const UploadState& state)
 void WearableWorker::handleConsumeStarted(bool success)
 {
     if (!success)
-        return;
+        handleFailure(ConsumeRequestFailed);
 
     // Do nothing here, polling is done in timer event.
 }
 
 void WearableWorker::pollExtend()
 {
-    WearableState::Status status = d->state.status;
+    // Not working => no reason to poll.
     if (!isWorking())
         return;
 
