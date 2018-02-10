@@ -126,6 +126,7 @@ int QnWearableCameraRestHandler::executeAdd(
         QnCameraUserAttributePool::ScopedLock attributesLock(
             owner->commonModule()->cameraUserAttributesPool(), apiCamera.id);
         (*attributesLock)->audioEnabled = true;
+        (*attributesLock)->motionType = Qn::MT_NoMotion;
         fromResourceToApi(*attributesLock, apiAttributes);
     }
 
