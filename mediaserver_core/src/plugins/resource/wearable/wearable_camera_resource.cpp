@@ -20,7 +20,11 @@ CameraDiagnostics::Result QnWearableCameraResource::initInternal()
 
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, lit("1"));
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, lit("0"));
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
+    setProperty(Qn::SUPPORTED_MOTION_PARAM_NAME, lit("softwaregrid"));
+#else
     setProperty(Qn::SUPPORTED_MOTION_PARAM_NAME, lit("none"));
+#endif
     saveParams();
 
     return result;
