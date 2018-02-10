@@ -11,7 +11,7 @@ ${url}         ${CLOUD TEST}
 Get Reset Password Link
     [arguments]    ${recipient}
     Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
-    ${email}    Wait For Email    recipient=${recipient}    timeout=120    subject=Reset your password
+    ${email}    Wait For Email    recipient=${recipient}    timeout=120    subject=${RESET PASSWORD EMAIL SUBJECT}
     ${links}    Get Links From Email    ${email}
     Close Mailbox
     Return From Keyword    @{links}[1]

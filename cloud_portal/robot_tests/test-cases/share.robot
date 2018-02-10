@@ -134,7 +134,7 @@ Sharing works
     Input Text    ${SHARE EMAIL}    ${random email}
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}
-    Check User Permissions    ${random email}    Custom
+    Check User Permissions    ${random email}    ${CUSTOM TEXT}
     Remove User Permissions    ${random email}
     Close Browser
 
@@ -148,10 +148,10 @@ Edit permission works
     Input Text    ${SHARE EMAIL}    ${random email}
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}
-    Edit User Permissions In Systems    ${random email}    Viewer
-    Check User Permissions    ${random email}    Viewer
-    Edit User Permissions In Systems    ${random email}    Custom
-    Check User Permissions    ${random email}    Custom
+    Edit User Permissions In Systems    ${random email}    ${VIEWER TEXT}
+    Check User Permissions    ${random email}    ${VIEWER TEXT}
+    Edit User Permissions In Systems    ${random email}    ${CUSTOM TEXT}
+    Check User Permissions    ${random email}    ${CUSTOM TEXT}
     Remove User Permissions    ${random email}
     Close Browser
 
@@ -165,8 +165,8 @@ Share with registered user - sends him notification
     Input Text    ${SHARE EMAIL}    ${EMAIL NOPERM}
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}
-    Check User Permissions    ${EMAIL NOPERM}    Custom
+    Check User Permissions    ${EMAIL NOPERM}    ${CUSTOM TEXT}
     Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
-    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    subject=TestFirstName TestLastName invites you to Nx Cloud    timeout=120
+    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    subject=${INVITED TO SYSTEM EMAIL SUBJECT}    timeout=120
     Remove User Permissions    ${EMAIL NOPERM}
     Close Browser

@@ -26,5 +26,9 @@
     "SHARE PERMISSIONS HINT ADV VIEWER"            :    "Can view live video, browse the archive, configure cameras, control PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER"                :    "Can view live video and browse the archive",
     "SHARE PERMISSIONS HINT LIVE VIEWER"           :    "Can only view live video",
-    "SHARE PERMISSIONS HINT CUSTOM"                :    "Use the Nx Cloud Client application to set up custom permissions"
+    "SHARE PERMISSIONS HINT CUSTOM"                :    "Use the Nx Cloud Client application to set up custom permissions",
+    "VIEWER TEXT"                                  :    "Viewer",
+    "CUSTOM TEXT"                                  :    "Custom",
+    "RESET PASSWORD EMAIL SUBJECT"                 :    "Reset your password",
+    "INVITED TO SYSTEM EMAIL SUBJECT"              :    "TestFirstName TestLastName invites you to Nx Cloud"
 }
