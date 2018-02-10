@@ -23,7 +23,7 @@ public:
     QnVirtualCameraResourcePtr camera() const;
 
 private:
-    void updateSensitivityVisibility();
+    void updateSensitivityEnabled();
 
 private:
     QScopedPointer<Ui::WearableMotionWidget> ui;

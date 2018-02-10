@@ -16,9 +16,9 @@ QnWearableMotionWidget::QnWearableMotionWidget(QWidget* parent):
     m_aligner->addWidget(ui->sensitivityLabel);
 
     connect(ui->motionDetectionCheckBox, &QCheckBox::stateChanged, this,
-        &QnWearableMotionWidget::updateSensitivityVisibility);
+        &QnWearableMotionWidget::updateSensitivityEnabled);
 
-    updateSensitivityVisibility();
+    updateSensitivityEnabled();
 }
 
 QnWearableMotionWidget::~QnWearableMotionWidget()
@@ -45,10 +45,10 @@ QnVirtualCameraResourcePtr QnWearableMotionWidget::camera() const
     return m_camera;
 }
 
-void QnWearableMotionWidget::updateSensitivityVisibility()
+void QnWearableMotionWidget::updateSensitivityEnabled()
 {
-    bool visible = ui->motionDetectionCheckBox->isChecked();
+    bool enabled = ui->motionDetectionCheckBox->isChecked();
 
-    ui->sensitivityLabel->setVisible(visible);
-    ui->sensitivitySpinBox->setVisible(visible);
+    ui->sensitivityLabel->setEnabled(enabled);
+    ui->sensitivitySpinBox->setEnabled(enabled);
 }
