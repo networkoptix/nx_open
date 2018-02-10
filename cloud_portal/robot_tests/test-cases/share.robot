@@ -80,7 +80,7 @@ Sharing roles are ordered: more access is on top of the list with options
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
-    Element Text Should Be    ${SHARE PERMISSIONS DROPDOWN}    ${SHARE PERMISSIONS DROPDOWN CHOICES}
+    Element Text Should Be    ${SHARE PERMISSIONS DROPDOWN}    ${ADMIN TEXT}\n${ADV VIEWER TEXT}\n${VIEWER TEXT}\n${LIVE VIEWER TEXT}\n${CUSTOM TEXT}
     Close Browser
 
 When user selects role - special hint appears
