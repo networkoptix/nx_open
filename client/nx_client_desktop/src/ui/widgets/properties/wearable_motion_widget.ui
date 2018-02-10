@@ -29,7 +29,7 @@
       <item>
        <widget class="QCheckBox" name="motionDetectionCheckBox">
         <property name="text">
-         <string>Detect motion in uploading video</string>
+         <string>Detect motion in uploaded video</string>
         </property>
        </widget>
       </item>
