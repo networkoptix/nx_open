@@ -283,10 +283,13 @@ public:
         QThread* targetThread = nullptr);
 
     /**
-    * Cancel running request by known requestID. If request is canceled, callback isn't called.
-    * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.
-    * If QnServerRestConnection is destroyed all running requests are canceled, no callbacks called.
-    */
+     * Cancel running request by known requestID. If request is canceled, callback isn't called.
+     * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.
+     * If QnServerRestConnection is destroyed all running requests are canceled, no callbacks called.
+     *
+     * Note that this effectively means that YOU ARE NEVER SAFE, even if you've cancelled all your requests
+     * in your destructor. Better bulletproof your callbacks with `QnGuardedCallback`.
+     */
     void cancelRequest(const Handle& requestId);
 
 private slots:
