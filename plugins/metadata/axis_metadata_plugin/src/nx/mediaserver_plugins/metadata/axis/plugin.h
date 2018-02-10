@@ -13,7 +13,7 @@
 #include <nx/sdk/metadata/camera_manager.h>
 #include <nx/network/socket_global.h>
 
-#include "identified_supported_event.h"
+#include "common.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -44,7 +44,7 @@ public:
         nx::sdk::Error* error) const override;
 
 private:
-    QList<IdentifiedSupportedEvent> fetchSupportedEvents(
+    AnalyticsDriverManifest fetchSupportedEvents(
         const nx::sdk::CameraInfo& cameraInfo);
 
 private:

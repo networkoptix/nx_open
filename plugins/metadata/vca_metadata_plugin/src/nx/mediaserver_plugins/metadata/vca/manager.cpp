@@ -30,7 +30,7 @@ namespace {
 static const std::chrono::seconds kConnectTimeout(5);
 static const std::chrono::seconds kReceiveTimeout(30);
 
-static const std::chrono::milliseconds kMinTimeBetweenEvents(3*1000);
+static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seconds(3);
 
 struct EventMessage
 {
@@ -285,8 +285,11 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
             != m_eventsToCatch.cend())
         {
             sendEventStartedPacket(event);
-            if (timerNeeded())
+            if (event.isStateful())
+            {
+                event.elapsedTimer.start();
                 m_timer.start(timeTillCheck(), [this](){ onTimer(); });
+            }
         }
 
         cleanBuffer(m_buffer, size);
@@ -304,67 +307,36 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         });
 }
 
-std::chrono::milliseconds Manager::timeTillCheck()
+std::chrono::milliseconds Manager::timeTillCheck() const
 {
     qint64 maxElapsed = 0;
     for (const QnUuid& id: m_eventsToCatch)
     {
         const AnalyticsEventType& event = m_plugin->eventByUuid(id);
-        if ((event.flags & nx::api::Analytics::EventTypeFlag::stateDependent)
-            && event.elapsedTimer.isValid())
-        {
-            if (maxElapsed < event.elapsedTimer.elapsed())
-                maxElapsed = event.elapsedTimer.elapsed();
-        }
+        if (event.timerStarted())
+            maxElapsed = std::max(maxElapsed, event.elapsedTimer.elapsed());
     }
-    using std::chrono::milliseconds;
-    auto result = kMinTimeBetweenEvents - milliseconds(maxElapsed);
-    if (result < milliseconds::zero())
-        result = milliseconds::zero();
+    auto result = kMinTimeBetweenEvents - std::chrono::milliseconds(maxElapsed);
+    result = std::max(result, std::chrono::milliseconds::zero());
     return result;
 }
 
-void Manager::sendEventStartedPacket(const AnalyticsEventType& event)
+void Manager::sendEventStartedPacket(const AnalyticsEventType& event) const
 {
-    bool needToHandleEvent = true;
-    if (event.flags & nx::api::Analytics::EventTypeFlag::stateDependent)
-    {
-        if (event.elapsedTimer.isValid())
-        {
-            std::chrono::milliseconds timeSinceLastEvent(event.elapsedTimer.restart());
-            if (timeSinceLastEvent < kMinTimeBetweenEvents)
-                needToHandleEvent = false;
-        }
-        else
-        {
-            event.elapsedTimer.start();
-        }
-    }
-    if (needToHandleEvent)
-    {
-        auto packet = createCommonEventMetadataPacket(event, /*active*/ true);
-        m_handler->handleMetadata(nx::sdk::Error::noError, packet);
-        NX_PRINT
-            << ((event.flags & nx::api::Analytics::EventTypeFlag::stateDependent)
-                ? "Event [start] "
-                : "Event [pulse] ")
-            << event.internalName.toUtf8().constData()
-            << " sent to server";
-    }
+    auto packet = createCommonEventMetadataPacket(event, /*active*/ true);
+    m_handler->handleMetadata(nx::sdk::Error::noError, packet);
+    NX_PRINT
+        << (event.isStateful() ? "Event [start] " : "Event [pulse] ")
+        << event.internalName.toUtf8().constData()
+        << " sent to server";
 }
 
-void Manager::sendEventStoppedPacket(const AnalyticsEventType& event)
+void Manager::sendEventStoppedPacket(const AnalyticsEventType& event) const
 {
-    if ((event.flags & nx::api::Analytics::EventTypeFlag::stateDependent)
-        && event.elapsedTimer.isValid()
-        && event.elapsedTimer.hasExpired(kMinTimeBetweenEvents.count()))
-    {
-        event.elapsedTimer.invalidate();
-        auto packet = createCommonEventMetadataPacket(event, /*active*/ false);
-        m_handler->handleMetadata(nx::sdk::Error::noError, packet);
-        NX_PRINT << "Event [stop] " << event.internalName.toUtf8().constData()
-            << " sent to server";
-    }
+    auto packet = createCommonEventMetadataPacket(event, /*active*/ false);
+    m_handler->handleMetadata(nx::sdk::Error::noError, packet);
+    NX_PRINT << "Event [stop] " << event.internalName.toUtf8().constData()
+        << " sent to server";
 }
 
 void Manager::onTimer()
@@ -372,11 +344,14 @@ void Manager::onTimer()
     for (const QnUuid& id: m_eventsToCatch)
     {
         const AnalyticsEventType& event = m_plugin->eventByUuid(id);
-        if (std::chrono::milliseconds(event.elapsedTimer.elapsed()) >= kMinTimeBetweenEvents)
+        if (event.timerStarted() && event.elapsedTimer.hasExpired(kMinTimeBetweenEvents.count()))
+        {
+            event.elapsedTimer.invalidate();
             sendEventStoppedPacket(event);
+        }
     }
 
-    if (timerNeeded())
+    if (isTimerNeeded())
         m_timer.start(timeTillCheck(), [this](){ onTimer(); });
 }
 
@@ -384,17 +359,13 @@ void Manager::onTimer()
  * We need timer if at least one state-dependent event took place recently (i.e. no longer then
  * kMinTimeBetweenEvents ms ago).
  */
-bool Manager::timerNeeded()
+bool Manager::isTimerNeeded() const
 {
     for (const QnUuid& id: m_eventsToCatch)
     {
         const AnalyticsEventType& event = m_plugin->eventByUuid(id);
-        if ((event.flags & nx::api::Analytics::EventTypeFlag::stateDependent)
-            && event.elapsedTimer.isValid()
-            && !event.elapsedTimer.hasExpired(kMinTimeBetweenEvents.count()))
-        {
+        if (event.timerStarted())
             return true;
-        }
     }
     return false;
 }
@@ -427,15 +398,14 @@ nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler
 
     SocketAddress vcaAddress(ipPort);
     m_tcpSocket = new nx::network::TCPSocket;
-    m_tcpSocket->bindToAioThread(m_timer.getAioThread());
-    m_tcpSocket->setNonBlockingMode(true);
-    m_tcpSocket->setRecvTimeout(kReceiveTimeout.count() * 1000);
-
     if (!m_tcpSocket->connect(vcaAddress, kConnectTimeout.count() * 1000))
     {
         NX_PRINT << "Failed to connect to camera tcp notification server";
         return nx::sdk::Error::networkError;
     }
+    m_tcpSocket->bindToAioThread(m_timer.getAioThread());
+    m_tcpSocket->setNonBlockingMode(true);
+    m_tcpSocket->setRecvTimeout(kReceiveTimeout.count() * 1000);
     NX_PRINT << "Connection to camera tcp notification server established";
     m_handler = handler;
     m_tcpSocket->readSomeAsync(
@@ -452,9 +422,15 @@ nx::sdk::Error Manager::stopFetchingMetadata()
 {
     if (m_tcpSocket)
     {
-        m_timer.pleaseStopSync();
+        nx::utils::promise<void> promise;
+        m_timer.pleaseStop(
+            [&]()
+            {
+                m_tcpSocket->pleaseStopSync();
+                promise.set_value();
+            });
+        promise.get_future().wait();
 
-        m_tcpSocket->pleaseStopSync();
         delete m_tcpSocket;
         m_tcpSocket = nullptr;
     }
