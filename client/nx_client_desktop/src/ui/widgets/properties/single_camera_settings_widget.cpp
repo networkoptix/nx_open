@@ -197,8 +197,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     updateFromResource(true);
     retranslateUi();
 
-    QnAligner* aligner = new QnAligner(this);
-    aligner->addWidgets({
+    QnAligner* leftAligner = new QnAligner(this);
+    leftAligner->addWidgets({
         ui->nameLabel,
         ui->modelLabel,
         ui->firmwareLabel,
@@ -208,7 +208,11 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
         ui->macAddressLabel,
         ui->loginLabel,
         ui->passwordLabel });
-    aligner->addAligner(ui->wearableArchiveLengthWidget->aligner());
+    leftAligner->addAligner(ui->wearableArchiveLengthWidget->aligner());
+
+    QnAligner* rightAligner = new QnAligner(this);
+    rightAligner->addAligner(ui->imageControlWidget->aligner());
+    rightAligner->addAligner(ui->wearableMotionWidget->aligner());
 }
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget()
