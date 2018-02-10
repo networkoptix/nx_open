@@ -1248,9 +1248,6 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags()
         if (m_currentWidget->resource()->flags().testFlag(Qn::sync))
             flags |= WidgetSupportsSync;
 
-        if (m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
-            flags &= ~WidgetSupportsLive;
-
         if (workbench()->currentLayout()->isSearchLayout()) /* Is a thumbnails search layout. */
             flags &= ~(WidgetSupportsLive | WidgetSupportsSync);
 
