@@ -547,4 +547,9 @@ bool QnPlISDResourceSearcher::testCredentials(const QUrl &url, const QAuthentica
     return status == CLHttpStatus::CL_HTTP_SUCCESS;
 }
 
+bool QnPlISDResourceSearcher::isEnabled() const
+{
+    return discoveryMode() != DiscoveryMode::disabled;
+}
+
 #endif // #ifdef ENABLE_ISD

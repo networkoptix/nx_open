@@ -470,4 +470,9 @@ QnNetworkResourcePtr QnActiResourceSearcher::findExistingResource(
     return existingRes;
 }
 
+bool QnActiResourceSearcher::isEnabled() const
+{
+    return discoveryMode() != DiscoveryMode::disabled;
+}
+
 #endif // #ifdef ENABLE_ACTI

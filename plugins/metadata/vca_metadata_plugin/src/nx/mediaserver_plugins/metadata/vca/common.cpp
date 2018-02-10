@@ -7,14 +7,14 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace vca {
 
-bool operator==(const VcaAnalyticsEventType& lh, const VcaAnalyticsEventType& rh)
+bool operator==(const AnalyticsEventType& lh, const AnalyticsEventType& rh)
 {
     return lh.eventTypeId == rh.eventTypeId;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(VcaAnalyticsEventType, (json),
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventType, (json),
     VcaAnalyticsEventType_Fields, (brief, true))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(VcaAnalyticsDriverManifest, (json),
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsDriverManifest, (json),
     VcaAnalyticsDriverManifest_Fields, (brief, true))
 
 } // namespace vca

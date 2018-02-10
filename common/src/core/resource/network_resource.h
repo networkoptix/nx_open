@@ -72,6 +72,9 @@ public:
     bool checkNetworkStatus(NetworkStatus status) const;
     void setNetworkStatus(NetworkStatus status);
 
+    // this value is updated by discovery process
+    QDateTime getLastDiscoveredTime() const;
+    void setLastDiscoveredTime(const QDateTime &time);
 
     // all data readers and any sockets will use this number as timeout value in ms
     void setNetworkTimeout(unsigned int timeout);
@@ -123,6 +126,8 @@ private:
     int m_mediaPort;
 
     bool m_probablyNeedToUpdateStatus;
+
+    QDateTime m_lastDiscoveredTime;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnNetworkResource::NetworkStatus)

@@ -544,7 +544,7 @@ QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
     }
 
 
-    return new QnOnvifStreamReader(toSharedPointer());
+    return new QnOnvifStreamReader(toSharedPointer(this));
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapabilityMapFromDrives(
@@ -1691,7 +1691,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     /* Note that we don't pass shared pointer here as this would create a
      * cyclic reference and onvif resource will never be deleted. */
     QnSoapServer::instance()->getService()->registerResource(
-        toSharedPointer().staticCast<QnPlOnvifResource>(),
+        toSharedPointer(this),
         QUrl(QString::fromStdString(m_eventCapabilities->XAddr)).host(),
         m_onvifNotificationSubscriptionReference );
 
@@ -2775,7 +2775,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
             _oasisWsnB2__UnsubscribeResponse response;
             soapWrapper.unsubscribe(request, response);
 
-            QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
+            QnSoapServer::instance()->getService()->removeResourceRegistration(toSharedPointer(this));
             if( !registerNotificationConsumer() )
             {
                 lk.relock();
@@ -2868,15 +2868,15 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
     }
 }
 
-QnAbstractPtzController* QnPlOnvifResource::createSpecialPtzController()
+QnAbstractPtzController* QnPlOnvifResource::createSpecialPtzController() const
 {
     if (getModel() == lit("DCS-5615"))
         return new QnDlinkPtzController(toSharedPointer(this));
-    else
-        return 0;
+
+    return 0;
 }
 
-QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal()
+QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal() const
 {
     QScopedPointer<QnAbstractPtzController> result;
     result.reset(createSpecialPtzController());
@@ -2986,7 +2986,7 @@ void QnPlOnvifResource::stopInputPortMonitoringAsync()
     }
 
     if (QnSoapServer::instance() && QnSoapServer::instance()->getService())
-        QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
+        QnSoapServer::instance()->getService()->removeResourceRegistration(toSharedPointer(this));
 
     NX_LOGX(lit("Port monitoring is stopped"), cl_logDEBUG1);
 }
@@ -3981,8 +3981,9 @@ void QnPlOnvifResource::updateVideoEncoder(
     }
     auto capabilities = isPrimary ? m_primaryStreamCapabilities : m_secondaryStreamCapabilities;
 
-    encoder.Encoding = capabilities.isH264 ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
-    //encoder.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
+    const auto codecId = QnAvCodecHelper::codecIdFromString(streamParams.codec);
+    encoder.Encoding = capabilities.isH264 && codecId != AV_CODEC_ID_MJPEG
+        ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
 
     Qn::StreamQuality quality = params.quality;
 

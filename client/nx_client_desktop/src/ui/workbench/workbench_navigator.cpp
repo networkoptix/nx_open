@@ -1694,7 +1694,7 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodT
     if (startTimeMs == DATETIME_NOW)
         return;
 
-    /* We don't want duplicate loaders. */
+    /* We don't want duplicate providers. */
     QSet<QnCachingCameraDataLoaderPtr> loaders;
     for (const auto widget: m_syncedWidgets)
     {

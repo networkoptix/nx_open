@@ -82,10 +82,10 @@ QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, vms::event::EventType
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
 
     if (vms::event::requiresCameraResource(eventType))
-        return toIds(resourcePool->getResources<QnVirtualCameraResource>(ids));
+        return toIds(resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids));
 
     if (vms::event::requiresServerResource(eventType))
-        return toIds(resourcePool->getResources<QnMediaServerResource>(ids));
+        return toIds(resourcePool->getResourcesByIds<QnMediaServerResource>(ids));
 
     return QSet<QnUuid>();
 }
@@ -104,7 +104,7 @@ QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, vms::event::ActionTy
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
 
     if (vms::event::requiresCameraResource(actionType))
-        return toIds(resourcePool->getResources<QnVirtualCameraResource>(ids));
+        return toIds(resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids));
 
     if (requiresUserResource(actionType))
         return filterSubjectIds(ids);
@@ -847,7 +847,7 @@ QIcon QnBusinessRuleViewModel::getIcon(Column column) const
         case Column::source:
         {
             // TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-            auto resources = resourcePool()->getResources(eventResources());
+            auto resources = resourcePool()->getResourcesByIds(eventResources());
             if (!vms::event::isResourceRequired(m_eventType))
             {
                 return qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
@@ -906,7 +906,7 @@ QIcon QnBusinessRuleViewModel::getIcon(Column column) const
             }
 
             // TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-            QnResourceList resources = resourcePool()->getResources(actionResources());
+            QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
             if (!vms::event::requiresCameraResource(m_actionType))
             {
                 return qnResIconCache->icon(QnResourceIconCache::Servers);
@@ -957,15 +957,15 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
             {
                 case vms::event::cameraMotionEvent:
                     return isResourcesListValid<QnCameraMotionPolicy>(
-                        resourcePool()->getResources<QnCameraMotionPolicy::resource_type>(filtered));
+                        resourcePool()->getResourcesByIds<QnCameraMotionPolicy::resource_type>(filtered));
 
                 case vms::event::cameraInputEvent:
                     return isResourcesListValid<QnCameraInputPolicy>(
-                        resourcePool()->getResources<QnCameraInputPolicy::resource_type>(filtered));
+                        resourcePool()->getResourcesByIds<QnCameraInputPolicy::resource_type>(filtered));
 
                 case vms::event::analyticsSdkEvent:
                     return isResourcesListValid<QnCameraAnalyticsPolicy>(
-                        resourcePool()->getResources<QnCameraAnalyticsPolicy::resource_type>(filtered));
+                        resourcePool()->getResourcesByIds<QnCameraAnalyticsPolicy::resource_type>(filtered));
 
                 case vms::event::softwareTriggerEvent:
                 {
@@ -1029,18 +1029,18 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     return QnSendEmailActionDelegate::isValidList(filtered, m_actionParams.emailAddress);
                 case vms::event::cameraRecordingAction:
                     return isResourcesListValid<QnCameraRecordingPolicy>(
-                        resourcePool()->getResources<QnCameraRecordingPolicy::resource_type>(filtered));
+                        resourcePool()->getResourcesByIds<QnCameraRecordingPolicy::resource_type>(filtered));
                 case vms::event::bookmarkAction:
                     return isResourcesListValid<QnCameraRecordingPolicy>(
-                        resourcePool()->getResources<QnBookmarkActionPolicy::resource_type>(filtered));
+                        resourcePool()->getResourcesByIds<QnBookmarkActionPolicy::resource_type>(filtered));
                 case vms::event::cameraOutputAction:
                     return isResourcesListValid<QnCameraOutputPolicy>(
-                        resourcePool()->getResources<QnCameraOutputPolicy::resource_type>(filtered));
+                        resourcePool()->getResourcesByIds<QnCameraOutputPolicy::resource_type>(filtered));
                 case vms::event::playSoundAction:
                 case vms::event::playSoundOnceAction:
                     return !m_actionParams.url.isEmpty()
                         && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
-                            resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
+                            resourcePool()->getResourcesByIds<QnCameraAudioTransmitPolicy::resource_type>(filtered))
                             || m_actionParams.playToClient
                         );
 
@@ -1061,13 +1061,13 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                 case vms::event::sayTextAction:
                     return !m_actionParams.sayText.isEmpty()
                         && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
-                            resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
+                            resourcePool()->getResourcesByIds<QnCameraAudioTransmitPolicy::resource_type>(filtered))
                             || m_actionParams.playToClient
                         );
 
                 case vms::event::executePtzPresetAction:
                     return isResourcesListValid<QnExecPtzPresetPolicy>(
-                        resourcePool()->getResources<QnExecPtzPresetPolicy::resource_type>(filtered))
+                        resourcePool()->getResourcesByIds<QnExecPtzPresetPolicy::resource_type>(filtered))
                         && m_actionResources.size() == 1
                         && !m_actionParams.presetId.isEmpty();
                 case vms::event::showTextOverlayAction:
@@ -1093,7 +1093,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
             }
 
             // TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-            auto resources = resourcePool()->getResources(filtered);
+            auto resources = resourcePool()->getResourcesByIds(filtered);
             if (vms::event::requiresCameraResource(m_actionType) && resources.isEmpty())
             {
                 return false;
@@ -1135,7 +1135,7 @@ void QnBusinessRuleViewModel::updateActionTypesModel()
 
 QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
 {
-    QnResourceList resources = resourcePool()->getResources(eventResources());
+    QnResourceList resources = resourcePool()->getResourcesByIds(eventResources());
     if (m_eventType == vms::event::cameraMotionEvent)
         return QnCameraMotionPolicy::getText(resources, detailed);
 
@@ -1175,7 +1175,7 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
 
 QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
 {
-    QnResourceList resources = resourcePool()->getResources(actionResources());
+    QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
     switch (m_actionType)
     {
         case vms::event::sendMailAction:
@@ -1219,7 +1219,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
 
             if (canUseSource)
             {
-                QnVirtualCameraResourceList targetCameras = resourcePool()->getResources<QnVirtualCameraResource>(m_actionResources);
+                QnVirtualCameraResourceList targetCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(m_actionResources);
 
                 if (targetCameras.isEmpty())
                     return tr("Source camera");

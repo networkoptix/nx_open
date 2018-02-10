@@ -449,7 +449,8 @@
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Nie można skonfigurować systemu</h2>
-    <p class="master-description">Operacja zakończona nieprawidłowo. <br> Opis błędu: {{settings.localError}}
+    <p class="master-description">Something went totally wrong. <br>
+        Error description: {{settings.localError}}
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Spróbuj ponownie</button>

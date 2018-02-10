@@ -611,7 +611,7 @@ void ActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
     if (user && !qnRuntime->isActiveXMode())
     {
-        for (const QnLayoutResourcePtr &layout : resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>())
+        for (const QnLayoutResourcePtr &layout : resourcePool()->getResourcesByParentId(user->getId()).filtered<QnLayoutResource>())
         {
             if (layout->hasFlags(Qn::local) && !layout->isFile())
                 resourcePool()->removeResource(layout);

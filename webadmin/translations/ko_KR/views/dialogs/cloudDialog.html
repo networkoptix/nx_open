@@ -10,7 +10,8 @@
 
     <alert type="danger" ng-if="finished && !succeed" ng-bind-html="errorMessage"></alert>
 
-    <alert type="info" ng-if="connecting">시스템을 연결중  ... <span class="product-name">{{Config.cloud.productName}}</span>... <br>몇분정도 지속될수있습니다.</alert>
+    <alert type="info" ng-if="connecting">Connecting system to... <span class="product-name">{{Config.cloud.productName}}</span> ... <br>
+        This may last about a minute.</alert>
 
     <form name="cloudForm" disable-autocomplete>
         <div class="form-group" validate-field>

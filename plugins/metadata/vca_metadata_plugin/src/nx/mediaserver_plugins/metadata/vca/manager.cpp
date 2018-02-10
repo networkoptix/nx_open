@@ -30,6 +30,8 @@ namespace {
 static const std::chrono::seconds kConnectTimeout(5);
 static const std::chrono::seconds kReceiveTimeout(30);
 
+static const std::chrono::milliseconds kMinTimeBetweenEvents(3*1000);
+
 struct EventMessage
 {
     // Translates vca parameters to their values, e.g. "type" -> "md".
@@ -37,33 +39,25 @@ struct EventMessage
 };
 
 nx::sdk::metadata::CommonEvent* createCommonEvent(
-    const VcaAnalyticsEventType& event)
+    const AnalyticsEventType& event, bool active)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
     commonEvent->setEventTypeId(nxpt::fromQnUuidToPluginGuid(event.eventTypeId));
     commonEvent->setCaption(event.eventName.value.toStdString());
     commonEvent->setDescription(event.eventName.value.toStdString());
+    commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
     commonEvent->setAuxilaryData(event.internalName.toStdString());
     return commonEvent;
 }
 
-nx::sdk::metadata::CommonEvent* createCommonEvent(
-    const VcaAnalyticsEventType& event,
-    bool active)
-{
-    auto commonEvent = createCommonEvent(event);
-    commonEvent->setIsActive(active);
-    return commonEvent;
-}
-
 nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
-    const VcaAnalyticsEventType& event)
+    const AnalyticsEventType& event, bool active = true)
 {
     using namespace std::chrono;
 
     auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
-    auto commonEvent = createCommonEvent(event);
+    auto commonEvent = createCommonEvent(event, active);
     packet->addEvent(commonEvent);
     packet->setTimestampUsec(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
@@ -186,7 +180,7 @@ nx::sdk::Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
 
 Manager::Manager(Plugin* plugin,
     const nx::sdk::CameraInfo& cameraInfo,
-    const VcaAnalyticsDriverManifest& typedManifest)
+    const AnalyticsDriverManifest& typedManifest)
 {
     m_url = cameraInfo.url;
     m_auth.setUser(cameraInfo.login);
@@ -285,14 +279,14 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         else
             NX_PRINT << "Message with unknown type received.";
 
-        const auto& event = m_plugin->eventByInternalName(it->second);
+        const AnalyticsEventType& event = m_plugin->eventByInternalName(it->second);
 
         if (std::find(m_eventsToCatch.cbegin(), m_eventsToCatch.cend(), event.eventTypeId)
             != m_eventsToCatch.cend())
         {
-            auto packet = createCommonEventMetadataPacket(event);
-            m_handler->handleMetadata(nx::sdk::Error::noError, packet);
-            NX_PRINT << "Event " << it->second.constData() << " sent to server";
+            sendEventStartedPacket(event);
+            if (timerNeeded())
+                m_timer.start(timeTillCheck(), [this](){ onTimer(); });
         }
 
         cleanBuffer(m_buffer, size);
@@ -308,6 +302,101 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         {
             this->onReceive(errorCode, size);
         });
+}
+
+std::chrono::milliseconds Manager::timeTillCheck()
+{
+    qint64 maxElapsed = 0;
+    for (const QnUuid& id: m_eventsToCatch)
+    {
+        const AnalyticsEventType& event = m_plugin->eventByUuid(id);
+        if ((event.flags & nx::api::Analytics::EventTypeFlag::stateDependent)
+            && event.elapsedTimer.isValid())
+        {
+            if (maxElapsed < event.elapsedTimer.elapsed())
+                maxElapsed = event.elapsedTimer.elapsed();
+        }
+    }
+    using std::chrono::milliseconds;
+    auto result = kMinTimeBetweenEvents - milliseconds(maxElapsed);
+    if (result < milliseconds::zero())
+        result = milliseconds::zero();
+    return result;
+}
+
+void Manager::sendEventStartedPacket(const AnalyticsEventType& event)
+{
+    bool needToHandleEvent = true;
+    if (event.flags & nx::api::Analytics::EventTypeFlag::stateDependent)
+    {
+        if (event.elapsedTimer.isValid())
+        {
+            std::chrono::milliseconds timeSinceLastEvent(event.elapsedTimer.restart());
+            if (timeSinceLastEvent < kMinTimeBetweenEvents)
+                needToHandleEvent = false;
+        }
+        else
+        {
+            event.elapsedTimer.start();
+        }
+    }
+    if (needToHandleEvent)
+    {
+        auto packet = createCommonEventMetadataPacket(event, /*active*/ true);
+        m_handler->handleMetadata(nx::sdk::Error::noError, packet);
+        NX_PRINT
+            << ((event.flags & nx::api::Analytics::EventTypeFlag::stateDependent)
+                ? "Event [start] "
+                : "Event [pulse] ")
+            << event.internalName.toUtf8().constData()
+            << " sent to server";
+    }
+}
+
+void Manager::sendEventStoppedPacket(const AnalyticsEventType& event)
+{
+    if ((event.flags & nx::api::Analytics::EventTypeFlag::stateDependent)
+        && event.elapsedTimer.isValid()
+        && event.elapsedTimer.hasExpired(kMinTimeBetweenEvents.count()))
+    {
+        event.elapsedTimer.invalidate();
+        auto packet = createCommonEventMetadataPacket(event, /*active*/ false);
+        m_handler->handleMetadata(nx::sdk::Error::noError, packet);
+        NX_PRINT << "Event [stop] " << event.internalName.toUtf8().constData()
+            << " sent to server";
+    }
+}
+
+void Manager::onTimer()
+{
+    for (const QnUuid& id: m_eventsToCatch)
+    {
+        const AnalyticsEventType& event = m_plugin->eventByUuid(id);
+        if (std::chrono::milliseconds(event.elapsedTimer.elapsed()) >= kMinTimeBetweenEvents)
+            sendEventStoppedPacket(event);
+    }
+
+    if (timerNeeded())
+        m_timer.start(timeTillCheck(), [this](){ onTimer(); });
+}
+
+/*
+ * We need timer if at least one state-dependent event took place recently (i.e. no longer then
+ * kMinTimeBetweenEvents ms ago).
+ */
+bool Manager::timerNeeded()
+{
+    for (const QnUuid& id: m_eventsToCatch)
+    {
+        const AnalyticsEventType& event = m_plugin->eventByUuid(id);
+        if ((event.flags & nx::api::Analytics::EventTypeFlag::stateDependent)
+            && event.elapsedTimer.isValid()
+            && !event.elapsedTimer.hasExpired(kMinTimeBetweenEvents.count()))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler* handler,
@@ -338,15 +427,16 @@ nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler
 
     SocketAddress vcaAddress(ipPort);
     m_tcpSocket = new nx::network::TCPSocket;
+    m_tcpSocket->bindToAioThread(m_timer.getAioThread());
     m_tcpSocket->setNonBlockingMode(true);
     m_tcpSocket->setRecvTimeout(kReceiveTimeout.count() * 1000);
+
     if (!m_tcpSocket->connect(vcaAddress, kConnectTimeout.count() * 1000))
     {
         NX_PRINT << "Failed to connect to camera tcp notification server";
         return nx::sdk::Error::networkError;
     }
     NX_PRINT << "Connection to camera tcp notification server established";
-
     m_handler = handler;
     m_tcpSocket->readSomeAsync(
         &m_buffer,
@@ -362,6 +452,8 @@ nx::sdk::Error Manager::stopFetchingMetadata()
 {
     if (m_tcpSocket)
     {
+        m_timer.pleaseStopSync();
+
         m_tcpSocket->pleaseStopSync();
         delete m_tcpSocket;
         m_tcpSocket = nullptr;
@@ -383,7 +475,6 @@ const char* Manager::capabilitiesManifest(nx::sdk::Error* error)
         if(rule.second.ruleEnabled) //< At least one enabled rule.
             return m_cameraManifest;
     }
-
     return "";
 }
 

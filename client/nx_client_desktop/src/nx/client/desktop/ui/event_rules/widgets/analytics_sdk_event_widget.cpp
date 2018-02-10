@@ -94,7 +94,7 @@ void AnalyticsSdkEventWidget::paramsChanged()
 
 void AnalyticsSdkEventWidget::updateSdkEventTypesModel()
 {
-    const auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(
+    const auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
         model()->eventResources());
     m_sdkEventModel->loadFromCameras(cameras);
     ui->sdkEventTypeComboBox->setEnabled(m_sdkEventModel->isValid());

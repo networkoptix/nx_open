@@ -34,6 +34,7 @@ static const QString kVideoCodecTypeTag = lit("videoCodecType");
 static const QString kVideoResolutionWidthTag = lit("videoResolutionWidth");
 static const QString kVideoResolutionHeightTag = lit("videoResolutionHeight");
 static const QString kFixedQualityTag = lit("fixedQuality");
+static const QString kFixedBitrateTag = lit("constantBitRate");
 static const QString kMaxFrameRateTag = lit("maxFrameRate");
 
 static const QString kRtspPortNumberTag = lit("rtspPortNo");
@@ -46,12 +47,14 @@ lit("/ISAPI/Streaming/channels/%1/capabilities");
 
 static const QString kChannelStreamingPathTemplate = lit("/Streaming/Channels/%1");
 
-static const std::array<QString, 5> kVideoChannelProperties = {
+static const std::array<QString, 6> kVideoChannelProperties = {
     kVideoCodecTypeTag,
     kVideoResolutionWidthTag,
     kVideoResolutionHeightTag,
     kFixedQualityTag,
-    kMaxFrameRateTag};
+    kMaxFrameRateTag,
+    kFixedBitrateTag
+};
 
 static const std::map<QString, AVCodecID> kCodecMap = {
     {lit("MJPEG"), AVCodecID::AV_CODEC_ID_MJPEG},
@@ -66,6 +69,7 @@ struct ChannelCapabilities
     std::vector<QSize> resolutions;
     std::vector<int> fps;
     std::vector<int> quality;
+    std::pair<int, int> bitrateRange;
 };
 
 // Intentionally use struct here just in case we need

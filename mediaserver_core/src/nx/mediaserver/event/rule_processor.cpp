@@ -27,6 +27,7 @@
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/event/actions/send_mail_action.h>
 #include <nx/vms/event/actions/camera_output_action.h>
+#include <nx/network/socket_global.h>
 
 namespace {
 
@@ -197,7 +198,7 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
 
     prepareAdditionActionParams(action);
 
-    auto resources = resourcePool()->getResources<QnNetworkResource>(action->getResources());
+    auto resources = resourcePool()->getResourcesByIds<QnNetworkResource>(action->getResources());
 
     switch (action->actionType())
     {
@@ -205,7 +206,7 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
         case vms::event::showOnAlarmLayoutAction:
         {
             if (action->getParams().useSource)
-                resources << resourcePool()->getResources<QnNetworkResource>(action->getSourceResources());
+                resources << resourcePool()->getResourcesByIds<QnNetworkResource>(action->getSourceResources());
             break;
         }
 
@@ -375,10 +376,12 @@ void RuleProcessor::addRule(const vms::event::RulePtr& value)
 
 void RuleProcessor::processEvent(const vms::event::AbstractEventPtr& event)
 {
+    // TODO: Introduce a thread pool so actions could do not block a single event queue.
+    NX_CRITICAL(!nx::network::SocketGlobals::aioService().isInAnyAioThread(),
+        "Processing event from an AIO thread will sooner or later lead to a deadlock!");
+
     QnMutexLocker lock(&m_mutex);
-
     const auto actions = matchActions(event);
-
     for (const auto& action: actions)
         executeAction(action);
 }
@@ -678,7 +681,7 @@ void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, boo
 
         if (rule->eventType() == vms::event::cameraInputEvent)
         {
-            auto resList = resourcePool()->getResources<QnVirtualCameraResource>(rule->eventResources());
+            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(rule->eventResources());
             if (resList.isEmpty() ||            //< Listening to all cameras.
                 resList.contains(camResource))
             {
@@ -755,7 +758,7 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     {
         if (businessRule->eventType() == vms::event::cameraInputEvent)
         {
-            auto resList = resourcePool()->getResources<QnVirtualCameraResource>(
+            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                 businessRule->eventResources());
             if (resList.isEmpty())
                 resList = resourcePool()->getAllCameras(QnResourcePtr(), true);
@@ -774,7 +777,7 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     {
         if (businessRule->actionType() == vms::event::cameraRecordingAction)
         {
-            auto resList = resourcePool()->getResources<QnVirtualCameraResource>(
+            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                 businessRule->actionResources());
             for (const auto& camera: resList)
             {

@@ -99,7 +99,7 @@ protected: // for testing only
                            const DeviceInfo& devInfo );
 
     virtual void onTimer( const quint64& timerID ) override;
-
+    virtual bool isEnabled() const override;
 private:
     void addNewDevice( const HostAddress& localAddress,
                        const QUrl& url, const QString& serial );

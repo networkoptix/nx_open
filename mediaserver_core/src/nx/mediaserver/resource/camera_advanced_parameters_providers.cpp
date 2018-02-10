@@ -85,8 +85,9 @@ StreamCapabilityAdvancedParametersProvider::StreamCapabilityAdvancedParametersPr
     const QSize& baseResolution)
 :
     m_camera(camera),
+    m_capabilities(capabilities),
     m_streamIndex(streamIndex),
-    m_descriptions(describeCapabilities(capabilities)),
+    m_descriptions(describeCapabilities()),
     m_defaults(bestParameters(capabilities, baseResolution))
 {
     for (auto it = capabilities.begin(); it != capabilities.end(); ++it)
@@ -97,6 +98,8 @@ StreamCapabilityAdvancedParametersProvider::StreamCapabilityAdvancedParametersPr
 
     if (!QJson::deserialize(camera->getProperty(proprtyName()).toUtf8(), &m_parameters))
         m_parameters = m_defaults;
+    updateMediaCapabilities();
+    m_camera->saveParams();
 }
 
 QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::getParameters() const
@@ -113,13 +116,13 @@ bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStrea
 
     if (value == m_defaults)
     {
-        if (!m_camera->removeProperty(proprtyName()) || !m_camera->saveParams())
+        if (!m_camera->removeProperty(proprtyName()))
             return false;
     }
     else
     {
         const auto json = QString::fromUtf8(QJson::serialized(value));
-        if (!m_camera->setProperty(proprtyName(), json) || !m_camera->saveParams())
+        if (!m_camera->setProperty(proprtyName(), json))
             return false;
     }
 
@@ -138,8 +141,20 @@ bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStrea
                 stream->pleaseReopenStream();
         }
     }
+    updateMediaCapabilities();
+    return m_camera->saveParams();
+}
 
-    return true;
+void StreamCapabilityAdvancedParametersProvider::updateMediaCapabilities()
+{
+    StreamCapabilityKey key;
+    key.codec = m_parameters.codec;
+    key.resolution = m_parameters.resolution;
+    auto streamCapabilities = m_capabilities.value(key);
+
+    auto mediaCapabilities = m_camera->cameraMediaCapability();
+    mediaCapabilities.streamCapabilities[m_streamIndex] = streamCapabilities;
+    m_camera->setCameraMediaCapability(mediaCapabilities);
 }
 
 QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::descriptions()
@@ -224,11 +239,10 @@ QSet<QString> StreamCapabilityAdvancedParametersProvider::set(
     return setParameters(parameters) ? ids : QSet<QString>();
 }
 
-QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::describeCapabilities(
-    const StreamCapabilityMap& capabilities) const
+QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::describeCapabilities() const
 {
     QMap<QString, QMap<QString, nx::media::CameraStreamCapability>> codecResolutionCapabilities;
-    for (auto it = capabilities.begin(); it != capabilities.end(); ++it)
+    for (auto it = m_capabilities.begin(); it != m_capabilities.end(); ++it)
         codecResolutionCapabilities[it.key().codec][sizeToString(it.key().resolution)] = it.value();
 
     QnCameraAdvancedParamGroup streamParameters;

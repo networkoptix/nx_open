@@ -133,8 +133,6 @@ void QnLiveStreamProvider::setCameraControlDisabled(bool value)
 QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStreamParams& value)
 {
     QnLiveStreamParams params = value;
-    if (params.bitrateKbps == 0 && params.quality == Qn::QualityNotDefined)
-        params.quality = Qn::QualityNormal;
 
     // Add advanced parameters
     const auto advancedParams = m_cameraRes->advancedLiveStreamParams();
@@ -157,7 +155,14 @@ QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStr
     if (m_role == Qn::CR_SecondaryLiveVideo)
         params.bitrateKbps = advancedLiveStreamParams.bitrateKbps;
     if (params.bitrateKbps == 0)
-        params.bitrateKbps = m_cameraRes->rawSuggestBitrateKbps(params.quality, params.resolution, params.fps);
+    {
+        if (params.quality == Qn::QualityNotDefined)
+            params.quality = Qn::QualityNormal;
+
+        params.bitrateKbps = m_cameraRes->suggestBitrateForQualityKbps(
+            params.quality, params.resolution, params.fps, m_role);
+    }
+
     return params;
 }
 

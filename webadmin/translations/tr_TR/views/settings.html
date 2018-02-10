@@ -44,7 +44,8 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Sunucuyu mevcut sistemden ayır</h3>
-                        <p>Bu eylem, sunucuyu veritabanını, yerel kullanıcıları ve yapılandırmayı koruyan sistemden ayırır. Video arşivi bozulmadan kalacaktır. <b> Bulut kullanıcıları silinir. </b></p>
+                        <p>This action will detach server from the system keeping database, local users and configuration.
+                            Video arşivi bozulmadan kalacaktır. <b>Cloud users will be deleted.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Sunucuyu mevcut sistemden ayır</button></p>
                     </div>
                     <div>
@@ -120,9 +121,9 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Cihaz Ağ Ayarları</h3>
+                        <h3>Device Network Settings</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Ayarları kaydet ve cihazı yeniden başlat</button>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Tarih ve Zaman</h3>

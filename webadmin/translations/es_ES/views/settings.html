@@ -42,7 +42,8 @@
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Separar el servidor del sistema</h3>
-                        <p>Esta acción separará el servidor de la base de datos de mantenimiento del sistema, los usuarios locales y la configuración. El archivo de vídeo permanecerá intacto. <b>Los usuarios de la nube se eliminarán.</b></p>
+                        <p>This action will detach server from the system keeping database, local users and configuration.
+                            El archivo de vídeo permanecerá intacto. <b>Cloud users will be deleted.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Separar del sistema</button></p>
                     </div>
                     <div>
@@ -115,7 +116,9 @@ De lo contrario, solo cambiará la contraseña de recuperación.</p>
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Configuración de red del dispositivo</h3>                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings> <button class="btn btn-default" ng-click="saveNetworkSettings()">Guardar la configuración y reiniciar el dispositivo</button>
+                        <h3>Device Network Settings</h3>
+                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Fecha y hora</h3>

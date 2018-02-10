@@ -522,7 +522,7 @@ void QnUserSettingsDialog::applyChanges()
     {
         auto accessibleResources = m_model->accessibleResources();
 
-        QnLayoutResourceList layoutsToShare = resourcePool()->getResources(accessibleResources)
+        QnLayoutResourceList layoutsToShare = resourcePool()->getResourcesByIds(accessibleResources)
             .filtered<QnLayoutResource>(
                 [](const QnLayoutResourcePtr& layout)
             {

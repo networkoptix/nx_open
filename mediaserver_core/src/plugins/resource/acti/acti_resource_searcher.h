@@ -25,6 +25,7 @@ public:
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
     static const QString kSystemInfoProductionIdParamName;
+    virtual bool isEnabled() const override;
 protected:
     virtual bool processPacket(
         const QHostAddress& discoveryAddr,

@@ -1567,7 +1567,7 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
         QnVideoWallItem existingItem = index.item();
         if (const auto layout = resourcePool()->getResourceById<QnLayoutResource>(existingItem.layout))
         {
-            auto removedResources = resourcePool()->getResources(layout->layoutResourceIds());
+            auto removedResources = resourcePool()->getResourcesByIds(layout->layoutResourceIds());
             if (!confirmRemoveResourcesFromLayout(layout, removedResources))
                 break;
         }
@@ -1985,7 +1985,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
         const auto oldResources = currentLayout->layoutResourceIds();
         const auto newResources = targetLayout->layoutResourceIds();
 
-        const auto removedResources = resourcePool()->getResources(oldResources - newResources);
+        const auto removedResources = resourcePool()->getResourcesByIds(oldResources - newResources);
         if (!confirmRemoveResourcesFromLayout(currentLayout, removedResources))
             return;
     }

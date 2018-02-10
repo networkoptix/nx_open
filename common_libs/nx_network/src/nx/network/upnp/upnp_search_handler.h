@@ -22,7 +22,7 @@ public:
      * @param discoveredDevAddress Discovered device address
      * @param devInfo Parameters, received by parsing xmlDevInfo
      * @param xmlDevInfo xml data as defined in [UPnP Device Architecture 1.1, section 2.3]
-     * @return true, if device has been recognized and processed successfully, false otherwise. 
+     * @return true, if device has been recognized and processed successfully, false otherwise.
      *   If true, packet WILL NOT be passed to other processors.
      */
     virtual bool processPacket(
@@ -30,6 +30,7 @@ public:
         const SocketAddress& discoveredDevAddress,
         const DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo ) = 0;
+    virtual bool isEnabled() const = 0;
 };
 
 class NX_NETWORK_API SearchAutoHandler:

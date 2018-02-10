@@ -25,9 +25,10 @@ const char* const kPluginName = "Axis metadata plugin";
 const QString kAxisVendor("axis");
 const QString kSoapPath("/vapix/services");
 
-// Two SOAP topics essential for video analytics.
+// SOAP topics essential for video analytics, other topics will be thrown away.
 const char* const kRuleEngine = "tns1:RuleEngine";
 const char* const kVideoSource = "tns1:VideoSource";
+const char* const kCameraApplicationPlatform = "tnsaxis:CameraApplicationPlatform";
 
 } // namespace
 
@@ -132,7 +133,8 @@ QList<IdentifiedSupportedEvent> Plugin::fetchSupportedEvents(
         return result;
 
     // Only some rules are useful.
-    axisCameraController.filterSupportedEvents({ kRuleEngine, kVideoSource });
+    axisCameraController.filterSupportedEvents(
+        { kRuleEngine, kVideoSource, kCameraApplicationPlatform});
     const auto& src = axisCameraController.suppotedEvents();
     std::transform(src.begin(), src.end(), std::back_inserter(result),
         [](const nx::axis::SupportedEvent& event) {return IdentifiedSupportedEvent(event); });

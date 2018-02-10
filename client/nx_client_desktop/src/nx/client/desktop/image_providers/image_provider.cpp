@@ -38,5 +38,10 @@ Qn::ThumbnailStatus QnBasicImageProvider::status() const
 
 void QnBasicImageProvider::doLoadAsync()
 {
-    executeDelayedParented([this] { emit imageChanged(m_image); }, this);
+    executeDelayedParented(
+        [this]
+        {
+            emit imageChanged(m_image);
+            emit statusChanged(Qn::ThumbnailStatus::Loaded);
+        }, this);
 }
