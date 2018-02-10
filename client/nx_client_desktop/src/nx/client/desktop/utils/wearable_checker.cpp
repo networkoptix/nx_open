@@ -3,6 +3,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 
+#include <utils/common/guarded_callback.h>
 #include <api/server_rest_connection.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -110,13 +111,13 @@ void WearableChecker::checkUploads(const QStringList& filePaths, const QnTimePer
     for (const WearablePayload& payload : d->result)
         request.elements.push_back(payload.local);
 
-    auto callback =
+    auto callback = guarded(this,
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             d->requests.releaseHandle(handle);
             QnWearableCheckReply reply = result.deserialized<QnWearableCheckReply>();
             handleCheckFinished(success, reply);
-        };
+        });
 
     d->requests.storeHandle(d->connection()->checkWearableUploads(d->camera, request, callback, thread()));
 }
