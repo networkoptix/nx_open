@@ -100,10 +100,14 @@ SystemError::ErrorCode DnsResolver::resolveSync(
 {
     for (const auto& resolver: m_resolversByPriority)
     {
-        const auto resultCode = resolver.second->resolve(hostName, ipVersion, resolvedAddresses);
+        std::deque<AddressEntry> resolvedAddressesEntries;
+        const auto resultCode = resolver.second->resolve(
+            hostName, ipVersion, &resolvedAddressesEntries);
         if (resultCode == SystemError::noError)
         {
-            NX_ASSERT(!resolvedAddresses->empty());
+            NX_ASSERT(!resolvedAddressesEntries.empty());
+            for (auto& entry: resolvedAddressesEntries)
+                resolvedAddresses->push_back(std::move(entry.host));
             return resultCode;
         }
     }
@@ -136,7 +140,12 @@ bool DnsResolver::isRequestIdKnown(RequestId requestId) const
 
 void DnsResolver::addEtcHost(const QString& name, std::vector<HostAddress> addresses)
 {
-    m_predefinedHostResolver->addEtcHost(name, std::move(addresses));
+    std::vector<AddressEntry> entries;
+    entries.reserve(addresses.size());
+    for (auto& address: addresses)
+        entries.push_back({ AddressType::direct, address });
+
+    m_predefinedHostResolver->addEtcHost(name, std::move(entries));
 }
 
 void DnsResolver::removeEtcHost(const QString& name)

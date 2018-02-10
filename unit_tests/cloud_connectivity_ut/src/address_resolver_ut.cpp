@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/address_resolver.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/test_support/sync_queue.h>
 
@@ -10,6 +12,176 @@ namespace nx {
 namespace network {
 namespace cloud {
 namespace test {
+
+#if 1
+
+class AddressResolver:
+    public ::testing::Test
+{
+};
+
+/**
+ * For every address expecting following resolve order:
+ * - Fixed address table.
+ * - cloud resolve, if and only if hostname looks like cloud address ("guid" or "guid.guid").
+ * - Regular DNS.
+ */
+class AddressResolverOrder:
+    public AddressResolver
+{
+public:
+    AddressResolverOrder():
+        m_addressResolver(SocketGlobals::addressResolver())
+    {
+        SocketGlobals::cloud().reinitialize();
+        SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+            nx::utils::Url("stun://127.0.0.1:12345"));
+    }
+
+    ~AddressResolverOrder()
+    {
+        SocketGlobals::cloud().reinitialize();
+    }
+
+protected:
+    void givenCloudHostname()
+    {
+        m_hostname = QnUuid::createUuid().toSimpleString();
+    }
+
+    void givenNonCloudHostname()
+    {
+        m_hostname = "example.com";
+    }
+
+    void addFixedEntry()
+    {
+        m_fixedEntry = SocketAddress(HostAddress::localhost, 12345);
+        m_addressResolver.addFixedAddress(
+            m_hostname,
+            m_fixedEntry);
+    }
+
+    void makeHostnameResolvableWithDns()
+    {
+        m_dnsEntry = HostAddress::localhost;
+        m_addressResolver.dnsResolver().addEtcHost(
+            m_hostname,
+            {{m_dnsEntry}});
+    }
+
+    void disableCloudConnect()
+    {
+        SocketGlobals::cloud().reinitialize();
+        // Mediator is not resolved, so cloud connect is disabled.
+    }
+
+    void assertResolveReturnsCloudEntry()
+    {
+        resolve();
+        assertResolveSucceeded();
+
+        ASSERT_EQ(1U, m_resolvedEntries.size());
+        ASSERT_EQ(AddressType::cloud, m_resolvedEntries.front().type);
+        ASSERT_EQ(m_hostname, m_resolvedEntries.front().host.toString());
+    }
+
+    void assertResolveReturnsDnsResolveResult()
+    {
+        resolve();
+        assertResolveSucceeded();
+
+        ASSERT_EQ(1U, m_resolvedEntries.size());
+        ASSERT_EQ(AddressType::direct, m_resolvedEntries.front().type);
+        ASSERT_EQ(m_dnsEntry, m_resolvedEntries.front().host);
+    }
+
+    void assertResolveReturnsFixedEntry()
+    {
+        resolve();
+        assertResolveSucceeded();
+
+        ASSERT_EQ(1U, m_resolvedEntries.size());
+        ASSERT_EQ(AddressType::direct, m_resolvedEntries.front().type);
+        ASSERT_EQ(m_fixedEntry, m_resolvedEntries.front().toEndpoint());
+    }
+
+    void assertHostnameCannotBeResolved()
+    {
+        resolve();
+        assertResolveFailed();
+    }
+
+    void assertResolveSucceeded()
+    {
+        ASSERT_EQ(SystemError::noError, m_resolveResult);
+    }
+
+    void assertResolveFailed()
+    {
+        ASSERT_NE(SystemError::noError, m_resolveResult);
+    }
+
+private:
+    nx::network::AddressResolver& m_addressResolver;
+    QString m_hostname;
+    SocketAddress m_fixedEntry;
+    HostAddress m_dnsEntry;
+    SystemError::ErrorCode m_resolveResult = SystemError::noError;
+    std::deque<AddressEntry> m_resolvedEntries;
+
+    void resolve()
+    {
+        m_resolvedEntries = m_addressResolver.resolveSync(
+            m_hostname, NatTraversalSupport::enabled, AF_INET);
+        if (m_resolvedEntries.empty())
+            m_resolveResult = SystemError::getLastOSErrorCode();
+    }
+};
+
+TEST_F(AddressResolverOrder, fixed_resolve_precedes_cloud_resolve)
+{
+    givenCloudHostname();
+    addFixedEntry();
+    assertResolveReturnsFixedEntry();
+}
+
+TEST_F(AddressResolverOrder, cloud_resolve_precedes_dns_resolve)
+{
+    givenCloudHostname();
+    makeHostnameResolvableWithDns();
+    assertResolveReturnsCloudEntry();
+}
+
+TEST_F(AddressResolverOrder, cloud_resolve_is_skipped_for_non_cloud_address)
+{
+    givenNonCloudHostname();
+    makeHostnameResolvableWithDns();
+    assertResolveReturnsDnsResolveResult();
+}
+
+TEST_F(
+    AddressResolverOrder,
+    cloud_resolve_is_skipped_if_cloud_connect_is_not_initialized)
+{
+    disableCloudConnect();
+
+    givenCloudHostname();
+    makeHostnameResolvableWithDns();
+    assertResolveReturnsDnsResolveResult();
+}
+
+TEST_F(
+    AddressResolverOrder,
+    cloud_hostname_is_not_resolved_if_cloud_connect_is_not_initialized)
+{
+    disableCloudConnect();
+
+    givenCloudHostname();
+    assertHostnameCannotBeResolved();
+}
+
+#else
 
 class AddressResolverCloudResolving:
     public ::testing::Test,
@@ -289,6 +461,8 @@ TEST(AddressResolverRealTest, Cancel)
         }
     }
 }
+
+#endif
 
 } // namespace test
 } // namespace cloud

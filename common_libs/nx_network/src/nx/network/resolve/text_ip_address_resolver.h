@@ -5,10 +5,7 @@
 namespace nx {
 namespace network {
 
-/**
- * Resolves address using OS-provided API.
- */
-class NX_NETWORK_API SystemResolver:
+class TextIpAddressResolver:
     public AbstractResolver
 {
 public:

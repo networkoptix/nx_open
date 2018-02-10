@@ -17,14 +17,14 @@ public:
     virtual SystemError::ErrorCode resolve(
         const QString& name,
         int ipVersion,
-        std::deque<HostAddress>* resolvedAddresses) override;
+        std::deque<AddressEntry>* resolvedAddresses) override;
 
-    void addEtcHost(const QString& name, std::vector<HostAddress> addresses);
+    void addEtcHost(const QString& name, std::vector<AddressEntry> entries);
     void removeEtcHost(const QString& name);
 
 private:
     mutable QnMutex m_mutex;
-    std::map<QString, std::vector<HostAddress>> m_etcHosts;
+    std::map<QString, std::vector<AddressEntry>> m_etcHosts;
 };
 
 } // namespace network

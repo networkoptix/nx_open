@@ -199,7 +199,7 @@ private:
     SystemError::ErrorCode saveHostNameWithoutResolving(
         const QString& hostName,
         int /*ipVersion*/,
-        std::deque<HostAddress>* /*resolvedAddresses*/)
+        std::deque<AddressEntry>* /*resolvedAddresses*/)
     {
         m_resolvedHostNames.push_back(hostName);
         return SystemError::hostNotFound;
@@ -300,9 +300,9 @@ private:
     SystemError::ErrorCode dnsResolveStub(
         const QString& /*hostName*/,
         int /*ipVersion*/,
-        std::deque<HostAddress>* resolvedAddresses)
+        std::deque<AddressEntry>* resolvedAddresses)
     {
-        resolvedAddresses->push_back(m_stubAddress);
+        resolvedAddresses->push_back({AddressType::direct, m_stubAddress});
         return SystemError::noError;
     }
 

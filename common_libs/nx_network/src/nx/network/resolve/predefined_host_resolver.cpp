@@ -6,7 +6,7 @@ namespace network {
 SystemError::ErrorCode PredefinedHostResolver::resolve(
     const QString& name,
     int ipVersion,
-    std::deque<HostAddress>* resolvedAddresses)
+    std::deque<AddressEntry>* resolvedAddresses)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -14,10 +14,10 @@ SystemError::ErrorCode PredefinedHostResolver::resolve(
     if (it == m_etcHosts.end())
         return SystemError::hostNotFound;
 
-    for (const auto address : it->second)
+    for (const auto entry: it->second)
     {
-        if (ipVersion != AF_INET || address.ipV4())
-            resolvedAddresses->push_back(address);
+        if (ipVersion != AF_INET || entry.host.ipV4()) // TODO: #ak Totally unclear condition.
+            resolvedAddresses->push_back(entry);
     }
 
     return SystemError::noError;
@@ -25,10 +25,10 @@ SystemError::ErrorCode PredefinedHostResolver::resolve(
 
 void PredefinedHostResolver::addEtcHost(
     const QString& name,
-    std::vector<HostAddress> addresses)
+    std::vector<AddressEntry> entries)
 {
     QnMutexLocker lock(&m_mutex);
-    m_etcHosts[name] = std::move(addresses);
+    m_etcHosts[name] = std::move(entries);
 }
 
 void PredefinedHostResolver::removeEtcHost(const QString& name)

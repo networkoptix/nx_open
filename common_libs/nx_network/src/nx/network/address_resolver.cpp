@@ -7,107 +7,27 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
 
+#include "cloud/cloud_address_resolver.h"
+#include "resolve/predefined_host_resolver.h"
+#include "resolve/text_ip_address_resolver.h"
+
 static const auto kDnsCacheTimeout = std::chrono::seconds(10);
 static const auto kMediatorCacheTimeout = std::chrono::seconds(1);
 
 namespace nx {
 namespace network {
 
-QString toString(const AddressType& type)
-{
-    switch(type)
-    {
-        case AddressType::unknown: return lit("unknown");
-        case AddressType::direct: return lit("direct");
-        case AddressType::cloud: return lit("cloud");
-    };
-
-    NX_ASSERT(false, Q_FUNC_INFO, "undefined AddressType");
-    return lit("undefined=%1").arg(static_cast<int>(type));
-}
-
-//-------------------------------------------------------------------------------------------------
-
-TypedAddress::TypedAddress(HostAddress address_, AddressType type_):
-    address(std::move(address_)),
-    type(std::move(type_))
-{
-}
-
-QString TypedAddress::toString() const
-{
-    return lm("%1(%2)").args(address, type);
-}
-
-//-------------------------------------------------------------------------------------------------
-
-AddressAttribute::AddressAttribute(AddressAttributeType type_, quint64 value_):
-    type(type_),
-    value(value_)
-{
-}
-
-bool AddressAttribute::operator ==(const AddressAttribute& rhs) const
-{
-    return type == rhs.type && value == rhs.value;
-}
-
-bool AddressAttribute::operator <(const AddressAttribute& rhs) const
-{
-    return type < rhs.type && value < rhs.value;
-}
-
-QString AddressAttribute::toString() const
-{
-    switch(type)
-    {
-        case AddressAttributeType::unknown:
-            return lit("unknown");
-        case AddressAttributeType::port:
-            return lit("port=%1").arg(value);
-    };
-
-    NX_ASSERT(false, Q_FUNC_INFO, "undefined AddressAttributeType");
-    return lit("undefined=%1").arg(static_cast<int>(type));
-}
-
-//-------------------------------------------------------------------------------------------------
-
-AddressEntry::AddressEntry(AddressType type_, HostAddress host_):
-    type(type_),
-    host(std::move(host_))
-{
-}
-
-AddressEntry::AddressEntry(const SocketAddress& address):
-    type(AddressType::direct),
-    host(address.address)
-{
-    attributes.push_back(AddressAttribute(
-        AddressAttributeType::port, address.port));
-}
-
-bool AddressEntry::operator==(const AddressEntry& rhs) const
-{
-    return type == rhs.type && host == rhs.host && attributes == rhs.attributes;
-}
-
-bool AddressEntry::operator<(const AddressEntry& rhs) const
-{
-    return type < rhs.type && host < rhs.host && attributes < rhs.attributes;
-}
-
-QString AddressEntry::toString() const
-{
-    return lm("%1:%2(%3)").arg(type).arg(host).container(attributes);
-}
-
-//-------------------------------------------------------------------------------------------------
-
 AddressResolver::AddressResolver():
     m_cloudAddressRegExp(QLatin1String(
         "(.+\\.)?[0-9a-f]{8}\\-[0-9a-f]{4}\\-[0-9a-f]{4}\\-[0-9a-f]{4}\\-[0-9a-f]{12}"))
 {
+    m_nonBlockingResolvers.push_back(std::make_unique<TextIpAddressResolver>());
+
+    auto predefinedHostResolver = std::make_unique<PredefinedHostResolver>();
+    m_predefinedHostResolver = predefinedHostResolver.get();
+    m_nonBlockingResolvers.push_back(std::move(predefinedHostResolver));
+
+    m_nonBlockingResolvers.push_back(std::make_unique<CloudAddressResolver>());
 }
 
 void AddressResolver::addFixedAddress(
@@ -117,8 +37,10 @@ void AddressResolver::addFixedAddress(
     NX_ASSERT(endpoint.address.isIpAddress());
     NX_VERBOSE(this, lm("Added fixed address for %1: %2").args(hostName, endpoint));
 
+    const AddressEntry entry(endpoint);
+    m_predefinedHostResolver->addEtcHost(hostName.toString(), {endpoint});
+
     QnMutexLocker lk(&m_mutex);
-    AddressEntry entry(endpoint);
     auto& entries = m_info.emplace(
         hostName,
         HostAddressInfo(isCloudHostName(&lk, hostName.toString())))
@@ -140,6 +62,8 @@ void AddressResolver::removeFixedAddress(
     const HostAddress& hostName, boost::optional<SocketAddress> endpoint)
 {
     NX_VERBOSE(this, lm("Removed fixed address for %1: %2").args(hostName, endpoint));
+
+    m_predefinedHostResolver->removeEtcHost(hostName.toString());
 
     QnMutexLocker lk(&m_mutex);
     const auto record = m_info.find(hostName);
@@ -164,65 +88,6 @@ void AddressResolver::removeFixedAddress(
     }
 }
 
-namespace {
-
-// InPlaceResolver ---------------------------------------------------------------------------------
-using ResolveHandler = AddressResolver::ResolveHandler;
-
-class InPlaceResolver
-{
-public:
-    InPlaceResolver(int ipVersion, const HostAddress& hostname);
-    bool resolve(ResolveHandler* handler);
-private:
-    int m_ipVersion;
-    HostAddress m_hostname;
-
-    bool callHandler(HostAddress hostAddress, ResolveHandler* handler);
-};
-
-InPlaceResolver::InPlaceResolver(int ipVersion, const HostAddress& hostname):
-    m_ipVersion(ipVersion),
-    m_hostname(hostname)
-{
-    NX_ASSERT(m_ipVersion == AF_INET || m_ipVersion == AF_INET6);
-    if (m_ipVersion != AF_INET && m_ipVersion != AF_INET6)
-        NX_ERROR(this, "Unknown ip version");
-}
-
-bool InPlaceResolver::resolve(ResolveHandler* handler)
-{
-    if (m_hostname.isIpAddress())
-        return callHandler(std::move(m_hostname), handler);
-
-    if (m_ipVersion == AF_INET && m_hostname.ipV4())
-        return callHandler(*m_hostname.ipV4(), handler);
-
-    HostAddress::IpV6WithScope ipV6WithScope = m_hostname.ipV6();
-    if (!ipV6WithScope.first || !m_hostname.isPureIpV6())
-        return false;
-
-    return callHandler(HostAddress(*ipV6WithScope.first, ipV6WithScope.second), handler);
-}
-
-bool InPlaceResolver::callHandler(HostAddress hostAddress, ResolveHandler* handler)
-{
-    NX_VERBOSE(this, lm("IP %1 resolved in place").arg(m_hostname));
-    AddressEntry entry(AddressType::direct, std::move(hostAddress));
-    (*handler)(SystemError::noError, std::deque<AddressEntry>({std::move(entry)}));
-
-    return true;
-}
-
-static bool inPlaceResolve(int ipVersion, const HostAddress& hostAddress, ResolveHandler* handler)
-{
-    InPlaceResolver resolver(ipVersion, hostAddress);
-    return resolver.resolve(handler);
-}
-// -------------------------------------------------------------------------------------------------
-
-} // namespace
-
 void AddressResolver::resolveAsync(
     const HostAddress& hostName,
     ResolveHandler handler,
@@ -230,11 +95,19 @@ void AddressResolver::resolveAsync(
     int ipVersion,
     void* requestId)
 {
-    if (inPlaceResolve(ipVersion, hostName, &handler))
-        return;
+    if (hostName.isIpAddress())
+    {
+        return handler(
+            SystemError::noError,
+            std::deque<AddressEntry>({{ AddressEntry(AddressType::direct, hostName) }}));
+    }
 
     if (SocketGlobals::ini().isHostDisabled(hostName))
         return handler(SystemError::noPermission, std::deque<AddressEntry>());
+
+    std::deque<AddressEntry> resolvedAddresses;
+    if (resolveNonBlocking(hostName.toString(), natTraversalSupport, ipVersion, &resolvedAddresses))
+        return handler(SystemError::noError, std::move(resolvedAddresses));
 
     QnMutexLocker lk(&m_mutex);
     auto info = m_info.emplace(
@@ -378,7 +251,7 @@ void AddressResolver::HostAddressInfo::setDnsEntries(
 }
 
 void AddressResolver::HostAddressInfo::setMediatorEntries(
-        std::vector<AddressEntry> entries)
+    std::vector<AddressEntry> entries)
 {
     m_mediatorState = State::resolved;
     m_mediatorResolveTime = std::chrono::steady_clock::now();
@@ -453,6 +326,30 @@ AddressResolver::RequestInfo::RequestInfo(
 }
 
 //-------------------------------------------------------------------------------------------------
+
+bool AddressResolver::resolveNonBlocking(
+    const QString& hostName,
+    NatTraversalSupport natTraversalSupport,
+    int ipVersion,
+    std::deque<AddressEntry>* resolvedAddresses)
+{
+    for (const auto& nonBlockingResolver: m_nonBlockingResolvers)
+    {
+        // TODO: Remove following if.
+        if (natTraversalSupport == NatTraversalSupport::disabled &&
+            dynamic_cast<CloudAddressResolver*>(nonBlockingResolver.get()) != nullptr)
+        {
+            continue;
+        }
+
+        const SystemError::ErrorCode resolveResult =
+            nonBlockingResolver->resolve(hostName, ipVersion, resolvedAddresses);
+        if (resolveResult == SystemError::noError)
+            return true;
+    }
+
+    return false;
+}
 
 void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
 {
