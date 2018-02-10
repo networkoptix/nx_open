@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QAction>
 
+#include <utils/common/guarded_callback.h>
 #include <common/common_module.h>
 
 #include <api/server_rest_connection.h>
@@ -114,13 +115,9 @@ void QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered()
     QString name = dialog->name();
     QnMediaServerResourcePtr server = dialog->server();
 
-    QPointer<QObject> guard(this);
-    auto callback =
-        [this, guard, server](bool success, rest::Handle, const QnJsonRestResult& reply)
+    auto callback = guarded(this,
+        [this, server](bool success, rest::Handle, const QnJsonRestResult& reply)
         {
-            if (!guard)
-                return;
-
             if (!success)
             {
                 QnMessageBox::critical(
@@ -132,7 +129,7 @@ void QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered()
 
             m_currentCameraUuid = reply.deserialized<QnWearableCameraReply>().id;
             maybeOpenCurrentSettings();
-        };
+        });
 
     server->restConnection()->addWearableCamera(name, callback, thread());
 }
