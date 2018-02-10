@@ -1,6 +1,8 @@
 #include "wearable_camera_resource.h"
 
 #include <plugins/resource/avi/avi_resource.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
+#include <nx/streaming/abstract_archive_delegate.h>
 
 const QString QnWearableCameraResource::kManufacture = lit("WEARABLE_CAMERA");
 
@@ -47,11 +49,17 @@ QnConstResourceAudioLayoutPtr QnWearableCameraResource::getAudioLayout(
     if (!dataProvider)
         return QnConstResourceAudioLayoutPtr();
 
-    QnAviResourcePtr resource = dataProvider->getResource().dynamicCast<QnAviResource>();
-    if(!resource)
-        return QnConstResourceAudioLayoutPtr();
+    const QnAbstractArchiveStreamReader* reader =
+        dynamic_cast<const QnAbstractArchiveStreamReader*>(dataProvider);
+    if (reader && reader->getArchiveDelegate())
+        return reader->getArchiveDelegate()->getAudioLayout();
 
-    return resource->getAudioLayout(dataProvider);
+    QnAviResourcePtr resource = dataProvider->getResource().dynamicCast<QnAviResource>();
+    if(resource)
+        return resource->getAudioLayout(dataProvider);
+
+    NX_ASSERT(false);
+    return QnConstResourceAudioLayoutPtr();
 }
 
 QnAbstractStreamDataProvider* QnWearableCameraResource::createLiveDataProvider()

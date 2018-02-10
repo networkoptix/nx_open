@@ -6,6 +6,7 @@
 #include <plugins/storage/memory/ext_iodevice_storage.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <plugins/resource/avi/avi_resource.h>
+#include <plugins/utils/avi_motion_archive_delegate.h>
 #include <core/resource/security_cam_resource.h>
 
 #include "server_edge_stream_recorder.h"
@@ -15,6 +16,8 @@
 namespace nx {
 namespace mediaserver_core {
 namespace recorder {
+
+using namespace plugins;
 
 
 WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
@@ -61,6 +64,8 @@ void WearableArchiveSynchronizationTask::cancel()
 
 bool WearableArchiveSynchronizationTask::execute()
 {
+    m_withMotion = m_resource->getMotionType() == Qn::MT_SoftwareGrid;
+
     createArchiveReader(m_startTimeMs);
     createStreamRecorder(m_startTimeMs);
 
@@ -85,6 +90,18 @@ WearableArchiveSynchronizationState WearableArchiveSynchronizationTask::state() 
     return m_state;
 }
 
+QnAviArchiveDelegate* WearableArchiveSynchronizationTask::createArchiveDelegate()
+{
+    if (!m_withMotion)
+        return new QnAviArchiveDelegate();
+
+    std::unique_ptr<AviMotionArchiveDelegate> result = std::make_unique<AviMotionArchiveDelegate>();
+    QnMotionRegion region;
+    result->setMotionRegion(region);
+    return result.release();
+}
+
+
 void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
 {
     QString temporaryFilePath = QString::number(nx::utils::random::number());
@@ -94,7 +111,7 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
     storage->setIsIoDeviceOwner(false);
 
     using namespace nx::mediaserver_core::plugins;
-    std::unique_ptr<QnAviArchiveDelegate> delegate = std::make_unique<QnAviArchiveDelegate>();
+    std::unique_ptr<QnAviArchiveDelegate> delegate(createArchiveDelegate());
     delegate->setStorage(storage);
     delegate->setAudioChannel(0);
     delegate->setStartTimeUs(startTimeMs * 1000);
@@ -108,7 +125,7 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
     if(delegate->endTime() != AV_NOPTS_VALUE)
         duration = (delegate->endTime() - delegate->startTime()) / 1000;
 
-    m_archiveReader = std::make_unique<QnArchiveStreamReader>(resource);
+    m_archiveReader = std::make_unique<QnArchiveStreamReader>(m_resource);
     m_archiveReader->setObjectName(lit("WearableCameraArchiveReader"));
     m_archiveReader->setArchiveDelegate(delegate.release());
     //m_archiveReader->setPlaybackMask(timePeriod);
@@ -149,8 +166,12 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
         QnServer::ChunksCatalog::HiQualityCatalog,
         m_archiveReader.get());
 
-    auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& motion) { return false; };
-    m_recorder->setSaveMotionHandler(saveMotionHandler);
+    if (!m_withMotion)
+    {
+        auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& motion) { return false; };
+        m_recorder->setSaveMotionHandler(saveMotionHandler);
+    }
+
     m_recorder->setObjectName(lit("WearableCameraArchiveRecorder"));
 
     m_recorder->setOnFileWrittenHandler(

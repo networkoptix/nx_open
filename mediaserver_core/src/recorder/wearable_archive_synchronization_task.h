@@ -12,6 +12,7 @@ class QIODevice;
 
 class QnAbstractArchiveStreamReader;
 class QnServerEdgeStreamRecorder;
+class QnAviArchiveDelegate;
 
 namespace nx {
 namespace mediaserver_core {
@@ -48,6 +49,7 @@ signals:
     void stateChanged(WearableArchiveSynchronizationState state);
 
 private:
+    QnAviArchiveDelegate* createArchiveDelegate();
     void createArchiveReader(qint64 startTimeMs);
     void createStreamRecorder(qint64 startTimeMs);
 
@@ -59,6 +61,7 @@ private:
 
     std::unique_ptr<QnAbstractArchiveStreamReader> m_archiveReader;
     std::unique_ptr<QnServerEdgeStreamRecorder> m_recorder;
+    bool m_withMotion = false;
 };
 
 using WearableArchiveTaskPtr = std::shared_ptr<WearableArchiveSynchronizationTask>;
