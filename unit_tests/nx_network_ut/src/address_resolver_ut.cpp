@@ -151,6 +151,34 @@ TEST_F(AddressResolverDeprecatedTests, HostNameResolve2)
     ASSERT_TRUE(m_connections.empty());
 }
 
+TEST_F(AddressResolverDeprecatedTests, cancellation)
+{
+    const auto doNone = [&](SystemError::ErrorCode, std::deque<AddressEntry>) {};
+
+    const std::vector<nx::network::HostAddress> kTestAddresses =
+    {
+        nx::network::HostAddress("example.com"),
+        nx::network::HostAddress("7C6BA51F-317E-461E-B47D-17A14CB751B0.com"),
+        nx::network::HostAddress(lm("%1.%2").args(
+            QnUuid::createUuid().toSimpleString(),
+            QnUuid::createUuid().toSimpleString())),
+    };
+
+    for (size_t timeout = 0; timeout <= 500; timeout *= 2)
+    {
+        for (const auto& address: kTestAddresses)
+        {
+            SocketGlobals::addressResolver().resolveAsync(
+                address, doNone, NatTraversalSupport::enabled, AF_INET, this);
+            if (timeout)
+                std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+            SocketGlobals::addressResolver().cancel(this);
+            if (!timeout)
+                timeout = 1;
+        }
+    }
+}
+
 //-------------------------------------------------------------------------------------------------
 
 class AddressResolver:
