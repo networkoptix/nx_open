@@ -35,8 +35,7 @@ WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
 
 WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask()
 {
-    // Actual data should be deleted in execute().
-    NX_ASSERT(!m_file);
+    // execute was never called?
     if (m_file)
         delete m_file.data();
 }
