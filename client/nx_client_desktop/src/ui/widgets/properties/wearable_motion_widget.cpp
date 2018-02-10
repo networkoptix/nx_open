@@ -4,6 +4,8 @@
 #include <core/resource/camera_resource.h>
 
 #include <ui/common/aligner.h>
+#include <ui/common/read_only.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
 QnWearableMotionWidget::QnWearableMotionWidget(QWidget* parent):
     QWidget(parent),
@@ -14,6 +16,11 @@ QnWearableMotionWidget::QnWearableMotionWidget(QWidget* parent):
 
     m_aligner = new QnAligner(this);
     m_aligner->addWidget(ui->sensitivityLabel);
+
+    connect(ui->motionDetectionCheckBox, &QCheckBox::stateChanged, this,
+        &QnWearableMotionWidget::changed);
+    connect(ui->sensitivitySpinBox, QnSpinboxIntValueChanged, this,
+        &QnWearableMotionWidget::changed);
 
     connect(ui->motionDetectionCheckBox, &QCheckBox::stateChanged, this,
         &QnWearableMotionWidget::updateSensitivityEnabled);
@@ -30,19 +37,41 @@ QnAligner* QnWearableMotionWidget::aligner() const
     return m_aligner;
 }
 
-void QnWearableMotionWidget::setCamera(const QnVirtualCameraResourcePtr &camera)
+bool QnWearableMotionWidget::isReadOnly() const
 {
-    if (m_camera == camera)
-        return;
-
-    m_camera = camera;
-
-    //updateFromState(qnClientModule->wearableManager()->state(camera));
+    return m_readOnly;
 }
 
-QnVirtualCameraResourcePtr QnWearableMotionWidget::camera() const
+void QnWearableMotionWidget::setReadOnly(bool readOnly)
 {
-    return m_camera;
+    if (m_readOnly == readOnly)
+        return;
+
+    using ::setReadOnly;
+    setReadOnly(ui->motionDetectionCheckBox, readOnly);
+    setReadOnly(ui->sensitivitySpinBox, readOnly);
+
+    m_readOnly = readOnly;
+}
+
+void QnWearableMotionWidget::updateFromResource(const QnVirtualCameraResourcePtr &camera)
+{
+    if (!camera)
+        return;
+
+    ui->motionDetectionCheckBox->setChecked(camera->getMotionType() == Qn::MT_SoftwareGrid);
+
+    //auto mdEnabled = supported.testFlag(motionType) && motionType != Qn::MT_NoMotion;
+    //if (!mdEnabled)
+        //motionType = Qn::MT_NoMotion;
+}
+
+void QnWearableMotionWidget::submitToResource(const QnVirtualCameraResourcePtr &camera)
+{
+    if (!camera)
+        return;
+
+    camera->setMotionType(ui->motionDetectionCheckBox->isChecked() ? Qn::MT_SoftwareGrid : Qn::MT_NoMotion);
 }
 
 void QnWearableMotionWidget::updateSensitivityEnabled()
