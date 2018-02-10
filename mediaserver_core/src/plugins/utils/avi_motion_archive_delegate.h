@@ -14,6 +14,7 @@ class AviMotionArchiveDelegate: public QnAviArchiveDelegate
 
 public:
     AviMotionArchiveDelegate();
+    virtual ~AviMotionArchiveDelegate() override;
 
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void setMotionRegion(const QnMotionRegion& region) override;
