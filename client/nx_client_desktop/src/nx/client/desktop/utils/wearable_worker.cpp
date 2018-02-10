@@ -2,6 +2,7 @@
 
 #include <QtCore/QTimer>
 
+#include <utils/common/guarded_callback.h>
 #include <rest/server/json_rest_result.h>
 #include <api/model/wearable_status_reply.h>
 #include <api/server_rest_connection.h>
@@ -101,13 +102,13 @@ void WearableWorker::updateState()
         return;
     d->waitingForStatusReply = true;
 
-    auto callback =
+    auto callback = guarded(this,
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             d->requests.releaseHandle(handle);
             QnWearableStatusReply reply = result.deserialized<QnWearableStatusReply>();
             handleStatusFinished(success, reply);
-        };
+        });
 
     d->requests.storeHandle(d->connection()->wearableCameraStatus(d->camera, callback, thread()));
 }
@@ -132,13 +133,13 @@ bool WearableWorker::addUploads(const WearablePayloadList& uploads)
         return true;
     }
 
-    auto callback =
+    auto callback = guarded(this,
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             d->requests.releaseHandle(handle);
             QnWearableStatusReply reply = result.deserialized<QnWearableStatusReply>();
             handleLockFinished(success, reply);
-        };
+        });
     d->requests.storeHandle(d->connection()->lockWearableCamera(
         d->camera,
         d->user,
@@ -172,13 +173,13 @@ void WearableWorker::processCurrentFile()
     {
         d->state.status = WearableState::Locked;
 
-        auto callback =
+        auto callback = guarded(this,
             [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
             {
                 d->requests.releaseHandle(handle);
                 QnWearableStatusReply reply = result.deserialized<QnWearableStatusReply>();
                 handleUnlockFinished(success, reply);
-            };
+            });
         d->requests.storeHandle(d->connection()->releaseWearableCameraLock(
             d->camera,
             d->lockToken,
@@ -256,13 +257,10 @@ void WearableWorker::handleStop()
     if (d->state.status == WearableState::Uploading)
         qnClientModule->uploadManager()->cancelUpload(d->state.currentUpload.id);
 
-    auto callback =
-        [this](bool, rest::Handle, const QnJsonRestResult&) { /* Just do nothing. */ };
     d->connection()->releaseWearableCameraLock(
         d->camera,
         d->lockToken,
-        callback,
-        thread());
+        nullptr);
 }
 
 void WearableWorker::handleStatusFinished(bool success, const QnWearableStatusReply& result)
@@ -385,12 +383,12 @@ void WearableWorker::handleUploadProgress(const UploadState& state)
         d->state.status = WearableState::Consuming;
         d->state.consumeProgress = 0;
 
-        auto callback =
+        auto callback = guarded(this,
             [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
             {
                 d->requests.releaseHandle(handle);
                 handleConsumeStarted(success);
-            };
+            });
 
         d->requests.storeHandle(d->connection()->consumeWearableCameraFile(
             d->camera,
@@ -418,13 +416,13 @@ void WearableWorker::pollExtend()
     if (!isWorking())
         return;
 
-    auto callback =
+    auto callback = guarded(this,
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             d->requests.releaseHandle(handle);
             QnWearableStatusReply reply = result.deserialized<QnWearableStatusReply>();
             handleExtendFinished(success, reply);
-        };
+        });
     d->requests.storeHandle(d->connection()->extendWearableCameraLock(
         d->camera,
         d->user,
