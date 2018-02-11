@@ -472,7 +472,7 @@ Handle ServerConnection::addWearableCamera(
 
 Handle ServerConnection::prepareWearableUploads(
     const QnNetworkResourcePtr& camera,
-    const QnWearableCheckData& data,
+    const QnWearablePrepareData& data,
     GetCallback callback,
     QThread* targetThread)
 {

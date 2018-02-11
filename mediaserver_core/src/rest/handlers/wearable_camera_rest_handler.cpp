@@ -150,7 +150,7 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
     if (!requireParameter(params, lit("cameraId"), result, &cameraId))
         return nx_http::StatusCode::invalidParameter;
 
-    QnWearableCheckData data;
+    QnWearablePrepareData data;
     if(!QJson::deserialize(body, &data) || data.elements.empty())
         return nx_http::StatusCode::invalidParameter;
 
@@ -163,7 +163,7 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
         return nx_http::StatusCode::internalServerError;
 
     QnTimePeriod unionPeriod;
-    for (const QnWearableCheckDataElement& element : data.elements)
+    for (const QnWearablePrepareDataElement& element : data.elements)
         unionPeriod.addPeriod(element.period);
 
     QnTimePeriodList serverTimePeriods = qnNormalStorageMan
@@ -175,16 +175,16 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
             /*keepSmallChunks*/ false,
             std::numeric_limits<int>::max());
 
-    QnWearableCheckReply reply;
+    QnWearablePrepareReply reply;
 
     qint64 totalSize = 0;
-    for (const QnWearableCheckDataElement& element : data.elements)
+    for (const QnWearablePrepareDataElement& element : data.elements)
         totalSize += element.size;
     uploader->clearSpace(totalSize, &reply.availableSpace);
 
-    for (const QnWearableCheckDataElement& element : data.elements)
+    for (const QnWearablePrepareDataElement& element : data.elements)
     {
-        QnWearableCheckReplyElement replyElement;
+        QnWearablePrepareReplyElement replyElement;
         replyElement.period = shrinkPeriod(element.period, serverTimePeriods);
         reply.elements.push_back(replyElement);
     }

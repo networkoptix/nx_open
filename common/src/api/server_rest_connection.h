@@ -229,7 +229,7 @@ public:
 
     Handle prepareWearableUploads(
         const QnNetworkResourcePtr& camera,
-        const QnWearableCheckData& data,
+        const QnWearablePrepareData& data,
         GetCallback callback,
         QThread* targetThread = nullptr);
 

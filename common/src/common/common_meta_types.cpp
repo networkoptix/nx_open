@@ -244,8 +244,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnManualResourceSearchEntry>();
     qRegisterMetaType<QnWearableCameraReply>();
     qRegisterMetaType<QnWearableStatusReply>();
-    qRegisterMetaType<QnWearableCheckData>();
-    qRegisterMetaType<QnWearableCheckReply>();
+    qRegisterMetaType<QnWearablePrepareData>();
+    qRegisterMetaType<QnWearablePrepareReply>();
 
     qRegisterMetaType<QnPtzPreset>();
     qRegisterMetaType<QnPtzPresetList>();

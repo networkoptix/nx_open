@@ -5,18 +5,18 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <recording/time_period.h>
 
-struct QnWearableCheckDataElement
+struct QnWearablePrepareDataElement
 {
     qint64 size = 0;
     QnTimePeriod period;
 };
-#define QnWearableCheckDataElement_Fields (size)(period)
+#define QnWearablePrepareDataElement_Fields (size)(period)
 
-struct QnWearableCheckData
+struct QnWearablePrepareData
 {
-    QVector<QnWearableCheckDataElement> elements;
+    QVector<QnWearablePrepareDataElement> elements;
 };
-#define QnWearableCheckData_Fields (elements)
+#define QnWearablePrepareData_Fields (elements)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnWearableCheckDataElement, (json)(ubjson)(metatype)(eq))
-QN_FUSION_DECLARE_FUNCTIONS(QnWearableCheckData, (json)(ubjson)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnWearablePrepareDataElement, (json)(ubjson)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnWearablePrepareData, (json)(ubjson)(metatype)(eq))

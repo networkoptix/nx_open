@@ -4,18 +4,18 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-struct QnWearableCheckReplyElement
+struct QnWearablePrepareReplyElement
 {
     QnTimePeriod period;
 };
-#define QnWearableCheckReplyElement_Fields (period)
+#define QnWearablePrepareReplyElement_Fields (period)
 
-struct QnWearableCheckReply
+struct QnWearablePrepareReply
 {
-    QVector<QnWearableCheckReplyElement> elements;
+    QVector<QnWearablePrepareReplyElement> elements;
     qint64 availableSpace = 0;
 };
-#define QnWearableCheckReply_Fields (elements)(availableSpace)
+#define QnWearablePrepareReply_Fields (elements)(availableSpace)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnWearableCheckReplyElement, (json)(ubjson)(metatype)(eq))
-QN_FUSION_DECLARE_FUNCTIONS(QnWearableCheckReply, (json)(ubjson)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnWearablePrepareReplyElement, (json)(ubjson)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnWearablePrepareReply, (json)(ubjson)(metatype)(eq))

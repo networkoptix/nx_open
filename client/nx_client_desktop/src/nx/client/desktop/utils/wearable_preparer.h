@@ -29,7 +29,7 @@ public:
 
 private:
     void checkLocally(WearablePayload& payload);
-    void handlePrepareFinished(bool success, const QnWearableCheckReply& reply);
+    void handlePrepareFinished(bool success, const QnWearablePrepareReply& reply);
 
 signals:
     void finished(const WearableUpload& result);

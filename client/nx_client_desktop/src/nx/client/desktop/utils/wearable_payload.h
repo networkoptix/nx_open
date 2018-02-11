@@ -29,8 +29,8 @@ struct WearablePayload
 
     QString path;
     Status status = Valid;
-    QnWearableCheckDataElement local;
-    QnWearableCheckReplyElement remote;
+    QnWearablePrepareDataElement local;
+    QnWearablePrepareReplyElement remote;
 };
 
 struct WearableUpload

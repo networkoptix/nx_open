@@ -107,7 +107,7 @@ void WearablePreparer::prepareUploads(const QStringList& filePaths, const QnTime
         return;
     }
 
-    QnWearableCheckData request;
+    QnWearablePrepareData request;
     for(int i = 0; i < d->upload.elements.size(); i++)
     {
         WearablePayload& payload = d->upload.elements[i];
@@ -123,7 +123,7 @@ void WearablePreparer::prepareUploads(const QStringList& filePaths, const QnTime
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             d->requests.releaseHandle(handle);
-            QnWearableCheckReply reply = result.deserialized<QnWearableCheckReply>();
+            QnWearablePrepareReply reply = result.deserialized<QnWearablePrepareReply>();
             handlePrepareFinished(success, reply);
         });
 
@@ -187,7 +187,7 @@ void WearablePreparer::checkLocally(WearablePayload& payload)
     d->queuePeriods.includeTimePeriod(payload.local.period);
 }
 
-void WearablePreparer::handlePrepareFinished(bool success, const QnWearableCheckReply& reply)
+void WearablePreparer::handlePrepareFinished(bool success, const QnWearablePrepareReply& reply)
 {
     if (!success || reply.elements.size() != d->localByRemoteIndex.size())
     {
