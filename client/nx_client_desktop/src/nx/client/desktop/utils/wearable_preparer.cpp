@@ -47,7 +47,7 @@ QnTimePeriod shrinkPeriod(const QnTimePeriod& local, const QnTimePeriodList& rem
 } // namespace
 
 
-struct WearableChecker::Private
+struct WearablePreparer::Private
 {
     Private(const QnSecurityCamResourcePtr& camera) :
         camera(camera),
@@ -69,21 +69,21 @@ struct WearableChecker::Private
     ServerRequestStorage requests;
 };
 
-WearableChecker::WearableChecker(const QnSecurityCamResourcePtr& camera, QObject* parent):
+WearablePreparer::WearablePreparer(const QnSecurityCamResourcePtr& camera, QObject* parent):
     base_type(parent),
     QnCommonModuleAware(parent),
     d(new Private(camera))
 {
-    connect(this, &WearableChecker::finishedLater, this,
-        &WearableChecker::finished, Qt::QueuedConnection);
+    connect(this, &WearablePreparer::finishedLater, this,
+        &WearablePreparer::finished, Qt::QueuedConnection);
 }
 
-WearableChecker::~WearableChecker()
+WearablePreparer::~WearablePreparer()
 {
     d->requests.cancelAllRequests();
 }
 
-void WearableChecker::checkUploads(const QStringList& filePaths, const QnTimePeriodList& queue)
+void WearablePreparer::prepareUploads(const QStringList& filePaths, const QnTimePeriodList& queue)
 {
     NX_ASSERT(d->result.isEmpty());
     NX_ASSERT(!filePaths.isEmpty());
@@ -116,13 +116,13 @@ void WearableChecker::checkUploads(const QStringList& filePaths, const QnTimePer
         {
             d->requests.releaseHandle(handle);
             QnWearableCheckReply reply = result.deserialized<QnWearableCheckReply>();
-            handleCheckFinished(success, reply);
+            handlePrepareFinished(success, reply);
         });
 
     d->requests.storeHandle(d->connection()->prepareWearableUploads(d->camera, request, callback, thread()));
 }
 
-void WearableChecker::checkLocally(WearablePayload& payload)
+void WearablePreparer::checkLocally(WearablePayload& payload)
 {
     if (!QFile::exists(payload.path))
     {
@@ -179,7 +179,7 @@ void WearableChecker::checkLocally(WearablePayload& payload)
     d->queuePeriods.includeTimePeriod(payload.local.period);
 }
 
-void WearableChecker::handleCheckFinished(bool success, const QnWearableCheckReply& reply)
+void WearablePreparer::handlePrepareFinished(bool success, const QnWearableCheckReply& reply)
 {
     if (!success || reply.elements.size() != d->result.size())
     {

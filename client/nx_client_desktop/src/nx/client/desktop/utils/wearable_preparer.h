@@ -14,7 +14,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class WearableChecker:
+class WearablePreparer:
     public QObject,
     public QnCommonModuleAware
 {
@@ -22,14 +22,14 @@ class WearableChecker:
     using base_type = QObject;
 
 public:
-    WearableChecker(const QnSecurityCamResourcePtr& camera, QObject* parent = nullptr);
-    virtual ~WearableChecker() override;
+    WearablePreparer(const QnSecurityCamResourcePtr& camera, QObject* parent = nullptr);
+    virtual ~WearablePreparer() override;
 
-    void checkUploads(const QStringList& filePaths, const QnTimePeriodList& queue);
+    void prepareUploads(const QStringList& filePaths, const QnTimePeriodList& queue);
 
 private:
     void checkLocally(WearablePayload& payload);
-    void handleCheckFinished(bool success, const QnWearableCheckReply& reply);
+    void handlePrepareFinished(bool success, const QnWearableCheckReply& reply);
 
 signals:
     void finished(const WearablePayloadList& result);

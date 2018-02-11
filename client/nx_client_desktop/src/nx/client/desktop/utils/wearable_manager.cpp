@@ -72,12 +72,12 @@ void WearableManager::prepareUploads(
     QObject* target,
     std::function<void(const WearablePayloadList&)> callback)
 {
-    WearableChecker* checker = new WearableChecker(camera, this);
+    WearablePreparer* checker = new WearablePreparer(camera, this);
 
-    connect(checker, &WearableChecker::finished, target, callback);
-    connect(checker, &WearableChecker::finished, checker, &QObject::deleteLater);
+    connect(checker, &WearablePreparer::finished, target, callback);
+    connect(checker, &WearablePreparer::finished, checker, &QObject::deleteLater);
 
-    checker->checkUploads(filePaths, state(camera).periods());
+    checker->prepareUploads(filePaths, state(camera).periods());
 }
 
 void WearableManager::updateState(const QnSecurityCamResourcePtr& camera)
