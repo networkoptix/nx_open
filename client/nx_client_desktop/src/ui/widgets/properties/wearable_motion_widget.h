@@ -33,6 +33,9 @@ signals:
 private:
     void updateSensitivityEnabled();
 
+    int calculateSensitivity(const QnVirtualCameraResourcePtr &camera) const;
+    void submitSensitivity(const QnVirtualCameraResourcePtr &camera, int sensitivity) const;
+
 private:
     QScopedPointer<Ui::WearableMotionWidget> ui;
     QnVirtualCameraResourcePtr m_camera;

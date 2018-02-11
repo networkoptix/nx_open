@@ -14,6 +14,9 @@ QnWearableMotionWidget::QnWearableMotionWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
+    ui->sensitivitySpinBox->setMinimum(1);
+    ui->sensitivitySpinBox->setMaximum(QnMotionRegion::kSensitivityLevelCount - 1);
+
     m_aligner = new QnAligner(this);
     m_aligner->addWidget(ui->sensitivityLabel);
 
@@ -60,10 +63,7 @@ void QnWearableMotionWidget::updateFromResource(const QnVirtualCameraResourcePtr
         return;
 
     ui->motionDetectionCheckBox->setChecked(camera->getMotionType() == Qn::MT_SoftwareGrid);
-
-    //auto mdEnabled = supported.testFlag(motionType) && motionType != Qn::MT_NoMotion;
-    //if (!mdEnabled)
-        //motionType = Qn::MT_NoMotion;
+    ui->sensitivitySpinBox->setValue(calculateSensitivity(camera));
 }
 
 void QnWearableMotionWidget::submitToResource(const QnVirtualCameraResourcePtr &camera)
@@ -72,6 +72,7 @@ void QnWearableMotionWidget::submitToResource(const QnVirtualCameraResourcePtr &
         return;
 
     camera->setMotionType(ui->motionDetectionCheckBox->isChecked() ? Qn::MT_SoftwareGrid : Qn::MT_NoMotion);
+    submitSensitivity(camera, ui->sensitivitySpinBox->value());
 }
 
 void QnWearableMotionWidget::updateSensitivityEnabled()
@@ -80,4 +81,22 @@ void QnWearableMotionWidget::updateSensitivityEnabled()
 
     ui->sensitivityLabel->setEnabled(enabled);
     ui->sensitivitySpinBox->setEnabled(enabled);
+}
+
+int QnWearableMotionWidget::calculateSensitivity(const QnVirtualCameraResourcePtr &camera) const
+{
+    QnMotionRegion region = camera->getMotionRegion(0);
+    auto rects = region.getAllMotionRects();
+    if (rects.empty())
+        return QnMotionRegion::kDefaultSensitivity;
+
+    // Assume motion region looks sane.
+    return rects.begin().key();
+}
+
+void QnWearableMotionWidget::submitSensitivity(const QnVirtualCameraResourcePtr &camera, int sensitivity) const
+{
+    QnMotionRegion region;
+    region.addRect(sensitivity, QRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+    camera->setMotionRegion(region, 0);
 }
