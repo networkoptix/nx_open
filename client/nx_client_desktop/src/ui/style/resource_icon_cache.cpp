@@ -181,18 +181,33 @@ QIcon QnResourceIconCache::icon(Key key)
     if (m_cache.contains(key))
         return m_cache.value(key);
 
-    const auto base = key & TypeMask;
-    const auto status = key & StatusMask;
-    if (status != QnResourceIconCache::Online)
+    QIcon result;
+
+    if (key & AlwaysSelected)
     {
-        qDebug() << "Error: unknown icon" << keyToString(key);
-        NX_ASSERT(false, Q_FUNC_INFO, "All icons should be pre-generated.");
+        QIcon source = icon(key & ~AlwaysSelected);
+        for (const QSize& size : source.availableSizes(QIcon::Selected))
+        {
+            QPixmap selectedPixmap = source.pixmap(size, QIcon::Selected);
+            result.addPixmap(selectedPixmap, QIcon::Normal);
+            result.addPixmap(selectedPixmap, QIcon::Selected);
+        }
+    }
+    else
+    {
+        const auto base = key & TypeMask;
+        const auto status = key & StatusMask;
+        if (status != QnResourceIconCache::Online)
+        {
+            qDebug() << "Error: unknown icon" << keyToString(key);
+            NX_ASSERT(false, Q_FUNC_INFO, "All icons should be pre-generated.");
+        }
+
+        result = m_cache.value(base);
     }
 
-    QIcon icon = m_cache.value(base);
-
-    m_cache.insert(key, icon);
-    return icon;
+    m_cache.insert(key, result);
+    return result;
 }
 
 QIcon QnResourceIconCache::icon(const QnResourcePtr& resource)

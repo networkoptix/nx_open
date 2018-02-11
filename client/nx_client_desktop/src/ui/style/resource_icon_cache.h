@@ -63,7 +63,8 @@ public:
         StatusMask      = 0xFF00,
 
         /* Additional flags */
-        ReadOnly        = 0x10000
+        ReadOnly        = 0x10000,
+        AlwaysSelected  = 0x20000
     };
     Q_DECLARE_FLAGS(Key, KeyPart)
 
