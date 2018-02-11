@@ -31,10 +31,17 @@ QnNewWearableCameraDialog::QnNewWearableCameraDialog(QWidget* parent):
     m_model->setHasCheckboxes(false);
     m_model->setUserCheckable(false);
     m_model->setReadOnly(true);
+    m_model->setOptions(QnResourceListModel::AlwaysSelectedOption);
     m_model->setResources(servers);
 
     ui->serverComboBox->setModel(m_model);
     ui->serverComboBox->setEditable(false);
+
+    if (servers.size() == 1)
+    {
+        ui->serverComboBox->hide();
+        ui->serverLabel->hide();
+    }
 
     /* Set up name edit. */
     QStringList usedNames;

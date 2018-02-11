@@ -7,6 +7,7 @@
 
 #include <utils/common/updatable.h>
 
+class QnAligner;
 namespace Ui
 {
     class ImageControlWidget;
@@ -23,6 +24,8 @@ public:
     QnImageControlWidget(QWidget *parent = nullptr);
     virtual ~QnImageControlWidget();
 
+    QnAligner* aligner() const;
+
     void updateFromResources(const QnVirtualCameraResourceList &cameras);
     void submitToResources(const QnVirtualCameraResourceList &cameras);
 
@@ -38,5 +41,6 @@ signals:
 
 private:
     QScopedPointer<Ui::ImageControlWidget> ui;
+    QnAligner* m_aligner = nullptr;
     bool m_readOnly;
 };

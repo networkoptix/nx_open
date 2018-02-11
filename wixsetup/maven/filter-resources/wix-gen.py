@@ -13,6 +13,7 @@ generated_items = [
     ('vcrt14', 'Client'),
     ('vcrt14', 'Server'),
     ('vcrt14', 'Traytool'),
+    ('vcrt14', 'Paxton'),
     ('vcrt14', 'Nxtool')
 ]
 

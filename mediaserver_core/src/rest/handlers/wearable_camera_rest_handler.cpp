@@ -2,24 +2,44 @@
 
 #include <QtCore/QFile>
 
+#include <nx/utils/std/cpp14.h>
+
+#include <common/common_module.h>
+
 #include <nx_ec/ec_api.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
+
 #include <api/model/wearable_camera_reply.h>
 #include <api/model/wearable_status_reply.h>
-#include <recorder/wearable_archive_synchronizer.h>
-#include <rest/server/rest_connection_processor.h>
+#include <api/model/wearable_prepare_data.h>
+#include <api/model/wearable_prepare_reply.h>
+
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_access/user_access_data.h>
-#include <common/common_module.h>
-#include <plugins/resource/wearable/wearable_camera_resource.h>
+
+#include <recorder/storage_manager.h>
 #include <media_server/media_server_module.h>
 #include <media_server/wearable_upload_manager.h>
 #include <media_server/wearable_lock_manager.h>
+#include <rest/server/rest_connection_processor.h>
 
-#include <nx/utils/std/cpp14.h>
-#include "core/resource/camera_user_attribute_pool.h"
-#include "nx_ec/data/api_conversion_functions.h"
+namespace {
+const qint64 kDetalizationLevelMs = 1;
+
+QnTimePeriod shrinkPeriod(const QnTimePeriod& local, const QnTimePeriodList& remote)
+{
+    QnTimePeriodList locals{ local };
+    locals.excludeTimePeriods(remote);
+
+    if (!locals.empty())
+        return locals[0];
+    return QnTimePeriod();
+}
+
+} // namespace
 
 using namespace nx::mediaserver_core::recorder;
 
@@ -44,13 +64,16 @@ int QnWearableCameraRestHandler::executeGet(
 int QnWearableCameraRestHandler::executePost(
     const QString& path,
     const QnRequestParams& params,
-    const QByteArray& /*body*/,
+    const QByteArray& body,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
     QString action = extractAction(path);
     if (action == "add")
         return executeAdd(params, result, owner);
+
+    if (action == "prepare")
+        return executePrepare(params, body, result, owner);
 
     if (action == "consume")
         return executeConsume(params, result, owner);
@@ -79,8 +102,6 @@ int QnWearableCameraRestHandler::executeAdd(
     if (!requireParameter(params, lit("name"), result, &name))
         return nx_http::StatusCode::invalidParameter;
 
-    ec2::ErrorCode code = ec2::ErrorCode::ok;
-
     ec2::ApiCameraData apiCamera;
     apiCamera.physicalId = QnUuid::createUuid().toSimpleString();
     apiCamera.fillId();
@@ -91,9 +112,8 @@ int QnWearableCameraRestHandler::executeAdd(
     // Note that physical id is in path, not in host.
     apiCamera.url = lit("wearable:///") + apiCamera.physicalId;
 
-    code = owner->commonModule()->ec2Connection()
+    ec2::ErrorCode code = owner->commonModule()->ec2Connection()
         ->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
-
     if (code != ec2::ErrorCode::ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest,
@@ -106,6 +126,7 @@ int QnWearableCameraRestHandler::executeAdd(
         QnCameraUserAttributePool::ScopedLock attributesLock(
             owner->commonModule()->cameraUserAttributesPool(), apiCamera.id);
         (*attributesLock)->audioEnabled = true;
+        (*attributesLock)->motionType = Qn::MT_NoMotion;
         fromResourceToApi(*attributesLock, apiAttributes);
     }
 
@@ -117,6 +138,58 @@ int QnWearableCameraRestHandler::executeAdd(
     reply.id = apiCamera.id;
     result.setReply(reply);
 
+    return nx_http::StatusCode::ok;
+}
+
+int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
+    const QByteArray& body,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
+{
+    QnUuid cameraId;
+    if (!requireParameter(params, lit("cameraId"), result, &cameraId))
+        return nx_http::StatusCode::invalidParameter;
+
+    QnWearablePrepareData data;
+    if(!QJson::deserialize(body, &data) || data.elements.empty())
+        return nx_http::StatusCode::invalidParameter;
+
+    QnResourcePtr resource = owner->resourcePool()->getResourceById(cameraId);
+    if (!resource)
+        return nx_http::StatusCode::invalidParameter;
+
+    QnWearableUploadManager* uploader = uploadManager(result);
+    if (!uploader)
+        return nx_http::StatusCode::internalServerError;
+
+    QnTimePeriod unionPeriod;
+    for (const QnWearablePrepareDataElement& element : data.elements)
+        unionPeriod.addPeriod(element.period);
+
+    QnTimePeriodList serverTimePeriods = qnNormalStorageMan
+        ->getFileCatalog(resource->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
+        ->getTimePeriods(
+            unionPeriod.startTimeMs,
+            unionPeriod.endTimeMs(),
+            kDetalizationLevelMs,
+            /*keepSmallChunks*/ false,
+            std::numeric_limits<int>::max());
+
+    QnWearablePrepareReply reply;
+
+    qint64 totalSize = 0;
+    for (const QnWearablePrepareDataElement& element : data.elements)
+        totalSize += element.size;
+    uploader->clearSpace(totalSize, &reply.availableSpace);
+
+    for (const QnWearablePrepareDataElement& element : data.elements)
+    {
+        QnWearablePrepareReplyElement replyElement;
+        replyElement.period = shrinkPeriod(element.period, serverTimePeriods);
+        reply.elements.push_back(replyElement);
+    }
+
+    result.setReply(reply);
     return nx_http::StatusCode::ok;
 }
 

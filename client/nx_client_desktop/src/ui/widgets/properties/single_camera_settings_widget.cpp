@@ -77,6 +77,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     ui->wearableUploadWidget->initializeContext(this);
     ui->wearableProgressWidget->initializeContext(this);
     ui->wearableArchiveLengthWidget->initializeContext(this);
+    ui->wearableMotionWidget->initializeContext(this);
     ui->licensingWidget->initializeContext(this);
     ui->cameraScheduleWidget->initializeContext(this);
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
@@ -194,11 +195,17 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->wearableProgressWidget, &QnWearableProgressWidget::activeChanged,
         this, &QnSingleCameraSettingsWidget::updateWearableProgressVisibility);
 
+    connect(ui->wearableArchiveLengthWidget, &QnArchiveLengthWidget::changed,
+        this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
+
+    connect(ui->wearableMotionWidget, &QnWearableMotionWidget::changed,
+        this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
+
     updateFromResource(true);
     retranslateUi();
 
-    QnAligner* aligner = new QnAligner(this);
-    aligner->addWidgets({
+    QnAligner* leftAligner = new QnAligner(this);
+    leftAligner->addWidgets({
         ui->nameLabel,
         ui->modelLabel,
         ui->firmwareLabel,
@@ -208,7 +215,11 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
         ui->macAddressLabel,
         ui->loginLabel,
         ui->passwordLabel });
-    aligner->addAligner(ui->wearableArchiveLengthWidget->aligner());
+    leftAligner->addAligner(ui->wearableArchiveLengthWidget->aligner());
+
+    QnAligner* rightAligner = new QnAligner(this);
+    rightAligner->addAligner(ui->imageControlWidget->aligner());
+    rightAligner->addAligner(ui->wearableMotionWidget->aligner());
 }
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget()
@@ -252,6 +263,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     ui->wearableUploadWidget->setCamera(camera);
     ui->wearableProgressWidget->setCamera(camera);
     ui->wearableArchiveLengthWidget->updateFromResources(cameras);
+    ui->wearableMotionWidget->updateFromResource(camera);
 
     if (m_camera)
     {
@@ -404,6 +416,12 @@ void QnSingleCameraSettingsWidget::submitToResource()
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
         m_camera->setDewarpingParams(dewarpingParams);
 
+        if (m_camera->hasFlags(Qn::wearable_camera))
+        {
+            ui->wearableMotionWidget->submitToResource(m_camera);
+            ui->wearableArchiveLengthWidget->submitToResources({m_camera});
+        }
+
         setHasDbChanges(false);
     }
 
@@ -441,6 +459,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         ui->motionControlsWidget->setVisible(false);
         ui->motionAvailableLabel->setVisible(true);
         ui->wearableUploadWidget->setVisible(false);
+        ui->wearableMotionWidget->setVisible(false);
     }
     else
     {
@@ -449,6 +468,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         bool hasAudio = m_camera->isAudioSupported();
 
         ui->wearableUploadWidget->setVisible(isWearable);
+        ui->wearableMotionWidget->setVisible(isWearable);
         ui->modelEdit->setVisible(!isWearable);
         ui->modelLabel->setVisible(!isWearable);
         ui->firmwareEdit->setVisible(!isWearable);
@@ -621,6 +641,7 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly)
     setReadOnly(ui->imageControlWidget, readOnly);
     setReadOnly(ui->advancedSettingsWidget, readOnly);
     setReadOnly(ui->ioPortSettingsWidget, readOnly);
+    setReadOnly(ui->wearableMotionWidget, readOnly);
 
     if (readOnly)
         setTabEnabledSafe(Qn::ExpertCameraSettingsTab, false);

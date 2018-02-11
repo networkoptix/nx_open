@@ -9,6 +9,14 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+/**
+ * Utility class to be used together with `ServerConnection`.
+ *
+ * The main purpose is to disabuse the user from the need to keep track of all the handles returned
+ * by the connection and make it possible to cancel all requests in destructor.
+ *
+ * See example usage in `WearableWorker` implementation.
+ */
 class ServerRequestStorage
 {
 public:

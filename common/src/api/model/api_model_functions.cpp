@@ -25,6 +25,8 @@
 #include "backup_status_reply.h"
 #include "wearable_camera_reply.h"
 #include "wearable_status_reply.h"
+#include "wearable_prepare_data.h"
+#include "wearable_prepare_reply.h"
 #include <utils/email/email.h>
 
 #define QN_MS_API_DATA_TYPES \
@@ -58,7 +60,11 @@
     (QnStorageScanData)\
     (QnBackupStatusData)\
     (QnWearableCameraReply)\
-    (QnWearableStatusReply)
+    (QnWearableStatusReply)\
+    (QnWearablePrepareData)\
+    (QnWearablePrepareDataElement)\
+    (QnWearablePrepareReply)\
+    (QnWearablePrepareReplyElement)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_MS_API_DATA_TYPES, (ubjson)(xml)(json)(csv_record), _Fields)

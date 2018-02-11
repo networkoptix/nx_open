@@ -5,10 +5,15 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+
 AviMotionArchiveDelegate::AviMotionArchiveDelegate():
     QnAviArchiveDelegate()
 {
     m_motionEstimation.setChannelNum(0);
+}
+
+AviMotionArchiveDelegate::~AviMotionArchiveDelegate()
+{
 }
 
 QnAbstractMediaDataPtr AviMotionArchiveDelegate::getNextData()

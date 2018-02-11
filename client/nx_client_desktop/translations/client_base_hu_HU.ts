@@ -5985,7 +5985,7 @@ to %1</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>NINCS ÉLŐ KÖZVETÍTÉS</translation>
     </message>
   </context>
   <context>
@@ -7007,11 +7007,11 @@ to %1</source>
     <name>QnWearableProgressWidget</name>
     <message>
       <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
+      <translation>Feltöltés %1... %2	%p%</translation>
     </message>
     <message>
       <source>Finalizing %1... %2	%p</source>
-      <translation type="unfinished">Finalizing %1... %2	%p</translation>
+      <translation>Befejezés %1... %2%p</translation>
     </message>
     <message numerus="yes">
       <source>(%n more file(s) in queue)</source>
@@ -7794,7 +7794,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Leállítja a feltöltés?</translation>
     </message>
     <message>
       <source>Stop</source>

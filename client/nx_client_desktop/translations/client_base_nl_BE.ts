@@ -874,15 +874,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
+      <translation>Draagbare camera...</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Nieuwe draagbare camera...</translation>
     </message>
     <message>
       <source>Upload to Wearable Camera...</source>
-      <translation type="unfinished">Upload to Wearable Camera...</translation>
+      <translation>Uploaden naar draagbare Camera...</translation>
     </message>
   </context>
   <context>
@@ -4508,11 +4508,11 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation type="unfinished">Wearable Camera</translation>
+      <translation>Draagbare camera</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation type="unfinished">Wearable Camera %1</translation>
+      <translation>Draagbare camera %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -5982,7 +5982,7 @@ to %1</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>GEEN LIVE STREAM</translation>
     </message>
   </context>
   <context>
@@ -7004,17 +7004,17 @@ to %1</source>
     <name>QnWearableProgressWidget</name>
     <message>
       <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
+      <translation>Uploaden %1... %2	%p%</translation>
     </message>
     <message>
       <source>Finalizing %1... %2	%p</source>
-      <translation type="unfinished">Finalizing %1... %2	%p</translation>
+      <translation>Afronden %1... %2	%p</translation>
     </message>
     <message numerus="yes">
       <source>(%n more file(s) in queue)</source>
-      <translation type="unfinished">
-        <numerusform>(%n more file(s) in queue)</numerusform>
-        <numerusform>(%n more file(s) in queue)</numerusform>
+      <translation>
+        <numerusform>(%n meer bestand(en) in de wachtrij)</numerusform>
+        <numerusform>(%n meer bestand(en) in de wachtrij)</numerusform>
       </translation>
     </message>
   </context>
@@ -7022,11 +7022,11 @@ to %1</source>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Gebruiker &quot;%1&quot; upload momenteel beeldmateriaal naar deze camera.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>Een andere gebruiker upload momenteel beeldmateriaal naar deze camera.</translation>
     </message>
   </context>
   <context>
@@ -7583,11 +7583,11 @@ to %1</source>
     <name>QnWorkbenchWearableHandler</name>
     <message>
       <source>Could not add wearable camera to server &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not add wearable camera to server &quot;%1&quot;.</translation>
+      <translation>Draagbare camera kon niet worden toegevoegd aan server &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recording...</source>
-      <translation type="unfinished">Open Wearable Camera Recording...</translation>
+      <translation>Open draagbare Camera opname...</translation>
     </message>
     <message>
       <source>All files (*.*)</source>
@@ -7784,14 +7784,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Video uploading to %n camera(s) will stop:</source>
-      <translation type="unfinished">
-        <numerusform>Video uploading to %n camera(s) will stop:</numerusform>
-        <numerusform>Video uploading to %n camera(s) will stop:</numerusform>
+      <translation>
+        <numerusform>Het uploaden van video naar %n camera ('s) zal stoppen:</numerusform>
+        <numerusform>Het uploaden van video naar %n camera ('s) zal stoppen:</numerusform>
       </translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Stoppen met uploaden?</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -7839,42 +7839,42 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>Kan bestand &quot;%1&quot; niet openen;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>Kan md5 voor bestand &quot;%1&quot; niet berekenen;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation type="unfinished">Could not create upload on the server side</translation>
+      <translation>Kan de upload niet maken op de server</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>Kan dit deel van het bestand niet uploaden naar de server</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>Kan het geüploade bestand niet controleren op de server</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>Bestand is beschadigd tijdens uploaden naar de server</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>File &quot;%1&quot; is not a video file.</source>
-      <translation type="unfinished">File &quot;%1&quot; is not a video file.</translation>
+      <translation>Bestand &quot;%1&quot; is geen videobestand.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>Kan niet starten met uploaden omdat een andere gebruiker momenteel beeldmateriaal naar deze camera aan het uploaden is.</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Kan niet starten met uploaden omdat gebruiker &quot;%1&quot; momenteel beeldmateriaal upload naar deze camera.</translation>
     </message>
   </context>
   <context>

@@ -316,7 +316,7 @@ void CloudServerSocket::startAcceptor(
             }
             else
             {
-                NX_DEBUG(this, lm("Cloud connection (session %1) from %2 has not been accepted with error %3. Info %4")
+                NX_INFO(this, lm("Cloud connection (session %1) from %2 has not been accepted with error %3. Info %4")
                     .args(acceptorPtr->connectionId(), acceptorPtr->remotePeerId(),
                         SystemError::toString(code), acceptorPtr->toString()));
             }
@@ -369,7 +369,7 @@ void CloudServerSocket::startAcceptingConnections(
     m_mediatorConnection->setOnReconnectedHandler(
         std::bind(&CloudServerSocket::onMediatorConnectionRestored, this));
 
-    // This is important to know if connection is lost, 
+    // This is important to know if connection is lost,
     // so server will use some keep alive even if mediator does not ask it to use any.
     const auto keepAliveOptions = response.tcpConnectionKeepAlive
         ? *response.tcpConnectionKeepAlive : kDefaultKeepAlive;
@@ -507,7 +507,7 @@ void CloudServerSocket::issueRegistrationRequest()
 {
     using namespace std::placeholders;
 
-    const auto cloudCredentials = 
+    const auto cloudCredentials =
         m_mediatorConnection->credentialsProvider()->getSystemCredentials();
 
     if (!cloudCredentials)  //< TODO: #ak this MUST be assert.
@@ -595,7 +595,7 @@ CustomAcceptorFactory& CustomAcceptorFactory::instance()
     return staticInstance;
 }
 
-std::vector<std::unique_ptr<AbstractConnectionAcceptor>> 
+std::vector<std::unique_ptr<AbstractConnectionAcceptor>>
     CustomAcceptorFactory::defaultFactoryFunction(
         const nx::hpm::api::SystemCredentials& credentials,
         const hpm::api::ListenResponse& response)

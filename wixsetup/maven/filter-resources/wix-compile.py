@@ -51,9 +51,9 @@ paxton_exe_name = '${artifact.name.paxton}.exe'
 wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtensionExt']
 common_components = []
 client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp', 'ClientVcrt14', 'MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
-server_components = ['ServerVox', 'Server', 'traytool', 'ServerVcrt14', 'TraytoolVcrt14', 'ClientVcrt14', 'MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
-nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls', 'NxtoolVcrt14', 'ClientVcrt14', 'MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
-paxton_components = ['AxClient', 'ClientQml', 'ClientFonts']
+server_components = ['ServerVox', 'Server', 'traytool', 'ServerVcrt14', 'TraytoolVcrt14', 'MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
+nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls', 'NxtoolVcrt14', 'MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
+paxton_components = ['AxClient', 'ClientQml', 'ClientFonts', 'ClientVox', 'PaxtonVcrt14']
 
 client_exe_components = ['ArchCheck', 'ClientPackage']
 server_exe_components = ['ArchCheck', 'ServerPackage']
@@ -94,7 +94,7 @@ def get_candle_command(project, suffix, args, components):
     command.append(r'-dClientVcrt14DstDir=${customization}_${release.version}.${buildNumber}_Dir')
     command.append(r'-dTraytoolVcrt14DstDir=${customization}TrayToolDir')
     command.append(r'-dNxtoolVcrt14DstDir=${customization}NxtoolDir')
-    command.append(r'-dPaxtonVcrt14DstDir=${customization}_${release.version}_Paxton')
+    command.append(r'-dPaxtonVcrt14DstDir=${customization}_${release.version}.${buildNumber}_Paxton')
 
     if suffix.startswith('client'):
         command.append('-dClientQmlDir=${ClientQmlDir}')

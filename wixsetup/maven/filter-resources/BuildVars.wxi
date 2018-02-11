@@ -91,5 +91,5 @@
     <?define VC14RedistPath="${VC14RedistPath}"?>
 
     <?define clientDirId = "$(var.customization)_$(var.releaseVersionFull)_Dir"?>
-    <?define paxtonDirId = "${customization}_${release.version}_Paxton"?>
+    <?define paxtonDirId = "$(var.customization)_$(var.releaseVersionFull)_Paxton"?>
 </Include>

@@ -1,9 +1,11 @@
 #include "wearable_upload_manager.h"
 
 #include <QtCore/QFile>
+#include <QtCore/QStorageInfo>
 
 #include <recorder/wearable_archive_synchronization_task.h>
 #include <recorder/wearable_archive_synchronizer.h>
+#include <recorder/storage_manager.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -29,6 +31,18 @@ QnWearableUploadManager::QnWearableUploadManager(QObject* parent):
 
 QnWearableUploadManager::~QnWearableUploadManager()
 {
+}
+
+bool QnWearableUploadManager::clearSpace(qint64 requestedSpace, qint64* availableSpace)
+{
+    Downloader* downloader = qnServerModule->findInstance<Downloader>();
+    NX_ASSERT(downloader);
+
+    QString path = QDir::cleanPath(downloader->filePath(lit(".")));
+    qnNormalStorageMan->clearSpaceForFile(path, requestedSpace);
+
+    *availableSpace = QStorageInfo(path).bytesAvailable();
+    return requestedSpace <= *availableSpace;
 }
 
 bool QnWearableUploadManager::consume(const QnUuid& cameraId, const QnUuid& token, const QString& uploadId, qint64 startTimeMs)

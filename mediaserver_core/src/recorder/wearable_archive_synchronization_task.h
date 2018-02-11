@@ -2,6 +2,7 @@
 
 #include <QtCore/QPointer>
 
+#include <utils/common/connective.h>
 #include <nx/mediaserver/server_module_aware.h>
 #include <core/resource/resource_fwd.h>
 
@@ -12,6 +13,7 @@ class QIODevice;
 
 class QnAbstractArchiveStreamReader;
 class QnServerEdgeStreamRecorder;
+class QnAviArchiveDelegate;
 
 namespace nx {
 namespace mediaserver_core {
@@ -22,7 +24,7 @@ namespace recorder {
  * Basically just writes a single file into archive.
  */
 class WearableArchiveSynchronizationTask:
-    public QObject,
+    public Connective<QObject>,
     public AbstractRemoteArchiveSynchronizationTask
 {
     Q_OBJECT
@@ -48,17 +50,21 @@ signals:
     void stateChanged(WearableArchiveSynchronizationState state);
 
 private:
-    void createArchiveReader(qint64 startTimeMs);
-    void createStreamRecorder(qint64 startTimeMs);
+    QnAviArchiveDelegate* createArchiveDelegate();
+    void createArchiveReader(qint64 startTimeMs, qint64* durationMs);
+    void createStreamRecorder(qint64 startTimeMs, qint64 durationMs);
 
 private:
     QnSecurityCamResourcePtr m_resource;
     QPointer<QIODevice> m_file;
     qint64 m_startTimeMs = 0;
-    WearableArchiveSynchronizationState m_state;
 
     std::unique_ptr<QnAbstractArchiveStreamReader> m_archiveReader;
     std::unique_ptr<QnServerEdgeStreamRecorder> m_recorder;
+    bool m_withMotion = false;
+
+    QnMutex m_stateMutex;
+    WearableArchiveSynchronizationState m_state;
 };
 
 using WearableArchiveTaskPtr = std::shared_ptr<WearableArchiveSynchronizationTask>;

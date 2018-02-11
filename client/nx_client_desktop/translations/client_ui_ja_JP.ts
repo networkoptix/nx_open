@@ -1691,17 +1691,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>新しいウェアラブルカメラ...</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessible by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessible by any user.</translation>
+      <translation>「ウェアラブル カメラ」は、あなたのシステム上の任意のサーバーにアップロードして、すべてのユーザーがアクセスできるビデオ ファイルの仮想ストレージです。</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>サーバー</translation>
     </message>
   </context>
   <context>
@@ -2556,8 +2556,7 @@
       <location/>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
 The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation>アップロードされたアーカイブは、サーバーストレージに空き容量がない場合、自動的に削除されます　サーバー上のすべてのカメラの中で最も古い映像が最初に削除されます</translation>
     </message>
   </context>
   <context>
@@ -2914,22 +2913,22 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>ビデオをアップロード</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>ファイルをアップロード</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>フォルダをアップロード...</translation>
     </message>
     <message>
       <location/>
       <source>&lt;warning&gt;</source>
-      <translation type="unfinished">&lt;warning&gt;</translation>
+      <translation>&lt;警告&gt;</translation>
     </message>
   </context>
   <context>

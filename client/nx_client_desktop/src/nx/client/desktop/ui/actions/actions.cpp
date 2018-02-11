@@ -1248,7 +1248,14 @@ void initialize(Manager* manager, Action* root)
     factory(UploadWearableCameraFileAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
-        .text(ContextMenu::tr("Upload to Wearable Camera..."))
+        .text(ContextMenu::tr("Upload File..."))
+        .condition(condition::hasFlags(Qn::wearable_camera, All)
+            && condition::isTrue(ini().enableWearableCameras));
+
+    factory(UploadWearableCameraFolderAction)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Upload Folder..."))
         .condition(condition::hasFlags(Qn::wearable_camera, All)
             && condition::isTrue(ini().enableWearableCameras));
 

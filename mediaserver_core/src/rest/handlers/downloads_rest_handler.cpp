@@ -6,6 +6,7 @@
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <rest/server/json_rest_result.h>
 #include <media_server/media_server_module.h>
+#include <recorder/storage_manager.h>
 
 using nx::vms::common::p2p::downloader::Downloader;
 using nx::vms::common::p2p::downloader::FileInformation;
@@ -123,6 +124,8 @@ public:
 
     bool hasDownloader() const;
 
+    ResultCode addFile(const FileInformation& fileInfo);
+
 private:
     QnDownloadsRestHandler* handler;
     Downloader* const downloader;
@@ -176,7 +179,7 @@ int Helper::handleAddDownload(const QString& fileName)
             return makeInvalidParameterError("url");
     }
 
-    const auto errorCode = downloader->addFile(fileInfo);
+    const auto errorCode = addFile(fileInfo);
     if (errorCode != ResultCode::ok)
         return makeDownloaderError(errorCode);
 
@@ -238,7 +241,7 @@ int Helper::handleAddUpload(const QString& fileName)
 
     fileInfo.status = FileInformation::Status::uploading;
 
-    const auto errorCode = downloader->addFile(fileInfo);
+    const auto errorCode = addFile(fileInfo);
     if (errorCode != ResultCode::ok)
         return makeDownloaderError(errorCode);
 
@@ -437,6 +440,16 @@ int Helper::makeDownloaderError(ResultCode errorCode)
         QnRestResult::CantProcessRequest,
         lit("DistributedFileDownloader returned error: %1").arg(
             QnLexical::serialized(errorCode)));
+}
+
+ResultCode Helper::addFile(const FileInformation& fileInfo)
+{
+    ResultCode errorCode = downloader->addFile(fileInfo);
+    if (errorCode == ResultCode::noFreeSpace) {
+        qnNormalStorageMan->clearSpaceForFile(downloader->filePath(fileInfo.name), fileInfo.size);
+        errorCode = downloader->addFile(fileInfo);
+    }
+    return errorCode;
 }
 
 bool Helper::hasDownloader() const

@@ -24,6 +24,8 @@
 #include <utils/ping_utility.h>
 #include <nx/client/desktop/utils/server_file_cache.h>
 #include <nx/client/desktop/utils/upload_state.h>
+#include <nx/client/desktop/utils/wearable_payload.h>
+#include <nx/client/desktop/utils/wearable_state.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx/cloud/cdb/api/system_data.h>
@@ -116,6 +118,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnUpdateResult>();
     qRegisterMetaType<QnCheckForUpdateResult>();
     qRegisterMetaType<UploadState>();
+    qRegisterMetaType<WearableState>();
+    qRegisterMetaType<WearableUpload>();
 
     qRegisterMetaType<nx::cdb::api::ResultCode>();
     qRegisterMetaType<nx::cdb::api::SystemData>();

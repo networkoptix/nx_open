@@ -874,15 +874,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
+      <translation>ウェアラブルカメラ...</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>新しいウェアラブルカメラ...</translation>
     </message>
     <message>
       <source>Upload to Wearable Camera...</source>
-      <translation type="unfinished">Upload to Wearable Camera...</translation>
+      <translation>ウェアラブルカメラにアップロード...</translation>
     </message>
   </context>
   <context>
@@ -4458,11 +4458,11 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation type="unfinished">Wearable Camera</translation>
+      <translation>ウェアラブルカメラ</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation type="unfinished">Wearable Camera %1</translation>
+      <translation>ウェアラブルカメラ %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -4470,7 +4470,7 @@ to %1</source>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation type="unfinished">Name cannot be empty</translation>
+      <translation>名前を空にすることはできません</translation>
     </message>
   </context>
   <context>
@@ -5917,7 +5917,7 @@ to %1</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>ライブストリームなし</translation>
     </message>
   </context>
   <context>
@@ -6067,7 +6067,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>USBストレージで録画が有効になりました</translation>
     </message>
   </context>
   <context>
@@ -6931,16 +6931,16 @@ to %1</source>
     <name>QnWearableProgressWidget</name>
     <message>
       <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
+      <translation>アップロード中 %1... %2	%p%</translation>
     </message>
     <message>
       <source>Finalizing %1... %2	%p</source>
-      <translation type="unfinished">Finalizing %1... %2	%p</translation>
+      <translation>ファイナライズ %1... %2	%p</translation>
     </message>
     <message numerus="yes">
       <source>(%n more file(s) in queue)</source>
-      <translation type="unfinished">
-        <numerusform>(%n more file(s) in queue)</numerusform>
+      <translation>
+        <numerusform>（%n 以上のファイル）</numerusform>
       </translation>
     </message>
   </context>
@@ -6948,11 +6948,11 @@ to %1</source>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>ユーザー &quot;%1&quot; は現在このカメラに映像をアップロードしています</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>別のユーザーが現在このカメラに映像をアップロードしています</translation>
     </message>
   </context>
   <context>
@@ -7503,11 +7503,11 @@ to %1</source>
     <name>QnWorkbenchWearableHandler</name>
     <message>
       <source>Could not add wearable camera to server &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not add wearable camera to server &quot;%1&quot;.</translation>
+      <translation>サーバー &quot;%1&quot; にウェアラブルカメラを追加できません</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recording...</source>
-      <translation type="unfinished">Open Wearable Camera Recording...</translation>
+      <translation>ウェアラブルカメラ録画を開く...</translation>
     </message>
     <message>
       <source>All files (*.*)</source>
@@ -7687,13 +7687,13 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Video uploading to %n camera(s) will stop:</source>
-      <translation type="unfinished">
-        <numerusform>Video uploading to %n camera(s) will stop:</numerusform>
+      <translation>
+        <numerusform>%n カメラへのビデオアップロードは停止します</numerusform>
       </translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>アップロードを停止しますか？</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -7740,42 +7740,42 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>ファイルを開くことができません"%1"</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>ファイル &quot;%1&amp;quot のmd5が計算できませんでした</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation type="unfinished">Could not create upload on the server side</translation>
+      <translation>サーバー側でアップロードを作成できませんでした</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>ファイルチャンクをサーバーにアップロードできませんでした</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>サーバーにアップロードされたファイルをチェックできませんでした</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>ファイルがサーバーにアップロードされている間に破損しました</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>File &quot;%1&quot; is not a video file.</source>
-      <translation type="unfinished">File &quot;%1&quot; is not a video file.</translation>
+      <translation>ファイル&quot;%1&quot; はビデオ ファイルではありません</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>別のユーザーが現在このカメラに映像をアップロードしているため、アップロードを開始できませんでした</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>別のユーザー &quot;%1&quot; が現在このカメラに映像をアップロードしているため、アップロードを開始できませんでした</translation>
     </message>
   </context>
   <context>
