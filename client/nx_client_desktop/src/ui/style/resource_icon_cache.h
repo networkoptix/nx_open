@@ -76,10 +76,9 @@ public:
     /**
      * @brief icon
      * @param key
-     * @param unchecked         Do not check against TypeMask
      * @return
      */
-    QIcon icon(Key key, bool unchecked = false);
+    QIcon icon(Key key);
 
     static Key key(const QnResourcePtr& resource);
 

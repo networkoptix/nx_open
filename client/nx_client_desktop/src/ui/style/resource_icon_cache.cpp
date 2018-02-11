@@ -170,12 +170,12 @@ QnResourceIconCache* QnResourceIconCache::instance()
     return qn_resourceIconCache();
 }
 
-QIcon QnResourceIconCache::icon(Key key, bool unchecked)
+QIcon QnResourceIconCache::icon(Key key)
 {
     /* This function will be called from GUI thread only,
      * so no synchronization is needed. */
 
-    if ((key & TypeMask) == Unknown && !unchecked)
+    if ((key & TypeMask) == Unknown)
         key = Unknown;
 
     if (m_cache.contains(key))
