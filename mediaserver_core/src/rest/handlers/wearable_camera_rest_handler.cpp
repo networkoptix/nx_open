@@ -12,8 +12,8 @@
 
 #include <api/model/wearable_camera_reply.h>
 #include <api/model/wearable_status_reply.h>
-#include <api/model/wearable_check_data.h>
-#include <api/model/wearable_check_reply.h>
+#include <api/model/wearable_prepare_data.h>
+#include <api/model/wearable_prepare_reply.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>

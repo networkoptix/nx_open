@@ -3,8 +3,8 @@
 #include <QtCore/QVector>
 #include <QtCore/QString>
 
-#include <api/model/wearable_check_data.h>
-#include <api/model/wearable_check_reply.h>
+#include <api/model/wearable_prepare_data.h>
+#include <api/model/wearable_prepare_reply.h>
 
 namespace nx {
 namespace client {
