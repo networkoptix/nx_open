@@ -37,13 +37,13 @@ public:
         nxpl::NX_GUID* typeList,
         int typeListSize) override;
 
-    bool timerNeeded();
+    bool isTimerNeeded() const;
 
-    std::chrono::milliseconds timeTillCheck();
+    std::chrono::milliseconds timeTillCheck() const;
 
-    void sendEventStartedPacket(const AnalyticsEventType& event);
+    void sendEventStartedPacket(const AnalyticsEventType& event) const;
 
-    void sendEventStoppedPacket(const AnalyticsEventType& event);
+    void sendEventStoppedPacket(const AnalyticsEventType& event) const;
 
     void onTimer();
 
@@ -62,7 +62,6 @@ private:
     QByteArray m_buffer;
     nx::network::TCPSocket* m_tcpSocket = nullptr;
     nx::sdk::metadata::MetadataHandler* m_handler = nullptr;
-
     nx::network::aio::Timer m_timer;
 };
 

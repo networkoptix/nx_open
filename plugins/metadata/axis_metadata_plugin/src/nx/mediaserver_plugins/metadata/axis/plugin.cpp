@@ -40,12 +40,6 @@ Plugin::Plugin()
     QFile f(":/axis/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
-
-#if 0
-    // Definitely this will be useful after pluginManager modification
-    nx::api::AnalyticsDriverManifest pluginManifest =
-        QJson::deserialized<nx::api::AnalyticsDriverManifest>(m_manifest);
-#endif
 }
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -109,8 +103,8 @@ CameraManager* Plugin::obtainCameraManager(
     if (!vendor.startsWith(kAxisVendor))
         return nullptr;
 
-    QList<IdentifiedSupportedEvent> events = fetchSupportedEvents(cameraInfo);
-    if (events.empty())
+    AnalyticsDriverManifest events = fetchSupportedEvents(cameraInfo);
+    if (events.outputEventTypes.empty())
         return nullptr;
 
     return new Manager(cameraInfo, events);
@@ -122,10 +116,9 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-QList<IdentifiedSupportedEvent> Plugin::fetchSupportedEvents(
-    const CameraInfo& cameraInfo)
+AnalyticsDriverManifest Plugin::fetchSupportedEvents(const CameraInfo& cameraInfo)
 {
-    QList<IdentifiedSupportedEvent> result;
+    AnalyticsDriverManifest result;
     const char* const ip_port = cameraInfo.url + sizeof("http://") - 1;
     nx::axis::CameraController axisCameraController(ip_port, cameraInfo.login,
         cameraInfo.password);
@@ -136,13 +129,13 @@ QList<IdentifiedSupportedEvent> Plugin::fetchSupportedEvents(
     axisCameraController.filterSupportedEvents(
         { kRuleEngine, kVideoSource, kCameraApplicationPlatform});
     const auto& src = axisCameraController.suppotedEvents();
-    std::transform(src.begin(), src.end(), std::back_inserter(result),
-        [](const nx::axis::SupportedEvent& event) {return IdentifiedSupportedEvent(event); });
+    std::transform(src.begin(), src.end(), std::back_inserter(result.outputEventTypes),
+        [](const nx::axis::SupportedEvent& event) {return AnalyticsEventType(event); });
 
     // Being uncommented, the next code line allows to get the list of supported events
     // in the same json format that is used in "static-resources/manifest.json".
     // All you need is to stop on a breakpoint and copy the text form your debugger.
-    //QString textForManifest = serializeEvents(result);
+    //QString textForManifest = QJson::serialized(result);
 
     return result;
 }

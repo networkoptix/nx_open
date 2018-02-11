@@ -18,25 +18,26 @@ namespace axis {
 
 Manager::Manager(
     const nx::sdk::CameraInfo& cameraInfo,
-    const QList<IdentifiedSupportedEvent>& events)
+    const AnalyticsDriverManifest& typedManifest)
 {
+    for (const AnalyticsEventType& event : typedManifest.outputEventTypes)
+    {
+        AnalyticsEventTypeExtended eventExtended;
+        static_cast<AnalyticsEventType&>(eventExtended) = event;
+        m_events.push_back(eventExtended);
+    }
+
+    m_manifest = QJson::serialized(typedManifest);
+
     m_url = cameraInfo.url;
     m_auth.setUser(cameraInfo.login);
     m_auth.setPassword(cameraInfo.password);
 
     nx::api::AnalyticsDeviceManifest deviceManifest;
-    for (const auto& event : events)
+    for (const auto& event : typedManifest.outputEventTypes)
     {
-        deviceManifest.supportedEventTypes.push_back(event.internalTypeId());
+        deviceManifest.supportedEventTypes.push_back(event.eventTypeId);
     }
-
-    // We use m_deviceManifestFull to give server full manifest, m_deviceManifestPartial (that
-    // gives server only Uuids) may be users for test purposes.
-    //m_deviceManifestPartial = QJson::serialized(deviceManifest);
-
-    m_deviceManifestFull = serializeEvents(events).toUtf8();
-
-    m_identifiedSupportedEvents = events;
 
     NX_PRINT << "Ctor :" << this;
 }
@@ -78,20 +79,34 @@ nx::sdk::Error Manager::stopFetchingMetadata()
 
 const char* Manager::capabilitiesManifest(nx::sdk::Error* error)
 {
-    if (m_deviceManifestFull.isEmpty())
+    if (m_manifest.isEmpty())
     {
         *error = nx::sdk::Error::unknownError;
         return nullptr;
     }
     *error = nx::sdk::Error::noError;
-    m_givenManifests.push_back(m_deviceManifestFull);
-    return m_deviceManifestFull.constData();
+    m_givenManifests.push_back(m_manifest);
+    return m_manifest.constData();
 }
 
 void Manager::freeManifest(const char* data)
 {
     // Do nothing. Memory allocated for Manifests is stored in m_givenManifests list and will be
     // released in Manager's destructor.
+}
+
+const AnalyticsEventTypeExtended& Manager::eventByUuid(const QnUuid& uuid) const noexcept
+{
+    static const AnalyticsEventTypeExtended emptyEvent;
+    const auto it = std::find_if(
+        m_events.cbegin(),
+        m_events.cend(),
+        [&uuid](const AnalyticsEventType& event) { return event.eventTypeId == uuid; });
+
+    if (it == m_events.cend())
+        return emptyEvent;
+    else
+        return *it;
 }
 
 } // axis

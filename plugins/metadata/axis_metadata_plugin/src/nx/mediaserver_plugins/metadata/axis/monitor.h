@@ -2,6 +2,7 @@
 
 #include <map>
 #include <vector>
+#include <mutex>
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
@@ -15,21 +16,45 @@
 #include <nx/network/http/test_http_server.h>
 #include <common/common_module.h>
 
-#include "identified_supported_event.h"
+#include "common.h"
 
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
 namespace axis {
 
+
 class Manager;
+
+class Monitor;
+
+class axisHandler: public nx_http::AbstractHttpRequestHandler
+{
+public:
+    virtual void processRequest(
+        nx_http::HttpServerConnection* const connection,
+        nx::utils::stree::ResourceContainer authInfo,
+        nx_http::Request request,
+        nx_http::Response* const response,
+        nx_http::RequestProcessedHandler completionHandler);
+
+    axisHandler(
+        Monitor* monitor,
+        const QList<AnalyticsEventTypeExtended>& events,
+        std::mutex& elapsedTimerMutex);
+
+private:
+    Monitor* m_monitor;
+    const QList<AnalyticsEventTypeExtended>& m_events;
+    std::mutex& m_elapsedTimerMutex;
+};
 
 class Monitor: public QObject
 {
     Q_OBJECT
 
 public:
-    using Handler = std::function<void(const std::vector<IdentifiedSupportedEvent>&)>;
+    using Handler = std::function<void(const QList<AnalyticsEventType>&)>;
 
     Monitor(
         Manager* manager,
@@ -44,8 +69,18 @@ public:
     void removeRules();
 
     HostAddress getLocalIp(const SocketAddress& cameraAddress);
+
     nx::sdk::Error startMonitoring(nxpl::NX_GUID* eventTypeList, int eventTypeListSize);
+
     void stopMonitoring();
+
+    std::chrono::milliseconds timeTillCheck() const;
+
+    void sendEventStartedPacket(const AnalyticsEventType& event) const;
+
+    void sendEventStoppedPacket(const AnalyticsEventType& event) const;
+
+    void onTimer();
 
  private:
     Manager * m_manager;
@@ -53,8 +88,10 @@ public:
     const QUrl m_endpoint;
     const QAuthenticator m_auth;
     nx::sdk::metadata::MetadataHandler* m_handler;
+    std::vector<QnUuid> m_eventsToCatch;
     TestHttpServer* m_httpServer;
-    mutable QnMutex m_mutex;
+    nx::network::aio::Timer m_timer;
+    mutable std::mutex m_elapsedTimerMutex;
 };
 
 } // axis
