@@ -413,7 +413,8 @@ void QnSingleCameraSettingsWidget::submitToResource()
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
         m_camera->setDewarpingParams(dewarpingParams);
 
-        ui->wearableMotionWidget->submitToResource(m_camera);
+        if(m_camera->hasFlags(Qn::wearable_camera))
+            ui->wearableMotionWidget->submitToResource(m_camera);
 
         setHasDbChanges(false);
     }
