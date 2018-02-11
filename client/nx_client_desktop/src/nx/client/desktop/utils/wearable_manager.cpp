@@ -6,7 +6,7 @@
 #include <recording/time_period_list.h>
 
 #include "wearable_worker.h"
-#include "wearable_checker.h"
+#include "wearable_preparer.h"
 
 namespace nx {
 namespace client {

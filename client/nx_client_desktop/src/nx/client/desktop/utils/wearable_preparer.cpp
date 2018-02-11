@@ -1,4 +1,4 @@
-#include "wearable_checker.h"
+#include "wearable_preparer.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
