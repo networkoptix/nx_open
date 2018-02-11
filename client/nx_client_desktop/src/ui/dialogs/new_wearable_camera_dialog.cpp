@@ -36,6 +36,12 @@ QnNewWearableCameraDialog::QnNewWearableCameraDialog(QWidget* parent):
     ui->serverComboBox->setModel(m_model);
     ui->serverComboBox->setEditable(false);
 
+    if (servers.size() == 1)
+    {
+        ui->serverComboBox->hide();
+        ui->serverLabel->hide();
+    }
+
     /* Set up name edit. */
     QStringList usedNames;
     for (const auto& camera: resourcePool()->getAllCameras())
