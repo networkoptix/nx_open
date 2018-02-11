@@ -532,6 +532,11 @@ action::Parameters QnWorkbenchNavigator::currentParameters(action::ActionScope s
 
 bool QnWorkbenchNavigator::isLiveSupported() const
 {
+    if (m_currentWidget && m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
+        for (const QnMediaResourcePtr& resource : m_syncedResources.keys())
+            if (calculateResourceWidgetFlags(resource->toResourcePtr()) & WidgetSupportsLive)
+                return true;
+
     return m_currentWidgetFlags & WidgetSupportsLive;
 }
 
@@ -794,6 +799,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
         updateSyncedPeriods();
     updateHistoryForCamera(widget->resource()->toResourcePtr().dynamicCast<QnSecurityCamResource>());
     updateLines();
+    updateLiveSupported();
 }
 
 void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
@@ -836,6 +842,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
     if (workbench() && !workbench()->isInLayoutChangeProcess())
         updateSyncedPeriods(); /* Full rebuild on widget removing. */
     updateLines();
+    updateLiveSupported();
 }
 
 QnResourceWidget *QnWorkbenchNavigator::currentWidget() const
@@ -1228,25 +1235,35 @@ void QnWorkbenchNavigator::updateLocalOffset()
         m_dayTimeWidget->setLocalOffset(localOffset);
 }
 
+QnWorkbenchNavigator::WidgetFlags QnWorkbenchNavigator::calculateResourceWidgetFlags(const QnResourcePtr& resource) const
+{
+    WidgetFlags result;
+
+    if (resource.dynamicCast<QnSecurityCamResource>())
+        result |= WidgetSupportsLive | WidgetSupportsPeriods;
+
+    if (resource->hasFlags(Qn::periods))
+        result |= WidgetSupportsPeriods;
+
+    if (resource->hasFlags(Qn::utc))
+        result |= WidgetUsesUTC;
+
+    if (resource->hasFlags(Qn::sync))
+        result |= WidgetSupportsSync;
+
+    if (resource->hasFlags(Qn::wearable_camera))
+        result &= ~WidgetSupportsLive;
+
+    return result;
+}
+
 void QnWorkbenchNavigator::updateCurrentWidgetFlags()
 {
     WidgetFlags flags = 0;
 
     if (m_currentWidget)
     {
-        flags = 0;
-
-        if (m_currentWidget->resource().dynamicCast<QnSecurityCamResource>())
-            flags |= WidgetSupportsLive | WidgetSupportsPeriods;
-
-        if (m_currentWidget->resource()->flags().testFlag(Qn::periods))
-            flags |= WidgetSupportsPeriods;
-
-        if (m_currentWidget->resource()->flags().testFlag(Qn::utc))
-            flags |= WidgetUsesUTC;
-
-        if (m_currentWidget->resource()->flags().testFlag(Qn::sync))
-            flags |= WidgetSupportsSync;
+        flags = calculateResourceWidgetFlags(m_currentWidget->resource());
 
         if (workbench()->currentLayout()->isSearchLayout()) /* Is a thumbnails search layout. */
             flags &= ~(WidgetSupportsLive | WidgetSupportsSync);
@@ -1254,10 +1271,6 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags()
         QnTimePeriod period = workbench()->currentLayout()->resource() ? workbench()->currentLayout()->resource()->getLocalRange() : QnTimePeriod();
         if (!period.isNull())
             flags &= ~WidgetSupportsLive;
-    }
-    else
-    {
-        flags = 0;
     }
 
     if (m_currentWidgetFlags == flags)
