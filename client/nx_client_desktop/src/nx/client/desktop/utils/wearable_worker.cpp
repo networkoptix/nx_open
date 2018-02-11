@@ -85,7 +85,7 @@ WearableWorker::WearableWorker(
             if (d->state.status == WearableState::Consuming)
                 pollExtend();
         });
-    timer->start(kConsumePollPeriodMSec);
+    quickTimer->start(kConsumePollPeriodMSec);
 }
 
 WearableWorker::~WearableWorker()
