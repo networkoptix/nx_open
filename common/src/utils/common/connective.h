@@ -52,6 +52,12 @@ inline const T* connector(const std::shared_ptr<T>& object)
     return connector(object.get());
 }
 
+template <class T>
+inline const T* connector(const std::unique_ptr<T>& object)
+{
+    return connector(object.get());
+}
+
 template <class T1, class S1, class T2, class S2>
 inline QMetaObject::Connection connect(
     const T1* sender,
