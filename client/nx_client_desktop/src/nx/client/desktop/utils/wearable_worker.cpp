@@ -30,7 +30,8 @@ const qint64 kDefaultUploadTtl = 1000 * 60 * 10;
 
 const qint64 kLockTtlMSec = 1000 * 15;
 
-const qint64 kPollPeriodMSec = 1000 * 5;
+const qint64 kUploadPollPeriodMSec = 1000 * 5;
+const qint64 kConsumePollPeriodMSec = 1000;
 
 } // namespace
 
@@ -73,7 +74,18 @@ WearableWorker::WearableWorker(
 
     QTimer* timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &WearableWorker::pollExtend);
-    timer->start(kPollPeriodMSec);
+    timer->start(kUploadPollPeriodMSec);
+
+    // The best way to do this would have been by integrating timers into the FSM,
+    // but that would've created another source of hard-to-find bugs. So we go the easy route.
+    QTimer* quickTimer = new QTimer(this);
+    connect(quickTimer, &QTimer::timeout, this,
+        [this]
+        {
+            if (d->state.status == WearableState::Consuming)
+                pollExtend();
+        });
+    timer->start(kConsumePollPeriodMSec);
 }
 
 WearableWorker::~WearableWorker()
