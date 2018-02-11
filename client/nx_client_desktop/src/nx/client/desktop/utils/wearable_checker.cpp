@@ -119,7 +119,7 @@ void WearableChecker::checkUploads(const QStringList& filePaths, const QnTimePer
             handleCheckFinished(success, reply);
         });
 
-    d->requests.storeHandle(d->connection()->checkWearableUploads(d->camera, request, callback, thread()));
+    d->requests.storeHandle(d->connection()->prepareWearableUploads(d->camera, request, callback, thread()));
 }
 
 void WearableChecker::checkLocally(WearablePayload& payload)

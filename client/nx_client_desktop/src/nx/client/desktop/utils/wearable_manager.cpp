@@ -66,7 +66,7 @@ QList<WearableState> WearableManager::runningUploads()
     return result;
 }
 
-void WearableManager::checkUploads(
+void WearableManager::prepareUploads(
     const QnSecurityCamResourcePtr& camera,
     const QStringList& filePaths,
     QObject* target,

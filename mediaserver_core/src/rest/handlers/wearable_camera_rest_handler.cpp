@@ -72,8 +72,8 @@ int QnWearableCameraRestHandler::executePost(
     if (action == "add")
         return executeAdd(params, result, owner);
 
-    if (action == "check")
-        return executeCheck(params, body, result, owner);
+    if (action == "prepare")
+        return executePrepare(params, body, result, owner);
 
     if (action == "consume")
         return executeConsume(params, result, owner);
@@ -141,7 +141,7 @@ int QnWearableCameraRestHandler::executeAdd(
     return nx_http::StatusCode::ok;
 }
 
-int QnWearableCameraRestHandler::executeCheck(const QnRequestParams& params,
+int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
     const QByteArray& body,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)

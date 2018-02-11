@@ -166,7 +166,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     for(QString& path: paths)
         path = path.trimmed();
 
-    qnClientModule->wearableManager()->checkUploads(camera, paths, this,
+    qnClientModule->wearableManager()->prepareUploads(camera, paths, this,
         [this, camera](const WearablePayloadList& uploads)
         {
             if(checkFileUpload(uploads))
@@ -201,7 +201,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
     for (QString& file : files)
         file = path + QDir::separator() + file;
 
-    qnClientModule->wearableManager()->checkUploads(camera, files, this,
+    qnClientModule->wearableManager()->prepareUploads(camera, files, this,
         [this, path, camera](const WearablePayloadList& uploads)
         {
             if (checkFolderUpload(path, uploads))

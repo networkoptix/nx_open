@@ -227,7 +227,7 @@ public:
         GetCallback callback,
         QThread* targetThread = nullptr);
 
-    Handle checkWearableUploads(
+    Handle prepareWearableUploads(
         const QnNetworkResourcePtr& camera,
         const QnWearableCheckData& data,
         GetCallback callback,

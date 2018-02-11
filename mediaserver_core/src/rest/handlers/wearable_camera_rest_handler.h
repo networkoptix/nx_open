@@ -30,7 +30,7 @@ private:
         QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner);
 
-    int executeCheck(const QnRequestParams& params,
+    int executePrepare(const QnRequestParams& params,
         const QByteArray& body,
         QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner);

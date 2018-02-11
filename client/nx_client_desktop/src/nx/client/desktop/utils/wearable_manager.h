@@ -31,7 +31,7 @@ public:
     WearableState state(const QnSecurityCamResourcePtr& camera);
     QList<WearableState> runningUploads();
 
-    void checkUploads(
+    void prepareUploads(
         const QnSecurityCamResourcePtr& camera,
         const QStringList& filePaths,
         QObject* target,

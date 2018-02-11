@@ -470,14 +470,14 @@ Handle ServerConnection::addWearableCamera(
         targetThread);
 }
 
-Handle ServerConnection::checkWearableUploads(
+Handle ServerConnection::prepareWearableUploads(
     const QnNetworkResourcePtr& camera,
     const QnWearableCheckData& data,
     GetCallback callback,
     QThread* targetThread)
 {
     return executePost(
-        lit("/api/wearableCamera/check"),
+        lit("/api/wearableCamera/prepare"),
         QnRequestParamList{ { lit("cameraId"), camera->getId().toSimpleString() } },
         kJsonContentType,
         QJson::serialized(data),
