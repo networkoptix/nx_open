@@ -22,14 +22,16 @@ public:
 
 private:
     void maybeOpenCurrentSettings();
+    bool checkFileUpload(const nx::client::desktop::WearablePayloadList& uploads);
+    bool checkFolderUpload(const QString& path, const nx::client::desktop::WearablePayloadList& uploads);
+    void uploadValidFiles(
+        const QnSecurityCamResourcePtr& camera,
+        const nx::client::desktop::WearablePayloadList& uploads);
 
 private slots:
     void at_newWearableCameraAction_triggered();
     void at_uploadWearableCameraFileAction_triggered();
-    void at_checkUploads_finished(
-        const QnSecurityCamResourcePtr& camera,
-        const nx::client::desktop::WearablePayloadList& uploads);
-
+    void at_uploadWearableCameraFolderAction_triggered();
     void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
     void at_context_userChanged();
 
