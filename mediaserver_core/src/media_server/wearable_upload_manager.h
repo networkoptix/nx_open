@@ -17,6 +17,8 @@ public:
     QnWearableUploadManager(QObject* parent = nullptr);
     virtual ~QnWearableUploadManager() override;
 
+    bool clearSpace(qint64 requestedSpace, qint64* availableSpace);
+
     bool consume(const QnUuid& cameraId, const QnUuid& token, const QString& uploadId, qint64 startTimeMs);
 
     bool isConsuming(const QnUuid& cameraId) const;

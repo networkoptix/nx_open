@@ -158,6 +158,10 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
     if (!resource)
         return nx_http::StatusCode::invalidParameter;
 
+    QnWearableUploadManager* uploader = uploadManager(result);
+    if (!uploader)
+        return nx_http::StatusCode::internalServerError;
+
     QnTimePeriod unionPeriod;
     for (const QnWearableCheckDataElement& element : data.elements)
         unionPeriod.addPeriod(element.period);
@@ -172,6 +176,11 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
             std::numeric_limits<int>::max());
 
     QnWearableCheckReply reply;
+
+    qint64 totalSize = 0;
+    for (const QnWearableCheckDataElement& element : data.elements)
+        totalSize += element.size;
+    uploader->clearSpace(totalSize, &reply.availableSpace);
 
     for (const QnWearableCheckDataElement& element : data.elements)
     {
