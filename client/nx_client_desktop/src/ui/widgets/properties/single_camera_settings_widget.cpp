@@ -195,6 +195,9 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->wearableProgressWidget, &QnWearableProgressWidget::activeChanged,
         this, &QnSingleCameraSettingsWidget::updateWearableProgressVisibility);
 
+    connect(ui->wearableArchiveLengthWidget, &QnArchiveLengthWidget::changed,
+        this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
+
     connect(ui->wearableMotionWidget, &QnWearableMotionWidget::changed,
         this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
@@ -413,8 +416,11 @@ void QnSingleCameraSettingsWidget::submitToResource()
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
         m_camera->setDewarpingParams(dewarpingParams);
 
-        if(m_camera->hasFlags(Qn::wearable_camera))
+        if (m_camera->hasFlags(Qn::wearable_camera))
+        {
             ui->wearableMotionWidget->submitToResource(m_camera);
+            ui->wearableArchiveLengthWidget->submitToResources({m_camera});
+        }
 
         setHasDbChanges(false);
     }
