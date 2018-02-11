@@ -282,17 +282,21 @@ void QnResourceListModel::at_resource_resourceChanged(const QnResourcePtr &resou
 
 QIcon QnResourceListModel::resourceIcon(const QnResourcePtr& resource) const
 {
+    QnResourceIconCache::Key addionalKey = 0;
+    if (m_options.testFlag(AlwaysSelectedOption))
+        addionalKey = QnResourceIconCache::AlwaysSelected;
+
     if (resource->hasFlags(Qn::server) && m_options.testFlag(ServerAsHealthMonitorOption))
-        return qnResIconCache->icon(QnResourceIconCache::HealthMonitor);
+        return qnResIconCache->icon(QnResourceIconCache::HealthMonitor | addionalKey);
 
     if (m_options.testFlag(HideStatusOption))
     {
         QnResourceIconCache::Key key = qnResIconCache->key(resource);
         key &= ~QnResourceIconCache::StatusMask;
         key |= QnResourceIconCache::Online;
-        return qnResIconCache->icon(key);
+        return qnResIconCache->icon(key | addionalKey);
     }
 
-    return qnResIconCache->icon(resource);
+    return qnResIconCache->icon(qnResIconCache->key(resource) | addionalKey);
 }
 
