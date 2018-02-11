@@ -97,7 +97,7 @@ QnAviArchiveDelegate* WearableArchiveSynchronizationTask::createArchiveDelegate(
 
     std::unique_ptr<AviMotionArchiveDelegate> result = std::make_unique<AviMotionArchiveDelegate>();
     QnMotionRegion region;
-    result->setMotionRegion(region);
+    result->setMotionRegion(m_resource->getMotionRegion(0));
     return result.release();
 }
 
