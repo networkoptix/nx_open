@@ -32,7 +32,7 @@ public:
     virtual ~WearableWorker() override;
 
     void updateState();
-    bool addUploads(const WearablePayloadList& uploads);
+    bool addUpload(const WearablePayloadList& payloads);
     void cancel();
 
     WearableState state() const;

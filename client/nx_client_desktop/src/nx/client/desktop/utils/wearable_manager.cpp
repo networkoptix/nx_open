@@ -70,7 +70,7 @@ void WearableManager::prepareUploads(
     const QnSecurityCamResourcePtr& camera,
     const QStringList& filePaths,
     QObject* target,
-    std::function<void(const WearablePayloadList&)> callback)
+    std::function<void(const WearableUpload&)> callback)
 {
     WearablePreparer* checker = new WearablePreparer(camera, this);
 
@@ -86,10 +86,10 @@ void WearableManager::updateState(const QnSecurityCamResourcePtr& camera)
         worker->updateState();
 }
 
-bool WearableManager::addUploads(const QnSecurityCamResourcePtr& camera, const WearablePayloadList& uploads)
+bool WearableManager::addUpload(const QnSecurityCamResourcePtr& camera, const WearablePayloadList& payloads)
 {
     if (WearableWorker* worker = cameraWorker(camera))
-        return worker->addUploads(uploads);
+        return worker->addUpload(payloads);
     return true; //< Just ignore it silently.
 }
 

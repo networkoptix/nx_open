@@ -35,11 +35,11 @@ public:
         const QnSecurityCamResourcePtr& camera,
         const QStringList& filePaths,
         QObject* target,
-        std::function<void(const WearablePayloadList&)> callback);
+        std::function<void(const WearableUpload&)> callback);
 
     void updateState(const QnSecurityCamResourcePtr& camera);
 
-    bool addUploads(const QnSecurityCamResourcePtr& camera, const WearablePayloadList& uploads);
+    bool addUpload(const QnSecurityCamResourcePtr& camera, const WearablePayloadList& payloads);
     void cancelUploads(const QnSecurityCamResourcePtr& camera);
     void cancelAllUploads();
 

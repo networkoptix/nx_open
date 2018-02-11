@@ -32,8 +32,8 @@ private:
     void handlePrepareFinished(bool success, const QnWearableCheckReply& reply);
 
 signals:
-    void finished(const WearablePayloadList& result);
-    void finishedLater(const WearablePayloadList& result);
+    void finished(const WearableUpload& result);
+    void finishedLater(const WearableUpload& result);
 
 private:
     struct Private;

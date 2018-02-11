@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QAction>
 
+#include <nx/utils/string.h>
 #include <utils/common/guarded_callback.h>
 #include <common/common_module.h>
 
@@ -26,6 +27,7 @@
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
+using namespace nx::utils;
 
 namespace {
 const int kMaxLinesInExtendedErrorMessage = 10;
@@ -167,10 +169,10 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
         path = path.trimmed();
 
     qnClientModule->wearableManager()->prepareUploads(camera, paths, this,
-        [this, camera](const WearablePayloadList& uploads)
+        [this, camera](const WearableUpload& upload)
         {
-            if(checkFileUpload(uploads))
-                uploadValidFiles(camera, uploads);
+            if(checkFileUpload(upload))
+                uploadValidFiles(camera, upload.elements);
         });
 }
 
@@ -202,18 +204,18 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
         file = path + QDir::separator() + file;
 
     qnClientModule->wearableManager()->prepareUploads(camera, files, this,
-        [this, path, camera](const WearablePayloadList& uploads)
+        [this, path, camera](const WearableUpload& upload)
         {
-            if (checkFolderUpload(path, uploads))
-                uploadValidFiles(camera, uploads);
+            if (checkFolderUpload(path, upload))
+                uploadValidFiles(camera, upload.elements);
         });
 }
 
-bool QnWorkbenchWearableHandler::checkFileUpload(const WearablePayloadList& uploads)
+bool QnWorkbenchWearableHandler::checkFileUpload(const WearableUpload& upload)
 {
-    int count = uploads.size();
+    int count = upload.elements.size();
 
-    if (WearablePayload::allHaveStatus(uploads, WearablePayload::UnsupportedFormat))
+    if (upload.allHaveStatus(WearablePayload::UnsupportedFormat))
     {
         QnMessageBox::critical(mainWindow(),
             tr("Selected file format(s) are not supported", 0, count),
@@ -221,7 +223,7 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearablePayloadList& uplo
         return false;
     }
 
-    if (WearablePayload::allHaveStatus(uploads, WearablePayload::NoTimestamp))
+    if (upload.allHaveStatus(WearablePayload::NoTimestamp))
     {
         QnMessageBox::critical(mainWindow(),
             tr("Selected file(s) do not have timestamp(s)", 0, count),
@@ -229,7 +231,7 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearablePayloadList& uplo
         return false;
     }
 
-    if (WearablePayload::allHaveStatus(uploads, WearablePayload::ChunksTakenByFileInQueue))
+    if (upload.allHaveStatus(WearablePayload::ChunksTakenByFileInQueue))
     {
         QnMessageBox::critical(mainWindow(),
             tr("Selected file(s) cover periods for which videos are already being uploaded", 0, count),
@@ -237,7 +239,7 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearablePayloadList& uplo
         return false;
     }
 
-    if (WearablePayload::allHaveStatus(uploads, WearablePayload::ChunksTakenOnServer))
+    if (upload.allHaveStatus(WearablePayload::ChunksTakenOnServer))
     {
         QnMessageBox::critical(mainWindow(),
             tr("Selected file(s) cover periods for which videos have already been uploaded", 0, count),
@@ -245,24 +247,22 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearablePayloadList& uplo
         return false;
     }
 
-    if (WearablePayload::allHaveStatus(uploads, WearablePayload::NoSpaceOnServer))
+    if (upload.allHaveStatus(WearablePayload::NoSpaceOnServer))
     {
-        QnMessageBox::critical(mainWindow(),
-            tr("Not enough space on server storage", 0, count),
-            tr("TODO."));
+        showNoSpaceOnServerWarning(upload);
         return false;
     }
 
-    if (WearablePayload::allHaveStatus(uploads, WearablePayload::ServerError))
+    if (upload.allHaveStatus(WearablePayload::ServerError))
         return false; //< Ignore it as the user is likely already seeing "reconnecting to server" dialog.
 
-    if (!WearablePayload::allHaveStatus(uploads, WearablePayload::Valid))
+    if (!upload.allHaveStatus(WearablePayload::Valid))
     {
         QString extendedMessage;
         int lines = 0;
-        for (const WearablePayload& upload : uploads)
+        for (const WearablePayload& payload : upload.elements)
         {
-            QString line = calculateExtendedErrorMessage(upload);
+            QString line = calculateExtendedErrorMessage(payload);
             if (!line.isEmpty())
             {
                 extendedMessage += line + lit("\n");
@@ -273,7 +273,7 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearablePayloadList& uplo
                 break;
         }
 
-        if (!WearablePayload::someHaveStatus(uploads, WearablePayload::Valid))
+        if (!upload.someHaveStatus(WearablePayload::Valid))
         {
             QnMessageBox::critical(mainWindow(),
                 tr("Selected file(s) will not be uploaded", 0, count),
@@ -283,7 +283,7 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearablePayloadList& uplo
         else
         {
             QDialogButtonBox::StandardButton button = QnMessageBox::critical(mainWindow(),
-                tr("Some files will not be uploaded", 0, count),
+                tr("Some file(s) will not be uploaded", 0, count),
                 extendedMessage,
                 QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
             if (button == QDialogButtonBox::Cancel)
@@ -294,9 +294,15 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearablePayloadList& uplo
     return true;
 }
 
-bool QnWorkbenchWearableHandler::checkFolderUpload(const QString& path, const WearablePayloadList& uploads)
+bool QnWorkbenchWearableHandler::checkFolderUpload(const QString& path, const WearableUpload& upload)
 {
-    if (!WearablePayload::someHaveStatus(uploads, WearablePayload::Valid))
+    if (upload.someHaveStatus(WearablePayload::NoSpaceOnServer))
+    {
+        showNoSpaceOnServerWarning(upload);
+        return false;
+    }
+
+    if (!upload.someHaveStatus(WearablePayload::Valid))
     {
         QnMessageBox::critical(mainWindow(),
             tr("There is no new files to upload in \"%1\"").arg(path));
@@ -306,16 +312,25 @@ bool QnWorkbenchWearableHandler::checkFolderUpload(const QString& path, const We
     return true;
 }
 
+void QnWorkbenchWearableHandler::showNoSpaceOnServerWarning(const WearableUpload& upload)
+{
+    QnMessageBox::critical(mainWindow(),
+        tr("Not enough space on server storage"),
+        tr("File(s) size - %1\nFree space - %2", 0, upload.elements.size())
+            .arg(formatFileSize(upload.spaceRequested))
+            .arg(formatFileSize(upload.spaceAvailable)));
+}
+
 void QnWorkbenchWearableHandler::uploadValidFiles(
     const QnSecurityCamResourcePtr& camera,
-    const WearablePayloadList& uploads)
+    const WearablePayloadList& payloads)
 {
-    WearablePayloadList validUploads;
-    for (const WearablePayload& upload : uploads)
-        if (upload.status == WearablePayload::Valid)
-            validUploads.push_back(upload);
+    WearablePayloadList validPayloads;
+    for (const WearablePayload& payload : payloads)
+        if (payload.status == WearablePayload::Valid)
+            validPayloads.push_back(payload);
 
-    if (!qnClientModule->wearableManager()->addUploads(camera, validUploads))
+    if (!qnClientModule->wearableManager()->addUpload(camera, validPayloads))
     {
         WearableState state = qnClientModule->wearableManager()->state(camera);
         NX_ASSERT(state.status == WearableState::LockedByOtherClient);

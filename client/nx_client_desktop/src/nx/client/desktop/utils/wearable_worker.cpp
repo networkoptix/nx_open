@@ -125,17 +125,17 @@ void WearableWorker::updateState()
     d->requests.storeHandle(d->connection()->wearableCameraStatus(d->camera, callback, thread()));
 }
 
-bool WearableWorker::addUploads(const WearablePayloadList& uploads)
+bool WearableWorker::addUpload(const WearablePayloadList& payloads)
 {
     if (d->state.status == WearableState::LockedByOtherClient)
         return false;
 
-    for (const WearablePayload& upload : uploads)
+    for (const WearablePayload& payload : payloads)
     {
         WearableState::EnqueuedFile file;
-        file.path = upload.path;
-        file.startTimeMs = upload.local.period.startTimeMs;
-        file.uploadPeriod = upload.remote.period;
+        file.path = payload.path;
+        file.startTimeMs = payload.local.period.startTimeMs;
+        file.uploadPeriod = payload.remote.period;
         d->state.queue.push_back(file);
     }
 

@@ -64,7 +64,8 @@ struct WearablePreparer::Private
     QnSecurityCamResourcePtr camera;
     QnMediaServerResourcePtr server;
     QnTimePeriodList queuePeriods;
-    WearablePayloadList result;
+    WearableUpload upload;
+    QVector<int> localByRemoteIndex;
 
     ServerRequestStorage requests;
 };
@@ -85,31 +86,38 @@ WearablePreparer::~WearablePreparer()
 
 void WearablePreparer::prepareUploads(const QStringList& filePaths, const QnTimePeriodList& queue)
 {
-    NX_ASSERT(d->result.isEmpty());
+    NX_ASSERT(d->upload.elements.isEmpty());
     NX_ASSERT(!filePaths.isEmpty());
 
     for (const QString& path : filePaths)
     {
         WearablePayload payload;
         payload.path = path;
-        d->result.push_back(payload);
+        d->upload.elements.push_back(payload);
     }
 
     d->queuePeriods = queue;
 
-    for (WearablePayload& payload : d->result)
+    for (WearablePayload& payload : d->upload.elements)
         checkLocally(payload);
 
-    if (!WearablePayload::someHaveStatus(d->result, WearablePayload::Valid))
+    if (!d->upload.someHaveStatus(WearablePayload::Valid))
     {
-        emit finishedLater(d->result);
+        emit finishedLater(d->upload);
         return;
     }
 
-    // Note that we don't meddle with sending only valid files here as this way it's just simpler.
     QnWearableCheckData request;
-    for (const WearablePayload& payload : d->result)
-        request.elements.push_back(payload.local);
+    for(int i = 0; i < d->upload.elements.size(); i++)
+    {
+        WearablePayload& payload = d->upload.elements[i];
+
+        if (payload.status == WearablePayload::Valid)
+        {
+            d->localByRemoteIndex.push_back(i);
+            request.elements.push_back(payload.local);
+        }
+    }
 
     auto callback = guarded(this,
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
@@ -181,27 +189,41 @@ void WearablePreparer::checkLocally(WearablePayload& payload)
 
 void WearablePreparer::handlePrepareFinished(bool success, const QnWearableCheckReply& reply)
 {
-    if (!success || reply.elements.size() != d->result.size())
+    if (!success || reply.elements.size() != d->localByRemoteIndex.size())
     {
-        for (WearablePayload& payload : d->result)
+        for (WearablePayload& payload : d->upload.elements)
             payload.status = WearablePayload::ServerError;
 
-        emit finished(d->result);
+        emit finished(d->upload);
         return;
     }
 
-    for (int i = 0; i < reply.elements.size(); i++)
-    {
-        WearablePayload& payload = d->result[i];
-        if(payload.status != WearablePayload::Valid)
-            continue; //< That's a file that was locally invalid.
+    qint64 totalSize = 0;
+    for (const WearablePayload& payload : d->upload.elements)
+        if (payload.status == WearablePayload::Valid)
+            totalSize += payload.local.size;
 
-        payload.remote = reply.elements[i];
-        if (!canUpload(payload.local.period, payload.remote.period))
-            payload.status = WearablePayload::ChunksTakenOnServer;
+    d->upload.spaceRequested = totalSize;
+    d->upload.spaceAvailable = reply.availableSpace;
+
+    if (totalSize > reply.availableSpace)
+    {
+        for (WearablePayload& payload : d->upload.elements)
+            if (payload.status == WearablePayload::Valid)
+                payload.status = WearablePayload::NoSpaceOnServer;
+    }
+    else
+    {
+        for (int i = 0; i < reply.elements.size(); i++)
+        {
+            WearablePayload& payload = d->upload.elements[d->localByRemoteIndex[i]];
+            payload.remote = reply.elements[i];
+            if (!canUpload(payload.local.period, payload.remote.period))
+                payload.status = WearablePayload::ChunksTakenOnServer;
+        }
     }
 
-    emit finished(d->result);
+    emit finished(d->upload);
 }
 
 } // namespace desktop

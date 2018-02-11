@@ -31,34 +31,42 @@ struct WearablePayload
     Status status = Valid;
     QnWearableCheckDataElement local;
     QnWearableCheckReplyElement remote;
+};
 
-    static bool allHaveStatus(const WearablePayloadList& list, Status status)
+struct WearableUpload
+{
+    WearablePayloadList elements;
+    qint64 spaceAvailable = 0;
+    qint64 spaceRequested = 0;
+
+    bool allHaveStatus(WearablePayload::Status status) const
     {
-        if (list.empty())
+        if (elements.empty())
             return false;
 
-        for (const WearablePayload& payload : list)
+        for (const WearablePayload& payload : elements)
             if (payload.status != status)
                 return false;
 
         return true;
     }
 
-    static bool someHaveStatus(const WearablePayloadList& list, Status status)
+    bool someHaveStatus(WearablePayload::Status status) const
     {
-        if (list.empty())
+        if (elements.empty())
             return false;
 
-        for (const WearablePayload& payload : list)
+        for (const WearablePayload& payload : elements)
             if (payload.status == status)
                 return true;
 
         return false;
     }
+
 };
 
 } // namespace desktop
 } // namespace client
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::client::desktop::WearablePayloadList)
+Q_DECLARE_METATYPE(nx::client::desktop::WearableUpload)
