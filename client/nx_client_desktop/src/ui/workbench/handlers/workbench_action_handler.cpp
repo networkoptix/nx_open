@@ -1187,8 +1187,17 @@ void ActionHandler::at_moveCameraAction_triggered() {
         if (!camera)
             continue;
 
+        // Drop out right away if we get a wearable camera here.
+        if (camera->hasFlags(Qn::wearable_camera))
+        {
+            QnMessageBox::critical(mainWindow(),
+                tr("Wearable Cameras cannot be moved between servers"));
+            return;
+        }
+
         resourcesToMove.push_back(camera);
     }
+
     if (!resourcesToMove.isEmpty()) {
         int handle = server->apiConnection()->checkCameraList(resourcesToMove, this, SLOT(at_cameraListChecked(int, const QnCameraListReply &, int)));
         m_awaitingMoveCameras.insert(handle, CameraMovingInfo(resourcesToMove, server));

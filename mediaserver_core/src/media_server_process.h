@@ -218,4 +218,5 @@ private:
     std::weak_ptr<QnMediaServerModule> m_serverModule;
     bool m_serviceMode;
     std::unique_ptr<MSSettings> m_settings;
+    bool m_stopObjectsCalled = false;
 };

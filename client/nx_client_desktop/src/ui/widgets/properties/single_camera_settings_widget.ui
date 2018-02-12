@@ -169,6 +169,25 @@
              </widget>
             </item>
             <item>
+             <spacer name="verticalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>8</width>
+                <height>8</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QnWearableMotionWidget" name="wearableMotionWidget" native="true"/>
+            </item>
+            <item>
              <spacer name="verticalSpacer_2">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -727,6 +746,12 @@ The oldest footage among all cameras on the server will be deleted first.</strin
    <class>QnWearableProgressWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/wearable_progress_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnWearableMotionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/properties/wearable_motion_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

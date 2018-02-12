@@ -295,7 +295,6 @@ void AsyncHttpClient::doDelete(const QUrl& url)
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    m_contentLocationUrl.setPath(QLatin1String("*"));
     composeRequest(nx_http::Method::delete_);
     initiateHttpMessageDelivery();
 }

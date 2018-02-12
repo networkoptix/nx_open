@@ -110,8 +110,14 @@ void ClientPool::sendRequestUnsafe(const Request& request, AsyncHttpClientPtr ht
     httpClient->setAuthType(request.authType);
     if (request.method == Method::get)
         httpClient->doGet(request.url);
-    else
+    else if (request.method == Method::put)
+        httpClient->doPut(request.url, request.contentType, request.messageBody);
+    else if (request.method == Method::post)
         httpClient->doPost(request.url, request.contentType, request.messageBody);
+    else if (request.method == Method::delete_)
+        httpClient->doDelete(request.url);
+    else
+        NX_ASSERT(false);
 }
 
 void ClientPool::sendNextRequestUnsafe()

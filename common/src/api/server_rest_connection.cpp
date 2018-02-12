@@ -38,6 +38,7 @@ namespace {
 
 static const size_t ResponseReadTimeoutMs = 15 * 1000;
 static const size_t TcpConnectTimeoutMs = 5 * 1000;
+static const nx_http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
 
 void trace(const QString& serverId, int handle, const QString& message)
 {
@@ -47,7 +48,7 @@ void trace(const QString& serverId, int handle, const QString& message)
         .arg(message));
 }
 
-} // namepspace
+} // namespace
 
 // --------------------------- public methods -------------------------------------------
 
@@ -169,7 +170,6 @@ Handle ServerConnection::sendStatisticsAsync(
     PostCallback callback,
     QThread *targetThread)
 {
-    static const nx_http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     static const auto path = lit("/ec2/statistics/send");
 
     auto server = getServerWithInternetAccess();
@@ -467,6 +467,21 @@ Handle ServerConnection::addWearableCamera(
         QnRequestParamList{ { lit("name"), name } },
         QByteArray(),
         QByteArray(),
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::prepareWearableUploads(
+    const QnNetworkResourcePtr& camera,
+    const QnWearablePrepareData& data,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executePost(
+        lit("/api/wearableCamera/prepare"),
+        QnRequestParamList{ { lit("cameraId"), camera->getId().toSimpleString() } },
+        kJsonContentType,
+        QJson::serialized(data),
         callback,
         targetThread);
 }

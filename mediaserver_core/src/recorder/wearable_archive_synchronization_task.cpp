@@ -1,11 +1,13 @@
 #include "wearable_archive_synchronization_task.h"
 
+#include <utils/common/sleep.h>
 #include <nx/utils/random.h>
 #include <nx/utils/log/log.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <plugins/storage/memory/ext_iodevice_storage.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <plugins/resource/avi/avi_resource.h>
+#include <plugins/utils/avi_motion_archive_delegate.h>
 #include <core/resource/security_cam_resource.h>
 
 #include "server_edge_stream_recorder.h"
@@ -15,6 +17,8 @@
 namespace nx {
 namespace mediaserver_core {
 namespace recorder {
+
+using namespace plugins;
 
 
 WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
@@ -35,8 +39,7 @@ WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
 
 WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask()
 {
-    // Actual data should be deleted in execute().
-    NX_ASSERT(!m_file);
+    // execute was never called?
     if (m_file)
         delete m_file.data();
 }
@@ -62,19 +65,27 @@ void WearableArchiveSynchronizationTask::cancel()
 
 bool WearableArchiveSynchronizationTask::execute()
 {
-    createArchiveReader(m_startTimeMs);
-    createStreamRecorder(m_startTimeMs);
+    m_withMotion = m_resource->getMotionType() == Qn::MT_SoftwareGrid;
 
+    createArchiveReader(m_startTimeMs, &m_state.duration);
+    createStreamRecorder(m_startTimeMs, m_state.duration);
     m_archiveReader->addDataProcessor(m_recorder.get());
+
     m_recorder->start();
     m_archiveReader->start();
-
-    m_recorder->wait();
     m_archiveReader->wait();
 
-    m_recorder.reset();
-    m_archiveReader.reset();
+    // Now some bad news: recorder might still have some packets in queue.
+    // And there is no way to wait until it's done. The workaround here is questionable at best.
+    while(m_recorder->queueSize() > 0)
+        QnSleep::msleep(10);
+    m_recorder->pleaseStop();
+    m_recorder->wait();
 
+    m_archiveReader.reset();
+    m_recorder.reset();
+
+    m_state.processed = m_state.duration;
     m_state.status = WearableArchiveSynchronizationState::Finished;
     emit stateChanged(m_state);
 
@@ -86,7 +97,18 @@ WearableArchiveSynchronizationState WearableArchiveSynchronizationTask::state() 
     return m_state;
 }
 
-void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
+QnAviArchiveDelegate* WearableArchiveSynchronizationTask::createArchiveDelegate()
+{
+    if (!m_withMotion)
+        return new QnAviArchiveDelegate();
+
+    std::unique_ptr<AviMotionArchiveDelegate> result = std::make_unique<AviMotionArchiveDelegate>();
+    QnMotionRegion region;
+    result->setMotionRegion(m_resource->getMotionRegion(0));
+    return result.release();
+}
+
+void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs, qint64* durationMs)
 {
     QString temporaryFilePath = QString::number(nx::utils::random::number());
     QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource(commonModule()));
@@ -95,7 +117,7 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
     storage->setIsIoDeviceOwner(false);
 
     using namespace nx::mediaserver_core::plugins;
-    std::unique_ptr<QnAviArchiveDelegate> delegate = std::make_unique<QnAviArchiveDelegate>();
+    std::unique_ptr<QnAviArchiveDelegate> delegate(createArchiveDelegate());
     delegate->setStorage(storage);
     delegate->setAudioChannel(0);
     delegate->setStartTimeUs(startTimeMs * 1000);
@@ -105,11 +127,11 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
     delegate->open(resource, nullptr);
     delegate->findStreams();
 
-    qint64 duration = 0;
+    *durationMs = 0;
     if(delegate->endTime() != AV_NOPTS_VALUE)
-        duration = (delegate->endTime() - delegate->startTime()) / 1000;
+        *durationMs = (delegate->endTime() - delegate->startTime()) / 1000;
 
-    m_archiveReader = std::make_unique<QnArchiveStreamReader>(resource);
+    m_archiveReader = std::make_unique<QnArchiveStreamReader>(m_resource);
     m_archiveReader->setObjectName(lit("WearableCameraArchiveReader"));
     m_archiveReader->setArchiveDelegate(delegate.release());
     //m_archiveReader->setPlaybackMask(timePeriod);
@@ -117,12 +139,11 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
     m_archiveReader->setErrorHandler(
         [this](const QString& errorString)
         {
-            NX_DEBUG(this, lm("Can not synchronize wearable chunk, error: %1").args(errorString));
+            NX_DEBUG(this, lm("Could not synchronize wearable chunk, error: %1").args(errorString));
 
             m_archiveReader->pleaseStop();
-            if (m_recorder)
-                m_recorder->pleaseStop();
 
+            QnMutexLocker locker(&m_stateMutex);
             m_state.errorString = errorString;
         });
 
@@ -130,16 +151,10 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
         [this]()
         {
             m_archiveReader->pleaseStop();
-            if (m_recorder)
-                m_recorder->pleaseStop();
-
-            m_state.processed = m_state.duration;
         });
-
-    m_state.duration = duration;
 }
 
-void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs)
+void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs, qint64 durationMs)
 {
     using namespace std::chrono;
 
@@ -150,26 +165,29 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
         QnServer::ChunksCatalog::HiQualityCatalog,
         m_archiveReader.get());
 
-    auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& motion) { return false; };
-    m_recorder->setSaveMotionHandler(saveMotionHandler);
+    if (!m_withMotion)
+    {
+        auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& motion) { return false; };
+        m_recorder->setSaveMotionHandler(saveMotionHandler);
+    }
+
     m_recorder->setObjectName(lit("WearableCameraArchiveRecorder"));
 
-    m_recorder->setOnFileWrittenHandler(
-        [this](milliseconds startTime, milliseconds duration)
+    // Make sure we get recordingProgress notifications.
+    // Adding 100ms at end just to feel safe. We don't want to drop packets.
+    m_recorder->setEofDateTime((startTimeMs + durationMs + 100) * 1000);
+
+    // Note that direct connection is OK here as we control the
+    // lifetimes of all the objects involved.
+    connect(m_recorder, &QnServerStreamRecorder::recordingProgress, this,
+        [this](int progress)
         {
-            m_state.processed = std::min(m_state.duration, m_state.processed + duration.count());
+            QnMutexLocker locker(&m_stateMutex);
+            m_state.processed = m_state.duration * progress / 100;
+            locker.unlock();
+
             emit stateChanged(m_state);
-        });
-
-    m_recorder->setEndOfRecordingHandler(
-        [this]()
-        {
-            m_recorder->pleaseStop();
-            if (m_archiveReader)
-                m_archiveReader->pleaseStop();
-
-            m_state.processed = m_state.duration;
-        });
+        }, Qt::DirectConnection);
 }
 
 } // namespace recorder
