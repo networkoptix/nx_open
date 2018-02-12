@@ -258,7 +258,7 @@ int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
     int bestScore = 0;
     const auto profileFilter = availableProfiles(channel);
 
-    for (const auto& profileEntry : channelProfiles)
+    for (const auto& profileEntry: channelProfiles)
     {
         const auto profile = profileEntry.second;
         const auto codecCoefficient =
