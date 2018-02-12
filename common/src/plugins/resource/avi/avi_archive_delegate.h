@@ -38,7 +38,7 @@ public:
 
     virtual bool open(
         const QnResourcePtr &resource,
-        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher = nullptr) override;
     virtual void close();
     virtual qint64 startTime() const;
     virtual void setStartTimeUs(qint64 startTimeUs);
