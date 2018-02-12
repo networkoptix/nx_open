@@ -448,7 +448,7 @@
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation type="unfinished">Refresh</translation>
     </message>
@@ -646,22 +646,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation type="unfinished">Advanced settings are unavailable</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation type="unfinished">Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation type="unfinished">Do not archive primary stream</translation>
     </message>
@@ -694,11 +681,6 @@
       <location/>
       <source>Restore Defaults</source>
       <translation type="unfinished">Restore Defaults</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation type="unfinished">Warning! Low quality may result in low resolution image.</translation>
     </message>
     <message>
       <location/>
@@ -754,11 +736,6 @@
       <location/>
       <source>Disable secondary stream</source>
       <translation type="unfinished">Disable secondary stream</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
     </message>
     <message>
       <location/>
@@ -1114,34 +1091,6 @@
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
       <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExportRapidReviewDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
-      <source>Export Rapid Review</source>
-      <translation type="unfinished">Export Rapid Review</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Initial Video Length</source>
-      <translation type="unfinished">Initial Video Length</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Exported Video Length</source>
-      <translation type="unfinished">Exported Video Length</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Frames Interval</source>
-      <translation type="unfinished">Frames Interval</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Rapid Review speed</source>
-      <translation type="unfinished">Rapid Review speed</translation>
     </message>
   </context>
   <context>
@@ -3169,11 +3118,6 @@ Click &quot;New role&quot; button to create one.</translation>
       <location/>
       <source>Upload Folder...</source>
       <translation type="unfinished">Upload Folder...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;warning&gt;</source>
-      <translation type="unfinished">&lt;warning&gt;</translation>
     </message>
   </context>
   <context>

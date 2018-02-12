@@ -448,7 +448,7 @@
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>새로고침</translation>
     </message>
@@ -646,22 +646,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation>고급 설정을 사용할 수 있습니다.</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation>주위: 고해상도 선택시 CPU및 네트워크 부하등의 기타 원인이 될 수 있습니다.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation>주 스트림을 저장하지 않음</translation>
     </message>
@@ -694,11 +681,6 @@
       <location/>
       <source>Restore Defaults</source>
       <translation>기본값 복원</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation>주의! 낮은 해상도는 이미지 품질이 낮은 결과를 얻을 수 있습니다.</translation>
     </message>
     <message>
       <location/>
@@ -754,11 +736,6 @@
       <location/>
       <source>Disable secondary stream</source>
       <translation>보조 스트림 활성화</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Quality</source>
-      <translation>화질</translation>
     </message>
     <message>
       <location/>
@@ -3139,11 +3116,6 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Upload Folder...</source>
       <translation>폴더 업로드...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;warning&gt;</source>
-      <translation>&lt;경고&gt;</translation>
     </message>
   </context>
   <context>

@@ -448,7 +448,7 @@
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>รีเฟรส</translation>
     </message>
@@ -646,22 +646,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation>การตั้งค่าขั้นสูงไม่พร้อมใช้งาน</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation>คำเตือน! การเลือกคุณภาพที่สูงอาจส่งผลกระทบ CPU ของคุณและประสิทธิภาพการทำงานของเครือข่ายและอาจก่อให้เกิดปัญหาอื่น ๆ.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation>ไ่ม่ต้องการเก็บภาพหลัก</translation>
     </message>
@@ -694,11 +681,6 @@
       <location/>
       <source>Restore Defaults</source>
       <translation>คืนค่าเริ่มต้น</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation>คำเตือน คุณภาพที่ตำ อาจจะทำให้ความละเอียดของภาพต่ำไปด้วย.</translation>
     </message>
     <message>
       <location/>
@@ -754,11 +736,6 @@
       <location/>
       <source>Disable secondary stream</source>
       <translation>ปิดใช้สตรีมรอง</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Quality</source>
-      <translation>คุณภาพ</translation>
     </message>
     <message>
       <location/>
@@ -3140,11 +3117,6 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Upload Folder...</source>
       <translation type="unfinished">Upload Folder...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;warning&gt;</source>
-      <translation type="unfinished">&lt;warning&gt;</translation>
     </message>
   </context>
   <context>

@@ -448,7 +448,7 @@
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>Обновить</translation>
     </message>
@@ -646,22 +646,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation>Расширенные настройки недоступны</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation>Внимание! Выбор Высокого качества можетотразиться на загрузке ЦП и сети, что может привести к дополнительным проблемам.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation>Не записывать первый поток</translation>
     </message>
@@ -694,11 +681,6 @@
       <location/>
       <source>Restore Defaults</source>
       <translation>Сбросить настройки</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation>Внимание! Низкое качество может привести к низкому разрешению изображения.</translation>
     </message>
     <message>
       <location/>
@@ -754,11 +736,6 @@
       <location/>
       <source>Disable secondary stream</source>
       <translation>Включить вторичный поток</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Quality</source>
-      <translation>Качество</translation>
     </message>
     <message>
       <location/>
@@ -3141,11 +3118,6 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Upload Folder...</source>
       <translation type="unfinished">Upload Folder...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;warning&gt;</source>
-      <translation type="unfinished">&lt;warning&gt;</translation>
     </message>
   </context>
   <context>

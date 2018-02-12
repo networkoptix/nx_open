@@ -448,7 +448,7 @@
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>Frissítés</translation>
     </message>
@@ -646,22 +646,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation>Haladó beállítások nem elérhetők</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation>Figyelem! A magas minőség kiválasztása hatással lehet a CPU és ahálózat teljesítményére és további problémákat okozhat.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation>Ne rögzítse az elsődleges adatfolyamot</translation>
     </message>
@@ -694,11 +681,6 @@
       <location/>
       <source>Restore Defaults</source>
       <translation>Visszaállítás alapértelmezettre</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation>Figyelem! Az alacsony minőség alacsony felbontást okozhat.</translation>
     </message>
     <message>
       <location/>
@@ -754,11 +736,6 @@
       <location/>
       <source>Disable secondary stream</source>
       <translation>A másodlagos stream tiltása</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Quality</source>
-      <translation>Minőség</translation>
     </message>
     <message>
       <location/>
@@ -3141,11 +3118,6 @@ Kattintson az &quot;Új szerepkör&quot; gombra a létrehozáshoz.</translation>
       <location/>
       <source>Upload Folder...</source>
       <translation>Mappa feltöltése...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;warning&gt;</source>
-      <translation type="unfinished">&lt;warning&gt;</translation>
     </message>
   </context>
   <context>

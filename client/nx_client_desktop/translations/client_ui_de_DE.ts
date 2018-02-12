@@ -448,7 +448,7 @@
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>Aktualisieren</translation>
     </message>
@@ -646,22 +646,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation>Erweiterte Einstellungen sind nicht verfügbar</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation>Warnung! Wenn Hohe Qualität ausgewählt wird kann Ihre CPU überlastet und die Netzwerkperformance eingeschränkt werden.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation>Primären Stream nicht archivieren</translation>
     </message>
@@ -694,11 +681,6 @@
       <location/>
       <source>Restore Defaults</source>
       <translation>Werkseinstellungen wiederherstellen</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation>Warnung! Die Einstellung niedrige Qualität kann zu schlechten Aufnahmen führen.</translation>
     </message>
     <message>
       <location/>
@@ -754,11 +736,6 @@
       <location/>
       <source>Disable secondary stream</source>
       <translation>Sekundären Stream deaktivieren</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Quality</source>
-      <translation>Qualität</translation>
     </message>
     <message>
       <location/>
@@ -3140,11 +3117,6 @@ Klicken Sie auf &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
       <location/>
       <source>Upload Folder...</source>
       <translation>Ordner hochladen...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;warning&gt;</source>
-      <translation>&lt;Warnung&gt;</translation>
     </message>
   </context>
   <context>

@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="hr" sourcelanguage="en">
   <context>
+    <name>AsyncImageWidget</name>
+    <message>
+      <source>NO DATA</source>
+      <translation type="unfinished">NO DATA</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -2254,6 +2261,18 @@ to view more bookmarks</translation>
       <source>Camera Id</source>
       <translation type="unfinished">Camera Id</translation>
     </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>Web</source>
+      <translation type="unfinished">Web</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation type="unfinished">No settings</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
@@ -2361,22 +2380,6 @@ to view more bookmarks</translation>
     <message>
       <source>Secondary</source>
       <translation type="unfinished">Secondary</translation>
-    </message>
-    <message>
-      <source>Don&apos;t change</source>
-      <translation type="unfinished">Don&apos;t change</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation type="unfinished">Low</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation type="unfinished">High</translation>
     </message>
     <message>
       <source>Edge</source>
@@ -5306,13 +5309,6 @@ to %1</translation>
     <message>
       <source>Health Monitor</source>
       <translation type="unfinished">Health Monitor</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnResourcePreviewWidget</name>
-    <message>
-      <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
     </message>
   </context>
   <context>
