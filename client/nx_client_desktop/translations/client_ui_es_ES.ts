@@ -170,6 +170,34 @@
     </message>
   </context>
   <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <source>Form</source>
+      <translation>Forma</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Fixed Archive Length</source>
+      <translation>Longitud de archivo fijo</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. Days</source>
+      <translation>Min Día</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Max. Days</source>
+      <translation>Días máximos</translation>
+    </message>
+  </context>
+  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -376,7 +404,7 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>Tamaño de la fuente</translation>
+      <translation>Tamaño de la letra</translation>
     </message>
     <message>
       <location/>
@@ -821,26 +849,6 @@
     </message>
     <message>
       <location/>
-      <source>Fixed Archive Length</source>
-      <translation>Longitud de archivo fijo</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation>Min Día</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Max. Days</source>
-      <translation>Días máximos</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Recording</source>
       <translation>Grabación de movimiento</translation>
     </message>
@@ -902,7 +910,7 @@
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation>Velocidad de transferencia</translation>
+      <translation>Bitrate</translation>
     </message>
   </context>
   <context>
@@ -1787,6 +1795,24 @@
     </message>
   </context>
   <context>
+    <name>NewWearableCameraDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
+      <source>New Wearable Camera...</source>
+      <translation>Nueva cámara portátil...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>To server</source>
+      <translation>Al servidor</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+    </message>
+  </context>
+  <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
@@ -2252,7 +2278,7 @@
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation>Longitud inicial del video</translation>
+      <translation>Duración del Video inicial</translation>
     </message>
     <message>
       <location/>
@@ -2667,6 +2693,12 @@
       <source>TextLabel</source>
       <translation type="unfinished">TextLabel</translation>
     </message>
+    <message>
+      <location/>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
+The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>El archivo cargado se puede eliminar automáticamente, si no hay espacio libre en el almacenamiento del servidor. Primero se eliminará el metraje más antiguo entre todas las cámaras del servidor.</translation>
+    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3048,6 +3080,70 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Edit Roles...</source>
       <translation>Editar funciones...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Form</source>
+      <translation>Forma</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>Detección de movimiento</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation type="unfinished">Detect motion in uploaded video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>Sensibilidad</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableProgressWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
+      <source>Form</source>
+      <translation>Forma</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cancel</source>
+      <translation>Cancelar</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableUploadWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
+      <source>Form</source>
+      <translation>Forma</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Video</source>
+      <translation>Subir vídeo</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload File...</source>
+      <translation>Subir archivo...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Folder...</source>
+      <translation>Subir Carpeta...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&lt;warning&gt;</source>
+      <translation>&lt;advertencia&gt;</translation>
     </message>
   </context>
   <context>

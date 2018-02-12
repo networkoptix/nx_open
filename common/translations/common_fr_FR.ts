@@ -923,7 +923,7 @@
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>minute</numerusform>
         <numerusform>minutes</numerusform>
       </translation>

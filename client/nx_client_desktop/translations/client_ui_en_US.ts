@@ -1803,12 +1803,12 @@
     </message>
     <message>
         <location/>
-        <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessible by any user.</source>
+        <source>To server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>To server</source>
+        <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3079,6 +3079,29 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
         <location/>
         <source>Edit Roles...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WearableMotionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Detect motion in uploaded video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sensitivity</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
