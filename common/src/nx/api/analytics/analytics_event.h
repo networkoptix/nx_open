@@ -30,6 +30,7 @@ public:
         QnUuid eventTypeId;
         TranslatableString eventName;
         EventTypeFlags flags = EventTypeFlag::noFlags;
+        bool isStateful() const noexcept { return flags.testFlag(EventTypeFlag::stateDependent); }
     };
 };
 #define AnalyticsEventType_Fields (eventTypeId)(eventName)(flags)
