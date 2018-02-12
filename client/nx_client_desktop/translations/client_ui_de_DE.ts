@@ -1695,13 +1695,13 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessible by any user.</source>
-      <translation>&quot;Tragbare Kamera&quot; ist ein virtueller Speicher für Videodateien, der auf jeden Server auf Ihrem System hochgeladen werden kann und von jedem Benutzer zugänglich ist.</translation>
+      <source>To server</source>
+      <translation>Zum Server</translation>
     </message>
     <message>
       <location/>
-      <source>To server</source>
-      <translation>Zum Server</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -2889,6 +2889,29 @@ Klicken Sie auf &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
       <location/>
       <source>Edit Roles...</source>
       <translation>Rollen bearbeiten...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Form</source>
+      <translation>Formular</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>Bewegungserkennung</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation type="unfinished">Detect motion in uploaded video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>Empfindlichkeit</translation>
     </message>
   </context>
   <context>

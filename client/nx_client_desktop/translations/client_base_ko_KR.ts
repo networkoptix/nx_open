@@ -874,15 +874,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
+      <translation>웨어러블 카메라...</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>새로운 웨어러블 카메라...</translation>
     </message>
     <message>
-      <source>Upload to Wearable Camera...</source>
-      <translation type="unfinished">Upload to Wearable Camera...</translation>
+      <source>Upload File...</source>
+      <translation type="unfinished">Upload File...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation type="unfinished">Upload Folder...</translation>
     </message>
   </context>
   <context>
@@ -2553,6 +2557,14 @@ to view more bookmarks</source>
     <message>
       <source>No device selected.</source>
       <translation>선택된 장치 없음.</translation>
+    </message>
+    <message>
+      <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
+      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+    </message>
+    <message>
+      <source>Cannot edit properties for several wearable cameras.</source>
+      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
     </message>
   </context>
   <context>
@@ -4380,6 +4392,10 @@ to %1</source>
       <source>Close</source>
       <translation>닫기</translation>
     </message>
+    <message>
+      <source>Stop</source>
+      <translation>중지</translation>
+    </message>
   </context>
   <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -4458,11 +4474,11 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation type="unfinished">Wearable Camera</translation>
+      <translation>웨어러블 카메라</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation type="unfinished">Wearable Camera %1</translation>
+      <translation>웨어러블 카메라 %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -4470,7 +4486,7 @@ to %1</source>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation type="unfinished">Name cannot be empty</translation>
+      <translation>이름을 비워둘 수 없습니다</translation>
     </message>
   </context>
   <context>
@@ -5917,7 +5933,7 @@ to %1</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>라이브 스트림 없음</translation>
     </message>
   </context>
   <context>
@@ -6931,28 +6947,36 @@ to %1</source>
     <name>QnWearableProgressWidget</name>
     <message>
       <source>Uploading %1... %2	%p%</source>
-      <translation type="unfinished">Uploading %1... %2	%p%</translation>
-    </message>
-    <message>
-      <source>Finalizing %1... %2	%p</source>
-      <translation type="unfinished">Finalizing %1... %2	%p</translation>
+      <translation>업로드 중 %1... %2	%p%</translation>
     </message>
     <message numerus="yes">
       <source>(%n more file(s) in queue)</source>
-      <translation type="unfinished">
-        <numerusform>(%n more file(s) in queue)</numerusform>
+      <translation>
+        <numerusform>(%n 대기열에있는 파일(들) 더보기)</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation type="unfinished">Stop uploading?</translation>
+    </message>
+    <message>
+      <source>Already uploaded files will be kept.</source>
+      <translation type="unfinished">Already uploaded files will be kept.</translation>
+    </message>
+    <message>
+      <source>Finalizing %1... %2	%p%</source>
+      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
     </message>
   </context>
   <context>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>사용자 &quot;%1&quot; 는 이 카메라로 촬영영상을 업로드하고 있습니다.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>또 다른 사용자는 이 카메라로 촬영영상을 업로드하고 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -7503,15 +7527,117 @@ to %1</source>
     <name>QnWorkbenchWearableHandler</name>
     <message>
       <source>Could not add wearable camera to server &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not add wearable camera to server &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>Open Wearable Camera Recording...</source>
-      <translation type="unfinished">Open Wearable Camera Recording...</translation>
+      <translation>웨어러블 카메라를 &quot;%1&quot;서버에 추가 할 수 없습니다.</translation>
     </message>
     <message>
       <source>All files (*.*)</source>
       <translation>모든 파일형식</translation>
+    </message>
+    <message>
+      <source>Video (%1)</source>
+      <translation type="unfinished">Video (%1)</translation>
+    </message>
+    <message>
+      <source>Open Wearable Camera Recordings...</source>
+      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+    </message>
+    <message>
+      <source>No video files found in &quot;%1&quot;</source>
+      <translation type="unfinished">No video files found in &quot;%1&quot;</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file format(s) are not supported</source>
+      <translation type="unfinished">
+        <numerusform>Selected file format(s) are not supported</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only video files are supported.</source>
+      <translation type="unfinished">Only video files are supported.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) do not have timestamp(s)</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only video files with correct timestamp are supported.</source>
+      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) cover periods for which videos are already being uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these file(s) to a different instance of a Wearable Camera.</source>
+      <translation type="unfinished">
+        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) cover periods for which videos have already been uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) will not be uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) will not be uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some file(s) will not be uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Some file(s) will not be uploaded</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There is no new files to upload in &quot;%1&quot;</source>
+      <translation type="unfinished">There is no new files to upload in &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation type="unfinished">Not enough space on server storage</translation>
+    </message>
+    <message numerus="yes">
+      <source>File(s) size - %1
+Free space - %2</source>
+      <translation type="unfinished">
+        <numerusform>File(s) size - %1
+Free space - %2</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation>사용자 &quot;%1&quot; 가 촬영영상을 업로드하고 있으므로 업로드를 시작할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+      <translation>다른 사용자가 현재 이 카메라로 촬영영상을 업로드하고 있으므로 업로드를 시작할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>File format of &quot;%1&quot; is not supported.</source>
+      <translation type="unfinished">File format of &quot;%1&quot; is not supported.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; does not have timestamp.</source>
+      <translation type="unfinished">File &quot;%1&quot; does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cover periods for which video is already being uploaded.</source>
+      <translation type="unfinished">File &quot;%1&quot; cover periods for which video is already being uploaded.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cover periods for which video has already been uploaded.</source>
+      <translation type="unfinished">File &quot;%1&quot; cover periods for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>There is no space on server for file &quot;%1&quot;.</source>
+      <translation type="unfinished">There is no space on server for file &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -7685,19 +7811,19 @@ to %1</source>
         <numerusform>Showreel에서 %n 아이템을 삭제 하시겠습니까?</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>Video uploading to %n camera(s) will stop:</source>
-      <translation type="unfinished">
-        <numerusform>Video uploading to %n camera(s) will stop:</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>전송을 중지 하겠습니까?</translation>
     </message>
     <message>
       <source>Stop</source>
       <translation>중지</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
+      <translation type="unfinished">
+        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7740,42 +7866,34 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>&quot;%1&quot; 파일을 열 수 없습니다.</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation> &quot;%1&quot; 파일에 대한 md5를 계산할 수 없습니다</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation type="unfinished">Could not create upload on the server side</translation>
+      <translation>서버 측에서 업로드를 생성 할 수 없습니다</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>고용량 파일을 서버에 업로드 할 수 없습니다</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>서버에 업로드 된 파일을 확인할 수 없습니다</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>서버에 업로드하는 동안 파일이 손상되었습니다</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
-      <source>File &quot;%1&quot; is not a video file.</source>
-      <translation type="unfinished">File &quot;%1&quot; is not a video file.</translation>
-    </message>
-    <message>
-      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
-    </message>
-    <message>
-      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <source>Failed to send request to the server.</source>
+      <translation type="unfinished">Failed to send request to the server.</translation>
     </message>
   </context>
   <context>
@@ -8114,6 +8232,10 @@ to %1</source>
     <message>
       <source>Failed to open server web page</source>
       <translation>서버 웹 페이지를 열지 못했습니다.</translation>
+    </message>
+    <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
     </message>
   </context>
   <context>
