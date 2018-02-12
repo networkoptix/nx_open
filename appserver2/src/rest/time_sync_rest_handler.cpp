@@ -1,24 +1,19 @@
-/**********************************************************
-* Aug 14, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "time_sync_rest_handler.h"
 
 #include <nx/network/http/custom_headers.h>
-#include <rest/server/rest_connection_processor.h>
 #include <nx/network/http/http_types.h>
+
+#include <rest/server/rest_connection_processor.h>
 
 #include "managers/time_manager.h"
 #include "connection_factory.h"
 
-
 namespace ec2 {
 
-const QString QnTimeSyncRestHandler::PATH = QString::fromLatin1( "ec2/timeSync" );
-const QByteArray QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME( "NX-TIME-SYNC-DATA" );
+const QString QnTimeSyncRestHandler::PATH = QString::fromLatin1("ec2/timeSync");
+const QByteArray QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME("NX-TIME-SYNC-DATA");
 
-QnTimeSyncRestHandler::QnTimeSyncRestHandler(Ec2DirectConnectionFactory* connection) :
+QnTimeSyncRestHandler::QnTimeSyncRestHandler(Ec2DirectConnectionFactory* connection):
     m_appServerConnection(connection)
 {
 }
@@ -28,12 +23,12 @@ int QnTimeSyncRestHandler::executeGet(
     const QnRequestParamList& /*params*/,
     QByteArray& /*result*/,
     QByteArray& /*contentType*/,
-    const QnRestConnectionProcessor* connection )
+    const QnRestConnectionProcessor* connection)
 {
-    auto peerGuid = connection->request().headers.find( Qn::PEER_GUID_HEADER_NAME );
-    if( peerGuid == connection->request().headers.end() )
+    auto peerGuid = connection->request().headers.find(Qn::PEER_GUID_HEADER_NAME);
+    if (peerGuid == connection->request().headers.end())
         return nx_http::StatusCode::badRequest;
-    auto timeSyncHeaderIter = connection->request().headers.find( TIME_SYNC_HEADER_NAME );
+    auto timeSyncHeaderIter = connection->request().headers.find(TIME_SYNC_HEADER_NAME);
     if (timeSyncHeaderIter != connection->request().headers.end())
     {
         boost::optional<qint64> rttMillis;
@@ -53,13 +48,13 @@ int QnTimeSyncRestHandler::executeGet(
             rttMillis);
     }
 
-    //sending our time synchronization information to remote peer
+    // Sending our time synchronization information to remote peer.
     connection->response()->headers.emplace(
         TIME_SYNC_HEADER_NAME,
-        m_appServerConnection->timeSyncManager()->getTimeSyncInfo().toString() );
+        m_appServerConnection->timeSyncManager()->getTimeSyncInfo().toString());
     connection->response()->headers.emplace(
         Qn::PEER_GUID_HEADER_NAME,
-        m_appServerConnection->commonModule()->moduleGUID().toByteArray() );
+        m_appServerConnection->commonModule()->moduleGUID().toByteArray());
 
     return nx_http::StatusCode::ok;
 }
@@ -71,14 +66,14 @@ int QnTimeSyncRestHandler::executePost(
     const QByteArray& /*srcBodyContentType*/,
     QByteArray& result,
     QByteArray& resultContentType,
-    const QnRestConnectionProcessor* connection )
+    const QnRestConnectionProcessor* connection)
 {
     return executeGet(
         path,
         params,
         result,
         resultContentType,
-        connection );
+        connection);
 }
 
-}
+} // namespace ec2
