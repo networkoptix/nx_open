@@ -46,11 +46,12 @@ using namespace nx::mediaserver::resource;
 HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     const AbstractSharedResourceContext::SharedId& sharedId)
     :
-    information([this](){ return loadInformation(); }, kCacheDataTimeout),
-    cgiParameters([this](){ return loadCgiParameters(); }, kCacheDataTimeout),
-    eventStatuses([this](){ return loadEventStatuses(); }, kCacheDataTimeout),
-    videoSources([this](){ return loadVideoSources(); }, kCacheDataTimeout),
-    videoProfiles([this](){ return loadVideoProfiles(); }, kCacheDataTimeout),
+    information([this]() { return loadInformation(); }, kCacheDataTimeout),
+    cgiParameters([this]() { return loadCgiParameters(); }, kCacheDataTimeout),
+    eventStatuses([this]() { return loadEventStatuses(); }, kCacheDataTimeout),
+    videoSources([this]() { return loadVideoSources(); }, kCacheDataTimeout),
+    videoProfiles([this]() { return loadVideoProfiles(); }, kCacheDataTimeout),
+    videoCodecInfo([this]() { return loadVideoCodecInfo(); }, kCacheDataTimeout),
     m_sharedId(sharedId),
     m_requestSemaphore(kMaxConcurrentRequestNumber)
 {
@@ -367,6 +368,37 @@ boost::optional<int> HanwhaSharedResourceContext::overlappedId() const
 void HanwhaSharedResourceContext::setDateTime(const QDateTime& dateTime)
 {
     m_timeSynchronizer->setDateTime(dateTime);
+}
+
+HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()
+{
+    HanwhaRequestHelper helper(shared_from_this());
+    helper.setIgnoreMutexAnalyzer(true);
+    auto response = helper.view(
+        lit("media/videocodecinfo"),
+        HanwhaRequestHelper::Parameters(),
+        kHanwhaChannelProperty);
+
+    if (!response.isSuccessful())
+    {
+        return {CameraDiagnostics::RequestFailedResult(
+            response.requestUrl(),
+            lit("Request failed"))};
+    }
+
+    const auto& parameters = cgiParameters();
+    if (!parameters)
+        return {CameraDiagnostics::CameraInvalidParams(lit("CGI parameters are invalid."))};
+
+
+    HanwhaCodecInfo codecInfo(response, parameters.value);
+    if (!codecInfo.isValid())
+    {
+        return {CameraDiagnostics::CameraInvalidParams(
+            lit("Video codec info is invalid"))};
+    }
+
+    return {CameraDiagnostics::NoErrorResult(), codecInfo};
 }
 
 } // namespace plugins

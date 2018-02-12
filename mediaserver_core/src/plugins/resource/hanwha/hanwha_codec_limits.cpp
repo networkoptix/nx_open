@@ -15,9 +15,16 @@ bool setValue(T* target, const T& value)
     return true;
 }
 
+static const std::map<QString, AVCodecID> kCodecProfileParameters = {
+    {lit("H264.Profile"), AVCodecID::AV_CODEC_ID_H264},
+    {lit("H265.Profile"), AVCodecID::AV_CODEC_ID_H265}
+};
+
 } // namespace
 
-bool HanwhaCodecLimits::setLimit(const QString& limitName, const QString& limitValue)
+bool HanwhaCodecLimits::setLimit(
+    const QString& limitName,
+    const QString& limitValue)
 {
     bool success = false;
     int value = limitValue.toInt(&success);
@@ -43,17 +50,21 @@ bool HanwhaCodecLimits::setLimit(const QString& limitName, const QString& limitV
         return setValue(&defaultCbrBitrate, value);
 
     if (limitName == kHanwhaMaxFpsProperty)
-        return setValue(&maxFps, value / 1000);
+        return setValue(&maxFps, value / (value < 1000 ? 1 : 1000));
 
     if (limitName == kHanwhaDefaultFpsProperty)
-        return setValue(&defaultFps, value / 1000);
+        return setValue(&defaultFps, value / (value < 1000 ? 1 : 1000));
 
     return false;
 }
 
-HanwhaCodecInfo::HanwhaCodecInfo(const HanwhaResponse& response)
+HanwhaCodecInfo::HanwhaCodecInfo(
+    const HanwhaResponse& response,
+    const HanwhaCgiParameters& cgiParameters)
 {
     m_isValid = parseResponse(response);
+    if (m_isValid)
+        m_isValid &= fetchCodecProfiles(cgiParameters);
 }
 
 boost::optional<HanwhaCodecLimits> HanwhaCodecInfo::limits(
@@ -104,7 +115,7 @@ boost::optional<HanwhaCodecLimits> HanwhaCodecInfo::limits(int channel, const QS
     return limits(channel, split[0], split[1], split[2]);
 }
 
-std::set<QSize> HanwhaCodecInfo::resolutions(
+std::vector<QSize> HanwhaCodecInfo::resolutions(
     int channel,
     AVCodecID codec,
     const QString& streamType) const
@@ -113,13 +124,13 @@ std::set<QSize> HanwhaCodecInfo::resolutions(
     return resolutions(channel, codecString, streamType);
 }
 
-std::set<QSize> HanwhaCodecInfo::resolutions(
+std::vector<QSize> HanwhaCodecInfo::resolutions(
     int channel,
     const QString& codec,
     const QString& streamType) const
 {
     const QString channelString = QString::number(channel);
-    std::set<QSize> result;
+    std::vector<QSize> result;
 
     auto channelInfo = m_channelInfo.find(channelString);
     if (channelInfo == m_channelInfo.cend())
@@ -134,16 +145,17 @@ std::set<QSize> HanwhaCodecInfo::resolutions(
         return result;
 
     for (const auto& entry: streamTypeInfo->second)
-        result.insert(fromHanwhaString<QSize>(entry.first));
+        result.push_back(fromHanwhaString<QSize>(entry.first));
 
+    sortResolutions(&result);
     return result;
 }
 
-std::set<QSize> HanwhaCodecInfo::resolutions(int channel, const QString& path) const
+std::vector<QSize> HanwhaCodecInfo::resolutions(int channel, const QString& path) const
 {
     const auto split = path.split(L'/');
     if (split.size() != 2)
-        return std::set<QSize>();
+        return std::vector<QSize>();
 
     return resolutions(channel, split[0], split[1]);
 }
@@ -187,6 +199,15 @@ std::set<AVCodecID> HanwhaCodecInfo::codecs(int channel) const
     return result;
 }
 
+QStringList HanwhaCodecInfo::codecProfiles(AVCodecID codec) const
+{
+    const auto profiles = m_codecProfiles.find(codec);
+    if (profiles == m_codecProfiles.cend())
+        return QStringList();
+
+    return profiles->second;
+}
+
 bool HanwhaCodecInfo::isValid() const
 {
     return m_isValid;
@@ -218,7 +239,42 @@ bool HanwhaCodecInfo::parseResponse(const HanwhaResponse& response)
             [split[3] /*StreamType*/]
             [split[4].toLower() /*Resolution*/];
 
+        qDebug() << "SETTING LIMIT:"
+            << split[1]
+            << split[2]
+            << split[3]
+            << split[4]
+            << split[5] << parameterValue;
+
         limits.setLimit(split[5], parameterValue);
+    }
+
+    return true;
+}
+
+void HanwhaCodecInfo::sortResolutions(std::vector<QSize>* resolutions)
+{
+    std::sort(
+        resolutions->begin(),
+        resolutions->end(),
+        [](const QSize& f, const QSize& s)
+        {
+            return f.width() * f.height() > s.width() * s.height();
+        });
+}
+
+bool HanwhaCodecInfo::fetchCodecProfiles(const HanwhaCgiParameters& cgiParameters)
+{
+    for (const auto& item: kCodecProfileParameters)
+    {
+        const auto& profileParameter = item.first;
+        auto codecId = item.second;
+
+        const auto profiles = cgiParameters.parameter(
+            lit("media/videoprofile/add_update/%1").arg(profileParameter));
+
+        if (profiles != boost::none)
+            m_codecProfiles[codecId] = profiles->possibleValues();
     }
 
     return true;
