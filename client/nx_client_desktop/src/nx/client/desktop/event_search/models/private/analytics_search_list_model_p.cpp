@@ -35,7 +35,7 @@ using namespace analytics::storage;
 
 namespace {
 
-static constexpr int kFetchBatchSize = 25;
+static constexpr int kFetchBatchSize = 110;
 
 static constexpr auto kUpdateTimerInterval = std::chrono::seconds(30);
 static constexpr auto kDataChangedInterval = std::chrono::milliseconds(250);

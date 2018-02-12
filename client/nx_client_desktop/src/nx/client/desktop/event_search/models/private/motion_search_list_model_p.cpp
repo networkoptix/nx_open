@@ -15,7 +15,7 @@ namespace desktop {
 
 namespace {
 
-static constexpr int kFetchBatchSize = 25;
+static constexpr int kFetchBatchSize = 110;
 
 } // namespace
 

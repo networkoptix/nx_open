@@ -182,6 +182,16 @@ void EventPanel::Private::setupEventSearch()
 
     defaultAction->trigger();
     button->setMenu(eventFilterMenu);
+
+    m_eventsTab->counterLabel()->setText(QString());
+    connectToRowCountChanges(m_eventsModel,
+        [this]()
+        {
+            const auto count = m_eventsModel->rowCount();
+            m_eventsTab->counterLabel()->setText(count
+                ? (count > 99 ? tr(">99 events") : tr("%n events", "", count))
+                : QString());
+        });
 }
 
 void EventPanel::Private::setupBookmarkSearch()
@@ -200,6 +210,16 @@ void EventPanel::Private::setupBookmarkSearch()
         {
             m_bookmarksModel->setFilterText(text);
             m_bookmarksTab->requestFetch();
+        });
+
+    m_bookmarksTab->counterLabel()->setText(QString());
+    connectToRowCountChanges(m_bookmarksModel,
+        [this]()
+        {
+            const auto count = m_bookmarksModel->rowCount();
+            m_bookmarksTab->counterLabel()->setText(count
+                ? (count > 99 ? tr(">99 bookmarks") : tr("%n bookmarks", "", count))
+                : QString());
         });
 }
 
@@ -237,6 +257,16 @@ void EventPanel::Private::setupAnalyticsSearch()
             if (state == ButtonState::deactivated)
                 m_currentMediaWidget->setAnalyticsSearchRect(QRectF());
     });
+
+    m_analyticsTab->counterLabel()->setText(QString());
+    connectToRowCountChanges(m_analyticsModel,
+        [this]()
+        {
+            const auto count = m_analyticsModel->rowCount();
+            m_analyticsTab->counterLabel()->setText(count
+                ? (count > 99 ? tr(">99 detected objects") : tr("%n detected objects", "", count))
+                : QString());
+        });
 }
 
 QnVirtualCameraResourcePtr EventPanel::Private::camera() const
@@ -356,6 +386,14 @@ void EventPanel::Private::setupBookmarksTabSyncWithNavigator()
                     m_tabs->setCurrentIndex(m_previousTabIndex);
             }
         });
+}
+
+void EventPanel::Private::connectToRowCountChanges(QAbstractItemModel* model,
+    std::function<void()> handler)
+{
+    connect(model, &QAbstractItemModel::modelReset, this, handler);
+    connect(model, &QAbstractItemModel::rowsInserted, this, handler);
+    connect(model, &QAbstractItemModel::rowsRemoved, this, handler);
 }
 
 } // namespace desktop

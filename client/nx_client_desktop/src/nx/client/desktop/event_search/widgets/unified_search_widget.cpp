@@ -92,8 +92,6 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->areaButton->setDeactivatable(true);
     ui->cameraButton->setDeactivatable(true);
 
-    ui->counterLabel->hide();
-
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
         this, &UnifiedSearchWidget::fetchMoreIfNeeded, Qt::QueuedConnection);
 

@@ -23,7 +23,6 @@ MotionSearchWidget::MotionSearchWidget(QWidget* parent):
     setMotionSearchEnabled(false);
 
     filterEdit()->hide();
-    counterLabel()->show();
 
     connect(m_model, &MotionSearchListModel::totalCountChanged,
         this, &MotionSearchWidget::updateEventCounter);

@@ -10,6 +10,7 @@
 class QTabWidget;
 class QStackedWidget;
 class QnMediaResourceWidget;
+class QAbstractItemModel;
 
 namespace QnNotificationLevel { enum class Value; }
 
@@ -53,6 +54,8 @@ private:
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
 
     void setupBookmarksTabSyncWithNavigator();
+
+    void connectToRowCountChanges(QAbstractItemModel* model, std::function<void()> handler);
 
 private:
     EventPanel* const q = nullptr;
