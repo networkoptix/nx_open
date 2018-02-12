@@ -1,10 +1,8 @@
 #include "updates2_status_data_ex.h"
 #include <nx/fusion/model_functions.h>
-#include <utils/common/synctime.h>
 
 namespace nx {
-namespace mediaserver {
-namespace updates2 {
+namespace update {
 namespace detail {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((Updates2StatusDataEx), (json), _Fields)
@@ -25,21 +23,9 @@ Updates2StatusDataEx::Updates2StatusDataEx(
     lastRefreshTime(lastRefreshTime)
 {}
 
-//Updates2StatusDataEx::Updates2StatusDataEx(const api::Updates2StatusData& other):
-//    Updates2StatusDataEx(
-//        qnSyncTime->currentMSecsSinceEpoch(),
-//        other.serverId, other.state,
-//        other.message, other.progress)
-//{}
-
-//Updates2StatusDataEx& Updates2StatusDataEx::operator=(const api::Updates2StatusData& other)
-//{
-
-//}
-
 void Updates2StatusDataEx::fromBase(const api::Updates2StatusData& other)
 {
-    lastRefreshTime = qnSyncTime->currentMSecsSinceEpoch();
+    lastRefreshTime = QDateTime::currentMSecsSinceEpoch();
     static_cast<Updates2StatusData&>(*this) = other;
 }
 
@@ -66,6 +52,5 @@ bool operator != (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& r
 }
 
 } // namespace detail
-} // namespace updates2
-} // namespace mediaserver
+} // namespace update
 } // namespace nx

@@ -1,20 +1,18 @@
+#include <nx/update/manager/detail/update_request_data_factory.h>
+#include <nx/update/installer/abstract_updates2_installer.h>
+#include <nx/update/info/abstract_update_registry.h>
+#include <nx/update/manager/detail/updates2_manager_base.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
-#include <nx/mediaserver/updates2/updates2_manager.h>
-#include <utils/common/synctime.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <nx/mediaserver/updates2/detail/update_request_data_factory.h>
-#include <nx/update/info/abstract_update_registry.h>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <thread>
 
 namespace nx {
-namespace mediaserver {
-namespace updates2 {
-namespace detail {
+namespace update {
 namespace test {
 
 class TestUpdateRegistry: public update::info::AbstractUpdateRegistry
@@ -77,7 +75,6 @@ const static QString kFileName = "test.file.name";
 class TestInstaller: public AbstractUpdates2Installer, public QnLongRunnable
 {
 public:
-//    MOCK_METHOD2(prepareAsync, void(const QString& path, PrepareUpdateCompletionHandler handler));
     virtual void prepareAsync(
         const QString& /*path*/,
         PrepareUpdateCompletionHandler handler) override
@@ -150,7 +147,7 @@ private:
     }
 };
 
-class TestUpdates2Manager: public Updates2ManagerBase
+class TestUpdates2Manager: public detail::Updates2ManagerBase
 {
 public:
     void setStatus(const detail::Updates2StatusDataEx& status)
@@ -205,7 +202,8 @@ public:
         m_getRemoteRegistryCondition.wakeOne();
     }
 
-    MOCK_METHOD0(refreshTimeout, qint64());
+    MOCK_CONST_METHOD0(refreshTimeout, qint64());
+    MOCK_CONST_METHOD0(filePath, QString());
     MOCK_METHOD0(loadStatusFromFile, void());
     MOCK_METHOD0(connectToSignals, void());
 
@@ -223,7 +221,7 @@ public:
         return m_remoteRegistryFactoryFunc();
     }
 
-    MOCK_METHOD0(moduleGuid, QnUuid());
+    MOCK_CONST_METHOD0(moduleGuid, QnUuid());
     MOCK_METHOD1(updateGlobalRegistry, void(const QByteArray& serializedRegistry));
 
     virtual void writeStatusToFile(const detail::Updates2StatusDataEx& statusData) override
@@ -281,7 +279,7 @@ protected:
 
     virtual void SetUp() override
     {
-        UpdateFileRequestDataFactory::setFactoryFunc(
+        detail::UpdateFileRequestDataFactory::setFactoryFunc(
             []()
             {
                 return update::info::UpdateFileRequestData(
@@ -516,7 +514,6 @@ protected:
     }
 
 private:
-    QnSyncTime m_syncTimeInstance;
     TestDownloader m_testDownloader;
     TestUpdates2Manager m_testUpdates2Manager;
     TestInstaller m_testInstaller;
@@ -849,7 +846,5 @@ TEST_F(Updates2Manager, Prepare_failedNoFreeSpace)
 }
 
 } // namespace test
-} // namespace detail
-} // namespace updates2
-} // namespace mediaserver
+} // namespace update
 } // namespace nx

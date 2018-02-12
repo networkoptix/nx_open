@@ -3,11 +3,10 @@
 #include <nx/api/updates2/updates2_status_data.h>
 
 namespace nx {
-namespace mediaserver {
-namespace updates2 {
+namespace update {
 namespace detail {
 
-struct Updates2StatusDataEx: api::Updates2StatusData
+struct NX_UPDATE_API Updates2StatusDataEx: api::Updates2StatusData
 {
     qint64 lastRefreshTime = 0;
     QSet<QString> files;
@@ -37,6 +36,5 @@ bool operator != (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& r
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Updates2StatusDataEx), (json))
 
 } // namespace detail
-} // namespace updates2
-} // namespace mediaserver
+} // namespace update
 } // namespace nx
