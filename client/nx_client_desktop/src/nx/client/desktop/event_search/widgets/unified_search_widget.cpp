@@ -92,6 +92,8 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->areaButton->setDeactivatable(true);
     ui->cameraButton->setDeactivatable(true);
 
+    ui->counterLabel->hide();
+
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
         this, &UnifiedSearchWidget::fetchMoreIfNeeded, Qt::QueuedConnection);
 
@@ -375,6 +377,12 @@ void UnifiedSearchWidget::updatePlaceholderState()
     }
 
     ui->placeholder->setHidden(hidden);
+    ui->counterLabel->setVisible(hidden);
+}
+
+QLabel* UnifiedSearchWidget::counterLabel() const
+{
+    return ui->counterLabel;
 }
 
 } // namespace desktop

@@ -33,9 +33,10 @@ private:
     using base_type::model;
     using base_type::setModel;
 
+    void updateEventCounter(int totalCount);
+
 private:
     class FilterModel;
-    FilterModel* const m_filterModel = nullptr;
     MotionSearchListModel* const m_model = nullptr;
 };
 
