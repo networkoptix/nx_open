@@ -368,9 +368,9 @@ QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const Wearable
     case WearablePayload::NoTimestamp:
         return tr("File \"%1\" does not have timestamp.").arg(fileName);
     case WearablePayload::ChunksTakenByFileInQueue:
-        return tr("File \"%1\" cover periods for which video is already being uploaded.").arg(fileName);
+        return tr("File \"%1\" covers period(s) that video is already being uploaded for.").arg(fileName);
     case WearablePayload::ChunksTakenOnServer:
-        return tr("File \"%1\" cover periods for which video has already been uploaded.").arg(fileName);
+        return tr("File \"%1\" covers period(s) that video has already been uploaded for.").arg(fileName);
     case WearablePayload::NoSpaceOnServer:
         return tr("There is no space on server for file \"%1\".").arg(fileName);
     default:
