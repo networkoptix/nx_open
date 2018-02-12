@@ -318,11 +318,6 @@ bool QnResource::hasParam(const QString &name) const
     return resType->hasParam(name);
 }
 
-bool QnResource::unknownResource() const
-{
-    return getName().isEmpty();
-}
-
 QnUuid QnResource::getTypeId() const
 {
     QnMutexLocker mutexLocker(&m_mutex);
