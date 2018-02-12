@@ -7,8 +7,6 @@
 
 #include <utils/math/math.h>
 
-#include <nx/utils/app_info.h>
-
 extern "C" {
 #ifdef WIN32
 #   define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
@@ -378,27 +376,23 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
 
 QImage CLVideoDecoderOutput::toImage() const
 {
-    // In some cases direct conversion to AV_PIX_FMT_BGRA in MacOS X causes crash in sws_scale
+    // In some cases direct conversion to AV_PIX_FMT_BGRA causes crash in sws_scale
     // function. As workaround we can temporary convert to AV_PIX_FMT_ARGB format and then convert
     // to target AV_PIX_FMT_BGRA
+    const AVPixelFormat intermediateFormat = AV_PIX_FMT_ARGB;
+    const AVPixelFormat targetFormat = AV_PIX_FMT_BGRA;
 
-    const AVPixelFormat targetFormat =
-        nx::utils::AppInfo::isMacOsX() ? AV_PIX_FMT_ARGB : AV_PIX_FMT_BGRA;
-
-    CLVideoDecoderOutputPtr target(new CLVideoDecoderOutput(width, height, targetFormat));
+    CLVideoDecoderOutputPtr target(new CLVideoDecoderOutput(width, height, intermediateFormat));
 
     convertImageFormat(width, height,
-        data, linesize, (AVPixelFormat) format,
-        target->data, target->linesize, targetFormat);
+        data, linesize, (AVPixelFormat)format,
+        target->data, target->linesize, intermediateFormat);
 
-    if (nx::utils::AppInfo::isMacOsX()) // Workaround for MacOS X.
-    {
-        const CLVideoDecoderOutputPtr converted(new CLVideoDecoderOutput(width, height, AV_PIX_FMT_BGRA));
-        convertImageFormat(width, height,
-            target->data, target->linesize, targetFormat,
-            converted->data, converted->linesize, AV_PIX_FMT_BGRA);
-        target = converted;
-    }
+    const CLVideoDecoderOutputPtr converted(new CLVideoDecoderOutput(width, height, targetFormat));
+    convertImageFormat(width, height,
+        target->data, target->linesize, intermediateFormat,
+        converted->data, converted->linesize, targetFormat);
+    target = converted;
 
     QImage img(width, height, QImage::Format_ARGB32);
     for (int y = 0; y < height; ++y)
