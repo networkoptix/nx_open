@@ -19,9 +19,11 @@ from robot.libraries.BuiltIn import BuiltIn
 
 class NoptixLibrary(object):
 
+
     def copy_text(self, locator):
         locator.send_keys(Keys.CONTROL+'a')
         locator.send_keys(Keys.CONTROL+'c')
+        
 
     def paste_text(self, locator):
         locator.send_keys(Keys.CONTROL+'v')

@@ -180,10 +180,11 @@ should display same user data as showed in user account (stress to cyrillic)
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 
-    Log In    ${email}    ${password}
-    Validate Log In
     Go To    ${url}/account
-    Wait Until Elements Are Visible    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}
+    Log In    ${email}    ${password}    None
+    Validate Log In
+    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    mark
+    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    hamill
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${CYRILLIC NAME}
     Clear Element Text    ${ACCOUNT LAST NAME}
@@ -191,6 +192,7 @@ should display same user data as showed in user account (stress to cyrillic)
     sleep    .15
     Wait Until Element Is Visible    ${ACCOUNT SAVE}
     Click Button    ${ACCOUNT SAVE}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
 
