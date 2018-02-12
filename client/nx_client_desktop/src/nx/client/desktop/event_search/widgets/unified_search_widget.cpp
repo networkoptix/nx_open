@@ -374,10 +374,12 @@ void UnifiedSearchWidget::updatePlaceholderState()
         ui->placeholderText->setText(isConstrained()
             ? m_placeholderTextConstrained
             : m_placeholderTextUnconstrained);
+
+        ui->placeholderText->adjustSize();
     }
 
     ui->placeholder->setHidden(hidden);
-    ui->counterLabel->setVisible(hidden);
+    ui->counterContainer->setVisible(hidden);
 }
 
 QLabel* UnifiedSearchWidget::counterLabel() const
