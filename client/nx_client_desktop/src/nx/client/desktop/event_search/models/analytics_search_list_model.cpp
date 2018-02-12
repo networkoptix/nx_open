@@ -31,21 +31,6 @@ void AnalyticsSearchListModel::setFilterText(const QString& value)
     d->setFilterText(value);
 }
 
-bool AnalyticsSearchListModel::setData(const QModelIndex& index, const QVariant& /*value*/, int role)
-{
-    if (!index.isValid() || index.model() != this)
-        return false;
-
-    switch (role)
-    {
-        case Qn::DefaultNotificationRole:
-            return d->defaultAction(index.row());
-
-        default:
-            return false;
-    }
-}
-
 bool AnalyticsSearchListModel::isConstrained() const
 {
     return filterRect().isValid() || base_type::isConstrained();
