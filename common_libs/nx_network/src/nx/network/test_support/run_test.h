@@ -14,13 +14,15 @@ namespace test {
  * Sets up environment and runs Google Tests. Should be used for all unit tests which use network.
  */
 inline int runTest(
-    int& argc, const char* argv[],
+    int argc, const char* argv[],
     utils::test::InitFunction extraInit = nullptr,
-    int socketGlobalsFlags = 0)
+    int socketGlobalsFlags = 0,
+    int gtestRunFlags = 0)
 {
     return utils::test::runTest(
         argc, argv,
-        [extraInit = std::move(extraInit), socketGlobalsFlags](const utils::ArgumentParser& args)
+        [extraInit = std::move(extraInit), socketGlobalsFlags](
+            const utils::ArgumentParser& args)
         {
             nx::utils::DetachedThreads detachedThreadsGuard;
 
@@ -40,15 +42,21 @@ inline int runTest(
                 });
 
             return deinitFunctions;
-        });
+        },
+        gtestRunFlags);
 }
 
 inline int runTest(
-    int& argc, char* argv[],
+    int argc, char* argv[],
     utils::test::InitFunction extraInit = nullptr,
-    int socketGlobalsFlags = 0)
+    int socketGlobalsFlags = 0,
+    int gtestRunFlags = 0)
 {
-    return runTest(argc, (const char**)argv, std::move(extraInit), socketGlobalsFlags);
+    return runTest(
+        argc, (const char**)argv,
+        std::move(extraInit),
+        socketGlobalsFlags,
+        gtestRunFlags);
 }
 
 } // namespace test

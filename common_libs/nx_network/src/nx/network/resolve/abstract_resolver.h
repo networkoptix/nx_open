@@ -6,6 +6,7 @@
 
 #include <nx/utils/system_error.h>
 
+#include "address_entry.h"
 #include "../socket_common.h"
 
 namespace nx {
@@ -22,7 +23,7 @@ public:
     virtual SystemError::ErrorCode resolve(
         const QString& hostName,
         int ipVersion,
-        std::deque<HostAddress>* resolvedAddresses) = 0;
+        std::deque<AddressEntry>* resolvedAddresses) = 0;
 };
 
 } // namespace network

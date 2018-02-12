@@ -11,7 +11,6 @@ ${url}         ${CLOUD TEST}
 Validate Register Success
     [arguments]    ${location}
     Wait Until Element Is Visible    ${ACCOUNT CREATION SUCCESS}
-    Element Should Be Visible    ${ACCOUNT CREATION SUCCESS}
     Location Should Be    ${location}
 
 Check Bad Email Input
@@ -193,17 +192,13 @@ should suggest user to log out, if he was logged in and goes to registration lin
     Validate Log In
     Go To    ${url}/register
     Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
-    Element Should Be Visible    ${LOGGED IN CONTINUE BUTTON}
-    Element Should Be Visible    ${LOGGED IN LOG OUT BUTTON}
     Close Browser
 
 should display promo-block, if user goes to registration from native app
     Open Browser and go to URL    ${url}/register?from=client
     Wait Until Element Is Visible    ${PROMO BLOCK}
-    Element Should Be Visible    ${PROMO BLOCK}
     Go To    ${url}/register?from=mobile
     Wait Until Element Is Visible    ${PROMO BLOCK}
-    Element Should Be Visible    ${PROMO BLOCK}
     Close Browser
 
 should not display promo-block, if user goes to registration not from native app

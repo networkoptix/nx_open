@@ -1,15 +1,15 @@
 {
   "activate_account": {
-    "emailSubject": "Activate your account"
+    "emailSubject": "Aktivieren Sie Ihr Konto"
   },
   "restore_password": {
-    "emailSubject": "Reset your password"
+    "emailSubject": "Passwort zurücksetzen"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
+    "emailSubject": "{{message.sharer_name}} lädt Sie zu {{PRODUCT_NAME}} ein"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
+    "emailSubject": "{{message.sharer_name}} lädt Sie zu {{PRODUCT_NAME}} ein"
   },
   "review_version": {
     "emailSubject": "Version {{message.id}} ist bereit, überprüft zu werden"

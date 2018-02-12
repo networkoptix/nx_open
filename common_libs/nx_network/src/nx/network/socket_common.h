@@ -59,6 +59,7 @@ static const size_t kTypicalMtuSize = 1500;
 
 enum InitializationFlags
 {
+    none = 0,
     disableUdt = 0x01,
     disableCloudConnect = 0x02
 };

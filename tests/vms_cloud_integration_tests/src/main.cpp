@@ -28,5 +28,7 @@ int main(int argc, char** argv)
 
             nx::network::ssl::Engine::useRandomCertificate("vms_cloud_integration_tests");
             return nx::utils::test::DeinitFunctions();
-        });
+        },
+        nx::network::InitializationFlags::none,
+        nx::utils::test::GtestRunFlag::gtestThrowOnFailure);
 }

@@ -18,21 +18,21 @@
     "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
     "flashOrWebmRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> hoặc<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> để phát video trong Internet Explorer.",
     "noArmSupport": "Trình duyệt hoặc thiết bị này không hỗ trợ xem video từ máy chủ trên nền ARM.",
-    "noFormat": "This browser does not support video playback from this camera.",
+    "noFormat": "Trình duyệt này không hỗ trợ phát lại video từ camera này.",
     "ieNoWebm": "Hãy cài đặt <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> cho Internet Explorer.",
     "ieWin10": "Vui lòng, sử dụng Microsoft Edge hoặc trình duyệt Google Chrome.",
     "ubuntuNX": "Trình duyệt này không hỗ trợ video từ máy chủ dựa trên ARM. Vui lòng sử dụng trình duyệt Chromium để thay thế."
   },
-  "searchCamPlaceholder": "Search",
+  "searchCamPlaceholder": "Tìm kiếm",
   "resolution": {
-    "auto": "Auto",
-    "high": "High",
-    "low": "Low"
+    "auto": "tự động",
+    "high": "cao (H)",
+    "low": "thấp (L)"
   },
   "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
   "voiceCommands": {
-    "play": "play",
-    "pause": "pause",
+    "play": "broadcast",
+    "pause": "giờ nghĩ giảo lao",
     "live": "go to live | show me live",
     "view": "view + [camera name]",
     "search": "find + [text for searchbar]",

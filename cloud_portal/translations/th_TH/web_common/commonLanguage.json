@@ -18,21 +18,21 @@
     "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
     "flashOrWebmRequired": "โปรด <a href='https://get.adobe.com/flashplayer/' target='_blank'> ติดตั้ง Adobe Flash</a> หรือ<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> สำหรับเล่นวิดีโอใน Internet Explorer",
     "noArmSupport": "เบราว์เซอร์หรืออุปกรณ์นี้ไม่สนับสนุนการเล่นวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM",
-    "noFormat": "This browser does not support video playback from this camera.",
+    "noFormat": "เบราเซอร์หรืออุปกรณ์นี้ไม่รองรับการเล่นวิดีโอจากกล้องนี้",
     "ieNoWebm": "โปรดติดตั้ง <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> สำหรับ Internet Explorer",
     "ieWin10": "โปรดใช้ Microsoft Edge หรือเบราว์เซอร์ Google Chrome",
     "ubuntuNX": "เบราว์เซอร์นี้ไม่สนับสนุนวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM โปรดใช้เบราว์เซอร์ Chromium แทน"
   },
-  "searchCamPlaceholder": "Search",
+  "searchCamPlaceholder": "ค้นหา",
   "resolution": {
-    "auto": "Auto",
-    "high": "High",
-    "low": "Low"
+    "auto": "อัตโนมัติ",
+    "high": "สูง",
+    "low": "ต่ำ"
   },
   "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
   "voiceCommands": {
-    "play": "play",
-    "pause": "pause",
+    "play": "เล่น",
+    "pause": "หยุด",
     "live": "go to live | show me live",
     "view": "view + [camera name]",
     "search": "find + [text for searchbar]",

@@ -1,4 +1,4 @@
-Thông điệp mới
+Tin nhắn mới
 
 Loại: {{message.type}}
 Dữ liệu: {{{message.data}}}
