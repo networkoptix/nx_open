@@ -170,6 +170,34 @@
     </message>
   </context>
   <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <source>Form</source>
+      <translation>フォーム</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Fixed Archive Length</source>
+      <translation>アーカイブ保持期間</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. Days</source>
+      <translation>最低(日)</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Auto</source>
+      <translation>自動</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Max. Days</source>
+      <translation>最大(日)</translation>
+    </message>
+  </context>
+  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -818,26 +846,6 @@
       <location/>
       <source>Do Not Record</source>
       <translation>録画しない</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fixed Archive Length</source>
-      <translation>アーカイブ保持期間</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation>自動</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation>最低(日)</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Max. Days</source>
-      <translation>最大(日)</translation>
     </message>
     <message>
       <location/>
@@ -1815,6 +1823,24 @@
     </message>
   </context>
   <context>
+    <name>NewWearableCameraDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
+      <source>New Wearable Camera...</source>
+      <translation>新しいウェアラブルカメラ...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>To server</source>
+      <translation>サーバー</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+    </message>
+  </context>
+  <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
@@ -2695,6 +2721,12 @@
       <source>TextLabel</source>
       <translation type="unfinished">TextLabel</translation>
     </message>
+    <message>
+      <location/>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
+The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>アップロードされたアーカイブは、サーバーストレージに空き容量がない場合、自動的に削除されます　サーバー上のすべてのカメラの中で最も古い映像が最初に削除されます</translation>
+    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -2867,11 +2899,6 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>バックアップ設定...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>無効になっているストレージへの記録は停止しますが古い記録の削除は実行されます</translation>
     </message>
   </context>
   <context>
@@ -3081,6 +3108,70 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Edit Roles...</source>
       <translation>役割を編集...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Form</source>
+      <translation>フォーム</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>モーション検知</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation type="unfinished">Detect motion in uploaded video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>感度:</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableProgressWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
+      <source>Form</source>
+      <translation>フォーム</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cancel</source>
+      <translation>キャンセル</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableUploadWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
+      <source>Form</source>
+      <translation>フォーム</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Video</source>
+      <translation>ビデオをアップロード</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload File...</source>
+      <translation>ファイルをアップロード</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Folder...</source>
+      <translation>フォルダをアップロード...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&lt;warning&gt;</source>
+      <translation>&lt;警告&gt;</translation>
     </message>
   </context>
   <context>

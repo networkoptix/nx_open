@@ -166,7 +166,35 @@
     <message>
       <location/>
       <source>Event Type:</source>
-      <translation>Event Type:</translation>
+      <translation type="unfinished">Event Type:</translation>
+    </message>
+  </context>
+  <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <source>Form</source>
+      <translation>Form</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Fixed Archive Length</source>
+      <translation>Fixed Archive Length</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. Days</source>
+      <translation>Min. Days</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Max. Days</source>
+      <translation>Max. Days</translation>
     </message>
   </context>
   <context>
@@ -361,7 +389,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation>Bookmark Info</translation>
+      <translation type="unfinished">Bookmark Info</translation>
     </message>
     <message>
       <location/>
@@ -371,17 +399,17 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>Area Width</translation>
+      <translation type="unfinished">Area Width</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>Font Size</translation>
+      <translation type="unfinished">Font Size</translation>
     </message>
     <message>
       <location/>
       <source>Include description</source>
-      <translation>Include description</translation>
+      <translation type="unfinished">Include description</translation>
     </message>
   </context>
   <context>
@@ -690,42 +718,42 @@
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
+      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
     </message>
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation>Camera Settings</translation>
+      <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
       <location/>
       <source>Keep camera stream and profile settings</source>
-      <translation>Keep camera stream and profile settings</translation>
+      <translation type="unfinished">Keep camera stream and profile settings</translation>
     </message>
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation>Calculate bitrate per GOP instead of bitrate per second</translation>
+      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
     </message>
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation>It will increase bitrate for camera.</translation>
+      <translation type="unfinished">It will increase bitrate for camera.</translation>
     </message>
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation>Secondary Stream</translation>
+      <translation type="unfinished">Secondary Stream</translation>
     </message>
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation>Disable secondary stream</translation>
+      <translation type="unfinished">Disable secondary stream</translation>
     </message>
     <message>
       <location/>
@@ -740,17 +768,17 @@
     <message>
       <location/>
       <source>Archive</source>
-      <translation>Archive</translation>
+      <translation type="unfinished">Archive</translation>
     </message>
     <message>
       <location/>
       <source>Media Streaming</source>
-      <translation>Media Streaming</translation>
+      <translation type="unfinished">Media Streaming</translation>
     </message>
     <message>
       <location/>
       <source>PTZ</source>
-      <translation>PTZ</translation>
+      <translation type="unfinished">PTZ</translation>
     </message>
   </context>
   <context>
@@ -821,26 +849,6 @@
     </message>
     <message>
       <location/>
-      <source>Fixed Archive Length</source>
-      <translation>Fixed Archive Length</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation>Min. Days</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Max. Days</source>
-      <translation>Max. Days</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Recording</source>
       <translation>Motion Recording</translation>
     </message>
@@ -902,7 +910,7 @@
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation>Bitrate</translation>
+      <translation type="unfinished">Bitrate</translation>
     </message>
   </context>
   <context>
@@ -1056,12 +1064,12 @@
     <message>
       <location/>
       <source>Authentication type</source>
-      <translation type="unfinished">Authentication type</translation>
+      <translation>Authentication type</translation>
     </message>
     <message>
       <location/>
       <source>Request type</source>
-      <translation type="unfinished">Request type</translation>
+      <translation>Request type</translation>
     </message>
   </context>
   <context>
@@ -1077,12 +1085,12 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>Export Settings</translation>
+      <translation type="unfinished">Export Settings</translation>
     </message>
     <message>
       <location/>
       <source>Make read-only</source>
-      <translation>Make read-only</translation>
+      <translation type="unfinished">Make read-only</translation>
     </message>
   </context>
   <context>
@@ -1090,22 +1098,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>Export Settings</translation>
+      <translation type="unfinished">Export Settings</translation>
     </message>
     <message>
       <location/>
       <source>Apply Filters</source>
-      <translation>Apply Filters</translation>
+      <translation type="unfinished">Apply Filters</translation>
     </message>
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>Rotation, Dewarping, Image Enhancement etc.</translation>
+      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
     </message>
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
     </message>
   </context>
   <context>
@@ -1141,22 +1149,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation>Export Video</translation>
+      <translation type="unfinished">Export Video</translation>
     </message>
     <message>
       <location/>
       <source>Single Camera</source>
-      <translation>Single Camera</translation>
+      <translation type="unfinished">Single Camera</translation>
     </message>
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation>Export Settings</translation>
+      <translation type="unfinished">Export Settings</translation>
     </message>
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation>Multi Video</translation>
+      <translation type="unfinished">Multi Video</translation>
     </message>
   </context>
   <context>
@@ -1334,12 +1342,12 @@
     <message>
       <location/>
       <source>Opacity</source>
-      <translation>Opacity</translation>
+      <translation type="unfinished">Opacity</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
-      <translation>Default</translation>
+      <translation type="unfinished">Default</translation>
     </message>
     <message>
       <location/>
@@ -1815,6 +1823,24 @@
     </message>
   </context>
   <context>
+    <name>NewWearableCameraDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>To server</source>
+      <translation type="unfinished">To server</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+    </message>
+  </context>
+  <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
@@ -2275,32 +2301,32 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation>Rapid Review</translation>
+      <translation type="unfinished">Rapid Review</translation>
     </message>
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation>Initial video length</translation>
+      <translation type="unfinished">Initial video length</translation>
     </message>
     <message>
       <location/>
       <source>Exported video length</source>
-      <translation>Exported video length</translation>
+      <translation type="unfinished">Exported video length</translation>
     </message>
     <message>
       <location/>
       <source>Speed</source>
-      <translation>Speed</translation>
+      <translation type="unfinished">Speed</translation>
     </message>
     <message>
       <location/>
       <source>Frames interval</source>
-      <translation>Frames interval</translation>
+      <translation type="unfinished">Frames interval</translation>
     </message>
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation>Reset Speed</translation>
+      <translation type="unfinished">Reset Speed</translation>
     </message>
   </context>
   <context>
@@ -2695,6 +2721,13 @@
       <source>TextLabel</source>
       <translation>TextLabel</translation>
     </message>
+    <message>
+      <location/>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
+The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
+The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -2868,11 +2901,6 @@
       <source>Backup Settings...</source>
       <translation>Backup Settings...</translation>
     </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -2961,7 +2989,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
       <source>Text</source>
-      <translation>Text</translation>
+      <translation type="unfinished">Text</translation>
     </message>
     <message>
       <location/>
@@ -2971,17 +2999,17 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>Font Size</translation>
+      <translation type="unfinished">Font Size</translation>
     </message>
     <message>
       <location/>
       <source>Enter plain text or HTML</source>
-      <translation>Enter plain text or HTML</translation>
+      <translation type="unfinished">Enter plain text or HTML</translation>
     </message>
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>Area Width</translation>
+      <translation type="unfinished">Area Width</translation>
     </message>
   </context>
   <context>
@@ -3002,17 +3030,17 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation>Timestamp</translation>
+      <translation type="unfinished">Timestamp</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>Font Size</translation>
+      <translation type="unfinished">Font Size</translation>
     </message>
     <message>
       <location/>
       <source>Format</source>
-      <translation>Format</translation>
+      <translation type="unfinished">Format</translation>
     </message>
     <message>
       <location/>
@@ -3082,6 +3110,70 @@ Click &quot;New role&quot; button to create one.</translation>
       <location/>
       <source>Edit Roles...</source>
       <translation>Edit Roles...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Form</source>
+      <translation>Form</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>Motion Detection</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation type="unfinished">Detect motion in uploaded video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>Sensitivity</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableProgressWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
+      <source>Form</source>
+      <translation>Form</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cancel</source>
+      <translation>Cancel</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableUploadWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
+      <source>Form</source>
+      <translation>Form</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Video</source>
+      <translation type="unfinished">Upload Video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload File...</source>
+      <translation type="unfinished">Upload File...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Folder...</source>
+      <translation type="unfinished">Upload Folder...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&lt;warning&gt;</source>
+      <translation>&lt;warning&gt;</translation>
     </message>
   </context>
   <context>

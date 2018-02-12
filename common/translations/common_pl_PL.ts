@@ -500,16 +500,16 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%2: %n jest wykorzystywana na %1.</numerusform>
-        <numerusform>%2: %n są wykorzystywane na %1.</numerusform>
+        <numerusform>%2: %n jest wykorzystywanych na %1.</numerusform>
+        <numerusform>%2: %n jest wykorzystywanych na %1.</numerusform>
         <numerusform>%2: %n jest wykorzystywanych na %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>%2: %n zostanie wykorzystana na %1.</numerusform>
-        <numerusform>%2: %n zostaną wykorzystane na %1.</numerusform>
+        <numerusform>%2: %n zostanie wykorzystanych na %1.</numerusform>
+        <numerusform>%2: %n zostanie wykorzystanych na %1.</numerusform>
         <numerusform>%2: %n zostanie wykorzystanych na %1.</numerusform>
       </translation>
     </message>
@@ -593,8 +593,8 @@
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n urządzeń</numerusform>
-        <numerusform>%n Urządzeń</numerusform>
+        <numerusform>%n Urządzenie</numerusform>
+        <numerusform>%n Urządzenia</numerusform>
         <numerusform>%n Urządzeń</numerusform>
       </translation>
     </message>
@@ -927,9 +927,9 @@
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
+        <numerusform>sekunda</numerusform>
+        <numerusform>sekundy</numerusform>
         <numerusform>sekund</numerusform>
-        <numerusform>sek.</numerusform>
-        <numerusform>sek.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -945,8 +945,8 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>godzin</numerusform>
-        <numerusform>godzin</numerusform>
+        <numerusform>godzina</numerusform>
+        <numerusform>godziny</numerusform>
         <numerusform>godzin</numerusform>
       </translation>
     </message>
@@ -954,7 +954,7 @@
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>dni</numerusform>
+        <numerusform>dzień</numerusform>
         <numerusform>dni</numerusform>
         <numerusform>dni</numerusform>
       </translation>
@@ -1194,23 +1194,23 @@
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>Rozłączono urządzenie</numerusform>
-        <numerusform>Rozłączono urządzenia</numerusform>
-        <numerusform>Rozłączono urządzenia</numerusform>
+        <numerusform>Rozłączone urządzenie</numerusform>
+        <numerusform>Rozłączone urządzenia</numerusform>
+        <numerusform>Rozłączone urządzenia</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
       <translation>
-        <numerusform>Rozłączenie kamery</numerusform>
-        <numerusform>Rozłączenie kamer</numerusform>
-        <numerusform>Rozłączenie kamer</numerusform>
+        <numerusform>Rozłączona kamera</numerusform>
+        <numerusform>Rozłączone kamery</numerusform>
+        <numerusform>Rozłączone kamery</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices IP Conflict</source>
       <translation>
-        <numerusform>Konflikt urządzenia IP</numerusform>
+        <numerusform>Konflikt urządzeń IP</numerusform>
         <numerusform>Konflikty urządzeń IP</numerusform>
         <numerusform>Konflikty urządzeń IP</numerusform>
       </translation>
@@ -1218,7 +1218,7 @@
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
       <translation>
-        <numerusform>Konflikt kamery IP</numerusform>
+        <numerusform>Konflikt kamer IP</numerusform>
         <numerusform>Konflikty kamer IP</numerusform>
         <numerusform>Konflikty kamer IP</numerusform>
       </translation>
@@ -1378,7 +1378,7 @@
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
-        <numerusform>Nie otrzymano żadnych danych w ciągu ostatnich sekund.</numerusform>
+        <numerusform>Nie otrzymano żadnych danych w ciągu ostatniej %n sekundy.</numerusform>
         <numerusform>Nie otrzymano żadnych danych w ciągu ostatnich %n sekund.</numerusform>
         <numerusform>Nie otrzymano żadnych danych w ciągu ostatnich %n sekund.</numerusform>
       </translation>
@@ -1502,9 +1502,9 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
+        <numerusform>%n Użytkownik</numerusform>
         <numerusform>%n Użytkowników</numerusform>
-        <numerusform>%n użytkowników</numerusform>
-        <numerusform>%n użytkowników</numerusform>
+        <numerusform>%n Użytkowników</numerusform>
       </translation>
     </message>
     <message numerus="yes">
