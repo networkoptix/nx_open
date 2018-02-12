@@ -1695,13 +1695,13 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessible by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessible by any user.</translation>
+      <source>To server</source>
+      <translation type="unfinished">To server</translation>
     </message>
     <message>
       <location/>
-      <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -2890,6 +2890,29 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Edit Roles...</source>
       <translation>編輯角色...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Form</source>
+      <translation>表格</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>位移偵測</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation type="unfinished">Detect motion in uploaded video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>靈敏度:</translation>
     </message>
   </context>
   <context>
