@@ -210,7 +210,7 @@ protected:
     {
         struct in_addr inAddr;
         memset(&inAddr, 0, sizeof(inAddr));
-        inAddr.S_un.S_addr = nx::utils::random::number<std::uint32_t>();
+        inAddr.s_addr = nx::utils::random::number<std::uint32_t>();
         m_dnsEntry = HostAddress(inAddr);
         m_resolver.dnsResolver().addEtcHost(m_hostNameToResolve, {*m_dnsEntry});
     }
@@ -332,7 +332,7 @@ protected:
         {
             struct in_addr inAddr;
             memset(&inAddr, 0, sizeof(inAddr));
-            inAddr.S_un.S_addr = 1000 + i;
+            inAddr.s_addr = 1000 + i;
             HostAddress address(inAddr);
             const SocketAddress endpoint(address, 12345);
             m_fixedEntries.push_back(endpoint);
