@@ -49,7 +49,7 @@ static std::deque<HostAddress> convertAddrInfo(addrinfo* addressInfo)
 SystemError::ErrorCode SystemResolver::resolve(
     const QString& hostName,
     int ipVersion,
-    std::deque<HostAddress>* resolvedAddresses)
+    std::deque<AddressEntry>* resolvedEntries)
 {
     auto resultCode = SystemError::noError;
     const auto guard = makeScopeGuard([&]() { SystemError::setLastErrorCode(resultCode); });
@@ -101,8 +101,13 @@ SystemError::ErrorCode SystemResolver::resolve(
     }
 
     std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> addressInfoGuard(addressInfo, &freeaddrinfo);
-    *resolvedAddresses = convertAddrInfo(addressInfo);
-    if (resolvedAddresses->empty())
+    auto resolvedAddresses = convertAddrInfo(addressInfo);
+    for (auto& address: resolvedAddresses)
+    {
+        resolvedEntries->push_back(
+            AddressEntry(AddressType::direct, std::move(address)));
+    }
+    if (resolvedEntries->empty())
         return SystemError::hostNotFound;
 
     return SystemError::noError;

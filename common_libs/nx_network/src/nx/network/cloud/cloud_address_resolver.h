@@ -1,21 +1,28 @@
 #pragma once
 
-#include "abstract_resolver.h"
+#include <QtCore/QRegExp>
+
+#include <nx/utils/thread/mutex.h>
+
+#include "../resolve/abstract_resolver.h"
 
 namespace nx {
 namespace network {
 
-/**
- * Resolves address using OS-provided API.
- */
-class NX_NETWORK_API SystemResolver:
+class CloudAddressResolver:
     public AbstractResolver
 {
 public:
+    CloudAddressResolver();
+
     virtual SystemError::ErrorCode resolve(
         const QString& hostName,
         int ipVersion,
         std::deque<AddressEntry>* resolvedAddresses) override;
+
+private:
+    const QRegExp m_cloudAddressRegExp;
+    QnMutex m_mutex;
 };
 
 } // namespace network
