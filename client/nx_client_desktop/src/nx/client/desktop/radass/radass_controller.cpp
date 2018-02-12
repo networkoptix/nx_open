@@ -62,7 +62,7 @@ bool isForcedHqDisplay(QnCamDisplay* display)
     return display->isFullScreen() || display->isZoomWindow() || display->isFisheyeEnabled();
 }
 
-bool isForcedLqDisplay(QnCamDisplay* display)
+bool isFastForwardOrRevMode(QnCamDisplay* display)
 {
     const auto speed = display->getSpeed();
     return speed > 1 + kSpeedValueEpsilon || speed < 0;
@@ -120,13 +120,14 @@ enum class LqReason
     smallItem,
     network,
     cpu,
-    fastForward,
     tooManyItems
 };
 
 LqReason slowLqReason(QnCamDisplay* display)
 {
-    return display->queueSize() < kSlowNetworkFrameLimit ? LqReason::network : LqReason::cpu;
+    return display->queueSize() < kSlowNetworkFrameLimit
+        ? LqReason::network
+        : LqReason::cpu;
 }
 
 bool isPerformanceProblem(LqReason value)
@@ -398,14 +399,6 @@ struct RadassController::Private
 
         const auto reader = display->getArchiveReader();
 
-        if (isForcedLqDisplay(display))
-        {
-            if (reader->getQuality() != MEDIA_Quality_Low)
-                trace("Forced switch to LQ", consumer);
-            gotoLowQuality(consumer, LqReason::fastForward);
-            return;
-        }
-
         if (isForcedHqDisplay(display))
         {
             if (reader->getQuality() != MEDIA_Quality_High)
@@ -512,14 +505,6 @@ struct RadassController::Private
         auto display = consumer->display;
         auto reader = display->getArchiveReader();
 
-        if (isForcedLqDisplay(display))
-        {
-            // For high speed mode change same item to LQ (do not try to find least item).
-            trace("Consumer is in FF, leaving in LQ", consumer);
-            gotoLowQuality(consumer, LqReason::fastForward, display->getSpeed());
-            return;
-        }
-
         if (isForcedHqDisplay(display))
         {
             trace("Consumer is in forced HQ, leaving as is", consumer);
@@ -560,19 +545,16 @@ struct RadassController::Private
         }
 
         QnCamDisplay* display = consumer->display;
-        if (qAbs(display->getSpeed()) < consumer->toLqSpeed
-            || (consumer->toLqSpeed < 0 && display->getSpeed() > 0))
+        if (isPerformanceProblem(consumer->lqReason)
+            &&
+            (
+                qAbs(display->getSpeed()) < consumer->toLqSpeed
+                || (consumer->toLqSpeed < 0 && display->getSpeed() > 0))
+            )
         {
             // If item leave high speed mode change same item to HQ
             trace("Consumer left FF mode, switching to HQ", consumer);
             gotoHighQuality(consumer);
-            return;
-        }
-
-        // Do not return to HQ in FF mode because of retry counter is not increased for FF.
-        if (isForcedLqDisplay(display))
-        {
-            trace("Consumer is forced to LQ, leaving as is", consumer);
             return;
         }
 
@@ -635,7 +617,7 @@ struct RadassController::Private
 
         // Do not rearrange items if any item is in FF/REW mode right now.
         if (std::any_of(consumers.cbegin(), consumers.cend(),
-            [](const ConsumerInfo& consumer) { return isForcedLqDisplay(consumer.display); }))
+            [](const ConsumerInfo& consumer) { return isFastForwardOrRevMode(consumer.display); }))
         {
             return;
         }
@@ -761,9 +743,7 @@ void RadassController::onTimer()
             }
             case RadassMode::Low:
             {
-                if (isForcedLqDisplay(consumer->display))
-                    d->gotoLowQuality(consumer, LqReason::fastForward);
-                else if (isForcedHqDisplay(consumer->display))
+                if (isForcedHqDisplay(consumer->display))
                     d->gotoHighQuality(consumer);
                 else
                     d->gotoLowQuality(consumer, LqReason::none);
