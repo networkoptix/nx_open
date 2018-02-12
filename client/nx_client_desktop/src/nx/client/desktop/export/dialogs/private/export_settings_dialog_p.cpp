@@ -186,15 +186,11 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
     }
 
     // Fixing settings for preview transcoding
+    // This settings are affecting both export and preview.
     nx::core::transcoding::Settings& settings = m_exportMediaSettings.transcodingSettings;
-
     if (m_exportMediaPersistentSettings.applyFilters)
     {
-        auto resource = m_exportMediaSettings.mediaResource->toResourcePtr();
-        QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
-        if (!forcedRotation.isEmpty())
-            settings.rotation = forcedRotation.toInt();
-
+        settings.rotation = m_availableTranscodingSettings.rotation;
         settings.aspectRatio = m_availableTranscodingSettings.aspectRatio;
         settings.enhancement = m_availableTranscodingSettings.enhancement;
         settings.dewarping = m_availableTranscodingSettings.dewarping;
@@ -209,13 +205,11 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
         settings.zoomWindow = QRectF();
     }
 
-    //m_fullFrameSize = QSize();
-
-    // Requesting base resource image. We will apply transcoding later
+    // Requesting base resource image. We will apply transcoding later.
     if (!m_mediaRawImageProvider)
     {
-        // Requesting an image without any additional transforms
-        // We do have our own image processor, so we do not bother server with transcoding
+        // Requesting an image without any additional transforms.
+        // We do have our own image processor, so we do not bother server with transcoding.
         api::ResourceImageRequest request;
         request.resource = m_exportMediaSettings.mediaResource->toResourcePtr();
         request.msecSinceEpoch = m_exportMediaSettings.timePeriod.startTimeMs;
@@ -226,7 +220,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
         m_mediaRawImageProvider.reset(new ResourceThumbnailProvider(request, this));
     }
 
-    // Initializing a wrapper, that will provide image, processed by m_mediaPreviewProcessor
+    // Initializing a wrapper, that will provide image, processed by m_mediaPreviewProcessor.
     if (!m_mediaPreviewProvider)
     {
         std::unique_ptr<ProxyImageProvider> provider(
@@ -238,12 +232,17 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
 
     m_mediaPreviewProcessor->setTranscodingSettings(settings, m_exportMediaSettings.mediaResource);
 
+    // We can get here from ExportSettingsDialog::setMediaParams.
+    // That silly method for some reason can not get necessary data by itself.
+    if (!m_exportMediaSettings.mediaResource)
+        return;
+
     m_mediaPreviewProvider->loadAsync();
     m_mediaPreviewWidget->setImageProvider(m_mediaPreviewProvider.get());
     validateSettings(Mode::Media);
 }
 
-// Used as ui signal handler in ExportSettingsDialog
+// Used as ui signal handler in ExportSettingsDialog.
 void ExportSettingsDialog::Private::setApplyFilters(bool value)
 {
     bool transcode = false;
@@ -346,6 +345,8 @@ void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period, bo
     }
 }
 
+// Used as ui signal handler in ExportSettingsDialog.
+// Generates a lag every time you type another symbol in file name.
 void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 {
     m_exportMediaSettings.fileName = filename;

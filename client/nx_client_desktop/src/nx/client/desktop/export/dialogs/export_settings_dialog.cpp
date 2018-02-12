@@ -564,6 +564,7 @@ void ExportSettingsDialog::setMediaParams(
     settings.enhancement = itemData.contrastParams;
     settings.dewarping = itemData.dewarpingParams;
     settings.zoomWindow = itemData.zoomRect;
+    settings.rotation = itemData.rotation;
 
     d->setMediaResource(mediaResource, settings);
 
