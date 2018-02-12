@@ -17,8 +17,6 @@ static const int kNoDataFontWeight = QFont::Light;
 
 } // namespace
 
-using namespace nx::client::desktop;
-
 QnGraphicsToolTipWidget::QnGraphicsToolTipWidget(QGraphicsItem* parent):
     base_type(parent),
     m_proxyWidget(new Clickable<QnMaskedProxyWidget>(this)),
@@ -51,7 +49,7 @@ QnGraphicsToolTipWidget::QnGraphicsToolTipWidget(QGraphicsItem* parent):
     font.setPixelSize(kNoDataFontPixelSize);
     font.setWeight(kNoDataFontWeight);
     m_previewWidget->setFont(font);
-    m_previewWidget->setCropMode(AsyncImageWidget::CropMode::notHovered);
+    m_previewWidget->setCropMode(nx::client::desktop::AsyncImageWidget::CropMode::notHovered);
 
     setThumbnailVisible(false);
 }

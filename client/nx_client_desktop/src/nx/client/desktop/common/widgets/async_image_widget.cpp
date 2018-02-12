@@ -72,6 +72,7 @@ AsyncImageWidget::AsyncImageWidget(QWidget* parent):
 {
     retranslateUi();
     setBackgroundRole(QPalette::Window);
+    setAttribute(Qt::WA_Hover);
 
     m_placeholder->setProperty(style::Properties::kDontPolishFontProperty, true);
     setProperty(style::Properties::kDontPolishFontProperty, true);
