@@ -366,16 +366,11 @@ bool UnifiedSearchWidget::hasRelevantTiles() const
 void UnifiedSearchWidget::updatePlaceholderState()
 {
     const bool hidden = hasRelevantTiles();
-    if (ui->placeholder->isHidden() == hidden)
-        return;
-
     if (!hidden)
     {
         ui->placeholderText->setText(isConstrained()
             ? m_placeholderTextConstrained
             : m_placeholderTextUnconstrained);
-
-        ui->placeholderText->adjustSize();
     }
 
     ui->placeholder->setHidden(hidden);
