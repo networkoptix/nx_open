@@ -27,6 +27,10 @@ struct AnalyticsEventType: nx::api::Analytics::EventType
     AnalyticsEventType() = default;
     AnalyticsEventType(const nx::axis::SupportedEvent& supportedEvent);
     QString fullName() const { return topic + QString("/") + name; }
+    bool isStateful() const noexcept
+    {
+        return flags.testFlag(nx::api::Analytics::EventTypeFlag::stateDependent);
+    }
 };
 
 #define AxisAnalyticsEventType_Fields AnalyticsEventType_Fields(topic)(name)
