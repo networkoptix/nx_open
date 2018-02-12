@@ -1973,14 +1973,14 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     // for live video make a quick check: status has higher priority than EOF
     if (states.isRealTimeSource)
     {
+        if (m_camera && m_camera->hasFlags(Qn::wearable_camera))
+            return Qn::NoLiveStreamOverlay;
+
         if (states.isOffline)
             return Qn::OfflineOverlay;
 
         if (states.isUnauthorized)
             return Qn::UnauthorizedOverlay;
-
-        if (m_camera && m_camera->hasFlags(Qn::wearable_camera))
-            return Qn::NoLiveStreamOverlay;
     }
 
     if (m_camera && m_camera->hasFlags(Qn::io_module))
@@ -2335,7 +2335,7 @@ QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates()
 
     ResourceStates result;
     result.isRealTimeSource = (camDisplay ? camDisplay->isRealTimeSource() : false);
-    result.isOffline = (result.isRealTimeSource && (!resource || (resource->getStatus() == Qn::Offline)));
+    result.isOffline = (result.isRealTimeSource && (!resource || (resource->getStatus() == Qn::Offline && !resource->hasFlags(Qn::wearable_camera))));
     result.isUnauthorized = (result.isRealTimeSource && (resource && (resource->getStatus() == Qn::Unauthorized)));
     result.hasVideo = hasVideo();
 
