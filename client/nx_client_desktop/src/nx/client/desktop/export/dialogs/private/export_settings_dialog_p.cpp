@@ -77,7 +77,7 @@ ExportSettingsDialog::Private::~Private()
 
 void ExportSettingsDialog::Private::updateOverlaysVisibility()
 {
-    if (m_exportMediaPersistentSettings.applyFilters)
+    if (m_exportMediaPersistentSettings.shouldExportOverlays())
     {
         for (const auto overlayType: m_exportMediaPersistentSettings.usedOverlays)
             overlay(overlayType)->setHidden(false);

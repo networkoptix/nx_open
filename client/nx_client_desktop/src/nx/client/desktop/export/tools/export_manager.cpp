@@ -8,32 +8,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-namespace {
-
-class ExportMediaProcess: public ExportProcess
-{
-public:
-    ExportMediaProcess(const QnUuid& id, const ExportMediaSettings& settings, QObject* parent):
-        ExportProcess(id, new ExportMediaTool(settings), parent)
-    {
-    }
-};
-
-class ExportLayoutProcess: public ExportProcess
-{
-public:
-    ExportLayoutProcess(const QnUuid& id, const ExportLayoutSettings& settings, QObject* parent):
-        ExportProcess(id, new ExportLayoutTool(settings), parent)
-    { }
-
-};
-
-} // namespace
-
-ExportProcess::ExportProcess(const QnUuid& id, AbstractExportTool* tool, QObject* parent):
+ExportProcess::ExportProcess(const QnUuid& id, std::unique_ptr<AbstractExportTool>&& tool, QObject* parent):
     base_type(parent),
     m_info(id),
-    m_tool(tool)
+    m_tool(std::move(tool))
 {
     connect(m_tool, &ExportMediaTool::rangeChanged, this,
         [this](int from, int to)
@@ -98,8 +76,8 @@ struct ExportManager::Private
 
     QnUuid startExport(ExportProcess* process)
     {
-        connect(process, &ExportMediaProcess::infoChanged, q, &ExportManager::processUpdated);
-        connect(process, &ExportMediaProcess::finished, q,
+        connect(process, &ExportProcess::infoChanged, q, &ExportManager::processUpdated);
+        connect(process, &ExportProcess::finished, q,
             [this](const QnUuid& id)
             {
                 if (auto process = exportProcesses.take(id))
@@ -111,6 +89,19 @@ struct ExportManager::Private
         exportProcesses.insert(process->info().id, process);
         process->start();
         return process->info().id;
+    }
+
+    void stopExport(const QnUuid& exportProcessId)
+    {
+        if (const auto process = exportProcesses.value(exportProcessId))
+            process->stop();
+    }
+
+    ExportProcessInfo info(const QnUuid& exportProcessId) const
+    {
+        if (const auto process = exportProcesses.value(exportProcessId))
+            return process->info();
+        return ExportProcessInfo(QnUuid());
     }
 };
 
@@ -124,27 +115,19 @@ ExportManager::~ExportManager()
 {
 }
 
-QnUuid ExportManager::exportMedia(const QnUuid& id, const ExportMediaSettings& settings)
+QnUuid ExportManager::startExport(const QnUuid& id, std::unique_ptr<AbstractExportTool>&& tool)
 {
-    return d->startExport(new ExportMediaProcess(id, settings, this));
-}
-
-QnUuid ExportManager::exportLayout(const QnUuid& id, const ExportLayoutSettings& settings)
-{
-    return d->startExport(new ExportLayoutProcess(id, settings, this));
+    return d->startExport(new ExportProcess(id, std::move(tool), this));
 }
 
 void ExportManager::stopExport(const QnUuid& exportProcessId)
 {
-    if (const auto process = d->exportProcesses.value(exportProcessId))
-        process->stop();
+    d->stopExport(exportProcessId);
 }
 
 ExportProcessInfo ExportManager::info(const QnUuid& exportProcessId) const
 {
-    if (const auto process = d->exportProcesses.value(exportProcessId))
-        return process->info();
-    return ExportProcessInfo(QnUuid());
+    return d->info(exportProcessId);
 }
 
 QString ExportProcess::errorString(ExportProcessError error)
