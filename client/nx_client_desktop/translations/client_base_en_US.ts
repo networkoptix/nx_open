@@ -889,7 +889,11 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Upload to Wearable Camera...</source>
+        <source>Upload File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upload Folder...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2738,6 +2742,14 @@ to view more bookmarks</source>
         <source>No device selected.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot edit properties for several wearable cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnChangeUserPasswordDialog</name>
@@ -4580,6 +4592,10 @@ to %1</source>
     </message>
     <message>
         <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7181,16 +7197,24 @@ to %1</source>
         <source>Uploading %1... %2	%p%</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Finalizing %1... %2	%p</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>(%n more file(s) in queue)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Stop uploading?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Already uploaded files will be kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finalizing %1... %2	%p%</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7590,11 +7614,120 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open Wearable Camera Recording...</source>
+        <source>All files (*.*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All files (*.*)</source>
+        <source>Video (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Wearable Camera Recordings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No video files found in &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected file format(s) are not supported</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Only video files are supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected file(s) do not have timestamp(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Only video files with correct timestamp are supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected file(s) cover periods for which videos are already being uploaded</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>You can upload these file(s) to a different instance of a Wearable Camera.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected file(s) cover periods for which videos have already been uploaded</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected file(s) will not be uploaded</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Some file(s) will not be uploaded</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>There is no new files to upload in &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough space on server storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>File(s) size - %1
+Free space - %2</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File format of &quot;%1&quot; is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; does not have timestamp.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; cover periods for which video is already being uploaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; cover periods for which video has already been uploaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is no space on server for file &quot;%1&quot;.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7786,13 +7919,6 @@ to %1</source>
             <numerusform>Remove %n items from showreel?</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Video uploading to %n camera(s) will stop:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>Stop uploading?</source>
         <translation type="unfinished"></translation>
@@ -7800,6 +7926,13 @@ to %1</source>
     <message>
         <source>Stop</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -8074,15 +8207,7 @@ to %1</source>
 <context>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
-        <source>File &quot;%1&quot; is not a video file.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+        <source>Failed to send request to the server.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8684,6 +8809,10 @@ to %1</source>
     </message>
     <message>
         <source>Failed to change password on %1 of %2 cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wearable Cameras cannot be moved between servers</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
