@@ -3,8 +3,10 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <recording/time_period_list.h>
 
 #include "wearable_worker.h"
+#include "wearable_preparer.h"
 
 namespace nx {
 namespace client {
@@ -64,16 +66,30 @@ QList<WearableState> WearableManager::runningUploads()
     return result;
 }
 
+void WearableManager::prepareUploads(
+    const QnSecurityCamResourcePtr& camera,
+    const QStringList& filePaths,
+    QObject* target,
+    std::function<void(const WearableUpload&)> callback)
+{
+    WearablePreparer* checker = new WearablePreparer(camera, this);
+
+    connect(checker, &WearablePreparer::finished, target, callback);
+    connect(checker, &WearablePreparer::finished, checker, &QObject::deleteLater);
+
+    checker->prepareUploads(filePaths, state(camera).periods());
+}
+
 void WearableManager::updateState(const QnSecurityCamResourcePtr& camera)
 {
-    if(WearableWorker* worker = ensureWorker(camera))
+    if(WearableWorker* worker = cameraWorker(camera))
         worker->updateState();
 }
 
-bool WearableManager::addUpload(const QnSecurityCamResourcePtr& camera, const QString& path, WearableError* error)
+bool WearableManager::addUpload(const QnSecurityCamResourcePtr& camera, const WearablePayloadList& payloads)
 {
-    if (WearableWorker* worker = ensureWorker(camera))
-        return worker->addUpload(path, error);
+    if (WearableWorker* worker = cameraWorker(camera))
+        return worker->addUpload(payloads);
     return true; //< Just ignore it silently.
 }
 
@@ -92,7 +108,7 @@ void WearableManager::cancelAllUploads()
     dropAllWorkers();
 }
 
-WearableWorker* WearableManager::ensureWorker(const QnSecurityCamResourcePtr& camera)
+WearableWorker* WearableManager::cameraWorker(const QnSecurityCamResourcePtr& camera)
 {
     NX_ASSERT(d->currentUser);
 

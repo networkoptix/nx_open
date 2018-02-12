@@ -29,6 +29,8 @@
 #include <api/model/getnonce_reply.h>
 #include <api/model/wearable_camera_reply.h>
 #include <api/model/wearable_status_reply.h>
+#include <api/model/wearable_prepare_data.h>
+#include <api/model/wearable_prepare_reply.h>
 #include <api/runtime_info_manager.h>
 
 #include <core/resource_access/resource_access_subject.h>
@@ -243,6 +245,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnManualResourceSearchEntry>();
     qRegisterMetaType<QnWearableCameraReply>();
     qRegisterMetaType<QnWearableStatusReply>();
+    qRegisterMetaType<QnWearablePrepareData>();
+    qRegisterMetaType<QnWearablePrepareReply>();
 
     qRegisterMetaType<QnPtzPreset>();
     qRegisterMetaType<QnPtzPresetList>();

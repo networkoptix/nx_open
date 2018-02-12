@@ -170,6 +170,34 @@
     </message>
   </context>
   <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <source>Form</source>
+      <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Fixed Archive Length</source>
+      <translation type="unfinished">Fixed Archive Length</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. Days</source>
+      <translation type="unfinished">Min. Days</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Auto</source>
+      <translation type="unfinished">Auto</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Max. Days</source>
+      <translation type="unfinished">Max. Days</translation>
+    </message>
+  </context>
+  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -420,7 +448,7 @@
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation type="unfinished">Refresh</translation>
     </message>
@@ -618,22 +646,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation type="unfinished">Advanced settings are unavailable</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation type="unfinished">Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation type="unfinished">Do not archive primary stream</translation>
     </message>
@@ -666,11 +681,6 @@
       <location/>
       <source>Restore Defaults</source>
       <translation type="unfinished">Restore Defaults</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation type="unfinished">Warning! Low quality may result in low resolution image.</translation>
     </message>
     <message>
       <location/>
@@ -726,11 +736,6 @@
       <location/>
       <source>Disable secondary stream</source>
       <translation type="unfinished">Disable secondary stream</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
     </message>
     <message>
       <location/>
@@ -818,26 +823,6 @@
       <location/>
       <source>Do Not Record</source>
       <translation type="unfinished">Do Not Record</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fixed Archive Length</source>
-      <translation type="unfinished">Fixed Archive Length</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation type="unfinished">Min. Days</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Max. Days</source>
-      <translation type="unfinished">Max. Days</translation>
     </message>
     <message>
       <location/>
@@ -1106,34 +1091,6 @@
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
       <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExportRapidReviewDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
-      <source>Export Rapid Review</source>
-      <translation type="unfinished">Export Rapid Review</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Initial Video Length</source>
-      <translation type="unfinished">Initial Video Length</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Exported Video Length</source>
-      <translation type="unfinished">Exported Video Length</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Frames Interval</source>
-      <translation type="unfinished">Frames Interval</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Rapid Review speed</source>
-      <translation type="unfinished">Rapid Review speed</translation>
     </message>
   </context>
   <context>
@@ -1812,6 +1769,24 @@
       <location/>
       <source>Expert</source>
       <translation type="unfinished">Expert</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewWearableCameraDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>To server</source>
+      <translation type="unfinished">To server</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -2695,6 +2670,13 @@
       <source>TextLabel</source>
       <translation type="unfinished">TextLabel</translation>
     </message>
+    <message>
+      <location/>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
+The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
+The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -2867,11 +2849,6 @@
       <location/>
       <source>Backup Settings...</source>
       <translation type="unfinished">Backup Settings...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
     </message>
   </context>
   <context>
@@ -3082,6 +3059,65 @@ Click &quot;New role&quot; button to create one.</translation>
       <location/>
       <source>Edit Roles...</source>
       <translation type="unfinished">Edit Roles...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Form</source>
+      <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation type="unfinished">Motion Detection</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation type="unfinished">Detect motion in uploaded video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation type="unfinished">Sensitivity</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableProgressWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
+      <source>Form</source>
+      <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableUploadWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
+      <source>Form</source>
+      <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Video</source>
+      <translation type="unfinished">Upload Video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload File...</source>
+      <translation type="unfinished">Upload File...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Folder...</source>
+      <translation type="unfinished">Upload Folder...</translation>
     </message>
   </context>
   <context>

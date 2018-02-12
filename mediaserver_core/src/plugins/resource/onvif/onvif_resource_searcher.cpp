@@ -178,7 +178,11 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 
     // TODO: Move out to some helper class, to remove direct link to hikvision.
     if (isSearchAction)
-        nx::mediaserver_core::plugins::HikvisionResource::tryToEnableOnvifSupport(deviceUrl, auth);
+    {
+        nx::mediaserver_core::plugins::HikvisionResource::tryToEnableIntegrationProtocols(
+            deviceUrl,
+            auth);
+    }
 
     // optimization. do not pull resource every time if resource already in pool
     if (rpResource)

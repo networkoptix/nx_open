@@ -6,6 +6,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include "camera_settings_tab.h"
 
+class QLabel;
 class QStackedWidget;
 
 class QnSingleCameraSettingsWidget;
@@ -64,13 +65,15 @@ private:
     void setMode(Mode mode);
     void setCurrentTab(Mode mode, Qn::CameraSettingsTab tab);
 
+    void updateInvalidText();
+
 private:
     QnVirtualCameraResourceList m_cameras;
     Qn::CameraSettingsTab m_emptyTab;
 
     QStackedWidget *m_stackedWidget;
-    QWidget *m_invalidWidget;
-    QWidget *m_emptyWidget;
+    QLabel *m_invalidWidget;
+    QLabel *m_emptyWidget;
     QnSingleCameraSettingsWidget *m_singleWidget;
     QnMultipleCameraSettingsWidget *m_multiWidget;
 };

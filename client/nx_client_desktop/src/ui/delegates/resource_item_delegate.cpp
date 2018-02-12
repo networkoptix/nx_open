@@ -695,10 +695,14 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     auto infoLevel = m_customInfoLevel;
     if (infoLevel == Qn::RI_Invalid)
         infoLevel = qnSettings->extraInfoInTree();
+
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    if (resource && resource->hasFlags(Qn::wearable_camera))
+        infoLevel = Qn::RI_FullInfo;
+
     if (infoLevel == Qn::RI_NameOnly)
         return;
 
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
     if (nodeType == Qn::VideoWallItemNode)

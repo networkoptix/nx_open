@@ -12,6 +12,7 @@ using RemoteArchiveTaskDoneHandler = std::function<void(const QnUuid&)>;
 
 class RemoteArchiveWorker: public QnLongRunnable
 {
+    Q_OBJECT
     using base_class = QnLongRunnable;
 
 public:

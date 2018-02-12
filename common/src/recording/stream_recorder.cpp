@@ -500,7 +500,12 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 
     if (vd && !m_gotKeyFrame[vd->channelNumber] && !(vd->flags & AV_PKT_FLAG_KEY))
     {
-        NX_VERBOSE(this, "saveData(): VIDEO; skip data");
+        NX_VERBOSE(this, lm(
+            "saveData(): VIDEO; skip data. "
+            "Timestamp: %1 (%2ms)")
+                .args(
+                    QDateTime::fromMSecsSinceEpoch(md->timestamp / 1000),
+                    vd->timestamp / 1000));
         return true; // skip data
     }
 
@@ -509,7 +514,12 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     {
         if (vd == 0 && mediaDev->hasVideo(md->dataProvider))
         {
-            NX_VERBOSE(this, "saveData(): AUDIO; skip audio packets before first video packet");
+            NX_VERBOSE(this, lm(
+                "saveData(): AUDIO; skip audio packets before first video packet. "
+                "Timestamp: %1 (%2ms)")
+                    .args(
+                        QDateTime::fromMSecsSinceEpoch(md->timestamp / 1000),
+                        md->timestamp / 1000));
             return true; // skip audio packets before first video packet
         }
         if (!initFfmpegContainer(md))
@@ -534,7 +544,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 
     if (md->flags & AV_PKT_FLAG_KEY)
         m_gotKeyFrame[channel] = true;
-    if ((md->flags & AV_PKT_FLAG_KEY) || !mediaDev->hasVideo(m_mediaProvider))
+    if (((md->flags & AV_PKT_FLAG_KEY) && md->dataType == QnAbstractMediaData::VIDEO) || !mediaDev->hasVideo(m_mediaProvider))
     {
         if (m_truncateInterval > 0
             && md->timestamp - m_startDateTime > (m_truncateInterval + m_truncateIntervalEps))

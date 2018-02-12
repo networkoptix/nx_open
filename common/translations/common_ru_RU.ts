@@ -488,7 +488,7 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation>Bridge</translation>
+      <translation type="unfinished">Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>

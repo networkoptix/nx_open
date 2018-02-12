@@ -170,6 +170,34 @@
     </message>
   </context>
   <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <source>Form</source>
+      <translation>表格</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Fixed Archive Length</source>
+      <translation>固定錄影天數</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. Days</source>
+      <translation>最小錄影天數</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Auto</source>
+      <translation>自動</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Max. Days</source>
+      <translation>最大錄影天數</translation>
+    </message>
+  </context>
+  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -420,7 +448,7 @@
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>重新整理</translation>
     </message>
@@ -618,22 +646,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation>進階設定不可用</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation>警告! 選擇高畫質可能影像CPU及網路品質並造成額外的問題.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation>不錄存主串流</translation>
     </message>
@@ -666,11 +681,6 @@
       <location/>
       <source>Restore Defaults</source>
       <translation>回復預設值</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation>警告! 低品質可能導致得到低解析度的影像.</translation>
     </message>
     <message>
       <location/>
@@ -729,11 +739,6 @@
     </message>
     <message>
       <location/>
-      <source>Quality</source>
-      <translation>畫質</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>位移偵測</translation>
     </message>
@@ -750,7 +755,7 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation>PTZ</translation>
+      <translation type="unfinished">PTZ</translation>
     </message>
   </context>
   <context>
@@ -818,26 +823,6 @@
       <location/>
       <source>Do Not Record</source>
       <translation>不要錄影</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fixed Archive Length</source>
-      <translation>固定錄影天數</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation>自動</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation>最小錄影天數</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Max. Days</source>
-      <translation>最大錄影天數</translation>
     </message>
     <message>
       <location/>
@@ -1787,6 +1772,24 @@
     </message>
   </context>
   <context>
+    <name>NewWearableCameraDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>To server</source>
+      <translation type="unfinished">To server</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+    </message>
+  </context>
+  <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
@@ -2667,6 +2670,13 @@
       <source>TextLabel</source>
       <translation type="unfinished">TextLabel</translation>
     </message>
+    <message>
+      <location/>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
+The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
+The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3049,6 +3059,65 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Edit Roles...</source>
       <translation>編輯角色...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Form</source>
+      <translation>表格</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>位移偵測</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation type="unfinished">Detect motion in uploaded video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>靈敏度:</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableProgressWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
+      <source>Form</source>
+      <translation>表格</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cancel</source>
+      <translation>取消</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableUploadWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
+      <source>Form</source>
+      <translation>表格</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Video</source>
+      <translation type="unfinished">Upload Video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload File...</source>
+      <translation type="unfinished">Upload File...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Folder...</source>
+      <translation type="unfinished">Upload Folder...</translation>
     </message>
   </context>
   <context>
