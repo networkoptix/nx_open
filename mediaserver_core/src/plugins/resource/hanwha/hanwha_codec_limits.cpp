@@ -239,13 +239,6 @@ bool HanwhaCodecInfo::parseResponse(const HanwhaResponse& response)
             [split[3] /*StreamType*/]
             [split[4].toLower() /*Resolution*/];
 
-        qDebug() << "SETTING LIMIT:"
-            << split[1]
-            << split[2]
-            << split[3]
-            << split[4]
-            << split[5] << parameterValue;
-
         limits.setLimit(split[5], parameterValue);
     }
 
