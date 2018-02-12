@@ -3,8 +3,11 @@
 #include <QtCore/QString>
 
 #include <nx/utils/uuid.h>
+#include <recording/time_period.h>
 
 #include "upload_state.h"
+
+class QnTimePeriodList;
 
 namespace nx {
 namespace client {
@@ -24,7 +27,8 @@ struct WearableState
     struct EnqueuedFile
     {
         QString path;
-        qint64 startTimeMs = 0;
+        qint64 startTimeMs;
+        QnTimePeriod uploadPeriod;
     };
 
     /** Current wearable status of the camera. */
@@ -67,6 +71,11 @@ struct WearableState
      * @returns                         Progress the whole operation, a number in [0, 100] range.
      */
     int progress() const;
+
+    /**
+     * @returns                         A union of all time periods for the files in this state.
+     */
+    QnTimePeriodList periods() const;
 };
 
 } // namespace desktop

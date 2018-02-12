@@ -3,6 +3,7 @@
 
 #include <core/resource/camera_resource.h>
 
+#include <ui/common/aligner.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -45,11 +46,19 @@ QnImageControlWidget::QnImageControlWidget(QWidget *parent)
             this, notifyAboutChanges);
     connect(ui->rotationComboBox, QnComboboxCurrentIndexChanged,
             this, notifyAboutChanges);
+
+    m_aligner = new QnAligner(this);
+    m_aligner->addWidgets({ui->rotationLabel, ui->aspectRatioLabel});
 }
 
 QnImageControlWidget::~QnImageControlWidget()
 {
 
+}
+
+QnAligner* QnImageControlWidget::aligner() const
+{
+    return m_aligner;
 }
 
 void QnImageControlWidget::updateFromResources(

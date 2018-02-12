@@ -208,6 +208,7 @@ protected slots:
 
     Q_SLOT void updateThumbnailsLoader();
 
+    WidgetFlags calculateResourceWidgetFlags(const QnResourcePtr& resource) const;
     void updateCurrentWidgetFlags();
 
     void updateAutoPaused();

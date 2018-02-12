@@ -1,6 +1,8 @@
 #include "wearable_camera_resource.h"
 
 #include <plugins/resource/avi/avi_resource.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
+#include <nx/streaming/abstract_archive_delegate.h>
 
 const QString QnWearableCameraResource::kManufacture = lit("WEARABLE_CAMERA");
 using namespace nx::mediaserver::resource;
@@ -21,7 +23,11 @@ CameraDiagnostics::Result QnWearableCameraResource::initInternal()
 
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, lit("1"));
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, lit("0"));
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
+    setProperty(Qn::SUPPORTED_MOTION_PARAM_NAME, lit("softwaregrid"));
+#else
     setProperty(Qn::SUPPORTED_MOTION_PARAM_NAME, lit("none"));
+#endif
     saveParams();
 
     return result;
@@ -44,11 +50,17 @@ QnConstResourceAudioLayoutPtr QnWearableCameraResource::getAudioLayout(
     if (!dataProvider)
         return QnConstResourceAudioLayoutPtr();
 
-    QnAviResourcePtr resource = dataProvider->getResource().dynamicCast<QnAviResource>();
-    if(!resource)
-        return QnConstResourceAudioLayoutPtr();
+    const QnAbstractArchiveStreamReader* reader =
+        dynamic_cast<const QnAbstractArchiveStreamReader*>(dataProvider);
+    if (reader && reader->getArchiveDelegate())
+        return reader->getArchiveDelegate()->getAudioLayout();
 
-    return resource->getAudioLayout(dataProvider);
+    QnAviResourcePtr resource = dataProvider->getResource().dynamicCast<QnAviResource>();
+    if(resource)
+        return resource->getAudioLayout(dataProvider);
+
+    NX_ASSERT(false);
+    return QnConstResourceAudioLayoutPtr();
 }
 
 QnAbstractStreamDataProvider* QnWearableCameraResource::createLiveDataProvider()

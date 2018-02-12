@@ -138,6 +138,7 @@ public:
      * Return writable storages with checkBox 'usedForWriting'
      */
     QSet<QnStorageResourcePtr> getUsedWritableStorages() const;
+    QSet<QnStorageResourcePtr> getClearableStorages() const;
 
     /*
      * Return all storages which can be used for writing
@@ -148,10 +149,11 @@ public:
     bool hasRebuildingStorages() const;
 
     void clearSpace(bool forced=false);
+    bool clearSpaceForFile(const QString& path, qint64 size);
     void checkSystemStorageSpace();
     void removeEmptyDirs(const QnStorageResourcePtr &storage);
 
-    bool clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
+    bool clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays, qint64 targetFreeSpace);
     void clearMaxDaysData();
     void clearMaxDaysData(QnServer::ChunksCatalog catalogIdx);
 
