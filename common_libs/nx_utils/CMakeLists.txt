@@ -7,15 +7,11 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
-if(LINUX)
-    add_compile_options("-Werror" "-Wall" "-Wextra")
-endif()
-
 if(IOS)
     set(ios_sources "src/nx/utils/log/log_ios.mm")
 endif()
 
-nx_add_target(nx_utils LIBRARY ${library_type}
+nx_add_target(nx_utils LIBRARY ${library_type} WERROR
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
         ${ios_sources}
