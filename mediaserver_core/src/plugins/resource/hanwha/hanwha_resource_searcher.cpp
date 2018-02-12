@@ -331,6 +331,11 @@ bool HanwhaResourceSearcher::processPacket(
 	return true;
 }
 
+bool HanwhaResourceSearcher::isEnabled() const
+{
+    return discoveryMode() != DiscoveryMode::disabled;
+}
+
 void HanwhaResourceSearcher::createResource(
     const nx_upnp::DeviceInfo& devInfo,
     const QnMacAddress& mac,

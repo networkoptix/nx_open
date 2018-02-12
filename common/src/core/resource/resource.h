@@ -131,32 +131,7 @@ public:
 
     // ==================================================
 
-    //QnParamList getResourceParamList() const; // returns params that can be changed on device level
-
     bool hasParam(const QString &name) const;
-
-    // return true if no error
-    //bool getParam(const QString &name, QVariant &val, QnDomain domain) const;
-
-#ifdef ENABLE_DATA_PROVIDERS
-    // same as getParam is invoked in separate thread.
-    // as soon as param changed parameterValueChanged() signal is emitted
-#endif
-
-
-    // return true if no error
-    //virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain);
-
-#ifdef ENABLE_DATA_PROVIDERS
-    // same as setParam but but returns immediately;
-    // this function leads setParam invoke in separate thread. so no need to make it virtual
-    //void setParamAsync(const QString &name, const QVariant &val, QnDomain domain);
-#endif
-
-    // some time we can find resource, but cannot request additional information from it ( resource has bad ip for example )
-    // in this case we need to request additional information later.
-    // unknownResource - tels if we need that additional information
-    virtual bool unknownResource() const;
 
 #ifdef ENABLE_DATA_PROVIDERS
     QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
