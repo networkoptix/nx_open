@@ -1691,17 +1691,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessible by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessible by any user.</translation>
+      <translation>Nueva cámara portátil...</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>Al servidor</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -2556,8 +2556,7 @@
       <location/>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
 The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation>El archivo cargado se puede eliminar automáticamente, si no hay espacio libre en el almacenamiento del servidor. Primero se eliminará el metraje más antiguo entre todas las cámaras del servidor.</translation>
     </message>
   </context>
   <context>
@@ -2892,6 +2891,29 @@ Click &quot;New role&quot; button to create one.</source>
     </message>
   </context>
   <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Form</source>
+      <translation>Forma</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>Detección de movimiento</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation type="unfinished">Detect motion in uploaded video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>Sensibilidad</translation>
+    </message>
+  </context>
+  <context>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
@@ -2914,22 +2936,22 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>Subir vídeo</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Subir archivo...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Subir Carpeta...</translation>
     </message>
     <message>
       <location/>
       <source>&lt;warning&gt;</source>
-      <translation type="unfinished">&lt;warning&gt;</translation>
+      <translation>&lt;advertencia&gt;</translation>
     </message>
   </context>
   <context>
