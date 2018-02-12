@@ -97,7 +97,7 @@ void Manager::freeManifest(const char* data)
 
 const AnalyticsEventTypeExtended& Manager::eventByUuid(const QnUuid& uuid) const noexcept
 {
-    static const AnalyticsEventTypeExtended emptyEvent;
+    static const AnalyticsEventTypeExtended emptyEvent{};
     const auto it = std::find_if(
         m_events.cbegin(),
         m_events.cend(),
