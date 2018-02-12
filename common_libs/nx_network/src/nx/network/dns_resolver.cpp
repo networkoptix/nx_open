@@ -17,8 +17,10 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/time.h>
-
 #include <nx/utils/scope_guard.h>
+
+#include "resolve/predefined_host_resolver.h"
+#include "resolve/system_resolver.h"
 
 namespace nx {
 namespace network {
@@ -140,17 +142,16 @@ bool DnsResolver::isRequestIdKnown(RequestId requestId) const
 
 void DnsResolver::addEtcHost(const QString& name, std::vector<HostAddress> addresses)
 {
-    std::vector<AddressEntry> entries;
-    entries.reserve(addresses.size());
+    std::deque<AddressEntry> entries;
     for (auto& address: addresses)
         entries.push_back({ AddressType::direct, address });
 
-    m_predefinedHostResolver->addEtcHost(name, std::move(entries));
+    m_predefinedHostResolver->addMapping(name, std::move(entries));
 }
 
 void DnsResolver::removeEtcHost(const QString& name)
 {
-    m_predefinedHostResolver->removeEtcHost(name);
+    m_predefinedHostResolver->removeMapping(name);
 }
 
 void DnsResolver::registerResolver(std::unique_ptr<AbstractResolver> resolver, int priority)

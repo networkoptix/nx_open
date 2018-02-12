@@ -14,12 +14,13 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/system_error.h>
 
-#include "resolve/predefined_host_resolver.h"
-#include "resolve/system_resolver.h"
+#include "resolve/abstract_resolver.h"
 #include "socket_common.h"
 
 namespace nx {
 namespace network {
+
+class PredefinedHostResolver;
 
 class NX_NETWORK_API DnsResolver:
     public QnLongRunnable

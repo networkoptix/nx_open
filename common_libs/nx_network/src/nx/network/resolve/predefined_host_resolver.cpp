@@ -16,25 +16,40 @@ SystemError::ErrorCode PredefinedHostResolver::resolve(
 
     for (const auto entry: it->second)
     {
-        if (ipVersion != AF_INET || entry.host.ipV4()) // TODO: #ak Totally unclear condition.
-            resolvedAddresses->push_back(entry);
+        if (ipVersion == AF_INET && !entry.host.ipV4())
+            continue; //< Only ipv4 hosts are requested.
+        resolvedAddresses->push_back(entry);
     }
 
     return SystemError::noError;
 }
 
-void PredefinedHostResolver::addEtcHost(
+void PredefinedHostResolver::addMapping(
     const QString& name,
-    std::vector<AddressEntry> entries)
+    std::deque<AddressEntry> entries)
 {
     QnMutexLocker lock(&m_mutex);
     m_etcHosts[name] = std::move(entries);
 }
 
-void PredefinedHostResolver::removeEtcHost(const QString& name)
+void PredefinedHostResolver::removeMapping(const QString& name)
 {
     QnMutexLocker lock(&m_mutex);
     m_etcHosts.erase(name);
+}
+
+void PredefinedHostResolver::removeMapping(
+    const QString& name,
+    const AddressEntry& entryToRemove)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_etcHosts.find(name);
+    if (it == m_etcHosts.end())
+        return;
+
+    it->second.erase(
+        std::remove(it->second.begin(), it->second.end(), entryToRemove),
+        it->second.end());
 }
 
 } // namespace network

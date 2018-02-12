@@ -38,7 +38,7 @@ void AddressResolver::addFixedAddress(
     NX_VERBOSE(this, lm("Added fixed address for %1: %2").args(hostName, endpoint));
 
     const AddressEntry entry(endpoint);
-    m_predefinedHostResolver->addEtcHost(hostName.toString(), {endpoint});
+    m_predefinedHostResolver->addMapping(hostName.toString(), {endpoint});
 
     QnMutexLocker lk(&m_mutex);
     auto& entries = m_info.emplace(
@@ -63,7 +63,7 @@ void AddressResolver::removeFixedAddress(
 {
     NX_VERBOSE(this, lm("Removed fixed address for %1: %2").args(hostName, endpoint));
 
-    m_predefinedHostResolver->removeEtcHost(hostName.toString());
+    m_predefinedHostResolver->removeMapping(hostName.toString());
 
     QnMutexLocker lk(&m_mutex);
     const auto record = m_info.find(hostName);

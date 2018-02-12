@@ -102,9 +102,9 @@ protected:
 
 } // namespace
 
-// TODO: #ak Most of these tests do not belong here.
-// They actually check how socket use AddressResolver, not how AddressResolver works.
-// So, these tests should belong to some stream socket acceptance test group.
+// TODO: #ak The following test does not belong here.
+// It actually checks how socket use AddressResolver, not how AddressResolver works.
+// So, this test should belong to some stream socket acceptance test group.
 
 TEST_F(AddressResolverDeprecatedTests, HostNameResolve2)
 {
@@ -196,17 +196,47 @@ public:
     }
 
 protected:
-    void whenResolvingStringRepresentationOfIpAddress()
+    void setIpVersionToUse(int ipVersion)
+    {
+        m_ipVersionToUse = ipVersion;
+    }
+
+    void givenStringRepresentationOfIpv4AddressAsHostname()
     {
         m_hostNameToResolve = "1.2.3.4";
-        m_resolver.resolveSync(m_hostNameToResolve, NatTraversalSupport::disabled, AF_INET);
+    }
+
+    void emulateHostnameResolvableByDnsResolver()
+    {
+        struct in_addr inAddr;
+        memset(&inAddr, 0, sizeof(inAddr));
+        inAddr.S_un.S_addr = nx::utils::random::number<std::uint32_t>();
+        m_dnsEntry = HostAddress(inAddr);
+        m_resolver.dnsResolver().addEtcHost(m_hostNameToResolve, {*m_dnsEntry});
+    }
+
+    void whenResolve()
+    {
+        ResolveResult resolveResult;
+        std::get<1>(resolveResult) = m_resolver.resolveSync(
+            m_hostNameToResolve,
+            NatTraversalSupport::disabled,
+            m_ipVersionToUse);
+        std::get<0>(resolveResult) = SystemError::getLastOSErrorCode();
+        m_resolveResults.push(std::move(resolveResult));
     }
 
     void assertDnsResolverHasNotBeenInvoked()
     {
-        ASSERT_EQ(
-            m_resolvedHostNames.end(),
-            std::find(m_resolvedHostNames.begin(), m_resolvedHostNames.end(), m_hostNameToResolve));
+        ASSERT_TRUE(m_hostnamesPassedToDnsResolver.empty());
+    }
+
+    void assertResolveIsDoneByDnsResolver()
+    {
+        const auto resolveResult = m_resolveResults.pop();
+        ASSERT_EQ(1U, std::get<1>(resolveResult).size());
+        ASSERT_EQ(AddressType::direct, std::get<1>(resolveResult).front().type);
+        ASSERT_EQ(*m_dnsEntry, std::get<1>(resolveResult).front().host);
     }
 
     network::AddressResolver& resolver()
@@ -219,9 +249,10 @@ private:
         std::tuple<SystemError::ErrorCode, std::deque<AddressEntry>>;
 
     network::AddressResolver m_resolver;
+    int m_ipVersionToUse = AF_INET;
     QString m_hostNameToResolve;
-    SocketAddress m_hostEndpoint;
-    std::list<QString> m_resolvedHostNames;
+    boost::optional<HostAddress> m_dnsEntry;
+    std::list<QString> m_hostnamesPassedToDnsResolver;
     nx::utils::SyncQueue<ResolveResult> m_resolveResults;
 
     SystemError::ErrorCode saveHostNameWithoutResolving(
@@ -229,15 +260,32 @@ private:
         int /*ipVersion*/,
         std::deque<AddressEntry>* /*resolvedAddresses*/)
     {
-        m_resolvedHostNames.push_back(hostName);
+        m_hostnamesPassedToDnsResolver.push_back(hostName);
         return SystemError::hostNotFound;
     }
 };
 
-TEST_F(AddressResolver, does_not_invoke_dns)
+TEST_F(
+    AddressResolver,
+    ipv4_resolve_does_not_invoke_dns_for_text_representation_of_ip_address)
 {
-    whenResolvingStringRepresentationOfIpAddress();
+    givenStringRepresentationOfIpv4AddressAsHostname();
+    whenResolve();
     assertDnsResolverHasNotBeenInvoked();
+}
+
+TEST_F(
+    AddressResolver,
+    ipv6_resolve_invokes_dns_for_text_representation_of_ip_address)
+{
+    setIpVersionToUse(AF_INET6);
+
+    givenStringRepresentationOfIpv4AddressAsHostname();
+    emulateHostnameResolvableByDnsResolver();
+
+    whenResolve();
+
+    assertResolveIsDoneByDnsResolver();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -277,6 +325,32 @@ protected:
         resolver().removeFixedAddress(m_hostNameToResolve, m_hostEndpoint);
     }
 
+    void registerMultipleEndpointsUnderSingleName()
+    {
+        m_hostNameToResolve = "example.com";
+        for (unsigned int i = 0; i < 3; ++i)
+        {
+            struct in_addr inAddr;
+            memset(&inAddr, 0, sizeof(inAddr));
+            inAddr.S_un.S_addr = 1000 + i;
+            HostAddress address(inAddr);
+            const SocketAddress endpoint(address, 12345);
+            m_fixedEntries.push_back(endpoint);
+            resolver().addFixedAddress(m_hostNameToResolve, endpoint);
+        }
+    }
+
+    void removeRandomFixedEndpoint()
+    {
+        const auto endpointIndexToRemove =
+            nx::utils::random::number<std::vector<SocketAddress>::size_type>(
+                0, m_fixedEntries.size() - 1);
+        resolver().removeFixedAddress(
+            m_hostNameToResolve,
+            m_fixedEntries[endpointIndexToRemove]);
+        m_fixedEntries.erase(m_fixedEntries.begin() + endpointIndexToRemove);
+    }
+
     void whenResolveDomain(const QString& domainName)
     {
         using namespace std::placeholders;
@@ -298,6 +372,17 @@ protected:
     {
         whenResolveDomain(m_hostNameToResolve.split(".").last());
         thenResolvedResultIs(SystemError::hostNotFound);
+    }
+
+    void assertFixedEndpointsCanStillBeResolved()
+    {
+        const auto entries = resolver().resolveSync(
+            m_hostNameToResolve, NatTraversalSupport::disabled, AF_INET);
+        ASSERT_EQ(entries.size(), m_fixedEntries.size());
+        for (decltype(entries)::size_type i = 0; i < entries.size(); ++i)
+        {
+            ASSERT_EQ(entries[i].toEndpoint(), m_fixedEntries[i]);
+        }
     }
 
     void thenResolvedTo(const SocketAddress& hostEndpoint)
@@ -324,6 +409,7 @@ private:
     SocketAddress m_hostEndpoint;
     nx::utils::SyncQueue<ResolveResult> m_resolveResults;
     HostAddress m_stubAddress;
+    std::vector<SocketAddress> m_fixedEntries;
 
     SystemError::ErrorCode dnsResolveStub(
         const QString& /*hostName*/,
@@ -363,6 +449,15 @@ TEST_F(
     unregisterDomainName();
 
     assertLowLevelDomainNameCannotBeResolved();
+}
+
+TEST_F(
+    AddressResolverNameMapping,
+    mapping_multiple_addresses_under_a_single_hostname)
+{
+    registerMultipleEndpointsUnderSingleName();
+    removeRandomFixedEndpoint();
+    assertFixedEndpointsCanStillBeResolved();
 }
 
 //-------------------------------------------------------------------------------------------------
