@@ -426,10 +426,10 @@ void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timest
 void QnServerStreamRecorder::updateContainerMetadata(QnAviArchiveMetadata* metadata) const
 {
     using namespace nx::mediaserver;
-    NX_ASSERT(m_startDateTime > 0);
+    NX_ASSERT(m_startDateTimeMks > 0);
     metadata->version = QnAviArchiveMetadata::kIntegrityCheckVersion;
     metadata->integrityHash =
-        IntegrityHashHelper::generateIntegrityHash(QByteArray::number(m_startDateTime / 1000));
+        IntegrityHashHelper::generateIntegrityHash(QByteArray::number(m_startDateTimeMks / 1000));
 }
 
 bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)
@@ -441,10 +441,10 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     bool isMotionContinue = m_lastMotionTimeUsec != (qint64)AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + afterThreshold;
     if (!isMotionContinue)
     {
-        if (m_endDateTime == (qint64)AV_NOPTS_VALUE || media->timestamp - m_endDateTime < MAX_FRAME_DURATION*1000)
+        if (m_endDateTimeMks == (qint64)AV_NOPTS_VALUE || media->timestamp - m_endDateTimeMks < MAX_FRAME_DURATION*1000)
             updateMotionStateInternal(false, media->timestamp, QnMetaDataV1Ptr());
         else
-            updateMotionStateInternal(false, m_endDateTime + MIN_FRAME_DURATION, QnMetaDataV1Ptr());
+            updateMotionStateInternal(false, m_endDateTimeMks + MIN_FRAME_DURATION, QnMetaDataV1Ptr());
     }
     QnScheduleTask task = currentScheduleTask();
 
@@ -487,12 +487,12 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     // if prebuffering mode and all buffer is full - drop data
 
     //qDebug() << "needSaveData=" << rez << "df=" << (media->timestamp - (m_lastMotionTimeUsec + task.getAfterThreshold()*1000000ll))/1000000.0;
-    if (!isMotionContinue && m_endDateTime != (qint64)AV_NOPTS_VALUE)
+    if (!isMotionContinue && m_endDateTimeMks != (qint64)AV_NOPTS_VALUE)
     {
-        if (media->timestamp - m_endDateTime < MAX_FRAME_DURATION*1000)
-            m_endDateTime = media->timestamp;
+        if (media->timestamp - m_endDateTimeMks < MAX_FRAME_DURATION*1000)
+            m_endDateTimeMks = media->timestamp;
         else
-            m_endDateTime += MIN_FRAME_DURATION;
+            m_endDateTimeMks += MIN_FRAME_DURATION;
         close();
     }
     return isMotionContinue;
@@ -744,7 +744,7 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
         if (normalStorage)
             m_recordingContextVector.emplace_back(
                 qnNormalStorageMan->getFileName(
-                    m_startDateTime/1000,
+                    m_startDateTimeMks/1000,
                     m_currentTimeZone,
                     netResource,
                     DeviceFileCatalog::prefixByCatalog(m_catalog),
@@ -756,7 +756,7 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
         if (backupStorage)
             m_recordingContextVector.emplace_back(
                 qnBackupStorageMan->getFileName(
-                    m_startDateTime/1000,
+                    m_startDateTimeMks/1000,
                     m_currentTimeZone,
                     netResource,
                     DeviceFileCatalog::prefixByCatalog(m_catalog),
