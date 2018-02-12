@@ -17,6 +17,7 @@
 
 #include <nx/client/desktop/common/widgets/animated_tab_widget.h>
 #include <nx/client/desktop/common/widgets/compact_tab_bar.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/common/selectable_text_button.h>
 #include <nx/client/desktop/event_search/models/unified_async_search_list_model.h>
 #include <nx/client/desktop/event_search/models/analytics_search_list_model.h>
@@ -100,6 +101,8 @@ EventPanel::Private::Private(EventPanel* q):
     connect(m_bookmarksTab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
     connect(m_analyticsTab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
     connect(m_notificationsTab, &NotificationListWidget::tileHovered, q, &EventPanel::tileHovered);
+
+    setupBookmarksTabSyncWithNavigator();
 }
 
 EventPanel::Private::~Private()
@@ -322,6 +325,37 @@ void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Va
     static constexpr int kRightBoundaryPosition = 32;
     m_counterLabel->setGeometry(kRightBoundaryPosition - width, kTopMargin,
         width, m_counterLabel->minimumHeight());
+}
+
+void EventPanel::Private::setupBookmarksTabSyncWithNavigator()
+{
+    connect(m_tabs, &QTabWidget::currentChanged, this,
+        [this](int index)
+        {
+            q->context()->action(ui::action::BookmarksModeAction)->setChecked(
+                m_tabs->currentWidget() == m_bookmarksTab);
+
+            m_previousTabIndex = m_lastTabIndex;
+            m_lastTabIndex = index;
+        });
+
+    connect(q->context()->action(ui::action::BookmarksModeAction), &QAction::toggled, this,
+        [this](bool on)
+        {
+            const auto index = m_tabs->indexOf(m_bookmarksTab);
+            if (index < 0)
+                return;
+
+            if (on)
+            {
+                m_tabs->setCurrentIndex(index);
+            }
+            else
+            {
+                if (m_tabs->currentWidget() == m_bookmarksTab)
+                    m_tabs->setCurrentIndex(m_previousTabIndex);
+            }
+        });
 }
 
 } // namespace desktop

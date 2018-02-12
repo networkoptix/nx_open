@@ -52,6 +52,8 @@ private:
 
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
 
+    void setupBookmarksTabSyncWithNavigator();
+
 private:
     EventPanel* const q = nullptr;
     QTabWidget* const m_tabs = nullptr;
@@ -73,6 +75,8 @@ private:
     AnalyticsSearchListModel* const m_analyticsModel = nullptr;
 
     QScopedPointer<vms::event::StringsHelper> m_helper;
+    int m_previousTabIndex = 0;
+    int m_lastTabIndex = 0;
 };
 
 } // namespace desktop
