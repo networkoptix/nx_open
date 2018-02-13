@@ -418,8 +418,9 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 
     if (m_eofDateTimeUs != qint64(AV_NOPTS_VALUE) && m_eofDateTimeUs > m_startDateTimeUs)
     {
-        int progress = (md->timestamp - m_startDateTimeUs) * 100LL;
-        progress /= (m_eofDateTimeUs - m_startDateTimeUs);
+        int progress =
+            ((md->timestamp - m_startDateTimeUs) * 100LL) / (m_eofDateTimeUs - m_startDateTimeUs);
+
         // That happens quite often.
         if (progress > 100)
         {

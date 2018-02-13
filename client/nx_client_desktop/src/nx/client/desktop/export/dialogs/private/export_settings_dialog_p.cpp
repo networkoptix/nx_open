@@ -80,7 +80,10 @@ void ExportSettingsDialog::Private::updateOverlaysVisibility()
     if (m_exportMediaPersistentSettings.shouldExportOverlays())
     {
         for (const auto overlayType: m_exportMediaPersistentSettings.usedOverlays)
-            overlay(overlayType)->setHidden(false);
+        {
+            ExportOverlayWidget* widget = overlay(overlayType);
+            widget->setHidden(false);
+        }
     }
     else
     {
@@ -125,13 +128,16 @@ void ExportSettingsDialog::Private::loadSettings()
 
     updateOverlays();
 
-    const auto& used = m_exportMediaPersistentSettings.usedOverlays;
-    for (const auto type: used)
-        selectOverlay(type);
-
     // Should we call it right here? There are no valid resource links here
     refreshMediaPreview();
     updateOverlaysVisibility();
+
+    if (m_exportMediaPersistentSettings.shouldExportOverlays())
+    {
+        const auto& used = m_exportMediaPersistentSettings.usedOverlays;
+        for (const auto type : used)
+            selectOverlay(type);
+    }
 }
 
 // Called outside from ExportSettingsDialog
@@ -554,7 +560,6 @@ void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
     const ExportBookmarkOverlayPersistentSettings& settings)
 {
     copyOverlaySettingsWithoutPosition(m_exportMediaPersistentSettings.bookmarkOverlay, settings);
-    updateBookmarkText();
     updateOverlayWidget(ExportOverlayType::bookmark);
 }
 
@@ -622,8 +627,10 @@ void ExportSettingsDialog::Private::updateOverlayWidget(ExportOverlayType type)
             break;
         }
 
-        case ExportOverlayType::image:
+        // Tricky case fallthrough. It is intended, really.
         case ExportOverlayType::bookmark:
+            updateBookmarkText();
+        case ExportOverlayType::image:
         case ExportOverlayType::text:
         {
             const auto runtime = m_exportMediaPersistentSettings.overlaySettings(type)

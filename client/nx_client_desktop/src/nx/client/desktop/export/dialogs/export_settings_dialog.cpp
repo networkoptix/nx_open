@@ -303,28 +303,10 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->bookmarkButton->setProperty(kOverlayPropertyName,
         qVariantFromValue(ExportOverlayType::bookmark));
 
-    const auto buttonForType =
+    connect(d, &Private::overlaySelected, this,
         [this](ExportOverlayType type)
         {
-            switch (type)
-            {
-                case ExportOverlayType::timestamp:
-                    return ui->timestampButton;
-                case ExportOverlayType::image:
-                    return ui->imageButton;
-                case ExportOverlayType::text:
-                    return ui->textButton;
-                case ExportOverlayType::bookmark:
-                    return ui->bookmarkButton;
-                default:
-                    return static_cast<ui::SelectableTextButton*>(nullptr);
-            }
-        };
-
-    connect(d, &Private::overlaySelected, this,
-        [buttonForType](ExportOverlayType type)
-        {
-            auto button = buttonForType(type);
+            auto button = buttonForOverlayType(type);
             if (button && button->state() != ui::SelectableTextButton::State::selected)
                 button->click();
         });
@@ -383,6 +365,24 @@ ExportSettingsDialog::~ExportSettingsDialog()
 {
     d->disconnect(this);
 }
+
+
+ui::SelectableTextButton* ExportSettingsDialog::buttonForOverlayType(ExportOverlayType type)
+{
+    switch (type)
+    {
+    case ExportOverlayType::timestamp:
+        return ui->timestampButton;
+    case ExportOverlayType::image:
+        return ui->imageButton;
+    case ExportOverlayType::text:
+        return ui->textButton;
+    case ExportOverlayType::bookmark:
+        return ui->bookmarkButton;
+    default:
+        return static_cast<ui::SelectableTextButton*>(nullptr);
+    }
+};
 
 ExportSettingsDialog::Mode ExportSettingsDialog::mode() const
 {
@@ -494,9 +494,10 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
 
 void ExportSettingsDialog::updateTranscodingWidgets()
 {
-    // Gather all data to apply to UI
-    bool transcodingLocked = d->exportMediaPersistentSettings().areFiltersForced();
-    bool transcodingChecked = d->exportMediaPersistentSettings().applyFilters;
+    // Gather all data to apply to UI.
+    const auto& settings = d->exportMediaPersistentSettings();
+    bool transcodingLocked = settings.areFiltersForced();
+    bool transcodingChecked = settings.applyFilters;
     bool overlayOptionsAvailable = d->mode() == Mode::Media;
 
     if (d->mode() == Mode::Media && !d->hasVideo())
@@ -505,21 +506,37 @@ void ExportSettingsDialog::updateTranscodingWidgets()
         transcodingChecked = false;
     }
 
-    // Should hide additional overlay buttons of transcoding is disabled
+    // Should hide additional overlay buttons of transcoding is disabled.
     if (!transcodingChecked || transcodingLocked)
     {
         overlayOptionsAvailable = false;
     }
 
-    // Applying data to UI
-    // All UI events should be locked here
+    // Applying data to UI.
+    // All UI events should be locked here.
     ui->exportMediaSettingsPage->setTranscodingAllowed(!transcodingLocked);
     ui->exportMediaSettingsPage->setApplyFilters(transcodingChecked, true);
 
     if (transcodingChecked && overlayOptionsAvailable)
         ui->cameraExportSettingsButton->click();
 
-    ui->transcodingButtonsWidget->setHidden(!overlayOptionsAvailable);
+    // Yep, we need exactly this condition.
+    if (overlayOptionsAvailable == ui->transcodingButtonsWidget->isHidden())
+    {
+        ui->transcodingButtonsWidget->setHidden(!overlayOptionsAvailable);
+    }
+
+    // Update button state for used overlays.
+    for (auto overlay: settings.usedOverlays)
+    {
+        ui::SelectableTextButton* button = buttonForOverlayType(overlay);
+        if (!button)
+            continue;
+        if (button->state() == ui::SelectableTextButton::State::deactivated)
+        {
+            button->setState(ui::SelectableTextButton::State::unselected);
+        }
+    }
 }
 
 void ExportSettingsDialog::setMediaParams(
@@ -552,7 +569,6 @@ void ExportSettingsDialog::setMediaParams(
     Filename baseFileName = currentSettings.fileName;
     QString namePart = resource->getName();
     baseFileName.name = nx::utils::replaceNonFileNameCharacters(namePart + L'_' + timePart, L'_');
-    // Changing filename causes signal that rebuilds filter chain
 
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     const auto customAr = mediaResource->customAspectRatio();
@@ -572,8 +588,7 @@ void ExportSettingsDialog::setMediaParams(
     //      and then emits ExportSettingsDialog::Private::transcodingAllowedChanged
     ui->mediaFilenamePanel->setFilename(suggestedFileName(baseFileName));
 
-    // Disabling additional filters if we have no video
-    // TODO: this case is mapped to d->isMediaEmpty()
+    // Disabling additional filters if we have no video.
     if (!mediaResource->hasVideo())
     {
         ui->timestampButton->setEnabled(false);
