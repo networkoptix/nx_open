@@ -534,15 +534,7 @@ QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
         Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
     if (shouldAppearAsSingleChannel)
-    {
-        return new nx::plugins::utils::MultisensorDataProvider(
-            toSharedPointer(this),
-            [](const QnResourcePtr& resource)
-        {
-            return new QnOnvifStreamReader(resource);
-        });
-    }
-
+        return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
 
     return new QnOnvifStreamReader(toSharedPointer(this));
 }
@@ -3952,7 +3944,7 @@ void QnPlOnvifResource::setMaxChannels(int value)
 
 void QnPlOnvifResource::updateVideoEncoder(
     VideoEncoder& encoder,
-    bool isPrimary,
+    Qn::StreamIndex streamIndex,
     const QnLiveStreamParams& streamParams)
 {
     QnLiveStreamParams params = streamParams;
@@ -3979,7 +3971,8 @@ void QnPlOnvifResource::updateVideoEncoder(
         }
         saveParams();
     }
-    auto capabilities = isPrimary ? m_primaryStreamCapabilities : m_secondaryStreamCapabilities;
+    const auto capabilities = (streamIndex == Qn::StreamIndex::primary)
+        ? m_primaryStreamCapabilities : m_secondaryStreamCapabilities;
 
     const auto codecId = QnAvCodecHelper::codecIdFromString(streamParams.codec);
     encoder.Encoding = capabilities.isH264 && codecId != AV_CODEC_ID_MJPEG
