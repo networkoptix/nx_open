@@ -40,6 +40,26 @@ void EventRibbon::setShowDefaultToolTips(bool value)
     d->setShowDefaultToolTips(value);
 }
 
+bool EventRibbon::previewsEnabled() const
+{
+    return d->previewsEnabled();
+}
+
+void EventRibbon::setPreviewsEnabled(bool value)
+{
+    d->setPreviewsEnabled(value);
+}
+
+bool EventRibbon::footersEnabled() const
+{
+    return d->footersEnabled();
+}
+
+void EventRibbon::setFootersEnabled(bool value)
+{
+    d->setFootersEnabled(value);
+}
+
 QScrollBar* EventRibbon::scrollBar() const
 {
     return d->scrollBar();

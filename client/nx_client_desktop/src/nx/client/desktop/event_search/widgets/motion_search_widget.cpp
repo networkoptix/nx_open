@@ -1,6 +1,7 @@
 #include "motion_search_widget.h"
 
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QToolButton>
 
 #include <ui/models/sort_filter_list_model.h>
 #include <ui/style/skin.h>
@@ -23,6 +24,7 @@ MotionSearchWidget::MotionSearchWidget(QWidget* parent):
     setMotionSearchEnabled(false);
 
     filterEdit()->hide();
+    showPreviewsButton()->show();
 
     connect(m_model, &MotionSearchListModel::totalCountChanged,
         this, &MotionSearchWidget::updateEventCounter);

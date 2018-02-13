@@ -30,6 +30,12 @@ public:
     bool showDefaultToolTips() const;
     void setShowDefaultToolTips(bool value);
 
+    bool previewsEnabled() const;
+    void setPreviewsEnabled(bool value);
+
+    bool footersEnabled() const;
+    void setFootersEnabled(bool value);
+
     virtual QSize sizeHint() const override;
 
     QScrollBar* scrollBar() const;

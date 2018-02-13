@@ -175,6 +175,8 @@ EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
     auto tile = new EventTile(q);
     tile->setContextMenuPolicy(Qt::CustomContextMenu);
     tile->installEventFilter(this);
+    tile->setPreviewEnabled(m_previewsEnabled);
+    tile->setFooterEnabled(m_footersEnabled);
     updateTile(tile, index);
 
     const auto importance = index.data(Qn::NotificationLevelRole);
@@ -557,6 +559,38 @@ bool EventRibbon::Private::showDefaultToolTips() const
 void EventRibbon::Private::setShowDefaultToolTips(bool value)
 {
     m_showDefaultToolTips = value;
+}
+
+bool EventRibbon::Private::previewsEnabled() const
+{
+    return m_previewsEnabled;
+}
+
+void EventRibbon::Private::setPreviewsEnabled(bool value)
+{
+    if (m_previewsEnabled == value)
+        return;
+
+    m_previewsEnabled = value;
+
+    for (auto tile: m_tiles)
+        tile->setPreviewEnabled(m_previewsEnabled);
+}
+
+bool EventRibbon::Private::footersEnabled() const
+{
+    return m_footersEnabled;
+}
+
+void EventRibbon::Private::setFootersEnabled(bool value)
+{
+    if (m_footersEnabled == value)
+        return;
+
+    m_footersEnabled = value;
+
+    for (auto tile: m_tiles)
+        tile->setFooterEnabled(m_footersEnabled);
 }
 
 int EventRibbon::Private::calculateHeight(QWidget* widget) const

@@ -60,14 +60,12 @@ EventTile::EventTile(QWidget* parent):
 
     ui->descriptionLabel->setHidden(true);
     ui->timestampLabel->setHidden(true);
-    ui->previewWidget->setHidden(true);
     ui->actionHolder->setHidden(true);
+    ui->narrowHolder->setHidden(true);
+    ui->wideHolder->setHidden(true);
     ui->footerLabel->setHidden(true);
 
     ui->previewWidget->setCropMode(AsyncImageWidget::CropMode::notHovered);
-
-    ui->wideHolder->setHidden(true);
-    ui->narrowHolder->setHidden(true);
 
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
@@ -212,7 +210,7 @@ QString EventTile::footerText() const
 void EventTile::setFooterText(const QString& value)
 {
     ui->footerLabel->setText(value);
-    ui->footerLabel->setHidden(value.isEmpty());
+    ui->footerLabel->setHidden(!m_footerEnabled || value.isEmpty());
 }
 
 QString EventTile::timestamp() const
@@ -252,7 +250,6 @@ QnImageProvider* EventTile::preview() const
 void EventTile::setPreview(QnImageProvider* value)
 {
     ui->previewWidget->setImageProvider(value);
-    ui->previewWidget->setHidden(!value);
     ui->previewWidget->parentWidget()->setHidden(!value);
 }
 
@@ -457,6 +454,28 @@ void EventTile::setRead(bool value)
         m_autoCloseTimer->start();
 }
 
+bool EventTile::previewEnabled() const
+{
+    return !ui->previewWidget->isHidden();
+}
+
+void EventTile::setPreviewEnabled(bool value)
+{
+    ui->previewWidget->setHidden(!value);
+    ui->previewWidget->parentWidget()->setHidden(!value || !ui->previewWidget->imageProvider());
+}
+
+bool EventTile::footerEnabled() const
+{
+    return m_footerEnabled;
+}
+
+void EventTile::setFooterEnabled(bool value)
+{
+    m_footerEnabled = value;
+    ui->footerLabel->setHidden(!m_footerEnabled || ui->footerLabel->text().isEmpty());
+}
+
 EventTile::Mode EventTile::mode() const
 {
     if (ui->previewWidget->parentWidget() == ui->narrowHolder)
@@ -482,17 +501,18 @@ void EventTile::setMode(Mode value)
             ui->previewWidget->setHidden(wasHidden);
         };
 
+    const bool noPreview = ui->previewWidget->isHidden() || !ui->previewWidget->imageProvider();
     switch (value)
     {
         case Mode::standard:
             reparentPreview(ui->narrowHolder);
-            ui->narrowHolder->setHidden(ui->previewWidget->isHidden());
+            ui->narrowHolder->setHidden(noPreview);
             ui->wideHolder->setHidden(true);
             break;
 
         case Mode::wide:
             reparentPreview(ui->wideHolder);
-            ui->wideHolder->setHidden(ui->previewWidget->isHidden());
+            ui->wideHolder->setHidden(noPreview);
             ui->narrowHolder->setHidden(false); //< There is a spacer child item.
             break;
 
