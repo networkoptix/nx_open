@@ -7,6 +7,7 @@ import vagrant.compat
 from pathlib2 import Path
 
 from .os_access import ProcessError, SshAccess, host_from_config
+from .patch_sshd import optimize_sshd
 from .vagrant_vm_config import DEFAULT_NATNET1, VagrantVMConfig
 from .virtualbox_management import VirtualboxManagement
 
@@ -247,7 +248,7 @@ class VagrantVM(object):
             f.write(self._vagrant.ssh_config(self.vagrant_name))
             f.flush()
             self._make_os_access('vagrant', f.name).run_command(['sudo', 'cp', '-r', '/home/vagrant/.ssh', '/root/'])
-            self._patch_sshd_config(self._make_os_access('root', f.name))
+            optimize_sshd(self._make_os_access('root', f.name))
         self.is_running = True
 
     def destroy(self):
@@ -270,18 +271,3 @@ class VagrantVM(object):
             file_path = Path(file_path_format.format(test_dir=test_dir, bin_dir=self._bin_dir))
             assert file_path.is_file(), '%s is expected but is missing' % file_path
             self.host_os_access.put_file(file_path, self._vagrant_dir)
-
-    @staticmethod
-    def _patch_sshd_config(root_ssh_host):
-        """With default settings, connection takes ~1.5 sec."""
-        sshd_config_path = '/etc/ssh/sshd_config'
-        settings = root_ssh_host.read_file(sshd_config_path).split('\n')  # Preserve new line at the end!
-        old_setting = 'UsePAM yes'
-        new_setting = 'UsePAM no'
-        try:
-            old_setting_line_index = settings.index(old_setting)
-        except ValueError:
-            assert False, "Wanted to replace %s with %s but couldn't fine latter" % (old_setting, new_setting)
-        settings[old_setting_line_index] = new_setting
-        root_ssh_host.write_file(sshd_config_path, '\n'.join(settings))
-        root_ssh_host.run_command(['service', 'ssh', 'reload'])
