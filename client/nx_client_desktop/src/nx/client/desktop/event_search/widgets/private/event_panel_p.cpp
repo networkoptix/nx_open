@@ -2,8 +2,9 @@
 
 #include <QtGui/QPainter>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QTabWidget>
 #include <QtWidgets/QScrollBar>
+#include <QtWidgets/QTabWidget>
+#include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 
 #include <core/resource/camera_resource.h>
@@ -204,6 +205,7 @@ void EventPanel::Private::setupBookmarkSearch()
     m_bookmarksTab->setModel(new UnifiedAsyncSearchListModel(m_bookmarksModel, this));
     m_bookmarksTab->setPlaceholderTexts(tr("No bookmarks"), kHtmlPlaceholder);
     m_bookmarksTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/bookmarks.png")));
+    m_bookmarksTab->showPreviewsButton()->show();
 
     connect(m_bookmarksTab->filterEdit(), &QnSearchLineEdit::textChanged, m_bookmarksModel,
         [this](const QString& text)
@@ -228,6 +230,8 @@ void EventPanel::Private::setupAnalyticsSearch()
     m_analyticsTab->setModel(new UnifiedAsyncSearchListModel(m_analyticsModel, this));
     m_analyticsTab->setPlaceholderTexts(tr("No objects"), tr("No objects detected"));
     m_analyticsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/analytics.png")));
+    m_analyticsTab->showPreviewsButton()->show();
+    m_analyticsTab->showInfoButton()->show();
 
     connect(m_analyticsTab->filterEdit(), &QnSearchLineEdit::textChanged, m_analyticsModel,
         [this](const QString& text)

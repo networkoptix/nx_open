@@ -100,6 +100,12 @@ public:
     bool isRead() const;
     void setRead(bool value);
 
+    bool previewEnabled() const;
+    void setPreviewEnabled(bool value);
+
+    bool footerEnabled() const;
+    void setFooterEnabled(bool value);
+
     enum class Mode
     {
         standard,
@@ -134,6 +140,7 @@ private:
     QTimer* m_autoCloseTimer = nullptr;
     qreal m_progressValue = 0.0;
     bool m_isRead = false;
+    bool m_footerEnabled = true;
 };
 
 } // namespace desktop

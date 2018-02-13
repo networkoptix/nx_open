@@ -134,18 +134,30 @@
       </property>
       <item>
        <widget class="QWidget" name="counterContainer" native="true">
-        <layout class="QVBoxLayout" name="verticalLayout_3">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>32</height>
+         </size>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout">
          <property name="spacing">
-          <number>0</number>
+          <number>8</number>
          </property>
          <property name="leftMargin">
-          <number>2</number>
+          <number>8</number>
          </property>
          <property name="topMargin">
           <number>0</number>
          </property>
          <property name="rightMargin">
-          <number>2</number>
+          <number>8</number>
          </property>
          <property name="bottomMargin">
           <number>0</number>
@@ -167,8 +179,31 @@
            <property name="text">
             <string notr="true">&lt;event counter&gt;</string>
            </property>
-           <property name="margin">
-            <number>6</number>
+          </widget>
+         </item>
+         <item>
+          <widget class="QnToolButton" name="showInfoButton">
+           <property name="toolTip">
+            <string>Show/hide information</string>
+           </property>
+           <property name="text">
+            <string notr="true"/>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QnToolButton" name="showPreviewsButton">
+           <property name="toolTip">
+            <string>Show/hide thumbnails</string>
+           </property>
+           <property name="text">
+            <string notr="true"/>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -298,6 +333,11 @@
    <class>nx::client::desktop::ui::SelectableTextButton</class>
    <extends>QPushButton</extends>
    <header location="global">nx/client/desktop/ui/common/selectable_text_button.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QnToolButton</class>
+   <extends>QToolButton</extends>
+   <header location="global">ui/widgets/common/tool_button.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
