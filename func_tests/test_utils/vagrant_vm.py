@@ -1,5 +1,6 @@
 import logging
 import tempfile
+from textwrap import dedent
 
 import jinja2
 import vagrant
@@ -190,7 +191,14 @@ class VagrantVMFactory(object):
         self._host_os_access.write_file(self._vagrant_file_path, vagrantfile.encode())
 
     def _write_ssh_config(self):
+        ssh_connections_dir = self._ssh_config_path.with_name('ssh_connections')
+        ssh_connections_dir.mkdir(exist_ok=True)
         with self._ssh_config_path.open('w') as f:
+            f.write(dedent(u'''
+                ControlMaster auto
+                ControlPersist 1m
+                ControlPath {}/%r@%h:%p
+                ''').format(ssh_connections_dir).strip() + '\n\n')
             for vm in self._vms.values():
                 if vm.is_running:
                     f.write(self._vagrant.ssh_config(vm.vagrant_name).decode())
