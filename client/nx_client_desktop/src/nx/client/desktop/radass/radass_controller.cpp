@@ -62,10 +62,14 @@ bool isForcedHqDisplay(QnCamDisplay* display)
     return display->isFullScreen() || display->isZoomWindow() || display->isFisheyeEnabled();
 }
 
+bool isFastForwardOrRevMode(float speed)
+{
+    return speed > 1 + kSpeedValueEpsilon || speed < 0;
+}
+
 bool isFastForwardOrRevMode(QnCamDisplay* display)
 {
-    const auto speed = display->getSpeed();
-    return speed > 1 + kSpeedValueEpsilon || speed < 0;
+    return isFastForwardOrRevMode(display->getSpeed());
 }
 
 QnVirtualCameraResourcePtr getCamera(QnCamDisplay* display)
@@ -118,22 +122,10 @@ enum class LqReason
 {
     none,
     smallItem,
-    network,
-    cpu,
+    performance,
+    performanceInFf,
     tooManyItems
 };
-
-LqReason slowLqReason(QnCamDisplay* display)
-{
-    return display->queueSize() < kSlowNetworkFrameLimit
-        ? LqReason::network
-        : LqReason::cpu;
-}
-
-bool isPerformanceProblem(LqReason value)
-{
-    return value == LqReason::cpu || value == LqReason::network;
-}
 
 enum class FindMethod
 {
@@ -145,7 +137,7 @@ struct ConsumerInfo
 {
     using Mode = nx::client::desktop::RadassMode;
 
-    QnCamDisplay* display;
+    QnCamDisplay* display = nullptr;
 
     float toLqSpeed = 0.0;
     LqReason lqReason = LqReason::none;
@@ -265,7 +257,7 @@ struct RadassController::Private
         SearchCondition condition = SearchCondition(),
         int* displaySize = nullptr)
     {
-        const bool findHQ = findQuality == MEDIA_Quality_High;
+        const bool findHq = findQuality == MEDIA_Quality_High;
         if (displaySize)
             *displaySize = 0;
 
@@ -309,11 +301,11 @@ struct RadassController::Private
             else
                 itr.previous();
 
-            auto consumer = itr.value();
-            auto display = consumer->display;
+            const auto consumer = itr.value();
+            const auto display = consumer->display;
             QnArchiveStreamReader* reader = display->getArchiveReader();
-            bool isReaderHQ = reader->getQuality() == MEDIA_Quality_High;
-            if (isReaderHQ == findHQ)
+            const bool isReaderHq = reader->getQuality() == MEDIA_Quality_High;
+            if (isReaderHq == findHq)
             {
                 if (displaySize)
                     *displaySize = itr.key() >> 32;
@@ -328,22 +320,47 @@ struct RadassController::Private
     {
         const auto reader = consumer->display->getArchiveReader();
         const bool isInHiQuality = reader->getQuality() == MEDIA_Quality_High;
+        const auto consumerSpeed = speed != kAutomaticSpeed ? speed : consumer->display->getSpeed();
+
+        const auto lQReasonString = [reason, consumer]
+            {
+                const auto display = consumer->display;
+                const QString performanceProblem = display->queueSize() < 3
+                    ? lit(" (Network)")
+                    : lit(" (CPU)");
+                switch (reason)
+                {
+                    case LqReason::smallItem:
+                        return lit("smallItem");
+                    case LqReason::performance:
+                        return lit("performance") + performanceProblem;
+                    case LqReason::performanceInFf:
+                        return lit("performanceInFf") + performanceProblem;
+                    case LqReason::tooManyItems:
+                        return lit("tooManyItems");
+                    default:
+                        break;
+                }
+                return QString();
+            };
 
         if (isInHiQuality)
         {
             const auto oldReason = consumer->lqReason;
-            const auto wasPerformanceProblem = isPerformanceProblem(oldReason)
+            const auto wasPerformanceProblem = oldReason == LqReason::performance
                 || oldReason == LqReason::tooManyItems;
 
-            if (wasPerformanceProblem && isPerformanceProblem(reason))
+            // Do not block Lq-Hq transition if current consumer was switched to Lq while FF/REW.
+            if (wasPerformanceProblem && reason == LqReason::performance)
             {
                 // Item goes to LQ again because of performance issue.
                 autoHqTransitionAllowed = false;
                 trace("Performance problem repeated on consumer, blocking LQ->HQ", consumer);
             }
 
-            trace(lit("Switching High->Low, %1 ms since last automatic change")
-                .arg(lastAutoSwitchTimer.elapsed()));
+            trace(lit("Switching High->Low, %1 ms since last automatic change, reason %2")
+                .arg(lastAutoSwitchTimer.elapsed())
+                .arg(lQReasonString()));
 
             // Last actual change time (for performance warning only).
             lastModeChangeTimer.restart();
@@ -351,8 +368,7 @@ struct RadassController::Private
 
         reader->setQuality(MEDIA_Quality_Low, true);
         consumer->lqReason = reason;
-        // Get speed for FF reason as external variable to prevent race condition.
-        consumer->toLqSpeed = speed != kAutomaticSpeed ? speed : consumer->display->getSpeed();
+        consumer->toLqSpeed = consumerSpeed;
         consumer->awaitingLqTime.invalidate();
     }
 
@@ -384,7 +400,7 @@ struct RadassController::Private
             {
                 return info.mode == RadassMode::Auto
                     && info.display->getArchiveReader()->getQuality() == MEDIA_Quality_Low
-                    && isPerformanceProblem(info.lqReason);
+                    && info.lqReason == LqReason::performance;
             });
     }
 
@@ -398,7 +414,6 @@ struct RadassController::Private
         const auto display = consumer->display;
 
         const auto reader = display->getArchiveReader();
-
         if (isForcedHqDisplay(display))
         {
             if (reader->getQuality() != MEDIA_Quality_High)
@@ -411,7 +426,7 @@ struct RadassController::Private
             && consumer->awaitingLqTime.hasExpired(kQualitySwitchIntervalMs))
         {
             trace("Consumer had slow stream for 5 seconds", consumer);
-            gotoLowQuality(consumer, slowLqReason(display));
+            gotoLowQuality(consumer, LqReason::performance);
             return;
         }
 
@@ -494,7 +509,7 @@ struct RadassController::Private
 
     void onSlowStream(Consumer consumer)
     {
-        trace("Slow stream detected", consumer);
+        trace("Slow stream detected.", consumer);
         lastSystemRtspDrop.restart();
         consumer->lastRtspDrop.restart();
 
@@ -502,18 +517,28 @@ struct RadassController::Private
         if (consumer->mode != RadassMode::Auto)
             return;
 
-        auto display = consumer->display;
-        auto reader = display->getArchiveReader();
+        const auto display = consumer->display;
+        const auto reader = display->getArchiveReader();
 
         if (isForcedHqDisplay(display))
         {
-            trace("Consumer is in forced HQ, leaving as is", consumer);
+            trace("Consumer is in forced HQ, leaving as is.", consumer);
             return;
         }
 
         // Check if reader already at LQ.
         if (reader->getQuality() == MEDIA_Quality_Low)
             return;
+
+        // If item is in high speed, switch it to Lq immediately without triggering timer. Speed is
+        // saved to an external variable to avoid race condition @rvasilenko.
+        const auto speed = display->getSpeed();
+        if (isFastForwardOrRevMode(speed))
+        {
+            trace("Consumer is in FF/Rew, swithing to LQ immediately.", consumer);
+            gotoLowQuality(consumer, LqReason::performanceInFf, speed);
+            return;
+        }
 
         // Do not go to LQ if recently switch occurred.
         if (!lastAutoSwitchTimer.hasExpired(kQualitySwitchIntervalMs))
@@ -523,8 +548,8 @@ struct RadassController::Private
             return;
         }
 
-        trace("Switching to LQ", consumer);
-        gotoLowQuality(consumer, slowLqReason(consumer->display));
+        trace("Switching to LQ.", consumer);
+        gotoLowQuality(consumer, LqReason::performance);
         lastAutoSwitchTimer.restart();
     }
 
@@ -537,6 +562,23 @@ struct RadassController::Private
         if (consumer->mode != RadassMode::Auto)
             return;
 
+        QnCamDisplay* display = consumer->display;
+        if (consumer->lqReason == LqReason::performanceInFf
+            && (qAbs(display->getSpeed()) < consumer->toLqSpeed
+                    || (consumer->toLqSpeed < 0 && display->getSpeed() > 0)))
+        {
+            // If item leave high speed mode change same item to HQ
+            trace("Consumer left FF mode or slowed, switching to HQ", consumer);
+            gotoHighQuality(consumer);
+            return;
+        }
+
+        if (isFastForwardOrRevMode(display))
+        {
+            trace("Consumer still in FF mode, left in LQ", consumer);
+            return;
+        }
+
         // Auto-Hq transition is not blocked
         if (!autoHqTransitionAllowed)
         {
@@ -544,22 +586,8 @@ struct RadassController::Private
             return;
         }
 
-        QnCamDisplay* display = consumer->display;
-        if (isPerformanceProblem(consumer->lqReason)
-            &&
-            (
-                qAbs(display->getSpeed()) < consumer->toLqSpeed
-                || (consumer->toLqSpeed < 0 && display->getSpeed() > 0))
-            )
-        {
-            // If item leave high speed mode change same item to HQ
-            trace("Consumer left FF mode, switching to HQ", consumer);
-            gotoHighQuality(consumer);
-            return;
-        }
-
         // Do not try HQ for small items.
-        if (!isBigItem(display))
+        if (isSmallOrMediumItem(display))
         {
             trace("Consumer is not big enough", consumer);
             return;
