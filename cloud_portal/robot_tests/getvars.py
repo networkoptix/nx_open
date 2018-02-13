@@ -1,7 +1,15 @@
 import codecs
 import json
+import re
 
 def get_variables(lang):
-    with codecs.open("translations/variables_"+lang+".json", 'r', 'utf-8') as file_descriptor:
-        target_content = json.load(file_descriptor)
-        return target_content
+    with codecs.open("customizations/variables_cloud.json", 'r') as customization_variables:
+        customization_json = json.load(customization_variables)
+        
+        with codecs.open("translations/variables_"+lang+".json", 'r') as translation_variables:
+            translation_variables = translation_variables.read()
+            for x in customization_json:
+                p = re.compile(x)
+                target_content = p.sub(customization_json[x], translation_variables)
+                target_content=  json.loads(target_content)
+            return target_content

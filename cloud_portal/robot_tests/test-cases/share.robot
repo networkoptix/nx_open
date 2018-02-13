@@ -167,6 +167,6 @@ Share with registered user - sends him notification
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Check User Permissions    ${EMAIL NOPERM}    ${CUSTOM TEXT}
     Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
-    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    subject=${INVITED TO SYSTEM EMAIL SUBJECT}    timeout=120
+    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    subject=TestFirstName TestLastName ${INVITED TO SYSTEM EMAIL SUBJECT}    timeout=120
     Remove User Permissions    ${EMAIL NOPERM}
     Close Browser
