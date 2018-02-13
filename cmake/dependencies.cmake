@@ -18,6 +18,10 @@ function(nx_detect_package_versions)
     _set_version(festival "2.4")
     _set_version(directx "JUN2010")
     _set_version(cassandra "2.7.0")
+    _set_version(gstreamer "1.0")
+    _set_version(glib "2.0")
+    _set_version(deepstream "0.1")
+    _set_version(deepstream_sample_models "0.1")
 
     if(WINDOWS)
         _set_version(qt "5.6.1-1")
@@ -84,6 +88,10 @@ function(nx_detect_package_versions)
         festival
         directx
         cassandra
+        gstreamer
+        glib
+        deepstream
+        deepstream_sample_models
     )
         if("${_${pkg}_version}" STREQUAL "")
             message(WARNING
@@ -142,6 +150,10 @@ function(nx_get_dependencies)
         nx_rdep_add_package(sysroot)
         nx_rdep_add_package(tegra_video)
         nx_rdep_add_package(jetpack)
+        nx_rdep_add_package(gstreamer)
+        nx_rdep_add_package(glib)
+        nx_rdep_add_package(deepstream)
+        nx_rdep_add_package(any/deepstream_sample_models)
     endif()
 
     if(ANDROID OR WINDOWS OR box MATCHES "bpi")
