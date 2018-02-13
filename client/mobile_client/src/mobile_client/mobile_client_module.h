@@ -17,6 +17,9 @@ public:
         QObject* parent = nullptr);
     QnCloudStatusWatcher* cloudStatusWatcher() const;
     ~QnMobileClientModule();
+
+    void initDesktopCamera();
+
 private:
     std::unique_ptr<QnClientCoreModule> m_clientCoreModule;
     QnCloudStatusWatcher* m_cloudStatusWatcher;

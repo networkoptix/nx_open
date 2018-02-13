@@ -41,6 +41,11 @@
 #include "math_approx.h"
 //#include "os_support.h"
 
+extern "C"
+{
+#include <libavutil/mem.h>
+}
+
 #ifdef FIXED_POINT
 
 #define toBARK(n)   (MULT16_16(26829,spx_atan(SHR32(MULT16_16(97,n),2))) + MULT16_16(4588,spx_atan(MULT16_32_Q15(20,MULT16_16(n,n)))) + MULT16_16(3355,n))

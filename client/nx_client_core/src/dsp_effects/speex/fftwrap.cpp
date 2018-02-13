@@ -39,6 +39,11 @@
 #include "arch.h"
 //#include "os_support.h"
 
+extern "C"
+{
+#include <libavutil/mem.h>
+}
+
 #define MAX_FFT_SIZE 2048
 
 #ifdef FIXED_POINT

@@ -37,6 +37,11 @@
 #include "arch.h"
 //#include "os_support.h"
 
+extern "C"
+{
+#include <libavutil/mem.h>
+}
+
 static void drfti1(int n, float *wa, int *ifac){
   static int ntryh[4] = { 4,2,3,5 };
   static float tpi = 6.28318530717958648f;
