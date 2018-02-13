@@ -1,5 +1,5 @@
 #include <nx/update/manager/detail/update_request_data_factory.h>
-#include <nx/update/installer/abstract_updates2_installer.h>
+#include <nx/update/installer/detail/abstract_updates2_installer.h>
 #include <nx/update/info/abstract_update_registry.h>
 #include <nx/update/manager/detail/updates2_manager_base.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
@@ -13,6 +13,7 @@
 
 namespace nx {
 namespace update {
+namespace detail {
 namespace test {
 
 class TestUpdateRegistry: public update::info::AbstractUpdateRegistry
@@ -72,7 +73,7 @@ enum class PrepareExpectedOutcome
 
 const static QString kFileName = "test.file.name";
 
-class TestInstaller: public AbstractUpdates2Installer, public QnLongRunnable
+class TestInstaller: public detail::AbstractUpdates2Installer, public QnLongRunnable
 {
 public:
     virtual void prepareAsync(
@@ -82,7 +83,7 @@ public:
         put(handler);
     }
 
-    MOCK_METHOD1(install, void(const QString& updateId));
+    MOCK_METHOD0(install, void());
 
     void setExpectedOutcome(PrepareExpectedOutcome expectedOutcome)
     {
@@ -121,10 +122,10 @@ private:
             switch (m_expectedOutcome)
             {
                 case PrepareExpectedOutcome::success:
-                    handler(PrepareResult::ok , kFileName);
+                    handler(PrepareResult::ok);
                     break;
                 case PrepareExpectedOutcome::fail_noFreeSpace:
-                    handler(PrepareResult::noFreeSpace , kFileName);
+                    handler(PrepareResult::noFreeSpace);
                     break;
             }
 
@@ -147,7 +148,7 @@ private:
     }
 };
 
-class TestUpdates2Manager: public detail::Updates2ManagerBase
+class TestUpdates2Manager: public Updates2ManagerBase
 {
 public:
     void setStatus(const detail::Updates2StatusDataEx& status)
@@ -846,5 +847,6 @@ TEST_F(Updates2Manager, Prepare_failedNoFreeSpace)
 }
 
 } // namespace test
+} // namespace detail
 } // namespace update
 } // namespace nx
