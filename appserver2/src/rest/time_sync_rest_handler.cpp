@@ -5,8 +5,8 @@
 
 #include <rest/server/rest_connection_processor.h>
 
-#include "managers/time_manager.h"
 #include "connection_factory.h"
+#include "managers/time_manager.h"
 
 namespace ec2 {
 
@@ -25,36 +25,18 @@ int QnTimeSyncRestHandler::executeGet(
     QByteArray& /*contentType*/,
     const QnRestConnectionProcessor* connection)
 {
-    auto peerGuid = connection->request().headers.find(Qn::PEER_GUID_HEADER_NAME);
-    if (peerGuid == connection->request().headers.end())
-        return nx_http::StatusCode::badRequest;
-    auto timeSyncHeaderIter = connection->request().headers.find(TIME_SYNC_HEADER_NAME);
-    if (timeSyncHeaderIter != connection->request().headers.end())
-    {
-        boost::optional<qint64> rttMillis;
-        auto rttHeaderIter = connection->request().headers.find(Qn::RTT_MS_HEADER_NAME);
-        if (rttHeaderIter != connection->request().headers.end())
-            rttMillis = rttHeaderIter->second.toLongLong();
-
-        if (!rttMillis)
-        {
-            StreamSocketInfo sockInfo;
-            if (connection->socket() && connection->socket()->getConnectionStatistics(&sockInfo))
-                rttMillis = sockInfo.rttVar;
-        }
-        m_appServerConnection->timeSyncManager()->processTimeSyncInfoHeader(
-            QnUuid::fromStringSafe(peerGuid->second),
-            timeSyncHeaderIter->second,
-            rttMillis);
-    }
+    const auto resultCode = processRequest(
+        connection->request(),
+        m_appServerConnection->timeSyncManager(),
+        connection->socket().data());
+    if (resultCode != nx_http::StatusCode::ok)
+        return resultCode;
 
     // Sending our time synchronization information to remote peer.
-    connection->response()->headers.emplace(
-        TIME_SYNC_HEADER_NAME,
-        m_appServerConnection->timeSyncManager()->getTimeSyncInfo().toString());
-    connection->response()->headers.emplace(
-        Qn::PEER_GUID_HEADER_NAME,
-        m_appServerConnection->commonModule()->moduleGUID().toByteArray());
+    prepareResponse(
+        *m_appServerConnection->timeSyncManager(),
+        *m_appServerConnection->commonModule(),
+        connection->response());
 
     return nx_http::StatusCode::ok;
 }
@@ -74,6 +56,50 @@ int QnTimeSyncRestHandler::executePost(
         result,
         resultContentType,
         connection);
+}
+
+nx_http::StatusCode::Value QnTimeSyncRestHandler::processRequest(
+    const nx_http::Request& request,
+    TimeSynchronizationManager* timeSynchronizationManager,
+    AbstractStreamSocket* connection)
+{
+    auto peerGuid = request.headers.find(Qn::PEER_GUID_HEADER_NAME);
+    if (peerGuid == request.headers.end())
+        return nx_http::StatusCode::badRequest;
+    auto timeSyncHeaderIter = request.headers.find(TIME_SYNC_HEADER_NAME);
+    if (timeSyncHeaderIter != request.headers.end())
+    {
+        boost::optional<qint64> rttMillis;
+        auto rttHeaderIter = request.headers.find(Qn::RTT_MS_HEADER_NAME);
+        if (rttHeaderIter != request.headers.end())
+            rttMillis = rttHeaderIter->second.toLongLong();
+
+        if (!rttMillis)
+        {
+            StreamSocketInfo sockInfo;
+            if (connection && connection->getConnectionStatistics(&sockInfo))
+                rttMillis = sockInfo.rttVar;
+        }
+        timeSynchronizationManager->processTimeSyncInfoHeader(
+            QnUuid::fromStringSafe(peerGuid->second),
+            timeSyncHeaderIter->second,
+            rttMillis);
+    }
+
+    return nx_http::StatusCode::ok;
+}
+
+void QnTimeSyncRestHandler::prepareResponse(
+    const TimeSynchronizationManager& timeSynchronizationManager,
+    const QnCommonModule& commonModule,
+    nx_http::Response* response)
+{
+    response->headers.emplace(
+        TIME_SYNC_HEADER_NAME,
+        timeSynchronizationManager.getTimeSyncInfo().toString());
+    response->headers.emplace(
+        Qn::PEER_GUID_HEADER_NAME,
+        commonModule.moduleGUID().toByteArray());
 }
 
 } // namespace ec2

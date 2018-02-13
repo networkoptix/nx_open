@@ -67,6 +67,14 @@ public:
     virtual ErrorCode saveSync(const ApiMiscData& data) = 0;
 };
 
+class AbstractTimeProvider
+{
+public:
+    virtual ~AbstractTimeProvider() = default;
+
+    virtual std::chrono::milliseconds millisSinceEpoch() = 0;
+};
+
 /**
  * Sequence has less priority than TimeSynchronizationManager::peerIsServer and
  * TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
@@ -137,7 +145,8 @@ public:
         nx::utils::StandaloneTimerManager* const timerManager,
         AbstractTransactionMessageBus* messageBus,
         Settings* settings,
-        std::shared_ptr<AbstractWorkAroundMiscDataSaver> workAroundMiscDataSaver = nullptr);
+        std::shared_ptr<AbstractWorkAroundMiscDataSaver> workAroundMiscDataSaver = nullptr,
+        std::shared_ptr<AbstractTimeProvider> localTimeProvider = nullptr);
     virtual ~TimeSynchronizationManager();
 
     /** Implemenattion of QnStoppable::pleaseStop. */
@@ -259,6 +268,7 @@ private:
     std::atomic<size_t> m_asyncOperationsInProgress;
     QnWaitCondition m_asyncOperationsWaitCondition;
     std::shared_ptr<AbstractWorkAroundMiscDataSaver> m_workAroundMiscDataSaver;
+    std::shared_ptr<AbstractTimeProvider> m_localTimeProvider;
 
     void selectLocalTimeAsSynchronized(
         QnMutexLockerBase* const lock,

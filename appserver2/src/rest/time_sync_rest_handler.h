@@ -2,9 +2,13 @@
 
 #include "rest/server/request_handler.h"
 
+class AbstractStreamSocket;
+class QnCommonModule;
+
 namespace ec2 {
 
 class Ec2DirectConnectionFactory;
+class TimeSynchronizationManager;
 
 class QnTimeSyncRestHandler:
     public QnRestRequestHandler
@@ -31,6 +35,16 @@ public:
         QByteArray& result,
         QByteArray& resultContentType,
         const QnRestConnectionProcessor*) override;
+
+    static nx_http::StatusCode::Value processRequest(
+        const nx_http::Request& request,
+        TimeSynchronizationManager* timeSynchronizationManager,
+        AbstractStreamSocket* connection);
+
+    static void prepareResponse(
+        const TimeSynchronizationManager& timeSynchronizationManager,
+        const QnCommonModule& commonModule,
+        nx_http::Response* response);
 
 private:
     Ec2DirectConnectionFactory* m_appServerConnection;

@@ -4,6 +4,10 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/http/test_http_server.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/random.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/time.h>
 
@@ -14,6 +18,7 @@
 #include <common/common_module.h>
 
 #include <managers/time_manager.h>
+#include <rest/time_sync_rest_handler.h>
 #include <settings.h>
 
 #include "misc_manager_stub.h"
@@ -41,6 +46,26 @@ TEST(TimePriorityKey, common)
 
 namespace {
 
+class TestTimeProvider:
+    public AbstractTimeProvider
+{
+public:
+    virtual std::chrono::milliseconds millisSinceEpoch() override
+    {
+        return nx::utils::millisSinceEpoch() + m_timeShift;
+    }
+
+    void applyRelativeShift(std::chrono::milliseconds shift)
+    {
+        m_timeShift += shift;
+    }
+
+private:
+    std::chrono::milliseconds m_timeShift{0};
+};
+
+//-------------------------------------------------------------------------------------------------
+
 class TimeSynchronizationPeer
 {
 public:
@@ -48,6 +73,7 @@ public:
         m_commonModule(
             /*clientMode*/ false,
             nx::core::access::Mode::direct),
+        m_osTimeProvider(std::make_shared<TestTimeProvider>()),
         m_miscManager(std::make_shared<MiscManagerStub>()),
         m_transactionMessageBus(std::make_unique<TransactionMessageBusStub>(&m_commonModule)),
         m_workAroundMiscDataSaverStub(
@@ -57,7 +83,8 @@ public:
             &m_timerManager,
             m_transactionMessageBus.get(),
             &m_settings,
-            m_workAroundMiscDataSaverStub))
+            m_workAroundMiscDataSaverStub,
+            m_osTimeProvider))
     {
         m_commonModule.setModuleGUID(QnUuid::createUuid());
         m_commonModule.globalSettings()->setOsTimeChangeCheckPeriod(
@@ -88,9 +115,12 @@ public:
         m_commonModule.globalSettings()->setSynchronizingTimeWithInternet(val);
     }
 
-    void start()
+    bool start()
     {
+        if (!startHttpServer())
+            return false;
         m_timeSynchronizationManager->start(m_miscManager);
+        return true;
     }
 
     std::chrono::milliseconds getSyncTime() const
@@ -114,10 +144,52 @@ public:
         m_timeSynchronizationManager->start(m_miscManager);
     }
 
+    void connectTo(TimeSynchronizationPeer* remotePeer)
+    {
+        m_transactionMessageBus->addConnectionToRemotePeer(
+            peerData(),
+            remotePeer->peerData(),
+            remotePeer->apiUrl(),
+            /*isIncoming*/ false);
+
+        remotePeer->emulatePeerConnectionAccept(this);
+    }
+
+    void emulatePeerConnectionAccept(TimeSynchronizationPeer* remotePeer)
+    {
+        m_transactionMessageBus->addConnectionToRemotePeer(
+            peerData(),
+            remotePeer->peerData(),
+            remotePeer->apiUrl(),
+            /*isIncoming*/ true);
+    }
+
+    ::ec2::ApiPeerData peerData() const
+    {
+        ::ec2::ApiPeerData peerData;
+        peerData.id = m_commonModule.moduleGUID();
+        peerData.peerType = Qn::PT_Server;
+        return peerData;
+    }
+
+    QUrl apiUrl() const
+    {
+        return nx::network::url::Builder()
+            .setScheme(nx_http::kUrlSchemeName)
+            .setEndpoint(m_httpServer.serverAddress()).toUrl();
+    }
+
+    void setOsTimeShift(std::chrono::milliseconds shift)
+    {
+        m_osTimeProvider->applyRelativeShift(shift);
+    }
+
 private:
     nx::utils::StandaloneTimerManager m_timerManager;
     QnCommonModule m_commonModule;
     Settings m_settings;
+    TestHttpServer m_httpServer;
+    std::shared_ptr<TestTimeProvider> m_osTimeProvider;
     std::shared_ptr<MiscManagerStub> m_miscManager;
     std::unique_ptr<TransactionMessageBusStub> m_transactionMessageBus;
     std::shared_ptr<WorkAroundMiscDataSaverStub> m_workAroundMiscDataSaverStub;
@@ -133,6 +205,43 @@ private:
         localPeerInfo.data.peer.instanceId = m_commonModule.moduleGUID();
         localPeerInfo.data.peer.persistentId = m_commonModule.moduleGUID();
         m_commonModule.runtimeInfoManager()->updateLocalItem(localPeerInfo);
+    }
+
+    bool startHttpServer()
+    {
+        using namespace std::placeholders;
+
+        if (!m_httpServer.bindAndListen())
+            return false;
+
+        m_httpServer.registerRequestProcessorFunc(
+            nx::network::url::joinPath("/", QnTimeSyncRestHandler::PATH),
+            std::bind(&TimeSynchronizationPeer::syncTimeHttpHandler, this, _1, _2, _3, _4, _5));
+
+        return true;
+    }
+
+    void syncTimeHttpHandler(
+        nx_http::HttpServerConnection* const connection,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx_http::Request request,
+        nx_http::Response* const response,
+        nx_http::RequestProcessedHandler completionHandler)
+    {
+        const auto resultCode = QnTimeSyncRestHandler::processRequest(
+            request,
+            m_timeSynchronizationManager.get(),
+            connection->socket().get());
+        if (resultCode != nx_http::StatusCode::ok)
+            return completionHandler(resultCode);
+
+        // Sending our time synchronization information to remote peer.
+        QnTimeSyncRestHandler::prepareResponse(
+            *m_timeSynchronizationManager,
+            m_commonModule,
+            response);
+
+        return completionHandler(nx_http::StatusCode::ok);
     }
 };
 
@@ -156,13 +265,24 @@ protected:
     {
         auto peer = std::make_unique<TimeSynchronizationPeer>();
         peer->setSynchronizeWithInternetEnabled(false);
-        peer->start();
+        ASSERT_TRUE(peer->start());
         m_peers.push_back(std::move(peer));
     }
 
     void givenMultipleOfflinePeersEachWithDifferentLocalTime()
     {
-        // TODO
+        const auto peerCount = 3;
+        for (int i = 0; i < peerCount; ++i)
+        {
+            auto peer = std::make_unique<TimeSynchronizationPeer>();
+            peer->setSynchronizeWithInternetEnabled(false);
+            peer->setOsTimeShift(
+                std::chrono::hours(nx::utils::random::number<int>(-1000, 1000)));
+            ASSERT_TRUE(peer->start());
+            m_peers.push_back(std::move(peer));
+        }
+
+        connectEveryPeerToEachOther();
     }
 
     void shiftLocalTime()
@@ -175,9 +295,37 @@ protected:
         m_peers.front()->emulateRestart();
     }
 
-    void waitForTimeToBeSynchronizedAccrossAllPeers()
+    void waitForTimeToBeSynchronizedAcrossAllPeers()
     {
-        // TODO
+        using namespace std::chrono;
+
+        // In real, time deviation depends on peer to peer request round trip time.
+        // Using very large value to make test reliable.
+        // Time difference on different peers has to be much larger than this value.
+        constexpr auto maxAllowedSyncTimeDeviation = std::chrono::minutes(10);
+
+        for (;;)
+        {
+            const auto t0 = steady_clock::now();
+            std::vector<milliseconds> syncTimes;
+            for (const auto& peer: m_peers)
+                syncTimes.push_back(peer->getSyncTime());
+            const auto t1 = steady_clock::now();
+
+            const auto maxDeviation =
+                duration_cast<milliseconds>(t1 - t0) +
+                milliseconds(*std::max_element(syncTimes.begin(), syncTimes.end()) -
+                    *std::min_element(syncTimes.begin(), syncTimes.end()));
+
+            if (maxDeviation <= maxAllowedSyncTimeDeviation)
+            {
+                std::cout << "Time synchronized with " << maxDeviation.count()
+                    << "ms deviation" << std::endl;
+                break;
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
     }
 
     void waitForTimeToBeSynchronizedWithLocalSystemClock()
@@ -199,6 +347,15 @@ protected:
 private:
     std::vector<std::unique_ptr<TimeSynchronizationPeer>> m_peers;
     nx::utils::test::ScopedTimeShift m_timeShift;
+
+    void connectEveryPeerToEachOther()
+    {
+        for (int i = 0; i < m_peers.size(); ++i)
+        {
+            for (int j = i+1; j < m_peers.size(); ++j)
+                m_peers[i]->connectTo(m_peers[j].get());
+        }
+    }
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -216,10 +373,10 @@ TEST_F(TimeManager, single_offline_server_follows_local_system_clock)
     waitForTimeToBeSynchronizedWithLocalSystemClock();
 }
 
-TEST_F(TimeManager, DISABLED_time_is_synchronized)
+TEST_F(TimeManager, multiple_peers_synchronize_time)
 {
     givenMultipleOfflinePeersEachWithDifferentLocalTime();
-    waitForTimeToBeSynchronizedAccrossAllPeers();
+    waitForTimeToBeSynchronizedAcrossAllPeers();
 }
 
 } // namespace test
