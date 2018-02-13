@@ -14,21 +14,22 @@ namespace client {
 namespace core {
 
 TwoWayAudioController::TwoWayAudioController(QObject* parent):
-    QObject(parent),
-    base_type()
+    base_type(parent),
+    QnConnectionContextAware()
 {
 }
 
 TwoWayAudioController::TwoWayAudioController(
     const QString& sourceId,
-    const QUuid& cameraId,
+    const QString& cameraId,
     QObject* parent)
     :
-    QObject(parent),
-    base_type(),
+    base_type(parent),
+    QnConnectionContextAware(),
     m_camera()
 {
-    setStreamData(sourceId, cameraId);
+    setSourceId(sourceId);
+    setResourceId(cameraId);
     start();
 }
 
@@ -49,7 +50,7 @@ bool TwoWayAudioController::start()
 
     const auto serverId = commonModule()->remoteGUID();
     const auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
-    if (!server || server->getStatus() != Qn::Online || !isAllowed())
+    if (!server || server->getStatus() != Qn::Online || !available())
         return false;
 
     setStarted(true); // Intermediate state.
@@ -58,6 +59,7 @@ bool TwoWayAudioController::start()
         [this, guard = QPointer<TwoWayAudioController>(this)]
             (bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
+            qDebug() << success << result.error << result.errorString;
             if (guard && handle == m_startHandle)
                 setStarted(success && result.error == QnRestResult::NoError);
 
@@ -83,37 +85,84 @@ void TwoWayAudioController::stop()
         rest::ServerConnection::GetCallback());
 }
 
-bool TwoWayAudioController::setStreamData(
-    const QString& sourceId,
-    const QUuid& cameraId)
+void TwoWayAudioController::setSourceId(const QString& value)
 {
-    if (sourceId.isEmpty() || cameraId.isNull())
-        return false;
+    if (m_sourceId == value)
+        return;
+
+    if (m_sourceId.isEmpty())
+        stop();
+
+    m_sourceId = value;
+}
+
+QString TwoWayAudioController::resourceId() const
+{
+    return m_camera ? m_camera->getId().toString() : QString();
+}
+
+void TwoWayAudioController::setResourceId(const QString& value)
+{
+    const auto id = QnUuid::fromStringSafe(value);
+    if (m_camera && m_camera->getId() == id)
+        return;
+
+    if (m_camera)
+        m_camera->disconnect(this);
 
     const auto pool = resourcePool();
-    m_camera = pool->getResourceById<QnVirtualCameraResource>(cameraId);
-    m_sourceId = sourceId;
-//            QnDesktopResource::calculateUniqueId(
-//        commonModule()->moduleGUID(), user->getId());
+    m_camera = pool->getResourceById<QnVirtualCameraResource>(id);
     m_licenseHelper.reset(m_camera && m_camera->isIOModule()
         ? new QnSingleCamLicenseStatusHelper(m_camera)
         : nullptr);
 
-    return m_camera;
+    if (m_camera)
+    {
+        connect(m_camera, &QnVirtualCameraResource::statusChanged,
+            this, &TwoWayAudioController::updateAvailability);
+        if (m_licenseHelper)
+        {
+            connect(m_licenseHelper, &QnSingleCamLicenseStatusHelper::licenseStatusChanged,
+                this, &TwoWayAudioController::updateAvailability);
+        }
+    }
+
+    updateAvailability();
+    emit resourceIdChanged();
 }
 
-bool TwoWayAudioController::isAllowed() const
+bool TwoWayAudioController::available() const
 {
-    if (!m_camera)
-        return false;
+    return m_available;
+}
 
-    if (m_camera->getStatus() != Qn::Online && m_camera->getStatus() != Qn::Recording)
-        return false;
+void TwoWayAudioController::updateAvailability()
+{
+    const bool isAvailable =
+        [this]()
+        {
+            if (!m_camera)
+                return false;
 
-    if (m_licenseHelper)
-        return m_licenseHelper->status() == QnLicenseUsageStatus::used;
+            if (m_camera->getStatus() != Qn::Online && m_camera->getStatus() != Qn::Recording)
+                return false;
 
-    return true;
+            if (m_licenseHelper)
+                return m_licenseHelper->status() == QnLicenseUsageStatus::used;
+
+            return true;
+        }();
+
+    setAvailability(isAvailable);
+}
+
+void TwoWayAudioController::setAvailability(bool value)
+{
+    if (m_available == value)
+        return;
+
+    m_available = value;
+    emit availabilityChanged();
 }
 
 void TwoWayAudioController::setStarted(bool value)
