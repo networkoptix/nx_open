@@ -290,11 +290,11 @@ constexpr auto kMaxAllowedSyncTimeDeviation = std::chrono::seconds(21);
 constexpr auto kMinMonotonicClockSkew = kMaxAllowedSyncTimeDeviation + std::chrono::seconds(10);
 constexpr auto kMaxMonotonicClockSkew = kMinMonotonicClockSkew + std::chrono::minutes(2);
 
-class TimeManager:
+class TimeSynchronization:
     public ::testing::Test
 {
 public:
-    TimeManager():
+    TimeSynchronization():
         m_timeShift(
             nx::utils::test::ClockType::system,
             std::chrono::seconds::zero())
@@ -410,7 +410,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-TEST_F(TimeManager, single_offline_server_follows_local_system_clock)
+TEST_F(TimeSynchronization, single_offline_server_follows_local_system_clock)
 {
     givenSingleOfflinePeer();
     waitForTimeToBeSynchronizedWithLocalSystemClock();
@@ -423,20 +423,20 @@ TEST_F(TimeManager, single_offline_server_follows_local_system_clock)
     waitForTimeToBeSynchronizedWithLocalSystemClock();
 }
 
-TEST_F(TimeManager, multiple_peers_synchronize_time)
+TEST_F(TimeSynchronization, multiple_peers_synchronize_time)
 {
     givenMultipleOfflinePeersEachWithDifferentLocalTime();
     waitForTimeToBeSynchronizedAcrossAllPeers();
 }
 
-TEST_F(TimeManager, multiple_peers_synchronize_time_after_monotonic_clock_skew)
+TEST_F(TimeSynchronization, multiple_peers_synchronize_time_after_monotonic_clock_skew)
 {
     givenMultipleSynchronizedPeers();
     skewMonotonicClockOnRandomPeer();
     waitForTimeToBeSynchronizedAcrossAllPeers();
 }
 
-// TEST_F(TimeManager, synctime_follows_selected_peer_after_clock_skew_fix)
+// TEST_F(TimeSynchronization, synctime_follows_selected_peer_after_clock_skew_fix)
 
 } // namespace test
 } // namespace ec2
