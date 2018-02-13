@@ -1,5 +1,4 @@
 import logging
-import socket
 import tempfile
 
 import jinja2
