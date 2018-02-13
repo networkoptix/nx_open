@@ -297,7 +297,6 @@ bool QnRtspClientArchiveDelegate::openInternal()
     m_closing = false;
     m_lastMediaFlags = -1;
     nx::utils::TimerManager::instance()->joinAndDeleteTimer(m_sessionTimeoutTimer);
-    m_sessionTimeoutTimer = 0;
     setCustomVideoLayout(QnCustomResourceVideoLayoutPtr());
 
     m_globalMinArchiveTime = startTime(); // force current value to avoid flicker effect while current server is being changed
@@ -806,7 +805,7 @@ void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
     bool fromLive = value && m_position == DATETIME_NOW;
     close();
 
-    if (!m_rtspSession->isOpened() && m_camera)
+    if (m_rtspSession->isOpened() && m_camera)
     {
         m_rtspSession->setScale(qAbs(m_rtspSession->getScale()) * sign);
         m_position = displayTime;
