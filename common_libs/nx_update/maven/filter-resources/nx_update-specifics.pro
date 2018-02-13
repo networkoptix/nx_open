@@ -5,6 +5,5 @@ win* {
 }
 
 linux {
-    QMAKE_CXXFLAGS += -Werror -Wno-error=unused-function
     QMAKE_LFLAGS += -Wl,--no-undefined
 }
