@@ -45,6 +45,8 @@
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <client_core/client_core_settings.h>
 #include <core/ptz/client_ptz_controller_pool.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
 
 using namespace nx::mobile_client;
 
@@ -137,6 +139,12 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
     commonModule->instance<QnServerInterfaceWatcher>();
 
+    const auto resourceDiscoveryManager = new QnResourceDiscoveryManager(commonModule);
+    commonModule->setResourceDiscoveryManager(resourceDiscoveryManager);
+//    resourceProcessor->moveToThread(resourceDiscoveryManager);
+//    resourceDiscoveryManager->setResourceProcessor(resourceProcessor);
+    resourceDiscoveryManager->setReady(true);
+
     auto qmlRoot = startupParameters.qmlRoot.isEmpty() ? kQmlRoot : startupParameters.qmlRoot;
     if (!qmlRoot.endsWith(L'/'))
         qmlRoot.append(L'/');
@@ -164,4 +172,14 @@ QnMobileClientModule::~QnMobileClientModule()
 QnCloudStatusWatcher* QnMobileClientModule::cloudStatusWatcher() const
 {
     return m_cloudStatusWatcher;
+}
+
+void QnMobileClientModule::initDesktopCamera()
+{
+    /* Initialize desktop camera searcher. */
+    const auto commonModule = m_clientCoreModule->commonModule();
+    const auto desktopSearcher = commonModule->store(new QnDesktopResourceSearcher(nullptr));
+    const auto resourceDiscoveryManager = commonModule->resourceDiscoveryManager();
+    desktopSearcher->setLocal(true);
+    resourceDiscoveryManager->addDeviceServer(desktopSearcher);
 }
