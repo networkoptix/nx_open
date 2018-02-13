@@ -18,6 +18,7 @@ function(nx_detect_package_versions)
     _set_version(festival "2.4")
     _set_version(directx "JUN2010")
     _set_version(cassandra "2.7.0")
+    _set_version(doxygen "1.8.14")
 
     if(WINDOWS)
         _set_version(qt "5.6.1-1")
@@ -84,6 +85,7 @@ function(nx_detect_package_versions)
         festival
         directx
         cassandra
+        doxygen
     )
         if("${_${pkg}_version}" STREQUAL "")
             message(WARNING
@@ -215,6 +217,13 @@ function(nx_get_dependencies)
             nx_rdep_add_package(openldap)
             nx_rdep_add_package(sasl2)
         endif()
+
+        if(WINDOWS)
+            nx_rdep_add_package(windows/doxygen PATH_VARIABLE doxygen_directory)
+        elseif(LINUX)
+            nx_rdep_add_package(linux/doxygen PATH_VARIABLE doxygen_directory)
+        endif()
+        nx_expose_to_parent_scope(doxygen_directory)
     endif()
 
     if(box STREQUAL "bpi")

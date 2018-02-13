@@ -194,6 +194,9 @@ if(withMediaServer)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
 
+    # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_metadata_sdk) into a single sdk like this.
+    add_subdirectory(nx_metadata_sdk)
+
     if(LINUX AND box MATCHES "none|tx1")
         add_subdirectory(root_tool)
     endif()

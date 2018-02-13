@@ -2,51 +2,42 @@
 set -e #< Exit on error.
 set -x #< Log each command.
 
-# All paths here are relative to this script's dir ($0).
-declare -r SDK_NAME="nx_metadata_sdk"
-declare -r PLUGIN_NAME="stub_metadata_plugin"
-declare -r PLUGIN_PATH="samples/$PLUGIN_NAME"
-declare -r BUILD_PATH="build"
+PLUGIN_NAME="stub_metadata_plugin"
 
-main()
-{
-    local -r BASE_DIR=$(readlink -f "$(dirname "$0")") #< Absolute path to this script's dir.
+# Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
+BASE_DIR=$(readlink -f "$(dirname "$0")") #< Absolute path to this script's dir.
+BUILD_DIR="$BASE_DIR-build"
 
-    local -r BUILD_DIR="$BASE_DIR/$BUILD_PATH"
-    rm -rf "$BUILD_DIR/"
-    mkdir -p "$BUILD_DIR"
-    cd "$BUILD_DIR"
+rm -rf "$BUILD_DIR/"
+mkdir -p "$BUILD_DIR"
+cd "$BUILD_DIR"
 
-    local GEN_OPTIONS=""
-    local SOURCE_DIR="$BASE_DIR/$PLUGIN_PATH"
-    case "$(uname -s)" in
-        CYGWIN*)
-            if [[ $(which cmake) != /usr/bin/* ]] #< Using Windows native cmake rather than Cygwin.
-            then
-                GEN_OPTIONS="-Ax64" #< Generate for Visual Studio and x64.
-                SOURCE_DIR=$(cygpath -w "$SOURCE_DIR") #< Windows cmake requires Windows path.
-            fi
-            ;;
-        *)
-            GEN_OPTIONS="-GNinja"
-            ;;
-    esac
+GEN_OPTIONS=""
+SOURCE_DIR="$BASE_DIR/samples/$PLUGIN_NAME"
+case "$(uname -s)" in
+    CYGWIN*)
+        if [[ $(which cmake) != /usr/bin/* ]] #< Using Windows native cmake rather than Cygwin.
+        then
+            GEN_OPTIONS="-Ax64" #< Generate for Visual Studio and x64.
+            SOURCE_DIR=$(cygpath -w "$SOURCE_DIR") #< Windows cmake requires Windows path.
+        fi
+        ;;
+    *)
+        GEN_OPTIONS="-GNinja"
+        ;;
+esac
 
-    cmake "$SOURCE_DIR" $GEN_OPTIONS #< Works for any cmake: Linux, Cygwin, and Windows native.
-    cmake --build .
+cmake "$SOURCE_DIR" $GEN_OPTIONS #< Works for any cmake: Linux, Cygwin, and Windows native.
+cmake --build .
 
-    { set +x; } 2>/dev/null #< Silently turn off logging each command.
-    sleep 1 #< Workaround from strange behavior of Windows CMake in Cygwin console.
-    local -r ARTIFACT=$(find "$BUILD_DIR" -name "*$PLUGIN_NAME.dll" -o -name "*$PLUGIN_NAME.so")
-    if [ -f "$ARTIFACT" ]
-    then
-        echo
-        echo "Plugin built successfully:"
-        echo "$ARTIFACT"
-    else
-        echo
-        echo "ERROR: Failed to build plugin."
-    fi
-}
-
-main "$@"
+{ set +x; } 2>/dev/null #< Silently turn off logging each command.
+ARTIFACT=$(find "$BUILD_DIR" -name "*$PLUGIN_NAME.dll" -o -name "*$PLUGIN_NAME.so")
+if [ -f "$ARTIFACT" ]
+then
+    echo
+    echo "Plugin built successfully:"
+    echo "$ARTIFACT"
+else
+    echo
+    echo "ERROR: Failed to build plugin."
+fi
