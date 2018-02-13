@@ -44,6 +44,7 @@ public:
 
     /** Rectangle where all tooltips should fit - in local coordinates. */
     void setToolTipsEnclosingRect(const QRectF &rect);
+    QRectF toolTipsEnclosingRect() const;
 
     QnBlinkingImageButtonWidget* blinker() const;
     void setBlinker(QnBlinkingImageButtonWidget* blinker);
@@ -117,6 +118,7 @@ private:
     std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
     QHash<QnUuid, QnNotificationWidget*> m_customPopupItems;
     QnNotificationWidget* m_currentDefaultPasswordChangeWidget = nullptr;
+    QRectF m_toolTipsEnclosingRect;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

@@ -32,12 +32,12 @@ UnifiedAsyncSearchListModel::~UnifiedAsyncSearchListModel()
 {
 }
 
-QString UnifiedAsyncSearchListModel::textFilter() const
+QString UnifiedAsyncSearchListModel::clientsideTextFilter() const
 {
     return m_filterModel->filterWildcard();
 }
 
-void UnifiedAsyncSearchListModel::setTextFilter(const QString& value)
+void UnifiedAsyncSearchListModel::setClientsideTextFilter(const QString& value)
 {
     m_filterModel->setFilterWildcard(value);
 }
@@ -50,6 +50,20 @@ QnTimePeriod UnifiedAsyncSearchListModel::selectedTimePeriod() const
 void UnifiedAsyncSearchListModel::setSelectedTimePeriod(const QnTimePeriod& value)
 {
     m_sourceModel->setSelectedTimePeriod(value);
+}
+
+bool UnifiedAsyncSearchListModel::isConstrained() const
+{
+    return m_sourceModel && (!clientsideTextFilter().isEmpty() || m_sourceModel->isConstrained());
+}
+
+int UnifiedAsyncSearchListModel::relevantCount() const
+{
+    int count = m_filterModel->rowCount();
+    if (m_busyIndicatorModel->active())
+        ++count;
+
+    return count;
 }
 
 bool UnifiedAsyncSearchListModel::canFetchMore(const QModelIndex& /*parent*/) const
@@ -76,7 +90,7 @@ void UnifiedAsyncSearchListModel::fetchMore(const QModelIndex& /*parent*/)
             const int previousRowCount = m_filterModel->rowCount();
             m_sourceModel->commitPrefetch(earliestTimeMs);
 
-            const bool hasClientSideFilter = !textFilter().isEmpty();
+            const bool hasClientSideFilter = !clientsideTextFilter().isEmpty();
             if (!hasClientSideFilter)
                 return;
 

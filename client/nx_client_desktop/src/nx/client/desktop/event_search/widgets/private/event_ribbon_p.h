@@ -3,6 +3,7 @@
 #include "../event_ribbon.h"
 
 #include <QtCore/QModelIndex>
+#include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QHash>
 #include <QtCore/QList>
@@ -17,11 +18,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class EventTile;
-
 class EventRibbon::Private: public QObject
 {
     Q_OBJECT
+    using PrivateSignal = EventRibbon::QPrivateSignal;
 
 public:
     Private(EventRibbon* q);
@@ -34,10 +34,24 @@ public:
 
     QScrollBar* scrollBar() const;
 
+    bool showDefaultToolTips() const;
+    void setShowDefaultToolTips(bool value);
+
+    bool previewsEnabled() const;
+    void setPreviewsEnabled(bool value);
+
+    bool footersEnabled() const;
+    void setFootersEnabled(bool value);
+
     int count() const;
 
     int unreadCount() const;
     QnNotificationLevel::Value highestUnreadImportance() const;
+
+    void updateHover(bool hovered, const QPoint& mousePos);
+
+protected:
+    virtual bool eventFilter(QObject* object, QEvent* event) override;
 
 private:
     void updateView(); //< Calls doUpdateView and emits q->unreadCountChanged if needed.
@@ -61,7 +75,10 @@ private:
     void updateCurrentShifts(); //< Updates m_currentShifts from m_itemShiftAnimations.
     void clearShiftAnimations();
 
+    void showContextMenu(EventTile* tile, const QPoint& posRelativeToTile);
+
     int indexOf(EventTile* tile) const;
+    int indexAtPos(const QPoint& pos) const;
 
     // Creates a tile widget for a data model item using the following roles:
     //     Qt::UuidRole for unique id
@@ -93,12 +110,18 @@ private:
     QSet<EventTile*> m_visible;
     QHash<EventTile*, QnNotificationLevel::Value> m_unread;
 
+    QPointer<EventTile> m_hoveredTile;
+
     // Maps animation object to item index. Duplicate indices are allowed.
     // Animation objects are owned by EventRibbon::Private object.
     // When stopped/finished they are destroyed and pointers removed from this hash.
     QHash<QVariantAnimation*, int> m_itemShiftAnimations;
 
     QHash<int, int> m_currentShifts; //< Maps item index to shift value.
+
+    bool m_showDefaultToolTips = false;
+    bool m_previewsEnabled = true;
+    bool m_footersEnabled = true;
 };
 
 } // namespace desktop

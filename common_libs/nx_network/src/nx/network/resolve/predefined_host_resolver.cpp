@@ -6,7 +6,7 @@ namespace network {
 SystemError::ErrorCode PredefinedHostResolver::resolve(
     const QString& name,
     int ipVersion,
-    std::deque<HostAddress>* resolvedAddresses)
+    std::deque<AddressEntry>* resolvedAddresses)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -14,27 +14,42 @@ SystemError::ErrorCode PredefinedHostResolver::resolve(
     if (it == m_etcHosts.end())
         return SystemError::hostNotFound;
 
-    for (const auto address : it->second)
+    for (const auto entry: it->second)
     {
-        if (ipVersion != AF_INET || address.ipV4())
-            resolvedAddresses->push_back(address);
+        if (ipVersion == AF_INET && !entry.host.ipV4())
+            continue; //< Only ipv4 hosts are requested.
+        resolvedAddresses->push_back(entry);
     }
 
     return SystemError::noError;
 }
 
-void PredefinedHostResolver::addEtcHost(
+void PredefinedHostResolver::addMapping(
     const QString& name,
-    std::vector<HostAddress> addresses)
+    std::deque<AddressEntry> entries)
 {
     QnMutexLocker lock(&m_mutex);
-    m_etcHosts[name] = std::move(addresses);
+    m_etcHosts[name] = std::move(entries);
 }
 
-void PredefinedHostResolver::removeEtcHost(const QString& name)
+void PredefinedHostResolver::removeMapping(const QString& name)
 {
     QnMutexLocker lock(&m_mutex);
     m_etcHosts.erase(name);
+}
+
+void PredefinedHostResolver::removeMapping(
+    const QString& name,
+    const AddressEntry& entryToRemove)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_etcHosts.find(name);
+    if (it == m_etcHosts.end())
+        return;
+
+    it->second.erase(
+        std::remove(it->second.begin(), it->second.end(), entryToRemove),
+        it->second.end());
 }
 
 } // namespace network

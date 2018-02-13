@@ -49,10 +49,22 @@ void paintLabelIcon(
         labelRect->setRight(iconRect.left() - padding - 1);
 }
 
+} // namespace
+
+QnNxStylePrivate::QnNxStylePrivate() :
+    QCommonStylePrivate(),
+    idleAnimator(new QnNoptixStyleAnimator()),
+    stateAnimator(new QnNoptixStyleAnimator())
+{
+}
+
+QnNxStylePrivate::~QnNxStylePrivate()
+{
+}
+
 /* Workaround while Qt's QWidget::mapFromGlobal is broken: */
 
-QPoint mapFromGlobal(const QGraphicsProxyWidget* to, const QPoint& globalPos);
-QPoint mapFromGlobal(const QWidget* to, const QPoint& globalPos)
+QPoint QnNxStylePrivate::mapFromGlobal(const QWidget* to, const QPoint& globalPos)
 {
     if (auto proxied = QnNxStylePrivate::graphicsProxiedWidget(to))
     {
@@ -63,7 +75,7 @@ QPoint mapFromGlobal(const QWidget* to, const QPoint& globalPos)
     return to->mapFromGlobal(globalPos);
 }
 
-QPoint mapFromGlobal(const QGraphicsProxyWidget* to, const QPoint& globalPos)
+QPoint QnNxStylePrivate::mapFromGlobal(const QGraphicsWidget* to, const QPoint& globalPos)
 {
     static const QPoint kInvalidPos(
         std::numeric_limits<int>::max(),
@@ -79,19 +91,6 @@ QPoint mapFromGlobal(const QGraphicsProxyWidget* to, const QPoint& globalPos)
 
     auto viewPos = mapFromGlobal(views[0], globalPos);
     return to->mapFromScene(views[0]->mapToScene(viewPos)).toPoint();
-}
-
-} // namespace
-
-QnNxStylePrivate::QnNxStylePrivate() :
-    QCommonStylePrivate(),
-    idleAnimator(new QnNoptixStyleAnimator()),
-    stateAnimator(new QnNoptixStyleAnimator())
-{
-}
-
-QnNxStylePrivate::~QnNxStylePrivate()
-{
 }
 
 QnPaletteColor QnNxStylePrivate::findColor(const QColor &color) const

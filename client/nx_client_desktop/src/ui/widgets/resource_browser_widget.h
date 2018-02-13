@@ -29,7 +29,6 @@ class QnWorkbenchContext;
 
 class HoverFocusProcessor;
 
-class QnResourcePreviewWidget;
 class QnResourceTreeModel;
 class QnResourceSearchSynchronizer;
 class QnResourceTreeWidget;

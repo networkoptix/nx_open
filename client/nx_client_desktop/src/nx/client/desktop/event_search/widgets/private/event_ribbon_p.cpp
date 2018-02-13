@@ -7,6 +7,7 @@
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QVariantAnimation>
 #include <QtGui/QWheelEvent>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QApplication>
 
@@ -18,6 +19,8 @@
 #include <ui/common/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/helper.h>
+#include <ui/style/nx_style_p.h>
+#include <ui/workaround/hidpi_workarounds.h>
 
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/client/desktop/ui/actions/action.h>
@@ -61,6 +64,9 @@ EventRibbon::Private::Private(EventRibbon* q):
     m_scrollBar(new QScrollBar(Qt::Vertical, q)),
     m_viewport(new QWidget(q))
 {
+    q->setAttribute(Qt::WA_Hover);
+    m_viewport->setAttribute(Qt::WA_Hover);
+
     m_scrollBar->setHidden(true);
     m_scrollBar->setSingleStep(kScrollBarStep);
     m_scrollBar->setFixedWidth(m_scrollBar->sizeHint().width());
@@ -108,6 +114,13 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
     insertNewTiles(0, m_model->rowCount(), UpdateMode::instant);
 
     m_modelConnections.reset(new QnDisconnectHelper());
+
+    *m_modelConnections << connect(m_model, &QObject::destroyed, this,
+        [this]()
+        {
+            m_model = nullptr;
+            clear();
+        });
 
     *m_modelConnections << connect(m_model, &QAbstractListModel::modelReset, this,
         [this]()
@@ -160,14 +173,18 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
 EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
 {
     auto tile = new EventTile(q);
+    tile->setContextMenuPolicy(Qt::CustomContextMenu);
+    tile->installEventFilter(this);
+    tile->setPreviewEnabled(m_previewsEnabled);
+    tile->setFooterEnabled(m_footersEnabled);
     updateTile(tile, index);
 
     const auto importance = index.data(Qn::NotificationLevelRole);
 
-    if (tile->progressBarVisible() || importance.isNull())
+    if (tile->progressBarVisible() || !importance.canConvert<QnNotificationLevel::Value>())
         tile->setRead(true);
     else
-        m_unread.insert(tile, QnNotificationLevel::Value(importance.toInt()));
+        m_unread.insert(tile, importance.value<QnNotificationLevel::Value>());
 
     connect(tile, &EventTile::closeRequested, this,
         [this]()
@@ -191,6 +208,9 @@ EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
             if (m_model)
                 m_model->setData(m_model->index(indexOf(tile)), QVariant(), Qn::DefaultNotificationRole);
         });
+
+    connect(tile, &QWidget::customContextMenuRequested, this,
+        [this](const QPoint &pos) { showContextMenu(static_cast<EventTile*>(sender()), pos); });
 
     return tile;
 }
@@ -269,6 +289,21 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
 
     tile->preview()->loadAsync();
     tile->setPreviewCropRect(previewCropRect);
+}
+
+void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRelativeToTile)
+{
+    if (!m_model)
+        return;
+
+    const auto index = m_model->index(indexOf(tile));
+    const auto menu = index.data(Qn::ContextMenuRole).value<QSharedPointer<QMenu>>();
+
+    if (!menu)
+        return;
+
+    const auto globalPos = QnHiDpiWorkarounds::safeMapToGlobal(tile, posRelativeToTile);
+    menu->exec(globalPos);
 }
 
 void EventRibbon::Private::debugCheckGeometries()
@@ -388,9 +423,9 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     }
 
     if (unreadCount() != oldUnreadCount)
-        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance());
+        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance(), PrivateSignal());
 
-    emit q->countChanged(m_tiles.size());
+    emit q->countChanged(m_tiles.size(), PrivateSignal());
 }
 
 void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMode)
@@ -452,9 +487,9 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
     doUpdateView();
 
     if (unreadCount() != oldUnreadCount)
-        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance());
+        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance(), PrivateSignal());
 
-    emit q->countChanged(m_tiles.size());
+    emit q->countChanged(m_tiles.size(), PrivateSignal());
 }
 
 void EventRibbon::Private::clear()
@@ -478,9 +513,9 @@ void EventRibbon::Private::clear()
     q->updateGeometry();
 
     if (hadUnreadTiles)
-        emit q->unreadCountChanged(0, QnNotificationLevel::Value::NoNotification);
+        emit q->unreadCountChanged(0, QnNotificationLevel::Value::NoNotification, PrivateSignal());
 
-    emit q->countChanged(m_tiles.size());
+    emit q->countChanged(m_tiles.size(), PrivateSignal());
 }
 
 void EventRibbon::Private::clearShiftAnimations()
@@ -516,6 +551,48 @@ QScrollBar* EventRibbon::Private::scrollBar() const
     return m_scrollBar;
 }
 
+bool EventRibbon::Private::showDefaultToolTips() const
+{
+    return m_showDefaultToolTips;
+}
+
+void EventRibbon::Private::setShowDefaultToolTips(bool value)
+{
+    m_showDefaultToolTips = value;
+}
+
+bool EventRibbon::Private::previewsEnabled() const
+{
+    return m_previewsEnabled;
+}
+
+void EventRibbon::Private::setPreviewsEnabled(bool value)
+{
+    if (m_previewsEnabled == value)
+        return;
+
+    m_previewsEnabled = value;
+
+    for (auto tile: m_tiles)
+        tile->setPreviewEnabled(m_previewsEnabled);
+}
+
+bool EventRibbon::Private::footersEnabled() const
+{
+    return m_footersEnabled;
+}
+
+void EventRibbon::Private::setFootersEnabled(bool value)
+{
+    if (m_footersEnabled == value)
+        return;
+
+    m_footersEnabled = value;
+
+    for (auto tile: m_tiles)
+        tile->setFooterEnabled(m_footersEnabled);
+}
+
 int EventRibbon::Private::calculateHeight(QWidget* widget) const
 {
     NX_EXPECT(widget);
@@ -539,13 +616,14 @@ QnNotificationLevel::Value EventRibbon::Private::highestUnreadImportance() const
     QnNotificationLevel::Value result = QnNotificationLevel::Value::NoNotification;
 
     // TODO: #vkutin Redo it differently if it visibly impacts performance.
+    static constexpr auto kMaxNotificationLevel = int(QnNotificationLevel::Value::LevelCount) - 1;
     for (const auto importance: m_unread)
     {
         if (importance < result)
             continue;
 
         result = importance;
-        if (int(result) == int(QnNotificationLevel::Value::LevelCount) - 1)
+        if (int(result) == kMaxNotificationLevel)
             break;
     }
 
@@ -559,7 +637,7 @@ void EventRibbon::Private::updateView()
     doUpdateView();
 
     if (unreadCount() != oldUnreadCount)
-        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance());
+        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance(), PrivateSignal());
 }
 
 void EventRibbon::Private::doUpdateView()
@@ -567,12 +645,14 @@ void EventRibbon::Private::doUpdateView()
     if (m_tiles.empty())
     {
         clear();
+        updateHover(false, QPoint());
         return;
     }
 
     if (!q->isVisible())
     {
         clearShiftAnimations();
+        updateHover(false, QPoint());
         return;
     }
 
@@ -642,6 +722,9 @@ void EventRibbon::Private::doUpdateView()
 
     updateScrollRange();
     debugCheckVisibility();
+
+    const auto pos = QnNxStylePrivate::mapFromGlobal(q, QCursor::pos());
+    updateHover(q->rect().contains(pos), pos);
 
     if (!m_currentShifts.empty()) //< If has running animations.
         qApp->postEvent(m_viewport, new QEvent(QEvent::LayoutRequest));
@@ -734,6 +817,66 @@ int EventRibbon::Private::count() const
 int EventRibbon::Private::unreadCount() const
 {
     return m_unread.size();
+}
+
+void EventRibbon::Private::updateHover(bool hovered, const QPoint& mousePos)
+{
+    if (hovered)
+    {
+        if (m_hoveredTile && m_hoveredTile->underMouse()) //< Nothing changed.
+            return;
+
+        const int index = indexAtPos(mousePos);
+        const auto tile = index >= 0 ? m_tiles[index] : nullptr;
+
+        if (tile == m_hoveredTile)
+            return;
+
+        m_hoveredTile = tile;
+
+        const auto modelIndex = (m_model && tile) ? m_model->index(index) : QModelIndex();
+        emit q->tileHovered(modelIndex, tile);
+    }
+    else
+    {
+        if (m_hoveredTile)
+        {
+            m_hoveredTile = nullptr;
+            emit q->tileHovered(QModelIndex(), nullptr);
+        }
+    }
+}
+
+int EventRibbon::Private::indexAtPos(const QPoint& pos) const
+{
+    const auto viewportPos = m_viewport->mapFrom(q, pos);
+    const int base = m_scrollBar->isHidden() ? 0 : m_scrollBar->value();
+
+    const auto next = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), base + viewportPos.y(),
+        [this](int left, EventTile* right) { return left < m_positions.value(right); });
+
+    if (next == m_tiles.cbegin())
+        return -1;
+
+    const auto candidate = next - 1;
+
+    return (*candidate)->geometry().contains(viewportPos)
+        ? std::distance(m_tiles.cbegin(), candidate)
+        : -1;
+}
+
+bool EventRibbon::Private::eventFilter(QObject* object, QEvent* event)
+{
+    if (qobject_cast<EventTile*>(object) && object->parent() == m_viewport)
+    {
+        if (!m_showDefaultToolTips && event->type() == QEvent::ToolTip)
+        {
+            event->ignore();
+            return true; //< Ignore tooltip events.
+        }
+    }
+
+    return QObject::eventFilter(object, event);
 }
 
 } // namespace desktop

@@ -6,10 +6,6 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
-if(LINUX)
-    add_compile_options("-Werror" "-Wall" "-Wextra")
-endif()
-
 nx_add_target(nx_relaying LIBRARY ${library_type}
     PUBLIC_LIBS
         nx_network nx_fusion nx_utils)

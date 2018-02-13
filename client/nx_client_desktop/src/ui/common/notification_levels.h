@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QMetaType>
 #include <QtGui/QColor>
 
 #include <nx/vms/event/event_fwd.h>
@@ -28,3 +29,5 @@ QColor notificationTextColor(Value level);
 QColor notificationColor(Value level);
 
 };
+
+Q_DECLARE_METATYPE(QnNotificationLevel::Value)

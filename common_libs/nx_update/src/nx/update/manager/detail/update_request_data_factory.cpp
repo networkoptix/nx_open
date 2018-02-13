@@ -3,8 +3,7 @@
 #include <utils/common/app_info.h>
 
 namespace nx {
-namespace mediaserver {
-namespace updates2 {
+namespace update {
 namespace detail {
 
 UpdateFileRequestDataFactory::FactoryFunc UpdateFileRequestDataFactory::s_factoryFunc = nullptr;
@@ -30,6 +29,5 @@ void UpdateFileRequestDataFactory::setFactoryFunc(UpdateFileRequestDataFactory::
 }
 
 } // namespace detail
-} // namespace updates2
-} // namespace mediaserver
+} // namespace update
 } // namespace nx

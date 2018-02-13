@@ -30,6 +30,9 @@ public:
     virtual int count() const override;
     virtual QVariant data(const QModelIndex& index, int role, bool& handled) const override;
 
+    QString filterText() const;
+    void setFilterText(const QString& value);
+
     virtual void clear() override;
 
 protected:
@@ -52,6 +55,7 @@ private:
 
 private:
     BookmarkSearchListModel* const q = nullptr;
+    QString m_filterText;
     QnCameraBookmarkList m_prefetch;
     std::deque<QnCameraBookmark> m_data;
     QHash<QnUuid, qint64> m_guidToTimestampMs;

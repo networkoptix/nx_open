@@ -26,15 +26,17 @@ public:
 
 protected:
     virtual bool hasRelevantTiles() const override;
-    void setCurrentTimePeriod(const QnTimePeriod& period) override;
+    virtual void setCurrentTimePeriod(const QnTimePeriod& period) override;
+    virtual bool isConstrained() const override;
 
 private:
     using base_type::model;
     using base_type::setModel;
 
+    void updateEventCounter(int totalCount);
+
 private:
     class FilterModel;
-    FilterModel* const m_filterModel = nullptr;
     MotionSearchListModel* const m_model = nullptr;
 };
 

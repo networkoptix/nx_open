@@ -53,7 +53,7 @@
 #include <plugins/plugin_manager.h>
 #include <nx/mediaserver/server_meta_types.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
-#include <nx/mediaserver/updates2/updates2_manager.h>
+#include <nx/mediaserver/updates2/server_updates2_manager.h>
 
 #include "wearable_lock_manager.h"
 #include "wearable_upload_manager.h"
@@ -192,7 +192,8 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
-    m_updates2Manager = store(new nx::mediaserver::updates2::Updates2Manager(this->commonModule()));
+    m_updates2Manager = store(
+        new nx::mediaserver::updates2::ServerUpdates2Manager(this->commonModule()));
 
 	store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
 
@@ -311,7 +312,7 @@ nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
     return m_rootTool.get();
 }
 
-nx::mediaserver::updates2::Updates2Manager* QnMediaServerModule::updates2Manager() const
+nx::mediaserver::updates2::ServerUpdates2Manager* QnMediaServerModule::updates2Manager() const
 {
     return m_updates2Manager;
 }
