@@ -1,4 +1,7 @@
 from django.contrib import admin
+from django.utils.html import format_html
+import pytz
+import datetime
 
 # Register your models here.
 
@@ -28,7 +31,7 @@ admin.site.register(Event, EventAdmin)
 
 
 class CloudNotificationAdmin(admin.ModelAdmin):
-    list_display = ('subject', 'body', 'sent_by', 'sent_date')
+    list_display = ('subject', 'body', 'sent_by', 'convert_date')
     change_form_template = 'notifications/cloud_notifications_change_form.html'
     readonly_fields = ('sent_by', 'sent_date')
     fieldsets = [
@@ -39,7 +42,20 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         ("When and who sent the notification", {'fields': (('sent_by', 'sent_date'))})
     ]
 
+    def convert_date(self, obj):
+        session = self.request.session
+        if 'timezone' in self.request.session:
+            timezone = self.request.session['timezone']
+            utc = pytz.utc.localize(obj.sent_date)
+            converted_time = utc.astimezone(pytz.timezone(timezone))\
+                                .replace(tzinfo=None).strftime("%b. %d, %Y, %H:%M")
+            return format_html('<span title="{}">{}</span>'.format(timezone,converted_time))
+        return obj.sent_date
+    convert_date.short_description = "Sent date"
+    convert_date.allow_tags = True
+
     def has_delete_permission(self, request, obj=None):
+        self.request = request
         if obj and obj.sent_date:
             return False
         return super(CloudNotificationAdmin, self).has_delete_permission(request,obj=obj)
