@@ -44,16 +44,6 @@ class ConfigCommand(object):
             )
 
 
-def make_vm_config_internal_network_command(virtualbox_vm, network):
-    kwargs = {}
-    if network.network == network.ip:  # it is just a network, and dhcp must be used
-        kwargs['type'] = ':dhcp'
-    else:
-        kwargs['ip'] = quote(network.ip)
-    network_name = virtualbox_vm.produce_internal_network(network)
-    kwargs['virtualbox__intnet'] = quote(network_name)
-    return ConfigCommand('network', [':private_network'], kwargs)
-
 def make_vm_provision_command(script, args=None, env=None):
     kwargs = dict(path=quote(script))
     if args:
@@ -178,15 +168,13 @@ class VagrantVMConfig(object):
         return self.vm_port_base + SSH_PORT_OFFSET + self.idx
 
     def expand(self, virtualbox_management):
-        network_vagrant_conf = [make_vm_config_internal_network_command(virtualbox_management, ip_address)
-                               for ip_address in self.ip_address_list]
         return ExpandedVagrantVMConfig(
             vagrant_name=self.vagrant_name,
             virtualbox_name=self.virtualbox_name,
             rest_api_internal_port=MEDIASERVER_LISTEN_PORT,
             rest_api_forwarded_port=self.rest_api_forwarded_port,
             ssh_forwarded_port=self.ssh_forwarded_port,
-            vagrant_conf=map(self._expand_vm_command, network_vagrant_conf + self.vagrant_conf),
+            vagrant_conf=map(self._expand_vm_command, self.vagrant_conf),
             virtualbox_conf=map(self._expand_virtualbox_command, self.virtualbox_conf),
             )
 

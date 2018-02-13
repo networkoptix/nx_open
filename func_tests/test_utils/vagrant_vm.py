@@ -53,7 +53,7 @@ class VagrantVMFactory(object):
         self._host_os_access = host_from_config(options.vm_ssh_host_config)
         self._vm_name_prefix = options.vm_name_prefix
         self._vm_port_base = options.vm_port_base
-        self._virtualbox_vm = VirtualboxManagement(self._vm_name_prefix, self._host_os_access)
+        self._virtualbox_vm = VirtualboxManagement(self._host_os_access)
         if options.vm_ssh_host_config:
             self._vagrant_dir = options.vm_host_work_dir / 'vagrant'
             self._vagrant_private_key_path = options.work_dir / 'vagrant_insecure_private_key'
