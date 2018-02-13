@@ -24,7 +24,7 @@
 #include <settings/qml_settings_adaptor.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 
 using namespace nx::vms::utils;
 

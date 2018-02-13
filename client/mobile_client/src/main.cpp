@@ -60,6 +60,7 @@ extern "C"
 #include <nx/utils/crash_dump/systemexcept.h>
 
 using namespace nx::mobile_client;
+using namespace std::chrono;
 
 int runUi(QtSingleGuiApplication* application)
 {
@@ -245,14 +246,14 @@ int runApplication(QtSingleGuiApplication* application)
 class TcpLogWriterOut : public nx::utils::log::AbstractWriter
 {
 public:
-    TcpLogWriterOut(const SocketAddress& targetAddress) :
+    TcpLogWriterOut(const nx::network::SocketAddress& targetAddress) :
         m_targetAddress(targetAddress)
     {
     }
 
     virtual void write(nx::utils::log::Level level, const QString& message) override
     {
-        static const int kTimeoutMs = 1000 * 3;
+        constexpr milliseconds kTimeout = seconds(3);
         if (!m_tcpSock)
         {
             m_tcpSock = std::make_unique<nx::network::TCPSocket>();
@@ -260,12 +261,12 @@ public:
             if (!ipV4Address)
                 return; //< Can't connect to non IPv4 address.
             if (!m_tcpSock->connect(
-                SocketAddress(*ipV4Address, m_targetAddress.port), kTimeoutMs))
+                nx::network::SocketAddress(*ipV4Address, m_targetAddress.port), kTimeout))
             {
                 m_tcpSock.reset();
                 return;
             }
-            m_tcpSock->setSendTimeout(kTimeoutMs);
+            m_tcpSock->setSendTimeout(kTimeout);
         }
         QByteArray data = message.toUtf8();
         data.append('\n');
@@ -273,8 +274,8 @@ public:
             m_tcpSock.reset(); //< Reconnect.
     }
 private:
-    std::unique_ptr<AbstractStreamSocket> m_tcpSock;
-    SocketAddress m_targetAddress;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSock;
+    nx::network::SocketAddress m_targetAddress;
 };
 
 void initLog(const QString& logLevel)
@@ -308,7 +309,7 @@ void initLog(const QString& logLevel)
             if (params.size() >= 2)
                 port = params[1].toInt();
             nx::utils::log::mainLogger()->setWriter(
-                std::make_unique<TcpLogWriterOut>(SocketAddress(address, port)));
+                std::make_unique<TcpLogWriterOut>(nx::network::SocketAddress(address, port)));
         }
     }
 
