@@ -321,7 +321,7 @@ void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, int chan
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
         auto& regions = (*userAttributesLock)->motionRegions;
-        while (regions.size() < channel)
+        while (channel >= regions.size())
             regions << QnMotionRegion();
         if (regions[channel] == mask)
             return;
