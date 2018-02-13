@@ -20,7 +20,11 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/resources)
 
 nx_configure_file(
-    maven/filter-resources/resources/static/skin.json
+    webadmin_skins/${defaultSkin}/styles-native.css
+    ${CMAKE_CURRENT_BINARY_DIR}/resources/static)
+
+nx_configure_file(
+    webadmin_skins/${defaultSkin}/styles.css
     ${CMAKE_CURRENT_BINARY_DIR}/resources/static)
 
 set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
