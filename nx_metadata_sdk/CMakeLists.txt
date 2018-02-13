@@ -3,7 +3,7 @@
 
 include(find_doxygen)
 
-####set(depends mediaserver server_plugins) #< Not required technically, but useful to prevent errors.
+set(depends mediaserver server_plugins) #< Not required technically, but useful to prevent errors.
 
 message(STATUS "Generating files for Metadata SDK")
 
