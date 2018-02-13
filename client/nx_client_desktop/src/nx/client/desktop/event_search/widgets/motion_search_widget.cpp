@@ -1,5 +1,8 @@
 #include "motion_search_widget.h"
 
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QToolButton>
+
 #include <ui/models/sort_filter_list_model.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/search_line_edit.h>
@@ -11,59 +14,20 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class MotionSearchWidget::FilterModel: public QnSortFilterListModel
-{
-    using base_type = QnSortFilterListModel;
-
-public:
-    using base_type::base_type;
-
-    QnTimePeriod selectedTimePeriod() const
-    {
-        return m_selectedTimePeriod;
-    }
-
-    void setSelectedTimePeriod(const QnTimePeriod& value)
-    {
-        if (m_selectedTimePeriod == value)
-            return;
-
-        m_selectedTimePeriod = value;
-        forceUpdate();
-    }
-
-protected:
-    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override
-    {
-        if (!m_selectedTimePeriod.isValid() || sourceParent.isValid() || !sourceModel())
-            return false;
-
-        const auto index = sourceModel()->index(sourceRow, 0, QModelIndex());
-
-        const auto timestampMs = sourceModel()->data(index, Qn::TimestampRole).value<qint64>();
-        const auto durationMs = sourceModel()->data(index, Qn::DurationRole).value<qint64>();
-
-        const QnTimePeriod period(timestampMs, durationMs);
-        return timestampMs > 0 && m_selectedTimePeriod.intersects(period);
-    }
-
-private:
-    QnTimePeriod m_selectedTimePeriod =
-        QnTimePeriod(QnTimePeriod::kMinTimeValue, QnTimePeriod::infiniteDuration());
-};
-
 MotionSearchWidget::MotionSearchWidget(QWidget* parent):
     base_type(parent),
-    m_filterModel(new FilterModel(this)),
     m_model(new MotionSearchListModel(this))
 {
-    m_filterModel->setSourceModel(m_model);
-    setModel(new SubsetListModel(m_filterModel, 0, QModelIndex(), this));
+    setModel(m_model);
 
     setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/motion.png")));
     setMotionSearchEnabled(false);
 
     filterEdit()->hide();
+    showPreviewsButton()->show();
+
+    connect(m_model, &MotionSearchListModel::totalCountChanged,
+        this, &MotionSearchWidget::updateEventCounter);
 }
 
 MotionSearchWidget::~MotionSearchWidget()
@@ -80,7 +44,7 @@ void MotionSearchWidget::setMotionSearchEnabled(bool value)
 
 bool MotionSearchWidget::isConstrained() const
 {
-    const auto period = m_filterModel->selectedTimePeriod();
+    const auto period = m_model->selectedTimePeriod();
     return period.startTimeMs > 0 || !period.isInfinite();
 }
 
@@ -96,13 +60,20 @@ void MotionSearchWidget::setCamera(const QnVirtualCameraResourcePtr& camera)
 
 bool MotionSearchWidget::hasRelevantTiles() const
 {
-    return m_filterModel && m_filterModel->rowCount() > 0;
+    return m_model->rowCount() > 0;
 }
 
 void MotionSearchWidget::setCurrentTimePeriod(const QnTimePeriod& period)
 {
-    m_filterModel->setSelectedTimePeriod(period);
+    m_model->setSelectedTimePeriod(period);
     requestFetch();
+}
+
+void MotionSearchWidget::updateEventCounter(int totalCount)
+{
+    counterLabel()->setText(totalCount
+        ? tr("%n motion events", "", totalCount)
+        : QString());
 }
 
 } // namespace desktop

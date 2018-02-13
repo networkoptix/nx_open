@@ -127,6 +127,20 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->areaButton->setIcon(qnSkin->icon(lit("text_buttons/area.png")));
 
     connect(ui->ribbon, &EventRibbon::tileHovered, this, &UnifiedSearchWidget::tileHovered);
+
+    ui->showInfoButton->hide();
+    ui->showPreviewsButton->hide();
+    ui->showInfoButton->setChecked(ui->ribbon->footersEnabled());
+    ui->showPreviewsButton->setChecked(ui->ribbon->previewsEnabled());
+    ui->showInfoButton->setDrawnBackgrounds(QnToolButton::ActiveBackgrounds);
+    ui->showPreviewsButton->setDrawnBackgrounds(QnToolButton::ActiveBackgrounds);
+    ui->showInfoButton->setIcon(qnSkin->icon(lit("events/show_information.png")));
+    ui->showPreviewsButton->setIcon(qnSkin->icon(lit("events/show_preview.png")));
+
+    connect(ui->showInfoButton, &QToolButton::toggled,
+        ui->ribbon, &EventRibbon::setFootersEnabled);
+    connect(ui->showPreviewsButton, &QToolButton::toggled,
+        ui->ribbon, &EventRibbon::setPreviewsEnabled);
 }
 
 UnifiedSearchWidget::~UnifiedSearchWidget()
@@ -197,6 +211,16 @@ ui::SelectableTextButton* UnifiedSearchWidget::timeButton() const
 ui::SelectableTextButton* UnifiedSearchWidget::cameraButton() const
 {
     return ui->cameraButton;
+}
+
+QToolButton* UnifiedSearchWidget::showInfoButton() const
+{
+    return ui->showInfoButton;
+}
+
+QToolButton* UnifiedSearchWidget::showPreviewsButton() const
+{
+    return ui->showPreviewsButton;
 }
 
 void UnifiedSearchWidget::setPlaceholderIcon(const QPixmap& value)
@@ -364,9 +388,6 @@ bool UnifiedSearchWidget::hasRelevantTiles() const
 void UnifiedSearchWidget::updatePlaceholderState()
 {
     const bool hidden = hasRelevantTiles();
-    if (ui->placeholder->isHidden() == hidden)
-        return;
-
     if (!hidden)
     {
         ui->placeholderText->setText(isConstrained()
@@ -375,6 +396,12 @@ void UnifiedSearchWidget::updatePlaceholderState()
     }
 
     ui->placeholder->setHidden(hidden);
+    ui->counterContainer->setVisible(hidden);
+}
+
+QLabel* UnifiedSearchWidget::counterLabel() const
+{
+    return ui->counterLabel;
 }
 
 } // namespace desktop

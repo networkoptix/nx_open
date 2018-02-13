@@ -3,10 +3,6 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
-#if(LINUX)
-#    add_compile_options("-Werror" "-Wall" "-Wextra")
-#endif()
-
 nx_add_target(udt LIBRARY ${library_type} NO_MOC)
 
 target_compile_definitions(udt

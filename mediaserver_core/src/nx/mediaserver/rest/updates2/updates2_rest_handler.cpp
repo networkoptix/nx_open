@@ -7,7 +7,7 @@
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/mediaserver/updates2/updates2_manager.h>
+#include <nx/mediaserver/updates2/server_updates2_manager.h>
 #include <rest/helpers/request_helpers.h>
 #include <rest/helpers/request_context.h>
 #include <api/helpers/empty_request_data.h>

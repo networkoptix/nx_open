@@ -15,13 +15,14 @@ namespace desktop {
 
 namespace {
 
-static constexpr int kFetchBatchSize = 25;
+static constexpr int kFetchBatchSize = 110;
 
 } // namespace
 
 MotionSearchListModel::Private::Private(MotionSearchListModel* q):
     QObject(),
-    q(q)
+    q(q),
+    m_selectedTimePeriod(QnTimePeriod::kMinTimeValue, QnTimePeriod::infiniteDuration())
 {
 }
 
@@ -92,17 +93,30 @@ void MotionSearchListModel::Private::reset()
     ScopedReset reset(q);
     m_data.clear();
 
+    int newTotalCount = 0;
+    QnRaiiGuard updateTotalCount(
+        [this, &newTotalCount]()
+        {
+            if (newTotalCount == m_totalCount)
+                return;
+
+            m_totalCount = newTotalCount;
+            emit q->totalCountChanged(m_totalCount);
+        });
+
     if (!m_loader)
         return;
 
-    const auto& periods = m_loader->periods(Qn::MotionContent);
+    const auto periods = this->periods();
+    newTotalCount = periods.size();
+
     m_data.insert(m_data.end(), periods.cbegin() + qMax(periods.size() - kFetchBatchSize, 0),
         periods.cend());
 }
 
 void MotionSearchListModel::Private::updateMotionPeriods(qint64 startTimeMs)
 {
-    const auto periods = m_loader->periods(Qn::MotionContent);
+    const auto periods = this->periods();
 
     if (startTimeMs == 0 || m_data.empty() || periods.empty())
     {
@@ -147,11 +161,17 @@ void MotionSearchListModel::Private::updateMotionPeriods(qint64 startTimeMs)
         for (auto chunk = newChunksBegin; chunk != periods.cend(); ++chunk)
             m_data.push_back(*chunk);
     }
+
+    if (periods.size() == m_totalCount)
+        return;
+
+    m_totalCount = periods.size();
+    emit q->totalCountChanged(m_totalCount);
 }
 
 bool MotionSearchListModel::Private::canFetchMore() const
 {
-    return m_loader && count() < m_loader->periods(Qn::MotionContent).size();
+    return m_loader && count() < m_totalCount;
 }
 
 void MotionSearchListModel::Private::fetchMore()
@@ -159,7 +179,7 @@ void MotionSearchListModel::Private::fetchMore()
     if (!m_loader)
         return;
 
-    const auto periods = m_loader->periods(Qn::MotionContent);
+    const auto periods = this->periods();
     const auto oldCount = count();
 
     const auto remaining = periods.size() - oldCount;
@@ -174,6 +194,34 @@ void MotionSearchListModel::Private::fetchMore()
 
     for (auto chunk = range.first; chunk != range.second; ++chunk)
         m_data.push_front(*chunk);
+}
+
+QnTimePeriod MotionSearchListModel::Private::selectedTimePeriod() const
+{
+    return m_selectedTimePeriod;
+}
+
+void MotionSearchListModel::Private::setSelectedTimePeriod(const QnTimePeriod& value)
+{
+    if (m_selectedTimePeriod == value)
+        return;
+
+    m_selectedTimePeriod = value;
+    reset();
+}
+
+int MotionSearchListModel::Private::totalCount() const
+{
+    return m_totalCount;
+}
+
+QnTimePeriodList MotionSearchListModel::Private::periods() const
+{
+    if (!m_loader)
+        return QnTimePeriodList();
+
+    const auto list = m_loader->periods(Qn::MotionContent);
+    return list.intersected(m_selectedTimePeriod);
 }
 
 } // namespace desktop

@@ -49,6 +49,7 @@ QnGraphicsToolTipWidget::QnGraphicsToolTipWidget(QGraphicsItem* parent):
     font.setPixelSize(kNoDataFontPixelSize);
     font.setWeight(kNoDataFontWeight);
     m_previewWidget->setFont(font);
+    m_previewWidget->setCropMode(nx::client::desktop::AsyncImageWidget::CropMode::notHovered);
 
     setThumbnailVisible(false);
 }

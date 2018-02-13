@@ -12,20 +12,25 @@ function(build_source_groups _src_root_path _source_list _root_group_name)
     endforeach()
 endfunction()
 
-function(nx_target_enable_werror target)
-    if(${nx_werror_condition})
+function(nx_target_enable_werror target werror_condition)
+    if(werror_condition STREQUAL "")
+        set(werror_condition ${nx_werror_condition})
+    endif()
+
+    if(${werror_condition})
         target_compile_options(${target} PRIVATE -Werror -Wall -Wextra)
     endif()
 endfunction()
 
 function(nx_add_target name type)
-    set(options NO_MOC WERROR NO_WERROR)
+    set(options NO_MOC NO_WERROR)
     set(oneValueArgs LIBRARY_TYPE)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
         SOURCE_EXCLUSIONS
         OTHER_SOURCES
         PUBLIC_LIBS PRIVATE_LIBS
+        WERROR
     )
 
     cmake_parse_arguments(NX "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -130,8 +135,8 @@ function(nx_add_target name type)
         nx_strip_target(${name} COPY_DEBUG_INFO)
     endif()
 
-    if(NOT NX_NO_WERROR AND (nx_enable_werror OR NX_WERROR))
-        nx_target_enable_werror(${name})
+    if(NOT NX_NO_WERROR AND (nx_enable_werror OR NOT "${NX_WERROR}" STREQUAL ""))
+        nx_target_enable_werror(${name} "${NX_WERROR}")
     endif()
 
     if(NOT NX_NO_MOC)
