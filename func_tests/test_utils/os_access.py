@@ -24,7 +24,12 @@ PROCESS_TIMEOUT = datetime.timedelta(hours=1)
 def args_from_env(env):
     if env is None:
         return []
-    return [name + '=' + '\'' + arg.replace('\\', '\\\\').replace('\'', '\\\'') + '\'' for name, arg in env.items()]
+    args = []
+    for name, value in env.items():
+        quoted_value = '\'' + str(value).replace('\\', '\\\\').replace('\'', '\\\'') + '\''
+        arg = name + '=' + quoted_value
+        args.append(arg)
+    return args
 
 
 class ProcessError(subprocess.CalledProcessError):
