@@ -125,3 +125,6 @@ Wait Until Elements Are Visible
     [arguments]    @{elements}
     :FOR     ${element}  IN  @{elements}
     \  Wait Until Element Is Visible    ${element}
+
+Form Validation
+    [arguments]
