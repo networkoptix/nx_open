@@ -277,6 +277,9 @@ class LocalAccess(OsAccess):
     def mk_dir(self, path):
         self.expand_path(path).mkdir(parents=True, exist_ok=True)
 
+    def iter_dir(self, path):
+        return path.iterdir()
+
     def rm_tree(self, path, ignore_errors=False):
         shutil.rmtree(str(self.expand_path(path)), ignore_errors=ignore_errors)
 
@@ -363,6 +366,9 @@ class SshAccess(OsAccess):
 
     def mk_dir(self, path):
         self.run_command(['mkdir', '-p', str(path)])
+
+    def iter_dir(self, path):
+        return [path / line for line in self.run_command(['ls', '-A', '-1', str(path)]).splitlines()]
 
     def rm_tree(self, path, ignore_errors=False):
         self.run_command(['rm', '-r', path], check_retcode=not ignore_errors)
