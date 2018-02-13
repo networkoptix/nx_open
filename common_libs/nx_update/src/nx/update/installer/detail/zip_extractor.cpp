@@ -1,5 +1,3 @@
-#pragma once
-
 #include "zip_extractor.h"
 
 namespace nx {
