@@ -6,8 +6,6 @@
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
-#include <nx/sdk/metadata/common_detected_event.h>
-#include <nx/sdk/metadata/common_detected_object.h>
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
 
 #define NX_DEBUG_ENABLE_OUTPUT true
@@ -43,16 +41,16 @@ Manager::Manager(Plugin* plugin):
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataManager)
+    if (interfaceId == nx::sdk::metadata::IID_CameraManager)
     {
         addRef();
-        return static_cast<AbstractMetadataManager*>(this);
+        return static_cast<nx::sdk::metadata::CameraManager*>(this);
     }
 
-    if (interfaceId == IID_ConsumingMetadataManager)
+    if (interfaceId == nx::sdk::metadata::IID_ConsumingCameraManager)
     {
         addRef();
-        return static_cast<AbstractConsumingMetadataManager*>(this);
+        return static_cast<nx::sdk::metadata::ConsumingCameraManager*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)
@@ -63,7 +61,12 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-Error Manager::setHandler(AbstractMetadataHandler* handler)
+void Manager::setDeclaredSettings(const nxpl::Setting *settings, int count)
+{
+    // Do nothing.
+}
+
+Error Manager::setHandler(MetadataHandler* handler)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -81,7 +84,7 @@ Error Manager::startFetchingMetadata(
     return Error::noError;
 }
 
-nx::sdk::Error Manager::putData(nx::sdk::metadata::AbstractDataPacket* dataPacket)
+nx::sdk::Error Manager::pushDataPacket(nx::sdk::metadata::DataPacket* dataPacket)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
     NX_OUTPUT << __func__ << "() END -> noError";

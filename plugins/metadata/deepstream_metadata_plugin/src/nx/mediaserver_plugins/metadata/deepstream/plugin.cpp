@@ -24,10 +24,10 @@ Plugin::~Plugin()
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    if (interfaceId == IID_MetadataPlugin)
+    if (interfaceId == nx::sdk::metadata::IID_Plugin)
     {
         addRef();
-        return static_cast<AbstractMetadataPlugin*>(this);
+        return static_cast<nx::sdk::metadata::Plugin*>(this);
     }
 
     if (interfaceId == nxpl::IID_Plugin3)
@@ -56,6 +56,11 @@ void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
+void Plugin::setDeclaredSettings(const nxpl::Setting *settings, int count)
+{
+    // Do nothing.
+}
+
 const char* Plugin::name() const
 {
     return "DeepStream metadata plugin";
@@ -74,21 +79,6 @@ void Plugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
 void Plugin::setLocale(const char* /*locale*/)
 {
     // Do nothing.
-}
-
-AbstractMetadataManager* Plugin::managerForResource(
-    const ResourceInfo& /*resourceInfo*/,
-    Error* outError)
-{
-    *outError = Error::noError;
-    return new Manager(this);
-}
-
-AbstractSerializer* Plugin::serializerForType(
-    const nxpl::NX_GUID& /*typeGuid*/,
-    Error* /*outError*/)
-{
-    return nullptr;
 }
 
 const char* Plugin::capabilitiesManifest(Error* error) const
@@ -127,6 +117,13 @@ const char* Plugin::capabilitiesManifest(Error* error) const
             "capabilities": "needDeepCopyForMediaFrame"
         }
     )json";
+}
+
+CameraManager *Plugin::obtainCameraManager(
+    const CameraInfo &cameraInfo, Error *outError)
+{
+    *outError = Error::noError;
+    return new Manager(this);
 }
 
 } // namespace deepstream

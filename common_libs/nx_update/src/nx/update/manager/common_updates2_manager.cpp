@@ -1,6 +1,5 @@
 #include "common_updates2_manager.h"
 #include "detail/update_request_data_factory.h"
-#include <nx/update/installer/updates2_installer.h>
 #include <nx/api/updates2/updates2_status_data.h>
 #include <nx/update/info/sync_update_checker.h>
 #include <nx/update/info/update_registry_factory.h>
@@ -75,11 +74,6 @@ void CommonUpdates2Manager::writeStatusToFile(const detail::Updates2StatusDataEx
         NX_WARNING(this, "Failed to save persistent update status data");
         return;
     }
-}
-
-AbstractUpdates2InstallerPtr CommonUpdates2Manager::installer()
-{
-    return std::make_shared<Updates2Installer>();
 }
 
 } // namespace update

@@ -6,7 +6,7 @@
 #include <mutex>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_consuming_metadata_manager.h>
+#include <nx/sdk/metadata/consuming_camera_manager.h>
 
 #include "plugin.h"
 
@@ -15,7 +15,7 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace deepstream {
 
-class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractConsumingMetadataManager>
+class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::ConsumingCameraManager>
 {
 public:
     Manager(Plugin* plugin);
@@ -23,12 +23,14 @@ public:
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
+    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
+
     virtual nx::sdk::Error startFetchingMetadata(
         nxpl::NX_GUID* /*eventTypeList*/,
         int /*eventTypeListSize*/) override;
 
     virtual nx::sdk::Error setHandler(
-        nx::sdk::metadata::AbstractMetadataHandler* handler) override;
+        nx::sdk::metadata::MetadataHandler* handler) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
@@ -37,11 +39,11 @@ public:
 
     virtual void freeManifest(const char* data) override;
 
-    virtual nx::sdk::Error putData(nx::sdk::metadata::AbstractDataPacket* dataPacket) override;
+    virtual nx::sdk::Error pushDataPacket(nx::sdk::metadata::DataPacket* dataPacket) override;
 
 private:
     Plugin* const m_plugin;
-    nx::sdk::metadata::AbstractMetadataHandler* m_handler;
+    nx::sdk::metadata::MetadataHandler* m_handler;
     mutable std::mutex m_mutex;
 };
 
