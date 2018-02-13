@@ -145,9 +145,8 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     QnSecurityCamResourcePtr camera = parameters.resource().dynamicCast<QnSecurityCamResource>();
-    if (!camera)
+    if (!camera || !camera->getParentServer())
         return;
-    QnMediaServerResourcePtr server = camera->getParentServer();
 
     QStringList filters;
     filters << tr("Video (%1)").arg(kVideoExtensions.join(L' '));
@@ -180,9 +179,8 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     QnSecurityCamResourcePtr camera = parameters.resource().dynamicCast<QnSecurityCamResource>();
-    if (!camera)
+    if (!camera || !camera->getParentServer())
         return;
-    QnMediaServerResourcePtr server = camera->getParentServer();
 
     QString path = QnFileDialog::getExistingDirectory(mainWindow(),
         tr("Open Wearable Camera Recordings..."),
