@@ -127,15 +127,15 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_firstTime(true),
     m_truncateInterval(0),
     m_fixedFileName(false),
-    m_endDateTimeMks(AV_NOPTS_VALUE),
-    m_startDateTimeMks(AV_NOPTS_VALUE),
+    m_endDateTimeUs(AV_NOPTS_VALUE),
+    m_startDateTimeUs(AV_NOPTS_VALUE),
     m_currentTimeZone(-1),
     m_waitEOF(false),
     m_forceDefaultCtx(false),
     m_packetWrited(false),
     m_currentChunkLen(0),
     m_prebufferingUsec(0),
-    m_eofDateTimeMks(AV_NOPTS_VALUE),
+    m_eofDateTimeUs(AV_NOPTS_VALUE),
     m_endOfData(false),
     m_lastProgress(-1),
     m_needCalcSignature(false),
@@ -222,7 +222,7 @@ void QnStreamRecorder::close()
         qint64 fileSize = 0;
         if (m_recordingContextVector[i].formatCtx)
         {
-            if (m_startDateTimeMks != qint64(AV_NOPTS_VALUE))
+            if (m_startDateTimeUs != qint64(AV_NOPTS_VALUE))
                 fileSize = QnFfmpegHelper::getFileSizeByIOContext(m_recordingContextVector[i].formatCtx->pb);
 
             QnFfmpegHelper::closeFfmpegIOContext(m_recordingContextVector[i].formatCtx->pb);
@@ -235,10 +235,10 @@ void QnStreamRecorder::close()
         }
         m_recordingContextVector[i].formatCtx = 0;
 
-        if (m_startDateTimeMks != qint64(AV_NOPTS_VALUE))
+        if (m_startDateTimeUs != qint64(AV_NOPTS_VALUE))
         {
-            qint64 fileDuration = m_startDateTimeMks !=
-                qint64(AV_NOPTS_VALUE) ? m_endDateTimeMks / 1000 - m_startDateTimeMks / 1000 : 0; // bug was here! rounded sum is not same as rounded summand!
+            qint64 fileDuration = m_startDateTimeUs !=
+                qint64(AV_NOPTS_VALUE) ? m_endDateTimeUs / 1000 - m_startDateTimeUs / 1000 : 0; // bug was here! rounded sum is not same as rounded summand!
 
             m_lastFileSize = fileSize;
             if (m_lastError.lastError != StreamRecorderError::fileCreate && !m_disableRegisterFile)
@@ -263,7 +263,7 @@ void QnStreamRecorder::close()
     }
 
     m_packetWrited = false;
-    m_endDateTimeMks = m_startDateTimeMks = AV_NOPTS_VALUE;
+    m_endDateTimeUs = m_startDateTimeUs = AV_NOPTS_VALUE;
 
     markNeedKeyData();
     m_firstTime = true;
@@ -327,7 +327,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         VERBOSE("EXIT: Unknown data");
         return true; // skip unknown data
     }
-    if (m_eofDateTimeMks != qint64(AV_NOPTS_VALUE) && md->timestamp > m_eofDateTimeMks)
+    if (m_eofDateTimeUs != qint64(AV_NOPTS_VALUE) && md->timestamp > m_eofDateTimeUs)
     {
         if (!m_endOfData)
         {
@@ -416,10 +416,10 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         m_waitEOF = false;
     }
 
-    if (m_eofDateTimeMks != qint64(AV_NOPTS_VALUE) && m_eofDateTimeMks > m_startDateTimeMks)
+    if (m_eofDateTimeUs != qint64(AV_NOPTS_VALUE) && m_eofDateTimeUs > m_startDateTimeUs)
     {
-        int progress = (md->timestamp - m_startDateTimeMks) * 100LL;
-        progress /= (m_eofDateTimeMks - m_startDateTimeMks);
+        int progress = (md->timestamp - m_startDateTimeUs) * 100LL;
+        progress /= (m_eofDateTimeUs - m_startDateTimeUs);
         // That happens quite often.
         if (progress > 100)
         {
@@ -461,30 +461,30 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         return saveMotion(std::dynamic_pointer_cast<const QnMetaDataV1>(md));
     }
 
-    if (m_endDateTimeMks != qint64(AV_NOPTS_VALUE)
-        && md->timestamp - m_endDateTimeMks > MAX_FRAME_DURATION * 2 * 1000LL
+    if (m_endDateTimeUs != qint64(AV_NOPTS_VALUE)
+        && md->timestamp - m_endDateTimeUs > MAX_FRAME_DURATION * 2 * 1000LL
         && m_truncateInterval > 0)
     {
         // If multifile recording is allowed, recreate the file if a recording hole is detected.
         NX_DEBUG(this, lm("Data hole detected for camera %1. Diff between packets: %2 ms")
             .arg(m_device->getUniqueId())
-            .arg((md->timestamp - m_endDateTimeMks) / 1000));
+            .arg((md->timestamp - m_endDateTimeUs) / 1000));
         close();
     }
-    else if (m_startDateTimeMks != qint64(AV_NOPTS_VALUE))
+    else if (m_startDateTimeUs != qint64(AV_NOPTS_VALUE))
     {
-        if (md->timestamp - m_startDateTimeMks > m_truncateInterval * 3 && m_truncateInterval > 0)
+        if (md->timestamp - m_startDateTimeUs > m_truncateInterval * 3 && m_truncateInterval > 0)
         {
             // if multifile recording allowed, recreate file if recording hole is detected
             NX_DEBUG(this, lm(
                 "Too long time when no I-frame detected (file length exceed %1 sec. Close file")
-                .arg((md->timestamp - m_startDateTimeMks) / 1000000));
+                .arg((md->timestamp - m_startDateTimeUs) / 1000000));
             close();
         }
-        else if (md->timestamp < m_startDateTimeMks - 1000LL * 1000)
+        else if (md->timestamp < m_startDateTimeUs - 1000LL * 1000)
         {
             NX_DEBUG(this, lm("Time translated into the past for %1 s. Close file")
-                .arg((md->timestamp - m_startDateTimeMks) / 1000000));
+                .arg((md->timestamp - m_startDateTimeUs) / 1000000));
             close();
         }
     }
@@ -553,11 +553,11 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     if (((md->flags & AV_PKT_FLAG_KEY) && md->dataType == QnAbstractMediaData::VIDEO) || !mediaDev->hasVideo(m_mediaProvider))
     {
         if (m_truncateInterval > 0
-            && md->timestamp - m_startDateTimeMks > (m_truncateInterval + m_truncateIntervalEps))
+            && md->timestamp - m_startDateTimeUs > (m_truncateInterval + m_truncateIntervalEps))
         {
-            m_endDateTimeMks = md->timestamp;
+            m_endDateTimeUs = md->timestamp;
             close();
-            m_endDateTimeMks = m_startDateTimeMks = md->timestamp;
+            m_endDateTimeUs = m_startDateTimeUs = md->timestamp;
 
             return saveData(md);
         }
@@ -573,7 +573,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         return true; // skip packet
     }
 
-    m_endDateTimeMks = md->timestamp;
+    m_endDateTimeUs = md->timestamp;
 
     if (md->dataType == QnAbstractMediaData::AUDIO && m_audioTranscoder)
     {
@@ -605,7 +605,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 
 qint64 QnStreamRecorder::getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md)
 {
-    return md->timestamp - m_startDateTimeMks;
+    return md->timestamp - m_startDateTimeUs;
 }
 
 int64_t QnStreamRecorder::lastFileSize() const
@@ -636,7 +636,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
             avPkt.dts = dts;
         const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.get());
         if (video && video->pts != AV_NOPTS_VALUE)
-            avPkt.pts = av_rescale_q(video->pts - m_startDateTimeMks, srcRate, stream->time_base) + (avPkt.dts - dts);
+            avPkt.pts = av_rescale_q(video->pts - m_startDateTimeUs, srcRate, stream->time_base) + (avPkt.dts - dts);
         else
             avPkt.pts = avPkt.dts;
 
@@ -710,7 +710,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
     m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
     //NX_ASSERT(m_mediaProvider); //< Commented out since
 
-    m_endDateTimeMks = m_startDateTimeMks = mediaData->timestamp;
+    m_endDateTimeUs = m_startDateTimeUs = mediaData->timestamp;
 
     // allocate container
     AVOutputFormat * outputCtx = av_guess_format(m_container.toLatin1().data(), NULL, NULL);
@@ -992,7 +992,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
         if (!m_disableRegisterFile)
             fileStarted(
-                m_startDateTimeMks / 1000,
+                m_startDateTimeUs / 1000,
                 m_currentTimeZone,
                 context.fileName,
                 m_mediaProvider
@@ -1112,7 +1112,7 @@ QString QnStreamRecorder::fixedFileName() const
 void QnStreamRecorder::setEofDateTime(qint64 value)
 {
     m_endOfData = false;
-    m_eofDateTimeMks = value;
+    m_eofDateTimeUs = value;
     m_lastProgress = -1;
 }
 
@@ -1158,7 +1158,7 @@ bool QnStreamRecorder::addSignatureFrame()
         return false;
     }
 
-    generatedFrame->timestamp = m_endDateTimeMks + 100 * 1000ll;
+    generatedFrame->timestamp = m_endDateTimeUs + 100 * 1000ll;
     m_needCalcSignature = false; // prevent recursive calls
     //for (int i = 0; i < 2; ++i) // 2 - work, 1 - work at VLC
     {

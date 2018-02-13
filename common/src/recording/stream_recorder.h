@@ -74,7 +74,7 @@ public:
 
     void close();
 
-    qint64 duration() const  { return m_endDateTimeMks - m_startDateTimeMks; }
+    qint64 duration() const  { return m_endDateTimeUs - m_startDateTimeUs; }
 
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
@@ -198,8 +198,8 @@ protected:
     bool m_gotKeyFrame[CL_MAX_CHANNELS];
     qint64 m_truncateInterval;
     bool m_fixedFileName;
-    qint64 m_endDateTimeMks;
-    qint64 m_startDateTimeMks;
+    qint64 m_endDateTimeUs;
+    qint64 m_startDateTimeUs;
     int m_currentTimeZone;
     std::vector<StreamRecorderContext> m_recordingContextVector;
 
@@ -214,7 +214,7 @@ private:
     int m_prebufferingUsec;
     QnUnsafeQueue<QnConstAbstractMediaDataPtr> m_prebuffer;
 
-    qint64 m_eofDateTimeMks;
+    qint64 m_eofDateTimeUs;
     bool m_endOfData;
     int m_lastProgress;
     bool m_needCalcSignature;
