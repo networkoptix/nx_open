@@ -27,7 +27,7 @@ class UnusedWallpapersWatcher;
 class LicenseWatcher;
 class RootTool;
 
-namespace updates2 { class Updates2Manager; }
+namespace updates2 { class ServerUpdates2Manager; }
 
 namespace metadata {
 
@@ -81,7 +81,7 @@ public:
     nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
-    nx::mediaserver::updates2::Updates2Manager* updates2Manager() const;
+    nx::mediaserver::updates2::ServerUpdates2Manager* updates2Manager() const;
 
     void initializeRootTool();
     nx::mediaserver::RootTool* rootTool() const;
@@ -111,7 +111,7 @@ private:
     std::unique_ptr<nx::analytics::storage::AbstractEventsStorage>
         m_analyticsEventsStorage;
     std::unique_ptr<nx::mediaserver::RootTool> m_rootTool;
-    nx::mediaserver::updates2::Updates2Manager* m_updates2Manager;
+    nx::mediaserver::updates2::ServerUpdates2Manager* m_updates2Manager;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

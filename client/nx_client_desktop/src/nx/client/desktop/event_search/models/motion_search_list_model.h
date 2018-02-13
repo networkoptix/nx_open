@@ -4,9 +4,12 @@
 #include <QtCore/QAbstractListModel>
 
 #include <core/resource/resource_fwd.h>
+#include <recording/time_period_list.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/client/desktop/event_search/models/abstract_event_list_model.h>
+
+class QnTimePeriod;
 
 namespace nx {
 namespace client {
@@ -29,6 +32,14 @@ public:
 
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
+
+    QnTimePeriod selectedTimePeriod() const;
+    void setSelectedTimePeriod(const QnTimePeriod& value);
+
+    int totalCount() const;
+
+signals:
+    void totalCountChanged(int value);
 
 private:
     class Private;

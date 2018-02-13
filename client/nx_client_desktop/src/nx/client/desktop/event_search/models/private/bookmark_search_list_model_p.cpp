@@ -17,7 +17,7 @@ namespace desktop {
 
 namespace {
 
-static constexpr int kFetchBatchSize = 25;
+static constexpr int kFetchBatchSize = 110;
 
 static const auto lowerBoundPredicate =
     [](const QnCameraBookmark& left, qint64 right) { return left.startTimeMs > right; };

@@ -98,6 +98,21 @@ void MotionSearchListModel::fetchMore(const QModelIndex& /*parent*/)
     d->fetchMore();
 }
 
+int MotionSearchListModel::totalCount() const
+{
+    return d->totalCount();
+}
+
+QnTimePeriod MotionSearchListModel::selectedTimePeriod() const
+{
+    return d->selectedTimePeriod();
+}
+
+void MotionSearchListModel::setSelectedTimePeriod(const QnTimePeriod& value)
+{
+    d->setSelectedTimePeriod(value);
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

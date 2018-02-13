@@ -1,10 +1,6 @@
 set(product.title "${company.name} vms_gateway_core")
 set(product.display.title "${company.name} VMS Gateway")
 
-if(LINUX)
-    add_compile_options("-Werror" "-Wall" "-Wextra")
-endif()
-
 set(library_type)
 if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)

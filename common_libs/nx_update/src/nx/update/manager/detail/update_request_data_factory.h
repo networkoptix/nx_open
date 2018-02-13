@@ -4,11 +4,10 @@
 #include <nx/update/info/update_request_data.h>
 
 namespace nx {
-namespace mediaserver {
-namespace updates2 {
+namespace update {
 namespace detail {
 
-class UpdateFileRequestDataFactory
+class NX_UPDATE_API UpdateFileRequestDataFactory
 {
 public:
     using FactoryFunc = utils::MoveOnlyFunc<update::info::UpdateFileRequestData()>;
@@ -20,6 +19,5 @@ private:
 };
 
 } // namespace detail
-} // namespace updates2
-} // namespace mediaserver
+} // namespace update
 } // namespace nx

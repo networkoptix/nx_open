@@ -45,8 +45,6 @@ public:
 
     virtual void clear() override;
 
-    bool defaultAction(int index) const;
-
 protected:
     virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) override;
     virtual bool commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll) override;

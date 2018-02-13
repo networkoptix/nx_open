@@ -10,7 +10,9 @@
 
 class QAbstractListModel;
 class QnSearchLineEdit;
+class QLabel;
 class QMenu;
+class QToolButton;
 class QnDisconnectHelper;
 
 namespace Ui { class UnifiedSearchWidget; }
@@ -46,6 +48,11 @@ public:
     ui::SelectableTextButton* areaButton() const;
     ui::SelectableTextButton* timeButton() const;
     ui::SelectableTextButton* cameraButton() const;
+
+    QToolButton* showInfoButton() const;
+    QToolButton* showPreviewsButton() const;
+
+    QLabel* counterLabel() const;
 
     void setPlaceholderIcon(const QPixmap& value);
     void setPlaceholderTexts(const QString& constrained, const QString& unconstrained);

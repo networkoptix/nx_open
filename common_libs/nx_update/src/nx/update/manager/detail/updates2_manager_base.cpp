@@ -1,25 +1,18 @@
+#include "updates2_manager_base.h"
 #include "update_request_data_factory.h"
 #include <nx/api/updates2/updates2_status_data.h>
 #include <nx/update/info/sync_update_checker.h>
 #include <nx/update/info/update_registry_factory.h>
 #include <common/common_module.h>
-#include <utils/common/synctime.h>
-#include <media_server/media_server_module.h>
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
-#include <media_server/settings.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <api/global_settings.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 
-#include "updates2_manager_base.h"
 
 namespace nx {
-namespace mediaserver {
-namespace updates2 {
+namespace update {
 namespace detail {
 
 using namespace vms::common::p2p::downloader;
@@ -35,7 +28,7 @@ static bool isNewRegistryBetter(
 
     QnSoftwareVersion newRegistryServerVersion;
     if (newRegistry->latestUpdate(
-            detail::UpdateFileRequestDataFactory::create(),
+            UpdateFileRequestDataFactory::create(),
             &newRegistryServerVersion) != update::info::ResultCode::ok)
     {
         return false;
@@ -43,7 +36,7 @@ static bool isNewRegistryBetter(
 
     QnSoftwareVersion oldRegistryServerVersion;
     if (oldRegistry->latestUpdate(
-            detail::UpdateFileRequestDataFactory::create(),
+            UpdateFileRequestDataFactory::create(),
             &oldRegistryServerVersion) != update::info::ResultCode::ok
         || newRegistryServerVersion > oldRegistryServerVersion)
     {
@@ -124,8 +117,11 @@ void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/)
             case api::Updates2StatusData::StatusCode::notAvailable:
             case api::Updates2StatusData::StatusCode::available:
             case api::Updates2StatusData::StatusCode::error:
-                m_currentStatus.fromBase(api::Updates2StatusData(moduleGuid(),
-                    api::Updates2StatusData::StatusCode::checking, "Checking for update"));
+                m_currentStatus.fromBase(
+                    api::Updates2StatusData(
+                        moduleGuid(),
+                        api::Updates2StatusData::StatusCode::checking,
+                        "Checking for update"));
                 break;
             default:
                 return;
@@ -284,7 +280,7 @@ void Updates2ManagerBase::setStatus(
     const QString& message)
 {
     detail::Updates2StatusDataEx newStatusData(
-        qnSyncTime->currentMSecsSinceEpoch(),
+        QDateTime::currentMSecsSinceEpoch(),
         moduleGuid(),
         code,
         message);
@@ -443,6 +439,5 @@ void Updates2ManagerBase::stopAsyncTasks()
 }
 
 } // namespace detail
-} // namespace updates2
-} // namespace mediaserver
+} // namespace update
 } // namespace nx

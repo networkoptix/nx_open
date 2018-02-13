@@ -37,6 +37,12 @@ public:
     bool showDefaultToolTips() const;
     void setShowDefaultToolTips(bool value);
 
+    bool previewsEnabled() const;
+    void setPreviewsEnabled(bool value);
+
+    bool footersEnabled() const;
+    void setFootersEnabled(bool value);
+
     int count() const;
 
     int unreadCount() const;
@@ -114,6 +120,8 @@ private:
     QHash<int, int> m_currentShifts; //< Maps item index to shift value.
 
     bool m_showDefaultToolTips = false;
+    bool m_previewsEnabled = true;
+    bool m_footersEnabled = true;
 };
 
 } // namespace desktop

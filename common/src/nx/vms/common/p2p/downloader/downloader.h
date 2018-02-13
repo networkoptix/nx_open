@@ -36,6 +36,19 @@ public:
         const QString& fileName, int chunkIndex, const QByteArray& buffer) = 0;
     virtual ResultCode deleteFile(const QString& fileName, bool deleteData = true) = 0;
     virtual QVector<QByteArray> getChunkChecksums(const QString& fileName) = 0;
+
+signals:
+    void downloadFinished(const QString& fileName);
+    void downloadFailed(const QString& fileName);
+    void fileAdded(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
+    void fileDeleted(const QString& fileName);
+    void fileInformationChanged(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
+    void fileStatusChanged(
+        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
+    void chunkDownloadFailed(const QString& fileName);
+
 };
 
 class DownloaderPrivate;
@@ -79,18 +92,6 @@ public:
 
     virtual QVector<QByteArray> getChunkChecksums(const QString& fileName) override;
     void atServerStart();
-
-signals:
-    void downloadFinished(const QString& fileName);
-    void downloadFailed(const QString& fileName);
-    void fileAdded(
-        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
-    void fileDeleted(const QString& fileName);
-    void fileInformationChanged(
-        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
-    void fileStatusChanged(
-        const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
-    void chunkDownloadFailed(const QString& fileName);
 
 private:
     QScopedPointer<DownloaderPrivate> const d_ptr;

@@ -1,6 +1,7 @@
+set(nx_enable_werror ON)
+
 add_subdirectory(cloud_db_client)
 
-set(nx_enable_werror ON)
 if(withClouds OR withDesktopClient)
     add_subdirectory(librelaying)
     add_subdirectory(libvms_gateway_core)

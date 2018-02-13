@@ -5,9 +5,7 @@
 #include <QtCore>
 
 namespace nx {
-namespace mediaserver {
-namespace updates2 {
-namespace detail {
+namespace update {
 
 enum class PrepareResult
 {
@@ -20,7 +18,7 @@ enum class PrepareResult
 using PrepareUpdateCompletionHandler =
     std::function<void(PrepareResult /*resultCode*/, const QString& /*updateId*/)>;
 
-class AbstractUpdates2Installer
+class NX_UPDATE_API AbstractUpdates2Installer
 {
 public:
     virtual ~AbstractUpdates2Installer() = default;
@@ -30,7 +28,5 @@ public:
 
 using AbstractUpdates2InstallerPtr = std::shared_ptr<AbstractUpdates2Installer>;
 
-} // namespace detail
-} // namespace updates2
-} // namespace mediaserver
+} // namespace update
 } // namespace nx
