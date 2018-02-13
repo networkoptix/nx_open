@@ -741,7 +741,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
 
     if (!m_tcpSock->connect(targetAddress, TCP_CONNECT_TIMEOUT_MS))
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
-    previousSocketHolder.reset();
+    previousSocketHolder.reset(); //< Reset old socket after taking new one to guarantee new TCP port.
 
     m_tcpSock->setNoDelay(true);
 
