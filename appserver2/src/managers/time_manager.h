@@ -67,13 +67,59 @@ public:
     virtual ErrorCode saveSync(const ApiMiscData& data) = 0;
 };
 
-class AbstractTimeProvider
+//-------------------------------------------------------------------------------------------------
+
+class AbstractSystemClock
 {
 public:
-    virtual ~AbstractTimeProvider() = default;
+    virtual ~AbstractSystemClock() = default;
 
     virtual std::chrono::milliseconds millisSinceEpoch() = 0;
 };
+
+class AbstractSteadyClock
+{
+public:
+    virtual ~AbstractSteadyClock() = default;
+
+    /**
+     * @return Time from some unspecified epoch.
+     */
+    virtual std::chrono::milliseconds now() = 0;
+};
+
+class SteadyClock:
+    public AbstractSteadyClock
+{
+public:
+    virtual std::chrono::milliseconds now() override;
+};
+
+class ElapsedTimer
+{
+public:
+    ElapsedTimer(AbstractSteadyClock* steadyClock):
+        m_steadyClock(steadyClock)
+    {
+        restart();
+    }
+
+    void restart()
+    {
+        m_startTime = m_steadyClock->now();
+    }
+
+    std::chrono::milliseconds elapsed() const
+    {
+        return m_steadyClock->now() - m_startTime;
+    }
+
+private:
+    AbstractSteadyClock* m_steadyClock = nullptr;
+    std::chrono::milliseconds m_startTime;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * Sequence has less priority than TimeSynchronizationManager::peerIsServer and
@@ -146,10 +192,11 @@ public:
         AbstractTransactionMessageBus* messageBus,
         Settings* settings,
         std::shared_ptr<AbstractWorkAroundMiscDataSaver> workAroundMiscDataSaver = nullptr,
-        std::shared_ptr<AbstractTimeProvider> localTimeProvider = nullptr);
+        const std::shared_ptr<AbstractSystemClock>& systemClock = nullptr,
+        const std::shared_ptr<AbstractSteadyClock>& steadyClock = nullptr);
     virtual ~TimeSynchronizationManager();
 
-    /** Implemenattion of QnStoppable::pleaseStop. */
+    /** Implementation of QnStoppable::pleaseStop. */
     virtual void pleaseStop() override;
 
     /**
@@ -243,8 +290,6 @@ private:
 
     /** Delta (millis) from m_monotonicClock to local time, synchronized with internet. */
     qint64 m_localSystemTimeDelta;
-    /** Using monotonic clock to be proof to local system time change. */
-    QElapsedTimer m_monotonicClock;
     //!priority key of current server
     TimePriorityKey m_localTimePriorityKey;
     mutable QnMutex m_mutex;
@@ -268,7 +313,10 @@ private:
     std::atomic<size_t> m_asyncOperationsInProgress;
     QnWaitCondition m_asyncOperationsWaitCondition;
     std::shared_ptr<AbstractWorkAroundMiscDataSaver> m_workAroundMiscDataSaver;
-    std::shared_ptr<AbstractTimeProvider> m_localTimeProvider;
+    std::shared_ptr<AbstractSystemClock> m_systemClock;
+    std::shared_ptr<AbstractSteadyClock> m_steadyClock;
+    /** Using monotonic clock to be proof to local system time change. */
+    ElapsedTimer m_monotonicClock;
 
     void selectLocalTimeAsSynchronized(
         QnMutexLockerBase* const lock,

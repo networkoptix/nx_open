@@ -46,8 +46,8 @@ TEST(TimePriorityKey, common)
 
 namespace {
 
-class TestTimeProvider:
-    public AbstractTimeProvider
+class TestSystemClock:
+    public AbstractSystemClock
 {
 public:
     virtual std::chrono::milliseconds millisSinceEpoch() override
@@ -66,6 +66,27 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+class TestSteadyClock:
+    public AbstractSteadyClock
+{
+public:
+    virtual std::chrono::milliseconds now() override
+    {
+        return m_steadyClock.now() + m_timeShift;
+    }
+
+    void applyRelativeShift(std::chrono::milliseconds shift)
+    {
+        m_timeShift += shift;
+    }
+
+private:
+    SteadyClock m_steadyClock;
+    std::chrono::milliseconds m_timeShift{ 0 };
+};
+
+//-------------------------------------------------------------------------------------------------
+
 class TimeSynchronizationPeer
 {
 public:
@@ -73,7 +94,8 @@ public:
         m_commonModule(
             /*clientMode*/ false,
             nx::core::access::Mode::direct),
-        m_osTimeProvider(std::make_shared<TestTimeProvider>()),
+        m_testSystemClock(std::make_shared<TestSystemClock>()),
+        m_testSteadyClock(std::make_shared<TestSteadyClock>()),
         m_miscManager(std::make_shared<MiscManagerStub>()),
         m_transactionMessageBus(std::make_unique<TransactionMessageBusStub>(&m_commonModule)),
         m_workAroundMiscDataSaverStub(
@@ -84,11 +106,16 @@ public:
             m_transactionMessageBus.get(),
             &m_settings,
             m_workAroundMiscDataSaverStub,
-            m_osTimeProvider))
+            m_testSystemClock,
+            m_testSteadyClock))
     {
         m_commonModule.setModuleGUID(QnUuid::createUuid());
+
         m_commonModule.globalSettings()->setOsTimeChangeCheckPeriod(
             std::chrono::milliseconds(100));
+        m_commonModule.globalSettings()->setSyncTimeExchangePeriod(
+            std::chrono::seconds(1));
+
         initializeRuntimeInfo();
 
         m_eventLoopThread.start();
@@ -181,7 +208,12 @@ public:
 
     void setOsTimeShift(std::chrono::milliseconds shift)
     {
-        m_osTimeProvider->applyRelativeShift(shift);
+        m_testSystemClock->applyRelativeShift(shift);
+    }
+
+    void skewMonotonicClock(std::chrono::milliseconds shift)
+    {
+        m_testSteadyClock->applyRelativeShift(shift);
     }
 
 private:
@@ -189,7 +221,8 @@ private:
     QnCommonModule m_commonModule;
     Settings m_settings;
     TestHttpServer m_httpServer;
-    std::shared_ptr<TestTimeProvider> m_osTimeProvider;
+    std::shared_ptr<TestSystemClock> m_testSystemClock;
+    std::shared_ptr<TestSteadyClock> m_testSteadyClock;
     std::shared_ptr<MiscManagerStub> m_miscManager;
     std::unique_ptr<TransactionMessageBusStub> m_transactionMessageBus;
     std::shared_ptr<WorkAroundMiscDataSaverStub> m_workAroundMiscDataSaverStub;
@@ -249,6 +282,14 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+// In real, time deviation depends on peer to peer request round trip time.
+// Using very large value to make test reliable.
+// Time difference on different peers has to be much larger than this value.
+constexpr auto kMaxAllowedSyncTimeDeviation = std::chrono::seconds(21);
+
+constexpr auto kMinMonotonicClockSkew = kMaxAllowedSyncTimeDeviation + std::chrono::seconds(10);
+constexpr auto kMaxMonotonicClockSkew = kMinMonotonicClockSkew + std::chrono::minutes(2);
+
 class TimeManager:
     public ::testing::Test
 {
@@ -285,6 +326,12 @@ protected:
         connectEveryPeerToEachOther();
     }
 
+    void givenMultipleSynchronizedPeers()
+    {
+        givenMultipleOfflinePeersEachWithDifferentLocalTime();
+        waitForTimeToBeSynchronizedAcrossAllPeers();
+    }
+
     void shiftLocalTime()
     {
         m_timeShift.applyRelativeShift(-std::chrono::hours(1));
@@ -295,14 +342,17 @@ protected:
         m_peers.front()->emulateRestart();
     }
 
+    void skewMonotonicClockOnRandomPeer()
+    {
+        const auto& randomPeer = nx::utils::random::choice(m_peers);
+        randomPeer->skewMonotonicClock(std::chrono::seconds(
+            nx::utils::random::number<int>(
+                kMinMonotonicClockSkew.count(), kMaxMonotonicClockSkew.count())));
+    }
+
     void waitForTimeToBeSynchronizedAcrossAllPeers()
     {
         using namespace std::chrono;
-
-        // In real, time deviation depends on peer to peer request round trip time.
-        // Using very large value to make test reliable.
-        // Time difference on different peers has to be much larger than this value.
-        constexpr auto maxAllowedSyncTimeDeviation = std::chrono::minutes(10);
 
         for (;;)
         {
@@ -317,7 +367,7 @@ protected:
                 milliseconds(*std::max_element(syncTimes.begin(), syncTimes.end()) -
                     *std::min_element(syncTimes.begin(), syncTimes.end()));
 
-            if (maxDeviation <= maxAllowedSyncTimeDeviation)
+            if (maxDeviation <= kMaxAllowedSyncTimeDeviation)
             {
                 std::cout << "Time synchronized with " << maxDeviation.count()
                     << "ms deviation" << std::endl;
@@ -378,6 +428,15 @@ TEST_F(TimeManager, multiple_peers_synchronize_time)
     givenMultipleOfflinePeersEachWithDifferentLocalTime();
     waitForTimeToBeSynchronizedAcrossAllPeers();
 }
+
+TEST_F(TimeManager, multiple_peers_synchronize_time_after_monotonic_clock_skew)
+{
+    givenMultipleSynchronizedPeers();
+    skewMonotonicClockOnRandomPeer();
+    waitForTimeToBeSynchronizedAcrossAllPeers();
+}
+
+// TEST_F(TimeManager, synctime_follows_selected_peer_after_clock_skew_fix)
 
 } // namespace test
 } // namespace ec2
