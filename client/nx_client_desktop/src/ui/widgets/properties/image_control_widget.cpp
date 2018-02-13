@@ -76,6 +76,7 @@ void QnImageControlWidget::updateFromResources(
     setVisible(allCamerasHaveVideo);
     ui->aspectRatioLabel->setVisible(!hasWearable);
     ui->aspectRatioComboBox->setVisible(!hasWearable);
+    ui->formLayout->setVerticalSpacing(hasWearable ? 0 : 8);
 
     updateAspectRatioFromResources(cameras);
     updateRotationFromResources(cameras);
