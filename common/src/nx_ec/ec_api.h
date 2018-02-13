@@ -502,6 +502,8 @@ namespace ec2
 
     class AbstractDiscoveryManager {
     public:
+        virtual ~AbstractDiscoveryManager() = default;
+
         template<class TargetType, class HandlerType> int discoverPeer(const QnUuid &id, const nx::utils::Url &url, TargetType *target, HandlerType handler) {
             return discoverPeer(id, url, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
@@ -599,6 +601,8 @@ namespace ec2
 
     class AbstractMiscManager {
     public:
+        virtual ~AbstractMiscManager() = default;
+
         template<class TargetType, class HandlerType> int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, TargetType *target, HandlerType handler) {
             return changeSystemId(systemId, sysIdTime, tranLogTime, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));

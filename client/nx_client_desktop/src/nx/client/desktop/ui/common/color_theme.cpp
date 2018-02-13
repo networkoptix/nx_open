@@ -30,8 +30,12 @@ public:
     struct ColorInfo
     {
         QString group;
-        int index;
+        int index = -1;
+
+        ColorInfo() = default;
+        ColorInfo(const QString& group, int index): group(group), index(index) {}
     };
+
     QHash<QColor, ColorInfo> colorInfoByColor;
 
 public:
@@ -123,9 +127,34 @@ QVariantMap ColorTheme::colors() const
     return d->colors;
 }
 
+QColor ColorTheme::color(const char* name) const
+{
+    return d->colors.value(QLatin1String(name)).value<QColor>();
+}
+
 QColor ColorTheme::color(const QString& name) const
 {
     return d->colors.value(name).value<QColor>();
+}
+
+QColor ColorTheme::color(const char* name, qreal alpha) const
+{
+    return transparent(color(name), alpha);
+}
+
+QColor ColorTheme::color(const QString& name, qreal alpha) const
+{
+    return transparent(color(name), alpha);
+}
+
+QList<QColor> ColorTheme::groupColors(const char* groupName) const
+{
+    return d->groups[QLatin1String(groupName)];
+}
+
+QList<QColor> ColorTheme::groupColors(const QString& groupName) const
+{
+    return d->groups[groupName];
 }
 
 QColor ColorTheme::transparent(const QColor& color, qreal alpha)

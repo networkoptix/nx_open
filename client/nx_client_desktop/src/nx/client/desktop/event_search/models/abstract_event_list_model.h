@@ -23,6 +23,7 @@ public:
     virtual ~AbstractEventListModel() override;
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
@@ -30,6 +31,9 @@ public:
 protected:
     bool isValid(const QModelIndex& index) const;
     virtual QString timestampText(qint64 timestampMs) const;
+
+    virtual bool defaultAction(const QModelIndex& index);
+    virtual bool activateLink(const QModelIndex& index, const QString& link);
 };
 
 } // namespace desktop

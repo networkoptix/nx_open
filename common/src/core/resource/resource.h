@@ -40,6 +40,7 @@ class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource
     Q_OBJECT
     Q_FLAGS(Qn::ResourceFlags)
     Q_FLAGS(Ptz::Capabilities)
+    Q_FLAGS(Qn::ResourceFlags)
     Q_PROPERTY(QnUuid id READ getId CONSTANT)
     Q_PROPERTY(QnUuid typeId READ getTypeId CONSTANT)
     Q_PROPERTY(QString uniqueId READ getUniqueId CONSTANT)
@@ -267,24 +268,6 @@ signals:
     void initializedChanged(const QnResourcePtr &resource);
     void videoLayoutChanged(const QnResourcePtr &resource);
 
-    //!Emitted on completion of every async get started with getParamAsync
-    /*!
-        \param paramValue in case \a result == false, this value cannot be relied on
-        \param success true, if param successfully read, false otherwise
-    */
-    void asyncParamGetDone(const QnResourcePtr &resource, const QString& paramName, const QString &paramValue, bool success) const;
-
-    void asyncParamsGetDone(const QnResourcePtr &resource, const QnCameraAdvancedParamValueList &values) const;
-
-    //!Emitted on completion of every async set started with setParamAsync
-    /*!
-        \param paramValue in case \a result == false, this value cannot be relied on
-        \param success true, if param successfully set, false otherwise
-    */
-    void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QString &paramValue, bool success);
-
-    void asyncParamsSetDone(const QnResourcePtr &resource, const QnCameraAdvancedParamValueList &values) const;
-
 public:
 #ifdef ENABLE_DATA_PROVIDERS
     // this is thread to process commands like setparam
@@ -302,20 +285,6 @@ public:
     void unlockConsumers() { m_consumersMtx.unlock(); }
 
     QnResourcePtr toSharedPointer() const;
-
-    // should just do physical job ( network or so ) do not care about memory domain
-    virtual bool getParamPhysical(const QString &id, QString &value);
-    virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result);
-    virtual bool setParamPhysical(const QString &id, const QString &value);
-    virtual bool setParamsPhysical(const QnCameraAdvancedParamValueList &value, QnCameraAdvancedParamValueList &result);
-    virtual bool setParamsBegin();
-    virtual bool setParamsEnd();
-
-    void getParamPhysicalAsync(const QString &id);
-    void setParamPhysicalAsync(const QString &id, const QString &value);
-
-    void getParamsPhysicalAsync(const QSet<QString> &ids);
-    void setParamsPhysicalAsync(const QnCameraAdvancedParamValueList &values);
 
     void setCommonModule(QnCommonModule* commonModule);
     QnCommonModule* commonModule() const;

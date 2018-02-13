@@ -21,19 +21,19 @@ void AnalyticsSearchListModel::setFilterRect(const QRectF& relativeRect)
     d->setFilterRect(relativeRect);
 }
 
-bool AnalyticsSearchListModel::setData(const QModelIndex& index, const QVariant& /*value*/, int role)
+QString AnalyticsSearchListModel::filterText() const
 {
-    if (!index.isValid() || index.model() != this)
-        return false;
+    return d->filterText();
+}
 
-    switch (role)
-    {
-        case Qn::DefaultNotificationRole:
-            return d->defaultAction(index.row());
+void AnalyticsSearchListModel::setFilterText(const QString& value)
+{
+    d->setFilterText(value);
+}
 
-        default:
-            return false;
-    }
+bool AnalyticsSearchListModel::isConstrained() const
+{
+    return filterRect().isValid() || base_type::isConstrained();
 }
 
 } // namespace desktop

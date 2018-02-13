@@ -1,7 +1,7 @@
 #ifdef ENABLE_PULSE_CAMERA
 
-#include "../onvif/dataprovider/rtp_stream_provider.h"
 #include "pulse_resource.h"
+#include <streaming/rtp_stream_reader.h>
 
 
 const QString QnPlPulseResource::MANUFACTURE(lit("Pulse"));
@@ -33,10 +33,17 @@ void QnPlPulseResource::setCroppingPhysical(QRect /*cropping*/)
 
 }
 
-CameraDiagnostics::Result QnPlPulseResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnPlPulseResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex /*streamIndex*/)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
+CameraDiagnostics::Result QnPlPulseResource::initializeCameraDriver()
 {
     updateDefaultAuthIfEmpty(QLatin1String("admin"), QLatin1String("admin"));
-    return QnPhysicalCameraResource::initInternal();
+    return CameraDiagnostics::NoErrorResult();
 }
 
 

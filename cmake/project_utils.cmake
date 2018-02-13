@@ -12,23 +12,32 @@ function(build_source_groups _src_root_path _source_list _root_group_name)
     endforeach()
 endfunction()
 
-function(nx_target_enable_werror target)
-    if(${nx_werror_condition})
+function(nx_target_enable_werror target werror_condition)
+    if(werror_condition STREQUAL "")
+        set(werror_condition ${nx_werror_condition})
+    endif()
+
+    if(${werror_condition})
         target_compile_options(${target} PRIVATE -Werror -Wall -Wextra)
     endif()
 endfunction()
 
 function(nx_add_target name type)
-    set(options NO_MOC NO_PCH WERROR NO_WERROR)
+    set(options NO_MOC NO_WERROR)
     set(oneValueArgs LIBRARY_TYPE)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
+        SOURCE_EXCLUSIONS
         OTHER_SOURCES
-        PUBLIC_LIBS PRIVATE_LIBS)
+        PUBLIC_LIBS PRIVATE_LIBS
+        WERROR
+    )
 
     cmake_parse_arguments(NX "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    find_sources("${CMAKE_CURRENT_SOURCE_DIR}/src" cpp_files hpp_files)
+    nx_find_sources("${CMAKE_CURRENT_SOURCE_DIR}/src" cpp_files hpp_files
+        EXCLUDE ${NX_SOURCE_EXCLUSIONS}
+    )
 
     set(resources ${NX_ADDITIONAL_RESOURCES})
     if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
@@ -72,9 +81,12 @@ function(nx_add_target name type)
         )
     endif()
 
-    set(sources ${cpp_files} ${rcc_files} ${qm_files})
-    if(NOT NX_NO_PCH)
-        set(sources ${sources} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
+    set(sources ${cpp_files} ${hpp_files} ${rcc_files} ${qm_files})
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h)
+        set(has_pch TRUE)
+        list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h)
+    else()
+        set(has_pch FALSE)
     endif()
 
     set(sources ${sources} ${NX_ADDITIONAL_SOURCES} ${NX_OTHER_RESOURCES} ${NX_OTHER_SOURCES})
@@ -123,8 +135,8 @@ function(nx_add_target name type)
         nx_strip_target(${name} COPY_DEBUG_INFO)
     endif()
 
-    if(NOT NX_NO_WERROR AND (nx_enable_werror OR NX_WERROR))
-        nx_target_enable_werror(${name})
+    if(NOT NX_NO_WERROR AND (nx_enable_werror OR NOT "${NX_WERROR}" STREQUAL ""))
+        nx_target_enable_werror(${name} "${NX_WERROR}")
     endif()
 
     if(NOT NX_NO_MOC)
@@ -137,8 +149,8 @@ function(nx_add_target name type)
         )
     endif()
 
-    if(NOT NX_NO_PCH)
-        add_precompiled_header(${name} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h" ${pch_flags})
+    if(has_pch)
+        add_precompiled_header(${name} ${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h)
     endif()
 
     target_include_directories(${name} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")

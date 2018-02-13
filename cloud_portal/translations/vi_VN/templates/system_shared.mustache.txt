@@ -1,11 +1,11 @@
-Hệ thống đã được chia sẻ với bạn
+Xin chào, {{message.fullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) hệ thống chia sẻ {{message.system_name}} với bạn.
+<a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> đã chia sẻ quyền truy cập vào hệ thống quản lý hình ảnh "{{message.system_name}}" với bạn.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-Hệ thống {{message.system_name}} đã được chia sẻ với bạn.
+Bạn đã được cấp quyền truy cập vào hệ thống quản lý hình ảnh "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Mở hệ thống: {{config.portal_url}} / systems / {{message.system_id}}
+Xem ở {{PRODUCT_NAME}} Cổng thông tin: {{config.portal_url}} / systems / {{message.system_id}}

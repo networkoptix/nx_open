@@ -1,5 +1,11 @@
 #include "temporary_account_password_manager.h"
 
+#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#include <zlib.h>
+#else
+#include <QtZlib/zlib.h>
+#endif
+
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -10,13 +16,14 @@
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/fusion/serialization/sql.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/utils/crc32.h>
 #include <nx/utils/cryptographic_random_device.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/string.h>
 #include <nx/utils/time.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/uuid.h>
 
 #include "../stree/cdb_ns.h"
 
@@ -106,10 +113,15 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
 }
 
 void TemporaryAccountPasswordManager::addRandomCredentials(
+    const std::string& accountEmail,
     data::TemporaryAccountCredentials* const data)
 {
     if (data->login.empty())
+    {
         data->login = generateRandomPassword();
+        const auto loginCrc32 = std::to_string(nx::utils::crc32(accountEmail));
+        data->login += "-" + loginCrc32;
+    }
 
     data->password = generateRandomPassword();
     data->passwordHa1 = nx::network::http::calcHa1(
@@ -219,18 +231,9 @@ boost::optional<TemporaryAccountCredentialsEx>
 
 std::string TemporaryAccountPasswordManager::generateRandomPassword() const
 {
-    std::string password(
-        nx::utils::random::number(
-            nx::utils::random::CryptographicRandomDevice::instance(), 10U, 20U),
-        'a');
-    std::generate(
-        password.begin(), password.end(),
-        [this]()
-        {
-            return nx::utils::random::number(
-                nx::utils::random::CryptographicRandomDevice::instance(), (int)'a', (int)'z');
-        });
-    return password;
+    auto str = QnUuid::createUuid().toSimpleByteArray().toLower();
+    str.replace('-', "");
+    return str.toStdString();
 }
 
 bool TemporaryAccountPasswordManager::isTemporaryPasswordExpired(

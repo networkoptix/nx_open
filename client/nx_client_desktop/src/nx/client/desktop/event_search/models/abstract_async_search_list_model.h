@@ -45,10 +45,13 @@ public:
     //   Must return false and do nothing if previous fetch is not committed yet.
     //   Time range synchronization between several models is possible with
     //   the help of earliestTimeFetchedMs/earliestTimeToCommitMs arguments.
+    //   If prefetch is cancelled, PrefetchCompletionHandler is called with -1.
     using PrefetchCompletionHandler = std::function<void(qint64 earliestTimeFetchedMs)>;
     virtual bool prefetchAsync(PrefetchCompletionHandler completionHandler);
     virtual void commitPrefetch(qint64 earliestTimeToCommitMs);
     virtual bool fetchInProgress() const;
+
+    virtual bool isConstrained() const;
 
 private:
     QScopedPointer<Private> d;

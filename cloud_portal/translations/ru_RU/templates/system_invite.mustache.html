@@ -1,13 +1,16 @@
-<h1>Добро пожаловать в {{PRODUCT_NAME}}</h1>
+<h1>Здравствуйте, {{message.fullName}}</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> приглашает вас присоединиться к <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a> и предоставляет доступ к своей системе {{message.system_name}}.</p>
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> предоставил вам доступ к системе {{message.system_name}}.
+
+Чтобы просмотреть и управлять ей, создайте учетную запись в <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>, используя ваш текущий адрес электронной почты, и следуйте дальнейшим инструкциям.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>Приглашаем вас присоединиться к <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>. 
-Вам был предоставлен доступ к {{message.system_name}}.</p>
+<p>Вам предоставлен доступ к системе видеонаблюдения «{{message.system_name}}».
+
+Чтобы просмотреть и управлять ей, создайте учетную запись в <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>, используя ваш текущий адрес электронной почты, и следуйте дальнейшим инструкциям.</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Для доступа к системе требуется регистрация</a>
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Зарегистрироваться</a>
 

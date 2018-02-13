@@ -40,6 +40,25 @@ QnCameraAdvancedParamValue::QnCameraAdvancedParamValue(const QString &id, const 
 {
 }
 
+QString QnCameraAdvancedParamValue::toString() const
+{
+    return lm("%1 = %2").args(id, value);
+}
+
+QnCameraAdvancedParamValueMap::QnCameraAdvancedParamValueMap(
+    const QnCameraAdvancedParamValueList& list)
+{
+    appendValueList(list);
+}
+
+
+QnCameraAdvancedParamValueMap::QnCameraAdvancedParamValueMap(
+    std::initializer_list<std::pair<QString, QString>> values)
+{
+    for (const auto& v: values)
+        insert(v.first, v.second);
+}
+
 QnCameraAdvancedParamValueList QnCameraAdvancedParamValueMap::toValueList() const
 {
     QnCameraAdvancedParamValueList result;
@@ -75,10 +94,49 @@ void QnCameraAdvancedParamValueMap::appendValueList(const QnCameraAdvancedParamV
         insert(value.id, value.value);
 }
 
+QSet<QString> QnCameraAdvancedParamValueMap::ids() const
+{
+    QSet<QString> set;
+    for (const auto& id: this->keys())
+        set.insert(id);
+
+    return set;
+}
+
 bool QnCameraAdvancedParameter::isValid() const
 {
 	return (dataType != DataType::None)
         && (!id.isEmpty());
+}
+
+bool QnCameraAdvancedParameter::isValueValid(const QString& value) const
+{
+    if (dataType == DataType::None)
+        return false;
+
+    if (dataType == DataType::Bool)
+        return value == lit("true") || value == lit("false");
+
+    if (dataType == DataType::Number)
+    {
+        bool isOk = false;
+        const auto number = value.toDouble(&isOk);
+        if (!isOk)
+            return false;
+
+        if (range.isEmpty())
+            return true;
+
+        double min = 0, max = 0;
+        getRange(min, max);
+        return number >= min && number <= max;
+    }
+
+    if (dataType == DataType::Enumeration)
+        return range.isEmpty() || getRange().contains(value);
+
+    // TODO: Add some more checks?
+    return true;
 }
 
 QString QnCameraAdvancedParameter::dataTypeToString(DataType value)
@@ -355,6 +413,61 @@ void QnCameraAdvancedParams::applyOverloads(const std::vector<QnCameraAdvancedPa
         traverseGroup(group);
 }
 
+static void mergeParams(
+    std::vector<QnCameraAdvancedParameter>* target,
+    std::vector<QnCameraAdvancedParameter>* source)
+{
+    for (auto& sourceParam: *source)
+    {
+        const auto targetParamById = std::find_if(
+            target->begin(), target->end(),
+            [&](const QnCameraAdvancedParameter& p){ return p.id == sourceParam.id; });
+
+        if (targetParamById != target->end())
+            NX_ASSERT(false, lm("Parameter with name '%1' clash").arg(sourceParam.id));
+        else
+            target->push_back(std::move(sourceParam));
+    }
+}
+
+static void mergeGroups(
+    std::vector<QnCameraAdvancedParamGroup>* target,
+    std::vector<QnCameraAdvancedParamGroup>* source)
+{
+    for (auto& sourceGroup: *source)
+    {
+        const auto targetGroup = std::find_if(
+            target->begin(), target->end(),
+            [&](const QnCameraAdvancedParamGroup& g){ return g.name == sourceGroup.name; });
+
+        if (targetGroup != target->end())
+        {
+            if (!targetGroup->description.isEmpty() && !sourceGroup.description.isEmpty())
+                targetGroup->description += lit("\n") + sourceGroup.description;
+            else
+                targetGroup->description +=  sourceGroup.description;
+
+            mergeParams(&targetGroup->params, &sourceGroup.params);
+            mergeGroups(&targetGroup->groups, &sourceGroup.groups);
+        }
+        else
+        {
+            target->push_back(std::move(sourceGroup));
+        }
+    }
+}
+
+void QnCameraAdvancedParams::merge(QnCameraAdvancedParams params)
+{
+    // These fields are never used in code, but could still be usefull for debug.
+    name += lit(", ") + params.name;
+    version += lit(", ") + params.version;
+    unique_id += lit(", ") + params.unique_id;
+    packet_mode |= params.packet_mode;
+
+    mergeGroups(&groups, &params.groups);
+}
+
 bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck) const
 {
     switch (type)
@@ -381,6 +494,15 @@ bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck)
             return false;
         }
     }
+}
+
+void QnCameraAdvancedParameterDependency::autoFillId()
+{
+    static const QChar kDelimiter(L',');
+    QString hash = range + kDelimiter + internalRange;
+    for (const auto& condition: conditions)
+        hash += kDelimiter + condition.paramId + kDelimiter + condition.value;
+    id = guidFromArbitraryData(hash).toSimpleString();
 }
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameter, DataType,

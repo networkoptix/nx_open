@@ -10,6 +10,7 @@
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/stun/stun_types.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/stree/node.h>
 #include <nx/utils/stree/resourcenameset.h>
 #include <nx/utils/stree/resourcecontainer.h>
@@ -202,23 +203,27 @@ private:
     {
         NX_ASSERT(isInSelfAioThread());
 
+        nx::network::http::StatusCode::Value resultCode =
+            nx::network::http::StatusCode::ok;
+        // Invoking handlers with mutex not locked.
+        auto scope = makeScopeGuard(
+            [this, &resultCode]() { signalWaitingHandlers(resultCode); });
+
         QnMutexLocker lk(&m_mutex);
 
         m_httpClient.reset();
 
         if (!client->response())
         {
-            return signalWaitingHandlers(
-                &lk,
-                nx::network::http::StatusCode::serviceUnavailable);
+            resultCode = nx::network::http::StatusCode::serviceUnavailable;
+            return;
         }
 
         if (client->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
         {
-            return signalWaitingHandlers(
-                &lk,
-                static_cast<nx::network::http::StatusCode::Value>(
-                    client->response()->statusLine.statusCode));
+            resultCode = static_cast<nx::network::http::StatusCode::Value>(
+                client->response()->statusLine.statusCode);
+            return;
         }
 
         QByteArray xmlData = client->fetchMessageBodyBuffer();
@@ -227,20 +232,18 @@ private:
             nx::utils::stree::StreeManager::loadStree(&xmlDataSource, m_nameset);
         if (!stree)
         {
-            return signalWaitingHandlers(
-                &lk,
-                nx::network::http::StatusCode::serviceUnavailable);
+            resultCode = nx::network::http::StatusCode::serviceUnavailable;
+            return;
         }
 
         // Selecting endpoint.
         if (!findModuleUrl(*stree))
         {
-            return signalWaitingHandlers(
-                &lk,
-                nx::network::http::StatusCode::notFound);
+            resultCode = nx::network::http::StatusCode::notFound;
+            return;
         }
 
-        signalWaitingHandlers(&lk, nx::network::http::StatusCode::ok);
+        resultCode = nx::network::http::StatusCode::ok;
     }
 
     bool findModuleUrl(const nx::utils::stree::AbstractNode& treeRoot)
@@ -277,17 +280,13 @@ private:
         return analyzeXmlSearchResult(outputData);
     }
 
-    void signalWaitingHandlers(
-        QnMutexLockerBase* const lk,
-        nx::network::http::StatusCode::Value statusCode)
+    void signalWaitingHandlers(nx::network::http::StatusCode::Value statusCode)
     {
-        auto handlers = std::move(m_resolveHandlers);
-        m_resolveHandlers = decltype(m_resolveHandlers)();
+        decltype(m_resolveHandlers) handlers;
+        m_resolveHandlers.swap(handlers);
         m_requestIsRunning = false;
-        lk->unlock();
-        for (auto& handler : handlers)
+        for (auto& handler: handlers)
             invokeHandler(handler, statusCode);
-        lk->relock();
     }
 };
 

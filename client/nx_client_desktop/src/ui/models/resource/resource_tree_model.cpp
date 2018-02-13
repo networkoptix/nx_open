@@ -7,6 +7,7 @@
 #include <common/common_module.h>
 
 #include <client/client_settings.h>
+#include <client/client_module.h>
 
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/global_permissions_manager.h>
@@ -34,6 +35,7 @@
 #include <api/global_settings.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/utils/wearable_manager.h>
 #include <ui/delegates/resource_tree_model_custom_column_delegate.h>
 
 #include <ui/models/resource/resource_tree_model_node.h>
@@ -87,6 +89,11 @@ QList<Qn::NodeType> rootNodeTypes()
             << Qn::SeparatorNode
             << Qn::UsersNode
             << Qn::ServersNode
+            << Qn::FilteredServersNode
+            << Qn::FilteredCamerasNode
+            << Qn::FilteredVideowallsNode
+            << Qn::FilteredUsersNode
+            << Qn::FilteredLayoutsNode
             << Qn::UserResourcesNode
             << Qn::LayoutsNode
             << Qn::LayoutToursNode
@@ -156,6 +163,9 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
 
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         &QnResourceTreeModel::handlePermissionsChanged);
+
+    connect(qnClientModule->wearableManager(), &WearableManager::stateChanged, this,
+        &QnResourceTreeModel::at_wearableManager_stateChanged);
 
     rebuildTree();
 
@@ -359,6 +369,13 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         if (m_scope == FullScope && isLoggedIn)
             return rootNode;
         return bastardNode;
+
+    case Qn::FilteredCamerasNode:
+    case Qn::FilteredServersNode:
+    case Qn::FilteredLayoutsNode:
+    case Qn::FilteredUsersNode:
+    case Qn::FilteredVideowallsNode:
+        return rootNode; // Always root node.
 
     case Qn::UserResourcesNode:
         if (m_scope == CamerasScope && !isAdmin)
@@ -1214,6 +1231,15 @@ void QnResourceTreeModel::at_systemNameChanged()
 void QnResourceTreeModel::at_autoDiscoveryEnabledChanged()
 {
     m_rootNodes[Qn::OtherSystemsNode]->update();
+}
+
+void QnResourceTreeModel::at_wearableManager_stateChanged(const WearableState& state)
+{
+    QnResourcePtr resource = resourcePool()->getResourceById(state.cameraId);
+    NX_ASSERT(resource);
+
+    auto node = ensureResourceNode(resource);
+    node->update();
 }
 
 QnResourceTreeModelNodeManager* QnResourceTreeModel::nodeManager() const

@@ -1,11 +1,11 @@
-Het systeem  is met u gedeeld
+Hallo, {{message.fullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) deelde het systeem {{message.system_name}} met u.
+{{message.sharer_name}} ({{message.sharer_email}}) heeft met u de toegang tot het video management systeem "{{message.system_name}}" gedeeld.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-Het systeem {{message.system_name}} werd met u gedeeld.
+U heeft toegang gekregen tot het video management systeem "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Open het systeem: {{config.portal_url}}/systems/{{message.system_id}}
+Weergave in het {{PRODUCT_NAME}} portal: {{config.portal_url}}/systems/{{message.system_id}}

@@ -12,7 +12,7 @@ class QnHiDpiWorkarounds
 public:
     static QAction* showMenu(QMenu* menu, const QPoint& globalPoint);
 
-    static QPoint safeMapToGlobal(QWidget*widget, const QPoint& offset);
+    static QPoint safeMapToGlobal(const QWidget* widget, const QPoint& offset);
 
     static void init();
 

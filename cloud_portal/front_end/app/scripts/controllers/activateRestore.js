@@ -29,6 +29,15 @@ angular.module('cloudApp')
             }
             if($scope.data.restoreCode || $scope.data.activateCode){
                 account.logoutAuthorised();
+                var code = $scope.data.restoreCode || $scope.data.activateCode;
+                account.checkCode(code).then(function(registered){
+                    if(!registered){
+                        // send to registration form with the code
+                        $location.path('/register/' + code);
+                    }
+                },function(){
+                    // Wrong activation code or some error - do nothing, keep user on this page
+                });
             }
 
             function setContext(name){

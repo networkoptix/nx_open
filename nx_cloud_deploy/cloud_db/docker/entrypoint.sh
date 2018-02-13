@@ -2,9 +2,19 @@
 
 mkdir -p /tmp/core
 
+export INSTANCE_IP=$(LD_LIBRARY_PATH= dig +short $CLOUD_DB_HOST)
+
 tmp=$(tempfile)
 envsubst < /opt/networkoptix/cloud_db/etc/cloud_db.conf > $tmp
 mv $tmp /opt/networkoptix/cloud_db/etc/cloud_db.conf
+
+tmp=$(tempfile)
+envsubst < /opt/networkoptix/cloud_db/etc/cloud_modules_template.xml > $tmp
+mv $tmp /opt/networkoptix/cloud_db/etc/cloud_modules_template.xml
+
+tmp=$(tempfile)
+envsubst < /opt/networkoptix/cloud_db/etc/cloud_modules_new_template.xml > $tmp
+mv $tmp /opt/networkoptix/cloud_db/etc/cloud_modules_new_template.xml
 
 if [ -n "$MODULE_CONFIGURATION" ]
 then

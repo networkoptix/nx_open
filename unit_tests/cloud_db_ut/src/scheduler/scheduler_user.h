@@ -140,12 +140,17 @@ public:
 
     void setShouldUnsubscribe(const QnUuid& taskId, UnsubscribeCb unsubscribeCb)
     {
+        QnMutexLocker lock(&m_mutex);
         m_unsubscribeId = taskId;
         m_unsubscribeCallback = std::move(unsubscribeCb);
         m_shouldUnsubscribe = true;
     }
 
-    void setShouldSubscribe() { m_shouldSubscribe = true; }
+    void setShouldSubscribe()
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_shouldSubscribe = true;
+    }
 
     TaskMap tasks()
     {

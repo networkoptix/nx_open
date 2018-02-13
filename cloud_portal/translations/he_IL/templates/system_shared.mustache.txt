@@ -1,11 +1,11 @@
-מערכת שותפה איתך
+שלום, {{message.fullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) שיתף את המערכת {{message.system_name}} איתך.
+{{message.sharer_name}} ({{message.sharer_email}}) שיתף גישה למערכת ניהול הוידאו "{{message.system_name}}".
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-המערכת {{message.system_name}} שותפה איתך.
+ניתנה לך גישה למערכת ניהול וידאו "{{message.system_name}}".
 {{/message.sharer_name}}
 
-פתח את המערכת: {{config.portal_url}} / systems / {{message.system_id}}
+הצג ב {{PRODUCT_NAME}} פורטל: {{config.portal_url}}/systems/{{message.system_id}}

@@ -1,13 +1,11 @@
 #pragma once
 
-#include <plugins/plugin_api.h>
-
 namespace nx {
 namespace sdk {
 
-struct ResourceInfo
+struct CameraInfo
 {
-    ResourceInfo()
+    CameraInfo()
     {
         vendor[0] = 0;
         model[0] = 0;

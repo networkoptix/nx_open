@@ -175,6 +175,12 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (camera && camera->getMaxFps() >= 50)
         m_forceMtDecoding = true; // we can get render speed limit instead. MT decoding and displaying frame queue turn on simultaneously
+
+    if (camera && camera->hasFlags(Qn::wearable_camera))
+    {
+        auto handler = [this] { playAudio(m_shouldPlayAudio); };
+        connect(camera.data(), &QnSecurityCamResource::audioEnabledChanged, this, handler);
+    }
 }
 
 QnCamDisplay::~QnCamDisplay()
@@ -447,11 +453,11 @@ bool QnCamDisplay::fillDataQueue()
     if (!isForcedBufferingEnabled() || isDataQueueFilled())
         return false;
 
-    const auto requiredBufferLength = nx::client::desktop::ini().forcedVideoBufferLengthUs
-        + nx::client::desktop::ini().additionalVideoBufferLengthUs;
+    const auto requiredBufferLengthUs =
+        std::chrono::microseconds(m_forcedVideoBufferLength).count();
     while (!needToStop()
         && m_lastQueuedVideoTime >= m_lastVideoPacketTime
-        && m_lastQueuedVideoTime - m_lastVideoPacketTime <= requiredBufferLength)
+        && m_lastQueuedVideoTime - m_lastVideoPacketTime <= requiredBufferLengthUs)
     {
         if (m_dataQueue.size() == m_dataQueue.maxSize())
             m_dataQueue.setMaxSize(m_dataQueue.maxSize() * 2);
@@ -460,7 +466,7 @@ bool QnCamDisplay::fillDataQueue()
         constexpr qint64 kMaxSleepTimeUs = 1000000;
 
         const auto sleepTime = std::max(kMinSleepTimeUs,
-            requiredBufferLength - (m_lastQueuedVideoTime - m_lastVideoPacketTime));
+            requiredBufferLengthUs - (m_lastQueuedVideoTime - m_lastVideoPacketTime));
         const auto maxSleepTime = std::min(kMaxSleepTimeUs, sleepTime + kMinSleepTimeUs);
 
         m_delay.terminatedSleep(sleepTime, maxSleepTime);
@@ -471,7 +477,8 @@ bool QnCamDisplay::fillDataQueue()
 
 bool QnCamDisplay::isDataQueueFilled() const
 {
-    const auto forcedVideoBufferLengthUs = nx::client::desktop::ini().forcedVideoBufferLengthUs;
+    const auto forcedVideoBufferLengthUs =
+        std::chrono::microseconds(m_forcedVideoBufferLength).count();
     return m_lastQueuedVideoTime - m_lastVideoPacketTime > forcedVideoBufferLengthUs;
 }
 
@@ -1684,6 +1691,15 @@ void QnCamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
 
 void QnCamDisplay::playAudio(bool play)
 {
+    if (m_resource->toResourcePtr()->hasFlags(Qn::wearable_camera))
+    {
+        m_shouldPlayAudio = play;
+        QnSecurityCamResourcePtr camera =
+            m_resource->toResourcePtr().dynamicCast<QnSecurityCamResource>();
+        if (camera && !camera->isAudioEnabled())
+            play = false; //< Ignore audio for wearable cameras if it is disabled in UI.
+    }
+
     if (m_playAudio == play)
         return;
 
@@ -2087,9 +2103,19 @@ Qn::MediaStreamEvent QnCamDisplay::lastMediaEvent() const
     return m_lastMediaEvent;
 }
 
+std::chrono::milliseconds QnCamDisplay::forcedVideoBufferLength() const
+{
+    return m_forcedVideoBufferLength;
+}
+
+void QnCamDisplay::setForcedVideoBufferLength(std::chrono::milliseconds length)
+{
+    m_forcedVideoBufferLength = length;
+}
+
 bool QnCamDisplay::isForcedBufferingEnabled() const
 {
-    return nx::client::desktop::ini().forcedVideoBufferLengthUs > 0;
+    return m_forcedVideoBufferLength != std::chrono::milliseconds::zero();
 }
 
 // -------------------------------- QnFpsStatistics -----------------------

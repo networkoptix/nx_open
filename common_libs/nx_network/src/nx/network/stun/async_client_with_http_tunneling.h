@@ -84,7 +84,7 @@ private:
     Settings m_settings;
     std::unique_ptr<AsyncClient> m_stunClient;
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
-    ConnectHandler m_connectHandler;
+    ConnectHandler m_httpTunnelEstablishedHandler;
     /** map<stun method, handler> */
     std::map<int, HandlerContext> m_indicationHandlers;
     mutable QnMutex m_mutex;
@@ -97,6 +97,7 @@ private:
     /** map<request id, request context>. */
     std::map<int, RequestContext> m_activeRequests;
     OnConnectionClosedHandler m_connectionClosedHandler;
+    ConnectHandler m_userConnectHandler;
 
     virtual void stopWhileInAioThread() override;
 
@@ -125,6 +126,7 @@ private:
     void scheduleReconnect();
     void reconnect();
     void onReconnectDone(SystemError::ErrorCode sysErrorCode);
+    void reportReconnect();
 };
 
 } // namespace stun

@@ -165,7 +165,9 @@ protected:
             m_systemMergeFixture.waitUntilMergeHistoryIsAdded();
         ASSERT_GE(systemMergeHistory.size(), 1U);
         if (!systemMergeHistory.front().mergedSystemCloudId.isEmpty())
+        {
             ASSERT_TRUE(systemMergeHistory.front().verify(m_systemCloudCredentials.back().key));
+        }
     }
 
     void thenMergedSystemDisappearedFromCloud()

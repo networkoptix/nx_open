@@ -46,6 +46,11 @@
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Détacher du système</button></p>
                     </div>
                     <div>
+                        <h3>Détacher le serveur du système</h3>
+                        <p>Cette action détachera le serveur de la base de données système, des utilisateurs locaux et de la configuration. Les archives vidéo resteront intactes. <b>Les utilisateurs Cloud seront supprimés.</b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Détacher du système</button></p>
+                    </div>
+                    <div>
                         <h3>Redémarrer</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Redémarrer serveur</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Redémarrer</button></p>

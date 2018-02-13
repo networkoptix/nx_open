@@ -4,6 +4,7 @@
 #include <nx/network/stun/stun_types.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
@@ -41,14 +42,18 @@ void AsyncClientWithHttpTunneling::connect(const utils::Url &url, ConnectHandler
 
             m_reconnectTimer.reset();
 
+            m_userConnectHandler = std::move(handler);
+
             connectInternal(
                 lock,
-                [this, handler = std::move(handler)](
-                    SystemError::ErrorCode systemErrorCode)
+                [this](SystemError::ErrorCode systemErrorCode)
                 {
-                    if (systemErrorCode != SystemError::noError)
+                    if (systemErrorCode == SystemError::noError)
+                        reportReconnect();
+                    else
                         scheduleReconnect();
-                    handler(systemErrorCode);
+                    //< TODO: ak reportReconnect() call looks strange here.
+                    // But, that is how stun::AsyncClient works and some code relies on that.
                 });
         });
 }
@@ -159,9 +164,6 @@ void AsyncClientWithHttpTunneling::closeConnection(SystemError::ErrorCode reason
             if (m_httpClient)
                 m_httpClient.reset();
 
-            if (m_connectHandler)
-                nx::utils::swapAndCall(m_connectHandler, reason);
-
             decltype(m_activeRequests) activeRequests;
             activeRequests.swap(m_activeRequests);
             for (auto& requestContext: activeRequests)
@@ -224,6 +226,8 @@ void AsyncClientWithHttpTunneling::connectInternal(
             if (sysErrorCode == SystemError::noError)
                 applyConnectionSettings();
             handler(sysErrorCode);
+            if (m_userConnectHandler)
+                nx::utils::swapAndCall(m_userConnectHandler, sysErrorCode);
         };
 
     if (m_url.scheme() == nx::network::http::kUrlSchemeName ||
@@ -240,7 +244,11 @@ void AsyncClientWithHttpTunneling::connectInternal(
     }
     else
     {
-        post([onConnected = std::move(onConnected)]() { onConnected(SystemError::invalidData); });
+        post(
+            [onConnected = std::move(onConnected)]()
+            {
+                onConnected(SystemError::invalidData);
+            });
     }
 }
 
@@ -314,7 +322,7 @@ void AsyncClientWithHttpTunneling::openHttpTunnel(
     const nx::utils::Url& url,
     ConnectHandler handler)
 {
-    m_connectHandler = std::move(handler);
+    m_httpTunnelEstablishedHandler = std::move(handler);
     m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
     m_httpClient->bindToAioThread(getAioThread());
     m_httpClient->doUpgrade(
@@ -325,6 +333,15 @@ void AsyncClientWithHttpTunneling::openHttpTunnel(
 
 void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
 {
+    SystemError::ErrorCode resultCode = SystemError::noError;
+    auto connecttionEventsReporter = makeScopeGuard(
+        [this, &resultCode]()
+        {
+            if (resultCode != SystemError::noError)
+                closeConnection(resultCode);
+            nx::utils::swapAndCall(m_httpTunnelEstablishedHandler, resultCode);
+        });
+
     std::unique_ptr<nx::network::http::AsyncClient> httpClient;
     httpClient.swap(m_httpClient);
 
@@ -332,7 +349,7 @@ void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
     {
         NX_DEBUG(this, lm("Connection to %1 failed with error %2").arg(m_url)
             .arg(SystemError::toString(httpClient->lastSysErrorCode())));
-        closeConnection(httpClient->lastSysErrorCode());
+        resultCode = httpClient->lastSysErrorCode();
         return;
     }
 
@@ -341,7 +358,7 @@ void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
         NX_DEBUG(this, lm("Connection to %1 failed with HTTP status %2")
             .arg(m_url)
             .arg(nx::network::http::StatusCode::toString(httpClient->response()->statusLine.statusCode)));
-        closeConnection(SystemError::connectionRefused);
+        resultCode = SystemError::connectionRefused;
         return;
     }
 
@@ -349,10 +366,9 @@ void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
     if (!connection->setRecvTimeout(std::chrono::milliseconds::zero()) ||
         !connection->setSendTimeout(std::chrono::milliseconds::zero()))
     {
-        const auto sysErrorCode = SystemError::getLastOSErrorCode();
+        resultCode = SystemError::getLastOSErrorCode();
         NX_DEBUG(this, lm("Error changing socket timeout. %1")
-            .arg(SystemError::toString(sysErrorCode)));
-        closeConnection(sysErrorCode);
+            .arg(SystemError::toString(resultCode)));
         return;
     }
 
@@ -361,8 +377,6 @@ void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
         createStunClient(lock, std::move(connection));
         sendPendingRequests();
     }
-
-    nx::utils::swapAndCall(m_connectHandler, SystemError::noError);
 }
 
 void AsyncClientWithHttpTunneling::onRequestCompleted(
@@ -433,6 +447,11 @@ void AsyncClientWithHttpTunneling::onReconnectDone(SystemError::ErrorCode sysErr
         return scheduleReconnect();
     }
 
+    reportReconnect();
+}
+
+void AsyncClientWithHttpTunneling::reportReconnect()
+{
     NX_DEBUG(this, lm("Reconnected to %1").arg(m_url));
     for (const auto& handlerContext: m_reconnectHandlers)
     {

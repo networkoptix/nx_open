@@ -35,6 +35,7 @@ public:
 
     virtual int cacheTimeout() const = 0;
     virtual bool isUpnpMulticastEnabled() const = 0;
+    virtual bool isAutoDiscoveryEnabled() const = 0;
 };
 
 class NX_NETWORK_API DeviceSearcherDefaultSettings:
@@ -43,6 +44,7 @@ class NX_NETWORK_API DeviceSearcherDefaultSettings:
 public:
     virtual int cacheTimeout() const override;
     virtual bool isUpnpMulticastEnabled() const override;
+    virtual bool isAutoDiscoveryEnabled() const override;
 };
 
 /**

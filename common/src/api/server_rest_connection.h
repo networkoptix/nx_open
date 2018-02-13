@@ -21,6 +21,7 @@
 #include <api/model/time_reply.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <api/model/wearable_camera_reply.h>
+#include <api/model/manual_camera_seach_reply.h>
 
 /**
  * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -157,6 +158,20 @@ public:
         GetCallback callback,
         QThread* targetThread = nullptr);
 
+    /**
+     * Creates a new file upload that you can upload chunks into via `uploadFileChunk` function.
+     *
+     * A quick note on TTL. Countdown normally starts once you've uploaded the whole file, but
+     * since clients are unreliable and might stop an upload prematurely, the server actually
+     * restarts the countdown after each mutating command.
+     *
+     * @param fileName                  Unique file name that will be used in other calls.
+     * @param size                      Size of the file, in bytes.
+     * @param chunkSize                 Size of a single chunk as will be used in succeeding
+     *                                  `uploadFileChunk` calls.
+     * @param md5                       MD5 hash of the file, as text (32-character hex string).
+     * @param ttl                       TTL for the upload, in milliseconds. Pass 0 for infinity.
+     */
     Handle addFileUpload(
         const QString& fileName,
         qint64 size,
@@ -238,8 +253,34 @@ public:
      *
      * @param name                      Name of the camera.
      */
-    Handle addWearableCameraAsync(
+    Handle addWearableCamera(
         const QString& name,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle wearableCameraStatus(
+        const QnNetworkResourcePtr& camera,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle lockWearableCamera(
+        const QnNetworkResourcePtr& camera,
+        const QnUserResourcePtr& user,
+        qint64 ttl,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle extendWearableCameraLock(
+        const QnNetworkResourcePtr& camera,
+        const QnUserResourcePtr& user,
+        const QnUuid& token,
+        qint64 ttl,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle releaseWearableCameraLock(
+        const QnNetworkResourcePtr& camera,
+        const QnUuid& token,
         GetCallback callback,
         QThread* targetThread = nullptr);
 
@@ -252,13 +293,15 @@ public:
      * uploaded file.
      *
      * @param camera                    Camera to add footage to.
+     * @param token                     Lock token.
      * @param uploadId                  Name of the uploaded file to use.
      * @param startTimeMs               Start time of the footage, in msecs since epoch.
      *
      * @see addFileUpload
      */
-    Handle consumeWearableCameraFileAsync(
+    Handle consumeWearableCameraFile(
         const QnNetworkResourcePtr& camera,
+        const QnUuid& token,
         const QString& uploadId,
         qint64 startTimeMs,
         PostCallback callback,
@@ -270,12 +313,39 @@ public:
         Result<nx::analytics::storage::LookupResult>::type callback,
         QThread* targetThread = nullptr);
 
+    Handle addCamera(
+        const QnManualResourceSearchList& cameras,
+        const QString& userName,
+        const QString& password,
+        GetCallback callback,
+        QThread* thread = nullptr);
+
+    Handle searchCameraStart(
+        const QString& startAddress,
+        const QString& endAddress,
+        const QString& userName,
+        const QString& password,
+        int port,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle searchCameraStatus(
+        const QnUuid& processUuid,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle searchCameraStop(
+        const QnUuid& processUuid,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
     /**
     * Cancel running request by known requestID. If request is canceled, callback isn't called.
     * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.
     * If QnServerRestConnection is destroyed all running requests are canceled, no callbacks called.
     */
     void cancelRequest(const Handle& requestId);
+
 
 private slots:
     void onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient);

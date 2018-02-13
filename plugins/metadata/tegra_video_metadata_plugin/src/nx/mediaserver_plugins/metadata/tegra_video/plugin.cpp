@@ -1,10 +1,10 @@
 #include "plugin.h"
 
 #include <nx/kit/debug.h>
-
 #include <plugins/plugin_tools.h>
 
-#include "manager.h"
+#include "tegra_video_metadata_plugin_ini.h"
+#include "camera_manager.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -14,89 +14,19 @@ namespace tegra_video {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Plugin::Plugin()
+Plugin::Plugin(): CommonPlugin("Tegra Video metadata plugin")
 {
-    NX_PRINT << "Created \"" << name() << "\"";
+    setEnableOutput(NX_DEBUG_ENABLE_OUTPUT); //< Base class is verbose when this descendant is.
 }
 
-Plugin::~Plugin()
+nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
+    const CameraInfo& /*cameraInfo*/, Error* /*outError*/)
 {
-    NX_PRINT << "Destroyed \"" << name() << "\"";
+    return new CameraManager(this);
 }
 
-void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
+std::string Plugin::capabilitiesManifest() const
 {
-    if (interfaceId == IID_MetadataPlugin)
-    {
-        addRef();
-        return static_cast<AbstractMetadataPlugin*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin3)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin3*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin2)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin2*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
-const char* Plugin::name() const
-{
-    return "Tegra Video metadata plugin";
-}
-
-void Plugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
-{
-    // Do nothing.
-}
-
-void Plugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
-{
-    // Do nothing.
-}
-
-void Plugin::setLocale(const char* /*locale*/)
-{
-    // Do nothing.
-}
-
-AbstractMetadataManager* Plugin::managerForResource(
-    const ResourceInfo& resourceInfo,
-    Error* outError)
-{
-    *outError = Error::noError;
-    return new Manager(this);
-}
-
-AbstractSerializer* Plugin::serializerForType(
-    const nxpl::NX_GUID& /*typeGuid*/,
-    Error* /*outError*/)
-{
-    return nullptr;
-}
-
-const char* Plugin::capabilitiesManifest(Error* error) const
-{
-    *error = Error::noError;
-
     return R"json(
         {
             "driverId": "{B14A8D7B-8009-4D38-A60D-04139345432E}",

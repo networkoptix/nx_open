@@ -15,7 +15,7 @@ public:
     virtual SystemError::ErrorCode resolve(
         const QString& hostName,
         int ipVersion,
-        std::deque<HostAddress>* resolvedAddresses) override;
+        std::deque<AddressEntry>* resolvedAddresses) override;
 };
 
 } // namespace network

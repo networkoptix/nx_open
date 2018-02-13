@@ -29,6 +29,7 @@ class SelectableTextButton: public QPushButton
     Q_OBJECT
     Q_PROPERTY(State state READ state WRITE setState NOTIFY stateChanged)
     Q_PROPERTY(bool deactivatable READ deactivatable WRITE setDeactivatable)
+    Q_PROPERTY(bool selectable READ selectable WRITE setSelectable)
     Q_PROPERTY(QString deactivatedText READ deactivatedText WRITE setDeactivatedText)
 
     using base_type = QPushButton;
@@ -46,6 +47,9 @@ public:
 
     State state() const;
     void setState(State value);
+
+    bool selectable() const;
+    void setSelectable(bool value);
 
     bool deactivatable() const;
     void setDeactivatable(bool value);

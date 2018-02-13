@@ -4,19 +4,20 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-#include <ui/widgets/common/panel.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
+class EventTile;
+
 class EventPanel:
-    public QnPanel,
+    public QWidget,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = QnPanel;
+    using base_type = QWidget;
 
 public:
     explicit EventPanel(QWidget* parent);
@@ -24,8 +25,8 @@ public:
 
     virtual ~EventPanel() override;
 
-protected:
-    virtual void paintEvent(QPaintEvent* event) override;
+signals:
+    void tileHovered(const QModelIndex& index, const EventTile* tile);
 
 private:
     class Private;

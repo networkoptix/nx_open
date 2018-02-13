@@ -30,6 +30,7 @@ bool isErrorOverlayCheck(Qn::ResourceStatusOverlay overlay)
         case Qn::LoadingOverlay:
         case Qn::NoDataOverlay:
         case Qn::NoVideoDataOverlay:
+        case Qn::NoLiveStreamOverlay:
             return false;
         default:
             return true;
@@ -170,6 +171,7 @@ QnStatusOverlayWidget::Controls QnStatusOverlayController::normalVisibleItems() 
         case Qn::NoVideoDataOverlay:
             return QnStatusOverlayWidget::Control::kImageOverlay;
         case Qn::NoDataOverlay:
+        case Qn::NoLiveStreamOverlay:
             return QnStatusOverlayWidget::Control::kCaption;
         default:
             return QnStatusOverlayWidget::Control::kNoControl;
@@ -254,6 +256,7 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
         { Qn::IoModuleDisabledOverlay, tr("DEVICE DISABLED") },
         { Qn::TooManyOpenedConnectionsOverlay, tr("TOO MANY CONNECTIONS") },
         { Qn::PasswordRequiredOverlay, tr("PASSWORD REQUIRED") },
+        { Qn::NoLiveStreamOverlay, tr("NO LIVE STREAM") },
     };
     return extractValue(overlay, kCaptions);
 }

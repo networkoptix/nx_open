@@ -3,6 +3,7 @@
 #include "../event_ribbon.h"
 
 #include <QtCore/QModelIndex>
+#include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QHash>
 #include <QtCore/QList>
@@ -17,11 +18,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class EventTile;
-
 class EventRibbon::Private: public QObject
 {
     Q_OBJECT
+    using PrivateSignal = EventRibbon::QPrivateSignal;
 
 public:
     Private(EventRibbon* q);
@@ -34,8 +34,22 @@ public:
 
     QScrollBar* scrollBar() const;
 
+    bool showDefaultToolTips() const;
+    void setShowDefaultToolTips(bool value);
+
+    int count() const;
+
+    int unreadCount() const;
+    QnNotificationLevel::Value highestUnreadImportance() const;
+
+    void updateHover(bool hovered, const QPoint& mousePos);
+
+protected:
+    virtual bool eventFilter(QObject* object, QEvent* event) override;
+
 private:
-    void updateView();
+    void updateView(); //< Calls doUpdateView and emits q->unreadCountChanged if needed.
+    void doUpdateView();
     void updateScrollRange();
 
     int calculateHeight(QWidget* widget) const;
@@ -55,7 +69,10 @@ private:
     void updateCurrentShifts(); //< Updates m_currentShifts from m_itemShiftAnimations.
     void clearShiftAnimations();
 
+    void showContextMenu(EventTile* tile, const QPoint& posRelativeToTile);
+
     int indexOf(EventTile* tile) const;
+    int indexAtPos(const QPoint& pos) const;
 
     // Creates a tile widget for a data model item using the following roles:
     //     Qt::UuidRole for unique id
@@ -66,6 +83,8 @@ private:
     //     Qt::ForegroundRole for titleColor
     EventTile* createTile(const QModelIndex& index);
     static void updateTile(EventTile* tile, const QModelIndex& index);
+
+    bool shouldSetTileRead(const EventTile* tile) const;
 
     void debugCheckGeometries();
     void debugCheckVisibility();
@@ -83,6 +102,9 @@ private:
     int m_totalHeight = 0;
 
     QSet<EventTile*> m_visible;
+    QHash<EventTile*, QnNotificationLevel::Value> m_unread;
+
+    QPointer<EventTile> m_hoveredTile;
 
     // Maps animation object to item index. Duplicate indices are allowed.
     // Animation objects are owned by EventRibbon::Private object.
@@ -90,6 +112,8 @@ private:
     QHash<QVariantAnimation*, int> m_itemShiftAnimations;
 
     QHash<int, int> m_currentShifts; //< Maps item index to shift value.
+
+    bool m_showDefaultToolTips = false;
 };
 
 } // namespace desktop

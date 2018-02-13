@@ -4,7 +4,6 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/cloud/mediator_connector.h>
-#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/std/cpp14.h>
@@ -30,7 +29,6 @@ TunnelConnector::TunnelConnector(
     m_udpSocket(std::move(udpSocket)),
     m_remotePeerCloudConnectVersion(hpm::api::kDefaultCloudConnectVersion)
 {
-    NX_ASSERT(nx::network::SocketGlobals::cloud().mediatorConnector().udpEndpoint());
     NX_CRITICAL(m_udpSocket);
     m_localAddress = m_udpSocket->getLocalAddress();
 
@@ -77,9 +75,9 @@ void TunnelConnector::connect(
         NX_LOGX(lm("cross-nat %1. mediator reported empty UDP address list for host %2")
             .arg(m_connectSessionId).arg(m_targetHostAddress.host.toString()),
             cl_logDEBUG1);
-        return holePunchingDone(
+        return post(std::bind(&TunnelConnector::holePunchingDone, this,
             api::NatTraversalResultCode::targetPeerHasNoUdpAddress,
-            SystemError::connectionReset);
+            SystemError::connectionReset));
     }
 
     for (const SocketAddress& endpoint: response.udpEndpointList)
@@ -246,8 +244,8 @@ void TunnelConnector::holePunchingDone(
             std::move(m_udtConnection));
     }
 
-    auto completionHandler = std::move(m_completionHandler);
-    completionHandler(
+    nx::utils::swapAndCall(
+        m_completionHandler,
         resultCode,
         sysErrorCode,
         std::move(tunnelConnection));

@@ -117,8 +117,6 @@ nx::utils::db::DBResult AuthenticationProvider::afterSharingSystem(
     if (sharingType == SharingType::invite)
         return nx::utils::db::DBResult::ok;
 
-    NX_DEBUG(this, lm("Updating authentication information of user %1 of system %2")
-        .arg(sharing.accountEmail).arg(sharing.systemId));
 
     const auto nonce = fetchOrCreateNonce(queryContext, sharing.systemId);
 
@@ -295,6 +293,10 @@ void AuthenticationProvider::addUserAuthRecord(
     const api::AccountData& account,
     const std::string& nonce)
 {
+    NX_DEBUG(this,
+        lm("Updating authentication information of user %1 (vms user id %2) of system %3")
+        .arg(account.email).arg(vmsUserId).arg(systemId));
+
     auto authRecord = generateAuthRecord(account, nonce);
 
     api::AuthInfo userAuthRecords;

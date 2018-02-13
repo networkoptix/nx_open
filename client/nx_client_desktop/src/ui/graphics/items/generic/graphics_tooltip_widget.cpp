@@ -49,6 +49,7 @@ QnGraphicsToolTipWidget::QnGraphicsToolTipWidget(QGraphicsItem* parent):
     font.setPixelSize(kNoDataFontPixelSize);
     font.setWeight(kNoDataFontWeight);
     m_previewWidget->setFont(font);
+    m_previewWidget->setCropMode(nx::client::desktop::AsyncImageWidget::CropMode::notHovered);
 
     setThumbnailVisible(false);
 }
@@ -106,6 +107,15 @@ void QnGraphicsToolTipWidget::setImageProvider(QnImageProvider* provider)
         return;
 
     m_previewWidget->setImageProvider(provider);
+    forceLayoutUpdate();
+}
+
+void QnGraphicsToolTipWidget::setHighlightRect(const QRectF& relativeRect)
+{
+    if (m_previewWidget->highlightRect() == relativeRect)
+        return;
+
+    m_previewWidget->setHighlightRect(relativeRect);
     forceLayoutUpdate();
 }
 

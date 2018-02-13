@@ -22,7 +22,7 @@
         <tr>
             <td>
                 <div class="view-wrapper">
-                    <camera-panel cameras-provider="camerasProvider" active-camera="activeCamera"
+                    <camera-panel cameras-provider="camerasProvider" active-camera="activeCamera" search-cams="searchCams"
                                   show-camera-panel="showCameraPanel" class="cameras-panel-wrapper"
                                   ng-class="{'hide-panel':!showCameraPanel}"></camera-panel>
                 </div>
@@ -30,70 +30,95 @@
             <td width="100%">
                 <div class="view-wrapper" ng-class="{invisible:!activeCamera}">
                     <div class="view-panel" ng-class="{'no-archive': !canViewArchive}">
-                        <div class="stick-to-top top-gradient">
-                            <div class="webclient-panel webclient-bottom-border">
-                                <div class="pull-right" >
-                                    <div class="video-title-buffer">&nbsp;</div>
-                                    <div class="btn-group video-settings-icon">
-                                        <span class="video-icon" data-toggle="dropdown" href="#">
-                                            <span class="glyphicon glyphicon-cog"></span>
-                                        </span>
-                                        <ul class="dropdown-menu video-settings" ng-class="{'no-fullscreen': !enableFullScreen}">
-                                            <li class="video-settings-title">Qualidade</li>
-                                            <li class="video-settings-divider"></li>
-                                            <li ng-repeat="resolution in availableResolutions" class="video-settings-item">
-                                                <a ng-class="{active:resolution == activeResolution}"
-                                                   ng-click="selectResolution(resolution)">{{resolution}}</a>
-                                            </li>
+                        <div class="fullscreen-area" ng-class="{'fullscreen': isFullscreen}">
+                            <div class="fullscreen-hoverarea">
+                                <div class="stick-to-top top-gradient" ng-class="{'hide-fullscreen': isFullscreen}">
+                                    <div class="webclient-panel webclient-bottom-border">
+                                        <div class="pull-right" >
+                                            <div class="video-title-buffer">&nbsp;</div>
+                                            <span ng-if="debugMode || showCastButton" class="video-icon">
+                                                <button class="cast-button" is="google-cast-button" id="castbutton" ng-click="showWarning()"></button>
+                                            </span>
+                                            <div class="btn-group video-settings-icon">
+                                                <span class="video-icon" data-toggle="dropdown" href="#">
+                                                    <span class="glyphicon glyphicon-cog"></span>
+                                                </span>
+                                                <ul class="dropdown-menu video-settings" ng-class="{'no-fullscreen': !enableFullScreen}">
+                                                    <li class="video-settings-title">Qualidade</li>
+                                                    <li class="video-settings-divider"></li>
+                                                    <li ng-repeat="resolution in availableResolutions" class="video-settings-item">
+                                                        <a ng-class="{active:resolution == activeResolution}"
+                                                           ng-click="selectResolution(resolution)">{{resolution}}</a>
+                                                    </li>
 
-                                            <li class="video-settings-divider buffer" ng-if="debugMode"></li>
-                                            <li class="video-settings-title" ng-if="debugMode">Video Player</li>
-                                            <li class="video-settings-divider"  ng-if="debugMode"></li>
-                                            <li ng-repeat="format in manualFormats" class="video-settings-item" ng-if="debugMode">
-                                                <a ng-class="{active:format == activeFormat}"
-                                                   ng-click="selectFormat(format)">{{format}}</a>
-                                                </li>
-                                            <li class="video-settings-divider buffer" ng-if="isWebAdmin || debugMode"></li>
-                                            <li class="video-settings-button" ng-if="isWebAdmin || debugMode"
-                                                ng-click="cameraLinks.enabled=!cameraLinks.enabled">
-                                                <span class="glyphicon glyphicon-cog"></span>Camera Details
-                                            </li>
-                                        </ul>
+                                                    <li class="video-settings-divider buffer" ng-if="debugMode"></li>
+                                                    <li class="video-settings-title" ng-if="debugMode">Video Player</li>
+                                                    <li class="video-settings-divider"  ng-if="debugMode"></li>
+                                                    <li ng-repeat="format in manualFormats" class="video-settings-item" ng-if="debugMode">
+                                                        <a ng-class="{active:format == activeFormat}"
+                                                           ng-click="selectFormat(format)">{{format}}</a>
+                                                        </li>
+                                                    <li class="video-settings-divider buffer" ng-if="isWebAdmin || debugMode"></li>
+                                                    <li class="video-settings-button" ng-if="isWebAdmin || debugMode"
+                                                        ng-click="cameraLinks.enabled=!cameraLinks.enabled">
+                                                        <span class="glyphicon glyphicon-cog"></span>Camera Details
+                                                    </li>
+                                                    <li class="video-settings-divider buffer" ng-if="betaMode || debugMode"></li>
+                                                    <li class="video-settings-button" ng-if="betaMode || debugMode"
+                                                        ng-click="voiceControls.showCommands=!voiceControls.showCommands">
+                                                        <span>
+                                                            <span ng-class="{'voice-active': voiceControls.enabled}"
+                                                                  class="glyphicon glyphicon-bullhorn"></span>
+                                                            &nbsp;Voice Commands
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <span ng-if="enableFullScreen && !isFullscreen" class="video-icon"
+                                                  ng-click="fullScreen()">
+                                                <span class="glyphicon glyphicon-fullscreen"></span>
+                                            </span>
+                                            <span ng-if="isFullscreen" class="video-icon"
+                                                  ng-click="closeFullscreen()">
+                                                <span class="glyphicon glyphicon-close-fullscreen"></span>
+                                            </span>
+                                        </div>
+                                        <div class="hide-excess-text video-title">
+                                            <span class="visible-xs" ng-click="showCamerasPanel()"
+                                                  ng-class="{'back-button': !showCameraPanel}">
+                                                <span class="glyphicon glyphicon-arrow-left"></span>
+                                            </span>
+                                            <camera-status camera="activeCamera" type="'video'"></camera-status>
+                                            <span class="caption-row video-name">
+                                                {{activeCamera.name + " (" + activeResolution + ")"}}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <span class="video-icon" ng-if="enableFullScreen" ng-click="fullScreen()">
-                                        <span class="glyphicon glyphicon-fullscreen"></span>
-                                    </span>
-                                </div>
-                                <div class="hide-excess-text video-title">
-                                    <span class="visible-xs" ng-click="showCameraPanel=true"
-                                          ng-class="{'back-button': !showCameraPanel}">
-                                        <span class="glyphicon glyphicon-arrow-left"></span>
-                                    </span>
-                                    <camera-status camera="activeCamera" type="'video'"></camera-status>
-                                    <span class="caption-row video-name">
-                                        {{activeCamera.name + " (" + activeResolution + ")"}}
-                                    </span>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="float-size">
-                            <camera-links ng-if="cameraLinks.enabled"
-                                          system="systemAPI" position="positionProvider.playedPosition"
-                                          live-mode="positionProvider.liveMode" active-camera="activeCamera"
-                                          player="player" current-resolution="currentResolution"
-                                          camera-links="cameraLinks"></camera-links>
-                            <camera-view-informer flags="{'status':activeCamera.status,
-                                                          'positionSelected': positionSelected,
-                                                          'iOSVideoTooLarge': iOSVideoTooLarge}"
-                                                  preview="preview">
-                            </camera-view-informer>
-                            <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected &&
-                                                        (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
-                                         vg-update-time="updateTime($currentTime, $duration)"
-                                         vg-player-ready="playerReady($API)" rotation="rotation" playing="positionProvider.playing"
-                                         vg-src="activeVideoSource" player="player" active-format="activeFormat">
-                            </videowindow>
+                            <div class="float-size">
+                                <div ng-if="isFullscreen && enableFullscreenNotification" class="fullscreen-notification fade-out">
+                                    <span>Press ESC to exit fullscreen</span>
+                                </div>
+                                <voice-control ng-if="voiceControls.showCommands" voice-controls="voiceControls"></voice-control>
+                                <camera-links ng-if="cameraLinks.enabled"
+                                              system="systemAPI" position="positionProvider.playedPosition"
+                                              live-mode="positionProvider.liveMode" active-camera="activeCamera"
+                                              player="player" current-resolution="currentResolution"
+                                              camera-links="cameraLinks"></camera-links>
+                                <camera-view-informer flags="{'status':activeCamera.status,
+                                                              'positionSelected': positionSelected,
+                                                              'iOSVideoTooLarge': iOSVideoTooLarge}"
+                                                      preview="preview">
+                                </camera-view-informer>
+                                <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected &&
+                                                            (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
+                                             vg-update-time="updateTime($currentTime, $duration)"
+                                             vg-player-ready="playerReady($API)" rotation="rotation"
+                                             player-handler="playerHandler"
+                                             vg-src="activeVideoSource" player="player" active-format="activeFormat">
+                                </videowindow>
+                            </div>
                         </div>
 
                         <div class="stick-to-bottom" ng-class="{invisible:!activeCamera}">

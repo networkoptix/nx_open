@@ -10,7 +10,6 @@ nx_add_target(nxtool EXECUTABLE
         "${CMAKE_CURRENT_BINARY_DIR}/nxtool_app_info_impl.cpp"
     OTHER_SOURCES
         ${QML_FILES}
-    NO_PCH
     PUBLIC_LIBS
         Qt5::Core
         Qt5::Gui

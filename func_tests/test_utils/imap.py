@@ -16,10 +16,10 @@ ACTIVATION_EMAIL_SUBJECT = 'Activate your account'
 
 class IMAPConnection(object):
 
-    def __init__(self, host, email, password):
+    def __init__(self, hostname, email, password):
         assert email and password, repr((email, password))
-        log.debug('\tIMAP: connecting to %r', host)
-        self._connection = imaplib.IMAP4_SSL(host)
+        log.debug('\tIMAP: connecting to %r', hostname)
+        self._connection = imaplib.IMAP4_SSL(hostname)
         self._call('login', email, password)
         self._call('select')
 

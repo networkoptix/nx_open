@@ -26,7 +26,7 @@ public:
 
     virtual bool bind(const network::SocketAddress& localEndpoint) override;
     virtual bool listen() override;
-    virtual utils::Url getServerUrl() const override;
+    virtual utils::Url url() const override;
     virtual nx::network::stun::MessageDispatcher& dispatcher() override;
     virtual void sendIndicationThroughEveryConnection(stun::Message) override;
     virtual std::size_t connectionCount() const override;

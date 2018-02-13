@@ -67,6 +67,15 @@ void AsyncClient::connect(
         [this, completionHandler = std::move(completionHandler)]() mutable
         {
             QnMutexLocker lock(&m_mutex);
+
+            if (m_state == State::connected)
+            {
+                lock.unlock();
+                if (completionHandler)
+                    completionHandler(SystemError::noError);
+                return;
+            }
+
             NX_ASSERT(!m_connectCompletionHandler);
             m_connectCompletionHandler = std::move(completionHandler);
             openConnectionImpl(&lock);
@@ -222,15 +231,18 @@ void AsyncClient::closeConnection(
 		baseConnection = std::move( m_baseConnection );
     }
 
-    if (baseConnection)
-        baseConnection->pleaseStopSync(false);
-
     NX_ASSERT(!baseConnection || !connection ||
         connection == baseConnection.get(),
         Q_FUNC_INFO, "Incorrect closeConnection call");
 
-    if (m_onConnectionClosedHandler)
-        m_onConnectionClosedHandler(errorCode);
+    if (baseConnection)
+    {
+        baseConnection->pleaseStopSync(false);
+
+        // Reporting connection close only if actually closed some connection.
+        if (m_onConnectionClosedHandler)
+            m_onConnectionClosedHandler(errorCode);
+    }
 }
 
 void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
@@ -247,7 +259,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
     {
         case State::disconnected:
         {
-            // estabilish new connection
+            // establish new connection
             m_connectingSocket =
                 SocketFactory::createStreamSocket(
                     m_useSsl, nx::network::NatTraversalSupport::disabled);

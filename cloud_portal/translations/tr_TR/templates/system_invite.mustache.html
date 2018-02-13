@@ -1,12 +1,16 @@
-<h1>{{PRODUCT_NAME}}'e hoş geldiniz</h1>
+<h1>Merhaba, {{message.fullName}}</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> Sizi <a href="{{config.portal_url}}"> {{PRODUCT_NAME}}'e davet ediyor </a> Ve {{message.system_name}} sistemini sizinle paylaştı.</p>
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a>sizle video yönetim sistemini paylaştı{{message.system_name}}.
+
+Bu hesabı görüntülemek ve yönetmek için lütfen <a href="{{config.portal_url}}"> {{PRODUCT_NAME}}'de hesap oluşturun </a> mevcut e-posta adresinizi kullanın ve talimatları uygulayın.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p><a href="{{config.portal_url}}"> {{PRODUCT_NAME}}'e katılmaya davet edildiniz </a> . {{message.system_name}} sistemi sizinle paylaşıldı.</p>
+<p>Video yönetim sistemine "{{message.system_name}}" erişim izni verildi.
+
+Bu hesabı görüntülemek ve yönetmek için lütfen <a href="{{config.portal_url}}"> {{PRODUCT_NAME}}'de hesap oluşturun </a> mevcut e-posta adresinizi kullanın ve talimatları uygulayın.</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Sistemi kaydedin ve görüntüleyin</a>
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Hesap oluştur</a>
 

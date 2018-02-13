@@ -6,7 +6,7 @@
 
 #include <nx/network/http/http_client.h>
 #include <core/resource/resource_fwd.h>
-#include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
+#include <streaming/rtp_stream_reader.h>
 #include <plugins/resource/hikvision/hikvision_utils.h>
 
 namespace nx {
@@ -33,7 +33,8 @@ private:
         const QSize& primaryResolution) const;
 
     QString chooseCodec(
-        const hikvision::ChannelCapabilities& channelCapabilities) const;
+        const hikvision::ChannelCapabilities& channelCapabilities,
+        AVCodecID codec) const;
 
     int chooseFps(
         const hikvision::ChannelCapabilities& channelCapabilities,
@@ -41,10 +42,6 @@ private:
 
     boost::optional<int> chooseQuality(
         Qn::StreamQuality quality,
-        const hikvision::ChannelCapabilities& channelCapabilities) const;
-
-    boost::optional<int> chooseQuality(
-        Qn::SecondStreamQuality quality,
         const hikvision::ChannelCapabilities& channelCapabilities) const;
 
     boost::optional<int> rescaleQuality(

@@ -36,6 +36,11 @@ angular.module('cloudApp')
                     return result.data.visited;
                 });
             },
+            checkCode:function(code){
+                return cloudApi.checkCode(code).then(function(result){
+                    return result.data.emailExists;
+                });
+            },
             requireLogin:function(){
                 var res = this.get();
                 res.catch(function(){

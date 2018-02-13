@@ -1,5 +1,7 @@
 #include "http_server.h"
 
+#include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -34,8 +36,8 @@ void Server::listen()
                 .arg(SystemError::toString(osErrorCode)).toStdString());
     }
 
-    NX_LOGX(lit("HTTP server is listening on %1")
-        .arg(containerString(m_settings.http().addrToListenList)), cl_logALWAYS);
+    NX_ALWAYS(this, lm("HTTP server is listening on %1")
+        .args(containerString(m_multiAddressHttpServer->endpoints())));
 }
 
 void Server::stopAcceptingNewRequests()
@@ -64,7 +66,8 @@ bool Server::launchHttpServerIfNeeded(
 
     // Registering HTTP handlers.
     m_httpMessageDispatcher->registerRequestProcessor<http::GetListeningPeerListHandler>(
-        http::GetListeningPeerListHandler::kHandlerPath,
+        nx::network::url::normalizePath(lm("/%1/%2")
+            .args(api::kMediatorApiPrefix, http::GetListeningPeerListHandler::kHandlerPath)),
         [&]() { return std::make_unique<http::GetListeningPeerListHandler>(peerRegistrator); });
 
     m_multiAddressHttpServer =

@@ -4,6 +4,8 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <nx/utils/app_info.h>
 
+#include <camera_vendors.h>
+
 #include <plugins/resource/desktop_camera/desktop_camera_resource_searcher.h>
 #include <plugins/resource/desktop_camera/desktop_camera_deleter.h>
 #include <plugins/resource/test_camera/testcamera_resource_searcher.h>
@@ -17,7 +19,9 @@
 #include <plugins/resource/d-link/dlink_resource_searcher.h>
 #include <plugins/resource/flex_watch/flexwatch_resource_searcher.h>
 #include <plugins/resource/flir/flir_resource_searcher.h>
-#include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
+#if defined(ENABLE_IQINVISION)
+    #include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
+#endif
 #include <plugins/resource/isd/isd_resource_searcher.h>
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
 #include <plugins/resource/stardot/stardot_resource_searcher.h>
@@ -27,7 +31,7 @@
 
 #if defined(ENABLE_HANWHA)
     #include <plugins/resource/hanwha/hanwha_resource_searcher.h>
-#endif // defined(ENABLE_HANWHA)
+#endif
 
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <common/common_module.h>
@@ -71,7 +75,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
     #ifdef ENABLE_STARDOT
         m_searchers << new QnStardotResourceSearcher(commonModule);
     #endif
-    #ifdef ENABLE_IQE
+    #ifdef ENABLE_IQINVISION
         m_searchers << new QnPlIqResourceSearcher(commonModule);
     #endif
     #ifdef ENABLE_ISD

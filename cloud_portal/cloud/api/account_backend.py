@@ -13,8 +13,12 @@ logger = logging.getLogger(__name__)
 
 class AccountBackend(ModelBackend):
     @staticmethod
+    def is_email_in_portal(email):
+        return models.Account.objects.filter(email=email.lower()).count() > 0
+
+    @staticmethod
     def check_email_in_portal(email, check_email_exists):
-        mail_exists = models.Account.objects.filter(email=email.lower()).count() > 0
+        mail_exists = AccountBackend.is_email_in_portal(email)
         if not mail_exists and check_email_exists:
             raise APILogicException('User is not in portal', ErrorCodes.not_found)
         if mail_exists and not check_email_exists:
@@ -23,13 +27,16 @@ class AccountBackend(ModelBackend):
 
     @staticmethod
     def authenticate(username=None, password=None):
-        user = Account.get(username, password)
+        user = Account.get(username, password)  # first - check cloud_db
+
         if user and 'email' in user:
-            try:
-                return models.Account.objects.get(email=user['email'])
-            except ObjectDoesNotExist:
-                raise APILogicException('User is not in portal', ErrorCodes.not_found)
-        return None
+            if username.find('@') > -1 and username != user['email']:  # code and email from cloud_db are wrong
+                raise APILogicException('Login does not match users email', ErrorCodes.wrong_code)
+
+            if not AccountBackend.is_email_in_portal(user['email']):
+                # so - user is in cloud_db, but not in cloud_portal
+                raise APILogicException('User is not in portal', ErrorCodes.portal_critical_error)
+        return models.Account.objects.get(email=user['email'])
 
     @staticmethod
     def get_user(user_id):
@@ -51,24 +58,17 @@ class AccountManager(db.models.Manager):
         :return custom_user.models.Account user: user
         :raise ValueError: email is not set
         """
-        now = timezone.now()
         if not email:
             raise APIRequestException('Email code is absent', ErrorCodes.wrong_parameters,
                                       error_data={'email': ['This field is required.']})
         email = email.lower()
 
-        logger.debug('AccountManager._create_user called: ' + email)
-        # email = self.normalize_email(email)
         first_name = extra_fields.pop("first_name")
         last_name = extra_fields.pop("last_name")
-
         code = extra_fields.pop("code", None)
 
-        logger.debug('AccountManager._create_user calling /cdb/account/register: ' + email)
-        result = Account.register(email, password, first_name, last_name, code=code)
-        logger.debug('AccountManager._create_user calling /cdb/account/register - success')
-
-        logger.debug('AccountManager._create_user saving user to cloud_portal: ' + email)
+        # this line will send request to cloud_db and raise an exception if fails:
+        Account.register(email, password, first_name, last_name, code=code)
         user = self.model(email=email,
                           first_name=first_name,
                           last_name=last_name,
@@ -76,7 +76,6 @@ class AccountManager(db.models.Manager):
                           **extra_fields)
         user.save(using=self._db)
 
-        logger.debug('AccountManager._create_user completed: ' + email)
         return user
 
     def create_user(self, email, password, **extra_fields):

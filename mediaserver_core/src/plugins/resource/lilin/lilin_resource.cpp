@@ -21,9 +21,9 @@ LilinResource::~LilinResource()
 
 }
 
-CameraDiagnostics::Result LilinResource::initInternal()
+CameraDiagnostics::Result LilinResource::initializeCameraDriver()
 {
-    auto result = base_type::initInternal();
+    auto result = base_type::initializeCameraDriver();
 
     if (result.errorCode != CameraDiagnostics::ErrorCode::Value::noError)
         return result;

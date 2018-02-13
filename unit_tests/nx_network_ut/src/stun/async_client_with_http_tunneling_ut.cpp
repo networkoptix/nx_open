@@ -10,6 +10,7 @@
 
 #include "stun_async_client_acceptance_tests.h"
 #include "stun_over_http_server_fixture.h"
+#include "stun_simple_server.h"
 
 namespace nx {
 namespace network {
@@ -133,18 +134,29 @@ TEST_F(AsyncClientWithHttpTunneling, regular_stun_connection)
 
 namespace {
 
-struct AsyncClientWithHttpTunnelingTestTypes
+struct StunAsyncClientWithHttpTunnelingVsHttpServerTestTypes
 {
     using ClientType = stun::AsyncClientWithHttpTunneling;
     using ServerType = StunOverHttpServer;
 };
 
+struct StunAsyncClientWithHttpTunnelingVsStunServerTestTypes
+{
+    using ClientType = stun::AsyncClientWithHttpTunneling;
+    using ServerType = SimpleServer;
+};
+
 } // namespace
 
 INSTANTIATE_TYPED_TEST_CASE_P(
-    StunAsyncClientWithHttpTunneling,
+    StunAsyncClientWithHttpTunnelingVsHttpServer,
     StunAsyncClientAcceptanceTest,
-    AsyncClientWithHttpTunnelingTestTypes);
+    StunAsyncClientWithHttpTunnelingVsHttpServerTestTypes);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    StunAsyncClientWithHttpTunnelingVsStunServer,
+    StunAsyncClientAcceptanceTest,
+    StunAsyncClientWithHttpTunnelingVsStunServerTestTypes);
 
 } // namespace test
 } // namespace stun

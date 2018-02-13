@@ -23,6 +23,7 @@ public:
     void setCameras(const QnVirtualCameraResourceList& cameras);
 
     bool isSingleCameraMode() const;
+    QnVirtualCameraResourcePtr singleCamera() const;
 
     QString name() const;
     void setName(const QString& name);

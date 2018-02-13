@@ -43,6 +43,7 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     QPalette clearPalette = m_lineEdit->palette();
     clearPalette.setBrush(QPalette::Base, QBrush(Qt::transparent));
     m_lineEdit->setPalette(clearPalette);
+
     m_lineEdit->setPlaceholderText(tr("Search"));
     m_lineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
     m_lineEdit->setClearButtonEnabled(true);

@@ -90,5 +90,5 @@ struct QnManualCameraSearchReply {
 
 #define QnManualCameraSearchReply_Fields (status)(processUuid)(cameras)
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnManualResourceSearchStatus)(QnManualResourceSearchEntry)(QnManualCameraSearchReply), (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnManualResourceSearchStatus)(QnManualResourceSearchEntry)(QnManualCameraSearchReply), (json)(ubjson)(metatype))
 

@@ -36,13 +36,10 @@ MultipleCameraSettingsWidget::MultipleCameraSettingsWidget(QWidget *parent):
     m_hasDbChanges(false),
     m_loginWasEmpty(true),
     m_passwordWasEmpty(true),
-    m_hasScheduleControlsChanges(false),
     m_readOnly(false),
     m_updating(false)
 {
     ui->setupUi(this);
-    ui->licensingWidget->initializeContext();
-    ui->cameraScheduleWidget->initializeContext();
 
     CheckboxUtils::autoClearTristate(ui->enableAudioCheckBox);
 
@@ -55,18 +52,11 @@ MultipleCameraSettingsWidget::MultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->passwordEdit, &QLineEdit::textChanged, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleTasksChanged, this,
-        &MultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::recordingSettingsChanged, this,
+    connect(ui->cameraScheduleWidget, &QnAbstractPreferencesWidget::hasChangesChanged, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::controlsChangesApplied, this,
-        [this] { m_hasScheduleControlsChanges = false; });
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::gridParamsChanged, this,
-        [this] { m_hasScheduleControlsChanges = true; });
+
     connect(ui->cameraScheduleWidget, &CameraScheduleWidget::scheduleEnabledChanged, this,
         &MultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged);
-    connect(ui->cameraScheduleWidget, &CameraScheduleWidget::archiveRangeChanged, this,
-        &MultipleCameraSettingsWidget::at_dbDataChanged);
     connect(ui->cameraScheduleWidget, &CameraScheduleWidget::alert, this,
         [this](const QString& text) { m_alertText = text; updateAlertBar(); });
 
@@ -202,7 +192,7 @@ void MultipleCameraSettingsWidget::submitToResources()
             camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
     }
 
-    ui->cameraScheduleWidget->submitToResources();
+    ui->cameraScheduleWidget->applyChanges();
     ui->imageControlWidget->submitToResources(m_cameras);
     ui->expertSettingsWidget->submitToResources(m_cameras);
 
@@ -269,7 +259,7 @@ void MultipleCameraSettingsWidget::updateFromResources()
 
     ui->imageControlWidget->updateFromResources(m_cameras);
     ui->licensingWidget->updateFromResources();
-    ui->cameraScheduleWidget->updateFromResources();
+    ui->cameraScheduleWidget->loadDataToUi();
 
     if (m_cameras.empty())
     {
@@ -289,6 +279,7 @@ void MultipleCameraSettingsWidget::updateFromResources()
         const bool isDtsBased = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->isDtsBased(); });
         const bool hasVideo = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasVideo(0); });
         const bool audioSupported = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->isAudioSupported(); });
+        const bool audioForced = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->isAudioForced(); });
         const bool recordingSupported = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasVideo(0) || camera->isAudioSupported(); });
 
         const bool audioEnabled = m_cameras.front()->isAudioEnabled();
@@ -298,7 +289,7 @@ void MultipleCameraSettingsWidget::updateFromResources()
                 return camera->isAudioEnabled() == audioEnabled;
             });
 
-        ui->enableAudioCheckBox->setEnabled(audioSupported);
+        ui->enableAudioCheckBox->setEnabled(audioSupported && !audioForced);
 
         setTabEnabledSafe(CameraSettingsTab::io, !m_lockedMode);
         setTabEnabledSafe(CameraSettingsTab::motion, !m_lockedMode);
@@ -347,7 +338,6 @@ void MultipleCameraSettingsWidget::updateFromResources()
     }
 
     setHasDbChanges(false);
-    m_hasScheduleControlsChanges = false;
 
     setTabEnabledSafe(CameraSettingsTab::general, !m_lockedMode);
 }
@@ -431,14 +421,6 @@ void MultipleCameraSettingsWidget::at_dbDataChanged()
         return;
 
     setHasDbChanges(true);
-}
-
-void MultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged()
-{
-    if (m_updating)
-        return;
-
-    at_dbDataChanged();
 }
 
 void MultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged(int state)

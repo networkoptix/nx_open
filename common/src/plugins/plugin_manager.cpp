@@ -12,7 +12,7 @@
 #include <decoders/abstractclientplugin.h>
 #include <decoders/abstractvideodecoderplugin.h>
 #include <plugins/camera_plugin.h>
-#include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <nx/sdk/metadata/plugin.h>
 #include <plugins/plugin_tools.h>
 
 #include "plugins_ini.h"
@@ -195,7 +195,7 @@ bool PluginManager::loadNxPlugin(
     {
         // Report settings to the plugin.
         if (!settingsForPlugin.empty())
-            pluginObj->setSettings(&settingsForPlugin[0], settingsForPlugin.size());
+            pluginObj->setSettings(&settingsForPlugin[0], (int) settingsForPlugin.size());
     }
 
     if (auto plugin2Obj = nxpt::ScopedRef<nxpl::Plugin2>(obj->queryInterface(nxpl::IID_Plugin2)))

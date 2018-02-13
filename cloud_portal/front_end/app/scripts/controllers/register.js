@@ -39,7 +39,7 @@ angular.module('cloudApp')
         }
 
         $scope.account = {
-            email: registerEmail,
+            email: registerEmail || account.getEmail(),
             password: '',
             firstName: '',
             lastName: '',

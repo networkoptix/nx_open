@@ -62,8 +62,14 @@ QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
         case Qn::PreviewTimeRole:
             return QVariant::fromValue(d->period(index.row()).startTimeMs);
 
+        case Qn::DurationRole:
+            return QVariant::fromValue(d->period(index.row()).durationMs);
+
         case Qn::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(d->camera());
+
+        case Qn::ContextMenuRole:
+            return QVariant::fromValue(d->contextMenu(index.row()));
 
         case Qn::DescriptionTextRole:
         {
@@ -90,6 +96,21 @@ bool MotionSearchListModel::canFetchMore(const QModelIndex& /*parent*/) const
 void MotionSearchListModel::fetchMore(const QModelIndex& /*parent*/)
 {
     d->fetchMore();
+}
+
+int MotionSearchListModel::totalCount() const
+{
+    return d->totalCount();
+}
+
+QnTimePeriod MotionSearchListModel::selectedTimePeriod() const
+{
+    return d->selectedTimePeriod();
+}
+
+void MotionSearchListModel::setSelectedTimePeriod(const QnTimePeriod& value)
+{
+    d->setSelectedTimePeriod(value);
 }
 
 } // namespace desktop

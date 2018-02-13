@@ -1,11 +1,11 @@
-Udostępniono Ci system
+Witaj {{message.fullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) udostępnia Ci system {{message.system_name}}.
+{{message.sharer_name}} ({{message.sharer_email}}) udostępnia Ci system zarządzania wideo "{{message.system_name}}".
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-Udostępniono Ci system {{message.system_name}}.
+Masz dostęp do systemu zarządzania wideo "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Otwórz system: {{config.portal_url}}/systems/{{message.system_id}}
+Wyświetl w portalu {{PRODUCT_NAME}}: {{config.portal_url}}/systems/{{message.system_id}}

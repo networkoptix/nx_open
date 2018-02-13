@@ -104,10 +104,14 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
 
+#include <camera_vendors.h>
+
 #include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
 #include <core/resource/avi/avi_resource.h>
-#include <plugins/resource/flir/flir_io_executor.h>
+#if defined(ENABLE_FLIR)
+    #include <plugins/resource/flir/flir_io_executor.h>
+#endif
 
 #include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
 
@@ -283,7 +287,7 @@
 #include <rest/handlers/change_camera_password_rest_handler.h>
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
-#include <nx/mediaserver/updates2/updates2_manager.h>
+#include <nx/mediaserver/updates2/server_updates2_manager.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 
 
@@ -558,15 +562,11 @@ static int freeGB(QString drive)
 }
 #endif
 
-static QStringList listRecordFolders(bool includeNetwork = false)
+static QStringList listRecordFolders(bool includeNonHdd = false)
 {
     using namespace nx::mediaserver::fs::media_paths;
 
-    const NetworkDrives networkDrivesFlag = includeNetwork
-        ? NetworkDrives::allowed
-        : NetworkDrives::notAllowed;
-
-    auto mediaPathList = get(FilterConfig::createDefault(networkDrivesFlag));
+    auto mediaPathList = get(FilterConfig::createDefault(includeNonHdd));
     NX_VERBOSE(kLogTag, lm("Record folders: %1").container(mediaPathList));
     return mediaPathList;
 }
@@ -1151,8 +1151,7 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
 
 void MediaServerProcess::stopSync()
 {
-    qWarning()<<"Stopping server";
-    NX_LOG( lit("Stopping server"), cl_logALWAYS );
+    qWarning() << "Stopping server";
 
     const int kStopTimeoutMs = 100 * 1000;
 
@@ -1557,8 +1556,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getCameraParam", new QnCameraSettingsRestHandler());
     reg("api/setCameraParam", new QnCameraSettingsRestHandler());
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
-    if(ini().enableWearableCameras)
-        reg("api/wearableCamera", new QnWearableCameraRestHandler());
+    reg("api/wearableCamera", new QnWearableCameraRestHandler());
     reg("api/ptz", new QnPtzRestHandler());
     reg("api/createEvent", new QnExternalEventRestHandler());
     static const char kGetTimePath[] = "api/gettime";
@@ -2843,7 +2841,10 @@ void MediaServerProcess::run()
     auto resourceSearchers = std::make_unique<QnMediaServerResourceSearchers>(commonModule());
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool(commonModule()));
-    auto flirExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
+
+    #if defined(ENABLE_FLIR)
+        auto flirExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
+    #endif
 
     auto upnpPortMapper = initializeUpnpPortMapper();
 
@@ -3092,6 +3093,7 @@ void MediaServerProcess::run()
     videoCameraPool.reset();
 
     commonModule()->resourceDiscoveryManager()->stop();
+    qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics event.
     QnResource::stopAsyncTasks();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now

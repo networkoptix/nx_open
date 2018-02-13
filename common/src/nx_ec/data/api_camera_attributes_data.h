@@ -64,7 +64,7 @@ struct ApiCameraAttributesData: ApiData
         licenseUsed(true),
         motionType(Qn::MT_Default),
         audioEnabled(false),
-        secondaryStreamQuality(Qn::SSQualityNotDefined),
+        disableDualStreaming(false),
         controlEnabled(true),
         minArchiveDays(-kDefaultMinArchiveDays),
         maxArchiveDays(-kDefaultMaxArchiveDays),
@@ -93,7 +93,7 @@ struct ApiCameraAttributesData: ApiData
     QnLatin1Array motionMask;
     std::vector<ApiScheduleTaskData> scheduleTasks;
     bool audioEnabled;
-    Qn::SecondStreamQuality secondaryStreamQuality;
+    bool disableDualStreaming;
     bool controlEnabled;
     QnLatin1Array dewarpingParams;
     int minArchiveDays;
@@ -110,7 +110,7 @@ struct ApiCameraAttributesData: ApiData
     (motionMask) \
     (scheduleTasks) \
     (audioEnabled) \
-    (secondaryStreamQuality)\
+    (disableDualStreaming)\
     (controlEnabled) \
     (dewarpingParams) \
     (minArchiveDays) \

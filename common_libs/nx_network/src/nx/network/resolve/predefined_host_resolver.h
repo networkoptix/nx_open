@@ -1,7 +1,7 @@
 #pragma once
 
+#include <deque>
 #include <map>
-#include <vector>
 
 #include <nx/utils/thread/mutex.h>
 
@@ -17,14 +17,15 @@ public:
     virtual SystemError::ErrorCode resolve(
         const QString& name,
         int ipVersion,
-        std::deque<HostAddress>* resolvedAddresses) override;
+        std::deque<AddressEntry>* resolvedAddresses) override;
 
-    void addEtcHost(const QString& name, std::vector<HostAddress> addresses);
-    void removeEtcHost(const QString& name);
+    void addMapping(const QString& name, std::deque<AddressEntry> entries);
+    void removeMapping(const QString& name);
+    void removeMapping(const QString& name, const AddressEntry& entryToRemove);
 
 private:
     mutable QnMutex m_mutex;
-    std::map<QString, std::vector<HostAddress>> m_etcHosts;
+    std::map<QString, std::deque<AddressEntry>> m_etcHosts;
 };
 
 } // namespace network

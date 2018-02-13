@@ -124,6 +124,11 @@ angular.module('cloudApp')
                     code:code
                 });
             },
+            checkCode:function(code){
+                return $http.post(apiBase + '/account/checkCode',{
+                    code:code
+                });
+            },
             authKey:function(){
                 return $http.post(apiBase + '/account/authKey');
             },

@@ -1,17 +1,20 @@
 {
   "activate_account": {
-    "emailSubject": "アカウントを確認"
+    "emailSubject": "アカウントの有効化"
   },
   "restore_password": {
-    "emailSubject": "パスワードを復元"
+    "emailSubject": "パスワードをリセット"
   },
   "system_invite": {
-    "emailSubject": "ビデオ システム {{message.system_name}} が共有されました"
+    "emailSubject": "{{message.sharer_name}}さんがあなたを{{PRODUCT_NAME}}に招待しています"
   },
   "system_shared": {
-    "emailSubject": "ビデオ システム {{message.system_name}} が共有されました"
+    "emailSubject": "{{message.sharer_name}}さんがあなたを{{PRODUCT_NAME}}に招待しています"
   },
   "review_version": {
     "emailSubject": "バージョン{{message.id}}の準備ができました"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
   }
 }

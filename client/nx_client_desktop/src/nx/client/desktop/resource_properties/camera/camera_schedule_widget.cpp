@@ -55,8 +55,7 @@ qreal getBitrateForQuality(
     int decimals)
 {
     const auto resolution = camera->defaultStream().getResolution();
-    const auto bitrateMbps = camera->suggestBitrateForQualityKbps(quality, resolution, fps)
-        / kKbpsInMbps;
+    const auto bitrateMbps = camera->rawSuggestBitrateKbps(quality, resolution, fps) / kKbpsInMbps;
     const auto roundingStep = std::pow(0.1, decimals);
     return qRound(bitrateMbps, roundingStep);
 }
@@ -217,25 +216,20 @@ namespace desktop {
 
 using namespace ui;
 
-CameraScheduleWidget::CameraScheduleWidget(QWidget* parent):
+CameraScheduleWidget::CameraScheduleWidget(QWidget* parent, bool snapScrollbarToParent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::manual),
-    ui(new Ui::CameraScheduleWidget),
-    m_disableUpdateGridParams(false),
-    m_motionAvailable(true),
-    m_recordingParamsAvailable(true),
-    m_readOnly(false),
-    m_maxFps(0),
-    m_maxDualStreamingFps(0),
-    m_motionTypeOverride(Qn::MT_Default),
-    m_updating(false)
+    QnWorkbenchContextAware(parent, InitializationMode::lazy),
+    ui(new Ui::CameraScheduleWidget)
 {
     ui->setupUi(this);
     ui->recordBeforeSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
     ui->recordAfterSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
 
     NX_ASSERT(parent);
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
+    QWidget* scrollbarOwner = snapScrollbarToParent
+        ? window()
+        : this;
+    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(scrollbarOwner);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseMaximumSpace(true);
 
@@ -297,7 +291,7 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent):
         [this]
         {
             if (!m_updating)
-                emit archiveRangeChanged();
+                emit hasChangesChanged();
         };
 
     auto handleCellValuesChanged =
@@ -307,7 +301,7 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent):
                 return;
 
             updateAlert(ScheduleChange);
-            emit scheduleTasksChanged();
+            emit hasChangesChanged();
         };
 
     connect(ui->gridWidget, &QnScheduleGridWidget::cellValuesChanged,
@@ -328,13 +322,11 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent):
         &CameraScheduleWidget::updateGridParams);
     connect(ui->fpsSpinBox, QnSpinboxIntValueChanged, this,
         &CameraScheduleWidget::updateGridParams);
-    connect(this, &CameraScheduleWidget::scheduleTasksChanged, this,
-        &CameraScheduleWidget::updateRecordSpinboxes);
 
     connect(ui->recordBeforeSpinBox, QnSpinboxIntValueChanged, this,
-        &CameraScheduleWidget::recordingSettingsChanged);
+        &CameraScheduleWidget::hasChangesChanged);
     connect(ui->recordAfterSpinBox, QnSpinboxIntValueChanged, this,
-        &CameraScheduleWidget::recordingSettingsChanged);
+        &CameraScheduleWidget::hasChangesChanged);
 
     connect(ui->licensesButton, &QPushButton::clicked, this,
         &CameraScheduleWidget::at_licensesButton_clicked);
@@ -365,9 +357,6 @@ CameraScheduleWidget::CameraScheduleWidget(QWidget* parent):
 
     installEventHandler({ ui->recordMotionButton, ui->recordMotionPlusLQButton },
         QEvent::MouseButtonRelease, this, &CameraScheduleWidget::at_releaseSignalizer_activated);
-
-    installEventHandler(ui->gridWidget, QEvent::MouseButtonRelease,
-        this, &CameraScheduleWidget::controlsChangesApplied);
 
     updateMotionButtons();
 
@@ -521,25 +510,27 @@ void CameraScheduleWidget::retranslateUi()
 
 void CameraScheduleWidget::afterContextInitialized()
 {
-    connect(context()->instance<QnWorkbenchPanicWatcher>(), &QnWorkbenchPanicWatcher::panicModeChanged, this, &CameraScheduleWidget::updatePanicLabelText);
-    connect(context(), &QnWorkbenchContext::userChanged, this, &CameraScheduleWidget::updateLicensesButtonVisible);
+    connect(
+        context()->instance<QnWorkbenchPanicWatcher>(),
+        &QnWorkbenchPanicWatcher::panicModeChanged,
+        this,
+        &CameraScheduleWidget::updatePanicLabelText);
     updatePanicLabelText();
+
+    connect(
+        context(),
+        &QnWorkbenchContext::userChanged,
+        this,
+        &CameraScheduleWidget::updateLicensesButtonVisible);
     updateLicensesButtonVisible();
 }
 
-bool CameraScheduleWidget::isReadOnly() const
+void CameraScheduleWidget::setReadOnlyInternal(bool readOnly)
 {
-    return m_readOnly;
-}
-
-void CameraScheduleWidget::setReadOnly(bool readOnly)
-{
-    if (m_readOnly == readOnly)
-        return;
-
     using ::setReadOnly;
     setReadOnly(ui->recordAlwaysButton, readOnly);
-    setReadOnly(ui->recordMotionButton, readOnly); // TODO: #GDM #Common this is not valid. Camera may not support HW motion, we need to check for this.
+    // TODO: #GDM This is not valid. Camera may not support HW motion, we need to check for this.
+    setReadOnly(ui->recordMotionButton, readOnly);
     setReadOnly(ui->recordMotionPlusLQButton, readOnly);
     setReadOnly(ui->noRecordButton, readOnly);
     setReadOnly(ui->qualityComboBox, readOnly);
@@ -551,8 +542,6 @@ void CameraScheduleWidget::setReadOnly(bool readOnly)
     setReadOnly(ui->exportScheduleButton, readOnly);
     setReadOnly(ui->exportWarningLabel, readOnly);
     setReadOnly(ui->archiveLengthWidget, readOnly);
-
-    m_readOnly = readOnly;
 }
 
 const QnVirtualCameraResourceList &CameraScheduleWidget::cameras() const
@@ -580,7 +569,12 @@ void CameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &cameras
     }
 }
 
-void CameraScheduleWidget::updateFromResources()
+bool CameraScheduleWidget::hasChanges() const
+{
+    return false;
+}
+
+void CameraScheduleWidget::loadDataToUi()
 {
     QScopedValueRollback<bool> updateRollback(m_updating, true);
 
@@ -588,8 +582,7 @@ void CameraScheduleWidget::updateFromResources()
     updateMotionAvailable();
     updateRecordingParamsAvailable();
 
-    m_advancedSettingsSupported = m_cameras.size() == 1
-        && !m_cameras.front()->cameraMediaCapability().isNull();
+    m_advancedSettingsSupported = m_cameras.size() == 1;
 
     ui->advancedSettingsButton->setVisible(m_advancedSettingsSupported);
     ui->advancedSettingsWidget->setVisible(m_advancedSettingsSupported && m_advancedSettingsVisible);
@@ -669,7 +662,7 @@ void CameraScheduleWidget::updateFromResources()
     retranslateUi();
 }
 
-void CameraScheduleWidget::submitToResources()
+void CameraScheduleWidget::applyChanges()
 {
     bool scheduleChanged = ui->gridWidget->isActive();
 
@@ -742,7 +735,7 @@ void CameraScheduleWidget::updateMaxFPS()
         m_maxFps = maxFps;
         int currentMaxFps = getGridMaxFps();
         if (currentMaxFps > m_maxFps)
-            emit scheduleTasksChanged();
+            emit hasChangesChanged();
     }
 
     if (m_maxDualStreamingFps != maxDualStreamingFps)
@@ -750,7 +743,7 @@ void CameraScheduleWidget::updateMaxFPS()
         m_maxDualStreamingFps = maxDualStreamingFps;
         int currentMaxDualStreamingFps = getGridMaxFps(true);
         if (currentMaxDualStreamingFps > m_maxDualStreamingFps)
-            emit scheduleTasksChanged();
+            emit hasChangesChanged();
     }
 
     updateMaxFpsValue(ui->recordMotionPlusLQButton->isChecked());
@@ -842,6 +835,7 @@ void CameraScheduleWidget::updateMotionAvailable()
     m_motionAvailable = available;
 
     updateMotionButtons();
+    updateRecordSpinboxes();
 }
 
 void CameraScheduleWidget::setExportScheduleButtonEnabled(bool enabled)
@@ -992,7 +986,7 @@ void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
     }
 
     if (!m_updating)
-        emit scheduleTasksChanged();
+        emit hasChangesChanged();
 }
 
 bool CameraScheduleWidget::canEnableRecording() const
@@ -1051,7 +1045,7 @@ void CameraScheduleWidget::updateGridParams(bool pickedFromGrid)
     ui->advancedSettingsWidget->setEnabled(enabled && m_recordingParamsAvailable);
     updateRecordSpinboxes();
 
-    if (!(m_readOnly && pickedFromGrid))
+    if (!(isReadOnly() && pickedFromGrid))
     {
         QnScheduleGridWidget::CellParams brush;
         brush.recordingType = recordType;
@@ -1079,7 +1073,6 @@ void CameraScheduleWidget::updateGridParams(bool pickedFromGrid)
         return;
 
     updateAlert(CurrentParamsChange);
-    emit gridParamsChanged();
 }
 
 void CameraScheduleWidget::setFps(int value)
@@ -1363,10 +1356,8 @@ void CameraScheduleWidget::at_exportScheduleButton_clicked()
         [this, sourceCamera = m_cameras.front(), copyArchiveLength, recordingEnabled]
             (const QnVirtualCameraResourcePtr &camera)
         {
-            QnVirtualCameraResourceList list;
-            list.push_back(camera);
             if (copyArchiveLength)
-                ui->archiveLengthWidget->submitToResources(list);
+                ui->archiveLengthWidget->submitToResources({camera});
 
             camera->setScheduleDisabled(!recordingEnabled);
             int maxFps = camera->getMaxFps();
@@ -1392,20 +1383,15 @@ void CameraScheduleWidget::at_exportScheduleButton_clicked()
 
                 if (const auto bitrate = task.getBitrateKbps()) // Try to calculate new custom bitrate
                 {
-                    if (!camera->cameraMediaCapability().isNull())
-                    {
-                        // Target camera supports custom bitrate
-                        const auto normalBitrate = getBitrateForQuality(sourceCamera,
-                            task.getStreamQuality(), task.getFps(), ui->bitrateSpinBox->decimals());
-                        const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
+                    // Target camera supports custom bitrate
+                    const auto normalBitrate = getBitrateForQuality(sourceCamera,
+                        task.getStreamQuality(), task.getFps(), ui->bitrateSpinBox->decimals());
+                    const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
 
-                        const auto targetNormalBitrate = getBitrateForQuality(camera,
-                            task.getStreamQuality(), task.getFps(), ui->bitrateSpinBox->decimals());
-                        const auto targetBitrate = targetNormalBitrate * bitrateAspect;
-                        task.setBitrateKbps(targetBitrate);
-                    }
-                    else
-                        task.setBitrateKbps(0);
+                    const auto targetNormalBitrate = getBitrateForQuality(camera,
+                        task.getStreamQuality(), task.getFps(), ui->bitrateSpinBox->decimals());
+                    const auto targetBitrate = targetNormalBitrate * bitrateAspect;
+                    task.setBitrateKbps(targetBitrate);
                 }
                 tasks.append(task);
             }

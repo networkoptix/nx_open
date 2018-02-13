@@ -17,7 +17,7 @@ namespace desktop {
 
 namespace {
 
-static constexpr int kFetchBatchSize = 25;
+static constexpr int kFetchBatchSize = 110;
 
 static const auto lowerBoundPredicate =
     [](const QnCameraBookmark& left, qint64 right) { return left.startTimeMs > right; };
@@ -67,6 +67,9 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
         case Qn::PreviewTimeRole:
             return QVariant::fromValue(bookmark.startTimeMs);
 
+        case Qn::DurationRole:
+            return QVariant::fromValue(bookmark.durationMs);
+
         case Qn::UuidRole:
             return QVariant::fromValue(bookmark.guid);
 
@@ -80,6 +83,20 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
             handled = false;
             return QVariant();
     }
+}
+
+QString BookmarkSearchListModel::Private::filterText() const
+{
+    return m_filterText;
+}
+
+void BookmarkSearchListModel::Private::setFilterText(const QString& value)
+{
+    if (m_filterText == value)
+        return;
+
+    clear();
+    m_filterText = value;
 }
 
 void BookmarkSearchListModel::Private::clear()
@@ -98,6 +115,7 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(qint64 fromMs, qi
     QnCameraBookmarkSearchFilter filter;
     filter.startTimeMs = fromMs;
     filter.endTimeMs = toMs;
+    filter.text = m_filterText;
     filter.orderBy.column = Qn::BookmarkStartTime;
     filter.orderBy.order = Qt::DescendingOrder;
     filter.limit = kFetchBatchSize;

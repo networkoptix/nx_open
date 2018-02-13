@@ -21,11 +21,12 @@ std::string BusinessDataGenerator::generateRandomEmailAddress()
     return ss.str();
 }
 
-AccountWithPassword BusinessDataGenerator::generateRandomAccount()
+AccountWithPassword BusinessDataGenerator::generateRandomAccount(
+    std::string email)
 {
     AccountWithPassword account;
     account.id = QnUuid::createUuid().toSimpleString().toStdString();
-    account.email = generateRandomEmailAddress();
+    account.email = email.empty() ? generateRandomEmailAddress() : email;
     account.fullName = account.email + "_fullname";
     account.customization = QnAppInfo::customizationName().toStdString();
     account.statusCode = api::AccountStatus::activated;

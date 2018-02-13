@@ -1,5 +1,7 @@
 #include "media_resource_widget.h"
 
+#include <chrono>
+
 #include <QtCore/QTimer>
 #include <QtCore/QVarLengthArray>
 #include <QtGui/QPainter>
@@ -117,6 +119,8 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <ini.h>
+
+using namespace std::chrono;
 
 using namespace nx;
 using namespace client::desktop;
@@ -588,6 +592,16 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
 
     connect(m_areaSelectOverlayWidget, &AreaSelectOverlayWidget::selectedAreaChanged,
         this, &QnMediaResourceWidget::analyticsSearchAreaSelected);
+}
+
+QRectF QnMediaResourceWidget::analyticsSearchRect() const
+{
+    return m_areaSelectOverlayWidget->selectedArea();
+}
+
+void QnMediaResourceWidget::setAnalyticsSearchRect(const QRectF& value)
+{
+    m_areaSelectOverlayWidget->setSelectedArea(value);
 }
 
 void QnMediaResourceWidget::initAreaHighlightOverlay()
@@ -1638,6 +1652,8 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
 
     if (isAnalyticsEnabled())
         d->analyticsController->updateAreas(timestamp, channel);
+    else
+        d->analyticsController->updateAreaForZoomWindow();
 
     if (ini().enableOldAnalyticsController && d->analyticsMetadataProvider)
     {
@@ -2166,6 +2182,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     {
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
+
+        if (d->isPlayingLive() && d->camera->hasFlags(Qn::wearable_camera))
+            return Qn::NoLiveStreamOverlay;
 
         const Qn::Permission requiredPermission = d->isPlayingLive()
             ? Qn::ViewLivePermission
@@ -2760,7 +2779,14 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
         return;
 
     if (!analyticsEnabled)
+    {
         d->analyticsController->clearAreas();
+    }
+    else
+    {
+        display()->camDisplay()->setForcedVideoBufferLength(
+            milliseconds(ini().analyticsVideoBufferLengthMs));
+    }
 
     titleBar()->rightButtonsBar()->button(Qn::AnalyticsButton)->setChecked(analyticsEnabled);
 }

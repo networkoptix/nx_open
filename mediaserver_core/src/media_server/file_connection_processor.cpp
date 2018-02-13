@@ -3,6 +3,7 @@
 #include <QtCore/QCache>
 #include <QtCore/QFileInfo>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QDir>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
@@ -18,8 +19,7 @@
 
 QString QnFileConnectionProcessor::externalPackagePath()
 {
-    //static const QString path = QDir(qApp->applicationDirPath()).filePath(lit("external.dat"));
-    static const QString path = QDir(lit("/opt/hanwha/mediaserver/bin")).filePath(lit("external.dat"));
+    static const QString path = QDir(qApp->applicationDirPath()).filePath(lit("external.dat"));
     return path;
 }
 

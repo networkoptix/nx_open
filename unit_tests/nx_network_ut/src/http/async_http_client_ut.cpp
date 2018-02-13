@@ -423,8 +423,7 @@ class AsyncHttpClientTestMultiRequest:
 {
 public:
     AsyncHttpClientTestMultiRequest():
-        m_client(nx::network::http::AsyncHttpClient::create()),
-        m_requestFinished(false)
+        m_client(nx::network::http::AsyncHttpClient::create())
     {
         init();
     }
@@ -432,14 +431,9 @@ public:
 protected:
     void doRequest(const nx::utils::Url& url, const QByteArray& message)
     {
-        static const int kWaitTimeoutMs = 1000 * 10;
-
-        QnMutexLocker lock(&m_mutex);
-        m_requestFinished = false;
         m_expectedResponse = message;
         m_client->doGet(url);
-        while (!m_requestFinished)
-            ASSERT_TRUE(m_waitCond.wait(&m_mutex, kWaitTimeoutMs));
+        m_requestResultQueue.pop();
     }
 
     void doMultipleRequestsReusingHttpClient()
@@ -458,9 +452,7 @@ private:
     std::vector<TestRequestContext> m_requests;
 
     nx::network::http::AsyncHttpClientPtr m_client;
-    QnMutex m_mutex;
-    QnWaitCondition m_waitCond;
-    bool m_requestFinished;
+    nx::utils::SyncQueue<int /*dummy*/> m_requestResultQueue;
     QByteArray m_expectedResponse;
 
     void init()
@@ -508,9 +500,7 @@ private:
         auto contentTypeIter = client->response()->headers.find("Content-Type");
         ASSERT_TRUE(contentTypeIter != client->response()->headers.end());
 
-        QnMutexLocker lock(&m_mutex);
-        m_requestFinished = true;
-        m_waitCond.wakeAll();
+        m_requestResultQueue.push(0 /*dummy*/);
     }
 };
 
@@ -526,7 +516,8 @@ TEST_F(AsyncHttpClientTestMultiRequest, server_supports_persistent_connections)
     doMultipleRequestsReusingHttpClient();
 }
 
-class AsyncHttpClientCustom: public ::testing::Test
+class AsyncHttpClientCustom:
+    public ::testing::Test
 {
 protected:
     void start(const QByteArray& response, bool breakAfterResponse = false)

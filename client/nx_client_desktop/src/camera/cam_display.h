@@ -1,6 +1,8 @@
 #ifndef QN_CAM_DISPLAY_H
 #define QN_CAM_DISPLAY_H
 
+#include <chrono>
+
 #include <QtCore/QTime>
 
 #include <utils/common/adaptive_sleep.h>
@@ -128,6 +130,9 @@ public:
 
     Qn::MediaStreamEvent lastMediaEvent() const;
 
+    std::chrono::milliseconds forcedVideoBufferLength() const;
+    void setForcedVideoBufferLength(std::chrono::milliseconds length);
+
     bool isForcedBufferingEnabled() const;
 
 public slots:
@@ -215,6 +220,7 @@ protected:
     float m_prevSpeed;
 
     bool m_playAudio;
+    bool m_shouldPlayAudio = false;
     bool m_needChangePriority;
     bool m_hadAudio; // got at least one audio packet
 
@@ -280,6 +286,7 @@ protected:
     bool m_fisheyeEnabled;
     int m_channelsCount;
 
+    std::chrono::milliseconds m_forcedVideoBufferLength = std::chrono::milliseconds::zero();
     qint64 m_lastQueuedVideoTime;
     int m_liveBufferSize;
     bool m_liveMaxLenReached;

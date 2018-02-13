@@ -1,8 +1,8 @@
-Willkommen bei {{PRODUCT_NAME}}
+Hallo,
 
-Vielen Dank für Ihre Teilnahme bei {{PRODUCT_NAME}}. Klicken Sie bitte unten auf die Schaltfläche, um Ihre Emailadresse zu bestätigen und das Konto zu aktivieren.
+  Klicken Sie bitte unten auf die Schaltfläche, um Ihre Emailadresse zu bestätigen und das Konto zu aktivieren.
 
-Account aktivieren: {{config.portal_url}}/activate/{{message.code}}
+{{config.portal_url}}/aktivieren/{{message.code}}
 
 Wenn Sie sich nicht bei {{PRODUCT_NAME}} registriert haben, ignorieren Sie diese Email.
-Geben Sie diese Nachricht oder diesen Link nicht an Dritte weiter.
+Teilen Sie die Nachricht oder den Link nicht mit anderen Personen.

@@ -91,6 +91,7 @@
 #include <nx/client/desktop/analytics/analytics_metadata_provider_factory.h>
 #include <nx/client/desktop/utils/upload_manager.h>
 #include <nx/client/desktop/utils/wearable_manager.h>
+#include <nx/client/desktop/analytics/object_display_settings.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -374,6 +375,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     m_uploadManager = new nx::client::desktop::UploadManager(commonModule);
     m_wearableManager = new nx::client::desktop::WearableManager(commonModule);
 
+    commonModule->store(m_uploadManager);
+    commonModule->store(m_wearableManager);
+
 #ifdef Q_OS_WIN
     commonModule->store(new QnIexploreUrlHandler());
 #endif
@@ -384,6 +388,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
 
     commonModule->store(new LayoutTemplateManager());
+    commonModule->store(new ObjectDisplaySettings());
 
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
 

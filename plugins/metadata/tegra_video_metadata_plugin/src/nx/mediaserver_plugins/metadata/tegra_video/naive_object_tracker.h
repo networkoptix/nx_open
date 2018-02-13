@@ -7,7 +7,7 @@
 
 #include <nx/utils/uuid.h>
 
-#include <nx/sdk/metadata/abstract_metadata_packet.h>
+#include <nx/sdk/metadata/metadata_packet.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 
 namespace nx {
@@ -20,7 +20,7 @@ class NaiveObjectTracker
 
 public:
     void filterAndTrack(
-        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* outMetadataPackets,
+        std::vector<nx::sdk::metadata::MetadataPacket*>* outMetadataPackets,
         const std::vector<TegraVideo::Rect>& rects,
         int64_t ptsUs);
 

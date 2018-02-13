@@ -12,7 +12,7 @@ from werkzeug.exceptions import BadRequest, NotFound, SecurityError
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
     from httplib import HTTPConnection
-elif sys.version_info[:2] in {(3, 5), (3, 6)}:
+elif sys.version_info[:2] in {(3, 4), (3, 5), (3, 6)}:  # Python 3.4 is on Ubuntu 14.04.
     # noinspection PyCompatibility,PyUnresolvedReferences
     from http.client import HTTPConnection
 
@@ -27,12 +27,29 @@ DUMMY_FILE_PATH = DATA_DIR / DUMMY_FILE_NAME
 UPDATES_FILE_NAME = 'updates.json'
 
 
+def write_json(path, data):
+    """In Python 2.7, 3.4 and 3.5 json.dumps returns different types."""
+    data_json = json.dumps(data, indent=2)
+    if isinstance(data_json, bytes):
+        path.write_bytes(data_json)
+    else:
+        path.write_text(data_json)
+
+
+def read_json(path):
+    """In Python 2.7, 3.4 and 3.5 json.loads accepts different types."""
+    if str == bytes:
+        return json.loads(path.read_bytes())
+    else:
+        return json.loads(path.read_text())
+
+
 def collect_actual_data():
     base_url = 'updates.networkoptix.com'
 
     conn = HTTPConnection(base_url, port=80)
     conn.request('GET', UPDATES_PATH)
-    root_obj = json.loads(conn.getresponse().read())
+    root_obj = json.loads(conn.getresponse().read().decode())
 
     path_to_update_obj = dict()
     for customization in root_obj:
@@ -44,7 +61,7 @@ def collect_actual_data():
             update_path = UPDATE_PATH_PATTERN.format(customization, build_num)
             conn.request('GET', update_path)
             response = conn.getresponse()
-            response_contents = response.read()
+            response_contents = response.read().decode()
             if response.status != 200:
                 _logger.warning("Ignore %s: HTTP status code %d.", update_path, response.status)
                 continue
@@ -109,12 +126,11 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
 def save_data_to_files(root_obj, path_to_update_obj):
     shutil.rmtree(str(DATA_DIR), ignore_errors=True)
     DATA_DIR.mkdir()
-    file_path = DATA_DIR / UPDATES_FILE_NAME
-    file_path.write_bytes(json.dumps(root_obj))
+    write_json(DATA_DIR / UPDATES_FILE_NAME, root_obj)
     for key, value in path_to_update_obj.items():
         file_path = DATA_DIR / key.lstrip('/')
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        file_path.write_bytes(json.dumps(value, indent=2))
+        write_json(file_path, value)
 
 
 @click.group(help='Test updates server', epilog=dedent("""
@@ -164,7 +180,7 @@ def serve(serve_update_archives, range_header):
             if not possible_path_key.exists():
                 raise NotFound()
 
-            update_obj = json.loads(possible_path_key.read_bytes())
+            update_obj = read_json(possible_path_key)
 
             def file_found_in_package(packages_name):
                 for os_key, os_obj in update_obj[packages_name].items():

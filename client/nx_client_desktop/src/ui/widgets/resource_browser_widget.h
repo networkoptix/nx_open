@@ -29,7 +29,6 @@ class QnWorkbenchContext;
 
 class HoverFocusProcessor;
 
-class QnResourcePreviewWidget;
 class QnResourceTreeModel;
 class QnResourceSearchSynchronizer;
 class QnResourceTreeWidget;
@@ -127,6 +126,8 @@ private:
     void setTooltipResource(const QnResourcePtr& camera);
 
     void selectIndices(const QModelIndexList& indices);
+
+    void initNewSearch();
 
 private slots:
     void updateFilter(bool force = false);

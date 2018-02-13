@@ -1,16 +1,14 @@
 #pragma once
 
+#include "compressed_audio_packet.h"
 #include "common_compressed_media_packet.h"
 
 namespace nx {
 namespace sdk {
 namespace metadata {
 
-class AbstractCompressedAudioPacket:
-    public CommonCompressedMediaPacket,
-    public AbstractCompressedAudioPacket
+class CommonCompressedAudioPacket: public CommonCompressedMediaPacket<CompressedAudioPacket>
 {
-public:
 };
 
 } // namespace metadata

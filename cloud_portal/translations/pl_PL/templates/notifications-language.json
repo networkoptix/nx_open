@@ -1,17 +1,20 @@
 {
   "activate_account": {
-    "emailSubject": "Potwierdź swoje konto"
+    "emailSubject": "Aktywuj swoje konto"
   },
   "restore_password": {
-    "emailSubject": "Przywróć swoje hasło"
+    "emailSubject": "Zresetuj swoje hasło"
   },
   "system_invite": {
-    "emailSubject": "Udostępniono Ci system wideo {{message.system_name}}"
+    "emailSubject": "{{message.sharer_name}} zaprasza Cię do {{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "Udostępniono Ci system wideo {{message.system_name}}"
+    "emailSubject": "{{message.sharer_name}} zaprasza Cię do {{PRODUCT_NAME}}"
   },
   "review_version": {
     "emailSubject": "Wersja {{message.id}} jest gotowa do sprawdzenia"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
   }
 }

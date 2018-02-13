@@ -10,6 +10,16 @@ option(analyzeMutexLocksForDeadlock
     "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
     OFF)
 
+if(MSVC)
+    # MSVC does not support compiler feature detection macros, so Qt fails to enable constexpr
+    # for some its claasses like QRect, QMargins, etc.
+    if(MSVC_VERSION GREATER 1900)
+        add_definitions(-D__cpp_constexpr=201304)
+    else()
+        add_definitions(-DQ_COMPILER_CONSTEXPR)
+    endif()
+endif()
+
 add_definitions(
     -DUSE_NX_HTTP
     -D__STDC_CONSTANT_MACROS
@@ -17,16 +27,11 @@ add_definitions(
     -DENABLE_SENDMAIL
     -DENABLE_DATA_PROVIDERS
     -DENABLE_SOFTWARE_MOTION_DETECTION
-    -DENABLE_THIRD_PARTY
-    -DENABLE_MDNS
-    -DENABLE_WEARABLE
 )
 
 if(WINDOWS)
     add_definitions(
         -D_WINSOCKAPI_=
-        -DENABLE_VMAX
-        -DENABLE_DESKTOP_CAMERA
     )
 endif()
 
@@ -34,41 +39,23 @@ if(UNIX)
     add_definitions(-DQN_EXPORT=)
 endif()
 
-set(enableAllVendors ON)
-
 if(ANDROID OR IOS)
     remove_definitions(
         -DENABLE_SENDMAIL
         -DENABLE_DATA_PROVIDERS
         -DENABLE_SOFTWARE_MOTION_DETECTION
-        -DENABLE_THIRD_PARTY
-        -DENABLE_MDNS
     )
-    set(enableAllVendors OFF)
 endif()
 
-if(box MATCHES "isd|edge1")
+if(box MATCHES "isd")
     set(enableAllVendors OFF)
-    remove_definitions(-DENABLE_SOFTWARE_MOTION_DETECTION)
+    remove_definitions(-DENABLE_MOTION_DETECTION)
     add_definitions(-DEDGE_SERVER)
 endif()
 
-if(enableAllVendors)
-    add_definitions(
-        -DENABLE_ONVIF
-        -DENABLE_AXIS
-        -DENABLE_ACTI
-        -DENABLE_ARECONT
-        -DENABLE_DLINK
-        -DENABLE_DROID
-        -DENABLE_TEST_CAMERA
-        -DENABLE_STARDOT
-        -DENABLE_IQE
-        -DENABLE_ISD
-        -DENABLE_PULSE_CAMERA
-        -DENABLE_FLIR
-        -DENABLE_ADVANTECH
-    )
+if(box MATCHES "edge1")
+    set(enableAllVendors OFF)
+    add_definitions(-DEDGE_SERVER)
 endif()
 
 if(WINDOWS)

@@ -518,6 +518,11 @@ QSizeF Geometry::dilated(const QSizeF& size, const QMarginsF& amount)
     return size + sizeDelta(amount);
 }
 
+QSizeF Geometry::dilated(const QSizeF& size, qreal amount)
+{
+    return QSizeF(size.width() + amount, size.height() + amount);
+}
+
 QRectF Geometry::eroded(const QRectF& rect, const QMarginsF& amount)
 {
     return rect.adjusted(amount.left(), amount.top(), -amount.right(), -amount.bottom());

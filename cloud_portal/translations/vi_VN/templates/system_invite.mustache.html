@@ -1,12 +1,16 @@
-<h1>Chào mừng bạn đến với {{PRODUCT_NAME}}</h1>
+<h1>Xin chào, {{message.fullName}}</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> Đang mời bạn tham gia <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> Và chia sẻ hệ thống {{message.system_name}} với bạn.</p>
+<p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> đã chia sẻ quyền truy cập vào hệ thống quản lý hình ảnh "{{message.system_name}}" với bạn.
+
+Để xem và quản lý nó, vui lòng tạo tài khoản trên <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> sử dụng địa chỉ email hiện tại của bạn và làm theo hướng dẫn khác.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>Bạn được mời bạn tham gia <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a>. Hệ thống {{message.system_name}} đã được chia sẻ với bạn.</p>
+<p>Bạn đã được cấp quyền truy cập vào hệ thống quản lý hình ảnh "{{message.system_name}}".
+
+Để xem và quản lý nó, vui lòng tạo tài khoản trên <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> sử dụng địa chỉ email hiện tại của bạn và làm theo hướng dẫn khác.</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Đăng ký và xem hệ thống</a>
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Tạo tài khoản</a>
 

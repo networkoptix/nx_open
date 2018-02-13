@@ -115,8 +115,9 @@
     "cantActivatePrefix": "Cannot activate your account",
     "cantSendConfirmationPrefix": "Cannot send confirmation Email",
     "cloudInvalidResponse": "Cloud DB returned an unexpected response",
-    "notAuthorized": "Incorrect Email or password",
+    "notAuthorized": "Wrong password",
     "wrongParameters": "Some parameters on the form are incorrect",
+    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "Account is already activated or confirmation code is incorrect",
     "wrongCodeRestore": "Confirmation code is already used or incorrect",
     "forbidden": "You do not have permissions to perform this action",
@@ -157,6 +158,7 @@
     "unavailable": "System is unreachable",
     "offline": "System is offline",
     "openClient": "Open in {{VMS_NAME}}",
+    "openClientNoSystem": "Open {{VMS_NAME}}",
     "confirmRenameTitle": "System name",
     "confirmRenameAction": "Save",
     "successRename": "System name saved",
@@ -200,19 +202,14 @@
         "label": "Mac OS",
         "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
-      },
       "linux": {
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
         "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      "macos": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -221,6 +218,11 @@
       "android": {
         "label": "Android",
         "shortLabel": "Android"
+      },
+      "arm": {
+        "label": "ARM",
+        "shortLabel": "ARM",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms": {

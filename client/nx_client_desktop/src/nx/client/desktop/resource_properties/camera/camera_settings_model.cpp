@@ -84,7 +84,6 @@ CameraSettingsModel::CameraSettingsModel(QnWorkbenchContext* context, QObject* p
     QnWorkbenchContextAware(context),
     d(new Private())
 {
-
 }
 
 CameraSettingsModel::~CameraSettingsModel()
@@ -123,6 +122,12 @@ void CameraSettingsModel::setCameras(const QnVirtualCameraResourceList& cameras)
 
 bool CameraSettingsModel::isSingleCameraMode() const
 {
+    return d->singleCamera;
+}
+
+QnVirtualCameraResourcePtr CameraSettingsModel::singleCamera() const
+{
+    NX_EXPECT(isSingleCameraMode());
     return d->singleCamera;
 }
 

@@ -1,0 +1,31 @@
+
+<div class="modal-header">
+    <h3 class="modal-title">Log in</h3>
+</div>
+<form class="form" name="loginForm" novalidate ng-controller="LoginCtrl">
+    <div class="modal-body" collapse="!authorized">
+        Authorization ...
+    </div>
+    <div class="modal-body" ng-if="!authorized" collapse="authorized">
+        <div class="form-group" ng-class="{'has-error' : loginForm.username.$invalid && (loginForm.username.$dirty || loginForm.submitted)}">
+            <label for="username" class="control-label">User Name</label>
+            <input type="text" id="username" name="username" class="form-control" ng-model="user.username" required auto-fill-sync>
+            <p class="help-block" ng-show="loginForm.username.$invalid && (loginForm.username.$dirty || loginForm.submitted)">
+                Username is required
+            </p>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error' : loginForm.password.$touched && loginForm.password.$invalid && (loginForm.username.$dirty || loginForm.submitted)}">
+            <label for="password" class="control-label">Password</label>
+            <input type="password" id="password" name="password" class="form-control" ng-model="user.password" required auto-fill-sync>
+            <p class="help-block" ng-show="loginForm.password.$invalid && (loginForm.password.$dirty || loginForm.submitted)">
+                Password is required
+            </p>
+        </div>
+    </div>
+
+    <div class="modal-footer" >
+        <button class="btn btn-primary pull-left" name="button" type="submit" ng-if="!authorized"
+                ng-disabled="loginForm.password.$touched && loginForm.$invalid || authorizing" ng-click="login()" enter-button>Log in</button>
+    </div>
+</form>

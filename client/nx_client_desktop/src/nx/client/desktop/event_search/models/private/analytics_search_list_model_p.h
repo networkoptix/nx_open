@@ -40,9 +40,10 @@ public:
     QRectF filterRect() const;
     void setFilterRect(const QRectF& relativeRect);
 
-    virtual void clear() override;
+    QString filterText() const;
+    void setFilterText(const QString& value);
 
-    bool defaultAction(int index) const;
+    virtual void clear() override;
 
 protected:
     virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) override;
@@ -69,11 +70,13 @@ private:
         int limit = std::numeric_limits<int>::max());
 
     QString description(const analytics::storage::DetectedObject& object) const;
+    QString attributes(const analytics::storage::DetectedObject& object) const;
     static qint64 startTimeMs(const analytics::storage::DetectedObject& object);
 
 private:
     AnalyticsSearchListModel* const q = nullptr;
     QRectF m_filterRect;
+    QString m_filterText;
     const QScopedPointer<QTimer> m_updateTimer;
     const QScopedPointer<QTimer> m_dataChangedTimer;
     QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.

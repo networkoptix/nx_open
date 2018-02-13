@@ -6,6 +6,7 @@
 #include <api/server_rest_connection_fwd.h>
 #include <common/common_module_aware.h>
 #include <nx/vms/common/p2p/downloader/private/peer_selection/abstract_peer_selector.h>
+#include <nx/network/http/http_async_client.h>
 
 class QnResourcePool;
 class QnAsyncHttpClientReply;
@@ -47,10 +48,15 @@ public:
         int chunkIndex,
         ChunkCallback callback) override;
 
-    virtual rest::Handle downloadChunkFromInternet(const FileInformation& fileInformation,
-        const QnUuid& peerId,
+    virtual rest::Handle downloadChunkFromInternet(const QnUuid& peerId,
+        const QString& fileName,
+        const nx::utils::Url &url,
         int chunkIndex,
+        int chunkSize,
         ChunkCallback callback) override;
+
+    virtual rest::Handle validateFileInformation(
+        const FileInformation& fileInformation, ValidateCallback callback) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
 
@@ -59,7 +65,7 @@ private:
     rest::QnConnectionPtr getConnection(const QnUuid& peerId) const;
 
     rest::Handle m_currentSelfRequestHandle = -1;
-    QHash<rest::Handle, QnAsyncHttpClientReply*> m_replyByHandle;
+    QHash<rest::Handle, nx::network::http::AsyncHttpClientPtr> m_httpClientByHandle;
     peer_selection::AbstractPeerSelectorPtr m_peerSelector;
 };
 

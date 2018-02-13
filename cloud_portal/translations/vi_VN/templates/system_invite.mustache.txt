@@ -6,7 +6,7 @@ Chào mừng bạn đến với {{PRODUCT_NAME}}
 
 {{^message.sharer_name}}
 Bạn được mời bạn tham gia {{PRODUCT_NAME}}.
-Hệ thống {{message.system_name}} đã được chia sẻ với bạn.
+You have been granted access to {{message.system_name}}.
 {{/message.sharer_name}}
 
 Đăng ký và xem hệ thống: {{config.portal_url}} / register / {{message.code}}

@@ -1,11 +1,11 @@
-系統與您共用
+您好, {{message.fullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) 共用系統 {{message.system_name}} 給您.
+{{message.sharer_name}} ({{message.sharer_email}}) 共用影像管理系統 {{message.system_name}} 給您.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-與您共用系統 {{message.system_name}}.
+您已被授予連線影像管理系統 “{{message.system_name}}” 的權限.
 {{/message.sharer_name}}
 
-開啟系統: {{config.portal_url}}/系統/{{message.system_id}}
+在{{PRODUCT_NAME}} 入口中查看: {{config.portal_url}}/systems/{{message.system_id}}

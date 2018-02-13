@@ -153,7 +153,7 @@ void QnResourceSelectionDialog::initModel()
     connect(m_resourceModel, &QnResourceTreeModel::dataChanged, this,
         &QnResourceSelectionDialog::at_resourceModel_dataChanged);
 
-    ui->resourcesWidget->setModel(m_resourceModel);
+    ui->resourcesWidget->setModel(m_resourceModel, QnResourceTreeWidget::standardSearch);
     ui->resourcesWidget->setFilterVisible(true);
     ui->resourcesWidget->setEditingEnabled(false);
     ui->resourcesWidget->setSimpleSelectionEnabled(true);
@@ -287,7 +287,7 @@ void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate* d
 
         QnColoringProxyModel* proxy = new QnColoringProxyModel(m_delegate, this);
         proxy->setSourceModel(m_resourceModel);
-        ui->resourcesWidget->setModel(proxy);
+        ui->resourcesWidget->setModel(proxy, QnResourceTreeWidget::standardSearch);
         ui->resourcesWidget->setCustomColumnDelegate(m_delegate->customColumnDelegate());
 
         setHelpTopic(ui->resourcesWidget->treeView(), m_delegate->helpTopicId());
