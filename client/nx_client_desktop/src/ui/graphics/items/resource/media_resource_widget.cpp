@@ -2335,7 +2335,7 @@ QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates()
 
     ResourceStates result;
     result.isRealTimeSource = (camDisplay ? camDisplay->isRealTimeSource() : false);
-    result.isOffline = (result.isRealTimeSource && (!resource || (resource->getStatus() == Qn::Offline && !resource->hasFlags(Qn::wearable_camera))));
+    result.isOffline = (result.isRealTimeSource && (!resource || resource->getStatus() == Qn::Offline));
     result.isUnauthorized = (result.isRealTimeSource && (resource && (resource->getStatus() == Qn::Unauthorized)));
     result.hasVideo = hasVideo();
 
