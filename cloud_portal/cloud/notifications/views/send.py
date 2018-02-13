@@ -14,8 +14,6 @@ from django.utils import timezone
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import permission_required
 import re
-import pytz
-import datetime
 
 #Replaces </p> and <br> with \n and then remove all html tags
 def html_to_text(html):
@@ -38,7 +36,7 @@ def format_message(notification):
 
 #For testing we dont want to send emails to everyone so we need to set
 #"BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = true" in cloud.settings
-def send_to_all_users(sent_by, notification, force=False, tz = None):
+def send_to_all_users(sent_by, notification, force=False):
     # if forced and not testing dont apply any filters to send to all users
     users = Account.objects.all()
 
@@ -50,13 +48,8 @@ def send_to_all_users(sent_by, notification, force=False, tz = None):
 
     message = format_message(notification)
     
-    sent_date = datetime.datetime.now()
-    if tz:
-        utc = pytz.utc.localize(datetime.datetime.now())
-        sent_date = utc.astimezone(pytz.timezone(tz)).replace(tzinfo=None)
-    
     notification.sent_by = sent_by
-    notification.sent_date = sent_date
+    notification.sent_date = timezone.now()
     notification.save()
     for user in users:
         message['full_name'] = user.get_full_name()
@@ -145,8 +138,7 @@ def cloud_notification_action(request):
     elif can_send and 'Send' in request.data and notification_id:
         force = 'ignore_subscriptions' in request.data
         notification = CloudNotification.objects.get(id=notification_id)
-        tz = request.session['timezone'] if 'timezone' in request.session else None
-        send_to_all_users(request.user, notification, force, tz)
+        send_to_all_users(request.user, notification, force)
         messages.success(request._request, "Cloud notification has been sent")
 
     else:
