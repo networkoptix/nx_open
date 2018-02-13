@@ -41,8 +41,8 @@ ${RESET PASSWORD BUTTON}              //form[@name='restorePassword']//button[@n
 ${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//input[@type='password']
 ${SAVE PASSWORD}                      //form[@name='restorePasswordWithCode']//button[@ng-click='checkForm()']
 ${RESET EMAIL SENT MESSAGE}           //div[@ng-if='restoringSuccess']/h1[contains(text(),'${RESET EMAIL SENT MESAGE TEXT}')]
-${RESET SUCCESS MESSAGE}              //h1[@ng-if='change.success || changeSuccess ' and contains(text(), '${RESET SUCCESS MESAGE TEXT}')]
-${RESET SUCCESS LOG IN LINK}          //h1[@ng-if='change.success || changeSuccess ' and contains(text(), '${RESET SUCCESS LOG IN LINK TEXT}')]/a[@href='/login']
+${RESET SUCCESS MESSAGE}              //h1[@ng-if='change.success || changeSuccess ' and contains(text(), '${RESET SUCCESS MESSAGE TEXT}')]
+${RESET SUCCESS LOG IN LINK}          //h1[@ng-if='change.success || changeSuccess ' and contains(text(), '${RESET SUCCESS MESSAGE TEXT}')]/a[@href='/login']
 
 #Change Password
 ${CURRENT PASSWORD INPUT}             //form[@name='passwordForm']//input[@ng-model='pass.password']

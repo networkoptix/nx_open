@@ -2,8 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT"                     :    "You have no Systems connected to",
     "LOG OUT BUTTON TEXT"                          :    "Log Out",
     "RESET EMAIL SENT MESAGE TEXT"                 :    "Password reset instructions are sent to Email",
-    "RESET SUCCESS MESAGE TEXT"                    :    "Password successfully saved",
-    "RESET SUCCESS LOG IN LINK TEXT"               :    "Password successfully saved",
+    "RESET SUCCESS MESSAGE TEXT"                   :    "Password successfully saved",
     "CREATE ACCOUNT BUTTON TEXT"                   :    "Create Account",
     "TERMS AND CONDITIONS LINK TEXT"               :    "Terms and Conditions",
     "RESEND ACTIVATION LINK BUTTON TEXT"           :    "Resend activation link",
@@ -25,12 +24,12 @@
     "SHARE PERMISSIONS HINT ADV VIEWER"            :    "Can view live video, browse the archive, configure cameras, control PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER"                :    "Can view live video and browse the archive",
     "SHARE PERMISSIONS HINT LIVE VIEWER"           :    "Can only view live video",
-    "SHARE PERMISSIONS HINT CUSTOM"                :    "Use the Nx Cloud Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM"                :    "Use the {{PRODUCT_NAME}} application to set up custom permissions",
     "ADMIN TEXT"                                   :    "Administrator",
     "ADV VIEWER TEXT"                              :    "Advanced Viewer",
     "VIEWER TEXT"                                  :    "Viewer",
     "LIVE VIEWER TEXT"                             :    "Live Viewer",    
     "CUSTOM TEXT"                                  :    "Custom",
     "RESET PASSWORD EMAIL SUBJECT"                 :    "Reset your password",
-    "INVITED TO SYSTEM EMAIL SUBJECT"              :    "TestFirstName TestLastName invites you to Nx Cloud"
+    "INVITED TO SYSTEM EMAIL SUBJECT"              :    "invites you to Nx Cloud"
 }
