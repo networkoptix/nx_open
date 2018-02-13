@@ -8,6 +8,7 @@ import logging
 import shutil
 import subprocess
 import threading
+from textwrap import dedent
 
 import pytz
 import tzlocal
@@ -317,13 +318,19 @@ class SshAccess(OsAccess):
         return '<{} {} ssh_config_path={}>'.format(self.__class__.__name__, self._user_and_host, self._config_path)
 
     def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None, env=None):
-        ssh_cmd = self._make_ssh_cmd() + [self._user_and_host]
-        if cwd:
-            cwd_args = ['cd', str(cwd), ';']
+        if isinstance(args, str):
+            script = dedent(args).strip()
+            script = '\n'.join(args_from_env(env)) + '\n' + script
+            if cwd:
+                script = 'cd "{}"\n'.format(cwd) + script
+            args = ['\n' + script]
         else:
-            cwd_args = []
+            args = [str(arg) for arg in args]
+            args = args_from_env(env) + args
+            if cwd:
+                args = ['cd', str(cwd), ';'] + args
         return self._local_os_access.run_command(
-            ssh_cmd + cwd_args + args_from_env(env) + [str(arg) for arg in args],
+            self._make_ssh_cmd() + [self._user_and_host] + args,
             input,
             check_retcode=check_retcode,
             log_output=log_output,
@@ -361,7 +368,7 @@ class SshAccess(OsAccess):
             return self.run_command(['tail', '--bytes=+%d' % ofs, from_remote_path], log_output=False)
         else:
             return self.run_command(['cat', from_remote_path], log_output=False)
-        
+
     def write_file(self, to_remote_path, contents):
         to_remote_path = PurePosixPath(to_remote_path)
         self.run_command(['mkdir', '-p', to_remote_path.parent, '&&', 'cat', '>', to_remote_path], contents)
@@ -395,7 +402,7 @@ class SshAccess(OsAccess):
     def get_timezone(self):
         tzname = self.read_file('/etc/timezone').strip()
         return pytz.timezone(tzname)
-        
+
     def make_proxy_command(self):
         return self._make_ssh_cmd() + [self._user_and_host, 'nc', '-q0', '%h', '%p']
 
