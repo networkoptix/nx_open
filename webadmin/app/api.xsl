@@ -36,7 +36,7 @@
 
                 </link><!-- This is strange hack, I know -->
 
-                <link rel="stylesheet" href="customization/styles.css"/>
+                <link rel="stylesheet" href="skin/styles.css"/>
             </head>
             <body class="api-xml">
                 <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
