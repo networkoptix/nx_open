@@ -196,7 +196,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &ExportSettingsDialog::updateMode);
 
     connect(d, &Private::transcodingModeChanged, this,
-        &ExportSettingsDialog::updateTranscodingWidgets);
+        &ExportSettingsDialog::updateWidgetsState);
 
     connect(d, &Private::frameSizeChanged, this,
         [this](const QSize& size)
@@ -492,7 +492,7 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
         setAlertText(i, texts[i]);
 }
 
-void ExportSettingsDialog::updateTranscodingWidgets()
+void ExportSettingsDialog::updateWidgetsState()
 {
     // Gather all data to apply to UI.
     const auto& settings = d->exportMediaPersistentSettings();
