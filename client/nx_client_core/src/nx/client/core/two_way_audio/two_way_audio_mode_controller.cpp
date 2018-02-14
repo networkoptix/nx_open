@@ -107,6 +107,7 @@ void TwoWayAudioController::setResourceId(const QString& value)
     if (m_camera && m_camera->getId() == id)
         return;
 
+    stop();
     if (m_camera)
         m_camera->disconnect(this);
 

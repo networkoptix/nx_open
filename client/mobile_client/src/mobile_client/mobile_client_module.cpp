@@ -46,14 +46,24 @@
 #include <client_core/client_core_settings.h>
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
 #include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
+#include <client/client_resource_processor.h>
+#include <utils/media/voice_spectrum_analyzer.h>
+
 
 using namespace nx::mobile_client;
 
 static const QString kQmlRoot = QStringLiteral("qrc:///qml");
+
+template<typename BaseType>
+BaseType extract(const QSharedPointer<BaseType>& pointer)
+{
+    return pointer ? *pointer : BaseType();
+}
 
 QnMobileClientModule::QnMobileClientModule(
     const QnMobileClientStartupParameters& startupParameters,
@@ -140,6 +150,7 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->store(new QnSystemsWeightsManager());
 
     commonModule->store(new settings::SessionsMigrationHelper());
+    commonModule->store(new QnVoiceSpectrumAnalyzer());
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this,
         [moduleManager = commonModule->moduleDiscoveryManager()](Qt::ApplicationState state)
@@ -157,6 +168,92 @@ QnMobileClientModule::QnMobileClientModule(
             }
         });
 
+
+    /// TEMPORARY
+    QSharedPointer<QnUuid> remoteServerId(new QnUuid());
+    QSharedPointer<QnDesktopResourcePtr> desktop(new QnDesktopResourcePtr());
+    QSharedPointer<QnMediaServerResourcePtr> server(new QnMediaServerResourcePtr());
+
+    const auto tryRemoveCurrentServerConnection =
+        [desktop, server]()
+        {
+            if (*server && *desktop)
+                (*desktop)->removeConnection(*server);
+        };
+
+    const auto tryAddCurrentServerConnection =
+        [desktop, server, tryRemoveCurrentServerConnection, userWatcher]()
+        {
+            tryRemoveCurrentServerConnection();
+            const auto user = userWatcher->user();
+            if (*server && *desktop && user)
+                (*desktop)->addConnection(*server, user->getId());
+        };
+
+    const auto handleResourceAdded =
+        [desktop, server, tryRemoveCurrentServerConnection,
+            tryAddCurrentServerConnection, remoteServerId](const QnResourcePtr& resource)
+        {
+            if (const auto desktopResource = resource.dynamicCast<QnDesktopResource>())
+            {
+                tryRemoveCurrentServerConnection();
+                *desktop = desktopResource;
+                tryAddCurrentServerConnection();
+            }
+            else if (const auto serverResource = resource.dynamicCast<QnMediaServerResource>())
+            {
+                if (serverResource->getId() == *remoteServerId)
+                {
+                    *server = serverResource;
+                    tryAddCurrentServerConnection();
+                }
+            }
+        };
+
+    const auto handleResourceRemoved =
+        [desktop, server, tryRemoveCurrentServerConnection,
+            tryAddCurrentServerConnection, remoteServerId](const QnResourcePtr& resource)
+        {
+            if (const auto desktopResource = resource.dynamicCast<QnDesktopResource>())
+            {
+                if (desktopResource != *desktop)
+                    return;
+
+                tryRemoveCurrentServerConnection();
+                (*desktop).reset();
+            }
+            else if (const auto serverResource = resource.dynamicCast<QnMediaServerResource>())
+            {
+                if (serverResource->getId() == *remoteServerId)
+                {
+                    tryRemoveCurrentServerConnection();
+                    (*server).reset();
+                }
+            }
+        };
+
+    const auto handleRemoteIdChanged =
+        [desktop, server, remoteServerId, commonModule, tryRemoveCurrentServerConnection,
+            tryAddCurrentServerConnection, handleResourceAdded]()
+        {
+            tryRemoveCurrentServerConnection();
+
+            *remoteServerId = commonModule->remoteGUID();
+            const auto pool = commonModule->resourcePool();
+            handleResourceAdded(pool->getResourceById<QnMediaServerResource>(*remoteServerId));
+        };
+
+    const auto pool = commonModule->resourcePool();
+    connect(pool, &QnResourcePool::resourceAdded, this, handleResourceAdded);
+    connect(pool, &QnResourcePool::resourceRemoved, this, handleResourceRemoved);
+    connect(commonModule, &QnCommonModule::remoteIdChanged, this, handleRemoteIdChanged);
+    connect(userWatcher, &QnUserWatcher::userChanged, this, tryAddCurrentServerConnection);
+
+    handleRemoteIdChanged();
+    for (const auto resource: pool->getResources<QnDesktopResource>())
+        handleResourceAdded(resource);
+
+    ///
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
     commonModule->instance<QnServerInterfaceWatcher>();
 
