@@ -299,30 +299,29 @@ void Updates2ManagerBase::startPreparing(const QString& updateFilePath)
     AbstractUpdates2InstallerPtr updateInstaller = installer();
     updateInstaller->prepareAsync(
         updateFilePath,
-        [this](PrepareResult prepareResult, const QString& updateId)
+        [this](PrepareResult prepareResult)
         {
             switch (prepareResult)
             {
                 case PrepareResult::ok:
                     setStatus(
                         api::Updates2StatusData::StatusCode::readyToInstall,
-                        lit("Update is ready for installation: %1").arg(updateId));
+                        lit("Update is ready for installation"));
                     return;
                 case PrepareResult::corruptedArchive:
                     setStatus(
                         api::Updates2StatusData::StatusCode::error,
-                        lit("Update archive is corrupted: %1").arg(updateId));
+                        lit("Update archive is corrupted"));
                     return;
                 case PrepareResult::noFreeSpace:
                     setStatus(
                         api::Updates2StatusData::StatusCode::error,
-                        lit("Failed to prepare update file (%1), no space left on device")
-                            .arg(updateId));
+                        lit("Failed to prepare update file, no space left on device"));
                     return;
                 case PrepareResult::unknownError:
                     setStatus(
                         api::Updates2StatusData::StatusCode::error,
-                        lit("Failed to prepare update files: %1").arg(updateId));
+                        lit("Failed to prepare update files"));
                     return;
             }
         });

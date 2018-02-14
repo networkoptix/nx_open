@@ -1,16 +1,20 @@
-:: Absolute path to this script's dir, including the trailing backslash.
-set BASE_DIR=%~dp0
+set PLUGIN_NAME=stub_metadata_plugin
 
-set BUILD_DIR=%BASE_DIR%build
-rmdir /S /Q %BUILD_DIR%\
-mkdir %BUILD_DIR%
-cd %BUILD_DIR%
+:: Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
+set BASE_DIR_WITH_BACKSLASH=%~dp0
+set BASE_DIR=%BASE_DIR_WITH_BACKSLASH:~0,-1%
+set BUILD_DIR=%BASE_DIR%-build
 
-cmake %BASE_DIR%samples\stub_metadata_plugin -Ax64
-cmake --build .
+if exist "%BUILD_DIR%/" rmdir /S /Q "%BUILD_DIR%/" || goto :EOF
+mkdir "%BUILD_DIR%" || goto :EOF
+@set ORIGINAL_DIR=%cd%
+cd "%BUILD_DIR%" || goto :EOF
 
-@set ARTIFACT=%BUILD_DIR%\Debug\stub_metadata_plugin.dll
-@if exist %ARTIFACT% (
+cmake "%BASE_DIR%\samples\%PLUGIN_NAME%" -Ax64 || goto :restoreCd
+cmake --build . || goto :restoreCd
+
+@set ARTIFACT=%BUILD_DIR%\Debug\%PLUGIN_NAME%.dll
+@if exist "%ARTIFACT%" (
     @echo:
     @echo Plugin built successfully:
     @echo %ARTIFACT%
@@ -18,3 +22,6 @@ cmake --build .
     @echo:
     @echo ERROR: Failed to build plugin.
 )
+
+:restoreCd
+@cd %ORIGINAL_DIR%

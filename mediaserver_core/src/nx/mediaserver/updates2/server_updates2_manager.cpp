@@ -88,6 +88,12 @@ QString ServerUpdates2Manager::filePath() const
     return qnServerModule->settings()->getDataDirectory() + QDir::separator() + kFileName;
 }
 
+update::detail::AbstractUpdates2InstallerPtr ServerUpdates2Manager::installer()
+{
+    // #TODO #akulikov implement this correctly
+    return nx::update::detail::AbstractUpdates2InstallerPtr();
+}
+
 } // namespace updates2
 } // namespace mediaserver
 } // namespace nx

@@ -19,7 +19,6 @@ private:
     virtual QnUuid moduleGuid() const override;
     virtual void updateGlobalRegistry(const QByteArray& serializedRegistry) override;
     virtual void writeStatusToFile(const detail::Updates2StatusDataEx& statusData) override;
-    virtual AbstractUpdates2InstallerPtr installer() override;
     virtual void remoteUpdateCompleted() override {}
 };
 

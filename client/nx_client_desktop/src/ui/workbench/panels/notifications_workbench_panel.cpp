@@ -39,6 +39,7 @@
 #include <utils/common/scoped_value_rollback.h>
 
 #include <nx/client/desktop/event_search/widgets/event_panel.h>
+#include <nx/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
 
 using namespace nx::client::desktop::ui;
@@ -418,7 +419,11 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
         ->instrument<ToolTipInstrument>();
 
     if (toolTipInstrument)
-        toolTipInstrument->addIgnoredItem(eventPanelContainer);
+    {
+        const auto ribbons = m_eventPanel->findChildren<EventRibbon*>();
+        for (auto ribbon: ribbons)
+            toolTipInstrument->addIgnoredWidget(ribbon);
+    }
 
     connect(m_eventPanel.data(), &EventPanel::tileHovered,
         this, &NotificationsWorkbenchPanel::at_eventTileHovered);
