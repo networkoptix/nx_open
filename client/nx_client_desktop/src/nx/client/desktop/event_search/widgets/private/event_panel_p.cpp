@@ -15,10 +15,12 @@
 #include <ui/widgets/common/search_line_edit.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_navigator.h>
 
 #include <nx/client/desktop/common/widgets/animated_tab_widget.h>
 #include <nx/client/desktop/common/widgets/compact_tab_bar.h>
 #include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/common/selectable_text_button.h>
 #include <nx/client/desktop/event_search/models/unified_async_search_list_model.h>
 #include <nx/client/desktop/event_search/models/analytics_search_list_model.h>
@@ -103,7 +105,7 @@ EventPanel::Private::Private(EventPanel* q):
     connect(m_analyticsTab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
     connect(m_notificationsTab, &NotificationListWidget::tileHovered, q, &EventPanel::tileHovered);
 
-    setupBookmarksTabSyncWithNavigator();
+    setupTabsSyncWithNavigator();
 }
 
 EventPanel::Private::~Private()
@@ -114,8 +116,11 @@ void EventPanel::Private::addCameraTabs()
 {
     NX_ASSERT(m_tabs->count() == kPermanentTabCount);
 
-    m_tabs->addTab(m_motionTab, qnSkin->icon(lit("events/tabs/motion.png")),
-        tr("Motion", "Motion tab title"));
+    if (m_camera->hasFlags(Qn::motion))
+    {
+        m_tabs->addTab(m_motionTab, qnSkin->icon(lit("events/tabs/motion.png")),
+            tr("Motion", "Motion tab title"));
+    }
     m_tabs->addTab(m_bookmarksTab, qnSkin->icon(lit("events/tabs/bookmarks.png")),
         tr("Bookmarks", "Bookmarks tab title"));
     m_tabs->addTab(m_eventsTab, qnSkin->icon(lit("events/tabs/events.png")),
@@ -317,16 +322,10 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
 
     setCamera(camera);
 
-    m_motionTab->setMotionSearchEnabled(false);
-
     if (!camera)
         return;
 
     m_mediaWidgetConnections.reset(new QnDisconnectHelper());
-
-    *m_mediaWidgetConnections << connect(
-        m_currentMediaWidget.data(), &QnMediaResourceWidget::motionSearchModeEnabled,
-            m_motionTab, &MotionSearchWidget::setMotionSearchEnabled);
 
     *m_mediaWidgetConnections << connect(
         m_currentMediaWidget.data(), &QnMediaResourceWidget::analyticsSearchAreaSelected, this,
@@ -339,6 +338,18 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
 
             m_analyticsTab->requestFetch();
         });
+
+    *m_mediaWidgetConnections << connect(m_currentMediaWidget.data(),
+        &QnMediaResourceWidget::motionSearchModeEnabled, this, &Private::at_motionSearchToggled);
+
+    *m_mediaWidgetConnections << connect(m_currentMediaWidget.data(),
+        &QnMediaResourceWidget::motionSelectionChanged, this,
+        [this]()
+        {
+            m_motionTab->setMotionSelectionEmpty(m_currentMediaWidget->isMotionSelectionEmpty());
+        });
+
+    at_specialModeToggled(m_currentMediaWidget->isMotionSearchModeEnabled(), m_motionTab);
 }
 
 void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Value importance)
@@ -361,7 +372,7 @@ void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Va
         width, m_counterLabel->minimumHeight());
 }
 
-void EventPanel::Private::setupBookmarksTabSyncWithNavigator()
+void EventPanel::Private::setupTabsSyncWithNavigator()
 {
     connect(m_tabs, &QTabWidget::currentChanged, this,
         [this](int index)
@@ -369,27 +380,77 @@ void EventPanel::Private::setupBookmarksTabSyncWithNavigator()
             q->context()->action(ui::action::BookmarksModeAction)->setChecked(
                 m_tabs->currentWidget() == m_bookmarksTab);
 
+            if (m_currentMediaWidget)
+            {
+                QnResourceWidgetList widgets({m_currentMediaWidget});
+                if (m_tabs->currentWidget() == m_motionTab)
+                    q->menu()->trigger(ui::action::StartSmartSearchAction, widgets);
+                else
+                    q->menu()->trigger(ui::action::StopSmartSearchAction, widgets);
+            }
+
+            auto extraContent = Qn::RecordingContent;
+            if (m_tabs->currentWidget() == m_motionTab)
+                extraContent = Qn::MotionContent;
+            else if (m_tabs->currentWidget() == m_analyticsTab)
+                extraContent = Qn::AnalyticsContent;
+
+            q->context()->navigator()->setSelectedExtraContent(extraContent);
+
+            if (const auto usw = qobject_cast<UnifiedSearchWidget*>(m_tabs->currentWidget()))
+                q->context()->navigator()->setSelectedTimePeriod(usw->currentTimePeriod());
+            else
+                q->context()->navigator()->setSelectedTimePeriod(QnTimePeriod::anytime());
+
             m_previousTabIndex = m_lastTabIndex;
             m_lastTabIndex = index;
         });
 
-    connect(q->context()->action(ui::action::BookmarksModeAction), &QAction::toggled, this,
-        [this](bool on)
+    const auto handleSelectedTimePeriodChanged =
+        [this](const QnTimePeriod& period)
         {
-            const auto index = m_tabs->indexOf(m_bookmarksTab);
-            if (index < 0)
-                return;
+            if (sender() == m_tabs->currentWidget())
+                q->context()->navigator()->setSelectedTimePeriod(period);
+        };
 
-            if (on)
-            {
-                m_tabs->setCurrentIndex(index);
-            }
-            else
-            {
-                if (m_tabs->currentWidget() == m_bookmarksTab)
-                    m_tabs->setCurrentIndex(m_previousTabIndex);
-            }
-        });
+    connect(m_motionTab, &UnifiedSearchWidget::currentTimePeriodChanged,
+        this, handleSelectedTimePeriodChanged);
+    connect(m_eventsTab, &UnifiedSearchWidget::currentTimePeriodChanged,
+        this, handleSelectedTimePeriodChanged);
+    connect(m_bookmarksTab, &UnifiedSearchWidget::currentTimePeriodChanged,
+        this, handleSelectedTimePeriodChanged);
+    connect(m_analyticsTab, &UnifiedSearchWidget::currentTimePeriodChanged,
+        this, handleSelectedTimePeriodChanged);
+
+    connect(q->context()->action(ui::action::BookmarksModeAction), &QAction::toggled,
+        this, &Private::at_bookmarksToggled);
+}
+
+void EventPanel::Private::at_motionSearchToggled(bool on)
+{
+    at_specialModeToggled(on, m_motionTab);
+}
+
+void EventPanel::Private::at_bookmarksToggled(bool on)
+{
+    at_specialModeToggled(on, m_bookmarksTab);
+}
+
+void EventPanel::Private::at_specialModeToggled(bool on, QWidget* correspondingTab)
+{
+    const auto index = m_tabs->indexOf(correspondingTab);
+    if (index < 0)
+        return;
+
+    if (on)
+    {
+        m_tabs->setCurrentIndex(index);
+    }
+    else
+    {
+        if (m_tabs->currentWidget() == correspondingTab)
+            m_tabs->setCurrentIndex(m_previousTabIndex);
+    }
 }
 
 void EventPanel::Private::connectToRowCountChanges(QAbstractItemModel* model,

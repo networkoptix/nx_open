@@ -262,22 +262,32 @@ void UnifiedSearchWidget::setSelectedPeriod(Period value)
         m_dayChangeTimer->stop();
 }
 
-void UnifiedSearchWidget::setCurrentTimePeriod(const QnTimePeriod& period)
+bool UnifiedSearchWidget::setCurrentTimePeriod(const QnTimePeriod& period)
 {
     auto asyncModel = qobject_cast<UnifiedAsyncSearchListModel*>(model());
     if (!asyncModel)
-        return;
+        return false;
 
     if (asyncModel->selectedTimePeriod() == period)
-        return;
+        return false;
 
     asyncModel->setSelectedTimePeriod(period);
-    requestFetch();
+    return true;
+}
+
+QnTimePeriod UnifiedSearchWidget::currentTimePeriod() const
+{
+    return m_currentTimePeriod;
 }
 
 void UnifiedSearchWidget::updateCurrentTimePeriod()
 {
-    setCurrentTimePeriod(effectiveTimePeriod());
+    m_currentTimePeriod = effectiveTimePeriod();
+    if (!setCurrentTimePeriod(m_currentTimePeriod))
+        return;
+
+    requestFetch();
+    emit currentTimePeriodChanged(m_currentTimePeriod);
 }
 
 QnTimePeriod UnifiedSearchWidget::effectiveTimePeriod() const
@@ -286,7 +296,7 @@ QnTimePeriod UnifiedSearchWidget::effectiveTimePeriod() const
     switch (m_period)
     {
         case Period::all:
-            return QnTimePeriod(QnTimePeriod::kMinTimeValue, QnTimePeriod::infiniteDuration());
+            return QnTimePeriod::anytime();
 
         case Period::selection:
             return m_timelineSelection;

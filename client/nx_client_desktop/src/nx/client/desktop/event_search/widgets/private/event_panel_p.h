@@ -53,9 +53,14 @@ private:
 
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
 
-    void setupBookmarksTabSyncWithNavigator();
+    void setupTabsSyncWithNavigator();
 
     void connectToRowCountChanges(QAbstractItemModel* model, std::function<void()> handler);
+
+    void at_motionSearchToggled(bool on);
+    void at_bookmarksToggled(bool on);
+
+    void at_specialModeToggled(bool on, QWidget* correspondingTab);
 
 private:
     EventPanel* const q = nullptr;

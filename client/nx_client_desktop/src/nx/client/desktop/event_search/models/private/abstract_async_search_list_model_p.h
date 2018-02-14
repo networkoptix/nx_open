@@ -57,7 +57,7 @@ protected:
 private:
     AbstractAsyncSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
-    QnTimePeriod m_selectedTimePeriod;
+    QnTimePeriod m_selectedTimePeriod = QnTimePeriod::anytime();
     qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
     rest::Handle m_currentFetchId = rest::Handle();
     PrefetchCompletionHandler m_prefetchCompletionHandler;

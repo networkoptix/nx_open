@@ -135,6 +135,12 @@ public:
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
+    Qn::TimePeriodContent selectedExtraContent() const; //< Qn::RecordingContent if none.
+    void setSelectedExtraContent(Qn::TimePeriodContent value);
+
+    QnTimePeriod selectedTimePeriod() const;
+    void setSelectedTimePeriod(const QnTimePeriod& value);
+
     QnCameraDataManager* cameraDataManager() const;
 
 signals:
@@ -356,6 +362,8 @@ private:
 
     QnDisconnectHelperPtr m_currentWidgetConnections;
     QnDisconnectHelperPtr m_centralWidgetConnections;
+
+    QnTimePeriod m_selectedTimePeriod = QnTimePeriod::anytime();
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);

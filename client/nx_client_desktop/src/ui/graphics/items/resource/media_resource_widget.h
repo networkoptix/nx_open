@@ -163,6 +163,7 @@ public:
 
     void setZoomWindowCreationModeEnabled(bool enabled);
     void setMotionSearchModeEnabled(bool enabled);
+    bool isMotionSearchModeEnabled() const;
 
     QnSpeedRange speedRange() const;
     static const QnSpeedRange& availableSpeedRange();

@@ -2738,6 +2738,11 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
     emit motionSearchModeEnabled(enabled);
 }
 
+bool QnMediaResourceWidget::isMotionSearchModeEnabled() const
+{
+    return (titleBar()->rightButtonsBar()->checkedButtons() & Qn::MotionSearchButton) != 0;
+}
+
 QnSpeedRange QnMediaResourceWidget::speedRange() const
 {
     static constexpr qreal kUnitSpeed = 1.0;

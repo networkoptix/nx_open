@@ -69,14 +69,17 @@ public:
     Period selectedPeriod() const;
     void setSelectedPeriod(Period value);
 
+    QnTimePeriod currentTimePeriod() const;
+
     void requestFetch();
 
 signals:
     void tileHovered(const QModelIndex& index, const EventTile* tile);
+    void currentTimePeriodChanged(const QnTimePeriod& period);
 
 protected:
     virtual bool hasRelevantTiles() const;
-    virtual void setCurrentTimePeriod(const QnTimePeriod& period);
+    virtual bool setCurrentTimePeriod(const QnTimePeriod& period);
     virtual bool isConstrained() const;
 
 private:
@@ -97,6 +100,7 @@ private:
     Period m_period = Period::all;
     QString m_placeholderTextConstrained;
     QString m_placeholderTextUnconstrained;
+    QnTimePeriod m_currentTimePeriod = QnTimePeriod::anytime();
     QScopedPointer<QnDisconnectHelper> m_modelConnections;
 };
 

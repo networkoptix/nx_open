@@ -21,7 +21,7 @@ MotionSearchWidget::MotionSearchWidget(QWidget* parent):
     setModel(m_model);
 
     setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/motion.png")));
-    setMotionSearchEnabled(false);
+    setMotionSelectionEmpty(true);
 
     filterEdit()->hide();
     showPreviewsButton()->show();
@@ -34,12 +34,21 @@ MotionSearchWidget::~MotionSearchWidget()
 {
 }
 
-void MotionSearchWidget::setMotionSearchEnabled(bool value)
+void MotionSearchWidget::setMotionSelectionEmpty(bool value)
 {
     if (value)
-        setPlaceholderTexts(tr("No motion"), tr("No motion detected"));
+    {
+        static const QString kHtmlPlaceholder =
+            lit("<center><p>%1</p><p><font size='-3'>%2</font></p></center>")
+                .arg(tr("No motion region"))
+                .arg(tr("Select some area on camera."));
+
+        setPlaceholderTexts(QString(), kHtmlPlaceholder);
+    }
     else
-        setPlaceholderTexts(tr("Motion search is turned off"), tr("Motion search is turned off"));
+    {
+        setPlaceholderTexts(tr("No motion"), tr("No motion detected"));
+    }
 }
 
 bool MotionSearchWidget::isConstrained() const
@@ -63,10 +72,13 @@ bool MotionSearchWidget::hasRelevantTiles() const
     return m_model->rowCount() > 0;
 }
 
-void MotionSearchWidget::setCurrentTimePeriod(const QnTimePeriod& period)
+bool MotionSearchWidget::setCurrentTimePeriod(const QnTimePeriod& period)
 {
+    if (m_model->selectedTimePeriod() == period)
+        return false;
+
     m_model->setSelectedTimePeriod(period);
-    requestFetch();
+    return true;
 }
 
 void MotionSearchWidget::updateEventCounter(int totalCount)

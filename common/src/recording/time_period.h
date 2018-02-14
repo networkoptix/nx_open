@@ -81,6 +81,11 @@ public:
     static qint64 infiniteDuration();
 
     /**
+    * \returns                          Returns infinite period starting from zero.
+    */
+    static QnTimePeriod anytime();
+
+    /**
      * \returns distance from the nearest period edge to the time in ms. Returns zerro if timeMs inside period
      */
     qint64 distanceToTime(qint64 timeMs) const;
