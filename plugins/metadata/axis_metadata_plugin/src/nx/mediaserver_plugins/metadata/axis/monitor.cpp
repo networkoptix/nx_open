@@ -53,11 +53,11 @@ nx::sdk::metadata::CommonEventsMetadataPacket* createCommonEventsMetadataPacket(
 } // namespace
 
 void axisHandler::processRequest(
-    nx_http::HttpServerConnection* const connection,
+    nx::network::http::HttpServerConnection* const connection,
     nx::utils::stree::ResourceContainer authInfo,
-    nx_http::Request request,
-    nx_http::Response* const response,
-    nx_http::RequestProcessedHandler completionHandler)
+    nx::network::http::Request request,
+    nx::network::http::Response* const response,
+    nx::network::http::RequestProcessedHandler completionHandler)
 {
     NX_PRINT << "Received from Axis: " << request.requestLine.toString().data();
 
@@ -80,7 +80,7 @@ void axisHandler::processRequest(
                 std::lock_guard<std::mutex> lock(m_elapsedTimerMutex);
                 event.elapsedTimer.start();
             }
-            completionHandler(nx_http::StatusCode::ok);
+            completionHandler(nx::network::http::StatusCode::ok);
             return;
         }
     }

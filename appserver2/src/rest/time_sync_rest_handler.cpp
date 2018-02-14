@@ -29,7 +29,7 @@ int QnTimeSyncRestHandler::executeGet(
         connection->request(),
         m_appServerConnection->timeSyncManager(),
         connection->socket().data());
-    if (resultCode != nx_http::StatusCode::ok)
+    if (resultCode != nx::network::http::StatusCode::ok)
         return resultCode;
 
     // Sending our time synchronization information to remote peer.
@@ -58,14 +58,14 @@ int QnTimeSyncRestHandler::executePost(
         connection);
 }
 
-nx_http::StatusCode::Value QnTimeSyncRestHandler::processRequest(
-    const nx_http::Request& request,
+nx::network::http::StatusCode::Value QnTimeSyncRestHandler::processRequest(
+    const nx::network::http::Request& request,
     TimeSynchronizationManager* timeSynchronizationManager,
     AbstractStreamSocket* connection)
 {
     auto peerGuid = request.headers.find(Qn::PEER_GUID_HEADER_NAME);
     if (peerGuid == request.headers.end())
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
     auto timeSyncHeaderIter = request.headers.find(TIME_SYNC_HEADER_NAME);
     if (timeSyncHeaderIter != request.headers.end())
     {
@@ -86,13 +86,13 @@ nx_http::StatusCode::Value QnTimeSyncRestHandler::processRequest(
             rttMillis);
     }
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 void QnTimeSyncRestHandler::prepareResponse(
     const TimeSynchronizationManager& timeSynchronizationManager,
     const QnCommonModule& commonModule,
-    nx_http::Response* response)
+    nx::network::http::Response* response)
 {
     response->headers.emplace(
         TIME_SYNC_HEADER_NAME,

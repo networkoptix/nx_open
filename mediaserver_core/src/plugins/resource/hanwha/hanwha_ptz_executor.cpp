@@ -118,7 +118,7 @@ void HanwhaPtzExecutor::sendValueToDevice(const QString& parameterName, int para
         });
 }
 
-std::unique_ptr<nx_http::AsyncClient> HanwhaPtzExecutor::makeHttpClient() const
+std::unique_ptr<nx::network::http::AsyncClient> HanwhaPtzExecutor::makeHttpClient() const
 {
     auto auth = m_hanwhaResource->getAuth();
     auto httpClient = std::make_unique<nx::network::http::AsyncClient>();

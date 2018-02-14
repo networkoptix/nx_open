@@ -218,7 +218,7 @@ public:
     QUrl apiUrl() const
     {
         return nx::network::url::Builder()
-            .setScheme(nx_http::kUrlSchemeName)
+            .setScheme(nx::network::http::kUrlSchemeName)
             .setEndpoint(m_httpServer.serverAddress()).toUrl();
     }
 
@@ -281,17 +281,17 @@ private:
     }
 
     void syncTimeHttpHandler(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request request,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
         const auto resultCode = QnTimeSyncRestHandler::processRequest(
             request,
             m_timeSynchronizationManager.get(),
             connection->socket().get());
-        if (resultCode != nx_http::StatusCode::ok)
+        if (resultCode != nx::network::http::StatusCode::ok)
             return completionHandler(resultCode);
 
         // Sending our time synchronization information to remote peer.
@@ -300,7 +300,7 @@ private:
             m_commonModule,
             response);
 
-        return completionHandler(nx_http::StatusCode::ok);
+        return completionHandler(nx::network::http::StatusCode::ok);
     }
 };
 
@@ -505,7 +505,7 @@ private:
     /** m_connectTable[i][j] is true, then peer[i] connects to peer[j]. */
     std::vector<std::vector<int>> m_connectTable;
     /** Needed just to satisfy QnCommonModule requirement. */
-    nx_http::ClientPool m_httpClientPool;
+    nx::network::http::ClientPool m_httpClientPool;
 
     void startPeers(int peerCount)
     {

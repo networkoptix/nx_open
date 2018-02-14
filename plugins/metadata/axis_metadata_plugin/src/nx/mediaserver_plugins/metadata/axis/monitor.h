@@ -28,15 +28,15 @@ class Manager;
 
 class Monitor;
 
-class axisHandler: public nx_http::AbstractHttpRequestHandler
+class axisHandler: public nx::network::http::AbstractHttpRequestHandler
 {
 public:
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
-        nx_http::Request request,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler);
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler);
 
     axisHandler(
         Monitor* monitor,

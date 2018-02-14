@@ -148,19 +148,19 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
 {
     QnUuid cameraId;
     if (!requireParameter(params, lit("cameraId"), result, &cameraId))
-        return nx_http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::invalidParameter;
 
     QnWearablePrepareData data;
     if(!QJson::deserialize(body, &data) || data.elements.empty())
-        return nx_http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::invalidParameter;
 
     QnResourcePtr resource = owner->resourcePool()->getResourceById(cameraId);
     if (!resource)
-        return nx_http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::invalidParameter;
 
     QnWearableUploadManager* uploader = uploadManager(result);
     if (!uploader)
-        return nx_http::StatusCode::internalServerError;
+        return nx::network::http::StatusCode::internalServerError;
 
     QnTimePeriod unionPeriod;
     for (const QnWearablePrepareDataElement& element : data.elements)
@@ -190,7 +190,7 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
     }
 
     result.setReply(reply);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnWearableCameraRestHandler::executeStatus(const QnRequestParams& params,

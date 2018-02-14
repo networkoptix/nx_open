@@ -31,7 +31,7 @@ private:
     void scheduleNextRequest(const QString& parameterName);
     void sendValueToDevice(const QString& parameterName, int parameterValue);
 
-    std::unique_ptr<nx_http::AsyncClient> makeHttpClient() const;
+    std::unique_ptr<nx::network::http::AsyncClient> makeHttpClient() const;
     boost::optional<int> toHanwhaSpeed(const QString& parameterName, qreal speed) const;
     ParameterContext& context(const QString& parameterName);
     std::set<int> range(const QString& parameterName) const;
