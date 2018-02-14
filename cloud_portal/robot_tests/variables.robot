@@ -1,5 +1,5 @@
 *** Settings ***
-Variables    getvars.py    en_US
+Variables    getvars.py
 
 *** Variables ***
 ${ALERT}                              //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']
@@ -141,6 +141,9 @@ ${EMAIL UNREGISTERED}                 noptixqa+unregistered@gmail.com
 ${EMAIL NOPERM}                       noptixqa+noperm@gmail.com
 ${BASE PASSWORD}                      qweasd123
 ${ALT PASSWORD}                       qweasd1234
+
+${TEST FIRST NAME}                    testFirstName
+${TEST LAST NAME}                     testLastName
 
 #Related to Auto Tests system
 ${AUTO TESTS SYSTEM ID}                     b4939b35-5b98-492b-a092-27fe8efeef38
