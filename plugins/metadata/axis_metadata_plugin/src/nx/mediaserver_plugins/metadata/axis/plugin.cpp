@@ -6,11 +6,13 @@
 
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
+#include <QtCore/QFileInfo>
 #include <QtCore/QFile>
 
 #include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
 #include <plugins/plugin_internal_tools.h>
+#include <nx/kit/debug.h>
 
 #include "manager.h"
 
@@ -25,11 +27,6 @@ const char* const kPluginName = "Axis metadata plugin";
 const QString kAxisVendor("axis");
 const QString kSoapPath("/vapix/services");
 
-// SOAP topics essential for video analytics, other topics will be thrown away.
-const char* const kRuleEngine = "tns1:RuleEngine";
-const char* const kVideoSource = "tns1:VideoSource";
-const char* const kCameraApplicationPlatform = "tnsaxis:CameraApplicationPlatform";
-
 } // namespace
 
 using namespace nx::sdk;
@@ -40,6 +37,16 @@ Plugin::Plugin()
     QFile f(":/axis/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
+    {
+        QFile file("plugins/axis/manifest.json");
+        if (file.open(QFile::ReadOnly))
+        {
+            NX_PRINT << "Switch to external manifest file "
+                << QFileInfo(file).absoluteFilePath().toStdString();
+            m_manifest = file.readAll();
+        }
+    }
+    m_typedManifest = QJson::deserialized<AnalyticsDriverManifest>(m_manifest);
 }
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -126,8 +133,10 @@ AnalyticsDriverManifest Plugin::fetchSupportedEvents(const CameraInfo& cameraInf
         return result;
 
     // Only some rules are useful.
-    axisCameraController.filterSupportedEvents(
-        { kRuleEngine, kVideoSource, kCameraApplicationPlatform});
+    std::vector<std::string> allowedTopics;
+    for (const auto& topic: m_typedManifest.allowedTopics)
+        allowedTopics.push_back(topic.toStdString());
+    axisCameraController.filterSupportedEvents(allowedTopics);
     const auto& src = axisCameraController.suppotedEvents();
     std::transform(src.begin(), src.end(), std::back_inserter(result.outputEventTypes),
         [](const nx::axis::SupportedEvent& event) {return AnalyticsEventType(event); });

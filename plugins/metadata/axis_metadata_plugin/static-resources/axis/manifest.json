@@ -1,10 +1,16 @@
 {
     "driverId": "{190ed57a-b435-a80b-1f7b-9f31c52ad63e}",
-    "driverName": {
+    "driverName": 
+    {
         "value": "Axis driver",
-        "localization": {
-        }
+        "localization": { }
     },
+    "allowedTopics":
+    [
+        "tns1:RuleEngine",
+        "tns1:VideoSource",
+        "tnsaxis:CameraApplicationPlatform"
+    ],
     "outputEventTypes": 
     [
         {
