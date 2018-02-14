@@ -1,6 +1,7 @@
 #if !defined(Q_OS_WIN)
 
 #include "desktop_audio_only_resource_searcher_impl.h"
+#include <QGLWidget>
 #include <QtMultimedia/QAudioDeviceInfo>
 
 #include <nx/utils/unused.h>

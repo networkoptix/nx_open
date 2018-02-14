@@ -400,7 +400,6 @@ int main(int argc, char *argv[])
     Q_UNUSED(staticModule);
 
     QnMobileClientModule mobile_client(startupParams);
-    mobile_client.initDesktopCamera();
     Q_UNUSED(mobile_client);
 
     qnSettings->setStartupParameters(startupParams);

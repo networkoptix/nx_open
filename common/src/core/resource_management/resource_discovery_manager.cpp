@@ -636,7 +636,7 @@ QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(const QnSecurity
         nx::utils::Url(camera->getUrl()), camera->getAuth(), resourceType->getName(), camera->getUniqueId());
     for (const auto& searcher: m_searchersList)
     {
-        if (resourceType && searcher->isResourceTypeSupported(resourceType->getId()))
+        if (searcher->isResourceTypeSupported(resourceType->getId()))
             info.searcher = searcher;
     }
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <nx/utils/singleton.h>
-#include <nx/utils/thread/mutex.h>
 
 struct QnSpectrumData
 {
