@@ -42,6 +42,7 @@ std::string normalizePath(std::string path)
 }
 
 QString normalizePath(const QString& path)
+{
     if (path.indexOf("//") == -1)
         return path;
 
