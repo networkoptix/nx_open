@@ -11,6 +11,7 @@ class ServerUpdates2Manager: public update::CommonUpdates2Manager
 {
 public:
     ServerUpdates2Manager(QnCommonModule* commonModule);
+    ~ServerUpdates2Manager();
 
 private:
     virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() override;

@@ -22,6 +22,7 @@ private:
     AbstractZipExtractorPtr m_extractor;
     QnMutex m_mutex;
     QnWaitCondition m_condition;
+    bool m_running = false;
 
     QString installerWorkDir() const;
 

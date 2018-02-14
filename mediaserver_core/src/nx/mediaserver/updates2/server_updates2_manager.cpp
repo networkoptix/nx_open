@@ -34,6 +34,11 @@ ServerUpdates2Manager::ServerUpdates2Manager(QnCommonModule* commonModule):
 {
 }
 
+ServerUpdates2Manager::~ServerUpdates2Manager()
+{
+    // #TODO #akulikov STOP installer here
+}
+
 qint64 ServerUpdates2Manager::refreshTimeout() const
 {
     const auto settingsValue = qnServerModule->roSettings()->value(
