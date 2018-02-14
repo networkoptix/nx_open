@@ -20,6 +20,7 @@ NX_NETWORK_API quint16 getDefaultPortForScheme(const QString& scheme);
 NX_NETWORK_API SocketAddress getEndpoint(const nx::utils::Url &);
 NX_NETWORK_API std::string normalizePath(std::string);
 NX_NETWORK_API QString normalizePath(const QString&);
+NX_NETWORK_API QString joinPath(const QString& left, const QString& right);
 
 } // namespace url
 } // namespace network

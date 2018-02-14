@@ -734,7 +734,7 @@ DiscoveryMode QnResourceDiscoveryManager::discoveryMode() const
 {
     if (commonModule()->globalSettings()->isAutoDiscoveryEnabled())
         return DiscoveryMode::fullyEnabled;
-    else if (isRedundancyUsing())
+    if (isRedundancyUsing())
         return DiscoveryMode::partiallyEnabled;
     return DiscoveryMode::disabled;
 }

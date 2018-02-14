@@ -79,8 +79,9 @@ int MiscManagerStub::getMiscParam(
             QByteArray value;
             auto it = m_miscParams.find(paramName);
             if (it != m_miscParams.end())
-                value = it->second;
-            handler->done(reqId, ErrorCode::ok, ApiMiscData(paramName, value));
+                handler->done(reqId, ErrorCode::ok, ApiMiscData(paramName, it->second));
+            else
+                handler->done(reqId, ErrorCode::ioError, ApiMiscData());
         });
 
     return reqId;

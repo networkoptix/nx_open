@@ -418,7 +418,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
     if (!isCameraControlRequired || m_mustNotConfigureResource)
         return CameraDiagnostics::NoErrorResult(); // do not update video encoder params
 
-    m_onvifRes->updateVideoEncoder(*encoderParamsToSet, isPrimary, params);
+    auto streamIndex = isPrimary ? Qn::StreamIndex::primary : Qn::StreamIndex::secondary;
+    m_onvifRes->updateVideoEncoder(*encoderParamsToSet, streamIndex, params);
 
     int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
     CameraDiagnostics::Result result = CameraDiagnostics::UnknownErrorResult();

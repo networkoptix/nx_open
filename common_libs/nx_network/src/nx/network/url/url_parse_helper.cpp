@@ -42,8 +42,27 @@ std::string normalizePath(std::string path)
 }
 
 QString normalizePath(const QString& path)
+    if (path.indexOf("//") == -1)
+        return path;
+
+    QString normalizedPath;
+    normalizedPath.reserve(path.size());
+
+    QChar prevCh = ' '; //< Anything but not /.
+    for (const auto& ch: path)
+    {
+        if (ch == L'/' && prevCh == L'/')
+            continue;
+        prevCh = ch;
+        normalizedPath.push_back(ch);
+    }
+
+    return normalizedPath;
+}
+
+QString joinPath(const QString& left, const QString& right)
 {
-    return QString::fromStdString(normalizePath(path.toStdString()));
+    return normalizePath(lm("%1/%2").args(left, right).toQString());
 }
 
 } // namespace url

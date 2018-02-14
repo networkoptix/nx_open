@@ -26,13 +26,16 @@ struct ExportProcessInfo
     ExportProcessError error = ExportProcessError::noError;
 };
 
+/**
+ * ExportProcess class deals with showing process of video exporting
+ */
 class ExportProcess: public Connective<QObject>
 {
     using base_type = Connective<QObject>;
     Q_OBJECT
 
 public:
-    ExportProcess(const QnUuid& id, AbstractExportTool* tool, QObject* parent = nullptr);
+    ExportProcess(const QnUuid& id, std::unique_ptr<AbstractExportTool>&& tool, QObject* parent = nullptr);
     virtual ~ExportProcess() override;
 
     const ExportProcessInfo& info() const;
@@ -48,7 +51,7 @@ signals:
 
 protected:
     ExportProcessInfo m_info;
-    QScopedPointer<AbstractExportTool> const m_tool;
+    std::unique_ptr<AbstractExportTool> m_tool;
 };
 
 /**
@@ -64,8 +67,11 @@ public:
 
     virtual ~ExportManager();
 
-    QnUuid exportMedia(const QnUuid& id, const ExportMediaSettings& settings);
-    QnUuid exportLayout(const QnUuid& id, const ExportLayoutSettings& settings);
+    /**
+     * Start export process using specified tool.
+     * Manager will take care of removing the tool
+     */
+    QnUuid startExport(const QnUuid& id, std::unique_ptr<AbstractExportTool>&& tool);
     void stopExport(const QnUuid& exportProcessId);
 
     ExportProcessInfo info(const QnUuid& exportProcessId) const;

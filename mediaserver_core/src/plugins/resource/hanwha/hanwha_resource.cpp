@@ -779,7 +779,6 @@ nx::mediaserver::resource::StreamCapabilityMap HanwhaResource::getStreamCapabili
 CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
 {
     const auto result = initDevice();
-
     if (!result)
     {
         const auto status = result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised
@@ -798,10 +797,10 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     bool isDefaultPassword = false;
     auto isDefaultPasswordGuard = makeScopeGuard(
         [this, &isDefaultPassword]
-    {
-        setCameraCapability(Qn::isDefaultPasswordCapability, isDefaultPassword);
-        saveParams();
-    });
+        {
+            setCameraCapability(Qn::isDefaultPasswordCapability, isDefaultPassword);
+            saveParams();
+        });
 
     const auto sharedContext = qnServerModule->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
@@ -874,7 +873,7 @@ void HanwhaResource::initMediaStreamCapabilities()
 nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::ConnectionRole role) const
 {
     nx::media::CameraStreamCapability capability;
-    if (m_isNvr)
+    if (!isConnectedViaSunapi())
     {
         capability.maxFps = 1;
         return capability;
@@ -945,15 +944,19 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
         const auto sunapiSupportAttribute = m_attributes.attribute<bool>(
             lit("Media/Protocol.SUNAPI/%1").arg(getChannel()));
 
-        m_isChannelConnectedBySunapi = sunapiSupportAttribute != boost::none
+        m_isChannelConnectedViaSunapi = sunapiSupportAttribute != boost::none
             && sunapiSupportAttribute.get();
 
-        if (m_isChannelConnectedBySunapi)
+        if (m_isChannelConnectedViaSunapi)
         {
             HanwhaRequestHelper helper(sharedContext(), /*bypassChannel*/ getChannel());
             m_bypassDeviceAttributes = helper.fetchAttributes(lit("attributes"));
             m_bypassDeviceCgiParameters = helper.fetchCgiParameters(lit("cgis"));
         }
+    }
+    else
+    {
+        m_isChannelConnectedViaSunapi = true;
     }
 
     if (auto parameters = sharedContext()->cgiParameters())
@@ -966,6 +969,12 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
 
 CameraDiagnostics::Result HanwhaResource::initMedia()
 {
+    if (m_isNvr && !isVideoSourceActive())
+    {
+        return CameraDiagnostics::CameraInvalidParams(
+            lit("Video source is not active"));
+    }
+
     auto videoProfiles = sharedContext()->videoProfiles();
     if (!videoProfiles)
         return videoProfiles.diagnostics;
@@ -973,7 +982,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     bool hasDualStreaming = false;
     const auto channel = getChannel();
 
-    if (!m_isNvr)
+    if (isConnectedViaSunapi())
     {
         HanwhaRequestHelper helper(sharedContext());
         helper.set(
@@ -1004,15 +1013,12 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 
         m_maxProfileCount = *maxProfileCount;
         hasDualStreaming = m_maxProfileCount - fixedProfileCount > 1;
-        auto result = fetchStreamLimits(&m_streamLimits);
 
-        if (!result)
-            return result;
+        auto codecInfo = sharedContext()->videoCodecInfo();
+        if (!codecInfo)
+            return codecInfo.diagnostics;
 
-        result = fetchCodecInfo(&m_codecInfo);
-
-        if (!result)
-            return result;
+        m_codecInfo = codecInfo.value;
 
         auto primaryStreamLimits = m_codecInfo.limits(
             getChannel(),
@@ -1026,14 +1032,19 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
                 lit("Can not fetch primary stream limits."));
         }
 
-        result = createNxProfiles();
+        auto result = createNxProfiles();
         if (!result)
             return result;
-    }
-    else if (!isVideoSourceActive())
-    {
-        return CameraDiagnostics::CameraInvalidParams(
-            lit("Video source is not active"));
+
+        if (isNvr())
+        {
+            result = setUpProfilePolicies(
+                profileByRole(Qn::ConnectionRole::CR_LiveVideo),
+                profileByRole(Qn::ConnectionRole::CR_SecondaryLiveVideo));
+
+            if (!result)
+                return result;
+        }
     }
 
     const bool hasAudio = m_attributes.attribute<int>(
@@ -1161,7 +1172,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         m_attributes,
         getChannel());
 
-    if (isNvr() && m_isChannelConnectedBySunapi)
+    if (isNvr() && m_isChannelConnectedViaSunapi)
     {
         // We consider capability is true if it's supported both by a NVR and a camera.
         m_ptzCapabilities &= calculateSupportedPtzCapabilities(
@@ -1416,6 +1427,30 @@ int HanwhaResource::chooseProfileToRemove(
     return profile;
 }
 
+CameraDiagnostics::Result HanwhaResource::setUpProfilePolicies(
+    int primaryProfile,
+    int secondaryProfile)
+{
+    HanwhaRequestHelper helper(sharedContext());
+    const auto response = helper.set(
+        lit("media/videoprofilepolicy"),
+        {
+            {kHanwhaChannelProperty, QString::number(getChannel())},
+            {lit("LiveProfile"), QString::number(primaryProfile)},
+            {lit("RecordProfile"), QString::number(primaryProfile)},
+            {lit("NetworkProfile"), QString::number(secondaryProfile)}
+        });
+
+    if (!response.isSuccessful())
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            response.requestUrl(),
+            lit("can't set up profile dependencies"));
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
 CameraDiagnostics::Result HanwhaResource::findProfiles(
     int* outPrimaryProfileNumber,
     int* outSecondaryProfileNumber,
@@ -1539,72 +1574,6 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
     }
 
     return CameraDiagnostics::NoErrorResult();
-}
-
-CameraDiagnostics::Result HanwhaResource::fetchStreamLimits(HanwhaStreamLimits* outStreamLimits)
-{
-    NX_ASSERT(outStreamLimits);
-    if (!outStreamLimits)
-    {
-        return CameraDiagnostics::CameraPluginErrorResult(
-            lit("Fetch stream limits: no output limits provided"));
-    }
-
-    for (const auto& limitParameter: kHanwhaStreamLimitParameters)
-    {
-        const auto parameter = m_cgiParameters.parameter(
-            lit("media/videoprofile/add_update/%1").arg(limitParameter));
-
-        if (!parameter.is_initialized())
-            continue;
-
-        outStreamLimits->setLimit(*parameter);
-    }
-
-    if (!outStreamLimits->isValid())
-        return CameraDiagnostics::CameraInvalidParams(lit("Can not fetch stream limits"));
-
-    sortResolutions(&outStreamLimits->resolutions);
-
-    return CameraDiagnostics::NoErrorResult();
-}
-
-CameraDiagnostics::Result HanwhaResource::fetchCodecInfo(HanwhaCodecInfo* outCodecInfo)
-{
-    HanwhaRequestHelper helper(sharedContext());
-    auto response = helper.view(
-        lit("media/videocodecinfo"),
-        HanwhaRequestHelper::Parameters(),
-        kHanwhaChannelProperty);
-
-    if (!response.isSuccessful())
-    {
-        return error(
-            response,
-            CameraDiagnostics::RequestFailedResult(
-                response.requestUrl(),
-                lit("Request failed")));
-    }
-
-    *outCodecInfo = HanwhaCodecInfo(response);
-    if (!outCodecInfo->isValid())
-    {
-        return CameraDiagnostics::CameraInvalidParams(
-            lit("Video codec info is invalid"));
-    }
-
-    return CameraDiagnostics::NoErrorResult();
-}
-
-void HanwhaResource::sortResolutions(std::vector<QSize>* resolutions) const
-{
-    std::sort(
-        resolutions->begin(),
-        resolutions->end(),
-        [](const QSize& f, const QSize& s)
-        {
-            return f.width() * f.height() > s.width() * s.height();
-        });
 }
 
 CameraDiagnostics::Result HanwhaResource::fetchPtzLimits(QnPtzLimits* outPtzLimits)
@@ -1781,7 +1750,7 @@ int HanwhaResource::profileByRole(Qn::ConnectionRole role) const
 
 AVCodecID HanwhaResource::defaultCodecForStream(Qn::ConnectionRole role) const
 {
-    const auto& codecs = m_streamLimits.codecs;
+    const auto& codecs = m_codecInfo.codecs(getChannel());
 
     if (codecs.find(AVCodecID::AV_CODEC_ID_H264) != codecs.cend())
         return AVCodecID::AV_CODEC_ID_H264;
@@ -1795,7 +1764,11 @@ AVCodecID HanwhaResource::defaultCodecForStream(Qn::ConnectionRole role) const
 
 QSize HanwhaResource::defaultResolutionForStream(Qn::ConnectionRole role) const
 {
-    const auto& resolutions = m_streamLimits.resolutions;
+    const auto& resolutions = m_codecInfo.resolutions(
+        getChannel(),
+        defaultCodecForStream(role),
+        lit("General"));
+
     if (resolutions.empty())
         return QSize();
 
@@ -1803,7 +1776,6 @@ QSize HanwhaResource::defaultResolutionForStream(Qn::ConnectionRole role) const
         return resolutions[0];
 
     return bestSecondaryResolution(resolutions[0], resolutions);
-    //< TODO: #dmishin consider taking this method from Onvif resource
 }
 
 int HanwhaResource::defaultGovLengthForStream(Qn::ConnectionRole role) const
@@ -1929,13 +1901,8 @@ QString HanwhaResource::suggestCodecProfile(
     Qn::ConnectionRole role,
     const QString& desiredProfile) const
 {
-    const QStringList* profiles = nullptr;
-    if (codec == AV_CODEC_ID_H264)
-        profiles = &m_streamLimits.h264Profiles;
-    else if (codec == AV_CODEC_ID_HEVC)
-        profiles = &m_streamLimits.hevcProfiles;
-
-    if (profiles && profiles->contains(desiredProfile))
+    const auto& profiles = m_codecInfo.codecProfiles(codec);
+    if (profiles.contains(desiredProfile))
         return desiredProfile;
 
     return defaultCodecProfileForStream(role);
@@ -2798,6 +2765,11 @@ bool HanwhaResource::setCameraCredentialsSync(const QAuthenticator& auth, QStrin
     }
 
     return true;
+}
+
+bool HanwhaResource::isConnectedViaSunapi() const
+{
+    return m_isChannelConnectedViaSunapi;
 }
 
 } // namespace plugins

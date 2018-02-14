@@ -140,7 +140,7 @@ function(nx_get_dependencies)
         nx_rdep_add_package(cifs-utils)
     endif()
 
-    if(box STREQUAL "tx1")
+    if(box MATCHES "tx1|rpi")
         nx_rdep_add_package(sysroot)
         nx_rdep_add_package(tegra_video)
         nx_rdep_add_package(jetpack)

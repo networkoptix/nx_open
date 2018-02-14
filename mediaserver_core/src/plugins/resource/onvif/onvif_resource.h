@@ -336,13 +336,14 @@ protected:
     void setPrimaryVideoCapabilities(const VideoOptionsLocal& capabilities) { m_primaryStreamCapabilities = capabilities; }
     void setSecondaryVideoCapabilities(const VideoOptionsLocal& capabilities) { m_secondaryStreamCapabilities = capabilities; }
     boost::optional<onvifXsd__H264Profile> getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
+
+    virtual void updateVideoEncoder(
+        VideoEncoder& encoder,
+        Qn::StreamIndex streamIndex,
+        const QnLiveStreamParams& streamParams);
 private:
     friend class QnOnvifStreamReader;
 
-    void updateVideoEncoder(
-        VideoEncoder& encoder,
-        bool isPrimary,
-        const QnLiveStreamParams& streamParams);
     CameraDiagnostics::Result fetchAndSetResourceOptions();
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);

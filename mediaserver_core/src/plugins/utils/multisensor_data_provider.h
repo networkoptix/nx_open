@@ -14,9 +14,7 @@ namespace utils {
 class MultisensorDataProvider : public CLServerPushStreamReader
 {
 public:
-    using DataProviderFactory = std::function<QnOnvifStreamReader* (const QnResourcePtr&)>;
-
-    MultisensorDataProvider(const QnResourcePtr& res, DataProviderFactory factory);
+    MultisensorDataProvider(const QnResourcePtr& res);
     virtual ~MultisensorDataProvider();
 
 protected:
@@ -36,7 +34,6 @@ protected:
 private:
     QnPlOnvifResourcePtr m_onvifRes;
     QnStreamMixer m_dataSource;
-    DataProviderFactory m_factory;
 private:
     void initSubChannels();
 
