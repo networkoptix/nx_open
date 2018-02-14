@@ -49,7 +49,7 @@ password change is not possible if old password is wrong
     Input Text    ${CURRENT PASSWORD INPUT}    tjyjrsxhrsthr6
     Input Text    ${NEW PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${CHANGE PASSWORD BUTTON}
-    Check For Alert    ${CANNOT SAVE PASSWORD INCORRECT}
+    Check For Alert    ${CANNOT SAVE PASSWORD} ${PASSWORD INCORRECT}
     Close Browser
 
 more than 255 symbols can be entered in new password field and then are cut to 255

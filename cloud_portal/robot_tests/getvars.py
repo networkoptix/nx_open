@@ -3,7 +3,7 @@ import json
 import re
 
 def get_variables(lang):
-    with codecs.open("customizations/variables_cloud.json", 'r') as customization_variables:
+    with codecs.open("customizations/variables_customization.json", 'r') as customization_variables:
         customization_json = json.load(customization_variables)
         
         with codecs.open("translations/variables_"+lang+".json", 'r') as translation_variables:

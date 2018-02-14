@@ -65,7 +65,7 @@ after log In, display user's email and menu in top right corner
 
 valid but unregistered email shows error message
     Open Browser and go to URL    ${url}
-    Log In    ${UNREGISTERED EMAIL}    ${password}
+    Log In    ${EMAIL UNREGISTERED}    ${password}
     Wait Until Element Is Visible    ${ALERT}
     Close Browser
 

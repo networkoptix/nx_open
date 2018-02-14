@@ -96,7 +96,8 @@ Remove User Permissions
     Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
     Wait Until Element Is Visible    ${DELETE USER BUTTON}
     Click Button    ${DELETE USER BUTTON}
-    Check For Alert    ${PERMISSIONS WERE REMOVED FROM} ${user email}
+    ${PERMISSIONS WERE REMOVED FROM EMAIL}    Replace String    ${PERMISSIONS WERE REMOVED FROM}    {{email}}    ${user email}
+    Check For Alert    ${PERMISSIONS WERE REMOVED FROM EMAIL}
 
 Check For Alert
     [arguments]    ${alert text}

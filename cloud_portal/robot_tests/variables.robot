@@ -137,7 +137,7 @@ ${EMAIL LIVE VIEWER}                  noptixqa+liveviewer@gmail.com
 ${EMAIL OWNER}                        noptixqa+owner@gmail.com
 ${EMAIL NOT OWNER}                    noptixqa+notowner@gmail.com
 ${EMAIL ADMIN}                        noptixqa+admin@gmail.com
-${UNREGISTERED EMAIL}                 noptixqa+unregistered@gmail.com
+${EMAIL UNREGISTERED}                 noptixqa+unregistered@gmail.com
 ${EMAIL NOPERM}                       noptixqa+noperm@gmail.com
 ${BASE PASSWORD}                      qweasd123
 ${ALT PASSWORD}                       qweasd1234
