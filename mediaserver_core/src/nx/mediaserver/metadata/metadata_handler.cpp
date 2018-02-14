@@ -21,6 +21,23 @@ namespace metadata {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
+MetadataHandler::MetadataHandler()
+{
+    connect(this, &MetadataHandler::sdkEventTriggered,
+        qnEventRuleConnector, &event::EventConnector::at_analyticsSdkEvent,
+        Qt::QueuedConnection);
+}
+
+nx::api::Analytics::EventType MetadataHandler::eventDescriptor(const QnUuid& eventId) const
+{
+    for (const auto& descriptor: m_manifest.outputEventTypes)
+    {
+        if (descriptor.eventTypeId == eventId)
+            return descriptor;
+    }
+    return nx::api::Analytics::EventType();
+}
+
 void MetadataHandler::handleMetadata(
     Error error,
     MetadataPacket* metadata)
@@ -103,28 +120,33 @@ void MetadataHandler::handleMetadataEvent(
     nxpt::ScopedRef<Event> eventData,
     qint64 timestampUsec)
 {
-    const auto eventState = eventData->isActive()
-        ? nx::vms::event::EventState::active
-        : nx::vms::event::EventState::inactive;
+auto eventState = nx::vms::event::EventState::undefined;
 
-    const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->typeId());
+        const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->eventTypeId());
+        NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
 
-    NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
+        auto descriptor = eventDescriptor(eventTypeId);
+        if (descriptor.flags.testFlag(nx::api::Analytics::EventTypeFlag::stateDependent))
+        {
+            eventState = eventData->isActive()
+                ? nx::vms::event::EventState::active
+                : nx::vms::event::EventState::inactive;
 
-    const bool duplicate = eventState == nx::vms::event::EventState::inactive
-        && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;
+            const bool isDublicate = eventState == nx::vms::event::EventState::inactive
+                && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;
 
-    if (duplicate)
-    {
-        NX_VERBOSE(this) << __func__ << lm("(): Ignoring duplicate event");
-        return;
-    }
+            if (isDublicate)
+            {
+                NX_VERBOSE(this) << __func__ << lm("(): Ignoring duplicate event");
+                return;
+            }
+        }
 
     setLastEventState(eventTypeId, eventState);
 
     auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
         m_resource,
-        m_pluginId,
+        m_manifest.driverId,
         eventTypeId,
         eventState,
         eventData->caption(),
@@ -146,9 +168,9 @@ void MetadataHandler::setResource(const QnSecurityCamResourcePtr& resource)
     m_resource = resource;
 }
 
-void MetadataHandler::setPluginId(const QnUuid& pluginId)
+void MetadataHandler::setManifest(const nx::api::AnalyticsDriverManifest& manifest)
 {
-    m_pluginId = pluginId;
+    m_manifest = manifest;
 }
 
 void MetadataHandler::registerDataReceptor(QnAbstractDataReceptor* dataReceptor)

@@ -63,10 +63,10 @@ int main(int /*argc*/, const char** argv)
             return nx::root_tool::changeOwner(getArg(argv, "<file_or_directory_path> is required"));
 
         if (command == "touch")
-            return nx::root_tool::changeOwner(getArg(argv, "<file_path> is required"));
+            return nx::root_tool::touchFile(getArg(argv, "<file_path> is required"));
 
         if (command == "mkdir")
-            return nx::root_tool::changeOwner(getArg(argv, "<directory_path> is required"));
+            return nx::root_tool::makeDirectory(getArg(argv, "<directory_path> is required"));
 
         if (command == "install")
             return nx::root_tool::install(getArg(argv, "<deb_package> is required"));

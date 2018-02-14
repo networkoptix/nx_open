@@ -2,40 +2,39 @@
 
 #include <QtWidgets/QAction>
 
-#include <nx/client/desktop/ui/actions/actions.h>
-#include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/ui/messages/resources_messages.h>
-#include <nx/client/desktop/utils/upload_manager.h>
-#include <nx/client/desktop/utils/wearable_manager.h>
-#include <api/model/wearable_camera_reply.h>
+#include <nx/utils/string.h>
+#include <utils/common/guarded_callback.h>
 #include <common/common_module.h>
+
+#include <api/server_rest_connection.h>
+#include <api/model/wearable_camera_reply.h>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
+
 #include <ui/dialogs/new_wearable_camera_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/common/read_only.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
-#include <core/resource/avi/avi_archive_delegate.h>
-#include <core/resource/avi/avi_resource.h>
-#include <api/server_rest_connection.h>
 
 #include <client/client_module.h>
+#include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/messages/resources_messages.h>
+#include <nx/client/desktop/utils/wearable_manager.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
+using namespace nx::utils;
 
 namespace {
-/**
- * Using TTL of 10 mins for uploads. This shall be enough even for the most extreme cases.
- * Also note that undershooting is not a problem here as a file that's currently open won't be
- * deleted.
- */
-const qint64 kDefaultUploadTtl = 1000 * 60 * 10;
-
-} // namespace
+const int kMaxLinesInExtendedErrorMessage = 10;
+const QStringList kVideoExtensions = {
+    lit("*.avi"), lit("*.mkv"), lit("*.mp4"), lit("*.mov"), lit("*.ts"), lit("*.m2ts"),
+    lit("*.mpeg"), lit("*.mpg"), lit("*.flv"), lit("*.wmv"), lit("*.3gp")};
+}
 
 class QnWearableSessionDelegate:
     public QObject,
@@ -86,6 +85,8 @@ QnWorkbenchWearableHandler::QnWorkbenchWearableHandler(QObject* parent):
         &QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered);
     connect(action(UploadWearableCameraFileAction), &QAction::triggered, this,
         &QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered);
+    connect(action(UploadWearableCameraFolderAction), &QAction::triggered, this,
+        &QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered);
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnWorkbenchWearableHandler::at_resourcePool_resourceAdded);
     connect(context(), &QnWorkbenchContext::userChanged, this,
@@ -94,25 +95,6 @@ QnWorkbenchWearableHandler::QnWorkbenchWearableHandler(QObject* parent):
 
 QnWorkbenchWearableHandler::~QnWorkbenchWearableHandler()
 {
-}
-
-qreal QnWorkbenchWearableHandler::calculateProgress(const UploadState& upload, bool processed)
-{
-    if (processed)
-        return 1.0;
-
-    switch (upload.status)
-    {
-        case UploadState::CreatingUpload:
-            return 0.1;
-        case UploadState::Uploading:
-            return 0.1 + 0.8 * upload.uploaded / upload.size;
-        case UploadState::Checking:
-        case UploadState::Done:
-            return 0.9;
-        default:
-            return 0.0;
-    }
 }
 
 void QnWorkbenchWearableHandler::maybeOpenCurrentSettings()
@@ -142,13 +124,9 @@ void QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered()
     QString name = dialog->name();
     QnMediaServerResourcePtr server = dialog->server();
 
-    QPointer<QObject> guard(this);
-    auto callback =
-        [this, guard, server](bool success, rest::Handle, const QnJsonRestResult& reply)
+    auto callback = guarded(this,
+        [this, server](bool success, rest::Handle, const QnJsonRestResult& reply)
         {
-            if (!guard)
-                return;
-
             if (!success)
             {
                 QnMessageBox::critical(
@@ -160,7 +138,7 @@ void QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered()
 
             m_currentCameraUuid = reply.deserialized<QnWearableCameraReply>().id;
             maybeOpenCurrentSettings();
-        };
+        });
 
     server->restConnection()->addWearableCamera(name, callback, thread());
 }
@@ -168,30 +146,207 @@ void QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered()
 void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    auto camera = parameters.resource().dynamicCast<QnSecurityCamResource>();
+    QnSecurityCamResourcePtr camera = parameters.resource().dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return;
     QnMediaServerResourcePtr server = camera->getParentServer();
 
-    QString fileName = QnFileDialog::getOpenFileName(
+    QStringList filters;
+    filters << tr("Video (%1)").arg(kVideoExtensions.join(L' '));
+    filters << tr("All files (*.*)");
+
+    QStringList paths = QnFileDialog::getOpenFileNames(
         mainWindowWidget(),
-        tr("Open Wearable Camera Recording..."),
+        tr("Open Wearable Camera Recordings..."),
         QString(),
-        tr("All files (*.*)"),
+        filters.join(lit(";;")),
         /*selectedFilter*/ nullptr,
         QnCustomFileDialog::fileDialogOptions()
     );
+    if (paths.isEmpty())
+        return;
 
     // TODO: #wearable requested by rvasilenko as copypaste from totalcmd doesn't work without
     // this line. Maybe move directly to QnFileDialog?
-    fileName = fileName.trimmed();
+    for(QString& path: paths)
+        path = path.trimmed();
 
-    if (fileName.isEmpty())
+    qnClientModule->wearableManager()->prepareUploads(camera, paths, this,
+        [this, camera](const WearableUpload& upload)
+        {
+            if(checkFileUpload(upload))
+                uploadValidFiles(camera, upload.elements);
+        });
+}
+
+void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    QnSecurityCamResourcePtr camera = parameters.resource().dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return;
+    QnMediaServerResourcePtr server = camera->getParentServer();
+
+    QString path = QnFileDialog::getExistingDirectory(mainWindow(),
+        tr("Open Wearable Camera Recordings..."),
+        QString(),
+        QnCustomFileDialog::directoryDialogOptions()
+    );
+    if (path.isEmpty())
         return;
 
-    WearableError error;
-    if (!qnClientModule->wearableManager()->addUpload(camera, fileName, &error))
-        QnMessageBox::critical(mainWindowWidget(), error.message, error.extraMessage);
+    QStringList files = QDir(path).entryList(kVideoExtensions);
+    if (files.empty())
+    {
+        QnMessageBox::critical(mainWindow(),
+            tr("No video files found in \"%1\"").arg(path));
+        return;
+    }
+
+    for (QString& file : files)
+        file = path + QDir::separator() + file;
+
+    qnClientModule->wearableManager()->prepareUploads(camera, files, this,
+        [this, path, camera](const WearableUpload& upload)
+        {
+            if (checkFolderUpload(path, upload))
+                uploadValidFiles(camera, upload.elements);
+        });
+}
+
+bool QnWorkbenchWearableHandler::checkFileUpload(const WearableUpload& upload)
+{
+    int count = upload.elements.size();
+
+    if (upload.allHaveStatus(WearablePayload::UnsupportedFormat))
+    {
+        QnMessageBox::critical(mainWindow(),
+            tr("Selected file format(s) are not supported", 0, count),
+            tr("Only video files are supported."));
+        return false;
+    }
+
+    if (upload.allHaveStatus(WearablePayload::NoTimestamp))
+    {
+        QnMessageBox::critical(mainWindow(),
+            tr("Selected file(s) do not have timestamp(s)", 0, count),
+            tr("Only video files with correct timestamp are supported."));
+        return false;
+    }
+
+    if (upload.allHaveStatus(WearablePayload::ChunksTakenByFileInQueue))
+    {
+        QnMessageBox::critical(mainWindow(),
+            tr("Selected file(s) cover periods for which videos are already being uploaded", 0, count),
+            tr("You can upload these file(s) to a different instance of a Wearable Camera.", 0, count));
+        return false;
+    }
+
+    if (upload.allHaveStatus(WearablePayload::ChunksTakenOnServer))
+    {
+        QnMessageBox::critical(mainWindow(),
+            tr("Selected file(s) cover periods for which videos have already been uploaded", 0, count),
+            tr("You can upload these file(s) to a different instance of a Wearable Camera.", 0, count));
+        return false;
+    }
+
+    if (upload.allHaveStatus(WearablePayload::NoSpaceOnServer))
+    {
+        showNoSpaceOnServerWarning(upload);
+        return false;
+    }
+
+    if (upload.allHaveStatus(WearablePayload::ServerError))
+        return false; //< Ignore it as the user is likely already seeing "reconnecting to server" dialog.
+
+    if (!upload.allHaveStatus(WearablePayload::Valid))
+    {
+        QString extendedMessage;
+        int lines = 0;
+        for (const WearablePayload& payload : upload.elements)
+        {
+            QString line = calculateExtendedErrorMessage(payload);
+            if (!line.isEmpty())
+            {
+                extendedMessage += line + lit("\n");
+                lines++;
+            }
+
+            if (lines == kMaxLinesInExtendedErrorMessage)
+                break;
+        }
+
+        if (!upload.someHaveStatus(WearablePayload::Valid))
+        {
+            QnMessageBox::critical(mainWindow(),
+                tr("Selected file(s) will not be uploaded", 0, count),
+                extendedMessage);
+            return false;
+        }
+        else
+        {
+            QDialogButtonBox::StandardButton button = QnMessageBox::critical(mainWindow(),
+                tr("Some file(s) will not be uploaded", 0, count),
+                extendedMessage,
+                QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+            if (button == QDialogButtonBox::Cancel)
+                return false;
+        }
+    }
+
+    return true;
+}
+
+bool QnWorkbenchWearableHandler::checkFolderUpload(const QString& path, const WearableUpload& upload)
+{
+    if (upload.someHaveStatus(WearablePayload::NoSpaceOnServer))
+    {
+        showNoSpaceOnServerWarning(upload);
+        return false;
+    }
+
+    if (!upload.someHaveStatus(WearablePayload::Valid))
+    {
+        QnMessageBox::critical(mainWindow(),
+            tr("There is no new files to upload in \"%1\"").arg(path));
+        return false;
+    }
+
+    return true;
+}
+
+void QnWorkbenchWearableHandler::showNoSpaceOnServerWarning(const WearableUpload& upload)
+{
+    QnMessageBox::critical(mainWindow(),
+        tr("Not enough space on server storage"),
+        tr("File(s) size - %1\nFree space - %2", 0, upload.elements.size())
+            .arg(formatFileSize(upload.spaceRequested))
+            .arg(formatFileSize(upload.spaceAvailable)));
+}
+
+void QnWorkbenchWearableHandler::uploadValidFiles(
+    const QnSecurityCamResourcePtr& camera,
+    const WearablePayloadList& payloads)
+{
+    WearablePayloadList validPayloads;
+    for (const WearablePayload& payload : payloads)
+        if (payload.status == WearablePayload::Valid)
+            validPayloads.push_back(payload);
+
+    if (!qnClientModule->wearableManager()->addUpload(camera, validPayloads))
+    {
+        WearableState state = qnClientModule->wearableManager()->state(camera);
+        NX_ASSERT(state.status == WearableState::LockedByOtherClient);
+
+        QString message;
+        QnResourcePtr resource = resourcePool()->getResourceById(state.lockUserId);
+        if (resource)
+            message = tr("Could not start upload as user \"%1\" is currently uploading footage to this camera.").arg(resource->getName());
+        else
+            message = tr("Could not start upload as another user is currently uploading footage to this camera.");
+
+        QnMessageBox::critical(mainWindow(), message);
+    }
 }
 
 void QnWorkbenchWearableHandler::at_resourcePool_resourceAdded(const QnResourcePtr &resource)
@@ -203,4 +358,25 @@ void QnWorkbenchWearableHandler::at_resourcePool_resourceAdded(const QnResourceP
 void QnWorkbenchWearableHandler::at_context_userChanged()
 {
     qnClientModule->wearableManager()->setCurrentUser(context()->user());
+}
+
+QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const WearablePayload& upload)
+{
+    QString fileName = QFileInfo(upload.path).fileName();
+
+    switch (upload.status)
+    {
+    case WearablePayload::UnsupportedFormat:
+        return tr("File format of \"%1\" is not supported.").arg(fileName);
+    case WearablePayload::NoTimestamp:
+        return tr("File \"%1\" does not have timestamp.").arg(fileName);
+    case WearablePayload::ChunksTakenByFileInQueue:
+        return tr("File \"%1\" cover periods for which video is already being uploaded.").arg(fileName);
+    case WearablePayload::ChunksTakenOnServer:
+        return tr("File \"%1\" cover periods for which video has already been uploaded.").arg(fileName);
+    case WearablePayload::NoSpaceOnServer:
+        return tr("There is no space on server for file \"%1\".").arg(fileName);
+    default:
+        return QString();
+    }
 }

@@ -569,7 +569,7 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n 카메라 (들)</numerusform>
+        <numerusform>%n 카메라(들)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1152,7 +1152,7 @@
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>장치 연결끊김</numerusform>
+        <numerusform>장치 연결이 끊어졌습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">

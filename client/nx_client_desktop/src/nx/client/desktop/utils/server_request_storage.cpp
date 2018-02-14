@@ -25,7 +25,7 @@ void ServerRequestStorage::storeHandle(rest::Handle handle)
 
 void ServerRequestStorage::releaseHandle(rest::Handle handle)
 {
-    NX_ASSERT(m_handles.contains(handle));
+    // Note that the handle might not be there, and it's perfectly OK.
     m_handles.remove(handle);
 }
 

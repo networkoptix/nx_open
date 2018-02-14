@@ -91,6 +91,7 @@ public:
         const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo ) override;
 
+    virtual bool isEnabled() const override;
 protected:
     /*!
         \param discoveryAddr Local interface address, device has been discovered on
@@ -104,7 +105,6 @@ protected:
         const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         QnResourceList& result ) = 0;
-
 private:
     QnResourceList m_resList;
 };

@@ -27,6 +27,7 @@
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/event/actions/send_mail_action.h>
 #include <nx/vms/event/actions/camera_output_action.h>
+#include <nx/network/socket_global.h>
 
 namespace {
 
@@ -205,7 +206,7 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
 
     prepareAdditionActionParams(action);
 
-    auto resources = resourcePool()->getResources<QnNetworkResource>(action->getResources());
+    auto resources = resourcePool()->getResourcesByIds<QnNetworkResource>(action->getResources());
 
     switch (action->actionType())
     {
@@ -213,7 +214,7 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
         case vms::event::showOnAlarmLayoutAction:
         {
             if (action->getParams().useSource)
-                resources << resourcePool()->getResources<QnNetworkResource>(action->getSourceResources());
+                resources << resourcePool()->getResourcesByIds<QnNetworkResource>(action->getSourceResources());
             break;
         }
 
@@ -392,11 +393,13 @@ void RuleProcessor::addRule(const vms::event::RulePtr& value)
 
 void RuleProcessor::processEvent(const vms::event::AbstractEventPtr& event)
 {
-    QnMutexLocker lock(&m_mutex);
+    // TODO: Introduce a thread pool so actions could do not block a single event queue.
+    NX_CRITICAL(!nx::network::SocketGlobals::aioService().isInAnyAioThread(),
+        "Processing event from an AIO thread will sooner or later lead to a deadlock!");
 
+    QnMutexLocker lock(&m_mutex);
     // Get pairs of {rule, action} for event
     const auto actions = matchActions(event);
-
     for (const auto& action: actions)
         executeAction(action);
 }
@@ -440,6 +443,7 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
         // If toggle event goes to 'off', stop action.
         if (!condOK || event->getToggleState() == vms::event::EventState::inactive)
             action = vms::event::ActionFactory::instantiateAction(
+                commonModule(),
                 rule,
                 event,
                 commonModule()->moduleGUID(),
@@ -450,6 +454,7 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
     else if (condOK)
     {
         action = vms::event::ActionFactory::instantiateAction(
+            commonModule(),
             rule,
             event,
             commonModule()->moduleGUID());
@@ -499,7 +504,11 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
 
 
     if (rule->aggregationPeriod() == 0 || !vms::event::allowsAggregation(rule->actionType()))
-        return vms::event::ActionFactory::instantiateAction(rule, event, commonModule()->moduleGUID());
+    {
+        return vms::event::ActionFactory::instantiateAction(
+            commonModule(),
+            rule, event, commonModule()->moduleGUID());
+    }
 
     QString eventKey = rule->getUniqueId();
     if (event->getResource() && event->getEventType() != vms::event::softwareTriggerEvent)
@@ -514,6 +523,7 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
     if (aggInfo.isExpired())
     {
         vms::event::AbstractActionPtr result = vms::event::ActionFactory::instantiateAction(
+            commonModule(),
             aggInfo.rule(),
             aggInfo.event(),
             commonModule()->moduleGUID(),
@@ -548,6 +558,7 @@ void RuleProcessor::at_timer()
         if (aggInfo.totalCount() > 0 && aggInfo.isExpired())
         {
             executeAction(vms::event::ActionFactory::instantiateAction(
+                commonModule(),
                 aggInfo.rule(),
                 aggInfo.event(),
                 commonModule()->moduleGUID(),
@@ -574,7 +585,7 @@ bool RuleProcessor::checkEventCondition(const vms::event::AbstractEventPtr& even
     if (!event->checkEventParams(rule->eventParams()))
         return false;
 
-    if (!vms::event::hasToggleState(event->getEventType()))
+    if (!vms::event::hasToggleState(event->getEventType(), rule->eventParams(), commonModule()))
         return true;
 
     return true;
@@ -706,7 +717,7 @@ void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, boo
 
         if (rule->eventType() == vms::event::cameraInputEvent)
         {
-            auto resList = resourcePool()->getResources<QnVirtualCameraResource>(rule->eventResources());
+            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(rule->eventResources());
             if (resList.isEmpty() ||            //< Listening to all cameras.
                 resList.contains(camResource))
             {
@@ -737,6 +748,7 @@ void RuleProcessor::terminateRunningRule(const vms::event::RulePtr& rule)
             if (event)
             {
                 vms::event::AbstractActionPtr action = vms::event::ActionFactory::instantiateAction(
+                    commonModule(),
                     rule,
                     event,
                     commonModule()->moduleGUID(),
@@ -782,7 +794,7 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     {
         if (businessRule->eventType() == vms::event::cameraInputEvent)
         {
-            auto resList = resourcePool()->getResources<QnVirtualCameraResource>(
+            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                 businessRule->eventResources());
             if (resList.isEmpty())
                 resList = resourcePool()->getAllCameras(QnResourcePtr(), true);
@@ -801,7 +813,7 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     {
         if (businessRule->actionType() == vms::event::cameraRecordingAction)
         {
-            auto resList = resourcePool()->getResources<QnVirtualCameraResource>(
+            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                 businessRule->actionResources());
             for (const auto& camera: resList)
             {

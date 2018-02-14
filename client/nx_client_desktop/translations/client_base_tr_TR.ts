@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="tr" sourcelanguage="en">
   <context>
+    <name>AsyncImageWidget</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>VERİ YOK</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -868,6 +875,22 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>Hücre aralığı...</translation>
     </message>
+    <message>
+      <source>Wearable Camera...</source>
+      <translation type="unfinished">Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation type="unfinished">Upload File...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation type="unfinished">Upload Folder...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -994,15 +1017,15 @@ to view more bookmarks</source>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation>Audio Video Interleave</translation>
+      <translation type="unfinished">Audio Video Interleave</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation>Matroska</translation>
+      <translation type="unfinished">Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation>MPEG-4 Part 14</translation>
+      <translation type="unfinished">MPEG-4 Part 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
@@ -1101,8 +1124,7 @@ to view more bookmarks</source>
       <source>Filename should not contain the following reserved characters:
 %1</source>
       <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+        <numerusform>Dosya adı ayrılmış şu karakterler içermemelidir: %1</numerusform>
         <numerusform>Filename should not contain the following reserved characters:
 %1</numerusform>
       </translation>
@@ -1348,7 +1370,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>...and %n more</source>
       <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
+        <numerusform>..ve %n fazlası</numerusform>
         <numerusform>...and %n more</numerusform>
       </translation>
     </message>
@@ -1380,6 +1402,17 @@ to view more bookmarks</source>
     <message>
       <source>Folder not found</source>
       <translation>Dosya bulunamadı</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnArchiveLengthWidget</name>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices.</source>
+      <translation>Yüksek değerler diğer cihazların arşiv boyutunu düşürebilir.</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras.</source>
+      <translation>Yüksek değerler diğer kameraların arşiv boyutunu düşürebilir.</translation>
     </message>
   </context>
   <context>
@@ -1466,35 +1499,35 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>These devices are removed from System</source>
       <translation type="unfinished">
-        <numerusform>These devices are removed from System</numerusform>
+        <numerusform>Cihazlar sistemden kaldırıldı</numerusform>
         <numerusform>These devices are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
       <translation type="unfinished">
-        <numerusform>These cameras are removed from System</numerusform>
+        <numerusform>Kameralar sistemden kaldırıldı</numerusform>
         <numerusform>These cameras are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
       <translation type="unfinished">
-        <numerusform>These servers are removed from System</numerusform>
+        <numerusform>Sunucular sistemden kaldırıldı</numerusform>
         <numerusform>These servers are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
       <translation type="unfinished">
-        <numerusform>These users are removed from System</numerusform>
+        <numerusform>Kullanıcılar sistemden kaldırıldı</numerusform>
         <numerusform>These users are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
       <translation type="unfinished">
-        <numerusform>These resources are removed from System</numerusform>
+        <numerusform>Kaynaklar sistemden kaldırıldı</numerusform>
         <numerusform>These resources are removed from System</numerusform>
       </translation>
     </message>
@@ -1576,7 +1609,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation type="unfinished">
-        <numerusform>%n action(s)</numerusform>
+        <numerusform>%n hareketler</numerusform>
         <numerusform>%n action(s)</numerusform>
       </translation>
     </message>
@@ -1727,7 +1760,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>You have %n notifications</source>
       <translation type="unfinished">
-        <numerusform>You have %n notifications</numerusform>
+        <numerusform>%n Yeni Bildiriminiz Var</numerusform>
         <numerusform>You have %n notifications</numerusform>
       </translation>
     </message>
@@ -1787,14 +1820,14 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%1 of %n devices</source>
       <translation type="unfinished">
-        <numerusform>%1 of %n devices</numerusform>
+        <numerusform>%n Aygıtların %1'i</numerusform>
         <numerusform>%1 of %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
       <translation type="unfinished">
-        <numerusform>%1 of %n cameras</numerusform>
+        <numerusform>%n Kameraların %1'i</numerusform>
         <numerusform>%1 of %n cameras</numerusform>
       </translation>
     </message>
@@ -1809,7 +1842,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
       <translation type="unfinished">
-        <numerusform>%1 of %n I/O modules</numerusform>
+        <numerusform>%n I/O Modüllerin %1'i</numerusform>
         <numerusform>%1 of %n I/O modules</numerusform>
       </translation>
     </message>
@@ -1834,7 +1867,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n Server(s)</source>
       <translation type="unfinished">
-        <numerusform>%n Server(s)</numerusform>
+        <numerusform>%n Sunucular</numerusform>
         <numerusform>%n Server(s)</numerusform>
       </translation>
     </message>
@@ -1873,7 +1906,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
       <translation type="unfinished">
-        <numerusform>Source and %n more cameras</numerusform>
+        <numerusform>Kaynak ve %n Kamera Daha</numerusform>
         <numerusform>Source and %n more cameras</numerusform>
       </translation>
     </message>
@@ -2078,7 +2111,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n devices found</source>
       <translation type="unfinished">
-        <numerusform>%n devices found</numerusform>
+        <numerusform>%n Aygıtlar Bulundu</numerusform>
         <numerusform>%n devices found</numerusform>
       </translation>
     </message>
@@ -2114,7 +2147,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n devices added.</source>
       <translation type="unfinished">
-        <numerusform>%n devices added.</numerusform>
+        <numerusform>%n cihaz eklendi.</numerusform>
         <numerusform>%n devices added.</numerusform>
       </translation>
     </message>
@@ -2125,7 +2158,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
       <translation type="unfinished">
-        <numerusform>Failed to add %n devices</numerusform>
+        <numerusform>%n cihazlar eklenemedi</numerusform>
         <numerusform>Failed to add %n devices</numerusform>
       </translation>
     </message>
@@ -2203,6 +2236,18 @@ to view more bookmarks</source>
       <source>Camera Id</source>
       <translation>Kamera Id</translation>
     </message>
+    <message>
+      <source>Settings</source>
+      <translation>Ayarlar</translation>
+    </message>
+    <message>
+      <source>Web</source>
+      <translation type="unfinished">Web</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation type="unfinished">No settings</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
@@ -2224,7 +2269,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
       <translation type="unfinished">
-        <numerusform>%1 does not support two-way audio</numerusform>
+        <numerusform>%1 iki yönlü ses aktarımını desteklemiyor</numerusform>
         <numerusform>%1 does not support two-way audio</numerusform>
       </translation>
     </message>
@@ -2311,22 +2356,6 @@ to view more bookmarks</source>
       <translation>İkincil</translation>
     </message>
     <message>
-      <source>Don&apos;t change</source>
-      <translation>Değiştirme</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Düşük</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>Orta</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Yüksek</translation>
-    </message>
-    <message>
       <source>Edge</source>
       <translation>Uç</translation>
     </message>
@@ -2343,7 +2372,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%1 have no input ports</source>
       <translation type="unfinished">
-        <numerusform>%1 have no input ports</numerusform>
+        <numerusform>%1 Giriş Port'u Bulunmuyor</numerusform>
         <numerusform>%1 have no input ports</numerusform>
       </translation>
     </message>
@@ -2383,14 +2412,14 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n devices found</source>
       <translation type="unfinished">
-        <numerusform>%n devices found</numerusform>
+        <numerusform>%n Aygıtlar Bulundu</numerusform>
         <numerusform>%n devices found</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
       <translation type="unfinished">
-        <numerusform>%n cameras found</numerusform>
+        <numerusform>%n Kameralar Bulundu</numerusform>
         <numerusform>%n cameras found</numerusform>
       </translation>
     </message>
@@ -2405,7 +2434,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n I/O modules found</source>
       <translation type="unfinished">
-        <numerusform>%n I/O modules found</numerusform>
+        <numerusform>%n I/O Modülleri Bulundu</numerusform>
         <numerusform>%n I/O modules found</numerusform>
       </translation>
     </message>
@@ -2499,7 +2528,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%1 have no output relays</source>
       <translation type="unfinished">
-        <numerusform>%1 have no output relays</numerusform>
+        <numerusform>%1'in Çıkış Bağlantısı Yok</numerusform>
         <numerusform>%1 have no output relays</numerusform>
       </translation>
     </message>
@@ -2553,14 +2582,6 @@ to view more bookmarks</source>
       <translation>sunucu zamanına göre</translation>
     </message>
     <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>Yüksek değerler diğer cihazların arşiv boyutunu düşürebilir.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>Yüksek değerler diğer kameraların arşiv boyutunu düşürebilir.</translation>
-    </message>
-    <message>
       <source>Not enough licenses to enable recording</source>
       <translation>Kaydı etkinleştirmek için lisans yeterli değil</translation>
     </message>
@@ -2606,7 +2627,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
+      <translation type="unfinished">Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -2678,21 +2699,21 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
       <translation type="unfinished">
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
+        <numerusform>%n cihazlarındaki değişiklikler kaydedilmedi:</numerusform>
         <numerusform>Changes to the following %n devices are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
       <translation type="unfinished">
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+        <numerusform>%n kameralarındaki değişiklikler kaydedilmedi:</numerusform>
         <numerusform>Changes to the following %n cameras are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
       <translation type="unfinished">
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+        <numerusform>%n I/O modüllerindeki değişiklikler kaydedilmedi:</numerusform>
         <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
       </translation>
     </message>
@@ -2710,6 +2731,14 @@ to view more bookmarks</source>
     <message>
       <source>No device selected.</source>
       <translation>Aygıt Seçilmedi.</translation>
+    </message>
+    <message>
+      <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
+      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+    </message>
+    <message>
+      <source>Cannot edit properties for several wearable cameras.</source>
+      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
     </message>
   </context>
   <context>
@@ -3309,14 +3338,14 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
       <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
+        <numerusform>%1'den %2'ye Kadar Olan Durum Günlüğü - %n olay(lar) bulundu</numerusform>
         <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation type="unfinished">
-        <numerusform>Event log for %1 - %n event(s) found</numerusform>
+        <numerusform>%1 İçin Olay Günlüğü - %n olay bulundu</numerusform>
         <numerusform>Event log for %1 - %n event(s) found</numerusform>
       </translation>
     </message>
@@ -3371,7 +3400,7 @@ to %1</source>
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
       <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
+        <numerusform>%1 (%n defa)</numerusform>
         <numerusform>%1 (%n times)</numerusform>
       </translation>
     </message>
@@ -3382,21 +3411,21 @@ to %1</source>
     <message numerus="yes">
       <source>and %n users more...</source>
       <translation type="unfinished">
-        <numerusform>and %n users more...</numerusform>
+        <numerusform>ve %n kullanıcıları...</numerusform>
         <numerusform>and %n users more...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
       <translation type="unfinished">
-        <numerusform>and %n more...</numerusform>
+        <numerusform>ve %n den fazlası...</numerusform>
         <numerusform>and %n more...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
       <translation type="unfinished">
-        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n Kaldırılan konular</numerusform>
         <numerusform>%n Removed subjects</numerusform>
       </translation>
     </message>
@@ -3761,7 +3790,7 @@ to %1</source>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
       <translation type="unfinished">
-        <numerusform>Test completed successfully: %n users found.</numerusform>
+        <numerusform>Test Başarıyla Tamamladı: %n Kullanıcılar Bulundu.</numerusform>
         <numerusform>Test completed successfully: %n users found.</numerusform>
       </translation>
     </message>
@@ -3931,7 +3960,7 @@ to %1</source>
     <message numerus="yes">
       <source>License expires in %n days</source>
       <translation type="unfinished">
-        <numerusform>License expires in %n days</numerusform>
+        <numerusform>%n gün içinde lisans süresi dolacaktır</numerusform>
         <numerusform>License expires in %n days</numerusform>
       </translation>
     </message>
@@ -4025,14 +4054,14 @@ to %1</source>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
       <translation type="unfinished">
-        <numerusform>At least %n %1 are required</numerusform>
+        <numerusform>%1 için en az %n gerekli</numerusform>
         <numerusform>At least %n %1 are required</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
       <translation type="unfinished">
-        <numerusform>%n %1 are currently in use</numerusform>
+        <numerusform>%n %1 kullanılıyor</numerusform>
         <numerusform>%n %1 are currently in use</numerusform>
       </translation>
     </message>
@@ -4043,7 +4072,7 @@ to %1</source>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Lisansları devre dışı bırak?</numerusform>
         <numerusform>Deactivate licenses?</numerusform>
       </translation>
     </message>
@@ -4054,21 +4083,21 @@ to %1</source>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
       <translation type="unfinished">
-        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>%n lisansları devre dışı bırakılamadı</numerusform>
         <numerusform>Failed to deactivate %n licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
       <translation type="unfinished">
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%n lisansın %1'i devre dışı bırakılamaz</numerusform>
         <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Lisanslar devre dışı bırakılamadı</numerusform>
         <numerusform>Cannot deactivate licenses</numerusform>
       </translation>
     </message>
@@ -4091,7 +4120,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
       <translation type="unfinished">
-        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n Lisans deaktif edildi</numerusform>
         <numerusform>%n licenses deactivated</numerusform>
       </translation>
     </message>
@@ -4106,7 +4135,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n channels.</source>
       <translation type="unfinished">
-        <numerusform>%n channels.</numerusform>
+        <numerusform>%n kanal.</numerusform>
         <numerusform>%n channels.</numerusform>
       </translation>
     </message>
@@ -4117,7 +4146,7 @@ to %1</source>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
       <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>%n den kalanı devre dışı bırak</numerusform>
         <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
@@ -4186,21 +4215,21 @@ to %1</source>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation type="unfinished">
-        <numerusform>Use licenses for selected %n devices</numerusform>
+        <numerusform>Seçilen %n Aygıt İçin Lisansları Kullan</numerusform>
         <numerusform>Use licenses for selected %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Use licenses for selected %n cameras</numerusform>
+        <numerusform>Seçilen %n Kamera İçin Lisanslarını Kullan</numerusform>
         <numerusform>Use licenses for selected %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
       <translation type="unfinished">
-        <numerusform>Use licenses for selected %n I/O modules</numerusform>
+        <numerusform>Seçilen %n I/O Modülü İçin Lisanslarını Kullan</numerusform>
         <numerusform>Use licenses for selected %n I/O modules</numerusform>
       </translation>
     </message>
@@ -4542,6 +4571,14 @@ to %1</source>
       <source>Skip</source>
       <translation>Geç</translation>
     </message>
+    <message>
+      <source>Close</source>
+      <translation>Kapat</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>Durdur</translation>
+    </message>
   </context>
   <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -4621,11 +4658,30 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnNewWearableCameraDialog</name>
+    <message>
+      <source>Wearable Camera</source>
+      <translation type="unfinished">Wearable Camera</translation>
+    </message>
+    <message>
+      <source>Wearable Camera %1</source>
+      <translation type="unfinished">Wearable Camera %1</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>İsim</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty</source>
+      <translation>İsim boş olamaz</translation>
+    </message>
+  </context>
+  <context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
       <source>%n more notifications</source>
       <translation type="unfinished">
-        <numerusform>%n more notifications</numerusform>
+        <numerusform>%n için daha fazla bildirim</numerusform>
         <numerusform>%n more notifications</numerusform>
       </translation>
     </message>
@@ -4823,21 +4879,21 @@ to %1</source>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
       <translation type="unfinished">
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+        <numerusform>Ön Ayar %n Dakika Hareket Olmadığında Aktif Edilecek</numerusform>
         <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
       <translation type="unfinished">
-        <numerusform>Tour has %n identical positions</numerusform>
+        <numerusform>Turların %n Pozisyonla Aynı</numerusform>
         <numerusform>Tour has %n identical positions</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
       <translation type="unfinished">
-        <numerusform>about %n minute(s)</numerusform>
+        <numerusform>yaklaşık %n dakika</numerusform>
         <numerusform>about %n minute(s)</numerusform>
       </translation>
     </message>
@@ -5060,7 +5116,7 @@ to %1</source>
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
       <translation type="unfinished">
-        <numerusform>Total %1 %n devices</numerusform>
+        <numerusform>%1 cihazın %n i</numerusform>
         <numerusform>Total %1 %n devices</numerusform>
       </translation>
     </message>
@@ -5068,7 +5124,7 @@ to %1</source>
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
       <translation type="unfinished">
-        <numerusform>Total %1 %n cameras</numerusform>
+        <numerusform>%1 kameranın %n i</numerusform>
         <numerusform>Total %1 %n cameras</numerusform>
       </translation>
     </message>
@@ -5076,7 +5132,7 @@ to %1</source>
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
       <translation type="unfinished">
-        <numerusform>Total %1 %n I/O modules</numerusform>
+        <numerusform>%1 I/O modülünün %n i</numerusform>
         <numerusform>Total %1 %n I/O modules</numerusform>
       </translation>
     </message>
@@ -5132,7 +5188,7 @@ to %1</source>
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
       <translation type="unfinished">
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+        <numerusform>%1 in %n i için %2 izni yok</numerusform>
         <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
       </translation>
     </message>
@@ -5150,7 +5206,7 @@ to %1</source>
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
       <translation type="unfinished">
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+        <numerusform>%1 in %n i kullanıcısı için %2 izni yok</numerusform>
         <numerusform>%n of %1 selected users have no %2 permission</numerusform>
       </translation>
     </message>
@@ -5183,13 +5239,6 @@ to %1</source>
     <message>
       <source>Health Monitor</source>
       <translation>Durum İzleyici</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnResourcePreviewWidget</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>VERİ YOK</translation>
     </message>
   </context>
   <context>
@@ -5407,7 +5456,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n Servers</source>
       <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
+        <numerusform>%n sunucular</numerusform>
         <numerusform>%n Servers</numerusform>
       </translation>
     </message>
@@ -5429,7 +5478,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n Users</source>
       <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
+        <numerusform>%n kullanıcı</numerusform>
         <numerusform>%n Users</numerusform>
       </translation>
     </message>
@@ -5439,7 +5488,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n additional</source>
       <translation type="unfinished">
-        <numerusform>%n additional</numerusform>
+        <numerusform>Ek olarak %n</numerusform>
         <numerusform>%n additional</numerusform>
       </translation>
     </message>
@@ -5450,7 +5499,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
       <translation type="unfinished">
-        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>%n kullanıcının %1 i geçersiz e-psotaya sahip</numerusform>
         <numerusform>%n of %1 users have invalid email address</numerusform>
       </translation>
     </message>
@@ -5461,7 +5510,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
       <translation type="unfinished">
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n kullanıcının %1 i geçersiz ikincil e-psotaya sahip</numerusform>
         <numerusform>%n of %1 additional email addresses are invalid</numerusform>
       </translation>
     </message>
@@ -5714,7 +5763,7 @@ to %1</source>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
       <translation type="unfinished">
-        <numerusform>Not enough free space at %n Servers:</numerusform>
+        <numerusform>%n sunucusunda yeterli alan yok:</numerusform>
         <numerusform>Not enough free space at %n Servers:</numerusform>
       </translation>
     </message>
@@ -6092,6 +6141,10 @@ to %1</source>
       <source>Set for this Camera</source>
       <translation>Bu Kamera için ayarla</translation>
     </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation type="unfinished">NO LIVE STREAM</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6237,7 +6290,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>Kayıt depolama durduralacaktır. Hedef dışı kayıtlar silinmeye devam edecektir.</translation>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
@@ -6728,35 +6781,35 @@ to %1</source>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
       <translation type="unfinished">
-        <numerusform>The problem is caused by %n servers:</numerusform>
+        <numerusform>%n sunucusu sebebiyle hata oluştu:</numerusform>
         <numerusform>The problem is caused by %n servers:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
       <translation type="unfinished">
-        <numerusform>No free space left on %n servers:</numerusform>
+        <numerusform>%n sunucusunda yeterli boş alan yok:</numerusform>
         <numerusform>No free space left on %n servers:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
       <translation type="unfinished">
-        <numerusform>%n servers are not responding:</numerusform>
+        <numerusform>%n Sunucu yanıt vermiyor:</numerusform>
         <numerusform>%n servers are not responding:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
       <translation type="unfinished">
-        <numerusform>%n servers have gone offline:</numerusform>
+        <numerusform>%n sunucusu çevrimdışı oldu:</numerusform>
         <numerusform>%n servers have gone offline:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
       <translation type="unfinished">
-        <numerusform>Authentication failed for %n servers:</numerusform>
+        <numerusform>%n sunucusu çevrimdışı oldu:</numerusform>
         <numerusform>Authentication failed for %n servers:</numerusform>
       </translation>
     </message>
@@ -6905,7 +6958,7 @@ to %1</source>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
       <translation type="unfinished">
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
+        <numerusform>Lütfen bu rolü ile %n kullanıcılarında gerçekleştirilecek eylemi seçin</numerusform>
         <numerusform>Please select an action to perform on %n users with this role</numerusform>
       </translation>
     </message>
@@ -7100,7 +7153,7 @@ to %1</source>
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
       <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Ekran %2</numerusform>
         <numerusform>PC %1 - Displays %2</numerusform>
       </translation>
     </message>
@@ -7110,6 +7163,43 @@ to %1</source>
     <message>
       <source>Muted</source>
       <translation>Sessiz</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableProgressWidget</name>
+    <message>
+      <source>Uploading %1... %2	%p%</source>
+      <translation type="unfinished">Uploading %1... %2	%p%</translation>
+    </message>
+    <message numerus="yes">
+      <source>(%n more file(s) in queue)</source>
+      <translation type="unfinished">
+        <numerusform>(%n more file(s) in queue)</numerusform>
+        <numerusform>(%n more file(s) in queue)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation type="unfinished">Stop uploading?</translation>
+    </message>
+    <message>
+      <source>Already uploaded files will be kept.</source>
+      <translation type="unfinished">Already uploaded files will be kept.</translation>
+    </message>
+    <message>
+      <source>Finalizing %1... %2	%p%</source>
+      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableUploadWidget</name>
+    <message>
+      <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Another user is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
     </message>
   </context>
   <context>
@@ -7178,7 +7268,7 @@ to %1</source>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n bookmarks?</numerusform>
+        <numerusform>%n bookmarklarını sil?</numerusform>
         <numerusform>Delete %n bookmarks?</numerusform>
       </translation>
     </message>
@@ -7255,7 +7345,7 @@ to %1</source>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
       <translation type="unfinished">
-        <numerusform>The following %n items are not saved:</numerusform>
+        <numerusform>Aşağıdaki %n nesneler kaydedilemedi:</numerusform>
         <numerusform>The following %n items are not saved:</numerusform>
       </translation>
     </message>
@@ -7270,7 +7360,7 @@ to %1</source>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
       <translation type="unfinished">
-        <numerusform>The following %n items are not deleted:</numerusform>
+        <numerusform>Aşağıdaki %n nesneler silinemedi:</numerusform>
         <numerusform>The following %n items are not deleted:</numerusform>
       </translation>
     </message>
@@ -7281,7 +7371,7 @@ to %1</source>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
       <translation type="unfinished">
-        <numerusform>Failed to delete %n items:</numerusform>
+        <numerusform>%n nesne silinemedi:</numerusform>
         <numerusform>Failed to delete %n items:</numerusform>
       </translation>
     </message>
@@ -7439,7 +7529,7 @@ to %1</source>
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n items?</numerusform>
+        <numerusform>%n öğeleri silinsin mi?</numerusform>
         <numerusform>Delete %n items?</numerusform>
       </translation>
     </message>
@@ -7458,7 +7548,7 @@ to %1</source>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n matrices?</numerusform>
+        <numerusform>%n matrisini sil?</numerusform>
         <numerusform>Delete %n matrices?</numerusform>
       </translation>
     </message>
@@ -7489,6 +7579,132 @@ to %1</source>
     <message>
       <source>Activate one more license to start Video Wall.</source>
       <translation>Video wall başlatmak için 1 den fazla lisans etkinleştrimeniz gerekir.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchWearableHandler</name>
+    <message>
+      <source>Could not add wearable camera to server &quot;%1&quot;.</source>
+      <translation type="unfinished">Could not add wearable camera to server &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>Tüm Dosyalar (*.*)</translation>
+    </message>
+    <message>
+      <source>Video (%1)</source>
+      <translation type="unfinished">Video (%1)</translation>
+    </message>
+    <message>
+      <source>Open Wearable Camera Recordings...</source>
+      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+    </message>
+    <message>
+      <source>No video files found in &quot;%1&quot;</source>
+      <translation type="unfinished">No video files found in &quot;%1&quot;</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file format(s) are not supported</source>
+      <translation type="unfinished">
+        <numerusform>Selected file format(s) are not supported</numerusform>
+        <numerusform>Selected file format(s) are not supported</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only video files are supported.</source>
+      <translation type="unfinished">Only video files are supported.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) do not have timestamp(s)</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
+        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only video files with correct timestamp are supported.</source>
+      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) cover periods for which videos are already being uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these file(s) to a different instance of a Wearable Camera.</source>
+      <translation type="unfinished">
+        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
+        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) cover periods for which videos have already been uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) will not be uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) will not be uploaded</numerusform>
+        <numerusform>Selected file(s) will not be uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some file(s) will not be uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Some file(s) will not be uploaded</numerusform>
+        <numerusform>Some file(s) will not be uploaded</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There is no new files to upload in &quot;%1&quot;</source>
+      <translation type="unfinished">There is no new files to upload in &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation type="unfinished">Not enough space on server storage</translation>
+    </message>
+    <message numerus="yes">
+      <source>File(s) size - %1
+Free space - %2</source>
+      <translation type="unfinished">
+        <numerusform>File(s) size - %1
+Free space - %2</numerusform>
+        <numerusform>File(s) size - %1
+Free space - %2</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>File format of &quot;%1&quot; is not supported.</source>
+      <translation type="unfinished">File format of &quot;%1&quot; is not supported.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; does not have timestamp.</source>
+      <translation type="unfinished">File &quot;%1&quot; does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cover periods for which video is already being uploaded.</source>
+      <translation type="unfinished">File &quot;%1&quot; cover periods for which video is already being uploaded.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cover periods for which video has already been uploaded.</source>
+      <translation type="unfinished">File &quot;%1&quot; cover periods for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>There is no space on server for file &quot;%1&quot;.</source>
+      <translation type="unfinished">There is no space on server for file &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -7523,7 +7739,7 @@ to %1</source>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
       <translation type="unfinished">
-        <numerusform>User will still have access to %n removed resources:</numerusform>
+        <numerusform>Kullanıcılar hala %n kaldrılan kaynaklara erişebilrler:</numerusform>
         <numerusform>User will still have access to %n removed resources:</numerusform>
       </translation>
     </message>
@@ -7534,7 +7750,7 @@ to %1</source>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
       <translation type="unfinished">
-        <numerusform>All users with this role will get access to %n resources:</numerusform>
+        <numerusform>Bu roldeki bütün kullanıcılar %n kaynaklarına erişecektir:</numerusform>
         <numerusform>All users with this role will get access to %n resources:</numerusform>
       </translation>
     </message>
@@ -7545,7 +7761,7 @@ to %1</source>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
       <translation type="unfinished">
-        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+        <numerusform>Bu roldeki kullanıcılar %n i kaldırdıktan sonra bu kaynaklara erişebileceklerdir:</numerusform>
         <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
       </translation>
     </message>
@@ -7560,35 +7776,35 @@ to %1</source>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
       <translation type="unfinished">
-        <numerusform>User will lose access to %n resources:</numerusform>
+        <numerusform>Kullanıcı %n kaynaklarına erişemeyecektir:</numerusform>
         <numerusform>User will lose access to %n resources:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
       <translation type="unfinished">
-        <numerusform>All users with this role will lose access to %n resources:</numerusform>
+        <numerusform>Bu roldeki bütün kullanıcılar %n kaynaklarına erişecektir:</numerusform>
         <numerusform>All users with this role will lose access to %n resources:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n shared layouts?</numerusform>
+        <numerusform>%n ekran düzenlerini silmek istiyor musunuz?</numerusform>
         <numerusform>Delete %n shared layouts?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
       <translation type="unfinished">
-        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
+        <numerusform>%n ekran düzenleri başka kullanıcılar ile paylaşılmış. Onlar içinde silmiş olacaksınız.</numerusform>
         <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
       <translation type="unfinished">
-        <numerusform>Remove %n items from layout?</numerusform>
+        <numerusform>%n nesneleri ekran düzeninden kaldır?</numerusform>
         <numerusform>Remove %n items from layout?</numerusform>
       </translation>
     </message>
@@ -7607,56 +7823,56 @@ to %1</source>
     <message numerus="yes">
       <source>Delete %n users?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n users?</numerusform>
+        <numerusform>%n kullanıcılarını sil?</numerusform>
         <numerusform>Delete %n users?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n devices?</numerusform>
+        <numerusform>%n cihazını sil?</numerusform>
         <numerusform>Delete %n devices?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n cameras?</numerusform>
+        <numerusform>%n kamerasını sil?</numerusform>
         <numerusform>Delete %n cameras?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n I/O Modules?</numerusform>
+        <numerusform>%n I/O modülünü sil?</numerusform>
         <numerusform>Delete %n I/O Modules?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n items?</numerusform>
+        <numerusform>%n öğeleri silinsin mi?</numerusform>
         <numerusform>Delete %n items?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
       <translation type="unfinished">
-        <numerusform>%n of them are auto-discovered.</numerusform>
+        <numerusform>%n kamera bulundu.</numerusform>
         <numerusform>%n of them are auto-discovered.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
       <translation type="unfinished">
-        <numerusform>%n cameras are auto-discovered.</numerusform>
+        <numerusform>%n kamera bulundu.</numerusform>
         <numerusform>%n cameras are auto-discovered.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
       <translation type="unfinished">
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
+        <numerusform>%n I/o modülü bulundu.</numerusform>
         <numerusform>%n I/O modules are auto-discovered.</numerusform>
       </translation>
     </message>
@@ -7675,8 +7891,23 @@ to %1</source>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
       <translation type="unfinished">
+        <numerusform>%n nesneleri showreelden kaldır?</numerusform>
         <numerusform>Remove %n items from showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation type="unfinished">Stop uploading?</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>Durdur</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
+      <translation type="unfinished">
+        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
       </translation>
     </message>
   </context>
@@ -7685,7 +7916,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n users</source>
       <translation type="unfinished">
-        <numerusform>%n users</numerusform>
+        <numerusform>%n kullanıcılar</numerusform>
         <numerusform>%n users</numerusform>
       </translation>
     </message>
@@ -7920,6 +8151,40 @@ to %1</source>
     <message>
       <source>Short</source>
       <translation>Kısa</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::UploadWorker</name>
+    <message>
+      <source>Could not open file &quot;%1&quot;</source>
+      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not calculate md5 for file &quot;%1&quot;</source>
+      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not create upload on the server side</source>
+      <translation type="unfinished">Could not create upload on the server side</translation>
+    </message>
+    <message>
+      <source>Could not upload file chunk to the server</source>
+      <translation type="unfinished">Could not upload file chunk to the server</translation>
+    </message>
+    <message>
+      <source>Could not check uploaded file on the server</source>
+      <translation type="unfinished">Could not check uploaded file on the server</translation>
+    </message>
+    <message>
+      <source>File was corrupted while being uploaded to the server</source>
+      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WearableWorker</name>
+    <message>
+      <source>Failed to send request to the server.</source>
+      <translation type="unfinished">Failed to send request to the server.</translation>
     </message>
   </context>
   <context>
@@ -8232,21 +8497,21 @@ to %1</source>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
       <translation type="unfinished">
-        <numerusform>Failed to move %n devices</numerusform>
+        <numerusform>%n cihazları taşımak başarısız oldu</numerusform>
         <numerusform>Failed to move %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Failed to move %n cameras</numerusform>
+        <numerusform>%n kameralarını taşırken hata oluştu</numerusform>
         <numerusform>Failed to move %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
       <translation type="unfinished">
-        <numerusform>Failed to move %n I/O Modules</numerusform>
+        <numerusform>%n cihazlarını taşırken hata oluştu</numerusform>
         <numerusform>Failed to move %n I/O Modules</numerusform>
       </translation>
     </message>
@@ -8257,21 +8522,21 @@ to %1</source>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
       <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>&quot;%1&quot; Sunucusu %n cihazlarına erişim sağlayamıyor. Onları yine de taşımak istiyor musunuz?</numerusform>
         <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
       <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+        <numerusform>&quot;%1&quot; Sunucusu %n kameralarına erişim sağlayamıyor. Onları yine de taşımak istiyor musunuz?</numerusform>
         <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
       <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+        <numerusform>&quot;%1&quot; Sunucusu %n I/O Modüllerine erişim sağlayamıyor. Onları yine de taşımak istiyor musunuz?</numerusform>
         <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
       </translation>
     </message>
@@ -8330,7 +8595,7 @@ to %1</source>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
       <translation type="unfinished">
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+        <numerusform>Bu %n Dosyaları Kalıcı Olarak Silmek İstediğinizden Emin Misiniz?</numerusform>
         <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
       </translation>
     </message>
@@ -8421,6 +8686,10 @@ to %1</source>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>%2 kameradan %1'de şifre değiştirilemedi</translation>
+    </message>
+    <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
     </message>
   </context>
   <context>

@@ -2427,7 +2427,7 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
         if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
             targetResources.insert(resource);
         if (eventParams.eventType >= vms::event::userDefinedEvent)
-            targetResources.unite(resourcePool()->getResources<QnResource>(eventParams.metadata.cameraRefs).toSet());
+            targetResources.unite(resourcePool()->getResourcesByIds(eventParams.metadata.cameraRefs).toSet());
     }
 
     for (const QnResourcePtr &resource : targetResources)

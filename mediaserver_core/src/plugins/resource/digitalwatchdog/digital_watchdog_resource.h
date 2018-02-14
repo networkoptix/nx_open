@@ -27,11 +27,13 @@ public:
     QnDigitalWatchdogResource();
     ~QnDigitalWatchdogResource();
 
-    virtual QnAbstractPtzController *createPtzControllerInternal() override;
     CLSimpleHTTPClient httpClient() const;
 
     void setVideoCodec(Qn::StreamIndex streamIndex, const QString& codec);
+
 protected:
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
+
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const override;

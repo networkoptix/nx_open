@@ -7,7 +7,7 @@
 #include <common/common_module_aware.h>
 
 #include "wearable_state.h"
-#include "wearable_error.h"
+#include "wearable_payload.h"
 
 struct QnWearableStatusReply;
 
@@ -32,7 +32,7 @@ public:
     virtual ~WearableWorker() override;
 
     void updateState();
-    bool addUpload(const QString& path, WearableError* error);
+    bool addUpload(const WearablePayloadList& payloads);
     void cancel();
 
     WearableState state() const;
@@ -41,13 +41,24 @@ public:
 
 signals:
     void stateChanged(const WearableState& state);
-    void error(const WearableState& state, const QString& errorMessage);
+    void error(const WearableState& state, const QString &errorMessage);
     void finished();
 
 private:
+    enum FailReason {
+        LockRequestFailed,
+        CameraSnatched,
+        UploadFailed,
+        ConsumeRequestFailed,
+    };
+
     void processCurrentFile();
     void processNextFile();
 
+    WearableState::Status calculateNewStatus(FailReason reason);
+    QString calculateErrorMessage(FailReason reason, const QString& errorMessage);
+    void handleFailure(FailReason reason, const QString& errorMessage = QString());
+    void handleStop();
     void handleStatusFinished(bool success, const QnWearableStatusReply& result);
     void handleLockFinished(bool success, const QnWearableStatusReply& result);
     void handleExtendFinished(bool success, const QnWearableStatusReply& result);
@@ -56,10 +67,6 @@ private:
     void handleConsumeStarted(bool success);
 
     void pollExtend();
-
-private:
-    QString calculateUserName(const QnUuid& userId);
-    QString calculateLockedMessage();
 
 private:
     struct Private;

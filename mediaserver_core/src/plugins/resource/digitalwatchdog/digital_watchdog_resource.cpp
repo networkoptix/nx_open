@@ -287,7 +287,7 @@ bool QnDigitalWatchdogResource::disableB2FramesForActiDW()
     return result == CL_HTTP_SUCCESS;
 }
 
-QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal()
+QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal() const
 {
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     bool useHttpPtz = resourceData.value<bool>(lit("dw-http-ptz"), false);

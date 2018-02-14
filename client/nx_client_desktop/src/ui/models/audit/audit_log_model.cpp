@@ -522,7 +522,7 @@ QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* d
     if (column == DescriptionColumn && (data->isPlaybackType() || data->eventType == Qn::AR_CameraUpdate || data->eventType == Qn::AR_CameraInsert))
     {
         QString result;
-        for (const auto& res : resourcePool()->getResources(data->resources))
+        for (const auto& res : resourcePool()->getResourcesByIds(data->resources))
         {
             result += res->toSearchString();
             result += lit(" ");

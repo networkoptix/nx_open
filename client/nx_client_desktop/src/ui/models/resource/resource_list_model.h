@@ -29,6 +29,7 @@ public:
     {
         HideStatusOption                = 0x01,
         ServerAsHealthMonitorOption     = 0x02,
+        AlwaysSelectedOption            = 0x04,
     };
     Q_DECLARE_FLAGS(Options, Option)
 

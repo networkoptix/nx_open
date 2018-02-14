@@ -25,7 +25,7 @@ public:
     channelCapabilities(Qn::ConnectionRole role);
     bool findDefaultPtzProfileToken();
 
-    static bool tryToEnableOnvifSupport(const nx::utils::Url& url, const QAuthenticator& authenticator);
+    static bool tryToEnableIntegrationProtocols(const nx::utils::Url& url, const QAuthenticator& authenticator);
 
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(

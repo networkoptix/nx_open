@@ -131,8 +131,6 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
     {
         hikvisionEvent.isActive = true;
         result.push_back(hikvisionEvent);
-        hikvisionEvent.isActive = false;
-        result.push_back(hikvisionEvent);
     };
 
     while (!reader.atEnd() && reader.readNextStartElement())

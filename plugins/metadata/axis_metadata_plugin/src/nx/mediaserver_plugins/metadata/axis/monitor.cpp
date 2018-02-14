@@ -23,87 +23,80 @@ static const std::string kWebServerPath("/axiscam");
 static const std::string kActionNamePrefix("NX_ACTION_");
 static const std::string kRuleNamePrefix("NX_RULE_");
 
-nx::sdk::metadata::CommonEvent* createCommonEvent(
-    const IdentifiedSupportedEvent& identifiedSupportedEvents,
-    bool active)
+static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seconds(3);
+
+nx::sdk::metadata::CommonEvent* createCommonEvent(const AnalyticsEventType& event, bool active)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
-    commonEvent->setTypeId(identifiedSupportedEvents.externalTypeId());
-    commonEvent->setCaption(identifiedSupportedEvents.base().name);
-    commonEvent->setDescription(identifiedSupportedEvents.base().description);
+    commonEvent->setTypeId(event.eventTypeIdExternal);
+    commonEvent->setCaption(event.name.toUtf8().constData());
+    commonEvent->setDescription(event.eventName.value.toUtf8().constData());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
-    commonEvent->setAuxilaryData(identifiedSupportedEvents.base().fullName());
+    commonEvent->setAuxilaryData(event.topic.toUtf8().constData());
     return commonEvent;
 }
 
 nx::sdk::metadata::CommonEventsMetadataPacket* createCommonEventsMetadataPacket(
-    const IdentifiedSupportedEvent& identifiedSupportedEvents)
+    const AnalyticsEventType& event, bool active)
 {
     using namespace std::chrono;
-
     auto packet = new nx::sdk::metadata::CommonEventsMetadataPacket();
-    auto commonEvent1 = createCommonEvent(identifiedSupportedEvents, /*active*/ true);
-    packet->addItem(commonEvent1);
-    auto commonEvent2 = createCommonEvent(identifiedSupportedEvents, /*active*/ false);
-    packet->addItem(commonEvent2);
+    auto commonEvent = createCommonEvent(event, active);
+    packet->addItem(commonEvent);
     packet->setTimestampUsec(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
     packet->setDurationUsec(-1);
     return packet;
 }
 
-class axisHandler : public nx::network::http::AbstractHttpRequestHandler
-{
-public:
-    virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer authInfo,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
-        nx::network::http::RequestProcessedHandler completionHandler)
-    {
-        NX_PRINT << "Received from Axis: " << request.requestLine.toString().data();
-
-        const QString kMessage = "?Message=";
-        const int kGuidStringLength = 36; //sizeof guid string
-        int startIndex = request.toString().indexOf(kMessage);
-        QString uuidString = request.toString().
-            mid(startIndex + kMessage.size(), kGuidStringLength);
-        QnUuid uuid(uuidString);
-        nxpl::NX_GUID guid = nxpt::fromQnUuidToPluginGuid(uuid);
-
-        for (const IdentifiedSupportedEvent& axisEvent: m_identifiedSupportedEvents)
-        {
-            if (memcmp(&axisEvent.externalTypeId(), &guid, 16) == 0)
-            {
-                auto packet = createCommonEventsMetadataPacket(axisEvent);
-                m_handler->handleMetadata(nx::sdk::Error::noError, packet);
-                NX_PRINT << "Event detected and sent to server: "
-                    << axisEvent.base().fullName();
-                completionHandler(nx::network::http::StatusCode::ok);
-                return;
-            }
-        }
-        NX_PRINT << "unknown uuid :(";
-    }
-
-    axisHandler(nx::sdk::metadata::MetadataHandler* handler,
-        const QList<IdentifiedSupportedEvent>& identifiedSupportedEvents)
-        :
-        m_handler(handler),
-        m_identifiedSupportedEvents(identifiedSupportedEvents)
-    {
-    }
-
-private:
-    nx::sdk::metadata::MetadataHandler* m_handler;
-
-    // events are actually stored in manager
-    const QList<IdentifiedSupportedEvent>& m_identifiedSupportedEvents;
-};
-
 } // namespace
+
+void axisHandler::processRequest(
+    nx_http::HttpServerConnection* const connection,
+    nx::utils::stree::ResourceContainer authInfo,
+    nx_http::Request request,
+    nx_http::Response* const response,
+    nx_http::RequestProcessedHandler completionHandler)
+{
+    NX_PRINT << "Received from Axis: " << request.requestLine.toString().data();
+
+    const QString kMessage = "?Message=";
+    const int kGuidStringLength = 36; //< Size of guid string.
+    int startIndex = request.toString().indexOf(kMessage);
+    QString uuidString = request.toString().
+        mid(startIndex + kMessage.size(), kGuidStringLength);
+    QnUuid uuid(uuidString);
+    nxpl::NX_GUID guid = nxpt::fromQnUuidToPluginGuid(uuid);
+
+    for (const AnalyticsEventTypeExtended& event: m_events)
+    {
+        if (memcmp(&event.eventTypeIdExternal, &guid, 16) == 0)
+        {
+            m_monitor->sendEventStartedPacket(event);
+
+            if (event.isStateful())
+            {
+                std::lock_guard<std::mutex> lock(m_elapsedTimerMutex);
+                event.elapsedTimer.start();
+            }
+            completionHandler(nx_http::StatusCode::ok);
+            return;
+        }
+    }
+    NX_PRINT << "unknown uuid";
+}
+
+axisHandler::axisHandler(
+    Monitor* monitor,
+    const QList<AnalyticsEventTypeExtended>& events,
+    std::mutex& elapsedTimerMutex)
+    :
+    m_monitor(monitor),
+    m_events(events),
+    m_elapsedTimerMutex(elapsedTimerMutex)
+{
+}
 
 Monitor::Monitor(
     Manager* manager,
@@ -141,14 +134,14 @@ void Monitor::addRules(const nx::network::SocketAddress& localAddress, nxpl::NX_
     for (int i = 0; i < eventTypeListSize; ++i)
     {
         const auto it = std::find_if(
-            m_manager->identifiedSupportedEvents().cbegin(),
-            m_manager->identifiedSupportedEvents().cend(),
-            [eventTypeList,i](const IdentifiedSupportedEvent& event)
+            m_manager->events().cbegin(),
+            m_manager->events().cend(),
+            [eventTypeList,i](const AnalyticsEventType& event)
             {
-                return memcmp(&event.externalTypeId(), &eventTypeList[i],
+                return memcmp(&event.eventTypeIdExternal, &eventTypeList[i],
                     sizeof(nxpl::NX_GUID)) == 0;
             });
-        if (it != m_manager->identifiedSupportedEvents().cend())
+        if (it != m_manager->events().cend())
         {
             static int globalCounter = 0;
 
@@ -158,10 +151,10 @@ void Monitor::addRules(const nx::network::SocketAddress& localAddress, nxpl::NX_
             // actionEventName - is a human readable event name, a part of a message that camera
             // will send us. The other part of a message is event guid. actionEventName is slightly
             // formatted to be cognizable in http URL query.
-            std::string actionEventName = it->base().fullName();
+            std::string actionEventName = it->fullName().toStdString();
             std::replace(actionEventName.begin(), actionEventName.end(), '/', '.');
             std::replace(actionEventName.begin(), actionEventName.end(), ':', '_');
-            std::string message = std::string(it->internalTypeId().toSimpleString().toLatin1()) +
+            std::string message = std::string(it->eventTypeId.toSimpleString().toLatin1()) +
                 std::string(".") + actionEventName;
 
             int actionId = cameraController.addActiveHttpNotificationAction(
@@ -169,21 +162,21 @@ void Monitor::addRules(const nx::network::SocketAddress& localAddress, nxpl::NX_
                 message.c_str(),
                 fullPath.c_str());
             if(actionId)
-                NX_PRINT << "Action addition succeded, actionId = " << actionId;
+                NX_PRINT << "Action addition succeeded, actionId = " << actionId;
             else
                 NX_PRINT << "Action addition failed";
 
-            NX_PRINT << "Try to add rule " << it->base().fullName();
+            NX_PRINT << "Try to add rule " << it->fullName().toUtf8().constData();
             //event.fullname is something like "tns1:VideoSource/tnsaxis:DayNightVision"
             std::string ruleName = kRuleNamePrefix + std::to_string(globalCounter);
             nx::axis::ActiveRule rule(
                 ruleName.c_str(),
                 /*enabled*/ true,
-                it->base().fullName().c_str(),
+                it->fullName().toUtf8().constData(),
                 actionId);
             const int ruleId = cameraController.addActiveRule(rule);
             if (actionId)
-                NX_PRINT << "Rule addition succeded, ruleId = " << actionId;
+                NX_PRINT << "Rule addition succeeded, ruleId = " << actionId;
             else
                 NX_PRINT << "Rule addition failed";
         }
@@ -218,6 +211,12 @@ nx::network::HostAddress Monitor::getLocalIp(const nx::network::SocketAddress& c
 nx::sdk::Error Monitor::startMonitoring(nxpl::NX_GUID* eventTypeList,
     int eventTypeListSize)
 {
+    m_eventsToCatch.resize(eventTypeListSize);
+    for (int i = 0; i < eventTypeListSize; ++i)
+    {
+        m_eventsToCatch[i] = nxpt::fromPluginGuidToQnUuid(eventTypeList[i]);
+    }
+
     const int kSchemePrefixLength = sizeof("http://") - 1;
     QString str = m_url.toString().remove(0, kSchemePrefixLength);
 
@@ -232,16 +231,19 @@ nx::sdk::Error Monitor::startMonitoring(nxpl::NX_GUID* eventTypeList,
 
     nx::network::SocketAddress localAddress(localIp);
     m_httpServer = new nx::network::http::TestHttpServer;
-    m_httpServer->bindAndListen(localAddress);
+    m_httpServer->server().bindToAioThread(m_timer.getAioThread());
 
+    m_httpServer->bindAndListen(localAddress);
     m_httpServer->registerRequestProcessor<axisHandler>(
         kWebServerPath.c_str(),
         [this]() -> std::unique_ptr<axisHandler>
         {
             return std::make_unique<axisHandler>(
-                this->m_handler, this->m_manager->identifiedSupportedEvents());
+                this, m_manager->events(), this->m_elapsedTimerMutex);
         },
         nx::network::http::kAnyMethod);
+
+    m_timer.start(kMinTimeBetweenEvents, [this](){ onTimer(); });
 
     localAddress = m_httpServer->server().address();
     this->addRules(localAddress, eventTypeList, eventTypeListSize);
@@ -252,9 +254,67 @@ void Monitor::stopMonitoring()
 {
     if (!m_httpServer)
         return;
+    m_timer.pleaseStopSync();
     delete m_httpServer;
     m_httpServer = nullptr;
     removeRules();
+}
+
+std::chrono::milliseconds Monitor::timeTillCheck() const
+{
+    qint64 maxElapsed = 0;
+    for (const QnUuid& id: m_eventsToCatch)
+    {
+        const AnalyticsEventTypeExtended& event = m_manager->eventByUuid(id);
+        std::lock_guard<std::mutex> lock(m_elapsedTimerMutex);
+        if (event.elapsedTimer.isValid())
+            maxElapsed = std::max(maxElapsed, event.elapsedTimer.elapsed());
+    }
+    auto result = kMinTimeBetweenEvents - std::chrono::milliseconds(maxElapsed);
+    result = std::max(result, std::chrono::milliseconds::zero());
+    return result;
+}
+
+void Monitor::sendEventStartedPacket(const AnalyticsEventType& event) const
+{
+    auto packet = createCommonEventMetadataPacket(event, /*active*/ true);
+    m_handler->handleMetadata(nx::sdk::Error::noError, packet);
+    NX_PRINT
+        << (event.isStateful() ? "Event [start] " : "Event [pulse] ")
+        << event.fullName().toUtf8().constData()
+        << " sent to server";
+}
+
+void Monitor::sendEventStoppedPacket(const AnalyticsEventType& event) const
+{
+    auto packet = createCommonEventMetadataPacket(event, /*active*/ false);
+    m_handler->handleMetadata(nx::sdk::Error::noError, packet);
+    NX_PRINT << "Event [stop] " << event.fullName().toUtf8().constData()
+        << " sent to server";
+}
+void Monitor::onTimer()
+{
+    for (const QnUuid& id : m_eventsToCatch)
+    {
+        const AnalyticsEventTypeExtended& event = m_manager->eventByUuid(id);
+
+        bool isTimeToSend = false;
+        {
+            std::lock_guard<std::mutex> lock(m_elapsedTimerMutex);
+            isTimeToSend = (event.elapsedTimer.isValid()
+                && event.elapsedTimer.hasExpired(kMinTimeBetweenEvents.count()));
+        }
+
+        if (isTimeToSend)
+        {
+            {
+                std::lock_guard<std::mutex> lock(m_elapsedTimerMutex);
+                event.elapsedTimer.invalidate();
+            }
+            sendEventStoppedPacket(event);
+        }
+    }
+    m_timer.start(timeTillCheck(), [this](){ onTimer(); });
 }
 
 } // axis

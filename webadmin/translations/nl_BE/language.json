@@ -87,7 +87,7 @@
         "maxRecordQueueSizeBytes": "Max records wachtrijgrootte (bytes)",
         "maxRecordQueueSizeElements": "Max records wachtrijgrootte (bytes)",
         "maxRemoteArchiveSynchronizationThreads": "Max externe opname synchronisatie taken",
-        "maxRtspConnectDurationSeconds": "Max Rtsp connect duration seconds",
+        "maxRtspConnectDurationSeconds": "Max. Rtsp connectie duur seconden",
         "maxSceneItems": "Max scène items (0 betekent standaard)",
         "proxyConnectTimeoutSec": "Time-out voor proxyverbinding (seconden)",
         "rtpTimeoutMs": "RTP timeout (milliseconden)",

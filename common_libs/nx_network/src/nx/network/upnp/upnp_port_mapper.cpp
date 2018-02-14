@@ -83,6 +83,11 @@ bool PortMapper::disableMapping(quint16 port, Protocol protocol)
     return true;
 }
 
+bool PortMapper::isEnabled() const
+{
+    return m_isEnabled;
+}
+
 void PortMapper::setIsEnabled(bool isEnabled)
 {
     QnMutexLocker lock(&m_mutex);
