@@ -28,7 +28,7 @@ should demand that email field is not empty
 should not succeed, if email is not registered
     Open Browser and go to URL    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
-    Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${UNREGISTERED EMAIL}
+    Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${EMAIL UNREGISTERED}
     Click Button    ${RESET PASSWORD BUTTON}
     Check For Alert Dismissable    ${CANNOT SEND CONFIRMATION EMAIL}
     Close Browser

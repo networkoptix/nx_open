@@ -13,21 +13,21 @@ ${common password}              yyyyyyyy
 ${valid email}                  noptixqa+valid@gmail.com
 
 *** Test Cases ***    FIRST       LAST        EMAIL                     PASS
-Invalid Email 1       None        None        noptixqagmail.com         None
-Invalid Email 2       None        None        @gmail.com                None
-Invalid Email 3       None        None        noptixqa@gmail..com       None
-Invalid Email 4       None        None        noptixqa@192.168.1.1.0    None
-Invalid Email 5       None        None        noptixqa.@gmail.com       None
-Invalid Email 6       None        None        noptixq..a@gmail.c        None
-Invalid Email 7       None        None        noptixqa@-gmail.com       None
-Empty Email           None        None        ${EMPTY}                  None
-Invalid Password 1    None        None        None                      ${7char password}
-Invalid Password 2    None        None        None                      ${no upper password}
-Empty Password        None        None        None                      ${EMPTY}
-Invalid First Name    ${SPACE}    None        None                      None
-Empty First Name      ${EMPTY}    None        None                      None
-Invalid Last Name     None        ${SPACE}    None                      None
-Empty Last Name       None        ${EMPTY}    None                      None
+Invalid Email 1       mark        hamill      noptixqagmail.com         ${BASE PASSWORD}
+Invalid Email 2       mark        hamill      @gmail.com                ${BASE PASSWORD}
+Invalid Email 3       mark        hamill      noptixqa@gmail..com       ${BASE PASSWORD}
+Invalid Email 4       mark        hamill      noptixqa@192.168.1.1.0    ${BASE PASSWORD}
+Invalid Email 5       mark        hamill      noptixqa.@gmail.com       ${BASE PASSWORD}
+Invalid Email 6       mark        hamill      noptixq..a@gmail.c        ${BASE PASSWORD}
+Invalid Email 7       mark        hamill      noptixqa@-gmail.com       ${BASE PASSWORD}
+Empty Email           mark        hamill      ${EMPTY}                  ${BASE PASSWORD}
+Invalid Password 1    mark        hamill      ${EMAIL UNREGISTERED}     ${7char password}
+Invalid Password 2    mark        hamill      ${EMAIL UNREGISTERED}     ${no upper password}
+Empty Password        mark        hamill      ${EMAIL UNREGISTERED}     ${EMPTY}
+Invalid First Name    ${SPACE}    hamill      ${EMAIL UNREGISTERED}     ${BASE PASSWORD}
+Empty First Name      ${EMPTY}    hamill      ${EMAIL UNREGISTERED}     ${BASE PASSWORD}
+Invalid Last Name     mark        ${SPACE}    ${EMAIL UNREGISTERED}     ${BASE PASSWORD}
+Empty Last Name       mark        ${EMPTY}    ${EMAIL UNREGISTERED}     ${BASE PASSWORD}
 Invalid All           ${SPACE}    ${SPACE}    noptixqagmail.com         ${7char password}
 Empty All             ${EMPTY}    ${EMPTY}    ${EMPTY}                  ${EMPTY}
 
@@ -36,10 +36,10 @@ Test Register Invalid
     [Arguments]    ${first}    ${last}    ${email}    ${pass}
     Open Browser and go to URL    ${url}/register
     Form Validation    Register    ${first}    ${last}    ${email}    ${pass}
-    Run Keyword Unless    "${pass}"=="None"    Check Password Outline
-    Run Keyword Unless    "${email}"=="None"    Check Email Outline
-    Run Keyword Unless    "${first}"=="None"    Check First Name Outline
-    Run Keyword Unless    "${last}"=="None"    Check Last Name Outline
+    Run Keyword Unless    "${pass}"=="${BASE PASSWORD}"    Check Password Outline
+    Run Keyword Unless    "${email}"=="${EMAIL UNREGISTERED}"    Check Email Outline
+    Run Keyword Unless    "${first}"=="mark"    Check First Name Outline
+    Run Keyword Unless    "${last}"=="hamill"    Check Last Name Outline
     Close Browser
 
 Check Email Outline
