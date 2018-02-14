@@ -75,9 +75,9 @@ ${DELETE USER CANCEL BUTTON}          //button[@ng-click='cancel()' and contains
 
 ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains(text(), '${SYSTEM NO ACCESS TEXT}')]
 
-#Disconnect from clout portal
+#Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
-${DISCONNECT FORM HEADER}             //h1['Disconnect System from Nx Cloud?']
+${DISCONNECT FORM HEADER}             //h1['${DISCONNECT FORM HEADER TEXT}']
 
 #Disconnect from my account
 ${DISCONNECT MODAL WARNING}              //p[contains(text(), '${DISCONNECT MODAL WARNING TEXT}')]
