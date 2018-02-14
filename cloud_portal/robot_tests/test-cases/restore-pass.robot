@@ -30,7 +30,7 @@ should not succeed, if email is not registered
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${EMAIL UNREGISTERED}
     Click Button    ${RESET PASSWORD BUTTON}
-    Check For Alert Dismissable    ${CANNOT SEND CONFIRMATION EMAIL}
+    Check For Alert Dismissable    ${CANNOT SEND CONFIRMATION EMAIL} ${ACCOUNT DOES NOT EXIST}
     Close Browser
 
 restores password
