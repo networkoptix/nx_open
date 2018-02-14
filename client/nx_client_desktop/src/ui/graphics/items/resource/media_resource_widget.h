@@ -190,6 +190,7 @@ signals:
     void zoomWindowRectangleVisibleChanged();
     void licenseStatusChanged();
     void analyticsSearchAreaSelected(const QRectF& relativeRect);
+    void ptzControllerChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -281,7 +282,8 @@ private:
 
     void setDisplay(const QnResourceDisplayPtr &display);
     void createButtons();
-    void createPtzController();
+
+    void updatePtzController();
 
     qreal calculateVideoAspectRatio() const;
 

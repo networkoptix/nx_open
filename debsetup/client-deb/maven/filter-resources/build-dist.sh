@@ -54,9 +54,11 @@ BUILD_INFO_TXT=@libdir@/build_info.txt
 LOGS_DIR="@libdir@/build_logs"
 LOG_FILE="$LOGS_DIR/client-build-dist.log"
 
+# [in] Library name
+# [in] Destination directory
 cp_sys_lib()
 {
-    "$SOURCE_ROOT_PATH"/build_utils/copy_system_library -c "$COMPILER" "$@"
+    "$SOURCE_ROOT_PATH"/build_utils/copy_system_library.sh -c "$COMPILER" "$@"
 }
 
 buildDistribution()

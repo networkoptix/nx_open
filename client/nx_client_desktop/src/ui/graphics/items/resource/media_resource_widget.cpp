@@ -340,6 +340,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
                 emit licenseStatusChanged();
             });
+
+        connect(qnPtzPool, &QnPtzControllerPool::controllerChanged, this,
+            [this](const QnResourcePtr& resource)
+            {
+                if (resource == d->camera)
+                    updatePtzController();
+            });
     }
 
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged, this,
@@ -371,7 +378,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     }
 
     updateAspectRatio();
-    createPtzController();
+    updatePtzController();
 
     /* Set up info updates. */
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
@@ -853,10 +860,10 @@ void QnMediaResourceWidget::createButtons()
     }
 }
 
-void QnMediaResourceWidget::createPtzController()
+void QnMediaResourceWidget::updatePtzController()
 {
-    auto threadPool = qnClientCoreModule->ptzControllerPool()->commandThreadPool();
-    auto executorThread = qnClientCoreModule->ptzControllerPool()->executorThread();
+    const auto threadPool = qnClientCoreModule->ptzControllerPool()->commandThreadPool();
+    const auto executorThread = qnClientCoreModule->ptzControllerPool()->executorThread();
 
     /* Set up PTZ controller. */
     QnPtzControllerPtr fisheyeController;
@@ -900,6 +907,8 @@ void QnMediaResourceWidget::createPtzController()
 
     connect(m_ptzController, &QnAbstractPtzController::changed, this,
         &QnMediaResourceWidget::at_ptzController_changed);
+
+    emit ptzControllerChanged();
 }
 
 qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
@@ -2320,17 +2329,16 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
     return base_type::calculateOverlayButton(statusOverlay);
 }
 
-void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key)
+void QnMediaResourceWidget::at_resource_propertyChanged(
+    const QnResourcePtr& /*resource*/,
+    const QString& key)
 {
-    Q_UNUSED(resource);
     if (key == QnMediaResource::customAspectRatioKey())
         updateCustomAspectRatio();
     else if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
         ensureTwoWayAudioWidget();
     else if (key == Qn::kCombinedSensorsDescriptionParamName)
         updateAspectRatio();
-    else if (key == Qn::PTZ_CAPABILITIES_PARAM_NAME)
-        updateButtonsVisibility();
 }
 
 void QnMediaResourceWidget::updateAspectRatio()

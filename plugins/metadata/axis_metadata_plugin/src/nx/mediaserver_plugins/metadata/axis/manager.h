@@ -44,20 +44,21 @@ public:
 
     virtual void freeManifest(const char* data) override;
 
-    const QList<AnalyticsEventTypeExtended>& events() const noexcept
+    const AnalyticsDriverManifest& events() const noexcept
     {
-        return m_events;
+        return m_typedManifest;
     }
 
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
-    const AnalyticsEventTypeExtended& eventByUuid(const QnUuid& uuid) const noexcept;
+
+    /** @return nullptr if not found */
+    const AnalyticsEventType* eventByUuid(const QnUuid& uuid) const noexcept;
 
 private:
-    QList<AnalyticsEventTypeExtended> m_events;
+    AnalyticsDriverManifest m_typedManifest;
     QByteArray m_manifest;
     QUrl m_url;
     QAuthenticator m_auth;
-
     Monitor* m_monitor = nullptr;
     QList<QByteArray> m_givenManifests; //< Place to store manifests we gave to caller
     // to provide 1) sufficient lifetime and 2) memory releasing in destructor.

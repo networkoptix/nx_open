@@ -8121,11 +8121,11 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Low</source>
-      <translation>Baixo</translation>
+      <translation>Baixa</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Alto</translation>
+      <translation>Alta</translation>
     </message>
     <message>
       <source>Custom</source>
