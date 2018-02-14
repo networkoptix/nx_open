@@ -885,11 +885,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Subir archivo...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Subir Carpeta...</translation>
     </message>
   </context>
   <context>
@@ -1010,7 +1010,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>La configuración no está disponible para archivos .EXE.</translation>
     </message>
   </context>
   <context>
@@ -2242,11 +2242,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Web</source>
-      <translation type="unfinished">Web</translation>
+      <translation>Red</translation>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>Sin configuraciones</translation>
     </message>
   </context>
   <context>
@@ -2734,11 +2734,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>No puede editar las propiedades de varias cámaras portátiles y no portátiles.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+      <translation>No puede editar las propiedades de varias cámaras portátiles y no portátiles.</translation>
     </message>
   </context>
   <context>
@@ -7183,15 +7183,15 @@ a %1</translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Detener la subida?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
+      <translation>Se mantendrán los archivos ya subidos.</translation>
     </message>
     <message>
       <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>Finalizando %1... %2%p%</translation>
     </message>
   </context>
   <context>
@@ -7596,43 +7596,43 @@ a %1</translation>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>Video (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+      <translation>Abrir Grabación de Cámara Portátil...</translation>
     </message>
     <message>
       <source>No video files found in &quot;%1&quot;</source>
-      <translation type="unfinished">No video files found in &quot;%1&quot;</translation>
+      <translation>No se encontraron archivos de video en &quot;%1&quot;</translation>
     </message>
     <message numerus="yes">
       <source>Selected file format(s) are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file format(s) are not supported</numerusform>
-        <numerusform>Selected file format(s) are not supported</numerusform>
+      <translation>
+        <numerusform>Los formatos de archivo seleccionados no son compatibles</numerusform>
+        <numerusform>Los formatos de archivo seleccionados no son compatibles</numerusform>
       </translation>
     </message>
     <message>
       <source>Only video files are supported.</source>
-      <translation type="unfinished">Only video files are supported.</translation>
+      <translation>Solo se admiten archivos de video.</translation>
     </message>
     <message numerus="yes">
       <source>Selected file(s) do not have timestamp(s)</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
-        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
+      <translation>
+        <numerusform>Los archivos seleccionados no tienen sello(s) de tiempo</numerusform>
+        <numerusform>Los archivos seleccionados no tienen sello de tiempo</numerusform>
       </translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
+      <translation>Solo se admiten archivos de video con la marca de tiempo correcta.</translation>
     </message>
     <message numerus="yes">
       <source>Selected file(s) cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Los archivos seleccionados cubren períodos para los cuales ya se están cargando videos</numerusform>
+        <numerusform>Los archivos seleccionados cubren períodos para los cuales ya se están cargando videos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8113,7 +8113,7 @@ Free space - %2</numerusform>
     <name>nx::client::desktop::RadassActionFactory</name>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation>Automático</translation>
     </message>
     <message>
       <source>Low</source>
@@ -8222,7 +8222,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>El período seleccionado no se puede exportar para la cámara actual.</translation>
     </message>
   </context>
   <context>

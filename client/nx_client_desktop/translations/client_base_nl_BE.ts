@@ -885,11 +885,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Upload bestand...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Upload map...</translation>
     </message>
   </context>
   <context>
@@ -1010,7 +1010,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
+      <translation>Instellingen zijn niet beschikbaar voor *.noc- en *.exe-bestanden.</translation>
     </message>
   </context>
   <context>
@@ -2242,11 +2242,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Web</source>
-      <translation type="unfinished">Web</translation>
+      <translation>Web</translation>
     </message>
     <message>
       <source>No settings</source>
-      <translation type="unfinished">No settings</translation>
+      <translation>Geen instellingen</translation>
     </message>
   </context>
   <context>
@@ -2734,11 +2734,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>Kan eigenschappen voor verschillende draagbare en niet-draagbare camera's niet bewerken.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+      <translation>Kan eigenschappen voor verschillende draagbare niet bewerken.</translation>
     </message>
   </context>
   <context>
@@ -7181,15 +7181,15 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Stoppen met uploaden?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
+      <translation>Reeds geuploade bestanden worden bewaard.</translation>
     </message>
     <message>
       <source>Finalizing %1... %2	%p%</source>
-      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+      <translation>Finaliseren %1... %2%p%</translation>
     </message>
   </context>
   <context>
@@ -7594,89 +7594,88 @@ to %1</source>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation type="unfinished">Video (%1)</translation>
+      <translation>Video (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+      <translation>Open draagbare Camera opnames...</translation>
     </message>
     <message>
       <source>No video files found in &quot;%1&quot;</source>
-      <translation type="unfinished">No video files found in &quot;%1&quot;</translation>
+      <translation>Geen videobestanden gevonden in &quot;%1&quot;</translation>
     </message>
     <message numerus="yes">
       <source>Selected file format(s) are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file format(s) are not supported</numerusform>
-        <numerusform>Selected file format(s) are not supported</numerusform>
+      <translation>
+        <numerusform>Geselecteerde bestandsindeling (en) worden niet ondersteund</numerusform>
+        <numerusform>Geselecteerde bestandsindeling (en) worden niet ondersteund</numerusform>
       </translation>
     </message>
     <message>
       <source>Only video files are supported.</source>
-      <translation type="unfinished">Only video files are supported.</translation>
+      <translation>Alleen videobestanden worden ondersteund.</translation>
     </message>
     <message numerus="yes">
       <source>Selected file(s) do not have timestamp(s)</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
-        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
+      <translation>
+        <numerusform>Geselecteerde bestand (en) hebben geen tijdstempel (s)</numerusform>
+        <numerusform>Geselecteerde bestand (en) hebben geen tijdstempel (s)</numerusform>
       </translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
+      <translation>Alleen videobestanden met de juiste tijdstempel worden ondersteund.</translation>
     </message>
     <message numerus="yes">
       <source>Selected file(s) cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Geselecteerde bestand (en) overlappen met video's die al geüpload worden</numerusform>
+        <numerusform>Geselecteerde bestand (en) overlappen met video's die al geüpload worden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these file(s) to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
-        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
+      <translation>
+        <numerusform>U kunt deze bestand(en) uploaden naar een ander exemplaar van een draagbare camera.</numerusform>
+        <numerusform>U kunt deze bestand(en) uploaden naar een ander exemplaar van een draagbare camera.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file(s) cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Geselecteerde bestand (en) overlappen met video's die al geüpload werden</numerusform>
+        <numerusform>Geselecteerde bestand (en) overlappen met video's die al geüpload werden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file(s) will not be uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) will not be uploaded</numerusform>
-        <numerusform>Selected file(s) will not be uploaded</numerusform>
+      <translation>
+        <numerusform>Geselecteerde bestand (en) worden niet geüpload</numerusform>
+        <numerusform>Geselecteerde bestand (en) worden niet geüpload</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some file(s) will not be uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Some file(s) will not be uploaded</numerusform>
-        <numerusform>Some file(s) will not be uploaded</numerusform>
+      <translation>
+        <numerusform>Sommige bestand(en) zullen niet worden geüpload</numerusform>
+        <numerusform>Sommige bestand(en) zullen niet worden geüpload</numerusform>
       </translation>
     </message>
     <message>
       <source>There is no new files to upload in &quot;%1&quot;</source>
-      <translation type="unfinished">There is no new files to upload in &quot;%1&quot;</translation>
+      <translation>Er zijn geen nieuwe bestanden om te uploaden in &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Niet genoeg schijfruimte op de server om op te slaan</translation>
     </message>
     <message numerus="yes">
       <source>File(s) size - %1
 Free space - %2</source>
-      <translation type="unfinished">
-        <numerusform>File(s) size - %1
-Free space - %2</numerusform>
-        <numerusform>File(s) size - %1
-Free space - %2</numerusform>
+      <translation>
+        <numerusform>Grootte bestand (en) - %1Vrije ruimte - %2</numerusform>
+        <numerusform>Grootte bestand (en) - %1
+Vrije ruimte - %2</numerusform>
       </translation>
     </message>
     <message>
@@ -7689,23 +7688,23 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>File format of &quot;%1&quot; is not supported.</source>
-      <translation type="unfinished">File format of &quot;%1&quot; is not supported.</translation>
+      <translation>Bestandsformaat van &quot;%1&quot; wordt niet ondersteund.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; does not have timestamp.</source>
-      <translation type="unfinished">File &quot;%1&quot; does not have timestamp.</translation>
+      <translation>Bestand &quot;%1&quot; heeft geen tijdstempel.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cover periods for which video is already being uploaded.</source>
-      <translation type="unfinished">File &quot;%1&quot; cover periods for which video is already being uploaded.</translation>
+      <translation>Bestand &quot;%1&quot; overlapt met video die al geüpload word.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cover periods for which video has already been uploaded.</source>
-      <translation type="unfinished">File &quot;%1&quot; cover periods for which video has already been uploaded.</translation>
+      <translation>Bestand &quot;%1&quot; overlapt met video die al geüpload werd.</translation>
     </message>
     <message>
       <source>There is no space on server for file &quot;%1&quot;.</source>
-      <translation type="unfinished">There is no space on server for file &quot;%1&quot;.</translation>
+      <translation>Er is geen ruimte op de server voor bestand &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -7906,9 +7905,9 @@ Free space - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      <translation>
+        <numerusform>Sommige videobestand(en) worden nog steeds geüpload naar %n draagbare camera's:</numerusform>
+        <numerusform>Sommige videobestand(en) worden nog steeds geüpload naar %n draagbare camera's:</numerusform>
       </translation>
     </message>
   </context>
@@ -8115,7 +8114,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Low</source>
-      <translation>Lage</translation>
+      <translation>Laag</translation>
     </message>
     <message>
       <source>High</source>
@@ -8185,7 +8184,7 @@ Free space - %2</numerusform>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>Kan geen verbinding maken met de server.</translation>
     </message>
   </context>
   <context>
@@ -8220,7 +8219,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>De geselecteerde periode kan niet worden geëxporteerd voor de huidige camera.</translation>
     </message>
   </context>
   <context>
@@ -8690,7 +8689,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+      <translation>Draagbare camera's kunnen niet van server worden verplaatst</translation>
     </message>
   </context>
   <context>

@@ -1786,7 +1786,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <translation>&quot;Tragbare Kamera&quot; ist ein virtueller Speicher für Videodateien, der auf jeden Server auf Ihrem System hochgeladen werden kann und von jedem Benutzer zugänglich ist.</translation>
     </message>
   </context>
   <context>
@@ -3075,7 +3075,7 @@ Klicken Sie auf &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Bewegung in hochgeladenen Video erkennen</translation>
     </message>
     <message>
       <location/>
