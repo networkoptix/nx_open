@@ -72,6 +72,8 @@ def login(request):
     django.contrib.auth.login(request, user)
     request.session['login'] = email
     request.session['password'] = password
+    if 'timezone' in request.data:
+        request.session['timezone'] = request.data['timezone']
     serializer = AccountSerializer(user, many=False)
     return api_success(serializer.data)
 
@@ -82,6 +84,7 @@ def login(request):
 def logout(request):
     request.session.pop('login', None)
     request.session.pop('password', None)
+    request.session.pop('timezone', None)
     django.contrib.auth.logout(request)
     return api_success()
 

@@ -49,7 +49,9 @@ var Config = {
         },
         unavailable: {
             style: 'label-default'
-        }
+        },
+        slave: 'slave',
+        master: 'master'
     },
     accessRoles: {
         unshare: 'none',
@@ -227,5 +229,8 @@ var Config = {
     debug: {
         chunksOnTimeline: false, // timeline.js - draw debug events
     },
-    responseOk: 'ok'
+    responseOk: 'ok',
+    systemCapabilities: {
+        cloudMerge: "cloudMerge"
+    }
 };

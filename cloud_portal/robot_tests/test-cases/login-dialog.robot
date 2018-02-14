@@ -65,7 +65,7 @@ after log In, display user's email and menu in top right corner
 
 valid but unregistered email shows error message
     Open Browser and go to URL    ${url}
-    Log In    ${UNREGISTERED EMAIL}    ${password}
+    Log In    ${EMAIL UNREGISTERED}    ${password}
     Wait Until Element Is Visible    ${ALERT}
     Close Browser
 
@@ -167,7 +167,6 @@ passes email from email input to Restore password page, even without clicking 'L
 
 redirects to /activate and shows non-activated user message when not activated; Resend activation button sends email
     Open Browser and go to URL    ${url}/register
-# Created this keyword myself in python.  It's located in browsermanagement.py line 255
     ${random email}    get random email
     Register    'mark'    'hamill'    ${random email}    ${BASE PASSWORD}
     Wait Until Element Is Visible    //h1[contains(@class,'process-success')]
