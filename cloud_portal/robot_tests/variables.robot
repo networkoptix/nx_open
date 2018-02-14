@@ -1,5 +1,5 @@
 *** Settings ***
-Variables    getvars.py    en_US
+Variables    getvars.py
 
 *** Variables ***
 ${ALERT}                              //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']
