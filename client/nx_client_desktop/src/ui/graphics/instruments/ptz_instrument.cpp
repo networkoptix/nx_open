@@ -364,6 +364,24 @@ void PtzInstrument::updateOverlayWidget()
     updateOverlayWidgetInternal(checked_cast<QnMediaResourceWidget*>(sender()));
 }
 
+void PtzInstrument::updateWidgetPtzController(QnMediaResourceWidget* widget)
+{
+    PtzData& data = m_dataByWidget[widget];
+    data.capabilitiesConnection = connect(widget->ptzController(),
+        &QnAbstractPtzController::changed,
+        this,
+        [this, widget](Qn::PtzDataFields fields)
+        {
+            if (fields.testFlag(Qn::CapabilitiesPtzField))
+                updateCapabilities(widget);
+            if (fields.testFlag(Qn::AuxilaryTraitsPtzField))
+                updateTraits(widget);
+        });
+    updateCapabilities(widget);
+    updateTraits(widget);
+    updateOverlayWidgetInternal(widget);
+}
+
 void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
 {
     bool hasCrosshair = widget->options().testFlag(QnResourceWidget::DisplayCrosshair);
@@ -592,26 +610,11 @@ bool PtzInstrument::registeredNotify(QGraphicsItem* item)
         &PtzInstrument::updateOverlayWidget);
     connect(widget, &QnMediaResourceWidget::fisheyeChanged, this,
         &PtzInstrument::updateOverlayWidget);
+    connect(widget, &QnMediaResourceWidget::ptzControllerChanged, this,
+        [this, widget] { updateWidgetPtzController(widget); });
 
-    PtzData& data = m_dataByWidget[widget];
-    data.capabilitiesConnection = connect(widget->ptzController(),
-        &QnAbstractPtzController::changed,
-        this,
-        [this, widget](Qn::PtzDataFields fields)
-        {
-            if (fields.testFlag(Qn::CapabilitiesPtzField))
-                updateCapabilities(widget);
-            if (fields.testFlag(Qn::AuxilaryTraitsPtzField))
-                updateTraits(widget);
-        }
-    );
-
-    updateCapabilities(widget);
-    updateTraits(widget);
-    updateOverlayWidgetInternal(widget);
-
+    updateWidgetPtzController(widget);
     return true;
-
 }
 
 void PtzInstrument::unregisteredNotify(QGraphicsItem* item)
