@@ -24,6 +24,8 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 #include <nx/client/desktop/utils/wearable_manager.h>
+#include <nx/client/desktop/utils/wearable_state.h>
+#include <nx/client/desktop/utils/wearable_payload.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;

@@ -9,6 +9,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/utils/wearable_manager.h>
+#include <nx/client/desktop/utils/wearable_state.h>
 #include <ui/dialogs/common/message_box.h>
 
 using namespace nx::client::desktop;

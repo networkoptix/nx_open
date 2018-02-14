@@ -15,6 +15,7 @@
 
 #include "server_request_storage.h"
 #include "upload_manager.h"
+#include "wearable_payload.h"
 
 namespace nx {
 namespace client {

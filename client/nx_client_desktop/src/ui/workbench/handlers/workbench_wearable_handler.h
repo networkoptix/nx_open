@@ -2,12 +2,13 @@
 
 #include <QtCore/QObject>
 
+#include <nx/utils/uuid.h>
+
 #include <core/resource/resource_fwd.h>
 #include <api/model/api_model_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
-#include <nx/utils/uuid.h>
-#include <nx/client/desktop/utils/wearable_payload.h>
+#include <nx/client/desktop/utils/wearable_fwd.h>
 
 class QnWorkbenchWearableHandler:
     public Connective<QObject>,
