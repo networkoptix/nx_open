@@ -69,7 +69,7 @@ angular.module('cloudApp')
                     email: email,
                     password: password,
                     remember: remember,
-                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null
+                    timezone: Intl && Intl.DateTimeFormat().resolvedOptions().timeZone || ""
                 });
             },
             logout:function(){
