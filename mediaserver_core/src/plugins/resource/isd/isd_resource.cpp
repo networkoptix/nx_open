@@ -257,20 +257,6 @@ void QnPlIsdResource::setCroppingPhysical(QRect /*cropping*/)
 {
 }
 
-QnConstResourceAudioLayoutPtr QnPlIsdResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
-{
-    if (isAudioEnabled()) {
-        const QnISDStreamReader* rtspReader = dynamic_cast<const QnISDStreamReader*>(dataProvider);
-        if (rtspReader && rtspReader->getDPAudioLayout())
-            return rtspReader->getDPAudioLayout();
-        else
-            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-    }
-    else
-        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-}
-
-
 void QnPlIsdResource::setMaxFps(int f)
 {
     setProperty(MAX_FPS_PARAM_NAME, f);

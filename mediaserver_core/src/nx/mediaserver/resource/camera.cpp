@@ -514,6 +514,21 @@ std::vector<Camera::AdvancedParametersProvider*> Camera::advancedParametersProvi
     return {};
 }
 
+QnConstResourceAudioLayoutPtr Camera::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
+{
+    if (isAudioEnabled())
+    {
+        if (auto liveProvider = dynamic_cast<const QnLiveStreamProvider*>(dataProvider))
+        {
+            auto result = liveProvider->getDPAudioLayout();
+            if (result)
+                return result;
+        }
+    }
+    return base_type::getAudioLayout(dataProvider);
+}
+
+
 } // namespace resource
 } // namespace mediaserver
 } // namespace nx

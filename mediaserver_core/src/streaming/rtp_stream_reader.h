@@ -12,7 +12,7 @@ public:
 
     void setRtpTransport(const RtpTransport::Value& transport);
     void setRequest(const QString& request);
-    QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+    virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
     virtual void pleaseStop() override;
 
 protected:
