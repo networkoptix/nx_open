@@ -122,7 +122,7 @@ void MetadataHandler::handleMetadataEvent(
 {
 auto eventState = nx::vms::event::EventState::undefined;
 
-        const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->eventTypeId());
+        const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->typeId());
         NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
 
         auto descriptor = eventDescriptor(eventTypeId);

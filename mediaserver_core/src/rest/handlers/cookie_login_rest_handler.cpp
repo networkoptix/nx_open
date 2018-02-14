@@ -74,8 +74,9 @@ int QnCookieLoginRestHandler::executePost(
         data += "; Path=/";
         if (!options.isEmpty())
             data += "; " + options;
-
-    nx::network::http::insertHeader(&owner->response()->headers, nx::network::http::HttpHeader("Set-Cookie", authData.toUtf8()));
+        nx::network::http::insertHeader(
+            &owner->response()->headers,
+            nx::network::http::HttpHeader("Set-Cookie", data));
     };
 
     // TODO: Save ganegated UUID and CSRF tocken for verification in
@@ -83,7 +84,6 @@ int QnCookieLoginRestHandler::executePost(
     setCookie(Qn::URL_QUERY_AUTH_KEY_NAME, cookieData.auth, "HttpOnly");
     setCookie(Qn::EC2_RUNTIME_GUID_HEADER_NAME, QnUuid::createUuid().toByteArray(), "HttpOnly");
     setCookie(Qn::CSRF_TOKEN_COOKIE_NAME, QnUuid::createUuid().toSimpleByteArray(), "");
-    nx::network::http::insertHeader(&owner->response()->headers, nx::network::http::HttpHeader("Set-Cookie", clientGuid.toUtf8()));
 
     QnCurrentUserRestHandler currentUser;
     return currentUser.executeGet(QString(), QnRequestParams(), result, owner);

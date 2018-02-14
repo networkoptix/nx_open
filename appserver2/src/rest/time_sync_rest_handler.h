@@ -2,7 +2,11 @@
 
 #include "rest/server/request_handler.h"
 
+namespace nx {
+namespace network {
 class AbstractStreamSocket;
+} // network
+} // nx
 class QnCommonModule;
 
 namespace ec2 {
@@ -39,7 +43,7 @@ public:
     static nx::network::http::StatusCode::Value processRequest(
         const nx::network::http::Request& request,
         TimeSynchronizationManager* timeSynchronizationManager,
-        AbstractStreamSocket* connection);
+        nx::network::AbstractStreamSocket* connection);
 
     static void prepareResponse(
         const TimeSynchronizationManager& timeSynchronizationManager,

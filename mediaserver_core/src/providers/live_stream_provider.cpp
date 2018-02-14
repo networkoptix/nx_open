@@ -304,7 +304,8 @@ float QnLiveStreamProvider::getDefaultFps() const
     {
         // noSharing
     }
-    return qBound(MIN_SECOND_STREAM_FPS, newSecondaryStreamFps, m_cameraRes->getMaxFps());
+    return qBound(
+        QnLiveStreamParams::kMinSecondStreamFps, newSecondaryStreamFps, m_cameraRes->getMaxFps());
 }
 
 bool QnLiveStreamProvider::needAnalyzeMotion(Qn::ConnectionRole /*role*/)

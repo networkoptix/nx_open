@@ -28,6 +28,7 @@
 #include <nx/vms/event/actions/send_mail_action.h>
 #include <nx/vms/event/actions/camera_output_action.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/aio/aio_service.h>
 
 namespace {
 

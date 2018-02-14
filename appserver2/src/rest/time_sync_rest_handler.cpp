@@ -61,7 +61,7 @@ int QnTimeSyncRestHandler::executePost(
 nx::network::http::StatusCode::Value QnTimeSyncRestHandler::processRequest(
     const nx::network::http::Request& request,
     TimeSynchronizationManager* timeSynchronizationManager,
-    AbstractStreamSocket* connection)
+    nx::network::AbstractStreamSocket* connection)
 {
     auto peerGuid = request.headers.find(Qn::PEER_GUID_HEADER_NAME);
     if (peerGuid == request.headers.end())
@@ -76,7 +76,7 @@ nx::network::http::StatusCode::Value QnTimeSyncRestHandler::processRequest(
 
         if (!rttMillis)
         {
-            StreamSocketInfo sockInfo;
+            nx::network::StreamSocketInfo sockInfo;
             if (connection && connection->getConnectionStatistics(&sockInfo))
                 rttMillis = sockInfo.rttVar;
         }
