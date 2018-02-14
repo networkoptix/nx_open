@@ -40,7 +40,13 @@ endfunction()
 
 _nx_create_vms_configuration()
 
-set(ENV{PYTHONPATH} "${CMAKE_SOURCE_DIR}/build_utils/python:${CMAKE_BINARY_DIR}")
+if(WIN32)
+    set(_sep ";")
+else()
+    set(_sep ":")
+endif()
+
+set(ENV{PYTHONPATH} "${CMAKE_SOURCE_DIR}/build_utils/python${_sep}${CMAKE_BINARY_DIR}")
 execute_process(
     COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py
     RESULT_VARIABLE sync_result
