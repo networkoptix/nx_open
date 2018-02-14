@@ -238,6 +238,7 @@ api::Updates2StatusData Updates2ManagerBase::download()
                 api::Updates2StatusData::StatusCode::preparing,
                 lit("Preparing update file: %1").arg(fileData.file));
             startPreparing(downloader()->filePath(fileData.file));
+            break;
         case ResultCode::fileAlreadyExists:
         case ResultCode::ok:
             setStatus(
@@ -304,24 +305,26 @@ void Updates2ManagerBase::startPreparing(const QString& updateFilePath)
             switch (prepareResult)
             {
                 case PrepareResult::ok:
-                    setStatus(
+                    return setStatus(
                         api::Updates2StatusData::StatusCode::readyToInstall,
                         lit("Update is ready for installation"));
-                    return;
                 case PrepareResult::corruptedArchive:
-                    setStatus(
+                    return setStatus(
                         api::Updates2StatusData::StatusCode::error,
                         lit("Update archive is corrupted"));
-                    return;
                 case PrepareResult::noFreeSpace:
-                    setStatus(
+                    return setStatus(
                         api::Updates2StatusData::StatusCode::error,
                         lit("Failed to prepare update file, no space left on device"));
-                    return;
+                case PrepareResult::cleanTemporaryFilesError:
+                    return setStatus(
+                        api::Updates2StatusData::StatusCode::error,
+                        lit("Failed to remove temporary files"));
                 case PrepareResult::unknownError:
-                    setStatus(
+                    return setStatus(
                         api::Updates2StatusData::StatusCode::error,
                         lit("Failed to prepare update files"));
+                case PrepareResult::alreadyStarted:
                     return;
             }
         });
@@ -397,22 +400,22 @@ void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
     m_currentStatus.files.remove(fileName);
 }
 
-void Updates2ManagerBase::onFileAdded(const FileInformation& fileInformation)
+void Updates2ManagerBase::onFileAdded(const FileInformation& /*fileInformation*/)
 {
 
 }
 
-void Updates2ManagerBase::onFileDeleted(const QString& fileName)
+void Updates2ManagerBase::onFileDeleted(const QString& /*fileName*/)
 {
 
 }
 
-void Updates2ManagerBase::onFileInformationChanged(const FileInformation& fileInformation)
+void Updates2ManagerBase::onFileInformationChanged(const FileInformation& /*fileInformation*/)
 {
 
 }
 
-void Updates2ManagerBase::onFileInformationStatusChanged(const FileInformation& fileInformation)
+void Updates2ManagerBase::onFileInformationStatusChanged(const FileInformation& /*fileInformation*/)
 {
 
 }

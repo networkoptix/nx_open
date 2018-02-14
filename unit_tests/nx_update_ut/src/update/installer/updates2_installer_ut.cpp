@@ -1,5 +1,6 @@
 #include <nx/update/installer/detail/updates2_installer_base.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/raii_guard.h>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -25,24 +26,67 @@ public:
     MOCK_CONST_METHOD0(createZipExtractor, AbstractZipExtractorPtr());
 };
 
+enum class ExpectedPrepareOutcome
+{
+    success,
+    fail_unknown,
+};
+
 class TestZipExtractor: public AbstractZipExtractor
 {
 public:
-    MOCK_METHOD3(
-        extractAsync,
-        void(const QString& filePath, const QString& outputDir, ExtractHandler extractHandler));
+    TestZipExtractor(ExpectedPrepareOutcome expectedOutcome):
+        m_expectedOutcome(expectedOutcome)
+    {}
 
-    MOCK_METHOD0(stop, void());
+    virtual void extractAsync(
+        const QString& /*filePath*/,
+        const QString& /*outputDir*/,
+        ExtractHandler extractHandler) override
+    {
+        {
+            QnMutexLocker lock(&m_mutex);
+            ++m_pendingRequests;
+        }
+
+        std::thread(
+            [this, self = this, extractHandler]()
+            {
+                auto decReqCountGuard = QnRaiiGuard::createDestructible(
+                    [self]()
+                    {
+                        QnMutexLocker lock(&self->m_mutex);
+                        --self->m_pendingRequests;
+                    });
+
+                switch (m_expectedOutcome)
+                {
+                case ExpectedPrepareOutcome::success:
+                    return extractHandler(QnZipExtractor::Error::Ok);
+                case ExpectedPrepareOutcome::fail_unknown:
+                    NX_ASSERT(false);
+                    break;
+                }
+            }).detach();
+    }
+
+    virtual void stop() override
+    {
+        QnMutexLocker lock(&m_mutex);
+        while (m_pendingRequests != 0)
+            m_condition.wait(lock.mutex());
+    }
+
+private:
+    QnMutex m_mutex;
+    QnWaitCondition m_condition;
+    int m_pendingRequests = 0;
+    ExpectedPrepareOutcome m_expectedOutcome = ExpectedPrepareOutcome::fail_unknown;
 };
 
 class Updates2Installer: public ::testing::Test
 {
 protected:
-    enum class ExpectedPrepareOutcome
-    {
-        success
-    };
-
     void whenPrepareRequestIsIssued(ExpectedPrepareOutcome expectedOutcome)
     {
         initializePrepareExpectations(expectedOutcome);
@@ -80,10 +124,13 @@ private:
             EXPECT_CALL(m_updates2Installer, cleanInstallerDirectory())
                 .Times(2)
                 .WillRepeatedly(Return(true));
-//            EXPECT_CALL(m_updates2Installer, createZipExtractor())
-//                .Times(1)
-//                .WillRepeatedly(Return());
-            // #TODO #akulikov uncomment snippet above and implement
+            EXPECT_CALL(m_updates2Installer, createZipExtractor())
+                .Times(1)
+                .WillOnce(Return(
+                    std::make_shared<TestZipExtractor>(ExpectedPrepareOutcome::success)));
+            break;
+        case ExpectedPrepareOutcome::fail_unknown:
+            NX_ASSERT(false);
             break;
         }
     }
@@ -91,9 +138,8 @@ private:
 
 TEST_F(Updates2Installer, prepareSuccessful)
 {
-//    whenPrepareRequestIsIssued(ExpectedPrepareOutcome::success);
-//    thenPrepareShouldEndWith(PrepareResult::ok);
-    // #TODO #akulikov uncomment snippet above and implement
+    whenPrepareRequestIsIssued(ExpectedPrepareOutcome::success);
+    thenPrepareShouldEndWith(PrepareResult::ok);
 }
 
 } // namespace test
