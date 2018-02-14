@@ -344,7 +344,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         connect(qnPtzPool, &QnPtzControllerPool::controllerChanged, this,
             [this](const QnResourcePtr& resource)
             {
-                if (resource == d->camera)
+                // Make sure we will not handle resource removing.
+                if (resource == d->camera && resource->resourcePool())
                     updatePtzController();
             });
     }
