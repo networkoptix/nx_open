@@ -6,7 +6,7 @@ namespace test {
 TransactionTransportStub::TransactionTransportStub(
     const ::ec2::ApiPeerData& localPeer,
     const ::ec2::ApiPeerData& remotePeer,
-    const QUrl& remotePeerApiUrl,
+    const nx::utils::Url& remotePeerApiUrl,
     bool isIncoming)
     :
     m_localPeer(localPeer),
@@ -156,7 +156,7 @@ void TransactionMessageBusStub::setTimeSyncManager(
 void TransactionMessageBusStub::addConnectionToRemotePeer(
     const ::ec2::ApiPeerData& localPeer,
     const ::ec2::ApiPeerData& remotePeer,
-    const QUrl& remotePeerApiUrl,
+    const nx::utils::Url& remotePeerApiUrl,
     bool isIncoming)
 {
     auto newConnection = std::make_unique<TransactionTransportStub>(

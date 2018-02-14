@@ -43,6 +43,20 @@ int MiscManagerStub::cleanupDatabase(
     return 0;
 }
 
+int MiscManagerStub::saveSystemMergeHistoryRecord(
+    const ApiSystemMergeHistoryRecord& /*param*/,
+    impl::SimpleHandlerPtr /*handler*/)
+{
+    // TODO
+    return 0;
+}
+
+int MiscManagerStub::getSystemMergeHistory(impl::GetSystemMergeHistoryHandlerPtr /*handler*/)
+{
+    // TODO
+    return 0;
+}
+
 int MiscManagerStub::saveMiscParam(
     const ec2::ApiMiscData& param,
     impl::SimpleHandlerPtr handler)

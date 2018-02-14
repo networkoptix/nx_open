@@ -61,7 +61,7 @@ ImageControlWidget::~ImageControlWidget()
 {
 }
 
-QnAligner* QnImageControlWidget::aligner() const
+QnAligner* ImageControlWidget::aligner() const
 {
     return m_aligner;
 }

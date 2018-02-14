@@ -21,12 +21,12 @@ namespace axis {
 struct AnalyticsEventType: nx::api::Analytics::EventType
 {
     QString topic;
-    QString name;
+    QString caption;
     nxpl::NX_GUID eventTypeIdExternal;
 
     AnalyticsEventType() = default;
     AnalyticsEventType(const nx::axis::SupportedEvent& supportedEvent);
-    QString fullName() const { return topic + QString("/") + name; }
+    QString fullName() const { return topic + QString("/") + caption; }
 };
 #define AxisAnalyticsEventType_Fields AnalyticsEventType_Fields(topic)(name)
 

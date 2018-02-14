@@ -20,6 +20,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 
 #include <client/client_module.h>
+#include <nx/client/core/utils/human_readable.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/messages/resources_messages.h>
@@ -187,7 +188,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
         return;
     QnMediaServerResourcePtr server = camera->getParentServer();
 
-    QString path = QnFileDialog::getExistingDirectory(mainWindow(),
+    QString path = QnFileDialog::getExistingDirectory(mainWindowWidget(),
         tr("Open Wearable Camera Recordings..."),
         QString(),
         QnCustomFileDialog::directoryDialogOptions()
@@ -198,7 +199,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
     QStringList files = QDir(path).entryList(kVideoExtensions);
     if (files.empty())
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::critical(mainWindowWidget(),
             tr("No video files found in \"%1\"").arg(path));
         return;
     }
@@ -220,7 +221,7 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearableUpload& upload)
 
     if (upload.allHaveStatus(WearablePayload::UnsupportedFormat))
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::critical(mainWindowWidget(),
             tr("Selected file format(s) are not supported", 0, count),
             tr("Only video files are supported."));
         return false;
@@ -228,7 +229,7 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearableUpload& upload)
 
     if (upload.allHaveStatus(WearablePayload::NoTimestamp))
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::critical(mainWindowWidget(),
             tr("Selected file(s) do not have timestamp(s)", 0, count),
             tr("Only video files with correct timestamp are supported."));
         return false;
@@ -236,7 +237,7 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearableUpload& upload)
 
     if (upload.allHaveStatus(WearablePayload::ChunksTakenByFileInQueue))
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::critical(mainWindowWidget(),
             tr("Selected file(s) cover periods for which videos are already being uploaded", 0, count),
             tr("You can upload these file(s) to a different instance of a Wearable Camera.", 0, count));
         return false;
@@ -244,7 +245,7 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearableUpload& upload)
 
     if (upload.allHaveStatus(WearablePayload::ChunksTakenOnServer))
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::critical(mainWindowWidget(),
             tr("Selected file(s) cover periods for which videos have already been uploaded", 0, count),
             tr("You can upload these file(s) to a different instance of a Wearable Camera.", 0, count));
         return false;
@@ -278,14 +279,14 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearableUpload& upload)
 
         if (!upload.someHaveStatus(WearablePayload::Valid))
         {
-            QnMessageBox::critical(mainWindow(),
+            QnMessageBox::critical(mainWindowWidget(),
                 tr("Selected file(s) will not be uploaded", 0, count),
                 extendedMessage);
             return false;
         }
         else
         {
-            QDialogButtonBox::StandardButton button = QnMessageBox::critical(mainWindow(),
+            QDialogButtonBox::StandardButton button = QnMessageBox::critical(mainWindowWidget(),
                 tr("Some file(s) will not be uploaded", 0, count),
                 extendedMessage,
                 QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -307,7 +308,7 @@ bool QnWorkbenchWearableHandler::checkFolderUpload(const QString& path, const We
 
     if (!upload.someHaveStatus(WearablePayload::Valid))
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::critical(mainWindowWidget(),
             tr("There is no new files to upload in \"%1\"").arg(path));
         return false;
     }
@@ -317,11 +318,13 @@ bool QnWorkbenchWearableHandler::checkFolderUpload(const QString& path, const We
 
 void QnWorkbenchWearableHandler::showNoSpaceOnServerWarning(const WearableUpload& upload)
 {
-    QnMessageBox::critical(mainWindow(),
+    using nx::client::core::HumanReadable;
+
+    QnMessageBox::critical(mainWindowWidget(),
         tr("Not enough space on server storage"),
         tr("File(s) size - %1\nFree space - %2", 0, upload.elements.size())
-            .arg(formatFileSize(upload.spaceRequested))
-            .arg(formatFileSize(upload.spaceAvailable)));
+            .arg(HumanReadable::digitalSize(upload.spaceRequested))
+            .arg(HumanReadable::digitalSize(upload.spaceAvailable)));
 }
 
 void QnWorkbenchWearableHandler::uploadValidFiles(
@@ -345,7 +348,7 @@ void QnWorkbenchWearableHandler::uploadValidFiles(
         else
             message = tr("Could not start upload as another user is currently uploading footage to this camera.");
 
-        QnMessageBox::critical(mainWindow(), message);
+        QnMessageBox::critical(mainWindowWidget(), message);
     }
 }
 

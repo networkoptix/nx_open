@@ -29,8 +29,8 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(const AnalyticsEventType& even
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
     commonEvent->setTypeId(event.eventTypeIdExternal);
-    commonEvent->setCaption(event.name.toUtf8().constData());
-    commonEvent->setDescription(event.eventName.value.toUtf8().constData());
+    commonEvent->setCaption(event.caption.toUtf8().constData());
+    commonEvent->setDescription(event.name.value.toUtf8().constData());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
     commonEvent->setAuxilaryData(event.topic.toUtf8().constData());
@@ -277,7 +277,7 @@ std::chrono::milliseconds Monitor::timeTillCheck() const
 
 void Monitor::sendEventStartedPacket(const AnalyticsEventType& event) const
 {
-    auto packet = createCommonEventMetadataPacket(event, /*active*/ true);
+    auto packet = createCommonEventsMetadataPacket(event, /*active*/ true);
     m_handler->handleMetadata(nx::sdk::Error::noError, packet);
     NX_PRINT
         << (event.isStateful() ? "Event [start] " : "Event [pulse] ")
@@ -287,7 +287,7 @@ void Monitor::sendEventStartedPacket(const AnalyticsEventType& event) const
 
 void Monitor::sendEventStoppedPacket(const AnalyticsEventType& event) const
 {
-    auto packet = createCommonEventMetadataPacket(event, /*active*/ false);
+    auto packet = createCommonEventsMetadataPacket(event, /*active*/ false);
     m_handler->handleMetadata(nx::sdk::Error::noError, packet);
     NX_PRINT << "Event [stop] " << event.fullName().toUtf8().constData()
         << " sent to server";

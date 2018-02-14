@@ -18,7 +18,7 @@ public:
     TransactionTransportStub(
         const ::ec2::ApiPeerData& localPeer,
         const ::ec2::ApiPeerData& remotePeer,
-        const QUrl& remotePeerApiUrl,
+        const nx::utils::Url& remotePeerApiUrl,
         bool isIncoming);
 
     virtual const ec2::ApiPeerData& localPeer() const override;
@@ -30,7 +30,7 @@ public:
 private:
     const ec2::ApiPeerData m_localPeer;
     const ec2::ApiPeerData m_remotePeer;
-    const QUrl m_remotePeerApiUrl;
+    const nx::utils::Url m_remotePeerApiUrl;
     const bool m_isIncoming;
 };
 
@@ -71,7 +71,7 @@ public:
     void addConnectionToRemotePeer(
         const ::ec2::ApiPeerData& localPeer,
         const ::ec2::ApiPeerData& remotePeer,
-        const QUrl& remotePeerApiUrl,
+        const nx::utils::Url& remotePeerApiUrl,
         bool isIncoming);
 
 private:

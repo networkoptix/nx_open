@@ -1228,7 +1228,7 @@ void ActionHandler::at_moveCameraAction_triggered() {
         // Drop out right away if we get a wearable camera here.
         if (camera->hasFlags(Qn::wearable_camera))
         {
-            QnMessageBox::critical(mainWindow(),
+            QnMessageBox::critical(mainWindowWidget(),
                 tr("Wearable Cameras cannot be moved between servers"));
             return;
         }

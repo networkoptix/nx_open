@@ -9,8 +9,8 @@
 #include <core/resource/media_server_resource.h>
 #include <recording/time_period_list.h>
 
-#include <plugins/resource/avi/avi_resource.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 
 #include "server_request_storage.h"
 

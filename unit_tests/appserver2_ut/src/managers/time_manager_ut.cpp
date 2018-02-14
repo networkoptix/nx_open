@@ -215,7 +215,7 @@ public:
         return peerData;
     }
 
-    QUrl apiUrl() const
+    nx::utils::Url apiUrl() const
     {
         return nx::network::url::Builder()
             .setScheme(nx::network::http::kUrlSchemeName)
@@ -246,7 +246,7 @@ private:
     nx::utils::StandaloneTimerManager m_timerManager;
     QnCommonModule m_commonModule;
     Settings m_settings;
-    TestHttpServer m_httpServer;
+    nx::network::http::TestHttpServer m_httpServer;
     std::shared_ptr<TestSystemClock> m_testSystemClock;
     std::shared_ptr<TestSteadyClock> m_testSteadyClock;
     std::shared_ptr<MiscManagerStub> m_miscManager;

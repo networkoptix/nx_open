@@ -247,11 +247,11 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
         (const AnalyticsHelper::EventDescriptor& eventType)
         {
             if (!hasDifferentDrivers)
-                return eventType.eventName.text(locale);
+                return eventType.name.text(locale);
 
             return lit("%1 - %2")
                 .arg(eventType.driverName.text(locale))
-                .arg(eventType.eventName.text(locale));
+                .arg(eventType.name.text(locale));
         };
 
     for (const auto& eventType: allEventTypes)

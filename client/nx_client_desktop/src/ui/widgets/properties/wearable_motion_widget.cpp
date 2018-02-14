@@ -9,7 +9,7 @@
 
 QnWearableMotionWidget::QnWearableMotionWidget(QWidget* parent):
     QWidget(parent),
-    QnWorkbenchContextAware(parent, true),
+    QnWorkbenchContextAware(parent, InitializationMode::lazy),
     ui(new Ui::WearableMotionWidget)
 {
     ui->setupUi(this);

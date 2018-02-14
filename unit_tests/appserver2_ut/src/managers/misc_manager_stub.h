@@ -48,6 +48,13 @@ protected:
         const ec2::ApiRuntimeData& data,
         impl::SimpleHandlerPtr handler) override;
 
+    virtual int saveSystemMergeHistoryRecord(
+        const ApiSystemMergeHistoryRecord& param,
+        impl::SimpleHandlerPtr handler) override;
+
+    virtual int getSystemMergeHistory(
+        impl::GetSystemMergeHistoryHandlerPtr handler) override;
+
 private:
     std::atomic<int> m_reqIdSequence;
     std::map<QByteArray, QByteArray> m_miscParams;

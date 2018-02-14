@@ -34,11 +34,11 @@ public:
 
     void setManifest(const nx::api::AnalyticsDriverManifest& manifest);
 
-signals:
-    void sdkEventTriggered(const nx::vms::event::AnalyticsSdkEventPtr& event);
-
     void registerDataReceptor(QnAbstractDataReceptor* dataReceptor);
     void removeDataReceptor(QnAbstractDataReceptor* dataReceptor);
+
+signals:
+    void sdkEventTriggered(const nx::vms::event::AnalyticsSdkEventPtr& event);
 
 private:
     nx::vms::event::EventState lastEventState(const QnUuid& eventId) const;

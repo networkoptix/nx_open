@@ -228,8 +228,8 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     {
         QSizeF paintSize = m_layoutThumbnail.size() / m_layoutThumbnail.devicePixelRatio();
         // Fitting thumbnail exactly to widget's rect.
-        paintSize = QnGeometry::bounded(paintSize, paintRect.size(), Qt::KeepAspectRatio);
-        paintSize = QnGeometry::expanded(paintSize, paintRect.size(), Qt::KeepAspectRatio);
+        paintSize = Geometry::bounded(paintSize, paintRect.size(), Qt::KeepAspectRatio);
+        paintSize = Geometry::expanded(paintSize, paintRect.size(), Qt::KeepAspectRatio);
 
         QRect dstRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
             paintSize.toSize(), paintRect.toRect());

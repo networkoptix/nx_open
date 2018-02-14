@@ -47,18 +47,18 @@ QnUuid guidFromEventName(const char* eventFullName)
 AnalyticsEventType::AnalyticsEventType(const nx::axis::SupportedEvent& supportedEvent)
 {
     eventTypeId = guidFromEventName(supportedEvent.fullName().c_str());
-    eventName.value = supportedEvent.description.c_str();
-    if (eventName.value.simplified().isEmpty())
+    name.value = supportedEvent.description.c_str();
+    if (name.value.simplified().isEmpty())
     {
-        eventName.value = supportedEvent.fullName().c_str();
-        eventName.value = ignoreNamespaces(eventName.value);
+        name.value = supportedEvent.fullName().c_str();
+        name.value = ignoreNamespaces(name.value);
     }
     flags = (supportedEvent.stateful)
         ? nx::api::Analytics::EventTypeFlag::stateDependent
         : nx::api::Analytics::EventTypeFlag::noFlags;
 
     topic = supportedEvent.topic.c_str();
-    name = supportedEvent.name.c_str();
+    caption = supportedEvent.name.c_str();
     eventTypeIdExternal = nxpt::fromQnUuidToPluginGuid(eventTypeId);
 }
 
