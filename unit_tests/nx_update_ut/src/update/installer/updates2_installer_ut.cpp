@@ -122,7 +122,7 @@ class Updates2Installer: public ::testing::Test
 protected:
     virtual void TearDown() override
     {
-        m_updates2Installer.stop();
+        m_updates2Installer.stopSync();
     }
 
     void whenPrepareRequestIsIssued(

@@ -93,10 +93,10 @@ QString ServerUpdates2Manager::filePath() const
     return qnServerModule->settings()->getDataDirectory() + QDir::separator() + kFileName;
 }
 
-update::detail::AbstractUpdates2InstallerPtr ServerUpdates2Manager::installer()
+update::detail::AbstractUpdates2Installer* ServerUpdates2Manager::installer()
 {
     // #TODO #akulikov implement this correctly
-    return nx::update::detail::AbstractUpdates2InstallerPtr();
+    return nullptr;
 }
 
 } // namespace updates2

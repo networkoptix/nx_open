@@ -63,7 +63,7 @@ protected:
     virtual void connectToSignals() = 0;
     virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() = 0;
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
-    virtual AbstractUpdates2InstallerPtr installer() = 0;
+    virtual AbstractUpdates2Installer* installer() = 0;
     virtual QString filePath() const = 0;
 
 };

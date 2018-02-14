@@ -15,8 +15,7 @@ public:
     virtual void prepareAsync(const QString& path, PrepareUpdateCompletionHandler handler) override;
     virtual void install() override;
     virtual ~Updates2InstallerBase() override;
-
-    void stop();
+    virtual void stopSync() override;
 
 private:
     AbstractZipExtractorPtr m_extractor;

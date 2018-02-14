@@ -26,9 +26,8 @@ public:
     virtual ~AbstractUpdates2Installer() = default;
     virtual void prepareAsync(const QString& path, PrepareUpdateCompletionHandler handler) = 0;
     virtual void install() = 0;
+    virtual void stopSync() = 0;
 };
-
-using AbstractUpdates2InstallerPtr = std::shared_ptr<AbstractUpdates2Installer>;
 
 } // namespace detail
 } // namespace update

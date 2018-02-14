@@ -67,7 +67,7 @@ QString Updates2InstallerBase::installerWorkDir() const
     return dataDirectoryPath() + QDir::separator() + ".installer";
 }
 
-void Updates2InstallerBase::stop()
+void Updates2InstallerBase::stopSync()
 {
     QnMutexLocker lock(&m_mutex);
     while (m_running)
@@ -76,7 +76,7 @@ void Updates2InstallerBase::stop()
 
 Updates2InstallerBase::~Updates2InstallerBase()
 {
-    stop();
+    stopSync();
 }
 
 } // namespace detail

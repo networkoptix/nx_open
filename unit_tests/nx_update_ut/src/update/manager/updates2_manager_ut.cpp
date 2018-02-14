@@ -90,9 +90,11 @@ public:
         m_expectedOutcome = expectedOutcome;
     }
 
+    MOCK_METHOD0(stopSync, void());
+
     ~TestInstaller()
     {
-        stop();
+        QnLongRunnable::stop();
     }
 
 private:
@@ -231,7 +233,7 @@ public:
     }
 
     MOCK_METHOD0(downloader, vms::common::p2p::downloader::AbstractDownloader*());
-    MOCK_METHOD0(installer, AbstractUpdates2InstallerPtr());
+    MOCK_METHOD0(installer, AbstractUpdates2Installer*());
 
     virtual void remoteUpdateCompleted() override
     {
@@ -423,7 +425,7 @@ protected:
                     .Times(1).WillOnce(Return(kFileName));
                 EXPECT_CALL(m_testUpdates2Manager, installer())
                     .Times(1)
-                    .WillOnce(Return(AbstractUpdates2InstallerPtr(&m_testInstaller, [](void*){})));
+                    .WillOnce(Return(&m_testInstaller));
             };
 
         switch (expectedOutcome)

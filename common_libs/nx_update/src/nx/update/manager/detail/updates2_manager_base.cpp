@@ -297,8 +297,7 @@ void Updates2ManagerBase::setStatus(
 
 void Updates2ManagerBase::startPreparing(const QString& updateFilePath)
 {
-    AbstractUpdates2InstallerPtr updateInstaller = installer();
-    updateInstaller->prepareAsync(
+    installer()->prepareAsync(
         updateFilePath,
         [this](PrepareResult prepareResult)
         {
