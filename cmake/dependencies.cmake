@@ -65,3 +65,5 @@ foreach(package_dir ${synched_package_dirs})
         nx_copy_package(${package_dir})
     endif()
 endforeach()
+
+file(TO_CMAKE_PATH "${QT_DIR}" QT_DIR)
