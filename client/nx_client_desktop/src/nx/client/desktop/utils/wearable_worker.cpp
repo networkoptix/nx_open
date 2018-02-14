@@ -349,7 +349,7 @@ void WearableWorker::handleExtendFinished(bool success, const QnWearableStatusRe
 
     if(d->state.status == WearableState::Consuming)
     {
-        d->state.consumeProgress = result.progress;
+        d->state.consumeProgress = result.consuming ? std::min(99, result.progress) : 100;
         emit stateChanged(d->state);
 
         if (!result.consuming)
