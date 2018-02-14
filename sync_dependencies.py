@@ -168,8 +168,6 @@ def sync_dependencies(syncher):
 
     sync("any/certificates-" + customization, path_variable="certificates_path")
 
-    sync("any/test")
-
 
 def main():
     syncher = RdepSyncher(PACKAGES_DIR)
