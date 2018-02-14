@@ -8229,15 +8229,15 @@ Free space - %2</numerusform>
     <name>nx::client::desktop::RadassActionFactory</name>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation>Авто</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Низкий</translation>
+      <translation>Низкое</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Высокий</translation>
+      <translation>Высокое</translation>
     </message>
     <message>
       <source>Custom</source>

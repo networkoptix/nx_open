@@ -10,3 +10,5 @@ endif()
 if(NOT PYTHON_EXECUTABLE)
     message(FATAL_ERROR "Python executable not found.")
 endif()
+
+set(ENV{PYTHONDONTWRITEBYTECODE} True)

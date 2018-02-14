@@ -8110,7 +8110,7 @@ Free space - %2</numerusform>
     <name>nx::client::desktop::RadassActionFactory</name>
     <message>
       <source>Auto</source>
-      <translation>Oto</translation>
+      <translation>Otomatik</translation>
     </message>
     <message>
       <source>Low</source>

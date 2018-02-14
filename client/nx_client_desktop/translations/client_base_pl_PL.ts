@@ -8228,11 +8228,11 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Low</source>
-      <translation>Niski</translation>
+      <translation>Niska</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Wysoki</translation>
+      <translation>Wysoka</translation>
     </message>
     <message>
       <source>Custom</source>
