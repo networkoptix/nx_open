@@ -37,7 +37,7 @@ class AccountBackend(ModelBackend):
                 import zlib
                 (uuid, temp_crc32) = username.split('-')
                 email_crc32 = zlib.crc32(user['email']) & 0xffffffff  # convert signed to unsigned crc32
-                if email_crc32 != temp_crc32:
+                if email_crc32 != int(temp_crc32):
                     raise APILogicException('Login does not match users email', ErrorCodes.wrong_code)
 
             if not AccountBackend.is_email_in_portal(user['email']):
