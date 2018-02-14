@@ -32,5 +32,5 @@
     "LIVE VIEWER TEXT"                             :    "Live Viewer",    
     "CUSTOM TEXT"                                  :    "Custom",
     "RESET PASSWORD EMAIL SUBJECT"                 :    "Reset your password",
-    "INVITED TO SYSTEM EMAIL SUBJECT"              :    "invites you to Nx Cloud"
+    "INVITED TO SYSTEM EMAIL SUBJECT"              :    "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
 }

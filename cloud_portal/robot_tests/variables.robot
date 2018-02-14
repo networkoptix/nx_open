@@ -142,6 +142,9 @@ ${EMAIL NOPERM}                       noptixqa+noperm@gmail.com
 ${BASE PASSWORD}                      qweasd123
 ${ALT PASSWORD}                       qweasd1234
 
+${TEST FIRST NAME}                    testFirstName
+${TEST LAST NAME}                     testLastName
+
 #Related to Auto Tests system
 ${AUTO TESTS SYSTEM ID}                     b4939b35-5b98-492b-a092-27fe8efeef38
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]
