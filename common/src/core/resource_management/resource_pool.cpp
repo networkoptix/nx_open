@@ -144,7 +144,7 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
 
     for (const auto& resource: addedResources)
     {
-        NX_VERBOSE(this) "RESOURCE ADDED"
+        NX_VERBOSE(this) << "RESOURCE ADDED"
             << resource->metaObject()->className()
             << resource->getName();
         emit resourceAdded(resource);
@@ -218,7 +218,7 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
             }
         }
 
-        NX_VERBOSE(this) "RESOURCE REMOVED"
+        NX_VERBOSE(this) << "RESOURCE REMOVED"
             << layoutResource->metaObject()->className()
             << layoutResource->getName();
     }
@@ -234,7 +234,7 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
                     otherResource->getUniqueId())
                     layoutResource->removeItem(data);
 
-        NX_VERBOSE(this) "RESOURCE REMOVED"
+        NX_VERBOSE(this) << "RESOURCE REMOVED"
             << otherResource->metaObject()->className()
             << otherResource->getName();
     }
