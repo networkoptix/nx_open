@@ -53,7 +53,7 @@ QnMetaDataV1Ptr AviMotionArchiveDelegate::analyzeMotion(const QnAbstractMediaDat
     if (!video)
         return nullptr;
 
-    bool result = m_motionEstimation.analizeFrame(video);
+    bool result = m_motionEstimation.analyzeFrame(video);
 
     if (!result)
         return nullptr;
