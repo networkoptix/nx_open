@@ -36,6 +36,7 @@ private slots:
     void at_uploadWearableCameraFolderAction_triggered();
     void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
     void at_context_userChanged();
+    void at_wearableManager_stateChanged(const nx::client::desktop::WearableState& state);
 
 private:
     QString calculateExtendedErrorMessage(const nx::client::desktop::WearablePayload& upload);

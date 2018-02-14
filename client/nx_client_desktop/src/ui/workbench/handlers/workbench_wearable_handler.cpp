@@ -5,6 +5,8 @@
 #include <nx/utils/string.h>
 #include <utils/common/guarded_callback.h>
 #include <common/common_module.h>
+#include <camera/camera_data_manager.h>
+#include <camera/loaders/caching_camera_data_loader.h>
 
 #include <api/server_rest_connection.h>
 #include <api/model/wearable_camera_reply.h>
@@ -93,6 +95,8 @@ QnWorkbenchWearableHandler::QnWorkbenchWearableHandler(QObject* parent):
         &QnWorkbenchWearableHandler::at_resourcePool_resourceAdded);
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnWorkbenchWearableHandler::at_context_userChanged);
+    connect(qnClientModule->wearableManager(), &WearableManager::stateChanged, this,
+        &QnWorkbenchWearableHandler::at_wearableManager_stateChanged);
 }
 
 QnWorkbenchWearableHandler::~QnWorkbenchWearableHandler()
@@ -355,6 +359,22 @@ void QnWorkbenchWearableHandler::at_resourcePool_resourceAdded(const QnResourceP
 void QnWorkbenchWearableHandler::at_context_userChanged()
 {
     qnClientModule->wearableManager()->setCurrentUser(context()->user());
+}
+
+void QnWorkbenchWearableHandler::at_wearableManager_stateChanged(const WearableState& state)
+{
+    if (state.consumeProgress != 100 || state.status != WearableState::Consuming)
+        return;
+
+    QnSecurityCamResourcePtr camera =
+        resourcePool()->getResourceById<QnSecurityCamResource>(state.cameraId);
+    if (!camera)
+        return;
+
+    context()
+        ->instance<QnCameraDataManager>()
+        ->loader(camera, /*create=*/true)
+        ->load(/*forced=*/true);
 }
 
 QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const WearablePayload& upload)
