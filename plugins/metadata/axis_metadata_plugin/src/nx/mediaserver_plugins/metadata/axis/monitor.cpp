@@ -141,13 +141,11 @@ Monitor::Monitor(
     m_handler(handler),
     m_httpServer(nullptr)
 {
-    NX_PRINT << "Ctor :" << this;
 }
 
 Monitor::~Monitor()
 {
     stopMonitoring();
-    NX_PRINT << "Dtor :" << this;
 }
 
 void Monitor::addRules(const SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
@@ -196,7 +194,7 @@ void Monitor::addRules(const SocketAddress& localAddress, nxpl::NX_GUID* eventTy
             else
                 NX_PRINT << "Action addition failed";
 
-            NX_PRINT << "Try to add rule " << it->fullName().toUtf8().constData();
+            NX_PRINT << "Try to add rule " << it->fullName().toStdString();
             //event.fullname is something like "tns1:VideoSource/tnsaxis:DayNightVision"
             std::string ruleName = kRuleNamePrefix + std::to_string(globalCounter);
             nx::axis::ActiveRule rule(
@@ -309,8 +307,7 @@ void Monitor::sendEventStartedPacket(const AnalyticsEventType& event) const
     m_handler->handleMetadata(nx::sdk::Error::noError, packet);
     NX_PRINT
         << (event.isStateful() ? "Event [start] " : "Event [pulse] ")
-        << event.fullName().toUtf8().constData()
-        << " sent to server";
+        << event.fullName().toStdString() << " sent to server";
 }
 
 void Monitor::sendEventStoppedPacket(const AnalyticsEventType& event) const

@@ -26,7 +26,7 @@ public:
     QnArecontRtspStreamReader(const QnResourcePtr& res);
     virtual ~QnArecontRtspStreamReader();
 
-    QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+    virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;

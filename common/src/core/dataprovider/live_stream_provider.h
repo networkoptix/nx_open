@@ -84,6 +84,7 @@ public:
     virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const override;
     virtual void pleaseReopenStream() = 0;
 
+    virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
 protected:
     QnAbstractCompressedMetadataPtr getMetaData();
     virtual QnMetaDataV1Ptr getCameraMetadata();

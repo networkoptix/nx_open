@@ -140,6 +140,7 @@ class Rdep:
         self._timestamps = {}
         try:
             config = ConfigParser.ConfigParser()
+            config.optionxform = str
             config.read(os.path.join(self.root, TIMESTAMPS_FILE))
 
             for package, timestamp in config.items('Timestamps'):

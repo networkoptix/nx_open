@@ -33,7 +33,7 @@ public:
 
     QnOnvifStreamReader(const QnResourcePtr& res);
     virtual ~QnOnvifStreamReader();
-    QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+    virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
     virtual void pleaseStop() override;
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
 

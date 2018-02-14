@@ -16,7 +16,7 @@ class QnDesktopCameraStreamReader: public CLServerPushStreamReader
 public:
     QnDesktopCameraStreamReader(const QnResourcePtr& res);
     virtual ~QnDesktopCameraStreamReader();
-    QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+    virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
     void setNeedVideoData(bool value);
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;

@@ -26,8 +26,6 @@ public:
 
     //bool hasDualStreaming() const {return false;}
 
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
-
 protected:
     QSize m_resolution1;
     QSize m_resolution2;

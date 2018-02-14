@@ -785,19 +785,6 @@ void QnPlAxisResource::setMotionMaskPhysical(int /*channel*/)
     }
 }
 
-QnConstResourceAudioLayoutPtr QnPlAxisResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
-{
-    if (isAudioEnabled()) {
-        const QnAxisStreamReader* axisReader = dynamic_cast<const QnAxisStreamReader*>(dataProvider);
-        if (axisReader && axisReader->getDPAudioLayout())
-            return axisReader->getDPAudioLayout();
-        else
-            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-    }
-    else
-        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-}
-
 int QnPlAxisResource::getChannelNumAxis() const
 {
     QString phId = getPhysicalId();

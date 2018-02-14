@@ -32,9 +32,10 @@ struct AnalyticsEventType: nx::api::Analytics::EventType
 
 struct AnalyticsDriverManifest: nx::api::AnalyticsDriverManifestBase
 {
+    QStringList allowedTopics;
     QList<AnalyticsEventType> outputEventTypes;
 };
-#define AxisAnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields(outputEventTypes)
+#define AxisAnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields(allowedTopics)(outputEventTypes)
 
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEventType, (json))
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
