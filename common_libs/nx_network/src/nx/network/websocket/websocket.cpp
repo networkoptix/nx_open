@@ -417,7 +417,7 @@ void WebSocket::sendControlResponse(FrameType requestType, FrameType responseTyp
             reportErrorIfAny(
                 ecode,
                 1, //< just not zero
-                [this, requestType](bool errorOccured)
+                [requestType](bool errorOccured)
                 {
                     if (errorOccured)
                     {
@@ -445,7 +445,7 @@ void WebSocket::sendControlRequest(FrameType type)
             reportErrorIfAny(
                 ecode,
                 1, //< just not zero
-                [this, type](bool errorOccured)
+                [type](bool errorOccured)
                 {
                     if (errorOccured)
                     {

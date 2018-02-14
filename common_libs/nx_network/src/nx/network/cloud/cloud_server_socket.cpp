@@ -216,7 +216,7 @@ void CloudServerSocket::cancelIOSync()
         // We need dispatch here to avoid blocking if called within aio thread.
         nx::utils::promise<void> cancelledPromise;
         cancelIOAsync(
-            [this, &cancelledPromise]
+            [&cancelledPromise]
             {
                 cancelledPromise.set_value();
             });

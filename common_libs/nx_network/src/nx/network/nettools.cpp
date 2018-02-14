@@ -558,11 +558,12 @@ QHostAddress getGatewayOfIf( const QString& ip )
 #elif defined(Q_OS_MAC)
 void removeARPrecord(const QHostAddress& /*ip*/) {}
 
-#ifdef Q_OS_IOS
-QString getMacByIP(const QHostAddress& ip, bool /*net*/) {
+#if defined(Q_OS_IOS)
+QString getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
+{
     return QString();
 }
-#else
+#else // defined(Q_OS_IOS)
 
 #define ROUNDUP(a) ((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
 
