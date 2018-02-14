@@ -14,6 +14,7 @@
 #include <nx/core/access/access_types.h>
 
 #include <api/global_settings.h>
+#include <api/http_client_pool.h>
 #include <api/runtime_info_manager.h>
 #include <common/common_module.h>
 
@@ -155,10 +156,18 @@ public:
         return std::chrono::milliseconds(m_timeSynchronizationManager->getSyncTime());
     }
 
-    void emulateRestart()
+    void stop()
     {
         m_timeSynchronizationManager.reset();
         m_transactionMessageBus.reset();
+    }
+
+    void restart()
+    {
+        if (m_timeSynchronizationManager)
+            m_timeSynchronizationManager.reset();
+        if (m_transactionMessageBus)
+            m_transactionMessageBus.reset();
 
         m_transactionMessageBus =
             std::make_unique<TransactionMessageBusStub>(&m_commonModule);
@@ -167,8 +176,15 @@ public:
             &m_timerManager,
             m_transactionMessageBus.get(),
             &m_settings,
-            m_workAroundMiscDataSaverStub);
+            m_workAroundMiscDataSaverStub,
+            m_testSystemClock,
+            m_testSteadyClock);
         m_timeSynchronizationManager->start(m_miscManager);
+    }
+
+    void setPrimaryPeerId(const QnUuid& peerId)
+    {
+        m_timeSynchronizationManager->primaryTimeServerChanged(ApiIdData(peerId));
     }
 
     void connectTo(TimeSynchronizationPeer* remotePeer)
@@ -206,7 +222,17 @@ public:
             .setEndpoint(m_httpServer.serverAddress()).toUrl();
     }
 
-    void setOsTimeShift(std::chrono::milliseconds shift)
+    std::chrono::milliseconds getSystemTime() const
+    {
+        return m_testSystemClock->millisSinceEpoch();
+    }
+
+    QnGlobalSettings* globalSettings() const
+    {
+        return m_commonModule.globalSettings();
+    }
+
+    void shiftSystemClock(std::chrono::milliseconds shift)
     {
         m_testSystemClock->applyRelativeShift(shift);
     }
@@ -310,18 +336,26 @@ protected:
         m_peers.push_back(std::move(peer));
     }
 
+    template<int peerCount>
+    void launchCluster(const int connectTable[peerCount][peerCount])
+    {
+        startPeers(peerCount);
+
+        m_connectTable.resize(peerCount);
+        for (int i = 0; i < peerCount; ++i)
+        {
+            m_connectTable[i].resize(peerCount);
+            for (int j = i+1; j < peerCount; ++j)
+                m_connectTable[i][j] = connectTable[i][j];
+        }
+
+        connectPeers();
+    }
+
     void givenMultipleOfflinePeersEachWithDifferentLocalTime()
     {
         const auto peerCount = 3;
-        for (int i = 0; i < peerCount; ++i)
-        {
-            auto peer = std::make_unique<TimeSynchronizationPeer>();
-            peer->setSynchronizeWithInternetEnabled(false);
-            peer->setOsTimeShift(
-                std::chrono::hours(nx::utils::random::number<int>(-1000, 1000)));
-            ASSERT_TRUE(peer->start());
-            m_peers.push_back(std::move(peer));
-        }
+        startPeers(peerCount);
 
         connectEveryPeerToEachOther();
     }
@@ -332,22 +366,74 @@ protected:
         waitForTimeToBeSynchronizedAcrossAllPeers();
     }
 
+    void givenMultipleSynchronizedPeersWithPrimaryPeerSelectedByUser()
+    {
+        givenMultipleOfflinePeersEachWithDifferentLocalTime();
+        selectRandomPeerAsPrimary();
+        waitForTimeToBeSynchronizedWithPrimaryPeerSystemClock();
+    }
+
+    void selectPrimaryPeer(int peerIndex)
+    {
+        m_primaryPeerIndex = peerIndex;
+
+        for (const auto& peer : m_peers)
+        {
+            peer->setPrimaryPeerId(
+                m_peers[m_primaryPeerIndex]->commonModule()->moduleGUID());
+        }
+    }
+
+    void selectRandomPeerAsPrimary()
+    {
+        // Selecting peer with the maximum id.
+        const auto it = std::max_element(
+            m_peers.begin(), m_peers.end(),
+            [](const auto& left, const auto& right)
+            {
+                return left->commonModule()->moduleGUID() < right->commonModule()->moduleGUID();
+            });
+        selectPrimaryPeer(it - m_peers.begin());
+    }
+
     void shiftLocalTime()
     {
         m_timeShift.applyRelativeShift(-std::chrono::hours(1));
     }
 
-    void restartPeer()
+    void restartAllPeers()
     {
-        m_peers.front()->emulateRestart();
+        for (const auto& peer: m_peers)
+            peer->restart();
+
+        if (m_peersConnected)
+            connectEveryPeerToEachOther();
     }
 
-    void skewMonotonicClockOnRandomPeer()
+    void stopAllPeers()
     {
-        const auto& randomPeer = nx::utils::random::choice(m_peers);
-        randomPeer->skewMonotonicClock(std::chrono::seconds(
+        for (const auto& peer: m_peers)
+            peer->stop();
+    }
+
+    void shiftMonotonicClockOnPeer(int peerIndex)
+    {
+        m_peers[peerIndex]->skewMonotonicClock(std::chrono::seconds(
             nx::utils::random::number<int>(
                 kMinMonotonicClockSkew.count(), kMaxMonotonicClockSkew.count())));
+    }
+
+    void shiftMonotonicClockOnRandomPeer()
+    {
+        const auto randomPeerIndex =
+            nx::utils::random::number<int>(0, m_peers.size() - 1);
+        shiftMonotonicClockOnPeer(randomPeerIndex);
+    }
+
+    void shiftLocalTimeOnPrimaryPeer()
+    {
+        m_peers[m_primaryPeerIndex]->shiftSystemClock(
+            std::chrono::hours(nx::utils::random::number<int>(-1000, 1000)));
     }
 
     void waitForTimeToBeSynchronizedAcrossAllPeers()
@@ -356,20 +442,12 @@ protected:
 
         for (;;)
         {
-            const auto t0 = steady_clock::now();
-            std::vector<milliseconds> syncTimes;
-            for (const auto& peer: m_peers)
-                syncTimes.push_back(peer->getSyncTime());
-            const auto t1 = steady_clock::now();
-
-            const auto maxDeviation =
-                duration_cast<milliseconds>(t1 - t0) +
-                milliseconds(*std::max_element(syncTimes.begin(), syncTimes.end()) -
-                    *std::min_element(syncTimes.begin(), syncTimes.end()));
-
-            if (maxDeviation <= kMaxAllowedSyncTimeDeviation)
+            std::chrono::milliseconds syncTime;
+            std::chrono::milliseconds syncTimeDeviation;
+            std::tie(syncTime, syncTimeDeviation) = getClusterSyncTime();
+            if (syncTimeDeviation <= kMaxAllowedSyncTimeDeviation)
             {
-                std::cout << "Time synchronized with " << maxDeviation.count()
+                std::cout << "Time synchronized with " << syncTimeDeviation.count()
                     << "ms deviation" << std::endl;
                 break;
             }
@@ -378,18 +456,43 @@ protected:
         }
     }
 
-    void waitForTimeToBeSynchronizedWithLocalSystemClock()
+    void waitForTimeToBeSynchronizedWithPrimaryPeerSystemClock()
     {
+        if (m_primaryPeerIndex == -1)
+        {
+            if (m_peers.size() == 1)
+            {
+                m_primaryPeerIndex = 0;
+            }
+            else
+            {
+                FAIL();
+            }
+        }
+
         for (;;)
         {
-            const auto syncTime = m_peers.front()->getSyncTime();
-            const auto osTime = nx::utils::millisSinceEpoch();
-            if (std::abs((syncTime - osTime).count()) <=
-                m_peers.front()->commonModule()->globalSettings()
-                    ->maxDifferenceBetweenSynchronizedAndLocalTime().count())
+            std::chrono::milliseconds syncTime;
+            std::chrono::milliseconds syncTimeDeviation;
+            std::tie(syncTime, syncTimeDeviation) = getClusterSyncTime();
+            const auto syncTimeError = syncTimeDeviation / 2;
+
+            const auto primaryPeerSystemTime =
+                m_peers[m_primaryPeerIndex]->getSystemTime();
+            const auto expectedSyncPrecision =
+                m_peers[m_primaryPeerIndex]->globalSettings()->
+                    maxDifferenceBetweenSynchronizedAndLocalTime();
+
+            if ((syncTimeDeviation <= kMaxAllowedSyncTimeDeviation) &&
+                (syncTime + syncTimeDeviation) > (primaryPeerSystemTime - expectedSyncPrecision) &&
+                (syncTime - syncTimeDeviation) < (primaryPeerSystemTime + expectedSyncPrecision))
             {
+                std::cout << "Time synchronized with "
+                    << std::abs(primaryPeerSystemTime.count() - syncTime.count())
+                    << "ms error" << std::endl;
                 break;
             }
+
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
@@ -397,14 +500,71 @@ protected:
 private:
     std::vector<std::unique_ptr<TimeSynchronizationPeer>> m_peers;
     nx::utils::test::ScopedTimeShift m_timeShift;
+    int m_primaryPeerIndex = -1;
+    bool m_peersConnected = false;
+    /** m_connectTable[i][j] is true, then peer[i] connects to peer[j]. */
+    std::vector<std::vector<int>> m_connectTable;
+    /** Needed just to satisfy QnCommonModule requirement. */
+    nx_http::ClientPool m_httpClientPool;
+
+    void startPeers(int peerCount)
+    {
+        for (int i = 0; i < peerCount; ++i)
+        {
+            auto peer = std::make_unique<TimeSynchronizationPeer>();
+            peer->setSynchronizeWithInternetEnabled(false);
+            peer->shiftSystemClock(
+                std::chrono::hours(nx::utils::random::number<int>(-1000, 1000)));
+            ASSERT_TRUE(peer->start());
+            m_peers.push_back(std::move(peer));
+        }
+    }
 
     void connectEveryPeerToEachOther()
     {
+        m_connectTable.resize(m_peers.size());
+        for (auto& val: m_connectTable)
+            val.resize(m_peers.size(), 1);
+
+        connectPeers();
+    }
+
+    void connectPeers()
+    {
         for (int i = 0; i < m_peers.size(); ++i)
         {
-            for (int j = i+1; j < m_peers.size(); ++j)
-                m_peers[i]->connectTo(m_peers[j].get());
+            for (int j = i + 1; j < m_peers.size(); ++j)
+            {
+                if (m_connectTable[i][j])
+                    m_peers[i]->connectTo(m_peers[j].get());
+            }
         }
+
+        m_peersConnected = true;
+    }
+
+    /**
+     * @return (mean sync time across all peers, deviation)
+     */
+    std::tuple<std::chrono::milliseconds, std::chrono::milliseconds> getClusterSyncTime() const
+    {
+        using namespace std::chrono;
+
+        const auto t0 = steady_clock::now();
+        std::vector<milliseconds> syncTimes;
+        for (const auto& peer: m_peers)
+            syncTimes.push_back(peer->getSyncTime());
+        const auto t1 = steady_clock::now();
+
+        const auto maxDeviation =
+            duration_cast<milliseconds>(t1 - t0) +
+            milliseconds(*std::max_element(syncTimes.begin(), syncTimes.end()) -
+                *std::min_element(syncTimes.begin(), syncTimes.end()));
+        const auto meanSyncTime =
+            std::accumulate(syncTimes.begin(), syncTimes.end(), milliseconds::zero()) /
+            syncTimes.size();
+
+        return std::make_tuple(milliseconds(meanSyncTime), maxDeviation);
     }
 };
 
@@ -413,14 +573,14 @@ private:
 TEST_F(TimeSynchronization, single_offline_server_follows_local_system_clock)
 {
     givenSingleOfflinePeer();
-    waitForTimeToBeSynchronizedWithLocalSystemClock();
+    waitForTimeToBeSynchronizedWithPrimaryPeerSystemClock();
 
     shiftLocalTime();
-    waitForTimeToBeSynchronizedWithLocalSystemClock();
+    waitForTimeToBeSynchronizedWithPrimaryPeerSystemClock();
 
-    restartPeer();
+    restartAllPeers();
     shiftLocalTime();
-    waitForTimeToBeSynchronizedWithLocalSystemClock();
+    waitForTimeToBeSynchronizedWithPrimaryPeerSystemClock();
 }
 
 TEST_F(TimeSynchronization, multiple_peers_synchronize_time)
@@ -432,11 +592,51 @@ TEST_F(TimeSynchronization, multiple_peers_synchronize_time)
 TEST_F(TimeSynchronization, multiple_peers_synchronize_time_after_monotonic_clock_skew)
 {
     givenMultipleSynchronizedPeers();
-    skewMonotonicClockOnRandomPeer();
+    shiftMonotonicClockOnRandomPeer();
     waitForTimeToBeSynchronizedAcrossAllPeers();
 }
 
-// TEST_F(TimeSynchronization, synctime_follows_selected_peer_after_clock_skew_fix)
+TEST_F(TimeSynchronization, synctime_follows_selected_peer_system_clock)
+{
+    givenMultipleOfflinePeersEachWithDifferentLocalTime();
+    selectRandomPeerAsPrimary();
+    waitForTimeToBeSynchronizedWithPrimaryPeerSystemClock();
+
+    shiftLocalTimeOnPrimaryPeer();
+    waitForTimeToBeSynchronizedWithPrimaryPeerSystemClock();
+}
+
+TEST_F(TimeSynchronization, synctime_follows_selected_peer_system_clock_after_restart)
+{
+    givenMultipleSynchronizedPeersWithPrimaryPeerSelectedByUser();
+
+    stopAllPeers();
+    shiftLocalTimeOnPrimaryPeer();
+    restartAllPeers();
+
+    waitForTimeToBeSynchronizedWithPrimaryPeerSystemClock();
+}
+
+TEST_F(TimeSynchronization, synctime_follows_selected_peer_after_clock_skew_fix)
+{
+    // There are 3 peers. Peer 0 connects to peer 1. Peer 1 connects to peer 2.
+    const int connectionTable[3][3] =
+    {
+        { 0, 1, 0 },
+        { 0, 0, 1 },
+        { 0, 0, 0 }
+    };
+
+    launchCluster<3>(connectionTable);
+    selectPrimaryPeer(0);
+    waitForTimeToBeSynchronizedWithPrimaryPeerSystemClock();
+
+    shiftMonotonicClockOnPeer(2);
+    waitForTimeToBeSynchronizedWithPrimaryPeerSystemClock();
+
+    shiftLocalTimeOnPrimaryPeer();
+    waitForTimeToBeSynchronizedWithPrimaryPeerSystemClock();
+}
 
 } // namespace test
 } // namespace ec2
