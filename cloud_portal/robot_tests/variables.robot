@@ -77,7 +77,7 @@ ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains
 
 #Disconnect from clout portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
-${DISCONNECT FORM HEADER}            //h1['Disconnect System from Nx Cloud?']
+${DISCONNECT FORM HEADER}             //h1['Disconnect System from Nx Cloud?']
 
 #Disconnect from my account
 ${DISCONNECT MODAL WARNING}              //p[contains(text(), '${DISCONNECT MODAL WARNING TEXT}')]
