@@ -117,7 +117,7 @@
     "cloudInvalidResponse": "Cloud DB heeft een onverwacht antwoord teruggezonden",
     "notAuthorized": "Wachtwoord onjuist",
     "wrongParameters": "Sommige parameters op het formulier zijn onjuist",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
+    "brokenAccount": "Onverwacht probleem met account. <a href=\"/restore_password\">Account herstellen</a>",
     "wrongCode": "Account is al geactiveerd of de bevestigingscode is onjuist",
     "wrongCodeRestore": "Bevestigingscode is al gebruikt of niet correct",
     "forbidden": "U hebt geen rechten om deze actie uit te voeren",

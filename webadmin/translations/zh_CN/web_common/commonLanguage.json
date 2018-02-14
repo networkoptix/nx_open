@@ -15,7 +15,7 @@
     "unauthorized": "需要身份验证",
     "noData": "无数据",
     "iosVideoTooLarge": "iOS不支持大于fullHD (2MP：1920x1080) 的视频。",
-    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashRequired": "请 <a href=\"https://get.adobe.com/flashplayer/\" target=\"_blank\">安装 Adobe Flash</a> 播放视频。",
     "flashOrWebmRequired": "请 <a href=\"https://get.adobe.com/flashplayer/\" target=\"_blank\">安装 Adobe Flash</a> 或 <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM 编解码器</a> 以在 Ie 中播放视频。",
     "noArmSupport": "此浏览器或设备不支持基于ARM的服务器的视频播放。",
     "noFormat": "此浏览器不支持本相机的视频播放。",

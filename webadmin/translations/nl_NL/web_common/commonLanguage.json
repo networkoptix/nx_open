@@ -15,7 +15,7 @@
     "unauthorized": "Authenticatie benodigd",
     "noData": "Geen data",
     "iosVideoTooLarge": "iOS ondersteunt geen video groter dan fullHD (2MP: 1920x1080).",
-    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> te installeren voor het afspelen van video's.",
     "flashOrWebmRequired": "<a href='https://get.adobe.com/flashplayer/' target='_blank'>installeer Adobe Flash</a> of<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor het afspelen van video in Internet Explorer.",
     "noArmSupport": "Deze browser of apparaat ondersteunt geen videoweergave van ARM-gebaseerde servers.",
     "noFormat": "Deze browser ondersteunt het afspelen van de beelden van deze camera niet.",
