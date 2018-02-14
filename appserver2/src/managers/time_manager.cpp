@@ -568,19 +568,23 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
 {
     const auto& commonModule = m_messageBus->commonModule();
 
-    //local peer is selected by user as primary time server
-    const bool synchronizingByCurrentServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
     //incrementing sequence
     m_localTimePriorityKey.sequence = newTimePriorityKeySequence;
     //"select primary time server" means "take its local time", so resetting internet synchronization flag
     m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
     if (!m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
-        m_localTimePriorityKey,
-        commonModule->globalSettings()->isSynchronizingTimeWithInternet()))
+            m_localTimePriorityKey,
+            commonModule->globalSettings()->isSynchronizingTimeWithInternet()))
     {
         return;
     }
 
+    setLocalTimeAsSynchronized(lock);
+}
+
+void TimeSynchronizationManager::setLocalTimeAsSynchronized(
+    QnMutexLockerBase* const lock)
+{
     //using current server time info
     const qint64 elapsed = m_monotonicClock.elapsed().count();
     //selection of peer as primary time server means it's local system time is to be used as synchronized time
@@ -605,17 +609,14 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
             m_usedTimeSyncInfo.timePriorityKey);
     }
 
-    if (!synchronizingByCurrentServer)
-    {
-        const qint64 curSyncTime = m_usedTimeSyncInfo.syncTime;
-        lock->unlock();
-        WhileExecutingDirectCall callGuard(this);
-        emit timeChanged(curSyncTime);
-        lock->relock();
-    }
-
     //reporting new sync time to everyone we know
     syncTimeWithAllKnownServers(*lock);
+
+    const qint64 curSyncTime = m_usedTimeSyncInfo.syncTime;
+    lock->unlock();
+    WhileExecutingDirectCall callGuard(this);
+    emit timeChanged(curSyncTime);
+    lock->relock();
 }
 
 TimeSyncInfo TimeSynchronizationManager::getTimeSyncInfo() const
@@ -1371,7 +1372,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
         ((m_localTimePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0);
 
     const bool isTimeSynchronizedByThisPeerLocalTime =
-        m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey &&
+        m_usedTimeSyncInfo.timePriorityKey.seed == m_localTimePriorityKey.seed &&
         !isSystemTimeSynchronizedWithInternet;
 
     const bool isSynchronizedToLocalTimeOffsetExceeded =
@@ -1384,7 +1385,12 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
         NX_LOGX(lm("System time is synchronized with this peer's local time. "
             "Detected time shift %1 ms. Updating synchronized time...")
             .arg(synchronizedToLocalTimeOffset), cl_logDEBUG1);
-        forceTimeResync();
+        QnMutexLocker lock(&m_mutex);
+        m_localTimePriorityKey.sequence =
+            std::max<decltype(m_localTimePriorityKey.sequence)>(
+                m_localTimePriorityKey.sequence,
+                m_usedTimeSyncInfo.timePriorityKey.sequence + 1);
+        setLocalTimeAsSynchronized(&lock);
         isTimeChanged = true;
     }
     else if (!isSystemTimeSynchronizedWithInternet)
