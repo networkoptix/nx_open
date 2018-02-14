@@ -145,12 +145,7 @@ QnAbstractStreamDataProvider* QnOpteraResource::createLiveDataProvider()
     if (!isInitialized())
         return nullptr;
 
-    return new nx::plugins::utils::MultisensorDataProvider(
-        toSharedPointer(this),
-        [](const QnResourcePtr& resource)
-    {
-        return new QnOnvifStreamReader(resource);
-    });
+    return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
 }
 
 

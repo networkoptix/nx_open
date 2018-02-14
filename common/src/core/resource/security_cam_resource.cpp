@@ -83,6 +83,9 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_cachedIsIOModule(
         [this]()->bool{ return getProperty(Qn::IO_CONFIG_PARAM_NAME).toInt() > 0; },
         &m_mutex),
+    m_cachedCanConfigureRemoteRecording(
+        [this]() { return getProperty(Qn::kCanConfigureRemoteRecording).toInt() > 0; },
+        &m_mutex),
     m_cachedAnalyticsSupportedEvents(
         [this]()
         {
@@ -477,7 +480,13 @@ bool QnSecurityCamResource::isDtsBased() const {
     return m_cachedIsDtsBased.get();
 }
 
-bool QnSecurityCamResource::isAnalog() const {
+bool QnSecurityCamResource::canConfigureRecording() const
+{
+    return !m_cachedIsDtsBased.get() || m_cachedCanConfigureRemoteRecording.get();
+}
+
+bool QnSecurityCamResource::isAnalog() const
+{
     QString val = getProperty(Qn::ANALOG_PARAM_NAME);
     return val.toInt() > 0;
 }
@@ -1306,6 +1315,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedIsDtsBased.reset();
     m_motionType.reset();
     m_cachedIsIOModule.reset();
+    m_cachedCanConfigureRemoteRecording.reset();
     m_cachedAnalyticsSupportedEvents.reset();
     m_cachedCameraMediaCapabilities.reset();
     m_cachedLicenseType.reset();

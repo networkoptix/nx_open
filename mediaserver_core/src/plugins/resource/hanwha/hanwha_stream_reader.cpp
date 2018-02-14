@@ -42,8 +42,9 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
 {
     const auto role = getRole();
     QString streamUrlString;
+
     int profileToOpen = kHanwhaInvalidProfile;
-    if (!m_hanwhaResource->isNvr())
+    if (m_hanwhaResource->isConnectedViaSunapi())
         profileToOpen = m_hanwhaResource->profileByRole(role);
     else
         profileToOpen = chooseNvrChannelProfile(role);
@@ -175,11 +176,8 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
     int profileNumber,
     const QnLiveStreamParams& parameters)
 {
-    if (m_hanwhaResource->isNvr())
-    {
-        // TODO: #dmishin implement profile configuration for NVR if needed.
+    if (!m_hanwhaResource->isConnectedViaSunapi())
         return CameraDiagnostics::NoErrorResult();
-    }
 
     if (profileNumber == kHanwhaInvalidProfile)
     {
@@ -265,8 +263,8 @@ int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
         const auto profile = profileEntry.second;
         const auto codecCoefficient =
             kHanwhaCodecCoefficients.find(profile.codec) != kHanwhaCodecCoefficients.cend()
-                ? kHanwhaCodecCoefficients.at(profile.codec)
-                : -1;
+            ? kHanwhaCodecCoefficients.at(profile.codec)
+            : -1;
 
         if (!profileFilter.contains(profile.number))
             continue;
@@ -289,7 +287,6 @@ int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
 bool HanwhaStreamReader::isCorrectProfile(int profileNumber) const
 {
     return profileNumber != kHanwhaInvalidProfile
-        || m_hanwhaResource->isNvr()
         || getRole() == Qn::CR_Archive;
 }
 

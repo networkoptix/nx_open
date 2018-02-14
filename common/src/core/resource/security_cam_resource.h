@@ -100,6 +100,9 @@ public:
     /** Returns true if camera stores archive on a external system */
     bool isDtsBased() const;
 
+    /** @return true if recording schedule can be configured for this device. */
+    bool canConfigureRecording() const;
+
     /** Returns true if it is a analog camera */
     bool isAnalog() const;
 
@@ -438,6 +441,7 @@ private:
     CachedValue<bool> m_cachedIsDtsBased;
     CachedValue<Qn::MotionType> m_motionType;
     CachedValue<bool> m_cachedIsIOModule;
+    CachedValue<bool> m_cachedCanConfigureRemoteRecording;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;

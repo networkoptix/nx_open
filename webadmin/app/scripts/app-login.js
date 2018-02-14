@@ -7,7 +7,10 @@ angular.module('webadminApp', [
     'ngRoute',
     'ui.bootstrap',
     'ngStorage'
-]).run(['mediaserver',function (mediaserver) {
+]).config(['$httpProvider', function ($httpProvider) {
+    $httpProvider.defaults.xsrfCookieName = 'nx-vms-csrf-token';
+    $httpProvider.defaults.xsrfHeaderName = 'Nx-Vms-Csrf-Token';
+}]).run(['mediaserver',function (mediaserver) {
     mediaserver.getCurrentUser();
 }]);
 

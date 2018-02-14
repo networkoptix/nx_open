@@ -380,7 +380,7 @@ class Rdep:
         url = self._repo_config.get_url()
         url = posixpath.join(url, TIMESTAMPS_FILE)
 
-        command = [ self._config.get_rsync("rsync"), url, self.root ]
+        command = [self._config.get_rsync("rsync"), url, _cygwin_path(self.root)]
         self._verbose_rsync(command)
         try:
             output = subprocess.check_output(command)

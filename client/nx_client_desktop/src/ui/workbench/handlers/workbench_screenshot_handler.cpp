@@ -206,7 +206,10 @@ qint64 QnWorkbenchScreenshotHandler::screenshotTimeMSec(QnMediaResourceWidget *w
 void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget *widget) {
 
     QStack<QString> keyStack;
-    keyStack.push(qnSettings->lastScreenshotDir() + lit("/"));
+
+    if (!qnSettings->lastScreenshotDir().isEmpty())
+        keyStack.push(qnSettings->lastScreenshotDir() + lit("/"));
+
     keyStack.push(widget->resource()->toResource()->getName());
 
     struct Key {

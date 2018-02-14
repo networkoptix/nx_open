@@ -3,6 +3,19 @@
 namespace ec2 {
 namespace test {
 
+TransactionTransportStub::TransactionTransportStub(
+    const ::ec2::ApiPeerData& localPeer,
+    const ::ec2::ApiPeerData& remotePeer,
+    const QUrl& remotePeerApiUrl,
+    bool isIncoming)
+    :
+    m_localPeer(localPeer),
+    m_remotePeer(remotePeer),
+    m_remotePeerApiUrl(remotePeerApiUrl),
+    m_isIncoming(isIncoming)
+{
+}
+
 const ec2::ApiPeerData& TransactionTransportStub::localPeer() const
 {
     return m_localPeer;
@@ -15,14 +28,12 @@ const ec2::ApiPeerData& TransactionTransportStub::remotePeer() const
 
 QUrl TransactionTransportStub::remoteAddr() const
 {
-    // TODO
-    return QUrl();
+    return m_remotePeerApiUrl;
 }
 
 bool TransactionTransportStub::isIncoming() const
 {
-    // TODO
-    return false;
+    return m_isIncoming;
 }
 
 nx_http::AuthInfoCache::AuthorizationCacheItem TransactionTransportStub::authData() const
@@ -134,6 +145,22 @@ void TransactionMessageBusStub::setTimeSyncManager(
     TimeSynchronizationManager* /*timeSyncManager*/)
 {
     // TODO
+}
+
+void TransactionMessageBusStub::addConnectionToRemotePeer(
+    const ::ec2::ApiPeerData& localPeer,
+    const ::ec2::ApiPeerData& remotePeer,
+    const QUrl& remotePeerApiUrl,
+    bool isIncoming)
+{
+    auto newConnection = std::make_unique<TransactionTransportStub>(
+        localPeer,
+        remotePeer,
+        remotePeerApiUrl,
+        isIncoming);
+    m_connections.push_back(std::move(newConnection));
+
+    emit newDirectConnectionEstablished(m_connections.back().get());
 }
 
 } // namespace test

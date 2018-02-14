@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>
+#include <vector>
+
 #include <common/common_module.h>
 
 #include <transaction/abstract_transaction_message_bus.h>
@@ -12,6 +15,12 @@ class TransactionTransportStub:
     public QnAbstractTransactionTransport
 {
 public:
+    TransactionTransportStub(
+        const ::ec2::ApiPeerData& localPeer,
+        const ::ec2::ApiPeerData& remotePeer,
+        const QUrl& remotePeerApiUrl,
+        bool isIncoming);
+
     virtual const ec2::ApiPeerData& localPeer() const override;
     virtual const ec2::ApiPeerData& remotePeer() const override;
     virtual QUrl remoteAddr() const override;
@@ -19,8 +28,10 @@ public:
     virtual nx_http::AuthInfoCache::AuthorizationCacheItem authData() const override;
 
 private:
-    ec2::ApiPeerData m_localPeer;
-    ec2::ApiPeerData m_remotePeer;
+    const ec2::ApiPeerData m_localPeer;
+    const ec2::ApiPeerData m_remotePeer;
+    const QUrl m_remotePeerApiUrl;
+    const bool m_isIncoming;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -55,6 +66,15 @@ public:
     virtual ConnectionGuardSharedState* connectionGuardSharedState() override;
     virtual detail::QnDbManager* getDb() const override;
     virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) override;
+
+    void addConnectionToRemotePeer(
+        const ::ec2::ApiPeerData& localPeer,
+        const ::ec2::ApiPeerData& remotePeer,
+        const QUrl& remotePeerApiUrl,
+        bool isIncoming);
+
+private:
+    std::vector<std::unique_ptr<TransactionTransportStub>> m_connections;
 };
 
 } // namespace test

@@ -65,8 +65,7 @@ void StunServer::initializeHttpTunnelling(http::Server* httpServer)
 {
     m_stunOverHttpServer.setupHttpTunneling(
         &httpServer->messageDispatcher(),
-        nx::network::url::normalizePath(
-            lm("/%1/%2").args(api::kMediatorApiPrefix, api::kStunOverHttpTunnelPath)).toUtf8());
+        network::url::joinPath(api::kMediatorApiPrefix, api::kStunOverHttpTunnelPath).toUtf8());
 }
 
 bool StunServer::bind()
