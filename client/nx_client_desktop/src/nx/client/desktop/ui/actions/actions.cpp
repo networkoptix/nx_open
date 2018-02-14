@@ -342,6 +342,7 @@ void initialize(Manager* manager, Action* root)
 
         factory(NewWearableCameraAction)
             .flags(Main | NoTarget)
+            .requiredGlobalPermission(Qn::GlobalAdminPermission)
             .text(ContextMenu::tr("Wearable Camera..."))
             .pulledText(ContextMenu::tr("New Wearable Camera..."))
             .condition(condition::isLoggedIn()
