@@ -1185,6 +1185,9 @@ int MediaServerProcess::getTcpPort() const
 
 void MediaServerProcess::stopObjects()
 {
+    if (m_stopObjectsCalled)
+        return;
+
     qWarning() << "QnMain::stopObjects() called";
 
     qnBackupStorageMan->scheduleSync()->stop();
@@ -1211,6 +1214,7 @@ void MediaServerProcess::stopObjects()
     }
 
     qnServerModule->updates2Manager()->stopAsyncTasks();
+    m_stopObjectsCalled = true;
 }
 
 void MediaServerProcess::updateDisabledVendorsIfNeeded()
@@ -2495,6 +2499,8 @@ void MediaServerProcess::run()
     QnConnectionInfo connectInfo;
     std::unique_ptr<ec2::QnDiscoveryMonitor> discoveryMonitor;
 
+    auto stopObjectsGuard = makeScopeGuard([this]() { stopObjects(); });
+
     while (!needToStop())
     {
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync(
@@ -2519,7 +2525,6 @@ void MediaServerProcess::run()
             case Qn::IncompatibleVersionConnectionResult:
             case Qn::IncompatibleProtocolConnectionResult:
                 NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
-                stopObjects();
                 return;
             default:
                 break;
@@ -2550,10 +2555,7 @@ void MediaServerProcess::run()
         this, &MediaServerProcess::at_runtimeInfoChanged, Qt::QueuedConnection);
 
     if (needToStop())
-    {
-        stopObjects();
         return; //TODO #ak correctly deinitialize what has been initialised
-    }
 
     qnServerModule->roSettings()->setValue(QnServer::kRemoveDbParamName, "0");
 
@@ -2563,7 +2565,6 @@ void MediaServerProcess::run()
     if (qnServerModule->roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes")
     {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
-        stopObjects();
         nx::SystemName systemName(connectInfo.systemName);
         systemName.saveToConfig(); //< migrate system name from foreign database via config
         nx::ServerSetting::setSysIdTime(0);
@@ -2635,10 +2636,7 @@ void MediaServerProcess::run()
     }
 
     if (needToStop())
-    {
-        stopObjects();
         return;
-    }
 
     if (qnServerModule->roSettings()->value("disableTranscoding").toBool())
         commonModule()->setTranscodeDisabled(true);
@@ -2651,7 +2649,6 @@ void MediaServerProcess::run()
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
-        stopObjects();
         return;
     }
 
@@ -2763,7 +2760,6 @@ void MediaServerProcess::run()
 
     if (needToStop())
     {
-        stopObjects();
         m_ipDiscovery.reset();
         return;
     }
@@ -2821,7 +2817,7 @@ void MediaServerProcess::run()
     QnResource::initAsyncPoolInstance();
 
     // ============================
-    GlobalSettingsToDeviceSearcherSettingsAdapter upnpDeviceSearcherSettings(globalSettings);
+    GlobalSettingsToDeviceSearcherSettingsAdapter upnpDeviceSearcherSettings(commonModule()->resourceDiscoveryManager());
     auto upnpDeviceSearcher = std::make_unique<nx::network::upnp::DeviceSearcher>(upnpDeviceSearcherSettings);
     std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
 
@@ -2866,7 +2862,6 @@ void MediaServerProcess::run()
 
     qnServerModule->metadataManagerPool()->init();
     at_runtimeInfoChanged(runtimeManager->localInfo());
-    initPublicIpDiscoveryUpdate();
 
     saveServerInfo(m_mediaServer);
     m_mediaServer->setStatus(Qn::Online);
@@ -3035,121 +3030,128 @@ void MediaServerProcess::run()
     if (m_serviceMode)
         serverModule->licenseWatcher()->start();
 
+    // If exception thrown by Qt event handler from within exec() we want to do some cleanup
+    // anyway.
+    auto cleanUpGuard = makeScopeGuard(
+        [&]()
+        {
+            disconnect(authHelper.get(), 0, this, 0);
+            disconnect(commonModule()->resourceDiscoveryManager(), 0, this, 0);
+            disconnect(qnNormalStorageMan, 0, this, 0);
+            disconnect(qnBackupStorageMan, 0, this, 0);
+            disconnect(commonModule(), 0, this, 0);
+            disconnect(runtimeManager, 0, this, 0);
+            disconnect(ec2Connection->getTimeNotificationManager().get(), 0, this, 0);
+            disconnect(ec2Connection.get(), 0, this, 0);
+            if (m_updatePiblicIpTimer) {
+                disconnect(m_updatePiblicIpTimer.get(), 0, this, 0);
+                m_updatePiblicIpTimer.reset();
+            }
+            disconnect(m_ipDiscovery.get(), 0, this, 0);
+            disconnect(commonModule()->moduleDiscoveryManager(), 0, this, 0);
+
+            WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);
+            waitingForObjectsToBeFreed.join();
+
+            qWarning() << "QnMain event loop has returned. Destroying objects...";
+
+            discoveryMonitor.reset();
+            m_crashReporter.reset();
+
+            //cancelling dumping system usage
+            quint64 dumpSystemResourceUsageTaskID = 0;
+            {
+                QnMutexLocker lk(&m_mutex);
+                dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskID;
+                m_dumpSystemResourceUsageTaskID = 0;
+            }
+            nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
+
+            m_ipDiscovery.reset(); // stop it before IO deinitialized
+            commonModule()->resourceDiscoveryManager()->pleaseStop();
+            QnResource::pleaseStopAsyncTasks();
+            multicastHttp.reset();
+            stopObjects();
+
+            QnResource::stopCommandProc();
+            if (m_initStoragesAsyncPromise)
+                m_initStoragesAsyncPromise->get_future().wait();
+            // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
+            nx::utils::TimerManager::instance()->stop();
+
+            hlsSessionPool.reset();
+
+            // Remove all stream recorders.
+            remoteArchiveSynchronizer.reset();
+            recordingManager.reset();
+
+            mserverResourceSearcher.reset();
+
+            videoCameraPool.reset();
+
+            commonModule()->resourceDiscoveryManager()->stop();
+            qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics event.
+            QnResource::stopAsyncTasks();
+
+            //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
+                //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
+            serverResourceProcessor.reset();
+
+            mdnsListener.reset();
+            resourceSearchers.reset();
+            upnpDeviceSearcher.reset();
+
+            connectorThread->quit();
+            connectorThread->wait();
+
+            //deleting object from wrong thread, but its no problem, since object's thread has been stopped and no event can be delivered to the object
+            eventConnector.reset();
+
+            eventRuleProcessor.reset();
+
+            motionHelper.reset();
+
+            //ptzPool.reset();
+
+            commonModule()->deleteMessageProcessor(); // stop receiving notifications
+            ec2ConnectionFactory->shutdown();
+
+            //disconnecting from EC2
+            clearEc2ConnectionGuard.reset();
+
+            cloudIntegrationManager.reset();
+            ec2Connection.reset();
+            ec2ConnectionFactory.reset();
+
+            commonModule()->setResourceDiscoveryManager(nullptr);
+
+            // This method will set flag on message channel to threat next connection close as normal
+            //appServerConnection->disconnectSync();
+            qnServerModule->setLastRunningTime(std::chrono::milliseconds::zero());
+
+            authHelper.reset();
+            //fileDeletor.reset();
+            //qnNormalStorageMan.reset();
+            //qnBackupStorageMan.reset();
+
+            if (m_mediaServer)
+                m_mediaServer->beforeDestroy();
+            m_mediaServer.clear();
+
+            performActionsOnExit();
+
+            nx::network::SocketGlobals::cloud().outgoingTunnelPool().clearOwnPeerIdIfEqual(
+                "ms", commonModule()->moduleGUID());
+
+            m_autoRequestForwarder.reset();
+
+            if (defaultMsgHandler)
+                qInstallMessageHandler(defaultMsgHandler);
+        });
+
     emit started();
     exec();
 
-    disconnect(authHelper.get(), 0, this, 0);
-    disconnect(commonModule()->resourceDiscoveryManager(), 0, this, 0);
-    disconnect(qnNormalStorageMan, 0, this, 0);
-    disconnect(qnBackupStorageMan, 0, this, 0);
-    disconnect(commonModule(), 0, this, 0);
-    disconnect(runtimeManager, 0, this, 0);
-    disconnect(ec2Connection->getTimeNotificationManager().get(), 0, this, 0);
-    disconnect(ec2Connection.get(), 0, this, 0);
-    if (m_updatePiblicIpTimer) {
-        disconnect(m_updatePiblicIpTimer.get(), 0, this, 0);
-        m_updatePiblicIpTimer.reset();
-    }
-    disconnect(m_ipDiscovery.get(), 0, this, 0);
-    disconnect(commonModule()->moduleDiscoveryManager(), 0, this, 0);
-
-    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed( QThread::currentThread(), 3 );
-    waitingForObjectsToBeFreed.join();
-
-    qWarning()<<"QnMain event loop has returned. Destroying objects...";
-
-    discoveryMonitor.reset();
-    m_crashReporter.reset();
-
-    //cancelling dumping system usage
-    quint64 dumpSystemResourceUsageTaskID = 0;
-    {
-        QnMutexLocker lk( &m_mutex );
-        dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskID;
-        m_dumpSystemResourceUsageTaskID = 0;
-    }
-    nx::utils::TimerManager::instance()->joinAndDeleteTimer( dumpSystemResourceUsageTaskID );
-
-    m_ipDiscovery.reset(); // stop it before IO deinitialized
-    commonModule()->resourceDiscoveryManager()->pleaseStop();
-    QnResource::pleaseStopAsyncTasks();
-    multicastHttp.reset();
-    stopObjects();
-
-    QnResource::stopCommandProc();
-    if (m_initStoragesAsyncPromise)
-        m_initStoragesAsyncPromise->get_future().wait();
-    // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
-    nx::utils::TimerManager::instance()->stop();
-
-    hlsSessionPool.reset();
-
-    // Remove all stream recorders.
-    remoteArchiveSynchronizer.reset();
-    recordingManager.reset();
-
-    mserverResourceSearcher.reset();
-
-    videoCameraPool.reset();
-
-    commonModule()->resourceDiscoveryManager()->stop();
-    qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics event.
-    QnResource::stopAsyncTasks();
-
-    //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
-        //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
-    serverResourceProcessor.reset();
-
-    mdnsListener.reset();
-    resourceSearchers.reset();
-    upnpDeviceSearcher.reset();
-
-    connectorThread->quit();
-    connectorThread->wait();
-
-    //deleting object from wrong thread, but its no problem, since object's thread has been stopped and no event can be delivered to the object
-    eventConnector.reset();
-
-    eventRuleProcessor.reset();
-
-    motionHelper.reset();
-
-    //ptzPool.reset();
-
-    commonModule()->deleteMessageProcessor(); // stop receiving notifications
-    ec2ConnectionFactory->shutdown();
-
-    //disconnecting from EC2
-    clearEc2ConnectionGuard.reset();
-
-    cloudIntegrationManager.reset();
-    ec2Connection.reset();
-    ec2ConnectionFactory.reset();
-
-    commonModule()->setResourceDiscoveryManager(nullptr);
-
-    // This method will set flag on message channel to threat next connection close as normal
-    //appServerConnection->disconnectSync();
-    qnServerModule->setLastRunningTime(std::chrono::milliseconds::zero());
-
-    authHelper.reset();
-    //fileDeletor.reset();
-    //qnNormalStorageMan.reset();
-    //qnBackupStorageMan.reset();
-
-    if (m_mediaServer)
-        m_mediaServer->beforeDestroy();
-    m_mediaServer.clear();
-
-    performActionsOnExit();
-
-    nx::network::SocketGlobals::cloud().outgoingTunnelPool().clearOwnPeerIdIfEqual(
-        "ms", commonModule()->moduleGUID());
-
-    m_autoRequestForwarder.reset();
-
-    if (defaultMsgHandler)
-        qInstallMessageHandler(defaultMsgHandler);
 }
 
 void MediaServerProcess::at_appStarted()

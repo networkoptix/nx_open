@@ -128,9 +128,14 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     const bool hasViewPermission = resource && accessController()->hasPermissions(resource,
         Qn::ViewContentPermission);
 
-    auto alarmCameras = resourcePool()->getResources<QnVirtualCameraResource>(action->getResources());
+    auto alarmCameras =
+        resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->getResources());
     if (action->getParams().useSource)
-        alarmCameras << resourcePool()->getResources<QnVirtualCameraResource>(action->getSourceResources());
+    {
+        alarmCameras.append(
+            resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+                action->getSourceResources()));
+    }
     alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
     alarmCameras = alarmCameras.toSet().toList();
 
@@ -267,7 +272,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
             case vms::event::userDefinedEvent:
             {
-                auto sourceCameras = resourcePool()->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
+                auto sourceCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+                    params.metadata.cameraRefs);
                 sourceCameras = accessController()->filtered(sourceCameras, Qn::ViewContentPermission);
                 if (!sourceCameras.isEmpty())
                 {
@@ -419,7 +425,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
 
     if (params.eventType >= vms::event::userDefinedEvent)
     {
-        const auto camList = resourcePool()->getResources<QnVirtualCameraResource>(
+        const auto camList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
             params.metadata.cameraRefs);
         return camList.isEmpty()
             ? QPixmap()

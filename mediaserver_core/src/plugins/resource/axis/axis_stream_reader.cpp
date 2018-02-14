@@ -15,6 +15,7 @@
 #include "axis_resource.h"
 #include "axis_resource.h"
 #include <utils/common/app_info.h>
+#include <utils/media/av_codec_helper.h>
 
 
 static const char AXIS_SEI_UUID[] = "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa";
@@ -195,7 +196,8 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
         Qn::StreamQuality quality = params.quality;
 
         QByteArray paramsStr;
-        paramsStr.append(lit("videocodec=%1").arg(params.codec.toLower()));
+        paramsStr.append(lit("videocodec=%1").arg(m_axisRes->toAxisCodecString(
+            QnAvCodecHelper::codecIdFromString(params.codec))));
         if (!params.resolution.isEmpty())
             paramsStr.append("&resolution=").append(m_axisRes->resolutionToString(params.resolution));
         //paramsStr.append("&text=0"); // do not use onscreen text message (fps e.t.c)

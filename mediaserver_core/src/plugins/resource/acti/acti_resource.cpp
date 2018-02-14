@@ -894,7 +894,7 @@ bool QnActiResource::hasDualStreaming() const
     return getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME).toInt() > 0;
 }
 
-QnAbstractPtzController *QnActiResource::createPtzControllerInternal()
+QnAbstractPtzController *QnActiResource::createPtzControllerInternal() const
 {
     return new QnActiPtzController(toSharedPointer(this));
 }

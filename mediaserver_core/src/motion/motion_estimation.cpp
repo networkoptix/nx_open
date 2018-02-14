@@ -1160,7 +1160,7 @@ void QnMotionEstimation::postFiltering()
 }
 
 
-QnAbstractCompressedMetadataPtr QnMotionEstimation::getMotion()
+QnMetaDataV1Ptr QnMotionEstimation::getMotion()
 {
     QnMetaDataV1Ptr rez(new QnMetaDataV1());
     //rez->timestamp = m_firstFrameTime == AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_firstFrameTime;

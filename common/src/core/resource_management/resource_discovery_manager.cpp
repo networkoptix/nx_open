@@ -730,6 +730,15 @@ QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const
     return m_state;
 }
 
+DiscoveryMode QnResourceDiscoveryManager::discoveryMode() const
+{
+    if (commonModule()->globalSettings()->isAutoDiscoveryEnabled())
+        return DiscoveryMode::fullyEnabled;
+    if (isRedundancyUsing())
+        return DiscoveryMode::partiallyEnabled;
+    return DiscoveryMode::disabled;
+}
+
 bool QnResourceDiscoveryManager::isRedundancyUsing() const
 {
     const auto& resPool = commonModule()->resourcePool();

@@ -32,6 +32,8 @@
 #include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/client/desktop/layout_templates/layout_template.h>
 #include <nx/client/desktop/utils/upload_state.h>
+#include <nx/client/desktop/utils/wearable_payload.h>
+#include <nx/client/desktop/utils/wearable_state.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx/cloud/cdb/api/system_data.h>
@@ -134,6 +136,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnUpdateResult>();
     qRegisterMetaType<QnCheckForUpdateResult>();
     qRegisterMetaType<UploadState>();
+    qRegisterMetaType<WearableState>();
+    qRegisterMetaType<WearableUpload>();
 
     qRegisterMetaType<nx::cdb::api::ResultCode>();
     qRegisterMetaType<nx::cdb::api::SystemData>();

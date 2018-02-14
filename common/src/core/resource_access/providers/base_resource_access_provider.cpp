@@ -267,7 +267,7 @@ void QnBaseResourceAccessProvider::handleSubjectRemoved(const QnResourceAccessSu
         resourceIds = m_accessibleResources.take(id);
     }
 
-    const auto resources = commonModule()->resourcePool()->getResources(resourceIds);
+    const auto resources = commonModule()->resourcePool()->getResourcesByIds(resourceIds);
     for (const auto& targetResource : resources)
         emit accessChanged(subject, targetResource, Source::none);
 }

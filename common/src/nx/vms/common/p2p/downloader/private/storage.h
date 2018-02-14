@@ -87,7 +87,7 @@ private:
     ResultCode loadDownload(const QString& fileName);
     void checkDownloadCompleted(FileMetadata& fileInfo);
 
-    static bool reserveSpace(const QString& fileName, const qint64 size);
+    static ResultCode reserveSpace(const QString& fileName, const qint64 size);
     static QString metadataFileName(const QString& fileName);
     static qint64 calculateChunkSize(qint64 fileSize, int chunkIndex, qint64 calculateChunkSize);
 

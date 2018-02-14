@@ -651,8 +651,6 @@ TEST_F(Updates2Manager, StatusWhileCheckingForUpdate)
     thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::checking);
     whenRemoteUpdateDone();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
-
-    // #TODO: #akulikov implement
 }
 
 TEST_F(Updates2Manager, Download_successful)

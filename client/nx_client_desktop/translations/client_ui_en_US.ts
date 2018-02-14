@@ -448,7 +448,7 @@
 <context>
     <name>BookmarksLog</name>
     <message>
-        <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+        <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
@@ -646,22 +646,9 @@
     </message>
 </context>
 <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-        <source>Advanced settings are unavailable</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>CameraExpertSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-        <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Do not archive primary stream</source>
         <translation></translation>
     </message>
@@ -694,11 +681,6 @@
         <location/>
         <source>Restore Defaults</source>
         <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning! Low quality may result in low resolution image.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -753,11 +735,6 @@
     <message>
         <location/>
         <source>Disable secondary stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Quality</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1803,12 +1780,12 @@
     </message>
     <message>
         <location/>
-        <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessible by any user.</source>
+        <source>To server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>To server</source>
+        <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3083,6 +3060,29 @@ Click &quot;New role&quot; button to create one.</source>
     </message>
 </context>
 <context>
+    <name>WearableMotionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Detect motion in uploaded video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sensitivity</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>WearableProgressWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
@@ -3115,11 +3115,6 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
         <location/>
         <source>Upload Folder...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;warning&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

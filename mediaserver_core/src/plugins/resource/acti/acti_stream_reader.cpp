@@ -33,6 +33,42 @@ QString QnActiStreamReader::formatResolutionStr(const QSize& resolution) const
     return QString(QLatin1String("N%1x%2")).arg(resolution.width()).arg(resolution.height());
 }
 
+int QnActiStreamReader::toJpegQuality(const QnLiveStreamParams& params)
+{
+    auto quality = params.quality;
+    if (quality == Qn::StreamQuality::QualityNotDefined)
+    {
+        int srcBitrate = params.bitrateKbps;
+        int bitrateDelta = std::numeric_limits<int>::max();
+        for (int i = Qn::StreamQuality::QualityLowest; i <= Qn::StreamQuality::QualityHighest; ++i)
+        {
+            QnLiveStreamParams p(params);
+            p.quality = (Qn::StreamQuality) i;
+            int bitrate = m_actiRes->suggestBitrateForQualityKbps((Qn::StreamQuality) i, params.resolution, params.fps, getRole());
+            if (abs(bitrate - srcBitrate) < bitrateDelta)
+            {
+                quality = p.quality;
+                bitrateDelta = abs(bitrate - srcBitrate);
+            }
+        }
+    }
+    switch (quality)
+    {
+        case Qn::QualityLowest:
+            return 15;
+        case Qn::QualityLow:
+            return 30;
+        case Qn::QualityNormal:
+            return 50;
+        case Qn::QualityHigh:
+            return 70;
+        case Qn::QualityHighest:
+            return 80;
+        default:
+            return 50;
+    }
+}
+
 CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
     bool isCameraControlRequired,
     const QnLiveStreamParams& streamParams)
@@ -42,6 +78,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
     QString SET_RESOLUTION(QLatin1String("CHANNEL=%1&VIDEO_RESOLUTION=%2"));
     QString SET_FPS(QLatin1String("CHANNEL=%1&VIDEO_FPS_NUM=%2"));
     QString SET_BITRATE(QLatin1String("CHANNEL=%1&VIDEO_BITRATE=%2&VIDEO_MAX_BITRATE=%2"));
+    QString SET_QUALITY(QLatin1String("CHANNEL=%1&VIDEO_MJPEG_QUALITY=%2"));
     QString SET_ENCODER(QLatin1String("CHANNEL=%1&VIDEO_ENCODER=%2"));
     QString SET_STREAMING_METHOD(QLatin1String("CHANNEL=%1&STREAMING_METHOD_CURRENT=%2"));
 
@@ -75,8 +112,8 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
             QByteArray result = m_actiRes->makeActiRequest(
                 QLatin1String("encoder"),
                 SET_STREAMING_METHOD
-                    .arg(ch)
-                    .arg(kStreamingMethodRtpUdp),
+                .arg(ch)
+                .arg(kStreamingMethodRtpUdp),
                 status);
 
             if (status != CL_HTTP_SUCCESS)
@@ -91,7 +128,10 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
         if (status != CL_HTTP_SUCCESS)
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
 
-        result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_BITRATE.arg(ch).arg(bitrateStr), status);
+        if (params.codec == "MJPEG")
+            result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_QUALITY.arg(ch).arg(toJpegQuality(params)), status);
+        else
+            result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_BITRATE.arg(ch).arg(bitrateStr), status);
         if (status != CL_HTTP_SUCCESS)
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
 

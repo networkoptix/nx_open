@@ -6,6 +6,8 @@
 #include <nx/sdk/metadata/camera_manager.h>
 #include <nx/vms/event/event_fwd.h>
 #include <plugins/plugin_tools.h>
+#include <nx/api/analytics/driver_manifest.h>
+#include <nx/vms/event/events/events_fwd.h>
 
 #include <nx/sdk/metadata/objects_metadata_packet.h>
 #include <nx/sdk/metadata/events_metadata_packet.h>
@@ -16,26 +18,33 @@ namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-class MetadataHandler: public nx::sdk::metadata::MetadataHandler
+class MetadataHandler: 
+    public QObject,
+    public nx::sdk::metadata::MetadataHandler
 {
+    Q_OBJECT
+
 public:
-    // TODO: #mike: Separate error handling from metadata handling.
+    MetadataHandler();
     virtual void handleMetadata(
         nx::sdk::Error error,
         nx::sdk::metadata::MetadataPacket* metadata) override;
 
     void setResource(const QnSecurityCamResourcePtr& resource);
 
-    void setPluginId(const QnUuid& pluginId);
+    void setManifest(const nx::api::AnalyticsDriverManifest& manifest);
 
     void registerDataReceptor(QnAbstractDataReceptor* dataReceptor);
     void removeDataReceptor(QnAbstractDataReceptor* dataReceptor);
+
+signals:
+    void sdkEventTriggered(const nx::vms::event::AnalyticsSdkEventPtr& event);
 
 private:
     nx::vms::event::EventState lastEventState(const QnUuid& eventId) const;
 
     void setLastEventState(const QnUuid& eventId, nx::vms::event::EventState eventState);
-
+    nx::api::Analytics::EventType eventDescriptor(const QnUuid& eventId) const;
     void handleEventsPacket(
         nxpt::ScopedRef<nx::sdk::metadata::EventsMetadataPacket> packet);
 
@@ -48,7 +57,7 @@ private:
 
 private:
     QnSecurityCamResourcePtr m_resource;
-    QnUuid m_pluginId;
+    nx::api::AnalyticsDriverManifest m_manifest;
     QMap<QnUuid, nx::vms::event::EventState> m_eventStateMap;
     QnAbstractDataReceptor* m_dataReceptor = nullptr;
 };

@@ -119,6 +119,7 @@ public:
 };
 
 bool operator==(const QnTimePeriod &first, const QnTimePeriod &other);
+bool operator!=(const QnTimePeriod &first, const QnTimePeriod &other);
 bool operator<(const QnTimePeriod &first, const QnTimePeriod &other);
 bool operator<(qint64 first, const QnTimePeriod &other);
 bool operator<(const QnTimePeriod &other, qint64 first);

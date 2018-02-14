@@ -202,6 +202,9 @@ if(withMediaServer)
     endif()
 endif()
 
+#add_subdirectory(_axis_controller)
+#add_subdirectory(_vca_controller)
+
 if(withTestCamera)
     add_subdirectory(testcamera)
 endif()

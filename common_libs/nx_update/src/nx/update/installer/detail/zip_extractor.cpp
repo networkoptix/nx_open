@@ -5,9 +5,9 @@ namespace update {
 namespace detail {
 
 void ZipExtractor::extractAsync(
-    const QString& filePath,
-    const QString& outputDir,
-    ExtractHandler extractHandler)
+    const QString& /*filePath*/,
+    const QString& /*outputDir*/,
+    ExtractHandler /*extractHandler*/)
 {
 
 }

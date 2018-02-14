@@ -253,7 +253,6 @@ public:
     virtual QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     virtual QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
-    virtual QnAbstractPtzController *createPtzControllerInternal() override;
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
     static CameraDiagnostics::Result readDeviceInformation(const QString& onvifUrl, const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
     CameraDiagnostics::Result readDeviceInformation();
@@ -298,7 +297,9 @@ public:
     VideoOptionsLocal secondaryVideoCapabilities() const;
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
+
 protected:
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     int strictBitrate(int bitrate, Qn::ConnectionRole role) const;
     void setAudioCodec(AUDIO_CODECS c);
 
@@ -335,13 +336,14 @@ protected:
     void setPrimaryVideoCapabilities(const VideoOptionsLocal& capabilities) { m_primaryStreamCapabilities = capabilities; }
     void setSecondaryVideoCapabilities(const VideoOptionsLocal& capabilities) { m_secondaryStreamCapabilities = capabilities; }
     boost::optional<onvifXsd__H264Profile> getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
+
+    virtual void updateVideoEncoder(
+        VideoEncoder& encoder,
+        Qn::StreamIndex streamIndex,
+        const QnLiveStreamParams& streamParams);
 private:
     friend class QnOnvifStreamReader;
 
-    void updateVideoEncoder(
-        VideoEncoder& encoder,
-        bool isPrimary,
-        const QnLiveStreamParams& streamParams);
     CameraDiagnostics::Result fetchAndSetResourceOptions();
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
@@ -576,7 +578,7 @@ private:
         bool active,
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
-    QnAbstractPtzController* createSpecialPtzController();
+    QnAbstractPtzController* createSpecialPtzController() const;
     bool trustMaxFPS();
     CameraDiagnostics::Result fetchOnvifCapabilities(
         DeviceSoapWrapper* const soapWrapper,

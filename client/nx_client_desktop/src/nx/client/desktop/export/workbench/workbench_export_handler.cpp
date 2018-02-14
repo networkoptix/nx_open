@@ -30,6 +30,7 @@
 
 #include <nx/client/desktop/export/data/export_media_settings.h>
 #include <nx/client/desktop/export/tools/export_layout_tool.h>
+#include <nx/client/desktop/export/tools/export_media_tool.h>
 #include <nx/client/desktop/export/tools/export_manager.h>
 #include <nx/client/desktop/export/dialogs/export_settings_dialog.h>
 
@@ -270,12 +271,6 @@ void WorkbenchExportHandler::handleExportVideoAction()
     if (!period.isValid() && !bookmark.isValid())
         return;
 
-    const auto centralResource = widget
-        ? widget->resource()->toResourcePtr()
-        : mediaResource->toResourcePtr();
-    const bool hasPermission = accessController()->hasPermissions(centralResource,
-        Qn::ExportPermission);
-
     const auto isFileNameValid =
         [this](const Filename& filename, bool quiet) -> bool
         {
@@ -302,6 +297,10 @@ void WorkbenchExportHandler::handleExportVideoAction()
     QWidget* main = mainWindowWidget();
     QScopedPointer<ExportSettingsDialog> dialog;
 
+    const auto centralResource = widget ? widget->resource() : mediaResource;
+
+    bool hasPermission = accessController()->hasPermissions(centralResource->toResourcePtr(),
+        Qn::ExportPermission);
     if (!hasPermission)
     {
         if (!widget || !period.isValid())
@@ -316,18 +315,20 @@ void WorkbenchExportHandler::handleExportVideoAction()
     }
     else if (widget)
     {
+        QnLayoutItemData itemData = widget->item()->data();
+        // Exporting from the scene and timeline
         if (bookmark.isValid())
         {
             dialog.reset(new ExportSettingsDialog(
                 { bookmark.startTimeMs, bookmark.durationMs }, bookmark, isFileNameValid, main));
 
-            dialog->setMediaParams(widget->resource(), widget->item()->data(), widget->context());
+            dialog->setMediaParams(centralResource, itemData, widget->context());
             dialog->hideTab(ExportSettingsDialog::Mode::Layout);
         }
         else
         {
             dialog.reset(new ExportSettingsDialog(period, bookmark, isFileNameValid, main));
-            dialog->setMediaParams(widget->resource(), widget->item()->data(), widget->context());
+            dialog->setMediaParams(centralResource, itemData, widget->context());
 
             // Why symmetry with the next block is broken?
             const auto periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
@@ -349,7 +350,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
         {
             dialog.reset(new ExportSettingsDialog(period, QnCameraBookmark(), isFileNameValid, main));
         }
-        dialog->setMediaParams(mediaResource, QnLayoutItemData(), context());
+        dialog->setMediaParams(centralResource, QnLayoutItemData(), context());
         dialog->hideTab(ExportSettingsDialog::Mode::Layout);
     }
 
@@ -357,6 +358,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
         return;
 
     QnUuid exportProcessId;
+    std::unique_ptr<AbstractExportTool> exportTool;
 
     switch (dialog->mode())
     {
@@ -374,11 +376,11 @@ void WorkbenchExportHandler::handleExportVideoAction()
                 layoutSettings.period = period;
                 layoutSettings.readOnly = false;
 
-                d->exportManager->exportLayout(exportProcessId, layoutSettings);
+                exportTool.reset(new ExportLayoutTool(layoutSettings));
             }
             else
             {
-                d->exportManager->exportMedia(exportProcessId, settings);
+                exportTool.reset(new ExportMediaTool(settings));
             }
 
             break;
@@ -387,7 +389,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
         {
             const auto settings = dialog->exportLayoutSettings();
             exportProcessId = d->initExport(settings.filename);
-            d->exportManager->exportLayout(exportProcessId, settings);
+            exportTool.reset(new ExportLayoutTool(settings));
             break;
         }
         default:
@@ -395,9 +397,12 @@ void WorkbenchExportHandler::handleExportVideoAction()
             return;
     }
 
+    NX_ASSERT(exportTool);
     NX_ASSERT(!exportProcessId.isNull(), "Workflow is broken");
     if (exportProcessId.isNull())
         return;
+
+    d->exportManager->startExport(exportProcessId, std::move(exportTool));
 
     const auto info = d->exportManager->info(exportProcessId);
 

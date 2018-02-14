@@ -5,17 +5,19 @@
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
+namespace vca {
 
-bool operator==(const Vca::VcaAnalyticsEventType& lh, const Vca::VcaAnalyticsEventType& rh)
+bool operator==(const AnalyticsEventType& lh, const AnalyticsEventType& rh)
 {
     return lh.eventTypeId == rh.eventTypeId;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Vca::VcaAnalyticsEventType, (json),
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventType, (json),
     VcaAnalyticsEventType_Fields, (brief, true))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Vca::VcaAnalyticsDriverManifest, (json),
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsDriverManifest, (json),
     VcaAnalyticsDriverManifest_Fields, (brief, true))
 
+} // namespace vca
 } // namespace metadata
 } // namespace mediaserver_plugin
 } // namespace nx

@@ -22,7 +22,7 @@
 
 static const QString kCameraIdParam = lit("cameraId");
 static const QString kDeprecatedResIdParam = lit("res_id");
-static const std::chrono::seconds kMaxWaitTimeout(15);
+static const std::chrono::seconds kMaxWaitTimeout(20);
 
 using StatusCode = nx::network::http::StatusCode::Value;
 

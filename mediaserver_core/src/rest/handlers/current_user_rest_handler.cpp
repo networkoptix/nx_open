@@ -26,6 +26,7 @@ int QnCurrentUserRestHandler::executeGet(
     {
         QnAuthHelper::instance()->doCookieAuthorization(
             "GET", nx::network::http::getHeaderValue(owner->request().headers, "Cookie"),
+            nx::network::http::getHeaderValue(owner->request().headers, Qn::CSRF_TOKEN_HEADER_NAME),
             *owner->response(), &accessRights);
     }
     if (accessRights.isNull())

@@ -8,6 +8,7 @@
 
 #include "camera_settings_tab.h"
 
+class QLabel;
 class QStackedWidget;
 
 namespace nx {
@@ -70,13 +71,15 @@ private:
     void setMode(Mode mode);
     void setCurrentTab(Mode mode, CameraSettingsTab tab);
 
+    void updateInvalidText();
+
 private:
     QnVirtualCameraResourceList m_cameras;
     CameraSettingsTab m_emptyTab;
 
     QStackedWidget *m_stackedWidget;
-    QWidget *m_invalidWidget;
-    QWidget *m_emptyWidget;
+    QLabel *m_invalidWidget;
+    QLabel *m_emptyWidget;
     SingleCameraSettingsWidget *m_singleWidget;
     MultipleCameraSettingsWidget *m_multiWidget;
 };

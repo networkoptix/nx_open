@@ -27,11 +27,15 @@ public:
     QnDigitalWatchdogResource();
     ~QnDigitalWatchdogResource();
 
-    virtual QnAbstractPtzController *createPtzControllerInternal() override;
     CLSimpleHTTPClient httpClient() const;
 
-    void setVideoCodec(Qn::StreamIndex streamIndex, const QString& codec);
+    virtual void updateVideoEncoder(
+        VideoEncoder& encoder,
+        Qn::StreamIndex streamIndex,
+        const QnLiveStreamParams& streamParams) override;
 protected:
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
+
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const override;
@@ -45,7 +49,6 @@ protected:
 
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 private:
     bool isDualStreamingEnabled(bool& unauth);
     void enableOnvifSecondStream();

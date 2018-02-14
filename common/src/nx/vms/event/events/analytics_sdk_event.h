@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/vms/event/events/prolonged_event.h>
+#include <nx/vms/event/events/events_fwd.h>
 
 class QnUuid;
 
@@ -44,3 +45,5 @@ private:
 } // namespace event
 } // namespace vms
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::vms::event::AnalyticsSdkEventPtr);
