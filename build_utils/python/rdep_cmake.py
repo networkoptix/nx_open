@@ -44,7 +44,7 @@ class RdepSyncher:
 
             return False
 
-        path = self.rdep.locate_package(full_package_name)
+        path = self.rdep.locate_package(full_package_name).replace("\\", "/")
 
         self._synched_package_dirs.append(path)
         if path_variable:
@@ -72,4 +72,4 @@ class RdepSyncher:
             for path in self._synched_package_dirs:
                 cmake_files = glob.glob(os.path.join(path, "*.cmake"))
                 if cmake_files and len(cmake_files) == 1:
-                    f.write("include({})\n".format(cmake_files[0]))
+                    f.write("include(\"{}\")\n".format(cmake_files[0].replace("\\", "/")))
