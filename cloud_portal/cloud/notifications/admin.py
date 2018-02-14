@@ -44,7 +44,7 @@ class CloudNotificationAdmin(admin.ModelAdmin):
 
     def convert_date(self, obj):
         session = self.request.session
-        if 'timezone' in self.request.session:
+        if obj.sent_date and 'timezone' in self.request.session and self.request.session['timezone']:
             timezone = self.request.session['timezone']
             utc = pytz.utc.localize(obj.sent_date)
             converted_time = utc.astimezone(pytz.timezone(timezone))\
