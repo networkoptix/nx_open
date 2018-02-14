@@ -36,7 +36,6 @@
 #include <nx/client/core/resource/layout_accessor.h>
 #include <nx/client/core/animation/kinetic_animation.h>
 #include <nx/client/mobile/resource/lite_client_layout_helper.h>
-#include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
 
 using namespace nx::client::mobile;
 
@@ -72,12 +71,9 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnCameraAccessRightsHelper>("com.networkoptix.qml", 1, 0, "QnCameraAccessRightsHelper");
     qmlRegisterType<QnTimeline>("com.networkoptix.qml", 1, 0, "QnTimelineView");
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
-    qmlRegisterType<QnCloudStatusWatcher>("com.networkop tix.qml", 1, 0, "QnCloudStatusWatcher");
+    qmlRegisterType<QnCloudStatusWatcher>("com.networkoptix.qml", 1, 0, "QnCloudStatusWatcher");
     qmlRegisterType<QnCloudSystemInformationWatcher>("com.networkoptix.qml", 1, 0, "QnCloudSystemInformationWatcher");
     qmlRegisterType<QnUserWatcher>("com.networkoptix.qml", 1, 0, "QnUserWatcher");
-    qmlRegisterType<nx::client::core::TwoWayAudioController>("com.networkoptix.qml",
-        1, 0, "TwoWayAudioController");
-
     /* NxMediaPlayer should not be used.
        It is here only to allow assignments of MediaPlayer to properties of this type. */
     qmlRegisterType<MediaPlayer>("Nx.Media", 1, 0, "MediaPlayer");

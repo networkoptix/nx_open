@@ -11,7 +11,7 @@ Item
 {
     id: videoNavigation
 
-//    property string resourceId
+    property string resourceId
     property var videoScreenController
     property bool paused: true
     property bool ptzAvailable: false
@@ -406,31 +406,6 @@ Item
 
             IconButton
             {
-                icon: lp("images/plus.png")
-                anchors.right: ptzButton.visible ? ptzButton.left : parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                visible: twoWayAudioController.available
-
-                onClicked:
-                {
-                    if (twoWayAudioController.started)
-                        twoWayAudioController.stop()
-                    else
-                        twoWayAudioController.start();
-                }
-
-                Binding
-                {
-                    target: twoWayAudioController
-                    property: "resourceId"
-                    value: videoScreenController.resourceId
-                }
-            }
-
-            IconButton
-            {
-                id: ptzButton
-
                 icon: lp("images/ptz/ptz.png")
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
@@ -598,7 +573,7 @@ Item
         }
     }
 
-//    onResourceIdChanged: d.playbackStarted = false
+    onResourceIdChanged: d.playbackStarted = false
 
     Component.onCompleted: d.updateNavigatorPosition()
 }

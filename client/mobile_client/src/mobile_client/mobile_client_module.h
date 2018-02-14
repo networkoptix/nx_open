@@ -20,8 +20,6 @@ public:
 
     void initDesktopCamera();
 
-    void startLocalSearches();
-
 private:
     std::unique_ptr<QnClientCoreModule> m_clientCoreModule;
     QnCloudStatusWatcher* m_cloudStatusWatcher;
