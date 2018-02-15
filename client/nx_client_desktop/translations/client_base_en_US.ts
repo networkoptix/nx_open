@@ -7022,13 +7022,6 @@ to %1</source>
         <source>Uploading %1... %2	%p%</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>(%n more file(s) in queue)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>Stop uploading?</source>
         <translation type="unfinished"></translation>
@@ -7039,6 +7032,10 @@ to %1</source>
     </message>
     <message>
         <source>Finalizing %1... %2	%p%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(%1 of %2)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7715,15 +7712,15 @@ Free space - %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>File &quot;%1&quot; cover periods for which video is already being uploaded.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>File &quot;%1&quot; cover periods for which video has already been uploaded.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>There is no space on server for file &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; covers period(s) that video is already being uploaded for.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; covers period(s) that video has already been uploaded for.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
