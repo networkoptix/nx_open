@@ -375,10 +375,10 @@ void QnWorkbenchWearableHandler::at_wearableManager_stateChanged(const WearableS
     if (!camera)
         return;
 
-    context()
-        ->instance<QnCameraDataManager>()
-        ->loader(camera, /*create=*/true)
-        ->load(/*forced=*/true);
+    QnCachingCameraDataLoaderPtr loader =
+        context()->instance<QnCameraDataManager>()->loader(camera, /*create=*/true);
+    loader->invalidateCachedData();
+    loader->load(/*forced=*/true);
 }
 
 QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const WearablePayload& upload)
