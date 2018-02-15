@@ -97,7 +97,7 @@ class ServerInstallation(object):
         config.optionxform = str  # make it case-sensitive, server treats it this way (yes, this is a bug)
         config.readfp(BytesIO(old_config))
         for name, value in kw.items():
-            config.set('General', name, value)
+            config.set('General', name, str(value))
         f = BytesIO()
         config.write(f)
         return f.getvalue()
