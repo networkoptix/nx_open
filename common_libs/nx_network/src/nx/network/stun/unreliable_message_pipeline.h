@@ -171,7 +171,7 @@ public:
         serializedMessage.reserve(nx::network::kTypicalMtuSize);
         messageSerializer.setMessage(&message);
         size_t bytesWritten = 0;
-        if (messageSerializer.serialize(&serializedMessage, &bytesWritten) != 
+        if (messageSerializer.serialize(&serializedMessage, &bytesWritten) !=
             nx::network::server::SerializerState::done)
         {
             NX_ASSERT(false);
@@ -185,7 +185,6 @@ public:
 
 private:
     CustomPipeline* m_customPipeline;
-    ParserType m_messageParser;
 
     virtual void datagramReceived(
         const SocketAddress& sourceAddress,
@@ -194,8 +193,9 @@ private:
         //reading and parsing message
         size_t bytesParsed = 0;
         MessageType msg;
-        m_messageParser.setMessage(&msg);
-        if (m_messageParser.parse(datagram, &bytesParsed) == nx::network::server::ParserState::done)
+        ParserType messageParser;
+        messageParser.setMessage(&msg);
+        if (messageParser.parse(datagram, &bytesParsed) == nx::network::server::ParserState::done)
         {
             m_customPipeline->messageReceived(
                 std::move(sourceAddress),
@@ -203,9 +203,8 @@ private:
         }
         else
         {
-            NX_LOGX(lm("Failed to parse UDP datagram of size %1 received from %2 on %3")
-                .arg((unsigned int)datagram.size()).arg(sourceAddress).arg(address()),
-                cl_logDEBUG1);
+            NX_ERROR(this, lm("Failed to parse UDP datagram of size %1 received from %2 on %3")
+                .arg((unsigned int)datagram.size()).arg(sourceAddress).arg(address()));
         }
     }
 
