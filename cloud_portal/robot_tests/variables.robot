@@ -68,10 +68,13 @@ ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
 ${RENAME SYSTEM}                      //button[@ng-click='rename()']
 ${DISCONNECT FROM MY ACCOUNT}         //button[@ng-click='delete()']
 ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//button[@ng-click='share()']
+${SHARE BUTTON DISABLED}              //div[@process-loading='gettingSystem']//button[@ng-click='share()' and @ng-disabled='!system.isAvailable']
 ${OPEN IN NX BUTTON}                  //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()']
+${OPEN IN NX BUTTON DISABLED}         //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()' and @ng-disabled='buttonDisabled']
 ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
 ${DELETE USER BUTTON}                 //button[@ng-click='ok()' and contains(text(), '${DELETE USER BUTTON TEXT}')]
 ${DELETE USER CANCEL BUTTON}          //button[@ng-click='cancel()' and contains(text(), '${DELETE USER CANCEL BUTTON TEXT}')]
+${SYSTEM NAME OFFLINE}                //span[@ng-if='!system.isOnline']
 
 ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains(text(), '${SYSTEM NO ACCESS TEXT}')]
 
@@ -150,13 +153,13 @@ ${AUTO TESTS SYSTEM ID}                     b4939b35-5b98-492b-a092-27fe8efeef38
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/following-sibling::span[contains(@class,'user-name')]
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..//button[@ng-click='checkForm()']
-
 ${SYSTEMS SEARCH INPUT}               //input[@ng-model='search.value']
 ${SYSTEMS TILE}                       //div[@ng-repeat="system in systems | filter:searchSystems as filtered"]
 
 #AUTOTESTS (with no space) is an offline system used for testing offline status on the systems page
 ${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
 ${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/..//button[@ng-click='checkForm()']
+${AUTOTESTS SYSTEM ID}                dd06f8bf-f7ea-49b3-96fc-fbc6742a2ad4
 
 #ASCII
 ${ESCAPE}                             \\27

@@ -17,21 +17,6 @@ Log in to Auto Tests System
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 *** Test Cases ***
-has system name, owner and OpenInNx button visible on systems page
-    Open Browser and go to URL    ${url}
-    Log In    ${EMAIL OWNER}    ${password}
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
-    Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
-    Close Browser
-
-shows offline status and does not show open in nx button when offline
-    Open Browser and go to URL    ${url}
-    Log In    ${EMAIL OWNER}    ${password}
-    Validate Log In
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTOTESTS OFFLINE}
-    Wait Until Element Is Not Visible    ${AUTOTESTS OFFLINE OPEN NX}
-    Close Browser
-
 should confirm, if owner deletes system (You are going to disconnect your system from cloud)
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL OWNER}
