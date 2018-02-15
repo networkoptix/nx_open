@@ -395,12 +395,12 @@ void EventPanel::Private::setupTabsSyncWithNavigator()
             else if (m_tabs->currentWidget() == m_analyticsTab)
                 extraContent = Qn::AnalyticsContent;
 
-            q->context()->navigator()->setSelectedExtraContent(extraContent);
+            q->navigator()->setSelectedExtraContent(extraContent);
 
             if (const auto usw = qobject_cast<UnifiedSearchWidget*>(m_tabs->currentWidget()))
-                q->context()->navigator()->setSelectedTimePeriod(usw->currentTimePeriod());
+                q->navigator()->setSelectedTimePeriod(usw->currentTimePeriod());
             else
-                q->context()->navigator()->setSelectedTimePeriod(QnTimePeriod::anytime());
+                q->navigator()->setSelectedTimePeriod(QnTimePeriod::anytime());
 
             m_previousTabIndex = m_lastTabIndex;
             m_lastTabIndex = index;
@@ -410,7 +410,7 @@ void EventPanel::Private::setupTabsSyncWithNavigator()
         [this](const QnTimePeriod& period)
         {
             if (sender() == m_tabs->currentWidget())
-                q->context()->navigator()->setSelectedTimePeriod(period);
+                q->navigator()->setSelectedTimePeriod(period);
         };
 
     connect(m_motionTab, &UnifiedSearchWidget::currentTimePeriodChanged,

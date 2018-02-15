@@ -73,6 +73,8 @@ private:
     QString attributes(const analytics::storage::DetectedObject& object) const;
     static qint64 startTimeMs(const analytics::storage::DetectedObject& object);
 
+    void updateWorkbenchFilter() const;
+
 private:
     AnalyticsSearchListModel* const q = nullptr;
     QRectF m_filterRect;

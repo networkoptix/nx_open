@@ -2528,7 +2528,14 @@ void QnWorkbenchNavigator::updateSliderBookmarks()
     if (!bookmarksModeEnabled())
         return;
 
-    //    m_timeSlider->setBookmarks(m_bookmarkAggregation->bookmarkList());
+    // TODO: #ynikitenkov Finish or ditch. Seems unused now.
+    //     m_timeSlider->setBookmarks(m_bookmarkAggregation->bookmarkList());
+}
+
+void QnWorkbenchNavigator::setAnalyticsFilter(const nx::analytics::storage::Filter& value)
+{
+    if (auto loader = loaderByWidget(m_currentMediaWidget))
+        loader->setAnalyticsFilter(value);
 }
 
 Qn::TimePeriodContent QnWorkbenchNavigator::selectedExtraContent() const

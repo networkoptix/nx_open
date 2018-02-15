@@ -8,6 +8,8 @@
 
 #include <nx/utils/uuid.h>
 
+#include <analytics/detected_objects_storage/analytics_events_storage_types.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
@@ -134,6 +136,9 @@ public:
         nx::client::desktop::ui::action::ActionScope scope) const override;
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
+
+    // Analytics filter for current media widget.
+    void setAnalyticsFilter(const nx::analytics::storage::Filter& value);
 
     Qn::TimePeriodContent selectedExtraContent() const; //< Qn::RecordingContent if none.
     void setSelectedExtraContent(Qn::TimePeriodContent value);

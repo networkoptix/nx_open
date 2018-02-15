@@ -187,6 +187,7 @@ void AnalyticsSearchListModel::Private::setFilterRect(const QRectF& relativeRect
 
     clear();
     m_filterRect = relativeRect;
+    updateWorkbenchFilter();
 }
 
 QString AnalyticsSearchListModel::Private::filterText() const
@@ -201,6 +202,7 @@ void AnalyticsSearchListModel::Private::setFilterText(const QString& value)
 
     clear();
     m_filterText = value;
+    updateWorkbenchFilter();
 }
 
 void AnalyticsSearchListModel::Private::clear()
@@ -416,6 +418,15 @@ void AnalyticsSearchListModel::Private::addNewlyReceivedObjects(
 
     m_latestTimeMs = duration_cast<milliseconds>(
         microseconds(m_data.front().firstAppearanceTimeUsec)).count();
+}
+
+void AnalyticsSearchListModel::Private::updateWorkbenchFilter() const
+{
+    Filter filter;
+    filter.deviceId = camera()->getId();
+    filter.boundingBox = m_filterRect;
+    filter.freeText = m_filterText;
+    q->navigator()->setAnalyticsFilter(filter);
 }
 
 rest::Handle AnalyticsSearchListModel::Private::getObjects(qint64 startMs, qint64 endMs,
