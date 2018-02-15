@@ -2221,6 +2221,10 @@
             }
         },
         {
+     "keys": ["*|H.264+4MP+HD+IR+IP+Camera"],
+          "onvifManufacturerReplacement": "merit-lilin"
+        },
+        {
             "keys":[
             "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28"
             ],

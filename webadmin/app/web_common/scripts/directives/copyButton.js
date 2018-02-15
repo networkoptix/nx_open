@@ -1,5 +1,5 @@
 angular.module('nxCommon')
-	.directive('copyButton', ['$timeout', '$log', function ($timeout, $Log) {
+	.directive('copyButton', ['$timeout', '$log', function ($timeout, $log) {
 		return{
 			restrict: 'E',
         	scope:{

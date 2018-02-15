@@ -67,7 +67,22 @@ namespace {
 
         return result;
     }
-}
+
+    class AxisParamsHelper
+    {
+    public:
+        static QString toDriverBoolValue(const QString& value)
+        {
+            return value == "true" ? "yes" : "no";
+        }
+
+        static QString fromDriverBoolValue(const QString& value)
+        {
+            return value == "yes" ? "true" : "false";
+        }
+    };
+
+} // namespace
 
 int QnPlAxisResource::portIdToIndex(const QString& id) const
 {
@@ -1652,9 +1667,11 @@ QnCameraAdvancedParamValueList QnPlAxisResource::parseParamsQueriesResult(
     {
         if (queriesResult.contains(param.id))
         {
-            auto paramValue = param.dataType == QnCameraAdvancedParameter::DataType::Enumeration
-                ? param.fromInternalRange(queriesResult[param.id])
-                : queriesResult[param.id];
+            auto paramValue = queriesResult[param.id];
+            if (param.dataType == QnCameraAdvancedParameter::DataType::Enumeration)
+                paramValue = param.fromInternalRange(paramValue);
+            else if (param.dataType == QnCameraAdvancedParameter::DataType::Bool)
+                paramValue = AxisParamsHelper::fromDriverBoolValue(paramValue);
 
             result.append(QnCameraAdvancedParamValue(param.id, paramValue));
         }
@@ -1692,9 +1709,10 @@ QString QnPlAxisResource::buildSetParamsQuery(const QnCameraAdvancedParamValueLi
                 continue;
 
             auto paramValue = paramIdAndValue.value;
-            paramValue = param.dataType == QnCameraAdvancedParameter::DataType::Enumeration
-                ? param.toInternalRange(paramValue)
-                : paramValue;
+            if (param.dataType == QnCameraAdvancedParameter::DataType::Enumeration)
+                paramValue = param.toInternalRange(paramValue);
+            else if (param.dataType == QnCameraAdvancedParameter::DataType::Bool)
+                paramValue = AxisParamsHelper::toDriverBoolValue(paramValue);
 
             query.addQueryItem(paramIdAndValue.id, paramValue);
         }
