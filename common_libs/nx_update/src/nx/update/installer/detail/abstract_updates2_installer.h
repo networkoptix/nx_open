@@ -15,6 +15,7 @@ enum class PrepareResult
     noFreeSpace,
     cleanTemporaryFilesError,
     alreadyStarted,
+    updateContentsError,
     unknownError,
 };
 

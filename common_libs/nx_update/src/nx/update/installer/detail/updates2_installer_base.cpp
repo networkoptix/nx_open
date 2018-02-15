@@ -44,17 +44,68 @@ void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompl
 
             switch (errorCode)
             {
-            case QnZipExtractor::Error::Ok:
-                return handler(PrepareResult::ok);
-            case QnZipExtractor::Error::NoFreeSpace:
-                return handler(PrepareResult::noFreeSpace);
-            default:
-                NX_WARNING(
-                    self,
-                    lm("ZipExtractor error: %1").args(QnZipExtractor::errorToString(errorCode)));
-                return handler(PrepareResult::unknownError);
+                case QnZipExtractor::Error::Ok:
+                {
+                    auto checkResult = self->checkContents();
+                    if (checkResult != PrepareResult::ok)
+                        return handler(checkResult);
+
+                    return handler(PrepareResult::ok);
+                }
+                case QnZipExtractor::Error::NoFreeSpace:
+                    return handler(PrepareResult::noFreeSpace);
+                default:
+                    NX_WARNING(
+                        self,
+                        lm("ZipExtractor error: %1").args(QnZipExtractor::errorToString(errorCode)));
+                    return handler(PrepareResult::unknownError);
             }
         });
+}
+
+PrepareResult Updates2InstallerBase::checkContents() const
+{
+    QVariantMap infoMap = updateInformation();
+    if (infoMap.isEmpty())
+        return PrepareResult::updateContentsError;
+
+    QString executable = infoMap.value("executable").toString();
+    if (executable.isEmpty())
+    {
+        NX_ERROR(this, "No executable specified in the update information file");
+        return PrepareResult::updateContentsError;
+    }
+
+    if (!checkExecutable(executable))
+    {
+        NX_ERROR(this, "Update executable file is invalid");
+        return PrepareResult::updateContentsError;
+    }
+
+    QnSystemInformation systemInfo = systemInformation();
+
+    QString platform = infoMap.value("platform").toString();
+    if (platform != systemInfo.platform)
+    {
+        NX_ERROR(this, lm("Incompatible update: %1 != %2").args(systemInfo.platform, platform));
+        return PrepareResult::updateContentsError;
+    }
+
+    QString arch = infoMap.value("arch").toString();
+    if (arch != systemInfo.arch)
+    {
+        NX_ERROR(this, lm("Incompatible update: %1 != %2").args(systemInfo.arch, arch));
+        return PrepareResult::updateContentsError;
+    }
+
+    QString modification = infoMap.value("modification").toString();
+    if (modification != systemInfo.modification)
+    {
+        NX_ERROR(this, lm("Incompatible update: %1 != %2").args(systemInfo.modification, modification));
+        return PrepareResult::updateContentsError;
+    }
+
+    return PrepareResult::ok;
 }
 
 void Updates2InstallerBase::install()

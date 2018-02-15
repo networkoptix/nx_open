@@ -24,6 +24,9 @@ public:
     MOCK_CONST_METHOD0(dataDirectoryPath, QString());
     MOCK_METHOD0(cleanInstallerDirectory, bool());
     MOCK_CONST_METHOD0(createZipExtractor, AbstractZipExtractorPtr());
+    MOCK_CONST_METHOD0(updateInformation, QVariantMap());
+    MOCK_CONST_METHOD0(systemInformation, QnSystemInformation());
+    MOCK_CONST_METHOD1(checkExecutable, bool(const QString&));
 };
 
 enum class ExpectedPrepareOutcome
@@ -32,7 +35,9 @@ enum class ExpectedPrepareOutcome
     fail_noFreeSpace,
     fail_unknown,
     fail_cleanFailed,
-    fail_alreadyRunning
+    fail_alreadyRunning,
+    fail_noUpdateJsonFile,
+    fail_noExecutableKeyInUpdateJson,
 };
 
 class TestZipExtractor: public AbstractZipExtractor
@@ -67,23 +72,25 @@ public:
 
                 switch (m_expectedOutcome)
                 {
-                case ExpectedPrepareOutcome::success:
-                    return extractHandler(QnZipExtractor::Error::Ok);
-                case ExpectedPrepareOutcome::fail_noFreeSpace:
-                    return extractHandler(QnZipExtractor::Error::NoFreeSpace);
-                case ExpectedPrepareOutcome::fail_cleanFailed:
-                    NX_ASSERT(false);
-                    break;
-                case ExpectedPrepareOutcome::fail_alreadyRunning:
-                {
-                    QnMutexLocker lock(&self->m_mutex);
-                    while (!m_mayProceed)
-                        m_proceedCondition.wait(lock.mutex());
-                    return extractHandler(QnZipExtractor::Error::Ok);
-                }
-                case ExpectedPrepareOutcome::fail_unknown:
-                    NX_ASSERT(false);
-                    break;
+                    case ExpectedPrepareOutcome::success:
+                    case ExpectedPrepareOutcome::fail_noUpdateJsonFile:
+                    case ExpectedPrepareOutcome::fail_noExecutableKeyInUpdateJson:
+                        return extractHandler(QnZipExtractor::Error::Ok);
+                    case ExpectedPrepareOutcome::fail_noFreeSpace:
+                        return extractHandler(QnZipExtractor::Error::NoFreeSpace);
+                    case ExpectedPrepareOutcome::fail_cleanFailed:
+                        NX_ASSERT(false);
+                        break;
+                    case ExpectedPrepareOutcome::fail_alreadyRunning:
+                    {
+                        QnMutexLocker lock(&self->m_mutex);
+                        while (!m_mayProceed)
+                            m_proceedCondition.wait(lock.mutex());
+                        return extractHandler(QnZipExtractor::Error::Ok);
+                    }
+                    case ExpectedPrepareOutcome::fail_unknown:
+                        NX_ASSERT(false);
+                        break;
                 }
 
             }).detach();
@@ -178,8 +185,61 @@ private:
 
     void initializeExpectations(ExpectedPrepareOutcome expectedOutcome)
     {
-        auto prepareCalls =
-            [this, expectedOutcome](int cleanInstallCount, AbstractZipExtractorPtr extractor)
+        static const QString kValidPlatform = "valid_platform";
+        static const QString kValidArch = "valid_arch";
+        static const QString KValidModification = "valid_modification";
+
+        static const QString kInValidPlatform = "invalid_platform";
+        static const QString kInValidArch = "invalid_arch";
+        static const QString KInValidModification = "invalid_modification";
+
+        static const QString kPlatformKey = "platform";
+        static const QString kArchKey = "arch";
+        static const QString kModificationKey = "modification";
+        static const QString kExecutableKey = "executable";
+
+        static const QString kExcutableName = "some.exe";
+
+        auto createSystemInformation =
+            [expectedOutcome]()
+            {
+                switch (expectedOutcome)
+                {
+                    case ExpectedPrepareOutcome::success:
+                        return QnSystemInformation(kValidPlatform, kValidArch, KValidModification);
+                    default:
+                        return QnSystemInformation();
+                }
+            };
+
+        auto createUpdateInformation =
+            [expectedOutcome]()
+            {
+                QVariantMap result;
+
+                switch (expectedOutcome)
+                {
+                    case ExpectedPrepareOutcome::success:
+                        result[kPlatformKey] = kValidPlatform;
+                        result[kArchKey] = kValidArch;
+                        result[kModificationKey] = KValidModification;
+                        result[kExecutableKey] = kExcutableName;
+                        break;
+                    case ExpectedPrepareOutcome::fail_noExecutableKeyInUpdateJson:
+                        result[kPlatformKey] = kValidPlatform;
+                        result[kArchKey] = kValidArch;
+                        result[kModificationKey] = KValidModification;
+                        break;
+                    default:
+                        break;
+                }
+
+                return result;
+            };
+
+        auto prepareExtractorCalls =
+            [this, expectedOutcome,
+            createUpdateInformation, createSystemInformation](int cleanInstallCount)
             {
                 EXPECT_CALL(m_updates2Installer, dataDirectoryPath())
                     .Times(1)
@@ -189,7 +249,27 @@ private:
                     .WillRepeatedly(Return(true));
                 EXPECT_CALL(m_updates2Installer, createZipExtractor())
                     .Times(1)
-                    .WillOnce(Return(extractor));
+                    .WillOnce(Return(m_extractorRef));
+
+                if (expectedOutcome == ExpectedPrepareOutcome::success)
+                {
+                    EXPECT_CALL(m_updates2Installer, updateInformation())
+                        .Times(1)
+                        .WillOnce(Return(createUpdateInformation()));
+                    EXPECT_CALL(m_updates2Installer, systemInformation())
+                        .Times(1)
+                        .WillOnce(Return(createSystemInformation()));
+                    EXPECT_CALL(m_updates2Installer, checkExecutable(_))
+                        .Times(1)
+                        .WillOnce(Return(true));
+                }
+
+                if (expectedOutcome == ExpectedPrepareOutcome::fail_noExecutableKeyInUpdateJson)
+                {
+                    EXPECT_CALL(m_updates2Installer, updateInformation())
+                        .Times(1)
+                        .WillOnce(Return(createUpdateInformation()));
+                }
             };
 
         if (!m_extractorRef)
@@ -197,26 +277,35 @@ private:
 
         switch (expectedOutcome)
         {
-        case ExpectedPrepareOutcome::success:
-            prepareCalls(1, m_extractorRef);
-            break;
-        case ExpectedPrepareOutcome::fail_noFreeSpace:
-            prepareCalls(2, m_extractorRef);
-            break;
-        case ExpectedPrepareOutcome::fail_cleanFailed:
-            EXPECT_CALL(m_updates2Installer, createZipExtractor())
-                .Times(1)
-                .WillOnce(Return(m_extractorRef));
-            EXPECT_CALL(m_updates2Installer, cleanInstallerDirectory())
-                .Times(1)
-                .WillOnce(Return(false));
-            break;
-        case ExpectedPrepareOutcome::fail_alreadyRunning:
-            NX_ASSERT(m_extractorRef);
-            break;
-        case ExpectedPrepareOutcome::fail_unknown:
-            NX_ASSERT(false);
-            break;
+            case ExpectedPrepareOutcome::success:
+                prepareExtractorCalls(1);
+                break;
+            case ExpectedPrepareOutcome::fail_noFreeSpace:
+                prepareExtractorCalls(2);
+                break;
+            case ExpectedPrepareOutcome::fail_cleanFailed:
+                EXPECT_CALL(m_updates2Installer, createZipExtractor())
+                    .Times(1)
+                    .WillOnce(Return(m_extractorRef));
+                EXPECT_CALL(m_updates2Installer, cleanInstallerDirectory())
+                    .Times(1)
+                    .WillOnce(Return(false));
+                break;
+            case ExpectedPrepareOutcome::fail_alreadyRunning:
+                NX_ASSERT(m_extractorRef);
+                break;
+            case ExpectedPrepareOutcome::fail_noUpdateJsonFile:
+                prepareExtractorCalls(1);
+                EXPECT_CALL(m_updates2Installer, updateInformation())
+                    .Times(1)
+                    .WillOnce(Return(createUpdateInformation()));
+                break;
+            case ExpectedPrepareOutcome::fail_noExecutableKeyInUpdateJson:
+                prepareExtractorCalls(1);
+                break;
+            case ExpectedPrepareOutcome::fail_unknown:
+                NX_ASSERT(false);
+                break;
         }
     }
 };
@@ -246,6 +335,41 @@ TEST_F(Updates2Installer, prepare_issuedWhenAlreadyRunning_shouldSuccess)
         PrepareResult::alreadyStarted,
         whenPrepareRequestIsIssuedInstantResult(ExpectedPrepareOutcome::fail_alreadyRunning));
     thenPrepareShouldAtLastEndWith(PrepareResult::ok);
+}
+
+TEST_F(Updates2Installer, prepareFailed_noJsonFileOrCorrupted)
+{
+    whenPrepareRequestIsIssued(ExpectedPrepareOutcome::fail_noUpdateJsonFile);
+    thenPrepareShouldEndWith(PrepareResult::updateContentsError);
+}
+
+TEST_F(Updates2Installer, prepareFailed_noExecutableField)
+{
+    whenPrepareRequestIsIssued(ExpectedPrepareOutcome::fail_noExecutableKeyInUpdateJson);
+    thenPrepareShouldEndWith(PrepareResult::updateContentsError);
+}
+
+// #TODO #akulikov implement rest check update information tests: fail_checkExecutableFailed,
+// fail_platformNotMatches, fail_archNotMatches, fail_modificationNotMatches
+
+TEST_F(Updates2Installer, prepareFailed_checkExecutableFailed)
+{
+
+}
+
+TEST_F(Updates2Installer, prepareFailed_platformNotMatches)
+{
+
+}
+
+TEST_F(Updates2Installer, prepareFailed_archNotMatches)
+{
+
+}
+
+TEST_F(Updates2Installer, prepareFailed_modificationNotMatches)
+{
+
 }
 
 } // namespace test

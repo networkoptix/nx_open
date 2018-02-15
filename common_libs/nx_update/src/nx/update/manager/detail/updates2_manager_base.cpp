@@ -319,6 +319,10 @@ void Updates2ManagerBase::startPreparing(const QString& updateFilePath)
                     return setStatus(
                         api::Updates2StatusData::StatusCode::error,
                         lit("Failed to remove temporary files"));
+                case PrepareResult::updateContentsError:
+                    return setStatus(
+                        api::Updates2StatusData::StatusCode::error,
+                        lit("Update contents are not valid"));
                 case PrepareResult::unknownError:
                     return setStatus(
                         api::Updates2StatusData::StatusCode::error,

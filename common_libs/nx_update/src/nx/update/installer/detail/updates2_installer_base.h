@@ -4,6 +4,7 @@
 #include <nx/update/installer/detail/abstract_zip_extractor.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <utils/common/system_information.h>
 
 namespace nx {
 namespace update {
@@ -24,6 +25,7 @@ private:
     bool m_running = false;
 
     QString installerWorkDir() const;
+    PrepareResult checkContents() const;
 
     // These below should be overriden in Server{Client}Updates2Installer
     virtual QString dataDirectoryPath() const = 0;
@@ -31,6 +33,9 @@ private:
     // These below should be overriden in CommonUpdates2Installer
     virtual bool cleanInstallerDirectory() = 0;
     virtual AbstractZipExtractorPtr createZipExtractor() const = 0;
+    virtual QVariantMap updateInformation() const = 0;
+    virtual QnSystemInformation systemInformation() const = 0;
+    virtual bool checkExecutable(const QString& executableName) const = 0;
 };
 
 } // namespace detail
