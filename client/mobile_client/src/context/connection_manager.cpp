@@ -30,7 +30,6 @@
 #include <nx/network/socket_global.h>
 #include <network/system_helpers.h>
 #include <helpers/system_weight_helper.h>
-#include <helpers/url_helper.h>
 #include <helpers/system_helpers.h>
 #include <settings/last_connection.h>
 #include <nx/utils/log/log.h>
@@ -436,7 +435,7 @@ bool QnConnectionManagerPrivate::doConnect()
 
             LastConnectionData connectionData{
                 connectionInfo.systemName,
-                QnUrlHelper(url).cleanUrl(),
+                url.cleanUrl(),
                 QnEncodedCredentials(url)};
             qnSettings->setLastUsedConnection(connectionData);
             qnSettings->save();

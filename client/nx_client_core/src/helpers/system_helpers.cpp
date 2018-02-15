@@ -1,6 +1,5 @@
 #include "system_helpers.h"
 
-#include <helpers/url_helper.h>
 #include <nx/network/socket_global.h>
 #include <client_core/client_core_settings.h>
 
@@ -16,7 +15,7 @@ const utils::log::Tag kCredentialsLogTag(typeid(Credentials));
 
 void storeConnection(const QnUuid& localSystemId, const QString& systemName, const nx::utils::Url& url)
 {
-    const auto cleanUrl = QnUrlHelper(url).cleanUrl();
+    const auto cleanUrl = url.cleanUrl();
 
     auto connections = qnClientCoreSettings->recentLocalConnections();
 
@@ -57,7 +56,7 @@ void removeConnection(const QnUuid& localSystemId, const nx::utils::Url& url)
         auto it = connections.find(localSystemId);
 
         if (it != connections.end())
-            it->urls.removeOne(QnUrlHelper(url).cleanUrl());
+            it->urls.removeOne(url.cleanUrl());
     }
 
     qnClientCoreSettings->setRecentLocalConnections(connections);
