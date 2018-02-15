@@ -13,9 +13,9 @@ namespace network {
 namespace http {
 namespace test {
 
-static const nx::String kTestPath = "/test/test";
-static const nx::String kContentServerPathPrefix = "/AsyncHttpClientRedirectTest/";
-static const nx::String kTestMessageBody = "test message body";
+static const char* kTestPath = "/test/test";
+static const char* kContentServerPathPrefix = "/AsyncHttpClientRedirectTest/";
+static const QByteArray kTestMessageBody = "test message body";
 
 class AsyncHttpClientRedirect:
     public ::testing::Test
@@ -41,7 +41,7 @@ protected:
         givenResourceServer();
         givenRedirectServer();
         ASSERT_TRUE(m_resourceServer->registerRedirectHandler(
-            nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
+            nx::network::url::joinPath(kContentServerPathPrefix, kTestPath).c_str(),
             m_redirectUrl));
     }
 
@@ -58,7 +58,7 @@ protected:
         ASSERT_TRUE(m_resourceServer->bindAndListen());
         m_actualUrl = nx::utils::Url(lm("http://localhost:%1%2")
             .arg(m_resourceServer->serverAddress().port)
-            .arg(nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath)));
+            .arg(nx::network::url::joinPath(kContentServerPathPrefix, kTestPath)));
     }
 
     void givenRedirectServer()
@@ -189,13 +189,13 @@ private:
         using namespace std::placeholders;
 
         ASSERT_TRUE(m_resourceServer->registerStaticProcessor(
-            nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
+            nx::network::url::joinPath(kContentServerPathPrefix, kTestPath).c_str(),
             kTestMessageBody,
             "text/plain",
             nx::network::http::Method::get));
 
         ASSERT_TRUE(m_resourceServer->registerRequestProcessorFunc(
-            nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
+            nx::network::url::joinPath(kContentServerPathPrefix, kTestPath).c_str(),
             std::bind(&AsyncHttpClientRedirect::savePostedResource, this, _1, _2, _3, _4, _5),
             nx::network::http::Method::post));
     }

@@ -296,18 +296,16 @@ private:
                 nx::cloud::relay::api::kServerClientSessionsPath, {kServerId});
 
         m_realRelay.registerStaticProcessor(
-            nx::network::url::normalizePath(
-                kRelayApiPrefix + nx::String("/") +
-                createClientSessionPath),
+            nx::network::url::joinPath(kRelayApiPrefix, createClientSessionPath).c_str(),
             QByteArray("{ \"sessionId\": \"") + kRelaySessionId +
                 QByteArray("\", \"sessionTimeout\": \"100\" }"),
             "application/json");
 
         m_realRelay.registerRequestProcessorFunc(
-            nx::network::url::normalizePath(
-                kRelayApiPrefix + nx::String("/") +
+            nx::network::url::joinPath(
+                kRelayApiPrefix,
                 nx::network::http::rest::substituteParameters(
-                    nx::cloud::relay::api::kClientSessionConnectionsPath, {kRelaySessionId})),
+                    nx::cloud::relay::api::kClientSessionConnectionsPath, {kRelaySessionId})).c_str(),
             std::bind(&RelayConnectorRedirect::upgradeConnection, this, _1, _2, _3, _4, _5));
 
         ASSERT_TRUE(m_realRelay.bindAndListen());
