@@ -250,7 +250,7 @@ namespace Qn
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QSet<QnUuid>. */
         ActionDataRole,                             /**< Role for business action. Value of type vms::event::AbstractActionPtr. */
         RuleModelRole, /* #deprecate #3.2 */        /**< Role for business rule caching model. Value of type QnBusinessRuleViewModelPtr. */
-        EventParamsRole,                            /**< Role for business event parameters. Value of type nx::vms::event::EventParameters. */
+        EventParametersRole,                            /**< Role for business event parameters. Value of type nx::vms::event::EventParameters. */
 
         StorageUrlRole,                             /**< Role for storing real storage Url in storage_url_dialog. */
 

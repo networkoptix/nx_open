@@ -1,4 +1,8 @@
-set(depends mediaserver)
+set(depends
+    mediaserver
+    server_plugins
+)
+
 if(targetDevice STREQUAL "bpi")
     list(APPEND depends "mobile_client")
 endif()

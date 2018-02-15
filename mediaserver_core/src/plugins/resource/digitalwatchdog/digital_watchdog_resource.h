@@ -29,10 +29,6 @@ public:
 
     CLSimpleHTTPClient httpClient() const;
 
-    virtual void updateVideoEncoder(
-        VideoEncoder& encoder,
-        Qn::StreamIndex streamIndex,
-        const QnLiveStreamParams& streamParams) override;
 protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
 
@@ -49,6 +45,11 @@ protected:
 
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
+
+    virtual void updateVideoEncoder(
+        VideoEncoder& encoder,
+        Qn::StreamIndex streamIndex,
+        const QnLiveStreamParams& streamParams) override;
 private:
     bool isDualStreamingEnabled(bool& unauth);
     void enableOnvifSecondStream();

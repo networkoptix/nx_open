@@ -14,15 +14,15 @@ QnWearableMotionWidget::QnWearableMotionWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    ui->sensitivitySpinBox->setMinimum(1);
-    ui->sensitivitySpinBox->setMaximum(QnMotionRegion::kSensitivityLevelCount - 1);
+    for (int i = 1; i < QnMotionRegion::kSensitivityLevelCount; i++)
+        ui->sensitivityComboBox->addItem(QString::number(i));
 
     m_aligner = new QnAligner(this);
     m_aligner->addWidget(ui->sensitivityLabel);
 
     connect(ui->motionDetectionCheckBox, &QCheckBox::stateChanged, this,
         &QnWearableMotionWidget::changed);
-    connect(ui->sensitivitySpinBox, QnSpinboxIntValueChanged, this,
+    connect(ui->sensitivityComboBox, QnComboboxCurrentIndexChanged, this,
         &QnWearableMotionWidget::changed);
 
     connect(ui->motionDetectionCheckBox, &QCheckBox::stateChanged, this,
@@ -52,7 +52,7 @@ void QnWearableMotionWidget::setReadOnly(bool readOnly)
 
     using ::setReadOnly;
     setReadOnly(ui->motionDetectionCheckBox, readOnly);
-    setReadOnly(ui->sensitivitySpinBox, readOnly);
+    setReadOnly(ui->sensitivityComboBox, readOnly);
 
     m_readOnly = readOnly;
 }
@@ -63,7 +63,7 @@ void QnWearableMotionWidget::updateFromResource(const QnVirtualCameraResourcePtr
         return;
 
     ui->motionDetectionCheckBox->setChecked(camera->getMotionType() == Qn::MT_SoftwareGrid);
-    ui->sensitivitySpinBox->setValue(calculateSensitivity(camera));
+    ui->sensitivityComboBox->setCurrentText(QString::number(calculateSensitivity(camera)));
 }
 
 void QnWearableMotionWidget::submitToResource(const QnVirtualCameraResourcePtr &camera)
@@ -72,7 +72,7 @@ void QnWearableMotionWidget::submitToResource(const QnVirtualCameraResourcePtr &
         return;
 
     camera->setMotionType(ui->motionDetectionCheckBox->isChecked() ? Qn::MT_SoftwareGrid : Qn::MT_NoMotion);
-    submitSensitivity(camera, ui->sensitivitySpinBox->value());
+    submitSensitivity(camera, ui->sensitivityComboBox->currentText().toInt());
 }
 
 void QnWearableMotionWidget::updateSensitivityEnabled()
@@ -80,7 +80,7 @@ void QnWearableMotionWidget::updateSensitivityEnabled()
     bool enabled = ui->motionDetectionCheckBox->isChecked();
 
     ui->sensitivityLabel->setEnabled(enabled);
-    ui->sensitivitySpinBox->setEnabled(enabled);
+    ui->sensitivityComboBox->setEnabled(enabled);
 }
 
 int QnWearableMotionWidget::calculateSensitivity(const QnVirtualCameraResourcePtr &camera) const

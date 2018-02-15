@@ -33,15 +33,17 @@ struct TimeBasedNonceProviderTest: ::testing::Test
 
     void testNonceExpiration(const QByteArray& nonce)
     {
-        ASSERT_TRUE(nonceProvider.isNonceValid(nonce));
-        for (int i = 0; i < 2; ++i)
+        QElapsedTimer timer;
+        timer.restart();
+        const int maxInterval = kSteadyExpirationPeriod.count() * 2;
+        while (nonceProvider.isNonceValid(nonce) && timer.elapsed() < maxInterval)
         {
-            std::this_thread::sleep_for(kSteadyExpirationPeriod / 2);
-            ASSERT_TRUE(nonceProvider.isNonceValid(nonce));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
 
-        std::this_thread::sleep_for(kSteadyExpirationPeriod * 2);
-        ASSERT_FALSE(nonceProvider.isNonceValid(nonce));
+        const auto interval = timer.elapsed();
+        EXPECT_GT(interval, maxInterval / 2);
+        EXPECT_LT(interval, maxInterval * 2);
     }
 };
 

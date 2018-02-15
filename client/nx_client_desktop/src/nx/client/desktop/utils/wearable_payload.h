@@ -6,12 +6,11 @@
 #include <api/model/wearable_prepare_data.h>
 #include <api/model/wearable_prepare_reply.h>
 
+#include "wearable_fwd.h"
+
 namespace nx {
 namespace client {
 namespace desktop {
-
-struct WearablePayload;
-using WearablePayloadList = QVector<WearablePayload>;
 
 struct WearablePayload
 {

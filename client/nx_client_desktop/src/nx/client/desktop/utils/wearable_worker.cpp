@@ -15,6 +15,7 @@
 
 #include "server_request_storage.h"
 #include "upload_manager.h"
+#include "wearable_payload.h"
 
 namespace nx {
 namespace client {
@@ -348,7 +349,7 @@ void WearableWorker::handleExtendFinished(bool success, const QnWearableStatusRe
 
     if(d->state.status == WearableState::Consuming)
     {
-        d->state.consumeProgress = result.progress;
+        d->state.consumeProgress = result.consuming ? std::min(99, result.progress) : 100;
         emit stateChanged(d->state);
 
         if (!result.consuming)

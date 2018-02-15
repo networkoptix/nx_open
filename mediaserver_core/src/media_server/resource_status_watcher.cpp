@@ -44,13 +44,12 @@ void QnResourceStatusWatcher::addResourcesImmediatly(const QnVirtualCameraResour
     QSet<QString> foreignCameras;
     for (const auto camera: cameras)
         foreignCameras << camera->getPhysicalId();
-    QSet<QString> discoveredCameras = commonModule()->resourceDiscoveryManager()->lastDiscoveredIds();
-    auto camerasToAddSet = discoveredCameras.intersect(foreignCameras);
+    QnResourceList discoveredCameras = commonModule()->resourceDiscoveryManager()->lastDiscoveredResources();
     QnResourceList camerasToAdd;
-    for (const auto& cameraPhysicalId: camerasToAddSet)
+    for (const auto& camera: discoveredCameras)
     {
-        if (auto res = resPool->getResourceByUniqueId(cameraPhysicalId))
-            camerasToAdd << res;
+        if (foreignCameras.contains(camera->getUniqueId()))
+            camerasToAdd << camera;
     }
     commonModule()->resourceDiscoveryManager()->addResourcesImmediatly(camerasToAdd);
 }

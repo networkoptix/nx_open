@@ -245,8 +245,6 @@ public:
     virtual int getOnvifRequestsRecieveTimeout() const;
     virtual int getOnvifRequestsSendTimeout() const;
 
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
-
     void calcTimeDrift(int* outSoapRes = nullptr) const; // calculate clock diff between camera and local clock at seconds
     static int calcTimeDrift(const QString& deviceUrl, int* outSoapRes = nullptr, QTimeZone* timeZone = nullptr);
 

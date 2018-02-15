@@ -15,6 +15,9 @@
 
 #include <nx/network/deprecated/asynchttpclient.h>
 
+#include <nx/utils/log/log.h>
+#define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
+    nx::utils::log::Level::debug, "vca_metadata_plugin") NX_PRINT_PREFIX
 #include <nx/kit/debug.h>
 
 #include "manager.h"
@@ -42,7 +45,6 @@ Plugin::Plugin()
         m_manifest = f.readAll();
     else
         NX_PRINT << kPluginName << " can not open resource \"" << kResourceName << "\".";
-
     m_typedManifest = QJson::deserialized<AnalyticsDriverManifest>(m_manifest);
 }
 

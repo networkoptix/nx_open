@@ -50,6 +50,7 @@ private:
         const nx::sdk::CameraInfo& cameraInfo);
 
 private:
+    AnalyticsDriverManifest m_typedManifest;
     QByteArray m_manifest;
 };
 

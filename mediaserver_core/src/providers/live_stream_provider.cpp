@@ -665,4 +665,9 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     }
 }
 
+QnConstResourceAudioLayoutPtr QnLiveStreamProvider::getDPAudioLayout() const
+{
+    return QnConstResourceAudioLayoutPtr();
+}
+
 #endif // ENABLE_DATA_PROVIDERS

@@ -485,6 +485,7 @@ void SingleCameraSettingsWidget::updateFromResource(bool silent)
         ui->vendorLabel->setVisible(!isWearable);
         ui->addressGroupBox->setVisible(!isWearable);
         ui->authenticationGroupBox->setVisible(!isWearable);
+        ui->topFormLayout->setVerticalSpacing(isWearable ? 2 : 8);
 
         if (isWearable)
         {
