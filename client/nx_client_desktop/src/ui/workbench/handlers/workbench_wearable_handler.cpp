@@ -199,7 +199,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
     QStringList files = QDir(path).entryList(kVideoExtensions);
     if (files.empty())
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("No video files found in selected folder"),
             path);
         return;
@@ -222,7 +222,7 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearableUpload& upload)
 
     if (upload.allHaveStatus(WearablePayload::UnsupportedFormat))
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("Selected file formats are not supported", 0, count),
             tr("Use .MKV, .AVI, .MP4 or other video files."));
         return false;
@@ -230,7 +230,7 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearableUpload& upload)
 
     if (upload.allHaveStatus(WearablePayload::NoTimestamp))
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("Selected files do not have timestamps", 0, count),
             tr("Only video files with correct timestamp are supported."));
         return false;
@@ -238,7 +238,7 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearableUpload& upload)
 
     if (upload.allHaveStatus(WearablePayload::ChunksTakenByFileInQueue))
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("Selected files cover periods for which videos are already being uploaded", 0, count),
             tr("You can upload these files to a different instance of a Wearable Camera.", 0, count));
         return false;
@@ -246,7 +246,7 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearableUpload& upload)
 
     if (upload.allHaveStatus(WearablePayload::ChunksTakenOnServer))
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("Selected files cover periods for which videos have already been uploaded", 0, count),
             tr("You can upload these files to a different instance of a Wearable Camera.", 0, count));
         return false;
@@ -280,14 +280,14 @@ bool QnWorkbenchWearableHandler::checkFileUpload(const WearableUpload& upload)
 
         if (!upload.someHaveStatus(WearablePayload::Valid))
         {
-            QnMessageBox::critical(mainWindow(),
+            QnMessageBox::warning(mainWindow(),
                 tr("Selected files will not be uploaded"),
                 extendedMessage);
             return false;
         }
         else
         {
-            QDialogButtonBox::StandardButton button = QnMessageBox::critical(mainWindow(),
+            QDialogButtonBox::StandardButton button = QnMessageBox::warning(mainWindow(),
                 tr("Some files will not be uploaded"),
                 extendedMessage,
                 QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -309,7 +309,7 @@ bool QnWorkbenchWearableHandler::checkFolderUpload(const QString& path, const We
 
     if (!upload.someHaveStatus(WearablePayload::Valid))
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("No new files to upload in selected folder"),
             path);
         return false;
@@ -390,7 +390,7 @@ QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const Wearable
     case WearablePayload::UnsupportedFormat:
         return tr("%1 - has unsupported format.").arg(fileName);
     case WearablePayload::NoTimestamp:
-        return tr("%1 - does not have timestamp").arg(fileName);
+        return tr("%1 - does not have timestamp.").arg(fileName);
     case WearablePayload::ChunksTakenByFileInQueue:
         return tr("%1 - covers period for which video has already been uploaded.").arg(fileName);
     case WearablePayload::ChunksTakenOnServer:
