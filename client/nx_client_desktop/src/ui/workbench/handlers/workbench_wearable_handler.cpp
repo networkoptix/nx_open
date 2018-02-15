@@ -371,8 +371,7 @@ void QnWorkbenchWearableHandler::at_wearableManager_stateChanged(const WearableS
     if (!camera)
         return;
 
-    context()
-        ->instance<QnCameraDataManager>()
+    qnClientModule->cameraDataManager()
         ->loader(camera, /*create=*/true)
         ->load(/*forced=*/true);
 }
