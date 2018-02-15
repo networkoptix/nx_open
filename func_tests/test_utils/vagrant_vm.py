@@ -1,6 +1,5 @@
 import logging
 import tempfile
-from textwrap import dedent
 
 import jinja2
 import vagrant
@@ -48,7 +47,6 @@ class VagrantVMFactory(object):
     def __init__(self, cache, options, config_factory):
         self._cache = cache
         self._bin_dir = options.bin_dir
-        self._vagrant_private_key_path = None  # defined for remote ssh vm host
         self._config_factory = config_factory
         self._host_os_access = host_from_config(options.vm_ssh_host_config)
         self._vm_name_prefix = options.vm_name_prefix
@@ -58,8 +56,11 @@ class VagrantVMFactory(object):
             self._vagrant_dir = options.vm_host_work_dir / 'vagrant'
             self._vagrant_private_key_path = options.work_dir / 'vagrant_insecure_private_key'
             self._copy_vagrant_insecure_ssh_key(to_local_path=self._vagrant_private_key_path)
+            self._vm_host_hostname = options.vm_ssh_host_config.hostname
         else:
             self._vagrant_dir = options.work_dir / 'vagrant'
+            self._vagrant_private_key_path = Path().home() / '.vagrant.d' / 'insecure_private_key'
+            self._vm_host_hostname = 'localhost'
         self._vagrant_file_path = self._vagrant_dir / 'Vagrantfile'
         self._ssh_config_path = options.work_dir / 'ssh.config'
         self._existing_vm_list = set(self._virtualbox_vm.get_vms_list())
@@ -194,14 +195,18 @@ class VagrantVMFactory(object):
         ssh_connections_dir = self._ssh_config_path.with_name('ssh_connections')
         ssh_connections_dir.mkdir(exist_ok=True)
         with self._ssh_config_path.open('w') as f:
-            f.write(dedent(u'''
-                ControlMaster auto
-                ControlPersist 1m
-                ControlPath {}/%r@%h:%p
-                ''').format(ssh_connections_dir).strip() + '\n\n')
+            f.write(u'StrictHostKeyChecking no\n')
+            f.write(u'UserKnownHostsFile /dev/null\n')
+            f.write(u'ControlMaster auto\n')
+            f.write(u'ControlMaster auto\n')
+            f.write(u'ControlPersist 10m\n')
+            f.write(u'ControlPath {}/%r@%h:%p\n'.format(ssh_connections_dir))
+            f.write(u'IdentityFile {}'.format(self._vagrant_private_key_path))
             for vm in self._vms.values():
-                if vm.is_running:
-                    f.write(self._vagrant.ssh_config(vm.vagrant_name).decode())
+                f.write(u'\n')
+                f.write(u'Host {}\n'.format(vm.vagrant_name))
+                f.write(u'    HostName {}\n'.format(self._vm_host_hostname))
+                f.write(u'    Port {}\n'.format(vm.config.ssh_forwarded_port))
 
 
 class VagrantVM(object):

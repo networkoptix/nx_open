@@ -91,7 +91,7 @@ class SshAccessConfig(object):
 
 def host_from_config(config):
     if config:
-        return SshAccess(config.os_access, name=config.name, user=config.user, key_path=config.key_file_path)
+        return SshAccess(config.hostname, name=config.name, user=config.user, key_path=config.key_file_path)
     else:
         return LocalAccess()
 
