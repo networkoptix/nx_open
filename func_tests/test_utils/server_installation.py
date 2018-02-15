@@ -207,7 +207,9 @@ def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_IN
     installation = ServerInstallation(os_access, installation_root / customization.installation_subdir)
 
     assert installation.is_valid
-    assert UpstartService(os_access, customization.service_name).is_running()  # Must run when installation ends.
+    service = UpstartService(os_access, customization.service_name)
+    if not service.is_running():
+        service.set_state(True)
     assert wait_until(lambda: _port_is_opened_on_server_machine(os_access, 7001))  # Opens after a while.
 
     installation.backup_config()
