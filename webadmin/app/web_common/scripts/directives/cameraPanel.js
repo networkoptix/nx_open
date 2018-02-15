@@ -1,18 +1,18 @@
 "use strict";
 angular.module('nxCommon')
-    .directive('cameraPanel', ['$localStorage',function ($localStorage) {
+    .directive('cameraPanel', ['$localStorage', '$timeout', function ($localStorage, $timeout) {
         return {
             restrict: 'E',
             scope:{
                 "activeCamera":"=",
                 "camerasProvider": "=",
-                "showCameraPanel": "="
+                "showCameraPanel": "=",
+                "searchCams": "="
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
             link: function (scope, element/*, attrs*/) {
                 scope.Config = Config;
                 scope.storage = $localStorage;
-                scope.searchCams = '';
                 scope.inputPlaceholder = L.common.searchCamPlaceholder;
 
                 var updateCameras = function(){
@@ -39,10 +39,16 @@ angular.module('nxCommon')
                     scope.storage.serverStates[server.id] = server.collapsed;
                 };
                 
-                function searchCams(){
+                function searchCams(searchText){
                     function has(str, substr){
-                        return str && str.toLowerCase().indexOf(substr.toLowerCase()) >= 0;
+                        return str && str.toLowerCase().replace(/\s/g, '').indexOf(substr.toLowerCase().replace(/\s/g, '')) >= 0;
                     }
+
+                    //If the text is blank allow scope.searchCams to update in dom then update cameras
+                    if(searchText === ''){
+                        return $timeout(searchCams);
+                    }
+
                     _.forEach(scope.mediaServers,function(server){
                         var cameras = scope.cameras[server.id];
                         var camsVisible = false;

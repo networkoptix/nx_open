@@ -9,7 +9,7 @@
  * @param animationState
  * @param debugEventsMode
  */
-function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleManager, animationState, debugSettings, hasHighDpi){
+function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleManager, animationState, debugSettings, pixelAspectRatio){
 
     this.canvas = canvas;
     this.recordsProvider = recordsProvider;
@@ -17,7 +17,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     this.animationState = animationState;
     this.debugEventsMode = debugSettings.debugEventsMode;
     this.allowDebug = debugSettings.allowDebug;
-    this.hasHighDpi = hasHighDpi;
+    this.hasHighDpi = pixelAspectRatio > 1;
+    this.pixelAspectRatio = pixelAspectRatio || 1;
 
     var self = this;
 
@@ -44,7 +45,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             alpha + ')';
     }
     function formatFont(font){
-        return font.weight + ' ' + font.size.toFixed(4) + 'px ' + font.face;
+        return font.weight + ' ' + (font.size * self.pixelAspectRatio).toFixed(4) + 'px ' + font.face;
     }
 
     function clearTimeline(){
@@ -98,7 +99,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             context,
             animationState.currentLevels.labels.index,
             animationState.targetLevels.labels.index,
-            self.animationState.zooming,
+            self.animationState.labels,
             'format',
             timelineConfig.labelFixed,
             timelineConfig.topLabelHeight,
@@ -120,7 +121,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             context,
             animationState.currentLevels.marks.index,
             animationState.targetLevels.marks.index,
-            self.animationState.zooming,
+            self.animationState.marks,
             false,// No format
             'none',
             timelineConfig.topLabelHeight,
@@ -149,7 +150,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         //3. Animation includes changing of height and font-size and transparency for colors
 
         function getPointAnimation(pointLevelIndex, levelName){ // Get transition value for animation for this level
-            var animation = self.animationState.zooming;
+            var animation = self.animationState[levelName];
 
             var minLevel = getLevelMinValue(levelName);
 
@@ -306,13 +307,13 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     }
     function drawLabel( context, date, level, alpha,
                         labelFormat, labelFixed, levelTop, levelHeight, font, labelAlign, bgColor, markColor, labelPositionFix, markAttach, markHeight){
-        var coordinate = self.scaleManager.dateToScreenCoordinate(date);
+        var coordinate = self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio);
 
         if(labelFormat) {
             context.font = formatFont(font);
 
             var nextDate = level.interval.addToDate(date);
-            var stopCoordinate = self.scaleManager.dateToScreenCoordinate(nextDate);
+            var stopCoordinate = self.scaleManager.dateToScreenCoordinate(nextDate, self.pixelAspectRatio);
             //var nextLevel = labelFixed?level:RulerModel.findBestLevel(nextDate);
             //var nextLabel = dateFormat(new Date(nextDate), nextLevel[labelFormat]);
 
@@ -321,8 +322,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             var textWidth = context.measureText(label).width;
 
             var textStart = levelTop * self.canvas.height // Top border
-                + (levelHeight * self.canvas.height - font.size) / 2 // Top padding
-                + font.size + labelPositionFix; // Font size
+                + (levelHeight * self.canvas.height - font.size * self.pixelAspectRatio) / 2 // Top padding
+                + font.size * self.pixelAspectRatio + labelPositionFix * self.pixelAspectRatio; // Font size
 
             var x = 0;
             switch (labelAlign) {
@@ -332,18 +333,18 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                     var center = (leftBound + rightBound) / 2;
 
                     x = self.scaleManager.bound(
-                            coordinate + timelineConfig.labelPadding,
+                            coordinate + timelineConfig.labelPadding * self.pixelAspectRatio,
                             center - textWidth / 2,
-                            stopCoordinate - textWidth - timelineConfig.labelPadding
+                            stopCoordinate - textWidth - timelineConfig.labelPadding * self.pixelAspectRatio
                     );
 
                     break;
 
                 case 'left':
                     x = self.scaleManager.bound(
-                        timelineConfig.labelPadding,
-                            coordinate + timelineConfig.labelPadding,
-                            stopCoordinate - textWidth - timelineConfig.labelPadding
+                        timelineConfig.labelPadding * self.pixelAspectRatio,
+                        coordinate + timelineConfig.labelPadding * self.pixelAspectRatio,
+                        stopCoordinate - textWidth - timelineConfig.labelPadding * self.pixelAspectRatio
                     );
 
                     break;
@@ -385,7 +386,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                     break;
                 case 'above':
                 default:
-                    context.clearRect(x, textStart - font.size, textWidth, font.size); // above
+                    context.clearRect(x, textStart - font.size * self.pixelAspectRatio, textWidth, font.size * self.pixelAspectRatio); // above
                     break;
             }
         }
@@ -423,6 +424,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     }
     // !!! Draw events
     function drawOrCheckEvents(context, mouseX, mouseY){
+        mouseY *= self.pixelAspectRatio;
+        mouseX *= self.pixelAspectRatio;
         var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height; // Top border
 
         if(context) {
@@ -461,8 +464,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     var chunkLoadingTextureImg = false;
     var chunkLoadingTextureSize = 0;
     function drawEvent(context, chunk, levelIndex, debug, targetLevelIndex){
-        var startCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.start);
-        var endCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.end);
+        var startCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.start, self.pixelAspectRatio);
+        var endCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.end, self.pixelAspectRatio);
 
         var blur = 1;//chunk.level/(RulerModel.levels.length - 1);
 
@@ -493,9 +496,9 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         else if(levelIndex != chunk.level || !chunk.level){
             //Show loading color under loading texture
             context.fillStyle = blurColor(timelineConfig.loadingChunkColor, blur);
-            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2, top,
-                            (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
-            
+            context.fillRect(startCoordinate - self.pixelAspectRatio * timelineConfig.minChunkWidth/2, top,
+                            (endCoordinate - startCoordinate) + self.pixelAspectRatio * timelineConfig.minChunkWidth/2, height);
+
             //Load the loading texture
             if(chunkLoadingTexture){
                 context.fillStyle = chunkLoadingTexture;
@@ -508,7 +511,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                         context.fillStyle = chunkLoadingTexture;
                         chunkLoadingTextureSize = this.width;
                     };
-                    var imagePath = hasHighDpi ? 'images/timeline-loading-filled@2x.png' : 'images/timeline-loading-filled.png';
+                    var imagePath = self.hasHighDpi ? 'images/timeline-loading-filled@2x.png' : 'images/timeline-loading-filled.png';
                     img.src = Config.webclient.staticResources + imagePath;
                     chunkLoadingTextureImg = img;
                 }
@@ -517,21 +520,21 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
             //Give the texture the appearance of moving
             var start = self.scaleManager.lastMinute();
-            var absoluteStartCoordinate = self.scaleManager.dateToCoordinate(chunk.start);
-            
-            var offset_x = - Math.floor(((start - absoluteStartCoordinate )/ timelineConfig.lastMinuteAnimationMs) % chunkLoadingTextureSize);
+            var absoluteStartCoordinate = self.scaleManager.dateToCoordinate(chunk.start, self.pixelAspectRatio);
+
+            var offset_x = - Math.floor(((start - absoluteStartCoordinate) / timelineConfig.lastMinuteAnimationMs) % chunkLoadingTextureSize) * self.pixelAspectRatio;
 
             context.save();
             context.translate(offset_x, 0);
 
-            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x, top,
-                            (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
+            context.fillRect(startCoordinate - self.pixelAspectRatio * timelineConfig.minChunkWidth/2 - offset_x, top,
+                            (endCoordinate - startCoordinate) + self.pixelAspectRatio * timelineConfig.minChunkWidth/2, height);
 
             context.restore();
         }
         else{
-            context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2, top,
-                            (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
+            context.fillRect(startCoordinate - self.pixelAspectRatio * timelineConfig.minChunkWidth/2, top,
+                            (endCoordinate - startCoordinate) + self.pixelAspectRatio * timelineConfig.minChunkWidth/2, height);
         }
     }
 
@@ -560,7 +563,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                     context.fillStyle = lastMinuteTexture;
                     lastMinuteTextureSize = this.width;
                 };
-                var imagePath = hasHighDpi ? 'images/timeline-loading@2x.png' : 'images/timeline-loading.png';
+                var imagePath = self.hasHighDpi ? 'images/timeline-loading@2x.png' : 'images/timeline-loading.png';
                 img.src = Config.webclient.staticResources + imagePath;
                 lastMinuteTextureImg = img;
             }
@@ -568,32 +571,36 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         }
 
         // 3. Draw last minute with texture
-        var startCoordinate = self.scaleManager.dateToScreenCoordinate(start);
-        var endCoordinate = self.scaleManager.dateToScreenCoordinate(end);
+        var startCoordinate = self.scaleManager.dateToScreenCoordinate(start, self.pixelAspectRatio);
+        var endCoordinate = self.scaleManager.dateToScreenCoordinate(end, self.pixelAspectRatio);
 
         var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height;
         var height = timelineConfig.chunkHeight * self.canvas.height;
 
-        var offset_x = - (start / timelineConfig.lastMinuteAnimationMs) % lastMinuteTextureSize;
+        var offset_x = - (start / timelineConfig.lastMinuteAnimationMs) % lastMinuteTextureSize * self.pixelAspectRatio;
 
         context.save();
         context.translate(offset_x, 0);
-        context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x, top,
-                        (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, height);
+        context.fillRect(startCoordinate - self.pixelAspectRatio * timelineConfig.minChunkWidth/2 - offset_x, top,
+                        (endCoordinate - startCoordinate) + self.pixelAspectRatio * timelineConfig.minChunkWidth/2, height);
 
         context.restore();
     }
 
     // !!! Draw ScrollBar
     function drawOrCheckScrollBar(context, mouseX, mouseY, catchScrollBarSlider){
-        var top = self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height -1; // top border where scrollbar belongs
+        mouseY *= self.pixelAspectRatio;
+        mouseX *= self.pixelAspectRatio;
+        var top = self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height - self.pixelAspectRatio; // top border where scrollbar belongs
 
         var scrollSlider = self.scaleManager.scrollSlider();
-        var startCoordinate = scrollSlider.start;
-        var scrollBarSliderWidth = scrollSlider.width;
+        var startCoordinate = scrollSlider.start * self.pixelAspectRatio;
+        var scrollBarSliderWidth = scrollSlider.width * self.pixelAspectRatio;
 
         var mouseInScrollbarRow = mouseY >= top;
-        var mouseInScrollbarSlider = mouseX >= startCoordinate && mouseX <= startCoordinate + scrollBarSliderWidth && mouseY >= top;
+        var mouseInScrollbarSlider = mouseX >= startCoordinate &&
+                                     mouseX <= startCoordinate + scrollBarSliderWidth &&
+                                     mouseY >= top;
 
         if(context) {
             //1. DrawBG
@@ -627,8 +634,8 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     }
 
     function drawScrollbarMarks(context, centerOfScrollBar, topOfScrollBar){
-        var marksHeightOffset = timelineConfig.scrollBarMarksHeightOffset;
-        var marksSpacing = timelineConfig.scrollBarMarksSpacing;
+        var marksHeightOffset = timelineConfig.scrollBarMarksHeightOffset * self.pixelAspectRatio;
+        var marksSpacing = timelineConfig.scrollBarMarksSpacing * self.pixelAspectRatio;
     
         context.beginPath();
         context.strokeStyle = blurColor(timelineConfig.scrollBarMarksColor,1);
@@ -643,70 +650,181 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         context.stroke();
     }
 
+
+    function timeMarkerOffScreen(date){
+        var coordinate = self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio);
+        return coordinate < 0 || self.canvas.width < coordinate;
+    }
+
+    function cursorInTimeMarker(date, mouseX, mouseY){
+        //check x-direction
+        var coordinate = self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio);
+        var width = timelineConfig.markerWidth * self.pixelAspectRatio;
+        var markerSideBuffer = timelineConfig.markerSideBuffer * self.pixelAspectRatio;
+
+        var isLeft = coordinate < 0 && markerSideBuffer <= mouseX && mouseX <= markerSideBuffer + width;
+        var isRight = coordinate > self.canvas.width && self.canvas.width - markerSideBuffer - width <= mouseX
+                                                     && mouseX <= self.canvas.width - markerSideBuffer;
+
+        //check y-direction
+        var height = timelineConfig.markerHeight * self.canvas.height;
+        var offset = timelineConfig.markerPullDown * self.pixelAspectRatio;
+        var isInY = offset <= mouseY && mouseY <= offset + height;
+
+        return {
+            rightMarker: isRight && isInY,
+            leftMarker: isLeft && isInY
+        };
+
+    }
+    function isLive(){
+        return !self.scaleManager.playedPosition ||
+            self.scaleManager.liveMode &&
+            self.scaleManager.end - self.scaleManager.playedPosition < self.scaleManager.stickToLiveMs;
+    }
+
+
     // !!! Draw and position for timeMarker
-    function drawTimeMarker(context){
-        if(!self.scaleManager.playedPosition || self.scaleManager.end - self.scaleManager.playedPosition < self.scaleManager.stickToLiveMs){
+    function drawOrCheckTimeMarker(context, mouseX, mouseY){
+        mouseX *= self.pixelAspectRatio;
+        mouseY *= self.pixelAspectRatio;
+
+        if(isLive()){
             return;
         }
 
-        drawMarker(context, self.scaleManager.playedPosition, timelineConfig.timeMarkerColor, timelineConfig.timeMarkerTextColor)
+        var cursorIn = {leftMarker: false, rightMarker: false};
+        if(timeMarkerOffScreen(self.scaleManager.playedPosition)){
+            cursorIn = cursorInTimeMarker(self.scaleManager.playedPosition, mouseX, mouseY);
+        }
+
+        if(context){
+            var markerColor = cursorIn.leftMarker || cursorIn.rightMarker
+                            ? timelineConfig.timeMarkerActiveColor
+                            : timelineConfig.timeMarkerColor;
+
+            drawMarker( context,
+                        self.scaleManager.playedPosition,
+                        markerColor,
+                        timelineConfig.timeMarkerLineWidth,
+                        timelineConfig.timeMarkerTextColor);
+
+            drawScrollBarMark(  context,
+                                self.scaleManager.playedPosition,
+                                markerColor,
+                                timelineConfig.timeMarkerLineWidth);
+        }
+        else{
+            return cursorIn;
+        }
     }
 
-    function drawPointerMarker(context, mouseX){
+    function drawPointerMarker(context, mouseX, mouseY){
         if(window.jscd.mobile || !mouseX){
             return;
         }
 
-        drawMarker(context, self.scaleManager.screenCoordinateToDate(mouseX),timelineConfig.pointerMarkerColor,timelineConfig.pointerMarkerTextColor);
+        var cursorIn = {leftMarker: false, rightMarker: false};
+        if(!isLive() && timeMarkerOffScreen(self.scaleManager.playedPosition)){
+            cursorIn = cursorInTimeMarker(self.scaleManager.playedPosition,
+                                              mouseX * self.pixelAspectRatio,
+                                              mouseY * self.pixelAspectRatio);
+
+            if(cursorIn.leftMarker || cursorIn.rightMarker){
+                return;
+            }
+        }
+
+        var date = self.scaleManager.dragDate || self.scaleManager.screenCoordinateToDate(mouseX);
+
+        drawMarker( context,
+                    date,
+                    timelineConfig.pointerMarkerColor,
+                    timelineConfig.timeMarkerPointerLineWidth,
+                    timelineConfig.pointerMarkerTextColor);
     }
 
-    function drawMarker(context, date, markerColor, textColor){
-        var coordinate =  self.scaleManager.dateToScreenCoordinate(date);
-
-        if(coordinate < 0 || coordinate > self.canvas.width ) {
-            return;
-        }
+    function drawMarker(context, date, markerColor, markWidth, textColor){
+        var coordinate = self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio);
 
         date = new Date(date);
 
         var height = timelineConfig.markerHeight * self.canvas.height;
+        var width = timelineConfig.markerWidth * self.pixelAspectRatio;
+        var triangleHeight = timelineConfig.markerTriangleHeight * self.pixelAspectRatio * self.canvas.height;
+        var offset = timelineConfig.markerPullDown * self.pixelAspectRatio;
 
         // Line
-
-        context.lineWidth = markerColor == timelineConfig.timeMarkerColor ? timelineConfig.timeMarkerLineWidth: timelineConfig.timeMarkerPointerLineWidth;
+        context.lineWidth = markWidth * self.pixelAspectRatio;
         context.strokeStyle = blurColor(markerColor,1);
         context.fillStyle = blurColor(markerColor,1);
 
         var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height + 0.5;
+        var bottom = Math.round(self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height) -
+                     timelineConfig.scrollBarTopPadding * self.canvas.height;
 
         context.beginPath();
         context.moveTo(0.5 + coordinate, top);
-        context.lineTo(0.5 + coordinate, Math.round(self.canvas.height - (timelineConfig.scrollBarHeight) * self.canvas.height)  - 2);
+        context.lineTo(0.5 + coordinate, bottom);
         context.stroke();
 
-        var startCoord = coordinate - timelineConfig.markerWidth /2;
+        var startCoord = coordinate - width/2;
+        var markerSideBuffer = timelineConfig.markerSideBuffer * self.pixelAspectRatio;
+
+        var triangleLeft = false;
+        var triangleRight = false;
+        var triEdges = coordinate;
         if(startCoord < 0){
-            startCoord = 0;
+            startCoord = markerSideBuffer;
+            if (coordinate < 0){
+                triangleLeft = true;
+            }
+            //lock triangle base withing time marker
+            if(coordinate - triangleHeight < startCoord){
+                triEdges = startCoord + triangleHeight;
+            }
         }
-        if(startCoord > self.canvas.width - timelineConfig.markerWidth){
-            startCoord = self.canvas.width - timelineConfig.markerWidth;
+        if(startCoord > self.canvas.width - width){
+            startCoord = self.canvas.width - width - markerSideBuffer;
+            if (coordinate > self.canvas.width){
+                triangleRight = true;
+            }
+
+            //lock triangle base withing time marker
+            if(coordinate + triangleHeight > self.canvas.width - markerSideBuffer){
+                triEdges = self.canvas.width - markerSideBuffer - triangleHeight;
+            }
         }
 
         // Bubble
-        context.fillRect(startCoord, timelineConfig.markerPullDown, timelineConfig.markerWidth, height );
+        context.fillRect(startCoord, offset, width, height );
 
         // Triangle
         context.beginPath();
-        context.moveTo(0.5 + coordinate + timelineConfig.markerTriangleHeight * self.canvas.height, height + timelineConfig.triangleHeightOffset);
-        context.lineTo(0.5 + coordinate, height + timelineConfig.triangleHeightOffset + timelineConfig.markerTriangleHeight * self.canvas.height);
-        context.lineTo(0.5 + coordinate - timelineConfig.markerTriangleHeight * self.canvas.height, height + timelineConfig.triangleHeightOffset);
+        if(!triangleLeft && !triangleRight){
+            context.moveTo(0.5 + triEdges + triangleHeight, height + offset);
+            context.lineTo(0.5 + coordinate, height + offset + triangleHeight);
+            context.lineTo(0.5 + triEdges - triangleHeight, height + offset);
+        }
+        else if (triangleLeft){
+            context.moveTo(startCoord, height/2 + offset);
+            context.lineTo(startCoord, (height/2 + offset) + triangleHeight);
+            context.lineTo(startCoord - triangleHeight, height/2 + offset);
+            context.lineTo(startCoord, (height/2 + offset) - triangleHeight);
+        }
+        else{
+            context.moveTo(startCoord + width, height/2 + offset);
+            context.lineTo(startCoord + width, (height/2 + offset) + triangleHeight);
+            context.lineTo(startCoord + width + triangleHeight, height/2 + offset);
+            context.lineTo(startCoord + width, (height/2 + offset) - triangleHeight);
+        }
         context.closePath();
         context.fill();
 
         // Labels
         context.fillStyle = blurColor(textColor,1);
         context.font = formatFont(timelineConfig.markerDateFont);
-        coordinate = startCoord + timelineConfig.markerWidth /2; // Set actual center of the marker
+        coordinate = startCoord + width/2; // Set actual center of the marker
 
         var dateString = dateFormat(date, timelineConfig.dateFormat);
         var dateWidth = context.measureText(dateString).width;
@@ -717,75 +835,72 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         context.font = formatFont(timelineConfig.markerTimeFont);
         dateString = dateFormat(date, timelineConfig.timeFormat);
         dateWidth = context.measureText(dateString).width;
-        textStart = height/2 + textStart;
+        textStart = height/2 + textStart - timelineConfig.markerTimeOffset * self.pixelAspectRatio;
         context.fillText(dateString,coordinate - dateWidth/2, textStart);
 
     }
 
+    function drawScrollBarMark(context, date, markColor, markWidth){
+        context.lineWidth = markWidth * self.pixelAspectRatio;
+        context.strokeStyle = blurColor(markColor,1);
 
+        var bottom = Math.round(self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height) -
+                     timelineConfig.scrollBarTopPadding * self.canvas.height;
+        var scrollCoordinate = (date - self.scaleManager.start)/(self.scaleManager.end - self.scaleManager.start) * self.canvas.width;
 
+        /* If the marker is off screen and within the scrollbar's area it should be moved
+           to the edge of the scrollbar that it is closest to.
+           When inside of the if statement we check if the marker is before the visible area
+           and set to the beginning otherwise set it to the end of the scrollbar.
+        */
+        var scrollSlider = self.scaleManager.scrollSlider();
+        var scrollBarStart = scrollSlider.start * self.pixelAspectRatio;
+        var scrollBarEnd = (scrollSlider.start + scrollSlider.width) * self.pixelAspectRatio;
 
-    var scrollLeftEnablingTimer = null;
-    var ableToScrollLeft = false;
-
-    var scrollRightEnablingTimer = null;
-    var ableToScrollRight = false;
+        if(timeMarkerOffScreen(date) && scrollBarStart <= scrollCoordinate && scrollCoordinate <= scrollBarEnd){
+            var beforeTimeline = self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio) < 0;
+            scrollCoordinate = beforeTimeline ? scrollBarStart : scrollBarEnd;
+        }
+        context.beginPath();
+        context.moveTo(0.5 + scrollCoordinate, bottom);
+        context.lineTo(0.5 + scrollCoordinate, self.canvas.height);
+        context.stroke();
+    }
 
 
     function drawOrCheckScrollButtons(context, mouseX, mouseY, isScrolling){
 
+        mouseX *= self.pixelAspectRatio
+        mouseY *= self.pixelAspectRatio
+        var scrollButtonsWidth = timelineConfig.scrollButtonsWidth * self.pixelAspectRatio;
         var canScrollRight = self.scaleManager.canScroll(false);
-        var mouseNearRightBorder = mouseX > self.canvas.width - timelineConfig.borderAreaWidth && mouseX < self.canvas.width;
+        var mouseNearRightBorder = mouseX > self.canvas.width - timelineConfig.borderAreaWidth * self.pixelAspectRatio &&
+                                   mouseX < self.canvas.width;
         var mouseOverRightScrollButton = canScrollRight &&
-                                        (mouseX > self.canvas.width - timelineConfig.scrollButtonsWidth && mouseX < self.canvas.width);
+                                        (mouseX > self.canvas.width - scrollButtonsWidth &&
+                                        mouseX < self.canvas.width);
 
         var canScrollLeft = self.scaleManager.canScroll(true);
-        var mouseNearLeftBorder = mouseX < timelineConfig.borderAreaWidth && mouseX > 0;
+        var mouseNearLeftBorder = mouseX < timelineConfig.borderAreaWidth * self.pixelAspectRatio && mouseX > 0;
         var mouseOverLeftScrollButton = canScrollLeft &&
-                                        (mouseX < timelineConfig.scrollButtonsWidth && mouseX > 0);
+                                        (mouseX < scrollButtonsWidth && mouseX > 0);
 
         var mouseInRightButton = mouseOverRightScrollButton && isScrolling;
         var mouseInLeftButton = mouseOverLeftScrollButton && isScrolling;
         
         if(context) {
             if (canScrollLeft) {
-                if(ableToScrollLeft || true) {
-                    drawScrollButton(context, true, mouseOverLeftScrollButton, mouseInLeftButton);
-                }else{
-                    if(!scrollLeftEnablingTimer) {
-                        scrollLeftEnablingTimer = setTimeout(function () {
-                            scrollLeftEnablingTimer = null;
-                            //ableToScrollLeft = true;
-                        }, timelineConfig.animationDuration);
-                    }
-                }
-            }else{
-                ableToScrollLeft = false;
-                if(scrollLeftEnablingTimer){
-                    clearTimeout(scrollLeftEnablingTimer);
-                    scrollLeftEnablingTimer = null;
-                }
+                drawScrollButton(context, true, mouseOverLeftScrollButton, mouseInLeftButton);
             }
-
             if (canScrollRight) {
-                if(ableToScrollRight || true) {
+                var sliderBar = self.scaleManager.scrollSlider();
+                var scrollbarEnd = (sliderBar.start + sliderBar.width) * self.pixelAspectRatio;
+                if(scrollbarEnd < self.canvas.width - self.pixelAspectRatio){
                     drawScrollButton(context, false, mouseOverRightScrollButton, mouseInRightButton);
-                }else{
-                    if(!scrollRightEnablingTimer) {
-                        scrollRightEnablingTimer = setTimeout(function () {
-                            scrollRightEnablingTimer = null;
-                            //ableToScrollRight = true;
-                        }, timelineConfig.animationDuration);
-                    }
                 }
-            }else{
-                ableToScrollRight = false;
-                if(scrollRightEnablingTimer){
-                    clearTimeout(scrollRightEnablingTimer);
-                }
-                scrollRightEnablingTimer = null;
             }
         }
+
         return {
             leftButton : mouseOverLeftScrollButton,
             rightButton: mouseOverRightScrollButton,
@@ -795,33 +910,36 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     }
 
     function drawScrollButton(context, left, hover, active){
+        var scrollButtonsWidth = timelineConfig.scrollButtonsWidth * self.pixelAspectRatio;
+        var scrollButtonsArrowWidth = timelineConfig.scrollButtonsArrow.width * self.pixelAspectRatio;
+        var scrollButtonsArrowHeight = timelineConfig.scrollButtonsArrow.size * self.pixelAspectRatio;
 
         context.fillStyle = hover? blurColor(timelineConfig.scrollButtonsHoverColor,1):blurColor(timelineConfig.scrollButtonsColor,1);
         if(active)
             context.fillStyle = blurColor(timelineConfig.scrollButtonsActiveColor,1);
 
-        var startCoordinate = left ? 0: self.canvas.width - timelineConfig.scrollButtonsWidth;
+        var startCoordinate = left ? 0: self.canvas.width - scrollButtonsWidth;
         var height = timelineConfig.scrollButtonsHeight * self.canvas.height;
-        var marginBottom = timelineConfig.scrollButtonMarginBottom;
-        context.fillRect(startCoordinate, self.canvas.height - height - marginBottom, timelineConfig.scrollButtonsWidth, height);
+        var marginBottom = timelineConfig.scrollButtonMarginBottom * self.pixelAspectRatio;
+        context.fillRect(startCoordinate, self.canvas.height - height - marginBottom, scrollButtonsWidth, height);
 
-        context.lineWidth = timelineConfig.scrollButtonsArrowLineWidth;
+        context.lineWidth = timelineConfig.scrollButtonsArrowLineWidth * self.pixelAspectRatio;
         context.strokeStyle =  active? blurColor(timelineConfig.scrollButtonsArrowActiveColor,1):blurColor(timelineConfig.scrollButtonsArrowColor,1);
 
-        var leftCoordinate = startCoordinate + ( timelineConfig.scrollButtonsWidth - timelineConfig.scrollButtonsArrow.width)/2;
-        var rightCoordinate = leftCoordinate + timelineConfig.scrollButtonsArrow.width;
+        var leftCoordinate = startCoordinate + ( scrollButtonsWidth - scrollButtonsArrowWidth)/2;
+        var rightCoordinate = leftCoordinate + scrollButtonsArrowWidth;
 
-        var topCoordinate = self.canvas.height - (height + timelineConfig.scrollButtonsArrow.size) / 2;
-        var bottomCoordinate = topCoordinate + timelineConfig.scrollButtonsArrow.size;
-
+        var topCoordinate = self.canvas.height - (height + scrollButtonsArrowHeight) / 2;
+        var bottomCoordinate = topCoordinate + scrollButtonsArrowHeight;
 
         context.beginPath();
-        context.moveTo(left?rightCoordinate:leftCoordinate, topCoordinate - marginBottom + 2);
+        context.moveTo(left?rightCoordinate:leftCoordinate, topCoordinate - marginBottom);
         context.lineTo(left?leftCoordinate:rightCoordinate, (topCoordinate + bottomCoordinate)/2 - marginBottom);
-        context.lineTo(left?rightCoordinate:leftCoordinate, bottomCoordinate - marginBottom - 2);
+        context.lineTo(left?rightCoordinate:leftCoordinate, bottomCoordinate - marginBottom);
         context.stroke();
 
     }
+
 
     function FpsCalculator(){
         var lastLoop = (new Date()).getMilliseconds();
@@ -869,8 +987,9 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
 
         var mouseOverEvents = false;
+
         if(!self.debugEventsMode) {
-            mouseOverEvents = drawOrCheckEvents(context,mouseX, mouseY);
+            mouseOverEvents = drawOrCheckEvents(context, mouseX, mouseY);
         }else{
             mouseOverEvents = drawOrCheckEvents(null, mouseX, mouseY);
             debugEvents(context);
@@ -883,10 +1002,19 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         var buttonsState = drawOrCheckScrollButtons(context, mouseX, mouseY, isScrolling);
 
 
-        drawTimeMarker(context);
+        drawOrCheckTimeMarker(context, mouseX, mouseY);
 
-        if(mouseOverEvents && !buttonsState.rightButton && ! buttonsState.leftButton) {
-            drawPointerMarker(context, mouseX, mouseY);
+        var clickedCoordinate =  self.scaleManager.clickedCoordinate();
+        if(!mouseOverEvents){ // Mouse left timeline - do not draw timemarker, but forget clickedCoordinate
+            self.scaleManager.clickedCoordinate(false);
+        }else{
+            if(!clickedCoordinate ||
+                Math.abs(mouseX - clickedCoordinate) > timelineConfig.hideTimeMarkerAfterClickedDistance){
+                if(!buttonsState.rightButton && !buttonsState.leftButton){ // Do not draw if any button is clicked
+                    drawPointerMarker(context, mouseX, mouseY);
+                }
+                self.scaleManager.clickedCoordinate(false); // forget clickedCoordinate
+            }
         }
     };
 
@@ -898,6 +1026,13 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             rightButton: false,
             eventsRow: false
         };
+
+        var timeMarker = drawOrCheckTimeMarker(null, mouseX, mouseY);
+        _.extend(result, timeMarker);
+
+        if(result.leftMarker || result.rightMarker){
+            return result;
+        }
 
         var buttons = drawOrCheckScrollButtons(null, mouseX, mouseY);
         _.extend(result, buttons);
@@ -913,8 +1048,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         }
 
         result.eventsRow = drawOrCheckEvents(null, mouseX, mouseY);
-
-        result.timeline = mouseY > 0 && mouseX > 0 && mouseX < canvas.width && mouseY < canvas.height;
+        result.timeline = mouseX > 0 && mouseX * self.pixelAspectRatio < self.canvas.width;
 
         return result;
     };

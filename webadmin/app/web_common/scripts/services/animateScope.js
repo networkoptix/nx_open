@@ -69,11 +69,18 @@ angular.module('nxCommon')
          * v0 = 2*(stop-start)/duration
          *
          * x(t) = x0 + (stop-start)* (2* time/duration - (time/duration)^2)
+         *
+         * !!! Dry resistance allows to slow down after linear movement
+         * if distance is exactly twice smaller or duration is twice larger
          */
         Animation.prototype.dryResistance = function(start,stop,time,duration){
             var proportion = time/duration;
             var delta = proportion * (2 - proportion);
             var result =start + (stop - start) * delta;
+            if(Number.isNaN(result)){
+                console.error('dryResistance-error',result,start,stop,time,duration);
+                throw "Animation value is not a number";
+            }
             return result;
         };
 
@@ -189,7 +196,6 @@ angular.module('nxCommon')
                 if(Number.isNaN(value)){
                     throw 'Animation target is not a number';
                 }
-
                 var targetAnimation = this.animating(scope, value);
                 if(targetAnimation){
                     targetAnimation.breakAnimation();

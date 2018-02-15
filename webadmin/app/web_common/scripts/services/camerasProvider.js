@@ -13,6 +13,7 @@ angular.module('nxCommon')
             this.mediaServers = null;
             this.storage = $localStorage;
             this.poll = null;
+            this.serverOffsets = {};
 
             this.bothRequest = null;
         }
@@ -82,10 +83,15 @@ angular.module('nxCommon')
             var findMediaStream = function(param){
                 return param.name === 'mediaStreams';
             };
+
+            var findIoConfigCapability = function(param){
+                return param.name === 'ioConfigCapability';
+            }
             
             function cameraFilter(camera){
                 // Filter desktop cameras here
-                if(camera.typeId === self.desktopCameraTypeId){ // Hide desctop cameras
+                // Hide desktop cameras and ioDevices
+                if(camera.typeId === self.desktopCameraTypeId || _.find(camera.addParams, findIoConfigCapability)){
                     return false;
                 }
 
@@ -95,7 +101,6 @@ angular.module('nxCommon')
             function cameraSorter(camera) {
                 camera.url = self.extractDomain(camera.url);
                 camera.preview = self.systemAPI.previewUrl(camera.id, false, null, Config.webclient.leftPanelPreviewHeight);
-                camera.fullPreview = self.systemAPI.previewUrl(camera.id, false, null, window.screen.availHeight);
                 camera.server = self.getServer(camera.parentId);
                 if(camera.server && camera.server.status === 'Offline'){
                     camera.status = 'Offline';
@@ -296,17 +301,70 @@ angular.module('nxCommon')
             }
         };
 
-        camerasProvider.prototype.getFirstCam = function(){
-            var tmpServerList = this.mediaServers;
-            var tmpCamerasList = this.cameras;
-            for(var i in tmpServerList){
-                var serverId = tmpServerList[i].id;
-                for(var j in tmpCamerasList[serverId]){
-                    if(tmpCamerasList[serverId][j] && tmpCamerasList[serverId][j].id){
-                        return tmpCamerasList[serverId][j].id;
+        //External Functions
+        camerasProvider.prototype.getFirstAvailableCamera = function(cameraName){
+            var results = {'visible':[], 'hidden': []};
+            var servers = this.mediaServers;
+            var cameras = this.cameras;
+            var getFirstCamera = cameraName === undefined;
+            for(var i in servers){
+                var server = servers[i];
+                if(!server.visible){
+                    continue;
+                }
+                for(var j in cameras[server.id]){
+                    var camera = cameras[server.id][j];
+                    if(camera.visible && (camera.name.replace(/ /g, '').toLowerCase().indexOf(cameraName) >= 0 || getFirstCamera)){
+                        if(getFirstCamera){
+                            return camera;
+                        }
+                        if(server.collapsed){
+                            results['hidden'].push(camera);
+                        }
+                        else{
+                            results['visible'].push(camera);
+                        }
                     }
                 }
             }
+            if(results['visible'].length > 0){
+                return results['visible'][0];
+            }
+            else if(results['hidden'].length > 0){
+                return results['hidden'][0];
+            }
+            else{
+                return null;
+            }
+        };
+
+        camerasProvider.prototype.getServerTimeOffset = function(serverId){
+            return this.serverOffsets[serverId];
+        };
+        camerasProvider.prototype.getServerTimes = function(){
+            var self = this;
+            return self.systemAPI.getServerTimes().then(function(result){
+                var serverOffsets = result.data.reply;
+                _.each(serverOffsets, function(server){
+                    //Typo with server api so we check for both spellings
+                    //Internal fix Link to task: https://networkoptix.atlassian.net/browse/VMS-7984
+                    var timeSinceEpochMs = server.timeSinceEpochMs || server.timeSinseEpochMs;
+                    self.serverOffsets[server.serverId] = timeManager.getOffset(timeSinceEpochMs, server.timeZoneOffsetMs);
+                });
+            });
+        };
+
+        camerasProvider.prototype.collapseServer = function(serverName, collapse){
+            var server = _.find(this.mediaServers, function(server){
+                return server.name.toLowerCase().replace(/ /g, '').indexOf(serverName) >= 0;
+            });
+            server.collapsed = collapse;
+        };
+
+        camerasProvider.prototype.collapseAllServers = function(collapse){
+            _.forEach(this.mediaServers, function(server){
+                server.collapsed = collapse;
+            });
         };
 
         return {
