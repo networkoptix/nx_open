@@ -56,7 +56,7 @@ namespace
     const int kMaxRecorderQueueSizePacketsDefault = 1000;
 
     const QString kTakeCameraOwnershipWithoutLock(lit("takeCameraOwnershipWithoutLock"));
-    const int kTakeCameraOwnershipWithoutLockDefault = false;
+    const int kTakeCameraOwnershipWithoutLockDefault = true;
 
     const QString kMaxRtpRetryCount(lit("maxRtpRetryCount"));
     const int kMaxRtpRetryCountDefault(6);

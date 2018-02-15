@@ -131,7 +131,7 @@ public:
     State state() const;
 
     void setLastDiscoveredResources(const QnResourceList& resources);
-    QSet<QString> lastDiscoveredIds() const;
+    QnResourceList lastDiscoveredResources() const;
     void addResourcesImmediatly(QnResourceList& resources);
 
     static QnNetworkResourcePtr findSameResource(const QnNetworkResourcePtr& netRes);

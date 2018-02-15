@@ -10,7 +10,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "recording/time_period.h"
-
+#include <nx/utils/timer_manager.h>
 
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;
@@ -20,7 +20,9 @@ class QnRtspClient;
 class QnRtspIoDevice;
 class QnNxRtpParser;
 
-class QnRtspClientArchiveDelegate: public QnAbstractArchiveDelegate
+class QnRtspClientArchiveDelegate:
+    public QnAbstractArchiveDelegate,
+    public nx::utils::TimerEventHandler
 {
     Q_OBJECT
 public:
@@ -70,7 +72,8 @@ public:
     virtual int getSequence() const override;
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
-
+protected:
+    virtual void onTimer(const nx::utils::TimerId& timerId) override;
 private:
     void setRtpData(QnRtspIoDevice* value);
     QnAbstractDataPacketPtr processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition);
@@ -87,6 +90,7 @@ private:
     void checkMinTimeFromOtherServer(const QnSecurityCamResourcePtr &camera);
     void setupRtspSession(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, QnRtspClient* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
+    void setCustomVideoLayout(const QnCustomResourceVideoLayoutPtr& value);
 private:
     QnMutex m_mutex;
     std::unique_ptr<QnRtspClient> m_rtspSession;
@@ -95,7 +99,6 @@ private:
     bool m_tcpMode;
     QMap<quint32, quint16> m_prevTimestamp;
     qint64 m_position;
-    bool m_opened;
     QnSecurityCamResourcePtr m_camera;
     QnMediaServerResourcePtr m_server;
     QnMediaServerResourcePtr m_fixedServer;
@@ -134,7 +137,7 @@ private:
     std::atomic_flag m_footageUpToDate;
     std::atomic_flag m_currentServerUpToDate;
     QElapsedTimer m_reopenTimer;
-    QElapsedTimer m_sessionTimeout;
+    nx::utils::TimerId m_sessionTimeoutTimer;
     std::chrono::milliseconds m_maxSessionDurationMs;
 };
 

@@ -1446,7 +1446,7 @@ void QnMediaResourceWidget::updateIconButton()
         return;
     }
 
-    if (!d->camera)
+    if (!d->camera || d->camera->hasFlags(Qn::wearable_camera))
     {
         buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, false);
         return;
@@ -2085,6 +2085,8 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     // TODO: #GDM #3.1 This really requires hell a lot of refactoring
     // for live video make a quick check: status has higher priority than EOF
+    if (d->isPlayingLive() && d->camera && d->camera->hasFlags(Qn::wearable_camera))
+        return Qn::NoLiveStreamOverlay;
     if (d->isOffline())
         return Qn::OfflineOverlay;
 
@@ -2095,9 +2097,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     {
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
-			
-        if (d->camera->hasFlags(Qn::wearable_camera))
-            return Qn::NoLiveStreamOverlay;
 			
 
         const Qn::Permission requiredPermission = d->isPlayingLive()

@@ -238,7 +238,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     const bool isDiscoveredManually = newCamRes->isManuallyAdded();
                     newNetRes->update(existCamRes);
                     newCamRes->setManuallyAdded( isDiscoveredManually );
-
+                    NX_ASSERT(newNetRes->resourcePool() == nullptr);
                     newNetRes->setParentId(commonModule()->moduleGUID());
                     newNetRes->setFlags(existCamRes->flags() & ~Qn::foreigner);
                     newNetRes->setId(existCamRes->getId());

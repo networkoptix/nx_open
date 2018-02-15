@@ -57,8 +57,11 @@ QnAppserverResourceProcessor::~QnAppserverResourceProcessor()
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
 {
-    for (const QnVirtualCameraResourcePtr& camera: resources.filtered<QnVirtualCameraResource>())
+    for (const QnVirtualCameraResourcePtr& camera : resources.filtered<QnVirtualCameraResource>())
+    {
+        NX_ASSERT(camera->resourcePool() == nullptr);
         camera->setParentId(m_serverId);
+    }
 
     // we've got two loops to avoid double call of double sending addCamera
     for (const QnVirtualCameraResourcePtr& camera: resources.filtered<QnVirtualCameraResource>())
