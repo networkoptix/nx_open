@@ -43,7 +43,8 @@ public:
 
     //!Returns thread id of current thread. On unix uses \a gettid function instead of pthread_self. It allows to find thread in gdb
     static uintptr_t currentThreadSystemId();
-
+signals:
+    void paused();
 public slots:
     virtual void start(Priority priority = InheritPriority);
     //!Implementation of QnStoppable::pleaseStop()

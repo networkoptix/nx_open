@@ -108,7 +108,8 @@ void QnAbstractArchiveStreamReader::run()
 
         if (!dataCanBeAccepted())
         {
-            QnSleep::msleep(5);
+            emit waitForDataCanBeAccepted();
+            QnSleep::msleep(10);
             continue;
         }
 
