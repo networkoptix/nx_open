@@ -1349,7 +1349,7 @@ void QnMediaResourceWidget::updateIconButton()
         return;
     }
 
-    if (!m_camera)
+    if (!m_camera || m_camera->hasFlags(Qn::wearable_camera))
     {
         buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, false);
         return;

@@ -13,6 +13,7 @@
 #include <plugins/resource/avi/avi_archive_delegate.h>
 
 #include "server_request_storage.h"
+#include "wearable_payload.h"
 
 namespace nx {
 namespace client {
