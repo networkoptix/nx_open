@@ -34,7 +34,12 @@
                     name="Rotation"
                     description="Image rotation."
                     dataType="Enumeration"
-                    range="0,180"
+                    range="0,90,180,270"
+                    readCmd="param.cgi"/>
+                <param id="root.Image.I0.Appearance.MirrorEnabled"
+                    name="Mirror image"
+                    description="Mirror image"
+                    dataType="Bool"
                     readCmd="param.cgi"/>
             </group>
             <group name="White Balance">
