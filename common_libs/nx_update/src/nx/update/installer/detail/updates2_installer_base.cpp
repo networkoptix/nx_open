@@ -45,13 +45,7 @@ void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompl
             switch (errorCode)
             {
                 case QnZipExtractor::Error::Ok:
-                {
-                    auto checkResult = self->checkContents();
-                    if (checkResult != PrepareResult::ok)
-                        return handler(checkResult);
-
-                    return handler(PrepareResult::ok);
-                }
+                    return handler(self->checkContents());
                 case QnZipExtractor::Error::NoFreeSpace:
                     return handler(PrepareResult::noFreeSpace);
                 default:
