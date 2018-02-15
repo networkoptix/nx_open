@@ -117,7 +117,7 @@
     "cloudInvalidResponse": "Baza danych chmury zwróciła nieoczekiwaną odpowiedź",
     "notAuthorized": "Nieprawidłowe hasło",
     "wrongParameters": "Niektóre parametry na formularzu są niepoprawne",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
+    "brokenAccount": "Nieoczekiwany problem z kontem. <a href=\"/restore_password\">Przywróć konto</a>",
     "wrongCode": "Konto jest już aktywne lub kod potwierdzenia jest nieprawidłowy",
     "wrongCodeRestore": "Kod potwierdzenia został już użyty lub jest nieprawidłowy",
     "forbidden": "Nie masz uprawnień do wykonania tej operacji",

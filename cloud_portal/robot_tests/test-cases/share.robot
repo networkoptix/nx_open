@@ -12,7 +12,7 @@ ${share dialogue}
 *** Keywords ***
 Log in to Auto Tests System
     [arguments]    ${email}
-    Go To    ${url}/systems/${AUTO TESTS URL}
+    Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${email}    ${password}    None
     Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
@@ -80,7 +80,7 @@ Sharing roles are ordered: more access is on top of the list with options
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
-    Element Text Should Be    ${SHARE PERMISSIONS DROPDOWN}    Administrator\nAdvanced Viewer\nViewer\nLive Viewer\nCustom
+    Element Text Should Be    ${SHARE PERMISSIONS DROPDOWN}    ${ADMIN TEXT}\n${ADV VIEWER TEXT}\n${VIEWER TEXT}\n${LIVE VIEWER TEXT}\n${CUSTOM TEXT}
     Close Browser
 
 When user selects role - special hint appears
@@ -93,35 +93,35 @@ When user selects role - special hint appears
     Wait Until Element Is Visible    ${SHARE PERMISSIONS ADMINISTRATOR}
     Click Element    ${SHARE PERMISSIONS ADMINISTRATOR}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
-    Element Text Should Be    ${SHARE PERMISSIONS HINT}    Unrestricted access including the ability to share
+    Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADMIN}
 #Advanced Viewer Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS ADVANCED VIEWER}
     Click Element    ${SHARE PERMISSIONS ADVANCED VIEWER}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
-    Element Text Should Be    ${SHARE PERMISSIONS HINT}    Can view live video, browse the archive, configure cameras, control PTZ etc
+    Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADV VIEWER}
 #Viewer Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS VIEWER}
     Click Element    ${SHARE PERMISSIONS VIEWER}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
-    Element Text Should Be    ${SHARE PERMISSIONS HINT}    Can view live video and browse the archive
+    Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT VIEWER}
 #Live Viewer Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS LIVE VIEWER}
     Click Element    ${SHARE PERMISSIONS LIVE VIEWER}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
-    Element Text Should Be    ${SHARE PERMISSIONS HINT}    Can only view live video
+    Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT LIVE VIEWER}
 #Custom Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS CUSTOM}
     Click Element    ${SHARE PERMISSIONS CUSTOM}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS HINT}
-    Element Text Should Be    ${SHARE PERMISSIONS HINT}    Use the Nx Cloud Client application to set up custom permissions
+    Element Text Should Be    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT CUSTOM}
     Close Browser
 
 Sharing works
@@ -133,8 +133,8 @@ Sharing works
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
     Click Button    ${SHARE BUTTON MODAL}
-    Check For Alert    New permissions saved
-    Check User Permissions    ${random email}    Custom
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Check User Permissions    ${random email}    ${CUSTOM TEXT}
     Remove User Permissions    ${random email}
     Close Browser
 
@@ -147,11 +147,11 @@ Edit permission works
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
     Click Button    ${SHARE BUTTON MODAL}
-    Check For Alert    New permissions saved
-    Edit User Permissions In Systems    ${random email}    Viewer
-    Check User Permissions    ${random email}    Viewer
-    Edit User Permissions In Systems    ${random email}    Custom
-    Check User Permissions    ${random email}    Custom
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Edit User Permissions In Systems    ${random email}    ${VIEWER TEXT}
+    Check User Permissions    ${random email}    ${VIEWER TEXT}
+    Edit User Permissions In Systems    ${random email}    ${CUSTOM TEXT}
+    Check User Permissions    ${random email}    ${CUSTOM TEXT}
     Remove User Permissions    ${random email}
     Close Browser
 
@@ -164,9 +164,9 @@ Share with registered user - sends him notification
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${EMAIL NOPERM}
     Click Button    ${SHARE BUTTON MODAL}
-    Check For Alert    New permissions saved
-    Check User Permissions    ${EMAIL NOPERM}    Custom
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Check User Permissions    ${EMAIL NOPERM}    ${CUSTOM TEXT}
     Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
-    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    subject=TestFirstName TestLastName invites you to Nx Cloud    timeout=120
+    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    subject=TestFirstName TestLastName ${INVITED TO SYSTEM EMAIL SUBJECT}    timeout=120
     Remove User Permissions    ${EMAIL NOPERM}
     Close Browser
