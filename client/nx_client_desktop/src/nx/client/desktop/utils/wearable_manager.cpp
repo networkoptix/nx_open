@@ -72,6 +72,9 @@ void WearableManager::prepareUploads(
     QObject* target,
     std::function<void(const WearableUpload&)> callback)
 {
+    if (!camera->getParentServer())
+        return;
+
     WearablePreparer* checker = new WearablePreparer(camera, this);
 
     connect(checker, &WearablePreparer::finished, target, callback);
