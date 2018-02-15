@@ -549,8 +549,18 @@ struct RadassController::Private
             return;
         }
 
-        trace("Switching to LQ.", consumer);
-        gotoLowQuality(consumer, LqReason::performance);
+        auto smallestConsumer = findConsumer(
+            FindMethod::Smallest,
+            MEDIA_Quality_High,
+            itemQualityCanBeLowered);
+        NX_ASSERT(isValid(smallestConsumer), "At least one camera must be found");
+        if (!isValid(smallestConsumer))
+        {
+            trace("Smallest HQ camera was not found, using source instead.", consumer);
+            smallestConsumer = consumer;
+        }
+        trace("Finding smallest HQ camera and switching it to LQ.", smallestConsumer);
+        gotoLowQuality(smallestConsumer, LqReason::performance);
         lastAutoSwitchTimer.restart();
     }
 
