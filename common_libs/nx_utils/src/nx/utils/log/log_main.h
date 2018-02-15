@@ -68,9 +68,8 @@ class NX_UTILS_API Stream: public Helper
 {
 public:
     Stream(): Helper() {} //< Constructing a stream which does not log anything.
-    Stream(Level level, const QString& tag, const QString& delimiter = QStringLiteral(" ")):
-        Helper(level, tag),
-        m_delimiter(delimiter)
+    Stream(Level level, const QString& tag):
+        Helper(level, tag)
     {
     }
 
@@ -85,6 +84,12 @@ public:
     Stream& operator=(const Stream&) = delete;
     Stream& operator=(Stream&&) = default;
 
+    Stream& setDelimiter(const QString& delimiter)
+    {
+        m_delimiter = delimiter;
+        return *this;
+    }
+
     /** Operator logic is reversed to support tricky syntax: if (stream) {} else stream << ... */
     explicit operator bool() const { return m_logger == nullptr; }
 
@@ -98,17 +103,17 @@ public:
 
 private:
     QStringList m_strings;
-    QString m_delimiter;
+    QString m_delimiter = QStringLiteral(" ");
 };
 
 template<typename Tag>
-Stream makeStream(Level level, const Tag& tag, const QString& delimiter = QStringLiteral(" "))
+Stream makeStream(Level level, const Tag& tag)
 {
     if (level > maxLevel())
         return Stream();
 
     using ::toString;
-    return Stream(level, toString(tag), delimiter);
+    return Stream(level, toString(tag));
 }
 
 } // namespace detail
@@ -126,7 +131,8 @@ Stream makeStream(Level level, const Tag& tag, const QString& delimiter = QStrin
     if (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG))) {} else stream << /*...*/
 
 #define NX_UTILS_LOG_STREAM_NO_SPACE(LEVEL, TAG) \
-    if (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG), QString())) {} else stream << /*...*/
+    if (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG))) {} \
+    else stream.setDelimiter(QString()) << /*...*/
 
 #define NX_UTILS_LOG(...) \
     NX_MSVC_EXPAND(NX_GET_4TH_ARG(__VA_ARGS__, \
