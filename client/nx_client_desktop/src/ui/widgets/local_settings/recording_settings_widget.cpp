@@ -173,10 +173,10 @@ void QnRecordingSettingsWidget::initResolutionCombobox()
 {
     ui->resolutionComboBox->addItem(tr("Native"), Qn::NativeResolution);
     ui->resolutionComboBox->addItem(tr("Quarter Native"), Qn::QuaterNativeResolution);
-    ui->resolutionComboBox->addItem(tr("1920x1080"), Qn::Exact1920x1080Resolution);
-    ui->resolutionComboBox->addItem(tr("1280x720"), Qn::Exact1280x720Resolution);
-    ui->resolutionComboBox->addItem(tr("640x480"), Qn::Exact640x480Resolution);
-    ui->resolutionComboBox->addItem(tr("320x240"), Qn::Exact320x240Resolution);
+    ui->resolutionComboBox->addItem(lit("1920x1080"), Qn::Exact1920x1080Resolution);
+    ui->resolutionComboBox->addItem(lit("1280x720"), Qn::Exact1280x720Resolution);
+    ui->resolutionComboBox->addItem(lit("640x480"), Qn::Exact640x480Resolution);
+    ui->resolutionComboBox->addItem(lit("320x240"), Qn::Exact320x240Resolution);
     ui->resolutionComboBox->setCurrentIndex(0);
 
     connect(ui->resolutionComboBox, QnComboboxCurrentIndexChanged, this,
