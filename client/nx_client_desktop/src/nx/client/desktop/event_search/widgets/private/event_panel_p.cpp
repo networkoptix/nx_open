@@ -397,30 +397,9 @@ void EventPanel::Private::setupTabsSyncWithNavigator()
 
             q->navigator()->setSelectedExtraContent(extraContent);
 
-            if (const auto usw = qobject_cast<UnifiedSearchWidget*>(m_tabs->currentWidget()))
-                q->navigator()->setSelectedTimePeriod(usw->currentTimePeriod());
-            else
-                q->navigator()->setSelectedTimePeriod(QnTimePeriod::anytime());
-
             m_previousTabIndex = m_lastTabIndex;
             m_lastTabIndex = index;
         });
-
-    const auto handleSelectedTimePeriodChanged =
-        [this](const QnTimePeriod& period)
-        {
-            if (sender() == m_tabs->currentWidget())
-                q->navigator()->setSelectedTimePeriod(period);
-        };
-
-    connect(m_motionTab, &UnifiedSearchWidget::currentTimePeriodChanged,
-        this, handleSelectedTimePeriodChanged);
-    connect(m_eventsTab, &UnifiedSearchWidget::currentTimePeriodChanged,
-        this, handleSelectedTimePeriodChanged);
-    connect(m_bookmarksTab, &UnifiedSearchWidget::currentTimePeriodChanged,
-        this, handleSelectedTimePeriodChanged);
-    connect(m_analyticsTab, &UnifiedSearchWidget::currentTimePeriodChanged,
-        this, handleSelectedTimePeriodChanged);
 
     connect(q->context()->action(ui::action::BookmarksModeAction), &QAction::toggled,
         this, &Private::at_bookmarksToggled);

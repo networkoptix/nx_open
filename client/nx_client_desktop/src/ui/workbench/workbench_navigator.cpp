@@ -1674,9 +1674,6 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodContent type)
         periods = loader->periods(type);
     }
 
-    if (type != Qn::RecordingContent)
-        periods = periods.intersected(m_selectedTimePeriod);
-
     if (m_timeSlider)
         m_timeSlider->setTimePeriods(CurrentLine, type, periods);
     if (m_calendar)
@@ -2550,19 +2547,4 @@ void QnWorkbenchNavigator::setSelectedExtraContent(Qn::TimePeriodContent value)
 
     if (value != Qn::RecordingContent)
         updateCurrentPeriods(value);
-}
-
-QnTimePeriod QnWorkbenchNavigator::selectedTimePeriod() const
-{
-    return m_selectedTimePeriod;
-}
-
-void QnWorkbenchNavigator::setSelectedTimePeriod(const QnTimePeriod& value)
-{
-    if (m_selectedTimePeriod == value)
-        return;
-
-    m_selectedTimePeriod = value;
-    if (selectedExtraContent() != Qn::RecordingContent)
-        updateCurrentPeriods(selectedExtraContent());
 }
