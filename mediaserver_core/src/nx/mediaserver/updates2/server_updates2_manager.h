@@ -11,6 +11,7 @@ class ServerUpdates2Manager: public update::CommonUpdates2Manager
 {
 public:
     ServerUpdates2Manager(QnCommonModule* commonModule);
+    ~ServerUpdates2Manager();
 
 private:
     virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() override;
@@ -18,6 +19,7 @@ private:
     virtual qint64 refreshTimeout() const override;
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() override;
     virtual QString filePath() const override;
+    virtual update::detail::AbstractUpdates2Installer* installer() override;
 };
 
 } // namespace updates2

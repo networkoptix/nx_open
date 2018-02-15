@@ -225,6 +225,18 @@ void QnNetworkResource::setNetworkStatus(NetworkStatus status)
     m_networkStatus = status;
 }
 
+QDateTime QnNetworkResource::getLastDiscoveredTime() const
+{
+    QnMutexLocker mutexLocker(&m_mutex);
+    return m_lastDiscoveredTime;
+}
+
+void QnNetworkResource::setLastDiscoveredTime(const QDateTime& time)
+{
+    QnMutexLocker mutexLocker(&m_mutex);
+    m_lastDiscoveredTime = time;
+}
+
 void QnNetworkResource::setNetworkTimeout(unsigned int timeout)
 {
     QnMutexLocker mutexLocker( &m_mutex );
@@ -244,6 +256,7 @@ void QnNetworkResource::updateInternal(const QnResourcePtr &other, Qn::NotifierL
     if (other_casted)
     {
         m_macAddress = other_casted->m_macAddress;
+        m_lastDiscoveredTime = other_casted->m_lastDiscoveredTime;
     }
 }
 

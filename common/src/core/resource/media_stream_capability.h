@@ -23,9 +23,7 @@ struct CameraStreamCapability
 
 struct CameraMediaCapability
 {
-    bool isNull() const { return streamCapabilities.isEmpty(); }
-
-    QMap<int, CameraStreamCapability> streamCapabilities;
+    QMap<Qn::StreamIndex, CameraStreamCapability> streamCapabilities;
     bool hasDualStreaming = false;
     bool hasAudio = false;
     // TODO: move more fields to here like io port settings e.t.c

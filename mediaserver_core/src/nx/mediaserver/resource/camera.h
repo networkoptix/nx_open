@@ -34,7 +34,7 @@ using StreamCapabilityMap = QMap<StreamCapabilityKey, nx::media::CameraStreamCap
 class Camera: public QnVirtualCameraResource
 {
     Q_OBJECT
-
+    using base_type = QnVirtualCameraResource;
 public:
     static const float kMaxEps;
 
@@ -49,6 +49,8 @@ public:
 
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
+
+    QnAbstractPtzController* createPtzController() const;
 
     /** Returns id-value pairs. */
     QnCameraAdvancedParamValueMap getAdvancedParameters(const QSet<QString>& ids);
@@ -119,6 +121,8 @@ public:
         virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) = 0;
     };
 
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
@@ -133,6 +137,7 @@ protected:
     */
     virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) = 0;
 
+    virtual QnAbstractPtzController* createPtzControllerInternal() const;
 private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
 

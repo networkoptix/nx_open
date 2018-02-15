@@ -67,7 +67,7 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(Fields fields)
 
     if (fields.testFlag(Field::eventType))
     {
-        bool hasToggleState = nx::vms::event::hasToggleState(model()->eventType());
+        bool hasToggleState = nx::vms::event::hasToggleState(model()->eventType(), model()->eventParams(), commonModule());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);
@@ -78,7 +78,7 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(Fields fields)
         QnIOPortDataList outputPorts;
         bool inited = false;
 
-        auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(model()->actionResources());
+        auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(model()->actionResources());
         foreach(const QnVirtualCameraResourcePtr &camera, cameras)
         {
             QnIOPortDataList cameraOutputs = camera->getRelayOutputList();

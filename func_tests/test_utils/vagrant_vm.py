@@ -1,6 +1,6 @@
 import logging
-import socket
 import tempfile
+from textwrap import dedent
 
 import jinja2
 import vagrant
@@ -8,6 +8,7 @@ import vagrant.compat
 from pathlib2 import Path
 
 from .os_access import ProcessError, SshAccess, host_from_config
+from .patch_sshd import optimize_sshd
 from .vagrant_vm_config import DEFAULT_NATNET1, VagrantVMConfig
 from .virtualbox_management import VirtualboxManagement
 
@@ -52,7 +53,7 @@ class VagrantVMFactory(object):
         self._host_os_access = host_from_config(options.vm_ssh_host_config)
         self._vm_name_prefix = options.vm_name_prefix
         self._vm_port_base = options.vm_port_base
-        self._virtualbox_vm = VirtualboxManagement(self._vm_name_prefix, self._host_os_access)
+        self._virtualbox_vm = VirtualboxManagement(self._host_os_access)
         if options.vm_ssh_host_config:
             self._vagrant_dir = options.vm_host_work_dir / 'vagrant'
             self._vagrant_private_key_path = options.work_dir / 'vagrant_insecure_private_key'
@@ -190,7 +191,14 @@ class VagrantVMFactory(object):
         self._host_os_access.write_file(self._vagrant_file_path, vagrantfile.encode())
 
     def _write_ssh_config(self):
+        ssh_connections_dir = self._ssh_config_path.with_name('ssh_connections')
+        ssh_connections_dir.mkdir(exist_ok=True)
         with self._ssh_config_path.open('w') as f:
+            f.write(dedent(u'''
+                ControlMaster auto
+                ControlPersist 1m
+                ControlPath {}/%r@%h:%p
+                ''').format(ssh_connections_dir).strip() + '\n\n')
             for vm in self._vms.values():
                 if vm.is_running:
                     f.write(self._vagrant.ssh_config(vm.vagrant_name).decode())
@@ -248,7 +256,7 @@ class VagrantVM(object):
             f.write(self._vagrant.ssh_config(self.vagrant_name))
             f.flush()
             self._make_os_access('vagrant', f.name).run_command(['sudo', 'cp', '-r', '/home/vagrant/.ssh', '/root/'])
-            self._patch_sshd_config(self._make_os_access('root', f.name))
+            optimize_sshd(self._make_os_access('root', f.name))
         self.is_running = True
 
     def destroy(self):
@@ -271,18 +279,3 @@ class VagrantVM(object):
             file_path = Path(file_path_format.format(test_dir=test_dir, bin_dir=self._bin_dir))
             assert file_path.is_file(), '%s is expected but is missing' % file_path
             self.host_os_access.put_file(file_path, self._vagrant_dir)
-
-    @staticmethod
-    def _patch_sshd_config(root_ssh_host):
-        """With default settings, connection takes ~1.5 sec."""
-        sshd_config_path = '/etc/ssh/sshd_config'
-        settings = root_ssh_host.read_file(sshd_config_path).split('\n')  # Preserve new line at the end!
-        old_setting = 'UsePAM yes'
-        new_setting = 'UsePAM no'
-        try:
-            old_setting_line_index = settings.index(old_setting)
-        except ValueError:
-            assert False, "Wanted to replace %s with %s but couldn't fine latter" % (old_setting, new_setting)
-        settings[old_setting_line_index] = new_setting
-        root_ssh_host.write_file(sshd_config_path, '\n'.join(settings))
-        root_ssh_host.run_command(['service', 'ssh', 'reload'])

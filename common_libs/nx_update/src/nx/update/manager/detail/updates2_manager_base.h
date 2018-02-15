@@ -5,7 +5,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/update/manager/detail/updates2_status_data_ex.h>
-#include <nx/update/installer/abstract_updates2_installer.h>
+#include <nx/update/installer/detail/abstract_updates2_installer.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 
@@ -49,20 +49,23 @@ protected:
     void onChunkDownloadFailed(const QString& fileName);
 
     // 'Real world' communication functions
-    virtual qint64 refreshTimeout() const = 0;
+    // These below should be overriden in CommonUpdates2Manager
     virtual void loadStatusFromFile() = 0;
-    virtual void connectToSignals() = 0;
     virtual update::info::AbstractUpdateRegistryPtr getGlobalRegistry() = 0;
-    virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() = 0;
     virtual QnUuid moduleGuid() const = 0;
     virtual void updateGlobalRegistry(const QByteArray& serializedRegistry) = 0;
     virtual void writeStatusToFile(const detail::Updates2StatusDataEx& statusData) = 0;
+    // This is for testing purposes only now
+    virtual void remoteUpdateCompleted() = 0;
+
+    // These below should be overriden in Server{Client}Updates2Manager
+    virtual qint64 refreshTimeout() const = 0;
+    virtual void connectToSignals() = 0;
+    virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() = 0;
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
-    virtual AbstractUpdates2InstallerPtr installer() = 0;
+    virtual AbstractUpdates2Installer* installer() = 0;
     virtual QString filePath() const = 0;
 
-    // for testing purposes
-    virtual void remoteUpdateCompleted() = 0;
 };
 
 } // namespace detail

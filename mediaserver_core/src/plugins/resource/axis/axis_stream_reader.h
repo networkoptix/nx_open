@@ -13,7 +13,7 @@ public:
     QnAxisStreamReader(const QnResourcePtr& res);
     virtual ~QnAxisStreamReader();
 
-    QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+    virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;

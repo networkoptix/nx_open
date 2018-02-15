@@ -80,7 +80,7 @@ public:
         if (!m_placeholder)
             return true;
 
-        auto resources = resourcePool()->getResources<QnVirtualCameraResource>(selected);
+        auto resources = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(selected);
         bool visible = !resources.isEmpty();
         m_placeholder->setCurrentWidget(visible
             ? m_buttonsPage
@@ -229,7 +229,7 @@ void QnFailoverPriorityDialog::setColors(const QnFailoverPriorityColors &colors)
 
 void QnFailoverPriorityDialog::updatePriorityForSelectedCameras(Qn::FailoverPriority priority)
 {
-    auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(selectedResources());
+    auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(selectedResources());
     m_customColumnDelegate->forceCamerasPriority(cameras, priority);
     setSelectedResources(QSet<QnUuid>());
 }

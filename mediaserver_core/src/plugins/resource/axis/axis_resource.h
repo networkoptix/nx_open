@@ -56,7 +56,6 @@ public:
     bool readMotionInfo();
 
     virtual void setMotionMaskPhysical(int channel) override;
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     virtual int getChannel() const override;
 
@@ -67,8 +66,6 @@ public:
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
 
-    virtual QnAbstractPtzController *createPtzControllerInternal() override;
-
     QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
@@ -76,6 +73,7 @@ public:
 
 
     QString resolutionToString(const QSize& resolution);
+    static QString toAxisCodecString(AVCodecID codecId);
 public slots:
     void onMonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient );
     void onMonitorMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr httpClient );
@@ -84,7 +82,9 @@ public slots:
     void onCurrentIOStateResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient );
 
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
+
 protected:
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
@@ -110,9 +110,11 @@ private:
     void stopInputPortMonitoringSync();
 
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
-
+    void setSupportedCodecs(const QSet<AVCodecID>& value);
+    QSet<AVCodecID> filterSupportedCodecs(const QList<QByteArray>& values) const;
 private:
     QList<AxisResolution> m_resolutionList;
+    QSet<AVCodecID> m_supportedCodecs;
 
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;
@@ -246,6 +248,7 @@ private:
         const QList<QnCameraAdvancedParameter>& params) const;
 
     bool isMaintenanceParam(const QnCameraAdvancedParameter& param) const;
+    CameraDiagnostics::Result getParameterValue(const QString& path, QByteArray* outResult);
 
     friend class QnAxisPtzController;
     friend class AxisIOMessageBodyParser;

@@ -939,6 +939,7 @@ enum IDType
 
     NewWearableCameraAction,
     UploadWearableCameraFileAction,
+    UploadWearableCameraFolderAction,
 
     /* Timeline actions. */
 

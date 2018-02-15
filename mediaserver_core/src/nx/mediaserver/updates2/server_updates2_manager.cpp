@@ -34,6 +34,11 @@ ServerUpdates2Manager::ServerUpdates2Manager(QnCommonModule* commonModule):
 {
 }
 
+ServerUpdates2Manager::~ServerUpdates2Manager()
+{
+    // #TODO #akulikov STOP installer here
+}
+
 qint64 ServerUpdates2Manager::refreshTimeout() const
 {
     const auto settingsValue = qnServerModule->roSettings()->value(
@@ -86,6 +91,12 @@ update::info::AbstractUpdateRegistryPtr ServerUpdates2Manager::getRemoteRegistry
 QString ServerUpdates2Manager::filePath() const
 {
     return qnServerModule->settings()->getDataDirectory() + QDir::separator() + kFileName;
+}
+
+update::detail::AbstractUpdates2Installer* ServerUpdates2Manager::installer()
+{
+    // #TODO #akulikov implement this correctly
+    return nullptr;
 }
 
 } // namespace updates2

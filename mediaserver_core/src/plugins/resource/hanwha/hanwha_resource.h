@@ -7,7 +7,6 @@
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
 #include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
-#include <plugins/resource/hanwha/hanwha_stream_limits.h>
 #include <plugins/resource/hanwha/hanwha_remote_archive_manager.h>
 #include <plugins/resource/hanwha/hanwha_archive_delegate.h>
 #include <plugins/resource/onvif/onvif_resource.h>
@@ -101,23 +100,19 @@ public:
     void updateToChannel(int value);
 
     bool isNvr() const;
-    QString focusMode() const;
     QString nxProfileName(Qn::ConnectionRole role) const;
-
-    static const QString kNormalizedSpeedPtzTrait;
-    static const QString kHas3AxisPtz;
-    static const QString kHanwhaAlternativeZoomTrait;
-    static const QString kHanwhaAlternativeFocusTrait;
 
     std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
 
     virtual bool setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString = nullptr) override;
+
+    bool isConnectedViaSunapi() const;
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
-    virtual QnAbstractPtzController* createPtzControllerInternal() override;
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     virtual bool allowRtspVideoLayout() const override { return false; }
 private:
@@ -142,11 +137,9 @@ private:
         int totalProfileNumber,
         const std::set<int>& inOutProfilesToRemove) const;
 
-    CameraDiagnostics::Result fetchStreamLimits(HanwhaStreamLimits* outStreamLimits);
-
-    CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
-
-    void sortResolutions(std::vector<QSize>* resolutions) const;
+    CameraDiagnostics::Result setUpProfilePolicies(
+        int primaryProfile,
+        int secondaryProfile);
 
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
 
@@ -265,7 +258,6 @@ private:
 
     mutable QnMutex m_mutex;
     int m_maxProfileCount = 0;
-    HanwhaStreamLimits m_streamLimits;
     HanwhaCodecInfo m_codecInfo;
     std::map<Qn::ConnectionRole, int> m_profileByRole;
 
@@ -275,10 +267,15 @@ private:
     std::map<QString, std::set<int>> m_alternativePtzRanges;
 
     std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
+
     HanwhaAttributes m_attributes;
+    HanwhaAttributes m_bypassDeviceAttributes;
+
     HanwhaCgiParameters m_cgiParameters;
+    HanwhaCgiParameters m_bypassDeviceCgiParameters;
+
     bool m_isNvr = false;
-    QString m_focusMode;
+    bool m_isChannelConnectedViaSunapi = false;
 
     nx::media::CameraMediaCapability m_capabilities;
     QMap<QString, QnIOPortData> m_ioPortTypeById;

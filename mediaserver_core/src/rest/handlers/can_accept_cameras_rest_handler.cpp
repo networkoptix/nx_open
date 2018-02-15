@@ -36,7 +36,10 @@ int QnCanAcceptCameraRestHandler::executePost(
     std::deque<QnSecurityCamResourcePtr> camerasToPing;
     QJson::deserialize(body, &inCameras);
 
-    const QSet<QString>& discoveredCameras = owner->commonModule()->resourceDiscoveryManager()->lastDiscoveredIds();
+    QSet<QString> discoveredCameras;
+    auto commonModule = owner->commonModule();
+    for (const auto& res: commonModule->resourceDiscoveryManager()->lastDiscoveredResources())
+        discoveredCameras.insert(res->getUniqueId());
 
     for(const QString& uniqueID: inCameras.uniqueIdList)
     {
@@ -53,7 +56,7 @@ int QnCanAcceptCameraRestHandler::executePost(
 
         if (camera->isManuallyAdded())
         {
-            manualCameraList.push_back(owner->commonModule()->resourceDiscoveryManager()->manualCameraInfo(camera));
+            manualCameraList.push_back(commonModule->resourceDiscoveryManager()->manualCameraInfo(camera));
             continue;
         }
 

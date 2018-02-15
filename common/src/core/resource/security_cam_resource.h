@@ -101,6 +101,9 @@ public:
     /** Returns true if camera stores archive on a external system */
     bool isDtsBased() const;
 
+    /** @return true if recording schedule can be configured for this device. */
+    bool canConfigureRecording() const;
+
     /** Returns true if it is a analog camera */
     bool isAnalog() const;
 
@@ -137,6 +140,7 @@ public:
     void setCameraCapability(Qn::CameraCapability capability, bool value);
 
     nx::media::CameraMediaCapability cameraMediaCapability() const;
+    void setCameraMediaCapability(const nx::media::CameraMediaCapability& value);
 
     /*!
         Change output with id \a ouputID state to \a activate
@@ -328,6 +332,9 @@ public:
      */
     virtual bool isRemoteArchiveMotionDetectionEnabled() const;
 
+    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
+
+    static Qn::StreamIndex toStreamIndex(Qn::ConnectionRole role);
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -382,7 +389,6 @@ signals:
         const QString& caption,
         const QString& description,
         qint64 timestamp );
-
 protected slots:
     virtual void at_initializedChanged();
     virtual void at_motionRegionChanged();
@@ -415,7 +421,6 @@ protected:
     virtual bool isInputPortMonitored() const;
 
     virtual Qn::LicenseType calculateLicenseType() const;
-    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
 protected:
 #ifdef ENABLE_DATA_PROVIDERS
     QnAudioTransmitterPtr m_audioTransmitter;
@@ -437,6 +442,7 @@ private:
     CachedValue<bool> m_cachedIsDtsBased;
     CachedValue<Qn::MotionType> m_motionType;
     CachedValue<bool> m_cachedIsIOModule;
+    CachedValue<bool> m_cachedCanConfigureRemoteRecording;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;

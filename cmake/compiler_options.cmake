@@ -4,7 +4,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
+if(developerBuild)
+    set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
+endif()
 
 option(analyzeMutexLocksForDeadlock
     "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"

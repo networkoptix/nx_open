@@ -133,14 +133,20 @@ struct ExportMediaPersistentSettings
 
     /**
      * Enable transcoding
-     * @returns true if transcoding value was changed
+     * @returns true if transcoding value was changed.
      */
     bool setTranscoding(bool value);
+
     /**
-    * Check if we use output format, that forces usage of filters
-    * @returns true if usage of filters is forced
-    */
+     * Check if we use output format, that forces usage of filters.
+     * @returns true if usage of filters is forced.
+     */
     bool areFiltersForced() const;
+
+    /**
+     * Check if we add overlays to exported video.
+     */
+    bool shouldExportOverlays() const;
 
     void updateRuntimeSettings(ExportMediaSettings& runtimeSettings) const;
     void setDimension(int newDimension);

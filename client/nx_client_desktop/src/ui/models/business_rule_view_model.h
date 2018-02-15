@@ -144,6 +144,7 @@ private:
     QString getAggregationText() const;
 
     static QString toggleStateToModelString(nx::vms::event::EventState value);
+    Fields updateEventClassRelatedParams();
 private:
     QnUuid m_id;
     bool m_modified;

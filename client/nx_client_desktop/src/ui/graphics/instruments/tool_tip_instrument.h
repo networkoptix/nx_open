@@ -20,11 +20,21 @@ public:
     void addIgnoredItem(QGraphicsItem* item);
     bool removeIgnoredItem(QGraphicsItem* item);
 
+    void addIgnoredWidget(QWidget* widget);
+    bool removeIgnoredWidget(QWidget* widget);
+
 protected:
-    virtual bool event(QWidget *viewport, QEvent *event) override;
+    virtual bool event(QWidget* viewport, QEvent* event) override;
+
+private:
+    QString widgetToolTip(QWidget* idget, const QPoint& pos) const;
+    QString itemToolTip(QGraphicsItem* item, const QPointF& pos) const;
+
+    void at_ignoredWidgetDestroyed();
 
 private:
     QSet<QGraphicsItem*> m_ignoredItems;
+    QSet<QWidget*> m_ignoredWidgets;
 };
 
 #endif // QN_TOOL_TIP_INSTRUMENT_H

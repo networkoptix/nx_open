@@ -1,5 +1,6 @@
 import logging
 import time
+from collections import namedtuple
 from datetime import datetime
 
 import pytest
@@ -7,48 +8,40 @@ import pytz
 import requests
 import requests.auth
 
-from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
-from test_utils.server import TimePeriod
-from test_utils.utils import SimpleNamespace, datetime_utc_now
+from test_utils.networking import setup_networks
+from test_utils.networking.ip_on_linux import LinuxIpNode
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT, TimePeriod
+from test_utils.utils import datetime_utc_now
 
 log = logging.getLogger(__name__)
 
+LAYOUTS = {
+    'nat': {
+        '10.254.254.0/28': {
+            'front': None,
+            'router': {
+                '10.254.254.16/28': {
+                    'behind': None}}}},
+    'direct': {
+        '10.254.254.0/28': {
+            'front': None,
+            'behind': None}}}
 
-@pytest.fixture(params=['direct', 'nat'])
-def nat_schema(request):
-    return request.param
+Servers = namedtuple('Servers', ['in_front', 'behind'])
 
 
-@pytest.fixture
+@pytest.fixture()
 def env(vm_factory, server_factory, http_schema, nat_schema):
-    if nat_schema == 'direct':
-        env_factory = direct_env
-    elif nat_schema == 'nat':
-        env_factory = nat_env
-    else:
-        assert False, "nat_schema must be either 'direct' or 'nat'"
-    return env_factory(vm_factory, server_factory, http_schema)
-
-def direct_env(vm_factory, server_factory, http_schema):
-    in_front = server_factory('in_front', http_schema=http_schema)
-    behind = server_factory('behind', http_schema=http_schema)
-    behind.merge([in_front])
-    return SimpleNamespace(in_front=in_front, behind=behind)
-
-def nat_env(vm_factory, server_factory, http_schema):
-    in_front_net    = '10.10.1/24'
-    in_front_net_gw = '10.10.1.1/24'
-    behind_net      = '10.10.2/24'
-    behind_net_gw   = '10.10.2.1/24'
-    router = vm_factory('router', ip_address_list=[in_front_net_gw, behind_net_gw],
-                        provision_scripts=['vm-provision-nat-router.sh'])
-    behind_vm = vm_factory('behind', ip_address_list=[behind_net], provision_scripts=['vm-provision-nat-behind.sh'])
-    in_front_vm = vm_factory('in-front', ip_address_list=[in_front_net])
-    in_front = server_factory('in_front', vm=in_front_vm, http_schema=http_schema)
-    behind = server_factory('behind', vm=behind_vm, http_schema=http_schema)
-    # behind must initiate merge, it can reach sever in_front, but not vise-versa
-    behind.merge([in_front])
-    return SimpleNamespace(in_front=in_front, behind=behind)
+    vms = dict()
+    for _ in range(3):
+        vm = vm_factory('updates')
+        vms[vm.virtualbox_name] = vm
+    ip_nodes = {virtualbox_name: LinuxIpNode(vm.guest_os_access) for virtualbox_name, vm in vms.items()}
+    assigned_nodes, _ = setup_networks(ip_nodes, LAYOUTS[nat_schema], {'front': 'internet', 'behind': 'internet'})
+    front = server_factory('server', vm=vms[assigned_nodes['front']], http_schema=http_schema)
+    behind = server_factory('server', vm=vms[assigned_nodes['behind']], http_schema=http_schema)
+    behind.merge([front])
+    return Servers(in_front=front, behind=behind)
 
 
 def wait_for_servers_return_same_results_to_api_call(env, method, api_object, api_method):
@@ -65,6 +58,8 @@ def wait_for_servers_return_same_results_to_api_call(env, method, api_object, ap
 
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920653/Connection+behind+NAT#ConnectionbehindNAT-test_merged_servers_should_return_same_results_to_certain_api_calls
+@pytest.mark.parametrize('http_schema', ['http', 'https'])
+@pytest.mark.parametrize('nat_schema', ['direct', 'nat'])
 def test_merged_servers_should_return_same_results_to_certain_api_calls(env):
     test_api_calls = [
         ('GET', 'ec2', 'getStorages'),

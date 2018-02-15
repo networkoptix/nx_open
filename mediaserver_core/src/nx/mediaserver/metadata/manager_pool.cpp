@@ -283,7 +283,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
 
         auto& context = m_contexts[camera->getId()];
         std::unique_ptr<MetadataHandler> handler(
-            createMetadataHandler(camera, pluginManifest->driverId));
+            createMetadataHandler(camera, *pluginManifest));
 
         if (auto consumingCameraManager = nxpt::ScopedRef<CameraManager>(
             manager->queryInterface(IID_CameraManager)))
@@ -340,7 +340,7 @@ void ManagerPool::releaseResourceCameraManagersUnsafe(const QnSecurityCamResourc
 
 MetadataHandler* ManagerPool::createMetadataHandler(
     const QnResourcePtr& resource,
-    const QnUuid& pluginId)
+    const nx::api::AnalyticsDriverManifest& manifest)
 {
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
@@ -354,7 +354,7 @@ MetadataHandler* ManagerPool::createMetadataHandler(
 
     auto handler = new MetadataHandler();
     handler->setResource(camera);
-    handler->setPluginId(pluginId);
+    handler->setManifest(manifest);
 
     return handler;
 }

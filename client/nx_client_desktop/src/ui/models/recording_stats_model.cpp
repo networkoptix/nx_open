@@ -220,16 +220,8 @@ QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) c
             if (index.column() != CameraNameColumn)
                 break;
 
-            // Makes always-selected cameras icon
-            const auto source = qnResIconCache->icon(QnResourceIconCache::Cameras);
-            QIcon result;
-            for (const auto& size: source.availableSizes(QIcon::Selected))
-            {
-                const auto selectedPixmap = source.pixmap(size, QIcon::Selected);
-                result.addPixmap(selectedPixmap, QIcon::Normal);
-                result.addPixmap(selectedPixmap, QIcon::Selected);
-            }
-            return result;
+            return qnResIconCache->icon(
+                QnResourceIconCache::Cameras | QnResourceIconCache::AlwaysSelected);
         }
         case Qn::RecordingStatsDataRole:
             return QVariant::fromValue<QnCamRecordingStatsData>(m_footer);

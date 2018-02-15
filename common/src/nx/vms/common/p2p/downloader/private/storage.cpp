@@ -186,8 +186,9 @@ ResultCode Storage::addNewFile(const FileInformation& fileInformation)
             info.chunkChecksums.resize(chunkCount);
         }
 
-        if (!reserveSpace(path, info.size >= 0 ? info.size : 0))
-            return ResultCode::noFreeSpace;
+        ResultCode reserveStatus = reserveSpace(path, info.size >= 0 ? info.size : 0);
+        if (reserveStatus != ResultCode::ok)
+            return reserveStatus;
 
         checkDownloadCompleted(info);
     }
@@ -701,17 +702,17 @@ void Storage::checkDownloadCompleted(FileMetadata& fileInfo)
     fileInfo.chunkChecksums = calculateChecksums(path, fileInfo.size);
 }
 
-bool Storage::reserveSpace(const QString& fileName, const qint64 size)
+ResultCode Storage::reserveSpace(const QString& fileName, const qint64 size)
 {
     QFile file(fileName);
 
     if (!file.open(QFile::ReadWrite))
-        return false;
+        return ResultCode::ioError;
 
     if (!file.resize(size))
-        return false;
+        return ResultCode::noFreeSpace;
 
-    return true;
+    return ResultCode::ok;
 }
 
 QString Storage::metadataFileName(const QString& fileName)

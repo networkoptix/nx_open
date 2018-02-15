@@ -29,7 +29,12 @@ OpenLayoutActionWidget::OpenLayoutActionWidget(QWidget* parent):
 
     m_listModel = new QnResourceListModel(this);
 
-    QnResourceList resources = resourcePool()->getAllResourceByTypeName(QnResourceTypePool::kLayoutTypeId);
+    QnResourceList resources = resourcePool()->getResources(
+        [typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kLayoutTypeId)](
+            const QnResourcePtr& resource)
+        {
+            return resource->getTypeId() == typeId;
+        });
     m_listModel->setResources(std::move(resources));
     ui->selectLayoutButton->setModel(m_listModel);
     connect(ui->selectLayoutButton, QnComboboxCurrentIndexChanged,

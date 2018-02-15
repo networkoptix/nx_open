@@ -43,6 +43,8 @@ public:
         const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) override;
 
+    virtual bool isEnabled() const override;
+
     static QAuthenticator getDefaultAuth();
 private:
     void createResource(

@@ -636,7 +636,7 @@ void ActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
     if (user && !qnRuntime->isActiveXMode())
     {
-        for (const QnLayoutResourcePtr &layout : resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>())
+        for (const QnLayoutResourcePtr &layout : resourcePool()->getResourcesByParentId(user->getId()).filtered<QnLayoutResource>())
         {
             if (layout->hasFlags(Qn::local) && !layout->isFile())
                 resourcePool()->removeResource(layout);
@@ -1225,8 +1225,17 @@ void ActionHandler::at_moveCameraAction_triggered() {
         if (!camera)
             continue;
 
+        // Drop out right away if we get a wearable camera here.
+        if (camera->hasFlags(Qn::wearable_camera))
+        {
+            QnMessageBox::critical(mainWindowWidget(),
+                tr("Wearable Cameras cannot be moved between servers"));
+            return;
+        }
+
         resourcesToMove.push_back(camera);
     }
+
     if (!resourcesToMove.isEmpty()) {
         int handle = server->apiConnection()->checkCameraList(resourcesToMove, this, SLOT(at_cameraListChecked(int, const QnCameraListReply &, int)));
         m_awaitingMoveCameras.insert(handle, CameraMovingInfo(resourcesToMove, server));

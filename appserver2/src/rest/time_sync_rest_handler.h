@@ -1,35 +1,36 @@
-/**********************************************************
-* Aug 14, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef TIME_SYNC_REST_HANDLER_H
-#define TIME_SYNC_REST_HANDLER_H
+#pragma once
 
 #include "rest/server/request_handler.h"
 
+namespace nx {
+namespace network {
+class AbstractStreamSocket;
+} // network
+} // nx
+class QnCommonModule;
 
 namespace ec2 {
 
 class Ec2DirectConnectionFactory;
+class TimeSynchronizationManager;
 
-class QnTimeSyncRestHandler: public QnRestRequestHandler
+class QnTimeSyncRestHandler:
+    public QnRestRequestHandler
 {
 public:
     static const QString PATH;
-    //!used to pass time sync information between peers
+    /** Contains peer's time synchronization information. */
     static const QByteArray TIME_SYNC_HEADER_NAME;
 
     QnTimeSyncRestHandler(Ec2DirectConnectionFactory* connection);
 
-    //!Implementation of \a QnRestRequestHandler::executeGet
     virtual int executeGet(
         const QString& path,
         const QnRequestParamList& params,
         QByteArray& result,
         QByteArray& contentType,
-        const QnRestConnectionProcessor* ) override;
-    //!Implementation of \a QnRestRequestHandler::executeGet
+        const QnRestConnectionProcessor*) override;
+
     virtual int executePost(
         const QString& path,
         const QnRequestParamList& params,
@@ -37,11 +38,20 @@ public:
         const QByteArray& srcBodyContentType,
         QByteArray& result,
         QByteArray& resultContentType,
-        const QnRestConnectionProcessor* ) override;
+        const QnRestConnectionProcessor*) override;
+
+    static nx::network::http::StatusCode::Value processRequest(
+        const nx::network::http::Request& request,
+        TimeSynchronizationManager* timeSynchronizationManager,
+        nx::network::AbstractStreamSocket* connection);
+
+    static void prepareResponse(
+        const TimeSynchronizationManager& timeSynchronizationManager,
+        const QnCommonModule& commonModule,
+        nx::network::http::Response* response);
+
 private:
     Ec2DirectConnectionFactory* m_appServerConnection;
 };
 
-}
-
-#endif  //TIME_SYNC_REST_HANDLER_H
+} // namespace ec2

@@ -28,9 +28,12 @@ protected:
     virtual std::string capabilitiesManifest() = 0;
 
     /**
-     * Override to accept next video frame for processing. The provided pointer is valid only until
-     * a subsequent call to pullMetadataPackets(), as well as the actual byte data pointer inside,
-     * regardless of the frame-deep-copy policy defined by the manifest.
+     * Override to accept next video frame for processing.
+     * @param videoFrame Contains a pointer to the compressed video frame raw bytes. If the plugin
+     *     manifest declares "needDeepCopyForMediaFrame" in "capabilities", the lifetime (validity)
+     *     of this pointer is the same as of videoFrame. Otherwise, the pointer is valid only until
+     *     and during the subsequent call to pullMetadataPackets(), even if the lifetime of
+     *     videoFrame is extended by addRef() or queryInterface() inside this method.
      */
     virtual bool pushVideoFrame(const CommonCompressedVideoPacket* /*videoFrame*/) { return true; }
 
@@ -66,6 +69,10 @@ protected:
     /** Enable or disable verbose debug output via NX_OUTPUT from methods of this class. */
     void setEnableOutput(bool value) { m_enableOutput = value; }
 
+    /**
+     * @return Parent plugin. The parent plugin is guaranteed to exist while any of its
+     * CameraManagers exist, thus, this pointer is valid during the lifetime of this CameraManager.
+     */
     Plugin* plugin() const { return m_plugin; }
 
 //-------------------------------------------------------------------------------------------------

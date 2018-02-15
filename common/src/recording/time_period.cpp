@@ -296,6 +296,11 @@ bool operator==(const QnTimePeriod &first, const QnTimePeriod &other)
         && (first.durationMs == other.durationMs));
 }
 
+bool operator!=(const QnTimePeriod &first, const QnTimePeriod &other)
+{
+    return !(first == other);
+}
+
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {
     const QString fmt = lit("dd MM yyyy hh:mm:ss");
     if (!period.isInfinite())

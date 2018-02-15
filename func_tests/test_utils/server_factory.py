@@ -56,6 +56,8 @@ class ServerFactory(object):
             api_url = '%s://%s:%d/' % (config.http_schema, vm.host_os_access.hostname, vm.config.rest_api_forwarded_port)
             customization = self._mediaserver_deb.customization
             service = UpstartService(vm.guest_os_access, customization.service_name)
+            if not service.is_running():
+                service.set_state(True)
             server = Server(
                 config.name, vm.guest_os_access, service, installation, api_url, self._ca,
                 rest_api_timeout=config.rest_api_timeout)

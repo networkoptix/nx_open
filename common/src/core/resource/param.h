@@ -107,6 +107,7 @@ namespace Qn
     static const QString NO_RECORDING_PARAMS_PARAM_NAME = lit("noRecordingParams");
     static const QString PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER = lit("parseOnvifNotificationsWithHttpReader");
     static const QString DISABLE_HEVC_PARAMETER_NAME = lit("disableHevc");
+    static const QString kCanConfigureRemoteRecording = lit("canConfigureRemoteRecording");
 
     // Mediaserver common info
     static const QString kTimezoneUtcOffset = lit("timezoneUtcOffset");

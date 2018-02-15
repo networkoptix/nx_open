@@ -23,14 +23,14 @@ function(nx_target_enable_werror target werror_condition)
 endfunction()
 
 function(nx_add_target name type)
-    set(options NO_MOC NO_WERROR)
+    set(options NO_MOC WERROR NO_WERROR)
     set(oneValueArgs LIBRARY_TYPE)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
         SOURCE_EXCLUSIONS
         OTHER_SOURCES
         PUBLIC_LIBS PRIVATE_LIBS
-        WERROR
+        WERROR_IF
     )
 
     cmake_parse_arguments(NX "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -135,8 +135,8 @@ function(nx_add_target name type)
         nx_strip_target(${name} COPY_DEBUG_INFO)
     endif()
 
-    if(NOT NX_NO_WERROR AND (nx_enable_werror OR NOT "${NX_WERROR}" STREQUAL ""))
-        nx_target_enable_werror(${name} "${NX_WERROR}")
+    if(NOT NX_NO_WERROR AND (nx_enable_werror OR NX_WERROR OR NOT "${NX_WERROR_IF}" STREQUAL ""))
+        nx_target_enable_werror(${name} "${NX_WERROR_IF}")
     endif()
 
     if(NOT NX_NO_MOC)
