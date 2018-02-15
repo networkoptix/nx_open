@@ -676,7 +676,7 @@ The oldest footage among all cameras on the server will be deleted first.</strin
    <item>
     <widget class="QnAlertBar" name="alertBar" native="true">
      <property name="text" stdset="0">
-      <string>TextLabel</string>
+      <string/>
      </property>
     </widget>
    </item>
