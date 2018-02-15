@@ -405,13 +405,7 @@ class SshAccess(OsAccess):
         return self._make_ssh_cmd() + [self._user_and_host, 'nc', '-q0', '%h', '%p']
 
     def _make_ssh_cmd(self, must_quote=False):
-        return ['ssh'] + self._make_identity_args() + self._make_config_args() + self._make_proxy_args(must_quote)
-
-    def _make_identity_args(self):
-        if self._key_file_path:
-            return ['-i', str(self._key_file_path)]
-        else:
-            return []
+        return ['ssh'] + self._make_config_args() + self._make_proxy_args(must_quote)
 
     def _make_config_args(self):
         if self._config_path:
