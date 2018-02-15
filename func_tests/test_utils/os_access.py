@@ -304,11 +304,17 @@ class SshAccess(OsAccess):
 
     def become(self, user):
         other_user_access = self.__class__(self._config_path, self.hostname, user=user)
-        try:
-            other_user_access.run_command(':')
-        except ProcessError:
+        if not other_user_access.works():
             self.run_command(['sudo', 'cp', '-r', '/home/vagrant/.ssh', '~{}/'.format(user)])
+        assert other_user_access.works()
         return other_user_access
+
+    def works(self):
+        try:
+            self.run_command([':'])
+        except ProcessError:
+            return False
+        return True
 
     def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None, env=None):
         if isinstance(args, str):
