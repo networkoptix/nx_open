@@ -7,5 +7,5 @@ QString QnCloudResultMessages::invalidCredentials()
 
 QString QnCloudResultMessages::accountNotActivated()
 {
-    return tr("Account isn't activated. Please check your email and follow provided instructions");
+    return tr("Account is not activated. Please check your email and follow provided instructions");
 }
