@@ -272,7 +272,7 @@ QVariant QnBusinessRuleViewModel::data(Column column, const int role) const
 
         case Qn::EventTypeRole:
             return qVariantFromValue(m_eventType);
-        case Qn::EventParamsRole:
+        case Qn::EventParametersRole:
             return qVariantFromValue(m_eventParams);
         case Qn::EventResourcesRole:
             return qVariantFromValue(filterEventResources(m_eventResources, m_eventType));

@@ -150,7 +150,7 @@ QList<EventState> allowedEventStates(
     QnCommonModule* commonModule)
 {
     QList<EventState> result;
-    bool hasTooggleStateResult = hasToggleState(eventType, runtimeParams, commonModule);
+    const bool hasTooggleStateResult = hasToggleState(eventType, runtimeParams, commonModule);
     if (!hasTooggleStateResult
         || eventType == userDefinedEvent
         || eventType == softwareTriggerEvent)
