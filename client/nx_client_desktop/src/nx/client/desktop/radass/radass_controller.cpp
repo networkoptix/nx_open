@@ -564,14 +564,18 @@ struct RadassController::Private
             return;
 
         QnCamDisplay* display = consumer->display;
-        if (consumer->lqReason == LqReason::performanceInFf
-            && (qAbs(display->getSpeed()) < consumer->toLqSpeed
-                    || (consumer->toLqSpeed < 0 && display->getSpeed() > 0)))
+        if (consumer->lqReason == LqReason::performanceInFf)
         {
-            // If item leave high speed mode change same item to HQ
-            trace("Consumer left FF mode or slowed, switching to HQ", consumer);
-            gotoHighQuality(consumer);
-            return;
+            const float oldSpeed = consumer->toLqSpeed;
+            const float currentSpeed = display->getSpeed();
+            if (!isFastForwardOrRevMode(currentSpeed)
+                || qAbs(currentSpeed) < qAbs(oldSpeed))
+            {
+                // If item leave high speed mode change it back to HQ.
+                trace("Consumer left FF mode or slowed, switching to HQ", consumer);
+                gotoHighQuality(consumer);
+                return;
+            }
         }
 
         if (isFastForwardOrRevMode(display))
