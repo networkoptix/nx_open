@@ -9,6 +9,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/utils/wearable_manager.h>
+#include <nx/client/desktop/utils/wearable_state.h>
 #include <ui/dialogs/common/message_box.h>
 
 using namespace nx::client::desktop;
@@ -131,7 +132,7 @@ QString QnWearableProgressWidget::calculateMessage(const WearableState& state)
     case WearableState::Consuming:
         return tr("Finalizing %1... %2\t%p%")
             .arg(calculateFileName(state))
-            .arg(calculateQueueMessage(state));;
+            .arg(calculateQueueMessage(state));
     default:
         return QString();
     }
@@ -139,12 +140,10 @@ QString QnWearableProgressWidget::calculateMessage(const WearableState& state)
 
 QString QnWearableProgressWidget::calculateQueueMessage(const WearableState& state)
 {
-    int left = state.queue.size() - (state.currentIndex + 1);
-
-    if (left <= 0)
+    if (state.queue.size() <= 1)
         return QString();
-    else
-        return tr("(%n more file(s) in queue)", "", left);
+
+    return tr("(%1 of %2)").arg(state.currentIndex + 1).arg(state.queue.size());
 }
 
 QString QnWearableProgressWidget::calculateFileName(const WearableState& state)

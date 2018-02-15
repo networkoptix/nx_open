@@ -6,8 +6,9 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 
-#include "wearable_payload.h"
+#include "wearable_fwd.h"
 
+struct QnWearablePrepareReply;
 class QnTimePeriodList;
 
 namespace nx {
