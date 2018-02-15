@@ -120,6 +120,7 @@ signals:
     void nextFrameOccured();
     void prevFrameOccured();
     void skipFramesTo(qint64 mksec);
+    void waitForDataCanBeAccepted();
 protected:
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher = nullptr;
     bool m_cycleMode;
