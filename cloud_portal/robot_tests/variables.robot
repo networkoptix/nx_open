@@ -60,8 +60,8 @@ ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/c
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), '${RESEND ACTIVATION LINK BUTTON TEXT}')]
 
 ${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || registerSuccess) && !activated']
-${ACTIVATION SUCCESS}                 //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), 'Your account is successfully activated')]
-${SUCCESS LOG IN BUTTON}              //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), 'Your account is successfully activated')]//a[@href='/login']
+${ACTIVATION SUCCESS}                 //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]
+${SUCCESS LOG IN BUTTON}              //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]//a[@href='/login']
 
 #In system settings
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
@@ -75,9 +75,9 @@ ${DELETE USER CANCEL BUTTON}          //button[@ng-click='cancel()' and contains
 
 ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains(text(), '${SYSTEM NO ACCESS TEXT}')]
 
-#Disconnect from clout portal
+#Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
-${DISCONNECT FORM HEADER}            //h1['Disconnect System from Nx Cloud?']
+${DISCONNECT FORM HEADER}             //h1['${DISCONNECT FORM HEADER TEXT}']
 
 #Disconnect from my account
 ${DISCONNECT MODAL WARNING}              //p[contains(text(), '${DISCONNECT MODAL WARNING TEXT}')]
