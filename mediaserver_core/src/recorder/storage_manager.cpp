@@ -2139,15 +2139,26 @@ QSet<QnStorageResourcePtr> QnStorageManager::getClearableStorages() const
     return result;
 }
 
-QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages() const
+QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
+    const QnStorageResourceList* additionalStorages) const
 {
     QSet<QnStorageResourcePtr> result;
 
-    QnStorageManager::StorageMap storageRoots = getAllStorages();
-    qint64 bigStorageThreshold = 0;
-    for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+    QnStorageResourceList storageRoots;
+    auto storageMap = getAllStorages();
+    for (auto itr = storageMap.cbegin(); itr != storageMap.cend(); ++itr)
+        storageRoots.append(itr.value());
+
+    if (additionalStorages)
     {
-        QnStorageResourcePtr fileStorage = itr.value();
+        for (auto storage: *additionalStorages)
+            storageRoots.append(storage);
+    }
+
+    qint64 bigStorageThreshold = 0;
+    for (auto itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+    {
+        QnStorageResourcePtr fileStorage = *itr;
         if (fileStorage->getStatus() != Qn::Offline)
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
@@ -2156,9 +2167,9 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages() const
     }
     bigStorageThreshold /= BIG_STORAGE_THRESHOLD_COEFF;
 
-    for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+    for (auto itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
-        QnStorageResourcePtr fileStorage = itr.value();
+        QnStorageResourcePtr fileStorage = *itr;
         if (fileStorage->getStatus() != Qn::Offline)
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
