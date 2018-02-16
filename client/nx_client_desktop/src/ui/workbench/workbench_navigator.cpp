@@ -1493,6 +1493,13 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
     if (m_dayTimeWidget)
         m_dayTimeWidget->setEnabledWindow(startTimeMSec, endTimeMSec);
 
+    if (!m_currentWidgetLoaded && widgetLoaded
+        && display()->widgets().size() == 1
+        && m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
+    {
+        setPosition(startTimeMSec * 1000);
+    }
+
     if (!m_pausedOverride)
     {
         // TODO: #GDM #vkutin #refactor logic in 3.1
