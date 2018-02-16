@@ -300,6 +300,7 @@ void Settings::loadSettings()
     m_http.connectionInactivityTimeout = nx::utils::parseOptionalTimerDuration(
         settings().value(kHttpConnectionInactivityTimeout).toString(), kDefaultHttpInactivityTimeout);
 
+    m_dbConnectionOptions.dbName = m_general.dataDir + "/" + m_dbConnectionOptions.dbName;
     m_dbConnectionOptions.loadFromSettings(settings());
 
     //Statistics
