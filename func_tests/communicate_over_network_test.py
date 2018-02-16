@@ -48,7 +48,7 @@ def env(vm_factory, server_factory, http_schema, layout_name):
     layout = LAYOUTS[layout_name]
     vms = dict()
     for _ in range(3):
-        vm = vm_factory('updates')
+        vm = vm_factory()
         vms[vm.virtualbox_name] = vm
     ip_nodes = {virtualbox_name: LinuxIpNode(vm.guest_os_access) for virtualbox_name, vm in vms.items()}
     assigned_nodes, _ = setup_networks(ip_nodes, layout['networks'], layout['default_gateways'])

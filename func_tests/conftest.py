@@ -336,7 +336,7 @@ def pytest_pyfunc_call(pyfuncitem):
 
 @pytest.fixture()
 def timeless_server(vm_factory, server_factory, server_name='timeless_server'):
-    vm = vm_factory('timeless', sync_time=False)
+    vm = vm_factory()
     config_file_params = dict(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
     server = server_factory(server_name, vm=vm, start=False, config_file_params=config_file_params)
     TimeProtocolRestriction(server).enable()
