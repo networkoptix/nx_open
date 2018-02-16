@@ -104,6 +104,8 @@ Check For Alert
     Wait Until Element Is Visible    ${ALERT}
     Element Should Be Visible    ${ALERT}
     Element Text Should Be    ${ALERT}    ${alert text}
+    Sleep    3
+    Element Should Be Visible    ${ALERT}
     Wait Until Page Does Not Contain Element    ${ALERT}
 
 Check For Alert Dismissable
