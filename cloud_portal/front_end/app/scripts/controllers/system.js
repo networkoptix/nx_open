@@ -145,6 +145,11 @@ angular.module('cloudApp')
                         errorPrefix: L.errorCodes.cantSharePrefix
                     }).then(function(){
                         $scope.locked[user.email] = false;
+                        var userId = user.id;
+                        $scope.system.users = _.filter($scope.system.users, function(user){
+                            return user.id != userId;
+                        });
+
                     },function(){
                         $scope.locked[user.email] = false;
                     });
