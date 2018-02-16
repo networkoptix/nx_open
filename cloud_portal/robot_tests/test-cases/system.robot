@@ -17,6 +17,16 @@ Log in to Auto Tests System
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 *** Test Cases ***
+systems dropdown should allow you to go back to the systems page
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${SYSTEMS DROPDOWN}
+    Click Link    ${SYSTEMS DROPDOWN}
+    Wait Until Element Is Visible    ${ALL SYSTEMS}
+    Click Link    ${ALL SYSTEMS}
+    Location Should Be    ${url}/systems
+    Close Browser
+
 should confirm, if owner deletes system (You are going to disconnect your system from cloud)
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL OWNER}
