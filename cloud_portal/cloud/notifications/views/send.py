@@ -116,6 +116,7 @@ def send_notification(request):
     return api_success()
 
 
+#Refactor later add state for messages, enforce review before allowing to send
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def cloud_notification_action(request):
@@ -137,6 +138,7 @@ def cloud_notification_action(request):
 
     elif can_send and 'Send' in request.data and notification_id:
         force = 'ignore_subscriptions' in request.data
+        notification_id = str(update_or_create_notification(request.data))
         notification = CloudNotification.objects.get(id=notification_id)
         send_to_all_users(request.user, notification, force)
         messages.success(request._request, "Cloud notification has been sent")

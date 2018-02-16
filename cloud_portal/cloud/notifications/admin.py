@@ -33,13 +33,13 @@ admin.site.register(Event, EventAdmin)
 class CloudNotificationAdmin(admin.ModelAdmin):
     list_display = ('subject', 'body', 'sent_by', 'convert_date')
     change_form_template = 'notifications/cloud_notifications_change_form.html'
-    readonly_fields = ('sent_by', 'sent_date')
+    readonly_fields = ('sent_by', 'convert_date')
     fieldsets = [
         ("Subject and Body for email", {
             'fields': ('subject', 'body'),
             'description': "<div>Body should be formated in html</div>"
         }),
-        ("When and who sent the notification", {'fields': (('sent_by', 'sent_date'))})
+        ("When and who sent the notification", {'fields': (('sent_by', 'convert_date'))})
     ]
 
     def convert_date(self, obj):
@@ -53,6 +53,7 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         return obj.sent_date
     convert_date.short_description = "Sent date"
     convert_date.allow_tags = True
+    convert_date.admin_order_field = "sent_date"
 
     def has_delete_permission(self, request, obj=None):
         self.request = request
