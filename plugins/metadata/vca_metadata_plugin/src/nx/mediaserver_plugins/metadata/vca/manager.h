@@ -11,6 +11,9 @@
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/camera_manager.h>
 
+#include <nx/network/aio/timer.h>
+#include <nx/network/system_socket.h>
+
 #include "common.h"
 #include "plugin.h"
 
