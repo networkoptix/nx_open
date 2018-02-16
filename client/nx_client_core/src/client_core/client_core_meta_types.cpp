@@ -17,7 +17,6 @@
 #include <client/forgotten_systems_manager.h>
 #include <utils/common/app_info.h>
 #include <helpers/nx_globals_object.h>
-#include <helpers/url_helper.h>
 #include <nx/client/core/animation/kinetic_animation.h>
 #include <nx/client/core/ui/frame_section.h>
 #include <nx/client/core/utils/geometry.h>
@@ -66,9 +65,8 @@ void initializeMetaTypes()
     qmlRegisterSingletonType<NxGlobalsObject>("Nx", 1, 0, "NxGlobals", &createNxGlobals);
     qmlRegisterUncreatableType<QnUuid>(
         "Nx.Utils", 1, 0, "Uuid", QLatin1String("Cannot create an instance of Uuid."));
-    qRegisterMetaType<QnUrlHelper>();
-    qmlRegisterUncreatableType<QnUrlHelper>(
-        "Nx", 1, 0, "UrlHelper", QLatin1String("Cannot create an instance of UrlHelper."));
+    qmlRegisterUncreatableType<utils::Url>(
+        "Nx.Utils", 1, 0, "Url", QLatin1String("Cannot create an instance of Url."));
     qmlRegisterUncreatableType<QnSoftwareVersion>(
         "Nx", 1, 0, "SoftwareVersion", QLatin1String("Cannot create an instance of SoftwareVersion."));
 

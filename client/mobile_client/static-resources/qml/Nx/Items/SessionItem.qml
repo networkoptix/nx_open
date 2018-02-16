@@ -39,7 +39,7 @@ Pane
         id: hostsModelAccessor
         model: hostsModel
 
-        property string defaultAddress: ""
+        property var defaultAddress: ""
 
         onDataChanged:
         {
@@ -52,8 +52,9 @@ Pane
 
         function updateDefaultAddress()
         {
+            // TODO: Make SystemHostsModel return nx::utils::Url.
             defaultAddress = count > 0
-                ? getData(0, "url")
+                ? NxGlobals.url(getData(0, "url"))
                 : ""
         }
     }
@@ -101,7 +102,7 @@ Pane
     {
         id: informationBlock
         enabled: compatible && online
-        address: NxGlobals.url(hostsModelAccessor.defaultAddress).address()
+        address: hostsModelAccessor.defaultAddress.displayAddress()
         user: authenticationDataModel.defaultCredentials.user
         factoryDetailsText: d.kFactorySystemDetailsText
     }
