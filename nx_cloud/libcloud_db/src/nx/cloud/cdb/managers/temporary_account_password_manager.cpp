@@ -239,7 +239,7 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::updateCredentialsAttrib
         ":accessRights",
         QnSql::serialized_field(tempPasswordData.accessRights.toString()));
 
-    const auto passwordHa1 = nx_http::calcHa1(
+    const auto passwordHa1 = nx::network::http::calcHa1(
         credentials.login.c_str(),
         tempPasswordData.realm.c_str(),
         credentials.password.c_str()).toStdString();

@@ -45,10 +45,10 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
     if (!result)
         return std::unique_ptr<AbstractStreamSocket>();
 
-#ifdef ENABLE_SSL
-    if (sslRequired || s_isSslEnforced)
-        result.reset(new deprecated::SslSocket(std::move(result), false));
-#endif // ENABLE_SSL
+//#ifdef ENABLE_SSL
+//    if (sslRequired || s_isSslEnforced)
+//        result.reset(new deprecated::SslSocket(std::move(result), false));
+//#endif // ENABLE_SSL
 
     return result;
 }
