@@ -54,6 +54,7 @@ should not allow to access /restore_password/sent /restore_password/success by d
     Close Browser
 
 should be able to set new password (which is same as old), redirect
+[tags]    not-ready
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -72,6 +73,7 @@ should be able to set new password (which is same as old), redirect
     Close Browser
 
 should set new password, login with new password
+[tags]    not-ready
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -93,6 +95,7 @@ should set new password, login with new password
     Close Browser
 
 should not allow to use one restore link twice
+[tags]    not-ready
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -116,6 +119,7 @@ should not allow to use one restore link twice
     Close Browser
 
 should make not-activated user active by restoring password
+[tags]    not-ready
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}

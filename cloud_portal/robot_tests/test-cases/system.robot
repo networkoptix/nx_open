@@ -115,6 +115,7 @@ rename button opens dialog; cancel closes without rename; save renames system
     Click Button    ${RENAME SAVE}
     Check For Alert    ${SYSTEM NAME SAVED}
     Verify In System    Auto Tests
+    Close Browser
 
 
 should open System page by link to not authorized user and redirect to homepage, if he does not log in
