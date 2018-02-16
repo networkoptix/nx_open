@@ -1,5 +1,6 @@
 #pragma once
 
+#include "nx/mediaserver/updates2/server_updates2_installer.h"
 #include <common/common_module_aware.h>
 #include <nx/update/manager/common_updates2_manager.h>
 
@@ -14,6 +15,8 @@ public:
     ~ServerUpdates2Manager();
 
 private:
+    ServerUpdates2Installer m_installer;
+
     virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() override;
     virtual void connectToSignals() override;
     virtual qint64 refreshTimeout() const override;
