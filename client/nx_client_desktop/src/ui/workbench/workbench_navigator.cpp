@@ -149,7 +149,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_recordingStartUtcMs(0),
     m_animatedPosition(0),
     m_previousMediaPosition(0),
-    m_positionAnimator(nullptr)
+    m_positionAnimator(nullptr),
+    m_mergedTimePeriods(decltype(m_mergedTimePeriods)())
 {
     /* We'll be using this one, so make sure it's created. */
     context()->instance<QnWorkbenchServerTimeWatcher>();
@@ -210,27 +211,25 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         auto chunksMergeTool = new QnThreadedChunksMergeTool();
         m_threadedChunksMergeTool[timePeriodType].reset(chunksMergeTool);
 
-        connect(chunksMergeTool, &QnThreadedChunksMergeTool::finished, this, [this, timePeriodType](int handle, const QnTimePeriodList &result)
-        {
-            if (handle != m_chunkMergingProcessHandle)
-                return;
-
-            if (timePeriodType == Qn::MotionContent)
+        connect(chunksMergeTool, &QnThreadedChunksMergeTool::finished, this,
+            [this, timePeriodType](int handle, const QnTimePeriodList& result)
             {
-                for (auto widget: m_syncedWidgets)
-                {
-                    if (auto archiveReader = widget->display()->archiveReader())
-                        archiveReader->setPlaybackMask(result);
-                }
-            }
+                if (handle != m_chunkMergingProcessHandle)
+                    return;
 
-            if (m_timeSlider)
-                m_timeSlider->setTimePeriods(SyncedLine, timePeriodType, result);
-            if (m_calendar)
-                m_calendar->setSyncedTimePeriods(timePeriodType, result);
-            if (m_dayTimeWidget)
-                m_dayTimeWidget->setSecondaryTimePeriods(timePeriodType, result);
-        });
+                m_mergedTimePeriods[timePeriodType] = result;
+
+                if (timePeriodType != Qn::RecordingContent && timePeriodType == selectedExtraContent())
+                    updatePlaybackMask();
+
+                if (m_timeSlider)
+                    m_timeSlider->setTimePeriods(SyncedLine, timePeriodType, result);
+                if (m_calendar)
+                    m_calendar->setSyncedTimePeriods(timePeriodType, result);
+                if (m_dayTimeWidget)
+                    m_dayTimeWidget->setSecondaryTimePeriods(timePeriodType, result);
+            });
+
         chunksMergeTool->start();
     }
 
@@ -2529,6 +2528,20 @@ void QnWorkbenchNavigator::updateSliderBookmarks()
     //     m_timeSlider->setBookmarks(m_bookmarkAggregation->bookmarkList());
 }
 
+void QnWorkbenchNavigator::updatePlaybackMask()
+{
+    const auto content = selectedExtraContent();
+    const auto mask = content != Qn::RecordingContent
+        ? m_mergedTimePeriods[content]
+        : QnTimePeriodList();
+
+    for (auto widget: m_syncedWidgets)
+    {
+        if (auto archiveReader = widget->display()->archiveReader())
+            archiveReader->setPlaybackMask(mask);
+    }
+}
+
 void QnWorkbenchNavigator::setAnalyticsFilter(const nx::analytics::storage::Filter& value)
 {
     if (auto loader = loaderByWidget(m_currentMediaWidget))
@@ -2547,4 +2560,6 @@ void QnWorkbenchNavigator::setSelectedExtraContent(Qn::TimePeriodContent value)
 
     if (value != Qn::RecordingContent)
         updateCurrentPeriods(value);
+
+    updatePlaybackMask();
 }

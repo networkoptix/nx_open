@@ -280,6 +280,8 @@ private:
 
     bool isCurrentWidgetSynced() const;
 
+    void updatePlaybackMask();
+
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
     QTime m_updateSliderTimer;
@@ -364,6 +366,8 @@ private:
 
     QnDisconnectHelperPtr m_currentWidgetConnections;
     QnDisconnectHelperPtr m_centralWidgetConnections;
+
+    std::array<QnTimePeriodList, Qn::TimePeriodContentCount> m_mergedTimePeriods;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);
