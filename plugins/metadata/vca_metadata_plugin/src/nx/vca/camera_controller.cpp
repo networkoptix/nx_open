@@ -126,37 +126,44 @@ namespace vca {
 
 namespace {
 
+struct RuleTuple
+{
+    int number=-1;
+    QByteArray parameter;
+    QByteArray value;
+};
+
 QByteArrayList splitRuleTable(QByteArray& ruleTable)
 {
-    // Rule table consists on lines that ends with \r\n.
+    // Rule table consists on lines that end with \r\n.
     QByteArrayList result = ruleTable.split('\n');
     for (auto& line: result)
-        line.chop(1); //< delete last '\r' symbol
+        line.chop(1); //< Delete last '\r' symbol.
     if (!result.isEmpty() && result.back().isEmpty())
         result.pop_back(); //< camera response often has final empty line
     return result;
 }
 
-//** @return tuple of (ruleNumber, ruleParameter, ruleParameterValue). */
-std::tuple<int, QByteArray, QByteArray> extractParameter(const QByteArray& line)
+RuleTuple extractParameter(const QByteArray& line)
 {
-    // The example of input line: "Eventprofile.P0.Notification.Tcp.enable=no".
+    // The example of input line: "Eventprofile.P3.Notification.Tcp.enable=no".
     // Here ruleName is 3, ruleParameter is "Notification.Tcp.enable", ruleParameterValue is "yes".
 
+    RuleTuple result;
     const int delimiterPos = line.indexOf('=');
     if (delimiterPos == -1)
-        return std::make_tuple(-1, QByteArray(), QByteArray());
+        return RuleTuple();
     const auto key = line.left(delimiterPos);
-    const auto value = line.mid(delimiterPos + 1);
+    result.value = line.mid(delimiterPos + 1);
     auto keyParts = key.split('.');
     if (keyParts.size() < 3)
-        return std::make_tuple(-1, QByteArray(), QByteArray());
-    const int ruleNumber = keyParts[1].mid(1).toInt();
+        return RuleTuple();
+    result.number = keyParts[1].mid(1).toInt();
 
     keyParts.removeFirst();
     keyParts.removeFirst(); //< Remove 2 first elements.
-    const auto ruleParameter = keyParts.join('.');
-    return std::make_tuple(ruleNumber, ruleParameter, value);
+    result.parameter = keyParts.join('.');
+    return result;
 }
 
 void filterOutUnnamedRules(std::map<int, SupportedRule>& rules)
@@ -176,29 +183,26 @@ std::map<int, SupportedRule> parseRuleTableLines(const QByteArrayList& lines)
     for (const auto& line: lines)
     {
         // There may be several '=' signs in a line, but we search leftmost.
-        int ruleNumber;
-        QByteArray parameter;
-        QByteArray value;
-        std::tie(ruleNumber, parameter, value) = extractParameter(line);
-        if (ruleNumber == -1)
+        RuleTuple ruleTuple = extractParameter(line);
+        if (ruleTuple.number == -1)
             continue;
 
-        rules[ruleNumber].profileId = ruleNumber;
-        if (parameter == "description")
+        rules[ruleTuple.number].profileId = ruleTuple.number;
+        if (ruleTuple.parameter == "description")
         {
-            rules[ruleNumber].description = value;
+            rules[ruleTuple.number].description = ruleTuple.value;
         }
-        else if (parameter == "enable")
+        else if (ruleTuple.parameter == "enable")
         {
-            rules[ruleNumber].ruleEnabled = (value == "yes");
+            rules[ruleTuple.number].ruleEnabled = (ruleTuple.value == "yes");
         }
-        else if (parameter == "name")
+        else if (ruleTuple.parameter == "name")
         {
-            rules[ruleNumber].name = value;
+            rules[ruleTuple.number].name = ruleTuple.value;
         }
-        else if (parameter == "Notification.Tcp.enable")
+        else if (ruleTuple.parameter == "Notification.Tcp.enable")
         {
-            rules[ruleNumber].tcpServerNotificationEnabled = (value == "yes");
+            rules[ruleTuple.number].tcpServerNotificationEnabled = (ruleTuple.value == "yes");
         }
     }
     return rules;
@@ -209,12 +213,9 @@ std::map<int, bool> parseTcpTableLines(const QByteArrayList& lines)
     std::map<int, bool> result;
     for (const auto& line: lines)
     {
-        int ruleNumber;
-        QByteArray parameter;
-        QByteArray value;
-        std::tie(ruleNumber, parameter, value) = extractParameter(line);
-        if(ruleNumber != -1 && parameter == "Notification")
-            result[ruleNumber] = (value == "yes");
+        RuleTuple ruleTuple = extractParameter(line);
+        if(ruleTuple.number != -1 && ruleTuple.parameter == "Notification")
+            result[ruleTuple.number] = (ruleTuple.value == "yes");
     }
 
     return result;
@@ -480,11 +481,11 @@ bool CameraController::readSupportedRulesTcpNotificationState()
 
     m_supportedRules = mergeRules(m_supportedRules, rules,
         [](const SupportedRule& oldRule, const SupportedRule& newRule)
-    {
-        SupportedRule result = oldRule;
-        result.tcpServerNotificationEnabled = newRule.tcpServerNotificationEnabled;
-        return result;
-    });
+        {
+            SupportedRule result = oldRule;
+            result.tcpServerNotificationEnabled = newRule.tcpServerNotificationEnabled;
+            return result;
+        });
 
     return true;
 }
@@ -531,7 +532,7 @@ bool CameraController::readTcpServerPort()
     if (portNumber == 0)
         return false; //< Incorrect cgi response.
 
-    m_tcpServerPort = static_cast<unsigned short>(portNumber);
+    m_tcpServerPort = static_cast<int16_t>(portNumber);
     return true;
 }
 

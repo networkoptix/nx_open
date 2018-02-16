@@ -9,16 +9,14 @@
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
 #include <nx/api/analytics/device_manifest.h>
+#include <nx/fusion/serialization/json.h>
 
 #include "nx/vca/camera_controller.h"
 
-// #mshevchenko is going to do smth with NX_PRINT/NX_DEBUG.
-//#include <nx/utils/log/log.h>
-//#define NX_DEBUG_STREAM nx::utils::log::detail::makeStream(nx::utils::log::Level::debug, "VCA")
-
+#include <nx/utils/log/log.h>
+#define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
+    nx::utils::log::Level::debug, "vca_metadata_plugin") NX_PRINT_PREFIX
 #include <nx/kit/debug.h>
-
-#include <nx/fusion/serialization/json.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -65,8 +63,7 @@ nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
     return packet;
 }
 
-static const int kEventMessageParameterCount = 9;
-static const std::array<QByteArray, kEventMessageParameterCount> kEventMessageKeys = {
+static const std::vector<QByteArray> kEventMessageKeys = {
     "ip",
     "unitname",
     "datetime",
@@ -78,43 +75,42 @@ static const std::array<QByteArray, kEventMessageParameterCount> kEventMessageKe
     "rulesdts",
 };
 
-// Values of event message parameters may contain names form kEventMessageParameterNames, so to
-// avoid search errors we extend key strings with '\n' symbol, '=' symbol is added for convenience.
-static const std::array<QByteArray, kEventMessageParameterCount> kEventMessageSearchKeys = {
-    "\nip=",
-    "\nunitname=",
-    "\ndatetime=",
-    "\ndts=",
-    "\ntype=",
-    "\ninfo=",
-    "\nid=",
-    "\nrulesname=",
-    "\nrulesdts=",
-};
+std::vector<QByteArray> decorate(const std::vector<QByteArray>& source)
+{
+    std::vector<QByteArray> result;
+    result.reserve(source.size());
+    static const QByteArray prefix("\n");
+    static const QByteArray postfix("=");
+    for (const QByteArray sourceLine : source)
+        result.emplace_back(prefix + sourceLine + postfix);
+    return result;
+}
 
-std::pair<const char*, const char*> findString(const char* msg, const char* end,
+static const std::vector<QByteArray> kEventMessageSearchKeys(decorate(kEventMessageKeys));
+
+std::pair<const char*, const char*> findString(const char* messageBegin, const char* messageEnd,
     const QByteArray& key)
 {
-    const char* keyValue = std::search(msg, end, key.begin(), key.end());
-    if (keyValue == end)
-        return std::make_pair(msg, msg);
+    const char* keyValue = std::search(messageBegin, messageEnd, key.begin(), key.end());
+    if (keyValue == messageEnd)
+        return std::make_pair(messageBegin, messageBegin);
     const char* Value = keyValue + key.size();
-    const char* ValueEnd = std::find(Value, end, '\n');
+    const char* ValueEnd = std::find(Value, messageEnd, '\n');
     return std::make_pair(Value, ValueEnd);
 }
 
-EventMessage parseMessage(const char* msg, int len)
+EventMessage parseMessage(const char* message, int messageLength)
 {
-    const char* cur = msg;
-    const char* end = msg + len;
+    const char* current = message;
+    const char* end = message + messageLength;
     EventMessage eventMessage;
 
-    for (int i = 0; i < kEventMessageParameterCount; ++i)
+    for (int i = 0; i < kEventMessageSearchKeys.size(); ++i)
     {
-        auto view = findString(cur, end, kEventMessageSearchKeys[i]);
+        auto view = findString(current, end, kEventMessageSearchKeys[i]);
         QByteArray value = QByteArray(view.first, view.second - view.first);
         eventMessage.parameters.insert(std::make_pair(kEventMessageKeys[i], value));
-        cur = view.second;
+        current = view.second;
     }
     return eventMessage;
 }
@@ -167,10 +163,10 @@ nx::sdk::Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
 
     // Switch on VCA-camera heartbeat and set interval slightly less then kReceiveTimeout.
     if (!vcaCameraConrtoller.setHeartbeat(
-        nx::vca::Heartbeat(kReceiveTimeout - std::chrono::seconds(2),
-        /*enabled*/ true)))
+        nx::vca::Heartbeat(kReceiveTimeout - std::chrono::seconds(2), /*enabled*/ true)))
     {
         NX_PRINT << "Failed to set VCA-camera heartbeat";
+        return nx::sdk::Error::networkError;
     }
 
     return nx::sdk::Error::noError;
