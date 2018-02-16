@@ -1030,7 +1030,7 @@ protected:
     {
         const auto codeParts = QByteArray::fromBase64(
             lastActivationCode().code.c_str()).split(':');
-        ASSERT_EQ(2U, codeParts.size());
+        ASSERT_EQ(2, codeParts.size());
 
         api::AccountUpdateData update;
         const std::string password = nx::utils::generateRandomName(7).toStdString();
