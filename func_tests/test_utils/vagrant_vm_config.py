@@ -3,8 +3,6 @@
 Functional tests define configuration required for them indirectly (via 'vm' fixture) using VagrantVMConfig class.
 """
 
-from .utils import quote
-
 MEDIASERVER_LISTEN_PORT = 7001
 SSH_PORT_OFFSET=2220
 
@@ -40,29 +38,16 @@ class ConfigCommand(object):
             )
 
 
-def make_vm_provision_command(script, args=None, env=None):
-    kwargs = dict(path=quote(script))
-    if args:
-        kwargs['args'] = '[%s]' % ', '.join(quote(arg) for arg in args)
-    if env:
-        kwargs['env'] = '{%s}' % ', '.join('%s: %s' % (name, value) for name, value in env.items())
-    return ConfigCommand('provision', [':shell'], kwargs)
-
-
 class VagrantVMConfigFactory(object):
 
     def __init__(self, customization_company_name):
         self._customization_company_name = customization_company_name
 
-    def __call__(self, name=None, provision_scripts=None, must_be_recreated=False,
-                 required_file_list=None):
+    def __call__(self, name=None, must_be_recreated=False, required_file_list=None):
         vagrant_conf = []
         virtualbox_conf = []
         if not required_file_list:
             required_file_list = []
-        for script in provision_scripts or []:
-            vagrant_conf += [make_vm_provision_command(script)]
-            required_file_list.append('{test_dir}/' + script)
         return VagrantVMConfig(name, required_file_list,
                                vagrant_conf, virtualbox_conf, must_be_recreated)
 
