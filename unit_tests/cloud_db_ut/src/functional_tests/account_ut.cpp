@@ -1080,7 +1080,7 @@ protected:
             m_inviteNotifications.back().message.code.c_str()).split(':');
 
         api::AccountUpdateData update;
-        const std::string password = nx::utils::generateRandomName(7);
+        const std::string password = nx::utils::generateRandomName(7).toStdString();
         update.passwordHa1 = nx_http::calcHa1(
             m_newAccountEmail.c_str(),
             nx::network::AppInfo::realm().toStdString().c_str(),
