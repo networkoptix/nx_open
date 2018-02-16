@@ -469,6 +469,8 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     logSettings.maxFileSize = 10 * 1024 * 1024;
     logSettings.maxBackupCount = 5;
     logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+    for (const auto& filter: startupParams.exceptionFilters.split(L';', QString::SkipEmptyParts))
+        logSettings.exceptionFilers.insert(filter); //< Remove in 4.0.
 
     nx::utils::log::initialize(
         logSettings,
