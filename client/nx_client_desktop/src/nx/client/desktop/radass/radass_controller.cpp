@@ -55,7 +55,7 @@ static constexpr int kSlowNetworkFrameLimit = 3;
 // Item will go to LQ if it is small for this period of time already.
 static constexpr int kLowerSmallItemQualityIntervalMs = 1000;
 
-static constexpr int kAutomaticSpeed = std::numeric_limits<int>().max();
+static constexpr int kAutomaticSpeed = std::numeric_limits<int>::max();
 
 bool isForcedHqDisplay(QnCamDisplay* display)
 {
@@ -274,17 +274,15 @@ struct RadassController::Private
             if (condition && !condition(display))
                 continue;
 
-            QSize size = display->getMaxScreenSize();
-            qint64 screenSquare = size.width() * size.height();
+            const QSize size = display->getMaxScreenSize();
+            const qint64 screenSquare = size.width() * size.height();
 
-            // Using pixels per second for more granular sorting.
-            QSize res = display->getVideoSize();
-            int pps = res.width() * res.height() * display->getAvarageFps();
+            static const int kMaximumValue = std::numeric_limits<int>::max();
 
             // Put display with max pps to the beginning, so if slow stream do HQ->LQ for max pps
             // display (between displays with same size).
-            static const int kMaximumValue = std::numeric_limits<int>().max();
-            pps = kMaximumValue - pps;
+            const QSize res = display->getVideoSize();
+            const int pps = kMaximumValue - (res.width() * res.height());
 
             consumerByScreenSize.insert((screenSquare << 32) + pps, info);
         }
