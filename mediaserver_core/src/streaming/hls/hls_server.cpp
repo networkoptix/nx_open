@@ -264,7 +264,7 @@ namespace nx_hls
         }
         m_currentFileName = fileName.toString();
 
-        const int extensionSepPos = fileName.indexOf( QChar('.') );
+        const int extensionSepPos = fileName.lastIndexOf( QChar('.') );
         const QStringRef& extension = extensionSepPos != -1 ? fileName.mid( extensionSepPos+1 ) : QStringRef();
         const QStringRef& shortFileName = fileName.mid( 0, extensionSepPos );
 
@@ -668,7 +668,7 @@ namespace nx_hls
         }
 
         QUrl baseChunkUrl;
-        baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() );
+        baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() + ".ts" );
 
         //if needed, adding proxy information to playlist url
         nx_http::HttpHeaders::const_iterator viaIter = request.headers.find( "Via" );
