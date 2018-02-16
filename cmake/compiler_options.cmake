@@ -42,7 +42,6 @@ endif()
 if(ANDROID OR IOS)
     remove_definitions(
         -DENABLE_SENDMAIL
-        -DENABLE_DATA_PROVIDERS
         -DENABLE_SOFTWARE_MOTION_DETECTION
     )
 endif()

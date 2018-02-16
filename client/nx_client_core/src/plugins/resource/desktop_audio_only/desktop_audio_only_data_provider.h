@@ -39,7 +39,8 @@ private:
     {
         ~AudioSourceInfo()
         {
-            input->stop();
+            if (input)
+                input->stop();
             if (speexPreprocessState)
             {
                 speex_preprocess_state_destroy(speexPreprocessState);

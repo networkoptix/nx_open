@@ -85,21 +85,28 @@ QnAudioDeviceInfo QnVideoRecorderSettings::getDeviceByName(const QString& _name,
     if (name == QObject::tr("None"))
         return QnAudioDeviceInfo();
 
+    qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(mode))
     {
+        qDebug() <<"<<<<<<" << info.deviceName();
         if (name.startsWith(info.deviceName())) {
             if (--devNum == 0)
+            {
+                qDebug() << "++++ return device" << info.deviceName();
                 return QnAudioDeviceInfo(info, _name);
+            }
         }
     }
 
     if (isDefault)
         *isDefault = true;
+    qDebug() << "------- return default device" << QAudioDeviceInfo::defaultInputDevice().deviceName();
     return QnAudioDeviceInfo(QAudioDeviceInfo::defaultInputDevice(), QString());
 }
 
 QnAudioDeviceInfo QnVideoRecorderSettings::primaryAudioDevice() const
 {
+    bool defDevice = false;
     return getDeviceByName(settings.value(QLatin1String("primaryAudioDevice")).toString(), QAudio::AudioInput);
 }
 

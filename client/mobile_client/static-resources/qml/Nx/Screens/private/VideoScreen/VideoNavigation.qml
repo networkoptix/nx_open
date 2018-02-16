@@ -406,17 +406,33 @@ Item
 
             IconButton
             {
+                id: streamButton
                 icon: lp("images/plus.png")
                 anchors.right: ptzButton.visible ? ptzButton.left : parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 visible: twoWayAudioController.available
 
+                Connections
+                {
+                    target: twoWayAudioController
+                    onStartedChanged:
+                    {
+                        streamButton.icon = twoWayAudioController.started
+                            ? lp("images/minus.png")
+                            : lp("images/plus.png");
+                    }
+                }
+
                 onClicked:
                 {
                     if (twoWayAudioController.started)
+                    {
                         twoWayAudioController.stop()
+                    }
                     else
+                    {
                         twoWayAudioController.start();
+                    }
                 }
 
                 Binding

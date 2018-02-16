@@ -21,7 +21,7 @@ namespace
     const auto kDefaultChannelCount = 1;
     const auto kDefaultCodec = lit("audio/pcm");
     const auto kEncoderCodecName = lit("mp2"); // libmp3lame
-    const auto kSingleChannelBitrate = 64000;
+    const auto kSingleChannelBitrate = 32000;
 }
 
 QnDesktopAudioOnlyDataProvider::QnDesktopAudioOnlyDataProvider(QnResourcePtr ptr) :
@@ -76,7 +76,9 @@ void QnDesktopAudioOnlyDataProvider::resizeBuffers()
 
 void QnDesktopAudioOnlyDataProvider::startInputs()
 {
-    for(auto& info: m_audioSourcesInfo)
+
+    const auto info = m_audioSourcesInfo.front();
+    //for(auto& info: m_audioSourcesInfo)
     {
         info->ioDevice =
             info->input->start();
@@ -216,38 +218,51 @@ bool QnDesktopAudioOnlyDataProvider::initInputDevices()
     {
         sourceInfo.reset(new AudioSourceInfo());
         sourceInfo->deviceInfo = static_cast<QAudioDeviceInfo>(secondaryAudioDevice);
-        m_audioSourcesInfo.push_back(sourceInfo);
+        //m_audioSourcesInfo.push_back(sourceInfo);
     }
 
 
+    using AudioInputPair = QPair<QAudioInput*, QAudioFormat>;
+
+    const auto createDevice =
+        [](const QAudioDeviceInfo& info) -> AudioInputPair
+        {
+            for (const auto sampleRate: info.supportedSampleRates())
+            {
+                for (const auto byteOrder: info.supportedByteOrders())
+                {
+                    for (const auto channelCount: info.supportedChannelCounts())
+                    {
+                        for (const auto codec: info.supportedCodecs())
+                        {
+                            for (const auto size: info.supportedSampleSizes())
+                            {
+                                for (const auto type: info.supportedSampleTypes())
+                                {
+                                    QAudioFormat format;
+                                    format.setSampleRate(sampleRate);
+                                    format.setByteOrder(byteOrder);
+                                    format.setChannelCount(channelCount);
+                                    format.setCodec(codec);
+                                    format.setSampleSize(size);
+                                    format.setSampleType(type);
+
+                                    QScopedPointer<QAudioInput> input(
+                                        new QAudioInput(info, format));
+                                    if (input->error() == QAudio::NoError)
+                                        return AudioInputPair(input.take(), format);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return AudioInputPair(nullptr, QAudioFormat());
+        };
 
     for (auto& source: m_audioSourcesInfo)
     {
-        QAudioFormat format;
-
-        format.setSampleRate(kDefaultSampleRate);
-        format.setChannelCount(kDefaultChannelCount);
-        format.setSampleSize(kDefaultSampleSize);
-        format.setCodec(kDefaultCodec);
-        format.setByteOrder(QAudioFormat::LittleEndian);
-        format.setSampleType(QAudioFormat::SignedInt);
-
-        if (!source->deviceInfo.isFormatSupported(format))
-        {
-            qDebug() << "Default format is not supported, trying to use nearest";
-            format = source->deviceInfo.nearestFormat(format);
-        }
-
-        if (format.sampleSize() != kDefaultSampleSize ||
-            format.sampleType() != QAudioFormat::SignedInt)
-        {
-            qDebug() << "Wrong sample format";
-            m_lastErrorStr = tr("Sample format of input device %1 is not supported.")
-                .arg(source->deviceInfo.deviceName());
-            return false;
-        }
-
-        source->format = format;
+        source->format = source->deviceInfo.preferredFormat();
         source->input.reset(new QAudioInput(
             source->deviceInfo,
             source->format));
