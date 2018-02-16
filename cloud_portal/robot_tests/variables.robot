@@ -66,6 +66,9 @@ ${SUCCESS LOG IN BUTTON}              //div[@ng-model-options="{ updateOn: 'blur
 #In system settings
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
 ${RENAME SYSTEM}                      //button[@ng-click='rename()']
+${RENAME CANCEL}                      //form[@name='renameForm']//button[@ng-click='close()']
+${RENAME SAVE}                        //form[@name='renameForm']//button[@ng-click='checkForm()']
+${RENAME INPUT}                       //form[@name='renameForm']//input[@ng-model='model.systemName']
 ${DISCONNECT FROM MY ACCOUNT}         //button[@ng-click='delete()']
 ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//button[@ng-click='share()']
 ${SHARE BUTTON DISABLED}              //div[@process-loading='gettingSystem']//button[@ng-click='share()' and @ng-disabled='!system.isAvailable']
@@ -149,7 +152,7 @@ ${TEST FIRST NAME}                    testFirstName
 ${TEST LAST NAME}                     testLastName
 
 #Related to Auto Tests system
-${AUTO TESTS SYSTEM ID}                     b4939b35-5b98-492b-a092-27fe8efeef38
+${AUTO_TESTS SYSTEM ID}                     b4939b35-5b98-492b-a092-27fe8efeef38
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/following-sibling::span[contains(@class,'user-name')]
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..//button[@ng-click='checkForm()']
@@ -159,7 +162,7 @@ ${SYSTEMS TILE}                       //div[@ng-repeat="system in systems | filt
 #AUTOTESTS (with no space) is an offline system used for testing offline status on the systems page
 ${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
 ${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/..//button[@ng-click='checkForm()']
-${AUTOTESTS SYSTEM ID}                dd06f8bf-f7ea-49b3-96fc-fbc6742a2ad4
+${AUTOTESTS OFFLINE SYSTEM ID}                dd06f8bf-f7ea-49b3-96fc-fbc6742a2ad4
 
 #ASCII
 ${ESCAPE}                             \\27

@@ -67,27 +67,55 @@ has Share button, visible for admin and owner
     Log in to Auto Tests System    ${EMAIL ADMIN}
     Close Browser
 
-does not show Share button to viewer, advanced viewer, live viewer
+does not show Share button or Rename button to viewer, advanced viewer, live viewer
 #This allows the expected error to not run the close browser action
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL VIEWER}
     Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
     Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
     Log in to Auto Tests System    ${EMAIL ADV VIEWER}
     Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
     Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
     Log in to Auto Tests System    ${EMAIL LIVE VIEWER}
     Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
     Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Close Browser
+
+rename button opens dialog; cancel closes without rename; save renames system
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}
+    Click Button    ${RENAME CANCEL}
+    Wait Until Page Does Not Contain Element    //div[@modal-render='true']
+    Verify In System    Auto Tests
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
+    Clear Element Text    ${RENAME INPUT}
+    Input Text    ${RENAME INPUT}    Auto Tests Rename
+    Click Button    ${RENAME SAVE}
+    Check For Alert    ${SYSTEM NAME SAVED}
+    Verify In System    Auto Tests Rename
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
+    Clear Element Text    ${RENAME INPUT}
+    Input Text    ${RENAME INPUT}    Auto Tests
+    Click Button    ${RENAME SAVE}
+    Check For Alert    ${SYSTEM NAME SAVED}
+    Verify In System    Auto Tests
+
 
 should open System page by link to not authorized user and redirect to homepage, if he does not log in
     Open Browser and go to URL    ${url}/systems/${AUTO TESTS SYSTEM ID}
