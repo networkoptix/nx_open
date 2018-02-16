@@ -56,16 +56,13 @@ static network::SocketAddress findFreeTcpAndUdpLocalAddress()
 }
 
 MediatorFunctionalTest::MediatorFunctionalTest(int flags):
+    utils::test::TestWithTemporaryDirectory("hpm", QString()),
     m_testFlags(flags),
     m_stunPort(0),
     m_httpPort(0)
 {
     if (m_testFlags & initializeSocketGlobals)
         nx::network::SocketGlobals::cloud().reinitialize();
-
-    m_tmpDir = QDir::homePath() + "/hpm_ut.data";
-    QDir(m_tmpDir).removeRecursively();
-    QDir().mkpath(m_tmpDir);
 
     m_stunAddress = findFreeTcpAndUdpLocalAddress();
     NX_LOGX(lm("STUN TCP & UDP endpoint: %1").arg(m_stunAddress), cl_logINFO);
@@ -75,7 +72,7 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     addArg("-stun/addrToListenList", m_stunAddress.toStdString().c_str());
     addArg("-http/addrToListenList", network::SocketAddress::anyPrivateAddress.toStdString().c_str());
     addArg("-log/logLevel", "DEBUG2");
-    addArg("-general/dataDir", m_tmpDir.toLatin1().constData());
+    addArg("-general/dataDir", testDataDir().toLatin1().constData());
 
     if (m_testFlags & MediatorTestFlags::useTestCloudDataProvider)
         registerCloudDataProvider(&m_cloudDataProvider);
@@ -84,8 +81,6 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
 MediatorFunctionalTest::~MediatorFunctionalTest()
 {
     stop();
-
-    QDir(m_tmpDir).removeRecursively();
 
     if (m_factoryFuncToRestore)
     {

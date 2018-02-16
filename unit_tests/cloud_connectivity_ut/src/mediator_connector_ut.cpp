@@ -12,6 +12,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include <libconnection_mediator/src/mediator_process_public.h>
 #include <libconnection_mediator/src/mediator_service.h>
@@ -26,10 +27,12 @@ static const char* kCloudModulesXmlPath = "/MediatorConnector/cloud_modules.xml"
 
 template<typename CloudModuleListGenerator>
 class MediatorConnector:
-    public ::testing::Test
+    public ::testing::Test,
+    public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
-    MediatorConnector()
+    MediatorConnector():
+        nx::utils::test::TestWithTemporaryDirectory("mediator", QString())
     {
         m_factoryFuncToRestore =
             AbstractCloudDataProviderFactory::setFactoryFunc(
@@ -149,6 +152,7 @@ private:
         mediator->addArg("--cloud_db/runWithCloud=false");
         mediator->addArg("--http/addrToListenList=127.0.0.1:0");
         mediator->addArg("--stun/addrToListenList=127.0.0.1:0");
+        mediator->addArg("-general/dataDir", testDataDir().toStdString().c_str());
         ASSERT_TRUE(mediator->startAndWaitUntilStarted());
 
         m_mediator = std::move(mediator);
