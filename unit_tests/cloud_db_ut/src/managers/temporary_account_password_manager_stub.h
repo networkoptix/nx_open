@@ -37,6 +37,11 @@ public:
         const data::TemporaryAccountCredentials& tempPasswordData,
         data::Credentials* credentials) override;
 
+    virtual nx::utils::db::DBResult updateCredentialsAttributes(
+        nx::utils::db::QueryContext* const queryContext,
+        const data::Credentials& credentials,
+        const data::TemporaryAccountCredentials& tempPasswordData) override;
+
     virtual nx::utils::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
         nx::utils::db::QueryContext* const queryContext,
         std::string accountEmail) override;

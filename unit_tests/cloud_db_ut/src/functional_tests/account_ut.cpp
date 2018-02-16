@@ -1016,12 +1016,91 @@ class AccountInvite:
     using base_type = AccountNewTest;
 
 public:
+    AccountInvite():
+        m_timeShift(nx::utils::test::ClockType::system)
+    {
+    }
+
     ~AccountInvite()
     {
         EMailManagerFactory::setFactory(std::move(m_emailManagerFactoryBak));
     }
 
 protected:
+    void whenInvitedSameNotRegisteredUserToMultipleSystems()
+    {
+        for (auto& system: m_systems)
+        {
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                shareSystem(account(), system.id,
+                    m_newAccountEmail, api::SystemAccessRole::cloudAdmin));
+        }
+    }
+
+    void inviteUser()
+    {
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            shareSystem(account(), m_systems.front().id,
+                m_newAccountEmail, api::SystemAccessRole::cloudAdmin));
+    }
+
+    void waitForInviteLinkToExpire()
+    {
+        // TODO: Replace with corresponding setting value (probably, doubled).
+        m_timeShift.applyAbsoluteShift(std::chrono::hours(24) * 7);
+    }
+
+    void removeUserFromSystem()
+    {
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            removeSystemSharing(
+                account().email,
+                account().password,
+                m_systems.front().id,
+                m_newAccountEmail));
+    }
+
+    void thenSameInviteCodeHasBeenDelivered()
+    {
+        ASSERT_EQ(m_systems.size(), m_inviteNotifications.size());
+        std::set<std::string> inviteCodes;
+        for (const auto& notification: m_inviteNotifications)
+        {
+            inviteCodes.insert(notification.message.code);
+            ASSERT_EQ(1U, inviteCodes.size());
+        }
+    }
+
+    void assertAccountCanBeActivatedUsingLatestInviteLink()
+    {
+        const auto codeParts = QByteArray::fromBase64(
+            m_inviteNotifications.back().message.code.c_str()).split(':');
+
+        api::AccountUpdateData update;
+        const std::string password = nx::utils::generateRandomName(7).toStdString();
+        update.passwordHa1 = nx::network::http::calcHa1(
+            m_newAccountEmail.c_str(),
+            nx::network::AppInfo::realm().toStdString().c_str(),
+            password.c_str()).toStdString();
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            updateAccount(
+                codeParts[1].toStdString(),
+                codeParts[0].toStdString(),
+                update));
+    }
+
+private:
+    TestEmailManager m_emailManager;
+    std::string m_newAccountEmail;
+    std::vector<api::SystemData> m_systems;
+    EMailManagerFactory::FactoryFunc m_emailManagerFactoryBak;
+    std::vector<InviteUserNotification> m_inviteNotifications;
+    nx::utils::test::ScopedTimeShift m_timeShift;
+
     virtual void SetUp() override
     {
         using namespace std::placeholders;
@@ -1045,37 +1124,9 @@ protected:
         whenActivatedAccount();
 
         m_systems.resize(kSystemCount);
-        for (auto& system : m_systems)
+        for (auto& system: m_systems)
             system = addRandomSystemToAccount(account());
     }
-
-    void whenInvitedSameNotRegisteredUserToMultipleSystems()
-    {
-        for (auto& system: m_systems)
-        {
-            ASSERT_EQ(
-                api::ResultCode::ok,
-                shareSystem(account(), system.id, m_newAccountEmail, api::SystemAccessRole::cloudAdmin));
-        }
-    }
-
-    void thenSameInviteCodeHasBeenDelivered()
-    {
-        ASSERT_EQ(m_systems.size(), m_inviteNotifications.size());
-        std::set<std::string> inviteCodes;
-        for (const auto& notification: m_inviteNotifications)
-        {
-            inviteCodes.insert(notification.message.code);
-            ASSERT_EQ(1U, inviteCodes.size());
-        }
-    }
-
-private:
-    TestEmailManager m_emailManager;
-    std::string m_newAccountEmail;
-    std::vector<api::SystemData> m_systems;
-    EMailManagerFactory::FactoryFunc m_emailManagerFactoryBak;
-    std::vector<InviteUserNotification> m_inviteNotifications;
 
     void notificationReceived(const nx::cdb::AbstractNotification& notification)
     {
@@ -1090,6 +1141,17 @@ TEST_F(AccountInvite, invite_code_from_multiple_systems_match)
 {
     whenInvitedSameNotRegisteredUserToMultipleSystems();
     thenSameInviteCodeHasBeenDelivered();
+}
+
+TEST_F(AccountInvite, repeated_invite_after_last_invite_link_expiration)
+{
+    inviteUser();
+    waitForInviteLinkToExpire();
+    removeUserFromSystem();
+
+    inviteUser();
+
+    assertAccountCanBeActivatedUsingLatestInviteLink();
 }
 
 } // namespace test
