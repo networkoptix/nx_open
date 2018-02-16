@@ -78,6 +78,11 @@ public:
         const data::TemporaryAccountCredentials& tempPasswordData,
         data::Credentials* credentials) = 0;
 
+    virtual nx::utils::db::DBResult updateCredentialsAttributes(
+        nx::utils::db::QueryContext* const queryContext,
+        const data::Credentials& credentials,
+        const data::TemporaryAccountCredentials& tempPasswordData) = 0;
+
     virtual nx::utils::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
         nx::utils::db::QueryContext* const queryContext,
         std::string accountEmail) = 0;
@@ -133,6 +138,11 @@ public:
         nx::utils::db::QueryContext* const queryContext,
         const data::TemporaryAccountCredentials& tempPasswordData,
         data::Credentials* credentials) override;
+
+    virtual nx::utils::db::DBResult updateCredentialsAttributes(
+        nx::utils::db::QueryContext* const queryContext,
+        const data::Credentials& credentials,
+        const data::TemporaryAccountCredentials& tempPasswordData) override;
 
     virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const override;
@@ -205,6 +215,10 @@ private:
     std::string preparePasswordString(
         const std::string& passwordHa1,
         const std::string& password);
+
+    void updateCredentialsInCache(
+        const data::Credentials& credentials,
+        const data::TemporaryAccountCredentials& tempPasswordData);
 };
 
 } // namespace cdb

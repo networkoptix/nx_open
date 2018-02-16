@@ -495,6 +495,14 @@ nx::utils::db::DBResult AccountManager::createPasswordResetCode(
         NX_LOGX(lm("Found existing password reset code (%1) for account %2")
             .arg(credentials.password).arg(accountEmail), cl_logDEBUG2);
         temporaryPassword = credentials.password;
+
+        // Updating expiration time.
+        dbResultCode = m_tempPasswordManager->updateCredentialsAttributes(
+            queryContext,
+            credentials,
+            tempPasswordData);
+        if (dbResultCode != nx::utils::db::DBResult::ok)
+            return dbResultCode;
     }
     else
     {
@@ -650,8 +658,8 @@ nx::utils::db::DBResult AccountManager::issueAccountActivationCode(
     {
         auto emailVerificationCode = QnUuid::createUuid().toByteArray().toHex().toStdString();
         const auto codeExpirationTime =
-            QDateTime::currentDateTimeUtc().addSecs(
-                std::chrono::duration_cast<std::chrono::seconds>(
+            QDateTime::fromTime_t(
+                (nx::utils::timeSinceEpoch() +
                     m_settings.accountManager().accountActivationCodeExpirationTimeout).count());
 
         m_dao->insertEmailVerificationCode(
