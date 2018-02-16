@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QAbstractListModel>
+
 #include <core/resource/resource_fwd.h>
 
 class QnCustomizableItemDelegate;
@@ -10,11 +11,15 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-// Custom accessor to get a string with resource version.
-QVariant resourceVersionAccessor(QnResourcePtr ptr, int role);
+/**
+ * @return Custom accessor to get a string with resource version.
+ */
+QVariant resourceVersionAccessor(const QnResourcePtr& ptr, int role);
 
-// Creates column-specific delegate, that applies color to resource version.
-QnCustomizableItemDelegate * makeVersionStatusDelegate(QnWorkbenchContext* context, QObject* parent);
+/**
+ * @return Column-specific delegate, that applies color to resource version.
+ */
+QnCustomizableItemDelegate* makeVersionStatusDelegate(QnWorkbenchContext* context, QObject* parent);
 
 } // namespace desktop
 } // namespace client
