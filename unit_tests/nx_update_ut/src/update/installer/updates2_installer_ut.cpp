@@ -38,6 +38,10 @@ enum class ExpectedPrepareOutcome
     fail_alreadyRunning,
     fail_noUpdateJsonFile,
     fail_noExecutableKeyInUpdateJson,
+    fail_noExecutableFound,
+    fail_platformNotMatches,
+    fail_archNotMatches,
+    fail_modificationNotMatches,
 };
 
 class TestZipExtractor: public AbstractZipExtractor
@@ -75,6 +79,10 @@ public:
                     case ExpectedPrepareOutcome::success:
                     case ExpectedPrepareOutcome::fail_noUpdateJsonFile:
                     case ExpectedPrepareOutcome::fail_noExecutableKeyInUpdateJson:
+                    case ExpectedPrepareOutcome::fail_noExecutableFound:
+                    case ExpectedPrepareOutcome::fail_platformNotMatches:
+                    case ExpectedPrepareOutcome::fail_archNotMatches:
+                    case ExpectedPrepareOutcome::fail_modificationNotMatches:
                         return extractHandler(QnZipExtractor::Error::Ok);
                     case ExpectedPrepareOutcome::fail_noFreeSpace:
                         return extractHandler(QnZipExtractor::Error::NoFreeSpace);
@@ -89,6 +97,9 @@ public:
                         return extractHandler(QnZipExtractor::Error::Ok);
                     }
                     case ExpectedPrepareOutcome::fail_unknown:
+                        NX_ASSERT(false);
+                        break;
+                    default:
                         NX_ASSERT(false);
                         break;
                 }
@@ -206,6 +217,10 @@ private:
                 switch (expectedOutcome)
                 {
                     case ExpectedPrepareOutcome::success:
+                    case ExpectedPrepareOutcome::fail_noExecutableFound:
+                    case ExpectedPrepareOutcome::fail_platformNotMatches:
+                    case ExpectedPrepareOutcome::fail_archNotMatches:
+                    case ExpectedPrepareOutcome::fail_modificationNotMatches:
                         return QnSystemInformation(kValidPlatform, kValidArch, KValidModification);
                     default:
                         return QnSystemInformation();
@@ -220,6 +235,7 @@ private:
                 switch (expectedOutcome)
                 {
                     case ExpectedPrepareOutcome::success:
+                    case ExpectedPrepareOutcome::fail_noExecutableFound:
                         result[kPlatformKey] = kValidPlatform;
                         result[kArchKey] = kValidArch;
                         result[kModificationKey] = KValidModification;
@@ -229,6 +245,24 @@ private:
                         result[kPlatformKey] = kValidPlatform;
                         result[kArchKey] = kValidArch;
                         result[kModificationKey] = KValidModification;
+                        break;
+                    case ExpectedPrepareOutcome::fail_platformNotMatches:
+                        result[kPlatformKey] = kInValidPlatform;
+                        result[kArchKey] = kValidArch;
+                        result[kModificationKey] = KValidModification;
+                        result[kExecutableKey] = kExcutableName;
+                        break;
+                    case ExpectedPrepareOutcome::fail_archNotMatches:
+                        result[kPlatformKey] = kValidPlatform;
+                        result[kArchKey] = kInValidArch;
+                        result[kModificationKey] = KValidModification;
+                        result[kExecutableKey] = kExcutableName;
+                        break;
+                    case ExpectedPrepareOutcome::fail_modificationNotMatches:
+                        result[kPlatformKey] = kValidPlatform;
+                        result[kArchKey] = kValidArch;
+                        result[kModificationKey] = KInValidModification;
+                        result[kExecutableKey] = kExcutableName;
                         break;
                     default:
                         break;
@@ -251,17 +285,27 @@ private:
                     .Times(1)
                     .WillOnce(Return(m_extractorRef));
 
-                if (expectedOutcome == ExpectedPrepareOutcome::success)
+                if (expectedOutcome == ExpectedPrepareOutcome::success
+                    || expectedOutcome == ExpectedPrepareOutcome::fail_noExecutableFound
+                    || expectedOutcome == ExpectedPrepareOutcome::fail_platformNotMatches
+                    || expectedOutcome == ExpectedPrepareOutcome::fail_archNotMatches
+                    || expectedOutcome == ExpectedPrepareOutcome::fail_modificationNotMatches)
                 {
                     EXPECT_CALL(m_updates2Installer, updateInformation())
                         .Times(1)
                         .WillOnce(Return(createUpdateInformation()));
-                    EXPECT_CALL(m_updates2Installer, systemInformation())
-                        .Times(1)
-                        .WillOnce(Return(createSystemInformation()));
+
+                    if (expectedOutcome != ExpectedPrepareOutcome::fail_noExecutableFound)
+                    {
+                        EXPECT_CALL(m_updates2Installer, systemInformation())
+                            .Times(1)
+                            .WillOnce(Return(createSystemInformation()));
+                    }
+
                     EXPECT_CALL(m_updates2Installer, checkExecutable(_))
                         .Times(1)
-                        .WillOnce(Return(true));
+                        .WillOnce(Return(
+                            expectedOutcome != ExpectedPrepareOutcome::fail_noExecutableFound));
                 }
 
                 if (expectedOutcome == ExpectedPrepareOutcome::fail_noExecutableKeyInUpdateJson)
@@ -301,6 +345,10 @@ private:
                     .WillOnce(Return(createUpdateInformation()));
                 break;
             case ExpectedPrepareOutcome::fail_noExecutableKeyInUpdateJson:
+            case ExpectedPrepareOutcome::fail_modificationNotMatches:
+            case ExpectedPrepareOutcome::fail_archNotMatches:
+            case ExpectedPrepareOutcome::fail_platformNotMatches:
+            case ExpectedPrepareOutcome::fail_noExecutableFound:
                 prepareExtractorCalls(1);
                 break;
             case ExpectedPrepareOutcome::fail_unknown:
@@ -349,27 +397,28 @@ TEST_F(Updates2Installer, prepareFailed_noExecutableField)
     thenPrepareShouldEndWith(PrepareResult::updateContentsError);
 }
 
-// #TODO #akulikov implement rest check update information tests: fail_checkExecutableFailed,
-// fail_platformNotMatches, fail_archNotMatches, fail_modificationNotMatches
-
 TEST_F(Updates2Installer, prepareFailed_checkExecutableFailed)
 {
-
+    whenPrepareRequestIsIssued(ExpectedPrepareOutcome::fail_noExecutableFound);
+    thenPrepareShouldEndWith(PrepareResult::updateContentsError);
 }
 
 TEST_F(Updates2Installer, prepareFailed_platformNotMatches)
 {
-
+    whenPrepareRequestIsIssued(ExpectedPrepareOutcome::fail_platformNotMatches);
+    thenPrepareShouldEndWith(PrepareResult::updateContentsError);
 }
 
 TEST_F(Updates2Installer, prepareFailed_archNotMatches)
 {
-
+    whenPrepareRequestIsIssued(ExpectedPrepareOutcome::fail_archNotMatches);
+    thenPrepareShouldEndWith(PrepareResult::updateContentsError);
 }
 
 TEST_F(Updates2Installer, prepareFailed_modificationNotMatches)
 {
-
+    whenPrepareRequestIsIssued(ExpectedPrepareOutcome::fail_modificationNotMatches);
+    thenPrepareShouldEndWith(PrepareResult::updateContentsError);
 }
 
 } // namespace test
