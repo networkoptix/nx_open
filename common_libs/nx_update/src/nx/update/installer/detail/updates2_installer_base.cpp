@@ -130,6 +130,9 @@ PrepareResult Updates2InstallerBase::checkContents() const
 
 bool Updates2InstallerBase::install()
 {
+
+    // #TODO #akulikov Implement this
+
     //QString logFileName;
     //if (initializeUpdateLog(version, &logFileName))
     //    arguments.append(logFileName);
