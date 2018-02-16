@@ -83,7 +83,7 @@ public:
         put(handler);
     }
 
-    MOCK_METHOD0(install, void());
+    MOCK_METHOD0(install, bool());
 
     void setExpectedOutcome(PrepareExpectedOutcome expectedOutcome)
     {

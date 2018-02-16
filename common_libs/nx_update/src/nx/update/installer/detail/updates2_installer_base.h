@@ -14,9 +14,13 @@ class NX_UPDATE_API Updates2InstallerBase: public AbstractUpdates2Installer
 {
 public:
     virtual void prepareAsync(const QString& path, PrepareUpdateCompletionHandler handler) override;
-    virtual void install() override;
+    virtual bool install() override;
     virtual ~Updates2InstallerBase() override;
     virtual void stopSync() override;
+
+protected:
+    QString installerWorkDir() const;
+    PrepareResult checkContents() const;
 
 private:
     AbstractZipExtractorPtr m_extractor;
@@ -24,8 +28,6 @@ private:
     QnWaitCondition m_condition;
     bool m_running = false;
 
-    QString installerWorkDir() const;
-    PrepareResult checkContents() const;
 
     // These below should be overriden in Server{Client}Updates2Installer
     virtual QString dataDirectoryPath() const = 0;

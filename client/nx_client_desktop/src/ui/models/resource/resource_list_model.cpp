@@ -147,12 +147,10 @@ void QnResourceListModel::setCheckedResources(const QSet<QnUuid>& ids)
 int QnResourceListModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    // Added name column by default
-    int result = 1;
-    if (m_hasCheckboxes)
-        result++;
-    if (m_hasStatus)
-        result++;
+
+    int result = 1;     //< Added name column by default.
+    result += m_hasCheckboxes;
+    result += m_hasStatus;
     return result;
 }
 

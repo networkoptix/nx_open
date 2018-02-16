@@ -36,7 +36,7 @@ ServerUpdates2Manager::ServerUpdates2Manager(QnCommonModule* commonModule):
 
 ServerUpdates2Manager::~ServerUpdates2Manager()
 {
-    // #TODO #akulikov STOP installer here
+    m_installer.stopSync();
 }
 
 qint64 ServerUpdates2Manager::refreshTimeout() const
@@ -95,8 +95,7 @@ QString ServerUpdates2Manager::filePath() const
 
 update::detail::AbstractUpdates2Installer* ServerUpdates2Manager::installer()
 {
-    // #TODO #akulikov implement this correctly
-    return nullptr;
+    return &m_installer;
 }
 
 } // namespace updates2

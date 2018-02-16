@@ -57,11 +57,6 @@ public:
     Stream() {} //< Pre-C++17, the default constructor is not inherited via "using".
     using Helper::Helper;
 
-    Stream(Level level, const QString& tag):
-        Helper(level, tag)
-    {
-    }
-
     ~Stream()
     {
         if (!m_logger)

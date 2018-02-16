@@ -6,6 +6,7 @@
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/resource_command.h>
+#include <providers/live_stream_provider.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>

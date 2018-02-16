@@ -9,5 +9,5 @@ _logger = logging.getLogger(__name__)
 
 @pytest.mark.usefixtures('init_logging')
 def test_install(vm_factory, bin_dir):
-    vm = vm_factory('server')
+    vm = vm_factory()
     install_mediaserver(vm.guest_os_access, bin_dir / 'mediaserver.deb')
