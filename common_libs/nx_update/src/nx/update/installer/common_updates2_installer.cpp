@@ -1,5 +1,3 @@
-#pragma once
-
 #include "common_updates2_installer.h"
 #include <nx/update/installer/detail/zip_extractor.h>
 #include <nx/utils/log/log.h>
