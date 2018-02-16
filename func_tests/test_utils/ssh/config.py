@@ -2,12 +2,13 @@ from __future__ import print_function
 
 from textwrap import dedent
 
+from pathlib2 import Path
+
 
 class SSHConfig(object):
-    def __init__(self, ssh_dir):
-        ssh_dir.mkdir(exist_ok=True)
-        self.path = ssh_dir / 'config'
-        self._connections_dir = ssh_dir / 'connections'
+    def __init__(self, path):
+        self.path = path
+        self._connections_dir = Path('/tmp/func_tests')
         self._connections_dir.mkdir(exist_ok=True)
 
     def reset(self):
@@ -20,7 +21,7 @@ class SSHConfig(object):
             ConnectionAttempts 1
             ControlMaster auto
             ControlPersist 10m
-            ControlPath {connections_dir}/%r@%h:%p
+            ControlPath {connections_dir}/%r@%h:%p.ssh.sock
         ''').lstrip().format(connections_dir=self._connections_dir.resolve()))
 
     def add_host(self, hostname, alias=None, port=None, user=None, key_path=None):

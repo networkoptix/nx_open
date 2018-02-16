@@ -106,7 +106,7 @@ def pytest_addoption(parser):
 def run_options(request):
     work_dir = request.config.getoption('--work-dir').expanduser()
     work_dir.mkdir(exist_ok=True, parents=True)
-    common_ssh_config = SSHConfig(work_dir / 'ssh')
+    common_ssh_config = SSHConfig(work_dir / 'ssh.config')
     common_ssh_config.reset()
     vm_host_hostname = request.config.getoption('--vm-host')
     if vm_host_hostname:
