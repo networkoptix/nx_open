@@ -1741,24 +1741,32 @@ void QnWorkbenchNavigator::updateLines()
     }
     else
     {
-        bool isSearch = workbench()->currentLayout()->isSearchLayout();
-        bool isLocal = m_currentWidget && m_currentWidget->resource()->flags().testFlag(Qn::local);
-
-        bool hasNonLocalResource = !isLocal;
-        if (!hasNonLocalResource)
-        {
-            for (const QnResourceWidget* widget: m_syncedWidgets)
+        auto isNormalCamera =
+            [](const QnResourceWidget* widget)
             {
-                if (widget->resource() && !widget->resource()->flags().testFlag(Qn::local))
+                return widget
+                    && !widget->resource()->hasFlags(Qn::local)
+                    && !widget->resource()->hasFlags(Qn::wearable_camera);
+            };
+
+        bool isSearch = workbench()->currentLayout()->isSearchLayout();
+        bool currentIsNormal = isNormalCamera(m_currentWidget);
+
+        bool haveNormal = currentIsNormal;
+        if (!haveNormal)
+        {
+            for (const QnResourceWidget* widget : m_syncedWidgets)
+            {
+                if (isNormalCamera(widget))
                 {
-                    hasNonLocalResource = true;
+                    haveNormal = true;
                     break;
                 }
             }
         }
 
-        m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, !isSearch && !isLocal);
-        m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, !isSearch && hasNonLocalResource);
+        m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, !isSearch && currentIsNormal);
+        m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, !isSearch && haveNormal);
     }
 }
 
