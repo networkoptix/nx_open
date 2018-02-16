@@ -9,7 +9,7 @@ from pathlib2 import Path
 from test_utils.os_access import LocalAccess
 from test_utils.ssh.sshd import optimize_sshd
 from .os_access import ProcessError, SshAccess
-from .vagrant_vm_config import DEFAULT_NATNET1, VagrantVMConfig
+from .vagrant_vm_config import VagrantVMConfig
 from .virtualbox_management import VirtualboxManagement
 
 log = logging.getLogger(__name__)
@@ -180,11 +180,10 @@ class VagrantVMFactory(object):
 
     def _write_vagrantfile(self, vm_config_list):
         expanded_vms_config_list = [
-            config.expand(self._virtualbox_vm) for config in vm_config_list]
+            config.expand() for config in vm_config_list]
         template_file_path = TEST_UTILS_DIR / 'Vagrantfile.jinja2'
         template = jinja2.Template(template_file_path.read_text())
         vagrantfile = template.render(
-            natnet1=DEFAULT_NATNET1,
             template_file_path=template_file_path,
             vms=expanded_vms_config_list)
         self._host_os_access.write_file(self._vagrant_file_path, vagrantfile.encode())

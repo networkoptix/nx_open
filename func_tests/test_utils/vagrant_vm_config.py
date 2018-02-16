@@ -3,12 +3,8 @@
 Functional tests define configuration required for them indirectly (via 'vm' fixture) using VagrantVMConfig class.
 """
 
-from netaddr import IPNetwork
+from .utils import quote
 
-from .utils import is_list_inst, quote
-
-DEFAULT_NATNET1 = '10.10.0/24'
-DEFAULT_PRIVATE_NET = '10.10.1/24'
 MEDIASERVER_LISTEN_PORT = 7001
 SSH_PORT_OFFSET=2220
 
@@ -58,18 +54,16 @@ class VagrantVMConfigFactory(object):
     def __init__(self, customization_company_name):
         self._customization_company_name = customization_company_name
 
-    # ip_address may end with .0 (like 1.2.3.0); this will be treated as network address, and dhcp will be used for it
-    def __call__(self, name=None, provision_scripts=None, must_be_recreated=False, ip_address_list=None,
+    def __call__(self, name=None, provision_scripts=None, must_be_recreated=False,
                  required_file_list=None):
         vagrant_conf = []
         virtualbox_conf = []
-        ip_address_list = map(IPNetwork, ip_address_list or [DEFAULT_PRIVATE_NET])
         if not required_file_list:
             required_file_list = []
         for script in provision_scripts or []:
             vagrant_conf += [make_vm_provision_command(script)]
             required_file_list.append('{test_dir}/' + script)
-        return VagrantVMConfig(name, ip_address_list, required_file_list,
+        return VagrantVMConfig(name, required_file_list,
                                vagrant_conf, virtualbox_conf, must_be_recreated)
 
 
@@ -79,7 +73,6 @@ class VagrantVMConfig(object):
     def from_dict(cls, d):
         return cls(
             name=d['name'],
-            ip_address_list=map(IPNetwork, d['ip_address_list']),
             required_file_list=d['required_file_list'],
             vagrant_conf=[ConfigCommand.from_dict(command) for command in d['vagrant_conf']],
             virtualbox_conf=[ConfigCommand.from_dict(command) for command in d['virtualbox_conf']],
@@ -88,12 +81,10 @@ class VagrantVMConfig(object):
             vm_port_base=d['vm_port_base'],
             )
 
-    def __init__(self, name, ip_address_list, required_file_list,
+    def __init__(self, name, required_file_list,
                  vagrant_conf, virtualbox_conf, must_be_recreated=False,
                  idx=None, vm_name_prefix=None, vm_port_base=None):
-        assert is_list_inst(ip_address_list, IPNetwork), repr(ip_address_list)
         self.name = name
-        self.ip_address_list = ip_address_list
         self.required_file_list = required_file_list
         self.vagrant_conf = vagrant_conf
         self.virtualbox_conf = virtualbox_conf
@@ -112,7 +103,6 @@ class VagrantVMConfig(object):
     def to_dict(self):
         return dict(
             name=self.name,
-            ip_address_list=map(str, self.ip_address_list),
             required_file_list=self.required_file_list,
             vagrant_conf=[command.to_dict() for command in self.vagrant_conf],
             virtualbox_conf=[command.to_dict() for command in self.virtualbox_conf],
@@ -124,7 +114,6 @@ class VagrantVMConfig(object):
     def clone(self, idx, vm_name_prefix, vm_port_base):
         return VagrantVMConfig(
             name=self.name,
-            ip_address_list=self.ip_address_list,
             required_file_list=self.required_file_list,
             vagrant_conf=self.vagrant_conf,
             virtualbox_conf=self.virtualbox_conf,
@@ -134,8 +123,7 @@ class VagrantVMConfig(object):
             )
 
     def matches(self, other):
-        return (self.ip_address_list == other.ip_address_list
-                and sorted(self.required_file_list) == sorted(other.required_file_list)
+        return (sorted(self.required_file_list) == sorted(other.required_file_list)
                 and self.vagrant_conf == other.vagrant_conf
                 and self.virtualbox_conf == other.virtualbox_conf)
 
@@ -161,7 +149,7 @@ class VagrantVMConfig(object):
     def ssh_forwarded_port(self):
         return self.vm_port_base + SSH_PORT_OFFSET + self.idx
 
-    def expand(self, virtualbox_management):
+    def expand(self):
         return ExpandedVagrantVMConfig(
             vagrant_name=self.vagrant_name,
             virtualbox_name=self.virtualbox_name,
