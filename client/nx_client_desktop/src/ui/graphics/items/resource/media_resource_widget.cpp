@@ -1812,7 +1812,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
     if (statusOverlay == Qn::AnalogWithoutLicenseOverlay)
         return Qn::MainWindow_MediaItem_AnalogLicense_Help;
 
-    if (statusOverlay == Qn::OfflineOverlay)
+    if (statusOverlay == Qn::OfflineOverlay || statusOverlay == Qn::oldFirmwareOverlay)
         return Qn::MainWindow_MediaItem_Diagnostics_Help;
 
     if (statusOverlay == Qn::UnauthorizedOverlay)
@@ -2098,6 +2098,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     if (d->isPlayingLive() && d->camera && d->camera->hasFlags(Qn::wearable_camera))
         return Qn::NoLiveStreamOverlay;
 
+    if (d->camera && d->camera->hasCameraCapabilities(Qn::isOldFirmwareCapability))
+        return Qn::oldFirmwareOverlay;
+
     if (d->isOffline())
         return Qn::OfflineOverlay;
 
@@ -2108,7 +2111,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     {
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
-			
+
 
         const Qn::Permission requiredPermission = d->isPlayingLive()
             ? Qn::ViewLivePermission
@@ -2223,6 +2226,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
             return Qn::ResourceOverlayButton::Empty;
         }
 
+        case Qn::oldFirmwareOverlay:
         case Qn::OfflineOverlay:
         {
             return menu()->canTrigger(action::CameraDiagnosticsAction, d->camera)
