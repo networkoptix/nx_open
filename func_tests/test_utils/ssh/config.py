@@ -12,10 +12,12 @@ class SSHConfig(object):
 
     def reset(self):
         self.path.write_text(dedent(u'''
-            PasswordAuthentication no
+            BatchMode yes
+            EscapeChar none
             StrictHostKeyChecking no
             UserKnownHostsFile /dev/null
-            ControlMaster auto
+            ConnectTimeout 1
+            ConnectionAttempts 1
             ControlMaster auto
             ControlPersist 10m
             ControlPath {connections_dir}/%r@%h:%p
