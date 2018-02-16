@@ -21,7 +21,7 @@ class SSHConfig(object):
             ControlMaster auto
             ControlPersist 10m
             ControlPath {connections_dir}/%r@%h:%p
-        ''').lstrip().format(connections_dir=self._connections_dir))
+        ''').lstrip().format(connections_dir=self._connections_dir.resolve()))
 
     def add_host(self, hostname, alias=None, port=None, user=None, key_path=None):
         lines = []
