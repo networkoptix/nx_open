@@ -7,7 +7,6 @@
 namespace nx {
 namespace utils {
 
-// ScopedGarbageCollector should be relocated to some other module. Ask Roma where to.
 /**
 * Scoped Garbage Collector.
 * Declare
