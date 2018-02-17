@@ -250,7 +250,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type == 'image/jpeg';}).src;
 
-            if((Config.allowBetaMode && window.chrome) || $scope.debugMode){
+            if((Config.allowBetaMode || $scope.debugMode) && jscd.browser.toLowerCase() == 'chrome'){
                 var streamInfo = {};
                 var streamType = "webm";
 
