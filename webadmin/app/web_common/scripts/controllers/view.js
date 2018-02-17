@@ -322,11 +322,6 @@ angular.module('nxCommon').controller('ViewCtrl',
             }*/
         };
 
-        if($scope.betaMode && jscd.browser.toLowerCase() == 'chrome'){
-            $scope.voiceControls = {enabled:true,showCommands:true};
-            voiceControl.initControls($scope);
-        }
-
         //On player error update source to cause player to restart
         $scope.crashCount = 0;
 
@@ -477,6 +472,10 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.ready = true;
             $timeout(updateHeights);
             $scope.camerasProvider.startPoll();
+            if(($scope.betaMode || $scope.debugMode) && jscd.browser.toLowerCase() == 'chrome'){
+                $scope.voiceControls = {enabled:true,showCommands:true};
+                voiceControl.initControls($scope);
+            }
         });
 
         // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%
