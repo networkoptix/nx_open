@@ -515,7 +515,6 @@ private:
     std::shared_ptr<AsyncHttpClient> m_obj;
 };
 
-
 /**
  * Helper function that uses nx_http::AsyncHttpClient for file download.
  * @param completionHandler <OS error code, status code, message body>.
@@ -527,20 +526,11 @@ private:
  */
 void NX_NETWORK_API downloadFileAsync(
     const QUrl& url,
-    std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)>
-        completionHandler,
-    const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
-    AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
-    AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
-
-void NX_NETWORK_API downloadFileAsync2(
-    const QUrl& url,
     std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType, nx_http::HttpHeaders)>
         completionHandler,
     const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
     AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
     AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
-
 
 /**
  * Calls previous function and waits for completion.
@@ -555,17 +545,11 @@ SystemError::ErrorCode NX_NETWORK_API downloadFileSync(
  */
 void NX_NETWORK_API downloadFileAsyncEx(
     const QUrl& url,
-    std::function<void(SystemError::ErrorCode, int /*statusCode*/,
-        nx_http::StringType /*contentType*/, nx_http::BufferType /*msgBody */)> completionHandler,
-    const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
-    AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
-    AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
-
-void downloadFileAsyncEx(
-    const QUrl& url,
-    std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)>
-        completionHandler,
-    nx_http::AsyncHttpClientPtr httpClientCaptured);
+    std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType,
+        nx_http::HttpHeaders)> completionHandler,
+    const nx_http::HttpHeaders& extraHeaders,
+    AsyncHttpClient::AuthType authType,
+    AsyncHttpClient::Timeouts timeouts);
 
 typedef std::function<void(SystemError::ErrorCode, int httpStatus)> UploadCompletionHandler;
 

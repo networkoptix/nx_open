@@ -413,7 +413,8 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
     if ((actionParameters.requestType == nx_http::Method::get) ||
         (actionParameters.requestType.isEmpty() && actionParameters.text.isEmpty()))
     {
-        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType messageBody)
+        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode,
+            nx_http::BufferType messageBody, nx_http::HttpHeaders /*httpHeaders*/)
         {
             if (osErrorCode != SystemError::noError ||
                 statusCode != nx_http::StatusCode::ok)

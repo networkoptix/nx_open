@@ -27,8 +27,8 @@ static void loadRemoteDataAsync(
     const QString& urlPath)
 {
     auto requestCompletionFunc =
-        [context, &outputData, server]
-        (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody)
+        [context, &outputData, server](SystemError::ErrorCode osErrorCode, int statusCode,
+            nx_http::BufferType msgBody, nx_http::HttpHeaders /*httpHeaders*/)
         {
             bool success = false;
             ApiServerHardwareIdsData remoteData;

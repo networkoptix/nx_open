@@ -324,7 +324,8 @@ bool QnPlAreconVisionResource::setRelayOutputState(
         [autoResetTimeoutMS, url](
             SystemError::ErrorCode errorCode,
             int statusCode,
-            nx_http::BufferType)
+            nx_http::BufferType,
+            nx_http::HttpHeaders)
         {
             if (errorCode != SystemError::noError ||
                 statusCode != nx_http::StatusCode::ok)
@@ -340,12 +341,13 @@ bool QnPlAreconVisionResource::setRelayOutputState(
                     resetOutputUrl.setQuery(lit("auxout=off"));
                     nx_http::downloadFileAsync(
                         resetOutputUrl,
-                        [](SystemError::ErrorCode, int, nx_http::BufferType){});
+                        [](SystemError::ErrorCode, int, nx_http::BufferType, nx_http::HttpHeaders){});
                 },
                 std::chrono::milliseconds(autoResetTimeoutMS));
         };
 
-    const auto emptyOutputDoneHandler = [](SystemError::ErrorCode, int, nx_http::BufferType) {};
+    const auto emptyOutputDoneHandler =
+        [](SystemError::ErrorCode, int, nx_http::BufferType, nx_http::HttpHeaders) {};
 
     if (activate && (autoResetTimeoutMS > 0))
         nx_http::downloadFileAsync(url, activateWithAutoResetDoneHandler);

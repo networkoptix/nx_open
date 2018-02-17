@@ -210,18 +210,21 @@ static DownloadResult downloadImage(
     // TODO: #rvasilenko implement raw format here
 
     DownloadResult result;
+
+    //[&] (SystemError::ErrorCode osStatus, int httpStatus, const nx_http::Response& response)
+
     auto requestCompletionFunc =
-    ///[&] (SystemError::ErrorCode osStatus, int httpStatus, const nx_http::Response& response)
-    [&](SystemError::ErrorCode osStatus, int httpStatus, nx_http::BufferType buffer, nx_http::HttpHeaders httpHeaders)
-    {
-            result.osStatus = osStatus;
-            result.httpStatus = (nx_http::StatusCode::Value) httpStatus;
-            result.body = std::move(buffer);
-            result.httpHeaders = std::move(httpHeaders);
-            context.executeGuarded([&context]() { context.requestProcessed(); });
+        [&l_result = result, &l_context = context](SystemError::ErrorCode osStatus, int httpStatus,
+            nx_http::BufferType buffer, nx_http::HttpHeaders httpHeaders)
+        {
+            l_result.osStatus = osStatus;
+            l_result.httpStatus = (nx_http::StatusCode::Value) httpStatus;
+            l_result.body = std::move(buffer);
+            l_result.httpHeaders = std::move(httpHeaders);
+            l_context.executeGuarded([&l_context]() { l_context.requestProcessed(); });
         };
 
-    runMultiserverDownloadRequest2(
+    runMultiserverDownloadRequest(
         server->commonModule()->router(),
         apiUrl,
         server,
@@ -232,8 +235,6 @@ static DownloadResult downloadImage(
     NX_DEBUG(typeid(QnMultiserverThumbnailRestHandler),
         lm("Request to '%1' finithed (%2) http status %3").args(
             apiUrl, SystemError::toString(result.osStatus), result.httpStatus));
-
-
 
     return result;
 }

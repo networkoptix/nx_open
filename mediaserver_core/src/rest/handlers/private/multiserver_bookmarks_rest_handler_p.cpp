@@ -49,8 +49,10 @@ namespace
         QUrl url,
         Context *ctx)
     {
-        auto requestCompletionFunc = [ctx] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) {
-            QN_UNUSED(osErrorCode, statusCode, msgBody);
+        auto requestCompletionFunc = [ctx] (SystemError::ErrorCode osErrorCode, int statusCode,
+            nx_http::BufferType msgBody, nx_http::HttpHeaders httpHeaders)
+        {
+            QN_UNUSED(osErrorCode, statusCode, msgBody, httpHeaders);
             ctx->executeGuarded([ctx]()
             {
                 ctx->requestProcessed();
@@ -65,7 +67,8 @@ namespace
         QnMultiServerCameraBookmarkList& outputData,
         const QnMediaServerResourcePtr &server, QnGetBookmarksRequestContext* ctx)
     {
-        auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
+        auto requestCompletionFunc = [ctx, &outputData](SystemError::ErrorCode osErrorCode,
+            int statusCode, nx_http::BufferType msgBody, nx_http::HttpHeaders /*httpHeaders*/)
         {
             QnCameraBookmarkList remoteData;
             bool success = false;
@@ -111,7 +114,8 @@ namespace
         const QnMediaServerResourcePtr &server,
         QnGetBookmarkTagsRequestContext* ctx)
     {
-        auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
+        auto requestCompletionFunc = [ctx, &outputData](SystemError::ErrorCode osErrorCode,
+            int statusCode, nx_http::BufferType msgBody, nx_http::HttpHeaders /*httpHeaders*/)
         {
             QnCameraBookmarkTagList remoteData;
             bool success = false;
