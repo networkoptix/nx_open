@@ -90,6 +90,7 @@ should open System page by link not authorized user, and show alert if logs in a
     Close Browser
 
 rename button opens dialog; cancel closes without rename; save renames system when offline
+    [tags]    not-ready
     Open Browser and go to URL    ${url}
     Log in to Autotests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}

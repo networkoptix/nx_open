@@ -103,6 +103,7 @@ does not show Share button or Rename button to viewer, advanced viewer, live vie
     Close Browser
 
 rename button opens dialog; cancel closes without rename; save renames system
+    [tags]    not-ready
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
