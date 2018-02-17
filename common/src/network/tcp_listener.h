@@ -65,7 +65,7 @@ public:
     */
     static void setPathIgnorePrefix(const QString& path);
 
-    /** Norlimize url path. cut off web prefix and '/' chars */
+    /** Normalize url path. cut off web prefix and '/' chars */
     static QString normalizedPath(const QString& path);
 
     virtual void applyModToRequest(nx_http::Request* /*request*/) {}
@@ -99,7 +99,5 @@ protected:
 
     QnTcpListenerPrivate *d_ptr;
 };
-
-
 
 #endif // __TCP_LISTENER_H__

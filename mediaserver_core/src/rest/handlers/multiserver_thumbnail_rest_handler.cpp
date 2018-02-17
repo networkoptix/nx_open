@@ -39,7 +39,7 @@ int QnMultiserverThumbnailRestHandler::executeGet(
     const QString& /*path*/,
     const QnRequestParamList& params,
     QByteArray& result, QByteArray& contentType,
-    const QnRestConnectionProcessor* processor )
+    const QnRestConnectionProcessor* processor)
 {
     auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(
         processor->commonModule()->resourcePool(), params);
@@ -52,12 +52,22 @@ int QnMultiserverThumbnailRestHandler::executeGet(
         processor->accessRights(), imageRequest.camera, requiredPermission))
     {
         return makeError(nx_http::StatusCode::forbidden,
-            lit("Access denied: Insufficent access rights"),
+            lit("Access denied: Insufficient access rights"),
             &result, &contentType, request.format, request.extraFormatting);
     }
 
     const auto ownerPort = processor->owner()->getPort();
-    return getScreenshot(processor->commonModule(), request, result, contentType, ownerPort);
+    qint64 frameTimestampUsec = 0;
+    auto httpResult = getScreenshot(processor->commonModule(), request, result, contentType, ownerPort,
+        &frameTimestampUsec);
+
+    if (httpResult == nx_http::StatusCode::ok)
+    {
+        auto& headers = processor->response()->headers;
+        nx_http::insertHeader(&headers,
+            nx_http::HttpHeader(Qn::FRAME_TIMESTAMP_US, QByteArray::number(frameTimestampUsec)));
+    }
+    return httpResult;
 }
 
 int QnMultiserverThumbnailRestHandler::getScreenshot(
@@ -65,7 +75,8 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(
     const QnThumbnailRequestData &request,
     QByteArray& result,
     QByteArray& contentType,
-    int ownerPort)
+    int ownerPort,
+    qint64* frameTimestamsUsec)
 {
     const auto& imageRequest = request.request;
 
@@ -93,9 +104,9 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(
 
     auto server = targetServer(commonModule, request);
     if (!server || server->getId() == commonModule->moduleGUID() || server->getStatus() != Qn::Online)
-        return getThumbnailLocal(request, result, contentType);
+        return getThumbnailLocal(request, result, contentType, frameTimestamsUsec);
 
-    return getThumbnailRemote(server, request, result, contentType, ownerPort);
+    return getThumbnailRemote(server, request, result, contentType, ownerPort, frameTimestamsUsec);
 }
 
 QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer(
@@ -115,7 +126,7 @@ QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer(
         imageRequest.msecSinceEpoch);
 }
 
-int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType ) const
+int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType, qint64* frameTimestampUsec) const
 {
     static const qint64 kUsecPerMs = 1000;
     const auto& imageRequest = request.request;
@@ -132,6 +143,8 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
         contentType = QByteArray();
         return nx_http::StatusCode::noContent;
     }
+    if(frameTimestampUsec)
+        *frameTimestampUsec = static_cast<qint64>(outFrame.data()->pkt_dts);
 
     QByteArray imageFormat = QnLexical::serialized<nx::api::CameraImageRequest::ThumbnailFormat>(imageRequest.imageFormat).toUtf8();
 
@@ -142,7 +155,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
     }
     else if (imageRequest.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::raw)
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Method is not implemeted");
+        NX_ASSERT(false, Q_FUNC_INFO, "Method is not implemented");
         // TODO: #rvasilenko implement me!!!
     }
     else
@@ -178,6 +191,7 @@ struct DownloadResult
     SystemError::ErrorCode osStatus = SystemError::notImplemented;
     nx_http::StatusCode::Value httpStatus = nx_http::StatusCode::internalServerError;
     QByteArray body;
+    nx_http::HttpHeaders httpHeaders;
 };
 
 static DownloadResult downloadImage(
@@ -197,21 +211,29 @@ static DownloadResult downloadImage(
 
     DownloadResult result;
     auto requestCompletionFunc =
-        [&] (SystemError::ErrorCode osStatus, int httpStatus, nx_http::BufferType body)
-        {
+    ///[&] (SystemError::ErrorCode osStatus, int httpStatus, const nx_http::Response& response)
+    [&](SystemError::ErrorCode osStatus, int httpStatus, nx_http::BufferType buffer, nx_http::HttpHeaders httpHeaders)
+    {
             result.osStatus = osStatus;
             result.httpStatus = (nx_http::StatusCode::Value) httpStatus;
-            result.body = std::move(body);
+            result.body = std::move(buffer);
+            result.httpHeaders = std::move(httpHeaders);
             context.executeGuarded([&context]() { context.requestProcessed(); });
         };
 
-    runMultiserverDownloadRequest(server->commonModule()->router(),
-        apiUrl, server, requestCompletionFunc, &context);
+    runMultiserverDownloadRequest2(
+        server->commonModule()->router(),
+        apiUrl,
+        server,
+        requestCompletionFunc,
+        &context);
 
     context.waitForDone();
     NX_DEBUG(typeid(QnMultiserverThumbnailRestHandler),
         lm("Request to '%1' finithed (%2) http status %3").args(
             apiUrl, SystemError::toString(result.osStatus), result.httpStatus));
+
+
 
     return result;
 }
@@ -221,7 +243,8 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
     const QnThumbnailRequestData &request,
     QByteArray& result,
     QByteArray& contentType,
-    int ownerPort ) const
+    int ownerPort,
+    qint64* frameTimestamsUsec) const
 {
     const auto response = downloadImage(server, request, ownerPort);
     if (response.osStatus != SystemError::noError)
@@ -244,6 +267,14 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
         contentType = (response.httpStatus == nx_http::StatusCode::ok)
             ? QByteArray("image/") + QnLexical::serialized(request.request.imageFormat).toUtf8()
             : QByteArray("application/json"); //< TODO: Provide content type from response.
+        if (frameTimestamsUsec)
+        {
+            const auto it = response.httpHeaders.find(Qn::FRAME_TIMESTAMP_US);
+            if (it != response.httpHeaders.end())
+            {
+                *frameTimestamsUsec = it->second.toLongLong(); //< 0 if conversion fails.
+            }
+        }
     }
 
     return response.httpStatus;

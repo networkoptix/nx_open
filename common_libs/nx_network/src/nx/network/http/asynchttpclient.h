@@ -533,6 +533,15 @@ void NX_NETWORK_API downloadFileAsync(
     AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
     AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
 
+void NX_NETWORK_API downloadFileAsync2(
+    const QUrl& url,
+    std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType, nx_http::HttpHeaders)>
+        completionHandler,
+    const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
+    AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
+    AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
+
+
 /**
  * Calls previous function and waits for completion.
  */

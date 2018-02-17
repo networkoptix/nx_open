@@ -63,6 +63,29 @@ void runMultiserverDownloadRequest(
 }
 
 template<typename Context, typename CompletionFunc>
+void runMultiserverDownloadRequest2(
+    QnRouter* router,
+    QUrl url,
+    const QnMediaServerResourcePtr &server,
+
+    //[&](SystemError::ErrorCode osStatus, int httpStatus, const nx_http::Response& response)
+    const CompletionFunc &requestCompletionFunc,
+    Context *context)
+{
+    const auto downloadRequest = [requestCompletionFunc]
+    (const QUrl &url, const nx_http::HttpHeaders &headers, Context *context)
+    {
+        context->executeGuarded([url, requestCompletionFunc, headers, context]()
+        {
+            nx_http::downloadFileAsync2(url, requestCompletionFunc, headers);
+            context->incRequestsCount();
+        });
+    };
+
+    runMultiserverRequest(router, url, downloadRequest, server, context);
+}
+
+template<typename Context, typename CompletionFunc>
 void runMultiserverUploadRequest(
     QnRouter* router,
     QUrl url,

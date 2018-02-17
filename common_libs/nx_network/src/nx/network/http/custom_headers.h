@@ -58,4 +58,6 @@ static const QByteArray CSRF_TOKEN_HEADER_NAME = "Nx-Vms-Csrf-Token";
 /** Url query item used in api/iomonitor and deprecated api/image. */
 static const QByteArray PHYSICAL_ID_URL_QUERY_ITEM = "cameraId";
 
+static const QByteArray FRAME_TIMESTAMP_US = "Frame-Timestamp";
+
 } // namespace Qn

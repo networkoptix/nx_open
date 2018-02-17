@@ -1463,6 +1463,55 @@ void AsyncHttpClient::setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody
 //-------------------------------------------------------------------------------------------------
 // Utilities.
 
+void downloadFileAsyncEx2(
+    const QUrl& url,
+    std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType, nx_http::HttpHeaders)> completionHandler,
+    nx_http::AsyncHttpClientPtr httpClientCaptured)
+{
+    auto requestCompletionFunc = [httpClientCaptured, completionHandler]
+    (nx_http::AsyncHttpClientPtr httpClient) mutable
+    {
+        httpClientCaptured->disconnect(nullptr, (const char*)nullptr);
+        httpClientCaptured.reset();
+
+        if (httpClient->failed())
+        {
+            completionHandler(
+                SystemError::connectionReset,
+                nx_http::StatusCode::ok,
+                nx_http::StringType(),
+                nx_http::BufferType(),
+                nx_http::HttpHeaders());
+            return;
+        }
+
+        if (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok &&
+            httpClient->response()->statusLine.statusCode != nx_http::StatusCode::partialContent)
+        {
+            completionHandler(
+                SystemError::noError,
+                httpClient->response()->statusLine.statusCode,
+                nx_http::StringType(),
+                nx_http::BufferType(),
+                nx_http::HttpHeaders());
+            return;
+        }
+
+        completionHandler(
+            SystemError::noError,
+            httpClient->response()->statusLine.statusCode,
+            httpClient->contentType(),
+            httpClient->fetchMessageBodyBuffer(),
+            httpClient->response()->headers);
+    };
+    QObject::connect(
+        httpClientCaptured.get(), &nx_http::AsyncHttpClient::done,
+        httpClientCaptured.get(), requestCompletionFunc,
+        Qt::DirectConnection);
+
+    httpClientCaptured->doGet(url);
+}
+
 void downloadFileAsyncEx(
     const QUrl& url,
     std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
@@ -1507,6 +1556,41 @@ void downloadFileAsyncEx(
         Qt::DirectConnection);
 
     httpClientCaptured->doGet(url);
+}
+
+void downloadFileAsyncEx2(
+    const QUrl& url,
+    std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType, nx_http::HttpHeaders)> completionHandler,
+    const nx_http::HttpHeaders& extraHeaders,
+    AsyncHttpClient::AuthType authType,
+    AsyncHttpClient::Timeouts timeouts)
+{
+    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    httpClient->setAdditionalHeaders(extraHeaders);
+    httpClient->setAuthType(authType);
+    httpClient->setSendTimeoutMs(timeouts.sendTimeout.count());
+    httpClient->setResponseReadTimeoutMs(timeouts.responseReadTimeout.count());
+    httpClient->setMessageBodyReadTimeoutMs(timeouts.messageBodyReadTimeout.count());
+    downloadFileAsyncEx2(url, completionHandler, std::move(httpClient));
+}
+
+void downloadFileAsync2(
+    const QUrl& url,
+    std::function<void(SystemError::ErrorCode, int, nx_http::BufferType, nx_http::HttpHeaders)> completionHandler,
+    const nx_http::HttpHeaders& extraHeaders,
+    AsyncHttpClient::AuthType authType,
+    AsyncHttpClient::Timeouts timeouts)
+{
+    auto handler = [completionHandler](
+        SystemError::ErrorCode osErrorCode,
+        int statusCode,
+        nx_http::StringType,
+        nx_http::BufferType msgBody,
+        nx_http::HttpHeaders httpHeaders)
+    {
+        completionHandler(osErrorCode, statusCode, msgBody, httpHeaders);
+    };
+    downloadFileAsyncEx2(url, handler, extraHeaders, authType, timeouts);
 }
 
 void downloadFileAsync(
