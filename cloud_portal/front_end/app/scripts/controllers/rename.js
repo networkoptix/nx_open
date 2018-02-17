@@ -26,8 +26,4 @@ angular.module('cloudApp')
         }).then(function(){
             dialogs.closeMe($scope, $scope.model.systemName);
         });
-
-        $scope.$on('$destroy', function(){
-            dialogs.dismissNotifications();
-        });
     }]);
