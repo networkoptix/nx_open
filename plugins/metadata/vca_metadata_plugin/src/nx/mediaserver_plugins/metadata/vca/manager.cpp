@@ -10,13 +10,13 @@
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/fusion/serialization/json.h>
-
-#include "nx/vca/camera_controller.h"
-
+#include <nx/utils/std/cppnx.h>
 #include <nx/utils/log/log.h>
 #define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
     nx::utils::log::Level::debug, "vca_metadata_plugin") NX_PRINT_PREFIX
 #include <nx/kit/debug.h>
+
+#include "nx/vca/camera_controller.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -63,30 +63,21 @@ nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
     return packet;
 }
 
-static const std::vector<QByteArray> kEventMessageKeys = {
-    "ip",
-    "unitname",
-    "datetime",
-    "dts",
-    "type",
-    "info",
-    "id",
-    "rulesname",
-    "rulesdts",
-};
-
-std::vector<QByteArray> decorate(const std::vector<QByteArray>& source)
+template<class T, size_t N, class Check = std::enable_if_t<!std::is_same<const char*, T>::value>>
+std::array<T, N> decorate(const std::array<T, N>& src)
 {
-    std::vector<QByteArray> result;
-    result.reserve(source.size());
-    static const QByteArray prefix("\n");
-    static const QByteArray postfix("=");
-    for (const QByteArray sourceLine : source)
-        result.emplace_back(prefix + sourceLine + postfix);
+    std::array<T, N> result;
+    static const T prefix("\n");
+    static const T postfix("=");
+    std::transform(src.begin(), src.end(), result.begin(),
+        [](const auto& item) { return prefix + item + postfix; });
     return result;
 }
 
-static const std::vector<QByteArray> kEventMessageSearchKeys(decorate(kEventMessageKeys));
+static const auto kEventMessageKeys = stdnx::make_array<QByteArray>(
+    "ip", "unitname", "datetime", "dts", "type", "info", "id", "rulesname", "rulesdts");
+
+static const auto kEventMessageSearchKeys = decorate(kEventMessageKeys);
 
 std::pair<const char*, const char*> findString(const char* messageBegin, const char* messageEnd,
     const QByteArray& key)

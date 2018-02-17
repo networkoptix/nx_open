@@ -4,15 +4,13 @@
 #include "gsoap/generated_with_soapcpp2/soapActionBindingProxy.h"
 #include "gsoap/generated_with_soapcpp2/EventBinding.nsmap"
 
-#include <memory>
-#include <vector>
-#include <tuple>
-#include <utility>
 #include <algorithm>
-#include <sstream>
 #include <iomanip>
+#include <memory>
+#include <sstream>
+#include <tuple>
 
-#include "httpda.h"
+#include "httpda.h" //< gsoap header for digest authentication
 
 namespace nx {
 namespace axis {
@@ -460,7 +458,7 @@ int CameraController::addActiveAction(const ActiveAction& action)
     _ns5__AddActionConfiguration addCommand;
     _ns5__AddActionConfigurationResponse response;
 
-    ScopedGarbageCollector gc;
+    nx::utils::ScopedGarbageCollector gc;
     addCommand.NewActionConfiguration = gc.create<ns5__NewActionConfiguration>();
     addCommand.NewActionConfiguration->Name = gc.create<std::string>(action.name);
 
@@ -528,7 +526,7 @@ int CameraController::addActiveRecipient(const ActiveRecipient& recipient)
     _ns5__AddRecipientConfiguration addCommand;
     _ns5__AddRecipientConfigurationResponse response;
 
-    ScopedGarbageCollector gc;
+    nx::utils::ScopedGarbageCollector gc;
     addCommand.NewRecipientConfiguration = gc.create<ns5__NewRecipientConfiguration>();
     addCommand.NewRecipientConfiguration->Name = gc.create<std::string>(recipient.name);
     addCommand.NewRecipientConfiguration->TemplateToken = recipient.token;
@@ -580,7 +578,7 @@ int CameraController::addActiveRule(const ActiveRule& rule)
     </StartEvent>
     */
 
-    ScopedGarbageCollector gc;
+    nx::utils::ScopedGarbageCollector gc;
     addCommand.NewActionRule = gc.create<ns5__NewActionRule>();
     addCommand.NewActionRule->Name = gc.create<std::string>(rule.name);
     addCommand.NewActionRule->Enabled = true;

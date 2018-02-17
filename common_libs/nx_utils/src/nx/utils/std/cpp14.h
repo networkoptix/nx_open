@@ -1,8 +1,7 @@
 #pragma once
 
 /**
- *  Some c++14 features missing in MS Visual studio 2012 and GCC 4.8 are
- *  defined here
+ * Some c++14 features missing in MS Visual studio 2012 and GCC 4.8 are defined here
  */
 #include <atomic>
 #include <memory>
