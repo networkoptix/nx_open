@@ -20,7 +20,6 @@
     "WRONG PASSWORD"                         :    "Wrong password",
     "ACCOUNT DOES NOT EXIST"                 :    "Account does not exist",
     "CANNOT SEND CONFIRMATION EMAIL"         :    "Cannot send confirmation Email:",
-    "CANNOT SAVE PASSWORD"                   :    "Cannot save password:",
     "CODE USED/INCORRECT"                    :    "Confirmation code is already used or incorrect",
     "SHARE PERMISSIONS HINT ADMIN"           :    "Unrestricted access including the ability to share",
     "SHARE PERMISSIONS HINT ADV VIEWER"      :    "Can view live video, browse the archive, configure cameras, control PTZ etc",
