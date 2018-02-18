@@ -1477,6 +1477,22 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             endTimeMSec = endTimeUSec == DATETIME_NOW
                 ? qnSyncTime->currentMSecsSinceEpoch()
                 : endTimeUSec / 1000;
+
+            if(m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
+            {
+                bool allWearable = std::all_of(m_syncedWidgets.begin(), m_syncedWidgets.end(),
+                    [](QnMediaResourceWidget* widget)
+                    {
+                        return widget->resource()->toResourcePtr()->hasFlags(Qn::wearable_camera);
+                    });
+
+                if (allWearable)
+                {
+                    QnTimePeriodList periods = m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent);
+                    if (!periods.empty() && !periods.back().isInfinite())
+                        endTimeMSec = periods.back().endTimeMs();
+                }
+            }
         }
     }
 
@@ -1492,6 +1508,13 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
         m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(), QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
     if (m_dayTimeWidget)
         m_dayTimeWidget->setEnabledWindow(startTimeMSec, endTimeMSec);
+
+    if (!m_currentWidgetLoaded && widgetLoaded
+        && display()->widgets().size() == 1
+        && m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
+    {
+        setPosition(startTimeMSec * 1000);
+    }
 
     if (!m_pausedOverride)
     {
