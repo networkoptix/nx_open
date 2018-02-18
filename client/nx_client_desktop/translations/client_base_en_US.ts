@@ -7632,93 +7632,93 @@ to %1</source>
     </message>
     <message>
         <source>Failed to add wearable camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No video files found in selected folder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Selected file formats are not supported</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Selected file format is not supported</numerusform>
+            <numerusform>Selected file formats are not supported</numerusform>
         </translation>
     </message>
     <message>
         <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Selected files do not have timestamps</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Selected file does not have timestamp</numerusform>
+            <numerusform>Selected files do not have timestamps</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Selected files cover periods for which videos are already being uploaded</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Selected file covers period for which video is already being uploaded</numerusform>
+            <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>You can upload these files to a different instance of a Wearable Camera.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>You can upload this file to a different instance of a Wearable Camera.</numerusform>
+            <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Selected files cover periods for which videos have already been uploaded</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Selected file covers period for which video has already been uploaded</numerusform>
+            <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
         </translation>
     </message>
     <message>
         <source>Selected files will not be uploaded</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Some files will not be uploaded</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No new files to upload in selected folder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Files size - %2</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>File size — %2</numerusform>
+            <numerusform>Files size — %2</numerusform>
         </translation>
     </message>
     <message>
         <source>Free space - %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Free space — %2</translation>
     </message>
     <message>
         <source>%1 - has unsupported format.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — has unsupported format.</translation>
     </message>
     <message>
         <source>%1 - does not have timestamp.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — does not have timestamp.</translation>
     </message>
     <message>
         <source>%1 - covers period for which video has already been uploaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — covers period for which video has already been uploaded.</translation>
     </message>
     <message>
         <source>%1 - covers period for which video is being uploaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — covers period for which video is being uploaded.</translation>
     </message>
     <message>
         <source>%1 - does not fit on server storage.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — does not fit on server storage.</translation>
     </message>
 </context>
 <context>
