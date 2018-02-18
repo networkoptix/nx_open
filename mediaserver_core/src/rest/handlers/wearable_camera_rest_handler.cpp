@@ -28,6 +28,7 @@
 
 namespace {
 const qint64 kDetalizationLevelMs = 1;
+const qint64 kMinChunkCheckSize = 100 * 1024 * 1024;
 
 QnTimePeriod shrinkPeriod(const QnTimePeriod& local, const QnTimePeriodList& remote)
 {
@@ -181,6 +182,12 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
     for (const QnWearablePrepareDataElement& element : data.elements)
         totalSize += element.size;
     uploader->clearSpace(totalSize, &reply.availableSpace);
+
+    qint64 minTime = std::numeric_limits<qint64>::max();
+    for (const QnWearablePrepareDataElement& element : data.elements)
+        minTime = std::min(minTime, element.period.startTimeMs);
+    if (!qnNormalStorageMan->canAddChunk(minTime, std::max(kMinChunkCheckSize, totalSize)))
+        reply.footageTooOld = true;
 
     for (const QnWearablePrepareDataElement& element : data.elements)
     {

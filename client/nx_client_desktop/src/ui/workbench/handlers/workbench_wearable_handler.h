@@ -23,8 +23,9 @@ public:
 
 private:
     void maybeOpenCurrentSettings();
-    bool checkFileUpload(const nx::client::desktop::WearableUpload &upload);
-    bool checkFolderUpload(const QString& path, const nx::client::desktop::WearableUpload& upload);
+    bool fixFileUpload(nx::client::desktop::WearableUpload *upload);
+    bool fixFolderUpload(const QString& path, nx::client::desktop::WearableUpload* upload);
+    bool fixOldFootageUpload(nx::client::desktop::WearableUpload* upload);
     void showNoSpaceOnServerWarning(const nx::client::desktop::WearableUpload& upload);
     void uploadValidFiles(
         const QnSecurityCamResourcePtr& camera,
