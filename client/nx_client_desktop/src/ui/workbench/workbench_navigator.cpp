@@ -1477,6 +1477,22 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             endTimeMSec = endTimeUSec == DATETIME_NOW
                 ? qnSyncTime->currentMSecsSinceEpoch()
                 : endTimeUSec / 1000;
+
+            if(m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
+            {
+                bool allWearable = std::all_of(m_syncedWidgets.begin(), m_syncedWidgets.end(),
+                    [](QnMediaResourceWidget* widget)
+                    {
+                        return widget->resource()->toResourcePtr()->hasFlags(Qn::wearable_camera);
+                    });
+
+                if (allWearable)
+                {
+                    QnTimePeriodList periods = m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent);
+                    if (!periods.empty() && !periods.back().isInfinite())
+                        endTimeMSec = periods.back().endTimeMs();
+                }
+            }
         }
     }
 
