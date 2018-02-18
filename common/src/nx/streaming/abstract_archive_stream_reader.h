@@ -119,6 +119,7 @@ signals:
     void nextFrameOccured();
     void prevFrameOccured();
     void skipFramesTo(qint64 mksec);
+    void waitForDataCanBeAccepted();
 protected:
     bool m_cycleMode;
     qint64 m_needToSleep;
