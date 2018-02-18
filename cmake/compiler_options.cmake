@@ -150,11 +150,7 @@ if(LINUX)
     )
     set(CMAKE_SKIP_BUILD_RPATH ON)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
-
-    # TODO: #dmishin ask #dklychkov about this condition.
-    if(LINUX)
-        set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
-    endif()
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
 
     set(CMAKE_EXE_LINKER_FLAGS
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
