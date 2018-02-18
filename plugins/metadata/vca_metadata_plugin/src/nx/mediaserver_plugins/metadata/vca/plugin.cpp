@@ -110,25 +110,7 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-const AnalyticsEventType& Plugin::eventByInternalName(
-    const QString& internalName) const noexcept
-{
-    // There are only few elements, so linear search is the fastest and the most simple.
-    const auto it = std::find_if(
-        m_typedManifest.outputEventTypes.cbegin(),
-        m_typedManifest.outputEventTypes.cend(),
-        [&internalName](const AnalyticsEventType& event)
-        {
-            return event.internalName == internalName;
-        });
-
-    return
-        (it != m_typedManifest.outputEventTypes.cend())
-            ? *it
-            : m_emptyEvent;
-}
-
-const AnalyticsEventType& Plugin::eventByUuid(const QnUuid& uuid) const noexcept
+const AnalyticsEventType* Plugin::eventByUuid(const QnUuid& uuid) const noexcept
 {
     const auto it = std::find_if(
         m_typedManifest.outputEventTypes.cbegin(),
@@ -138,12 +120,8 @@ const AnalyticsEventType& Plugin::eventByUuid(const QnUuid& uuid) const noexcept
             return event.eventTypeId == uuid;
         });
 
-    return
-        (it != m_typedManifest.outputEventTypes.cend())
-        ? *it
-        : m_emptyEvent;
+    return (it != m_typedManifest.outputEventTypes.cend()) ? &(*it) : nullptr;
 }
-
 
 } // namespace vca
 } // namespace metadata

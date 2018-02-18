@@ -11,6 +11,7 @@
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/std/cppnx.h>
+
 #include <nx/utils/log/log.h>
 #define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
     nx::utils::log::Level::debug, "vca_metadata_plugin") NX_PRINT_PREFIX
@@ -181,13 +182,13 @@ Manager::Manager(Plugin* plugin,
 
     static const int kBufferCapacity = 4096;
     m_buffer.reserve(kBufferCapacity);
-    NX_PRINT << "Manager created " << this;
+    NX_PRINT << "VCA metadata manager created";
 }
 
 Manager::~Manager()
 {
     stopFetchingMetadata();
-    NX_PRINT << "Manager destroyed " << this;
+    NX_PRINT << "VCA metadata manager destroyed";
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -203,6 +204,45 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
         return static_cast<nxpl::PluginInterface*>(this);
     }
     return nullptr;
+}
+
+void Manager::treatMessage(int size)
+{
+    std::replace(m_buffer.data(), m_buffer.data() + size - 1, '\0', '_');
+    EventMessage message = parseMessage(m_buffer.data(), size);
+
+    const auto parameterIterator = message.parameters.find("type");
+    if (parameterIterator != message.parameters.end())
+        NX_PRINT << "Message received. Type = " << parameterIterator->second.constData();
+    else
+    {
+        NX_PRINT << "Message with unknown type received. Type = "
+            << parameterIterator->second.constData();
+        return;
+    }
+    const QString internalName = parameterIterator->second;
+
+    auto it = std::find_if(m_eventsToCatch.begin(), m_eventsToCatch.end(),
+        [&internalName](ElapsedEvent& event)
+    {
+        return event.type.internalName == internalName;
+    });
+    if (it != m_eventsToCatch.cend())
+    {
+        sendEventStartedPacket(it->type);
+        if (it->type.isStateful())
+        {
+            it->timer.start();
+            m_timer.start(timeTillCheck(), [this](){ onTimer(); });
+        }
+    }
+    else
+    {
+        NX_PRINT << "Packed with undefined event type received. Uuid = "
+            << internalName.toStdString();
+    }
+
+    cleanBuffer(m_buffer, size);
 }
 
 void Manager::onReceive(SystemError::ErrorCode, size_t)
@@ -232,8 +272,8 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         }
         if (memcmp(m_buffer.data(), kPreamble, kPrefixSize) != 0)
         {
-            // Corrupted message. Throw all received data away and read new.
-            NX_PRINT << "Wrong preamble = " << m_buffer.mid(0, kPrefixSize).data()
+            NX_PRINT << "Corrupted message. Wrong preamble, preamble = "
+                << m_buffer.mid(0, kPrefixSize).data()
                 << ", buffer size = " << m_buffer.size();
             cleanBuffer(m_buffer, m_buffer.size());
             break;
@@ -242,8 +282,7 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         int size = atoi(p);
         if (size == 0 || size > m_buffer.capacity())
         {
-            // Corrupted message. Throw all received data away and read new.
-            NX_PRINT << "Wrong message size, message size = " << size
+            NX_PRINT << "Corrupted message. Wrong message size, message size = " << size
                 << ", buffer size = " << m_buffer.size();
             cleanBuffer(m_buffer, m_buffer.size());
             break;
@@ -256,37 +295,14 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         }
 
         NX_PRINT << "Message ready, size = " << size << " buffer size = " << m_buffer.size();
-
-        std::replace(m_buffer.data(), m_buffer.data() + size - 1, '\0', '_');
-        EventMessage message = parseMessage(m_buffer.data(), size);
-
-        auto it = message.parameters.find("type");
-        if (it != message.parameters.end())
-            NX_PRINT << "Message received, type=" << it->second.constData() << ".";
-        else
-            NX_PRINT << "Message with unknown type received.";
-
-        const AnalyticsEventType& event = m_plugin->eventByInternalName(it->second);
-
-        if (std::find(m_eventsToCatch.cbegin(), m_eventsToCatch.cend(), event.eventTypeId)
-            != m_eventsToCatch.cend())
-        {
-            sendEventStartedPacket(event);
-            if (event.isStateful())
-            {
-                event.elapsedTimer.start();
-                m_timer.start(timeTillCheck(), [this](){ onTimer(); });
-            }
-        }
-
-        cleanBuffer(m_buffer, size);
+        treatMessage(size);
         NX_PRINT << "Message treated, size = " << size << " buffer size = " << m_buffer.size()
             << "\n";
     }
     NX_PRINT << "Buffer processing finished. Iteration id = " << id
         << " buffer size = " << m_buffer.size();
 
-    this->m_tcpSocket->readSomeAsync(
+    m_tcpSocket->readSomeAsync(
         &m_buffer,
         [this](SystemError::ErrorCode errorCode, size_t size)
         {
@@ -296,14 +312,13 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
 
 std::chrono::milliseconds Manager::timeTillCheck() const
 {
-    qint64 maxElapsed = 0;
-    for (const QnUuid& id: m_eventsToCatch)
+    std::chrono::milliseconds maxElapsed(0);
+    for (const ElapsedEvent& event: m_eventsToCatch)
     {
-        const AnalyticsEventType& event = m_plugin->eventByUuid(id);
-        if (event.timerStarted())
-            maxElapsed = std::max(maxElapsed, event.elapsedTimer.elapsed());
+        if (event.type.isStateful())
+            maxElapsed = std::max(maxElapsed, event.timer.elapsedSinceStart());
     }
-    auto result = kMinTimeBetweenEvents - std::chrono::milliseconds(maxElapsed);
+    auto result = kMinTimeBetweenEvents - maxElapsed;
     result = std::max(result, std::chrono::milliseconds::zero());
     return result;
 }
@@ -328,13 +343,12 @@ void Manager::sendEventStoppedPacket(const AnalyticsEventType& event) const
 
 void Manager::onTimer()
 {
-    for (const QnUuid& id: m_eventsToCatch)
+    for (ElapsedEvent& event: m_eventsToCatch)
     {
-        const AnalyticsEventType& event = m_plugin->eventByUuid(id);
-        if (event.timerStarted() && event.elapsedTimer.hasExpired(kMinTimeBetweenEvents.count()))
+        if (event.timer.hasExpiredSinceStart(kMinTimeBetweenEvents))
         {
-            event.elapsedTimer.invalidate();
-            sendEventStoppedPacket(event);
+            event.timer.stop();
+            sendEventStoppedPacket(event.type);
         }
     }
 
@@ -343,22 +357,21 @@ void Manager::onTimer()
 }
 
 /*
- * We need timer if at least one state-dependent event took place recently (i.e. no longer then
- * kMinTimeBetweenEvents ms ago).
+ * We need timer if at least one state-dependent event took place recently (i.e. its timer has been
+ * started, but not stopped yet).
  */
 bool Manager::isTimerNeeded() const
 {
-    for (const QnUuid& id: m_eventsToCatch)
+    for (const ElapsedEvent& event: m_eventsToCatch)
     {
-        const AnalyticsEventType& event = m_plugin->eventByUuid(id);
-        if (event.timerStarted())
+        if (event.timer.isStarted())
             return true;
     }
     return false;
 }
 
 nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler* handler,
-    nxpl::NX_GUID* typeList, int typeListSize)
+    nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
 {
     QString host = m_url.host();
     nx::vca::CameraController vcaCameraConrtoller(host, m_auth.user(), m_auth.password());
@@ -367,10 +380,14 @@ nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler
     if (error != nx::sdk::Error::noError)
         return error;
 
-    m_eventsToCatch.resize(typeListSize);
-    for (int i = 0; i < typeListSize; ++i)
+    for (int i = 0; i < eventTypeListSize; ++i)
     {
-        m_eventsToCatch[i] = nxpt::fromPluginGuidToQnUuid(typeList[i]);
+        QnUuid id = nxpt::fromPluginGuidToQnUuid(eventTypeList[i]);
+        const AnalyticsEventType* eventType = m_plugin->eventByUuid(id);
+        if (!eventType)
+            NX_PRINT << "Unknown event type. TypeId = " << id.toStdString();
+        else
+            m_eventsToCatch.emplace_back(*eventType);
     }
 
     if (!vcaCameraConrtoller.readTcpServerPort())
@@ -417,9 +434,9 @@ nx::sdk::Error Manager::stopFetchingMetadata()
                 promise.set_value();
             });
         promise.get_future().wait();
-
         delete m_tcpSocket;
         m_tcpSocket = nullptr;
+        m_eventsToCatch.clear();
     }
     return nx::sdk::Error::noError;
 }
