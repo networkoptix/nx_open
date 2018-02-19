@@ -183,7 +183,12 @@ def _port_is_opened_on_server_machine(hostname, port):
         return True
 
 
-def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_INSTALLATION_ROOT):
+def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_INSTALLATION_ROOT, reinstall=False):
+    if not reinstall:
+        found_installation = find_deb_installation(os_access, mediaserver_deb, installation_root=installation_root)
+        if found_installation is not None:
+            return found_installation
+
     customization = mediaserver_deb.customization
     remote_path = PurePosixPath('/tmp') / 'func_tests' / customization.company_name / mediaserver_deb.path.name
     os_access.mk_dir(remote_path.parent)
