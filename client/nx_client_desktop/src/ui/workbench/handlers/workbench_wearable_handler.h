@@ -2,14 +2,13 @@
 
 #include <QtCore/QObject>
 
+#include <nx/utils/uuid.h>
+
 #include <core/resource/resource_fwd.h>
 #include <api/model/api_model_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
-#include <nx/utils/uuid.h>
-
-class QnNewWearableCameraDialog;
-namespace nx { namespace client { namespace desktop { struct UploadState; }}}
+#include <nx/client/desktop/utils/wearable_fwd.h>
 
 class QnWorkbenchWearableHandler:
     public Connective<QObject>,
@@ -23,25 +22,26 @@ public:
     virtual ~QnWorkbenchWearableHandler() override;
 
 private:
-    qreal calculateProgress(const nx::client::desktop::UploadState& upload, bool processed);
-
     void maybeOpenCurrentSettings();
+    bool checkFileUpload(const nx::client::desktop::WearableUpload &upload);
+    bool checkFolderUpload(const QString& path, const nx::client::desktop::WearableUpload& upload);
+    void showNoSpaceOnServerWarning(const nx::client::desktop::WearableUpload& upload);
+    void uploadValidFiles(
+        const QnSecurityCamResourcePtr& camera,
+        const nx::client::desktop::WearablePayloadList& payloads);
 
 private slots:
     void at_newWearableCameraAction_triggered();
     void at_uploadWearableCameraFileAction_triggered();
-
+    void at_uploadWearableCameraFolderAction_triggered();
     void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
     void at_context_userChanged();
+    void at_wearableManager_stateChanged(const nx::client::desktop::WearableState& state);
 
 private:
-    struct FootageInfo
-    {
-        QnSecurityCamResourcePtr camera;
-        qint64 startTimeMs;
-    };
+    QString calculateExtendedErrorMessage(const nx::client::desktop::WearablePayload& upload);
 
+private:
     QnUuid m_currentCameraUuid;
-    QHash<QString, FootageInfo> m_infoByUploadId;
 };
 

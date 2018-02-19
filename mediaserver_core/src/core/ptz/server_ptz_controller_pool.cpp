@@ -3,6 +3,7 @@
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 #include <common/static_common_module.h>
+
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/home_ptz_controller.h>
 #include <core/ptz/mapped_ptz_controller.h>
@@ -14,6 +15,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/param.h>
+
+#include <nx/mediaserver/resource/camera.h>
 
 QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent):
     base_type(parent)
@@ -49,7 +52,7 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
     if(!resource->isInitialized())
         return QnPtzControllerPtr();
 
-    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    auto camera = resource.dynamicCast<nx::mediaserver::resource::Camera>();
     if(!camera)
         return QnPtzControllerPtr();
 

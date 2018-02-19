@@ -168,19 +168,6 @@ CameraDiagnostics::Result QnStardotResource::initializeCameraDriver()
     return CameraDiagnostics::NoErrorResult();
 }
 
-QnConstResourceAudioLayoutPtr QnStardotResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
-{
-    if (isAudioEnabled()) {
-        const QnStardotStreamReader* stardotReader = dynamic_cast<const QnStardotStreamReader*>(dataProvider);
-        if (stardotReader && stardotReader->getDPAudioLayout())
-            return stardotReader->getDPAudioLayout();
-        else
-            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-    }
-    else
-        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-}
-
 QString QnStardotResource::getRtspUrl() const
 {
     QUrl url;

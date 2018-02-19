@@ -13,7 +13,7 @@ public:
     QnActiStreamReader(const QnResourcePtr& res);
     virtual ~QnActiStreamReader();
 
-    QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+    virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
@@ -24,6 +24,7 @@ protected:
 private:
     int getActiChannelNum() const;
     QString formatResolutionStr(const QSize& resolution) const;
+    int toJpegQuality(const QnLiveStreamParams& params);
 private:
     QnMulticodecRtpReader m_multiCodec;
     QnActiResourcePtr m_actiRes;

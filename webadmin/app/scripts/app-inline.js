@@ -8,7 +8,10 @@ angular.module('webadminApp', [
     'ui.bootstrap',
     'ngStorage',
     'typeahead-focus'
-]).config(['$routeProvider', function ($routeProvider) {
+]).config(['$httpProvider', function ($httpProvider) {
+    $httpProvider.defaults.xsrfCookieName = 'nx-vms-csrf-token';
+    $httpProvider.defaults.xsrfHeaderName = 'Nx-Vms-Csrf-Token';
+}]).config(['$routeProvider', function ($routeProvider) {
     $routeProvider
         .when('/setup', {
             templateUrl: Config.viewsDir + 'dialogs/setup-inline.html',

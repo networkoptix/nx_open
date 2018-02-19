@@ -15,7 +15,6 @@
 #include <nx/utils/log/log.h>
 #include <camera/camera_pool.h>
 #include <utils/media/av_codec_helper.h>
-#include "dw_stream_reader.h"
 #include <nx/fusion/model_functions.h>
 #include <plugins/utils/multisensor_data_provider.h>
 
@@ -116,7 +115,7 @@ public:
             .args(QnLexical::serialized(streamIndex), value, m_resource->getUrl()));
 
         auto requestHelper = makeRequestHelper();
-        m_videoConfig->replace(type->first, type->second, value.toUtf8());
+        m_videoConfig->replace(type->first, type->second, value.toLower().toUtf8());
         return requestHelper.post("SetVideoStreamConfig", *m_videoConfig);
     }
 
@@ -287,7 +286,7 @@ bool QnDigitalWatchdogResource::disableB2FramesForActiDW()
     return result == CL_HTTP_SUCCESS;
 }
 
-QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal()
+QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal() const
 {
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     bool useHttpPtz = resourceData.value<bool>(lit("dw-http-ptz"), false);
@@ -481,28 +480,14 @@ nx::mediaserver::resource::StreamCapabilityMap QnDigitalWatchdogResource::getStr
     return result;
 }
 
-QnAbstractStreamDataProvider* QnDigitalWatchdogResource::createLiveDataProvider()
+void QnDigitalWatchdogResource::updateVideoEncoder(
+    VideoEncoder& encoder,
+    Qn::StreamIndex streamIndex,
+    const QnLiveStreamParams& streamParams)
 {
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    bool shouldAppearAsSingleChannel = resData.value<bool>(
-        Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
-
-    if (shouldAppearAsSingleChannel)
-    {
-        return new nx::plugins::utils::MultisensorDataProvider(
-            toSharedPointer(this),
-            [](const QnResourcePtr& resource)
-            {
-                return new QnDwStreamReader(resource);
-            });
-    }
-
-    return new QnDwStreamReader(toSharedPointer());
-}
-
-void QnDigitalWatchdogResource::setVideoCodec(Qn::StreamIndex streamIndex, const QString& codec)
-{
-    m_cproApiClient->setVideoCodec(streamIndex, codec);
+    if (!m_cproApiClient->setVideoCodec(streamIndex, streamParams.codec))
+        NX_WARNING(this, lm("Failed to configure codec %1 for resource %2").args(streamParams.codec, getUrl()));
+    base_type::updateVideoEncoder(encoder, streamIndex, streamParams);
 }
 
 #endif //ENABLE_ONVIF

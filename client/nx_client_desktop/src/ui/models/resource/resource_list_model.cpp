@@ -147,12 +147,10 @@ void QnResourceListModel::setCheckedResources(const QSet<QnUuid>& ids)
 int QnResourceListModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    // Added name column by default
-    int result = 1;
-    if (m_hasCheckboxes)
-        result++;
-    if (m_hasStatus)
-        result++;
+
+    int result = 1;     //< Added name column by default.
+    result += m_hasCheckboxes;
+    result += m_hasStatus;
     return result;
 }
 
@@ -308,17 +306,21 @@ void QnResourceListModel::at_resource_resourceChanged(const QnResourcePtr &resou
 
 QIcon QnResourceListModel::resourceIcon(const QnResourcePtr& resource) const
 {
+    QnResourceIconCache::Key addionalKey = 0;
+    if (m_options.testFlag(AlwaysSelectedOption))
+        addionalKey = QnResourceIconCache::AlwaysSelected;
+
     if (resource->hasFlags(Qn::server) && m_options.testFlag(ServerAsHealthMonitorOption))
-        return qnResIconCache->icon(QnResourceIconCache::HealthMonitor);
+        return qnResIconCache->icon(QnResourceIconCache::HealthMonitor | addionalKey);
 
     if (m_options.testFlag(HideStatusOption))
     {
         QnResourceIconCache::Key key = qnResIconCache->key(resource);
         key &= ~QnResourceIconCache::StatusMask;
         key |= QnResourceIconCache::Online;
-        return qnResIconCache->icon(key);
+        return qnResIconCache->icon(key | addionalKey);
     }
 
-    return qnResIconCache->icon(resource);
+    return qnResIconCache->icon(qnResIconCache->key(resource) | addionalKey);
 }
 

@@ -21,6 +21,7 @@ QVector<QnUuid> toIdList(const QnResourceList& list)
 }
 
 AbstractActionPtr ActionFactory::instantiateAction(
+    QnCommonModule* commonModule,
     const RulePtr& rule,
     const AbstractEventPtr& event,
     const QnUuid& moduleGuid,
@@ -34,7 +35,8 @@ AbstractActionPtr ActionFactory::instantiateAction(
     result->setParams(rule->actionParams());
     result->setResources(rule->actionResources());
 
-    if (hasToggleState(event->getEventType()) && hasToggleState(rule->actionType()))
+    if (hasToggleState(event->getEventType(), runtimeParams, commonModule) &&
+        hasToggleState(rule->actionType()))
     {
         EventState value = state != EventState::undefined ? state : event->getToggleState();
         result->setToggleState(value);
@@ -45,12 +47,13 @@ AbstractActionPtr ActionFactory::instantiateAction(
 }
 
 AbstractActionPtr ActionFactory::instantiateAction(
+    QnCommonModule* commonModule,
     const RulePtr& rule,
     const AbstractEventPtr& event,
     const QnUuid& moduleGuid,
     const AggregationInfo& aggregationInfo)
 {
-    AbstractActionPtr result = instantiateAction(rule, event, moduleGuid);
+    AbstractActionPtr result = instantiateAction(commonModule, rule, event, moduleGuid);
     if (!result)
         return result;
 

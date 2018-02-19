@@ -169,8 +169,6 @@ void QnLiveStreamProvider::setCameraControlDisabled(bool value)
 QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStreamParams& value)
 {
     QnLiveStreamParams params = value;
-    if (params.bitrateKbps == 0 && params.quality == Qn::QualityNotDefined)
-        params.quality = Qn::QualityNormal;
 
     // Add advanced parameters
     const auto advancedParams = m_cameraRes->advancedLiveStreamParams();
@@ -193,7 +191,14 @@ QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStr
     if (m_role == Qn::CR_SecondaryLiveVideo)
         params.bitrateKbps = advancedLiveStreamParams.bitrateKbps;
     if (params.bitrateKbps == 0)
-        params.bitrateKbps = m_cameraRes->rawSuggestBitrateKbps(params.quality, params.resolution, params.fps);
+    {
+        if (params.quality == Qn::QualityNotDefined)
+            params.quality = Qn::QualityNormal;
+
+        params.bitrateKbps = m_cameraRes->suggestBitrateForQualityKbps(
+            params.quality, params.resolution, params.fps, m_role);
+    }
+
     return params;
 }
 
@@ -270,9 +275,37 @@ bool QnLiveStreamProvider::canChangeStatus() const
 float QnLiveStreamProvider::getDefaultFps() const
 {
     float maxFps = m_cameraRes->getMaxFps();
-    int reservedSecondStreamFps = m_cameraRes->reservedSecondStreamFps();
+    if (getRole() != Qn::CR_SecondaryLiveVideo)
+    {
+        int reservedSecondStreamFps = m_cameraRes->reservedSecondStreamFps();
+        return qMax(1.0, maxFps - reservedSecondStreamFps);
+    }
 
-    return qMax(1.0, maxFps - reservedSecondStreamFps);
+    // now primary has newFps
+    // this is secondary stream
+    // need to adjust fps
+
+    QnLiveStreamParams params;
+    const Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
+    int newSecondaryStreamFps = m_cameraRes->defaultSecondaryFps(params.quality);
+
+    if (sharingMethod == Qn::PixelsFpsSharing)
+    {
+        if (m_cameraRes->getMaxFps() - m_primaryFps < 2)
+            newSecondaryStreamFps /= 2;
+    }
+    else if (sharingMethod == Qn::BasicFpsSharing)
+    {
+        newSecondaryStreamFps = qMin(
+            newSecondaryStreamFps,
+            m_cameraRes->getMaxFps() - m_primaryFps);
+    }
+    else
+    {
+        // noSharing
+    }
+    return qBound(
+        QnLiveStreamParams::kMinSecondStreamFps, newSecondaryStreamFps, m_cameraRes->getMaxFps());
 }
 
 bool QnLiveStreamProvider::needAnalyzeMotion(Qn::ConnectionRole /*role*/)
@@ -428,33 +461,7 @@ void QnLiveStreamProvider::onPrimaryFpsChanged(int primaryFps)
 {
     QnMutexLocker lock(&m_liveMutex);
     NX_ASSERT(getRole() == Qn::CR_SecondaryLiveVideo);
-    // now primary has newFps
-    // this is secondary stream
-    // need to adjust fps
-
-    QnLiveStreamParams params;
-    const Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
-    int newSecondaryStreamFps = m_cameraRes->defaultSecondaryFps(params.quality);
-
-    if (sharingMethod == Qn::PixelsFpsSharing)
-    {
-        if (m_cameraRes->getMaxFps() - primaryFps < 2 )
-            newSecondaryStreamFps /= 2;
-    }
-    else if (sharingMethod == Qn::BasicFpsSharing)
-    {
-        newSecondaryStreamFps = qMin(
-            newSecondaryStreamFps,
-            m_cameraRes->getMaxFps() - primaryFps);
-    }
-    else
-    {
-        // noSharing
-    }
-    m_liveParams.fps = qBound(
-        QnLiveStreamParams::kMinSecondStreamFps,
-        newSecondaryStreamFps,
-        m_cameraRes->getMaxFps());
+    m_primaryFps = primaryFps;
 }
 
 QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
@@ -656,6 +663,11 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
         NX_LOG(lm("QnLiveStreamProvider: bitrateInfo has been updated for %1 stream")
                 .arg(QnLexical::serialized(info.encoderIndex)), cl_logINFO);
     }
+}
+
+QnConstResourceAudioLayoutPtr QnLiveStreamProvider::getDPAudioLayout() const
+{
+    return QnConstResourceAudioLayoutPtr();
 }
 
 #endif // ENABLE_DATA_PROVIDERS

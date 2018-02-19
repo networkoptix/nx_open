@@ -3,13 +3,14 @@
 
 #include <QtCore/QFileInfo>
 
-#include <client/client_module.h>
-
 #include <core/resource/camera_resource.h>
 
+#include <client/client_module.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/utils/wearable_manager.h>
+#include <nx/client/desktop/utils/wearable_state.h>
+#include <ui/dialogs/common/message_box.h>
 
 using namespace nx::client::desktop;
 
@@ -28,11 +29,7 @@ QnWearableProgressWidget::QnWearableProgressWidget(QWidget* parent):
         });
 
     connect(ui->cancelButton, &QPushButton::clicked, this,
-        [this]
-        {
-            if (m_camera)
-                qnClientModule->wearableManager()->cancelUploads(m_camera);
-        });
+        &QnWearableProgressWidget::at_cancelButton_clicked);
 }
 
 QnWearableProgressWidget::~QnWearableProgressWidget()
@@ -77,6 +74,24 @@ void QnWearableProgressWidget::updateFromState(const WearableState& state)
     ui->uploadProgressBar->setFormat(calculateMessage(state));
 }
 
+void QnWearableProgressWidget::at_cancelButton_clicked()
+{
+    if (!m_camera)
+        return;
+
+    WearableState state = qnClientModule->wearableManager()->state(m_camera);
+
+    QnMessageBox dialog(QnMessageBoxIcon::Question,
+        tr("Stop uploading?"), tr("Already uploaded files will be kept."),
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
+    dialog.addCustomButton(QnMessageBoxCustomButton::Stop,
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+    if (dialog.exec() == QDialogButtonBox::Cancel)
+        return;
+
+    qnClientModule->wearableManager()->cancelUploads(m_camera);
+}
+
 bool QnWearableProgressWidget::calculateActive(const WearableState& state)
 {
     switch (state.status)
@@ -115,9 +130,9 @@ QString QnWearableProgressWidget::calculateMessage(const WearableState& state)
             .arg(calculateFileName(state))
             .arg(calculateQueueMessage(state));
     case WearableState::Consuming:
-        return tr("Finalizing %1... %2\t%p")
+        return tr("Finalizing %1... %2\t%p%")
             .arg(calculateFileName(state))
-            .arg(calculateQueueMessage(state));;
+            .arg(calculateQueueMessage(state));
     default:
         return QString();
     }
@@ -125,12 +140,10 @@ QString QnWearableProgressWidget::calculateMessage(const WearableState& state)
 
 QString QnWearableProgressWidget::calculateQueueMessage(const WearableState& state)
 {
-    int left = state.queue.size() - (state.currentIndex + 1);
-
-    if (left <= 0)
+    if (state.queue.size() <= 1)
         return QString();
-    else
-        return tr("(%n more file(s) in queue)", "", left);
+
+    return tr("(%1 of %2)").arg(state.currentIndex + 1).arg(state.queue.size());
 }
 
 QString QnWearableProgressWidget::calculateFileName(const WearableState& state)

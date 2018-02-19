@@ -38,6 +38,7 @@ enum class QnMessageBoxCustomButton
     Delete,                     //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
     Reset,                      //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
     Close,                      //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
+    Stop,                       //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
     Skip,                       //< QDialogButtonBox::RejectRole / Qn::ButtonAccent::NoAccent
 };
 

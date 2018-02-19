@@ -4,9 +4,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <nx/client/desktop/utils/wearable_fwd.h>
 
 namespace Ui { class WearableUploadWidget; }
-namespace nx { namespace client { namespace desktop { struct WearableState; }}}
 
 class QnWearableUploadWidget : public QWidget, public QnWorkbenchContextAware
 {

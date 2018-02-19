@@ -57,7 +57,7 @@ namespace
     const int kMaxRecorderQueueSizePacketsDefault = 1000;
 
     const QString kTakeCameraOwnershipWithoutLock(lit("takeCameraOwnershipWithoutLock"));
-    const int kTakeCameraOwnershipWithoutLockDefault = false;
+    const int kTakeCameraOwnershipWithoutLockDefault = true;
 
     const QString kMaxRtpRetryCount(lit("maxRtpRetryCount"));
     const int kMaxRtpRetryCountDefault(6);
@@ -79,6 +79,8 @@ namespace
 
     const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(20);
     const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(1);
+    const std::chrono::seconds kOsTimeChangeCheckPeriodDefault(10);
+    const std::chrono::minutes kSyncTimeExchangePeriodDefault(10);
 
     const QString kHanwhaDeleteProfilesOnInitIfNeeded(lit("hanwhaDeleteProfilesOnInitIfNeeded"));
     const bool kHanwhaDeleteProfilesOnInitIfNeededDefault = false;
@@ -307,6 +309,20 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors(
             duration_cast<milliseconds>(kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault).count(),
             this);
     timeSynchronizationAdaptors << m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor;
+
+    m_osTimeChangeCheckPeriodAdaptor =
+        new QnLexicalResourcePropertyAdaptor<int>(
+            kOsTimeChangeCheckPeriod,
+            duration_cast<milliseconds>(kOsTimeChangeCheckPeriodDefault).count(),
+            this);
+    timeSynchronizationAdaptors << m_osTimeChangeCheckPeriodAdaptor;
+
+    m_syncTimeExchangePeriodAdaptor =
+        new QnLexicalResourcePropertyAdaptor<int>(
+            kSyncTimeExchangePeriod,
+            duration_cast<milliseconds>(kSyncTimeExchangePeriodDefault).count(),
+            this);
+    timeSynchronizationAdaptors << m_syncTimeExchangePeriodAdaptor;
 
     for (auto adaptor: timeSynchronizationAdaptors)
     {
@@ -988,6 +1004,26 @@ std::chrono::milliseconds QnGlobalSettings::maxDifferenceBetweenSynchronizedAndL
 {
     return std::chrono::milliseconds(
         m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor->value());
+}
+
+std::chrono::milliseconds QnGlobalSettings::osTimeChangeCheckPeriod() const
+{
+    return std::chrono::milliseconds(m_osTimeChangeCheckPeriodAdaptor->value());
+}
+
+void QnGlobalSettings::setOsTimeChangeCheckPeriod(std::chrono::milliseconds value)
+{
+    m_osTimeChangeCheckPeriodAdaptor->setValue(value.count());
+}
+
+std::chrono::milliseconds QnGlobalSettings::syncTimeExchangePeriod() const
+{
+    return std::chrono::milliseconds(m_syncTimeExchangePeriodAdaptor->value());
+}
+
+void QnGlobalSettings::setSyncTimeExchangePeriod(std::chrono::milliseconds value)
+{
+    m_syncTimeExchangePeriodAdaptor->setValue(value.count());
 }
 
 QString QnGlobalSettings::cloudAccountName() const

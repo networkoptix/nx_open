@@ -67,6 +67,7 @@ public:
     virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const override;
     virtual void pleaseReopenStream() = 0;
 
+    virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
 protected:
     QnAbstractCompressedMetadataPtr getMetadata();
     virtual QnMetaDataV1Ptr getCameraMetadata();
@@ -101,6 +102,7 @@ private:
     // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened.
     // TODO: Find the way to keep it in sync besides pleaseReopenStream() call, which causes delay.
     QnLiveStreamParams m_liveParams;
+    int m_primaryFps = 0;
 
     bool m_prevCameraControlDisabled;
     unsigned int m_framesSinceLastMetaData;

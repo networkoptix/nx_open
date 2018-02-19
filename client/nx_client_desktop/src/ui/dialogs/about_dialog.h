@@ -13,7 +13,6 @@ namespace Ui {
 
 class QnResourceListModel;
 
-
 class QnAboutDialog : public QnSessionAwareButtonBoxDialog {
     Q_OBJECT
 
@@ -31,7 +30,7 @@ protected slots:
 private:
     void retranslateUi();
 
-    // Makes report that contains a list of connected servers and their versions
+    // Makes report that contains a list of connected servers and their versions.
     void generateServersReport();
 
 private:
@@ -39,7 +38,7 @@ private:
     QPushButton *m_copyButton;
 
     QString m_serversReport;
-    QnResourceListModel* m_serverListModel;
+    QnResourceListModel* m_serverListModel = nullptr;
 };
 
 #endif // QN_ABOUT_DIALOG_H

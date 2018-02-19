@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi" sourcelanguage="en">
   <context>
+    <name>AsyncImageWidget</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>Không có sẵn</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -868,6 +875,22 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>Không gian khuôn...</translation>
     </message>
+    <message>
+      <source>Wearable Camera...</source>
+      <translation type="unfinished">Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation type="unfinished">Upload File...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation type="unfinished">Upload Folder...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -1101,9 +1124,8 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+      <translation>
+        <numerusform>Tên tệp không được chứa các ký tự dự sau: %1</numerusform>
       </translation>
     </message>
     <message>
@@ -1341,8 +1363,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>... và %n hơn nữa</numerusform>
       </translation>
     </message>
   </context>
@@ -1373,6 +1395,17 @@ to view more bookmarks</source>
     <message>
       <source>Folder not found</source>
       <translation>Không tìm thấy thư mục</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnArchiveLengthWidget</name>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices.</source>
+      <translation>Giá trị nhỏ nhất có thể dẫn đến giảm độ dài lưu trữ trên các thiết bị khác.</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras.</source>
+      <translation>Giá trị nhỏ nhất có thể dẫn đến giảm độ dài lưu trữ trên camera.</translation>
     </message>
   </context>
   <context>
@@ -1458,32 +1491,32 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from System</numerusform>
+      <translation>
+        <numerusform>Các thiết bị này được gỡ bỏ khỏi hệ thống</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from System</numerusform>
+      <translation>
+        <numerusform>Những camera này sẽ được gỡ bỏ khỏi Hệ thống</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These servers are removed from System</numerusform>
+      <translation>
+        <numerusform>Các máy chủ này được xóa khỏi Hệ thống</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These users are removed from System</numerusform>
+      <translation>
+        <numerusform>Những người dùng này sẽ bị xóa khỏi Hệ thống</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These resources are removed from System</numerusform>
+      <translation>
+        <numerusform>Các tài nguyên này sẽ được xóa khỏi Hệ thống</numerusform>
       </translation>
     </message>
     <message>
@@ -1563,8 +1596,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n action(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n action(s)</numerusform>
+      <translation>
+        <numerusform>%n hoạt động</numerusform>
       </translation>
     </message>
     <message>
@@ -1713,8 +1746,8 @@ to view more bookmarks</source>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
-        <numerusform>You have %n notifications</numerusform>
+      <translation>
+        <numerusform>Bạn có %n thông báo</numerusform>
       </translation>
     </message>
   </context>
@@ -1772,14 +1805,14 @@ to view more bookmarks</source>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n devices</numerusform>
+      <translation>
+        <numerusform>%1 of %n thiết bị</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n cameras</numerusform>
+      <translation>
+        <numerusform>%1 trong số %n camera</numerusform>
       </translation>
     </message>
     <message>
@@ -1792,8 +1825,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n I/O modules</numerusform>
+      <translation>
+        <numerusform>%1 trong tổng số %n mô đun I/O</numerusform>
       </translation>
     </message>
     <message>
@@ -1816,8 +1849,8 @@ to view more bookmarks</source>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n Server(s)</numerusform>
+      <translation>
+        <numerusform>%n Servers</numerusform>
       </translation>
     </message>
     <message>
@@ -1854,8 +1887,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more cameras</numerusform>
+      <translation>
+        <numerusform>Nguồn và %n máy ảnh hơn</numerusform>
       </translation>
     </message>
     <message>
@@ -2058,8 +2091,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
-        <numerusform>%n devices found</numerusform>
+      <translation>
+        <numerusform>%n thiết bị được tìm</numerusform>
       </translation>
     </message>
     <message>
@@ -2093,8 +2126,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices added.</source>
-      <translation type="unfinished">
-        <numerusform>%n devices added.</numerusform>
+      <translation>
+        <numerusform>%n Thiết bị đã thêm.</numerusform>
       </translation>
     </message>
     <message>
@@ -2103,8 +2136,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to add %n devices</numerusform>
+      <translation>
+        <numerusform>Không thể thêm thiết bị %n</numerusform>
       </translation>
     </message>
     <message>
@@ -2181,6 +2214,18 @@ to view more bookmarks</source>
       <source>Camera Id</source>
       <translation>Tên Camera</translation>
     </message>
+    <message>
+      <source>Settings</source>
+      <translation>Cài đặt</translation>
+    </message>
+    <message>
+      <source>Web</source>
+      <translation type="unfinished">Web</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation type="unfinished">No settings</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
@@ -2201,8 +2246,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation type="unfinished">
-        <numerusform>%1 does not support two-way audio</numerusform>
+      <translation>
+        <numerusform>%1 không hỗ trợ âm thanh hai chiều</numerusform>
       </translation>
     </message>
   </context>
@@ -2288,22 +2333,6 @@ to view more bookmarks</source>
       <translation>Phụ</translation>
     </message>
     <message>
-      <source>Don&apos;t change</source>
-      <translation>Don&apos;t Lưu</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Thấp</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>Trong</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Cao</translation>
-    </message>
-    <message>
       <source>Edge</source>
       <translation>Cạnh</translation>
     </message>
@@ -2319,8 +2348,8 @@ to view more bookmarks</source>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation type="unfinished">
-        <numerusform>%1 have no input ports</numerusform>
+      <translation>
+        <numerusform>%1 Không có cổng đầu vào</numerusform>
       </translation>
     </message>
   </context>
@@ -2358,14 +2387,14 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
-        <numerusform>%n devices found</numerusform>
+      <translation>
+        <numerusform>%n thiết bị được tìm</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras found</numerusform>
+      <translation>
+        <numerusform>%n máy ảnh được tìm thấy</numerusform>
       </translation>
     </message>
     <message>
@@ -2378,8 +2407,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules found</numerusform>
+      <translation>
+        <numerusform>%n I/O module tìm thấy</numerusform>
       </translation>
     </message>
     <message>
@@ -2471,8 +2500,8 @@ to view more bookmarks</source>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation type="unfinished">
-        <numerusform>%1 have no output relays</numerusform>
+      <translation>
+        <numerusform>%1 không có rơ le đầu ra</numerusform>
       </translation>
     </message>
   </context>
@@ -2525,14 +2554,6 @@ to view more bookmarks</source>
       <translation>dựa trên thời gian máy chủ</translation>
     </message>
     <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>Giá trị nhỏ nhất có thể dẫn đến giảm độ dài lưu trữ trên các thiết bị khác.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>Giá trị nhỏ nhất có thể dẫn đến giảm độ dài lưu trữ trên camera.</translation>
-    </message>
-    <message>
       <source>Not enough licenses to enable recording</source>
       <translation>Phần mềm chưa đăng ký bản quyền để thực hiện ghi</translation>
     </message>
@@ -2578,7 +2599,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
+      <translation type="unfinished">Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -2649,20 +2670,20 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
+      <translation>
+        <numerusform>Những thay đổi dưới đây%n không được lưu trên thiết bị:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+      <translation>
+        <numerusform>Những thay đổi dưới đây%n không được lưu trên thiết bị:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+      <translation>
+        <numerusform>Những thay đổi dưới đây %n không được lưu trên I/O Modules:</numerusform>
       </translation>
     </message>
     <message>
@@ -2679,6 +2700,14 @@ to view more bookmarks</source>
     <message>
       <source>No device selected.</source>
       <translation>Không có thiết bị được chọn.</translation>
+    </message>
+    <message>
+      <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
+      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+    </message>
+    <message>
+      <source>Cannot edit properties for several wearable cameras.</source>
+      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
     </message>
   </context>
   <context>
@@ -3276,14 +3305,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
+      <translation>
+        <numerusform>Ghi sự kiện cho giai đoạn %1-%2 - %n sự kiện tìm thấy</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n event(s) found</numerusform>
+      <translation>
+        <numerusform>Ghi sự kiện cho %1 - %n sự kiện tìm thấy</numerusform>
       </translation>
     </message>
     <message>
@@ -3336,8 +3365,8 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n thời gian)</numerusform>
       </translation>
     </message>
     <message>
@@ -3346,20 +3375,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation type="unfinished">
-        <numerusform>and %n users more...</numerusform>
+      <translation>
+        <numerusform>và %n nhiều người dùng hơn...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation type="unfinished">
-        <numerusform>and %n more...</numerusform>
+      <translation>
+        <numerusform>và %n nhiều hơn nữa...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
-        <numerusform>%n Removed subjects</numerusform>
+      <translation>
+        <numerusform>%n Chủ đề đã bị xóa</numerusform>
       </translation>
     </message>
     <message>
@@ -3722,8 +3751,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation type="unfinished">
-        <numerusform>Test completed successfully: %n users found.</numerusform>
+      <translation>
+        <numerusform>Kiểm tra đã hoàn thành công: %n người đã được tìm thấy.</numerusform>
       </translation>
     </message>
   </context>
@@ -3891,8 +3920,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
-        <numerusform>License expires in %n days</numerusform>
+      <translation>
+        <numerusform>Bản quyền sẽ hết hạn trong %n ngày</numerusform>
       </translation>
     </message>
     <message>
@@ -3984,14 +4013,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
-      <translation type="unfinished">
-        <numerusform>At least %n %1 are required</numerusform>
+      <translation>
+        <numerusform>Ít nhất %n %1 được yêu cầu</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
-      <translation type="unfinished">
-        <numerusform>%n %1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%n %1 hiện đang được sử dụng</numerusform>
       </translation>
     </message>
     <message>
@@ -4000,8 +4029,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>Hủy kích hoạt giấy phép?</numerusform>
       </translation>
     </message>
     <message>
@@ -4010,20 +4039,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
-        <numerusform>Failed to deactivate %n licenses</numerusform>
+      <translation>
+        <numerusform>%n Cấp bản quyền lỗi</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+      <translation>
+        <numerusform>%1 trong số %n giấy phép không kích hoạt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>Không thể hủy kích hoạt bản quyền</numerusform>
       </translation>
     </message>
     <message>
@@ -4044,8 +4073,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%n licenses deactivated</numerusform>
+      <translation>
+        <numerusform>%n Bản quyền ngừng hoạt động</numerusform>
       </translation>
     </message>
     <message>
@@ -4058,8 +4087,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
-        <numerusform>%n channels.</numerusform>
+      <translation>
+        <numerusform>%n kênh.</numerusform>
       </translation>
     </message>
     <message>
@@ -4068,8 +4097,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>Hủy kích hoạt %n Khác</numerusform>
       </translation>
     </message>
     <message>
@@ -4136,20 +4165,20 @@ to %1</source>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Use licenses for selected %n devices</numerusform>
+      <translation>
+        <numerusform>Sử dụng giấy phép để lựa chọn %n thiết bị</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Use licenses for selected %n cameras</numerusform>
+      <translation>
+        <numerusform>Sử dụng giấy phép cho %n máy ảnh được lựa chọn</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>Use licenses for selected %n I/O modules</numerusform>
+      <translation>
+        <numerusform>Sử dụng giấy phép để lựa chọn %n I/O module</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4488,6 +4517,14 @@ to %1</source>
       <source>Skip</source>
       <translation>Bỏ qua</translation>
     </message>
+    <message>
+      <source>Close</source>
+      <translation>Đóng cửa</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>Dừng lại</translation>
+    </message>
   </context>
   <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -4567,11 +4604,30 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnNewWearableCameraDialog</name>
+    <message>
+      <source>Wearable Camera</source>
+      <translation type="unfinished">Wearable Camera</translation>
+    </message>
+    <message>
+      <source>Wearable Camera %1</source>
+      <translation type="unfinished">Wearable Camera %1</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Tên</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty</source>
+      <translation>Tên không thể để trống</translation>
+    </message>
+  </context>
+  <context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
       <source>%n more notifications</source>
-      <translation type="unfinished">
-        <numerusform>%n more notifications</numerusform>
+      <translation>
+        <numerusform>%n thêm thông báo</numerusform>
       </translation>
     </message>
   </context>
@@ -4767,20 +4823,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation type="unfinished">
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+      <translation>
+        <numerusform>Đây điểm thiết lập trong %n phút sau khi kích hoạt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation type="unfinished">
-        <numerusform>Tour has %n identical positions</numerusform>
+      <translation>
+        <numerusform>Cruise gồm %n cùng một vị trí</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation type="unfinished">
-        <numerusform>about %n minute(s)</numerusform>
+      <translation>
+        <numerusform>về %n phút</numerusform>
       </translation>
     </message>
     <message>
@@ -5001,22 +5057,22 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n devices</numerusform>
+      <translation>
+        <numerusform>Tổng số %1 thiết bị %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n cameras</numerusform>
+      <translation>
+        <numerusform>Tổng số %1 %n camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n I/O modules</numerusform>
+      <translation>
+        <numerusform>Tổng số %1 %n môđun I/O</numerusform>
       </translation>
     </message>
     <message>
@@ -5070,8 +5126,8 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%n trong số %1 chọn các role không có quyền truy cập %2</numerusform>
       </translation>
     </message>
     <message>
@@ -5087,8 +5143,8 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%n trong số %1 chọn người dùng không có quyền truy cập %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5120,13 +5176,6 @@ to %1</source>
     <message>
       <source>Health Monitor</source>
       <translation>Theo dõi tài nguyên hệ thống</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnResourcePreviewWidget</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>Không có sẵn</translation>
     </message>
   </context>
   <context>
@@ -5343,8 +5392,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
+      <translation>
+        <numerusform>%n Máy chủ</numerusform>
       </translation>
     </message>
   </context>
@@ -5364,8 +5413,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Người dùng</numerusform>
       </translation>
     </message>
   </context>
@@ -5373,8 +5422,8 @@ to %1</source>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation type="unfinished">
-        <numerusform>%n additional</numerusform>
+      <translation>
+        <numerusform>%n bổ sung</numerusform>
       </translation>
     </message>
     <message>
@@ -5383,8 +5432,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 users have invalid email address</numerusform>
+      <translation>
+        <numerusform>%n trong số %1 người dùng có địa chỉ email không hợp lệ</numerusform>
       </translation>
     </message>
     <message>
@@ -5393,8 +5442,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      <translation>
+        <numerusform>%n trong tổng số %1 địa chỉ email bổ sung không hợp lệ</numerusform>
       </translation>
     </message>
     <message>
@@ -5645,8 +5694,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
-      <translation type="unfinished">
-        <numerusform>Not enough free space at %n Servers:</numerusform>
+      <translation>
+        <numerusform>Không đủ không gian trống tại %n Máy chủ:</numerusform>
       </translation>
     </message>
     <message>
@@ -6023,6 +6072,10 @@ to %1</source>
       <source>Set for this Camera</source>
       <translation>Đặt cho Máy ảnh này</translation>
     </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation type="unfinished">NO LIVE STREAM</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6049,7 +6102,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
       </translation>
     </message>
@@ -6167,7 +6220,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>Sẽ không ghi hình khi vô hiệu hóa thiết bị lưu trữ. Tuy nhiên, xóa các video cũ từ bộ nhớ vấn được.</translation>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
@@ -6657,32 +6710,32 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>The problem is caused by %n servers:</numerusform>
+      <translation>
+        <numerusform>Vấn đề là do %n máy chủ:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>No free space left on %n servers:</numerusform>
+      <translation>
+        <numerusform>Không gian trống còn lại trên %n máy chủ:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
-      <translation type="unfinished">
-        <numerusform>%n servers are not responding:</numerusform>
+      <translation>
+        <numerusform>%n máy chủ không được đáp ứng:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
-      <translation type="unfinished">
-        <numerusform>%n servers have gone offline:</numerusform>
+      <translation>
+        <numerusform>%n máy chủ đã đi offline:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>Authentication failed for %n servers:</numerusform>
+      <translation>
+        <numerusform>Xác thực không thành cho %n máy chủ:</numerusform>
       </translation>
     </message>
     <message>
@@ -6829,8 +6882,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation type="unfinished">
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
+      <translation>
+        <numerusform>Vui lòng chọn hành động để thực hiện trên %n người dùng có vai trò</numerusform>
       </translation>
     </message>
   </context>
@@ -7023,8 +7076,8 @@ to %1</source>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>PC %1 - Hiển thị %2</numerusform>
       </translation>
     </message>
   </context>
@@ -7033,6 +7086,42 @@ to %1</source>
     <message>
       <source>Muted</source>
       <translation>Người câm</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableProgressWidget</name>
+    <message>
+      <source>Uploading %1... %2	%p%</source>
+      <translation type="unfinished">Uploading %1... %2	%p%</translation>
+    </message>
+    <message numerus="yes">
+      <source>(%n more file(s) in queue)</source>
+      <translation type="unfinished">
+        <numerusform>(%n more file(s) in queue)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation type="unfinished">Stop uploading?</translation>
+    </message>
+    <message>
+      <source>Already uploaded files will be kept.</source>
+      <translation type="unfinished">Already uploaded files will be kept.</translation>
+    </message>
+    <message>
+      <source>Finalizing %1... %2	%p%</source>
+      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableUploadWidget</name>
+    <message>
+      <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Another user is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
     </message>
   </context>
   <context>
@@ -7100,8 +7189,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n bookmarks?</numerusform>
+      <translation>
+        <numerusform>Xóa %n Bookmark?</numerusform>
       </translation>
     </message>
   </context>
@@ -7176,8 +7265,8 @@ to %1</source>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>The following %n items are not saved:</numerusform>
+      <translation>
+        <numerusform>Các mục %n sau đây không được lưu lại:</numerusform>
       </translation>
     </message>
     <message>
@@ -7190,8 +7279,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation type="unfinished">
-        <numerusform>The following %n items are not deleted:</numerusform>
+      <translation>
+        <numerusform>Các mục %n sau đây không bị xóa:</numerusform>
       </translation>
     </message>
     <message>
@@ -7200,8 +7289,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n items:</numerusform>
+      <translation>
+        <numerusform>Không thể xóa %n mục:</numerusform>
       </translation>
     </message>
     <message>
@@ -7357,8 +7446,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n items?</numerusform>
+      <translation>
+        <numerusform>Xóa %n mục?</numerusform>
       </translation>
     </message>
     <message>
@@ -7375,8 +7464,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n matrices?</numerusform>
+      <translation>
+        <numerusform>Xóa %n ma trận?</numerusform>
       </translation>
     </message>
     <message>
@@ -7406,6 +7495,123 @@ to %1</source>
     <message>
       <source>Activate one more license to start Video Wall.</source>
       <translation>Kích hoạt thêm bản quyền để bắt đầu phiên điều khiển Video Wall.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchWearableHandler</name>
+    <message>
+      <source>Could not add wearable camera to server &quot;%1&quot;.</source>
+      <translation type="unfinished">Could not add wearable camera to server &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>Tất cả các file(*.*)</translation>
+    </message>
+    <message>
+      <source>Video (%1)</source>
+      <translation type="unfinished">Video (%1)</translation>
+    </message>
+    <message>
+      <source>Open Wearable Camera Recordings...</source>
+      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+    </message>
+    <message>
+      <source>No video files found in &quot;%1&quot;</source>
+      <translation type="unfinished">No video files found in &quot;%1&quot;</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file format(s) are not supported</source>
+      <translation type="unfinished">
+        <numerusform>Selected file format(s) are not supported</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only video files are supported.</source>
+      <translation type="unfinished">Only video files are supported.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) do not have timestamp(s)</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only video files with correct timestamp are supported.</source>
+      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) cover periods for which videos are already being uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these file(s) to a different instance of a Wearable Camera.</source>
+      <translation type="unfinished">
+        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) cover periods for which videos have already been uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) will not be uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) will not be uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some file(s) will not be uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Some file(s) will not be uploaded</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There is no new files to upload in &quot;%1&quot;</source>
+      <translation type="unfinished">There is no new files to upload in &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation type="unfinished">Not enough space on server storage</translation>
+    </message>
+    <message numerus="yes">
+      <source>File(s) size - %1
+Free space - %2</source>
+      <translation type="unfinished">
+        <numerusform>File(s) size - %1
+Free space - %2</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>File format of &quot;%1&quot; is not supported.</source>
+      <translation type="unfinished">File format of &quot;%1&quot; is not supported.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; does not have timestamp.</source>
+      <translation type="unfinished">File &quot;%1&quot; does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cover periods for which video is already being uploaded.</source>
+      <translation type="unfinished">File &quot;%1&quot; cover periods for which video is already being uploaded.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cover periods for which video has already been uploaded.</source>
+      <translation type="unfinished">File &quot;%1&quot; cover periods for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>There is no space on server for file &quot;%1&quot;.</source>
+      <translation type="unfinished">There is no space on server for file &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -7439,8 +7645,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation type="unfinished">
-        <numerusform>User will still have access to %n removed resources:</numerusform>
+      <translation>
+        <numerusform>Người dùng sẽ vẫn có quyền truy cập vào %n tài nguyên đã xóa:</numerusform>
       </translation>
     </message>
     <message>
@@ -7449,8 +7655,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation type="unfinished">
-        <numerusform>All users with this role will get access to %n resources:</numerusform>
+      <translation>
+        <numerusform>Tất cả người dùng với vai trò này sẽ nhận được quyền truy cập vào tài nguyên %n:</numerusform>
       </translation>
     </message>
     <message>
@@ -7459,8 +7665,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation type="unfinished">
-        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+      <translation>
+        <numerusform>Người dùng sẽ vẫn có quyền truy cập vào %n tài nguyên đã xóa:</numerusform>
       </translation>
     </message>
     <message>
@@ -7473,32 +7679,32 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation type="unfinished">
-        <numerusform>User will lose access to %n resources:</numerusform>
+      <translation>
+        <numerusform>Người dùng sẽ mất quyền truy cập vào các tài nguyên %n:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation type="unfinished">
-        <numerusform>All users with this role will lose access to %n resources:</numerusform>
+      <translation>
+        <numerusform>Tất cả người dùng với vai trò này sẽ nhận được quyền truy cập vào tài nguyên %n:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n shared layouts?</numerusform>
+      <translation>
+        <numerusform>Xóa %n Layout được chia sẻ?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation type="unfinished">
-        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
+      <translation>
+        <numerusform>Những layout %n này được chia sẻ với người dùng khác, vì vậy bạn cũng xóa nó cho họ.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from layout?</numerusform>
+      <translation>
+        <numerusform>Xóa %n mục khỏi layout?</numerusform>
       </translation>
     </message>
     <message>
@@ -7515,50 +7721,50 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n users?</numerusform>
+      <translation>
+        <numerusform>Xóa %n người dùng?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n devices?</numerusform>
+      <translation>
+        <numerusform>Xóa %n thiết bị?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n cameras?</numerusform>
+      <translation>
+        <numerusform>Xóa %n camera?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n I/O Modules?</numerusform>
+      <translation>
+        <numerusform>Xóa %n I/O Modules?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n items?</numerusform>
+      <translation>
+        <numerusform>Xóa %n mục?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n of them are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>%n trong số đó được tự động phát hiện.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>%n camera được tự động phát hiện.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>%n Các mô đun I/O được tự động phát hiện.</numerusform>
       </translation>
     </message>
     <message>
@@ -7575,8 +7781,22 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
+      <translation>
+        <numerusform>Xóa %n mục khỏi showreel?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation type="unfinished">Stop uploading?</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>Dừng lại</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
       <translation type="unfinished">
-        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
       </translation>
     </message>
   </context>
@@ -7584,8 +7804,8 @@ to %1</source>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
-        <numerusform>%n users</numerusform>
+      <translation>
+        <numerusform>%n người dùng</numerusform>
       </translation>
     </message>
   </context>
@@ -7818,6 +8038,40 @@ to %1</source>
     <message>
       <source>Short</source>
       <translation>Quá ngắn</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::UploadWorker</name>
+    <message>
+      <source>Could not open file &quot;%1&quot;</source>
+      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not calculate md5 for file &quot;%1&quot;</source>
+      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not create upload on the server side</source>
+      <translation type="unfinished">Could not create upload on the server side</translation>
+    </message>
+    <message>
+      <source>Could not upload file chunk to the server</source>
+      <translation type="unfinished">Could not upload file chunk to the server</translation>
+    </message>
+    <message>
+      <source>Could not check uploaded file on the server</source>
+      <translation type="unfinished">Could not check uploaded file on the server</translation>
+    </message>
+    <message>
+      <source>File was corrupted while being uploaded to the server</source>
+      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WearableWorker</name>
+    <message>
+      <source>Failed to send request to the server.</source>
+      <translation type="unfinished">Failed to send request to the server.</translation>
     </message>
   </context>
   <context>
@@ -8129,20 +8383,20 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::ActionHandler</name>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n devices</numerusform>
+      <translation>
+        <numerusform>Không thể di chuyển thiết bị %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n cameras</numerusform>
+      <translation>
+        <numerusform>Không thể di chuyển %n camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n I/O Modules</numerusform>
+      <translation>
+        <numerusform>Không di chuyển được các mô-đun I/O %n</numerusform>
       </translation>
     </message>
     <message>
@@ -8151,20 +8405,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>Máy chủ &quot;%1&quot; không thể truy cập %n thiết bị. Di chuyển chúng anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>Máy chủ &quot;%1&quot; không thể truy cập vào %n máy ảnh. Di chuyển chúng anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>Máy chủ &quot;%1&quot; không thể truy cập vào mô-đun I/O %n. Di chuyển chúng bằng mọi cách?</numerusform>
       </translation>
     </message>
     <message>
@@ -8221,8 +8475,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation type="unfinished">
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+      <translation>
+        <numerusform>Bạn có chắc chắn muốn xóa vĩnh viễn các tập tin%n?</numerusform>
       </translation>
     </message>
     <message>
@@ -8312,6 +8566,10 @@ to %1</source>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>Không thể thay đổi mật khẩu trên %1 trong số %2 máy ảnh</translation>
+    </message>
+    <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
     </message>
   </context>
   <context>

@@ -44,16 +44,6 @@ class ConfigCommand(object):
             )
 
 
-def make_vm_config_internal_network_command(virtualbox_vm, network):
-    kwargs = {}
-    if network.network == network.ip:  # it is just a network, and dhcp must be used
-        kwargs['type'] = ':dhcp'
-    else:
-        kwargs['ip'] = quote(network.ip)
-    network_name = virtualbox_vm.produce_internal_network(network)
-    kwargs['virtualbox__intnet'] = quote(network_name)
-    return ConfigCommand('network', [':private_network'], kwargs)
-
 def make_vm_provision_command(script, args=None, env=None):
     kwargs = dict(path=quote(script))
     if args:
@@ -62,9 +52,6 @@ def make_vm_provision_command(script, args=None, env=None):
         kwargs['env'] = '{%s}' % ', '.join('%s: %s' % (name, value) for name, value in env.items())
     return ConfigCommand('provision', [':shell'], kwargs)
 
-def make_virtualbox_host_time_disabled_command():
-    return ConfigCommand(None, [':setextradata', ':id', quote('VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled'), '1'])
-
 
 class VagrantVMConfigFactory(object):
 
@@ -72,15 +59,13 @@ class VagrantVMConfigFactory(object):
         self._customization_company_name = customization_company_name
 
     # ip_address may end with .0 (like 1.2.3.0); this will be treated as network address, and dhcp will be used for it
-    def __call__(self, name=None, provision_scripts=None, must_be_recreated=False,
-                 ip_address_list=None, required_file_list=None, sync_time=True):
+    def __call__(self, name=None, provision_scripts=None, must_be_recreated=False, ip_address_list=None,
+                 required_file_list=None):
         vagrant_conf = []
         virtualbox_conf = []
         ip_address_list = map(IPNetwork, ip_address_list or [DEFAULT_PRIVATE_NET])
         if not required_file_list:
             required_file_list = []
-        if not sync_time:
-            virtualbox_conf += [make_virtualbox_host_time_disabled_command()]
         for script in provision_scripts or []:
             vagrant_conf += [make_vm_provision_command(script)]
             required_file_list.append('{test_dir}/' + script)
@@ -149,8 +134,7 @@ class VagrantVMConfig(object):
             )
 
     def matches(self, other):
-        return (self.name == other.name
-                and self.ip_address_list == other.ip_address_list
+        return (self.ip_address_list == other.ip_address_list
                 and sorted(self.required_file_list) == sorted(other.required_file_list)
                 and self.vagrant_conf == other.vagrant_conf
                 and self.virtualbox_conf == other.virtualbox_conf)
@@ -178,15 +162,13 @@ class VagrantVMConfig(object):
         return self.vm_port_base + SSH_PORT_OFFSET + self.idx
 
     def expand(self, virtualbox_management):
-        network_vagrant_conf = [make_vm_config_internal_network_command(virtualbox_management, ip_address)
-                               for ip_address in self.ip_address_list]
         return ExpandedVagrantVMConfig(
             vagrant_name=self.vagrant_name,
             virtualbox_name=self.virtualbox_name,
             rest_api_internal_port=MEDIASERVER_LISTEN_PORT,
             rest_api_forwarded_port=self.rest_api_forwarded_port,
             ssh_forwarded_port=self.ssh_forwarded_port,
-            vagrant_conf=map(self._expand_vm_command, network_vagrant_conf + self.vagrant_conf),
+            vagrant_conf=map(self._expand_vm_command, self.vagrant_conf),
             virtualbox_conf=map(self._expand_virtualbox_command, self.virtualbox_conf),
             )
 

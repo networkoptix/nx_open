@@ -32,7 +32,7 @@ void QnServerEdgeStreamRecorder::setOnFileWrittenHandler(FileWrittenHandler hand
     m_fileWrittenHandler = std::move(handler);
 }
 
-bool QnServerEdgeStreamRecorder::canAcceptData() const 
+bool QnServerEdgeStreamRecorder::canAcceptData() const
 {
     return !isQueueFull();
 }

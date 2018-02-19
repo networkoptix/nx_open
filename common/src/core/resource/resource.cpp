@@ -1,12 +1,8 @@
 #include "resource.h"
 
-#include <climits>
-
 #include <typeinfo>
 
-#include <QtCore/QCoreApplication>
 #include <QtCore/QMetaObject>
-#include <QtCore/QMetaProperty>
 #include <QtCore/QRunnable>
 
 #include <nx_ec/data/api_resource_data.h>
@@ -17,7 +13,6 @@
 #include <core/resource/camera_advanced_param.h>
 #include <utils/common/warnings.h>
 #include "core/resource_management/resource_pool.h"
-#include "core/ptz/abstract_ptz_controller.h"
 
 #include "resource_command_processor.h"
 #include "resource_consumer.h"
@@ -46,23 +41,13 @@ static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 // QnResource
 // -------------------------------------------------------------------------- //
 QnResource::QnResource(QnCommonModule* commonModule):
-    QObject(),
     m_mutex(QnMutex::Recursive),
     m_initMutex(QnMutex::Recursive),
-    m_resourcePool(NULL),
-    m_flags(0),
-    m_initialized(false),
-    m_lastInitTime(0),
-    m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
-    m_lastMediaIssue(CameraDiagnostics::NoErrorResult()),
-    m_initInProgress(false),
     m_commonModule(commonModule)
 {
 }
 
-QnResource::QnResource(const QnResource& right)
-    :
-    QObject(),
+QnResource::QnResource(const QnResource& right):
     m_parentId(right.m_parentId),
     m_name(right.m_name),
     m_url(right.m_url),
@@ -70,8 +55,6 @@ QnResource::QnResource(const QnResource& right)
     m_id(right.m_id),
     m_typeId(right.m_typeId),
     m_flags(right.m_flags),
-    m_lastDiscoveredTime(right.m_lastDiscoveredTime),
-    m_tags(right.m_tags),
     m_initialized(right.m_initialized),
     m_lastInitTime(right.m_lastInitTime),
     m_prevInitializationResult(right.m_prevInitializationResult),
@@ -128,9 +111,6 @@ void QnResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& no
     NX_ASSERT(toSharedPointer(this));
 
     m_typeId = other->m_typeId;
-    m_lastDiscoveredTime = other->m_lastDiscoveredTime;
-
-    m_tags = other->m_tags;
 
     if (m_url != other->m_url)
     {
@@ -232,12 +212,11 @@ QnUuid QnResource::getParentId() const
 void QnResource::setParentId(const QnUuid& parent)
 {
     bool initializedChanged = false;
-    QnUuid oldParentId;
     {
         QnMutexLocker locker(&m_mutex);
         if (m_parentId == parent)
             return;
-        oldParentId = m_parentId;
+
         m_parentId = parent;
         if (m_initialized)
         {
@@ -325,18 +304,10 @@ QString QnResource::toSearchString() const
 
 QnResourcePtr QnResource::getParentResource() const
 {
-    QnUuid parentID;
-    QnResourcePool* resourcePool = NULL;
-    {
-        QnMutexLocker mutexLocker(&m_mutex);
-        parentID = getParentId();
-        resourcePool = m_resourcePool;
-    }
+    if (const auto resourcePool = this->resourcePool())
+        return resourcePool->getResourceById(getParentId());
 
-    if (resourcePool)
-        return resourcePool->getResourceById(parentID);
-    else
-        return QnResourcePtr();
+    return QnResourcePtr();
 }
 
 bool QnResource::hasParam(const QString &name) const
@@ -345,11 +316,6 @@ bool QnResource::hasParam(const QString &name) const
     if (!resType)
         return false;
     return resType->hasParam(name);
-}
-
-bool QnResource::unknownResource() const
-{
-    return getName().isEmpty();
 }
 
 QnUuid QnResource::getTypeId() const
@@ -433,18 +399,6 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     doStatusChanged(oldStatus, newStatus, reason);
 }
 
-QDateTime QnResource::getLastDiscoveredTime() const
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    return m_lastDiscoveredTime;
-}
-
-void QnResource::setLastDiscoveredTime(const QDateTime &time)
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    m_lastDiscoveredTime = time;
-}
-
 QnUuid QnResource::getId() const
 {
     QnMutexLocker mutexLocker(&m_mutex);
@@ -457,7 +411,7 @@ void QnResource::setId(const QnUuid& id)
 
     // TODO: #dmishin it seems really wrong. Think about how to do it in another way.
     NX_ASSERT(
-        dynamic_cast<QnSecurityCamResource*>(this) || m_locallySavedProperties.size() == 0,
+        dynamic_cast<QnSecurityCamResource*>(this) || m_locallySavedProperties.empty(),
         lit("Only camera resources are allowed to set properties if id is not set."));
 
     m_id = id;
@@ -478,37 +432,6 @@ void QnResource::setUrl(const QString &url)
         m_url = url;
     }
     emit urlChanged(toSharedPointer(this));
-}
-
-void QnResource::addTag(const QString& tag)
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    if (!m_tags.contains(tag))
-        m_tags.push_back(tag);
-}
-
-void QnResource::setTags(const QStringList& tags)
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    m_tags = tags;
-}
-
-void QnResource::removeTag(const QString& tag)
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    m_tags.removeAll(tag);
-}
-
-bool QnResource::hasTag(const QString& tag) const
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    return m_tags.contains(tag);
-}
-
-QStringList QnResource::getTags() const
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    return m_tags;
 }
 
 void QnResource::addConsumer(QnResourceConsumer *consumer)
@@ -580,44 +503,6 @@ QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(Qn::Connect
     return NULL;
 }
 #endif
-
-QnAbstractPtzController *QnResource::createPtzController()
-{
-    QnAbstractPtzController *result = createPtzControllerInternal();
-    if (!result)
-        return result;
-
-    /* Do some sanity checking. */
-    Ptz::Capabilities capabilities = result->getCapabilities();
-    if((capabilities & Ptz::LogicalPositioningPtzCapability) && !(capabilities & Ptz::AbsolutePtzCapabilities))
-    {
-        auto message =
-            lit("Logical position space capability is defined for a PTZ controller that does not support absolute movement. %1 %2")
-                .arg(getName())
-                .arg(getUrl());
-
-        qDebug() << message;
-        NX_LOG(message, cl_logWARNING);
-    }
-
-    if((capabilities & Ptz::DevicePositioningPtzCapability) && !(capabilities & Ptz::AbsolutePtzCapabilities))
-    {
-        auto message =
-            lit("Device position space capability is defined for a PTZ controller that does not support absolute movement. %1 %2")
-                .arg(getName())
-                .arg(getUrl());
-
-        qDebug() << message;
-        NX_LOG(message.toLatin1(), cl_logERROR);
-    }
-
-    return result;
-}
-
-QnAbstractPtzController *QnResource::createPtzControllerInternal()
-{
-    return NULL;
-}
 
 CameraDiagnostics::Result QnResource::initInternal()
 {
@@ -795,19 +680,6 @@ ec2::ApiResourceParamDataList QnResource::getAllProperties() const
             result.emplace_back(it.key(), it.value());
     }
 
-#if 0
-    printf("\n==== Camera: %s ====\n", getName().toLatin1().constData());
-    printf("\tStatic properties:\n");
-    for (auto it = staticDefaultProperties.cbegin(); it != staticDefaultProperties.cend(); ++it)
-        printf("\t\t%s = %s\n", it.key().toLatin1().constData(), it.value().toLatin1().constData());
-
-    printf("\tRuntime properties:\n");
-    for (auto it = runtimeProperties.cbegin(); it != runtimeProperties.cend(); ++it)
-        printf("\t\t%s = %s\n", it->name.toLatin1().constData(), it->value.toLatin1().constData());
-
-    printf("\n");
-#endif
-
     std::copy(runtimeProperties.cbegin(), runtimeProperties.cend(), std::back_inserter(result));
     return result;
 }
@@ -815,7 +687,6 @@ ec2::ApiResourceParamDataList QnResource::getAllProperties() const
 void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
 {
     emit resourceChanged(toSharedPointer(this));
-    //modifiedFields << "resourceChanged";
 
     const QnResourcePtr & _t1 = toSharedPointer(this);
     void *_a[] = {0, const_cast<void*>(reinterpret_cast<const void*>(&_t1))};

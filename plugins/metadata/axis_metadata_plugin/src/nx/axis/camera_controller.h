@@ -339,7 +339,7 @@ public:
     int addActiveRule(const ActiveRule& rule);
     bool removeActiveRule(int ruleId);
 
-    // Axiliary functions. Helpful to clean camera memory after work.
+    // Auxiliary functions. Helpful to clean camera memory after work.
     // Waring: they do not empty corresponding vectors.
     int removeAllActiveActions(const char* namePrefix = nullptr);
     int removeAllActiveRecipients(const char* namePrefix = nullptr);

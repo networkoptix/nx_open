@@ -344,6 +344,7 @@ void initialize(Manager* manager, Action* root)
 
         factory(NewWearableCameraAction)
             .flags(Main | NoTarget)
+            .requiredGlobalPermission(Qn::GlobalAdminPermission)
             .text(ContextMenu::tr("Wearable Camera..."))
             .pulledText(ContextMenu::tr("New Wearable Camera..."))
             .condition(condition::isLoggedIn()
@@ -1259,7 +1260,16 @@ void initialize(Manager* manager, Action* root)
     factory(UploadWearableCameraFileAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
-        .text(ContextMenu::tr("Upload to Wearable Camera..."))
+        .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
+        .text(ContextMenu::tr("Upload File..."))
+        .condition(condition::hasFlags(Qn::wearable_camera, MatchMode::All)
+            && condition::isTrue(ini().enableWearableCameras));
+
+    factory(UploadWearableCameraFolderAction)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget)
+        .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
+        .text(ContextMenu::tr("Upload Folder..."))
         .condition(condition::hasFlags(Qn::wearable_camera, MatchMode::All)
             && condition::isTrue(ini().enableWearableCameras));
 

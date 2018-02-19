@@ -36,8 +36,9 @@ nx::network::http::Message OpenTunnelNotification::toHttpMessage() const
     message.request->requestLine.method = "OPEN_TUNNEL";
     message.request->requestLine.version.protocol = "NXRELAY";
     message.request->requestLine.version.version = "0.1";
-    message.request->requestLine.url = nx::network::url::normalizePath(
-        lm("%1/%2").args(nx::cloud::relay::api::kRelayClientPathPrefix, m_clientPeerName));
+    message.request->requestLine.url = nx::network::url::joinPath(
+        nx::cloud::relay::api::kRelayClientPathPrefix,
+        m_clientPeerName.toStdString());
     message.request->headers.emplace(
         kClientEndpoint, m_clientEndpoint.toString().toUtf8());
     return message;

@@ -9,7 +9,6 @@ namespace event {
 InstantEvent::InstantEvent(EventType eventType, const QnResourcePtr& resource, qint64 timeStamp):
     base_type(eventType, resource, EventState::undefined, timeStamp)
 {
-    NX_ASSERT(!hasToggleState(eventType));
 }
 
 bool InstantEvent::isEventStateMatched(EventState state, ActionType /*actionType*/) const

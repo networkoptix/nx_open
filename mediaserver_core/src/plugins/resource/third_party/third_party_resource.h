@@ -30,9 +30,6 @@ public:
         const nxcip_qt::CameraDiscoveryManager& discoveryManager );
     virtual ~QnThirdPartyResource();
 
-    //!Implementation of QnResource::getPtzController
-    virtual QnAbstractPtzController* createPtzControllerInternal() override;
-
     //!Implementation of QnNetworkResource::ping
     /*!
         At the moment always returns \a true
@@ -48,8 +45,6 @@ public:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QnIOPortDataList getRelayOutputList() const override;
-
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     //!Implementation of QnSecurityCamResource::getInputPortList
     virtual QnIOPortDataList getInputPortList() const override;
@@ -92,6 +87,7 @@ public:
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
 protected:
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;

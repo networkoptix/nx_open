@@ -68,18 +68,21 @@ QnCameraAdvancedParams QnCameraAdvancedParamsReader::paramsFromResource(const Qn
     return QJson::deserialized<QnCameraAdvancedParams>(serialized);
 }
 
-void QnCameraAdvancedParamsReader::setParamsToResource(const QnResourcePtr &resource, const QnCameraAdvancedParams &params) {
+void QnCameraAdvancedParamsReader::setParamsToResource(const QnResourcePtr &resource, const QnCameraAdvancedParams &params)
+{
     NX_ASSERT(resource);
     QByteArray serialized = QJson::serialized(params);
     setEncodedParamsToResource(resource, QString::fromUtf8(serialized));
 }
 
-QString QnCameraAdvancedParamsReader::encodedParamsFromResource(const QnResourcePtr &resource) {
+QString QnCameraAdvancedParamsReader::encodedParamsFromResource(const QnResourcePtr &resource)
+{
     NX_ASSERT(resource);
     return resource->getProperty(advancedParametersKey);
 }
 
-void QnCameraAdvancedParamsReader::setEncodedParamsToResource(const QnResourcePtr &resource, const QString &params) {
+void QnCameraAdvancedParamsReader::setEncodedParamsToResource(const QnResourcePtr &resource, const QString &params)
+{
     NX_ASSERT(resource);
     resource->setProperty(advancedParametersKey, params);
 }

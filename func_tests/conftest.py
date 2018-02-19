@@ -11,12 +11,12 @@ from test_utils.camera import SampleMediaFile, CameraFactory
 from test_utils.cloud_host import CloudAccountFactory, resolve_cloud_host_from_registry
 from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
 from test_utils.mediaserverdeb import MediaserverDeb
-from test_utils.os_access import SshAccessConfig
 from test_utils.internet_time import TimeProtocolRestriction
 from test_utils.lightweight_servers_factory import LWS_BINARY_NAME, LightweightServersFactory
 from test_utils.metrics_saver import MetricsSaver
 from test_utils.server_factory import ServerFactory
 from test_utils.server_physical_host import PhysicalInstallationCtl
+from test_utils.ssh.config import SSHConfig
 from test_utils.utils import SimpleNamespace
 from test_utils.vagrant_vm import VagrantVMFactory
 from test_utils.vagrant_vm_config import VagrantVMConfigFactory
@@ -104,15 +104,16 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope='session')
 def run_options(request):
-    vm_host = request.config.getoption('--vm-host')
-    if vm_host:
-        vm_ssh_host_config = SshAccessConfig(
-            name='vm_host',
-            hostname=vm_host,
+    work_dir = request.config.getoption('--work-dir').expanduser()
+    work_dir.mkdir(exist_ok=True, parents=True)
+    common_ssh_config = SSHConfig(work_dir / 'ssh.config')
+    common_ssh_config.reset()
+    vm_host_hostname = request.config.getoption('--vm-host')
+    if vm_host_hostname:
+        common_ssh_config.add_host(
+            vm_host_hostname,
             user=request.config.getoption('--vm-host-user'),
-            key_file_path=request.config.getoption('--vm-host-key'))
-    else:
-        vm_ssh_host_config = None
+            key_path=request.config.getoption('--vm-host-key'))
     bin_dir = request.config.getoption('--bin-dir').expanduser()
     assert bin_dir, 'Argument --bin-dir is required'
     mediaserver_deb = MediaserverDeb(bin_dir / request.config.getoption('--mediaserver-dist-path'))
@@ -125,7 +126,7 @@ def run_options(request):
         cloud_group=request.config.getoption('--cloud-group'),
         customization=request.config.getoption('--customization'),
         autotest_email_password=autotest_email_password,
-        work_dir=request.config.getoption('--work-dir').expanduser(),
+        work_dir=work_dir,
         bin_dir=bin_dir,
         mediaserver_deb=mediaserver_deb,
         media_sample_path=request.config.getoption('--media-sample-path'),
@@ -136,11 +137,12 @@ def run_options(request):
         vm_name_prefix=request.config.getoption('--vm-name-prefix'),
         vm_port_base=request.config.getoption('--vm-port-base'),
         vm_address=request.config.getoption('--vm-address'),
-        vm_ssh_host_config=vm_ssh_host_config,
+        vm_host_hostname=vm_host_hostname,
         vm_host_work_dir=request.config.getoption('--vm-host-dir'),
         max_log_width=request.config.getoption('--max-log-width'),
         log_level=request.config.getoption('--log-level'),
         tests_config=tests_config,
+        common_ssh_config=common_ssh_config,
         )
 
 
@@ -226,6 +228,8 @@ def session_vm_factory(request, run_options, init_logging, customization_company
     config_factory = VagrantVMConfigFactory(customization_company_name)
     factory = VagrantVMFactory(
         request.config.cache,
+        run_options.common_ssh_config,
+        run_options.vm_host_hostname,
         run_options,
         config_factory,
         )
@@ -332,7 +336,7 @@ def pytest_pyfunc_call(pyfuncitem):
 
 @pytest.fixture()
 def timeless_server(vm_factory, server_factory, server_name='timeless_server'):
-    vm = vm_factory('timeless', sync_time=False)
+    vm = vm_factory()
     config_file_params = dict(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
     server = server_factory(server_name, vm=vm, start=False, config_file_params=config_file_params)
     TimeProtocolRestriction(server).enable()

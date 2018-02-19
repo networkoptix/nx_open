@@ -60,7 +60,7 @@ QnThirdPartyResource::~QnThirdPartyResource()
     stopInputPortMonitoringAsync();
 }
 
-QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
+QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal() const
 {
     if( !m_camManager )
         return nullptr;
@@ -205,19 +205,6 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createLiveDataProvider()
 void QnThirdPartyResource::setMotionMaskPhysical(int /*channel*/)
 {
     //TODO/IMPL
-}
-
-QnConstResourceAudioLayoutPtr QnThirdPartyResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
-{
-    if (isAudioEnabled()) {
-        const ThirdPartyStreamReader* reader = dynamic_cast<const ThirdPartyStreamReader*>(dataProvider);
-        if (reader && reader->getDPAudioLayout())
-            return reader->getDPAudioLayout();
-        else
-            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-    }
-    else
-        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
 }
 
 //!Implementation of QnSecurityCamResource::getRelayOutputList
