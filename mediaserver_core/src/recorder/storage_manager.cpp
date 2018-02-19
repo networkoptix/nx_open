@@ -1762,6 +1762,32 @@ bool QnStorageManager::clearSpaceForFile(const QString& path, qint64 size)
     return volume.bytesAvailable() > size;
 }
 
+bool QnStorageManager::canAddChunk(qint64 timeMs, qint64 size)
+{
+    qint64 available = 0;
+    for (const QnStorageResourcePtr& storage : getUsedWritableStorages())
+    {
+        qint64 free = storage->getFreeSpace();
+        qint64 reserved = storage->getSpaceLimit();
+        available += free > reserved ? free - reserved : 0;
+    }
+    if (available > size)
+        return true;
+
+    qint64 minTime = 0x7fffffffffffffffll;
+    DeviceFileCatalogPtr catalog;
+    {
+        QnMutexLocker lock(&m_mutexCatalog);
+        findTotalMinTime(true, m_devFileCatalog[QnServer::HiQualityCatalog], minTime, catalog);
+        findTotalMinTime(true, m_devFileCatalog[QnServer::LowQualityCatalog], minTime, catalog);
+    }
+
+    if (minTime > timeMs)
+        return false;
+
+    return false;
+}
+
 void QnStorageManager::clearBookmarks()
 {
     QMap<QString, qint64> minTimes; // key - unique id, value - timestamp to delete
