@@ -10,6 +10,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace client {
@@ -34,21 +35,22 @@ CameraThumbnailProvider::CameraThumbnailProvider(
 
     /* Making connection through event loop to handle data from another thread. */
     connect(this, &CameraThumbnailProvider::imageDataLoadedInternal, this,
-        [this](const QByteArray &data)
+        [this](const QByteArray &data, Qn::ThumbnailStatus nextStatus)
         {
             if (!data.isEmpty())
             {
                 const auto imageFormat = QnLexical::serialized(m_request.imageFormat).toUtf8();
                 m_image.loadFromData(data, imageFormat);
             }
-            else
+            else if (nextStatus != Qn::ThumbnailStatus::NoData)
             {
-                setStatus(Qn::ThumbnailStatus::NoData);
+                NX_VERBOSE(this, "CameraThumbnailProvider::imageDataLoadedInternal - empty data but status not NoData!!!");
             }
 
             emit imageChanged(m_image);
             emit sizeHintChanged(sizeHint());
-            emit statusChanged(status());
+
+            setStatus(nextStatus);
         }, Qt::QueuedConnection);
 }
 
@@ -89,8 +91,7 @@ void CameraThumbnailProvider::doLoadAsync()
 
     if (!commonModule()->currentServer())
     {
-        emit imageDataLoadedInternal(QByteArray());
-        setStatus(Qn::ThumbnailStatus::NoData);
+        emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData);
         return;
     }
 
@@ -101,15 +102,15 @@ void CameraThumbnailProvider::doLoadAsync()
         {
             if (!guard)
                 return;
-            if (success)
-                emit imageDataLoadedInternal(imageData);
-            setStatus(success ? Qn::ThumbnailStatus::Loaded : Qn::ThumbnailStatus::NoData);
+            Qn::ThumbnailStatus nextStatus =
+                success ? Qn::ThumbnailStatus::Loaded : Qn::ThumbnailStatus::NoData;
+            emit imageDataLoadedInternal(imageData, nextStatus);
         });
 
     if (handle <= 0)
     {
-        emit imageDataLoadedInternal(QByteArray());
-        setStatus(Qn::ThumbnailStatus::NoData);
+        // It will change to status NoData as well
+        emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData);
     }
 }
 

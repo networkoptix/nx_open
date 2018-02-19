@@ -407,15 +407,15 @@ void QnVideowallItemWidget::updateLayout()
 
     if (m_layout)
     {
+        // Right now this widget does not have any sort of proper size to calculate aspect ratio
         const QSize previewSize = kPreviewSize;
         m_layoutThumbnailProvider.reset(
             new LayoutThumbnailLoader(m_layout, previewSize, nx::api::ImageRequest::kLatestThumbnail));
 
         connect(m_layoutThumbnailProvider.get(), &QnImageProvider::statusChanged,
             this, &QnVideowallItemWidget::at_updateThumbnailStatus);
-        connect(m_layoutThumbnailProvider.get(), &QnImageProvider::imageChanged,
-            this, &QnVideowallItemWidget::at_updateThumbnailImage);
 
+        m_layoutThumbnailProvider->setResourcePool(resourcePool());
         m_layoutThumbnailProvider->loadAsync();
 
         connect(m_layout, &QnLayoutResource::itemAdded, this,
@@ -474,6 +474,9 @@ void QnVideowallItemWidget::at_updateThumbnailStatus(Qn::ThumbnailStatus status)
     {
         case Qn::ThumbnailStatus::Loaded:
             m_resourceStatus = Qn::EmptyOverlay;
+            m_layoutThumbnail = QPixmap::fromImage(m_layoutThumbnailProvider->image());
+            qDebug() << "QnVideowallItemWidget got thumbs of size " << m_layoutThumbnail.size();
+            update();
             break;
 
         case Qn::ThumbnailStatus::Loading:
@@ -484,11 +487,4 @@ void QnVideowallItemWidget::at_updateThumbnailStatus(Qn::ThumbnailStatus status)
             m_resourceStatus = Qn::NoDataOverlay;
             break;
     }
-
-}
-
-void QnVideowallItemWidget::at_updateThumbnailImage(const QImage& image)
-{
-    m_layoutThumbnail = QPixmap::fromImage(image);
-    update();
 }
