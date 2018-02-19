@@ -8,7 +8,7 @@ import requests
 import requests.auth
 
 from test_utils.networking import setup_networks
-from test_utils.networking.ip_on_linux import LinuxIpNode
+from test_utils.networking.linux import LinuxNodeNetworking
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT, TimePeriod
 from test_utils.utils import datetime_utc_now
 
@@ -46,19 +46,14 @@ LAYOUTS = {
 @pytest.fixture()
 def env(vm_factory, server_factory, http_schema, layout_name):
     layout = LAYOUTS[layout_name]
-    vms = dict()
-    for _ in range(3):
-        vm = vm_factory()
-        vms[vm.virtualbox_name] = vm
-    ip_nodes = {virtualbox_name: LinuxIpNode(vm.guest_os_access) for virtualbox_name, vm in vms.items()}
-    assigned_nodes, _ = setup_networks(ip_nodes, layout['networks'], layout['default_gateways'])
-    server = {}
+    vms, _ = setup_networks([vm_factory() for _ in range(3)], layout['networks'], layout['default_gateways'])
+    servers = {}
     for alias in layout['mediaservers']:
-        server[alias] = server_factory('server', vm=vms[assigned_nodes[alias]], http_schema=http_schema)
-    first_server = server[layout['mediaservers'][0]]
-    other_servers = [server[alias] for alias in layout['mediaservers'][1:]]
+        servers[alias] = server_factory('server', vm=vms[alias], http_schema=http_schema)
+    first_server = servers[layout['mediaservers'][0]]
+    other_servers = [servers[alias] for alias in layout['mediaservers'][1:]]
     first_server.merge(other_servers)
-    return server
+    return servers
 
 
 def wait_for_servers_return_same_results_to_api_call(env, method, api_object, api_method):

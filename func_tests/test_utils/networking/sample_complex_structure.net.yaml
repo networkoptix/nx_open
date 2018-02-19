@@ -1,6 +1,6 @@
 # Structure is built on top of IP level abstraction.
 # Hosts, which can reach each other on IP level, are considered as nodes located in one network.
-# NAT networks are treated as separate networks. They cannot be reached from outside.
+# NAT networks are treated as separate networks. They cannot be reached from hypervisor.
 # Some nodes can be in several networks but
 # nothing is routed through them on IP level.
 #
@@ -31,5 +31,4 @@ networks:
         h51:
 default_gateways:  # Where to route traffic with unknown destination.
   c: h22  # Mandatory for *c*: disambiguate where to direct unknown traffic.
-  h22: internet  # Special: connect node to internet via host.
-  a:  # None: no default route at all -- reject unknown traffic.
+  a:  # None: no default route at all -- prohibit unknown traffic.

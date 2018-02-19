@@ -55,7 +55,7 @@ class ServerFactory(object):
             if not service.is_running():
                 service.set_state(True)
             server = Server(
-                config.name, vm.guest_os_access, service, installation, api_url, self._ca,
+                config.name, vm.guest_os_access, service, installation, api_url, self._ca, vm,
                 rest_api_timeout=config.rest_api_timeout)
 
         self._allocated_servers.append(server)  # _prepare_server may fail, will need to save it's artifact in that case

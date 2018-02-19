@@ -6,6 +6,9 @@ import vagrant
 import vagrant.compat
 from pathlib2 import Path
 
+from test_utils.networking import NodeNetworking
+from test_utils.networking.linux import LinuxNodeNetworking
+from test_utils.networking.virtual_box import VirtualBoxNodeNetworking
 from test_utils.os_access import LocalAccess
 from test_utils.ssh.sshd import optimize_sshd
 from .os_access import ProcessError, SshAccess
@@ -53,11 +56,13 @@ class VagrantVMFactory(object):
         self._vm_name_prefix = options.vm_name_prefix
         self._vm_port_base = options.vm_port_base
         if vm_host_hostname:
+            self.vm_host_hostname = vm_host_hostname
             self._host_os_access = SshAccess(self._common_ssh_config.path, vm_host_hostname)
             self._vagrant_dir = options.vm_host_work_dir / 'vagrant'
             self._vagrant_private_key_path = options.work_dir / 'vagrant_insecure_private_key'
             self._host_os_access.get_file('.vagrant.d/insecure_private_key', self._vagrant_private_key_path)
         else:
+            self.vm_host_hostname = 'localhost'
             self._host_os_access = LocalAccess()
             self._vagrant_dir = options.work_dir / 'vagrant'
             self._vagrant_private_key_path = Path().home() / '.vagrant.d' / 'insecure_private_key'
@@ -200,6 +205,7 @@ class VagrantVM(object):
         self.is_allocated = False
         self.is_running = is_running
         self._ssh_config_path = _ssh_config_path
+        self.networking = None  # TODO: Move initialization from init() method.
 
     def __str__(self):
         return '%s virtualbox_name=%s timezone=%s' % (self.vagrant_name, self.virtualbox_name, self.timezone or '?')
@@ -229,6 +235,10 @@ class VagrantVM(object):
                 raise
         else:
             self.guest_os_access = os_access
+        self.networking = NodeNetworking(
+            LinuxNodeNetworking(self.guest_os_access),
+            VirtualBoxNodeNetworking(self.virtualbox_name))
+        self.networking.reset()
 
     def start(self):
         assert not self.is_running

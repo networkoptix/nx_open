@@ -1,50 +1,58 @@
 from netaddr import IPNetwork
 
-from test_utils.networking import link_on_virtualbox as link  # Static polymorphism.
+
+class NodeNetworking(object):
+    def __init__(self, os_networking, hypervisor_networking):
+        self.os = os_networking
+        self.hypervisor = hypervisor_networking
+
+    def route_global_through_host(self):
+        self.hypervisor.os.route_global(self.hypervisor.available_mac_addresses)
+
+    def reset(self):
+        self.hypervisor.unplug_all()
+        self.os.flush_ip(self.hypervisor.available_mac_addresses)
 
 
-def setup_networks(ip_nodes, networks, default_gateways):
-    unassigned_vm_names = set(ip_nodes.keys())
-    assigned_vm_names = dict()
+def setup_networks(machines, networks_tree, default_gateways=None, ):
+    default_gateways = default_gateways or {}
+    unassigned_machines = machines
+    assigned_machines = dict()  # Alias from structure -> machine.
 
-    # Always disconnect all nodes.
-    for name, node in ip_nodes.items():
-        node.reset_everything(link.host_nat_interface_mac_address(name), link.other_mac_addresses(name))
-        link.unplug_all(name)
-
-    def setup_subtree(subtree, router_alias, outer_ip_networks):
-        for network_alias in subtree:
-            ip_network = IPNetwork(network_alias)  # Alias is same as network address space.
-            ip_addresses = ip_network.iter_hosts()
-            router_ip_address = next(ip_addresses)  # May be unused but must be reserved.
+    def setup_subtree(subtree, router_alias=None, outer_networks=None):
+        outer_networks = outer_networks or []
+        for network_name in subtree:
+            network = IPNetwork(network_name)  # Network name is same as network address space.
+            network_ip_addresses = network.iter_hosts()
+            router_ip_address = next(network_ip_addresses)  # May be unused but must be reserved.
             if router_alias is not None:  # No router on top level.
-                router_vm_name = assigned_vm_names[router_alias]  # Added when processed as host.
-                router_mac_address = link.plug(router_vm_name, network_alias)
-                ip_nodes[router_vm_name].set_address(router_mac_address, router_ip_address, ip_network)
-            for alias in sorted(subtree[network_alias].keys()):
-                if alias not in assigned_vm_names:  # TODO: Names in config should be same as VM names.
-                    assigned_vm_names[alias] = unassigned_vm_names.pop()
-                vm_name = assigned_vm_names[alias]
-                mac_address = link.plug(vm_name, network_alias)
-                ip_address = next(ip_addresses)
-                ip_nodes[vm_name].set_address(mac_address, ip_address, ip_network)
-                for outer_ip_network in outer_ip_networks:
-                    ip_nodes[vm_name].add_routes(outer_ip_network, router_ip_address)
+                router_node = assigned_machines[router_alias].networking  # Added when processed as host.
+                router_mac_address = router_node.hypervisor.plug(network_name)
+                router_node.os.setup_ip(router_mac_address, router_ip_address, network.prefixlen)
+            for host_alias in sorted(subtree[network_name].keys()):
+                try:
+                    host_networking = assigned_machines[host_alias].networking
+                except KeyError:
+                    assigned_machines[host_alias] = unassigned_machines.pop()
+                    host_networking = assigned_machines[host_alias].networking
+                host_mac_address = host_networking.hypervisor.plug(network_name)  # Connected to this network.
+                host_ip_address = next(network_ip_addresses)  # Connected to this network.
+                host_networking.os.setup_ip(host_mac_address, host_ip_address, network.prefixlen)
+                for outer_network in outer_networks:
+                    host_networking.os.route(outer_network, host_mac_address, router_ip_address)
                 if router_alias is not None:
                     # Disambiguate default gateway explicitly if host is connected to multiple networks.
-                    if alias not in default_gateways or default_gateways[alias] == router_alias:
-                        ip_nodes[vm_name].set_default_gateway(mac_address, router_ip_address)
-                if subtree[network_alias][alias] is not None:
-                    ip_nodes[vm_name].enable_masquerading(mac_address)  # Host is router for underlying NAT subnet.
-                    setup_subtree(subtree[network_alias][alias], alias, outer_ip_networks + [ip_network])
+                    if host_alias not in default_gateways or default_gateways[host_alias] == router_alias:
+                        host_networking.os.route_global(host_mac_address, router_ip_address)
+                if subtree[network_name][host_alias] is not None:
+                    host_networking.os.enable_masquerading(host_mac_address)  # Router for underlying subnet.
+                    setup_subtree(subtree[network_name][host_alias], host_alias, outer_networks + [network])
 
-    setup_subtree(networks, None, [])
+    setup_subtree(networks_tree)
 
-    for name in default_gateways:
-        vm_name = assigned_vm_names[name]
-        if default_gateways[name] is None:
-            ip_nodes[vm_name].delete_default_gateway()
-        elif default_gateways[name] == 'internet':  # Special.
-            ip_nodes[vm_name].enable_internet(link.host_nat_interface_mac_address(vm_name), link.host_ip_address())
+    for alias in default_gateways:
+        networking = assigned_machines[alias].networking
+        if default_gateways[alias] is None:
+            networking.os.prohibit_global()
 
-    return assigned_vm_names, unassigned_vm_names
+    return assigned_machines, unassigned_machines
