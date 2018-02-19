@@ -166,8 +166,6 @@ class VagrantVMFactory(object):
             for name, vm in sorted(self._vms.items(), key=lambda (name, vm): vm.config.idx):
                 if vm.is_allocated:
                     continue
-                if not vm.config.matches(config_template):
-                    continue
                 if config_template.must_be_recreated:
                     return vm
                 if pred and not pred(vm):
@@ -235,7 +233,6 @@ class VagrantVM(object):
     def start(self):
         assert not self.is_running
         log.info('Starting VM: %s...', self)
-        self._copy_required_files_to_vagrant_dir()
         self._vagrant.up(vm_name=self.vagrant_name)
         self.guest_os_access = SshAccess(self._ssh_config_path, self.vagrant_name).become('root')
         optimize_sshd(self.guest_os_access)
@@ -245,10 +242,3 @@ class VagrantVM(object):
         assert self.is_running
         self._vagrant.destroy(self.vagrant_name)
         self.is_running = False
-
-    def _copy_required_files_to_vagrant_dir(self):
-        test_dir = TEST_UTILS_DIR.parent
-        for file_path_format in self.config.required_file_list:
-            file_path = Path(file_path_format.format(test_dir=test_dir, bin_dir=self._bin_dir))
-            assert file_path.is_file(), '%s is expected but is missing' % file_path
-            self.host_os_access.put_file(file_path, self._vagrant_dir)
