@@ -216,7 +216,9 @@ void ManagerPool::setManagerDeclaredSettings(
     // TODO: Stub. Implement storing the settings in the database.
     std::vector<nxpl::Setting> settings;
     loadSettingsFromFile(&settings, ini().stubCameraManagerSettings);
-    manager->setDeclaredSettings(&settings.front(), (int) settings.size());
+    manager->setDeclaredSettings(
+        settings.empty() ? nullptr : &settings.front(),
+        (int) settings.size());
     freeSettings(&settings);
 }
 
@@ -225,7 +227,9 @@ void ManagerPool::setPluginDeclaredSettings(Plugin* plugin)
     // TODO: Stub. Implement storing the settings in the database.
     std::vector<nxpl::Setting> settings;
     loadSettingsFromFile(&settings, ini().stubPluginSettings);
-    plugin->setDeclaredSettings(&settings.front(), (int) settings.size());
+    plugin->setDeclaredSettings(
+        settings.empty() ? nullptr : &settings.front(),
+        (int) settings.size());
     freeSettings(&settings);
 }
 
