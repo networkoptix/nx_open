@@ -1,5 +1,6 @@
-import netaddr
-from pathlib2 import PurePosixPath
+import csv
+
+from netaddr import EUI
 
 
 class LinuxIpNode(object):
@@ -7,9 +8,16 @@ class LinuxIpNode(object):
         self._os_access = os_access
         self._interface_names = dict()
 
-        for interface_dir in self._os_access.iter_dir(PurePosixPath('/sys/class/net')):
-            raw_mac_output = os_access.read_file(interface_dir / 'address')
-            self._interface_names[netaddr.EUI(raw_mac_output)] = interface_dir.name
+        raw_mac_addresses = self._os_access.run_command('''
+            mkdir -p /tmp/func_tests/networking && cd /tmp/func_tests/networking
+            ls -1 /sys/class/net > interfaces.txt
+            xargs -t -a interfaces.txt -I {} cat /sys/class/net/{}/address > mac_addresses.txt
+            paste interfaces.txt mac_addresses.txt
+            ''')
+        self._interface_names = {
+            EUI(mac_address): interface
+            for interface, mac_address
+            in csv.reader(raw_mac_addresses.splitlines(), delimiter='\t')}
 
     def reset_everything(self, host_only_mac_address, other_mac_addresses):
         self._os_access.run_command(
