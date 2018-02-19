@@ -17,19 +17,14 @@ Log in to Auto Tests System
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 *** Test Cases ***
-has system name, owner and OpenInNx button visible on systems page
+systems dropdown should allow you to go back to the systems page
     Open Browser and go to URL    ${url}
-    Log In    ${EMAIL OWNER}    ${password}
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
-    Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
-    Close Browser
-
-shows offline status and does not show open in nx button when offline
-    Open Browser and go to URL    ${url}
-    Log In    ${EMAIL OWNER}    ${password}
-    Validate Log In
-    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTOTESTS OFFLINE}
-    Wait Until Element Is Not Visible    ${AUTOTESTS OFFLINE OPEN NX}
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${SYSTEMS DROPDOWN}
+    Click Link    ${SYSTEMS DROPDOWN}
+    Wait Until Element Is Visible    ${ALL SYSTEMS}
+    Click Link    ${ALL SYSTEMS}
+    Location Should Be    ${url}/systems
     Close Browser
 
 should confirm, if owner deletes system (You are going to disconnect your system from cloud)
@@ -82,27 +77,57 @@ has Share button, visible for admin and owner
     Log in to Auto Tests System    ${EMAIL ADMIN}
     Close Browser
 
-does not show Share button to viewer, advanced viewer, live viewer
+does not show Share button or Rename button to viewer, advanced viewer, live viewer
 #This allows the expected error to not run the close browser action
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL VIEWER}
     Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
     Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
     Log in to Auto Tests System    ${EMAIL ADV VIEWER}
     Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
     Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
     Log in to Auto Tests System    ${EMAIL LIVE VIEWER}
     Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
     Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Close Browser
+
+rename button opens dialog; cancel closes without rename; save renames system
+    [tags]    not-ready
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}
+    Click Button    ${RENAME CANCEL}
+    Wait Until Page Does Not Contain Element    //div[@modal-render='true']
+    Verify In System    Auto Tests
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
+    Clear Element Text    ${RENAME INPUT}
+    Input Text    ${RENAME INPUT}    Auto Tests Rename
+    Click Button    ${RENAME SAVE}
+    Check For Alert    ${SYSTEM NAME SAVED}
+    Verify In System    Auto Tests Rename
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
+    Clear Element Text    ${RENAME INPUT}
+    Input Text    ${RENAME INPUT}    Auto Tests
+    Click Button    ${RENAME SAVE}
+    Check For Alert    ${SYSTEM NAME SAVED}
+    Verify In System    Auto Tests
+    Close Browser
+
 
 should open System page by link to not authorized user and redirect to homepage, if he does not log in
     Open Browser and go to URL    ${url}/systems/${AUTO TESTS SYSTEM ID}
