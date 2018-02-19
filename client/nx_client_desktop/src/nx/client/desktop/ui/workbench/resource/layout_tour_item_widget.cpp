@@ -99,7 +99,7 @@ LayoutTourItemWidget::LayoutTourItemWidget(
     setOption(QnResourceWidget::WindowRotationForbidden);
 
     QnLayoutResourcePtr layout = resource().dynamicCast<QnLayoutResource>();
-    QnResourcePool* resourcePool = context->resourcePool();
+
     if (!layout)
     {
         layout = QnLayoutResource::createFromResource(resource());

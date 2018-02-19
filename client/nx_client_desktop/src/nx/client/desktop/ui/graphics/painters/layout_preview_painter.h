@@ -5,11 +5,12 @@
 #include <QtGui/QPainter>
 
 #include <core/resource/resource_fwd.h>
-
+#include <core/resource_management/resource_pool.h>
 #include <ui/customization/customized.h>
 
 class QnCameraThumbnailManager;
 class QnBusyIndicator;
+class QnResourcePool;
 
 namespace nx {
 namespace client {
@@ -65,7 +66,7 @@ private:
     QPixmap m_layoutThumbnail;
 
     // We need resource pool to pass it to m_layoutThumbnailProvider.
-    QnResourcePool* m_resourcePool;
+    QPointer<QnResourcePool> m_resourcePool;
     // Status of resource loading.
     Qn::ResourceStatusOverlay m_resourceStatus = Qn::NoDataOverlay;
 

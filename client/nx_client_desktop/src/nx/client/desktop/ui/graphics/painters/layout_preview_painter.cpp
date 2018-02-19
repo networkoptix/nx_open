@@ -19,9 +19,10 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
-    // We request this size for thumbnails.
-    static const QSize kPreviewSize(640, 480);
+// We request this size for thumbnails.
+static const QSize kPreviewSize(640, 480);
 }
+
 namespace nx {
 namespace client {
 namespace desktop {

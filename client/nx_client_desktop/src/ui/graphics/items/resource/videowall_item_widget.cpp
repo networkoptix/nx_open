@@ -28,6 +28,8 @@
 #include <nx/client/desktop/utils/mime_data.h>
 #include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
 
+#include <nx/utils/log/log.h>
+
 #include <ui/animation/variant_animator.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
@@ -475,7 +477,7 @@ void QnVideowallItemWidget::at_updateThumbnailStatus(Qn::ThumbnailStatus status)
         case Qn::ThumbnailStatus::Loaded:
             m_resourceStatus = Qn::EmptyOverlay;
             m_layoutThumbnail = QPixmap::fromImage(m_layoutThumbnailProvider->image());
-            qDebug() << "QnVideowallItemWidget got thumbs of size " << m_layoutThumbnail.size();
+            NX_VERBOSE(this) "QnVideowallItemWidget got thumbs of size " << m_layoutThumbnail.size();
             update();
             break;
 

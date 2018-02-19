@@ -38,7 +38,7 @@ public:
     QColor itemBackgroundColor() const;
     void setItemBackgroundColor(const QColor& value);
 
-    void setResourcePool(QnResourcePool* pool);
+    void setResourcePool(const QPointer<QnResourcePool>& pool);
 
     QColor fontColor() const;
     void setFontColor(const QColor& value);
@@ -50,7 +50,7 @@ private:
     struct Private;
     QScopedPointer<Private> d;
 
-    QnResourcePool* m_resourcePool;
+    QPointer<QnResourcePool> m_resourcePool;
 };
 
 } // namespace desktop
