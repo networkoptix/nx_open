@@ -250,7 +250,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type == 'image/jpeg';}).src;
 
-            if((Config.allowBetaMode && window.chrome) || $scope.debugMode){
+            if((Config.allowBetaMode || $scope.debugMode) && jscd.browser.toLowerCase() == 'chrome'){
                 var streamInfo = {};
                 var streamType = "webm";
 
@@ -321,11 +321,6 @@ angular.module('nxCommon').controller('ViewCtrl',
                 $scope.playerAPI.seekTime(playing); // Jump to buffered video
             }*/
         };
-
-        if($scope.betaMode && jscd.browser.toLowerCase() == 'chrome'){
-            $scope.voiceControls = {enabled:true,showCommands:true};
-            voiceControl.initControls($scope);
-        }
 
         //On player error update source to cause player to restart
         $scope.crashCount = 0;
@@ -477,6 +472,10 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.ready = true;
             $timeout(updateHeights);
             $scope.camerasProvider.startPoll();
+            if(($scope.betaMode || $scope.debugMode) && jscd.browser.toLowerCase() == 'chrome'){
+                $scope.voiceControls = {enabled:true,showCommands:true};
+                voiceControl.initControls($scope);
+            }
         });
 
         // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%
