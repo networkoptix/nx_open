@@ -234,6 +234,10 @@ qint64 QnTimePeriod::infiniteDuration() {
     return ::infiniteDuration;
 }
 
+QnTimePeriod QnTimePeriod::anytime() {
+    return QnTimePeriod(kMinTimeValue, infiniteDuration());
+}
+
 bool QnTimePeriod::isEmpty() const {
     return durationMs == 0;
 }

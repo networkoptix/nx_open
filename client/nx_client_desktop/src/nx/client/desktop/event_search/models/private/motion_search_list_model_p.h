@@ -47,7 +47,7 @@ private:
     QnVirtualCameraResourcePtr m_camera;
     QnCachingCameraDataLoaderPtr m_loader;
     std::deque<QnTimePeriod> m_data; //< Reversed list.
-    QnTimePeriod m_selectedTimePeriod;
+    QnTimePeriod m_selectedTimePeriod = QnTimePeriod::anytime();
     int m_totalCount = 0;
 };
 

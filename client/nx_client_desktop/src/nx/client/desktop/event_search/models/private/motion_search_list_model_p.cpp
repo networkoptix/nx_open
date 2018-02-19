@@ -21,8 +21,7 @@ static constexpr int kFetchBatchSize = 110;
 
 MotionSearchListModel::Private::Private(MotionSearchListModel* q):
     QObject(),
-    q(q),
-    m_selectedTimePeriod(QnTimePeriod::kMinTimeValue, QnTimePeriod::infiniteDuration())
+    q(q)
 {
 }
 

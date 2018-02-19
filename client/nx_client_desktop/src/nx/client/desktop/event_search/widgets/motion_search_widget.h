@@ -19,14 +19,14 @@ public:
     MotionSearchWidget(QWidget* parent = nullptr);
     virtual ~MotionSearchWidget() override;
 
-    void setMotionSearchEnabled(bool value);
+    void setMotionSelectionEmpty(bool value);
 
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
 protected:
     virtual bool hasRelevantTiles() const override;
-    virtual void setCurrentTimePeriod(const QnTimePeriod& period) override;
+    virtual bool setCurrentTimePeriod(const QnTimePeriod& period) override;
     virtual bool isConstrained() const override;
 
 private:

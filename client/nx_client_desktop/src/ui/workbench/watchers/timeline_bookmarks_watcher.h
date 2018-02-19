@@ -43,6 +43,9 @@ public:
         const QnVirtualCameraResourcePtr &camera
         , qint64 positionMs);
 
+    QString textFilter() const;
+    void setTextFilter(const QString& value);
+
 private:
     void onResourceRemoved(const QnResourcePtr &resource);
 
@@ -52,6 +55,8 @@ private:
     void tryUpdateTimelineBookmarks(const QnVirtualCameraResourcePtr &camera);
     void onTimelineWindowChanged(qint64 startTimeMs
         , qint64 endTimeMs);
+
+    void setTimelineBookmarks(const QnCameraBookmarkList& bookmarks);
 
 private:
     void setCurrentCamera(const QnVirtualCameraResourcePtr &camera);
@@ -72,4 +77,5 @@ private:
     TimerPtr m_updateStaticQueriesTimer;
     nx::utils::PendingOperation* m_updateQueryOperation;
     QnCameraBookmarkSearchFilter m_timlineFilter;
+    QString m_textFilter;
 };
