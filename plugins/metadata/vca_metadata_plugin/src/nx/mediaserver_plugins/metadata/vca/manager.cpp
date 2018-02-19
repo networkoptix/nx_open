@@ -74,7 +74,7 @@ std::array<T, N> makeEventSearchKeys(const std::array<T, N>& src)
     return result;
 }
 
-static const auto kEventMessageKeys = stdnx::make_array<QByteArray>(
+static const auto kEventMessageKeys = nx::utils::make_array<QByteArray>(
     "ip", "unitname", "datetime", "dts", "type", "info", "id", "rulesname", "rulesdts");
 
 static const auto kEventMessageSearchKeys = makeEventSearchKeys(kEventMessageKeys);
