@@ -20,6 +20,7 @@
 #include <api/global_settings.h>
 #include <database/server_db.h>
 #include <recording/time_period.h>
+#include <audit/mserver_audit_manager.h>
 
 class AuthReturnCodeTest:
     public ::testing::Test
@@ -185,6 +186,7 @@ public:
             if (expectedStatusCode == nx_http::StatusCode::unauthorized)
             {
                 QnTimePeriod period(0, std::numeric_limits<int64_t>::max());
+                static_cast<QnMServerAuditManager*>(qnAuditManager)->flushRecords();
                 QnAuditRecordList outputData = qnServerDb->getAuditData(period, QnUuid());
                 ASSERT_TRUE(!outputData.isEmpty());
                 ASSERT_EQ(Qn::AuditRecordType::AR_UnauthorizedLogin, outputData.last().eventType);
