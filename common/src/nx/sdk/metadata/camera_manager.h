@@ -94,7 +94,7 @@ public:
      *         }
      *     ]
      * }
-     */                                               o
+     */
     virtual const char* capabilitiesManifest(Error* error) = 0;
 
     /**
