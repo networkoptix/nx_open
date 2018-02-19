@@ -73,7 +73,8 @@ void requestRemotePeers(
             [&outputReply, context, serverId = server->getId(), &mergeFunction](
                 SystemError::ErrorCode /*osErrorCode*/,
                 int statusCode,
-                nx_http::BufferType body)
+                nx_http::BufferType body,
+                nx_http::HttpHeaders /*httpHeaders*/)
             {
                 ReplyType reply;
                 bool success = false;

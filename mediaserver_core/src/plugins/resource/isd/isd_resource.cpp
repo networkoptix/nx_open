@@ -54,7 +54,8 @@ void QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)> completionHa
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
-        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
+        (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody,
+        nx_http::HttpHeaders /*httpHeaders*/) mutable
     {
         if( osErrorCode != SystemError::noError ||
             statusCode != nx_http::StatusCode::ok )

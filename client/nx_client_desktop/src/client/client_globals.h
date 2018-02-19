@@ -349,6 +349,7 @@ namespace Qn
         TooManyOpenedConnectionsOverlay,
         PasswordRequiredOverlay,
         NoLiveStreamOverlay,
+        oldFirmwareOverlay,
 
         OverlayCount
     };

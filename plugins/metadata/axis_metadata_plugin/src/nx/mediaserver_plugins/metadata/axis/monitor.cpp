@@ -8,6 +8,10 @@
 #include <network/tcp_connection_priv.h>
 #include <nx/network/system_socket.h>
 #include <api/http_client_pool.h>
+
+#include <nx/utils/log/log.h>
+#define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
+    nx::utils::log::Level::debug, "vca_metadata_plugin") NX_PRINT_PREFIX
 #include <nx/kit/debug.h>
 
 #include "manager.h"
@@ -29,11 +33,11 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(const AnalyticsEventType& even
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
     commonEvent->setEventTypeId(event.eventTypeIdExternal);
-    commonEvent->setCaption(event.name.toUtf8().constData());
-    commonEvent->setDescription(event.eventName.value.toUtf8().constData());
+    commonEvent->setCaption(event.name.toStdString());
+    commonEvent->setDescription(event.eventName.value.toStdString());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
-    commonEvent->setAuxilaryData(event.topic.toUtf8().constData());
+    commonEvent->setAuxilaryData(event.topic.toStdString());
     return commonEvent;
 }
 
@@ -52,49 +56,6 @@ nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
 
 } // namespace
 
-void ElapsedTimerThreadSafe::start()
-{
-    std::lock_guard<mutex_type> lock(m_mutex);
-    m_timer.start();
-}
-
-void ElapsedTimerThreadSafe::stop()
-{
-    std::lock_guard<mutex_type> lock(m_mutex);
-    m_timer.invalidate();
-}
-
-std::chrono::milliseconds ElapsedTimerThreadSafe::elapsedSinceStart() const
-{
-    std::shared_lock<mutex_type> lock(m_mutex);
-    return std::chrono::milliseconds(m_timer.isValid() ? m_timer.elapsed() : 0);
-}
-
-bool ElapsedTimerThreadSafe::hasExpiredSinceStart(std::chrono::milliseconds ms) const
-{
-    std::shared_lock<mutex_type> lock(m_mutex);
-    return m_timer.isValid() && m_timer.hasExpired(ms.count());
-}
-
-#if 0
-// Further methods may be useful, but their usage was excised out the code after refactoring
-bool ElapsedTimerThreadSafe::isStarted() const
-{
-    std::shared_lock<mutex_type> lock(m_mutex);
-    return m_timer.isValid();
-}
-std::chrono::milliseconds ElapsedTimerThreadSafe::elapsed() const
-{
-    std::shared_lock<mutex_type> lock(m_mutex);
-    return std::chrono::milliseconds(m_timer.elapsed());
-}
-bool ElapsedTimerThreadSafe::hasExpired(std::chrono::milliseconds ms) const
-{
-    std::shared_lock<mutex_type> lock(m_mutex);
-    return m_timer.hasExpired(ms.count());
-}
-#endif
-
 void axisHandler::processRequest(
     nx_http::HttpServerConnection* const connection,
     nx::utils::stree::ResourceContainer authInfo,
@@ -112,7 +73,7 @@ void axisHandler::processRequest(
     QnUuid uuid(uuidString);
 
     ElapsedEvents& m_events = m_monitor->eventsToCatch();
-    auto it = std::find_if(m_events.begin(), m_events.end(),
+    const auto it = std::find_if(m_events.begin(), m_events.end(),
         [&uuid](ElapsedEvent& event) { return event.type.eventTypeId == uuid; });
     if (it != m_events.end())
     {
@@ -123,7 +84,7 @@ void axisHandler::processRequest(
     else
     {
         NX_PRINT << "Received packed with undefined event type. Uuid = "
-            << uuidString.toUtf8().constData();
+            << uuidString.toStdString();
     }
     completionHandler(nx_http::StatusCode::ok);
 }
@@ -245,7 +206,8 @@ nx::sdk::Error Monitor::startMonitoring(nxpl::NX_GUID* eventTypeList,
         const AnalyticsEventType* eventType = m_manager->eventByUuid(id);
         if (!eventType)
             NX_PRINT << "Unknown event type. TypeId = " << id.toStdString();
-        m_eventsToCatch.emplace_back(*eventType);
+        else
+            m_eventsToCatch.emplace_back(*eventType);
     }
 
     const int kSchemePrefixLength = sizeof("http://") - 1;

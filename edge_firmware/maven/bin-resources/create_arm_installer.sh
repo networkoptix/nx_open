@@ -110,10 +110,7 @@ copyBuildLibs()
         libpostproc
 
         # third-party
-        liblber
-        libldap
         libquazip
-        libsasl2
         libsigar
         libudt
     )
@@ -149,6 +146,22 @@ copyBuildLibs()
             libvdpau_sunxi
             libEGL
             libGLESv1_CM
+        )
+    fi
+
+    # OpenSSL (for latest debians).
+    if [ "$BOX" = "rpi" ] || [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
+        LIBS_TO_COPY+=(
+            libssl
+            libcrypto
+        )
+    fi
+
+    if [ "$BOX" = "edge1" ]; then
+        LIBS_TO_COPY+=(
+            liblber
+            libldap
+            libsasl2
         )
     fi
 
@@ -244,7 +257,7 @@ copyBins()
         if [ -d "$BIN_BUILD_DIR/plugins" ]; then
             local FILE
             for FILE in "$BIN_BUILD_DIR/plugins/"*; do
-                if [[ $FILE != *.debug ]]; then
+                if [ -f $FILE ] && [[ $FILE != *.debug ]]; then
                     if [ "$CUSTOMIZATION" != "hanwha" ] && [[ "$FILE" == *hanwha* ]]; then
                         continue
                     fi

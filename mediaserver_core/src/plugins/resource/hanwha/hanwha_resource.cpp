@@ -795,10 +795,12 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
 {
     setCameraCapability(Qn::SetUserPasswordCapability, true);
     bool isDefaultPassword = false;
+    bool isOldFirmware = false;
     auto isDefaultPasswordGuard = makeScopeGuard(
-        [this, &isDefaultPassword]
+        [&]
         {
             setCameraCapability(Qn::isDefaultPasswordCapability, isDefaultPassword);
+            setCameraCapability(Qn::isOldFirmwareCapability, isOldFirmware);
             saveParams();
         });
 
@@ -820,9 +822,9 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
         !getFirmware().isEmpty()
         && minFirmwareVersion > getFirmware())
     {
-        return CameraDiagnostics::CameraInvalidParams(
-            lit("Please update firmware for this device. Minimal supported firmware: '%1'. Device firmware: '%2'.")
-            .arg(minFirmwareVersion).arg(getFirmware()));
+        isOldFirmware = true;
+        return CameraDiagnostics::CameraOldFirmware(
+            minFirmwareVersion, getFirmware());
     }
 
     result = initMedia();

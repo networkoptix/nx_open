@@ -7,6 +7,10 @@
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
 #include <nx/api/analytics/device_manifest.h>
+
+#include <nx/utils/log/log.h>
+#define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
+    nx::utils::log::Level::debug, "vca_metadata_plugin") NX_PRINT_PREFIX
 #include <nx/kit/debug.h>
 
 #include <nx/fusion/serialization/json.h>
@@ -30,11 +34,13 @@ Manager::Manager(
     nx::api::AnalyticsDeviceManifest deviceManifest;
     for (const auto& event: typedManifest.outputEventTypes)
         deviceManifest.supportedEventTypes.push_back(event.eventTypeId);
+    NX_PRINT << "Axis metadata manager created";
 }
 
 Manager::~Manager()
 {
     stopFetchingMetadata();
+    NX_PRINT << "Axis metadata manager destroyed";
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)

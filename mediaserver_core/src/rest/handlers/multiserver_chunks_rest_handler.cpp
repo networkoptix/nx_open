@@ -49,8 +49,8 @@ static void loadRemoteDataAsync(
     int requestNum, const QElapsedTimer& timer)
 {
     auto requestCompletionFunc =
-        [ctx, &outputData, server, requestNum, timer](
-            SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody)
+        [ctx, &outputData, server, requestNum, timer](SystemError::ErrorCode osErrorCode,
+            int statusCode, nx_http::BufferType msgBody, nx_http::HttpHeaders /*httpHeaders*/)
         {
             MultiServerPeriodDataList remoteData;
             bool success = false;

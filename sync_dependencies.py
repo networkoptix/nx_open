@@ -45,19 +45,19 @@ def determine_package_versions():
         v["openssl"] = "1.0.1i"
         v["libjpeg-turbo"] = "1.4.1"
 
+    if box in ("bpi", "bananapi", "rpi"):
+        v["openssl"] = "1.0.2l-deb9"
+
     if box in ("bpi", "bananapi"):
-        v["openssl"] = "1.0.0j"
         v["quazip"] = "0.7"
 
     if box == "bananapi":
         v["ffmpeg"] = "3.1.1-bananapi"
         v["qt"] = "5.6.1-1"
-        v["openssl"] = "1.0.0j"
 
     if box == "rpi":
-        v["qt"] = "5.6.1"
+        v["qt"] = "5.6.3"
         v["quazip"] = "0.7.2"
-        v["openssl"] = "1.0.1t-deb8"
 
     if box == "edge1":
         v["qt"] = "5.6.3"
@@ -84,7 +84,11 @@ def sync_dependencies(syncher):
     sync("any/nx_kit")
     sync("any/detection_plugin_interface")
 
-    sync("openssl")
+    if box in ("rpi", "bpi", "bananapi"):
+        sync("linux-arm/openssl")
+    else:
+        sync("openssl")
+
     sync("ffmpeg")
 
     if box in ("bpi", "bananapi"):
@@ -147,7 +151,7 @@ def sync_dependencies(syncher):
             if not sync("any/server-external-" + branch, optional=True):
                 sync("any/server-external-" + shortReleaseVersion)
 
-        if platform == "linux" and arch == "arm":
+        if box in ("tx1", "edge1"):
             sync("openldap")
             sync("sasl2")
 

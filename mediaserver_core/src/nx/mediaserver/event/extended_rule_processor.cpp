@@ -413,7 +413,8 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
     if ((actionParameters.requestType == nx_http::Method::get) ||
         (actionParameters.requestType.isEmpty() && actionParameters.text.isEmpty()))
     {
-        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType messageBody)
+        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode,
+            nx_http::BufferType messageBody, nx_http::HttpHeaders /*httpHeaders*/)
         {
             if (osErrorCode != SystemError::noError ||
                 statusCode != nx_http::StatusCode::ok)
@@ -548,7 +549,7 @@ bool ExtendedRuleProcessor::triggerCameraOutput(const vms::event::CameraOutputAc
                 autoResetTimeout);
 }
 
-QByteArray ExtendedRuleProcessor::getEventScreenshotEncoded(
+ExtendedRuleProcessor::TimespampedFrame ExtendedRuleProcessor::getEventScreenshotEncoded(
     const QnUuid& id,
     qint64 timestampUsec,
     QSize dstSize) const
@@ -558,7 +559,7 @@ QByteArray ExtendedRuleProcessor::getEventScreenshotEncoded(
         commonModule()->moduleGUID());
 
     if (!camera || !server)
-        return QByteArray();
+        return TimespampedFrame();
 
     api::CameraImageRequest request;
     request.camera = camera;
@@ -567,12 +568,14 @@ QByteArray ExtendedRuleProcessor::getEventScreenshotEncoded(
     request.roundMethod = api::CameraImageRequest::RoundMethod::precise;
 
     QnMultiserverThumbnailRestHandler handler;
-    QByteArray frame;
+    TimespampedFrame timestemedFrame;
+    //qint64 frameTimestampUsec = 0;
     QByteArray contentType;
-    auto result = handler.getScreenshot(commonModule(), request, frame, contentType, server->getPort());
+    auto result = handler.getScreenshot(commonModule(), request, timestemedFrame.frame, contentType,
+        server->getPort(), &timestemedFrame.timestampUsec);
     if (result != nx_http::StatusCode::ok)
-        return QByteArray();
-    return frame;
+        return TimespampedFrame();
+    return timestemedFrame;
 }
 
 bool ExtendedRuleProcessor::sendMailInternal(const vms::event::SendMailActionPtr& action, int aggregatedResCount)
@@ -766,7 +769,8 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     const int deviceCount = aggregationInfo.toList().size();
     contextMap[tpEvent] = helper.eventName(eventType, qMax(1, deviceCount));
-    contextMap[tpSource] = helper.getResoureNameFromParams(params, Qn::ResourceInfoLevel::RI_NameOnly);
+    contextMap[tpSource] = helper.getResoureNameFromParams(
+        params, Qn::ResourceInfoLevel::RI_NameOnly);
     contextMap[tpSourceIP] = helper.getResoureIPFromParams(params);
 
     const auto aggregationCount = action->getAggregationCount();
@@ -778,24 +782,40 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
         case vms::event::cameraMotionEvent:
         case vms::event::cameraInputEvent:
         {
-            auto camRes = resourcePool()->getResourceById<QnVirtualCameraResource>(action->getRuntimeParams().eventResourceId);
+            auto camRes = resourcePool()->getResourceById<QnVirtualCameraResource>(
+                action->getRuntimeParams().eventResourceId);
             cameraHistoryPool()->updateCameraHistorySync(camRes);
             if (camRes->hasVideo(nullptr))
             {
-                QByteArray screenshotData = getEventScreenshotEncoded(action->getRuntimeParams().eventResourceId, action->getRuntimeParams().eventTimestampUsec, SCREENSHOT_SIZE);
-                if (!screenshotData.isNull())
+                const qint64 eventTimeUs = action->getRuntimeParams().eventTimestampUsec;
+                const qint64 currentTimeBeforeGetUs = qnSyncTime->currentUSecsSinceEpoch();
+
+                TimespampedFrame timestempedFrame = getEventScreenshotEncoded(
+                    action->getRuntimeParams().eventResourceId, eventTimeUs, SCREENSHOT_SIZE);
+
+                if (!timestempedFrame.frame.isNull())
                 {
+                    static const qint64 kIntervalUs = 5'000'000;
+                    const qint64 currentTimeUs = qnSyncTime->currentUSecsSinceEpoch();
+
                     if (camRes->getStatus() == Qn::Recording)
                     {
-                        contextMap[tpUrlInt] = helper.urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
-                        contextMap[tpUrlExt] = helper.urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
+                        contextMap[tpUrlInt] = helper.urlForCamera(
+                            params.eventResourceId, params.eventTimestampUsec, /*isPublic*/ false);
+                        contextMap[tpUrlExt] = helper.urlForCamera(
+                            params.eventResourceId, params.eventTimestampUsec, /*isPublic*/ true);
                     }
-                    QBuffer screenshotStream(&screenshotData);
-                    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
-                    contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+
+                    if (std::abs(currentTimeUs - timestempedFrame.timestampUsec) < kIntervalUs)
+                    {
+                        // Only fresh screenshots are sent.
+                        QBuffer screenshotStream(&timestempedFrame.frame);
+                        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(
+                            tpScreenshot, screenshotStream, lit("image/jpeg"))));
+                        contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+                    }
                 }
             }
-
             break;
         }
 
@@ -835,13 +855,13 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
             if (camera->hasVideo(nullptr))
             {
                 QByteArray screenshotData = getEventScreenshotEncoded(params.eventResourceId,
-                    params.eventTimestampUsec, SCREENSHOT_SIZE);
+                    params.eventTimestampUsec, SCREENSHOT_SIZE).frame;
                 if (!screenshotData.isNull())
                 {
-                    contextMap[tpUrlInt] = helper.urlForCamera(params.eventResourceId,
-                        params.eventTimestampUsec, false);
-                    contextMap[tpUrlExt] = helper.urlForCamera(params.eventResourceId,
-                        params.eventTimestampUsec, true);
+                    contextMap[tpUrlInt] = helper.urlForCamera(
+                        params.eventResourceId, params.eventTimestampUsec, /*isPublic*/ false);
+                    contextMap[tpUrlExt] = helper.urlForCamera(
+                        params.eventResourceId, params.eventTimestampUsec, /*isPublic*/ true);
 
                     QBuffer screenshotStream(&screenshotData);
                     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot,
@@ -862,7 +882,8 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                 int screenshotNum = 1;
                 for (const QnUuid& cameraId: metadata.cameraRefs)
                 {
-                    if (QnVirtualCameraResourcePtr camRes = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
+                    if (QnVirtualCameraResourcePtr camRes =
+                        resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
                     {
                         QVariantMap camera;
 
@@ -871,14 +892,22 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                         camera[tpCameraIP] = camInfo.host();
 
                         cameraHistoryPool()->updateCameraHistorySync(camRes);
-                        camera[tpUrlInt] = helper.urlForCamera(cameraId, params.eventTimestampUsec, false);
-                        camera[tpUrlExt] = helper.urlForCamera(cameraId, params.eventTimestampUsec, true);
+                        camera[tpUrlInt] = helper.urlForCamera(
+                            cameraId, params.eventTimestampUsec, /*isPublic*/ false);
+                        camera[tpUrlExt] = helper.urlForCamera(
+                            cameraId, params.eventTimestampUsec, /*isPublic*/ true);
 
-                        QByteArray screenshotData = getEventScreenshotEncoded(cameraId, params.eventTimestampUsec, SCREENSHOT_SIZE);
-                        if (!screenshotData.isNull()) {
+                        QByteArray screenshotData = getEventScreenshotEncoded(
+                            cameraId, params.eventTimestampUsec, SCREENSHOT_SIZE).frame;
+                        if (!screenshotData.isNull())
+                        {
                             QBuffer screenshotStream(&screenshotData);
-                            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshotNum.arg(screenshotNum), screenshotStream, lit("image/jpeg"))));
-                            camera[QLatin1String("screenshot")] = lit("cid:") + tpScreenshotNum.arg(screenshotNum++);
+                            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(
+                                tpScreenshotNum.arg(screenshotNum),
+                                screenshotStream,
+                                lit("image/jpeg"))));
+                            camera[QLatin1String("screenshot")] =
+                                lit("cid:") + tpScreenshotNum.arg(screenshotNum++);
                         }
 
                         cameras << camera;

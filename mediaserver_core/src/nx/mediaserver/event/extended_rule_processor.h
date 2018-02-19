@@ -77,6 +77,12 @@ private:
         SendEmailAggregationData() : periodicTaskID(0), eventCount(0) {}
     };
 
+    struct TimespampedFrame
+    {
+        qint64 timestampUsec = 0;
+        QByteArray frame;
+    };
+
     QMap<QnUuid, qint64> m_runningBookmarkActions;
     QScopedPointer<EmailManagerImpl> m_emailManager;
     QMap<SendEmailAggregationKey, SendEmailAggregationData> m_aggregatedEmails;
@@ -93,7 +99,8 @@ private:
      */
     void updateRecipientsList(const vms::event::SendMailActionPtr& action) const;
 
-    QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize) const;
+    TimespampedFrame getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec,
+        QSize dstSize) const;
 
     QVariantMap eventDescriptionMap(
         const vms::event::AbstractActionPtr& action,

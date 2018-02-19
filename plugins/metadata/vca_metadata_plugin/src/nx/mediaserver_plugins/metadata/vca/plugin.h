@@ -46,15 +46,11 @@ public:
     virtual const char* capabilitiesManifest(
         nx::sdk::Error* error) const override;
 
-    // Managers can safely ask plugin about events. If no event found, m_emptyEvent is returned.
-    const AnalyticsEventType& eventByInternalName(const QString& internalName) const noexcept;
+    const AnalyticsEventType* eventByUuid(const QnUuid& uuid) const noexcept;
 
-    const AnalyticsEventType& eventByUuid(const QnUuid& uuid) const noexcept;
 private:
     QByteArray m_manifest;
     AnalyticsDriverManifest m_typedManifest;
-    AnalyticsEventType m_emptyEvent;
-
 };
 
 } // namespace vca

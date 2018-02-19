@@ -39,7 +39,8 @@ protected:
 private:
     HanwhaProfileParameters makeProfileParameters(
         int profileNumber,
-        const QnLiveStreamParams& parameters) const;
+        const QnLiveStreamParams& parameters,
+        bool isAudioSupported) const;
 
     CameraDiagnostics::Result updateProfile(
         int profileNumber,
