@@ -150,7 +150,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_animatedPosition(0),
     m_previousMediaPosition(0),
     m_positionAnimator(nullptr),
-    m_mergedTimePeriods(decltype(m_mergedTimePeriods)())
+    m_mergedTimePeriods()
 {
     /* We'll be using this one, so make sure it's created. */
     context()->instance<QnWorkbenchServerTimeWatcher>();
