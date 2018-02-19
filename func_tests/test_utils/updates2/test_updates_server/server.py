@@ -21,10 +21,13 @@ _logger = logging.getLogger(__name__)
 UPDATE_PATH_PATTERN = '/{}/{}/update.json'
 UPDATES_PATH = '/updates.json'
 
-DATA_DIR = Path(__file__).parent / 'data'
+DATA_DIR = Path(__file__).with_name('data').resolve()
 DUMMY_FILE_NAME = 'dummy.raw'
 DUMMY_FILE_PATH = DATA_DIR / DUMMY_FILE_NAME
 UPDATES_FILE_NAME = 'updates.json'
+
+if not DUMMY_FILE_PATH.exists():
+    raise Exception('Dummy file not found')
 
 
 def write_json(path, data):
@@ -165,42 +168,27 @@ def serve(serve_update_archives, range_header):
 
     @app.route('/<path:path>')
     def serve(path):
-        path = PurePath(path)
-
+        path = DATA_DIR.joinpath(path).resolve()
+        if DATA_DIR not in path.parents:
+            raise SecurityError("Resolved path is outside of data dir.")
         if 'Range' in request.headers and range_header == 'err':
             raise BadRequest('Range header is not supported')
-
         if path.suffix == '.json':
-            return send_file(str(DATA_DIR / path))
-        elif path.suffix == '.zip' and not serve_update_archives:
-            possible_path_key = DATA_DIR / path.parent / 'update.json'
-
-            if DATA_DIR not in possible_path_key.resolve().parents:
-                raise SecurityError()
-            if not possible_path_key.exists():
-                raise NotFound()
-
-            update_obj = read_json(possible_path_key)
-
-            def file_found_in_package(packages_name):
-                for os_key, os_obj in update_obj[packages_name].items():
-                    for file_key, file_obj in os_obj.items():
-                        if file_obj['file'] == path.name:
-                            return True
-                return False
-
-            if not file_found_in_package('packages') and not file_found_in_package('clientPackages'):
-                raise NotFound()
-
-            if not DUMMY_FILE_PATH.exists():
-                raise Exception('Dummy file not found')
-
-            return send_file(
-                str(DUMMY_FILE_PATH),
-                as_attachment=True, attachment_filename=path.name,
-                conditional=range_header == 'support')
-        else:
-            raise NotFound()
+            if path.exists():
+                return send_file(str(path))
+        elif path.suffix == '.zip' and serve_update_archives:
+            update_path = path.with_name('update.json')
+            if update_path.exists():
+                update = read_json(update_path)
+                for packages_key in {'packages', 'clientPackages'}:
+                    for os_specific_packages in update[packages_key].values():
+                        for package in os_specific_packages.values():
+                            if package['file'] == path.name:
+                                return send_file(
+                                    str(DUMMY_FILE_PATH),
+                                    as_attachment=True, attachment_filename=path.name,
+                                    conditional=range_header == 'support')
+        raise NotFound()
 
     app.run(port=8080)
 
