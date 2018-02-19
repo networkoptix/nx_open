@@ -9,12 +9,8 @@
 #include <nx/network/system_socket.h>
 #include <api/http_client_pool.h>
 
-#include <nx/utils/log/log.h>
-#define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
-    nx::utils::log::Level::debug, "vca_metadata_plugin") NX_PRINT_PREFIX
-#include <nx/kit/debug.h>
-
 #include "manager.h"
+#include "log.h"
 
 namespace nx {
 namespace mediaserver_plugins {

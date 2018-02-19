@@ -12,12 +12,8 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/std/cppnx.h>
 
-#include <nx/utils/log/log.h>
-#define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
-    nx::utils::log::Level::debug, "vca_metadata_plugin") NX_PRINT_PREFIX
-#include <nx/kit/debug.h>
-
 #include "nx/vca/camera_controller.h"
+#include "log.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -65,7 +61,7 @@ nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
 }
 
 template<class T, size_t N, class Check = std::enable_if_t<!std::is_same<const char*, T>::value>>
-std::array<T, N> decorate(const std::array<T, N>& src)
+std::array<T, N> makeEventSearchKeys(const std::array<T, N>& src)
 {
     std::array<T, N> result;
     std::transform(src.begin(), src.end(), result.begin(),
@@ -81,7 +77,7 @@ std::array<T, N> decorate(const std::array<T, N>& src)
 static const auto kEventMessageKeys = stdnx::make_array<QByteArray>(
     "ip", "unitname", "datetime", "dts", "type", "info", "id", "rulesname", "rulesdts");
 
-static const auto kEventMessageSearchKeys = decorate(kEventMessageKeys);
+static const auto kEventMessageSearchKeys = makeEventSearchKeys(kEventMessageKeys);
 
 std::pair<const char*, const char*> findString(const char* messageBegin, const char* messageEnd,
     const QByteArray& key)

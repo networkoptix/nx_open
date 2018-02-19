@@ -42,22 +42,11 @@ struct SupportedRule
 struct Heartbeat
 {
     std::chrono::seconds interval;
-    bool enabled;
-
-    Heartbeat(std::chrono::seconds interval, bool enabled)
-        :
-        interval(interval),
-        enabled(enabled)
+    bool isEnabled;
+    Heartbeat(): interval(1), isEnabled(false) {}
+    Heartbeat(std::chrono::seconds interval, bool isEnabled):
+        interval(interval), isEnabled(isEnabled)
     {
-        // VCA-camera documentation sets the allowable range of heartbeat interval.
-        static const std::chrono::seconds kMinInterval(1);
-        static const std::chrono::seconds kMaxInterval(300);
-
-        if (interval > kMaxInterval)
-            interval = kMaxInterval;
-
-        if (interval < kMinInterval)
-            interval = kMinInterval;
     }
 };
 

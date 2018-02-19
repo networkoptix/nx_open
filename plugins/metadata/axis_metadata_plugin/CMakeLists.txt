@@ -17,3 +17,4 @@ include_directories(
 )
 
 add_definitions(-DWITH_OPENSSL)
+add_definitions(-DNX_PRINT_TO_LOG)
