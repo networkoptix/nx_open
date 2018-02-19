@@ -18,6 +18,8 @@
 #include "utils/common/sleep.h"
 #include "common/common_module.h"
 #include <api/global_settings.h>
+#include <database/server_db.h>
+#include <recording/time_period.h>
 
 class AuthReturnCodeTest:
     public ::testing::Test
@@ -179,6 +181,14 @@ public:
 
             Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
             ASSERT_EQ(expectedAuthResult, authResult);
+
+            if (expectedStatusCode == nx_http::StatusCode::unauthorized)
+            {
+                QnTimePeriod period(0, std::numeric_limits<int64_t>::max());
+                QnAuditRecordList outputData = qnServerDb->getAuditData(period, QnUuid());
+                ASSERT_TRUE(!outputData.isEmpty());
+                ASSERT_EQ(Qn::AuditRecordType::AR_UnauthorizedLogin, outputData.last().eventType);
+            }
         }
     }
 };
