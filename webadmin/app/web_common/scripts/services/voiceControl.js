@@ -166,11 +166,13 @@ angular.module('nxCommon')
         };
 
         $window.onfocus = function(){
-            if(self.viewScope.voiceControls.enabled){
+            if(self.viewScope && self.viewScope.voiceControls.enabled){
                 self.startListening();
             }
         }
         $window.onblur = function(){
-            self.stopListening();
+            if(self.viewScope) {
+                self.stopListening();
+            }
         }
     }]);
