@@ -1812,7 +1812,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
     if (statusOverlay == Qn::AnalogWithoutLicenseOverlay)
         return Qn::MainWindow_MediaItem_AnalogLicense_Help;
 
-    if (statusOverlay == Qn::OfflineOverlay || statusOverlay == Qn::oldFirmwareOverlay)
+    if (statusOverlay == Qn::OfflineOverlay || statusOverlay == Qn::OldFirmwareOverlay)
         return Qn::MainWindow_MediaItem_Diagnostics_Help;
 
     if (statusOverlay == Qn::UnauthorizedOverlay)
@@ -2099,7 +2099,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         return Qn::NoLiveStreamOverlay;
 
     if (d->camera && d->camera->hasCameraCapabilities(Qn::isOldFirmwareCapability))
-        return Qn::oldFirmwareOverlay;
+        return Qn::OldFirmwareOverlay;
 
     if (d->isOffline())
         return Qn::OfflineOverlay;
@@ -2226,7 +2226,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
             return Qn::ResourceOverlayButton::Empty;
         }
 
-        case Qn::oldFirmwareOverlay:
+        case Qn::OldFirmwareOverlay:
         case Qn::OfflineOverlay:
         {
             return menu()->canTrigger(action::CameraDiagnosticsAction, d->camera)
