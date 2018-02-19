@@ -27,10 +27,12 @@ private:
     QnMutex m_mutex;
     QnWaitCondition m_condition;
     bool m_running = false;
-
+    mutable QString m_version;
+    mutable QString m_executable;
 
     // These below should be overriden in Server{Client}Updates2Installer
     virtual QString dataDirectoryPath() const = 0;
+    virtual bool initializeUpdateLog(const QString& targetVersion, QString* logFileName) const = 0;
 
     // These below should be overriden in CommonUpdates2Installer
     virtual bool cleanInstallerDirectory() = 0;

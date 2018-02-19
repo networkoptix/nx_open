@@ -27,6 +27,9 @@ public:
     MOCK_CONST_METHOD0(updateInformation, QVariantMap());
     MOCK_CONST_METHOD0(systemInformation, QnSystemInformation());
     MOCK_CONST_METHOD1(checkExecutable, bool(const QString&));
+    MOCK_CONST_METHOD2(
+        initializeUpdateLog,
+        bool(const QString& targetVersion, QString* logFileName));
 };
 
 enum class ExpectedPrepareOutcome
