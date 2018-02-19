@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <shared_mutex>
+#include <nx/utils/thread/mutex.h>
 
 #include <QtCore/QElapsedTimer>
 
@@ -10,11 +11,6 @@ namespace utils {
 
 class NX_UTILS_API ElapsedTimerThreadSafe
 {
-    // TODO: change to shared_timed_mutex to shared_mutex when c++17 available
-    using mutex_type = std::shared_timed_mutex;
-    mutable mutex_type m_mutex;
-    QElapsedTimer m_timer;
-
 public:
     void start();
     void stop();
@@ -28,6 +24,10 @@ public:
     bool isStarted() const;
     std::chrono::milliseconds elapsed() const;
     bool hasExpired(std::chrono::milliseconds ms) const;
+
+private:
+    mutable QnReadWriteLock m_mutex;
+    QElapsedTimer m_timer;
 };
 
 } // namespace utils
