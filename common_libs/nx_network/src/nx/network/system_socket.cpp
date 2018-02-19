@@ -439,11 +439,11 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
         return false;
     }
 
-    int on = 1;
+    const int off = 0;
     if (m_ipVersion == AF_INET6
-        && ::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&on, sizeof(on)))
+        && ::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&off, sizeof(off)))
     {
-            return false;
+        return false;
     }
 
 #ifdef SO_NOSIGPIPE
@@ -840,6 +840,8 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connectToIp(
         return false;
     if (!isNonBlockingModeBak && !this->setNonBlockingMode(true))
         return false;
+
+    NX_ASSERT(addr.get()->sa_family == this->m_ipVersion);
 
     int connectResult = ::connect(this->m_fd, addr.get(), addr.length());
     if (connectResult != 0)
