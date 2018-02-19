@@ -143,7 +143,6 @@ struct ConsumerInfo
     LqReason lqReason = LqReason::none;
     QElapsedTimer initialTime;
     QElapsedTimer awaitingLqTime;
-    QElapsedTimer lastRtspDrop;
 
     // Item will go to LQ if it is small for this period of time already.
     QElapsedTimer itemIsSmallInHq;
@@ -420,14 +419,6 @@ struct RadassController::Private
             return;
         }
 
-        if (consumer->awaitingLqTime.isValid()
-            && consumer->awaitingLqTime.hasExpired(kQualitySwitchIntervalMs))
-        {
-            trace("Consumer had slow stream for 5 seconds", consumer);
-            gotoLowQuality(consumer, LqReason::performance);
-            return;
-        }
-
         // Switch HQ->LQ if visual item size is small.
         if (reader->getQuality() == MEDIA_Quality_High
             && isSmallItem(display)
@@ -454,22 +445,25 @@ struct RadassController::Private
         if (display->isRealTimeSource()
             // LQ live stream.
             && reader->getQuality() == MEDIA_Quality_Low
-            // No drop report several last seconds.
-            && consumer->lastRtspDrop.hasExpired(kQualitySwitchIntervalMs)
             // There are no a lot of packets in the queue (it is possible if CPU slow).
-            && display->queueSize() <= display->maxQueueSize() / 2
+            && display->queueSize() <= (display->maxQueueSize() * 0.75)
             // Check if camera is not out of the screen
             && !reader->isPaused()
             // Check if camera is not paused
             && !reader->isMediaPaused()
             // No recently slow report by any camera.
-            && lastAutoSwitchTimer.hasExpired(kQualitySwitchIntervalMs)
+            && lastSystemRtspDrop.hasExpired(kQualitySwitchIntervalMs)
             // Is big enough item for HQ.
-            && isBigItem(display)
-            // Auto-Hq transition is not blocked
-            && autoHqTransitionAllowed)
+            && isBigItem(display))
         {
             streamBackToNormal(consumer);
+        }
+
+        if (consumer->awaitingLqTime.isValid()
+            && consumer->awaitingLqTime.hasExpired(kQualitySwitchIntervalMs))
+        {
+            trace("Consumer had slow stream for 5 seconds", consumer);
+            gotoLowQuality(consumer, LqReason::performance);
         }
     }
 
@@ -509,7 +503,6 @@ struct RadassController::Private
     {
         trace("Slow stream detected.", consumer);
         lastSystemRtspDrop.restart();
-        consumer->lastRtspDrop.restart();
 
         // Skip unsupported cameras and cameras with manual stream control.
         if (consumer->mode != RadassMode::Auto)
