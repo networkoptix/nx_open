@@ -2,7 +2,8 @@
 
 #include <QByteArray>
 
-// TODO: #ak Most (if not all) of these strings are not relevant for nx_network and should be moved to vms.
+// TODO: #ak Most (if not all) of these strings are not relevant for nx_network and should be moved
+// to vms.
 namespace Qn {
 
 static const QByteArray GUID_HEADER_NAME = "X-guid";
@@ -58,6 +59,6 @@ static const QByteArray CSRF_TOKEN_HEADER_NAME = "Nx-Vms-Csrf-Token";
 /** Url query item used in api/iomonitor and deprecated api/image. */
 static const QByteArray PHYSICAL_ID_URL_QUERY_ITEM = "cameraId";
 
-static const QByteArray FRAME_TIMESTAMP_US = "Frame-Timestamp";
+static const QByteArray FRAME_TIMESTAMP_US_HEADER_NAME = "Frame-Timestamp";
 
 } // namespace Qn

@@ -255,7 +255,7 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
         apiUrl.setPassword(m_auth.password());
 
         auto requestCompletionFunc = [&](SystemError::ErrorCode, int statusCode, nx_http::StringType,
-            nx_http::BufferType msgBody, nx_http::HttpHeaders /*httpHeaders*/)
+            nx_http::BufferType msgBody, nx_http::HttpHeaders /*httpResponseHeaders*/)
         {
             {
                 QnMutexLocker lock(&waitMutex);
@@ -342,7 +342,7 @@ bool QnPravisCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamete
         apiUrl.setPassword(m_auth.password());
 
         auto requestCompletionFunc = [&](SystemError::ErrorCode, int statusCode, nx_http::StringType,
-            nx_http::BufferType msgBody, nx_http::HttpHeaders /*httpHeaders*/)
+            nx_http::BufferType msgBody, nx_http::HttpHeaders /*httpResponseHeaders*/)
         {
             {
                 QnMutexLocker lock(&waitMutex);

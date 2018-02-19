@@ -45,8 +45,10 @@ int QnMultiserverThumbnailRestHandler::executeGet(
         processor->commonModule()->resourcePool(), params);
     const auto& imageRequest = request.request;
 
-    auto requiredPermission = nx::api::CameraImageRequest::isSpecialTimeValue(imageRequest.msecSinceEpoch)
-            ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
+    auto requiredPermission =
+        nx::api::CameraImageRequest::isSpecialTimeValue(imageRequest.msecSinceEpoch)
+        ? Qn::Permission::ViewLivePermission
+        : Qn::Permission::ViewFootagePermission;
 
     if (!processor->commonModule()->resourceAccessManager()->hasPermission(
         processor->accessRights(), imageRequest.camera, requiredPermission))
@@ -58,14 +60,14 @@ int QnMultiserverThumbnailRestHandler::executeGet(
 
     const auto ownerPort = processor->owner()->getPort();
     qint64 frameTimestampUsec = 0;
-    auto httpResult = getScreenshot(processor->commonModule(), request, result, contentType, ownerPort,
-        &frameTimestampUsec);
+    auto httpResult = getScreenshot(processor->commonModule(), request, result, contentType,
+        ownerPort, &frameTimestampUsec);
 
     if (httpResult == nx_http::StatusCode::ok)
     {
         auto& headers = processor->response()->headers;
-        nx_http::insertHeader(&headers,
-            nx_http::HttpHeader(Qn::FRAME_TIMESTAMP_US, QByteArray::number(frameTimestampUsec)));
+        nx_http::insertHeader(&headers, nx_http::HttpHeader(
+            Qn::FRAME_TIMESTAMP_US_HEADER_NAME, QByteArray::number(frameTimestampUsec)));
     }
     return httpResult;
 }
@@ -103,17 +105,20 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(
     }
 
     auto server = targetServer(commonModule, request);
-    if (!server || server->getId() == commonModule->moduleGUID() || server->getStatus() != Qn::Online)
-        return getThumbnailLocal(request, result, contentType, frameTimestamsUsec);
+    bool loadLocal = !server || server->getId() == commonModule->moduleGUID()
+        || server->getStatus() != Qn::Online;
 
-    return getThumbnailRemote(server, request, result, contentType, ownerPort, frameTimestamsUsec);
+    return (loadLocal)
+        ? getThumbnailLocal(request, result, contentType, frameTimestamsUsec)
+        : getThumbnailRemote(server, request, result, contentType, ownerPort, frameTimestamsUsec);
 }
 
 QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer(
     QnCommonModule* commonModule,
     const QnThumbnailRequestData &request ) const
 {
-    auto currentServer = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(commonModule->moduleGUID());
+    auto currentServer = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
+        commonModule->moduleGUID());
 
     if (request.isLocal)
         return currentServer;
@@ -126,7 +131,8 @@ QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer(
         imageRequest.msecSinceEpoch);
 }
 
-int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType, qint64* frameTimestampUsec) const
+int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailRequestData &request,
+    QByteArray& result, QByteArray& contentType, qint64* frameTimestampUsec) const
 {
     static const qint64 kUsecPerMs = 1000;
     const auto& imageRequest = request.request;
@@ -146,7 +152,8 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
     if(frameTimestampUsec)
         *frameTimestampUsec = static_cast<qint64>(outFrame.data()->pkt_dts);
 
-    QByteArray imageFormat = QnLexical::serialized<nx::api::CameraImageRequest::ThumbnailFormat>(imageRequest.imageFormat).toUtf8();
+    QByteArray imageFormat = QnLexical::serialized<nx::api::CameraImageRequest::ThumbnailFormat>(
+        imageRequest.imageFormat).toUtf8();
 
     if (imageRequest.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::jpg)
     {
@@ -270,7 +277,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
             : QByteArray("application/json"); //< TODO: Provide content type from response.
         if (frameTimestamsUsec)
         {
-            const auto it = response.httpHeaders.find(Qn::FRAME_TIMESTAMP_US);
+            const auto it = response.httpHeaders.find(Qn::FRAME_TIMESTAMP_US_HEADER_NAME);
             if (it != response.httpHeaders.end())
             {
                 *frameTimestamsUsec = it->second.toLongLong(); //< 0 if conversion fails.

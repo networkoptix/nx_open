@@ -142,7 +142,8 @@ public:
 
     /**
      * Start POST request to url.
-     * @param includeContentLength TODO #ak this parameter is a hack. Replace it with AbstractMsgBodySource if future version
+     * @param includeContentLength TODO #ak this parameter is a hack. Replace it
+     * with AbstractMsgBodySource if future version
      * @return true, if socket is created and async connect is started. false otherwise
      * @todo Infinite POST message body support
      */
@@ -473,9 +474,13 @@ public:
 
     void reset()
     {
-        // MUST call terminate BEFORE shared pointer destruction to allow for async handlers to complete.
+        // MUST call terminate BEFORE shared pointer destruction to allow for async handlers to
+        // complete.
         if (m_obj.use_count() == 1)
-            m_obj->pleaseStopSync(false);   //< pleaseStopSync should have already been called explicitly.
+        {
+            // pleaseStopSync should have already been called explicitly.
+            m_obj->pleaseStopSync(false);
+        }
         m_obj.reset();
     }
 
@@ -515,19 +520,23 @@ private:
     std::shared_ptr<AsyncHttpClient> m_obj;
 };
 
+using DownloadCompletionHandler = std::function<void(
+    SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType /*message body*/,
+    nx_http::HttpHeaders /*response headers*/)>;
+
 /**
  * Helper function that uses nx_http::AsyncHttpClient for file download.
- * @param completionHandler <OS error code, status code, message body>.
- * "Status code" and "message body" are valid only if "OS error code" is SystemError::noError
+ * @param completionHandler <OS error code, status code, message body, http response headers>.
+ * "Status code", "message body" and "http response headers" are valid only if "OS error code"
+ * is SystemError::noError.
  * @return true if started async download, false otherwise.
  * @note It is strongly recommended to use this for downloading only small files (e.g., camera
-*  params).
+ * params).
  * For real files better to use nx_http::AsyncHttpClient directly.
  */
 void NX_NETWORK_API downloadFileAsync(
     const QUrl& url,
-    std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType, nx_http::HttpHeaders)>
-        completionHandler,
+    DownloadCompletionHandler completionHandler,
     const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
     AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
     AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
@@ -540,18 +549,21 @@ SystemError::ErrorCode NX_NETWORK_API downloadFileSync(
     int* const statusCode,
     nx_http::BufferType* const msgBody);
 
+using DownloadCompletionHandlerEx = std::function<void(SystemError::ErrorCode, int /*statusCode*/,
+    nx_http::StringType /*content type*/, nx_http::BufferType /*message body*/,
+    nx_http::HttpHeaders /*response headers*/)>;
+
 /**
  * Same as downloadFileAsync but provide contentType at callback.
  */
 void NX_NETWORK_API downloadFileAsyncEx(
     const QUrl& url,
-    std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType,
-        nx_http::HttpHeaders)> completionHandler,
+    DownloadCompletionHandlerEx completionHandlerEx,
     const nx_http::HttpHeaders& extraHeaders,
     AsyncHttpClient::AuthType authType,
     AsyncHttpClient::Timeouts timeouts);
 
-typedef std::function<void(SystemError::ErrorCode, int httpStatus)> UploadCompletionHandler;
+using UploadCompletionHandler = std::function<void(SystemError::ErrorCode, int httpStatus)>;
 
 /**
  * Uploads specified data using POST.
