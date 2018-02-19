@@ -107,8 +107,6 @@ PrepareResult Updates2InstallerBase::checkContents() const
 
 bool Updates2InstallerBase::install()
 {
-
-    // #TODO #akulikov Implement this
     QString currentDir = QDir::currentPath();
     QDir::setCurrent(installerWorkDir());
 
