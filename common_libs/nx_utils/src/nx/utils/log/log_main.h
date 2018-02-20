@@ -67,6 +67,7 @@ Helper makeHelper(Level level, const Tag& tag)
 class NX_UTILS_API Stream: public Helper
 {
 public:
+    Stream() {} //< Pre-C++17, the default constructor is not inherited via "using".
     using Helper::Helper;
 
     ~Stream()
