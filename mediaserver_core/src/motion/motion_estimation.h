@@ -27,24 +27,41 @@ public:
     */
     void setMotionMask(const QnMotionRegion& region);
     void setChannelNum(int value);
+
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
-    //void analizeFrame(const CLVideoDecoderOutput* frame);
-    /*!
-        \return true if successfully decoded and analyzed \a frame
-    */
-    bool analyzeFrame(const QnCompressedVideoDataPtr& frame);
+
+    // TODO: Refactor: Move decoding out of QnMotionEstimation. Originally, decoding was needed
+    // only for the motion detection, but recently it started to be used for metadata plugins as
+    // well, hence the new method decodeFrame() - to decode a frame only once, if it is needed both
+    // for metadata plugins and motion detection.
+    /**
+     * @return Null in case of a decoding error, or if the frame should be skipped (not decoded).
+     */
+    CLConstVideoDecoderOutputPtr decodeFrame(const QnCompressedVideoDataPtr& frame);
+
+    /**
+     * @param outVideoDecoderOutput If not null, supplies a shared pointer to be set to the decoded
+     *     video frame. In this case the frame is decoded in full, such optimization as
+     *     Y-channel-only decoding is not used.
+     * @return Whether successfully decoded and analyzed the frame.
+     */
+    bool analyzeFrame(
+        const QnCompressedVideoDataPtr& frame,
+        CLConstVideoDecoderOutputPtr* outVideoDecoderOutput = nullptr);
+
 #endif
+
     QnMetaDataV1Ptr getMotion();
     bool existsMetadata() const;
 
-    //!Returns resolution of video picture (it is known only after first successful \a QnMotionEstimation::analizeFrame call)
+    //!Returns resolution of video picture (it is known only after first successful \a QnMotionEstimation::analyzeFrame call)
     QSize videoResolution() const;
 
 private:
     void scaleMask(quint8* mask, quint8* scaledMask);
     void reallocateMask(int width, int height);
     void postFiltering();
-    void analizeMotionAmount(quint8* frame);
+    void analyzeMotionAmount(quint8* frame);
 	void scaleFrame(const uint8_t* data, int width, int height, int stride, uint8_t* frameBuffer,uint8_t* prevFrameBuffer, uint8_t* deltaBuffer);
 
 private:

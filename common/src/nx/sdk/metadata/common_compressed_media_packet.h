@@ -1,12 +1,13 @@
 #pragma once
 
-#include <plugins/plugin_tools.h>
-
-#include "media_context.h"
-
 #include <memory>
 #include <vector>
 #include <string>
+#include <cstdint>
+
+#include <plugins/plugin_tools.h>
+
+#include "media_context.h"
 
 namespace nx {
 namespace sdk {
@@ -20,29 +21,29 @@ public:
 
     virtual const int dataSize() const
     {
-        return m_data ? (int) m_data->size() : m_externalDataSize;
+        return m_ownedData ? (int) m_ownedData->size() : m_externalDataSize;
     }
 
     virtual const char* data() const
     {
-        if (m_data && !m_data->empty())
-            return &m_data->at(0);
+        if (m_ownedData && !m_ownedData->empty())
+            return &m_ownedData->at(0);
         return m_externalData;
     }
 
-    void setData(std::vector<char> data)
+    void setOwnedData(std::vector<char> data)
     {
-        m_data.reset(new std::vector<char>());
-        *m_data = std::move(data);
+        m_ownedData.reset(new std::vector<char>());
+        *m_ownedData = std::move(data);
         m_externalData = nullptr;
         m_externalDataSize = 0;
     }
 
-    void setData(const char* data, int size)
+    void setExternalData(const char* data, int size)
     {
         m_externalData = data;
         m_externalDataSize = size;
-        m_data.reset();
+        m_ownedData.reset();
     }
 
     virtual const MediaContext* context() const { return nullptr; }
@@ -52,7 +53,7 @@ public:
     void setTimestampUsec(int64_t value) { m_timestampUsec = value; }
 
 private:
-    std::unique_ptr<std::vector<char>> m_data; //< Deep copy.
+    std::unique_ptr<std::vector<char>> m_ownedData; //< Deep copy.
     const char* m_externalData = nullptr;
     int m_externalDataSize = 0;
     std::string m_codec;
