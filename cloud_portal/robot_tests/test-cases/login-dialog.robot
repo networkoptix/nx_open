@@ -258,7 +258,7 @@ should respond to Space key and toggle checkbox
 
 handles two tabs, updates second tab state if logout is done on first
     Open Browser and go to URL    ${url}/register
-    Wait Until Element Is Visible    ${TERMS AND CONDITIONS LINK}
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Click Link    ${TERMS AND CONDITIONS LINK}
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[1]
