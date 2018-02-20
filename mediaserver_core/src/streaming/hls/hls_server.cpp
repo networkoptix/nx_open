@@ -947,7 +947,7 @@ namespace nx_hls
 
         const auto& chunkAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
             accessRights,
-            HLS_PREFIX + camResource->getUniqueId(),
+            HLS_PREFIX + camResource->getUniqueId() + ".ts",
             QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS );
         newHlsSession->setChunkAuthenticationQueryItem( chunkAuthenticationKey );
 
