@@ -142,7 +142,7 @@ QnResourceList HanwhaResourceSearcher::findResources(void)
 		QnMutexLocker lock(&m_mutex);
 		upnpResults = m_foundUpnpResources;
 		m_foundUpnpResources.clear();
-		m_alreadFoundMacAddresses.clear();
+		m_alreadyFoundMacAddresses.clear();
 	}
     addResourcesViaSunApi(upnpResults);
     return upnpResults;
@@ -313,8 +313,8 @@ bool HanwhaResourceSearcher::processPacket(
             return false;
         }
 
-        const bool alreadyFound = m_alreadFoundMacAddresses.find(cameraMac.toString())
-            != m_alreadFoundMacAddresses.end();
+        const bool alreadyFound = m_alreadyFoundMacAddresses.find(cameraMac.toString())
+            != m_alreadyFoundMacAddresses.end();
 
 		if (alreadyFound)
             return true;
@@ -325,7 +325,7 @@ bool HanwhaResourceSearcher::processPacket(
     createResource(devInfo, cameraMac, foundUpnpResources);
 
     QnMutexLocker lock(&m_mutex);
-    m_alreadFoundMacAddresses.insert(cameraMac.toString());
+    m_alreadyFoundMacAddresses.insert(cameraMac.toString());
     m_foundUpnpResources += foundUpnpResources;
 
 	return true;
