@@ -2,8 +2,9 @@
 
 #include <QtGui/QPainter>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QTabWidget>
 #include <QtWidgets/QScrollBar>
+#include <QtWidgets/QTabWidget>
+#include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 
 #include <core/resource/camera_resource.h>
@@ -17,6 +18,7 @@
 
 #include <nx/client/desktop/common/widgets/animated_tab_widget.h>
 #include <nx/client/desktop/common/widgets/compact_tab_bar.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/common/selectable_text_button.h>
 #include <nx/client/desktop/event_search/models/unified_async_search_list_model.h>
 #include <nx/client/desktop/event_search/models/analytics_search_list_model.h>
@@ -100,6 +102,8 @@ EventPanel::Private::Private(EventPanel* q):
     connect(m_bookmarksTab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
     connect(m_analyticsTab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
     connect(m_notificationsTab, &NotificationListWidget::tileHovered, q, &EventPanel::tileHovered);
+
+    setupBookmarksTabSyncWithNavigator();
 }
 
 EventPanel::Private::~Private()
@@ -179,6 +183,16 @@ void EventPanel::Private::setupEventSearch()
 
     defaultAction->trigger();
     button->setMenu(eventFilterMenu);
+
+    m_eventsTab->counterLabel()->setText(QString());
+    connectToRowCountChanges(m_eventsModel,
+        [this]()
+        {
+            const auto count = m_eventsModel->rowCount();
+            m_eventsTab->counterLabel()->setText(count
+                ? (count > 99 ? tr(">99 events") : tr("%n events", "", count))
+                : QString());
+        });
 }
 
 void EventPanel::Private::setupBookmarkSearch()
@@ -191,12 +205,23 @@ void EventPanel::Private::setupBookmarkSearch()
     m_bookmarksTab->setModel(new UnifiedAsyncSearchListModel(m_bookmarksModel, this));
     m_bookmarksTab->setPlaceholderTexts(tr("No bookmarks"), kHtmlPlaceholder);
     m_bookmarksTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/bookmarks.png")));
+    m_bookmarksTab->showPreviewsButton()->show();
 
     connect(m_bookmarksTab->filterEdit(), &QnSearchLineEdit::textChanged, m_bookmarksModel,
         [this](const QString& text)
         {
             m_bookmarksModel->setFilterText(text);
             m_bookmarksTab->requestFetch();
+        });
+
+    m_bookmarksTab->counterLabel()->setText(QString());
+    connectToRowCountChanges(m_bookmarksModel,
+        [this]()
+        {
+            const auto count = m_bookmarksModel->rowCount();
+            m_bookmarksTab->counterLabel()->setText(count
+                ? (count > 99 ? tr(">99 bookmarks") : tr("%n bookmarks", "", count))
+                : QString());
         });
 }
 
@@ -205,6 +230,8 @@ void EventPanel::Private::setupAnalyticsSearch()
     m_analyticsTab->setModel(new UnifiedAsyncSearchListModel(m_analyticsModel, this));
     m_analyticsTab->setPlaceholderTexts(tr("No objects"), tr("No objects detected"));
     m_analyticsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/analytics.png")));
+    m_analyticsTab->showPreviewsButton()->show();
+    m_analyticsTab->showInfoButton()->show();
 
     connect(m_analyticsTab->filterEdit(), &QnSearchLineEdit::textChanged, m_analyticsModel,
         [this](const QString& text)
@@ -234,6 +261,16 @@ void EventPanel::Private::setupAnalyticsSearch()
             if (state == ButtonState::deactivated)
                 m_currentMediaWidget->setAnalyticsSearchRect(QRectF());
     });
+
+    m_analyticsTab->counterLabel()->setText(QString());
+    connectToRowCountChanges(m_analyticsModel,
+        [this]()
+        {
+            const auto count = m_analyticsModel->rowCount();
+            m_analyticsTab->counterLabel()->setText(count
+                ? (count > 99 ? tr(">99 detected objects") : tr("%n detected objects", "", count))
+                : QString());
+        });
 }
 
 QnVirtualCameraResourcePtr EventPanel::Private::camera() const
@@ -322,6 +359,45 @@ void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Va
     static constexpr int kRightBoundaryPosition = 32;
     m_counterLabel->setGeometry(kRightBoundaryPosition - width, kTopMargin,
         width, m_counterLabel->minimumHeight());
+}
+
+void EventPanel::Private::setupBookmarksTabSyncWithNavigator()
+{
+    connect(m_tabs, &QTabWidget::currentChanged, this,
+        [this](int index)
+        {
+            q->context()->action(ui::action::BookmarksModeAction)->setChecked(
+                m_tabs->currentWidget() == m_bookmarksTab);
+
+            m_previousTabIndex = m_lastTabIndex;
+            m_lastTabIndex = index;
+        });
+
+    connect(q->context()->action(ui::action::BookmarksModeAction), &QAction::toggled, this,
+        [this](bool on)
+        {
+            const auto index = m_tabs->indexOf(m_bookmarksTab);
+            if (index < 0)
+                return;
+
+            if (on)
+            {
+                m_tabs->setCurrentIndex(index);
+            }
+            else
+            {
+                if (m_tabs->currentWidget() == m_bookmarksTab)
+                    m_tabs->setCurrentIndex(m_previousTabIndex);
+            }
+        });
+}
+
+void EventPanel::Private::connectToRowCountChanges(QAbstractItemModel* model,
+    std::function<void()> handler)
+{
+    connect(model, &QAbstractItemModel::modelReset, this, handler);
+    connect(model, &QAbstractItemModel::rowsInserted, this, handler);
+    connect(model, &QAbstractItemModel::rowsRemoved, this, handler);
 }
 
 } // namespace desktop

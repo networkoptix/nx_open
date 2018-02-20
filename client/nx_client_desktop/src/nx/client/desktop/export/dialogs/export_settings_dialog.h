@@ -6,8 +6,8 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <utils/common/connective.h>
-
 #include <nx/client/desktop/common/utils/filesystem.h>
+#include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
 
 namespace Ui { class ExportSettingsDialog; }
 
@@ -20,6 +20,8 @@ struct QnLayoutItemData;
 namespace nx {
 namespace client {
 namespace desktop {
+
+namespace ui { class SelectableTextButton; }
 
 struct ExportMediaSettings;
 struct ExportLayoutSettings;
@@ -65,14 +67,16 @@ public:
     void setMediaParams(const QnMediaResourcePtr& mediaResource, const QnLayoutItemData& itemData,
         QnWorkbenchContext* context);
 private:
-
+    ui::SelectableTextButton* buttonForOverlayType(ExportOverlayType type);
     void setupSettingsButtons();
     void updateSettingsWidgets();
     void updateMode();
     void updateTabWidgetSize();
     void updateAlerts(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
     static void updateAlertsInternal(QLayout* layout, const QStringList& texts, bool severe);
-    void updateTranscodingWidgets();
+
+    // Updates state of widgets according to internal state
+    void updateWidgetsState();
 
     Filename suggestedFileName(const Filename& baseName) const;
 

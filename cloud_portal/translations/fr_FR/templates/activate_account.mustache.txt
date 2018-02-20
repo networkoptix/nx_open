@@ -1,8 +1,8 @@
-Hello,
+Bonjour,
 
-  Please open the link below to confirm your email address and activate the account.
+  S.V.P ouvrir le lien ci-dessous pour confirmer votre courriel et activer le compte.
 
 {{config.portal_url}}/activate/{{message.code}}
 
 Si vous n'avez pas enregistré sur {{PRODUCT_NAME}}, ignorez ce courriel.
-Do not share the message or the link with anyone.
+Ne partagez pas le message ou le lien avec qui que ce soit.

@@ -1,1 +1,1 @@
-crowdin download -b vms_4.0 --config crowdin-vms.yaml
+crowdin download -b default --config crowdin-vms.yaml

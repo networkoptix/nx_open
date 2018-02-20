@@ -16,8 +16,8 @@
     </div>
     <form ng-if="canMerge" name="mergeForm" novalidate>
         <div class="modal-body">
-            <div class="merge-text">Merge current System with</div>
-            <div uib-dropdown class="merge-dropdown">
+            <!--div>Merge current System with</div>
+            <div uib-dropdown class="dropdown-select">
                 <a uib-dropdown-toggle href="#">
                     <system-status system="targetSystem"></system-status><span class="icon-caret"></span>
                 </a>
@@ -29,23 +29,30 @@
                         </a>
                     </li>
                 </ul>
+            </div-->
+            <div class="form-group">
+                <label for="system">Merge current System with</label>
+                <select class="form-control" name="targetSystem" id="system" ng-model="targetSystem"
+                        ng-options="system as addStatus(system) for system in systems"></select>
             </div>
-            <p ng-if="systemStatus =='offline'"
+            <p ng-if="systemMergeable =='offline'"
                class="help-block warning-label">System {{targetSystem.name}} is offline cannot be merged with the current one.</p>
-            <p ng-if="systemStatus =='incompatable'"
+            <p ng-if="systemMergeable =='cannotMerge'"
                class="help-block warning-label">System {{targetSystem.name}} is incompatable cannot be merged with the current one.</p>
-            <p ng-if="systemStatus == ''"
+            <p ng-if="systemMergeable == ''"
                class="help-block">You can merge only Systems in which you have owner permissions.</p>
-            <div ng-class="{'disabled-settings': systemStatus != ''}">
-                <div class="merge-text">Took system name and settings from</div>
-                <div class="form-group" ng-init="$parent.masterSystemId=system.id">
-                    <div class="radio">
-                        <input type="radio" id="firstSystem" ng-model="$parent.masterSystemId" ng-value="system.id">
-                        <label for="firstSystem">{{system.info.name}}</label>
+            <div>
+                <div ng-class="{'text-muted': systemStatus != ''}">Took system name and settings from</div>
+                <div ng-init="$parent.masterSystemId=system.id">
+                    <div>
+                        <input type="radio" id="firstSystem" ng-model="$parent.masterSystemId" ng-value="system.id"
+                                                             ng-disabled="systemStatus != ''">
+                        <label class="light-label" ng-class="{'text-muted': systemStatus != ''}" for="firstSystem">{{system.info.name}}</label>
                     </div>
-                    <div class="radio">
-                        <input type="radio" id="secondSystem" ng-model="$parent.masterSystemId" ng-value="targetSystem.id">
-                        <label for="secondSystem">{{targetSystem.name}}</label>
+                    <div>
+                        <input type="radio" id="secondSystem" ng-model="$parent.masterSystemId" ng-value="targetSystem.id"
+                                                              ng-disabled="systemStatus != ''">
+                        <label class="light-label" ng-class="{'text-muted': systemStatus != ''}" for="secondSystem">{{targetSystem.name}}</label>
                     </div>
                 </div>
             </div>

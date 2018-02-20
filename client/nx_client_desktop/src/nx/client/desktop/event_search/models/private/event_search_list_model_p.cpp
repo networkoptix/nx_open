@@ -24,7 +24,7 @@ namespace desktop {
 
 namespace {
 
-static constexpr int kFetchBatchSize = 25;
+static constexpr int kFetchBatchSize = 110;
 
 // In "live mode", every kUpdateTimerInterval newly happened events are fetched.
 static constexpr auto kUpdateTimerInterval = std::chrono::seconds(15);

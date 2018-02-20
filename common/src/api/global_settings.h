@@ -54,6 +54,8 @@ const QString kMaxDifferenceBetweenSynchronizedAndInternetTime(
     lit("maxDifferenceBetweenSynchronizedAndInternetTime"));
 const QString kMaxDifferenceBetweenSynchronizedAndLocalTime(
     lit("maxDifferenceBetweenSynchronizedAndLocalTimeMs"));
+const QString kOsTimeChangeCheckPeriod(lit("osTimeChangeCheckPeriodMs"));
+const QString kSyncTimeExchangePeriod(lit("syncTimeExchangePeriod"));
 const QString kNameAutoDiscoveryEnabled(lit("autoDiscoveryEnabled"));
 const QString kNameBackupQualities(lit("backupQualities"));
 const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
@@ -214,6 +216,8 @@ public:
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
 
+    // -- Time synchronization parameters.
+
     bool isTimeSynchronizationEnabled() const;
     void setTimeSynchronizationEnabled(bool value);
 
@@ -222,6 +226,15 @@ public:
 
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndInternetTime() const;
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndLocalTime() const;
+
+    std::chrono::milliseconds osTimeChangeCheckPeriod() const;
+    void setOsTimeChangeCheckPeriod(std::chrono::milliseconds value);
+
+    std::chrono::milliseconds syncTimeExchangePeriod() const;
+    void setSyncTimeExchangePeriod(std::chrono::milliseconds value);
+
+    // -- (end) Time synchronization parameters.
+
     bool takeCameraOwnershipWithoutLock() const;
 
     // -- Cloud settings
@@ -351,6 +364,8 @@ private:
     QnResourcePropertyAdaptor<bool> *m_synchronizeTimeWithInternetAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int> *m_osTimeChangeCheckPeriodAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int> *m_syncTimeExchangePeriodAdaptor = nullptr;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_backupNewCamerasByDefaultAdaptor = nullptr;
 

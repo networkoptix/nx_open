@@ -45,6 +45,12 @@
 // TODO: Does it make sense to move into some config?
 static const bool kVerifyDigestUriWithParams = false;
 
+namespace {
+
+static const QByteArray kCookieAuthMethod("GET");
+
+} // namespace
+
 void QnAuthHelper::UserDigestData::parse(const nx::network::http::Request& request)
 {
     ha1Digest = nx::network::http::getHeaderValue(request.headers, Qn::HA1_DIGEST_HEADER_NAME);
@@ -188,13 +194,18 @@ Qn::AuthResult QnAuthHelper::authenticate(
 
     if (allowedAuthMethods & nx::network::http::AuthMethod::cookie)
     {
-        const QString& cookie = QLatin1String(nx::network::http::getHeaderValue(request.headers, "Cookie"));
+        const auto cookie = nx::network::http::getHeaderValue(request.headers, "Cookie");
         int customAuthInfoPos = cookie.indexOf(Qn::URL_QUERY_AUTH_KEY_NAME);
         if (customAuthInfoPos >= 0)
         {
             if (usedAuthMethod)
                 *usedAuthMethod = nx::network::http::AuthMethod::cookie;
-            const auto result = doCookieAuthorization("GET", cookie.toUtf8(), response, accessRights);
+
+            const auto result = doCookieAuthorization(
+                 request.requestLine.method, cookie,
+                 nx::network::http::getHeaderValue(request.headers, Qn::CSRF_TOKEN_HEADER_NAME),
+                 response, accessRights);
+
             NX_DEBUG(this, lm("%1 with cookie (%2)").args(result, request.requestLine));
             return result;
         }
@@ -524,26 +535,27 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
 Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     const QByteArray& method,
     const QByteArray& authData,
+    const QByteArray& csrfToken,
     nx::network::http::Response& responseHeaders,
     Qn::UserAccessData* accessRights)
 {
-    nx::network::http::Response tmpHeaders;
-
     QMap<nx::network::http::BufferType, nx::network::http::BufferType> params;
     nx::utils::parseNameValuePairs(authData, ';', &params);
 
-    Qn::AuthResult authResult = Qn::Auth_Forbidden;
-    if (params.contains(Qn::URL_QUERY_AUTH_KEY_NAME))
-    {
-        //authenticating
-        authResult = authenticateByUrl(
-            QUrl::fromPercentEncoding(params.value(Qn::URL_QUERY_AUTH_KEY_NAME)).toUtf8(),
-            method,
-            responseHeaders,
-            accessRights);
-    }
+    const auto auth = params.value(Qn::URL_QUERY_AUTH_KEY_NAME);
+    if (auth.isEmpty())
+        return Qn::Auth_Forbidden;
 
-    return authResult;
+    const auto csrfParam = params.value(Qn::CSRF_TOKEN_COOKIE_NAME);
+    if (csrfParam.isEmpty() || csrfParam != csrfToken)
+        return Qn::Auth_InvalidCsrfToken;
+
+    // TODO: Verify UUID and CSRF token against some cache as well.
+    return authenticateByUrl(
+        QUrl::fromPercentEncoding(auth).toUtf8(),
+        kCookieAuthMethod,
+        responseHeaders, accessRights);
+
 }
 
 void QnAuthHelper::addAuthHeader(
@@ -654,11 +666,11 @@ bool QnAuthHelper::checkUserPassword(const QnUserResourcePtr& user, const QStrin
         user->getName(),
         password,
         user->getRealm(),
-        "GET",
+        kCookieAuthMethod,
         qnAuthHelper->generateNonce());
 
     nx::network::http::Response response;
-    return authenticateByUrl(auth, QByteArray("GET"), response) == Qn::Auth_OK;
+    return authenticateByUrl(auth, kCookieAuthMethod, response) == Qn::Auth_OK;
 }
 
 QnLdapManager* QnAuthHelper::ldapManager() const

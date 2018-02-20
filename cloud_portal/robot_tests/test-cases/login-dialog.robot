@@ -15,7 +15,6 @@ can be opened in anonymous state
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${LOG IN MODAL}
-    Element Should be Visible    ${LOG IN MODAL}
     Close Browser
 
 can be closed after clicking on background
@@ -23,7 +22,6 @@ can be closed after clicking on background
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${LOG IN MODAL}    //div[@uib-modal-backdrop='modal-backdrop']/..
-    Element Should be Visible    //div[@uib-modal-backdrop='modal-backdrop']/..
     Click Element    //div[@uib-modal-backdrop='modal-backdrop']/..
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
     Page Should Not Contain Element    ${LOG IN MODAL}
@@ -32,17 +30,18 @@ can be closed after clicking on background
 allows to log in with existing credentials and to log out
     Open Browser and go to URL    ${url}
     Log In    ${email}    ${password}
+    Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Click Element    ${ACCOUNT DROPDOWN}
     Wait Until Element Is Visible    ${LOG OUT BUTTON}
     Click Link    ${LOG OUT BUTTON}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
-    Element Should Be Visible    ${LOG IN NAV BAR}
     Close Browser
 
 redirects to systems after log In
     Open Browser and go to URL    ${url}
     Log In    ${email}    ${password}
+    Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Location Should Be    ${url}/systems
     Close Browser
@@ -59,6 +58,7 @@ after log In, display user's email and menu in top right corner
     Open Browser and go to URL    ${url}
     Maximize Browser Window
     Log In    ${email}    ${password}
+    Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Element Text Should Be    ${ACCOUNT DROPDOWN}    ${email}
     Close Browser
@@ -67,7 +67,6 @@ valid but unregistered email shows error message
     Open Browser and go to URL    ${url}
     Log In    ${UNREGISTERED EMAIL}    ${password}
     Wait Until Element Is Visible    ${ALERT}
-    Element Should Be Visible    ${ALERT}
     Close Browser
 
 allows log in with existing email in uppercase
@@ -81,7 +80,6 @@ rejects log in with wrong password
     Open Browser and go to URL    ${url}
     Log In    ${email}    'arthahrtrthjsrtjy'
     wait until element is visible    ${ALERT}
-    Element Should Be Visible    ${ALERT}
     Close Browser
 
 rejects log in without password
@@ -149,8 +147,8 @@ contains 'I forgot password' link that leads to Restore Password page with pre-f
     Log In    ${email}    'aderhgadehf'
     Wait Until Element Is Visible    ${FORGOT PASSWORD}
     Click Link    ${FORGOT PASSWORD}
-    Wait Until Element Is Visible    ${RESET PASSWORD EMAIL INPUT}
-    Textfield Should Contain    ${RESET PASSWORD EMAIL INPUT}    ${email}
+    Wait Until Element Is Visible    ${RESTORE PASSWORD EMAIL INPUT}
+    Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Close Browser
 
 passes email from email input to Restore password page, even without clicking 'Log in' button
@@ -163,8 +161,8 @@ passes email from email input to Restore password page, even without clicking 'L
     sleep    .15
     Wait Until Element Is Visible    ${FORGOT PASSWORD}
     Click Link    ${FORGOT PASSWORD}
-    Wait Until Element Is Visible    ${RESET PASSWORD EMAIL INPUT}
-    Textfield Should Contain    ${RESET PASSWORD EMAIL INPUT}    ${email}
+    Wait Until Element Is Visible    ${RESTORE PASSWORD EMAIL INPUT}
+    Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Close Browser
 
 redirects to /activate and shows non-activated user message when not activated; Resend activation button sends email
@@ -247,7 +245,7 @@ should respond to Enter key and log in
     Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${password}
     Press Key    ${PASSWORD INPUT}    ${ENTER}

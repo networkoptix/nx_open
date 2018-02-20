@@ -40,6 +40,12 @@ public:
 
         return true;
     }
+
+    virtual bool isEnabled() const override
+    {
+        return true;
+    }
+
 };
 
 // TODO: implement over mocked sockets

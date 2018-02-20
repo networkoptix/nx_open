@@ -5,6 +5,7 @@
 #include <QtCore/QFutureWatcher>
 #include <QtConcurrent/QtConcurrentRun>
 
+#include <utils/common/guarded_callback.h>
 #include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
 #include <nx/utils/cryptographic_hash.h>
@@ -161,12 +162,12 @@ void UploadWorker::handleMd5Calculated()
 
     emitProgress();
 
-    auto callback =
+    auto callback = guarded(this,
         [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
         {
             d->requests.releaseHandle(handle);
             handleFileUploadCreated(success);
-        };
+        });
 
     d->requests.storeHandle(d->connection()->addFileUpload(
         d->upload.id,
@@ -208,12 +209,12 @@ void UploadWorker::handleUpload()
         return;
     }
 
-    auto callback =
+    auto callback = guarded(this,
         [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
         {
             d->requests.releaseHandle(handle);
             handleChunkUploaded(success);
-        };
+        });
 
     d->requests.storeHandle(d->connection()->uploadFileChunk(
         d->upload.id,
@@ -242,7 +243,7 @@ void UploadWorker::handleAllUploaded()
 
     emitProgress();
 
-    auto callback =
+    auto callback = guarded(this,
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             d->requests.releaseHandle(handle);
@@ -251,7 +252,7 @@ void UploadWorker::handleAllUploaded()
             FileInformation info = result.deserialized<FileInformation>();
             const bool fileStatusOk = info.status == FileInformation::Status::downloaded;
             handleCheckFinished(success, fileStatusOk);
-        };
+        });
 
     d->requests.storeHandle(d->connection()->fileDownloadStatus(
         d->upload.id,

@@ -55,7 +55,7 @@ qreal getBitrateForQuality(
     int decimals)
 {
     const auto resolution = camera->defaultStream().getResolution();
-    const auto bitrateMbps = camera->rawSuggestBitrateKbps(quality, resolution, fps) / kKbpsInMbps;
+    const auto bitrateMbps = camera->suggestBitrateForQualityKbps(quality, resolution, fps, Qn::CR_LiveVideo) / kKbpsInMbps;
     const auto roundingStep = std::pow(0.1, decimals);
     return qRound(bitrateMbps, roundingStep);
 }
@@ -144,7 +144,7 @@ public:
 
     virtual bool validate(const QSet<QnUuid>& selected) override
     {
-        auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(selected);
+        auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(selected);
 
         QnCamLicenseUsageHelper helper(cameras, m_recordingEnabled, commonModule());
 
@@ -1400,7 +1400,7 @@ void CameraScheduleWidget::at_exportScheduleButton_clicked()
             camera->setScheduleTasks(tasks);
         };
 
-    auto selectedCameras = resourcePool()->getResources<QnVirtualCameraResource>(
+    auto selectedCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
         dialog->selectedResources());
     qnResourcesChangesManager->saveCameras(selectedCameras, applyChanges);
     updateLicensesLabelText();

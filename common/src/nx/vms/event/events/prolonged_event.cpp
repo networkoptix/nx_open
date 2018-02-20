@@ -15,7 +15,6 @@ ProlongedEvent::ProlongedEvent(
     :
     base_type(eventType, resource, toggleState, timeStamp)
 {
-    NX_ASSERT(hasToggleState(eventType));
 }
 
 bool ProlongedEvent::isEventStateMatched(EventState state, ActionType actionType) const

@@ -80,7 +80,7 @@ public:
     virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
 
 private:
-    QnCameraAdvancedParams describeCapabilities(const StreamCapabilityMap& capabilities) const;
+    QnCameraAdvancedParams describeCapabilities() const;
     std::vector<QnCameraAdvancedParameter> describeCapabilities(
         const QMap<QString, QMap<QString, nx::media::CameraStreamCapability>>&
             codecResolutionCapabilities) const;
@@ -93,9 +93,10 @@ private:
     boost::optional<QString> getValue(
         const QnCameraAdvancedParamValueMap& values,
         const QString& baseName);
-
+    void updateMediaCapabilities();
 private:
     Camera* const m_camera;
+    const StreamCapabilityMap m_capabilities;
     const Qn::StreamIndex m_streamIndex;
     const QnCameraAdvancedParams m_descriptions;
     const QnLiveStreamParams m_defaults;

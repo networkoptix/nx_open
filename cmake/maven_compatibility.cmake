@@ -20,7 +20,7 @@ set(libdir ${CMAKE_CURRENT_BINARY_DIR})
 set(ClientVoxSourceDir "${CMAKE_CURRENT_BINARY_DIR}/bin/vox")
 
 set(installer.target.dir ${build.configuration})
-set(bin_source_dir "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin")
+set(bin_source_dir ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 set(artifact.name.client "${client_distribution_name}")
 set(artifact.name.server "${server_distribution_name}")

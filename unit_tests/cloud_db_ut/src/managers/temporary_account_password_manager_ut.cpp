@@ -1,5 +1,10 @@
 #include <gtest/gtest.h>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+
+#include <nx/utils/crc32.h>
+
 #include <nx/cloud/cdb/managers/temporary_account_password_manager.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
 
@@ -28,9 +33,12 @@ protected:
         m_tempPasswordManager.addRandomCredentials(m_email, &m_credentials);
     }
 
-    void assertCredentialsLoginEqualAccountEmail()
+    void assertCredentialsLoginContainsAccountEmailCrc32()
     {
-        ASSERT_EQ(m_email, m_credentials.accountEmail);
+        std::vector<std::string> splitVec;
+        boost::split(splitVec, m_credentials.login, boost::algorithm::is_any_of("-"));
+        ASSERT_EQ(2U, splitVec.size());
+        ASSERT_EQ(std::to_string(nx::utils::crc32(m_email)), splitVec[1]);
     }
 
 private:
@@ -42,7 +50,7 @@ private:
 TEST_F(TemporaryAccountPasswordManager, temporary_login_is_equal_to_account_email)
 {
     generateTemporaryCredentials();
-    assertCredentialsLoginEqualAccountEmail();
+    assertCredentialsLoginContainsAccountEmailCrc32();
 }
 
 } // namespace test

@@ -1,0 +1,35 @@
+#pragma once
+
+#include <functional>
+#include <memory>
+#include <QtCore>
+
+namespace nx {
+namespace update {
+namespace detail {
+
+enum class PrepareResult
+{
+    ok,
+    corruptedArchive,
+    noFreeSpace,
+    cleanTemporaryFilesError,
+    alreadyStarted,
+    unknownError,
+};
+
+using PrepareUpdateCompletionHandler = std::function<void(PrepareResult /*resultCode*/)>;
+
+class NX_UPDATE_API AbstractUpdates2Installer
+{
+public:
+    virtual ~AbstractUpdates2Installer() = default;
+    virtual void prepareAsync(const QString& path, PrepareUpdateCompletionHandler handler) = 0;
+    virtual void install() = 0;
+};
+
+using AbstractUpdates2InstallerPtr = std::shared_ptr<AbstractUpdates2Installer>;
+
+} // namespace detail
+} // namespace update
+} // namespace nx

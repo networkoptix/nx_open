@@ -42,6 +42,12 @@
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>システムからサーバーを切離す</h3>
+                        <p>This action will detach server from the system keeping database, local users and configuration.
+                            ビデオのアーカイブはそのまま残ります <b>Cloud users will be deleted.</b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">システムからサーバーを切離す</button></p>
+                    </div>
+                    <div>
+                        <h3>システムからサーバーを切離す</h3>
                         <p>これにより、データベース、ローカルユーザー、および構成を保持しているサーバーがシステムから切り離されます。ビデオのアーカイブはそのまま残されます <b>クラウドユーザーは削除されます </b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">システムからサーバーを切離す</button></p>
                     </div>
@@ -119,9 +125,9 @@
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>デバイス ネットワーク設定</h3>                        
-<network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings> 
-<button class="btn btn-default" ng-click="saveNetworkSettings()">設定を保存しデバイスを再起動</button>
+                        <h3>Device Network Settings</h3>
+                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>日付と時刻</h3>

@@ -49,7 +49,6 @@ Outline Error
 
 Alert Error
     wait until element is visible    ${PASSWORD INPUT}
-    Element Should Be Visible    ${PASSWORD INPUT}
 
 Check Email Outline
     ${class}    Get Element Attribute    ${EMAIL INPUT}/..    class

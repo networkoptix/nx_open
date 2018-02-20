@@ -14,7 +14,7 @@ public:
     virtual ~QnVistaResource();
 
 protected:
-    virtual QnAbstractPtzController *createPtzControllerInternal() override;
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     //virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
 };
 

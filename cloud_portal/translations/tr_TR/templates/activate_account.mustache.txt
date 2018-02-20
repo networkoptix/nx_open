@@ -1,8 +1,8 @@
-Hello,
+Merhaba,
 
-  Please open the link below to confirm your email address and activate the account.
+  Lütfen e-posta adresinizi onaylamak ve hesabı etkinleştirmek için aşağıdaki bağlantıyı açın.
 
 {{config.portal_url}}/activate/{{message.code}}
 
 {{PRODUCT_NAME}}'e kaydolmadıysanız, bu e-postayı yok sayın.
-Do not share the message or the link with anyone.
+İletiyi veya bağlantıyı kimseyle paylaşmayın.

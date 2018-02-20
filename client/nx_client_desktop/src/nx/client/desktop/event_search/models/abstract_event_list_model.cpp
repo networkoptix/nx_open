@@ -2,6 +2,9 @@
 
 #include <QtCore/QDateTime>
 
+#include <ui/graphics/items/controls/time_slider.h>
+#include <ui/workbench/workbench_navigator.h>
+#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
 #include <utils/common/delayed.h>
 
@@ -52,6 +55,21 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
     }
 }
 
+bool AbstractEventListModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+    switch (role)
+    {
+        case Qn::DefaultNotificationRole:
+            return defaultAction(index);
+
+        case Qn::ActivateLinkRole:
+            return activateLink(index, value.toString());
+
+        default:
+            return base_type::setData(index, value, role);
+    }
+}
+
 bool AbstractEventListModel::canFetchMore(const QModelIndex& /*parent*/) const
 {
     return false;
@@ -77,6 +95,34 @@ QString AbstractEventListModel::timestampText(qint64 timestampMs) const
         return dateTime.date().toString(Qt::DefaultLocaleShortDate);
 
     return dateTime.time().toString(Qt::DefaultLocaleShortDate);
+}
+
+bool AbstractEventListModel::defaultAction(const QModelIndex& index)
+{
+    if (!isValid(index) || index.model() != this)
+        return false;
+
+    // TODO: #vkutin Introduce a new QnAction instead of direct access.
+    auto slider = navigator()->timeSlider();
+    if (!slider)
+        return false;
+
+    const auto timestampMsVariant = index.data(Qn::TimestampRole);
+    if (!timestampMsVariant.canConvert<qint64>())
+        return false;
+
+    const QnScopedTypedPropertyRollback<bool, QnTimeSlider> downRollback(slider,
+        &QnTimeSlider::setSliderDown,
+        &QnTimeSlider::isSliderDown,
+        true);
+
+    slider->setValue(timestampMsVariant.value<qint64>(), true);
+    return true;
+}
+
+bool AbstractEventListModel::activateLink(const QModelIndex& index, const QString& /*link*/)
+{
+    return defaultAction(index);
 }
 
 } // namespace desktop

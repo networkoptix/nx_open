@@ -1,8 +1,8 @@
-Hello,
+Hallo,
 
-  Please open the link below to confirm your email address and activate the account.
+  Open de onderstaande link om uw e-mailadres te bevestigen en het account te activeren.
 
-{{config.portal_url}}/activate/{{message.code}}
+{{config.portal_url}}/activeer/{{message.code}}
 
 Als je niet in {{PRODUCT_NAME}} hebt aangemeld, negeer en verwijder dan deze e-mail.
-Do not share the message or the link with anyone.
+Deel het bericht of de link met niemand.

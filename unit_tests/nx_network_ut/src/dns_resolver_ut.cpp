@@ -86,7 +86,7 @@ private:
     SystemError::ErrorCode testResolve(
         const QString& hostName,
         int /*ipVersion*/,
-        std::deque<HostAddress>* resolvedAddress)
+        std::deque<AddressEntry>* resolvedAddress)
     {
         if (hostName == hardToResolveHost)
         {
@@ -97,7 +97,7 @@ private:
         if (!m_pipelinedRequests.empty())
             startNextPipelinedTask();
 
-        resolvedAddress->push_back({HostAddress::localhost});
+        resolvedAddress->push_back({AddressType::direct, HostAddress::localhost});
         return SystemError::noError;
     }
 

@@ -1,5 +1,7 @@
 #include "media_resource_widget.h"
 
+#include <chrono>
+
 #include <QtCore/QTimer>
 #include <QtCore/QVarLengthArray>
 #include <QtGui/QPainter>
@@ -117,6 +119,8 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <ini.h>
+
+using namespace std::chrono;
 
 using namespace nx;
 using namespace client::desktop;
@@ -336,6 +340,14 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
                 emit licenseStatusChanged();
             });
+
+        connect(qnPtzPool, &QnPtzControllerPool::controllerChanged, this,
+            [this](const QnResourcePtr& resource)
+            {
+                // Make sure we will not handle resource removing.
+                if (resource == d->camera && resource->resourcePool())
+                    updatePtzController();
+            });
     }
 
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged, this,
@@ -367,7 +379,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     }
 
     updateAspectRatio();
-    createPtzController();
+    updatePtzController();
 
     /* Set up info updates. */
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
@@ -849,10 +861,10 @@ void QnMediaResourceWidget::createButtons()
     }
 }
 
-void QnMediaResourceWidget::createPtzController()
+void QnMediaResourceWidget::updatePtzController()
 {
-    auto threadPool = qnClientCoreModule->ptzControllerPool()->commandThreadPool();
-    auto executorThread = qnClientCoreModule->ptzControllerPool()->executorThread();
+    const auto threadPool = qnClientCoreModule->ptzControllerPool()->commandThreadPool();
+    const auto executorThread = qnClientCoreModule->ptzControllerPool()->executorThread();
 
     /* Set up PTZ controller. */
     QnPtzControllerPtr fisheyeController;
@@ -896,6 +908,8 @@ void QnMediaResourceWidget::createPtzController()
 
     connect(m_ptzController, &QnAbstractPtzController::changed, this,
         &QnMediaResourceWidget::at_ptzController_changed);
+
+    emit ptzControllerChanged();
 }
 
 qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
@@ -2316,17 +2330,16 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
     return base_type::calculateOverlayButton(statusOverlay);
 }
 
-void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key)
+void QnMediaResourceWidget::at_resource_propertyChanged(
+    const QnResourcePtr& /*resource*/,
+    const QString& key)
 {
-    Q_UNUSED(resource);
     if (key == QnMediaResource::customAspectRatioKey())
         updateCustomAspectRatio();
     else if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
         ensureTwoWayAudioWidget();
     else if (key == Qn::kCombinedSensorsDescriptionParamName)
         updateAspectRatio();
-    else if (key == Qn::PTZ_CAPABILITIES_PARAM_NAME)
-        updateButtonsVisibility();
 }
 
 void QnMediaResourceWidget::updateAspectRatio()
@@ -2775,7 +2788,14 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
         return;
 
     if (!analyticsEnabled)
+    {
         d->analyticsController->clearAreas();
+    }
+    else
+    {
+        display()->camDisplay()->setForcedVideoBufferLength(
+            milliseconds(ini().analyticsVideoBufferLengthMs));
+    }
 
     titleBar()->rightButtonsBar()->button(Qn::AnalyticsButton)->setChecked(analyticsEnabled);
 }

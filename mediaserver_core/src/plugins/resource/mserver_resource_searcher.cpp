@@ -102,7 +102,7 @@ public:
             pool->getResourceById(commonModule->moduleGUID()));
         if (mediaServer)
         {
-            QnResourceList resList = pool->getResourcesWithParentId(mediaServer->getId());
+            QnResourceList resList = pool->getResourcesByParentId(mediaServer->getId());
             for (int i = 0; i < resList.size(); ++i) {
                 QnNetworkResourcePtr netRes = resList[i].dynamicCast<QnNetworkResource>();
                 if (netRes && hasRunningLiveProvider(netRes))

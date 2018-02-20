@@ -59,7 +59,9 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
 
     auto channelCapabilities = optionalChannelCapabilities.get();
     auto resolutionList = m_hikvisionResource->primaryVideoCapabilities().resolutions;
-    auto resolution = chooseResolution(channelCapabilities, liveStreamParameters.resolution);
+    QSize resolution = liveStreamParameters.resolution;
+    if (resolution.isEmpty())
+        resolution = chooseResolution(channelCapabilities, liveStreamParameters.resolution);
     auto codec = chooseCodec(
         channelCapabilities,
         QnAvCodecHelper::codecIdFromString(liveStreamParameters.codec));
@@ -68,7 +70,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
     boost::optional<int> quality = boost::none;
     quality = chooseQuality(liveStreamParameters.quality, channelCapabilities);
 
-    result = configureChannel(resolution, codec, fps, quality);
+    result = configureChannel(resolution, codec, fps, quality, liveStreamParameters.bitrateKbps);
     if (!result)
         return result;
 
@@ -255,10 +257,12 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
     QSize resolution,
     QString codec,
     int fps,
-    boost::optional<int> quality)
+    boost::optional<int> quality,
+    boost::optional<int> bitrateKbps)
 {
     auto url = hikvisionRequestUrlFromPath(kChannelStreamingPathTemplate.arg(
         buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
+    QString urlStr = url.toString();
 
     nx::Buffer responseBuffer;
     nx::network::http::StatusCode::Value statusCode;
@@ -282,7 +286,8 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
         resolution,
         codec,
         fps,
-        quality);
+        quality,
+        bitrateKbps);
 
     if (!result)
     {
@@ -291,6 +296,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
             responseBuffer);
     }
 
+    qWarning() << videoChannelConfiguration.toString().toUtf8();
     result = doPutRequest(
         url,
         m_hikvisionResource->getAuth(),
@@ -315,7 +321,8 @@ bool HikvisionHevcStreamReader::updateVideoChannelConfiguration(
     const QSize& resolution,
     const QString& codec,
     int fps,
-    boost::optional<int> quality) const
+    boost::optional<int> quality,
+    boost::optional<int> bitrateKbps) const
 {
     auto element = outVideoChannelConfiguration->documentElement();
     if (element.isNull() || element.tagName() != kChannelRootElementTag)
@@ -330,12 +337,14 @@ bool HikvisionHevcStreamReader::updateVideoChannelConfiguration(
     auto codecElement = videoElement.firstChildElement(kVideoCodecTypeTag);
     auto fpsElement = videoElement.firstChildElement(kMaxFrameRateTag);
     auto qualityElement = videoElement.firstChildElement(kFixedQualityTag);
+    auto bitrateElement = videoElement.firstChildElement(kFixedBitrateTag);
 
     bool elementsAreOk = !resolutionWidthElement.isNull()
         && !resolutionHeightElement.isNull()
         && !codecElement.isNull()
         && !fpsElement.isNull()
-        && !qualityElement.isNull();
+        && !qualityElement.isNull()
+        && !bitrateElement.isNull();
 
     if (!elementsAreOk)
         return false;
@@ -346,6 +355,8 @@ bool HikvisionHevcStreamReader::updateVideoChannelConfiguration(
     fpsElement.firstChild().setNodeValue(QString::number(fps));
     if (quality)
         qualityElement.firstChild().setNodeValue(QString::number(quality.get()));
+    if (bitrateKbps && *bitrateKbps > 0)
+        bitrateElement.firstChild().setNodeValue(QString::number(*bitrateKbps));
 
     return true;
 }

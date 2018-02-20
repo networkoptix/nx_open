@@ -230,7 +230,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         }
         else
         {
-            const bool isEventProlonged = vms::event::hasToggleState(m_model->eventType());
+            const bool isEventProlonged = vms::event::hasToggleState(m_model->eventType(), m_model->eventParams(), commonModule());
             ui->eventStatesComboBox->setVisible(isEventProlonged && !m_model->isActionProlonged());
         }
     }
@@ -416,8 +416,11 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
     if (!m_model || m_updating || index == -1)
         return;
 
-    if (!vms::event::hasToggleState(m_model->eventType()) || m_model->isActionProlonged())
+    if (!vms::event::hasToggleState(m_model->eventType(), m_model->eventParams(), commonModule()) ||
+        m_model->isActionProlonged())
+    {
         return;
+    }
 
     int typeIdx = m_model->eventStatesModel()->item(index)->data().toInt();
     vms::event::EventState val = (vms::event::EventState) typeIdx;

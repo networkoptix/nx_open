@@ -75,7 +75,9 @@ void FilterChain::prepareForImage(const QnMediaResourcePtr& resource,
         return;
 
     NX_ASSERT(!isReady(), "Double initialization");
-    NX_EXPECT(isImageTranscodingRequired(fullImageResolution));
+
+    if (!isImageTranscodingRequired(fullImageResolution, resolutionLimit))
+        return;
 
     prepareImageArFilter(resource, fullImageResolution);
     prepareZoomWindowFilter();
@@ -84,6 +86,8 @@ void FilterChain::prepareForImage(const QnMediaResourcePtr& resource,
     prepareRotationFilter();
     prepareDownscaleFilter(fullImageResolution, resolutionLimit);
     prepareOverlaysFilters();
+
+    NX_ASSERT(!isEmpty());
 
     m_ready = true;
 }

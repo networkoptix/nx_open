@@ -365,7 +365,7 @@ void QnSearchBookmarksDialogPrivate::chooseCamera()
 
     if (dialog.exec() == QDialog::Accepted)
     {
-        auto selectedCameras = resourcePool()->getResources<QnVirtualCameraResource>(
+        auto selectedCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
             dialog.selectedResources());
         setCameras(selectedCameras);
         m_model->applyFilter();

@@ -6,12 +6,14 @@
 #include <nx/utils/move_only_func.h>
 
 #include <common/static_common_module.h>
+#include <common/common_meta_types.h>
 
 int main(int argc, char** argv)
 {
     QnStaticCommonModule staticCommonModule(Qn::PeerType::PT_Server);
 
     std::unique_ptr<QCoreApplication> application;
+    QnCommonMetaTypes::initialize();
     return nx::network::test::runTest(argc, argv,
         [&](const nx::utils::ArgumentParser& /*args*/)
         {

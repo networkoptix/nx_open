@@ -29,16 +29,6 @@ int DeviceSearcherDefaultSettings::cacheTimeout() const
     return XML_DESCRIPTION_LIVE_TIME_MS;
 }
 
-bool DeviceSearcherDefaultSettings::isUpnpMulticastEnabled() const
-{
-    return true;
-}
-
-bool DeviceSearcherDefaultSettings::isAutoDiscoveryEnabled() const
-{
-    return true;
-}
-
 static DeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
 
 const QString DeviceSearcher::DEFAULT_DEVICE_TYPE = lit("%1 Server")
@@ -311,9 +301,6 @@ void DeviceSearcher::onSomeBytesRead(
 
 void DeviceSearcher::dispatchDiscoverPackets()
 {
-    if (!m_settings.isUpnpMulticastEnabled())
-        return;
-
     for (const QnInterfaceAndAddr& iface : getAllIPv4Interfaces())
     {
         const std::shared_ptr<AbstractDatagramSocket>& sock = getSockByIntf(iface);
@@ -322,19 +309,26 @@ void DeviceSearcher::dispatchDiscoverPackets()
 
         const auto lock = m_handlerGuard->lock();
         NX_ASSERT(lock);
-        for (const auto& handler : m_handlers)
+        for( const auto& handler : m_handlers )
         {
-            // undefined device type will trigger default discovery
-            const auto& deviceType = !handler.first.isEmpty() ?
-                handler.first : DEFAULT_DEVICE_TYPE;
+            if (std::any_of(handler.second.begin(), handler.second.end(),
+                [](const std::pair<SearchHandler*, uintptr_t>& value)
+                {
+                    return value.first->isEnabled();
+                }))
+            {
+                // undefined device type will trigger default discovery
+                const auto& deviceType = !handler.first.isEmpty() ?
+                        handler.first : DEFAULT_DEVICE_TYPE;
 
-            QByteArray data;
-            data.append(lit("M-SEARCH * HTTP/1.1\r\n"));
-            data.append(lit("Host: %1\r\n").arg(sock->getLocalAddress().toString()));
-            data.append(lit("ST:%1\r\n").arg(toUpnpUrn(deviceType, lit("device"))));
-            data.append(lit("Man:\"ssdp:discover\"\r\n"));
-            data.append(lit("MX:3\r\n\r\n"));
-            sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
+                QByteArray data;
+                data.append( lit("M-SEARCH * HTTP/1.1\r\n") );
+                data.append( lit("Host: %1\r\n").arg( sock->getLocalAddress().toString() ) );
+                data.append( lit("ST:%1\r\n").arg( toUpnpUrn(deviceType, lit("device")) ) );
+                data.append( lit("Man:\"ssdp:discover\"\r\n") );
+                data.append( lit("MX:3\r\n\r\n") );
+                sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
+            }
         }
     }
 }
@@ -528,8 +522,7 @@ const DeviceSearcher::UPNPDescriptionCacheItem* DeviceSearcher::findDevDescripti
     if (it == m_upnpDescCache.end())
         return NULL;
 
-    if (m_settings.isAutoDiscoveryEnabled() &&
-       m_cacheTimer.elapsed() - it->second.creationTimestamp > m_settings.cacheTimeout())
+    if(m_cacheTimer.elapsed() - it->second.creationTimestamp > m_settings.cacheTimeout())
     {
         //item has expired
         m_upnpDescCache.erase(it);
@@ -571,9 +564,12 @@ void DeviceSearcher::processPacket(DiscoveredDeviceInfo info)
 
             for (const auto& handler : sortedHandlers)
             {
-                handler.second->processPacket(
-                    info.localInterfaceAddress, devAddress,
-                    info.devInfo, info.xmlDevInfo);
+                if (handler.second->isEnabled())
+                {
+                    handler.second->processPacket(
+                        info.localInterfaceAddress, devAddress,
+                        info.devInfo, info.xmlDevInfo);
+                }
             }
         });
 }

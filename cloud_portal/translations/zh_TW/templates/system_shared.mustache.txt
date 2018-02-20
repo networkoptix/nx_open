@@ -1,11 +1,11 @@
-Hello, {{message.fullName}}
+您好, {{message.fullName}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) has shared access to video management system "{{message.system_name}}" with you.
+{{message.sharer_name}} ({{message.sharer_email}}) 共用影像管理系統 {{message.system_name}} 給您.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-You have been granted access to video management system "{{message.system_name}}".
+您已被授予連線影像管理系統 “{{message.system_name}}” 的權限.
 {{/message.sharer_name}}
 
-View in {{PRODUCT_NAME}} Portal: {{config.portal_url}}/systems/{{message.system_id}}
+在{{PRODUCT_NAME}} 入口中查看: {{config.portal_url}}/systems/{{message.system_id}}
