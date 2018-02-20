@@ -36,5 +36,7 @@
     "INVITED TO SYSTEM EMAIL SUBJECT"        :    "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}",
     "DISCONNECT FORM HEADER TEXT"            :    "Disconnect System from {{PRODUCT_NAME}}?",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT"    :    "Your account is successfully activated",
-    "SYSTEM NAME SAVED"                      :    "System name saved"
+    "SYSTEM NAME SAVED"                      :    "System name saved",
+    "ACCOUNT IS CREATED"                     :    "Account is created",
+    "CONFIRMATION MESSAGE IS SENT TO"        :    "Confirmation message is sent to {{email}}"
 }

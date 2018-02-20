@@ -43,13 +43,14 @@ ${RESET PASSWORD BUTTON}              //form[@name='restorePassword']//button[@n
 ${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//input[@type='password']
 ${SAVE PASSWORD}                      //form[@name='restorePasswordWithCode']//button[@ng-click='checkForm()']
 ${RESET EMAIL SENT MESSAGE}           //div[@ng-if='restoringSuccess']/h1[contains(text(),'${RESET EMAIL SENT MESAGE TEXT}')]
-${RESET SUCCESS MESSAGE}              //h1[@ng-if='change.success || changeSuccess']/div[contains(text(), '${RESET SUCCESS MESSAGE TEXT}')]
+${RESET SUCCESS MESSAGE}              //h1[contains(text(), '${RESET SUCCESS MESSAGE TEXT}')]
 ${RESET SUCCESS LOG IN LINK}          //h1[@ng-if='change.success || changeSuccess']//a[@href='/login']
 
 #Change Password
 ${CURRENT PASSWORD INPUT}             //form[@name='passwordForm']//input[@ng-model='pass.password']
 ${NEW PASSWORD INPUT}                 //form[@name='passwordForm']//password-input[@ng-model='pass.newPassword']//input[@type='password']
 ${CHANGE PASSWORD BUTTON}             //form[@name='passwordForm']//button[@ng-click='checkForm()']
+${PASSWORD IS REQUIRED}               //span[@ng-if='passwordInput.password.$error.required']
 
 #Register Form Elements
 ${REGISTER FIRST NAME INPUT}          //form[@name= 'registerForm']//input[@ng-model='account.firstName']
@@ -60,6 +61,8 @@ ${REGISTER SUBSCRIBE CHECKBOX}        //form[@name= 'registerForm']//input[@ng-m
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), '${CREATE ACCOUNT BUTTON TEXT}')]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula' and contains(text(), '${TERMS AND CONDITIONS LINK TEXT}')]
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), '${RESEND ACTIVATION LINK BUTTON TEXT}')]
+
+${EMAIL ALREADY REGISTERED}           //span[@ng-if="registerForm.registerEmail.$error.alreadyExists"]
 
 ${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || registerSuccess) && !activated']
 ${ACTIVATION SUCCESS}                 //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]

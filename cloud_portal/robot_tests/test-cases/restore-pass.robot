@@ -7,15 +7,6 @@ Suite Teardown    Close All Browsers
 ${password}    ${BASE PASSWORD}
 ${url}         ${CLOUD TEST}
 
-*** Keywords ***
-Get Reset Password Link
-    [arguments]    ${recipient}
-    Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
-    ${email}    Wait For Email    recipient=${recipient}    timeout=120    subject=${RESET PASSWORD EMAIL SUBJECT}
-    ${links}    Get Links From Email    ${email}
-    Close Mailbox
-    Return From Keyword    @{links}[1]
-
 *** Test Cases ***
 should demand that email field is not empty
     Open Browser and go to URL    ${url}/restore_password

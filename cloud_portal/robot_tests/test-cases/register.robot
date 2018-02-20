@@ -8,11 +8,6 @@ ${password}    ${BASE PASSWORD}
 ${url}         ${CLOUD TEST}
 
 *** Keywords ***
-Validate Register Success
-    [arguments]    ${location}
-    Wait Until Element Is Visible    ${ACCOUNT CREATION SUCCESS}
-    Location Should Be    ${location}
-
 Check Bad Email Input
     [arguments]    ${email}
     Wait Until Elements Are Visible    ${REGISTER EMAIL INPUT}    ${CREATE ACCOUNT BUTTON}
@@ -56,42 +51,42 @@ should register user with correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Validate Register Success
     Close Browser
 
 should register user with cyrillic First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    ${CYRILLIC NAME}    ${CYRILLIC NAME}    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Validate Register Success
     Close Browser
 
 should register user with smiley First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    ${SMILEY NAME}    ${SMILEY NAME}    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Validate Register Success
     Close Browser
 
 should register user with glyph First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    ${GLYPH NAME}    ${GLYPH NAME}    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Validate Register Success
     Close Browser
 
 should allow `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    ${SYMBOL NAME}    ${SYMBOL NAME}    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Validate Register Success
     Close Browser
 
 should allow !#$%&'*+-/=?^_`{|}~ in email field
     ${email}    Get Random Symbol Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Validate Register Success
     Close Browser
 
 should respond to Enter key and save data
@@ -103,7 +98,7 @@ should respond to Enter key and save data
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     Press Key    ${REGISTER PASSWORD INPUT}    ${ENTER}
-    Validate Register Success    ${url}/register/success
+    Validate Register Success
     Close Browser
 
 should respond to Tab key
