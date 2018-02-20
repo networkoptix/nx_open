@@ -103,7 +103,7 @@ should respond to Enter key and save data
 
 should respond to Tab key
     Open Browser and go to URL    ${url}/register
-    Wait Until Element Is Visible    ${REGISTER FIRST NAME INPUT}
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}
     Element Should Be Focused    ${REGISTER FIRST NAME INPUT}
     Press Key    ${REGISTER FIRST NAME INPUT}    ${TAB}
     Element Should Be Focused    ${REGISTER LAST NAME INPUT}
