@@ -916,8 +916,7 @@ void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
     bool longNoData = ((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250) || diff > 1000*10;
     if (longNoData || m_quality == MEDIA_Quality_Low || m_quality == MEDIA_Quality_LowIframesOnly)
     {
-        m_blockReopening = true;
-        close();
+        beforeClose();
     }
 }
 
