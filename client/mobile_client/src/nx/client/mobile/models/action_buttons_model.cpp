@@ -8,13 +8,13 @@ namespace {
 
 enum Roles
 {
-    TypeRoleId = Qt::UserRole,
-    IconPathRoleId
+    typeRoleId = Qt::UserRole,
+    iconPathRoleId
 };
 
 const QHash<int, QByteArray> kRoleNames = {
-    {TypeRoleId, "type"},
-    {IconPathRoleId, "iconPath"}};
+    {typeRoleId, "type"},
+    {iconPathRoleId, "iconPath"}};
 
 } // namespace
 
@@ -35,12 +35,14 @@ struct ActionButtonsModel::Button
 
 ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::ptzButton()
 {
-    return ButtonPtr(new Button({ActionButtonsModel::PtzButton, lit("images/ptz/ptz.png")}));
+    return ButtonPtr(new Button(
+        {ActionButtonsModel::PtzButton, lit("images/ptz/ptz.png")}));
 }
 
 ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::twoWayAudioButton()
 {
-    return ButtonPtr(new Button({ActionButtonsModel::TwoWayAudioButton, lit("images/plus.png")}));
+    return ButtonPtr(new Button(
+        {ActionButtonsModel::TwoWayAudioButton, lit("images/plus.png")}));
 }
 
 //
@@ -101,9 +103,9 @@ QVariant ActionButtonsModel::data(const QModelIndex& index, int role) const
     const auto& button = m_buttons.at(row);
     switch (role)
     {
-        case TypeRoleId:
+        case typeRoleId:
             return button->type;
-        case IconPathRoleId:
+        case iconPathRoleId:
             return button->iconPath;
         default:
             return QVariant();

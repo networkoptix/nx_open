@@ -11,8 +11,20 @@ ButtonsPanel
 
     signal softTriggerButtonClicked() // TODO: add parameters and prolongetd studd
 
+    onResourceIdChanged:
+    {
+        // reset states of buttons
+    }
+
+    onPressedChanged:
+    {
+        console.log("-------- pressed: ", index, pressed)
+    }
+
     onButtonClicked:
     {
+        console.log("-------- clicked", index)
+
         var type = d.modelDataAccessor.getData(index, "type")
         switch(type)
         {

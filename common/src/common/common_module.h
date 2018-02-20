@@ -223,7 +223,7 @@ public:
     void setBeforeRestoreData(const BeforeRestoreDbData& data);
     BeforeRestoreDbData beforeRestoreDbData() const;
 
-    void setCloudMoxde(bool value) { m_cloudMode = value; }
+    void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
 
     void setModuleInformation(const QnModuleInformation& moduleInformation);
