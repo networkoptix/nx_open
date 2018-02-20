@@ -135,9 +135,6 @@ class VagrantVMFactory(object):
         if not vm:
             vm = self._create_vm(config)
         vm.is_allocated = True
-        if config.must_be_recreated and vm.is_running:
-            vm.destroy()
-            self._existing_vm_list.remove(vm.virtualbox_name)
         if not vm.is_running and vm.virtualbox_name in self._existing_vm_list:
             self._remove_vms(vm.virtualbox_name)
         if not vm.is_running:
@@ -171,8 +168,6 @@ class VagrantVMFactory(object):
             for name, vm in sorted(self._vms.items(), key=lambda (name, vm): vm.config.idx):
                 if vm.is_allocated:
                     continue
-                if config_template.must_be_recreated:
-                    return vm
                 if pred and not pred(vm):
                     continue
                 return vm

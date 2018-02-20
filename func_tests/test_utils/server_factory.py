@@ -46,7 +46,7 @@ class ServerFactory(object):
             if config.vm:
                 vm = config.vm
             else:
-                vm = self._vagrant_vm_factory(must_be_recreated=config.leave_initial_cloud_host)
+                vm = self._vagrant_vm_factory()
             installation = install_mediaserver(vm.guest_os_access, self._mediaserver_deb)
             installation.put_key_and_cert(self._ca.generate_key_and_cert())
             api_url = '%s://%s:%d/' % (config.http_schema, vm.host_os_access.hostname, vm.config.rest_api_forwarded_port)
