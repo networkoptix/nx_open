@@ -199,5 +199,6 @@
         <resource name = "3356" public = "3556"/>     
         <resource name = "1355" public = "1225"/>  
         <resource name = "20375" public = "20365"/>        
+        <resource name = "08ZMD-300" public = "08ZMD-400"/>
     </oem>
 </resources>
