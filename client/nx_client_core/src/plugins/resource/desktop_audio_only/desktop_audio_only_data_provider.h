@@ -35,35 +35,12 @@ protected:
     virtual void run() override;
 
 private:
-    struct AudioSourceInfo
-    {
-        ~AudioSourceInfo()
-        {
-            if (input)
-                input->stop();
-            if (speexPreprocessState)
-            {
-                speex_preprocess_state_destroy(speexPreprocessState);
-                speexPreprocessState = 0;
-            }
-
-            if(frameBuffer)
-                qFreeAligned(frameBuffer);
-        }
-
-        QAudioDeviceInfo deviceInfo;
-        QAudioFormat format;
-        QIODevice* ioDevice;
-        std::unique_ptr<QAudioInput> input;
-        QByteArray buffer;
-        char* frameBuffer;
-        SpeexPreprocessState* speexPreprocessState;
-    };
-
+    struct AudioSourceInfo;
     typedef std::shared_ptr<AudioSourceInfo> AudioSourceInfoPtr;
 
-
-
+    static QAudioFormat getAppropriateAudioFormat(
+        const QAudioDeviceInfo& deviceInfo,
+        QString* errorString = nullptr);
 
 private:
     quint32 getFrameSize();
