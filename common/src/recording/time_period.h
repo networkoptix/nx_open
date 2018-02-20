@@ -55,6 +55,9 @@ public:
     bool intersects(const QnTimePeriod &other) const;
     void clear();
 
+    /** Time value bound by this period. */
+    qint64 bound(qint64 timeMs) const;
+
     /**
      * \returns                         Whether this is an empty period --- a
      *                                  period of zero length.

@@ -25,10 +25,10 @@
 #include <nx/client/desktop/event_search/models/unified_async_search_list_model.h>
 #include <nx/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/client/desktop/event_search/models/bookmark_search_list_model.h>
+#include <nx/client/desktop/event_search/models/motion_search_list_model.h>
 #include <nx/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/client/desktop/event_search/widgets/notification_list_widget.h>
 #include <nx/client/desktop/event_search/widgets/unified_search_widget.h>
-#include <nx/client/desktop/event_search/widgets/motion_search_widget.h>
 #include <nx/client/desktop/event_search/widgets/notification_counter_label.h>
 #include <nx/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/event/strings_helper.h>
@@ -50,12 +50,13 @@ EventPanel::Private::Private(EventPanel* q):
     q(q),
     m_tabs(new AnimatedTabWidget(new CompactTabBar(), q)),
     m_notificationsTab(new NotificationListWidget(m_tabs)),
-    m_motionTab(new MotionSearchWidget(m_tabs)),
+    m_motionTab(new UnifiedSearchWidget(m_tabs)),
     m_bookmarksTab(new UnifiedSearchWidget(m_tabs)),
     m_eventsTab(new UnifiedSearchWidget(m_tabs)),
     m_analyticsTab(new UnifiedSearchWidget(m_tabs)),
     m_counterLabel(new NotificationCounterLabel(m_tabs->tabBar())),
     m_eventsModel(new EventSearchListModel(this)),
+    m_motionModel(new MotionSearchListModel(this)),
     m_bookmarksModel(new BookmarkSearchListModel(this)),
     m_analyticsModel(new AnalyticsSearchListModel(this)),
     m_helper(new vms::event::StringsHelper(q->commonModule()))
@@ -96,14 +97,14 @@ EventPanel::Private::Private(EventPanel* q):
         this, &Private::currentWorkbenchWidgetChanged, Qt::QueuedConnection);
 
     setupEventSearch();
+    setupMotionSearch();
     setupBookmarkSearch();
     setupAnalyticsSearch();
 
-    connect(m_eventsTab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
-    connect(m_motionTab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
-    connect(m_bookmarksTab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
-    connect(m_analyticsTab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
     connect(m_notificationsTab, &NotificationListWidget::tileHovered, q, &EventPanel::tileHovered);
+
+    for (auto tab: {m_eventsTab, m_motionTab, m_bookmarksTab, m_analyticsTab})
+        connect(tab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
 
     setupTabsSyncWithNavigator();
 }
@@ -200,6 +201,25 @@ void EventPanel::Private::setupEventSearch()
         });
 }
 
+void EventPanel::Private::setupMotionSearch()
+{
+    auto model = new UnifiedAsyncSearchListModel(m_motionModel, this);
+    m_motionTab->setModel(model);
+    //m_motionTab->setPlaceholderTexts(tr("No events"), tr("No events occured"));
+    m_motionTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/motion.png")));
+
+    m_motionTab->filterEdit()->hide();
+    m_motionTab->showPreviewsButton()->show();
+
+    connect(m_motionModel, &MotionSearchListModel::totalCountChanged, this,
+        [this](int totalCount)
+        {
+            m_motionTab->counterLabel()->setText(totalCount
+                ? tr("%n motion events", "", totalCount)
+                : QString());
+        });
+}
+
 void EventPanel::Private::setupBookmarkSearch()
 {
     static const QString kHtmlPlaceholder =
@@ -290,8 +310,8 @@ void EventPanel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
 
     m_camera = camera;
 
-    m_motionTab->setCamera(camera);
     m_eventsModel->setCamera(camera);
+    m_motionModel->setCamera(camera);
     m_bookmarksModel->setCamera(camera);
     m_analyticsModel->setCamera(camera);
 
@@ -343,12 +363,9 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
         &QnMediaResourceWidget::motionSearchModeEnabled, this, &Private::at_motionSearchToggled);
 
     *m_mediaWidgetConnections << connect(m_currentMediaWidget.data(),
-        &QnMediaResourceWidget::motionSelectionChanged, this,
-        [this]()
-        {
-            m_motionTab->setMotionSelectionEmpty(m_currentMediaWidget->isMotionSelectionEmpty());
-        });
+        &QnMediaResourceWidget::motionSelectionChanged, this, &Private::at_motionSelectionChanged);
 
+    at_motionSelectionChanged();
     at_specialModeToggled(m_currentMediaWidget->isMotionSearchModeEnabled(), m_motionTab);
 }
 
@@ -429,6 +446,23 @@ void EventPanel::Private::at_specialModeToggled(bool on, QWidget* correspondingT
     {
         if (m_tabs->currentWidget() == correspondingTab)
             m_tabs->setCurrentIndex(m_previousTabIndex);
+    }
+}
+
+void EventPanel::Private::at_motionSelectionChanged()
+{
+    if (!m_currentMediaWidget || m_currentMediaWidget->isMotionSelectionEmpty())
+    {
+        static const QString kHtmlPlaceholder =
+            lit("<center><p>%1</p><p><font size='-3'>%2</font></p></center>")
+                .arg(tr("No motion region"))
+                .arg(tr("Select some area on camera."));
+
+        m_motionTab->setPlaceholderTexts(QString(), kHtmlPlaceholder);
+    }
+    else
+    {
+        m_motionTab->setPlaceholderTexts(tr("No motion"), tr("No motion detected"));
     }
 }
 

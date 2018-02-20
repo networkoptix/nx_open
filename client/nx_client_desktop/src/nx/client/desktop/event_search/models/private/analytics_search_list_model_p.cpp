@@ -240,7 +240,7 @@ void AnalyticsSearchListModel::Private::clear()
     m_prefetch.clear();
     m_objectIdToTimestampUs.clear();
     m_currentUpdateId = rest::Handle();
-    m_latestTimeMs = qMin(qnSyncTime->currentMSecsSinceEpoch(), selectedTimePeriod().endTimeMs());
+    m_latestTimeMs = qMin(qnSyncTime->currentMSecsSinceEpoch(), q->relevantTimePeriod().endTimeMs());
     m_filterRect = QRectF();
     base_type::clear();
 
@@ -335,7 +335,7 @@ bool AnalyticsSearchListModel::Private::commitPrefetch(qint64 earliestTimeToComm
 void AnalyticsSearchListModel::Private::clipToSelectedTimePeriod()
 {
     m_currentUpdateId = rest::Handle(); //< Cancel timed update.
-    m_latestTimeMs = qMin(m_latestTimeMs, selectedTimePeriod().endTimeMs());
+    m_latestTimeMs = qMin(m_latestTimeMs, q->relevantTimePeriod().endTimeMs());
     refreshUpdateTimer();
 
     const auto cleanupFunction =
@@ -343,12 +343,12 @@ void AnalyticsSearchListModel::Private::clipToSelectedTimePeriod()
 
     // Explicit specialization is required for gcc 4.6.
     clipToTimePeriod<decltype(m_data), decltype(upperBoundPredicateMs)>(
-        m_data, upperBoundPredicateMs, selectedTimePeriod(), cleanupFunction);
+        m_data, upperBoundPredicateMs, q->relevantTimePeriod(), cleanupFunction);
 }
 
 void AnalyticsSearchListModel::Private::refreshUpdateTimer()
 {
-    if (camera() && selectedTimePeriod().isInfinite())
+    if (camera() && q->relevantTimePeriod().isInfinite())
     {
         if (!m_updateTimer->isActive())
         {

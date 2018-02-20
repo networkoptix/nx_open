@@ -148,20 +148,19 @@ UnifiedSearchWidget::~UnifiedSearchWidget()
     m_modelConnections.reset();
 }
 
-QAbstractListModel* UnifiedSearchWidget::model() const
+UnifiedAsyncSearchListModel* UnifiedSearchWidget::model() const
 {
-    return ui->ribbon->model();
+    return m_model;
 }
 
-void UnifiedSearchWidget::setModel(QAbstractListModel* value)
+void UnifiedSearchWidget::setModel(UnifiedAsyncSearchListModel* value)
 {
-    auto oldModel = model();
-
-    if (oldModel == value)
+    if (m_model == value)
         return;
 
     m_modelConnections.reset();
 
+    m_model = value;
     ui->ribbon->setModel(value);
 
     if (!value)
@@ -237,12 +236,6 @@ void UnifiedSearchWidget::setPlaceholderTexts(
     updatePlaceholderState();
 }
 
-bool UnifiedSearchWidget::isConstrained() const
-{
-    auto asyncModel = qobject_cast<UnifiedAsyncSearchListModel*>(model());
-    return asyncModel && asyncModel->isConstrained();
-}
-
 UnifiedSearchWidget::Period UnifiedSearchWidget::selectedPeriod() const
 {
     return m_period;
@@ -262,19 +255,6 @@ void UnifiedSearchWidget::setSelectedPeriod(Period value)
         m_dayChangeTimer->stop();
 }
 
-bool UnifiedSearchWidget::setCurrentTimePeriod(const QnTimePeriod& period)
-{
-    auto asyncModel = qobject_cast<UnifiedAsyncSearchListModel*>(model());
-    if (!asyncModel)
-        return false;
-
-    if (asyncModel->selectedTimePeriod() == period)
-        return false;
-
-    asyncModel->setSelectedTimePeriod(period);
-    return true;
-}
-
 QnTimePeriod UnifiedSearchWidget::currentTimePeriod() const
 {
     return m_currentTimePeriod;
@@ -282,11 +262,14 @@ QnTimePeriod UnifiedSearchWidget::currentTimePeriod() const
 
 void UnifiedSearchWidget::updateCurrentTimePeriod()
 {
-    m_currentTimePeriod = effectiveTimePeriod();
-    if (!setCurrentTimePeriod(m_currentTimePeriod))
+    const auto newTimePeriod = effectiveTimePeriod();
+    if (m_currentTimePeriod == newTimePeriod)
         return;
 
+    m_currentTimePeriod = newTimePeriod;
+    m_model->setRelevantTimePeriod(m_currentTimePeriod);
     requestFetch();
+
     emit currentTimePeriodChanged(m_currentTimePeriod);
 }
 
@@ -387,20 +370,12 @@ void UnifiedSearchWidget::fetchMoreIfNeeded()
     model()->fetchMore(QModelIndex());
 }
 
-bool UnifiedSearchWidget::hasRelevantTiles() const
-{
-    auto asyncModel = qobject_cast<UnifiedAsyncSearchListModel*>(model());
-    return asyncModel
-        ? asyncModel->relevantCount() > 0
-        : model() && model()->rowCount() > 0;
-}
-
 void UnifiedSearchWidget::updatePlaceholderState()
 {
-    const bool hidden = hasRelevantTiles();
+    const bool hidden = m_model && m_model->relevantCount() > 0;
     if (!hidden)
     {
-        ui->placeholderText->setText(isConstrained()
+        ui->placeholderText->setText(m_model && m_model->isConstrained()
             ? m_placeholderTextConstrained
             : m_placeholderTextUnconstrained);
     }

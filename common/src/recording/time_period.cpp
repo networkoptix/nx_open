@@ -294,6 +294,11 @@ QnTimePeriod QnTimePeriod::truncatedFront(qint64 timeMs) const
     return *this;
 }
 
+qint64 QnTimePeriod::bound(qint64 timeMs) const
+{
+    return qBound(startTimeMs, timeMs, endTimeMs());
+}
+
 bool operator==(const QnTimePeriod &first, const QnTimePeriod &other)
 {
     return ((first.startTimeMs == other.startTimeMs)

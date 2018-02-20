@@ -31,14 +31,13 @@ public:
 
     bool canFetchMore() const;
     void fetchMore();
+    bool fetchInProgress() const;
 
-    QnTimePeriod selectedTimePeriod() const;
-    void setSelectedTimePeriod(const QnTimePeriod& value);
+    void reset();
 
     int totalCount() const;
 
 private:
-    void reset();
     void updateMotionPeriods(qint64 startTimeMs);
     QnTimePeriodList periods() const;
 
@@ -47,8 +46,8 @@ private:
     QnVirtualCameraResourcePtr m_camera;
     QnCachingCameraDataLoaderPtr m_loader;
     std::deque<QnTimePeriod> m_data; //< Reversed list.
-    QnTimePeriod m_selectedTimePeriod = QnTimePeriod::anytime();
     int m_totalCount = 0;
+    bool m_fetchInProgress = false;
 };
 
 } // namespace desktop
