@@ -86,27 +86,18 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
         t.restart();
         nx_http::AuthMethod::Value usedMethod = nx_http::AuthMethod::noAuth;
         Qn::AuthResult authResult;
+        QnAuthSession lastUnauthorizedData;
         while ((authResult = qnAuthHelper->authenticate(d->request, d->response, isProxy, accessRights, &usedMethod)) != Qn::Auth_OK)
         {
+            lastUnauthorizedData = authSession();
+
             nx_http::insertOrReplaceHeader(
                 &d->response.headers,
                 nx_http::HttpHeader( Qn::AUTH_RESULT_HEADER_NAME, QnLexical::serialized(authResult).toUtf8() ) );
 
-            int retryThreshold = 0;
-            if (usedMethod == nx_http::AuthMethod::httpDigest)
-                retryThreshold = MAX_AUTH_RETRY_COUNT;
-            else if (d->authenticatedOnce)
-                retryThreshold = 2; // Allow two more try if password just changed (QT client need it because of password cache)
-            if (retryCount >= retryThreshold && !logReported && authResult != Qn::Auth_WrongInternalLogin)
-            {
-                logReported = true;
-                auto session = authSession();
-                session.id = QnUuid::createUuid();
-                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
-            }
 
             if( !d->socket->isConnected() )
-                return false;   //connection has been closed
+                break;   //connection has been closed
 
             nx_http::StatusCode::Value httpResult;
             QByteArray msgBody;
@@ -132,7 +123,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
 
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT) {
-                return false;
+                break;
             }
             while (t.elapsed() < AUTH_TIMEOUT && d->socket->isConnected())
             {
@@ -142,12 +133,27 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
                 }
             }
             if (t.elapsed() >= AUTH_TIMEOUT || !d->socket->isConnected())
-                return false; // close connection
+                break; // close connection
         }
-        if (qnAuthHelper->restrictionList()->getAllowedAuthMethods(d->request) & nx_http::AuthMethod::noAuth)
+
+        if (usedMethod == nx_http::AuthMethod::noAuth)
+        {
             *noAuth = true;
-        if (usedMethod != nx_http::AuthMethod::noAuth)
+        }
+        else if (authResult != Qn::Auth_OK)
+        {
+            if (authResult != Qn::Auth_WrongInternalLogin)
+            {
+                lastUnauthorizedData.id = QnUuid::createUuid();
+                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(
+                    lastUnauthorizedData, Qn::AR_UnauthorizedLogin));
+            }
+            return false;
+        }
+        else
+        {
             d->authenticatedOnce = true;
+        }
     }
     return true;
 }

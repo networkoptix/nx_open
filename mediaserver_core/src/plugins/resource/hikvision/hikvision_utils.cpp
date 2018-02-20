@@ -2,6 +2,8 @@
 
 #include "hikvision_utils.h"
 
+#include <nx/network/rtsp/rtsp_types.h>
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -356,11 +358,13 @@ bool parseTransportElement(
 
     auto rtspPortNumberElement = transportElement.firstChildElement(kRtspPortNumberTag);
     if (rtspPortNumberElement.isNull())
-        return false;
+    {
+        outChannelProperties->rtspPort = nx_rtsp::DEFAULT_RTSP_PORT;
+        return true;
+    }
 
     bool success = false;
-    outChannelProperties->rtspPortNumber = rtspPortNumberElement.text().toInt(&success);
-
+    outChannelProperties->rtspPort = rtspPortNumberElement.text().toInt(&success);
     return success;
 }
 
