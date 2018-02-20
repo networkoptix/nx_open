@@ -70,10 +70,46 @@ void CameraManager::settingsChanged()
     NX_PRINT << __func__ << "()";
 }
 
-bool CameraManager::pushVideoFrame(const CommonCompressedVideoPacket* videoFrame)
+bool CameraManager::pushCompressedVideoFrame(const CommonCompressedVideoPacket* videoFrame)
 {
-    NX_OUTPUT << __func__ << "() BEGIN";
-    m_videoFrame = videoFrame;
+    NX_OUTPUT << __func__ << "() BEGIN: timestamp " << videoFrame->timestampUsec() << " us";
+    m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
+    NX_OUTPUT << __func__ << "() END -> true";
+    return true;
+}
+
+bool CameraManager::pushUncompressedVideoFrame(const CommonUncompressedVideoFrame* videoFrame)
+{
+    NX_OUTPUT << __func__ << "() BEGIN: timestamp " << videoFrame->timestampUsec() << " us";
+    m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
+
+    if (videoFrame->planeCount() != 3)
+    {
+        NX_PRINT << __func__ << "() END -> false: videoFrame->planeCount() is "
+            << videoFrame->planeCount() << " instead of 3";
+        return false;
+    }
+
+    const auto expectedPixelFormat = UncompressedVideoFrame::PixelFormat::yuv420;
+    if (videoFrame->pixelFormat() != expectedPixelFormat)
+    {
+        NX_PRINT << __func__ << "() END -> false: videoFrame->pixelFormat() is "
+            << (int) videoFrame->pixelFormat() << " instead of " << (int) expectedPixelFormat;
+        return false;
+    }
+
+    // Dump 8 bytes at offset 16 of the plane 0.
+    if (videoFrame->dataSize(0) < 44)
+    {
+        NX_PRINT << __func__ << "(): videoFrame->dataSize(0) == " << videoFrame->dataSize(0)
+            << ", which is suspiciously low";
+    }
+    else
+    {
+        // Hex dump some 8 bytes from raw pixel data.
+        NX_PRINT_HEX_DUMP("bytes 36..43", videoFrame->data(0) + 36, 8);
+    }
+
     NX_OUTPUT << __func__ << "() END -> true";
     return true;
 }
@@ -81,9 +117,15 @@ bool CameraManager::pushVideoFrame(const CommonCompressedVideoPacket* videoFrame
 bool CameraManager::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPackets)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
-    metadataPackets->push_back(cookSomeObjects());
-    m_videoFrame = nullptr;
-    NX_OUTPUT << __func__ << "() END -> true";
+
+    MetadataPacket* const metadataPacket = cookSomeObjects();
+    if (metadataPacket)
+        metadataPackets->push_back(metadataPacket);
+
+    m_lastVideoFrameTimestampUsec = 0;
+
+    NX_OUTPUT << __func__ << "() END -> true: Generated " << (metadataPacket ? 1 : 0)
+        << " metadata packet(s)";
     return true;
 }
 
@@ -166,7 +208,7 @@ MetadataPacket* CameraManager::cookSomeEvents()
 
 MetadataPacket* CameraManager::cookSomeObjects()
 {
-    if (!m_videoFrame)
+    if (m_lastVideoFrameTimestampUsec == 0)
         return nullptr;
 
     auto commonObject = new CommonObject();
@@ -186,7 +228,7 @@ MetadataPacket* CameraManager::cookSomeObjects()
     commonObject->setBoundingBox(Rect((float) dt, (float) dt, 0.25F, 0.25F));
 
     auto objectPacket = new CommonObjectsMetadataPacket();
-    objectPacket->setTimestampUsec(m_videoFrame->timestampUsec());
+    objectPacket->setTimestampUsec(m_lastVideoFrameTimestampUsec);
     objectPacket->setDurationUsec(1000000LL * 10);
     objectPacket->addItem(commonObject);
     return objectPacket;

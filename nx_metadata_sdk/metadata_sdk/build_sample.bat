@@ -5,13 +5,13 @@ set BASE_DIR_WITH_BACKSLASH=%~dp0
 set BASE_DIR=%BASE_DIR_WITH_BACKSLASH:~0,-1%
 set BUILD_DIR=%BASE_DIR%-build
 
-if exist "%BUILD_DIR%/" rmdir /S /Q "%BUILD_DIR%/" || goto :EOF
-mkdir "%BUILD_DIR%" || goto :EOF
-@set ORIGINAL_DIR=%cd%
-cd "%BUILD_DIR%" || goto :EOF
+if exist "%BUILD_DIR%/" rmdir /S /Q "%BUILD_DIR%/" || goto :fail
+mkdir "%BUILD_DIR%" || goto :fail
+@set ORIGINAL_DIR=%CD%
+cd "%BUILD_DIR%" || goto :fail
 
-cmake "%BASE_DIR%\samples\%PLUGIN_NAME%" -Ax64 || goto :restoreCd
-cmake --build . || goto :restoreCd
+cmake "%BASE_DIR%\samples\%PLUGIN_NAME%" -Ax64 || goto :failRestoringCd
+cmake --build . || goto :failRestoringCd
 
 @set ARTIFACT=%BUILD_DIR%\Debug\%PLUGIN_NAME%.dll
 @if exist "%ARTIFACT%" (
@@ -21,7 +21,16 @@ cmake --build . || goto :restoreCd
 ) else (
     @echo:
     @echo ERROR: Failed to build plugin.
+    @set ERRORLEVEL=42
+    @goto :failRestoringCd
 )
 
-:restoreCd
 @cd %ORIGINAL_DIR%
+@goto :EOF
+
+:failRestoringCd
+@set ERRORLEVEL=%ERRORLEVEL% &::< Set env var ERRORLEVEL to the internal value of error level.
+@cd %ORIGINAL_DIR%
+
+:fail
+@exit /b %ERRORLEVEL%

@@ -2,7 +2,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include "media_data_receptor.h"
+#include "video_data_receptor.h"
 
 namespace nx {
 namespace mediaserver {

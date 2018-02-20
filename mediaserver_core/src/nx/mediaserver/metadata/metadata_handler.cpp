@@ -70,7 +70,7 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> p
         nxpt::ScopedRef<Event> eventData(item->queryInterface(IID_Event));
         if (eventData)
         {
-            auto timestampUsec = packet->timestampUsec();
+            const int64_t timestampUsec = packet->timestampUsec();
             handleMetadataEvent(std::move(eventData), timestampUsec);
         }
         else

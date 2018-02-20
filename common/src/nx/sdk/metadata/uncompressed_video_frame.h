@@ -11,13 +11,13 @@ namespace metadata {
  * Each class that implements VideoFrame interface
  * should properly handle this GUID in its queryInterface method
  */
-static const nxpl::NX_GUID IID_VideoFrame =
-    {{0x46, 0xb3, 0x52, 0x7f, 0x17, 0xf1, 0x4e, 0x29, 0x98, 0x6f, 0xfa, 0x1a, 0xcc, 0x87, 0xac, 0x0d}};
+static const nxpl::NX_GUID IID_UncompressedVideoFrame =
+    {{0x46,0xb3,0x52,0x7f,0x17,0xf1,0x4e,0x29,0x98,0x6f,0xfa,0x1a,0xcc,0x87,0xac,0x0d}};
 
 /**
  * @brief The VideoFrame class represents interface of decoded video frame.
  */
-class VideoFrame: public MediaFrame
+class UncompressedVideoFrame: public MediaFrame
 {
 public:
 
@@ -34,10 +34,10 @@ public:
 
     enum class Handle
     {
-        NoHandle,
-        GLTexture,
-        EGLImageHandle,
-        UserHandle = 1000
+        none = 0,
+        glTexture,
+        eglImage,
+        user = 1000
     };
 
     /**
@@ -68,10 +68,15 @@ public:
     virtual int handle() const = 0;
 
     /**
-     * @brief maps the contents of a video frame to system (CPU addressable) memory.
-     * @return true if map success. If handle is not zero function 'bits' should be called only after map call.
-     * otherwise function 'bits' returns zero.
-     * If function handle
+     * @param plane Number of the plane, in range 0..planesCount().
+     * @return Number of bytes in each pixel line of the plane, or 0 if the data is not accessible.
+     */
+    virtual int lineSize(int plane) const = 0;
+
+    /**
+     * Maps the raw data of the video frame to the system (CPU addressable) memory. If handle() is
+     * non-zero, data() should be called only after map call, otherwise data() returns null.
+     * @return Success.
      */
     virtual bool map() = 0;
     virtual void unmap() = 0;

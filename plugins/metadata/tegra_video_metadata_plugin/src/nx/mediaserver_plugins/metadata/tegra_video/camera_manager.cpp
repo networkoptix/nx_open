@@ -131,7 +131,7 @@ bool CameraManager::pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int6
     return true;
 }
 
-bool CameraManager::pushVideoFrame(const CommonCompressedVideoPacket* videoFrame)
+bool CameraManager::pushCompressedVideoFrame(const CommonCompressedVideoPacket* videoFrame)
 {
     if (!pushCompressedFrame(videoFrame))
         return false;

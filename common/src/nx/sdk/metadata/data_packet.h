@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include <plugins/plugin_api.h>
 
 namespace nx {
@@ -18,6 +20,11 @@ static const nxpl::NX_GUID IID_DataPacket
  */
 class DataPacket: public nxpl::PluginInterface
 {
+public:
+    /**
+     * @return Timestamp of the media data in microseconds since epoch, or 0 if not relevant.
+     */
+    virtual int64_t timestampUsec() const = 0;
 };
 
 } // namespace metadata

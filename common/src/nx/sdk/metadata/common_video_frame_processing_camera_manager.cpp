@@ -43,15 +43,34 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
 {
     NX_OUTPUT << __func__ << "() BEGIN";
 
-    nxpt::ScopedRef<CommonCompressedVideoPacket> videoFrame(
-        dataPacket->queryInterface(IID_CompressedVideoPacket));
-    if (!videoFrame)
-        return Error::noError; //< No error: no video frame.
-
-    if (!pushVideoFrame(videoFrame.get()))
+    if (!dataPacket)
     {
-        NX_OUTPUT << __func__ << "() END -> unknownError: pushVideoFrame() failed";
+        NX_PRINT << __func__ << "() END -> unknownError: INTERNAL ERROR: dataPacket is null.";
         return Error::unknownError;
+    }
+
+    if (auto videoFrame = nxpt::ScopedRef<CommonCompressedVideoPacket>(
+        dataPacket->queryInterface(IID_CompressedVideoPacket)))
+    {
+        if (!pushCompressedVideoFrame(videoFrame.get()))
+        {
+            NX_OUTPUT << __func__ << "() END -> unknownError: pushCompressedVideoFrame() failed";
+            return Error::unknownError;
+        }
+    }
+    else if (auto videoFrame = nxpt::ScopedRef<CommonUncompressedVideoFrame>(
+        dataPacket->queryInterface(IID_UncompressedVideoFrame)))
+    {
+        if (!pushUncompressedVideoFrame(videoFrame.get()))
+        {
+            NX_OUTPUT << __func__ << "() END -> unknownError: pushUncompressedVideoFrame() failed";
+            return Error::unknownError;
+        }
+    }
+    else
+    {
+        NX_OUTPUT << __func__ << "() END -> noError: Unsupported frame supplied; ignored";
+        return Error::noError;
     }
 
     std::vector<MetadataPacket*> metadataPackets;
@@ -69,8 +88,15 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
 
     for (auto& metadataPacket: metadataPackets)
     {
-        m_handler->handleMetadata(Error::noError, metadataPacket);
-        metadataPacket->releaseRef();
+        if (metadataPacket)
+        {
+            m_handler->handleMetadata(Error::noError, metadataPacket);
+            metadataPacket->releaseRef();
+        }
+        else
+        {
+            NX_OUTPUT << __func__ << "(): Null metadata packet found; ignored";
+        }
     }
 
     NX_OUTPUT << __func__ << "() END -> noError";
