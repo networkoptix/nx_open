@@ -1,5 +1,4 @@
 # Components Namings
-set(parent.customization "default")
 set(product.name "EZ Pro")
 set(display.product.name "EZ Pro")
 set(product.name.short "ionetworks")

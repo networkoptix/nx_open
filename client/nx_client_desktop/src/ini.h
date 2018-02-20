@@ -21,6 +21,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, allowCustomArZoomWindows, "Allow zoom windows to have custom aspect ratio.");
     NX_INI_FLAG(0, hideEnhancedVideo, "Hide enhanced video from the scene.");
     NX_INI_FLAG(0, enableWearableCameras, "Enable wearable cameras.");
+    NX_INI_FLAG(0, debugThumbnailProviders, "Enable debug mode for thumbnail providers");
 };
 
 inline Ini& ini()

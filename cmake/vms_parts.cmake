@@ -66,6 +66,9 @@ cmake_dependent_option(withDistributions "Enable distributions build"
     ON
 )
 
+option(enableHanwha OFF "Enable hanwha camera vendor even if it is disabled by default")
+mark_as_advanced(enableHanwha)
+
 unset(_withMediaServer)
 unset(_withNxTool)
 unset(_withTrayTool)

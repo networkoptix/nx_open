@@ -68,10 +68,13 @@ template<class T, size_t N, class Check = std::enable_if_t<!std::is_same<const c
 std::array<T, N> decorate(const std::array<T, N>& src)
 {
     std::array<T, N> result;
-    static const T prefix("\n");
-    static const T postfix("=");
     std::transform(src.begin(), src.end(), result.begin(),
-        [](const auto& item) { return prefix + item + postfix; });
+        [](const auto& item)
+        {
+            static const T prefix("\n");
+            static const T postfix("=");
+            return prefix + item + postfix;
+        });
     return result;
 }
 

@@ -847,7 +847,7 @@ int QnActiResource::roundFps(int srcFps, Qn::ConnectionRole role) const
         int distance = qAbs(availFps[i] - srcFps);
         if (distance <= minDistance)
         {
-            // Preffer higher fps if same distance
+            // Prefer higher fps on the same distance
             minDistance = distance;
             result = availFps[i];
         }

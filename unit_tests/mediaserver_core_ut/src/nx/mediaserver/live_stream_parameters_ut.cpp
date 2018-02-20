@@ -16,8 +16,10 @@ class VideoCameraMock: public QnAbstractVideoCamera
 public:
     VideoCameraMock(QnSharedResourcePointer<CameraMock> camera)
     {
-        m_primaryProvider.reset(dynamic_cast<QnLiveStreamProvider*>(camera->createDataProvider(Qn::CR_LiveVideo)));
-        m_secondaryProvider.reset(dynamic_cast<QnLiveStreamProvider*>(camera->createDataProvider(Qn::CR_SecondaryLiveVideo)));
+        m_primaryProvider.reset(dynamic_cast<QnLiveStreamProvider*>(
+            camera->createDataProvider(Qn::CR_LiveVideo)));
+        m_secondaryProvider.reset(dynamic_cast<QnLiveStreamProvider*>(
+            camera->createDataProvider(Qn::CR_SecondaryLiveVideo)));
 
         NX_ASSERT(m_primaryProvider);
         NX_ASSERT(m_secondaryProvider);

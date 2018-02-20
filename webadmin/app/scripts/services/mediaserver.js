@@ -549,8 +549,10 @@ angular.module('webadminApp')
             },
             getLanguages:function(){
                 return wrapGet('languages.json').then(function(data){
-                    return _.filter(data.data,function(language){
-                        return Config.supportedLanguages.indexOf(language.language) >= 0;
+                    return _.map(Config.supportedLanguages, function(configLang){
+                        return _.filter(data.data, function(mediaServerLang){
+                            return mediaServerLang.language == configLang;
+                        })[0];
                     });
                 });
             },

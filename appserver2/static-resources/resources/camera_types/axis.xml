@@ -343,5 +343,7 @@
         <resource name = "AXISQ6124" public = "AXISP1365"/>
         <resource name = "AXISM5054" public = "AXISQ6044"/>
         <resource name = "AXISD2050" public = "AXISQ1942"/>
+        <resource name = "AXISP12 MkII" public = "AXISP1428E"/>
+        <resource name = "AXIS P12 MkII" public = "AXISP1428E"/>
     </oem>
 </resources>

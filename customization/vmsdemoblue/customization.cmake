@@ -1,5 +1,4 @@
 # Components Namings
-set(parent.customization "default")
 set(product.name "VMS Demonstration")
 set(display.product.name "VMS Demonstration")
 set(product.name.short "vmsdemoblue")

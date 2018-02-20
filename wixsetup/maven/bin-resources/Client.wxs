@@ -72,7 +72,7 @@
                 <Directory Id="ClientRootDir" Name="$(var.releaseVersionFull)">
 
                     <Component Id="MiniLauncherExecutable">
-                        <File Id="minilauncher.exe" Name="$(var.minilauncherBinaryName)" Source="$(var.SourceDir)/minilauncher.exe" KeyPath="yes" DiskId="14">
+                        <File Id="minilauncher.exe" Name="$(var.minilauncherBinaryName)" Source="$(var.SourceDir)/$(var.minilauncherBinaryName)" KeyPath="yes" DiskId="14">
                             <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="$(var.productName)"
                               WorkingDirectory='ClientRootDir' Advertise="yes" Icon="icon_menu.exe" >
                             </Shortcut>
@@ -110,7 +110,7 @@
                     <Directory Id="$(var.customization)VoxDir" Name="vox"/>
 
                     <Component Id="ClientExecutable">
-                        <File Id="client.exe" Name="$(var.clientName).exe" Source="$(var.SourceDir)/desktop_client.exe" KeyPath="yes" DiskId="14">
+                        <File Id="client.exe" Name="$(var.clientName).exe" Source="$(var.SourceDir)/$(var.clientName).exe" KeyPath="yes" DiskId="14">
                             <fire:FirewallException Id="FirewallExceptionClient" Name="$(var.productName)" Scope="any" IgnoreFailure="yes"/>
                         </File>
                         <File Id="launcherVersionFile" Name="$(var.launcherVersionFile)" Source="$(var.SourceDir)/$(var.launcherVersionFile)" DiskId="14" />

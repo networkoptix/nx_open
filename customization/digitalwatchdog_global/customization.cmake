@@ -1,7 +1,6 @@
 set(defaultSkin "dark_orange")
 
 # Components Namings
-set(parent.customization "digitalwatchdog")
 set(display.product.name "DW Spectrum")
 set(product.name "DW Spectrum Global")
 set(product.name.short "dwspectrum_global")
