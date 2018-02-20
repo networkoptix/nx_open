@@ -274,7 +274,7 @@ void CrossNatConnector::onConnectorFinished(
 void CrossNatConnector::onTimeout()
 {
     NX_LOGX(lm("cross-nat %1 timed out. Result code %2")
-        .arg(QnLexical::serialized(m_connectResultReport.resultCode)),
+        .args(m_connectSessionId, QnLexical::serialized(m_connectResultReport.resultCode)),
         cl_logDEBUG1);
 
     m_done = true;

@@ -958,6 +958,16 @@ protected:
         return m_account;
     }
 
+    AccountWithPassword& account()
+    {
+        return m_account;
+    }
+
+    api::AccountConfirmationCode lastActivationCode() const
+    {
+        return m_activationCode;
+    }
+
 private:
     using TimeRange =
         std::pair<std::chrono::system_clock::time_point, std::chrono::system_clock::time_point>;
@@ -1006,6 +1016,53 @@ TEST_F(AccountNewTest, proper_error_code_is_reported_when_using_not_activated_ac
 
     whenRequestSystemList();
     thenResultCodeIs(api::ResultCode::accountNotActivated);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class AccountActivation:
+    public AccountNewTest
+{
+    using base_type = AccountNewTest;
+
+protected:
+    void whenUpdateAccountUsingActivationCode()
+    {
+        const auto codeParts = QByteArray::fromBase64(
+            lastActivationCode().code.c_str()).split(':');
+        ASSERT_EQ(2, codeParts.size());
+
+        api::AccountUpdateData update;
+        const std::string password = nx::utils::generateRandomName(7).toStdString();
+        update.fullName = nx::utils::generateRandomName(7).toStdString();
+        update.passwordHa1 = nx::network::http::calcHa1(
+            account().email.c_str(),
+            nx::network::AppInfo::realm().toStdString().c_str(),
+            password.c_str()).toStdString();
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            updateAccount(codeParts[1].toStdString(), codeParts[0].toStdString(), update));
+
+        account().password = password;
+    }
+
+    void theAccountIsActivated()
+    {
+        api::AccountData accountData;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getAccount(account().email, account().password, &accountData));
+        ASSERT_EQ(api::AccountStatus::activated, accountData.statusCode);
+    }
+};
+
+TEST_F(
+    AccountActivation,
+    activation_code_can_be_used_to_activate_account_with_update_account_call)
+{
+    givenNotActivatedAccount();
+    whenUpdateAccountUsingActivationCode();
+    theAccountIsActivated();
 }
 
 //-------------------------------------------------------------------------------------------------
