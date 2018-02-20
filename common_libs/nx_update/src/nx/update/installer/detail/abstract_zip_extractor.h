@@ -19,7 +19,6 @@ public:
         const QString& filePath,
         const QString& outputDir,
         ExtractHandler extractHandler) = 0;
-    virtual void stop() = 0;
 };
 
 using AbstractZipExtractorPtr = std::shared_ptr<AbstractZipExtractor>;

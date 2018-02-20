@@ -63,14 +63,13 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
     m_copyButton = new ClipboardButton(ClipboardButton::StandardType::copyLong, this);
     ui->buttonBox->addButton(m_copyButton, QDialogButtonBox::HelpRole);
 
-    using ResourceListModel = QnResourceListModel;
     ui->servers->setItemDelegateForColumn(0, new QnResourceItemDelegate(this));
     ui->servers->setItemDelegateForColumn(1, nx::client::desktop::makeVersionStatusDelegate(context(), this));
 
     m_serverListModel = new QnResourceListModel(this);
     m_serverListModel->setHasStatus(true);
 
-    // Custom accessor to get a string with server version
+    // Custom accessor to get a string with server version.
     m_serverListModel->setCustomColumnAccessor(1, nx::client::desktop::resourceVersionAccessor);
     ui->servers->setModel(m_serverListModel);
 
@@ -192,16 +191,13 @@ void QnAboutDialog::retranslateUi()
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnAboutDialog::at_copyButton_clicked() {
-    QClipboard *clipboard = QApplication::clipboard();
-
+void QnAboutDialog::at_copyButton_clicked()
+{
+    const QLatin1String nextLine("\n");
     QString output;
-
-    output += QTextDocumentFragment::fromHtml(ui->versionLabel->text()).toPlainText() +
-        QLatin1String("\n");
-    output += QTextDocumentFragment::fromHtml(ui->gpuLabel->text()).toPlainText() +
-        QLatin1String("\n");
+    output += QTextDocumentFragment::fromHtml(ui->versionLabel->text()).toPlainText() + nextLine;
+    output += QTextDocumentFragment::fromHtml(ui->gpuLabel->text()).toPlainText() + nextLine;
     output += QTextDocumentFragment::fromHtml(m_serversReport).toPlainText();
 
-    clipboard->setText(output);
+    QApplication::clipboard()->setText(output);
 }

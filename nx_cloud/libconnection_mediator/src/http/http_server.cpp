@@ -66,7 +66,7 @@ bool Server::launchHttpServerIfNeeded(
 
     // Registering HTTP handlers.
     m_httpMessageDispatcher->registerRequestProcessor<http::GetListeningPeerListHandler>(
-        network::url::joinPath(api::kMediatorApiPrefix, GetListeningPeerListHandler::kHandlerPath),
+        network::url::joinPath(api::kMediatorApiPrefix, GetListeningPeerListHandler::kHandlerPath).c_str(),
         [&]() { return std::make_unique<http::GetListeningPeerListHandler>(peerRegistrator); });
 
     m_multiAddressHttpServer =

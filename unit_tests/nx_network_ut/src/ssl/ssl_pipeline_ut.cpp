@@ -204,7 +204,7 @@ protected:
     void givenRandomData()
     {
         m_inputData.resize(nx::utils::random::number<size_t>(1024, 2048));
-        std::generate(m_inputData.data(), m_inputData.data() + m_inputData.size(), rand);
+        std::generate(m_inputData.data(), m_inputData.data() + m_inputData.size(), [](){ return 'a' + (rand() % 'z'); } );
     }
 
     void givenEncodeDecodePipeline()

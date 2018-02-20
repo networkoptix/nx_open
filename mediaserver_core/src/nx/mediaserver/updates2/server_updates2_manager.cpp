@@ -34,6 +34,11 @@ ServerUpdates2Manager::ServerUpdates2Manager(QnCommonModule* commonModule):
 {
 }
 
+ServerUpdates2Manager::~ServerUpdates2Manager()
+{
+    m_installer.stopSync();
+}
+
 qint64 ServerUpdates2Manager::refreshTimeout() const
 {
     const auto settingsValue = qnServerModule->roSettings()->value(
@@ -88,10 +93,9 @@ QString ServerUpdates2Manager::filePath() const
     return qnServerModule->settings()->getDataDirectory() + QDir::separator() + kFileName;
 }
 
-update::detail::AbstractUpdates2InstallerPtr ServerUpdates2Manager::installer()
+update::detail::AbstractUpdates2Installer* ServerUpdates2Manager::installer()
 {
-    // #TODO #akulikov implement this correctly
-    return nx::update::detail::AbstractUpdates2InstallerPtr();
+    return &m_installer;
 }
 
 } // namespace updates2

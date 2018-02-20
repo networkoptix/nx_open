@@ -8,8 +8,11 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 
 #include <nx/utils/datetime.h>
+#include <nx/utils/pending_operation.h>
 
 namespace nx {
 namespace client {
@@ -29,13 +32,35 @@ static const auto upperBoundPredicate =
 
 BookmarkSearchListModel::Private::Private(BookmarkSearchListModel* q):
     base_type(q),
-    q(q)
+    q(q),
+    m_updateBookmarksWatcher(createUpdateBookmarksWatcherOperation())
 {
     watchBookmarkChanges();
 }
 
 BookmarkSearchListModel::Private::~Private()
 {
+}
+
+utils::PendingOperation* BookmarkSearchListModel::Private::createUpdateBookmarksWatcherOperation()
+{
+    const auto updateBookmarksWatcher =
+        [this]()
+        {
+            if (!camera())
+                return;
+
+            if (auto watcher = q->context()->instance<QnTimelineBookmarksWatcher>())
+                watcher->setTextFilter(m_filterText);
+        };
+
+    static constexpr int kUpdateWorkbenchFilterDelayMs = 100;
+
+    auto result = new utils::PendingOperation(updateBookmarksWatcher,
+        kUpdateWorkbenchFilterDelayMs, this);
+
+    result->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
+    return result;
 }
 
 int BookmarkSearchListModel::Private::count() const
@@ -97,6 +122,7 @@ void BookmarkSearchListModel::Private::setFilterText(const QString& value)
 
     clear();
     m_filterText = value;
+    m_updateBookmarksWatcher->requestOperation();
 }
 
 void BookmarkSearchListModel::Private::clear()
@@ -108,6 +134,8 @@ void BookmarkSearchListModel::Private::clear()
     m_guidToTimestampMs.clear();
     m_prefetch.clear();
     base_type::clear();
+
+    m_updateBookmarksWatcher->requestOperation();
 }
 
 rest::Handle BookmarkSearchListModel::Private::requestPrefetch(qint64 fromMs, qint64 toMs)
@@ -191,7 +219,7 @@ void BookmarkSearchListModel::Private::clipToSelectedTimePeriod()
         [this](const QnCameraBookmark& item) { m_guidToTimestampMs.remove(item.guid); };
 
     clipToTimePeriod<decltype(m_data), decltype(upperBoundPredicate)>(
-        m_data, upperBoundPredicate, selectedTimePeriod(), itemCleanup);
+        m_data, upperBoundPredicate, q->relevantTimePeriod(), itemCleanup);
 }
 
 bool BookmarkSearchListModel::Private::hasAccessRights() const

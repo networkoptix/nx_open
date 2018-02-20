@@ -336,7 +336,7 @@ bool AddressResolver::resolveNonBlocking(
     for (const auto& nonBlockingResolver: m_nonBlockingResolvers)
     {
         // TODO: Remove following if.
-        if (natTraversalSupport == NatTraversalSupport::disabled &&
+        if ((natTraversalSupport == NatTraversalSupport::disabled || !m_isCloudResolveEnabled) &&
             dynamic_cast<CloudAddressResolver*>(nonBlockingResolver.get()) != nullptr)
         {
             continue;

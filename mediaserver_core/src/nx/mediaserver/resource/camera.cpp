@@ -6,6 +6,7 @@
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/resource_command.h>
+#include <providers/live_stream_provider.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
@@ -513,6 +514,21 @@ std::vector<Camera::AdvancedParametersProvider*> Camera::advancedParametersProvi
 {
     return {};
 }
+
+QnConstResourceAudioLayoutPtr Camera::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
+{
+    if (isAudioEnabled())
+    {
+        if (auto liveProvider = dynamic_cast<const QnLiveStreamProvider*>(dataProvider))
+        {
+            auto result = liveProvider->getDPAudioLayout();
+            if (result)
+                return result;
+        }
+    }
+    return base_type::getAudioLayout(dataProvider);
+}
+
 
 } // namespace resource
 } // namespace mediaserver

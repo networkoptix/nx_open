@@ -26,33 +26,18 @@ SocketAddress getEndpoint(const nx::utils::Url& url)
         static_cast<quint16>(url.port(getDefaultPortForScheme(url.scheme()))));
 }
 
-std::string normalizePath(std::string path)
+std::string normalizePath(const std::string& path)
 {
-    // TODO: #ak Remove "..".
-
-    for (std::string::size_type pos = 0;;)
-    {
-        pos = path.find("//", pos);
-        if (pos == std::string::npos)
-            break;
-        path.replace(pos, 2U, "/");
-    }
-
-    return path;
-}
-
-QString normalizePath(const QString& path)
-{
-    if (path.indexOf("//") == -1)
+    if (path.find("//") == std::string::npos)
         return path;
 
-    QString normalizedPath;
+    std::string normalizedPath;
     normalizedPath.reserve(path.size());
 
-    QChar prevCh = ' '; //< Anything but not /.
+    char prevCh = ' '; //< Anything but not /.
     for (const auto& ch: path)
     {
-        if (ch == L'/' && prevCh == L'/')
+        if (ch == '/' && prevCh == '/')
             continue;
         prevCh = ch;
         normalizedPath.push_back(ch);
@@ -61,9 +46,19 @@ QString normalizePath(const QString& path)
     return normalizedPath;
 }
 
-QString joinPath(const QString& left, const QString& right)
+QString normalizePath(const QString& path)
 {
-    return normalizePath(lm("%1/%2").args(left, right).toQString());
+    return QString::fromStdString(normalizePath(path.toStdString()));
+}
+
+std::string normalizePath(const char* path)
+{
+    return normalizePath(std::string(path));
+}
+
+std::string joinPath(const std::string& left, const std::string& right)
+{
+    return normalizePath(left + "/" + right);
 }
 
 } // namespace url

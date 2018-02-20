@@ -171,7 +171,7 @@ void QnTimelineBookmarksWatcher::updateCurrentCamera()
 void QnTimelineBookmarksWatcher::onBookmarkRemoved(const QnUuid &id)
 {
     if (m_aggregation->removeBookmark(id))
-        m_mergeHelper->setBookmarks(m_aggregation->bookmarkList());
+        setTimelineBookmarks(m_aggregation->bookmarkList());
 }
 
 void QnTimelineBookmarksWatcher::tryUpdateTimelineBookmarks(const QnVirtualCameraResourcePtr &camera)
@@ -192,7 +192,30 @@ void QnTimelineBookmarksWatcher::tryUpdateTimelineBookmarks(const QnVirtualCamer
     m_aggregation->setBookmarkList(staticQuery->cachedBookmarks());
     m_aggregation->mergeBookmarkList(m_timelineQuery->cachedBookmarks());
 
-    m_mergeHelper->setBookmarks(m_aggregation->bookmarkList());
+    setTimelineBookmarks(m_aggregation->bookmarkList());
+}
+
+void QnTimelineBookmarksWatcher::setTimelineBookmarks(const QnCameraBookmarkList& bookmarks)
+{
+    if (m_textFilter.isEmpty())
+    {
+        m_mergeHelper->setBookmarks(bookmarks);
+    }
+    else
+    {
+        QnCameraBookmarkSearchFilter filter;
+        filter.text = m_textFilter;
+
+        QnCameraBookmarkList filtered(bookmarks.size());
+        filtered.resize(std::distance(filtered.begin(),
+            std::copy_if(bookmarks.cbegin(), bookmarks.cend(), filtered.begin(),
+                [&filter](const QnCameraBookmark& bookmark)
+                {
+                    return filter.checkBookmark(bookmark);
+                })));
+
+        m_mergeHelper->setBookmarks(filtered);
+    }
 }
 
 void QnTimelineBookmarksWatcher::onTimelineWindowChanged(qint64 startTimeMs, qint64 endTimeMs)
@@ -255,4 +278,20 @@ void QnTimelineBookmarksWatcher::ensureQueryForCamera(const QnVirtualCameraResou
     filter.limit = kMaxStaticBookmarksCount;
     filter.sparsing.used = true;
     query->setFilter(filter);
+}
+
+QString QnTimelineBookmarksWatcher::textFilter() const
+{
+    return m_textFilter;
+}
+
+void QnTimelineBookmarksWatcher::setTextFilter(const QString& value)
+{
+    if (m_textFilter == value)
+        return;
+
+    m_textFilter = value;
+
+    if (m_currentCamera)
+        tryUpdateTimelineBookmarks(m_currentCamera);
 }

@@ -6,8 +6,8 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 
+#include "wearable_fwd.h"
 #include "wearable_state.h"
-#include "wearable_payload.h"
 
 struct QnWearableStatusReply;
 

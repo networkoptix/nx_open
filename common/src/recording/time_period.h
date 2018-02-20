@@ -55,6 +55,9 @@ public:
     bool intersects(const QnTimePeriod &other) const;
     void clear();
 
+    /** Time value bound by this period. */
+    qint64 bound(qint64 timeMs) const;
+
     /**
      * \returns                         Whether this is an empty period --- a
      *                                  period of zero length.
@@ -79,6 +82,11 @@ public:
      * \returns                         Infinite duration constant value (-1).
      */
     static qint64 infiniteDuration();
+
+    /**
+    * \returns                          Returns infinite period starting from zero.
+    */
+    static QnTimePeriod anytime();
 
     /**
      * \returns distance from the nearest period edge to the time in ms. Returns zerro if timeMs inside period

@@ -80,7 +80,7 @@ void Updates2ManagerBase::atServerStart()
             download();
             break;
         case api::Updates2StatusData::StatusCode::readyToInstall:
-            // #TODO: #akulikov implement
+        case api::Updates2StatusData::StatusCode::installing:
             break;
     }
 
@@ -109,24 +109,25 @@ void Updates2ManagerBase::checkForGlobalDictionaryUpdate()
 
 void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/)
 {
-    auto onExitGuard = makeScopeGuard([this]() { remoteUpdateCompleted(); });
-    {
-        QnMutexLocker lock(&m_mutex);
-        switch (m_currentStatus.state)
+    auto onExitGuard =
+        makeScopeGuard([this]() { remoteUpdateCompleted(); });
         {
-            case api::Updates2StatusData::StatusCode::notAvailable:
-            case api::Updates2StatusData::StatusCode::available:
-            case api::Updates2StatusData::StatusCode::error:
-                m_currentStatus.fromBase(
-                    api::Updates2StatusData(
-                        moduleGuid(),
-                        api::Updates2StatusData::StatusCode::checking,
-                        "Checking for update"));
-                break;
-            default:
-                return;
+            QnMutexLocker lock(&m_mutex);
+            switch (m_currentStatus.state)
+            {
+                case api::Updates2StatusData::StatusCode::notAvailable:
+                case api::Updates2StatusData::StatusCode::available:
+                case api::Updates2StatusData::StatusCode::error:
+                    m_currentStatus.fromBase(
+                        api::Updates2StatusData(
+                            moduleGuid(),
+                            api::Updates2StatusData::StatusCode::checking,
+                            "Checking for update"));
+                    break;
+                default:
+                    return;
+            }
         }
-    }
 
     auto remoteRegistry = getRemoteRegistry();
     if (remoteRegistry)
@@ -297,8 +298,7 @@ void Updates2ManagerBase::setStatus(
 
 void Updates2ManagerBase::startPreparing(const QString& updateFilePath)
 {
-    AbstractUpdates2InstallerPtr updateInstaller = installer();
-    updateInstaller->prepareAsync(
+    installer()->prepareAsync(
         updateFilePath,
         [this](PrepareResult prepareResult)
         {
@@ -320,6 +320,10 @@ void Updates2ManagerBase::startPreparing(const QString& updateFilePath)
                     return setStatus(
                         api::Updates2StatusData::StatusCode::error,
                         lit("Failed to remove temporary files"));
+                case PrepareResult::updateContentsError:
+                    return setStatus(
+                        api::Updates2StatusData::StatusCode::error,
+                        lit("Update contents are not valid"));
                 case PrepareResult::unknownError:
                     return setStatus(
                         api::Updates2StatusData::StatusCode::error,
@@ -386,6 +390,7 @@ void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
     switch (fileInformation.status)
     {
         case FileInformation::Status::notFound:
+        case FileInformation::Status::downloading:
             onError(lit("Failed to find update file: %1").arg(fileName));
             break;
         case FileInformation::Status::corrupted:
@@ -402,12 +407,12 @@ void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
 
 void Updates2ManagerBase::onFileAdded(const FileInformation& /*fileInformation*/)
 {
-
+    // #TODO #akulikov implement
 }
 
 void Updates2ManagerBase::onFileDeleted(const QString& /*fileName*/)
 {
-
+    // #TODO #akulikov implement
 }
 
 void Updates2ManagerBase::onFileInformationChanged(const FileInformation& /*fileInformation*/)
@@ -438,6 +443,20 @@ void Updates2ManagerBase::onChunkDownloadFailed(const QString& fileName)
 void Updates2ManagerBase::stopAsyncTasks()
 {
     m_timerManager.stop();
+}
+
+api::Updates2StatusData Updates2ManagerBase::install()
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_currentStatus.state != api::Updates2StatusData::StatusCode::readyToInstall)
+        return m_currentStatus.base();
+
+    if (installer()->install())
+        setStatus(api::Updates2StatusData::StatusCode::installing, "Installing update");
+    else
+        setStatus(api::Updates2StatusData::StatusCode::error, "Error while installing update");
+
+    return m_currentStatus.base();
 }
 
 } // namespace detail

@@ -12,11 +12,6 @@ void ZipExtractor::extractAsync(
 
 }
 
-void ZipExtractor::stop()
-{
-
-}
-
 } // namespace detail
 } // namespace update
 } // namespace nx

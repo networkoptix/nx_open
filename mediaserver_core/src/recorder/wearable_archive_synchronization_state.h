@@ -29,7 +29,11 @@ struct WearableArchiveSynchronizationState {
         if (duration == 0)
             return 0;
 
-        return 100 * processed / duration;
+        if (status == Finished)
+            return 100;
+
+        qint64 result = 100 * processed / duration;
+        return result <= 99 ? result : 99;
     }
 };
 

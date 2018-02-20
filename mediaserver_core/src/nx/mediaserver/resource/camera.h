@@ -34,7 +34,7 @@ using StreamCapabilityMap = QMap<StreamCapabilityKey, nx::media::CameraStreamCap
 class Camera: public QnVirtualCameraResource
 {
     Q_OBJECT
-
+    using base_type = QnVirtualCameraResource;
 public:
     static const float kMaxEps;
 
@@ -120,6 +120,8 @@ public:
         /** @return ids of successfully set parameters. */
         virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) = 0;
     };
+
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;

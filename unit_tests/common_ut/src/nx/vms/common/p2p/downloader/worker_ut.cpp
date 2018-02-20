@@ -113,7 +113,7 @@ protected:
             for (int written = 0; written != size;)
             {
                 written += file.write(
-                    pattern.constData(), qMin((qint64)pattern.size(), size - written));
+                    pattern.constData(), std::min<int64_t>(pattern.size(), size - written));
             }
 
             file.close();
@@ -204,7 +204,7 @@ protected:
     Peer* defaultPeer = nullptr;
     int step = 0;
     nx::utils::MoveOnlyFunc<void()> m_onRequestFileInfoCb = nullptr;
-	QnSyncTime syncTime;
+    QnSyncTime syncTime;
 };
 
 TEST_F(DistributedFileDownloaderWorkerTest, simplePeersSelection)

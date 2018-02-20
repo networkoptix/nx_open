@@ -11,6 +11,9 @@
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/camera_manager.h>
 
+#include <nx/network/aio/timer.h>
+#include <nx/network/system_socket.h>
+
 #include "common.h"
 #include "plugin.h"
 
@@ -33,9 +36,9 @@ public:
     void onReceive(SystemError::ErrorCode, size_t);
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nx::sdk::metadata::MetadataHandler* handler,
-        nxpl::NX_GUID* typeList,
-        int typeListSize) override;
+        nxpl::NX_GUID* typeList, int typeListSize) override;
+
+    virtual nx::sdk::Error setHandler(nx::sdk::metadata::MetadataHandler* handler) override;
 
     bool isTimerNeeded() const;
 
@@ -52,6 +55,8 @@ public:
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) override;
 
     virtual void freeManifest(const char* data) override;
+
+    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override {};
 
 private:
     QUrl m_url;

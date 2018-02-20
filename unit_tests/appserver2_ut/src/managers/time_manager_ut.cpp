@@ -274,7 +274,7 @@ private:
             return false;
 
         m_httpServer.registerRequestProcessorFunc(
-            nx::network::url::joinPath("/", QnTimeSyncRestHandler::PATH),
+            nx::network::url::joinPath("/", QnTimeSyncRestHandler::PATH.toStdString()).c_str(),
             std::bind(&TimeSynchronizationPeer::syncTimeHttpHandler, this, _1, _2, _3, _4, _5));
 
         return true;

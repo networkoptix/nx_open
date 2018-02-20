@@ -13,7 +13,6 @@ public:
         const QString& filePath,
         const QString& outputDir,
         ExtractHandler extractHandler) override;
-    virtual void stop() override;
 };
 
 } // namespace detail

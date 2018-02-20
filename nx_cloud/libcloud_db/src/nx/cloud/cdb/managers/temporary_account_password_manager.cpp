@@ -217,6 +217,55 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryCredentia
     return nx::utils::db::DBResult::ok;
 }
 
+nx::utils::db::DBResult TemporaryAccountPasswordManager::updateCredentialsAttributes(
+    nx::utils::db::QueryContext* const queryContext,
+    const data::Credentials& credentials,
+    const data::TemporaryAccountCredentials& tempPasswordData)
+{
+    QSqlQuery updateTempPasswordQuery(*queryContext->connection());
+    updateTempPasswordQuery.prepare(
+        R"sql(
+        UPDATE account_password SET
+            expiration_timestamp_utc = :expirationTimestampUtc,
+            prolongation_period_sec = :prolongationPeriodSec,
+            max_use_count = :maxUseCount,
+            access_rights = :accessRights,
+            is_email_code = :isEmailCode
+        WHERE
+            login = :login AND password_ha1 = :passwordString
+        )sql");
+    QnSql::bind(tempPasswordData, &updateTempPasswordQuery);
+    updateTempPasswordQuery.bindValue(
+        ":accessRights",
+        QnSql::serialized_field(tempPasswordData.accessRights.toString()));
+
+    const auto passwordHa1 = nx::network::http::calcHa1(
+        credentials.login.c_str(),
+        tempPasswordData.realm.c_str(),
+        credentials.password.c_str()).toStdString();
+
+    auto passwordString = preparePasswordString(
+        passwordHa1,
+        credentials.password);
+    updateTempPasswordQuery.bindValue(":login", QnSql::serialized_field(credentials.login));
+    updateTempPasswordQuery.bindValue(
+        ":passwordString",
+        QnSql::serialized_field(passwordString));
+    if (!updateTempPasswordQuery.exec())
+    {
+        NX_LOG(lm("Could not update temporary password for account %1. %2")
+            .arg(tempPasswordData.accountEmail).arg(updateTempPasswordQuery.lastError().text()),
+            cl_logDEBUG1);
+        return nx::utils::db::DBResult::ioError;
+    }
+
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        std::bind(&TemporaryAccountPasswordManager::updateCredentialsInCache, this,
+            credentials, tempPasswordData));
+
+    return nx::utils::db::DBResult::ok;
+}
+
 boost::optional<TemporaryAccountCredentialsEx>
     TemporaryAccountPasswordManager::getCredentialsByLogin(
         const std::string& login) const
@@ -483,6 +532,37 @@ std::string TemporaryAccountPasswordManager::preparePasswordString(
     if (!password.empty())
         passwordParts.push_back(password);
     return boost::algorithm::join(passwordParts, ":");
+}
+
+void TemporaryAccountPasswordManager::updateCredentialsInCache(
+    const data::Credentials& credentials,
+    const data::TemporaryAccountCredentials& tempPasswordData)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    auto& temporaryCredentialsByEmail = m_temporaryCredentials.get<kIndexByLogin>();
+    auto it = temporaryCredentialsByEmail.lower_bound(credentials.login);
+    for (;
+        (it != temporaryCredentialsByEmail.end()) && (it->login == credentials.login);
+        ++it)
+    {
+        if (it->password != credentials.password)
+            continue;
+
+        temporaryCredentialsByEmail.modify(
+            it,
+            [&tempPasswordData](
+                TemporaryAccountCredentialsEx& temporaryAccountCredentials)
+            {
+                temporaryAccountCredentials.expirationTimestampUtc =
+                    tempPasswordData.expirationTimestampUtc;
+                temporaryAccountCredentials.prolongationPeriodSec =
+                    tempPasswordData.prolongationPeriodSec;
+                temporaryAccountCredentials.maxUseCount = tempPasswordData.maxUseCount;
+                temporaryAccountCredentials.accessRights = tempPasswordData.accessRights;
+                temporaryAccountCredentials.isEmailCode = tempPasswordData.isEmailCode;
+            });
+    }
 }
 
 } // namespace cdb

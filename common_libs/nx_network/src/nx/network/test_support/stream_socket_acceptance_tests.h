@@ -243,6 +243,9 @@ public:
             m_serverSocket->pleaseStopSync();
         if (m_server)
             m_server->pleaseStopSync();
+
+        for (const auto& connectionContext: m_clientConnections)
+            connectionContext->connection.pleaseStopSync();
     }
 
 protected:

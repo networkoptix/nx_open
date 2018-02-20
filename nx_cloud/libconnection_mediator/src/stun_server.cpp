@@ -70,7 +70,7 @@ void StunServer::initializeHttpTunnelling(http::Server* httpServer)
 {
     m_stunOverHttpServer.setupHttpTunneling(
         &httpServer->messageDispatcher(),
-        network::url::joinPath(api::kMediatorApiPrefix, api::kStunOverHttpTunnelPath).toUtf8());
+        network::url::joinPath(api::kMediatorApiPrefix, api::kStunOverHttpTunnelPath).c_str());
 }
 
 bool StunServer::bind()

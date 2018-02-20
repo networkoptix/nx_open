@@ -46,8 +46,6 @@ public:
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QnIOPortDataList getRelayOutputList() const override;
 
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
-
     //!Implementation of QnSecurityCamResource::getInputPortList
     virtual QnIOPortDataList getInputPortList() const override;
     //!Implementation of QnSecurityCamResource::setRelayOutputState

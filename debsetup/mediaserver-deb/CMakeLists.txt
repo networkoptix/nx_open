@@ -1,4 +1,9 @@
-set(depends mediaserver server_plugins)
+set(depends
+    mediaserver
+    root_tool
+    server_plugins
+    testcamera
+)
 
 # Variables used by build-dist.sh.
 set(common_depends

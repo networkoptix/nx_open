@@ -21,6 +21,7 @@ public:
     Updates2ManagerBase();
     api::Updates2StatusData status();
     api::Updates2StatusData download();
+    api::Updates2StatusData install();
     void atServerStart();
     /** After this method is called manager is not operational and should be destroyed */
     void stopAsyncTasks();
@@ -63,7 +64,7 @@ protected:
     virtual void connectToSignals() = 0;
     virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() = 0;
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
-    virtual AbstractUpdates2InstallerPtr installer() = 0;
+    virtual AbstractUpdates2Installer* installer() = 0;
     virtual QString filePath() const = 0;
 
 };

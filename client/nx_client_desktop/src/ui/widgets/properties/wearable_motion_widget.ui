@@ -40,14 +40,13 @@
           <property name="text">
            <string>Sensitivity</string>
           </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="sensitivitySpinBox">
-          <property name="value">
-           <number>5</number>
-          </property>
-         </widget>
+         <widget class="QComboBox" name="sensitivityComboBox"/>
         </item>
        </layout>
       </item>

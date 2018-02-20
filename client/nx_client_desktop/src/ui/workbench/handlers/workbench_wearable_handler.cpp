@@ -5,6 +5,8 @@
 #include <nx/utils/string.h>
 #include <utils/common/guarded_callback.h>
 #include <common/common_module.h>
+#include <camera/camera_data_manager.h>
+#include <camera/loaders/caching_camera_data_loader.h>
 
 #include <api/server_rest_connection.h>
 #include <api/model/wearable_camera_reply.h>
@@ -25,6 +27,8 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 #include <nx/client/desktop/utils/wearable_manager.h>
+#include <nx/client/desktop/utils/wearable_state.h>
+#include <nx/client/desktop/utils/wearable_payload.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -92,6 +96,8 @@ QnWorkbenchWearableHandler::QnWorkbenchWearableHandler(QObject* parent):
         &QnWorkbenchWearableHandler::at_resourcePool_resourceAdded);
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnWorkbenchWearableHandler::at_context_userChanged);
+    connect(qnClientModule->wearableManager(), &WearableManager::stateChanged, this,
+        &QnWorkbenchWearableHandler::at_wearableManager_stateChanged);
 }
 
 QnWorkbenchWearableHandler::~QnWorkbenchWearableHandler()
@@ -148,9 +154,8 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     QnSecurityCamResourcePtr camera = parameters.resource().dynamicCast<QnSecurityCamResource>();
-    if (!camera)
+    if (!camera || !camera->getParentServer())
         return;
-    QnMediaServerResourcePtr server = camera->getParentServer();
 
     QStringList filters;
     filters << tr("Video (%1)").arg(kVideoExtensions.join(L' '));
@@ -184,9 +189,8 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     QnSecurityCamResourcePtr camera = parameters.resource().dynamicCast<QnSecurityCamResource>();
-    if (!camera)
+    if (!camera || !camera->getParentServer())
         return;
-    QnMediaServerResourcePtr server = camera->getParentServer();
 
     QString path = QnFileDialog::getExistingDirectory(mainWindowWidget(),
         tr("Open Wearable Camera Recordings..."),
@@ -363,6 +367,21 @@ void QnWorkbenchWearableHandler::at_context_userChanged()
     qnClientModule->wearableManager()->setCurrentUser(context()->user());
 }
 
+void QnWorkbenchWearableHandler::at_wearableManager_stateChanged(const WearableState& state)
+{
+    if (state.consumeProgress != 100 || state.status != WearableState::Consuming)
+        return;
+
+    QnSecurityCamResourcePtr camera =
+        resourcePool()->getResourceById<QnSecurityCamResource>(state.cameraId);
+    if (!camera)
+        return;
+
+    qnClientModule->cameraDataManager()
+        ->loader(camera, /*create=*/true)
+        ->load(/*forced=*/true);
+}
+
 QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const WearablePayload& upload)
 {
     QString fileName = QFileInfo(upload.path).fileName();
@@ -374,9 +393,9 @@ QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const Wearable
     case WearablePayload::NoTimestamp:
         return tr("File \"%1\" does not have timestamp.").arg(fileName);
     case WearablePayload::ChunksTakenByFileInQueue:
-        return tr("File \"%1\" cover periods for which video is already being uploaded.").arg(fileName);
+        return tr("File \"%1\" covers period(s) that video is already being uploaded for.").arg(fileName);
     case WearablePayload::ChunksTakenOnServer:
-        return tr("File \"%1\" cover periods for which video has already been uploaded.").arg(fileName);
+        return tr("File \"%1\" covers period(s) that video has already been uploaded for.").arg(fileName);
     case WearablePayload::NoSpaceOnServer:
         return tr("There is no space on server for file \"%1\".").arg(fileName);
     default:
