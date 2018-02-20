@@ -70,20 +70,23 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Close Browser
 
-has Share button, visible for admin and owner
+has Share button and user list visible for admin and owner
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${USERS LIST}
     Log Out
     Log in to Auto Tests System    ${EMAIL ADMIN}
+    Wait Until Element Is Visible    ${USERS LIST}
     Close Browser
 
-does not show Share button or Rename button to viewer, advanced viewer, live viewer
+does not show Share button, Rename button, or user list to viewer, advanced viewer, live viewer
 #This allows the expected error to not run the close browser action
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL VIEWER}
     Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${USERS LIST}
     Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
@@ -91,6 +94,7 @@ does not show Share button or Rename button to viewer, advanced viewer, live vie
     Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${USERS LIST}
     Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Log Out
@@ -98,9 +102,31 @@ does not show Share button or Rename button to viewer, advanced viewer, live vie
     Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${USERS LIST}
     Register Keyword To Run On Failure    Failure Tasks
     Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     Close Browser
+
+does not display edit and remove for owner row
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${EMAIL ADMIN}
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]
+    Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'Edit')]/..
+    Close Browser
+
+always displays owner on the top of the table
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${FIRST USER OWNER}
+    Close Browser
+
+contains user emails and names
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${ADMIN FIRST NAME} ${ADMIN LAST NAME}')]
 
 rename button opens dialog; cancel closes without rename; save renames system
     [tags]    not-ready
@@ -127,7 +153,6 @@ rename button opens dialog; cancel closes without rename; save renames system
     Check For Alert    ${SYSTEM NAME SAVED}
     Verify In System    Auto Tests
     Close Browser
-
 
 should open System page by link to not authorized user and redirect to homepage, if he does not log in
     Open Browser and go to URL    ${url}/systems/${AUTO TESTS SYSTEM ID}

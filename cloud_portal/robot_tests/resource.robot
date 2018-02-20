@@ -103,6 +103,7 @@ Remove User Permissions
     Click Button    ${DELETE USER BUTTON}
     ${PERMISSIONS WERE REMOVED FROM EMAIL}    Replace String    ${PERMISSIONS WERE REMOVED FROM}    {{email}}    ${user email}
     Check For Alert    ${PERMISSIONS WERE REMOVED FROM EMAIL}
+    Wait Until Element Is Not Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
 
 Check For Alert
     [arguments]    ${alert text}
