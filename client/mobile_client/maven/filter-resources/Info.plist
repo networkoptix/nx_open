@@ -90,6 +90,8 @@
 	</dict>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app does not use photo library.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Allows you to send sound to the camera</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app does not use camera.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

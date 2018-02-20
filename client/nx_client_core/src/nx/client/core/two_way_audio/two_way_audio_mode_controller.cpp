@@ -66,7 +66,6 @@ bool TwoWayAudioController::start()
         [this, guard = QPointer<TwoWayAudioController>(this)]
             (bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
-            qDebug() << "DDD-----------" << success << result.error << result.errorString;
             if (guard && handle == m_startHandle)
                 setStarted(success && result.error == QnRestResult::NoError);
 

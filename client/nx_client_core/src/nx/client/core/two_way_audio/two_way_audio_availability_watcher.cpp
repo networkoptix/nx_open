@@ -71,7 +71,6 @@ void TwoWayAudioAvailabilityWatcher::updateAvailability()
             return true;
         }();
 
-    qDebug() << "--------- update availability" << isAvailable;
     setAvailable(isAvailable);
 }
 

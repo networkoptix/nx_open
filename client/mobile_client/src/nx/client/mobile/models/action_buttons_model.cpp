@@ -137,7 +137,6 @@ void ActionButtonsModel::updatePtzButtonVisibility()
 
 void ActionButtonsModel::updateTwoWayAudioButtonVisibility()
 {
-    qDebug() << "-=======================asdasdasdsa";
     static constexpr int kMaxButtonPosition = 2;
 
     const auto itEnd = m_buttons.size() > kMaxButtonPosition
