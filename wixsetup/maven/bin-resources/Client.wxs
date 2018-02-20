@@ -72,7 +72,7 @@
                 <Directory Id="ClientRootDir" Name="$(var.releaseVersionFull)">
 
                     <Component Id="MiniLauncherExecutable">
-                        <File Id="minilauncher.exe" Name="$(var.minilauncherBinaryName)" Source="$(var.SourceDir)/minilauncher.exe" KeyPath="yes" DiskId="14">
+                        <File Id="minilauncher.exe" Name="$(var.minilauncherBinaryName)" Source="$(var.SourceDir)/$(var.minilauncherBinaryName)" KeyPath="yes" DiskId="14">
                             <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="$(var.productName)"
                               WorkingDirectory='ClientRootDir' Advertise="yes" Icon="icon_menu.exe" >
                             </Shortcut>
@@ -87,7 +87,7 @@
                     </Component>
 
                     <Component Id="AppLauncherExecutable">
-                        <File Id="applauncher.exe" Name="applauncher.exe" Source="$(var.SourceDir)/$(var.applauncherName).exe" KeyPath="yes" DiskId="14"/>
+                        <File Id="applauncher.exe" Name="applauncher.exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes" DiskId="14"/>
                     </Component>
 
                     <Directory Id="ImageFormats" Name="imageformats">
