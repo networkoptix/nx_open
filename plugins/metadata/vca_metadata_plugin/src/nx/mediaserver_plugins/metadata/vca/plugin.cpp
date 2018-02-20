@@ -17,7 +17,7 @@
 
 #include <nx/utils/log/log.h>
 #define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
-    nx::utils::log::Level::debug, lm("vca_metadata_plugin")) NX_PRINT_PREFIX
+    nx::utils::log::Level::debug, lm("vca_metadata_plugin")) << NX_PRINT_PREFIX
 #include <nx/kit/debug.h>
 
 #include "manager.h"
