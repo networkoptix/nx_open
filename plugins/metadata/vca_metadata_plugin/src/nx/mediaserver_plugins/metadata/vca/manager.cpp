@@ -373,6 +373,7 @@ bool Manager::isTimerNeeded() const
 nx::sdk::Error Manager::setHandler(nx::sdk::metadata::MetadataHandler* handler)
 {
     m_handler = handler;
+    return nx::sdk::Error::noError;
 }
 
 nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* typeList, int typeListSize)
