@@ -36,6 +36,9 @@
        <string>General</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -414,8 +417,8 @@ The oldest footage among all cameras on the server will be deleted first.</strin
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>4</width>
-                  <height>4</height>
+                  <width>8</width>
+                  <height>8</height>
                  </size>
                 </property>
                </spacer>

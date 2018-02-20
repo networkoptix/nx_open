@@ -78,15 +78,16 @@ namespace {
 
     QnManualResourceSearchEntry entryFromCamera(const QnSecurityCamResourcePtr &camera)
     {
+        const auto type = qnResTypePool->getResourceType(camera->getTypeId());
+        const auto resourceInPool = QnResourceDiscoveryManager::findSameResource(camera);
+
+        const bool exists =
+            (resourceInPool && resourceInPool->getHostAddress() == camera->getHostAddress())
+            || restrictNewManualCameraByIP(camera);
+
         return QnManualResourceSearchEntry(
-              camera->getName()
-            , camera->getUrl()
-            , qnResTypePool->getResourceType(camera->getTypeId())->getName()
-            , camera->getVendor()
-            , camera->getUniqueId()
-            , QnResourceDiscoveryManager::findSameResource(camera)
-              || restrictNewManualCameraByIP(camera)
-            );
+            camera->getName(), camera->getUrl(), type->getName(),
+            camera->getVendor(), camera->getUniqueId(), exists);
     }
 
     QnManualResourceSearchEntry entryFromResource(const QnResourcePtr &resource)

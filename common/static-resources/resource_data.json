@@ -892,7 +892,10 @@
                 "Hikvision|DS-2CD2742FWD-IS",
                 "Hikvision|DS-2CD2942F-IS",
                 "Hikvision|DS-2CD4A26FWD-IZS",
-                "Hikvision|DS-2DE4A220IW-DE"
+                "Hikvision|DS-2DE4A220IW-DE",
+                "Hikvision|DS-2CD2522FWD*",
+                "ONVIF|H47",
+                "ONVIF|IP-2CD4B26FWD-IZS"                
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
@@ -2102,8 +2105,9 @@
         },
         {
             "keys": [
-                "Dahua|IPC-K15P", "Dahua|DH-IPC-K15P",
-                "Dahua|IPC-K35A", "Dahua|DH-IPC-K35A"
+                "Dahua|IPC-K15*", "Dahua|DH-IPC-K15*",
+                "Dahua|IPC-K35A", "Dahua|DH-IPC-K35A",
+                "Dahua|IPC-K35A*", "Dahua|DH-IPC-K35A*"
             ],
             "2WayAudio":
             {
@@ -2270,6 +2274,10 @@
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=2;height=2;sensors=0,1,2,3"
-        }      
+        },
+        {
+            "keys": ["*|CMD-C244"],
+            "onvifManufacturerReplacement": "Hikvision"
+        }
     ]
 }

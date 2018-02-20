@@ -229,7 +229,15 @@ void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &d
         .arg(dt(startTimeMs)),
         dataType);
     emit periodsChanged(timePeriodType, startTimeMs);
+}
 
+void QnCachingCameraDataLoader::invalidateCachedData()
+{
+    NX_VERBOSE(this, "Chunks: mark local cache as dirty");
+
+    for (int i = 0; i < Qn::TimePeriodContentCount; i++)
+        if (m_loaders[i])
+            m_loaders[i]->discardCachedData();
 }
 
 void QnCachingCameraDataLoader::discardCachedData()

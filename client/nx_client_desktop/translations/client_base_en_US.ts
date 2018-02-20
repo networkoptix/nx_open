@@ -7607,10 +7607,6 @@ to %1</source>
 <context>
     <name>QnWorkbenchWearableHandler</name>
     <message>
-        <source>Could not add wearable camera to server &quot;%1&quot;.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>All files (*.*)</source>
         <translation></translation>
     </message>
@@ -7623,83 +7619,12 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>No video files found in &quot;%1&quot;</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Selected file format(s) are not supported</source>
-        <translation>
-            <numerusform>Selected file format is not supported</numerusform>
-            <numerusform>Selected file formats are not supported</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Only video files are supported.</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Selected file(s) do not have timestamp(s)</source>
-        <translation>
-            <numerusform>Selected file does not have timestamp</numerusform>
-            <numerusform>Selected files do not have timestamps</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Only video files with correct timestamp are supported.</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Selected file(s) cover periods for which videos are already being uploaded</source>
-        <translation>
-            <numerusform>Selected file covers periods for which videos are already being uploaded</numerusform>
-            <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>You can upload these file(s) to a different instance of a Wearable Camera.</source>
-        <translation>
-            <numerusform>You can upload this file to a different instance of a Wearable Camera.</numerusform>
-            <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Selected file(s) cover periods for which videos have already been uploaded</source>
-        <translation>
-            <numerusform>Selected file covers periods for which videos have already been uploaded</numerusform>
-            <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Selected file(s) will not be uploaded</source>
-        <translation>
-            <numerusform>Selected file will not be uploaded</numerusform>
-            <numerusform>Selected files will not be uploaded</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Some file(s) will not be uploaded</source>
-        <translation>
-            <numerusform>One file will not be uploaded</numerusform>
-            <numerusform>Some files will not be uploaded</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>There is no new files to upload in &quot;%1&quot;</source>
         <translation></translation>
     </message>
     <message>
         <source>Not enough space on server storage</source>
         <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>File(s) size - %1
-Free space - %2</source>
-        <translation>
-            <numerusform>File size - %1
-Free space - %2</numerusform>
-            <numerusform>Files size - %1
-Free space - %2</numerusform>
-        </translation>
     </message>
     <message>
         <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
@@ -7710,24 +7635,94 @@ Free space - %2</numerusform>
         <translation></translation>
     </message>
     <message>
-        <source>File format of &quot;%1&quot; is not supported.</source>
+        <source>Failed to add wearable camera</source>
         <translation></translation>
     </message>
     <message>
-        <source>File &quot;%1&quot; does not have timestamp.</source>
+        <source>No video files found in selected folder</source>
+        <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected file formats are not supported</source>
+        <translation>
+            <numerusform>Selected file format is not supported</numerusform>
+            <numerusform>Selected file formats are not supported</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Use .MKV, .AVI, .MP4 or other video files.</source>
+        <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected files do not have timestamps</source>
+        <translation>
+            <numerusform>Selected file does not have timestamp</numerusform>
+            <numerusform>Selected files do not have timestamps</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected files cover periods for which videos are already being uploaded</source>
+        <translation>
+            <numerusform>Selected file covers period for which video is already being uploaded</numerusform>
+            <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>You can upload these files to a different instance of a Wearable Camera.</source>
+        <translation>
+            <numerusform>You can upload this file to a different instance of a Wearable Camera.</numerusform>
+            <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected files cover periods for which videos have already been uploaded</source>
+        <translation>
+            <numerusform>Selected file covers period for which video has already been uploaded</numerusform>
+            <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Selected files will not be uploaded</source>
         <translation></translation>
     </message>
     <message>
-        <source>There is no space on server for file &quot;%1&quot;.</source>
+        <source>Some files will not be uploaded</source>
         <translation></translation>
     </message>
     <message>
-        <source>File &quot;%1&quot; covers period(s) that video is already being uploaded for.</source>
+        <source>No new files to upload in selected folder</source>
         <translation></translation>
     </message>
+    <message numerus="yes">
+        <source>Files size - %2</source>
+        <translation>
+            <numerusform>File size — %2</numerusform>
+            <numerusform>Files size — %2</numerusform>
+        </translation>
+    </message>
     <message>
-        <source>File &quot;%1&quot; covers period(s) that video has already been uploaded for.</source>
-        <translation></translation>
+        <source>Free space - %2</source>
+        <translation>Free space — %2</translation>
+    </message>
+    <message>
+        <source>%1 - has unsupported format.</source>
+        <translation>%1 — has unsupported format.</translation>
+    </message>
+    <message>
+        <source>%1 - does not have timestamp.</source>
+        <translation>%1 — does not have timestamp.</translation>
+    </message>
+    <message>
+        <source>%1 - covers period for which video has already been uploaded.</source>
+        <translation>%1 — covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+        <source>%1 - covers period for which video is being uploaded.</source>
+        <translation>%1 — covers period for which video is being uploaded.</translation>
+    </message>
+    <message>
+        <source>%1 - does not fit on server storage.</source>
+        <translation>%1 — does not fit on server storage.</translation>
     </message>
 </context>
 <context>

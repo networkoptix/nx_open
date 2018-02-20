@@ -1485,6 +1485,22 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             endTimeMSec = endTimeUSec == DATETIME_NOW
                 ? qnSyncTime->currentMSecsSinceEpoch()
                 : endTimeUSec / 1000;
+
+            if(m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
+            {
+                bool allWearable = std::all_of(m_syncedWidgets.begin(), m_syncedWidgets.end(),
+                    [](QnMediaResourceWidget* widget)
+                    {
+                        return widget->resource()->toResourcePtr()->hasFlags(Qn::wearable_camera);
+                    });
+
+                if (allWearable)
+                {
+                    QnTimePeriodList periods = m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent);
+                    if (!periods.empty() && !periods.back().isInfinite())
+                        endTimeMSec = periods.back().endTimeMs();
+                }
+            }
         }
     }
 
@@ -1500,6 +1516,13 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
         m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(), QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
     if (m_dayTimeWidget)
         m_dayTimeWidget->setEnabledWindow(startTimeMSec, endTimeMSec);
+
+    if (!m_currentWidgetLoaded && widgetLoaded
+        && display()->widgets().size() == 1
+        && m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
+    {
+        setPosition(startTimeMSec * 1000);
+    }
 
     if (!m_pausedOverride)
     {
@@ -1754,24 +1777,32 @@ void QnWorkbenchNavigator::updateLines()
     }
     else
     {
-        bool isSearch = workbench()->currentLayout()->isSearchLayout();
-        bool isLocal = m_currentWidget && m_currentWidget->resource()->flags().testFlag(Qn::local);
-
-        bool hasNonLocalResource = !isLocal;
-        if (!hasNonLocalResource)
-        {
-            for (const QnResourceWidget* widget: m_syncedWidgets)
+        auto isNormalCamera =
+            [](const QnResourceWidget* widget)
             {
-                if (widget->resource() && !widget->resource()->flags().testFlag(Qn::local))
+                return widget
+                    && !widget->resource()->hasFlags(Qn::local)
+                    && !widget->resource()->hasFlags(Qn::wearable_camera);
+            };
+
+        bool isSearch = workbench()->currentLayout()->isSearchLayout();
+        bool currentIsNormal = isNormalCamera(m_currentWidget);
+
+        bool haveNormal = currentIsNormal;
+        if (!haveNormal)
+        {
+            for (const QnResourceWidget* widget : m_syncedWidgets)
+            {
+                if (isNormalCamera(widget))
                 {
-                    hasNonLocalResource = true;
+                    haveNormal = true;
                     break;
                 }
             }
         }
 
-        m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, !isSearch && !isLocal);
-        m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, !isSearch && hasNonLocalResource);
+        m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, !isSearch && currentIsNormal);
+        m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, !isSearch && haveNormal);
     }
 }
 

@@ -42,9 +42,11 @@ static const QString kPrimaryStreamNumber = lit("01");
 static const QString kSecondaryStreamNumber = lit("02");
 
 static const QString kCapabilitiesRequestPathTemplate =
-lit("/ISAPI/Streaming/channels/%1/capabilities");
+    lit("/ISAPI/Streaming/channels/%1/capabilities");
 
+// TODO: Find out if we have to try both paths.
 static const QString kChannelStreamingPathTemplate = lit("/Streaming/Channels/%1");
+static const QString kChannelStreamingPathForNvrTemplate = lit("/ISAPI/Streaming/channels/%1");
 
 static const std::array<QString, 5> kVideoChannelProperties = {
     kVideoCodecTypeTag,
@@ -72,7 +74,8 @@ struct ChannelCapabilities
 // some additional channel properties in the future.
 struct ChannelProperties
 {
-    int rtspPortNumber = 554;
+    int rtspPort = 0;
+    QUrl httpUrl;
 };
 
 struct ChannelStatusResponse final
