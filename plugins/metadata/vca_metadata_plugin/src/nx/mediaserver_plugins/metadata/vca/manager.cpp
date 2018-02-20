@@ -12,9 +12,7 @@
 
 #include "nx/vca/camera_controller.h"
 
-// TODO: #mshevchenko is going to do smth with NX_PRINT/NX_DEBUG.
-//#include <nx/utils/log/log.h>
-//#define NX_DEBUG_STREAM nx::utils::log::detail::makeStream(nx::utils::log::Level::debug, "VCA")
+// TODO: #szaitsev: Redirect NX_DEBUG_STREAM to NX_UTILS_LOG_STREAM_NO_SPACE.
 
 #include <nx/kit/debug.h>
 
