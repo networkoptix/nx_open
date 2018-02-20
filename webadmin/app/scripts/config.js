@@ -107,6 +107,7 @@ var Config = {
         statisticsReportLastTime: {type: 'static'},
         statisticsReportServerApi: {type: 'text'},
         statisticsReportTimeCycle: {type: 'number'},
+        localSystemId: {type: 'static'},
         systemId: {type: 'static'},
         systemNameForId: {type: 'text'},
         takeCameraOwnershipWithoutLock: {type: 'checkbox'},
