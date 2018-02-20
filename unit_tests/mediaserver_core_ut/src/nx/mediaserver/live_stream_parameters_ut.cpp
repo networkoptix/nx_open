@@ -77,17 +77,19 @@ public:
         m_camera = newCamera(
             [](CameraMock* camera)
         {
-            camera->setStreamCapabilityMaps({
-                { { "MJPEG", QSize(800, 600) },{ 128, 8192, 15 } },
-                { { "MJPEG", QSize(1920, 1080) },{ 128, 8192, 15 } },
-                { { "H264", QSize(800, 600) },{ 128, 8192, 15 } },
-                { { "H264", QSize(1920, 1080) },{ 128, 8192, 15 } },
-                { { "H265", QSize(800, 600) },{ 128, 8192, 15 } },
-                { { "H265", QSize(1920, 1080) },{ 128, 8192, 15 } },
-            }, {
-                { { "MJPEG", QSize(200, 150) },{ 128, 8192, 15 } },
-                { { "MJPEG", QSize(480, 270) },{ 128, 8192, 15 } },
-                { { "MJPEG", QSize(800, 600) },{ 128, 8192, 15 } },
+            camera->setStreamCapabilityMaps(
+            {
+                {{"MJPEG", QSize(800, 600) },{ 128, 8192, 15 }},
+                {{"MJPEG", QSize(1920, 1080) },{ 128, 8192, 15 }},
+                {{"H264", QSize(800, 600) },{ 128, 8192, 15 }},
+                {{"H264", QSize(1920, 1080) },{ 128, 8192, 15 }},
+                {{"H265", QSize(800, 600) },{ 128, 8192, 15 }},
+                {{"H265", QSize(1920, 1080) },{ 128, 8192, 15 }},
+            },
+            {
+                {{"MJPEG", QSize(200, 150) },{ 128, 8192, 15 }},
+                {{"MJPEG", QSize(480, 270) },{ 128, 8192, 15 }},
+                {{"MJPEG", QSize(800, 600) },{ 128, 8192, 15 }},
             });
         });
         NX_ASSERT(m_camera);
@@ -100,7 +102,6 @@ public:
     QnSharedResourcePointer<CameraMock> m_camera;
     QnSharedResourcePointer<VideoCameraMock> m_videoCamera;
 };
-
 
 TEST_F(LiveStreamParameters, mergeWithEmptyParams)
 {
