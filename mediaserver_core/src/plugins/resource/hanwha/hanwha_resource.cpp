@@ -1386,6 +1386,7 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
     }
 
     m_profileByRole[Qn::ConnectionRole::CR_LiveVideo] = nxPrimaryProfileNumber;
+    m_profileByRole[Qn::ConnectionRole::CR_Archive] = nxPrimaryProfileNumber;
     m_profileByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo] = nxSecondaryProfileNumber;
 
     return CameraDiagnostics::NoErrorResult();
