@@ -7,6 +7,8 @@ import Nx.Media 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
+import "../../../Controls"
+
 Item
 {
     id: videoNavigation
@@ -352,6 +354,8 @@ Item
 
             IconButton
             {
+                id: calendarButton
+
                 anchors.verticalCenter: parent.verticalCenter
                 icon: lp("/images/calendar.png")
                 enabled: d.hasArchive
@@ -404,6 +408,35 @@ Item
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
 
+            ActionButtonsPanel
+            {
+                resourceId: videoScreenController.resourceId
+
+                anchors.left: calendarButton.right
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                visible: d.liveMode
+
+                onPtzButtonClicked: videoNavigation.ptzButtonClicked()
+                onTwoWayAudioButtonClicked:
+                {
+                    if (twoWayAudioController.started)
+                        twoWayAudioController.stop()
+                    else
+                        twoWayAudioController.start();
+
+                    console.log("TwoWayAudio clicked")
+                }
+
+                Binding
+                {
+                    target: twoWayAudioController
+                    property: "resourceId"
+                    value: videoScreenController.resourceId
+                }
+            }
+
+            /*
             IconButton
             {
                 id: streamButton
@@ -454,6 +487,7 @@ Item
 
                 onClicked: videoNavigation.ptzButtonClicked()
             }
+            */
 
             Timer
             {

@@ -8,6 +8,7 @@
 #include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
+#include <nx/client/core/two_way_audio/two_way_audio_availability_watcher.h>
 
 namespace nx {
 namespace client {
@@ -15,8 +16,11 @@ namespace core {
 
 TwoWayAudioController::TwoWayAudioController(QObject* parent):
     base_type(parent),
-    QnConnectionContextAware()
+    QnConnectionContextAware(),
+    m_availabilityWatcher(new TwoWayAudioAvailabilityWatcher())
 {
+    connect(m_availabilityWatcher, &TwoWayAudioAvailabilityWatcher::availabilityChanged,
+        this, &TwoWayAudioController::availabilityChanged);
 }
 
 TwoWayAudioController::TwoWayAudioController(
@@ -26,8 +30,11 @@ TwoWayAudioController::TwoWayAudioController(
     :
     base_type(parent),
     QnConnectionContextAware(),
-    m_camera()
+    m_availabilityWatcher(new TwoWayAudioAvailabilityWatcher())
 {
+    connect(m_availabilityWatcher, &TwoWayAudioAvailabilityWatcher::availabilityChanged,
+        this, &TwoWayAudioController::availabilityChanged);
+
     setSourceId(sourceId);
     setResourceId(cameraId);
     start();
@@ -45,7 +52,7 @@ bool TwoWayAudioController::started() const
 
 bool TwoWayAudioController::start()
 {
-    if (started())
+    if (started() || !available())
         return false;
 
     const auto serverId = commonModule()->remoteGUID();
@@ -111,59 +118,15 @@ void TwoWayAudioController::setResourceId(const QString& value)
     if (m_camera)
         m_camera->disconnect(this);
 
-    const auto pool = resourcePool();
+    const auto pool = commonModule()->resourcePool();
     m_camera = pool->getResourceById<QnVirtualCameraResource>(id);
-    m_licenseHelper.reset(m_camera && m_camera->isIOModule()
-        ? new QnSingleCamLicenseStatusHelper(m_camera)
-        : nullptr);
-
-    if (m_camera)
-    {
-        connect(m_camera, &QnVirtualCameraResource::statusChanged,
-            this, &TwoWayAudioController::updateAvailability);
-        if (m_licenseHelper)
-        {
-            connect(m_licenseHelper, &QnSingleCamLicenseStatusHelper::licenseStatusChanged,
-                this, &TwoWayAudioController::updateAvailability);
-        }
-    }
-
-    updateAvailability();
+    m_availabilityWatcher->setResourceId(id);
     emit resourceIdChanged();
 }
 
 bool TwoWayAudioController::available() const
 {
-    return m_available;
-}
-
-void TwoWayAudioController::updateAvailability()
-{
-    const bool isAvailable =
-        [this]()
-        {
-            if (!m_camera)
-                return false;
-
-            if (m_camera->getStatus() != Qn::Online && m_camera->getStatus() != Qn::Recording)
-                return false;
-
-            if (m_licenseHelper)
-                return m_licenseHelper->status() == QnLicenseUsageStatus::used;
-
-            return true;
-        }();
-
-    setAvailability(isAvailable);
-}
-
-void TwoWayAudioController::setAvailability(bool value)
-{
-    if (m_available == value)
-        return;
-
-    m_available = value;
-    emit availabilityChanged();
+    return m_availabilityWatcher->available();
 }
 
 void TwoWayAudioController::setStarted(bool value)

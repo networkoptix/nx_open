@@ -5,7 +5,6 @@
 
 #include <common/common_module_aware.h>
 #include <client_core/connection_context_aware.h>
-#include <utils/license_usage_helper.h>
 #include <utils/common/connective.h>
 
 class QnSingleCamLicenseStatusHelper;
@@ -13,6 +12,8 @@ class QnSingleCamLicenseStatusHelper;
 namespace nx {
 namespace client {
 namespace core {
+
+class TwoWayAudioAvailabilityWatcher;
 
 class TwoWayAudioController: public Connective<QObject>, public QnConnectionContextAware
 {
@@ -50,8 +51,6 @@ signals:
     void availabilityChanged();
 
 private:
-    void updateAvailability();
-    void setAvailability(bool value);
     void setStarted(bool value);
 
 private:
@@ -60,7 +59,7 @@ private:
     rest::Handle m_startHandle = 0;
     QString m_sourceId;
     QnVirtualCameraResourcePtr m_camera;
-    QScopedPointer<QnSingleCamLicenseStatusHelper> m_licenseHelper;
+    QScopedPointer<TwoWayAudioAvailabilityWatcher> m_availabilityWatcher;
 };
 
 } // namespace core
