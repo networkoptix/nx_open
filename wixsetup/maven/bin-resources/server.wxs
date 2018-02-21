@@ -240,7 +240,7 @@
         <?endif?>
 
         <Component Id="ServerBuildInfoTxt" Directory="MediaServerRootDir">
-            <File Id="build_info.txt" Name="build_info.txt" Source="$(var.SourceDir)\..\..\build_info.txt" DiskId="6"/>
+            <File Id="build_info.txt" Name="build_info.txt" Source="$(var.SourceDir)\..\build_info.txt" DiskId="6"/>
         </Component>
 
         <Feature Id="ServerFeature" Title="$(var.productName) Media Server" Level="1"
