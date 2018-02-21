@@ -721,7 +721,7 @@ namespace nx_hls
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getResourceChunk(
         const nx_http::Request& request,
         const QStringRef& uniqueResourceID,
-        const QnSecurityCamResourcePtr& /*camResource*/,
+        const QnSecurityCamResourcePtr& cameraResource,
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response )
     {
@@ -763,11 +763,13 @@ namespace nx_hls
             params.streamQuality,
             requestParams);
 
-        const auto resource = commonModule()->resourcePool()->getResourceByUniqueId(currentChunkKey.srcResourceUniqueID());
         auto requiredPermission = currentChunkKey.live()
             ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
-        if (!commonModule()->resourceAccessManager()->hasPermission(d_ptr->accessRights, resource, requiredPermission))
+        if (!commonModule()->resourceAccessManager()->hasPermission(
+                d_ptr->accessRights, cameraResource, requiredPermission))
+        {
             return nx_http::StatusCode::forbidden;
+        }
 
 
         //streaming chunk
