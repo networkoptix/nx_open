@@ -120,7 +120,7 @@ if(IOS)
     endif()
 
     execute_process(
-        COMMAND "${PROJECT_SOURCE_DIR}/build_utils/shell/get_provisioning_id.sh" "${provisioning_profile}"
+        COMMAND "${PROJECT_SOURCE_DIR}/build_utils/macos/get_provisioning_id.sh" "${provisioning_profile}"
         RESULT_VARIABLE result
         OUTPUT_VARIABLE provisioning_profile_id
         OUTPUT_STRIP_TRAILING_WHITESPACE
