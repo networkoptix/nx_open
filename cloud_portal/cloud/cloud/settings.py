@@ -331,7 +331,7 @@ NOTIFICATIONS_CONFIG = {
     }
 }
 
-BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = True
+BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = 'debug' in conf and conf['debug']
 NOTIFICATIONS_AUTO_SUBSCRIBE = False
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
