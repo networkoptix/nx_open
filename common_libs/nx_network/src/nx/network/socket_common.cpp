@@ -4,6 +4,20 @@
 
 #include "socket_global.h"
 
+bool operator==(const in_addr& left, const in_addr& right)
+{
+    return memcmp(&left, &right, sizeof(left)) == 0;
+}
+
+bool operator==(const in6_addr& left, const in6_addr& right)
+{
+    return memcmp(&left, &right, sizeof(left)) == 0;
+}
+
+#ifndef _WIN32
+const in_addr in4addr_loopback{ htonl(INADDR_LOOPBACK) };
+#endif
+
 namespace nx {
 namespace network {
 
