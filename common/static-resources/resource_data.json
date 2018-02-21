@@ -833,7 +833,8 @@
                 "Hikvision|DS-2DE4A220IW-DE",
                 "Hikvision|DS-2CD2522FWD*",
                 "ONVIF|H47",
-                "ONVIF|IP-2CD4B26FWD-IZS"                
+                "ONVIF|IP-2CD4B26FWD-IZS",
+                "*|NC304-WDA"
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
