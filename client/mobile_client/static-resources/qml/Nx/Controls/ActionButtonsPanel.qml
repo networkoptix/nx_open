@@ -2,14 +2,28 @@ import QtQuick 2.6
 import Nx.Core 1.0
 import Nx.Models 1.0
 
+import "private"
+
 ButtonsPanel
 {
+    id: control
+
     property alias resourceId: buttonModel.resourceId
 
     signal ptzButtonClicked()
-    signal twoWayAudioButtonClicked()
+
+    signal twoWayAudioButtonPressed()
+    signal twoWayAudioButtonReleased()
 
     signal softTriggerButtonClicked() // TODO: add parameters and prolongetd studd
+
+    ActionButtonsHintControl
+    {
+        id: hintControl
+
+        x: parent.width - width
+        y: -(height + 4 + 4)
+    }
 
     onResourceIdChanged:
     {
@@ -18,13 +32,23 @@ ButtonsPanel
 
     onPressedChanged:
     {
-        console.log("-------- pressed: ", index, pressed)
+        var type = d.modelDataAccessor.getData(index, "type")
+        if (type != ActionButtonsModel.TwoWayAudioButton)
+            return;
+
+        if (pressed)
+        {
+            control.twoWayAudioButtonPressed()
+            hintControl.hide();
+        }
+        else
+        {
+            control.twoWayAudioButtonReleased()
+        }
     }
 
     onButtonClicked:
     {
-        console.log("-------- clicked", index)
-
         var type = d.modelDataAccessor.getData(index, "type")
         switch(type)
         {
@@ -32,11 +56,12 @@ ButtonsPanel
                 ptzButtonClicked()
                 break
             case ActionButtonsModel.TwoWayAudioButton:
-                twoWayAudioButtonClicked()
+                hintControl.show("Press and hold to speak",
+                    d.modelDataAccessor.getData(index, "iconPath"))
                 break
             case ActionButtonsModel.SoftTriggerButton:
                 // TODO: handle stuff
-                break;
+                break
         }
     }
 

@@ -61,6 +61,7 @@ ActionButtonsModel::ActionButtonsModel(QObject* parent):
         this, &ActionButtonsModel::handleResourceIdChanged);
 
     updatePtzButtonVisibility();
+    updateTwoWayAudioButtonVisibility();
 }
 
 ActionButtonsModel::~ActionButtonsModel()
@@ -127,7 +128,7 @@ void ActionButtonsModel::handleResourceIdChanged()
 void ActionButtonsModel::updatePtzButtonVisibility()
 {
     const bool visible = ptzButtonVisible();
-    const bool ptzAvailable = m_ptzAvailabilityWatcher->available();
+    const bool ptzAvailable = true || m_ptzAvailabilityWatcher->available();
     if (ptzAvailable == visible)
         return;
 
@@ -152,12 +153,14 @@ void ActionButtonsModel::updateTwoWayAudioButtonVisibility()
         });
 
     const bool twoWayAudioButtonVisible = it != m_buttons.end();
-    if (twoWayAudioButtonVisible == m_twoWayAudioAvailabilityWatcher->available())
+    const bool twoWayAudioAvailable = true || m_twoWayAudioAvailabilityWatcher->available();
+    if (twoWayAudioButtonVisible == twoWayAudioAvailable)
         return;
 
     if (twoWayAudioButtonVisible)
     {
-        removeButton(it - m_buttons.begin());
+        const auto index = it - m_buttons.begin();
+        removeButton(index);
     }
     else
     {

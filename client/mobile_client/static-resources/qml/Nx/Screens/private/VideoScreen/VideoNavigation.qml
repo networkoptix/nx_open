@@ -412,21 +412,15 @@ Item
             {
                 resourceId: videoScreenController.resourceId
 
-                anchors.left: calendarButton.right
-                anchors.right: parent.right
+                x: calendarButton.x + calendarButton.width + 4
+                width: parent.width - x - 4
+
                 anchors.verticalCenter: parent.verticalCenter
                 visible: d.liveMode
 
                 onPtzButtonClicked: videoNavigation.ptzButtonClicked()
-                onTwoWayAudioButtonClicked:
-                {
-                    if (twoWayAudioController.started)
-                        twoWayAudioController.stop()
-                    else
-                        twoWayAudioController.start();
-
-                    console.log("TwoWayAudio clicked")
-                }
+                onTwoWayAudioButtonPressed: twoWayAudioController.start()
+                onTwoWayAudioButtonReleased: twoWayAudioController.stop()
 
                 Binding
                 {

@@ -1,71 +1,79 @@
 import QtQuick 2.6
 
-Row
+Item
 {
     id: control
 
     property alias model: buttonRepeater.model
-
     property int pressedStateFilterMs: 200
 
     signal buttonClicked(int index)
     signal pressedChanged(int index, bool pressed)
 
-    layoutDirection: Qt.RightToLeft
-    anchors.verticalCenter: parent.verticalCenter
+    width: rowItem.width
+    height: rowItem.height
 
-    Repeater
+    Row
     {
-        id: buttonRepeater
+        id: rowItem
 
-        delegate:
-            IconButton
-            {
-                id: button
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
 
-                icon: lp(model.iconPath)
+        layoutDirection: Qt.RightToLeft
+        Repeater
+        {
+            id: buttonRepeater
 
-                anchors.verticalCenter: parent.verticalCenter
-
-                property bool filteringPressing: false
-
-                onClicked:
+            delegate:
+                IconButton
                 {
-                    if (!filteringPressing)
+                    id: button
+
+                    icon: lp(model.iconPath)
+
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    property bool filteringPressing: false
+
+                    onClicked:
                     {
-                        pressedStateFilterTimer.stop()
-                        releasedStateFilterTimer.stop()
-                        control.buttonClicked(index)
+                        if (!filteringPressing)
+                        {
+                            pressedStateFilterTimer.stop()
+                            releasedStateFilterTimer.stop()
+                            control.buttonClicked(index)
+                        }
+                    }
+
+                    onPressedChanged:
+                    {
+                        if (pressed)
+                            pressedStateFilterTimer.restart()
+                        else
+                            releasedStateFilterTimer.restart();
+                    }
+
+                    Timer
+                    {
+                        id: pressedStateFilterTimer
+                        interval: control.pressedStateFilterMs
+                        onTriggered: finishStateProcessing(true)
+                    }
+
+                    Timer
+                    {
+                        id: releasedStateFilterTimer
+                        interval: control.pressedStateFilterMs
+                        onTriggered: finishStateProcessing(false)
+                    }
+
+                    function finishStateProcessing(value)
+                    {
+                        button.filteringPressing = value
+                        control.pressedChanged(index, value)
                     }
                 }
-
-                onPressedChanged:
-                {
-                    if (pressed)
-                        pressedStateFilterTimer.restart()
-                    else
-                        releasedStateFilterTimer.restart();
-                }
-
-                Timer
-                {
-                    id: pressedStateFilterTimer
-                    interval: control.pressedStateFilterMs
-                    onTriggered: finishStateProcessing(true)
-                }
-
-                Timer
-                {
-                    id: releasedStateFilterTimer
-                    interval: control.pressedStateFilterMs
-                    onTriggered: finishStateProcessing(false)
-                }
-
-                function finishStateProcessing(value)
-                {
-                    button.filteringPressing = value
-                    control.pressedChanged(index, value)
-                }
-            }
+        }
     }
 }
