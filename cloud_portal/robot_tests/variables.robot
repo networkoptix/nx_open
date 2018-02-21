@@ -11,10 +11,11 @@ ${CLOUD TEST}                         https://cloud-test.hdw.mx
 ${CLOUD DEV}                          https://cloud-dev2.hdw.mx
 ${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
 
-${CYRILLIC NAME}                     Кенгшщзх
-${SMILEY NAME}                       ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
-${GLYPH NAME}                        您都可以享受源源不絕的好禮及優惠
-${SYMBOL NAME}                       `~!@#$%^&*()_:";'{}[]+<>?,./\
+${CYRILLIC TEXT}                     Кенгшщзх
+${SMILEY TEXT}                       ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
+${GLYPH TEXT}                        您都可以享受源源不絕的好禮及優惠
+${SYMBOL TEXT}                       `~!@#$%^&*()_:";'{}[]+<>?,./\
+${TM TEXT}                           qweasdzxc123®™
 
 #Log In Elements
 ${LOG IN MODAL}                       //div[contains(@class, 'modal-content')]

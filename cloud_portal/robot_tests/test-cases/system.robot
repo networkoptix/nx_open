@@ -185,7 +185,7 @@ should display same user data as user provided during registration (stress to cy
 #create user
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    ${CYRILLIC NAME}    ${CYRILLIC NAME}    ${email}    ${password}
+    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
     Activate    ${email}
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
@@ -203,7 +203,7 @@ should display same user data as user provided during registration (stress to cy
 
 #verify user was added with appropriate name
     Log In    ${email}    ${password}
-    Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
+    Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
 
 #remove new user from system
     Log Out
@@ -212,6 +212,7 @@ should display same user data as user provided during registration (stress to cy
     Close Browser
 
 should display same user data as showed in user account (stress to cyrillic)
+    [tags]    not-ready
 #create user
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
@@ -236,9 +237,9 @@ should display same user data as showed in user account (stress to cyrillic)
     Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    mark
     Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    hamill
     Clear Element Text    ${ACCOUNT FIRST NAME}
-    Input Text    ${ACCOUNT FIRST NAME}    ${CYRILLIC NAME}
+    Input Text    ${ACCOUNT FIRST NAME}    ${CYRILLIC TEXT}
     Clear Element Text    ${ACCOUNT LAST NAME}
-    Input Text    ${ACCOUNT LAST NAME}    ${CYRILLIC NAME}
+    Input Text    ${ACCOUNT LAST NAME}    ${CYRILLIC TEXT}
     sleep    .15
     Wait Until Element Is Visible    ${ACCOUNT SAVE}
     Click Button    ${ACCOUNT SAVE}

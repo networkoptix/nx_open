@@ -57,28 +57,28 @@ should register user with correct credentials
 should register user with cyrillic First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    ${CYRILLIC NAME}    ${CYRILLIC NAME}    ${email}    ${password}
+    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
     Validate Register Success
     Close Browser
 
 should register user with smiley First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    ${SMILEY NAME}    ${SMILEY NAME}    ${email}    ${password}
+    Register    ${SMILEY TEXT}    ${SMILEY TEXT}    ${email}    ${password}
     Validate Register Success
     Close Browser
 
 should register user with glyph First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    ${GLYPH NAME}    ${GLYPH NAME}    ${email}    ${password}
+    Register    ${GLYPH TEXT}    ${GLYPH TEXT}    ${email}    ${password}
     Validate Register Success
     Close Browser
 
 should allow `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    ${SYMBOL NAME}    ${SYMBOL NAME}    ${email}    ${password}
+    Register    ${SYMBOL TEXT}    ${SYMBOL TEXT}    ${email}    ${password}
     Validate Register Success
     Close Browser
 
