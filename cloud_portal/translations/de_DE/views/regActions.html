@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Account wurde erstellt. <br>Bestätigungsmail wird an <br>{{account.email}} gesendet
+        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -39,7 +39,7 @@
             </div>
         </div>
         <div class="form-group" validate-field>
-            <label for="registerEmail"  class="col-sm-4 control-label">Email</label>
+            <label for="registerEmail"  class="col-sm-4 control-label">E-Mail</label>
             <div class="col-sm-4">
                 <input ng-hide="lockEmail" type="email" class="form-control" ng-model="account.email" id="registerEmail" maxlength="255"
                        name="registerEmail" required autocomplete="off"  validate-email
@@ -70,7 +70,10 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <small class="conditions-note">Wenn Sie auf "Account erstellen" klicken, stimmen Sie <br> den <a href="/content/eula" target="_blank">Geschäftsbedingungen</a> zu</small>
+                <div class="small conditions-note">
+                    Indem Sie auf "Konto erstellen" klicken, erklären Sie sich einverstanden mit den
+                    <div><a href="/content/eula" target="_blank">Allgemeine Geschäftsbedingungen</a></div>
+                </div>
             </div>
         </div>
     </form>

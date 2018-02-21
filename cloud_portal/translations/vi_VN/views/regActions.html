@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Tài khoản được tạo. <br> Thông báo xác nhận được gửi đến <br> {{account.email}}
+        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -35,7 +35,7 @@
  name="lastName" autocomplete="off">
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Tên là bắt buộc.</span>
+                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Họ là bắt buộc.</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -66,7 +66,10 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <small class="conditions-note"> Bằng cách nhấp vào "Tạo Tài khoản", bạn đồng ý <br> đến <a href="/content/eula" target="_blank"> Điều khoản và Điều kiện </a></small>
+                <div class="small conditions-note">
+                    By clicking "Create Account", you agree to
+                    <div><a href="/content/eula" target="_blank">Terms and Conditions</a></div>
+                </div>
             </div>
         </div>
     </form>

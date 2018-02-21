@@ -440,7 +440,8 @@
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Kan het systeem niet aanmaken</h2>
-    <p class="master-description">Er ging iets verkeerd. <br>Beschrijving van de fout: {{settings.localError}}
+    <p class="master-description">Something went totally wrong. <br>
+        Error description: {{settings.localError}}
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Nogmaals proberen</button>

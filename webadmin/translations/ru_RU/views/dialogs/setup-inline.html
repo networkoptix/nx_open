@@ -445,8 +445,8 @@
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Не удаётся настроить систему</h2>
-    <p class="master-description">Произошла непредвиденная ошибка.
-<br>Описание ошибки: {{settings.localError}}
+    <p class="master-description">Что-то пошло не так. <br>
+        Описание ошибки: {{settings.localError}}
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Повторить</button>

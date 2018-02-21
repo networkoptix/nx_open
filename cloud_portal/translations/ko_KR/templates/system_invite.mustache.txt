@@ -5,7 +5,7 @@
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-{{PRODUCT_NAME}} 에 가입하도록 초대되었습니다.
+{{PRODUCT_NAME}}에 가입하도록 초대되었습니다.
 {{message.system_name}}에 대한 액세스 권한이 부여되었습니다.
 {{/message.sharer_name}}
 

@@ -1,7 +1,7 @@
 {
   "cameraLinks": {
-    "highStream": "Primaire stream",
-    "lowStream": "Secundaire stream",
+    "highStream": "Hoge stroom",
+    "lowStream": "Lage stroom",
     "transcoding": "Transcoding",
     "unknown": "Onbekend",
     "copyToClipboard": "kopiëren naar klembord",

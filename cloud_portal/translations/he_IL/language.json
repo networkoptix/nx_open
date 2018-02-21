@@ -21,8 +21,8 @@
     "systems": "מערכות -",
     "system": "מערכת -",
     "systemShare": "שתף מערכת -",
-    "activate": "הפעל חשבון -",
-    "activateSent": "הפעל חשבון",
+    "activate": "הפעל חשבון",
+    "activateSent": "הפעל חשבון -",
     "activateSuccess": "החשבון הופעל -",
     "activateCode": "הפעל חשבון",
     "restorePassword": "איפוס סיסמא -",
@@ -53,7 +53,7 @@
     },
     "Viewer": {
       "label": "צופה",
-      "description": "יכול לצפות בוידאו חי ולעיין בארכיון"
+      "description": "ניתן להציג וידאו חי ולעיין בארכיון"
     },
     "Live Viewer": {
       "label": "צופה בשידור חי",
@@ -157,7 +157,7 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "המערכת אינה זמינה",
     "offline": "המערכת אינה מקוונת",
-    "openClient": "פתח ב {{VMS_NAME}}",
+    "openClient": "פתח ב- {{VMS_NAME}}",
     "openClientNoSystem": "פתח {{VMS_NAME}}",
     "confirmRenameTitle": "שם מערכת",
     "confirmRenameAction": "שמור",
@@ -166,10 +166,10 @@
     "confirmDisconnectAction": "נתק",
     "confirmUnshareFromMe": "אתה עומד לנתק את המערכת מהחשבון שלך. לא תוכל עוד לגשת למערכת זו. האם להמשיך?",
     "confirmUnshareFromMeTitle": "נתק מערכת?",
-    "confirmUnshareFromMeAction": "התנתק",
+    "confirmUnshareFromMeAction": "נתק",
     "confirmUnshare": "משתמש זה לא יוכל לגשת למערכת. האם אתה בטוח?",
     "confirmUnshareTitle": "מחק משתמש?",
-    "confirmUnshareAction": "מחיקה",
+    "confirmUnshareAction": "מחק",
     "successDisconnected": "המערכת מנותקת בהצלחה מ- {{PRODUCT_NAME}}",
     "successDeleted": "המערכת {{systemName}} נמחקה בהצלחה מהחשבון שלך",
     "permissionsRemoved": "ההרשאות הוסרו מ- {{email}}"
@@ -255,7 +255,7 @@
     "setNewPasswordLabel": "סיסמא חדשה"
   },
   "regActions": {
-    "passwordLabel": "סיסמה",
+    "passwordLabel": "סיסמא",
     "createAccount": "צור חשבון"
   },
   "header": {
