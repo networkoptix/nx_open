@@ -111,23 +111,24 @@ void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/)
 {
     auto onExitGuard =
         makeScopeGuard([this]() { remoteUpdateCompleted(); });
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        switch (m_currentStatus.state)
         {
-            QnMutexLocker lock(&m_mutex);
-            switch (m_currentStatus.state)
-            {
-                case api::Updates2StatusData::StatusCode::notAvailable:
-                case api::Updates2StatusData::StatusCode::available:
-                case api::Updates2StatusData::StatusCode::error:
-                    m_currentStatus.fromBase(
-                        api::Updates2StatusData(
-                            moduleGuid(),
-                            api::Updates2StatusData::StatusCode::checking,
-                            "Checking for update"));
-                    break;
-                default:
-                    return;
-            }
+            case api::Updates2StatusData::StatusCode::notAvailable:
+            case api::Updates2StatusData::StatusCode::available:
+            case api::Updates2StatusData::StatusCode::error:
+                m_currentStatus.fromBase(
+                    api::Updates2StatusData(
+                        moduleGuid(),
+                        api::Updates2StatusData::StatusCode::checking,
+                        "Checking for update"));
+                break;
+            default:
+                return;
         }
+    }
 
     auto remoteRegistry = getRemoteRegistry();
     if (remoteRegistry)
@@ -417,12 +418,13 @@ void Updates2ManagerBase::onFileDeleted(const QString& /*fileName*/)
 
 void Updates2ManagerBase::onFileInformationChanged(const FileInformation& /*fileInformation*/)
 {
-
+    // #TODO #akulikov implement
 }
 
-void Updates2ManagerBase::onFileInformationStatusChanged(const FileInformation& /*fileInformation*/)
+void Updates2ManagerBase::onFileInformationStatusChanged(const FileInformation& fileInformation)
 {
-
+    if (fileInformation.status == FileInformation::Status::corrupted)
+        onDownloadFailed(fileInformation.name);
 }
 
 void Updates2ManagerBase::onChunkDownloadFailed(const QString& fileName)

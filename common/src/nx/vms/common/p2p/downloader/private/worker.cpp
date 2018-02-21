@@ -445,7 +445,7 @@ void Worker::setShouldWait(bool value)
             },
             std::chrono::milliseconds(delayMs()));
     }
-    else
+    else if (!value)
     {
         m_shouldWait = false;
         m_waitCondition.wakeOne();
@@ -808,8 +808,7 @@ void Worker::handleDownloadChunkReply(
     const auto resultCode = m_storage->writeFileChunk(m_fileName, chunkIndex, data);
     if (resultCode != ResultCode::ok)
     {
-        NX_WARNING(m_logTag,
-            lm("Cannot write chunk. Storage error: %1").arg(resultCode));
+        NX_WARNING(m_logTag, lm("Cannot write chunk. Storage error: %1").arg(resultCode));
 
         // TODO: Implement error handling
         success = false;
