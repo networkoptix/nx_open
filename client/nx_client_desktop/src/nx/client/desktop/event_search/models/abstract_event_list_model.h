@@ -36,6 +36,25 @@ public:
     const QnTimePeriod& relevantTimePeriod() const;
     void setRelevantTimePeriod(const QnTimePeriod& value);
 
+    enum class FetchDirection
+    {
+        earlier,
+        later
+    };
+
+    FetchDirection fetchDirection() const;
+    void setFetchDirection(FetchDirection value);
+
+    /** Maximal item count (fetched window size). */
+    int maximumCount() const;
+    void setMaximumCount(int value);
+
+    /** Item count acquired by one fetch. */
+    int fetchBatchSize() const;
+    void setFetchBatchSize(int value);
+
+    virtual QnTimePeriod fetchedTimeWindow() const;
+
 signals:
     void fetchAboutToBeFinished(QPrivateSignal); //< Emitted before actual model update.
     void fetchFinished(bool cancelled, QPrivateSignal);
@@ -48,12 +67,17 @@ protected:
     virtual bool activateLink(const QModelIndex& index, const QString& link);
 
     virtual void relevantTimePeriodChanged(const QnTimePeriod& previousValue);
+    virtual void fetchDirectionChanged();
+    virtual void maximumCountChanged();
 
     void beginFinishFetch();
     void endFinishFetch(bool cancelled = false);
 
 private:
     QnTimePeriod m_relevantTimePeriod = QnTimePeriod::anytime();
+    FetchDirection m_fetchDirection = FetchDirection::earlier;
+    int m_maximumCount = 1000; //< Default maximum item count.
+    int m_fetchBatchSize = 100; //< Default item count acquired by one fetch.
 };
 
 } // namespace desktop

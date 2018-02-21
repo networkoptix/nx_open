@@ -24,8 +24,6 @@ namespace desktop {
 
 namespace {
 
-static constexpr int kFetchBatchSize = 110;
-
 // In "live mode", every kUpdateTimerInterval newly happened events are fetched.
 static constexpr auto kUpdateTimerInterval = std::chrono::seconds(15);
 
@@ -168,7 +166,7 @@ bool EventSearchListModel::Private::hasAccessRights() const
 
 rest::Handle EventSearchListModel::Private::requestPrefetch(qint64 fromMs, qint64 toMs)
 {
-    const auto limit = kFetchBatchSize * m_requestLimitMultiplier;
+    const auto limit = lastBatchSize() * m_requestLimitMultiplier;
     const auto eventsReceived =
         [this, fromMs, toMs, limit]
             (bool success, rest::Handle handle, vms::event::ActionDataList&& data)
@@ -197,7 +195,7 @@ rest::Handle EventSearchListModel::Private::requestPrefetch(qint64 fromMs, qint6
             {
                 static constexpr int kMaxMultiplier = 64;
 
-                if (m_prefetch.size() < kFetchBatchSize)
+                if (m_prefetch.size() < lastBatchSize())
                     m_requestLimitMultiplier = qMin(m_requestLimitMultiplier * 2, kMaxMultiplier);
                 else
                     m_requestLimitMultiplier = qMax(m_requestLimitMultiplier / 2, 1);
@@ -225,7 +223,7 @@ rest::Handle EventSearchListModel::Private::requestPrefetch(qint64 fromMs, qint6
     return getEvents(fromMs, toMs, eventsReceived, limit);
 }
 
-bool EventSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll)
+bool EventSearchListModel::Private::commitPrefetch(qint64 syncTimeToCommitMs, bool& fetchedAll)
 {
     if (!m_success)
     {
@@ -234,7 +232,7 @@ bool EventSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommitMs
     }
 
     const auto earliestTimeToCommitUs = std::chrono::duration_cast<std::chrono::microseconds>(
-        std::chrono::milliseconds(earliestTimeToCommitMs)).count();
+        std::chrono::milliseconds(syncTimeToCommitMs)).count();
 
     const auto end = std::upper_bound(m_prefetch.begin(), m_prefetch.end(),
         earliestTimeToCommitUs, upperBoundPredicateUs);
@@ -258,7 +256,7 @@ bool EventSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommitMs
         qDebug() << "Committing no events";
     }
 
-    fetchedAll = count == m_prefetch.size() && m_prefetch.size() < kFetchBatchSize;
+    fetchedAll = count == m_prefetch.size() && m_prefetch.size() < lastBatchSize();
     m_prefetch.clear();
     return true;
 }

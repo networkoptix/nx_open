@@ -5,6 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <recording/time_period.h>
 
+#include <nx/client/desktop/event_search/models/abstract_event_list_model.h>
 #include <nx/client/desktop/common/models/concatenation_list_model.h>
 #include <nx/vms/event/event_fwd.h>
 
@@ -14,7 +15,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class AbstractEventListModel;
 class BusyIndicatorModel;
 
 class UnifiedAsyncSearchListModel: public ConcatenationListModel
@@ -36,6 +36,10 @@ public:
 
     QnTimePeriod relevantTimePeriod() const;
     void setRelevantTimePeriod(const QnTimePeriod& value);
+
+    using FetchDirection = AbstractEventListModel::FetchDirection;
+    FetchDirection fetchDirection() const;
+    void setFetchDirection(FetchDirection value);
 
     bool isConstrained() const;
 

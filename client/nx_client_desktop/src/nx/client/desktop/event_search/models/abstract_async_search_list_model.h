@@ -40,6 +40,8 @@ public:
 
     virtual bool fetchInProgress() const override;
 
+    virtual QnTimePeriod fetchedTimeWindow() const override;
+
 protected:
     // This is currently used only internally, as we don't use fetch timestamp synchronization.
 
@@ -47,13 +49,14 @@ protected:
     //   completionHandler instead. To finalize fetch commitPrefetch must be called.
     //   Must return false and do nothing if previous fetch is not committed yet.
     //   Time range synchronization between several models is possible with
-    //   the help of earliestTimeFetchedMs/earliestTimeToCommitMs arguments.
+    //   the help of boundaryTimeFetchedMs/syncTimeToCommitMs arguments.
     //   If prefetch is cancelled, PrefetchCompletionHandler is called with -1.
-    using PrefetchCompletionHandler = std::function<void(qint64 earliestTimeFetchedMs)>;
+    using PrefetchCompletionHandler = std::function<void(qint64 boundaryTimeFetchedMs)>;
     virtual bool prefetchAsync(PrefetchCompletionHandler completionHandler);
-    virtual void commitPrefetch(qint64 earliestTimeToCommitMs);
+    virtual void commitPrefetch(qint64 syncTimeToCommitMs);
 
     virtual void relevantTimePeriodChanged(const QnTimePeriod& previousValue) override;
+    virtual void fetchDirectionChanged() override;
 
 private:
     QScopedPointer<Private> d;

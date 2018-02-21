@@ -34,8 +34,6 @@ using namespace analytics::storage;
 
 namespace {
 
-static constexpr int kFetchBatchSize = 110;
-
 static constexpr auto kUpdateTimerInterval = std::chrono::seconds(30);
 static constexpr auto kDataChangedInterval = std::chrono::milliseconds(250);
 
@@ -276,7 +274,7 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(qint64 fromMs, q
             }
 
             NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().track.empty());
-            complete(m_prefetch.size() >= kFetchBatchSize
+            complete(m_prefetch.size() >= lastBatchSize()
                 ? startTimeMs(m_prefetch.back()) + 1 /*discard last ms*/
                 : 0);
         };
@@ -284,10 +282,10 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(qint64 fromMs, q
     qDebug() << "Requesting analytics from" << utils::timestampToRfc2822(fromMs)
         << "to" << utils::timestampToRfc2822(toMs);
 
-    return getObjects(fromMs, toMs, dataReceived, kFetchBatchSize);
+    return getObjects(fromMs, toMs, dataReceived, lastBatchSize());
 }
 
-bool AnalyticsSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll)
+bool AnalyticsSearchListModel::Private::commitPrefetch(qint64 syncTimeToCommitMs, bool& fetchedAll)
 {
     if (!m_success)
     {
@@ -296,7 +294,7 @@ bool AnalyticsSearchListModel::Private::commitPrefetch(qint64 earliestTimeToComm
     }
 
     const auto latestTimeUs = std::chrono::duration_cast<std::chrono::microseconds>(
-        std::chrono::milliseconds(earliestTimeToCommitMs)).count();
+        std::chrono::milliseconds(syncTimeToCommitMs)).count();
 
     const auto end = std::upper_bound(m_prefetch.begin(), m_prefetch.end(),
         latestTimeUs, upperBoundPredicateUs);
@@ -459,7 +457,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(qint64 startMs, qint6
     request.deviceId = camera()->getId();
     request.timePeriod = QnTimePeriod::fromInterval(startMs, endMs);
     request.sortOrder = Qt::DescendingOrder;
-    request.maxObjectsToSelect = kFetchBatchSize;
+    request.maxObjectsToSelect = limit;
     request.boundingBox = m_filterRect;
     request.freeText = m_filterText;
 

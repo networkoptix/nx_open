@@ -20,8 +20,6 @@ namespace desktop {
 
 namespace {
 
-static constexpr int kFetchBatchSize = 110;
-
 static const auto lowerBoundPredicate =
     [](const QnCameraBookmark& left, qint64 right) { return left.startTimeMs > right; };
 
@@ -146,7 +144,7 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(qint64 fromMs, qi
     filter.text = m_filterText;
     filter.orderBy.column = Qn::BookmarkStartTime;
     filter.orderBy.order = Qt::DescendingOrder;
-    filter.limit = kFetchBatchSize;
+    filter.limit = lastBatchSize();
 
     qDebug() << "Requesting bookmarks from" << utils::timestampToRfc2822(fromMs)
         << "to" << utils::timestampToRfc2822(toMs);
@@ -172,13 +170,13 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(qint64 fromMs, qi
                     << utils::timestampToRfc2822(m_prefetch.front().startTimeMs);
             }
 
-            complete(m_prefetch.size() < kFetchBatchSize
+            complete(m_prefetch.size() < lastBatchSize()
                 ? 0
                 : m_prefetch.back().startTimeMs + 1/*discard last ms*/);
         });
 }
 
-bool BookmarkSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll)
+bool BookmarkSearchListModel::Private::commitPrefetch(qint64 syncTimeToCommitMs, bool& fetchedAll)
 {
     if (!m_success)
     {
@@ -187,7 +185,7 @@ bool BookmarkSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommi
     }
 
     const auto end = std::upper_bound(m_prefetch.cbegin(), m_prefetch.cend(),
-        earliestTimeToCommitMs, upperBoundPredicate);
+        syncTimeToCommitMs, upperBoundPredicate);
 
     const auto first = this->count();
     const auto count = std::distance(m_prefetch.cbegin(), end);
@@ -209,7 +207,7 @@ bool BookmarkSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommi
         qDebug() << "Committing no bookmarks";
     }
 
-    fetchedAll = count == m_prefetch.size() && m_prefetch.size() < kFetchBatchSize;
+    fetchedAll = count == m_prefetch.size() && m_prefetch.size() < lastBatchSize();
     return true;
 }
 
@@ -245,7 +243,7 @@ void BookmarkSearchListModel::Private::watchBookmarkChanges()
 void BookmarkSearchListModel::Private::addBookmark(const QnCameraBookmark& bookmark)
 {
     // Skip bookmarks outside of time range.
-    if (!fetchedTimePeriod().contains(bookmark.startTimeMs))
+    if (!fetchedTimeWindow().contains(bookmark.startTimeMs))
         return;
 
     if (m_guidToTimestampMs.contains(bookmark.guid))

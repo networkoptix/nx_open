@@ -76,6 +76,16 @@ void UnifiedAsyncSearchListModel::setRelevantTimePeriod(const QnTimePeriod& valu
     m_sourceModel->setRelevantTimePeriod(value);
 }
 
+UnifiedAsyncSearchListModel::FetchDirection UnifiedAsyncSearchListModel::fetchDirection() const
+{
+    return m_sourceModel->fetchDirection();
+}
+
+void UnifiedAsyncSearchListModel::setFetchDirection(FetchDirection value)
+{
+    m_sourceModel->setFetchDirection(value);
+}
+
 bool UnifiedAsyncSearchListModel::isConstrained() const
 {
     return m_sourceModel && (!clientsideTextFilter().isEmpty() || m_sourceModel->isConstrained());

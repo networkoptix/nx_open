@@ -24,6 +24,7 @@ public:
     virtual void setCamera(const QnVirtualCameraResourcePtr& camera);
 
     void relevantTimePeriodChanged(const QnTimePeriod& previousValue);
+    void fetchDirectionChanged();
 
     virtual int count() const = 0;
     virtual QVariant data(const QModelIndex& index, int role, bool& handled) const = 0;
@@ -32,14 +33,14 @@ public:
 
     bool canFetchMore() const;
     bool prefetch(PrefetchCompletionHandler completionHandler);
-    void commit(qint64 earliestTimeToCommitMs);
+    void commit(qint64 syncTimeToCommitMs);
     bool fetchInProgress() const;
 
-    QnTimePeriod fetchedTimePeriod() const;
+    QnTimePeriod fetchedTimeWindow() const;
 
 protected:
     virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) = 0;
-    virtual bool commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll) = 0;
+    virtual bool commitPrefetch(qint64 syncTimeToCommitMs, bool& fetchedAll) = 0;
     virtual void clipToSelectedTimePeriod() = 0;
     virtual bool hasAccessRights() const = 0;
 
@@ -53,13 +54,20 @@ protected:
         const QnTimePeriod& period,
         std::function<void(typename DataContainer::const_reference)> itemCleanup = nullptr);
 
+    int lastBatchSize() const;
+
+private:
+    static QnTimePeriod infiniteFuture();
+
 private:
     AbstractAsyncSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
-    qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
+    QnTimePeriod m_fetchedTimeWindow = infiniteFuture();
     rest::Handle m_currentFetchId = rest::Handle();
     PrefetchCompletionHandler m_prefetchCompletionHandler;
+    FetchDirection m_prefetchDirection = FetchDirection::earlier;
     bool m_fetchedAll = false;
+    int m_lastBatchSize = 0;
 };
 
 // ------------------------------------------------------------------------------------------------

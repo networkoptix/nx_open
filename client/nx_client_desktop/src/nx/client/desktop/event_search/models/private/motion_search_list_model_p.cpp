@@ -16,12 +16,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-namespace {
-
-static constexpr int kFetchBatchSize = 110;
-
-} // namespace
-
 MotionSearchListModel::Private::Private(MotionSearchListModel* q):
     QObject(),
     q(q)
@@ -112,7 +106,7 @@ void MotionSearchListModel::Private::reset()
     const auto periods = this->periods();
     newTotalCount = periods.size();
 
-    m_data.insert(m_data.end(), periods.cbegin() + qMax(periods.size() - kFetchBatchSize, 0),
+    m_data.insert(m_data.end(), periods.cbegin() + qMax(periods.size() - q->fetchBatchSize(), 0),
         periods.cend());
 }
 
@@ -194,7 +188,7 @@ void MotionSearchListModel::Private::fetchMore()
         [this]() { q->beginFinishFetch(); },
         [this]() { q->endFinishFetch(); });
 
-    const auto delta = qMin(remaining, kFetchBatchSize);
+    const auto delta = qMin(remaining, q->fetchBatchSize());
     const auto newCount = oldCount + delta;
 
     ScopedInsertRows insertRows(q,  oldCount, newCount - 1);

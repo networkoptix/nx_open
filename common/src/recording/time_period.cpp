@@ -296,7 +296,7 @@ QnTimePeriod QnTimePeriod::truncatedFront(qint64 timeMs) const
 
 qint64 QnTimePeriod::bound(qint64 timeMs) const
 {
-    return qBound(startTimeMs, timeMs, endTimeMs());
+    return qBound(startTimeMs, timeMs, endTimeMs() - 1);
 }
 
 bool operator==(const QnTimePeriod &first, const QnTimePeriod &other)

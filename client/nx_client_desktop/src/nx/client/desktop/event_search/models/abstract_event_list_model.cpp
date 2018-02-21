@@ -151,7 +151,58 @@ void AbstractEventListModel::setRelevantTimePeriod(const QnTimePeriod& value)
     relevantTimePeriodChanged(previousValue);
 }
 
+AbstractEventListModel::FetchDirection AbstractEventListModel::fetchDirection() const
+{
+    return m_fetchDirection;
+}
+
+void AbstractEventListModel::setFetchDirection(FetchDirection value)
+{
+    if (m_fetchDirection == value)
+        return;
+
+    m_fetchDirection = value;
+    fetchDirectionChanged();
+}
+
+int AbstractEventListModel::maximumCount() const
+{
+    return m_maximumCount;
+}
+
+void AbstractEventListModel::setMaximumCount(int value)
+{
+    if (m_maximumCount == value)
+        return;
+
+    m_maximumCount = value;
+    maximumCountChanged();
+}
+
+void AbstractEventListModel::maximumCountChanged()
+{
+}
+
+int AbstractEventListModel::fetchBatchSize() const
+{
+    return m_fetchBatchSize;
+}
+
+void AbstractEventListModel::setFetchBatchSize(int value)
+{
+    m_fetchBatchSize = value;
+}
+
+QnTimePeriod AbstractEventListModel::fetchedTimeWindow() const
+{
+    return QnTimePeriod();
+}
+
 void AbstractEventListModel::relevantTimePeriodChanged(const QnTimePeriod& /*previousValue*/)
+{
+}
+
+void AbstractEventListModel::fetchDirectionChanged()
 {
 }
 
