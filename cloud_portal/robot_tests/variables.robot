@@ -11,10 +11,11 @@ ${CLOUD TEST}                         https://cloud-test.hdw.mx
 ${CLOUD DEV}                          https://cloud-dev2.hdw.mx
 ${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
 
-${CYRILLIC NAME}                     Кенгшщзх
-${SMILEY NAME}                       ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
-${GLYPH NAME}                        您都可以享受源源不絕的好禮及優惠
-${SYMBOL NAME}                       `~!@#$%^&*()_:";'{}[]+<>?,./\
+${CYRILLIC TEXT}                     Кенгшщзх
+${SMILEY TEXT}                       ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
+${GLYPH TEXT}                        您都可以享受源源不絕的好禮及優惠
+${SYMBOL TEXT}                       `~!@#$%^&*()_:";'{}[]+<>?,./\
+${TM TEXT}                           qweasdzxc123®™
 
 #Log In Elements
 ${LOG IN MODAL}                       //div[contains(@class, 'modal-content')]
@@ -43,13 +44,14 @@ ${RESET PASSWORD BUTTON}              //form[@name='restorePassword']//button[@n
 ${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//input[@type='password']
 ${SAVE PASSWORD}                      //form[@name='restorePasswordWithCode']//button[@ng-click='checkForm()']
 ${RESET EMAIL SENT MESSAGE}           //div[@ng-if='restoringSuccess']/h1[contains(text(),'${RESET EMAIL SENT MESAGE TEXT}')]
-${RESET SUCCESS MESSAGE}              //h1[@ng-if='change.success || changeSuccess']/div[contains(text(), '${RESET SUCCESS MESSAGE TEXT}')]
+${RESET SUCCESS MESSAGE}              //h1[contains(text(), '${RESET SUCCESS MESSAGE TEXT}')]
 ${RESET SUCCESS LOG IN LINK}          //h1[@ng-if='change.success || changeSuccess']//a[@href='/login']
 
 #Change Password
 ${CURRENT PASSWORD INPUT}             //form[@name='passwordForm']//input[@ng-model='pass.password']
 ${NEW PASSWORD INPUT}                 //form[@name='passwordForm']//password-input[@ng-model='pass.newPassword']//input[@type='password']
 ${CHANGE PASSWORD BUTTON}             //form[@name='passwordForm']//button[@ng-click='checkForm()']
+${PASSWORD IS REQUIRED}               //span[@ng-if='passwordInput.password.$error.required']
 
 #Register Form Elements
 ${REGISTER FIRST NAME INPUT}          //form[@name= 'registerForm']//input[@ng-model='account.firstName']
@@ -61,11 +63,14 @@ ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[cont
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula' and contains(text(), '${TERMS AND CONDITIONS LINK TEXT}')]
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), '${RESEND ACTIVATION LINK BUTTON TEXT}')]
 
+${EMAIL ALREADY REGISTERED}           //span[@ng-if="registerForm.registerEmail.$error.alreadyExists"]
+
 ${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || registerSuccess) && !activated']
 ${ACTIVATION SUCCESS}                 //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]
 ${SUCCESS LOG IN BUTTON}              //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]//a[@href='/login']
 
 #In system settings
+${FIRST USER OWNER}                   //table[@ng-if='system.users.length']/tbody/tr/td[3]/span[contains(text(),'${OWNER TEXT}')]
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
 ${RENAME SYSTEM}                      //button[@ng-click='rename()']
 ${RENAME CANCEL}                      //form[@name='renameForm']//button[@ng-click='close()']
@@ -80,6 +85,7 @@ ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
 ${DELETE USER BUTTON}                 //button[@ng-click='ok()' and contains(text(), '${DELETE USER BUTTON TEXT}')]
 ${DELETE USER CANCEL BUTTON}          //button[@ng-click='cancel()' and contains(text(), '${DELETE USER CANCEL BUTTON TEXT}')]
 ${SYSTEM NAME OFFLINE}                //span[@ng-if='!system.isOnline']
+${USERS LIST}                         //div[@process-loading='gettingSystemUsers']
 
 ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains(text(), '${SYSTEM NO ACCESS TEXT}')]
 
@@ -145,6 +151,8 @@ ${EMAIL LIVE VIEWER}                  noptixqa+liveviewer@gmail.com
 ${EMAIL OWNER}                        noptixqa+owner@gmail.com
 ${EMAIL NOT OWNER}                    noptixqa+notowner@gmail.com
 ${EMAIL ADMIN}                        noptixqa+admin@gmail.com
+${ADMIN FIRST NAME}                   asdasasd
+${ADMIN LAST NAME}                    asdasasdas
 ${EMAIL UNREGISTERED}                 noptixqa+unregistered@gmail.com
 ${EMAIL NOPERM}                       noptixqa+noperm@gmail.com
 ${BASE PASSWORD}                      qweasd123
