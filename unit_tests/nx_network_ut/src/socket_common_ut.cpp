@@ -76,7 +76,6 @@ static void testHostAddress(
 TEST(HostAddress, Base)
 {
     testHostAddress("0.0.0.0", "::", htonl(INADDR_ANY), in6addr_any);
-    testHostAddress("127.0.0.1", "::1", htonl(INADDR_LOOPBACK), in6addr_loopback);
 
     const auto kIpV4a = HostAddress::ipV4from(QString("12.34.56.78"));
     const auto kIpV6a = HostAddress::ipV6from(QString("::ffff:c22:384e")).first;
@@ -88,6 +87,20 @@ TEST(HostAddress, Base)
 
     testHostAddress("12.34.56.78", "::ffff:12.34.56.78", kIpV4a->s_addr, kIpV6a);
     testHostAddress(nullptr, "2001:db8:0:2::1", boost::none, kIpV6b);
+}
+
+TEST(HostAddress, localhost)
+{
+    ASSERT_EQ(HostAddress::ipV6from("::1"), HostAddress::localhost.ipV6());
+    ASSERT_EQ(in6addr_loopback, *HostAddress::localhost.ipV6().first);
+
+    ASSERT_EQ(*HostAddress::ipV4from("127.0.0.1"), *HostAddress::localhost.ipV4());
+    in_addr loopback;
+    memset(&loopback, 0, sizeof(loopback));
+    loopback.s_addr = htonl(INADDR_LOOPBACK);
+    ASSERT_EQ(loopback, *HostAddress::localhost.ipV4());
+
+    ASSERT_EQ("localhost", HostAddress::localhost.toString().toStdString());
 }
 
 TEST(HostAddress, IpV6FromString)

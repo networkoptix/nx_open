@@ -17,7 +17,7 @@ SystemError::ErrorCode TextIpAddressResolver::resolve(
         return SystemError::noError;
     }
 
-    HostAddress::IpV6WithScope ipV6WithScope = hostAddress.ipV6();
+    IpV6WithScope ipV6WithScope = hostAddress.ipV6();
     if (!ipV6WithScope.first || !hostAddress.isPureIpV6())
         return SystemError::hostUnreach;
 

@@ -41,8 +41,9 @@ protected:
             std::bind(&SocketStreamingTestGroupFixture::streamingServerMain, this, doServerDelay));
 
         typename SocketTypeSet::ClientSocket clientSocket;
-        SocketAddress addr("127.0.0.1", m_serverPort.get_future().get());
-        ASSERT_TRUE(clientSocket.connect(addr, nx::network::kNoTimeout));
+        const auto addr = m_serverAddress.get_future().get();
+        ASSERT_TRUE(clientSocket.connect(addr, nx::network::kNoTimeout))
+            << SystemError::getLastOSErrorText().toStdString();
         if (doServerDelay)
             clientSocket.setSendTimeout(duration_cast<milliseconds>(kClientDelay).count());
 
@@ -79,15 +80,15 @@ protected:
     }
 
 private:
-    nx::utils::promise<int> m_serverPort;
+    nx::utils::promise<SocketAddress> m_serverAddress;
 
     void streamingServerMain(bool doServerDelay)
     {
         const auto server = std::make_unique<typename SocketTypeSet::ServerSocket>();
 
-        ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
+        ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
         ASSERT_TRUE(server->listen());
-        m_serverPort.set_value(server->getLocalAddress().port);
+        m_serverAddress.set_value(server->getLocalAddress());
 
         std::unique_ptr<AbstractStreamSocket> client(server->accept());
         ASSERT_TRUE((bool)client);
@@ -289,7 +290,7 @@ protected:
     {
         m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
         ASSERT_TRUE(m_connection->connect(
-            m_server->address(), nx::network::kNoTimeout));
+            serverEndpoint(), nx::network::kNoTimeout));
     }
 
     void givenPingPongServer()
@@ -343,7 +344,7 @@ protected:
             m_clientConnections.push_back(
                 std::make_unique<ClientConnectionContext>());
             ASSERT_TRUE(m_clientConnections.back()->connection.connect(
-                m_server->address(), kNoTimeout));
+                serverEndpoint(), kNoTimeout));
             ASSERT_TRUE(m_clientConnections.back()->connection.setNonBlockingMode(true));
             m_clientConnections.back()->buffer.reserve(m_serverMessage.size());
 
@@ -415,6 +416,11 @@ protected:
     SocketAddress mappedEndpoint() const
     {
         return m_mappedEndpoint;
+    }
+
+    SocketAddress serverEndpoint() const
+    {
+        return SocketAddress(m_server->address().toString());
     }
 
 private:

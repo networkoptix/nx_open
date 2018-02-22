@@ -34,7 +34,20 @@ bool socketCannotRecoverFromError(SystemError::ErrorCode sysErrorCode)
 //-------------------------------------------------------------------------------------------------
 // HostAddress
 
-const HostAddress HostAddress::localhost(*ipV4from(lit("127.0.0.1")));
+HostAddress::HostAddress(
+    boost::optional<QString> addrStr,
+    boost::optional<in_addr> ipV4,
+    boost::optional<in6_addr> ipV6)
+    :
+    m_string(std::move(addrStr)),
+    m_ipV4(ipV4),
+    m_ipV6(ipV6)
+{
+}
+
+const HostAddress HostAddress::localhost(
+    QString("localhost"), in4addr_loopback, in6addr_loopback);
+
 const HostAddress HostAddress::anyHost(*ipV4from(lit("0.0.0.0")));
 
 HostAddress::HostAddress(const in_addr& addr):
@@ -123,6 +136,11 @@ const QString& HostAddress::toString() const
     return *m_string;
 }
 
+std::string HostAddress::toStdString() const
+{
+    return toString().toStdString();
+}
+
 boost::optional<in_addr> HostAddress::ipV4() const
 {
     if (m_ipV4)
@@ -152,7 +170,7 @@ boost::optional<in_addr> HostAddress::ipV4() const
     return boost::none;
 }
 
-HostAddress::IpV6WithScope HostAddress::ipV6() const
+IpV6WithScope HostAddress::ipV6() const
 {
     if (m_ipV6)
         return IpV6WithScope(m_ipV6, m_scopeId);
@@ -204,6 +222,23 @@ bool HostAddress::isPureIpV6() const
     return (bool) ipV6().first && !(bool) ipV4();
 }
 
+HostAddress HostAddress::toPureIpAddress(int desiredIpVersion) const
+{
+    if (desiredIpVersion == AF_INET6)
+    {
+        const auto ipv6WithScope = ipV6();
+        if (ipv6WithScope.first)
+            return HostAddress(*ipv6WithScope.first, ipv6WithScope.second);
+    }
+    else
+    {
+        if (ipV4())
+            return HostAddress(*ipV4());
+    }
+
+    return HostAddress();
+}
+
 boost::optional<uint32_t> HostAddress::scopeId() const
 {
     return m_scopeId;
@@ -232,7 +267,7 @@ boost::optional<QString> HostAddress::ipToString(
     else
         return boost::none;
 
-    if ((bool) scopeId)
+    if ((bool) scopeId && *scopeId != 0)
     {
         result += '%';
         result += QString::number(scopeId.get());
@@ -250,7 +285,7 @@ boost::optional<in_addr> HostAddress::ipV4from(const QString& ip)
     return boost::none;
 }
 
-HostAddress::IpV6WithScope HostAddress::ipV6from(const QString& ip)
+IpV6WithScope HostAddress::ipV6from(const QString& ip)
 {
     IpV6WithScope result;
     QString ipString = ip;
@@ -277,7 +312,6 @@ HostAddress::IpV6WithScope HostAddress::ipV6from(const QString& ip)
         }
     }
 
-
     struct in6_addr addr6;
     if (inet_pton(AF_INET6, ipString.toLatin1().data(), &addr6))
     {
@@ -303,11 +337,6 @@ boost::optional<in_addr> HostAddress::ipV4from(const in6_addr& v6)
         v4.s_addr = htonl(INADDR_ANY);
         return v4;
     }
-    if (std::memcmp(&v6, &in6addr_loopback, sizeof(v6)) == 0)
-    {
-        v4.s_addr = htonl(INADDR_LOOPBACK);
-        return v4;
-    }
 
     if (std::memcmp(kIpVersionMapPrefix.data(), &v6.s6_addr[0], kIpVersionMapPrefix.size()) != 0)
         return boost::none;
@@ -316,14 +345,12 @@ boost::optional<in_addr> HostAddress::ipV4from(const in6_addr& v6)
     return v4;
 }
 
-HostAddress::IpV6WithScope HostAddress::ipV6from(const in_addr& v4)
+IpV6WithScope HostAddress::ipV6from(const in_addr& v4)
 {
     // TODO: Remove this hack when IPv6 is properly supported!
     //  Try to map it from IPv4 as v4 format is preferable
     if (v4.s_addr == htonl(INADDR_ANY))
         return IpV6WithScope(in6addr_any, boost::none);
-    if (v4.s_addr == htonl(INADDR_LOOPBACK))
-        return IpV6WithScope(in6addr_loopback, boost::none);
 
     in6_addr v6;
     std::memcpy(&v6.s6_addr[0], kIpVersionMapPrefix.data(), kIpVersionMapPrefix.size());
@@ -381,6 +408,18 @@ SocketAddress::SocketAddress(const char* utf8Str):
 {
 }
 
+SocketAddress::SocketAddress(const sockaddr_in& ipv4Endpoint):
+    address(ipv4Endpoint.sin_addr),
+    port(ntohs(ipv4Endpoint.sin_port))
+{
+}
+
+SocketAddress::SocketAddress(const sockaddr_in6& ipv6Endpoint):
+    address(ipv6Endpoint.sin6_addr, ipv6Endpoint.sin6_scope_id),
+    port(ntohs(ipv6Endpoint.sin6_port))
+{
+}
+
 SocketAddress::~SocketAddress()
 {
 }
@@ -426,7 +465,15 @@ bool SocketAddress::isNull() const
 }
 
 const SocketAddress SocketAddress::anyAddress(HostAddress::anyHost, 0);
-const SocketAddress SocketAddress::anyPrivateAddress(HostAddress::localhost, 0);
+
+const SocketAddress SocketAddress::anyPrivateAddress(
+    HostAddress::localhost, 0);
+
+const SocketAddress SocketAddress::anyPrivateAddressV4(
+    HostAddress::localhost.toPureIpAddress(AF_INET), 0);
+
+const SocketAddress SocketAddress::anyPrivateAddressV6(
+    HostAddress::localhost.toPureIpAddress(AF_INET6), 0);
 
 QString SocketAddress::trimIpV6(const QString& ip)
 {

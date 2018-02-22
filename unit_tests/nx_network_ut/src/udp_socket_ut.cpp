@@ -75,10 +75,9 @@ protected:
 
         assertMessageIsReceivedFrom(
             ipVersion,
-            SocketAddress("127.0.0.1", m_sender->getLocalAddress().port));
+            m_sender->getLocalAddress());
 
-        assertSendResultIsCorrect(
-            SocketAddress("127.0.0.1", m_receiver->getLocalAddress().port));
+        assertSendResultIsCorrect(m_receiver->getLocalAddress());
     }
 
 private:
@@ -134,6 +133,10 @@ private:
                 {
                     m_successfulSendResultQueue.push(
                         SendResult{code, resolvedTargetEndpoint, size});
+                }
+                else
+                {
+                    std::cerr<<SystemError::toString(code).toStdString()<<"\n";
                 }
 
                 m_sendRetryTimer->scheduleNextTry(
@@ -191,7 +194,7 @@ private:
 
 TEST_F(UdpSocket, TransferIpV4) { udpSocketTransferTest(AF_INET, "127.0.0.1"); }
 TEST_F(UdpSocket, TransferDnsIpV4) { udpSocketTransferTest(AF_INET, "localhost"); }
-TEST_F(UdpSocket, TransferIpV6) { udpSocketTransferTest(AF_INET6, "127.0.0.1"); }
+TEST_F(UdpSocket, TransferIpV6) { udpSocketTransferTest(AF_INET6, "[::1]"); }
 TEST_F(UdpSocket, TransferDnsIpV6) { udpSocketTransferTest(AF_INET6, "localhost"); }
 
 TEST_F(UdpSocket, TransferNat64)
