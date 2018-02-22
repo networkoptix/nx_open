@@ -64,13 +64,13 @@ PrepareResult Updates2InstallerBase::checkContents(const QString& outputPath) co
     if (infoMap.isEmpty())
         return PrepareResult::updateContentsError;
 
-    m_executable = outputPath + QDir::separator() + infoMap.value("executable").toString();
-    if (m_executable.isEmpty())
+    if (infoMap.value("executable").toString().isEmpty())
     {
         NX_ERROR(this, "No executable specified in the update information file");
         return PrepareResult::updateContentsError;
     }
 
+    m_executable = outputPath + QDir::separator() + infoMap.value("executable").toString();
     if (!checkExecutable(m_executable))
     {
         NX_ERROR(this, "Update executable file is invalid");
