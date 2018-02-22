@@ -153,7 +153,7 @@ void SystemResolver::ensureLocalHostCompatibility(
     if (hostName != "localhost")
         return;
 
-    // On Linux, localhost is resolved to ::1, but ::1 can still be used to connect to.
+    // On Linux, localhost is resolved to 127.0.0.1 only, but ::1 can still be used to connect to.
     // On Windows, localhost is resolved to (127.0.01, ::1).
     // Making behavior consistent across different platforms.
 
