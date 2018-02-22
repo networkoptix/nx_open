@@ -351,6 +351,7 @@ Item
             anchors.top: timeline.bottom
             background: Rectangle { color: ColorTheme.base3 }
             padding: 4
+            z: 1
 
             IconButton
             {
