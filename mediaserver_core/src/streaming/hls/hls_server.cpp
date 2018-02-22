@@ -264,7 +264,7 @@ namespace nx_hls
         }
         m_currentFileName = fileName.toString();
 
-        const int extensionSepPos = fileName.indexOf( QChar('.') );
+        const int extensionSepPos = fileName.lastIndexOf( QChar('.') );
         const QStringRef& extension = extensionSepPos != -1 ? fileName.mid( extensionSepPos+1 ) : QStringRef();
         const QStringRef& shortFileName = fileName.mid( 0, extensionSepPos );
 
@@ -668,7 +668,7 @@ namespace nx_hls
         }
 
         QUrl baseChunkUrl;
-        baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() );
+        baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() + ".ts" );
 
         //if needed, adding proxy information to playlist url
         nx_http::HttpHeaders::const_iterator viaIter = request.headers.find( "Via" );
@@ -721,7 +721,7 @@ namespace nx_hls
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getResourceChunk(
         const nx_http::Request& request,
         const QStringRef& uniqueResourceID,
-        const QnSecurityCamResourcePtr& /*camResource*/,
+        const QnSecurityCamResourcePtr& cameraResource,
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response )
     {
@@ -763,11 +763,13 @@ namespace nx_hls
             params.streamQuality,
             requestParams);
 
-        const auto resource = commonModule()->resourcePool()->getResourceByUniqueId(currentChunkKey.srcResourceUniqueID());
         auto requiredPermission = currentChunkKey.live()
             ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
-        if (!commonModule()->resourceAccessManager()->hasPermission(d_ptr->accessRights, resource, requiredPermission))
+        if (!commonModule()->resourceAccessManager()->hasPermission(
+                d_ptr->accessRights, cameraResource, requiredPermission))
+        {
             return nx_http::StatusCode::forbidden;
+        }
 
 
         //streaming chunk
@@ -947,7 +949,7 @@ namespace nx_hls
 
         const auto& chunkAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
             accessRights,
-            HLS_PREFIX + camResource->getUniqueId(),
+            HLS_PREFIX + camResource->getUniqueId() + ".ts",
             QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS );
         newHlsSession->setChunkAuthenticationQueryItem( chunkAuthenticationKey );
 

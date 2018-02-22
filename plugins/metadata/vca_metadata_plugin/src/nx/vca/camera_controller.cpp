@@ -492,7 +492,14 @@ bool CameraController::readSupportedRulesTcpNotificationState()
 
 bool CameraController::setHeartbeat(Heartbeat heartbeat) const
 {
-    const QString yesno = heartbeat.enabled ? "yes" : "no";
+    // VCA-camera documentation sets the allowable range of heartbeat interval.
+    static const std::chrono::seconds kMinInterval(1);
+    static const std::chrono::seconds kMaxInterval(300);
+
+    if (heartbeat.interval > kMaxInterval || heartbeat.interval < kMinInterval)
+        return false;
+
+    const QString yesno = heartbeat.isEnabled ? "yes" : "no";
     const QString interval = QString::number(heartbeat.interval.count());
     static const QString kSetHeartbeatCommandPattern =
         "action=update&group=Event.Rule.health&tcp=yes&enable=%1&interval=%2";

@@ -1,7 +1,7 @@
 #include "event_handler.h"
 
 #include <plugins/plugin_tools.h>
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include <nx/sdk/metadata/events_metadata_packet.h>
 #include <nx/sdk/metadata/objects_metadata_packet.h>
@@ -60,7 +60,8 @@ void EventHandler::handleMetadata(
 
         auto eventState = nx::vms::event::EventState::undefined;
 
-        const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->eventTypeId());
+        const auto eventTypeId =
+            nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(eventData->eventTypeId());
 
         auto descriptor = eventDescriptor(eventTypeId);
         if (descriptor.flags.testFlag(nx::api::Analytics::EventTypeFlag::stateDependent))

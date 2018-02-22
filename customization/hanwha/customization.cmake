@@ -1,4 +1,4 @@
-set(defaultSkin "dark_orange")
+set(defaultSkin "gray_orange")
 
 # Components Namings
 set(display.product.name "Wisenet WAVE")

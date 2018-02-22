@@ -3,18 +3,12 @@
 #include <chrono>
 #include <algorithm>
 
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 #include <nx/utils/std/cpp14.h>
-#include <network/tcp_connection_priv.h>
 #include <nx/network/system_socket.h>
-#include <api/http_client_pool.h>
-
-#include <nx/utils/log/log.h>
-#define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
-    nx::utils::log::Level::debug, "vca_metadata_plugin") NX_PRINT_PREFIX
-#include <nx/kit/debug.h>
 
 #include "manager.h"
+#include "log.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -202,7 +196,7 @@ nx::sdk::Error Monitor::startMonitoring(nxpl::NX_GUID* eventTypeList,
 {
     for (int i = 0; i < eventTypeListSize; ++i)
     {
-        QnUuid id = nxpt::fromPluginGuidToQnUuid(eventTypeList[i]);
+        QnUuid id = nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(eventTypeList[i]);
         const AnalyticsEventType* eventType = m_manager->eventByUuid(id);
         if (!eventType)
             NX_PRINT << "Unknown event type. TypeId = " << id.toStdString();
@@ -296,4 +290,3 @@ void Monitor::onTimer()
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
-

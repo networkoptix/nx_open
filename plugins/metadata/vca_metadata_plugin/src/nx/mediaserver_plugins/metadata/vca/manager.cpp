@@ -4,7 +4,7 @@
 
 #include <QtCore/QUrl>
 
-#include <plugins/plugin_internal_tools.h> //< nxpt::fromQnUuidToPluginGuid
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
@@ -12,12 +12,8 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/std/cppnx.h>
 
-#include <nx/utils/log/log.h>
-#define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
-    nx::utils::log::Level::debug, "vca_metadata_plugin") NX_PRINT_PREFIX
-#include <nx/kit/debug.h>
-
 #include "nx/vca/camera_controller.h"
+#include "log.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -41,7 +37,8 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(
     const AnalyticsEventType& event, bool active)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
-    commonEvent->setEventTypeId(nxpt::fromQnUuidToPluginGuid(event.eventTypeId));
+    commonEvent->setEventTypeId(
+        nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(event.eventTypeId));
     commonEvent->setCaption(event.eventName.value.toStdString());
     commonEvent->setDescription(event.eventName.value.toStdString());
     commonEvent->setIsActive(active);
@@ -65,7 +62,7 @@ nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
 }
 
 template<class T, size_t N, class Check = std::enable_if_t<!std::is_same<const char*, T>::value>>
-std::array<T, N> decorate(const std::array<T, N>& src)
+std::array<T, N> makeEventSearchKeys(const std::array<T, N>& src)
 {
     std::array<T, N> result;
     std::transform(src.begin(), src.end(), result.begin(),
@@ -78,10 +75,10 @@ std::array<T, N> decorate(const std::array<T, N>& src)
     return result;
 }
 
-static const auto kEventMessageKeys = stdnx::make_array<QByteArray>(
+static const auto kEventMessageKeys = nx::utils::make_array<QByteArray>(
     "ip", "unitname", "datetime", "dts", "type", "info", "id", "rulesname", "rulesdts");
 
-static const auto kEventMessageSearchKeys = decorate(kEventMessageKeys);
+static const auto kEventMessageSearchKeys = makeEventSearchKeys(kEventMessageKeys);
 
 std::pair<const char*, const char*> findString(const char* messageBegin, const char* messageEnd,
     const QByteArray& key)
@@ -385,7 +382,7 @@ nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler
 
     for (int i = 0; i < eventTypeListSize; ++i)
     {
-        QnUuid id = nxpt::fromPluginGuidToQnUuid(eventTypeList[i]);
+        QnUuid id = nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(eventTypeList[i]);
         const AnalyticsEventType* eventType = m_plugin->eventByUuid(id);
         if (!eventType)
             NX_PRINT << "Unknown event type. TypeId = " << id.toStdString();

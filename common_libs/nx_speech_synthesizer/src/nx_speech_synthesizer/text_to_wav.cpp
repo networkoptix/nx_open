@@ -1,4 +1,3 @@
-#if !defined(EDGE_SERVER) && !defined(DISABLE_FESTIVAL)
 #include "text_to_wav.h"
 
 #include <QtCore/QFile>
@@ -442,4 +441,3 @@ QSharedPointer<TextToWaveServer::SynthetiseSpeechTask> TextToWaveServer::addTask
     task->dest = dest;
     return m_textQueue.push( task ) ? task : QSharedPointer<SynthetiseSpeechTask>();
 }
-#endif

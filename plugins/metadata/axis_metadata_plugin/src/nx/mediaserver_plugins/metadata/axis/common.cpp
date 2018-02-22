@@ -1,10 +1,12 @@
 #include "common.h"
 
-#include <plugins/plugin_internal_tools.h>
+#include <QCryptographicHash>
+
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/uuid.h>
-#include <utils/common/id.h>
+//#include <utils/common/id.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -38,8 +40,14 @@ QString ignoreNamespaces(const QString& tags)
 
 QnUuid guidFromEventName(const char* eventFullName)
 {
-    const QString line(eventFullName);
-    return guidFromArbitraryData(ignoreNamespaces(line).toLatin1());
+    // TODO: Use guidFromArbitraryData here after moving QnUuid functions from common to common_libs
+    const QString kTrimmedEventFullName = ignoreNamespaces(QString(eventFullName));
+    const char* bytesToHash = kTrimmedEventFullName.toUtf8().constData();
+
+    QCryptographicHash md5Hash(QCryptographicHash::Md5);
+    md5Hash.addData(bytesToHash);
+    QByteArray hashResult = md5Hash.result();
+    return QnUuid::fromRfc4122(hashResult);
 }
 
 } // namespace
@@ -59,7 +67,7 @@ AnalyticsEventType::AnalyticsEventType(const nx::axis::SupportedEvent& supported
 
     topic = supportedEvent.topic.c_str();
     name = supportedEvent.name.c_str();
-    eventTypeIdExternal = nxpt::fromQnUuidToPluginGuid(eventTypeId);
+    eventTypeIdExternal = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(eventTypeId);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventType, (json),

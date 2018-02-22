@@ -11,14 +11,10 @@
 
 #include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
-#include <plugins/plugin_internal_tools.h>
-
-#include <nx/utils/log/log.h>
-#define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
-    nx::utils::log::Level::debug, "vca_metadata_plugin") NX_PRINT_PREFIX
-#include <nx/kit/debug.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include "manager.h"
+#include "log.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -166,3 +162,4 @@ NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
 }
 
 } // extern "C"
+

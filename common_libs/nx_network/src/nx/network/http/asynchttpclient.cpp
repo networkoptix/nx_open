@@ -902,8 +902,9 @@ void AsyncHttpClient::processResponseHeadersBytes(
 
     // Connection could have already been closed by remote peer.
 
-    if (m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber ||       //still reading previous message
-        m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders)     //still reading message headers
+    // (if still reading previous message) or (still reading message headers)
+    if (m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber
+        || m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders)
     {
         //response has not been read yet, reading further
         m_responseBuffer.resize(0);
@@ -948,9 +949,9 @@ void AsyncHttpClient::processResponseHeadersBytes(
     m_state = sResponseReceived;
     const auto requestSequenceBak = m_requestSequence;
     emit responseReceived(sharedThis);
-    if (m_terminated ||
-        (m_requestSequence != requestSequenceBak))  //user started new request within responseReceived handler
+    if (m_terminated || (m_requestSequence != requestSequenceBak))
     {
+        // User started new request within responseReceived handler.
         return;
     }
 
@@ -1107,7 +1108,8 @@ void AsyncHttpClient::processResponseMessageBodyBytes(
 
 void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
 {
-    const bool useHttp11 = true;   //TODO #ak check if we need it (e.g. we using keep-alive or requesting live capture)
+    // TODO: #ak check if we need it (e.g. we using keep-alive or requesting live capture).
+    const bool useHttp11 = true;
 
     m_request.requestLine.method = httpMethod;
 
@@ -1156,13 +1158,13 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
         }
     }
 
-    // It is not correct just to replace headers because there
-    // could be multiple headers with same name in m_additionalHeaders.
+    // It is not correct just to replace headers because there could be multiple headers with same
+    // name in m_additionalHeaders.
     for (const auto& header: m_additionalHeaders)
         m_request.headers.erase(header.first);
     m_request.headers.insert(m_additionalHeaders.cbegin(), m_additionalHeaders.cend());
 
-    //adding user credentials
+    // Adding user credentials.
     if (!m_contentLocationUrl.userName().isEmpty())
         m_userName = m_contentLocationUrl.userName();
     if (!m_contentLocationUrl.password().isEmpty())
@@ -1170,8 +1172,9 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
     m_contentLocationUrl.setUserName(m_userName);
     m_contentLocationUrl.setPassword(m_userPassword);
 
-    //adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
-    //TODO #ak remove it after 2.3 support is over
+    // Adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4
+    // (generate user's digest).
+    // TODO #ak remove it after 2.3 support is over.
     if (!m_userName.isEmpty() &&
         m_request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME) == m_request.headers.end())
     {
@@ -1267,11 +1270,14 @@ bool AsyncHttpClient::resendRequestWithAuthorization(
     bool isProxy)
 {
     const StringType authenticateHeaderName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
-    const StringType authorizationHeaderName = isProxy ? StringType("Proxy-Authorization") : header::Authorization::NAME;
+    const StringType authorizationHeaderName = isProxy
+        ? StringType("Proxy-Authorization")
+        : header::Authorization::NAME;
     const QString userName = isProxy ? m_proxyUserName : m_userName;
     const QString userPassword = isProxy ? m_proxyUserPassword : m_userPassword;
 
-    //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
+    // If response contains WWW-Authenticate with Digest authentication, generating
+    // "Authorization: Digest" header and adding it to custom headers.
     NX_ASSERT(response.statusLine.statusCode == StatusCode::unauthorized ||
                 response.statusLine.statusCode == StatusCode::proxyAuthenticationRequired);
 
@@ -1312,7 +1318,8 @@ bool AsyncHttpClient::resendRequestWithAuthorization(
                 m_authType == authDigestWithPasswordHash
                     ? userPassword.toLatin1()
                     : boost::optional<nx_http::BufferType>(),
-                m_contentLocationUrl.toString(QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority | QUrl::FullyEncoded).toUtf8(),
+                m_contentLocationUrl.toString(QUrl::RemoveScheme | QUrl::RemovePort
+                    | QUrl::RemoveAuthority | QUrl::FullyEncoded).toUtf8(),
                 wwwAuthenticateHeader,
                 &digestAuthorizationHeader))
         {
@@ -1368,7 +1375,8 @@ void AsyncHttpClient::doSomeCustomLogic(
         return;
 
     //calculating user's digest with new realm
-    const auto newRealmDigest = calcHa1(m_userName.toUtf8(), realmIter->second, m_userPassword.toUtf8());
+    const auto newRealmDigest = calcHa1(m_userName.toUtf8(), realmIter->second,
+        m_userPassword.toUtf8());
     const auto cryptSha512Hash = linuxCryptSha512(
         m_userPassword.toUtf8(),
         generateSalt(LINUX_CRYPT_SALT_LENGTH));
@@ -1465,10 +1473,10 @@ void AsyncHttpClient::setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody
 
 void downloadFileAsyncEx(
     const QUrl& url,
-    std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType, nx_http::HttpHeaders)> completionHandler,
+    DownloadCompletionHandlerEx completionHandlerEx,
     nx_http::AsyncHttpClientPtr httpClientCaptured)
 {
-    auto requestCompletionFunc = [httpClientCaptured, completionHandler]
+    auto requestCompletionFunc = [httpClientCaptured, completionHandlerEx]
     (nx_http::AsyncHttpClientPtr httpClient) mutable
     {
         httpClientCaptured->disconnect(nullptr, (const char*)nullptr);
@@ -1476,7 +1484,7 @@ void downloadFileAsyncEx(
 
         if (httpClient->failed())
         {
-            completionHandler(
+            completionHandlerEx(
                 SystemError::connectionReset,
                 nx_http::StatusCode::ok,
                 nx_http::StringType(),
@@ -1488,7 +1496,7 @@ void downloadFileAsyncEx(
         if (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok &&
             httpClient->response()->statusLine.statusCode != nx_http::StatusCode::partialContent)
         {
-            completionHandler(
+            completionHandlerEx(
                 SystemError::noError,
                 httpClient->response()->statusLine.statusCode,
                 nx_http::StringType(),
@@ -1497,7 +1505,7 @@ void downloadFileAsyncEx(
             return;
         }
 
-        completionHandler(
+        completionHandlerEx(
             SystemError::noError,
             httpClient->response()->statusLine.statusCode,
             httpClient->contentType(),
@@ -1514,8 +1522,7 @@ void downloadFileAsyncEx(
 
 void downloadFileAsyncEx(
     const QUrl& url,
-    std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType,
-        nx_http::HttpHeaders)> completionHandler,
+    DownloadCompletionHandlerEx completionHandlerEx,
     const nx_http::HttpHeaders& extraHeaders,
     AsyncHttpClient::AuthType authType,
     AsyncHttpClient::Timeouts timeouts)
@@ -1526,25 +1533,25 @@ void downloadFileAsyncEx(
     httpClient->setSendTimeoutMs(timeouts.sendTimeout.count());
     httpClient->setResponseReadTimeoutMs(timeouts.responseReadTimeout.count());
     httpClient->setMessageBodyReadTimeoutMs(timeouts.messageBodyReadTimeout.count());
-    downloadFileAsyncEx(url, completionHandler, std::move(httpClient));
+    downloadFileAsyncEx(url, completionHandlerEx, std::move(httpClient));
 }
 
 void downloadFileAsync(
     const QUrl& url,
-    std::function<void(SystemError::ErrorCode, int, nx_http::BufferType, nx_http::HttpHeaders)> completionHandler,
+    DownloadCompletionHandler completionHandler,
     const nx_http::HttpHeaders& extraHeaders,
     AsyncHttpClient::AuthType authType,
     AsyncHttpClient::Timeouts timeouts)
 {
-    auto handler = [completionHandler](
+    DownloadCompletionHandlerEx handler = [completionHandler](
         SystemError::ErrorCode osErrorCode,
         int statusCode,
         nx_http::StringType,
         nx_http::BufferType msgBody,
         nx_http::HttpHeaders httpHeaders)
-    {
-        completionHandler(osErrorCode, statusCode, msgBody, httpHeaders);
-    };
+        {
+            completionHandler(osErrorCode, statusCode, msgBody, httpHeaders);
+        };
     downloadFileAsyncEx(url, handler, extraHeaders, authType, timeouts);
 }
 

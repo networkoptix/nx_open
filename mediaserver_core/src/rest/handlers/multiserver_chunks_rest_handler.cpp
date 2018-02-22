@@ -50,7 +50,8 @@ static void loadRemoteDataAsync(
 {
     auto requestCompletionFunc =
         [ctx, &outputData, server, requestNum, timer](SystemError::ErrorCode osErrorCode,
-            int statusCode, nx_http::BufferType msgBody, nx_http::HttpHeaders /*httpHeaders*/)
+            int statusCode, nx_http::BufferType msgBody,
+            nx_http::HttpHeaders /*httpResponseHeaders*/)
         {
             MultiServerPeriodDataList remoteData;
             bool success = false;
@@ -84,7 +85,8 @@ static void loadRemoteDataAsync(
     modifiedRequest.isLocal = true;
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
 
-    runMultiserverDownloadRequest(commonModule->router(), apiUrl, server, requestCompletionFunc, ctx);
+    runMultiserverDownloadRequest(
+        commonModule->router(), apiUrl, server, requestCompletionFunc, ctx);
 }
 
 static void loadLocalData(
@@ -152,9 +154,11 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
     else
     {
         QSet<QnMediaServerResourcePtr> onlineServers;
-        for (const auto& camera: ctx.request().resList)
-            onlineServers += owner->commonModule()->cameraHistoryPool()->getCameraFootageData(camera, true).toSet();
-
+        for (const auto& camera : ctx.request().resList)
+        {
+            onlineServers += owner->commonModule()->cameraHistoryPool()
+                ->getCameraFootageData(camera, true).toSet();
+        }
         for (const auto& server: onlineServers)
         {
             if (server->getId() == owner->commonModule()->moduleGUID())
@@ -165,7 +169,8 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
             }
             else
             {
-                loadRemoteDataAsync(owner->commonModule(), outputData, server, &ctx, requestNum, timer);
+                loadRemoteDataAsync(
+                    owner->commonModule(), outputData, server, &ctx, requestNum, timer);
                 qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #"
                     << requestNum << ". After loading remote data from server" << server->getId()
                     << ". timeout=" << timer.elapsed();
@@ -187,7 +192,8 @@ int QnMultiserverChunksRestHandler::executeGet(
 {
     MultiServerPeriodDataList outputData;
     QnRestResult restResult;
-    QnChunksRequestData request = QnChunksRequestData::fromParams(owner->commonModule()->resourcePool(), params);
+    QnChunksRequestData request =
+        QnChunksRequestData::fromParams(owner->commonModule()->resourcePool(), params);
 
     int requestNum = ++staticRequestNum;
     QElapsedTimer timer;
@@ -198,7 +204,8 @@ int QnMultiserverChunksRestHandler::executeGet(
     if (!request.isValid())
     {
         restResult.setError(QnRestResult::InvalidParameter, "Invalid parameters");
-        QnFusionRestHandlerDetail::serializeRestReply(outputData, params, result, contentType, restResult);
+        QnFusionRestHandlerDetail::serializeRestReply(
+            outputData, params, result, contentType, restResult);
         return nx_http::StatusCode::ok;
     }
     outputData = loadDataSync(request, owner, requestNum, timer);
@@ -222,7 +229,6 @@ int QnMultiserverChunksRestHandler::executeGet(
             QnFusionRestHandlerDetail::serializeRestReply(
                 timePeriodList, params, result, contentType, restResult);
         }
-
     }
     else
     {

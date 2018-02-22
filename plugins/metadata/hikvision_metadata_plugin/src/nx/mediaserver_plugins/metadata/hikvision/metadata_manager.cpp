@@ -7,7 +7,7 @@
 
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 #include <nx/utils/log/log_main.h>
 
 namespace nx {
@@ -85,7 +85,7 @@ Error MetadataManager::startFetchingMetadata(
     NX_ASSERT(m_plugin);
     std::vector<QnUuid> eventTypes;
     for (int i = 0; i < typeListSize; ++i)
-        eventTypes.push_back(nxpt::fromPluginGuidToQnUuid(typeList[i]));
+        eventTypes.push_back(nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(typeList[i]));
     m_monitor =
         std::make_unique<HikvisionMetadataMonitor>(m_plugin->driverManifest(), m_url, m_auth, eventTypes);
 

@@ -65,10 +65,8 @@
 #include <ui/workaround/mac_utils.h>
 #endif
 
-#ifndef DISABLE_FESTIVAL
 #include <nx_speech_synthesizer/text_to_wav.h>
 #include <nx/utils/file_system.h>
-#endif
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
@@ -271,13 +269,11 @@ int main(int argc, char** argv)
     mac_setLimits();
 #endif
 
-#ifndef DISABLE_FESTIVAL
     std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
         nx::utils::file_system::applicationDirPath(argc, argv));
 
     textToWaveServer->start();
     textToWaveServer->waitForStarted();
-#endif
 
     const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
     if (startupParams.hiDpiDisabled)

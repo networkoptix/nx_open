@@ -123,7 +123,7 @@ namespace nx_hls
         nx_http::StatusCode::Value getResourceChunk(
             const nx_http::Request& request,
             const QStringRef& uniqueResourceID,
-            const QnSecurityCamResourcePtr& camResource,
+            const QnSecurityCamResourcePtr& cameraResource,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
 

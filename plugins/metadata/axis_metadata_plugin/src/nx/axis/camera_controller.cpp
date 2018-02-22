@@ -10,6 +10,8 @@
 #include <sstream>
 #include <tuple>
 
+#include <nx/utils/thread/mutex.h>
+
 #include "httpda.h" //< gsoap header for digest authentication
 
 namespace nx {
@@ -55,6 +57,9 @@ bool makeSoapRequest(
     const char* password)
 {
     static const int kAuthenticationError = 401;
+
+    static QnMutex soapMutex;
+    QnMutexLocker locker(&soapMutex);
 
     // Plugin deregistering actions and memory deallocation run in ServiceGuard destructor.
     soap_register_plugin(service.soap, http_da);

@@ -4,13 +4,14 @@
 #include <type_traits>
 #include <utility>
 
-/**
+/**@file
   * This file is for c++ utilities that are absent in modern c++ standards but can be easily
   * implemented using c++14. Some of them are in std::experimental, some present on selected
   * compilers, some are waiting in c++20 and further standards.
  */
 
-namespace stdnx {
+namespace nx {
+namespace utils {
 
 /*
  * While declaring c arrays one may omit size if uses initialization, e.g.: int x[] = {9, 8, 7};
@@ -29,4 +30,5 @@ constexpr std::array<std::common_type_t<Ts...>, sizeof...(Ts)> make_array(Ts&&..
     return {std::forward<Ts>(ts)...};
 }
 
-} // namespace stdnx
+}   //namespace utils
+}   //namespace nx
