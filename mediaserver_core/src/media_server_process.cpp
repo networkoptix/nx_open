@@ -726,20 +726,14 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
 
-        nx::mserver_aux::UnmountedLocalStoragesFilter unmountedLocalStoragesFilter(QnAppInfo::mediaFolderName());
-        auto unMountedStorages = unmountedLocalStoragesFilter.getUnmountedStorages(
-                [this]()
-                {
-                    QnStorageResourceList result;
-                    for (const auto& storage: m_mediaServer->getStorages())
-                        if (!storage->isExternal())
-                            result.push_back(storage);
-
-                    return result;
-                }(),
-                listRecordFolders(true));
-
-        storagesToRemove.append(unMountedStorages);
+        const auto unmountedStorages =
+            mserver_aux::getUnmountedStorages(m_mediaServer->getStorages());
+        for (const auto& storageResource: unmountedStorages)
+        {
+            auto fileStorageResource = storageResource.dynamicCast<QnFileStorageResource>();
+            if (fileStorageResource)
+                fileStorageResource->setMounted(false);
+        }
 
         NX_DEBUG(this, lm("Found %1 storages to remove").arg(storagesToRemove.size()));
         for (const auto& storage: storagesToRemove)

@@ -51,6 +51,7 @@
 #include "database/server_db.h"
 #include "common/common_globals.h"
 #include <media_server/media_server_module.h>
+#include <media_server_process_aux.h>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -396,12 +397,21 @@ public:
     TestStorageThread(QnStorageManager* owner): m_owner(owner) {}
     virtual void run() override
     {
+        auto unmountedStorages = nx::mserver_aux::getUnmountedStorages(storagesToTest());
+        for (const auto& storage: storagesToTest())
+        {
+            auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
+            if (fileStorage && !unmountedStorages.contains(storage))
+                fileStorage->setMounted(true);
+        }
+
         for (const auto& storage : storagesToTest())
         {
             if (needToStop())
                 return;
 
-            Qn::ResourceStatus status = storage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
+            Qn::ResourceStatus status =
+                storage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
             if (storage->getStatus() != status)
                 m_owner->changeStorageStatus(storage, status);
 
