@@ -96,7 +96,6 @@ copyBuildLibs()
         libnx_fusion
         libnx_kit
         libnx_network
-        libnx_speech_synthesizer
         libnx_utils
 
         # ffmpeg
@@ -118,6 +117,12 @@ copyBuildLibs()
     local OPTIONAL_LIBS_TO_COPY=(
         libvpx
     )
+
+    if [ "$BOX" != "edge1" ]; then
+        LIBS_TO_COPY+=(
+            libnx_speech_synthesizer
+        )
+    fi
 
     # Libs for BananaPi-based platforms.
     if [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
