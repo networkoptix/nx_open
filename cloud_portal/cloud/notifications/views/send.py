@@ -53,7 +53,7 @@ def send_to_all_users(sent_by, notification, force=False):
     notification.save()
     for user in users:
         message['full_name'] = user.get_full_name()
-        api.send(user.email, 'cloud_notification', message, 'default')
+        api.send(user.email, 'cloud_notification', message, user.customization)
 
 
 def update_or_create_notification(data):
@@ -133,7 +133,7 @@ def cloud_notification_action(request):
         notification_id = str(update_or_create_notification(request.data))
         message = format_message(CloudNotification.objects.get(id=notification_id))
         message['full_name'] = request.user.get_full_name()
-        api.send(request.user.email, 'cloud_notification', message, 'default')
+        api.send(request.user.email, 'cloud_notification', message, request.user.customization)
         messages.success(request._request, "Preview has been sent")
 
     elif can_send and 'Send' in request.data and notification_id:

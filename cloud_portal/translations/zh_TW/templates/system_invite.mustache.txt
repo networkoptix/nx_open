@@ -9,5 +9,5 @@
 You have been granted access to {{message.system_name}}.
 {{/message.sharer_name}}
 
-註冊並查看系統: {{config.portal_url}}/register/{{message.code}}
+註冊並查看系統: {{config.portal_url}}/註冊/{{message.code}}
 

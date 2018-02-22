@@ -5,7 +5,7 @@
   "dialogs": {
     "okButton": "Oké",
     "cancelButton": "Annuleren",
-    "loginTitle": "Meld u aan bij {{PRODUCT_NAME}}",
+    "loginTitle": "Log in op {{PRODUCT_NAME}}",
     "loginButton": "Log in",
     "logoutAuthorisedTitle": "U bent reeds ingelogd",
     "logoutAuthorisedContinueButton": "Doorgaan",
@@ -40,7 +40,7 @@
     "activated": "geactiveerd",
     "online": "online",
     "offline": "offline",
-    "unavailable": "niet Beschikbaar"
+    "unavailable": "niet beschikbaar"
   },
   "accessRoles": {
     "disabled": {
@@ -85,10 +85,10 @@
     },
     "viewer": {
       "label": "Kijker",
-      "description": "Kan live video bekijken en doorzoeken in het archief"
+      "description": "Kan live video bekijken en zoeken in het archief"
     },
     "liveViewer": {
-      "label": "Live Viewer",
+      "label": "Live kijker",
       "description": "Kan alleen live video bekijken"
     },
     "advancedViewer": {
@@ -97,11 +97,11 @@
     },
     "custom": {
       "label": "Aangepast",
-      "description": "Gebruik de {{PRODUCT_NAME}} Client-applicatie om aangepaste toestemmingen op te stellen"
+      "description": "Gebruik de {{PRODUCT_NAME}} client-applicatie om aangepaste rechten in te stellen"
     }
   },
   "errorCodes": {
-    "ok": "oké",
+    "ok": "oke",
     "cantSendActivationPrefix": "Kan geen bevestigingsmail versturen",
     "cantDisconnectSystemPrefix": "Kan het systeem niet verwijderen",
     "cantUnshareWithMeSystemPrefix": "Kan het systeem niet verwijderen",
@@ -162,7 +162,7 @@
     "confirmRenameTitle": "Systeemnaam",
     "confirmRenameAction": "Opslaan",
     "successRename": "Systeemnaam opgeslagen",
-    "confirmDisconnectTitle": "Ontkoppel het systeem van {{PRODUCT_NAME}}?",
+    "confirmDisconnectTitle": "Verbinding verbreken met systeem {{PRODUCT_NAME}}?",
     "confirmDisconnectAction": "Verbinding verbreken",
     "confirmUnshareFromMe": "U staat op het punt om dit systeem uit uw account te verbreken. U kunt dit systeem niet meer gebruiken. Weet u het zeker?",
     "confirmUnshareFromMeTitle": "Systeem loskoppelen?",
@@ -250,12 +250,12 @@
   },
   "activeActions": {
     "sendConfirm": "Activatielink opnieuw verzenden",
-    "resetPassword": "Wachtwoord resetten",
+    "resetPassword": "Reset wachtwoord",
     "setNewPassword": "Wachtwoord opslaan",
     "setNewPasswordLabel": "Nieuw wachtwoord"
   },
   "regActions": {
-    "passwordLabel": "Wachtwoord",
+    "passwordLabel": "Password",
     "createAccount": "Account aanmaken"
   },
   "header": {

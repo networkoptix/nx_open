@@ -30,7 +30,7 @@
                             <td><div class="name">{{cloud.ownerName}}</div>
                                 <div class="hint">{{cloud.ownerEmail}}</div></td>
                         </tr>
-                        {{/cloud}}
+                        {{/bulut}}
                         </tbody>
                     </table>
                 </div>
@@ -70,7 +70,7 @@
                                 <b>Web sitesi</b><br>
                                 <a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
-                        {{/system}}
+                        {{/sistem}}
                         <td class="left-border">
                             <b>Destek</b><br>
                             <a href="{{supportLink}}">{{supportLinkText}}</a>

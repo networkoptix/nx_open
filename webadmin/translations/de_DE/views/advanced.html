@@ -106,7 +106,7 @@
             Es wurde kein Hauptspeicher für das Schreiben ausgewählt - Video wird nicht auf diesem Server aufgezeichnet.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Der reservierte Speicherplatz ist größer als der freie Speicherplatz. Videomaterial kann entfernt werden, um Speicherplatz freizugeben.
+            Reservierter Speicherplatz ist größer als der freie Speicherplatz. Das aktuelle Videomaterial kann entfernt werden, um Speicherplatz freizugeben.
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Beheben Sie alle markierten Einstellungen, um abspeichern zu können</div>
 
@@ -208,7 +208,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Warnung!</b> Einige Änderungen erfordern einen Neustart <b>alle</b> die Server im System.<br><br>
+        <b>Warnung!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Aktuellen Server neu starten</button>
         </div>

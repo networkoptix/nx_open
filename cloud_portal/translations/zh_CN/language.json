@@ -1,7 +1,7 @@
 {
-  "language_name": "简体中文",
+  "language_name": "LANGUAGE_NAME",
   "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}",
   "dialogs": {
     "okButton": "确定",
     "cancelButton": "取消",
@@ -12,7 +12,7 @@
     "logoutAuthorisedLogoutButton": "退出登录"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
+    "template": "{{title}}{{PRODUCT_NAME}}",
     "default": "{{PRODUCT_NAME}}",
     "registerSuccess": "欢迎来到",
     "register": "创建帐户中",
