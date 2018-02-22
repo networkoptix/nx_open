@@ -23,6 +23,9 @@ angular.module('nxCommon', [
         if($location.search().debug){
             Config.allowDebugMode = $location.search().debug;
         }
+        if($location.search().beta){
+            Config.allowBetaMode = $location.search().beta;
+        }
         return original.apply($location, [path]);
     };
 

@@ -38,7 +38,9 @@ canvas{
   height: 100px;
 }
 
-
+.add-cursor{
+  cursor: pointer;
+}
 
 
 ng-include{
@@ -233,6 +235,7 @@ ng-include{
   background-color:$additional_light2;
   border-left: 1px solid $light6;
   border-right: 1px solid $light4;
+  cursor: pointer;
 
   .webclient-button{
     margin: 40px auto;

@@ -6,12 +6,13 @@ angular.module('nxCommon')
 			restrict: 'E',
         	scope:{
         	    flags: "=",
-        	    preloader: "="
+        	    preloader: "=",
+                preview: "="
         	},
         	templateUrl: Config.viewsDirCommon + 'components/placeholder.html',
         	link: function(scope){
                 scope.$watch('flags', function(){
-                    scope.title = null;
+                    scope.placeholderTitle = null;
                     scope.message = null;
                     scope.iconClass = null;
                     scope.condition = false;
@@ -46,13 +47,13 @@ angular.module('nxCommon')
 
                     //offline and unauthorized are special cases. All others can be set without editing
                     if(scope.alertType == 'status'){
-                        scope.title = L.common.cameraStates[(scope.flags[scope.alertType]).toLowerCase()];
+                        scope.placeholderTitle = L.common.cameraStates[(scope.flags[scope.alertType]).toLowerCase()];
                         scope.message = null;
                         scope.iconClass = scope.flags.status == 'Offline' ? 'camera-view-offline' : 'camera-view-unauthorized';
                     }
                     else{
                         scope.iconClass = 'camera-view-error';
-                        scope.title = L.common.cameraStates.error;
+                        scope.placeholderTitle = L.common.cameraStates.error;
                         scope.message = L.common.cameraStates[scope.alertType];
                     }
                 }, true);
