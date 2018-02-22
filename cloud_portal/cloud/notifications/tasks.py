@@ -9,6 +9,7 @@ from celery.exceptions import Ignore
 from django.conf import settings
 
 from api.models import Account
+from notifications.models import CloudNotification
 
 import traceback
 import logging
@@ -57,21 +58,28 @@ def send_email(user_email, type, message, customization, attempt=1):
 # For testing we dont want to send emails to everyone so we need to set
 # "BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = true" in cloud.settings
 @shared_task
-def send_to_all_users(message, force=False):
+def send_to_all_users(notification_id, message, force=False):
     # if forced and not testing dont apply any filters to send to all users
-    users = Account.objects.all()
+    try:
+        users = Account.objects.all()
 
-    if not force:
-        users = users.filter(subscribe=True)
+        if not force:
+            users = users.filter(subscribe=True)
 
-    if settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY:
-        users = users.filter(is_superuser=True)
+        if settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY:
+            users = users.filter(is_superuser=True)
 
-    for user in users:
-        message['full_name'] = user.get_full_name()
-        send_email.delay(user.email, 'cloud_notification', message, user.customization)
+        for user in users:
+            message['full_name'] = user.get_full_name()
+            send_email.delay(user.email, 'cloud_notification', message, user.customization)
+    except:
+        #If an error happens we need to unblock notification so it can be sent again
+        notification = CloudNotification.objects.get(id=notification_id)
+        notification.send_by = None
+        notification.sent_date = None
+        notification.save()
 
-    return {'subject': message['subject'], 'force': force}
+    return {'notification_id': notification_id, 'subject': message['subject'], 'force': force}
 
 
 @shared_task
