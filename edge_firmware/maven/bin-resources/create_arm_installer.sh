@@ -79,6 +79,13 @@ copyLib() # file lib_dir alt_lib_dir symlink_target_dir
     fi
 }
 
+# [in] Library name
+# [in] Destination directory
+copy_sys_lib()
+{
+    "$SOURCE_DIR"/build_utils/copy_system_library.sh -c "$COMPILER" "$@"
+}
+
 #--------------------------------------------------------------------------------------------------
 
 # [in] LIB_INSTALL_DIR
@@ -455,13 +462,11 @@ copyVox()
 }
 
 # [in] LIB_INSTALL_DIR
-copyToolchainLibsIfNeeded()
+copyToolchainLibs()
 {
-    [ -z "$TOOLCHAIN_LIB_DIR" ] && exit
-
     echo "Copying toolchain libs (libstdc++, libatomic)"
-    cp -r "$TOOLCHAIN_LIB_DIR/libstdc++.so"* "$LIB_INSTALL_DIR/"
-    cp -r "$TOOLCHAIN_LIB_DIR/libatomic.so"* "$LIB_INSTALL_DIR/"
+    copy_sys_lib "libstdc++.so.6" "$LIB_INSTALL_DIR"
+    copy_sys_lib "libatomic.so.1" "$LIB_INSTALL_DIR"
 }
 
 # [in] WORK_DIR
@@ -553,7 +558,7 @@ buildDistribution()
     copyDebs
     copyAdditionalSysrootFilesIfNeeded
     copyVox
-    copyToolchainLibsIfNeeded
+    copyToolchainLibs
 
     if [ "$BOX" = "bpi" ]; then
         copyBpiSpecificFiles
