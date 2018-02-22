@@ -9,11 +9,11 @@
         {% endfor %}
         {% block submit_buttons_bottom %}{% endblock %}
         {% if not original.sent_date %}
-        <div style="text-align:center">
+        <div style="text-align:right">
             {% if BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY %}
-            <h1 style="">Broadcast Notifications To Superuser Only</h1>
+            <h1 style="">Send notifications to superusers only</h1>
             {% else %}
-            <h1 style="color:red">Broadcast Notifications To All Users</h1>
+            <h1 style="color:red">Send notifications to all users</h1>
             {% endif %}
         </div>
         <div class="submit-row">
