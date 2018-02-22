@@ -104,6 +104,8 @@ copyBuildLibs()
         libnx_kit
         libnx_network
         libnx_utils
+        libnx_sdk
+        libnx_plugin_utils
 
         # ffmpeg
         libavcodec
