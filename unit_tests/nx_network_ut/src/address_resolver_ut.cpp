@@ -333,6 +333,20 @@ TEST_F(AddressResolver, localhost_is_resolved_properly_ipv6)
     andResolvedTo(HostAddress(in6addr_loopback, 0));
 }
 
+TEST_F(AddressResolver, resolving_same_name_with_different_ip_version)
+{
+    whenResolve("localhost");
+    thenResolvedSucceeded();
+
+    setIpVersionToUse(AF_INET6);
+
+    whenResolve("localhost");
+
+    thenResolvedSucceeded();
+    andResolvedTo(HostAddress(in4addr_loopback));
+    andResolvedTo(HostAddress(in6addr_loopback, 0));
+}
+
 //-------------------------------------------------------------------------------------------------
 
 class AddressResolverNameMapping:
