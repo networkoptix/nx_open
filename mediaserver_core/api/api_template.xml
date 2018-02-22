@@ -2656,6 +2656,97 @@ the respective JSON fields can be empty.</description>
                         <caption>JSON result with error code</caption>
                     </result>
                 </function>
+                <function>
+                    <name>getAnalyticsActions</name>
+                    <description>
+                        Get analytics actions from all metadata plugins on the current server which are applicable
+                        to the specified metadata object type.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>objectTypeId</name>
+                            <description>
+                                Id of an object type to which an action should be applicable.</description>
+                            <optional>false</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>JSON with an error code, error message and a JSON object in "reply" field:</caption>
+                        <params>
+                            <param>
+                                <name>actions</name>
+                                <description>
+                                    List of JSON objects, each describing a set of actions from a particular metadata plugin.
+                                </description>
+                            </param>
+                            <param>
+                                <name>actions[].actionIds</name>
+                                <description>
+                                    List of action ids (strings).
+                                </description>
+                            </param>
+                            <param>
+                                <name>actions[].driverId</name>
+                                <description>
+                                    Id of a metadata plugin which offers the actions.
+                                </description>
+                            </param>
+                        </params>
+                    </result>
+                </function>
+                <function>
+                    <name>executeAnalyticsAction</name>
+                    <description>
+                        Execute analytics action from the particular metadata plugin on this server.
+                        The action is applied to the specified metadata object.</description>
+                    <method>POST</method>
+                    <params>
+                        <param>
+                            <name>driverId</name>
+                            <description>
+                                Id of a metadata plugin which offers the action.</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>actionId</name>
+                            <description>
+                                Id of an action to execute.</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>objectId</name>
+                            <description>
+                                Id of a metadata object to which the action is applied.</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>params</name>
+                            <description>
+                                JSON object with key-value pairs containing values for the action
+                                params described in the plugin manifest.</description>
+                            <optional>false</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>JSON with an error code, error message and a JSON object in "reply" field:</caption>
+                        <params>
+                            <param>
+                                <name>actionUrl</name>
+                                <description>
+                                    If not empty, provides a URL composed by the plugin, to be
+                                    opened by Client in an embedded browser.
+                                </description>
+                            </param>
+                            <param>
+                                <name>messageToUser</name>
+                                <description>
+                                    If not empty, provides a message composed by the plugin, to be
+                                    shown to the user who triggered the action.
+                                </description>
+                            </param>
+                        </params>
+                    </result>
+                </function>
             </functions>
         </group>
         <group>
