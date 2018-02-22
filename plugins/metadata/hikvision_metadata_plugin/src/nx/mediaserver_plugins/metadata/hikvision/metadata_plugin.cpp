@@ -27,7 +27,6 @@ static const std::chrono::seconds kCacheTimeout{60};
 
 } // namespace
 
-
 bool MetadataPlugin::DeviceData::hasExpired() const
 {
     return !timeout.isValid() || timeout.hasExpired(kCacheTimeout);
@@ -203,6 +202,11 @@ boost::optional<QList<QnUuid>> MetadataPlugin::fetchSupportedEvents(
 const Hikvision::DriverManifest& MetadataPlugin::driverManifest() const
 {
     return m_driverManifest;
+}
+
+void MetadataPlugin::executeAction(Action* /*action*/, Error* /*outError*/)
+{
+    // Do nothing.
 }
 
 } // namespace hikvision

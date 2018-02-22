@@ -143,7 +143,7 @@ void Plugin::settingsChanged()
 
 void Plugin::executeAction(
     const std::string& actionId,
-    const Object* object,
+    nxpl::NX_GUID objectId,
     const std::map<std::string, std::string>& params,
     std::string* outActionUrl,
     std::string* outMessageToUser,
@@ -151,21 +151,34 @@ void Plugin::executeAction(
 {
     if (actionId == "nx.stub.addToList")
     {
-        NX_PRINT << __func__ << "(): nx.stub.addToList; returning a message with param values.";
+        NX_PRINT << __func__
+            << "(): id [nx.stub.addToList]; returning a message with param values.";
+
+        std::string valueA;
+        auto paramAIt = params.find("paramA");
+        if (paramAIt != params.cend())
+            valueA = paramAIt->second;
+
+        std::string valueB;
+        auto paramBIt = params.find("paramB");
+        if (paramBIt != params.cend())
+            valueB = paramBIt->second;
+
         *outMessageToUser = std::string("Your param values are: ")
-            + "paramA: [" + params.at("paramA") + "], "
-            + "paramB: [" + params.at("paramB") + "]";
+            + "paramA: [" + valueA + "], "
+            + "paramB: [" + valueB + "]";
 
     }
     else if (actionId == "nx.stub.addPerson")
     {
         *outActionUrl = "http://internal.server/addPerson?objectId=" +
-            nxpt::NxGuidHelper::toStdString(object->id());
-        NX_PRINT << __func__ << "(): nx.stub.addPerson; returning URL: [" << *outActionUrl << "]";
+            nxpt::NxGuidHelper::toStdString(objectId);
+        NX_PRINT << __func__
+            << "(): id [nx.stub.addPerson]; returning URL: [" << *outActionUrl << "]";
     }
     else
     {
-        NX_PRINT << __func__ << "(): ERROR: Unsupported action: [" << actionId << "]";
+        NX_PRINT << __func__ << "(): ERROR: Unsupported action id: [" << actionId << "]";
         *error = Error::unknownError;
     }
 }

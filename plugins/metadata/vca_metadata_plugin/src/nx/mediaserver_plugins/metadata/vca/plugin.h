@@ -52,6 +52,10 @@ public:
     const AnalyticsEventType& eventByInternalName(const QString& internalName) const noexcept;
 
     const AnalyticsEventType& eventByUuid(const QnUuid& uuid) const noexcept;
+
+    virtual void executeAction(
+        nx::sdk::metadata::Action* action, nx::sdk::Error* outError) override;
+
 private:
     QByteArray m_manifest;
     AnalyticsDriverManifest m_typedManifest;

@@ -158,6 +158,10 @@ const AnalyticsEventType& Plugin::eventByUuid(const QnUuid& uuid) const noexcept
         : m_emptyEvent;
 }
 
+void Plugin::executeAction(Action* /*action*/, Error* /*outError*/)
+{
+    // Do nothing.
+}
 
 } // namespace vca
 } // namespace metadata

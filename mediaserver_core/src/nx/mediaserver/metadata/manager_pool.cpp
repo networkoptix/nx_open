@@ -267,7 +267,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
         boost::optional<nx::api::AnalyticsDriverManifest> pluginManifest =
             loadPluginManifest(plugin);
         if (!pluginManifest)
-            return;
+            continue; //< The error is already logged.
         assignPluginManifestToServer(*pluginManifest, server);
 
         boost::optional<nx::api::AnalyticsDeviceManifest> managerManifest;
@@ -515,18 +515,14 @@ void ManagerPool::assignPluginManifestToServer(
     auto existingManifests = server->analyticsDrivers();
     auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
         [&manifest](const nx::api::AnalyticsDriverManifest& m)
-    {
-        return m.driverId == manifest.driverId;
-    });
+        {
+            return m.driverId == manifest.driverId;
+        });
 
     if (it == existingManifests.cend())
-    {
         existingManifests.push_back(manifest);
-    }
     else
-    {
         *it = manifest;
-    }
 
     server->setAnalyticsDrivers(existingManifests);
     server->saveParams();
@@ -570,7 +566,7 @@ void ManagerPool::mergePluginManifestToServer(
 std::pair<
     boost::optional<nx::api::AnalyticsDeviceManifest>,
     boost::optional<nx::api::AnalyticsDriverManifest>
-    >
+>
 ManagerPool::loadManagerManifest(
     CameraManager* manager,
     const QnSecurityCamResourcePtr& camera)

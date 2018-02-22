@@ -22,7 +22,7 @@ protected:
 
     virtual void executeAction(
         const std::string& actionId,
-        const nx::sdk::metadata::Object* object,
+        nxpl::NX_GUID objectId,
         const std::map<std::string, std::string>& params,
         std::string* outActionUrl,
         std::string* outMessageToUser,

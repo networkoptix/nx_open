@@ -21,6 +21,7 @@ namespace mediaserver {
 namespace plugins {
 namespace hikvision {
 
+// TODO: Rename and change namespaces the same way as e.g. Stub plugin.
 class MetadataPlugin:
     public nxpt::CommonRefCounter<nx::sdk::metadata::Plugin>
 {
@@ -48,10 +49,14 @@ public:
 
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
 
+    virtual void executeAction(
+        nx::sdk::metadata::Action* action, nx::sdk::Error* outError) override;
+
 private:
     boost::optional<QList<QnUuid>> fetchSupportedEvents(
         const nx::sdk::CameraInfo& cameraInfo);
     QList<QnUuid> parseSupportedEvents(const QByteArray& data);
+
 private:
     mutable QnMutex m_mutex;
     QByteArray m_manifest;
