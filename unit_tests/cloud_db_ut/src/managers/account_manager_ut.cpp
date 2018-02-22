@@ -137,8 +137,8 @@ protected:
 
     void thenProperTemporaryCodeIsCreated()
     {
-        ASSERT_EQ(1U, m_tempPasswordManager.registeredCredentials().size());
-        const auto& tempCredentials = m_tempPasswordManager.registeredCredentials()[0];
+        ASSERT_FALSE(m_tempPasswordManager.registeredCredentials().empty());
+        const auto& tempCredentials = m_tempPasswordManager.registeredCredentials().back();
         ASSERT_EQ(1, tempCredentials.maxUseCount);
 
         auto curTime = nx::utils::utcTime();
