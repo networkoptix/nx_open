@@ -1,4 +1,5 @@
-#include "plugin_internal_tools.h"
+#include "uuid.h"
+
 #include <nx/utils/log/log.h>
 #include <plugins/plugin_tools.h>
 
@@ -8,7 +9,9 @@
 #include <arpa/inet.h>
 #endif
 
-namespace nxpt {
+namespace nx {
+namespace mediaserver_plugins {
+namespace utils {
 
 QnUuid fromPluginGuidToQnUuid(const nxpl::NX_GUID& guid)
 {
@@ -31,24 +34,6 @@ nxpl::NX_GUID fromQnUuidToPluginGuid(const QnUuid& uuid)
     return nxpt::NxGuidHelper::fromRawData(uuid.toRfc4122());
 }
 
-} // namespace nxpt
-
-namespace nx {
-namespace sdk {
-
-QString toString(const nx::sdk::CameraInfo& cameraInfo)
-{
-    return lm(
-        "Vendor: %1, Model: %2, Firmware: %3, UID: %4, Shared ID: %5, URL: %6, Channel: %7")
-        .args(
-            cameraInfo.vendor,
-            cameraInfo.model,
-            cameraInfo.firmware,
-            cameraInfo.uid,
-            cameraInfo.sharedId,
-            cameraInfo.url,
-            cameraInfo.channel).toQString();
-}
-
-} // namespace sdk
+} // namespace utils
+} // namespace mediaserver_plugins
 } // namespace nx

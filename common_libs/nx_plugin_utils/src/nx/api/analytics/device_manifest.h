@@ -6,7 +6,7 @@
 namespace nx {
 namespace api {
 
-struct AnalyticsDeviceManifest
+struct /*NX_PLUGIN_UTILS_API*/ AnalyticsDeviceManifest
 {
     QList<QnUuid> supportedEventTypes;
 };

@@ -1,5 +1,4 @@
 #include "common_event.h"
-#include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace sdk {
@@ -83,7 +82,6 @@ void CommonEvent::setIsActive(bool isActive)
 
 CommonEvent::~CommonEvent()
 {
-    NX_VERBOSE(this, "DESTROYING ITEM");
 }
 
 } // namespace metadata

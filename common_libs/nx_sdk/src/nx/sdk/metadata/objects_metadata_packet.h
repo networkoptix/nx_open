@@ -37,7 +37,6 @@ struct Rect
     float height = 0;
 };
 
-
 /**
  * Each class that implements AbstractDetectedObject interface
  * should properly handle this GUID in its queryInterface method

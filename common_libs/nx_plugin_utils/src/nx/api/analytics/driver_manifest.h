@@ -14,7 +14,7 @@ namespace api {
 /**
 * Description of the analytics driver, which can generate different events.
 */
-struct AnalyticsDriverManifestBase
+struct /*NX_PLUGIN_UTILS_API*/ AnalyticsDriverManifestBase
 {
     QnUuid driverId;
     TranslatableString driverName;
@@ -26,7 +26,7 @@ struct AnalyticsDriverManifestBase
 #define AnalyticsDriverManifestBase_Fields (driverId)(driverName)(acceptedDataTypes)(supportedCodecs)\
     (supportedHandleTypes)(supportedPixelFormats)
 
-struct AnalyticsDriverManifest: AnalyticsDriverManifestBase
+struct /*NX_PLUGIN_UTILS_API*/ AnalyticsDriverManifest: AnalyticsDriverManifestBase
 {
    QList<Analytics::EventType> outputEventTypes;
 };

@@ -8,7 +8,7 @@
 namespace nx {
 namespace api {
 
-struct TranslatableString
+struct /*NX_PLUGIN_UTILS_API*/ TranslatableString
 {
     QString value;
     QMap<QString, QString> localization;

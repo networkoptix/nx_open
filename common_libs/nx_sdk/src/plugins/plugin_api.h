@@ -14,7 +14,7 @@
         and nxpl::PluginInterface::releaseRef MUST be called by user to free up resources
 
     \note Use in multithreaded environment:\n
-        - \a PluginInterface::releaseRef is not guaranteed to be called from thread that called \a PluginInterface::addRef, 
+        - \a PluginInterface::releaseRef is not guaranteed to be called from thread that called \a PluginInterface::addRef,
             so reference counting - related functionality MUST be thread-safe
 */
 namespace nxpl
@@ -97,7 +97,7 @@ namespace nxpl
     {
     public:
         virtual ~Plugin() {}
-    
+
         //!Name of plugin
         /*!
             This name is used for information purpose only
@@ -148,16 +148,17 @@ namespace nxpl
     typedef PluginInterface* (*CreateNXPluginInstanceProc)();
 }
 
+// TODO: Move NX_PLUGIN_API definition from here to cmake.
 #ifdef _WIN32
     #define NX_PLUGIN_API __declspec(dllexport)
 #else
     #define NX_PLUGIN_API
 #endif
 
-//!Define to mark locale dependent output paramters and return values.
+//!Define to mark locale dependent output parameters and return values.
 #define NX_LOCALE_DEPENDENT
 
-//!Define to mark ascii only output parameters and return values.
+//!Define to mark ASCII only output parameters and return values.
 #define NX_ASCII
 
 #endif  //NX_PLUGIN_API_H

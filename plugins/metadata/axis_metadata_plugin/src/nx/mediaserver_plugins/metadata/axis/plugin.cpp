@@ -11,7 +11,7 @@
 
 #include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include "manager.h"
 #include "log.h"
@@ -162,3 +162,4 @@ NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
 }
 
 } // extern "C"
+

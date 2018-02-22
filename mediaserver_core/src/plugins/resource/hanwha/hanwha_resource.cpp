@@ -13,7 +13,7 @@
 #include <QtCore/QMap>
 
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
 #include <camera/camera_pool.h>

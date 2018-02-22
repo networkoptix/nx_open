@@ -9,7 +9,7 @@ namespace nx {
 namespace sdk {
 namespace metadata {
 
-class CommonEvent: public nxpt::CommonRefCounter<Event>
+class /*NX_SDK_API*/ CommonEvent: public nxpt::CommonRefCounter<Event>
 {
 public:
     virtual ~CommonEvent();
@@ -48,7 +48,6 @@ private:
     std::string m_auxilaryData;
     bool m_isActive = false;
 };
-
 
 } // namespace nx
 } // namespace sdk

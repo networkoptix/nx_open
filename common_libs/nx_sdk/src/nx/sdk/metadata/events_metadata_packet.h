@@ -39,7 +39,6 @@ public:
     virtual bool isActive() const = 0;
 };
 
-
 /**
 * Each class that implements EventsMetadataPacket interface
 * should properly handle this GUID in its queryInterface method

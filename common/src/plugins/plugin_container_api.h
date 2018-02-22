@@ -3,8 +3,7 @@
 
 #include <stdint.h>
 
-#include "plugin_api.h"
-
+#include <plugins/plugin_api.h>
 
 namespace nxpl
 {

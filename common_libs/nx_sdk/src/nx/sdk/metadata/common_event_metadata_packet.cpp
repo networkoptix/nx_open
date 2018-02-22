@@ -1,5 +1,4 @@
 #include "common_event_metadata_packet.h"
-#include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace sdk {
@@ -62,7 +61,6 @@ void CommonEventMetadataPacket::resetEvents()
 
 CommonEventMetadataPacket::~CommonEventMetadataPacket()
 {
-    NX_VERBOSE(this, "DESTROYING PACKET");
 }
 
 } // namespace metadata

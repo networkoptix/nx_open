@@ -15,7 +15,6 @@
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/elapsed_timer_thread_safe.h>
-#include <common/common_module.h>
 
 #include "common.h"
 

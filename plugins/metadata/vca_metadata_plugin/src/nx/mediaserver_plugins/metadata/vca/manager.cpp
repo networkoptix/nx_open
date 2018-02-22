@@ -4,7 +4,7 @@
 
 #include <QtCore/QUrl>
 
-#include <plugins/plugin_internal_tools.h> //< nxpt::fromQnUuidToPluginGuid
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
@@ -37,7 +37,8 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(
     const AnalyticsEventType& event, bool active)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
-    commonEvent->setEventTypeId(nxpt::fromQnUuidToPluginGuid(event.eventTypeId));
+    commonEvent->setEventTypeId(
+        nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(event.eventTypeId));
     commonEvent->setCaption(event.eventName.value.toStdString());
     commonEvent->setDescription(event.eventName.value.toStdString());
     commonEvent->setIsActive(active);
@@ -381,7 +382,7 @@ nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler
 
     for (int i = 0; i < eventTypeListSize; ++i)
     {
-        QnUuid id = nxpt::fromPluginGuidToQnUuid(eventTypeList[i]);
+        QnUuid id = nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(eventTypeList[i]);
         const AnalyticsEventType* eventType = m_plugin->eventByUuid(id);
         if (!eventType)
             NX_PRINT << "Unknown event type. TypeId = " << id.toStdString();

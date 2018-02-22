@@ -2,6 +2,8 @@ add_subdirectory(nx_utils)
 add_subdirectory(nx_fusion)
 add_subdirectory(nx_network)
 add_subdirectory(udt)
+add_subdirectory(nx_sdk)
+add_subdirectory(nx_plugin_utils)
 
 if(withDesktopClient OR withMobileClient)
     add_subdirectory(nx_audio)
