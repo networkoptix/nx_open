@@ -1,15 +1,14 @@
 from __future__ import absolute_import
-
 from celery import shared_task
-
 from .engines import email_engine
-
 
 from smtplib import SMTPException, SMTPConnectError
 from ssl import SSLError
 from celery.exceptions import Ignore
 
 from django.conf import settings
+
+from api.models import Account
 
 import traceback
 import logging
@@ -53,6 +52,26 @@ def send_email(user_email, type, message, customization, attempt=1):
     else:
         return {'user_email': user_email, 'type': type, 'message': message,
                 'customization': customization, 'attempt': attempt}
+
+
+# For testing we dont want to send emails to everyone so we need to set
+# "BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = true" in cloud.settings
+@shared_task
+def send_to_all_users(message, force=False):
+    # if forced and not testing dont apply any filters to send to all users
+    users = Account.objects.all()
+
+    if not force:
+        users = users.filter(subscribe=True)
+
+    if settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY:
+        users = users.filter(is_superuser=True)
+
+    for user in users:
+        message['full_name'] = user.get_full_name()
+        send_email.delay(user.email, 'cloud_notification', message, user.customization)
+
+    return {'subject': message['subject'], 'force': force}
 
 
 @shared_task
