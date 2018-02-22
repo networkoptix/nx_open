@@ -2195,7 +2195,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     {
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
-			
+
 
         const Qn::Permission requiredPermission = d->isPlayingLive()
             ? Qn::ViewLivePermission
@@ -2748,6 +2748,11 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
     emit motionSearchModeEnabled(enabled);
 }
 
+bool QnMediaResourceWidget::isMotionSearchModeEnabled() const
+{
+    return (titleBar()->rightButtonsBar()->checkedButtons() & Qn::MotionSearchButton) != 0;
+}
+
 QnSpeedRange QnMediaResourceWidget::speedRange() const
 {
     static constexpr qreal kUnitSpeed = 1.0;
@@ -2794,6 +2799,8 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
     }
     else
     {
+        // We don't unset forced video buffer length to avoid micro-freezes required to fill in the
+        // video buffer on succeeding analytics mode activations.
         display()->camDisplay()->setForcedVideoBufferLength(
             milliseconds(ini().analyticsVideoBufferLengthMs));
     }

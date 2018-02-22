@@ -12,9 +12,7 @@
 
 #include "nx/vca/camera_controller.h"
 
-// #mshevchenko is going to do smth with NX_PRINT/NX_DEBUG.
-//#include <nx/utils/log/log.h>
-//#define NX_DEBUG_STREAM nx::utils::log::detail::makeStream(nx::utils::log::Level::debug, "VCA")
+// TODO: #szaitsev: Redirect NX_DEBUG_STREAM to NX_UTILS_LOG_STREAM_NO_SPACE.
 
 #include <nx/kit/debug.h>
 
@@ -42,9 +40,9 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(
     const AnalyticsEventType& event, bool active)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
-    commonEvent->setEventTypeId(nxpt::fromQnUuidToPluginGuid(event.eventTypeId));
-    commonEvent->setCaption(event.eventName.value.toStdString());
-    commonEvent->setDescription(event.eventName.value.toStdString());
+    commonEvent->setTypeId(nxpt::fromQnUuidToPluginGuid(event.eventTypeId));
+    commonEvent->setCaption(event.name.value.toStdString());
+    commonEvent->setDescription(event.name.value.toStdString());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
     commonEvent->setAuxilaryData(event.internalName.toStdString());
@@ -323,7 +321,7 @@ std::chrono::milliseconds Manager::timeTillCheck() const
 
 void Manager::sendEventStartedPacket(const AnalyticsEventType& event) const
 {
-    auto packet = createCommonEventMetadataPacket(event, /*active*/ true);
+    auto packet = createCommonEventsMetadataPacket(event, /*active*/ true);
     m_handler->handleMetadata(nx::sdk::Error::noError, packet);
     NX_PRINT
         << (event.isStateful() ? "Event [start] " : "Event [pulse] ")
@@ -333,7 +331,7 @@ void Manager::sendEventStartedPacket(const AnalyticsEventType& event) const
 
 void Manager::sendEventStoppedPacket(const AnalyticsEventType& event) const
 {
-    auto packet = createCommonEventMetadataPacket(event, /*active*/ false);
+    auto packet = createCommonEventsMetadataPacket(event, /*active*/ false);
     m_handler->handleMetadata(nx::sdk::Error::noError, packet);
     NX_PRINT << "Event [stop] " << event.internalName.toUtf8().constData()
         << " sent to server";
@@ -370,8 +368,13 @@ bool Manager::isTimerNeeded() const
     return false;
 }
 
-nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler* handler,
-    nxpl::NX_GUID* typeList, int typeListSize)
+nx::sdk::Error Manager::setHandler(nx::sdk::metadata::MetadataHandler* handler)
+{
+    m_handler = handler;
+    return nx::sdk::Error::noError;
+}
+
+nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* typeList, int typeListSize)
 {
     QString host = m_url.host();
     nx::vca::CameraController vcaCameraConrtoller(host, m_auth.user(), m_auth.password());
@@ -396,9 +399,9 @@ nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler
     QString ipPort = kAddressPattern.arg(
         m_url.host(), QString::number(vcaCameraConrtoller.tcpServerPort()));
 
-    SocketAddress vcaAddress(ipPort);
+    nx::network::SocketAddress vcaAddress(ipPort);
     m_tcpSocket = new nx::network::TCPSocket;
-    if (!m_tcpSocket->connect(vcaAddress, kConnectTimeout.count() * 1000))
+    if (!m_tcpSocket->connect(vcaAddress, kConnectTimeout))
     {
         NX_PRINT << "Failed to connect to camera tcp notification server";
         return nx::sdk::Error::networkError;
@@ -407,7 +410,7 @@ nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler
     m_tcpSocket->setNonBlockingMode(true);
     m_tcpSocket->setRecvTimeout(kReceiveTimeout.count() * 1000);
     NX_PRINT << "Connection to camera tcp notification server established";
-    m_handler = handler;
+
     m_tcpSocket->readSomeAsync(
         &m_buffer,
         [this](SystemError::ErrorCode errorCode, size_t size)

@@ -8,31 +8,6 @@ namespace nx {
 namespace update {
 namespace detail {
 
-//bool QnServerUpdateTool::initializeUpdateLog(const QString& targetVersion, QString* logFileName) const
-//{
-//    QString logDir = qnServerModule->roSettings()->value(lit("logDir"), getDataDirectory() + lit("/log/")).toString();
-//    if (logDir.isEmpty())
-//        return false;
-//
-//    QString fileName = QDir(logDir).absoluteFilePath(updateLogFileName);
-//    QFile logFile(fileName);
-//    if (!logFile.open(QFile::Append))
-//        return false;
-//
-//    QByteArray preface;
-//    preface.append("================================================================================\n");
-//    preface.append(QString(lit(" [%1] Starting system update:\n")).arg(QDateTime::currentDateTime().toString()));
-//    preface.append(QString(lit("    Current version: %1\n")).arg(qnStaticCommon->engineVersion().toString()));
-//    preface.append(QString(lit("    Target version: %1\n")).arg(targetVersion));
-//    preface.append("================================================================================\n");
-//
-//    logFile.write(preface);
-//    logFile.close();
-//
-//    *logFileName = fileName;
-//    return true;
-//}
-
 void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompletionHandler handler)
 {
     {
@@ -55,7 +30,7 @@ void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompl
     m_extractor->extractAsync(
         path,
         installerWorkDir(),
-        [self = this, handler](QnZipExtractor::Error errorCode)
+        [self = this, handler](QnZipExtractor::Error errorCode, const QString& outputPath)
         {
             auto cleanupGuard = QnRaiiGuard::createDestructible(
                 [self, errorCode]()
@@ -71,7 +46,7 @@ void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompl
             switch (errorCode)
             {
                 case QnZipExtractor::Error::Ok:
-                    return handler(self->checkContents());
+                    return handler(self->checkContents(outputPath));
                 case QnZipExtractor::Error::NoFreeSpace:
                     return handler(PrepareResult::noFreeSpace);
                 default:
@@ -83,20 +58,20 @@ void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompl
         });
 }
 
-PrepareResult Updates2InstallerBase::checkContents() const
+PrepareResult Updates2InstallerBase::checkContents(const QString& outputPath) const
 {
-    QVariantMap infoMap = updateInformation();
+    QVariantMap infoMap = updateInformation(outputPath);
     if (infoMap.isEmpty())
         return PrepareResult::updateContentsError;
 
-    QString executable = infoMap.value("executable").toString();
-    if (executable.isEmpty())
+    if (infoMap.value("executable").toString().isEmpty())
     {
         NX_ERROR(this, "No executable specified in the update information file");
         return PrepareResult::updateContentsError;
     }
 
-    if (!checkExecutable(executable))
+    m_executable = outputPath + QDir::separator() + infoMap.value("executable").toString();
+    if (!checkExecutable(m_executable))
     {
         NX_ERROR(this, "Update executable file is invalid");
         return PrepareResult::updateContentsError;
@@ -125,51 +100,53 @@ PrepareResult Updates2InstallerBase::checkContents() const
         return PrepareResult::updateContentsError;
     }
 
+    m_version = infoMap.value(lit("version")).toString();
+
     return PrepareResult::ok;
 }
 
 bool Updates2InstallerBase::install()
 {
+    QString currentDir = QDir::currentPath();
+    QDir::setCurrent(installerWorkDir());
 
-    // #TODO #akulikov Implement this
+    QStringList arguments;
+    QString logFileName;
 
-    //QString logFileName;
-    //if (initializeUpdateLog(version, &logFileName))
-    //    arguments.append(logFileName);
-    //else
-    //    NX_LOG("QnServerUpdateTool: Could not create or open update log file.", cl_logWARNING);
+    if (initializeUpdateLog(m_version, &logFileName))
+        arguments.append(logFileName);
+    else
+        NX_WARNING(this, "Failed to create or open update log file.");
 
-    //QFile executableFile(updateDir.absoluteFilePath(executable));
-    //if (!executableFile.exists()) {
-    //    NX_LOG(lit("QnServerUpdateTool: The specified executable doesn't exists: %1").arg(executable), cl_logERROR);
-    //    return false;
-    //}
-    //if (!executableFile.permissions().testFlag(QFile::ExeOwner)) {
-    //    NX_LOG(lit("QnServerUpdateTool: The specified executable doesn't have an execute permission: %1").arg(executable), cl_logWARNING);
-    //    executableFile.setPermissions(executableFile.permissions() | QFile::ExeOwner);
-    //}
-    //if (nx::utils::log::mainLogger()->isToBeLogged(nx::utils::log::Level::debug))
-    //{
-    //    QString argumentsStr(" APPSERVER_PASSWORD=\"\" APPSERVER_PASSWORD_CONFIRM=\"\" SERVER_PASSWORD=\"\" SERVER_PASSWORD_CONFIRM=\"\"");
-    //    for (const QString& arg : arguments)
-    //        argumentsStr += lit(" ") + arg;
+    if (nx::utils::log::mainLogger()->isToBeLogged(nx::utils::log::Level::debug))
+    {
+        QString argumentsStr(
+            " APPSERVER_PASSWORD=\"\" APPSERVER_PASSWORD_CONFIRM=\"\" SERVER_PASSWORD=\"\"\
+             SERVER_PASSWORD_CONFIRM=\"\"");
+        for (const QString& arg : arguments)
+            argumentsStr += lit(" ") + arg;
 
-    //    NX_LOG(lit("QnServerUpdateTool: Launching %1 %2").arg(executable).arg(argumentsStr), cl_logINFO);
-    //}
+        NX_INFO(this, lm("Launching %1 %2").arg(m_executable).args(argumentsStr));
+    }
 
-    //const SystemError::ErrorCode processStartErrorCode = nx::startProcessDetached(QDir(installerWorkDir()).absoluteFilePath(executable), arguments);
-    //if (processStartErrorCode == SystemError::noError) {
-    //    NX_LOG("QnServerUpdateTool: Update has been started.", cl_logINFO);
-    //}
-    //else {
-    //    NX_LOG(lit("QnServerUpdateTool: Cannot launch update script. %1").arg(SystemError::toString(processStartErrorCode)), cl_logERROR);
-    //}
+    const SystemError::ErrorCode processStartErrorCode = nx::startProcessDetached(
+        QDir(installerWorkDir()).absoluteFilePath(m_executable),
+        arguments);
+    if (processStartErrorCode == SystemError::noError)
+    {
+        NX_INFO(this, "Update has been started.");
+    }
+    else
+    {
+        NX_ERROR(
+            this,
+            lm("Failed to launch update script. %1")
+                .args(SystemError::toString(processStartErrorCode)));
+    }
 
-    //QDir::setCurrent(currentDir);
+    QDir::setCurrent(currentDir);
 
-    //return true;
-
-    return false;
+    return true;
 }
 
 QString Updates2InstallerBase::installerWorkDir() const

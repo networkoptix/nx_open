@@ -40,4 +40,5 @@ then
 else
     echo
     echo "ERROR: Failed to build plugin."
+    exit 42
 fi

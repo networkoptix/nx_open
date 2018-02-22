@@ -6,10 +6,13 @@ import vagrant
 import vagrant.compat
 from pathlib2 import Path
 
+from test_utils.networking import NodeNetworking
+from test_utils.networking.linux import LinuxNodeNetworking
+from test_utils.networking.virtual_box import VirtualBoxNodeNetworking
 from test_utils.os_access import LocalAccess
 from test_utils.ssh.sshd import optimize_sshd
 from .os_access import ProcessError, SshAccess
-from .vagrant_vm_config import DEFAULT_NATNET1, VagrantVMConfig
+from .vagrant_vm_config import VagrantVMConfig
 from .virtualbox_management import VirtualboxManagement
 
 log = logging.getLogger(__name__)
@@ -53,11 +56,13 @@ class VagrantVMFactory(object):
         self._vm_name_prefix = options.vm_name_prefix
         self._vm_port_base = options.vm_port_base
         if vm_host_hostname:
+            self.vm_host_hostname = vm_host_hostname
             self._host_os_access = SshAccess(self._common_ssh_config.path, vm_host_hostname)
             self._vagrant_dir = options.vm_host_work_dir / 'vagrant'
             self._vagrant_private_key_path = options.work_dir / 'vagrant_insecure_private_key'
             self._host_os_access.get_file('.vagrant.d/insecure_private_key', self._vagrant_private_key_path)
         else:
+            self.vm_host_hostname = 'localhost'
             self._host_os_access = LocalAccess()
             self._vagrant_dir = options.work_dir / 'vagrant'
             self._vagrant_private_key_path = Path().home() / '.vagrant.d' / 'insecure_private_key'
@@ -166,8 +171,6 @@ class VagrantVMFactory(object):
             for name, vm in sorted(self._vms.items(), key=lambda (name, vm): vm.config.idx):
                 if vm.is_allocated:
                     continue
-                if not vm.config.matches(config_template):
-                    continue
                 if config_template.must_be_recreated:
                     return vm
                 if pred and not pred(vm):
@@ -180,11 +183,10 @@ class VagrantVMFactory(object):
 
     def _write_vagrantfile(self, vm_config_list):
         expanded_vms_config_list = [
-            config.expand(self._virtualbox_vm) for config in vm_config_list]
+            config.expand() for config in vm_config_list]
         template_file_path = TEST_UTILS_DIR / 'Vagrantfile.jinja2'
         template = jinja2.Template(template_file_path.read_text())
         vagrantfile = template.render(
-            natnet1=DEFAULT_NATNET1,
             template_file_path=template_file_path,
             vms=expanded_vms_config_list)
         self._host_os_access.write_file(self._vagrant_file_path, vagrantfile.encode())
@@ -203,6 +205,7 @@ class VagrantVM(object):
         self.is_allocated = False
         self.is_running = is_running
         self._ssh_config_path = _ssh_config_path
+        self.networking = None  # TODO: Move initialization from init() method.
 
     def __str__(self):
         return '%s virtualbox_name=%s timezone=%s' % (self.vagrant_name, self.virtualbox_name, self.timezone or '?')
@@ -232,11 +235,14 @@ class VagrantVM(object):
                 raise
         else:
             self.guest_os_access = os_access
+        self.networking = NodeNetworking(
+            LinuxNodeNetworking(self.guest_os_access),
+            VirtualBoxNodeNetworking(self.virtualbox_name))
+        self.networking.reset()
 
     def start(self):
         assert not self.is_running
         log.info('Starting VM: %s...', self)
-        self._copy_required_files_to_vagrant_dir()
         self._vagrant.up(vm_name=self.vagrant_name)
         self.guest_os_access = SshAccess(self._ssh_config_path, self.vagrant_name).become('root')
         optimize_sshd(self.guest_os_access)
@@ -246,10 +252,3 @@ class VagrantVM(object):
         assert self.is_running
         self._vagrant.destroy(self.vagrant_name)
         self.is_running = False
-
-    def _copy_required_files_to_vagrant_dir(self):
-        test_dir = TEST_UTILS_DIR.parent
-        for file_path_format in self.config.required_file_list:
-            file_path = Path(file_path_format.format(test_dir=test_dir, bin_dir=self._bin_dir))
-            assert file_path.is_file(), '%s is expected but is missing' % file_path
-            self.host_os_access.put_file(file_path, self._vagrant_dir)

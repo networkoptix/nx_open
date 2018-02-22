@@ -14,7 +14,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class AbstractAsyncSearchListModel;
+class AbstractEventListModel;
 class BusyIndicatorModel;
 
 class UnifiedAsyncSearchListModel: public ConcatenationListModel
@@ -23,7 +23,7 @@ class UnifiedAsyncSearchListModel: public ConcatenationListModel
     using base_type = ConcatenationListModel;
 
 public:
-    explicit UnifiedAsyncSearchListModel(AbstractAsyncSearchListModel* sourceModel,
+    explicit UnifiedAsyncSearchListModel(AbstractEventListModel* sourceModel,
         QObject* parent = nullptr);
 
     virtual ~UnifiedAsyncSearchListModel() override;
@@ -34,17 +34,18 @@ public:
     QString clientsideTextFilter() const;
     void setClientsideTextFilter(const QString& value);
 
-    QnTimePeriod selectedTimePeriod() const;
-    void setSelectedTimePeriod(const QnTimePeriod& value);
+    QnTimePeriod relevantTimePeriod() const;
+    void setRelevantTimePeriod(const QnTimePeriod& value);
 
     bool isConstrained() const;
 
     int relevantCount() const;
 
 private:
-    AbstractAsyncSearchListModel* const m_sourceModel = nullptr;
+    AbstractEventListModel* const m_sourceModel = nullptr;
     QnSortFilterListModel* const m_filterModel = nullptr;
     BusyIndicatorModel* const m_busyIndicatorModel = nullptr;
+    int m_previousRowCount = 0;
 };
 
 } // namespace desktop

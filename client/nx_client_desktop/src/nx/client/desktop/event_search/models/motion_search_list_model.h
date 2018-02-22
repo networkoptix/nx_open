@@ -32,14 +32,15 @@ public:
 
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
-
-    QnTimePeriod selectedTimePeriod() const;
-    void setSelectedTimePeriod(const QnTimePeriod& value);
+    virtual bool fetchInProgress() const override;
 
     int totalCount() const;
 
 signals:
     void totalCountChanged(int value);
+
+protected:
+    virtual void relevantTimePeriodChanged(const QnTimePeriod& previousValue) override;
 
 private:
     class Private;

@@ -24,7 +24,7 @@ class ConsumingCameraManager: public CameraManager
 public:
     /**
      * @brief pushDataPacket provides data to the plugin.
-     * @param dataPacket packet of data.
+     * @param dataPacket packet of data. Never null.
      * @return noError in case of success, other value in case of failure.
      */
     virtual Error pushDataPacket(DataPacket* dataPacket) = 0;

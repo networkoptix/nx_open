@@ -15,6 +15,9 @@
 class QnUuid;
 
 namespace nx {
+
+namespace utils { class PendingOperation; }
+
 namespace client {
 namespace desktop {
 
@@ -50,6 +53,8 @@ private:
 
     int indexOf(const QnUuid& guid) const; //< Logarithmic complexity.
 
+    utils::PendingOperation* createUpdateBookmarksWatcherOperation();
+
     static QPixmap pixmap();
     static QColor color();
 
@@ -57,6 +62,7 @@ private:
     BookmarkSearchListModel* const q = nullptr;
     QString m_filterText;
     QnCameraBookmarkList m_prefetch;
+    QScopedPointer<utils::PendingOperation> m_updateBookmarksWatcher;
     std::deque<QnCameraBookmark> m_data;
     QHash<QnUuid, qint64> m_guidToTimestampMs;
     bool m_success = true;

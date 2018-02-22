@@ -14,8 +14,11 @@ from test_utils.mediaserverdeb import MediaserverDeb
 from test_utils.internet_time import TimeProtocolRestriction
 from test_utils.lightweight_servers_factory import LWS_BINARY_NAME, LightweightServersFactory
 from test_utils.metrics_saver import MetricsSaver
+from test_utils.server import Server
 from test_utils.server_factory import ServerFactory
+from test_utils.server_installation import install_mediaserver
 from test_utils.server_physical_host import PhysicalInstallationCtl
+from test_utils.service import UpstartService
 from test_utils.ssh.config import SSHConfig
 from test_utils.utils import SimpleNamespace
 from test_utils.vagrant_vm import VagrantVMFactory
@@ -154,6 +157,16 @@ def work_dir(run_options):
 @pytest.fixture(scope='session')
 def bin_dir(run_options):
     return run_options.bin_dir
+
+
+@pytest.fixture(scope='session')
+def ca(work_dir):
+    return CA(work_dir / 'ca')
+
+
+@pytest.fixture(scope='session')
+def mediaserver_deb(run_options):
+    return run_options.mediaserver_deb
 
 
 @pytest.fixture(scope='session')
@@ -332,14 +345,3 @@ def pytest_pyfunc_call(pyfuncitem):
         server_factory.perform_post_checks()
     if passed and lws_factory:
         lws_factory.perform_post_checks()
-
-
-@pytest.fixture()
-def timeless_server(vm_factory, server_factory, server_name='timeless_server'):
-    vm = vm_factory()
-    config_file_params = dict(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
-    server = server_factory(server_name, vm=vm, start=False, config_file_params=config_file_params)
-    TimeProtocolRestriction(server).enable()
-    server.start_service()
-    server.setup_local_system()
-    return server

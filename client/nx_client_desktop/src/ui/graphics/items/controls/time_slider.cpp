@@ -2275,6 +2275,8 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
 
         /* Draw lines background (that is, time periods). */
         lineTop = lineBarRect.top();
+        QnTimePeriodList extraContent;
+
         for (int line = 0; line < m_lineCount; line++)
         {
             qreal lineHeight = lineUnit * effectiveLineStretch(line);
@@ -2282,11 +2284,24 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
                 continue;
 
             QRectF lineRect(lineBarRect.left(), lineTop, lineBarRect.width(), lineHeight);
+            switch (m_selectedExtraContent)
+            {
+                case Qn::MotionContent:
+                    extraContent = m_lineData[line].timeStorage.aggregated(Qn::MotionContent);
+                    break;
+
+                case Qn::AnalyticsContent:
+                    extraContent = m_lineData[line].timeStorage.aggregated(Qn::AnalyticsContent);
+                    break;
+
+                default:
+                    extraContent = QnTimePeriodList();
+            }
 
             drawPeriodsBar(
                 painter,
                 m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),
-                m_lineData[line].timeStorage.aggregated(Qn::MotionContent),
+                extraContent,
                 lineRect);
 
             lineTop += lineHeight;
@@ -2473,7 +2488,7 @@ void QnTimeSlider::drawMarker(QPainter* painter, qint64 pos, const QColor& color
     painter->drawLine(QPointF(x, rect().top()), QPointF(x, rect().bottom()));
 }
 
-void QnTimeSlider::drawPeriodsBar(QPainter* painter, const QnTimePeriodList& recorded, const QnTimePeriodList& motion, const QRectF& rect)
+void QnTimeSlider::drawPeriodsBar(QPainter* painter, const QnTimePeriodList& recorded, const QnTimePeriodList& extra, const QRectF& rect)
 {
     qint64 minimumValue = this->windowStart();
     qint64 maximumValue = this->windowEnd();
@@ -2484,7 +2499,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter* painter, const QnTimePeriodList& rec
 
     /* Note that constness of period lists is important here as requesting
      * iterators from a non-const object will result in detach. */
-    const QnTimePeriodList periods[Qn::TimePeriodContentCount] = {recorded, motion};
+    const QnTimePeriodList periods[Qn::TimePeriodContentCount] = {recorded, extra};
 
     QnTimePeriodList::const_iterator pos[Qn::TimePeriodContentCount];
     QnTimePeriodList::const_iterator end[Qn::TimePeriodContentCount];
@@ -3529,4 +3544,18 @@ void QnTimeSlider::finishDragProcess(DragInfo* info)
 
     setSliderDown(false);
     m_dragDelta = QPointF();
+}
+
+Qn::TimePeriodContent QnTimeSlider::selectedExtraContent() const
+{
+    return m_selectedExtraContent;
+}
+
+void QnTimeSlider::setSelectedExtraContent(Qn::TimePeriodContent value)
+{
+    if (m_selectedExtraContent == value)
+        return;
+
+    m_selectedExtraContent = value;
+    update();
 }

@@ -23,9 +23,9 @@ detail::AbstractZipExtractorPtr CommonUpdates2Installer::createZipExtractor() co
     return std::make_shared<detail::ZipExtractor>();
 }
 
-QVariantMap CommonUpdates2Installer::updateInformation() const
+QVariantMap CommonUpdates2Installer::updateInformation(const QString& outputPath) const
 {
-    QFile updateInfoFile(QDir(installerWorkDir()).absoluteFilePath(kUpdateInfoFileName));
+    QFile updateInfoFile(QDir(outputPath).absoluteFilePath(kUpdateInfoFileName));
     if (!updateInfoFile.open(QFile::ReadOnly))
     {
         NX_ERROR(

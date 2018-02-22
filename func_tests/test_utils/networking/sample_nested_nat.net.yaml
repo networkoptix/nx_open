@@ -14,4 +14,3 @@ networks:
           10.254.3.0/24:
             e:
 default_gateways:
-  a: internet

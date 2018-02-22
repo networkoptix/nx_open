@@ -46,6 +46,8 @@ public:
     virtual const char* capabilitiesManifest(
         nx::sdk::Error* error) const override;
 
+    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override {}
+
     // Managers can safely ask plugin about events. If no event found, m_emptyEvent is returned.
     const AnalyticsEventType& eventByInternalName(const QString& internalName) const noexcept;
 

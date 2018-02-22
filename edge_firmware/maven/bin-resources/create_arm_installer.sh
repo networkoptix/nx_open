@@ -96,6 +96,7 @@ copyBuildLibs()
         libnx_fusion
         libnx_kit
         libnx_network
+        libnx_update
         libnx_speech_synthesizer
         libnx_utils
 

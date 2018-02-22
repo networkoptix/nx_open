@@ -100,7 +100,7 @@ class Server(object):
 
     def __init__(
             self,
-            name, os_access, service, installation, rest_api_url, ca,
+            name, os_access, service, installation, rest_api_url, ca, machine,
             rest_api_timeout=None, internal_ip_port=None):
         assert name, repr(name)
         assert isinstance(os_access, OsAccess), repr(os_access)
@@ -111,6 +111,7 @@ class Server(object):
         self._service = service
         self.rest_api_url = rest_api_url
         self._ca = ca
+        self.machine = machine
         self.rest_api = RestApi(self.title, self.rest_api_url, timeout=rest_api_timeout, ca_cert=self._ca.cert_path)
         self.settings = None
         self.local_system_id = None
@@ -360,7 +361,7 @@ class Server(object):
         def make_key(method):
             digest = generate_auth_key(method, other_server.user.lower(), other_server.password, nonce, realm)
             return urllib.quote(base64.urlsafe_b64encode(':'.join([other_server.user.lower(), nonce, digest])))
-        self.rest_api.api.mergeSystems.GET(
+        self.rest_api.api.mergeSystems.POST(
             url=other_server.internal_url,
             getKey=make_key('GET'),
             postKey=make_key('POST'),

@@ -249,7 +249,7 @@ namespace detail {
 
 typedef std::function<void(const char*)> PrintFunc;
 
-#define NX_KIT_DEBUG_DETAIL_PRINT_FUNC [](const char* message) { NX_PRINT << message; }
+#define NX_KIT_DEBUG_DETAIL_PRINT_FUNC [&](const char* message) { NX_PRINT << message; }
 
 /** @param file Supply __FILE__. */
 NX_KIT_API std::string printPrefix(const char* file);

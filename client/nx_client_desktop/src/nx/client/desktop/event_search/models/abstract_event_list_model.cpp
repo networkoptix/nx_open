@@ -79,6 +79,16 @@ void AbstractEventListModel::fetchMore(const QModelIndex& /*parent*/)
 {
 }
 
+bool AbstractEventListModel::fetchInProgress() const
+{
+    return false;
+}
+
+bool AbstractEventListModel::isConstrained() const
+{
+    return m_relevantTimePeriod != QnTimePeriod::anytime();
+}
+
 bool AbstractEventListModel::isValid(const QModelIndex& index) const
 {
     return index.model() == this && !index.parent().isValid() && index.column() == 0
@@ -123,6 +133,36 @@ bool AbstractEventListModel::defaultAction(const QModelIndex& index)
 bool AbstractEventListModel::activateLink(const QModelIndex& index, const QString& /*link*/)
 {
     return defaultAction(index);
+}
+
+const QnTimePeriod& AbstractEventListModel::relevantTimePeriod() const
+{
+    return m_relevantTimePeriod;
+}
+
+void AbstractEventListModel::setRelevantTimePeriod(const QnTimePeriod& value)
+{
+    if (value == m_relevantTimePeriod)
+        return;
+
+    const auto previousValue = m_relevantTimePeriod;
+    m_relevantTimePeriod = value;
+
+    relevantTimePeriodChanged(previousValue);
+}
+
+void AbstractEventListModel::relevantTimePeriodChanged(const QnTimePeriod& /*previousValue*/)
+{
+}
+
+void AbstractEventListModel::beginFinishFetch()
+{
+    emit fetchAboutToBeFinished(QPrivateSignal());
+}
+
+void AbstractEventListModel::endFinishFetch(bool cancelled)
+{
+    emit fetchFinished(cancelled, QPrivateSignal());
 }
 
 } // namespace desktop

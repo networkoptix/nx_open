@@ -4,7 +4,7 @@
 #include <utils/common/delayed.h>
 
 #include <nx/client/desktop/common/models/subset_list_model.h>
-#include <nx/client/desktop/event_search/models/abstract_async_search_list_model.h>
+#include <nx/client/desktop/event_search/models/abstract_event_list_model.h>
 #include <nx/client/desktop/event_search/models/private/busy_indicator_model_p.h>
 
 namespace nx {
@@ -12,7 +12,7 @@ namespace client {
 namespace desktop {
 
 UnifiedAsyncSearchListModel::UnifiedAsyncSearchListModel(
-    AbstractAsyncSearchListModel* sourceModel,
+    AbstractEventListModel* sourceModel,
     QObject* parent)
     :
     base_type(parent),
@@ -26,6 +26,30 @@ UnifiedAsyncSearchListModel::UnifiedAsyncSearchListModel(
     m_filterModel->setSourceModel(m_sourceModel);
     m_filterModel->setFilterRole(Qn::ResourceSearchStringRole);
     m_filterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+
+    connect(m_sourceModel, &AbstractEventListModel::fetchAboutToBeFinished, this,
+        [this]()
+        {
+            m_busyIndicatorModel->setActive(false);
+            m_previousRowCount = m_filterModel->rowCount();
+        });
+
+    connect(m_sourceModel, &AbstractEventListModel::fetchFinished, this,
+        [this](bool cancelled)
+        {
+            const bool hasClientSideFilter = !clientsideTextFilter().isEmpty();
+            if (cancelled || !hasClientSideFilter)
+                return;
+
+            // If fetch produced enough records after filtering, do nothing.
+            const auto kReFetchCountThreshold = 15;
+            if (m_filterModel->rowCount() - m_previousRowCount > kReFetchCountThreshold)
+                return;
+
+            // Queue more fetch after a short delay.
+            static const int kReFetchDelayMs = 50;
+            executeDelayedParented([this]() { fetchMore(); }, kReFetchDelayMs, this);
+        });
 }
 
 UnifiedAsyncSearchListModel::~UnifiedAsyncSearchListModel()
@@ -42,14 +66,14 @@ void UnifiedAsyncSearchListModel::setClientsideTextFilter(const QString& value)
     m_filterModel->setFilterWildcard(value);
 }
 
-QnTimePeriod UnifiedAsyncSearchListModel::selectedTimePeriod() const
+QnTimePeriod UnifiedAsyncSearchListModel::relevantTimePeriod() const
 {
-    return m_sourceModel->selectedTimePeriod();
+    return m_sourceModel->relevantTimePeriod();
 }
 
-void UnifiedAsyncSearchListModel::setSelectedTimePeriod(const QnTimePeriod& value)
+void UnifiedAsyncSearchListModel::setRelevantTimePeriod(const QnTimePeriod& value)
 {
-    m_sourceModel->setSelectedTimePeriod(value);
+    m_sourceModel->setRelevantTimePeriod(value);
 }
 
 bool UnifiedAsyncSearchListModel::isConstrained() const
@@ -73,39 +97,8 @@ bool UnifiedAsyncSearchListModel::canFetchMore(const QModelIndex& /*parent*/) co
 
 void UnifiedAsyncSearchListModel::fetchMore(const QModelIndex& /*parent*/)
 {
-    if (!canFetchMore())
-        return;
-
-    auto prefetchCompletionHandler =
-        [this, guard = QPointer<UnifiedAsyncSearchListModel>(this)](qint64 earliestTimeMs)
-        {
-            if (!guard)
-                return;
-
-            m_busyIndicatorModel->setActive(false);
-
-            if (earliestTimeMs < 0) //< Was cancelled.
-                return;
-
-            const int previousRowCount = m_filterModel->rowCount();
-            m_sourceModel->commitPrefetch(earliestTimeMs);
-
-            const bool hasClientSideFilter = !clientsideTextFilter().isEmpty();
-            if (!hasClientSideFilter)
-                return;
-
-            // If fetch produced enough records after filtering, do nothing.
-            const auto kReFetchCountThreshold = 15;
-            if (m_filterModel->rowCount() - previousRowCount > kReFetchCountThreshold)
-                return;
-
-            // Queue more fetch after a short delay.
-            static const int kReFetchDelayMs = 50;
-            executeDelayedParented([this]() { fetchMore(); }, kReFetchDelayMs, this);
-        };
-
-    const auto fetchInProgress = m_sourceModel->prefetchAsync(prefetchCompletionHandler);
-    m_busyIndicatorModel->setActive(fetchInProgress);
+    m_sourceModel->fetchMore();
+    m_busyIndicatorModel->setActive(m_sourceModel->fetchInProgress());
 }
 
 } // namespace desktop

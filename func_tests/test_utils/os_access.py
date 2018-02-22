@@ -322,6 +322,7 @@ class SshAccess(OsAccess):
             script = '\n'.join(args_from_env(env)) + '\n' + script
             if cwd:
                 script = 'cd "{}"\n'.format(cwd) + script
+            script = "set -euxo pipefail\n" + script
             args = ['\n' + script]
         else:
             args = [str(arg) for arg in args]

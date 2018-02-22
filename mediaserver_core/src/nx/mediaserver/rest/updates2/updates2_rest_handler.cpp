@@ -134,7 +134,7 @@ JsonRestResponse createActionResponse(const QByteArray& body)
             result.json.setReply(qnServerModule->updates2Manager()->download());
             break;
         case api::Updates2ActionData::ActionCode::install:
-            // #TODO #akulikov implement
+            result.json.setReply(qnServerModule->updates2Manager()->install());
             break;
         case api::Updates2ActionData::ActionCode::stop:
             // #TODO #akulikov implement

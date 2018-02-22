@@ -408,7 +408,7 @@ protected:
 
         downloader::FileInformation fileInformation(kFileName);
         fileInformation.url = kFileUrl;
-        fileInformation.md5 = kFileMd5;
+        fileInformation.md5 = QByteArray::fromHex(kFileMd5.toBase64());
         fileInformation.size = kFileSize;
         fileInformation.peerPolicy =
             downloader::FileInformation::PeerSelectionPolicy::byPlatform;
@@ -416,6 +416,8 @@ protected:
         auto setSuccessfulExpectations =
             [this, &fileInformation](downloader::ResultCode downloadResult)
             {
+                EXPECT_CALL(m_testDownloader, deleteFile(fileInformation.name, true))
+                    .Times(1).WillOnce(Return(downloader::ResultCode::ok));
                 EXPECT_CALL(m_testDownloader, addFile(fileInformation))
                     .Times(1).WillOnce(Return(downloadResult));
                 fileInformation.status = downloader::FileInformation::Status::downloaded;
@@ -428,6 +430,7 @@ protected:
                     .WillOnce(Return(&m_testInstaller));
             };
 
+
         switch (expectedOutcome)
         {
             case DownloadExpectedOutcome::success_fileNotExists:
@@ -437,23 +440,24 @@ protected:
                 EXPECT_CALL(m_testDownloader, addFile(fileInformation))
                     .Times(1).WillOnce(Return(downloader::ResultCode::ok));
                 EXPECT_CALL(m_testDownloader, deleteFile(kFileName, _))
-                    .Times(1).WillOnce(Return(downloader::ResultCode::ok));
-
+                    .Times(2).WillRepeatedly(Return(downloader::ResultCode::ok));
                 fileInformation.status = downloader::FileInformation::Status::corrupted;
                 EXPECT_CALL(m_testDownloader, fileInformation(kFileName))
                     .Times(1).WillOnce(Return(fileInformation));
                 break;
             case DownloadExpectedOutcome::fail_addFileFailed:
+                EXPECT_CALL(m_testDownloader, deleteFile(fileInformation.name, true))
+                    .Times(1).WillOnce(Return(downloader::ResultCode::ok));
                 EXPECT_CALL(m_testDownloader, addFile(fileInformation))
                     .Times(1).WillOnce(Return(downloader::ResultCode::ioError));
                 break;
+            case DownloadExpectedOutcome::success_fileAlreadyDownloaded:
             case DownloadExpectedOutcome::success_fileAlreadyExists:
-                setSuccessfulExpectations(downloader::ResultCode::fileAlreadyExists);
+                // File should has been deleted by deleteFile() call so addFile should return ok,
+                // not fileAlreadyExists
+                setSuccessfulExpectations(downloader::ResultCode::ok);
                 break;
             case DownloadExpectedOutcome::fail_wrongState:
-                break;
-            case DownloadExpectedOutcome::success_fileAlreadyDownloaded:
-                // #TODO: #akulikov implement
                 break;
         }
     }

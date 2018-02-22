@@ -46,11 +46,6 @@ public:
      * @return pointer to the codec context.
      */
     virtual const MediaContext* context() const = 0;
-
-    /**
-     * @return UTC timestamp in microseconds of the media data
-     */
-    virtual int64_t timestampUsec() const = 0;
 };
 
 } // namespace metadata

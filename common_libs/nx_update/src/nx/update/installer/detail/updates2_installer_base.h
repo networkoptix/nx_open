@@ -20,22 +20,24 @@ public:
 
 protected:
     QString installerWorkDir() const;
-    PrepareResult checkContents() const;
+    PrepareResult checkContents(const QString& outputPath) const;
 
 private:
     AbstractZipExtractorPtr m_extractor;
     QnMutex m_mutex;
     QnWaitCondition m_condition;
     bool m_running = false;
-
+    mutable QString m_version;
+    mutable QString m_executable;
 
     // These below should be overriden in Server{Client}Updates2Installer
     virtual QString dataDirectoryPath() const = 0;
+    virtual bool initializeUpdateLog(const QString& targetVersion, QString* logFileName) const = 0;
 
     // These below should be overriden in CommonUpdates2Installer
     virtual bool cleanInstallerDirectory() = 0;
     virtual AbstractZipExtractorPtr createZipExtractor() const = 0;
-    virtual QVariantMap updateInformation() const = 0;
+    virtual QVariantMap updateInformation(const QString& outputPath) const = 0;
     virtual QnSystemInformation systemInformation() const = 0;
     virtual bool checkExecutable(const QString& executableName) const = 0;
 };

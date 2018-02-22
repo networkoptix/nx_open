@@ -595,8 +595,8 @@ QnMotionEstimation::QnMotionEstimation(): m_channelNum(0)
     m_decoder = 0;
     //m_outFrame.setUseExternalData(false);
     //m_prevFrame.setUseExternalData(false);
-    m_frames[0] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
-    m_frames[1] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
+    m_frames[0] = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
+    m_frames[1] = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
     m_frames[0]->setUseExternalData(false);
     m_frames[1]->setUseExternalData(false);
 
@@ -760,7 +760,7 @@ void QnMotionEstimation::reallocateMask(int width, int height)
     m_scaledWidth = Qn::kMotionGridWidth;
 #endif
 
-    int swUp = m_scaledWidth+1; // reserve one extra column because of analize_frame function for x8 width can write 1 extra byte
+    int swUp = m_scaledWidth+1; // reserve one extra column because of analyzeFrame() for x8 width can write 1 extra byte
     m_scaledMask = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
     m_linkedNums = (int*) qMallocAligned(Qn::kMotionGridHeight * swUp * sizeof(int), 32);
     m_motionSensScaledMask = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
@@ -787,7 +787,7 @@ void QnMotionEstimation::reallocateMask(int width, int height)
     m_isNewMask = false;
 }
 
-void QnMotionEstimation::analizeMotionAmount(quint8* frame)
+void QnMotionEstimation::analyzeMotionAmount(quint8* frame)
 {
     // 1. filtering. If a lot of motion around current pixel, mark it too, also remove motion if diff < mask
     quint8* curPtr = frame;
@@ -1012,98 +1012,178 @@ void QnMotionEstimation::scaleFrame(const uint8_t* data, int width, int height, 
     }
 }
 
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
-bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& videoData)
-{
-    QnMutexLocker lock( &m_mutex );
+#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
 
-    if (m_decoder == 0 && !(videoData->flags & AV_PKT_FLAG_KEY))
-        return false;
-    if( !m_motionMask )
-        return false;   //no motion mask set
-    if (m_decoder == 0 || m_decoder->getContext()->codec_id != videoData->compressionType)
+CLConstVideoDecoderOutputPtr QnMotionEstimation::decodeFrame(const QnCompressedVideoDataPtr& frame)
+{
+    QnMutexLocker lock(&m_mutex);
+    CLVideoDecoderOutputPtr videoDecoderOutput(new CLVideoDecoderOutput());
+
+    if (!m_decoder && !(frame->flags & AV_PKT_FLAG_KEY))
+        return CLConstVideoDecoderOutputPtr{nullptr};
+    if (!m_decoder || m_decoder->getContext()->codec_id != frame->compressionType)
     {
         delete m_decoder;
-        m_decoder = new QnFfmpegVideoDecoder(videoData->compressionType, videoData, false);
-        m_decoder->getContext()->flags |= CODEC_FLAG_GRAY;
+        m_decoder = new QnFfmpegVideoDecoder(frame->compressionType, frame, false);
     }
+
+    m_decoder->getContext()->flags &= ~CODEC_FLAG_GRAY; //< Turn off Y-only mode.
+
+    if (!m_decoder->decode(frame, &videoDecoderOutput))
+        return CLConstVideoDecoderOutputPtr{nullptr};
+
+    return videoDecoderOutput;
+}
+
+bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
+    CLConstVideoDecoderOutputPtr* outVideoDecoderOutput)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    if (!m_decoder && !(frame->flags & AV_PKT_FLAG_KEY))
+        return false;
+    if( !m_motionMask )
+        return false; //< No motion mask set.
+    if (!m_decoder || m_decoder->getContext()->codec_id != frame->compressionType)
+    {
+        delete m_decoder;
+        m_decoder = new QnFfmpegVideoDecoder(frame->compressionType, frame, false);
+    }
+
+    // Turn on Y-only mode if the decoded frame was not requested from this function.
+    if (outVideoDecoderOutput)
+        m_decoder->getContext()->flags &= ~CODEC_FLAG_GRAY;
+    else
+        m_decoder->getContext()->flags |= CODEC_FLAG_GRAY;
 
     int idx = m_totalFrames % FRAMES_BUFFER_SIZE;
     int prevIdx = (m_totalFrames-1) % FRAMES_BUFFER_SIZE;
 
-    if (!m_decoder->decode(videoData, &m_frames[idx]))
+    if (!m_decoder->decode(frame, &m_frames[idx]))
         return false;
-    if (m_frames[idx]->width < Qn::kMotionGridWidth || m_frames[idx]->height < Qn::kMotionGridHeight)
+    if (outVideoDecoderOutput)
+        *outVideoDecoderOutput = m_frames[idx];
+    if (m_frames[idx]->width < Qn::kMotionGridWidth
+        || m_frames[idx]->height < Qn::kMotionGridHeight)
+    {
         return false;
-    m_videoResolution.setWidth( m_frames[idx]->width );
-    m_videoResolution.setHeight( m_frames[idx]->height );
+    }
+    m_videoResolution.setWidth(m_frames[idx]->width);
+    m_videoResolution.setHeight(m_frames[idx]->height);
     if (m_firstFrameTime == qint64(AV_NOPTS_VALUE))
         m_firstFrameTime = m_frames[idx]->pkt_dts;
     m_lastFrameTime = m_frames[idx]->pkt_dts;
-    m_firstFrameTime = qMin(m_firstFrameTime, m_lastFrameTime); // protection if time goes to past
+    m_firstFrameTime = qMin(m_firstFrameTime, m_lastFrameTime); //< protection if time goes to past
 
 #if 0
     // test
     fillFrameRect(m_frames[idx], QRect(0,0,m_frames[idx]->width, m_frames[idx]->height), 225);
-    if (m_totalFrames % 2 == 1) {
+    if (m_totalFrames % 2 == 1)
+    {
         fillFrameRect(m_frames[idx], QRect(QPoint(0, 20), QPoint(m_frames[idx]->width, 32)), 20);
-        fillFrameRect(m_frames[idx], QRect(QPoint(0, m_frames[idx]->height/2), QPoint(m_frames[idx]->width, m_frames[idx]->height/2+8)), 20);
+        fillFrameRect(m_frames[idx],
+            QRect(
+                QPoint(0, m_frames[idx]->height/2),
+                QPoint(m_frames[idx]->width, m_frames[idx]->height/2+8)),
+            20);
 
-        fillFrameRect(m_frames[idx], QRect(QPoint(0, m_frames[idx]->height/2-8), QPoint(m_frames[idx]->width/4, m_frames[idx]->height/2)), 20);
-        fillFrameRect(m_frames[idx], QRect(QPoint(m_frames[idx]->width/2, m_frames[idx]->height/2-24), QPoint(m_frames[idx]->width*3/4, m_frames[idx]->height/2)), 20);
+        fillFrameRect(m_frames[idx],
+            QRect(
+                QPoint(0, m_frames[idx]->height/2-8),
+                QPoint(m_frames[idx]->width/4, m_frames[idx]->height/2)),
+            20);
+        fillFrameRect(m_frames[idx],
+            QRect(
+                QPoint(m_frames[idx]->width/2, m_frames[idx]->height/2-24),
+                QPoint(m_frames[idx]->width*3/4, m_frames[idx]->height/2)),
+            20);
     }
     //else
-    //    fillFrameRect(m_frames[idx], QRect(QPoint(0, m_frames[idx]->height/2), QPoint(m_frames[idx]->width, m_frames[idx]->height)), 40);
+    //    fillFrameRect(m_frames[idx],
+    //        QRect(
+    //            QPoint(0, m_frames[idx]->height/2),
+    //            QPoint(m_frames[idx]->width, m_frames[idx]->height)),
+    //        40);
 #endif
-    if (m_frames[idx]->width != m_lastImgWidth || m_frames[idx]->height != m_lastImgHeight || m_isNewMask)
-	{
+
+    if (m_frames[idx]->width != m_lastImgWidth
+        || m_frames[idx]->height != m_lastImgHeight
+        || m_isNewMask)
+    {
         reallocateMask(m_frames[idx]->width, m_frames[idx]->height);
 		m_scaleXStep = m_lastImgWidth * 65536 / Qn::kMotionGridWidth;
 		m_scaleYStep = m_lastImgHeight * 65536 / Qn::kMotionGridHeight;
         m_totalFrames = 0;
-	};
-	/*
-	LARGE_INTEGER timer;
-	double PCFreq = 0.0;
-	if( QueryPerformanceFrequency(&timer) )
-	{
-		PCFreq = double(timer.QuadPart)/1000.0;
-		//qDebug()<<"start"<< m_numFrame;
-	};
-	QueryPerformanceCounter(&timer);
-	*/
-#if !defined(DEBUG_CPU_MODE) && (defined(__i386) || defined(__amd64) || defined(_WIN32))
-    // do not calc motion if resolution just changed
-    if (m_frames[0]->width == m_frames[1]->width
-        && m_frames[0]->height == m_frames[1]->height
-        && m_frames[0]->format == m_frames[1]->format
-        && (m_frames[idx]->width >= Qn::kMotionGridWidth && m_frames[idx]->height >= Qn::kMotionGridHeight))
+    }
+
+
+#if 0
+    LARGE_INTEGER timer;
+    double PCFreq = 0.0;
+    if (QueryPerformanceFrequency(&timer))
     {
-        // calculate difference between frames
-        if (m_xStep == 8)
-            getFrame_avgY_array_8_x (m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx]);
-        else if (m_xStep == 16)
-            getFrame_avgY_array_16_x(m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx]);
+	    PCFreq = (double) timer.QuadPart / 1000.0;
+	    //qDebug() << "start" << m_numFrame;
+    }
+    QueryPerformanceCounter(&timer);
+#endif // 0
+
+    #if !defined(DEBUG_CPU_MODE) && (defined(__i386) || defined(__amd64) || defined(_WIN32))
+        // Do not calculate motion if resolution just changed.
+        if (m_frames[0]->width == m_frames[1]->width
+            && m_frames[0]->height == m_frames[1]->height
+            && m_frames[0]->format == m_frames[1]->format
+            && m_frames[idx]->width >= Qn::kMotionGridWidth
+            && m_frames[idx]->height >= Qn::kMotionGridHeight)
+        {
+            // Calculate difference between frames.
+            if (m_xStep == 8)
+            {
+                getFrame_avgY_array_8_x(
+                    m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx]);
+            }
+            else if (m_xStep == 16)
+            {
+                getFrame_avgY_array_16_x(
+                    m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx]);
+            }
+            else
+            {
+                getFrame_avgY_array_x_x(
+                    m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx], m_xStep);
+            }
+            analyzeMotionAmount(m_frameBuffer[idx]);
+        }
+    #else
+        if (m_totalFrames == 0)
+        {
+            for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
+            {
+                scaleFrame(
+                    m_frames[idx].data()->data[0],
+                    m_frames[idx]->width,
+                    m_frames[idx]->height,
+                    m_frames[idx]->linesize[0],
+                    m_frameBuffer[i],
+                    m_frameBuffer[0],
+                    m_frameDeltaBuffer);
+            }
+        }
         else
-            getFrame_avgY_array_x_x (m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx], m_xStep);
+        {
+            scaleFrame(
+                m_frames[idx].data()->data[0],
+                m_frames[idx]->width,
+                m_frames[idx]->height,
+                m_frames[idx]->linesize[0],
+                m_frameBuffer[idx],
+                m_frameBuffer[prevIdx],
+                m_frameDeltaBuffer);
+        }
+        analyzeMotionAmount(m_frameDeltaBuffer);
+    #endif
 
-        analizeMotionAmount(m_frameBuffer[idx]);
-
-
-    }
-#else
-    if (m_totalFrames == 0) {
-        for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
-            scaleFrame(m_frames[idx].data()->data[0], m_frames[idx]->width, m_frames[idx]->height, m_frames[idx]->linesize[0], m_frameBuffer[i], m_frameBuffer[0], m_frameDeltaBuffer);
-    }
-    else {
-        scaleFrame(m_frames[idx].data()->data[0], m_frames[idx]->width, m_frames[idx]->height, m_frames[idx]->linesize[0], m_frameBuffer[idx], m_frameBuffer[prevIdx], m_frameDeltaBuffer);
-    }
-    analizeMotionAmount(m_frameDeltaBuffer);
-#endif
-
-
-	/*
+#if 0
 	LARGE_INTEGER end_time;
 	if ( QueryPerformanceCounter(&end_time) )
 	{
@@ -1113,20 +1193,20 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& videoData)
 
 	if ( m_numFrame % 100 == 0 )
 	{
-		qDebug() << "analize motion estimations speed:" << (m_sumLogTime / 100.0);
+		qDebug() << "Motion estimation speed:" << (m_sumLogTime / 100.0);
 		m_sumLogTime = 0.0;
 	};
 	//qDebug() << m_numFrame;
 	m_numFrame++;
-	*/
+#endif // 0
+
     if (m_totalFrames == 0)
         m_totalFrames++;
 
-
-
     return true;
 }
-#endif
+
+#endif // defined(ENABLE_SOFTWARE_MOTION_DETECTION)
 
 void QnMotionEstimation::postFiltering()
 {

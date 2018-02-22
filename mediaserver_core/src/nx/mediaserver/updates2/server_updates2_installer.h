@@ -10,6 +10,9 @@ class ServerUpdates2Installer: public update::CommonUpdates2Installer
 {
 private:
     virtual QString dataDirectoryPath() const override;
+    virtual bool initializeUpdateLog(
+        const QString& targetVersion,
+        QString* logFileName) const override;
 };
 
 } // namespace updates2

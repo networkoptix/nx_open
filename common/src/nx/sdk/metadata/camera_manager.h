@@ -107,7 +107,7 @@ public:
      * Called before other methods. Server provides the set of settings stored in its database for
      * the combination of a resource instance and a plugin type.
      * @param settings Values of settings declared in the manifest. The pointer is valid only
-     *     during the call.
+     *     during the call. If count is 0, the pointer is null.
      */
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) = 0;
 };

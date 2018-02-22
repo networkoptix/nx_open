@@ -61,7 +61,7 @@ std::string Plugin::capabilitiesManifest() const
                     }
                 }
             ],
-            "capabilities": "needDeepCopyForMediaFrame",
+            "capabilities": "needDeepCopyForMediaFrame|needUncompressedVideoFrames",
             "settings": {
                 "params": [
                     {

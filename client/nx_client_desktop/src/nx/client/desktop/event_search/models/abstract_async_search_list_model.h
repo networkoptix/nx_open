@@ -30,15 +30,18 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
-    QnTimePeriod selectedTimePeriod() const;
-    void setSelectedTimePeriod(const QnTimePeriod& value);
-
     void clear();
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
+    virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
+
+    virtual bool fetchInProgress() const override;
+
+protected:
+    // This is currently used only internally, as we don't use fetch timestamp synchronization.
 
     // An alternative to fetchMore that does not insert new rows immediately but calls
     //   completionHandler instead. To finalize fetch commitPrefetch must be called.
@@ -49,9 +52,8 @@ public:
     using PrefetchCompletionHandler = std::function<void(qint64 earliestTimeFetchedMs)>;
     virtual bool prefetchAsync(PrefetchCompletionHandler completionHandler);
     virtual void commitPrefetch(qint64 earliestTimeToCommitMs);
-    virtual bool fetchInProgress() const;
 
-    virtual bool isConstrained() const;
+    virtual void relevantTimePeriodChanged(const QnTimePeriod& previousValue) override;
 
 private:
     QScopedPointer<Private> d;
