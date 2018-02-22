@@ -359,6 +359,15 @@ bool Socket<SocketInterfaceToImplement>::setSendTimeout(unsigned int ms)
 }
 
 template<typename SocketInterfaceToImplement>
+bool Socket<SocketInterfaceToImplement>::setIpv6Only(bool val)
+{
+    NX_ASSERT(this->m_ipVersion == AF_INET6);
+
+    const int on = val ? 1 : 0;
+    return ::setsockopt(this->m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&on, sizeof(on)) == 0;
+}
+
+template<typename SocketInterfaceToImplement>
 Pollable* Socket<SocketInterfaceToImplement>::pollable()
 {
     return this;
