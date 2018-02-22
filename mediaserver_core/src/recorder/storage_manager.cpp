@@ -500,10 +500,10 @@ QnStorageManager::QnStorageManager(
     connect(resourcePool(), &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 
-	connect(this, &QnStorageManager::rebuildFinished,
+    connect(this, &QnStorageManager::rebuildFinished,
         [this] (QnSystemHealth::MessageType message)
         {
-    		if (message == QnSystemHealth::ArchiveFastScanFinished ||
+            if (message == QnSystemHealth::ArchiveFastScanFinished ||
                 message == QnSystemHealth::ArchiveRebuildFinished)
             {
                 for (const auto& storage: getUsedWritableStorages())
@@ -516,7 +516,7 @@ QnStorageManager::QnStorageManager(
                     }
                 }
             }
-    	});
+        });
 
     if (m_role == QnServer::StoragePool::Backup)
     {
@@ -812,16 +812,16 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     sqlDb = QSqlDatabase();
     QSqlDatabase::removeDatabase(connectionName);
 
-	QString depracatedFileName = fileName + lit("_deprecated");
-	if (!QFile::remove(depracatedFileName))
-		NX_LOG(lit("%1 Deprecated db file %2 found but remove failed. Remove it manually and restart server")
-			.arg(Q_FUNC_INFO)
-			.arg(depracatedFileName), cl_logWARNING);
+    QString depracatedFileName = fileName + lit("_deprecated");
+    if (!QFile::remove(depracatedFileName))
+        NX_LOG(lit("%1 Deprecated db file %2 found but remove failed. Remove it manually and restart server")
+            .arg(Q_FUNC_INFO)
+            .arg(depracatedFileName), cl_logWARNING);
 
     if (!QFile::rename(fileName, depracatedFileName))
-		NX_LOG(lit("%1 Rename failed for deprecated db file %2. Rename (remove) it manually and restart server")
-			.arg(Q_FUNC_INFO)
-			.arg(fileName), cl_logWARNING);
+        NX_LOG(lit("%1 Rename failed for deprecated db file %2. Rename (remove) it manually and restart server")
+            .arg(Q_FUNC_INFO)
+            .arg(fileName), cl_logWARNING);
 
 
     auto sdb = qnStorageDbPool->getSDB(storage);
@@ -1109,7 +1109,7 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == commonModule()->moduleGUID())
     {
-		m_warnSended = false;
+        m_warnSended = false;
         connect(storage.data(), &QnStorageResource::isBackupChanged, this, &QnStorageManager::at_storageChanged);
         if (checkIfMyStorage(storage))
             addStorage(storage);
@@ -1120,7 +1120,7 @@ void QnStorageManager::onDelResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == commonModule()->moduleGUID() && checkIfMyStorage(storage)) {
-		m_warnSended = false;
+        m_warnSended = false;
         removeStorage(storage);
         qnStorageDbPool->removeSDB(storage);
     }

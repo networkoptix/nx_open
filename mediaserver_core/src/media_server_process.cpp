@@ -724,8 +724,6 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
         }
 
-        QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
-
         const auto unmountedStorages =
             mserver_aux::getUnmountedStorages(m_mediaServer->getStorages());
         for (const auto& storageResource: unmountedStorages)
@@ -733,6 +731,24 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             auto fileStorageResource = storageResource.dynamicCast<QnFileStorageResource>();
             if (fileStorageResource)
                 fileStorageResource->setMounted(false);
+        }
+
+        QnStorageResourceList smallStorages = getSmallStorages(m_mediaServer->getStorages());
+        QnStorageResourceList storagesToRemove;
+        for (const auto& smallStorage: smallStorages)
+        {
+            bool isSmallStorageAmongstUnmounted = false;
+            for (const auto& unmountedStorage: unmountedStorages)
+            {
+                if (unmountedStorage == smallStorage)
+                {
+                    isSmallStorageAmongstUnmounted = true;
+                    break;
+                }
+            }
+
+            if (!isSmallStorageAmongstUnmounted)
+                storagesToRemove.append(smallStorage);
         }
 
         NX_DEBUG(this, lm("Found %1 storages to remove").arg(storagesToRemove.size()));
