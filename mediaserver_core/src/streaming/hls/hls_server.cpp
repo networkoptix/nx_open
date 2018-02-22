@@ -43,6 +43,8 @@
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_listener.h>
 #include <media_server/media_server_module.h>
+#include <rest/server/json_rest_result.h>
+#include <nx/fusion/serialization_format.h>
 
 //TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
@@ -100,19 +102,30 @@ namespace nx_hls
 
     void QnHttpLiveStreamingProcessor::processRequest(const nx_http::Request& request)
     {
+        Q_D(QnTCPConnectionProcessor);
+
         nx_http::Response response;
         response.statusLine.version = request.requestLine.version;
 
-        response.statusLine.statusCode = getRequestedFile(request, &response);
+        QnJsonRestResult error;
+        response.statusLine.statusCode = getRequestedFile(request, &response, &error);
         if (response.statusLine.statusCode == nx_http::StatusCode::forbidden)
         {
             sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
             m_state = sDone;
             return;
         }
+        else if (error.error != QnJsonRestResult::NoError)
+        {
+            d->response.messageBody = QJson::serialized(error);
+            base_type::sendResponse(
+                nx_http::StatusCode::ok,
+                Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::JsonFormat));
+            m_state = sDone;
+            return;
+        }
 
         prepareResponse(request, &response);
-
         sendResponse(response);
     }
 
@@ -237,7 +250,8 @@ namespace nx_hls
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getRequestedFile(
         const nx_http::Request& request,
-        nx_http::Response* const response )
+        nx_http::Response* const response,
+        QnJsonRestResult* error)
     {
         //retreiving requested file name
         const QString& path = request.requestLine.url.path();
@@ -334,7 +348,8 @@ namespace nx_hls
                 d_ptr->accessRights,
                 camera,
                 requestParams,
-                response );
+                response,
+                error);
         }
         else
         {
@@ -440,7 +455,8 @@ namespace nx_hls
         const Qn::UserAccessData& accessRights,
         const QnVideoCameraPtr& videoCamera,
         const std::multimap<QString, QString>& requestParams,
-        nx_http::Response* const response)
+        nx_http::Response* const response,
+        QnJsonRestResult* error)
     {
         std::multimap<QString, QString>::const_iterator chunkedParamIter = requestParams.find(StreamingParams::CHUNKED_PARAM_NAME);
 
@@ -498,9 +514,12 @@ namespace nx_hls
                 camResource,
                 videoCamera,
                 streamQuality,
-                &session);
-            if (result != nx_http::StatusCode::ok)
+                &session,
+                error);
+            if (result != nx_http::StatusCode::ok || error->error)
+            {
                 return result;
+            }
             if (!HLSSessionPool::instance()->add(session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS))
             {
                 NX_ASSERT(false);
@@ -881,8 +900,19 @@ namespace nx_hls
         const QnSecurityCamResourcePtr& camResource,
         const QnVideoCameraPtr& videoCamera,
         MediaQuality streamQuality,
-        HLSSession** session )
+        HLSSession** session,
+        QnJsonRestResult* error)
     {
+        Qn::MediaStreamEvent mediaStreamEvent = Qn::MediaStreamEvent::NoEvent;
+        if (camResource)
+            mediaStreamEvent = camResource->checkForErrors();
+        if (mediaStreamEvent)
+        {
+            error->errorString = toString(mediaStreamEvent);
+            error->error = QnRestResult::Forbidden;
+            return nx_http::StatusCode::ok;
+        }
+
         std::vector<MediaQuality> requiredQualities;
         requiredQualities.reserve( 2 );
         if( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Auto )
@@ -938,8 +968,17 @@ namespace nx_hls
                         quality );
                 if( !archivePlaylistManager->initialize() )
                 {
-                    NX_LOG( lit("QnHttpLiveStreamingProcessor::getPlaylist. Failed to initialize archive playlist for camera %1").
-                        arg(camResource->getUniqueId()), cl_logDEBUG1 );
+                    mediaStreamEvent = archivePlaylistManager->lastError().toMediaStreamEvent();
+                    NX_DEBUG(this,
+                        lm("QnHttpLiveStreamingProcessor::getPlaylist. "
+                        "Failed to initialize archive playlist for camera %1. %2").
+                        args(camResource->getUniqueId(), toString(mediaStreamEvent)));
+                    if (mediaStreamEvent)
+                    {
+                        error->errorString = toString(mediaStreamEvent);
+                        error->error = QnRestResult::Forbidden;
+                        return nx_http::StatusCode::ok;
+                    }
                     return nx_http::StatusCode::internalServerError;
                 }
 

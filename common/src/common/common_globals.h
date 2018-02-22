@@ -873,8 +873,15 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     enum MediaStreamEvent
     {
         NoEvent,
-        TooManyOpenedConnections
+
+        startErrorEvent = 100,
+        TooManyOpenedConnectionsError,
+        ForbiddentBecauseDefaultPasswordError,
+        ForbiddenBecauseNoLicenseError,
+        oldFirmwareError,
+        endErrorEvent = 199,
     };
+    QString toString(MediaStreamEvent value);
 
     enum class StreamIndex
     {
