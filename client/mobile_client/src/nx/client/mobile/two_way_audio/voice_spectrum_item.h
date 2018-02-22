@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtQuick/QQuickItem>
-#include <QtCore/QElapsedTimer>
 
 class QSGGeometry;
 class QSGGeometryNode;
@@ -17,37 +16,48 @@ class VoiceSpectrumItem: public QQuickItem
     using base_type = QQuickItem;
 
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
-    Q_PROPERTY(int elementsCount READ elementsCount WRITE setElementsCount
-        NOTIFY elementsCountChanged)
+    Q_PROPERTY(int lineWidth READ lineWidth WRITE setLineWidth NOTIFY lineWidthChanged)
+    Q_PROPERTY(int lineSpacing READ lineSpacing WRITE setLineSpacing NOTIFY lineSpacingChanged)
 
 public:
     VoiceSpectrumItem(QQuickItem* parent = nullptr);
+
+    virtual ~VoiceSpectrumItem() override;
 
     virtual QSGNode* updatePaintNode(
         QSGNode* node,
         UpdatePaintNodeData* updatePaintNodeData) override;
 
-    int elementsCount() const;
-    void setElementsCount(int value);
-
     QColor color() const;
     void setColor(const QColor& color);
 
+    int lineWidth() const;
+    void setLineWidth(int value);
+
+    int lineSpacing() const;
+    void setLineSpacing(int value);
+
 signals:
-    void elementsCountChanged();
     void colorChanged();
+    void lineWidthChanged();
+    void lineSpacingChanged();
 
 private:
     void updateNodeGeometry();
     void updateNodeMaterial();
+    void clearGeometryData();
 
     QSGGeometryNode* getNode();
 
 private:
-    QElapsedTimer m_animationTimer;
-    int m_lastWidth = 0;
-    int m_elementsCount = 10;
+    class VisualizerDataGenerator;
+    using VisualizerDataGeneratorPtr = QScopedPointer<VisualizerDataGenerator>;
+
+    const VisualizerDataGeneratorPtr m_generator;
+
     QColor m_color = Qt::red;
+
+    int m_lastLinesCount = 0;
     QSGFlatColorMaterial* m_material = nullptr;
     QSGGeometryNode* m_node = nullptr;
     QSGGeometry* m_geometry = nullptr;

@@ -102,7 +102,7 @@ namespace
             });
     }
 
-    void normalizeVector(VisualizerData& source)
+    void normalizeData(VisualizerData& source)
     {
         if (source.isEmpty())
             return;
@@ -121,7 +121,7 @@ namespace
             e *= k;
     }
 
-    VisualizerData animateVector(const VisualizerData& prev, const VisualizerData& next, qint64 timeStepMs)
+    VisualizerData animateData(const VisualizerData& prev, const VisualizerData& next, qint64 timeStepMs)
     {
         //NX_ASSERT(next.size() == QnVoiceSpectrumAnalyzer::bandsCount());
 
@@ -146,7 +146,7 @@ namespace
         return result;
     }
 
-    VisualizerData generateEmptyVector(qint64 elapsedMs)
+    VisualizerData generateEmptyData(qint64 elapsedMs)
     {
         /* Making slider move forth and back.. */
         int size = QnVoiceSpectrumAnalyzer::bandsCount();
@@ -432,11 +432,11 @@ void QnTwoWayAudioWidgetPrivate::paint(QPainter *painter, const QRectF& sourceRe
         auto data = QnVoiceSpectrumAnalyzer::instance()->getSpectrumData().data;
         if (data.isEmpty())
         {
-            paintVisualizer(painter, visualizerRect, generateEmptyVector(m_paintTimeStamp), colors.visualizer);
+            paintVisualizer(painter, visualizerRect, generateEmptyData(m_paintTimeStamp), colors.visualizer);
             return;
         }
 
-        normalizeVector(data);
+        normalizeData(data);
 
         /* Calculate size hint when first time receiving analyzed data. */
         if (m_visualizerData.isEmpty() && !data.isEmpty())
@@ -445,7 +445,7 @@ void QnTwoWayAudioWidgetPrivate::paint(QPainter *painter, const QRectF& sourceRe
             q->updateGeometry();
         }
 
-        m_visualizerData = animateVector(m_visualizerData, data, timeStepMs);
+        m_visualizerData = animateData(m_visualizerData, data, timeStepMs);
         paintVisualizer(painter, visualizerRect, m_visualizerData, colors.visualizer);
     }
 }

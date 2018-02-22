@@ -1,6 +1,5 @@
 import QtQuick 2.6
 import Nx 1.0
-import com.networkoptix.qml 1.0
 
 Rectangle
 {
@@ -18,16 +17,51 @@ Rectangle
 
     visible: false
 
-    function show(text, iconPath)
+    Component
     {
-        control.icon = iconPath
-        hintTextControl.text = text
+        id: dummyComponent
+
+        Item {}
+    }
+
+    Component
+    {
+        id: textComponent
+
+        Text
+        {
+            height: 24
+            wrapMode: Text.NoWrap
+            verticalAlignment: Text.AlignVCenter
+            color: ColorTheme.brightText
+            font.pixelSize: 14
+            font.weight: Font.Normal
+        }
+
+    }
+
+    function showHint(text, iconPath)
+    {
         hideTimer.restart()
+
+        loader.sourceComponent = textComponent
+        loader.item.text = text
+        control.icon = iconPath
+        control.visible = true
+    }
+
+    function showCustomProcess(component, iconPath)
+    {
+        hideTimer.stop()
+
+        loader.sourceComponent = component
+        control.icon = iconPath
         control.visible = true
     }
 
     function hide()
     {
+        loader.sourceComponent = dummyComponent
         hideTimer.stop()
         control.visible = false
     }
@@ -41,29 +75,17 @@ Rectangle
         height: 24
         spacing: 12
 
-        VoiceSpectrumItem
+        Loader
         {
-            id: vsi
-
-            height: 24
-            width: 96
-        }
-
-        Text
-        {
-            id: hintTextControl
-            height: 24
-            wrapMode: Text.NoWrap
-            verticalAlignment: Text.AlignVCenter
-            color: ColorTheme.brightText
-            font.pixelSize: 14
-            font.weight: Font.Normal
+            id: loader
+            anchors.verticalCenter: parent.verticalCenter
         }
 
         Image
         {
             source: lp(icon)
             visible: icon.length
+            anchors.verticalCenter: parent.verticalCenter
         }
     }
 

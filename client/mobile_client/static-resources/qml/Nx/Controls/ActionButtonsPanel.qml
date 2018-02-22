@@ -1,6 +1,8 @@
 import QtQuick 2.6
+import Nx 1.0
 import Nx.Core 1.0
 import Nx.Models 1.0
+import com.networkoptix.qml 1.0
 
 import "private"
 
@@ -34,16 +36,18 @@ ButtonsPanel
     {
         var type = d.modelDataAccessor.getData(index, "type")
         if (type != ActionButtonsModel.TwoWayAudioButton)
-            return;
+            return
 
         if (pressed)
         {
             control.twoWayAudioButtonPressed()
-            hintControl.hide();
+            hintControl.showCustomProcess(voiceVisualizerComponent,
+                d.modelDataAccessor.getData(index, "iconPath"))
         }
         else
         {
             control.twoWayAudioButtonReleased()
+            hintControl.hide()
         }
     }
 
@@ -56,7 +60,7 @@ ButtonsPanel
                 ptzButtonClicked()
                 break
             case ActionButtonsModel.TwoWayAudioButton:
-                hintControl.show("Press and hold to speak",
+                hintControl.showHint("Press and hold to speak",
                     d.modelDataAccessor.getData(index, "iconPath"))
                 break
             case ActionButtonsModel.SoftTriggerButton:
@@ -80,4 +84,16 @@ ButtonsPanel
                     model: buttonModel
                 }
         }
+
+    Component
+    {
+        id: voiceVisualizerComponent
+
+        VoiceSpectrumItem
+        {
+            height: 36
+            width: 96
+            color: ColorTheme.highlight
+        }
+    }
 }
