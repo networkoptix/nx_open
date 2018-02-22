@@ -29,14 +29,38 @@ PtzAvailabilityWatcher::PtzAvailabilityWatcher(QObject* parent):
 
 void PtzAvailabilityWatcher::setResourceId(const QnUuid& uuid)
 {
-    const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    const auto cameraResource = resourcePool->getResourceById<QnVirtualCameraResource>(uuid);
-    const auto controller = qnClientCoreModule->ptzControllerPool()->controller(cameraResource);
+    if (m_camera)
+        m_camera->disconnect(this);
 
-    const auto server = cameraResource->getParentServer();
+    const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    m_camera = resourcePool->getResourceById<QnVirtualCameraResource>(uuid);
+    if (!m_camera)
+    {
+        setAvailable(false);
+        return;
+    }
+
+    connect(m_camera, &QnVirtualCameraResource::statusChanged,
+        this, &PtzAvailabilityWatcher::updateAvailability);
+
+    updateAvailability();
+}
+
+void PtzAvailabilityWatcher::updateAvailability()
+{
+    if (!m_camera)
+    {
+        setAvailable(false);
+        return;
+    }
+
+    const auto cameraStatus = m_camera->getStatus();
+    const bool correctStatus = cameraStatus == Qn::Online || cameraStatus == Qn::Recording;
+    const auto controller = qnClientCoreModule->ptzControllerPool()->controller(m_camera);
+    const auto server = m_camera->getParentServer();
     const bool validServerVersion = server && server->getVersion() >= QnSoftwareVersion(2, 6);
 
-    setAvailable(kSupportMobilePtz && validServerVersion && !controller.isNull());
+    setAvailable(kSupportMobilePtz && correctStatus && validServerVersion && !controller.isNull());
 }
 
 bool PtzAvailabilityWatcher::available() const

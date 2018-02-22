@@ -128,7 +128,7 @@ void ActionButtonsModel::handleResourceIdChanged()
 void ActionButtonsModel::updatePtzButtonVisibility()
 {
     const bool visible = ptzButtonVisible();
-    const bool ptzAvailable = true || m_ptzAvailabilityWatcher->available();
+    const bool ptzAvailable = m_ptzAvailabilityWatcher->available();
     if (ptzAvailable == visible)
         return;
 
@@ -153,7 +153,7 @@ void ActionButtonsModel::updateTwoWayAudioButtonVisibility()
         });
 
     const bool twoWayAudioButtonVisible = it != m_buttons.end();
-    const bool twoWayAudioAvailable = true || m_twoWayAudioAvailabilityWatcher->available();
+    const bool twoWayAudioAvailable = m_twoWayAudioAvailabilityWatcher->available();
     if (twoWayAudioButtonVisible == twoWayAudioAvailable)
         return;
 

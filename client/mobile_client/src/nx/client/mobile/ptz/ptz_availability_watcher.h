@@ -2,16 +2,19 @@
 
 #include <QtCore/QObject>
 
+#include <core/resource/resource_fwd.h>
+#include <utils/common/connective.h>
+
 class QnUuid;
 
 namespace nx {
 namespace client {
 namespace mobile {
 
-class PtzAvailabilityWatcher: public QObject
+class PtzAvailabilityWatcher: public Connective<QObject>
 {
     Q_OBJECT
-    using base_type = QObject;
+    using base_type = Connective<QObject>;
 
     Q_PROPERTY(bool available READ available NOTIFY availabilityChanged)
 
@@ -28,7 +31,10 @@ signals:
 private:
     void setAvailable(bool value);
 
+    void updateAvailability();
+
 private:
+    QnVirtualCameraResourcePtr m_camera;
     bool m_available = false;
 };
 
