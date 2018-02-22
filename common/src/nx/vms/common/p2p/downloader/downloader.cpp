@@ -205,7 +205,6 @@ ResultCode Downloader::deleteFile(
 {
     Q_D(Downloader);
     auto worker = d->workers.take(fileName);
-    NX_ASSERT(worker);
     if (worker)
         worker->stop();
     return d->storage->deleteFile(fileName, deleteData);

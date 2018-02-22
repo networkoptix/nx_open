@@ -226,33 +226,31 @@ api::Updates2StatusData Updates2ManagerBase::download()
     using namespace vms::common::p2p::downloader;
 
     FileInformation fileInformation;
-    fileInformation.md5 = fileData.md5;
+    fileInformation.md5 = QByteArray::fromHex(fileData.md5.toBase64());
     fileInformation.name = fileData.file;
     fileInformation.size = fileData.size;
     fileInformation.url = fileData.url;
     fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
 
+    downloader()->deleteFile(fileData.file);
+    for (const auto& fileName : m_currentStatus.files)
+            downloader()->deleteFile(fileName);
+
     ResultCode resultCode = downloader()->addFile(fileInformation);
     switch (resultCode)
     {
         case ResultCode::fileAlreadyDownloaded:
-            setStatus(
-                api::Updates2StatusData::StatusCode::preparing,
-                lit("Preparing update file: %1").arg(fileData.file));
-            startPreparing(downloader()->filePath(fileData.file));
-            break;
         case ResultCode::fileAlreadyExists:
+            NX_ASSERT(false);
+            setStatus(
+                api::Updates2StatusData::StatusCode::error,
+                lit("Downloader internal error: File exists after preliminary deleting: %1")
+                    .arg(fileData.file));
+            break;
         case ResultCode::ok:
             setStatus(
                 api::Updates2StatusData::StatusCode::downloading,
                 lit("Downloading update file: %1").arg(fileData.file));
-
-            for (const auto& fileName: m_currentStatus.files)
-            {
-                if (fileName != fileData.file)
-                    downloader()->deleteFile(fileName);
-            }
-
             m_currentStatus.files.insert(fileData.file);
             break;
         case ResultCode::fileDoesNotExist:
