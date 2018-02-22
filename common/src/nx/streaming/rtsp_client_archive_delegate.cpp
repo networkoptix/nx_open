@@ -126,7 +126,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &came
     if (maxSessionDuration.count() > 0)
         m_maxSessionDurationMs = maxSessionDuration;
     else
-        m_maxSessionDurationMs = std::chrono::milliseconds(std::numeric_limits<qint64>::max());
+        m_maxSessionDurationMs = std::chrono::milliseconds::max();
 
     m_auth.username = commonModule->currentUrl().userName();
     m_auth.password = commonModule->currentUrl().password();
