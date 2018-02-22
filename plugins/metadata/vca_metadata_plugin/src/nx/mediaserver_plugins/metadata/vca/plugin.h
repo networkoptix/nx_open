@@ -46,13 +46,16 @@ public:
     virtual const char* capabilitiesManifest(
         nx::sdk::Error* error) const override;
 
+    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override {}
+
     // Managers can safely ask plugin about events. If no event found, m_emptyEvent is returned.
-    const Vca::VcaAnalyticsEventType& eventByInternalName(
-        const QString& internalName) const noexcept;
+    const AnalyticsEventType& eventByInternalName(const QString& internalName) const noexcept;
+
+    const AnalyticsEventType& eventByUuid(const QnUuid& uuid) const noexcept;
 private:
     QByteArray m_manifest;
-    Vca::VcaAnalyticsDriverManifest m_typedManifest;
-    Vca::VcaAnalyticsEventType m_emptyEvent;
+    AnalyticsDriverManifest m_typedManifest;
+    AnalyticsEventType m_emptyEvent;
 
 };
 

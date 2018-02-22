@@ -1,17 +1,15 @@
 #pragma once
+
 #include <atomic>
-#include <QtCore/QDateTime>
-#include <QtCore/QMap>
+
 #include <QtCore/QMetaType>
 #include <QtCore/QSet>
-#include <QtCore/QStringList>
 #include <QtCore/QThreadPool>
 
 #include <api/model/kvpair.h>
 
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/from_this_to_shared.h>
-#include <nx/fusion/model_functions_fwd.h>
 
 #include <utils/common/id.h>
 #include <utils/common/functional.h>
@@ -23,7 +21,6 @@
 #include "shared_resource_pointer.h"
 #include "resource_fwd.h"
 #include "resource_type.h"
-#include "param.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
@@ -49,8 +46,6 @@ class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource
     Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId NOTIFY parentIdChanged)
     Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
-    Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
-    Q_PROPERTY(QStringList tags READ getTags WRITE setTags)
     Q_PROPERTY(Ptz::Capabilities ptzCapabilities
         READ getPtzCapabilities WRITE setPtzCapabilities NOTIFY ptzCapabilitiesChanged)
 public:
@@ -78,7 +73,6 @@ public:
 
     virtual Qn::ResourceStatus getStatus() const;
     virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local);
-    QDateTime getLastStatusUpdateTime() const;
 
     //!this function is called if resource changes state from offline to online or so
     /*!
@@ -125,11 +119,6 @@ public:
     virtual QString getName() const;
     virtual void setName(const QString& name);
 
-
-    // this value is updated by discovery process
-    QDateTime getLastDiscoveredTime() const;
-    void setLastDiscoveredTime(const QDateTime &time);
-
     QnResourcePool *resourcePool() const;
     virtual void setResourcePool(QnResourcePool *resourcePool);
 
@@ -137,38 +126,13 @@ public:
 
 
     template<class Resource>
-    static QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource);
+    static QnSharedResourcePointer<Resource> toSharedPointer(const Resource *resource);
 
     QnResourcePtr getParentResource() const;
 
     // ==================================================
 
-    //QnParamList getResourceParamList() const; // returns params that can be changed on device level
-
     bool hasParam(const QString &name) const;
-
-    // return true if no error
-    //bool getParam(const QString &name, QVariant &val, QnDomain domain) const;
-
-#ifdef ENABLE_DATA_PROVIDERS
-    // same as getParam is invoked in separate thread.
-    // as soon as param changed parameterValueChanged() signal is emitted
-#endif
-
-
-    // return true if no error
-    //virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain);
-
-#ifdef ENABLE_DATA_PROVIDERS
-    // same as setParam but but returns immediately;
-    // this function leads setParam invoke in separate thread. so no need to make it virtual
-    //void setParamAsync(const QString &name, const QVariant &val, QnDomain domain);
-#endif
-
-    // some time we can find resource, but cannot request additional information from it ( resource has bad ip for example )
-    // in this case we need to request additional information later.
-    // unknownResource - tels if we need that additional information
-    virtual bool unknownResource() const;
 
 #ifdef ENABLE_DATA_PROVIDERS
     QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
@@ -176,12 +140,6 @@ public:
 
     virtual QString getUrl() const;
     virtual void setUrl(const QString &url);
-
-    void addTag(const QString& tag);
-    void setTags(const QStringList& tags);
-    void removeTag(const QString& tag);
-    bool hasTag(const QString& tag) const;
-    QStringList getTags() const;
 
     bool hasConsumer(QnResourceConsumer *consumer) const;
 #ifdef ENABLE_DATA_PROVIDERS
@@ -202,7 +160,7 @@ public:
     bool hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const;
     void setPtzCapabilities(Ptz::Capabilities capabilities);
     void setPtzCapability(Ptz::Capabilities capability, bool value);
-    QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here
+
 
     /* Note that these functions hide property API inherited from QObject.
      * This is intended as this API cannot be used with QnResource anyway
@@ -298,8 +256,6 @@ protected:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
 #endif
 
-    virtual QnAbstractPtzController *createPtzControllerInternal(); // TODO: #Elric does not belong here
-
     virtual CameraDiagnostics::Result initInternal();
     //!Called just after successful \a initInternal()
     /*!
@@ -316,7 +272,6 @@ private:
     void disconnectAllConsumers();
     void initAndEmit();
 
-    void updateUrlName(const QString &oldUrl, const QString &newUrl);
     bool emitDynamicSignal(const char *signal, void **arguments);
 
     void emitPropertyChanged(const QString& key);
@@ -374,7 +329,7 @@ private:
     };
 
     /** Resource pool this this resource belongs to. */
-    QnResourcePool* m_resourcePool;
+    QnResourcePool* m_resourcePool = nullptr;
 
     /** Identifier of this resource. */
     QnUuid m_id;
@@ -383,27 +338,24 @@ private:
     QnUuid m_typeId;
 
     /** Flags of this resource that determine its type. */
-    Qn::ResourceFlags m_flags;
+    Qn::ResourceFlags m_flags = 0;
 
-    QDateTime m_lastDiscoveredTime;
-
-    QStringList m_tags;
-
-    bool m_initialized;
+    bool m_initialized = false;
     static QnMutex m_initAsyncMutex;
 
-    qint64 m_lastInitTime;
-    CameraDiagnostics::Result m_prevInitializationResult;
-    CameraDiagnostics::Result m_lastMediaIssue;
+    qint64 m_lastInitTime = 0;
+    CameraDiagnostics::Result m_prevInitializationResult = CameraDiagnostics::Result(
+        CameraDiagnostics::ErrorCode::unknown);
+    CameraDiagnostics::Result m_lastMediaIssue = CameraDiagnostics::NoErrorResult();
     QAtomicInt m_initializationAttemptCount;
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
-    bool m_initInProgress;
+    bool m_initInProgress = false;
     QnCommonModule* m_commonModule;
 };
 
 template<class Resource>
-QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource)
+QnSharedResourcePointer<Resource> toSharedPointer(const Resource *resource)
 {
     if (!resource)
         return QnSharedResourcePointer<Resource>();
@@ -411,7 +363,7 @@ QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource)
 }
 
 template<class Resource>
-QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource)
+QnSharedResourcePointer<Resource> QnResource::toSharedPointer(const Resource *resource)
 {
     using ::toSharedPointer; /* Let ADL kick in. */
     return toSharedPointer(resource);

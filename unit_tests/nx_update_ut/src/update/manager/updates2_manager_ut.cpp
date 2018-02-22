@@ -1,5 +1,5 @@
 #include <nx/update/manager/detail/update_request_data_factory.h>
-#include <nx/update/installer/abstract_updates2_installer.h>
+#include <nx/update/installer/detail/abstract_updates2_installer.h>
 #include <nx/update/info/abstract_update_registry.h>
 #include <nx/update/manager/detail/updates2_manager_base.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
@@ -13,6 +13,7 @@
 
 namespace nx {
 namespace update {
+namespace detail {
 namespace test {
 
 class TestUpdateRegistry: public update::info::AbstractUpdateRegistry
@@ -72,7 +73,7 @@ enum class PrepareExpectedOutcome
 
 const static QString kFileName = "test.file.name";
 
-class TestInstaller: public AbstractUpdates2Installer, public QnLongRunnable
+class TestInstaller: public detail::AbstractUpdates2Installer, public QnLongRunnable
 {
 public:
     virtual void prepareAsync(
@@ -82,16 +83,18 @@ public:
         put(handler);
     }
 
-    MOCK_METHOD1(install, void(const QString& updateId));
+    MOCK_METHOD0(install, bool());
 
     void setExpectedOutcome(PrepareExpectedOutcome expectedOutcome)
     {
         m_expectedOutcome = expectedOutcome;
     }
 
+    MOCK_METHOD0(stopSync, void());
+
     ~TestInstaller()
     {
-        stop();
+        QnLongRunnable::stop();
     }
 
 private:
@@ -121,10 +124,10 @@ private:
             switch (m_expectedOutcome)
             {
                 case PrepareExpectedOutcome::success:
-                    handler(PrepareResult::ok , kFileName);
+                    handler(PrepareResult::ok);
                     break;
                 case PrepareExpectedOutcome::fail_noFreeSpace:
-                    handler(PrepareResult::noFreeSpace , kFileName);
+                    handler(PrepareResult::noFreeSpace);
                     break;
             }
 
@@ -147,7 +150,7 @@ private:
     }
 };
 
-class TestUpdates2Manager: public detail::Updates2ManagerBase
+class TestUpdates2Manager: public Updates2ManagerBase
 {
 public:
     void setStatus(const detail::Updates2StatusDataEx& status)
@@ -230,7 +233,7 @@ public:
     }
 
     MOCK_METHOD0(downloader, vms::common::p2p::downloader::AbstractDownloader*());
-    MOCK_METHOD0(installer, AbstractUpdates2InstallerPtr());
+    MOCK_METHOD0(installer, AbstractUpdates2Installer*());
 
     virtual void remoteUpdateCompleted() override
     {
@@ -405,7 +408,7 @@ protected:
 
         downloader::FileInformation fileInformation(kFileName);
         fileInformation.url = kFileUrl;
-        fileInformation.md5 = kFileMd5;
+        fileInformation.md5 = QByteArray::fromHex(kFileMd5.toBase64());
         fileInformation.size = kFileSize;
         fileInformation.peerPolicy =
             downloader::FileInformation::PeerSelectionPolicy::byPlatform;
@@ -413,6 +416,8 @@ protected:
         auto setSuccessfulExpectations =
             [this, &fileInformation](downloader::ResultCode downloadResult)
             {
+                EXPECT_CALL(m_testDownloader, deleteFile(fileInformation.name, true))
+                    .Times(1).WillOnce(Return(downloader::ResultCode::ok));
                 EXPECT_CALL(m_testDownloader, addFile(fileInformation))
                     .Times(1).WillOnce(Return(downloadResult));
                 fileInformation.status = downloader::FileInformation::Status::downloaded;
@@ -422,8 +427,9 @@ protected:
                     .Times(1).WillOnce(Return(kFileName));
                 EXPECT_CALL(m_testUpdates2Manager, installer())
                     .Times(1)
-                    .WillOnce(Return(AbstractUpdates2InstallerPtr(&m_testInstaller, [](void*){})));
+                    .WillOnce(Return(&m_testInstaller));
             };
+
 
         switch (expectedOutcome)
         {
@@ -434,23 +440,24 @@ protected:
                 EXPECT_CALL(m_testDownloader, addFile(fileInformation))
                     .Times(1).WillOnce(Return(downloader::ResultCode::ok));
                 EXPECT_CALL(m_testDownloader, deleteFile(kFileName, _))
-                    .Times(1).WillOnce(Return(downloader::ResultCode::ok));
-
+                    .Times(2).WillRepeatedly(Return(downloader::ResultCode::ok));
                 fileInformation.status = downloader::FileInformation::Status::corrupted;
                 EXPECT_CALL(m_testDownloader, fileInformation(kFileName))
                     .Times(1).WillOnce(Return(fileInformation));
                 break;
             case DownloadExpectedOutcome::fail_addFileFailed:
+                EXPECT_CALL(m_testDownloader, deleteFile(fileInformation.name, true))
+                    .Times(1).WillOnce(Return(downloader::ResultCode::ok));
                 EXPECT_CALL(m_testDownloader, addFile(fileInformation))
                     .Times(1).WillOnce(Return(downloader::ResultCode::ioError));
                 break;
+            case DownloadExpectedOutcome::success_fileAlreadyDownloaded:
             case DownloadExpectedOutcome::success_fileAlreadyExists:
-                setSuccessfulExpectations(downloader::ResultCode::fileAlreadyExists);
+                // File should has been deleted by deleteFile() call so addFile should return ok,
+                // not fileAlreadyExists
+                setSuccessfulExpectations(downloader::ResultCode::ok);
                 break;
             case DownloadExpectedOutcome::fail_wrongState:
-                break;
-            case DownloadExpectedOutcome::success_fileAlreadyDownloaded:
-                // #TODO: #akulikov implement
                 break;
         }
     }
@@ -650,8 +657,6 @@ TEST_F(Updates2Manager, StatusWhileCheckingForUpdate)
     thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::checking);
     whenRemoteUpdateDone();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
-
-    // #TODO: #akulikov implement
 }
 
 TEST_F(Updates2Manager, Download_successful)
@@ -846,5 +851,6 @@ TEST_F(Updates2Manager, Prepare_failedNoFreeSpace)
 }
 
 } // namespace test
+} // namespace detail
 } // namespace update
 } // namespace nx

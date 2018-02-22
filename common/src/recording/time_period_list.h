@@ -183,8 +183,6 @@ public:
      */
     void excludeTimePeriods(const QnTimePeriodList& periodList);
 
-    void excludeTimePeriodList(const QnTimePeriodList& timePeriodList);
-
     /**
      * Converts any period list to a simple list: sorted and containing only non-overlapped periods.
      */

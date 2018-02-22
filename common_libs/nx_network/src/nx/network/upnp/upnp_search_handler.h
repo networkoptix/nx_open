@@ -32,6 +32,7 @@ public:
         const SocketAddress& discoveredDevAddress,
         const DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo ) = 0;
+    virtual bool isEnabled() const = 0;
 };
 
 class NX_NETWORK_API SearchAutoHandler:

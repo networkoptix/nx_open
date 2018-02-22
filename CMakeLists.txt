@@ -194,10 +194,18 @@ if(withMediaServer)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
 
+    if(withDistributions)
+        # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_metadata_sdk) into one like this.
+        add_subdirectory(nx_metadata_sdk)
+    endif()
+
     if(LINUX AND box MATCHES "none|tx1")
         add_subdirectory(root_tool)
     endif()
 endif()
+
+#add_subdirectory(_axis_controller)
+#add_subdirectory(_vca_controller)
 
 if(withTestCamera)
     add_subdirectory(testcamera)

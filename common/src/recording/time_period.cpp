@@ -234,6 +234,10 @@ qint64 QnTimePeriod::infiniteDuration() {
     return ::infiniteDuration;
 }
 
+QnTimePeriod QnTimePeriod::anytime() {
+    return QnTimePeriod(kMinTimeValue, infiniteDuration());
+}
+
 bool QnTimePeriod::isEmpty() const {
     return durationMs == 0;
 }
@@ -290,10 +294,20 @@ QnTimePeriod QnTimePeriod::truncatedFront(qint64 timeMs) const
     return *this;
 }
 
+qint64 QnTimePeriod::bound(qint64 timeMs) const
+{
+    return qBound(startTimeMs, timeMs, endTimeMs());
+}
+
 bool operator==(const QnTimePeriod &first, const QnTimePeriod &other)
 {
     return ((first.startTimeMs == other.startTimeMs)
         && (first.durationMs == other.durationMs));
+}
+
+bool operator!=(const QnTimePeriod &first, const QnTimePeriod &other)
+{
+    return !(first == other);
 }
 
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {

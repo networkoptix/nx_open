@@ -1,4 +1,4 @@
-﻿#include "plugin.h"
+#include "plugin.h"
 
 #include <array>
 #include <fstream>
@@ -15,6 +15,10 @@
 
 #include <nx/network/deprecated/asynchttpclient.h>
 
+#include <nx/utils/log/log.h>
+// TODO: #szaitsev: Redirect NX_DEBUG_STREAM to NX_UTILS_LOG_STREAM_NO_SPACE.
+//#define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
+//    nx::utils::log::Level::debug, lm("vca_metadata_plugin")) << NX_PRINT_PREFIX
 #include <nx/kit/debug.h>
 
 #include "manager.h"
@@ -42,8 +46,7 @@ Plugin::Plugin()
         m_manifest = f.readAll();
     else
         NX_PRINT << kPluginName << " can not open resource \"" << kResourceName << "\".";
-
-    m_typedManifest = QJson::deserialized<Vca::VcaAnalyticsDriverManifest>(m_manifest);
+    m_typedManifest = QJson::deserialized<AnalyticsDriverManifest>(m_manifest);
 }
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -121,14 +124,14 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-const Vca::VcaAnalyticsEventType& Plugin::eventByInternalName(
+const AnalyticsEventType& Plugin::eventByInternalName(
     const QString& internalName) const noexcept
 {
     // There are only few elements, so linear search is the fastest and the most simple.
     const auto it = std::find_if(
         m_typedManifest.outputEventTypes.cbegin(),
         m_typedManifest.outputEventTypes.cend(),
-        [&internalName](const Vca::VcaAnalyticsEventType& event)
+        [&internalName](const AnalyticsEventType& event)
         {
             return event.internalName == internalName;
         });
@@ -138,6 +141,23 @@ const Vca::VcaAnalyticsEventType& Plugin::eventByInternalName(
             ? *it
             : m_emptyEvent;
 }
+
+const AnalyticsEventType& Plugin::eventByUuid(const QnUuid& uuid) const noexcept
+{
+    const auto it = std::find_if(
+        m_typedManifest.outputEventTypes.cbegin(),
+        m_typedManifest.outputEventTypes.cend(),
+        [&uuid](const AnalyticsEventType& event)
+        {
+            return event.eventTypeId == uuid;
+        });
+
+    return
+        (it != m_typedManifest.outputEventTypes.cend())
+        ? *it
+        : m_emptyEvent;
+}
+
 
 } // namespace vca
 } // namespace metadata

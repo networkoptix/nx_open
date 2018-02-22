@@ -24,9 +24,10 @@
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/sdk/metadata/consuming_camera_manager.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
-#include "media_data_receptor.h"
 #include <nx/utils/log/log_main.h>
 #include <mediaserver_ini.h>
+
+#include "video_data_receptor.h"
 
 namespace nx {
 namespace api {
@@ -216,7 +217,9 @@ void ManagerPool::setManagerDeclaredSettings(
     // TODO: Stub. Implement storing the settings in the database.
     std::vector<nxpl::Setting> settings;
     loadSettingsFromFile(&settings, ini().stubCameraManagerSettings);
-    manager->setDeclaredSettings(&settings.front(), (int) settings.size());
+    manager->setDeclaredSettings(
+        settings.empty() ? nullptr : &settings.front(),
+        (int) settings.size());
     freeSettings(&settings);
 }
 
@@ -225,7 +228,9 @@ void ManagerPool::setPluginDeclaredSettings(Plugin* plugin)
     // TODO: Stub. Implement storing the settings in the database.
     std::vector<nxpl::Setting> settings;
     loadSettingsFromFile(&settings, ini().stubPluginSettings);
-    plugin->setDeclaredSettings(&settings.front(), (int) settings.size());
+    plugin->setDeclaredSettings(
+        settings.empty() ? nullptr : &settings.front(),
+        (int) settings.size());
     freeSettings(&settings);
 }
 
@@ -283,7 +288,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
 
         auto& context = m_contexts[camera->getId()];
         std::unique_ptr<MetadataHandler> handler(
-            createMetadataHandler(camera, pluginManifest->driverId));
+            createMetadataHandler(camera, *pluginManifest));
 
         if (auto consumingCameraManager = nxpt::ScopedRef<CameraManager>(
             manager->queryInterface(IID_CameraManager)))
@@ -340,7 +345,7 @@ void ManagerPool::releaseResourceCameraManagersUnsafe(const QnSecurityCamResourc
 
 MetadataHandler* ManagerPool::createMetadataHandler(
     const QnResourcePtr& resource,
-    const QnUuid& pluginId)
+    const nx::api::AnalyticsDriverManifest& manifest)
 {
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
@@ -354,7 +359,7 @@ MetadataHandler* ManagerPool::createMetadataHandler(
 
     auto handler = new MetadataHandler();
     handler->setResource(camera);
-    handler->setPluginId(pluginId);
+    handler->setManifest(manifest);
 
     return handler;
 }
@@ -687,29 +692,104 @@ bool ManagerPool::cameraInfoFromResource(
     return true;
 }
 
-void ManagerPool::putVideoData(const QnUuid& id, const QnCompressedVideoData* video)
+void ManagerPool::warnOnce(bool* warningIssued, const QString& message)
 {
-    QnMutexLocker lock(&m_contextMutex);
-    for (auto& data: m_contexts[id].managers())
+    if (!*warningIssued)
     {
-        using namespace nx::sdk::metadata;
-        nxpt::ScopedRef<ConsumingCameraManager> manager(
-            data.manager->queryInterface(IID_ConsumingCameraManager));
-        if (!manager)
-            return;
-        bool needDeepCopy = data.manifest.capabilities.testFlag(
-            nx::api::AnalyticsDriverManifestBase::needDeepCopyForMediaFrame);
-        auto packet = toPluginVideoPacket(video, needDeepCopy);
-        manager->pushDataPacket(packet.get());
+        *warningIssued = true;
+        NX_WARNING(this) << message;
+    }
+    else
+    {
+        NX_VERBOSE(this) << message;
     }
 }
 
-QWeakPointer<QnAbstractDataReceptor> ManagerPool::mediaDataReceptor(const QnUuid& id)
+void ManagerPool::putVideoFrame(
+    const QnUuid& id,
+    const QnConstCompressedVideoDataPtr& compressedFrame,
+    const CLConstVideoDecoderOutputPtr& uncompressedFrame)
+{
+    NX_VERBOSE(this) << lm("putVideoFrame(\"%1\", %2, %3)").args(
+        id,
+        compressedFrame ? "compressedFrame" : "/*compressedFrame*/ nullptr",
+        uncompressedFrame ? "uncompressedFrame" : "/*uncompressedFrame*/ nullptr");
+
+    QnMutexLocker lock(&m_contextMutex);
+    for (auto& managerData: m_contexts[id].managers())
+    {
+        nxpt::ScopedRef<ConsumingCameraManager> manager(
+            managerData.manager->queryInterface(IID_ConsumingCameraManager));
+        if (!manager)
+            continue;
+        const bool needDeepCopy = managerData.manifest.capabilities.testFlag(
+            nx::api::AnalyticsDriverManifestBase::needDeepCopyForMediaFrame);
+        const bool needUncompressedVideoFrames = managerData.manifest.capabilities.testFlag(
+            nx::api::AnalyticsDriverManifestBase::needUncompressedVideoFrames);
+        DataPacket* dataPacket = nullptr;
+        if (needUncompressedVideoFrames)
+        {
+            if (uncompressedFrame)
+            {
+                dataPacket = VideoDataReceptor::videoDecoderOutputToPlugin(
+                    uncompressedFrame, needDeepCopy);
+            }
+            else
+            {
+                warnOnce(&m_uncompressedFrameWarningIssued,
+                    lm("Uncompressed frame requested but not received."));
+            }
+        }
+        else
+        {
+            if (compressedFrame)
+            {
+                dataPacket = VideoDataReceptor::compressedVideoDataToPlugin(
+                    compressedFrame, needDeepCopy);
+            }
+            else
+            {
+                warnOnce(&m_compressedFrameWarningIssued,
+                    lm("Compressed frame requested but not received."));
+            }
+        }
+        if (dataPacket)
+            manager->pushDataPacket(dataPacket);
+        else
+            NX_VERBOSE(this) << lm("Video frame not sent to CameraManager.");
+    }
+}
+
+QWeakPointer<VideoDataReceptor> ManagerPool::mediaDataReceptor(const QnUuid& id)
 {
     QnMutexLocker lock(&m_contextMutex);
     auto& context = m_contexts[id];
+
+    // Check whether at least one CameraManager requires uncompressedFrames.
+    bool uncompressedFramesNeeded = false;
+    for (auto& managerData: m_contexts[id].managers())
+    {
+        nxpt::ScopedRef<ConsumingCameraManager> manager(
+            managerData.manager->queryInterface(IID_ConsumingCameraManager));
+        if (!manager)
+            continue;
+        uncompressedFramesNeeded = managerData.manifest.capabilities.testFlag(
+            nx::api::AnalyticsDriverManifestBase::needUncompressedVideoFrames);
+        if (uncompressedFramesNeeded)
+            break;
+    }
+
     auto dataReceptor = VideoDataReceptorPtr(new VideoDataReceptor(
-        std::bind(&ManagerPool::putVideoData, this, id, std::placeholders::_1)));
+        [this, id](
+            const QnConstCompressedVideoDataPtr& compressedFrame,
+            const CLConstVideoDecoderOutputPtr& uncompressedFrame)
+        {
+            putVideoFrame(id, compressedFrame, uncompressedFrame);
+        },
+        uncompressedFramesNeeded
+            ? VideoDataReceptor::AcceptedFrameKind::uncompressed
+            : VideoDataReceptor::AcceptedFrameKind::compressed));
+
     context.setVideoFrameDataReceptor(dataReceptor);
     return dataReceptor.toWeakRef();
 }

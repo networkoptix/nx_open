@@ -23,6 +23,7 @@
 
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/utils/datetime.h>
+#include <nx/utils/pending_operation.h>
 #include <nx/vms/event/analytics_helper.h>
 
 namespace nx {
@@ -65,6 +66,7 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
     q(q),
     m_updateTimer(new QTimer()),
     m_dataChangedTimer(new QTimer()),
+    m_updateWorkbenchFilter(createUpdateWorkbenchFilterOperation()),
     m_metadataSource(createMetadataSource())
 {
     m_updateTimer->setInterval(std::chrono::milliseconds(kUpdateTimerInterval).count());
@@ -76,6 +78,30 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
 
 AnalyticsSearchListModel::Private::~Private()
 {
+}
+
+utils::PendingOperation* AnalyticsSearchListModel::Private::createUpdateWorkbenchFilterOperation()
+{
+    const auto updateWorkbenchFilter =
+        [this]()
+        {
+            if (!camera())
+                return;
+
+            Filter filter;
+            filter.deviceId = camera()->getId();
+            filter.boundingBox = m_filterRect;
+            filter.freeText = m_filterText;
+            q->navigator()->setAnalyticsFilter(filter);
+        };
+
+    static constexpr int kUpdateWorkbenchFilterDelayMs = 100;
+
+    auto result = new utils::PendingOperation(updateWorkbenchFilter,
+        kUpdateWorkbenchFilterDelayMs, this);
+
+    result->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
+    return result;
 }
 
 media::SignalingMetadataConsumer* AnalyticsSearchListModel::Private::createMetadataSource()
@@ -187,6 +213,7 @@ void AnalyticsSearchListModel::Private::setFilterRect(const QRectF& relativeRect
 
     clear();
     m_filterRect = relativeRect;
+    m_updateWorkbenchFilter->requestOperation();
 }
 
 QString AnalyticsSearchListModel::Private::filterText() const
@@ -201,6 +228,7 @@ void AnalyticsSearchListModel::Private::setFilterText(const QString& value)
 
     clear();
     m_filterText = value;
+    m_updateWorkbenchFilter->requestOperation();
 }
 
 void AnalyticsSearchListModel::Private::clear()
@@ -212,11 +240,12 @@ void AnalyticsSearchListModel::Private::clear()
     m_prefetch.clear();
     m_objectIdToTimestampUs.clear();
     m_currentUpdateId = rest::Handle();
-    m_latestTimeMs = qMin(qnSyncTime->currentMSecsSinceEpoch(), selectedTimePeriod().endTimeMs());
+    m_latestTimeMs = qMin(qnSyncTime->currentMSecsSinceEpoch(), q->relevantTimePeriod().endTimeMs());
     m_filterRect = QRectF();
     base_type::clear();
 
     refreshUpdateTimer();
+    m_updateWorkbenchFilter->requestOperation();
 }
 
 bool AnalyticsSearchListModel::Private::hasAccessRights() const
@@ -306,7 +335,7 @@ bool AnalyticsSearchListModel::Private::commitPrefetch(qint64 earliestTimeToComm
 void AnalyticsSearchListModel::Private::clipToSelectedTimePeriod()
 {
     m_currentUpdateId = rest::Handle(); //< Cancel timed update.
-    m_latestTimeMs = qMin(m_latestTimeMs, selectedTimePeriod().endTimeMs());
+    m_latestTimeMs = qMin(m_latestTimeMs, q->relevantTimePeriod().endTimeMs());
     refreshUpdateTimer();
 
     const auto cleanupFunction =
@@ -314,12 +343,12 @@ void AnalyticsSearchListModel::Private::clipToSelectedTimePeriod()
 
     // Explicit specialization is required for gcc 4.6.
     clipToTimePeriod<decltype(m_data), decltype(upperBoundPredicateMs)>(
-        m_data, upperBoundPredicateMs, selectedTimePeriod(), cleanupFunction);
+        m_data, upperBoundPredicateMs, q->relevantTimePeriod(), cleanupFunction);
 }
 
 void AnalyticsSearchListModel::Private::refreshUpdateTimer()
 {
-    if (camera() && selectedTimePeriod().isInfinite())
+    if (camera() && q->relevantTimePeriod().isInfinite())
     {
         if (!m_updateTimer->isActive())
         {

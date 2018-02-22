@@ -11,7 +11,6 @@
 
 #include "recording/time_period.h"
 
-
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;
 class QnArchiveStreamReader;
@@ -70,7 +69,6 @@ public:
     virtual int getSequence() const override;
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
-
 private:
     void setRtpData(QnRtspIoDevice* value);
     QnAbstractDataPacketPtr processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition);
@@ -87,6 +85,8 @@ private:
     void checkMinTimeFromOtherServer(const QnSecurityCamResourcePtr &camera);
     void setupRtspSession(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, QnRtspClient* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
+    void setCustomVideoLayout(const QnCustomResourceVideoLayoutPtr& value);
+    bool isConnectionExpired() const;
 private:
     QnMutex m_mutex;
     std::unique_ptr<QnRtspClient> m_rtspSession;
@@ -95,7 +95,6 @@ private:
     bool m_tcpMode;
     QMap<quint32, quint16> m_prevTimestamp;
     qint64 m_position;
-    bool m_opened;
     QnSecurityCamResourcePtr m_camera;
     QnMediaServerResourcePtr m_server;
     QnMediaServerResourcePtr m_fixedServer;

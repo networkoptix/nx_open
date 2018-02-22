@@ -334,3 +334,8 @@ bool QnUpnpResourceSearcherAsync::processPacket(
         m_resList );
     return resListSizeBak > m_resList.size();   //device recognized, no need to process this upnp data futher
 }
+
+bool QnUpnpResourceSearcherAsync::isEnabled() const
+{
+    return discoveryMode() != DiscoveryMode::disabled;
+}

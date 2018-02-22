@@ -10,15 +10,17 @@ namespace sdk {
 namespace metadata {
 
 /**
- * Each class that implements Plugin interface
- * should properly handle this GUID in its queryInterface method
+ * Each class that implements Plugin interface should properly handle this GUID in its
+ * queryInterface().
  */
-static const nxpl::NX_GUID IID_Plugin = {{0x6d, 0x73, 0x71, 0x36, 0x17, 0xad, 0x43, 0xf9,
-    0x9f, 0x80, 0x7d, 0x56, 0x91, 0x36, 0x82, 0x94}};
+static const nxpl::NX_GUID IID_Plugin =
+    {{0x6d,0x73,0x71,0x36,0x17,0xad,0x43,0xf9,0x9f,0x80,0x7d,0x56,0x91,0x36,0x82,0x94}};
 
 /**
- * @brief The Plugin class is a main interface for metadata plugins.
- * Each metadata plugin should implement this interface.
+ * Main interface for a Metadata Plugin instance. The instance is created by Mediaserver on its
+ * start via a call to createNxMetadataPlugin() which should be exported as extern "C" by the
+ * plugin library, and is destroyed (via releaseRef()) on Mediaserver shutdown. Mediaserver never
+ * creates more than one instance of Plugin.
  */
 class Plugin: public nxpl::Plugin3
 {
@@ -48,7 +50,7 @@ public:
      * Called before other methods. Server provides the set of settings stored in its database for
      * the plugin type.
      * @param settings Values of settings declared in the manifest. The pointer is valid only
-     *     during the call.
+     *     during the call. If count is 0, the pointer is null.
      */
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) = 0;
 };

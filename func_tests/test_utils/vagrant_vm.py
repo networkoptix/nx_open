@@ -1,5 +1,4 @@
 import logging
-import socket
 import tempfile
 
 import jinja2
@@ -7,8 +6,13 @@ import vagrant
 import vagrant.compat
 from pathlib2 import Path
 
-from .os_access import ProcessError, SshAccess, host_from_config
-from .vagrant_vm_config import DEFAULT_NATNET1, VagrantVMConfig
+from test_utils.networking import NodeNetworking
+from test_utils.networking.linux import LinuxNodeNetworking
+from test_utils.networking.virtual_box import VirtualBoxNodeNetworking
+from test_utils.os_access import LocalAccess
+from test_utils.ssh.sshd import optimize_sshd
+from .os_access import ProcessError, SshAccess
+from .vagrant_vm_config import VagrantVMConfig
 from .virtualbox_management import VirtualboxManagement
 
 log = logging.getLogger(__name__)
@@ -44,38 +48,35 @@ class RemotableVagrant(vagrant.Vagrant):
 class VagrantVMFactory(object):
     _vagrant_vms_cache_key = 'nx/vagrant_vms'
 
-    def __init__(self, cache, options, config_factory):
+    def __init__(self, cache, common_ssh_config, vm_host_hostname, options, config_factory):
+        self._common_ssh_config = common_ssh_config
         self._cache = cache
         self._bin_dir = options.bin_dir
-        self._vagrant_private_key_path = None  # defined for remote ssh vm host
         self._config_factory = config_factory
-        self._host_os_access = host_from_config(options.vm_ssh_host_config)
         self._vm_name_prefix = options.vm_name_prefix
         self._vm_port_base = options.vm_port_base
-        self._virtualbox_vm = VirtualboxManagement(self._vm_name_prefix, self._host_os_access)
-        if options.vm_ssh_host_config:
+        if vm_host_hostname:
+            self.vm_host_hostname = vm_host_hostname
+            self._host_os_access = SshAccess(self._common_ssh_config.path, vm_host_hostname)
             self._vagrant_dir = options.vm_host_work_dir / 'vagrant'
             self._vagrant_private_key_path = options.work_dir / 'vagrant_insecure_private_key'
-            self._copy_vagrant_insecure_ssh_key(to_local_path=self._vagrant_private_key_path)
+            self._host_os_access.get_file('.vagrant.d/insecure_private_key', self._vagrant_private_key_path)
         else:
+            self.vm_host_hostname = 'localhost'
+            self._host_os_access = LocalAccess()
             self._vagrant_dir = options.work_dir / 'vagrant'
+            self._vagrant_private_key_path = Path().home() / '.vagrant.d' / 'insecure_private_key'
+        self._virtualbox_vm = VirtualboxManagement(self._host_os_access)
         self._vagrant_file_path = self._vagrant_dir / 'Vagrantfile'
-        self._ssh_config_path = options.work_dir / 'ssh.config'
         self._existing_vm_list = set(self._virtualbox_vm.get_vms_list())
-        options.work_dir.mkdir(parents=True, exist_ok=True)
         self._vagrant = RemotableVagrant(
             self._host_os_access, root=str(self._vagrant_dir), quiet_stdout=False, quiet_stderr=False)
         self._vms = self._discover_existing_vms()  # VM name -> VagrantVM
-        self._write_ssh_config()
         self._init_running_vms()
         if self._vms:
             self._last_vm_idx = max(vm.config.idx for vm in self._vms.values())
         else:
             self._last_vm_idx = 0
-
-    def _copy_vagrant_insecure_ssh_key(self, to_local_path):
-        log.debug('picking vagrant insecure ssh key:')
-        self._host_os_access.get_file('.vagrant.d/insecure_private_key', to_local_path)
 
     def _discover_existing_vms(self):
         vm_config_list = self._load_vms_config_from_cache()
@@ -91,12 +92,17 @@ class VagrantVMFactory(object):
         self._cache.set(self._vagrant_vms_cache_key, [vm.config.to_dict() for vm in self._vms.values()])
 
     def _make_vagrant_vm(self, config, is_running):
+        self._common_ssh_config.add_host(
+            self._host_os_access.hostname,
+            alias=config.vagrant_name,
+            port=config.ssh_forwarded_port,
+            user=u'vagrant',
+            key_path=self._vagrant_private_key_path)
         return VagrantVM(
             self._bin_dir,
             self._vagrant_dir,
             self._vagrant,
-            self._vagrant_private_key_path,
-            self._ssh_config_path,
+            self._common_ssh_config.path,
             self._host_os_access,
             config,
             is_running)
@@ -137,7 +143,6 @@ class VagrantVMFactory(object):
         if not vm.is_running:
             vm.start()
             self._existing_vm_list.add(vm.virtualbox_name)
-            self._write_ssh_config()  # with newly added vm; vm must be already running for this
             vm.init()
         log.info('VM: %s', vm)
         return vm
@@ -166,8 +171,6 @@ class VagrantVMFactory(object):
             for name, vm in sorted(self._vms.items(), key=lambda (name, vm): vm.config.idx):
                 if vm.is_allocated:
                     continue
-                if not vm.config.matches(config_template):
-                    continue
                 if config_template.must_be_recreated:
                     return vm
                 if pred and not pred(vm):
@@ -180,36 +183,29 @@ class VagrantVMFactory(object):
 
     def _write_vagrantfile(self, vm_config_list):
         expanded_vms_config_list = [
-            config.expand(self._virtualbox_vm) for config in vm_config_list]
+            config.expand() for config in vm_config_list]
         template_file_path = TEST_UTILS_DIR / 'Vagrantfile.jinja2'
         template = jinja2.Template(template_file_path.read_text())
         vagrantfile = template.render(
-            natnet1=DEFAULT_NATNET1,
             template_file_path=template_file_path,
             vms=expanded_vms_config_list)
         self._host_os_access.write_file(self._vagrant_file_path, vagrantfile.encode())
 
-    def _write_ssh_config(self):
-        with self._ssh_config_path.open('w') as f:
-            for vm in self._vms.values():
-                if vm.is_running:
-                    f.write(self._vagrant.ssh_config(vm.vagrant_name).decode())
-
 
 class VagrantVM(object):
-    def __init__(self, bin_dir, vagrant_dir, vagrant, vagrant_private_key_path,
-                 ssh_config_path, host_os_access, config, is_running):
+    def __init__(self, bin_dir, vagrant_dir, vagrant,
+                 _ssh_config_path, host_os_access, config, is_running):
         self._bin_dir = bin_dir
         self._vagrant_dir = vagrant_dir
         self._vagrant = vagrant
-        self._vagrant_private_key_path = vagrant_private_key_path
-        self._ssh_config_path = ssh_config_path
         self.config = config
         self.host_os_access = host_os_access
-        self.guest_os_access = None
+        self.guest_os_access = None  # Until VM is started.
         self.timezone = None
         self.is_allocated = False
         self.is_running = is_running
+        self._ssh_config_path = _ssh_config_path
+        self.networking = None  # TODO: Move initialization from init() method.
 
     def __str__(self):
         return '%s virtualbox_name=%s timezone=%s' % (self.vagrant_name, self.virtualbox_name, self.timezone or '?')
@@ -228,61 +224,31 @@ class VagrantVM(object):
     def init(self, safe=False):
         assert self.is_running
         try:
-            self.guest_os_access = self._make_os_access('root')
-            self.timezone = self._load_timezone()  # and check it is accessible
+            os_access = SshAccess(self._ssh_config_path, self.vagrant_name).become('root')
+            self.timezone = os_access.get_timezone()  # and check it is accessible
         except ProcessError as x:
             if safe and 'Permission denied' in x.output:
                 log.info('Unable to access machine %s as root, will reinit it',
                          self.vagrant_name)  # .ssh copying to root was missing?
-                self.guest_os_access = None
                 self.is_running = False
             else:
                 raise
+        else:
+            self.guest_os_access = os_access
+        self.networking = NodeNetworking(
+            LinuxNodeNetworking(self.guest_os_access),
+            VirtualBoxNodeNetworking(self.virtualbox_name))
+        self.networking.reset()
 
     def start(self):
         assert not self.is_running
         log.info('Starting VM: %s...', self)
-        self._copy_required_files_to_vagrant_dir()
         self._vagrant.up(vm_name=self.vagrant_name)
-        with tempfile.NamedTemporaryFile() as f:
-            f.write(self._vagrant.ssh_config(self.vagrant_name))
-            f.flush()
-            self._make_os_access('vagrant', f.name).run_command(['sudo', 'cp', '-r', '/home/vagrant/.ssh', '/root/'])
-            self._patch_sshd_config(self._make_os_access('root', f.name))
+        self.guest_os_access = SshAccess(self._ssh_config_path, self.vagrant_name).become('root')
+        optimize_sshd(self.guest_os_access)
         self.is_running = True
 
     def destroy(self):
         assert self.is_running
         self._vagrant.destroy(self.vagrant_name)
         self.is_running = False
-
-    def _make_os_access(self, user, ssh_config_path=None):
-        # Vagrant VM name is tied to hostname and port in SSH config which is mandatory here.
-        return SshAccess(self.vagrant_name, user=user, key_path=self._vagrant_private_key_path,
-                         ssh_config_path=ssh_config_path or self._ssh_config_path,
-                         proxy_os_access=self.host_os_access)
-
-    def _load_timezone(self):
-        return self.guest_os_access.get_timezone()
-
-    def _copy_required_files_to_vagrant_dir(self):
-        test_dir = TEST_UTILS_DIR.parent
-        for file_path_format in self.config.required_file_list:
-            file_path = Path(file_path_format.format(test_dir=test_dir, bin_dir=self._bin_dir))
-            assert file_path.is_file(), '%s is expected but is missing' % file_path
-            self.host_os_access.put_file(file_path, self._vagrant_dir)
-
-    @staticmethod
-    def _patch_sshd_config(root_ssh_host):
-        """With default settings, connection takes ~1.5 sec."""
-        sshd_config_path = '/etc/ssh/sshd_config'
-        settings = root_ssh_host.read_file(sshd_config_path).split('\n')  # Preserve new line at the end!
-        old_setting = 'UsePAM yes'
-        new_setting = 'UsePAM no'
-        try:
-            old_setting_line_index = settings.index(old_setting)
-        except ValueError:
-            assert False, "Wanted to replace %s with %s but couldn't fine latter" % (old_setting, new_setting)
-        settings[old_setting_line_index] = new_setting
-        root_ssh_host.write_file(sshd_config_path, '\n'.join(settings))
-        root_ssh_host.run_command(['service', 'ssh', 'reload'])

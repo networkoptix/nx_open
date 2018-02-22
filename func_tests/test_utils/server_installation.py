@@ -97,7 +97,7 @@ class ServerInstallation(object):
         config.optionxform = str  # make it case-sensitive, server treats it this way (yes, this is a bug)
         config.readfp(BytesIO(old_config))
         for name, value in kw.items():
-            config.set('General', name, value)
+            config.set('General', name, str(value))
         f = BytesIO()
         config.write(f)
         return f.getvalue()
@@ -183,7 +183,12 @@ def _port_is_opened_on_server_machine(hostname, port):
         return True
 
 
-def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_INSTALLATION_ROOT):
+def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_INSTALLATION_ROOT, reinstall=False):
+    if not reinstall:
+        found_installation = find_deb_installation(os_access, mediaserver_deb, installation_root=installation_root)
+        if found_installation is not None:
+            return found_installation
+
     customization = mediaserver_deb.customization
     remote_path = PurePosixPath('/tmp') / 'func_tests' / customization.company_name / mediaserver_deb.path.name
     os_access.mk_dir(remote_path.parent)
@@ -207,7 +212,9 @@ def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_IN
     installation = ServerInstallation(os_access, installation_root / customization.installation_subdir)
 
     assert installation.is_valid
-    assert UpstartService(os_access, customization.service_name).is_running()  # Must run when installation ends.
+    service = UpstartService(os_access, customization.service_name)
+    if not service.is_running():
+        service.set_state(True)
     assert wait_until(lambda: _port_is_opened_on_server_machine(os_access, 7001))  # Opens after a while.
 
     installation.backup_config()

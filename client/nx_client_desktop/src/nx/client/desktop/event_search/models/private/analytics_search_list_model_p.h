@@ -20,6 +20,9 @@ class QnUuid;
 class QnMediaResourceWidget;
 
 namespace nx {
+
+namespace utils { class PendingOperation; }
+
 namespace client {
 namespace desktop {
 
@@ -73,12 +76,15 @@ private:
     QString attributes(const analytics::storage::DetectedObject& object) const;
     static qint64 startTimeMs(const analytics::storage::DetectedObject& object);
 
+    utils::PendingOperation* createUpdateWorkbenchFilterOperation();
+
 private:
     AnalyticsSearchListModel* const q = nullptr;
     QRectF m_filterRect;
     QString m_filterText;
     const QScopedPointer<QTimer> m_updateTimer;
     const QScopedPointer<QTimer> m_dataChangedTimer;
+    const QScopedPointer<utils::PendingOperation> m_updateWorkbenchFilter;
     QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.
     media::AbstractMetadataConsumerPtr m_metadataSource;
     QnResourceDisplayPtr m_display;

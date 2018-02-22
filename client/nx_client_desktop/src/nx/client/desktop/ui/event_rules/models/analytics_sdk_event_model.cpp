@@ -56,8 +56,8 @@ QVariant AnalyticsSdkEventModel::data(const QModelIndex& index, int role) const
             return useDriverName
                 ? lit("%1 - %2")
                     .arg(item.driverName.text(qnRuntime->locale()))
-                    .arg(item.eventName.text(qnRuntime->locale()))
-                : item.eventName.text(qnRuntime->locale());
+                    .arg(item.name.text(qnRuntime->locale()))
+                : item.name.text(qnRuntime->locale());
         }
 
         case EventTypeIdRole:
@@ -81,7 +81,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     if (!d->valid)
     {
         nx::vms::event::AnalyticsHelper::EventDescriptor dummy;
-        dummy.eventName.value = tr("No event types supported");
+        dummy.name.value = tr("No event types supported");
         d->items.push_back(dummy);
     }
     endResetModel();

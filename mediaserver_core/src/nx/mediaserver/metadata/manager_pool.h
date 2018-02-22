@@ -21,6 +21,8 @@
 #include <nx/fusion/serialization/json.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include "resource_metadata_context.h"
+#include <nx/streaming/video_data_packet.h>
+#include <decoders/video/ffmpeg_video_decoder.h>
 
 class QnMediaServerModule;
 class QnCompressedVideoData;
@@ -50,12 +52,14 @@ public:
     /**
      * Return QnAbstractDataReceptor that will receive data from audio/video data provider.
      */
-    QWeakPointer<QnAbstractDataReceptor> mediaDataReceptor(const QnUuid& id);
+    QWeakPointer<VideoDataReceptor> mediaDataReceptor(const QnUuid& id);
 
     /**
      * Register data receptor that will receive metadata packets.
      */
-    void registerDataReceptor(const QnResourcePtr& resource, QWeakPointer<QnAbstractDataReceptor> metadaReceptor);
+    void registerDataReceptor(
+        const QnResourcePtr& resource,
+        QWeakPointer<QnAbstractDataReceptor> metadaReceptor);
 
 public slots:
     void initExistingResources();
@@ -82,7 +86,7 @@ private:
 
     MetadataHandler* createMetadataHandler(
         const QnResourcePtr& resource,
-        const QnUuid& pluginId);
+        const nx::api::AnalyticsDriverManifest& manifest);
 
     void handleResourceChanges(const QnResourcePtr& resource);
 
@@ -138,11 +142,19 @@ private:
         const QnSecurityCamResourcePtr& camera,
         nx::sdk::CameraInfo* outCameraInfo) const;
 
-    void putVideoData(const QnUuid& id, const QnCompressedVideoData* data);
+    void putVideoFrame(
+        const QnUuid& id,
+        const QnConstCompressedVideoDataPtr& compressedFrame,
+        const CLConstVideoDecoderOutputPtr& uncompressedFrame);
+
+    void warnOnce(bool* warningIssued, const QString& message);
+
 private:
     ResourceMetadataContextMap m_contexts;
     QnMediaServerModule* m_serverModule;
     QnMutex m_contextMutex;
+    bool m_compressedFrameWarningIssued = false;
+    bool m_uncompressedFrameWarningIssued = false;
 };
 
 } // namespace metadata

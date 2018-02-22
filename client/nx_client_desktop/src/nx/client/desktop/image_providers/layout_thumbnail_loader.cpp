@@ -74,7 +74,7 @@ struct LayoutThumbnailLoader::Private
 
     void trackLoader(QnImageProviderPtr loader)
     {
-        data.loaders.push_back(loader);
+        data.providers.push_back(loader);
         data.numLoading++;
     }
 
@@ -242,7 +242,7 @@ struct LayoutThumbnailLoader::Private
     {
         QImage image;
         Qn::ThumbnailStatus status = Qn::ThumbnailStatus::Invalid;
-        QList<QnImageProviderPtr> loaders;
+        QList<QnImageProviderPtr> providers;
         int numLoading = 0;
     };
 

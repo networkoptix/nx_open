@@ -280,16 +280,17 @@ void QnResourceDiscoveryManager::setLastDiscoveredResources(const QnResourceList
     m_discoveryUpdateIdx = (m_discoveryUpdateIdx + 1) % sz;
 }
 
-QSet<QString> QnResourceDiscoveryManager::lastDiscoveredIds() const
+QnResourceList QnResourceDiscoveryManager::lastDiscoveredResources() const
 {
     QnMutexLocker lock( &m_resListMutex );
     int sz = sizeof(m_lastDiscoveredResources) / sizeof(QnResourceList);
-    QSet<QString> allDiscoveredIds;
-    for (int i = 0; i < sz; ++i) {
+    QMap<QString, QnResourcePtr> result;
+    for (int i = 0; i < sz; ++i)
+    {
         for(const QnResourcePtr& res: m_lastDiscoveredResources[i])
-            allDiscoveredIds << res->getUniqueId();
+            result.insert(res->getUniqueId(), res);
     }
-    return allDiscoveredIds;
+    return result.values();
 }
 
 void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
@@ -728,6 +729,15 @@ QnResourceDiscoveryManager::ResourceSearcherList QnResourceDiscoveryManager::plu
 QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const
 {
     return m_state;
+}
+
+DiscoveryMode QnResourceDiscoveryManager::discoveryMode() const
+{
+    if (commonModule()->globalSettings()->isAutoDiscoveryEnabled())
+        return DiscoveryMode::fullyEnabled;
+    if (isRedundancyUsing())
+        return DiscoveryMode::partiallyEnabled;
+    return DiscoveryMode::disabled;
 }
 
 bool QnResourceDiscoveryManager::isRedundancyUsing() const

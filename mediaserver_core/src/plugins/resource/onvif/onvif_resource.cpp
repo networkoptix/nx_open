@@ -535,17 +535,9 @@ QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
         Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
     if (shouldAppearAsSingleChannel)
-    {
-        return new nx::plugins::utils::MultisensorDataProvider(
-            toSharedPointer(this),
-            [](const QnResourcePtr& resource)
-        {
-            return new QnOnvifStreamReader(resource);
-        });
-    }
+        return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
 
-
-    return new QnOnvifStreamReader(toSharedPointer());
+    return new QnOnvifStreamReader(toSharedPointer(this));
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapabilityMapFromDrives(
@@ -1694,7 +1686,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     /* Note that we don't pass shared pointer here as this would create a
      * cyclic reference and onvif resource will never be deleted. */
     QnSoapServer::instance()->getService()->registerResource(
-        toSharedPointer().staticCast<QnPlOnvifResource>(),
+        toSharedPointer(this),
         QUrl(QString::fromStdString(m_eventCapabilities->XAddr)).host(),
         m_onvifNotificationSubscriptionReference );
 
@@ -2505,19 +2497,6 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
     return CameraDiagnostics::RequestFailedResult(QLatin1String("getAudioSourceConfigurations"), QLatin1String("missing channel configuration (2)"));
 }
 
-QnConstResourceAudioLayoutPtr QnPlOnvifResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
-{
-    if (isAudioEnabled()) {
-        const QnOnvifStreamReader* onvifReader = dynamic_cast<const QnOnvifStreamReader*>(dataProvider);
-        if (onvifReader && onvifReader->getDPAudioLayout())
-            return onvifReader->getDPAudioLayout();
-        else
-            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-    }
-    else
-        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-}
-
 bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) {
     m_prevOnvifResultCode = CameraDiagnostics::NoErrorResult();
 
@@ -2778,7 +2757,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
             _oasisWsnB2__UnsubscribeResponse response;
             soapWrapper.unsubscribe(request, response);
 
-            QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
+            QnSoapServer::instance()->getService()->removeResourceRegistration(toSharedPointer(this));
             if( !registerNotificationConsumer() )
             {
                 lk.relock();
@@ -2871,15 +2850,15 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
     }
 }
 
-QnAbstractPtzController* QnPlOnvifResource::createSpecialPtzController()
+QnAbstractPtzController* QnPlOnvifResource::createSpecialPtzController() const
 {
     if (getModel() == lit("DCS-5615"))
         return new QnDlinkPtzController(toSharedPointer(this));
-    else
-        return 0;
+
+    return 0;
 }
 
-QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal()
+QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal() const
 {
     QScopedPointer<QnAbstractPtzController> result;
     result.reset(createSpecialPtzController());
@@ -2989,7 +2968,7 @@ void QnPlOnvifResource::stopInputPortMonitoringAsync()
     }
 
     if (QnSoapServer::instance() && QnSoapServer::instance()->getService())
-        QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
+        QnSoapServer::instance()->getService()->removeResourceRegistration(toSharedPointer(this));
 
     NX_LOGX(lit("Port monitoring is stopped"), cl_logDEBUG1);
 }
@@ -3957,7 +3936,7 @@ void QnPlOnvifResource::setMaxChannels(int value)
 
 void QnPlOnvifResource::updateVideoEncoder(
     VideoEncoder& encoder,
-    bool isPrimary,
+    Qn::StreamIndex streamIndex,
     const QnLiveStreamParams& streamParams)
 {
     QnLiveStreamParams params = streamParams;
@@ -3984,10 +3963,12 @@ void QnPlOnvifResource::updateVideoEncoder(
         }
         saveParams();
     }
-    auto capabilities = isPrimary ? m_primaryStreamCapabilities : m_secondaryStreamCapabilities;
+    const auto capabilities = (streamIndex == Qn::StreamIndex::primary)
+        ? m_primaryStreamCapabilities : m_secondaryStreamCapabilities;
 
-    encoder.Encoding = capabilities.isH264 ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
-    //encoder.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
+    const auto codecId = QnAvCodecHelper::codecIdFromString(streamParams.codec);
+    encoder.Encoding = capabilities.isH264 && codecId != AV_CODEC_ID_MJPEG
+        ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
 
     Qn::StreamQuality quality = params.quality;
 

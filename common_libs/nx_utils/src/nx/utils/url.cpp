@@ -142,6 +142,36 @@ Url& Url::operator=(const QString& url)
     return *this;
 }
 
+Url::Url(const std::string& url):
+    Url(QString::fromStdString(url))
+{
+}
+
+Url& Url::operator=(const std::string& url)
+{
+    return (*this = QString::fromStdString(url));
+}
+
+Url::Url(const char* url):
+    Url(QString::fromUtf8(url))
+{
+}
+
+Url& Url::operator=(const char* url)
+{
+    return (*this = QString::fromUtf8(url));
+}
+
+Url::Url(const QByteArray& url):
+    Url(QString::fromUtf8(url))
+{
+}
+
+Url& Url::operator=(const QByteArray& url)
+{
+    return (*this = QString::fromUtf8(url));
+}
+
 Url::Url(const QUrl& other): m_url(other)
 {
 }

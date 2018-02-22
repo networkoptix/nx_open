@@ -19,6 +19,11 @@ nx_configure_file(
     maven/filter-resources/resources/serverProperties.json
     ${CMAKE_CURRENT_BINARY_DIR}/resources)
 
+nx_configure_directory(
+    ${CMAKE_CURRENT_SOURCE_DIR}/webadmin_skins/${defaultSkin}
+    ${CMAKE_CURRENT_BINARY_DIR}/resources/static/skin
+    COPYONLY)
+
 set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
 
 execute_process(

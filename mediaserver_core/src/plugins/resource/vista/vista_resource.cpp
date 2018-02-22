@@ -13,7 +13,8 @@ QnVistaResource::~QnVistaResource() {
     return;
 }
 
-QnAbstractPtzController *QnVistaResource::createPtzControllerInternal() {
+QnAbstractPtzController* QnVistaResource::createPtzControllerInternal() const
+{
     QScopedPointer<QnAbstractPtzController> result(base_type::createPtzControllerInternal());
     if(!result)
         return NULL;

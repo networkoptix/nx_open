@@ -170,6 +170,34 @@
     </message>
   </context>
   <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <source>Form</source>
+      <translation>טופס</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Fixed Archive Length</source>
+      <translation>מספר הימים לשמירה בארכיון</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. Days</source>
+      <translation>מספר ימים מינימלי</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Auto</source>
+      <translation>אוטומטי</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Max. Days</source>
+      <translation>מספר ימים מקסימלי</translation>
+    </message>
+  </context>
+  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -420,7 +448,7 @@
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>רענן</translation>
     </message>
@@ -618,22 +646,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation>הגדרות מתקדמות אינן זמינות</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation>אזהרה! בחירה ב"איכות גבוהה" עלולה להשפיע על תפקוד הרשת והמעבד שלך ולגרום לבעיות נוספות.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation>אל תאחסן את הזרם הראשי</translation>
     </message>
@@ -666,11 +681,6 @@
       <location/>
       <source>Restore Defaults</source>
       <translation>שחזר ברירות מחדל</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation>אזהרה! "איכות נמוכה" עלולה לגרום לרזולוציית תמונה נמוכה.</translation>
     </message>
     <message>
       <location/>
@@ -726,11 +736,6 @@
       <location/>
       <source>Disable secondary stream</source>
       <translation>אל תאפשר זרם וידאו משני</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Quality</source>
-      <translation>איכות</translation>
     </message>
     <message>
       <location/>
@@ -818,26 +823,6 @@
       <location/>
       <source>Do Not Record</source>
       <translation>אל תקליט</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fixed Archive Length</source>
-      <translation>מספר הימים לשמירה בארכיון</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation>אוטומטי</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation>מספר ימים מינימלי</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Max. Days</source>
-      <translation>מספר ימים מקסימלי</translation>
     </message>
     <message>
       <location/>
@@ -1787,6 +1772,24 @@
     </message>
   </context>
   <context>
+    <name>NewWearableCameraDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>To server</source>
+      <translation type="unfinished">To server</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+    </message>
+  </context>
+  <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
@@ -2667,6 +2670,13 @@
       <source>TextLabel</source>
       <translation type="unfinished">TextLabel</translation>
     </message>
+    <message>
+      <location/>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
+The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
+The oldest footage among all cameras on the server will be deleted first.</translation>
+    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3048,6 +3058,65 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Edit Roles...</source>
       <translation>עריכת תפקידים...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Form</source>
+      <translation>טופס</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>זיהוי תנועה</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation type="unfinished">Detect motion in uploaded video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>רגישות</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableProgressWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
+      <source>Form</source>
+      <translation>טופס</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cancel</source>
+      <translation>ביטול</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableUploadWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
+      <source>Form</source>
+      <translation>טופס</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Video</source>
+      <translation type="unfinished">Upload Video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload File...</source>
+      <translation type="unfinished">Upload File...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Folder...</source>
+      <translation type="unfinished">Upload Folder...</translation>
     </message>
   </context>
   <context>

@@ -4,9 +4,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <nx/client/desktop/utils/wearable_fwd.h>
 
 namespace Ui { class WearableProgressWidget; }
-namespace nx { namespace client { namespace desktop { struct WearableState; }}}
 
 class QnWearableProgressWidget : public QWidget, public QnWorkbenchContextAware
 {
@@ -27,6 +27,8 @@ signals:
 
 private:
     void updateFromState(const nx::client::desktop::WearableState& state);
+
+    void at_cancelButton_clicked();
 
     bool calculateActive(const nx::client::desktop::WearableState& state);
     bool calculateCancelable(const nx::client::desktop::WearableState& state);

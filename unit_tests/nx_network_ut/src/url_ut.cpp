@@ -15,6 +15,17 @@ TEST(UrlGetEndpoint, defaultPortCorrespondsToUrlScheme)
     ASSERT_EQ(0, getEndpoint(nx::utils::Url("/host/path")).port);
 }
 
+TEST(Url, joinPath)
+{
+    ASSERT_EQ("/path/somewhere", nx::network::url::joinPath("/path/", "/somewhere"));
+    ASSERT_EQ("/path/somewhere", nx::network::url::joinPath("/path", "somewhere"));
+    ASSERT_EQ("path/somewhere", nx::network::url::joinPath("path/", "/somewhere"));
+    ASSERT_EQ("/some_path", nx::network::url::joinPath("/", "/some_path"));
+    ASSERT_EQ("/some_path", nx::network::url::joinPath("/", "/some_path"));
+    ASSERT_EQ("/some_path", nx::network::url::joinPath("", "/some_path"));
+    ASSERT_EQ("/some_path", nx::network::url::joinPath("", "some_path"));
+}
+
 } // namespace test
 } // namespace url
 } // namespace network

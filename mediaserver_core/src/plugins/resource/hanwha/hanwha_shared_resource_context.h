@@ -11,6 +11,7 @@
 #include <plugins/resource/hanwha/hanwha_common.h>
 #include <plugins/resource/hanwha/hanwha_time_synchronizer.h>
 #include <plugins/resource/hanwha/hanwha_utils.h>
+#include <plugins/resource/hanwha/hanwha_codec_limits.h>
 #include <recording/time_period_list.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 
@@ -142,6 +143,7 @@ public:
     HanwhaCachedData<HanwhaResponse> eventStatuses;
     HanwhaCachedData<HanwhaResponse> videoSources;
     HanwhaCachedData<HanwhaResponse> videoProfiles;
+    HanwhaCachedData<HanwhaCodecInfo> videoCodecInfo;
 
 private:
     HanwhaResult<HanwhaInformation> loadInformation();
@@ -149,6 +151,7 @@ private:
     HanwhaResult<HanwhaResponse> loadEventStatuses();
     HanwhaResult<HanwhaResponse> loadVideoSources();
     HanwhaResult<HanwhaResponse> loadVideoProfiles();
+    HanwhaResult<HanwhaCodecInfo> loadVideoCodecInfo();
 
     void cleanupUnsafe();
 

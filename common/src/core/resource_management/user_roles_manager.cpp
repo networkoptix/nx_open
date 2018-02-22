@@ -43,7 +43,7 @@ QnUserRolesManager::~QnUserRolesManager()
 template<class IDList>
 void QnUserRolesManager::usersAndRoles(const IDList& ids, QnUserResourceList& users, QList<QnUuid>& roles)
 {
-    users = resourcePool()->getResources<QnUserResource>(ids);
+    users = resourcePool()->getResourcesByIds<QnUserResource>(ids);
 
     QnMutexLocker lk(&m_mutex);
     roles.clear();

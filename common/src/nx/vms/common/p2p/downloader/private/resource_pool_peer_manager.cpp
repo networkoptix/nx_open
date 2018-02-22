@@ -193,7 +193,7 @@ rest::Handle ResourcePoolPeerManager::validateFileInformation(
     const auto handle = ++m_currentSelfRequestHandle;
     auto httpClient = createHttpClient();
     httpClient->doHead(fileInformation.url,
-        [this, &fileInformation, callback, handle, httpClient](
+        [this, fileInformation, callback, handle, httpClient](
             network::http::AsyncHttpClientPtr asyncClient) mutable
         {
             if (asyncClient->failed()
@@ -210,7 +210,7 @@ rest::Handle ResourcePoolPeerManager::validateFileInformation(
                 return callback(false, handle);
             }
 
-            callback(false, handle);
+            callback(true, handle);
         });
 
     return handle;
@@ -256,14 +256,15 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
             if (!m_httpClientByHandle.remove(handle))
                 return;
 
+            using namespace network;
             QByteArray result;
 
-            if (!client->failed()
-                && client->response()
-                && client->response()->statusLine.statusCode == network::http::StatusCode::ok)
-            {
+            auto okResponse = client->response() &&
+                (client->response()->statusLine.statusCode == http::StatusCode::partialContent
+                || client->response()->statusLine.statusCode == http::StatusCode::ok);
+
+            if (!client->failed() && okResponse)
                 result = client->fetchMessageBodyBuffer();
-            }
 
             callback(!result.isNull(), handle, result);
         });

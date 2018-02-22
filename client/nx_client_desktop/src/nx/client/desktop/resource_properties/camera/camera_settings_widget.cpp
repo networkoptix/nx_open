@@ -72,6 +72,10 @@ void CameraSettingsWidget::setCameras(const QnVirtualCameraResourceList &cameras
 
     m_cameras = cameras;
 
+    bool hasWearable = false;
+    for (const QnVirtualCameraResourcePtr& camera : cameras)
+        hasWearable |= camera->hasFlags(Qn::wearable_camera);
+
     switch (m_cameras.size())
     {
         case 0:
@@ -82,8 +86,16 @@ void CameraSettingsWidget::setCameras(const QnVirtualCameraResourceList &cameras
             setMode(SingleMode);
             break;
         default:
-            m_multiWidget->setCameras(m_cameras);
-            setMode(MultiMode);
+            if (hasWearable)
+            {
+                setMode(InvalidMode);
+                updateInvalidText();
+            }
+            else
+            {
+                m_multiWidget->setCameras(m_cameras);
+                setMode(MultiMode);
+            }
             break;
     }
 
@@ -280,6 +292,23 @@ void CameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled)
         default:
             break;
     }
+}
+
+void CameraSettingsWidget::updateInvalidText()
+{
+    bool hasWearable = false;
+    bool hasNonWearable = false;
+    for (const QnVirtualCameraResourcePtr& camera : m_cameras) {
+        hasWearable |= camera->hasFlags(Qn::wearable_camera);
+        hasNonWearable |= !camera->hasFlags(Qn::wearable_camera);
+    }
+
+    if (hasWearable && hasNonWearable)
+        m_invalidWidget->setText(tr("Cannot edit properties for several wearable and non-wearable cameras."));
+    else if (hasWearable)
+        m_invalidWidget->setText(tr("Cannot edit properties for several wearable cameras."));
+    else
+        m_invalidWidget->setText(QString());
 }
 
 } // namespace desktop
