@@ -1035,8 +1035,8 @@ protected:
         api::AccountUpdateData update;
         const std::string password = nx::utils::generateRandomName(7).toStdString();
         update.fullName = nx::utils::generateRandomName(7).toStdString();
-        update.passwordHa1 = nx::network::http::calcHa1(
-            account().email.c_str(),
+        update.passwordHa1 = nx_http::calcHa1(
+            codeParts[1].toStdString().c_str(),
             nx::network::AppInfo::realm().toStdString().c_str(),
             password.c_str()).toStdString();
         ASSERT_EQ(
