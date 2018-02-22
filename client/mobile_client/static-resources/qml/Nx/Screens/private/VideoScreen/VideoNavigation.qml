@@ -13,7 +13,7 @@ Item
 {
     id: videoNavigation
 
-//    property string resourceId
+    property string resourceId
     property var videoScreenController
     property bool paused: true
     property bool ptzAvailable: false
@@ -590,7 +590,7 @@ Item
         }
     }
 
-//    onResourceIdChanged: d.playbackStarted = false
+    onResourceIdChanged: d.playbackStarted = false
 
     Component.onCompleted: d.updateNavigatorPosition()
 }
