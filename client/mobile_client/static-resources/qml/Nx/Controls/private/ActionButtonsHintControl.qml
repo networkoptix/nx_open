@@ -10,7 +10,7 @@ Rectangle
     property int horizontalPadding: 12
     property int verticalPadding: 12
 
-    width: bodyRow.width + horizontalPadding * 2
+    width: bodyRow.width + horizontalPadding
     height: bodyRow.height + verticalPadding * 2
     color: ColorTheme.transparent(ColorTheme.base8, 0.95)
     radius: 2
@@ -73,7 +73,6 @@ Rectangle
         x: control.horizontalPadding
         y: control.verticalPadding
         height: 24
-        spacing: 12
 
         Loader
         {

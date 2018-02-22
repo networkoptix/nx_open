@@ -42,7 +42,7 @@ ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::ptzButton()
 ActionButtonsModel::ButtonPtr ActionButtonsModel::Button::twoWayAudioButton()
 {
     return ButtonPtr(new Button(
-        {ActionButtonsModel::TwoWayAudioButton, lit("images/plus.png")}));
+        {ActionButtonsModel::TwoWayAudioButton, lit("images/two_way_audio/mic.png")}));
 }
 
 //
