@@ -61,7 +61,7 @@ def send_email(user_email, type, message, customization, attempt=1):
 def send_to_all_users(notification_id, message, force=False):
     # if forced and not testing dont apply any filters to send to all users
     try:
-        users = Account.objects.all()
+        users = Account.objects.exclude(activated_date=None)
 
         if not force:
             users = users.filter(subscribe=True)
