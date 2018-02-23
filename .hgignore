@@ -147,6 +147,10 @@ edge_firmware/isd/*.tar.gz
 **/Makefile
 
 cloud_portal/front_end/node_modules
+cloud_portal/front_end/app/images/promo
+cloud_portal/front_end/app/images/favicon.ico
+cloud_portal/front_end/app/images/logo.png
+cloud_portal/front_end/app/images/logo_small.png
 cloud_portal/front_end/app/styles/custom
 cloud_portal/front_end/dist
 cloud_portal/front_end/config.json

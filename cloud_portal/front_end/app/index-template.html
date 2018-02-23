@@ -9,37 +9,33 @@
     <title></title>
     <meta name="description" content="">
 
-    <base href="/" />
+    <base href="/">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
+    <link rel="icon" href="/static/customization/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/static/customization/favicon.ico" type="image/x-icon">
+
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <link rel="shortcut icon" href="/static/images/favicon.ico">
 
     <link rel="stylesheet" href="fonts/roboto/roboto_bold/stylesheet.css" />
     <link rel="stylesheet" href="fonts/roboto/roboto_light/stylesheet.css" />
     <link rel="stylesheet" href="fonts/roboto/roboto_regular/stylesheet.css" />
     <link rel="stylesheet" href="fonts/roboto/roboto_medium/stylesheet.css" />
 
-    <!-- build:css({.tmp,app}) static/styles/503.css -->
-
-    <link rel="stylesheet" href="styles/main.css">
-    <!-- endbuild -->
 
 </head>
-<body class="loading">
+<body>
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an outdated browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
 
-<!-- Add your site or application content here -->
+<header></header>
 
-
-<div class="jumbotron error-page">
-    <img src="/static/images/503.png"  srcset="/static/images/503@2x.png 2x">
-    %BLOCK_CONTENT%
-
+<div ng-view="" ng-model-options="{ updateOn: 'blur' }">
 </div>
 
-
-<!-- endbuild -->
+<footer></footer>
 
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

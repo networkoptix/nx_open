@@ -1,4 +1,4 @@
-function FlashlsAPI (flashObject) {
+window.FlashlsAPI = function(flashObject) {
     function genCallback(flo, p){
         window[p] = function(eventName, args) {
             flo.embedHandler();
@@ -79,7 +79,7 @@ function FlashlsAPI (flashObject) {
         requestFragment: function(data) {},
         abortFragment: function(data) {}
     };
-}
+};
 
 FlashlsAPI.prototype.kill = function(){
     delete window[this.id];

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp', [
-    'ipCookie',
+    'ngCookies',
     'ngResource',
     'ngSanitize',
     'ngAnimate',

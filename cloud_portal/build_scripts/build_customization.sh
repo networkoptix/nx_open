@@ -31,8 +31,8 @@ dir=../customizations/$CUSTOMIZATION/
 
     echo "Build statics"
     pushd ../front_end
-    grunt setbranding:$CUSTOMIZATION
-    grunt build
+    npm run setBranding $CUSTOMIZATION
+    npm run build
     popd
 
     cp -rf $dir/front_end/styles/* ../front_end/app/styles/custom
