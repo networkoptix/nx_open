@@ -940,6 +940,11 @@ enum IDType
     ZoomToTimeSelectionAction,
 
     /**
+     * Exports standalone exe client.
+     */
+    ExportStandaloneClientAction,
+
+    /**
      * Exports selected range.
      */
     ExportTimeSelectionAction,
