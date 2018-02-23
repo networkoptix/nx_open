@@ -1,3 +1,4 @@
+
 #include "workbench_export_handler.h"
 
 #include <QtWidgets/QAction>
@@ -55,6 +56,10 @@
 #include <nx/utils/string.h>
 
 #include <utils/common/app_info.h>
+
+#ifdef Q_OS_WIN
+#   include <launcher/nov_launcher_win.h>
+#endif
 
 using namespace nx::client::desktop::ui;
 
@@ -132,6 +137,9 @@ QnWorkbenchExportHandler::QnWorkbenchExportHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
+    connect(action(action::ExportStandaloneClientAction), &QAction::triggered, this,
+        &QnWorkbenchExportHandler::at_exportStandaloneClientAction_triggered);
+
     connect(action(action::ExportTimeSelectionAction), &QAction::triggered, this,
         &QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered);
     connect(action(action::ExportLayoutAction), &QAction::triggered, this,
@@ -879,7 +887,7 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
         const auto confirmed = confirmExport(QnMessageBoxIcon::Warning,
             tr("You are about to export a lot of video"),
             tr("It may require over a gigabyte of HDD space and take several minutes to complete.")
-                + L'\n' + tr("Export anyway?"));
+            + L'\n' + tr("Export anyway?"));
 
         if (!confirmed)
             return;
@@ -929,6 +937,38 @@ void QnWorkbenchExportHandler::at_exportRapidReviewAction_triggered()
 
     qnSettings->setTimelapseSpeed(dialog->speed());
     exportTimeSelection(parameters, dialog->frameStepMs());
+}
+
+void QnWorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
+{
+    const auto exeExtension = lit(".exe");
+    const auto tmpExtension = lit(".tmp");
+
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
+        mainWindow(),
+        lit("Export Standalone Client"),
+        QnAppInfo::clientExecutableName(),
+        lit("*") + exeExtension
+    ));
+    dialog->setFileMode(QFileDialog::AnyFile);
+    dialog->setAcceptMode(QFileDialog::AcceptSave);
+    if (!dialog->exec())
+        return;
+
+    QString targetFilename = dialog->selectedFile();
+    if (!targetFilename.endsWith(exeExtension))
+        targetFilename = targetFilename +exeExtension;
+
+    QString temporaryFilename = targetFilename;
+    temporaryFilename.replace(exeExtension, tmpExtension);
+    if (QnNovLauncher::createLaunchingFile(temporaryFilename) != QnNovLauncher::ErrorCode::Ok)
+    {
+        QnMessageBox::critical(mainWindow(), lit("File %1 cannot be written").arg(temporaryFilename));
+        return;
+    }
+
+    QFile::rename(temporaryFilename, targetFilename);
+    showExportCompleteMessage();
 }
 
 void QnWorkbenchExportHandler::showExportCompleteMessage()
