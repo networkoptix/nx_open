@@ -209,7 +209,8 @@ void Controller::initializeSecurity()
         m_streeManager,
         m_accountManager,
         m_systemManager,
-        m_systemManager);
+        m_systemManager,
+        m_tempPasswordManager);
 }
 
 void Controller::initializeDataSynchronizationEngine()
