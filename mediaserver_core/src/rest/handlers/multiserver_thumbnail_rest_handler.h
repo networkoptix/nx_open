@@ -20,12 +20,17 @@ public:
         const QnThumbnailRequestData &request,
         QByteArray& result,
         QByteArray& contentType,
-        int ownerPort);
+        int ownerPort,
+        qint64* frameTimestamsUsec = nullptr);
 
 private:
     /** Calculate server where the request should be executed. */
-    QnMediaServerResourcePtr targetServer(QnCommonModule* commonModule, const QnThumbnailRequestData &request) const;
+    QnMediaServerResourcePtr targetServer(QnCommonModule* commonModule,
+        const QnThumbnailRequestData &request) const;
 
-    int getThumbnailLocal(const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType) const;
-    int getThumbnailRemote(const QnMediaServerResourcePtr &server, const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType, int ownerPort) const;
+    int getThumbnailLocal(const QnThumbnailRequestData &request, QByteArray& result,
+        QByteArray& contentType, qint64* frameTimestamsUsec) const;
+    int getThumbnailRemote(const QnMediaServerResourcePtr &server,
+        const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType,
+        int ownerPort, qint64* frameTimestamsUsec) const;
 };

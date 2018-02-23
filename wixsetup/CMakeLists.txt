@@ -94,7 +94,7 @@ endif()
 
 if(withDesktopClient)
     set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/client/nx_client_desktop/static-resources/qml/")
-    set(desktop_client_executable "${bin_source_dir}/desktop_client.exe")
+    set(desktop_client_executable "${bin_source_dir}/${product.name}.exe")
 
     add_custom_target(collect_qml_dependencies
         DEPENDS
@@ -108,18 +108,6 @@ if(withDesktopClient)
             "--output" ${client_qml_dir}
         )
     add_dependencies(wixsetup collect_qml_dependencies applauncher minilauncher)
-
-    add_custom_target(copy_client_binaries
-    COMMENT "Copying client binaries..."
-    DEPENDS
-        desktop_client
-        minilauncher
-    COMMAND ${CMAKE_COMMAND} -E copy
-        "${bin_source_dir}/minilauncher.exe" "${bin_source_dir}/${minilauncher.binary.name}"
-    COMMAND ${CMAKE_COMMAND} -E copy
-        "${desktop_client_executable}" "${bin_source_dir}/${client.binary.name}"
-    )
-    add_dependencies(wixsetup copy_client_binaries)
 
     add_custom_target(generate_client_update_package ALL
     COMMENT "Preparing client update package..."

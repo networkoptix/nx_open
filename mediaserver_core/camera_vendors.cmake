@@ -62,7 +62,7 @@ if(NOT targetDevice MATCHES "android|ios|edge1")
     nx_enable_camera_vendor_old(advantech)
     nx_enable_camera_vendor_old(wearable)
 
-    if(customization STREQUAL "hanwha")
+    if(enableHanwha OR developerBuild OR customization STREQUAL "hanwha")
         nx_enable_camera_vendor(hanwha)
     endif()
 endif()

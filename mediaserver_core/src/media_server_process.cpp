@@ -1,7 +1,5 @@
 #include "media_server_process.h"
 
-#include <plugins/plugin_internal_tools.h>
-
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -3090,7 +3088,7 @@ void MediaServerProcess::run()
             videoCameraPool.reset();
 
             commonModule()->resourceDiscoveryManager()->stop();
-            qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics event.
+            qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics events.
             QnResource::stopAsyncTasks();
 
             //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now

@@ -1,5 +1,4 @@
 # Components Namings
-set(parent.customization "default")
 set(product.name "FlyView")
 set(display.product.name "FlyView")
 set(product.name.short "ipera_ru")

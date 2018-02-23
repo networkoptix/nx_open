@@ -38,6 +38,7 @@ namespace ec2
     void RemoteEC2Connection::updateConnectionUrl(const nx::utils::Url &url)
     {
         m_connectionInfo.ecUrl = url;
+        m_queryProcessor->setUrl(url);
     }
 
     void RemoteEC2Connection::startReceivingNotifications()

@@ -71,6 +71,7 @@
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
 
+#include <ui/graphics/view/graphics_view.h>
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
 #include <ui/workaround/gl_widget_factory.h>
@@ -415,12 +416,12 @@ void QnWorkbenchDisplay::setScene(QGraphicsScene *scene)
         initSceneView();
 }
 
-QnGraphicsView* QnWorkbenchDisplay::view() const
+QGraphicsView* QnWorkbenchDisplay::view() const
 {
     return m_view;
 }
 
-void QnWorkbenchDisplay::setView(QnGraphicsView *view)
+void QnWorkbenchDisplay::setView(QGraphicsView *view)
 {
     if (m_view == view)
         return;

@@ -234,14 +234,17 @@ class MediaListener(object):
 
     def _thread_main(self, listen_socket):
         log.info('%s: thread started.', self)
+        poll = select.poll()
+        poll.register(listen_socket, select.POLLIN | select.POLLERR)
         while not self._stop_flag:
-            read, write, error = select.select([listen_socket], [], [listen_socket], 0.1)
-            if not read and not error:
+            events = poll.poll(100)  # timeout in milliseconds
+            if not events:
                 continue
             sock, addr = listen_socket.accept()
             log.info('%s: accepted connection from %s:%d', self, addr[0], addr[1])
             streamer = MediaStreamer(self._media_stream_path, sock, addr)
             self._streamers.append(streamer)
+        poll.unregister(listen_socket)
         listen_socket.close()
         log.info('%s: thread is finished.', self)
 

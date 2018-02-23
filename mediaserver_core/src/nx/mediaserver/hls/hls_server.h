@@ -119,7 +119,7 @@ private:
     nx::network::http::StatusCode::Value getResourceChunk(
         const nx::network::http::Request& request,
         const QStringRef& uniqueResourceID,
-        const QnSecurityCamResourcePtr& camResource,
+            const QnSecurityCamResourcePtr& cameraResource,
         const std::multimap<QString, QString>& requestParams,
         nx::network::http::Response* const response );
 

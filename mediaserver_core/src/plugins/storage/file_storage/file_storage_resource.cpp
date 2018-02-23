@@ -852,12 +852,15 @@ qint64 QnFileStorageResource::getTotalSpace() const
     if (!m_valid)
         return QnStorageResource::kUnknownSize;
 
+    QString path;
+    {
+        QnMutexLocker lock(&m_mutex);
+        path = m_localPath.isEmpty() ? getPath() : m_localPath;
+    }
+
     QnMutexLocker locker(&m_writeTestMutex);
     if (m_cachedTotalSpace <= 0)
-    {
-        m_cachedTotalSpace = getDiskTotalSpace(
-            m_localPath.isEmpty() ? getPath() : m_localPath);
-    }
+        m_cachedTotalSpace = getDiskTotalSpace(path);
 
     return m_cachedTotalSpace;
 }
@@ -1102,13 +1105,13 @@ bool findPathInTabFile(const QString& path, const QString& tabFilePath, QString*
 bool QnFileStorageResource::isStorageDirMounted() const
 {
     QString mountPoint;
-
+    const auto localPath = getLocalPathSafe();
     NX_LOG(lit("[initOrUpdate, isStorageDirMounted] local path: %1, getPath(): %2")
-            .arg(m_localPath)
+            .arg(localPath)
             .arg(getPath()), cl_logDEBUG2);
 
-    if (!m_localPath.isEmpty())
-        return findPathInTabFile(m_localPath, lit("/proc/mounts"), &mountPoint, true);
+    if (!localPath.isEmpty())
+        return findPathInTabFile(localPath, lit("/proc/mounts"), &mountPoint, true);
     else if (findPathInTabFile(getPath(), lit("/etc/fstab"), &mountPoint, false))
         return findPathInTabFile(mountPoint, lit("/etc/mtab"), &mountPoint, true);
 

@@ -1,5 +1,4 @@
 # Components Namings
-set(parent.customization "default")
 set(product.name "VMS Smart Client")
 set(display.product.name "VMS DTV")
 set(product.name.short "ust")

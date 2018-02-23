@@ -313,6 +313,7 @@ void QnMediaServerResource::setUrl(const QString& url)
 
     lock.unlock();
 
+    emit primaryAddressChanged(toSharedPointer(this));
     emit apiUrlChanged(toSharedPointer(this));
 }
 
@@ -462,8 +463,7 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::Notif
     {
         if (m_apiConnection)
             m_apiConnection->setUrl(getApiUrl());
-        if (oldPrimaryAddress.port != currentAddress.port)
-            notifiers << [r = toSharedPointer(this)]{ emit r->portChanged(r); };
+        notifiers << [r = toSharedPointer(this)]{ emit r->primaryAddressChanged(r); };
     }
 }
 

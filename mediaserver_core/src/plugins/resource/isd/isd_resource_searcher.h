@@ -65,7 +65,7 @@ private:
 
 private:
 	QnResourceList m_foundUpnpResources;
-	std::set<QString> m_alreadFoundMacAddresses;
+	std::set<QString> m_alreadyFoundMacAddresses;
 	mutable QnMutex m_mutex;
 };
 

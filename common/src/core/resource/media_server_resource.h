@@ -153,7 +153,6 @@ private slots:
     void resetCachedValues();
 
 signals:
-    void portChanged(const QnResourcePtr &resource);
     void serverFlagsChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
     void auxUrlsChanged(const QnResourcePtr &resource);

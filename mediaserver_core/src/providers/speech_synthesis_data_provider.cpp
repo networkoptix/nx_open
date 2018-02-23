@@ -108,10 +108,8 @@ QByteArray QnSpeechSynthesisDataProvider::doSynthesis(const QString &text, bool*
 
     *outStatus = true;
 
-#ifndef DISABLE_FESTIVAL
     auto ttvInstance = TextToWaveServer::instance();
     ttvInstance->generateSoundSync(text, &soundBuf, &waveFormat);
-#endif
 
     m_ctx = initializeAudioContext(waveFormat);
     if (!m_ctx)

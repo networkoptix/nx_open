@@ -61,6 +61,7 @@ QString baseToString(QnResourceIconCache::Key base)
         QN_STRINGIFY(Cameras);
 
         QN_STRINGIFY(Recorder);
+        QN_STRINGIFY(MultisensorCamera);
         QN_STRINGIFY(Image);
         QN_STRINGIFY(Media);
         QN_STRINGIFY(User);
@@ -125,6 +126,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(Cameras,                 loadIcon(lit("tree/cameras.png")));
     m_cache.insert(IOModule,                loadIcon(lit("tree/io.png")));
     m_cache.insert(Recorder,                loadIcon(lit("tree/encoder.png")));
+    m_cache.insert(MultisensorCamera,       loadIcon(lit("tree/multisensor.png")));
     m_cache.insert(Image,                   loadIcon(lit("tree/snapshot.png")));
     m_cache.insert(Media,                   loadIcon(lit("tree/media.png")));
     m_cache.insert(User,                    loadIcon(lit("tree/user.png")));

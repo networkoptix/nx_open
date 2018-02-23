@@ -90,7 +90,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
 
     Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, [this](const QnResourcePtr&) {
         m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
-        QnMutexLocker mtx( &m_liveMutex );
+        QnMutexLocker lock(&m_liveMutex);
         updateSoftwareMotion();
     });
 
@@ -152,14 +152,14 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 
 Qn::ConnectionRole QnLiveStreamProvider::getRole() const
 {
-    QnMutexLocker mtx( &m_liveMutex );
+    QnMutexLocker lock(&m_liveMutex);
     return m_role;
 }
 
 Qn::StreamIndex QnLiveStreamProvider::encoderIndex() const
 {
-    return getRole() == Qn::CR_LiveVideo ? Qn::StreamIndex::primary
-                                         : Qn::StreamIndex::secondary;
+    return getRole() == Qn::CR_LiveVideo
+        ? Qn::StreamIndex::primary : Qn::StreamIndex::secondary;
 }
 
 void QnLiveStreamProvider::setCameraControlDisabled(bool value)
@@ -173,7 +173,7 @@ QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStr
 {
     QnLiveStreamParams params = value;
 
-    // Add advanced parameters
+    // Add advanced parameters.
     const auto advancedParams = m_cameraRes->advancedLiveStreamParams();
     auto advancedLiveStreamParams = getRole() == Qn::CR_SecondaryLiveVideo
         ? advancedParams.secondaryStream : advancedParams.primaryStream;
@@ -319,7 +319,7 @@ bool QnLiveStreamProvider::needAnalyzeMotion(Qn::ConnectionRole /*role*/)
 
 bool QnLiveStreamProvider::isMaxFps() const
 {
-    QnMutexLocker mtx( &m_liveMutex );
+    QnMutexLocker lock(&m_liveMutex);
     return m_liveParams.fps >= m_cameraRes->getMaxFps() - 0.1;
 }
 
@@ -572,7 +572,7 @@ bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResource* netRes)
 
 void QnLiveStreamProvider::startIfNotRunning()
 {
-    QnMutexLocker mtx( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
     if (!isRunning())
     {
         m_framesSincePrevMediaStreamCheck = CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1;
@@ -619,7 +619,7 @@ void QnLiveStreamProvider::updateStreamResolution(int channelNumber, const QSize
     }
 
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
-    QnMutexLocker mtx( &m_liveMutex );
+    QnMutexLocker lock(&m_liveMutex);
     updateSoftwareMotion();
 }
 

@@ -262,7 +262,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
     }
     m_currentFileName = fileName.toString();
 
-    const int extensionSepPos = fileName.indexOf( QChar('.') );
+        const int extensionSepPos = fileName.lastIndexOf( QChar('.') );
     const QStringRef& extension = extensionSepPos != -1 ? fileName.mid( extensionSepPos+1 ) : QStringRef();
     const QStringRef& shortFileName = fileName.mid( 0, extensionSepPos );
 
@@ -666,7 +666,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
     }
 
     QUrl baseChunkUrl;
-    baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() );
+        baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() + ".ts" );
 
     //if needed, adding proxy information to playlist url
     nx::network::http::HttpHeaders::const_iterator viaIter = request.headers.find( "Via" );
@@ -719,7 +719,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
 nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChunk(
     const nx::network::http::Request& request,
     const QStringRef& uniqueResourceID,
-    const QnSecurityCamResourcePtr& /*camResource*/,
+        const QnSecurityCamResourcePtr& cameraResource,
     const std::multimap<QString, QString>& requestParams,
     nx::network::http::Response* const response )
 {
@@ -761,11 +761,13 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
         params.streamQuality,
         requestParams);
 
-    const auto resource = commonModule()->resourcePool()->getResourceByUniqueId(currentChunkKey.srcResourceUniqueID());
     auto requiredPermission = currentChunkKey.live()
         ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
-    if (!commonModule()->resourceAccessManager()->hasPermission(d_ptr->accessRights, resource, requiredPermission))
+    if (!commonModule()->resourceAccessManager()->hasPermission(
+            d_ptr->accessRights, cameraResource, requiredPermission))
+    {
         return nx::network::http::StatusCode::forbidden;
+    }
 
 
     //streaming chunk
@@ -945,7 +947,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
 
     const auto& chunkAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
         accessRights,
-        HLS_PREFIX + camResource->getUniqueId(),
+            HLS_PREFIX + camResource->getUniqueId() + ".ts",
         QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS );
     newHlsSession->setChunkAuthenticationQueryItem( chunkAuthenticationKey );
 

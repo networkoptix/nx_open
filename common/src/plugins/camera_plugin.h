@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #include "camera_plugin_types.h"
-#include "plugin_api.h"
+#include <plugins/plugin_api.h>
 
 
 //!VMS Camera Integration Plugin API (c++)

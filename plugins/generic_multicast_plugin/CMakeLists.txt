@@ -3,4 +3,8 @@ nx_add_server_plugin(generic_multicast_plugin
     PUBLIC_LIBS
         Qt5::Core Qt5::Network Qt5::Multimedia
         ffmpeg
-        common nx_network nx_utils)
+        common 
+        #nx_plugin_utils
+        nx_network 
+        nx_utils 
+)

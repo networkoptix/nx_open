@@ -5,11 +5,16 @@ set(box "rpi")
 set(CMAKE_C_COMPILER "${PACKAGES_DIR}/linux-arm/gcc-7.2.0/bin/arm-unknown-linux-gnueabihf-gcc")
 set(CMAKE_CXX_COMPILER "${PACKAGES_DIR}/linux-arm/gcc-7.2.0/bin/arm-unknown-linux-gnueabihf-g++")
 
-set(glib_dir "${PACKAGES_DIR}/linux-arm/glib-2.0")
-set(zlib_dir "${PACKAGES_DIR}/linux-arm/zlib-1.2")
-set(common_link_flags "-Wl,-rpath-link,${glib_dir}/lib")
-string(APPEND common_link_flags " -L${zlib_dir}/lib -Wl,-rpath-link,${zlib_dir}/lib")
-string(APPEND common_link_flags " -latomic")
+include_directories(SYSTEM "${PACKAGES_DIR}/rpi/sysroot/usr/include")
+
+set(_sysroot_dir "${PACKAGES_DIR}/rpi/sysroot")
+set(common_link_flags "-latomic")
+string(APPEND common_link_flags " -Wl,-rpath-link,${_sysroot_dir}/lib/arm-linux-gnueabihf")
+string(APPEND common_link_flags " -Wl,-rpath-link,${_sysroot_dir}/usr/lib/arm-linux-gnueabihf")
+string(APPEND common_link_flags " -L${_sysroot_dir}/lib/arm-linux-gnueabihf")
+string(APPEND common_link_flags " -L${_sysroot_dir}/usr/lib/arm-linux-gnueabihf")
+unset(_sysroot_dir)
+
 set(CMAKE_EXE_LINKER_FLAGS_INIT "${common_link_flags}")
 set(CMAKE_SHARED_LINKER_FLAGS_INIT "${common_link_flags}")
 

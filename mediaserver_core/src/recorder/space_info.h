@@ -8,7 +8,7 @@
 namespace nx {
 namespace recorder {
 
-class SpaceInfo 
+class SpaceInfo
 {
     struct StorageSpaceInfo
     {
@@ -17,8 +17,8 @@ class SpaceInfo
         int64_t totalSpace;
 
         StorageSpaceInfo() : index(0), effectiveSpace(0LL), totalSpace(0LL) {}
-        StorageSpaceInfo(int index, int64_t totalSpace) : 
-            index(index), 
+        StorageSpaceInfo(int index, int64_t totalSpace) :
+            index(index),
             effectiveSpace(0LL),
             totalSpace(totalSpace) {}
     };
