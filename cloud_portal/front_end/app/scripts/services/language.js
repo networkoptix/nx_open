@@ -9,6 +9,28 @@
             function () {
 
                 var lang = {
+                    language: '',
+                    pageTitles: {
+                        registerSuccess: '',
+                        register: '',
+                        account: '',
+                        system: '',
+                        systemShare: '',
+                        systems: '',
+                        view: '',
+                        changePassword: '',
+                        activate: '',
+                        activateCode: '',
+                        activateSuccess: '',
+                        restorePassword: '',
+                        restorePasswordCode: '',
+                        restorePasswordSuccess: '',
+                        debug: '',
+                        login: '',
+                        download: '',
+                        downloadPlatform: '',
+                        pageNotFound: ''
+                    },
                     common: {}
                 };
 
