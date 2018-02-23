@@ -359,7 +359,10 @@ void AccountManager::createTemporaryCredentials(
                 params.timeouts.prolongationPeriod).count();
     tempPasswordData.maxUseCount = std::numeric_limits<int>::max();
     //filling in access rights
-    tempPasswordData.accessRights.requestsDenied.add(kAccountUpdatePath);
+    tempPasswordData.accessRights.requestsDenied.add(
+        data::ApiRequestRule(
+            kAccountUpdatePath,
+            {{attr::ha1, true}, {attr::userPassword, true}}));
     tempPasswordData.accessRights.requestsDenied.add(kAccountPasswordResetPath);
     m_tempPasswordManager->addRandomCredentials(
         accountEmail,
