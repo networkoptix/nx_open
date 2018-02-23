@@ -37,7 +37,6 @@ angular.module('nxCommon')
             templateUrl: Config.viewsDirCommon + 'components/videowindow.html',// ???
 
             link: function (scope, element/*, attrs*/) {
-                element = $(element);
                 var mimeTypes = {
                     'hls': 'application/x-mpegURL',
                     'webm': 'video/webm',

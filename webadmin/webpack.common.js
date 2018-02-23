@@ -12,8 +12,7 @@ module.exports = {
 		inline: 'scripts/entrypoint-inline.js',
 		login: 'scripts/entrypoint-login.js',
 		webcommonApp: 'web_common/scripts/entrypoint-app.js',
-		webcommonInline: 'web_common/scripts/entrypoint-inline.js',
-		webcommonLogin: 'web_common/scripts/entrypoint-login.js'
+		webcommonPartial: 'web_common/scripts/entrypoint-partial.js',
 	},
 	plugins: [
         //Development plugins
@@ -27,12 +26,12 @@ module.exports = {
 			filename: 'index.html'
 		}),
 		new HtmlWebpackPlugin({
-			chunks: ['commons', 'inline', 'webcommonInline'],
+			chunks: ['commons', 'inline', 'webcommonPartial'],
 			template: 'inline-template.html',
 			filename: 'inline.html'
 		}),
 		new HtmlWebpackPlugin({
-			chunks: ['commons', 'login', 'webcommonLogin'],
+			chunks: ['commons', 'login', 'webcommonPartial'],
 			template: 'login-template.html',
 			filename: 'login.html'
 		}),
@@ -55,6 +54,7 @@ module.exports = {
 			'md5': 'md5',
       		'$': 'jquery',
             'jQuery': 'jquery',
+            'window.jQuery': 'jquery',
 			'_': 'underscore',
 			'Base64': 'base-64',
             'screenfull': 'screenfull'

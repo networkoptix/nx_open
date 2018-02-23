@@ -3,7 +3,6 @@ angular.module('webadminApp').directive('autoFillSync',['$timeout', function($ti
     return {
         require: 'ngModel',
         link: function(scope, elem, attrs, ngModel) {
-            elem = $(elem);
             var origVal = elem.val();
             $timeout(function () {
                 var newVal = elem.val();
