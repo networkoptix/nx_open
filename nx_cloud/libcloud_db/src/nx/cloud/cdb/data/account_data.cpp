@@ -63,10 +63,19 @@ bool AccountConfirmationCode::getAsVariant(int /*resID*/, QVariant* const /*valu
 }
 
 //-------------------------------------------------------------------------------------------------
-bool AccountUpdateData::getAsVariant(int /*resID*/, QVariant* const /*value*/) const
+bool AccountUpdateData::getAsVariant(int resID, QVariant* const value) const
 {
-    //TODO #ak
-    return false;
+    switch (resID)
+    {
+        case attr::ha1:
+            if (!passwordHa1)
+                return false;
+            *value = QString::fromStdString(*passwordHa1);
+            return true;
+
+        default:
+            return false;
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -133,21 +142,90 @@ void TemporaryCredentialsParams::put(int resID, const QVariant& value)
 }
 
 //-------------------------------------------------------------------------------------------------
+
+ApiRequestRule::ApiRequestRule(const std::string& path):
+    path(path)
+{
+}
+
+ApiRequestRule::ApiRequestRule(const char* path):
+    path(path)
+{
+}
+
+std::string ApiRequestRule::toString() const
+{
+    // TODO
+    return path;
+}
+
+bool ApiRequestRule::parse(const std::string& str)
+{
+    // TODO
+    path = str;
+    return true;
+}
+
+bool ApiRequestRule::match(
+    const nx::utils::stree::AbstractResourceReader& /*requestAttributes*/) const
+{
+    // TODO
+    return true;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool RequestRuleGroup::empty() const
+{
+    return rules.empty();
+}
+
+bool RequestRuleGroup::match(
+    const std::string& path,
+    const nx::utils::stree::AbstractResourceReader& requestAttributes) const
+{
+    for (const auto& requestRule: rules)
+    {
+        if (path == requestRule.path)
+            return requestRule.match(requestAttributes);
+    }
+
+    return false;
+}
+
+std::string RequestRuleGroup::toString(const std::string& rulePrefix) const
+{
+    if (rules.empty())
+        return std::string();
+
+    std::vector<std::string> rulesStr;
+    for (const auto& rule: rules)
+        rulesStr.push_back(rule.toString());
+    return rulePrefix + boost::algorithm::join(rulesStr, ":" + rulePrefix);
+}
+
+void RequestRuleGroup::add(const ApiRequestRule& rule)
+{
+    rules.push_back(rule);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 std::string AccessRestrictions::toString() const
 {
-    std::string result;
-    if (!requestsAllowed.empty())
-        result += "+" + boost::algorithm::join(requestsAllowed, ":+");
-    if (!requestsDenied.empty())
-        result += "-" + boost::algorithm::join(requestsDenied, ":-");
+    std::string result = requestsAllowed.toString("+");
+    if (!result.empty() && !requestsDenied.empty())
+        result += ":";
+    result += requestsDenied.toString("-");
     return result;
 }
 
 bool AccessRestrictions::parse(const std::string& str)
 {
-    using namespace boost::algorithm;
+    // TODO: #ak toString() and parse are not symmetric for a bit. Refactor!
+    // TODO: #ak Use spirit?
 
-    //TODO #ak use spirit?
+    using namespace boost::algorithm;
 
     std::vector<std::string> allRequestsWithModifiers;
     boost::algorithm::split(
@@ -158,18 +236,22 @@ bool AccessRestrictions::parse(const std::string& str)
     for (std::string& requestWithModifier: allRequestsWithModifiers)
     {
         if (requestWithModifier.empty())
+            continue;
+
+        ApiRequestRule apiRequestRule;
+        if (!apiRequestRule.parse(requestWithModifier.substr(1)))
         {
-            NX_ASSERT(false);
+            NX_ASSERT(false, requestWithModifier.substr(1).c_str());
             continue;
         }
 
         if (requestWithModifier[0] == '+')
         {
-            requestsAllowed.push_back(requestWithModifier.substr(1));
+            requestsAllowed.rules.push_back(std::move(apiRequestRule));
         }
         else if (requestWithModifier[0] == '-')
         {
-            requestsDenied.push_back(requestWithModifier.substr(1));
+            requestsDenied.rules.push_back(std::move(apiRequestRule));
         }
         else
         {
@@ -181,22 +263,17 @@ bool AccessRestrictions::parse(const std::string& str)
     return true;
 }
 
-bool AccessRestrictions::authorize(const nx::utils::stree::AbstractResourceReader& requestAttributes) const
+bool AccessRestrictions::authorize(
+    const nx::utils::stree::AbstractResourceReader& requestAttributes) const
 {
     std::string requestPath;
     if (!requestAttributes.get(attr::requestPath, &requestPath))
         return true;    //assert?
 
     if (!requestsAllowed.empty())
-        return std::find(
-            requestsAllowed.begin(),
-            requestsAllowed.end(),
-            requestPath) != requestsAllowed.end();
+        return requestsAllowed.match(requestPath, requestAttributes);
 
-    return std::find(
-        requestsDenied.begin(),
-        requestsDenied.end(),
-        requestPath) == requestsDenied.end();
+    return !requestsDenied.match(requestPath, requestAttributes);
 }
 
 //-------------------------------------------------------------------------------------------------

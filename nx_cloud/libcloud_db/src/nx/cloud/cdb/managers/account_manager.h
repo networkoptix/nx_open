@@ -246,7 +246,7 @@ private:
         bool activateAccountIfNotActive,
         data::AccountUpdateDataWithEmail accountData);
 
-    nx::utils::db::DBResult resetPassword(
+    nx::utils::db::DBResult issueRestorePasswordCode(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& accountEmail,
         data::AccountConfirmationCode* const confirmationCode);

@@ -893,7 +893,7 @@ protected:
         m_timeShift.applyRelativeShift(kTimeShift);
     }
 
-    void whenActivatedAccount()
+    void whenActivateAccount()
     {
         m_activationTimeRange.first =
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
@@ -996,7 +996,7 @@ TEST_F(AccountNewTest, account_timestamps)
 
     whenShiftedSystemTime();
 
-    whenActivatedAccount();
+    whenActivateAccount();
 
     assertRegistrationTimestampIsCorrect();
     assertActivationTimestampIsCorrect();
@@ -1035,8 +1035,8 @@ protected:
         api::AccountUpdateData update;
         const std::string password = nx::utils::generateRandomName(7).toStdString();
         update.fullName = nx::utils::generateRandomName(7).toStdString();
-        update.passwordHa1 = nx::network::http::calcHa1(
-            account().email.c_str(),
+        update.passwordHa1 = nx_http::calcHa1(
+            codeParts[1].toStdString().c_str(),
             nx::network::AppInfo::realm().toStdString().c_str(),
             password.c_str()).toStdString();
         ASSERT_EQ(
@@ -1046,7 +1046,16 @@ protected:
         account().password = password;
     }
 
-    void theAccountIsActivated()
+    void assertActivationCodeContainsEmail()
+    {
+        const auto codeParts = QByteArray::fromBase64(
+            lastActivationCode().code.c_str()).split(':');
+        ASSERT_EQ(2, codeParts.size());
+
+        ASSERT_EQ(account().email, codeParts[1].toStdString());
+    }
+
+    void thenAccountIsActivated()
     {
         api::AccountData accountData;
         ASSERT_EQ(
@@ -1058,11 +1067,19 @@ protected:
 
 TEST_F(
     AccountActivation,
+    activation_code_contains_account_email)
+{
+    givenNotActivatedAccount();
+    assertActivationCodeContainsEmail();
+}
+
+TEST_F(
+    AccountActivation,
     activation_code_can_be_used_to_activate_account_with_update_account_call)
 {
     givenNotActivatedAccount();
     whenUpdateAccountUsingActivationCode();
-    theAccountIsActivated();
+    thenAccountIsActivated();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1131,6 +1148,15 @@ protected:
         }
     }
 
+    void assertInviteCodeContainsEmail()
+    {
+        const auto codeParts = QByteArray::fromBase64(
+            m_inviteNotifications.back().message.code.c_str()).split(':');
+        ASSERT_EQ(2, codeParts.size());
+
+        ASSERT_EQ(m_newAccountEmail, codeParts[1].toStdString());
+    }
+
     void assertAccountCanBeActivatedUsingLatestInviteLink()
     {
         const auto codeParts = QByteArray::fromBase64(
@@ -1178,7 +1204,7 @@ private:
         m_newAccountEmail = BusinessDataGenerator::generateRandomEmailAddress();
 
         givenNotActivatedAccount();
-        whenActivatedAccount();
+        whenActivateAccount();
 
         m_systems.resize(kSystemCount);
         for (auto& system: m_systems)
@@ -1193,6 +1219,12 @@ private:
             m_inviteNotifications.push_back(*inviteNotification);
     }
 };
+
+TEST_F(AccountInvite, invite_code_contains_email)
+{
+    inviteUser();
+    assertInviteCodeContainsEmail();
+}
 
 TEST_F(AccountInvite, invite_code_from_multiple_systems_match)
 {
