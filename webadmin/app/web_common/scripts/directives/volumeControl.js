@@ -9,6 +9,7 @@ angular.module('nxCommon')
         	},
         	templateUrl: Config.viewsDirCommon + 'components/volumeControl.html',
         	link: function(scope, element){
+        		element = $(element);
 		        var selector = '[data-rangeslider]';
 
 		        scope.currentVolume = scope.volumeLevel;

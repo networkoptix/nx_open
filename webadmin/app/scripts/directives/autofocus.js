@@ -5,6 +5,7 @@ angular.module('webadminApp')
         return {
             restrict: 'A',
             link : function(scope, $element, attr) {
+                $element = $($element);
                 if(typeof(attr.autoFocus) === 'undefined' ||
                     attr.autoFocus === '' ||
                     attr.autoFocus === 'true' ||
@@ -19,6 +20,7 @@ angular.module('webadminApp')
         return {
             restrict: 'A',
             link : function(scope, $element) {
+                $element = $($element);
                 var $body = $('body');
 
                 function keyHandler(event){

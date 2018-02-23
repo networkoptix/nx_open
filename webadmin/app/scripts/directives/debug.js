@@ -8,6 +8,7 @@ angular.module('webadminApp')
                 debug:'='
             },
             link : function(scope, $element) {
+                $element = $($element);
                 scope.$watch("debug",function(){
                     $element.html(JSON.stringify(scope.debug, null, 2));
                 });
