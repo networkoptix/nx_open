@@ -143,6 +143,14 @@ void TemporaryCredentialsParams::put(int resID, const QVariant& value)
 
 //-------------------------------------------------------------------------------------------------
 
+std::string FieldRule::toString(const nx::utils::stree::ResourceNameSet& nameset) const
+{
+    return (required ? "+" : "-") +
+        nameset.findResourceByID(dataFieldId).name.toStdString();
+}
+
+//-------------------------------------------------------------------------------------------------
+
 ApiRequestRule::ApiRequestRule(const std::string& path):
     path(path)
 {
@@ -153,24 +161,103 @@ ApiRequestRule::ApiRequestRule(const char* path):
 {
 }
 
-std::string ApiRequestRule::toString() const
+ApiRequestRule::ApiRequestRule(
+    const std::string& path,
+    const std::vector<FieldRule>& fieldRules)
+    :
+    path(path),
+    m_fieldRules(fieldRules)
 {
-    // TODO
-    return path;
 }
 
-bool ApiRequestRule::parse(const std::string& str)
+std::string ApiRequestRule::toString(
+    const nx::utils::stree::ResourceNameSet& nameset) const
 {
-    // TODO
-    path = str;
-    return true;
+    std::string result = path;
+    if (!m_fieldRules.empty())
+        result += ";" + fieldRulesToString(nameset);
+    return result;
+}
+
+bool ApiRequestRule::parse(
+    const nx::utils::stree::ResourceNameSet& nameset,
+    const std::string& str)
+{
+    using namespace boost::algorithm;
+
+    if (str.empty())
+        return false;
+
+    std::vector<std::string> tokens;
+    boost::algorithm::split(tokens, str, is_any_of(";"), token_compress_on);
+
+    path = tokens.front();
+    if (tokens.size() == 1)
+        return true;
+
+    return parseFieldRules(nameset, tokens[1]);
 }
 
 bool ApiRequestRule::match(
-    const nx::utils::stree::AbstractResourceReader& /*requestAttributes*/) const
+    const nx::utils::stree::AbstractResourceReader& requestAttributes) const
 {
-    // TODO
+    if (m_fieldRules.empty())
+        return true;
+
+    int matchedFieldCount = 0;
+    for (const auto& fieldRule: m_fieldRules)
+    {
+        if (fieldRule.required && requestAttributes.contains(fieldRule.dataFieldId))
+            ++matchedFieldCount;
+        else if (!fieldRule.required && !requestAttributes.contains(fieldRule.dataFieldId))
+            ++matchedFieldCount;
+    }
+
+    return matchedFieldCount > 0; //< This is OR condition.
+}
+
+bool ApiRequestRule::parseFieldRules(
+    const nx::utils::stree::ResourceNameSet& nameset,
+    const std::string& str)
+{
+    using namespace boost::algorithm;
+
+    if (str.empty())
+        return true;
+
+    std::vector<std::string> tokens;
+    boost::algorithm::split(tokens, str, is_any_of(","), token_compress_on);
+    for (const auto& token: tokens)
+    {
+        if (token.empty())
+            continue;
+
+        std::tuple<std::string /*fieldName*/, bool /*fieldRequired*/> fieldRuleData;
+        if (token.front() == '+')
+            fieldRuleData = std::make_tuple(token.substr(1), true);
+        else if (token.front() == '-')
+            fieldRuleData = std::make_tuple(token.substr(1), false);
+        else
+            fieldRuleData = std::make_tuple(token, true);
+
+        const auto fieldDescription =
+            nameset.findResourceByName(std::get<0>(fieldRuleData).c_str());
+        if (fieldDescription.id < 0)
+            continue;
+
+        m_fieldRules.push_back({fieldDescription.id, std::get<1>(fieldRuleData)});
+    }
+
     return true;
+}
+
+std::string ApiRequestRule::fieldRulesToString(
+    const nx::utils::stree::ResourceNameSet& nameset) const
+{
+    std::vector<std::string> rulesStrings;
+    for (const auto& fieldRule: m_fieldRules)
+        rulesStrings.push_back(fieldRule.toString(nameset));
+    return boost::algorithm::join(rulesStrings, ",");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -193,14 +280,16 @@ bool RequestRuleGroup::match(
     return false;
 }
 
-std::string RequestRuleGroup::toString(const std::string& rulePrefix) const
+std::string RequestRuleGroup::toString(
+    const nx::utils::stree::ResourceNameSet& nameset,
+    const std::string& rulePrefix) const
 {
     if (rules.empty())
         return std::string();
 
     std::vector<std::string> rulesStr;
     for (const auto& rule: rules)
-        rulesStr.push_back(rule.toString());
+        rulesStr.push_back(rule.toString(nameset));
     return rulePrefix + boost::algorithm::join(rulesStr, ":" + rulePrefix);
 }
 
@@ -211,16 +300,19 @@ void RequestRuleGroup::add(const ApiRequestRule& rule)
 
 //-------------------------------------------------------------------------------------------------
 
-std::string AccessRestrictions::toString() const
+std::string AccessRestrictions::toString(
+    const nx::utils::stree::ResourceNameSet& nameset) const
 {
-    std::string result = requestsAllowed.toString("+");
+    std::string result = requestsAllowed.toString(nameset, "+");
     if (!result.empty() && !requestsDenied.empty())
         result += ":";
-    result += requestsDenied.toString("-");
+    result += requestsDenied.toString(nameset, "-");
     return result;
 }
 
-bool AccessRestrictions::parse(const std::string& str)
+bool AccessRestrictions::parse(
+    const nx::utils::stree::ResourceNameSet& nameset,
+    const std::string& str)
 {
     // TODO: #ak toString() and parse are not symmetric for a bit. Refactor!
     // TODO: #ak Use spirit?
@@ -239,7 +331,9 @@ bool AccessRestrictions::parse(const std::string& str)
             continue;
 
         ApiRequestRule apiRequestRule;
-        if (!apiRequestRule.parse(requestWithModifier.substr(1)))
+        if (!apiRequestRule.parse(
+                nameset,
+                requestWithModifier.substr(1)))
         {
             NX_ASSERT(false, requestWithModifier.substr(1).c_str());
             continue;
@@ -268,7 +362,7 @@ bool AccessRestrictions::authorize(
 {
     std::string requestPath;
     if (!requestAttributes.get(attr::requestPath, &requestPath))
-        return true;    //assert?
+        return false;
 
     if (!requestsAllowed.empty())
         return requestsAllowed.match(requestPath, requestAttributes);

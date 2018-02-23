@@ -19,6 +19,8 @@
 namespace nx {
 namespace cdb {
 
+namespace conf { class Settings; } // namespace
+
 class TemporaryAccountCredentialsEx:
     public data::TemporaryAccountCredentials
 {
@@ -92,6 +94,10 @@ public:
 
     virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const = 0;
+
+    virtual bool authorize(
+        const std::string& credentialsId,
+        const nx::utils::stree::AbstractResourceReader& inputData) const = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -101,6 +107,7 @@ class TemporaryAccountPasswordManager:
 {
 public:
     TemporaryAccountPasswordManager(
+        const nx::utils::stree::ResourceNameSet& attrNameset,
         nx::utils::db::AsyncSqlQueryExecutor* const dbManager) noexcept(false);
     virtual ~TemporaryAccountPasswordManager();
 
@@ -147,6 +154,10 @@ public:
     virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const override;
 
+    virtual bool authorize(
+        const std::string& credentialsId,
+        const nx::utils::stree::AbstractResourceReader& inputData) const override;
+
     std::string generateRandomPassword() const;
 
 private:
@@ -172,6 +183,7 @@ private:
     constexpr static const int kIndexByLogin = 1;
     constexpr static const int kIndexByAccountEmail = 2;
 
+    const nx::utils::stree::ResourceNameSet& m_attrNameset;
     nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
     nx::utils::Counter m_startedAsyncCallsCounter;
     TemporaryCredentialsDictionary m_temporaryCredentials;

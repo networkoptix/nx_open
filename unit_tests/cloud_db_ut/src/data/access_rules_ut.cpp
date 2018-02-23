@@ -14,33 +14,45 @@ class AccessRestrictions:
 protected:
     void parseRules(const std::string& rulesStr)
     {
-        ASSERT_TRUE(m_accessRestrictions.parse(rulesStr));
+        ASSERT_TRUE(m_accessRestrictions.parse(m_nameset, rulesStr));
     }
 
-    void assertRequestIsAuthorized(const std::string& path)
+    void assertRequestIsAuthorized(
+        const std::string& path,
+        const std::vector<std::tuple<attr::Value, std::string>>& fields = {})
     {
-        utils::stree::ResourceContainer rc;
-        rc.put(attr::requestPath, QString::fromStdString(path));
-        ASSERT_TRUE(m_accessRestrictions.authorize(rc));
+        ASSERT_TRUE(m_accessRestrictions.authorize(prepareQueryData(path, fields)));
     }
 
-    void assertRequestIsNotAuthorized(const std::string& path)
+    void assertRequestIsNotAuthorized(
+        const std::string& path,
+        const std::vector<std::tuple<attr::Value, std::string>>& fields = {})
     {
-        utils::stree::ResourceContainer rc;
-        rc.put(attr::requestPath, QString::fromStdString(path));
-        ASSERT_FALSE(m_accessRestrictions.authorize(rc));
+        ASSERT_FALSE(m_accessRestrictions.authorize(prepareQueryData(path, fields)));
     }
 
     void assertParseAndToStringIsSymmetric(const std::string& rulesStr)
     {
         data::AccessRestrictions accessRestrictions;
 
-        ASSERT_TRUE(accessRestrictions.parse(rulesStr));
-        ASSERT_EQ(rulesStr, accessRestrictions.toString());
+        ASSERT_TRUE(accessRestrictions.parse(m_nameset, rulesStr));
+        ASSERT_EQ(rulesStr, accessRestrictions.toString(m_nameset));
     }
 
 private:
+    const CdbAttrNameSet m_nameset;
     data::AccessRestrictions m_accessRestrictions;
+
+    utils::stree::ResourceContainer prepareQueryData(
+        const std::string& path,
+        const std::vector<std::tuple<attr::Value, std::string>>& fields = {})
+    {
+        utils::stree::ResourceContainer rc;
+        rc.put(attr::requestPath, QString::fromStdString(path));
+        for (const auto& field: fields)
+            rc.put(std::get<0>(field), QString::fromStdString(std::get<1>(field)));
+        return rc;
+    }
 };
 
 TEST_F(AccessRestrictions, allowed_request_is_authorized)
@@ -94,6 +106,43 @@ TEST_F(AccessRestrictions, parse_toString_are_symmetric)
     assertParseAndToStringIsSymmetric("-/allowed/request1:-/allowed/request2");
     assertParseAndToStringIsSymmetric("+/allowed/request1:-/allowed/request2");
     assertParseAndToStringIsSymmetric("");
+
+    // Rules with fields.
+    assertParseAndToStringIsSymmetric("+/allowed/request1;+ha1,+user.name:-/allowed/request2");
+    assertParseAndToStringIsSymmetric("+/allowed/request1;-ha1");
+}
+
+TEST_F(AccessRestrictions, allow_rule_with_denied_fields)
+{
+    parseRules("+/allowed/request1;-ha1");
+
+    assertRequestIsAuthorized("/allowed/request1");
+    assertRequestIsNotAuthorized("/allowed/request1", {{ attr::ha1, "value" }});
+}
+
+TEST_F(AccessRestrictions, allow_rule_with_required_fields)
+{
+    parseRules("+/allowed/request1;+user.name");
+
+    assertRequestIsNotAuthorized("/allowed/request1", {{ attr::ha1, "value" }});
+    assertRequestIsAuthorized("/allowed/request1", {{ attr::userName, "value" }});
+}
+
+TEST_F(AccessRestrictions, deny_rule_with_required_fields)
+{
+    parseRules("-/allowed/request1;+ha1");
+
+    assertRequestIsNotAuthorized("/allowed/request1", {{ attr::ha1, "value" }});
+    assertRequestIsAuthorized("/allowed/request1", {{ attr::userName, "value" }});
+}
+
+TEST_F(AccessRestrictions, deny_rule_with_multiple_required_fields)
+{
+    parseRules("-/allowed/request1;+ha1,+user.name");
+
+    assertRequestIsAuthorized("/allowed/request1");
+    assertRequestIsNotAuthorized("/allowed/request1", {{ attr::ha1, "value" }});
+    assertRequestIsNotAuthorized("/allowed/request1", {{ attr::userName, "value" }});
 }
 
 } // namespace test

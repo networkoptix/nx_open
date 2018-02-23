@@ -6,6 +6,7 @@
 
 #include "../managers/account_manager.h"
 #include "../managers/system_manager.h"
+#include "../managers/temporary_account_password_manager.h"
 #include "../stree/cdb_ns.h"
 #include "../stree/stree_manager.h"
 
@@ -16,12 +17,14 @@ AuthorizationManager::AuthorizationManager(
     const StreeManager& stree,
     const AbstractAccountManager& accountManager,
     const AbstractSystemManager& systemManager,
-    const AbstractSystemSharingManager& systemSharingManager)
+    const AbstractSystemSharingManager& systemSharingManager,
+    const AbstractTemporaryAccountPasswordManager& temporaryAccountPasswordManager)
 :
     m_stree(stree),
     m_accountManager(accountManager),
     m_systemManager(systemManager),
-    m_systemSharingManager(systemSharingManager)
+    m_systemSharingManager(systemSharingManager),
+    m_temporaryAccountPasswordManager(temporaryAccountPasswordManager)
 {
 }
 
@@ -141,7 +144,20 @@ bool AuthorizationManager::checkStaticRules(
         }
     }
 
+    if (!authorizeTemporaryCredentials(inputData))
+        return false;
+
     return true;
+}
+
+bool AuthorizationManager::authorizeTemporaryCredentials(
+    const nx::utils::stree::AbstractResourceReader& inputData) const
+{
+    std::string credentialsId;
+    if (!inputData.get(attr::credentialsId, &credentialsId))
+        return true; //< Request is authenticated not by temporary credentials.
+
+    return m_temporaryAccountPasswordManager.authorize(credentialsId, inputData);
 }
 
 bool AuthorizationManager::checkDynamicRules(
