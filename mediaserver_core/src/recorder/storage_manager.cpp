@@ -51,6 +51,7 @@
 #include "database/server_db.h"
 #include "common/common_globals.h"
 #include <media_server/media_server_module.h>
+#include <media_server_process_aux.h>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -396,12 +397,21 @@ public:
     TestStorageThread(QnStorageManager* owner): m_owner(owner) {}
     virtual void run() override
     {
+        auto unmountedStorages = nx::mserver_aux::getUnmountedStorages(storagesToTest());
+        for (const auto& storage: storagesToTest())
+        {
+            auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
+            if (fileStorage && !unmountedStorages.contains(storage))
+                fileStorage->setMounted(true);
+        }
+
         for (const auto& storage : storagesToTest())
         {
             if (needToStop())
                 return;
 
-            Qn::ResourceStatus status = storage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
+            Qn::ResourceStatus status =
+                storage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
             if (storage->getStatus() != status)
                 m_owner->changeStorageStatus(storage, status);
 
@@ -490,10 +500,10 @@ QnStorageManager::QnStorageManager(
     connect(resourcePool(), &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 
-	connect(this, &QnStorageManager::rebuildFinished,
+    connect(this, &QnStorageManager::rebuildFinished,
         [this] (QnSystemHealth::MessageType message)
         {
-    		if (message == QnSystemHealth::ArchiveFastScanFinished ||
+            if (message == QnSystemHealth::ArchiveFastScanFinished ||
                 message == QnSystemHealth::ArchiveRebuildFinished)
             {
                 for (const auto& storage: getUsedWritableStorages())
@@ -506,7 +516,7 @@ QnStorageManager::QnStorageManager(
                     }
                 }
             }
-    	});
+        });
 
     if (m_role == QnServer::StoragePool::Backup)
     {
@@ -802,16 +812,16 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     sqlDb = QSqlDatabase();
     QSqlDatabase::removeDatabase(connectionName);
 
-	QString depracatedFileName = fileName + lit("_deprecated");
-	if (!QFile::remove(depracatedFileName))
-		NX_LOG(lit("%1 Deprecated db file %2 found but remove failed. Remove it manually and restart server")
-			.arg(Q_FUNC_INFO)
-			.arg(depracatedFileName), cl_logWARNING);
+    QString depracatedFileName = fileName + lit("_deprecated");
+    if (!QFile::remove(depracatedFileName))
+        NX_LOG(lit("%1 Deprecated db file %2 found but remove failed. Remove it manually and restart server")
+            .arg(Q_FUNC_INFO)
+            .arg(depracatedFileName), cl_logWARNING);
 
     if (!QFile::rename(fileName, depracatedFileName))
-		NX_LOG(lit("%1 Rename failed for deprecated db file %2. Rename (remove) it manually and restart server")
-			.arg(Q_FUNC_INFO)
-			.arg(fileName), cl_logWARNING);
+        NX_LOG(lit("%1 Rename failed for deprecated db file %2. Rename (remove) it manually and restart server")
+            .arg(Q_FUNC_INFO)
+            .arg(fileName), cl_logWARNING);
 
 
     auto sdb = qnStorageDbPool->getSDB(storage);
@@ -1099,7 +1109,7 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == commonModule()->moduleGUID())
     {
-		m_warnSended = false;
+        m_warnSended = false;
         connect(storage.data(), &QnStorageResource::isBackupChanged, this, &QnStorageManager::at_storageChanged);
         if (checkIfMyStorage(storage))
             addStorage(storage);
@@ -1110,7 +1120,7 @@ void QnStorageManager::onDelResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == commonModule()->moduleGUID() && checkIfMyStorage(storage)) {
-		m_warnSended = false;
+        m_warnSended = false;
         removeStorage(storage);
         qnStorageDbPool->removeSDB(storage);
     }

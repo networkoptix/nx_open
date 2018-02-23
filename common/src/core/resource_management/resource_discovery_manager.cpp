@@ -564,18 +564,14 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
     const auto& resPool = netRes->commonModule()->resourcePool();
     auto existResource = resPool->getResourceByUniqueId<QnVirtualCameraResource>(camRes->getUniqueId());
     if (existResource)
-    {
-        bool isSameIp = existResource->getHostAddress() == netRes->getHostAddress();
-        return isSameIp ? existResource : QnVirtualCameraResourcePtr();
-    }
+        return existResource;
 
-    for (const auto& existResource: resPool->getResources<QnVirtualCameraResource>())
+    for (const auto& existRes: resPool->getResources<QnVirtualCameraResource>())
     {
-        bool isSameChannels = netRes->getChannel() == existResource->getChannel();
-        bool isSameMACs = !existResource->getMAC().isNull() && existResource->getMAC() == netRes->getMAC();
-        bool isSameIp = existResource->getHostAddress() == netRes->getHostAddress();
-        if (isSameChannels && isSameMACs)
-            return isSameIp ? existResource : QnVirtualCameraResourcePtr();
+        bool sameChannels = netRes->getChannel() == existRes->getChannel();
+        bool sameMACs = !existRes->getMAC().isNull() && existRes->getMAC() == netRes->getMAC();
+        if (sameChannels && sameMACs)
+            return existRes;
     }
 
     return QnNetworkResourcePtr();
@@ -633,7 +629,7 @@ int QnResourceDiscoveryManager::registerManualCameras(const std::vector<QnManual
     int addedCount = 0;
     for (const auto& camera: cameras)
     {
-        // This is important to use reverse order of searchers as ONVIF resource type fits both
+        // This is important to use reverse order of searchers as ONVIF resource type fits both 
         // ONVIF and FLEX searchers, while ONVIF is always last one.
         for (auto searcherIterator = m_searchersList.rbegin();
             searcherIterator != m_searchersList.rend();

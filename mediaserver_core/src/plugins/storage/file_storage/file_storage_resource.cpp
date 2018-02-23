@@ -847,6 +847,12 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 {
     NX_LOG(lit("[initOrUpdate] for storage %1 begin").arg(getUrl()), cl_logDEBUG2);
 
+    if (!isMounted())
+    {
+        NX_VERBOSE(this, lm("[initOrUpdate] storage %1 is not mounted").args(getUrl()));
+        return Qn::StorageInitResult::StorageInit_CreateFailed;
+    }
+
     Qn::StorageInitResult result;
     {
         QnMutexLocker lock(&m_mutexCheckStorage);
@@ -948,6 +954,18 @@ bool QnFileStorageResource::isLocal()
     }
 
     return true;
+}
+
+void QnFileStorageResource::setMounted(bool value)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_isMounted = value;
+}
+
+bool QnFileStorageResource::isMounted() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_isMounted;
 }
 
 float QnFileStorageResource::getAvarageWritingUsage() const

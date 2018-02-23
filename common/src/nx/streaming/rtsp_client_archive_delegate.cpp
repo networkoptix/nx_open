@@ -92,21 +92,17 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_flags |= Flag_CanSeekImmediatly;
 
     // These signals are emitted from the same thread. It is safe to call close();
-	if (reader)
+    auto closeIfExpired = [this]()
 	{
-		connect(reader, &QnLongRunnable::paused, this,
-			[this]()
-			{
-				if (isConnectionExpired())
-					close();
-			}, Qt::DirectConnection);
-		connect(reader, &QnArchiveStreamReader::waitForDataCanBeAccepted, this,
-			[this]()
-			{
-				if (isConnectionExpired())
-					close();
-			}, Qt::DirectConnection);
-	}
+		if (isConnectionExpired())
+			close();
+    };
+    if (reader)
+    {
+        connect(reader, &QnLongRunnable::paused, this, closeIfExpired, Qt::DirectConnection);
+        connect(reader, &QnArchiveStreamReader::waitForDataCanBeAccepted,
+            this, closeIfExpired, Qt::DirectConnection);
+    }
 }
 
 void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &camera)
@@ -916,8 +912,7 @@ void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
     bool longNoData = ((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250) || diff > 1000*10;
     if (longNoData || m_quality == MEDIA_Quality_Low || m_quality == MEDIA_Quality_LowIframesOnly)
     {
-        m_blockReopening = true;
-        close();
+        beforeClose();
     }
 }
 

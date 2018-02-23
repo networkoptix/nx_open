@@ -17,26 +17,26 @@ QnAuditRecord filteredRecord(QnAuditRecord record)
     return record;
 }
 
-
 QnMServerAuditManager::QnMServerAuditManager(QObject* parent):
     QnAuditManager(parent),
     m_internalId(-1)
 {
     m_internalId = qnServerDb->auditRecordMaxId();
-    connect (&m_timer, &QTimer::timeout, this,
-        [this]()
-        {
-            decltype(m_recordsToAdd) records;
-            {
-                QnMutexLocker lock(&m_mutex);
-                if (m_recordsToAdd.empty())
-                    return;
-                std::swap(records, m_recordsToAdd);
-            }
-            if (!qnServerDb->addAuditRecords(records))
-                qWarning() << "Failed to add" << records.size() << "audit trail records";
-        });
+    connect(&m_timer, &QTimer::timeout, this, &QnMServerAuditManager::flushRecords);
     m_timer.start(1000 * 5);
+}
+
+void QnMServerAuditManager::flushRecords()
+{
+    decltype(m_recordsToAdd) records;
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_recordsToAdd.empty())
+            return;
+        std::swap(records, m_recordsToAdd);
+    }
+    if (!qnServerDb->addAuditRecords(records))
+        qWarning() << "Failed to add" << records.size() << "audit trail records";
 }
 
 QnMServerAuditManager::~QnMServerAuditManager()
