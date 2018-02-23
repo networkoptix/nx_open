@@ -18,10 +18,6 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView
-from django.conf import settings
-
-def add_settings_to_template(request):
-    return {'BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY': settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY }
 
 
 admin.site.disable_action('delete_selected')  # Remove delete action from all models in admin
