@@ -43,7 +43,7 @@ public:
 };
 
 /**
- * This interface introduced for testing purposes. 
+ * This interface introduced for testing purposes.
  * It is incomplete and quite raw.
  */
 class AbstractAccountManager
@@ -108,7 +108,7 @@ public:
         const AuthorizationInfo& authzInfo,
         data::AccountConfirmationCode emailVerificationCode,
         std::function<void(api::ResultCode, api::AccountEmail)> completionHandler );
-    
+
     /**
      * Retrieves account corresponding to authorization data \a authzInfo.
      */
@@ -142,7 +142,7 @@ public:
      */
     virtual boost::optional<data::AccountData> findAccountByUserName(
         const std::string& userName) const override;
-    
+
     nx::utils::db::DBResult insertAccount(
         nx::utils::db::QueryContext* const queryContext,
         data::AccountData account);
@@ -232,7 +232,7 @@ private:
         bool activateAccountIfNotActive,
         data::AccountUpdateDataWithEmail accountData);
 
-    nx::utils::db::DBResult resetPassword(
+    nx::utils::db::DBResult issueRestorePasswordCode(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& accountEmail,
         data::AccountConfirmationCode* const confirmationCode);
