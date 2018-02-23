@@ -8,8 +8,12 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 module.exports = {
   	context: path.resolve(__dirname + '/app'),
   	entry:{
-        app: 'scripts/entrypoint.js',
-		webcommon: 'web_common/scripts/entrypoint.js',
+        app: 'scripts/entrypoint-app.js',
+		inline: 'scripts/entrypoint-inline.js',
+		login: 'scripts/entrypoint-login.js',
+		webcommonApp: 'web_common/scripts/entrypoint-app.js',
+		webcommonInline: 'web_common/scripts/entrypoint-inline.js',
+		webcommonLogin: 'web_common/scripts/entrypoint-login.js'
 	},
 	plugins: [
         //Development plugins
@@ -18,26 +22,26 @@ module.exports = {
         //Plugins used for making templates
         new webpack.NamedModulesPlugin(),
 		new HtmlWebpackPlugin({
-			//chunks: ['app', 'webcommon'],
+			chunks: ['commons', 'app', 'webcommonApp'],
 			template: 'index-template.html',
 			filename: 'index.html'
 		}),
 		new HtmlWebpackPlugin({
-			//chunks: ['app', 'webcommon'],
+			chunks: ['commons', 'inline', 'webcommonInline'],
 			template: 'inline-template.html',
 			filename: 'inline.html'
 		}),
 		new HtmlWebpackPlugin({
-			//chunks: ['app', 'webcommon'],
+			chunks: ['commons', 'login', 'webcommonLogin'],
 			template: 'login-template.html',
 			filename: 'login.html'
 		}),
-        new ExtractTextPlugin({filename: 'styles/[name].css'}),//"styles/main.css"),
+        new ExtractTextPlugin({filename: 'styles/[name].css'}),
         new CopyWebpackPlugin([
 			{
 				from: '',
 				to: '',
-				ignore: ['web_common/**', 'styles/**', '.*', '*.js', 'index-template.html', 'index.html']
+				ignore: ['web_common/**', 'styles/**', '.*', '*.js', '*-template.html']
 			},
         	{
         		from: 'web_common',
