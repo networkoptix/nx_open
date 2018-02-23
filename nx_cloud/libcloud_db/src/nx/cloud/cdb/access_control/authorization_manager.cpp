@@ -123,11 +123,33 @@ bool AuthorizationManager::checkStaticRules(
 {
     NX_VERBOSE(this, "Checking static authorization rules");
 
+    // TODO: #ak Introduce some generic code for adding such rules.
+    // NOTE: Such rules should be added from outside, by corresponding managers.
+
+    if (!authorizeRequestToSystemBeingMerged(
+            requestedEntity,
+            requestedAction,
+            inputData,
+            outAuthzInfo))
+    {
+        return false;
+    }
+
+    if (!authorizeTemporaryCredentials(inputData))
+        return false;
+
+    return true;
+}
+
+bool AuthorizationManager::authorizeRequestToSystemBeingMerged(
+    EntityType requestedEntity,
+    DataActionType requestedAction,
+    const nx::utils::stree::AbstractResourceReader& inputData,
+    nx::utils::stree::AbstractResourceWriter* outAuthzInfo) const
+{
     if (requestedEntity == EntityType::system &&
         (requestedAction == DataActionType::update || requestedAction == DataActionType::delete_))
     {
-        // TODO: #ak Introduce some general code here when adding next static rule.
-
         // Checking system state.
         const auto systemId = inputData.get<std::string>(attr::systemId);
         if (!systemId)
@@ -143,9 +165,6 @@ bool AuthorizationManager::checkStaticRules(
             return false;
         }
     }
-
-    if (!authorizeTemporaryCredentials(inputData))
-        return false;
 
     return true;
 }

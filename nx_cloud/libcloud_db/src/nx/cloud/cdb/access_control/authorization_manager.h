@@ -63,6 +63,12 @@ private:
         const nx::utils::stree::AbstractResourceReader& inputData,
         nx::utils::stree::AbstractResourceWriter* outAuthzInfo) const;
 
+    bool authorizeRequestToSystemBeingMerged(
+        EntityType requestedEntity,
+        DataActionType requestedAction,
+        const nx::utils::stree::AbstractResourceReader& inputData,
+        nx::utils::stree::AbstractResourceWriter* outAuthzInfo) const;
+
     bool authorizeTemporaryCredentials(
         const nx::utils::stree::AbstractResourceReader& inputData) const;
 
