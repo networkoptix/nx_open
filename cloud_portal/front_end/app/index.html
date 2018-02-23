@@ -1,8 +1,8 @@
 <!doctype html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" ng-app="cloudApp"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" ng-app="cloudApp"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" ng-app="cloudApp"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" ng-app="cloudApp"> <!--<![endif]-->
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -49,8 +49,8 @@
 
 <!--[if lt IE 9]>
 <!-- build:js static/scripts/ie-downgrade.js -->
-<script src="bower_components/es5-shim/es5-shim.js"></script>
-<script src="bower_components/json3/lib/json3.min.js"></script>
+<!--<script src="bower_components/es5-shim/es5-shim.js"></script>-->
+<!--<script src="bower_components/json3/lib/json3.min.js"></script>-->
 <!-- endbuild -->
 <!--[endif]-->
 
@@ -58,8 +58,8 @@
 <!-- bower:js -->
 <script src="bower_components/jquery/jquery.js"></script>
 <script src="bower_components/angular/angular.js"></script>
-<script src="bower_components/json3/lib/json3.js"></script>
-<script src="bower_components/es5-shim/es5-shim.js"></script>
+<!--<script src="bower_components/json3/lib/json3.js"></script>-->
+<!--<script src="bower_components/es5-shim/es5-shim.js"></script>-->
 <script src="bower_components/bootstrap-sass/assets/javascripts/bootstrap.js"></script>
 <script src="bower_components/angular-resource/angular-resource.js"></script>
 <script src="bower_components/angular-cookies/angular-cookies.js"></script>
@@ -133,8 +133,10 @@
 
 <script src="scripts/client-detection.js"></script>
 
-<script src="scripts/config.js"></script>
 <script src="scripts/app.js"></script>
+
+<script src="scripts/services/nx-config.js"></script>
+<script src="scripts/services/language.js"></script>
 
 <script src="scripts/controllers/startPage.js"></script>
 <script src="scripts/controllers/login.js"></script>
@@ -171,13 +173,11 @@
 <script src="scripts/services/system.js"></script>
 <script src="scripts/services/account.js"></script>
 <script src="scripts/services/systems.js"></script>
-
-<script src="scripts/bootstrap.js"></script>
 <!-- endbuild -->
 
 
 <!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+<script async>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
