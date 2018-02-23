@@ -1,12 +1,12 @@
 {
-  "language_name": "Belgisch-Nederlands",
+  "language_name": "LANGUAGE_NAME",
   "productName": "{{PRODUCT_NAME}}",
   "clientProtocol": "{{CLIENT_PROTOCOL}}:",
   "dialogs": {
     "okButton": "Oké",
     "cancelButton": "Annuleren",
     "loginTitle": "Log in op {{PRODUCT_NAME}}",
-    "loginButton": "Log in",
+    "loginButton": "Inloggen",
     "logoutAuthorisedTitle": "U bent reeds ingelogd",
     "logoutAuthorisedContinueButton": "Doorgaan",
     "logoutAuthorisedLogoutButton": "Uitloggen"
@@ -52,19 +52,19 @@
       "description": "Onbeperkt toegang, inclusief de mogelijkheid om systeem te delen en te verbinden / te verbreken vanuit de cloud"
     },
     "Viewer": {
-      "label": "Kijker",
+      "label": "Viewer",
       "description": "Kan live video bekijken en zoeken in het archief"
     },
     "Live Viewer": {
-      "label": "Live kijker",
+      "label": "Live Viewer",
       "description": "Kan alleen live video bekijken"
     },
     "Advanced Viewer": {
-      "label": "Geavanceerde Kijker",
+      "label": "Geavanceerde Viewer",
       "description": "Kan live video bekijken, bladeren in het archief, camera configureren, PTZ, enz. bedienen"
     },
     "Administrator": {
-      "label": "Administrator",
+      "label": "Beheerder",
       "description": "Onbeperkt toegang inclusief de mogelijkheid om te delen"
     },
     "Custom": {
@@ -72,7 +72,7 @@
       "description": "Gebruik de {{PRODUCT_NAME}} client-applicatie om aangepaste rechten in te stellen"
     },
     "cloudAdmin": {
-      "label": "Administrator",
+      "label": "Beheerder",
       "description": "Kan systeem configureren en delen"
     },
     "customRole": {
@@ -84,16 +84,16 @@
       "description": "Onbeperkt toegang, inclusief de mogelijkheid om systeem te delen en te verbinden / te verbreken vanuit de cloud"
     },
     "viewer": {
-      "label": "Kijker",
-      "description": "Kan live video bekijken en zoeken in het archief"
+      "label": "Viewer",
+      "description": "Kan live video bekijken en zoeken in opgenomen beelden"
     },
     "liveViewer": {
-      "label": "Live kijker",
+      "label": "Live Viewer",
       "description": "Kan alleen live video bekijken"
     },
     "advancedViewer": {
-      "label": "Geavanceerde Kijker",
-      "description": "Kan live video bekijken, bladeren in het archief, camera configureren, PTZ, enz. bedienen"
+      "label": "Geavanceerde Viewer",
+      "description": "Kan live video bekijken, zoeken in opgenomen beelden, camera configureren, PTZ, enz. bedienen"
     },
     "custom": {
       "label": "Aangepast",

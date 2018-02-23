@@ -1,5 +1,5 @@
 {
-  "language_name": "LANGUAGE_NAME",
+  "language_name": "NOME_LINGUA",
   "productName": "{{PRODUCT_NAME}}",
   "clientProtocol": "{{CLIENT_PROTOCOL}}:",
   "dialogs": {
@@ -19,7 +19,7 @@
     "changePassword": "Change password -",
     "account": "Account settings -",
     "systems": "Systems -",
-    "system": "System -",
+    "system": "Sistema -",
     "systemShare": "Share System -",
     "activate": "Activate account -",
     "activateSent": "Activate account -",
@@ -40,7 +40,7 @@
     "activated": "activated",
     "online": "online",
     "offline": "offline",
-    "unavailable": "unavailable"
+    "unavailable": "non disponibile"
   },
   "accessRoles": {
     "disabled": {
@@ -115,7 +115,7 @@
     "cantActivatePrefix": "Cannot activate your account",
     "cantSendConfirmationPrefix": "Cannot send confirmation Email",
     "cloudInvalidResponse": "Cloud DB returned an unexpected response",
-    "notAuthorized": "Wrong password",
+    "notAuthorized": "Password errata",
     "wrongParameters": "Some parameters on the form are incorrect",
     "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "Account is already activated or confirmation code is incorrect",
@@ -130,7 +130,7 @@
     "emailNotFound": "Account does not exist",
     "EmailAlreadyExists": "This Email is already registered",
     "oldPasswordMistmatch": "Current password is incorrect",
-    "passwordMismatch": "Wrong password",
+    "passwordMismatch": "Password errata",
     "cantEditYourself": "Changing own permissions is not allowed",
     "cantEditAdmin": "This user has administrator permissions",
     "cantOpenClient": "{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
@@ -141,7 +141,7 @@
     "minLengthMessage": "Password must contain at least 8 characters",
     "requiredMessage": "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
     "weakMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger",
-    "strongMessage": "Strong password!",
+    "strongMessage": "Password sicura!",
     "commonMessage": "This password is in top most popular passwords in the world"
   },
   "sharing": {
@@ -163,10 +163,10 @@
     "confirmRenameAction": "Save",
     "successRename": "System name saved",
     "confirmDisconnectTitle": "Disconnect System from {{PRODUCT_NAME}}?",
-    "confirmDisconnectAction": "Disconnect",
+    "confirmDisconnectAction": "Scollegamento",
     "confirmUnshareFromMe": "You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
     "confirmUnshareFromMeTitle": "Disconnect System?",
-    "confirmUnshareFromMeAction": "Disconnect",
+    "confirmUnshareFromMeAction": "Scollegamento",
     "confirmUnshare": "This user will not be able to access System. Are you sure?",
     "confirmUnshareTitle": "Delete user?",
     "confirmUnshareAction": "Delete",
@@ -250,7 +250,7 @@
   },
   "activeActions": {
     "sendConfirm": "Resend activation link",
-    "resetPassword": "Reset Password",
+    "resetPassword": "Reimpostare la Password",
     "setNewPassword": "Save password",
     "setNewPasswordLabel": "New password"
   },
