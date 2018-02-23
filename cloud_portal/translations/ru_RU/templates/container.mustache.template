@@ -30,7 +30,7 @@
                             <td><div class="name">{{cloud.ownerName}}</div>
                                 <div class="hint">{{cloud.ownerEmail}}</div></td>
                         </tr>
-                        {{/облачный}}
+                        {{/cloud}}
                         </tbody>
                     </table>
                 </div>
