@@ -12,6 +12,7 @@ Log in to Auto Tests System
     [arguments]    ${email}
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${email}    ${password}    None
+    Validate Log In
     Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
@@ -155,14 +156,16 @@ rename button opens dialog; cancel closes without rename; save renames system
     Close Browser
 
 should open System page by link to not authorized user and redirect to homepage, if he does not log in
-    Open Browser and go to URL    ${url}/systems/${AUTO TESTS SYSTEM ID}
+    Open Browser and go to URL    ${url}
+    Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
     Click Button    ${LOG IN CLOSE BUTTON}
     Wait Until Element Is Visible    ${JUMBOTRON}
     Close Browser
 
 should open System page by link to not authorized user and show it, after owner logs in
-    Open Browser and go to URL    ${url}/systems/${AUTO TESTS SYSTEM ID}
+    Open Browser and go to URL    ${url}
+    Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${EMAIL OWNER}   ${password}    None
     Verify In System    Auto Tests
     Close Browser
@@ -176,7 +179,8 @@ should open System page by link to user without permission and show alert (Syste
     Close Browser
 
 should open System page by link not authorized user, and show alert if logs in and has no permission
-    Open Browser and go to URL    ${url}/systems/${AUTO TESTS SYSTEM ID}
+    Open Browser and go to URL    ${url}
+    Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${EMAIL NOPERM}   ${password}    None
     Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
     Close Browser

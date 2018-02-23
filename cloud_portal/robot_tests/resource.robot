@@ -12,6 +12,19 @@ Open Browser and go to URL
     Open Browser    ${url}    Chrome
 #    Maximize Browser Window
     Set Selenium Speed    0
+    Check Language
+
+Check Language
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}
+    ${current}    Get Element Attribute    ${LANGUAGE DROPDOWN}//span[2]    lang
+    Run Keyword If    "${current}"!="${LANGUAGE}"    Set Language
+
+Set Language
+    Click Button    ${LANGUAGE DROPDOWN}
+    Wait Until Element Is Visible    ${LANGUAGE TO SELECT}
+    sleep    1
+    Click Element    ${LANGUAGE TO SELECT}
+    sleep     1
 
 Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
@@ -27,6 +40,7 @@ Log In
 Validate Log In
     Wait Until Page Contains Element    ${AUTHORIZED BODY}
     Page Should Contain Element    ${AUTHORIZED BODY}
+    Check Language
 
 Log Out
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}

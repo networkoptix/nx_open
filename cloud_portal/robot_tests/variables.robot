@@ -6,10 +6,13 @@ ${ALERT}                              //div[contains(@class, 'ng-toast')]//span[
 ${ALERT CLOSE}                        //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']/../preceding-sibling::button[@ng-click='!message.dismissOnClick && dismiss()']
 
 ${LOCAL}                              https://localhost:9000/
-
 ${CLOUD TEST}                         https://cloud-test.hdw.mx
 ${CLOUD DEV}                          https://cloud-dev2.hdw.mx
 ${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
+${CLOUD STAGE}                        https://cloud-stage.hdw.mx
+
+${LANGUAGE DROPDOWN}                 //footer//button[@uib-dropdown-toggle]
+${LANGUAGE TO SELECT}                //footer//span[@lang='${LANGUAGE}']/..
 
 ${CYRILLIC TEXT}                     Кенгшщзх
 ${SMILEY TEXT}                       ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
