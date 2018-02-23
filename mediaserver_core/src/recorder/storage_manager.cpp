@@ -1784,7 +1784,7 @@ bool QnStorageManager::canAddChunk(qint64 timeMs, qint64 size)
     if (available > size)
         return true;
 
-    qint64 minTime = 0x7fffffffffffffffll;
+    qint64 minTime = std::numeric_limits<qint64>::max();
     DeviceFileCatalogPtr catalog;
     {
         QnMutexLocker lock(&m_mutexCatalog);
@@ -1795,7 +1795,7 @@ bool QnStorageManager::canAddChunk(qint64 timeMs, qint64 size)
     if (minTime > timeMs)
         return false;
 
-    return false;
+    return true;
 }
 
 void QnStorageManager::clearBookmarks()
