@@ -71,6 +71,14 @@ boost::optional<TemporaryAccountCredentialsEx>
     return boost::none;
 }
 
+bool TemporaryAccountPasswordManagerStub::authorize(
+    const std::string& /*credentialsId*/,
+    const nx::utils::stree::AbstractResourceReader& /*inputData*/) const
+{
+    // TODO
+    return true;
+}
+
 } // namespace test
 } // namespace cdb
 } // namespace nx
