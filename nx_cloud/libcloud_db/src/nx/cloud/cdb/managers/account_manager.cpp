@@ -359,8 +359,8 @@ void AccountManager::createTemporaryCredentials(
                 params.timeouts.prolongationPeriod).count();
     tempPasswordData.maxUseCount = std::numeric_limits<int>::max();
     //filling in access rights
-    tempPasswordData.accessRights.requestsDenied.push_back(kAccountUpdatePath);
-    tempPasswordData.accessRights.requestsDenied.push_back(kAccountPasswordResetPath);
+    tempPasswordData.accessRights.requestsDenied.add(kAccountUpdatePath);
+    tempPasswordData.accessRights.requestsDenied.add(kAccountPasswordResetPath);
     m_tempPasswordManager->addRandomCredentials(
         accountEmail,
         &tempPasswordData);
@@ -471,7 +471,7 @@ nx::utils::db::DBResult AccountManager::createPasswordResetCode(
         nx::utils::timeSinceEpoch().count() + codeExpirationTimeout.count();
     tempPasswordData.maxUseCount = 1;
     tempPasswordData.isEmailCode = true;
-    tempPasswordData.accessRights.requestsAllowed.push_back(kAccountUpdatePath);
+    tempPasswordData.accessRights.requestsAllowed.add(kAccountUpdatePath);
 
     data::Credentials credentials;
     auto dbResultCode = m_tempPasswordManager->fetchTemporaryCredentials(
@@ -696,8 +696,8 @@ std::string AccountManager::generateAccountActivationCode(
     tempPasswordData.expirationTimestampUtc = codeExpirationTime.count();
     tempPasswordData.maxUseCount = 1;
     tempPasswordData.isEmailCode = true;
-    tempPasswordData.accessRights.requestsAllowed.push_back(kAccountActivatePath);
-    tempPasswordData.accessRights.requestsAllowed.push_back(kAccountUpdatePath);
+    tempPasswordData.accessRights.requestsAllowed.add(kAccountActivatePath);
+    tempPasswordData.accessRights.requestsAllowed.add(kAccountUpdatePath);
     m_tempPasswordManager->addRandomCredentials(
         accountEmail,
         &tempPasswordData);
