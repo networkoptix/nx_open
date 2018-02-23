@@ -47,6 +47,11 @@ Register
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     Click Button    ${CREATE ACCOUNT BUTTON}
 
+Validate Register Success
+    [arguments]    ${location}=${url}/register/success
+    Wait Until Element Is Visible    ${ACCOUNT CREATION SUCCESS}
+    Location Should Be    ${location}
+
 Validate Register Email Received
     [arguments]    ${recipient}
     Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
@@ -98,6 +103,7 @@ Remove User Permissions
     Click Button    ${DELETE USER BUTTON}
     ${PERMISSIONS WERE REMOVED FROM EMAIL}    Replace String    ${PERMISSIONS WERE REMOVED FROM}    {{email}}    ${user email}
     Check For Alert    ${PERMISSIONS WERE REMOVED FROM EMAIL}
+    Wait Until Element Is Not Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
 
 Check For Alert
     [arguments]    ${alert text}
@@ -111,7 +117,7 @@ Check For Alert Dismissable
     Wait Until Elements Are Visible    ${ALERT}    ${ALERT CLOSE}
     Element Should Be Visible    ${ALERT}
     Element Text Should Be    ${ALERT}    ${alert text}
-
+    Click Element    ${ALERT CLOSE}
 
 Verify In System
     [arguments]    ${system name}
@@ -149,3 +155,11 @@ Register Form Validation
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     click button    ${CREATE ACCOUNT BUTTON}
+
+Get Reset Password Link
+    [arguments]    ${recipient}
+    Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
+    ${email}    Wait For Email    recipient=${recipient}    timeout=120    subject=${RESET PASSWORD EMAIL SUBJECT}
+    ${links}    Get Links From Email    ${email}
+    Close Mailbox
+    Return From Keyword    @{links}[1]

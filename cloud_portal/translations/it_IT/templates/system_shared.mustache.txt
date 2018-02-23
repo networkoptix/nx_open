@@ -1,4 +1,4 @@
-Hello, {{message.fullName}}
+Buongiorno, {{message.fullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) has shared access to video management system "{{message.system_name}}" with you.

@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        <br>アカウントが登録されました<br>{{account.email}} に確認のメッセージを送信します
+        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -9,7 +9,7 @@
     </h1>
 
     <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
-        <h1 ng-if="!session.fromClient">アカウント作成</h1>
+        <h1 ng-if="!session.fromClient">アカウントを作成</h1>
 
         <!-- special hack to prevent autocompletion -->
         <input type="text" style="display:none">
@@ -49,9 +49,11 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Emailが必要です</span>
-                 <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">有効なEmailを入力してください</span>
-                 <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">このEmailは {{PRODUCT_NAME}} で既に登録されています</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required.</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please, enter a valid Email.</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in {{PRODUCT_NAME}}.</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
@@ -68,7 +70,10 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <small class="conditions-note">アカウントの作成をクリックして <br><a href="/content/eula" target="_blank">利用規約</a> を同意します</small>
+                <div class="small conditions-note">
+                    アカウント作成ボタンを押すことで、次の規約への同意とみなされます
+                    <div><a href="/content/eula" target="_blank">利用規約</a></div>
+                </div>
             </div>
         </div>
     </form>

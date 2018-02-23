@@ -70,7 +70,7 @@
                                 <b>Web</b><br>
                                 <a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
-                        {{/system}}
+                        {{/rendszer}}
                         <td class="left-border">
                             <b>Támogatás</b>
                             <br><a href="{{supportLink}}">{{supportLinkText}}</a>

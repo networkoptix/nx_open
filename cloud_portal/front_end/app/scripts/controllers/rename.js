@@ -11,6 +11,8 @@ angular.module('cloudApp')
             systemName: dialogSettings.params.systemName
         }
 
+        var dialogSettings = dialogs.getSettings($scope);
+
         var systemId = dialogSettings.params.systemId;
 
         $scope.close = function(){
@@ -23,9 +25,5 @@ angular.module('cloudApp')
             successMessage: L.system.successRename
         }).then(function(){
             dialogs.closeMe($scope, $scope.model.systemName);
-        });
-
-        $scope.$on('$destroy', function(){
-            dialogs.dismissNotifications();
         });
     }]);
