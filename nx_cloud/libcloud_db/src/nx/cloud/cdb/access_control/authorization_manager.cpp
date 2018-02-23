@@ -114,10 +114,10 @@ nx::utils::stree::ResourceContainer AuthorizationManager::addHelperAttributes(
 }
 
 bool AuthorizationManager::checkStaticRules(
-    EntityType requestedEntity,
-    DataActionType requestedAction,
+    EntityType /*requestedEntity*/,
+    DataActionType /*requestedAction*/,
     const nx::utils::stree::AbstractResourceReader& inputData,
-    nx::utils::stree::AbstractResourceWriter* outAuthzInfo) const
+    nx::utils::stree::AbstractResourceWriter* /*outAuthzInfo*/) const
 {
     if (!authorizeTemporaryCredentials(inputData))
         return false;
