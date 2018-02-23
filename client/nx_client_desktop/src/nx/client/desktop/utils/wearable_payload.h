@@ -20,6 +20,7 @@ struct WearablePayload
         FileDoesntExist,
         UnsupportedFormat,
         NoTimestamp,
+        FootagePastMaxDays,
         ChunksTakenByFileInQueue,
         ChunksTakenOnServer,
         FootageTooOld,

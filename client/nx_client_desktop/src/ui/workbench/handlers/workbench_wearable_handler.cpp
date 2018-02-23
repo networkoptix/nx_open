@@ -176,7 +176,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     qnClientModule->wearableManager()->prepareUploads(camera, paths, this,
         [this, camera](WearableUpload upload)
         {
-            if(fixFileUpload(&upload))
+            if(fixFileUpload(camera, &upload))
                 uploadValidFiles(camera, upload.elements);
         });
 }
@@ -216,7 +216,9 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
         });
 }
 
-bool QnWorkbenchWearableHandler::fixFileUpload(WearableUpload* upload)
+bool QnWorkbenchWearableHandler::fixFileUpload(
+    const QnSecurityCamResourcePtr& camera,
+    WearableUpload* upload)
 {
     int count = upload->elements.size();
 
@@ -233,6 +235,42 @@ bool QnWorkbenchWearableHandler::fixFileUpload(WearableUpload* upload)
         QnMessageBox::warning(mainWindow(),
             tr("Selected files do not have timestamps", 0, count),
             tr("Only video files with correct timestamp are supported."));
+        return false;
+    }
+
+    if (upload->allHaveStatus(WearablePayload::FootagePastMaxDays))
+    {
+        qint64 minTime = std::numeric_limits<qint64>::max();
+        qint64 maxTime = std::numeric_limits<qint64>::min();
+        for (const WearablePayload& payload : upload->elements)
+        {
+            minTime = std::min(minTime, payload.local.period.startTimeMs);
+            maxTime = std::max(maxTime, payload.local.period.endTimeMs());
+        }
+
+        QString title = tr("Selected files are too old", 0, count);
+
+        int days = camera->maxDays();
+        QString extra;
+        if (count == 1)
+        {
+            extra = tr(
+                "Selected file was recorded on %1, "
+                "but only files that were recorded in the last %n days can be uploaded. "
+                "You can change this in camera archive settings.", 0, days)
+                .arg(QDateTime::fromMSecsSinceEpoch(minTime).toString(Qt::SystemLocaleShortDate));
+        }
+        else
+        {
+            extra = tr(
+                "Selected files were recorded between %1 and %2, "
+                "but only files that were recorded in the last %n days can be uploaded. "
+                "You can change this in camera archive settings.", 0, days)
+                .arg(QDateTime::fromMSecsSinceEpoch(minTime).toString(Qt::SystemLocaleShortDate))
+                .arg(QDateTime::fromMSecsSinceEpoch(maxTime).toString(Qt::SystemLocaleShortDate));
+        }
+
+        QnMessageBox::warning(mainWindow(), title, extra);
         return false;
     }
 
@@ -435,6 +473,8 @@ QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const Wearable
         return tr("%1 - has unsupported format.").arg(fileName);
     case WearablePayload::NoTimestamp:
         return tr("%1 - does not have timestamp.").arg(fileName);
+    case WearablePayload::FootagePastMaxDays:
+        return tr("%1 - is older than allowed in camera archive settings.").arg(fileName);
     case WearablePayload::ChunksTakenByFileInQueue:
         return tr("%1 - covers period for which video has already been uploaded.").arg(fileName);
     case WearablePayload::ChunksTakenOnServer:

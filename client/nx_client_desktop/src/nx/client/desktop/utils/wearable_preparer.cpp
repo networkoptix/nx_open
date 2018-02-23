@@ -4,6 +4,7 @@
 #include <QtCore/QFileInfo>
 
 #include <utils/common/guarded_callback.h>
+#include <utils/common/synctime.h>
 #include <api/server_rest_connection.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -44,6 +45,8 @@ QnTimePeriod shrinkPeriod(const QnTimePeriod& local, const QnTimePeriodList& rem
         return locals[0];
     return QnTimePeriod();
 }
+
+const qint64 kOneDayMSecs = 1000ll * 3600ll * 24ll;
 
 } // namespace
 
@@ -174,6 +177,18 @@ void WearablePreparer::checkLocally(WearablePayload& payload)
     }
 
     QnTimePeriod localPeriod = QnTimePeriod(startTimeMs, durationMs);
+    payload.local.period = localPeriod;
+
+    if (d->camera->maxDays() > 0)
+    {
+        qint64 minTime = qnSyncTime->currentMSecsSinceEpoch() - kOneDayMSecs * d->camera->maxDays();
+        if (startTimeMs < minTime)
+        {
+            payload.status = WearablePayload::FootagePastMaxDays;
+            return;
+        }
+    }
+
     QnTimePeriod expectedRemotePeriod = shrinkPeriod(localPeriod, d->queuePeriods);
     if (!canUpload(localPeriod, expectedRemotePeriod))
     {
@@ -181,7 +196,6 @@ void WearablePreparer::checkLocally(WearablePayload& payload)
         return;
     }
 
-    payload.local.period = localPeriod;
     payload.local.size = QFileInfo(payload.path).size();
     payload.status = WearablePayload::Valid;
 
