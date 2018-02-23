@@ -941,6 +941,7 @@ void QnWorkbenchExportHandler::at_exportRapidReviewAction_triggered()
 
 void QnWorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
 {
+#ifdef Q_OS_WIN
     const auto exeExtension = lit(".exe");
     const auto tmpExtension = lit(".tmp");
 
@@ -969,6 +970,7 @@ void QnWorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
 
     QFile::rename(temporaryFilename, targetFilename);
     showExportCompleteMessage();
+#endif
 }
 
 void QnWorkbenchExportHandler::showExportCompleteMessage()
