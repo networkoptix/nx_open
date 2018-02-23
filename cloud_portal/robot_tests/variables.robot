@@ -10,6 +10,7 @@ ${CLOUD TEST}                         https://cloud-test.hdw.mx
 ${CLOUD DEV}                          https://cloud-dev2.hdw.mx
 ${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
 ${CLOUD STAGE}                        https://cloud-stage.hdw.mx
+${URL}                                ${CLOUD TEST}
 
 ${LANGUAGE DROPDOWN}                 //footer//button[@uib-dropdown-toggle]
 ${LANGUAGE TO SELECT}                //footer//span[@lang='${LANGUAGE}']/..

@@ -9,22 +9,21 @@ Resource          variables.robot
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    Open Browser    ${url}    Chrome
+    Open Browser    ${URL}    Chrome
 #    Maximize Browser Window
     Set Selenium Speed    0
     Check Language
+    Go To    ${url}
 
 Check Language
-    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}
-    ${current}    Get Element Attribute    ${LANGUAGE DROPDOWN}//span[2]    lang
-    Run Keyword If    "${current}"!="${LANGUAGE}"    Set Language
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[2]
+    ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    1
+    Run Keyword If    "${status}"=="FAIL"    Set Language
 
 Set Language
     Click Button    ${LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    ${LANGUAGE TO SELECT}
-    sleep    1
     Click Element    ${LANGUAGE TO SELECT}
-    sleep     1
 
 Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
