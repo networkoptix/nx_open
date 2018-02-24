@@ -3,7 +3,7 @@ import 'angular-route';
 import 'bootstrap-sass';
 import 'angular-resource';
 import 'angular-sanitize';
-import 'angular-bootstrap';
+import 'angular-ui-bootstrap';
 import 'angular-clipboard';
 import 'tc-angular-chartjs';
 

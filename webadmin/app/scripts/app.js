@@ -9,8 +9,6 @@ angular.module('webadminApp', [
     'ui.bootstrap',
     'tc.chartjs',
     'ngStorage',
-    //'typeahead-focus',
-    //'ui.timepicker',
     'angular-clipboard'
 ]).config(['$httpProvider', function ($httpProvider) {
     $httpProvider.defaults.xsrfCookieName = 'nx-vms-csrf-token';

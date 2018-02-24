@@ -1,6 +1,6 @@
 import 'ngstorage';
 import 'bootstrap-sass';
-import 'angular-bootstrap';
+import 'angular-ui-bootstrap';
 
 //Vendor scripts
 require('./vendor/client-detection.js');

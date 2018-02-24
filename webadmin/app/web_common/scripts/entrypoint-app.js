@@ -1,7 +1,7 @@
 import 'ngstorage';
 import 'screenfull';
 import 'bootstrap-sass';
-import 'angular-bootstrap';
+import 'angular-ui-bootstrap';
 import 'angular-clipboard';
 import 'jquery-mousewheel';
 

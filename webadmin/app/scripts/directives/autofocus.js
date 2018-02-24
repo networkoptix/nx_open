@@ -5,7 +5,7 @@ angular.module('webadminApp')
         return {
             restrict: 'A',
             link : function(scope, $element, attr) {
-                if(attr.autoFocus === 'undefined' ||
+                if(typeof(attr.autoFocus) === 'undefined' ||
                     attr.autoFocus === '' ||
                     attr.autoFocus === 'true' ||
                     attr.autoFocus === true) {
