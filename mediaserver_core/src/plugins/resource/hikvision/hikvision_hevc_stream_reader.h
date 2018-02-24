@@ -26,7 +26,7 @@ protected:
 
 private:
     nx::utils::Url buildHikvisionStreamUrl(
-        const const hikvision::ChannelProperties& properties) const;
+        const hikvision::ChannelProperties& properties) const;
     nx::utils::Url hikvisionRequestUrlFromPath(const QString& path) const;
 
     QSize chooseResolution(
