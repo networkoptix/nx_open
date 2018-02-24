@@ -1,6 +1,6 @@
 {
   "activate_account": {
-    "emailSubject": "Account activeren"
+    "emailSubject": "Activeer uw account"
   },
   "restore_password": {
     "emailSubject": "Uw wachtwoord opnieuw instellen"

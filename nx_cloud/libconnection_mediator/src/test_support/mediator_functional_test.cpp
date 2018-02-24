@@ -49,7 +49,7 @@ static network::SocketAddress findFreeTcpAndUdpLocalAddress()
         if (!udpSocket.bind(address))
             continue;
 
-        return address;
+        return tcpSocket.getLocalAddress();
     }
 
     return network::SocketAddress::anyPrivateAddress;
@@ -70,7 +70,7 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     addArg("/path/to/bin");
     addArg("-e");
     addArg("-stun/addrToListenList", m_stunAddress.toStdString().c_str());
-    addArg("-http/addrToListenList", network::SocketAddress::anyPrivateAddress.toStdString().c_str());
+    addArg("-http/addrToListenList", network::SocketAddress::anyPrivateAddressV4.toStdString().c_str());
     addArg("-log/logLevel", "DEBUG2");
     addArg("-general/dataDir", testDataDir().toLatin1().constData());
 
@@ -251,7 +251,7 @@ void MediatorFunctionalTest::beforeModuleCreation()
         }
     }
 
-    network::SocketAddress httpEndpoint = network::SocketAddress::anyPrivateAddress;
+    network::SocketAddress httpEndpoint = network::SocketAddress::anyPrivateAddressV4;
     if (m_httpPort != 0)
         httpEndpoint.port = m_httpPort;
 

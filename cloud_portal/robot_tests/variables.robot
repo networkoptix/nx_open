@@ -11,10 +11,11 @@ ${CLOUD TEST}                         https://cloud-test.hdw.mx
 ${CLOUD DEV}                          https://cloud-dev2.hdw.mx
 ${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
 
-${CYRILLIC NAME}                     Кенгшщзх
-${SMILEY NAME}                       ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
-${GLYPH NAME}                        您都可以享受源源不絕的好禮及優惠
-${SYMBOL NAME}                       `~!@#$%^&*()_:";'{}[]+<>?,./\
+${CYRILLIC TEXT}                     Кенгшщзх
+${SMILEY TEXT}                       ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
+${GLYPH TEXT}                        您都可以享受源源不絕的好禮及優惠
+${SYMBOL TEXT}                       `~!@#$%^&*()_:";'{}[]+<>?,./\
+${TM TEXT}                           qweasdzxc123®™
 
 #Log In Elements
 ${LOG IN MODAL}                       //div[contains(@class, 'modal-content')]
@@ -30,6 +31,8 @@ ${YOU HAVE NO SYSTEMS}                //span[contains(text(),'${YOU HAVE NO SYST
 
 ${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), '${LOG OUT BUTTON TEXT}')]
+${SYSTEMS DROPDOWN}                   //li[contains(@class, 'collapse-second')]//a['uib-dropdown-toggle']
+${ALL SYSTEMS}                        //li[contains(@class, 'collapse-second')]//a[@ng-href='/systems']
 ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
 ${ANONYMOUS BODY}                     //body[contains(@class,'anonymous')]
 ${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
@@ -41,13 +44,14 @@ ${RESET PASSWORD BUTTON}              //form[@name='restorePassword']//button[@n
 ${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//input[@type='password']
 ${SAVE PASSWORD}                      //form[@name='restorePasswordWithCode']//button[@ng-click='checkForm()']
 ${RESET EMAIL SENT MESSAGE}           //div[@ng-if='restoringSuccess']/h1[contains(text(),'${RESET EMAIL SENT MESAGE TEXT}')]
-${RESET SUCCESS MESSAGE}              //h1[@ng-if='change.success || changeSuccess']/div[contains(text(), '${RESET SUCCESS MESSAGE TEXT}')]
+${RESET SUCCESS MESSAGE}              //h1[contains(text(), '${RESET SUCCESS MESSAGE TEXT}')]
 ${RESET SUCCESS LOG IN LINK}          //h1[@ng-if='change.success || changeSuccess']//a[@href='/login']
 
 #Change Password
 ${CURRENT PASSWORD INPUT}             //form[@name='passwordForm']//input[@ng-model='pass.password']
 ${NEW PASSWORD INPUT}                 //form[@name='passwordForm']//password-input[@ng-model='pass.newPassword']//input[@type='password']
 ${CHANGE PASSWORD BUTTON}             //form[@name='passwordForm']//button[@ng-click='checkForm()']
+${PASSWORD IS REQUIRED}               //span[@ng-if='passwordInput.password.$error.required']
 
 #Register Form Elements
 ${REGISTER FIRST NAME INPUT}          //form[@name= 'registerForm']//input[@ng-model='account.firstName']
@@ -59,19 +63,29 @@ ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[cont
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula' and contains(text(), '${TERMS AND CONDITIONS LINK TEXT}')]
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), '${RESEND ACTIVATION LINK BUTTON TEXT}')]
 
+${EMAIL ALREADY REGISTERED}           //span[@ng-if="registerForm.registerEmail.$error.alreadyExists"]
+
 ${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || registerSuccess) && !activated']
 ${ACTIVATION SUCCESS}                 //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]
 ${SUCCESS LOG IN BUTTON}              //div[@ng-model-options="{ updateOn: 'blur' }"]//h1[@ng-if='activate.success' and contains(text(), '${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}')]//a[@href='/login']
 
 #In system settings
+${FIRST USER OWNER}                   //table[@ng-if='system.users.length']/tbody/tr/td[3]/span[contains(text(),'${OWNER TEXT}')]
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
 ${RENAME SYSTEM}                      //button[@ng-click='rename()']
+${RENAME CANCEL}                      //form[@name='renameForm']//button[@ng-click='close()']
+${RENAME SAVE}                        //form[@name='renameForm']//button[@ng-click='checkForm()']
+${RENAME INPUT}                       //form[@name='renameForm']//input[@ng-model='model.systemName']
 ${DISCONNECT FROM MY ACCOUNT}         //button[@ng-click='delete()']
 ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//button[@ng-click='share()']
+${SHARE BUTTON DISABLED}              //div[@process-loading='gettingSystem']//button[@ng-click='share()' and @ng-disabled='!system.isAvailable']
 ${OPEN IN NX BUTTON}                  //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()']
+${OPEN IN NX BUTTON DISABLED}         //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()' and @ng-disabled='buttonDisabled']
 ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
 ${DELETE USER BUTTON}                 //button[@ng-click='ok()' and contains(text(), '${DELETE USER BUTTON TEXT}')]
 ${DELETE USER CANCEL BUTTON}          //button[@ng-click='cancel()' and contains(text(), '${DELETE USER CANCEL BUTTON TEXT}')]
+${SYSTEM NAME OFFLINE}                //span[@ng-if='!system.isOnline']
+${USERS LIST}                         //div[@process-loading='gettingSystemUsers']
 
 ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains(text(), '${SYSTEM NO ACCESS TEXT}')]
 
@@ -137,6 +151,8 @@ ${EMAIL LIVE VIEWER}                  noptixqa+liveviewer@gmail.com
 ${EMAIL OWNER}                        noptixqa+owner@gmail.com
 ${EMAIL NOT OWNER}                    noptixqa+notowner@gmail.com
 ${EMAIL ADMIN}                        noptixqa+admin@gmail.com
+${ADMIN FIRST NAME}                   asdasasd
+${ADMIN LAST NAME}                    asdasasdas
 ${EMAIL UNREGISTERED}                 noptixqa+unregistered@gmail.com
 ${EMAIL NOPERM}                       noptixqa+noperm@gmail.com
 ${BASE PASSWORD}                      qweasd123
@@ -146,17 +162,17 @@ ${TEST FIRST NAME}                    testFirstName
 ${TEST LAST NAME}                     testLastName
 
 #Related to Auto Tests system
-${AUTO TESTS SYSTEM ID}                     b4939b35-5b98-492b-a092-27fe8efeef38
+${AUTO_TESTS SYSTEM ID}                     b4939b35-5b98-492b-a092-27fe8efeef38
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/following-sibling::span[contains(@class,'user-name')]
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..//button[@ng-click='checkForm()']
-
 ${SYSTEMS SEARCH INPUT}               //input[@ng-model='search.value']
 ${SYSTEMS TILE}                       //div[@ng-repeat="system in systems | filter:searchSystems as filtered"]
 
 #AUTOTESTS (with no space) is an offline system used for testing offline status on the systems page
 ${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
 ${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/..//button[@ng-click='checkForm()']
+${AUTOTESTS OFFLINE SYSTEM ID}                dd06f8bf-f7ea-49b3-96fc-fbc6742a2ad4
 
 #ASCII
 ${ESCAPE}                             \\27

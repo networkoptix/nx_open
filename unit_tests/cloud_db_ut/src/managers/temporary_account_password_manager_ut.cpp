@@ -6,6 +6,7 @@
 #include <nx/utils/crc32.h>
 
 #include <nx/cloud/cdb/managers/temporary_account_password_manager.h>
+#include <nx/cloud/cdb/stree/cdb_ns.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
 
 #include "base_persistent_data_test.h"
@@ -21,6 +22,7 @@ class TemporaryAccountPasswordManager:
 public:
     TemporaryAccountPasswordManager():
         m_tempPasswordManager(
+            m_attrNameset,
             &persistentDbManager()->queryExecutor())
     {
         m_email = BusinessDataGenerator::generateRandomEmailAddress();
@@ -42,6 +44,7 @@ protected:
     }
 
 private:
+    CdbAttrNameSet m_attrNameset;
     cdb::TemporaryAccountPasswordManager m_tempPasswordManager;
     data::TemporaryAccountCredentials m_credentials;
     std::string m_email;

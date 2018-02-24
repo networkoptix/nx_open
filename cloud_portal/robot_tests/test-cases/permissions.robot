@@ -138,6 +138,22 @@ Sharing works
     Remove User Permissions    ${random email}
     Close Browser
 
+displays pencil and cross links for each user only on hover
+    Open Browser and go to URL    ${url}
+    Log in to Auto Tests System    ${email}
+    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    ${random email}    Get Random Email
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
+    Input Text    ${SHARE EMAIL}    ${random email}
+    Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'Edit')]/..
+    Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'Edit')]/..
+
 Edit permission works
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${email}
@@ -153,6 +169,32 @@ Edit permission works
     Edit User Permissions In Systems    ${random email}    ${CUSTOM TEXT}
     Check User Permissions    ${random email}    ${CUSTOM TEXT}
     Remove User Permissions    ${random email}
+    Close Browser
+
+Delete user works
+    Open Browser and go to URL    ${url}/register
+    ${random email}    Get Random Email
+    Register    mark    harmill    ${random email}    ${password}
+    Activate    ${random email}
+    Log in to Auto Tests System    ${email}
+    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
+    Input Text    ${SHARE EMAIL}    ${random email}
+    Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Check User Permissions    ${random email}    ${CUSTOM TEXT}
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${random email}
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${email}
+    Remove User Permissions    ${random email}
+    Log Out
+    Validate Log Out
+    Log In    ${random email}    ${password}
+    Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
     Close Browser
 
 Share with registered user - sends him notification

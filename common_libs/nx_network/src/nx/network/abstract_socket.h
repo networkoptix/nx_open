@@ -167,6 +167,11 @@ public:
     virtual bool getLastError(SystemError::ErrorCode* errorCode) const = 0;
 
     /**
+     * Set IPV6_V6ONLY socket option. Default value is false on EVERY platform.
+     */
+    virtual bool setIpv6Only(bool val) = 0;
+
+    /**
      * Returns system-specific socket handle.
      * TODO: #ak remove this method after complete move to the new socket.
      */
