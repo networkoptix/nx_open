@@ -45,6 +45,14 @@ private:
 
 } // namespace
 
+TEST_F(SystemSharing, system_user_list_is_available_under_system_credentials)
+{
+    std::vector<api::SystemSharingEx> sharings;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystemSharings(system().id, system().authKey, &sharings));
+}
+
 TEST_F(SystemSharing, get_users)
 {
     {
