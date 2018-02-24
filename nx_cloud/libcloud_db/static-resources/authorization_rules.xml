@@ -90,8 +90,8 @@
                                     <set value="maintenance" resName="authorized" resValue="true"/>
                                 </condition>
                             </sequence>
-                        </condition>
-                    </condition>
+                         </condition>
+                     </condition>
                     <condition value="/cdb/system/getAccessRoleList" resName="systemId" matchType="presence">
                         <sequence value="false">
                             <set resName="authorized" resValue="false"/>
