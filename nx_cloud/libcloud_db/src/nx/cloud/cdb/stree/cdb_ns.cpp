@@ -42,6 +42,7 @@ CdbAttrNameSet::CdbAttrNameSet()
     registerResource(attr::credentialsType, "credentials.type", QVariant::String);
     registerResource(attr::credentialsExpirationPeriod, "credentials.expirationPeriod", QVariant::String);
     registerResource(attr::credentialsProlongationPeriod, "credentials.prolongationPeriod", QVariant::String);
+    registerResource(attr::credentialsId, "credentials.id", QVariant::String);
 }
 
 } // namespace cdb

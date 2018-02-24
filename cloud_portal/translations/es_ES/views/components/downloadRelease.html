@@ -2,7 +2,9 @@
     <b> {{release.version}} </b> <small> {{release.productDescription}} </small> <br> <small> PUBLICADO {{release.date}} </small>
 </h1>
 <div ng-if="release.releaseNotes">
-    <h4> Notas de la versión </h4>
+    <h4>
+        Notas de la versión
+    </h4>
     <div ng-bind-html="release.releaseNotes"></div>
 </div>
 

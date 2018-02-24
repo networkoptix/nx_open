@@ -92,6 +92,7 @@ public:
     virtual bool getRecvBufferSize(unsigned int* buffSize) const override;
     virtual bool setRecvTimeout(unsigned int ms) override;
     virtual bool setSendTimeout(unsigned int ms) override;
+    virtual bool setIpv6Only(bool val) override;
 
     virtual Pollable* pollable() override;
     virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override;

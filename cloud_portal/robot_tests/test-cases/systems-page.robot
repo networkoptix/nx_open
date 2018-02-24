@@ -15,6 +15,13 @@ should show list of Systems
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${SYSTEMS TILE}
     Close Browser
 
+has system name, owner and OpenInNx button visible on systems page
+    Open Browser and go to URL    ${url}
+    Log In    ${EMAIL OWNER}    ${password}
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
+    Close Browser
+
 should show Open in NX client button for online system
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}

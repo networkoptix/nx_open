@@ -46,14 +46,6 @@ redirects to systems after log In
     Location Should Be    ${url}/systems
     Close Browser
 
-#redirects to systems after log In, (EXPECTED FAILURE)
-#    Open Browser and go to URL    ${url}
-#    Log In    ${email}    ${password}
-#    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-#    ${current page}    Get Location
-#    Should Be True    '${current page}' == '${url}/system'
-#    Close Browser
-
 after log In, display user's email and menu in top right corner
     Open Browser and go to URL    ${url}
     Maximize Browser Window
@@ -97,15 +89,6 @@ rejects log in without both email and password
     ${class}    Get Element Attribute    ${EMAIL INPUT}/..    class
     Should Contain    ${class}    has-error
     Close Browser
-
-#rejects log in without both email and password, (EXPECTED FAILURE)
-#    Open Browser and go to URL    ${url}
-#    Log In    ${EMPTY}    ${EMPTY}
-#    ${class}    Get Element Attribute    ${PASSWORD INPUT}/..    class
-#    Should Contain    ${class}    has-eror
-#    ${class}    Get Element Attribute    ${EMAIL INPUT}/..    class
-#    Should Contain    ${class}    has-error
-#    Close Browser
 
 rejects log in with email in non-email format but with password
     Open Browser and go to URL    ${url}
@@ -275,7 +258,7 @@ should respond to Space key and toggle checkbox
 
 handles two tabs, updates second tab state if logout is done on first
     Open Browser and go to URL    ${url}/register
-    Wait Until Element Is Visible    ${TERMS AND CONDITIONS LINK}
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Click Link    ${TERMS AND CONDITIONS LINK}
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[1]

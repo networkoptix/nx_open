@@ -26,6 +26,7 @@
                 </div>
             </td>
             <td width="100%">
+                <voice-control ng-if="voiceControls.showCommands" voice-controls="voiceControls"></voice-control>
                 <div class="view-wrapper" ng-class="{invisible:!activeCamera}">
                     <div class="view-panel" ng-class="{'no-archive': !canViewArchive}">
                         <div class="stick-to-top top-gradient">

@@ -3,7 +3,7 @@ from django import db
 import models
 from api.controllers.cloud_api import Account
 from django.contrib.auth.backends import ModelBackend
-from api.helpers.exceptions import APIRequestException, APILogicException, ErrorCodes
+from api.helpers.exceptions import APIRequestException, APIException, APILogicException, ErrorCodes
 from django.core.exceptions import ObjectDoesNotExist
 from cloud import settings
 
@@ -75,7 +75,13 @@ class AccountManager(db.models.Manager):
         code = extra_fields.pop("code", None)
 
         # this line will send request to cloud_db and raise an exception if fails:
-        Account.register(email, password, first_name, last_name, code=code)
+        try:
+            Account.register(email, password, first_name, last_name, code=code)
+        except APIException as a:
+            if a.error_code == ErrorCodes.account_exists and not AccountBackend.is_email_in_portal(email):
+                raise APILogicException('User is not in portal', ErrorCodes.portal_critical_error)
+            else:
+                raise
         user = self.model(email=email,
                           first_name=first_name,
                           last_name=last_name,

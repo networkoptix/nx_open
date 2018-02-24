@@ -146,12 +146,12 @@ void DnsResolver::addEtcHost(const QString& name, std::vector<HostAddress> addre
     for (auto& address: addresses)
         entries.push_back({ AddressType::direct, address });
 
-    m_predefinedHostResolver->addMapping(name, std::move(entries));
+    m_predefinedHostResolver->replaceMapping(name.toStdString(), std::move(entries));
 }
 
 void DnsResolver::removeEtcHost(const QString& name)
 {
-    m_predefinedHostResolver->removeMapping(name);
+    m_predefinedHostResolver->removeMapping(name.toStdString());
 }
 
 void DnsResolver::registerResolver(std::unique_ptr<AbstractResolver> resolver, int priority)

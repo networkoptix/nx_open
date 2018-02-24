@@ -75,10 +75,10 @@ void AccountManager::authenticateByName(
         }
     }
 
-    //NOTE currently, all authenticateByName are sync.
-    //  Changing it to async requires some HTTP authentication refactoring
+    // NOTE: Currently, every authenticateByName is synchronous.
+    // Changing it to async requires some HTTP authentication refactoring.
 
-    //authenticating by temporary password
+    // Authenticating by temporary password.
     m_tempPasswordManager->authenticateByName(
         username,
         std::move(validateHa1Func),
@@ -89,15 +89,17 @@ void AccountManager::authenticateByName(
         {
             if (authResult == api::ResultCode::ok)
             {
-                bool authenticatedByEmailCode = false;
-                authProperties->get(
-                    attr::authenticatedByEmailCode,
-                    &authenticatedByEmailCode);
-                if (authenticatedByEmailCode)
+                const auto authenticatedByEmailCode =
+                    authProperties->get<bool>(attr::authenticatedByEmailCode);
+                const auto accountEmail =
+                    authProperties->get<std::string>(cdb::attr::authAccountEmail);
+
+                if (static_cast<bool>(authenticatedByEmailCode) && *authenticatedByEmailCode &&
+                    static_cast<bool>(accountEmail))
                 {
                     //activating account
                     m_cache.atomicUpdate(
-                        std::string(username.constData(), username.size()),
+                        *accountEmail,
                         [](api::AccountData& account) {
                             account.statusCode = api::AccountStatus::activated;
                         });
@@ -218,6 +220,8 @@ void AccountManager::resetPassword(
     data::AccountEmail accountEmail,
     std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler)
 {
+    using namespace std::placeholders;
+
     auto account = m_cache.find(accountEmail.email);
     if (!account)
     {
@@ -228,18 +232,11 @@ void AccountManager::resetPassword(
             data::AccountConfirmationCode());
     }
 
-    //fetching request source
     bool hasRequestCameFromSecureSource = false;
     authzInfo.get(attr::secureSource, &hasRequestCameFromSecureSource);
 
     m_dbManager->executeUpdate<std::string, data::AccountConfirmationCode>(
-        [this](
-            nx::utils::db::QueryContext* const queryContext,
-            const std::string& accountEmail,
-            data::AccountConfirmationCode* const confirmationCode)
-        {
-            return resetPassword(queryContext, accountEmail, confirmationCode);
-        },
+        std::bind(&AccountManager::issueRestorePasswordCode, this, _1, _2, _3),
         accountEmail.email,
         [this, hasRequestCameFromSecureSource,
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
@@ -364,8 +361,11 @@ void AccountManager::createTemporaryCredentials(
     }
     tempPasswordData.maxUseCount = std::numeric_limits<int>::max();
     //filling in access rights
-    tempPasswordData.accessRights.requestsDenied.push_back(kAccountUpdatePath);
-    tempPasswordData.accessRights.requestsDenied.push_back(kAccountPasswordResetPath);
+    tempPasswordData.accessRights.requestsDenied.add(
+        data::ApiRequestRule(
+            kAccountUpdatePath,
+            {{attr::ha1, true}, {attr::userPassword, true}}));
+    tempPasswordData.accessRights.requestsDenied.add(kAccountPasswordResetPath);
     m_tempPasswordManager->addRandomCredentials(
         accountEmail,
         &tempPasswordData);
@@ -476,7 +476,7 @@ nx::utils::db::DBResult AccountManager::createPasswordResetCode(
         nx::utils::timeSinceEpoch().count() + codeExpirationTimeout.count();
     tempPasswordData.maxUseCount = 1;
     tempPasswordData.isEmailCode = true;
-    tempPasswordData.accessRights.requestsAllowed.push_back(kAccountUpdatePath);
+    tempPasswordData.accessRights.requestsAllowed.add(kAccountUpdatePath);
 
     data::Credentials credentials;
     auto dbResultCode = m_tempPasswordManager->fetchTemporaryCredentials(
@@ -656,17 +656,17 @@ nx::utils::db::DBResult AccountManager::issueAccountActivationCode(
     }
     else
     {
-        auto emailVerificationCode = QnUuid::createUuid().toByteArray().toHex().toStdString();
         const auto codeExpirationTime =
-            QDateTime::fromTime_t(
-                (nx::utils::timeSinceEpoch() +
-                    m_settings.accountManager().accountActivationCodeExpirationTimeout).count());
+            nx::utils::timeSinceEpoch() +
+                m_settings.accountManager().accountActivationCodeExpirationTimeout;
+        const auto emailVerificationCode =
+            generateAccountActivationCode(queryContext, accountEmail, codeExpirationTime);
 
         m_dao->insertEmailVerificationCode(
             queryContext,
             accountEmail,
             emailVerificationCode,
-            codeExpirationTime);
+            QDateTime::fromTime_t(codeExpirationTime.count()));
 
         resultData->code = std::move(emailVerificationCode);
     }
@@ -682,6 +682,32 @@ nx::utils::db::DBResult AccountManager::issueAccountActivationCode(
         });
 
     return nx::utils::db::DBResult::ok;
+}
+
+std::string AccountManager::generateAccountActivationCode(
+    nx::utils::db::QueryContext* const queryContext,
+    const std::string& accountEmail,
+    const std::chrono::seconds& codeExpirationTime)
+{
+    data::TemporaryAccountCredentials tempPasswordData;
+    tempPasswordData.accountEmail = accountEmail;
+    tempPasswordData.login = accountEmail;
+    tempPasswordData.realm = AuthenticationManager::realm().constData();
+    tempPasswordData.expirationTimestampUtc = codeExpirationTime.count();
+    tempPasswordData.maxUseCount = 1;
+    tempPasswordData.isEmailCode = true;
+    tempPasswordData.accessRights.requestsAllowed.add(kAccountActivatePath);
+    tempPasswordData.accessRights.requestsAllowed.add(kAccountUpdatePath);
+    m_tempPasswordManager->addRandomCredentials(
+        accountEmail,
+        &tempPasswordData);
+    const auto dbResult = m_tempPasswordManager->registerTemporaryCredentials(
+        queryContext, tempPasswordData);
+    if (dbResult != nx::utils::db::DBResult::ok)
+        throw nx::utils::db::Exception(dbResult);
+
+    return QByteArray::fromStdString(tempPasswordData.password + ":" + tempPasswordData.login)
+        .toBase64().toStdString();
 }
 
 void AccountManager::accountReactivated(
@@ -869,7 +895,7 @@ void AccountManager::updateAccountCache(
     }
 }
 
-nx::utils::db::DBResult AccountManager::resetPassword(
+nx::utils::db::DBResult AccountManager::issueRestorePasswordCode(
     nx::utils::db::QueryContext* const queryContext,
     const std::string& accountEmail,
     data::AccountConfirmationCode* const confirmationCode)
