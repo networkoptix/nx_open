@@ -1,6 +1,7 @@
 const fs = require('fs');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const common = require('./webpack.common.js');
 
 module.exports = merge(common, {
@@ -8,7 +9,7 @@ module.exports = merge(common, {
     devServer:{
         contentBase: './dist',
         hot: true,
-        host: 'localhost',
+        host: '0.0.0.0',
         port: 9000,
         proxy: [
             {
@@ -18,7 +19,7 @@ module.exports = merge(common, {
             },
             {
                 context: '/static/',
-                target: "https://localhost:9000",
+                target: "https://0.0.0.0:9000",
                 pathRewrite: {"^/static" : ""},
                 changeOrigin: true,
                 secure: false
@@ -34,6 +35,7 @@ module.exports = merge(common, {
     }
     ,
     plugins:[
-        new webpack.HotModuleReplacementPlugin()
+        new webpack.HotModuleReplacementPlugin(),
+        new BundleAnalyzerPlugin({analyzerHost:'0.0.0.0', analyzerPort:9001})
     ]
 });

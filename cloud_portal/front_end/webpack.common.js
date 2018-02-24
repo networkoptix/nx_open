@@ -11,9 +11,8 @@ const webCommonPath = path.join(__dirname, '../../webadmin/app/web_common');
 module.exports = {
   	context: path.resolve(__dirname + '/app'),
   	entry:{
-  		config: 'scripts/config.js',
         app: 'scripts/entrypoint.js',
-		webcommon: 'web_common/scripts/entrypoint.js',
+		webcommon: 'web_common/scripts/entrypoint.js'
 	},
 	plugins: [
         //Development plugins
@@ -23,7 +22,8 @@ module.exports = {
         new webpack.NamedModulesPlugin(),
 		new HtmlWebpackPlugin({
 			template: 'index-template.html',
-			filename: 'index.html'
+			filename: 'index.html',
+			inject: false
 		}),
         new ExtractTextPlugin("styles/main.css"),
         new CopyWebpackPlugin([
@@ -44,6 +44,7 @@ module.exports = {
 			'md5': 'md5',
       		'$': 'jquery',
             'jQuery': 'jquery',
+			'window.jQuery': 'jquery',
 			'_': 'underscore',
             'screenfull': 'screenfull',
 			'jquery-mousewheel': 'jquery-mousewheel'

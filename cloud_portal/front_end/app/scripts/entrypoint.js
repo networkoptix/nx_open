@@ -1,17 +1,17 @@
 import 'angular';
 import 'bootstrap-sass';
-import 'angular-ui-bootstrap';
 import 'ng-toast';
 import 'ngstorage';
-import 'screenfull';
 import 'angular-route';
 import 'angular-base64';
-import 'angular-animate';
 import 'angular-cookies';
 import 'angular-resource';
 import 'angular-sanitize';
+import 'angular-animate';
+import 'angular-ui-bootstrap';
 import 'angular-clipboard';
 import 'tc-angular-chartjs';
+import 'jquery-mousewheel';
 
 import 'ng-toast/dist/ngToast.css';
 import 'ng-toast/dist/ngToast-animations.css';

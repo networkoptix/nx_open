@@ -1,5 +1,3 @@
-import 'jquery-mousewheel';
-
 //Vendor
 require('./vendor/cast.js');
 require('./vendor/cast-framework.js');

@@ -16,7 +16,6 @@ angular.module('nxCommon')
             },
             templateUrl: Config.viewsDirCommon + 'components/timeline.html',
             link: function (scope, element/*, attrs*/) {
-                element = $(element);
                 /**
                  * This is main timeline module.
                  *

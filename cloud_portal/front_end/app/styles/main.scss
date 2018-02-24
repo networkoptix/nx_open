@@ -3,13 +3,11 @@
 @import 'custom/_custom_palette';
 @import '_theme_variables';
 @import '~bootstrap-sass/assets/stylesheets/bootstrap';
-//@import '../bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
 @import '_theme_override';
 @import '_header';
 
 @import '_big_brother';
 
-//@import 'common';
 @import '../../../../webadmin/app/web_common/styles/common';
 
 html {
