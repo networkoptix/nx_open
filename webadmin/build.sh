@@ -12,8 +12,6 @@ then
     exit 1
 fi
 
-compass --version &> /dev/null || (echo "Error: Ruby Compass is not installed." >&2 && exit 1)
-
 # Update sources.
 
 for entry in $(ls -A "$SOURCE_DIR")
@@ -23,6 +21,7 @@ do
 done
 
 [ -e static ] && rm -r static
+[ -e node_modules] && rm -r node_modules
 [ -e server-external ] && rm -r server-external
 
 # Save the repository info.
@@ -30,10 +29,16 @@ done
 hg log -r . --repository "$SOURCE_DIR/.." > version.txt
 
 # Install dependencies.
-
 npm install
-node_modules/bower/bin/bower install
 
 # Build webadmin.
+npm run build
+mv dist static
 
-node_modules/grunt-cli/bin/grunt publish
+# Make translations
+pushd translation
+    ./localize.sh
+popd
+
+#Pack
+tar -czvf external.dat ./static
