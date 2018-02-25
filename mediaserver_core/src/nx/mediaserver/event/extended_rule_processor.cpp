@@ -77,6 +77,7 @@
 #include <utils/common/util.h>
 #include <nx/utils/concurrent.h>
 #include <utils/camera/bookmark_helpers.h>
+#include "nx/mediaserver/resource/camera.h"
 
 namespace {
 
@@ -318,7 +319,7 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
     const vms::event::AbstractActionPtr& action)
 {
     const auto params = action->getParams();
-    const auto resource = resourcePool()->getResourceById<QnSecurityCamResource>(
+    const auto resource = resourcePool()->getResourceById<nx::mediaserver::resource::Camera>(
         params.actionResourceId);
 
     if (!resource)
@@ -376,7 +377,7 @@ bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActio
 #if !defined(EDGE_SERVER)
     const auto params = action->getParams();
     const auto text = params.sayText;
-    const auto resource = resourcePool()->getResourceById<QnSecurityCamResource>(
+    const auto resource = resourcePool()->getResourceById<nx::mediaserver::resource::Camera>(
         params.actionResourceId);
     if (!resource)
         return false;

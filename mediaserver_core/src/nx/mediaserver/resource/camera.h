@@ -3,6 +3,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource/media_stream_capability.h>
+#include <core/dataconsumer/audio_data_transmitter.h>
+
+typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 
 namespace nx {
 namespace mediaserver {
@@ -123,6 +126,7 @@ public:
 
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
+    virtual QnAudioTransmitterPtr getAudioTransmitter();
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
@@ -140,7 +144,8 @@ protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const;
 private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
-
+protected:
+    QnAudioTransmitterPtr m_audioTransmitter;
 private:
     int m_channelNumber; // video/audio source number
     QElapsedTimer m_lastInitTime;
@@ -149,6 +154,7 @@ private:
     std::map<QString, AdvancedParametersProvider*> m_advancedParametersProvidersByParameterId;
     std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>> m_streamCapabilityAdvancedProviders;
 };
+using CameraPtr = QSharedPointer<Camera>;
 
 } // namespace resource
 } // namespace mediaserver

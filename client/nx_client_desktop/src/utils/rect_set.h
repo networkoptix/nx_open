@@ -4,7 +4,7 @@
 #include <QtCore/QRect>
 #include <QtCore/QPoint>
 #include <set>
-#include "warnings.h"
+#include <utils/common/warnings.h>
 
 /**
  * Rectangle set is an abstraction of a set of rectangles with fast

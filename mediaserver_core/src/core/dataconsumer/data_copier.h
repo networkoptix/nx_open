@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "abstract_data_receptor.h"
+#include <core/dataconsumer/abstract_data_receptor.h>
 
 /**
  * Copies incoming data stream to multiple receptors.

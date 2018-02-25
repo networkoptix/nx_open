@@ -13,6 +13,7 @@
 #include <nx/mediaserver/event/event_connector.h>
 #include <analytics/common/object_detection_metadata.h>
 #include <nx/fusion/model_functions.h>
+#include <core/dataconsumer/abstract_data_receptor.h>
 
 namespace nx {
 namespace mediaserver {

@@ -529,6 +529,13 @@ QnConstResourceAudioLayoutPtr Camera::getAudioLayout(const QnAbstractStreamDataP
     return base_type::getAudioLayout(dataProvider);
 }
 
+QnAudioTransmitterPtr Camera::getAudioTransmitter()
+{
+    if (!isInitialized())
+        return nullptr;
+    return m_audioTransmitter;
+}
+
 
 } // namespace resource
 } // namespace mediaserver

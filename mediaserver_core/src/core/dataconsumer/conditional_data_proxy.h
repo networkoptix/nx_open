@@ -2,7 +2,7 @@
 
 #include <nx/utils/move_only_func.h>
 
-#include "abstract_data_receptor.h"
+#include <core/dataconsumer/abstract_data_receptor.h>
 
 class ConditionalDataProxy:
     public QnAbstractDataReceptor

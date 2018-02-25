@@ -14,7 +14,6 @@
 #include <utils/common/delete_later.h>
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
-#include <utils/common/toggle.h>
 #include <utils/common/util.h>
 #include <utils/common/delayed.h>
 #include <utils/common/aspect_ratio.h>

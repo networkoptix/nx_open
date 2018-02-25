@@ -25,7 +25,6 @@
 #include <QtConcurrent/QtConcurrent>
 #include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
-#include <utils/call_counter/call_counter.h>
 #include <QtCore/QThreadPool>
 
 #include <QtNetwork/QUdpSocket>
@@ -2323,7 +2322,6 @@ void MediaServerProcess::run()
         qnStaticCommon->setEngineVersion(QnSoftwareVersion(m_cmdLineArguments.engineVersion));
     }
 
-    QnCallCountStart(std::chrono::milliseconds(5000));
 #ifdef Q_OS_WIN32
     nx::misc::ServerDataMigrateHandler migrateHandler;
     switch (nx::misc::migrateFilesFromWindowsOldDir(&migrateHandler))

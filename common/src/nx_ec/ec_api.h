@@ -14,7 +14,6 @@
 #include <api/model/connection_info.h>
 #include <api/model/email_attachment.h>
 
-#include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/videowall_control_message.h>
 #include <core/resource_access/user_access_data.h>
 
