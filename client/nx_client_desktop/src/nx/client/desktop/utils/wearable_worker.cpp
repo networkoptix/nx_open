@@ -214,8 +214,8 @@ void WearableWorker::processCurrentFile()
     );
     if (uploadId.isEmpty())
     {
-        emit error(d->state, errorMessage);
-        processNextFile();
+        handleFailure(UploadFailed, errorMessage);
+        return;
     }
 
     d->state.status = WearableState::Uploading;
@@ -320,15 +320,14 @@ void WearableWorker::handleLockFinished(bool success, const QnWearableStatusRepl
     {
         d->state.lockUserId = result.userId;
         handleFailure(CameraSnatched);
+        return;
     }
-    else
-    {
-        d->state.status = WearableState::Locked;
-        d->lockToken = result.token;
 
-        emit stateChanged(d->state);
-        processCurrentFile();
-    }
+    d->state.status = WearableState::Locked;
+    d->lockToken = result.token;
+
+    emit stateChanged(d->state);
+    processCurrentFile();
 }
 
 void WearableWorker::handleExtendFinished(bool success, const QnWearableStatusReply& result)
