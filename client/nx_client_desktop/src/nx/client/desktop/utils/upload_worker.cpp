@@ -119,9 +119,6 @@ UploadState UploadWorker::state() const
 
 void UploadWorker::emitProgress()
 {
-    NX_ASSERT(d->upload.status != UploadState::Canceled);
-    NX_ASSERT(d->upload.status != UploadState::Initial);
-
     emit progress(d->upload);
 }
 
