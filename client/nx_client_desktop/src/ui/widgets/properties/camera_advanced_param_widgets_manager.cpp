@@ -94,13 +94,7 @@ void QnCameraAdvancedParamWidgetsManager::loadValues(
             valuesToKeep[param.id] = param.value;
     }
 
-    // Run handler chains.
-    for (const auto& watch : m_handlerChains.keys())
-    {
-        const auto& handlerChains = m_handlerChains.value(watch);
-        for (auto& func : handlerChains)
-            func();
-    }
+    runAllHandlerChains();
 
     // Connect handler chains to watched values.
     m_handlerChainConnections.clear();
@@ -198,6 +192,8 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(
 {
     auto page = createWidgetsForPage(name, params);
     setUpDependenciesForPage(params);
+    // Make initial call to handle default values.
+    runAllHandlerChains();
 
     return page;
 }
@@ -311,6 +307,17 @@ void QnCameraAdvancedParamWidgetsManager::setUpDependenciesForPage(
     }
 }
 
+void QnCameraAdvancedParamWidgetsManager::runAllHandlerChains()
+{
+    // Run handler chains.
+    for (const auto& watch: m_handlerChains.keys())
+    {
+        const auto& handlerChains = m_handlerChains.value(watch);
+        for (auto& func: handlerChains)
+            func();
+    }
+}
+
 QnCameraAdvancedParamWidgetsManager::DependencyHandler
 QnCameraAdvancedParamWidgetsManager::makeDependencyHandler(
     const QnCameraAdvancedParameterDependency& dependency,
@@ -318,64 +325,64 @@ QnCameraAdvancedParamWidgetsManager::makeDependencyHandler(
 {
     return
         [dependency, parameter, this]() -> bool
-    {
-        const auto paramId = parameter.id;
-        auto widget = m_paramWidgetsById.value(paramId);
-        if (!widget)
-            return false;
-
-        bool allConditionsSatisfied = std::all_of(
-            dependency.conditions.cbegin(), dependency.conditions.cend(),
-            [this](const QnCameraAdvancedParameterCondition& condition)
         {
-            using ConditionType =
-                QnCameraAdvancedParameterCondition::ConditionType;
-
-            if (condition.type == ConditionType::present)
-                return m_paramWidgetsById.contains(condition.paramId);
-
-            if (condition.type == ConditionType::notPresent)
-                return !m_paramWidgetsById.contains(condition.paramId);
-
-            auto widget = m_paramWidgetsById.value(condition.paramId);
-            return widget && condition.checkValue(widget->value());
-        });
-
-        // TODO: #dmishin move this somewhere.
-        if (dependency.type == DependencyType::show)
-        {
-            if (auto label = m_paramLabelsById.value(paramId))
-                label->setHidden(!allConditionsSatisfied);
-
-            widget->setHidden(!allConditionsSatisfied);
-        }
-        else if (dependency.type == DependencyType::range)
-        {
-            if (!allConditionsSatisfied)
+            const auto paramId = parameter.id;
+            auto widget = m_paramWidgetsById.value(paramId);
+            if (!widget)
                 return false;
 
-            widget->setRange(dependency.range);
-            if (parameter.bindDefaultToMinimum)
+            bool allConditionsSatisfied = std::all_of(
+                dependency.conditions.cbegin(), dependency.conditions.cend(),
+                [this](const QnCameraAdvancedParameterCondition& condition)
             {
-                const auto minMax = dependency.range.split(L',');
-                if (!minMax.isEmpty())
-                    widget->setValue(minMax.first().trimmed());
+                using ConditionType =
+                    QnCameraAdvancedParameterCondition::ConditionType;
+
+                if (condition.type == ConditionType::present)
+                    return m_paramWidgetsById.contains(condition.paramId);
+
+                if (condition.type == ConditionType::notPresent)
+                    return !m_paramWidgetsById.contains(condition.paramId);
+
+                auto widget = m_paramWidgetsById.value(condition.paramId);
+                return widget && condition.checkValue(widget->value());
+            });
+
+            // TODO: #dmishin move this somewhere.
+            if (dependency.type == DependencyType::show)
+            {
+                if (auto label = m_paramLabelsById.value(paramId))
+                    label->setHidden(!allConditionsSatisfied);
+
+                widget->setHidden(!allConditionsSatisfied);
+            }
+            else if (dependency.type == DependencyType::range)
+            {
+                if (!allConditionsSatisfied)
+                    return false;
+
+                widget->setRange(dependency.range);
+                if (parameter.bindDefaultToMinimum)
+                {
+                    const auto minMax = dependency.range.split(L',');
+                    if (!minMax.isEmpty())
+                        widget->setValue(minMax.first().trimmed());
+                }
+
+                auto label = dynamic_cast<QLabel*>(m_paramLabelsById[paramId]);
+                if (!label)
+                    return false;
+
+                setLabelText(label, parameter, dependency.range);
+            }
+            else if (dependency.type == DependencyType::trigger)
+            {
+                return false;
+                //< Do nothing. All work will be done by other handlers
             }
 
-            auto label = dynamic_cast<QLabel*>(m_paramLabelsById[paramId]);
-            if (!label)
-                return false;
-
-            setLabelText(label, parameter, dependency.range);
-        }
-        else if (dependency.type == DependencyType::trigger)
-        {
-            return false;
-            //< Do nothing. All work will be done by other handlers
-        }
-
-        return allConditionsSatisfied;
-    };
+            return allConditionsSatisfied;
+        };
 }
 
 QnCameraAdvancedParamWidgetsManager::HandlerChainLauncher
@@ -384,17 +391,17 @@ QnCameraAdvancedParamWidgetsManager::makeHandlerChainLauncher(
 {
     return
         [handlerChains]()
-    {
-        for (const auto& chainPair : handlerChains)
         {
-            auto& chain = chainPair.second;
-            for (const auto& handler : chain)
+            for (const auto& chainPair : handlerChains)
             {
-                if (handler())
-                    break;
+                auto& chain = chainPair.second;
+                for (const auto& handler : chain)
+                {
+                    if (handler())
+                        break;
+                }
             }
-        }
-    };
+        };
 }
 
 void QnCameraAdvancedParamWidgetsManager::setLabelText(
