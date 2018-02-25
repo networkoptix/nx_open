@@ -1744,8 +1744,6 @@ bool QnStorageManager::clearSpaceForFile(const QString& path, qint64 size)
 {
     NX_LOG(lit("Clearing %1 bytes for file \"%2\".").arg(size).arg(path), cl_logDEBUG2);
 
-    //size = 125939630080 + 1000 * 1000 * 1000;
-
     QStorageInfo volume(path);
     if (!volume.isValid())
         return false;
@@ -1753,23 +1751,14 @@ bool QnStorageManager::clearSpaceForFile(const QString& path, qint64 size)
     if (volume.bytesAvailable() > size)
         return true;
 
-    QString volumePath = QDir::cleanPath(volume.rootPath());
+    QnStorageResourcePtr storage = getStorageByVolume(volume.rootPath());
+    if (!storage)
+        return false;
 
-    QnMutexLocker locker(&m_clearSpaceMutex);
-    QSet<QnStorageResourcePtr> storages;
-    for (const QnStorageResourcePtr& storage : getClearableStorages())
-    {
-        QString storagePath = QDir::cleanPath(storage->getUrl());
+    if (storage->hasFlags(Qn::storage_fastscan))
+        return false;
 
-        if (storagePath.startsWith(volumePath))
-            storages << storage;
-    }
-
-    for (const QnStorageResourcePtr& storage : storages)
-        clearOldestSpace(storage, true, size);
-
-    volume = QStorageInfo(path);
-    return volume.bytesAvailable() > size;
+    return clearOldestSpace(storage, true, size);
 }
 
 bool QnStorageManager::canAddChunk(qint64 timeMs, qint64 size)
@@ -1784,7 +1773,7 @@ bool QnStorageManager::canAddChunk(qint64 timeMs, qint64 size)
     if (available > size)
         return true;
 
-    qint64 minTime = 0x7fffffffffffffffll;
+    qint64 minTime = std::numeric_limits<qint64>::max();
     DeviceFileCatalogPtr catalog;
     {
         QnMutexLocker lock(&m_mutexCatalog);
@@ -1795,7 +1784,7 @@ bool QnStorageManager::canAddChunk(qint64 timeMs, qint64 size)
     if (minTime > timeMs)
         return false;
 
-    return false;
+    return true;
 }
 
 void QnStorageManager::clearBookmarks()
@@ -2527,6 +2516,22 @@ QnStorageResourcePtr QnStorageManager::getStorageByUrlExact(const QString& stora
         if (storageUrl == root)
             return *itr;
     }
+    return QnStorageResourcePtr();
+}
+
+QnStorageResourcePtr QnStorageManager::getStorageByVolume(const QString& volumeRoot) const
+{
+    QnMutexLocker lock(&m_mutexStorages);
+
+    QnStorageResourcePtr ret;
+    for (const QnStorageResourcePtr& storage: m_storageRoots)
+    {
+        QStorageInfo info(storage->getUrl());
+
+        if (info.isValid() && QDir::cleanPath(info.rootPath()) == QDir::cleanPath(volumeRoot))
+            return storage;
+    }
+
     return QnStorageResourcePtr();
 }
 
