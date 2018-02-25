@@ -214,7 +214,7 @@ void WearableWorker::processCurrentFile()
     );
     if (uploadId.isEmpty())
     {
-        handleFailure(UploadFailed, errorMessage);
+        handleFailure(WearableState::UploadFailed, errorMessage);
         return;
     }
 
@@ -224,22 +224,22 @@ void WearableWorker::processCurrentFile()
     emit stateChanged(d->state);
 }
 
-WearableState::Status WearableWorker::calculateNewStatus(FailReason reason)
+WearableState::Status WearableWorker::calculateNewStatus(WearableState::Error error)
 {
-    switch (reason)
+    switch (error)
     {
-    case LockRequestFailed:
-    case CameraSnatched:
+    case WearableState::LockRequestFailed:
+    case WearableState::CameraSnatched:
         return WearableState::LockedByOtherClient;
-    case UploadFailed:
-    case ConsumeRequestFailed:
+    case WearableState::UploadFailed:
+    case WearableState::ConsumeRequestFailed:
         return WearableState::Unlocked;
     default:
         return WearableState::Unlocked;
     }
 }
 
-QString WearableWorker::calculateErrorMessage(FailReason reason, const QString& errorMessage)
+QString WearableWorker::calculateErrorMessage(WearableState::Error error, const QString& errorMessage)
 {
     if (!errorMessage.isEmpty())
         return errorMessage;
@@ -248,15 +248,16 @@ QString WearableWorker::calculateErrorMessage(FailReason reason, const QString& 
     return tr("Failed to send request to the server.");
 }
 
-void WearableWorker::handleFailure(FailReason reason, const QString& errorMessage)
+void WearableWorker::handleFailure(WearableState::Error error, const QString& errorMessage)
 {
     handleStop();
 
     d->state.queue.clear();
-    d->state.status = calculateNewStatus(reason);
+    d->state.status = calculateNewStatus(error);
+    d->state.error = error;
 
     emit stateChanged(d->state);
-    emit error(d->state, calculateErrorMessage(reason, errorMessage));
+    emit this->error(d->state, calculateErrorMessage(error, errorMessage));
     emit finished();
 }
 
@@ -308,7 +309,7 @@ void WearableWorker::handleLockFinished(bool success, const QnWearableStatusRepl
 {
     if (!success)
     {
-        handleFailure(LockRequestFailed);
+        handleFailure(WearableState::LockRequestFailed);
         return;
     }
 
@@ -319,7 +320,7 @@ void WearableWorker::handleLockFinished(bool success, const QnWearableStatusRepl
     if (!result.success)
     {
         d->state.lockUserId = result.userId;
-        handleFailure(CameraSnatched);
+        handleFailure(WearableState::CameraSnatched);
         return;
     }
 
@@ -342,7 +343,7 @@ void WearableWorker::handleExtendFinished(bool success, const QnWearableStatusRe
 
     if (!result.success)
     {
-        handleFailure(CameraSnatched);
+        handleFailure(WearableState::CameraSnatched);
         return;
     }
 
@@ -386,7 +387,7 @@ void WearableWorker::handleUploadProgress(const UploadState& state)
 
     if (state.status == UploadState::Error)
     {
-        handleFailure(UploadFailed, state.errorMessage);
+        handleFailure(WearableState::UploadFailed, state.errorMessage);
         return;
     }
 
@@ -417,7 +418,7 @@ void WearableWorker::handleUploadProgress(const UploadState& state)
 void WearableWorker::handleConsumeStarted(bool success)
 {
     if (!success)
-        handleFailure(ConsumeRequestFailed);
+        handleFailure(WearableState::ConsumeRequestFailed);
 
     // Do nothing here, polling is done in timer event.
 }

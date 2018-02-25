@@ -213,14 +213,6 @@ void WearablePreparer::handlePrepareFinished(bool success, const QnWearablePrepa
         return;
     }
 
-    qint64 totalSize = 0;
-    for (const WearablePayload& payload : d->upload.elements)
-        if (payload.status == WearablePayload::Valid)
-            totalSize += payload.local.size;
-
-    d->upload.spaceRequested = totalSize;
-    d->upload.spaceAvailable = reply.availableSpace;
-
     for (int i = 0; i < reply.elements.size(); i++)
     {
         WearablePayload& payload = d->upload.elements[d->localByRemoteIndex[i]];
@@ -229,16 +221,11 @@ void WearablePreparer::handlePrepareFinished(bool success, const QnWearablePrepa
             payload.status = WearablePayload::ChunksTakenOnServer;
     }
 
-    if (totalSize > reply.availableSpace)
-    {
-        for (WearablePayload& payload : d->upload.elements)
-            payload.status = WearablePayload::NoSpaceOnServer;
-    }
-    else if (reply.footageTooOld)
+    if (reply.storageCleanupNeeded)
     {
         for (WearablePayload& payload : d->upload.elements)
             if (payload.status == WearablePayload::Valid)
-                payload.status = WearablePayload::FootageTooOld;
+                payload.status = WearablePayload::StorageCleanupNeeded;
     }
 
     emit finished(d->upload);

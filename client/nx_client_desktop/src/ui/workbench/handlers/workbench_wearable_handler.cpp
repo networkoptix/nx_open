@@ -293,16 +293,10 @@ bool QnWorkbenchWearableHandler::fixFileUpload(
     if (upload->someHaveStatus(WearablePayload::ServerError))
         return false; //< Ignore it as the user is likely already seeing "reconnecting to server" dialog.
 
-    if (upload->someHaveStatus(WearablePayload::NoSpaceOnServer))
-    {
-        showNoSpaceOnServerWarning(*upload);
-        return false;
-    }
-
     bool performExtendedCheck = true;
-    if (upload->someHaveStatus(WearablePayload::FootageTooOld))
+    if (upload->someHaveStatus(WearablePayload::StorageCleanupNeeded))
     {
-        if (fixOldFootageUpload(upload))
+        if (fixStorageCleanupUpload(upload))
             performExtendedCheck = false;
         else
             return false;
@@ -351,14 +345,8 @@ bool QnWorkbenchWearableHandler::fixFolderUpload(const QString& path, WearableUp
     if (upload->someHaveStatus(WearablePayload::ServerError))
         return false; //< Ignore it as the user is likely already seeing "reconnecting to server" dialog.
 
-    if (upload->someHaveStatus(WearablePayload::NoSpaceOnServer))
-    {
-        showNoSpaceOnServerWarning(*upload);
-        return false;
-    }
-
-    if (upload->someHaveStatus(WearablePayload::FootageTooOld))
-        if (!fixOldFootageUpload(upload))
+    if (upload->someHaveStatus(WearablePayload::StorageCleanupNeeded))
+        if (!fixStorageCleanupUpload(upload))
             return false;
 
     if (!upload->someHaveStatus(WearablePayload::Valid))
@@ -372,18 +360,20 @@ bool QnWorkbenchWearableHandler::fixFolderUpload(const QString& path, WearableUp
     return true;
 }
 
-bool QnWorkbenchWearableHandler::fixOldFootageUpload(WearableUpload* upload)
+bool QnWorkbenchWearableHandler::fixStorageCleanupUpload(WearableUpload* upload)
 {
     int n = upload->elements.size();
 
     bool fixed = QnMessageBox::warning(mainWindow(),
-        tr("Some files may be deleted soon after being uploaded", 0, n),
-        tr("Some files are older than any other on the server, "
-            "and there is not much free space left on the storage. "
-            "They may be deleted to free up space for future recorded or uploaded video.", 0, n)
+        tr("Some footage may be deleted after uploading these files", 0, n),
+        tr("There is not much free space left on server storage. "
+            "Some old footage may be deleted to free up space. "
+            "Note that if selected files happen to be the oldest on the server, "
+            "they will be deleted right after being uploaded.", 0, n)
         + lit("\n\n")
-        + tr("To prevent these files from being deleted you can add additional storage or "
-            "increase archive keep time in camera settings.", 0, n)
+        + tr("To prevent this you can add additional storage. "
+            "You can also control which footage will be deleted first by changing "
+            "archive keep time in camera settings.")
         + lit("\n\n")
         + tr("Upload anyway?"),
         QDialogButtonBox::Yes | QDialogButtonBox::Cancel) == QDialogButtonBox::Yes;
@@ -391,22 +381,11 @@ bool QnWorkbenchWearableHandler::fixOldFootageUpload(WearableUpload* upload)
     if (fixed)
     {
         for (WearablePayload& payload : upload->elements)
-            if (payload.status == WearablePayload::FootageTooOld)
+            if (payload.status == WearablePayload::StorageCleanupNeeded)
                 payload.status = WearablePayload::Valid;
     }
 
     return fixed;
-}
-
-void QnWorkbenchWearableHandler::showNoSpaceOnServerWarning(const WearableUpload& upload)
-{
-    QnMessageBox::critical(mainWindow(),
-        tr("Not enough space on server storage"),
-        tr("Files size - %2", 0, upload.elements.size())
-            .arg(formatFileSize(upload.spaceRequested))
-        + lit("\n") +
-        tr("Free space - %2")
-            .arg(formatFileSize(upload.spaceAvailable)));
 }
 
 void QnWorkbenchWearableHandler::uploadValidFiles(
@@ -447,18 +426,29 @@ void QnWorkbenchWearableHandler::at_context_userChanged()
 
 void QnWorkbenchWearableHandler::at_wearableManager_stateChanged(const WearableState& state)
 {
-    if (state.consumeProgress != 100 || state.status != WearableState::Consuming)
-        return;
-
     QnSecurityCamResourcePtr camera =
         resourcePool()->getResourceById<QnSecurityCamResource>(state.cameraId);
     if (!camera)
         return;
 
-    QnCachingCameraDataLoaderPtr loader =
-        context()->instance<QnCameraDataManager>()->loader(camera, /*create=*/true);
-    loader->invalidateCachedData();
-    loader->load(/*forced=*/true);
+    /* Fire an error only on upload failure. */
+    if (state.error == WearableState::UploadFailed)
+    {
+        QnMessageBox::critical(mainWindow(),
+            tr("Could not finish upload to %1").arg(camera->getName()),
+            tr("Make sure there is enough space on server storage."));
+        return;
+    }
+
+
+    /* Update chunks if we've just finished consume request. */
+    if (state.consumeProgress == 100 && state.status == WearableState::Consuming)
+    {
+        QnCachingCameraDataLoaderPtr loader =
+            context()->instance<QnCameraDataManager>()->loader(camera, /*create=*/true);
+        loader->invalidateCachedData();
+        loader->load(/*forced=*/true);
+    }
 }
 
 QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const WearablePayload& upload)

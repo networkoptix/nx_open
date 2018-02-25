@@ -23,8 +23,7 @@ struct WearablePayload
         FootagePastMaxDays,
         ChunksTakenByFileInQueue,
         ChunksTakenOnServer,
-        FootageTooOld,
-        NoSpaceOnServer,
+        StorageCleanupNeeded,
         ServerError
     };
 
@@ -37,8 +36,6 @@ struct WearablePayload
 struct WearableUpload
 {
     WearablePayloadList elements;
-    qint64 spaceAvailable = 0;
-    qint64 spaceRequested = 0;
 
     bool allHaveStatus(WearablePayload::Status status) const
     {
