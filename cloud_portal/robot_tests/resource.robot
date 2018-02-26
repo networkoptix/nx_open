@@ -17,7 +17,7 @@ Open Browser and go to URL
 
 Check Language
     Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[2]
-    ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    1
+    ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
     Run Keyword If    "${status}"=="FAIL"    Set Language
 
 Set Language
@@ -135,7 +135,6 @@ Check For Alert Dismissable
 Verify In System
     [arguments]    ${system name}
     Wait Until Element Is Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
-    Element Should Be Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
 
 Failure Tasks
     Capture Page Screenshot    selenium-screenshot-{index}.png
