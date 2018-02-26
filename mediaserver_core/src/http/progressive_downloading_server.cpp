@@ -693,6 +693,13 @@ void QnProgressiveDownloadingConsumer::run()
             ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
         if (!commonModule()->resourceAccessManager()->hasPermission(d->accessRights, resource, requiredPermission))
         {
+            if (commonModule()->resourceAccessManager()->hasPermission(
+                d->accessRights, resource, Qn::Permission::ViewLivePermission))
+            {
+                sendMediaEventErrorResponse(Qn::MediaStreamEvent::ForbiddenBecauseNoLicenseError);
+                return;
+            }
+
             sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
             return;
         }
