@@ -42,8 +42,9 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
 {
     const auto role = getRole();
     QString streamUrlString;
+
     int profileToOpen = kHanwhaInvalidProfile;
-    if (!m_hanwhaResource->isNvr())
+    if (m_hanwhaResource->isConnectedViaSunapi())
         profileToOpen = m_hanwhaResource->profileByRole(role);
     else
         profileToOpen = chooseNvrChannelProfile(role);
@@ -117,7 +118,8 @@ void HanwhaStreamReader::closeStream()
 
 HanwhaProfileParameters HanwhaStreamReader::makeProfileParameters(
     int profileNumber,
-    const QnLiveStreamParams& parameters) const
+    const QnLiveStreamParams& parameters,
+    bool isAudioSupported) const
 {
     const auto role = getRole();
     const auto codec = m_hanwhaResource->streamCodec(role);
@@ -145,7 +147,7 @@ HanwhaProfileParameters HanwhaStreamReader::makeProfileParameters(
         {kHanwhaResolutionProperty, toHanwhaString(resolution)}
     };
 
-    if (m_hanwhaResource->isAudioSupported())
+    if (isAudioSupported)
     {
         result.emplace(kHanwhaAudioInputEnableProperty, toHanwhaString(
             m_hanwhaResource->isAudioEnabled()));
@@ -175,11 +177,8 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
     int profileNumber,
     const QnLiveStreamParams& parameters)
 {
-    if (m_hanwhaResource->isNvr())
-    {
-        // TODO: #dmishin implement profile configuration for NVR if needed.
+    if (!m_hanwhaResource->isConnectedViaSunapi())
         return CameraDiagnostics::NoErrorResult();
-    }
 
     if (profileNumber == kHanwhaInvalidProfile)
     {
@@ -189,15 +188,25 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     helper.setIgnoreMutexAnalyzer(true);
-    const auto profileParameters = makeProfileParameters(profileNumber, parameters);
+    const auto profileParameters =
+        makeProfileParameters(profileNumber, parameters, m_hanwhaResource->isAudioSupported());
     // Some cameras have bug: they could close connection with delay.
     // It affects newly opened connections. Don't change parameters to prevent it.
     if (m_prevProfileParameters == profileParameters)
         return CameraDiagnostics::NoErrorResult();
 
     m_hanwhaResource->beforeConfigureStream(getRole());
-    const auto response = helper.update(lit("media/videoprofile"), profileParameters);
+    auto response = helper.update(lit("media/videoprofile"), profileParameters);
+    if (!response.isSuccessful() && response.errorCode() == kHanwhaInvalidParameterHttpCode)
+    {
+        // It is a camera bug workaround.
+        // We have at least 1 camera that report supported audio but it is really not.
+        const auto profileParameters =
+            makeProfileParameters(profileNumber, parameters, /*isAudioSupported*/ false);
+        response = helper.update(lit("media/videoprofile"), profileParameters);
+    }
     m_hanwhaResource->afterConfigureStream(getRole());
+
     if (!response.isSuccessful())
     {
         return error(
@@ -265,8 +274,8 @@ int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
         const auto profile = profileEntry.second;
         const auto codecCoefficient =
             kHanwhaCodecCoefficients.find(profile.codec) != kHanwhaCodecCoefficients.cend()
-                ? kHanwhaCodecCoefficients.at(profile.codec)
-                : -1;
+            ? kHanwhaCodecCoefficients.at(profile.codec)
+            : -1;
 
         if (!profileFilter.contains(profile.number))
             continue;
@@ -289,7 +298,6 @@ int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
 bool HanwhaStreamReader::isCorrectProfile(int profileNumber) const
 {
     return profileNumber != kHanwhaInvalidProfile
-        || m_hanwhaResource->isNvr()
         || getRole() == Qn::CR_Archive;
 }
 

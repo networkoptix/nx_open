@@ -199,6 +199,11 @@ public:
         return true;
     }
 
+    virtual bool setIpv6Only(bool /*val*/) override
+    {
+        return true;
+    }
+
     virtual SOCKET_HANDLE handle() const override
     {
         return SOCKET_HANDLE();

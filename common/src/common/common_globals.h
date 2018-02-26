@@ -43,7 +43,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AudioTransmitCapability             = 0x040,
         RemoteArchiveCapability             = 0x100,
         SetUserPasswordCapability           = 0x200, //< Can change password on a camera.
-        isDefaultPasswordCapability         = 0x400 //< Camera has default password now.
+        isDefaultPasswordCapability         = 0x400, //< Camera has default password now.
+        isOldFirmwareCapability             = 0x800, //< Camera has too old firmware.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -558,6 +559,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         Auth_LDAPConnectError,   // can't connect to the LDAP system to authenticate
         Auth_CloudConnectError,   // can't connect to the Cloud to authenticate
         Auth_DisabledUser,    // disabled user
+        Auth_InvalidCsrfToken, // for cookie login
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
     QString toString(AuthResult value);

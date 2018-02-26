@@ -11,8 +11,8 @@ nx_set_variable_if_empty(nxtool.name "${company.name} ${display.product.name} Se
 nx_set_variable_if_empty(windowsInstallPath "${company.name}")
 
 set(client.binary.name "client-bin")
-set(applauncher.binary.name "applauncher")
-set(minilauncher.binary.name "applauncher-bin")
+set(applauncher.binary.name "applauncher-bin")
+set(minilauncher.binary.name "applauncher")
 set(testcamera.binary.name "testcamera")
 set(installation.root "/opt/${deb.customization.company.name}")
 set(launcher.version.file "launcher.version")

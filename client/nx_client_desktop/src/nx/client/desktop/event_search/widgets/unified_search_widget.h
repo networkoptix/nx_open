@@ -40,8 +40,8 @@ public:
     UnifiedSearchWidget(QWidget* parent);
     virtual ~UnifiedSearchWidget() override;
 
-    QAbstractListModel* model() const;
-    void setModel(QAbstractListModel* value);
+    UnifiedAsyncSearchListModel* model() const;
+    void setModel(UnifiedAsyncSearchListModel* value);
 
     QnSearchLineEdit* filterEdit() const;
     ui::SelectableTextButton* typeButton() const;
@@ -69,15 +69,13 @@ public:
     Period selectedPeriod() const;
     void setSelectedPeriod(Period value);
 
+    QnTimePeriod currentTimePeriod() const;
+
     void requestFetch();
 
 signals:
     void tileHovered(const QModelIndex& index, const EventTile* tile);
-
-protected:
-    virtual bool hasRelevantTiles() const;
-    virtual void setCurrentTimePeriod(const QnTimePeriod& period);
-    virtual bool isConstrained() const;
+    void currentTimePeriodChanged(const QnTimePeriod& period);
 
 private:
     void updateCurrentTimePeriod();
@@ -97,6 +95,8 @@ private:
     Period m_period = Period::all;
     QString m_placeholderTextConstrained;
     QString m_placeholderTextUnconstrained;
+    QnTimePeriod m_currentTimePeriod = QnTimePeriod::anytime();
+    UnifiedAsyncSearchListModel* m_model = nullptr;
     QScopedPointer<QnDisconnectHelper> m_modelConnections;
 };
 

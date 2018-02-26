@@ -26,24 +26,39 @@ SocketAddress getEndpoint(const nx::utils::Url& url)
         static_cast<quint16>(url.port(getDefaultPortForScheme(url.scheme()))));
 }
 
-std::string normalizePath(std::string path)
+std::string normalizePath(const std::string& path)
 {
-    // TODO: #ak Remove "..".
+    if (path.find("//") == std::string::npos)
+        return path;
 
-    for (std::string::size_type pos = 0;;)
+    std::string normalizedPath;
+    normalizedPath.reserve(path.size());
+
+    char prevCh = ' '; //< Anything but not /.
+    for (const auto& ch: path)
     {
-        pos = path.find("//", pos);
-        if (pos == std::string::npos)
-            break;
-        path.replace(pos, 2U, "/");
+        if (ch == '/' && prevCh == '/')
+            continue;
+        prevCh = ch;
+        normalizedPath.push_back(ch);
     }
 
-    return path;
+    return normalizedPath;
 }
 
 QString normalizePath(const QString& path)
 {
     return QString::fromStdString(normalizePath(path.toStdString()));
+}
+
+std::string normalizePath(const char* path)
+{
+    return normalizePath(std::string(path));
+}
+
+std::string joinPath(const std::string& left, const std::string& right)
+{
+    return normalizePath(left + "/" + right);
 }
 
 } // namespace url

@@ -12,7 +12,14 @@ should show list of Systems
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
-    Wait Until Element Is Visible    ${SYSTEMS TILE}
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${SYSTEMS TILE}
+    Close Browser
+
+has system name, owner and OpenInNx button visible on systems page
+    Open Browser and go to URL    ${url}
+    Log In    ${EMAIL OWNER}    ${password}
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
     Close Browser
 
 should show Open in NX client button for online system
@@ -26,7 +33,7 @@ should not show Open in NX client button for offline system
     Open Browser and go to URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
-    Wait Until Elements Are Visible    ${AUTOTESTS OFFLINE}
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTOTESTS OFFLINE}
     Close Browser
 
 should show system's state for systems if they are offline. Otherwise - button Open in Nx
@@ -51,13 +58,14 @@ should update owner name in systems list, if it's changed
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL OWNER}    ${password}    None
     Validate Log In
-    Wait Until Elements Are Visible    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}
+    Wait Until Elements Are Visible    ${ACCOUNT EMAIL}    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}
+    Wait Until Textfield Contains    ${ACCOUNT EMAIL}    ${EMAIL OWNER}
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    newFirstName
     Clear Element Text    ${ACCOUNT LAST NAME}
     Input Text    ${ACCOUNT LAST NAME}    newLastName
     Click Button    ${ACCOUNT SAVE}
-    Check For Alert    Your account is successfully saved
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Go To    ${url}/systems
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS USER}    newFirstName newLastName
@@ -69,5 +77,5 @@ should update owner name in systems list, if it's changed
     Clear Element Text    ${ACCOUNT LAST NAME}
     Input Text    ${ACCOUNT LAST NAME}    testLastName
     Click Button    ${ACCOUNT SAVE}
-    Check For Alert    Your account is successfully saved
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser

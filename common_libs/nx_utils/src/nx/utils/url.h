@@ -18,6 +18,21 @@ public:
     Url(const QString& url);
     Url& operator=(const QString& url);
 
+    Url(const std::string& url);
+    Url& operator=(const std::string& url);
+
+    /**
+     * @param url UTF-8 string.
+     */
+    Url(const char* url);
+    Url& operator=(const char* url);
+
+    /**
+     * @param url UTF-8 string.
+     */
+    Url(const QByteArray& url);
+    Url& operator=(const QByteArray& url);
+
     Url(const Url& /*other*/) = default;
     Url& operator=(const Url& /*other*/) = default;
 

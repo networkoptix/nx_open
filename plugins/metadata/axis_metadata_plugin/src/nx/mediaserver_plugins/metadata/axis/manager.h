@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QString>
@@ -9,7 +11,7 @@
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/camera_manager.h>
 
-#include "identified_supported_event.h"
+#include "common.h"
 #include "monitor.h"
 
 namespace nx {
@@ -23,7 +25,7 @@ class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 {
 public:
     Manager(const nx::sdk::CameraInfo& cameraInfo,
-        const QList<IdentifiedSupportedEvent>& events);
+        const AnalyticsDriverManifest& typedManifest);
 
     virtual ~Manager();
 
@@ -42,21 +44,21 @@ public:
 
     virtual void freeManifest(const char* data) override;
 
-    const QList<IdentifiedSupportedEvent>& identifiedSupportedEvents() const
+    const AnalyticsDriverManifest& events() const noexcept
     {
-        return m_identifiedSupportedEvents;
+        return m_typedManifest;
     }
 
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
 
+    /** @return nullptr if not found */
+    const AnalyticsEventType* eventByUuid(const QnUuid& uuid) const noexcept;
+
 private:
-    // QByteArray m_deviceManifestPartial; //< Guids only - for test purposes.
-    QByteArray m_deviceManifestFull; //< Guids and description.
+    AnalyticsDriverManifest m_typedManifest;
+    QByteArray m_manifest;
     QUrl m_url;
     QAuthenticator m_auth;
-
-    QList<IdentifiedSupportedEvent> m_identifiedSupportedEvents;
-
     Monitor* m_monitor = nullptr;
     QList<QByteArray> m_givenManifests; //< Place to store manifests we gave to caller
     // to provide 1) sufficient lifetime and 2) memory releasing in destructor.

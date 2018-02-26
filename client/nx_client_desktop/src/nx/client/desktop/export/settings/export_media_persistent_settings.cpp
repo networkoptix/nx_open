@@ -199,15 +199,24 @@ void ExportMediaPersistentSettings::setDimension(int newDimension)
         overlaySettings(ExportOverlayType(i))->rescale(factor);
 }
 
+bool ExportMediaPersistentSettings::shouldExportOverlays() const
+{
+    return applyFilters && !areFiltersForced();
+}
+
 void ExportMediaPersistentSettings::updateRuntimeSettings(ExportMediaSettings& runtimeSettings) const
 {
     auto& overlays = runtimeSettings.transcodingSettings.overlays;
 
     overlays.clear();
-    overlays.reserve(usedOverlays.size());
 
-    for (const auto type: usedOverlays)
-        overlays << overlaySettings(type)->createRuntimeSettings();
+    if (shouldExportOverlays())
+    {
+        overlays.reserve(usedOverlays.size());
+
+        for (const auto type : usedOverlays)
+            overlays << overlaySettings(type)->createRuntimeSettings();
+    }
 }
 
 bool ExportMediaPersistentSettings::areFiltersForced() const

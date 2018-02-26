@@ -1,6 +1,4 @@
 # Components Namings
-set(defaultSkin "dark_blue")
-set(parent.customization "default")
 set(display.product.name "SK VMS")
 set(display_mobile_name "SK VMS")
 set(mobile_bundle_name "SK")

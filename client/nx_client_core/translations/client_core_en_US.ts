@@ -2,6 +2,105 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
+    <name>HumanReadable</name>
+    <message numerus="yes">
+        <source>Bytes</source>
+        <comment>Full suffix for displaying bytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>B</source>
+        <comment>Suffix for displaying bytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Kilobytes</source>
+        <comment>Full suffix for displaying kilobytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>KB</source>
+        <comment>Suffix for displaying kilobytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Megabytes</source>
+        <comment>Full suffix for displaying megabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>MB</source>
+        <comment>Suffix for displaying megabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Gigabytes</source>
+        <comment>Full suffix for displaying gigabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>GB</source>
+        <comment>Suffix for displaying gigabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Terabytes</source>
+        <comment>Full suffix for displaying terabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>TB</source>
+        <comment>Suffix for displaying terabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Petabytes</source>
+        <comment>Full suffix for displaying petabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>PB</source>
+        <comment>Suffix for displaying petabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>QnCloudResultInfo</name>
     <message>
         <source>Successful.</source>

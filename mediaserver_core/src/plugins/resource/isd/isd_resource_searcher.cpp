@@ -132,7 +132,7 @@ QnResourceList QnPlISDResourceSearcher::findResources(void)
 		QnMutexLocker lock(&m_mutex);
 		upnpResults = m_foundUpnpResources;
 		m_foundUpnpResources.clear();
-		m_alreadFoundMacAddresses.clear();
+		m_alreadyFoundMacAddresses.clear();
 	}
 
     QnResourceList mdnsResults;
@@ -466,9 +466,9 @@ bool QnPlISDResourceSearcher::processPacket(
 	{
 		QnMutexLocker lock(&m_mutex);
 
-		if (m_alreadFoundMacAddresses.find(cameraMAC.toString()) == m_alreadFoundMacAddresses.end())
+		if (m_alreadyFoundMacAddresses.find(cameraMAC.toString()) == m_alreadyFoundMacAddresses.end())
 		{
-			m_alreadFoundMacAddresses.insert(cameraMAC.toString());
+			m_alreadyFoundMacAddresses.insert(cameraMAC.toString());
 			createResource( devInfo, cameraMAC, cameraAuth, m_foundUpnpResources);
 		}
 	}
@@ -545,6 +545,11 @@ bool QnPlISDResourceSearcher::testCredentials(const nx::utils::Url &url, const Q
         auth);
 
     return status == CLHttpStatus::CL_HTTP_SUCCESS;
+}
+
+bool QnPlISDResourceSearcher::isEnabled() const
+{
+    return discoveryMode() != DiscoveryMode::disabled;
 }
 
 #endif // #ifdef ENABLE_ISD

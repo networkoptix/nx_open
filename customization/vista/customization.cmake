@@ -1,7 +1,6 @@
 set(defaultSkin "dark_green")
 
 # Components Namings
-set(parent.customization "vista")
 set(product.name "Qulu")
 set(display.product.name "qulu")
 set(display_mobile_name "qulu2 Mobile")

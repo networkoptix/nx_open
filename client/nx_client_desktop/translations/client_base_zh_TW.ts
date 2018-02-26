@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh-TW" sourcelanguage="en">
   <context>
+    <name>AsyncImageWidget</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>無資料</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -869,6 +876,22 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>背景格間距...</translation>
     </message>
+    <message>
+      <source>Wearable Camera...</source>
+      <translation type="unfinished">Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation type="unfinished">Upload File...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation type="unfinished">Upload Folder...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -999,11 +1022,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Matroska</source>
-      <translation>Matroska</translation>
+      <translation type="unfinished">Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation>MPEG-4 Part 14</translation>
+      <translation type="unfinished">MPEG-4 Part 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
@@ -1101,8 +1124,8 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
+      <translation>
+        <numerusform>檔名不可包含以下字元:
 %1</numerusform>
       </translation>
     </message>
@@ -1341,8 +1364,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...與另外 %n 個</numerusform>
       </translation>
     </message>
   </context>
@@ -1373,6 +1396,17 @@ to view more bookmarks</source>
     <message>
       <source>Folder not found</source>
       <translation>找不到資料夾</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnArchiveLengthWidget</name>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices.</source>
+      <translation>過高的最小值可能會導致其它設備上的錄影天數減少.</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras.</source>
+      <translation>過高的最小值可能會導致其它攝影機上的錄影天數減少.</translation>
     </message>
   </context>
   <context>
@@ -1458,32 +1492,32 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from System</numerusform>
+      <translation>
+        <numerusform>這些設備已從系統中刪除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from System</numerusform>
+      <translation>
+        <numerusform>這些相機已從系統中移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These servers are removed from System</numerusform>
+      <translation>
+        <numerusform>這些伺服器已從系統中被移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These users are removed from System</numerusform>
+      <translation>
+        <numerusform>這些使用者已從系統中被移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These resources are removed from System</numerusform>
+      <translation>
+        <numerusform>這些資源已從系統中被移除</numerusform>
       </translation>
     </message>
     <message>
@@ -1563,8 +1597,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n action(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n action(s)</numerusform>
+      <translation>
+        <numerusform>%n 個動作</numerusform>
       </translation>
     </message>
     <message>
@@ -1713,8 +1747,8 @@ to view more bookmarks</source>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
-        <numerusform>You have %n notifications</numerusform>
+      <translation>
+        <numerusform>您有 %n 個通知</numerusform>
       </translation>
     </message>
   </context>
@@ -1772,14 +1806,14 @@ to view more bookmarks</source>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n devices</numerusform>
+      <translation>
+        <numerusform>%n 個裝置中的 %1 個</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n cameras</numerusform>
+      <translation>
+        <numerusform>%n 個攝影機中的 %1 個</numerusform>
       </translation>
     </message>
     <message>
@@ -1792,8 +1826,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n 個 I/O 模組中的 %1 個</numerusform>
       </translation>
     </message>
     <message>
@@ -1816,8 +1850,8 @@ to view more bookmarks</source>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n Server(s)</numerusform>
+      <translation>
+        <numerusform>%n 個伺服器</numerusform>
       </translation>
     </message>
     <message>
@@ -1854,8 +1888,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more cameras</numerusform>
+      <translation>
+        <numerusform>來源與 %n 個攝影機</numerusform>
       </translation>
     </message>
     <message>
@@ -2058,8 +2092,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
-        <numerusform>%n devices found</numerusform>
+      <translation>
+        <numerusform>已找到 %n 個裝置</numerusform>
       </translation>
     </message>
     <message>
@@ -2093,8 +2127,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices added.</source>
-      <translation type="unfinished">
-        <numerusform>%n devices added.</numerusform>
+      <translation>
+        <numerusform>%n 個設備被加入.</numerusform>
       </translation>
     </message>
     <message>
@@ -2103,8 +2137,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to add %n devices</numerusform>
+      <translation>
+        <numerusform>無法新增 %n 個設備</numerusform>
       </translation>
     </message>
     <message>
@@ -2181,6 +2215,18 @@ to view more bookmarks</source>
       <source>Camera Id</source>
       <translation>攝影機 Id</translation>
     </message>
+    <message>
+      <source>Settings</source>
+      <translation>設定</translation>
+    </message>
+    <message>
+      <source>Web</source>
+      <translation type="unfinished">Web</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation type="unfinished">No settings</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
@@ -2201,8 +2247,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation type="unfinished">
-        <numerusform>%1 does not support two-way audio</numerusform>
+      <translation>
+        <numerusform>%1 不支援雙向語音</numerusform>
       </translation>
     </message>
   </context>
@@ -2288,24 +2334,8 @@ to view more bookmarks</source>
       <translation>次要</translation>
     </message>
     <message>
-      <source>Don&apos;t change</source>
-      <translation>不變更</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>低 (L)</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>中 (M)</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>高 (H)</translation>
-    </message>
-    <message>
       <source>Edge</source>
-      <translation>Edge</translation>
+      <translation type="unfinished">Edge</translation>
     </message>
   </context>
   <context>
@@ -2319,8 +2349,8 @@ to view more bookmarks</source>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation type="unfinished">
-        <numerusform>%1 have no input ports</numerusform>
+      <translation>
+        <numerusform>%1 沒有輸入埠</numerusform>
       </translation>
     </message>
   </context>
@@ -2358,14 +2388,14 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
-        <numerusform>%n devices found</numerusform>
+      <translation>
+        <numerusform>已找到 %n 個裝置</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras found</numerusform>
+      <translation>
+        <numerusform>已找到 %n 個攝影機</numerusform>
       </translation>
     </message>
     <message>
@@ -2378,8 +2408,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules found</numerusform>
+      <translation>
+        <numerusform>已找到 %n 個 I/O 模組</numerusform>
       </translation>
     </message>
     <message>
@@ -2471,8 +2501,8 @@ to view more bookmarks</source>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation type="unfinished">
-        <numerusform>%1 have no output relays</numerusform>
+      <translation>
+        <numerusform>%1 沒有輸出繼電器</numerusform>
       </translation>
     </message>
   </context>
@@ -2525,14 +2555,6 @@ to view more bookmarks</source>
       <translation>以伺服器時間為準</translation>
     </message>
     <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>過高的最小值可能會導致其它設備上的錄影天數減少.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>過高的最小值可能會導致其它攝影機上的錄影天數減少.</translation>
-    </message>
-    <message>
       <source>Not enough licenses to enable recording</source>
       <translation>沒有足夠的授權來啟用錄影</translation>
     </message>
@@ -2578,7 +2600,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
+      <translation type="unfinished">Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -2649,20 +2671,20 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
+      <translation>
+        <numerusform>以下 %n 個設備的變更未被儲存:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+      <translation>
+        <numerusform>以下 %n 個攝影機的變更未被儲存:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+      <translation>
+        <numerusform>以下 %n 個 I/O 模組的變更未被儲存:</numerusform>
       </translation>
     </message>
     <message>
@@ -2679,6 +2701,14 @@ to view more bookmarks</source>
     <message>
       <source>No device selected.</source>
       <translation>並未選擇任何裝置.</translation>
+    </message>
+    <message>
+      <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
+      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+    </message>
+    <message>
+      <source>Cannot edit properties for several wearable cameras.</source>
+      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
     </message>
   </context>
   <context>
@@ -3280,14 +3310,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
+      <translation>
+        <numerusform>事件記錄 %1 到 %2的時段內 - 找到 %n 事件</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n event(s) found</numerusform>
+      <translation>
+        <numerusform>%1 的事件記錄 - 找到 %n 事件</numerusform>
       </translation>
     </message>
     <message>
@@ -3340,8 +3370,8 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n 次)</numerusform>
       </translation>
     </message>
     <message>
@@ -3350,20 +3380,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation type="unfinished">
-        <numerusform>and %n users more...</numerusform>
+      <translation>
+        <numerusform>和再 %n 個使用者...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation type="unfinished">
-        <numerusform>and %n more...</numerusform>
+      <translation>
+        <numerusform>和再 %n 個...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
-        <numerusform>%n Removed subjects</numerusform>
+      <translation>
+        <numerusform>%n 個已移除之項目</numerusform>
       </translation>
     </message>
     <message>
@@ -3726,8 +3756,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation type="unfinished">
-        <numerusform>Test completed successfully: %n users found.</numerusform>
+      <translation>
+        <numerusform>測試成功: 找到 %n 個使用者.</numerusform>
       </translation>
     </message>
   </context>
@@ -3895,8 +3925,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
-        <numerusform>License expires in %n days</numerusform>
+      <translation>
+        <numerusform>授權在 %n 天後到期</numerusform>
       </translation>
     </message>
     <message>
@@ -3988,14 +4018,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
-      <translation type="unfinished">
-        <numerusform>At least %n %1 are required</numerusform>
+      <translation>
+        <numerusform>最少需要 %n %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
-      <translation type="unfinished">
-        <numerusform>%n %1 are currently in use</numerusform>
+      <translation>
+        <numerusform>已使用 %n %1</numerusform>
       </translation>
     </message>
     <message>
@@ -4004,8 +4034,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>要重置授權?</numerusform>
       </translation>
     </message>
     <message>
@@ -4014,20 +4044,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
-        <numerusform>Failed to deactivate %n licenses</numerusform>
+      <translation>
+        <numerusform>重置 %n 個授權失敗</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+      <translation>
+        <numerusform>%n 個授權中有 %1 個授權無法重置</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>無法重置授權</numerusform>
       </translation>
     </message>
     <message>
@@ -4048,8 +4078,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%n licenses deactivated</numerusform>
+      <translation>
+        <numerusform>%n 個授權已重置</numerusform>
       </translation>
     </message>
     <message>
@@ -4062,8 +4092,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
-        <numerusform>%n channels.</numerusform>
+      <translation>
+        <numerusform>%n 個授權.</numerusform>
       </translation>
     </message>
     <message>
@@ -4072,8 +4102,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>重置另外 %n 個</numerusform>
       </translation>
     </message>
     <message>
@@ -4140,20 +4170,20 @@ to %1</source>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Use licenses for selected %n devices</numerusform>
+      <translation>
+        <numerusform>使用授權在所選的 %n 個裝置</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Use licenses for selected %n cameras</numerusform>
+      <translation>
+        <numerusform>使用授權在所選的 %n 支攝影機</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>Use licenses for selected %n I/O modules</numerusform>
+      <translation>
+        <numerusform>使用授權在所選的 %n 組 I/O 模組</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4492,6 +4522,14 @@ to %1</source>
       <source>Skip</source>
       <translation>略過</translation>
     </message>
+    <message>
+      <source>Close</source>
+      <translation>關閉​​​</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>停止</translation>
+    </message>
   </context>
   <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -4571,11 +4609,30 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnNewWearableCameraDialog</name>
+    <message>
+      <source>Wearable Camera</source>
+      <translation type="unfinished">Wearable Camera</translation>
+    </message>
+    <message>
+      <source>Wearable Camera %1</source>
+      <translation type="unfinished">Wearable Camera %1</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>名稱</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty</source>
+      <translation>名稱不能為空白</translation>
+    </message>
+  </context>
+  <context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
       <source>%n more notifications</source>
-      <translation type="unfinished">
-        <numerusform>%n more notifications</numerusform>
+      <translation>
+        <numerusform>%n 更多通知</numerusform>
       </translation>
     </message>
   </context>
@@ -4771,20 +4828,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation type="unfinished">
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+      <translation>
+        <numerusform>這個預設點將在 %n 分鐘後啟動</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation type="unfinished">
-        <numerusform>Tour has %n identical positions</numerusform>
+      <translation>
+        <numerusform>巡航包含了 %n 個相同的位置</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation type="unfinished">
-        <numerusform>about %n minute(s)</numerusform>
+      <translation>
+        <numerusform>大約 %n 分鐘</numerusform>
       </translation>
     </message>
     <message>
@@ -5005,22 +5062,22 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n devices</numerusform>
+      <translation>
+        <numerusform>總共 %1 %n 個設備</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n cameras</numerusform>
+      <translation>
+        <numerusform>總共 %1 %n 個攝影機</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n I/O modules</numerusform>
+      <translation>
+        <numerusform>總共 %1 %n 個 I/O 模組</numerusform>
       </translation>
     </message>
     <message>
@@ -5074,8 +5131,8 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%1 個選定角色中有 %n 個角色沒有 %2 權限</numerusform>
       </translation>
     </message>
     <message>
@@ -5091,8 +5148,8 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%1 個選定使用者中有 %n 個使用者沒有 %2 權限</numerusform>
       </translation>
     </message>
   </context>
@@ -5124,13 +5181,6 @@ to %1</source>
     <message>
       <source>Health Monitor</source>
       <translation>資源檢視器</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnResourcePreviewWidget</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>無資料</translation>
     </message>
   </context>
   <context>
@@ -5347,8 +5397,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
+      <translation>
+        <numerusform>%n 伺服器</numerusform>
       </translation>
     </message>
   </context>
@@ -5368,8 +5418,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n 使用者</numerusform>
       </translation>
     </message>
   </context>
@@ -5377,8 +5427,8 @@ to %1</source>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation type="unfinished">
-        <numerusform>%n additional</numerusform>
+      <translation>
+        <numerusform>%n 附加</numerusform>
       </translation>
     </message>
     <message>
@@ -5387,8 +5437,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 users have invalid email address</numerusform>
+      <translation>
+        <numerusform>%1 個使用者中有 %n 個使用者的電子郵件地址有誤</numerusform>
       </translation>
     </message>
     <message>
@@ -5397,8 +5447,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      <translation>
+        <numerusform>%1 個附加 Email 地址中有 %n 個無效</numerusform>
       </translation>
     </message>
     <message>
@@ -5649,8 +5699,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
-      <translation type="unfinished">
-        <numerusform>Not enough free space at %n Servers:</numerusform>
+      <translation>
+        <numerusform>在 %n 伺服器上沒有足夠的可用空間:</numerusform>
       </translation>
     </message>
     <message>
@@ -6028,6 +6078,10 @@ to %1</source>
       <source>Set for this Camera</source>
       <translation>設定這支攝影機</translation>
     </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation type="unfinished">NO LIVE STREAM</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6054,7 +6108,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
       </translation>
     </message>
@@ -6172,7 +6226,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>錄影到停用的儲存將置將停止. 但其中的錄影資料仍會被循環錄影刪除.</translation>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
@@ -6662,32 +6716,32 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>The problem is caused by %n servers:</numerusform>
+      <translation>
+        <numerusform>此問題源自 %n 台伺服器:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>No free space left on %n servers:</numerusform>
+      <translation>
+        <numerusform>已無剩餘空間在 %n 台伺服器:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
-      <translation type="unfinished">
-        <numerusform>%n servers are not responding:</numerusform>
+      <translation>
+        <numerusform>%n 台伺服器無回應:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
-      <translation type="unfinished">
-        <numerusform>%n servers have gone offline:</numerusform>
+      <translation>
+        <numerusform>%n 台伺服器已斷線:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>Authentication failed for %n servers:</numerusform>
+      <translation>
+        <numerusform>%n 個伺服器驗證失敗:</numerusform>
       </translation>
     </message>
     <message>
@@ -6834,8 +6888,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation type="unfinished">
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
+      <translation>
+        <numerusform>請選擇要對這 %n 使用者做的動作</numerusform>
       </translation>
     </message>
   </context>
@@ -7028,8 +7082,8 @@ to %1</source>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>PC %1 - 螢幕 %2</numerusform>
       </translation>
     </message>
   </context>
@@ -7038,6 +7092,42 @@ to %1</source>
     <message>
       <source>Muted</source>
       <translation>靜音</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableProgressWidget</name>
+    <message>
+      <source>Uploading %1... %2	%p%</source>
+      <translation type="unfinished">Uploading %1... %2	%p%</translation>
+    </message>
+    <message numerus="yes">
+      <source>(%n more file(s) in queue)</source>
+      <translation type="unfinished">
+        <numerusform>(%n more file(s) in queue)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation type="unfinished">Stop uploading?</translation>
+    </message>
+    <message>
+      <source>Already uploaded files will be kept.</source>
+      <translation type="unfinished">Already uploaded files will be kept.</translation>
+    </message>
+    <message>
+      <source>Finalizing %1... %2	%p%</source>
+      <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableUploadWidget</name>
+    <message>
+      <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Another user is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
     </message>
   </context>
   <context>
@@ -7105,8 +7195,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n bookmarks?</numerusform>
+      <translation>
+        <numerusform>刪除 %n 書籤?</numerusform>
       </translation>
     </message>
   </context>
@@ -7181,8 +7271,8 @@ to %1</source>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>The following %n items are not saved:</numerusform>
+      <translation>
+        <numerusform>下列 %n 項目未被儲存:</numerusform>
       </translation>
     </message>
     <message>
@@ -7195,8 +7285,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation type="unfinished">
-        <numerusform>The following %n items are not deleted:</numerusform>
+      <translation>
+        <numerusform>下列 %n 項目未被刪除:</numerusform>
       </translation>
     </message>
     <message>
@@ -7205,8 +7295,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n items:</numerusform>
+      <translation>
+        <numerusform>未能刪除 %n 項目:</numerusform>
       </translation>
     </message>
     <message>
@@ -7362,8 +7452,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n items?</numerusform>
+      <translation>
+        <numerusform>刪除 %n 項目?</numerusform>
       </translation>
     </message>
     <message>
@@ -7380,8 +7470,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n matrices?</numerusform>
+      <translation>
+        <numerusform>刪除 %n 矩陣?</numerusform>
       </translation>
     </message>
     <message>
@@ -7411,6 +7501,123 @@ to %1</source>
     <message>
       <source>Activate one more license to start Video Wall.</source>
       <translation>再啟動一個授權來開啟電視牆.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchWearableHandler</name>
+    <message>
+      <source>Could not add wearable camera to server &quot;%1&quot;.</source>
+      <translation type="unfinished">Could not add wearable camera to server &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>全部檔案 (*.*)</translation>
+    </message>
+    <message>
+      <source>Video (%1)</source>
+      <translation type="unfinished">Video (%1)</translation>
+    </message>
+    <message>
+      <source>Open Wearable Camera Recordings...</source>
+      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+    </message>
+    <message>
+      <source>No video files found in &quot;%1&quot;</source>
+      <translation type="unfinished">No video files found in &quot;%1&quot;</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file format(s) are not supported</source>
+      <translation type="unfinished">
+        <numerusform>Selected file format(s) are not supported</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only video files are supported.</source>
+      <translation type="unfinished">Only video files are supported.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) do not have timestamp(s)</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only video files with correct timestamp are supported.</source>
+      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) cover periods for which videos are already being uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these file(s) to a different instance of a Wearable Camera.</source>
+      <translation type="unfinished">
+        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) cover periods for which videos have already been uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file(s) will not be uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected file(s) will not be uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some file(s) will not be uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Some file(s) will not be uploaded</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There is no new files to upload in &quot;%1&quot;</source>
+      <translation type="unfinished">There is no new files to upload in &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation type="unfinished">Not enough space on server storage</translation>
+    </message>
+    <message numerus="yes">
+      <source>File(s) size - %1
+Free space - %2</source>
+      <translation type="unfinished">
+        <numerusform>File(s) size - %1
+Free space - %2</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>File format of &quot;%1&quot; is not supported.</source>
+      <translation type="unfinished">File format of &quot;%1&quot; is not supported.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; does not have timestamp.</source>
+      <translation type="unfinished">File &quot;%1&quot; does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cover periods for which video is already being uploaded.</source>
+      <translation type="unfinished">File &quot;%1&quot; cover periods for which video is already being uploaded.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cover periods for which video has already been uploaded.</source>
+      <translation type="unfinished">File &quot;%1&quot; cover periods for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>There is no space on server for file &quot;%1&quot;.</source>
+      <translation type="unfinished">There is no space on server for file &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -7444,8 +7651,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation type="unfinished">
-        <numerusform>User will still have access to %n removed resources:</numerusform>
+      <translation>
+        <numerusform>使用者仍然有 %n 刪除資源的權限:</numerusform>
       </translation>
     </message>
     <message>
@@ -7454,8 +7661,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation type="unfinished">
-        <numerusform>All users with this role will get access to %n resources:</numerusform>
+      <translation>
+        <numerusform>這角色的所有使用者都將獲得 %n 資源的權限:</numerusform>
       </translation>
     </message>
     <message>
@@ -7464,8 +7671,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation type="unfinished">
-        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+      <translation>
+        <numerusform>這角色的所有使用者都將獲得 %n 刪除資源的權限:</numerusform>
       </translation>
     </message>
     <message>
@@ -7478,32 +7685,32 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation type="unfinished">
-        <numerusform>User will lose access to %n resources:</numerusform>
+      <translation>
+        <numerusform>使用者將失去 %n 資源的權限:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation type="unfinished">
-        <numerusform>All users with this role will lose access to %n resources:</numerusform>
+      <translation>
+        <numerusform>這角色的所有使用者都將失去 %n 資源的權限:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n shared layouts?</numerusform>
+      <translation>
+        <numerusform>刪除 %n 共用佈局?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation type="unfinished">
-        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
+      <translation>
+        <numerusform>這 %n 佈局已與其他使用者共用, 所以您也幫他們刪除了.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from layout?</numerusform>
+      <translation>
+        <numerusform>從佈局中刪除 %n 項目嗎?</numerusform>
       </translation>
     </message>
     <message>
@@ -7520,50 +7727,50 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n users?</numerusform>
+      <translation>
+        <numerusform>刪除 %n 使用者?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n devices?</numerusform>
+      <translation>
+        <numerusform>刪除 %n 設備?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n cameras?</numerusform>
+      <translation>
+        <numerusform>刪除 %n 攝影機?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n I/O Modules?</numerusform>
+      <translation>
+        <numerusform>刪除 %n I/O 模組?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n items?</numerusform>
+      <translation>
+        <numerusform>刪除 %n 項目?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n of them are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>其中 %n 是自動搜尋到的.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>%n 攝影機是自動搜尋到的.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>%n I/O 模組是自動搜尋到的.</numerusform>
       </translation>
     </message>
     <message>
@@ -7580,8 +7787,22 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
+      <translation>
+        <numerusform>從幻燈片中刪除 %n 項目嗎?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation type="unfinished">Stop uploading?</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>停止</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
       <translation type="unfinished">
-        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
       </translation>
     </message>
   </context>
@@ -7589,8 +7810,8 @@ to %1</source>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
-        <numerusform>%n users</numerusform>
+      <translation>
+        <numerusform>%n 個使用者</numerusform>
       </translation>
     </message>
   </context>
@@ -7823,6 +8044,40 @@ to %1</source>
     <message>
       <source>Short</source>
       <translation>太短</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::UploadWorker</name>
+    <message>
+      <source>Could not open file &quot;%1&quot;</source>
+      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not calculate md5 for file &quot;%1&quot;</source>
+      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not create upload on the server side</source>
+      <translation type="unfinished">Could not create upload on the server side</translation>
+    </message>
+    <message>
+      <source>Could not upload file chunk to the server</source>
+      <translation type="unfinished">Could not upload file chunk to the server</translation>
+    </message>
+    <message>
+      <source>Could not check uploaded file on the server</source>
+      <translation type="unfinished">Could not check uploaded file on the server</translation>
+    </message>
+    <message>
+      <source>File was corrupted while being uploaded to the server</source>
+      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WearableWorker</name>
+    <message>
+      <source>Failed to send request to the server.</source>
+      <translation type="unfinished">Failed to send request to the server.</translation>
     </message>
   </context>
   <context>
@@ -8134,20 +8389,20 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::ActionHandler</name>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n devices</numerusform>
+      <translation>
+        <numerusform>移動 %n 個設備失敗</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n cameras</numerusform>
+      <translation>
+        <numerusform>移動 %n 個攝影機失敗</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n I/O Modules</numerusform>
+      <translation>
+        <numerusform>移動 %n 個 I/O 模組失敗</numerusform>
       </translation>
     </message>
     <message>
@@ -8156,20 +8411,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>伺服器 &quot;%1&quot; 無法存取這 %n 個設備. 仍要移動嗎?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>伺服器 &quot;%1&quot; 無法存取這 %n 個攝影機. 仍要移動嗎?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>伺服器 &quot;%1&quot; 無法存取這 %n 個I/O模組. 仍要移動嗎?</numerusform>
       </translation>
     </message>
     <message>
@@ -8226,8 +8481,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation type="unfinished">
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+      <translation>
+        <numerusform>您確定要永久刪除這 %n 個檔案?</numerusform>
       </translation>
     </message>
     <message>
@@ -8317,6 +8572,10 @@ to %1</source>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>變更 %2 支攝影機中的 %1 支攝影機密碼失敗</translation>
+    </message>
+    <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
     </message>
   </context>
   <context>

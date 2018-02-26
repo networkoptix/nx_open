@@ -105,7 +105,8 @@ void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHan
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
-        ( SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody ) mutable
+        (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody,
+        nx::network::http::HttpHeaders /*httpHeaders*/) mutable
     {
         if( osErrorCode != SystemError::noError ||
             statusCode != nx::network::http::StatusCode::ok )
@@ -767,19 +768,6 @@ bool QnActiResource::isInputPortMonitored() const
     return m_inputMonitored;
 }
 
-QnConstResourceAudioLayoutPtr QnActiResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
-{
-    if (isAudioEnabled()) {
-        const QnActiStreamReader* actiReader = dynamic_cast<const QnActiStreamReader*>(dataProvider);
-        if (actiReader && actiReader->getDPAudioLayout())
-            return actiReader->getDPAudioLayout();
-        else
-            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-    }
-    else
-        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-}
-
 QString QnActiResource::getRtspUrl(int actiChannelNum) const
 {
     QUrl url(getUrl());
@@ -859,7 +847,7 @@ int QnActiResource::roundFps(int srcFps, Qn::ConnectionRole role) const
         int distance = qAbs(availFps[i] - srcFps);
         if (distance <= minDistance)
         {
-            // Preffer higher fps if same distance
+            // Prefer higher fps on the same distance
             minDistance = distance;
             result = availFps[i];
         }
@@ -894,7 +882,7 @@ bool QnActiResource::hasDualStreaming() const
     return getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME).toInt() > 0;
 }
 
-QnAbstractPtzController *QnActiResource::createPtzControllerInternal()
+QnAbstractPtzController *QnActiResource::createPtzControllerInternal() const
 {
     return new QnActiPtzController(toSharedPointer(this));
 }

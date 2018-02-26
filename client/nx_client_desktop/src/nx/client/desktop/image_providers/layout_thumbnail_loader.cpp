@@ -17,7 +17,11 @@
 #include <ui/widgets/common/autoscaled_plain_text.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 
+#include <nx/utils/log/log.h>
+#include <ini.h>
+
 using nx::client::core::Geometry;
+
 
 namespace nx {
 namespace client {
@@ -34,6 +38,25 @@ static inline bool isOdd(int value)
     return (value & 1) != 0;
 }
 
+static const char * statusToString(Qn::ThumbnailStatus status)
+{
+    switch (status)
+    {
+    case Qn::ThumbnailStatus::Invalid:
+        return "Invalid";
+    case Qn::ThumbnailStatus::Loading:
+        return "Loading";
+    case Qn::ThumbnailStatus::Loaded:
+        return "Loaded";
+    case Qn::ThumbnailStatus::NoData:
+        return "NoData";
+    case Qn::ThumbnailStatus::Refreshing:
+        return "Refreshing";
+    default:
+        return "UnknownStatus";
+    }
+}
+
 } // namespace
 
 using ResourceThumbnailProviderPtr = QSharedPointer<ResourceThumbnailProvider>;
@@ -46,6 +69,31 @@ struct LayoutThumbnailLoader::Private
     QnLayoutResourcePtr layout;
     QSize maximumSize;
     qint64 msecSinceEpoch;
+
+    // Pretty name for debug output.
+    QString layoutName;
+
+    struct ThumbnailItemData
+    {
+        QString name;
+        // Resource to be loaded. Can be empty when we load a background
+        QnResourcePtr resource;
+        // Image provider that deals with loading process
+        QnImageProviderPtr provider;
+        // Last status for an item
+        Qn::ThumbnailStatus status;
+        // Desired rotation for a tile.
+        qreal rotation;
+        // Output rectangle for the cell, that contains this resource
+        QRectF outCellRect;
+        // Final output rectangle
+        QRect outRect;
+
+        bool rendered = false;
+    };
+
+    // Because we share this items.
+    using ItemPtr = std::shared_ptr<ThumbnailItemData>;
 
     // Methods.
     Private(LayoutThumbnailLoader* q,
@@ -72,94 +120,130 @@ struct LayoutThumbnailLoader::Private
         setPaletteColor(nonCameraWidget.data(), QPalette::WindowText, qnGlobals->errorTextColor());
     }
 
-    void trackLoader(QnImageProviderPtr loader)
+    //ItemPtr trackLoader(const QnResourcePtr& resource, QnImageProviderPtr loader)
+    // Allocate a new item to be tracked.
+    ItemPtr newItem()
     {
-        data.loaders.push_back(loader);
-        data.numLoading++;
+        ItemPtr item(new ThumbnailItemData());
+        items.push_back(item);
+        numLoading++;
+        return item;
     }
 
-    void notifyLoaderIsComplete()
+    void notifyLoaderIsComplete(ItemPtr item)
     {
-        if (data.numLoading > 0)
+        if (numLoading > 0)
         {
-            --data.numLoading;
-            if(data.numLoading == 0)
+            --numLoading;
+            if(numLoading == 0)
             {
-                data.status = Qn::ThumbnailStatus::Loaded;
-                emit q->statusChanged(data.status);
+                status = Qn::ThumbnailStatus::Loaded;
+                NX_VERBOSE(this) << "LayoutThumbnailLoader(" << layoutName << ") is complete";
+                emit q->statusChanged(status);
             }
         }
     }
 
+    // Draws a pixmap for 'NoData' or 'Invalid' state.
+    void drawStatusPixmap(Qn::ThumbnailStatus status, const QnAspectRatio& aspectRatio,
+        ItemPtr item)
+    {
+        qreal rotation = qMod(item->rotation, 180.0);
+        QRectF cellRect = item->outCellRect;
+
+        // Aspect ratio is invalid when there is no image. No need to rotate in this case.
+        if (qFuzzyIsNull(rotation) || !aspectRatio.isValid())
+        {
+            const auto targetRect = aspectRatio.isValid()
+                ? Geometry::expanded(aspectRatio.toFloat(), cellRect, Qt::KeepAspectRatio)
+                : cellRect;
+
+            QPainter painter(&outputImage);
+            paintPixmapSharp(&painter, specialPixmap(status, targetRect.size().toSize()),
+                targetRect.topLeft());
+        }
+        else
+        {
+            if (rotation < 0.0)
+                rotation += 180.0;
+
+            // 0 = up, 1 = left, 2 = down.
+            const auto direction = qRound(rotation / 90.0);
+
+            qreal ar = aspectRatio.toFloat();
+            rotation -= direction * 90.0;
+            if (isOdd(direction))
+                ar = 1.0 / ar;
+
+            const auto cellCenter = cellRect.center();
+            const auto targetRect = Geometry::encloseRotatedGeometry(
+                cellRect, ar, rotation);
+
+            QPainter painter(&outputImage);
+            painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+            painter.translate(cellRect.center());
+            painter.rotate(rotation);
+            painter.translate(-cellRect.center());
+            paintPixmapSharp(&painter, specialPixmap(status, targetRect.size().toSize()),
+                targetRect.topLeft());
+        }
+        emit q->imageChanged(outputImage);
+    }
+
     void updateTileStatus(Qn::ThumbnailStatus status, const QnAspectRatio& aspectRatio,
-        const QRectF& cellRect, qreal rotation)
+        ItemPtr item)
     {
         bool loaderIsComplete = false;
+        QString strStatus = QString::fromLocal8Bit(statusToString(status));
+
+        NX_VERBOSE(this) << "LayoutThumbnailLoader(" << layoutName << ") item ="
+            << item->name
+            << " status =" << strStatus;
+
         switch (status)
         {
             case Qn::ThumbnailStatus::Loading:
                 break;
 
             case Qn::ThumbnailStatus::Loaded:
+                item->status = status;
                 loaderIsComplete = true;
                 break;
 
-            case Qn::ThumbnailStatus::Refreshing:
             case Qn::ThumbnailStatus::Invalid:
-            case Qn::ThumbnailStatus::NoData:
-            {
-                rotation = qMod(rotation, 180.0);
-
-                // Aspect ratio is invalid when there is no image. No need to rotate in this case.
-                if (qFuzzyIsNull(rotation) || !aspectRatio.isValid())
-                {
-                    const auto targetRect = aspectRatio.isValid()
-                        ? Geometry::expanded(aspectRatio.toFloat(), cellRect, Qt::KeepAspectRatio)
-                        : cellRect;
-
-                    QPainter painter(&data.image);
-                    paintPixmapSharp(&painter, specialPixmap(status, targetRect.size().toSize()),
-                        targetRect.topLeft());
-                }
-                else
-                {
-                    if (rotation < 0.0)
-                        rotation += 180.0;
-
-                    // 0 = up, 1 = left, 2 = down.
-                    const auto direction = qRound(rotation / 90.0);
-
-                    qreal ar = aspectRatio.toFloat();
-                    rotation -= direction * 90.0;
-                    if (isOdd(direction))
-                        ar = 1.0 / ar;
-
-                    const auto cellCenter = cellRect.center();
-                    const auto targetRect = Geometry::encloseRotatedGeometry(
-                        cellRect, ar, rotation);
-
-                    QPainter painter(&data.image);
-                    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-                    painter.translate(cellRect.center());
-                    painter.rotate(rotation);
-                    painter.translate(-cellRect.center());
-                    paintPixmapSharp(&painter, specialPixmap(status, targetRect.size().toSize()),
-                        targetRect.topLeft());
-                }
-
-                emit q->imageChanged(data.image);
                 loaderIsComplete = true;
+            case Qn::ThumbnailStatus::NoData:
+                if(item->status != Qn::ThumbnailStatus::Loaded)
+                    drawStatusPixmap(status, aspectRatio, item);
+                else
+                    item->status = status;
                 break;
-            }
+            case Qn::ThumbnailStatus::Refreshing:
+                break;
         }
 
         if (loaderIsComplete)
-            notifyLoaderIsComplete();
+            notifyLoaderIsComplete(item);
     }
 
-    void drawTile(const QImage& tile, qreal aspectRatio, const QRectF& cellRect,
-        qreal rotation, const QRectF& zoomRect)
+    void finalizeOutputImage()
     {
+        QRect selection = this->calculateContentRect();
+        if (!selection.isEmpty())
+        {
+            outputRegion = outputImage.copy(selection);
+            emit q->imageChanged(outputRegion);
+        }
+        else
+        {
+            NX_WARNING(this, "LayoutThumbnailLoader::finalizeOutputImage() has empty contents rectangle");
+        }
+    }
+
+    void drawTile(const ItemPtr& item, qreal aspectRatio, const QRectF& zoomRect)
+    {
+        const QImage& tile = item->provider->image();
+
         if (tile.isNull())
             return;
 
@@ -167,55 +251,61 @@ struct LayoutThumbnailLoader::Private
         if (!zoomRect.isNull())
             sourceRect = Geometry::subRect(tile.rect(), zoomRect).toRect();
 
-        if (qFuzzyIsNull(rotation))
+        if (qFuzzyIsNull(item->rotation))
         {
-            const auto targetRect = Geometry::expanded(aspectRatio,
-                cellRect, Qt::KeepAspectRatio);
-            QPainter painter(&data.image);
+            item->outRect = Geometry::expanded(
+                aspectRatio, item->outCellRect, Qt::KeepAspectRatio).toRect();
+            QPainter painter(&outputImage);
             painter.setRenderHints(QPainter::SmoothPixmapTransform);
-            painter.drawImage(targetRect, tile, sourceRect);
+            painter.drawImage(item->outRect, tile, sourceRect);
         }
         else
         {
-            const auto cellCenter = cellRect.center();
-            const auto targetRect = Geometry::encloseRotatedGeometry(
-                cellRect, aspectRatio, rotation);
+            const auto cellCenter = item->outCellRect.center();
+            item->outRect = Geometry::encloseRotatedGeometry(
+                item->outCellRect, aspectRatio, item->rotation).toRect();
 
-            QPainter painter(&data.image);
+            QPainter painter(&outputImage);
             painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-            painter.translate(cellRect.center());
-            painter.rotate(rotation);
-            painter.translate(-cellRect.center());
-            painter.drawImage(targetRect, tile, sourceRect);
+            painter.translate(item->outCellRect.center());
+            painter.rotate(item->rotation);
+            painter.translate(-item->outCellRect.center());
+            painter.drawImage(item->outRect, tile, sourceRect);
         }
 
-        emit q->imageChanged(data.image);
+        finalizeOutputImage();
     }
 
-    void drawBackground(const QImage& background, const QRectF& targetRect)
+    void drawBackground(const ItemPtr& item, const QImage& background)
     {
         if (background.isNull())
             return;
 
-        const auto loaded = data.image;
+        // We store current contents.
+        // Then we draw background over empty image
+        // and after that we finally draw saved contents.
+        const QImage loaded = outputImage;
 
-        data.image = QImage(loaded.size(), QImage::Format_ARGB32_Premultiplied);
-        data.image.fill(Qt::transparent);
+        outputImage = QImage(loaded.size(), QImage::Format_ARGB32_Premultiplied);
+        outputImage.fill(Qt::transparent);
 
-        QPainter painter(&data.image);
+        QPainter painter(&outputImage);
         painter.setRenderHints(QPainter::SmoothPixmapTransform);
         painter.setOpacity(layout->backgroundOpacity());
-        painter.drawImage(targetRect, background, background.rect());
+        painter.drawImage(item->outCellRect, background, background.rect());
+        item->outRect = item->outCellRect.toRect();
         painter.setOpacity(1.0);
+        // Draw old contents over the background.
         painter.drawImage(0, 0, loaded);
 
-        emit q->imageChanged(data.image);
+        finalizeOutputImage();
     }
 
+    // Generates a pixmap for 'NoData' or 'Invalid' state.
     QPixmap specialPixmap(Qn::ThumbnailStatus status, const QSize& size) const
     {
-        QPixmap pixmap(size * data.image.devicePixelRatio());
-        pixmap.setDevicePixelRatio(data.image.devicePixelRatio());
+        QPixmap pixmap(size * outputImage.devicePixelRatio());
+        pixmap.setDevicePixelRatio(outputImage.devicePixelRatio());
         pixmap.fill(Qt::transparent);
 
         switch (status)
@@ -237,16 +327,50 @@ struct LayoutThumbnailLoader::Private
         return pixmap;
     }
 
-    // Intermediate/output data.
-    struct Data
+    // Calculates a bounding rectangle for output thumbnail.
+    QRect calculateContentRect() const
     {
-        QImage image;
-        Qn::ThumbnailStatus status = Qn::ThumbnailStatus::Invalid;
-        QList<QnImageProviderPtr> loaders;
-        int numLoading = 0;
-    };
+        QRect result;
+        bool first = true;
+        for (const ItemPtr& item : items)
+        {
+            if (item->outRect.isEmpty())
+                continue;
 
-    Data data;
+            if (first)
+            {
+                result = item->outRect;
+                first = false;
+            }
+            else
+            {
+                result = result.united(item->outRect);
+            }
+        }
+        return result;
+    }
+
+    // Resets internal state
+    void reset()
+    {
+        items.clear();
+        outputImage = QImage();
+        status = Qn::ThumbnailStatus::Invalid;
+        numLoading = 0;
+    }
+
+    int numLoading = 0;
+
+    // We draw all items to this image.
+    QImage outputImage;
+    // We cut a part of outputImage and send it to clients.
+    QImage outputRegion;
+    // Output status of thumbnail loader.
+    Qn::ThumbnailStatus status = Qn::ThumbnailStatus::Invalid;
+    // Items to be loaded.
+    QList<ItemPtr> items;
+
+    // We need this widgets to draw special states, like 'NoData'.
     QScopedPointer<QnAutoscaledPlainText> noDataWidget;
     QScopedPointer<QnAutoscaledPlainText> nonCameraWidget;
 };
@@ -273,17 +397,17 @@ QnLayoutResourcePtr LayoutThumbnailLoader::layout() const
 
 QImage LayoutThumbnailLoader::image() const
 {
-    return d->data.image;
+    return d->outputRegion;
 }
 
 QSize LayoutThumbnailLoader::sizeHint() const
 {
-    return d->data.image.size();
+    return d->outputRegion.size();
 }
 
 Qn::ThumbnailStatus LayoutThumbnailLoader::status() const
 {
-    return d->data.status;
+    return d->status;
 }
 
 QColor LayoutThumbnailLoader::itemBackgroundColor() const
@@ -306,26 +430,35 @@ void LayoutThumbnailLoader::setFontColor(const QColor& value)
     setPaletteColor(d->noDataWidget.data(), QPalette::WindowText, value);
 }
 
+void LayoutThumbnailLoader::setResourcePool(const QPointer<QnResourcePool>& pool)
+{
+    m_resourcePool = pool;
+}
+
 void LayoutThumbnailLoader::doLoadAsync()
 {
     if (!d->layout)
         return;
 
-    const auto resourcePool = d->layout->resourcePool();
+    QnResourcePool* resourcePool = d->layout->resourcePool();
     if (!resourcePool)
-        return;
+        resourcePool = m_resourcePool;
 
-    d->data = Private::Data();
+    d->reset();
 
     QRectF bounding;
-    const auto layoutItems = d->layout->getItems();
+    const QnLayoutItemDataMap& layoutItems = d->layout->getItems();
 
     QVector<QPair<QnUuid, QnResourcePtr>> validItems;
     validItems.reserve(layoutItems.size());
 
+    // This is initial bounding box. This calculation uses cell sizes, instead of a pixels.
+    // Right now we do not know actual pixel size of layout items.
+    // Pixel-accurate calculations will be done in Private::finalizeOutputImage.
     for (auto iter = layoutItems.constBegin(); iter != layoutItems.constEnd(); ++iter)
     {
-        const auto& itemRect = iter->combinedGeometry;
+        const QnLayoutItemData& item = iter.value();
+        const auto& itemRect = item.combinedGeometry;
         if (!itemRect.isValid()) // TODO: #GDM #VW some items can be not placed yet, wtf
             continue;
 
@@ -345,10 +478,11 @@ void LayoutThumbnailLoader::doLoadAsync()
 
     if (bounding.isEmpty())
     {
-        d->data.status = Qn::ThumbnailStatus::Loaded;
+        d->status = Qn::ThumbnailStatus::Loaded;
+        // Dat proper event chain.
         emit sizeHintChanged(QSize());
-        emit statusChanged(d->data.status);
-        emit imageChanged(d->data.image);
+        emit imageChanged(d->outputImage);
+        emit statusChanged(d->status);
         return;
     }
 
@@ -365,108 +499,129 @@ void LayoutThumbnailLoader::doLoadAsync()
     const qreal targetAr = Geometry::aspectRatio(d->maximumSize);
     if (sourceAr > targetAr)
     {
-        xscale = d->maximumSize.width() / bounding.width();
-        yscale = xscale / cellAspectRatio;
+        xscale = ceilf(d->maximumSize.width() / bounding.width());
+        yscale = ceilf(xscale / cellAspectRatio);
     }
     else
     {
-        yscale = d->maximumSize.height() / bounding.height();
+        yscale = ceilf(d->maximumSize.height() / bounding.height());
         xscale = yscale * cellAspectRatio;
     }
 
-    QSize outputSize(bounding.width() * xscale, bounding.height() * yscale);
-    d->data.image = QImage(outputSize, QImage::Format_ARGB32_Premultiplied);
-    d->data.image.fill(Qt::transparent);
-    d->data.status = Qn::ThumbnailStatus::Loading;
+    // Pretty name for debug output
+    d->layoutName = d->layout->getName();
+    if (d->layoutName.isEmpty())
+        d->layoutName = lit("Nameless");
 
-    emit sizeHintChanged(d->data.image.size());
-    emit statusChanged(d->data.status);
+    QSize outputSize(bounding.width() * xscale, bounding.height() * yscale);
+    d->outputImage = QImage(outputSize, QImage::Format_ARGB32_Premultiplied);
+
+    // Distinct color for debugging.
+    if (client::desktop::ini().debugThumbnailProviders)
+        d->outputImage.fill(Qt::darkBlue);
+    else
+        d->outputImage.fill(Qt::transparent);
+
+    d->status = Qn::ThumbnailStatus::Loading;
+
+    emit sizeHintChanged(d->outputImage.size());
+    emit statusChanged(d->status);
 
     if (hasBackground)
     {
-        QnImageProviderPtr loader(
+        // Ensure that loader is not forgotten before it produces any result.
+        Private::ItemPtr item = d->newItem();
+
+        item->outCellRect = QRectF(
+            (backgroundRect.left() - bounding.left()) * xscale,
+            (backgroundRect.top() - bounding.top()) * yscale,
+            backgroundRect.width() * xscale,
+            backgroundRect.height() * yscale);
+
+        item->name = lit("Background");
+
+        item->provider.reset(
             new LayoutBackgroundImageProvider(d->layout, kBackgroundPreviewSize));
 
-        connect(loader.data(), &QnImageProvider::statusChanged, this,
-            [this](Qn::ThumbnailStatus status)
+        // We connect only to statusChanged event.
+        // We expect that provider sends signals in a proper order
+        // and it already has generated image.
+        connect(item->provider.data(), &QnImageProvider::statusChanged, this,
+            [this, item](Qn::ThumbnailStatus status)
             {
                 if (status == Qn::ThumbnailStatus::Loaded)
                 {
-                    d->notifyLoaderIsComplete();
+                    d->drawBackground(item, item->provider->image());
+                    d->notifyLoaderIsComplete(item);
                 }
             });
 
-        connect(loader.data(), &QnImageProvider::imageChanged, this,
-            [this, backgroundRect, xscale, yscale, bounding](const QImage& image)
-            {
-                const QRectF scaledBackgroundRect(
-                    (backgroundRect.left() - bounding.left()) * xscale,
-                    (backgroundRect.top() - bounding.top()) * yscale,
-                    backgroundRect.width() * xscale,
-                    backgroundRect.height() * yscale);
-
-                d->drawBackground(image, scaledBackgroundRect);
-            });
-
-        // Ensure that loader is not forgotten before it produces any result.
-        d->trackLoader(loader);
-        loader->loadAsync();
+        item->provider->loadAsync();
     }
 
-    for (const auto& item: validItems)
+    for (const auto& layoutItem: validItems)
     {
-        const auto data = d->layout->getItem(item.first);
-        const auto& resource = item.second;
-        const auto& cellRect = data.combinedGeometry;
-        const auto rotation = data.rotation;
-        const auto zoomRect = data.zoomRect;
+        QnLayoutItemData data = d->layout->getItem(layoutItem.first);
+
+        Private::ItemPtr thumbnailItem = d->newItem();
+
+        thumbnailItem->resource = layoutItem.second;
+        thumbnailItem->rotation = data.rotation;
+        thumbnailItem->name = layoutItem.second->getName();
 
         // Cell bounds.
-        const QRectF scaledCellRect(
+        const auto& cellRect = data.combinedGeometry;
+        thumbnailItem->outCellRect = QRectF(
             (cellRect.left() - bounding.left() + spacing * 0.5) * xscale,
             (cellRect.top() - bounding.top() + spacing * 0.5) * yscale,
             (cellRect.width() - spacing) * xscale,
             (cellRect.height() - spacing) * yscale);
 
-        QSize thumbnailSize(0, scaledCellRect.height());
+        // Deal with zoom.
+        QSize thumbnailSize(0, thumbnailItem->outCellRect.height());
+        const auto zoomRect = data.zoomRect;
         if (!zoomRect.isEmpty())
             thumbnailSize /= zoomRect.height();
 
+        // Fill in request for the thumbnail.
+        // We will warp this image later.
         api::ResourceImageRequest request;
-        request.resource = resource;
+        request.resource = thumbnailItem->resource;
         request.msecSinceEpoch = d->msecSinceEpoch;
         request.size = thumbnailSize;
         request.rotation = 0;
+        thumbnailItem->provider.reset(new ResourceThumbnailProvider(request));
 
-        ResourceThumbnailProviderPtr loader(new ResourceThumbnailProvider(request));
-
-        connect(loader.data(), &QnImageProvider::statusChanged, this,
-            [this, loader, rotation, scaledCellRect](Qn::ThumbnailStatus status)
+        // We connect only to statusChanged event.
+        // We expect that provider sends signals in a proper order
+        // and it already has generated image.
+        connect(thumbnailItem->provider.data(), &QnImageProvider::statusChanged, this,
+            [this, thumbnailItem, zoomRect](Qn::ThumbnailStatus status)
             {
-                QnAspectRatio aspectRatio(loader->sizeHint());
-                d->updateTileStatus(status, aspectRatio, scaledCellRect, rotation);
+                QnAspectRatio sourceAr(thumbnailItem->provider->sizeHint());
+                if (status == Qn::ThumbnailStatus::Loaded)
+                {
+                    const auto sourceAr =
+                        Geometry::aspectRatio(thumbnailItem->provider->sizeHint());
+                    auto aspectRatio = zoomRect.isNull()
+                        ? sourceAr
+                        : sourceAr * Geometry::aspectRatio(zoomRect);
+                    d->drawTile(thumbnailItem, aspectRatio, zoomRect);
+                }
+                // TODO: Why do we use different types for aspect ratio
+                // in drawTile and updateTileStatus ?
+                d->updateTileStatus(status, sourceAr, thumbnailItem);
             });
 
-        connect(loader.data(), &QnImageProvider::imageChanged, this,
-            [this, loader, rotation, scaledCellRect, zoomRect](const QImage& tile)
-            {
-                const auto sourceAr = Geometry::aspectRatio(loader->sizeHint());
-                auto aspectRatio = zoomRect.isNull()
-                    ? sourceAr
-                    : sourceAr * Geometry::aspectRatio(zoomRect);
-
-                d->drawTile(tile, aspectRatio, scaledCellRect, rotation, zoomRect);
-            });
-
-        d->trackLoader(loader);
-        loader->loadAsync();
+        thumbnailItem->provider->loadAsync();
     }
 
-    if (d->data.numLoading == 0)
+    if (d->numLoading == 0)
     {
         // If there's nothing to load.
-        d->data.status = Qn::ThumbnailStatus::Loaded;
-        emit statusChanged(d->data.status);
+        // TODO: #dkargin I guess we should draw NoData here.
+        d->status = Qn::ThumbnailStatus::Loaded;
+        emit statusChanged(d->status);
     }
 }
 

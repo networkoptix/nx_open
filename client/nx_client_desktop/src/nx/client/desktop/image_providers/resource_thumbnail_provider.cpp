@@ -11,6 +11,7 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -24,22 +25,57 @@ namespace desktop {
 
 struct ResourceThumbnailProvider::Private
 {
-    void updateRequest(const api::ResourceImageRequest& value)
+    bool updateRequest(const api::ResourceImageRequest& value)
     {
         request = value;
 
-        QnMediaResourcePtr mediaResource = request.resource.dynamicCast<QnMediaResource>();
-        // Some cameras are actually provide only sound stream. So we draw sound icon for this.
-        if (mediaResource && !mediaResource->hasVideo())
+        QnResourcePtr resource = value.resource;
+
+        NX_ASSERT(resource);
+
+        QnMediaResourcePtr mediaResource = value.resource.dynamicCast<QnMediaResource>();
+        bool useCustomSoundIcon = mediaResource && !mediaResource->hasVideo();
+
+        QString placeholderIconPath;
+
+        if (resource->hasFlags(Qn::server))
         {
+            placeholderIconPath = lit("item_placeholders/videowall_server_placeholder.png");
+        }
+        else if (resource->hasFlags(Qn::web_page))
+        {
+            placeholderIconPath = lit("item_placeholders/videowall_webpage_placeholder.png");
+        }
+        else if(useCustomSoundIcon)
+        {
+            // Some cameras are actually provide only sound stream. So we draw sound icon for this.
+            placeholderIconPath = lit("item_placeholders/sound.png");
+        }
+        else if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+        {
+            api::CameraImageRequest cameraRequest(camera, request);
+            baseProvider.reset(new CameraThumbnailProvider(cameraRequest));
+        }
+        else if (const auto aviResource = resource.dynamicCast<QnAviResource>())
+        {
+            baseProvider.reset(new FfmpegImageProvider(resource));
+        }
+        else
+        {
+            NX_ASSERT(false);
+            return false;
+        }
+
+        if (!baseProvider && !placeholderIconPath.isEmpty())
+        {
+            QPixmap pixmap = qnSkin->pixmap(placeholderIconPath, true);
             // TODO: vms 4.0 has a new way to get preset colors
             const auto& palette = QnNxStyle::instance()->genericPalette();
             const auto& backgroundColor = palette.color(lit("dark"), 4);
             const auto& frameColor = palette.color(lit("dark"), 6);
-            QPixmap pixmap = qnSkin->pixmap(lit("item_placeholders/sound.png"), true);
             QSize size = pixmap.size();
             QPixmap dst(size);
-            // We fill in background.
+            // We fill in the background.
             dst.fill(backgroundColor);
             QPainter painter(&dst);
             painter.setRenderHints(QPainter::SmoothPixmapTransform);
@@ -49,15 +85,8 @@ struct ResourceThumbnailProvider::Private
 
             baseProvider.reset(new QnBasicImageProvider(dst.toImage()));
         }
-        else if (const auto camera = request.resource.dynamicCast<QnVirtualCameraResource>())
-        {
-            api::CameraImageRequest cameraRequest(camera, request);
-            baseProvider.reset(new CameraThumbnailProvider(cameraRequest));
-        }
-        else if (request.resource)
-        {
-            baseProvider.reset(new FfmpegImageProvider(request.resource));
-        }
+
+        return true;
     }
 
     QScopedPointer<QnImageProvider> baseProvider;
@@ -86,11 +115,16 @@ api::ResourceImageRequest ResourceThumbnailProvider::requestData() const
 void ResourceThumbnailProvider::setRequestData(const api::ResourceImageRequest& request)
 {
     if (d->baseProvider)
+    {
         d->baseProvider->disconnect(this);
+        d->baseProvider.reset();
+    }
 
-    d->updateRequest(request);
-
-    if (auto p = d->baseProvider.data())
+    if (!d->updateRequest(request))
+    {
+        d->baseProvider.reset();
+    }
+    else if (auto p = d->baseProvider.data())
     {
         connect(p, &QnImageProvider::imageChanged, this, &QnImageProvider::imageChanged);
         connect(p, &QnImageProvider::statusChanged, this, &QnImageProvider::statusChanged);
@@ -123,6 +157,10 @@ void ResourceThumbnailProvider::doLoadAsync()
 {
     if (d->baseProvider)
         d->baseProvider->loadAsync();
+    else
+    {
+        emit statusChanged(Qn::ThumbnailStatus::Invalid);
+    }
 }
 
 } // namespace desktop

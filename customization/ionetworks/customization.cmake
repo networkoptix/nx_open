@@ -1,6 +1,4 @@
 # Components Namings
-set(parent.customization "default")
-set(defaultSkin "dark_blue")
 set(product.name "EZ Pro")
 set(display.product.name "EZ Pro")
 set(display_mobile_name "EZ Pro Mobile")

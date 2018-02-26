@@ -2,7 +2,6 @@ set(supported "false")
 set(defaultSkin "dark_green")
 
 # Components Namings
-set(parent.customization "vista")
 set(product.name "PCMS")
 set(display.product.name "PCMS")
 set(product.name.short "airylife")

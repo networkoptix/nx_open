@@ -4,7 +4,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
+if(developerBuild)
+    set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
+endif()
 
 option(analyzeMutexLocksForDeadlock
     "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
@@ -17,6 +19,16 @@ if(MSVC)
         add_definitions(-D__cpp_constexpr=201304)
     else()
         add_definitions(-DQ_COMPILER_CONSTEXPR)
+    endif()
+endif()
+
+if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
+    # TODO: Use CMake defaults in the next release version (remove the following two lines).
+    string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+    string(REPLACE "-O3" "-O2" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        add_compile_options(-fno-devirtualize)
     endif()
 endif()
 
@@ -133,10 +145,6 @@ if(UNIX)
 endif()
 
 if(LINUX)
-    # TODO: Use CMake defaults in the next release version (remove the following two lines).
-    string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
-    string(REPLACE "-O3" "-O2" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-
     if(NOT "${arch}" MATCHES "arm|aarch64")
         add_compile_options(-msse2)
     endif()
@@ -147,11 +155,7 @@ if(LINUX)
     )
     set(CMAKE_SKIP_BUILD_RPATH ON)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
-
-    # TODO: #dmishin ask #dklychkov about this condition.
-    if(LINUX)
-        set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
-    endif()
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
 
     set(CMAKE_EXE_LINKER_FLAGS
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")

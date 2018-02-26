@@ -95,7 +95,7 @@ const int kQueryTimeoutMs = 15000;
 QnVirtualCameraResourceList cameras(const QSet<QnUuid>& ids)
 {
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    return resourcePool->getResources<QnVirtualCameraResource>(ids);
+    return resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids);
 }
 
 } // namespace
@@ -247,11 +247,11 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
         (const AnalyticsHelper::EventDescriptor& eventType)
         {
             if (!hasDifferentDrivers)
-                return eventType.eventName.text(locale);
+                return eventType.name.text(locale);
 
             return lit("%1 - %2")
                 .arg(eventType.driverName.text(locale))
-                .arg(eventType.eventName.text(locale));
+                .arg(eventType.name.text(locale));
         };
 
     for (const auto& eventType: allEventTypes)
@@ -383,7 +383,7 @@ void QnEventLogDialog::updateData()
     if (serverIssue)
         setCameraList(QSet<QnUuid>());
 
-    bool istantOnly = !hasToggleState(eventType)
+    bool istantOnly = !hasToggleState(eventType, vms::event::EventParameters(), commonModule())
         && eventType != undefinedEvent;
 
     updateActionList(istantOnly);

@@ -7,15 +7,6 @@ Suite Teardown    Close All Browsers
 ${password}    ${BASE PASSWORD}
 ${url}         ${CLOUD TEST}
 
-*** Keywords ***
-Get Reset Password Link
-    [arguments]    ${recipient}
-    Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
-    ${email}    Wait For Email    recipient=${recipient}    timeout=120    subject=Reset your password
-    ${links}    Get Links From Email    ${email}
-    Close Mailbox
-    Return From Keyword    @{links}[1]
-
 *** Test Cases ***
 should demand that email field is not empty
     Open Browser and go to URL    ${url}/restore_password
@@ -28,9 +19,9 @@ should demand that email field is not empty
 should not succeed, if email is not registered
     Open Browser and go to URL    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
-    Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${UNREGISTERED EMAIL}
+    Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${EMAIL UNREGISTERED}
     Click Button    ${RESET PASSWORD BUTTON}
-    Check For Alert Dismissable    Cannot send confirmation Email: Account does not exist
+    Check For Alert Dismissable    ${CANNOT SEND CONFIRMATION EMAIL} ${ACCOUNT DOES NOT EXIST}
     Close Browser
 
 restores password
@@ -112,7 +103,7 @@ should not allow to use one restore link twice
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${SAVE PASSWORD}
-    Check For Alert Dismissable    Cannot save password: Confirmation code is already used or incorrect
+    Check For Alert Dismissable    ${CANNOT SAVE PASSWORD} ${CODE USED/INCORRECT}
     Close Browser
 
 should make not-activated user active by restoring password

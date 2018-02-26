@@ -25,6 +25,7 @@ public:
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
     static const QString kSystemInfoProductionIdParamName;
+    virtual bool isEnabled() const override;
 protected:
     virtual bool processPacket(
         const QHostAddress& discoveryAddr,
@@ -82,7 +83,7 @@ private:
     QnUuid m_resTypeId;
     QMap<QString, std::shared_ptr<QnActiSystemInfoChecker>> m_systemInfoCheckers;
     QnResourceList m_foundUpnpResources;
-    QSet<QString> m_alreadFoundMacAddresses;
+    QSet<QString> m_alreadyFoundMacAddresses;
 };
 
 #endif // #ifdef ENABLE_ACTI

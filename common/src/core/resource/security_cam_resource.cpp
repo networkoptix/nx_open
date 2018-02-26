@@ -83,6 +83,9 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_cachedIsIOModule(
         [this]()->bool{ return getProperty(Qn::IO_CONFIG_PARAM_NAME).toInt() > 0; },
         &m_mutex),
+    m_cachedCanConfigureRemoteRecording(
+        [this]() { return getProperty(Qn::kCanConfigureRemoteRecording).toInt() > 0; },
+        &m_mutex),
     m_cachedAnalyticsSupportedEvents(
         [this]()
         {
@@ -214,8 +217,9 @@ void QnSecurityCamResource::updateInternal(const QnResourcePtr &other, Qn::Notif
 int QnSecurityCamResource::getMaxFps() const
 {
     const auto capabilities = cameraMediaCapability();
-    if (!capabilities.isNull())
-        return capabilities.streamCapabilities.value(Qn::CR_LiveVideo).maxFps;
+    int result = capabilities.streamCapabilities.value(Qn::StreamIndex::primary).maxFps;
+    if (result > 0)
+        return result;
 
     // Compatibility with version < 3.1.2
     QString value = getProperty(Qn::MAX_FPS_PARAM_NAME);
@@ -389,7 +393,7 @@ void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, int chan
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
         auto& regions = (*userAttributesLock)->motionRegions;
-        while (regions.size() < channel)
+        while (channel >= regions.size())
             regions << QnMotionRegion();
         if (regions[channel] == mask)
             return;
@@ -453,11 +457,19 @@ nx::media::CameraMediaCapability QnSecurityCamResource::cameraMediaCapability() 
     return m_cachedCameraMediaCapabilities.get();
 }
 
+void QnSecurityCamResource::setCameraMediaCapability(const nx::media::CameraMediaCapability& value)
+{
+    setProperty(
+        nx::media::kCameraMediaCapabilityParamName, QString::fromLatin1(QJson::serialized(value)));
+    m_cachedCameraMediaCapabilities.reset();
+    saveParams();
+}
+
 bool QnSecurityCamResource::hasDualStreaming() const
 {
     const auto capabilities = cameraMediaCapability();
-    if (!capabilities.isNull())
-        return capabilities.hasDualStreaming;
+    if (capabilities.hasDualStreaming)
+        return true;
 
     // Compatibility with version < 3.1.2
     QString val = getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME);
@@ -468,7 +480,13 @@ bool QnSecurityCamResource::isDtsBased() const {
     return m_cachedIsDtsBased.get();
 }
 
-bool QnSecurityCamResource::isAnalog() const {
+bool QnSecurityCamResource::canConfigureRecording() const
+{
+    return !m_cachedIsDtsBased.get() || m_cachedCanConfigureRemoteRecording.get();
+}
+
+bool QnSecurityCamResource::isAnalog() const
+{
     QString val = getProperty(Qn::ANALOG_PARAM_NAME);
     return val.toInt() > 0;
 }
@@ -662,8 +680,8 @@ bool QnSecurityCamResource::hasTwoWayAudio() const
 bool QnSecurityCamResource::isAudioSupported() const
 {
     const auto capabilities = cameraMediaCapability();
-    if (!capabilities.isNull())
-        return capabilities.hasAudio;
+    if (capabilities.hasAudio)
+        return true;
 
     // Compatibility with version < 3.1.2
     QString val = getProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME);
@@ -1297,6 +1315,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedIsDtsBased.reset();
     m_motionType.reset();
     m_cachedIsIOModule.reset();
+    m_cachedCanConfigureRemoteRecording.reset();
     m_cachedAnalyticsSupportedEvents.reset();
     m_cachedCameraMediaCapabilities.reset();
     m_cachedLicenseType.reset();
@@ -1304,13 +1323,15 @@ void QnSecurityCamResource::resetCachedValues()
 
 Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
 {
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    if (resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP))
-        return Qn::BPG_Predefined;
+    if (qnStaticCommon)
+    {
+        QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+        if (resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP))
+            return Qn::BPG_Predefined;
 
-    if (getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt() > 0)
-        return Qn::BPG_User;
-
+        if (getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt() > 0)
+            return Qn::BPG_User;
+    }
     return Qn::BPG_None;
 }
 
@@ -1318,16 +1339,6 @@ bool QnSecurityCamResource::isIOModule() const
 {
     return m_cachedIsIOModule.get();
 }
-
-#ifdef ENABLE_DATA_PROVIDERS
-QnAudioTransmitterPtr QnSecurityCamResource::getAudioTransmitter()
-{
-    if (!isInitialized())
-        return nullptr;
-    return m_audioTransmitter;
-}
-
-#endif
 
 nx::core::resource::AbstractRemoteArchiveManager* QnSecurityCamResource::remoteArchiveManager()
 {
@@ -1378,12 +1389,17 @@ bool QnSecurityCamResource::doesEventComeFromAnalyticsDriver(nx::vms::event::Eve
     return eventType == nx::vms::event::EventType::analyticsSdkEvent;
 }
 
+Qn::StreamIndex QnSecurityCamResource::toStreamIndex(Qn::ConnectionRole role)
+{
+    return role == Qn::CR_SecondaryLiveVideo ? Qn::StreamIndex::secondary : Qn::StreamIndex::primary;
+}
+
 int QnSecurityCamResource::suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
 {
     if (streamParams.bitrateKbps > 0)
     {
         auto result = streamParams.bitrateKbps;
-        auto streamCapability = cameraMediaCapability().streamCapabilities.value(role);
+        auto streamCapability = cameraMediaCapability().streamCapabilities.value(toStreamIndex(role));
         if (streamCapability.maxBitrateKbps > 0)
             result = qBound(streamCapability.minBitrateKbps, result, streamCapability.maxBitrateKbps);
         return result;
@@ -1415,7 +1431,8 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
     };
     if (role == Qn::CR_Default)
         role = Qn::CR_LiveVideo;
-    auto streamCapability = cameraMediaCapability().streamCapabilities.value(role);
+    auto mediaCaps = cameraMediaCapability();
+    auto streamCapability = mediaCaps.streamCapabilities.value(toStreamIndex(role));
     if (streamCapability.defaultBitrateKbps > 0)
     {
         double coefficient = bitrateCoefficient(quality);
@@ -1432,7 +1449,15 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
     if (bitratePerGopType() != Qn::BPG_None)
         result = result * (30.0 / (qreal)fps);
 
-    return (int)result;
+    if (streamCapability.maxBitrateKbps > 0)
+    {
+        result = qBound(
+            (float)streamCapability.minBitrateKbps,
+            result,
+            (float)streamCapability.maxBitrateKbps);
+    }
+
+    return result;
 }
 
 bool QnSecurityCamResource::setCameraCredentialsSync(

@@ -14,7 +14,6 @@
 #include <utils/common/delete_later.h>
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
-#include <utils/common/toggle.h>
 #include <utils/common/util.h>
 #include <utils/common/delayed.h>
 #include <utils/common/aspect_ratio.h>
@@ -71,6 +70,7 @@
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
 
+#include <ui/graphics/view/graphics_view.h>
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
 #include <ui/workaround/gl_widget_factory.h>
@@ -415,12 +415,12 @@ void QnWorkbenchDisplay::setScene(QGraphicsScene *scene)
         initSceneView();
 }
 
-QnGraphicsView* QnWorkbenchDisplay::view() const
+QGraphicsView* QnWorkbenchDisplay::view() const
 {
     return m_view;
 }
 
-void QnWorkbenchDisplay::setView(QnGraphicsView *view)
+void QnWorkbenchDisplay::setView(QGraphicsView *view)
 {
     if (m_view == view)
         return;
@@ -2427,7 +2427,7 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
         if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
             targetResources.insert(resource);
         if (eventParams.eventType >= vms::event::userDefinedEvent)
-            targetResources.unite(resourcePool()->getResources<QnResource>(eventParams.metadata.cameraRefs).toSet());
+            targetResources.unite(resourcePool()->getResourcesByIds(eventParams.metadata.cameraRefs).toSet());
     }
 
     for (const QnResourcePtr &resource : targetResources)

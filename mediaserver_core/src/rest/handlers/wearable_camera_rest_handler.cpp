@@ -2,22 +2,48 @@
 
 #include <QtCore/QFile>
 
+#include <nx/utils/std/cpp14.h>
+#include <utils/common/synctime.h>
+
+#include <common/common_module.h>
+
 #include <nx_ec/ec_api.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
+
 #include <api/model/wearable_camera_reply.h>
 #include <api/model/wearable_status_reply.h>
-#include <recorder/wearable_archive_synchronizer.h>
-#include <rest/server/rest_connection_processor.h>
+#include <api/model/wearable_prepare_data.h>
+#include <api/model/wearable_prepare_reply.h>
+
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_access/user_access_data.h>
-#include <common/common_module.h>
-#include <plugins/resource/wearable/wearable_camera_resource.h>
+
+#include <recorder/storage_manager.h>
 #include <media_server/media_server_module.h>
 #include <media_server/wearable_upload_manager.h>
 #include <media_server/wearable_lock_manager.h>
+#include <rest/server/rest_connection_processor.h>
 
-#include <nx/utils/std/cpp14.h>
+namespace {
+const qint64 kDetalizationLevelMs = 1;
+const qint64 kMinChunkCheckSize = 100 * 1024 * 1024;
+const qint64 kOneDayMSecs = 1000ll * 3600ll * 24ll;
+
+QnTimePeriod shrinkPeriod(const QnTimePeriod& local, const QnTimePeriodList& remote)
+{
+    QnTimePeriodList locals{ local };
+    locals.excludeTimePeriods(remote);
+
+    if (!locals.empty())
+        return locals[0];
+    return QnTimePeriod();
+}
+
+} // namespace
 
 using namespace nx::mediaserver_core::recorder;
 
@@ -42,13 +68,16 @@ int QnWearableCameraRestHandler::executeGet(
 int QnWearableCameraRestHandler::executePost(
     const QString& path,
     const QnRequestParams& params,
-    const QByteArray& /*body*/,
+    const QByteArray& body,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
     QString action = extractAction(path);
     if (action == "add")
         return executeAdd(params, result, owner);
+
+    if (action == "prepare")
+        return executePrepare(params, body, result, owner);
 
     if (action == "consume")
         return executeConsume(params, result, owner);
@@ -77,19 +106,18 @@ int QnWearableCameraRestHandler::executeAdd(
     if (!requireParameter(params, lit("name"), result, &name))
         return nx::network::http::StatusCode::invalidParameter;
 
-    ec2::ApiCameraData camera;
-    camera.physicalId = QnUuid::createUuid().toSimpleString();
-    camera.fillId();
-    camera.manuallyAdded = true;
-    camera.typeId = QnResourceTypePool::kWearableCameraTypeUuid;
-    camera.parentId = owner->commonModule()->moduleGUID();
-    camera.name = name;
+    ec2::ApiCameraData apiCamera;
+    apiCamera.physicalId = QnUuid::createUuid().toSimpleString();
+    apiCamera.fillId();
+    apiCamera.manuallyAdded = true;
+    apiCamera.typeId = QnResourceTypePool::kWearableCameraTypeUuid;
+    apiCamera.parentId = owner->commonModule()->moduleGUID();
+    apiCamera.name = name;
     // Note that physical id is in path, not in host.
-    camera.url = lit("wearable:///") + camera.physicalId;
+    apiCamera.url = lit("wearable:///") + apiCamera.physicalId;
 
-    const ec2::ErrorCode code = owner->commonModule()->ec2Connection()
-        ->getCameraManager(Qn::kSystemAccess)->addCameraSync(camera);
-
+    ec2::ErrorCode code = owner->commonModule()->ec2Connection()
+        ->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
     if (code != ec2::ErrorCode::ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest,
@@ -97,10 +125,85 @@ int QnWearableCameraRestHandler::executeAdd(
         return nx::network::http::StatusCode::internalServerError;
     }
 
+    ec2::ApiCameraAttributesData apiAttributes;
+    {
+        QnCameraUserAttributePool::ScopedLock attributesLock(
+            owner->commonModule()->cameraUserAttributesPool(), apiCamera.id);
+        (*attributesLock)->audioEnabled = true;
+        (*attributesLock)->motionType = Qn::MT_NoMotion;
+        fromResourceToApi(*attributesLock, apiAttributes);
+    }
+
+    owner->commonModule()->ec2Connection()
+        ->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync({apiAttributes});
+    // We don't care about return code here as wearable camera is already added.
+
     QnWearableCameraReply reply;
-    reply.id = camera.id;
+    reply.id = apiCamera.id;
     result.setReply(reply);
 
+    return nx::network::http::StatusCode::ok;
+}
+
+int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
+    const QByteArray& body,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
+{
+    QnUuid cameraId;
+    if (!requireParameter(params, lit("cameraId"), result, &cameraId))
+        return nx::network::http::StatusCode::invalidParameter;
+
+    QnWearablePrepareData data;
+    if(!QJson::deserialize(body, &data) || data.elements.empty())
+        return nx::network::http::StatusCode::invalidParameter;
+
+    QnVirtualCameraResourcePtr camera =
+        owner->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
+    if (!camera)
+        return nx::network::http::StatusCode::invalidParameter;
+
+    QnWearableUploadManager* uploader = uploadManager(result);
+    if (!uploader)
+        return nx::network::http::StatusCode::internalServerError;
+
+    QnTimePeriod unionPeriod;
+    for (const QnWearablePrepareDataElement& element : data.elements)
+        unionPeriod.addPeriod(element.period);
+
+    QnTimePeriodList serverTimePeriods = qnNormalStorageMan
+        ->getFileCatalog(camera->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
+        ->getTimePeriods(
+            unionPeriod.startTimeMs,
+            unionPeriod.endTimeMs(),
+            kDetalizationLevelMs,
+            /*keepSmallChunks*/ false,
+            std::numeric_limits<int>::max());
+
+    QnWearablePrepareReply reply;
+
+    qint64 totalSize = 0;
+    for (const QnWearablePrepareDataElement& element : data.elements)
+        totalSize += element.size;
+    uploader->clearSpace(totalSize, &reply.availableSpace);
+
+    qint64 minTime = std::numeric_limits<qint64>::max();
+    for (const QnWearablePrepareDataElement& element : data.elements)
+        minTime = std::min(minTime, element.period.startTimeMs);
+
+    qint64 threshold = qnSyncTime->currentMSecsSinceEpoch() - kOneDayMSecs * camera->minDays();
+    if (minTime < threshold)
+        if (!qnNormalStorageMan->canAddChunk(minTime, std::max(kMinChunkCheckSize, totalSize)))
+            reply.footageTooOld = true;
+
+    for (const QnWearablePrepareDataElement& element : data.elements)
+    {
+        QnWearablePrepareReplyElement replyElement;
+        replyElement.period = shrinkPeriod(element.period, serverTimePeriods);
+        reply.elements.push_back(replyElement);
+    }
+
+    result.setReply(reply);
     return nx::network::http::StatusCode::ok;
 }
 

@@ -207,5 +207,6 @@ class RestApi(object):
             raise
         if not raise_exception:
             return response.content
+        data = self._retrieve_data(response)
         self._raise_for_status(response)
-        return self._retrieve_data(response)
+        return data

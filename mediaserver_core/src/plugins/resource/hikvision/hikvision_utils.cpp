@@ -2,6 +2,8 @@
 
 #include "hikvision_utils.h"
 
+#include <nx/network/rtsp/rtsp_types.h>
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -115,10 +117,10 @@ std::vector<ChannelStatusResponse> parseAvailableChannelsResponse(
 boost::optional<ChannelStatusResponse> parseChannelStatusResponse(nx::network::http::StringType message)
 {
     QDomDocument doc;
-    
+
     doc.setContent(message);
     auto element = doc.documentElement();
-    
+
     return parseChannelElement(element);
 }
 
@@ -222,12 +224,10 @@ bool parseVideoElement(const QDomElement& videoElement, ChannelCapabilities* out
         if (propertyElement.isNull())
             return false;
 
-        auto options = propertyElement.attribute(kOptionsAttribute);
-
-        if (options.isEmpty())
-            return false;
-
         auto tag = propertyElement.tagName();
+        auto options = propertyElement.attribute(kOptionsAttribute);
+        if (options.isEmpty() && tag != kFixedBitrateTag)
+            return false;
 
         if (tag == kVideoCodecTypeTag)
             success = parseCodecList(options, &outCapabilities->codecs);
@@ -239,6 +239,13 @@ bool parseVideoElement(const QDomElement& videoElement, ChannelCapabilities* out
             success = parseIntegerList(options, &outCapabilities->quality);
         else if (tag == kMaxFrameRateTag)
             success = parseIntegerList(options, &outCapabilities->fps);
+        else if (tag == kFixedBitrateTag)
+        {
+            outCapabilities->bitrateRange.first = propertyElement.attribute("min").toInt(&success);
+            if (!success)
+                return false;
+            outCapabilities->bitrateRange.second = propertyElement.attribute("max").toInt(&success);
+        }
 
         if (!success)
             return false;
@@ -351,11 +358,13 @@ bool parseTransportElement(
 
     auto rtspPortNumberElement = transportElement.firstChildElement(kRtspPortNumberTag);
     if (rtspPortNumberElement.isNull())
-        return false;
+    {
+        outChannelProperties->rtspPort = nx_rtsp::DEFAULT_RTSP_PORT;
+        return true;
+    }
 
     bool success = false;
-    outChannelProperties->rtspPortNumber = rtspPortNumberElement.text().toInt(&success);
-
+    outChannelProperties->rtspPort = rtspPortNumberElement.text().toInt(&success);
     return success;
 }
 
@@ -413,7 +422,7 @@ bool doRequest(
         result = httpClient.doGet(url);
     else if (method == nx::network::http::Method::put && bufferToSend)
         result = httpClient.doPut(url, kContentType.toUtf8(), *bufferToSend);
-    
+
     if (!result)
         return false;
 
@@ -469,7 +478,7 @@ bool codecSupported(AVCodecID codecId, const ChannelCapabilities& channelCapabil
 
 bool responseIsOk(const boost::optional<CommonResponse>& response)
 {
-    return response 
+    return response
         && response->statusCode == kStatusCodeOk;
 }
 

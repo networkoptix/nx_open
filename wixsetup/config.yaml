@@ -20,7 +20,7 @@ client_update_files_directory: '${client_update_files_directory}'
 server_update_files_directory: '${server_update_files_directory}'
 
 # Source binaries
-client_binary_name: '${product.name}'
+client_binary_name: '${product.name}.exe'
 minilauncher_binary_name: '${minilauncher.binary.name}'
 launcher_version_file: '${launcher.version.file}'
 

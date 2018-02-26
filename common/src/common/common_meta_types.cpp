@@ -31,6 +31,8 @@
 #include <api/model/getnonce_reply.h>
 #include <api/model/wearable_camera_reply.h>
 #include <api/model/wearable_status_reply.h>
+#include <api/model/wearable_prepare_data.h>
+#include <api/model/wearable_prepare_reply.h>
 #include <api/runtime_info_manager.h>
 
 #include <core/resource_access/resource_access_subject.h>
@@ -75,9 +77,10 @@
 #include <core/onvif/onvif_config_data.h>
 
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/events/abstract_event.h>
-#include <nx/vms/event/rule.h>
 #include <nx/vms/event/event_fwd.h>
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/events/analytics_sdk_event.h>
+#include <nx/vms/event/rule.h>
 
 #include <licensing/license.h>
 
@@ -150,6 +153,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::ResourceStatus>();
     qRegisterMetaType<Qn::BitratePerGopType>();
     qRegisterMetaType<nx::vms::event::EventReason>();
+    qRegisterMetaType<nx::vms::event::AnalyticsSdkEventPtr>();
 
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();
@@ -248,6 +252,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnManualResourceSearchEntry>();
     qRegisterMetaType<QnWearableCameraReply>();
     qRegisterMetaType<QnWearableStatusReply>();
+    qRegisterMetaType<QnWearablePrepareData>();
+    qRegisterMetaType<QnWearablePrepareReply>();
 
     qRegisterMetaType<QnPtzPreset>();
     qRegisterMetaType<QnPtzPresetList>();

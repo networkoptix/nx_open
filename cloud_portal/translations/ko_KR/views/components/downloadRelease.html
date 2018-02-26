@@ -2,7 +2,9 @@
     <b> {{release.version}} </b> <small> {{release.productDescription}} </small> <br> <small> 게시 날짜: {{release.date}} </small>
 </h1>
 <div ng-if="release.releaseNotes">
-    <h4> 출시 노트 </h4>
+    <h4>
+        업데이트 내용
+    </h4>
     <div ng-bind-html="release.releaseNotes"></div>
 </div>
 

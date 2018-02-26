@@ -30,6 +30,9 @@
 #include <nx/mediaserver/metadata/manager_pool.h>
 #include <nx/fusion/model_functions.h>
 
+using nx::mediaserver::metadata::VideoDataReceptor;
+using nx::mediaserver::metadata::VideoDataReceptorPtr;
+
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10 * 1000;
 static const int SAVE_BITRATE_FRAME = 300; // value TBD
@@ -89,7 +92,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
 
     Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, [this](const QnResourcePtr&) {
         m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
-        QnMutexLocker mtx( &m_liveMutex );
+        QnMutexLocker lock(&m_liveMutex);
         updateSoftwareMotion();
     });
 
@@ -151,14 +154,14 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 
 Qn::ConnectionRole QnLiveStreamProvider::getRole() const
 {
-    QnMutexLocker mtx( &m_liveMutex );
+    QnMutexLocker lock(&m_liveMutex);
     return m_role;
 }
 
 Qn::StreamIndex QnLiveStreamProvider::encoderIndex() const
 {
-    return getRole() == Qn::CR_LiveVideo ? Qn::StreamIndex::primary
-                                         : Qn::StreamIndex::secondary;
+    return getRole() == Qn::CR_LiveVideo
+        ? Qn::StreamIndex::primary : Qn::StreamIndex::secondary;
 }
 
 void QnLiveStreamProvider::setCameraControlDisabled(bool value)
@@ -171,10 +174,8 @@ void QnLiveStreamProvider::setCameraControlDisabled(bool value)
 QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStreamParams& value)
 {
     QnLiveStreamParams params = value;
-    if (params.bitrateKbps == 0 && params.quality == Qn::QualityNotDefined)
-        params.quality = Qn::QualityNormal;
 
-    // Add advanced parameters
+    // Add advanced parameters.
     const auto advancedParams = m_cameraRes->advancedLiveStreamParams();
     auto advancedLiveStreamParams = getRole() == Qn::CR_SecondaryLiveVideo
         ? advancedParams.secondaryStream : advancedParams.primaryStream;
@@ -195,7 +196,14 @@ QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStr
     if (m_role == Qn::CR_SecondaryLiveVideo)
         params.bitrateKbps = advancedLiveStreamParams.bitrateKbps;
     if (params.bitrateKbps == 0)
-        params.bitrateKbps = m_cameraRes->rawSuggestBitrateKbps(params.quality, params.resolution, params.fps);
+    {
+        if (params.quality == Qn::QualityNotDefined)
+            params.quality = Qn::QualityNormal;
+
+        params.bitrateKbps = m_cameraRes->suggestBitrateForQualityKbps(
+            params.quality, params.resolution, params.fps, m_role);
+    }
+
     return params;
 }
 
@@ -272,9 +280,37 @@ bool QnLiveStreamProvider::canChangeStatus() const
 float QnLiveStreamProvider::getDefaultFps() const
 {
     float maxFps = m_cameraRes->getMaxFps();
-    int reservedSecondStreamFps = m_cameraRes->reservedSecondStreamFps();
+    if (getRole() != Qn::CR_SecondaryLiveVideo)
+    {
+        int reservedSecondStreamFps = m_cameraRes->reservedSecondStreamFps();
+        return qMax(1.0, maxFps - reservedSecondStreamFps);
+    }
 
-    return qMax(1.0, maxFps - reservedSecondStreamFps);
+    // now primary has newFps
+    // this is secondary stream
+    // need to adjust fps
+
+    QnLiveStreamParams params;
+    const Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
+    int newSecondaryStreamFps = m_cameraRes->defaultSecondaryFps(params.quality);
+
+    if (sharingMethod == Qn::PixelsFpsSharing)
+    {
+        if (m_cameraRes->getMaxFps() - m_primaryFps < 2)
+            newSecondaryStreamFps /= 2;
+    }
+    else if (sharingMethod == Qn::BasicFpsSharing)
+    {
+        newSecondaryStreamFps = qMin(
+            newSecondaryStreamFps,
+            m_cameraRes->getMaxFps() - m_primaryFps);
+    }
+    else
+    {
+        // noSharing
+    }
+    return qBound(
+        QnLiveStreamParams::kMinSecondStreamFps, newSecondaryStreamFps, m_cameraRes->getMaxFps());
 }
 
 bool QnLiveStreamProvider::needAnalyzeMotion(Qn::ConnectionRole /*role*/)
@@ -285,7 +321,7 @@ bool QnLiveStreamProvider::needAnalyzeMotion(Qn::ConnectionRole /*role*/)
 
 bool QnLiveStreamProvider::isMaxFps() const
 {
-    QnMutexLocker mtx( &m_liveMutex );
+    QnMutexLocker lock(&m_liveMutex);
     return m_liveParams.fps >= m_cameraRes->getMaxFps() - 0.1;
 }
 
@@ -339,57 +375,21 @@ void QnLiveStreamProvider::onStreamReopen()
     m_totalVideoFrames = 0;
 }
 
-void QnLiveStreamProvider::onGotVideoFrame(
-    const QnCompressedVideoDataPtr& videoData,
-    const QnLiveStreamParams& currentLiveParams,
-    bool isCameraControlRequired)
+/**
+ * @param outNeedUncompressedFrame Set to true if a non-null VideoDataReceptor is returned and
+ *     the uncompressed frame has to be passed to the returned VideoDataReceptor.
+ * @return Stored m_videoDataReceptor, if it exists and sending the frame to metadata plugins is
+ *     needed; null otherwise.
+ */
+VideoDataReceptorPtr QnLiveStreamProvider::getVideoDataReceptorForMetadataPluginsIfNeeded(
+    const QnCompressedVideoDataPtr& compressedFrame,
+    bool* outNeedUncompressedFrame)
 {
-    m_totalVideoFrames++;
-    m_framesSinceLastMetaData++;
-
-    saveMediaStreamParamsIfNeeded(videoData);
-    if (m_totalVideoFrames && (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
-        saveBitrateIfNeeded(videoData, currentLiveParams, isCameraControlRequired);
-
-#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
-
-    bool updateResolutionFromPrimaryStream = !m_cameraRes->hasDualStreaming2()
-        && (m_role == Qn::CR_LiveVideo)
-        && (!m_resolutionCheckTimer.isValid()
-            || m_resolutionCheckTimer.elapsed() > PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS);
-
-    if (needAnalyzeMotion(getRole()))
-    {
-        static const int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()
-            * SECONDARY_STREAM_MAX_RESOLUTION.height();
-
-        const bool needAnalyzeFrame = !m_forcedMotionStream.isEmpty()
-            || videoData->width * videoData->height <= maxSquare;
-
-        const int channel = videoData->channelNumber;
-
-        if (needAnalyzeFrame && m_motionEstimation[channel].analyzeFrame(videoData))
-        {
-            updateStreamResolution(
-                channel,
-                m_motionEstimation[channel].videoResolution());
-        }
-    }
-    else if (updateResolutionFromPrimaryStream)
-    {
-        QSize newResolution;
-        extractMediaStreamParams(videoData, &newResolution);
-        if (newResolution.isValid())
-        {
-            updateStreamResolution( videoData->channelNumber, newResolution );
-            m_resolutionCheckTimer.restart();
-        }
-    }
-
+    VideoDataReceptorPtr videoDataReceptor;
     if (ini().enableMetadataProcessing)
     {
         const bool needToAnalyzeFrame = !ini().analyzeKeyFramesOnly
-            || videoData->flags & QnAbstractMediaData::MediaFlags_AVKey;
+            || compressedFrame->flags & QnAbstractMediaData::MediaFlags_AVKey;
 
         const auto roleForAnalytics = ini().analyzeSecondaryStream
             ? Qn::ConnectionRole::CR_SecondaryLiveVideo
@@ -398,15 +398,103 @@ void QnLiveStreamProvider::onGotVideoFrame(
         const bool needToAnalyzeStream = roleForAnalytics == getRole();
 
         if (needToAnalyzeFrame && needToAnalyzeStream)
+            videoDataReceptor = m_videoDataReceptor.toStrongRef();
+    }
+    if (!videoDataReceptor)
+    {
+        *outNeedUncompressedFrame = false;
+    }
+    else
+    {
+        *outNeedUncompressedFrame =
+           videoDataReceptor->acceptedFrameKind() ==
+               VideoDataReceptor::AcceptedFrameKind::uncompressed;
+    }
+
+    return videoDataReceptor;
+}
+
+void QnLiveStreamProvider::onGotVideoFrame(
+    const QnCompressedVideoDataPtr& compressedFrame,
+    const QnLiveStreamParams& currentLiveParams,
+    bool isCameraControlRequired)
+{
+    m_totalVideoFrames++;
+    m_framesSinceLastMetaData++;
+
+    saveMediaStreamParamsIfNeeded(compressedFrame);
+    if (m_totalVideoFrames && (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
+        saveBitrateIfNeeded(compressedFrame, currentLiveParams, isCameraControlRequired);
+
+#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
+
+    NX_VERBOSE(this) << lm("Proceeding with motion detection and/or feeding metadata plugins");
+
+    bool needToAnalyzeMotion = false;
+    if (needAnalyzeMotion(getRole()))
+    {
+        static const int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()
+            * SECONDARY_STREAM_MAX_RESOLUTION.height();
+        needToAnalyzeMotion = !m_forcedMotionStream.isEmpty()
+            || compressedFrame->width * compressedFrame->height <= maxSquare;
+    }
+    else
+    {
+        const bool updateResolutionFromPrimaryStream = !m_cameraRes->hasDualStreaming2()
+            && m_role == Qn::CR_LiveVideo
+            && (!m_resolutionCheckTimer.isValid()
+                || m_resolutionCheckTimer.elapsed() > PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS);
+        if (updateResolutionFromPrimaryStream)
         {
-            auto receptor = m_videoDataReceptor.toStrongRef();
-            if (receptor && receptor->canAcceptData())
+            QSize newResolution;
+            extractMediaStreamParams(compressedFrame, &newResolution);
+            if (newResolution.isValid())
             {
-                NX_VERBOSE(this) << "Pushing to receptor, timestamp:" << videoData->timestamp;
-                receptor->putData(videoData);
+                updateStreamResolution(compressedFrame->channelNumber, newResolution);
+                m_resolutionCheckTimer.restart();
             }
         }
     }
+
+    bool needUncompressedFrame = false;
+    auto videoDataReceptor = getVideoDataReceptorForMetadataPluginsIfNeeded(
+        compressedFrame, &needUncompressedFrame);
+
+    const int channel = compressedFrame->channelNumber;
+    auto& motionEstimation = m_motionEstimation[channel];
+    CLConstVideoDecoderOutputPtr uncompressedFrame;
+    if (needToAnalyzeMotion)
+    {
+        NX_VERBOSE(this) << lm("Analyzing motion; needUncompressedFrame: %1")
+            .arg(needUncompressedFrame);
+        if (motionEstimation.analyzeFrame(compressedFrame),
+            needUncompressedFrame ? &uncompressedFrame : nullptr)
+        {
+            updateStreamResolution(channel, motionEstimation.videoResolution());
+        }
+    }
+    else if (needUncompressedFrame)
+    {
+        NX_VERBOSE(this) << lm("Decoding frame for metadata plugins");
+        uncompressedFrame = motionEstimation.decodeFrame(compressedFrame);
+        if (!uncompressedFrame)
+        {
+            NX_WARNING(this) << "Unable to decode frame for metadata plugins, timestamp:"
+               << compressedFrame->timestamp;
+        }
+    }
+
+    if (videoDataReceptor)
+    {
+        NX_VERBOSE(this) << "Pushing to receptor, timestamp:" << compressedFrame->timestamp;
+
+        // NOTE: In case uncompressedFrame is passed, compressedFrame is not passed to avoid its
+        // potential deep-copying.
+        videoDataReceptor->putFrame(
+            uncompressedFrame ? nullptr : compressedFrame,
+            uncompressedFrame);
+    }
+
 #endif // ENABLE_SOFTWARE_MOTION_DETECTION
 }
 
@@ -430,33 +518,7 @@ void QnLiveStreamProvider::onPrimaryFpsChanged(int primaryFps)
 {
     QnMutexLocker lock(&m_liveMutex);
     NX_ASSERT(getRole() == Qn::CR_SecondaryLiveVideo);
-    // now primary has newFps
-    // this is secondary stream
-    // need to adjust fps
-
-    QnLiveStreamParams params;
-    const Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
-    int newSecondaryStreamFps = m_cameraRes->defaultSecondaryFps(params.quality);
-
-    if (sharingMethod == Qn::PixelsFpsSharing)
-    {
-        if (m_cameraRes->getMaxFps() - primaryFps < 2 )
-            newSecondaryStreamFps /= 2;
-    }
-    else if (sharingMethod == Qn::BasicFpsSharing)
-    {
-        newSecondaryStreamFps = qMin(
-            newSecondaryStreamFps,
-            m_cameraRes->getMaxFps() - primaryFps);
-    }
-    else
-    {
-        // noSharing
-    }
-    m_liveParams.fps = qBound(
-        QnLiveStreamParams::kMinSecondStreamFps,
-        newSecondaryStreamFps,
-        m_cameraRes->getMaxFps());
+    m_primaryFps = primaryFps;
 }
 
 QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
@@ -512,7 +574,7 @@ bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResource* netRes)
 
 void QnLiveStreamProvider::startIfNotRunning()
 {
-    QnMutexLocker mtx( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
     if (!isRunning())
     {
         m_framesSincePrevMediaStreamCheck = CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1;
@@ -536,6 +598,8 @@ void QnLiveStreamProvider::updateStreamResolution(int channelNumber, const QSize
     if( newResolution == m_videoResolutionByChannelNumber[channelNumber] )
         return;
 
+    NX_VERBOSE(this) << lm("Updating stream resolution");
+
     m_videoResolutionByChannelNumber[channelNumber] = newResolution;
     onStreamResolutionChanged( channelNumber, newResolution );
 
@@ -557,7 +621,7 @@ void QnLiveStreamProvider::updateStreamResolution(int channelNumber, const QSize
     }
 
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
-    QnMutexLocker mtx( &m_liveMutex );
+    QnMutexLocker lock(&m_liveMutex);
     updateSoftwareMotion();
 }
 
@@ -670,6 +734,11 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
         NX_LOG(lm("QnLiveStreamProvider: bitrateInfo has been updated for %1 stream")
                 .arg(QnLexical::serialized(info.encoderIndex)), cl_logINFO);
     }
+}
+
+QnConstResourceAudioLayoutPtr QnLiveStreamProvider::getDPAudioLayout() const
+{
+    return QnConstResourceAudioLayoutPtr();
 }
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -12,14 +12,12 @@
                        class="form-control" ng-value="formatUserName()" readonly>
             </div>
             <div class="form-group">
-                <label for="role">Permissions</label>
-
+                <label for="role">Quyền truy nhập</label>
                 <select class="form-control" name="role" id="role" ng-model="user.role"
                         ng-options="option as ($root.L.accessRoles[option.name].label || option.name) for option in accessRoles"></select>
-
-                <span class="help-block">
-                    {{getRoleDescription()}}
-                </span>
+<span class="help-block">
+{{getRoleDescription()}}
+</span>
             </div>
         </div>
         <div class="modal-footer">
@@ -27,7 +25,7 @@
                             form="shareForm"
                             button-text="buttonText"></process-button>
 
-            <button type="button" class="btn btn-default" ng-click="close()" > Hủy </button>
+            <button type="button" class="btn btn-default" ng-click="close()" >Hủy</button>
         </div>
     </form>
 </div>

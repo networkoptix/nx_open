@@ -96,7 +96,7 @@ copyBuildLibs()
         libnx_fusion
         libnx_kit
         libnx_network
-        libnx_speech_synthesizer
+        libnx_update
         libnx_utils
 
         # ffmpeg
@@ -110,10 +110,7 @@ copyBuildLibs()
         libpostproc
 
         # third-party
-        liblber
-        libldap
         libquazip
-        libsasl2
         libsigar
         libudt
     )
@@ -121,6 +118,12 @@ copyBuildLibs()
     local OPTIONAL_LIBS_TO_COPY=(
         libvpx
     )
+
+    if [ "$BOX" != "edge1" ]; then
+        LIBS_TO_COPY+=(
+            libnx_speech_synthesizer
+        )
+    fi
 
     # Libs for BananaPi-based platforms.
     if [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
@@ -149,6 +152,22 @@ copyBuildLibs()
             libvdpau_sunxi
             libEGL
             libGLESv1_CM
+        )
+    fi
+
+    # OpenSSL (for latest debians).
+    if [ "$BOX" = "rpi" ] || [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
+        LIBS_TO_COPY+=(
+            libssl
+            libcrypto
+        )
+    fi
+
+    if [ "$BOX" = "edge1" ]; then
+        LIBS_TO_COPY+=(
+            liblber
+            libldap
+            libsasl2
         )
     fi
 
@@ -244,7 +263,7 @@ copyBins()
         if [ -d "$BIN_BUILD_DIR/plugins" ]; then
             local FILE
             for FILE in "$BIN_BUILD_DIR/plugins/"*; do
-                if [[ $FILE != *.debug ]]; then
+                if [ -f $FILE ] && [[ $FILE != *.debug ]]; then
                     if [ "$CUSTOMIZATION" != "hanwha" ] && [[ "$FILE" == *hanwha* ]]; then
                         continue
                     fi
@@ -417,6 +436,9 @@ copyAdditionalSysrootFilesIfNeeded()
         echo "Copying (sysroot) libglib required for bananapi on Debian 8 \"Jessie\""
         cp -r "$SYSROOT_LIB_DIR/libglib"* "$LIB_INSTALL_DIR/"
         echo "Copying (sysroot) hdparm required for bananapi on Debian 8 \"Jessie\""
+        cp -r "$PACKAGES_DIR/sysroot/usr/bin/hdparm" "$INSTALL_DIR/mediaserver/bin/"
+    elif [ "$BOX" = "rpi" ]; then
+        echo "Copying (sysroot) hdparm"
         cp -r "$PACKAGES_DIR/sysroot/usr/bin/hdparm" "$INSTALL_DIR/mediaserver/bin/"
     fi
 }

@@ -1,6 +1,7 @@
 #include "resource_access_filter.h"
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
 
 namespace {
 
@@ -31,6 +32,7 @@ bool QnResourceAccessFilter::isShareable(Filter filter, const QnResourcePtr& res
         case QnResourceAccessFilter::MediaFilter:
             return flags.testFlag(Qn::web_page)
                 || flags.testFlag(Qn::live_cam)
+                || flags.testFlag(Qn::wearable_camera)
                 || (flags.testFlag(Qn::remote_server) && !flags.testFlag(Qn::fake));
 
         case QnResourceAccessFilter::LayoutsFilter:
@@ -103,7 +105,7 @@ QSet<QnUuid> QnResourceAccessFilter::filteredResources(
     const QSet<QnUuid>& source)
 {
     QSet<QnUuid> result;
-    for (const auto& resource : filteredResources(filter, resPool->getResources(source)))
+    for (const auto& resource : filteredResources(filter, resPool->getResourcesByIds(source)))
         result << resource->getId();
     return result;
 }

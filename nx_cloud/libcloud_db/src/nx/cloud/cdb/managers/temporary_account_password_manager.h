@@ -19,6 +19,8 @@
 namespace nx {
 namespace cdb {
 
+namespace conf { class Settings; } // namespace
+
 class TemporaryAccountCredentialsEx:
     public data::TemporaryAccountCredentials
 {
@@ -78,6 +80,11 @@ public:
         const data::TemporaryAccountCredentials& tempPasswordData,
         data::Credentials* credentials) = 0;
 
+    virtual nx::utils::db::DBResult updateCredentialsAttributes(
+        nx::utils::db::QueryContext* const queryContext,
+        const data::Credentials& credentials,
+        const data::TemporaryAccountCredentials& tempPasswordData) = 0;
+
     virtual nx::utils::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
         nx::utils::db::QueryContext* const queryContext,
         std::string accountEmail) = 0;
@@ -87,6 +94,10 @@ public:
 
     virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const = 0;
+
+    virtual bool authorize(
+        const std::string& credentialsId,
+        const nx::utils::stree::AbstractResourceReader& inputData) const = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -96,6 +107,7 @@ class TemporaryAccountPasswordManager:
 {
 public:
     TemporaryAccountPasswordManager(
+        const nx::utils::stree::ResourceNameSet& attrNameset,
         nx::utils::db::AsyncSqlQueryExecutor* const dbManager) noexcept(false);
     virtual ~TemporaryAccountPasswordManager();
 
@@ -134,8 +146,17 @@ public:
         const data::TemporaryAccountCredentials& tempPasswordData,
         data::Credentials* credentials) override;
 
+    virtual nx::utils::db::DBResult updateCredentialsAttributes(
+        nx::utils::db::QueryContext* const queryContext,
+        const data::Credentials& credentials,
+        const data::TemporaryAccountCredentials& tempPasswordData) override;
+
     virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const override;
+
+    virtual bool authorize(
+        const std::string& credentialsId,
+        const nx::utils::stree::AbstractResourceReader& inputData) const override;
 
     std::string generateRandomPassword() const;
 
@@ -162,6 +183,7 @@ private:
     constexpr static const int kIndexByLogin = 1;
     constexpr static const int kIndexByAccountEmail = 2;
 
+    const nx::utils::stree::ResourceNameSet& m_attrNameset;
     nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
     nx::utils::Counter m_startedAsyncCallsCounter;
     TemporaryCredentialsDictionary m_temporaryCredentials;
@@ -205,6 +227,10 @@ private:
     std::string preparePasswordString(
         const std::string& passwordHa1,
         const std::string& password);
+
+    void updateCredentialsInCache(
+        const data::Credentials& credentials,
+        const data::TemporaryAccountCredentials& tempPasswordData);
 };
 
 } // namespace cdb

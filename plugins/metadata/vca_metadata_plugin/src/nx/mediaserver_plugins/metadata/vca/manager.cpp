@@ -4,21 +4,19 @@
 
 #include <QtCore/QUrl>
 
-#include <plugins/plugin_internal_tools.h> //< nxpt::fromQnUuidToPluginGuid
+#include <nx/kit/debug.h>
+
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/api/analytics/device_manifest.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/utils/std/cppnx.h>
 
 #include "nx/vca/camera_controller.h"
 
-// #mshevchenko is going to do smth with NX_PRINT/NX_DEBUG.
-//#include <nx/utils/log/log.h>
-//#define NX_DEBUG_STREAM nx::utils::log::detail::makeStream(nx::utils::log::Level::debug, "VCA")
-
-#include <nx/kit/debug.h>
-
-#include <nx/fusion/serialization/json.h>
+#define NX_PRINT_PREFIX "[metadata::vca::Manager] "
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -30,6 +28,8 @@ namespace {
 static const std::chrono::seconds kConnectTimeout(5);
 static const std::chrono::seconds kReceiveTimeout(30);
 
+static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seconds(3);
+
 struct EventMessage
 {
     // Translates vca parameters to their values, e.g. "type" -> "md".
@@ -37,13 +37,13 @@ struct EventMessage
 };
 
 nx::sdk::metadata::CommonEvent* createCommonEvent(
-    const Vca::VcaAnalyticsEventType& event,
-    bool active)
+    const AnalyticsEventType& event, bool active)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
-    commonEvent->setEventTypeId(nxpt::fromQnUuidToPluginGuid(event.eventTypeId));
-    commonEvent->setCaption(event.eventName.value.toStdString());
-    commonEvent->setDescription(event.eventName.value.toStdString());
+    commonEvent->setTypeId(
+        nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(event.eventTypeId));
+    commonEvent->setCaption(event.name.value.toStdString());
+    commonEvent->setDescription(event.name.value.toStdString());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
     commonEvent->setAuxilaryData(event.internalName.toStdString());
@@ -51,71 +51,61 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(
 }
 
 nx::sdk::metadata::CommonEventsMetadataPacket* createCommonEventsMetadataPacket(
-    const Vca::VcaAnalyticsEventType& event)
+    const AnalyticsEventType& event, bool active = true)
 {
     using namespace std::chrono;
 
     auto packet = new nx::sdk::metadata::CommonEventsMetadataPacket();
-    auto commonEvent1 = createCommonEvent(event, /*active*/ true);
-    packet->addItem(commonEvent1);
-    auto commonEvent2 = createCommonEvent(event, /*active*/ false);
-    packet->addItem(commonEvent2);
+    auto commonEvent = createCommonEvent(event, active);
+    packet->addItem(commonEvent);
     packet->setTimestampUsec(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
     packet->setDurationUsec(-1);
     return packet;
 }
 
-static const int kEventMessageParameterCount = 9;
-static const std::array<QByteArray, kEventMessageParameterCount> kEventMessageKeys = {
-    "ip",
-    "unitname",
-    "datetime",
-    "dts",
-    "type",
-    "info",
-    "id",
-    "rulesname",
-    "rulesdts",
-};
+template<class T, size_t N, class Check = std::enable_if_t<!std::is_same<const char*, T>::value>>
+std::array<T, N> makeEventSearchKeys(const std::array<T, N>& src)
+{
+    std::array<T, N> result;
+    std::transform(src.begin(), src.end(), result.begin(),
+        [](const auto& item)
+        {
+            static const T prefix("\n");
+            static const T postfix("=");
+            return prefix + item + postfix;
+        });
+    return result;
+}
 
-// Values of event message parameters may contain names form kEventMessageParameterNames, so to
-// avoid search errors we extend key strings with '\n' symbol, '=' symbol is added for convenience.
-static const std::array<QByteArray, kEventMessageParameterCount> kEventMessageSearchKeys = {
-    "\nip=",
-    "\nunitname=",
-    "\ndatetime=",
-    "\ndts=",
-    "\ntype=",
-    "\ninfo=",
-    "\nid=",
-    "\nrulesname=",
-    "\nrulesdts=",
-};
+static const auto kEventMessageKeys = nx::utils::make_array<QByteArray>(
+    "ip", "unitname", "datetime", "dts", "type", "info", "id", "rulesname", "rulesdts");
 
-std::pair<const char*, const char*> findString(const char* msg, const char* end,
+static const auto kEventMessageSearchKeys = makeEventSearchKeys(kEventMessageKeys);
+
+std::pair<const char*, const char*> findString(const char* messageBegin, const char* messageEnd,
     const QByteArray& key)
 {
-    const char* keyValue = std::search(msg, end, key.begin(), key.end());
-    if (keyValue == end)
-        return std::make_pair(msg, msg);
+    const char* keyValue = std::search(messageBegin, messageEnd, key.begin(), key.end());
+    if (keyValue == messageEnd)
+        return std::make_pair(messageBegin, messageBegin);
     const char* Value = keyValue + key.size();
-    const char* ValueEnd = std::find(Value, end, '\n');
+    const char* ValueEnd = std::find(Value, messageEnd, '\n');
     return std::make_pair(Value, ValueEnd);
 }
 
-EventMessage parseMessage(const char* msg, int len)
+EventMessage parseMessage(const char* message, int messageLength)
 {
-    const char* cur = msg;
-    const char* end = msg + len;
+    const char* current = message;
+    const char* end = message + messageLength;
     EventMessage eventMessage;
 
-    for (int i = 0; i < kEventMessageParameterCount; ++i)
+    for (int i = 0; i < kEventMessageSearchKeys.size(); ++i)
     {
-        auto view = findString(cur, end, kEventMessageSearchKeys[i]);
+        auto view = findString(current, end, kEventMessageSearchKeys[i]);
         QByteArray value = QByteArray(view.first, view.second - view.first);
         eventMessage.parameters.insert(std::make_pair(kEventMessageKeys[i], value));
-        cur = view.second;
+        current = view.second;
     }
     return eventMessage;
 }
@@ -168,10 +158,10 @@ nx::sdk::Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
 
     // Switch on VCA-camera heartbeat and set interval slightly less then kReceiveTimeout.
     if (!vcaCameraConrtoller.setHeartbeat(
-        nx::vca::Heartbeat(kReceiveTimeout - std::chrono::seconds(2),
-        /*enabled*/ true)))
+        nx::vca::Heartbeat(kReceiveTimeout - std::chrono::seconds(2), /*enabled*/ true)))
     {
         NX_PRINT << "Failed to set VCA-camera heartbeat";
+        return nx::sdk::Error::networkError;
     }
 
     return nx::sdk::Error::noError;
@@ -181,7 +171,7 @@ nx::sdk::Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
 
 Manager::Manager(Plugin* plugin,
     const nx::sdk::CameraInfo& cameraInfo,
-    const Vca::VcaAnalyticsDriverManifest& typedManifest)
+    const AnalyticsDriverManifest& typedManifest)
 {
     m_url = cameraInfo.url;
     m_auth.setUser(cameraInfo.login);
@@ -195,13 +185,13 @@ Manager::Manager(Plugin* plugin,
 
     static const int kBufferCapacity = 4096;
     m_buffer.reserve(kBufferCapacity);
-    NX_PRINT << "Manager created " << this;
+    NX_PRINT << "VCA metadata manager created";
 }
 
 Manager::~Manager()
 {
     stopFetchingMetadata();
-    NX_PRINT << "Manager destroyed " << this;
+    NX_PRINT << "VCA metadata manager destroyed";
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -217,6 +207,45 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
         return static_cast<nxpl::PluginInterface*>(this);
     }
     return nullptr;
+}
+
+void Manager::treatMessage(int size)
+{
+    std::replace(m_buffer.data(), m_buffer.data() + size - 1, '\0', '_');
+    EventMessage message = parseMessage(m_buffer.data(), size);
+
+    const auto parameterIterator = message.parameters.find("type");
+    if (parameterIterator != message.parameters.end())
+        NX_PRINT << "Message received. Type = " << parameterIterator->second.constData();
+    else
+    {
+        NX_PRINT << "Message with unknown type received. Type = "
+            << parameterIterator->second.constData();
+        return;
+    }
+    const QString internalName = parameterIterator->second;
+
+    auto it = std::find_if(m_eventsToCatch.begin(), m_eventsToCatch.end(),
+        [&internalName](ElapsedEvent& event)
+    {
+        return event.type.internalName == internalName;
+    });
+    if (it != m_eventsToCatch.cend())
+    {
+        sendEventStartedPacket(it->type);
+        if (it->type.isStateful())
+        {
+            it->timer.start();
+            m_timer.start(timeTillCheck(), [this](){ onTimer(); });
+        }
+    }
+    else
+    {
+        NX_PRINT << "Packed with undefined event type received. Uuid = "
+            << internalName.toStdString();
+    }
+
+    cleanBuffer(m_buffer, size);
 }
 
 void Manager::onReceive(SystemError::ErrorCode, size_t)
@@ -246,8 +275,8 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         }
         if (memcmp(m_buffer.data(), kPreamble, kPrefixSize) != 0)
         {
-            // Corrupted message. Throw all received data away and read new.
-            NX_PRINT << "Wrong preamble = " << m_buffer.mid(0, kPrefixSize).data()
+            NX_PRINT << "Corrupted message. Wrong preamble, preamble = "
+                << m_buffer.mid(0, kPrefixSize).data()
                 << ", buffer size = " << m_buffer.size();
             cleanBuffer(m_buffer, m_buffer.size());
             break;
@@ -256,8 +285,7 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         int size = atoi(p);
         if (size == 0 || size > m_buffer.capacity())
         {
-            // Corrupted message. Throw all received data away and read new.
-            NX_PRINT << "Wrong message size, message size = " << size
+            NX_PRINT << "Corrupted message. Wrong message size, message size = " << size
                 << ", buffer size = " << m_buffer.size();
             cleanBuffer(m_buffer, m_buffer.size());
             break;
@@ -270,34 +298,14 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         }
 
         NX_PRINT << "Message ready, size = " << size << " buffer size = " << m_buffer.size();
-
-        std::replace(m_buffer.data(), m_buffer.data() + size - 1, '\0', '_');
-        EventMessage message = parseMessage(m_buffer.data(), size);
-
-        auto it = message.parameters.find("type");
-        if (it != message.parameters.end())
-            NX_PRINT << "Message received, type=" << it->second.constData() << ".";
-        else
-            NX_PRINT << "Message with unknown type got.";
-
-        const auto& event = m_plugin->eventByInternalName(it->second);
-
-        if (std::find(m_eventsToCatch.cbegin(), m_eventsToCatch.cend(), event.eventTypeId)
-            != m_eventsToCatch.cend())
-        {
-            auto packet = createCommonEventsMetadataPacket(event);
-            m_handler->handleMetadata(nx::sdk::Error::noError, packet);
-            NX_PRINT << "Event " << it->second.constData() << " sent to server";
-        }
-
-        cleanBuffer(m_buffer, size);
+        treatMessage(size);
         NX_PRINT << "Message treated, size = " << size << " buffer size = " << m_buffer.size()
             << "\n";
     }
     NX_PRINT << "Buffer processing finished. Iteration id = " << id
         << " buffer size = " << m_buffer.size();
 
-    this->m_tcpSocket->readSomeAsync(
+    m_tcpSocket->readSomeAsync(
         &m_buffer,
         [this](SystemError::ErrorCode errorCode, size_t size)
         {
@@ -305,8 +313,73 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         });
 }
 
-nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler* handler,
-    nxpl::NX_GUID* typeList, int typeListSize)
+std::chrono::milliseconds Manager::timeTillCheck() const
+{
+    std::chrono::milliseconds maxElapsed(0);
+    for (const ElapsedEvent& event: m_eventsToCatch)
+    {
+        if (event.type.isStateful())
+            maxElapsed = std::max(maxElapsed, event.timer.elapsedSinceStart());
+    }
+    auto result = kMinTimeBetweenEvents - maxElapsed;
+    result = std::max(result, std::chrono::milliseconds::zero());
+    return result;
+}
+
+void Manager::sendEventStartedPacket(const AnalyticsEventType& event) const
+{
+    auto packet = createCommonEventsMetadataPacket(event, /*active*/ true);
+    m_handler->handleMetadata(nx::sdk::Error::noError, packet);
+    NX_PRINT
+        << (event.isStateful() ? "Event [start] " : "Event [pulse] ")
+        << event.internalName.toUtf8().constData()
+        << " sent to server";
+}
+
+void Manager::sendEventStoppedPacket(const AnalyticsEventType& event) const
+{
+    auto packet = createCommonEventsMetadataPacket(event, /*active*/ false);
+    m_handler->handleMetadata(nx::sdk::Error::noError, packet);
+    NX_PRINT << "Event [stop] " << event.internalName.toUtf8().constData()
+        << " sent to server";
+}
+
+void Manager::onTimer()
+{
+    for (ElapsedEvent& event: m_eventsToCatch)
+    {
+        if (event.timer.hasExpiredSinceStart(kMinTimeBetweenEvents))
+        {
+            event.timer.stop();
+            sendEventStoppedPacket(event.type);
+        }
+    }
+
+    if (isTimerNeeded())
+        m_timer.start(timeTillCheck(), [this](){ onTimer(); });
+}
+
+/*
+ * We need timer if at least one state-dependent event took place recently (i.e. its timer has been
+ * started, but not stopped yet).
+ */
+bool Manager::isTimerNeeded() const
+{
+    for (const ElapsedEvent& event: m_eventsToCatch)
+    {
+        if (event.timer.isStarted())
+            return true;
+    }
+    return false;
+}
+
+nx::sdk::Error Manager::setHandler(nx::sdk::metadata::MetadataHandler* handler)
+{
+    m_handler = handler;
+    return nx::sdk::Error::noError;
+}
+
+nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
 {
     QString host = m_url.host();
     nx::vca::CameraController vcaCameraConrtoller(host, m_auth.user(), m_auth.password());
@@ -315,10 +388,14 @@ nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler
     if (error != nx::sdk::Error::noError)
         return error;
 
-    m_eventsToCatch.resize(typeListSize);
-    for (int i = 0; i < typeListSize; ++i)
+    for (int i = 0; i < eventTypeListSize; ++i)
     {
-        m_eventsToCatch[i] = nxpt::fromPluginGuidToQnUuid(typeList[i]);
+        QnUuid id = nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(eventTypeList[i]);
+        const AnalyticsEventType* eventType = m_plugin->eventByUuid(id);
+        if (!eventType)
+            NX_PRINT << "Unknown event type. TypeId = " << id.toStdString();
+        else
+            m_eventsToCatch.emplace_back(*eventType);
     }
 
     if (!vcaCameraConrtoller.readTcpServerPort())
@@ -331,18 +408,18 @@ nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler
     QString ipPort = kAddressPattern.arg(
         m_url.host(), QString::number(vcaCameraConrtoller.tcpServerPort()));
 
-    SocketAddress vcaAddress(ipPort);
+    nx::network::SocketAddress vcaAddress(ipPort);
     m_tcpSocket = new nx::network::TCPSocket;
-    m_tcpSocket->setNonBlockingMode(true);
-    m_tcpSocket->setRecvTimeout(kReceiveTimeout.count() * 1000);
-    if (!m_tcpSocket->connect(vcaAddress, kConnectTimeout.count() * 1000))
+    if (!m_tcpSocket->connect(vcaAddress, kConnectTimeout))
     {
         NX_PRINT << "Failed to connect to camera tcp notification server";
         return nx::sdk::Error::networkError;
     }
+    m_tcpSocket->bindToAioThread(m_timer.getAioThread());
+    m_tcpSocket->setNonBlockingMode(true);
+    m_tcpSocket->setRecvTimeout(kReceiveTimeout.count() * 1000);
     NX_PRINT << "Connection to camera tcp notification server established";
 
-    m_handler = handler;
     m_tcpSocket->readSomeAsync(
         &m_buffer,
         [this](SystemError::ErrorCode errorCode, size_t size)
@@ -357,9 +434,17 @@ nx::sdk::Error Manager::stopFetchingMetadata()
 {
     if (m_tcpSocket)
     {
-        m_tcpSocket->pleaseStopSync();
+        nx::utils::promise<void> promise;
+        m_timer.pleaseStop(
+            [&]()
+            {
+                m_tcpSocket->pleaseStopSync();
+                promise.set_value();
+            });
+        promise.get_future().wait();
         delete m_tcpSocket;
         m_tcpSocket = nullptr;
+        m_eventsToCatch.clear();
     }
     return nx::sdk::Error::noError;
 }
@@ -378,7 +463,6 @@ const char* Manager::capabilitiesManifest(nx::sdk::Error* error)
         if(rule.second.ruleEnabled) //< At least one enabled rule.
             return m_cameraManifest;
     }
-
     return "";
 }
 

@@ -106,6 +106,11 @@ bool DummySocket::getLastError(SystemError::ErrorCode* /*errorCode*/) const
     return false;
 }
 
+bool DummySocket::setIpv6Only( bool /*val*/ )
+{
+    return false;
+}
+
 AbstractSocket::SOCKET_HANDLE DummySocket::handle() const
 {
     return 0;

@@ -1,5 +1,5 @@
 {
-  "language_name": "Türk",
+  "language_name": "DİL ADI",
   "productName": "{{PRODUCT_NAME}}",
   "clientProtocol": "{{CLIENT_PROTOCOL}}:",
   "dialogs": {
@@ -88,7 +88,7 @@
       "description": "Canlı video görüntüleyebilir ve arşive gözatabilir"
     },
     "liveViewer": {
-      "label": "Canlı İzleme",
+      "label": "Canlı İzleyici",
       "description": "Sadece canlı vidyo izleyebilir"
     },
     "advancedViewer": {
@@ -200,12 +200,12 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "El Capitan, OSX 10.12 Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS,  LTS"
       },
       "macos": {
         "label": "Mac OS",

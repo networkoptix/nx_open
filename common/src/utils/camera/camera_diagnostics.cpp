@@ -210,6 +210,13 @@ public:
                     << QnDeviceDependentStrings::getNameFromSet(resourcePool, details, device);
                 break;
             }
+            case cameraOldFirmwareError:
+            {
+                errorMessageParts <<
+                    tr("Please update firmware. "
+                       "Minimal supported version is %1. Current version is %2").arg(p1).arg(p2);
+                break;
+            }
             case badMediaStream:
             {
                 QnCameraDeviceStringSet details(

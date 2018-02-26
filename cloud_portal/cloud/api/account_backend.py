@@ -3,7 +3,7 @@ from django import db
 import models
 from api.controllers.cloud_api import Account
 from django.contrib.auth.backends import ModelBackend
-from api.helpers.exceptions import APIRequestException, APILogicException, ErrorCodes
+from api.helpers.exceptions import APIRequestException, APIException, APILogicException, ErrorCodes
 from django.core.exceptions import ObjectDoesNotExist
 from cloud import settings
 
@@ -30,8 +30,15 @@ class AccountBackend(ModelBackend):
         user = Account.get(username, password)  # first - check cloud_db
 
         if user and 'email' in user:
-            if username.find('@') > -1 and username != user['email']:  # code and email from cloud_db are wrong
-                raise APILogicException('Login does not match users email', ErrorCodes.wrong_code)
+            if username.find('@') > -1:
+                if username != user['email']:  # code and email from cloud_db are wrong
+                    raise APILogicException('Login does not match users email', ErrorCodes.wrong_code)
+            elif username.find('-') > -1:  # CLOUD-1661 - temp login now has format: guid-crc32(accountEmail)
+                import zlib
+                (uuid, temp_crc32) = username.split('-')
+                email_crc32 = zlib.crc32(user['email']) & 0xffffffff  # convert signed to unsigned crc32
+                if email_crc32 != int(temp_crc32):
+                    raise APILogicException('Login does not match users email', ErrorCodes.wrong_code)
 
             if not AccountBackend.is_email_in_portal(user['email']):
                 # so - user is in cloud_db, but not in cloud_portal
@@ -68,7 +75,13 @@ class AccountManager(db.models.Manager):
         code = extra_fields.pop("code", None)
 
         # this line will send request to cloud_db and raise an exception if fails:
-        Account.register(email, password, first_name, last_name, code=code)
+        try:
+            Account.register(email, password, first_name, last_name, code=code)
+        except APIException as a:
+            if a.error_code == ErrorCodes.account_exists and not AccountBackend.is_email_in_portal(email):
+                raise APILogicException('User is not in portal', ErrorCodes.portal_critical_error)
+            else:
+                raise
         user = self.model(email=email,
                           first_name=first_name,
                           last_name=last_name,

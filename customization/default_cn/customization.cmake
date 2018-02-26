@@ -1,6 +1,4 @@
 # Components Namings
-set(parent.customization "default")
-set(defaultSkin "dark_blue")
 set(product.name "Nx Witness Chinese")
 set(display.product.name "Nx Witness")
 set(product.name.short "hdwitness_all_cn")

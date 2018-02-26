@@ -17,7 +17,9 @@ Controller::Controller(const conf::Settings& settings):
     m_dbInstanceController(settings.dbConnectionOptions()),
     m_emailManager(EMailManagerFactory::create(settings)),
     m_streeManager(settings.auth().rulesXmlPath),
-    m_tempPasswordManager(&m_dbInstanceController.queryExecutor()),
+    m_tempPasswordManager(
+        m_streeManager.resourceNameSet(),
+        &m_dbInstanceController.queryExecutor()),
     m_accountManager(
         settings,
         m_streeManager,
@@ -207,7 +209,8 @@ void Controller::initializeSecurity()
         m_streeManager,
         m_accountManager,
         m_systemManager,
-        m_systemManager);
+        m_systemManager,
+        m_tempPasswordManager);
 }
 
 void Controller::initializeDataSynchronizationEngine()

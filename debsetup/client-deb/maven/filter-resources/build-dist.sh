@@ -54,9 +54,11 @@ BUILD_INFO_TXT=@libdir@/build_info.txt
 LOGS_DIR="@libdir@/build_logs"
 LOG_FILE="$LOGS_DIR/client-build-dist.log"
 
+# [in] Library name
+# [in] Destination directory
 cp_sys_lib()
 {
-    "$SOURCE_ROOT_PATH"/build_utils/copy_system_library -c "$COMPILER" "$@"
+    "$SOURCE_ROOT_PATH"/build_utils/copy_system_library.sh -c "$COMPILER" "$@"
 }
 
 buildDistribution()
@@ -83,8 +85,8 @@ buildDistribution()
     cp -r qt.conf $BINSTAGE/
 
     echo "Copying client binaries and old version libs"
-    cp -r $CLIENT_BIN_PATH/desktop_client $BINSTAGE/client-bin
-    cp -r $CLIENT_BIN_PATH/applauncher $BINSTAGE/applauncher-bin
+    cp -r "$CLIENT_BIN_PATH/@client.binary.name@" "$BINSTAGE"
+    cp -r "$CLIENT_BIN_PATH/@applauncher.binary.name@" "$BINSTAGE"
     cp -r bin/client $BINSTAGE
     cp -r $CLIENT_BIN_PATH/@launcher.version.file@ $BINSTAGE
     cp -r bin/applauncher $BINSTAGE

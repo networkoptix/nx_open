@@ -1,6 +1,4 @@
 # Components Namings
-set(parent.customization "default")
-set(defaultSkin "dark_blue")
 set(product.name "FlyView")
 set(display.product.name "FlyView")
 set(display_mobile_name "FlyView Mobile")

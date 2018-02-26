@@ -91,7 +91,7 @@ String Engine::makeCertificateAndKey(
 static String x509info(X509& x509)
 {
     auto issuer = utils::wrapUnique(X509_NAME_oneline(
-        X509_get_issuer_name(&x509), NULL, 0), &CRYPTO_free);
+        X509_get_issuer_name(&x509), NULL, 0), [](char* ptr) { free(ptr); });
 
     if (!issuer || !issuer.get())
         return String("unavaliable");

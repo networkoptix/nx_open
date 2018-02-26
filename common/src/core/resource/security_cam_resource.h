@@ -13,7 +13,6 @@
 #include <common/common_globals.h>
 #include <api/model/api_ioport_data.h>
 
-#include <core/dataconsumer/audio_data_transmitter.h>
 #include <core/misc/schedule_task.h>
 
 #include <core/resource/media_resource.h>
@@ -26,10 +25,6 @@
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
-
-#ifdef ENABLE_DATA_PROVIDERS
-typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
-#endif
 
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
 {
@@ -101,6 +96,9 @@ public:
     /** Returns true if camera stores archive on a external system */
     bool isDtsBased() const;
 
+    /** @return true if recording schedule can be configured for this device. */
+    bool canConfigureRecording() const;
+
     /** Returns true if it is a analog camera */
     bool isAnalog() const;
 
@@ -137,6 +135,7 @@ public:
     void setCameraCapability(Qn::CameraCapability capability, bool value);
 
     nx::media::CameraMediaCapability cameraMediaCapability() const;
+    void setCameraMediaCapability(const nx::media::CameraMediaCapability& value);
 
     /*!
         Change output with id \a ouputID state to \a activate
@@ -296,10 +295,6 @@ public:
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
 
-#ifdef ENABLE_DATA_PROVIDERS
-    virtual QnAudioTransmitterPtr getAudioTransmitter();
-#endif
-
     bool isEnoughFpsToRunSecondStream(int currentFps) const;
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager();
 
@@ -328,6 +323,9 @@ public:
      */
     virtual bool isRemoteArchiveMotionDetectionEnabled() const;
 
+    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
+
+    static Qn::StreamIndex toStreamIndex(Qn::ConnectionRole role);
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -382,7 +380,6 @@ signals:
         const QString& caption,
         const QString& description,
         qint64 timestamp );
-
 protected slots:
     virtual void at_initializedChanged();
     virtual void at_motionRegionChanged();
@@ -415,11 +412,6 @@ protected:
     virtual bool isInputPortMonitored() const;
 
     virtual Qn::LicenseType calculateLicenseType() const;
-    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
-protected:
-#ifdef ENABLE_DATA_PROVIDERS
-    QnAudioTransmitterPtr m_audioTransmitter;
-#endif
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;
@@ -437,6 +429,7 @@ private:
     CachedValue<bool> m_cachedIsDtsBased;
     CachedValue<Qn::MotionType> m_motionType;
     CachedValue<bool> m_cachedIsIOModule;
+    CachedValue<bool> m_cachedCanConfigureRemoteRecording;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;

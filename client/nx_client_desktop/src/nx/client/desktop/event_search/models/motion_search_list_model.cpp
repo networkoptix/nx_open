@@ -10,6 +10,7 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <nx/client/core/utils/human_readable.h>
+#include <nx/utils/log/assert.h>
 #include <nx/vms/event/event_fwd.h>
 
 namespace nx {
@@ -98,19 +99,20 @@ void MotionSearchListModel::fetchMore(const QModelIndex& /*parent*/)
     d->fetchMore();
 }
 
+bool MotionSearchListModel::fetchInProgress() const
+{
+    return d->fetchInProgress();
+}
+
 int MotionSearchListModel::totalCount() const
 {
     return d->totalCount();
 }
 
-QnTimePeriod MotionSearchListModel::selectedTimePeriod() const
+void MotionSearchListModel::relevantTimePeriodChanged(const QnTimePeriod& previousValue)
 {
-    return d->selectedTimePeriod();
-}
-
-void MotionSearchListModel::setSelectedTimePeriod(const QnTimePeriod& value)
-{
-    d->setSelectedTimePeriod(value);
+    NX_ASSERT(previousValue != relevantTimePeriod());
+    d->reset();
 }
 
 } // namespace desktop

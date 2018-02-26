@@ -14,7 +14,7 @@ angular.module('cloudApp')
             if(system.stateOfHealth == 'offline'){
                 return 'offline'
             }
-            if(!system.capabilities || system.capabilities.indexOf('cloudMerge') < 0){
+            if(!system.canMerge){
                 return 'cannotMerge';
             }
             return '';
@@ -23,7 +23,7 @@ angular.module('cloudApp')
         account.get().then(function(user){
             $scope.user = user;
             $scope.systems = systemsProvider.getMySystems(user.email, $scope.system.id);
-            $scope.canMerge = $scope.system.isMine && $scope.systems.length > 0;
+            $scope.showMergeForm = $scope.system.canMerge && $scope.systems.length > 0;
             $scope.targetSystem = $scope.systems[0];
             $scope.systemMergeable = checkMergeAbility($scope.targetSystem);
         });
@@ -38,7 +38,7 @@ angular.module('cloudApp')
             if(system.stateOfHealth == 'offline'){
                 status = ' (offline)';
             }
-            else if(system.stateOfHealth == 'online' && (!system.capabilities || system.capabilities.indexOf('cloudMerge') < 0)){
+            else if(system.stateOfHealth == 'online' && system.canMerge){
                 status = ' (incompatable)';
             }
             return system.name + status;
@@ -61,7 +61,9 @@ angular.module('cloudApp')
             successMessage: L.system.mergeSystemSuccess
         }).then(function(){
             systemsProvider.forceUpdateSystems();
-            dialogs.closeMe($scope, {"anotherSystemId":$scope.targetSystem.id, "role": $scope.masterSystemId == $scope.system.id ? 'master' : 'slave'});
+            dialogs.closeMe($scope, {"anotherSystemId":$scope.targetSystem.id,
+                                     "role": $scope.masterSystemId == $scope.system.id ? Config.systemStatuses.master
+                                                                                       : Config.systemStatuses.slave});
         });
 
         $scope.close = function(){

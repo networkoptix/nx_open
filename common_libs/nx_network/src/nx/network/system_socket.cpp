@@ -129,8 +129,7 @@ SocketAddress Socket<SocketInterfaceToImplement>::getLocalAddress() const
         socklen_t addrLen = sizeof(addr);
         if (::getsockname(m_fd, (sockaddr*)&addr, &addrLen) < 0)
             return SocketAddress();
-
-        return SocketAddress(addr.sin_addr, ntohs(addr.sin_port));
+        return SocketAddress(addr);
     }
     else if (m_ipVersion == AF_INET6)
     {
@@ -138,8 +137,7 @@ SocketAddress Socket<SocketInterfaceToImplement>::getLocalAddress() const
         socklen_t addrLen = sizeof(addr);
         if (::getsockname(m_fd, (sockaddr*)&addr, &addrLen) < 0)
             return SocketAddress();
-
-        return SocketAddress(addr.sin6_addr, ntohs(addr.sin6_port));
+        return SocketAddress(addr);
     }
 
     return SocketAddress();
@@ -356,6 +354,15 @@ bool Socket<SocketInterfaceToImplement>::setSendTimeout(unsigned int ms)
     }
     m_writeTimeoutMS = ms;
     return true;
+}
+
+template<typename SocketInterfaceToImplement>
+bool Socket<SocketInterfaceToImplement>::setIpv6Only(bool val)
+{
+    NX_ASSERT(this->m_ipVersion == AF_INET6);
+
+    const int on = val ? 1 : 0;
+    return ::setsockopt(this->m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&on, sizeof(on)) == 0;
 }
 
 template<typename SocketInterfaceToImplement>
@@ -724,8 +731,7 @@ SocketAddress CommunicatingSocket<SocketInterfaceToImplement>::getForeignAddress
         socklen_t addrLen = sizeof(addr);
         if (::getpeername(this->m_fd, (sockaddr*)&addr, &addrLen) < 0)
             return SocketAddress();
-
-        return SocketAddress(addr.sin_addr, ntohs(addr.sin_port));
+        return SocketAddress(addr);
     }
     else if (this->m_ipVersion == AF_INET6)
     {
@@ -733,8 +739,7 @@ SocketAddress CommunicatingSocket<SocketInterfaceToImplement>::getForeignAddress
         socklen_t addrLen = sizeof(addr);
         if (::getpeername(this->m_fd, (sockaddr*)&addr, &addrLen) < 0)
             return SocketAddress();
-
-        return SocketAddress(addr.sin6_addr, ntohs(addr.sin6_port));
+        return SocketAddress(addr);
     }
 
     return SocketAddress();
@@ -1746,13 +1751,30 @@ void UDPSocket::sendToAsync(
 {
     if (endpoint.address.isIpAddress())
     {
-        setDestAddr(endpoint);
+        SocketAddress resolvedEndpoint;
+        resolvedEndpoint.address = endpoint.address.toPureIpAddress(this->m_ipVersion);
+        resolvedEndpoint.port = endpoint.port;
+
+        // TODO: #ak In case of ipv6 we have to determine scope_id.
+
+        // It is possible that address still has to be resolved.
+        // E.g., if ipv6 address has been passed to ipv4 socket.
+        // In this case - returning an error.
+        if (!resolvedEndpoint.address.isIpAddress())
+        {
+            return post(std::bind(std::move(handler),
+                SystemError::addrNotAvailable,
+                SocketAddress(),
+                (size_t)-1));
+        }
+
+        setDestAddr(resolvedEndpoint);
         return sendAsync(
             buffer,
-            [endpoint, handler = std::move(handler)](
+            [resolvedEndpoint, handler = std::move(handler)](
                 SystemError::ErrorCode code, size_t size)
             {
-                handler(code, endpoint, size);
+                handler(code, resolvedEndpoint, size);
             });
     }
 
@@ -1764,9 +1786,23 @@ void UDPSocket::sendToAsync(
             if (code != SystemError::noError)
                 return handler(code, SocketAddress(), 0);
 
-            // TODO: Here we select first address with hope it is correct one. This will never work
-            // for NAT64, so we have to fix it somehow.
-            sendToAsync(buffer, SocketAddress(ips.front(), port), std::move(handler));
+            auto addressIter = std::find_if(
+                ips.begin(), ips.end(),
+                [this](const HostAddress& addr)
+                {
+                    if (m_ipVersion == AF_INET && addr.ipV4())
+                        return true;
+                    if (m_ipVersion == AF_INET6 && addr.isPureIpV6())
+                        return true;
+                    return false;
+                });
+            if (addressIter == ips.end())
+                addressIter = ips.begin();
+
+            sendToAsync(
+                buffer,
+                SocketAddress(*addressIter, port),
+                std::move(handler));
         });
 }
 

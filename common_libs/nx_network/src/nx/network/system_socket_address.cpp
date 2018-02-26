@@ -69,19 +69,9 @@ SocketAddress SystemSocketAddress::toSocketAddress() const
         return SocketAddress();
 
     if (m_sockaddr.untyped.sa_family == AF_INET)
-    {
-        return SocketAddress(m_sockaddr.v4.sin_addr, ntohs(m_sockaddr.v4.sin_port));
-    }
+        return SocketAddress(m_sockaddr.v4);
     else if (m_sockaddr.untyped.sa_family == AF_INET6)
-    {
-        HostAddress resultHostAddr;
-        if (m_sockaddr.v6.sin6_scope_id  == 0)
-            resultHostAddr = HostAddress(m_sockaddr.v6.sin6_addr);
-        else
-            resultHostAddr = HostAddress(m_sockaddr.v6.sin6_addr, m_sockaddr.v6.sin6_scope_id);
-
-        return SocketAddress(resultHostAddr, ntohs(m_sockaddr.v6.sin6_port));
-    }
+        return SocketAddress(m_sockaddr.v6);
 
     NX_ASSERT(false, lm("Unknown socket family type: %1").arg(m_sockaddr.untyped.sa_family));
     return SocketAddress();

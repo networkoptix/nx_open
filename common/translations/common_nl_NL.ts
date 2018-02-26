@@ -632,14 +632,14 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n I/O Module(s)</numerusform>
         <numerusform>%n I/O Module(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n I/O module(s)</numerusform>
         <numerusform>%n I/O module(s)</numerusform>
       </translation>
@@ -1519,7 +1519,7 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation>Analytics Event</translation>
+      <translation type="unfinished">Analytics Event</translation>
     </message>
     <message>
       <source>%1 at %2</source>

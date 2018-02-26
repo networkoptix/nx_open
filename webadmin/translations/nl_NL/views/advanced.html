@@ -106,7 +106,7 @@
             Er is geen opslaglocatie gekozen voor het wegschrijven van data. Video zal niet worden opgenomen op deze server.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            De gereserveerde ruimte is groter dan de beschikbare ruimte. Er kan video-data worden verwijderd om ruimte beschikbaar te maken.
+            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Pas de gemarkeerde instellingen aan om deze op te kunnen slaan</div>
 
@@ -169,7 +169,7 @@
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting] || setting}}
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting] || instelling}}
                     <small ng-if="L.settingsConfig[setting]" class="text-muted">&nbsp;&nbsp;{{setting}}</small>
             </label>
             <div class="col-sm-6">

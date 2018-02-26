@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <QtCore/QDir>
+#include <QtCore/QStorageInfo>
 
 #include <utils/fs/file.h>
 #include <utils/common/util.h>
@@ -939,6 +940,8 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
 void QnStorageManager::cancelRebuildCatalogAsync()
 {
     QnMutexLocker lock( &m_mutexRebuild );
+    if (!m_rebuildArchiveThread)
+        return;
     m_rebuildCancelled = true;
     m_rebuildArchiveThread->cancelFullScanTasks();
     NX_LOG("Catalog rebuild operation is canceled", cl_logINFO);
@@ -1613,12 +1616,10 @@ void QnStorageManager::clearSpace(bool forced)
 
     // 2. free storage space
     bool allStoragesReady = true;
-    QSet<QnStorageResourcePtr> storages;
+    QSet<QnStorageResourcePtr> storages = getClearableStorages();
 
     for (const auto& storage: getUsedWritableStorages()) {
-        if (!storage->hasFlags(Qn::storage_fastscan)) {
-            storages << storage;
-        } else {
+        if (!storages.contains(storage)) {
             NX_LOG(lit("[Cleanup]: Storage %1 is being fast scanned. Skipping")
                     .arg(storage->getUrl()), cl_logDEBUG2);
             allStoragesReady = false;
@@ -1670,11 +1671,11 @@ void QnStorageManager::clearSpace(bool forced)
 
     QnStorageResourceList delAgainList;
     for(const QnStorageResourcePtr& storage: storages) {
-        if (!clearOldestSpace(storage, true))
+        if (!clearOldestSpace(storage, true, storage->getSpaceLimit()))
             delAgainList << storage;
     }
     for(const QnStorageResourcePtr& storage: delAgainList)
-        clearOldestSpace(storage, false);
+        clearOldestSpace(storage, false, storage->getSpaceLimit());
 
     if (nx::utils::log::isToBeLogged(cl_logDEBUG2) && toDeleteTotal > 0)
     {
@@ -1738,6 +1739,64 @@ void QnStorageManager::clearSpace(bool forced)
                 clearAnalyticsEvents(oldestDataTimestampByCamera);
         }
     }
+}
+
+bool QnStorageManager::clearSpaceForFile(const QString& path, qint64 size)
+{
+    NX_LOG(lit("Clearing %1 bytes for file \"%2\".").arg(size).arg(path), cl_logDEBUG2);
+
+    //size = 125939630080 + 1000 * 1000 * 1000;
+
+    QStorageInfo volume(path);
+    if (!volume.isValid())
+        return false;
+
+    if (volume.bytesAvailable() > size)
+        return true;
+
+    QString volumePath = QDir::cleanPath(volume.rootPath());
+
+    QnMutexLocker locker(&m_clearSpaceMutex);
+    QSet<QnStorageResourcePtr> storages;
+    for (const QnStorageResourcePtr& storage : getClearableStorages())
+    {
+        QString storagePath = QDir::cleanPath(storage->getUrl());
+
+        if (storagePath.startsWith(volumePath))
+            storages << storage;
+    }
+
+    for (const QnStorageResourcePtr& storage : storages)
+        clearOldestSpace(storage, true, size);
+
+    volume = QStorageInfo(path);
+    return volume.bytesAvailable() > size;
+}
+
+bool QnStorageManager::canAddChunk(qint64 timeMs, qint64 size)
+{
+    qint64 available = 0;
+    for (const QnStorageResourcePtr& storage : getUsedWritableStorages())
+    {
+        qint64 free = storage->getFreeSpace();
+        qint64 reserved = storage->getSpaceLimit();
+        available += free > reserved ? free - reserved : 0;
+    }
+    if (available > size)
+        return true;
+
+    qint64 minTime = 0x7fffffffffffffffll;
+    DeviceFileCatalogPtr catalog;
+    {
+        QnMutexLocker lock(&m_mutexCatalog);
+        findTotalMinTime(true, m_devFileCatalog[QnServer::HiQualityCatalog], minTime, catalog);
+        findTotalMinTime(true, m_devFileCatalog[QnServer::LowQualityCatalog], minTime, catalog);
+    }
+
+    if (minTime > timeMs)
+        return false;
+
+    return false;
 }
 
 void QnStorageManager::clearAnalyticsEvents(
@@ -1997,11 +2056,10 @@ void QnStorageManager::findTotalMinTime(const bool useMinArchiveDays, const File
     }
 }
 
-bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays)
+bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays, qint64 targetFreeSpace)
 {
-    if (storage->getSpaceLimit() == 0)
+    if (targetFreeSpace == 0)
         return true; // unlimited. nothing to delete
-
 
     QString dir = storage->getUrl();
 
@@ -2012,7 +2070,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     if (freeSpace == -1)
         return true; // nothing to delete
 
-    qint64 toDelete = storage->getSpaceLimit() - freeSpace;
+    qint64 toDelete = targetFreeSpace - freeSpace;
 
     if (toDelete > 0)
     {
@@ -2062,7 +2120,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
             return true; // nothing to delete
 
         qint64 oldToDelete = toDelete;
-        toDelete = storage->getSpaceLimit() - freeSpace;
+        toDelete = targetFreeSpace - freeSpace;
         if (oldToDelete == toDelete && deletedChunk.startTimeMs != -1)
         {	// Non-empty chunk's been found and delete attempt's been made.
             // But ToDelete is still the same. This might mean that storage went offline.
@@ -2123,15 +2181,37 @@ QSet<QnStorageResourcePtr> QnStorageManager::getUsedWritableStorages() const
     return result;
 }
 
-QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages() const
+QSet<QnStorageResourcePtr> QnStorageManager::getClearableStorages() const
 {
     QSet<QnStorageResourcePtr> result;
 
-    QnStorageManager::StorageMap storageRoots = getAllStorages();
-    qint64 bigStorageThreshold = 0;
-    for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+    for (const auto& storage : getUsedWritableStorages())
+        if (!storage->hasFlags(Qn::storage_fastscan))
+            result << storage;
+
+    return result;
+}
+
+QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
+    const QnStorageResourceList* additionalStorages) const
+{
+    QSet<QnStorageResourcePtr> result;
+
+    QnStorageResourceList storageRoots;
+    auto storageMap = getAllStorages();
+    for (auto itr = storageMap.cbegin(); itr != storageMap.cend(); ++itr)
+        storageRoots.append(itr.value());
+
+    if (additionalStorages)
     {
-        QnStorageResourcePtr fileStorage = itr.value();
+        for (auto storage: *additionalStorages)
+            storageRoots.append(storage);
+    }
+
+    qint64 bigStorageThreshold = 0;
+    for (auto itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+    {
+        QnStorageResourcePtr fileStorage = *itr;
         if (fileStorage->getStatus() != Qn::Offline)
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
@@ -2140,9 +2220,9 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages() const
     }
     bigStorageThreshold /= BIG_STORAGE_THRESHOLD_COEFF;
 
-    for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+    for (auto itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
-        QnStorageResourcePtr fileStorage = itr.value();
+        QnStorageResourcePtr fileStorage = *itr;
         if (fileStorage->getStatus() != Qn::Offline)
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();

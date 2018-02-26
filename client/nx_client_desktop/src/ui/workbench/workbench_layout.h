@@ -6,8 +6,8 @@
 
 #include <client_core/connection_context_aware.h>
 
-#include <utils/common/matrix_map.h>
-#include <utils/common/rect_set.h>
+#include "matrix_map.h"
+#include <utils/rect_set.h>
 
 #include <core/resource/resource_fwd.h>
 

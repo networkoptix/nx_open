@@ -350,20 +350,15 @@ void TestPeerManager::run()
         if (needToStop())
             return;
 
-        using namespace std::chrono;
-
-        qint64 nowMs = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        qint64 nowMs = QDateTime::currentMSecsSinceEpoch();
         if (requestTime == -1)
             requestTime = nowMs;
 
-        if (m_delayBeforeRequest != 0
-            && nowMs - requestTime < m_delayBeforeRequest)
+        if (m_delayBeforeRequest != 0 && nowMs - requestTime < m_delayBeforeRequest)
         {
             lock.unlock();
-            std::this_thread::sleep_for(
-                std::chrono::milliseconds(m_delayBeforeRequest - (nowMs - requestTime)));
+            QThread::msleep(m_delayBeforeRequest - (nowMs - requestTime));
             lock.relock();
-            requestTime = nowMs;
         }
         requestTime = nowMs;
 
@@ -378,7 +373,6 @@ void TestPeerManager::run()
         lock.relock();
     }
 }
-
 
 QByteArray TestPeerManager::readFileChunk(
     const FileInformation& fileInformation, int chunkIndex)

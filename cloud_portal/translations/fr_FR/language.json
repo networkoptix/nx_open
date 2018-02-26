@@ -12,7 +12,7 @@
     "logoutAuthorisedLogoutButton": "Déconnecter"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
+    "template": "{{title}}{{PRODUCT_NAME}}",
     "default": "{{PRODUCT_NAME}}",
     "registerSuccess": "Bienvenue sur",
     "register": "Créer compte dans",
@@ -117,7 +117,7 @@
     "cloudInvalidResponse": "BD Nuage a retourné une réponse inattendue",
     "notAuthorized": "Mot de passe incorrect",
     "wrongParameters": "Certains paramètres dans le formulaire sont incorrects",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
+    "brokenAccount": "Problème inattendu avec le compte. <a href=\"/restore_password\">Restaurer le compte</a>",
     "wrongCode": "Compte déjà activé ou le code de confirmation est incorrect",
     "wrongCodeRestore": "Code de confirmation est déjà utilisé ou incorrecte",
     "forbidden": "Vous n’avez pas l'autorisation nécessaire pour effectuer cette action",

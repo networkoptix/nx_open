@@ -102,7 +102,7 @@ private:
     QList<QnUuid> peersForChunk(int chunkIndex) const;
 
     void setShouldWait(bool value);
-    void setShouldWaitForCb();
+    void setShouldWaitForAsyncOperationCompletion();
     virtual void run() override;
     virtual void pleaseStop() override;
     void pleaseStopUnsafe();

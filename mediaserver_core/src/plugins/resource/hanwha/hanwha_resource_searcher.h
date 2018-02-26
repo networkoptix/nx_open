@@ -43,6 +43,8 @@ public:
         const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) override;
 
+    virtual bool isEnabled() const override;
+
     static QAuthenticator getDefaultAuth();
 private:
     void createResource(
@@ -80,7 +82,7 @@ private:
 
     mutable QnMutex m_mutex;
     QnResourceList m_foundUpnpResources;
-    std::set<QString> m_alreadFoundMacAddresses;
+    std::set<QString> m_alreadyFoundMacAddresses;
     QMap<QString, int> m_channelsByCamera;
 
     // TODO: #dmishin make different session keys for different session types

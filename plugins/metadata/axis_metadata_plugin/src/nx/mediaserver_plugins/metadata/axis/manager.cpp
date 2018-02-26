@@ -7,9 +7,10 @@
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/api/analytics/device_manifest.h>
+#include <nx/fusion/serialization/json.h>
 #include <nx/kit/debug.h>
 
-#include <nx/fusion/serialization/json.h>
+#define NX_PRINT_PREFIX "[metadata::axis::Manager] "
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -18,33 +19,25 @@ namespace axis {
 
 Manager::Manager(
     const nx::sdk::CameraInfo& cameraInfo,
-    const QList<IdentifiedSupportedEvent>& events)
+    const AnalyticsDriverManifest& typedManifest)
+    :
+    m_typedManifest(typedManifest),
+    m_manifest(QJson::serialized(typedManifest)),
+    m_url(cameraInfo.url)
 {
-    m_url = cameraInfo.url;
     m_auth.setUser(cameraInfo.login);
     m_auth.setPassword(cameraInfo.password);
 
     nx::api::AnalyticsDeviceManifest deviceManifest;
-    for (const auto& event : events)
-    {
-        deviceManifest.supportedEventTypes.push_back(event.internalTypeId());
-    }
-
-    // We use m_deviceManifestFull to give server full manifest, m_deviceManifestPartial (that
-    // gives server only Uuids) may be users for test purposes.
-    //m_deviceManifestPartial = QJson::serialized(deviceManifest);
-
-    m_deviceManifestFull = serializeEvents(events).toUtf8();
-
-    m_identifiedSupportedEvents = events;
-
-    NX_PRINT << "Ctor :" << this;
+    for (const auto& event: typedManifest.outputEventTypes)
+        deviceManifest.supportedEventTypes.push_back(event.eventTypeId);
+    NX_PRINT << "Axis metadata manager created";
 }
 
 Manager::~Manager()
 {
     stopFetchingMetadata();
-    NX_PRINT << "Dtor :" << this;
+    NX_PRINT << "Axis metadata manager destroyed";
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -88,20 +81,33 @@ nx::sdk::Error Manager::stopFetchingMetadata()
 
 const char* Manager::capabilitiesManifest(nx::sdk::Error* error)
 {
-    if (m_deviceManifestFull.isEmpty())
+    if (m_manifest.isEmpty())
     {
         *error = nx::sdk::Error::unknownError;
         return nullptr;
     }
     *error = nx::sdk::Error::noError;
-    m_givenManifests.push_back(m_deviceManifestFull);
-    return m_deviceManifestFull.constData();
+    m_givenManifests.push_back(m_manifest);
+    return m_manifest.constData();
 }
 
 void Manager::freeManifest(const char* data)
 {
     // Do nothing. Memory allocated for Manifests is stored in m_givenManifests list and will be
     // released in Manager's destructor.
+}
+
+const AnalyticsEventType* Manager::eventByUuid(const QnUuid& uuid) const noexcept
+{
+    const auto it = std::find_if(
+        m_typedManifest.outputEventTypes.cbegin(),
+        m_typedManifest.outputEventTypes.cend(),
+        [&uuid](const AnalyticsEventType& event) { return event.eventTypeId == uuid; });
+
+    if (it == m_typedManifest.outputEventTypes.cend())
+        return nullptr;
+    else
+        return &(*it);
 }
 
 } // axis

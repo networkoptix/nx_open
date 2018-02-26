@@ -1,5 +1,4 @@
 set(defaultSkin "dark_blue")
-set(parent.customization "default")
 
 # Components Namings
 set(display.product.name "Sefica ProBox")

@@ -11,7 +11,7 @@
   "systemOffline": "System Offline",
   "cameraStates": {
     "offline": "Offline",
-    "error": "Error",
+    "error": "Errore",
     "unauthorized": "Authentication required",
     "noData": "No data",
     "iosVideoTooLarge": "iOS does not support video larger than fullHD (2MP: 1920x1080).",

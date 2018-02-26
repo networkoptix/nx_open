@@ -29,6 +29,14 @@ nx::utils::db::DBResult TemporaryAccountPasswordManagerStub::fetchTemporaryCrede
     return nx::utils::db::DBResult::notFound;
 }
 
+nx::utils::db::DBResult TemporaryAccountPasswordManagerStub::updateCredentialsAttributes(
+    nx::utils::db::QueryContext* const /*queryContext*/,
+    const data::Credentials& /*credentials*/,
+    const data::TemporaryAccountCredentials& /*tempPasswordData*/)
+{
+    return nx::utils::db::DBResult::ioError;
+}
+
 void TemporaryAccountPasswordManagerStub::addRandomCredentials(
     const std::string& /*accountEmail*/,
     data::TemporaryAccountCredentials* const /*data*/)
@@ -61,6 +69,14 @@ boost::optional<TemporaryAccountCredentialsEx>
         const std::string& /*login*/) const
 {
     return boost::none;
+}
+
+bool TemporaryAccountPasswordManagerStub::authorize(
+    const std::string& /*credentialsId*/,
+    const nx::utils::stree::AbstractResourceReader& /*inputData*/) const
+{
+    // TODO
+    return true;
 }
 
 } // namespace test

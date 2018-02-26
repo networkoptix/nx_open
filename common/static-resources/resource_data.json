@@ -109,7 +109,17 @@
         },
         {
             "keys": [
-                "Sony|SNC-CX600*"
+                "Sony|SNC-CX600*",
+                "Sony|SNC-VM600*",
+                "Sony|SNC-VM630",
+                "Sony|SNC-VM641",
+                "Sony|SNC-VB632D",
+                "Sony|SNC-VB642D",
+                "Sony|SNC-EB642R",
+                "Sony|SNC-EM642R",
+                "Sony|SNC-VM642R",
+                "Sony|SNC-WR632R",
+                "Sony|SNC-WR602C"
             ],
 
             "2WayAudio":
@@ -882,7 +892,10 @@
                 "Hikvision|DS-2CD2742FWD-IS",
                 "Hikvision|DS-2CD2942F-IS",
                 "Hikvision|DS-2CD4A26FWD-IZS",
-                "Hikvision|DS-2DE4A220IW-DE"
+                "Hikvision|DS-2DE4A220IW-DE",
+                "Hikvision|DS-2CD2522FWD*",
+                "ONVIF|H47",
+                "ONVIF|IP-2CD4B26FWD-IZS"                
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
@@ -2092,8 +2105,9 @@
         },
         {
             "keys": [
-                "Dahua|IPC-K15P", "Dahua|DH-IPC-K15P",
-                "Dahua|IPC-K35A", "Dahua|DH-IPC-K35A"
+                "Dahua|IPC-K15*", "Dahua|DH-IPC-K15*",
+                "Dahua|IPC-K35A", "Dahua|DH-IPC-K35A",
+                "Dahua|IPC-K35A*", "Dahua|DH-IPC-K35A*"
             ],
             "2WayAudio":
             {
@@ -2209,6 +2223,10 @@
                     }
                 }
             }
+        },
+        {
+     "keys": ["*|H.264+4MP+HD+IR+IP+Camera"],
+          "onvifManufacturerReplacement": "merit-lilin"
         },
         {
             "keys":[

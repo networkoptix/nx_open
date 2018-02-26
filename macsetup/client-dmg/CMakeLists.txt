@@ -64,6 +64,8 @@ add_custom_target(desktop_client_dmg ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${QT_DIR}/plugins/mediaservice ${libdir}/bin/mediaservice
     COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_SOURCE_DIR}/common/maven/bin-resources/resources/qt/etc/qt.conf ${libdir}/bin
+    COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file} ${libdir}/bin
 
     COMMAND ${CMAKE_CURRENT_BINARY_DIR}/build_dmg.sh
@@ -73,6 +75,7 @@ add_custom_target(desktop_client_dmg ALL
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/plugins/platforms
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/plugins/audio
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/plugins/mediaservice
+    COMMAND ${CMAKE_COMMAND} -E remove ${libdir}/bin/qt.conf
     COMMAND ${CMAKE_COMMAND} -E remove ${libdir}/bin/${launcher.version.file}
 
     COMMAND ${CMAKE_COMMAND} -E copy
@@ -88,7 +91,7 @@ if(NOT useLoginKeychain AND NOT ${mac.skip.sign})
     endif()
 
     add_custom_target(prepare_keychain
-        ${CMAKE_SOURCE_DIR}/build_utils/shell/prepare_build_keychain.sh
+        ${CMAKE_SOURCE_DIR}/build_utils/macos/prepare_build_keychain.sh
             --keychain ${codeSigningKeychainName}
             --keychain-password ${codeSigningKeychainPassword}
             --certificate ${certificate}

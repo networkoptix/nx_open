@@ -92,7 +92,7 @@ namespace {
                 tr("Cannot add new devices because they store archive on external storage."),
                 tr("Cannot add new cameras because they store archive on external storage."));
 
-            auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(selectedResources);
+            auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(selectedResources);
             if (boost::algorithm::any_of(cameras, isDtsCamera))
             {
                 // If has dts-based cameras then change massage accordingly

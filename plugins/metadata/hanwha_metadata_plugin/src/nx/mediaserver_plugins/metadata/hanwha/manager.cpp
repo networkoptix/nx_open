@@ -1,16 +1,17 @@
+#include <nx/kit/debug.h>
+#define NX_PRINT_PREFIX "[metadata::hanwha::Manager] "
+
 #include "manager.h"
 
 #include <chrono>
 
 #include <QtCore/QUrl>
 
-#define NX_PRINT_PREFIX "[metadata::hanwha::Manager] "
-#include <nx/kit/debug.h>
-
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 
 #include "common.h"
+
 
 namespace nx {
 namespace mediaserver_plugins {

@@ -37,7 +37,7 @@ public:
         const nx::network::SocketAddress& deviceEndpoint,
         const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) override;
-
+    virtual bool isEnabled() const override;
 private:
 
     void createResource(
@@ -65,7 +65,7 @@ private:
 
 private:
 	QnResourceList m_foundUpnpResources;
-	std::set<QString> m_alreadFoundMacAddresses;
+	std::set<QString> m_alreadyFoundMacAddresses;
 	mutable QnMutex m_mutex;
 };
 

@@ -21,11 +21,8 @@ SystemError::ErrorCode CloudAddressResolver::resolve(
 {
     QnMutexLocker locker(&m_mutex);
 
-    if (!m_cloudAddressRegExp.exactMatch(hostName) ||
-        !static_cast<bool>(SocketGlobals::cloud().mediatorConnector().udpEndpoint()))
-    {
+    if (!m_cloudAddressRegExp.exactMatch(hostName))
         return SystemError::hostNotFound;
-    }
 
     resolvedAddresses->push_back(AddressEntry(AddressType::cloud, HostAddress(hostName)));
     return SystemError::noError;

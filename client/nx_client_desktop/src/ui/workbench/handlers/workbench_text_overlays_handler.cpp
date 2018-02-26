@@ -133,12 +133,12 @@ void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
     if (isProlongedAction && couldBeInstantEvent)
         return;
 
-    auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(
+    auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
         businessAction->getResources());
 
     if (actionParams.useSource)
     {
-        cameras << resourcePool()->getResources<QnVirtualCameraResource>(
+        cameras << resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
             businessAction->getSourceResources());
     }
 

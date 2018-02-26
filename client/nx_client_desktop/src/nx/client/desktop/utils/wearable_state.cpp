@@ -1,5 +1,7 @@
 #include "wearable_state.h"
 
+#include <recording/time_period_list.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -52,6 +54,16 @@ int WearableState::progress() const
     }
 
     return (100 * currentIndex + filePercent) / queue.size();
+}
+
+QnTimePeriodList WearableState::periods() const
+{
+    QnTimePeriodList result;
+
+    for (const EnqueuedFile& file : queue)
+        result.includeTimePeriod(file.uploadPeriod);
+
+    return result;
 }
 
 } // namespace desktop

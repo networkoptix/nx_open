@@ -231,6 +231,9 @@ public:
     bool isBookmarksVisible() const;
     void setBookmarksVisible(bool bookmarksVisible);
 
+    Qn::TimePeriodContent selectedExtraContent() const; //< Qn::RecordingContent if none.
+    void setSelectedExtraContent(Qn::TimePeriodContent value);
+
     qreal msecsPerPixel() const;
 
     bool positionMarkerVisible() const;
@@ -365,7 +368,7 @@ private:
 
     bool scaleWindow(qreal factor, qint64 anchor);
 
-    void drawPeriodsBar(QPainter* painter, const QnTimePeriodList& recorded, const QnTimePeriodList& motion, const QRectF& rect);
+    void drawPeriodsBar(QPainter* painter, const QnTimePeriodList& recorded, const QnTimePeriodList& extra, const QRectF& rect);
     void drawTickmarks(QPainter* painter, const QRectF& rect);
     void drawSolidBackground(QPainter* painter, const QRectF& rect);
     void drawMarker(QPainter* painter, qint64 pos, const QColor& color, qreal width = 1.0);
@@ -507,6 +510,8 @@ private:
     bool m_updatingValue;
 
     qint64 m_dragWindowStart = 0;
+
+    Qn::TimePeriodContent m_selectedExtraContent = Qn::RecordingContent;
 
     const QScopedPointer<KineticZoomHandler> m_kineticZoomHandler;
     const QScopedPointer<KineticScrollHandler> m_kineticScrollHandler;

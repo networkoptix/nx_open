@@ -6,11 +6,13 @@
 
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
+#include <QtCore/QFileInfo>
 #include <QtCore/QFile>
 
 #include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
+#include <nx/kit/debug.h>
 
 #include "manager.h"
 
@@ -25,10 +27,6 @@ const char* const kPluginName = "Axis metadata plugin";
 const QString kAxisVendor("axis");
 const QString kSoapPath("/vapix/services");
 
-// Two SOAP topics essential for video analytics.
-const char* const kRuleEngine = "tns1:RuleEngine";
-const char* const kVideoSource = "tns1:VideoSource";
-
 } // namespace
 
 using namespace nx::sdk;
@@ -39,12 +37,16 @@ Plugin::Plugin()
     QFile f(":/axis/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
-
-#if 0
-    // Definitely this will be useful after pluginManager modification
-    nx::api::AnalyticsDriverManifest pluginManifest =
-        QJson::deserialized<nx::api::AnalyticsDriverManifest>(m_manifest);
-#endif
+    {
+        QFile file("plugins/axis/manifest.json");
+        if (file.open(QFile::ReadOnly))
+        {
+            NX_PRINT << "Switch to external manifest file "
+                << QFileInfo(file).absoluteFilePath().toStdString();
+            m_manifest = file.readAll();
+        }
+    }
+    m_typedManifest = QJson::deserialized<AnalyticsDriverManifest>(m_manifest);
 }
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -112,8 +114,8 @@ CameraManager* Plugin::obtainCameraManager(
     if (!vendor.startsWith(kAxisVendor))
         return nullptr;
 
-    QList<IdentifiedSupportedEvent> events = fetchSupportedEvents(cameraInfo);
-    if (events.empty())
+    AnalyticsDriverManifest events = fetchSupportedEvents(cameraInfo);
+    if (events.outputEventTypes.empty())
         return nullptr;
 
     return new Manager(cameraInfo, events);
@@ -125,10 +127,9 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-QList<IdentifiedSupportedEvent> Plugin::fetchSupportedEvents(
-    const CameraInfo& cameraInfo)
+AnalyticsDriverManifest Plugin::fetchSupportedEvents(const CameraInfo& cameraInfo)
 {
-    QList<IdentifiedSupportedEvent> result;
+    AnalyticsDriverManifest result;
     const char* const ip_port = cameraInfo.url + sizeof("http://") - 1;
     nx::axis::CameraController axisCameraController(ip_port, cameraInfo.login,
         cameraInfo.password);
@@ -136,15 +137,18 @@ QList<IdentifiedSupportedEvent> Plugin::fetchSupportedEvents(
         return result;
 
     // Only some rules are useful.
-    axisCameraController.filterSupportedEvents({ kRuleEngine, kVideoSource });
+    std::vector<std::string> allowedTopics;
+    for (const auto& topic: m_typedManifest.allowedTopics)
+        allowedTopics.push_back(topic.toStdString());
+    axisCameraController.filterSupportedEvents(allowedTopics);
     const auto& src = axisCameraController.suppotedEvents();
-    std::transform(src.begin(), src.end(), std::back_inserter(result),
-        [](const nx::axis::SupportedEvent& event) {return IdentifiedSupportedEvent(event); });
+    std::transform(src.begin(), src.end(), std::back_inserter(result.outputEventTypes),
+        [](const nx::axis::SupportedEvent& event) {return AnalyticsEventType(event); });
 
     // Being uncommented, the next code line allows to get the list of supported events
     // in the same json format that is used in "static-resources/manifest.json".
     // All you need is to stop on a breakpoint and copy the text form your debugger.
-    //QString textForManifest = serializeEvents(result);
+    //QString textForManifest = QJson::serialized(result);
 
     return result;
 }
@@ -162,3 +166,4 @@ NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
 }
 
 } // extern "C"
+

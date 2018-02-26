@@ -17,8 +17,10 @@ class VideoCameraMock: public MediaServerVideoCameraMock
 public:
     VideoCameraMock(QnSharedResourcePointer<CameraMock> camera)
     {
-        m_primaryProvider.reset(dynamic_cast<QnLiveStreamProvider*>(camera->createDataProvider(Qn::CR_LiveVideo)));
-        m_secondaryProvider.reset(dynamic_cast<QnLiveStreamProvider*>(camera->createDataProvider(Qn::CR_SecondaryLiveVideo)));
+        m_primaryProvider.reset(dynamic_cast<QnLiveStreamProvider*>(
+            camera->createDataProvider(Qn::CR_LiveVideo)));
+        m_secondaryProvider.reset(dynamic_cast<QnLiveStreamProvider*>(
+            camera->createDataProvider(Qn::CR_SecondaryLiveVideo)));
 
         NX_ASSERT(m_primaryProvider);
         NX_ASSERT(m_secondaryProvider);
@@ -48,6 +50,26 @@ private:
 };
 
 
+class LiveStreamParametersWithoutAdvancedParams: public CameraTest
+{
+public:
+    LiveStreamParametersWithoutAdvancedParams()
+    {
+        m_camera = newCamera(
+            [](CameraMock* camera)
+            {
+            });
+        NX_ASSERT(m_camera);
+        m_camera->setId(QnUuid::createUuid());
+
+        m_videoCamera.reset(new VideoCameraMock(m_camera));
+        m_videoCamera->init();
+    }
+
+    QnSharedResourcePointer<CameraMock> m_camera;
+    QnSharedResourcePointer<VideoCameraMock> m_videoCamera;
+};
+
 class LiveStreamParameters: public CameraTest
 {
 public:
@@ -56,17 +78,19 @@ public:
         m_camera = newCamera(
             [](CameraMock* camera)
         {
-            camera->setStreamCapabilityMaps({
-                { { "MJPEG", QSize(800, 600) },{ 10, 100, 30 } },
-                { { "MJPEG", QSize(1920, 1080) },{ 10, 100, 20 } },
-                { { "H264", QSize(800, 600) },{ 10, 100, 60 } },
-                { { "H264", QSize(1920, 1080) },{ 10, 100, 30 } },
-                { { "H265", QSize(800, 600) },{ 10, 100, 30 } },
-                { { "H265", QSize(1920, 1080) },{ 10, 100, 15 } },
-            }, {
-                { { "MJPEG", QSize(200, 150) },{ 10, 100, 30 } },
-                { { "MJPEG", QSize(480, 270) },{ 10, 100, 20 } },
-                { { "MJPEG", QSize(800, 600) },{ 10, 100, 15 } },
+            camera->setStreamCapabilityMaps(
+            {
+                {{"MJPEG", QSize(800, 600) },{ 128, 8192, 15 }},
+                {{"MJPEG", QSize(1920, 1080) },{ 128, 8192, 15 }},
+                {{"H264", QSize(800, 600) },{ 128, 8192, 15 }},
+                {{"H264", QSize(1920, 1080) },{ 128, 8192, 15 }},
+                {{"H265", QSize(800, 600) },{ 128, 8192, 15 }},
+                {{"H265", QSize(1920, 1080) },{ 128, 8192, 15 }},
+            },
+            {
+                {{"MJPEG", QSize(200, 150) },{ 128, 8192, 15 }},
+                {{"MJPEG", QSize(480, 270) },{ 128, 8192, 15 }},
+                {{"MJPEG", QSize(800, 600) },{ 128, 8192, 15 }},
             });
         });
         NX_ASSERT(m_camera);
@@ -129,9 +153,18 @@ TEST_F(LiveStreamParameters, mergeWithNonEmptyParams)
     m_videoCamera->getPrimaryReader()->setPrimaryStreamParams(params);
     updatedParams = m_videoCamera->getPrimaryReader()->getLiveParams();
     EXPECT_EQ(updatedParams.bitrateKbps, 1000);
+
+    EXPECT_TRUE(m_camera->setAdvancedParameter("secondaryStream.fps", "15"));
+    EXPECT_EQ(15, m_videoCamera->getSecondaryReader()->getLiveParams().fps);
+
+    EXPECT_TRUE(m_camera->setAdvancedParameter("secondaryStream.fps", "10"));
+    EXPECT_EQ(10, m_videoCamera->getSecondaryReader()->getLiveParams().fps);
+
+    EXPECT_TRUE(m_camera->setAdvancedParameter("secondaryStream.fps", "20"));
+    EXPECT_EQ(15, m_videoCamera->getSecondaryReader()->getLiveParams().fps); //< Max fps exceeded.
 }
 
-TEST_F(LiveStreamParameters, secondaryFps)
+TEST_F(LiveStreamParametersWithoutAdvancedParams, secondaryFps)
 {
     QnLiveStreamParams params;
 

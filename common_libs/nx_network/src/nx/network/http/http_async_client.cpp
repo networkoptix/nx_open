@@ -565,11 +565,12 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
     m_responseBuffer.resize(0);
     if (!m_socket->setRecvTimeout(m_responseReadTimeout))
     {
+        const auto sysErrorCode = SystemError::getLastOSErrorCode();
+
         if (reconnectIfAppropriate())
             return;
 
-        const auto sysErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOGX(lm("Url %1. Error setting receive timeout to %2 ms. %3")
+        NX_LOGX(lm("Url %1. Error setting receive timeout to %2. %3")
             .arg(m_contentLocationUrl).arg(m_responseReadTimeout)
             .arg(SystemError::toString(sysErrorCode)),
             cl_logDEBUG1);

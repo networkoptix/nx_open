@@ -21,7 +21,7 @@ password can be changed
     Input Text    ${CURRENT PASSWORD INPUT}    ${password}
     Input Text    ${NEW PASSWORD INPUT}    ${password}
     Click Button    ${CHANGE PASSWORD BUTTON}
-    Check For Alert    Your account is successfully saved
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
 
 password is actually changed, so login works with new password
@@ -29,7 +29,7 @@ password is actually changed, so login works with new password
     Input Text    ${CURRENT PASSWORD INPUT}    ${password}
     Input Text    ${NEW PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${CHANGE PASSWORD BUTTON}
-    Check For Alert    Your account is successfully saved
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Log Out
     Validate Log Out
 
@@ -41,7 +41,7 @@ password is actually changed, so login works with new password
     Input Text    ${CURRENT PASSWORD INPUT}    ${ALT PASSWORD}
     Input Text    ${NEW PASSWORD INPUT}    ${password}
     Click Button    ${CHANGE PASSWORD BUTTON}
-    Check For Alert    Your account is successfully saved
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
 
 password change is not possible if old password is wrong
@@ -49,7 +49,7 @@ password change is not possible if old password is wrong
     Input Text    ${CURRENT PASSWORD INPUT}    tjyjrsxhrsthr6
     Input Text    ${NEW PASSWORD INPUT}    ${ALT PASSWORD}
     Click Button    ${CHANGE PASSWORD BUTTON}
-    Check For Alert    Cannot save password: Current password is incorrect
+    Check For Alert    ${CANNOT SAVE PASSWORD} ${PASSWORD INCORRECT}
     Close Browser
 
 more than 255 symbols can be entered in new password field and then are cut to 255
@@ -65,7 +65,7 @@ pressing Enter key saves data
     Input Text    ${CURRENT PASSWORD INPUT}    ${password}
     Input Text    ${NEW PASSWORD INPUT}    ${password}
     Press Key    ${NEW PASSWORD INPUT}    ${ENTER}
-    Check For Alert    Your account is successfully saved
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
 
 pressing Tab key moves focus to the next element

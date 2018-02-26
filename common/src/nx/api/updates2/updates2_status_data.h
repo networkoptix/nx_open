@@ -22,6 +22,7 @@ public:
         downloading,
         preparing,
         readyToInstall,
+        installing,
         error,
     };
     Q_ENUM(StatusCode)

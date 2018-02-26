@@ -714,7 +714,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, action::IDType actionId,
     int selectedPage)
 {
-    const QnResourceList resList = resourcePool()->getResources(record->resources);
+    const QnResourceList resList = resourcePool()->getResourcesByIds(record->resources);
     if (resList.isEmpty())
     {
         const auto count = static_cast<int>(record->resources.size());

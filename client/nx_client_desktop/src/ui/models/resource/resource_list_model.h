@@ -29,6 +29,7 @@ public:
     {
         HideStatusOption                = 0x01,
         ServerAsHealthMonitorOption     = 0x02,
+        AlwaysSelectedOption            = 0x04,
     };
     Q_DECLARE_FLAGS(Options, Option)
 
@@ -69,8 +70,8 @@ public:
 
     /**
      * Custom column accessor
-     * Overrides a logic of QVariant data(const QModelIndex &index, int role) for specified column
-     * Accessor gets a pointer to appropriate resource according to index.row()
+     * Overrides a logic of QVariant data(const QModelIndex &index, int role) for specified column.
+     * Accessor gets a pointer to appropriate resource according to index.row().
      */
     using ColumnDataAccessor = std::function<QVariant(QnResourcePtr, int)>;
     void setCustomColumnAccessor(int column, ColumnDataAccessor dataAccessor);

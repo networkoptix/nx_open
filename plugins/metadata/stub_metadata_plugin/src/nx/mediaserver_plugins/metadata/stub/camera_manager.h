@@ -29,8 +29,11 @@ protected:
 
     virtual void settingsChanged() override;
 
-    virtual bool pushVideoFrame(
+    virtual bool pushCompressedVideoFrame(
         const sdk::metadata::CommonCompressedVideoPacket* videoFrame) override;
+
+    virtual bool pushUncompressedVideoFrame(
+        const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) override;
 
     virtual bool pullMetadataPackets(
         std::vector<sdk::metadata::MetadataPacket*>* metadataPackets) override;
@@ -47,7 +50,7 @@ private:
     int m_counter = 0;
     int m_counterObjects = 0;
     std::string m_eventTypeId;
-    const sdk::metadata::CommonCompressedVideoPacket* m_videoFrame;
+    int64_t m_lastVideoFrameTimestampUsec = 0;
 };
 
 const std::string kDriverGuid = "{B14A8D7B-8009-4D38-A60D-04139345432E}";

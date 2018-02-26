@@ -61,6 +61,7 @@ QString baseToString(QnResourceIconCache::Key base)
         QN_STRINGIFY(Cameras);
 
         QN_STRINGIFY(Recorder);
+        QN_STRINGIFY(MultisensorCamera);
         QN_STRINGIFY(Image);
         QN_STRINGIFY(Media);
         QN_STRINGIFY(User);
@@ -125,6 +126,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(Cameras,                 loadIcon(lit("tree/cameras.png")));
     m_cache.insert(IOModule,                loadIcon(lit("tree/io.png")));
     m_cache.insert(Recorder,                loadIcon(lit("tree/encoder.png")));
+    m_cache.insert(MultisensorCamera,       loadIcon(lit("tree/multisensor.png")));
     m_cache.insert(Image,                   loadIcon(lit("tree/snapshot.png")));
     m_cache.insert(Media,                   loadIcon(lit("tree/media.png")));
     m_cache.insert(User,                    loadIcon(lit("tree/user.png")));
@@ -172,29 +174,44 @@ QnResourceIconCache* QnResourceIconCache::instance()
     return qn_resourceIconCache();
 }
 
-QIcon QnResourceIconCache::icon(Key key, bool unchecked)
+QIcon QnResourceIconCache::icon(Key key)
 {
     /* This function will be called from GUI thread only,
      * so no synchronization is needed. */
 
-    if ((key & TypeMask) == Unknown && !unchecked)
+    if ((key & TypeMask) == Unknown)
         key = Unknown;
 
     if (m_cache.contains(key))
         return m_cache.value(key);
 
-    const auto base = key & TypeMask;
-    const auto status = key & StatusMask;
-    if (status != QnResourceIconCache::Online)
+    QIcon result;
+
+    if (key & AlwaysSelected)
     {
-        qDebug() << "Error: unknown icon" << keyToString(key);
-        NX_ASSERT(false, Q_FUNC_INFO, "All icons should be pre-generated.");
+        QIcon source = icon(key & ~AlwaysSelected);
+        for (const QSize& size : source.availableSizes(QIcon::Selected))
+        {
+            QPixmap selectedPixmap = source.pixmap(size, QIcon::Selected);
+            result.addPixmap(selectedPixmap, QIcon::Normal);
+            result.addPixmap(selectedPixmap, QIcon::Selected);
+        }
+    }
+    else
+    {
+        const auto base = key & TypeMask;
+        const auto status = key & StatusMask;
+        if (status != QnResourceIconCache::Online)
+        {
+            qDebug() << "Error: unknown icon" << keyToString(key);
+            NX_ASSERT(false, Q_FUNC_INFO, "All icons should be pre-generated.");
+        }
+
+        result = m_cache.value(base);
     }
 
-    QIcon icon = m_cache.value(base);
-
-    m_cache.insert(key, icon);
-    return icon;
+    m_cache.insert(key, result);
+    return result;
 }
 
 QIcon QnResourceIconCache::icon(const QnResourcePtr& resource)

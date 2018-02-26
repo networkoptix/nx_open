@@ -12,8 +12,8 @@ mkdir %TARGET_DIR%\sample\axiscamplugin\
 copy /Y readme.txt %TARGET_DIR%\
 
 @rem Copying integration headers
-copy /Y ..\common\src\plugins\plugin_api.h %TARGET_DIR%\include\plugins\
-copy /Y ..\common\src\plugins\plugin_tools.h %TARGET_DIR%\include\plugins\
+copy /Y ..\common_libs\nx_sdk\src\plugins\plugin_api.h %TARGET_DIR%\include\plugins\
+copy /Y ..\common_libs\nx_sdk\src\plugins\plugin_tools.h %TARGET_DIR%\include\plugins\
 copy /Y ..\common\src\plugins\camera_plugin.h %TARGET_DIR%\include\plugins\
 copy /Y ..\common\src\plugins\camera_plugin_types.h %TARGET_DIR%\include\plugins\
 

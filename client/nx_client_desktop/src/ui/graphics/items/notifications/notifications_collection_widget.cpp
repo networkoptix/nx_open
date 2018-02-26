@@ -409,9 +409,9 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
     QString title = m_helper->eventAtResource(params, qnSettings->extraInfoInTree());
     qint64 timestampMs = params.eventTimestampUsec / 1000;
 
-    auto alarmCameras = resourcePool()->getResources<QnVirtualCameraResource>(action->getResources());
+    auto alarmCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->getResources());
     if (action->getParams().useSource)
-        alarmCameras << resourcePool()->getResources<QnVirtualCameraResource>(action->getSourceResources());
+        alarmCameras << resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->getSourceResources());
     alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
     alarmCameras = alarmCameras.toSet().toList();
 
@@ -575,7 +575,8 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
 
             case vms::event::userDefinedEvent:
             {
-                auto sourceCameras = resourcePool()->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
+                auto sourceCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+                    params.metadata.cameraRefs);
                 sourceCameras = accessController()->filtered(sourceCameras, Qn::ViewFootagePermission);
                 if (!sourceCameras.isEmpty())
                 {
@@ -685,7 +686,8 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const vms::event::AbstractA
 
     if (eventType >= vms::event::userDefinedEvent)
     {
-        QnVirtualCameraResourceList camList = resourcePool()->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
+        auto camList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+            params.metadata.cameraRefs);
         if (!camList.isEmpty())
             return qnResIconCache->icon(QnResourceIconCache::Camera);
 

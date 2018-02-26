@@ -1,6 +1,4 @@
 # Components Namings
-set(defaultSkin "dark_blue")
-set(parent.customization "default")
 set(display.product.name "Tricom MVSS")
 set(display_mobile_name "MVSS Mobile")
 set(mobile_bundle_name "MVSS")

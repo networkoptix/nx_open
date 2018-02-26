@@ -252,7 +252,7 @@ QnResourceList QnActiResourceSearcher::findResources()
     QnMutexLocker lock(&m_mutex);
     QnResourceList result = std::move(m_foundUpnpResources);
     m_foundUpnpResources.clear();
-    m_alreadFoundMacAddresses.clear();
+    m_alreadyFoundMacAddresses.clear();
     return result;
 }
 
@@ -274,9 +274,9 @@ bool QnActiResourceSearcher::processPacket(
         devInfoCopy.friendlyName = NX_VENDOR;
 
     auto physicalId = stringToActiPhysicalID(devInfo.serialNumber);
-    if (m_alreadFoundMacAddresses.contains(physicalId))
+    if (m_alreadyFoundMacAddresses.contains(physicalId))
         return true;
-    m_alreadFoundMacAddresses.insert(physicalId);
+    m_alreadyFoundMacAddresses.insert(physicalId);
 
     auto existingRes = resourcePool()->getNetResourceByPhysicalId(physicalId);
 
@@ -468,6 +468,11 @@ QnNetworkResourcePtr QnActiResourceSearcher::findExistingResource(
     }
 
     return existingRes;
+}
+
+bool QnActiResourceSearcher::isEnabled() const
+{
+    return discoveryMode() != DiscoveryMode::disabled;
 }
 
 #endif // #ifdef ENABLE_ACTI

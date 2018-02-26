@@ -74,6 +74,7 @@ public:
     virtual bool setSendTimeout(unsigned int ms) override;
     virtual bool getSendTimeout(unsigned int* millis) const override;
     virtual bool getLastError(SystemError::ErrorCode* errorCode) const override;
+    virtual bool setIpv6Only(bool val) override;
 
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
     virtual nx::network::aio::AbstractAioThread* getAioThread() const override;

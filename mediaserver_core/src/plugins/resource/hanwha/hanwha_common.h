@@ -53,6 +53,7 @@ enum class HanwhaSessionType
 //TODO: #dmishin consider using Fusion instead of custom methods.
 
 static const int kHanwhaBlockedHttpCode = 490;
+static const int kHanwhaInvalidParameterHttpCode = 602;
 
 static const QString kHanwhaManufacturerName("Hanwha Techwin");
 static const int kHanwhaInvalidProfile = -1;
@@ -194,6 +195,15 @@ static const QString kHanwhaMaxLengthAttribute = lit("maxlen");
 static const int kHanwhaConfigurationNotFoundError = 612;
 
 static const QString kHanwhaNvrDeviceType = lit("NVR");
+
+static const int kHanwhaNoBypassChannel = -1;
+
+static const QString kHanwhaNormalizedSpeedPtzTrait("NormalizedSpeed");
+static const QString kHanwhaHas3AxisPtz("3AxisPTZ");
+static const QString kHanwhaSimpleFocusTrait("SimpleFocusTrait");
+static const QString kHanwhaAutoFocusTrait("AutoFocusTrait");
+static const QString kHanwhaAlternativeZoomTrait("AlternativeZoomTrait");
+static const QString kHanwhaAlternativeFocusTrait("AlternativeFocusTrait");
 
 } // namespace plugins
 } // namespace mediaserver_core

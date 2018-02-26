@@ -83,7 +83,6 @@
 #include <nx/utils/collection.h>
 #include <utils/common/synctime.h>
 #include <utils/common/system_information.h>
-#include <utils/common/url.h>
 #include <utils/common/delayed.h>
 #include <nx/vms/discovery/manager.h>
 #include <network/router.h>

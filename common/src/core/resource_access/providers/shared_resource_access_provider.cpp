@@ -97,7 +97,7 @@ void QnSharedResourceAccessProvider::handleSharedResourcesChanged(
 
     QString subjectName = subject.name();
 
-    for (auto resource: commonModule()->resourcePool()->getResources(changed))
+    for (auto resource: commonModule()->resourcePool()->getResourcesByIds(changed))
     {
         if (newValues.contains(resource->getId()))
         {

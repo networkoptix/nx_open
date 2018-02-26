@@ -11,6 +11,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/utils/wearable_manager.h>
+#include <nx/client/desktop/utils/wearable_state.h>
 
 using namespace nx::client::desktop;
 
@@ -29,11 +30,18 @@ QnWearableUploadWidget::QnWearableUploadWidget(QWidget* parent):
     connect(timer, &QTimer::timeout, this, &QnWearableUploadWidget::maybePollState);
     timer->start(kStatePollPeriodMSec);
 
-    connect(ui->uploadFileButton, &QPushButton::pressed, this,
+    connect(ui->uploadFileButton, &QPushButton::clicked, this,
         [this]()
         {
             if (m_camera)
                 menu()->trigger(ui::action::UploadWearableCameraFileAction, m_camera);
+        });
+
+    connect(ui->uploadFolderButton, &QPushButton::clicked, this,
+        [this]()
+        {
+            if (m_camera)
+                menu()->trigger(ui::action::UploadWearableCameraFolderAction, m_camera);
         });
 
     connect(qnClientModule->wearableManager(), &WearableManager::stateChanged, this,
@@ -42,8 +50,6 @@ QnWearableUploadWidget::QnWearableUploadWidget(QWidget* parent):
             if (m_camera && state.cameraId == m_camera->getId())
                 updateFromState(state);
         });
-
-    ui->uploadFolderButton->hide(); // TODO: #wearable
 }
 
 QnWearableUploadWidget::~QnWearableUploadWidget()

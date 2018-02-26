@@ -2,6 +2,11 @@
 
 #include "utils/common/synctime.h"
 #include "core/resource/resource.h"
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <nx/api/analytics/driver_manifest.h>
+#include <nx/vms/event/analytics_helper.h>
 
 namespace nx {
 namespace vms {
@@ -113,33 +118,45 @@ bool isResourceRequired(EventType eventType)
         || requiresServerResource(eventType);
 }
 
-bool hasToggleState(EventType eventType)
+bool hasToggleState(
+    EventType eventType,
+    const EventParameters& runtimeParams,
+    QnCommonModule* commonModule)
 {
     switch (eventType)
     {
-        case anyEvent:
-        case cameraMotionEvent:
-        case cameraInputEvent:
-        case analyticsSdkEvent:
-        case userDefinedEvent:
-        case softwareTriggerEvent:
+    case anyEvent:
+    case cameraMotionEvent:
+    case cameraInputEvent:
+    case userDefinedEvent:
+    case softwareTriggerEvent:
+        return true;
+    case analyticsSdkEvent:
+    {
+        if (runtimeParams.analyticsEventId().isNull())
             return true;
-
-        default:
-            return false;
+        AnalyticsHelper helper(commonModule);
+        auto descriptor = helper.eventDescriptor(runtimeParams.analyticsEventId());
+        return descriptor.flags.testFlag(nx::api::Analytics::stateDependent);
+    }
+    default:
+        return false;
     }
 }
 
-QList<EventState> allowedEventStates(EventType eventType)
+QList<EventState> allowedEventStates(
+    EventType eventType,
+    const EventParameters& runtimeParams,
+    QnCommonModule* commonModule)
 {
     QList<EventState> result;
-    if (!hasToggleState(eventType)
-        || eventType == analyticsSdkEvent
+    const bool hasTooggleStateResult = hasToggleState(eventType, runtimeParams, commonModule);
+    if (!hasTooggleStateResult
         || eventType == userDefinedEvent
         || eventType == softwareTriggerEvent)
         result << EventState::undefined;
 
-    if (hasToggleState(eventType))
+    if (hasTooggleStateResult)
         result << EventState::active << EventState::inactive;
     return result;
 }

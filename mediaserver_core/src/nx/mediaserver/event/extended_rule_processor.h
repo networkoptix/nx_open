@@ -81,6 +81,7 @@ private:
     QScopedPointer<EmailManagerImpl> m_emailManager;
     QMap<SendEmailAggregationKey, SendEmailAggregationData> m_aggregatedEmails;
     QThreadPool m_emailThreadPool;
+
 private:
     bool sendMail(const vms::event::SendMailActionPtr& action);
     void sendAggregationEmail(const SendEmailAggregationKey& aggregationKey);
@@ -93,7 +94,14 @@ private:
      */
     void updateRecipientsList(const vms::event::SendMailActionPtr& action) const;
 
-    QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize) const;
+    struct TimespampedFrame
+    {
+        qint64 timestampUsec = 0;
+        QByteArray frame;
+    };
+
+    TimespampedFrame getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec,
+        QSize dstSize) const;
 
     QVariantMap eventDescriptionMap(
         const vms::event::AbstractActionPtr& action,
