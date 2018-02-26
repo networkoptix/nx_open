@@ -176,7 +176,7 @@ ModuleConnector::Module::Priority
     if (m_id.isNull())
         return kDefault;
 
-    if (host == HostAddress::localhost || host == lit("localhost"))
+    if (host == HostAddress::localhost || host.toString().toLower() == lit("localhost"))
         return kLocalHost;
 
     if (host.isLocal())
