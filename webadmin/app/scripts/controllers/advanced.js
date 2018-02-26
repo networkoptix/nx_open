@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('AdvancedCtrl', ['$scope', '$modal', '$log', 'mediaserver', '$location', 'dialogs', 'systemAPI',
+    .controller('AdvancedCtrl', ['$scope', '$uibModal', '$log', 'mediaserver', '$location', 'dialogs', 'systemAPI',
     function ($scope, $modal, $log, mediaserver,$location, dialogs, systemAPI) {
 
 

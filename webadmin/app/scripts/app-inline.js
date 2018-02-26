@@ -6,8 +6,7 @@ angular.module('webadminApp', [
     'ngSanitize',
     'ngRoute',
     'ui.bootstrap',
-    'ngStorage',
-    'typeahead-focus'
+    'ngStorage'
 ]).config(['$httpProvider', function ($httpProvider) {
     $httpProvider.defaults.xsrfCookieName = 'nx-vms-csrf-token';
     $httpProvider.defaults.xsrfHeaderName = 'Nx-Vms-Csrf-Token';

@@ -16,7 +16,7 @@ var PLAYER_STATE = {
  *  - Current media variables for transition between Cast and local modes
  * @struct @constructor
  */
-var CastPlayer = function() {
+window.CastPlayer = function() {
     /** @type {PlayerHandler} Delegation proxy for media playback */
     this.playerHandler = new PlayerHandler(this);
 

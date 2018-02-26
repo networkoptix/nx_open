@@ -4,7 +4,7 @@
     This module prepares to run a bootstrap application: detects language, requests language strings
 */
 
-var L = {};
+window.L = {};
 
 function setLanguage(lang){
 
