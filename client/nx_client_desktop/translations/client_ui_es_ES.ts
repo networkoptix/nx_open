@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Forma</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Longitud de archivo fijo</translation>
     </message>
@@ -1722,7 +1717,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Ciclo de Gira</translation>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>
@@ -1786,7 +1781,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <translation>&quot;Cámara portátil&quot; es un almacenamiento virtual para archivos de video, que podría cargarse en cualquier servidor de su sistema y ser accesible para cualquier usuario.</translation>
     </message>
   </context>
   <context>
@@ -2668,7 +2663,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
+      <translation>TextLabel</translation>
     </message>
     <message>
       <location/>
@@ -3063,18 +3058,13 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Forma</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Detección de movimiento</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Detectar movimiento en video cargado</translation>
     </message>
     <message>
       <location/>
@@ -3086,11 +3076,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Forma</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Cancelar</translation>
     </message>
@@ -3099,11 +3084,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Forma</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation>Subir vídeo</translation>
     </message>

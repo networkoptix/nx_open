@@ -118,6 +118,12 @@ protected:
     virtual bool isInputPortMonitored() const override;
 
 private:
+    struct CameraAdvancedParamQueryInfo
+    {
+        QString group;
+        QString cmd;
+    };
+
     QSize extractResolution(const QByteArray& resolutionStr) const;
     QList<QSize> parseResolutionStr(const QByteArray& resolutions);
     QMap<int, QString> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
@@ -154,7 +160,7 @@ private:
         const QList<QnCameraAdvancedParameter>& params,
         QnCameraAdvancedParamValueList& result) const;
 
-    QMap<QString, QString> resolveQueries(QMap<QString, QnCameraAdvancedParamQueryInfo>& queries) const;
+    QMap<QString, QString> resolveQueries(QMap<QString, CameraAdvancedParamQueryInfo>& queries) const;
 
     void extractParamValues(const QString& paramValue, const QString& mask, QMap<QString, QString>& result) const;
     QString fillMissingParams(const QString& unresolvedTemplate, const QString& valueFromCamera) const;
