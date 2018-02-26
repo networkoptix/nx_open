@@ -14,6 +14,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/random.h>
+#include <thread>
 
 namespace nx {
 namespace mediaserver_core {
