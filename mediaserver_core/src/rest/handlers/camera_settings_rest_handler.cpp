@@ -61,14 +61,6 @@ int QnCameraSettingsRestHandler::executeGet(
         }
     }
 
-    if (!owner->resourceAccessManager()->hasPermission(
-        owner->accessRights(),
-        camera,
-        Qn::Permission::ReadPermission))
-    {
-        return nx_http::StatusCode::forbidden;
-    }
-
     // Clean params that are not keys.
     QnRequestParams locParams = params;
     locParams.remove(Qn::SERVER_GUID_HEADER_NAME);
@@ -103,6 +95,15 @@ int QnCameraSettingsRestHandler::executeGet(
     const auto action = extractAction(path);
     if (action == "getCameraParam")
     {
+
+        if (!owner->resourceAccessManager()->hasPermission(
+            owner->accessRights(),
+            camera,
+            Qn::Permission::ReadPermission))
+        {
+            return nx_http::StatusCode::forbidden;
+        }
+
         camera->getAdvancedParametersAsync(
             values.ids(),
             [&, guard = operationGuard.sharedGuard()](const QnCameraAdvancedParamValueMap& result)
@@ -116,6 +117,21 @@ int QnCameraSettingsRestHandler::executeGet(
     }
     else if (action == "setCameraParam")
     {
+        if (!owner->resourceAccessManager()->hasGlobalPermission(
+            owner->accessRights(),
+            Qn::GlobalPermission::GlobalEditCamerasPermission))
+        {
+            return nx_http::StatusCode::forbidden;
+        }
+
+        if (!owner->resourceAccessManager()->hasPermission(
+            owner->accessRights(),
+            camera,
+            Qn::Permission::WritePermission))
+        {
+            return nx_http::StatusCode::forbidden;
+        }
+
         camera->setAdvancedParametersAsync(
             values,
             [&, guard = operationGuard.sharedGuard()](const QSet<QString>& result)
