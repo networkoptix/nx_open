@@ -24,6 +24,14 @@ struct WearableState
         Consuming,
     };
 
+    enum Error {
+        NoError,
+        LockRequestFailed,
+        CameraSnatched,
+        UploadFailed,
+        ConsumeRequestFailed,
+    };
+
     struct EnqueuedFile
     {
         QString path;
@@ -33,6 +41,9 @@ struct WearableState
 
     /** Current wearable status of the camera. */
     Status status = Unlocked;
+
+    /** Error, if any. */
+    Error error = NoError;
 
     /** Id of the camera. */
     QnUuid cameraId;

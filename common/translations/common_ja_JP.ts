@@ -500,13 +500,13 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%1.ライセンス中の %n %2 を使用.</numerusform>
+        <numerusform>%1 ライセンス中の %n %2 を使用</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>%1.ライセンス中の %n %2 を使用.</numerusform>
+        <numerusform>%1 ライセンス中の %n %2 を使用</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1306,7 +1306,7 @@
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>%n, %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n 時, 開始: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>

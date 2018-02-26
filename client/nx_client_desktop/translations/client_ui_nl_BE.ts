@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Gefixeerde archieflengte</translation>
     </message>
@@ -262,7 +257,7 @@
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation>Systeemrapportage</translation>
+      <translation>Audit Trail</translation>
     </message>
     <message>
       <location/>
@@ -468,7 +463,7 @@
     <message>
       <location filename="../src/ui/widgets/business/business_rule_widget.ui"/>
       <source>Event</source>
-      <translation>Gebeurtenis</translation>
+      <translation>Event</translation>
     </message>
     <message>
       <location/>
@@ -516,7 +511,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation>Gebeurtnisregels</translation>
+      <translation>Event regels</translation>
     </message>
     <message>
       <location/>
@@ -614,12 +609,12 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
@@ -1001,7 +996,7 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>Logboek</translation>
+      <translation>Gebeurtenissenlog</translation>
     </message>
     <message>
       <location/>
@@ -1039,7 +1034,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
@@ -1049,7 +1044,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
@@ -1476,7 +1471,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
@@ -1700,12 +1695,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
@@ -1723,7 +1718,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation>Persoonlijke instellingen</translation>
+      <translation>Personalisatie</translation>
     </message>
     <message>
       <location/>
@@ -1773,7 +1768,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Tour cyclus</translation>
+      <translation>Toer cyclus</translation>
     </message>
   </context>
   <context>
@@ -1837,7 +1832,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <translation>&quot;Draagbare Camera&quot; is een virtuele opslag voor videobestanden, die kan worden geüpload naar elke server op uw systeem en toegankelijk is voor elke gebruiker.</translation>
     </message>
   </context>
   <context>
@@ -2017,7 +2012,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Wachtwoord:</translation>
     </message>
     <message>
       <location/>
@@ -2074,7 +2069,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Wachtwoord:</translation>
     </message>
     <message>
       <location/>
@@ -2084,7 +2079,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Gebruikersnaam:</translation>
+      <translation>Aanmelden:</translation>
     </message>
     <message>
       <location/>
@@ -2448,7 +2443,7 @@
     <message>
       <location/>
       <source>Search</source>
-      <translation>Search</translation>
+      <translation>Zoek</translation>
     </message>
   </context>
   <context>
@@ -2684,12 +2679,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
@@ -2929,12 +2924,12 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Gebruikersnaam:</translation>
+      <translation>Aanmelden:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Wachtwoord:</translation>
     </message>
   </context>
   <context>
@@ -3102,30 +3097,25 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Role</source>
-      <translation>Profiel</translation>
+      <translation>Rol</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation>Profielen bewerken...</translation>
+      <translation>Rollen bewerken...</translation>
     </message>
   </context>
   <context>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Bewegingsdetectie</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Beweging detecteren in geüploade video</translation>
     </message>
     <message>
       <location/>
@@ -3137,11 +3127,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Annuleren</translation>
     </message>
@@ -3150,11 +3135,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation>Upload Video</translation>
     </message>
@@ -3167,11 +3147,6 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Upload Folder...</source>
       <translation>Upload map...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;warning&gt;</source>
-      <translation>&lt;waarschuwing&gt;</translation>
     </message>
   </context>
   <context>

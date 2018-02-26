@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation type="unfinished">Fixed Archive Length</translation>
     </message>
@@ -3116,11 +3111,6 @@ Click &quot;New role&quot; button to create one.</translation>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation type="unfinished">Motion Detection</translation>
     </message>
@@ -3139,11 +3129,6 @@ Click &quot;New role&quot; button to create one.</translation>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation type="unfinished">Cancel</translation>
     </message>
@@ -3152,11 +3137,6 @@ Click &quot;New role&quot; button to create one.</translation>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation type="unfinished">Upload Video</translation>
     </message>
@@ -3169,11 +3149,6 @@ Click &quot;New role&quot; button to create one.</translation>
       <location/>
       <source>Upload Folder...</source>
       <translation type="unfinished">Upload Folder...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;warning&gt;</source>
-      <translation type="unfinished">&lt;warning&gt;</translation>
     </message>
   </context>
   <context>
