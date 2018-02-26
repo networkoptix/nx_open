@@ -882,11 +882,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>파일 업로드...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>폴더 업로드...</translation>
     </message>
   </context>
   <context>
