@@ -17,7 +17,7 @@ do
     cp -rf ../static/views/* ../static/lang_$LANG/views/
 
     echo "Overwrite them with localized sources"
-    cp -rf $lang_dir/views/* ../static/lang_$LANG/views/ || true
+    [ -e $lang_dir/views ] && cp -rf $lang_dir/views/* ../static/lang_$LANG/views/
 
 
     mkdir ../static/lang_$LANG/web_common/
@@ -26,7 +26,7 @@ do
     cp -rf ../static/web_common/views/* ../static/lang_$LANG/web_common/views/
 
     echo "Overwrite them with localized sources"
-    cp -rf $lang_dir/web_common/views/* ../static/lang_$LANG/web_common/views/ || true
+    [ -e $lang_dir/web_common/views ] && cp -rf $lang_dir/web_common/views/* ../static/lang_$LANG/web_common/views/
 
 done
 

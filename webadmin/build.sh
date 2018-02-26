@@ -22,7 +22,6 @@ done
 
 echo "Clean old directories"
 [ -e static ] && rm -r static
-[ -e dist ] && rm -r dist
 [ -e server-external ] && rm -r server-external
 [ -e external.dat ] && rm external.dat
 
