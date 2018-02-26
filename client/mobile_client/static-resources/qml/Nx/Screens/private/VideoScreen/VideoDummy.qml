@@ -78,6 +78,19 @@ DummyMessage
                 title: qsTr("Not enough licenses")
                 image: lp("/images/alert_license.png")
             }
+        },
+        State
+        {
+            name: "defaultPasswordAlert"
+            PropertyChanges
+            {
+                target: dummyMessage
+                title: qsTr("Password required")
+                image: lp("/images/alert_alert.png")
+                description: qsTr(
+                    "Set password on this camera using Wisenet WAVE client or camera web-page to view video")
+            }
+
         }
     ]
 }

@@ -35,8 +35,10 @@ Control
 
         property bool offline: status == QnCameraListModel.Offline ||
                                status == QnCameraListModel.NotDefined ||
-                               status == QnCameraListModel.Unauthorized
+                               status == QnCameraListModel.Unauthorized ||
+                               isDefaultPassword
         property bool unauthorized: status == QnCameraListModel.Unauthorized
+        property bool isDefaultPassword: resourceHelper.isDefaultCameraPassword
 
         // This property prevents video component re-creation while scrolling.
         property bool videoAllowed: false
@@ -155,9 +157,15 @@ Control
             Image
             {
                 anchors.horizontalCenter: parent.horizontalCenter
-                source: d.unauthorized
-                    ? lp("/images/camera_locked.png")
-                    : lp("/images/camera_offline.png")
+                source:
+                {
+                    if (d.unauthorized)
+                        return lp("/images/camera_locked.png")
+
+                    return d.isDefaultPassword
+                        ? lp("/images/alert_alert.png") //< TODO: change to appropriate icone when A. Pats fix it.
+                        : lp("/images/camera_offline.png")
+                }
             }
 
             Text
@@ -167,7 +175,16 @@ Control
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
-                text: d.unauthorized ? qsTr("Authentication required") : qsTr("Offline")
+                text:
+                {
+                    if (d.unauthorized)
+                        return qsTr("Authentication required")
+
+                    return d.isDefaultPassword
+                        ? qsTr("Password required")
+                        : qsTr("Offline")
+                }
+
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
                 font.pixelSize: 14

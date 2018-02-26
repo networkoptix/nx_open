@@ -1,6 +1,7 @@
 #include "resource_helper.h"
 
 #include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 QnResourceHelper::QnResourceHelper(QObject* parent):
@@ -32,9 +33,16 @@ void QnResourceHelper::setResourceId(const QString& id)
     connect(m_resource, &QnResource::statusChanged,
         this, &QnResourceHelper::resourceStatusChanged);
 
+    if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
+    {
+        connect(camera, &QnSecurityCamResource::capabilitiesChanged,
+            this, &QnResourceHelper::defaultCameraPasswordChanged);
+    }
+
     emit resourceIdChanged();
     emit resourceNameChanged();
     emit resourceStatusChanged();
+    emit defaultCameraPasswordChanged();
 }
 
 Qn::ResourceStatus QnResourceHelper::resourceStatus() const
@@ -50,4 +58,12 @@ QString QnResourceHelper::resourceName() const
 QnResourcePtr QnResourceHelper::resource() const
 {
     return m_resource;
+}
+
+bool QnResourceHelper::isDefaultCameraPassword() const
+{
+    if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
+        return camera->hasCameraCapabilities(Qn::isDefaultPasswordCapability);
+
+    return false;
 }

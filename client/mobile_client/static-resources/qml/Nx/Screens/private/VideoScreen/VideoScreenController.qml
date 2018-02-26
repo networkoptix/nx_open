@@ -23,11 +23,14 @@ Object
     readonly property bool failed: mediaPlayer.failed
     readonly property bool offline: serverOffline || cameraOffline
     readonly property bool noLicenses: resourceHelper.analogCameraWithoutLicense;
+    readonly property bool isDefaultCameraPassword: resourceHelper.isDefaultCameraPassword
 
     readonly property string dummyState:
     {
         if (serverOffline)
             return "serverOffline"
+        else if (isDefaultCameraPassword)
+            return "defaultPasswordAlert"
         else if (cameraUnauthorized)
             return "cameraUnauthorized"
         else if (cameraOffline)

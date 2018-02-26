@@ -59,13 +59,14 @@ PageBase
         property bool animatePlaybackControls: true
         property bool showOfflineStatus: false
         property bool cameraWarningVisible:
-            (showOfflineStatus
+            ((showOfflineStatus
                 || videoScreenController.cameraOffline
                 || videoScreenController.cameraUnauthorized
                 || videoScreenController.failed
                 || videoScreenController.noVideoStreams
                 || videoScreenController.noLicenses)
-            && !videoScreenController.mediaPlayer.playing
+            && !videoScreenController.mediaPlayer.playing)
+            || videoScreenController.isDefaultCameraPassword
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
 
