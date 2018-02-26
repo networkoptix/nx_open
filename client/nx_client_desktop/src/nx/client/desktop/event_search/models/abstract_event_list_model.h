@@ -41,6 +41,7 @@ public:
         earlier,
         later
     };
+    Q_ENUM(FetchDirection)
 
     FetchDirection fetchDirection() const;
     void setFetchDirection(FetchDirection value);

@@ -60,6 +60,7 @@ void AbstractAsyncSearchListModel::Private::relevantTimePeriodChanged(
 
 void AbstractAsyncSearchListModel::Private::fetchDirectionChanged()
 {
+    qDebug() << "New fetch direction:" << q->fetchDirection();
     // TODO: FIXME: #vkutin Implement me!
 }
 
@@ -86,8 +87,12 @@ void AbstractAsyncSearchListModel::Private::cancelPrefetch()
 
 bool AbstractAsyncSearchListModel::Private::canFetchMore() const
 {
-    // TODO: FIXME: #vkutin Check remaining time between relevantTimePeriod and fetchedTimeWindow
-    return !m_fetchedAll && m_camera && !fetchInProgress() && hasAccessRights();
+    if (m_fetchedAll || !m_camera || fetchInProgress() || !hasAccessRights())
+        return false;
+
+    return q->fetchDirection() == FetchDirection::earlier
+        ? (m_fetchedTimeWindow.startTimeMs > q->relevantTimePeriod().startTimeMs)
+        : (m_fetchedTimeWindow.endTimeMs() < q->relevantTimePeriod().endTimeMs());
 }
 
 bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler completionHandler)
@@ -128,8 +133,11 @@ void AbstractAsyncSearchListModel::Private::commit(qint64 syncTimeToCommitMs)
     }
     else
     {
-        // TODO: FIXME: #vkutin Implement me!
-        NX_ASSERT(false);
+        if (!m_fetchedTimeWindow.isInfinite())
+        {
+            const auto endMs = q->relevantTimePeriod().bound(syncTimeToCommitMs) + 1;
+            m_fetchedTimeWindow.durationMs = endMs - m_fetchedTimeWindow.startTimeMs;
+        }
     }
 }
 

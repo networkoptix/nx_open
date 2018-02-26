@@ -361,8 +361,14 @@ void UnifiedSearchWidget::fetchMoreIfNeeded()
         return;
 
     const auto scrollBar = ui->ribbon->scrollBar();
-    if (scrollBar->isVisible() && scrollBar->value() < scrollBar->maximum())
+    if (scrollBar->isVisible() && qBetween(1, scrollBar->value(), scrollBar->maximum()))
         return;
+
+    const bool atTheEnd = scrollBar->isHidden() || scrollBar->value() == scrollBar->maximum();
+
+    model()->setFetchDirection(atTheEnd
+        ? AbstractEventListModel::FetchDirection::earlier
+        : AbstractEventListModel::FetchDirection::later);
 
     if (!model()->canFetchMore(QModelIndex()))
         return;
