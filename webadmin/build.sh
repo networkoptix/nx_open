@@ -25,10 +25,6 @@ echo "Clean old directories" >&2
 [ -e server-external ] && rm -r server-external
 [ -e external.dat ] && rm external.dat
 
-# Save the repository info.
-echo "Create version.txt" >&2
-hg log -r . --repository "$SOURCE_DIR/.." > version.txt
-
 # Install dependencies.
 echo "Install node dependencies" >&2
 npm install
@@ -43,6 +39,11 @@ echo "Create translations" >&2
 pushd translation
     ./localize.sh
 popd
+
+# Save the repository info.
+echo "Create version.txt" >&2
+hg log -r . --repository "$SOURCE_DIR/.." > static/version.txt
+cat static/version.txt >&2
 
 #Pack
 echo "Pack external.dat" >&2
