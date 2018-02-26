@@ -34,6 +34,7 @@
     "SHARE PERMISSIONS HINT LIVE VIEWER"   :    "Can only view live video",
     "SHARE PERMISSIONS HINT CUSTOM"        :    "Use the {{PRODUCT_NAME}} Client application to set up custom permissions",
 
+    "EDIT USER BUTTON TEXT"                :    "Edit",
     "DELETE USER BUTTON TEXT"              :    "Delete",
     "DELETE USER CANCEL BUTTON TEXT"       :    "Cancel",
 
