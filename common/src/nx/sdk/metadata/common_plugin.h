@@ -75,7 +75,7 @@ public:
     virtual void executeAction(Action* action, Error* outError) override;
 
 private:
-    bool CommonPlugin::fillSettingsMap(
+    bool fillSettingsMap(
         std::map<std::string, std::string>* map, const nxpl::Setting* settings, int count,
         const char* func) const;
 
