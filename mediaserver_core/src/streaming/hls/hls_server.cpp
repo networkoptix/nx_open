@@ -529,7 +529,16 @@ namespace nx_hls
         auto requiredPermission = session->isLive()
             ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
         if (!commonModule()->resourceAccessManager()->hasPermission(accessRights, camResource, requiredPermission))
+        {
+            if (commonModule()->resourceAccessManager()->hasPermission(
+                accessRights, camResource, Qn::Permission::ViewLivePermission))
+            {
+                error->errorString = toString(Qn::MediaStreamEvent::ForbiddenBecauseNoLicenseError);
+                error->error = QnRestResult::Forbidden;
+                return nx_http::StatusCode::ok;
+            }
             return nx_http::StatusCode::forbidden;
+        }
 
         ensureChunkCacheFilledEnoughForPlayback(session, session->streamQuality());
 
