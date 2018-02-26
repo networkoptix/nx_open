@@ -43,12 +43,28 @@
 #include <nx/mobile_client/settings/migration_helper.h>
 #include <nx/mobile_client/settings/settings_migration.h>
 #include <nx/client/core/watchers/known_server_connections.h>
+#include <nx/client/mobile/two_way_audio/server_audio_connection_watcher.h>
 #include <client_core/client_core_settings.h>
 #include <core/ptz/client_ptz_controller_pool.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
+#include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
+#include <plugins/resource/desktop_camera/desktop_resource_base.h>
+#include <client/client_resource_processor.h>
+#include <utils/media/voice_spectrum_analyzer.h>
+
 
 using namespace nx::mobile_client;
 
 static const QString kQmlRoot = QStringLiteral("qrc:///qml");
+
+template<typename BaseType>
+BaseType extract(const QSharedPointer<BaseType>& pointer)
+{
+    return pointer ? *pointer : BaseType();
+}
 
 QnMobileClientModule::QnMobileClientModule(
     const QnMobileClientStartupParameters& startupParameters,
@@ -90,7 +106,25 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->instance<QnCameraHistoryPool>();
     commonModule->store(new QnMobileClientCameraFactory());
 
-    auto userWatcher = commonModule->store(new QnUserWatcher());
+    const auto userWatcher = commonModule->store(new QnUserWatcher());
+    const auto twoWayAudioController = commonModule->store(
+        new nx::client::core::TwoWayAudioController);
+
+    const auto updateTwoWayAudioControllerSourceId =
+        [commonModule, twoWayAudioController, userWatcher]()
+        {
+            const auto userId = userWatcher->user() ? userWatcher->user()->getId() : QnUuid();
+            const auto sourceId = QnDesktopResource::calculateUniqueId(
+                commonModule->moduleGUID(), userId);
+            twoWayAudioController->setSourceId(sourceId);
+        };
+
+    connect(userWatcher, &QnUserWatcher::userChanged,
+        this, updateTwoWayAudioControllerSourceId);
+    connect(commonModule, &QnCommonModule::moduleInformationChanged,
+        this, updateTwoWayAudioControllerSourceId);
+
+    updateTwoWayAudioControllerSourceId();
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = commonModule->moduleGUID();
@@ -117,6 +151,7 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->store(new QnSystemsWeightsManager());
 
     commonModule->store(new settings::SessionsMigrationHelper());
+    commonModule->store(new QnVoiceSpectrumAnalyzer());
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this,
         [moduleManager = commonModule->moduleDiscoveryManager()](Qt::ApplicationState state)
@@ -134,8 +169,19 @@ QnMobileClientModule::QnMobileClientModule(
             }
         });
 
+    commonModule->store(new nx::client::mobile::ServerAudioConnectionWatcher(commonModule));
+
+    const auto resourceDiscoveryManager = new QnResourceDiscoveryManager(commonModule);
+    commonModule->setResourceDiscoveryManager(resourceDiscoveryManager);
+
+    auto resourceProcessor = commonModule->store(new QnClientResourceProcessor());
+    resourceProcessor->moveToThread(resourceDiscoveryManager);
+    resourceDiscoveryManager->setResourceProcessor(resourceProcessor);
+
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
     commonModule->instance<QnServerInterfaceWatcher>();
+
+    resourceDiscoveryManager->setReady(true);
 
     auto qmlRoot = startupParameters.qmlRoot.isEmpty() ? kQmlRoot : startupParameters.qmlRoot;
     if (!qmlRoot.endsWith(L'/'))
@@ -164,4 +210,20 @@ QnMobileClientModule::~QnMobileClientModule()
 QnCloudStatusWatcher* QnMobileClientModule::cloudStatusWatcher() const
 {
     return m_cloudStatusWatcher;
+}
+
+void QnMobileClientModule::initDesktopCamera()
+{
+    /* Initialize desktop camera searcher. */
+    const auto commonModule = m_clientCoreModule->commonModule();
+    const auto desktopSearcher = commonModule->store(new QnDesktopResourceSearcher(nullptr));
+    const auto resourceDiscoveryManager = commonModule->resourceDiscoveryManager();
+    desktopSearcher->setLocal(true);
+    resourceDiscoveryManager->addDeviceServer(desktopSearcher);
+}
+
+void QnMobileClientModule::startLocalSearches()
+{
+    const auto commonModule = m_clientCoreModule->commonModule();
+    commonModule->resourceDiscoveryManager()->start();
 }

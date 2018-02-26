@@ -2,11 +2,10 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
-
+#include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
 #include <QtMultimedia/QAudioDeviceInfo>
 
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QDesktopWidget>
 
 #ifdef Q_OS_WIN
 #   include <d3d9.h>
@@ -96,6 +95,7 @@ QnAudioDeviceInfo QnVideoRecorderSettings::getDeviceByName(const QString& _name,
 
     if (isDefault)
         *isDefault = true;
+
     return QnAudioDeviceInfo(QAudioDeviceInfo::defaultInputDevice(), QString());
 }
 
@@ -197,22 +197,24 @@ int QnVideoRecorderSettings::screen() const
 {
     int oldScreen = settings.value(QLatin1String("screen")).toInt();
     QRect geometry = settings.value(QLatin1String("screenResolution")).toRect();
-    QDesktopWidget *desktop = qApp->desktop();
-    if (desktop->screen(oldScreen)->geometry() == geometry) {
+
+    const auto screens = QGuiApplication::screens();
+    if (screens.at(oldScreen)->geometry() == geometry)
         return oldScreen;
-    } else {
-        for (int i = 0; i < desktop->screenCount(); i++) {
-            if (desktop->screen(i)->geometry() == geometry)
-                return i;
-        }
+
+    for (int i = 0; i < screens.size(); i++)
+    {
+        if (screens.at(i)->geometry() == geometry)
+            return i;
     }
-    return desktop->primaryScreen();
+    return screens.indexOf(QGuiApplication::primaryScreen());
 }
 
 void QnVideoRecorderSettings::setScreen(int screen)
 {
     settings.setValue(QLatin1String("screen"), screen);
-    settings.setValue(QLatin1String("screenResolution"),  qApp->desktop()->screen(screen)->geometry());
+    settings.setValue(QLatin1String("screenResolution"),
+        QGuiApplication::screens().at(screen)->geometry());
 }
 
 QString QnVideoRecorderSettings::recordingFolder() const {

@@ -721,11 +721,10 @@ void AsyncClient::initiateTcpConnection()
 
     m_state = State::sInit;
 
-    int ipVersion = AF_INET;
-    if ((bool) HostAddress(m_contentLocationUrl.host()).isPureIpV6())
-    {
-        ipVersion = AF_INET6;
-    }
+    const int ipVersion =
+        (bool) HostAddress(m_contentLocationUrl.host()).isPureIpV6()
+        ? AF_INET6
+        : SocketFactory::tcpClientIpVersion();
 
     m_socket = SocketFactory::createStreamSocket(
         m_contentLocationUrl.scheme() == lm("https"),

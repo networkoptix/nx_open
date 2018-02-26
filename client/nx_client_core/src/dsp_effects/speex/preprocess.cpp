@@ -68,6 +68,11 @@
 #include "math_approx.h"
 //#include "os_support.h"
 
+extern "C"
+{
+#include <libavutil/mem.h>
+}
+
 #ifndef M_PI
 #define M_PI 3.14159263
 #endif

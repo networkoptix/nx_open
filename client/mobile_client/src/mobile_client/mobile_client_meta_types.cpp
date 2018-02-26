@@ -36,6 +36,9 @@
 #include <nx/client/core/resource/layout_accessor.h>
 #include <nx/client/core/animation/kinetic_animation.h>
 #include <nx/client/mobile/resource/lite_client_layout_helper.h>
+#include <nx/client/mobile/models/action_buttons_model.h>
+#include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
+#include <nx/client/mobile/two_way_audio/voice_spectrum_item.h>
 
 using namespace nx::client::mobile;
 
@@ -61,6 +64,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
         "Nx.Settings", 1, 0, "MobileSettings",
         lit("Cannot create an instance of MobileSettings."));
 
+    qmlRegisterType<nx::client::mobile::ActionButtonsModel>("Nx.Core", 1, 0, "ActionButtonsModel");
     qmlRegisterType<QnCameraListModel>("com.networkoptix.qml", 1, 0, "QnCameraListModel");
     qmlRegisterType<QnCalendarModel>("com.networkoptix.qml", 1, 0, "QnCalendarModel");
     qmlRegisterType<QnLayoutsModel>("com.networkoptix.qml", 1, 0, "QnLayoutsModel");
@@ -74,6 +78,11 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnCloudStatusWatcher>("com.networkoptix.qml", 1, 0, "QnCloudStatusWatcher");
     qmlRegisterType<QnCloudSystemInformationWatcher>("com.networkoptix.qml", 1, 0, "QnCloudSystemInformationWatcher");
     qmlRegisterType<QnUserWatcher>("com.networkoptix.qml", 1, 0, "QnUserWatcher");
+    qmlRegisterType<nx::client::core::TwoWayAudioController>("com.networkoptix.qml",
+        1, 0, "TwoWayAudioController");
+
+    qmlRegisterType<nx::client::mobile::VoiceSpectrumItem>("com.networkoptix.qml", 1, 0, "VoiceSpectrumItem");
+
     /* NxMediaPlayer should not be used.
        It is here only to allow assignments of MediaPlayer to properties of this type. */
     qmlRegisterType<MediaPlayer>("Nx.Media", 1, 0, "MediaPlayer");
