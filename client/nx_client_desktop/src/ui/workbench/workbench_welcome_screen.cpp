@@ -428,8 +428,8 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
 
     const auto callback = [localId, userName]()
         {
-            auto authData =  qnClientCoreSettings->systemAuthenticationData();
-            auto credentialsList = authData[localId];
+            auto authData = qnClientCoreSettings->systemAuthenticationData();
+            auto& credentialsList = authData[localId];
             const auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
                 [userName](const QnEncodedCredentials& other)
                 {
