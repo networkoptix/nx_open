@@ -245,7 +245,7 @@ should display same user data as showed in user account (stress to cyrillic)
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
-    Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC NAME} ${CYRILLIC NAME}')]
+    Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
 
     #remove new user from system
     Log Out
