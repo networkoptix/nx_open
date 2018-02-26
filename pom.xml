@@ -536,8 +536,10 @@
             <modules>
                 <module>common_libs/nx_email</module>
 
+<!--
                 <module>nx_sdk</module>
                 <module>nx_storage_sdk</module>
+-->
 
                 <module>common_libs/nx_speech_synthesizer</module>
                 <module>mediaserver_core</module>

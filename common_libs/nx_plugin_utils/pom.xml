@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nx_plugin_utils</artifactId>
     <packaging>pom</packaging>
-    <name>Nx SDK Library</name>
+    <name>Nx Plugin Utils Library</name>
 
     <properties>
         <guid>${nx_plugin_utils.guid}</guid>
