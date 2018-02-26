@@ -148,7 +148,7 @@ private:
     boost::optional<uint32_t> m_scopeId;
 
     HostAddress(
-        boost::optional<QString> addrStr,
+        boost::optional<QString> addressString,
         boost::optional<in_addr> ipV4,
         boost::optional<in6_addr> ipV6);
 };

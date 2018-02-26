@@ -125,6 +125,9 @@ INCLUDEPATH +=  ${project.build.sourceDirectory} \
                 $$clean_path("${libdir}")/include \
                 $$ADDITIONAL_QT_INCLUDES
 
+INCLUDEPATH += $$ROOT_DIR/common_libs/nx_plugin_utils/src/
+INCLUDEPATH += $$ROOT_DIR/common_libs/nx_sdk/src/
+
 win* {
     DEFINES += \
         NX_KIT_API=__declspec(dllimport) \
