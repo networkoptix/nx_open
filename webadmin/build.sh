@@ -49,6 +49,6 @@ cat static/version.txt >&2
 echo "Pack external.dat" >&2
 tar -czvf external.dat ./static
 mkdir -p ./server-external/bin
-mv external.dat server-external/bin/extemvrnal.dat
+mv external.dat server-external/bin/external.dat
 
 echo "Webadmin build done" >&2
