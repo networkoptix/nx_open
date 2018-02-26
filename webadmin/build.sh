@@ -47,3 +47,7 @@ popd
 #Pack
 echo "Pack external.dat"
 tar -czvf external.dat ./static
+mkdir -p ./server-external/bin
+mv external.dat server-external/bin/extemvrnal.dat
+
+echo "Webadmin build done"
