@@ -550,9 +550,9 @@ angular.module('webadminApp')
             getLanguages:function(){
                 return wrapGet('languages.json').then(function(data){
                     return _.map(Config.supportedLanguages, function(configLang){
-                        return _.filter(data.data, function(mediaServerLang){
+                        return _.find(data.data, function(mediaServerLang){
                             return mediaServerLang.language == configLang;
-                        })[0];
+                        });
                     });
                 });
             },
