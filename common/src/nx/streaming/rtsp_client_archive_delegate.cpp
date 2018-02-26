@@ -92,11 +92,12 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_flags |= Flag_CanSeekImmediatly;
 
     // These signals are emitted from the same thread. It is safe to call close();
-    auto closeIfExpired = [this]()
-	{
-		if (isConnectionExpired())
-			close();
-    };
+    auto closeIfExpired =
+        [this]()
+	    {
+		    if (isConnectionExpired())
+			    close();
+        };
     if (reader)
     {
         connect(reader, &QnLongRunnable::paused, this, closeIfExpired, Qt::DirectConnection);
