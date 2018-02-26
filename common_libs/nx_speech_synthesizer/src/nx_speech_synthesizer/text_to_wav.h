@@ -1,7 +1,4 @@
-#if !defined(EDGE_SERVER) && !defined(DISABLE_FESTIVAL)
-
-#ifndef TEXT_TO_WAV_H
-#define TEXT_TO_WAV_H
+#pragma once
 
 #include <QtCore/QIODevice>
 #include <QtCore/QSharedPointer>
@@ -92,7 +89,3 @@ private:
 
     QSharedPointer<SynthetiseSpeechTask> addTaskToQueue( const QString& text, QIODevice* const dest );
 };
-
-#endif  //TEXT_TO_WAV_H
-
-#endif

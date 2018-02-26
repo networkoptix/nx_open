@@ -272,7 +272,7 @@ protected:
     {
         for (auto id: m_generator->consumers())
         {
-            verifyData(m_dataList.data(id), kRemoteAddressCount * kEntriesCount);
+            verifyData(m_dataList.data(id).get(), kRemoteAddressCount * kEntriesCount);
             m_generator->resetVisited();
         }
     }
@@ -280,14 +280,14 @@ protected:
     void thenEveryConsumerShouldBecomeEmpty()
     {
         for (auto id: m_generator->consumers())
-            verifyData(m_dataList.data(id), 0);
+            verifyData(m_dataList.data(id).get(), 0);
     }
 
     void thenOnlyNonExceededDataShouldExist()
     {
         for (auto id: m_generator->consumers())
         {
-            verifyData(m_dataList.data(id), kRemoteAddressCount * ConsumerData::kMaxEntriesCount);
+            verifyData(m_dataList.data(id).get(), kRemoteAddressCount * ConsumerData::kMaxEntriesCount);
             m_generator->resetVisited();
         }
     }

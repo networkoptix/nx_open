@@ -24,6 +24,8 @@
 #include <client/client_settings.h>
 #include <client/client_module.h>
 
+#include <nx/client/desktop/resource_views/data/camera_extra_status.h>
+
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
@@ -40,11 +42,22 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+using namespace nx::client::desktop;
+
 namespace {
 
 constexpr int kSeparatorItemHeight = 16;
 constexpr int kExtraTextMargin = 5;
 static constexpr int kMaxResourceNameLength = 120; // TODO: #GDM Think about common place to use.
+
+bool isCollapsibleNode(const QModelIndex& index)
+{
+    NX_ASSERT(index.model());
+    if (!index.model())
+        return false;
+
+    return index.model()->rowCount(index) > 0;
+}
 
 } // namespace
 
@@ -257,29 +270,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         }
     }
 
-    QRect extraIconRect(iconRect);
-    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-
-    /* Draw "recording" or "scheduled" icon: */
-    if (m_options.testFlag(RecordingIcons))
-    {
-        extraIconRect.moveLeft(extraIconRect.left() - extraIconRect.width());
-
-        const bool recording = camera && camera->getStatus() == Qn::Recording;
-        const bool scheduled = camera && !camera->isScheduleDisabled();
-
-        if (recording || scheduled)
-            (recording ? m_recordingIcon : m_scheduledIcon).paint(painter, extraIconRect);
-    }
-
-    /* Draw "problems" icon: */
-    if (m_options.testFlag(ProblemIcons))
-    {
-        extraIconRect.moveLeft(extraIconRect.left() - extraIconRect.width());
-        if (camera && camera->statusFlags().testFlag(Qn::CSF_HasIssuesFlag))
-            m_buggyIcon.paint(painter, extraIconRect);
-    }
+    paintExtraStatus(painter, iconRect, index);
 }
 
 QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
@@ -767,4 +758,38 @@ QVariant QnResourceItemDelegate::rowCheckState(const QModelIndex& index) const
 
     const auto checkIndex = index.sibling(index.row(), m_checkBoxColumn);
     return checkIndex.data(Qt::CheckStateRole);
+}
+
+void QnResourceItemDelegate::paintExtraStatus(
+    QPainter* painter,
+    const QRect& iconRect,
+    const QModelIndex& index) const
+{
+    const auto extraStatus = index.data(Qn::CameraExtraStatusRole).value<CameraExtraStatus>();
+    if (extraStatus.isEmpty())
+        return;
+
+    QRect extraIconRect(iconRect);
+    const int offset = extraIconRect.width();
+
+    // Leave space for collapser if needed.
+    if (isCollapsibleNode(index))
+        extraIconRect.moveLeft(extraIconRect.left() - offset);
+
+    // Draw "recording" or "scheduled" icon.
+    if (m_options.testFlag(RecordingIcons) && (extraStatus.recording || extraStatus.scheduled))
+    {
+        extraIconRect.moveLeft(extraIconRect.left() - offset);
+        const auto& icon = extraStatus.recording
+            ? m_recordingIcon
+            : m_scheduledIcon;
+        icon.paint(painter, extraIconRect);
+    }
+
+    // Draw "problems" icon.
+    if (m_options.testFlag(ProblemIcons) && extraStatus.buggy)
+    {
+        extraIconRect.moveLeft(extraIconRect.left() - offset);
+        m_buggyIcon.paint(painter, extraIconRect);
+    }
 }

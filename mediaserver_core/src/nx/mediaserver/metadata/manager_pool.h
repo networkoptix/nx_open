@@ -160,3 +160,11 @@ private:
 } // namespace metadata
 } // namespace mediaserver
 } // namespace nx
+
+namespace nx {
+namespace sdk {
+
+QString toString(const nx::sdk::CameraInfo& cameraInfo);
+
+} // namespace sdk
+} // namespace nx

@@ -7,8 +7,8 @@ import yaml
 from environment import zip_files
 
 
-def create_client_debug_file(binaries_dir, output_filename):
-    pdb_filename = 'desktop_client.pdb'
+def create_client_debug_file(binaries_dir, client_binary_name, output_filename):
+    pdb_filename = client_binary_name.replace('.exe', '.pdb')
     zip_files([pdb_filename], binaries_dir, output_filename)
 
 
@@ -25,6 +25,7 @@ def main():
         args.output, config['client_debug_distribution_name']) + '.zip'
     create_client_debug_file(
         binaries_dir=config['bin_source_dir'],
+        client_binary_name=config['client_binary_name'],
         output_filename=output_filename)
 
 

@@ -78,6 +78,11 @@ set_source_files_properties(
         RESOURCE_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources"
 )
 
+set(private_libs qtservice qtsinglecoreapplication sigar)
+if(NOT targetDevice STREQUAL edge1)
+    list(APPEND private_libs nx_speech_synthesizer)
+endif()
+
 nx_add_target(mediaserver_core LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mediaserver_core_app_info_impl.cpp"
@@ -90,10 +95,9 @@ nx_add_target(mediaserver_core LIBRARY
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
     PUBLIC_LIBS
-        qtservice qtsinglecoreapplication Qt5::WebSockets
-        ffmpeg nx_onvif quazip sigar openssl
-        common appserver2 cloud_db_client nx_email nx_speech_synthesizer nx_network nx_fusion
-        nx_utils nx_kit nx_update
+        Qt5::WebSockets
+        appserver2 nx_onvif nx_email cloud_db_client nx_update
+    PRIVATE_LIBS ${private_libs}
 )
 
 nx_add_vendor_macros(mediaserver_core)
@@ -101,7 +105,7 @@ nx_add_vendor_macros(mediaserver_core)
 if(LINUX)
     target_link_libraries(mediaserver_core PRIVATE ldap lber)
 
-    if(arch MATCHES "arm|aarch64")
+    if(arch STREQUAL "aarch64" OR box STREQUAL "edge1")
         target_link_libraries(mediaserver_core PRIVATE sasl2)
     endif()
 endif()

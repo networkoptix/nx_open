@@ -52,7 +52,8 @@ static JsonRestResponse createStatusAllResponse(const QnRestConnectionProcessor*
             [&context, &updates2StatusDataList, serverId = server->getId(), responsePromisePtr](
                 SystemError::ErrorCode osErrorCode,
                 int statusCode,
-                network::http::BufferType msgBody) mutable
+                network::http::BufferType msgBody,
+                nx::network::http::HttpHeaders /*responseHeaders*/) mutable
             {
 
                 api::Updates2StatusData updates2StatusData(

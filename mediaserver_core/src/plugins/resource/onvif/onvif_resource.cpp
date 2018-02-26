@@ -2701,7 +2701,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncod
         if (soapWrapper.getLastError().contains(QLatin1String("not possible to set")))
             return CameraDiagnostics::CannotConfigureMediaStreamResult( QLatin1String("fps") );   // TODO: #ak find param name
         else
-            return CameraDiagnostics::CannotConfigureMediaStreamResult( QString() );
+            return CameraDiagnostics::CannotConfigureMediaStreamResult( QString("'stream profile parameters'") );
     }
     return CameraDiagnostics::NoErrorResult();
 }

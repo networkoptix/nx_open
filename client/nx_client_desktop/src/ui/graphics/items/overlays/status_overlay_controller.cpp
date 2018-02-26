@@ -257,6 +257,7 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
         { Qn::TooManyOpenedConnectionsOverlay, tr("TOO MANY CONNECTIONS") },
         { Qn::PasswordRequiredOverlay, tr("PASSWORD REQUIRED") },
         { Qn::NoLiveStreamOverlay, tr("NO LIVE STREAM") },
+        { Qn::OldFirmwareOverlay, tr("UNSUPPORTED FIRMWARE VERSION") },
     };
     return extractValue(overlay, kCaptions);
 }

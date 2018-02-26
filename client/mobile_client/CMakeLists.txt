@@ -36,14 +36,7 @@ else()
     set(ios_sources)
 endif()
 
-# When merge with mobile branch take everything from mobile branch!
-if(parent.customization AND NOT ${parent.customization} STREQUAL ${customization})
-    set(additional_resources
-        "${PROJECT_SOURCE_DIR}/customization/${parent.customization}/mobile_client/resources")
-else()
-    set(additional_resources)
-endif()
-
+set(additional_resources)
 set(customization_resources "${customization_dir}/mobile_client/resources")
 if(EXISTS ${customization_resources})
     list(APPEND additional_resources ${customization_resources})
@@ -127,7 +120,7 @@ if(IOS)
     endif()
 
     execute_process(
-        COMMAND "${PROJECT_SOURCE_DIR}/build_utils/shell/get_provisioning_id.sh" "${provisioning_profile}"
+        COMMAND "${PROJECT_SOURCE_DIR}/build_utils/macos/get_provisioning_id.sh" "${provisioning_profile}"
         RESULT_VARIABLE result
         OUTPUT_VARIABLE provisioning_profile_id
         OUTPUT_STRIP_TRAILING_WHITESPACE

@@ -4,6 +4,7 @@
 #include <nx/streaming/rtsp_client.h>
 #include <core/resource/camera_resource.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
+#include <core/dataconsumer/audio_data_transmitter.h>
 
 namespace nx {
 namespace mediaserver_core {

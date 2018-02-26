@@ -79,8 +79,8 @@ int SpaceInfo::getOptimalStorageIndex(const std::vector<int>& allowedIndexes) co
     for (const auto& spaceInfo: m_storageSpaceInfo)
     {
         if (std::find_if(
-                allowedIndexes.cbegin(), 
-                allowedIndexes.cend(), 
+                allowedIndexes.cbegin(),
+                allowedIndexes.cend(),
                 [&spaceInfo](int index) { return index == spaceInfo.index; }) != allowedIndexes.cend())
         {
             filteredSpaceInfo.emplace_back(spaceInfo);
@@ -89,14 +89,14 @@ int SpaceInfo::getOptimalStorageIndex(const std::vector<int>& allowedIndexes) co
 
     if(filteredSpaceInfo.empty())
     {
-        NX_LOG(lit("[Storage, SpaceInfo, Selection] Failed to find approprirate storage index"), 
+        NX_LOG(lit("[Storage, SpaceInfo, Selection] Failed to find approprirate storage index"),
             cl_logDEBUG1);
         return -1;
     }
 
     /* use totalSpace based algorithm if effective space is unknown for any of the storages */
-    bool hasStorageWithoutEffectiveSpace = std::any_of(filteredSpaceInfo.cbegin(), 
-        filteredSpaceInfo.cend(), 
+    bool hasStorageWithoutEffectiveSpace = std::any_of(filteredSpaceInfo.cbegin(),
+        filteredSpaceInfo.cend(),
         [](const StorageSpaceInfo& info)
         {
             return info.effectiveSpace == 0;
@@ -110,8 +110,8 @@ int SpaceInfo::getOptimalStorageIndex(const std::vector<int>& allowedIndexes) co
 
 int SpaceInfo::getStorageIndexImpl(const SpaceInfoVector& filteredSpaceInfo, bool byEffectiveSpace) const
 {
-    /* select storage index based on their effective (or total) spaces. 
-    *  Space plays a 'weight' role, but the selection algorithm is essentially random 
+    /* select storage index based on their effective (or total) spaces.
+    *  Space plays a 'weight' role, but the selection algorithm is essentially random
     */
     double randomSelectionPoint = 0.5;
     try
@@ -120,7 +120,7 @@ int SpaceInfo::getStorageIndexImpl(const SpaceInfoVector& filteredSpaceInfo, boo
     }
     catch (const std::exception&)
     {
-        NX_LOG(lit("[Storage, SpaceInfo, Selection] Exception while selecting random point"), 
+        NX_LOG(lit("[Storage, SpaceInfo, Selection] Exception while selecting random point"),
             cl_logDEBUG1);
     }
 
@@ -155,7 +155,7 @@ Candidates count = %1, byEffectiveSpace = %2, totalSpace = %3, selection point =
     }
 
     NX_ASSERT(false);
-    NX_LOG(lit("[Storage, SpaceInfo, Selection] No storage index found."), cl_logDEBUG1);   
+    NX_LOG(lit("[Storage, SpaceInfo, Selection] No storage index found."), cl_logDEBUG1);
 
     return -1;
 }

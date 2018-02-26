@@ -1,7 +1,5 @@
 #include "media_server_process.h"
 
-#include <plugins/plugin_internal_tools.h>
-
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -27,7 +25,6 @@
 #include <QtConcurrent/QtConcurrent>
 #include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
-#include <utils/call_counter/call_counter.h>
 #include <QtCore/QThreadPool>
 
 #include <QtNetwork/QUdpSocket>
@@ -2325,7 +2322,6 @@ void MediaServerProcess::run()
         qnStaticCommon->setEngineVersion(QnSoftwareVersion(m_cmdLineArguments.engineVersion));
     }
 
-    QnCallCountStart(std::chrono::milliseconds(5000));
 #ifdef Q_OS_WIN32
     nx::misc::ServerDataMigrateHandler migrateHandler;
     switch (nx::misc::migrateFilesFromWindowsOldDir(&migrateHandler))
@@ -3090,7 +3086,7 @@ void MediaServerProcess::run()
             videoCameraPool.reset();
 
             commonModule()->resourceDiscoveryManager()->stop();
-            qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics event.
+            qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics events.
             QnResource::stopAsyncTasks();
 
             //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now

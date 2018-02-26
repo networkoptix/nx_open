@@ -54,6 +54,13 @@ public:
         Qn::UserAccessData* accessRights = 0,
         nx::network::http::AuthMethod::Value* usedAuthMethod = 0);
 
+    Qn::AuthResult httpAuthenticate(
+        const nx::network::http::Request& request,
+        nx::network::http::Response& response,
+        bool isProxy,
+        Qn::UserAccessData* accessRights,
+        nx::network::http::AuthMethod::Value* usedAuthMethod);
+
     nx::network::http::AuthMethodRestrictionList* restrictionList();
 
     //!Creates query item for \a path which does not require authentication
@@ -130,7 +137,6 @@ private:
         void parse( const nx::network::http::Request& request );
         bool empty() const;
     };
-
 
     /*!
         \param userRes Can be NULL

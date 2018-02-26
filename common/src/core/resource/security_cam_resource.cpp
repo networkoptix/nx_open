@@ -1340,16 +1340,6 @@ bool QnSecurityCamResource::isIOModule() const
     return m_cachedIsIOModule.get();
 }
 
-#ifdef ENABLE_DATA_PROVIDERS
-QnAudioTransmitterPtr QnSecurityCamResource::getAudioTransmitter()
-{
-    if (!isInitialized())
-        return nullptr;
-    return m_audioTransmitter;
-}
-
-#endif
-
 nx::core::resource::AbstractRemoteArchiveManager* QnSecurityCamResource::remoteArchiveManager()
 {
     return nullptr;
