@@ -295,7 +295,7 @@ to view more bookmarks</source>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation>Đăng nhập %1...</translation>
+      <translation>Đăng nhập vào %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
@@ -317,7 +317,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>Event Rules...</translation>
+      <translation>Quy tắc sự kiện...</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -725,7 +725,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation>Khung trước</translation>
+      <translation>Trên một khung</translation>
     </message>
     <message>
       <source>Next Frame</source>
@@ -848,6 +848,22 @@ to view more bookmarks</source>
       <translation>Làm Showreel</translation>
     </message>
     <message>
+      <source>Wearable Camera...</source>
+      <translation type="unfinished">Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation type="unfinished">Upload File...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation type="unfinished">Upload Folder...</translation>
+    </message>
+    <message>
       <source>Start Analytics...</source>
       <translation>Bắt đầu Analytics...</translation>
     </message>
@@ -874,22 +890,6 @@ to view more bookmarks</source>
     <message>
       <source>Cell Spacing...</source>
       <translation>Không gian khuôn...</translation>
-    </message>
-    <message>
-      <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
-    </message>
-    <message>
-      <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
-    </message>
-    <message>
-      <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
-    </message>
-    <message>
-      <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
     </message>
   </context>
   <context>
@@ -1001,12 +1001,12 @@ to view more bookmarks</source>
       <translation>Bạn sắp xuất một đoạn video dài. Nó có thể yêu cầu trên một gigabyte dung lượng ổ cứng và mất vài phút để hoàn thành.</translation>
     </message>
     <message>
-      <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation>Các tập tin cục bộ, các widget của máy chủ và trang web sẽ không được xuất.</translation>
-    </message>
-    <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
       <translation>Đã xuất tệp .EXE sẽ có kích thước trên 4 GB và không thể mở bằng cách nhấp đúp vào trong Windows. Nó chỉ có thể được mở trong %1 Client.</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>Các tập tin cục bộ, các widget của máy chủ và trang web sẽ không được xuất.</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
@@ -1171,14 +1171,6 @@ to view more bookmarks</source>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>Chỉ cho phép chữ cái, số và ký tự bàn phím.</translation>
     </message>
-    <message>
-      <source>Long</source>
-      <translation>Dài</translation>
-    </message>
-    <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>Chỉ cho phép chữ cái, số và ký tự bàn phím %1.</translation>
-    </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
@@ -1190,6 +1182,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>Mật khẩu phải có ít nhất %n ký tự.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>Dài</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
@@ -1209,6 +1205,10 @@ to view more bookmarks</source>
         <numerusform>Mật khẩu không được chứa %n hoặc nhiều ký tự lặp lại.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>Chỉ cho phép chữ cái, số và ký tự bàn phím %1.</translation>
+    </message>
   </context>
   <context>
     <name>PermissionsInfoTable</name>
@@ -1226,7 +1226,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Permissions</source>
-      <translation>Quyền truy nhập</translation>
+      <translation>Quyền</translation>
     </message>
   </context>
   <context>
@@ -1431,7 +1431,7 @@ to view more bookmarks</source>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Sao chép lựa chọn vào Clipboard</translation>
+      <translation>Sao chép vào clipboard lựa chọn</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -1926,7 +1926,7 @@ to view more bookmarks</source>
     <message>
       <source>at</source>
       <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation>於</translation>
+      <translation>đến</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -2326,7 +2326,7 @@ to view more bookmarks</source>
     <name>QnCameraExpertSettingsWidget</name>
     <message>
       <source>Primary</source>
-      <translation>Сhìa khóa</translation>
+      <translation>Chính</translation>
     </message>
     <message>
       <source>Secondary</source>
@@ -2357,7 +2357,7 @@ to view more bookmarks</source>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Sao chép lựa chọn vào Clipboard</translation>
+      <translation>Sẽ chọn Copy to clipboard</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -2801,8 +2801,8 @@ to %1</source>
       <translation>Email hoặc mật khẩu không chính xác</translation>
     </message>
     <message>
-      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation>Đã kích hoạt tài khoản. Vui lòng kiểm tra email của bạn và làm theo các bước như hướng dẫn</translation>
+      <source>Account is not activated. Please check your email and follow provided instructions</source>
+      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
     </message>
   </context>
   <context>
@@ -2832,7 +2832,7 @@ to %1</source>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2967,7 +2967,7 @@ to %1</source>
     </message>
     <message>
       <source>Download</source>
-      <translation>Tải xuống</translation>
+      <translation>Tải về</translation>
     </message>
     <message>
       <source>Restart</source>
@@ -3150,22 +3150,22 @@ to %1</source>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation>Camera này yêu cầu mật khẩu để được thiết lập.</translation>
     </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation>Yêu cầu quản trị viên hệ thống của bạn làm điều đó.</translation>
+    </message>
     <message numerus="yes">
       <source>Set Password</source>
       <translation>
         <numerusform>Đặt mật khẩu</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Ask your system administrator to do it.</source>
-      <translation>Yêu cầu quản trị viên hệ thống của bạn làm điều đó.</translation>
-    </message>
   </context>
   <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Không thể khởi tạo bộ mã hóa âm thanh.</translation>
+      <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -3192,7 +3192,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Không thể khởi tạo bộ mã hóa âm thanh.</translation>
+      <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
@@ -3219,7 +3219,7 @@ to %1</source>
     <name>QnDisconnectFromCloudDialogPrivate</name>
     <message>
       <source>Next</source>
-      <translation>Tiếp tục</translation>
+      <translation>Kế tiếp</translation>
     </message>
     <message>
       <source>Enter password to continue.</source>
@@ -3513,7 +3513,7 @@ to %1</source>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation>Thời gian máy chủ...</translation>
+      <translation>Chọn thư mục...</translation>
     </message>
     <message>
       <source>Folder already added</source>
@@ -3779,7 +3779,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>DN</source>
@@ -3945,7 +3945,7 @@ to %1</source>
     </message>
     <message>
       <source>Export</source>
-      <translation>Xuất ra</translation>
+      <translation>Xuất</translation>
     </message>
     <message>
       <source>Export licenses to a file</source>
@@ -4079,7 +4079,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Tẩy</translation>
+      <translation>Gỡ bỏ</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4103,7 +4103,7 @@ to %1</source>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>Khóa bản quyền không hợp lệ</translation>
+      <translation>Key bản quyền Không hợp lệ</translation>
     </message>
     <message>
       <source>Please contact Customer Support to obtain a valid License Key.</source>
@@ -4290,7 +4290,7 @@ to %1</source>
     <name>QnLoginToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>Password</source>
@@ -4311,7 +4311,7 @@ to %1</source>
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Đăng nhập vào %1</translation>
+      <translation>Đăng nhập %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
@@ -4971,22 +4971,6 @@ to %1</source>
       <source>Quarter Native</source>
       <translation>Quarter Native</translation>
     </message>
-    <message>
-      <source>1920x1080</source>
-      <translation>1920x1080</translation>
-    </message>
-    <message>
-      <source>1280x720</source>
-      <translation>1280x720</translation>
-    </message>
-    <message>
-      <source>640x480</source>
-      <translation>640x480</translation>
-    </message>
-    <message>
-      <source>320x240</source>
-      <translation>320x240</translation>
-    </message>
   </context>
   <context>
     <name>QnRecordingStatsModel</name>
@@ -5036,7 +5020,7 @@ to %1</source>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Máy chụp hình</translation>
+      <translation>Máy ảnh</translation>
     </message>
     <message>
       <source>Archived duration in calendar days since the first recording</source>
@@ -5241,7 +5225,7 @@ to %1</source>
     </message>
     <message>
       <source>Showreel</source>
-      <translation>Showreel</translation>
+      <translation>Showreels</translation>
     </message>
   </context>
   <context>
@@ -5331,7 +5315,7 @@ to %1</source>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Máy chụp hình</translation>
+      <translation>Máy ảnh</translation>
     </message>
     <message>
       <source>Created</source>
@@ -5863,7 +5847,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>SMTP Server</source>
@@ -5898,7 +5882,7 @@ to %1</source>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -6061,6 +6045,10 @@ to %1</source>
       <translation>Vui lòng kiểm tra thông tin xác thực</translation>
     </message>
     <message>
+      <source>NO LIVE STREAM</source>
+      <translation type="unfinished">NO LIVE STREAM</translation>
+    </message>
+    <message>
       <source>TOO MANY CONNECTIONS</source>
       <translation>QUÁ NHIỀU KẾT NỐI</translation>
     </message>
@@ -6073,8 +6061,8 @@ to %1</source>
       <translation>Đặt cho Máy ảnh này</translation>
     </message>
     <message>
-      <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <source>UNSUPPORTED FIRMWARE VERSION</source>
+      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
     </message>
   </context>
   <context>
@@ -6109,7 +6097,7 @@ to %1</source>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation>Tb</translation>
+      <translation>TB</translation>
     </message>
   </context>
   <context>
@@ -6235,7 +6223,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Tẩy</translation>
+      <translation>Gỡ bỏ</translation>
     </message>
     <message>
       <source>Inaccessible</source>
@@ -6340,7 +6328,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -6493,7 +6481,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>Đồng bộ hóa lưu trữ từ xa</translation>
+      <translation>Remote archive synchronization</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -6640,12 +6628,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>hh:mm</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6844,7 +6832,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
   </context>
   <context>
@@ -6895,7 +6883,7 @@ to %1</source>
     </message>
     <message>
       <source>Permissions</source>
-      <translation>Quyền truy nhập</translation>
+      <translation>Quyền</translation>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
@@ -6907,7 +6895,7 @@ to %1</source>
     </message>
     <message>
       <source>New Role</source>
-      <translation>Vai trò Mới</translation>
+      <translation>Vai trò mới</translation>
     </message>
     <message>
       <source>New Role %1</source>
@@ -6922,7 +6910,7 @@ to %1</source>
     </message>
     <message>
       <source>Permissions</source>
-      <translation>Quyền truy nhập</translation>
+      <translation>Quyền</translation>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
@@ -6998,7 +6986,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
@@ -7094,12 +7082,6 @@ to %1</source>
       <source>Uploading %1... %2	%p%</source>
       <translation type="unfinished">Uploading %1... %2	%p%</translation>
     </message>
-    <message numerus="yes">
-      <source>(%n more file(s) in queue)</source>
-      <translation type="unfinished">
-        <numerusform>(%n more file(s) in queue)</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop uploading?</source>
       <translation type="unfinished">Stop uploading?</translation>
@@ -7111,6 +7093,10 @@ to %1</source>
     <message>
       <source>Finalizing %1... %2	%p%</source>
       <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+    </message>
+    <message>
+      <source>(%1 of %2)</source>
+      <translation type="unfinished">(%1 of %2)</translation>
     </message>
   </context>
   <context>
@@ -7452,7 +7438,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation>Bức tường video stop?</translation>
+      <translation>Dừng Video Wall?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -7500,10 +7486,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchWearableHandler</name>
     <message>
-      <source>Could not add wearable camera to server &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not add wearable camera to server &quot;%1&quot;.</translation>
-    </message>
-    <message>
       <source>All files (*.*)</source>
       <translation>Tất cả các file(*.*)</translation>
     </message>
@@ -7516,74 +7498,8 @@ to %1</source>
       <translation type="unfinished">Open Wearable Camera Recordings...</translation>
     </message>
     <message>
-      <source>No video files found in &quot;%1&quot;</source>
-      <translation type="unfinished">No video files found in &quot;%1&quot;</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file format(s) are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file format(s) are not supported</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Only video files are supported.</source>
-      <translation type="unfinished">Only video files are supported.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) do not have timestamp(s)</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>Only video files with correct timestamp are supported.</source>
       <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You can upload these file(s) to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) will not be uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) will not be uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Some file(s) will not be uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Some file(s) will not be uploaded</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>There is no new files to upload in &quot;%1&quot;</source>
-      <translation type="unfinished">There is no new files to upload in &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
-    </message>
-    <message numerus="yes">
-      <source>File(s) size - %1
-Free space - %2</source>
-      <translation type="unfinished">
-        <numerusform>File(s) size - %1
-Free space - %2</numerusform>
-      </translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
@@ -7594,24 +7510,124 @@ Free space - %2</numerusform>
       <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
     </message>
     <message>
-      <source>File format of &quot;%1&quot; is not supported.</source>
-      <translation type="unfinished">File format of &quot;%1&quot; is not supported.</translation>
+      <source>Failed to add wearable camera</source>
+      <translation type="unfinished">Failed to add wearable camera</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; does not have timestamp.</source>
-      <translation type="unfinished">File &quot;%1&quot; does not have timestamp.</translation>
+      <source>No video files found in selected folder</source>
+      <translation type="unfinished">No video files found in selected folder</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <translation type="unfinished">
+        <numerusform>Selected file formats are not supported</numerusform>
+      </translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; cover periods for which video is already being uploaded.</source>
-      <translation type="unfinished">File &quot;%1&quot; cover periods for which video is already being uploaded.</translation>
+      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
+      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <translation type="unfinished">
+        <numerusform>Selected files do not have timestamps</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Wearable Camera.</source>
+      <translation type="unfinished">
+        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      </translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; cover periods for which video has already been uploaded.</source>
-      <translation type="unfinished">File &quot;%1&quot; cover periods for which video has already been uploaded.</translation>
+      <source>Selected files will not be uploaded</source>
+      <translation type="unfinished">Selected files will not be uploaded</translation>
     </message>
     <message>
-      <source>There is no space on server for file &quot;%1&quot;.</source>
-      <translation type="unfinished">There is no space on server for file &quot;%1&quot;.</translation>
+      <source>Some files will not be uploaded</source>
+      <translation type="unfinished">Some files will not be uploaded</translation>
+    </message>
+    <message>
+      <source>No new files to upload in selected folder</source>
+      <translation type="unfinished">No new files to upload in selected folder</translation>
+    </message>
+    <message>
+      <source>%1 - has unsupported format.</source>
+      <translation type="unfinished">%1 - has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 - does not have timestamp.</source>
+      <translation type="unfinished">%1 - does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 - covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 - covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation type="unfinished">
+        <numerusform>Selected files are too old</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation type="unfinished">
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation type="unfinished">
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation type="unfinished">To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation type="unfinished">Upload anyway?</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation type="unfinished">Could not finish upload to %1</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation type="unfinished">Make sure there is enough space on server storage.</translation>
+    </message>
+    <message>
+      <source>%1 - is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 - is older than allowed in camera archive settings.</translation>
     </message>
   </context>
   <context>
@@ -7866,12 +7882,12 @@ Free space - %2</numerusform>
       <translation>Lỗi ghi tệp.</translation>
     </message>
     <message>
-      <source>Internal error</source>
-      <translation>Lỗi bên trong</translation>
-    </message>
-    <message>
       <source>No data exported.</source>
       <translation>Không xuất dữ liệu.</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>Lỗi bên trong</translation>
     </message>
   </context>
   <context>
@@ -7882,7 +7898,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Export</source>
-      <translation>Xuất ra</translation>
+      <translation>Xuất</translation>
     </message>
     <message>
       <source>Rapid Review</source>
@@ -7961,7 +7977,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>Thời gian máy chủ...</translation>
+      <translation>Chọn thư mục...</translation>
     </message>
   </context>
   <context>
@@ -8205,7 +8221,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Export</source>
-      <translation>Xuất ra</translation>
+      <translation>Xuất</translation>
     </message>
   </context>
   <context>
@@ -8227,7 +8243,7 @@ Free space - %2</numerusform>
     <message>
       <source>Copy</source>
       <comment>to Clipboard</comment>
-      <translation>Bản sao</translation>
+      <translation>Sao chép</translation>
     </message>
     <message>
       <source>Copy to Clipboard</source>
@@ -8251,13 +8267,6 @@ Free space - %2</numerusform>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>Đã dán</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>Không có sẵn</translation>
     </message>
   </context>
   <context>
@@ -8333,7 +8342,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Next</source>
-      <translation>Tiếp tục</translation>
+      <translation>Kế tiếp</translation>
     </message>
     <message>
       <source>Name is necessary</source>
@@ -8349,7 +8358,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
@@ -8451,7 +8460,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>Thời gian máy chủ...</translation>
+      <translation>Chọn thư mục...</translation>
     </message>
     <message>
       <source>Too short period selected</source>
@@ -8560,16 +8569,16 @@ Free space - %2</numerusform>
       <translation>Không mở được trang web máy chủ</translation>
     </message>
     <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>Không thể thay đổi mật khẩu</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>Không thể thay đổi mật khẩu trên %1 trong số %2 máy ảnh</translation>
-    </message>
-    <message>
-      <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
     </message>
   </context>
   <context>
@@ -8610,7 +8619,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>Xóa Showreel %1?</translation>
+      <translation>Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

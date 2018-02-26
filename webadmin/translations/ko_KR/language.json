@@ -176,6 +176,20 @@
         "default": "{{PRODUCT_NAME}} 웹 인터페이스"
     },
     "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pause",
+            "help": "help | show commands",
+            "collapse all servers": "collapse all servers",
+            "collapse server": "collapse server + [server name]",
+            "play": "play",
+            "clear search": "clear search",
+            "live": "go to live | show me live",
+            "expand all servers": "expand all servers",
+            "stop listening": "stop listening",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
         "systemOffline": "시스템 오프라인",
         "cameraLinks": {
             "copyToClipboard": "클립보드에 복사",
@@ -186,9 +200,9 @@
             "transcoding": "트랜스코딩",
             "copyActiveText": "클립보드에 복사됨"
         },
-        "searchCamPlaceholder": "검색",
+        "searchCamPlaceholder": "Search",
         "cameraStates": {
-            "noFormat": "이 브라우저 또는 장치는이 카메라의 비디오 재생을 지원하지 않습니다.",
+            "noFormat": "This browser does not support video playback from this camera.",
             "ieWin10": "Microsoft Edge 또는 Google 크롬 브라우저를 사용하십시오.",
             "iosVideoTooLarge": "iOS는 fullHD (2MP: 1920x1080) 보다 큰 비디오를 지원하지 않습니다.",
             "unauthorized": "인증이 필요합니다",
@@ -199,7 +213,13 @@
             "error": "오류",
             "offline": "오프라인",
             "noData": "데이터 없음",
-            "flashRequired": "ARM 기반 서버에서 비디오를 재생하려면 <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a>을 설치하십시오."
+            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+        },
+        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "resolution": {
+            "high": "High",
+            "auto": "Auto",
+            "low": "Low"
         }
     }
 }

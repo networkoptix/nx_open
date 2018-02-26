@@ -1023,7 +1023,7 @@ QMap<QString, QnCameraAdvancedParameter> QnActiResource::getParamsMap(const QSet
  * Needed when user changes not all params in aggregate parameter.
  * Example: WB_GAIN=127,%WB_R_GAIN becomes WB_GAIN=127,245
  */
-QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, QnCameraAdvancedParamQueryInfo> &queries) const
+QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, CameraAdvancedParamQueryInfo> &queries) const
 {
     CLHttpStatus status;
     QMap<QString, QString> setQueries;
@@ -1116,7 +1116,7 @@ QMap<QString, QString> QnActiResource::buildSetParamsQueries(const QnCameraAdvan
 {
     QMap<QString, QString> paramToAgregate;
     QMap<QString, QString> paramToValue;
-    QMap<QString, QnCameraAdvancedParamQueryInfo> agregateToCmd;
+    QMap<QString, CameraAdvancedParamQueryInfo> agregateToCmd;
 
     for(const auto& val: values)
         paramToValue[val.id] = val.value;
@@ -1141,7 +1141,7 @@ QMap<QString, QString> QnActiResource::buildSetParamsQueries(const QnCameraAdvan
 
         paramToAgregate[id] = agregate;
 
-        QnCameraAdvancedParamQueryInfo info;
+        CameraAdvancedParamQueryInfo info;
         info.group = getParamGroup(paramsMap[id]);
         info.cmd = args;
         agregateToCmd[agregate] = info;

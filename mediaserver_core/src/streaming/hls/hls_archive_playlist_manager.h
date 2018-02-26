@@ -46,6 +46,7 @@ namespace nx_hls
         //!Implementation of AbstractPlaylistManager::getMaxBitrate
         virtual int getMaxBitrate() const override;
 
+        CameraDiagnostics::Result lastError() const;
     private:
         const QnSecurityCamResourcePtr m_camResource;
         qint64 m_startTimestamp;

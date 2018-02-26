@@ -1,3 +1,4 @@
+
 #include "workbench_export_handler.h"
 
 #include <QtWidgets/QAction>
@@ -41,6 +42,10 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_access_controller.h>
+
+#ifdef Q_OS_WIN
+#   include <launcher/nov_launcher_win.h>
+#endif
 
 namespace nx {
 namespace client {
@@ -167,6 +172,9 @@ WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
 
     connect(action(ui::action::ExportVideoAction), &QAction::triggered, this,
         &WorkbenchExportHandler::handleExportVideoAction);
+
+    connect(action(ui::action::ExportStandaloneClientAction), &QAction::triggered, this,
+        &WorkbenchExportHandler::at_exportStandaloneClientAction_triggered);
 }
 
 WorkbenchExportHandler::~WorkbenchExportHandler()
@@ -385,6 +393,41 @@ void WorkbenchExportHandler::handleExportVideoAction()
             NX_ASSERT(false, "Should never get here in 'cancelled' state");
             break;
     }
+}
+
+
+void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
+{
+#ifdef Q_OS_WIN
+    const auto exeExtension = lit(".exe");
+    const auto tmpExtension = lit(".tmp");
+
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
+        mainWindow(),
+        lit("Export Standalone Client"),
+        QnAppInfo::clientExecutableName(),
+        lit("*") + exeExtension
+    ));
+    dialog->setFileMode(QFileDialog::AnyFile);
+    dialog->setAcceptMode(QFileDialog::AcceptSave);
+    if (!dialog->exec())
+        return;
+
+    QString targetFilename = dialog->selectedFile();
+    if (!targetFilename.endsWith(exeExtension))
+        targetFilename = targetFilename +exeExtension;
+
+    QString temporaryFilename = targetFilename;
+    temporaryFilename.replace(exeExtension, tmpExtension);
+    if (QnNovLauncher::createLaunchingFile(temporaryFilename) != QnNovLauncher::ErrorCode::Ok)
+    {
+        QnMessageBox::critical(mainWindow(), lit("File %1 cannot be written").arg(temporaryFilename));
+        return;
+    }
+
+    QFile::rename(temporaryFilename, targetFilename);
+    QnMessageBox::success(mainWindow(), tr("Export completed"));
+#endif
 }
 
 } // namespace desktop

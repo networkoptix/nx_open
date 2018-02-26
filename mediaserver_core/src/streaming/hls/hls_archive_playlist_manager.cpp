@@ -13,6 +13,7 @@
 #include <media_server/media_server_module.h>
 
 #include "streaming/streaming_chunk_cache_key.h"
+#include <nx/fusion/serialization/lexical.h>
 
 
 namespace nx_hls
@@ -79,11 +80,17 @@ namespace nx_hls
             m_prevChunkEndTimestamp = -1;
             return false;
         }
+
         m_prevChunkEndTimestamp = nextData->timestamp;
         m_currentArchiveChunk = m_delegate->getLastUsedChunkInfo();
 
         m_initialPlaylistCreated = false;
-        return true;
+        return archiveDelegate->lastError().errorCode == CameraDiagnostics::ErrorCode::noError;
+    }
+
+    CameraDiagnostics::Result ArchivePlaylistManager::lastError() const
+    {
+        return m_delegate ? m_delegate->lastError() : CameraDiagnostics::NoErrorResult();
     }
 
     size_t ArchivePlaylistManager::generateChunkList(
@@ -142,7 +149,7 @@ namespace nx_hls
             if( !nextData )
             {
                 //end of archive reached
-                //TODO/HLS: #ak end of archive is moving forward constantly, so need just imply some delay 
+                //TODO/HLS: #ak end of archive is moving forward constantly, so need just imply some delay
                 m_eof = true;
                 return false;
             }
@@ -161,7 +168,7 @@ namespace nx_hls
         if( nextData->flags & QnAbstractMediaData::MediaFlags_BOF )
         {
             //gap in archive detected
-            if( m_prevChunkEndTimestamp >= m_currentArchiveChunk.startTimeUsec && 
+            if( m_prevChunkEndTimestamp >= m_currentArchiveChunk.startTimeUsec &&
                 m_prevChunkEndTimestamp < (m_currentArchiveChunk.startTimeUsec + m_currentArchiveChunk.durationUsec) )
             {
                 chunkData.duration = m_currentArchiveChunk.durationUsec - (m_prevChunkEndTimestamp - m_currentArchiveChunk.startTimeUsec);
@@ -201,4 +208,5 @@ namespace nx_hls
         //returning max archive timestamp
         return m_delegate->endTime();
     }
+
 }

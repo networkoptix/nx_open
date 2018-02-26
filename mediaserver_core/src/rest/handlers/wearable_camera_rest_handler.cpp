@@ -167,6 +167,8 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
     if (!uploader)
         return nx_http::StatusCode::internalServerError;
 
+    QnWearablePrepareReply reply;
+
     QnTimePeriod unionPeriod;
     for (const QnWearablePrepareDataElement& element : data.elements)
         unionPeriod.addPeriod(element.period);
@@ -180,28 +182,25 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
             /*keepSmallChunks*/ false,
             std::numeric_limits<int>::max());
 
-    QnWearablePrepareReply reply;
-
-    qint64 totalSize = 0;
-    for (const QnWearablePrepareDataElement& element : data.elements)
-        totalSize += element.size;
-    uploader->clearSpace(totalSize, &reply.availableSpace);
-
-    qint64 minTime = std::numeric_limits<qint64>::max();
-    for (const QnWearablePrepareDataElement& element : data.elements)
-        minTime = std::min(minTime, element.period.startTimeMs);
-
-    qint64 threshold = qnSyncTime->currentMSecsSinceEpoch() - kOneDayMSecs * camera->minDays();
-    if (minTime < threshold)
-        if (!qnNormalStorageMan->canAddChunk(minTime, std::max(kMinChunkCheckSize, totalSize)))
-            reply.footageTooOld = true;
-
     for (const QnWearablePrepareDataElement& element : data.elements)
     {
         QnWearablePrepareReplyElement replyElement;
         replyElement.period = shrinkPeriod(element.period, serverTimePeriods);
         reply.elements.push_back(replyElement);
     }
+
+    qint64 totalSize = 0;
+    qint64 maxSize = 0;
+    for (const QnWearablePrepareDataElement& element : data.elements)
+    {
+        totalSize += element.size;
+        maxSize = std::max(maxSize, element.size);
+    }
+
+    if (maxSize > uploader->downloadBytesAvailable())
+        reply.storageCleanupNeeded = true;
+    if (totalSize > uploader->totalBytesAvailable())
+        reply.storageCleanupNeeded = true;
 
     result.setReply(reply);
     return nx_http::StatusCode::ok;

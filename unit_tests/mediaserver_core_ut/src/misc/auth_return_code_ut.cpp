@@ -191,7 +191,7 @@ public:
 
             if (expectedStatusCode == nx_http::StatusCode::unauthorized)
             {
-                QnTimePeriod period(0, std::numeric_limits<int64_t>::max());
+                QnTimePeriod period(0, std::numeric_limits<qint64>::max());
                 static_cast<QnMServerAuditManager*>(qnAuditManager)->flushRecords();
                 QnAuditRecordList outputData = qnServerDb->getAuditData(period, QnUuid());
                 ASSERT_TRUE(!outputData.isEmpty());

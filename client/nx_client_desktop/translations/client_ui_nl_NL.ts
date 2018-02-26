@@ -26,7 +26,7 @@
     <message>
       <location/>
       <source>Support</source>
-      <translation>Ondersteuning</translation>
+      <translation>Support</translation>
     </message>
     <message>
       <location/>
@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Gefixeerde archieflengte</translation>
     </message>
@@ -468,7 +463,7 @@
     <message>
       <location filename="../src/ui/widgets/business/business_rule_widget.ui"/>
       <source>Event</source>
-      <translation>Gebeurtenis</translation>
+      <translation>Event</translation>
     </message>
     <message>
       <location/>
@@ -498,7 +493,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation>Naar</translation>
+      <translation>Bron</translation>
     </message>
   </context>
   <context>
@@ -516,7 +511,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation>Event regels</translation>
+      <translation>Gebeurtnisregels</translation>
     </message>
     <message>
       <location/>
@@ -614,12 +609,12 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
@@ -680,7 +675,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Standaardinstellingen herstellen</translation>
+      <translation>Herstel standaardwaarden</translation>
     </message>
     <message>
       <location/>
@@ -961,6 +956,14 @@
     </message>
   </context>
   <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>Categorie</translation>
+    </message>
+  </context>
+  <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
@@ -998,7 +1001,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Event regels...</translation>
+      <translation>Gebeurtenisregels...</translation>
     </message>
   </context>
   <context>
@@ -1016,7 +1019,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
@@ -1026,7 +1029,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
@@ -1159,12 +1162,12 @@
     <message>
       <location/>
       <source>Y Offset</source>
-      <translation>Y Offset</translation>
+      <translation>Y-as verschuiving</translation>
     </message>
     <message>
       <location/>
       <source>X Offset</source>
-      <translation>X Offset</translation>
+      <translation>X-as verschuiving</translation>
     </message>
     <message>
       <location/>
@@ -1202,12 +1205,12 @@
     <message>
       <location/>
       <source>Add...</source>
-      <translation>Voeg toe...</translation>
+      <translation>Toevoegen...</translation>
     </message>
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Verwijder</translation>
+      <translation>Verwijderen</translation>
     </message>
     <message>
       <location/>
@@ -1425,7 +1428,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
@@ -1443,7 +1446,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Gebruikers ophalen via LDAP...</translation>
+      <translation>Gebruikers ophalen van LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -1476,7 +1479,7 @@
     <message>
       <location/>
       <source>Generic</source>
-      <translation>Algemeen</translation>
+      <translation>Generiek</translation>
     </message>
     <message>
       <location/>
@@ -1570,7 +1573,7 @@
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>Licentie activeren</translation>
+      <translation>Activeer licentie</translation>
     </message>
     <message>
       <location/>
@@ -1649,12 +1652,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
@@ -1753,7 +1756,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Aanmelden:</translation>
+      <translation>Login:</translation>
     </message>
     <message>
       <location/>
@@ -1845,7 +1848,7 @@
     <message>
       <location/>
       <source>Events</source>
-      <translation>Evenementen</translation>
+      <translation>Events</translation>
     </message>
   </context>
   <context>
@@ -1868,7 +1871,7 @@
     <message>
       <location/>
       <source>Start Tour</source>
-      <translation>Start Tour</translation>
+      <translation>Start tour</translation>
     </message>
     <message>
       <location/>
@@ -1966,7 +1969,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Wachtwoord:</translation>
     </message>
     <message>
       <location/>
@@ -2023,7 +2026,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Wachtwoord:</translation>
     </message>
     <message>
       <location/>
@@ -2033,7 +2036,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Gebruikersnaam:</translation>
+      <translation>Aanmelden:</translation>
     </message>
     <message>
       <location/>
@@ -2056,7 +2059,7 @@
     <message>
       <location/>
       <source>Add...</source>
-      <translation>Toevoegen...</translation>
+      <translation>Voeg toe...</translation>
     </message>
     <message>
       <location/>
@@ -2194,7 +2197,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Gebruikers ophalen van LDAP...</translation>
+      <translation>Gebruikers ophalen via LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2369,7 +2372,7 @@
     <message>
       <location/>
       <source>Resolution</source>
-      <translation>Resolution</translation>
+      <translation>Resolutie</translation>
     </message>
     <message>
       <location/>
@@ -2633,12 +2636,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
@@ -2664,11 +2667,6 @@
       <location/>
       <source>Reset</source>
       <translation>Reset</translation>
-    </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
     </message>
     <message>
       <location/>
@@ -2878,12 +2876,12 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Gebruikersnaam:</translation>
+      <translation>Login:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Wachtwoord:</translation>
     </message>
   </context>
   <context>
@@ -3063,11 +3061,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Bewegingsdetectie</translation>
     </message>
@@ -3086,11 +3079,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Annuleren</translation>
     </message>
@@ -3099,11 +3087,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation>Upload Video</translation>
     </message>
@@ -3146,7 +3129,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Schedule</source>
-      <translation>Rooster</translation>
+      <translation>Schema</translation>
     </message>
     <message>
       <location/>

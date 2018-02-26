@@ -296,6 +296,9 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
             channelProperties.httpUrl.toString(),
             responseBuffer);
     }
+    // Workaround camera bug. It wont change bitrate if codec just changed.
+    const bool execTwice = m_previousCodecValue != codec;
+    m_previousCodecValue = codec;
 
     qWarning() << videoChannelConfiguration.toString().toUtf8();
     result = doPutRequest(
@@ -303,7 +306,14 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
         m_hikvisionResource->getAuth(),
         videoChannelConfiguration.toString().toUtf8(),
         &statusCode);
-
+    if (result && execTwice)
+    {
+        result = doPutRequest(
+            channelProperties.httpUrl,
+            m_hikvisionResource->getAuth(),
+            videoChannelConfiguration.toString().toUtf8(),
+            &statusCode);
+    }
     if (!result)
     {
         if (statusCode == nx_http::StatusCode::Value::unauthorized)

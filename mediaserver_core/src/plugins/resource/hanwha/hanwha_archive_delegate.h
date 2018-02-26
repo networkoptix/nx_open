@@ -44,6 +44,7 @@ public:
         bool /*fastSwitch*/,
         const QSize& /*resolution*/) override;
 
+    virtual CameraDiagnostics::Result lastError() const override;
 private:
     bool isForwardDirection() const;
 private:

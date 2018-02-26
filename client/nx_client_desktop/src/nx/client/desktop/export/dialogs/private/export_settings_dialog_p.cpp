@@ -365,6 +365,9 @@ void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
     {
         refreshMediaPreview();
     }
+
+    validateSettings(Mode::Media);
+
     emit transcodingModeChanged();
 }
 
