@@ -4,11 +4,7 @@
 #include <QString>
 
 #include <core/resource/resource_fwd.h>
-
-namespace Qn
-{
-    enum MediaStreamEvent;
-} //namespace Qn
+#include <common/common_globals.h>
 
 //!Holds types related to performing camera availability diagnostics
 namespace CameraDiagnostics {
