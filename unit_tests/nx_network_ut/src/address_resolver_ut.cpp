@@ -232,7 +232,7 @@ protected:
         whenResolve();
     }
 
-    void thenResolvedSucceeded()
+    void thenResolveSucceeded()
     {
         m_prevResolveResult = m_resolveResults.pop();
         ASSERT_EQ(SystemError::noError, std::get<0>(m_prevResolveResult));
@@ -257,7 +257,7 @@ protected:
 
     void assertResolveIsDoneByDnsResolver()
     {
-        thenResolvedSucceeded();
+        thenResolveSucceeded();
 
         ASSERT_EQ(1U, std::get<1>(m_prevResolveResult).size());
         ASSERT_EQ(AddressType::direct, std::get<1>(m_prevResolveResult).front().type);
@@ -318,7 +318,7 @@ TEST_F(AddressResolver, localhost_is_resolved_properly_ipv4)
 {
     whenResolve("localhost");
 
-    thenResolvedSucceeded();
+    thenResolveSucceeded();
     andResolvedTo(HostAddress(in4addr_loopback));
 }
 
@@ -328,7 +328,7 @@ TEST_F(AddressResolver, localhost_is_resolved_properly_ipv6)
 
     whenResolve("localhost");
 
-    thenResolvedSucceeded();
+    thenResolveSucceeded();
     andResolvedTo(HostAddress(in4addr_loopback));
     andResolvedTo(HostAddress(in6addr_loopback, 0));
 }
@@ -336,13 +336,13 @@ TEST_F(AddressResolver, localhost_is_resolved_properly_ipv6)
 TEST_F(AddressResolver, resolving_same_name_with_different_ip_version)
 {
     whenResolve("localhost");
-    thenResolvedSucceeded();
+    thenResolveSucceeded();
 
     setIpVersionToUse(AF_INET6);
 
     whenResolve("localhost");
 
-    thenResolvedSucceeded();
+    thenResolveSucceeded();
     andResolvedTo(HostAddress(in4addr_loopback));
     andResolvedTo(HostAddress(in6addr_loopback, 0));
 }

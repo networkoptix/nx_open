@@ -31,8 +31,8 @@
 NX_NETWORK_API bool operator==(const in_addr& left, const in_addr& right);
 NX_NETWORK_API bool operator==(const in6_addr& left, const in6_addr& right);
 
-#ifndef _WIN32
-NX_NETWORK_API extern const in_addr in4addr_loopback;
+#if !defined(_WIN32)
+    NX_NETWORK_API extern const in_addr in4addr_loopback;
 #endif
 
 namespace nx {
