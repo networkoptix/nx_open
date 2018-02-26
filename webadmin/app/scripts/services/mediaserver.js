@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', ['$http', '$modal', '$q', '$localStorage', '$location', '$log', 'nativeClient', 'systemAPI',
+    .factory('mediaserver', ['$http', '$uibModal', '$q', '$localStorage', '$location', '$log', 'nativeClient', 'systemAPI',
     function ($http, $modal, $q, $localStorage, $location, $log, nativeClient, systemAPI) {
 
 

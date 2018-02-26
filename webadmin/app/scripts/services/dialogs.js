@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('dialogs', ['$http', '$modal', '$q', '$location', function ($http, $modal, $q, $location) {
+    .factory('dialogs', ['$http', '$uibModal', '$q', '$location', function ($http, $modal, $q, $location) {
         function openDialog(settings){
 
             //scope.inline = typeof($location.search().inline) != 'undefined';
@@ -11,7 +11,7 @@ angular.module('webadminApp')
             }
 
             // Check 401 against offline
-            var modalInstance = $modal.open({
+            var  modalInstance = $modal.open({
                 controller: 'DialogCtrl',
                 templateUrl: Config.viewsDir + 'components/dialog.html',
                 animation: !isInline(),
@@ -114,7 +114,7 @@ angular.module('webadminApp')
                 }).result;
             }
         };
-    }]).controller("DialogCtrl", ['$scope', '$modalInstance', 'settings', function($scope, $modalInstance, settings){
+    }]).controller("DialogCtrl", ['$scope', '$uibModalInstance', 'settings', function($scope, $modalInstance, settings){
         $scope.settings = settings;
         $scope.settings.localLogin = $scope.settings.localLogin || Config.defaultLogin;
         $scope.forms = {};
