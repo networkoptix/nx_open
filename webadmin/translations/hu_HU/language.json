@@ -176,6 +176,20 @@
         "default": "{{PRODUCT_NAME}} web interfész"
     },
     "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pause",
+            "help": "help | show commands",
+            "collapse all servers": "collapse all servers",
+            "collapse server": "collapse server + [server name]",
+            "play": "play",
+            "clear search": "clear search",
+            "live": "go to live | show me live",
+            "expand all servers": "expand all servers",
+            "stop listening": "stop listening",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
         "systemOffline": "A rendszer offline",
         "cameraLinks": {
             "copyToClipboard": "másolás vágólapra",
@@ -186,9 +200,9 @@
             "transcoding": "Transzkódolás",
             "copyActiveText": "vágólapra másolva"
         },
-        "searchCamPlaceholder": "keresés",
+        "searchCamPlaceholder": "Search",
         "cameraStates": {
-            "noFormat": "Ez a böngésző vagy eszköz nem támogatja erről a kameráról történő videofájl lejátszást.",
+            "noFormat": "This browser does not support video playback from this camera.",
             "ieWin10": "Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.",
             "iosVideoTooLarge": "Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
             "unauthorized": "Hitelesítés szükséges",
@@ -199,7 +213,13 @@
             "error": "Hiba",
             "offline": "Offline",
             "noData": "Nincs adat",
-            "flashRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a> a videó ARM-alapú szerverről történő lejátszásához."
+            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+        },
+        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "resolution": {
+            "high": "High",
+            "auto": "Auto",
+            "low": "Low"
         }
     }
 }

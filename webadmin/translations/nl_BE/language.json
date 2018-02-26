@@ -176,6 +176,20 @@
         "default": "{{PRODUCT_NAME}} web interface"
     },
     "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pause",
+            "help": "help | show commands",
+            "collapse all servers": "collapse all servers",
+            "collapse server": "collapse server + [server name]",
+            "play": "play",
+            "clear search": "clear search",
+            "live": "go to live | show me live",
+            "expand all servers": "expand all servers",
+            "stop listening": "stop listening",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
         "systemOffline": "Systeem Offline",
         "cameraLinks": {
             "copyToClipboard": "kopieer naar klembord",
@@ -186,9 +200,9 @@
             "transcoding": "Transcoding",
             "copyActiveText": "gekopieerd naar het klembord"
         },
-        "searchCamPlaceholder": "search",
+        "searchCamPlaceholder": "Search",
         "cameraStates": {
-            "noFormat": "Deze browser of apparaat ondersteunt geen videoweergave van deze camera.",
+            "noFormat": "This browser does not support video playback from this camera.",
             "ieWin10": "Gebruik alsjeblieft de browsers Microsoft Edge of Google Chrome.",
             "iosVideoTooLarge": "iOS ondersteunt geen video die groter is dan FullHD (2MP: 1920x1080).",
             "unauthorized": "Authentication required",
@@ -199,7 +213,13 @@
             "error": "Error",
             "offline": "Offline",
             "noData": "Geen data",
-            "flashRequired": "<a href='https://get.adobe.com/flashplayer/' target='_blank'>installeer Adobe Flash</a> om video af te spelen van ARM-based servers."
+            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+        },
+        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "resolution": {
+            "high": "High",
+            "auto": "Auto",
+            "low": "Low"
         }
     }
 }
