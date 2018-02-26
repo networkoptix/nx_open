@@ -854,6 +854,22 @@ to view more bookmarks</source>
       <translation>制作幻灯片</translation>
     </message>
     <message>
+      <source>Wearable Camera...</source>
+      <translation type="unfinished">Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation type="unfinished">Upload File...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation type="unfinished">Upload Folder...</translation>
+    </message>
+    <message>
       <source>Start Analytics...</source>
       <translation>启动分析...</translation>
     </message>
@@ -880,22 +896,6 @@ to view more bookmarks</source>
     <message>
       <source>Cell Spacing...</source>
       <translation>网格间距：</translation>
-    </message>
-    <message>
-      <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
-    </message>
-    <message>
-      <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
-    </message>
-    <message>
-      <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
-    </message>
-    <message>
-      <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
     </message>
   </context>
   <context>
@@ -1007,16 +1007,16 @@ to view more bookmarks</source>
       <translation>您即将导出长视频。它可能需要超过千兆字节的硬盘空间，需要几分钟才能完成。</translation>
     </message>
     <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation>导出的.EXE文件的大小超过4 GB，无法在Windows中双击打开。它只能在 %1 Client中播放。</translation>
+    </message>
+    <message>
       <source>Settings are not available for .EXE files.</source>
       <translation>设置不可用于.EXE文件。</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
       <translation>本地文件，服务器监视器小部件和网页将不会被导出。</translation>
-    </message>
-    <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>导出的.EXE文件的大小超过4 GB，无法在Windows中双击打开。它只能在 %1 Client中播放。</translation>
     </message>
   </context>
   <context>
@@ -1176,14 +1176,6 @@ to view more bookmarks</source>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>允许只拉丁文字母、 数字和符号键盘。</translation>
     </message>
-    <message>
-      <source>Long</source>
-      <translation>长</translation>
-    </message>
-    <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>允许只拉丁文字母、 数字和符号键盘%1。</translation>
-    </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
@@ -1195,6 +1187,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>密码必须至少 %n 个字符长。</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>长</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
@@ -1213,6 +1209,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>密码不应当包含%n重复字符</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>允许只拉丁文字母、 数字和符号键盘%1。</translation>
     </message>
   </context>
   <context>
@@ -3168,15 +3168,15 @@ to %1</source>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation>某些选定的相机需要设置密码。</translation>
     </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation>要求您的系统管理员执行此操作。</translation>
+    </message>
     <message numerus="yes">
       <source>Set Password</source>
       <translation>
         <numerusform>设置密码</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Ask your system administrator to do it.</source>
-      <translation>要求您的系统管理员执行此操作。</translation>
     </message>
   </context>
   <context>
@@ -6087,6 +6087,10 @@ to %1</source>
       <translation>请检查身份验证信息</translation>
     </message>
     <message>
+      <source>NO LIVE STREAM</source>
+      <translation type="unfinished">NO LIVE STREAM</translation>
+    </message>
+    <message>
       <source>TOO MANY CONNECTIONS</source>
       <translation>连接太多</translation>
     </message>
@@ -6097,10 +6101,6 @@ to %1</source>
     <message>
       <source>Set for this Camera</source>
       <translation>为此相机设置</translation>
-    </message>
-    <message>
-      <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
     </message>
   </context>
   <context>
@@ -7920,12 +7920,12 @@ to %1</source>
       <translation>文件写入错误</translation>
     </message>
     <message>
-      <source>Internal error</source>
-      <translation>内部错误</translation>
-    </message>
-    <message>
       <source>No data exported.</source>
       <translation>没有数据导出。</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>内部错误</translation>
     </message>
   </context>
   <context>
@@ -8714,16 +8714,16 @@ to %1</source>
       <translation>无法打开服务器 web 页</translation>
     </message>
     <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>变更密码失败</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>无法更改%2个摄像机中%1个摄像机上的密码</translation>
-    </message>
-    <message>
-      <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
     </message>
   </context>
   <context>

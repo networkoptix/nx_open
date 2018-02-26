@@ -1332,7 +1332,7 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation>大小</translation>
+      <translation>大小:</translation>
     </message>
     <message>
       <location/>

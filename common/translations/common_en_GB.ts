@@ -499,28 +499,28 @@
     <name>QnLicenseUsageHelper</name>
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n %2 are used out of %1.</numerusform>
         <numerusform>%n %2 are used out of %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n %2 will be used out of %1.</numerusform>
         <numerusform>%n %2 will be used out of %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Activate %n more %1.</numerusform>
         <numerusform>Activate %n more %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n more %1 will be used.</numerusform>
         <numerusform>%n more %1 will be used.</numerusform>
       </translation>
@@ -572,28 +572,28 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
       <source>%n Camera(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Camera(s)</numerusform>
         <numerusform>%n Camera(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n camera(s)</numerusform>
         <numerusform>%n camera(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Device(s)</numerusform>
         <numerusform>%n Device(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n device(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n device(s)</numerusform>
         <numerusform>%n device(s)</numerusform>
       </translation>
@@ -632,14 +632,14 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O Module(s)</numerusform>
         <numerusform>%n I/O Module(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O module(s)</numerusform>
         <numerusform>%n I/O module(s)</numerusform>
       </translation>
@@ -907,7 +907,7 @@
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>milliseconds</numerusform>
         <numerusform>milliseconds</numerusform>
       </translation>
@@ -915,7 +915,7 @@
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>seconds</numerusform>
         <numerusform>seconds</numerusform>
       </translation>
@@ -923,7 +923,7 @@
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>minutes</numerusform>
         <numerusform>minutes</numerusform>
       </translation>
@@ -931,7 +931,7 @@
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>hours</numerusform>
         <numerusform>hours</numerusform>
       </translation>
@@ -939,7 +939,7 @@
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>days</numerusform>
         <numerusform>days</numerusform>
       </translation>
@@ -947,7 +947,7 @@
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>weeks</numerusform>
         <numerusform>weeks</numerusform>
       </translation>
@@ -955,7 +955,7 @@
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>months</numerusform>
         <numerusform>months</numerusform>
       </translation>
@@ -963,7 +963,7 @@
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>years</numerusform>
         <numerusform>years</numerusform>
       </translation>
@@ -1115,7 +1115,7 @@
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Motion on Cameras</numerusform>
         <numerusform>Motion on Cameras</numerusform>
       </translation>
@@ -1158,42 +1158,42 @@
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Input Signal on Devices</numerusform>
         <numerusform>Input Signal on Devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Input Signal on Cameras</numerusform>
         <numerusform>Input Signal on Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices Disconnected</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Devices Disconnected</numerusform>
         <numerusform>Devices Disconnected</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Cameras Disconnected</numerusform>
         <numerusform>Cameras Disconnected</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices IP Conflict</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Devices IP Conflict</numerusform>
         <numerusform>Devices IP Conflict</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Cameras IP Conflict</numerusform>
         <numerusform>Cameras IP Conflict</numerusform>
       </translation>
@@ -1330,7 +1330,7 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
@@ -1343,14 +1343,14 @@
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
         <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>No data received during last %n seconds.</numerusform>
         <numerusform>No data received during last %n seconds.</numerusform>
       </translation>
@@ -1473,14 +1473,14 @@
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Users</numerusform>
         <numerusform>%n Users</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Roles</numerusform>
         <numerusform>%n Roles</numerusform>
       </translation>

@@ -574,29 +574,29 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n Camara(s)</numerusform>
-        <numerusform>%n Camara(s)</numerusform>
+        <numerusform>%n Camara</numerusform>
+        <numerusform>%n Camaras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
       <translation>
-        <numerusform>%n camara(s)</numerusform>
-        <numerusform>%n camara(s)</numerusform>
+        <numerusform>%n camara</numerusform>
+        <numerusform>%n camaras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n Dispositivo(s)</numerusform>
-        <numerusform>%n Dispositivo(s)</numerusform>
+        <numerusform>%n Dispositivo</numerusform>
+        <numerusform>%n Dispositivos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
-        <numerusform>%n dispositivo(s)</numerusform>
-        <numerusform>%n dispositivo(s)</numerusform>
+        <numerusform>%n Dispositivo</numerusform>
+        <numerusform>%n Dispositivos</numerusform>
       </translation>
     </message>
     <message>
@@ -634,15 +634,15 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n E/S Módulo(s)</numerusform>
-        <numerusform>%n E/S Módulo(s)</numerusform>
+        <numerusform>%n I/O Modulos</numerusform>
+        <numerusform>%n I/O Modulos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n E/S módulo(s)</numerusform>
-        <numerusform>%n E/S módulo(s)</numerusform>
+        <numerusform>%n I/O Modulos</numerusform>
+        <numerusform>%n I/O Modulos</numerusform>
       </translation>
     </message>
     <message>
@@ -909,7 +909,7 @@
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>milisegundos</numerusform>
+        <numerusform>milisegundo</numerusform>
         <numerusform>milisegundos</numerusform>
       </translation>
     </message>
@@ -1117,8 +1117,8 @@
     <message numerus="yes">
       <source>Motion on Cameras</source>
       <translation>
-        <numerusform>Movimiento en cámaras</numerusform>
-        <numerusform>Movimiento en cámaras</numerusform>
+        <numerusform>Movimiento en las cámaras</numerusform>
+        <numerusform>Movimiento en las cámaras</numerusform>
       </translation>
     </message>
     <message>
@@ -1159,7 +1159,7 @@
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Señal de entrada en dispositivos</numerusform>
         <numerusform>Señal de entrada en dispositivos</numerusform>
       </translation>

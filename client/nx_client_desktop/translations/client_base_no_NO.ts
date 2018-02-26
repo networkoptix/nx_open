@@ -854,6 +854,22 @@ to view more bookmarks</translation>
       <translation type="unfinished">Make Showreel</translation>
     </message>
     <message>
+      <source>Wearable Camera...</source>
+      <translation type="unfinished">Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation type="unfinished">Upload File...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation type="unfinished">Upload Folder...</translation>
+    </message>
+    <message>
       <source>Start Analytics...</source>
       <translation type="unfinished">Start Analytics...</translation>
     </message>
@@ -880,22 +896,6 @@ to view more bookmarks</translation>
     <message>
       <source>Cell Spacing...</source>
       <translation type="unfinished">Cell Spacing...</translation>
-    </message>
-    <message>
-      <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
-    </message>
-    <message>
-      <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
-    </message>
-    <message>
-      <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
-    </message>
-    <message>
-      <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
     </message>
   </context>
   <context>
@@ -1007,16 +1007,16 @@ to view more bookmarks</translation>
       <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
     </message>
     <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+    </message>
+    <message>
       <source>Settings are not available for .EXE files.</source>
       <translation type="unfinished">Settings are not available for .EXE files.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
       <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
-    </message>
-    <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
     </message>
   </context>
   <context>
@@ -1179,14 +1179,6 @@ to view more bookmarks</translation>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation type="unfinished">Only latin letters, numbers and keyboard symbols are allowed.</translation>
     </message>
-    <message>
-      <source>Long</source>
-      <translation type="unfinished">Long</translation>
-    </message>
-    <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
-    </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation type="unfinished">
@@ -1200,6 +1192,10 @@ to view more bookmarks</translation>
         <numerusform>Password must be at least %n characters long.</numerusform>
         <numerusform>Password must be at least %n characters long.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation type="unfinished">Long</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
@@ -1221,6 +1217,10 @@ to view more bookmarks</translation>
         <numerusform>Password should not contain %n or more repeating characters.</numerusform>
         <numerusform>Password should not contain %n or more repeating characters.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
     </message>
   </context>
   <context>
@@ -3205,16 +3205,16 @@ to %1</translation>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation type="unfinished">Some of selected cameras requires password to be set up.</translation>
     </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation type="unfinished">Ask your system administrator to do it.</translation>
+    </message>
     <message numerus="yes">
       <source>Set Password</source>
       <translation type="unfinished">
         <numerusform>Set Password</numerusform>
         <numerusform>Set Password</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
     </message>
   </context>
   <context>
@@ -6162,6 +6162,10 @@ to %1</translation>
       <translation type="unfinished">Please check authentication information</translation>
     </message>
     <message>
+      <source>NO LIVE STREAM</source>
+      <translation type="unfinished">NO LIVE STREAM</translation>
+    </message>
+    <message>
       <source>TOO MANY CONNECTIONS</source>
       <translation type="unfinished">TOO MANY CONNECTIONS</translation>
     </message>
@@ -6172,10 +6176,6 @@ to %1</translation>
     <message>
       <source>Set for this Camera</source>
       <translation type="unfinished">Set for this Camera</translation>
-    </message>
-    <message>
-      <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
     </message>
   </context>
   <context>
@@ -8038,12 +8038,12 @@ to %1</translation>
       <translation type="unfinished">File write error.</translation>
     </message>
     <message>
-      <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
-    </message>
-    <message>
       <source>No data exported.</source>
       <translation type="unfinished">No data exported.</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation type="unfinished">Internal error</translation>
     </message>
   </context>
   <context>
@@ -8840,16 +8840,16 @@ to %1</translation>
       <translation type="unfinished">Failed to open server web page</translation>
     </message>
     <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation type="unfinished">Failed to change password</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
-    </message>
-    <message>
-      <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
     </message>
   </context>
   <context>

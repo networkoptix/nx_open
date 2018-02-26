@@ -87,7 +87,7 @@ to view more bookmarks</source>
     <name>ContextMenu</name>
     <message>
       <source>Filter...</source>
-      <translation>פילטר...</translation>
+      <translation>סנן...</translation>
     </message>
     <message>
       <source>Connect to System</source>
@@ -99,7 +99,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>יומן אירועים...</translation>
+      <translation>רשימת אירועים...</translation>
     </message>
     <message>
       <source>Cameras to Backup...</source>
@@ -288,7 +288,7 @@ to view more bookmarks</source>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation>התחבר אל %1...</translation>
+      <translation>היכנס ל- %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
@@ -386,7 +386,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open</source>
-      <translation>פתיחה</translation>
+      <translation>פתח</translation>
     </message>
     <message>
       <source>Monitor</source>
@@ -702,7 +702,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Medium</source>
-      <translation>בינונית</translation>
+      <translation>בינוני</translation>
     </message>
     <message>
       <source>Large</source>
@@ -714,7 +714,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Close</source>
-      <translation>סגירה</translation>
+      <translation>סגור</translation>
     </message>
     <message>
       <source>Close All But This</source>
@@ -722,7 +722,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Play</source>
-      <translation>נגן</translation>
+      <translation>הפעל</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -730,11 +730,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation>לפריים קודם</translation>
+      <translation>פריים קודם</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation>לפריים הבא</translation>
+      <translation>פריים הבא</translation>
     </message>
     <message>
       <source>To Start</source>
@@ -853,6 +853,22 @@ to view more bookmarks</source>
       <translation>צור סיור פריסות</translation>
     </message>
     <message>
+      <source>Wearable Camera...</source>
+      <translation type="unfinished">Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation type="unfinished">Upload File...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation type="unfinished">Upload Folder...</translation>
+    </message>
+    <message>
       <source>Start Analytics...</source>
       <translation>התחל אנליטיקה...</translation>
     </message>
@@ -879,22 +895,6 @@ to view more bookmarks</source>
     <message>
       <source>Cell Spacing...</source>
       <translation>מרווח בין תאים...</translation>
-    </message>
-    <message>
-      <source>Wearable Camera...</source>
-      <translation type="unfinished">Wearable Camera...</translation>
-    </message>
-    <message>
-      <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
-    </message>
-    <message>
-      <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
-    </message>
-    <message>
-      <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
     </message>
   </context>
   <context>
@@ -952,7 +952,7 @@ to view more bookmarks</source>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>שגיאה לא מוכרת.</translation>
+      <translation>שגיאה לא ידועה.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -972,7 +972,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation>הרישיון הוא רשיון לניסיון.</translation>
+      <translation>הרישיון הוא רישיון זמני.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
@@ -1006,16 +1006,16 @@ to view more bookmarks</source>
       <translation>. את/ה עומד לייצא וידאו ארוך... הוא עשוי לדרוש מעל ג'יגה של שטח דיסק קשיח, ולקחת כמה דקות.</translation>
     </message>
     <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation>קובץ EXE המיוצא יהיה בגודל מעל 4 GB ולא ניתן לפתוח אותו על ידי לחיצה כפולה ב- Windows. ניתן להפעיל אותו רק בתחנת קליינט בתוכנה %1.</translation>
+    </message>
+    <message>
       <source>Settings are not available for .EXE files.</source>
       <translation>ההגדרות אינן זמינות עבור. קבצי ה-EXE.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
       <translation>קבצים מקומיים, רכיבי יישומי שרת ודפי אינטרנט לא ייוצאו.</translation>
-    </message>
-    <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>קובץ EXE המיוצא יהיה בגודל מעל 4 GB ולא ניתן לפתוח אותו על ידי לחיצה כפולה ב- Windows. ניתן להפעיל אותו רק בתחנת קליינט בתוכנה %1.</translation>
     </message>
   </context>
   <context>
@@ -1065,7 +1065,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>קצה תחתון</translation>
+      <translation>תחתית</translation>
     </message>
     <message>
       <source>Page Left</source>
@@ -1085,19 +1085,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>גלול שמאלה</translation>
+      <translation>גלול לשמאל</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>גלול מעלה</translation>
+      <translation>גלול למעלה</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>גלול ימינה</translation>
+      <translation>גלול לימין</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation>גלול מטה</translation>
+      <translation>גלול למטה</translation>
     </message>
   </context>
   <context>
@@ -1128,14 +1128,11 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
+        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
+        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
       </translation>
     </message>
     <message>
@@ -1181,14 +1178,6 @@ to view more bookmarks</source>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>רק אותיות לטינית, מספרים וסימני מקלדת מותרים.</translation>
     </message>
-    <message>
-      <source>Long</source>
-      <translation>ארוך</translation>
-    </message>
-    <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>רק אותיות לטינית, מספרים וסימני מקלדת %1 מותרים.</translation>
-    </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
@@ -1206,6 +1195,10 @@ to view more bookmarks</source>
         <numerusform>סיסמה חייבת להכיל לפחות %n תווים.</numerusform>
         <numerusform>סיסמה חייבת להכיל לפחות %n תווים.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>ארוך</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
@@ -1234,12 +1227,16 @@ to view more bookmarks</source>
         <numerusform>Password should not contain %n or more repeating characters.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>רק אותיות לטינית, מספרים וסימני מקלדת %1 מותרים.</translation>
+    </message>
   </context>
   <context>
     <name>PermissionsInfoTable</name>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation>מצלמות ומשאבים</translation>
+      <translation>מצלמות &amp; משאבים</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
@@ -1362,7 +1359,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Customer Support</source>
-      <translation>שירות לקוחות</translation>
+      <translation>תמיכת לקוחות</translation>
     </message>
     <message>
       <source>Client is not connected to any System</source>
@@ -1388,11 +1385,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>... ועוד %n</numerusform>
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+        <numerusform>... ועוד %n</numerusform>
+        <numerusform>... ועוד %n</numerusform>
+        <numerusform>... ועוד %n</numerusform>
       </translation>
     </message>
   </context>
@@ -1404,14 +1401,14 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>כל מצלמות ומשאבים</translation>
+      <translation>כל המצלמות והמשאבים</translation>
     </message>
   </context>
   <context>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation>שיפורי תמונה</translation>
+      <translation>שיפור תמונה</translation>
     </message>
     <message>
       <source>Image Enhancement - %1</source>
@@ -1440,7 +1437,7 @@ to view more bookmarks</source>
     <name>QnAuditItemDelegate</name>
     <message>
       <source>Play</source>
-      <translation>נגן</translation>
+      <translation>הפעל</translation>
     </message>
     <message>
       <source>User settings...</source>
@@ -1475,7 +1472,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Devices</source>
-      <translation>מכשירים</translation>
+      <translation>התקנים</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -1519,47 +1516,47 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>התקנים אלו הוסרו מהמערכת</numerusform>
-        <numerusform>These devices are removed from System</numerusform>
-        <numerusform>These devices are removed from System</numerusform>
-        <numerusform>These devices are removed from System</numerusform>
+        <numerusform>התקנים אלו הוסרו מהמערכת</numerusform>
+        <numerusform>התקנים אלו הוסרו מהמערכת</numerusform>
+        <numerusform>התקנים אלו הוסרו מהמערכת</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>מצלמות אלו הוסרו מהמערכת</numerusform>
-        <numerusform>These cameras are removed from System</numerusform>
-        <numerusform>These cameras are removed from System</numerusform>
-        <numerusform>These cameras are removed from System</numerusform>
+        <numerusform>מצלמות אלו הוסרו מהמערכת</numerusform>
+        <numerusform>מצלמות אלו הוסרו מהמערכת</numerusform>
+        <numerusform>מצלמות אלו הוסרו מהמערכת</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>שרתים אלו הוסרו מהמערכת</numerusform>
-        <numerusform>These servers are removed from System</numerusform>
-        <numerusform>These servers are removed from System</numerusform>
-        <numerusform>These servers are removed from System</numerusform>
+        <numerusform>שרתים אלו הוסרו מהמערכת</numerusform>
+        <numerusform>שרתים אלו הוסרו מהמערכת</numerusform>
+        <numerusform>שרתים אלו הוסרו מהמערכת</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>משתמשים אלו הוסרו מהמערכת</numerusform>
-        <numerusform>These users are removed from System</numerusform>
-        <numerusform>These users are removed from System</numerusform>
-        <numerusform>These users are removed from System</numerusform>
+        <numerusform>משתמשים אלו הוסרו מהמערכת</numerusform>
+        <numerusform>משתמשים אלו הוסרו מהמערכת</numerusform>
+        <numerusform>משתמשים אלו הוסרו מהמערכת</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>משאבים אלו הוסרו מהמערכת</numerusform>
-        <numerusform>These resources are removed from System</numerusform>
-        <numerusform>These resources are removed from System</numerusform>
-        <numerusform>These resources are removed from System</numerusform>
+        <numerusform>משאבים אלו הוסרו מהמערכת</numerusform>
+        <numerusform>משאבים אלו הוסרו מהמערכת</numerusform>
+        <numerusform>משאבים אלו הוסרו מהמערכת</numerusform>
       </translation>
     </message>
     <message>
@@ -1579,7 +1576,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>שם משתמש</translation>
+      <translation>הכנס</translation>
     </message>
     <message>
       <source>User updated</source>
@@ -1587,11 +1584,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Watching live</source>
-      <translation>צפיה חיה</translation>
+      <translation>צופה בשידור חי</translation>
     </message>
     <message>
       <source>Watching archive</source>
-      <translation>ארכיון צפיה</translation>
+      <translation>צופה בארכיון</translation>
     </message>
     <message>
       <source>Exporting video</source>
@@ -1639,11 +1636,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n action(s)</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>פעולה %n</numerusform>
         <numerusform>%n פעולות</numerusform>
-        <numerusform>%n action(s)</numerusform>
-        <numerusform>%n action(s)</numerusform>
-        <numerusform>%n action(s)</numerusform>
+        <numerusform>%n פעולות</numerusform>
+        <numerusform>%n פעולות</numerusform>
       </translation>
     </message>
     <message>
@@ -1676,11 +1673,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Time</source>
-      <translation>זמן</translation>
+      <translation>שעה</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;תיאור</translation>
+      <translation>תיאור</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -1792,11 +1789,11 @@ to view more bookmarks</source>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>יש לך התראה %n</numerusform>
         <numerusform>יש לך %n התראות</numerusform>
-        <numerusform>You have %n notifications</numerusform>
-        <numerusform>You have %n notifications</numerusform>
-        <numerusform>You have %n notifications</numerusform>
+        <numerusform>יש לך %n התראות</numerusform>
+        <numerusform>יש לך %n התראות</numerusform>
       </translation>
     </message>
   </context>
@@ -1839,11 +1836,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation>הסיסמא אינה נכונה.</translation>
+      <translation>הסיסמה אינה נכונה.</translation>
     </message>
     <message>
       <source>Select Build</source>
@@ -1854,20 +1851,20 @@ to view more bookmarks</source>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>התקן %1 מ %n</numerusform>
         <numerusform>התקנים %1 מ %n</numerusform>
-        <numerusform>%1 of %n devices</numerusform>
-        <numerusform>%1 of %n devices</numerusform>
-        <numerusform>%1 of %n devices</numerusform>
+        <numerusform>התקנים %1 מ %n</numerusform>
+        <numerusform>התקנים %1 מ %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>מצלמה %1 מ %n</numerusform>
         <numerusform>מצלמות %1 מ %n</numerusform>
-        <numerusform>%1 of %n cameras</numerusform>
-        <numerusform>%1 of %n cameras</numerusform>
-        <numerusform>%1 of %n cameras</numerusform>
+        <numerusform>מצלמות %1 מ %n</numerusform>
+        <numerusform>מצלמות %1 מ %n</numerusform>
       </translation>
     </message>
     <message>
@@ -1880,11 +1877,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>מודול קלט/פלט %1 מ %n</numerusform>
         <numerusform>מודולי קלט/פלט %1 מ %n</numerusform>
-        <numerusform>%1 of %n I/O modules</numerusform>
-        <numerusform>%1 of %n I/O modules</numerusform>
-        <numerusform>%1 of %n I/O modules</numerusform>
+        <numerusform>מודולי קלט/פלט %1 מ %n</numerusform>
+        <numerusform>מודולי קלט/פלט %1 מ %n</numerusform>
       </translation>
     </message>
     <message>
@@ -1907,11 +1904,11 @@ to view more bookmarks</source>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>שרת %n</numerusform>
         <numerusform>%n שרתים</numerusform>
-        <numerusform>%n Server(s)</numerusform>
-        <numerusform>%n Server(s)</numerusform>
-        <numerusform>%n Server(s)</numerusform>
+        <numerusform>%n שרתים</numerusform>
+        <numerusform>%n שרתים</numerusform>
       </translation>
     </message>
     <message>
@@ -1948,11 +1945,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>מקור ו %n מצלמות נוספות</numerusform>
         <numerusform>מקורות ו %n מצלמות נוספות</numerusform>
-        <numerusform>Source and %n more cameras</numerusform>
-        <numerusform>Source and %n more cameras</numerusform>
-        <numerusform>Source and %n more cameras</numerusform>
+        <numerusform>מקורות ו %n מצלמות נוספות</numerusform>
+        <numerusform>מקורות ו %n מצלמות נוספות</numerusform>
       </translation>
     </message>
     <message>
@@ -2002,7 +1999,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Devices</source>
-      <translation>מכשירים</translation>
+      <translation>התקנים</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -2076,7 +2073,7 @@ to view more bookmarks</source>
     <name>QnBusinessRulesViewModel</name>
     <message>
       <source>On</source>
-      <translation>פעיל</translation>
+      <translation>פועל</translation>
     </message>
     <message>
       <source>Event</source>
@@ -2155,11 +2152,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
-        <numerusform>נמצאו %n התקנים</numerusform>
-        <numerusform>%n devices found</numerusform>
-        <numerusform>%n devices found</numerusform>
-        <numerusform>%n devices found</numerusform>
+      <translation>
+        <numerusform>נמצא מכשיר %n</numerusform>
+        <numerusform>%n מכשירים נמצאו</numerusform>
+        <numerusform>%n מכשירים נמצאו</numerusform>
+        <numerusform>%n מכשירים נמצאו</numerusform>
       </translation>
     </message>
     <message>
@@ -2185,7 +2182,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Server offline</source>
-      <translation>השרת במצב לא מקוון</translation>
+      <translation>השרת אינו זמין</translation>
     </message>
     <message>
       <source>Device adding is possible for online servers only.</source>
@@ -2193,11 +2190,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices added.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n התקנים נוספים.</numerusform>
-        <numerusform>%n devices added.</numerusform>
-        <numerusform>%n devices added.</numerusform>
-        <numerusform>%n devices added.</numerusform>
+        <numerusform>%n התקנים נוספים.</numerusform>
+        <numerusform>%n התקנים נוספים.</numerusform>
+        <numerusform>%n התקנים נוספים.</numerusform>
       </translation>
     </message>
     <message>
@@ -2206,11 +2203,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>הוספת %n התקנים נכשלה</numerusform>
-        <numerusform>Failed to add %n devices</numerusform>
-        <numerusform>Failed to add %n devices</numerusform>
-        <numerusform>Failed to add %n devices</numerusform>
+        <numerusform>הוספת %n התקנים נכשלה</numerusform>
+        <numerusform>הוספת %n התקנים נכשלה</numerusform>
+        <numerusform>הוספת %n התקנים נכשלה</numerusform>
       </translation>
     </message>
     <message>
@@ -2307,11 +2304,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 אינו תומך באודיו דו-כיווני</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
+        <numerusform>%1 אינו תומך באודיו דו-כיווני</numerusform>
+        <numerusform>%1 אינו תומך באודיו דו-כיווני</numerusform>
+        <numerusform>%1 אינו תומך באודיו דו-כיווני</numerusform>
       </translation>
     </message>
   </context>
@@ -2402,15 +2399,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>נמוך</translation>
+      <translation>נמוכה</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>בינונית</translation>
+      <translation>בינוני</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>גבוה</translation>
+      <translation>גבוהה</translation>
     </message>
     <message>
       <source>Edge</source>
@@ -2428,11 +2425,11 @@ to view more bookmarks</source>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>ל%1 אין כניסת קלט</numerusform>
         <numerusform>ל%1 אין כניסות קלט</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
+        <numerusform>ל%1 אין כניסות קלט</numerusform>
+        <numerusform>ל%1 אין כניסות קלט</numerusform>
       </translation>
     </message>
   </context>
@@ -2470,20 +2467,20 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>נמצא התקן %n</numerusform>
         <numerusform>נמצאו %n התקנים</numerusform>
-        <numerusform>%n devices found</numerusform>
-        <numerusform>%n devices found</numerusform>
-        <numerusform>%n devices found</numerusform>
+        <numerusform>נמצאו %n התקנים</numerusform>
+        <numerusform>נמצאו %n התקנים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>נמצאה מצלמה %n</numerusform>
         <numerusform>נמצאו %n מצלמות</numerusform>
-        <numerusform>%n cameras found</numerusform>
-        <numerusform>%n cameras found</numerusform>
-        <numerusform>%n cameras found</numerusform>
+        <numerusform>נמצאו %n מצלמות</numerusform>
+        <numerusform>נמצאו %n מצלמות</numerusform>
       </translation>
     </message>
     <message>
@@ -2496,11 +2493,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>נמצא התקן קלט/פלט %n</numerusform>
         <numerusform>נמצאו %n התקני קלט/פלט</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
+        <numerusform>נמצאו %n התקני קלט/פלט</numerusform>
+        <numerusform>נמצאו %n התקני קלט/פלט</numerusform>
       </translation>
     </message>
     <message>
@@ -2592,11 +2589,11 @@ to view more bookmarks</source>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>ל%1 אין יציאת ממסר</numerusform>
         <numerusform>ל%1 אין יציאות ממסר</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
+        <numerusform>ל%1 אין יציאות ממסר</numerusform>
+        <numerusform>ל%1 אין יציאות ממסר</numerusform>
       </translation>
     </message>
   </context>
@@ -2638,11 +2635,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>On</source>
-      <translation>פעיל</translation>
+      <translation>פועל</translation>
     </message>
     <message>
       <source>Recording Schedule</source>
-      <translation>לוח זמנים הקלטה</translation>
+      <translation>תזמון הקלטה</translation>
     </message>
     <message>
       <source>based on server time</source>
@@ -2737,7 +2734,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>יומן אירועים...</translation>
+      <translation>רשימת אירועים...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
@@ -2765,29 +2762,29 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>שינויים ב %n ההתקנים הבאים לא יישמרו:</numerusform>
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
+        <numerusform>שינויים ב %n ההתקנים הבאים לא יישמרו:</numerusform>
+        <numerusform>שינויים ב %n ההתקנים הבאים לא יישמרו:</numerusform>
+        <numerusform>שינויים ב %n ההתקנים הבאים לא יישמרו:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>שינויים ב %n המצלמות הבאות לא יישמרו:</numerusform>
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+        <numerusform>שינויים ב %n המצלמות הבאות לא יישמרו:</numerusform>
+        <numerusform>שינויים ב %n המצלמות הבאות לא יישמרו:</numerusform>
+        <numerusform>שינויים ב %n המצלמות הבאות לא יישמרו:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>שינויים ב %n ההתקני קלט/פלט הבאים לא יישמרו:</numerusform>
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+        <numerusform>שינויים ב %n ההתקני קלט/פלט הבאים לא יישמרו:</numerusform>
+        <numerusform>שינויים ב %n ההתקני קלט/פלט הבאים לא יישמרו:</numerusform>
+        <numerusform>שינויים ב %n ההתקני קלט/פלט הבאים לא יישמרו:</numerusform>
       </translation>
     </message>
     <message>
@@ -2822,7 +2819,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>אימות סיסמא</translation>
+      <translation>אימות סיסמה</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -2830,11 +2827,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Current Password</source>
-      <translation>סיסמא נוכחית</translation>
+      <translation>סיסמה נוכחית</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one.</source>
-      <translation>כדי לשנות את הסיסמא שלך, יש להזין את הסיסמא הנוכחית.</translation>
+      <translation>כדי לשנות את הסיסמה שלך, יש להזין את הסיסמה הנוכחית.</translation>
     </message>
     <message>
       <source>Invalid current password.</source>
@@ -2867,7 +2864,7 @@ devices</source>
     <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>נתק את המערכת מ- %1</translation>
+      <translation>נתק את מערכת מ %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
@@ -2946,11 +2943,11 @@ to %1</source>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>דוא"ל</translation>
+      <translation>אימייל</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -2958,7 +2955,7 @@ to %1</source>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation>שכחת סיסמא?</translation>
+      <translation>שכחת סיסמה?</translation>
     </message>
     <message>
       <source>Connect to %1</source>
@@ -3047,7 +3044,7 @@ to %1</source>
     </message>
     <message>
       <source>Incorrect username or password</source>
-      <translation>שם משתמש או סיסמא שגויים</translation>
+      <translation>שם משתמש או סיסמה שגויים</translation>
     </message>
     <message>
       <source>Server may be restarting now. Please try again later.</source>
@@ -3085,7 +3082,7 @@ to %1</source>
     </message>
     <message>
       <source>Restart</source>
-      <translation>איתחול</translation>
+      <translation>הפעל מחדש</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
@@ -3165,7 +3162,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect</source>
-      <translation>חיבור</translation>
+      <translation>התחבר</translation>
     </message>
   </context>
   <context>
@@ -3264,6 +3261,10 @@ to %1</source>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation>לחלק מהמצלמות שנבחרו נדרשת סיסמא להגדרה.</translation>
     </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation>בקש ממנהל המערכת שלך לעשות זאת.</translation>
+    </message>
     <message numerus="yes">
       <source>Set Password</source>
       <translation type="unfinished">
@@ -3273,16 +3274,12 @@ to %1</source>
         <numerusform>Set Password</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Ask your system administrator to do it.</source>
-      <translation>בקש ממנהל המערכת שלך לעשות זאת.</translation>
-    </message>
   </context>
   <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>לא ניתן להפעיל את מקודד האודיו.</translation>
+      <translation>לא ניתן לאתחל את מקודד האודיו.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -3305,7 +3302,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>לא ניתן לאתחל את מקודד הוידאו.</translation>
+      <translation>לא ניתן להפעיל את מקודד הוידאו.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
@@ -3340,7 +3337,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter password to continue.</source>
-      <translation>הזן סיסמא כדי להמשיך.</translation>
+      <translation>הזן סיסמה כדי להמשיך.</translation>
     </message>
     <message>
       <source>Set local owner password</source>
@@ -3348,11 +3345,11 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>שם משתמש</translation>
+      <translation>כניסה</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <source>Internal Error</source>
@@ -3386,7 +3383,7 @@ to %1</source>
     <message>
       <source>Disconnect System from %1?</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>נתק את המערכת מ- %1?</translation>
+      <translation>נתק את מערכת מ %1?</translation>
     </message>
     <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
@@ -3422,20 +3419,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>רשימת תיעוד אירועים לתקופה מ%1 עד %2 - אירוע %n נמצא</numerusform>
         <numerusform>רשימת תיעוד אירועים לתקופה מ%1 עד %2 - %n אירועים נמצאו</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
+        <numerusform>רשימת תיעוד אירועים לתקופה מ%1 עד %2 - %n אירועים נמצאו</numerusform>
+        <numerusform>רשימת תיעוד אירועים לתקופה מ%1 עד %2 - %n אירועים נמצאו</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>רשימת תיעוד אירועים ל %1 - אירוע %n נמצא</numerusform>
         <numerusform>רשימת תיעוד אירועים ל %1 - %n אירועים נמצאה</numerusform>
-        <numerusform>Event log for %1 - %n event(s) found</numerusform>
-        <numerusform>Event log for %1 - %n event(s) found</numerusform>
-        <numerusform>Event log for %1 - %n event(s) found</numerusform>
+        <numerusform>רשימת תיעוד אירועים ל %1 - %n אירועים נמצאה</numerusform>
+        <numerusform>רשימת תיעוד אירועים ל %1 - %n אירועים נמצאה</numerusform>
       </translation>
     </message>
     <message>
@@ -3479,7 +3476,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;תיאור</translation>
+      <translation>תיאור</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3488,11 +3485,11 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>%1 (פעם אחת)</numerusform>
         <numerusform>%1 (%n פעמים)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
+        <numerusform>%1 (%n פעמים)</numerusform>
+        <numerusform>%1 (%n פעמים)</numerusform>
       </translation>
     </message>
     <message>
@@ -3501,29 +3498,29 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>ו %n משתמשים נוספים...</numerusform>
-        <numerusform>and %n users more...</numerusform>
-        <numerusform>and %n users more...</numerusform>
-        <numerusform>and %n users more...</numerusform>
+        <numerusform>ו %n משתמשים נוספים...</numerusform>
+        <numerusform>ו %n משתמשים נוספים...</numerusform>
+        <numerusform>ו %n משתמשים נוספים...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>ו %n נוספים...</numerusform>
-        <numerusform>and %n more...</numerusform>
-        <numerusform>and %n more...</numerusform>
-        <numerusform>and %n more...</numerusform>
+        <numerusform>ו %n נוספים...</numerusform>
+        <numerusform>ו %n נוספים...</numerusform>
+        <numerusform>ו %n נוספים...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n נושאים שהוסרו</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n נושאים שהוסרו</numerusform>
+        <numerusform>%n נושאים שהוסרו</numerusform>
+        <numerusform>%n נושאים שהוסרו</numerusform>
       </translation>
     </message>
     <message>
@@ -3581,7 +3578,7 @@ to %1</source>
     <message>
       <source>Never</source>
       <comment>Failover priority</comment>
-      <translation>לעולם לא</translation>
+      <translation>אף פעםלעולם לא</translation>
     </message>
     <message>
       <source>Low</source>
@@ -3591,7 +3588,7 @@ to %1</source>
     <message>
       <source>Medium</source>
       <comment>Failover priority</comment>
-      <translation>בינונית</translation>
+      <translation>בינוניבינוני</translation>
     </message>
     <message>
       <source>High</source>
@@ -3878,7 +3875,7 @@ to %1</source>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
-      <translation>בדיקה</translation>
+      <translation>בדוק</translation>
     </message>
     <message>
       <source>Test failed</source>
@@ -3886,11 +3883,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>הבדיקה הושלמה בהצלחה: משתמש %n נמצא.</numerusform>
         <numerusform>הבדיקה הושלמה בהצלחה: %n משתמשים נמצאו.</numerusform>
-        <numerusform>Test completed successfully: %n users found.</numerusform>
-        <numerusform>Test completed successfully: %n users found.</numerusform>
-        <numerusform>Test completed successfully: %n users found.</numerusform>
+        <numerusform>הבדיקה הושלמה בהצלחה: %n משתמשים נמצאו.</numerusform>
+        <numerusform>הבדיקה הושלמה בהצלחה: %n משתמשים נמצאו.</numerusform>
       </translation>
     </message>
   </context>
@@ -3917,7 +3914,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>דוא"ל</translation>
+      <translation>אימייל</translation>
     </message>
     <message>
       <source>DN</source>
@@ -4006,7 +4003,7 @@ to %1</source>
     </message>
     <message>
       <source>Status</source>
-      <translation>Status</translation>
+      <translation>מצב</translation>
     </message>
     <message>
       <source>Server</source>
@@ -4058,11 +4055,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>הרישיון יפוג בעוד- %n ימים</numerusform>
-        <numerusform>License expires in %n days</numerusform>
-        <numerusform>License expires in %n days</numerusform>
-        <numerusform>License expires in %n days</numerusform>
+        <numerusform>הרישיון יפוג בעוד- %n ימים</numerusform>
+        <numerusform>הרישיון יפוג בעוד- %n ימים</numerusform>
+        <numerusform>הרישיון יפוג בעוד- %n ימים</numerusform>
       </translation>
     </message>
     <message>
@@ -4086,7 +4083,7 @@ to %1</source>
     </message>
     <message>
       <source>Export</source>
-      <translation>ייצא</translation>
+      <translation>יצא</translation>
     </message>
     <message>
       <source>Export licenses to a file</source>
@@ -4154,20 +4151,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>לפחות %n %1 נדרשים</numerusform>
-        <numerusform>At least %n %1 are required</numerusform>
-        <numerusform>At least %n %1 are required</numerusform>
-        <numerusform>At least %n %1 are required</numerusform>
+        <numerusform>לפחות %n %1 נדרשים</numerusform>
+        <numerusform>לפחות %n %1 נדרשים</numerusform>
+        <numerusform>לפחות %n %1 נדרשים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n %1 נמצאים כרגע בשימוש</numerusform>
-        <numerusform>%n %1 are currently in use</numerusform>
-        <numerusform>%n %1 are currently in use</numerusform>
-        <numerusform>%n %1 are currently in use</numerusform>
+        <numerusform>%n %1 נמצאים כרגע בשימוש</numerusform>
+        <numerusform>%n %1 נמצאים כרגע בשימוש</numerusform>
+        <numerusform>%n %1 נמצאים כרגע בשימוש</numerusform>
       </translation>
     </message>
     <message>
@@ -4176,11 +4173,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>להשבית רישיונות?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>להשבית רישיונות?</numerusform>
+        <numerusform>להשבית רישיונות?</numerusform>
+        <numerusform>להשבית רישיונות?</numerusform>
       </translation>
     </message>
     <message>
@@ -4189,29 +4186,29 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>נכשל הניסיון להשבית %n רישיונות</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>נכשל הניסיון להשבית %n רישיונות</numerusform>
+        <numerusform>נכשל הניסיון להשבית %n רישיונות</numerusform>
+        <numerusform>נכשל הניסיון להשבית %n רישיונות</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 מתוך %n רישיונות לא ניתנים להשבתה</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%1 מתוך %n רישיונות לא ניתנים להשבתה</numerusform>
+        <numerusform>%1 מתוך %n רישיונות לא ניתנים להשבתה</numerusform>
+        <numerusform>%1 מתוך %n רישיונות לא ניתנים להשבתה</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>אין אפשרות להשבית את הרישיונות</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>אין אפשרות להשבית את הרישיונות</numerusform>
+        <numerusform>אין אפשרות להשבית את הרישיונות</numerusform>
+        <numerusform>אין אפשרות להשבית את הרישיונות</numerusform>
       </translation>
     </message>
     <message>
@@ -4232,16 +4229,16 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n רישיונות הושבתו</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n רישיונות הושבתו</numerusform>
+        <numerusform>%n רישיונות הושבתו</numerusform>
+        <numerusform>%n רישיונות הושבתו</numerusform>
       </translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>הסר</translation>
+      <translation>הסרה</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4249,24 +4246,24 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n ערוצים.</numerusform>
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
+        <numerusform>%n ערוצים.</numerusform>
+        <numerusform>%n ערוצים.</numerusform>
+        <numerusform>%n ערוצים.</numerusform>
       </translation>
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation>אנא פנה למוקד תמיכת לקוחות.</translation>
+      <translation>צור קשר עם תמיכת הלקוחות.</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>השבת %n אחרים</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>השבת %n אחרים</numerusform>
+        <numerusform>השבת %n אחרים</numerusform>
+        <numerusform>השבת %n אחרים</numerusform>
       </translation>
     </message>
     <message>
@@ -4333,29 +4330,29 @@ to %1</source>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>השתמש ברישיון עבור %n ההתקן שנבחר</numerusform>
         <numerusform>השתמש ברישיונות עבור %n ההתקנים שנבחרו</numerusform>
-        <numerusform>Use licenses for selected %n devices</numerusform>
-        <numerusform>Use licenses for selected %n devices</numerusform>
-        <numerusform>Use licenses for selected %n devices</numerusform>
+        <numerusform>השתמש ברישיונות עבור %n ההתקנים שנבחרו</numerusform>
+        <numerusform>השתמש ברישיונות עבור %n ההתקנים שנבחרו</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>השתמש ברישיון עבור %n המצלמה שנבחרה</numerusform>
         <numerusform>השתמש ברישיונות עבור %n המצלמות שנבחרו</numerusform>
-        <numerusform>Use licenses for selected %n cameras</numerusform>
-        <numerusform>Use licenses for selected %n cameras</numerusform>
-        <numerusform>Use licenses for selected %n cameras</numerusform>
+        <numerusform>השתמש ברישיונות עבור %n המצלמות שנבחרו</numerusform>
+        <numerusform>השתמש ברישיונות עבור %n המצלמות שנבחרו</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>השתמש ברישיונות עבור %n ההתקנים שנבחרו</numerusform>
-        <numerusform>Use licenses for selected %n I/O modules</numerusform>
-        <numerusform>Use licenses for selected %n I/O modules</numerusform>
-        <numerusform>Use licenses for selected %n I/O modules</numerusform>
+      <translation>
+        <numerusform>השתמש ברישיון עבור מודול הקלט/פלט שנבחר</numerusform>
+        <numerusform>השתמש ברישיונות עבור %n התקני הקלט/פלט שנבחרו</numerusform>
+        <numerusform>השתמש ברישיונות עבור %n התקני הקלט/פלט שנבחרו</numerusform>
+        <numerusform>השתמש ברישיונות עבור %n התקני הקלט/פלט שנבחרו</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4470,11 +4467,11 @@ to %1</source>
     <name>QnLoginToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>דוא"ל</translation>
+      <translation>אימייל</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -4482,7 +4479,7 @@ to %1</source>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation>שכחתי סיסמה?</translation>
+      <translation>שכחת סיסמה?</translation>
     </message>
     <message>
       <source>Learn more about</source>
@@ -4491,12 +4488,12 @@ to %1</source>
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>התחבר אל %1</translation>
+      <translation>היכנס ל- %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ברוך הבא אל %1!</translation>
+      <translation>ברוכים הבאים ל %1!</translation>
     </message>
   </context>
   <context>
@@ -4655,7 +4652,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to merge Systems</source>
-      <translation>מיזוג המערכות נכשל</translation>
+      <translation>נכשלה מיזוג מערכות</translation>
     </message>
     <message>
       <source>URL is invalid.</source>
@@ -4809,11 +4806,11 @@ to %1</source>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
       <source>%n more notifications</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n הודעות נוספות</numerusform>
-        <numerusform>%n more notifications</numerusform>
-        <numerusform>%n more notifications</numerusform>
-        <numerusform>%n more notifications</numerusform>
+        <numerusform>%n הודעות נוספות</numerusform>
+        <numerusform>%n הודעות נוספות</numerusform>
+        <numerusform>%n הודעות נוספות</numerusform>
       </translation>
     </message>
   </context>
@@ -5009,29 +5006,29 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>פריסט זה יופעל לאחר דקה %n של חוסר פעילות</numerusform>
         <numerusform>פריסט זה יופעל לאחר %n דקות של חוסר פעילות</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+        <numerusform>פריסט זה יופעל לאחר %n דקות של חוסר פעילות</numerusform>
+        <numerusform>פריסט זה יופעל לאחר %n דקות של חוסר פעילות</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>לסיור מיקום חופף %n</numerusform>
         <numerusform>לסיור %n מיקומים חופפים</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
+        <numerusform>לסיור %n מיקומים חופפים</numerusform>
+        <numerusform>לסיור %n מיקומים חופפים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>בערך דקה %n</numerusform>
         <numerusform>בערך %n דקות</numerusform>
-        <numerusform>about %n minute(s)</numerusform>
-        <numerusform>about %n minute(s)</numerusform>
-        <numerusform>about %n minute(s)</numerusform>
+        <numerusform>בערך %n דקות</numerusform>
+        <numerusform>בערך %n דקות</numerusform>
       </translation>
     </message>
     <message>
@@ -5093,7 +5090,7 @@ to %1</source>
     <name>QnPtzTourSpotsModel</name>
     <message>
       <source>Lowest</source>
-      <translation>הנמוכה ביותר</translation>
+      <translation>הנמוך ביותר</translation>
     </message>
     <message>
       <source>Low</source>
@@ -5191,7 +5188,7 @@ to %1</source>
     </message>
     <message>
       <source>Space</source>
-      <translation>שטח</translation>
+      <translation>מרווח</translation>
     </message>
     <message>
       <source>Calendar Days</source>
@@ -5227,7 +5224,7 @@ to %1</source>
     </message>
     <message>
       <source>Device</source>
-      <translation>מכשיר</translation>
+      <translation>התקן</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -5243,40 +5240,40 @@ to %1</source>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 ט"ב</translation>
+      <translation>%1 Tb</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 ג"ב</translation>
+      <translation>%1 Gb</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>סך הכל %1 %n התקנים</numerusform>
-        <numerusform>Total %1 %n devices</numerusform>
-        <numerusform>Total %1 %n devices</numerusform>
-        <numerusform>Total %1 %n devices</numerusform>
+        <numerusform>סך הכל %1 %n התקנים</numerusform>
+        <numerusform>סך הכל %1 %n התקנים</numerusform>
+        <numerusform>סך הכל %1 %n התקנים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>סך הכל %1 %n מצלמות</numerusform>
-        <numerusform>Total %1 %n cameras</numerusform>
-        <numerusform>Total %1 %n cameras</numerusform>
-        <numerusform>Total %1 %n cameras</numerusform>
+        <numerusform>סך הכל %1 %n מצלמות</numerusform>
+        <numerusform>סך הכל %1 %n מצלמות</numerusform>
+        <numerusform>סך הכל %1 %n מצלמות</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>סה"כ %1 %n מודולי קלט / פלט</numerusform>
-        <numerusform>Total %1 %n I/O modules</numerusform>
-        <numerusform>Total %1 %n I/O modules</numerusform>
-        <numerusform>Total %1 %n I/O modules</numerusform>
+        <numerusform>סה"כ %1 %n מודולי קלט / פלט</numerusform>
+        <numerusform>סה"כ %1 %n מודולי קלט / פלט</numerusform>
+        <numerusform>סה"כ %1 %n מודולי קלט / פלט</numerusform>
       </translation>
     </message>
     <message>
@@ -5330,11 +5327,11 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
+        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
+        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
       </translation>
     </message>
     <message>
@@ -5350,11 +5347,11 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
+        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
+        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5434,7 +5431,7 @@ to %1</source>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>פריסות</translation>
+      <translation>פריסה</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
@@ -5472,7 +5469,7 @@ to %1</source>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation>סגירה</translation>
+      <translation>סגור</translation>
     </message>
     <message>
       <source>Information</source>
@@ -5525,7 +5522,7 @@ to %1</source>
     </message>
     <message>
       <source>Search</source>
-      <translation>חיפוש</translation>
+      <translation>חפש</translation>
     </message>
   </context>
   <context>
@@ -5563,7 +5560,7 @@ to %1</source>
     <name>QnSearchLineEdit</name>
     <message>
       <source>Search</source>
-      <translation>חיפוש</translation>
+      <translation>חפש</translation>
     </message>
   </context>
   <context>
@@ -5609,11 +5606,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n שרתים</numerusform>
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+        <numerusform>%n שרתים</numerusform>
+        <numerusform>%n שרתים</numerusform>
+        <numerusform>%n שרתים</numerusform>
       </translation>
     </message>
   </context>
@@ -5633,11 +5630,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
       </translation>
     </message>
   </context>
@@ -5645,11 +5642,11 @@ to %1</source>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n נוספים</numerusform>
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
+        <numerusform>%n נוספים</numerusform>
+        <numerusform>%n נוספים</numerusform>
+        <numerusform>%n נוספים</numerusform>
       </translation>
     </message>
     <message>
@@ -5658,11 +5655,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>ל %n מתוך%1 משתמשים יש כתובת מייל לא חוקית</numerusform>
-        <numerusform>%n of %1 users have invalid email address</numerusform>
-        <numerusform>%n of %1 users have invalid email address</numerusform>
-        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>ל %n מתוך%1 משתמשים יש כתובת מייל לא חוקית</numerusform>
+        <numerusform>ל %n מתוך%1 משתמשים יש כתובת מייל לא חוקית</numerusform>
+        <numerusform>ל %n מתוך%1 משתמשים יש כתובת מייל לא חוקית</numerusform>
       </translation>
     </message>
     <message>
@@ -5671,11 +5668,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n מתוך %1 של כתובות דואר אלקטרוני נוספות אינן תקינות</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n מתוך %1 של כתובות דואר אלקטרוני נוספות אינן תקינות</numerusform>
+        <numerusform>%n מתוך %1 של כתובות דואר אלקטרוני נוספות אינן תקינות</numerusform>
+        <numerusform>%n מתוך %1 של כתובות דואר אלקטרוני נוספות אינן תקינות</numerusform>
       </translation>
     </message>
     <message>
@@ -5791,7 +5788,7 @@ to %1</source>
     </message>
     <message>
       <source>Status</source>
-      <translation>Status</translation>
+      <translation>מצב</translation>
     </message>
   </context>
   <context>
@@ -5926,11 +5923,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>אין מספיק מקום פנוי ב- %n שרתים:</numerusform>
-        <numerusform>Not enough free space at %n Servers:</numerusform>
-        <numerusform>Not enough free space at %n Servers:</numerusform>
-        <numerusform>Not enough free space at %n Servers:</numerusform>
+        <numerusform>אין מספיק מקום פנוי ב- %n שרתים:</numerusform>
+        <numerusform>אין מספיק מקום פנוי ב- %n שרתים:</numerusform>
+        <numerusform>אין מספיק מקום פנוי ב- %n שרתים:</numerusform>
       </translation>
     </message>
     <message>
@@ -6095,11 +6092,11 @@ to %1</source>
     <name>QnSmtpAdvancedSettingsWidget</name>
     <message>
       <source>Auto</source>
-      <translation>אוטומטי</translation>
+      <translation>אוטו</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>דוא"ל</translation>
+      <translation>אימייל</translation>
     </message>
     <message>
       <source>SMTP Server</source>
@@ -6115,7 +6112,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -6134,7 +6131,7 @@ to %1</source>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
       <source>Email</source>
-      <translation>דוא"ל</translation>
+      <translation>אימייל</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -6142,11 +6139,11 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>הסיסמה לא יכולה להיות ריקה.</translation>
+      <translation>לא ניתן להותיר את שדה הסיסמה ריק.</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -6297,6 +6294,10 @@ to %1</source>
       <translation>בדוק את פרטי האימות</translation>
     </message>
     <message>
+      <source>NO LIVE STREAM</source>
+      <translation type="unfinished">NO LIVE STREAM</translation>
+    </message>
+    <message>
       <source>TOO MANY CONNECTIONS</source>
       <translation>חיבורים רבים מדי</translation>
     </message>
@@ -6307,10 +6308,6 @@ to %1</source>
     <message>
       <source>Set for this Camera</source>
       <translation>הגדר למצלמה הזאת</translation>
-    </message>
-    <message>
-      <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
     </message>
   </context>
   <context>
@@ -6338,7 +6335,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
@@ -6474,7 +6471,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>הסר</translation>
+      <translation>הסרה</translation>
     </message>
     <message>
       <source>Inaccessible</source>
@@ -6506,7 +6503,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 ג"ב</translation>
+      <translation>%1 Gb</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -6579,7 +6576,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>דוא"ל</translation>
+      <translation>אימייל</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -6732,7 +6729,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>סנכרון ארכיון מרוחוק</translation>
+      <translation>Remote archive synchronization</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -6793,7 +6790,7 @@ to %1</source>
     </message>
     <message>
       <source>Time</source>
-      <translation>זמן</translation>
+      <translation>שעה</translation>
     </message>
   </context>
   <context>
@@ -6879,12 +6876,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>hh:mm</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6949,47 +6946,47 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>הבעיה נגרמה על ידי שרת %n:</numerusform>
         <numerusform>הבעיה נגרמה על ידי %n שרתים:</numerusform>
-        <numerusform>The problem is caused by %n servers:</numerusform>
-        <numerusform>The problem is caused by %n servers:</numerusform>
-        <numerusform>The problem is caused by %n servers:</numerusform>
+        <numerusform>הבעיה נגרמה על ידי %n שרתים:</numerusform>
+        <numerusform>הבעיה נגרמה על ידי %n שרתים:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>לא נותר מקום פנוי על שרת %n:</numerusform>
         <numerusform>לא נותר מקום פנוי על %n שרתים:</numerusform>
-        <numerusform>No free space left on %n servers:</numerusform>
-        <numerusform>No free space left on %n servers:</numerusform>
-        <numerusform>No free space left on %n servers:</numerusform>
+        <numerusform>לא נותר מקום פנוי על %n שרתים:</numerusform>
+        <numerusform>לא נותר מקום פנוי על %n שרתים:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>שרת %n איננו מגיב:</numerusform>
         <numerusform>%n שרתים אינם מגיבים:</numerusform>
-        <numerusform>%n servers are not responding:</numerusform>
-        <numerusform>%n servers are not responding:</numerusform>
-        <numerusform>%n servers are not responding:</numerusform>
+        <numerusform>%n שרתים אינם מגיבים:</numerusform>
+        <numerusform>%n שרתים אינם מגיבים:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>שרת %n איננו מקוון:</numerusform>
         <numerusform>%n שרתים אינם מקוונים:</numerusform>
-        <numerusform>%n servers have gone offline:</numerusform>
-        <numerusform>%n servers have gone offline:</numerusform>
-        <numerusform>%n servers have gone offline:</numerusform>
+        <numerusform>%n שרתים אינם מקוונים:</numerusform>
+        <numerusform>%n שרתים אינם מקוונים:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>אימות נכשל עבור %n שרת:</numerusform>
         <numerusform>אימות נכשל עבור %n שרתים:</numerusform>
-        <numerusform>Authentication failed for %n servers:</numerusform>
-        <numerusform>Authentication failed for %n servers:</numerusform>
-        <numerusform>Authentication failed for %n servers:</numerusform>
+        <numerusform>אימות נכשל עבור %n שרתים:</numerusform>
+        <numerusform>אימות נכשל עבור %n שרתים:</numerusform>
       </translation>
     </message>
     <message>
@@ -7098,7 +7095,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>דוא"ל</translation>
+      <translation>אימייל</translation>
     </message>
   </context>
   <context>
@@ -7136,11 +7133,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>בחר פעולה לביצוע על %n משתמשים בתפקיד זה</numerusform>
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
+        <numerusform>בחר פעולה לביצוע על %n משתמשים בתפקיד זה</numerusform>
+        <numerusform>בחר פעולה לביצוע על %n משתמשים בתפקיד זה</numerusform>
+        <numerusform>בחר פעולה לביצוע על %n משתמשים בתפקיד זה</numerusform>
       </translation>
     </message>
   </context>
@@ -7255,7 +7252,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>דוא"ל</translation>
+      <translation>אימייל</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
@@ -7263,7 +7260,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -7290,7 +7287,7 @@ to %1</source>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>הסיסמה לא יכולה להיות ריקה.</translation>
+      <translation>לא ניתן להותיר את שדה הסיסמה ריק.</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
@@ -7333,11 +7330,11 @@ to %1</source>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>מחשב %1 - תצוגות %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>מחשב %1 - תצוגות %2</numerusform>
+        <numerusform>מחשב %1 - תצוגות %2</numerusform>
+        <numerusform>מחשב %1 - תצוגות %2</numerusform>
       </translation>
     </message>
   </context>
@@ -7354,15 +7351,6 @@ to %1</source>
       <source>Uploading %1... %2	%p%</source>
       <translation type="unfinished">Uploading %1... %2	%p%</translation>
     </message>
-    <message numerus="yes">
-      <source>(%n more file(s) in queue)</source>
-      <translation type="unfinished">
-        <numerusform>(%n more file(s) in queue)</numerusform>
-        <numerusform>(%n more file(s) in queue)</numerusform>
-        <numerusform>(%n more file(s) in queue)</numerusform>
-        <numerusform>(%n more file(s) in queue)</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop uploading?</source>
       <translation type="unfinished">Stop uploading?</translation>
@@ -7374,6 +7362,10 @@ to %1</source>
     <message>
       <source>Finalizing %1... %2	%p%</source>
       <translation type="unfinished">Finalizing %1... %2	%p%</translation>
+    </message>
+    <message>
+      <source>(%1 of %2)</source>
+      <translation type="unfinished">(%1 of %2)</translation>
     </message>
   </context>
   <context>
@@ -7440,7 +7432,7 @@ to %1</source>
     </message>
     <message>
       <source>Server offline</source>
-      <translation>השרת במצב לא מקוון</translation>
+      <translation>השרת אינו זמין</translation>
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
@@ -7452,11 +7444,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>מחק %n סימניות?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
+        <numerusform>מחק %n סימניות?</numerusform>
+        <numerusform>מחק %n סימניות?</numerusform>
+        <numerusform>מחק %n סימניות?</numerusform>
       </translation>
     </message>
   </context>
@@ -7492,7 +7484,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to merge Systems</source>
-      <translation>נכשלה מיזוג מערכות</translation>
+      <translation>מיזוג המערכות נכשל</translation>
     </message>
     <message>
       <source>Failed to update Server</source>
@@ -7531,11 +7523,11 @@ to %1</source>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n הפריטים הבאים לא נשמרים:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
+        <numerusform>%n הפריטים הבאים לא נשמרים:</numerusform>
+        <numerusform>%n הפריטים הבאים לא נשמרים:</numerusform>
+        <numerusform>%n הפריטים הבאים לא נשמרים:</numerusform>
       </translation>
     </message>
     <message>
@@ -7548,11 +7540,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n הפריטים הבאים לא נמחקו:</numerusform>
-        <numerusform>The following %n items are not deleted:</numerusform>
-        <numerusform>The following %n items are not deleted:</numerusform>
-        <numerusform>The following %n items are not deleted:</numerusform>
+        <numerusform>%n הפריטים הבאים לא נמחקו:</numerusform>
+        <numerusform>%n הפריטים הבאים לא נמחקו:</numerusform>
+        <numerusform>%n הפריטים הבאים לא נמחקו:</numerusform>
       </translation>
     </message>
     <message>
@@ -7561,11 +7553,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>מחיקת %n פריטים נכשלה:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
+        <numerusform>מחיקת %n פריטים נכשלה:</numerusform>
+        <numerusform>מחיקת %n פריטים נכשלה:</numerusform>
+        <numerusform>מחיקת %n פריטים נכשלה:</numerusform>
       </translation>
     </message>
     <message>
@@ -7666,7 +7658,7 @@ to %1</source>
     <name>QnWorkbenchUpdateWatcher</name>
     <message>
       <source>Release Notes</source>
-      <translation>הערות שחרור</translation>
+      <translation>הערות מוצר</translation>
     </message>
     <message>
       <source>%1 version available</source>
@@ -7721,16 +7713,16 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
-        <numerusform>מחק %n פריטים?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+      <translation>
+        <numerusform>למחוק %n פריטים?</numerusform>
+        <numerusform>למחוק %n פריטים?</numerusform>
+        <numerusform>למחוק %n פריטים?</numerusform>
+        <numerusform>למחוק %n פריטים?</numerusform>
       </translation>
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation>הפסק את קיר הוידאו?</translation>
+      <translation>הם לעצור את קיר וידאו?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -7738,15 +7730,15 @@ to %1</source>
     </message>
     <message>
       <source>Stop</source>
-      <translation>עצירה</translation>
+      <translation>עצור</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>האם למחוק %n מטריצות?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
+        <numerusform>האם למחוק %n מטריצות?</numerusform>
+        <numerusform>האם למחוק %n מטריצות?</numerusform>
+        <numerusform>האם למחוק %n מטריצות?</numerusform>
       </translation>
     </message>
     <message>
@@ -7781,10 +7773,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchWearableHandler</name>
     <message>
-      <source>Could not add wearable camera to server &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not add wearable camera to server &quot;%1&quot;.</translation>
-    </message>
-    <message>
       <source>All files (*.*)</source>
       <translation>כל הקבצים (*.*)</translation>
     </message>
@@ -7797,101 +7785,8 @@ to %1</source>
       <translation type="unfinished">Open Wearable Camera Recordings...</translation>
     </message>
     <message>
-      <source>No video files found in &quot;%1&quot;</source>
-      <translation type="unfinished">No video files found in &quot;%1&quot;</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file format(s) are not supported</source>
-      <translation type="unfinished">
-        <numerusform>Selected file format(s) are not supported</numerusform>
-        <numerusform>Selected file format(s) are not supported</numerusform>
-        <numerusform>Selected file format(s) are not supported</numerusform>
-        <numerusform>Selected file format(s) are not supported</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Only video files are supported.</source>
-      <translation type="unfinished">Only video files are supported.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) do not have timestamp(s)</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
-        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
-        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
-        <numerusform>Selected file(s) do not have timestamp(s)</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>Only video files with correct timestamp are supported.</source>
       <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected file(s) cover periods for which videos are already being uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You can upload these file(s) to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
-        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
-        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
-        <numerusform>You can upload these file(s) to a different instance of a Wearable Camera.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected file(s) cover periods for which videos have already been uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) will not be uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected file(s) will not be uploaded</numerusform>
-        <numerusform>Selected file(s) will not be uploaded</numerusform>
-        <numerusform>Selected file(s) will not be uploaded</numerusform>
-        <numerusform>Selected file(s) will not be uploaded</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Some file(s) will not be uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Some file(s) will not be uploaded</numerusform>
-        <numerusform>Some file(s) will not be uploaded</numerusform>
-        <numerusform>Some file(s) will not be uploaded</numerusform>
-        <numerusform>Some file(s) will not be uploaded</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>There is no new files to upload in &quot;%1&quot;</source>
-      <translation type="unfinished">There is no new files to upload in &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
-    </message>
-    <message numerus="yes">
-      <source>File(s) size - %1
-Free space - %2</source>
-      <translation type="unfinished">
-        <numerusform>File(s) size - %1
-Free space - %2</numerusform>
-        <numerusform>File(s) size - %1
-Free space - %2</numerusform>
-        <numerusform>File(s) size - %1
-Free space - %2</numerusform>
-        <numerusform>File(s) size - %1
-Free space - %2</numerusform>
-      </translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
@@ -7902,24 +7797,154 @@ Free space - %2</numerusform>
       <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
     </message>
     <message>
-      <source>File format of &quot;%1&quot; is not supported.</source>
-      <translation type="unfinished">File format of &quot;%1&quot; is not supported.</translation>
+      <source>Failed to add wearable camera</source>
+      <translation type="unfinished">Failed to add wearable camera</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; does not have timestamp.</source>
-      <translation type="unfinished">File &quot;%1&quot; does not have timestamp.</translation>
+      <source>No video files found in selected folder</source>
+      <translation type="unfinished">No video files found in selected folder</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <translation type="unfinished">
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
+      </translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; cover periods for which video is already being uploaded.</source>
-      <translation type="unfinished">File &quot;%1&quot; cover periods for which video is already being uploaded.</translation>
+      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
+      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <translation type="unfinished">
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Wearable Camera.</source>
+      <translation type="unfinished">
+        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      </translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; cover periods for which video has already been uploaded.</source>
-      <translation type="unfinished">File &quot;%1&quot; cover periods for which video has already been uploaded.</translation>
+      <source>Selected files will not be uploaded</source>
+      <translation type="unfinished">Selected files will not be uploaded</translation>
     </message>
     <message>
-      <source>There is no space on server for file &quot;%1&quot;.</source>
-      <translation type="unfinished">There is no space on server for file &quot;%1&quot;.</translation>
+      <source>Some files will not be uploaded</source>
+      <translation type="unfinished">Some files will not be uploaded</translation>
+    </message>
+    <message>
+      <source>No new files to upload in selected folder</source>
+      <translation type="unfinished">No new files to upload in selected folder</translation>
+    </message>
+    <message>
+      <source>%1 - has unsupported format.</source>
+      <translation type="unfinished">%1 - has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 - does not have timestamp.</source>
+      <translation type="unfinished">%1 - does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 - covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 - covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 - covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 - covers period for which video is being uploaded.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation type="unfinished">
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation type="unfinished">
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation type="unfinished">
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation type="unfinished">To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation type="unfinished">Upload anyway?</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation type="unfinished">Could not finish upload to %1</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation type="unfinished">Make sure there is enough space on server storage.</translation>
+    </message>
+    <message>
+      <source>%1 - is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 - is older than allowed in camera archive settings.</translation>
     </message>
   </context>
   <context>
@@ -7953,11 +7978,11 @@ Free space - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>למשתמש תהיה עדיין גישה אל %n משאבים שהוסרו:</numerusform>
-        <numerusform>User will still have access to %n removed resources:</numerusform>
-        <numerusform>User will still have access to %n removed resources:</numerusform>
-        <numerusform>User will still have access to %n removed resources:</numerusform>
+        <numerusform>למשתמש תהיה עדיין גישה אל %n משאבים שהוסרו:</numerusform>
+        <numerusform>למשתמש תהיה עדיין גישה אל %n משאבים שהוסרו:</numerusform>
+        <numerusform>למשתמש תהיה עדיין גישה אל %n משאבים שהוסרו:</numerusform>
       </translation>
     </message>
     <message>
@@ -7966,11 +7991,11 @@ Free space - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>כל המשתמשים עם התפקיד הזה יקבלו גישה אל %n משאבים:</numerusform>
-        <numerusform>All users with this role will get access to %n resources:</numerusform>
-        <numerusform>All users with this role will get access to %n resources:</numerusform>
-        <numerusform>All users with this role will get access to %n resources:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה יקבלו גישה אל %n משאבים:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה יקבלו גישה אל %n משאבים:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה יקבלו גישה אל %n משאבים:</numerusform>
       </translation>
     </message>
     <message>
@@ -7979,11 +8004,11 @@ Free space - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>כל המשתמשים עם התפקיד הזה עדיין יקבלו גישה אל %n משאבים שהוסרו:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה עדיין יקבלו גישה אל %n משאבים שהוסרו:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה עדיין יקבלו גישה אל %n משאבים שהוסרו:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה עדיין יקבלו גישה אל %n משאבים שהוסרו:</numerusform>
       </translation>
     </message>
     <message>
@@ -7996,47 +8021,47 @@ Free space - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>המשתמש יאבד את הגישה ל %n משאבים:</numerusform>
-        <numerusform>User will lose access to %n resources:</numerusform>
-        <numerusform>User will lose access to %n resources:</numerusform>
-        <numerusform>User will lose access to %n resources:</numerusform>
+        <numerusform>המשתמש יאבד את הגישה ל %n משאבים:</numerusform>
+        <numerusform>המשתמש יאבד את הגישה ל %n משאבים:</numerusform>
+        <numerusform>המשתמש יאבד את הגישה ל %n משאבים:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>כל המשתמשים עם התפקיד הזה יאבדו את הגישה ל %n משאבים:</numerusform>
-        <numerusform>All users with this role will lose access to %n resources:</numerusform>
-        <numerusform>All users with this role will lose access to %n resources:</numerusform>
-        <numerusform>All users with this role will lose access to %n resources:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה יאבדו את הגישה ל %n משאבים:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה יאבדו את הגישה ל %n משאבים:</numerusform>
+        <numerusform>כל המשתמשים עם התפקיד הזה יאבדו את הגישה ל %n משאבים:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>למחוק %n פריסות משותפות?</numerusform>
-        <numerusform>Delete %n shared layouts?</numerusform>
-        <numerusform>Delete %n shared layouts?</numerusform>
-        <numerusform>Delete %n shared layouts?</numerusform>
+        <numerusform>למחוק %n פריסות משותפות?</numerusform>
+        <numerusform>למחוק %n פריסות משותפות?</numerusform>
+        <numerusform>למחוק %n פריסות משותפות?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n פריסות אלו משותפות עם משתמשים אחרים, כך שתמחק אותן גם להם.</numerusform>
-        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
-        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
-        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
+        <numerusform>%n פריסות אלו משותפות עם משתמשים אחרים, כך שתמחק אותן גם להם.</numerusform>
+        <numerusform>%n פריסות אלו משותפות עם משתמשים אחרים, כך שתמחק אותן גם להם.</numerusform>
+        <numerusform>%n פריסות אלו משותפות עם משתמשים אחרים, כך שתמחק אותן גם להם.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
-        <numerusform>Remove %n items from layout?</numerusform>
-        <numerusform>Remove %n items from layout?</numerusform>
-        <numerusform>Remove %n items from layout?</numerusform>
+        <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
+        <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
+        <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
       </translation>
     </message>
     <message>
@@ -8053,74 +8078,74 @@ Free space - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>מחק %n משתמשים?</numerusform>
-        <numerusform>Delete %n users?</numerusform>
-        <numerusform>Delete %n users?</numerusform>
-        <numerusform>Delete %n users?</numerusform>
+        <numerusform>מחק %n משתמשים?</numerusform>
+        <numerusform>מחק %n משתמשים?</numerusform>
+        <numerusform>מחק %n משתמשים?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>מחק %n התקנים?</numerusform>
-        <numerusform>Delete %n devices?</numerusform>
-        <numerusform>Delete %n devices?</numerusform>
-        <numerusform>Delete %n devices?</numerusform>
+        <numerusform>מחק %n התקנים?</numerusform>
+        <numerusform>מחק %n התקנים?</numerusform>
+        <numerusform>מחק %n התקנים?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>מחק %n מצלמות?</numerusform>
-        <numerusform>Delete %n cameras?</numerusform>
-        <numerusform>Delete %n cameras?</numerusform>
-        <numerusform>Delete %n cameras?</numerusform>
+        <numerusform>מחק %n מצלמות?</numerusform>
+        <numerusform>מחק %n מצלמות?</numerusform>
+        <numerusform>מחק %n מצלמות?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
-        <numerusform>Delete %n I/O Modules?</numerusform>
-        <numerusform>Delete %n I/O Modules?</numerusform>
-        <numerusform>Delete %n I/O Modules?</numerusform>
+        <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
+        <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
+        <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>מחק %n פריטים?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+        <numerusform>מחק %n פריטים?</numerusform>
+        <numerusform>מחק %n פריטים?</numerusform>
+        <numerusform>מחק %n פריטים?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
-        <numerusform>%n of them are auto-discovered.</numerusform>
-        <numerusform>%n of them are auto-discovered.</numerusform>
-        <numerusform>%n of them are auto-discovered.</numerusform>
+        <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
-        <numerusform>%n cameras are auto-discovered.</numerusform>
-        <numerusform>%n cameras are auto-discovered.</numerusform>
-        <numerusform>%n cameras are auto-discovered.</numerusform>
+        <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
+        <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
+        <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
       </translation>
     </message>
     <message>
@@ -8137,11 +8162,11 @@ Free space - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
+        <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
+        <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
       </translation>
     </message>
     <message>
@@ -8166,11 +8191,11 @@ Free space - %2</numerusform>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n users</numerusform>
-        <numerusform>%n users</numerusform>
-        <numerusform>%n users</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
       </translation>
     </message>
   </context>
@@ -8231,12 +8256,12 @@ Free space - %2</numerusform>
       <translation>שגיאת כתיבה בקובץ.</translation>
     </message>
     <message>
-      <source>Internal error</source>
-      <translation>שגיאה פנימית</translation>
-    </message>
-    <message>
       <source>No data exported.</source>
       <translation>אין נתונים לייצוא.</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>שגיאה פנימית</translation>
     </message>
   </context>
   <context>
@@ -8247,7 +8272,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Export</source>
-      <translation>ייצא</translation>
+      <translation>יצא</translation>
     </message>
     <message>
       <source>Rapid Review</source>
@@ -8363,15 +8388,15 @@ Free space - %2</numerusform>
     <name>nx::client::desktop::RadassActionFactory</name>
     <message>
       <source>Auto</source>
-      <translation>אוטומטי</translation>
+      <translation>אוטומטית</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>נמוך</translation>
+      <translation>נמוכה</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>גבוה</translation>
+      <translation>גבוהה</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -8653,7 +8678,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Export</source>
-      <translation>ייצא</translation>
+      <translation>יצא</translation>
     </message>
     <message>
       <source>You are about to export a lot of video</source>
@@ -8817,7 +8842,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Email</source>
-      <translation>דוא"ל</translation>
+      <translation>אימייל</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
@@ -8851,29 +8876,29 @@ Free space - %2</numerusform>
     <name>nx::client::desktop::ui::workbench::ActionHandler</name>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>העברת %n התקנים נכשלה</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
+        <numerusform>העברת %n התקנים נכשלה</numerusform>
+        <numerusform>העברת %n התקנים נכשלה</numerusform>
+        <numerusform>העברת %n התקנים נכשלה</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>העברת %n מצלמות נכשלה</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
+        <numerusform>העברת %n מצלמות נכשלה</numerusform>
+        <numerusform>העברת %n מצלמות נכשלה</numerusform>
+        <numerusform>העברת %n מצלמות נכשלה</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>העברת %n התקני קלט/פלט נכשלה</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
+        <numerusform>העברת %n התקני קלט/פלט נכשלה</numerusform>
+        <numerusform>העברת %n התקני קלט/פלט נכשלה</numerusform>
+        <numerusform>העברת %n התקני קלט/פלט נכשלה</numerusform>
       </translation>
     </message>
     <message>
@@ -8882,29 +8907,29 @@ Free space - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקנים. להעביר אותם בכל זאת?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקנים. להעביר אותם בכל זאת?</numerusform>
+        <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקנים. להעביר אותם בכל זאת?</numerusform>
+        <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקנים. להעביר אותם בכל זאת?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n מצלמות. להעביר אותן בכל זאת?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+        <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n מצלמות. להעביר אותן בכל זאת?</numerusform>
+        <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n מצלמות. להעביר אותן בכל זאת?</numerusform>
+        <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n מצלמות. להעביר אותן בכל זאת?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקני קלט /פלט. להעביר אותם בכל זאת?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+        <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקני קלט /פלט. להעביר אותם בכל זאת?</numerusform>
+        <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקני קלט /פלט. להעביר אותם בכל זאת?</numerusform>
+        <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקני קלט /פלט. להעביר אותם בכל זאת?</numerusform>
       </translation>
     </message>
     <message>
@@ -8961,11 +8986,11 @@ Free space - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>האם אתה בטוח שברצונך למחוק %n קובץ זה?</numerusform>
         <numerusform>האם אתה בטוח שברצונך למחוק את %n הקבצים האלו?</numerusform>
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+        <numerusform>האם אתה בטוח שברצונך למחוק את %n הקבצים האלו?</numerusform>
+        <numerusform>האם אתה בטוח שברצונך למחוק את %n הקבצים האלו?</numerusform>
       </translation>
     </message>
     <message>
@@ -9049,16 +9074,16 @@ Free space - %2</numerusform>
       <translation>פתיחת דף האינטרנט של השרת נכשלה</translation>
     </message>
     <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>שינוי הסיסמה נכשל</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>כישלון בשינוי סיסמה במצלמות %1 ו- %2</translation>
-    </message>
-    <message>
-      <source>Wearable Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
     </message>
   </context>
   <context>
@@ -9099,7 +9124,7 @@ Free space - %2</numerusform>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>מחק Showreel %1?</translation>
+      <translation>Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

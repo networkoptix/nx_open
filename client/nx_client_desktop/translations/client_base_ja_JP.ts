@@ -853,6 +853,22 @@ to view more bookmarks</source>
       <translation>シーケンス表示作成</translation>
     </message>
     <message>
+      <source>Wearable Camera...</source>
+      <translation>ウェアラブルカメラ...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation>新しいウェアラブルカメラ...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation>ファイルをアップロード...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation>フォルダをアップロード...</translation>
+    </message>
+    <message>
       <source>Start Analytics...</source>
       <translation>解析開始...</translation>
     </message>
@@ -879,22 +895,6 @@ to view more bookmarks</source>
     <message>
       <source>Cell Spacing...</source>
       <translation>セルの間隔...</translation>
-    </message>
-    <message>
-      <source>Wearable Camera...</source>
-      <translation>ウェアラブルカメラ...</translation>
-    </message>
-    <message>
-      <source>New Wearable Camera...</source>
-      <translation>新しいウェアラブルカメラ...</translation>
-    </message>
-    <message>
-      <source>Upload File...</source>
-      <translation>ファイルをアップロード...</translation>
-    </message>
-    <message>
-      <source>Upload Folder...</source>
-      <translation>フォルダをアップロード...</translation>
     </message>
   </context>
   <context>
@@ -1006,16 +1006,16 @@ to view more bookmarks</source>
       <translation>長いビデオをエクスポートしようとしています　ギガバイト以上の空き容量のを必要とし、数分かかることがあります</translation>
     </message>
     <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation>エクスポートされた.EXEファイルのサイズは4 GBを超えるのでWindowsで開くことはできません %1 Clientでのみ再生できます</translation>
+    </message>
+    <message>
       <source>Settings are not available for .EXE files.</source>
       <translation>EXEファイルは設定できません</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
       <translation>ローカルファイル、サーバーモニターウィジェット、およびWebページはエクスポートされません</translation>
-    </message>
-    <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>エクスポートされた.EXEファイルのサイズは4 GBを超えるのでWindowsで開くことはできません %1 Clientでのみ再生できます</translation>
     </message>
   </context>
   <context>
@@ -1175,14 +1175,6 @@ to view more bookmarks</source>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>ラテン文字、数字、およびキーボードの記号のみが許可されます</translation>
     </message>
-    <message>
-      <source>Long</source>
-      <translation>文字数</translation>
-    </message>
-    <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>ラテン文字、数字、およびキーボードシンボル%1のみが許可されます</translation>
-    </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
@@ -1194,6 +1186,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>パスワードは最低でも %n 文字以上にして下さい</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>文字数</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
@@ -1212,6 +1208,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>パスワードに %n 以上の繰り返し文字を使用しないでください</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>ラテン文字、数字、およびキーボードシンボル%1のみが許可されます</translation>
     </message>
   </context>
   <context>
@@ -3167,15 +3167,15 @@ to %1</source>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation>選択されたカメラの中には、パスワードの設定が必要なものがあります</translation>
     </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation>システム管理者に依頼してください</translation>
+    </message>
     <message numerus="yes">
       <source>Set Password</source>
       <translation>
         <numerusform>パスワードの設定</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Ask your system administrator to do it.</source>
-      <translation>システム管理者に依頼してください</translation>
     </message>
   </context>
   <context>
@@ -6086,6 +6086,10 @@ to %1</source>
       <translation>認証情報を確認してください</translation>
     </message>
     <message>
+      <source>NO LIVE STREAM</source>
+      <translation>ライブストリームなし</translation>
+    </message>
+    <message>
       <source>TOO MANY CONNECTIONS</source>
       <translation>接続が多すぎます</translation>
     </message>
@@ -6096,10 +6100,6 @@ to %1</source>
     <message>
       <source>Set for this Camera</source>
       <translation>このカメラに設定</translation>
-    </message>
-    <message>
-      <source>NO LIVE STREAM</source>
-      <translation>ライブストリームなし</translation>
     </message>
   </context>
   <context>
@@ -7919,12 +7919,12 @@ to %1</source>
       <translation>ファイル書き込みエラー</translation>
     </message>
     <message>
-      <source>Internal error</source>
-      <translation>内部エラー</translation>
-    </message>
-    <message>
       <source>No data exported.</source>
       <translation>データはエクスポートされませんでした</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>内部エラー</translation>
     </message>
   </context>
   <context>
@@ -8713,16 +8713,16 @@ to %1</source>
       <translation>サーバーの ウェブ ページを開くのに失敗しました</translation>
     </message>
     <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation>ウェアラブルカメラはサーバー間で移動できません</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>パスワードを変更できませんでした</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>%2 カメラの %1 のパスワードを変更できませんでした</translation>
-    </message>
-    <message>
-      <source>Wearable Cameras cannot be moved between servers</source>
-      <translation>ウェアラブルカメラはサーバー間で移動できません</translation>
     </message>
   </context>
   <context>

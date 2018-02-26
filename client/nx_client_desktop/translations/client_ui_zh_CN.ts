@@ -753,7 +753,7 @@
     <message>
       <location/>
       <source>Quality</source>
-      <translation>质量</translation>
+      <translation>画质</translation>
     </message>
     <message>
       <location/>
