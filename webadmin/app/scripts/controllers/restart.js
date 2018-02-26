@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('RestartCtrl', ['$scope', '$modalInstance', '$interval', 'mediaserver', 'port',
+    .controller('RestartCtrl', ['$scope', '$uibModalInstance', '$interval', 'mediaserver', 'port',
     function ($scope, $modalInstance, $interval, mediaserver, port) {
 
         port = port || window.location.port;

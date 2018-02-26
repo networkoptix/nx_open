@@ -5,7 +5,7 @@ timeManager is for server/local time conversions.
 In data structures we always store "display time"
 In server requests - we always use server time
 */
-var timeManager = {
+window.timeManager = {
     useServerTime: true,
     timeLatency: 0,
     timeZoneOffset: 0
@@ -104,7 +104,7 @@ timeManager.init = function(useServerTime){
 };
 
 //Record
-function Chunk(boundaries,start,end,level,title,extension){
+window.Chunk = function(boundaries,start,end,level,title,extension){
     this.start = start;
     this.end = end;
     this.level = level || 0;
@@ -142,7 +142,7 @@ function NumberToDate(date){
 }
 
 // Additional mini-library for declaring and using settings for ruler levels
-function Interval (ms,seconds,minutes,hours,days,months,years){
+window.Interval = function(ms,seconds,minutes,hours,days,months,years){
     this.seconds = seconds;
     this.minutes = minutes;
     this.hours = hours;
@@ -254,7 +254,7 @@ Interval.prototype.alignToFuture = function(date){
  * Special model for ruler levels. Stores all possible detailization level for the ruler
  * @type {{levels: *[], getLevelIndex: getLevelIndex}}
  */
-var RulerModel = {
+window.RulerModel = {
 
     /**
      * Presets for detailization levels
@@ -330,7 +330,7 @@ var RulerModel = {
 };
 
 //Provider for records from mediaserver
-function CameraRecordsProvider(cameras, mediaserver, width) {
+window.CameraRecordsProvider = function(cameras, mediaserver, width) {
     this.cameras = cameras;
     this.width = width;
     this.mediaserver = mediaserver;
@@ -720,7 +720,7 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
  * ShortCache - special collection for short chunks with best detailization for calculating playing position and date
  * @constructor
  */
-function ShortCache(cameras, mediaserver){
+window.ShortCache = function(cameras, mediaserver){
     this.mediaserver = mediaserver;
     this.cameras = cameras;
 
@@ -969,7 +969,7 @@ function parseChunks(chunks){
 
 
 
-function ScaleManager(minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs,
+window.ScaleManager = function(minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs,
                        lastMinuteInterval, minPixelsPerLevel, minScrollBarWidth, pixelAspectRatio, $q){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
