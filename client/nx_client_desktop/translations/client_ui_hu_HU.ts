@@ -1632,7 +1632,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Túra ciklus</translation>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>

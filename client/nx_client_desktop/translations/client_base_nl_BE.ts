@@ -95,7 +95,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>Logboek...</translation>
+      <translation>Gebeurtenissenlog...</translation>
     </message>
     <message>
       <source>Cameras to Backup...</source>
@@ -183,11 +183,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New Layout...</source>
-      <translation>Nieuwe schermindeling...</translation>
+      <translation>Nieuwe lay-out...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation>Open schermindeling...</translation>
+      <translation>Nieuwe lay-out...</translation>
     </message>
     <message>
       <source>Open...</source>
@@ -211,11 +211,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation>Huidige schermindeling opslaan</translation>
+      <translation>Huidige lay-out opslaan</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation>Huidige schermindeling opslaan als...</translation>
+      <translation>Bewaar huidige lay-out als...</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
@@ -306,7 +306,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>Gebeurtenisregels...</translation>
+      <translation>Event regels...</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -398,7 +398,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
-      <translation>Toon op alarm scherm</translation>
+      <translation>Openen in alarm lay-out</translation>
     </message>
     <message>
       <source>Open in New Window</source>
@@ -442,7 +442,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Verwijderen</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <source>Stop Video Wall</source>
@@ -454,11 +454,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Layout</source>
-      <translation>Schermindeling opslaan</translation>
+      <translation>Layout opslaan</translation>
     </message>
     <message>
       <source>Save Layout As...</source>
-      <translation>Sla de schermindeling op als...</translation>
+      <translation>Sla de layout op als...</translation>
     </message>
     <message>
       <source>Maximize Item</source>
@@ -486,7 +486,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>Laag</translation>
+      <translation>Lage</translation>
     </message>
     <message>
       <source>High</source>
@@ -554,11 +554,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation>Verwijderen uit de schermindeling</translation>
+      <translation>Verwijderen uit de lay-out</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
-      <translation>Delen van de schermindeling beëindigen</translation>
+      <translation>Lay-out delen beëindigen</translation>
     </message>
     <message>
       <source>Edit...</source>
@@ -574,7 +574,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation>Schermindeling instellen als achtergrond</translation>
+      <translation>Lay-out instellen als achtergrond</translation>
     </message>
     <message>
       <source>User Settings...</source>
@@ -582,11 +582,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>User Roles...</source>
-      <translation>Gebruikersprofielen...</translation>
+      <translation>Gebruikersrollen...</translation>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation>Profielinstellingen...</translation>
+      <translation>Rolinstellingen...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -666,7 +666,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Layout Settings...</source>
-      <translation>Schermindeling instellingen...</translation>
+      <translation>Lay-out instellingen...</translation>
     </message>
     <message>
       <source>Video Wall Settings...</source>
@@ -1062,7 +1062,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
         <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
       </translation>
@@ -1123,7 +1123,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Gedeelde schermindelingen</translation>
+      <translation>Gedeelde lay-outs</translation>
     </message>
     <message>
       <source>All</source>
@@ -1275,7 +1275,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>en %n meer</numerusform>
         <numerusform>en %n meer</numerusform>
       </translation>
@@ -1285,11 +1285,11 @@ to view more bookmarks</source>
     <name>QnAccessibleResourcesWidget</name>
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>Door het geven van toegang tot sommige schermindelingen, geeft u ook toegang tot alle camera's in deze schermindeling. Daarmee krijgt de gebruiker toegang tot extra camera's op deze schermindeling.</translation>
+      <translation>Door het geven van toegang tot sommige lay-outs, geeft u ook toegang tot alle camera's in deze lay-out. Daarmee krijgt de gebruiker toegang tot extra camera's op deze lay-outs.</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>Alle camera's en apparaten</translation>
+      <translation>Alle camera's &amp; apparaten</translation>
     </message>
   </context>
   <context>
@@ -1404,36 +1404,36 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>Deze apparaten worden verwijderd uit het systeem</numerusform>
+      <translation>
+        <numerusform>Dit aparaat is verwijderd uit het systeem</numerusform>
         <numerusform>Deze apparaten worden verwijderd uit het systeem</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>Deze camera's worden verwijderd uit het systeem</numerusform>
+      <translation>
+        <numerusform>Deze camera wordt verwijderd uit het systeem</numerusform>
         <numerusform>Deze camera's worden verwijderd uit het systeem</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>Deze server worden verwijderd uit het systeem</numerusform>
+      <translation>
+        <numerusform>Deze server wordt verwijderd uit het systeem</numerusform>
         <numerusform>Deze server worden verwijderd uit het systeem</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>Deze gebruikers worden verwijderd uit het systeem</numerusform>
+      <translation>
+        <numerusform>Deze gebruiker wordt verwijderd uit het systeem</numerusform>
         <numerusform>Deze gebruikers worden verwijderd uit het systeem</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>Deze bronnen worden verwijderd uit het systeem</numerusform>
+      <translation>
+        <numerusform>Deze bron wordt verwijderd uit het systeem</numerusform>
         <numerusform>Deze bronnen worden verwijderd uit het systeem</numerusform>
       </translation>
     </message>
@@ -1446,7 +1446,7 @@ to view more bookmarks</source>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation>Unknown</translation>
+      <translation>Onbekend</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -1514,8 +1514,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n action(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n acties</numerusform>
+      <translation>
+        <numerusform>%n actie</numerusform>
         <numerusform>%n acties</numerusform>
       </translation>
     </message>
@@ -1665,7 +1665,7 @@ to view more bookmarks</source>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>U heeft %n notificaties</numerusform>
         <numerusform>U heeft %n notificaties</numerusform>
       </translation>
@@ -1710,7 +1710,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
@@ -1725,14 +1725,14 @@ to view more bookmarks</source>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 van %n apparaten</numerusform>
         <numerusform>%1 van %n apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 van %n camera's</numerusform>
         <numerusform>%1 van %n camera's</numerusform>
       </translation>
@@ -1747,8 +1747,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%1 van %n I/O modules</numerusform>
+      <translation>
+        <numerusform>%1 van %n I/O module</numerusform>
         <numerusform>%1 van %n I/O modules</numerusform>
       </translation>
     </message>
@@ -1772,8 +1772,8 @@ to view more bookmarks</source>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n servers</numerusform>
+      <translation>
+        <numerusform>%n server</numerusform>
         <numerusform>%n servers</numerusform>
       </translation>
     </message>
@@ -1811,8 +1811,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
-      <translation type="unfinished">
-        <numerusform>Bron- en %n meer camera's</numerusform>
+      <translation>
+        <numerusform>Bron- en %n meer camera</numerusform>
         <numerusform>Bron- en %n meer camera's</numerusform>
       </translation>
     </message>
@@ -1898,7 +1898,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No event rules</source>
-      <translation>Geen gebeurtenisregels</translation>
+      <translation>Geen event regels</translation>
     </message>
     <message>
       <source>Filter by devices...</source>
@@ -2016,7 +2016,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n apparaat gevonden</numerusform>
         <numerusform>%n apparaten gevonden</numerusform>
       </translation>
@@ -2052,7 +2052,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices added.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n apparaten toegevoegd.</numerusform>
         <numerusform>%n apparaten toegevoegd.</numerusform>
       </translation>
@@ -2063,8 +2063,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Het toevoegen van %n apparaten is niet gelukt</numerusform>
+      <translation>
+        <numerusform>Het toevoegen van %n het apparaat is niet gelukt</numerusform>
         <numerusform>Het toevoegen van %n apparaten is niet gelukt</numerusform>
       </translation>
     </message>
@@ -2155,8 +2155,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation type="unfinished">
-        <numerusform>%1 bieden geen ondersteuning voor twee-weg audio</numerusform>
+      <translation>
+        <numerusform>%1 biedt geen ondersteuning voor twee-weg audio</numerusform>
         <numerusform>%1 bieden geen ondersteuning voor twee-weg audio</numerusform>
       </translation>
     </message>
@@ -2254,8 +2254,8 @@ to view more bookmarks</source>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation type="unfinished">
-        <numerusform>%1 geeft geen inputpoorten</numerusform>
+      <translation>
+        <numerusform>%1 geeft geen inputpoort</numerusform>
         <numerusform>%1 geeft geen inputpoorten</numerusform>
       </translation>
     </message>
@@ -2301,8 +2301,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation type="unfinished">
-        <numerusform>%n camera's gevonden</numerusform>
+      <translation>
+        <numerusform>%n camera gevonden</numerusform>
         <numerusform>%n camera's gevonden</numerusform>
       </translation>
     </message>
@@ -2316,8 +2316,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules gevonden</numerusform>
+      <translation>
+        <numerusform>%n I/O module gevonden</numerusform>
         <numerusform>%n I/O modules gevonden</numerusform>
       </translation>
     </message>
@@ -2396,7 +2396,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message numerus="yes">
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Opname of bewegingsdetectie is uitgeschakeld voor %1</numerusform>
         <numerusform>Opname of bewegingsdetectie is uitgeschakeld voor %1</numerusform>
       </translation>
@@ -2413,8 +2413,8 @@ to view more bookmarks</source>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation type="unfinished">
-        <numerusform>%1 hebben geen relaisuitgangen</numerusform>
+      <translation>
+        <numerusform>%1 heeft geen relaisuitgang</numerusform>
         <numerusform>%1 hebben geen relaisuitgangen</numerusform>
       </translation>
     </message>
@@ -2423,7 +2423,7 @@ to view more bookmarks</source>
     <name>QnCameraRecordingPolicy</name>
     <message numerus="yes">
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Opname is uitgeschakeld voor %1</numerusform>
         <numerusform>Opname is uitgeschakeld voor %1</numerusform>
       </translation>
@@ -2552,21 +2552,21 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Wijzigingen voor de volgende %n apparaten worden niet opgeslagen:</numerusform>
         <numerusform>Wijzigingen voor de volgende %n apparaten worden niet opgeslagen:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Wijzigingen voor de volgende %n camera's worden niet opgeslagen:</numerusform>
         <numerusform>Wijzigingen voor de volgende %n camera's worden niet opgeslagen:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Wijzigingen voor de volgende %n I/O-modules worden niet opgeslagen:</numerusform>
         <numerusform>Wijzigingen voor de volgende %n I/O-modules worden niet opgeslagen:</numerusform>
       </translation>
@@ -2730,7 +2730,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -3104,11 +3104,11 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Internal Error</source>
@@ -3178,15 +3178,15 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation type="unfinished">
-        <numerusform>Logboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
+      <translation>
+        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
         <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation type="unfinished">
-        <numerusform>Logboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
+      <translation>
+        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
         <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
       </translation>
     </message>
@@ -3215,7 +3215,7 @@ to %1</source>
     </message>
     <message>
       <source>Event</source>
-      <translation>Gebeurtenis</translation>
+      <translation>Event</translation>
     </message>
     <message>
       <source>Source</source>
@@ -3240,7 +3240,7 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 (%n keer)</numerusform>
         <numerusform>%1 (%n keer)</numerusform>
       </translation>
@@ -3251,21 +3251,21 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>en %n gebruikers meer...</numerusform>
         <numerusform>en %n gebruikers meer...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>en %n meer...</numerusform>
         <numerusform>en %n meer...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Verwijderde onderwerpen</numerusform>
         <numerusform>%n Verwijderde onderwerpen</numerusform>
       </translation>
@@ -3662,7 +3662,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Test succesvol afgerond: %n gebruikers gevonden.</numerusform>
         <numerusform>Test succesvol afgerond: %n gebruikers gevonden.</numerusform>
       </translation>
@@ -3687,7 +3687,7 @@ to %1</source>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Email</source>
@@ -3800,7 +3800,7 @@ to %1</source>
     </message>
     <message>
       <source>Error</source>
-      <translation>Error</translation>
+      <translation>Fout</translation>
     </message>
     <message>
       <source>Server not found</source>
@@ -3832,7 +3832,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>De licentie verloopt over %n dagen</numerusform>
         <numerusform>De licentie verloopt over %n dagen</numerusform>
       </translation>
@@ -3926,14 +3926,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Ten minste %n %1 zijn vereist</numerusform>
         <numerusform>Ten minste %n %1 zijn vereist</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n %1 zijn momenteel in gebruik</numerusform>
         <numerusform>%n %1 zijn momenteel in gebruik</numerusform>
       </translation>
@@ -3944,7 +3944,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Licenties deactiveren?</numerusform>
         <numerusform>Licenties deactiveren?</numerusform>
       </translation>
@@ -3955,21 +3955,21 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Het deactiveren van %n licenties is mislukt</numerusform>
         <numerusform>Het deactiveren van %n licenties is mislukt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 van %n licenties kunnen niet worden gedeactiveerd</numerusform>
         <numerusform>%1 van %n licenties kunnen niet worden gedeactiveerd</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Het deactiveren van de licenties is mislukt</numerusform>
         <numerusform>Het deactiveren van de licenties is mislukt</numerusform>
       </translation>
@@ -3992,7 +3992,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n licenties gedeactiveerd</numerusform>
         <numerusform>%n licenties gedeactiveerd</numerusform>
       </translation>
@@ -4007,7 +4007,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kanalen.</numerusform>
         <numerusform>%n kanalen.</numerusform>
       </translation>
@@ -4018,7 +4018,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Deactiveren %n overige</numerusform>
         <numerusform>Deactiveren %n overige</numerusform>
       </translation>
@@ -4087,28 +4087,28 @@ to %1</source>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
       <source>Use analog licenses to view these %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gebruik encoder licenties om deze %n camera's te bekijken</numerusform>
         <numerusform>Gebruik encoder licenties om deze %n camera's te bekijken</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gebruik licenties voor de geselecteerde %n apparaten</numerusform>
         <numerusform>Gebruik licenties voor de geselecteerde %n apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gebruik licenties voor de geselecteerde %n camera's</numerusform>
         <numerusform>Gebruik licenties voor de geselecteerde %n camera's</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gebruik licenties voor de geselecteerde %n I / O-modules</numerusform>
         <numerusform>Gebruik licenties voor de geselecteerde %n I / O-modules</numerusform>
       </translation>
@@ -4130,11 +4130,11 @@ to %1</source>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation>Persoonlijke instellingen</translation>
+      <translation>Personalisatie</translation>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation>Schermopname</translation>
+      <translation>Scherm Opname</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -4220,11 +4220,11 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation>Accounts aanmaken</translation>
+      <translation>Account aanmaken</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -4237,7 +4237,7 @@ to %1</source>
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Meld u aan bij %1</translation>
+      <translation>Inloggen op %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
@@ -4542,7 +4542,7 @@ to %1</source>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
       <source>%n more notifications</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n meer meldingen</numerusform>
         <numerusform>%n meer meldingen</numerusform>
       </translation>
@@ -4736,21 +4736,21 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Deze preset wordt geactiveerd na %n minuten inactiviteit</numerusform>
         <numerusform>Deze preset wordt geactiveerd na %n minuten inactiviteit</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Tour heeft %n identieke posities</numerusform>
         <numerusform>Tour heeft %n identieke posities</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>ongeveer %n minuten</numerusform>
         <numerusform>ongeveer %n minuten</numerusform>
       </translation>
@@ -4973,7 +4973,7 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Totaal %1 %n apparaten</numerusform>
         <numerusform>Totaal %1 %n apparaten</numerusform>
       </translation>
@@ -4981,7 +4981,7 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Totaal %1 %n camera's</numerusform>
         <numerusform>Totaal %1 %n camera's</numerusform>
       </translation>
@@ -4989,7 +4989,7 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Totaal %1 %n I / O modules</numerusform>
         <numerusform>Totaal %1 %n I / O modules</numerusform>
       </translation>
@@ -5045,7 +5045,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n van %1 geselecteerde profielen hebben geen toestemming voor %2</numerusform>
         <numerusform>%n van %1 geselecteerde profielen hebben geen toestemming voor %2</numerusform>
       </translation>
@@ -5063,7 +5063,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n van %1 geselecteerde gebruikers hebben geen toestemming voor %2</numerusform>
         <numerusform>%n van %1 geselecteerde gebruikers hebben geen toestemming voor %2</numerusform>
       </translation>
@@ -5236,7 +5236,7 @@ to %1</source>
     </message>
     <message>
       <source>Search</source>
-      <translation>Search</translation>
+      <translation>Zoek</translation>
     </message>
   </context>
   <context>
@@ -5274,7 +5274,7 @@ to %1</source>
     <name>QnSearchLineEdit</name>
     <message>
       <source>Search</source>
-      <translation>Search</translation>
+      <translation>Zoek</translation>
     </message>
   </context>
   <context>
@@ -5320,7 +5320,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n servers</numerusform>
         <numerusform>%n servers</numerusform>
       </translation>
@@ -5342,7 +5342,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n gebruikers</numerusform>
         <numerusform>%n gebruikers</numerusform>
       </translation>
@@ -5352,7 +5352,7 @@ to %1</source>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n extra</numerusform>
         <numerusform>%n extra</numerusform>
       </translation>
@@ -5627,7 +5627,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Niet genoeg vrije ruimte bij %n servers:</numerusform>
         <numerusform>Niet genoeg vrije ruimte bij %n servers:</numerusform>
       </translation>
@@ -5814,7 +5814,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -5841,7 +5841,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -6025,7 +6025,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
       </translation>
@@ -6417,7 +6417,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>Extern archief synchronisatie</translation>
+      <translation>Externe archief synchronisatie</translation>
     </message>
   </context>
   <context>
@@ -6525,42 +6525,42 @@ to %1</source>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation>yyyy</translation>
+      <translation>jjjj</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM jjjj uu:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM jjjj uu:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h ap</translation>
+      <translation>dd MMMM jjjj u ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>dd MMMM yyyy</translation>
+      <translation>dd MMMM jjjj</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM yyyy</translation>
+      <translation>MMMM, jjjj</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>yyyy</translation>
+      <translation>jjjj</translation>
     </message>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h:mm ap</translation>
+      <translation>u:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
@@ -6700,7 +6700,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Role</source>
@@ -6757,7 +6757,7 @@ to %1</source>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6765,7 +6765,7 @@ to %1</source>
     </message>
     <message>
       <source>Role</source>
-      <translation>Profiel</translation>
+      <translation>Rol</translation>
     </message>
     <message>
       <source>Email</source>
@@ -6807,8 +6807,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation type="unfinished">
-        <numerusform>Selecteer alstublieft een actie voor %n gebruikers met dit profiel</numerusform>
+      <translation>
+        <numerusform>Selecteer alstublieft een actie voor %n gebruikers met deze rol</numerusform>
         <numerusform>Selecteer alstublieft een actie voor %n gebruikers met deze rol</numerusform>
       </translation>
     </message>
@@ -6829,7 +6829,7 @@ to %1</source>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Schermindelingen</translation>
+      <translation>Layouts</translation>
     </message>
     <message>
       <source>New Role</source>
@@ -6852,11 +6852,11 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
-      <translation>Camera's en apparaten</translation>
+      <translation>Camera's &amp;&amp; apparaten</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Schermindelingen</translation>
+      <translation>Layouts</translation>
     </message>
     <message>
       <source>Send Invite</source>
@@ -6904,7 +6904,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -6932,7 +6932,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -7002,7 +7002,7 @@ to %1</source>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>PC %1 - Weergave %2</numerusform>
         <numerusform>PC %1 - Weergave %2</numerusform>
       </translation>
@@ -7114,7 +7114,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bladwijzer %n verwijderen?</numerusform>
         <numerusform>Bladwijzer %n verwijderen?</numerusform>
       </translation>
@@ -7362,7 +7362,7 @@ to %1</source>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>De volgende %n items zijn niet opgeslagen:</numerusform>
         <numerusform>De volgende %n items zijn niet opgeslagen:</numerusform>
       </translation>
@@ -7377,7 +7377,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>De volgende %n items zijn niet verwijderd:</numerusform>
         <numerusform>De volgende %n items zijn niet verwijderd:</numerusform>
       </translation>
@@ -7388,7 +7388,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kan %n items niet verwijderen:</numerusform>
         <numerusform>Kan %n items niet verwijderen:</numerusform>
       </translation>
@@ -7546,7 +7546,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n items?</numerusform>
         <numerusform>Verwijder %n items?</numerusform>
       </translation>
@@ -7565,7 +7565,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n matrixen?</numerusform>
         <numerusform>Verwijder %n matrixen?</numerusform>
       </translation>
@@ -7787,7 +7787,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gebruiker heeft nog toegang tot %n verwijderde bronnen:</numerusform>
         <numerusform>Gebruiker heeft nog toegang tot %n verwijderde bronnen:</numerusform>
       </translation>
@@ -7798,8 +7798,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation type="unfinished">
-        <numerusform>Alle gebruikers met dit profiel krijgen toegang tot %n apparaten:</numerusform>
+      <translation>
+        <numerusform>Alle gebruikers met deze rol krijgen toegang tot %n apparaten:</numerusform>
         <numerusform>Alle gebruikers met deze rol krijgen toegang tot %n apparaten:</numerusform>
       </translation>
     </message>
@@ -7809,8 +7809,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation type="unfinished">
-        <numerusform>Alle gebruikers met dit profiel hebben nog toegang tot %n verwijderde bronnen:</numerusform>
+      <translation>
+        <numerusform>Alle gebruikers met deze rol hebben nog toegang tot %n verwijderde bronnen:</numerusform>
         <numerusform>Alle gebruikers met deze rol hebben nog toegang tot %n verwijderde bronnen:</numerusform>
       </translation>
     </message>
@@ -7824,36 +7824,36 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gebruiker verliest toegang tot %n bronnen:</numerusform>
         <numerusform>Gebruiker verliest toegang tot %n bronnen:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Alle gebruikers met deze rol verliezen toegang tot %n apparaten:</numerusform>
         <numerusform>Alle gebruikers met deze rol verliezen toegang tot %n apparaten:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation type="unfinished">
-        <numerusform>Verwijder %n gedeelde schermindelingen?</numerusform>
+      <translation>
+        <numerusform>Verwijder %n gedeelde layouts?</numerusform>
         <numerusform>Verwijder %n gedeelde layouts?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation type="unfinished">
-        <numerusform>Deze %n schermindelingen worden gedeeld met andere gebruikers, dus u verwijdert deze ook voor hen.</numerusform>
+      <translation>
+        <numerusform>Deze %n layouts worden gedeeld met andere gebruikers, dus u verwijdert deze ook voor hen.</numerusform>
         <numerusform>Deze %n layouts worden gedeeld met andere gebruikers, dus u verwijdert deze ook voor hen.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation type="unfinished">
-        <numerusform>Verwijder %n items uit de schermindeling?</numerusform>
+      <translation>
+        <numerusform>Verwijder %n items uit layout?</numerusform>
         <numerusform>Verwijder %n items uit layout?</numerusform>
       </translation>
     </message>
@@ -7871,28 +7871,28 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n gebruikers?</numerusform>
         <numerusform>Verwijder %n gebruikers?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n apparaten?</numerusform>
         <numerusform>Verwijder %n apparaten?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n camera's?</numerusform>
         <numerusform>Verwijder %n camera's?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n I/O Modules?</numerusform>
         <numerusform>Verwijder %n I/O Modules?</numerusform>
       </translation>
@@ -7906,21 +7906,21 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n daarvan worden automatisch ontdekt.</numerusform>
         <numerusform>%n daarvan worden automatisch ontdekt.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n camera's zijn automatisch ontdekt.</numerusform>
         <numerusform>%n camera's zijn automatisch ontdekt.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I / O-modules zijn automatisch ontdekt.</numerusform>
         <numerusform>%n I / O-modules zijn automatisch ontdekt.</numerusform>
       </translation>
@@ -7939,7 +7939,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n items van showreel?</numerusform>
         <numerusform>Verwijder %n items van showreel?</numerusform>
       </translation>
@@ -8242,7 +8242,7 @@ to %1</source>
     </message>
     <message>
       <source>Layout is locked and cannot be changed.</source>
-      <translation>De schermindeling is vergrendeld en kan niet worden gewijzigd.</translation>
+      <translation>Layout is vergrendeld en kan niet worden gewijzigd.</translation>
     </message>
     <message>
       <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
@@ -8418,30 +8418,30 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>Showreel %1 verwijderen?</translation>
+      <translation>Show Voorbeeld %1 verwijderen?</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutsHandler</name>
     <message>
       <source>Save Layout As</source>
-      <translation>Schermindeling opslaan als</translation>
+      <translation>Layout opslaan als</translation>
     </message>
     <message>
       <source>Enter Layout Name:</source>
-      <translation>Voer de naam voor de schermindeling in:</translation>
+      <translation>Voer layout naam in:</translation>
     </message>
     <message>
       <source>New Layout</source>
-      <translation>Nieuwe schermindeling</translation>
+      <translation>Nieuwe layout</translation>
     </message>
     <message>
       <source>Enter the name of the layout to create:</source>
-      <translation>Voer de naam van de schermindeling in om deze aan te maken:</translation>
+      <translation>Voer de naam van de layout in om deze aan te maken:</translation>
     </message>
     <message>
       <source>New Layout %1</source>
-      <translation>Nieuwe schermindeling %1</translation>
+      <translation>Nieuwe layout %1</translation>
     </message>
   </context>
 </TS>

@@ -46,7 +46,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation>ブックマークを削除しますか</translation>
+      <translation>ブックマークを削除</translation>
     </message>
   </context>
   <context>
@@ -944,7 +944,7 @@ to view more bookmarks</source>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>未知のエラー.</translation>
+      <translation>不明なエラー</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -6027,11 +6027,11 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>アーカイブのバックアップは &lt;b&gt;%1&lt;/b&gt;まで完了</translation>
+      <translation>アーカイブバックアップは&lt;b&gt;%1&lt;/b&gt;まで完了</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>次のバックアップは &lt;b&gt;%1&lt;/b&gt; の予定</translation>
+      <translation>次のバックアップは&lt;b&gt;%1&lt;/b&gt;にスケジュールされています</translation>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>
@@ -6316,7 +6316,7 @@ to %1</source>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation>一部のユーザーにメール アドレスが設定されていません.</translation>
+      <translation>一部のユーザーにメール アドレスが設定されていません</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
@@ -6352,7 +6352,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>リモートアーカイブの同期</translation>
+      <translation>Remote archive synchronization</translation>
     </message>
   </context>
   <context>
@@ -6495,12 +6495,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>hh:mm</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -8304,7 +8304,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>%1シーケンス表示を削除しますか？</translation>
+      <translation>Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

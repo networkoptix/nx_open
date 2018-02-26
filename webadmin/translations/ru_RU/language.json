@@ -55,16 +55,16 @@
     "settingsConfig": {
         "arecontRtspEnabled": "RTSP для Arecont Vision включен",
         "auditTrailEnabled": "Аудит включен",
-        "auditTrailPeriodDays": "Пераод для аудита (дни)",
+        "auditTrailPeriodDays": "Период для аудита (дни)",
         "autoDiscoveryEnabled": "Включить автоматическое обнаружение устройств",
-        "autoUpdateThumbnails": "Автоматически обновлять эскизов",
+        "autoUpdateThumbnails": "Автоматически обновлять эскизы",
         "backupNewCamerasByDefault": "Резервное копирование новых камер по умолчанию",
         "backupQualities": "Качество резервного копирования",
         "cameraSettingsOptimization": "Разрешить оптимизацию настроек устройств",
         "clientStatisticsSettingsUrl": "Относительный url-адрес статистики клиента",
         "cloudAccountName": "Учетная запись владельца облака",
         "cloudConnectRelayingEnabled": "Включить ретрансляцию для облачного подключения",
-        "cloudConnectUdpHolePunchingEnabled": "Включить туннилирование UDP для облачного подключения",
+        "cloudConnectUdpHolePunchingEnabled": "Включить туннелирование UDP для облачного подключения",
         "cloudHost": "Облачный узел",
         "cloudSystemID": "Идентификатор облачной системы",
         "disabledVendors": "Отключенные производители камер",
@@ -111,7 +111,7 @@
         "timeSynchronizationEnabled": "Синхронизация времени включена",
         "updateNotificationsEnabled": "Уведомления об обновлениях включены",
         "upnpPortMappingEnabled": "Сопоставление портов UPNP включено",
-        "useTextEmailFormat": "Отправка текстовых сообщений простым тестом"
+        "useTextEmailFormat": "Отправка писем простым текстом"
     },
     "info": {
         "tabs": {

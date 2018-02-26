@@ -284,7 +284,7 @@ to view more bookmarks</source>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation>Đăng nhập %1...</translation>
+      <translation>Đăng nhập vào %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
@@ -306,7 +306,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>Event Rules...</translation>
+      <translation>Quy tắc sự kiện...</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -750,7 +750,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation>Khung trước</translation>
+      <translation>Trên một khung</translation>
     </message>
     <message>
       <source>Next Frame</source>
@@ -1130,7 +1130,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Permissions</source>
-      <translation>Quyền truy nhập</translation>
+      <translation>Quyền</translation>
     </message>
   </context>
   <context>
@@ -1342,7 +1342,7 @@ to view more bookmarks</source>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Sao chép lựa chọn vào Clipboard</translation>
+      <translation>Sao chép vào clipboard lựa chọn</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -1837,7 +1837,7 @@ to view more bookmarks</source>
     <message>
       <source>at</source>
       <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation>於</translation>
+      <translation>đến</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -2218,7 +2218,7 @@ to view more bookmarks</source>
     <name>QnCameraExpertSettingsWidget</name>
     <message>
       <source>Primary</source>
-      <translation>Сhìa khóa</translation>
+      <translation>Chính</translation>
     </message>
     <message>
       <source>Secondary</source>
@@ -2245,7 +2245,7 @@ to view more bookmarks</source>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Sao chép lựa chọn vào Clipboard</translation>
+      <translation>Sẽ chọn Copy to clipboard</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -2698,7 +2698,7 @@ to %1</source>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2833,7 +2833,7 @@ to %1</source>
     </message>
     <message>
       <source>Download</source>
-      <translation>Tải xuống</translation>
+      <translation>Tải về</translation>
     </message>
     <message>
       <source>Restart</source>
@@ -3010,7 +3010,7 @@ to %1</source>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Không thể khởi tạo bộ mã hóa âm thanh.</translation>
+      <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -3037,7 +3037,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Không thể khởi tạo bộ mã hóa âm thanh.</translation>
+      <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
@@ -3064,7 +3064,7 @@ to %1</source>
     <name>QnDisconnectFromCloudDialogPrivate</name>
     <message>
       <source>Next</source>
-      <translation>Tiếp tục</translation>
+      <translation>Kế tiếp</translation>
     </message>
     <message>
       <source>Enter password to continue.</source>
@@ -3358,7 +3358,7 @@ to %1</source>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation>Thời gian máy chủ...</translation>
+      <translation>Chọn thư mục...</translation>
     </message>
     <message>
       <source>Folder already added</source>
@@ -3656,7 +3656,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>DN</source>
@@ -3822,7 +3822,7 @@ to %1</source>
     </message>
     <message>
       <source>Export</source>
-      <translation>Xuất ra</translation>
+      <translation>Xuất</translation>
     </message>
     <message>
       <source>Export licenses to a file</source>
@@ -3956,7 +3956,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Tẩy</translation>
+      <translation>Gỡ bỏ</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -3980,7 +3980,7 @@ to %1</source>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>Khóa bản quyền không hợp lệ</translation>
+      <translation>Key bản quyền Không hợp lệ</translation>
     </message>
     <message>
       <source>Please contact Customer Support to obtain a valid License Key.</source>
@@ -4167,7 +4167,7 @@ to %1</source>
     <name>QnLoginToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>Password</source>
@@ -4188,7 +4188,7 @@ to %1</source>
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Đăng nhập vào %1</translation>
+      <translation>Đăng nhập %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
@@ -4899,7 +4899,7 @@ to %1</source>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Máy chụp hình</translation>
+      <translation>Máy ảnh</translation>
     </message>
     <message>
       <source>Archived duration in calendar days since the first recording</source>
@@ -5111,7 +5111,7 @@ to %1</source>
     </message>
     <message>
       <source>Showreel</source>
-      <translation>Showreel</translation>
+      <translation>Showreels</translation>
     </message>
   </context>
   <context>
@@ -5201,7 +5201,7 @@ to %1</source>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Máy chụp hình</translation>
+      <translation>Máy ảnh</translation>
     </message>
     <message>
       <source>Created</source>
@@ -5733,7 +5733,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>SMTP Server</source>
@@ -5768,7 +5768,7 @@ to %1</source>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -5967,7 +5967,7 @@ to %1</source>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation>Tb</translation>
+      <translation>TB</translation>
     </message>
   </context>
   <context>
@@ -6093,7 +6093,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Tẩy</translation>
+      <translation>Gỡ bỏ</translation>
     </message>
     <message>
       <source>Inaccessible</source>
@@ -6198,7 +6198,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -6351,7 +6351,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>Đồng bộ hóa lưu trữ từ xa</translation>
+      <translation>Remote archive synchronization</translation>
     </message>
   </context>
   <context>
@@ -6494,12 +6494,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>hh:mm</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6698,7 +6698,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
   </context>
   <context>
@@ -6749,7 +6749,7 @@ to %1</source>
     </message>
     <message>
       <source>Permissions</source>
-      <translation>Quyền truy nhập</translation>
+      <translation>Quyền</translation>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
@@ -6761,7 +6761,7 @@ to %1</source>
     </message>
     <message>
       <source>New Role</source>
-      <translation>Vai trò Mới</translation>
+      <translation>Vai trò mới</translation>
     </message>
     <message>
       <source>New Role %1</source>
@@ -6776,7 +6776,7 @@ to %1</source>
     </message>
     <message>
       <source>Permissions</source>
-      <translation>Quyền truy nhập</translation>
+      <translation>Quyền</translation>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
@@ -6852,7 +6852,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
@@ -7202,7 +7202,7 @@ to %1</source>
     </message>
     <message>
       <source>Export</source>
-      <translation>Xuất</translation>
+      <translation>Xuất ra</translation>
     </message>
     <message>
       <source>You are about to export a lot of video</source>
@@ -7475,7 +7475,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation>Bức tường video stop?</translation>
+      <translation>Dừng Video Wall?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -7928,7 +7928,7 @@ to %1</source>
     <message>
       <source>Copy</source>
       <comment>to Clipboard</comment>
-      <translation>Bản sao</translation>
+      <translation>Sao chép</translation>
     </message>
     <message>
       <source>Copy to Clipboard</source>
@@ -8034,7 +8034,7 @@ to %1</source>
     </message>
     <message>
       <source>Next</source>
-      <translation>Tiếp tục</translation>
+      <translation>Kế tiếp</translation>
     </message>
     <message>
       <source>Name is necessary</source>
@@ -8050,7 +8050,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>Emai</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
@@ -8152,7 +8152,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>Thời gian máy chủ...</translation>
+      <translation>Chọn thư mục...</translation>
     </message>
     <message>
       <source>Too short period selected</source>
@@ -8303,7 +8303,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>Xóa Showreel %1?</translation>
+      <translation>Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

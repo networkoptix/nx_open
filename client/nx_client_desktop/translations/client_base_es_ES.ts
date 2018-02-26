@@ -1062,7 +1062,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>El nombre de archivo no debe contener los siguientes caracteres reservados: %1</numerusform>
         <numerusform>El nombre de archivo no debe contener los siguientes caracteres reservados: %1</numerusform>
       </translation>
@@ -1275,7 +1275,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>...y %n más</numerusform>
         <numerusform>...y %n más</numerusform>
       </translation>
@@ -1404,35 +1404,35 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Estos dispositivos son eliminados del Sistema</numerusform>
         <numerusform>Estos dispositivos son eliminados del Sistema</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Estas cámaras son eliminadas del Sistema</numerusform>
         <numerusform>Estas cámaras son eliminadas del Sistema</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Estos servidores son eliminados del sistema</numerusform>
         <numerusform>Estos servidores son eliminados del sistema</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Estos usuarios son eliminados del sistema</numerusform>
         <numerusform>Estos usuarios son eliminados del sistema</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Estos recursos son eliminados del Sistema</numerusform>
         <numerusform>Estos recursos son eliminados del Sistema</numerusform>
       </translation>
@@ -1514,8 +1514,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n action(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n acciones</numerusform>
+      <translation>
+        <numerusform>%n accion</numerusform>
         <numerusform>%n acciones</numerusform>
       </translation>
     </message>
@@ -1665,8 +1665,8 @@ to view more bookmarks</source>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
-        <numerusform>Tienes %n notificaciones</numerusform>
+      <translation>
+        <numerusform>Tienes %n notificacion</numerusform>
         <numerusform>Tienes %n notificaciones</numerusform>
       </translation>
     </message>
@@ -1725,14 +1725,14 @@ to view more bookmarks</source>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 de %n dispositivo</numerusform>
         <numerusform>%1 de %n dispositivos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 de %n cámara</numerusform>
         <numerusform>%1 de %n cámaras</numerusform>
       </translation>
@@ -1747,7 +1747,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 de %n módulo de E/S</numerusform>
         <numerusform>%1 de %n módulos de E/S</numerusform>
       </translation>
@@ -1772,8 +1772,8 @@ to view more bookmarks</source>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n Servidores</numerusform>
+      <translation>
+        <numerusform>%n Servidor</numerusform>
         <numerusform>%n Servidores</numerusform>
       </translation>
     </message>
@@ -1811,7 +1811,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Fuente y %n más cámaras</numerusform>
         <numerusform>Fuente y %n más cámaras</numerusform>
       </translation>
@@ -2016,7 +2016,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n dispositivos encontrados</numerusform>
         <numerusform>%n dispositivos encontrados</numerusform>
       </translation>
@@ -2052,7 +2052,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices added.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n dispositivos de añadido.</numerusform>
         <numerusform>%n dispositivos de añadido.</numerusform>
       </translation>
@@ -2063,7 +2063,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Error al agregar dispositivos de %n</numerusform>
         <numerusform>Error al agregar dispositivos de %n</numerusform>
       </translation>
@@ -2155,7 +2155,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 no soporta audio de dos vías</numerusform>
         <numerusform>%1 no soporta audio de dos vías</numerusform>
       </translation>
@@ -2254,7 +2254,7 @@ to view more bookmarks</source>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 no tiene puerto de entrada</numerusform>
         <numerusform>%1 no tienen puertos de entrada</numerusform>
       </translation>
@@ -2301,7 +2301,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n cámaras encontradas</numerusform>
         <numerusform>%n cámaras encontradas</numerusform>
       </translation>
@@ -2316,7 +2316,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n módulo de E/S encontrado</numerusform>
         <numerusform>%n módulos de E/S encontrados</numerusform>
       </translation>
@@ -2396,7 +2396,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message numerus="yes">
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Detección de movimiento o grabación está desactivada por %1</numerusform>
         <numerusform>Detección de movimiento o grabación está desactivada por %1</numerusform>
       </translation>
@@ -2413,7 +2413,7 @@ to view more bookmarks</source>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 no tiene relé de salida</numerusform>
         <numerusform>%1 no tienen relés de salida</numerusform>
       </translation>
@@ -2423,7 +2423,7 @@ to view more bookmarks</source>
     <name>QnCameraRecordingPolicy</name>
     <message numerus="yes">
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Grabación está desactivada por %1</numerusform>
         <numerusform>Grabaciónes están desactivadas por %1</numerusform>
       </translation>
@@ -2552,21 +2552,21 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>No se guardan los cambios en el siguiente dispositivo de %n:</numerusform>
         <numerusform>No se guardan los cambios en los siguientes dispositivos de %n:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>No se guardan los cambios en las siguientes cámaras de %n:</numerusform>
         <numerusform>No se guardan los cambios en las siguientes cámaras de %n:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Los cambios en los siguientes %n Módulos de E / S no se guardan:</numerusform>
         <numerusform>Los cambios en los siguientes %n Módulos de E / S no se guardan:</numerusform>
       </translation>
@@ -3181,15 +3181,15 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation type="unfinished">
-        <numerusform>Registro de eventos para el período de %1 a %2: %n eventos encontrados</numerusform>
+      <translation>
+        <numerusform>Registro de eventos para el período de %1 a %2: %n evento encontrado</numerusform>
         <numerusform>Registro de eventos para el período de %1 a %2: %n eventos encontrados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation type="unfinished">
-        <numerusform>Registro de eventos para %1 - %n eventos encontrados</numerusform>
+      <translation>
+        <numerusform>Registro de eventos para %1 - %n evento encontrado</numerusform>
         <numerusform>Registro de eventos para %1 - %n eventos encontrados</numerusform>
       </translation>
     </message>
@@ -3243,7 +3243,7 @@ a %1</translation>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 (%n vez)</numerusform>
         <numerusform>%1 (%n veces)</numerusform>
       </translation>
@@ -3254,21 +3254,21 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>y usuario de %n más...</numerusform>
         <numerusform>y usuarios de %n más...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>y %n más...</numerusform>
         <numerusform>y %n más...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Sujetos eliminados</numerusform>
         <numerusform>%n Sujetos eliminados</numerusform>
       </translation>
@@ -3665,7 +3665,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Prueba ha completado con éxito: %n usuarios encontrados.</numerusform>
         <numerusform>Prueba ha completado con éxito: %n usuarios encontrados.</numerusform>
       </translation>
@@ -3835,7 +3835,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>La licencia caduca en %n días</numerusform>
         <numerusform>La licencia caduca en %n días</numerusform>
       </translation>
@@ -3929,14 +3929,14 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Se requieren al menos %n %1</numerusform>
         <numerusform>Se requieren al menos %n %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n%1 están actualmente en uso</numerusform>
         <numerusform>%n%1 están actualmente en uso</numerusform>
       </translation>
@@ -3947,7 +3947,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>¿Deseas desactivar las licencias?</numerusform>
         <numerusform>¿Deseas desactivar las licencias?</numerusform>
       </translation>
@@ -3958,21 +3958,21 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Error al desactivar %n licencias</numerusform>
         <numerusform>Error al desactivar %n licencias</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 de %n licencias no se pueden desactivar</numerusform>
         <numerusform>%1 de %n licencias no se pueden desactivar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>No se pueden desactivar las licencias</numerusform>
         <numerusform>No se pueden desactivar las licencias</numerusform>
       </translation>
@@ -3995,7 +3995,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n licencias desactivadas</numerusform>
         <numerusform>%n licencias desactivadas</numerusform>
       </translation>
@@ -4021,7 +4021,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Desactivar %n Otros</numerusform>
         <numerusform>Desactivar %n Otros</numerusform>
       </translation>
@@ -4090,28 +4090,28 @@ a %1</translation>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
       <source>Use analog licenses to view these %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Use licencias análogas para ver estas cámaras %n</numerusform>
         <numerusform>Use licencias análogas para ver estas cámaras %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Use licencia para el %n dispositivo seleccionado</numerusform>
         <numerusform>Use licencias para los %n dispositivos seleccionados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Use licencia para la %n cámaras seleccionadas</numerusform>
         <numerusform>Use licencias para las %n cámaras seleccionadas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Use licencia para el %n de Módulo de E/S</numerusform>
         <numerusform>Use licencias para los %n de Módulos de E/S</numerusform>
       </translation>
@@ -4545,7 +4545,7 @@ a %1</translation>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
       <source>%n more notifications</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n más notificaciones</numerusform>
         <numerusform>%n más notificaciones</numerusform>
       </translation>
@@ -4739,22 +4739,22 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Esta programación se activará después de %n minutos de inactividad</numerusform>
         <numerusform>Esta programación se activará después de %n minutos de inactividad</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gira tiene posiciones idénticas %n</numerusform>
         <numerusform>Gira tiene posiciones idénticas %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation type="unfinished">
-        <numerusform>acerca %n minutos</numerusform>
+      <translation>
+        <numerusform>acerca %n minuto</numerusform>
         <numerusform>acerca %n minutos</numerusform>
       </translation>
     </message>
@@ -4976,7 +4976,7 @@ a %1</translation>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Total %1 %n dispositivos</numerusform>
         <numerusform>Total %1 %n dispositivos</numerusform>
       </translation>
@@ -4984,7 +4984,7 @@ a %1</translation>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Total %1 %n cámaras</numerusform>
         <numerusform>Total %1 %n cámaras</numerusform>
       </translation>
@@ -4992,7 +4992,7 @@ a %1</translation>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Total %1 %n E/S módulos</numerusform>
         <numerusform>Total %1 %n E/S módulos</numerusform>
       </translation>
@@ -5048,7 +5048,7 @@ a %1</translation>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n de %1 las funciones seleccionadas no tienen permiso %2</numerusform>
         <numerusform>%n de %1 las funciones seleccionadas no tienen permiso %2</numerusform>
       </translation>
@@ -5066,7 +5066,7 @@ a %1</translation>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n de %1 usuarios seleccionados no tienen permiso %2</numerusform>
         <numerusform>%n de %1 usuarios seleccionados no tienen permiso %2</numerusform>
       </translation>
@@ -5323,7 +5323,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Servidores</numerusform>
         <numerusform>%n Servidores</numerusform>
       </translation>
@@ -5355,7 +5355,7 @@ a %1</translation>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n adicionales</numerusform>
         <numerusform>%n adicionales</numerusform>
       </translation>
@@ -5630,7 +5630,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>No hay suficiente espacio libre en %n Servidores:</numerusform>
         <numerusform>No hay suficiente espacio libre en %n Servidores:</numerusform>
       </translation>
@@ -6027,7 +6027,7 @@ a %1</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
       </translation>
@@ -6419,7 +6419,7 @@ a %1</translation>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>Sincronización de archivo remoto</translation>
+      <translation>Remote archive synchronization</translation>
     </message>
   </context>
   <context>
@@ -6527,47 +6527,47 @@ a %1</translation>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation>yyyy</translation>
+      <translation>aaaa</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh: mm</translation>
+      <translation>dd MMMM aaaa hh: mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh: mm</translation>
+      <translation>dd MMMM aaaa hh: mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h ap</translation>
+      <translation>dd MMMM aaaa h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>dd MMMM yyyy</translation>
+      <translation>dd MMMM aaaa</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM yyyy</translation>
+      <translation>MMMM aaaa</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>yyyy</translation>
+      <translation>aaaa</translation>
     </message>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>hh:mm</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM aaaa h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6809,7 +6809,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Seleccione una acción para realizar en %n usuarios con esta función</numerusform>
         <numerusform>Seleccione una acción para realizar en %n usuarios con esta función</numerusform>
       </translation>
@@ -7004,7 +7004,7 @@ a %1</translation>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>PC %1 -Pantallas %2</numerusform>
         <numerusform>PC %1 -Pantallas %2</numerusform>
       </translation>
@@ -7116,7 +7116,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>¿Eliminar %n marcador?</numerusform>
         <numerusform>¿Eliminar %n marcadores?</numerusform>
       </translation>
@@ -7364,7 +7364,7 @@ a %1</translation>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Los siguientes %n elementos no se guardan:</numerusform>
         <numerusform>Los siguientes %n elementos no se guardan:</numerusform>
       </translation>
@@ -7379,7 +7379,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Los siguientes %n elementos no son eliminados:</numerusform>
         <numerusform>Los siguientes %n elementos no son eliminados:</numerusform>
       </translation>
@@ -7390,7 +7390,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Error al eliminar %n elementos:</numerusform>
         <numerusform>Error al eliminar %n elementos:</numerusform>
       </translation>
@@ -7548,8 +7548,8 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
-        <numerusform>¿Eliminar %n artículos?</numerusform>
+      <translation>
+        <numerusform>¿Borrar %n archivos?</numerusform>
         <numerusform>¿Borrar %n archivos?</numerusform>
       </translation>
     </message>
@@ -7567,7 +7567,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Eliminar %n matrices?</numerusform>
         <numerusform>Eliminar %n matrices?</numerusform>
       </translation>
@@ -7789,7 +7789,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>El usuario todavía tendrá acceso a %n recursos eliminados:</numerusform>
         <numerusform>El usuario todavía tendrá acceso a %n recursos eliminados:</numerusform>
       </translation>
@@ -7800,7 +7800,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Todos los usuarios con esta función tendrán acceso a %n recursos:</numerusform>
         <numerusform>Todos los usuarios con esta función tendrán acceso a %n recursos:</numerusform>
       </translation>
@@ -7811,7 +7811,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Todos los usuarios con esta función todavía tendrán acceso a %n recursos eliminados:</numerusform>
         <numerusform>Todos los usuarios con esta función todavía tendrán acceso a %n recursos eliminados:</numerusform>
       </translation>
@@ -7826,35 +7826,35 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>El usuario perderá el acceso a %n recursos:</numerusform>
         <numerusform>El usuario perderá el acceso a %n recursos:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Todos los usuarios con esta función perderán el acceso a %n recursos:</numerusform>
         <numerusform>Todos los usuarios con esta función perderán el acceso a %n recursos:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>¿Eliminar %n diseños compartidos?</numerusform>
         <numerusform>¿Eliminar %n diseños compartidos?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Estos %n diseños se comparten con otros usuarios, por lo que también se eliminan para ellos.</numerusform>
         <numerusform>Estos %n diseños se comparten con otros usuarios, por lo que también se eliminan para ellos.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>¿Quitar %n elementos del diseño?</numerusform>
         <numerusform>¿Quitar %n elementos del diseño?</numerusform>
       </translation>
@@ -7873,28 +7873,28 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>¿Eliminar %n usuarios?</numerusform>
         <numerusform>¿Eliminar %n usuarios?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>¿Eliminar %n dispositivos?</numerusform>
         <numerusform>¿Eliminar %n dispositivos?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>¿Eliminar %n camaras?</numerusform>
         <numerusform>¿Eliminar %n camaras?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>¿Eliminar %n E/S Modulos?</numerusform>
         <numerusform>¿Eliminar %n E/S Modulos?</numerusform>
       </translation>
@@ -7908,21 +7908,21 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n de ellos son auto-descubiertos.</numerusform>
         <numerusform>%n de ellos son auto-descubiertos.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n cámaras son auto-descubiertas.</numerusform>
         <numerusform>%n cámaras son auto-descubiertas.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n E/S Modulos son auto-descubiertas.</numerusform>
         <numerusform>%n E/S Modulos son auto-descubiertas.</numerusform>
       </translation>
@@ -7941,7 +7941,7 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Quitar %n elemenos del showreel?</numerusform>
         <numerusform>Quitar %n elemenos del showreel?</numerusform>
       </translation>
@@ -8420,7 +8420,7 @@ a %1</translation>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>¿Eliminar Showreel %1?</translation>
+      <translation>Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

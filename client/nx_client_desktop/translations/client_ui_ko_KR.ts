@@ -16,7 +16,7 @@
     <message>
       <location/>
       <source>Credits</source>
-      <translation>Credits</translation>
+      <translation>생성</translation>
     </message>
     <message>
       <location/>
@@ -234,7 +234,7 @@
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation>감사 추적</translation>
+      <translation>시스템 감사</translation>
     </message>
     <message>
       <location/>
@@ -442,7 +442,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation>항목</translation>
+      <translation>At</translation>
     </message>
   </context>
   <context>
@@ -465,7 +465,7 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation>이벤트정보...</translation>
+      <translation>이벤트 로그...</translation>
     </message>
     <message>
       <location/>
@@ -478,7 +478,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
       <source>Server is offline</source>
-      <translation>서버는 오프 라인 입니다</translation>
+      <translation>오프라인</translation>
     </message>
     <message>
       <location/>
@@ -503,7 +503,7 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation>멈춤</translation>
+      <translation>정지</translation>
     </message>
     <message>
       <location/>
@@ -558,12 +558,12 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>패스워드</translation>
+      <translation>비밀번호</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>로그인</translation>
     </message>
     <message>
       <location/>
@@ -692,7 +692,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>기본값 복원</translation>
+      <translation>초기값 복구</translation>
     </message>
     <message>
       <location/>
@@ -877,7 +877,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>패스워드 변경</translation>
+      <translation>암호 변경</translation>
     </message>
   </context>
   <context>
@@ -885,7 +885,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation>로그인 유지</translation>
+      <translation>로그인 상태 유지</translation>
     </message>
   </context>
   <context>
@@ -903,7 +903,7 @@
     <message>
       <location/>
       <source>Save password</source>
-      <translation>패스워드 저장</translation>
+      <translation>비밀번호 저장</translation>
     </message>
   </context>
   <context>
@@ -998,7 +998,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>로그인</translation>
     </message>
     <message>
       <location/>
@@ -1008,7 +1008,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>패스워드</translation>
+      <translation>비밀번호</translation>
     </message>
     <message>
       <location/>
@@ -1107,7 +1107,7 @@
     <message>
       <location/>
       <source>X Offset</source>
-      <translation>X 오프셋</translation>
+      <translation>오프셋 X</translation>
     </message>
     <message>
       <location/>
@@ -1150,7 +1150,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>삭제</translation>
+      <translation>제거</translation>
     </message>
     <message>
       <location/>
@@ -1335,7 +1335,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>패스워드</translation>
+      <translation>비밀번호</translation>
     </message>
     <message>
       <location/>
@@ -1353,7 +1353,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>LDAP으로 부터 사용자 정보 가져오기</translation>
+      <translation>LDAP으로 부터 사용자 정보 일기</translation>
     </message>
     <message>
       <location/>
@@ -1419,7 +1419,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>삭제</translation>
+      <translation>제거</translation>
     </message>
     <message>
       <location/>
@@ -1559,12 +1559,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>로그인</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>패스워드</translation>
+      <translation>비밀번호</translation>
     </message>
     <message>
       <location/>
@@ -1617,7 +1617,7 @@
     <message>
       <location/>
       <source>Intensity</source>
-      <translation>강도</translation>
+      <translation>강도:</translation>
     </message>
     <message>
       <location/>
@@ -1632,7 +1632,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>투어 간격</translation>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>
@@ -1855,7 +1855,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>북마크(책갈피)</translation>
+      <translation>북마크</translation>
     </message>
   </context>
   <context>
@@ -1876,7 +1876,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>패스워드:</translation>
+      <translation>비밀번호:</translation>
     </message>
     <message>
       <location/>
@@ -1907,7 +1907,7 @@
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation>로그인 유지</translation>
+      <translation>로그인 상태 유지</translation>
     </message>
   </context>
   <context>
@@ -1933,7 +1933,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>패스워드:</translation>
+      <translation>비밀번호:</translation>
     </message>
     <message>
       <location/>
@@ -1943,7 +1943,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Login:</translation>
+      <translation>로그인:</translation>
     </message>
     <message>
       <location/>
@@ -1997,7 +1997,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>삭제</translation>
+      <translation>제거</translation>
     </message>
     <message>
       <location/>
@@ -2053,7 +2053,7 @@
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>
       <source>System Administration</source>
-      <translation>시스템 관리자</translation>
+      <translation>관리자</translation>
     </message>
   </context>
   <context>
@@ -2081,7 +2081,7 @@
     <message>
       <location/>
       <source>Options</source>
-      <translation>옵션:</translation>
+      <translation>옵션</translation>
     </message>
     <message>
       <location/>
@@ -2333,7 +2333,7 @@
     <message>
       <location/>
       <source>Failover Priority...</source>
-      <translation>Failover우선순위...</translation>
+      <translation>이중화 우선순위</translation>
     </message>
     <message>
       <location/>
@@ -2475,7 +2475,7 @@
     <message>
       <location/>
       <source>Fisheye</source>
-      <translation>Fisheye</translation>
+      <translation>어안렌즈</translation>
     </message>
     <message>
       <location/>
@@ -2510,12 +2510,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>로그인</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>패스워드</translation>
+      <translation>비밀번호</translation>
     </message>
     <message>
       <location/>
@@ -2755,12 +2755,12 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Login:</translation>
+      <translation>로그인:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation>패스워드:</translation>
+      <translation>비밀번호:</translation>
     </message>
   </context>
   <context>
@@ -2768,7 +2768,7 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation>역할</translation>
+      <translation>역할들:</translation>
     </message>
     <message>
       <location/>

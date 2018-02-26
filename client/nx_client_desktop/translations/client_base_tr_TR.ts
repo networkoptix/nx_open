@@ -1062,7 +1062,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Dosya adı ayrılmış şu karakterler içermemelidir: %1</numerusform>
         <numerusform>Dosya adı ayrılmış şu karakterleri içermemelidir: %1</numerusform>
       </translation>
@@ -1275,7 +1275,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>..ve %n fazlası</numerusform>
         <numerusform>..ve %n fazlası</numerusform>
       </translation>
@@ -1404,35 +1404,35 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Cihazlar sistemden kaldırıldı</numerusform>
         <numerusform>Cihazlar sistemden kaldırıldı</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kameralar sistemden kaldırıldı</numerusform>
         <numerusform>Kameralar sistemden kaldırıldı</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Sunucular sistemden kaldırıldı</numerusform>
         <numerusform>Sunucular sistemden kaldırıldı</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kullanıcılar sistemden kaldırıldı</numerusform>
         <numerusform>Kullanıcılar sistemden kaldırıldı</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kaynaklar sistemden kaldırıldı</numerusform>
         <numerusform>Kaynaklar sistemden kaldırıldı</numerusform>
       </translation>
@@ -1514,8 +1514,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n action(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n hareketler</numerusform>
+      <translation>
+        <numerusform>%n hareket</numerusform>
         <numerusform>%n hareketler</numerusform>
       </translation>
     </message>
@@ -1665,7 +1665,7 @@ to view more bookmarks</source>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Yeni Bildiriminiz Var</numerusform>
         <numerusform>%n Yeni Bildiriminiz Var</numerusform>
       </translation>
@@ -1725,14 +1725,14 @@ to view more bookmarks</source>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Aygıtların %1'i</numerusform>
         <numerusform>%n Aygıtların %1'i</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Kameraların %1'i</numerusform>
         <numerusform>%n Kameraların %1'i</numerusform>
       </translation>
@@ -1747,7 +1747,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O Modüllerin %1'i</numerusform>
         <numerusform>%n I/O Modüllerin %1'i</numerusform>
       </translation>
@@ -1772,8 +1772,8 @@ to view more bookmarks</source>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n Sunucular</numerusform>
+      <translation>
+        <numerusform>%n Sunucu</numerusform>
         <numerusform>%n Sunucular</numerusform>
       </translation>
     </message>
@@ -1811,7 +1811,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kaynak ve %n Kamera Daha</numerusform>
         <numerusform>Kaynak ve %n Kamera Daha</numerusform>
       </translation>
@@ -2016,7 +2016,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Aygıtlar Bulundu</numerusform>
         <numerusform>%n Aygıtlar Bulundu</numerusform>
       </translation>
@@ -2052,7 +2052,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices added.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n cihaz eklendi.</numerusform>
         <numerusform>%n cihaz eklendi.</numerusform>
       </translation>
@@ -2063,8 +2063,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n cihazlar eklenemedi</numerusform>
+      <translation>
+        <numerusform>%n cihaz eklenemedi</numerusform>
         <numerusform>%n cihazlar eklenemedi</numerusform>
       </translation>
     </message>
@@ -2155,7 +2155,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 iki yönlü ses aktarımını desteklemiyor</numerusform>
         <numerusform>%1 iki yönlü ses aktarımını desteklemiyor</numerusform>
       </translation>
@@ -2254,7 +2254,7 @@ to view more bookmarks</source>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 Giriş Port'u Bulunmuyor</numerusform>
         <numerusform>%1 Giriş Port'u Bulunmuyor</numerusform>
       </translation>
@@ -2301,8 +2301,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation type="unfinished">
-        <numerusform>%n Kameralar Bulundu</numerusform>
+      <translation>
+        <numerusform>%n Kamera Bulundu</numerusform>
         <numerusform>%n Kameralar Bulundu</numerusform>
       </translation>
     </message>
@@ -2316,7 +2316,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O Modülleri Bulundu</numerusform>
         <numerusform>%n I/O Modülleri Bulundu</numerusform>
       </translation>
@@ -2396,7 +2396,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message numerus="yes">
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kayıt veya Hareket Algılama Devre Dışı Bırakıldı %1</numerusform>
         <numerusform>Kayıt veya Hareket Algılama Devre Dışı Bırakıldı %1</numerusform>
       </translation>
@@ -2413,7 +2413,7 @@ to view more bookmarks</source>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1'in Çıkış Bağlantısı Yok</numerusform>
         <numerusform>%1'in Çıkış Bağlantısı Yok</numerusform>
       </translation>
@@ -2423,7 +2423,7 @@ to view more bookmarks</source>
     <name>QnCameraRecordingPolicy</name>
     <message numerus="yes">
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kayıt %1 için Devre Dışı Bırakıldı</numerusform>
         <numerusform>Kayıt %1 için Devre Dışı Bırakıldı</numerusform>
       </translation>
@@ -2552,22 +2552,22 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>%n cihazlarındaki değişiklikler kaydedilmedi:</numerusform>
+      <translation>
+        <numerusform>%n cihazındaki değişiklikler kaydedilmedi:</numerusform>
         <numerusform>%n cihazlarındaki değişiklikler kaydedilmedi:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>%n kameralarındaki değişiklikler kaydedilmedi:</numerusform>
+      <translation>
+        <numerusform>%n kamerasındaki değişiklikler kaydedilmedi:</numerusform>
         <numerusform>%n kameralarındaki değişiklikler kaydedilmedi:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modüllerindeki değişiklikler kaydedilmedi:</numerusform>
+      <translation>
+        <numerusform>%n I/O modülündeki değişiklikler kaydedilmedi:</numerusform>
         <numerusform>%n I/O modüllerindeki değişiklikler kaydedilmedi:</numerusform>
       </translation>
     </message>
@@ -3178,15 +3178,15 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1'den %2'ye Kadar Olan Durum Günlüğü - %n olay(lar) bulundu</numerusform>
         <numerusform>%1'den %2'ye Kadar Olan Durum Günlüğü - %n olay(lar) bulundu</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation type="unfinished">
-        <numerusform>%1 İçin Olay Günlüğü - %n olay bulundu</numerusform>
+      <translation>
+        <numerusform>%1 İçin Olay Günlüğü - %n olay(lar) bulundu</numerusform>
         <numerusform>%1 İçin Olay Günlüğü - %n olay bulundu</numerusform>
       </translation>
     </message>
@@ -3240,7 +3240,7 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 (%n defa)</numerusform>
         <numerusform>%1 (%n defa)</numerusform>
       </translation>
@@ -3251,21 +3251,21 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation type="unfinished">
-        <numerusform>ve %n kullanıcıları...</numerusform>
+      <translation>
+        <numerusform>ve %n kullanıcısı...</numerusform>
         <numerusform>ve %n kullanıcıları...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>ve %n den fazlası...</numerusform>
         <numerusform>ve %n den fazlası...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Kaldırılan konular</numerusform>
         <numerusform>%n Kaldırılan konular</numerusform>
       </translation>
@@ -3662,7 +3662,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Test Başarıyla Tamamladı: %n Kullanıcılar Bulundu.</numerusform>
         <numerusform>Test Başarıyla Tamamladı: %n Kullanıcılar Bulundu.</numerusform>
       </translation>
@@ -3832,7 +3832,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n gün içinde lisans süresi dolacaktır</numerusform>
         <numerusform>%n gün içinde lisans süresi dolacaktır</numerusform>
       </translation>
@@ -3926,14 +3926,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 için en az %n gerekli</numerusform>
         <numerusform>%1 için en az %n gerekli</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n %1 kullanılıyor</numerusform>
         <numerusform>%n %1 kullanılıyor</numerusform>
       </translation>
@@ -3944,7 +3944,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Lisansları devre dışı bırak?</numerusform>
         <numerusform>Lisansları devre dışı bırak?</numerusform>
       </translation>
@@ -3955,21 +3955,21 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n lisansları devre dışı bırakılamadı</numerusform>
         <numerusform>%n lisansları devre dışı bırakılamadı</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n lisansın %1'i devre dışı bırakılamaz</numerusform>
         <numerusform>%n lisansın %1'i devre dışı bırakılamaz</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Lisanslar devre dışı bırakılamadı</numerusform>
         <numerusform>Lisanslar devre dışı bırakılamadı</numerusform>
       </translation>
@@ -3992,7 +3992,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Lisans deaktif edildi</numerusform>
         <numerusform>%n Lisans deaktif edildi</numerusform>
       </translation>
@@ -4007,7 +4007,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kanal.</numerusform>
         <numerusform>%n kanal.</numerusform>
       </translation>
@@ -4018,7 +4018,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n den kalanı devre dışı bırak</numerusform>
         <numerusform>%n den kalanı devre dışı bırak</numerusform>
       </translation>
@@ -4087,29 +4087,29 @@ to %1</source>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
       <source>Use analog licenses to view these %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Kameralarını Görüntülemek İçin Analog Lisansları Kullan</numerusform>
+      <translation>
+        <numerusform>%n Kameralarını Görüntülemek İçin Analog Lisans Kullan</numerusform>
         <numerusform>%n Kameralarını Görüntülemek İçin Analog Lisansları Kullan</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Seçilen %n Aygıt İçin Lisansları Kullan</numerusform>
+      <translation>
+        <numerusform>Seçilen %n Aygıt İçin Lisans Kullan</numerusform>
         <numerusform>Seçilen %n Aygıt İçin Lisansları Kullan</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Seçilen %n Kamera İçin Lisanslarını Kullan</numerusform>
+      <translation>
+        <numerusform>Seçilen %n Kamera İçin Lisans Kullan</numerusform>
         <numerusform>Seçilen %n Kamera İçin Lisanslarını Kullan</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>Seçilen %n I/O Modülü İçin Lisanslarını Kullan</numerusform>
+      <translation>
+        <numerusform>Seçilen %n I/O Modülü İçin Lisans Kullan</numerusform>
         <numerusform>Seçilen %n I/O Modülü İçin Lisanslarını Kullan</numerusform>
       </translation>
     </message>
@@ -4542,7 +4542,7 @@ to %1</source>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
       <source>%n more notifications</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n için daha fazla bildirim</numerusform>
         <numerusform>%n için daha fazla bildirim</numerusform>
       </translation>
@@ -4736,21 +4736,21 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Ön Ayar %n Dakika Hareket Olmadığında Aktif Edilecek</numerusform>
         <numerusform>Ön Ayar %n Dakika Hareket Olmadığında Aktif Edilecek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation type="unfinished">
-        <numerusform>Turların %n Pozisyonla Aynı</numerusform>
+      <translation>
+        <numerusform>Tur %n Pozisyonla Aynı</numerusform>
         <numerusform>Turların %n Pozisyonla Aynı</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>yaklaşık %n dakika</numerusform>
         <numerusform>yaklaşık %n dakika</numerusform>
       </translation>
@@ -4973,7 +4973,7 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 cihazın %n i</numerusform>
         <numerusform>%1 cihazın %n i</numerusform>
       </translation>
@@ -4981,7 +4981,7 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 kameranın %n i</numerusform>
         <numerusform>%1 kameranın %n i</numerusform>
       </translation>
@@ -4989,7 +4989,7 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 I/O modülünün %n i</numerusform>
         <numerusform>%1 I/O modülünün %n i</numerusform>
       </translation>
@@ -5045,7 +5045,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 in %n i için %2 izni yok</numerusform>
         <numerusform>%1 in %n i için %2 izni yok</numerusform>
       </translation>
@@ -5063,7 +5063,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 in %n i kullanıcısı için %2 izni yok</numerusform>
         <numerusform>%1 in %n i kullanıcısı için %2 izni yok</numerusform>
       </translation>
@@ -5320,8 +5320,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n sunucular</numerusform>
+      <translation>
+        <numerusform>%n sunucu</numerusform>
         <numerusform>%n sunucular</numerusform>
       </translation>
     </message>
@@ -5342,8 +5342,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n kullanıcı</numerusform>
+      <translation>
+        <numerusform>%n kullanıcılar</numerusform>
         <numerusform>%n kullanıcılar</numerusform>
       </translation>
     </message>
@@ -5352,7 +5352,7 @@ to %1</source>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Ek olarak %n</numerusform>
         <numerusform>Ek olarak %n</numerusform>
       </translation>
@@ -5627,7 +5627,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n sunucusunda yeterli alan yok:</numerusform>
         <numerusform>%n sunucusunda yeterli alan yok:</numerusform>
       </translation>
@@ -6024,7 +6024,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
       </translation>
@@ -6416,7 +6416,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>Uzak arşiv senkronizasyonu</translation>
+      <translation>Remote archive synchronization</translation>
     </message>
   </context>
   <context>
@@ -6559,12 +6559,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>hh:mm</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6806,7 +6806,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Lütfen bu rolü ile %n kullanıcılarında gerçekleştirilecek eylemi seçin</numerusform>
         <numerusform>Lütfen bu rolü ile %n kullanıcılarında gerçekleştirilecek eylemi seçin</numerusform>
       </translation>
@@ -7001,7 +7001,7 @@ to %1</source>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>PC %1 - Ekran %2</numerusform>
         <numerusform>PC %1 - Ekran %2</numerusform>
       </translation>
@@ -7113,7 +7113,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n bookmarklarını sil?</numerusform>
         <numerusform>%n bookmarklarını sil?</numerusform>
       </translation>
@@ -7361,8 +7361,8 @@ to %1</source>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Aşağıdaki %n nesneler kaydedilemedi:</numerusform>
+      <translation>
+        <numerusform>Aşağıdaki %n nesne kaydedilemedi:</numerusform>
         <numerusform>Aşağıdaki %n nesneler kaydedilemedi:</numerusform>
       </translation>
     </message>
@@ -7376,8 +7376,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation type="unfinished">
-        <numerusform>Aşağıdaki %n nesneler silinemedi:</numerusform>
+      <translation>
+        <numerusform>Aşağıdaki %n nesne silinemedi:</numerusform>
         <numerusform>Aşağıdaki %n nesneler silinemedi:</numerusform>
       </translation>
     </message>
@@ -7387,7 +7387,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n nesne silinemedi:</numerusform>
         <numerusform>%n nesne silinemedi:</numerusform>
       </translation>
@@ -7545,8 +7545,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
-        <numerusform>%n öğeleri silinsin mi?</numerusform>
+      <translation>
+        <numerusform>%n öğesi silinsin mi?</numerusform>
         <numerusform>%n öğesi silinsin mi?</numerusform>
       </translation>
     </message>
@@ -7564,7 +7564,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n matrisini sil?</numerusform>
         <numerusform>%n matrisini sil?</numerusform>
       </translation>
@@ -7786,7 +7786,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kullanıcılar hala %n kaldrılan kaynaklara erişebilrler:</numerusform>
         <numerusform>Kullanıcılar hala %n kaldrılan kaynaklara erişebilrler:</numerusform>
       </translation>
@@ -7797,7 +7797,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bu roldeki bütün kullanıcılar %n kaynaklarına erişecektir:</numerusform>
         <numerusform>Bu roldeki bütün kullanıcılar %n kaynaklarına erişecektir:</numerusform>
       </translation>
@@ -7808,7 +7808,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bu roldeki kullanıcılar %n i kaldırdıktan sonra bu kaynaklara erişebileceklerdir:</numerusform>
         <numerusform>Bu roldeki kullanıcılar %n i kaldırdıktan sonra bu kaynaklara erişebileceklerdir:</numerusform>
       </translation>
@@ -7823,35 +7823,35 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kullanıcı %n kaynaklarına erişemeyecektir:</numerusform>
         <numerusform>Kullanıcı %n kaynaklarına erişemeyecektir:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bu roldeki bütün kullanıcılar %n kaynaklarına erişecektir:</numerusform>
         <numerusform>Bu roldeki bütün kullanıcılar %n kaynaklarına erişecektir:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n ekran düzenlerini silmek istiyor musunuz?</numerusform>
         <numerusform>%n ekran düzenlerini silmek istiyor musunuz?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n ekran düzenleri başka kullanıcılar ile paylaşılmış. Onlar içinde silmiş olacaksınız.</numerusform>
         <numerusform>%n ekran düzenleri başka kullanıcılar ile paylaşılmış. Onlar içinde silmiş olacaksınız.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n nesneleri ekran düzeninden kaldır?</numerusform>
         <numerusform>%n nesneleri ekran düzeninden kaldır?</numerusform>
       </translation>
@@ -7870,28 +7870,28 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kullanıcılarını sil?</numerusform>
         <numerusform>%n kullanıcılarını sil?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n cihazını sil?</numerusform>
         <numerusform>%n cihazını sil?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kamerasını sil?</numerusform>
         <numerusform>%n kamerasını sil?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O modülünü sil?</numerusform>
         <numerusform>%n I/O modülünü sil?</numerusform>
       </translation>
@@ -7905,21 +7905,21 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kamera bulundu.</numerusform>
         <numerusform>%n kamera bulundu.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kamera bulundu.</numerusform>
         <numerusform>%n kamera bulundu.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/o modülü bulundu.</numerusform>
         <numerusform>%n I/o modülü bulundu.</numerusform>
       </translation>
@@ -7938,7 +7938,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n nesneleri showreelden kaldır?</numerusform>
         <numerusform>%n nesneleri showreelden kaldır?</numerusform>
       </translation>
@@ -8417,7 +8417,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>Showreel %1'i silinsin mi?</translation>
+      <translation>Delete Showreel %1?</translation>
     </message>
   </context>
   <context>
