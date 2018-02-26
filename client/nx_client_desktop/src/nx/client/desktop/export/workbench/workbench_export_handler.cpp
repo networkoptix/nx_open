@@ -172,9 +172,9 @@ WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
 
     connect(action(ui::action::ExportVideoAction), &QAction::triggered, this,
         &WorkbenchExportHandler::handleExportVideoAction);
-        
-    connect(action(action::ExportStandaloneClientAction), &QAction::triggered, this,
-        &QnWorkbenchExportHandler::at_exportStandaloneClientAction_triggered);
+
+    connect(action(ui::action::ExportStandaloneClientAction), &QAction::triggered, this,
+        &WorkbenchExportHandler::at_exportStandaloneClientAction_triggered);
 }
 
 WorkbenchExportHandler::~WorkbenchExportHandler()
