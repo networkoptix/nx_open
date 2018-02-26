@@ -396,7 +396,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
 }
 
 
-void QnWorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
+void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
 {
 #ifdef Q_OS_WIN
     const auto exeExtension = lit(".exe");
@@ -426,7 +426,7 @@ void QnWorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
     }
 
     QFile::rename(temporaryFilename, targetFilename);
-    showExportCompleteMessage();
+    QnMessageBox::success(mainWindow(), tr("Export completed"));
 #endif
 }
 
