@@ -30,7 +30,7 @@ public:
 
 signals:
     /** Internal signal to implement thread-safety. */
-    void imageDataLoadedInternal(const QByteArray &data);
+    void imageDataLoadedInternal(const QByteArray &data, Qn::ThumbnailStatus nextStatus);
 
 protected:
     virtual void doLoadAsync() override;

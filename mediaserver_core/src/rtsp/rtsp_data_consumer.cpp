@@ -255,7 +255,6 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         bool clearHiQ = !needSecondaryStream(m_liveQuality); // remove LQ packets, keep HQ
 
         // try to reduce queue by removed packets in specified quality
-        bool somethingDeleted = false;
         for (quint32 ch = 0; ch < m_videoChannels; ++ch)
         {
             for (int i = unsafeQueue.size() - 1; i >=0; --i)
@@ -274,7 +273,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         }
 
         // try to reduce queue by removed video packets at any quality
-        if (!somethingDeleted)
+        if (!m_someDataIsDropped)
         {
             for (quint32 ch = 0; ch < m_videoChannels; ++ch)
             {

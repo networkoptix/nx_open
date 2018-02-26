@@ -1,5 +1,3 @@
-#pragma once
-
 #include "server_updates2_installer.h"
 #include <media_server/media_server_module.h>
 #include <media_server/settings.h>

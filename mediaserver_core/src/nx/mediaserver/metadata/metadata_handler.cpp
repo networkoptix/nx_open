@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 
 #include <plugins/plugin_tools.h>
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/events/events_fwd.h>
@@ -13,6 +13,7 @@
 #include <nx/mediaserver/event/event_connector.h>
 #include <analytics/common/object_detection_metadata.h>
 #include <nx/fusion/model_functions.h>
+#include <core/dataconsumer/abstract_data_receptor.h>
 
 namespace nx {
 namespace mediaserver {
@@ -82,6 +83,7 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> p
 
 void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket> packet)
 {
+    using namespace nx::mediaserver_plugins::utils;
     nx::common::metadata::DetectionMetadataPacket data;
     while (true)
     {
@@ -89,8 +91,8 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket>
         if (!item)
             break;
         nx::common::metadata::DetectedObject object;
-        object.objectTypeId = nxpt::fromPluginGuidToQnUuid(item->typeId());
-        object.objectId = nxpt::fromPluginGuidToQnUuid(item->id());
+        object.objectTypeId = fromPluginGuidToQnUuid(item->typeId());
+        object.objectId = fromPluginGuidToQnUuid(item->id());
         const auto box = item->boundingBox();
         object.boundingBox = QRectF(box.x, box.y, box.width, box.height);
 
@@ -120,27 +122,28 @@ void MetadataHandler::handleMetadataEvent(
     nxpt::ScopedRef<Event> eventData,
     qint64 timestampUsec)
 {
-auto eventState = nx::vms::event::EventState::undefined;
+    auto eventState = nx::vms::event::EventState::undefined;
 
-        const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->typeId());
-        NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
+    const auto eventTypeId =
+        nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(eventData->typeId());
+    NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
 
-        auto descriptor = eventDescriptor(eventTypeId);
-        if (descriptor.flags.testFlag(nx::api::Analytics::EventTypeFlag::stateDependent))
+    auto descriptor = eventDescriptor(eventTypeId);
+    if (descriptor.flags.testFlag(nx::api::Analytics::EventTypeFlag::stateDependent))
+    {
+        eventState = eventData->isActive()
+            ? nx::vms::event::EventState::active
+            : nx::vms::event::EventState::inactive;
+
+        const bool isDublicate = eventState == nx::vms::event::EventState::inactive
+            && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;
+
+        if (isDublicate)
         {
-            eventState = eventData->isActive()
-                ? nx::vms::event::EventState::active
-                : nx::vms::event::EventState::inactive;
-
-            const bool isDublicate = eventState == nx::vms::event::EventState::inactive
-                && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;
-
-            if (isDublicate)
-            {
-                NX_VERBOSE(this) << __func__ << lm("(): Ignoring duplicate event");
-                return;
-            }
+            NX_VERBOSE(this) << __func__ << lm("(): Ignoring duplicate event");
+            return;
         }
+    }
 
     setLastEventState(eventTypeId, eventState);
 

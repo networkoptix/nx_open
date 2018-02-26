@@ -8,6 +8,7 @@
 #include <proxy/2wayaudio/proxy_audio_transmitter.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/mediaserver/resource/camera.h>
 
 namespace
 {
@@ -40,13 +41,13 @@ QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QString& sourceId)
     return QnVideoCameraPtr();
 }
 
-QnSecurityCamResourcePtr QnAudioStreamerPool::getTransmitDestination(const QnUuid& resourceId) const
+nx::mediaserver::resource::CameraPtr QnAudioStreamerPool::getTransmitDestination(const QnUuid& resourceId) const
 {
-    auto resource = resourcePool()->getResourceById<QnSecurityCamResource>(resourceId);
+    auto resource = resourcePool()->getResourceById<nx::mediaserver::resource::Camera>(resourceId);
     if (!resource)
-        return QnSecurityCamResourcePtr();
+        return nx::mediaserver::resource::CameraPtr();
     if (!resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
-        return QnSecurityCamResourcePtr();
+        return nx::mediaserver::resource::CameraPtr();
     return resource;
 }
 

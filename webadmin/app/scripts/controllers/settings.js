@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', ['$scope', '$rootScope', '$modal', '$log', 'mediaserver', '$poll', '$localStorage',
+    .controller('SettingsCtrl', ['$scope', '$rootScope', '$uibModal', '$log', 'mediaserver', '$poll', '$localStorage',
                                  'cloudAPI', '$location', '$timeout', 'dialogs', 'nativeClient',
     function ($scope, $rootScope, $modal, $log, mediaserver, $poll, $localStorage, cloudAPI, $location,
               $timeout, dialogs, nativeClient) {

@@ -78,10 +78,10 @@ def create_client_update_file(
         e.zip_rdep_package_to(zip, vox_dir)
         e.zip_rdep_package_to(zip, fonts_dir)
 
-        zip.write(os.path.join(binaries_dir, 'desktop_client.exe'), client_binary_name + '.exe')
+        zip.write(os.path.join(binaries_dir, client_binary_name), client_binary_name)
         zip.write(os.path.join(binaries_dir, 'applauncher.exe'), 'applauncher.exe')
         zip.write(os.path.join(binaries_dir, launcher_version_name), launcher_version_name)
-        zip.write(os.path.join(binaries_dir, 'minilauncher.exe'), minilauncher_binary_name)
+        zip.write(os.path.join(binaries_dir, minilauncher_binary_name), minilauncher_binary_name)
         zip.write(os.path.join(current_binary_dir, 'qt.conf'), 'qt.conf')
 
 

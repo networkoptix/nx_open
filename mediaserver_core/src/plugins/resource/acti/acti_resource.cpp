@@ -105,7 +105,8 @@ void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHan
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
-        ( SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody ) mutable
+        (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody,
+        nx::network::http::HttpHeaders /*httpHeaders*/) mutable
     {
         if( osErrorCode != SystemError::noError ||
             statusCode != nx::network::http::StatusCode::ok )
@@ -846,7 +847,7 @@ int QnActiResource::roundFps(int srcFps, Qn::ConnectionRole role) const
         int distance = qAbs(availFps[i] - srcFps);
         if (distance <= minDistance)
         {
-            // Preffer higher fps if same distance
+            // Prefer higher fps on the same distance
             minDistance = distance;
             result = availFps[i];
         }

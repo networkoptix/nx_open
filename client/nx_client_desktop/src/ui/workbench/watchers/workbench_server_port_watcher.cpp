@@ -39,21 +39,20 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
                 return;
 
             m_currentServer = currentServer;
-            connect(currentServer, &QnMediaServerResource::portChanged, this,
-                [this](const QnResourcePtr &resource)
+            connect(currentServer, &QnMediaServerResource::primaryAddressChanged, this,
+                [](const QnResourcePtr &resource)
                 {
                     const auto currentServer = resource.dynamicCast<QnMediaServerResource>();
                     if (!currentServer)
                         return;
 
-                    nx::utils::Url url = commonModule()->currentUrl();
-                    if (url.isEmpty() || (url.port() == currentServer->getPort()))
-                        return;
-
                     if (auto connection = QnAppServerConnectionFactory::ec2Connection())
                     {
-                        connection->updateConnectionUrl(url);
-                        menu()->trigger(action::ReconnectAction);
+                        const auto oldUrl = connection->connectionInfo().effectiveUrl();
+                        auto newUrl = currentServer->getApiUrl();
+                        newUrl.setUserName(oldUrl.userName());
+                        newUrl.setPassword(oldUrl.password());
+                        connection->updateConnectionUrl(newUrl);
                     }
                 });
         });

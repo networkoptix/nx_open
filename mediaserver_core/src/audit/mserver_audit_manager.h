@@ -14,12 +14,10 @@ public:
     QnMServerAuditManager(std::chrono::milliseconds lastRunningTime, QObject* parent);
     ~QnMServerAuditManager();
 
+    void flushRecords();
 protected:
     virtual int addAuditRecordInternal(const QnAuditRecord& record) override;
     virtual int updateAuditRecordInternal(int internalId, const QnAuditRecord& record) override;
-
-private:
-    void flushRecords();
 
 private:
     QTimer m_timer;

@@ -28,9 +28,25 @@
 
 #include <utils/email/email.h>
 
-#include <utils/common/url.h>
-
 #include <api/global_settings.h>
+
+namespace {
+
+bool isUrlEqual(const nx::utils::Url &l, const nx::utils::Url &r, QUrl::FormattingOptions ignored = QUrl::RemovePassword | QUrl::RemoveScheme) 
+{
+    nx::utils::Url lc(l), rc(r);
+    if (ignored & QUrl::RemovePassword) {
+        lc.setPassword(QString());
+        rc.setPassword(QString());
+    }
+
+    if (ignored & QUrl::RemoveScheme)
+        lc.setScheme(rc.scheme());
+
+    return lc == rc;
+}
+
+} // namespace
 
 QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* parent /*= 0*/):
     base_type(parent),
@@ -187,7 +203,7 @@ void QnUserProfileWidget::applyChanges()
             qnClientCoreSettings->save();
 
             auto lastUsed = qnSettings->lastUsedConnection();
-            if (!lastUsed.url.password().isEmpty() && qnUrlEqual(lastUsed.url, url))
+            if (!lastUsed.url.password().isEmpty() && isUrlEqual(lastUsed.url, url))
             {
                 lastUsed.url = url;
                 qnSettings->setLastUsedConnection(lastUsed);

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('JoinCtrl', ['$scope', '$modalInstance', '$interval', 'mediaserver', 'dialogs',
+    .controller('JoinCtrl', ['$scope', '$uibModalInstance', '$interval', 'mediaserver', 'dialogs',
     function ($scope, $modalInstance, $interval, mediaserver, dialogs) {
         $scope.settings = {
             url :'',

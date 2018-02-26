@@ -68,6 +68,7 @@ enum Value
     cameraPluginError,
     liveVideoIsNotSupportedError,
     tooManyOpenedConnections,
+    cameraOldFirmwareError,
     unknown
 };
 
@@ -276,6 +277,15 @@ public:
         const QString& errorString)
         :
         Result(ErrorCode::cameraInvalidParams, errorString)
+    {
+    }
+};
+
+class CameraOldFirmware: public Result
+{
+public:
+    CameraOldFirmware(const QString& minimalVersion, const QString& currentVersion):
+        Result(ErrorCode::cameraOldFirmwareError,minimalVersion,currentVersion)
     {
     }
 };

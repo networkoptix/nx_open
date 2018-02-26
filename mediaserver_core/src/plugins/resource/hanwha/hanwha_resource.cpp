@@ -13,7 +13,7 @@
 #include <QtCore/QMap>
 
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
 #include <camera/camera_pool.h>
@@ -795,10 +795,12 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
 {
     setCameraCapability(Qn::SetUserPasswordCapability, true);
     bool isDefaultPassword = false;
+    bool isOldFirmware = false;
     auto isDefaultPasswordGuard = makeScopeGuard(
-        [this, &isDefaultPassword]
+        [&]
         {
             setCameraCapability(Qn::isDefaultPasswordCapability, isDefaultPassword);
+            setCameraCapability(Qn::isOldFirmwareCapability, isOldFirmware);
             saveParams();
         });
 
@@ -820,9 +822,9 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
         !getFirmware().isEmpty()
         && minFirmwareVersion > getFirmware())
     {
-        return CameraDiagnostics::CameraInvalidParams(
-            lit("Please update firmware for this device. Minimal supported firmware: '%1'. Device firmware: '%2'.")
-            .arg(minFirmwareVersion).arg(getFirmware()));
+        isOldFirmware = true;
+        return CameraDiagnostics::CameraOldFirmware(
+            minFirmwareVersion, getFirmware());
     }
 
     result = initMedia();
@@ -1384,6 +1386,7 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
     }
 
     m_profileByRole[Qn::ConnectionRole::CR_LiveVideo] = nxPrimaryProfileNumber;
+    m_profileByRole[Qn::ConnectionRole::CR_Archive] = nxPrimaryProfileNumber;
     m_profileByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo] = nxSecondaryProfileNumber;
 
     return CameraDiagnostics::NoErrorResult();

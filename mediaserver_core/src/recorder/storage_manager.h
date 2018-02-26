@@ -148,13 +148,15 @@ public:
     /*
      * Return all storages which can be used for writing
      */
-    QSet<QnStorageResourcePtr> getAllWritableStorages() const;
+    QSet<QnStorageResourcePtr> getAllWritableStorages(
+        const QnStorageResourceList* additionalStorages = nullptr) const;
 
     QnStorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;
 
     void clearSpace(bool forced=false);
     bool clearSpaceForFile(const QString& path, qint64 size);
+    bool canAddChunk(qint64 timeMs, qint64 size);
     void checkSystemStorageSpace();
     void removeEmptyDirs(const QnStorageResourcePtr &storage);
 

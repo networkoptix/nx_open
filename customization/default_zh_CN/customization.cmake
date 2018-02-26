@@ -1,5 +1,4 @@
 # Components Namings
-set(parent.customization "default")
 set(product.name "Nx Witness Simplified Chinese")
 set(display.product.name "Nx Witness")
 set(product.name.short "hdwitness_cn")

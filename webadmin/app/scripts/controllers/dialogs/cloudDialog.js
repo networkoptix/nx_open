@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('CloudDialogCtrl', ['$scope', '$modalInstance', 'mediaserver', 'cloudAPI', 'connect',
+    .controller('CloudDialogCtrl', ['$scope', '$uibModalInstance', 'mediaserver', 'cloudAPI', 'connect',
                                     'systemName', 'cloudSystemID', 'cloudAccountName',
     function ($scope, $modalInstance, mediaserver, cloudAPI, connect, systemName, cloudSystemID, cloudAccountName) {
         //1. Detect action: connect or disconnect

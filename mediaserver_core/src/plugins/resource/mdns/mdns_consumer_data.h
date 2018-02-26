@@ -6,6 +6,7 @@
 #include <list>
 
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "mdns_consumer_data.h"
 
@@ -38,6 +39,7 @@ private:
     using EntryList = QList<Entry>;
     using RemoteAddrToEntries = QMap<QString, EntryList>;
 
+    mutable QnMutex m_mutex;
     RemoteAddrToEntries m_addrToEntries;
     mutable bool m_read = false;
 };
@@ -54,14 +56,15 @@ public:
         const QString& localAddress,
         const QByteArray& responseData);
 
-    const ConsumerData* data(uintptr_t id) const;
+    std::shared_ptr<const ConsumerData> data(uintptr_t id) const;
     void clearRead();
 
 private:
     /** List is required to guarantee, that consumers receive data in order they were registered. */
-    using IdConsumerPair = std::pair<std::uintptr_t, ConsumerData>;
+    using IdConsumerPair = std::pair<std::uintptr_t, std::shared_ptr<ConsumerData>>;
     using IdConsumerDataList = std::list<IdConsumerPair>;
 
+    mutable QnMutex m_mutex;
     IdConsumerDataList m_data;
 };
 

@@ -54,6 +54,7 @@ signals:
     void loadingFailed();
 public slots:
     void discardCachedData();
+    void invalidateCachedData();
 private slots:
     void at_loader_ready(const QnAbstractCameraDataPtr &timePeriods, qint64 startTimeMs, Qn::TimePeriodContent dataType);
 

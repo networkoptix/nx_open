@@ -10,7 +10,7 @@
         <?define commonProgramFiles = "c:\Program Files\Common Files\" ?>
         <?endif?>
 
-        <WixVariable Id="WixUILicenseRtf" Value="resources\License.rtf" />
+        <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="resources\logo_493x58.bmp" />
         <WixVariable Id="WixUIDialogBmp" Value="resources\logo_493x312.bmp" />
 
@@ -48,7 +48,7 @@
         <Media Id="11" Cabinet="clqt2.cab" EmbedCab="yes" />
         <Media Id="12" Cabinet="clqtpl.cab" EmbedCab="yes" />
         <Media Id="13" Cabinet="cllibs.cab" EmbedCab="yes" />
-        <Media Id="14" Cabinet="clexec.cab" EmbedCab="yes" />    
+        <Media Id="14" Cabinet="clexec.cab" EmbedCab="yes" />
 
         <UIRef Id="WixUI_Minimal" />
     </Product>

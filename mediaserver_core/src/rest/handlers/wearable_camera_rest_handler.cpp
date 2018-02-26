@@ -3,6 +3,7 @@
 #include <QtCore/QFile>
 
 #include <nx/utils/std/cpp14.h>
+#include <utils/common/synctime.h>
 
 #include <common/common_module.h>
 
@@ -16,6 +17,7 @@
 #include <api/model/wearable_prepare_reply.h>
 
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_access/user_access_data.h>
@@ -28,6 +30,8 @@
 
 namespace {
 const qint64 kDetalizationLevelMs = 1;
+const qint64 kMinChunkCheckSize = 100 * 1024 * 1024;
+const qint64 kOneDayMSecs = 1000ll * 3600ll * 24ll;
 
 QnTimePeriod shrinkPeriod(const QnTimePeriod& local, const QnTimePeriodList& remote)
 {
@@ -154,8 +158,9 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
     if(!QJson::deserialize(body, &data) || data.elements.empty())
         return nx::network::http::StatusCode::invalidParameter;
 
-    QnResourcePtr resource = owner->resourcePool()->getResourceById(cameraId);
-    if (!resource)
+    QnVirtualCameraResourcePtr camera =
+        owner->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
+    if (!camera)
         return nx::network::http::StatusCode::invalidParameter;
 
     QnWearableUploadManager* uploader = uploadManager(result);
@@ -167,7 +172,7 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
         unionPeriod.addPeriod(element.period);
 
     QnTimePeriodList serverTimePeriods = qnNormalStorageMan
-        ->getFileCatalog(resource->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
+        ->getFileCatalog(camera->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
         ->getTimePeriods(
             unionPeriod.startTimeMs,
             unionPeriod.endTimeMs(),
@@ -181,6 +186,15 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
     for (const QnWearablePrepareDataElement& element : data.elements)
         totalSize += element.size;
     uploader->clearSpace(totalSize, &reply.availableSpace);
+
+    qint64 minTime = std::numeric_limits<qint64>::max();
+    for (const QnWearablePrepareDataElement& element : data.elements)
+        minTime = std::min(minTime, element.period.startTimeMs);
+
+    qint64 threshold = qnSyncTime->currentMSecsSinceEpoch() - kOneDayMSecs * camera->minDays();
+    if (minTime < threshold)
+        if (!qnNormalStorageMan->canAddChunk(minTime, std::max(kMinChunkCheckSize, totalSize)))
+            reply.footageTooOld = true;
 
     for (const QnWearablePrepareDataElement& element : data.elements)
     {

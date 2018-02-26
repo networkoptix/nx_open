@@ -1,7 +1,7 @@
 'use strict';
 
 
-function NativePlayer(){
+window.NativePlayer = function(){
 
     // requestAnimationFrame polyfill
     this.init = function(element,readyHandler) {

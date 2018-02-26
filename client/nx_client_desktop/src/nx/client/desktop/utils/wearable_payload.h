@@ -22,6 +22,7 @@ struct WearablePayload
         NoTimestamp,
         ChunksTakenByFileInQueue,
         ChunksTakenOnServer,
+        FootageTooOld,
         NoSpaceOnServer,
         ServerError
     };

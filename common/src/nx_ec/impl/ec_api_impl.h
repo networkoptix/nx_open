@@ -16,7 +16,6 @@
 #include <nx/vms/event/event_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_type.h>
-#include <core/resource/camera_bookmark_fwd.h>
 #include <licensing/license.h>
 
 

@@ -25,7 +25,8 @@ protected:
         const QnLiveStreamParams& params) override;
 
 private:
-    nx::utils::Url buildHikvisionStreamUrl(int rtspPortNumber) const;
+    nx::utils::Url buildHikvisionStreamUrl(
+        const hikvision::ChannelProperties& properties) const;
     nx::utils::Url hikvisionRequestUrlFromPath(const QString& path) const;
 
     QSize chooseResolution(
@@ -53,6 +54,7 @@ private:
         hikvision::ChannelProperties* outChannelProperties) const;
 
     CameraDiagnostics::Result configureChannel(
+        const hikvision::ChannelProperties& channelProperties,
         QSize resolution,
         QString codec,
         int fps,
