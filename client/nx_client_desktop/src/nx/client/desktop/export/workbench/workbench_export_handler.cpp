@@ -338,10 +338,23 @@ void WorkbenchExportHandler::handleExportVideoAction()
             {
                 ExportLayoutSettings layoutSettings;
                 layoutSettings.filename = settings.fileName;
-                layoutSettings.layout = QnLayoutResource::createFromResource(mediaResource->toResourcePtr());
+                const auto& resourcePtr = mediaResource->toResourcePtr();
+                layoutSettings.layout = QnLayoutResource::createFromResource(resourcePtr);
                 layoutSettings.mode = ExportLayoutSettings::Mode::Export;
                 layoutSettings.period = period;
                 layoutSettings.readOnly = false;
+
+                // Forcing camera rotation to match a rotation, used for camera in export preview.
+                // This rotation properly matches either to:
+                //  - export from the scene, uses rotation from the layout.
+                //  - export from bookmark. Matches rotation from camera settings.
+                auto layoutItems = layoutSettings.layout->getItems();
+                if (!layoutItems.empty())
+                {
+                    QnLayoutItemData item = *layoutItems.begin();
+                    item.rotation = settings.transcodingSettings.rotation;
+                    layoutSettings.layout->updateItem(item);
+                }
 
                 exportTool.reset(new ExportLayoutTool(layoutSettings));
             }
