@@ -150,11 +150,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Űrlap</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Fix archiválási hossz</translation>
     </message>
@@ -2896,11 +2891,6 @@ Kattintson az &quot;Új szerepkör&quot; gombra a létrehozáshoz.</translation>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Űrlap</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Mozgásérzékelés</translation>
     </message>
@@ -2919,11 +2909,6 @@ Kattintson az &quot;Új szerepkör&quot; gombra a létrehozáshoz.</translation>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Űrlap</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Mégsem</translation>
     </message>
@@ -2932,11 +2917,6 @@ Kattintson az &quot;Új szerepkör&quot; gombra a létrehozáshoz.</translation>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Űrlap</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation>Video feltöltése</translation>
     </message>
@@ -2949,11 +2929,6 @@ Kattintson az &quot;Új szerepkör&quot; gombra a létrehozáshoz.</translation>
       <location/>
       <source>Upload Folder...</source>
       <translation>Mappa feltöltése...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;warning&gt;</source>
-      <translation type="unfinished">&lt;warning&gt;</translation>
     </message>
   </context>
   <context>

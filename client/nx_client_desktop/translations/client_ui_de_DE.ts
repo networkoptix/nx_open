@@ -150,11 +150,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Formular</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Feste Archivlänge</translation>
     </message>
@@ -1701,7 +1696,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <translation>&quot;Tragbare Kamera&quot; ist ein virtueller Speicher für Videodateien, der auf jeden Server auf Ihrem System hochgeladen werden kann und von jedem Benutzer zugänglich ist.</translation>
     </message>
   </context>
   <context>
@@ -2895,18 +2890,13 @@ Klicken Sie auf &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Formular</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Bewegungserkennung</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Bewegung in hochgeladenen Video erkennen</translation>
     </message>
     <message>
       <location/>
@@ -2918,11 +2908,6 @@ Klicken Sie auf &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Formular</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Abbrechen</translation>
     </message>
@@ -2931,11 +2916,6 @@ Klicken Sie auf &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Formular</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation>Video hochladen</translation>
     </message>
@@ -2948,11 +2928,6 @@ Klicken Sie auf &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
       <location/>
       <source>Upload Folder...</source>
       <translation>Ordner hochladen...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;warning&gt;</source>
-      <translation>&lt;Warnung&gt;</translation>
     </message>
   </context>
   <context>

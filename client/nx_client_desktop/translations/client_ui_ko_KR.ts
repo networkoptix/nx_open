@@ -150,11 +150,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>녹화 범위 설정</translation>
     </message>
@@ -2894,11 +2889,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>움직임 감지:</translation>
     </message>
@@ -2917,11 +2907,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>취소</translation>
     </message>
@@ -2930,11 +2915,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation>비디오 업로드</translation>
     </message>
@@ -2947,11 +2927,6 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Upload Folder...</source>
       <translation>폴더 업로드...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;warning&gt;</source>
-      <translation>&lt;경고&gt;</translation>
     </message>
   </context>
   <context>

@@ -565,29 +565,29 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n Camera (s)</numerusform>
-        <numerusform>%n Camera (s)</numerusform>
+        <numerusform>%n Camera(s)</numerusform>
+        <numerusform>%n Camera(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
       <translation>
-        <numerusform>%n camera (s)</numerusform>
-        <numerusform>%n camera (s)</numerusform>
+        <numerusform>%n camera(s)</numerusform>
+        <numerusform>%n camera(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n Apparaat (en)</numerusform>
-        <numerusform>%n Apparaat (en)</numerusform>
+        <numerusform>%n Apparaat(en)</numerusform>
+        <numerusform>%n Apparaat(en)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
-        <numerusform>%n apparaat (en)</numerusform>
-        <numerusform>%n apparaat (en)</numerusform>
+        <numerusform>%n apparaat(en)</numerusform>
+        <numerusform>%n apparaat(en)</numerusform>
       </translation>
     </message>
     <message>
@@ -1104,8 +1104,8 @@
     <message numerus="yes">
       <source>Motion on Cameras</source>
       <translation>
-        <numerusform>Beweging op de camera's</numerusform>
-        <numerusform>Beweging op de camera's</numerusform>
+        <numerusform>Beweging op camera's</numerusform>
+        <numerusform>Beweging op camera's</numerusform>
       </translation>
     </message>
     <message>
@@ -1147,15 +1147,15 @@
     <message numerus="yes">
       <source>Input Signal on Devices</source>
       <translation>
-        <numerusform>Input op de apparaten</numerusform>
-        <numerusform>Input op de apparaten</numerusform>
+        <numerusform>Ingangen op de apparaten</numerusform>
+        <numerusform>Ingangen op de apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
       <translation>
-        <numerusform>Input op de camera's</numerusform>
-        <numerusform>Input op de camera's</numerusform>
+        <numerusform>Ingangen op de camera's</numerusform>
+        <numerusform>Ingangen op de camera's</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1168,8 +1168,8 @@
     <message numerus="yes">
       <source>Cameras Disconnected</source>
       <translation>
-        <numerusform>Camera's losgekoppeld</numerusform>
-        <numerusform>Camera's losgekoppeld</numerusform>
+        <numerusform>Camera's niet verbonden</numerusform>
+        <numerusform>Camera's niet verbonden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1462,7 +1462,7 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n Gebruikers</numerusform>
+        <numerusform>%n gebruikers</numerusform>
         <numerusform>%n gebruikers</numerusform>
       </translation>
     </message>

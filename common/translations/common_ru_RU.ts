@@ -491,33 +491,37 @@
     <name>QnLicenseUsageHelper</name>
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n %2 использовано из %1.</numerusform>
         <numerusform>%n %2 использовано из %1.</numerusform>
+        <numerusform>%n %2 are used out of %1.</numerusform>
         <numerusform>%n %2 использовано из %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n %2 будет использовано из %1.</numerusform>
         <numerusform>%n %2 будет использовано из %1.</numerusform>
+        <numerusform>%n %2 will be used out of %1.</numerusform>
         <numerusform>%n %2 будет использовано из %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Активируйте ещё %n %1.</numerusform>
         <numerusform>Активируйте ещё %n %1.</numerusform>
+        <numerusform>Activate %n more %1.</numerusform>
         <numerusform>Активируйте ещё %n %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Будет использовано ещё %n %1.</numerusform>
         <numerusform>Будет использовано ещё %n %1.</numerusform>
+        <numerusform>%n more %1 will be used.</numerusform>
         <numerusform>Будет использовано ещё %n %1.</numerusform>
       </translation>
     </message>
@@ -568,33 +572,37 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
       <source>%n Camera(s)</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n камера</numerusform>
         <numerusform>%n камеры</numerusform>
+        <numerusform>%n Camera(s)</numerusform>
         <numerusform>%n камер</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n камера</numerusform>
         <numerusform>%n камеры</numerusform>
+        <numerusform>%n camera(s)</numerusform>
         <numerusform>%n камер</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n устройство</numerusform>
         <numerusform>%n устройства</numerusform>
+        <numerusform>%n Device(s)</numerusform>
         <numerusform>%n устройств</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n device(s)</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n устройство</numerusform>
         <numerusform>%n устройства</numerusform>
+        <numerusform>%n device(s)</numerusform>
         <numerusform>%n устройств</numerusform>
       </translation>
     </message>
@@ -632,17 +640,19 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n модуль ввода/вывода</numerusform>
         <numerusform>%n модуля ввода/вывода</numerusform>
+        <numerusform>%n I/O Module(s)</numerusform>
         <numerusform>%n модулей ввода/вывода</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n модуль ввода/вывода</numerusform>
         <numerusform>%n модуля ввода/вывода</numerusform>
+        <numerusform>%n I/O module(s)</numerusform>
         <numerusform>%n модулей ввода/вывода</numerusform>
       </translation>
     </message>
@@ -905,72 +915,80 @@
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>миллисекунда</numerusform>
         <numerusform>миллисекунда</numerusform>
+        <numerusform>milliseconds</numerusform>
         <numerusform>миллисекунда</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>секунды</numerusform>
         <numerusform>секунды</numerusform>
+        <numerusform>seconds</numerusform>
         <numerusform>секунды</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>минут</numerusform>
         <numerusform>минут</numerusform>
+        <numerusform>minutes</numerusform>
         <numerusform>минут</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>часов</numerusform>
         <numerusform>часов</numerusform>
+        <numerusform>hours</numerusform>
         <numerusform>часов</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>дней</numerusform>
         <numerusform>дней</numerusform>
+        <numerusform>days</numerusform>
         <numerusform>дней</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>недель</numerusform>
         <numerusform>недель</numerusform>
+        <numerusform>weeks</numerusform>
         <numerusform>недель</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>месяцев</numerusform>
         <numerusform>месяцев</numerusform>
+        <numerusform>months</numerusform>
         <numerusform>месяцев</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>лет</numerusform>
         <numerusform>лет</numerusform>
+        <numerusform>years</numerusform>
         <numerusform>лет</numerusform>
       </translation>
     </message>
@@ -1121,9 +1139,10 @@
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Движение на камерах</numerusform>
         <numerusform>Движение на камерах</numerusform>
+        <numerusform>Motion on Cameras</numerusform>
         <numerusform>Движение на камерах</numerusform>
       </translation>
     </message>
@@ -1165,49 +1184,55 @@
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Входной сигнал на устройствах</numerusform>
         <numerusform>Входной сигнал на устройствах</numerusform>
+        <numerusform>Input Signal on Devices</numerusform>
         <numerusform>Входной сигнал на устройствах</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Входной сигнал на камерах</numerusform>
         <numerusform>Входной сигнал на камерах</numerusform>
+        <numerusform>Input Signal on Cameras</numerusform>
         <numerusform>Входной сигнал на камерах</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices Disconnected</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Устройств отключены</numerusform>
         <numerusform>Устройств отключены</numerusform>
+        <numerusform>Devices Disconnected</numerusform>
         <numerusform>Устройств отключены</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Камер отключено</numerusform>
         <numerusform>Камер отключено</numerusform>
+        <numerusform>Cameras Disconnected</numerusform>
         <numerusform>Камер отключено</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices IP Conflict</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Конфликт IP адреса устройств</numerusform>
         <numerusform>Конфликт IP адреса устройств</numerusform>
+        <numerusform>Devices IP Conflict</numerusform>
         <numerusform>Конфликт IP адреса устройств</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Конфликт IP адреса камер</numerusform>
         <numerusform>Конфликт IP адреса камер</numerusform>
+        <numerusform>Cameras IP Conflict</numerusform>
         <numerusform>Конфликт IP адреса камер</numerusform>
       </translation>
     </message>
@@ -1343,9 +1368,10 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n раза, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n раза, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n раза, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
@@ -1357,17 +1383,19 @@
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Первое проявление: %2 %1 (всего %n раза)</numerusform>
         <numerusform>Первое проявление: %2 %1 (всего %n раза)</numerusform>
+        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
         <numerusform>Первое проявление: %2 %1 (всего %n раза)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
+        <numerusform>No data received during last %n seconds.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
       </translation>
     </message>
@@ -1489,17 +1517,19 @@
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n User</numerusform>
         <numerusform>%n User</numerusform>
+        <numerusform>%n Users</numerusform>
         <numerusform>%n User</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Role</numerusform>
         <numerusform>%n Role</numerusform>
+        <numerusform>%n Roles</numerusform>
         <numerusform>%n Role</numerusform>
       </translation>
     </message>

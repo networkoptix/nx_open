@@ -150,11 +150,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulaire</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Longeur d'Archive Fixe</translation>
     </message>
@@ -2896,11 +2891,6 @@ Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulaire</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Détection de mouvement</translation>
     </message>
@@ -2919,11 +2909,6 @@ Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulaire</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Annuler</translation>
     </message>
@@ -2932,11 +2917,6 @@ Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulaire</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation type="unfinished">Upload Video</translation>
     </message>
@@ -2949,11 +2929,6 @@ Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
       <location/>
       <source>Upload Folder...</source>
       <translation type="unfinished">Upload Folder...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&lt;warning&gt;</source>
-      <translation>&lt;warning&gt;</translation>
     </message>
   </context>
   <context>
