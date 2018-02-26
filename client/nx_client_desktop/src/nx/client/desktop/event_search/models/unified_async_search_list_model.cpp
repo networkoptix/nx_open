@@ -18,10 +18,14 @@ UnifiedAsyncSearchListModel::UnifiedAsyncSearchListModel(
     base_type(parent),
     m_sourceModel(sourceModel),
     m_filterModel(new QnSortFilterListModel(this)),
-    m_busyIndicatorModel(new BusyIndicatorModel(this))
+    m_headIndicatorModel(new BusyIndicatorModel(this)),
+    m_tailIndicatorModel(new BusyIndicatorModel(this))
 {
     NX_ASSERT(sourceModel);
-    setModels({new SubsetListModel(m_filterModel, 0, QModelIndex(), this), m_busyIndicatorModel});
+    setModels({
+        m_headIndicatorModel,
+        new SubsetListModel(m_filterModel, 0, QModelIndex(), this),
+        m_tailIndicatorModel});
 
     m_filterModel->setSourceModel(m_sourceModel);
     m_filterModel->setFilterRole(Qn::ResourceSearchStringRole);
@@ -30,7 +34,8 @@ UnifiedAsyncSearchListModel::UnifiedAsyncSearchListModel(
     connect(m_sourceModel, &AbstractEventListModel::fetchAboutToBeFinished, this,
         [this]()
         {
-            m_busyIndicatorModel->setActive(false);
+            m_headIndicatorModel->setActive(false);
+            m_tailIndicatorModel->setActive(false);
             m_previousRowCount = m_filterModel->rowCount();
         });
 
@@ -94,7 +99,9 @@ bool UnifiedAsyncSearchListModel::isConstrained() const
 int UnifiedAsyncSearchListModel::relevantCount() const
 {
     int count = m_filterModel->rowCount();
-    if (m_busyIndicatorModel->active())
+    if (m_headIndicatorModel->active())
+        ++count;
+    if (m_tailIndicatorModel->active())
         ++count;
 
     return count;
@@ -108,7 +115,12 @@ bool UnifiedAsyncSearchListModel::canFetchMore(const QModelIndex& /*parent*/) co
 void UnifiedAsyncSearchListModel::fetchMore(const QModelIndex& /*parent*/)
 {
     m_sourceModel->fetchMore();
-    m_busyIndicatorModel->setActive(m_sourceModel->fetchInProgress());
+
+    auto indicatorModel = fetchDirection() == FetchDirection::earlier
+        ? m_tailIndicatorModel
+        : m_headIndicatorModel;
+
+    indicatorModel->setActive(m_sourceModel->fetchInProgress());
 }
 
 } // namespace desktop

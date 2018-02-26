@@ -61,6 +61,8 @@ void AbstractAsyncSearchListModel::Private::relevantTimePeriodChanged(
 void AbstractAsyncSearchListModel::Private::fetchDirectionChanged()
 {
     qDebug() << "New fetch direction:" << q->fetchDirection();
+    cancelPrefetch();
+    m_fetchedAll = false;
     // TODO: FIXME: #vkutin Implement me!
 }
 

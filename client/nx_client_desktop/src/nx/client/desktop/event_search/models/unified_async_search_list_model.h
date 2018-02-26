@@ -48,7 +48,8 @@ public:
 private:
     AbstractEventListModel* const m_sourceModel = nullptr;
     QnSortFilterListModel* const m_filterModel = nullptr;
-    BusyIndicatorModel* const m_busyIndicatorModel = nullptr;
+    BusyIndicatorModel* const m_headIndicatorModel = nullptr;
+    BusyIndicatorModel* const m_tailIndicatorModel = nullptr;
     int m_previousRowCount = 0;
 };
 
