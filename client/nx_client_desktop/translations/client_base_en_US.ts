@@ -6130,6 +6130,10 @@ to %1</source>
         <source>Set for this Camera</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>UNSUPPORTED FIRMWARE VERSION</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -8376,13 +8380,6 @@ to %1</source>
     <message>
         <source>Pasted</source>
         <comment>from Clipboard</comment>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
-    <message>
-        <source>NO DATA</source>
         <translation></translation>
     </message>
 </context>
