@@ -10,8 +10,7 @@ ${url}         ${CLOUD TEST}
 
 *** Keywords ***
 Log In To Change Password Page
-    Open Browser and go to URL    ${url}
-    Go To    ${url}/account/password
+    Open Browser and go to URL    ${url}/account/password
     Log In    ${email}    ${password}    None
     Validate Log In
     Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}

@@ -1,6 +1,6 @@
 *** Settings ***
 
-Library           Selenium2Library    screenshot_root_directory=\Screenshots    run_on_failure=Failure Tasks
+Library           Selenium2Library    screenshot_root_directory=\Screenshots    #run_on_failure=Failure Tasks
 Library           ImapLibrary
 Library           String
 Library           NoptixLibrary/
