@@ -107,7 +107,8 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     AuthorizationManager authorizationManager(
         controller.streeManager(),
         controller.accountManager(),
-        controller.systemManager());
+        controller.systemManager(),
+        controller.tempPasswordManager());
     m_authorizationManager = &authorizationManager;
 
     CloudModuleUrlProvider cloudModuleUrlProviderDeprecated(

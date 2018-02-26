@@ -92,6 +92,12 @@ public:
             return boost::none;
         return val;
     }
+
+    bool contains(int resId) const
+    {
+        QVariant value;
+        return getAsVariant(resId, &value);
+    }
 };
 
 //!Implement this interface to allow writing resource values to object
