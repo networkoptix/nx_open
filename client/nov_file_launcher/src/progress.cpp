@@ -1,4 +1,7 @@
 #include "progress.h"
+
+#include <algorithm>
+
 #include <Commctrl.h>
 
 #pragma comment(lib, "comctl32")
@@ -55,7 +58,7 @@ QnLauncherProgress::~QnLauncherProgress()
 void QnLauncherProgress::setRange(long long minPos, long long maxPos)
 {
     m_minPos = minPos;
-    m_scale = double(kResolution) / max(maxPos - minPos, 1);
+    m_scale = double(kResolution) / std::max(maxPos - minPos, 1ll);
     processMessages();
 }
 
@@ -70,7 +73,7 @@ void QnLauncherProgress::setPos(long long pos)
 void QnLauncherProgress::updateCaption(int value)
 {
     static const double kValueToPercentage = 100.0 / kResolution;
-    const int percentage = min(max(0, (int)(kValueToPercentage * value)), 100);
+    const int percentage = std::min(std::max(0, (int)(kValueToPercentage * value)), 100);
 
     enum { BUFFER_SIZE = 5 };
     wchar_t buffer[BUFFER_SIZE + 1];

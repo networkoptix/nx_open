@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <algorithm>
+
 #include <tchar.h>
 #include <Windows.h>
 #include <Commctrl.h>
@@ -129,7 +131,7 @@ bool createDirectory(const wstring& path)
 
     if (!success)
         logfile << L"Error: directory was not created: " << result << L"\n";
-     
+
     return success;
 }
 
@@ -160,7 +162,7 @@ int extractFile(ifstream& srcFile, const wstring& fullFileName, int64_t pos, int
     int64_t bytesLeft = fileSize;
 
     do {
-        srcFile.read(buffer, min(bytesLeft, 1024*1024ll));
+        srcFile.read(buffer, std::min(bytesLeft, 1024*1024ll));
         dstFile.write(buffer, srcFile.gcount());
         bytesLeft -= srcFile.gcount();
         pos += srcFile.gcount();
