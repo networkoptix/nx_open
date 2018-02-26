@@ -94,6 +94,8 @@
         <hikvision_metadata_plugin.guid>{67178141-FE19-410C-BA94-3A2166A8BE47}</hikvision_metadata_plugin.guid>
         <stub_metadata_plugin.guid>{8f5484ec-6bea-4a9c-8746-9e49d6fea726}</stub_metadata_plugin.guid>
         <root_tool.guid>{366783da-a82c-11e7-b026-57c39dec835a}</root_tool.guid>
+	<nx_sdk.guid>{D3351412-0FFB-4E1C-88AC-04354AF7BAE4}</nx_sdk.guid>
+	<nx_plugin_utils.guid>{8C97B604-A30E-46AE-99FB-6BB042B2C2B3}</nx_plugin_utils.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -497,6 +499,8 @@
                 <module>common_libs/nx_network</module>
                 <module>common_libs/nx_update</module>
                 <module>common_libs/nx_utils</module>
+                <module>common_libs/nx_sdk</module>
+                <module>common_libs/nx_plugin_utils</module>
                 <module>common_libs/nx_vms_utils</module>
                 <module>common_libs/udt</module>
                 <module>nx_cloud/cloud_db_client</module>
@@ -532,8 +536,10 @@
             <modules>
                 <module>common_libs/nx_email</module>
 
+<!--
                 <module>nx_sdk</module>
                 <module>nx_storage_sdk</module>
+-->
 
                 <module>common_libs/nx_speech_synthesizer</module>
                 <module>mediaserver_core</module>

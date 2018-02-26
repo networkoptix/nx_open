@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/data/account_data.h>
+#include <nx/cloud/cdb/data/access_rules.h>
 #include <nx/cloud/cdb/stree/cdb_ns.h>
 
 namespace nx {
