@@ -2,7 +2,7 @@
 
 angular.module('webadminApp')
     .controller('JoinCtrl', ['$scope', '$uibModalInstance', '$interval', 'mediaserver', 'dialogs',
-    function ($scope, $modalInstance, $interval, mediaserver, dialogs) {
+    function ($scope, $uibModalInstance, $interval, mediaserver, dialogs) {
         $scope.settings = {
             url :'',
             login: Config.defaultLogin,
@@ -196,6 +196,6 @@ angular.module('webadminApp')
         };
 
         $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
     }]);
