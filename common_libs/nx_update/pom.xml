@@ -20,12 +20,16 @@
         <template>lib</template>
 
         <qt.libs>core gui sql network</qt.libs>
-        <global.libs>-lnx_fusion -lnx_utils -lnx_network -lcommon -lnx_kit</global.libs>
+        <global.libs>-lnx_fusion -lnx_utils -lnx_network -lcommon -lnx_kit -lnx_sdk -lnx_plugin_utils</global.libs>
         <windows.oslibs>-lws2_32 DbgHelp.lib -lIphlpapi -lOle32  -lSecur32 -lwinmm</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
 
         <rdep.packages>openssl</rdep.packages>
+        <rdep.windows.packages>quazip</rdep.windows.packages>
+        <rdep.linux.packages>quazip</rdep.linux.packages>
+        <rdep.mac.packages>quazip</rdep.mac.packages>
+
         <windows.defines>_USING_V110_SDK71_</windows.defines>
         <buildLib>sharedLib</buildLib>
     </properties>
@@ -56,6 +60,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
     </dependencies>
 
