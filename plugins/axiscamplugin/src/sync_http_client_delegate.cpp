@@ -5,6 +5,8 @@
 
 #include "sync_http_client_delegate.h"
 
+#include <cassert>
+
 #include <QMutexLocker>
 #include <QThread>
 
@@ -27,8 +29,8 @@ SyncHttpClientDelegate::~SyncHttpClientDelegate()
 
 void SyncHttpClientDelegate::get( const QNetworkRequest& request )
 {
-    NX_ASSERT( QThread::currentThread() != thread() );
- 
+    assert( QThread::currentThread() != thread() );
+
     QMutexLocker lk( &m_mutex );
 
     if( m_reply )
@@ -51,7 +53,7 @@ void SyncHttpClientDelegate::get( const QNetworkRequest& request )
 
 QByteArray SyncHttpClientDelegate::readWholeMessageBody()
 {
-    NX_ASSERT( QThread::currentThread() != thread() );
+    assert( QThread::currentThread() != thread() );
 
     if( m_requestState > rsReadingMessageBody )
         return QByteArray();

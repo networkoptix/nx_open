@@ -137,8 +137,8 @@ def sync_dependencies(syncher):
         sync("libjpeg-turbo")
 
     if withMediaServer:
-        sync("any/nx_sdk-1.6.0")
-        sync("any/nx_storage_sdk-1.6.0")
+        sync("any/nx_sdk-1.7.0")
+        sync("any/nx_storage_sdk-1.7.0")
         sync("sigar")
 
         sync("any/apidoctool", path_variable="APIDOCTOOL_PATH")
