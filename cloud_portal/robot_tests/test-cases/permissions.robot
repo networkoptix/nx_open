@@ -200,6 +200,7 @@ Delete user works
     Close Browser
 
 Share with registered user - sends him notification
+    [tags]    email
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
