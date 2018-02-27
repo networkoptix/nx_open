@@ -178,17 +178,17 @@
     "common": {
         "voiceCommands": {
             "search": "find + [text for searchbar]",
-            "pause": "pause",
+            "pause": "pauze",
             "help": "help | show commands",
-            "collapse all servers": "collapse all servers",
+            "collapse all servers": "vouw alle servers samen",
             "collapse server": "collapse server + [server name]",
-            "play": "play",
-            "clear search": "clear search",
+            "play": "afspelen",
+            "clear search": "zoekopdracht wissen",
             "live": "go to live | show me live",
-            "expand all servers": "expand all servers",
-            "stop listening": "stop listening",
+            "expand all servers": "vouw alle servers uit",
+            "stop listening": "stoppen met luisteren",
             "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
+            "view": "bekijk + [camera naam]"
         },
         "systemOffline": "Systeem Offline",
         "cameraLinks": {
@@ -200,9 +200,9 @@
             "transcoding": "Transcoding",
             "copyActiveText": "gekopieerd naar het klembord"
         },
-        "searchCamPlaceholder": "Search",
+        "searchCamPlaceholder": "Zoek",
         "cameraStates": {
-            "noFormat": "This browser does not support video playback from this camera.",
+            "noFormat": "Deze browser ondersteunt het afspelen van videobeelden van deze camera niet.",
             "ieWin10": "Gebruik alsjeblieft de browsers Microsoft Edge of Google Chrome.",
             "iosVideoTooLarge": "iOS ondersteunt geen video die groter is dan FullHD (2MP: 1920x1080).",
             "unauthorized": "Authentication required",
@@ -213,13 +213,13 @@
             "error": "Error",
             "offline": "Offline",
             "noData": "Geen data",
-            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+            "flashRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> te installeren voor het afspelen van video's."
         },
-        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "chromeCastWarning": "Chromecast is arbeidsintensief en kan problemen veroorzaken op uw server.",
         "resolution": {
-            "high": "High",
-            "auto": "Auto",
-            "low": "Low"
+            "high": "Hoog",
+            "auto": "Automatisch",
+            "low": "Laag"
         }
     }
 }
