@@ -1109,6 +1109,10 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == commonModule()->moduleGUID())
     {
+        auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
+        if (fileStorage && nx::mserver_aux::isStorageUnmounted(fileStorage))
+            fileStorage->setMounted(false);
+
         m_warnSended = false;
         connect(storage.data(), &QnStorageResource::isBackupChanged, this, &QnStorageManager::at_storageChanged);
         if (checkIfMyStorage(storage))

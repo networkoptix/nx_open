@@ -154,22 +154,29 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
 
         if (storage)
         {
-            storage->setUrl(data.url); /* createStorage does not fill url. */
+            storage->setUrl(data.url);
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
+
+            data.isOnline = storage->initOrUpdate() == Qn::StorageInit_Ok;
+            if (data.isOnline)
+            {
+                if (storage->getId().isNull())
+                    storage->setId(QnUuid::createUuid());
+                storage->setStatus(Qn::Online);
+            }
 
             QnStorageResourceList additionalStorages;
             additionalStorages.append(storage);
             auto writableStoragesIfCurrentWasAdded = qnNormalStorageMan->getAllWritableStorages(
                 &additionalStorages);
 
-            data.isOnline = storage->initOrUpdate() == Qn::StorageInit_Ok;
             data.isWritable = data.isOnline
                 && storage->isWritable()
                 && writableStoragesIfCurrentWasAdded.contains(storage);
 
             auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-            if (fileStorage)
+            if (fileStorage && data.isOnline)
                 data.reservedSpace = fileStorage->calcInitialSpaceLimit();
         }
 

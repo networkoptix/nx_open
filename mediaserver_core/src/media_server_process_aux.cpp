@@ -64,6 +64,14 @@ QnStorageResourceList UnmountedLocalStoragesFilter::getUnmountedStorages(
     return result;
 }
 
+bool isStorageUnmounted(const QnStorageResourcePtr& storage)
+{
+    QnStorageResourceList storages;
+    storages.append(storage);
+
+    return getUnmountedStorages(storages).contains(storage);
+}
+
 QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allServerStorages)
 {
     nx::mserver_aux::UnmountedLocalStoragesFilter unmountedLocalStoragesFilter(
@@ -77,7 +85,7 @@ QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allServe
         lm("Record folders: %1").container(mediaPathList));
 
     QnStorageResourceList filteredStorages;
-    for (const auto& storage : allServerStorages)
+    for (const auto& storage: allServerStorages)
     {
         if (!storage->isExternal())
             filteredStorages.push_back(storage);
