@@ -397,11 +397,10 @@ public:
     TestStorageThread(QnStorageManager* owner): m_owner(owner) {}
     virtual void run() override
     {
-        auto unmountedStorages = nx::mserver_aux::getUnmountedStorages(storagesToTest());
         for (const auto& storage: storagesToTest())
         {
             auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-            if (fileStorage && !unmountedStorages.contains(storage))
+            if (fileStorage && !nx::mserver_aux::isStorageUnmounted(storage))
                 fileStorage->setMounted(true);
         }
 

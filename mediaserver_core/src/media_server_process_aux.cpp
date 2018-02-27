@@ -66,10 +66,7 @@ QnStorageResourceList UnmountedLocalStoragesFilter::getUnmountedStorages(
 
 bool isStorageUnmounted(const QnStorageResourcePtr& storage)
 {
-    QnStorageResourceList storages;
-    storages.append(storage);
-
-    return getUnmountedStorages(storages).contains(storage);
+    return getUnmountedStorages(QnStorageResourceList() << storage).contains(storage);
 }
 
 QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allServerStorages)
