@@ -253,11 +253,6 @@ bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
         setUrl(source->getUrl());
         mergedSomething = true;
     }
-    if (source->getAuth() != getAuth())
-    {
-        setAuth(source->getAuth());
-        mergedSomething = true;
-    }
     if (!source->getMAC().isNull() && source->getMAC() != getMAC())
     {
         setMAC(source->getMAC());

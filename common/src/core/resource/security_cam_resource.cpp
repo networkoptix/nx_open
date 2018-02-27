@@ -1114,13 +1114,19 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         return false;
 
     bool result = base_type::mergeResourcesIfNeeded(source);
+    if (getAuth() != camera->getAuth() && camera->isManuallyAdded())
+    {
+        setAuth(source->getAuth());
+        result = true;
+    }
 
     if (getGroupId() != camera->getGroupId())
     {
+        // Group ID can be changed for ONVIF resource because if we unauthorized,
+        // maxChannels is not accessible.
         setGroupId(camera->getGroupId());
-        result = true; // groupID can be changed for onvif resource because if not auth info, maxChannels is not accessible
+        result = true;
     }
-
     if (getGroupName().isEmpty() && getGroupName() != camera->getGroupName())
     {
         setGroupName(camera->getGroupName());
@@ -1137,12 +1143,6 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         setVendor(camera->getVendor());
         result = true;
     }
-    if (getMAC() != camera->getMAC() && !camera->getMAC().isNull())
-    {
-        setMAC(camera->getMAC());
-        result = true;
-    }
-
 
     return result;
 }
