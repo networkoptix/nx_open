@@ -176,6 +176,20 @@
         "default": "{{PRODUCT_NAME}} Benutzeroberfläche"
     },
     "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pause",
+            "help": "help | show commands",
+            "collapse all servers": "collapse all servers",
+            "collapse server": "collapse server + [server name]",
+            "play": "play",
+            "clear search": "clear search",
+            "live": "go to live | show me live",
+            "expand all servers": "expand all servers",
+            "stop listening": "stop listening",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
         "systemOffline": "System offline",
         "cameraLinks": {
             "copyToClipboard": "in zwischenablage kopieren",
@@ -186,9 +200,9 @@
             "transcoding": "Umkodierung",
             "copyActiveText": "in die zwischenablage kopiert"
         },
-        "searchCamPlaceholder": "suche",
+        "searchCamPlaceholder": "Search",
         "cameraStates": {
-            "noFormat": "Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von dieser Kamera.",
+            "noFormat": "This browser does not support video playback from this camera.",
             "ieWin10": "Bitte benutzen Sie Microsoft Edge oder Google Chrome Browser.",
             "iosVideoTooLarge": "iOS unterstützt Videos größer als FullHD (2MP: 1920 x 1080) nicht.",
             "unauthorized": "Authentifizierung erforderlich",
@@ -199,7 +213,13 @@
             "error": "Fehler",
             "offline": "Offline",
             "noData": "Keine Daten",
-            "flashRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>, um Videos von ARM-basierten Servern abzuspielen."
+            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+        },
+        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "resolution": {
+            "high": "High",
+            "auto": "Auto",
+            "low": "Low"
         }
     }
 }

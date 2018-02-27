@@ -47,7 +47,7 @@ cat static/version.txt >&2
 
 #Pack
 echo "Pack external.dat" >&2
-tar -czvf external.dat ./static
+zip -r external.dat ./static
 mkdir -p ./server-external/bin
 mv external.dat server-external/bin/external.dat
 

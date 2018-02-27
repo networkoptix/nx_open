@@ -62,7 +62,7 @@ void LayoutPreviewPainter::setLayout(const QnLayoutResourcePtr& layout)
         // Disconnect from previous layout
         m_layout->disconnect(this);
         m_layoutThumbnailProvider.reset();
-        m_resourceStatus = Qn::NoDataOverlay;
+        m_overlayStatus = Qn::NoDataOverlay;
     }
 
     m_layout = layout;
@@ -137,7 +137,11 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
     }
     painter->fillRect(paintRect, m_backgroundColor);
 
-    if (m_layout && !m_layoutThumbnail.isNull())
+    Qn::ThumbnailStatus status = Qn::ThumbnailStatus::Invalid;
+    if (m_layoutThumbnailProvider)
+        status = m_layoutThumbnailProvider->status();
+
+    if (m_layout && !m_layoutThumbnail.isNull() && (status == Qn::ThumbnailStatus::Loading || status == Qn::ThumbnailStatus::Loaded))
     {
         QSizeF paintSize = m_layoutThumbnail.size() / m_layoutThumbnail.devicePixelRatio();
         // Fitting thumbnail exactly to widget's rect.
@@ -159,15 +163,15 @@ void LayoutPreviewPainter::at_updateThumbnailStatus(Qn::ThumbnailStatus status)
     switch (status)
     {
     case Qn::ThumbnailStatus::Loaded:
-        m_resourceStatus = Qn::EmptyOverlay;
+        m_overlayStatus = Qn::EmptyOverlay;
         break;
 
     case Qn::ThumbnailStatus::Loading:
-        m_resourceStatus = Qn::LoadingOverlay;
+        m_overlayStatus = Qn::LoadingOverlay;
         break;
 
     default:
-        m_resourceStatus = Qn::NoDataOverlay;
+        m_overlayStatus = Qn::NoDataOverlay;
         break;
     }
 

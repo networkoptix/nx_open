@@ -176,6 +176,20 @@
         "default": "{{PRODUCT_NAME}} 网页界面"
     },
     "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pause",
+            "help": "help | show commands",
+            "collapse all servers": "collapse all servers",
+            "collapse server": "collapse server + [server name]",
+            "play": "play",
+            "clear search": "clear search",
+            "live": "go to live | show me live",
+            "expand all servers": "expand all servers",
+            "stop listening": "stop listening",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
         "systemOffline": "系统处于离线状态",
         "cameraLinks": {
             "copyToClipboard": "复制到剪贴板",
@@ -186,9 +200,9 @@
             "transcoding": "转码",
             "copyActiveText": "已复制到剪贴板"
         },
-        "searchCamPlaceholder": "搜索",
+        "searchCamPlaceholder": "Search",
         "cameraStates": {
-            "noFormat": "此浏览器或设备不支持本相机的视频播放。",
+            "noFormat": "This browser does not support video playback from this camera.",
             "ieWin10": "请使用Microsoft Edge或Google Chrome浏览器。",
             "iosVideoTooLarge": "iOS不支持大于fullHD (2MP：1920x1080) 的视频。",
             "unauthorized": "需要身份验证",
@@ -199,7 +213,13 @@
             "error": "错误",
             "offline": "离线",
             "noData": "无数据",
-            "flashRequired": "请 <a href=\"https://get.adobe.com/flashplayer/\" target=\"_blank\">安装 Adobe Flash</a> 播放视频从基于 ARM 的服务器。"
+            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+        },
+        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "resolution": {
+            "high": "High",
+            "auto": "Auto",
+            "low": "Low"
         }
     }
 }

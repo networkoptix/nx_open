@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Gefixeerde archieflengte</translation>
     </message>
@@ -262,7 +257,7 @@
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation>Systeemrapportage</translation>
+      <translation>Audit Trail</translation>
     </message>
     <message>
       <location/>
@@ -468,7 +463,7 @@
     <message>
       <location filename="../src/ui/widgets/business/business_rule_widget.ui"/>
       <source>Event</source>
-      <translation>Gebeurtenis</translation>
+      <translation>Event</translation>
     </message>
     <message>
       <location/>
@@ -516,7 +511,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation>Gebeurtnisregels</translation>
+      <translation>Event regels</translation>
     </message>
     <message>
       <location/>
@@ -614,12 +609,12 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
@@ -961,6 +956,14 @@
     </message>
   </context>
   <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>Categorie</translation>
+    </message>
+  </context>
+  <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
@@ -978,7 +981,7 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>Logboek</translation>
+      <translation>Gebeurtenissenlog</translation>
     </message>
     <message>
       <location/>
@@ -1016,7 +1019,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
@@ -1026,7 +1029,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
@@ -1425,7 +1428,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
@@ -1649,12 +1652,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
@@ -1672,7 +1675,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation>Persoonlijke instellingen</translation>
+      <translation>Personalisatie</translation>
     </message>
     <message>
       <location/>
@@ -1722,7 +1725,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Tour cyclus</translation>
+      <translation>Toer cyclus</translation>
     </message>
   </context>
   <context>
@@ -1966,7 +1969,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Wachtwoord:</translation>
     </message>
     <message>
       <location/>
@@ -2023,7 +2026,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Wachtwoord:</translation>
     </message>
     <message>
       <location/>
@@ -2033,7 +2036,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Gebruikersnaam:</translation>
+      <translation>Aanmelden:</translation>
     </message>
     <message>
       <location/>
@@ -2397,7 +2400,7 @@
     <message>
       <location/>
       <source>Search</source>
-      <translation>Search</translation>
+      <translation>Zoek</translation>
     </message>
   </context>
   <context>
@@ -2633,12 +2636,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <location/>
@@ -2664,11 +2667,6 @@
       <location/>
       <source>Reset</source>
       <translation>Reset</translation>
-    </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation>Text label</translation>
     </message>
     <message>
       <location/>
@@ -2878,12 +2876,12 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Gebruikersnaam:</translation>
+      <translation>Aanmelden:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Wachtwoord:</translation>
     </message>
   </context>
   <context>
@@ -3051,23 +3049,18 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Role</source>
-      <translation>Profiel</translation>
+      <translation>Rol</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation>Profielen bewerken...</translation>
+      <translation>Rollen bewerken...</translation>
     </message>
   </context>
   <context>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Bewegingsdetectie</translation>
     </message>
@@ -3086,11 +3079,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Annuleren</translation>
     </message>
@@ -3099,11 +3087,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation>Upload Video</translation>
     </message>

@@ -10,6 +10,8 @@
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include <nx/utils/log/log.h>
+#include <nx/mediaserver/fs/media_paths/media_paths.h>
+#include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
 
 namespace nx {
 namespace mserver_aux {
@@ -62,6 +64,27 @@ QnStorageResourceList UnmountedLocalStoragesFilter::getUnmountedStorages(
     return result;
 }
 
+QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allServerStorages)
+{
+    nx::mserver_aux::UnmountedLocalStoragesFilter unmountedLocalStoragesFilter(
+        QnAppInfo::mediaFolderName());
+
+    using namespace nx::mediaserver::fs::media_paths;
+
+    auto mediaPathList = get(FilterConfig::createDefault(/*includeNonHdd*/ true));
+    NX_VERBOSE(
+        nx::utils::log::Tag(typeid(UnmountedLocalStoragesFilter)),
+        lm("Record folders: %1").container(mediaPathList));
+
+    QnStorageResourceList filteredStorages;
+    for (const auto& storage : allServerStorages)
+    {
+        if (!storage->isExternal())
+            filteredStorages.push_back(storage);
+    }
+
+    return unmountedLocalStoragesFilter.getUnmountedStorages(filteredStorages, mediaPathList);
+}
 
 LocalSystemIndentityHelper::LocalSystemIndentityHelper(
         const BeforeRestoreDbData& restoreData,
@@ -303,7 +326,7 @@ BeforeRestoreDbData savePersistentDataBeforeDbRestore(
     return data;
 }
 
-void makeFakeData(const QString& fakeDataString, 
+void makeFakeData(const QString& fakeDataString,
     const ec2::AbstractECConnectionPtr& connection, const QnUuid& serverId)
 {
     if (fakeDataString.isEmpty())

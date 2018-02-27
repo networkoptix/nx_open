@@ -30,6 +30,7 @@
 
 #include <nx/client/desktop/ui/dialogs/debug/animations_control_dialog.h>
 #include <nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.h>
+#include <nx/client/desktop/custom_settings/dialogs/custom_settings_test_dialog.h>
 
 #include <finders/test_systems_finder.h>
 #include <finders/system_tiles_test_case.h>
@@ -49,6 +50,7 @@
 #define DEBUG_ACTIONS
 //#endif
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -118,6 +120,9 @@ public:
         addButton(lit("Applaucher control"), [this] { (new QnApplauncherControlDialog(this))->show();});
 
         addButton(lit("Animations control"), [this] { (new AnimationsControlDialog(this))->show(); });
+
+        addButton(lit("Custom Settings Test"), [this]
+            { (new CustomSettingsTestDialog(this))->show(); });
 
         addButton(lit("Web View"), [this]
             {

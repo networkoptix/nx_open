@@ -403,15 +403,23 @@ void ExportSettingsDialog::updateSettingsWidgets()
 {
     const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();
 
-    ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
-    ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
-    ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
-    ui->timestampSettingsPage->setFormatEnabled(d->mediaSupportsUtc());
-    ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
-    ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
-    ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
+    if (mediaPersistentSettings.shouldExportOverlays())
+    {
+        ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
+        ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
+        ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
+        ui->timestampSettingsPage->setFormatEnabled(d->mediaSupportsUtc());
+        ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
+        ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
+        ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
 
-    ui->rapidReviewSettingsPage->setSpeed(d->storedRapidReviewSettings().speed);
+        if(mediaPersistentSettings.rapidReview.enabled)
+        {
+            int speed = d->storedRapidReviewSettings().speed;
+            ui->rapidReviewSettingsPage->setSpeed(speed);
+        }
+    }
+
     ui->mediaFilenamePanel->setFilename(d->selectedFileName(Mode::Media));
     ui->layoutFilenamePanel->setFilename(d->selectedFileName(Mode::Layout));
 }

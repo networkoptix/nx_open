@@ -67,12 +67,12 @@
     <message>
       <location/>
       <source>Black level</source>
-      <translation>黑階</translation>
+      <translation>黑色準位</translation>
     </message>
     <message>
       <location/>
       <source>White level</source>
-      <translation>白階</translation>
+      <translation>白色準位</translation>
     </message>
   </context>
   <context>
@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>表格</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>固定錄影天數</translation>
     </message>
@@ -432,7 +427,7 @@
     <message>
       <location/>
       <source>Timeout</source>
-      <translation>逾時</translation>
+      <translation>&amp;逾時</translation>
     </message>
     <message>
       <location/>
@@ -619,7 +614,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入帳號</translation>
+      <translation>登入</translation>
     </message>
     <message>
       <location/>
@@ -680,7 +675,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>回復預設值</translation>
+      <translation>恢復預設值</translation>
     </message>
     <message>
       <location/>
@@ -895,7 +890,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>更改密碼</translation>
+      <translation>變更密碼</translation>
     </message>
   </context>
   <context>
@@ -961,6 +956,14 @@
     </message>
   </context>
   <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>類別</translation>
+    </message>
+  </context>
+  <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
@@ -978,7 +981,7 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>事件日誌</translation>
+      <translation>事件記錄</translation>
     </message>
     <message>
       <location/>
@@ -1016,7 +1019,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入帳號</translation>
+      <translation>登入</translation>
     </message>
     <message>
       <location/>
@@ -1169,7 +1172,7 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation>大小</translation>
+      <translation>大小:</translation>
     </message>
     <message>
       <location/>
@@ -1182,7 +1185,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
       <source>Misc</source>
-      <translation>其他設定</translation>
+      <translation>其他</translation>
     </message>
     <message>
       <location/>
@@ -1286,7 +1289,7 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation>大小</translation>
+      <translation>大小:</translation>
     </message>
     <message>
       <location/>
@@ -1443,7 +1446,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>從LDAP獲取使用者...</translation>
+      <translation>從LDAP中選取使用者...</translation>
     </message>
     <message>
       <location/>
@@ -1649,7 +1652,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入帳號</translation>
+      <translation>登入</translation>
     </message>
     <message>
       <location/>
@@ -1692,7 +1695,7 @@
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation>時間模式</translation>
+      <translation>時間模式:</translation>
     </message>
     <message>
       <location/>
@@ -1707,7 +1710,7 @@
     <message>
       <location/>
       <source>Intensity</source>
-      <translation>亮度</translation>
+      <translation>明亮度:</translation>
     </message>
     <message>
       <location/>
@@ -1722,7 +1725,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>巡曳週期</translation>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>
@@ -1743,7 +1746,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>身份驗証</translation>
+      <translation>認證</translation>
     </message>
     <message>
       <location/>
@@ -1758,7 +1761,7 @@
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>允許聲音</translation>
+      <translation>啟用聲音</translation>
     </message>
     <message>
       <location/>
@@ -1804,7 +1807,7 @@
     <message>
       <location/>
       <source>Test...</source>
-      <translation>測試...</translation>
+      <translation>測試…</translation>
     </message>
     <message>
       <location/>
@@ -1878,7 +1881,7 @@
     <message>
       <location/>
       <source>Details</source>
-      <translation>細節</translation>
+      <translation>詳細</translation>
     </message>
     <message>
       <location/>
@@ -1945,7 +1948,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>寫入書籤</translation>
+      <translation>書籤</translation>
     </message>
   </context>
   <context>
@@ -2033,7 +2036,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>登入帳號:</translation>
+      <translation>登入:</translation>
     </message>
     <message>
       <location/>
@@ -2306,7 +2309,7 @@
     <message>
       <location/>
       <source>s</source>
-      <translation>s</translation>
+      <translation>秒</translation>
     </message>
     <message>
       <location/>
@@ -2466,7 +2469,7 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>IP 位址</translation>
+      <translation>IP 位址:</translation>
     </message>
     <message>
       <location/>
@@ -2558,7 +2561,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>身份驗証</translation>
+      <translation>驗證</translation>
     </message>
     <message>
       <location/>
@@ -2568,7 +2571,7 @@
     <message>
       <location/>
       <source>Motion</source>
-      <translation>位移</translation>
+      <translation>位移偵測</translation>
     </message>
     <message>
       <location/>
@@ -2633,7 +2636,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入帳號</translation>
+      <translation>登入</translation>
     </message>
     <message>
       <location/>
@@ -2643,7 +2646,7 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>IP 位址</translation>
+      <translation>IP 位址:</translation>
     </message>
     <message>
       <location/>
@@ -2664,11 +2667,6 @@
       <location/>
       <source>Reset</source>
       <translation>重置</translation>
-    </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
     </message>
     <message>
       <location/>
@@ -2879,7 +2877,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>Login:</source>
-      <translation>登入帳號:</translation>
+      <translation>登入:</translation>
     </message>
     <message>
       <location/>
@@ -3065,11 +3063,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>表格</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>位移偵測</translation>
     </message>
@@ -3088,11 +3081,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>表格</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>取消</translation>
     </message>
@@ -3101,11 +3089,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>表格</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation type="unfinished">Upload Video</translation>
     </message>

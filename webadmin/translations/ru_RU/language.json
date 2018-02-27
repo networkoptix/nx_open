@@ -55,16 +55,16 @@
     "settingsConfig": {
         "arecontRtspEnabled": "RTSP для Arecont Vision включен",
         "auditTrailEnabled": "Аудит включен",
-        "auditTrailPeriodDays": "Audit trail period days",
+        "auditTrailPeriodDays": "Период для аудита (дни)",
         "autoDiscoveryEnabled": "Включить автоматическое обнаружение устройств",
-        "autoUpdateThumbnails": "Auto-update thumbnails",
+        "autoUpdateThumbnails": "Автоматически обновлять эскизы",
         "backupNewCamerasByDefault": "Резервное копирование новых камер по умолчанию",
         "backupQualities": "Качество резервного копирования",
         "cameraSettingsOptimization": "Разрешить оптимизацию настроек устройств",
-        "clientStatisticsSettingsUrl": "Client statistics relative url",
+        "clientStatisticsSettingsUrl": "Относительный url-адрес статистики клиента",
         "cloudAccountName": "Учетная запись владельца облака",
-        "cloudConnectRelayingEnabled": "Enable relaying for cloud connect",
-        "cloudConnectUdpHolePunchingEnabled": "Enable UDP hole punching for cloud connect",
+        "cloudConnectRelayingEnabled": "Включить ретрансляцию для облачного подключения",
+        "cloudConnectUdpHolePunchingEnabled": "Включить туннелирование UDP для облачного подключения",
         "cloudHost": "Облачный узел",
         "cloudSystemID": "Идентификатор облачной системы",
         "disabledVendors": "Отключенные производители камер",
@@ -74,7 +74,7 @@
         "emailFrom": "Email от",
         "emailSignature": "Подпись к письму",
         "emailSupportEmail": "Электронная почта поддержки",
-        "enableEdgeRecording": "Enable edge recording",
+        "enableEdgeRecording": "Включить запись на внутренний носитель (edge)",
         "eventLogPeriodDays": "Event log period (days)",
         "hanwhaDeleteProfilesOnInitIfNeeded": "Delete camera profiles on init if needed",
         "ldapAdminDn": "LDAP Администратор DN",
@@ -102,17 +102,17 @@
         "statisticsAllowed": "Отправлять анонимную статистику использования и отчеты о сбоях",
         "statisticsReportLastNumber": "Статистика - последний номер",
         "statisticsReportLastTime": "Статистика - последний раз",
-        "statisticsReportLastVersion": "Statistics report - last version",
+        "statisticsReportLastVersion": "Статистика - последняя версия",
         "statisticsReportServerApi": "API сервера статистики",
         "statisticsReportTimeCycle": "Интервал статистического отчета",
-        "statisticsReportUpdateDelay": "Statistics report - update delay",
-        "synchronizeTimeWithInternet": "Synchronize time with Internet",
+        "statisticsReportUpdateDelay": "Отчет о статистике - период обновления",
+        "synchronizeTimeWithInternet": "Синхронизировать время с Интернетом",
         "systemName": "Имя системы",
         "takeCameraOwnershipWithoutLock": "Взять управление камерой на себя, не закрывая доступ другим",
         "timeSynchronizationEnabled": "Синхронизация времени включена",
         "updateNotificationsEnabled": "Уведомления об обновлениях включены",
         "upnpPortMappingEnabled": "Сопоставление портов UPNP включено",
-        "useTextEmailFormat": "Send plain-text emails"
+        "useTextEmailFormat": "Отправка писем простым текстом"
     },
     "info": {
         "tabs": {
@@ -176,6 +176,20 @@
         "default": "{{PRODUCT_NAME}} web-интерфейс"
     },
     "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pause",
+            "help": "help | show commands",
+            "collapse all servers": "collapse all servers",
+            "collapse server": "collapse server + [server name]",
+            "play": "play",
+            "clear search": "clear search",
+            "live": "go to live | show me live",
+            "expand all servers": "expand all servers",
+            "stop listening": "stop listening",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
         "systemOffline": "Система не в сети",
         "cameraLinks": {
             "copyToClipboard": "копировать в буфер",
@@ -186,9 +200,9 @@
             "transcoding": "Перекодирование",
             "copyActiveText": "скопировано в буфер обмена"
         },
-        "searchCamPlaceholder": "поиск",
+        "searchCamPlaceholder": "Search",
         "cameraStates": {
-            "noFormat": "Этот браузер или устройство не поддерживает воспроизведение видео с этой камеры.",
+            "noFormat": "This browser does not support video playback from this camera.",
             "ieWin10": "Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
             "iosVideoTooLarge": "iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
             "unauthorized": "Требуется аутентификация",
@@ -199,7 +213,13 @@
             "error": "Ошибка",
             "offline": "Не в сети",
             "noData": "Нет данных",
-            "flashRequired": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> для воспроизведения видео с серверов на базе ARM."
+            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+        },
+        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "resolution": {
+            "high": "High",
+            "auto": "Auto",
+            "low": "Low"
         }
     }
 }

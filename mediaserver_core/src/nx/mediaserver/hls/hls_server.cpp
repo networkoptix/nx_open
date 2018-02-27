@@ -39,6 +39,8 @@
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_listener.h>
 #include <media_server/media_server_module.h>
+#include <rest/server/json_rest_result.h>
+#include <nx/fusion/serialization_format.h>
 
 //TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
@@ -98,19 +100,30 @@ HttpLiveStreamingProcessor::~HttpLiveStreamingProcessor()
 
 void HttpLiveStreamingProcessor::processRequest(const nx::network::http::Request& request)
 {
+        Q_D(QnTCPConnectionProcessor);
+
     nx::network::http::Response response;
     response.statusLine.version = request.requestLine.version;
 
-    response.statusLine.statusCode = getRequestedFile(request, &response);
+        QnJsonRestResult error;
+        response.statusLine.statusCode = getRequestedFile(request, &response, &error);
     if (response.statusLine.statusCode == nx::network::http::StatusCode::forbidden)
     {
         sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
         m_state = sDone;
         return;
     }
+    else if (error.error != QnJsonRestResult::NoError)
+    {
+        d->response.messageBody = QJson::serialized(error);
+        base_type::sendResponse(
+            nx::network::http::StatusCode::ok,
+            Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::JsonFormat));
+        m_state = sDone;
+        return;
+    }
 
     prepareResponse(request, &response);
-
     sendResponse(response);
 }
 
@@ -235,7 +248,8 @@ namespace {
 
 nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFile(
     const nx::network::http::Request& request,
-    nx::network::http::Response* const response )
+    nx::network::http::Response* const response,
+    QnJsonRestResult* error)
 {
     //retreiving requested file name
     const QString& path = request.requestLine.url.path();
@@ -332,7 +346,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
             d_ptr->accessRights,
             camera,
             requestParams,
-            response );
+                response,
+                error);
     }
     else
     {
@@ -438,7 +453,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
     const Qn::UserAccessData& accessRights,
     const QnVideoCameraPtr& videoCamera,
     const std::multimap<QString, QString>& requestParams,
-    nx::network::http::Response* const response)
+    nx::network::http::Response* const response,
+    QnJsonRestResult* error)
 {
     std::multimap<QString, QString>::const_iterator chunkedParamIter = requestParams.find(StreamingParams::CHUNKED_PARAM_NAME);
 
@@ -496,9 +512,12 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
             camResource,
             videoCamera,
             streamQuality,
-            &session);
-        if (result != nx::network::http::StatusCode::ok)
+            &session,
+            error);
+        if (result != nx::network::http::StatusCode::ok || error->error)
+        {
             return result;
+        }
         if (!SessionPool::instance()->add(session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS))
         {
             NX_ASSERT(false);
@@ -508,7 +527,16 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
     auto requiredPermission = session->isLive()
         ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
     if (!commonModule()->resourceAccessManager()->hasPermission(accessRights, camResource, requiredPermission))
+    {
+        if (commonModule()->resourceAccessManager()->hasPermission(
+                accessRights, camResource, Qn::Permission::ViewLivePermission))
+        {
+            error->errorString = toString(Qn::MediaStreamEvent::ForbiddenBecauseNoLicenseError);
+            error->error = QnRestResult::Forbidden;
+            return nx::network::http::StatusCode::ok;
+        }
         return nx::network::http::StatusCode::forbidden;
+    }
 
     ensureChunkCacheFilledEnoughForPlayback(session, session->streamQuality());
 
@@ -719,7 +747,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
 nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChunk(
     const nx::network::http::Request& request,
     const QStringRef& uniqueResourceID,
-        const QnSecurityCamResourcePtr& cameraResource,
+    const QnSecurityCamResourcePtr& cameraResource,
     const std::multimap<QString, QString>& requestParams,
     nx::network::http::Response* const response )
 {
@@ -879,8 +907,19 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
     const QnSecurityCamResourcePtr& camResource,
     const QnVideoCameraPtr& videoCamera,
     MediaQuality streamQuality,
-    Session** session )
+    Session** session,
+    QnJsonRestResult* error)
 {
+    Qn::MediaStreamEvent mediaStreamEvent = Qn::MediaStreamEvent::NoEvent;
+    if (camResource)
+        mediaStreamEvent = camResource->checkForErrors();
+    if (mediaStreamEvent)
+    {
+        error->errorString = toString(mediaStreamEvent);
+        error->error = QnRestResult::Forbidden;
+        return nx::network::http::StatusCode::ok;
+    }
+
     std::vector<MediaQuality> requiredQualities;
     requiredQualities.reserve( 2 );
     if( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Auto )
@@ -936,8 +975,17 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
                     quality );
             if( !archivePlaylistManager->initialize() )
             {
-                NX_LOG( lit("HttpLiveStreamingProcessor::getPlaylist. Failed to initialize archive playlist for camera %1").
-                    arg(camResource->getUniqueId()), cl_logDEBUG1 );
+                    mediaStreamEvent = archivePlaylistManager->lastError().toMediaStreamEvent();
+                    NX_DEBUG(this,
+                        lm("QnHttpLiveStreamingProcessor::getPlaylist. "
+                           "Failed to initialize archive playlist for camera %1")
+                             .args(camResource->getUniqueId(), toString(mediaStreamEvent)));
+                    if (mediaStreamEvent)
+                    {
+                        error->errorString = toString(mediaStreamEvent);
+                        error->error = QnRestResult::Forbidden;
+                        return nx::network::http::StatusCode::ok;
+                    }
                 return nx::network::http::StatusCode::internalServerError;
             }
 
