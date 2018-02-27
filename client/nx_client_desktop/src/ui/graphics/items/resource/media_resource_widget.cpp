@@ -2158,8 +2158,15 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         return Qn::EmptyOverlay;
     }
 
-    if (d->resource->hasFlags(Qn::local_video) && d->resource->getStatus() == Qn::Offline)
-        return Qn::NoDataOverlay;
+    if (d->resource->hasFlags(Qn::local_video))
+    {
+        if (d->resource->getStatus() == Qn::Offline)
+            return Qn::NoDataOverlay;
+
+        // Handle export from I/O modules.
+        if (!d->hasVideo)
+            return Qn::NoVideoDataOverlay;
+    }
 
     if (options().testFlag(DisplayActivity) && d->display()->isPaused())
     {

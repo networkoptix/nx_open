@@ -102,9 +102,13 @@ QnConstResourceVideoLayoutPtr QnAviResource::getVideoLayout(const QnAbstractStre
 
 bool QnAviResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) const
 {
-    return dataProvider ? dataProvider->hasVideo() : true;
-}
+    if (dataProvider)
+        return dataProvider->hasVideo();
 
+    const QScopedPointer<QnAviArchiveDelegate> archiveDelegate(createArchiveDelegate());
+    archiveDelegate->open(toSharedPointer(this));
+    return archiveDelegate->hasVideo();
+}
 
 QnConstResourceAudioLayoutPtr QnAviResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
