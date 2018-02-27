@@ -149,7 +149,7 @@ def sync_dependencies(syncher):
             sync("any/server-external-" + customWebAdminVersion)
         else:
             if not sync("any/server-external-" + branch, optional=True):
-                sync("any/server-external-" + shortReleaseVersion)
+                sync("any/server-external-" + releaseVersion)
 
         if box in ("tx1", "edge1"):
             sync("openldap")
