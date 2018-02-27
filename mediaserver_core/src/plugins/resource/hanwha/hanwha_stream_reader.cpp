@@ -43,12 +43,7 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     const auto role = getRole();
     QString streamUrlString;
 
-    int profileToOpen = kHanwhaInvalidProfile;
-    if (m_hanwhaResource->isConnectedViaSunapi())
-        profileToOpen = m_hanwhaResource->profileByRole(role);
-    else
-        profileToOpen = chooseNvrChannelProfile(role);
-
+    const auto profileToOpen = m_hanwhaResource->profileByRole(role);
     if (!isCorrectProfile(profileToOpen))
     {
         return CameraDiagnostics::CameraInvalidParams(
@@ -218,30 +213,6 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
 
     m_prevProfileParameters = profileParameters;
     return CameraDiagnostics::NoErrorResult();
-}
-
-int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
-{
-    // Accodring to hawna request for ONVIF:
-    // - Use Recording profile from NVR as a Primary stream.
-    // - Use Live Streaming profile from NVR as a Secondary stream.
-    // See: http://git.wisenetdev.com/HanwhaTechwinAmerica/WAVE/issues/290
-    const auto requiredProfileName = (role == Qn::CR_SecondaryLiveVideo)
-        ? lit("LiveProfile") : lit("RecordProfile");
-
-    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
-    const auto response = helper.view(
-        lit("media/videoprofilepolicy"),
-        {{kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())}});
-
-    for (const auto& profile: response.response())
-    {
-        if (profile.first.endsWith(requiredProfileName))
-            return profile.second.toInt();
-    }
-
-    return kHanwhaInvalidProfile;
 }
 
 bool HanwhaStreamReader::isCorrectProfile(int profileNumber) const
