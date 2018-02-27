@@ -38,8 +38,15 @@
 
                     <div>
                         <h3>Reset server</h3>
-                        <p>Deze actie zal de server herstellen naar default (wissen van de database en het resetten van de configuratie). De server zal gescheiden worden van het huidige systeem. Het video-archief zal in tact blijven.</p>
+                        <p>Met deze actie wordt deze server teruggezet naar de standaardinstellingen (de database en de configuratie worden gewist).
+                            De server zal worden losgemaakt van het huidige systeem. Videoarchief zal intact blijven.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Fabrieksinstellingen herstellen</button></p>
+                    </div>
+                    <div>
+                        <h3>Maak de server los van het systeem</h3>
+                        <p>Met deze actie wordt de server losgekoppeld van de systeemdatabase met behoud van lokale gebruikers en configuratie.
+                            Videoarchief zal intact blijven. <b>Alle cloud gebruikers zullen worden verwijderd.</b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Maak los van het systeem</button></p>
                     </div>
                     <div>
                         <h3>Herstarten</h3>
@@ -47,10 +54,10 @@
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form" >
-                            <h3>Verander het administrator wachtwoord</h3>
-                            <p>Als het systeem lokaal is (niet aangesloten op de cloud) dan zal het wachtwoord voor de  gebruiker "admin" and het herstel (root) wachtwoord gewijzigd worden op de servers..<br>
-                                Anders zal alleen het recovery wachtwoord gewijzigd worden.</p>
+                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
+                            <h3>Wijzig admin wachtwoord</h3>
+                            <p>Als het systeem niet is aangesloten op de cloud dan zal het wachtwoord voor de  gebruiker "admin" and het herstel (root) wachtwoord gewijzigd worden op de servers.<br>
+Anders zal alleen het recovery wachtwoord gewijzigd worden.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>
@@ -114,7 +121,9 @@
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Netwerk apparaatinstellingen</h3>                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings> <button class="btn btn-default" ng-click="saveNetworkSettings()">-Instellingen opslaan en herstarten van het apparaat</button>
+                        <h3>Netwerkinstellingen Apparaat</h3>
+                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Instellingen opslaan en herstart de server</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Datum en tijd</h3>

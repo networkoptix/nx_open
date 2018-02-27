@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Egyéni",
-      "description": "Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
+      "description": "Egyéni engedélyek konfigurálásához használja a {{PRODUCT_NAME}} klienst"
     },
     "cloudAdmin": {
       "label": "Adminisztrátor",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Egyéni",
-      "description": "Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
+      "description": "Egyéni engedélyek konfigurálásához használja a {{PRODUCT_NAME}} klienst"
     }
   },
   "errorCodes": {
@@ -115,8 +115,9 @@
     "cantActivatePrefix": "A fiók aktiválása nem lehetséges",
     "cantSendConfirmationPrefix": "Megerősítő e-mailt nem lehet elküldeni",
     "cloudInvalidResponse": "Felhő DB ismeretlen választ jelzett vissza",
-    "notAuthorized": "Hibás e-mail cím vagy jelszó",
+    "notAuthorized": "Hibás jelszó",
     "wrongParameters": "Néhány paraméter hibás",
+    "brokenAccount": "Váratlan probléma a fiókkal. <a href=\"/restore_password\">Fiók visszaállítása</a>",
     "wrongCode": "A fiók van már aktiválva van, vagy a megerősítési kód hibás",
     "wrongCodeRestore": "Megerősítési kód már használt, vagy hibás",
     "forbidden": "Nincs engedélye erre a műveletre",
@@ -156,7 +157,8 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "Rendszer nem elérhető",
     "offline": "A rendszer offline",
-    "openClient": "Megnyitás {{VMS_NAME}}",
+    "openClient": "Megnyitás {{VMS_NAME}} alkalmazással",
+    "openClientNoSystem": "{{VMS_NAME}} Megnyitása",
     "confirmRenameTitle": "Rendszer neve",
     "confirmRenameAction": "Mentés",
     "successRename": "Rendszer neve mentve",
@@ -203,7 +205,7 @@
       "linux": {
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
       },
       "macos": {
         "label": "Mac OS",

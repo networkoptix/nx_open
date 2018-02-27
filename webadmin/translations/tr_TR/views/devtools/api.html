@@ -21,7 +21,7 @@
                             </div>
 
                             <div ng-repeat="group in apiGroups">
-                                <b>{{group.groupName}} <span ng-if="group.urlPrefix">: {{group.urlPrefix}} / </span></b>
+                                <b>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></b>
                                 <ul>
                                     <li ng-repeat="function in group.functions | orderBy:'name' | filter: {searchLabel:searchFunc}"
                                         ng-if="!function.proprietary || allowProprietary">
@@ -43,7 +43,7 @@
 
                             <div ng-if="!activeFunction">
                                 <div ng-repeat="group in apiGroups">
-                                    <h3>{{group.groupName}} <span ng-if="group.urlPrefix">: {{group.urlPrefix}} / </span></h3>
+                                    <h3>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></h3>
                                     <p>{{group.groupDescription}}</p>
                                     <ul>
                                         <li ng-repeat="function in group.functions | orderBy:'name' | filter: {$:searchFunc}"

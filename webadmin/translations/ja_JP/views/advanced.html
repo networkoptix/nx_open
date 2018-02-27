@@ -106,7 +106,7 @@
             書き込みのための主記憶装置ドライブが選択されていません - ビデオはこのサーバーに記録されません。
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            予約済み領域の容量が空き領域を超えています。現在のビデオ映像は領域確保の為に削除される可能性があります
+            予約済み領域の容量が空き領域を超えています 現在のビデオ映像は、領域を確保する為に削除される可能性があります
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">すべての強調表示されている設定を修正して保存します</div>
 
@@ -169,7 +169,7 @@
 
     <form class="form row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{Config.settingsConfig[setting].label}}</label>
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting]}}</label>
             <div class="col-sm-6">
                 <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
                        style="height: 22px"
@@ -208,7 +208,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>警告 ！</b> いくつかの変更は、再起動を必要とします <b>すべて</b> システム内のサーバー<br><br>
+        <b>警告 ！</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >現在のサーバーを再起動</button>
         </div>

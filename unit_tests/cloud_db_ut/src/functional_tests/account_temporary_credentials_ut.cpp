@@ -30,43 +30,178 @@ class AccountTemporaryCredentials:
     public CdbFunctionalTest
 {
 public:
-    AccountTemporaryCredentials()
+    AccountTemporaryCredentials():
+        m_expirationPeriod(std::chrono::hours(1))
     {
-        init();
     }
 
 protected:
+    void setTemporaryCredentialsExpirationPeriod(
+        std::chrono::seconds expirationPeriod)
+    {
+        m_expirationPeriod = expirationPeriod;
+    }
+
     void allocateAccountTemporaryCredentials()
     {
-        m_account = addActivatedAccount2();
-
         api::TemporaryCredentialsParams params;
-        params.timeouts.expirationPeriod = std::chrono::hours(1);
+        params.timeouts.expirationPeriod = m_expirationPeriod;
+        m_temporaryCredentials.push_back(api::TemporaryCredentials());
         ASSERT_EQ(
             api::ResultCode::ok,
             createTemporaryCredentials(
                 m_account.email,
                 m_account.password,
                 params,
-                &m_temporaryCredentials));
+                &m_temporaryCredentials.back()));
+        ASSERT_EQ(
+            m_expirationPeriod,
+            m_temporaryCredentials.back().timeouts.expirationPeriod);
+    }
+
+    void allocateMultipleTemporaryCredentialsForSingleAccount()
+    {
+        constexpr int credentialsCount = 2;
+        for (int i = 0; i < credentialsCount; ++i)
+            allocateAccountTemporaryCredentials();
+    }
+
+    void changeAccountPassword()
+    {
+        std::string account1NewPassword = m_account.password + "new";
+        api::AccountUpdateData accountUpdateData;
+        accountUpdateData.passwordHa1 = nx_http::calcHa1(
+            m_account.email.c_str(),
+            moduleInfo().realm.c_str(),
+            account1NewPassword.c_str()).constData();
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            updateAccount(m_account.email, m_account.password, accountUpdateData));
+    }
+
+    void waitForTemporaryCredentialsToExpire()
+    {
+        std::this_thread::sleep_for(m_expirationPeriod + std::chrono::seconds(1));
     }
 
     void assertTemporaryCredentialsAreLowCase()
     {
-        for (auto c: m_temporaryCredentials.login)
-            ASSERT_EQ(std::tolower(c), c);
+        for (const auto& credentials: m_temporaryCredentials)
+        {
+            for (auto c: credentials.login)
+                ASSERT_EQ(std::tolower(c), c);
 
-        for (auto c: m_temporaryCredentials.password)
-            ASSERT_EQ(std::tolower(c), c);
+            for (auto c: credentials.password)
+                ASSERT_EQ(std::tolower(c), c);
+        }
+    }
+
+    void assertTemporaryCredentialsCanBeUsedToAuthenticateToVms()
+    {
+        auto cdbConnection = connection(m_system.id, m_system.authKey);
+
+        for (const auto& credentials: m_temporaryCredentials)
+        {
+            api::AuthRequest authRequest;
+            authRequest.nonce = api::generateCloudNonceBase(m_system.id);
+            authRequest.realm = nx::network::AppInfo::realm().toStdString();
+            authRequest.username = credentials.login;
+
+            api::ResultCode resultCode = api::ResultCode::ok;
+            api::AuthResponse authResponse;
+            std::tie(resultCode, authResponse) =
+                makeSyncCall<api::ResultCode, api::AuthResponse>(
+                    std::bind(
+                        &nx::cdb::api::AuthProvider::getAuthenticationResponse,
+                        cdbConnection->authProvider(),
+                        authRequest,
+                        std::placeholders::_1));
+            ASSERT_EQ(api::ResultCode::ok, resultCode);
+            ASSERT_EQ(m_account.email, authResponse.authenticatedAccountData.accountEmail);
+
+            const auto ha1 = nx_http::calcHa1(
+                credentials.login.c_str(),
+                nx::network::AppInfo::realm().toStdString().c_str(),
+                credentials.password.c_str());
+            ASSERT_EQ(
+                nx_http::calcIntermediateResponse(
+                    ha1,
+                    QByteArray::fromStdString(authRequest.nonce)).toStdString(),
+                authResponse.intermediateResponse);
+        }
+    }
+
+    void assertTemporaryCredentialsCannotBeUsedToAuthenticateToVms()
+    {
+        for (const auto& credentials: m_temporaryCredentials)
+        {
+            api::AccountData accountData;
+            ASSERT_EQ(
+                api::ResultCode::notAuthorized,
+                getAccount(
+                    credentials.login,
+                    credentials.password,
+                    &accountData));
+        }
+    }
+
+    void assertTemporaryCredentialsCannotBeUsedPermanentlyToAuthenticateToVms()
+    {
+        for (int i = 0; i < 2; ++i)
+        {
+            if (i == 1)
+            {
+                ASSERT_TRUE(restart());
+            }
+
+            assertTemporaryCredentialsCannotBeUsedToAuthenticateToVms();
+        }
+    }
+
+    void assertAccountNameUpdateIsAllowed()
+    {
+        api::AccountUpdateData accountUpdate;
+        accountUpdate.fullName = m_account.fullName + "new";
+        accountUpdate.customization = m_account.customization + "new";
+
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            updateAccount(
+                m_temporaryCredentials.back().login,
+                m_temporaryCredentials.back().password,
+                accountUpdate));
+    }
+
+    void assertAccountPasswordUpdateIsForbidden()
+    {
+        api::AccountUpdateData accountUpdate;
+        accountUpdate.passwordHa1 = nx_http::calcHa1(
+            m_account.email.c_str(),
+            moduleInfo().realm.c_str(),
+            (nx::utils::generateRandomName(7) + "new").constData()).constData();
+        accountUpdate.fullName = m_account.fullName + "new";
+        accountUpdate.customization = m_account.customization + "new";
+
+        ASSERT_EQ(
+            api::ResultCode::forbidden,
+            updateAccount(
+                m_temporaryCredentials.back().login,
+                m_temporaryCredentials.back().password,
+                accountUpdate));
     }
 
 private:
     AccountWithPassword m_account;
-    api::TemporaryCredentials m_temporaryCredentials;
+    std::vector<api::TemporaryCredentials> m_temporaryCredentials;
+    api::SystemData m_system;
+    std::chrono::seconds m_expirationPeriod;
 
-    void init()
+    virtual void SetUp() override
     {
         ASSERT_TRUE(startAndWaitUntilStarted());
+
+        m_account = addActivatedAccount2();
+        m_system = addRandomSystemToAccount(m_account);
     }
 };
 
@@ -131,146 +266,49 @@ TEST_F(AccountTemporaryCredentials, verify_temporary_credentials_are_accepted_by
             ASSERT_EQ(api::ResultCode::ok, result);
             ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
         }
-
-        //checking that account update is forbidden
-        std::string account1NewPassword = account1Password + "new";
-        api::AccountUpdateData update;
-        update.passwordHa1 = nx_http::calcHa1(
-            account1.email.c_str(),
-            moduleInfo().realm.c_str(),
-            account1NewPassword.c_str()).constData();
-        update.fullName = account1.fullName + "new";
-        update.customization = account1.customization + "new";
-
-        result = updateAccount(
-            temporaryCredentials.login,
-            temporaryCredentials.password,
-            update);
-        ASSERT_EQ(result, api::ResultCode::forbidden);
     }
+}
+
+TEST_F(AccountTemporaryCredentials, can_be_used_to_update_account)
+{
+    allocateAccountTemporaryCredentials();
+    assertAccountNameUpdateIsAllowed();
+}
+
+TEST_F(AccountTemporaryCredentials, cannot_be_used_to_change_password)
+{
+    allocateAccountTemporaryCredentials();
+    assertAccountPasswordUpdateIsForbidden();
 }
 
 TEST_F(AccountTemporaryCredentials, temporary_credentials_expiration)
 {
-    constexpr const auto expirationPeriod = std::chrono::seconds(5);
+    setTemporaryCredentialsExpirationPeriod(std::chrono::seconds(1));
 
-    api::AccountData account1;
-    std::string account1Password;
-    api::ResultCode result = addActivatedAccount(&account1, &account1Password);
-    ASSERT_EQ(result, api::ResultCode::ok);
-
-    api::TemporaryCredentialsParams params;
-    params.timeouts.expirationPeriod = expirationPeriod;
-    api::TemporaryCredentials temporaryCredentials;
-    result = createTemporaryCredentials(
-        account1.email,
-        account1Password,
-        params,
-        &temporaryCredentials);
-    ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(
-        expirationPeriod,
-        temporaryCredentials.timeouts.expirationPeriod);
-
-    result = getAccount(
-        temporaryCredentials.login,
-        temporaryCredentials.password,
-        &account1);
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    std::this_thread::sleep_for(expirationPeriod);
-
-    for (int i = 0; i < 2; ++i)
-    {
-        if (i == 1)
-        {
-            ASSERT_TRUE(restart());
-        }
-
-        result = getAccount(
-            temporaryCredentials.login,
-            temporaryCredentials.password,
-            &account1);
-        ASSERT_EQ(api::ResultCode::notAuthorized, result);
-    }
+    allocateAccountTemporaryCredentials();
+    waitForTemporaryCredentialsToExpire();
+    assertTemporaryCredentialsCannotBeUsedPermanentlyToAuthenticateToVms();
 }
 
 TEST_F(AccountTemporaryCredentials, temporary_credentials_login_to_system)
 {
-    constexpr const auto expirationPeriod = std::chrono::seconds(50);
+    allocateAccountTemporaryCredentials();
+    assertTemporaryCredentialsCanBeUsedToAuthenticateToVms();
+}
 
-    const auto account = addActivatedAccount2();
-    const auto system = addRandomSystemToAccount(account);
-
-    api::TemporaryCredentialsParams params;
-    params.timeouts.expirationPeriod = expirationPeriod;
-    api::TemporaryCredentials temporaryCredentials;
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        createTemporaryCredentials(
-            account.email,
-            account.password,
-            params,
-            &temporaryCredentials));
-
-    auto cdbConnection = connection(system.id, system.authKey);
-
-    api::AuthRequest authRequest;
-    authRequest.nonce = api::generateCloudNonceBase(system.id);
-    authRequest.realm = nx::network::AppInfo::realm().toStdString();
-    authRequest.username = temporaryCredentials.login;
-
-    api::ResultCode resultCode = api::ResultCode::ok;
-    api::AuthResponse authResponse;
-    std::tie(resultCode, authResponse) =
-        makeSyncCall<api::ResultCode, api::AuthResponse>(
-            std::bind(
-                &nx::cdb::api::AuthProvider::getAuthenticationResponse,
-                cdbConnection->authProvider(),
-                authRequest,
-                std::placeholders::_1));
-    ASSERT_EQ(api::ResultCode::ok, resultCode);
-    ASSERT_EQ(account.email, authResponse.authenticatedAccountData.accountEmail);
+TEST_F(
+    AccountTemporaryCredentials,
+    multiple_temporary_credentials_can_be_used_simultaneously_to_login_to_system)
+{
+    allocateMultipleTemporaryCredentialsForSingleAccount();
+    assertTemporaryCredentialsCanBeUsedToAuthenticateToVms();
 }
 
 TEST_F(AccountTemporaryCredentials, temporary_credentials_removed_on_password_change)
 {
-    constexpr const auto expirationPeriod = std::chrono::seconds(50);
-
-    auto account = addActivatedAccount2();
-    const auto system = addRandomSystemToAccount(account);
-
-    api::TemporaryCredentialsParams params;
-    params.timeouts.expirationPeriod = expirationPeriod;
-    api::TemporaryCredentials temporaryCredentials;
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        createTemporaryCredentials(
-            account.email,
-            account.password,
-            params,
-            &temporaryCredentials));
-
-    std::string account1NewPassword = account.password + "new";
-    api::AccountUpdateData accountUpdateData;
-    accountUpdateData.passwordHa1 = nx_http::calcHa1(
-        account.email.c_str(),
-        moduleInfo().realm.c_str(),
-        account1NewPassword.c_str()).constData();
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        updateAccount(account.email, account.password, accountUpdateData));
-
-    for (int i = 0; i < 2; ++i)
-    {
-        if (i == 1)
-            restart();
-
-        api::AccountData accountData;
-        ASSERT_EQ(
-            api::ResultCode::notAuthorized,
-            getAccount(temporaryCredentials.login, temporaryCredentials.password, &accountData));
-    }
+    allocateAccountTemporaryCredentials();
+    changeAccountPassword();
+    assertTemporaryCredentialsCannotBeUsedPermanentlyToAuthenticateToVms();
 }
 
 TEST_F(AccountTemporaryCredentials, temporary_credentials_are_low_case)

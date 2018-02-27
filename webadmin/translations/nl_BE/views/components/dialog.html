@@ -1,6 +1,6 @@
 
 <div class="modal-header" ng-if="settings.title">
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="close()" ng-if="settings.closable"><span aria-hidden="true">&times;</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="close()" ng-if="settings.closable"><span aria-hidden="true">&keer;</span></button>
     <h4 class="modal-title">{{settings.title}}</h4>
 </div>
 <div class="modal-body" ng-if="settings.content || settings.needOldPassword || settings.createLoginAndPassword">
@@ -10,7 +10,7 @@
         <form class="master-controls" name="forms.localForm" novalidate disable-autocomplete>
             <div class="form-group" validate-field>
                 <input ng-model="settings.localLogin" name="localLogin" class="form-control"
-                       type="text" placeholder="Login" required readonly>
+                       type="text" placeholder="Gebruikersnaam" required readonly>
             </div>
             <password-input ng-model="settings.localPassword"></password-input>
             <div class="form-group" validate-field ng-class="{'has-error':forms.localForm.passwordInput.$valid &&

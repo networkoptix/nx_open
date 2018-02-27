@@ -573,6 +573,7 @@ table.webclient-window>tbody>tr>td{
 /* Voice controls */
 .voice-panel{
   max-width: 200px;
+  z-index: 3;
 }
 .no-wrap{
   white-space: nowrap;

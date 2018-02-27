@@ -332,7 +332,7 @@ TEST_F(Account, bad_registration)
     QObject::connect(
         client.get(), &nx_http::AsyncHttpClient::done,
         client.get(),
-        [&donePromise](nx_http::AsyncHttpClientPtr /*client*/) { donePromise.set_value(); }, 
+        [&donePromise](nx_http::AsyncHttpClientPtr /*client*/) { donePromise.set_value(); },
         Qt::DirectConnection);
     client->doPost(url, "application/json", QJson::serialized(account1));
 
@@ -429,7 +429,7 @@ TEST_F(Account, update)
     ASSERT_EQ(
         api::ResultCode::ok,
         updateAccount(account1.email, account1.password, update));
-    
+
     account1.password = account1NewPassword;
     account1.fullName = update.fullName.get();
     account1.customization = update.customization.get();
@@ -879,12 +879,12 @@ protected:
 
     void givenNotActivatedAccount()
     {
-        m_registrationTimeRange.first = 
+        m_registrationTimeRange.first =
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
         auto result = addAccount(&m_account, &m_account.password, &m_activationCode);
         ASSERT_EQ(api::ResultCode::ok, result);
         ASSERT_TRUE(!m_activationCode.code.empty());
-        m_registrationTimeRange.second = 
+        m_registrationTimeRange.second =
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
     }
 
@@ -893,14 +893,14 @@ protected:
         m_timeShift.applyRelativeShift(kTimeShift);
     }
 
-    void whenActivatedAccount()
+    void whenActivateAccount()
     {
-        m_activationTimeRange.first = 
+        m_activationTimeRange.first =
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
         std::string accountEmail;
         auto result = activateAccount(m_activationCode, &accountEmail);
         ASSERT_EQ(api::ResultCode::ok, result);
-        m_activationTimeRange.second = 
+        m_activationTimeRange.second =
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
     }
 
@@ -933,7 +933,7 @@ protected:
             nx::utils::floor<milliseconds>(account.registrationTime),
             nx::utils::floor<milliseconds>(m_registrationTimeRange.second));
     }
-    
+
     void assertActivationTimestampIsCorrect()
     {
         using namespace std::chrono;
@@ -956,6 +956,16 @@ protected:
     const AccountWithPassword& account() const
     {
         return m_account;
+    }
+
+    AccountWithPassword& account()
+    {
+        return m_account;
+    }
+
+    api::AccountConfirmationCode lastActivationCode() const
+    {
+        return m_activationCode;
     }
 
 private:
@@ -986,7 +996,7 @@ TEST_F(AccountNewTest, account_timestamps)
 
     whenShiftedSystemTime();
 
-    whenActivatedAccount();
+    whenActivateAccount();
 
     assertRegistrationTimestampIsCorrect();
     assertActivationTimestampIsCorrect();
@@ -1010,18 +1020,170 @@ TEST_F(AccountNewTest, proper_error_code_is_reported_when_using_not_activated_ac
 
 //-------------------------------------------------------------------------------------------------
 
+class AccountActivation:
+    public AccountNewTest
+{
+    using base_type = AccountNewTest;
+
+protected:
+    void whenUpdateAccountUsingActivationCode()
+    {
+        const auto codeParts = QByteArray::fromBase64(
+            lastActivationCode().code.c_str()).split(':');
+        ASSERT_EQ(2, codeParts.size());
+
+        api::AccountUpdateData update;
+        const std::string password = nx::utils::generateRandomName(7).toStdString();
+        update.fullName = nx::utils::generateRandomName(7).toStdString();
+        update.passwordHa1 = nx_http::calcHa1(
+            codeParts[1].toStdString().c_str(),
+            nx::network::AppInfo::realm().toStdString().c_str(),
+            password.c_str()).toStdString();
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            updateAccount(codeParts[1].toStdString(), codeParts[0].toStdString(), update));
+
+        account().password = password;
+    }
+
+    void assertActivationCodeContainsEmail()
+    {
+        const auto codeParts = QByteArray::fromBase64(
+            lastActivationCode().code.c_str()).split(':');
+        ASSERT_EQ(2, codeParts.size());
+
+        ASSERT_EQ(account().email, codeParts[1].toStdString());
+    }
+
+    void thenAccountIsActivated()
+    {
+        api::AccountData accountData;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getAccount(account().email, account().password, &accountData));
+        ASSERT_EQ(api::AccountStatus::activated, accountData.statusCode);
+    }
+};
+
+TEST_F(
+    AccountActivation,
+    activation_code_contains_account_email)
+{
+    givenNotActivatedAccount();
+    assertActivationCodeContainsEmail();
+}
+
+TEST_F(
+    AccountActivation,
+    activation_code_can_be_used_to_activate_account_with_update_account_call)
+{
+    givenNotActivatedAccount();
+    whenUpdateAccountUsingActivationCode();
+    thenAccountIsActivated();
+}
+
+//-------------------------------------------------------------------------------------------------
+
 class AccountInvite:
     public AccountNewTest
 {
     using base_type = AccountNewTest;
 
 public:
+    AccountInvite():
+        m_timeShift(nx::utils::test::ClockType::system)
+    {
+    }
+
     ~AccountInvite()
     {
         EMailManagerFactory::setFactory(std::move(m_emailManagerFactoryBak));
     }
 
 protected:
+    void whenInvitedSameNotRegisteredUserToMultipleSystems()
+    {
+        for (auto& system: m_systems)
+        {
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                shareSystem(account(), system.id,
+                    m_newAccountEmail, api::SystemAccessRole::cloudAdmin));
+        }
+    }
+
+    void inviteUser()
+    {
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            shareSystem(account(), m_systems.front().id,
+                m_newAccountEmail, api::SystemAccessRole::cloudAdmin));
+    }
+
+    void waitForInviteLinkToExpire()
+    {
+        // TODO: Replace with corresponding setting value (probably, doubled).
+        m_timeShift.applyAbsoluteShift(std::chrono::hours(24) * 7);
+    }
+
+    void removeUserFromSystem()
+    {
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            removeSystemSharing(
+                account().email,
+                account().password,
+                m_systems.front().id,
+                m_newAccountEmail));
+    }
+
+    void thenSameInviteCodeHasBeenDelivered()
+    {
+        ASSERT_EQ(m_systems.size(), m_inviteNotifications.size());
+        std::set<std::string> inviteCodes;
+        for (const auto& notification: m_inviteNotifications)
+        {
+            inviteCodes.insert(notification.message.code);
+            ASSERT_EQ(1U, inviteCodes.size());
+        }
+    }
+
+    void assertInviteCodeContainsEmail()
+    {
+        const auto codeParts = QByteArray::fromBase64(
+            m_inviteNotifications.back().message.code.c_str()).split(':');
+        ASSERT_EQ(2, codeParts.size());
+
+        ASSERT_EQ(m_newAccountEmail, codeParts[1].toStdString());
+    }
+
+    void assertAccountCanBeActivatedUsingLatestInviteLink()
+    {
+        const auto codeParts = QByteArray::fromBase64(
+            m_inviteNotifications.back().message.code.c_str()).split(':');
+
+        api::AccountUpdateData update;
+        const std::string password = nx::utils::generateRandomName(7).toStdString();
+        update.passwordHa1 = nx_http::calcHa1(
+            m_newAccountEmail.c_str(),
+            nx::network::AppInfo::realm().toStdString().c_str(),
+            password.c_str()).toStdString();
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            updateAccount(
+                codeParts[1].toStdString(),
+                codeParts[0].toStdString(),
+                update));
+    }
+
+private:
+    TestEmailManager m_emailManager;
+    std::string m_newAccountEmail;
+    std::vector<api::SystemData> m_systems;
+    EMailManagerFactory::FactoryFunc m_emailManagerFactoryBak;
+    std::vector<InviteUserNotification> m_inviteNotifications;
+    nx::utils::test::ScopedTimeShift m_timeShift;
+
     virtual void SetUp() override
     {
         using namespace std::placeholders;
@@ -1042,54 +1204,43 @@ protected:
         m_newAccountEmail = BusinessDataGenerator::generateRandomEmailAddress();
 
         givenNotActivatedAccount();
-        whenActivatedAccount();
+        whenActivateAccount();
 
         m_systems.resize(kSystemCount);
-        for (auto& system : m_systems)
+        for (auto& system: m_systems)
             system = addRandomSystemToAccount(account());
     }
 
-    void whenInvitedSameNotRegisteredUserToMultipleSystems()
-    {
-        for (auto& system: m_systems)
-        {
-            ASSERT_EQ(
-                api::ResultCode::ok,
-                shareSystem(account(), system.id, m_newAccountEmail, api::SystemAccessRole::cloudAdmin));
-        }
-    }
-
-    void thenSameInviteCodeHasBeenDelivered()
-    {
-        ASSERT_EQ(m_systems.size(), m_inviteNotifications.size());
-        std::set<std::string> inviteCodes;
-        for (const auto& notification: m_inviteNotifications)
-        {
-            inviteCodes.insert(notification.message.code);
-            ASSERT_EQ(1U, inviteCodes.size());
-        }
-    }
-
-private:
-    TestEmailManager m_emailManager;
-    std::string m_newAccountEmail;
-    std::vector<api::SystemData> m_systems;
-    EMailManagerFactory::FactoryFunc m_emailManagerFactoryBak;
-    std::vector<InviteUserNotification> m_inviteNotifications;
-
     void notificationReceived(const nx::cdb::AbstractNotification& notification)
     {
-        const auto inviteNotification = 
+        const auto inviteNotification =
             dynamic_cast<const InviteUserNotification*>(&notification);
         if (inviteNotification)
             m_inviteNotifications.push_back(*inviteNotification);
     }
 };
 
+TEST_F(AccountInvite, invite_code_contains_email)
+{
+    inviteUser();
+    assertInviteCodeContainsEmail();
+}
+
 TEST_F(AccountInvite, invite_code_from_multiple_systems_match)
 {
     whenInvitedSameNotRegisteredUserToMultipleSystems();
     thenSameInviteCodeHasBeenDelivered();
+}
+
+TEST_F(AccountInvite, repeated_invite_after_last_invite_link_expiration)
+{
+    inviteUser();
+    waitForInviteLinkToExpire();
+    removeUserFromSystem();
+
+    inviteUser();
+
+    assertAccountCanBeActivatedUsingLatestInviteLink();
 }
 
 } // namespace test

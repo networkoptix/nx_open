@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Tài khoản được tạo. <br> Thông báo xác nhận được gửi đến <br> {{account.email}}
+        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -35,7 +35,7 @@
  name="lastName" autocomplete="off">
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Tên là bắt buộc.</span>
+                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Họ là bắt buộc.</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -49,7 +49,11 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required"> Email là bắt buộc. </span> <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email"> Vui lòng nhập một Email hợp lệ. </span> <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists"> Email này đã được đăng ký trong {{PRODUCT_NAME}}. </span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required.</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please, enter a valid Email.</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in {{PRODUCT_NAME}}.</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
@@ -66,7 +70,10 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <small class="conditions-note"> Bằng cách nhấp vào "Tạo Tài khoản", bạn đồng ý <br> đến <a href="/content/eula" target="_blank"> Điều khoản và Điều kiện </a></small>
+                <div class="small conditions-note">
+                    By clicking "Create Account", you agree to
+                    <div><a href="/content/eula" target="_blank">Terms and Conditions</a></div>
+                </div>
             </div>
         </div>
     </form>

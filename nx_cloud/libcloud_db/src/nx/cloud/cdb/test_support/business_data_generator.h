@@ -15,7 +15,11 @@ class BusinessDataGenerator
 public:
     static std::string generateRandomEmailAddress();
 
-    static AccountWithPassword generateRandomAccount();
+    /**
+     * @param email If empty, then random email address is generated.
+     */
+    static AccountWithPassword generateRandomAccount(
+        std::string email = std::string());
 
     static data::SystemData generateRandomSystem(const api::AccountData& account);
 

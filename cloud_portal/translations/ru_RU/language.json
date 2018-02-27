@@ -9,7 +9,7 @@
     "loginButton": "Войти",
     "logoutAuthorisedTitle": "Вы уже выполнили вход",
     "logoutAuthorisedContinueButton": "Продолжить",
-    "logoutAuthorisedLogoutButton": "Выйти"
+    "logoutAuthorisedLogoutButton": "Выход"
   },
   "pageTitles": {
     "template": "{{title}} {{PRODUCT_NAME}}",
@@ -53,15 +53,15 @@
     },
     "Viewer": {
       "label": "Видео с камер и архив",
-      "description": "Может смотреть видео в реальном времени и архив"
+      "description": "Может смотреть живое видео и архив"
     },
     "Live Viewer": {
-      "label": "Только видео в реальном времени",
-      "description": "Может смотреть только видео в реальном времени"
+      "label": "Только видео с камер",
+      "description": "Может смотреть только живое видео"
     },
     "Advanced Viewer": {
       "label": "Просмотр и настройка",
-      "description": "Может смотреть видео в реальном времени, архив, изменять настройки камер, управлять PTZ и т. д"
+      "description": "Может смотреть живое видео, архив, изменять настройки камер, управлять PTZ и т. д"
     },
     "Administrator": {
       "label": "Администратор",
@@ -88,12 +88,12 @@
       "description": "Может смотреть живое видео и архив"
     },
     "liveViewer": {
-      "label": "Только видео в реальном времени",
-      "description": "Может смотреть только видео в реальном времени"
+      "label": "Только видео с камер",
+      "description": "Может смотреть только живое видео"
     },
     "advancedViewer": {
       "label": "Просмотр и настройка",
-      "description": "Может смотреть видео в реальном времени, архив, изменять настройки камер, управлять PTZ и т. д"
+      "description": "Может смотреть живое видео, архив, изменять настройки камер, управлять PTZ и т. д"
     },
     "custom": {
       "label": "Особые",
@@ -101,7 +101,7 @@
     }
   },
   "errorCodes": {
-    "ok": "ok",
+    "ok": "ок",
     "cantSendActivationPrefix": "Не удается отправить подтверждение по Email",
     "cantDisconnectSystemPrefix": "Не удается удалить систему",
     "cantUnshareWithMeSystemPrefix": "Не удается удалить систему",
@@ -115,8 +115,9 @@
     "cantActivatePrefix": "Не удается активировать вашу учетную запись",
     "cantSendConfirmationPrefix": "Не удается отправить подтверждение по Email",
     "cloudInvalidResponse": "Облачная БД вернула неожиданный ответ",
-    "notAuthorized": "Неверный Email / пароль",
+    "notAuthorized": "Неправильный пароль",
     "wrongParameters": "Некоторые параметры в форме неверны",
+    "brokenAccount": "Неожиданная проблема с учетной записью. <a href=\"/restore_password\">Восстановить учетную запись</a>",
     "wrongCode": "Учетная запись уже активирована или неверный код подтверждения",
     "wrongCodeRestore": "Код подтверждения уже используется или неверен",
     "forbidden": "Отсутствуют полномочия на выполнение этого действия",
@@ -157,6 +158,7 @@
     "unavailable": "Система недоступна",
     "offline": "Система не в сети",
     "openClient": "Открыть в {{VMS_NAME}}",
+    "openClientNoSystem": "Открыть {{VMS_NAME}}",
     "confirmRenameTitle": "Имя системы",
     "confirmRenameAction": "Сохранить",
     "successRename": "Имя системы сохранено",

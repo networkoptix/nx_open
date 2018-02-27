@@ -1,7 +1,7 @@
 {
-  "language_name": "简体中文",
+  "language_name": "LANGUAGE_NAME",
   "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}",
   "dialogs": {
     "okButton": "确定",
     "cancelButton": "取消",
@@ -12,7 +12,7 @@
     "logoutAuthorisedLogoutButton": "退出登录"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
+    "template": "{{title}}{{PRODUCT_NAME}}",
     "default": "{{PRODUCT_NAME}}",
     "registerSuccess": "欢迎来到",
     "register": "创建帐户中",
@@ -115,8 +115,9 @@
     "cantActivatePrefix": "无法激活您的帐户",
     "cantSendConfirmationPrefix": "不能发送确认电子邮件",
     "cloudInvalidResponse": "云 DB 返回了意外的响应",
-    "notAuthorized": "错误的邮箱或密码",
+    "notAuthorized": "错误的密码。",
     "wrongParameters": "窗体上的一些参数不正确",
+    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "已经激活帐户或确认码不正确",
     "wrongCodeRestore": "确认代码已使用或不正确",
     "forbidden": "您没有权限执行此操作",
@@ -157,6 +158,7 @@
     "unavailable": "系统无法访问",
     "offline": "系统处于离线状态",
     "openClient": "在 {{VMS_NAME}} 中打开",
+    "openClientNoSystem": "打开 {{VMS_NAME}}",
     "confirmRenameTitle": "系统名称",
     "confirmRenameAction": "保存",
     "successRename": "保存的系统名称",

@@ -17,7 +17,7 @@
     "registerSuccess": "Bienvenido a",
     "register": "Crear cuenta en",
     "changePassword": "Cambiar contraseña -",
-    "account": "Configuración de cuenta",
+    "account": "Ajustes de cuenta",
     "systems": "Sistemas -",
     "system": "Sistema -",
     "systemShare": "Compartir Sistema -",
@@ -84,7 +84,7 @@
       "description": "Acceso sin restricciones, incluyendo la capacidad para compartir y conectar/desconectar el sistema de la nube"
     },
     "viewer": {
-      "label": "Observador",
+      "label": "Espectador",
       "description": "Puede ver video en vivo y ver el archivo"
     },
     "liveViewer": {
@@ -92,8 +92,8 @@
       "description": "Sólo puede ver vídeo en vivo"
     },
     "advancedViewer": {
-      "label": "Observador avanzado",
-      "description": "Puede ver el vídeo vivo, ver el archivo, configurar cámaras, controlar PTZ etc"
+      "label": "Visor avanzado",
+      "description": "Puede ver el vídeo vivo, hojear el archivo, configurar cámaras, controlar PTZ etc"
     },
     "custom": {
       "label": "Personalizado",
@@ -107,20 +107,21 @@
     "cantUnshareWithMeSystemPrefix": "No se puede eliminar el sistema",
     "cantSharePrefix": "No se puede compartir el sistema",
     "cantGetUsersListPrefix": "Lista de usuarios no está disponible",
-    "cantGetSystemsListPrefix": "La lista de Sistemas no está disponible",
-    "cantRegisterPrefix": "Un error ha ocurrido",
-    "cantGetSystemInfoPrefix": "La información del sistema no esta disponible",
+    "cantGetSystemsListPrefix": "Lista de Systemas no está disponible",
+    "cantRegisterPrefix": "Error a ocurrido",
+    "cantGetSystemInfoPrefix": "La información del sistema es no disponible",
     "cantChangeAccountPrefix": "No puede guardar los cambios",
     "cantChangePasswordPrefix": "No se puede guardar la contraseña",
     "cantActivatePrefix": "No puede activar su cuenta",
     "cantSendConfirmationPrefix": "No se puede enviar el correo electrónico de confirmación",
-    "cloudInvalidResponse": "El BD de la Nube ha devuelto una respuesta inesperada",
-    "notAuthorized": "El correo electrónico o la contraseña esta incorrecta",
+    "cloudInvalidResponse": "Cloud DB ha devuelto una respuesta inesperada",
+    "notAuthorized": "Contraseña incorrecta",
     "wrongParameters": "Algunos parámetros en el formulario son incorrectos",
-    "wrongCode": "Ya está activada la cuenta o el código de confirmación es incorrecto",
-    "wrongCodeRestore": "El código de confirmación ya ha sido utlizado o está incorrecto",
+    "brokenAccount": "Problema inesperado con cuenta. <a href=\"/restore_password\"> restaurar cuenta</a>",
+    "wrongCode": "Ya está activada la cuenta o código de confirmación es incorrecto",
+    "wrongCodeRestore": "Código de confirmación ya sea usado o está incorrecta",
     "forbidden": "No tiene permisos para realizar esta acción",
-    "accountNotActivated": "Esta cuenta no ha sido activada. <a href=\"/activate\"> Enviar enlace de activación de nuevo</a>",
+    "accountNotActivated": "Esta cuenta aún no es activada. <a href=\"/activate\"> Envíe enlace de activación de nuevo</a>",
     "accountBlocked": "Esta cuenta está bloqueada",
     "notFound": "No se ha encontrado",
     "alreadyExists": "Esta cuenta ya existe",
@@ -132,7 +133,7 @@
     "passwordMismatch": "Contraseña incorrecta",
     "cantEditYourself": "Cambiar permisos propios no está permitido",
     "cantEditAdmin": "Este usuario tiene permisos de administrador",
-    "cantOpenClient": "{{VMS_NAME}} aplicación no ha sido detectada.<a href=\"/download\">Descargar</a>",
+    "cantOpenClient": "{{VMS_NAME}} aplicación no es detectada.<a href=\"/download\">Descargar</a>",
     "lostConnection": "Conexión al {{systemName}} se ha perdido",
     "thisSystem": "el sistema"
   },
@@ -141,13 +142,13 @@
     "requiredMessage": "Utilice sólo letras, números y símbolos de teclado, evite los espacios iniciales y finales",
     "weakMessage": "Uso de números, letras mayúsculas y minúsculas y caracteres especiales para hacer su contraseña más fuerte",
     "strongMessage": "¡Contraseña segura!",
-    "commonMessage": "Esta contraseña se encuentra entre los más populares en el mundo"
+    "commonMessage": "Esta contraseña se encuentra en la parte superior más populares de contraseñas en el mundo"
   },
   "sharing": {
-    "confirmOwner": "Si se cambia el dueño del sistema, revocará la titularidad de esta cuenta. Esta acción es irreversible. ¿Está seguro?",
+    "confirmOwner": "Si se cambia el propietario del sistema, podrá revocar la titularidad de la cuenta corriente. Esta acción es irreversible. ¿Está seguro?",
     "shareTitle": "Compartir",
     "shareConfirmButton": "Compartir",
-    "editShareTitle": "Editar permisos",
+    "editShareTitle": "Corrija permisos",
     "editShareConfirmButton": "Guardar",
     "permissionsSaved": "Nuevos permisos guardados"
   },
@@ -157,12 +158,13 @@
     "unavailable": "El sistema es inalcanzable",
     "offline": "Sistema está desconectado",
     "openClient": "Abierto en {{VMS_NAME}}",
+    "openClientNoSystem": "Abrir {{VMS_NAME}}",
     "confirmRenameTitle": "Nombre del sistema",
     "confirmRenameAction": "Guardar",
     "successRename": "Nombre del sistema guardado",
     "confirmDisconnectTitle": "Desconectar el sistema de {{PRODUCT_NAME}}?",
     "confirmDisconnectAction": "Desconectar",
-    "confirmUnshareFromMe": "Está a punto de desconectar este sistema de su cuenta. Usted no podrá acceder a este sistema. ¿Está seguro?",
+    "confirmUnshareFromMe": "Está a punto de desconectar este sistema de su cuenta. Usted no podrá acceder a este sistema ya. ¿Está seguro?",
     "confirmUnshareFromMeTitle": "Desconectar el Sistema?",
     "confirmUnshareFromMeAction": "Desconectar",
     "confirmUnshare": "Este usuario no podrá acceder el sistema. ¿Está seguro?",

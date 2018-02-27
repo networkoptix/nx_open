@@ -1,5 +1,11 @@
 #include "temporary_account_password_manager.h"
 
+#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#include <zlib.h>
+#else
+#include <QtZlib/zlib.h>
+#endif
+
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -10,6 +16,7 @@
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/fusion/serialization/sql.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/utils/crc32.h>
 #include <nx/utils/cryptographic_random_device.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
@@ -30,9 +37,11 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
     const conf::Settings& settings,
+    const nx::utils::stree::ResourceNameSet& attrNameset,
     nx::utils::db::AsyncSqlQueryExecutor* const dbManager) noexcept(false)
 :
     m_settings(settings),
+    m_attrNameset(attrNameset),
     m_dbManager(dbManager)
 {
     if (fillCache() != nx::utils::db::DBResult::ok)
@@ -48,7 +57,7 @@ TemporaryAccountPasswordManager::~TemporaryAccountPasswordManager()
 void TemporaryAccountPasswordManager::authenticateByName(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> checkPasswordHash,
-    const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+    const nx::utils::stree::AbstractResourceReader& /*authSearchInputData*/,
     nx::utils::stree::ResourceContainer* const authProperties,
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
@@ -60,10 +69,7 @@ void TemporaryAccountPasswordManager::authenticateByName(
     if (!credentials)
         return completionHandler(api::ResultCode::notAuthorized);
 
-    // TODO: #ak Currently, checking password permissions here, 
-    // but should move it to authorization phase.
-    if (!credentials->accessRights.authorize(authSearchInputData))
-        return completionHandler(api::ResultCode::forbidden);
+    authProperties->put(cdb::attr::credentialsId, QString::fromStdString(credentials->id));
 
     // Preparing output data.
     authProperties->put(
@@ -71,8 +77,6 @@ void TemporaryAccountPasswordManager::authenticateByName(
         QString::fromStdString(credentials->accountEmail));
     if (credentials->isEmailCode)
         authProperties->put(cdb::attr::authenticatedByEmailCode, true);
-
-    runExpirationRulesOnSuccessfulLogin(lk, *credentials);
 
     completionHandler(api::ResultCode::ok);
 }
@@ -108,10 +112,15 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
 }
 
 void TemporaryAccountPasswordManager::addRandomCredentials(
+    const std::string& accountEmail,
     data::TemporaryAccountCredentials* const data)
 {
     if (data->login.empty())
+    {
         data->login = generateRandomPassword();
+        const auto loginCrc32 = std::to_string(nx::utils::crc32(accountEmail));
+        data->login += "-" + loginCrc32;
+    }
 
     data->password = generateRandomPassword();
     data->passwordHa1 = nx_http::calcHa1(
@@ -127,7 +136,7 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::removeTemporaryPassword
     QSqlQuery removeTempPasswordsQuery(*queryContext->connection());
     removeTempPasswordsQuery.prepare(
         R"sql(
-        DELETE FROM account_password 
+        DELETE FROM account_password
         WHERE account_id=(SELECT id FROM account WHERE email=?)
         )sql");
     removeTempPasswordsQuery.addBindValue(QnSql::serialized_field(accountEmail));
@@ -156,7 +165,7 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::registerTemporaryCreden
 {
     TemporaryAccountCredentialsEx tmpPasswordDataInternal(
         std::move(tempPasswordData));
-    tmpPasswordDataInternal.id = 
+    tmpPasswordDataInternal.id =
         QnUuid::createUuid().toSimpleString().toStdString();
 
     return insertTempPassword(
@@ -183,7 +192,7 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryCredentia
     QnSql::bind(tempPasswordData, &fetchTempPasswordQuery);
     fetchTempPasswordQuery.bindValue(
         ":accessRights",
-        QnSql::serialized_field(tempPasswordData.accessRights.toString()));
+        QnSql::serialized_field(tempPasswordData.accessRights.toString(m_attrNameset)));
     if (!fetchTempPasswordQuery.exec())
     {
         NX_LOG(lm("Error fetching temporary password for account %1. %2")
@@ -207,7 +216,56 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryCredentia
     return nx::utils::db::DBResult::ok;
 }
 
-boost::optional<TemporaryAccountCredentialsEx> 
+nx::utils::db::DBResult TemporaryAccountPasswordManager::updateCredentialsAttributes(
+    nx::utils::db::QueryContext* const queryContext,
+    const data::Credentials& credentials,
+    const data::TemporaryAccountCredentials& tempPasswordData)
+{
+    QSqlQuery updateTempPasswordQuery(*queryContext->connection());
+    updateTempPasswordQuery.prepare(
+        R"sql(
+        UPDATE account_password SET
+            expiration_timestamp_utc = :expirationTimestampUtc,
+            prolongation_period_sec = :prolongationPeriodSec,
+            max_use_count = :maxUseCount,
+            access_rights = :accessRights,
+            is_email_code = :isEmailCode
+        WHERE
+            login = :login AND password_ha1 = :passwordString
+        )sql");
+    QnSql::bind(tempPasswordData, &updateTempPasswordQuery);
+    updateTempPasswordQuery.bindValue(
+        ":accessRights",
+        QnSql::serialized_field(tempPasswordData.accessRights.toString(m_attrNameset)));
+
+    const auto passwordHa1 = nx_http::calcHa1(
+        credentials.login.c_str(),
+        tempPasswordData.realm.c_str(),
+        credentials.password.c_str()).toStdString();
+
+    auto passwordString = preparePasswordString(
+        passwordHa1,
+        credentials.password);
+    updateTempPasswordQuery.bindValue(":login", QnSql::serialized_field(credentials.login));
+    updateTempPasswordQuery.bindValue(
+        ":passwordString",
+        QnSql::serialized_field(passwordString));
+    if (!updateTempPasswordQuery.exec())
+    {
+        NX_LOG(lm("Could not update temporary password for account %1. %2")
+            .arg(tempPasswordData.accountEmail).arg(updateTempPasswordQuery.lastError().text()),
+            cl_logDEBUG1);
+        return nx::utils::db::DBResult::ioError;
+    }
+
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        std::bind(&TemporaryAccountPasswordManager::updateCredentialsInCache, this,
+            credentials, tempPasswordData));
+
+    return nx::utils::db::DBResult::ok;
+}
+
+boost::optional<TemporaryAccountCredentialsEx>
     TemporaryAccountPasswordManager::getCredentialsByLogin(
         const std::string& login) const
 {
@@ -219,9 +277,33 @@ boost::optional<TemporaryAccountCredentialsEx>
     return *it;
 }
 
+bool TemporaryAccountPasswordManager::authorize(
+    const std::string& credentialsId,
+    const nx::utils::stree::AbstractResourceReader& inputData) const
+{
+    QnMutexLocker lock(&m_mutex);
+
+    const auto& temporaryCredentialsById = m_temporaryCredentials.get<kIndexById>();
+    auto it = temporaryCredentialsById.find(credentialsId);
+    if (it == temporaryCredentialsById.end())
+    {
+        NX_DEBUG(this, lm("Authentication has been done by unknown credentials (id %1)")
+            .args(credentialsId));
+        return false;
+    }
+
+    if (!it->accessRights.authorize(inputData))
+        return false;
+
+    const_cast<TemporaryAccountPasswordManager*>(this)->
+        runExpirationRulesOnSuccessfulLogin(lock, *it);
+
+    return true;
+}
+
 std::string TemporaryAccountPasswordManager::generateRandomPassword() const
 {
-    auto str = QnUuid::createUuid().toSimpleByteArray();
+    auto str = QnUuid::createUuid().toSimpleByteArray().toLower();
     str.replace('-', "");
     return str.toStdString();
 }
@@ -229,7 +311,7 @@ std::string TemporaryAccountPasswordManager::generateRandomPassword() const
 bool TemporaryAccountPasswordManager::isTemporaryPasswordExpired(
     const TemporaryAccountCredentialsEx& temporaryCredentials) const
 {
-    const bool isExpired = 
+    const bool isExpired =
         (temporaryCredentials.expirationTimestampUtc > 0) &&
         (temporaryCredentials.expirationTimestampUtc <= nx::utils::timeSinceEpoch().count());
 
@@ -306,7 +388,9 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords
         std::string password;
         parsePasswordString(tmpPassword.passwordHa1, &tmpPassword.passwordHa1, &password);
 
-        tmpPassword.accessRights.parse(tmpPassword.accessRightsStr);
+        tmpPassword.accessRights.parse(
+            m_attrNameset,
+            tmpPassword.accessRightsStr);
         std::string login = tmpPassword.login;
         m_temporaryCredentials.insert(std::move(tmpPassword));
     }
@@ -321,17 +405,17 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::insertTempPassword(
     QSqlQuery insertTempPasswordQuery(*queryContext->connection());
     insertTempPasswordQuery.prepare(
         R"sql(
-        INSERT INTO account_password (id, account_id, login, password_ha1, realm, 
-            expiration_timestamp_utc, prolongation_period_sec, max_use_count, 
-            use_count, is_email_code, access_rights) 
-        VALUES (:id, (SELECT id FROM account WHERE email=:accountEmail), :login, 
-            :passwordString, :realm, :expirationTimestampUtc, :prolongationPeriodSec, 
+        INSERT INTO account_password (id, account_id, login, password_ha1, realm,
+            expiration_timestamp_utc, prolongation_period_sec, max_use_count,
+            use_count, is_email_code, access_rights)
+        VALUES (:id, (SELECT id FROM account WHERE email=:accountEmail), :login,
+            :passwordString, :realm, :expirationTimestampUtc, :prolongationPeriodSec,
             :maxUseCount, :useCount, :isEmailCode, :accessRights)
         )sql");
     QnSql::bind(tempPasswordData, &insertTempPasswordQuery);
     insertTempPasswordQuery.bindValue(
         ":accessRights",
-        QnSql::serialized_field(tempPasswordData.accessRights.toString()));
+        QnSql::serialized_field(tempPasswordData.accessRights.toString(m_attrNameset)));
 
     auto passwordString = preparePasswordString(
         tempPasswordData.passwordHa1,
@@ -382,7 +466,7 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::deleteTempPassword(
     return nx::utils::db::DBResult::ok;
 }
 
-boost::optional<const TemporaryAccountCredentialsEx&> 
+boost::optional<const TemporaryAccountCredentialsEx&>
     TemporaryAccountPasswordManager::findMatchingCredentials(
         const QnMutexLockerBase& /*lk*/,
         const std::string& username,
@@ -473,6 +557,37 @@ std::string TemporaryAccountPasswordManager::preparePasswordString(
     if (!password.empty())
         passwordParts.push_back(password);
     return boost::algorithm::join(passwordParts, ":");
+}
+
+void TemporaryAccountPasswordManager::updateCredentialsInCache(
+    const data::Credentials& credentials,
+    const data::TemporaryAccountCredentials& tempPasswordData)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    auto& temporaryCredentialsByEmail = m_temporaryCredentials.get<kIndexByLogin>();
+    auto it = temporaryCredentialsByEmail.lower_bound(credentials.login);
+    for (;
+        (it != temporaryCredentialsByEmail.end()) && (it->login == credentials.login);
+        ++it)
+    {
+        if (it->password != credentials.password)
+            continue;
+
+        temporaryCredentialsByEmail.modify(
+            it,
+            [&tempPasswordData](
+                TemporaryAccountCredentialsEx& temporaryAccountCredentials)
+            {
+                temporaryAccountCredentials.expirationTimestampUtc =
+                    tempPasswordData.expirationTimestampUtc;
+                temporaryAccountCredentials.prolongationPeriodSec =
+                    tempPasswordData.prolongationPeriodSec;
+                temporaryAccountCredentials.maxUseCount = tempPasswordData.maxUseCount;
+                temporaryAccountCredentials.accessRights = tempPasswordData.accessRights;
+                temporaryAccountCredentials.isEmailCode = tempPasswordData.isEmailCode;
+            });
+    }
 }
 
 } // namespace cdb

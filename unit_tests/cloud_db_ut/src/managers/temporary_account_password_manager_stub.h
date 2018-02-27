@@ -24,7 +24,9 @@ public:
         data::TemporaryAccountCredentials tmpPasswordData,
         std::function<void(api::ResultCode)> completionHandler) override;
 
-    virtual void addRandomCredentials(data::TemporaryAccountCredentials* const data) override;
+    virtual void addRandomCredentials(
+        const std::string& /*accountEmail*/,
+        data::TemporaryAccountCredentials* const data) override;
 
     virtual nx::utils::db::DBResult registerTemporaryCredentials(
         nx::utils::db::QueryContext* const queryContext,
@@ -35,6 +37,11 @@ public:
         const data::TemporaryAccountCredentials& tempPasswordData,
         data::Credentials* credentials) override;
 
+    virtual nx::utils::db::DBResult updateCredentialsAttributes(
+        nx::utils::db::QueryContext* const queryContext,
+        const data::Credentials& credentials,
+        const data::TemporaryAccountCredentials& tempPasswordData) override;
+
     virtual nx::utils::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
         nx::utils::db::QueryContext* const queryContext,
         std::string accountEmail) override;
@@ -44,6 +51,10 @@ public:
 
     virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const override;
+
+    virtual bool authorize(
+        const std::string& credentialsId,
+        const nx::utils::stree::AbstractResourceReader& inputData) const override;
 
     const std::vector<data::TemporaryAccountCredentials>& registeredCredentials() const
     {

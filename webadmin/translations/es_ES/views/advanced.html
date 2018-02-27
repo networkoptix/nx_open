@@ -106,7 +106,7 @@
             Ninguna unidad de almacenamiento principal fue seleccionada para la escritura - vídeo no será registrado en este servidor.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            El espacio reservado en cantidad es mayor que el espacio libre. Videos actuales se pueden extraer para liberar algo de espacio.
+            La cantidad de espacio reservado es mayor que el espacio libre restante. Las secuencias de video actuales pueden eliminarse para liberar espacio.
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Fijar todos los valores resaltados para guardarlo</div>
 
@@ -114,7 +114,7 @@
         <button class="btn btn-warning" ng-click="cancel()">Cancelar</button>
     </form>
 
-    <h2>Ajustes del Registro</h2>
+    <h2>Configuración del Registro</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div class="form-group">
             <label class="col-sm-4">Nivel de registro principal</label>
@@ -124,10 +124,10 @@
                     <option value="NONE">Ninguno: Registro deshabilitado.</option>
                     <option value="ALWAYS">Siempre: Registrar errores, advertencias y mensajes más importantes.</option>
                     <option value="ERROR">Error: Sólo errores de registro.</option>
-                    <option value="WARNING">Aviso: Las advertencias de registro y errores.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
+                    <option value="WARNING">Aviso: Registro de advertencias y errores.</option>
+                    <option value="INFO">Info: Registro de errores, avisos y todos los mensajes.</option>
                     <option value="DEBUG">Depuración: Registre cada mensaje del sistema y la depuración del sistema.</option>
-                    <option value="DEBUG2">Depuración2: Registre cada mensaje del sistema e información de ajuste ampliada.</option>
+                    <option value="DEBUG2">Depuración2: Registre cada mensaje del sistema e información de depuración ampliada.</option>
                 </select>
             </div>
         </div>
@@ -139,9 +139,9 @@
                     <option value="ALWAYS">Siempre: Registrar errores, advertencias y mensajes más importantes.</option>
                     <option value="ERROR">Error: Sólo errores de registro.</option>
                     <option value="WARNING">Aviso: Las advertencias de registro y errores.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
+                    <option value="INFO">Info: Registro de errores, avisos y todos los mensajes.</option>
                     <option value="DEBUG">Depuración: Registre cada mensaje del sistema y la depuración del sistema.</option>
-                    <option value="DEBUG2">Depuración2: Registre cada mensaje del sistema e información de ajuste ampliada.</option>
+                    <option value="DEBUG2">Depuración2: Registre cada mensaje del sistema e información de depuración ampliada.</option>
                 </select>
             </div>
         </div>
@@ -169,7 +169,7 @@
 
     <form class="form row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{Config.settingsConfig[setting].label}}</label>
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting]}}</label>
             <div class="col-sm-6">
                 <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
                        style="height: 22px"
@@ -208,7 +208,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>¡Aviso!</b> Algunos cambios requieren reiniciar <b>todos</b> los servidores en Sistema.<br><br>
+        <b>¡Aviso!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Reiniciar servidor actual</button>
         </div>

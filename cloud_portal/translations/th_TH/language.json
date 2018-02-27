@@ -5,7 +5,7 @@
   "dialogs": {
     "okButton": "ตกลง",
     "cancelButton": "ยกเลิก",
-    "loginTitle": "เข้าสู่ระบบ {{PRODUCT_NAME}}",
+    "loginTitle": "ยินดีต้อนรับสู่ {{PRODUCT_NAME}}",
     "loginButton": "ลงชื่อเข้าสู่ระบบ",
     "logoutAuthorisedTitle": "คุณกำลังอยู่ในระบบ",
     "logoutAuthorisedContinueButton": "ดำเนิน​การ",
@@ -24,8 +24,8 @@
     "activate": "บัญชีที่ใช้งานได้ -",
     "activateSent": "บัญชีที่ใช้งานได้ -",
     "activateSuccess": "บัญชีที่เปิดใช้งาน-",
-    "activateCode": "เปิดใช้งานบัญชี -",
-    "restorePassword": "รีเซ็ตรหัสผ่าน -",
+    "activateCode": "บัญชีที่ใช้งานได้ -",
+    "restorePassword": "กำหนดรหัสผ่านใหม่ -",
     "restorePasswordSuccess": "บันทึกรหัสผ่านแล้ว -",
     "restorePasswordCode": "กำหนดรหัสผ่านใหม่ -",
     "view": "ดูกล้อง - ",
@@ -40,7 +40,7 @@
     "activated": "เปิดใช้งาน",
     "online": "ออนไลน์",
     "offline": "ออฟไลน์",
-    "unavailable": "ไม่มี"
+    "unavailable": "ไม่พร้อมใช้งาน"
   },
   "accessRoles": {
     "disabled": {
@@ -115,8 +115,9 @@
     "cantActivatePrefix": "ไม่สามารถเปิดใช้งานบัญชีของคุณได้",
     "cantSendConfirmationPrefix": "ไม่สามารถส่งอีเมลยืนยัน",
     "cloudInvalidResponse": "คลาวด์ DB การส่งคืนการตอบสนองที่ไม่คาดคิด",
-    "notAuthorized": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "notAuthorized": "รหัสผ่านผิด",
     "wrongParameters": "พารามิเตอร์บางอย่างในแบบฟอร์มไม่ถูกต้อง",
+    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "บัญชีถูกเปิดใช้งานหรือรหัสยืนยันไม่ถูกต้อง",
     "wrongCodeRestore": "ใช้รหัสยืนยันแล้วหรือไม่ถูกต้อง",
     "forbidden": "การเข้าถึงถูกปฏิเสธ คุณไม่มีสิทธิ์ดำเนินการนี้.",
@@ -157,10 +158,11 @@
     "unavailable": "ระบบไม่สามารถเข้าถึงได้",
     "offline": "ระบบออฟไลน์",
     "openClient": "เปิดใน {{VMS_NAME}}",
+    "openClientNoSystem": "เปิด {{VMS_NAME}}",
     "confirmRenameTitle": "ชื่อระบบ",
     "confirmRenameAction": "บันทึก",
     "successRename": "ระบบเปลี่ยนชื่อ",
-    "confirmDisconnectTitle": "ยกเลิกการเชื่อมต่อระบบจาก {{PRODUCT_NAME}}?",
+    "confirmDisconnectTitle": "ตัดการเชื่อมต่อระบบจาก {{PRODUCT_NAME}} หรือไม่?",
     "confirmDisconnectAction": "ตัดการเชื่อมต่อ",
     "confirmUnshareFromMe": "คุณกำลังจะยกเลิกการเชื่อมต่อระบบนี้จากบัญชีของคุณ คุณจะไม่สามารถเข้าถึงระบบนี้ได้อีกต่อไป คุณแน่ใจไหม?",
     "confirmUnshareFromMeTitle": "ยกเลิกการเชื่อมต่อระบบหรือไม่?",

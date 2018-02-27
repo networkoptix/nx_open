@@ -12,7 +12,7 @@
     "logoutAuthorisedLogoutButton": "Déconnecter"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
+    "template": "{{title}}{{PRODUCT_NAME}}",
     "default": "{{PRODUCT_NAME}}",
     "registerSuccess": "Bienvenue sur",
     "register": "Créer compte dans",
@@ -115,8 +115,9 @@
     "cantActivatePrefix": "Impossible d'activer votre compte",
     "cantSendConfirmationPrefix": "Impossible d’envoyer courriel de confirmation",
     "cloudInvalidResponse": "BD Nuage a retourné une réponse inattendue",
-    "notAuthorized": "Courriel ou mot de passe incorrect",
+    "notAuthorized": "Mot de passe incorrect",
     "wrongParameters": "Certains paramètres dans le formulaire sont incorrects",
+    "brokenAccount": "Problème inattendu avec le compte. <a href=\"/restore_password\">Restaurer le compte</a>",
     "wrongCode": "Compte déjà activé ou le code de confirmation est incorrect",
     "wrongCodeRestore": "Code de confirmation est déjà utilisé ou incorrecte",
     "forbidden": "Vous n’avez pas l'autorisation nécessaire pour effectuer cette action",
@@ -157,6 +158,7 @@
     "unavailable": "Le système est inaccessible",
     "offline": "System Hors ligne",
     "openClient": "Ouvert à {{VMS_NAME}}",
+    "openClientNoSystem": "Ouvrir {{VMS_NAME}}",
     "confirmRenameTitle": "Nom système",
     "confirmRenameAction": "Enregistrer",
     "successRename": "Nom du système sauvegardé",

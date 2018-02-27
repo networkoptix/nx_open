@@ -1,20 +1,23 @@
 <div class="container" >
     <div ng-if="data.activateCode" process-loading="activate">
         <h1 class="process-success" ng-if="activate.success">
-            您的帳號已成功啟動<br>
-            <a class="btn btn-default" href="/login">登入</a>
+            Your account is successfully activated
+        </h1>
+        <h1 class="process-success" ng-if="activate.success">
+            <a class="btn btn-default" href="/login">Log In</a>
         </h1>
 
         <h1 class="process-success" ng-if="!activate.success">
-            帳號已被啟動或確認碼不正確
+            帳號已經啟動或確認碼不正確
         </h1>
     </div>
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            您的帳號已成功啟動<br>
-            <a href="/login">登入</a>
-            <!-- <button ng-if="session.fromClient" ng-click="openClient()" class="btn btn-default">Open {{VMS_NAME}}</button> -->
+            Your account is successfully activated
+        </h1>
+        <h1 class="process-success">
+            <a class="btn btn-default" href="/login">Log In</a>
         </h1>
     </div>
     
@@ -24,7 +27,7 @@
             <p>我們已經將啟動連結發信給{{data.email}}。<br>
             請點擊此連結以啟動您的帳戶。</p>
         </div>
-        <h1 ng-if="!data.email">Activate your account</h1>
+        <h1 ng-if="!data.email">啟動您的帳號</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
@@ -83,9 +86,11 @@
         </form>
     </div>
     <div ng-if="data.restoreCode">
-        <h1 class="process-success" ng-if="change.success || changeSuccess ">
-            密碼儲存成功<br>
-            <a href="/login">登入</a>
+        <h1 class="process-success" ng-if="change.success || changeSuccess">
+            Password successfully saved
+        </h1>
+        <h1 class="process-success" ng-if="change.success || changeSuccess">
+            <a class="btn btn-default" href="/login">Log In</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>

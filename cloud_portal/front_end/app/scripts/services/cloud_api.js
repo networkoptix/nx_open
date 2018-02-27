@@ -68,7 +68,8 @@ angular.module('cloudApp')
                 return $http.post(apiBase + '/account/login',{
                     email: email,
                     password: password,
-                    remember: remember
+                    remember: remember,
+                    timezone: Intl && Intl.DateTimeFormat().resolvedOptions().timeZone || ""
                 });
             },
             logout:function(){
@@ -121,6 +122,11 @@ angular.module('cloudApp')
             },
             activate:function(code){
                 return $http.post(apiBase + '/account/activate',{
+                    code:code
+                });
+            },
+            checkCode:function(code){
+                return $http.post(apiBase + '/account/checkCode',{
                     code:code
                 });
             },

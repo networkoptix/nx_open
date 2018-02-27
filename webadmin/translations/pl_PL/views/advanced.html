@@ -106,7 +106,7 @@
             Nie wybrano głównego magazynu do nagrywania - dane wideo nie będą nagrywane na tym serwerze.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Zarezerwowana przestrzeń jest większa niż dostępna przestrzeń. Bieżące materiały mogą zostać usunięte w celu zwiększenia dostępnej przestrzeni.
+            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Skonfiguruj podświetlone ustawienia, aby je zapisać.</div>
 
@@ -169,7 +169,7 @@
 
     <form class="form row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{Config.settingsConfig[setting].label}}</label>
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting]}}</label>
             <div class="col-sm-6">
                 <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
                        style="height: 22px"
@@ -208,7 +208,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Uwaga!</b> Niektóre zmiany wymagają ponownego uruchomienia <b>wszystkich</b> serwerów w systemie.<br><br>
+        <b>Uwaga!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Uruchom ponownie bieżący serwer</button>
         </div>

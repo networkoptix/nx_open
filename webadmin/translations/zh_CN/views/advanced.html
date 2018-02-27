@@ -106,7 +106,7 @@
             没有主要存储驱动器被选为写作 — 视频将不记录在此服务器上。
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            保留的空间量大于剩余自由空间。当前录像可能删除以释放一些空间。
+            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">修正所有标记的设定并储存</div>
 
@@ -169,7 +169,7 @@
 
     <form class="form row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{Config.settingsConfig[setting].label}}</label>
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting]}}</label>
             <div class="col-sm-6">
                 <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
                        style="height: 22px"
@@ -208,7 +208,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>注意!</b> 某些更改需要重新启动 <b>全部</b> 系统中的服务器。<br><br>
+        <b>警告!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >重新启动当前服务器</button>
         </div>

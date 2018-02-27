@@ -106,7 +106,7 @@
             Nincs fő tároló meghajtó kiválasztva a íráshoz - a videók nem lesznek rögzítve ezen a szerveren.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            A fenntartott tárhely nagyobb mint a rendelkezésre álló. A jelenlegi videó folyam eltávolításra kerülhet tárhely felszabadítás miatt.
+            Reserved space amount is greater than free space left. Aktuális felvétel eltávolítható, hogy helyet szabadítson fel.
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">A mentéshez javítsa a kijelölt beállításokat</div>
 
@@ -169,7 +169,7 @@
 
     <form class="form row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{Config.settingsConfig[setting].label}}</label>
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting]}}</label>
             <div class="col-sm-6">
                 <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
                        style="height: 22px"
@@ -208,7 +208,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Figyelem!</b> Egyes változások miatt újraindítást szükséges <b>mind</b> szerverek a rendszerben.<br><br>
+        <b>Figyelem!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Jelenlegi szerver újraindítása</button>
         </div>

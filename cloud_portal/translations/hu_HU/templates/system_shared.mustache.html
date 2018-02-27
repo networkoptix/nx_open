@@ -1,11 +1,9 @@
-<h1>Hello, {{message.fullName}}</h1>
+<h1>Hello {{message.fullName}}</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> has shared access to video management system "{{message.system_name}}" with you.</p>
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> megosztotta {{message.system_name}} rendszerét Önnel.</p>
 {{/message.sharer_name}}
-
-{{^message.sharer_name}}
-<p>You have been granted access to video management system "{{message.system_name}}".</p>
+<p>Hozzáférést kapott a "{{message.system_name}}" videómenedzsment rendszerhez.</p>
 {{/message.sharer_name}}
 
 <a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">View in {{PRODUCT_NAME}} Portal</a>
