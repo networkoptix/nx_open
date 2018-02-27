@@ -93,8 +93,10 @@ void serialize(QnJsonContext* ctx, const T& value, const QString& key, QJsonObje
 {
     NX_ASSERT(outTarget);
 
-    QJsonValueRef jsonValue = (*outTarget)[key];
+    QJsonValue jsonValue;
     QJson::serialize(ctx, value, &jsonValue);
+    if (!jsonValue.isNull())
+        (*outTarget)[key] = jsonValue;
 }
 
 /**
