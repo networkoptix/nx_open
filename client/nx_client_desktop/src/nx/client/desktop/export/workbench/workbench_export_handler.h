@@ -25,6 +25,7 @@ public:
     virtual ~WorkbenchExportHandler() override;
 
 private:
+    void at_exportStandaloneClientAction_triggered();
     void exportProcessUpdated(const ExportProcessInfo& info);
     void exportProcessFinished(const ExportProcessInfo& info);
 

@@ -15,6 +15,7 @@
 #include <nx/utils/uuid.h>
 
 #include "abstract_archive_integrity_watcher.h"
+#include <utils/camera/camera_diagnostics.h>
 
 enum class PlaybackMode
 {
@@ -134,6 +135,11 @@ public:
     {
         m_errorHandler = handler;
     };
+
+    virtual CameraDiagnostics::Result lastError() const
+    {
+        return CameraDiagnostics::NoErrorResult();
+    }
 
 protected:
     Flags m_flags;

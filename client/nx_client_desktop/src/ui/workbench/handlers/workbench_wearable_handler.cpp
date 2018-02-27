@@ -180,7 +180,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     qnClientModule->wearableManager()->prepareUploads(camera, paths, this,
         [this, camera](WearableUpload upload)
         {
-            if(fixFileUpload(&upload))
+            if(fixFileUpload(camera, &upload))
                 uploadValidFiles(camera, upload.elements);
         });
 }
@@ -220,7 +220,9 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
         });
 }
 
-bool QnWorkbenchWearableHandler::fixFileUpload(WearableUpload* upload)
+bool QnWorkbenchWearableHandler::fixFileUpload(
+    const QnSecurityCamResourcePtr& camera,
+    WearableUpload* upload)
 {
     int count = upload->elements.size();
 
@@ -237,6 +239,42 @@ bool QnWorkbenchWearableHandler::fixFileUpload(WearableUpload* upload)
         QnMessageBox::warning(mainWindowWidget(),
             tr("Selected files do not have timestamps", 0, count),
             tr("Only video files with correct timestamp are supported."));
+        return false;
+    }
+
+    if (upload->allHaveStatus(WearablePayload::FootagePastMaxDays))
+    {
+        qint64 minTime = std::numeric_limits<qint64>::max();
+        qint64 maxTime = std::numeric_limits<qint64>::min();
+        for (const WearablePayload& payload : upload->elements)
+        {
+            minTime = std::min(minTime, payload.local.period.startTimeMs);
+            maxTime = std::max(maxTime, payload.local.period.endTimeMs());
+        }
+
+        QString title = tr("Selected files are too old", 0, count);
+
+        int days = camera->maxDays();
+        QString extra;
+        if (count == 1)
+        {
+            extra = tr(
+                "Selected file was recorded on %1, "
+                "but only files that were recorded in the last %n days can be uploaded. "
+                "You can change this in camera archive settings.", 0, days)
+                .arg(QDateTime::fromMSecsSinceEpoch(minTime).toString(Qt::SystemLocaleShortDate));
+        }
+        else
+        {
+            extra = tr(
+                "Selected files were recorded between %1 and %2, "
+                "but only files that were recorded in the last %n days can be uploaded. "
+                "You can change this in camera archive settings.", 0, days)
+                .arg(QDateTime::fromMSecsSinceEpoch(minTime).toString(Qt::SystemLocaleShortDate))
+                .arg(QDateTime::fromMSecsSinceEpoch(maxTime).toString(Qt::SystemLocaleShortDate));
+        }
+
+        QnMessageBox::warning(mainWindow(), title, extra);
         return false;
     }
 
@@ -259,16 +297,10 @@ bool QnWorkbenchWearableHandler::fixFileUpload(WearableUpload* upload)
     if (upload->someHaveStatus(WearablePayload::ServerError))
         return false; //< Ignore it as the user is likely already seeing "reconnecting to server" dialog.
 
-    if (upload->someHaveStatus(WearablePayload::NoSpaceOnServer))
-    {
-        showNoSpaceOnServerWarning(*upload);
-        return false;
-    }
-
     bool performExtendedCheck = true;
-    if (upload->someHaveStatus(WearablePayload::FootageTooOld))
+    if (upload->someHaveStatus(WearablePayload::StorageCleanupNeeded))
     {
-        if (fixOldFootageUpload(upload))
+        if (fixStorageCleanupUpload(upload))
             performExtendedCheck = false;
         else
             return false;
@@ -317,14 +349,8 @@ bool QnWorkbenchWearableHandler::fixFolderUpload(const QString& path, WearableUp
     if (upload->someHaveStatus(WearablePayload::ServerError))
         return false; //< Ignore it as the user is likely already seeing "reconnecting to server" dialog.
 
-    if (upload->someHaveStatus(WearablePayload::NoSpaceOnServer))
-    {
-        showNoSpaceOnServerWarning(*upload);
-        return false;
-    }
-
-    if (upload->someHaveStatus(WearablePayload::FootageTooOld))
-        if (!fixOldFootageUpload(upload))
+    if (upload->someHaveStatus(WearablePayload::StorageCleanupNeeded))
+        if (!fixStorageCleanupUpload(upload))
             return false;
 
     if (!upload->someHaveStatus(WearablePayload::Valid))
@@ -338,18 +364,20 @@ bool QnWorkbenchWearableHandler::fixFolderUpload(const QString& path, WearableUp
     return true;
 }
 
-bool QnWorkbenchWearableHandler::fixOldFootageUpload(WearableUpload* upload)
+bool QnWorkbenchWearableHandler::fixStorageCleanupUpload(WearableUpload* upload)
 {
     int n = upload->elements.size();
 
     bool fixed = QnMessageBox::warning(mainWindowWidget(),
-        tr("Some files may be deleted soon after being uploaded", 0, n),
-        tr("Some files are older than any other on the server, "
-            "and there is not much free space left on the storage. "
-            "They may be deleted to free up space for future recorded or uploaded video.", 0, n)
+        tr("Some footage may be deleted after uploading these files", 0, n),
+        tr("There is not much free space left on server storage. "
+            "Some old footage may be deleted to free up space. "
+            "Note that if selected files happen to be the oldest on the server, "
+            "they will be deleted right after being uploaded.", 0, n)
         + lit("\n\n")
-        + tr("To prevent these files from being deleted you can add additional storage or "
-            "increase archive keep time in camera settings.", 0, n)
+        + tr("To prevent this you can add additional storage. "
+            "You can also control which footage will be deleted first by changing "
+            "archive keep time in camera settings.")
         + lit("\n\n")
         + tr("Upload anyway?"),
         QDialogButtonBox::Yes | QDialogButtonBox::Cancel) == QDialogButtonBox::Yes;
@@ -357,23 +385,11 @@ bool QnWorkbenchWearableHandler::fixOldFootageUpload(WearableUpload* upload)
     if (fixed)
     {
         for (WearablePayload& payload : upload->elements)
-            if (payload.status == WearablePayload::FootageTooOld)
+            if (payload.status == WearablePayload::StorageCleanupNeeded)
                 payload.status = WearablePayload::Valid;
     }
 
     return fixed;
-}
-
-void QnWorkbenchWearableHandler::showNoSpaceOnServerWarning(const WearableUpload& upload)
-{
-    using nx::client::core::HumanReadable;
-    QnMessageBox::critical(mainWindowWidget(),
-        tr("Not enough space on server storage"),
-        tr("Files size - %1", 0, upload.elements.size())
-        .arg(HumanReadable::digitalSize(upload.spaceRequested))
-        + lit("\n") +
-        tr("Free space - %1")
-        .arg(HumanReadable::digitalSize(upload.spaceAvailable)));
 }
 
 void QnWorkbenchWearableHandler::uploadValidFiles(
@@ -414,18 +430,29 @@ void QnWorkbenchWearableHandler::at_context_userChanged()
 
 void QnWorkbenchWearableHandler::at_wearableManager_stateChanged(const WearableState& state)
 {
-    if (state.consumeProgress != 100 || state.status != WearableState::Consuming)
-        return;
-
     QnSecurityCamResourcePtr camera =
         resourcePool()->getResourceById<QnSecurityCamResource>(state.cameraId);
     if (!camera)
         return;
 
-    QnCachingCameraDataLoaderPtr loader =
-        qnClientModule->cameraDataManager()->loader(camera, /*create=*/true);
-    loader->invalidateCachedData();
-    loader->load(/*forced=*/true);
+    /* Fire an error only on upload failure. */
+    if (state.error == WearableState::UploadFailed)
+    {
+        QnMessageBox::critical(mainWindow(),
+            tr("Could not finish upload to %1").arg(camera->getName()),
+            tr("Make sure there is enough space on server storage."));
+        return;
+    }
+
+
+    /* Update chunks if we've just finished consume request. */
+    if (state.consumeProgress == 100 && state.status == WearableState::Consuming)
+    {
+        QnCachingCameraDataLoaderPtr loader =
+            qnClientModule->cameraDataManager()->loader(camera, /*create=*/true);
+        loader->invalidateCachedData();
+        loader->load(/*forced=*/true);
+    }
 }
 
 QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const WearablePayload& upload)
@@ -440,6 +467,8 @@ QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const Wearable
         return tr("%1 - has unsupported format.").arg(fileName);
     case WearablePayload::NoTimestamp:
         return tr("%1 - does not have timestamp.").arg(fileName);
+    case WearablePayload::FootagePastMaxDays:
+        return tr("%1 - is older than allowed in camera archive settings.").arg(fileName);
     case WearablePayload::ChunksTakenByFileInQueue:
         return tr("%1 - covers period for which video has already been uploaded.").arg(fileName);
     case WearablePayload::ChunksTakenOnServer:

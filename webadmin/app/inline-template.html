@@ -17,12 +17,19 @@
 
     <link rel="stylesheet" href="skin/styles-native.css">
 
+    <% for (key in htmlWebpackPlugin.files.css) { %>
+    <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[key] %>" />
+    <% } %>
+
 </head>
 <body class="inline-webadmin">
 
 <!-- Add your site or application content here -->
 <div class="panel master" ng-view=""></div>
 
+<% for (key in htmlWebpackPlugin.files.chunks) { %>
+<script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks[key].entry %>"></script>
+<% } %>
 <script src="customization/config.js"></script>
 </body>
 </html>

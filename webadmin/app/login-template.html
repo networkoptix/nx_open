@@ -20,6 +20,9 @@
     <link rel="stylesheet" href="fonts/roboto/roboto_medium/stylesheet.css" />
 
     <link rel="stylesheet" href="skin/styles.css">
+    <% for (key in htmlWebpackPlugin.files.css) { %>
+    <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[key] %>" />
+    <% } %>
 </head>
 <body>
 <!--[if lt IE 7]>
@@ -35,6 +38,9 @@
 <script src="bower_components/json3/lib/json3.min.js"></script>
 <![endif]-->
 
+<% for (key in htmlWebpackPlugin.files.chunks) { %>
+<script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks[key].entry %>"></script>
+<% } %>
 <script src="customization/config.js"></script>
 </body>
 </html>

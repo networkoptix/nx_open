@@ -1467,3 +1467,13 @@ bool QnSecurityCamResource::setCameraCredentialsSync(
         *outErrorString = lit("Operation is not permitted.");
     return false;
 }
+
+Qn::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
+{
+    const auto capabilities = getCameraCapabilities();
+    if (capabilities.testFlag(Qn::isDefaultPasswordCapability))
+        return Qn::MediaStreamEvent::ForbiddentBecauseDefaultPasswordError;
+    if (capabilities.testFlag(Qn::isOldFirmwareCapability))
+        return Qn::MediaStreamEvent::oldFirmwareError;
+    return Qn::MediaStreamEvent::NoEvent;
+}

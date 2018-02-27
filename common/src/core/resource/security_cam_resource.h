@@ -295,6 +295,11 @@ public:
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
 
+    /**
+     * Return non zero media event error if camera resource has an issue.
+     */
+    Qn::MediaStreamEvent checkForErrors() const;
+
     bool isEnoughFpsToRunSecondStream(int currentFps) const;
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager();
 

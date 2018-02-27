@@ -68,7 +68,7 @@ private:
     // We need resource pool to pass it to m_layoutThumbnailProvider.
     QPointer<QnResourcePool> m_resourcePool;
     // Status of resource loading.
-    Qn::ResourceStatusOverlay m_resourceStatus = Qn::NoDataOverlay;
+    Qn::ResourceStatusOverlay m_overlayStatus = Qn::NoDataOverlay;
 
     std::unique_ptr<nx::client::desktop::LayoutThumbnailLoader> m_layoutThumbnailProvider;
 };
