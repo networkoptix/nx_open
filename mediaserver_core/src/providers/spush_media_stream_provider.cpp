@@ -21,7 +21,7 @@ static QnAbstractMediaDataPtr createMetadataPacket()
 {
     QnAbstractMediaDataPtr rez = QnCompressedMetadata::createMediaEventPacket(
         DATETIME_NOW,
-        Qn::MediaStreamEvent::TooManyOpenedConnections);
+        Qn::MediaStreamEvent::TooManyOpenedConnectionsError);
     rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
     QnSleep::msleep(50);
     return rez;

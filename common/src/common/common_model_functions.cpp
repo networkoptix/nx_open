@@ -122,4 +122,23 @@ QString toString(AuthResult value)
     return QnLexical::serialized(value);
 }
 
+QString toString(MediaStreamEvent value)
+{
+    switch (value)
+    {
+        case NoEvent:
+            return QString();
+        case TooManyOpenedConnectionsError:
+            return lit("Too many opened connections");
+        case ForbiddentBecauseDefaultPasswordError:
+            return lit("Please setup camera password");
+        case ForbiddenBecauseNoLicenseError:
+            return lit("No license");
+        case oldFirmwareError:
+            return lit("Cameras has too old firmware");
+        default:
+            return lit("Unknown error");
+    }
+}
+
 } // namespace Qn

@@ -71,6 +71,7 @@ private:
 
 private:
     QnHikvisionResourcePtr m_hikvisionResource;
+    QString m_previousCodecValue;
 };
 
 } // namespace plugins

@@ -28,7 +28,6 @@
                 </div>
             </td>
             <td width="100%">
-                <voice-control ng-if="voiceControls.showCommands" voice-controls="voiceControls"></voice-control>
                 <div class="view-wrapper" ng-class="{invisible:!activeCamera}">
                     <div class="view-panel" ng-class="{'no-archive': !canViewArchive}">
                         <div class="fullscreen-area" ng-class="{'fullscreen': isFullscreen}">
@@ -101,6 +100,7 @@
                                 <div ng-if="isFullscreen && enableFullscreenNotification" class="fullscreen-notification fade-out">
                                     <span>הקש ESC כדי לצאת ממסך מלא</span>
                                 </div>
+                                <voice-control ng-if="voiceControls.showCommands" voice-controls="voiceControls"></voice-control>
                                 <camera-links ng-if="cameraLinks.enabled"
                                               system="systemAPI" position="positionProvider.playedPosition"
                                               live-mode="positionProvider.liveMode" active-camera="activeCamera"

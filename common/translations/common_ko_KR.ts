@@ -314,6 +314,10 @@
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요 (오류 &quot;%1&quot;).</translation>
     </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -569,7 +573,7 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n 카메라(들)</numerusform>
+        <numerusform>%n 카메라 (들)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1152,7 +1156,7 @@
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>장치 연결이 끊어졌습니다</numerusform>
+        <numerusform>장치 연결끊김</numerusform>
       </translation>
     </message>
     <message numerus="yes">

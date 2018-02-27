@@ -4,6 +4,7 @@
 #include <QString>
 
 #include <core/resource/resource_fwd.h>
+#include <common/common_globals.h>
 
 //!Holds types related to performing camera availability diagnostics
 namespace CameraDiagnostics {
@@ -105,6 +106,7 @@ public:
 
     explicit operator bool() const;
     QString toString(QnResourcePool* resourcePool) const;
+    Qn::MediaStreamEvent toMediaStreamEvent() const;
 };
 
 class NoErrorResult: public Result
