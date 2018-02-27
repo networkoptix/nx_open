@@ -274,7 +274,7 @@ bool QnWorkbenchWearableHandler::fixFileUpload(
                 .arg(QDateTime::fromMSecsSinceEpoch(maxTime).toString(Qt::SystemLocaleShortDate));
         }
 
-        QnMessageBox::warning(mainWindow(), title, extra);
+        QnMessageBox::warning(mainWindowWidget(), title, extra);
         return false;
     }
 
@@ -438,7 +438,7 @@ void QnWorkbenchWearableHandler::at_wearableManager_stateChanged(const WearableS
     /* Fire an error only on upload failure. */
     if (state.error == WearableState::UploadFailed)
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::critical(mainWindowWidget(),
             tr("Could not finish upload to %1").arg(camera->getName()),
             tr("Make sure there is enough space on server storage."));
         return;
