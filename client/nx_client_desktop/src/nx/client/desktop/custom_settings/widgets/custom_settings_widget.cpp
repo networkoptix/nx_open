@@ -9,11 +9,11 @@ namespace desktop {
 
 struct CustomSettingsWidget::Private
 {
-    QScopedPointer<QnCameraAdvancedParamWidgetsManager> manager;
+    QScopedPointer<CameraAdvancedParamWidgetsManager> manager;
 
     void init(QTreeWidget* groupWidget, QStackedWidget* contentsWidget)
     {
-        manager.reset(new QnCameraAdvancedParamWidgetsManager(groupWidget, contentsWidget));
+        manager.reset(new CameraAdvancedParamWidgetsManager(groupWidget, contentsWidget));
     }
 
 };

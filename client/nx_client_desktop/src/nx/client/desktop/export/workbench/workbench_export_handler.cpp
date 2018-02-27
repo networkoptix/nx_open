@@ -457,7 +457,7 @@ void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
     const auto tmpExtension = lit(".tmp");
 
     QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
-        mainWindow(),
+        mainWindowWidget(),
         lit("Export Standalone Client"),
         QnAppInfo::clientExecutableName(),
         lit("*") + exeExtension
