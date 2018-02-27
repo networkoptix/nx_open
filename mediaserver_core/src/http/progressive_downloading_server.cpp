@@ -479,7 +479,7 @@ void QnProgressiveDownloadingConsumer::sendMediaEventErrorResponse(
     error.error = QnRestResult::Forbidden;
     d->response.messageBody = QJson::serialized(error);
     sendResponse(
-        nx_http::StatusCode::ok,
+        nx::network::http::StatusCode::ok,
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::JsonFormat));
 }
 
@@ -492,7 +492,7 @@ void QnProgressiveDownloadingConsumer::sendJsonResponse(const QString& errorStri
     error.error = QnRestResult::CantProcessRequest;
     d->response.messageBody = QJson::serialized(error);
     sendResponse(
-        nx_http::StatusCode::ok,
+        nx::network::http::StatusCode::ok,
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::JsonFormat));
 }
 

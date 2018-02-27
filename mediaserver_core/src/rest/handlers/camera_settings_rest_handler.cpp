@@ -103,7 +103,7 @@ int QnCameraSettingsRestHandler::executeGet(
             camera,
             Qn::Permission::ReadPermission))
         {
-            return nx_http::StatusCode::forbidden;
+            return nx::network::http::StatusCode::forbidden;
         }
 
         camera->getAdvancedParametersAsync(
@@ -123,7 +123,7 @@ int QnCameraSettingsRestHandler::executeGet(
             owner->accessRights(),
             Qn::GlobalPermission::GlobalEditCamerasPermission))
         {
-            return nx_http::StatusCode::forbidden;
+            return nx::network::http::StatusCode::forbidden;
         }
 
         if (!owner->resourceAccessManager()->hasPermission(
@@ -131,7 +131,7 @@ int QnCameraSettingsRestHandler::executeGet(
             camera,
             Qn::Permission::WritePermission))
         {
-            return nx_http::StatusCode::forbidden;
+            return nx::network::http::StatusCode::forbidden;
         }
 
         camera->setAdvancedParametersAsync(

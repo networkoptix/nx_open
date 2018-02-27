@@ -105,8 +105,8 @@ private:
         const Qn::UserAccessData& accessRights,
         const QnVideoCameraPtr& videoCamera,
         const std::multimap<QString, QString>& requestParams,
-            nx::network::http::Response* const response );
-            QnJsonRestResult* error);
+        nx::network::http::Response* const response,
+        QnJsonRestResult* error);
     //!Generates variant playlist (containing references to other playlists providing different qualities)
     nx::network::http::StatusCode::Value getVariantPlaylist(
         Session* session,
@@ -137,8 +137,8 @@ private:
         const QnSecurityCamResourcePtr& camResource,
         const QnVideoCameraPtr& videoCamera,
         MediaQuality streamQuality,
-            HLSSession** session,
-            QnJsonRestResult* error);
+        Session** session,
+        QnJsonRestResult* error);
     int estimateStreamBitrate(
         Session* const session,
         QnSecurityCamResourcePtr camResource,
