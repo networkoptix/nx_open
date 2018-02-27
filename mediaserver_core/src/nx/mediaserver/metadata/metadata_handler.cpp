@@ -32,7 +32,7 @@ nx::api::Analytics::EventType MetadataHandler::eventDescriptor(const QnUuid& eve
 {
     for (const auto& descriptor: m_manifest.outputEventTypes)
     {
-        if (descriptor.eventTypeId == eventId)
+        if (descriptor.typeId == eventId)
             return descriptor;
     }
     return nx::api::Analytics::EventType();

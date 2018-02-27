@@ -47,12 +47,12 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AnalyticsDriverManifestBase::Capability)
 struct AnalyticsManifestObjectAction
 {
     QString id;
-    // TODO: Add name (with localization support).
-    QStringList supportedObjectTypes;
+    TranslatableString name;
+    QList<QnUuid> supportedObjectTypeIds;
     // TODO: Add settings.
 };
 #define AnalyticsManifestObjectAction_Fields \
-    (id)(supportedObjectTypes)
+    (id)(name)(supportedObjectTypeIds)
 
 struct AnalyticsDriverManifest: AnalyticsDriverManifestBase
 {

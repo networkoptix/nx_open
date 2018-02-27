@@ -164,8 +164,8 @@ QList<QnUuid> MetadataPlugin::parseSupportedEvents(const QByteArray& data)
             for (const auto& dependedName: descriptor.dependedEvent.split(','))
             {
                 auto descriptor = m_driverManifest.eventDescriptorByInternalName(dependedName);
-                if (!descriptor.eventTypeId.isNull())
-                    result << descriptor.eventTypeId;
+                if (!descriptor.typeId.isNull())
+                    result << descriptor.typeId;
             }
         }
     }

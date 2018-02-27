@@ -101,7 +101,7 @@ std::string Plugin::capabilitiesManifest() const
                     "name": {
                         "value": "Add to list"
                     },
-                    "supportedObjectTypes": [
+                    "supportedObjectTypeIds": [
                         ")json" + kCarObjectGuid + R"json("
                     ],
                     "settings": {
@@ -127,7 +127,7 @@ std::string Plugin::capabilitiesManifest() const
                     "name": {
                         "value": "Add person (URL-based)"
                     },
-                    "supportedObjectTypes": [
+                    "supportedObjectTypeIds": [
                         ")json" + kCarObjectGuid + R"json("
                     ]
                 }

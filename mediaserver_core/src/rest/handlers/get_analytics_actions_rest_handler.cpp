@@ -22,10 +22,10 @@ int QnGetAnalyticsActionsRestHandler::executeGet(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    QString objectTypeId = params.value("objectTypeId");
-    if (objectTypeId.isEmpty())
+    const auto objectTypeId = QnUuid(params.value("objectTypeId"));
+    if (objectTypeId.isNull())
     {
-        result.setError(QnRestResult::InvalidParameter, "Parameter objectTypeId is missing");
+        result.setError(QnRestResult::InvalidParameter, "Parameter objectTypeId is missing or invalid");
         return nx::network::http::StatusCode::invalidParameter;
     }
 
@@ -39,7 +39,7 @@ int QnGetAnalyticsActionsRestHandler::executeGet(
 
         for (const auto& action: manifest.objectActions)
         {
-            if (action.supportedObjectTypes.contains(objectTypeId))
+            if (action.supportedObjectTypeIds.contains(objectTypeId))
                 actionsOfPlugin.actionIds.append(action.id);
         }
 

@@ -34,7 +34,7 @@ namespace api {
 
 uint qHash(const Analytics::EventType& t)
 {
-    return qHash(t.eventTypeId.toByteArray());
+    return qHash(t.typeId.toByteArray());
 }
 
 } // namespace api
@@ -471,7 +471,7 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
 
 uint qHash(const nx::api::Analytics::EventType& t)// noexcept
 {
-    return qHash(t.eventTypeId.toByteArray());
+    return qHash(t.typeId.toByteArray());
 }
 
 boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifest(
@@ -614,7 +614,7 @@ ManagerPool::loadManagerManifest(
             std::back_inserter(deviceManifest->supportedEventTypes),
             [](const nx::api::Analytics::EventType& driverManifestElement)
             {
-                return driverManifestElement.eventTypeId;
+                return driverManifestElement.typeId;
             });
         return std::make_pair(deviceManifest, driverManifest);
     }

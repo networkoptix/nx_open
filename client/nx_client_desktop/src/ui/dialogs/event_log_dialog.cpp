@@ -258,7 +258,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
     {
         auto item = new QStandardItem(eventName(eventType));
         item->setData(EventType::analyticsSdkEvent, EventTypeRole);
-        item->setData(qVariantFromValue(eventType.eventTypeId), EventSubtypeRole);
+        item->setData(qVariantFromValue(eventType.typeId), EventSubtypeRole);
         rootItem->appendRow(item);
     }
 

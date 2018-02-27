@@ -149,7 +149,7 @@ const AnalyticsEventType& Plugin::eventByUuid(const QnUuid& uuid) const noexcept
         m_typedManifest.outputEventTypes.cend(),
         [&uuid](const AnalyticsEventType& event)
         {
-            return event.eventTypeId == uuid;
+            return event.typeId == uuid;
         });
 
     return
