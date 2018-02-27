@@ -176,6 +176,20 @@
         "default": "{{PRODUCT_NAME}} web interface"
     },
     "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pause",
+            "help": "help | show commands",
+            "collapse all servers": "collapse all servers",
+            "collapse server": "collapse server + [server name]",
+            "play": "play",
+            "clear search": "clear search",
+            "live": "go to live | show me live",
+            "expand all servers": "expand all servers",
+            "stop listening": "stop listening",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
         "systemOffline": "System Offline",
         "cameraLinks": {
             "copyToClipboard": "copy to clipboard",
@@ -186,9 +200,9 @@
             "transcoding": "Transcoding",
             "copyActiveText": "copied to clipboard"
         },
-        "searchCamPlaceholder": "pesquisa",
+        "searchCamPlaceholder": "Search",
         "cameraStates": {
-            "noFormat": "This browser or device does not support video playback from  this camera.",
+            "noFormat": "This browser does not support video playback from this camera.",
             "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",
             "iosVideoTooLarge": "iOS does not support video larger than fullHD (2MP: 1920x1080).",
             "unauthorized": "Authentication required",
@@ -199,7 +213,13 @@
             "error": "Erro",
             "offline": "Offline",
             "noData": "No data",
-            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers."
+            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+        },
+        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "resolution": {
+            "high": "High",
+            "auto": "Auto",
+            "low": "Low"
         }
     }
 }

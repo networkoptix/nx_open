@@ -1436,3 +1436,10 @@ bool QnArchiveStreamReader::needKeyData(int channel) const
         return true;
     return base_type::needKeyData(channel);
 }
+
+CameraDiagnostics::Result QnArchiveStreamReader::lastError() const
+{
+    if (!m_delegate)
+        return CameraDiagnostics::NoErrorResult();
+    return m_delegate->lastError();
+}

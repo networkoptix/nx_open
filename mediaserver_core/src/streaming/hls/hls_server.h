@@ -18,6 +18,7 @@
 #include "../streaming_chunk.h"
 #include <core/resource_access/user_access_data.h>
 
+class QnJsonRestResult;
 
 namespace nx_hls
 {
@@ -46,7 +47,7 @@ namespace nx_hls
         public QnTCPConnectionProcessor
     {
         Q_OBJECT
-
+        using base_type = QnTCPConnectionProcessor;
     public:
         static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
@@ -91,7 +92,10 @@ namespace nx_hls
         /*!
             In case of success, adds Content-Type, Content-Length headers to \a response
         */
-        nx_http::StatusCode::Value getRequestedFile( const nx_http::Request& request, nx_http::Response* const response );
+        nx_http::StatusCode::Value getRequestedFile(
+            const nx_http::Request& request,
+            nx_http::Response* const response,
+            QnJsonRestResult* error);
         void sendResponse( const nx_http::Response& response );
         /*!
             \return false, if no more data to send (reached end of file)
@@ -104,7 +108,8 @@ namespace nx_hls
             const Qn::UserAccessData& accessRights,
             const QnVideoCameraPtr& videoCamera,
             const std::multimap<QString, QString>& requestParams,
-            nx_http::Response* const response );
+            nx_http::Response* const response,
+            QnJsonRestResult* error);
         //!Generates variant playlist (containing references to other playlists providing different qualities)
         nx_http::StatusCode::Value getVariantPlaylist(
             HLSSession* session,
@@ -135,7 +140,8 @@ namespace nx_hls
             const QnSecurityCamResourcePtr& camResource,
             const QnVideoCameraPtr& videoCamera,
             MediaQuality streamQuality,
-            HLSSession** session );
+            HLSSession** session,
+            QnJsonRestResult* error);
         int estimateStreamBitrate(
             HLSSession* const session,
             QnSecurityCamResourcePtr camResource,

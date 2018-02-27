@@ -428,8 +428,22 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
 
     const auto callback = [localId, userName]()
         {
-            nx::client::core::helpers::storeCredentials(
-                localId, QnEncodedCredentials(userName, QString()));
+            auto authData = qnClientCoreSettings->systemAuthenticationData();
+            auto& credentialsList = authData[localId];
+            const auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
+                [userName](const QnEncodedCredentials& other)
+                {
+                    return other.user == userName;
+                });
+
+            if (it == credentialsList.end())
+                return;
+
+            const auto insertionIndex = it - credentialsList.begin();
+            credentialsList.erase(it);
+            credentialsList.insert(insertionIndex, QnEncodedCredentials(userName, QString()));
+
+            qnClientCoreSettings->setSystemAuthenticationData(authData);
         };
 
     executeDelayedParented(callback, 0, this);

@@ -23,6 +23,8 @@ private:
     QString m_mediaFolderName;
 };
 
+QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allServerStorages);
+
 class SystemNameProxy
 {
 public:
@@ -99,7 +101,7 @@ bool setUpSystemIdentity(
         SettingsProxy* settings,
         SystemNameProxyPtr systemNameProxy);
 
-void makeFakeData(const QString& fakeDataString, 
+void makeFakeData(const QString& fakeDataString,
     const ec2::AbstractECConnectionPtr& connection, const QnUuid& moduleGuid);
 
 } // namespace mserver_aux

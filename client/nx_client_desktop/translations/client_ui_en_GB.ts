@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Fixed Archive Length</translation>
     </message>
@@ -958,6 +953,14 @@
       <location/>
       <source>Description contains:</source>
       <translation>Description contains:</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>Category</translation>
     </message>
   </context>
   <context>
@@ -2667,11 +2670,6 @@
     </message>
     <message>
       <location/>
-      <source>TextLabel</source>
-      <translation>TextLabel</translation>
-    </message>
-    <message>
-      <location/>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
 The oldest footage among all cameras on the server will be deleted first.</source>
       <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
@@ -3065,11 +3063,6 @@ Click &quot;New role&quot; button to create one.</translation>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Motion Detection</translation>
     </message>
@@ -3088,11 +3081,6 @@ Click &quot;New role&quot; button to create one.</translation>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Cancel</translation>
     </message>
@@ -3101,11 +3089,6 @@ Click &quot;New role&quot; button to create one.</translation>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation type="unfinished">Upload Video</translation>
     </message>

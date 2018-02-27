@@ -394,7 +394,15 @@ QnLayoutResourcePtr LayoutThumbnailLoader::layout() const
 
 QImage LayoutThumbnailLoader::image() const
 {
-    return d->outputRegion;
+    switch (d->status)
+    {
+        case Qn::ThumbnailStatus::NoData:
+        case Qn::ThumbnailStatus::Invalid:
+        case Qn::ThumbnailStatus::Refreshing:
+            return QImage();
+        default:
+            return d->outputRegion;
+    }
 }
 
 QSize LayoutThumbnailLoader::sizeHint() const
@@ -475,10 +483,9 @@ void LayoutThumbnailLoader::doLoadAsync()
 
     if (bounding.isEmpty())
     {
-        d->status = Qn::ThumbnailStatus::Loaded;
+        d->status = Qn::ThumbnailStatus::NoData;
         // Dat proper event chain.
         emit sizeHintChanged(QSize());
-        emit imageChanged(d->outputImage);
         emit statusChanged(d->status);
         return;
     }
@@ -617,7 +624,7 @@ void LayoutThumbnailLoader::doLoadAsync()
     {
         // If there's nothing to load.
         // TODO: #dkargin I guess we should draw NoData here.
-        d->status = Qn::ThumbnailStatus::Loaded;
+        d->status = Qn::ThumbnailStatus::NoData;
         emit statusChanged(d->status);
     }
 }
