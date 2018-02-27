@@ -6,7 +6,7 @@
 
 window.L = {};
 
-function setLanguage(lang){
+window.setLanguage = function(lang){
 
     function setCookie(cname, cvalue, exdays) {
         var d = new Date();
@@ -16,7 +16,7 @@ function setLanguage(lang){
     }
 
     setCookie("language", lang, 100); // Almost never expiring cookie
-}
+};
 (function LanguageDetect(){
 
     function getCookie(cname) {

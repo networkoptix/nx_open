@@ -4,8 +4,8 @@
  * If once health chart will dissapear - try going to tc-angular-chartjs and find there "chartObj.resize();" and comment to hell!
  */
 angular.module('webadminApp')
-    .controller('HealthCtrl', ['$scope', '$uibModal', '$log', 'mediaserver', '$poll',
-    function ($scope, $modal, $log, mediaserver, $poll) {
+    .controller('HealthCtrl', ['$scope', '$log', 'mediaserver', '$poll',
+    function ($scope, $log, mediaserver, $poll) {
         $scope.healthLength = 100;//сколько точек сохраняем
         $scope.interval = 1000;// 1 секунда
         $scope.serverIsOnline = true;
