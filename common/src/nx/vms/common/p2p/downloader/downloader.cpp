@@ -75,19 +75,23 @@ void DownloaderPrivate::createWorker(const QString& fileName)
 
 void DownloaderPrivate::at_workerFinished(const QString& fileName)
 {
-    auto worker = workers.take(fileName);
-    if (!worker)
-        return;
+    Worker::State state;
+    {
+        QnMutexLocker lock(&mutex);
+        auto worker = workers.take(fileName);
+        if (!worker)
+            return;
+
+        state = worker->state();
+        worker->stop();
+    }
 
     Q_Q(Downloader);
 
-    const auto state = worker->state();
     if (state == Worker::State::finished)
         emit q->downloadFinished(fileName);
     else
         emit q->downloadFailed(fileName);
-
-    worker->stop();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -202,14 +206,16 @@ ResultCode Downloader::writeFileChunk(
     return d->storage->writeFileChunk(fileName, chunkIndex, buffer);
 }
 
-ResultCode Downloader::deleteFile(
-    const QString& fileName,
-    bool deleteData)
+ResultCode Downloader::deleteFile(const QString& fileName, bool deleteData)
 {
     Q_D(Downloader);
-    auto worker = d->workers.take(fileName);
-    if (worker)
-        worker->stop();
+    {
+        QnMutexLocker lock(&d->mutex);
+        auto worker = d->workers.take(fileName);
+        if (worker)
+            worker->stop();
+    }
+
     return d->storage->deleteFile(fileName, deleteData);
 }
 
