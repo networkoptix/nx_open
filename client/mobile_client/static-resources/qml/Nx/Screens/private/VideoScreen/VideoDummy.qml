@@ -97,7 +97,7 @@ DummyMessage
             PropertyChanges
             {
                 target: dummyMessage
-                title: qsTr("Unsopported firmware version")
+                title: qsTr("Unsupported firmware version")
                 image: lp("/images/alert_alert.png")
                 description: qsTr("Please update firmware")
             }
