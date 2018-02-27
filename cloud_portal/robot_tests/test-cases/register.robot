@@ -25,6 +25,7 @@ should open register page in anonymous state by clicking Register button on top 
     Close Browser
 
 should open register page from register success page by clicking Register button on top right corner
+    [tags]    email
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    'mark'    'hamill'    ${email}    ${password}

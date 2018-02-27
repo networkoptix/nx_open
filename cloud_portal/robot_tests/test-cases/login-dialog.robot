@@ -149,6 +149,7 @@ passes email from email input to Restore password page, even without clicking 'L
     Close Browser
 
 redirects to /activate and shows non-activated user message when not activated; Resend activation button sends email
+    [tags]    email
     Open Browser and go to URL    ${url}/register
     ${random email}    get random email
     Register    'mark'    'hamill'    ${random email}    ${BASE PASSWORD}

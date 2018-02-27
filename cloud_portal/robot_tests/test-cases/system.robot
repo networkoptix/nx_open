@@ -129,7 +129,6 @@ contains user emails and names
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${ADMIN FIRST NAME} ${ADMIN LAST NAME}')]
 
 rename button opens dialog; cancel closes without rename; save renames system
-    [tags]    not-ready
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
@@ -182,6 +181,7 @@ should open System page by link not authorized user, and show alert if logs in a
     Close Browser
 
 should display same user data as user provided during registration (stress to cyrillic)
+    [tags]    email
 #create user
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register

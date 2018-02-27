@@ -173,6 +173,7 @@ Edit permission works
     Close Browser
 
 Delete user works
+    [tags]    email
     Open Browser and go to URL    ${url}/register
     ${random email}    Get Random Email
     Register    mark    harmill    ${random email}    ${password}
