@@ -220,79 +220,28 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
     return CameraDiagnostics::NoErrorResult();
 }
 
-QSet<int> HanwhaStreamReader::availableProfiles(int channel) const
+int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
 {
-    QSet<int> result;
+    // Accodring to hawna request for ONVIF:
+    // - Use Recording profile from NVR as a Primary stream.
+    // - Use Live Streaming profile from NVR as a Secondary stream.
+    // See: http://git.wisenetdev.com/HanwhaTechwinAmerica/WAVE/issues/290
+    const auto requiredProfileName = (role == Qn::CR_SecondaryLiveVideo)
+        ? lit("LiveProfile") : lit("RecordProfile");
+
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(
         lit("media/videoprofilepolicy"),
-        {{ kHanwhaChannelProperty, QString::number(channel) }});
+        {{kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())}});
 
-    if (!response.isSuccessful())
-        return result;
-
-    for (const auto& entry: response.response())
+    for (const auto& profile: response.response())
     {
-        if (entry.first.endsWith("Profile"))
-            result << entry.second.toInt();
-    }
-    return result;
-}
-
-int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
-{
-    const auto channel = m_hanwhaResource->getChannel();
-
-    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
-    const auto response = helper.view(
-        lit("media/videoprofile"),
-        {{kHanwhaChannelProperty, QString::number(channel)}});
-
-    if (!response.isSuccessful())
-        return kHanwhaInvalidProfile;
-
-    const auto profiles = parseProfiles(response);
-    if (profiles.empty())
-        return kHanwhaInvalidProfile;
-
-    if (profiles.find(channel) == profiles.cend())
-        return kHanwhaInvalidProfile;
-
-    const auto& channelProfiles = profiles.at(channel);
-
-    if (channelProfiles.empty())
-        return kHanwhaInvalidProfile;
-
-    int bestProfile = kHanwhaInvalidProfile;
-    int bestScore = 0;
-    const auto profileFilter = availableProfiles(channel);
-
-    for (const auto& profileEntry: channelProfiles)
-    {
-        const auto profile = profileEntry.second;
-        const auto codecCoefficient =
-            kHanwhaCodecCoefficients.find(profile.codec) != kHanwhaCodecCoefficients.cend()
-            ? kHanwhaCodecCoefficients.at(profile.codec)
-            : -1;
-
-        if (!profileFilter.contains(profile.number))
-            continue;
-
-        const auto score = profile.resolution.width()
-            * profile.resolution.height()
-            * codecCoefficient
-            + profile.frameRate;
-
-        if (score > bestScore)
-        {
-            bestScore = score;
-            bestProfile = profile.number;
-        }
+        if (profile.first.endsWith(requiredProfileName))
+            return profile.second.toInt();
     }
 
-    return bestProfile;
+    return kHanwhaInvalidProfile;
 }
 
 bool HanwhaStreamReader::isCorrectProfile(int profileNumber) const

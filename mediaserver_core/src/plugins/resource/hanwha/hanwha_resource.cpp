@@ -1048,6 +1048,11 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
                 return result;
         }
     }
+    else
+    {
+        // See: HanwhaStreamReader::chooseNvrChannelProfile(...).
+        hasDualStreaming = true;
+    }
 
     const bool hasAudio = m_attributes.attribute<int>(
         lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
