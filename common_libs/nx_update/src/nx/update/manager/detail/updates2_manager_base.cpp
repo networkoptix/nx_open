@@ -400,7 +400,7 @@ void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
             break;
     }
 
-    downloader()->deleteFile(fileName, /*deleteTrue*/ true);
+    downloader()->deleteFile(fileName, /*deleteData*/ true);
     m_currentStatus.files.remove(fileName);
 }
 
