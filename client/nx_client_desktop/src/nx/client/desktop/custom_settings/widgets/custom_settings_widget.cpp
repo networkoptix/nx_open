@@ -1,7 +1,7 @@
 #include "custom_settings_widget.h"
 #include "ui_custom_settings_widget.h"
 
-#include <ui/widgets/properties/camera_advanced_param_widgets_manager.h>
+#include <nx/client/desktop/resource_properties/camera/camera_advanced_param_widgets_manager.h>
 
 namespace nx {
 namespace client {
