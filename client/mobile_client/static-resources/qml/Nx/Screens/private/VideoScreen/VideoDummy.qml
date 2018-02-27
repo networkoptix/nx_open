@@ -90,7 +90,17 @@ DummyMessage
                 description: qsTr(
                     "Set password on this camera using Wisenet WAVE client or camera web-page to view video")
             }
-
+        },
+        State
+        {
+            name: "oldFirmwareAlert"
+            PropertyChanges
+            {
+                target: dummyMessage
+                title: qsTr("Unsopported firmware version")
+                image: lp("/images/alert_alert.png")
+                description: qsTr("Please update firmware")
+            }
         }
     ]
 }

@@ -35,13 +35,18 @@ void QnResourceHelper::setResourceId(const QString& id)
 
     if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
     {
-        connect(camera, &QnSecurityCamResource::capabilitiesChanged,
-            this, &QnResourceHelper::defaultCameraPasswordChanged);
+        connect(camera, &QnSecurityCamResource::capabilitiesChanged, this,
+            [this]()
+            {
+                defaultCameraPasswordChanged();
+                oldCameraFirmwareChanged();
+            });
     }
 
     emit resourceIdChanged();
     emit resourceNameChanged();
     emit resourceStatusChanged();
+    emit oldCameraFirmwareChanged();
     emit defaultCameraPasswordChanged();
 }
 
@@ -60,10 +65,20 @@ QnResourcePtr QnResourceHelper::resource() const
     return m_resource;
 }
 
-bool QnResourceHelper::isDefaultCameraPassword() const
+bool QnResourceHelper::hasCameraCapability(Qn::CameraCapability capability) const
 {
     if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
-        return camera->hasCameraCapabilities(Qn::isDefaultPasswordCapability);
+        return camera->hasCameraCapabilities(capability);
 
     return false;
+}
+
+bool QnResourceHelper::isDefaultCameraPassword() const
+{
+    return hasCameraCapability(Qn::isDefaultPasswordCapability);
+}
+
+bool QnResourceHelper::isOldCameraFirmware() const
+{
+    return hasCameraCapability(Qn::isOldFirmwareCapability);
 }
