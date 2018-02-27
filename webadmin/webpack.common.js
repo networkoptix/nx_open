@@ -50,6 +50,10 @@ module.exports = {
                 to: 'web_common',
                 ignore: ['scripts/**', 'styles/**', 'chromeless/**', '*.js']
             },
+            {
+                from:'../node_modules/bootstrap-sass/assets/fonts',
+                to: 'fonts'
+            }
         ]),
 
         //Plugins for npm packages
