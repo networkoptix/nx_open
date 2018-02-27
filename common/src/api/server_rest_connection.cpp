@@ -356,6 +356,20 @@ Handle ServerConnection::searchCameraStop(
             callback, targetThread);
 }
 
+Handle ServerConnection::executeAnalyticsAction(
+    const AnalyticsAction& action,
+    Result<QnJsonRestResult>::type callback,
+    QThread* targetThread)
+{
+    return executePost(
+        lit("/api/executeAnalyticsAction"),
+        QnRequestParamList(),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(action),
+        callback,
+        targetThread);
+}
+
 Handle ServerConnection::addFileUpload(
     const QString& fileName,
     qint64 size,

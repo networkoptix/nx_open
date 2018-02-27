@@ -7,6 +7,7 @@
 
 #include <QtCore/QSet>
 #include <QtCore/QHash>
+#include <QtCore/QSharedPointer>
 
 #include <api/server_rest_connection_fwd.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
@@ -18,8 +19,11 @@
 
 class QnUuid;
 class QnMediaResourceWidget;
+class QMenu;
 
 namespace nx {
+
+namespace api { struct AnalyticsManifestObjectAction; }
 
 namespace utils { class PendingOperation; }
 
@@ -74,9 +78,14 @@ private:
 
     QString description(const analytics::storage::DetectedObject& object) const;
     QString attributes(const analytics::storage::DetectedObject& object) const;
+    QSharedPointer<QMenu> contextMenu(const analytics::storage::DetectedObject& object) const;
     static qint64 startTimeMs(const analytics::storage::DetectedObject& object);
 
     utils::PendingOperation* createUpdateWorkbenchFilterOperation();
+
+    void executePluginAction(const QnUuid& driverId,
+        const api::AnalyticsManifestObjectAction& action,
+        const analytics::storage::DetectedObject& object) const;
 
 private:
     AnalyticsSearchListModel* const q = nullptr;
