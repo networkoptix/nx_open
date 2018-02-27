@@ -23,6 +23,9 @@
     <link rel="stylesheet" href="fonts/roboto/roboto_medium/stylesheet.css" />
 
     <!--<link rel="stylesheet" href="images/icons/icons.css">-->
+    <% for (key in htmlWebpackPlugin.files.css) { %>
+    <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[key] %>" />
+    <% } %>
 
     <link rel="stylesheet" href="customization/styles.css">
 
@@ -37,6 +40,9 @@
 <!-- Add your site or application content here -->
 <div ng-view=""></div>
 
+<% for (key in htmlWebpackPlugin.files.chunks) { %>
+<script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks[key].entry %>"></script>
+<% } %>
 <script src="customization/config.js"></script>
 </body>
 </html>

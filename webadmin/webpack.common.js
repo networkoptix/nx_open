@@ -23,17 +23,20 @@ module.exports = {
         new HtmlWebpackPlugin({
             chunks: ['commons', 'app', 'webcommonApp'],
             template: 'index-template.html',
-            filename: 'index.html'
+            filename: 'index.html',
+            inject:false
         }),
         new HtmlWebpackPlugin({
             chunks: ['commons', 'inline', 'webcommonPartial'],
             template: 'inline-template.html',
-            filename: 'inline.html'
+            filename: 'inline.html',
+            inject:false
         }),
         new HtmlWebpackPlugin({
             chunks: ['commons', 'login', 'webcommonPartial'],
             template: 'login-template.html',
-            filename: 'login.html'
+            filename: 'login.html',
+            inject:false
         }),
         new ExtractTextPlugin({filename: 'styles/[name].css'}),
         new CopyWebpackPlugin([
@@ -68,7 +71,7 @@ module.exports = {
     output: {
         filename: 'scripts/[name].js',
         path: path.resolve(__dirname, 'dist'),
-        publicPath: '/'
+        publicPath: ''
     },
     resolve:{
         alias:{
