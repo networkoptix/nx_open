@@ -475,12 +475,12 @@ void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
     temporaryFilename.replace(exeExtension, tmpExtension);
     if (QnNovLauncher::createLaunchingFile(temporaryFilename) != QnNovLauncher::ErrorCode::Ok)
     {
-        QnMessageBox::critical(mainWindow(), lit("File %1 cannot be written").arg(temporaryFilename));
+        QnMessageBox::critical(mainWindowWidget(), lit("File %1 cannot be written").arg(temporaryFilename));
         return;
     }
 
     QFile::rename(temporaryFilename, targetFilename);
-    QnMessageBox::success(mainWindow(), tr("Export completed"));
+    QnMessageBox::success(mainWindowWidget(), tr("Export completed"));
 #endif
 }
 
