@@ -7,7 +7,7 @@ Suite Teardown    Close All Browsers
 ${email}    ${EMAIL OWNER}
 ${email invalid}    aodehurgjaegir
 ${password}    ${BASE PASSWORD}
-${url}         ${CLOUD TEST}
+${url}         ${ENV}
 
 *** Test Cases ***
 can be opened in anonymous state

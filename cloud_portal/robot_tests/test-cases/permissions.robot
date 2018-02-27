@@ -6,7 +6,7 @@ Suite Teardown    Close All Browsers
 *** Variables ***
 ${email}           ${EMAIL OWNER}
 ${password}        ${BASE PASSWORD}
-${url}             ${CLOUD TEST}
+${url}             ${ENV}
 ${share dialogue}
 
 *** Keywords ***

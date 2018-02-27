@@ -9,7 +9,7 @@ Resource          variables.robot
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    Open Browser    ${URL}    Chrome
+    Open Browser    ${ENV}    Chrome
 #    Maximize Browser Window
     Set Selenium Speed    0
     Check Language

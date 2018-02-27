@@ -5,7 +5,7 @@ Suite Teardown    Close All Browsers
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
-${url}         ${CLOUD TEST}
+${url}         ${ENV}
 
 *** Test Cases ***
 Register and Activate
