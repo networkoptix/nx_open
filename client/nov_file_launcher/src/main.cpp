@@ -2,7 +2,10 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <iostream>
 #include <algorithm>
+
+#include <boost/preprocessor/cat.hpp>
 
 #include <tchar.h>
 #include <Windows.h>
@@ -11,34 +14,6 @@
 #include "version.h"
 #include "progress.h"
 #include "resource.h"
-#include <iostream>
-
-// -------------------------------------------------------------------------- //
-// boost/preprocessor/cat.hpp
-// -------------------------------------------------------------------------- //
-# /* Copyright (C) 2001
-#  * Housemarque Oy
-#  * http://www.housemarque.com
-#  *
-#  * Distributed under the Boost Software License, Version 1.0. (See
-#  * accompanying file LICENSE_1_0.txt or copy at
-#  * http://www.boost.org/LICENSE_1_0.txt)
-#  */
-#
-# /* Revised by Paul Mensonides (2002) */
-#
-# /* See http://www.boost.org for most recent version. */
-#
-#ifndef BOOST_PREPROCESSOR_CAT_HPP
-#define BOOST_PREPROCESSOR_CAT_HPP
-#
-#define BOOST_PP_CAT(a, b) BOOST_PP_CAT_OO((a, b))
-#define BOOST_PP_CAT_OO(par) BOOST_PP_CAT_I ## par
-#
-#define BOOST_PP_CAT_I(a, b) BOOST_PP_CAT_II(a ## b)
-#define BOOST_PP_CAT_II(res) res
-#
-#endif
 
 typedef signed __int64 int64_t;
 
@@ -197,12 +172,17 @@ BOOL startProcessAsync(wchar_t* commandline, const wstring& dstDir)
 
 int launchFile(const wstring& executePath)
 {
+    logfile << L"Launch file " << executePath << "\n";
+
     static const int kMaximumFileCatalogSize = 1024 * 1024;
 
     ifstream srcFile;
     srcFile.open(executePath.c_str(), std::ios_base::binary);
     if (!srcFile.is_open())
+    {
+        logfile << L"Cannot open file " << executePath << "\n";
         return -1;
+    }
 
     // see seekg(-value, std::ios::end) is broken in MSVC2012 for x86 mode. Workaround it
     srcFile.seekg(0, std::ios::end);
@@ -214,7 +194,10 @@ int launchFile(const wstring& executePath)
     srcFile.read((char*) &novPos, sizeof(int64_t));
     srcFile.read((char*) &magic, sizeof(int64_t));
     if (magic != MAGIC)
+    {
+        logfile << L"Magic was not found" << "\n";
         return -5;
+    }
 
     srcFile.seekg(novPos-sizeof(int64_t)); // go to index_pos field
     int64_t indexEofPos = (int64_t)srcFile.tellg(); // + sizeof(int64_t);
@@ -222,7 +205,10 @@ int launchFile(const wstring& executePath)
 
     auto catalogSize = indexEofPos - indexTablePos;
     if (catalogSize > kMaximumFileCatalogSize)
-        return -3; // too long file catalog
+    {
+        logfile << L"Too long file catalog " << catalogSize << "\n";
+        return -3;
+    }
 
     char* buffer = new char[catalogSize];
     try
@@ -236,7 +222,10 @@ int launchFile(const wstring& executePath)
             int64_t builtinFilePos;
             srcFile.read((char*)&builtinFilePos, sizeof(int64_t));
             if (builtinFilePos > indexEofPos)
-                return -3; // invalid catalog
+            {
+                logfile << L"Invalid catalog" << "\n";
+                return -3;
+            }
             filePosList.push_back(builtinFilePos);
 
             int fileNameSize;
@@ -252,7 +241,6 @@ int launchFile(const wstring& executePath)
         delete [] buffer;
         wstring dstDir = getDstDir();
 
-        logfile.open(getTempPath() + L"nov_file_launcher.log", std::ofstream::out);
         logfile << L"Preparing folder: " << dstDir << "\n";
 
         set<wstring> checkedDirs;
@@ -274,25 +262,20 @@ int launchFile(const wstring& executePath)
             }
         }
 
-        logfile.close();
         srcFile.close();
 
         // start client
         static const wchar_t kPathTemplate[](L"\"%s\" \"%s\" --exported");
         wchar_t buffer[sizeof(kPathTemplate) / sizeof(kPathTemplate[0]) + (MAX_PATH-2)*2];
         wsprintf(buffer, kPathTemplate, getFullFileName(dstDir, CLIENT_FILE_NAME).c_str(), executePath.c_str());
-        if (!startProcessAsync(buffer, dstDir))
-        {
-            // todo: refactor it. Current version have different 'exe' name for installer and debug mode. So, try both names
-            wsprintf(buffer, kPathTemplate, getFullFileName(dstDir, L"desktop_client.exe").c_str(), executePath.c_str());
-            startProcessAsync(buffer, dstDir);
-        }
-
+        logfile << L"Starting process.. " << buffer << "\n";
+        startProcessAsync(buffer, dstDir);
         return 0;
     }
     catch(...)
     {
         delete [] buffer;
+        logfile << "Exception caught";
         return -2;
     }
 }
@@ -310,26 +293,45 @@ wstring unquoteStr(std::wstring str)
     return str;
 }
 
-int APIENTRY _tWinMain(HINSTANCE hInstance,
-                       HINSTANCE hPrevInstance,
-                       LPTSTR    lpCmdLine,
-                       int       nCmdShow)
+int main(int argc, char** argv)
 {
+    logfile.open(getTempPath() + L"nov_file_launcher.log", std::ofstream::out);
+
     INITCOMMONCONTROLSEX initCtrlEx;
     memset(&initCtrlEx, 0, sizeof(initCtrlEx));
     initCtrlEx.dwSize = sizeof(INITCOMMONCONTROLSEX);
     initCtrlEx.dwICC = ICC_PROGRESS_CLASS;
     InitCommonControlsEx(&initCtrlEx);
 
-    if (std::wstring(lpCmdLine).empty())
+    auto cmdLine = std::wstring(GetCommandLineW());
+    logfile << cmdLine;
+
+    auto szArglist = CommandLineToArgvW(GetCommandLineW(), &argc);
+    if (!szArglist)
+    {
+        logfile << "Win api call CommandLineToArgvW failed";
+    }
+    else
+    {
+        std::wstring exePath(szArglist[argc - 1]);
+        launchFile(exePath);
+    }
+    /*
+    for( i=0; i<nArgs; i++) printf("%d: %ws\n", i, szArglist[i]);
+
+    if (cmdLine.empty())
     {
         wchar_t exepath[MAX_PATH];
-        GetModuleFileName(0, exepath, MAX_PATH);
+        GetModuleFileNameW(0, exepath, MAX_PATH);
         launchFile(exepath);
     }
     else
     {
-        launchFile(unquoteStr(lpCmdLine));
-    }
+        launchFile(unquoteStr(cmdLine));
+    }*/
+
+    LocalFree(szArglist);
+
+    logfile.close();
     return 0;
 }
