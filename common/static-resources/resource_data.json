@@ -660,7 +660,7 @@
                 "DW|DWC-MF21M8TIR","Win4NET Co., Ltd.|Clebo-MF21M8TIR",
                 "DW|DWC-MF21M4FM","Win4NET Co., Ltd.|Clebo-MF21M4FM",
                 "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM",
-                "DW|DWC-MB950TIR", "DW|DWC-MV950TIR"
+                "DW|DWC-MB950TIR", "DW|DWC-MV950TIR", "DW|DWC-BVI2IR"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
@@ -786,12 +786,6 @@
                 "DW|DWC-PV2M4TIR","DW|DWC-PB2M4TIR", "DWC|DWC-PV2M4T", "DW|DWC-PV2M4T"
             ],
         "dw-http-ptz": true
-        },
-        {
-            "keys": [
-                "DW|DWC-BVI2IR"
-            ],
-            "dw-pravis-chipset": true
         },
         {
             "keys": [

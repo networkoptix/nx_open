@@ -28,11 +28,6 @@ int QnActiStreamReader::getActiChannelNum() const
     return m_role == Qn::CR_LiveVideo ? 1 : 2;
 }
 
-QString QnActiStreamReader::formatResolutionStr(const QSize& resolution) const
-{
-    return QString(QLatin1String("N%1x%2")).arg(resolution.width()).arg(resolution.height());
-}
-
 int QnActiStreamReader::toJpegQuality(const QnLiveStreamParams& params)
 {
     auto quality = params.quality;
@@ -92,7 +87,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
     params.fps = m_actiRes->roundFps(params.fps, m_role);
     int ch = getActiChannelNum();
 
-    QString resolutionStr = formatResolutionStr(params.resolution);
+    QString resolutionStr = QnActiResource::formatResolutionStr(params.resolution);
 
     int bitrate = m_actiRes->suggestBitrateKbps(params, getRole());
     bitrate = m_actiRes->roundBitrate(bitrate);
