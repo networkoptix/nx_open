@@ -72,7 +72,7 @@ class VagrantBoxServerCtl(ServerCtl):
         self._run_service_action('start' if is_started else 'stop')
 
     def make_core_dump(self):
-        self.host.run_command(['killall', '--signal', 'SIGTRAP', 'mediaserver-bin'])
+        self.host.run_command(['killall', '--signal', 'SIGTRAP', 'mediaserver-bin'], check_retcode=False)
 
     def _run_service_action(self, action):
         return self.host.run_command([action, self._service_name])

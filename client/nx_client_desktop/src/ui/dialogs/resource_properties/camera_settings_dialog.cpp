@@ -9,6 +9,7 @@
 
 #include <common/common_module.h>
 
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
@@ -106,15 +107,33 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnCameraSettingsDialog::updateReadOnly);
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
-    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources)
-    {
-        if (isHidden())
-            return;
+    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this,
+        [this](const QnResourceList &resources)
+        {
+            if (isHidden())
+                return;
 
-        auto cameras = resources.filtered<QnVirtualCameraResource>();
-        if (!cameras.isEmpty())
-            setCameras(cameras);
-    });
+            auto cameras = resources.filtered<QnVirtualCameraResource>();
+            if (!cameras.isEmpty())
+                setCameras(cameras);
+        });
+
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
+        {
+            auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+            if (!camera)
+                return;
+
+            auto selectedCameras = m_settingsWidget->cameras();
+            if (selectedCameras.contains(camera))
+            {
+                selectedCameras.removeAll(camera);
+                setCameras(selectedCameras, /*force*/ true);
+                if (selectedCameras.empty())
+                    hide();
+            }
+        });
 
     setupDefaultPasswordListener();
 
