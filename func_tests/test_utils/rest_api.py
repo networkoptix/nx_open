@@ -10,7 +10,6 @@ But for POST method keyword parameters are translated to json request body.
 import datetime
 import json
 import logging
-import pprint
 
 import requests
 import requests.exceptions
@@ -176,7 +175,7 @@ class RestApi(object):
             log.warning("Non-JSON response:\n%r", response.content)
             return response.content
 
-        log.debug("Response data:\n%s", pprint.pformat(response_data))
+        log.debug("Response data:\n%s", json.dumps(response_data, indent=4))
 
         if not isinstance(response_data, dict):
             return response_data
@@ -189,7 +188,7 @@ class RestApi(object):
         return response_data['reply']
 
     def request(self, method, path, raise_exception=True, new_connection=False, timeout=None, **kwargs):
-        log.debug('%r: %s %s\n%s', self, method, path, json.dumps(kwargs))
+        log.debug('%r: %s %s\n%s', self, method, path, json.dumps(kwargs, indent=4))
         try:
             make_request = requests.request if new_connection else self._session.request
             response = make_request(

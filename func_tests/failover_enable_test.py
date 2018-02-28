@@ -13,7 +13,7 @@ import pytest
 
 import server_api_data_generators as generator
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
-from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str, str_to_bool, wait_until
+from test_utils.utils import datetime_utc_now, bool_to_str, str_to_bool, wait_until
 
 
 CAMERA_SWITCHING_PERIOD_SEC = 4*60
@@ -59,7 +59,7 @@ def create_cameras_and_servers(server_factory, camera_factory, counter, server_n
     return server_rec_list
 
 def create_server(server_factory, name, all_camera_mac_set, setup_settings=None):
-    server = server_factory(name, setup_settings=setup_settings)
+    server = server_factory.get(name, setup_settings=setup_settings)
     wait_until_cameras_are_online(server, all_camera_mac_set)
     return server
 

@@ -5,8 +5,9 @@ import jinja2
 import vagrant
 import vagrant.compat
 from pathlib2 import Path
+from pylru import lrudecorator
 
-from test_utils.networking import NodeNetworking
+from test_utils.networking import NodeNetworking, reset_networking
 from test_utils.networking.linux import LinuxNodeNetworking
 from test_utils.networking.virtual_box import VirtualBoxNodeNetworking
 from test_utils.os_access import LocalAccess
@@ -68,10 +69,10 @@ class VagrantVMFactory(object):
             self._vagrant_private_key_path = Path().home() / '.vagrant.d' / 'insecure_private_key'
         self._virtualbox_vm = VirtualboxManagement(self._host_os_access)
         self._vagrant_file_path = self._vagrant_dir / 'Vagrantfile'
-        self._existing_vm_list = set(self._virtualbox_vm.get_vms_list())
         self._vagrant = RemotableVagrant(
             self._host_os_access, root=str(self._vagrant_dir), quiet_stdout=False, quiet_stderr=False)
         self._vms = self._discover_existing_vms()  # VM name -> VagrantVM
+        self._allocated_vms = {}
         self._init_running_vms()
         if self._vms:
             self._last_vm_idx = max(vm.config.idx for vm in self._vms.values())
@@ -119,30 +120,31 @@ class VagrantVMFactory(object):
         self._vms.clear()
         self._save_vms_config_to_cache()
         self._last_vm_idx = 0
-        self._existing_vm_list = set(self._virtualbox_vm.get_vms_list())
-
-    def __call__(self, *args, **kw):
-        config = self._config_factory(*args, **kw)
-        return self._allocate_vm(config)
 
     def release_all_vms(self):
         log.debug('Releasing all VMs: %s', ', '.join(vm.vagrant_name for vm in self._vms.values() if vm.is_allocated))
+        self.get.clear()
         for vm in self._vms.values():
             vm.is_allocated = False
 
-    def _allocate_vm(self, config):
-        vm = self._find_matching_vm(config)
-        if not vm:
-            vm = self._create_vm(config)
-        vm.is_allocated = True
-        if not vm.is_running and vm.virtualbox_name in self._existing_vm_list:
-            self._remove_vms(vm.virtualbox_name)
-        if not vm.is_running:
-            vm.start()
-            self._existing_vm_list.add(vm.virtualbox_name)
-            vm.init()
-        log.info('VM: %s', vm)
-        return vm
+    @lrudecorator(1000)
+    def get(self, name=None):
+        found_vm = None
+        for vm in self._vms.values():
+            if not vm.is_allocated and vm.is_running:
+                found_vm = vm
+                break
+        if found_vm is None:
+            for vm in self._vms.values():
+                if not vm.is_allocated:
+                    found_vm = vm
+                    break
+            if found_vm is None:
+                found_vm = self._create_vm(self._config_factory(name))
+            found_vm.start()
+        found_vm.init()
+        found_vm.is_allocated = True
+        return found_vm
 
     def _remove_vms(self, vms_name):
         log.info('Removing old vm %s...', vms_name)
@@ -162,19 +164,6 @@ class VagrantVMFactory(object):
         self._save_vms_config_to_cache()
         self._write_vagrantfile([b.config for b in self._vms.values()])
         return vm
-
-    def _find_matching_vm(self, config_template):
-        def find(pred=None):
-            for name, vm in sorted(self._vms.items(), key=lambda (name, vm): vm.config.idx):
-                if vm.is_allocated:
-                    continue
-                if pred and not pred(vm):
-                    continue
-                return vm
-            return None
-
-        # first try running ones
-        return find(lambda vm: vm.is_running) or find()
 
     def _write_vagrantfile(self, vm_config_list):
         expanded_vms_config_list = [
@@ -233,7 +222,7 @@ class VagrantVM(object):
         self.networking = NodeNetworking(
             LinuxNodeNetworking(self.guest_os_access),
             VirtualBoxNodeNetworking(self.virtualbox_name))
-        self.networking.reset()
+        reset_networking(self)
 
     def start(self):
         assert not self.is_running

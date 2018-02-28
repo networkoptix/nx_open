@@ -19,7 +19,7 @@ class LinuxNodeNetworking(object):
             for interface, mac_address
             in csv.reader(raw_mac_addresses.splitlines(), delimiter='\t')}
 
-    def flush_ip(self, available_mac_addresses):
+    def reset(self, available_mac_addresses):
         """Don't touch localhost, host-bound interface and interfaces unknown to VM."""
         available_interfaces = {self._interface_names[mac_address] for mac_address in available_mac_addresses}
         self._os_access.run_command(
@@ -59,7 +59,7 @@ class LinuxNodeNetworking(object):
         """Prohibit default route explicitly."""
         self._os_access.run_command('ip route replace prohibit default proto static')
 
-    def enable_masquerading(self, outer_mac_address):
+    def setup_nat(self, outer_mac_address):
         """Connection can be initiated from inner_net_nodes only. Addresses are masqueraded."""
         self._os_access.run_command(
             '''
