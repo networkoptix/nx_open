@@ -480,6 +480,11 @@ Handle ServerConnection::getTimeOfServersAsync(
     return executeGet(lit("/ec2/getTimeOfServers"), QnRequestParamList(), callback, targetThread);
 }
 
+rest::Handle ServerConnection::getEventRules(GetCallback callback, QThread* targetThread)
+{
+    return executeGet(lit("/ec2/getEventRules"), QnRequestParamList(), callback, targetThread);
+}
+
 rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
     nx::vms::event::EventState toggleState,
     GetCallback callback,

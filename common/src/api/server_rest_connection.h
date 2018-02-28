@@ -225,6 +225,8 @@ public:
         Result<MultiServerTimeData>::type callback,
         QThread *targetThread = nullptr);
 
+    Handle getEventRules(GetCallback callback, QThread* targetThread = nullptr);
+
     Handle testEventRule(const QnUuid& ruleId, nx::vms::event::EventState toggleState,
         GetCallback callback, QThread* targetThread = nullptr);
 

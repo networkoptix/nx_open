@@ -49,11 +49,18 @@ signals:
 
 private:
     struct Button;
+    struct SoftwareButton;
     using ButtonPtr = QSharedPointer<Button>;
     using ButtonList = QList<ButtonPtr>;
 
 private:
     void handleResourceIdChanged();
+
+    int softTriggerButtonStartIndex() const;
+
+    void removeSoftTriggerButtons();
+
+    void updateSoftTriggerButtons();
 
     void updatePtzButtonVisibility();
 
@@ -64,6 +71,14 @@ private:
     void removeButton(int index);
 
     bool ptzButtonVisible() const;
+
+    ButtonList::const_iterator lowerBoundByRuleId(const QnUuid& ruleId) const;
+
+    int buttonIndexByRuleId(const QnUuid& ruleId) const;
+
+    int insertionIndexByRuleId(const QnUuid& ruleId) const;
+
+    static QnUuid getRuleId(const ButtonPtr& button);
 
 private:
     QnUuid m_resourceId;
