@@ -12,6 +12,8 @@ ${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
 ${CLOUD STAGE}                        https://cloud-stage.hdw.mx
 ${ENV}                                ${CLOUD TEST}
 
+${BROWSER}                           Chrome
+
 ${LANGUAGE DROPDOWN}                 //footer//button[@uib-dropdown-toggle]
 ${LANGUAGE TO SELECT}                //footer//span[@lang='${LANGUAGE}']/..
 
@@ -35,6 +37,7 @@ ${YOU HAVE NO SYSTEMS}                //span[contains(text(),'${YOU HAVE NO SYST
 
 ${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), '${LOG OUT BUTTON TEXT}')]
+${ACCOUNT SETTINGS BUTTON}            //li[contains(@class, 'collapse-first')]//a[contains(text(), '${ACCOUNT SETTINGS BUTTON TEXT}')]
 ${SYSTEMS DROPDOWN}                   //li[contains(@class, 'collapse-second')]//a['uib-dropdown-toggle']
 ${ALL SYSTEMS}                        //li[contains(@class, 'collapse-second')]//a[@ng-href='/systems']
 ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
@@ -136,6 +139,7 @@ ${ACCOUNT EMAIL}                      //form[@name='accountForm']//input[@ng-mod
 ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-model='account.first_name']
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
+${ACCOUNT SUBSCRIBE CHECKBOX}         //form[@name='accountForm']//input[@ng-model='account.subscribe']
 
 #Already logged in modal
 ${LOGGED IN CONTINUE BUTTON}          //div[@uib-modal-transclude]//button[@ng-click='ok()']

@@ -9,7 +9,7 @@ Resource          variables.robot
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    Open Browser    ${ENV}    Chrome
+    Open Browser    ${ENV}    ${BROWSER}
 #    Maximize Browser Window
     Set Selenium Speed    0
     Check Language
@@ -17,7 +17,9 @@ Open Browser and go to URL
 
 Check Language
     Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[2]
+    Register Keyword To Run On Failure    NONE
     ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword If    "${status}"=="FAIL"    Set Language
 
 Set Language
@@ -53,12 +55,13 @@ Validate Log Out
     Wait Until Element Is Visible    ${ANONYMOUS BODY}
 
 Register
-    [arguments]    ${first name}    ${last name}    ${email}    ${password}
+    [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=true
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Input Text    ${REGISTER FIRST NAME INPUT}    ${first name}
     Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
+    Run Keyword If    ${checked}==false    Click Element    ${REGISTER SUBSCRIBE CHECKBOX}
     Click Button    ${CREATE ACCOUNT BUTTON}
 
 Validate Register Success
