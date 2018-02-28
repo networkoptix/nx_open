@@ -15,6 +15,8 @@ class TwoWayAudioAvailabilityWatcher;
 namespace mobile {
 
 class PtzAvailabilityWatcher;
+class SoftwareTriggersWatcher;
+class SoftwareTriggerData;
 
 class ActionButtonsModel: public Connective<QAbstractListModel>
 {
@@ -58,10 +60,6 @@ private:
 
     int softTriggerButtonStartIndex() const;
 
-    void removeSoftTriggerButtons();
-
-    void updateSoftTriggerButtons();
-
     void updatePtzButtonVisibility();
 
     void updateTwoWayAudioButtonVisibility();
@@ -72,19 +70,28 @@ private:
 
     bool ptzButtonVisible() const;
 
-    ButtonList::const_iterator lowerBoundByRuleId(const QnUuid& ruleId) const;
+    ButtonList::const_iterator lowerBoundById(const QnUuid& ruleId) const;
 
-    int buttonIndexByRuleId(const QnUuid& ruleId) const;
+    int buttonIndexById(const QnUuid& id) const;
 
-    int insertionIndexByRuleId(const QnUuid& ruleId) const;
+    int insertionIndexById(const QnUuid& id) const;
 
-    static QnUuid getRuleId(const ButtonPtr& button);
+    void addSoftwareTriggerButton(
+        const QnUuid& id,
+        const SoftwareTriggerData& data,
+        const QString& iconPath,
+        bool enabled);
+
+    void removeSoftwareTriggerButton(const QnUuid& id);
+
+    static QnUuid getSoftwareButtonId(const ButtonPtr& button);
 
 private:
     QnUuid m_resourceId;
     ButtonList m_buttons;
     QScopedPointer<PtzAvailabilityWatcher> m_ptzAvailabilityWatcher;
     QScopedPointer<core::TwoWayAudioAvailabilityWatcher> m_twoWayAudioAvailabilityWatcher;
+    QScopedPointer<SoftwareTriggersWatcher> m_softwareTriggeresWatcher;
 };
 
 } // namespace mobile
