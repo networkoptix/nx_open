@@ -22,11 +22,12 @@
 #include <ui/style/nx_style_p.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
+#include <nx/api/mediaserver/image_request.h>
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/client/desktop/ui/actions/action.h>
-#include <nx/utils/log/assert.h>
-#include <nx/api/mediaserver/image_request.h>
 #include <nx/client/desktop/image_providers/camera_thumbnail_provider.h>
+#include <nx/client/desktop/utils/widget_utils.h>
+#include <nx/utils/log/assert.h>
 
 namespace nx {
 namespace client {
@@ -723,7 +724,7 @@ void EventRibbon::Private::doUpdateView()
     updateScrollRange();
     debugCheckVisibility();
 
-    const auto pos = QnNxStylePrivate::mapFromGlobal(q, QCursor::pos());
+    const auto pos = WidgetUtils::mapFromGlobal(q, QCursor::pos());
     updateHover(q->rect().contains(pos), pos);
 
     if (!m_currentShifts.empty()) //< If has running animations.
