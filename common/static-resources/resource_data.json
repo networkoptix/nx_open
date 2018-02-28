@@ -642,6 +642,12 @@
         },
         {
             "keys": [
+                "HANWHA|SNP*"
+            ],
+            "ptzCapabilitiesToAdd": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability"
+        },
+        {
+            "keys": [
                 "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136",
                 "VIVOTEK|FD8162", "VIVOTEK|FD8372", "VIVOTEK|FD8135H", "VIVOTEK|IP8151", "VIVOTEK|IP8335H",
                 "VIVOTEK|IP8362", "VIVOTEK|MD8562", "VIVOTEK|IP8371E", "VIVOTEK|FD8363",
@@ -660,7 +666,7 @@
                 "DW|DWC-MF21M8TIR","Win4NET Co., Ltd.|Clebo-MF21M8TIR",
                 "DW|DWC-MF21M4FM","Win4NET Co., Ltd.|Clebo-MF21M4FM",
                 "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM",
-                "DW|DWC-MB950TIR", "DW|DWC-MV950TIR"
+                "DW|DWC-MB950TIR", "DW|DWC-MV950TIR", "DW|DWC-BVI2IR"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
@@ -786,12 +792,6 @@
                 "DW|DWC-PV2M4TIR","DW|DWC-PB2M4TIR", "DWC|DWC-PV2M4T", "DW|DWC-PV2M4T"
             ],
         "dw-http-ptz": true
-        },
-        {
-            "keys": [
-                "DW|DWC-BVI2IR"
-            ],
-            "dw-pravis-chipset": true
         },
         {
             "keys": [
