@@ -16,7 +16,14 @@
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/utils/log/log_main.h>
 
-static const int MAX_GOP_LEN = 100;
+namespace {
+
+static constexpr int kMaxGopLen = 100;
+
+static constexpr int kRoundFactor = 4;
+
+} // namespace
+
 
 QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnAbstractArchiveDelegate* archiveDelegate, qint64 ceilTime)
 {
@@ -32,7 +39,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnAbstractArchiveDelegate* ar
     // if ceilTime specified try frame with time > requested time (round time to ceil)
     if (ceilTime != (qint64)AV_NOPTS_VALUE && video && video->timestamp < ceilTime - 1000ll)
     {
-        for (int i = 0; i < MAX_GOP_LEN; ++i)
+        for (int i = 0; i < kMaxGopLen; ++i)
         {
             QnAbstractMediaDataPtr media2 = archiveDelegate->getNextData();
             if (!media2 || media2->timestamp == DATETIME_NOW)
@@ -57,18 +64,18 @@ QSize QnGetImageHelper::updateDstSize(
     double ar = sar * outFrame->width / outFrame->height;
     if (!dstSize.isEmpty())
     {
-        dstSize.setHeight(qPower2Ceil((unsigned)dstSize.height(), 4));
-        dstSize.setWidth(qPower2Ceil((unsigned)dstSize.width(), 4));
+        dstSize.setHeight(qPower2Ceil((unsigned)dstSize.height(), kRoundFactor));
+        dstSize.setWidth(qPower2Ceil((unsigned)dstSize.width(), kRoundFactor));
     }
     else if (dstSize.height() > 0)
     {
-        dstSize.setHeight(qPower2Ceil((unsigned)dstSize.height(), 4));
-        dstSize.setWidth(qPower2Ceil((unsigned)(dstSize.height()*ar), 4));
+        dstSize.setHeight(qPower2Ceil((unsigned)dstSize.height(), kRoundFactor));
+        dstSize.setWidth(qPower2Ceil((unsigned)(dstSize.height()*ar), kRoundFactor));
     }
     else if (dstSize.width() > 0)
     {
-        dstSize.setWidth(qPower2Ceil((unsigned)dstSize.width(), 4));
-        dstSize.setHeight(qPower2Ceil((unsigned)(dstSize.width() / ar), 4));
+        dstSize.setWidth(qPower2Ceil((unsigned)dstSize.width(), kRoundFactor));
+        dstSize.setHeight(qPower2Ceil((unsigned)(dstSize.width() / ar), kRoundFactor));
     }
     else
     {
@@ -201,7 +208,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
     else
     {
         bool precise = request.roundMethod == nx::api::ImageRequest::RoundMethod::precise;
-        for (int i = 0; i < MAX_GOP_LEN && !gotFrame && video; ++i)
+        for (int i = 0; i < kMaxGopLen && !gotFrame && video; ++i)
         {
             gotFrame = decoder.decode(video, &outFrame) && (!precise || video->timestamp >= timeUSec);
             if (gotFrame)

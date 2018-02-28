@@ -17,9 +17,12 @@ struct ImageRequest
      */
     enum class RoundMethod
     {
-        iFrameBefore,   //< Get the thumbnail from the nearest keyframe before the given time.
-        precise,        //< Get the thumbnail as near to given time as possible.
-        iFrameAfter,    //< Get the thumbnail from the nearest keyframe after the given time.
+        // Get the thumbnail from the nearest keyframe before the given time.
+        iFrameBefore,
+        // Get the thumbnail as near to given time as possible.
+        precise,
+        // Get the thumbnail from the nearest keyframe after the given time.
+        iFrameAfter,
     };
 
     enum class ThumbnailFormat
@@ -91,8 +94,8 @@ struct CameraImageRequest: ImageRequest
 } // namespace nx
 
 #define QN_THUMBNAIL_ENUM_TYPES \
-    (nx::api::ImageRequest::RoundMethod)\
-    (nx::api::ImageRequest::ThumbnailFormat)\
-    (nx::api::ImageRequest::AspectRatio)\
+    (nx::api::ImageRequest::RoundMethod) \
+    (nx::api::ImageRequest::ThumbnailFormat) \
+    (nx::api::ImageRequest::AspectRatio) \
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_THUMBNAIL_ENUM_TYPES, (lexical))
