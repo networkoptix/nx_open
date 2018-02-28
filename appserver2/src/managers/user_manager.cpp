@@ -108,7 +108,12 @@ void callSaveUserAsync<FixedUrlClientQueryProcessor>(
                 && queryProcessor->userName() == user.name
                 && !newPassword.isEmpty())
             {
-                queryProcessor->setPassword(newPassword);
+                if (auto connection = QnAppServerConnectionFactory::ec2Connection())
+                {
+                    auto url = connection->connectionInfo().ecUrl;
+                    url.setPassword(newPassword);
+                    connection->updateConnectionUrl(url);
+                }
             }
             handler->done(reqID, errorCode);
         });

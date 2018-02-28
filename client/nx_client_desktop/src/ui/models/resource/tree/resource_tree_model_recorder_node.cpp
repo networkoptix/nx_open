@@ -57,9 +57,9 @@ QIcon QnResourceTreeModelRecorderNode::calculateIcon() const
 {
     if (!children().empty())
     {
-        auto camera = child(0)->resource().dynamicCast<QnVirtualCameraResource>();
+        const auto camera = child(0)->resource().dynamicCast<QnVirtualCameraResource>();
         NX_ASSERT(camera);
-        if (camera && !camera->isDtsBased())
+        if (camera && camera->isMultiSensorCamera())
             return qnResIconCache->icon(QnResourceIconCache::MultisensorCamera);
     }
 

@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/client_camera.h>
 
 #include <nx/client/desktop/ui/common/checkbox_utils.h>
 #include <ui/common/read_only.h>
@@ -181,19 +182,20 @@ void QnMultipleCameraSettingsWidget::submitToResources()
     QString login = ui->loginEdit->text().trimmed();
     QString password = ui->passwordEdit->text().trimmed();
 
-    for (const auto& camera : m_cameras)
+    for (const auto& camera: m_cameras)
     {
         QAuthenticator auth = camera->getAuth();
 
-        QString cameraLogin = auth.user();
         if (!login.isEmpty() || !m_loginWasEmpty)
-            cameraLogin = login;
+            auth.setUser(login);
 
-        QString cameraPassword = auth.password();
         if (!password.isEmpty() || !m_passwordWasEmpty)
-            cameraPassword = password;
+            auth.setPassword(password);
 
-        camera->setAuth(cameraLogin, cameraPassword);
+        if (camera->isMultiSensorCamera())
+            QnClientCameraResource::setAuthToMultisensorCamera(camera, auth);
+        else
+            camera->setAuth(auth);
 
         if (ui->enableAudioCheckBox->checkState() != Qt::PartiallyChecked && camera->isAudioSupported())
             camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
