@@ -431,7 +431,7 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
 {
     for (auto& data: context.managers())
     {
-        if (eventTypeIds.empty())
+        if (eventTypeIds.empty() && !data.isStreamConsumer)
         {
             NX_DEBUG(
                 this,
