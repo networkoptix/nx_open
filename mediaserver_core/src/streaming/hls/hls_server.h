@@ -18,7 +18,7 @@
 #include "../streaming_chunk.h"
 #include <core/resource_access/user_access_data.h>
 
-class QnJsonRestResult;
+struct QnJsonRestResult;
 
 namespace nx_hls
 {
