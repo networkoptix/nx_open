@@ -15,13 +15,10 @@ bool operator==(const in6_addr& left, const in6_addr& right)
 }
 
 #if !defined(_WIN32)
-    const in_addr in4addr_loopback =
-        []()
-        {
-            in_addr result;
-            result.s_addr = htonl(INADDR_LOOPBACK);
-            return result;
-        }();
+#   if defined(__arm__)
+#       undef htonl
+#   endif
+    const in_addr in4addr_loopback{ htonl(INADDR_LOOPBACK) };
 #endif
 
 namespace nx {
