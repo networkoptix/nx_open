@@ -80,7 +80,7 @@ void SystemMergeManager::processMergeHistoryRecord(
             return utils::db::DBResult::ok;
         },
         [completionHandler = std::move(completionHandler)](
-            nx::utils::db::QueryContext* queryContext,
+            nx::utils::db::QueryContext* /*queryContext*/,
             utils::db::DBResult dbResultCode)
         {
             completionHandler(dbResultToApiResult(dbResultCode));
