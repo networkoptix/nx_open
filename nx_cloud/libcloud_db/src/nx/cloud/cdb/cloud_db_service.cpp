@@ -30,6 +30,11 @@ std::vector<network::SocketAddress> CloudDbService::httpEndpoints() const
     return m_view->endpoints();
 }
 
+Controller& CloudDbService::controller()
+{
+    return *m_controller;
+}
+
 std::unique_ptr<utils::AbstractServiceSettings> CloudDbService::createSettings()
 {
     return std::make_unique<conf::Settings>();
@@ -48,6 +53,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     m_settings = &settings;
 
     Controller controller(settings);
+    m_controller = &controller;
 
     HttpView view(settings, &controller);
     m_view = &view;

@@ -28,6 +28,7 @@
 #include "account_manager.h"
 #include "cache.h"
 #include "data_view.h"
+#include "extension_pool.h"
 #include "managers_types.h"
 #include "system_sharing_manager.h"
 #include "../access_control/auth_types.h"
@@ -48,13 +49,21 @@ class AbstractEmailManager;
 class AbstractAccountManager;
 class AbstractSystemHealthInfoProvider;
 
-namespace ec2 {
-
-class SyncronizationEngine;
-
-} // namespace ec2
+namespace ec2 { class SyncronizationEngine; } // namespace ec2
 
 class InviteUserNotification;
+
+//-------------------------------------------------------------------------------------------------
+
+class AbstractSystemExtension
+{
+public:
+    virtual ~AbstractSystemExtension() = default;
+
+    virtual void modifySystemBeforeProviding(api::SystemDataEx* system) = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 class AbstractSystemManager
 {
@@ -76,7 +85,12 @@ public:
     virtual nx::utils::db::DBResult markSystemForDeletion(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& systemId) = 0;
+
+    virtual void addExtension(AbstractSystemExtension*) = 0;
+    virtual void removeExtension(AbstractSystemExtension*) = 0;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * Provides methods for manipulating system data on persisent storage.
@@ -195,6 +209,9 @@ public:
     virtual void addSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
     virtual void removeSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
 
+    virtual void addExtension(AbstractSystemExtension*) override;
+    virtual void removeExtension(AbstractSystemExtension*) override;
+
 private:
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
         const api::SystemSharing& data);
@@ -277,6 +294,7 @@ private:
     std::unique_ptr<dao::AbstractSystemDataObject> m_systemDao;
     dao::rdb::SystemSharingDataObject m_systemSharingDao;
     std::set<AbstractSystemSharingExtension*> m_systemSharingExtensions;
+    ExtensionPool<AbstractSystemExtension> m_extensions;
 
     virtual void afterUpdatingAccount(
         nx::utils::db::QueryContext*,

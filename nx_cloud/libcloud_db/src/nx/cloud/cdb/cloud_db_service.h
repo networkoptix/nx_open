@@ -10,6 +10,7 @@
 namespace nx {
 namespace cdb {
 
+class Controller;
 class HttpView;
 
 namespace conf { class Settings; }
@@ -24,6 +25,8 @@ public:
 
     std::vector<network::SocketAddress> httpEndpoints() const;
 
+    Controller& controller();
+
 protected:
     virtual std::unique_ptr<utils::AbstractServiceSettings> createSettings() override;
     virtual int serviceMain(const utils::AbstractServiceSettings& settings) override;
@@ -31,6 +34,7 @@ protected:
 private:
     const conf::Settings* m_settings;
     HttpView* m_view = nullptr;
+    Controller* m_controller = nullptr;
 };
 
 } // namespace cdb

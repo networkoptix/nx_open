@@ -2,13 +2,13 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/time.h>
 
 #include <nx/cloud/cdb/client/data/types.h>
 
 #include "../settings.h"
 #include "../stree/cdb_ns.h"
 #include "system_health_info_provider.h"
-#include "system_manager.h"
 
 namespace nx {
 namespace cdb {
@@ -17,18 +17,23 @@ SystemMergeManager::SystemMergeManager(
     AbstractSystemManager* systemManager,
     const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
     AbstractVmsGateway* vmsGateway,
-    nx::utils::db::AsyncSqlQueryExecutor* dbManager)
+    nx::utils::db::AsyncSqlQueryExecutor* queryExecutor)
     :
     m_systemManager(systemManager),
     m_systemHealthInfoProvider(systemHealthInfoProvider),
     m_vmsGateway(vmsGateway),
-    m_dbManager(dbManager)
+    m_queryExecutor(queryExecutor),
+    m_dao(dao::SystemMergeDaoFactory::instance().create(queryExecutor))
 {
+    loadSystemMergeInfo();
+
+    m_systemManager->addExtension(this);
 }
 
 SystemMergeManager::~SystemMergeManager()
 {
     m_runningRequestCounter.wait();
+    m_systemManager->removeExtension(this);
 }
 
 void SystemMergeManager::startMergingSystems(
@@ -64,6 +69,25 @@ void SystemMergeManager::startMergingSystems(
 }
 
 void SystemMergeManager::processMergeHistoryRecord(
+    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    m_queryExecutor->executeUpdate(
+        [this, mergeHistoryRecord](
+            utils::db::QueryContext* queryContext)
+        {
+            processMergeHistoryRecord(queryContext, mergeHistoryRecord);
+            return utils::db::DBResult::ok;
+        },
+        [completionHandler = std::move(completionHandler)](
+            nx::utils::db::QueryContext* queryContext,
+            utils::db::DBResult dbResultCode)
+        {
+            completionHandler(dbResultToApiResult(dbResultCode));
+        });
+}
+
+void SystemMergeManager::processMergeHistoryRecord(
     nx::utils::db::QueryContext* queryContext,
     const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord)
 {
@@ -85,11 +109,21 @@ void SystemMergeManager::processMergeHistoryRecord(
     if (resultCode != nx::utils::db::DBResult::ok)
         throw nx::utils::db::Exception(resultCode);
 
+    if (!verifyMergeHistoryRecord(mergeHistoryRecord, system))
+        return;
+
+    updateCompletedMergeData(queryContext, mergeHistoryRecord);
+}
+
+bool SystemMergeManager::verifyMergeHistoryRecord(
+    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord,
+    const data::SystemData& system)
+{
     if (!mergeHistoryRecord.verify(system.authKey.c_str()))
     {
         NX_WARNING(this, lm("Could not verify merge history record for system %1. Ignoring...")
             .args(system.id));
-        return;
+        return false;
     }
 
     if (system.status != api::SystemStatus::beingMerged)
@@ -99,10 +133,75 @@ void SystemMergeManager::processMergeHistoryRecord(
             .args(system.id, QnLexical::serialized(system.status)));
     }
 
-    resultCode = m_systemManager->markSystemForDeletion(
+    return true;
+}
+
+void SystemMergeManager::updateCompletedMergeData(
+    nx::utils::db::QueryContext* queryContext,
+    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord)
+{
+    using namespace std::placeholders;
+
+    NX_DEBUG(this, lm("Cleaning up after completed merge. Slave system %1")
+        .args(mergeHistoryRecord.mergedSystemCloudId));
+
+    m_dao->removeMergeBySlaveSystemId(
+        queryContext,
+        mergeHistoryRecord.mergedSystemCloudId.toStdString());
+
+    auto resultCode = m_systemManager->markSystemForDeletion(
         queryContext, mergeHistoryRecord.mergedSystemCloudId.toStdString());
     if (resultCode != nx::utils::db::DBResult::ok)
         throw nx::utils::db::Exception(resultCode);
+
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        std::bind(&SystemMergeManager::removeMergeInfoFromCache, this, mergeHistoryRecord));
+}
+
+void SystemMergeManager::removeMergeInfoFromCache(
+    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    auto slaveSystemInfoIter =
+        m_mergedSystems.find(mergeHistoryRecord.mergedSystemCloudId.toStdString());
+    if (slaveSystemInfoIter == m_mergedSystems.end())
+        return;
+
+    auto masterSystemInfoIter =
+        m_mergedSystems.find(slaveSystemInfoIter->second.anotherSystemId);
+    if (masterSystemInfoIter != m_mergedSystems.end())
+        m_mergedSystems.erase(masterSystemInfoIter);
+
+    m_mergedSystems.erase(slaveSystemInfoIter);
+}
+
+void SystemMergeManager::modifySystemBeforeProviding(
+    api::SystemDataEx* system)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_mergedSystems.find(system->id);
+    if (it != m_mergedSystems.end())
+        system->mergeInfo = it->second;
+}
+
+void SystemMergeManager::loadSystemMergeInfo()
+{
+    using namespace std::placeholders;
+
+    NX_DEBUG(this, lm("Loading ongoing merges"));
+
+    std::vector<dao::MergeInfo> ongoingMerges =
+        m_queryExecutor->executeSelectQuerySync(
+            std::bind(&dao::AbstractSystemMergeDao::fetchAll, m_dao.get(), _1));
+
+    for (const auto& mergeInfo: ongoingMerges)
+    {
+        m_mergedSystems.emplace(mergeInfo.masterSystemId, mergeInfo.masterSystemInfo());
+        m_mergedSystems.emplace(mergeInfo.slaveSystemId, mergeInfo.slaveSystemInfo());
+    }
+
+    NX_DEBUG(this, lm("Loaded %1 ongoing merges").args(ongoingMerges.size()));
 }
 
 api::ResultCode SystemMergeManager::validateRequestInput(
@@ -175,11 +274,15 @@ void SystemMergeManager::processVmsMergeRequestResult(
 
     if (vmsRequestResult.resultCode != VmsResultCode::ok)
     {
+        NX_VERBOSE(this, lm("Merge %1 into %2. Request to system %1 failed with result %3")
+            .args(mergeRequestContext->idOfSystemToBeMerged,
+                mergeRequestContext->idOfSystemToMergeTo,
+                QnLexical::serialized(vmsRequestResult.resultCode)));
         finishMerge(mergeRequestContext, api::ResultCode::vmsRequestFailure);
         return;
     }
 
-    m_dbManager->executeUpdate(
+    m_queryExecutor->executeUpdate(
         std::bind(&SystemMergeManager::updateSystemStateInDb, this, _1,
             mergeRequestContext->idOfSystemToMergeTo,
             mergeRequestContext->idOfSystemToBeMerged),
@@ -202,13 +305,32 @@ void SystemMergeManager::processUpdateSystemResult(
 
 nx::utils::db::DBResult SystemMergeManager::updateSystemStateInDb(
     nx::utils::db::QueryContext* queryContext,
-    const std::string& /*idOfSystemToMergeTo*/,
+    const std::string& idOfSystemToMergeTo,
     const std::string& idOfSystemToMergeBeMerged)
 {
+    dao::MergeInfo mergeInfo;
+    mergeInfo.masterSystemId = idOfSystemToMergeTo;
+    mergeInfo.slaveSystemId = idOfSystemToMergeBeMerged;
+    mergeInfo.startTime = nx::utils::utcTime();
+    m_dao->save(queryContext, mergeInfo);
+
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        std::bind(&SystemMergeManager::saveSystemMergeInfoToCache, this, mergeInfo));
+
     return m_systemManager->updateSystemStatus(
         queryContext,
         idOfSystemToMergeBeMerged,
         api::SystemStatus::beingMerged);
+}
+
+void SystemMergeManager::saveSystemMergeInfoToCache(const dao::MergeInfo& mergeInfo)
+{
+    NX_VERBOSE(this, lm("Merge %1 into %2. Updating cache")
+        .args(mergeInfo.slaveSystemId, mergeInfo.masterSystemId));
+
+    QnMutexLocker lock(&m_mutex);
+    m_mergedSystems[mergeInfo.masterSystemId] = mergeInfo.masterSystemInfo();
+    m_mergedSystems[mergeInfo.slaveSystemId] = mergeInfo.slaveSystemInfo();
 }
 
 void SystemMergeManager::finishMerge(

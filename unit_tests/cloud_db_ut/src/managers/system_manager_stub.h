@@ -30,6 +30,9 @@ public:
         nx::utils::db::QueryContext* const queryContext,
         const std::string& systemId) override;
 
+    virtual void addExtension(AbstractSystemExtension*) override;
+    virtual void removeExtension(AbstractSystemExtension*) override;
+
     void addSystem(const api::SystemData& system);
 
 private:

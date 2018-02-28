@@ -21,8 +21,12 @@ public:
 
     void setForwardOnly(bool val);
     void prepare(const QString& query);
+
     void bindValue(const QString& placeholder, const QVariant& value) noexcept;
     void bindValue(int pos, const QVariant& value) noexcept;
+    void bindValue(const std::string& placeholder, const std::string& value) noexcept;
+    void bindValue(int pos, const std::string& value) noexcept;
+
     void exec();
 
     bool next();
