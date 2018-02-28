@@ -766,7 +766,7 @@ void QnResourceItemDelegate::paintExtraStatus(
     const QModelIndex& index) const
 {
     const auto extraStatus = index.data(Qn::CameraExtraStatusRole).value<CameraExtraStatus>();
-    if (extraStatus.isEmpty())
+    if (extraStatus == CameraExtraStatus())
         return;
 
     QRect extraIconRect(iconRect);
@@ -777,17 +777,19 @@ void QnResourceItemDelegate::paintExtraStatus(
         extraIconRect.moveLeft(extraIconRect.left() - offset);
 
     // Draw "recording" or "scheduled" icon.
-    if (m_options.testFlag(RecordingIcons) && (extraStatus.recording || extraStatus.scheduled))
+    if (m_options.testFlag(RecordingIcons)
+        && (extraStatus.testFlag(CameraExtraStatusFlag::recording)
+            || extraStatus.testFlag(CameraExtraStatusFlag::scheduled)))
     {
         extraIconRect.moveLeft(extraIconRect.left() - offset);
-        const auto& icon = extraStatus.recording
+        const auto& icon = extraStatus.testFlag(CameraExtraStatusFlag::recording)
             ? m_recordingIcon
             : m_scheduledIcon;
         icon.paint(painter, extraIconRect);
     }
 
     // Draw "problems" icon.
-    if (m_options.testFlag(ProblemIcons) && extraStatus.buggy)
+    if (m_options.testFlag(ProblemIcons) && extraStatus.testFlag(CameraExtraStatusFlag::buggy))
     {
         extraIconRect.moveLeft(extraIconRect.left() - offset);
         m_buggyIcon.paint(painter, extraIconRect);
