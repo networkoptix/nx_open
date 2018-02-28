@@ -175,9 +175,6 @@ void QnUserProfileWidget::applyChanges()
             QUrl url = commonModule()->currentUrl();
             url.setPassword(m_newPassword);
 
-            if (auto connection = QnAppServerConnectionFactory::ec2Connection())
-                connection->updateConnectionUrl(url);
-
             using namespace nx::client::core::helpers;
             const auto localSystemId = commonModule()->globalSettings()->localSystemId();
             if (getCredentials(localSystemId, url.userName()).isValid())
