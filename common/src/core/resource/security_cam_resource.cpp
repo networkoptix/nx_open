@@ -534,7 +534,10 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
 
 bool QnSecurityCamResource::isMultiSensorCamera() const
 {
-    return !getGroupId().isEmpty() && !isDtsBased();
+    return !getGroupId().isEmpty()
+        && !isDtsBased()
+        && !isAnalogEncoder()
+        && !isAnalog();
 }
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const
