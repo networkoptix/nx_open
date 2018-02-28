@@ -64,11 +64,9 @@ bool isCollapsibleNode(const QModelIndex& index)
 
 QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
     base_type(parent),
-    m_workbench(),
     m_recordingIcon(qnSkin->icon("tree/recording.png")),
     m_scheduledIcon(qnSkin->icon("tree/scheduled.png")),
     m_buggyIcon(qnSkin->icon("tree/buggy.png")),
-    m_colors(),
     m_fixedHeight(style::Metrics::kViewRowHeight),
     m_rowSpacing(0),
     m_customInfoLevel(Qn::ResourceInfoLevel::RI_Invalid),
@@ -270,6 +268,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         }
     }
 
+    const auto indentation = style->pixelMetric(QStyle::PM_TreeViewIndentation);
     paintExtraStatus(painter, iconRect, index);
 }
 
@@ -770,18 +769,28 @@ void QnResourceItemDelegate::paintExtraStatus(
         return;
 
     QRect extraIconRect(iconRect);
-    const int offset = extraIconRect.width();
+
+    // Check if there are too much icons for this indentaion level.
+    const auto shiftIconLeft =
+        [&extraIconRect]
+        {
+            const int pos = extraIconRect.left() - style::Metrics::kDefaultIconSize;
+            extraIconRect.moveLeft(pos);
+            return pos >= 0;
+        };
 
     // Leave space for collapser if needed.
     if (isCollapsibleNode(index))
-        extraIconRect.moveLeft(extraIconRect.left() - offset);
+        shiftIconLeft();
 
     // Draw "recording" or "scheduled" icon.
     if (m_options.testFlag(RecordingIcons)
         && (extraStatus.testFlag(CameraExtraStatusFlag::recording)
             || extraStatus.testFlag(CameraExtraStatusFlag::scheduled)))
     {
-        extraIconRect.moveLeft(extraIconRect.left() - offset);
+        if (!shiftIconLeft())
+            return;
+
         const auto& icon = extraStatus.testFlag(CameraExtraStatusFlag::recording)
             ? m_recordingIcon
             : m_scheduledIcon;
@@ -791,7 +800,9 @@ void QnResourceItemDelegate::paintExtraStatus(
     // Draw "problems" icon.
     if (m_options.testFlag(ProblemIcons) && extraStatus.testFlag(CameraExtraStatusFlag::buggy))
     {
-        extraIconRect.moveLeft(extraIconRect.left() - offset);
+        if (!shiftIconLeft())
+            return;
+
         m_buggyIcon.paint(painter, extraIconRect);
     }
 }
