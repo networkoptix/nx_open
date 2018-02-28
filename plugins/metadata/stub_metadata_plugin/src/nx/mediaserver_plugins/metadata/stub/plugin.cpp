@@ -28,19 +28,19 @@ std::string Plugin::capabilitiesManifest() const
 {
     return R"json(
         {
-            "driverId": ")json" + kDriverGuid + R"json(",
+            "driverId": ")json" + nxpt::NxGuidHelper::toStdString(kDriverGuid) + R"json(",
             "driverName": {
                 "value": "Stub Driver"
             },
             "outputEventTypes": [
                 {
-                    "typeId": ")json" + kLineCrossingEventGuid + R"json(",
+                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kLineCrossingEventGuid) + R"json(",
                     "name": {
                         "value": "Line crossing"
                     }
                 },
                 {
-                    "typeId": ")json" + kObjectInTheAreaEventGuid + R"json(",
+                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kObjectInTheAreaEventGuid) + R"json(",
                     "name": {
                         "value": "Object in the area"
                     },
@@ -49,13 +49,13 @@ std::string Plugin::capabilitiesManifest() const
             ],
             "outputObjectTypes": [
                 {
-                    "typeId": ")json" + kCarObjectGuid + R"json(",
+                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json(",
                     "name": {
                         "value": "Car"
                     }
                 },
                 {
-                    "typeId": ")json" + kHumanFaceObjectGuid + R"json(",
+                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kHumanFaceObjectGuid) + R"json(",
                     "name": {
                         "value": "Human face"
                     }
@@ -102,7 +102,7 @@ std::string Plugin::capabilitiesManifest() const
                         "value": "Add to list"
                     },
                     "supportedObjectTypeIds": [
-                        ")json" + kCarObjectGuid + R"json("
+                        ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json("
                     ],
                     "settings": {
                         "params": [
@@ -128,7 +128,7 @@ std::string Plugin::capabilitiesManifest() const
                         "value": "Add person (URL-based)"
                     },
                     "supportedObjectTypeIds": [
-                        ")json" + kCarObjectGuid + R"json("
+                        ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json("
                     ]
                 }
             ]

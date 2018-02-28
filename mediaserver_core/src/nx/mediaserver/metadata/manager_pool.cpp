@@ -19,6 +19,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/mediaserver/metadata/metadata_handler.h>
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
+#include <nx/mediaserver/metadata/plugin_setting.h>
 
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
@@ -201,13 +202,12 @@ void ManagerPool::loadSettingsFromFile(std::vector<nxpl::Setting>* settings, con
     }
 
     const QString& settingsStr = f.readAll();
-    const auto& jsonObject = QJson::deserialized<QMap<QString, QString>>(settingsStr.toUtf8());
-    settings->resize(jsonObject.size());
-    for (int i = 0; i < jsonObject.size(); ++i)
+    const auto& settingsFromJson = QJson::deserialized<QList<PluginSetting>>(settingsStr.toUtf8());
+    settings->resize(settingsFromJson.size());
+    for (auto i = 0; i < settingsFromJson.size(); ++i)
     {
-        const QString key = jsonObject.keys().at(i);
-        settings->at(i).name = strdup(key.toUtf8().data());
-        settings->at(i).value = strdup(jsonObject.value(key).toUtf8().data());
+        settings->at(i).name = strdup(settingsFromJson.at(i).name.toUtf8().data());
+        settings->at(i).value = strdup(settingsFromJson.at(i).value.toUtf8().data());
     }
 }
 
