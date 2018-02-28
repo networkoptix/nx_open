@@ -9,7 +9,9 @@
 #include <watchers/user_watcher.h>
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
 
 namespace {
 
@@ -25,8 +27,35 @@ const QHash<int, QByteArray> kRoleNames = {
 
 QString extractIconPath(const nx::vms::event::RulePtr& rule)
 {
-    //return rule->eventParams().description;
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>> " << rule->eventParams().description;
     return lit("images/two_way_audio/mic.png");
+}
+
+template<class Container, class Item>
+bool contains(const Container& cont, const Item& item)
+{
+    return std::find(cont.cbegin(), cont.cend(), item) != cont.cend();
+}
+
+bool appropriateSoftwareTriggerRule(
+    const nx::vms::event::RulePtr& rule,
+    const QnUserResourcePtr& currentUser,
+    const QnUuid& resourceId)
+{
+    if (rule->isDisabled() || rule->eventType() != nx::vms::event::softwareTriggerEvent)
+        return false;
+
+    if (!rule->eventResources().empty() && !rule->eventResources().contains(resourceId))
+        return false;
+
+    if (rule->eventParams().metadata.allUsers)
+        return true;
+
+    const auto subjects = rule->eventParams().metadata.instigators;
+    if (contains(subjects, currentUser->getId()))
+        return true;
+
+    return contains(subjects, QnUserRolesManager::unifiedUserRoleId(currentUser));
 }
 
 } // namespace
@@ -235,7 +264,8 @@ void ActionButtonsModel::updateSoftTriggerButtons()
     const auto commonModule = qnClientCoreModule->commonModule();
     const auto accessManager = commonModule->resourceAccessManager();
     const auto userWatcher = commonModule->instance<QnUserWatcher>();
-    if (!accessManager->hasGlobalPermission(userWatcher->user(), Qn::GlobalUserInputPermission))
+    const auto currentUser = userWatcher->user();
+    if (!accessManager->hasGlobalPermission(currentUser, Qn::GlobalUserInputPermission))
         return;
 
     using ButtonsMap = QMap<QnUuid, ButtonPtr>;
@@ -258,9 +288,11 @@ void ActionButtonsModel::updateSoftTriggerButtons()
         }();
 
     ButtonsMap newButtons;
-    const auto rules = commonModule->eventRuleManager()->rules();
     for(const auto& rule: commonModule->eventRuleManager()->rules())
-        newButtons.insert(rule->id(), SoftwareButton::create(rule));
+    {
+        if (appropriateSoftwareTriggerRule(rule, currentUser, m_resourceId))
+            newButtons.insert(rule->id(), SoftwareButton::create(rule));
+    }
 
     const auto oldButtonIds = oldButtons.keys().toSet();
     const auto newButtonIds = newButtons.keys().toSet();
