@@ -21,12 +21,26 @@ public:
      * \param startTimeMs               Period's start time, normally in milliseconds since epoch.
      * \param durationMs                Period's duration, in milliseconds.
      */
-    constexpr QnTimePeriod(qint64 startTimeMs, qint64 durationMs);
+    constexpr QnTimePeriod(qint64 startTimeMs, qint64 durationMs):
+        startTimeMs(startTimeMs),
+        durationMs(durationMs)
+    {
+    }
 
-    constexpr QnTimePeriod(const std::chrono::milliseconds& startTime,
-        const std::chrono::milliseconds& duration);
+    constexpr QnTimePeriod(
+        const std::chrono::milliseconds& startTime,
+        const std::chrono::milliseconds& duration)
+        :
+        QnTimePeriod(startTime.count(), duration.count())
+    {
+    }
 
-    static constexpr QnTimePeriod fromInterval(qint64 startTimeMs, qint64 endTimeMs);
+    static constexpr QnTimePeriod fromInterval(qint64 startTimeMs, qint64 endTimeMs)
+    {
+        return startTimeMs <= endTimeMs
+            ? QnTimePeriod(startTimeMs, endTimeMs)
+            : QnTimePeriod(endTimeMs, startTimeMs);
+    };
 
     QnTimePeriod& operator = (const QnTimePeriod &other);
 
@@ -75,22 +89,34 @@ public:
     /**
      * \returns                         Infinite duration constant value (-1).
      */
-    static constexpr qint64 infiniteDuration();
+    static constexpr qint64 infiniteDuration()
+    {
+        return -1;
+    };
 
     /**
     * \returns                         Maximal possible timestamp value.
     */
-    static constexpr qint64 maxTimeValue();
+    static constexpr qint64 maxTimeValue()
+    {
+        return std::numeric_limits<qint64>::max();
+    };
 
     /**
     * \returns                         Minimal possible timestamp value (0).
     */
-    static constexpr qint64 minTimeValue();
+    static constexpr qint64 minTimeValue()
+    {
+        return 0;
+    };
 
     /**
     * \returns                          Returns infinite period starting from zero.
     */
-    static constexpr QnTimePeriod anytime();
+    static constexpr QnTimePeriod anytime()
+    {
+        return QnTimePeriod(minTimeValue(), infiniteDuration());
+    };
 
     /**
      * \returns distance from the nearest period edge to the time in ms. Returns zerro if timeMs inside period
@@ -120,92 +146,42 @@ public:
     void setDuration(std::chrono::milliseconds value);
     std::chrono::milliseconds duration() const;
 
-    constexpr bool operator==(const QnTimePeriod& other) const;
-    constexpr bool operator!=(const QnTimePeriod& other) const;
-    constexpr bool operator<(const QnTimePeriod& other) const;
-    constexpr bool operator<(qint64 timeMs) const;
+    constexpr bool operator==(const QnTimePeriod& other) const
+    {
+        return startTimeMs == other.startTimeMs && durationMs == other.durationMs;
+    };
+
+    constexpr bool operator!=(const QnTimePeriod& other) const
+    {
+        return !(*this == other);
+    };
+
+    constexpr bool operator<(const QnTimePeriod& other) const
+    {
+        return startTimeMs < other.startTimeMs;
+    };
+
+    constexpr bool operator<(qint64 timeMs) const
+    {
+        return this->startTimeMs < timeMs;
+    };
 
 public:
     /** Start time in milliseconds. */
     qint64 startTimeMs = 0;
 
-    /** Duration in milliseconds.
-     *
+    /**
+     * Duration in milliseconds.
      * infiniteDuration() if duration is infinite or unknown. It may be the case if this time period
-     * represents a video chunk that is being recorded at the moment. */
+     * represents a video chunk that is being recorded at the moment.
+     */
     qint64 durationMs = 0;
 };
-
-constexpr bool operator<(qint64 timeMs, const QnTimePeriod& other);
-
-// ------------------------------------------------------------------------------------------------
-// Implementation.
-
-constexpr QnTimePeriod::QnTimePeriod(qint64 startTimeMs, qint64 durationMs):
-    startTimeMs(startTimeMs),
-    durationMs(durationMs)
-{
-}
-
-constexpr QnTimePeriod::QnTimePeriod(
-    const std::chrono::milliseconds& startTime,
-    const std::chrono::milliseconds& duration)
-    :
-    QnTimePeriod(startTime.count(), duration.count())
-{
-}
-
-constexpr QnTimePeriod QnTimePeriod::fromInterval(qint64 startTimeMs, qint64 endTimeMs)
-{
-    return startTimeMs <= endTimeMs
-        ? QnTimePeriod(startTimeMs, endTimeMs)
-        : QnTimePeriod(endTimeMs, startTimeMs);
-}
-
-constexpr qint64 QnTimePeriod::infiniteDuration()
-{
-    return -1;
-}
-
-constexpr qint64 QnTimePeriod::maxTimeValue()
-{
-    return std::numeric_limits<qint64>::max();
-}
-
-constexpr qint64 QnTimePeriod::minTimeValue()
-{
-    return 0;
-}
-
-constexpr QnTimePeriod QnTimePeriod::anytime()
-{
-    return QnTimePeriod(minTimeValue(), infiniteDuration());
-}
-
-constexpr bool QnTimePeriod::operator==(const QnTimePeriod& other) const
-{
-    return startTimeMs == other.startTimeMs && durationMs == other.durationMs;
-}
-
-constexpr bool QnTimePeriod::operator!=(const QnTimePeriod& other) const
-{
-    return !(*this == other);
-}
-
-constexpr bool QnTimePeriod::operator<(const QnTimePeriod& other) const
-{
-    return startTimeMs < other.startTimeMs;
-}
-
-constexpr bool QnTimePeriod::operator<(qint64 timeMs) const
-{
-    return this->startTimeMs < timeMs;
-}
 
 constexpr bool operator<(qint64 timeMs, const QnTimePeriod& other)
 {
     return timeMs < other.startTimeMs;
-}
+};
 
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
 
