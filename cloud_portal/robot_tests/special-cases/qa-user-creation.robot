@@ -1,3 +1,4 @@
+#This script is for adding QA users to a new db
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
