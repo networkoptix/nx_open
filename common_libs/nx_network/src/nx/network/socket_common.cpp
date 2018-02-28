@@ -15,6 +15,9 @@ bool operator==(const in6_addr& left, const in6_addr& right)
 }
 
 #if !defined(_WIN32)
+#   if defined(__arm__)
+#       undef htonl
+#   endif
     const in_addr in4addr_loopback{ htonl(INADDR_LOOPBACK) };
 #endif
 
