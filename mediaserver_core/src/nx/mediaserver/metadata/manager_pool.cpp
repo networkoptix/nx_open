@@ -553,7 +553,7 @@ void ManagerPool::mergePluginManifestToServer(
 #if defined _DEBUG
     // Sometimes in debug purposes we need do clean existingManifest.outputEventTypes list.
     if (!manifest.outputEventTypes.empty() &&
-        manifest.outputEventTypes.front().eventTypeId == nx::api::kResetPluginManifestEventId)
+        manifest.outputEventTypes.front().typeId == nx::api::kResetPluginManifestEventId)
     {
         it->outputEventTypes.clear();
     }
