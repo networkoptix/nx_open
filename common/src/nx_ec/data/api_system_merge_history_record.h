@@ -10,6 +10,7 @@ struct ApiSystemMergeHistoryRecord
     qint64 timestamp;
     nx::String mergedSystemLocalId;
     nx::String mergedSystemCloudId;
+    /** User who started merge. */
     QString username;
     /** Calculated with ApiSystemMergeHistoryRecord::calculateSignature function. */
     nx::String signature;

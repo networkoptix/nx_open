@@ -97,6 +97,21 @@ void serialize(QnJsonContext* ctx, const T& value, const QString& key, QJsonObje
     QJson::serialize(ctx, value, &jsonValue);
 }
 
+template<class T>
+void serialize(
+    QnJsonContext* ctx,
+    const boost::optional<T>& value,
+    const QString& key,
+    QJsonObject* outTarget)
+{
+    NX_ASSERT(outTarget);
+
+    QJsonValue jsonValue;
+    QJson::serialize(ctx, value, &jsonValue);
+    if (!jsonValue.isNull())
+        (*outTarget)[key] = jsonValue;
+}
+
 /**
  * Serialize the given value into a JSON string.
  * @param ctx JSON context to use.

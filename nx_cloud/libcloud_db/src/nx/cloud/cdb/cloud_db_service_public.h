@@ -23,6 +23,7 @@ public:
     int exec();
 
     const CloudDbService* impl() const;
+    CloudDbService* impl();
 
 private:
     CloudDbService* m_impl;
