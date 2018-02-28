@@ -1,21 +1,7 @@
 #include "cloud_db_service.h"
 
-#include <algorithm>
-#include <chrono>
-#include <iostream>
-#include <list>
-#include <thread>
-#include <type_traits>
-
-#include <QtCore/QDir>
-
-#include <nx/network/http/auth_tools.h>
-#include <nx/network/socket_global.h>
-#include <nx/utils/db/db_structure_updater.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/current_process.h>
-#include <nx/utils/std/cpp14.h>
-#include <nx/utils/system_error.h>
 #include <nx/utils/type_utils.h>
 
 #include "controller.h"
