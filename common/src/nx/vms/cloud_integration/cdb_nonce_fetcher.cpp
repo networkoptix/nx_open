@@ -264,6 +264,13 @@ void CdbNonceFetcher::gotNonce(
         NX_LOGX(lit("Failed to fetch nonce from cdb: %1").
             arg(static_cast<int>(resCode)), cl_logWARNING);
         m_cloudConnectionManager->processCloudErrorCode(resCode);
+        
+        decltype(m_timerID) timerID;
+        {
+            QnMutexLocker lock(&m_mutex);
+            std::swap(m_timerID, timerID);
+        }
+        timerID.reset();
 
         QnMutexLocker lock(&m_mutex);
         m_timerID = nx::utils::TimerManager::TimerGuard(
