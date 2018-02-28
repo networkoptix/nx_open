@@ -67,7 +67,8 @@ angular.module('cloudApp')
                 alreadyExists: function(error){
                     $scope.registerForm.registerForm.registerEmail.$setValidity('alreadyExists',false);
                     return false;
-                }
+                },
+                portalError: L.errorCodes.brokenAccount
             },
             holdAlerts:true,
             errorPrefix:L.errorCodes.cantRegisterPrefix
