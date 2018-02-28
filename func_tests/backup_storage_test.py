@@ -17,7 +17,7 @@ from test_utils.host import ProcessError
 log = logging.getLogger(__name__)
 
 
-BACKUP_STORAGE_PATH = '/tmp/bstorage'
+BACKUP_STORAGE_PATH = '/mnt/disk2'
 BACKUP_STORAGE_READY_TIMEOUT_SEC = 60  # seconds
 BACKUP_SCHEDULE_TIMEOUT_SEC = 60       # seconds
 
@@ -82,8 +82,7 @@ def second_camera_backup_type(request):
 @pytest.fixture
 def server(server_factory, system_backup_type):
     server = server_factory('server', start=False)
-    server.host.run_command(['rm', '-rfv', BACKUP_STORAGE_PATH])
-    server.host.run_command(['mkdir', '-p', BACKUP_STORAGE_PATH])
+    server.host.run_command(['rm', '-rfv', os.path.join(BACKUP_STORAGE_PATH, '*')])
     server.start_service()
     server.setup_local_system()
     server.set_system_settings(
