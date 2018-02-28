@@ -1231,9 +1231,18 @@ CameraExtraStatus QnResourceTreeModelNode::calculateCameraExtraStatus() const
 {
     CameraExtraStatus result;
     const auto camera = m_resource.dynamicCast<QnVirtualCameraResource>();
-    result.recording = camera && camera->getStatus() == Qn::Recording;
-    result.scheduled = camera && !camera->isScheduleDisabled();
-    result.buggy = camera && camera->statusFlags().testFlag(Qn::CSF_HasIssuesFlag);
+    if (!camera)
+        return result;
+
+    if (camera->getStatus() == Qn::Recording)
+        result |= CameraExtraStatusFlag::recording;
+
+    if (!camera->isScheduleDisabled())
+        result |= CameraExtraStatusFlag::scheduled;
+
+    if (camera->statusFlags().testFlag(Qn::CSF_HasIssuesFlag))
+        result |= CameraExtraStatusFlag::buggy;
+
     return result;
 }
 

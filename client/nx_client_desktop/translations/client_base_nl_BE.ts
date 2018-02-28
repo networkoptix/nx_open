@@ -2832,7 +2832,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
+      <translation>Account is niet geactiveerd. Controleer uw e-mail en volg de instructies</translation>
     </message>
   </context>
   <context>
@@ -6131,7 +6131,7 @@ to %1</source>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>NIET-ONDERSTEUNDE FIRMWAREVERSIE</translation>
     </message>
   </context>
   <context>

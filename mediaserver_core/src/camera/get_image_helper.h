@@ -44,12 +44,6 @@ private:
     static QSharedPointer<CLVideoDecoderOutput> getImageWithCertainQuality(bool useHQ,
         const nx::api::CameraImageRequest& request);
 
-    static QSharedPointer<CLVideoDecoderOutput> getMostPreciseImageFromLive(
-        QnVideoCameraPtr& camera,
-        bool useHq,
-        quint64 time,
-        int channel);
-
     static CLVideoDecoderOutputPtr decodeFrameSequence(
         std::unique_ptr<QnConstDataPacketQueue>& sequence,
         quint64 timeUSec);

@@ -4165,6 +4165,8 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
     if (userId != QnUserResource::kAdminGuid)
         DB_LOAD(QnUserResource::kAdminGuid, data->users);
 
+    // Event rules are required for software triggers.
+    DB_LOAD(QnUuid(), data->rules);
     DB_LOAD(nullptr, data->cameraHistory);
     DB_LOAD(QnUuid(), data->discoveryData);
     DB_LOAD(QnUuid(), data->allProperties);
