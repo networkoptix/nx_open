@@ -45,6 +45,14 @@ nx::utils::db::DBResult SystemManagerStub::markSystemForDeletion(
     return updateSystemStatus(queryContext, systemId, api::SystemStatus::deleted_);
 }
 
+void SystemManagerStub::addExtension(AbstractSystemExtension*)
+{
+}
+
+void SystemManagerStub::removeExtension(AbstractSystemExtension*)
+{
+}
+
 void SystemManagerStub::addSystem(const api::SystemData& system)
 {
     m_systems.emplace(system.id, system);

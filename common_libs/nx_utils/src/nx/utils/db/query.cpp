@@ -36,6 +36,20 @@ void SqlQuery::bindValue(int pos, const QVariant& value) noexcept
     m_sqlQuery.bindValue(pos, value);
 }
 
+void SqlQuery::bindValue(
+    const std::string& placeholder,
+    const std::string& value) noexcept
+{
+    bindValue(
+        QString::fromStdString(placeholder),
+        QString::fromStdString(value));
+}
+
+void SqlQuery::bindValue(int pos, const std::string& value) noexcept
+{
+    bindValue(pos, QString::fromStdString(value));
+}
+
 void SqlQuery::exec()
 {
     if (!m_sqlQuery.exec())

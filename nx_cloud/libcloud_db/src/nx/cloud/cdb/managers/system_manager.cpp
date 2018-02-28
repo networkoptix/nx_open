@@ -299,6 +299,9 @@ void SystemManager::getSystems(
             m_systemHealthInfoProvider.isSystemOnline(systemDataEx.id)
             ? api::SystemHealth::online
             : api::SystemHealth::offline;
+
+        m_extensions.invoke(
+            &AbstractSystemExtension::modifySystemBeforeProviding, &systemDataEx);
     }
 
     completionHandler(api::ResultCode::ok, resultData);
@@ -683,6 +686,16 @@ void SystemManager::addSystemSharingExtension(AbstractSystemSharingExtension* ex
 void SystemManager::removeSystemSharingExtension(AbstractSystemSharingExtension* extension)
 {
     m_systemSharingExtensions.erase(extension);
+}
+
+void SystemManager::addExtension(AbstractSystemExtension* extension)
+{
+    m_extensions.add(extension);
+}
+
+void SystemManager::removeExtension(AbstractSystemExtension* extension)
+{
+    m_extensions.remove(extension);
 }
 
 std::pair<std::string, std::string> SystemManager::extractSystemIdAndVmsUserId(
