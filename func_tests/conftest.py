@@ -14,6 +14,7 @@ from test_utils.cloud_host import CloudAccountFactory, resolve_cloud_host_from_r
 from test_utils.config import SingleTestConfig, TestParameter, TestsConfig
 from test_utils.lightweight_servers_factory import LWS_BINARY_NAME, LightweightServersFactory
 from test_utils.mediaserverdeb import MediaserverDeb
+from test_utils.merging import merge_system
 from test_utils.metrics_saver import MetricsSaver
 from test_utils.networking import setup_networks
 from test_utils.server_factory import ServerFactory
@@ -335,26 +336,9 @@ def sample_media_file(run_options):
 def network(vm_factory, server_factory, layout_file):
     path = Path(__file__).with_name('network_layouts') / layout_file
     layout = yaml.load(path.read_text())
-    setup_networks(vm_factory, layout['networks'])
-    servers = {}
-    for remote_alias, local_aliases in layout['mergers'].items():
-        for local_alias, merge_parameters in local_aliases.items():
-            servers[remote_alias] = server_factory.get(remote_alias)
-            servers[local_alias] = server_factory.get(local_alias)
-            merge_kwargs = {}
-            if merge_parameters is not None:
-                try:
-                    merge_kwargs['take_remote_settings'] = merge_parameters['settings'] == 'remote'
-                except KeyError:
-                    pass
-                try:
-                    remote_network = IPNetwork(merge_parameters['network'])
-                except KeyError:
-                    pass
-                else:
-                    merge_kwargs['remote_network'] = remote_network
-            servers[local_alias].merge_systems(servers[remote_alias], **merge_kwargs)
-    return servers
+    vms = setup_networks(vm_factory, layout['networks'])
+    servers = merge_system(server_factory, layout.get('mergers', {}) or {})
+    return vms, servers
 
 
 # pytest teardown does not allow failing the test from it. We have to use pytest hook for this.

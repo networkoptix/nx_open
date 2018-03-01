@@ -37,7 +37,7 @@ def _make_timeless_server(vm, mediaserver_deb, ca, server_name):
 
 @pytest.fixture()
 def layout_file():
-    return 'direct.yaml'
+    return 'direct-merge_toward_requested.yaml'
 
 
 @pytest.fixture

@@ -58,8 +58,8 @@ def check_media_stream_transports(server):
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/77234376/Camera+history+test
 @pytest.mark.testcam
 def test_camera_switching_should_be_represented_in_history(artifact_factory, server_factory, camera):
-    one = server_factory.get('one')
-    two = server_factory.get('two')
+    one = server_factory.create('one')
+    two = server_factory.create('two')
     one.merge([two])
 
     camera.start_streaming()

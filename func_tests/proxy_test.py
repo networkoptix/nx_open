@@ -9,17 +9,19 @@ log = logging.getLogger(__name__)
 
 @pytest.fixture()
 def layout_file():
-    return 'direct.yaml'
+    return 'direct-merge_toward_requested.yaml'
 
 
 @pytest.fixture()
 def proxy(network):
-    return network['first']
+    _, servers = network
+    return servers['first']
 
 
 @pytest.fixture()
 def proxy_headers(network):
-    target_guid = network['second'].ecs_guid
+    _, servers = network
+    target_guid = servers['second'].ecs_guid
     return {'X-server-guid': target_guid}
 
 

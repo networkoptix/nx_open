@@ -13,8 +13,8 @@ log = logging.getLogger(__name__)
 def test_merged_archive(server_factory, camera, sample_media_file):
     log.debug('camera: %r, sample media file: %r', camera, sample_media_file)
 
-    one = server_factory.get('one')
-    two = server_factory.get('two')
+    one = server_factory.create('one')
+    two = server_factory.create('two')
     one.merge([two])
 
     one.add_camera(camera)

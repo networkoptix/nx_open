@@ -30,7 +30,7 @@ def install_updates_server(os_access, python_path):
 
 @pytest.fixture
 def server(server_factory):
-    return server_factory.get('server')
+    return server_factory.create('server')
 
 
 def test_single_server(server):

@@ -343,7 +343,7 @@ class Server(object):
         for server in other_server_list:
             self.merge_systems(server)
 
-    def merge_systems(self, other_server, remote_network=IPNetwork('10.0.0.0/8'), take_remote_settings=False):
+    def merge_systems(self, other_server, remote_network=IPNetwork('10.254.0.0/16'), take_remote_settings=False):
         log.info('Merging servers: %s with local_system_id=%r and %s with local_system_id=%r',
                  self, self.local_system_id, other_server, other_server.local_system_id)
         assert self.is_started() and other_server.is_started()
@@ -370,7 +370,6 @@ class Server(object):
             self.set_user_password(other_server.user, other_server.password)
         else:
             other_server.set_user_password(self.user, self.password)
-
         wait = Wait("until servers are merged", timeout_sec=MEDIASERVER_MERGE_TIMEOUT.total_seconds())
         while True:
             self.load_system_settings()

@@ -116,8 +116,8 @@ def merge_schema(request):
 
 @pytest.fixture
 def env(server_factory, merge_schema):
-    one = server_factory.get('one')
-    two = server_factory.get('two')
+    one = server_factory.create('one')
+    two = server_factory.create('two')
     if merge_schema == 'merged':
         one.merge([two])
     return SimpleNamespace(

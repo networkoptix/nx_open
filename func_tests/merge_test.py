@@ -7,9 +7,12 @@ import logging
 import time
 
 import pytest
+import yaml
+from pathlib2 import Path
 
 import server_api_data_generators as generator
-from test_utils.rest_api import HttpError
+from test_utils.networking import setup_networks
+from test_utils.rest_api import HttpError, RestApiError
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.utils import bool_to_str, datetime_utc_now, str_to_bool
 
@@ -60,13 +63,22 @@ def check_admin_disabled(server):
     assert x_info.value.status_code == 403
 
 
-@pytest.fixture
-def one(server_factory, test_system_settings):
-    return server_factory.get('one', setup_settings=test_system_settings)
+@pytest.fixture()
+def vms(vm_factory):
+    path = Path(__file__).with_name('network_layouts') / 'direct-no_merge.yaml'
+    layout = yaml.load(path.read_text())
+    vms = setup_networks(vm_factory, layout['networks'])
+    return vms
+
 
 @pytest.fixture
-def two(server_factory):
-    return server_factory.get('two')
+def one(vms, server_factory, test_system_settings):
+    return server_factory.create('one', vm=vms['first'], setup_settings=test_system_settings)
+
+
+@pytest.fixture
+def two(vms, server_factory):
+    return server_factory.create('two', vm=vms['second'])
 
 
 def test_merge_take_local_settings(one, two, test_system_settings):
@@ -117,16 +129,19 @@ def test_merge_take_remote_settings(one, two):
         auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
 
 
-def test_merge_cloud_with_local(server_factory, cloud_account, test_system_settings):
+def test_merge_cloud_with_local(vms, server_factory, cloud_account, test_system_settings):
     # Start local server systemName
     # and move it to working state
-    one = server_factory.get('one', setup_cloud_account=cloud_account, setup_settings=test_system_settings)
-    two = server_factory.get('two')
+    one = server_factory.create('one', vm=vms['first'], setup_cloud_account=cloud_account, setup_settings=test_system_settings)
+    two = server_factory.create('two', vm=vms['second'])
 
     # Merge systems (takeRemoteSettings = False) -> Error
-    with pytest.raises(HttpError) as x_info:
+    try:
         two.merge_systems(one)
-    assert x_info.value.reason == 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD'
+    except RestApiError as e:
+        assert e.error_string == 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD'
+    else:
+        assert False, 'Expected: DEPENDENT_SYSTEM_BOUND_TO_CLOUD'
 
     # Merge systems (takeRemoteSettings = true)
     two.merge_systems(one, take_remote_settings=True)
@@ -136,30 +151,38 @@ def test_merge_cloud_with_local(server_factory, cloud_account, test_system_setti
 
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/71467018/Merge+systems+test#Mergesystemstest-test_merge_cloud_systems
-def test_merge_cloud_systems(server_factory, cloud_account_factory):
+def test_merge_cloud_systems(vms, server_factory, cloud_account_factory):
     cloud_account_1 = cloud_account_factory()
     cloud_account_2 = cloud_account_factory()
-    one = server_factory.get('one', setup_cloud_account=cloud_account_1)
-    two = server_factory.get('two', setup_cloud_account=cloud_account_2)
+    one = server_factory.create('one', vm=vms['first'], setup_cloud_account=cloud_account_1)
+    two = server_factory.create('two', vm=vms['second'], setup_cloud_account=cloud_account_2)
 
     # Merge 2 cloud systems one way
-    with pytest.raises(HttpError) as x_info:
+    try:
         two.merge_systems(one, take_remote_settings=False)
-    assert x_info.value.reason == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
+    except RestApiError as e:
+        assert e.error_string == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
+    else:
+        assert False, 'Expected: BOTH_SYSTEM_BOUND_TO_CLOUD'
 
     # Merge 2 cloud systems the other way
-    with pytest.raises(HttpError) as x_info:
+    try:
         two.merge_systems(one, take_remote_settings=True)
-    assert x_info.value.reason == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
+    except RestApiError as e:
+        assert e.error_string == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
+    else:
+        assert False, 'Expected: BOTH_SYSTEM_BOUND_TO_CLOUD'
 
     # Test default (admin) user disabled
     check_admin_disabled(one)
 
 
-def test_cloud_merge_after_disconnect(server_factory, cloud_account, test_system_settings):
+def test_cloud_merge_after_disconnect(vms, server_factory, cloud_account, test_system_settings):
     # Setup cloud and wait new cloud credentials
-    one = server_factory.get('one', setup_cloud_account=cloud_account, setup_settings=test_system_settings)
-    two = server_factory.get('two', setup_cloud_account=cloud_account)
+    one = server_factory.create(
+        'one', vm=vms['first'],
+        setup_cloud_account=cloud_account, setup_settings=test_system_settings)
+    two = server_factory.create('two', vm=vms['second'], setup_cloud_account=cloud_account)
 
     # Check setupCloud's settings on Server1
     check_system_settings(
@@ -194,9 +217,10 @@ def wait_entity_merge_done(one, two, method, api_object, api_method, expected_re
             assert result_1 == result_2
         time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.0)
 
-def test_merge_resources(server_factory):
-    one = server_factory.get('one')
-    two = server_factory.get('two')
+
+def test_merge_resources(vms, server_factory):
+    one = server_factory.create('one', vm=vms['first'])
+    two = server_factory.create('two', vm=vms['second'])
     user_data = generator.generate_user_data(1)
     camera_data = generator.generate_camera_data(1)
     one.rest_api.ec2.saveUser.POST(**user_data)
@@ -206,9 +230,9 @@ def test_merge_resources(server_factory):
     wait_entity_merge_done(one, two, 'GET', 'ec2', 'getCamerasEx', [camera_data['id']])
 
 
-def test_restart_one_server(server_factory, cloud_account):
-    one = server_factory.get('one')
-    two = server_factory.get('two')
+def test_restart_one_server(vms, server_factory, cloud_account):
+    one = server_factory.create('one', vm=vms['first'])
+    two = server_factory.create('two', vm=vms['second'])
     one.merge([two])
 
     # Stop Server2 and clear its database

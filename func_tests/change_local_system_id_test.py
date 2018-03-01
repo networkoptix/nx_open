@@ -12,8 +12,8 @@ log = logging.getLogger(__name__)
 
 @pytest.fixture
 def env(server_factory):
-    one = server_factory.get('one')
-    two = server_factory.get('two')
+    one = server_factory.create('one')
+    two = server_factory.create('two')
     one.merge([two])
     return SimpleNamespace(
         one=one,

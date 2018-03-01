@@ -22,7 +22,7 @@ UNEXISTENT_USER_ROLE_GUIID = '44e4161e-158e-2201-e000-000000000001'
 
 @pytest.fixture
 def server(server_factory):
-    return server_factory.get('server')
+    return server_factory.create('server')
 
 
 # https://networkoptix.atlassian.net/browse/VMS-3911
@@ -230,7 +230,7 @@ def test_non_existent_api_endpoints(server, path):
 
 
 def test_https_verification(server_factory):
-    server = server_factory.get('server', http_schema='https')
+    server = server_factory.create('server', http_schema='https')
     url = server.rest_api_url.rstrip('/') + '/api/ping'
     with warnings.catch_warnings(record=True) as warning_list:
         response = requests.get(url, verify=str(server.rest_api.ca_cert))

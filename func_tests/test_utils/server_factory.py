@@ -35,7 +35,10 @@ class ServerFactory(object):
         self._mediaserver_deb = mediaserver_deb
 
     @lrudecorator(1000)
-    def get(self, name, *args, **kw):
+    def get(self, name):
+        return self.create(name)
+
+    def create(self, name, *args, **kw):
         config = ServerConfig(name, *args, **kw)
         server = None
         if self._physical_installation_ctl and not config.vm:  # this server requires specific vm, can not allocate it on physical one
@@ -47,8 +50,8 @@ class ServerFactory(object):
                 vm = self._vagrant_vm_factory.get(name)
             installation = install_mediaserver(vm.guest_os_access, self._mediaserver_deb)
             installation.put_key_and_cert(self._ca.generate_key_and_cert())
-            api_url = '%s://%s:%d/' % (
-            config.http_schema, vm.host_os_access.hostname, vm.config.rest_api_forwarded_port)
+            vm_host_hostname = vm.host_os_access.hostname
+            api_url = '%s://%s:%d/' % (config.http_schema, vm_host_hostname, vm.config.rest_api_forwarded_port)
             customization = self._mediaserver_deb.customization
             service = UpstartService(vm.guest_os_access, customization.service_name)
             if not service.is_running():

@@ -77,7 +77,7 @@ def second_camera_backup_type(request):
 
 @pytest.fixture
 def server(server_factory, system_backup_type):
-    server = server_factory.get('server', start=False)
+    server = server_factory.create('server', start=False)
     server.os_access.run_command(['rm', '-rfv', BACKUP_STORAGE_PATH])
     server.os_access.run_command(['mkdir', '-p', BACKUP_STORAGE_PATH])
     server.start_service()
