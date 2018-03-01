@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <map>
+#include <set>
 
 #include <QtCore/QString>
 #include <QtCore/QRegExp>
