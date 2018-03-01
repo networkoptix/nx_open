@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <optional>
 
 #include <gtest/gtest.h>
 
@@ -56,7 +55,7 @@ protected:
         ConnectResult* const connectResult);
 
 private:
-    std::optional<CrossNatConnectorFactory::Function> m_oldFactoryFunc;
+    boost::optional<CrossNatConnectorFactory::Function> m_oldFactoryFunc;
     nx::hpm::MediatorFunctionalTest m_mediator;
 };
 
