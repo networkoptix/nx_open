@@ -111,8 +111,10 @@ public:
         return !(*this == nullptr);
     }
 
-    //using std::function<F>::operator();
-    using std::function<F>::operator bool;
+    explicit operator bool() const noexcept
+    {
+        return static_cast<bool>(static_cast<const base_type&>(*this));
+    }
 
     void swap(MoveOnlyFunc& other)
     {

@@ -4,6 +4,7 @@
 ***********************************************************/
 
 #include <atomic>
+#include <optional>
 
 #include <gtest/gtest.h>
 
@@ -464,7 +465,7 @@ protected:
     }
 
 private:
-    boost::optional<CrossNatConnectorFactory::Function> m_oldFactoryFunc;
+    std::optional<CrossNatConnectorFactory::Function> m_oldFactoryFunc;
     AddressEntry m_addressEntry;
     std::chrono::milliseconds m_connectTimeout;
 
