@@ -15,8 +15,7 @@ namespace {
 
 QString extractIconPath(const nx::vms::event::RulePtr& rule)
 {
-    //qDebug() << ">>>>>>>>>>>>>>>>>>>>>> " << rule->eventParams().description;
-    return lit("images/two_way_audio/mic.png");
+    return lit("images/soft_trigger/user_selectable/%1.png").arg(rule->eventParams().description);
 }
 
 template<class Container, class Item>
