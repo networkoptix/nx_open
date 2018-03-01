@@ -22,6 +22,12 @@ if(MSVC)
     endif()
 endif()
 
+if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        add_compile_options(-fno-devirtualize)
+    endif()
+endif()
+
 add_definitions(
     -DUSE_NX_HTTP
     -D__STDC_CONSTANT_MACROS
@@ -139,10 +145,6 @@ if(LINUX)
     # TODO: Use CMake defaults in the next release version (remove the following two lines).
     string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
     string(REPLACE "-O3" "-O2" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        add_compile_options(-fno-devirtualize)
-    endif()
 
     if(NOT "${arch}" MATCHES "arm|aarch64")
         add_compile_options(-msse2)
