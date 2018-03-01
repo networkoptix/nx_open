@@ -22,6 +22,9 @@
 
 
 namespace nx {
+
+namespace network { namespace aio { class AbstractAioThread; } }
+
 namespace cdb {
 /**
  * Contains classes and methods for manipulating cloud_db data.
@@ -48,6 +51,8 @@ class BaseConnection
 {
 public:
     virtual ~BaseConnection() {}
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) = 0;
 
     /**
      * Set credentials to use.

@@ -28,12 +28,17 @@ namespace client {
  * Executes HTTP requests asynchronously.
  * On object destruction all not yet completed requests are cancelled.
  */
-class AsyncRequestsExecutor
+class AsyncRequestsExecutor:
+    public nx::network::aio::BasicPollable
 {
+    using base_type = nx::network::aio::BasicPollable;
+
 public:
     AsyncRequestsExecutor(
         network::cloud::CloudModuleUrlFetcher* const cdbEndPointFetcher);
     virtual ~AsyncRequestsExecutor();
+
+    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     void setCredentials(
         const std::string& login,
@@ -59,7 +64,6 @@ public:
         // TODO #ak Introduce generic implementation with variadic templates available.
 
         nx_http::AuthInfo auth;
-        SocketAddress proxyEndpoint;
         {
             QnMutexLocker lk(&m_mutex);
             auth = m_auth;
@@ -67,19 +71,25 @@ public:
 
         m_cdbEndPointFetcher->get(
             auth,
-            [this, auth, path, input, handler, errHandler](
-                nx_http::StatusCode::Value resCode,
-                QUrl cdbUrl) mutable
+            [this, auth, path, input = std::move(input),
+                handler = std::move(handler), errHandler = std::move(errHandler)](
+                    nx_http::StatusCode::Value resCode,
+                    QUrl cdbUrl) mutable
             {
-                if (resCode != nx_http::StatusCode::ok)
-                    return errHandler(api::httpStatusCodeToResultCode(resCode));
+                post(
+                    [this, resCode, cdbUrl = std::move(cdbUrl), auth, path, input = std::move(input),
+                        handler = std::move(handler), errHandler = std::move(errHandler)]() mutable
+                    {
+                        if (resCode != nx_http::StatusCode::ok)
+                            return errHandler(api::httpStatusCodeToResultCode(resCode));
 
-                cdbUrl.setPath(network::url::normalizePath(cdbUrl.path() + path));
-                execute(
-                    std::move(cdbUrl),
-                    std::move(auth),
-                    input,
-                    std::move(handler));
+                        cdbUrl.setPath(network::url::normalizePath(cdbUrl.path() + path));
+                        execute(
+                            std::move(cdbUrl),
+                            std::move(auth),
+                            input,
+                            std::move(handler));
+                    });
             });
     }
 
@@ -101,16 +111,24 @@ public:
                 nx_http::StatusCode::Value resCode,
                 QUrl cdbUrl) mutable
             {
-                if (resCode != nx_http::StatusCode::ok)
-                    return errHandler(api::httpStatusCodeToResultCode(resCode));
+                post(
+                    [this, resCode, cdbUrl = std::move(cdbUrl), auth, path,
+                        handler = std::move(handler), errHandler = std::move(errHandler)]() mutable
+                    {
+                        if (resCode != nx_http::StatusCode::ok)
+                            return errHandler(api::httpStatusCodeToResultCode(resCode));
 
-                cdbUrl.setPath(network::url::normalizePath(cdbUrl.path() + path));
-                execute(
-                    std::move(cdbUrl),
-                    std::move(auth),
-                    std::move(handler));
+                        cdbUrl.setPath(network::url::normalizePath(cdbUrl.path() + path));
+                        execute(
+                            std::move(cdbUrl),
+                            std::move(auth),
+                            std::move(handler));
+                    });
             });
     }
+
+protected:
+    virtual void stopWhileInAioThread() override;
 
 private:
     mutable QnMutex m_mutex;
@@ -174,7 +192,7 @@ private:
         std::unique_ptr<HttpClientType> client,
         std::function<void(api::ResultCode, OutputData...)> completionHandler)
     {
-        QnMutexLocker lk(&m_mutex);
+        client->bindToAioThread(getAioThread());
 
         client->setRequestTimeout(m_requestTimeout);
 
@@ -207,7 +225,6 @@ private:
     std::unique_ptr<network::aio::BasicPollable> getClientByPointer(
         network::aio::BasicPollable* httpClientPtr)
     {
-        QnMutexLocker lk(&m_mutex);
         auto requestIter =
             std::find_if(
                 m_runningRequests.begin(),

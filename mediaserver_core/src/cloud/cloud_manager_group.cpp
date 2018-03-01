@@ -16,7 +16,6 @@ CloudManagerGroup::CloudManagerGroup(
     cloudUserInfoPool(
         std::make_unique<CloudUserInfoPoolSupplier>(commonModule->resourcePool())),
     authenticationNonceFetcher(
-        nx::utils::TimerManager::instance(),
         &connectionManager,
         &cloudUserInfoPool,
         defaultNonceFetcher),
