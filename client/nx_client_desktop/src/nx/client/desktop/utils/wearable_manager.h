@@ -5,10 +5,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
-#include <nx/utils/uuid.h>
 
-#include "wearable_state.h"
-#include "wearable_payload.h"
+#include "wearable_fwd.h"
 
 namespace nx {
 namespace client {

@@ -233,7 +233,9 @@ TEST(TcpServerSocketIpv6, BindsToLocalAddress)
 {
     TCPServerSocket socket(AF_INET6);
     ASSERT_TRUE(socket.bind(SocketAddress::anyPrivateAddress));
-    ASSERT_EQ(HostAddress::localhost, socket.getLocalAddress().address);
+    ASSERT_EQ(
+        HostAddress::localhost.toPureIpAddress(AF_INET6).toString(),
+        socket.getLocalAddress().address.toString());
 }
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(

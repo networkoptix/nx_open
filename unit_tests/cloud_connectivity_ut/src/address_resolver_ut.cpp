@@ -3,9 +3,6 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/address_resolver.h>
-#include <nx/network/cloud/cloud_connect_controller.h>
-#include <nx/network/cloud/mediator_connector.h>
-#include <nx/network/socket_global.h>
 #include <nx/utils/test_support/sync_queue.h>
 
 namespace nx {
@@ -23,17 +20,9 @@ class AddressResolverOrder:
     public ::testing::Test
 {
 public:
-    AddressResolverOrder():
-        m_addressResolver(SocketGlobals::addressResolver())
+    AddressResolverOrder()
     {
-        SocketGlobals::cloud().reinitialize();
-        SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
-            nx::utils::Url("stun://127.0.0.1:12345"));
-    }
-
-    ~AddressResolverOrder()
-    {
-        SocketGlobals::cloud().reinitialize();
+        m_addressResolver.setCloudResolveEnabled(true);
     }
 
 protected:
@@ -65,7 +54,7 @@ protected:
 
     void disableCloudConnect()
     {
-        SocketGlobals::cloud().reinitialize();
+        m_addressResolver.setCloudResolveEnabled(false);
         // Mediator is not resolved, so cloud connect is disabled.
     }
 
@@ -121,7 +110,7 @@ protected:
     }
 
 private:
-    nx::network::AddressResolver& m_addressResolver;
+    nx::network::AddressResolver m_addressResolver;
     QString m_hostname;
     SocketAddress m_fixedEntry;
     HostAddress m_dnsEntry;

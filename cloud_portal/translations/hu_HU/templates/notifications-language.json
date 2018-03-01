@@ -1,6 +1,6 @@
 {
   "activate_account": {
-    "emailSubject": "Aktiváld a fiókod"
+    "emailSubject": "Fiók aktiválása"
   },
   "restore_password": {
     "emailSubject": "A jelszó alaphelyzetbe állítása"

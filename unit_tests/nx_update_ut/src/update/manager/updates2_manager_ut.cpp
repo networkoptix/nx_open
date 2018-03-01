@@ -83,16 +83,18 @@ public:
         put(handler);
     }
 
-    MOCK_METHOD0(install, void());
+    MOCK_METHOD0(install, bool());
 
     void setExpectedOutcome(PrepareExpectedOutcome expectedOutcome)
     {
         m_expectedOutcome = expectedOutcome;
     }
 
+    MOCK_METHOD0(stopSync, void());
+
     ~TestInstaller()
     {
-        stop();
+        QnLongRunnable::stop();
     }
 
 private:
@@ -231,7 +233,7 @@ public:
     }
 
     MOCK_METHOD0(downloader, vms::common::p2p::downloader::AbstractDownloader*());
-    MOCK_METHOD0(installer, AbstractUpdates2InstallerPtr());
+    MOCK_METHOD0(installer, AbstractUpdates2Installer*());
 
     virtual void remoteUpdateCompleted() override
     {
@@ -406,7 +408,7 @@ protected:
 
         downloader::FileInformation fileInformation(kFileName);
         fileInformation.url = kFileUrl;
-        fileInformation.md5 = kFileMd5;
+        fileInformation.md5 = QByteArray::fromHex(kFileMd5.toBase64());
         fileInformation.size = kFileSize;
         fileInformation.peerPolicy =
             downloader::FileInformation::PeerSelectionPolicy::byPlatform;
@@ -414,6 +416,8 @@ protected:
         auto setSuccessfulExpectations =
             [this, &fileInformation](downloader::ResultCode downloadResult)
             {
+                EXPECT_CALL(m_testDownloader, deleteFile(fileInformation.name, true))
+                    .Times(1).WillOnce(Return(downloader::ResultCode::ok));
                 EXPECT_CALL(m_testDownloader, addFile(fileInformation))
                     .Times(1).WillOnce(Return(downloadResult));
                 fileInformation.status = downloader::FileInformation::Status::downloaded;
@@ -423,8 +427,9 @@ protected:
                     .Times(1).WillOnce(Return(kFileName));
                 EXPECT_CALL(m_testUpdates2Manager, installer())
                     .Times(1)
-                    .WillOnce(Return(AbstractUpdates2InstallerPtr(&m_testInstaller, [](void*){})));
+                    .WillOnce(Return(&m_testInstaller));
             };
+
 
         switch (expectedOutcome)
         {
@@ -435,23 +440,24 @@ protected:
                 EXPECT_CALL(m_testDownloader, addFile(fileInformation))
                     .Times(1).WillOnce(Return(downloader::ResultCode::ok));
                 EXPECT_CALL(m_testDownloader, deleteFile(kFileName, _))
-                    .Times(1).WillOnce(Return(downloader::ResultCode::ok));
-
+                    .Times(2).WillRepeatedly(Return(downloader::ResultCode::ok));
                 fileInformation.status = downloader::FileInformation::Status::corrupted;
                 EXPECT_CALL(m_testDownloader, fileInformation(kFileName))
                     .Times(1).WillOnce(Return(fileInformation));
                 break;
             case DownloadExpectedOutcome::fail_addFileFailed:
+                EXPECT_CALL(m_testDownloader, deleteFile(fileInformation.name, true))
+                    .Times(1).WillOnce(Return(downloader::ResultCode::ok));
                 EXPECT_CALL(m_testDownloader, addFile(fileInformation))
                     .Times(1).WillOnce(Return(downloader::ResultCode::ioError));
                 break;
+            case DownloadExpectedOutcome::success_fileAlreadyDownloaded:
             case DownloadExpectedOutcome::success_fileAlreadyExists:
-                setSuccessfulExpectations(downloader::ResultCode::fileAlreadyExists);
+                // File should has been deleted by deleteFile() call so addFile should return ok,
+                // not fileAlreadyExists
+                setSuccessfulExpectations(downloader::ResultCode::ok);
                 break;
             case DownloadExpectedOutcome::fail_wrongState:
-                break;
-            case DownloadExpectedOutcome::success_fileAlreadyDownloaded:
-                // #TODO: #akulikov implement
                 break;
         }
     }

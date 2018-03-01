@@ -176,6 +176,20 @@
         "default": "{{PRODUCT_NAME}} giao diện web"
     },
     "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pause",
+            "help": "help | show commands",
+            "collapse all servers": "collapse all servers",
+            "collapse server": "collapse server + [server name]",
+            "play": "play",
+            "clear search": "clear search",
+            "live": "go to live | show me live",
+            "expand all servers": "expand all servers",
+            "stop listening": "stop listening",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
         "systemOffline": "Hệ thống offline",
         "cameraLinks": {
             "copyToClipboard": "sao chép vào clipboard",
@@ -186,9 +200,9 @@
             "transcoding": "Đang chuyển mã",
             "copyActiveText": "đã sao chép vào clipboard"
         },
-        "searchCamPlaceholder": "tìm kiếm",
+        "searchCamPlaceholder": "Search",
         "cameraStates": {
-            "noFormat": "Trình duyệt hoặc thiết bị này không hỗ trợ phát lại video từ camera này.",
+            "noFormat": "This browser does not support video playback from this camera.",
             "ieWin10": "Vui lòng, sử dụng Microsoft Edge hoặc trình duyệt Google Chrome.",
             "iosVideoTooLarge": "ios không hỗ trợ video lớn hơn fullHD (2MP: 1920x1080).",
             "unauthorized": "Yêu cầu xác thực",
@@ -199,7 +213,13 @@
             "error": "Lỗi",
             "offline": "Ẩn",
             "noData": "Không có dữ liệu",
-            "flashRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> để phát video từ máy chủ ARM."
+            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+        },
+        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "resolution": {
+            "high": "High",
+            "auto": "Auto",
+            "low": "Low"
         }
     }
 }

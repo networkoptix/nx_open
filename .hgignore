@@ -183,6 +183,7 @@ plugins/NxControl/NxControl.cs
 
 mobile_client/build-*
 build/*
+build-*/*
 
 statserver/.venv
 statserver/build

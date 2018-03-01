@@ -85,12 +85,12 @@
                     <label class="col-sm-3 control-label">Resource</label>
                     <div class="col-sm-5">
                         <input type="text" ng-model="session.eventResource"
-                               typeahead="resource as resource.name for resource in filterResources($viewValue) | limitTo:10"
-                               typeahead-focus-on-select="false"
-                               typeahead-min-length="0"
-                               typeahead-show-hint="true"
-                               typeahead-focus-first="false"
-                               typeahead-focus
+                               uib-typeahead="resource as resource.name for resource in filterResources($viewValue) | limitTo:10"
+                               uib-typeahead-focus-on-select="false"
+                               uib-typeahead-min-length="0"
+                               uib-typeahead-show-hint="true"
+                               uib-typeahead-focus-first="false"
+                               uib-typeahead-focus
                                class="form-control">
                     </div>
                     <div class="col-sm-4">

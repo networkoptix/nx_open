@@ -57,7 +57,7 @@ class ServerInstallation(object):
             'test', '-f', self.dir / 'bin' / 'mediaserver', ';', 'echo', '$?', ';',
             'test', '-f', self.dir / 'bin' / 'mediaserver-bin', ';', 'echo', '$?', ';',
             'test', '-f', self._config_path, ';', 'echo', '$?', ';',
-            'test', '-f', self._key_cert_path, ';', 'echo', '$?', ';',
+            'test', '-f', self._config_path_initial, ';', 'echo', '$?', ';',
             ])
         return all(code == '0' for code in raw_exit_codes.splitlines(False))
 
@@ -97,7 +97,7 @@ class ServerInstallation(object):
         config.optionxform = str  # make it case-sensitive, server treats it this way (yes, this is a bug)
         config.readfp(BytesIO(old_config))
         for name, value in kw.items():
-            config.set('General', name, value)
+            config.set('General', name, str(value))
         f = BytesIO()
         config.write(f)
         return f.getvalue()
@@ -160,10 +160,12 @@ def find_all_installations(os_access, installation_root=DEFAULT_INSTALLATION_ROO
         PurePosixPath(path_str)
         for path_str in paths_raw_output.splitlines(False)]
     installed_customizations = customizations_from_paths(paths, installation_root)
-    installations = [
-        ServerInstallation(os_access, installation_root / customization.installation_subdir)
-        for customization in installed_customizations]
-    return installations
+    for customization in installed_customizations:
+        installation = ServerInstallation(os_access, installation_root / customization.installation_subdir)
+        if installation.is_valid():
+            yield installation
+        else:
+            log.error('Installation at %s is invalid.', installation.dir)
 
 
 def find_deb_installation(os_access, mediaserver_deb, installation_root=DEFAULT_INSTALLATION_ROOT):
@@ -183,7 +185,12 @@ def _port_is_opened_on_server_machine(hostname, port):
         return True
 
 
-def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_INSTALLATION_ROOT):
+def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_INSTALLATION_ROOT, reinstall=False):
+    if not reinstall:
+        found_installation = find_deb_installation(os_access, mediaserver_deb, installation_root=installation_root)
+        if found_installation is not None:
+            return found_installation
+
     customization = mediaserver_deb.customization
     remote_path = PurePosixPath('/tmp') / 'func_tests' / customization.company_name / mediaserver_deb.path.name
     os_access.mk_dir(remote_path.parent)
@@ -207,7 +214,9 @@ def install_mediaserver(os_access, mediaserver_deb, installation_root=DEFAULT_IN
     installation = ServerInstallation(os_access, installation_root / customization.installation_subdir)
 
     assert installation.is_valid
-    assert UpstartService(os_access, customization.service_name).is_running()  # Must run when installation ends.
+    service = UpstartService(os_access, customization.service_name)
+    if not service.is_running():
+        service.set_state(True)
     assert wait_until(lambda: _port_is_opened_on_server_machine(os_access, 7001))  # Opens after a while.
 
     installation.backup_config()

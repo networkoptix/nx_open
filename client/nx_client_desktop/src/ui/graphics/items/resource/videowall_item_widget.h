@@ -80,7 +80,6 @@ private:
     void at_doubleClicked(Qt::MouseButton button);
 
     void at_updateThumbnailStatus(Qn::ThumbnailStatus status);
-    void at_updateThumbnailImage(const QImage& image);
 
     void initInfoOverlay();
 

@@ -9,7 +9,7 @@ namespace nx {
 namespace update {
 namespace detail {
 
-using ExtractHandler = std::function<void(QnZipExtractor::Error)>;
+using ExtractHandler = std::function<void(QnZipExtractor::Error, const QString& /*outputPath*/)>;
 
 class NX_UPDATE_API AbstractZipExtractor
 {
@@ -19,7 +19,6 @@ public:
         const QString& filePath,
         const QString& outputDir,
         ExtractHandler extractHandler) = 0;
-    virtual void stop() = 0;
 };
 
 using AbstractZipExtractorPtr = std::shared_ptr<AbstractZipExtractor>;

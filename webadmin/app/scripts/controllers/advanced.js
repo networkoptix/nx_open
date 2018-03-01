@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('AdvancedCtrl', ['$scope', '$modal', '$log', 'mediaserver', '$location', 'dialogs', 'systemAPI',
-    function ($scope, $modal, $log, mediaserver,$location, dialogs, systemAPI) {
+    .controller('AdvancedCtrl', ['$scope', '$uibModal', '$log', 'mediaserver', '$location', 'dialogs', 'systemAPI',
+    function ($scope, $uibModal, $log, mediaserver,$location, dialogs, systemAPI) {
 
 
         mediaserver.getUser().then(function(user){
@@ -221,7 +221,7 @@ angular.module('webadminApp')
         };
 
         $scope.restartServer = function(passPort){
-            $modal.open({
+            $uibModal.open({
                 templateUrl: Config.viewsDir + 'restart.html',
                 controller: 'RestartCtrl',
                 resolve:{

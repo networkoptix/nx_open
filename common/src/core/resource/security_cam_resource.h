@@ -13,7 +13,6 @@
 #include <common/common_globals.h>
 #include <api/model/api_ioport_data.h>
 
-#include <core/dataconsumer/audio_data_transmitter.h>
 #include <core/misc/schedule_task.h>
 
 #include <core/resource/media_resource.h>
@@ -26,10 +25,6 @@
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
-
-#ifdef ENABLE_DATA_PROVIDERS
-typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
-#endif
 
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
 {
@@ -125,6 +120,8 @@ public:
      * Returns true if all cameras in a same camera group should share 1 license
      */
     bool isSharingLicenseInGroup() const;
+
+    bool isMultiSensorCamera() const;
 
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
@@ -300,9 +297,10 @@ public:
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
 
-#ifdef ENABLE_DATA_PROVIDERS
-    virtual QnAudioTransmitterPtr getAudioTransmitter();
-#endif
+    /**
+     * Return non zero media event error if camera resource has an issue.
+     */
+    Qn::MediaStreamEvent checkForErrors() const;
 
     bool isEnoughFpsToRunSecondStream(int currentFps) const;
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager();
@@ -421,10 +419,6 @@ protected:
     virtual bool isInputPortMonitored() const;
 
     virtual Qn::LicenseType calculateLicenseType() const;
-protected:
-#ifdef ENABLE_DATA_PROVIDERS
-    QnAudioTransmitterPtr m_audioTransmitter;
-#endif
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;

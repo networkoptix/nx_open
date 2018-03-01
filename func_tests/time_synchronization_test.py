@@ -6,9 +6,12 @@ from datetime import datetime, timedelta
 import pytest
 import pytz
 
-from conftest import timeless_server
-from test_utils.internet_time import get_internet_time, TimeProtocolRestriction
-from test_utils.utils import wait_until, holds_long_enough
+from test_utils.internet_time import TimeProtocolRestriction, get_internet_time
+from test_utils.networking import setup_networks
+from test_utils.server import Server
+from test_utils.server_installation import install_mediaserver
+from test_utils.service import UpstartService
+from test_utils.utils import holds_long_enough, wait_until
 
 log = logging.getLogger(__name__)
 
@@ -17,10 +20,30 @@ BASE_TIME = datetime(2017, 3, 14, 15, 0, 0, tzinfo=pytz.utc)  # Tue Mar 14 15:00
 System = namedtuple('System', ['primary', 'secondary'])
 
 
+def _make_timeless_server(vm, mediaserver_deb, ca, server_name):
+    server_installation = install_mediaserver(vm.guest_os_access, mediaserver_deb)
+    server_installation.change_config(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
+    service = UpstartService(vm.guest_os_access, mediaserver_deb.customization.service_name)
+    api_url = 'http://{host}:{port}/'.format(host=vm.host_os_access.hostname, port=vm.config.rest_api_forwarded_port)
+    server = Server(server_name, vm.guest_os_access, service, server_installation, api_url, ca, vm)
+    if service.get_state():
+        server.stop_service()
+    vm.networking.os_networking.prohibit_global()
+    server_installation.cleanup_var_dir()
+    server.start_service()
+    server.setup_local_system()
+    return server
+
+
+@pytest.fixture()
+def layout_file():
+    return 'direct.yaml'
+
+
 @pytest.fixture
-def system(vm_factory, server_factory):
-    one = timeless_server(vm_factory, server_factory, 'one')
-    two = timeless_server(vm_factory, server_factory, 'two')
+def system(vm_factory, mediaserver_deb, ca):
+    one = _make_timeless_server(vm_factory.get('first'), mediaserver_deb, ca, 'one')
+    two = _make_timeless_server(vm_factory.get('second'), mediaserver_deb, ca, 'two')
     one.merge([two])
     response = one.rest_api.ec2.getCurrentTime.GET()
     primary_server_guid = response['primaryTimeServerGuid']
@@ -36,6 +59,7 @@ def system(vm_factory, server_factory):
     return system
 
 
+@pytest.mark.quick
 def test_primary_follows_vm_time(system):
     primary_vm_time = system.primary.os_access.set_time(BASE_TIME + timedelta(hours=20))
     assert wait_until(lambda: system.primary.get_time().is_close_to(primary_vm_time)), (
@@ -43,6 +67,7 @@ def test_primary_follows_vm_time(system):
             system.primary.get_time(), primary_vm_time))
 
 
+@pytest.mark.quick
 def test_change_time_on_primary_server(system):
     """Change time on PRIMARY server's machine. Expect all servers align with it."""
     primary_vm_time = system.primary.os_access.set_time(BASE_TIME + timedelta(hours=20))
@@ -54,6 +79,7 @@ def test_change_time_on_primary_server(system):
             system.secondary.get_time(), primary_vm_time))
 
 
+@pytest.mark.quick
 def test_change_primary_server(system):
     """Change PRIMARY server, change time on its machine. Expect all servers align with it."""
     system.secondary.rest_api.ec2.forcePrimaryTimeServer.POST(id=system.secondary.ecs_guid)

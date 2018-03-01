@@ -2,7 +2,7 @@
 
 #include <map>
 #include <vector>
-#include <mutex>
+#include <shared_mutex>
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
@@ -14,7 +14,7 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/http/test_http_server.h>
-#include <common/common_module.h>
+#include <nx/utils/elapsed_timer_thread_safe.h>
 
 #include "common.h"
 
@@ -23,6 +23,20 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace axis {
 
+/**
+ * The purpose of ElapsedEvent is to store information when event of corresponding type happened
+ * last time.
+ * @note ElapsedEvent is thread-safe.
+ * @note ElapsedEvent is non-copyable, non-movable and non-default-constructible.
+ */
+struct ElapsedEvent
+{
+public:
+    const AnalyticsEventType type;
+    nx::utils::ElapsedTimerThreadSafe timer;
+    ElapsedEvent(const AnalyticsEventType& analyticsEventType): type(analyticsEventType){}
+};
+using ElapsedEvents = std::list<ElapsedEvent>;
 
 class Manager;
 
@@ -31,6 +45,8 @@ class Monitor;
 class axisHandler: public nx::network::http::AbstractHttpRequestHandler
 {
 public:
+    axisHandler(Monitor* monitor): m_monitor(monitor) {}
+
     virtual void processRequest(
         nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
@@ -38,15 +54,9 @@ public:
         nx::network::http::Response* const response,
         nx::network::http::RequestProcessedHandler completionHandler);
 
-    axisHandler(
-        Monitor* monitor,
-        const QList<AnalyticsEventTypeExtended>& events,
-        std::mutex& elapsedTimerMutex);
 
 private:
     Monitor* m_monitor;
-    const QList<AnalyticsEventTypeExtended>& m_events;
-    std::mutex& m_elapsedTimerMutex;
 };
 
 class Monitor: public QObject
@@ -82,15 +92,17 @@ public:
 
     void onTimer();
 
+    ElapsedEvents& eventsToCatch() noexcept { return m_eventsToCatch; }
+
  private:
     Manager * m_manager;
     const QUrl m_url;
     const QUrl m_endpoint;
     const QAuthenticator m_auth;
     nx::sdk::metadata::MetadataHandler* m_handler;
-    std::vector<QnUuid> m_eventsToCatch;
+    ElapsedEvents m_eventsToCatch; //< The monitor treats events from this list.
     nx::network::http::TestHttpServer* m_httpServer;
-    nx::network::aio::Timer m_timer;
+    nx::network::aio::Timer m_aioTimer;
     mutable std::mutex m_elapsedTimerMutex;
 };
 

@@ -23,8 +23,7 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     virtual void setCamera(const QnVirtualCameraResourcePtr& camera);
 
-    QnTimePeriod selectedTimePeriod() const;
-    void setSelectedTimePeriod(const QnTimePeriod& newTimePeriod);
+    void relevantTimePeriodChanged(const QnTimePeriod& previousValue);
 
     virtual int count() const = 0;
     virtual QVariant data(const QModelIndex& index, int role, bool& handled) const = 0;
@@ -57,7 +56,6 @@ protected:
 private:
     AbstractAsyncSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
-    QnTimePeriod m_selectedTimePeriod;
     qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
     rest::Handle m_currentFetchId = rest::Handle();
     PrefetchCompletionHandler m_prefetchCompletionHandler;

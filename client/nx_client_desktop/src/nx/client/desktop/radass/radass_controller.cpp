@@ -55,7 +55,7 @@ static constexpr int kSlowNetworkFrameLimit = 3;
 // Item will go to LQ if it is small for this period of time already.
 static constexpr int kLowerSmallItemQualityIntervalMs = 1000;
 
-static constexpr int kAutomaticSpeed = std::numeric_limits<int>().max();
+static constexpr int kAutomaticSpeed = std::numeric_limits<int>::max();
 
 bool isForcedHqDisplay(QnCamDisplay* display)
 {
@@ -143,7 +143,6 @@ struct ConsumerInfo
     LqReason lqReason = LqReason::none;
     QElapsedTimer initialTime;
     QElapsedTimer awaitingLqTime;
-    QElapsedTimer lastRtspDrop;
 
     // Item will go to LQ if it is small for this period of time already.
     QElapsedTimer itemIsSmallInHq;
@@ -274,17 +273,15 @@ struct RadassController::Private
             if (condition && !condition(display))
                 continue;
 
-            QSize size = display->getMaxScreenSize();
-            qint64 screenSquare = size.width() * size.height();
+            const QSize size = display->getMaxScreenSize();
+            const qint64 screenSquare = size.width() * size.height();
 
-            // Using pixels per second for more granular sorting.
-            QSize res = display->getVideoSize();
-            int pps = res.width() * res.height() * display->getAvarageFps();
+            static const int kMaximumValue = std::numeric_limits<int>::max();
 
             // Put display with max pps to the beginning, so if slow stream do HQ->LQ for max pps
             // display (between displays with same size).
-            static const int kMaximumValue = std::numeric_limits<int>().max();
-            pps = kMaximumValue - pps;
+            const QSize res = display->getVideoSize();
+            const int pps = kMaximumValue - (res.width() * res.height());
 
             consumerByScreenSize.insert((screenSquare << 32) + pps, info);
         }
@@ -422,14 +419,6 @@ struct RadassController::Private
             return;
         }
 
-        if (consumer->awaitingLqTime.isValid()
-            && consumer->awaitingLqTime.hasExpired(kQualitySwitchIntervalMs))
-        {
-            trace("Consumer had slow stream for 5 seconds", consumer);
-            gotoLowQuality(consumer, LqReason::performance);
-            return;
-        }
-
         // Switch HQ->LQ if visual item size is small.
         if (reader->getQuality() == MEDIA_Quality_High
             && isSmallItem(display)
@@ -456,22 +445,25 @@ struct RadassController::Private
         if (display->isRealTimeSource()
             // LQ live stream.
             && reader->getQuality() == MEDIA_Quality_Low
-            // No drop report several last seconds.
-            && consumer->lastRtspDrop.hasExpired(kQualitySwitchIntervalMs)
             // There are no a lot of packets in the queue (it is possible if CPU slow).
-            && display->queueSize() <= display->maxQueueSize() / 2
+            && display->queueSize() <= (display->maxQueueSize() * 0.75)
             // Check if camera is not out of the screen
             && !reader->isPaused()
             // Check if camera is not paused
             && !reader->isMediaPaused()
             // No recently slow report by any camera.
-            && lastAutoSwitchTimer.hasExpired(kQualitySwitchIntervalMs)
+            && lastSystemRtspDrop.hasExpired(kQualitySwitchIntervalMs)
             // Is big enough item for HQ.
-            && isBigItem(display)
-            // Auto-Hq transition is not blocked
-            && autoHqTransitionAllowed)
+            && isBigItem(display))
         {
             streamBackToNormal(consumer);
+        }
+
+        if (consumer->awaitingLqTime.isValid()
+            && consumer->awaitingLqTime.hasExpired(kQualitySwitchIntervalMs))
+        {
+            trace("Consumer had slow stream for 5 seconds", consumer);
+            gotoLowQuality(consumer, LqReason::performance);
         }
     }
 
@@ -511,7 +503,6 @@ struct RadassController::Private
     {
         trace("Slow stream detected.", consumer);
         lastSystemRtspDrop.restart();
-        consumer->lastRtspDrop.restart();
 
         // Skip unsupported cameras and cameras with manual stream control.
         if (consumer->mode != RadassMode::Auto)
@@ -548,8 +539,18 @@ struct RadassController::Private
             return;
         }
 
-        trace("Switching to LQ.", consumer);
-        gotoLowQuality(consumer, LqReason::performance);
+        auto smallestConsumer = findConsumer(
+            FindMethod::Smallest,
+            MEDIA_Quality_High,
+            itemQualityCanBeLowered);
+        NX_ASSERT(isValid(smallestConsumer), "At least one camera must be found");
+        if (!isValid(smallestConsumer))
+        {
+            trace("Smallest HQ camera was not found, using source instead.", consumer);
+            smallestConsumer = consumer;
+        }
+        trace("Finding smallest HQ camera and switching it to LQ.", smallestConsumer);
+        gotoLowQuality(smallestConsumer, LqReason::performance);
         lastAutoSwitchTimer.restart();
     }
 
@@ -563,14 +564,18 @@ struct RadassController::Private
             return;
 
         QnCamDisplay* display = consumer->display;
-        if (consumer->lqReason == LqReason::performanceInFf
-            && (qAbs(display->getSpeed()) < consumer->toLqSpeed
-                    || (consumer->toLqSpeed < 0 && display->getSpeed() > 0)))
+        if (consumer->lqReason == LqReason::performanceInFf)
         {
-            // If item leave high speed mode change same item to HQ
-            trace("Consumer left FF mode or slowed, switching to HQ", consumer);
-            gotoHighQuality(consumer);
-            return;
+            const float oldSpeed = consumer->toLqSpeed;
+            const float currentSpeed = display->getSpeed();
+            if (!isFastForwardOrRevMode(currentSpeed)
+                || qAbs(currentSpeed) < qAbs(oldSpeed))
+            {
+                // If item leave high speed mode change it back to HQ.
+                trace("Consumer left FF mode or slowed, switching to HQ", consumer);
+                gotoHighQuality(consumer);
+                return;
+            }
         }
 
         if (isFastForwardOrRevMode(display))

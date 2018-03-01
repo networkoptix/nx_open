@@ -167,8 +167,15 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
 
-            data.isWritable = storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable();
-            data.isOnline = true;
+            QnStorageResourceList additionalStorages;
+            additionalStorages.append(storage);
+            auto writableStoragesIfCurrentWasAdded = qnNormalStorageMan->getAllWritableStorages(
+                &additionalStorages);
+
+            data.isOnline = storage->initOrUpdate() == Qn::StorageInit_Ok;
+            data.isWritable = data.isOnline
+                && storage->isWritable()
+                && writableStoragesIfCurrentWasAdded.contains(storage);
 
             auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
             if (fileStorage)

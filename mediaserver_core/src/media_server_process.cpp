@@ -1,7 +1,5 @@
 #include "media_server_process.h"
 
-#include <plugins/plugin_internal_tools.h>
-
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -27,7 +25,6 @@
 #include <QtConcurrent/QtConcurrent>
 #include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
-#include <utils/call_counter/call_counter.h>
 #include <QtCore/QThreadPool>
 
 #include <QtNetwork/QUdpSocket>
@@ -744,22 +741,32 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
         }
 
-        QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
+        const auto unmountedStorages =
+            mserver_aux::getUnmountedStorages(m_mediaServer->getStorages());
+        for (const auto& storageResource: unmountedStorages)
+        {
+            auto fileStorageResource = storageResource.dynamicCast<QnFileStorageResource>();
+            if (fileStorageResource)
+                fileStorageResource->setMounted(false);
+        }
 
-        nx::mserver_aux::UnmountedLocalStoragesFilter unmountedLocalStoragesFilter(QnAppInfo::mediaFolderName());
-        auto unMountedStorages = unmountedLocalStoragesFilter.getUnmountedStorages(
-                [this]()
+        QnStorageResourceList smallStorages = getSmallStorages(m_mediaServer->getStorages());
+        QnStorageResourceList storagesToRemove;
+        for (const auto& smallStorage: smallStorages)
+        {
+            bool isSmallStorageAmongstUnmounted = false;
+            for (const auto& unmountedStorage: unmountedStorages)
+            {
+                if (unmountedStorage == smallStorage)
                 {
-                    QnStorageResourceList result;
-                    for (const auto& storage: m_mediaServer->getStorages())
-                        if (!storage->isExternal())
-                            result.push_back(storage);
+                    isSmallStorageAmongstUnmounted = true;
+                    break;
+                }
+            }
 
-                    return result;
-                }(),
-                listRecordFolders(true));
-
-        storagesToRemove.append(unMountedStorages);
+            if (!isSmallStorageAmongstUnmounted)
+                storagesToRemove.append(smallStorage);
+        }
 
         NX_DEBUG(this, lm("Found %1 storages to remove").arg(storagesToRemove.size()));
         for (const auto& storage: storagesToRemove)
@@ -2325,7 +2332,6 @@ void MediaServerProcess::run()
         qnStaticCommon->setEngineVersion(QnSoftwareVersion(m_cmdLineArguments.engineVersion));
     }
 
-    QnCallCountStart(std::chrono::milliseconds(5000));
 #ifdef Q_OS_WIN32
     nx::misc::ServerDataMigrateHandler migrateHandler;
     switch (nx::misc::migrateFilesFromWindowsOldDir(&migrateHandler))
@@ -3090,7 +3096,7 @@ void MediaServerProcess::run()
             videoCameraPool.reset();
 
             commonModule()->resourceDiscoveryManager()->stop();
-            qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics event.
+            qnServerModule->metadataManagerPool()->stop(); //< Stop processing analytics events.
             QnResource::stopAsyncTasks();
 
             //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now

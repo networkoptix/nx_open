@@ -2,7 +2,7 @@ set(product.title "${client.name}")
 set(product.display.title "${client.display.name}")
 
 if(WINDOWS)
-    set(nov_file_launcher_executable "${CMAKE_BINARY_DIR}/bin/launcher${CMAKE_EXECUTABLE_SUFFIX}")
+    set(nov_file_launcher_executable "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/launcher${CMAKE_EXECUTABLE_SUFFIX}")
 else()
     set(nov_file_launcher_executable)
 endif()
@@ -16,9 +16,6 @@ nx_configure_file(
 
 nx_configure_file(
     maven/filter-resources/client_app_info_impl.cpp
-    ${CMAKE_CURRENT_BINARY_DIR})
-nx_configure_file(
-    maven/filter-resources/version.h
     ${CMAKE_CURRENT_BINARY_DIR})
 nx_configure_file(
     ${PROJECT_SOURCE_DIR}/cpp/maven/bin-resources/app_icons.h
@@ -50,14 +47,6 @@ nx_add_target(nx_client_desktop LIBRARY
 )
 
 if(WINDOWS)
-    ExternalProject_Add(
-        nov_file_launcher
-        SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/launcher"
-        CMAKE_ARGS
-            -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
-            -DCONFIG_DIRECTORY=${CMAKE_CURRENT_BINARY_DIR}
-        BUILD_BYPRODUCTS "${nov_file_launcher_executable}"
-    )
     add_dependencies(nx_client_desktop nov_file_launcher)
 endif()
 

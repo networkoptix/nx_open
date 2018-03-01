@@ -6,7 +6,6 @@
 #include "video_data_packet.h"
 
 #include <utils/memory/cyclic_allocator.h>
-#include <network/h264_rtp_parser.h>
 
 QnCompressedVideoData::QnCompressedVideoData( QnConstMediaContextPtr ctx )
 :

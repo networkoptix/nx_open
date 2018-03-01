@@ -30,7 +30,7 @@ public:
 protected:
     virtual std::string capabilitiesManifest() override;
 
-    virtual bool pushVideoFrame(
+    virtual bool pushCompressedVideoFrame(
         const nx::sdk::metadata::CommonCompressedVideoPacket* videoFrame) override;
 
     virtual bool pullMetadataPackets(

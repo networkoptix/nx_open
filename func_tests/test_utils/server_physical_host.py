@@ -4,7 +4,7 @@ import logging
 import uuid
 
 from test_utils.build_info import customization_from_company_name
-from .os_access import SshAccessConfig, host_from_config
+from .os_access import SshAccessConfig
 from .server import Server
 from .service import MEDIASERVER_DIR, AdHocService, SERVER_CTL_TARGET_PATH
 from .server_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, ServerInstallation
@@ -96,7 +96,7 @@ class PhysicalInstallationHost(object):
 
     @classmethod
     def from_config(cls, config, deb_path, customization_company_name, ca):
-        return cls(config.name, host_from_config(config.location), config.root_dir, config.limit,
+        return cls(config.name, config.ssh_config, config.root_dir, config.limit,
                    deb_path, customization_company_name, ca)
 
     def __init__(self, name, os_access, root_dir, limit, deb_path, customization_company_name, ca):
@@ -149,7 +149,7 @@ class PhysicalInstallationHost(object):
         rest_api_url = '%s://%s:%d/' % (config.http_schema, self.os_access.hostname, server_port)
         service = AdHocService(self.os_access, installation.dir)
         server = Server(config.name, self.os_access, service, installation, rest_api_url, self._ca,
-                        rest_api_timeout=config.rest_api_timeout, internal_ip_port=server_port)
+                        None, rest_api_timeout=config.rest_api_timeout, internal_ip_port=server_port)
         self._allocated_server_list.append(server)
         return server
 

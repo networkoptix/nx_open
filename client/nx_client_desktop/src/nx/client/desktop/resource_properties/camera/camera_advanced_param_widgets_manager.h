@@ -39,6 +39,7 @@ private:
     QWidget* createContentsPage(const QString &name, const std::vector<QnCameraAdvancedParameter> &params);
     QWidget* createWidgetsForPage(const QString &name, const std::vector<QnCameraAdvancedParameter> &params);
     void setUpDependenciesForPage(const std::vector<QnCameraAdvancedParameter> &params);
+    void runAllHandlerChains();
 
     using DependencyHandler = std::function<bool()>;
     using HandlerChains = std::map<

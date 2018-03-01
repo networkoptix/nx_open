@@ -151,17 +151,6 @@
         </div>
     </form>
 
-    <h2>El ile güncelleme</h2>
-    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
-        <div class="form-group">
-            <label class="col-sm-4">Yükleyiciyi karşıya yükle</label>
-            <div class="col-sm-8">
-                <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">Lütfen konfigürasyonun doğruluğundan emin olun.</p>
-            </div>
-        </div>
-    </form>
-
     <h1>Gelişmiş sistem ayarları</h1>
     <div class="alert alert-danger" role="alert">
         <b>Dikkat!</b> Yapılan herhangi bir değişiklik sunucunun düzgün çalışmamasına neden olabilir.
@@ -210,7 +199,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Uyarı!</b> Bazı değişiklikler yeniden başlatmayı gerektirir <b>tüm</b> sistemdeki sunucular.<br><br>
+        <b>Uyarı!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Geçerli sunucuyu yeniden başlat</button>
         </div>

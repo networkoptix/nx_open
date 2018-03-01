@@ -393,7 +393,7 @@ void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, int chan
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
         auto& regions = (*userAttributesLock)->motionRegions;
-        while (regions.size() < channel)
+        while (channel >= regions.size())
             regions << QnMotionRegion();
         if (regions[channel] == mask)
             return;
@@ -530,6 +530,14 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
     if (!resType)
         return false;
     return resType->hasParam(lit("canShareLicenseGroup"));
+}
+
+bool QnSecurityCamResource::isMultiSensorCamera() const
+{
+    return !getGroupId().isEmpty()
+        && !isDtsBased()
+        && !isAnalogEncoder()
+        && !isAnalog();
 }
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const
@@ -1340,16 +1348,6 @@ bool QnSecurityCamResource::isIOModule() const
     return m_cachedIsIOModule.get();
 }
 
-#ifdef ENABLE_DATA_PROVIDERS
-QnAudioTransmitterPtr QnSecurityCamResource::getAudioTransmitter()
-{
-    if (!isInitialized())
-        return nullptr;
-    return m_audioTransmitter;
-}
-
-#endif
-
 nx::core::resource::AbstractRemoteArchiveManager* QnSecurityCamResource::remoteArchiveManager()
 {
     return nullptr;
@@ -1476,4 +1474,14 @@ bool QnSecurityCamResource::setCameraCredentialsSync(
     if (outErrorString)
         *outErrorString = lit("Operation is not permitted.");
     return false;
+}
+
+Qn::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
+{
+    const auto capabilities = getCameraCapabilities();
+    if (capabilities.testFlag(Qn::isDefaultPasswordCapability))
+        return Qn::MediaStreamEvent::ForbiddentBecauseDefaultPasswordError;
+    if (capabilities.testFlag(Qn::isOldFirmwareCapability))
+        return Qn::MediaStreamEvent::oldFirmwareError;
+    return Qn::MediaStreamEvent::NoEvent;
 }

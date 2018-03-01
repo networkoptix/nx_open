@@ -26,7 +26,7 @@ QnTimePeriod extractItemTimeWindow(QnWorkbenchItem *item)
     QnTimePeriod window = item->data(Qn::ItemSliderWindowRole).value<QnTimePeriod>();
 
     if(window.isEmpty())
-        window = QnTimePeriod(QnTimePeriod::kMinTimeValue, QnTimePeriod::infiniteDuration());
+        window = QnTimePeriod::anytime();
 
     qint64 windowStartMs = window.startTimeMs;
     qint64 windowEndMs = (window.isInfinite() ? QnTimePeriod::kMaxTimeValue : window.endTimeMs());

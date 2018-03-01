@@ -8,12 +8,15 @@ import tempfile
 import time
 import urllib
 import uuid
+from pprint import pformat
 
 import pytest
 import pytz
 import requests.exceptions
+from netaddr.ip import IPNetwork, IPAddress
 from pathlib2 import Path
 
+from test_utils.utils import wait_until, Wait
 from .camera import Camera, SampleMediaFile, make_schedule_task
 from .cloud_host import CloudAccount
 from .os_access import OsAccess, LocalAccess
@@ -100,7 +103,7 @@ class Server(object):
 
     def __init__(
             self,
-            name, os_access, service, installation, rest_api_url, ca,
+            name, os_access, service, installation, rest_api_url, ca, machine,
             rest_api_timeout=None, internal_ip_port=None):
         assert name, repr(name)
         assert isinstance(os_access, OsAccess), repr(os_access)
@@ -111,12 +114,13 @@ class Server(object):
         self._service = service
         self.rest_api_url = rest_api_url
         self._ca = ca
+        self.machine = machine
         self.rest_api = RestApi(self.title, self.rest_api_url, timeout=rest_api_timeout, ca_cert=self._ca.cert_path)
         self.settings = None
         self.local_system_id = None
         self.ecs_guid = None
         self.internal_ip_port = internal_ip_port or MEDIASERVER_LISTEN_PORT
-        self.internal_ip_address = None
+        self.forwarded_port = None
         self._state = None  # self._st_*
 
     def __repr__(self):
@@ -132,10 +136,6 @@ class Server(object):
     @property
     def password(self):
         return self.rest_api.password
-
-    @property
-    def internal_url(self):
-        return 'http://%s:%d/' % (self.internal_ip_address, self.internal_ip_port)
 
     @property
     def dir(self):
@@ -232,19 +232,13 @@ class Server(object):
 
     def load_system_settings(self, log_settings=False):
         log.debug('%s: Loading settings...', self)
-        self.settings = self.get_system_settings()
+        self.settings = self.rest_api.api.systemSettings.GET()['settings']
         if log_settings:
             for name, value in self.settings.items():
                 log.debug('%s settings: %s = %r', self.title, name, value)
         self.local_system_id = self.settings['localSystemId']
         self.cloud_system_id = self.settings['cloudSystemID']
-        iflist = self.rest_api.api.iflist.GET()
-        self.internal_ip_address = iflist[-1]['ipAddr']
         self.ecs_guid = self.rest_api.ec2.testConnection.GET()['ecsGuid']
-
-    def get_system_settings(self):
-        response = self.rest_api.api.systemSettings.GET()
-        return response['settings']
 
     def is_system_set_up(self):
         return self.settings['localSystemId'] != MEDIASERVER_UNSETUP_LOCAL_SYSTEM_ID
@@ -349,7 +343,7 @@ class Server(object):
         for server in other_server_list:
             self.merge_systems(server)
 
-    def merge_systems(self, other_server, take_remote_settings=False):
+    def merge_systems(self, other_server, remote_network=IPNetwork('10.0.0.0/8'), take_remote_settings=False):
         log.info('Merging servers: %s with local_system_id=%r and %s with local_system_id=%r',
                  self, self.local_system_id, other_server, other_server.local_system_id)
         assert self.is_started() and other_server.is_started()
@@ -360,32 +354,31 @@ class Server(object):
         def make_key(method):
             digest = generate_auth_key(method, other_server.user.lower(), other_server.password, nonce, realm)
             return urllib.quote(base64.urlsafe_b64encode(':'.join([other_server.user.lower(), nonce, digest])))
-        self.rest_api.api.mergeSystems.GET(
-            url=other_server.internal_url,
-            getKey=make_key('GET'),
-            postKey=make_key('POST'),
-            takeRemoteSettings=take_remote_settings,
-            timeout=MEDIASERVER_MERGE_REQUEST_TIMEOUT,
-            )
+        interfaces = other_server.rest_api.api.iflist.GET()
+        url = None
+        for interface in interfaces:
+            ip_address_to = IPAddress(interface['ipAddr'])
+            if ip_address_to in remote_network:
+                url = 'http://{ip_address}:{port}/'.format(ip_address=ip_address_to, port=self.internal_ip_port)
+        if url is None:
+            raise Exception("No IP address from {} from interfaces:\n{}".format(remote_network, pformat(interfaces)))
+        self.rest_api.api.mergeSystems.POST(
+            url=url,
+            getKey=make_key('GET'), postKey=make_key('POST'),
+            takeRemoteSettings=take_remote_settings, mergeOneServer=False)
         if take_remote_settings:
             self.set_user_password(other_server.user, other_server.password)
         else:
             other_server.set_user_password(self.user, self.password)
-        self._wait_for_servers_to_merge(other_server)
-        time.sleep(5)  # servers still need some time to settle down; hope this time will be enough
 
-    def _wait_for_servers_to_merge(self, other_server):
-        start_time = datetime_utc_now()
-        while datetime_utc_now() - start_time < MEDIASERVER_MERGE_TIMEOUT:
+        wait = Wait("until servers are merged", timeout_sec=MEDIASERVER_MERGE_TIMEOUT.total_seconds())
+        while True:
             self.load_system_settings()
             other_server.load_system_settings()
             if self.local_system_id == other_server.local_system_id:
-                log.info('Servers are merged now, have common local_system_id=%r', self.local_system_id)
-                return
-            log.debug('Servers are not merged yet, waiting...')
-            time.sleep(0.5)
-        pytest.fail('Timed out in %s waiting for servers %s and %s to be merged'
-                    % (MEDIASERVER_MERGE_TIMEOUT, self, other_server))
+                break
+            if not wait.sleep_and_continue():
+                assert False, 'Servers are not merged'
 
     def set_user_password(self, user, password):
         log.debug('%s got user/password: %r/%r', self, user, password)

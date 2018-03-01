@@ -173,11 +173,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulaire</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Longeur d'Archive Fixe</translation>
     </message>
@@ -961,6 +956,14 @@
     </message>
   </context>
   <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>Catégorie</translation>
+    </message>
+  </context>
+  <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
@@ -1722,7 +1725,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Cycle de tour</translation>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>
@@ -2667,11 +2670,6 @@
     </message>
     <message>
       <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
-    </message>
-    <message>
-      <location/>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
 The oldest footage among all cameras on the server will be deleted first.</source>
       <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
@@ -3065,11 +3063,6 @@ Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulaire</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Détection de mouvement</translation>
     </message>
@@ -3088,11 +3081,6 @@ Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulaire</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Annuler</translation>
     </message>
@@ -3101,11 +3089,6 @@ Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulaire</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation type="unfinished">Upload Video</translation>
     </message>

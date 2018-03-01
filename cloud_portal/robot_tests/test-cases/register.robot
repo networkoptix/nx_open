@@ -8,11 +8,6 @@ ${password}    ${BASE PASSWORD}
 ${url}         ${CLOUD TEST}
 
 *** Keywords ***
-Validate Register Success
-    [arguments]    ${location}
-    Wait Until Element Is Visible    ${ACCOUNT CREATION SUCCESS}
-    Location Should Be    ${location}
-
 Check Bad Email Input
     [arguments]    ${email}
     Wait Until Elements Are Visible    ${REGISTER EMAIL INPUT}    ${CREATE ACCOUNT BUTTON}
@@ -56,81 +51,42 @@ should register user with correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Validate Register Success
     Close Browser
 
 should register user with cyrillic First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    ${CYRILLIC NAME}    ${CYRILLIC NAME}    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
+    Validate Register Success
     Close Browser
 
 should register user with smiley First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    ${SMILEY NAME}    ${SMILEY NAME}    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Register    ${SMILEY TEXT}    ${SMILEY TEXT}    ${email}    ${password}
+    Validate Register Success
     Close Browser
 
 should register user with glyph First and Last names and correct credentials
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    ${GLYPH NAME}    ${GLYPH NAME}    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
+    Register    ${GLYPH TEXT}    ${GLYPH TEXT}    ${email}    ${password}
+    Validate Register Success
     Close Browser
 
 should allow `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
     ${email}    Get Random Email
     Open Browser and go to URL    ${url}/register
-    Register    ${SYMBOL NAME}    ${SYMBOL NAME}    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
-    Close Browser
-
-should not allow to register without all fields filled
-    ${email}    Get Random Email
-    Open Browser and go to URL    ${url}/register
-    Wait Until Element Is Visible    ${CREATE ACCOUNT BUTTON}
-    Click Button    ${CREATE ACCOUNT BUTTON}
-    ${class}    Get Element Attribute    ${REGISTER FIRST NAME INPUT}/../..    class
-    Should Contain    ${class}    has-error
-    ${class}    Get Element Attribute    ${REGISTER LAST NAME INPUT}/../..    class
-    Should Contain    ${class}    has-error
-    ${class}    Get Element Attribute    ${REGISTER EMAIL INPUT}/../..    class
-    Should Contain    ${class}    has-error
-    ${class}    Get Element Attribute    ${REGISTER PASSWORD INPUT}/../../..    class
-    Should Contain    ${class}    has-error
-    Close Browser
-
-should not allow to register with blank spaces in in First and Last name fields
-    ${email}    Get Random Email
-    Open Browser and go to URL    ${url}/register
-    Register    ${SPACE}    ${SPACE}    ${email}    ${password}
-    ${class}    Get Element Attribute    ${REGISTER FIRST NAME INPUT}/../..    class
-    Should Contain    ${class}    has-error
-    ${class}    Get Element Attribute    ${REGISTER LAST NAME INPUT}/../..    class
-    Should Contain    ${class}    has-error
+    Register    ${SYMBOL TEXT}    ${SYMBOL TEXT}    ${email}    ${password}
+    Validate Register Success
     Close Browser
 
 should allow !#$%&'*+-/=?^_`{|}~ in email field
     ${email}    Get Random Symbol Email
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    Validate Register Success    ${url}/register/success
-    Close Browser
-
-should not allow to register without email
-    Open Browser and go to URL    ${url}/register
-    Register    mark    hamill    ${EMPTY}    ${password}
-    ${class}    Get Element Attribute    ${REGISTER EMAIL INPUT}/../..    class
-    Should Contain    ${class}    has-error
-
-    ${class}    Get Element Attribute    ${REGISTER FIRST NAME INPUT}/../..    class
-    Should Not Contain    ${class}    has-error
-    ${class}    Get Element Attribute    ${REGISTER LAST NAME INPUT}/../..    class
-    Should Not Contain    ${class}    has-error
-    ${class}    Get Element Attribute    ${REGISTER PASSWORD INPUT}/../../..    class
-    Should Not Contain    ${class}    has-error
+    Validate Register Success
     Close Browser
 
 should respond to Enter key and save data
@@ -142,12 +98,12 @@ should respond to Enter key and save data
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     Press Key    ${REGISTER PASSWORD INPUT}    ${ENTER}
-    Validate Register Success    ${url}/register/success
+    Validate Register Success
     Close Browser
 
 should respond to Tab key
     Open Browser and go to URL    ${url}/register
-    Wait Until Element Is Visible    ${REGISTER FIRST NAME INPUT}
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}
     Element Should Be Focused    ${REGISTER FIRST NAME INPUT}
     Press Key    ${REGISTER FIRST NAME INPUT}    ${TAB}
     Element Should Be Focused    ${REGISTER LAST NAME INPUT}
@@ -159,22 +115,6 @@ should respond to Tab key
     Element Should Be Focused    ${REGISTER SUBSCRIBE CHECKBOX}
     Press Key    ${REGISTER SUBSCRIBE CHECKBOX}    ${TAB}
     Element Should Be Focused    ${CREATE ACCOUNT BUTTON}
-    Close Browser
-
-#May be moved into its own data driven testing
-should not allow to register with email in non-email format
-    Open Browser and go to URL    ${url}/register
-    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER PASSWORD INPUT}
-    Input Text    ${REGISTER FIRST NAME INPUT}    mark
-    Input Text    ${REGISTER LAST NAME INPUT}    hamil
-    Input Text    ${REGISTER PASSWORD INPUT}    ${password}
-    Check Bad Email Input    noptixqagmail.com
-    Check Bad Email Input    @gmail.com
-    Check Bad Email Input    noptixqa@gmail..com
-    Check Bad Email Input    noptixqa@192.168.1.1.0
-    Check Bad Email Input    noptixqa.@gmail.com
-    Check Bad Email Input    noptixq..a@gmail.c
-    Check Bad Email Input    noptixqa@-gmail.com
     Close Browser
 
 should open Terms and conditions in a new page

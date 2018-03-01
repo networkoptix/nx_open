@@ -60,7 +60,9 @@ CloudConnectors ConnectorFactory::defaultFactoryFunction(
     {
         TunnelConnectorContext context;
         context.connector = std::make_unique<relay::Connector>(
-            nx::utils::Url(*response.trafficRelayUrl), targetAddress, connectSessionId);
+            nx::utils::Url(QString::fromUtf8(*response.trafficRelayUrl)),
+            targetAddress,
+            connectSessionId);
         context.startDelay = response.params.trafficRelayingStartDelay;
         connectors.emplace_back(std::move(context));
     }

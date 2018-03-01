@@ -14,7 +14,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/dataprovider/live_stream_params.h>
-#include <core/dataconsumer/abstract_data_receptor.h>
+#include <nx/mediaserver/metadata/video_data_receptor.h>
 #include <core/dataconsumer/data_copier.h>
 
 static const int META_DATA_DURATION_MS = 300;
@@ -67,6 +67,7 @@ public:
     virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const override;
     virtual void pleaseReopenStream() = 0;
 
+    virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
 protected:
     QnAbstractCompressedMetadataPtr getMetadata();
     virtual QnMetaDataV1Ptr getCameraMetadata();
@@ -97,6 +98,11 @@ private:
 
     void emitAnalyticsEventIfNeeded(const QnAbstractCompressedMetadataPtr& metadata);
     QnLiveStreamParams mergeWithAdvancedParams(const QnLiveStreamParams& params);
+
+    nx::mediaserver::metadata::VideoDataReceptorPtr getVideoDataReceptorForMetadataPluginsIfNeeded(
+        const QnCompressedVideoDataPtr& compressedFrame,
+        bool* outNeedUncompressedFrame);
+
 private:
     // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened.
     // TODO: Find the way to keep it in sync besides pleaseReopenStream() call, which causes delay.
@@ -126,7 +132,7 @@ private:
     int m_framesSincePrevMediaStreamCheck;
     QWeakPointer<QnAbstractVideoCamera> m_owner;
 
-    QWeakPointer<QnAbstractDataReceptor> m_videoDataReceptor;
+    QWeakPointer<nx::mediaserver::metadata::VideoDataReceptor> m_videoDataReceptor;
     QSharedPointer<MetadataDataReceptor> m_metadataReceptor;
     QnAbstractDataReceptorPtr m_analyticsEventsSaver;
     QSharedPointer<DataCopier> m_dataReceptorMultiplexer;

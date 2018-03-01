@@ -149,7 +149,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_recordingStartUtcMs(0),
     m_animatedPosition(0),
     m_previousMediaPosition(0),
-    m_positionAnimator(nullptr)
+    m_positionAnimator(nullptr),
+    m_mergedTimePeriods()
 {
     /* We'll be using this one, so make sure it's created. */
     context()->instance<QnWorkbenchServerTimeWatcher>();
@@ -210,27 +211,25 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         auto chunksMergeTool = new QnThreadedChunksMergeTool();
         m_threadedChunksMergeTool[timePeriodType].reset(chunksMergeTool);
 
-        connect(chunksMergeTool, &QnThreadedChunksMergeTool::finished, this, [this, timePeriodType](int handle, const QnTimePeriodList &result)
-        {
-            if (handle != m_chunkMergingProcessHandle)
-                return;
-
-            if (timePeriodType == Qn::MotionContent)
+        connect(chunksMergeTool, &QnThreadedChunksMergeTool::finished, this,
+            [this, timePeriodType](int handle, const QnTimePeriodList& result)
             {
-                for (auto widget: m_syncedWidgets)
-                {
-                    if (auto archiveReader = widget->display()->archiveReader())
-                        archiveReader->setPlaybackMask(result);
-                }
-            }
+                if (handle != m_chunkMergingProcessHandle)
+                    return;
 
-            if (m_timeSlider)
-                m_timeSlider->setTimePeriods(SyncedLine, timePeriodType, result);
-            if (m_calendar)
-                m_calendar->setSyncedTimePeriods(timePeriodType, result);
-            if (m_dayTimeWidget)
-                m_dayTimeWidget->setSecondaryTimePeriods(timePeriodType, result);
-        });
+                m_mergedTimePeriods[timePeriodType] = result;
+
+                if (timePeriodType != Qn::RecordingContent && timePeriodType == selectedExtraContent())
+                    updatePlaybackMask();
+
+                if (m_timeSlider)
+                    m_timeSlider->setTimePeriods(SyncedLine, timePeriodType, result);
+                if (m_calendar)
+                    m_calendar->setSyncedTimePeriods(timePeriodType, result);
+                if (m_dayTimeWidget)
+                    m_dayTimeWidget->setSecondaryTimePeriods(timePeriodType, result);
+            });
+
         chunksMergeTool->start();
     }
 
@@ -1488,6 +1487,22 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             endTimeMSec = endTimeUSec == DATETIME_NOW
                 ? qnSyncTime->currentMSecsSinceEpoch()
                 : endTimeUSec / 1000;
+
+            if(m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
+            {
+                bool allWearable = std::all_of(m_syncedWidgets.begin(), m_syncedWidgets.end(),
+                    [](QnMediaResourceWidget* widget)
+                    {
+                        return widget->resource()->toResourcePtr()->hasFlags(Qn::wearable_camera);
+                    });
+
+                if (allWearable)
+                {
+                    QnTimePeriodList periods = m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent);
+                    if (!periods.empty() && !periods.back().isInfinite())
+                        endTimeMSec = periods.back().endTimeMs();
+                }
+            }
         }
     }
 
@@ -1503,6 +1518,13 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
         m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(), QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
     if (m_dayTimeWidget)
         m_dayTimeWidget->setEnabledWindow(startTimeMSec, endTimeMSec);
+
+    if (!m_currentWidgetLoaded && widgetLoaded
+        && display()->widgets().size() == 1
+        && m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
+    {
+        setPosition(startTimeMSec * 1000);
+    }
 
     const auto buffering = widgetLoaded
         && m_currentMediaWidget->display()->camDisplay()->isBuffering();
@@ -1772,24 +1794,32 @@ void QnWorkbenchNavigator::updateLines()
     }
     else
     {
-        bool isSearch = workbench()->currentLayout()->isSearchLayout();
-        bool isLocal = m_currentWidget && m_currentWidget->resource()->flags().testFlag(Qn::local);
-
-        bool hasNonLocalResource = !isLocal;
-        if (!hasNonLocalResource)
-        {
-            for (const QnResourceWidget* widget: m_syncedWidgets)
+        auto isNormalCamera =
+            [](const QnResourceWidget* widget)
             {
-                if (widget->resource() && !widget->resource()->flags().testFlag(Qn::local))
+                return widget
+                    && !widget->resource()->hasFlags(Qn::local)
+                    && !widget->resource()->hasFlags(Qn::wearable_camera);
+            };
+
+        bool isSearch = workbench()->currentLayout()->isSearchLayout();
+        bool currentIsNormal = isNormalCamera(m_currentWidget);
+
+        bool haveNormal = currentIsNormal;
+        if (!haveNormal)
+        {
+            for (const QnResourceWidget* widget : m_syncedWidgets)
+            {
+                if (isNormalCamera(widget))
                 {
-                    hasNonLocalResource = true;
+                    haveNormal = true;
                     break;
                 }
             }
         }
 
-        m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, !isSearch && !isLocal);
-        m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, !isSearch && hasNonLocalResource);
+        m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, !isSearch && currentIsNormal);
+        m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, !isSearch && haveNormal);
     }
 }
 
@@ -2535,5 +2565,42 @@ void QnWorkbenchNavigator::updateSliderBookmarks()
     if (!bookmarksModeEnabled())
         return;
 
-    //    m_timeSlider->setBookmarks(m_bookmarkAggregation->bookmarkList());
+    // TODO: #ynikitenkov Finish or ditch. Seems unused now.
+    //     m_timeSlider->setBookmarks(m_bookmarkAggregation->bookmarkList());
+}
+
+void QnWorkbenchNavigator::updatePlaybackMask()
+{
+    const auto content = selectedExtraContent();
+    const auto mask = content != Qn::RecordingContent
+        ? m_mergedTimePeriods[content]
+        : QnTimePeriodList();
+
+    for (auto widget: m_syncedWidgets)
+    {
+        if (auto archiveReader = widget->display()->archiveReader())
+            archiveReader->setPlaybackMask(mask);
+    }
+}
+
+void QnWorkbenchNavigator::setAnalyticsFilter(const nx::analytics::storage::Filter& value)
+{
+    if (auto loader = loaderByWidget(m_currentMediaWidget))
+        loader->setAnalyticsFilter(value);
+}
+
+Qn::TimePeriodContent QnWorkbenchNavigator::selectedExtraContent() const
+{
+    return m_timeSlider ? m_timeSlider->selectedExtraContent() : Qn::RecordingContent;
+}
+
+void QnWorkbenchNavigator::setSelectedExtraContent(Qn::TimePeriodContent value)
+{
+    if (m_timeSlider)
+        m_timeSlider->setSelectedExtraContent(value);
+
+    if (value != Qn::RecordingContent)
+        updateCurrentPeriods(value);
+
+    updatePlaybackMask();
 }

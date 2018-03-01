@@ -8,7 +8,7 @@ from test_utils.server import TimePeriod
 # https://networkoptix.atlassian.net/browse/TEST-181
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920667/Media+stream+loading+test
 def test_media_stream_should_be_loaded_correctly(artifact_factory, server_factory, camera, sample_media_file, stream_type):
-    server = server_factory('server')
+    server = server_factory.get('server')
     # prepare media archive
     server.add_camera(camera)
     start_time = datetime(2017, 1, 27, tzinfo=pytz.utc)

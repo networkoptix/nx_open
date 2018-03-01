@@ -226,6 +226,30 @@ protected:
         m_resolveResults.push(std::move(resolveResult));
     }
 
+    void whenResolve(const QString& hostName)
+    {
+        m_hostNameToResolve = hostName;
+        whenResolve();
+    }
+
+    void thenResolveSucceeded()
+    {
+        m_prevResolveResult = m_resolveResults.pop();
+        ASSERT_EQ(SystemError::noError, std::get<0>(m_prevResolveResult));
+    }
+
+    void andResolvedTo(const HostAddress& hostAddress)
+    {
+        const auto& entries = std::get<1>(m_prevResolveResult);
+        auto entryIter = std::find_if(
+            entries.begin(), entries.end(),
+            [hostAddress](const AddressEntry& entry)
+            {
+                return entry.type == AddressType::direct && entry.host == hostAddress;
+            });
+        ASSERT_TRUE(entryIter != entries.end());
+    }
+
     void assertDnsResolverHasNotBeenInvoked()
     {
         ASSERT_TRUE(m_hostnamesPassedToDnsResolver.empty());
@@ -233,10 +257,11 @@ protected:
 
     void assertResolveIsDoneByDnsResolver()
     {
-        const auto resolveResult = m_resolveResults.pop();
-        ASSERT_EQ(1U, std::get<1>(resolveResult).size());
-        ASSERT_EQ(AddressType::direct, std::get<1>(resolveResult).front().type);
-        ASSERT_EQ(*m_dnsEntry, std::get<1>(resolveResult).front().host);
+        thenResolveSucceeded();
+
+        ASSERT_EQ(1U, std::get<1>(m_prevResolveResult).size());
+        ASSERT_EQ(AddressType::direct, std::get<1>(m_prevResolveResult).front().type);
+        ASSERT_EQ(*m_dnsEntry, std::get<1>(m_prevResolveResult).front().host);
     }
 
     network::AddressResolver& resolver()
@@ -254,6 +279,7 @@ private:
     boost::optional<HostAddress> m_dnsEntry;
     std::list<QString> m_hostnamesPassedToDnsResolver;
     nx::utils::SyncQueue<ResolveResult> m_resolveResults;
+    ResolveResult m_prevResolveResult;
 
     SystemError::ErrorCode saveHostNameWithoutResolving(
         const QString& hostName,
@@ -286,6 +312,39 @@ TEST_F(
     whenResolve();
 
     assertResolveIsDoneByDnsResolver();
+}
+
+TEST_F(AddressResolver, localhost_is_resolved_properly_ipv4)
+{
+    whenResolve("localhost");
+
+    thenResolveSucceeded();
+    andResolvedTo(HostAddress(in4addr_loopback));
+}
+
+TEST_F(AddressResolver, localhost_is_resolved_properly_ipv6)
+{
+    setIpVersionToUse(AF_INET6);
+
+    whenResolve("localhost");
+
+    thenResolveSucceeded();
+    andResolvedTo(HostAddress(in4addr_loopback));
+    andResolvedTo(HostAddress(in6addr_loopback, 0));
+}
+
+TEST_F(AddressResolver, resolving_same_name_with_different_ip_version)
+{
+    whenResolve("localhost");
+    thenResolveSucceeded();
+
+    setIpVersionToUse(AF_INET6);
+
+    whenResolve("localhost");
+
+    thenResolveSucceeded();
+    andResolvedTo(HostAddress(in4addr_loopback));
+    andResolvedTo(HostAddress(in6addr_loopback, 0));
 }
 
 //-------------------------------------------------------------------------------------------------

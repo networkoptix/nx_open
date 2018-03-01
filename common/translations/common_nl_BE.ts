@@ -314,6 +314,10 @@
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in I/O instellingen (fout &quot;%1&quot;).</translation>
     </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Werk de firmware bij. Minimale ondersteunde versie is %1. De huidige versie is %2</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -632,14 +636,14 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O Module(s)</numerusform>
         <numerusform>%n I/O Module(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O module(s)</numerusform>
         <numerusform>%n I/O module(s)</numerusform>
       </translation>

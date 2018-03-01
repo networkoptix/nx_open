@@ -3,6 +3,7 @@
 #include <QtCore/QFile>
 
 #include <nx/utils/std/cpp14.h>
+#include <utils/common/synctime.h>
 
 #include <common/common_module.h>
 
@@ -16,6 +17,7 @@
 #include <api/model/wearable_prepare_reply.h>
 
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_access/user_access_data.h>
@@ -28,6 +30,8 @@
 
 namespace {
 const qint64 kDetalizationLevelMs = 1;
+const qint64 kMinChunkCheckSize = 100 * 1024 * 1024;
+const qint64 kOneDayMSecs = 1000ll * 3600ll * 24ll;
 
 QnTimePeriod shrinkPeriod(const QnTimePeriod& local, const QnTimePeriodList& remote)
 {
@@ -154,20 +158,23 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
     if(!QJson::deserialize(body, &data) || data.elements.empty())
         return nx::network::http::StatusCode::invalidParameter;
 
-    QnResourcePtr resource = owner->resourcePool()->getResourceById(cameraId);
-    if (!resource)
+    QnVirtualCameraResourcePtr camera =
+        owner->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
+    if (!camera)
         return nx::network::http::StatusCode::invalidParameter;
 
     QnWearableUploadManager* uploader = uploadManager(result);
     if (!uploader)
         return nx::network::http::StatusCode::internalServerError;
 
+    QnWearablePrepareReply reply;
+
     QnTimePeriod unionPeriod;
     for (const QnWearablePrepareDataElement& element : data.elements)
         unionPeriod.addPeriod(element.period);
 
     QnTimePeriodList serverTimePeriods = qnNormalStorageMan
-        ->getFileCatalog(resource->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
+        ->getFileCatalog(camera->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
         ->getTimePeriods(
             unionPeriod.startTimeMs,
             unionPeriod.endTimeMs(),
@@ -175,19 +182,25 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
             /*keepSmallChunks*/ false,
             std::numeric_limits<int>::max());
 
-    QnWearablePrepareReply reply;
-
-    qint64 totalSize = 0;
-    for (const QnWearablePrepareDataElement& element : data.elements)
-        totalSize += element.size;
-    uploader->clearSpace(totalSize, &reply.availableSpace);
-
     for (const QnWearablePrepareDataElement& element : data.elements)
     {
         QnWearablePrepareReplyElement replyElement;
         replyElement.period = shrinkPeriod(element.period, serverTimePeriods);
         reply.elements.push_back(replyElement);
     }
+
+    qint64 totalSize = 0;
+    qint64 maxSize = 0;
+    for (const QnWearablePrepareDataElement& element : data.elements)
+    {
+        totalSize += element.size;
+        maxSize = std::max(maxSize, element.size);
+    }
+
+    if (maxSize > uploader->downloadBytesAvailable())
+        reply.storageCleanupNeeded = true;
+    if (totalSize > uploader->totalBytesAvailable())
+        reply.storageCleanupNeeded = true;
 
     result.setReply(reply);
     return nx::network::http::StatusCode::ok;

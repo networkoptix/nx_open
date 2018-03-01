@@ -54,7 +54,8 @@ void QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)> completionHa
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
-        ( SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody ) mutable
+        (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody,
+        nx::network::http::HttpHeaders /*httpResponseHeaders*/) mutable
     {
         if( osErrorCode != SystemError::noError ||
             statusCode != nx::network::http::StatusCode::ok )
@@ -256,20 +257,6 @@ QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
 void QnPlIsdResource::setCroppingPhysical(QRect /*cropping*/)
 {
 }
-
-QnConstResourceAudioLayoutPtr QnPlIsdResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
-{
-    if (isAudioEnabled()) {
-        const QnISDStreamReader* rtspReader = dynamic_cast<const QnISDStreamReader*>(dataProvider);
-        if (rtspReader && rtspReader->getDPAudioLayout())
-            return rtspReader->getDPAudioLayout();
-        else
-            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-    }
-    else
-        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-}
-
 
 void QnPlIsdResource::setMaxFps(int f)
 {

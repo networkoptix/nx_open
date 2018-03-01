@@ -1,5 +1,4 @@
 # Components Namings
-set(parent.customization "default")
 set(display.product.name "Sentry Matrix")
 set(display.mobile.name "Sentry Mobile")
 set(product.name "Sentry Matrix")

@@ -132,7 +132,9 @@ protected:
         std::vector<AddressEntry> m_mediatorEntries;
     };
 
-    typedef std::map< HostAddress, HostAddressInfo > HostInfoMap;
+    typedef std::map<
+        std::tuple<int /*ipVersion*/, HostAddress>,
+        HostAddressInfo> HostInfoMap;
     typedef HostInfoMap::iterator HaInfoIterator;
 
     struct RequestInfo
@@ -155,8 +157,6 @@ protected:
         int ipVersion,
         std::deque<AddressEntry>* resolvedAddresses);
 
-    void tryFastDomainResolve(HaInfoIterator info);
-
     void dnsResolve(
         HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator, int ipVersion);
 
@@ -165,24 +165,6 @@ protected:
 
     std::vector<Guard> grabHandlers(
         SystemError::ErrorCode lastErrorCode, HaInfoIterator info);
-
-    template<typename Functor>
-    bool iterateSubdomains(const QString& domain, const Functor& functor)
-    {
-        // TODO: #mux Think about better representation to increase performance
-        const QString suffix = lm(".%1").arg(domain);
-        for (auto it = m_info.begin(); it != m_info.end(); ++it)
-        {
-            if (it->first.toString().endsWith(suffix) &&
-                !it->second.getAll().empty())
-            {
-                if (functor(it))
-                    return true;
-            }
-        }
-
-        return false;
-    }
 
 protected:
     mutable QnMutex m_mutex;

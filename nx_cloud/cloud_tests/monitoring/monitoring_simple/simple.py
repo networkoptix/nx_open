@@ -238,6 +238,7 @@ class CloudSession(object):
         container.remove()
 
         assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect'
+        assert status == 0, 'Cloud connect test util exited with non-zero status {}'.format(status)
 
 
 def main():

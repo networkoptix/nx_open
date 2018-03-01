@@ -24,7 +24,7 @@ struct AnalyticsEventType: nx::api::Analytics::EventType
     QString caption;
     nxpl::NX_GUID eventTypeIdExternal;
 
-    AnalyticsEventType() = default;
+    AnalyticsEventType() = default; //< Fusion needs default constructor.
     AnalyticsEventType(const nx::axis::SupportedEvent& supportedEvent);
     QString fullName() const { return topic + QString("/") + caption; }
 };
@@ -32,18 +32,13 @@ struct AnalyticsEventType: nx::api::Analytics::EventType
 
 struct AnalyticsDriverManifest: nx::api::AnalyticsDriverManifestBase
 {
+    QStringList allowedTopics;
     QList<AnalyticsEventType> outputEventTypes;
 };
-#define AxisAnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields(outputEventTypes)
+#define AxisAnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields(allowedTopics)(outputEventTypes)
 
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEventType, (json))
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
-
-struct AnalyticsEventTypeExtended: AnalyticsEventType
-{
-    AnalyticsEventTypeExtended() = default;
-    mutable QElapsedTimer elapsedTimer;
-};
 
 } // axis
 } // namespace metadata

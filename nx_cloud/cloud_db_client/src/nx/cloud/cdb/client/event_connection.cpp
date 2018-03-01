@@ -37,6 +37,11 @@ EventConnection::EventConnection(
 {
 }
 
+void EventConnection::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+{
+    m_reconnectTimer.bindToAioThread(aioThread);
+}
+
 void EventConnection::setCredentials(const std::string& login, const std::string& password)
 {
     m_auth.user.username = QString::fromStdString(login);

@@ -214,6 +214,8 @@ private:
     const CLVideoDecoderOutput& operator=( const CLVideoDecoderOutput& );
 };
 typedef QSharedPointer<CLVideoDecoderOutput> CLVideoDecoderOutputPtr;
+typedef QSharedPointer<const CLVideoDecoderOutput> CLConstVideoDecoderOutputPtr;
+
 /*
 struct CLVideoDecoderOutput
 {

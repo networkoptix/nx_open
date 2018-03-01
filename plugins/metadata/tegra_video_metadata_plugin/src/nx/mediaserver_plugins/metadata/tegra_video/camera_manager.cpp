@@ -3,15 +3,16 @@
 #include <iostream>
 #include <chrono>
 
-#define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
 #include <nx/kit/debug.h>
 
-#include <plugins/plugin_internal_tools.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/sdk/metadata/common_object.h>
 
 #include "tegra_video_metadata_plugin_ini.h"
 #include "attribute_options.h"
+#include <nx/mediaserver_plugins/utils/uuid.h>
+
+#define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -131,7 +132,7 @@ bool CameraManager::pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int6
     return true;
 }
 
-bool CameraManager::pushVideoFrame(const CommonCompressedVideoPacket* videoFrame)
+bool CameraManager::pushCompressedVideoFrame(const CommonCompressedVideoPacket* videoFrame)
 {
     if (!pushCompressedFrame(videoFrame))
         return false;
@@ -210,8 +211,8 @@ bool CameraManager::makeMetadataPacketsFromRectsPostprocNone(
     for (const auto& rect: rects)
     {
         auto commonObject = new CommonObject();
-
-        const auto objectId = nxpt::fromQnUuidToPluginGuid(QnUuid::createUuid());
+        const auto objectId =
+            nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(QnUuid::createUuid());
         commonObject->setId(objectId);
         commonObject->setTypeId(m_objectTypeId);
 

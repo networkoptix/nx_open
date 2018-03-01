@@ -310,7 +310,7 @@ void Worker::doWork()
                             if (m_downloadingChunks.count(true) == 0)
                                 requestAvailableChunks();
                             else
-                                setShouldWaitForCb();
+                                setShouldWaitForAsyncOperationCompletion();
                         }
                         else
                             downloadNextChunk();
@@ -321,7 +321,7 @@ void Worker::doWork()
                     }
                     else if (m_downloadingChunks.count(true) != 0)
                     {
-                        setShouldWaitForCb();
+                        setShouldWaitForAsyncOperationCompletion();
                     }
                     else
                     {
@@ -375,7 +375,7 @@ void Worker::validateFileInformation()
 
         m_contextByHandle.insert(
             handle, RequestContext(m_peerManager->selfId(), State::validatingFileInformation));
-        setShouldWaitForCb();
+        setShouldWaitForAsyncOperationCompletion();
     }
     else
     {
@@ -423,10 +423,10 @@ void Worker::requestFileInformationInternal()
     if (m_contextByHandle.isEmpty())
         setShouldWait(true);
     else
-        setShouldWaitForCb();
+        setShouldWaitForAsyncOperationCompletion();
 }
 
-void Worker::setShouldWaitForCb()
+void Worker::setShouldWaitForAsyncOperationCompletion()
 {
     m_shouldWait = true;
 }
@@ -445,7 +445,7 @@ void Worker::setShouldWait(bool value)
             },
             std::chrono::milliseconds(delayMs()));
     }
-    else
+    else if (!value)
     {
         m_shouldWait = false;
         m_waitCondition.wakeOne();
@@ -491,7 +491,7 @@ void Worker::handleFileInformationReply(
         [this]()
         {
             if (!m_contextByHandle.isEmpty())
-                return setShouldWaitForCb();
+                return setShouldWaitForAsyncOperationCompletion();
 
             if (m_state == State::requestingFileInformation
                 || m_state == State::requestingAvailableChunks)
@@ -563,7 +563,7 @@ void Worker::handleFileInformationReply(
 void Worker::requestChecksums()
 {
     if (m_downloadingChunks.count(true) != 0)
-        return setShouldWaitForCb();
+        return setShouldWaitForAsyncOperationCompletion();
 
     m_subsequentChunksToDownload = 0;
     setState(State::requestingChecksums);
@@ -595,7 +595,7 @@ void Worker::requestChecksums()
     if (m_contextByHandle.isEmpty())
         setShouldWait(true);
     else
-        setShouldWaitForCb();
+        setShouldWaitForAsyncOperationCompletion();
 }
 
 void Worker::handleChecksumsReply(
@@ -671,12 +671,12 @@ void Worker::downloadNextChunk()
     setState(State::downloadingChunks);
 
     if (m_downloadingChunks.count(true) >= kMaxSimultaneousDownloads)
-        return setShouldWaitForCb();
+        return setShouldWaitForAsyncOperationCompletion();
 
     const int chunkIndex = selectNextChunk();
 
     if (chunkIndex < 0)
-        return setShouldWaitForCb();
+        return setShouldWaitForAsyncOperationCompletion();
 
     const auto& fileInfo = fileInformation();
 
@@ -808,8 +808,7 @@ void Worker::handleDownloadChunkReply(
     const auto resultCode = m_storage->writeFileChunk(m_fileName, chunkIndex, data);
     if (resultCode != ResultCode::ok)
     {
-        NX_WARNING(m_logTag,
-            lm("Cannot write chunk. Storage error: %1").arg(resultCode));
+        NX_WARNING(m_logTag, lm("Cannot write chunk. Storage error: %1").arg(resultCode));
 
         // TODO: Implement error handling
         success = false;

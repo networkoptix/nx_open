@@ -118,6 +118,8 @@ namespace Qn
         ResourceStatusRole,                         /**< Role for resource status. Value of type int (Qn::ResourceStatus). */
         ResourceIconKeyRole,                        /**< Role for resource custom icon key. Value of type QString. */
 
+        CameraExtraStatusRole,                      /**< Custom camera status (recording, buggy, etc). Value of CameraExtraStatus. */
+
         VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QnUuid. */
         VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QnUuid. */
         VideoWallItemIndicesRole,                   /**< Role for videowall item indices list. Value of type QnVideoWallItemIndexList. */
@@ -250,7 +252,7 @@ namespace Qn
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QSet<QnUuid>. */
         ActionDataRole,                             /**< Role for business action. Value of type vms::event::AbstractActionPtr. */
         RuleModelRole, /* #deprecate #3.2 */        /**< Role for business rule caching model. Value of type QnBusinessRuleViewModelPtr. */
-        EventParamsRole,                            /**< Role for business event parameters. Value of type nx::vms::event::EventParameters. */
+        EventParametersRole,                            /**< Role for business event parameters. Value of type nx::vms::event::EventParameters. */
 
         StorageUrlRole,                             /**< Role for storing real storage Url in storage_url_dialog. */
 
@@ -377,6 +379,7 @@ namespace Qn
         TooManyOpenedConnectionsOverlay,
         PasswordRequiredOverlay,
         NoLiveStreamOverlay,
+        OldFirmwareOverlay,
 
         OverlayCount
     };

@@ -150,6 +150,11 @@ public:
         return m_target->setSendTimeout(ms);
     }
 
+    virtual bool setIpv6Only(bool val) override
+    {
+        return m_target->setIpv6Only(val);
+    }
+
     virtual Pollable* pollable() override
     {
         return m_target->pollable();

@@ -47,6 +47,11 @@ Register
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     Click Button    ${CREATE ACCOUNT BUTTON}
 
+Validate Register Success
+    [arguments]    ${location}=${url}/register/success
+    Wait Until Element Is Visible    ${ACCOUNT CREATION SUCCESS}
+    Location Should Be    ${location}
+
 Validate Register Email Received
     [arguments]    ${recipient}
     Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
@@ -81,7 +86,7 @@ Edit User Permissions In Systems
     Click Element    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${permissions}']
     Wait Until Element Is Visible    ${EDIT PERMISSIONS SAVE}
     Click Element    ${EDIT PERMISSIONS SAVE}
-    Check For Alert    New permissions saved
+    Check For Alert    ${NEW PERMISSIONS SAVED}
 
 Check User Permissions
     [arguments]    ${user email}    ${permissions}
@@ -96,7 +101,9 @@ Remove User Permissions
     Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
     Wait Until Element Is Visible    ${DELETE USER BUTTON}
     Click Button    ${DELETE USER BUTTON}
-    Check For Alert    Permissions were removed from ${user email}
+    ${PERMISSIONS WERE REMOVED FROM EMAIL}    Replace String    ${PERMISSIONS WERE REMOVED FROM}    {{email}}    ${user email}
+    Check For Alert    ${PERMISSIONS WERE REMOVED FROM EMAIL}
+    Wait Until Element Is Not Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
 
 Check For Alert
     [arguments]    ${alert text}
@@ -110,7 +117,7 @@ Check For Alert Dismissable
     Wait Until Elements Are Visible    ${ALERT}    ${ALERT CLOSE}
     Element Should Be Visible    ${ALERT}
     Element Text Should Be    ${ALERT}    ${alert text}
-
+    Click Element    ${ALERT CLOSE}
 
 Verify In System
     [arguments]    ${system name}
@@ -125,3 +132,34 @@ Wait Until Elements Are Visible
     [arguments]    @{elements}
     :FOR     ${element}  IN  @{elements}
     \  Wait Until Element Is Visible    ${element}
+
+Form Validation
+    [arguments]    ${form name}    ${first name}=mark    ${last name}=hamill    ${email}=${EMAIL OWNER}    ${password}=${BASE PASSWORD}
+    Run Keyword If    "${form name}"=="Log In"    Log In Form Validation   ${email}    ${password}
+    Run Keyword If    "${form name}"=="Register"    Register Form Validation    ${first name}    ${last name}    ${email}    ${password}
+
+Log In Form Validation
+    [Arguments]    ${email}    ${password}
+    Wait Until Elements Are Visible    ${LOG IN NAV BAR}
+    Click Link    ${LOG IN NAV BAR}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
+    Input Text    ${EMAIL INPUT}    ${email}
+    Input Text    ${PASSWORD INPUT}    ${password}
+    click button    ${LOG IN BUTTON}
+
+Register Form Validation
+    [arguments]    ${first name}    ${last name}    ${email}    ${password}
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
+    Input Text    ${REGISTER FIRST NAME INPUT}    ${first name}
+    Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
+    Input Text    ${REGISTER EMAIL INPUT}    ${email}
+    Input Text    ${REGISTER PASSWORD INPUT}    ${password}
+    click button    ${CREATE ACCOUNT BUTTON}
+
+Get Reset Password Link
+    [arguments]    ${recipient}
+    Open Mailbox    host=imap.gmail.com    password=qweasd!@#    port=993    user=noptixqa@gmail.com    is_secure=True
+    ${email}    Wait For Email    recipient=${recipient}    timeout=120    subject=${RESET PASSWORD EMAIL SUBJECT}
+    ${links}    Get Links From Email    ${email}
+    Close Mailbox
+    Return From Keyword    @{links}[1]

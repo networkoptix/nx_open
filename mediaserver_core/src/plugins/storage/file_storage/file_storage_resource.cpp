@@ -852,12 +852,15 @@ qint64 QnFileStorageResource::getTotalSpace() const
     if (!m_valid)
         return QnStorageResource::kUnknownSize;
 
+    QString path;
+    {
+        QnMutexLocker lock(&m_mutex);
+        path = m_localPath.isEmpty() ? getPath() : m_localPath;
+    }
+
     QnMutexLocker locker(&m_writeTestMutex);
     if (m_cachedTotalSpace <= 0)
-    {
-        m_cachedTotalSpace = getDiskTotalSpace(
-            m_localPath.isEmpty() ? getPath() : m_localPath);
-    }
+        m_cachedTotalSpace = getDiskTotalSpace(path);
 
     return m_cachedTotalSpace;
 }
@@ -920,6 +923,12 @@ bool QnFileStorageResource::testWriteCapInternal() const
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 {
     NX_LOG(lit("[initOrUpdate] for storage %1 begin").arg(getUrl()), cl_logDEBUG2);
+
+    if (!isMounted())
+    {
+        NX_VERBOSE(this, lm("[initOrUpdate] storage %1 is not mounted").args(getUrl()));
+        return Qn::StorageInitResult::StorageInit_CreateFailed;
+    }
 
     Qn::StorageInitResult result;
     {
@@ -1024,6 +1033,18 @@ bool QnFileStorageResource::isLocal()
     return true;
 }
 
+void QnFileStorageResource::setMounted(bool value)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_isMounted = value;
+}
+
+bool QnFileStorageResource::isMounted() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_isMounted;
+}
+
 float QnFileStorageResource::getAvarageWritingUsage() const
 {
     QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getId());
@@ -1102,13 +1123,13 @@ bool findPathInTabFile(const QString& path, const QString& tabFilePath, QString*
 bool QnFileStorageResource::isStorageDirMounted() const
 {
     QString mountPoint;
-
+    const auto localPath = getLocalPathSafe();
     NX_LOG(lit("[initOrUpdate, isStorageDirMounted] local path: %1, getPath(): %2")
-            .arg(m_localPath)
+            .arg(localPath)
             .arg(getPath()), cl_logDEBUG2);
 
-    if (!m_localPath.isEmpty())
-        return findPathInTabFile(m_localPath, lit("/proc/mounts"), &mountPoint, true);
+    if (!localPath.isEmpty())
+        return findPathInTabFile(localPath, lit("/proc/mounts"), &mountPoint, true);
     else if (findPathInTabFile(getPath(), lit("/etc/fstab"), &mountPoint, false))
         return findPathInTabFile(mountPoint, lit("/etc/mtab"), &mountPoint, true);
 

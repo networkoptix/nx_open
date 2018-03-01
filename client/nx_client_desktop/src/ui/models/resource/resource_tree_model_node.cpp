@@ -31,6 +31,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -632,7 +633,7 @@ QList<QnResourceTreeModelNodePtr> QnResourceTreeModelNode::childrenRecursive() c
     return result;
 }
 
-QnResourceTreeModelNodePtr QnResourceTreeModelNode::child(int index)
+QnResourceTreeModelNodePtr QnResourceTreeModelNode::child(int index) const
 {
     return m_children[index];
 }
@@ -824,6 +825,9 @@ QVariant QnResourceTreeModelNode::data(int role, int column) const
 
         case Qn::ResourceStatusRole:
             return QVariant::fromValue<int>(m_status);
+
+        case Qn::CameraExtraStatusRole:
+            return qVariantFromValue(m_cameraExtraStatus);
 
         case Qn::NodeTypeRole:
             return qVariantFromValue(m_type);
@@ -1185,9 +1189,6 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
         case Qn::AllLayoutsAccessNode:
             return qnResIconCache->icon(QnResourceIconCache::SharedLayouts);
 
-        case Qn::RecorderNode:
-            return qnResIconCache->icon(QnResourceIconCache::Recorder);
-
         case Qn::SystemNode:
             return qnResIconCache->icon(QnResourceIconCache::OtherSystem);
 
@@ -1254,6 +1255,25 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
     return QIcon();
 }
 
+CameraExtraStatus QnResourceTreeModelNode::calculateCameraExtraStatus() const
+{
+    CameraExtraStatus result;
+    const auto camera = m_resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return result;
+
+    if (camera->getStatus() == Qn::Recording)
+        result |= CameraExtraStatusFlag::recording;
+
+    if (!camera->isScheduleDisabled())
+        result |= CameraExtraStatusFlag::scheduled;
+
+    if (camera->statusFlags().testFlag(Qn::CSF_HasIssuesFlag))
+        result |= CameraExtraStatusFlag::buggy;
+
+    return result;
+}
+
 void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodePtr& child)
 {
     NX_ASSERT(child->parent() == this);
@@ -1315,11 +1335,16 @@ void QnResourceTreeModelNode::changeInternal()
     emit m_model->dataChanged(index, index.sibling(index.row(), Qn::ColumnCount - 1));
 }
 
+void QnResourceTreeModelNode::updateIcon()
+{
+    m_icon = calculateIcon();
+    changeInternal();
+}
+
 void QnResourceTreeModelNode::setNameInternal(const QString& name)
 {
     m_displayName = m_name = name;
 }
-
 
 void QnResourceTreeModelNode::updateResourceStatus()
 {
@@ -1328,8 +1353,21 @@ void QnResourceTreeModelNode::updateResourceStatus()
         return;
 
     m_status = m_resource->getStatus();
+    m_cameraExtraStatus = calculateCameraExtraStatus();
     m_icon = calculateIcon();
     changeInternal();
+
+    if (m_parent && m_parent->type() == Qn::RecorderNode)
+        m_parent->updateCameraExtraStatus();
+}
+
+void QnResourceTreeModelNode::updateCameraExtraStatus()
+{
+    m_cameraExtraStatus = calculateCameraExtraStatus();
+    changeInternal();
+
+    if (m_parent && m_parent->type() == Qn::RecorderNode)
+        m_parent->updateCameraExtraStatus();
 }
 
 bool QnResourceTreeModelNode::isPrimary() const

@@ -6,12 +6,11 @@
 #include <api/model/wearable_prepare_data.h>
 #include <api/model/wearable_prepare_reply.h>
 
+#include "wearable_fwd.h"
+
 namespace nx {
 namespace client {
 namespace desktop {
-
-struct WearablePayload;
-using WearablePayloadList = QVector<WearablePayload>;
 
 struct WearablePayload
 {
@@ -21,9 +20,10 @@ struct WearablePayload
         FileDoesntExist,
         UnsupportedFormat,
         NoTimestamp,
+        FootagePastMaxDays,
         ChunksTakenByFileInQueue,
         ChunksTakenOnServer,
-        NoSpaceOnServer,
+        StorageCleanupNeeded,
         ServerError
     };
 
@@ -36,8 +36,6 @@ struct WearablePayload
 struct WearableUpload
 {
     WearablePayloadList elements;
-    qint64 spaceAvailable = 0;
-    qint64 spaceRequested = 0;
 
     bool allHaveStatus(WearablePayload::Status status) const
     {

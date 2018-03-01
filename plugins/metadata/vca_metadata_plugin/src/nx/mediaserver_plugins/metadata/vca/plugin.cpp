@@ -1,4 +1,4 @@
-﻿#include "plugin.h"
+#include "plugin.h"
 
 #include <array>
 #include <fstream>
@@ -11,11 +11,7 @@
 
 #include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
-#include <plugins/plugin_internal_tools.h>
-
-#include <nx/network/deprecated/asynchttpclient.h>
-
-#include <nx/kit/debug.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include "manager.h"
 
@@ -40,9 +36,6 @@ Plugin::Plugin()
     QFile f(kResourceName);
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
-    else
-        NX_PRINT << kPluginName << " can not open resource \"" << kResourceName << "\".";
-
     m_typedManifest = QJson::deserialized<AnalyticsDriverManifest>(m_manifest);
 }
 
@@ -103,16 +96,10 @@ CameraManager* Plugin::obtainCameraManager(
 {
     *outError = Error::noError;
     const auto vendor = QString(cameraInfo.vendor).toLower();
-    if (!vendor.startsWith(kVcaVendor))
-    {
-        NX_PRINT << kPluginName << " got unsupported resource. Manager can not be created.";
-        return nullptr;
-    }
-    else
-    {
-        NX_PRINT << kPluginName << " creates new manager.";
+    if (vendor.startsWith(kVcaVendor))
         return new Manager(this, cameraInfo, m_typedManifest);
-    }
+    else
+        return nullptr;
 }
 
 const char* Plugin::capabilitiesManifest(Error* error) const
@@ -121,25 +108,7 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-const AnalyticsEventType& Plugin::eventByInternalName(
-    const QString& internalName) const noexcept
-{
-    // There are only few elements, so linear search is the fastest and the most simple.
-    const auto it = std::find_if(
-        m_typedManifest.outputEventTypes.cbegin(),
-        m_typedManifest.outputEventTypes.cend(),
-        [&internalName](const AnalyticsEventType& event)
-        {
-            return event.internalName == internalName;
-        });
-
-    return
-        (it != m_typedManifest.outputEventTypes.cend())
-            ? *it
-            : m_emptyEvent;
-}
-
-const AnalyticsEventType& Plugin::eventByUuid(const QnUuid& uuid) const noexcept
+const AnalyticsEventType* Plugin::eventByUuid(const QnUuid& uuid) const noexcept
 {
     const auto it = std::find_if(
         m_typedManifest.outputEventTypes.cbegin(),
@@ -149,12 +118,8 @@ const AnalyticsEventType& Plugin::eventByUuid(const QnUuid& uuid) const noexcept
             return event.eventTypeId == uuid;
         });
 
-    return
-        (it != m_typedManifest.outputEventTypes.cend())
-        ? *it
-        : m_emptyEvent;
+    return (it != m_typedManifest.outputEventTypes.cend()) ? &(*it) : nullptr;
 }
-
 
 } // namespace vca
 } // namespace metadata

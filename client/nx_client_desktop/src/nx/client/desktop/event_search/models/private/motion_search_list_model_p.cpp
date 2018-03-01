@@ -1,5 +1,7 @@
 #include "motion_search_list_model_p.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <core/resource/camera_resource.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -7,6 +9,7 @@
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
+#include <nx/utils/raii_guard.h>
 #include <nx/vms/event/event_fwd.h>
 
 namespace nx {
@@ -21,8 +24,7 @@ static constexpr int kFetchBatchSize = 110;
 
 MotionSearchListModel::Private::Private(MotionSearchListModel* q):
     QObject(),
-    q(q),
-    m_selectedTimePeriod(QnTimePeriod::kMinTimeValue, QnTimePeriod::infiniteDuration())
+    q(q)
 {
 }
 
@@ -176,8 +178,10 @@ bool MotionSearchListModel::Private::canFetchMore() const
 
 void MotionSearchListModel::Private::fetchMore()
 {
-    if (!m_loader)
+    if (!m_loader || m_fetchInProgress)
         return;
+
+    QScopedValueRollback<bool> progressRollback(m_fetchInProgress, true);
 
     const auto periods = this->periods();
     const auto oldCount = count();
@@ -185,6 +189,10 @@ void MotionSearchListModel::Private::fetchMore()
     const auto remaining = periods.size() - oldCount;
     if (remaining == 0)
         return;
+
+    QnRaiiGuard finishFetch(
+        [this]() { q->beginFinishFetch(); },
+        [this]() { q->endFinishFetch(); });
 
     const auto delta = qMin(remaining, kFetchBatchSize);
     const auto newCount = oldCount + delta;
@@ -196,18 +204,9 @@ void MotionSearchListModel::Private::fetchMore()
         m_data.push_front(*chunk);
 }
 
-QnTimePeriod MotionSearchListModel::Private::selectedTimePeriod() const
+bool MotionSearchListModel::Private::fetchInProgress() const
 {
-    return m_selectedTimePeriod;
-}
-
-void MotionSearchListModel::Private::setSelectedTimePeriod(const QnTimePeriod& value)
-{
-    if (m_selectedTimePeriod == value)
-        return;
-
-    m_selectedTimePeriod = value;
-    reset();
+    return m_fetchInProgress;
 }
 
 int MotionSearchListModel::Private::totalCount() const
@@ -221,7 +220,7 @@ QnTimePeriodList MotionSearchListModel::Private::periods() const
         return QnTimePeriodList();
 
     const auto list = m_loader->periods(Qn::MotionContent);
-    return list.intersected(m_selectedTimePeriod);
+    return list.intersected(q->relevantTimePeriod());
 }
 
 } // namespace desktop

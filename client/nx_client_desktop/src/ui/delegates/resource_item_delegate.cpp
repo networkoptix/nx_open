@@ -24,6 +24,8 @@
 #include <client/client_settings.h>
 #include <client/client_module.h>
 
+#include <nx/client/desktop/resource_views/data/camera_extra_status.h>
+
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
@@ -35,9 +37,12 @@
 #include <ui/workbench/workbench_item.h>
 
 #include <nx/client/desktop/utils/wearable_manager.h>
+#include <nx/client/desktop/utils/wearable_state.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -45,16 +50,23 @@ constexpr int kSeparatorItemHeight = 16;
 constexpr int kExtraTextMargin = 5;
 static constexpr int kMaxResourceNameLength = 120; // TODO: #GDM Think about common place to use.
 
+bool isCollapsibleNode(const QModelIndex& index)
+{
+    NX_ASSERT(index.model());
+    if (!index.model())
+        return false;
+
+    return index.model()->rowCount(index) > 0;
+}
+
 } // namespace
 
 
 QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
     base_type(parent),
-    m_workbench(),
     m_recordingIcon(qnSkin->icon("tree/recording.png")),
     m_scheduledIcon(qnSkin->icon("tree/scheduled.png")),
     m_buggyIcon(qnSkin->icon("tree/buggy.png")),
-    m_colors(),
     m_fixedHeight(style::Metrics::kViewRowHeight),
     m_rowSpacing(0),
     m_customInfoLevel(Qn::ResourceInfoLevel::RI_Invalid),
@@ -256,29 +268,8 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         }
     }
 
-    QRect extraIconRect(iconRect);
-    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-
-    /* Draw "recording" or "scheduled" icon: */
-    if (m_options.testFlag(RecordingIcons))
-    {
-        extraIconRect.moveLeft(extraIconRect.left() - extraIconRect.width());
-
-        const bool recording = camera && camera->getStatus() == Qn::Recording;
-        const bool scheduled = camera && !camera->isScheduleDisabled();
-
-        if (recording || scheduled)
-            (recording ? m_recordingIcon : m_scheduledIcon).paint(painter, extraIconRect);
-    }
-
-    /* Draw "problems" icon: */
-    if (m_options.testFlag(ProblemIcons))
-    {
-        extraIconRect.moveLeft(extraIconRect.left() - extraIconRect.width());
-        if (camera && camera->statusFlags().testFlag(Qn::CSF_HasIssuesFlag))
-            m_buggyIcon.paint(painter, extraIconRect);
-    }
+    const auto indentation = style->pixelMetric(QStyle::PM_TreeViewIndentation);
+    paintExtraStatus(painter, iconRect, index);
 }
 
 QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
@@ -766,4 +757,52 @@ QVariant QnResourceItemDelegate::rowCheckState(const QModelIndex& index) const
 
     const auto checkIndex = index.sibling(index.row(), m_checkBoxColumn);
     return checkIndex.data(Qt::CheckStateRole);
+}
+
+void QnResourceItemDelegate::paintExtraStatus(
+    QPainter* painter,
+    const QRect& iconRect,
+    const QModelIndex& index) const
+{
+    const auto extraStatus = index.data(Qn::CameraExtraStatusRole).value<CameraExtraStatus>();
+    if (extraStatus == CameraExtraStatus())
+        return;
+
+    QRect extraIconRect(iconRect);
+
+    // Check if there are too much icons for this indentaion level.
+    const auto shiftIconLeft =
+        [&extraIconRect]
+        {
+            const int pos = extraIconRect.left() - style::Metrics::kDefaultIconSize;
+            extraIconRect.moveLeft(pos);
+            return pos >= 0;
+        };
+
+    // Leave space for collapser if needed.
+    if (isCollapsibleNode(index))
+        shiftIconLeft();
+
+    // Draw "recording" or "scheduled" icon.
+    if (m_options.testFlag(RecordingIcons)
+        && (extraStatus.testFlag(CameraExtraStatusFlag::recording)
+            || extraStatus.testFlag(CameraExtraStatusFlag::scheduled)))
+    {
+        if (!shiftIconLeft())
+            return;
+
+        const auto& icon = extraStatus.testFlag(CameraExtraStatusFlag::recording)
+            ? m_recordingIcon
+            : m_scheduledIcon;
+        icon.paint(painter, extraIconRect);
+    }
+
+    // Draw "problems" icon.
+    if (m_options.testFlag(ProblemIcons) && extraStatus.testFlag(CameraExtraStatusFlag::buggy))
+    {
+        if (!shiftIconLeft())
+            return;
+
+        m_buggyIcon.paint(painter, extraIconRect);
+    }
 }

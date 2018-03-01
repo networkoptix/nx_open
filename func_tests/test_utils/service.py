@@ -47,7 +47,7 @@ class UpstartService(Service):
         self._run_service_action('start' if is_started else 'stop')
 
     def make_core_dump(self):
-        self.os_access.run_command(['killall', '--signal', 'SIGTRAP', 'mediaserver-bin'])
+        self.os_access.run_command(['killall', '--signal', 'SIGTRAP', 'mediaserver-bin'], check_retcode=False)
 
     def _run_service_action(self, action):
         return self.os_access.run_command([action, self._service_name])

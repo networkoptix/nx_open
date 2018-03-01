@@ -32,14 +32,9 @@ void AbstractAsyncSearchListModel::setCamera(const QnVirtualCameraResourcePtr& c
     d->setCamera(camera);
 }
 
-QnTimePeriod AbstractAsyncSearchListModel::selectedTimePeriod() const
+void AbstractAsyncSearchListModel::relevantTimePeriodChanged(const QnTimePeriod& previousValue)
 {
-    return d->selectedTimePeriod();
-}
-
-void AbstractAsyncSearchListModel::setSelectedTimePeriod(const QnTimePeriod& value)
-{
-    d->setSelectedTimePeriod(value);
+    d->relevantTimePeriodChanged(previousValue);
 }
 
 void AbstractAsyncSearchListModel::clear()
@@ -71,6 +66,25 @@ bool AbstractAsyncSearchListModel::canFetchMore(const QModelIndex& /*parent*/) c
     return d->canFetchMore();
 }
 
+void AbstractAsyncSearchListModel::fetchMore(const QModelIndex& /*parent*/)
+{
+    prefetchAsync(
+        [this, guard = QPointer<AbstractAsyncSearchListModel>(this)](qint64 earliestTimeMs)
+        {
+            if (!guard)
+                return;
+
+            const bool cancelled = earliestTimeMs < 0;
+
+            QnRaiiGuard finishFetch(
+                [this]() { beginFinishFetch(); },
+                [this, cancelled]() { endFinishFetch(cancelled); });
+
+            if (!cancelled)
+                commitPrefetch(earliestTimeMs);
+        });
+}
+
 bool AbstractAsyncSearchListModel::prefetchAsync(PrefetchCompletionHandler completionHandler)
 {
     return d->prefetch(completionHandler);
@@ -84,12 +98,6 @@ void AbstractAsyncSearchListModel::commitPrefetch(qint64 earliestTimeToCommitMs)
 bool AbstractAsyncSearchListModel::fetchInProgress() const
 {
     return d->fetchInProgress();
-}
-
-bool AbstractAsyncSearchListModel::isConstrained() const
-{
-    const auto period = selectedTimePeriod();
-    return period.startTimeMs > 0 || !period.isInfinite();
 }
 
 } // namespace desktop

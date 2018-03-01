@@ -155,10 +155,8 @@
 #include <utils/common/event_processors.h>
 #include <nx/utils/string.h>
 #include <utils/common/delayed.h>
-#include <utils/common/time.h>
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
-#include <utils/common/url.h>
 #include <utils/email/email.h>
 #include <utils/math/math.h>
 #include <nx/utils/std/cpp14.h>
@@ -2388,7 +2386,7 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
         if (data.component == Qn::ServerComponent)
         {
             QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
-            if(resource)
+            if (resource)
                 mismatched << data.resource;
         }
     }
@@ -2404,10 +2402,10 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
     // Add a list of mismatched servers if there are any.
     if (!mismatched.empty())
     {
-        QTableView * serverList = new QTableView();
+        auto serverList = new QTableView();
         serverList->setShowGrid(false);
 
-        QnResourceListModel * serverListModel = new QnResourceListModel(serverList);
+        auto serverListModel = new QnResourceListModel(serverList);
 
         serverListModel->setCustomColumnAccessor(1, nx::client::desktop::resourceVersionAccessor);
         serverListModel->setHasStatus(true);
@@ -2415,19 +2413,19 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
 
         serverList->setModel(serverListModel);
         serverList->setItemDelegateForColumn(0, new QnResourceItemDelegate(this));
-        serverList->setItemDelegateForColumn(1, nx::client::desktop::makeVersionStatusDelegate(context(), serverListModel));
+        serverList->setItemDelegateForColumn(1, makeVersionStatusDelegate(context(), serverListModel));
 
-        auto* horisontalHeader = serverList->horizontalHeader();
+        auto horisontalHeader = serverList->horizontalHeader();
         horisontalHeader->hide();
         horisontalHeader->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
         horisontalHeader->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
 
-        auto* verticalHeader = serverList->verticalHeader();
+        auto verticalHeader = serverList->verticalHeader();
         verticalHeader->hide();
         verticalHeader->setDefaultSectionSize(kSectionHeight);
 
-        // Finally adding control to a widget.
         // Adding this to QnMessageBox::Layout::Main looks ugly.
+        // Adding to Layout::Content (default value) looks much better.
         messageBox->addCustomWidget(serverList);
     }
 

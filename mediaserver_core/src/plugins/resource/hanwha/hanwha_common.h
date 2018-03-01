@@ -53,6 +53,7 @@ enum class HanwhaSessionType
 //TODO: #dmishin consider using Fusion instead of custom methods.
 
 static const int kHanwhaBlockedHttpCode = 490;
+static const int kHanwhaInvalidParameterHttpCode = 602;
 
 static const QString kHanwhaManufacturerName("Hanwha Techwin");
 static const int kHanwhaInvalidProfile = -1;

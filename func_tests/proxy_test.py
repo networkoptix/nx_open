@@ -1,52 +1,55 @@
-"""Test proxy request feature (request with X-server-guid HTTP header)."""
+import logging
+
 import pytest
+from requests import Session
+from requests.auth import HTTPDigestAuth
+
+log = logging.getLogger(__name__)
 
 
-@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-8259")
-def test_proxy_light_request(server_factory, http_schema):
-    one = server_factory('one', http_schema=http_schema)
-    two = server_factory('two', http_schema=http_schema)
-    one.merge([two])
-
-    response1 = one.rest_api.api.moduleInformation.GET()
-    response2_proxy = two.rest_api.api.moduleInformation.GET(
-        headers={'X-server-guid': one.ecs_guid})
-    assert response1 == response2_proxy
-    response2 = two.rest_api.api.moduleInformation.GET()
-    response1_proxy = one.rest_api.api.moduleInformation.GET(
-        headers={'X-server-guid': two.ecs_guid})
-    assert response1_proxy == response2
+@pytest.fixture()
+def layout_file():
+    return 'direct.yaml'
 
 
-def test_proxy_hard_request(server_factory, http_schema):
-    one = server_factory('one', http_schema=http_schema)
-    two = server_factory('two', http_schema=http_schema)
-    one.merge([two])
-
-    response1 = one.rest_api.ec2.getFullInfo.GET()
-    response2 = two.rest_api.ec2.getFullInfo.GET()
-    assert response1 == response2
-    response1_proxy = one.rest_api.ec2.getFullInfo.GET(
-        headers={'X-server-guid': two.ecs_guid})
-    assert response2 == response1_proxy
+@pytest.fixture()
+def proxy(network):
+    return network['first']
 
 
-def test_proxy_request_to_another_network(vm_factory, server_factory, http_schema):
-    net_1 = '10.10.1/24'
-    net_2 = '10.10.2/24'
-    vm_1 = vm_factory('side', ip_address_list=[net_1])
-    vm_2 = vm_factory('side', ip_address_list=[net_2])
-    middle_vm = vm_factory('middle', ip_address_list=[net_1, net_2])
-    one = server_factory('one', vm=vm_1, http_schema=http_schema)
-    two = server_factory('two', vm=vm_2, http_schema=http_schema)
-    middle = server_factory('middle', vm=middle_vm, http_schema=http_schema)
-    middle.merge([one, two])
+@pytest.fixture()
+def proxy_headers(network):
+    target_guid = network['second'].ecs_guid
+    return {'X-server-guid': target_guid}
 
-    test_response = one.rest_api.ec2.testConnection.GET(
-        headers={'X-server-guid': two.ecs_guid})
-    assert test_response['ecsGuid'] == two.ecs_guid
-    servers = one.rest_api.ec2.getMediaServersEx.GET(
-        id=two.ecs_guid,
-        headers={'X-server-guid': two.ecs_guid})
-    assert len(servers) == 1
-    assert servers[0]['status'] == 'Online'
+
+@pytest.mark.parametrize('iterations', [1, 2, 10])
+def test_ping(iterations, proxy, proxy_headers):
+    with Session() as session:
+        for _ in range(iterations):
+            session.get(proxy.rest_api_url + 'api/ping', headers=proxy_headers).raise_for_status()
+
+
+@pytest.mark.parametrize('iterations', [1, 2, 10])
+def test_ping_alternate_addressee(proxy, proxy_headers, iterations):
+    with Session() as session:
+        for _ in range(iterations):
+            session.get(proxy.rest_api_url + 'api/ping').raise_for_status()
+            session.get(proxy.rest_api_url + 'api/ping', headers=proxy_headers).raise_for_status()
+
+
+def test_redirect(proxy, proxy_headers):
+    auth = HTTPDigestAuth(proxy.user, proxy.password)
+    with Session() as session:
+        redirect_response = session.get(proxy.rest_api_url, auth=auth, headers=proxy_headers, allow_redirects=False)
+        assert 300 <= redirect_response.status_code <= 399, "Expected 3xx but got: %r" % redirect_response
+        follow_url = proxy.rest_api_url.rstrip('/') + redirect_response.headers['Location']
+        follow_response = session.get(follow_url, auth=auth, headers=proxy_headers, allow_redirects=False)
+        follow_response.raise_for_status()
+
+
+def test_404(proxy, proxy_headers):
+    auth = HTTPDigestAuth(proxy.user, proxy.password)
+    with Session() as session:
+        response = session.get(proxy.rest_api_url + 'nonexistent', auth=auth, headers=proxy_headers)
+        assert response.status_code == 404, "Expected 404 but got: %r" % response

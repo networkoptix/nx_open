@@ -154,7 +154,7 @@ void EventSearchListModel::Private::clear()
     m_data.clear();
     m_prefetch.clear();
     m_currentUpdateId = rest::Handle();
-    m_latestTimeMs = qMin(qnSyncTime->currentMSecsSinceEpoch(), selectedTimePeriod().endTimeMs());
+    m_latestTimeMs = qMin(qnSyncTime->currentMSecsSinceEpoch(), q->relevantTimePeriod().endTimeMs());
     m_requestLimitMultiplier = 1;
     base_type::clear();
 
@@ -266,14 +266,14 @@ bool EventSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommitMs
 void EventSearchListModel::Private::clipToSelectedTimePeriod()
 {
     m_currentUpdateId = rest::Handle(); //< Cancel timed update.
-    m_latestTimeMs = qMin(m_latestTimeMs, selectedTimePeriod().endTimeMs());
+    m_latestTimeMs = qMin(m_latestTimeMs, q->relevantTimePeriod().endTimeMs());
     refreshUpdateTimer();
-    clipToTimePeriod(m_data, upperBoundPredicateMs, selectedTimePeriod());
+    clipToTimePeriod(m_data, upperBoundPredicateMs, q->relevantTimePeriod());
 }
 
 void EventSearchListModel::Private::refreshUpdateTimer()
 {
-    if (camera() && selectedTimePeriod().isInfinite())
+    if (camera() && q->relevantTimePeriod().isInfinite())
     {
         if (!m_updateTimer->isActive())
         {

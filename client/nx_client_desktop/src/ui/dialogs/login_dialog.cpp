@@ -33,7 +33,6 @@
 
 #include <utils/applauncher_utils.h>
 #include <utils/common/app_info.h>
-#include <utils/common/url.h>
 #include <utils/common/util.h>
 #include <utils/connection_diagnostics_helper.h>
 

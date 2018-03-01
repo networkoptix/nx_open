@@ -2497,19 +2497,6 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
     return CameraDiagnostics::RequestFailedResult(QLatin1String("getAudioSourceConfigurations"), QLatin1String("missing channel configuration (2)"));
 }
 
-QnConstResourceAudioLayoutPtr QnPlOnvifResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
-{
-    if (isAudioEnabled()) {
-        const QnOnvifStreamReader* onvifReader = dynamic_cast<const QnOnvifStreamReader*>(dataProvider);
-        if (onvifReader && onvifReader->getDPAudioLayout())
-            return onvifReader->getDPAudioLayout();
-        else
-            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-    }
-    else
-        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
-}
-
 bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) {
     m_prevOnvifResultCode = CameraDiagnostics::NoErrorResult();
 
@@ -2714,7 +2701,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncod
         if (soapWrapper.getLastError().contains(QLatin1String("not possible to set")))
             return CameraDiagnostics::CannotConfigureMediaStreamResult( QLatin1String("fps") );   // TODO: #ak find param name
         else
-            return CameraDiagnostics::CannotConfigureMediaStreamResult( QString() );
+            return CameraDiagnostics::CannotConfigureMediaStreamResult( QString("'stream profile parameters'") );
     }
     return CameraDiagnostics::NoErrorResult();
 }

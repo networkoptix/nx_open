@@ -1,20 +1,23 @@
 <div class="container" >
     <div ng-if="data.activateCode" process-loading="activate">
-        <h1 class="process-success" ng-if="activate.success"> 
-            Hesabınız başarıyla etkinleştirildi <br>
-             <a class="btn btn-default" href="/login"> Giriş Yap </a>
+        <h1 class="process-success" ng-if="activate.success">
+            Your account is successfully activated
+        </h1>
+        <h1 class="process-success" ng-if="activate.success">
+            <a class="btn btn-default" href="/login">Oturum Aç</a>
         </h1>
 
-         <h1 class="process-success" ng-if="!activate.success">
-             Hesap zaten etkinleştirildi veya onay kodu yanlış 
+        <h1 class="process-success" ng-if="!activate.success">
+            Hesap zaten etkinleştirildi veya onay kodu yanlış
         </h1>
     </div>
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            Hesabınız başarıyla etkinleştirildi <br> 
-            <a href="/login"> Giriş Yap </a>
-            <!-- <button ng-if="session.fromClient" ng-click="openClient()" class="btn btn-default">Open {{VMS_NAME}}</button> -->
+            Your account is successfully activated
+        </h1>
+        <h1 class="process-success">
+            <a class="btn btn-default" href="/login">Oturum Aç</a>
         </h1>
     </div>
     
@@ -57,7 +60,7 @@
     </div>
 
     <div ng-if="restoring">
-        <h1>Parolayı sıfırla</h1>
+        <h1>Parolayı sıfırla -</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
                 <label for="email"  class="col-sm-4 control-label">E-posta</label>
@@ -83,9 +86,11 @@
         </form>
     </div>
     <div ng-if="data.restoreCode">
-        <h1 class="process-success" ng-if="change.success || changeSuccess ">
-            Hesabınız başarıyla etkinleştirildi <br> 
-            <a href="/login"> Giriş Yap </a>
+        <h1 class="process-success" ng-if="change.success || changeSuccess">
+            Password successfully saved
+        </h1>
+        <h1 class="process-success" ng-if="change.success || changeSuccess">
+            <a class="btn btn-default" href="/login">Oturum Aç</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>

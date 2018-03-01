@@ -72,6 +72,8 @@ def login(request):
     django.contrib.auth.login(request, user)
     request.session['login'] = email
     request.session['password'] = password
+    if 'timezone' in request.data:
+        request.session['timezone'] = request.data['timezone']
     serializer = AccountSerializer(user, many=False)
     return api_success(serializer.data)
 
@@ -82,6 +84,7 @@ def login(request):
 def logout(request):
     request.session.pop('login', None)
     request.session.pop('password', None)
+    request.session.pop('timezone', None)
     django.contrib.auth.logout(request)
     return api_success()
 
@@ -160,12 +163,12 @@ def activate(request):
             raise APIInternalException('No email from cloud_db', ErrorCodes.cloud_invalid_response)
 
         email = user_data['email'].lower()
-        try:
-            user = api.models.Account.objects.get(email=email)
-            user.activated_date = timezone.now()
-            user.save(update_fields=['activated_date'])
-        except ObjectDoesNotExist:
+        if not AccountBackend.is_email_in_portal(email):
             raise APIInternalException('No email in portal_db', ErrorCodes.portal_critical_error)
+
+        user = api.models.Account.objects.get(email=email)
+        user.activated_date = timezone.now()
+        user.save(update_fields=['activated_date'])
         return api_success()
     elif 'user_email' in request.data:
         user_email = request.data['user_email'].lower()

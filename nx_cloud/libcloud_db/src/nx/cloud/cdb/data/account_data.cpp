@@ -1,9 +1,5 @@
 #include "account_data.h"
 
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/join.hpp>
-#include <boost/algorithm/string/split.hpp>
-
 #include <nx/fusion/model_functions.h>
 #include <nx/network/buffer.h>
 #include <nx/utils/timer_manager.h>
@@ -63,10 +59,19 @@ bool AccountConfirmationCode::getAsVariant(int /*resID*/, QVariant* const /*valu
 }
 
 //-------------------------------------------------------------------------------------------------
-bool AccountUpdateData::getAsVariant(int /*resID*/, QVariant* const /*value*/) const
+bool AccountUpdateData::getAsVariant(int resID, QVariant* const value) const
 {
-    //TODO #ak
-    return false;
+    switch (resID)
+    {
+        case attr::ha1:
+            if (!passwordHa1)
+                return false;
+            *value = QString::fromStdString(*passwordHa1);
+            return true;
+
+        default:
+            return false;
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -133,73 +138,7 @@ void TemporaryCredentialsParams::put(int resID, const QVariant& value)
 }
 
 //-------------------------------------------------------------------------------------------------
-std::string AccessRestrictions::toString() const
-{
-    std::string result;
-    if (!requestsAllowed.empty())
-        result += "+" + boost::algorithm::join(requestsAllowed, ":+");
-    if (!requestsDenied.empty())
-        result += "-" + boost::algorithm::join(requestsDenied, ":-");
-    return result;
-}
 
-bool AccessRestrictions::parse(const std::string& str)
-{
-    using namespace boost::algorithm;
-
-    //TODO #ak use spirit?
-
-    std::vector<std::string> allRequestsWithModifiers;
-    boost::algorithm::split(
-        allRequestsWithModifiers,
-        str,
-        is_any_of(":"),
-        token_compress_on);
-    for (std::string& requestWithModifier: allRequestsWithModifiers)
-    {
-        if (requestWithModifier.empty())
-        {
-            NX_ASSERT(false);
-            continue;
-        }
-
-        if (requestWithModifier[0] == '+')
-        {
-            requestsAllowed.push_back(requestWithModifier.substr(1));
-        }
-        else if (requestWithModifier[0] == '-')
-        {
-            requestsDenied.push_back(requestWithModifier.substr(1));
-        }
-        else
-        {
-            NX_ASSERT(false, requestWithModifier.c_str());
-            continue;
-        }
-    }
-
-    return true;
-}
-
-bool AccessRestrictions::authorize(const nx::utils::stree::AbstractResourceReader& requestAttributes) const
-{
-    std::string requestPath;
-    if (!requestAttributes.get(attr::requestPath, &requestPath))
-        return true;    //assert?
-
-    if (!requestsAllowed.empty())
-        return std::find(
-            requestsAllowed.begin(),
-            requestsAllowed.end(),
-            requestPath) != requestsAllowed.end();
-
-    return std::find(
-        requestsDenied.begin(),
-        requestsDenied.end(),
-        requestPath) == requestsDenied.end();
-}
-
-//-------------------------------------------------------------------------------------------------
 TemporaryAccountCredentials::TemporaryAccountCredentials():
     expirationTimestampUtc(0),
     prolongationPeriodSec(0),

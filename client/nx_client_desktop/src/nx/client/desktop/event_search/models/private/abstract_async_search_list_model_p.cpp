@@ -9,8 +9,7 @@ namespace desktop {
 
 AbstractAsyncSearchListModel::Private::Private(AbstractAsyncSearchListModel* q):
     base_type(),
-    q(q),
-    m_selectedTimePeriod(QnTimePeriod::kMinTimeValue, QnTimePeriod::infiniteDuration())
+    q(q)
 {
 }
 
@@ -32,34 +31,27 @@ void AbstractAsyncSearchListModel::Private::setCamera(const QnVirtualCameraResou
     m_camera = camera;
 }
 
-QnTimePeriod AbstractAsyncSearchListModel::Private::selectedTimePeriod() const
+void AbstractAsyncSearchListModel::Private::relevantTimePeriodChanged(
+    const QnTimePeriod& previousValue)
 {
-    return m_selectedTimePeriod;
-}
+    const auto currentValue = q->relevantTimePeriod();
+    NX_ASSERT(currentValue != previousValue);
 
-void AbstractAsyncSearchListModel::Private::setSelectedTimePeriod(const QnTimePeriod& newTimePeriod)
-{
-    if (m_selectedTimePeriod == newTimePeriod)
-        return;
-
-    const auto oldTimePeriod = m_selectedTimePeriod;
-    m_selectedTimePeriod = newTimePeriod;
-
-    if (!m_selectedTimePeriod.isValid())
+    if (!currentValue.isValid())
     {
         clear();
         m_fetchedAll = true;
         return;
     }
 
-    if (newTimePeriod.endTimeMs() > oldTimePeriod.endTimeMs())
+    if (currentValue.endTimeMs() > previousValue.endTimeMs())
     {
         clear();
     }
     else
     {
-        m_fetchedAll = m_fetchedAll && (newTimePeriod.startTimeMs >= oldTimePeriod.startTimeMs);
-        m_earliestTimeMs = qBound(newTimePeriod.startTimeMs, m_earliestTimeMs, newTimePeriod.endTimeMs());
+        m_fetchedAll = m_fetchedAll && (currentValue.startTimeMs >= previousValue.startTimeMs);
+        m_earliestTimeMs = currentValue.bound(m_earliestTimeMs);
         clipToSelectedTimePeriod();
         cancelPrefetch();
     }
@@ -68,8 +60,7 @@ void AbstractAsyncSearchListModel::Private::setSelectedTimePeriod(const QnTimePe
 void AbstractAsyncSearchListModel::Private::clear()
 {
     m_fetchedAll = false;
-    m_earliestTimeMs = qBound(m_selectedTimePeriod.startTimeMs,
-        qnSyncTime->currentMSecsSinceEpoch(), m_selectedTimePeriod.endTimeMs());
+    m_earliestTimeMs = q->relevantTimePeriod().bound(qnSyncTime->currentMSecsSinceEpoch());
     cancelPrefetch();
 }
 
@@ -92,7 +83,7 @@ bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler c
     if (!canFetchMore() || !completionHandler)
         return false;
 
-    m_currentFetchId = requestPrefetch(m_selectedTimePeriod.startTimeMs, m_earliestTimeMs - 1);
+    m_currentFetchId = requestPrefetch(q->relevantTimePeriod().startTimeMs, m_earliestTimeMs - 1);
     if (!m_currentFetchId)
         return false;
 
@@ -113,8 +104,7 @@ void AbstractAsyncSearchListModel::Private::commit(qint64 earliestTimeToCommitMs
     if (!commitPrefetch(earliestTimeToCommitMs, m_fetchedAll))
         return;
 
-    m_earliestTimeMs = qBound(m_selectedTimePeriod.startTimeMs, earliestTimeToCommitMs,
-        m_selectedTimePeriod.endTimeMs());
+    m_earliestTimeMs = q->relevantTimePeriod().bound(earliestTimeToCommitMs);
 }
 
 bool AbstractAsyncSearchListModel::Private::fetchInProgress() const
@@ -136,9 +126,9 @@ void AbstractAsyncSearchListModel::Private::complete(qint64 earliestTimeMs)
 
 QnTimePeriod AbstractAsyncSearchListModel::Private::fetchedTimePeriod() const
 {
-    return m_selectedTimePeriod.isInfinite()
+    return q->relevantTimePeriod().isInfinite()
         ? QnTimePeriod(m_earliestTimeMs, QnTimePeriod::infiniteDuration())
-        : QnTimePeriod::fromInterval(m_earliestTimeMs, m_selectedTimePeriod.endTimeMs());
+        : QnTimePeriod::fromInterval(m_earliestTimeMs, q->relevantTimePeriod().endTimeMs());
 }
 
 } // namespace desktop

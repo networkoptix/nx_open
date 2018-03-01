@@ -7,9 +7,10 @@
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/api/analytics/device_manifest.h>
+#include <nx/fusion/serialization/json.h>
 #include <nx/kit/debug.h>
 
-#include <nx/fusion/serialization/json.h>
+#define NX_PRINT_PREFIX "[metadata::axis::Manager] "
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -19,33 +20,24 @@ namespace axis {
 Manager::Manager(
     const nx::sdk::CameraInfo& cameraInfo,
     const AnalyticsDriverManifest& typedManifest)
+    :
+    m_typedManifest(typedManifest),
+    m_manifest(QJson::serialized(typedManifest)),
+    m_url(cameraInfo.url)
 {
-    for (const AnalyticsEventType& event : typedManifest.outputEventTypes)
-    {
-        AnalyticsEventTypeExtended eventExtended;
-        static_cast<AnalyticsEventType&>(eventExtended) = event;
-        m_events.push_back(eventExtended);
-    }
-
-    m_manifest = QJson::serialized(typedManifest);
-
-    m_url = cameraInfo.url;
     m_auth.setUser(cameraInfo.login);
     m_auth.setPassword(cameraInfo.password);
 
     nx::api::AnalyticsDeviceManifest deviceManifest;
-    for (const auto& event : typedManifest.outputEventTypes)
-    {
+    for (const auto& event: typedManifest.outputEventTypes)
         deviceManifest.supportedEventTypes.push_back(event.eventTypeId);
-    }
-
-    NX_PRINT << "Ctor :" << this;
+    NX_PRINT << "Axis metadata manager created";
 }
 
 Manager::~Manager()
 {
     stopFetchingMetadata();
-    NX_PRINT << "Dtor :" << this;
+    NX_PRINT << "Axis metadata manager destroyed";
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -105,18 +97,17 @@ void Manager::freeManifest(const char* data)
     // released in Manager's destructor.
 }
 
-const AnalyticsEventTypeExtended& Manager::eventByUuid(const QnUuid& uuid) const noexcept
+const AnalyticsEventType* Manager::eventByUuid(const QnUuid& uuid) const noexcept
 {
-    static const AnalyticsEventTypeExtended emptyEvent{};
     const auto it = std::find_if(
-        m_events.cbegin(),
-        m_events.cend(),
+        m_typedManifest.outputEventTypes.cbegin(),
+        m_typedManifest.outputEventTypes.cend(),
         [&uuid](const AnalyticsEventType& event) { return event.eventTypeId == uuid; });
 
-    if (it == m_events.cend())
-        return emptyEvent;
+    if (it == m_typedManifest.outputEventTypes.cend())
+        return nullptr;
     else
-        return *it;
+        return &(*it);
 }
 
 } // axis

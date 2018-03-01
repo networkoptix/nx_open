@@ -410,6 +410,13 @@ bool UdtSocket<InterfaceToImplement>::getLastError(SystemError::ErrorCode* /*err
 }
 
 template<typename InterfaceToImplement>
+bool UdtSocket<InterfaceToImplement>::setIpv6Only(bool /*val*/)
+{
+    // TODO: #ak
+    return true;
+}
+
+template<typename InterfaceToImplement>
 AbstractSocket::SOCKET_HANDLE UdtSocket<InterfaceToImplement>::handle() const
 {
     NX_ASSERT(!isClosed());

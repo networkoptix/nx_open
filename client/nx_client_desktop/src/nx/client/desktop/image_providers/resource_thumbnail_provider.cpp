@@ -11,6 +11,7 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -24,7 +25,7 @@ namespace desktop {
 
 struct ResourceThumbnailProvider::Private
 {
-    void updateRequest(const api::ResourceImageRequest& value)
+    bool updateRequest(const api::ResourceImageRequest& value)
     {
         request = value;
 
@@ -55,9 +56,14 @@ struct ResourceThumbnailProvider::Private
             api::CameraImageRequest cameraRequest(camera, request);
             baseProvider.reset(new CameraThumbnailProvider(cameraRequest));
         }
-        else if (request.resource)
+        else if (const auto aviResource = resource.dynamicCast<QnAviResource>())
         {
-            baseProvider.reset(new FfmpegImageProvider(request.resource));
+            baseProvider.reset(new FfmpegImageProvider(resource));
+        }
+        else
+        {
+            NX_ASSERT(false);
+            return false;
         }
 
         if (!baseProvider && !placeholderIconPath.isEmpty())
@@ -79,6 +85,8 @@ struct ResourceThumbnailProvider::Private
 
             baseProvider.reset(new QnBasicImageProvider(dst.toImage()));
         }
+
+        return true;
     }
 
     QScopedPointer<QnImageProvider> baseProvider;
@@ -107,11 +115,16 @@ api::ResourceImageRequest ResourceThumbnailProvider::requestData() const
 void ResourceThumbnailProvider::setRequestData(const api::ResourceImageRequest& request)
 {
     if (d->baseProvider)
+    {
         d->baseProvider->disconnect(this);
+        d->baseProvider.reset();
+    }
 
-    d->updateRequest(request);
-
-    if (auto p = d->baseProvider.data())
+    if (!d->updateRequest(request))
+    {
+        d->baseProvider.reset();
+    }
+    else if (auto p = d->baseProvider.data())
     {
         connect(p, &QnImageProvider::imageChanged, this, &QnImageProvider::imageChanged);
         connect(p, &QnImageProvider::statusChanged, this, &QnImageProvider::statusChanged);
@@ -144,6 +157,10 @@ void ResourceThumbnailProvider::doLoadAsync()
 {
     if (d->baseProvider)
         d->baseProvider->loadAsync();
+    else
+    {
+        emit statusChanged(Qn::ThumbnailStatus::Invalid);
+    }
 }
 
 } // namespace desktop

@@ -18,6 +18,7 @@ endif()
 
 set(CMAKE_BUILD_TYPE ${default_cmake_build_type} CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
+set(CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE "x64" CACHE INTERNAL "")
 
 set(targetDevice "" CACHE STRING "Target device. For the list see cmake/toolchains.")
 set(box "none")
@@ -194,8 +195,10 @@ if(withMediaServer)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
 
-    # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_metadata_sdk) into a single sdk like this.
-    add_subdirectory(nx_metadata_sdk)
+    if(withDistributions)
+        # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_metadata_sdk) into one like this.
+        add_subdirectory(nx_metadata_sdk)
+    endif()
 
     if(LINUX AND box MATCHES "none|tx1")
         add_subdirectory(root_tool)

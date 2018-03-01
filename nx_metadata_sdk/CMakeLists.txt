@@ -24,17 +24,9 @@ set(sdk_src_nx_kit_origin ${CMAKE_SOURCE_DIR}/open/artifacts/nx_kit)
 file(GLOB_RECURSE sdk_src_nx_kit_files ${sdk_src_nx_kit_origin}/*)
 
 # Collect source files for Plugin SDK.
-set(sdk_src_common_origin ${CMAKE_SOURCE_DIR}/common/src)
+set(sdk_src_nx_sdk ${CMAKE_SOURCE_DIR}/common_libs/nx_sdk/src)
 file(GLOB_RECURSE sdk_src_common_files
-    ${sdk_src_common_origin}/plugins/plugin_api.h
-    ${sdk_src_common_origin}/plugins/plugin_tools.h
-    ${sdk_src_common_origin}/nx/sdk/common.h
-    ${sdk_src_common_origin}/nx/sdk/metadata/*
-)
-list(REMOVE_ITEM sdk_src_common_files
-    ${sdk_src_common_origin}/nx/sdk/metadata/media_frame.h
-    ${sdk_src_common_origin}/nx/sdk/metadata/audio_frame.h
-    ${sdk_src_common_origin}/nx/sdk/metadata/video_frame.h
+    ${sdk_src_nx_sdk}/*
 )
 
 # Collect source files for the sample - Stub Metadata Plugin.
@@ -77,4 +69,4 @@ add_custom_command(OUTPUT ${zip_file}
         ${sdk_src_sample_files}
 )
 
-add_custom_target(nx_metadata_sdk DEPENDS ${zip_file})
+add_custom_target(nx_metadata_sdk ALL DEPENDS ${zip_file})

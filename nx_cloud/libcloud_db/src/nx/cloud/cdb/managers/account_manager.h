@@ -208,6 +208,11 @@ private:
         const std::string& accountEmail,
         std::unique_ptr<AbstractActivateAccountNotification> notification,
         data::AccountConfirmationCode* const resultData);
+    std::string generateAccountActivationCode(
+        nx::utils::db::QueryContext* const queryContext,
+        const std::string& email,
+        const std::chrono::seconds& codeExpirationTime);
+
     void accountReactivated(
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
@@ -241,7 +246,7 @@ private:
         bool activateAccountIfNotActive,
         data::AccountUpdateDataWithEmail accountData);
 
-    nx::utils::db::DBResult resetPassword(
+    nx::utils::db::DBResult issueRestorePasswordCode(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& accountEmail,
         data::AccountConfirmationCode* const confirmationCode);

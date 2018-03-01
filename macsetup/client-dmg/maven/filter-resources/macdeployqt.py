@@ -55,11 +55,11 @@ def prepare(binary, sbindir, tlibdir):
     tcontentsdir = os.path.dirname(tbindir)
     tresdir = join(tcontentsdir, 'Resources')
 
-    applauncher_binary = join(tbindir, 'applauncher-bin')
-    applauncher_script = join(tbindir, 'applauncher')
+    applauncher_binary = join(tbindir, '@applauncher.binary.name@')
+    applauncher_script = join(tbindir, '@minilauncher.binary.name@')
 
-    shutil.copyfile(join(sbindir, 'desktop_client'), binary)
-    shutil.copyfile(join(sbindir, 'applauncher'), applauncher_binary)
+    shutil.copyfile(join(sbindir, '@client.binary.name@'), binary)
+    shutil.copyfile(join(sbindir, '@applauncher.binary.name@'), applauncher_binary)
     shutil.copyfile(join(sbindir, 'qt.conf'), join(tbindir, 'qt.conf'))
 
     os.chmod(binary, 0755)

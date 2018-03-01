@@ -103,7 +103,7 @@ QIcon QnNoptixIconLoader::polish(const QIcon& icon)
     if (!pixmapName.startsWith(lit(":/skin")))
         return icon;
 
-    /* Ok, that's an icon from :/skin, :/skin_dark or :/skin_light. */
+    /* Ok, that's an icon from :/skin or :/skin_dark */
     int index = pixmapName.indexOf(L'/', 2);
     if (index == -1)
         return icon;

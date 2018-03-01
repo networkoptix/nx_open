@@ -39,6 +39,8 @@ public:
         Cameras,
 
         Recorder,
+        MultisensorCamera,
+
         Image,
         Media,
         User,

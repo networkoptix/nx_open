@@ -314,6 +314,10 @@
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>まず、録画をOnにしてI/Oモジュール設定で fps を減少します (エラー&quot;%1&quot;)。</translation>
     </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>ファームウェアを更新してください。最小サポートバージョンは %1です。現在のバージョンは %2です</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>

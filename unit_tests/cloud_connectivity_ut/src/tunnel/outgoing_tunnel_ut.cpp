@@ -721,11 +721,6 @@ TEST_F(OutgoingTunnel, connectTimeout)
     requestSeveralConnectionsToTheTarget();
     assertConnectResultIs(SystemError::timedOut);
     assertNoConnectionsHaveBeenCreated();
-
-    #ifdef _DEBUG
-        if (!utils::TestOptions::areTimeAssertsDisabled())
-            assertActualTimeoutErrorDoesNotExceed(std::chrono::milliseconds(500));
-    #endif
 }
 
 /** testing that tunnel passes correct connect timeout to tunnel connection */

@@ -340,6 +340,14 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
                 emit licenseStatusChanged();
             });
+
+        connect(qnPtzPool, &QnPtzControllerPool::controllerChanged, this,
+            [this](const QnResourcePtr& resource)
+            {
+                // Make sure we will not handle resource removing.
+                if (resource == d->camera && resource->resourcePool())
+                    updatePtzController();
+            });
     }
 
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged, this,
@@ -371,7 +379,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     }
 
     updateAspectRatio();
-    createPtzController();
+    updatePtzController();
 
     /* Set up info updates. */
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
@@ -853,10 +861,10 @@ void QnMediaResourceWidget::createButtons()
     }
 }
 
-void QnMediaResourceWidget::createPtzController()
+void QnMediaResourceWidget::updatePtzController()
 {
-    auto threadPool = qnClientCoreModule->ptzControllerPool()->commandThreadPool();
-    auto executorThread = qnClientCoreModule->ptzControllerPool()->executorThread();
+    const auto threadPool = qnClientCoreModule->ptzControllerPool()->commandThreadPool();
+    const auto executorThread = qnClientCoreModule->ptzControllerPool()->executorThread();
 
     /* Set up PTZ controller. */
     QnPtzControllerPtr fisheyeController;
@@ -900,6 +908,8 @@ void QnMediaResourceWidget::createPtzController()
 
     connect(m_ptzController, &QnAbstractPtzController::changed, this,
         &QnMediaResourceWidget::at_ptzController_changed);
+
+    emit ptzControllerChanged();
 }
 
 qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
@@ -1520,7 +1530,7 @@ void QnMediaResourceWidget::updateIconButton()
         return;
     }
 
-    if (!d->camera)
+    if (!d->camera || d->camera->hasFlags(Qn::wearable_camera))
     {
         buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, false);
         return;
@@ -1886,7 +1896,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
     if (statusOverlay == Qn::AnalogWithoutLicenseOverlay)
         return Qn::MainWindow_MediaItem_AnalogLicense_Help;
 
-    if (statusOverlay == Qn::OfflineOverlay)
+    if (statusOverlay == Qn::OfflineOverlay || statusOverlay == Qn::OldFirmwareOverlay)
         return Qn::MainWindow_MediaItem_Diagnostics_Help;
 
     if (statusOverlay == Qn::UnauthorizedOverlay)
@@ -2172,6 +2182,12 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     // TODO: #GDM #3.1 This really requires hell a lot of refactoring
     // for live video make a quick check: status has higher priority than EOF
+    if (d->isPlayingLive() && d->camera && d->camera->hasFlags(Qn::wearable_camera))
+        return Qn::NoLiveStreamOverlay;
+
+    if (d->camera && d->camera->hasCameraCapabilities(Qn::isOldFirmwareCapability))
+        return Qn::OldFirmwareOverlay;
+
     if (d->isOffline())
         return Qn::OfflineOverlay;
 
@@ -2183,8 +2199,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
 
-        if (d->isPlayingLive() && d->camera->hasFlags(Qn::wearable_camera))
-            return Qn::NoLiveStreamOverlay;
 
         const Qn::Permission requiredPermission = d->isPlayingLive()
             ? Qn::ViewLivePermission
@@ -2210,7 +2224,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             return Qn::IoModuleDisabledOverlay;
     }
 
-    if (d->display()->camDisplay()->lastMediaEvent() == Qn::MediaStreamEvent::TooManyOpenedConnections)
+    if (d->display()->camDisplay()->lastMediaEvent() == Qn::MediaStreamEvent::TooManyOpenedConnectionsError)
     {
         // Too many opened connections
         return Qn::TooManyOpenedConnectionsOverlay;
@@ -2231,8 +2245,15 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         return Qn::EmptyOverlay;
     }
 
-    if (d->resource->hasFlags(Qn::local_video) && d->resource->getStatus() == Qn::Offline)
-        return Qn::NoDataOverlay;
+    if (d->resource->hasFlags(Qn::local_video))
+    {
+        if (d->resource->getStatus() == Qn::Offline)
+            return Qn::NoDataOverlay;
+
+        // Handle export from I/O modules.
+        if (!d->hasVideo)
+            return Qn::NoVideoDataOverlay;
+    }
 
     if (options().testFlag(DisplayActivity) && d->display()->isPaused())
     {
@@ -2299,6 +2320,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
             return Qn::ResourceOverlayButton::Empty;
         }
 
+        case Qn::OldFirmwareOverlay:
         case Qn::OfflineOverlay:
         {
             return menu()->canTrigger(action::CameraDiagnosticsAction, d->camera)
@@ -2320,17 +2342,16 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
     return base_type::calculateOverlayButton(statusOverlay);
 }
 
-void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key)
+void QnMediaResourceWidget::at_resource_propertyChanged(
+    const QnResourcePtr& /*resource*/,
+    const QString& key)
 {
-    Q_UNUSED(resource);
     if (key == QnMediaResource::customAspectRatioKey())
         updateCustomAspectRatio();
     else if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
         ensureTwoWayAudioWidget();
     else if (key == Qn::kCombinedSensorsDescriptionParamName)
         updateAspectRatio();
-    else if (key == Qn::PTZ_CAPABILITIES_PARAM_NAME)
-        updateButtonsVisibility();
 }
 
 void QnMediaResourceWidget::updateAspectRatio()
@@ -2738,6 +2759,11 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
     emit motionSearchModeEnabled(enabled);
 }
 
+bool QnMediaResourceWidget::isMotionSearchModeEnabled() const
+{
+    return (titleBar()->rightButtonsBar()->checkedButtons() & Qn::MotionSearchButton) != 0;
+}
+
 QnSpeedRange QnMediaResourceWidget::speedRange() const
 {
     static constexpr qreal kUnitSpeed = 1.0;
@@ -2784,6 +2810,8 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
     }
     else
     {
+        // We don't unset forced video buffer length to avoid micro-freezes required to fill in the
+        // video buffer on succeeding analytics mode activations.
         display()->camDisplay()->setForcedVideoBufferLength(
             milliseconds(ini().analyticsVideoBufferLengthMs));
     }
