@@ -37,6 +37,14 @@ void AbstractAsyncSearchListModel::Private::relevantTimePeriodChanged(
     const auto currentValue = q->relevantTimePeriod();
     NX_ASSERT(currentValue != previousValue);
 
+    qDebug() << "Relevant time period changed";
+    qDebug() << "--- Old was from"
+        << utils::timestampToRfc2822(previousValue.startTimeMs) << "to"
+        << utils::timestampToRfc2822(previousValue.endTimeMs());
+    qDebug() << "--- New is from"
+        << utils::timestampToRfc2822(currentValue.startTimeMs) << "to"
+        << utils::timestampToRfc2822(currentValue.endTimeMs());
+
     if (!currentValue.isValid())
     {
         clear();
