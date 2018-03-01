@@ -88,6 +88,7 @@ Unchecking check box and saving maintains that setting
     Verify In Account Page
     Click Element    ${ACCOUNT SUBSCRIBE CHECKBOX}
     Click Button    ${ACCOUNT SAVE}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
     Open Browser and go to URL    ${url}/account
     Log In    ${random email}    ${password}    button=None
@@ -108,6 +109,7 @@ Checking check box and saving maintains that setting
     Verify In Account Page
     Click Element    ${ACCOUNT SUBSCRIBE CHECKBOX}
     Click Button    ${ACCOUNT SAVE}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
     Open Browser and go to URL    ${url}/account
     Log In    ${random email}    ${password}    button=None
@@ -122,6 +124,7 @@ Changing first name and saving maintains that setting
     Verify In Account Page
     Input Text    ${ACCOUNT FIRST NAME}    nameChanged
     Click Button    ${ACCOUNT SAVE}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
@@ -129,6 +132,7 @@ Changing first name and saving maintains that setting
     Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    nameChanged
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
     Click Button    ${ACCOUNT SAVE}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
 
 
@@ -139,6 +143,7 @@ Changing last name and saving maintains that setting
     Verify In Account Page
     Input Text    ${ACCOUNT LAST NAME}    nameChanged
     Click Button    ${ACCOUNT SAVE}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
@@ -146,6 +151,7 @@ Changing last name and saving maintains that setting
     Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    nameChanged
     Input Text    ${ACCOUNT LAST NAME}    ${TEST FIRST NAME}
     Click Button    ${ACCOUNT SAVE}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
 
 First name is required
@@ -170,6 +176,33 @@ Last name is required
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
     Close Browser
 
-Language changes when saved and maintains that setting
+SPACE for first name is not valid
+    Open Browser and go to URL    ${url}/account
+    Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
+    Verify In Account Page
+    Input Text    ${ACCOUNT FIRST NAME}    ${SPACE}
+    Click Button    ${ACCOUNT SAVE}
+    Wait Until Element Is Visible    ${ACCOUNT FIRST NAME}/parent::div/parent::div[contains(@class, "has-error")]
+    Element Should Be Visible    ${FIRST NAME IS REQUIRED}
+    Close Browser
+
+SPACE for last name is not valid
+    Open Browser and go to URL    ${url}/account
+    Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
+    Verify In Account Page
+    Input Text    ${ACCOUNT LAST NAME}    ${SPACE}
+    Click Button    ${ACCOUNT SAVE}
+    Wait Until Element Is Visible    ${ACCOUNT LAST NAME}/parent::div/parent::div[contains(@class, "has-error")]
+    Element Should Be Visible    ${LAST NAME IS REQUIRED}
+    Close Browser
 
 Email field is un-editable
+    Open Browser and go to URL    ${url}/account
+    Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
+    Verify In Account Page
+    ${read only}    Get Element Attribute    ${ACCOUNT EMAIL}    readOnly
+    Should Be True    "${read only}"
+    Close Browser

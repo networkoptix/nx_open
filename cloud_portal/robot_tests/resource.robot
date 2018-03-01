@@ -61,7 +61,7 @@ Register
     Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
-    Run Keyword If    ${checked}==false    Click Element    ${REGISTER SUBSCRIBE CHECKBOX}
+    Run Keyword If    "${checked}"=="false"    Click Element    ${REGISTER SUBSCRIBE CHECKBOX}
     Click Button    ${CREATE ACCOUNT BUTTON}
 
 Validate Register Success
