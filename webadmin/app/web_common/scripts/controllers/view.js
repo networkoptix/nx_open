@@ -108,6 +108,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             var dimensions = resolution.split('x');
             return dimensions[0] > 1920 || dimensions[1] > 1080;
         }
+
         function checkiOSResolution(camera){
             var streams = _.find(camera.mediaStreams,function(stream){
                 return stream.transports.indexOf('hls')>0 && largeResolution(stream.resolution);
@@ -115,6 +116,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             // Here we have two hls streams
             return !!streams;
         }
+
         function updateAvailableResolutions() {
             if($scope.player == null){
                 $scope.availableResolutions = [L.common.resolution.auto];
@@ -168,6 +170,10 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
         }
 
+        function findRotation(param) {
+            return param.name === 'rotation';
+        }
+
         $scope.updateCamera = function (position) {
             var oldTimePosition = null;
             if($scope.positionProvider && !$scope.positionProvider.liveMode){
@@ -204,12 +210,26 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         function updateVideoSource(playingPosition) {
+            if (!$scope.activeCamera ||
+                $scope.activeCamera.status === 'Offline' ||
+                $scope.activeCamera.status === 'Unauthorized') {
+
+                $scope.activeVideoSource = {src: ''};
+                return;
+            }
+
+            var salt = '&' + Math.random(),
+                cameraId = $scope.activeCamera.id,
+                resolution = $scope.activeResolution,
+                resolutionHls = channels[resolution] || channels.Low,
+                live = !playingPosition;
+
             if($scope.playerAPI) {
                 // Pause playing
                 $scope.playerAPI.pause();
             }
+
             updateAvailableResolutions();
-            var live = !playingPosition;
 
             $scope.positionSelected = !!playingPosition;
             if(!$scope.positionProvider){
@@ -222,16 +242,6 @@ angular.module('nxCommon').controller('ViewCtrl',
             }else{
                 playingPosition = Math.round(playingPosition);
             }
-
-            if(!$scope.activeCamera){
-                return;
-            }
-            var salt = '&' + Math.random();
-            var cameraId = $scope.activeCamera.id;
-            var serverUrl = '';
-
-            var resolution = $scope.activeResolution;
-            var resolutionHls = channels[resolution] || channels.Low;
 
             // Fix here!
             if(resolutionHls === channels.Low && $scope.availableResolutions.indexOf('Low')<0){
@@ -287,10 +297,6 @@ angular.module('nxCommon').controller('ViewCtrl',
             }*/
         };
 
-        function findRotation(param){
-            return param.name === 'rotation';
-        }
-
         $scope.switchPlaying = function(play){
             if($scope.playerAPI) {
                 if (play) {
@@ -328,8 +334,8 @@ angular.module('nxCommon').controller('ViewCtrl',
         function handleVideoError(forceLive){
             var showError = $scope.crashCount < Config.webclient.maxCrashCount;
             if(showError){
-                updateVideoSource($scope.positionProvider.liveMode || forceLive
-                                                                    ? null : $scope.positionProvider.playedPosition);
+                updateVideoSource($scope.positionProvider.liveMode ||
+                                  forceLive ? null : $scope.positionProvider.playedPosition);
                 $scope.crashCount += 1;
             }
             else{
@@ -393,7 +399,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         $scope.closeFullscreen = function(){
             screenfull.exit();
-        }
+        };
 
         $scope.showCamerasPanel = function(){
             $scope.showCameraPanel=true;
@@ -411,8 +417,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         });
 
         $scope.$watch('activeCamera.status',function(status,oldStatus){
-
-            if(typeof(oldStatus) == "undefined"){
+            if(typeof(oldStatus) === 'undefined'){
                 return;
             }
 
@@ -423,11 +428,13 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         //timeFromUrl is used if we have a time from the url if not then set to false
         var timeFromUrl = $routeParams.time || null;
+
         $scope.$watch('activeCamera', function(){
-            if(!$scope.activeCamera){
+            if(!$scope.activeCamera) {
                 $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
                 return;
             }
+
             $scope.player = null;
             $scope.crashCount = 0;
             $scope.storage.cameraId  = $scope.activeCamera.id;
