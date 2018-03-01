@@ -565,8 +565,7 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
 
     for (const auto& camera: m_cameras)
     {
-        disconnect(camera, &QnSecurityCamResource::resourceChanged,
-            this, &QnCameraScheduleWidget::cameraResourceChanged);
+        camera->disconnect(this);
     }
 
     m_cameras = cameras;
@@ -575,6 +574,15 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     {
         connect(camera, &QnSecurityCamResource::resourceChanged,
             this, &QnCameraScheduleWidget::cameraResourceChanged, Qt::QueuedConnection);
+        connect(camera, &QnResource::propertyChanged, this,
+            [this](const QnResourcePtr& resource, const QString& propertyName)
+            {
+                if (propertyName == nx::media::kCameraMediaCapabilityParamName
+                    || propertyName == Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
+                {
+                    syncBitrateWithFps();
+                }
+            });
     }
 }
 
