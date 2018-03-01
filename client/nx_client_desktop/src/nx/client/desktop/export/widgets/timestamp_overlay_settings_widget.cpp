@@ -77,7 +77,7 @@ void TimestampOverlaySettingsWidget::setData(const ExportTimestampOverlayPersist
 
 bool TimestampOverlaySettingsWidget::formatEnabled() const
 {
-    return !ui->formatComboBox->isEnabled();
+    return ui->formatComboBox->isEnabled();
 }
 
 void TimestampOverlaySettingsWidget::setFormatEnabled(bool value)
