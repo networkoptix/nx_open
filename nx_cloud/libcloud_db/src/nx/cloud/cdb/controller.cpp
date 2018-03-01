@@ -15,6 +15,7 @@ Controller::Controller(const conf::Settings& settings):
     m_streeManager(settings.auth().rulesXmlPath),
     m_tempPasswordManager(
         settings,
+        m_streeManager.resourceNameSet(),
         &m_dbInstanceController.queryExecutor()),
     m_accountManager(
         settings,

@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
+        Cuenta creada. <br>Mensaje de confirmación es enviado a <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -49,11 +49,11 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Correo electrónico.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required.</span></div>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Por favor, entre en un correo electrónico válido.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please, enter a valid Email.</span></div>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Este correo electrónico ya ha sido registrado en {{PRODUCT_NAME}}.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in {{PRODUCT_NAME}}.</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>

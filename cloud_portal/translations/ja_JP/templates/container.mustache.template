@@ -30,7 +30,7 @@
                             <td><div class="name">{{cloud.ownerName}}</div>
                                 <div class="hint">{{cloud.ownerEmail}}</div></td>
                         </tr>
-                        {{/クラウド}}
+                        {{/cloud}}
                         </tbody>
                     </table>
                 </div>
@@ -70,7 +70,7 @@
                                 <b>ウェブサイト</b><br>
                                 <a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
-                        {{/システム}}
+                        {{/system}}
                         <td class="left-border">
                             <b>サポート</b><br>
                             <a href="{{supportLink}}">{{supportLinkText}}</a>

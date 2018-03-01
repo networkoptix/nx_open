@@ -30,7 +30,7 @@
                             <td><div class="name">{{cloud.ownerName}}</div>
                                 <div class="hint">{{cloud.ownerEmail}}</div></td>
                         </tr>
-                        {{/nube}}
+                        {{/cloud}}
                         </tbody>
                     </table>
                 </div>
@@ -70,7 +70,7 @@
                                 <b>Sitio web</b><br>
                                 <a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
-                        {{/sistema}}
+                        {{/system}}
                         <td class="left-border">
                             <b>Soporte</b><br>
                             <a href="{{supportLink}}">{{supportLinkText}}</a>

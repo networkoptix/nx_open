@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
+        作成されたアカウント <br>{{account.email}}<br>に確認メッセージを送信します
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -49,9 +49,11 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Emailが必要です</span>
-                 <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">有効なEmailを入力してください</span>
-                 <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">このEmailは {{PRODUCT_NAME}} で既に登録されています</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">メールアドレスが必要です</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">有効なメールアドレスを入力して下さい</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">このEmailは既に {{PRODUCT_NAME}} に登録されています</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>

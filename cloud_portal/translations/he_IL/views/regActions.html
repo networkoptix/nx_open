@@ -49,7 +49,11 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required"> נדרש דוא"ל. </span> <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email"> יש להזין כתובת דוא"ל חוקית. </span> <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists"> כתובת זו כבר רשומה ב- {{PRODUCT_NAME}}. </span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required.</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please, enter a valid Email.</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in {{PRODUCT_NAME}}.</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
