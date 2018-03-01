@@ -36,8 +36,7 @@ void PerformanceTest::detectLightMode()
         QString cpuName = QnPerformance::cpuName();
         QRegExp poorCpuRegExp(lit("Intel\\(R\\) (Atom\\(TM\\)|Celeron\\(R\\)) CPU .*"));
         poorCpu = poorCpuRegExp.exactMatch(cpuName);
-        NX_INFO("QnPerformanceTest",
-            lm("QnPerformanceTest: CPU: \"%1\" poor: %2").arg(cpuName).arg(poorCpu));
+        NX_LOG(lm("QnPerformanceTest: CPU: \"%1\" poor: %2").arg(cpuName).arg(poorCpu), cl_logINFO);
 
         // Create OpenGL context and check GL_RENDERER.
         const auto surface = std::make_unique<QOffscreenSurface>();
@@ -52,8 +51,7 @@ void PerformanceTest::detectLightMode()
                 lit("Gallium .* on llvmpipe .*|Mesa DRI Intel\\(R\\) Bay Trail.*"));
             poorGpu = poorRendererRegExp.exactMatch(renderer);
 
-            NX_INFO("QnPerformanceTest",
-                lm("QnPerformanceTest: Renderer: \"%1\" poor: %2").arg(renderer).arg(poorGpu));
+            NX_LOG(lm("QnPerformanceTest: Renderer: \"%1\" poor: %2").arg(renderer).arg(poorGpu), cl_logINFO);
         }
     }
 
