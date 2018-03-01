@@ -21,8 +21,8 @@ def check_user_exists(server, is_cloud):
 def test_with_different_cloud_hosts_must_not_be_able_to_merge(server_factory, cloud_account, http_schema):
     cloud_host_2 = 'cloud.non.existent'
 
-    one = server_factory('one', setup=False, http_schema=http_schema)
-    two = server_factory('two', start=False, http_schema=http_schema)
+    one = server_factory.get('one', setup=False, http_schema=http_schema)
+    two = server_factory.get('two', start=False, http_schema=http_schema)
 
     two.patch_binary_set_cloud_host(cloud_host_2)
     two.start_service()
@@ -49,8 +49,8 @@ def test_with_different_cloud_hosts_must_not_be_able_to_merge(server_factory, cl
     
 
 def test_server_should_be_able_to_merge_local_to_cloud_one(server_factory, cloud_account, http_schema):
-    one = server_factory('one', setup=False, http_schema=http_schema)
-    two = server_factory('two', http_schema=http_schema)
+    one = server_factory.get('one', setup=False, http_schema=http_schema)
+    two = server_factory.get('two', http_schema=http_schema)
 
     one.setup_cloud_system(cloud_account)
     check_user_exists(one, is_cloud=True)
@@ -62,7 +62,7 @@ def test_server_should_be_able_to_merge_local_to_cloud_one(server_factory, cloud
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85204446/Cloud+test
 def test_server_with_hardcoded_cloud_host_should_be_able_to_setup_with_cloud(server_factory, cloud_account, http_schema):
-    one = server_factory('one', setup=False, leave_initial_cloud_host=True, http_schema=http_schema)
+    one = server_factory.get('one', setup=False, leave_initial_cloud_host=True, http_schema=http_schema)
     try:
         one.setup_cloud_system(cloud_account)
     except HttpError as x:

@@ -131,19 +131,6 @@
             "flags": "stateDependent"
         },
         {
-            "typeId": "{1BAB8A57-5F19-4E3A-B73B-3641058D46B8}",
-            "name": {
-                "value": "Dry contact input",
-                "localization": {
-                }
-            },
-            "internalName": "AlarmInput.,NetworkAlarmInput",
-            "description": "Dry contact input has been %1",
-            "positiveState": "activated",
-            "negativeState": "deactivated",
-            "flags": "stateDependent"
-        },
-        {
             "typeId": "{F1F723BB-20C8-453A-AFCE-86F318CBF097}",
             "name": {
                 "value": "Motion detection",

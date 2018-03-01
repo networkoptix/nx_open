@@ -26,19 +26,24 @@ def _make_timeless_server(vm, mediaserver_deb, ca, server_name):
     service = UpstartService(vm.guest_os_access, mediaserver_deb.customization.service_name)
     api_url = 'http://{host}:{port}/'.format(host=vm.host_os_access.hostname, port=vm.config.rest_api_forwarded_port)
     server = Server(server_name, vm.guest_os_access, service, server_installation, api_url, ca, vm)
-    server.stop_service()
-    vm.networking.os.prohibit_global()
+    if service.get_state():
+        server.stop_service()
+    vm.networking.os_networking.prohibit_global()
     server_installation.cleanup_var_dir()
     server.start_service()
     server.setup_local_system()
     return server
 
 
+@pytest.fixture()
+def layout_file():
+    return 'direct.yaml'
+
+
 @pytest.fixture
 def system(vm_factory, mediaserver_deb, ca):
-    vms, _ = setup_networks([vm_factory() for _ in range(2)], {'10.254.0.0/28': {'first': None, 'second': None}})
-    one = _make_timeless_server(vms['first'], mediaserver_deb, ca, 'one')
-    two = _make_timeless_server(vms['second'], mediaserver_deb, ca, 'two')
+    one = _make_timeless_server(vm_factory.get('first'), mediaserver_deb, ca, 'one')
+    two = _make_timeless_server(vm_factory.get('second'), mediaserver_deb, ca, 'two')
     one.merge([two])
     response = one.rest_api.ec2.getCurrentTime.GET()
     primary_server_guid = response['primaryTimeServerGuid']

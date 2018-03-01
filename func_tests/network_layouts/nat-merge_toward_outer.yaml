@@ -1,0 +1,10 @@
+mergers:
+  outer:
+    inner:
+      settings: remote
+networks:
+  10.254.254.0/28:
+    outer:
+    router:
+      10.254.254.16/28:
+        inner:

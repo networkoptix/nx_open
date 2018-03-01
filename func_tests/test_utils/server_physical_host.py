@@ -149,7 +149,7 @@ class PhysicalInstallationHost(object):
         rest_api_url = '%s://%s:%d/' % (config.http_schema, self.os_access.hostname, server_port)
         service = AdHocService(self.os_access, installation.dir)
         server = Server(config.name, self.os_access, service, installation, rest_api_url, self._ca,
-                        rest_api_timeout=config.rest_api_timeout, internal_ip_port=server_port)
+                        None, rest_api_timeout=config.rest_api_timeout, internal_ip_port=server_port)
         self._allocated_server_list.append(server)
         return server
 

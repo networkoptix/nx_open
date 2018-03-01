@@ -103,7 +103,7 @@ public:
     bool SetupAudioInput();
 
     static QString toActiEncoderString(const QString& value);
-
+    static QString formatResolutionStr(const QSize& resolution);
 protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
@@ -168,7 +168,10 @@ private:
     boost::optional<QString> tryToGetSystemInfoValue(const ActiSystemInfo& report, const QString& key) const;
 
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
-
+    CameraDiagnostics::Result maxFpsForSecondaryResolution(
+        const QString& secondaryCodec, const QSize& secondaryResolution, int* outFps);
+    QString bestPrimaryCodec() const;
+    CameraDiagnostics::Result detectMaxFpsForSecondaryCodec();
 private:
     class TriggerOutputTask
     {
@@ -205,10 +208,23 @@ private:
         std::map<QByteArray, std::vector<QByteArray> > params;
     };
 
+    struct ComparableSize: public QSize
+    {
+    public:
+        ComparableSize(const QSize& value = QSize()): QSize(value) {}
+        bool operator<(const QSize& other) const
+        {
+            if (width() != other.width())
+                return width() < other.width();
+            return height() < other.height();
+        }
+    };
+
 
     QList<QSize> m_resolutionList[MAX_STREAMS];
     QList<int> m_availFps[MAX_STREAMS];
     QMap<int, QString> m_availableBitrates;
+    QMap<ComparableSize, int> m_maxSecondaryFps;
     QSet<QString> m_availableEncoders;
     RtpTransport::Value m_desiredTransport;
 

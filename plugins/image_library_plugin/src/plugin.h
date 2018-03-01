@@ -12,21 +12,14 @@
 
 #include <plugins/plugin_api.h>
 
-
 /*! \mainpage
     \par
     This project demonstrates usage of camera integration plugin API to add support of camera with remote archive (e.g., storage is bound directly to camera)\n
 
     \par Build how-to
-    Compiles to dynamic library. Tested on MS Windows 7 and Ubuntu 12.04.\n
+    Use provided CMakeLists.txt project file to generate solution for your favorite build tool or IDE.
+    Compiles to dynamic library. Tested on MS Windows 10 and Ubuntu 16.04.LTS\n
     Does not require any third party library\n
-
-    To build on linux:
-    \code
-    CD %SDK_DIR%/sample/image_library_plugin
-    make
-    \endcode
-    On windows in directory %SDK_DIR%/sample/image_library_plugin/win You can find image_library_plugin.vcproj project file for msvc2008.
     Successful build results in libimage_library_plugin.so (linux) and image_library_plugin.dll (mswin)
 
     \par Usage

@@ -6,25 +6,15 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-struct CameraExtraStatus
+enum class CameraExtraStatusFlag
 {
-    bool recording = false;
-    bool scheduled = false;
-    bool buggy =  false;
-
-    CameraExtraStatus& operator|=(const CameraExtraStatus& other)
-    {
-        recording |= other.recording;
-        scheduled |= other.scheduled;
-        buggy |= other.buggy;
-        return *this;
-    }
-
-    bool isEmpty() const
-    {
-        return !recording && !scheduled && !buggy;
-    }
+    empty = 0,
+    recording = 1 << 0,
+    scheduled = 1 << 1,
+    buggy = 1 << 2
 };
+Q_DECLARE_FLAGS(CameraExtraStatus, CameraExtraStatusFlag)
+Q_DECLARE_OPERATORS_FOR_FLAGS(CameraExtraStatus)
 
 } // namespace desktop
 } // namespace client

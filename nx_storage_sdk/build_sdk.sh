@@ -30,20 +30,22 @@ mkdir -p $TARGET_DIR/sample/ftpstorageplugin
 cp -f readme.txt $TARGET_DIR
 
 #Copying integration headers
-cp -f ../common/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/
+cp -f ../common_libs/nx_sdk/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/
 cp -f ../mediaserver_core/src/plugins/storage/third_party/third_party_storage.h $TARGET_DIR/include/plugins/storage/third_party
 
 pluginName=ftpstorageplugin
 
-#Copying plugin
+#Copying Ftp Storage plugin
 mkdir -p $TARGET_DIR/sample/$pluginName/src/impl
 
 cp -f ../storage_plugins/$pluginName/src/CMakeLists.txt $TARGET_DIR/sample/$pluginName/src
 
 cp -f ../storage_plugins/$pluginName/src/ftp_library.h $TARGET_DIR/sample/$pluginName/src
 cp -f ../storage_plugins/$pluginName/src/ftp_library.cpp $TARGET_DIR/sample/$pluginName/src
+
 cp -f ../storage_plugins/$pluginName/src/impl/ftplib.cpp $TARGET_DIR/sample/$pluginName/src/impl
 cp -f ../storage_plugins/$pluginName/src/impl/ftplib.h $TARGET_DIR/sample/$pluginName/src/impl
+
 cp -f ../storage_plugins/$pluginName/Doxyfile $TARGET_DIR/sample/$pluginName
 
 if [ $? -eq 0 ]

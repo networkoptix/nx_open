@@ -107,6 +107,7 @@ public:
     virtual bool setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString = nullptr) override;
 
     bool isConnectedViaSunapi() const;
+
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
@@ -127,6 +128,7 @@ private:
     CameraDiagnostics::Result initRemoteArchive();
 
     CameraDiagnostics::Result createNxProfiles();
+    CameraDiagnostics::Result fetchExistingProfiles();
     CameraDiagnostics::Result createNxProfile(
         Qn::ConnectionRole role,
         int* outNxProfile,

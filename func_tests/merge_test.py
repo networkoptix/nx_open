@@ -62,11 +62,11 @@ def check_admin_disabled(server):
 
 @pytest.fixture
 def one(server_factory, test_system_settings):
-    return server_factory('one', setup_settings=test_system_settings)
+    return server_factory.get('one', setup_settings=test_system_settings)
 
 @pytest.fixture
 def two(server_factory):
-    return server_factory('two')
+    return server_factory.get('two')
 
 
 def test_merge_take_local_settings(one, two, test_system_settings):
@@ -120,8 +120,8 @@ def test_merge_take_remote_settings(one, two):
 def test_merge_cloud_with_local(server_factory, cloud_account, test_system_settings):
     # Start local server systemName
     # and move it to working state
-    one = server_factory('one', setup_cloud_account=cloud_account, setup_settings=test_system_settings)
-    two = server_factory('two')
+    one = server_factory.get('one', setup_cloud_account=cloud_account, setup_settings=test_system_settings)
+    two = server_factory.get('two')
 
     # Merge systems (takeRemoteSettings = False) -> Error
     with pytest.raises(HttpError) as x_info:
@@ -139,8 +139,8 @@ def test_merge_cloud_with_local(server_factory, cloud_account, test_system_setti
 def test_merge_cloud_systems(server_factory, cloud_account_factory):
     cloud_account_1 = cloud_account_factory()
     cloud_account_2 = cloud_account_factory()
-    one = server_factory('one', setup_cloud_account=cloud_account_1)
-    two = server_factory('two', setup_cloud_account=cloud_account_2)
+    one = server_factory.get('one', setup_cloud_account=cloud_account_1)
+    two = server_factory.get('two', setup_cloud_account=cloud_account_2)
 
     # Merge 2 cloud systems one way
     with pytest.raises(HttpError) as x_info:
@@ -158,8 +158,8 @@ def test_merge_cloud_systems(server_factory, cloud_account_factory):
 
 def test_cloud_merge_after_disconnect(server_factory, cloud_account, test_system_settings):
     # Setup cloud and wait new cloud credentials
-    one = server_factory('one', setup_cloud_account=cloud_account, setup_settings=test_system_settings)
-    two = server_factory('two', setup_cloud_account=cloud_account)
+    one = server_factory.get('one', setup_cloud_account=cloud_account, setup_settings=test_system_settings)
+    two = server_factory.get('two', setup_cloud_account=cloud_account)
 
     # Check setupCloud's settings on Server1
     check_system_settings(
@@ -195,8 +195,8 @@ def wait_entity_merge_done(one, two, method, api_object, api_method, expected_re
         time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.0)
 
 def test_merge_resources(server_factory):
-    one = server_factory('one')
-    two = server_factory('two')
+    one = server_factory.get('one')
+    two = server_factory.get('two')
     user_data = generator.generate_user_data(1)
     camera_data = generator.generate_camera_data(1)
     one.rest_api.ec2.saveUser.POST(**user_data)
@@ -207,8 +207,8 @@ def test_merge_resources(server_factory):
 
 
 def test_restart_one_server(server_factory, cloud_account):
-    one = server_factory('one')
-    two = server_factory('two')
+    one = server_factory.get('one')
+    two = server_factory.get('two')
     one.merge([two])
 
     # Stop Server2 and clear its database

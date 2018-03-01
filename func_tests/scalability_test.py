@@ -71,7 +71,7 @@ def servers(metrics_saver, server_factory, lightweight_servers, config):
         synchronizeTimeWithInternet=utils.bool_to_str(False),
         ))
     start_time = utils.datetime_utc_now()
-    server_list = [server_factory('server_%04d' % (idx + 1),
+    server_list = [server_factory.get('server_%04d' % (idx + 1),
                            setup_settings=setup_settings,
                            rest_api_timeout=config.REST_API_TIMEOUT)
                        for idx in range(server_count)]
