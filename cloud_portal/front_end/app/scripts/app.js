@@ -7,41 +7,15 @@ angular.module('cloudApp.filters', []);
 angular.module('cloudApp.constants', []);
 angular.module('cloudApp.templates', []);
 
-angular.module('cloudApp', [
-    'ngCookies',
-    'ngResource',
-    'ngSanitize',
-    'ngAnimate',
-    'ngRoute',
-    'ui.bootstrap',
-    'ngStorage',
-    'base64',
-    'nxCommon',
-    'ngToast',
-    'angular-clipboard'
-]).config(['$httpProvider', function ($httpProvider) {
-    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-}]).config(['ngToastProvider', function(ngToastProvider) {
-    ngToastProvider.configure({
-        timeout: Config.alertTimeout,
-        animation: 'fade',
-        horizontalPosition: 'center',
-        maxNumber: Config.alertsMaxCount,
-        combineDuplications: true,
-        newestOnTop: false
-    });
-}]).config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
-    $locationProvider.html5Mode(true); //Get rid of hash in urls
-    $locationProvider.hashPrefix('!');
+window.Config = {};
+window.L = {};
 
 (function () {
 
     'use strict';
-
     angular
         .module('cloudApp', [
-            'ipCookie',
+            'ngCookies',
             'ngResource',
             'ngSanitize',
             'ngAnimate',

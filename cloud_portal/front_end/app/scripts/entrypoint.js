@@ -17,8 +17,6 @@ import 'ng-toast/dist/ngToast.css';
 import 'ng-toast/dist/ngToast-animations.css';
 import '../styles/main.scss';
 
-require('./config.js');
-require('./bootstrap.js');
 require('./client-detection.js');
 
 //Vendor
@@ -47,7 +45,9 @@ require('./services/account.js');
 require('./services/angular-uuid2.js');
 require('./services/cloud_api.js');
 require('./services/dialogs.js');
+require('./services/language.js');
 require('./services/mediaserver.js');
+require('./services/nx-config.js');
 require('./services/page.js');
 require('./services/poll.js');
 require('./services/process.js');
