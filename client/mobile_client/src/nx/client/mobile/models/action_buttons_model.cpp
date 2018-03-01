@@ -4,19 +4,30 @@
 #include <nx/client/mobile/software_trigger/software_triggers_watcher.h>
 #include <nx/client/core/two_way_audio/two_way_audio_availability_watcher.h>
 #include <nx/utils/log/log.h>
-
+#include <nx/vms/event/strings_helper.h>
 
 namespace {
 
 enum Roles
 {
     typeRoleId = Qt::UserRole,
-    iconPathRoleId
+    enabledRoleId,
+    iconPathRoleId,
+
+    // Software trigger roles
+    triggerNameRoleId,
+    triggerIdRoleId,
+    triggerIsProlongedRoleId,
 };
 
 const QHash<int, QByteArray> kRoleNames = {
     {typeRoleId, "type"},
-    {iconPathRoleId, "iconPath"}};
+    {enabledRoleId, "enabled"},
+    {iconPathRoleId, "iconPath"},
+
+    {triggerNameRoleId, "triggerName"},
+    {triggerIdRoleId, "triggerId"},
+    {triggerIsProlongedRoleId, "prolongedTrigger"}};
 
 } // namespace
 
@@ -132,6 +143,8 @@ ActionButtonsModel::ActionButtonsModel(QObject* parent):
     m_twoWayAudioAvailabilityWatcher(new TwoWayAudioAvailabilityWatcher()),
     m_softwareTriggeresWatcher(new SoftwareTriggersWatcher())
 {
+    connect(this, &ActionButtonsModel::resourceIdChanged,
+        this, &ActionButtonsModel::handleResourceIdChanged);
     connect(m_ptzAvailabilityWatcher, &PtzAvailabilityWatcher::availabilityChanged,
         this, &ActionButtonsModel::updatePtzButtonVisibility);
     connect(m_twoWayAudioAvailabilityWatcher, &TwoWayAudioAvailabilityWatcher::availabilityChanged,
@@ -142,11 +155,30 @@ ActionButtonsModel::ActionButtonsModel(QObject* parent):
     connect(m_softwareTriggeresWatcher, &SoftwareTriggersWatcher::triggerRemoved,
         this, &ActionButtonsModel::removeSoftwareTriggerButton);
 
-    connect(this, &ActionButtonsModel::resourceIdChanged,
-        this, &ActionButtonsModel::handleResourceIdChanged);
+    const auto emitDataChanged =
+        [this](const QnUuid& id, int roleId)
+        {
+            const auto row = triggerButtonIndexById(id);
+            if (row < 0)
+            {
+                NX_EXPECT(false, "Wrong trigger button id");
+                return;
+            }
 
-    updatePtzButtonVisibility();
-    updateTwoWayAudioButtonVisibility();
+            const auto rowIndex = index(row);
+            emit dataChanged(rowIndex, rowIndex, {roleId});
+        };
+
+    connect(m_softwareTriggeresWatcher, &SoftwareTriggersWatcher::triggerEnabledChanged,
+        this, &ActionButtonsModel::updateTriggerEnabled);
+    connect(m_softwareTriggeresWatcher, &SoftwareTriggersWatcher::triggerIconChanged,
+        this, &ActionButtonsModel::updateTriggerIcon);
+    connect(m_softwareTriggeresWatcher, &SoftwareTriggersWatcher::triggerNameChanged,
+        this, &ActionButtonsModel::updateTriggerName);
+    connect(m_softwareTriggeresWatcher, &SoftwareTriggersWatcher::triggerIdChanged,
+        this, &ActionButtonsModel::updateTriggerId);
+    connect(m_softwareTriggeresWatcher, &SoftwareTriggersWatcher::triggerProlongedChanged,
+        this, &ActionButtonsModel::updateTriggerProlonged);
 }
 
 ActionButtonsModel::~ActionButtonsModel()
@@ -187,15 +219,40 @@ QVariant ActionButtonsModel::data(const QModelIndex& index, int role) const
     }
 
     const auto& button = m_buttons.at(row);
+
     switch (role)
     {
         case typeRoleId:
             return button->type;
+        case enabledRoleId:
+            return button->enabled;
         case iconPathRoleId:
             return button->iconPath;
-        default:
-            return QVariant();
     }
+
+    const auto softwareButton = button->type == SoftTriggerButton
+        ? static_cast<SoftwareButton*>(button.data())
+        : nullptr;
+
+    switch(role)
+    {
+        case triggerNameRoleId:
+            if (softwareButton)
+                return vms::event::StringsHelper::getSoftwareTriggerName(softwareButton->data.name);
+            NX_EXPECT(false, "Wrong software trigger button");
+            break;
+        case triggerIdRoleId:
+            if (softwareButton)
+                return softwareButton->data.triggerId;
+            NX_EXPECT(false, "Wrong software trigger button");
+            break;
+        case triggerIsProlongedRoleId:
+            if (softwareButton)
+                return softwareButton->data.prolonged;
+            NX_EXPECT(false, "Wrong software trigger button");
+            break;
+    }
+
     return QVariant();
 }
 
@@ -228,7 +285,7 @@ QnUuid ActionButtonsModel::getSoftwareButtonId(const ButtonPtr& button)
     return softwareButton ? softwareButton->id : QnUuid();
 }
 
-ActionButtonsModel::ButtonList::const_iterator ActionButtonsModel::lowerBoundById(
+ActionButtonsModel::ButtonList::const_iterator ActionButtonsModel::lowerBoundByTriggerButtonId(
     const QnUuid& id) const
 {
     static const auto compareFunction =
@@ -250,17 +307,17 @@ ActionButtonsModel::ButtonList::const_iterator ActionButtonsModel::lowerBoundByI
         SoftwareButton::fake(id), compareFunction);
 }
 
-int ActionButtonsModel::buttonIndexById(const QnUuid& id) const
+int ActionButtonsModel::triggerButtonIndexById(const QnUuid& id) const
 {
-    const auto it = lowerBoundById(id);
+    const auto it = lowerBoundByTriggerButtonId(id);
     return it != m_buttons.end() && getSoftwareButtonId(*it) == id
         ? it - m_buttons.begin()
         : -1;
 }
 
-int ActionButtonsModel::insertionIndexById(const QnUuid& ruleId) const
+int ActionButtonsModel::triggerButtonInsertionIndexById(const QnUuid& ruleId) const
 {
-    const auto it = lowerBoundById(ruleId);
+    const auto it = lowerBoundByTriggerButtonId(ruleId);
     return it == m_buttons.end() ? m_buttons.size() : it - m_buttons.begin();
 }
 
@@ -270,13 +327,13 @@ void ActionButtonsModel::addSoftwareTriggerButton(
     const QString& iconPath,
     bool enabled)
 {
-    const auto index = insertionIndexById(id);
-    insertButton(insertionIndexById(id), SoftwareButton::create(id, data, iconPath, enabled));
+    const auto index = triggerButtonInsertionIndexById(id);
+    insertButton(triggerButtonInsertionIndexById(id), SoftwareButton::create(id, data, iconPath, enabled));
 }
 
 void ActionButtonsModel::removeSoftwareTriggerButton(const QnUuid& id)
 {
-    removeButton(buttonIndexById(id));
+    removeButton(triggerButtonIndexById(id));
 }
 
 void ActionButtonsModel::updatePtzButtonVisibility()
@@ -352,6 +409,101 @@ void ActionButtonsModel::removeButton(int index)
     beginRemoveRows(QModelIndex(), index, index);
     m_buttons.removeAt(index);
     endRemoveRows();
+}
+
+void ActionButtonsModel::updateTriggerEnabled(const QnUuid& id)
+{
+    const auto row = triggerButtonIndexById(id);
+    if (row < 0)
+    {
+        NX_EXPECT(false, "Software button does not exist");
+        return;
+    }
+
+    const auto button = static_cast<SoftwareButton*>(m_buttons[row].data());
+    const auto enabled = m_softwareTriggeresWatcher->triggerEnabled(id);
+    if (button->enabled == enabled)
+        return;
+
+    button->enabled = enabled;
+    const auto rowIndex = index(row);
+    emit dataChanged(rowIndex, rowIndex, {enabledRoleId});
+}
+
+void ActionButtonsModel::updateTriggerName(const QnUuid& id)
+{
+    const auto row = triggerButtonIndexById(id);
+    if (row < 0)
+    {
+        NX_EXPECT(false, "Software button does not exist");
+        return;
+    }
+
+    const auto button = static_cast<SoftwareButton*>(m_buttons[row].data());
+    const auto name = m_softwareTriggeresWatcher->triggerData(id).name;
+    if (button->data.name == name)
+        return;
+
+    button->data.name = name;
+    const auto rowIndex = index(row);
+    emit dataChanged(rowIndex, rowIndex, {triggerNameRoleId});
+}
+
+void ActionButtonsModel::updateTriggerIcon(const QnUuid& id)
+{
+    const auto row = triggerButtonIndexById(id);
+    if (row < 0)
+    {
+        NX_EXPECT(false, "Software button does not exist");
+        return;
+    }
+
+    const auto button = static_cast<SoftwareButton*>(m_buttons[row].data());
+    const auto icon = m_softwareTriggeresWatcher->triggerIcon(id);
+    if (button->iconPath == icon)
+        return;
+
+    button->iconPath = icon;
+    const auto rowIndex = index(row);
+    emit dataChanged(rowIndex, rowIndex, {iconPathRoleId});
+}
+
+void ActionButtonsModel::updateTriggerId(const QnUuid& id)
+{
+    const auto row = triggerButtonIndexById(id);
+    if (row < 0)
+    {
+        NX_EXPECT(false, "Software button does not exist");
+        return;
+    }
+
+    const auto button = static_cast<SoftwareButton*>(m_buttons[row].data());
+    const auto triggerId = m_softwareTriggeresWatcher->triggerData(id).triggerId;
+    if (button->data.triggerId == triggerId)
+        return;
+
+    button->data.triggerId = triggerId;
+    const auto rowIndex = index(row);
+    emit dataChanged(rowIndex, rowIndex, {triggerIdRoleId});
+}
+
+void ActionButtonsModel::updateTriggerProlonged(const QnUuid& id)
+{
+    const auto row = triggerButtonIndexById(id);
+    if (row < 0)
+    {
+        NX_EXPECT(false, "Software button does not exist");
+        return;
+    }
+
+    const auto button = static_cast<SoftwareButton*>(m_buttons[row].data());
+    const auto prolonged = m_softwareTriggeresWatcher->triggerData(id).prolonged;
+    if (button->data.prolonged == prolonged)
+        return;
+
+    button->data.prolonged = prolonged;
+    const auto rowIndex = index(row);
+    emit dataChanged(rowIndex, rowIndex, {triggerIsProlongedRoleId});
 }
 
 } // namespace mobile

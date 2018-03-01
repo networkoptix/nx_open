@@ -697,9 +697,10 @@ QString StringsHelper::defaultSoftwareTriggerName()
     return tr("Trigger Name");
 }
 
-QString StringsHelper::getSoftwareTriggerName(const QString& id)
+
+QString StringsHelper::getSoftwareTriggerName(const QString& name)
 {
-    const auto triggerId = id.trimmed();
+    const auto triggerId = name.trimmed();
     return triggerId.isEmpty() ? defaultSoftwareTriggerName() : triggerId;
 }
 

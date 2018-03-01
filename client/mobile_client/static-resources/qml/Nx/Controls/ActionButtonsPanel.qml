@@ -29,26 +29,16 @@ ButtonsPanel
 
     onResourceIdChanged:
     {
-        // reset states of buttons
+        //TODO: reset states of buttons
     }
 
     onPressedChanged:
     {
         var type = d.modelDataAccessor.getData(index, "type")
-        if (type != ActionButtonsModel.TwoWayAudioButton)
-            return
-
-        if (pressed)
-        {
-            control.twoWayAudioButtonPressed()
-            hintControl.showCustomProcess(voiceVisualizerComponent,
-                d.modelDataAccessor.getData(index, "iconPath"))
-        }
-        else
-        {
-            control.twoWayAudioButtonReleased()
-            hintControl.hide()
-        }
+        if (type == ActionButtonsModel.TwoWayAudioButton)
+            d.handleTwoWayAudioPressed(pressed)
+        else if (type == ActionButtonsModel.SoftTriggerButton)
+            d.handleSoftwareTriggerPressed(pressed)
     }
 
     onButtonClicked:
@@ -64,7 +54,10 @@ ButtonsPanel
                     d.modelDataAccessor.getData(index, "iconPath"))
                 break
             case ActionButtonsModel.SoftTriggerButton:
-                // TODO: handle stuff
+                // TODO: temporary. Remove this
+                hintControl.showHint(
+                    d.modelDataAccessor.getData(index, "triggerName"),
+                    d.modelDataAccessor.getData(index, "iconPath"))
                 break
         }
     }
@@ -83,6 +76,26 @@ ButtonsPanel
                 {
                     model: buttonModel
                 }
+
+            function handleTwoWayAudioPressed(pressed)
+            {
+                if (pressed)
+                {
+                    control.twoWayAudioButtonPressed()
+                    hintControl.showCustomProcess(voiceVisualizerComponent,
+                        d.modelDataAccessor.getData(index, "iconPath"))
+                }
+                else
+                {
+                    control.twoWayAudioButtonReleased()
+                    hintControl.hide()
+                }
+            }
+
+            function handleSoftwareTriggerPressed(pressed)
+            {
+
+            }
         }
 
     Component

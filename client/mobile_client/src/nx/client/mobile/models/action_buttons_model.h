@@ -18,6 +18,7 @@ class PtzAvailabilityWatcher;
 class SoftwareTriggersWatcher;
 class SoftwareTriggerData;
 
+// TODO: RENAME EVERYTHING. Refactor a bit.
 class ActionButtonsModel: public Connective<QAbstractListModel>
 {
     Q_OBJECT
@@ -70,11 +71,11 @@ private:
 
     bool ptzButtonVisible() const;
 
-    ButtonList::const_iterator lowerBoundById(const QnUuid& ruleId) const;
+    ButtonList::const_iterator lowerBoundByTriggerButtonId(const QnUuid& ruleId) const;
 
-    int buttonIndexById(const QnUuid& id) const;
+    int triggerButtonIndexById(const QnUuid& id) const;
 
-    int insertionIndexById(const QnUuid& id) const;
+    int triggerButtonInsertionIndexById(const QnUuid& id) const;
 
     void addSoftwareTriggerButton(
         const QnUuid& id,
@@ -83,6 +84,12 @@ private:
         bool enabled);
 
     void removeSoftwareTriggerButton(const QnUuid& id);
+
+    void updateTriggerEnabled(const QnUuid& id);
+    void updateTriggerName(const QnUuid& id);
+    void updateTriggerIcon(const QnUuid& id);
+    void updateTriggerId(const QnUuid& id);
+    void updateTriggerProlonged(const QnUuid& id);
 
     static QnUuid getSoftwareButtonId(const ButtonPtr& button);
 

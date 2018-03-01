@@ -9,6 +9,7 @@
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
 #include <watchers/user_watcher.h>
+#include <utils/common/synctime.h>
 
 namespace {
 
@@ -71,19 +72,19 @@ SoftwareTriggersWatcher::DescriptionPtr SoftwareTriggersWatcher::Description::cr
 //
 
 SoftwareTriggersWatcher::SoftwareTriggersWatcher(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    m_commonModule(qnClientCoreModule->commonModule()),
+    m_ruleManager(m_commonModule->eventRuleManager())
 {
-    const auto commonModule = qnClientCoreModule->commonModule();
-    const auto eventRuleManager = commonModule->eventRuleManager();
-
-    connect(eventRuleManager, &vms::event::RuleManager::resetRules,
+    connect(m_ruleManager, &vms::event::RuleManager::rulesReset,
         this, &SoftwareTriggersWatcher::updateTriggers);
-    // TODO: add processing //rule added // rule removed etc
-
+    connect(m_ruleManager, &vms::event::RuleManager::ruleAddedOrUpdated,
+        this, &SoftwareTriggersWatcher::updateTriggerByRule);
+    connect(m_ruleManager, &vms::event::RuleManager::ruleRemoved,
+        this, &SoftwareTriggersWatcher::tryRemoveTrigger);
 
     connect(this, &SoftwareTriggersWatcher::resourceIdChanged,
         this, &SoftwareTriggersWatcher::updateTriggers);
-
 }
 
 void SoftwareTriggersWatcher::setResourceId(const QnUuid& resourceId)
@@ -95,11 +96,17 @@ void SoftwareTriggersWatcher::setResourceId(const QnUuid& resourceId)
     emit resourceIdChanged();
 }
 
-void SoftwareTriggersWatcher::forcedUpdateEnabledStates()
+SoftwareTriggerData SoftwareTriggersWatcher::triggerData(const QnUuid& id) const
 {
+    const auto it = m_data.find(id);
+    if (it != m_data.end())
+        return it.value()->data;
+
+    NX_EXPECT(false, "Invalid trigger id");
+    return SoftwareTriggerData();
 }
 
-bool SoftwareTriggersWatcher::isEnabled(const QnUuid& id) const
+bool SoftwareTriggersWatcher::triggerEnabled(const QnUuid& id) const
 {
     const auto it = m_data.find(id);
     if (it != m_data.end())
@@ -109,7 +116,7 @@ bool SoftwareTriggersWatcher::isEnabled(const QnUuid& id) const
     return false;
 }
 
-QString SoftwareTriggersWatcher::icon(const QnUuid& id) const
+QString SoftwareTriggersWatcher::triggerIcon(const QnUuid& id) const
 {
     const auto it = m_data.find(id);
     if (it != m_data.end())
@@ -119,57 +126,103 @@ QString SoftwareTriggersWatcher::icon(const QnUuid& id) const
     return QString();
 }
 
-
-void SoftwareTriggersWatcher::clearTriggers()
-{
-    while(!m_data.isEmpty())
-        removeTrigger(m_data.begin().key());
-}
-
-void SoftwareTriggersWatcher::removeTrigger(const QnUuid& id)
+void SoftwareTriggersWatcher::tryRemoveTrigger(const QnUuid& id)
 {
     if (m_data.remove(id))
         emit triggerRemoved(id);
-    else
-        NX_EXPECT(false, "Wrong trigger id index");
 }
 
 void SoftwareTriggersWatcher::updateTriggers()
 {
-    const auto commonModule = qnClientCoreModule->commonModule();
-    const auto accessManager = commonModule->resourceAccessManager();
-    const auto userWatcher = commonModule->instance<QnUserWatcher>();
-    const auto currentUser = userWatcher->user();
+    for(const auto& rule: m_ruleManager->rules())
+        updateTriggerByRule(rule);
+}
 
-    if (!accessManager->hasGlobalPermission(currentUser, Qn::GlobalUserInputPermission))
+void SoftwareTriggersWatcher::updateTriggersAvailability()
+{
+    for (const auto& id: m_data.keys())
+        updateTriggerAvailability(id, true);
+}
+
+void SoftwareTriggersWatcher::updateTriggerByRule(const nx::vms::event::RulePtr& rule)
+{
+    const auto id = rule->id();
+    const auto accessManager = m_commonModule->resourceAccessManager();
+    const auto currentUser = m_commonModule->instance<QnUserWatcher>()->user();
+    if (!accessManager->hasGlobalPermission(currentUser, Qn::GlobalUserInputPermission)
+        || !appropriateSoftwareTriggerRule(rule, currentUser, m_resourceId))
     {
-        clearTriggers();
+        tryRemoveTrigger(id);
         return;
     }
 
-    DescriptionsHash newData;
-    for(const auto& rule: commonModule->eventRuleManager()->rules())
-    {
-        if (appropriateSoftwareTriggerRule(rule, currentUser, m_resourceId))
-            newData.insert(rule->id(), Description::create(rule));
-    }
+    const auto it = m_data.find(rule->id());
+    const bool createNewTrigger = it == m_data.end();
+    const auto data = createNewTrigger
+        ? m_data.insert(id, Description::create(rule)).value()
+        : it.value();
 
-    const auto oldIds = m_data.keys().toSet();
-    const auto newIds = newData.keys().toSet();
-
-    using IdsSet = QSet<DescriptionsHash::key_type>;
-    const auto removedIds = IdsSet(oldIds).subtract(newIds);
-    const auto addedIds = IdsSet(newIds).subtract(oldIds);
-
-    for (const auto& id: removedIds)
-        removeTrigger(id);
-
-    for (const auto& id: addedIds)
-    {
-        const auto data = newData.value(id);
-        m_data.insert(id, data);
+    updateTriggerAvailability(id, !createNewTrigger);
+    updateTriggerData(id, !createNewTrigger);
+    if (createNewTrigger)
         emit triggerAdded(id, data->data, data->iconPath, data->enabled);
+}
+
+void SoftwareTriggersWatcher::updateTriggerData(const QnUuid& id, bool emiSignal)
+{
+    const auto commonModule = qnClientCoreModule->commonModule();
+    const auto eventRuleManager = commonModule->eventRuleManager();
+
+    const auto it = m_data.find(id);
+    if (it == m_data.end())
+        return;
+
+    const auto& currentData = it.value();
+    const auto newData = Description::create(eventRuleManager->rule(id));
+    if (newData->iconPath != currentData->iconPath)
+    {
+        currentData->iconPath = newData->iconPath;
+        emit triggerIconChanged(id);
     }
+
+    if (newData->data.name != currentData->data.name)
+    {
+        currentData->data.name = newData->data.name;
+        emit triggerNameChanged(id);
+    }
+
+    if (newData->data.triggerId != currentData->data.triggerId)
+    {
+        currentData->data.triggerId = newData->data.triggerId;
+        emit triggerIdChanged(id);
+    }
+
+    if (newData->data.prolonged != currentData->data.prolonged)
+    {
+        currentData->data.prolonged = newData->data.prolonged;
+        emit triggerProlongedChanged(id);
+    }
+}
+
+void SoftwareTriggersWatcher::updateTriggerAvailability(const QnUuid& id, bool emitSignal)
+{
+    const auto commonModule = qnClientCoreModule->commonModule();
+    const auto rule = commonModule->eventRuleManager()->rule(id);
+    if (!rule)
+        return;
+
+    const auto descriptionIt = m_data.find(id);
+    if (descriptionIt == m_data.end())
+        return;
+
+    const bool enabled = rule->isScheduleMatchTime(qnSyncTime->currentDateTime());
+    const auto description = descriptionIt.value();
+    if (description->enabled == enabled)
+        return;
+
+    description->enabled = enabled;
+    if (emitSignal)
+        emit triggerEnabledChanged(id);
 }
 
 } // namespace mobile
