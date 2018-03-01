@@ -32,9 +32,9 @@ class NoptixLibrary(object):
     def get_random_email(self):
         return "noptixqa+" + str(time.time()) + "@gmail.com"
 
-    def get_30_random_emails(self):
+    def get_many_random_emails(self, howMany):
         emails = []
-        for x in xrange(0,30):
+        for x in xrange(0,int(howMany)):
             emails.append(self.get_random_email())
             time.sleep(.2)
         return emails

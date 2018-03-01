@@ -9,6 +9,7 @@ Suite Teardown    Close All Browsers
 ${email}           ${EMAIL OWNER}
 ${password}        ${BASE PASSWORD}
 ${url}             ${CLOUD TEST}
+${how many}        30
 
 *** Keywords ***
 Log in to Auto Tests System
@@ -27,17 +28,17 @@ Check For Alert2
 
 *** Test Cases ***
 Add Then Remove
-    @{emails}    Get 30 Random Emails
+    @{emails}    Get Many Random Emails    ${how many}
     Open Browser and go to URL    ${url}
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
-    :FOR    ${x}    IN RANGE    30
+    :FOR    ${x}    IN RANGE    ${how many}
     \  Click Button    ${SHARE BUTTON SYSTEMS}
     \  Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     \  Input Text    ${SHARE EMAIL}    @{emails}[${x}]
     \  Click Button    ${SHARE BUTTON MODAL}
     \  Check For Alert2    ${NEW PERMISSIONS SAVED}
     Register Keyword To Run On Failure    Capture Page Screenshot
-    :FOR    ${x}    IN RANGE    30
+    :FOR    ${x}    IN RANGE    ${how many}
     \  Run Keyword And Continue On Failure    Remove User Permissions    @{emails}[${x}]
     Close Browser
