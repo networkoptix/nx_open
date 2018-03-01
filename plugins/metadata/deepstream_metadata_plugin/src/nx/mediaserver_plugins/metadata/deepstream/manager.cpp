@@ -1,15 +1,15 @@
 #include "manager.h"
 
-#include <iostream>
-#include <chrono>
-#include <math.h>
-
 #include <plugins/plugin_tools.h>
+
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
 
-#define NX_DEBUG_ENABLE_OUTPUT true
-#define NX_PRINT_PREFIX "metadata::stub::Manager::"
+#include <nx/mediaserver_plugins/metadata/deepstream/deepstream_common.h>
+#include <nx/mediaserver_plugins/metadata/deepstream/default_pipeline_builder.h>
+#include <nx/mediaserver_plugins/metadata/deepstream/deepstream_metadata_plugin_ini.h>
+
+#define NX_PRINT_PREFIX "metadata::deepstream::Manager::"
 #include <nx/kit/debug.h>
 
 namespace nx {
@@ -17,26 +17,16 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace deepstream {
 
-namespace {
-
-static const nxpl::NX_GUID kLineCrossingEventGuid =
-    {{0x7E, 0x94, 0xCE, 0x15, 0x3B, 0x69, 0x47, 0x19, 0x8D, 0xFD, 0xAC, 0x1B, 0x76, 0xE5, 0xD8, 0xF4}};
-
-static const nxpl::NX_GUID kObjectInTheAreaEventGuid =
-    {{0xB0, 0xE6, 0x40, 0x44, 0xFF, 0xA3, 0x4B, 0x7F, 0x80, 0x7A, 0x06, 0x0C, 0x1F, 0xE5, 0xA0, 0x4C}};
-
-static const nxpl::NX_GUID kCarDetectedEventGuid =
-    {{ 0x15, 0x3D, 0xD8, 0x79, 0x1C, 0xD2, 0x46, 0xB7, 0xAD, 0xD6, 0x7C, 0x6B, 0x48, 0xEA, 0xC1, 0xFC }};
-
-} // namespace
-
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Manager::Manager(Plugin* plugin):
-    m_plugin(plugin)
+Manager::Manager(Plugin* plugin, const std::string& id):
+    m_plugin(plugin),
+    m_pipelineBuilder(std::make_unique<DefaultPipelineBuilder>()),
+    m_pipeline(m_pipelineBuilder->build(id))
 {
-    NX_PRINT << __func__ << "(\"" << plugin->name() << "\") -> " << this;
+    NX_OUTPUT << __func__ << "(\"" << plugin->name() << "\") -> " << this;
+    m_pipeline->start();
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -63,14 +53,30 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
 
 void Manager::setDeclaredSettings(const nxpl::Setting *settings, int count)
 {
-    // Do nothing.
+    NX_OUTPUT << __func__ << " Received Manager settings:";
+    NX_OUTPUT << "{";
+    for (int i = 0; i < count; ++i)
+    {
+        NX_OUTPUT << "    \"" << settings[i].name
+            << "\": \"" << settings[i].value << "\""
+            << ((i < count - 1) ? "," : "");
+    }
+    NX_OUTPUT << "}";
+
 }
 
 Error Manager::setHandler(MetadataHandler* handler)
 {
-    NX_OUTPUT << __func__ << "() BEGIN";
+    NX_OUTPUT << __func__ << " Setting metadata handler";
     std::lock_guard<std::mutex> lock(m_mutex);
     m_handler = handler;
+    m_pipeline->setMetadataCallback(
+        [this](MetadataPacket* packet)
+        {
+            NX_OUTPUT << __func__ << " Calling metadata handler";
+            m_handler->handleMetadata(Error::noError, packet);
+        });
+
     NX_OUTPUT << __func__ << "() END -> noError";
     return Error::noError;
 }
@@ -79,51 +85,62 @@ Error Manager::startFetchingMetadata(
     nxpl::NX_GUID* /*eventTypeList*/,
     int /*eventTypeListSize*/)
 {
-    NX_OUTPUT << __func__ << "() BEGIN";
-    NX_OUTPUT << __func__ << "() END -> noError";
+    NX_OUTPUT << __func__ << " Starting to fetch metadata. Doing nothing, actually...";
     return Error::noError;
 }
 
 nx::sdk::Error Manager::pushDataPacket(nx::sdk::metadata::DataPacket* dataPacket)
 {
-    NX_OUTPUT << __func__ << "() BEGIN";
-    NX_OUTPUT << __func__ << "() END -> noError";
+#if 0
+    nxpt::ScopedRef<nx::sdk::metadata::CompressedVideoPacket> compressedVideo(
+        dataPacket->queryInterface(nx::sdk::metadata::IID_CompressedVideoPacket));
+
+    if (!compressedVideo)
+        return nx::sdk::Error::noError;
+
+    NX_OUTPUT << __func__ << " Frame timestamp is: " << dataPacket->timestampUsec();
+#endif
+
+    NX_OUTPUT
+        << __func__
+        << " Pushing data packet to pipeline";
+
+    m_pipeline->pushDataPacket(dataPacket);
     return Error::noError;
 }
 
 Error Manager::stopFetchingMetadata()
 {
-    NX_OUTPUT << __func__ << "() BEGIN";
+    NX_OUTPUT << __func__ << " Stopping to fetch metadata. Doing nothing, actually...";
     return Error::noError;
 }
 
 const char* Manager::capabilitiesManifest(Error* error)
 {
     *error = Error::noError;
-
-    // TODO: Reuse GUID constants declared in this file.
-    return R"json(
+    static const auto managerManifest = (R"json(
         {
-            "supportedEventTypes": [
-                "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
-                "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}"
-            ],
             "supportedObjectTypes": [
-                "{153DD879-1CD2-46B7-ADD6-7C6B48EAC1FC}"
+                ")json" + nxpt::NxGuidHelper::toStdString(kCarGuid) + R"json(",
+                ")json" + nxpt::NxGuidHelper::toStdString(kHumanGuid) + R"json(",
+                ")json" + nxpt::NxGuidHelper::toStdString(kRcGuid) + R"json("
             ]
         }
-    )json";
+    )json");
+
+    return managerManifest.c_str();
 }
+
 void Manager::freeManifest(const char* data)
 {
-    NX_PRINT << __func__ << "Freeing manifest";
+    NX_OUTPUT << __func__ << " Freeing manifest, doing nothing actually...";
 }
 
 Manager::~Manager()
 {
-    NX_PRINT << __func__ << "(" << this << ") BEGIN";
+    NX_OUTPUT << __func__ << "(" << this << ") BEGIN";
     stopFetchingMetadata();
-    NX_PRINT << __func__ << "(" << this << ") END";
+    NX_OUTPUT << __func__ << "(" << this << ") END";
 }
 
 } // namespace deepstream

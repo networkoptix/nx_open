@@ -1,14 +1,14 @@
 #pragma once
 
 #include <thread>
-#include <atomic>
 #include <memory>
 #include <mutex>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/consuming_camera_manager.h>
 
-#include "plugin.h"
+#include <nx/sdk/metadata/plugin.h>
+#include <nx/sdk/metadata/consuming_camera_manager.h>
+#include <nx/mediaserver_plugins/metadata/deepstream/pipeline_builder.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -18,7 +18,7 @@ namespace deepstream {
 class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::ConsumingCameraManager>
 {
 public:
-    Manager(Plugin* plugin);
+    Manager(nx::sdk::metadata::Plugin* plugin, const std::string& id);
     virtual ~Manager();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
@@ -26,8 +26,8 @@ public:
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nxpl::NX_GUID* /*eventTypeList*/,
-        int /*eventTypeListSize*/) override;
+        nxpl::NX_GUID* eventTypeList,
+        int eventTypeListSize) override;
 
     virtual nx::sdk::Error setHandler(
         nx::sdk::metadata::MetadataHandler* handler) override;
@@ -42,8 +42,10 @@ public:
     virtual nx::sdk::Error pushDataPacket(nx::sdk::metadata::DataPacket* dataPacket) override;
 
 private:
-    Plugin* const m_plugin;
+    nx::sdk::metadata::Plugin* const m_plugin;
     nx::sdk::metadata::MetadataHandler* m_handler;
+    std::unique_ptr<PipelineBuilder> m_pipelineBuilder;
+    std::unique_ptr<nx::gstreamer::Pipeline> m_pipeline;
     mutable std::mutex m_mutex;
 };
 
