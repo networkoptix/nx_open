@@ -137,13 +137,11 @@ bool MultipartContentParser::setContentType( const StringType& contentType )
     if( nx_http::ConstBufferRefType(contentType, 0, sizeof(multipartContentType)-1) != multipartContentType )
         return false;   //unexpected content type
 
+    // Searching first non-space.
     const nx_http::StringType::value_type* boundaryStart = std::find_if(
         sepPos+1,
         contentType.constData()+contentType.size(),
-        [](const nx_http::StringType::value_type& val)
-        {
-            return val != ' '; //searching first non-space
-        });
+        [](const auto& val) { return val != ' ';  });
     if( boundaryStart == contentType.constData()+contentType.size() )
     {
         //failed to read boundary marker
