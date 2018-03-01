@@ -9,7 +9,7 @@ add_subdirectory(axis_metadata_plugin)
 
 # add_subdirectory(vca_metadata_plugin)
 
-if (LINUX AND ${arch} STREQUAL "x64")
+if (targetDevice STREQUAL "tx1")
     add_subdirectory(deepstream_metadata_plugin)
 endif()
 
