@@ -164,7 +164,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkPushMyScreen)
     target->addFlags(Qn::desktop_camera);
     auto videoWall = addVideoWall();
     auto layout = addLayoutForVideoWall(videoWall);
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
 
     QnLayoutItemData layoutItem;
     layoutItem.resource.id = target->getId();
