@@ -12,3 +12,5 @@ netaddr
 pytest-instafail
 pyyaml
 pathlib2
+pylru==1.0.9
+datadiff==2.0.0

@@ -77,7 +77,7 @@ def second_camera_backup_type(request):
 
 @pytest.fixture
 def server(server_factory, system_backup_type):
-    server = server_factory('server', start=False)
+    server = server_factory.get('server', start=False)
     server.os_access.run_command(['rm', '-rfv', BACKUP_STORAGE_PATH])
     server.os_access.run_command(['mkdir', '-p', BACKUP_STORAGE_PATH])
     server.start_service()
@@ -122,7 +122,7 @@ def add_backup_storage(server):
         parentId=server.ecs_guid,
         storageType='local',
         usedForWriting=True,
-        url=BACKUP_STORAGE_PATH)
+        url=str(BACKUP_STORAGE_PATH))
     server.rest_api.ec2.saveStorage.POST(**backup_storage_data)
     storages = server.rest_api.ec2.getStorages.GET()
     backup_storage = [s for s in server.rest_api.ec2.getStorages.GET()

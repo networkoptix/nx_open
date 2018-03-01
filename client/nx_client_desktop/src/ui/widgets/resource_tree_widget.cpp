@@ -153,6 +153,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     ui->resourcesTreeView->setItemDelegateForColumn(Qn::NameColumn, m_itemDelegate);
     ui->resourcesTreeView->setProperty(style::Properties::kSideIndentation,
         QVariant::fromValue(QnIndents(0, 1)));
+    ui->resourcesTreeView->setIndentation(style::Metrics::kDefaultIconSize);
 
     ui->resourcesTreeView->setConfirmExpandDelegate(
         [](const QModelIndex& index) -> bool

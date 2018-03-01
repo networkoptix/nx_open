@@ -34,13 +34,19 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
 
     m_overrideContinuousMove = m_flip != 0 || (m_traits & (Ptz::FourWayPtzTrait | Ptz::EightWayPtzTrait));
 
+    resourceData.value(Qn::PTZ_CAPABILITIES_TO_ADD_PARAM_NAME, &m_capabilitiesToAdd);
+    resourceData.value(Qn::PTZ_CAPABILITIES_TO_REMOVE_PARAM_NAME, &m_capabilitiesToRemove);
+
     if(resourceData.value(Qn::PTZ_CAPABILITIES_PARAM_NAME, &m_capabilities))
         m_overrideCapabilities = true;
 }
 
 Ptz::Capabilities QnWorkaroundPtzController::getCapabilities() const
 {
-    return m_overrideCapabilities ? m_capabilities : base_type::getCapabilities();
+    if (m_overrideCapabilities)
+        return m_capabilities;
+
+    return (base_type::getCapabilities() | m_capabilitiesToAdd) & ~m_capabilitiesToRemove;
 }
 
 bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {

@@ -57,7 +57,7 @@ class ServerInstallation(object):
             'test', '-f', self.dir / 'bin' / 'mediaserver', ';', 'echo', '$?', ';',
             'test', '-f', self.dir / 'bin' / 'mediaserver-bin', ';', 'echo', '$?', ';',
             'test', '-f', self._config_path, ';', 'echo', '$?', ';',
-            'test', '-f', self._key_cert_path, ';', 'echo', '$?', ';',
+            'test', '-f', self._config_path_initial, ';', 'echo', '$?', ';',
             ])
         return all(code == '0' for code in raw_exit_codes.splitlines(False))
 
@@ -160,10 +160,12 @@ def find_all_installations(os_access, installation_root=DEFAULT_INSTALLATION_ROO
         PurePosixPath(path_str)
         for path_str in paths_raw_output.splitlines(False)]
     installed_customizations = customizations_from_paths(paths, installation_root)
-    installations = [
-        ServerInstallation(os_access, installation_root / customization.installation_subdir)
-        for customization in installed_customizations]
-    return installations
+    for customization in installed_customizations:
+        installation = ServerInstallation(os_access, installation_root / customization.installation_subdir)
+        if installation.is_valid():
+            yield installation
+        else:
+            log.error('Installation at %s is invalid.', installation.dir)
 
 
 def find_deb_installation(os_access, mediaserver_deb, installation_root=DEFAULT_INSTALLATION_ROOT):

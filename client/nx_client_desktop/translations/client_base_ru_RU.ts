@@ -2201,7 +2201,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
       <translation type="unfinished">
-        <numerusform>Failed to add %n device</numerusform>
+        <numerusform>Не удалось добавить %n устройство</numerusform>
         <numerusform>Не удалось добавить %n устройства</numerusform>
         <numerusform>Не удалось добавить %n устройств</numerusform>
         <numerusform>Failed to add %n devices</numerusform>

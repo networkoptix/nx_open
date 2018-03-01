@@ -187,7 +187,7 @@ class LocalAccess(OsAccess):
         stdout_buffer = []
         stderr_buffer = []
         stdout_thread = threading.Thread(target=self._read_thread, args=(log.debug, pipe.stdout, stdout_buffer, log_output))
-        stderr_thread = threading.Thread(target=self._read_thread, args=(log.error, pipe.stderr, stderr_buffer, True))
+        stderr_thread = threading.Thread(target=self._read_thread, args=(log.debug, pipe.stderr, stderr_buffer, True))
         stdout_thread.daemon = True
         stderr_thread.daemon = True
         stdout_thread.start()

@@ -1,58 +1,58 @@
+from collections import namedtuple
+
 from netaddr import IPNetwork
 
-
-class NodeNetworking(object):
-    def __init__(self, os_networking, hypervisor_networking):
-        self.os = os_networking
-        self.hypervisor = hypervisor_networking
-
-    def route_global_through_host(self):
-        self.hypervisor.os.route_global(self.hypervisor.available_mac_addresses)
-
-    def reset(self):
-        self.hypervisor.unplug_all()
-        self.os.flush_ip(self.hypervisor.available_mac_addresses)
+NodeNetworking = namedtuple('NodeNetworking', ['os_networking', 'hypervisor_networking'])
 
 
-def setup_networks(machines, networks_tree, default_gateways=None, ):
+def enable_internet(machine):
+    machine.networking.os_networking.route_global(
+        machine.networking.hypervisor_networking.host_bound_mac_address,
+        machine.networking.hypervisor_networking.host_ip_address)
+
+
+def disable_internet(machine):
+    machine.networking.os_networking.prohibit_global()
+
+
+def reset_networking(machine):
+    machine.networking.hypervisor_networking.unplug_all()
+    machine.networking.os_networking.reset(machine.networking.hypervisor_networking.available_mac_addresses)
+    enable_internet(machine)
+
+
+def setup_networks(machine_factory, networks_tree, default_gateways=None):
     default_gateways = default_gateways or {}
-    unassigned_machines = machines
-    assigned_machines = dict()  # Alias from structure -> machine.
+    nodes_ip_addresses = {}
 
-    def setup_subtree(subtree, router_alias=None, outer_networks=None):
-        outer_networks = outer_networks or []
-        for network_name in subtree:
+    def setup_tree(tree, router_alias, reachable_networks):
+        for network_name in tree:
             network = IPNetwork(network_name)  # Network name is same as network address space.
-            network_ip_addresses = network.iter_hosts()
-            router_ip_address = next(network_ip_addresses)  # May be unused but must be reserved.
-            if router_alias is not None:  # No router on top level.
-                router_node = assigned_machines[router_alias].networking  # Added when processed as host.
-                router_mac_address = router_node.hypervisor.plug(network_name)
-                router_node.os.setup_ip(router_mac_address, router_ip_address, network.prefixlen)
-            for host_alias in sorted(subtree[network_name].keys()):
-                try:
-                    host_networking = assigned_machines[host_alias].networking
-                except KeyError:
-                    assigned_machines[host_alias] = unassigned_machines.pop()
-                    host_networking = assigned_machines[host_alias].networking
-                host_mac_address = host_networking.hypervisor.plug(network_name)  # Connected to this network.
-                host_ip_address = next(network_ip_addresses)  # Connected to this network.
-                host_networking.os.setup_ip(host_mac_address, host_ip_address, network.prefixlen)
-                for outer_network in outer_networks:
-                    host_networking.os.route(outer_network, host_mac_address, router_ip_address)
-                if router_alias is not None:
-                    # Disambiguate default gateway explicitly if host is connected to multiple networks.
-                    if host_alias not in default_gateways or default_gateways[host_alias] == router_alias:
-                        host_networking.os.route_global(host_mac_address, router_ip_address)
-                if subtree[network_name][host_alias] is not None:
-                    host_networking.os.enable_masquerading(host_mac_address)  # Router for underlying subnet.
-                    setup_subtree(subtree[network_name][host_alias], host_alias, outer_networks + [network])
+            ip_addresses = network.iter_hosts()
+            router_ip_address = next(ip_addresses)  # May be unused but must be reserved.
+            nodes = dict(zip(tree[network_name].keys(), ip_addresses))
+            if router_alias is not None:
+                nodes[router_alias] = router_ip_address
+            for alias, ip_address in nodes.items():
+                networking = machine_factory.get(alias).networking
+                mac_address = networking.hypervisor_networking.plug(network_name)
+                networking.os_networking.setup_ip(mac_address, ip_address, network.prefixlen)
+                if alias != router_alias:
+                    # Routes on router was set up when it was interpreted as host.
+                    for reachable_network in reachable_networks:
+                        networking.os_networking.route(reachable_network, mac_address, router_ip_address)
+                    # Default gateway can be specified explicitly.
+                    if alias in default_gateways and default_gateways[alias] == router_alias:
+                        networking.os_networking.route_global(mac_address, router_ip_address)
+                    subtree = tree[network_name][alias]
+                    if subtree is not None:
+                        networking.os_networking.setup_nat(mac_address)
+                        setup_tree(subtree, alias, reachable_networks + [network])
+            for alias, ip_address in nodes.items():
+                nodes_ip_addresses.setdefault(alias, []).append(ip_address)
 
-    setup_subtree(networks_tree)
+    setup_tree(networks_tree, None, [])
 
     for alias in default_gateways:
-        networking = assigned_machines[alias].networking
         if default_gateways[alias] is None:
-            networking.os.prohibit_global()
-
-    return assigned_machines, unassigned_machines
+            machine_factory.get(alias).networking.os_networking.prohibit_global()

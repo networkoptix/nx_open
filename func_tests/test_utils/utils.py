@@ -115,19 +115,51 @@ class RunningTime(object):
         return '{self.__class__.__name__}({self:s})'.format(self=self)
 
 
-def wait_until(check_condition, timeout_sec=10):
-    start_timestamp = time.time()
-    delay_sec = 0.1
-    while True:
-        if check_condition():
-            return True
-        if time.time() - start_timestamp >= timeout_sec:
+class Wait(object):
+    def __init__(self, name, timeout_sec=10, attempts_limit=100, logging_levels=(logging.WARNING, logging.ERROR)):
+        self._continue_level, self._stop_level = logging_levels
+        self._name = name
+        self._timeout_sec = timeout_sec
+        self._started_at = time.time()
+        self._attempts_limit = attempts_limit
+        self._delay_sec = 0.1
+        self._attempts_made = 0
+
+    def sleep_and_continue(self):
+        self._attempts_made += 1
+        since_start_sec = time.time() - self._started_at
+        if since_start_sec > self._timeout_sec or self._attempts_made >= self._attempts_limit:
+            log.log(
+                self._stop_level, "Stop to wait %s: %g/%g sec, %d/%d attempts.",
+                self._name, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit)
             return False
-        time.sleep(delay_sec)
-        delay_sec *= 2
+        self._delay_sec *= 2
+        log.log(
+            self._continue_level, "Continue to wait %s: %g/%g sec, %d/%d attempts, sleep %g sec.",
+            self._name, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit, self._delay_sec)
+        time.sleep(self._delay_sec)
+        return True
 
 
-def holds_long_enough(check_condition, timeout_sec=10):
-    return not wait_until(lambda: not check_condition(), timeout_sec=timeout_sec)
+def wait_until(condition_is_true, name=None, timeout_sec=10):
+    name = name or "until %s returns True" % condition_is_true.__name__
+    wait = Wait(name=name, timeout_sec=timeout_sec)
+    while True:
+        if condition_is_true():
+            break
+        if not wait.sleep_and_continue():
+            return False
+    return True
+
+
+def holds_long_enough(condition_is_true, name=None, timeout_sec=10):
+    name = name or "while %s is returning True" % condition_is_true.__name__
+    wait = Wait(name=name, timeout_sec=timeout_sec, logging_levels=(logging.DEBUG, logging.INFO))
+    while True:
+        if not condition_is_true():
+            break
+        if not wait.sleep_and_continue():
+            return True
+    return False
 
 

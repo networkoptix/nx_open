@@ -13,7 +13,7 @@
 
 #include "hls_playlist_manager.h"
 
-class QnJsonRestResult;
+struct QnJsonRestResult;
 
 namespace nx {
 namespace mediaserver {

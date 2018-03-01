@@ -16,6 +16,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -404,7 +405,12 @@ void SingleCameraSettingsWidget::submitToResource()
         loginEditAuth.setUser(ui->loginEdit->text().trimmed());
         loginEditAuth.setPassword(ui->passwordEdit->text().trimmed());
         if (m_camera->getAuth() != loginEditAuth)
-            m_camera->setAuth(loginEditAuth);
+        {
+            if (m_camera->isMultiSensorCamera())
+                QnClientCameraResource::setAuthToMultisensorCamera(m_camera, loginEditAuth);
+            else
+                m_camera->setAuth(loginEditAuth);
+        }
 
         ui->cameraScheduleWidget->applyChanges();
 
