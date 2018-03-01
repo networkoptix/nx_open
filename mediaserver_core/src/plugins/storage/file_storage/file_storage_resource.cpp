@@ -260,11 +260,21 @@ qint64 getLocalPossiblyNonExistingPathSize(const QString &path)
 {
     qint64 result;
 
+    const auto rootTool = qnServerModule->rootTool();
     if (QDir(path).exists())
+    {
+        if (rootTool)
+            rootTool->changeOwner(path);
         return getDiskTotalSpace(path);
+    }
 
     if (!QDir().mkpath(path))
-        return -1;
+    {
+        if (rootTool && !rootTool->makeDirectory(path))
+            return -1;
+        if (rootTool)
+            rootTool->changeOwner(path);
+    }
 
     result = getDiskTotalSpace(path);
     QDir(path).removeRecursively();
