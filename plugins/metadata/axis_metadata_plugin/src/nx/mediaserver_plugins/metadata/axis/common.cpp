@@ -46,7 +46,7 @@ QnUuid guidFromEventName(const char* eventFullName)
 
 AnalyticsEventType::AnalyticsEventType(const nx::axis::SupportedEvent& supportedEvent)
 {
-    eventTypeId = guidFromEventName(supportedEvent.fullName().c_str());
+    typeId = guidFromEventName(supportedEvent.fullName().c_str());
     name.value = supportedEvent.description.c_str();
     if (name.value.simplified().isEmpty())
     {
@@ -59,7 +59,7 @@ AnalyticsEventType::AnalyticsEventType(const nx::axis::SupportedEvent& supported
 
     topic = supportedEvent.topic.c_str();
     caption = supportedEvent.name.c_str();
-    eventTypeIdExternal = nxpt::fromQnUuidToPluginGuid(eventTypeId);
+    eventTypeIdExternal = nxpt::fromQnUuidToPluginGuid(typeId);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventType, (json),

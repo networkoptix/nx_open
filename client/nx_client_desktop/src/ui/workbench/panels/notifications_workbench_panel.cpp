@@ -28,7 +28,6 @@
 #include <ui/processors/hover_processor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/helper.h>
-#include <ui/style/nx_style_p.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_ui_globals.h>
@@ -41,7 +40,9 @@
 #include <nx/client/desktop/event_search/widgets/event_panel.h>
 #include <nx/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
+#include <nx/client/desktop/utils/widget_utils.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace NxUi {
@@ -455,7 +456,7 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
 
     const auto tilePos = (tile->rect().topLeft() + tile->rect().bottomLeft()) / 2;
     const auto globalPos = QnHiDpiWorkarounds::safeMapToGlobal(tile, tilePos);
-    const auto tooltipPos = QnNxStylePrivate::mapFromGlobal(parentWidget, globalPos);
+    const auto tooltipPos = WidgetUtils::mapFromGlobal(parentWidget, globalPos);
 
     QPointer<QnNotificationToolTipWidget> toolTip(
         new QnNotificationToolTipWidget(parentWidget));

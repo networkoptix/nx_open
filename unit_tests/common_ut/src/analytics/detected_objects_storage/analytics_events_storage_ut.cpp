@@ -1265,7 +1265,7 @@ protected:
     {
         Filter filter;
         filter.timePeriod.setStartTime(m_oldestAvailableDataTimestamp);
-        filter.timePeriod.setDuration(std::chrono::milliseconds(QnTimePeriod::UnlimitedPeriod));
+        filter.timePeriod.durationMs = QnTimePeriod::infiniteDuration();
 
         for (;;)
         {

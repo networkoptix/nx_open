@@ -3,12 +3,15 @@
 #include <chrono>
 
 #include <QtGui/QPalette>
+#include <QtGui/QDesktopServices>
+#include <QtWidgets/QMenu>
 
 #include <analytics/common/object_detection_metadata.h>
 #include <api/server_rest_connection.h>
 #include <camera/resource_display.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/helper.h>
@@ -192,6 +195,9 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return QVariant::fromValue(object.track.empty()
                 ? QRectF()
                 : object.track.front().boundingBox);
+
+        case Qn::ContextMenuRole:
+            return QVariant::fromValue(contextMenu(object));
 
         default:
             handled = false;
@@ -623,6 +629,87 @@ QString AnalyticsSearchListModel::Private::attributes(
 
     const auto color = QPalette().color(QPalette::WindowText);
     return kCss.arg(color.name()) + kTableTemplate.arg(rows);
+}
+
+QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
+    const analytics::storage::DetectedObject& object) const
+{
+    if (!camera())
+        return QSharedPointer<QMenu>();
+
+    // TODO: #vkutin Is this a correct way of choosing servers for analytics actions?
+    auto servers = q->cameraHistoryPool()->getCameraFootageData(camera(), true);
+    servers.push_back(camera()->getParentServer());
+
+    const auto allActions = vms::event::AnalyticsHelper::availableActions(servers, object.objectTypeId);
+    if (allActions.isEmpty())
+        return QSharedPointer<QMenu>();
+
+    QSharedPointer<QMenu> menu(new QMenu());
+    for (const auto& driverActions: allActions)
+    {
+        if (!menu->isEmpty())
+            menu->addSeparator();
+
+        const auto& driverId = driverActions.driverId;
+        for (const auto& action: driverActions.actions)
+        {
+            const auto name = action.name.text(QString());
+            menu->addAction(name,
+                [this, action, object, driverId, guard = QPointer<const Private>(this)]()
+                {
+                    if (guard)
+                        executePluginAction(driverId, action, object);
+                });
+        }
+    }
+
+    return menu;
+}
+
+void AnalyticsSearchListModel::Private::executePluginAction(
+    const QnUuid& driverId,
+    const api::AnalyticsManifestObjectAction& action,
+    const analytics::storage::DetectedObject& object) const
+{
+    const auto server = q->commonModule()->currentServer();
+    NX_ASSERT(server && server->restConnection());
+    if (!server || !server->restConnection())
+        return;
+
+    const auto resultCallback =
+        [this, guard = QPointer<const Private>(this)]
+            (bool success, rest::Handle /*requestId*/, QnJsonRestResult result)
+        {
+            if (result.error != QnRestResult::NoError)
+            {
+                QnMessageBox::warning(q->mainWindowWidget(), tr("Failed to execute plugin action"),
+                    result.errorString);
+                return;
+            }
+
+            if (!success)
+                return;
+
+            const auto reply = result.deserialized<AnalyticsActionResult>();
+            if (!reply.messageToUser.isEmpty())
+            {
+                QnMessageBox::success(q->mainWindowWidget(), reply.messageToUser);
+            }
+
+            if (!reply.actionUrl.isEmpty())
+            {
+                // TODO: #vkutin Open this on layout instead, if required.
+                QDesktopServices::openUrl(reply.actionUrl);
+            }
+        };
+
+    AnalyticsAction actionData;
+    actionData.driverId = driverId;
+    actionData.actionId = action.id;
+    actionData.objectId = object.objectId;
+
+    server->restConnection()->executeAnalyticsAction(actionData, resultCallback, thread());
 }
 
 qint64 AnalyticsSearchListModel::Private::startTimeMs(

@@ -19,6 +19,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/mediaserver/metadata/metadata_handler.h>
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
+#include <nx/mediaserver/metadata/plugin_setting.h>
 
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
@@ -34,7 +35,7 @@ namespace api {
 
 uint qHash(const Analytics::EventType& t)
 {
-    return qHash(t.eventTypeId.toByteArray());
+    return qHash(t.typeId.toByteArray());
 }
 
 } // namespace api
@@ -201,13 +202,12 @@ void ManagerPool::loadSettingsFromFile(std::vector<nxpl::Setting>* settings, con
     }
 
     const QString& settingsStr = f.readAll();
-    const auto& jsonObject = QJson::deserialized<QMap<QString, QString>>(settingsStr.toUtf8());
-    settings->resize(jsonObject.size());
-    for (int i = 0; i < jsonObject.size(); ++i)
+    const auto& settingsFromJson = QJson::deserialized<QList<PluginSetting>>(settingsStr.toUtf8());
+    settings->resize(settingsFromJson.size());
+    for (auto i = 0; i < settingsFromJson.size(); ++i)
     {
-        const QString key = jsonObject.keys().at(i);
-        settings->at(i).name = strdup(key.toUtf8().data());
-        settings->at(i).value = strdup(jsonObject.value(key).toUtf8().data());
+        settings->at(i).name = strdup(settingsFromJson.at(i).name.toUtf8().data());
+        settings->at(i).value = strdup(settingsFromJson.at(i).value.toUtf8().data());
     }
 }
 
@@ -267,7 +267,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
         boost::optional<nx::api::AnalyticsDriverManifest> pluginManifest =
             loadPluginManifest(plugin);
         if (!pluginManifest)
-            return;
+            continue; //< The error is already logged.
         assignPluginManifestToServer(*pluginManifest, server);
 
         boost::optional<nx::api::AnalyticsDeviceManifest> managerManifest;
@@ -431,7 +431,7 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
 {
     for (auto& data: context.managers())
     {
-        if (eventTypeIds.empty())
+        if (eventTypeIds.empty() && !data.isStreamConsumer)
         {
             NX_DEBUG(
                 this,
@@ -471,7 +471,7 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
 
 uint qHash(const nx::api::Analytics::EventType& t)// noexcept
 {
-    return qHash(t.eventTypeId.toByteArray());
+    return qHash(t.typeId.toByteArray());
 }
 
 boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifest(
@@ -515,18 +515,14 @@ void ManagerPool::assignPluginManifestToServer(
     auto existingManifests = server->analyticsDrivers();
     auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
         [&manifest](const nx::api::AnalyticsDriverManifest& m)
-    {
-        return m.driverId == manifest.driverId;
-    });
+        {
+            return m.driverId == manifest.driverId;
+        });
 
     if (it == existingManifests.cend())
-    {
         existingManifests.push_back(manifest);
-    }
     else
-    {
         *it = manifest;
-    }
 
     server->setAnalyticsDrivers(existingManifests);
     server->saveParams();
@@ -557,7 +553,7 @@ void ManagerPool::mergePluginManifestToServer(
 #if defined _DEBUG
     // Sometimes in debug purposes we need do clean existingManifest.outputEventTypes list.
     if (!manifest.outputEventTypes.empty() &&
-        manifest.outputEventTypes.front().eventTypeId == nx::api::kResetPluginManifestEventId)
+        manifest.outputEventTypes.front().typeId == nx::api::kResetPluginManifestEventId)
     {
         it->outputEventTypes.clear();
     }
@@ -570,7 +566,7 @@ void ManagerPool::mergePluginManifestToServer(
 std::pair<
     boost::optional<nx::api::AnalyticsDeviceManifest>,
     boost::optional<nx::api::AnalyticsDriverManifest>
-    >
+>
 ManagerPool::loadManagerManifest(
     CameraManager* manager,
     const QnSecurityCamResourcePtr& camera)
@@ -618,7 +614,7 @@ ManagerPool::loadManagerManifest(
             std::back_inserter(deviceManifest->supportedEventTypes),
             [](const nx::api::Analytics::EventType& driverManifestElement)
             {
-                return driverManifestElement.eventTypeId;
+                return driverManifestElement.typeId;
             });
         return std::make_pair(deviceManifest, driverManifest);
     }

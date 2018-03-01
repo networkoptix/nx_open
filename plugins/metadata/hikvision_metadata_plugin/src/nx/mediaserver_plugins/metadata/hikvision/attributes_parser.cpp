@@ -146,7 +146,7 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
             for (const auto& dependedName: descriptor.forcedEvent.split(','))
             {
                 const auto childDescriptor = manifest.eventDescriptorByInternalName(dependedName);
-                hikvisionEvent.typeId = childDescriptor.eventTypeId;
+                hikvisionEvent.typeId = childDescriptor.typeId;
                 addEvent(hikvisionEvent);
             }
         }

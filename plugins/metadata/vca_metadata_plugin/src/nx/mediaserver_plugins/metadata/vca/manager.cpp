@@ -40,7 +40,7 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(
     const AnalyticsEventType& event, bool active)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
-    commonEvent->setTypeId(nxpt::fromQnUuidToPluginGuid(event.eventTypeId));
+    commonEvent->setTypeId(nxpt::fromQnUuidToPluginGuid(event.typeId));
     commonEvent->setCaption(event.name.value.toStdString());
     commonEvent->setDescription(event.name.value.toStdString());
     commonEvent->setIsActive(active);
@@ -187,7 +187,7 @@ Manager::Manager(Plugin* plugin,
 
     nx::api::AnalyticsDeviceManifest typedCameraManifest;
     for (const auto& eventType: typedManifest.outputEventTypes)
-        typedCameraManifest.supportedEventTypes.push_back(eventType.eventTypeId);
+        typedCameraManifest.supportedEventTypes.push_back(eventType.typeId);
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
     static const int kBufferCapacity = 4096;
@@ -279,7 +279,7 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
 
         const AnalyticsEventType& event = m_plugin->eventByInternalName(it->second);
 
-        if (std::find(m_eventsToCatch.cbegin(), m_eventsToCatch.cend(), event.eventTypeId)
+        if (std::find(m_eventsToCatch.cbegin(), m_eventsToCatch.cend(), event.typeId)
             != m_eventsToCatch.cend())
         {
             sendEventStartedPacket(event);

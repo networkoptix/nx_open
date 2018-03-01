@@ -26,7 +26,7 @@ QString nameInternal(
     {
         for (const auto& eventType: manifest.*list)
         {
-            if (eventType.eventTypeId == eventTypeId)
+            if (eventType.typeId == eventTypeId)
                 return eventType.name.text(locale);
         };
     }
@@ -66,7 +66,7 @@ public:
     void addUnique(const nx::api::AnalyticsDriverManifest& manifest,
         const nx::api::Analytics::EventType& eventType)
     {
-AnalyticsEventTypeId id{manifest.driverId, eventType.eventTypeId};
+        AnalyticsEventTypeId id{manifest.driverId, eventType.typeId};
         if (keys.contains(id))
             return;
 
@@ -110,7 +110,7 @@ AnalyticsHelper::EventDescriptor AnalyticsHelper::eventDescriptor(const QnUuid& 
         {
             for (const auto& eventType: manifest.outputEventTypes)
             {
-                if (eventType.eventTypeId == eventId)
+                if (eventType.typeId == eventId)
                 {
                     cachedData[eventId] = eventType;
                     return eventType;
@@ -156,7 +156,7 @@ QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::supportedAnalyticsEvent
         {
             for (const auto& eventType: manifest.outputEventTypes)
             {
-                if (!allowedEvents.contains(eventType.eventTypeId))
+                if (!allowedEvents.contains(eventType.typeId))
                     continue;
 
                 storage.addUnique(manifest, eventType);
@@ -193,6 +193,35 @@ QString AnalyticsHelper::objectName(const QnVirtualCameraResourcePtr& camera,
 {
     return nameInternal(
         camera, objectTypeId, locale, &nx::api::AnalyticsDriverManifest::outputObjectTypes);
+}
+
+QList<AnalyticsHelper::PluginActions> AnalyticsHelper::availableActions(
+    const QnMediaServerResourceList& servers, const QnUuid& objectTypeId)
+{
+    QList<AnalyticsHelper::PluginActions> actions;
+    if (servers.isEmpty())
+        return actions;
+
+    for (const auto& server: servers.toSet())
+    {
+        const auto& manifests = server->analyticsDrivers();
+        for (const auto& manifest: manifests)
+        {
+            PluginActions actionsOfPlugin;
+            actionsOfPlugin.driverId = manifest.driverId;
+
+            for (const auto& action: manifest.objectActions)
+            {
+                if (action.supportedObjectTypeIds.contains(objectTypeId))
+                    actionsOfPlugin.actions.append(action);
+            }
+
+            if (!actionsOfPlugin.actions.isEmpty())
+                actions.append(actionsOfPlugin);
+        }
+    }
+
+    return actions;
 }
 
 } // namespace event

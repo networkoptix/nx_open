@@ -222,7 +222,7 @@ public:
                     for (int j = 0; j < 3; ++j)
                     {
                         nx::api::Analytics::EventType eventType;
-                        eventType.eventTypeId = QnUuid::createUuid();
+                        eventType.typeId = QnUuid::createUuid();
                         eventType.name.value = lit("Event %1").arg(j);
                         eventType.name.localization[lit("ru_RU")] = lit("Russion %1").arg(j);
                         manifest.outputEventTypes.push_back(eventType);
@@ -257,7 +257,7 @@ public:
                                 std::back_inserter(supported),
                                 [](const nx::api::Analytics::EventType& eventType)
                                 {
-                                    return eventType.eventTypeId;
+                                    return eventType.typeId;
                                 });
                             camera->setAnalyticsSupportedEvents(supported);
                         }

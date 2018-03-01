@@ -312,7 +312,8 @@ bool EventTile::event(QEvent* event)
             return true;
 
         case QEvent::MouseButtonRelease:
-            emit clicked();
+            if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
+                emit clicked();
             break;
 
         default:

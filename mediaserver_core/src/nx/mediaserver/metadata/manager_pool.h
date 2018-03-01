@@ -61,14 +61,24 @@ public:
         const QnResourcePtr& resource,
         QWeakPointer<QnAbstractDataReceptor> metadaReceptor);
 
+    using PluginList = QList<nx::sdk::metadata::Plugin*>;
+
+    /**
+     * @return List of available plugins; for each item, queryInterface() is called which increases
+     * the reference counter, thus, it is usually needed to release each plugin in the caller.
+     */
+    PluginList availablePlugins() const;
+
+    /**
+     * @return Deserialized plugin manifest, or none on error.
+     */
+    boost::optional<nx::api::AnalyticsDriverManifest> loadPluginManifest(
+        nx::sdk::metadata::Plugin* plugin);
+
 public slots:
     void initExistingResources();
 
 private:
-    using PluginList = QList<nx::sdk::metadata::Plugin*>;
-
-    PluginList availablePlugins() const;
-
     void loadSettingsFromFile(std::vector<nxpl::Setting>* settings, const char* filename);
 
     void setManagerDeclaredSettings(
@@ -114,9 +124,6 @@ private:
 
         return deserialized;
     }
-
-    boost::optional<nx::api::AnalyticsDriverManifest> loadPluginManifest(
-        nx::sdk::metadata::Plugin* plugin);
 
     void assignPluginManifestToServer(
         const nx::api::AnalyticsDriverManifest& manifest,

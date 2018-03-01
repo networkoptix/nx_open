@@ -172,7 +172,7 @@ int AbstractAsyncSearchListModel::Private::lastBatchSize() const
 
 QnTimePeriod AbstractAsyncSearchListModel::Private::infiniteFuture()
 {
-    return QnTimePeriod(QnTimePeriod::kMaxTimeValue, QnTimePeriod::infiniteDuration());
+    return QnTimePeriod(QnTimePeriod::maxTimeValue(), QnTimePeriod::infiniteDuration());
 }
 
 } // namespace desktop

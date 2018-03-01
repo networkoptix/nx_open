@@ -38,11 +38,11 @@ std::string CameraManager::capabilitiesManifest()
     return R"json(
         {
             "supportedEventTypes": [
-                ")json" + kLineCrossingEventGuid + R"json(",
-                ")json" + kObjectInTheAreaEventGuid + R"json("
+                ")json" + nxpt::NxGuidHelper::toStdString(kLineCrossingEventGuid) + R"json(",
+                ")json" + nxpt::NxGuidHelper::toStdString(kObjectInTheAreaEventGuid) + R"json("
             ],
             "supportedObjectTypes": [
-                ")json" + kCarObjectGuid + R"json("
+                ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json("
             ],
             "settings": {
                 "params": [
@@ -187,7 +187,7 @@ MetadataPacket* CameraManager::cookSomeEvents()
     commonEvent->setDescription("Line crossing (description)");
     commonEvent->setAuxilaryData(R"json({ "auxilaryData": "someJson" })json");
     commonEvent->setIsActive(m_counter == 1);
-    commonEvent->setTypeId(nxpt::NxGuidHelper::fromRawData(m_eventTypeId.c_str()));
+    commonEvent->setTypeId(m_eventTypeId);
 
     auto eventPacket = new CommonEventsMetadataPacket();
     eventPacket->setTimestampUsec(usSinceEpoch());
@@ -214,11 +214,13 @@ MetadataPacket* CameraManager::cookSomeObjects()
     auto commonObject = new CommonObject();
 
     commonObject->setAuxilaryData(R"json({ "auxilaryData": "someJson2" })json");
-    commonObject->setTypeId(nxpt::NxGuidHelper::fromRawData(kCarObjectGuid.c_str()));
+    commonObject->setTypeId(kCarObjectGuid);
 
     // To be binary modified to be unique for each object.
-    nxpl::NX_GUID objectId = nxpt::NxGuidHelper::fromRawData(
-        "{B5294F25-4FE6-4647-B8D1-A0729F70F2D1}");
+    nxpl::NX_GUID objectId = {{
+        0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47,
+        0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1}};
+
     double dt = m_counterObjects++ / 32.0;
     double intPart;
     dt = modf(dt, &intPart) * 0.75;
