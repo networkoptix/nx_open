@@ -59,23 +59,37 @@ static int execute(const std::string& command)
     return 0;
 }
 
-int mount(Argument url, Argument directory, OptionalArgument username, OptionalArgument password)
+int mount(
+    Argument url,
+    Argument directory,
+    OptionalArgument optUsername,
+    OptionalArgument optPassword)
 {
     checkMountPermissions(directory);
     if (url.find("//") != 0)
         throw std::invalid_argument(url + " is not an SMB url");
 
-    std::ostringstream command;
-    command << "mount -t cifs '" << url << "' '" << directory << "'"
-       << " -o uid=" << kRealUid << ",gid=" << kRealGid;
+    auto makeCommandString =
+        [&url, &directory](const std::string& username, const std::string& password)
+        {
+            std::ostringstream command;
+            command << "mount -t cifs '" << url << "' '" << directory << "'"
+                << " -o uid=" << kRealUid << ",gid=" << kRealGid
+                <<",username=" << username << ",password=" << password;
 
-    if (username)
-        command << ",username=" << *username;
+            return command.str();
+        };
 
-    if (password)
-        command << ",password=" << *password;
+    std::string password = optPassword ? *optPassword : "";
+    std::string username = optUsername ? *optUsername : "guest";
 
-    return execute(command.str());
+    for (const auto& candidate: std::array<std::string, 2>{username, "WORKGROUP\\" + username})
+    {
+        if (execute(makeCommandString(candidate, password)) == 0)
+            return 0;
+    }
+
+    return -1;
 }
 
 int unmount(Argument directory)
