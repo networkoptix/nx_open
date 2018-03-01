@@ -48,16 +48,16 @@ class ServerFactory(object):
                 vm = config.vm
             else:
                 vm = self._vagrant_vm_factory.get(name)
-            installation = install_mediaserver(vm.guest_os_access, self._mediaserver_deb)
+            installation = install_mediaserver(vm.os_access, self._mediaserver_deb)
             installation.put_key_and_cert(self._ca.generate_key_and_cert())
             vm_host_hostname = vm.host_os_access.hostname
             api_url = '%s://%s:%d/' % (config.http_schema, vm_host_hostname, vm.config.rest_api_forwarded_port)
             customization = self._mediaserver_deb.customization
-            service = UpstartService(vm.guest_os_access, customization.service_name)
+            service = UpstartService(vm.os_access, customization.service_name)
             if not service.is_running():
                 service.set_state(True)
             server = Server(
-                config.name, vm.guest_os_access, service, installation, api_url, self._ca, vm,
+                name, service, installation, api_url, self._ca, vm,
                 rest_api_timeout=config.rest_api_timeout)
 
         self._allocated_servers.append(server)  # _prepare_server may fail, will need to save it's artifact in that case

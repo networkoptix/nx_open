@@ -103,19 +103,21 @@ class Server(object):
 
     def __init__(
             self,
-            name, os_access, service, installation, rest_api_url, ca, machine,
+            name, service, installation, rest_api_url, ca, machine,
             rest_api_timeout=None, internal_ip_port=None):
         assert name, repr(name)
-        assert isinstance(os_access, OsAccess), repr(os_access)
         self.title = name.upper()
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
-        self.os_access = os_access
-        self._installation = installation
-        self._service = service
+        self.os_access = machine.os_access  # Deprecated.
+        self.installation = installation
+        self.service = service
         self.rest_api_url = rest_api_url
         self._ca = ca
         self.machine = machine
-        self.rest_api = RestApi(self.title, self.rest_api_url, timeout=rest_api_timeout, ca_cert=self._ca.cert_path)
+        self.rest_api = RestApi(
+            self.title,
+            self.rest_api_url,
+            timeout=rest_api_timeout, ca_cert=self._ca.cert_path)
         self.settings = None
         self.local_system_id = None
         self.ecs_guid = None
@@ -139,21 +141,21 @@ class Server(object):
 
     @property
     def dir(self):
-        return self._installation.dir
+        return self.installation.dir
 
     def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None, config_file_params=None):
         if self._state is None:
-            was_started = self._service.get_state()
+            was_started = self.service.get_state()
             self._state = self._st_starting if was_started else self._st_stopped
         else:
             was_started = self._state in [self._st_starting, self._st_started]
         log.info('Service for %s %s started', self, was_started and 'WAS' or 'was NOT')
-        self._installation.cleanup_core_files()
+        self.installation.cleanup_core_files()
         if reset:
             if was_started:
                 self.stop_service()
-            self._installation.cleanup_var_dir()
-            self._installation.put_key_and_cert(self._ca.generate_key_and_cert())
+            self.installation.cleanup_var_dir()
+            self.installation.put_key_and_cert(self._ca.generate_key_and_cert())
             if patch_set_cloud_host:
                 self.patch_binary_set_cloud_host(patch_set_cloud_host)  # may be changed by previous tests...
             self.reset_config(logLevel=log_level, tranLogLevel=log_level, **(config_file_params or {}))
@@ -166,7 +168,7 @@ class Server(object):
             assert not reset or not self.is_system_set_up(), 'Failed to properly reinit server - it reported to be already set up'
 
     def list_core_files(self):
-        return self._installation.list_core_files()
+        return self.installation.list_core_files()
 
     def is_started(self):
         assert self._state is not None, 'server status is still unknown'
@@ -196,7 +198,7 @@ class Server(object):
         assert self._state != self._bool2final_state(is_started), (
             'Service for %s is already %s' % (self, is_started and 'started' or 'stopped'))
         if not (is_started and self._state == self._st_starting):
-            self._service.set_state(is_started)
+            self.service.set_state(is_started)
         self._state = self._st_starting if is_started else self._st_stopped
         if is_started:
             self.wait_for_server_become_online()
@@ -228,7 +230,7 @@ class Server(object):
             return False
 
     def get_log_file(self):
-        return self._installation.get_log_file()
+        return self.installation.get_log_file()
 
     def load_system_settings(self, log_settings=False):
         log.debug('%s: Loading settings...', self)
@@ -252,11 +254,11 @@ class Server(object):
             return 'local'
 
     def reset(self):
-        was_started = self._service.is_running()
+        was_started = self.service.is_running()
         if was_started:
             self.stop_service()
-        self._installation.cleanup_var_dir()
-        self._installation.put_key_and_cert(self._ca.generate_key_and_cert())
+        self.installation.cleanup_var_dir()
+        self.installation.put_key_and_cert(self._ca.generate_key_and_cert())
         if was_started:
             self.start_service()
 
@@ -290,7 +292,7 @@ class Server(object):
             break
 
     def make_core_dump(self):
-        self._service.make_core_dump()
+        self.service.make_core_dump()
         self._state = self._st_stopped
 
     def get_time(self):
@@ -300,14 +302,14 @@ class Server(object):
         return RunningTime(received, datetime.datetime.now(pytz.utc) - started_at)
 
     def reset_config(self, **kw):
-        self._installation.reset_config(**kw)
+        self.installation.reset_config(**kw)
 
     def change_config(self, **kw):
-        self._installation.change_config(**kw)
+        self.installation.change_config(**kw)
 
     def patch_binary_set_cloud_host(self, new_host):
         assert self.is_stopped(), 'Server %s must be stopped first for patching its binaries' % self
-        self._installation.patch_binary_set_cloud_host(new_host)
+        self.installation.patch_binary_set_cloud_host(new_host)
         self.set_user_password(REST_API_USER, REST_API_PASSWORD)  # Must be reset to default ones
 
     def set_system_settings(self, **kw):
@@ -434,7 +436,7 @@ class Server(object):
     @property
     def storage(self):
         # GET /ec2/getStorages is not always possible: server sometimes is not started.
-        storage_path = self._installation.dir / MEDIASERVER_STORAGE_PATH
+        storage_path = self.installation.dir / MEDIASERVER_STORAGE_PATH
         return Storage(self.os_access, storage_path, self.os_access.get_timezone())
 
     def rebuild_archive(self):

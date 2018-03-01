@@ -7,6 +7,7 @@ import yaml
 from netaddr import IPAddress, IPNetwork
 from pathlib2 import Path
 
+from network_layouts import get_layout
 from test_utils.artifact import ArtifactFactory
 from test_utils.ca import CA
 from test_utils.camera import CameraFactory, SampleMediaFile
@@ -334,10 +335,9 @@ def sample_media_file(run_options):
 
 @pytest.fixture()
 def network(vm_factory, server_factory, layout_file):
-    path = Path(__file__).with_name('network_layouts') / layout_file
-    layout = yaml.load(path.read_text())
-    vms = setup_networks(vm_factory, layout['networks'])
-    servers = merge_system(server_factory, layout.get('mergers', {}) or {})
+    layout = get_layout(layout_file)
+    vms = setup_networks(vm_factory, layout.networks)
+    servers = merge_system(server_factory, layout.mergers)
     return vms, servers
 
 

@@ -1,53 +1,71 @@
+import contextlib
 import logging
+import socket
+import struct
 import time
 from collections import namedtuple
 from datetime import datetime, timedelta
 
 import pytest
-import pytz
+from pytz import utc
+from pylru import lrudecorator
 
-from test_utils.internet_time import TimeProtocolRestriction, get_internet_time
-from test_utils.networking import setup_networks
-from test_utils.server import Server
-from test_utils.server_installation import install_mediaserver
-from test_utils.service import UpstartService
-from test_utils.utils import holds_long_enough, wait_until
+from network_layouts import get_layout
+from test_utils.merging import merge_system
+from test_utils.networking import disable_internet, enable_internet, setup_networks
+from test_utils.utils import RunningTime, holds_long_enough, wait_until
 
 log = logging.getLogger(__name__)
 
-BASE_TIME = datetime(2017, 3, 14, 15, 0, 0, tzinfo=pytz.utc)  # Tue Mar 14 15:00:00 UTC 2017
+BASE_TIME = datetime(2017, 3, 14, 15, 0, 0, tzinfo=utc)  # Tue Mar 14 15:00:00 UTC 2017
 
 System = namedtuple('System', ['primary', 'secondary'])
 
 
-def _make_timeless_server(vm, mediaserver_deb, ca, server_name):
-    server_installation = install_mediaserver(vm.guest_os_access, mediaserver_deb)
-    server_installation.change_config(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
-    service = UpstartService(vm.guest_os_access, mediaserver_deb.customization.service_name)
-    api_url = 'http://{host}:{port}/'.format(host=vm.host_os_access.hostname, port=vm.config.rest_api_forwarded_port)
-    server = Server(server_name, vm.guest_os_access, service, server_installation, api_url, ca, vm)
-    if service.get_state():
-        server.stop_service()
-    vm.networking.os_networking.prohibit_global()
-    server_installation.cleanup_var_dir()
-    server.start_service()
-    server.setup_local_system()
-    return server
+@lrudecorator(1)
+def get_internet_time(address='time.rfc868server.com', port=37):
+    """Get time from RFC868 time server wrap into Python's datetime.
+    >>> import timeit
+    >>> get_internet_time()  # doctest: +ELLIPSIS
+    RunningTime(...)
+    >>> timeit.timeit(get_internet_time, number=1) < 1e-4
+    True
+    """
+    with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        started_at = datetime.now(utc)
+        s.connect((address, port))
+        time_data = s.recv(4)
+        request_duration = datetime.now(utc) - started_at
+    remote_as_rfc868_timestamp, = struct.unpack('!I', time_data)
+    posix_to_rfc868_diff = datetime.fromtimestamp(0, utc) - datetime(1900, 1, 1, tzinfo=utc)
+    remote_as_posix_timestamp = remote_as_rfc868_timestamp - posix_to_rfc868_diff.total_seconds()
+    remote_as_datetime = datetime.fromtimestamp(remote_as_posix_timestamp, utc)
+    return RunningTime(remote_as_datetime, request_duration)
 
 
 @pytest.fixture()
-def layout_file():
-    return 'direct-merge_toward_requested.yaml'
-
-
-@pytest.fixture
-def system(vm_factory, mediaserver_deb, ca):
-    one = _make_timeless_server(vm_factory.get('first'), mediaserver_deb, ca, 'one')
-    two = _make_timeless_server(vm_factory.get('second'), mediaserver_deb, ca, 'two')
-    one.merge([two])
-    response = one.rest_api.ec2.getCurrentTime.GET()
-    primary_server_guid = response['primaryTimeServerGuid']
-    system = System(one, two) if one.ecs_guid == primary_server_guid else System(two, one)
+def system(vm_factory, server_factory):
+    layout = get_layout('direct-merge_toward_requested.yaml')
+    vms = setup_networks(vm_factory, layout.networks)
+    servers = {}
+    for alias in {'first', 'second'}:
+        server = server_factory.create(alias, vm=vms[alias])
+        if server.service.get_state():
+            server.stop_service()
+        # Reset server without internet access.
+        server.machine.networking.os_networking.prohibit_global()
+        server.installation.cleanup_var_dir()
+        server.installation.change_config(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
+        server.start_service()
+        server.setup_local_system()
+        servers[alias] = server
+    merge_system(servers, layout.mergers)
+    random_server = servers['first']
+    random_server_response = random_server.rest_api.ec2.getCurrentTime.GET()
+    if servers['first'].ecs_guid == random_server_response['primaryTimeServerGuid']:
+        system = System(primary=servers['first'], secondary=servers['second'])
+    else:
+        system = System(primary=servers['second'], secondary=servers['first'])
     primary_vm_time = system.primary.os_access.set_time(BASE_TIME)
     system.secondary.os_access.set_time(BASE_TIME)
     assert wait_until(lambda: system.primary.get_time().is_close_to(primary_vm_time)), (
@@ -116,8 +134,7 @@ def test_primary_server_temporary_offline(system):
 def test_secondary_server_temporary_inet_on(system):
     system.primary.set_system_settings(synchronizeTimeWithInternet=True)
 
-    # Turn on RFC868 (time protocol) on secondary VM.
-    TimeProtocolRestriction(system.secondary).disable()
+    enable_internet(system.secondary.machine)
     assert wait_until(lambda: system.primary.get_time().is_close_to(get_internet_time())), (
         "After connection to internet time server on MACHINE WITH NON-PRIMARY time server was allowed, "
         "time on PRIMARY time server %s is NOT EQUAL to internet time %s" % (
@@ -131,7 +148,7 @@ def test_secondary_server_temporary_inet_on(system):
         "After connection to internet time server on MACHINE WITH NON-PRIMARY time server was allowed, "
         "time on PRIMARY time server %s does NOT FOLLOW to internet time %s" % (
             system.primary.get_time(), get_internet_time()))
-    TimeProtocolRestriction(system.secondary).enable()
+    disable_internet(system.secondary.machine)
 
     # Turn off RFC868 (time protocol)
     assert holds_long_enough(lambda: system.primary.get_time().is_close_to(get_internet_time())), (

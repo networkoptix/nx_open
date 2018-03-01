@@ -184,7 +184,7 @@ class VagrantVM(object):
         self._vagrant = vagrant
         self.config = config
         self.host_os_access = host_os_access
-        self.guest_os_access = None  # Until VM is started.
+        self.os_access = None  # Until VM is started.
         self.timezone = None
         self.is_allocated = False
         self.is_running = is_running
@@ -218,9 +218,9 @@ class VagrantVM(object):
             else:
                 raise
         else:
-            self.guest_os_access = os_access
+            self.os_access = os_access
         self.networking = NodeNetworking(
-            LinuxNodeNetworking(self.guest_os_access),
+            LinuxNodeNetworking(self.os_access),
             VirtualBoxNodeNetworking(self.virtualbox_name))
         reset_networking(self)
 
@@ -228,8 +228,8 @@ class VagrantVM(object):
         assert not self.is_running
         log.info('Starting VM: %s...', self)
         self._vagrant.up(vm_name=self.vagrant_name)
-        self.guest_os_access = SshAccess(self._ssh_config_path, self.vagrant_name).become('root')
-        optimize_sshd(self.guest_os_access)
+        self.os_access = SshAccess(self._ssh_config_path, self.vagrant_name).become('root')
+        optimize_sshd(self.os_access)
         self.is_running = True
 
     def destroy(self):
