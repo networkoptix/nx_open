@@ -5,9 +5,6 @@
 #include <mutex>
 #include <memory>
 
-#include <festival/festival.h>
-#include <EST_wave_aux.h>
-
 #ifdef QN_USE_VLD
 #include <vld.h>
 #endif
@@ -15,8 +12,16 @@
 static char festivalVoxPath[256];
 
 #if (_XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L) && 0
+
 #include <stdio.h>
+#include <festival/festival.h>
+#include <EST_wave_aux.h>
+
 #else
+
+#include <festival/festival.h>
+#include <EST_wave_aux.h>
+
 namespace
 {
     //TODO/IMPL: #ak use ffmpeg instead of following code (stolen from speech_tools)
