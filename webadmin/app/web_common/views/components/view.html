@@ -131,6 +131,7 @@
 
                     <div class="stick-to-bottom" ng-class="{invisible:!activeCamera}">
                         <timeline
+                                camera-status="activeCamera.status"
                                 can-play-live="!(activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')"
                                 records-provider="activeVideoRecords"
                                 position-handler="switchPosition"
