@@ -113,7 +113,7 @@ void axisHandler::processRequest(
 
     ElapsedEvents& m_events = m_monitor->eventsToCatch();
     auto it = std::find_if(m_events.begin(), m_events.end(),
-        [&uuid](ElapsedEvent& event) { return event.type.eventTypeId == uuid; });
+        [&uuid](ElapsedEvent& event) { return event.type.typeId == uuid; });
     if (it != m_events.end())
     {
         m_monitor->sendEventStartedPacket(it->type);
@@ -182,7 +182,7 @@ void Monitor::addRules(const nx::network::SocketAddress& localAddress, nxpl::NX_
             std::string actionEventName = it->fullName().toStdString();
             std::replace(actionEventName.begin(), actionEventName.end(), '/', '.');
             std::replace(actionEventName.begin(), actionEventName.end(), ':', '_');
-            std::string message = std::string(it->eventTypeId.toSimpleString().toLatin1()) +
+            std::string message = std::string(it->typeId.toSimpleString().toLatin1()) +
                 std::string(".") + actionEventName;
 
             int actionId = cameraController.addActiveHttpNotificationAction(
