@@ -1947,6 +1947,7 @@ void QnWorkbenchNavigator::updateTimelineRelevancy()
         || (currentWidget()
             && widgetIsReady
             && isPlayingSupported()
+            && !resource->hasFlags(Qn::desktop_camera)
             && (hasArchive() || resource->flags().testFlag(Qn::local)));
 
     if (m_timelineRelevant == value)
