@@ -11,9 +11,9 @@
 #include <QtCore/QObject>
 
 #include <nx/cloud/cdb/api/connection.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/timer_manager.h>
 #include <nx/utils/safe_direct_connection.h>
 
 #include "abstract_nonce_provider.h"
@@ -36,7 +36,6 @@ public:
      * @param defaultGenerator Used if no connection to cloud.
      */
     CdbNonceFetcher(
-        nx::utils::StandaloneTimerManager* timerManager,
         AbstractCloudConnectionManager* const cloudConnectionManager,
         AbstractCloudUserInfoPool* cloudUserInfoPool,
         AbstractNonceProvider* defaultGenerator);
@@ -73,8 +72,7 @@ private:
     mutable std::deque<NonceCtx> m_cdbNonceQueue;
     QElapsedTimer m_monotonicClock;
     std::unique_ptr<nx::cdb::api::Connection> m_connection;
-    nx::utils::TimerManager::TimerGuard m_timerID;
-    nx::utils::StandaloneTimerManager* m_timerManager;
+    nx::network::aio::Timer m_timer;
     AbstractCloudUserInfoPool* m_cloudUserInfoPool;
 
     void fetchCdbNonceAsync();
