@@ -70,7 +70,7 @@
                                 <b>網站</b><br>
                                 <a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
-                        {{/系統}}
+                        {{/system}}
                         <td class="left-border">
                             <b>支持</b><br>
                             <a href="{{supportLink}}">{{supportLinkText}}</a>
