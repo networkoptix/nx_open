@@ -27,7 +27,8 @@ using namespace nx::sdk::metadata;
 StubMetadataManager::StubMetadataManager():
     m_eventTypeId(kLineCrossingEventGuid)
 {
-    std::cout << "Creating metadata manager! " << (uintptr_t)this << std::endl;
+    std::cout << "Creating nx::mediaserver::plugins::StubMetadataManager "
+        << (uintptr_t) this << std::endl;
 }
 
 void* StubMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -98,7 +99,8 @@ void StubMetadataManager::freeManifest(const char* data)
 StubMetadataManager::~StubMetadataManager()
 {
     stopFetchingMetadata();
-    std::cout << "Destroying metadata manager!" << (uintptr_t)this << std::endl;
+    std::cout << "Destroying Creating nx::mediaserver::plugins::StubMetadataManager "
+        << (uintptr_t) this << std::endl;
 }
 
 
