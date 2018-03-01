@@ -109,10 +109,12 @@ void AbstractAsyncSearchListModel::Private::commit(qint64 earliestTimeToCommitMs
     qDebug() << "Commit id:" << m_currentFetchId;
     m_currentFetchId = rest::Handle();
 
+    earliestTimeToCommitMs = q->relevantTimePeriod().bound(earliestTimeToCommitMs);
+
     if (!commitPrefetch(earliestTimeToCommitMs, m_fetchedAll))
         return;
 
-    m_earliestTimeMs = q->relevantTimePeriod().bound(earliestTimeToCommitMs);
+    m_earliestTimeMs = earliestTimeToCommitMs;
 }
 
 bool AbstractAsyncSearchListModel::Private::fetchInProgress() const
