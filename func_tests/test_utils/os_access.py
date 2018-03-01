@@ -86,11 +86,11 @@ class SshAccessConfig(object):
     def __init__(self, name, hostname, user=None, key_file_path=None):
         self.name = name
         self.hostname = hostname
-        self.user = user
+        self.rest_api.user = user
         self.key_file_path = key_file_path
 
     def __repr__(self):
-        return '<os_access=%r user=%r key_file=%r>' % (self.hostname, self.user, self.key_file_path)
+        return '<os_access=%r user=%r key_file=%r>' % (self.hostname, self.rest_api.user, self.key_file_path)
 
 
 class OsAccess(object):

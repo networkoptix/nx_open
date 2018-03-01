@@ -60,7 +60,7 @@ def server(name, server_factory, bin_dir, db_version):
     server.start()
     system_settings = dict(autoDiscoveryEnabled=bool_to_str(False))
     server.setup_local_system(systemSettings=system_settings)
-    server.set_system_settings(statisticsAllowed=False)
+    server.rest_api.api.systemSettings.GET(statisticsAllowed=False)
     if db_version == '2.4':
         check_camera(server, server_config.CAMERA_GUID)
     return server
@@ -69,7 +69,7 @@ def copy_database_file(server, bin_dir, backup_db_filename):
     backup_db_path = bin_dir / backup_db_filename
     assert backup_db_path.exists(), (
         "Binary artifact required for this test (database file) '%s' does not exist." % backup_db_path)
-    server_db_path = server.dir / MEDIASERVER_DATABASE_PATH
+    server_db_path = server.installation.dir / MEDIASERVER_DATABASE_PATH
     server.os_access.put_file(backup_db_path, server_db_path)
 
 def check_camera(server, camera_guid):

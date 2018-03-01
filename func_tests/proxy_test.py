@@ -43,7 +43,7 @@ def test_ping_alternate_addressee(proxy, proxy_headers, iterations):
 
 
 def test_redirect(proxy, proxy_headers):
-    auth = HTTPDigestAuth(proxy.user, proxy.password)
+    auth = HTTPDigestAuth(proxy.rest_api.user, proxy.rest_api.password)
     with Session() as session:
         redirect_response = session.get(proxy.rest_api.url, auth=auth, headers=proxy_headers, allow_redirects=False)
         assert 300 <= redirect_response.status_code <= 399, "Expected 3xx but got: %r" % redirect_response
@@ -53,7 +53,7 @@ def test_redirect(proxy, proxy_headers):
 
 
 def test_404(proxy, proxy_headers):
-    auth = HTTPDigestAuth(proxy.user, proxy.password)
+    auth = HTTPDigestAuth(proxy.rest_api.user, proxy.rest_api.password)
     with Session() as session:
         response = session.get(proxy.rest_api.url + 'nonexistent', auth=auth, headers=proxy_headers)
         assert response.status_code == 404, "Expected 404 but got: %r" % response

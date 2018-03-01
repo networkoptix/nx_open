@@ -39,10 +39,10 @@ def test_responses_are_equal(network, target_alias, proxy_alias, api_endpoint):
     while True:
         response_direct = requests.get(
             servers[target_alias].rest_api.url + api_endpoint,
-            auth=requests.auth.HTTPDigestAuth(servers[target_alias].user, servers[target_alias].password))
+            auth=requests.auth.HTTPDigestAuth(servers[target_alias].rest_api.user, servers[target_alias].rest_api.password))
         response_via_proxy = requests.get(
             servers[proxy_alias].rest_api.url + api_endpoint,
-            auth=requests.auth.HTTPDigestAuth(servers[proxy_alias].user, servers[proxy_alias].password),
+            auth=requests.auth.HTTPDigestAuth(servers[proxy_alias].rest_api.user, servers[proxy_alias].rest_api.password),
             headers={'X-server-guid': target_guid})
         diff = datadiff.diff(
             response_via_proxy.json(), response_direct.json(),

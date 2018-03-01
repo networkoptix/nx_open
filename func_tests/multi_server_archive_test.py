@@ -16,7 +16,7 @@ def test_merged_archive(server_factory, camera, sample_media_file):
 
     one = server_factory.create('one')
     two = server_factory.create('two')
-    one.merge([two])
+    one.merge_systems(two)
 
     one.add_camera(camera)
 

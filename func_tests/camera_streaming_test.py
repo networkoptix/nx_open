@@ -62,7 +62,7 @@ def check_media_stream_transports(server):
 def test_camera_switching_should_be_represented_in_history(artifact_factory, server_factory, camera):
     one = server_factory.create('one')
     two = server_factory.create('two')
-    one.merge([two])
+    one.merge_systems(two)
 
     camera.start_streaming()
     camera.wait_until_discovered_by_server([one, two])

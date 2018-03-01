@@ -169,7 +169,7 @@ def get_response(server, method, api_object, api_method):
             log.error("%s call '%s/%s' error: %s", server, api_object, api_method, x)
     log.error('Retry count exceeded limit (%d) for %s call %s/%s; seems server is deadlocked, will make core dump.',
               CHECK_METHOD_RETRY_COUNT, server, api_object, api_method)
-    server.make_core_dump()
+    server.service.make_core_dump()
     raise  # reraise last exception
 
 def clean_transaction_log(json):
@@ -215,7 +215,7 @@ def make_dumps_and_fail(message, servers, merge_timeout, api_method, api_call_st
     log.info(full_message)
     log.info('killing servers for core dumps')
     for server in servers:
-        server.make_core_dump()
+        server.service.make_core_dump()
     pytest.fail(full_message)
 
 def wait_for_method_matched(artifact_factory, servers, method, api_object, api_method, start_time, merge_timeout):
@@ -295,7 +295,8 @@ def test_scalability(artifact_factory, metrics_saver, config, lightweight_server
         for server in servers:
             server.merge_systems(lightweight_servers[0], take_remote_settings=True)
     else:
-        servers[0].merge(servers[1:])
+        for server in servers[1:]:
+            servers[0].merge_systems(server)
 
     try:
         wait_for_data_merged(artifact_factory, lightweight_servers + servers, config.MERGE_TIMEOUT, start_time)

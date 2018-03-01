@@ -124,7 +124,7 @@ class LightweightServer(Server):
                 response = self.rest_api.api.moduleInformation.GET(timeout=LWS_SYNC_CHECK_TIMEOUT)
             except ReadTimeout:
                 #log.error('ReadTimeout when waiting for lws api/moduleInformation; will make core dump')
-                #self.make_core_dump()
+                #self.service.make_core_dump()
                 raise
             if response['serverFlags'] == 'SF_P2pSyncDone':
                 log.info('Lightweight servers merged between themselves in %s' % (utils.datetime_utc_now() - start_time))
@@ -240,7 +240,7 @@ class LightweightServersHost(object):
             return
         if self._first_server and self._first_server.is_online() and not self._first_server.is_online():
             log.warning('Lightweight server at %s does not respond to ping - making core dump', self._host_name)
-            self._first_server.make_core_dump()
+            self._first_server.service.make_core_dump()
 
     def perform_post_checks(self):
         log.info('----- performing post-test checks for lightweight servers at %s'

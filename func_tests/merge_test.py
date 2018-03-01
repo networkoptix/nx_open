@@ -36,7 +36,7 @@ def check_system_settings(server, **kw):
 def change_bool_setting(server, setting):
     val = str_to_bool(get_settings(server.rest_api)[setting])
     settings = {setting:  bool_to_str(not val)}
-    server.set_system_settings(**settings)
+    server.rest_api.get('/api/systemSettings', params=settings)
     check_system_settings(server, **settings)
     return val
 
@@ -227,7 +227,7 @@ def test_merge_resources(vms, server_factory):
 def test_restart_one_server(vms, server_factory, cloud_account):
     one = server_factory.create('one', vm=vms['first'])
     two = server_factory.create('two', vm=vms['second'])
-    one.merge([two])
+    one.merge_systems(two)
 
     # Stop Server2 and clear its database
     guid2 = get_server_id(two.rest_api)

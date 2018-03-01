@@ -2,14 +2,13 @@ import logging
 
 from pylru import lrudecorator
 
-from test_utils.api_shortcuts import get_local_system_id, get_server_id
 from test_utils.rest_api import RestApi
 from test_utils.server import DEFAULT_SERVER_LOG_LEVEL
-from test_utils.service import UpstartService
 from test_utils.server_installation import install_mediaserver
-from .core_file_traceback import create_core_file_traceback
-from .server import ServerConfig, Server
+from test_utils.service import UpstartService
 from .artifact import ArtifactType
+from .core_file_traceback import create_core_file_traceback
+from .server import Server, ServerConfig
 
 log = logging.getLogger(__name__)
 
@@ -93,7 +92,7 @@ class ServerFactory(object):
 
     def _save_server_log(self, server):
         server_name = server.title.lower()
-        log_contents = server.get_log_file()
+        log_contents = server.installation.get_log_file()
         if not log_contents:
             return
         artifact_factory = self._artifact_factory(
@@ -103,7 +102,7 @@ class ServerFactory(object):
 
     def _save_server_core_files(self, server):
         server_name = server.title.lower()
-        for remote_core_path in server.list_core_files():
+        for remote_core_path in server.installation.list_core_files():
             fname = remote_core_path.name
             artifact_factory = self._artifact_factory(
                 ['server', server_name, fname],
@@ -112,7 +111,7 @@ class ServerFactory(object):
             server.os_access.get_file(remote_core_path, local_core_path)
             log.debug('core file for server %s, %s is stored to %s', server.title, server, local_core_path)
             traceback = create_core_file_traceback(
-                server.os_access, server.dir / 'bin/mediaserver-bin', server.dir / 'lib', remote_core_path)
+                server.os_access, server.installation.dir / 'bin/mediaserver-bin', server.dir / 'lib', remote_core_path)
             artifact_factory = self._artifact_factory(
                 ['server', server_name, fname, 'traceback'],
                 name='%s-%s-tb' % (server_name, fname), is_error=True, artifact_type=TRACEBACK_ARTIFACT_TYPE)
@@ -123,13 +122,13 @@ class ServerFactory(object):
         for server in self._allocated_servers:
             if server.service.is_running() and not server.is_online():
                 log.warning('Server %s is started but does not respond to ping - making core dump', server)
-                server.make_core_dump()
+                server.service.make_core_dump()
 
     def perform_post_checks(self):
         log.info('Perform post-test checks.')
         self._check_if_servers_are_online()
         core_dumped_servers = []
         for server in self._allocated_servers:
-            if server.list_core_files():
+            if server.installation.list_core_files():
                 core_dumped_servers.append(server.title)
         assert not core_dumped_servers, 'Following server(s) left core dump(s): %s' % ', '.join(core_dumped_servers)

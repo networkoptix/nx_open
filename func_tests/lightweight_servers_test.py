@@ -22,5 +22,5 @@ def test_merge(server_factory, lightweight_servers_factory, iteration):
 @pytest.mark.skipif(not os.environ.has_key('FRAMEWORK_TEST'), reason='Only for testing of testing framework itself')
 def test_coredump(lightweight_servers_factory):
     lws_list = lightweight_servers_factory(10)
-    lws_list[0].make_core_dump()
+    lws_list[0].service.make_core_dump()
 

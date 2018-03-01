@@ -83,7 +83,7 @@ def server(server_factory, system_backup_type):
     server.os_access.run_command(['mkdir', '-p', BACKUP_STORAGE_PATH])
     server.start()
     server.setup_local_system()
-    server.set_system_settings(backupQualities=system_backup_type)
+    server.rest_api.api.systemSettings.GET(backupQualities=system_backup_type)
     add_backup_storage(server)
     change_and_assert_server_backup_type(server, 'BackupManual')
     return server
@@ -194,7 +194,7 @@ def assert_backup_equal_to_archive(server, camera, system_backup_type, backup_ne
 
 def test_backup_by_request(server, camera_factory, sample_media_file, system_backup_type, backup_new_camera,
                            second_camera_backup_type):
-    server.set_system_settings(
+    server.rest_api.api.systemSettings.GET(
         backupNewCamerasByDefault=backup_new_camera)
     start_time = datetime(2017, 3, 27, tzinfo=pytz.utc)
     camera_1 = add_camera(camera_factory, server, camera_id=1, backup_type=BACKUP_BOTH)

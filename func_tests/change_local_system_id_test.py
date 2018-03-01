@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 def env(server_factory):
     one = server_factory.create('one')
     two = server_factory.create('two')
-    one.merge([two])
+    one.merge_systems(two)
     return SimpleNamespace(
         one=one,
         two=two,

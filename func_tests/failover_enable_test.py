@@ -49,7 +49,8 @@ def create_cameras_and_servers(server_factory, camera_factory, counter, server_n
     all_camera_mac_set = set(create_cameras(camera_factory, counter, count=server_count*2))
     server_list = [create_server(server_factory, server_name, all_camera_mac_set)
                        for server_name in server_name_list]
-    server_list[0].merge(server_list[1:])
+    for server in server_list[1:]:
+        server_list[0].merge_systems(server)
     wait_until_servers_are_online(server_list)
     server_rec_list = [ServerRec(server, set(sorted(all_camera_mac_set)[idx*2 : idx*2 + 2]))
                            for idx, server in enumerate(server_list)]
@@ -191,7 +192,7 @@ def test_failover_and_auto_discovery(server_factory, camera_factory, counter, di
         systemSettings=dict(autoDiscoveryEnabled=bool_to_str(discovery))))
     assert str_to_bool(get_settings(two.rest_api)['autoDiscoveryEnabled']) == discovery
     attach_cameras_to_server(one, camera_mac_set)
-    one.merge([two])
+    one.merge_systems(two)
     wait_until_servers_are_online([one, two])
     wait_until_cameras_on_server_reduced_to(two, set())  # recheck there are no cameras on server two
     two.rest_api.ec2.saveMediaServerUserAttributes.POST(

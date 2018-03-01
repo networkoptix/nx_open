@@ -17,13 +17,13 @@ from netaddr.ip import IPAddress, IPNetwork
 from pathlib2 import Path
 
 from test_utils.api_shortcuts import get_local_system_id, get_server_id, get_settings
-from test_utils.utils import Wait, wait_until
+from test_utils.utils import wait_until
 from .camera import Camera, SampleMediaFile, make_schedule_task
 from .cloud_host import CloudAccount
 from .media_stream import open_media_stream
 from .os_access import LocalAccess
 from .rest_api import HttpError, REST_API_PASSWORD, REST_API_USER
-from .utils import RunningTime, datetime_utc_now, datetime_utc_to_timestamp, is_list_inst
+from .utils import datetime_utc_now, datetime_utc_to_timestamp, is_list_inst
 from .vagrant_vm_config import MEDIASERVER_LISTEN_PORT
 
 DEFAULT_HTTP_SCHEMA = 'http'
@@ -106,25 +106,9 @@ class Server(object):
         self.machine = machine
         self.rest_api = api
         self.internal_ip_port = port or MEDIASERVER_LISTEN_PORT
-        self.forwarded_port = None
 
     def __repr__(self):
         return '<Server at %s>' % self.rest_api.url
-
-    @property
-    def user(self):
-        return self.rest_api.user
-
-    @property
-    def password(self):
-        return self.rest_api.password
-
-    @property
-    def dir(self):
-        return self.installation.dir
-
-    def list_core_files(self):
-        return self.installation.list_core_files()
 
     def is_online(self):
         try:
@@ -151,9 +135,6 @@ class Server(object):
         else:
             if not already_stopped_ok:
                 raise Exception("Already stopped")
-
-    def get_log_file(self):
-        return self.installation.get_log_file()
 
     def restart_via_api(self, timeout=MEDIASERVER_START_TIMEOUT):
         old_runtime_id = self.rest_api.api.moduleInformation.GET()['runtimeId']
@@ -184,22 +165,10 @@ class Server(object):
             log.info("Server restarted successfully, new runtime id is %s", new_runtime_id)
             break
 
-    def make_core_dump(self):
-        self.service.make_core_dump()
-
-    def get_time(self):
-        started_at = datetime.datetime.now(pytz.utc)
-        time_response = self.rest_api.ec2.getCurrentTime.GET()
-        received = datetime.datetime.fromtimestamp(float(time_response['value']) / 1000., pytz.utc)
-        return RunningTime(received, datetime.datetime.now(pytz.utc) - started_at)
-
     def patch_binary_set_cloud_host(self, new_host):
         assert not self.service.is_running(), 'Server %s must be stopped first for patching its binaries' % self
         self.installation.patch_binary_set_cloud_host(new_host)
         self.set_user_password(REST_API_USER, REST_API_PASSWORD)  # Must be reset to default ones
-
-    def set_system_settings(self, **kw):
-        self.rest_api.api.systemSettings.GET(**kw)
 
     def setup_local_system(self, **kw):
         log.info('Setting up server as local system %s:', self)
@@ -213,22 +182,17 @@ class Server(object):
             systemName=self.name,
             cloudAuthKey=bind_info.auth_key,
             cloudSystemID=bind_info.system_id,
-            cloudAccountName=cloud_account.user,
+            cloudAccountName=cloud_account.rest_api.user,
             timeout=datetime.timedelta(minutes=5),
             **kw)
         settings = setup_response['settings']
-        self.set_user_password(cloud_account.user, cloud_account.password)
+        self.set_user_password(cloud_account.rest_api.user, cloud_account.password)
         assert get_settings(self.rest_api)['systemName'] == self.name
         return settings
 
     def detach_from_cloud(self, password):
         self.rest_api.api.detachFromCloud.POST(password=password)
         self.set_user_password(REST_API_USER, password)
-
-    def merge(self, other_server_list):
-        assert is_list_inst(other_server_list, Server), repr(other_server_list)
-        for server in other_server_list:
-            self.merge_systems(server)
 
     def merge_systems(self, other, remote_network=IPNetwork('10.254.0.0/16'), take_remote_settings=False):
         log.info('Merging servers: %s with local_system_id=%r and %s', self, other)
@@ -238,8 +202,8 @@ class Server(object):
         realm, nonce = other.get_nonce()
 
         def make_key(method):
-            digest = generate_auth_key(method, other.user.lower(), other.password, nonce, realm)
-            return urllib.quote(base64.urlsafe_b64encode(':'.join([other.user.lower(), nonce, digest])))
+            digest = generate_auth_key(method, other.rest_api.user.lower(), other.rest_api.password, nonce, realm)
+            return urllib.quote(base64.urlsafe_b64encode(':'.join([other.rest_api.user.lower(), nonce, digest])))
         interfaces = other.rest_api.api.iflist.GET()
         url = None
         for interface in interfaces:
@@ -253,9 +217,9 @@ class Server(object):
             getKey=make_key('GET'), postKey=make_key('POST'),
             takeRemoteSettings=take_remote_settings, mergeOneServer=False)
         if take_remote_settings:
-            self.set_user_password(other.user, other.password)
+            self.set_user_password(other.rest_api.user, other.rest_api.password)
         else:
-            other.set_user_password(self.user, self.password)
+            other.set_user_password(self.rest_api.user, self.rest_api.password)
         wait_until(lambda: get_local_system_id(self.rest_api) == get_local_system_id(other.rest_api))
 
     def set_user_password(self, user, password):
@@ -278,7 +242,7 @@ class Server(object):
                     raise
             time.sleep(1)
         pytest.fail('Timed out in %s waiting for server %s to accept credentials: user=%r, password=%r'
-                    % (MEDIASERVER_CREDENTIALS_TIMEOUT, self, self.user, self.password))
+                    % (MEDIASERVER_CREDENTIALS_TIMEOUT, self, self.rest_api.user, self.rest_api.password))
 
     def get_nonce(self):
         response = self.rest_api.api.getNonce.GET()
@@ -331,7 +295,7 @@ class Server(object):
     def get_media_stream(self, stream_type, camera):
         assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
         assert isinstance(camera, Camera), repr(camera)
-        return open_media_stream(self.rest_api.url, self.user, self.password, stream_type, camera.mac_addr)
+        return open_media_stream(self.rest_api.url, self.rest_api.user, self.rest_api.password, stream_type, camera.mac_addr)
 
 
 class Storage(object):

@@ -120,7 +120,7 @@ def env(server_factory, merge_schema):
     one = server_factory.create('one')
     two = server_factory.create('two')
     if merge_schema == 'merged':
-        one.merge([two])
+        one.merge_systems(two)
     return SimpleNamespace(
         one=one,
         two=two,

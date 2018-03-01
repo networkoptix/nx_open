@@ -1,3 +1,10 @@
+from datetime import datetime
+
+from pytz import utc
+
+from test_utils.utils import RunningTime
+
+
 def get_server_id(api):
     return api.get('/ec2/testConnection')['ecsGuid']
 
@@ -16,3 +23,10 @@ def set_local_system_id(api, new_id):
 
 def get_cloud_system_id(api):
     return get_settings(api)['cloudSystemID']
+
+
+def get_time(api):
+    started_at = datetime.now(utc)
+    time_response = api.get('/ec2/getCurrentTime')
+    received = datetime.fromtimestamp(float(time_response['value']) / 1000., utc)
+    return RunningTime(received, datetime.now(utc) - started_at)
