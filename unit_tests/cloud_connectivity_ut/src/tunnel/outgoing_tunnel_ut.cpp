@@ -4,7 +4,6 @@
 ***********************************************************/
 
 #include <atomic>
-#include <optional>
 
 #include <gtest/gtest.h>
 
@@ -17,6 +16,7 @@
 #include <nx/network/system_socket.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/scope_guard.h>
 
