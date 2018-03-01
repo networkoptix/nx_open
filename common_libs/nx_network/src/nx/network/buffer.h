@@ -12,6 +12,8 @@
 #include <limits>
 
 #include <QtCore/QByteArray>
+#include <QtCore/QString>
+
 #include <boost/functional/hash/hash.hpp>
 
 #ifdef _WIN32

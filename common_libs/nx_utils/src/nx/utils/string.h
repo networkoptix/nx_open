@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <QtCore/QDateTime>
+#include <QtCore/QMap>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
