@@ -132,6 +132,11 @@ public:
         m_aioObject.pleaseStopSync();
     }
 
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
+    {
+        m_aioObject.bindToAioThread(aioThread);
+    }
+
     virtual void setCredentials(
         const std::string& /*login*/,
         const std::string& /*password*/) override
@@ -304,7 +309,6 @@ public:
         m_cloudConnectionManager(&m_cloudData, m_cloudSystemId),
         m_cloudUserInfoPool(m_cloudSystemId),
         m_cdbNonceFetcher(
-            &m_timerManager,
             &m_cloudConnectionManager,
             &m_cloudUserInfoPool,
             &m_nonceProvider)
@@ -373,7 +377,6 @@ protected:
 private:
     CloudData m_cloudData;
     std::string m_cloudSystemId;
-    nx::utils::StandaloneTimerManager m_timerManager;
     DummyCloudConnectionManager m_cloudConnectionManager;
     DummyCloudUserInfoPool m_cloudUserInfoPool;
     DummyNonceProvider m_nonceProvider;
@@ -381,11 +384,6 @@ private:
     QByteArray m_prevNonce;
     std::string m_latestCloudNonce;
     nx::utils::SyncQueue<std::string> m_fetchedNonceEventReceiver;
-
-    virtual void SetUp() override
-    {
-        m_timerManager.start();
-    }
 };
 
 TEST_F(CdbNonceFetcher, nonce_taken_from_cloud_user_attributes_is_accepted)
