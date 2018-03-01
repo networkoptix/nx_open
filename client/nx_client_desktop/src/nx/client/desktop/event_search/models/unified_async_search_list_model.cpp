@@ -93,7 +93,7 @@ void UnifiedAsyncSearchListModel::setFetchDirection(FetchDirection value)
 
 bool UnifiedAsyncSearchListModel::isConstrained() const
 {
-    return m_sourceModel && (!clientsideTextFilter().isEmpty() || m_sourceModel->isConstrained());
+    return m_sourceModel && (!clientsideTextFilter().isEmpty() || m_sourceModel->isConstrained()); 
 }
 
 int UnifiedAsyncSearchListModel::relevantCount() const

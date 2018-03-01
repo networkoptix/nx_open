@@ -53,8 +53,8 @@ public:
     virtual void clear() override;
 
 protected:
-    virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) override;
-    virtual bool commitPrefetch(qint64 syncTimeToCommitMs, bool& fetchedAll) override;
+    virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
+    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit, bool& fetchedAll) override;
     virtual void clipToSelectedTimePeriod() override;
     virtual bool hasAccessRights() const override;
 
@@ -73,13 +73,12 @@ private:
         analytics::storage::ObjectPosition&& position);
 
     using GetCallback = std::function<void(bool, rest::Handle, analytics::storage::LookupResult&&)>;
-    rest::Handle getObjects(qint64 startMs, qint64 endMs, GetCallback callback,
+    rest::Handle getObjects(const QnTimePeriod& period, GetCallback callback,
         int limit = std::numeric_limits<int>::max());
 
     QString description(const analytics::storage::DetectedObject& object) const;
     QString attributes(const analytics::storage::DetectedObject& object) const;
     QSharedPointer<QMenu> contextMenu(const analytics::storage::DetectedObject& object) const;
-    static qint64 startTimeMs(const analytics::storage::DetectedObject& object);
 
     utils::PendingOperation* createUpdateWorkbenchFilterOperation();
 
@@ -104,7 +103,7 @@ private:
     std::deque<analytics::storage::DetectedObject> m_data;
     bool m_success = true;
 
-    QHash<QnUuid, qint64> m_objectIdToTimestampUs;
+    QHash<QnUuid, qint64> m_objectIdToTimestampMs;
 };
 
 } // namespace desktop

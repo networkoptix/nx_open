@@ -73,6 +73,7 @@ public:
     bool isEmpty() const;
 
     qint64 endTimeMs() const;
+    void setEndTimeMs(qint64 value);
 
     /**
      * \returns                         Whether this is a null time period.

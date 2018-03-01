@@ -364,11 +364,12 @@ void UnifiedSearchWidget::fetchMoreIfNeeded()
     if (scrollBar->isVisible() && qBetween(1, scrollBar->value(), scrollBar->maximum()))
         return;
 
-    const bool atTheEnd = scrollBar->isHidden() || scrollBar->value() == scrollBar->maximum();
-
-    model()->setFetchDirection(atTheEnd
-        ? AbstractEventListModel::FetchDirection::earlier
-        : AbstractEventListModel::FetchDirection::later);
+    if (scrollBar->isHidden() || scrollBar->value() == scrollBar->maximum())
+        model()->setFetchDirection(AbstractEventListModel::FetchDirection::earlier);
+    else if (scrollBar->value() == 0)
+        model()->setFetchDirection(AbstractEventListModel::FetchDirection::later);
+    else
+        model()->setFetchDirection(AbstractEventListModel::FetchDirection::none);
 
     if (!model()->canFetchMore(QModelIndex()))
         return;

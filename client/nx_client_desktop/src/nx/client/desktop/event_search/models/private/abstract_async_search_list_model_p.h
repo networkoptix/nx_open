@@ -33,19 +33,19 @@ public:
 
     bool canFetchMore() const;
     bool prefetch(PrefetchCompletionHandler completionHandler);
-    void commit(qint64 syncTimeToCommitMs);
+    void commit(const QnTimePeriod& periodToCommit);
     bool fetchInProgress() const;
 
     QnTimePeriod fetchedTimeWindow() const;
 
 protected:
-    virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) = 0;
-    virtual bool commitPrefetch(qint64 syncTimeToCommitMs, bool& fetchedAll) = 0;
+    virtual rest::Handle requestPrefetch(const QnTimePeriod& period) = 0;
+    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit, bool& fetchedAll) = 0;
     virtual void clipToSelectedTimePeriod() = 0;
     virtual bool hasAccessRights() const = 0;
 
     bool shouldSkipResponse(rest::Handle requestId) const;
-    void complete(qint64 earliestTimeMs); //< Calls and clears m_prefetchCompletionHandler.
+    void completePrefetch(const QnTimePeriod& actuallyFetched, bool limitReached);
     void cancelPrefetch();
 
     template<class DataContainer, class UpperBoundPredicate>
@@ -66,6 +66,7 @@ private:
     rest::Handle m_currentFetchId = rest::Handle();
     PrefetchCompletionHandler m_prefetchCompletionHandler;
     FetchDirection m_prefetchDirection = FetchDirection::earlier;
+    QnTimePeriod m_requestedFetchPeriod;
     bool m_fetchedAll = false;
     int m_lastBatchSize = 0;
 };

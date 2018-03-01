@@ -38,6 +38,7 @@ public:
 
     enum class FetchDirection
     {
+        none,
         earlier,
         later
     };
@@ -76,7 +77,7 @@ protected:
 
 private:
     QnTimePeriod m_relevantTimePeriod = QnTimePeriod::anytime();
-    FetchDirection m_fetchDirection = FetchDirection::earlier;
+    FetchDirection m_fetchDirection = FetchDirection::none;
     int m_maximumCount = 1000; //< Default maximum item count.
     int m_fetchBatchSize = 100; //< Default item count acquired by one fetch.
 };

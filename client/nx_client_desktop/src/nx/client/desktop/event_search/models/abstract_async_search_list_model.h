@@ -49,11 +49,11 @@ protected:
     //   completionHandler instead. To finalize fetch commitPrefetch must be called.
     //   Must return false and do nothing if previous fetch is not committed yet.
     //   Time range synchronization between several models is possible with
-    //   the help of boundaryTimeFetchedMs/syncTimeToCommitMs arguments.
-    //   If prefetch is cancelled, PrefetchCompletionHandler is called with -1.
-    using PrefetchCompletionHandler = std::function<void(qint64 boundaryTimeFetchedMs)>;
+    //   the help of fetchedPeriod/periodToCommit arguments.
+    //   If prefetch is cancelled, PrefetchCompletionHandler is called with {-1, 0}.
+    using PrefetchCompletionHandler = std::function<void(const QnTimePeriod& fetchedPeriod)>;
     virtual bool prefetchAsync(PrefetchCompletionHandler completionHandler);
-    virtual void commitPrefetch(qint64 syncTimeToCommitMs);
+    virtual void commitPrefetch(const QnTimePeriod& periodToCommit);
 
     virtual void relevantTimePeriodChanged(const QnTimePeriod& previousValue) override;
     virtual void fetchDirectionChanged() override;

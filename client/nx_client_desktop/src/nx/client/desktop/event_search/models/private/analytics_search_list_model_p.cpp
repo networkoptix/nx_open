@@ -40,24 +40,24 @@ namespace {
 static constexpr auto kUpdateTimerInterval = std::chrono::seconds(30);
 static constexpr auto kDataChangedInterval = std::chrono::milliseconds(250);
 
-static const auto lowerBoundPredicateUs =
-    [](const DetectedObject& left, qint64 rightUs)
+qint64 startTimeMs(const DetectedObject& object)
+{
+    using namespace std::chrono;
+    return duration_cast<milliseconds>(microseconds(object.firstAppearanceTimeUsec)).count();
+}
+
+static const auto lowerBoundPredicate =
+    [](const DetectedObject& left, qint64 rightMs)
     {
-        return left.firstAppearanceTimeUsec > rightUs;
+        using namespace std::chrono;
+        return startTimeMs(left) > rightMs;
     };
 
-static const auto upperBoundPredicateUs =
-    [](qint64 leftUs, const DetectedObject& right)
-    {
-        return leftUs > right.firstAppearanceTimeUsec;
-    };
-
-static const auto upperBoundPredicateMs =
+static const auto upperBoundPredicate =
     [](qint64 leftMs, const DetectedObject& right)
     {
         using namespace std::chrono;
-        return leftMs > duration_cast<milliseconds>(
-            microseconds(right.firstAppearanceTimeUsec)).count();
+        return leftMs > startTimeMs(right);
     };
 
 } // namespace
@@ -242,7 +242,7 @@ void AnalyticsSearchListModel::Private::clear()
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
     m_prefetch.clear();
-    m_objectIdToTimestampUs.clear();
+    m_objectIdToTimestampMs.clear();
     m_currentUpdateId = rest::Handle();
     m_latestTimeMs = qMin(qnSyncTime->currentMSecsSinceEpoch(), q->relevantTimePeriod().endTimeMs());
     m_filterRect = QRectF();
@@ -257,7 +257,7 @@ bool AnalyticsSearchListModel::Private::hasAccessRights() const
     return q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
 }
 
-rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(qint64 fromMs, qint64 toMs)
+rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
 {
     const auto dataReceived =
         [this](bool success, rest::Handle handle, LookupResult&& data)
@@ -268,30 +268,36 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(qint64 fromMs, q
             m_prefetch = success ? std::move(data) : LookupResult();
             m_success = success;
 
-            if (m_prefetch.empty())
+            const auto actuallyFetched = m_prefetch.empty()
+                ? QnTimePeriod()
+                : QnTimePeriod::fromInterval(startTimeMs(m_prefetch.back()),
+                    startTimeMs(m_prefetch.front()));
+
+            if (actuallyFetched.isNull())
             {
                 qDebug() << "Pre-fetched no analytics";
             }
             else
             {
                 qDebug() << "Pre-fetched" << m_prefetch.size() << "analytics from"
-                    << utils::timestampToRfc2822(startTimeMs(m_prefetch.back())) << "to"
-                    << utils::timestampToRfc2822(startTimeMs(m_prefetch.front()));
+                    << utils::timestampToRfc2822(actuallyFetched.startTimeMs) << "to"
+                    << utils::timestampToRfc2822(actuallyFetched.endTimeMs());
             }
 
             NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().track.empty());
-            complete(m_prefetch.size() >= lastBatchSize()
-                ? startTimeMs(m_prefetch.back()) + 1 /*discard last ms*/
-                : 0);
+
+            const bool limitReached = m_prefetch.size() >= lastBatchSize();
+            completePrefetch(actuallyFetched, limitReached);
         };
 
-    qDebug() << "Requesting analytics from" << utils::timestampToRfc2822(fromMs)
-        << "to" << utils::timestampToRfc2822(toMs);
+    qDebug() << "Requesting analytics from" << utils::timestampToRfc2822(period.startTimeMs)
+        << "to" << utils::timestampToRfc2822(period.endTimeMs());
 
-    return getObjects(fromMs, toMs, dataReceived, lastBatchSize());
+    return getObjects(period, dataReceived, lastBatchSize());
 }
 
-bool AnalyticsSearchListModel::Private::commitPrefetch(qint64 syncTimeToCommitMs, bool& fetchedAll)
+bool AnalyticsSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit,
+    bool& fetchedAll)
 {
     if (!m_success)
     {
@@ -299,32 +305,43 @@ bool AnalyticsSearchListModel::Private::commitPrefetch(qint64 syncTimeToCommitMs
         return false;
     }
 
-    const auto latestTimeUs = std::chrono::duration_cast<std::chrono::microseconds>(
-        std::chrono::milliseconds(syncTimeToCommitMs)).count();
+    const auto begin = std::lower_bound(m_prefetch.cbegin(), m_prefetch.cend(),
+        periodToCommit.endTimeMs(), lowerBoundPredicate);
 
-    const auto end = std::upper_bound(m_prefetch.begin(), m_prefetch.end(),
-        latestTimeUs, upperBoundPredicateUs);
+    const auto end = std::upper_bound(m_prefetch.cbegin(), m_prefetch.cend(),
+        periodToCommit.startTimeMs, upperBoundPredicate);
 
-    const auto first = this->count();
-    const auto count = std::distance(m_prefetch.begin(), end);
-
+    const auto count = std::distance(begin, end);
     if (count > 0)
     {
         qDebug() << "Committing" << count << "analytics from"
-            << utils::timestampToRfc2822(startTimeMs(m_prefetch[count - 1])) << "to"
-            << utils::timestampToRfc2822(startTimeMs(m_prefetch.front()));
+            << utils::timestampToRfc2822(startTimeMs(*(end - 1))) << "to"
+            << utils::timestampToRfc2822(startTimeMs(*begin));
 
-        ScopedInsertRows insertRows(q,  first, first + count - 1);
+        const auto updateLookup =
+            [this, begin, end]()
+            {
+                for (auto iter = begin; iter != end; ++iter)
+                {
+                    if (!m_objectIdToTimestampMs.contains(iter->objectId)) //< Just to be safe.
+                        m_objectIdToTimestampMs[iter->objectId] = startTimeMs(*iter);
+                }
+            };
 
-        for (auto iter = m_prefetch.begin(); iter != end; ++iter)
+        if (q->fetchDirection() == FetchDirection::earlier)
         {
-            if (!m_objectIdToTimestampUs.contains(iter->objectId)) //< Just to be safe.
-                m_objectIdToTimestampUs[iter->objectId] = iter->firstAppearanceTimeUsec;
+            const auto first = this->count();
+            ScopedInsertRows insertRows(q, first, first + count - 1);
+            updateLookup();
+            m_data.insert(m_data.end(), std::make_move_iterator(begin), std::make_move_iterator(end));
         }
-
-        m_data.insert(m_data.end(),
-            std::make_move_iterator(m_prefetch.begin()),
-            std::make_move_iterator(end));
+        else
+        {
+            NX_ASSERT(q->fetchDirection() == FetchDirection::later);
+            ScopedInsertRows insertRows(q, 0, count - 1);
+            updateLookup();
+            m_data.insert(m_data.begin(), std::make_move_iterator(begin), std::make_move_iterator(end));
+        }
     }
     else
     {
@@ -343,11 +360,11 @@ void AnalyticsSearchListModel::Private::clipToSelectedTimePeriod()
     refreshUpdateTimer();
 
     const auto cleanupFunction =
-        [this](const DetectedObject& object) { m_objectIdToTimestampUs.remove(object.objectId); };
+        [this](const DetectedObject& object) { m_objectIdToTimestampMs.remove(object.objectId); };
 
     // Explicit specialization is required for gcc 4.6.
-    clipToTimePeriod<decltype(m_data), decltype(upperBoundPredicateMs)>(
-        m_data, upperBoundPredicateMs, q->relevantTimePeriod(), cleanupFunction);
+    clipToTimePeriod<decltype(m_data), decltype(upperBoundPredicate)>(
+        m_data, upperBoundPredicate, q->relevantTimePeriod(), cleanupFunction);
 }
 
 void AnalyticsSearchListModel::Private::refreshUpdateTimer()
@@ -392,18 +409,15 @@ void AnalyticsSearchListModel::Private::periodicUpdate()
     qDebug() << "Periodic update: requesting new analytics from"
         << utils::timestampToRfc2822(m_latestTimeMs) << "to infinity";
 
-    m_currentUpdateId = getObjects(m_latestTimeMs,
-        std::numeric_limits<qint64>::max(), eventsReceived);
+    m_currentUpdateId = getObjects(QnTimePeriod(m_latestTimeMs, QnTimePeriod::infiniteDuration()),
+        eventsReceived);
 }
 
 void AnalyticsSearchListModel::Private::addNewlyReceivedObjects(
     LookupResult&& data)
 {
-    using namespace std::chrono;
-    const auto latestTimeUs = duration_cast<microseconds>(milliseconds(m_latestTimeMs)).count();
-
     const auto overlapBegin = std::lower_bound(data.begin(), data.end(),
-        latestTimeUs, lowerBoundPredicateUs);
+        m_latestTimeMs, lowerBoundPredicate);
 
     auto added = std::distance(data.begin(), overlapBegin);
     int updated = 0;
@@ -413,7 +427,7 @@ void AnalyticsSearchListModel::Private::addNewlyReceivedObjects(
         const auto index = indexOf(iter->objectId);
         if (index < 0)
         {
-            if (iter->firstAppearanceTimeUsec != latestTimeUs)
+            if (startTimeMs(*iter) != m_latestTimeMs)
             {
                 // A new object with timestamp older than latestTimeUs is invalid:
                 //   we shouldn't insert objects in the middle of already loaded set.
@@ -447,11 +461,10 @@ void AnalyticsSearchListModel::Private::addNewlyReceivedObjects(
             m_data.push_front(std::move(*iter));
     }
 
-    m_latestTimeMs = duration_cast<milliseconds>(
-        microseconds(m_data.front().firstAppearanceTimeUsec)).count();
+    m_latestTimeMs = startTimeMs(m_data.front());
 }
 
-rest::Handle AnalyticsSearchListModel::Private::getObjects(qint64 startMs, qint64 endMs,
+rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& period,
     GetCallback callback, int limit)
 {
     const auto server = q->commonModule()->currentServer();
@@ -461,7 +474,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(qint64 startMs, qint6
 
     Filter request;
     request.deviceId = camera()->getId();
-    request.timePeriod = QnTimePeriod::fromInterval(startMs, endMs);
+    request.timePeriod = period;
     request.sortOrder = Qt::DescendingOrder;
     request.maxObjectsToSelect = limit;
     request.boundingBox = m_filterRect;
@@ -529,7 +542,7 @@ void AnalyticsSearchListModel::Private::processMetadata(
     ScopedInsertRows insertRows(q, 0, int(newObjects.size()) - 1);
 
     for (const auto& newObject: newObjects)
-        m_objectIdToTimestampUs[newObject.objectId] = newObject.firstAppearanceTimeUsec;
+        m_objectIdToTimestampMs[newObject.objectId] = startTimeMs(newObject);
 
     m_data.insert(m_data.begin(),
         std::make_move_iterator(newObjects.begin()),
@@ -574,13 +587,13 @@ void AnalyticsSearchListModel::Private::advanceObject(DetectedObject& object,
 
 int AnalyticsSearchListModel::Private::indexOf(const QnUuid& objectId) const
 {
-    auto timeUs = m_objectIdToTimestampUs.value(objectId, -1);
-    if (timeUs < 0)
+    auto timeMs = m_objectIdToTimestampMs.value(objectId, -1);
+    if (timeMs < 0)
         return -1;
 
     const auto range = std::make_pair(
-        std::lower_bound(m_data.cbegin(), m_data.cend(), timeUs, lowerBoundPredicateUs),
-        std::upper_bound(m_data.cbegin(), m_data.cend(), timeUs, upperBoundPredicateUs));
+        std::lower_bound(m_data.cbegin(), m_data.cend(), timeMs, lowerBoundPredicate),
+        std::upper_bound(m_data.cbegin(), m_data.cend(), timeMs, upperBoundPredicate));
 
     const auto iter = std::find_if(range.first, range.second,
         [&objectId](const DetectedObject& item) { return item.objectId == objectId; });
@@ -599,12 +612,12 @@ QString AnalyticsSearchListModel::Private::description(
     //   Or we need to add some "lastAppearanceDurationUsec"?
     const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
 
+    using namespace std::chrono;
     return lit("%1: %2<br>%3: %4")
         .arg(tr("Start"))
         .arg(start.toString(Qt::RFC2822Date))
         .arg(tr("Duration"))
-        .arg(core::HumanReadable::timeSpan(std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::microseconds(durationUs))));
+        .arg(core::HumanReadable::timeSpan(duration_cast<milliseconds>(microseconds(durationUs))));
 }
 
 QString AnalyticsSearchListModel::Private::attributes(
@@ -710,13 +723,6 @@ void AnalyticsSearchListModel::Private::executePluginAction(
     actionData.objectId = object.objectId;
 
     server->restConnection()->executeAnalyticsAction(actionData, resultCallback, thread());
-}
-
-qint64 AnalyticsSearchListModel::Private::startTimeMs(
-    const DetectedObject& object)
-{
-    return std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::microseconds(object.firstAppearanceTimeUsec)).count();
 }
 
 } // namespace desktop

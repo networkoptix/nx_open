@@ -35,6 +35,13 @@ qint64 QnTimePeriod::endTimeMs() const
     return startTimeMs + durationMs;
 }
 
+void QnTimePeriod::setEndTimeMs(qint64 value)
+{
+    durationMs = value != DATETIME_NOW
+        ? qMax(0LL, value - startTimeMs)
+        : infiniteDuration();
+}
+
 bool QnTimePeriod::isLeftIntersection(const QnTimePeriod& other) const
 {
     return other.startTimeMs < startTimeMs

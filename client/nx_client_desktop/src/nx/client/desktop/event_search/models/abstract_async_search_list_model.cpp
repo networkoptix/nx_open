@@ -74,19 +74,20 @@ bool AbstractAsyncSearchListModel::canFetchMore(const QModelIndex& /*parent*/) c
 void AbstractAsyncSearchListModel::fetchMore(const QModelIndex& /*parent*/)
 {
     prefetchAsync(
-        [this, guard = QPointer<AbstractAsyncSearchListModel>(this)](qint64 earliestTimeMs)
+        [this, guard = QPointer<AbstractAsyncSearchListModel>(this)]
+            (const QnTimePeriod& fetchedPeriod)
         {
             if (!guard)
                 return;
 
-            const bool cancelled = earliestTimeMs < 0;
+            const bool cancelled = fetchedPeriod.startTimeMs < 0;
 
             QnRaiiGuard finishFetch(
                 [this]() { beginFinishFetch(); },
                 [this, cancelled]() { endFinishFetch(cancelled); });
 
             if (!cancelled)
-                commitPrefetch(earliestTimeMs);
+                commitPrefetch(fetchedPeriod);
         });
 }
 
@@ -105,9 +106,9 @@ bool AbstractAsyncSearchListModel::prefetchAsync(PrefetchCompletionHandler compl
     return d->prefetch(completionHandler);
 }
 
-void AbstractAsyncSearchListModel::commitPrefetch(qint64 syncTimeToCommitMs)
+void AbstractAsyncSearchListModel::commitPrefetch(const QnTimePeriod& periodToCommit)
 {
-    d->commit(syncTimeToCommitMs);
+    d->commit(periodToCommit);
 }
 
 } // namespace desktop

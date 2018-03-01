@@ -136,21 +136,21 @@ void BookmarkSearchListModel::Private::clear()
     m_updateBookmarksWatcher->requestOperation();
 }
 
-rest::Handle BookmarkSearchListModel::Private::requestPrefetch(qint64 fromMs, qint64 toMs)
+rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
 {
     QnCameraBookmarkSearchFilter filter;
-    filter.startTimeMs = fromMs;
-    filter.endTimeMs = toMs;
+    filter.startTimeMs = period.startTimeMs;
+    filter.endTimeMs = period.endTimeMs();
     filter.text = m_filterText;
     filter.orderBy.column = Qn::BookmarkStartTime;
     filter.orderBy.order = Qt::DescendingOrder;
     filter.limit = lastBatchSize();
 
-    qDebug() << "Requesting bookmarks from" << utils::timestampToRfc2822(fromMs)
-        << "to" << utils::timestampToRfc2822(toMs);
+    qDebug() << "Requesting bookmarks from" << utils::timestampToRfc2822(period.startTimeMs)
+        << "to" << utils::timestampToRfc2822(period.endTimeMs());
 
     return qnCameraBookmarksManager->getBookmarksAsync({camera()}, filter,
-        [this, guard = QPointer<QObject>(this)]
+        [this, period, guard = QPointer<QObject>(this)]
             (bool success, const QnCameraBookmarkList& bookmarks, int requestId)
         {
             if (!guard || shouldSkipResponse(requestId))
@@ -159,24 +159,29 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(qint64 fromMs, qi
             m_prefetch = success ? std::move(bookmarks) : QnCameraBookmarkList();
             m_success = success;
 
-            if (m_prefetch.empty())
+            const auto actuallyFetched = m_prefetch.empty()
+                ? QnTimePeriod()
+                : QnTimePeriod::fromInterval(m_prefetch.back().startTimeMs,
+                    m_prefetch.front().startTimeMs);
+
+            if (actuallyFetched.isNull())
             {
                 qDebug() << "Pre-fetched no bookmarks";
             }
             else
             {
                 qDebug() << "Pre-fetched" << m_prefetch.size() << "bookmarks from"
-                    << utils::timestampToRfc2822(m_prefetch.back().startTimeMs) << "to"
-                    << utils::timestampToRfc2822(m_prefetch.front().startTimeMs);
+                    << utils::timestampToRfc2822(actuallyFetched.startTimeMs) << "to"
+                    << utils::timestampToRfc2822(actuallyFetched.endTimeMs());
             }
 
-            complete(m_prefetch.size() < lastBatchSize()
-                ? 0
-                : m_prefetch.back().startTimeMs + 1/*discard last ms*/);
+            const bool limitReached = m_prefetch.size() >= lastBatchSize();
+            completePrefetch(actuallyFetched, limitReached);
         });
 }
 
-bool BookmarkSearchListModel::Private::commitPrefetch(qint64 syncTimeToCommitMs, bool& fetchedAll)
+bool BookmarkSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit,
+    bool& fetchedAll)
 {
     if (!m_success)
     {
@@ -184,22 +189,33 @@ bool BookmarkSearchListModel::Private::commitPrefetch(qint64 syncTimeToCommitMs,
         return false;
     }
 
+    const auto begin = std::lower_bound(m_prefetch.cbegin(), m_prefetch.cend(),
+        periodToCommit.endTimeMs(), lowerBoundPredicate);
+
     const auto end = std::upper_bound(m_prefetch.cbegin(), m_prefetch.cend(),
-        syncTimeToCommitMs, upperBoundPredicate);
+        periodToCommit.startTimeMs, upperBoundPredicate);
 
-    const auto first = this->count();
-    const auto count = std::distance(m_prefetch.cbegin(), end);
-
+    const auto count = std::distance(begin, end);
     if (count > 0)
     {
         qDebug() << "Committing" << count << "bookmarks from"
-            << utils::timestampToRfc2822(m_prefetch[count - 1].startTimeMs) << "to"
-            << utils::timestampToRfc2822(m_prefetch.front().startTimeMs);
+            << utils::timestampToRfc2822((end-1)->startTimeMs) << "to"
+            << utils::timestampToRfc2822(begin->startTimeMs);
 
-        ScopedInsertRows insertRows(q, first, first + count - 1);
-        m_data.insert(m_data.end(), m_prefetch.cbegin(), end);
+        if (q->fetchDirection() == FetchDirection::earlier)
+        {
+            const auto first = this->count();
+            ScopedInsertRows insertRows(q, first, first + count - 1);
+            m_data.insert(m_data.end(), begin, end);
+        }
+        else
+        {
+            NX_ASSERT(q->fetchDirection() == FetchDirection::later);
+            ScopedInsertRows insertRows(q, 0, count - 1);
+            m_data.insert(m_data.begin(), begin, end);
+        }
 
-        for (auto iter = m_prefetch.cbegin(); iter != end; ++iter)
+        for (auto iter = begin; iter != end; ++iter)
             m_guidToTimestampMs[iter->guid] = iter->startTimeMs;
     }
     else

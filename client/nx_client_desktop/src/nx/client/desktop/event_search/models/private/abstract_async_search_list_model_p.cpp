@@ -81,7 +81,7 @@ void AbstractAsyncSearchListModel::Private::clear()
 void AbstractAsyncSearchListModel::Private::cancelPrefetch()
 {
     if (m_currentFetchId && m_prefetchCompletionHandler)
-        m_prefetchCompletionHandler(-1);
+        m_prefetchCompletionHandler(QnTimePeriod(-1, 0));
 
     m_currentFetchId = rest::Handle();
     m_prefetchCompletionHandler = PrefetchCompletionHandler();
@@ -92,9 +92,21 @@ bool AbstractAsyncSearchListModel::Private::canFetchMore() const
     if (m_fetchedAll || !m_camera || fetchInProgress() || !hasAccessRights())
         return false;
 
-    return q->fetchDirection() == FetchDirection::earlier
-        ? (m_fetchedTimeWindow.startTimeMs > q->relevantTimePeriod().startTimeMs)
-        : (m_fetchedTimeWindow.endTimeMs() < q->relevantTimePeriod().endTimeMs());
+    switch (q->fetchDirection())
+    {
+        case FetchDirection::none:
+            return false;
+
+        case FetchDirection::earlier:
+            return m_fetchedTimeWindow.startTimeMs > q->relevantTimePeriod().startTimeMs;
+
+        case FetchDirection::later:
+            return m_fetchedTimeWindow.endTimeMs() < q->relevantTimePeriod().endTimeMs();
+
+        default:
+            NX_ASSERT(false);
+            return false;
+    }
 }
 
 bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler completionHandler)
@@ -105,10 +117,18 @@ bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler c
     m_prefetchDirection = q->fetchDirection();
     m_lastBatchSize = q->fetchBatchSize();
 
-    m_currentFetchId = m_prefetchDirection == FetchDirection::earlier
-        ? requestPrefetch(q->relevantTimePeriod().startTimeMs, fetchedTimeWindow().startTimeMs - 1)
-        : requestPrefetch(fetchedTimeWindow().endTimeMs() + 1, q->relevantTimePeriod().endTimeMs());
+    if (m_prefetchDirection == FetchDirection::earlier)
+    {
+        m_requestedFetchPeriod.startTimeMs = q->relevantTimePeriod().startTimeMs;
+        m_requestedFetchPeriod.setEndTimeMs(fetchedTimeWindow().startTimeMs - 1);
+    }
+    else
+    {
+        m_requestedFetchPeriod.startTimeMs = fetchedTimeWindow().endTimeMs() + 1;
+        m_requestedFetchPeriod.setEndTimeMs(q->relevantTimePeriod().endTimeMs());
+    }
 
+    m_currentFetchId = requestPrefetch(m_requestedFetchPeriod);
     if (!m_currentFetchId)
         return false;
 
@@ -118,7 +138,7 @@ bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler c
     return true;
 }
 
-void AbstractAsyncSearchListModel::Private::commit(qint64 syncTimeToCommitMs)
+void AbstractAsyncSearchListModel::Private::commit(const QnTimePeriod& periodToCommit)
 {
     if (!m_currentFetchId)
         return;
@@ -126,21 +146,13 @@ void AbstractAsyncSearchListModel::Private::commit(qint64 syncTimeToCommitMs)
     qDebug() << "Commit id:" << m_currentFetchId;
     m_currentFetchId = rest::Handle();
 
-    if (!commitPrefetch(syncTimeToCommitMs, m_fetchedAll))
+    if (!commitPrefetch(periodToCommit, m_fetchedAll))
         return;
 
-    if (m_prefetchDirection == FetchDirection::earlier)
-    {
-        m_fetchedTimeWindow.startTimeMs = q->relevantTimePeriod().bound(syncTimeToCommitMs);
-    }
+    if (m_fetchedTimeWindow.isInfinite()) // TODO: FIXME: #vkutin Is this right?
+        m_fetchedTimeWindow = periodToCommit;
     else
-    {
-        if (!m_fetchedTimeWindow.isInfinite())
-        {
-            const auto endMs = q->relevantTimePeriod().bound(syncTimeToCommitMs) + 1;
-            m_fetchedTimeWindow.durationMs = endMs - m_fetchedTimeWindow.startTimeMs;
-        }
-    }
+        m_fetchedTimeWindow.addPeriod(periodToCommit);
 }
 
 bool AbstractAsyncSearchListModel::Private::fetchInProgress() const
@@ -153,10 +165,25 @@ bool AbstractAsyncSearchListModel::Private::shouldSkipResponse(rest::Handle requ
     return !m_currentFetchId || !m_prefetchCompletionHandler || m_currentFetchId != requestId;
 }
 
-void AbstractAsyncSearchListModel::Private::complete(qint64 earliestTimeMs)
+void AbstractAsyncSearchListModel::Private::completePrefetch(
+    const QnTimePeriod& actuallyFetched, bool limitReached)
 {
+    auto fetchedPeriod = [&]()
+    {
+        if (!limitReached)
+            return m_requestedFetchPeriod;
+
+        auto result = m_requestedFetchPeriod;
+        if (m_prefetchDirection == FetchDirection::earlier)
+            result.startTimeMs = actuallyFetched.startTimeMs + 1;
+        else
+            result.setEndTimeMs(actuallyFetched.endTimeMs() - 1);
+
+        return result;
+    };
+
     NX_ASSERT(m_prefetchCompletionHandler);
-    m_prefetchCompletionHandler(earliestTimeMs);
+    m_prefetchCompletionHandler(fetchedPeriod());
     m_prefetchCompletionHandler = PrefetchCompletionHandler();
 }
 
