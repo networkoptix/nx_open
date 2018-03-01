@@ -38,8 +38,8 @@ public:
     static constexpr QnTimePeriod fromInterval(qint64 startTimeMs, qint64 endTimeMs)
     {
         return startTimeMs <= endTimeMs
-            ? QnTimePeriod(startTimeMs, endTimeMs)
-            : QnTimePeriod(endTimeMs, startTimeMs);
+            ? QnTimePeriod(startTimeMs, endTimeMs - startTimeMs)
+            : QnTimePeriod(endTimeMs, startTimeMs - endTimeMs);
     };
 
     QnTimePeriod& operator = (const QnTimePeriod &other);
