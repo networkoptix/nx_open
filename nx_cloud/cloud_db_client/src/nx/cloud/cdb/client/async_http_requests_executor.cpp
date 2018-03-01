@@ -18,16 +18,9 @@ AsyncRequestsExecutor::AsyncRequestsExecutor(
 
 AsyncRequestsExecutor::~AsyncRequestsExecutor()
 {
-    QnMutexLocker lk(&m_mutex);
-    while (!m_runningRequests.empty())
-    {
-        auto request = std::move(m_runningRequests.front());
-        m_runningRequests.pop_front();
-        lk.unlock();
-        request->pleaseStopSync();
-        request.reset();
-        lk.relock();
-    }
+    m_cdbEndPointFetcher.reset();
+
+    pleaseStopSync();
 }
 
 void AsyncRequestsExecutor::setCredentials(
@@ -65,6 +58,20 @@ void AsyncRequestsExecutor::setRequestTimeout(
 std::chrono::milliseconds AsyncRequestsExecutor::requestTimeout() const
 {
     return m_requestTimeout;
+}
+
+void AsyncRequestsExecutor::bindToAioThread(
+    network::aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+
+    for (auto& request: m_runningRequests)
+        request->bindToAioThread(aioThread);
+}
+
+void AsyncRequestsExecutor::stopWhileInAioThread()
+{
+    m_runningRequests.clear();
 }
 
 } // namespace client
