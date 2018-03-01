@@ -11,10 +11,11 @@ import yaml
 from pathlib2 import Path
 
 import server_api_data_generators as generator
+from test_utils.api_shortcuts import get_server_id, get_settings
 from test_utils.networking import setup_networks
 from test_utils.rest_api import HttpError, RestApiError
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
-from test_utils.utils import bool_to_str, datetime_utc_now, str_to_bool
+from test_utils.utils import bool_to_str, datetime_utc_now, str_to_bool, wait_until
 
 log = logging.getLogger(__name__)
 
@@ -28,12 +29,12 @@ def test_system_settings():
 
 
 def check_system_settings(server, **kw):
-    settings_to_check = {k: v for k, v in server.settings.items() if k in kw.keys()}
+    settings_to_check = {k: v for k, v in get_settings(server.rest_api).items() if k in kw.keys()}
     assert settings_to_check == kw
 
 
 def change_bool_setting(server, setting):
-    val = str_to_bool(server.settings[setting])
+    val = str_to_bool(get_settings(server.rest_api)[setting])
     settings = {setting:  bool_to_str(not val)}
     server.set_system_settings(**settings)
     check_system_settings(server, **settings)
@@ -41,14 +42,7 @@ def change_bool_setting(server, setting):
 
 
 def wait_for_settings_merge(one, two):
-    start_time = datetime_utc_now()
-    while datetime_utc_now() - start_time < MEDIASERVER_MERGE_TIMEOUT:
-        one.load_system_settings()
-        two.load_system_settings()
-        if one.settings == two.settings:
-            return
-        time.sleep(0.5)
-    assert one.settings == two.settings
+    assert wait_until(lambda: one.rest_api.get('/api/systemSettings') == two.rest_api.get('/api/systemSettings'))
 
 
 def check_admin_disabled(server):
@@ -236,8 +230,10 @@ def test_restart_one_server(vms, server_factory, cloud_account):
     one.merge([two])
 
     # Stop Server2 and clear its database
-    guid2 = two.ecs_guid
-    two.reset()
+    guid2 = get_server_id(two.rest_api)
+    two.stop()
+    two.installation.cleanup_var_dir()
+    two.start()
 
     # Remove Server2 from database on Server1
     one.rest_api.ec2.removeResource.POST(id=guid2)

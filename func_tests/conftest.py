@@ -3,8 +3,7 @@ import os
 from textwrap import dedent
 
 import pytest
-import yaml
-from netaddr import IPAddress, IPNetwork
+from netaddr import IPAddress
 from pathlib2 import Path
 
 from network_layouts import get_layout

@@ -56,10 +56,10 @@ def test_server_should_pick_archive_file_with_time_after_db_time(server, camera,
     assert expected_periods_1 == server.get_recorded_time_periods(camera)
 
     # stop service and add more media files to archive:
-    server.stop_service()
+    server.stop()
     for st in start_times_2:
         storage.save_media_sample(camera, st, sample)
-    server.start_service()
+    server.start()
 
     time.sleep(10)  # servers still need some time to settle down; hope this time will be enough
     # after restart new periods must be picked:
@@ -225,13 +225,13 @@ def test_frequent_restarts(server):
     '/api/nonExistent', '/ec2/nonExistent'])  # VMS-7809: Redirects with 301 but not returns 404.
 def test_non_existent_api_endpoints(server, path):
     auth = HTTPDigestAuth(server.user, server.password)
-    response = requests.get(server.rest_api_url.rstrip('/') + path, auth=auth, allow_redirects=False)
+    response = requests.get(server.rest_api.url.rstrip('/') + path, auth=auth, allow_redirects=False)
     assert response.status_code == 404, "Expected 404 but got %r"
 
 
 def test_https_verification(server_factory):
     server = server_factory.create('server', http_schema='https')
-    url = server.rest_api_url.rstrip('/') + '/api/ping'
+    url = server.rest_api.url.rstrip('/') + '/api/ping'
     with warnings.catch_warnings(record=True) as warning_list:
         response = requests.get(url, verify=str(server.rest_api.ca_cert))
     assert response.status_code == 200

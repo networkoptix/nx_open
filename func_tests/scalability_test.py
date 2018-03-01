@@ -17,6 +17,7 @@ import server_api_data_generators as generator
 import test_utils.utils as utils
 import transaction_log
 from memory_usage_metrics import load_host_memory_usage
+from test_utils.api_shortcuts import get_server_id
 from test_utils.compare import compare_values
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.utils import GrowingSleep
@@ -132,7 +133,7 @@ def create_test_data_on_server((config, server, index)):
         saveUser=resource_test.SeedResourceGenerator(generator.generate_user_data, index * config.USERS_PER_SERVER),
         saveStorage=resource_test.SeedResourceWithParentGenerator(generator.generate_storage_data, index * config.STORAGES_PER_SERVER),
         saveLayout=resource_test.LayoutGenerator(index * (config.USERS_PER_SERVER + 1)))
-    servers_with_guids = [(server, server.ecs_guid)]
+    servers_with_guids = [(server, get_server_id(server.rest_api))]
     users = create_resources_on_server_by_size(
         server, 'saveUser',  resource_generators, config.USERS_PER_SERVER)
     users.append(get_server_admin(server))
@@ -302,6 +303,6 @@ def test_scalability(artifact_factory, metrics_saver, config, lightweight_server
         metrics_saver.save('merge_duration', merge_duration)
         collect_additional_metrics(metrics_saver, servers, lightweight_servers)
     finally:
-        if servers[0].is_started():
-            servers[0].load_system_settings(log_settings=True)  # log final settings
+        if servers[0].is_online():
+            servers[0].rest_api.get('/api/systemSettings')  # log final settings
     assert utils.str_to_bool(servers[0].settings['autoDiscoveryEnabled']) == False

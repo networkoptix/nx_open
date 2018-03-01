@@ -2,6 +2,9 @@ import logging
 
 from pylru import lrudecorator
 
+from test_utils.api_shortcuts import get_local_system_id, get_server_id
+from test_utils.rest_api import RestApi
+from test_utils.server import DEFAULT_SERVER_LOG_LEVEL
 from test_utils.service import UpstartService
 from test_utils.server_installation import install_mediaserver
 from .core_file_traceback import create_core_file_traceback
@@ -48,43 +51,32 @@ class ServerFactory(object):
                 vm = config.vm
             else:
                 vm = self._vagrant_vm_factory.get(name)
-            installation = install_mediaserver(vm.os_access, self._mediaserver_deb)
-            installation.put_key_and_cert(self._ca.generate_key_and_cert())
             vm_host_hostname = vm.host_os_access.hostname
             api_url = '%s://%s:%d/' % (config.http_schema, vm_host_hostname, vm.config.rest_api_forwarded_port)
-            customization = self._mediaserver_deb.customization
-            service = UpstartService(vm.os_access, customization.service_name)
-            if not service.is_running():
-                service.set_state(True)
             server = Server(
-                name, service, installation, api_url, self._ca, vm,
-                rest_api_timeout=config.rest_api_timeout)
-
-        self._allocated_servers.append(server)  # _prepare_server may fail, will need to save it's artifact in that case
-        self._prepare_server(config, server)
-        log.info('SERVER %s: %s at %s, rest_api=%s ecs_guid=%r local_system_id=%r',
-                 server.title, server.name, server.os_access, server.rest_api_url, server.ecs_guid,
-                 server.local_system_id)
-        return server
-
-    def _prepare_server(self, config, server):
-        if config.leave_initial_cloud_host:
-            patch_set_cloud_host = None
-        else:
-            patch_set_cloud_host = self._cloud_host
-        server.init(
-            must_start=config.start,
-            reset=self._reset_servers,
-            patch_set_cloud_host=patch_set_cloud_host,
-            config_file_params=config.config_file_params,
-            )
-        if server.is_started() and not server.is_system_set_up() and config.setup:
+                name,
+                UpstartService(vm.os_access, self._mediaserver_deb.customization.service_name),
+                install_mediaserver(vm.os_access, self._mediaserver_deb),
+                RestApi(name, api_url, timeout=config.rest_api_timeout),
+                vm)
+        self._allocated_servers.append(server)  # Following may fail, will need to save it's artifact in that case.
+        server.stop(already_stopped_ok=True)
+        server.installation.cleanup_core_files()
+        server.installation.cleanup_var_dir()
+        server.installation.reset_config(
+            logLevel=DEFAULT_SERVER_LOG_LEVEL,
+            tranLogLevel=DEFAULT_SERVER_LOG_LEVEL,
+            **(config.config_file_params or {}))
+        server.installation.put_key_and_cert(self._ca.generate_key_and_cert())
+        if not config.leave_initial_cloud_host:
+            server.patch_binary_set_cloud_host(self._cloud_host)  # may be changed by previous tests...
+        server.start()
+        if config.setup:
             if config.setup_cloud_account:
-                log.info('Setting up server as local system %s:', server)
                 server.setup_cloud_system(config.setup_cloud_account, **config.setup_settings)
             else:
-                log.info('Setting up server as local system %s:', server)
                 server.setup_local_system(**config.setup_settings)
+        return server
 
     def release(self):
         self.get.clear()
@@ -129,7 +121,7 @@ class ServerFactory(object):
 
     def _check_if_servers_are_online(self):
         for server in self._allocated_servers:
-            if server.is_started() and not server.is_server_online():
+            if server.service.is_running() and not server.is_online():
                 log.warning('Server %s is started but does not respond to ping - making core dump', server)
                 server.make_core_dump()
 

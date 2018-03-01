@@ -7,6 +7,7 @@ import pytz
 import requests
 import requests.auth
 
+from test_utils.api_shortcuts import get_server_id
 from test_utils.server import TimePeriod
 from test_utils.utils import Wait
 
@@ -34,14 +35,15 @@ log = logging.getLogger(__name__)
 def test_responses_are_equal(network, target_alias, proxy_alias, api_endpoint):
     _, servers = network
     wait = Wait("until responses become equal")
+    target_guid = get_server_id(servers[target_alias].rest_api)
     while True:
         response_direct = requests.get(
-            servers[target_alias].rest_api_url + api_endpoint,
+            servers[target_alias].rest_api.url + api_endpoint,
             auth=requests.auth.HTTPDigestAuth(servers[target_alias].user, servers[target_alias].password))
         response_via_proxy = requests.get(
-            servers[proxy_alias].rest_api_url + api_endpoint,
+            servers[proxy_alias].rest_api.url + api_endpoint,
             auth=requests.auth.HTTPDigestAuth(servers[proxy_alias].user, servers[proxy_alias].password),
-            headers={'X-server-guid': servers[target_alias].ecs_guid})
+            headers={'X-server-guid': target_guid})
         diff = datadiff.diff(
             response_via_proxy.json(), response_direct.json(),
             fromfile='via proxy', tofile='direct',

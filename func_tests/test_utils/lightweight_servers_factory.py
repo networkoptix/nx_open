@@ -5,12 +5,14 @@ import logging
 
 from requests.exceptions import ReadTimeout
 
+from test_utils.rest_api import RestApi
+from test_utils.utils import wait_until
 from . import utils
 from .utils import GrowingSleep
 from .core_file_traceback import create_core_file_traceback
 from .server_factory import SERVER_LOG_ARTIFACT_TYPE, CORE_FILE_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
 from .server import Server
-from .service import SERVER_CTL_TARGET_PATH, AdHocService
+from .service import AdHocService
 from .template_renderer import TemplateRenderer
 
 log = logging.getLogger(__name__)
@@ -21,7 +23,6 @@ LWS_PORT_BASE = 3000
 LWS_BINARY_NAME = 'appserver2_ut'
 LWS_START_TIMEOUT = datetime.timedelta(minutes=10)  # timeout when waiting for lws become online (pingable)
 LWS_SYNC_CHECK_TIMEOUT = datetime.timedelta(minutes=1)  # calling api/moduleInformation to check for SF_P2pSyncDone flag
-
 
 
 class LightweightServersFactory(object):
@@ -110,17 +111,9 @@ class LightweightServersInstallation(object):
 
 
 class LightweightServer(Server):
-
-    def __init__(self, name, host, service, installation, rest_api_url, ca, rest_api_timeout=None,
-                 internal_ip_port=None):
-        Server.__init__(self, name, host, service, installation, rest_api_url, ca,
-                        rest_api_timeout=rest_api_timeout, internal_ip_port=internal_ip_port)
-        self.internal_ip_address = host.hostname
-        self._state = self._st_started
-
-    def load_system_settings(self, log_settings=False):
-        response = self.rest_api.api.ping.GET()
-        self.local_system_id = response['localSystemId']
+    def __init__(self, name, os_access, service, installation, rest_api, port=None):
+        super(LightweightServer, self).__init__(name, service, installation, rest_api, None, port=port)
+        self.internal_ip_address = os_access.hostname
 
     def wait_until_synced(self, timeout):
         log.info('Waiting for lightweight servers to merge between themselves')
@@ -169,16 +162,15 @@ class LightweightServersHost(object):
         self._cleanup_log_files()
         self._os_access.put_file(self._test_binary_path, self._lws_dir)
         self._write_lws_ctl(server_dir, server_count, lws_params)
-        self.service.set_state(is_started=True)
+        self.service.start()
         # must be set before cycle following it so failure in that cycle won't prevent from artifacts collection from 'release' method
         self._allocated = True
         for idx in range(server_count):
             server_port = LWS_PORT_BASE + idx
-            rest_api_url = '%s://%s:%d/' % ('http', self._os_access.hostname, server_port)
-            server = LightweightServer('lws-%05d' % idx, self._os_access, self._installation, self.service, self._ca,
-                                       rest_api_url, internal_ip_port=server_port)
-            response = server.wait_for_server_become_online(timeout=LWS_START_TIMEOUT, check_interval_sec=2)
-            server.local_system_id = response['localSystemId']
+            name = 'lws-%05d' % idx
+            api = RestApi(name, '%s://%s:%d/' % ('http', self._os_access.hostname, server_port))
+            server = LightweightServer(name, self._os_access, self.service, self._installation, api, port=server_port)
+            wait_until(server.is_online)
             if not self._first_server:
                 self._first_server = server
             yield server
@@ -190,8 +182,8 @@ class LightweightServersHost(object):
         self._allocated = False
 
     def _init(self):
-        if self.service.get_state():
-            self.service.set_state(is_started=False)
+        if self.service.is_running():
+            self.service.stop()
         self._installation.cleanup_core_files()
         self._installation.cleanup_test_tmp_dir()
 
@@ -210,7 +202,7 @@ class LightweightServersHost(object):
             PORT_BASE=LWS_PORT_BASE,
             TEST_TMP_DIR=self._installation.test_tmp_dir,
             **lws_params)
-        lws_ctl_path = self._lws_dir / SERVER_CTL_TARGET_PATH
+        lws_ctl_path = self._lws_dir / 'server_ctl.sh'
         self._os_access.write_file(lws_ctl_path, contents)
         self._os_access.run_command(['chmod', '+x', lws_ctl_path])
 
@@ -246,7 +238,7 @@ class LightweightServersHost(object):
     def _check_if_server_is_online(self):
         if not self._allocated:
             return
-        if self._first_server and self._first_server.is_started() and not self._first_server.is_server_online():
+        if self._first_server and self._first_server.is_online() and not self._first_server.is_online():
             log.warning('Lightweight server at %s does not respond to ping - making core dump', self._host_name)
             self._first_server.make_core_dump()
 

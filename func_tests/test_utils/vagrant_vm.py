@@ -1,5 +1,4 @@
 import logging
-import tempfile
 
 import jinja2
 import vagrant

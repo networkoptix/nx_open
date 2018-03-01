@@ -11,6 +11,7 @@ from pytz import utc
 from pylru import lrudecorator
 
 from network_layouts import get_layout
+from test_utils.api_shortcuts import get_server_id
 from test_utils.merging import merge_system
 from test_utils.networking import disable_internet, enable_internet, setup_networks
 from test_utils.utils import RunningTime, holds_long_enough, wait_until
@@ -50,19 +51,18 @@ def system(vm_factory, server_factory):
     servers = {}
     for alias in {'first', 'second'}:
         server = server_factory.create(alias, vm=vms[alias])
-        if server.service.get_state():
-            server.stop_service()
+        if server.service.is_running():
+            server.stop()
         # Reset server without internet access.
         server.machine.networking.os_networking.prohibit_global()
         server.installation.cleanup_var_dir()
         server.installation.change_config(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
-        server.start_service()
+        server.start()
         server.setup_local_system()
         servers[alias] = server
     merge_system(servers, layout.mergers)
-    random_server = servers['first']
-    random_server_response = random_server.rest_api.ec2.getCurrentTime.GET()
-    if servers['first'].ecs_guid == random_server_response['primaryTimeServerGuid']:
+    first_server_response = servers['first'].rest_api.ec2.getCurrentTime.GET()
+    if first_server_response['isPrimaryTimeServer']:
         system = System(primary=servers['first'], secondary=servers['second'])
     else:
         system = System(primary=servers['second'], secondary=servers['first'])
@@ -100,7 +100,8 @@ def test_change_time_on_primary_server(system):
 @pytest.mark.quick
 def test_change_primary_server(system):
     """Change PRIMARY server, change time on its machine. Expect all servers align with it."""
-    system.secondary.rest_api.ec2.forcePrimaryTimeServer.POST(id=system.secondary.ecs_guid)
+    guid = get_server_id(system.secondary.rest_api)
+    system.secondary.rest_api.ec2.forcePrimaryTimeServer.POST(id=guid)
     new_primary, new_secondary = system.secondary, system.primary
     new_primary_vm_time = new_primary.os_access.set_time(BASE_TIME + timedelta(hours=5))
     assert wait_until(lambda: new_primary.get_time().is_close_to(new_primary_vm_time)), (
@@ -123,7 +124,7 @@ def test_change_time_on_secondary_server(system):
 def test_primary_server_temporary_offline(system):
     primary_time = system.primary.os_access.set_time(BASE_TIME - timedelta(hours=2))
     assert wait_until(lambda: system.secondary.get_time().is_close_to(primary_time))
-    system.primary.stop_service()
+    system.primary.stop()
     system.secondary.os_access.set_time(BASE_TIME + timedelta(hours=4))
     assert holds_long_enough(lambda: system.secondary.get_time().is_close_to(primary_time)), (
         "After PRIMARY time server was stopped, "
@@ -158,12 +159,12 @@ def test_secondary_server_temporary_inet_on(system):
             system.primary.get_time(), get_internet_time()))
 
     # Stop secondary server
-    system.secondary.stop_service()
+    system.secondary.stop()
     assert holds_long_enough(lambda: system.primary.get_time().is_close_to(get_internet_time())), (
         "When NON-PRIMARY server was stopped, "
         "time on PRIMARY time server %s is NOT EQUAL to internet time %s" % (
             system.primary.get_time(), get_internet_time()))
-    system.secondary.start_service()
+    system.secondary.start()
 
     # Restart secondary server
     system.secondary.restart_via_api()
@@ -173,11 +174,11 @@ def test_secondary_server_temporary_inet_on(system):
             system.primary.get_time(), get_internet_time()))
 
     # Stop and start both servers - so that servers could forget internet time
-    system.secondary.stop_service()
-    system.primary.stop_service()
+    system.secondary.stop()
+    system.primary.stop()
     time.sleep(1)
-    system.primary.start_service()
-    system.secondary.start_service()
+    system.primary.start()
+    system.secondary.start()
 
     # Detect new PRIMARY and change its system time
     system.primary.os_access.set_time(BASE_TIME - timedelta(hours=25))

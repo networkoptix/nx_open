@@ -57,7 +57,7 @@ def server(name, server_factory, bin_dir, db_version):
         copy_database_file(server, bin_dir, server_config.DATABASE_FILE_V_2_4)
     else:
         server = server_factory.create(name, start=False)
-    server.start_service()
+    server.start()
     system_settings = dict(autoDiscoveryEnabled=bool_to_str(False))
     server.setup_local_system(systemSettings=system_settings)
     server.set_system_settings(statisticsAllowed=False)
@@ -145,13 +145,13 @@ def test_backup_restore(artifact_factory, one, two, camera):
 @pytest.mark.skip(reason="VMS-5969")
 @pytest.mark.parametrize('db_version', ['current'])
 def test_server_guids_changed(one, two):
-    one.stop_service()
-    two.stop_service()
+    one.stop()
+    two.stop()
     # To make server database and configuration file guids different
-    one.change_config(guidIsHWID='no', serverGuid=SERVER_CONFIG['one'].SERVER_GUID)
-    two.reset_config(guidIsHWID='no', serverGuid=SERVER_CONFIG['two'].SERVER_GUID)
-    one.start_service()
-    two.start_service()
+    one.installation.change_config(guidIsHWID='no', serverGuid=SERVER_CONFIG['one'].SERVER_GUID)
+    two.installation.reset_config(guidIsHWID='no', serverGuid=SERVER_CONFIG['two'].SERVER_GUID)
+    one.start()
+    two.start()
     one.setup_local_system()
     two.setup_local_system()
     two.merge_systems(one)

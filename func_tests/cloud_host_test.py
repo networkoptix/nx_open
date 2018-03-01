@@ -1,4 +1,5 @@
 import logging
+from uuid import UUID
 
 import pytest
 
@@ -25,7 +26,7 @@ def test_with_different_cloud_hosts_must_not_be_able_to_merge(server_factory, cl
     two = server_factory.create('two', start=False, http_schema=http_schema)
 
     two.patch_binary_set_cloud_host(cloud_host_2)
-    two.start_service()
+    two.start()
     two.setup_local_system()
 
     one.setup_cloud_system(cloud_account)
@@ -36,15 +37,17 @@ def test_with_different_cloud_hosts_must_not_be_able_to_merge(server_factory, cl
     assert x_info.value.reason == 'INCOMPATIBLE'
 
     # after patching to new cloud host server should reset system and users
-    one.stop_service()
+    one.stop()
     one.patch_binary_set_cloud_host(cloud_host_2)
-    one.start_service()
-    assert one.get_setup_type() is None  # patch/change cloud host must reset the system
+    one.start()
+    assert (
+        one.rest_api.get('/api/systemSettings')['settings']['localSystemId'] == UUID(0),
+        "patch/change cloud host must reset the system")
     one.setup_local_system()
     check_user_exists(one, is_cloud=False)  # cloud user must be gone after patch/changed cloud host
 
     one.merge_systems(two)
-    assert two.get_setup_type() == 'local'
+    assert not two.rest_api.get('/api/systemSettings')['settings']['cloudSystemID']
     check_user_exists(two, is_cloud=False)  # cloud user most not get into server two either
     
 
