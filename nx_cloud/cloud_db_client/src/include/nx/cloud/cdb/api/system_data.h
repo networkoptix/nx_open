@@ -4,6 +4,7 @@
 #include <chrono>
 #include <string>
 #include <vector>
+#include <map>
 
 #include <boost/optional.hpp>
 
