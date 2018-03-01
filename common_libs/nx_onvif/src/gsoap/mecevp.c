@@ -1020,7 +1020,7 @@ soap_mec_get_base64(struct soap *soap, struct soap_mec_data *data, char *t, size
         return SOAP_OK;
       }
       if (c >= '+' && c <= '+' + 79)
-      { register int b = soap_base64i[c - '+'];
+      { int b = soap_base64i[c - '+'];
         if (b >= 64)
           return soap->error = SOAP_SSL_ERROR;
         m = (m << 6) + b;
