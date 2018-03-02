@@ -54,9 +54,6 @@ def pytest_addoption(parser):
     parser.addoption('--cloud-group', default=DEFAULT_CLOUD_GROUP,
                      help='Cloud group; cloud host for it will be requested from ireg.hdw.mx;'
                           ' default is %r' % DEFAULT_CLOUD_GROUP)
-    parser.addoption('--customization', default=DEFAULT_CUSTOMIZATION,
-                     help='Customization; will be used for requesting cloud host from ireg.hdw.mx;'
-                          ' default is %r' % DEFAULT_CUSTOMIZATION)
     parser.addoption('--autotest-email-password',
                      help='Password for accessing service account via IMAP protocol. '
                           'Used for activation cloud accounts for different cloud groups and customizations.')
@@ -71,9 +68,6 @@ def pytest_addoption(parser):
                      help='media sample file path, default is %s at binary directory' % MEDIA_SAMPLE_PATH)
     parser.addoption('--media-stream-path', default=MEDIA_STREAM_PATH, type=Path,
                      help='media sample test camera stream, relative to bin dir [%s]' % MEDIA_STREAM_PATH)
-    parser.addoption('--no-servers-reset', action='store_true',
-                     help='skip servers reset/cleanup on test setup')
-    parser.addoption('--recreate-vms', action='store_true', help='destroy and create again vagrant VMs')
     parser.addoption('--vm-name-prefix', default=DEFAULT_VIRTUALBOX_NAME_PREFIX,
                      help='prefix for virtualenv machine names')
     parser.addoption('--vm-port-base', type=int, default=DEFAULT_REST_API_FORWARDED_PORT_BASE,
