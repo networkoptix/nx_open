@@ -16,7 +16,7 @@ IosDeviceInformation iosDeviceInformation()
 
     const auto& infoString = QString::fromLatin1(systemInfo.machine);
 
-    QRegExp infoRegExp(lit("(\\w+)(\\d+),(\\d+)"));
+    QRegExp infoRegExp(lit("([^\\d]+)(\\d+),(\\d+)"));
 
     if (!infoRegExp.exactMatch(infoString))
         return IosDeviceInformation();
