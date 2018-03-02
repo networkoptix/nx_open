@@ -7585,6 +7585,10 @@ to %1</source>
       <translation>Alleen videobestanden met de juiste tijdstempel worden ondersteund.</translation>
     </message>
     <message>
+      <source>Not enough space on server storage</source>
+      <translation>Niet genoeg schijfruimte op de server</translation>
+    </message>
+    <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
       <translation>Kan niet starten met uploaden omdat gebruiker &quot;%1&quot; momenteel beeldmateriaal upload naar deze camera.</translation>
     </message>
@@ -7651,6 +7655,17 @@ to %1</source>
       <source>No new files to upload in selected folder</source>
       <translation>Geen nieuwe bestanden om te uploaden in de geselecteerde map</translation>
     </message>
+    <message numerus="yes">
+      <source>Files size - %2</source>
+      <translation>
+        <numerusform>Bestandsgrootte - %2</numerusform>
+        <numerusform>Bestandsgrootte - %2</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Free space - %2</source>
+      <translation>Vrije ruimte - %2</translation>
+    </message>
     <message>
       <source>%1 - has unsupported format.</source>
       <translation>%1 - heeft een niet-ondersteund formaat.</translation>
@@ -7667,60 +7682,9 @@ to %1</source>
       <source>%1 - covers period for which video is being uploaded.</source>
       <translation>%1 - bevat een periode waarvoor video wordt geüpload.</translation>
     </message>
-    <message numerus="yes">
-      <source>Selected files are too old</source>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation type="unfinished">To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</translation>
-    </message>
-    <message>
-      <source>Upload anyway?</source>
-      <translation type="unfinished">Upload anyway?</translation>
-    </message>
-    <message>
-      <source>Could not finish upload to %1</source>
-      <translation type="unfinished">Could not finish upload to %1</translation>
-    </message>
-    <message>
-      <source>Make sure there is enough space on server storage.</source>
-      <translation type="unfinished">Make sure there is enough space on server storage.</translation>
-    </message>
-    <message>
-      <source>%1 - is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 - is older than allowed in camera archive settings.</translation>
+      <source>%1 - does not fit on server storage.</source>
+      <translation>%1 - past niet op serveropslag.</translation>
     </message>
   </context>
   <context>

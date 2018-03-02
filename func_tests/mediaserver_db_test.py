@@ -20,6 +20,7 @@ import pytest
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str
 
+
 SERVER_CONFIG = dict(
     one=SimpleNamespace(
         DATABASE_FILE_V_2_4='v2.4.1-box1.db',
@@ -53,7 +54,11 @@ def two(server_factory, run_options, db_version):
 def server(name, server_factory, bin_dir, db_version):
     server_config = SERVER_CONFIG[name]
     if db_version == '2.4':
-        config_file_params = dict(guidIsHWID='no', serverGuid=server_config.SERVER_GUID)
+        config_file_params = dict(
+            guidIsHWID='no',
+            serverGuid=server_config.SERVER_GUID,
+            minStorageSpace=1024*1024,  # 1M
+            )
         server = server_factory(name, start=False, config_file_params=config_file_params)
         copy_database_file(server, bin_dir, server_config.DATABASE_FILE_V_2_4)
     else:
