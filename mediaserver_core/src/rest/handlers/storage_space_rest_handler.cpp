@@ -23,6 +23,7 @@
 #include <nx/network/http/http_types.h>
 #include <rest/server/rest_connection_processor.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/log/log.h>
 
 namespace
 {
@@ -180,9 +181,17 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
             auto writableStoragesIfCurrentWasAdded = qnNormalStorageMan->getAllWritableStorages(
                 &additionalStorages);
 
+            bool wouldBeWritableIfAmongstServerStorages =
+                writableStoragesIfCurrentWasAdded.contains(storage);
             data.isWritable = data.isOnline
                 && storage->isWritable()
-                && writableStoragesIfCurrentWasAdded.contains(storage);
+                && wouldBeWritableIfAmongstServerStorages;
+
+            NX_VERBOSE(
+                this,
+                lm("[ApiStorageSpace] Optional storage %1, online: %2, isWritable: %3, wouldBeWritableIfAmongstServerStorages: %4")
+                    .args(storage->getUrl(), data.isOnline, storage->isWritable(),
+                        wouldBeWritableIfAmongstServerStorages));
 
             auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
             if (fileStorage && data.isOnline)

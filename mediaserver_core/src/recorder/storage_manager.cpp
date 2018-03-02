@@ -2191,6 +2191,17 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
             bigStorageThreshold = qMax(bigStorageThreshold, available);
+            NX_VERBOSE(
+                this,
+                lm("[ApiStorageSpace, Writable storages] candidate: %1, available: %2, threshold: %3")
+                    .args(fileStorage->getUrl(), available, bigStorageThreshold));
+        }
+        else
+        {
+            NX_VERBOSE(
+                this,
+                lm("[ApiStorageSpace, Writable storages] candidate: %1 is offline and thus neglected")
+                    .args(fileStorage->getUrl()));
         }
     }
     bigStorageThreshold /= BIG_STORAGE_THRESHOLD_COEFF;
@@ -2203,6 +2214,11 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
             if (available >= bigStorageThreshold)
                 result << fileStorage;
+
+            NX_VERBOSE(
+                this,
+                lm("[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate")
+                    .args(fileStorage->getUrl()));
         }
     }
 
@@ -2225,8 +2241,15 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
 
     if (totalNonSystemStoragesSpace > systemStorageSpace * kSystemStorageTreshold && !systemStorageItVec.empty())
     {
-        for (auto it : systemStorageItVec)
+        for (auto it: systemStorageItVec)
+        {
+            NX_VERBOSE(
+                this,
+                lm("[ApiStorageSpace, Writable storages] Removing system storage %1 out of candidates")
+                    .args((*it)->getUrl()));
+
             result.remove(*it);
+        }
     }
 
     return result;

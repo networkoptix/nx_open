@@ -222,14 +222,19 @@ QIODevice* QnFileStorageResource::open(
                 ffmpegMaxBufferSize,
                 getId()));
     rez->setSystemFlags(systemFlags);
+
     if (rez->open(openMode))
         return rez.release();
 
-    if (const auto rootTool = qnServerModule->rootTool())
+    const auto rootTool = qnServerModule->rootTool();
+    if (rootTool)
     {
         if (rootTool->touchFile(fileName) && rez->open(openMode))
             return rez.release();
     }
+
+    NX_ERROR(this, lm("[open] failed to open file %1 root_tool is present: %2")
+        .args(fileName, (bool) rootTool));
 
     return nullptr;
 }
@@ -776,7 +781,24 @@ QnFileStorageResource::~QnFileStorageResource()
     if (!m_localPath.isEmpty())
     {
 #if __linux__
-        umount(m_localPath.toLatin1().constData());
+        const auto rootTool = qnServerModule->rootTool();
+        if (rootTool)
+        {
+            bool result = rootTool->unmount(m_localPath);
+            NX_VERBOSE(
+                this,
+                lm("[mount] unmounting folder %1 while destructing object result: %2")
+                    .args(m_localPath, result));
+        }
+        else
+        {
+            int result = umount(m_localPath.toLatin1().constData());
+            NX_VERBOSE(
+                this,
+                lm("[mount] unmounting folder %1 while destructing object result: %2")
+                    .args(m_localPath, result));
+        }
+
 #elif __APPLE__
         unmount(m_localPath.toLatin1().constData(), 0);
 #endif
@@ -925,9 +947,25 @@ bool QnFileStorageResource::testWriteCapInternal() const
         return true;
 
     if (const auto rootTool = qnServerModule->rootTool())
-        return rootTool->touchFile(fileName) && QFile::remove(fileName);
+    {
+        bool result = rootTool->touchFile(fileName);
+        NX_VERBOSE(
+           this,
+           lm("[initOrUpdate, WriteTest] root_tool touch file %1 result %2").args(fileName, result));
 
-    return false;
+        if (!result)
+            return false;
+
+        result = QFile::remove(fileName);
+        NX_VERBOSE(
+           this,
+           lm("[initOrUpdate, WriteTest] Remove file %1 result %2").args(fileName, result));
+
+        if (!result)
+            return false;
+    }
+
+    return true;
 }
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
@@ -964,13 +1002,15 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
     // remount attempt in initOrUpdate()
     if (!m_writeCapCached.get())
     {
-        NX_LOG("[initOrUpdate] write test file failed", cl_logDEBUG2);
+        NX_ERROR(this, lm("[initOrUpdate, WriteTest] write test failed for %1").args(getUrl()));
         m_valid = false;
         return Qn::StorageInit_WrongPath;
     }
     QString localPath = getLocalPathSafe();
     m_cachedTotalSpace = getDiskTotalSpace(localPath.isEmpty() ? getPath() : localPath); // update cached value periodically
-    NX_LOG("QnFileStorageResource::initOrUpdate completed", cl_logDEBUG2);
+    NX_VERBOSE(
+        this,
+        lm("QnFileStorageResource::initOrUpdate successfully completed for %1").args(getUrl()));
 
     return Qn::StorageInit_Ok;
 }
