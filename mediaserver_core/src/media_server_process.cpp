@@ -739,6 +739,10 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         QnStorageResourceList smallStorages = getSmallStorages(m_mediaServer->getStorages());
         QnStorageResourceList storagesToRemove;
+        // We won't remove automatically storages which might have been unmounted because of their
+        // small size. This small size might be the result of the unmounting itself (just the size
+        // of the local drive where mount folder is located). User will be able to remove such
+        // storages by themselves.
         for (const auto& smallStorage: smallStorages)
         {
             bool isSmallStorageAmongstUnmounted = false;

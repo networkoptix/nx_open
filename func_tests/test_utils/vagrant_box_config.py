@@ -13,6 +13,7 @@ DEFAULT_NATNET1 = '10.10.0/24'
 DEFAULT_PRIVATE_NET = '10.10.1/24'
 MEDIASERVER_LISTEN_PORT = 7001
 BOX_PROVISION_MEDIASERVER = 'box-provision-mediaserver.sh'
+BOX_PROVISION_MOUNT_IMAGE = 'create_mount_image.sh'
 SSH_PORT_OFFSET=2220
 
 
@@ -91,8 +92,11 @@ class BoxConfigFactory(object):
                 BOX_PROVISION_MEDIASERVER,
                 args=[mediaserver_dist_fname],
                 env=dict(COMPANY_NAME=quote(self._customization_company_name)))]
-            required_file_list += [self._mediaserver_dist_path,
-                                   '{test_dir}/test_utils/' + BOX_PROVISION_MEDIASERVER]
+            required_file_list += [
+                self._mediaserver_dist_path,
+                '{test_dir}/test_utils/' + BOX_PROVISION_MEDIASERVER,
+                '{test_dir}/test_utils/' + BOX_PROVISION_MOUNT_IMAGE,
+                ]
         for script in provision_scripts or []:
             vm_commands += [make_vm_provision_command(script)]
             required_file_list.append('{test_dir}/' + script)
