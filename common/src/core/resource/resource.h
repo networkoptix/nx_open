@@ -32,7 +32,7 @@ class QnInitResPool: public QThreadPool
 public:
 };
 
-class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource>
+class QnResource: public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
     Q_FLAGS(Qn::ResourceFlags)

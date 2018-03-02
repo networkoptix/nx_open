@@ -19,7 +19,7 @@ class CameraMediaStreams;
 class CameraBitrates;
 class CameraBitrateInfo;
 
-class QN_EXPORT QnVirtualCameraResource : public QnSecurityCamResource
+class QnVirtualCameraResource : public QnSecurityCamResource
 {
     Q_OBJECT
     Q_FLAGS(Qn::CameraCapabilities)

@@ -1,4 +1,4 @@
-if(enableHanwha OR developerBuild OR customization STREQUAL "hanwha")
+if(enable_hanwha)
     add_subdirectory(hanwha_metadata_plugin)
 endif()
 
