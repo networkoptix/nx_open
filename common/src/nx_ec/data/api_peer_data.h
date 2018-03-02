@@ -153,13 +153,17 @@ typedef QSet<QnUuid> QnPeerSet;
 struct ApiPeerDataEx: public ApiPeerData
 {
     ApiPeerDataEx(): ApiPeerData() {}
-    ApiPeerDataEx(const ApiPeerData& data) : ApiPeerData(data) {}
 
     QnUuid systemId;
     QString cloudHost = nx::network::AppInfo::defaultCloudHost();
     qint64 identityTime = 0;
     int aliveUpdateIntervalMs = 0;
     int protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
+
+    void assign(const ApiPeerData& data)
+    {
+        ((ApiPeerData&)*this) = data;
+    }
 };
 
 #define ApiPeerDataEx_Fields ApiPeerData_Fields (systemId)(cloudHost)(identityTime)(aliveUpdateIntervalMs)(protoVersion)

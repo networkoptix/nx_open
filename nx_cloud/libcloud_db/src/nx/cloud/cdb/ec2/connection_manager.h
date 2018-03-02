@@ -56,6 +56,14 @@ class TransactionLog;
 class TransactionTransport;
 class TransactionTransportHeader;
 
+struct SystemStatusDescriptor
+{
+    api::SystemHealth health;
+    int protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
+
+    SystemStatusDescriptor() = default;
+};
+
 /**
  * Manages ec2 transaction connections from mediaservers.
  */
@@ -63,7 +71,7 @@ class ConnectionManager
 {
 public:
     using SystemStatusChangedSubscription =
-        nx::utils::Subscription<std::string /*systemId*/, api::SystemHealth>;
+        nx::utils::Subscription<std::string /*systemId*/, SystemStatusDescriptor>;
 
     ConnectionManager(
         const QnUuid& moduleGuid,
@@ -170,7 +178,9 @@ private:
     nx::utils::SubscriptionId m_onNewTransactionSubscriptionId;
     SystemStatusChangedSubscription m_systemStatusChangedSubscription;
 
-    bool addNewConnection(ConnectionContext connectionContext);
+    bool addNewConnection(
+        ConnectionContext connectionContext,
+        const ::ec2::ApiPeerDataEx& remotePeerInfo);
 
     bool isOneMoreConnectionFromSystemAllowed(
         const QnMutexLockerBase& lk,

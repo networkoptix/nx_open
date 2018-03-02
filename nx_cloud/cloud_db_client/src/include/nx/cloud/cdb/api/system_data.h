@@ -232,6 +232,11 @@ public:
     std::string anotherSystemId;
 };
 
+enum class SystemCapabilityFlag
+{
+    cloudMerge,
+};
+
 class SystemDataEx:
     public SystemData
 {
@@ -252,6 +257,7 @@ public:
      */
     std::chrono::system_clock::time_point lastLoginTime;
     boost::optional<SystemMergeInfo> mergeInfo;
+    std::vector<SystemCapabilityFlag> capabilities;
 
     SystemDataEx():
         accessRole(SystemAccessRole::none),
