@@ -27,7 +27,8 @@ RUN dpkg-divert --local --rename --add /sbin/initctl \
         && rm -rf /var/lib/apt/lists/* \
         && python2 get-pip.py \
         && python3.6 get-pip.py \
-        && rm /get-pip.py
+        && rm /get-pip.py \
+        && pip2 install pyOpenSSL==17.5.0
 
 COPY docker/config_helper.py /usr/local/bin/
 
