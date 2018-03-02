@@ -344,7 +344,8 @@ class RemoteSshHost(Host):
         ssh_cmd = self._make_ssh_cmd() + [self._user_and_host]
         if cwd:
             args = [subprocess.list2cmdline(['cd', cwd, '&&'] + args)]
-        return self._local_host.run_command(ssh_cmd + args, input, check_retcode=check_retcode, log_output=log_output, timeout=timeout)
+        quoted_args = subprocess.list2cmdline(args)
+        return self._local_host.run_command(ssh_cmd + [quoted_args], input, check_retcode=check_retcode, log_output=log_output, timeout=timeout)
 
     def file_exists(self, path):
         output = self.run_command(['[', '-f', path, ']', '&&', 'echo', 'yes', '||', 'echo', 'no']).strip()
