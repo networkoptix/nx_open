@@ -90,7 +90,7 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const system
 
 #define SystemDataEx_Fields SystemData_Fields \
     (ownerFullName)(accessRole)(sharingPermissions)(stateOfHealth) \
-    (usageFrequency)(lastLoginTime)(mergeInfo)
+    (usageFrequency)(lastLoginTime)(mergeInfo)(capabilities)
 #define SystemDataExList_Fields (systems)
 
 
@@ -121,6 +121,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemHealth)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemAccessRole)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::FilterField)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::MergeRole)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemCapabilityFlag)
 
 } // namespace api
 } // namespace cdb
@@ -131,3 +132,4 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemHealth), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemAccessRole), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::FilterField), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::MergeRole), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemCapabilityFlag), (lexical))

@@ -330,3 +330,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, MergeRole,
     (nx::cdb::api::MergeRole::master, "master")
     (nx::cdb::api::MergeRole::slave, "slave")
 )
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemCapabilityFlag,
+    (nx::cdb::api::SystemCapabilityFlag::cloudMerge, "cloudMerge")
+)
