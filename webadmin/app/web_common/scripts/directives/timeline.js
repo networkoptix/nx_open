@@ -5,15 +5,14 @@ angular.module('nxCommon')
         return {
             restrict: 'E',
             scope: {
-                cameraStatus: '<',
-                canViewArchive: '<',
+                canViewArchive: "=",
                 recordsProvider: '=',
                 positionProvider: '=',
                 playHandler: '=',
-                canPlayLive: '<',
+                canPlayLive: '=',
                 ngClick: '&',
                 positionHandler: '=',
-                volumeLevel: '<'
+                volumeLevel: '='
             },
             templateUrl: Config.viewsDirCommon + 'components/timeline.html',
             link: function (scope, element/*, attrs*/) {
@@ -531,7 +530,7 @@ angular.module('nxCommon')
                 }
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     scope.emptyArchive = true;
-                    if(scope.cameraStatus !== 'Offline' &&  scope.recordsProvider) {
+                    if(scope.recordsProvider) {
                         scope.loading = true;
                         initRecordsProvider();
                         timelineRender.setRecordsProvider(scope.recordsProvider);
