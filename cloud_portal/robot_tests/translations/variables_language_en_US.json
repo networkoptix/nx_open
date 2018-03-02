@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT"             :    "You have no Systems connected to {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT"                  :    "Log Out",
+    "ACCOUNT SETTINGS BUTTON TEXT"         :    "Account Settings",
     "RESET EMAIL SENT MESAGE TEXT"         :    "Password reset instructions are sent to Email",
     "CREATE ACCOUNT BUTTON TEXT"           :    "Create Account",
     "TERMS AND CONDITIONS LINK TEXT"       :    "Terms and Conditions",
@@ -34,6 +35,9 @@
     "SHARE PERMISSIONS HINT LIVE VIEWER"   :    "Can only view live video",
     "SHARE PERMISSIONS HINT CUSTOM"        :    "Use the {{PRODUCT_NAME}} Client application to set up custom permissions",
 
+    "ACCOUNT TEXT"                         :    "Account",
+
+    "EDIT USER BUTTON TEXT"                :    "Edit",
     "DELETE USER BUTTON TEXT"              :    "Delete",
     "DELETE USER CANCEL BUTTON TEXT"       :    "Cancel",
 
