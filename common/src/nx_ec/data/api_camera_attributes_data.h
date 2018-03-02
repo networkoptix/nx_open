@@ -101,6 +101,7 @@ struct ApiCameraAttributesData: ApiData
     QnUuid preferredServerId;
     Qn::FailoverPriority failoverPriority;
     Qn::CameraBackupQualities backupType;
+    QString logicalId;
 };
 #define ApiCameraAttributesData_Fields_Short \
     (userDefinedGroupName) \
@@ -117,7 +118,8 @@ struct ApiCameraAttributesData: ApiData
     (maxArchiveDays) \
     (preferredServerId) \
     (failoverPriority) \
-    (backupType)
+    (backupType) \
+    (logicalId)
 #define ApiCameraAttributesData_Fields (cameraId)(cameraName) ApiCameraAttributesData_Fields_Short
 
 } // namespace ec2

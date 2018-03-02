@@ -912,6 +912,19 @@ void QnSecurityCamResource::setVendor(const QString& value)
     SAFE(m_vendor = value)
 }
 
+QString QnSecurityCamResource::getLogicalId() const
+{
+    QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
+    return (*userAttributesLock)->logicalId;
+}
+
+void QnSecurityCamResource::setLogicalId(const QString& value)
+{
+    NX_ASSERT(!getId().isNull());
+    QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
+    (*userAttributesLock)->logicalId = value;
+}
+
 void QnSecurityCamResource::setMaxDays(int value)
 {
     NX_ASSERT(!getId().isNull());

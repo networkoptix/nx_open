@@ -210,6 +210,9 @@ public:
     QString getVendor() const;
     void setVendor(const QString &value);
 
+    QString getLogicalId() const;
+    void setLogicalId(const QString &value);
+
     bool isGroupPlayOnly() const;
 
     bool needsToChangeDefaultPassword() const;

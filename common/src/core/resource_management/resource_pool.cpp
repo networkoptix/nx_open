@@ -276,6 +276,15 @@ QnSecurityCamResourceList QnResourcePool::getResourcesBySharedId(const QString& 
         });
 }
 
+QnSecurityCamResourceList QnResourcePool::getResourcesByLogicalId(const QString& logicalId) const
+{
+    return getResources<QnSecurityCamResource>(
+        [&logicalId](const QnSecurityCamResourcePtr& camera)
+    {
+        return camera->getLogicalId() == logicalId;
+    });
+}
+
 QnResourcePtr QnResourcePool::getResourceByUrl(const QString& url) const
 {
     return getResource([&url](const QnResourcePtr& resource){return resource->getUrl() == url; });

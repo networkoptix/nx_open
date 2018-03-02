@@ -121,7 +121,8 @@ public:
     QnResourcePool *resourcePool() const;
     virtual void setResourcePool(QnResourcePool *resourcePool);
 
-    virtual QString toSearchString() const;
+    QString toSearchString() const;
+    virtual QStringList searchFilters() const;
 
 
     template<class Resource>

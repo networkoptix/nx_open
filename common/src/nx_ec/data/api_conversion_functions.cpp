@@ -228,16 +228,16 @@ void fromResourceToApi(const QnScheduleTask& src, ApiScheduleTaskData& dst)
 void fromApiToResource(const ApiScheduleTaskData& src, QnScheduleTask& dst, const QnUuid& resourceId)
 {
     dst = QnScheduleTask(
-        resourceId, 
-        src.dayOfWeek, 
-        src.startTime, 
-        src.endTime, 
+        resourceId,
+        src.dayOfWeek,
+        src.startTime,
+        src.endTime,
         src.recordingType,
-        src.beforeThreshold, 
-        src.afterThreshold, 
-        src.streamQuality, 
-        src.fps, 
-        src.recordAudio, 
+        src.beforeThreshold,
+        src.afterThreshold,
+        src.streamQuality,
+        src.fps,
+        src.recordAudio,
         src.bitrateKbps);
 }
 
@@ -273,6 +273,7 @@ void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAtt
     dst->preferredServerId = src.preferredServerId;
     dst->failoverPriority = src.failoverPriority;
     dst->backupQualities = src.backupType;
+    dst->logicalId = src.logicalId;
 }
 
 void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst)
@@ -303,6 +304,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.preferredServerId = src->preferredServerId;
     dst.failoverPriority = src->failoverPriority;
     dst.backupType = src->backupQualities;
+    dst.logicalId = src->logicalId;
 }
 
 void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserAttributesList& dst)

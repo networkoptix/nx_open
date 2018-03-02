@@ -45,6 +45,7 @@
 #include <media_server/media_server_module.h>
 #include <rest/server/json_rest_result.h>
 #include <nx/fusion/serialization_format.h>
+#include <api/helpers/camera_id_helper.h>
 
 //TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
@@ -284,16 +285,8 @@ namespace nx_hls
 
         // Searching for requested resource.
         const QString& resId = shortFileName.toString();
-        QnResourcePtr resource;
-        const QnUuid uuid = QnUuid::fromStringSafe(resId);
-        if (!uuid.isNull())
-            resource = resourcePool()->getResourceById(uuid);
-        if (!resource)
-            resource = resourcePool()->getResourceByUniqueId(resId);
-        if (!resource)
-            resource = resourcePool()->getResourceByMacAddress(resId);
-        if (!resource)
-            resource = resourcePool()->getResourceByUrl(resId);
+        QnResourcePtr resource = nx::camera_id_helper::findCameraByFlexibleId(
+            commonModule()->resourcePool(), resId);
         if (!resource)
         {
             NX_LOG(lit("HLS. Requested resource %1 not found").arg(resId), cl_logDEBUG1);

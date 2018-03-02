@@ -59,6 +59,7 @@ extern "C"
 #include <nx/fusion/serialization/lexical_enum.h>
 #include <media_server/media_server_module.h>
 #include <plugins/resource/avi/thumbnails_archive_delegate.h>
+#include <api/helpers/camera_id_helper.h>
 
 class QnTcpListener;
 
@@ -316,19 +317,8 @@ void QnRtspConnectionProcessor::parseRequest()
         if (resId.startsWith('/'))
             resId = resId.mid(1);
 
-        QnResourcePtr resource;
-        const QnUuid uuid = QnUuid::fromStringSafe(resId);
-        if (!uuid.isNull())
-            resource = resourcePool()->getResourceById(uuid);
-        if (!resource)
-            resource = resourcePool()->getResourceByUniqueId(resId);
-        if (!resource)
-            resource = resourcePool()->getResourceByMacAddress(resId);
-        if (!resource)
-            resource = resourcePool()->getResourceByUrl(resId);
-        if (!resource)
-            return;
-
+        QnResourcePtr resource = nx::camera_id_helper::findCameraByFlexibleId(
+            commonModule()->resourcePool(), resId);
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
     }
 
