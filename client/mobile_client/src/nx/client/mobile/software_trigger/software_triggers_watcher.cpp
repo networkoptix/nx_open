@@ -10,6 +10,7 @@
 #include <client_core/client_core_module.h>
 #include <watchers/user_watcher.h>
 #include <utils/common/synctime.h>
+#include <nx/vms/event/strings_helper.h>
 
 namespace {
 
@@ -65,7 +66,7 @@ SoftwareTriggersWatcher::DescriptionPtr SoftwareTriggersWatcher::Description::cr
     const nx::vms::event::RulePtr& rule)
 {
     const auto params = rule->eventParams();
-    const auto name = params.caption;
+    const auto name = vms::event::StringsHelper::getSoftwareTriggerName(params.caption);
     const bool prolonged = rule->isActionProlonged();
     return DescriptionPtr(new Description({extractIconPath(rule), name, prolonged, true}));
 }
@@ -187,7 +188,6 @@ void SoftwareTriggersWatcher::updateTriggerData(const QnUuid& id, bool emiSignal
     const auto it = m_data.find(id);
     if (it == m_data.end())
         return;
-    ///return vms::event::StringsHelper::getSoftwareTriggerName(softwareButton->data.name);
 
     const auto& currentData = it.value();
     const auto newData = Description::create(eventRuleManager->rule(id));

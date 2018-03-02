@@ -4,7 +4,6 @@
 #include <nx/client/mobile/software_trigger/software_triggers_watcher.h>
 #include <nx/client/core/two_way_audio/two_way_audio_availability_watcher.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/event/strings_helper.h>
 
 namespace {
 
