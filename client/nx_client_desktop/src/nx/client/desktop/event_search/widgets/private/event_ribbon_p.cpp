@@ -660,11 +660,13 @@ void EventRibbon::Private::doUpdateView()
     const int base = m_scrollBar->isHidden() ? 0 : m_scrollBar->value();
     const int height = m_viewport->height();
 
-    const auto first = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), base,
-        [this](int left, EventTile* right) { return left < m_positions.value(right); }) - 1;
+    const auto secondInView = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), base,
+        [this](int left, EventTile* right) { return left < m_positions.value(right); });
 
-    auto iter = first;
-    int currentPosition = m_positions.value(*first);
+    NX_ASSERT(secondInView != m_tiles.begin());
+    auto iter = secondInView - 1;
+
+    int currentPosition = m_positions.value(*iter);
     const auto positionLimit = base + height;
 
     QSet<EventTile*> newVisible;
