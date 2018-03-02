@@ -90,11 +90,7 @@ static CheckOwnerResult checkCurrentOwner(Argument url)
     return CheckOwnerResult::other;
 }
 
-int mount(
-    Argument url,
-    Argument directory,
-    OptionalArgument optUsername,
-    OptionalArgument optPassword)
+int mount(Argument url, Argument directory, OptionalArgument username, OptionalArgument password)
 {
     checkMountPermissions(directory);
     if (url.find("//") != 0)
@@ -111,12 +107,12 @@ int mount(
             return command.str();
         };
 
-    std::string password = optPassword ? *optPassword : "";
-    std::string username = optUsername ? *optUsername : "guest";
+    std::string passwordString = password ? *password : "";
+    std::string usernameString = username ? *username : "guest";
 
-    for (const auto& candidate: std::array<std::string, 2>{username, "WORKGROUP\\" + username})
+    for (const auto& candidate: {usernameString, "WORKGROUP\\" + usernameString})
     {
-        if (execute(makeCommandString(candidate, password)) == 0)
+        if (execute(makeCommandString(candidate, passwordString)) == 0)
             return 0;
     }
 
