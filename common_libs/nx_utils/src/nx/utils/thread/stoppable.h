@@ -10,7 +10,7 @@
 #include <vector>
 
 /** Abstract class providing interface to stop doing anything without object destruction */
-class QN_EXPORT QnStoppable
+class QnStoppable
 {
 public:
     virtual ~QnStoppable() = default;

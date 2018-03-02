@@ -15,7 +15,7 @@ class QnCryptographicHashPrivate;
  * Just like <tt>QCryptographicHash</tt>, but works MUCH faster.
  * Uses OpenSSL internally.
  */
-class QN_EXPORT QnCryptographicHash {
+class QnCryptographicHash {
 public:
     enum Algorithm {
         Md4 = QCryptographicHash::Md4,

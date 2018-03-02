@@ -7,7 +7,7 @@
 
 #include <nx/streaming/abstract_data_consumer.h>
 
-class QN_EXPORT QnResourceCommandProcessor : public QnAbstractDataConsumer
+class QnResourceCommandProcessor : public QnAbstractDataConsumer
 {
     Q_OBJECT
 

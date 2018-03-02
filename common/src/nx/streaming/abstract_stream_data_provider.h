@@ -29,7 +29,7 @@ public:
     virtual void notInUse(void* user) = 0;
 };
 
-class QN_EXPORT QnAbstractStreamDataProvider : public QnLongRunnable, public QnResourceConsumer
+class QnAbstractStreamDataProvider : public QnLongRunnable, public QnResourceConsumer
 {
     Q_OBJECT
 public:

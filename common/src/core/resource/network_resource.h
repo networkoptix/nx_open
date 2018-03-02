@@ -10,7 +10,7 @@
 class QnTimePeriodList;
 class QnCommonModule;
 
-class QN_EXPORT QnNetworkResource : public QnResource
+class QnNetworkResource : public QnResource
 {
     Q_OBJECT
     //Q_PROPERTY(QHostAddress hostAddress READ getHostAddress WRITE setHostAddress)

@@ -16,7 +16,7 @@ class QByteArray;
 /**
  * Container class for aligned memory chunks.
  */
-class QN_EXPORT QnByteArray {
+class QnByteArray {
 public:
     /**
      * Constructor.

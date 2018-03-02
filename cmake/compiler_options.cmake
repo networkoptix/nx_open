@@ -37,10 +37,6 @@ if(WINDOWS)
     )
 endif()
 
-if(UNIX)
-    add_definitions(-DQN_EXPORT=)
-endif()
-
 if(ANDROID OR IOS)
     remove_definitions(
         -DENABLE_SENDMAIL
@@ -82,9 +78,6 @@ if(WINDOWS)
     add_definitions(
         -DNOMINMAX=
         -DUNICODE)
-    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
-        $<$<STREQUAL:$<TARGET_PROPERTY:TYPE>,STATIC_LIBRARY>:QN_EXPORT=>
-        $<$<NOT:$<STREQUAL:$<TARGET_PROPERTY:TYPE>,STATIC_LIBRARY>>:QN_EXPORT=Q_DECL_EXPORT>)
 
     add_compile_options(
         /MP

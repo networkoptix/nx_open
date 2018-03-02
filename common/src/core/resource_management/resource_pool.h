@@ -26,7 +26,7 @@
  * Resource pool can also give a list of resources based on some criteria and helps to administrate
  * resources.
  */
-class QN_EXPORT QnResourcePool: public Connective<QObject>, public QnCommonModuleAware
+class QnResourcePool: public Connective<QObject>, public QnCommonModuleAware
 {
 Q_OBJECT
     using base_type = Connective<QObject>;
