@@ -101,6 +101,7 @@ def pytest_addoption(parser):
                          Configuration parameters for a test, format: 
                          --test-parameter=test.param1=value1,test.param2=value2
                          ''').strip())
+    parser.addoption('--clean', '--reinstall', action='store_true')
 
 
 @pytest.fixture(scope='session')
@@ -145,6 +146,12 @@ def run_options(request):
         tests_config=tests_config,
         common_ssh_config=common_ssh_config,
         )
+
+
+@pytest.fixture(scope='session', autouse=True)
+def clean(request, session_vm_factory):
+    if request.config.getoption('clean'):
+        session_vm_factory.destroy_all()
 
 
 @pytest.fixture(scope='session')
@@ -240,7 +247,7 @@ def cloud_host(run_options):
 
 
 @pytest.fixture(scope='session')
-def session_vm_factory(request, run_options, customization_company_name):
+def session_vm_factory(request, run_options, init_logging, customization_company_name):
     """Create factory once per session, don't release VMs"""
     config_factory = VagrantVMConfigFactory(customization_company_name)
     factory = VagrantVMFactory(

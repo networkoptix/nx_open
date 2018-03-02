@@ -119,6 +119,7 @@ class VagrantVMFactory(object):
         self._vms.clear()
         self._save_vms_config_to_cache()
         self._last_vm_idx = 0
+        self._write_vagrantfile([b.config for b in self._vms.values()])
 
     def release_all_vms(self):
         log.debug('Releasing all VMs: %s', ', '.join(vm.vagrant_name for vm in self._vms.values() if vm.is_allocated))
