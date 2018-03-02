@@ -137,8 +137,9 @@ rename button opens dialog; cancel closes without rename; save renames system
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}
     Click Button    ${RENAME CANCEL}
-    Wait Until Element Is Not Visible    //div[@modal-render='true']
+    Wait Until Page Does Not Contain Element    //div[@modal-render='true']
     Verify In System    Auto Tests
+    Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${OPEN IN NX BUTTON}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
     Clear Element Text    ${RENAME INPUT}
@@ -146,6 +147,7 @@ rename button opens dialog; cancel closes without rename; save renames system
     Click Button    ${RENAME SAVE}
     Check For Alert    ${SYSTEM NAME SAVED}
     Verify In System    Auto Tests Rename
+    Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${OPEN IN NX BUTTON}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
     Clear Element Text    ${RENAME INPUT}
