@@ -31,7 +31,7 @@ bool MultipartContentParser::processData( const QnByteArrayConstRef& data )
                     &lineBuffer,
                     &bytesRead );
                 offset += bytesRead;
-                if (!lineFound && 
+                if (!lineFound &&
                     m_lineSplitter.partialLineBuffer() == m_endBoundaryLine)
                 {
                     m_lineSplitter.reset();
@@ -137,10 +137,11 @@ bool MultipartContentParser::setContentType( const StringType& contentType )
     if( nx_http::ConstBufferRefType(contentType, 0, sizeof(multipartContentType)-1) != multipartContentType )
         return false;   //unexpected content type
 
+    // Searching first non-space.
     const nx_http::StringType::value_type* boundaryStart = std::find_if(
         sepPos+1,
         contentType.constData()+contentType.size(),
-        std::not1( std::bind1st( std::equal_to<nx_http::StringType::value_type>(), ' ' ) ) );   //searching first non-space
+        [](const auto& val) { return val != ' ';  });
     if( boundaryStart == contentType.constData()+contentType.size() )
     {
         //failed to read boundary marker

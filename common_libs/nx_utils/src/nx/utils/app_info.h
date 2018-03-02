@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QString>
+
 namespace nx {
 namespace utils {
 
@@ -57,7 +59,7 @@ public:
     {
         return isWindows() && !isWin64();
     }
-    
+
 };
 
 } // namespace nx

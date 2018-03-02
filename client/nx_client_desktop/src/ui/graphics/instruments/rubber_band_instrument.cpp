@@ -14,13 +14,16 @@
 #include <utils/math/color_transformations.h>
 
 namespace {
-    struct ItemIsMouseInteractive: public std::unary_function<QGraphicsItem *, bool> {
-        bool operator()(QGraphicsItem *item) const {
-            return item->acceptedMouseButtons() & Qt::LeftButton;
-        }
-    };
 
-} // anonymous namespace
+struct ItemIsMouseInteractive
+{
+    bool operator()(QGraphicsItem *item) const
+    {
+        return item->acceptedMouseButtons() & Qt::LeftButton;
+    }
+};
+
+} // namespace
 
 /**
  * Item that implements a rubber band. The downside of implementing rubber band

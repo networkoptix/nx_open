@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QString>
+
 struct QnApplauncherAppInfo
 {
     static QString applicationName();

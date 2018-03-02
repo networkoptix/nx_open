@@ -16,6 +16,7 @@
 #include <nx/network/system_socket.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/scope_guard.h>
 
@@ -464,7 +465,7 @@ protected:
     }
 
 private:
-    boost::optional<CrossNatConnectorFactory::Function> m_oldFactoryFunc;
+    std::optional<CrossNatConnectorFactory::Function> m_oldFactoryFunc;
     AddressEntry m_addressEntry;
     std::chrono::milliseconds m_connectTimeout;
 

@@ -10,7 +10,7 @@ from vms_configuration import *
 def determine_package_versions():
     v = {
         "qt": "5.6.2",
-        "boost": "1.60.0",
+        "boost": "1.66.0",
         "openssl": "1.0.2e",
         "ffmpeg": "3.1.1",
         "quazip": "0.7.1",
