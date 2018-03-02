@@ -3,7 +3,6 @@
 #include <chrono>
 
 #include <QtGui/QPalette>
-#include <QtGui/QDesktopServices>
 #include <QtWidgets/QMenu>
 
 #include <analytics/common/object_detection_metadata.h>
@@ -25,6 +24,7 @@
 #include <utils/common/synctime.h>
 
 #include <nx/client/core/utils/human_readable.h>
+#include <nx/client/desktop/common/widgets/web_view_dialog.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/event/analytics_helper.h>
@@ -725,8 +725,7 @@ void AnalyticsSearchListModel::Private::executePluginAction(
 
             if (!reply.actionUrl.isEmpty())
             {
-                // TODO: #vkutin Open this on layout instead, if required.
-                QDesktopServices::openUrl(reply.actionUrl);
+                WebViewDialog::showUrl(reply.actionUrl);
             }
         };
 
