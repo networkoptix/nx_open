@@ -14,6 +14,8 @@ export DEBIAN_FRONTEND=noninteractive
 echo "kernel.core_pattern=core.%t.%p" > /etc/sysctl.d/60-core-pattern.conf
 service procps start
 
+. /vagrant/create_mount_image.sh
+
 # gdb is required to create tracebacks for core dumps
 # others are required for mediaserver itself
 echo "Install mediaserver dependencies..."
